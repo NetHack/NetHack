@@ -187,10 +187,11 @@ struct instance_flags {
     int override_ID;       /* true to force full identification of objects */
     int suppress_price;    /* controls doname() for unpaid objects */
     int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
-#define TER_MAP 0x01
-#define TER_TRP 0x02
-#define TER_OBJ 0x04
-#define TER_MON 0x08
+#define TER_MAP    0x01
+#define TER_TRP    0x02
+#define TER_OBJ    0x04
+#define TER_MON    0x08
+#define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
@@ -347,6 +348,7 @@ struct instance_flags {
     /* copies of values in struct u, used during detection when the
        originals are temporarily cleared; kept here rather than
        locally so that they can be restored during a hangup save */
+    Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
 };
@@ -434,7 +436,7 @@ struct cmd {
     boolean num_pad;       /* same as iflags.num_pad except during updates */
     boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
-    boolean swap_yz;       /* German keyboards; use z to move NW, y to zap */
+    boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
     char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */

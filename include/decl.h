@@ -185,8 +185,6 @@ E NEARDATA struct kinfo {
 } killer;
 
 E long done_money;
-E const char *configfile;
-E char lastconfigfile[BUFSZ]; /* used for messaging */
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];

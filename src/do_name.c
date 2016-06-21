@@ -8,6 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
+STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
 STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
@@ -63,8 +64,15 @@ const char *goal;
         putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
         putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
+        /* both of these are primarily useful when choosing a travel
+           destination for the '_' command */
+        putstr(tmpwin, 0,
+               "Use d or D to move the cursor to next door or doorway.");
+        putstr(tmpwin, 0,
+               "Use x or X to move the cursor to unexplored location.");
+    }
     if (!iflags.terrainmode) {
-        putstr(tmpwin, 0, "Use d or D to move the cursor to next door or doorway.");
         if (getpos_hilitefunc)
             putstr(tmpwin, 0, "Use $ to display valid locations.");
         putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -121,28 +129,63 @@ const void *b;
     return dist_1 - dist_2;
 }
 
-#define GLOC_MONS 0
-#define GLOC_OBJS 1
-#define GLOC_DOOR 2
+enum gloctypes {
+    GLOC_MONS = 0,
+    GLOC_OBJS,
+    GLOC_DOOR,
+    GLOC_EXPLORE,
 
-boolean
-gather_locs_glyphmatch(glyph, gloc)
-int glyph, gloc;
+    NUM_GLOCS
+};
+
+
+#define IS_UNEXPLORED_LOC(x,y) \
+    (isok((x), (y))                                     \
+     && glyph_is_cmap(levl[(x)][(y)].glyph)             \
+     && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
+     && !levl[(x)][(y)].seenv)
+
+STATIC_OVL boolean
+gather_locs_interesting(x,y, gloc)
+int x,y, gloc;
 {
+    /* TODO: if glyph is a pile glyph, convert to ordinary one
+     *       in order to keep tail/boulder/rock check simple.
+     */
+    int glyph = glyph_at(x, y);
+
     switch (gloc) {
     default:
-    case GLOC_MONS: return (glyph_is_monster(glyph)
-                            && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
-    case GLOC_OBJS: return (glyph_is_object(glyph)
-                            && glyph != objnum_to_glyph(BOULDER)
-                            && glyph != objnum_to_glyph(ROCK));
-    case GLOC_DOOR: return (glyph_is_cmap(glyph)
-                            && ((glyph_to_cmap(glyph) == S_hcdoor)
-                                || (glyph_to_cmap(glyph) == S_vcdoor)
-                                || (glyph_to_cmap(glyph) == S_hodoor)
-                                || (glyph_to_cmap(glyph) == S_vodoor)
-                                || (glyph_to_cmap(glyph) == S_ndoor)));
+    case GLOC_MONS:
+        /* unlike '/M', this skips monsters revealed by
+           warning glyphs and remembered unseen ones */
+        return (glyph_is_monster(glyph)
+                && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+    case GLOC_OBJS:
+        return (glyph_is_object(glyph)
+                && glyph != objnum_to_glyph(BOULDER)
+                && glyph != objnum_to_glyph(ROCK));
+    case GLOC_DOOR:
+        return (glyph_is_cmap(glyph)
+                && (is_cmap_door(glyph_to_cmap(glyph))
+                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
+                    || glyph_to_cmap(glyph) == S_ndoor));
+    case GLOC_EXPLORE:
+        return (glyph_is_cmap(glyph)
+                && (is_cmap_door(glyph_to_cmap(glyph))
+                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
+                    || glyph_to_cmap(glyph) == S_ndoor
+                    || glyph_to_cmap(glyph) == S_room
+                    || glyph_to_cmap(glyph) == S_darkroom
+                    || glyph_to_cmap(glyph) == S_corr
+                    || glyph_to_cmap(glyph) == S_litcorr)
+                && (IS_UNEXPLORED_LOC(x + 1, y)
+                    || IS_UNEXPLORED_LOC(x - 1, y)
+                    || IS_UNEXPLORED_LOC(x, y + 1)
+                    || IS_UNEXPLORED_LOC(x, y - 1)));
     }
+    /*NOTREACHED*/
+    return FALSE;
 }
 
 /* gather locations for monsters or objects shown on the map */
@@ -152,7 +195,7 @@ coord **arr_p;
 int *cnt_p;
 int gloc;
 {
-    int x, y, pass, glyph, idx;
+    int x, y, pass, idx;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -169,14 +212,8 @@ int gloc;
     for (pass = 0; pass < 2; pass++) {
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
-                /* TODO: if glyph is a pile glyph, convert to ordinary one
-                 *       in order to keep tail/boulder/rock check simple.
-                 */
-                glyph = glyph_at(x, y);
-                /* unlike '/M', this skips monsters revealed by
-                   warning glyphs and remembered invisible ones */
                 if ((x == u.ux && y == u.uy)
-                    || gather_locs_glyphmatch(glyph, gloc)) {
+                    || gather_locs_interesting(x, y, gloc)) {
                     if (!pass) {
                         ++*cnt_p;
                     } else {
@@ -291,18 +328,18 @@ coord *ccp;
 boolean force;
 const char *goal;
 {
+    static const char pick_chars[] = ".,;:",
+                      mMoOdDxX[] = "mMoOdDxX";
+    const char *cp;
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
-    static const char pick_chars[] = ".,;:";
-    const char *cp;
     boolean hilite_state = FALSE;
-    coord *monarr = (coord *) 0, *objarr = (coord *) 0,
-        *doorarr = (coord *) 0;
-    int moncount = 0, monidx = 0, objcount = 0, objidx = 0,
-        doorcount = 0, dooridx = 0;
+    coord *garr[NUM_GLOCS] = DUMMY;
+    int gcount[NUM_GLOCS] = DUMMY;
+    int gidx[NUM_GLOCS] = DUMMY;
 
     if (!goal)
         goal = "desired location";
@@ -412,6 +449,10 @@ const char *goal;
             }
             goto nxtc;
         } else if (c == '#') {
+            /* unfortunately, using '#' as a command means we can't move
+               cursor to sinks, iron bars, and poison clouds; perhaps
+               when autodescribe is already on, next '#' should try to
+               move to '#' rather than to toggle off? (or ask; ick...) */
             iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
@@ -421,53 +462,30 @@ const char *goal;
             msg_given = TRUE;
             goto nxtc;
         } else if (c == '@') { /* return to hero's spot */
-            /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
+            /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
-            monidx = objidx = dooridx = 0;
+            for (i = 0; i < NUM_GLOCS; i++)
+                gidx[i] = 0;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
-        } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
-            if (!monarr) {
-                gather_locs(&monarr, &moncount, GLOC_MONS);
-                monidx = 0; /* monarr[0] is hero's spot */
+        } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
+            /* nearest or farthest monster or object or door or unexplored */
+            int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
+                gloc = gtmp >> 1;             /* 0..3 */
+
+            if (!garr[gloc]) {
+                gather_locs(&garr[gloc], &gcount[gloc], gloc);
+                gidx[gloc] = 0; /* garr[][0] is hero's spot */
             }
-            if (c == 'm') {
-                monidx = (monidx + 1) % moncount;
-            } else {
-                if (--monidx < 0)
-                    monidx = moncount - 1;
+            if (!(gtmp & 1)) {  /* c=='m' || c=='o' || c=='d' || c=='x') */
+                gidx[gloc] = (gidx[gloc] + 1) % gcount[gloc];
+            } else {            /* c=='M' || c=='O' || c=='D' || c=='X') */
+                if (--gidx[gloc] < 0)
+                    gidx[gloc] = gcount[gloc] - 1;
             }
-            cx = monarr[monidx].x;
-            cy = monarr[monidx].y;
-            goto nxtc;
-        } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
-            if (!objarr) {
-                gather_locs(&objarr, &objcount, GLOC_OBJS);
-                objidx = 0; /* objarr[0] is hero's spot */
-            }
-            if (c == 'o') {
-                objidx = (objidx + 1) % objcount;
-            } else {
-                if (--objidx < 0)
-                    objidx = objcount - 1;
-            }
-            cx = objarr[objidx].x;
-            cy = objarr[objidx].y;
-            goto nxtc;
-        } else if (c == 'd' || c == 'D') {  /* door/doorway */
-            if (!doorarr) {
-                gather_locs(&doorarr, &doorcount, GLOC_DOOR);
-                dooridx = 0; /* objarr[0] is hero's spot */
-            }
-            if (c == 'd') {
-                dooridx = (dooridx + 1) % doorcount;
-            } else {
-                if (--dooridx < 0)
-                    dooridx = doorcount - 1;
-            }
-            cx = doorarr[dooridx].x;
-            cy = doorarr[dooridx].y;
+            cx = garr[gloc][gidx[gloc]].x;
+            cy = garr[gloc][gidx[gloc]].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
@@ -475,9 +493,17 @@ const char *goal;
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
 
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
-                for (sidx = 1; sidx < MAXPCHARS; sidx++)
+                for (sidx = 1; sidx < MAXPCHARS; sidx++) { /* [0] left as 0 */
+                    if (IS_DOOR(sidx) || IS_WALL(sidx)
+                        || sidx == SDOOR || sidx == SCORR
+                        || glyph_to_cmap(k) == S_room
+                        || glyph_to_cmap(k) == S_darkroom
+                        || glyph_to_cmap(k) == S_corr
+                        || glyph_to_cmap(k) == S_litcorr)
+                        continue;
                     if (c == defsyms[sidx].sym || c == (int) showsyms[sidx])
                         matching[sidx] = (char) ++k;
+                }
                 if (k) {
                     for (pass = 0; pass <= 1; pass++) {
                         /* pass 0: just past current pos to lower right;
@@ -488,35 +514,39 @@ const char *goal;
                             lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
                             hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
                             for (tx = lo_x; tx <= hi_x; tx++) {
-                                /* look at dungeon feature, not at
-                                   user-visible glyph */
-                                k = back_to_glyph(tx, ty);
-                                /* uninteresting background glyph */
+                                /* first, look at what is currently visible
+                                   (might be monster) */
+                                k = glyph_at(tx, ty);
                                 if (glyph_is_cmap(k)
-                                    && (IS_DOOR(levl[tx][ty].typ)
-                                        || glyph_to_cmap(k) == S_room
-                                        || glyph_to_cmap(k) == S_darkroom
-                                        || glyph_to_cmap(k) == S_corr
-                                        || glyph_to_cmap(k) == S_litcorr)) {
-                                    /* what hero remembers to be at tx,ty */
-                                    k = glyph_at(tx, ty);
+                                    && matching[glyph_to_cmap(k)])
+                                    goto foundc;
+                                /* next, try glyph that's remembered here
+                                   (might be trap or object) */
+                                if (level.flags.hero_memory
+                                    /* !terrainmode: don't move to remembered
+                                       trap or object if not currently shown */
+                                    && !iflags.terrainmode) {
+                                    k = levl[tx][ty].glyph;
+                                    if (glyph_is_cmap(k)
+                                        && matching[glyph_to_cmap(k)])
+                                        goto foundc;
                                 }
-                                if (glyph_is_cmap(k)
-                                    && matching[glyph_to_cmap(k)]
-                                    && (levl[tx][ty].seenv
-                                        || iflags.terrainmode)
-                                    && !IS_WALL(levl[tx][ty].typ)
-                                    && levl[tx][ty].typ != SDOOR
-                                    && glyph_to_cmap(k) != S_room
-                                    && glyph_to_cmap(k) != S_corr
-                                    && glyph_to_cmap(k) != S_litcorr) {
-                                    cx = tx, cy = ty;
-                                    if (msg_given) {
-                                        clear_nhwindow(WIN_MESSAGE);
-                                        msg_given = FALSE;
-                                    }
-                                    goto nxtc;
+                                /* last, try actual terrain here (shouldn't
+                                   we be using lastseentyp[][] instead?) */
+                                if (levl[tx][ty].seenv) {
+                                    k = back_to_glyph(tx, ty);
+                                    if (glyph_is_cmap(k)
+                                        && matching[glyph_to_cmap(k)])
+                                        goto foundc;
                                 }
+                                continue;
+                            foundc:
+                                cx = tx, cy = ty;
+                                if (msg_given) {
+                                    clear_nhwindow(WIN_MESSAGE);
+                                    msg_given = FALSE;
+                                }
+                                goto nxtc;
                             } /* column */
                         }     /* row */
                     }         /* pass */
@@ -539,10 +569,8 @@ const char *goal;
             }     /* !quitchars */
             if (force)
                 goto nxtc;
-            if (!iflags.terrainmode) {
-                pline("Done.");
-                msg_given = FALSE; /* suppress clear */
-            }
+            pline("Done.");
+            msg_given = FALSE; /* suppress clear */
             cx = -1;
             cy = 0;
             result = 0; /* not -1 */
@@ -563,10 +591,9 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
-    if (monarr)
-        free((genericptr_t) monarr);
-    if (objarr)
-        free((genericptr_t) objarr);
+    for (i = 0; i < NUM_GLOCS; i++)
+        if (garr[i])
+            free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
@@ -1564,6 +1591,24 @@ rndcolor()
                                            : c_obj_colors[k];
 }
 
+static NEARDATA const char *const hliquids[] = {
+    "yoghurt", "oobleck", "clotted blood", "diluted water", "purified water",
+    "instant coffee", "tea", "herbal infusion", "liquid rainbow",
+    "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",
+    "ketchup", "slow light", "oil", "vinaigrette", "liquid crystal", "honey",
+    "caramel sauce", "ink", "aqueous humour", "milk substitute", "fruit juice",
+    "glowing lava", "gastric acid", "mineral water", "cough syrup", "quicksilver",
+    "sweet vitriol", "grey goo", "pink slime",
+};
+
+const char *
+hliquid(liquidpref)
+const char *liquidpref;
+{
+    return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
+                                         : liquidpref;
+}
+
 /* Aliases for road-runner nemesis
  */
 static const char *const coynames[] = {
@@ -1586,7 +1631,7 @@ char *buf;
         Sprintf(buf, "%s - %s",
                 x_monnam(mtmp, ARTICLE_NONE, (char *) 0, 0, TRUE),
                 mtmp->mcan ? coynames[SIZE(coynames) - 1]
-                           : coynames[rn2(SIZE(coynames) - 1)]);
+                           : coynames[mtmp->m_id % (SIZE(coynames) - 1)]);
     }
     return buf;
 }

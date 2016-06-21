@@ -420,6 +420,8 @@ static struct Comp_Opt {
 
 #else /* use rest of file */
 
+extern char configfile[]; /* for messages */
+
 extern struct symparse loadsyms[];
 static boolean need_redraw; /* for doset() */
 
@@ -917,10 +919,10 @@ rejectoption(optname)
 const char *optname;
 {
 #ifdef MICRO
-    pline("\"%s\" settable only from %s.", optname, lastconfigfile);
+    pline("\"%s\" settable only from %s.", optname, configfile);
 #else
     pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
-          lastconfigfile);
+          configfile);
 #endif
 }
 
@@ -941,7 +943,7 @@ const char *opts;
 #endif
 
     if (from_file)
-        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", lastconfigfile,
+        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", configfile,
 #ifdef WIN32
                     "\n",
 #else
@@ -2207,12 +2209,13 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, TRUE);
         return;
     }
+
 #ifdef CHANGE_COLOR
     if (match_optname(opts, "palette", 3, TRUE)
 #ifdef MAC
         || match_optname(opts, "hicolor", 3, TRUE)
 #endif
-            ) {
+        ) {
         int color_number, color_incr;
 
 #ifndef WIN32
@@ -2227,17 +2230,16 @@ boolean tinitial, tfrom_file;
             }
             color_number = CLR_MAX + 4; /* HARDCODED inverse number */
             color_incr = -1;
-        } else {
+        } else
 #endif
+        {
             if (negated) {
                 bad_negation("palette", FALSE);
                 return;
             }
             color_number = 0;
             color_incr = 1;
-#ifdef MAC
         }
-#endif
 #ifdef WIN32
         op = string_for_opt(opts, TRUE);
         if (!alternative_palette(op))
@@ -2264,8 +2266,8 @@ boolean tinitial, tfrom_file;
 #else
                         rgb <<= 8;
 #endif
-                        tmp = *(pt++);
-                        if (isalpha(tmp)) {
+                        tmp = *pt++;
+                        if (isalpha((uchar) tmp)) {
                             tmp = (tmp + 9) & 0xf; /* Assumes ASCII... */
                         } else {
                             tmp &= 0xf; /* Digits in ASCII too... */
@@ -2277,9 +2279,8 @@ boolean tinitial, tfrom_file;
                         rgb += tmp;
                     }
                 }
-                if (*pt == '/') {
+                if (*pt == '/')
                     pt++;
-                }
                 change_color(color_number, rgb, reverse);
                 color_number += color_incr;
             }
@@ -5319,7 +5320,7 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
+    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);

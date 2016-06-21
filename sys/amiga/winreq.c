@@ -55,7 +55,7 @@ void ClearCol(struct Window *w);
 void
 EditColor()
 {
-    extern const char *configfile;
+    extern char configfile[];
     int i, done = 0, okay = 0;
     long code, qual, class;
     register struct Gadget *gd, *dgad;

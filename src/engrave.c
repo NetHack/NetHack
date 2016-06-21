@@ -185,11 +185,12 @@ register int x, y;
     else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
         return "air";
     else if (is_pool(x, y))
-        return (Underwater && !Is_waterlevel(&u.uz)) ? "bottom" : "water";
+        return (Underwater && !Is_waterlevel(&u.uz))
+            ? "bottom" : hliquid("water");
     else if (is_ice(x, y))
         return "ice";
     else if (is_lava(x, y))
-        return "lava";
+        return hliquid("lava");
     else if (lev->typ == DRAWBRIDGE_DOWN)
         return "bridge";
     else if (IS_ALTAR(levl[x][y].typ))

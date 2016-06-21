@@ -491,11 +491,11 @@ int roomno;
         if (!rn2(5)
             && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS))
                    != 0) {
-            /* [TODO: alter this (at a minimum, by switching from
-               an exclamation to a simple declaration) if hero has
-               already killed enough ghosts.] */
+            int ngen = mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
-                pline("An enormous ghost appears next to you!");
+                pline("A%s ghost appears next to you%c",
+                      ngen < 5 ? "n enormous" : "",
+                      ngen < 10 ? '!' : '.');
             else
                 You("sense a presence close by!");
             mtmp->mpeaceful = 0;
@@ -503,7 +503,7 @@ int roomno;
             if (flags.verbose)
                 You("are frightened to death, and unable to move.");
             nomul(-3);
-            multi_reason = "being terrified of a demon";
+            multi_reason = "being terrified of a ghost";
             nomovemsg = "You regain your composure.";
         }
     }

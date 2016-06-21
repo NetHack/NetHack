@@ -716,7 +716,7 @@ xchar x, y;
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                pline(pullmsg, "lava");
+                pline(pullmsg, hliquid("lava"));
                 break;
             case TT_BEARTRAP: {
                 register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;

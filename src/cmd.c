@@ -183,6 +183,7 @@ static const char *readchar_queue = "";
 static coord clicklook_cc;
 
 STATIC_DCL char *NDECL(parse);
+STATIC_DCL void FDECL(show_direction_keys, (winid, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, const char *));
 
 STATIC_PTR int
@@ -356,7 +357,7 @@ doextlist(VOID_ARGS)
     return 0;
 }
 
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#ifdef TTY_GRAPHICS
 #define MAX_EXT_CMD 50 /* Change if we ever have > 50 ext cmds */
 
 /*
@@ -1491,16 +1492,26 @@ int final;
     }
     you_are(buf, "");
 
-    /* report alignment (bypass you_are() in order to omit ending period) */
+    /* report alignment (bypass you_are() in order to omit ending period);
+       adverb is used to distinguish between temporary change (helm of opp.
+       alignment), permanent change (one-time conversion), and original */
     Sprintf(buf, " %s%s%s, %son a mission for %s",
             You_, !final ? are : were,
             align_str(u.ualign.type),
             /* helm of opposite alignment (might hide conversion) */
-            (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily "
+            (u.ualign.type != u.ualignbase[A_CURRENT])
+               /* what's the past tense of "currently"? if we used "formerly"
+                  it would sound like a reference to the original alignment */
+               ? (!final ? "currently " : "temporarily ")
                /* permanent conversion */
-               : (u.ualign.type != u.ualignbase[A_ORIGINAL]) ? "now "
+               : (u.ualign.type != u.ualignbase[A_ORIGINAL])
+                  /* and what's the past tense of "now"? certainly not "then"
+                     in a context like this...; "belatedly" == weren't that
+                     way sooner (in other words, didn't start that way) */
+                  ? (!final ? "now " : "belatedly ")
                   /* atheist (ignored in very early game) */
-                  : (!u.uconduct.gnostic && moves > 1000L) ? "nominally "
+                  : (!u.uconduct.gnostic && moves > 1000L)
+                     ? "nominally "
                      /* lastly, normal case */
                      : "",
             u_gname());
@@ -2623,6 +2634,26 @@ int final;
     } else {
         Sprintf(buf, "used %ld wish%s", u.uconduct.wishes,
                 (u.uconduct.wishes > 1L) ? "es" : "");
+        if (u.uconduct.wisharti) {
+            /* if wisharti == wishes
+             *  1 wish (for an artifact)
+             *  2 wishes (both for artifacts)
+             *  N wishes (all for artifacts)
+             * else (N is at least 2 in order to get here; M < N)
+             *  N wishes (1 for an artifact)
+             *  N wishes (M for artifacts)
+             */
+            if (u.uconduct.wisharti == u.uconduct.wishes)
+                Sprintf(eos(buf), " (%s",
+                        (u.uconduct.wisharti > 2L) ? "all "
+                          : (u.uconduct.wisharti == 2L) ? "both " : "");
+            else
+                Sprintf(eos(buf), " (%ld ", u.uconduct.wisharti);
+
+            Sprintf(eos(buf), "for %s)",
+                    (u.uconduct.wisharti == 1L) ? "an artifact"
+                                                : "artifacts");
+        }
         you_have_X(buf);
 
         if (!u.uconduct.wisharti)
@@ -3350,7 +3381,8 @@ boolean initial;
             Cmd.num_pad = flagtemp;
             ++updated;
         }
-        /* swap_yz mode (only applicable for !num_pad) */
+        /* swap_yz mode (only applicable for !num_pad); intended for
+           QWERTZ keyboard used in Central Europe, particularly Germany */
         flagtemp = (iflags.num_pad_mode & 1) ? !Cmd.num_pad : FALSE;
         if (flagtemp != Cmd.swap_yz) {
             Cmd.swap_yz = flagtemp;
@@ -3384,12 +3416,12 @@ boolean initial;
             ++updated;
             /* phone_layout has been toggled */
             for (i = 0; i < 3; i++) {
-                c = '1' + i;                           /* 1,2,3 <-> 7,8,9 */
+                c = '1' + i;             /* 1,2,3 <-> 7,8,9 */
                 cmdtmp = Cmd.commands[c];              /* tmp = [1] */
                 Cmd.commands[c] = Cmd.commands[c + 6]; /* [1] = [7] */
                 Cmd.commands[c + 6] = cmdtmp;          /* [7] = tmp */
-                c = (M('1') & 0xff) + i;  /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-                cmdtmp = Cmd.commands[c]; /* tmp = [M-1] */
+                c = (M('1') & 0xff) + i; /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
+                cmdtmp = Cmd.commands[c];              /* tmp = [M-1] */
                 Cmd.commands[c] = Cmd.commands[c + 6]; /* [M-1] = [M-7] */
                 Cmd.commands[c + 6] = cmdtmp;          /* [M-7] = tmp */
             }
@@ -3789,46 +3821,14 @@ retry:
     return 1;
 }
 
-STATIC_OVL boolean
-help_dir(sym, msg)
-char sym;
-const char *msg;
+STATIC_OVL void
+show_direction_keys(win, nodiag)
+winid win;
+boolean nodiag;
 {
-    char ctrl;
-    winid win;
-    static const char wiz_only_list[] = "EFGIOVW";
-    char buf[BUFSZ], buf2[BUFSZ], *explain;
+    char buf[BUFSZ];
 
-    win = create_nhwindow(NHW_TEXT);
-    if (!win)
-        return FALSE;
-    if (msg) {
-        Sprintf(buf, "cmdassist: %s", msg);
-        putstr(win, 0, buf);
-        putstr(win, 0, "");
-    }
-    if (letter(sym)) {
-        sym = highc(sym);
-        ctrl = (sym - 'A') + 1;
-        if ((explain = dowhatdoes_core(ctrl, buf2))
-            && (!index(wiz_only_list, sym) || wizard)) {
-            Sprintf(buf, "Are you trying to use ^%c%s?", sym,
-                    index(wiz_only_list, sym)
-                        ? ""
-                        : " as specified in the Guidebook");
-            putstr(win, 0, buf);
-            putstr(win, 0, "");
-            putstr(win, 0, explain);
-            putstr(win, 0, "");
-            putstr(win, 0, "To use that command, you press");
-            Sprintf(buf, "the <Ctrl> key, and the <%c> key at the same time.",
-                    sym);
-            putstr(win, 0, buf);
-            putstr(win, 0, "");
-        }
-    }
-    if (NODIAG(u.umonnum)) {
-        putstr(win, 0, "Valid direction keys in your current form are:");
+    if (nodiag) {
         Sprintf(buf, "             %c   ", Cmd.move_N);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
@@ -3838,7 +3838,6 @@ const char *msg;
         Sprintf(buf, "             %c   ", Cmd.move_S);
         putstr(win, 0, buf);
     } else {
-        putstr(win, 0, "Valid direction keys are:");
         Sprintf(buf, "          %c  %c  %c", Cmd.move_NW, Cmd.move_N,
                 Cmd.move_NE);
         putstr(win, 0, buf);
@@ -3850,6 +3849,53 @@ const char *msg;
                 Cmd.move_SE);
         putstr(win, 0, buf);
     };
+}
+
+
+STATIC_OVL boolean
+help_dir(sym, msg)
+char sym;
+const char *msg;
+{
+    static const char wiz_only_list[] = "EFGIVW";
+    char ctrl;
+    winid win;
+    char buf[BUFSZ], buf2[BUFSZ], *explain;
+
+    win = create_nhwindow(NHW_TEXT);
+    if (!win)
+        return FALSE;
+    if (msg) {
+        Sprintf(buf, "cmdassist: %s", msg);
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+    }
+    if (letter(sym) || sym == '[') { /* 'dat/cmdhelp' shows ESC as ^[ */
+        sym = highc(sym); /* @A-Z[ (note: letter() accepts '@') */
+        ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
+        if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
+            && (!index(wiz_only_list, sym) || wizard)) {
+            Sprintf(buf, "Are you trying to use ^%c%s?", sym,
+                    index(wiz_only_list, sym)
+                        ? ""
+                        : " as specified in the Guidebook");
+            putstr(win, 0, buf);
+            putstr(win, 0, "");
+            putstr(win, 0, explain);
+            putstr(win, 0, "");
+            putstr(win, 0,
+                  "To use that command, hold down the <Ctrl> key as a shift");
+            Sprintf(buf, "and press the <%c> key.", sym);
+            putstr(win, 0, buf);
+            putstr(win, 0, "");
+        }
+    }
+
+    Sprintf(buf, "Valid direction keys %sare:",
+            NODIAG(u.umonnum) ? "in your current form " : "");
+    putstr(win, 0, buf);
+    show_direction_keys(win, NODIAG(u.umonnum));
+
     putstr(win, 0, "");
     putstr(win, 0, "          <  up");
     putstr(win, 0, "          >  down");

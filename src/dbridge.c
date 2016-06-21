@@ -750,7 +750,7 @@ struct entity *etmp;
                           E_phrase(etmp, "drink"), lava ? "lava" : "moat");
                 else
                     pline("%s into the %s.", E_phrase(etmp, "fall"),
-                          lava ? "lava" : "moat");
+                          lava ? hliquid("lava") : "moat");
             }
         killer.format = NO_KILLER_PREFIX;
         Strcpy(killer.name, "fell from a drawbridge");
@@ -901,13 +901,13 @@ int x, y;
         if (lev1->typ == DRAWBRIDGE_UP) {
             if (cansee(x2, y2))
                 pline_The("portcullis of the drawbridge falls into the %s!",
-                          lava ? "lava" : "moat");
+                          lava ? hliquid("lava") : "moat");
             else if (!Deaf)
                 You_hear("a loud *SPLASH*!");
         } else {
             if (cansee(x, y))
                 pline_The("drawbridge collapses into the %s!",
-                          lava ? "lava" : "moat");
+                          lava ? hliquid("lava") : "moat");
             else if (!Deaf)
                 You_hear("a loud *SPLASH*!");
         }

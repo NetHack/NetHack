@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1457207051 2016/03/05 19:44:11 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1465163425 2016/06/05 21:50:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -581,10 +581,10 @@ struct {
 {S_anti_magic_trap,      "anti magic trap", "anti-magic field"},
 {S_polymorph_trap,       "polymorph trap", "polymorph trap"},
 {S_vibrating_square,     "vibrating square", "vibrating square"},
-{S_vbeam,    "vertical beam", "wall"},
-{S_hbeam,    "horizontal beam", "wall"},
-{S_lslant,   "left slant beam", "wall"},
-{S_rslant,   "right slant beam", "wall"},
+{S_vbeam,    "vertical beam", "cmap 65"},
+{S_hbeam,    "horizontal beam", "cmap 66"},
+{S_lslant,   "left slant beam", "cmap 67"},
+{S_rslant,   "right slant beam", "cmap 68"},
 {S_digbeam,  "dig beam", "cmap 69"},
 {S_flashbeam, "flash beam", "cmap 70"},
 {S_boomleft, "boom left", "cmap 71"},

@@ -1,1 +1,2 @@
 Makefile.* NHSUBST
+*.com NHSUBST

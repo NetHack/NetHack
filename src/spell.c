@@ -43,6 +43,7 @@ STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
+STATIC_DCL boolean FDECL(spell_hurtle_step, (genericptr_t, int, int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -812,11 +813,11 @@ cast_protection()
                                          ? "maw"
                                          : "ooze")
                                 : (u.uinwater
-                                   ? "water"
+                                   ? hliquid("water")
                                    : (rmtyp == CLOUD)
                                       ? "cloud"
                                       : IS_TREE(rmtyp)
-                                         ? "vegitation"
+                                         ? "vegetation"
                                          : IS_STWALL(rmtyp)
                                             ? "stone"
                                             : "air");
@@ -1136,6 +1137,7 @@ boolean atme;
     case SPE_INVISIBILITY:
         (void) peffects(pseudo);
         break;
+    /* end of potion-like spells */
 
     case SPE_CURE_BLINDNESS:
         healup(0, 0, FALSE, TRUE);
@@ -1151,10 +1153,12 @@ boolean atme;
         (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
         break;
     case SPE_CLAIRVOYANCE:
-        if (!BClairvoyant)
-            do_vicinity_map();
+        if (!BClairvoyant) {
+            if (role_skill >= P_SKILLED)
+                pseudo->blessed = 1; /* detect monsters as well as map */
+            do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
-        else if (uarmh && uarmh->otyp == CORNUTHAUM)
+        } else if (uarmh && uarmh->otyp == CORNUTHAUM)
             You("sense a pointy hat on top of your %s.", body_part(HEAD));
         break;
     case SPE_PROTECTION:
@@ -1177,11 +1181,23 @@ boolean atme;
     return 1;
 }
 
+STATIC_OVL boolean
+spell_hurtle_step(arg, x, y)
+genericptr_t arg;
+int x, y;
+{
+    if (!isok(x,y)) return FALSE;
+    if (!ZAP_POS(levl[x][y].typ)
+        && !(IS_DOOR(levl[x][y].typ) && (levl[x][y].doormask & D_ISOPEN)))
+        return FALSE;
+    return TRUE;
+}
+
 /* Choose location where spell takes effect. */
 STATIC_OVL int
 throwspell()
 {
-    coord cc;
+    coord cc, uc;
     struct monst *mtmp;
 
     if (u.uinwater) {
@@ -1213,6 +1229,11 @@ throwspell()
         Your("mind fails to lock onto that location!");
         return 0;
     }
+
+    uc.x = u.ux;
+    uc.y = u.uy;
+
+    walk_path(&uc, &cc, spell_hurtle_step, NULL);
 
     u.dx = cc.x;
     u.dy = cc.y;

@@ -3560,7 +3560,8 @@ drown()
     }
 
     if (!u.uinwater) {
-        You("%s into the water%c", Is_waterlevel(&u.uz) ? "plunge" : "fall",
+        You("%s into the %s%c", Is_waterlevel(&u.uz) ? "plunge" : "fall",
+            hliquid("water"),
             Amphibious || Swimming ? '.' : '!');
         if (!Swimming && !Is_waterlevel(&u.uz))
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
@@ -3657,7 +3658,7 @@ crawl:
         /* time to do some strip-tease... */
         boolean succ = Is_waterlevel(&u.uz) ? TRUE : emergency_disrobe(&lost);
 
-        You("try to crawl out of the water.");
+        You("try to crawl out of the %s.", hliquid("water"));
         if (lost)
             You("dump some of your gear to lose weight...");
         if (succ) {
@@ -5026,13 +5027,13 @@ lava_effects()
 
     if (!Fire_resistance) {
         if (Wwalking) {
-            pline_The("lava here burns you!");
+            pline_The("%s here burns you!", hliquid("lava"));
             if (usurvive) {
                 losehp(dmg, lava_killer, KILLED_BY); /* lava damage */
                 goto burn_stuff;
             }
         } else
-            You("fall into the lava!");
+            You("fall into the %s!", hliquid("lava"));
 
         usurvive = Lifesaved || discover;
         if (wizard)
@@ -5089,9 +5090,10 @@ lava_effects()
            hero needs to escape immediately */
         u.utrap = rn1(4, 4) + ((boil_away ? 2 : rn1(4, 12)) << 8);
         u.utraptype = TT_LAVA;
-        You("sink into the lava%s!", !boil_away
-                                         ? ", but it only burns slightly"
-                                         : " and are about to be immolated");
+        You("sink into the %s%s!", hliquid("lava"),
+            !boil_away
+            ? ", but it only burns slightly"
+            : " and are about to be immolated");
         if (u.uhp > 1)
             losehp(!boil_away ? 1 : (u.uhp / 2), lava_killer,
                    KILLED_BY); /* lava damage */

@@ -194,20 +194,6 @@ start: RogueEpyx
 	Restrictions: rogue
 	Handling: IBM
 	Color: Yes
-	S_weapon: \x18			# up arrow
-	S_armor: \x0a			# Vert rect with o
-	S_ring: \x09			# circle with arrow
-	S_amulet: \x0c			# "female" symbol
-	S_food: \x05			# club (as in cards)
-	S_potion: \xad			# upside down '!'
-	S_scroll: \x0e			# musical note
-	S_wand: \xe7			# greek tau
-	S_coin: \x0f			# yes it's the same as gems
-	S_gem: \x0f			# fancy '*'
-	S_rock: \x60
-	S_ball: \x30
-	S_chain: \x5f
-	S_venom: \x2e
 	S_vwall: \xba			# all walls now use
 	S_hwall: \xcd			# double line graphics
 	S_tlcorn: \xc9 
@@ -249,18 +235,24 @@ start: RogueEpyx
 	S_magic_trap: \x04 
 	S_anti_magic_trap: \x04 
 	S_polymorph_trap: \x04 
-	S_weapon: \x18
-	S_armor: \x5b
-	S_ring: \x3d
-	S_amulet: \xc
-	S_tool: \x28
-	S_food: \x5
-	S_potion: \xad
-	S_scroll: \xe
-	S_book: \x2b
-	S_wand: \xe7
-	S_coin: \xf
-	S_gem: \xf
+	S_weapon: \x18			# up arrow
+# ^J	S_armor: \x0a			# Vert rect with o
+	S_armor: \x5b			# default: '['
+# ^I	S_ring: \x09			# circle with arrow
+	S_ring: \x3d			# default: '='
+	S_amulet: \x0c			# "female" symbol
+	S_tool: \x28			# default: '('
+	S_food: \x05			# club (as in cards)
+	S_potion: \xad			# upside down '!'
+	S_scroll: \x0e			# musical note
+	S_book: \x2b			# default: '+'
+	S_wand: \xe7			# greek tau
+	S_coin: \x0f			# yes it's the same as gems
+	S_gem: \x0f			# fancy '*'
+	S_rock: \x60
+	S_ball: \x30
+	S_chain: \x5f
+	S_venom: \x2e
 	S_rock: \x60
 	S_ball: \x30
 	S_chain: \x5f

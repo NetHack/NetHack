@@ -57,13 +57,15 @@
 #define DISMOUNT_BYCHOICE 6
 
 /* Special returns from mapglyph() */
-#define MG_CORPSE 0x01
-#define MG_INVIS 0x02
-#define MG_DETECT 0x04
-#define MG_PET 0x08
-#define MG_RIDDEN 0x10
-#define MG_STATUE 0x20
+#define MG_CORPSE  0x01
+#define MG_INVIS   0x02
+#define MG_DETECT  0x04
+#define MG_PET     0x08
+#define MG_RIDDEN  0x10
+#define MG_STATUE  0x20
 #define MG_OBJPILE 0x40  /* more than one stack of objects */
+#define MG_BW_LAVA 0x80  /* 'black & white lava': highlight lava if it
+                            can't be distringuished from water by color */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)

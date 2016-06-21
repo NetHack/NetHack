@@ -53,6 +53,7 @@ dipping fruit juice into enlightenment gave different result than the inverse
 make travel walk up to a trap and stop when the trap blocks the only
 	way forward, instead of trying to go straight line
 travel will displace pets rather than stop
+discard travel cache when moving to a different dungeon level
 do not autopickup unpaid items in shops
 death due an unseen gas spore's explosion resulted in "killed by a died"
 allow optional parameter "true", "yes", "false", or "no" for boolean options
@@ -185,6 +186,7 @@ wand/spell/breath zaps that reached the edge of the level on the Plane of Air
 stop amulets and other items which aren't affected by erosion damage from
 	being subjected to erosion damage
 grammar bit: polyself w/ gender change yielded "you turn into a Elvenking"
+grammar bit when hallucinating: "you kill poor goblin" ('the' missing for pet)
 some blindness cures ignored u.ucreamed
 some instances of stun or confusion timers were being overridden rather than
 	incremented when new stun or confusion damage was suffered
@@ -269,9 +271,40 @@ while in shop, stone-to-flesh at self causing carried, hero owned figurine
 	or statue to animate claimed it belonged to shopkeeper
 reviving one of a stack of N corpses in a shop charged a usage fee for all N;
 	remaining N-1 were owned by hero if carried but by shop if on floor
+gremlin wailing in agony should wake up nearby monsters
+add more lighting variance to the second bigroom variant
+when getpos was picking a location, typing '^' to move to the next known trap
+	skipped some detected traps if their location was unseen
+describe detected door traps and chest traps as trapped door and trapped chest
+	instead of bear trap; bear trap tile is still used on map though
+thrown potion that killed peaceful monster would cause "the <mon> gets argry"
+	after the message about it being killed
+when poly'd into a hider and engulfed, attempt to hide via #monster was blocked
+	but feedback said "can't hide while held" rather than "while engulfed"
+various monster/object/food/gold/trap detections were inconsistent in how they
+	behaved if performed while engulfed or underwater
+show in inventory which monster a leash is attached to
+using /? to look up something by name, supplying multiple spaces (with no
+	other characters) as the name triggered impossible "singular of null?"
+add support for the 'altmeta' option to the 'what-does' command ('&' or '?f')
+when wielded weapon becomes untouchable (after alignment change or polymorph)
+	hero could be 'blasted by its power' twice in succession
+at startup, if sysconf had been read but user's own config file couldn't be
+	read, sysconf got processed again as if it contained user's options
+don't give "you cannot pass through the bars" when travel is testing possible
+	paths in the vicinity of iron bars
+if blind and no gloves, using 'm<dir>' to move and then 'e' could be used to
+	locate cockatrice corpse without fatal touching (by declining to eat)
+it's cannabilism for a were<foo> to eat a <foo> corpse
+conduct: wishing for an artifact and not getting it because it already exists
+	counts as wishing for an artifact, just like when not getting it
+	because of quest restrictions or too many artifacts in play does
+avoid ring of poison resistance as starting equipment for orcish wizard
+gelatinous cube shouldn't be able to eat a scroll of scare monster
+make fireballs or cones of cold cast a skilled or higher not go through walls
 
 
-Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository
+Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 fix "object lost" panic during pickup caused by sortloot revamp
 more sortloot revisions
@@ -284,6 +317,7 @@ catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
 fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
 	'remove' menu choices in interactive handling for menu colorings,
 	message types, and autopickup exceptions subject to buffer overflow
+when picking a destination for #jump, '$' to show valid dest. is more accurate
 
 
 Platform- and/or Interface-Specific Fixes
@@ -366,7 +400,8 @@ feedback from probing of long worm now includes number of segments it has
 monk starts with 'shuriken' pre-discovered (despite language issue...)
 item-using monster on or next to a fire trap can use it to be cured of
 	turning into slime
-wizard mode ^G can now specify "male" or "female" when creating a monster
+wizard mode ^G can now specify "sleeping", "male" or "female" when
+	creating a monster
 REPRODUCIBLE_BUILD is new config.h setting to fetch build date+time from
 	environment instead of using current date+time, so that later rebuild
 	could duplicate the original (disabled by default; tested for Unix)
@@ -383,8 +418,22 @@ during end of game disclosure, the vanquished monsters list can be sorted in
 	one of several ways by answering 'a' to "disclose vanquished monsters?"
 when #terrain is displaying a censored version of the map (no monsters, &c),
 	moving the cursor will display farlook's brief autodescribe feedback
+when monster/object/trap detection temporarily clears the map to highlight the
+	results of such detection, farlook autodescibe can be used to view it
 interrupt a multi turn action if hp or pw is restored to maximum
 pressing d or D when cursor positioning targets doors and doorways
+pressing x or X when cursor positioning targets possibly unexplored location
+	(potentially useful when using '_' [not mouse] to invoke travel)
+swallowers can't re-engulf hero immediately after spitting him/her out
+werejackals can summon foxes and coyotes; werewolves can summon wargs
+allow taming monkeys and apes with bananas
+GENERICUSERS is now a sysconf statement instead of compile-time option
+fountains are bright blue
+ray bounceback chance depends on the wall type
+undead #turning takes less time at higher experience level
+peacefuls may react when you attack other peacefuls
+prevent diagonal jumping through open doorways
+different liquids when hallucinating
 
 
 Platform- and/or Interface-Specific New Features
@@ -407,16 +456,17 @@ X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Malcolm Ryan's improved tin opener
-Ray Chason's keyboard may stop responding after locking or unlocking a door when
-	using altkeyhandler=nhraykey.dll 
-Ray Chason's fix: window interfaces that support transparency may give away unseen
-	parts of the map
+Ray Chason's keyboard may stop responding after locking or unlocking a door
+	when using altkeyhandler=nhraykey.dll
+Ray Chason's fix: window interfaces that support transparency may give away
+	unseen parts of the map
 Ray Chason's xprname should honor iflags.menu_tab_sep
 Ray Chason's punctuation for "That foo is really a mimic."
 Ray Chason's proper background tiles for lava and water
 Ray Chason's MS-DOS port restored to functionality with credit to Reddit user 
 	b_helyer for the fix to sys/share/pcmain.c
 Ray Chason's MSDOS port support for some VESA modes
+Darshan Shaligram's pet ranged attack
 
 
 Code Cleanup and Reorganization

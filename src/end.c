@@ -781,6 +781,8 @@ int how;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();
+    if (!context.mon_moving)
+        endmultishot(FALSE);
 }
 
 /*
@@ -1678,7 +1680,7 @@ boolean ask;
                 pfx = !strncmpi(buf, "the ", 3) ? 0
                       : !strncmpi(buf, "an ", 3) ? 1
                         : !strncmpi(buf, "a ", 2) ? 2
-                          : !isdigit(buf[2]) ? 4 : 0;
+                          : !digit(buf[2]) ? 4 : 0;
                 if (class_header)
                     ++pfx;
                 Sprintf(buftoo, "%*s%s", pfx, "", buf);

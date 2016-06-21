@@ -35,6 +35,7 @@ sys_early_init()
     sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
     sysopt.shellers = (char *) 0;
     sysopt.explorers = (char *) 0;
+    sysopt.genericusers = (char *) 0;
     sysopt.maxplayers = 0; /* XXX eventually replace MAX_NR_OF_PLAYERS */
 
     /* record file */
@@ -94,6 +95,9 @@ sysopt_release()
     if (sysopt.debugfiles)
         free((genericptr_t) sysopt.debugfiles),
         sysopt.debugfiles = (char *) 0;
+    if (sysopt.genericusers)
+        free((genericptr_t) sysopt.genericusers),
+        sysopt.genericusers = (char *) 0;
 #ifdef PANICTRACE
     if (sysopt.gdbpath)
         free((genericptr_t) sysopt.gdbpath), sysopt.gdbpath = (char *) 0;

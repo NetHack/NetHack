@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1454715969 2016/02/05 23:46:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -619,7 +619,9 @@ boolean allowmsg;
            and also shouldn't eat current species when polymorphed
            (even if having the form of something which doesn't care
            about cannibalism--hero's innate traits aren't altered) */
-        && (your_race(fptr) || (Upolyd && same_race(youmonst.data, fptr)))) {
+        && (your_race(fptr)
+            || (Upolyd && same_race(youmonst.data, fptr))
+            || (u.ulycn >= LOW_PM && were_beastie(pm) == u.ulycn))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
                 You("have a bad feeling deep inside.");
@@ -2012,12 +2014,23 @@ eatspecial()
         vault_gd_watching(GD_EATGOLD);
         return;
     }
+    if (objects[otmp->otyp].oc_material == PAPER) {
 #ifdef MAIL
-    if (otmp->otyp == SCR_MAIL) {
-        /* no nutrition */
-        pline("This junk mail is less than satisfying.");
-    }
+        if (otmp->otyp == SCR_MAIL)
+            /* no nutrition */
+            pline("This junk mail is less than satisfying.");
+        else
 #endif
+        if (otmp->otyp == SCR_SCARE_MONSTER)
+            /* to eat scroll, hero is currently polymorphed into a monster */
+            pline("Yuck%c", otmp->blessed ? '!' : '.');
+        else if (otmp->oclass == SCROLL_CLASS
+                 /* check description after checking for specific scrolls */
+                 && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+            pline("Yum%c", otmp->blessed ? '!' : '.');
+        else
+            pline("Needs salt...");
+    }
     if (otmp->oclass == POTION_CLASS) {
         otmp->quan++; /* dopotion() does a useup() */
         (void) dopotion(otmp);
@@ -2451,8 +2464,11 @@ doeat()
             u.uconduct.unvegan++;
         u.uconduct.food++;
 
-        if (otmp->cursed)
+        if (otmp->cursed) {
             (void) rottenfood(otmp);
+            nodelicious = TRUE;
+        } else if (objects[otmp->otyp].oc_material == PAPER)
+            nodelicious = TRUE;
 
         if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
             pline("Ecch - that must have been poisonous!");
@@ -2461,7 +2477,7 @@ doeat()
                 losehp(rnd(15), xname(otmp), KILLED_BY_AN);
             } else
                 You("seem unaffected by the poison.");
-        } else if (!otmp->cursed && !nodelicious) {
+        } else if (!nodelicious) {
             pline("%s%s is delicious!",
                   (obj_is_pname(otmp)
                    && otmp->oartifact < ART_ORB_OF_DETECTION)
@@ -3009,6 +3025,16 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
             char qsfx[QBUFSZ];
             boolean one = (otmp->quan == 1L);
 
+            /* if blind and without gloves, attempting to eat (or tin or
+               offer) a cockatrice corpse is fatal before asking whether
+               or not to use it; otherwise, 'm<dir>' followed by 'e' could
+               be used to locate cockatrice corpses without touching them */
+            if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
+                feel_cockatrice(otmp, FALSE);
+                /* if life-saved (or poly'd into stone golem), terminate
+                   attempt to eat off floor */
+                return (struct obj *) 0;
+            }
             /* "There is <an object> here; <verb> it?" or
                "There are <N objects> here; <verb> one?" */
             Sprintf(qbuf, "There %s ", otense(otmp, "are"));
@@ -3026,8 +3052,8 @@ skipfloor:
     /* We cannot use ALL_CLASSES since that causes getobj() to skip its
      * "ugly checks" and we need to check for inedible items.
      */
-    otmp =
-        getobj(feeding ? allobj : offering ? offerfodder : comestibles, verb);
+    otmp = getobj(feeding ? allobj : offering ? offerfodder : comestibles,
+                  verb);
     if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
             You_cant("%s that!", verb);

@@ -947,7 +947,7 @@ dokick()
     }
     if (is_pool(x, y) ^ !!u.uinwater) {
         /* objects normally can't be removed from water by kicking */
-        You("splash some water around.");
+        You("splash some %s around.", hliquid("water"));
         return 1;
     }
 

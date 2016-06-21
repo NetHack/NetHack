@@ -8,11 +8,9 @@
 STATIC_VAR NEARDATA struct obj *otmp;
 
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(passiveum,
-                     (struct permonst *, struct monst *, struct attack *));
-
+STATIC_DCL int FDECL(passiveum, (struct permonst *, struct monst *,
+                                 struct attack *));
 STATIC_DCL void FDECL(mayberem, (struct obj *, const char *));
-
 STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
 STATIC_DCL int FDECL(hitmu, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(gulpmu, (struct monst *, struct attack *));
@@ -20,7 +18,6 @@ STATIC_DCL int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
 STATIC_DCL void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
-
 STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
@@ -33,41 +30,48 @@ register struct monst *mtmp;
 register struct attack *mattk;
 {
     int compat;
+    const char *pfmt = 0;
+    char *Monst_name = Monnam(mtmp);
 
     /* Note: if opposite gender, "seductively" */
     /* If same gender, "engagingly" for nymph, normal msg for others */
-    if ((compat = could_seduce(mtmp, &youmonst, mattk)) && !mtmp->mcan
-        && !mtmp->mspec_used) {
-        pline("%s %s you %s.", Monnam(mtmp), Blind ? "talks to" : "smiles at",
-              compat == 2 ? "engagingly" : "seductively");
-    } else
+    if ((compat = could_seduce(mtmp, &youmonst, mattk)) != 0
+        && !mtmp->mcan && !mtmp->mspec_used) {
+        pline("%s %s you %s.", Monst_name,
+              Blind ? "talks to" : "smiles at",
+              (compat == 2) ? "engagingly" : "seductively");
+    } else {
         switch (mattk->aatyp) {
         case AT_BITE:
-            pline("%s bites!", Monnam(mtmp));
+            pfmt = "%s bites!";
             break;
         case AT_KICK:
-            pline("%s kicks%c", Monnam(mtmp),
+            pline("%s kicks%c", Monst_name,
                   thick_skinned(youmonst.data) ? '.' : '!');
             break;
         case AT_STNG:
-            pline("%s stings!", Monnam(mtmp));
+            pfmt = "%s stings!";
             break;
         case AT_BUTT:
-            pline("%s butts!", Monnam(mtmp));
+            pfmt = "%s butts!";
             break;
         case AT_TUCH:
-            pline("%s touches you!", Monnam(mtmp));
+            pfmt = "%s touches you!";
             break;
         case AT_TENT:
-            pline("%s tentacles suck you!", s_suffix(Monnam(mtmp)));
+            pfmt = "%s tentacles suck you!";
+            Monst_name = s_suffix(Monst_name);
             break;
         case AT_EXPL:
         case AT_BOOM:
-            pline("%s explodes!", Monnam(mtmp));
+            pfmt = "%s explodes!";
             break;
         default:
-            pline("%s hits!", Monnam(mtmp));
+            pfmt = "%s hits!";
         }
+        if (pfmt)
+            pline(pfmt, Monst_name);
+    }
 }
 
 /* monster missed you */
@@ -139,6 +143,7 @@ register struct monst *mtmp;
 register struct attack *mattk;
 {
     int compat;
+    const char *Monst_name; /* Monnam(mtmp) */
 
     /* no map_invisible() -- no way to tell where _this_ is coming from */
 
@@ -150,42 +155,41 @@ register struct attack *mattk;
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
               && could_seduce(mtmp, &youmonst, (struct attack *) 0));
+    Monst_name = Monnam(mtmp);
 
     if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
-        const char *swings =
-            mattk->aatyp == AT_BITE
-                ? "snaps"
-                : mattk->aatyp == AT_KICK
-                      ? "kicks"
-                      : (mattk->aatyp == AT_STNG || mattk->aatyp == AT_BUTT
-                         || nolimbs(mtmp->data))
-                            ? "lunges"
-                            : "swings";
+        const char *swings = (mattk->aatyp == AT_BITE) ? "snaps"
+                             : (mattk->aatyp == AT_KICK) ? "kicks"
+                               : (mattk->aatyp == AT_STNG
+                                  || mattk->aatyp == AT_BUTT
+                                  || nolimbs(mtmp->data)) ? "lunges"
+                                 : "swings";
 
         if (compat)
-            pline("%s tries to touch you and misses!", Monnam(mtmp));
+            pline("%s tries to touch you and misses!", Monst_name);
         else
             switch (rn2(3)) {
             case 0:
-                pline("%s %s wildly and misses!", Monnam(mtmp), swings);
+                pline("%s %s wildly and misses!", Monst_name, swings);
                 break;
             case 1:
-                pline("%s attacks a spot beside you.", Monnam(mtmp));
+                pline("%s attacks a spot beside you.", Monst_name);
                 break;
             case 2:
-                pline("%s strikes at %s!", Monnam(mtmp),
-                      levl[mtmp->mux][mtmp->muy].typ == WATER ? "empty water"
-                                                              : "thin air");
+                pline("%s strikes at %s!", Monst_name,
+                      (levl[mtmp->mux][mtmp->muy].typ == WATER)
+                        ? "empty water"
+                        : "thin air");
                 break;
             default:
-                pline("%s %s wildly!", Monnam(mtmp), swings);
+                pline("%s %s wildly!", Monst_name, swings);
                 break;
             }
 
     } else if (Displaced) {
         if (compat)
-            pline("%s smiles %s at your %sdisplaced image...", Monnam(mtmp),
-                  compat == 2 ? "engagingly" : "seductively",
+            pline("%s smiles %s at your %sdisplaced image...", Monst_name,
+                  (compat == 2) ? "engagingly" : "seductively",
                   Invis ? "invisible " : "");
         else
             pline("%s strikes at your %sdisplaced image and misses you!",
@@ -194,20 +198,20 @@ register struct attack *mattk;
                    * displaced image, since the displaced image is also
                    * invisible.
                    */
-                  Monnam(mtmp), Invis ? "invisible " : "");
+                  Monst_name, Invis ? "invisible " : "");
 
     } else if (Underwater) {
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
-            pline("%s reaches towards your distorted image.", Monnam(mtmp));
+            pline("%s reaches towards your distorted image.", Monst_name);
         else
             pline("%s is fooled by water reflections and misses!",
-                  Monnam(mtmp));
+                  Monst_name);
 
     } else
         impossible("%s attacks you without knowing your location?",
-                   Monnam(mtmp));
+                   Monst_name);
 }
 
 void
@@ -217,9 +221,9 @@ struct permonst *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
 boolean message;
 {
     if (message) {
-        if (is_animal(mdat))
+        if (is_animal(mdat)) {
             You("get regurgitated!");
-        else {
+        } else {
             char blast[40];
             register int i;
 
@@ -227,9 +231,9 @@ boolean message;
             for (i = 0; i < NATTK; i++)
                 if (mdat->mattk[i].aatyp == AT_ENGL)
                     break;
-            if (mdat->mattk[i].aatyp != AT_ENGL)
+            if (mdat->mattk[i].aatyp != AT_ENGL) {
                 impossible("Swallower has no engulfing attack?");
-            else {
+            } else {
                 if (is_whirly(mdat)) {
                     switch (mdat->mattk[i].adtyp) {
                     case AD_ELEC:
@@ -296,6 +300,20 @@ struct attack *alt_attk_buf;
             /* note: 3d9 is slightly higher than previous 4d6 */
         }
 
+    } else if (attk->aatyp == AT_ENGL && magr->mspec_used) {
+        /* can't re-engulf yet; switch to simpler attack */
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
+            || attk->adtyp == AD_COLD || attk->adtyp == AD_FIRE) {
+            attk->aatyp = AT_TUCH;
+        } else {
+            attk->aatyp = AT_CLAW; /* attack message will be "<foo> hits" */
+            attk->adtyp = AD_PHYS;
+        }
+        attk->damn = 1; /* relatively weak: 1d6 */
+        attk->damd = 6;
+
     /* barrow wight, Nazgul, erinys have weapon attack for non-physical
        damage; force physical damage if attacker has been cancelled or
        if weapon is sufficiently interesting; a few unique creatures
@@ -306,11 +324,10 @@ struct attack *alt_attk_buf;
                && !(mptr->mattk[1].aatyp == AT_WEAP
                     && mptr->mattk[1].adtyp == AD_PHYS)
                && (magr->mcan
-                   || (weap
-                       && ((weap->otyp == CORPSE
-                            && touch_petrifies(&mons[weap->corpsenm]))
-                           || weap->oartifact == ART_STORMBRINGER
-                           || weap->oartifact == ART_VORPAL_BLADE)))) {
+                   || (weap && ((weap->otyp == CORPSE
+                                 && touch_petrifies(&mons[weap->corpsenm]))
+                                || weap->oartifact == ART_STORMBRINGER
+                                || weap->oartifact == ART_VORPAL_BLADE)))) {
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_PHYS;
@@ -332,7 +349,7 @@ mattacku(mtmp)
 register struct monst *mtmp;
 {
     struct attack *mattk, alt_attk;
-    int i, j, tmp, sum[NATTK];
+    int i, j = 0, tmp, sum[NATTK];
     struct permonst *mdat = mtmp->data;
     boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
     /* Is it near you?  Affects your actions */
@@ -681,10 +698,10 @@ register struct monst *mtmp;
         case AT_ENGL:
             if (!range2) {
                 if (foundyou) {
-                    if (u.uswallow || tmp > (j = rnd(20 + i))) {
-                        /* Force swallowing monster to be
-                         * displayed even when player is
-                         * moving away */
+                    if (u.uswallow
+                        || (!mtmp->mspec_used && tmp > (j = rnd(20 + i)))) {
+                        /* force swallowing monster to be displayed
+                           even when hero is moving away */
                         flush_screen(1);
                         sum[i] = gulpmu(mtmp, mattk);
                     } else {
@@ -1157,7 +1174,8 @@ register struct attack *mattk;
         break;
     case AD_LEGS: {
         register long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
-        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left";
+        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
+                   *Monst_name = Monnam(mtmp), *leg = body_part(LEG);
 
         /* This case is too obvious to ignore, but Nethack is not in
          * general very good at considering height--most short monsters
@@ -1165,31 +1183,30 @@ register struct attack *mattk;
          * [FIXME: why can't a flying attacker overcome this?]
          */
         if (u.usteed || Levitation || Flying) {
-            pline("%s tries to reach your %s %s!", Monnam(mtmp), sidestr,
-                  body_part(LEG));
+            pline("%s tries to reach your %s %s!", Monst_name, sidestr, leg);
             dmg = 0;
         } else if (mtmp->mcan) {
-            pline("%s nuzzles against your %s %s!", Monnam(mtmp), sidestr,
-                  body_part(LEG));
+            pline("%s nuzzles against your %s %s!", Monnam(mtmp),
+                  sidestr, leg);
             dmg = 0;
         } else {
             if (uarmf) {
                 if (rn2(2) && (uarmf->otyp == LOW_BOOTS
-                               || uarmf->otyp == IRON_SHOES))
+                               || uarmf->otyp == IRON_SHOES)) {
                     pline("%s pricks the exposed part of your %s %s!",
-                          Monnam(mtmp), sidestr, body_part(LEG));
-                else if (!rn2(5))
-                    pline("%s pricks through your %s boot!", Monnam(mtmp),
+                          Monst_name, sidestr, leg);
+                } else if (!rn2(5)) {
+                    pline("%s pricks through your %s boot!", Monst_name,
                           sidestr);
-                else {
-                    pline("%s scratches your %s boot!", Monnam(mtmp),
+                } else {
+                    pline("%s scratches your %s boot!", Monst_name,
                           sidestr);
                     dmg = 0;
                     break;
                 }
             } else
-                pline("%s pricks your %s %s!", Monnam(mtmp), sidestr,
-                      body_part(LEG));
+                pline("%s pricks your %s %s!", Monst_name, sidestr, leg);
+
             set_wounded_legs(side, rnd(60 - ACURR(A_DEX)));
             exercise(A_STR, FALSE);
             exercise(A_DEX, FALSE);
@@ -1308,12 +1325,11 @@ register struct attack *mattk;
                 (void) rloc(mtmp, TRUE);
             return 3;
         } else if (mtmp->mcan) {
-            if (!Blind) {
+            if (!Blind)
                 pline("%s tries to %s you, but you seem %s.",
                       Adjmonnam(mtmp, "plain"),
                       flags.female ? "charm" : "seduce",
                       flags.female ? "unaffected" : "uninterested");
-            }
             if (rn2(3)) {
                 if (!tele_restrict(mtmp))
                     (void) rloc(mtmp, TRUE);
@@ -1478,10 +1494,11 @@ register struct attack *mattk;
         hitmsg(mtmp, mattk);
         if (!mtmp->mcan && !rn2(3))
             if (Acid_resistance) {
-                pline("You're covered in acid, but it seems harmless.");
+                pline("You're covered in %s, but it seems harmless.",
+                      hliquid("acid"));
                 dmg = 0;
             } else {
-                pline("You're covered in acid!  It burns!");
+                pline("You're covered in %s!  It burns!", hliquid("acid"));
                 exercise(A_STR, FALSE);
             }
         else
@@ -1705,6 +1722,7 @@ register struct attack *mattk;
         newsym(mtmp->mx, mtmp->my);
         if (is_animal(mtmp->data) && u.usteed) {
             char buf[BUFSZ];
+
             /* Too many quirks presently if hero and steed
              * are swallowed. Pretend purple worms don't
              * like horses for now :-)
@@ -2633,7 +2651,7 @@ register struct attack *mattk;
     switch (olduasmon->mattk[i].adtyp) {
     case AD_ACID:
         if (!rn2(2)) {
-            pline("%s is splashed by your acid!", Monnam(mtmp));
+            pline("%s is splashed by your %s!", Monnam(mtmp), hliquid("acid"));
             if (resists_acid(mtmp)) {
                 pline("%s is not affected.", Monnam(mtmp));
                 tmp = 0;

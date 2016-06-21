@@ -236,6 +236,8 @@ E void NDECL(decl_init);
 
 /* ### detect.c ### */
 
+E boolean FDECL(trapped_chest_at, (int, int, int));
+E boolean FDECL(trapped_door_at, (int, int, int));
 E struct obj *FDECL(o_in, (struct obj *, CHAR_P));
 E struct obj *FDECL(o_material, (struct obj *, unsigned));
 E int FDECL(gold_detect, (struct obj *));
@@ -246,7 +248,7 @@ E int FDECL(trap_detect, (struct obj *));
 E const char *FDECL(level_distance, (d_level *));
 E void FDECL(use_crystal_ball, (struct obj **));
 E void NDECL(do_mapping);
-E void NDECL(do_vicinity_map);
+E void FDECL(do_vicinity_map, (struct obj *));
 E void FDECL(cvt_sdoor_to_door, (struct rm *));
 #ifdef USE_TRAMPOLI
 E void FDECL(findone, (int, int, genericptr_t));
@@ -399,6 +401,7 @@ E char *FDECL(distant_monnam, (struct monst *, int, char *));
 E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
+E const char *FDECL(hliquid, (const char *));
 E const char *NDECL(roguename);
 E struct obj *FDECL(realloc_obj,
                     (struct obj *, int, genericptr_t, int, const char *));
@@ -1013,6 +1016,7 @@ E boolean FDECL(picking_lock, (int *, int *));
 E boolean FDECL(picking_at, (int, int));
 E void FDECL(breakchestlock, (struct obj *, BOOLEAN_P));
 E void NDECL(reset_pick);
+E void NDECL(maybe_reset_pick);
 E int FDECL(pick_lock, (struct obj *));
 E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *, struct obj *));
@@ -1512,6 +1516,9 @@ E int FDECL(breamu, (struct monst *, struct attack *));
 E boolean FDECL(linedup, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, int));
 E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *, int));
+E int FDECL(thrwmm, (struct monst *, struct monst *));
+E int FDECL(spitmm, (struct monst *, struct attack *, struct monst *));
+E int FDECL(breamm, (struct monst *, struct attack *, struct monst *));
 E void FDECL(m_useupall, (struct monst *, struct obj *));
 E void FDECL(m_useup, (struct monst *, struct obj *));
 E void FDECL(m_throw, (struct monst *, int, int, int, int, int, struct obj *));
@@ -1769,6 +1776,7 @@ E int FDECL(query_objlist, (const char *, struct obj **, int,
                             menu_item **, int, boolean (*)(OBJ_P)));
 E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
+E int FDECL(container_at, (int, int, BOOLEAN_P));
 E int NDECL(doloot);
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E boolean NDECL(u_handsy);
@@ -2796,6 +2804,7 @@ E struct monst *FDECL(boomhit, (struct obj *, int, int));
 E int FDECL(zhitm, (struct monst *, int, int, struct obj **));
 E int FDECL(burn_floor_objects, (int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(buzz, (int, int, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(dobuzz, (int, int, XCHAR_P, XCHAR_P, int, int, BOOLEAN_P));
 E void FDECL(melt_ice, (XCHAR_P, XCHAR_P, const char *));
 E void FDECL(start_melt_ice_timeout, (XCHAR_P, XCHAR_P, long));
 E void FDECL(melt_ice_away, (ANY_P *, long));

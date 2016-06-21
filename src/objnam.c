@@ -908,7 +908,8 @@ boolean with_price;
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
-            Strcat(bp, " (in use)");
+            Sprintf(eos(bp), " (attached to %s)",
+                    a_monnam(find_mid(obj->leashmon, FM_FMON)));
             break;
         }
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
@@ -2488,7 +2489,8 @@ char oclass;
         long prob = rn2(maxprob);
 
         i = 0;
-        while (i < n - 1 && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
+        while (i < n - 1
+               && (prob -= (objects[validobjs[i]].oc_prob + 1)) >= 0)
             i++;
         return validobjs[i];
     }
@@ -3568,7 +3570,8 @@ typfnd:
         }
 
         otmp = oname(otmp, name);
-        if (otmp->oartifact) {
+        /* name==aname => wished for artifact (otmp->oartifact => got it) */
+        if (otmp->oartifact || name == aname) {
             otmp->quan = 1L;
             u.uconduct.wisharti++; /* KMH, conduct */
         }

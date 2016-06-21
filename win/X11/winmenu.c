@@ -38,7 +38,6 @@
 
 #include "hack.h"
 #include "winX.h"
-#include <ctype.h>
 
 static void FDECL(menu_select, (Widget, XtPointer, XtPointer));
 static void FDECL(invert_line, (struct xwindow *, x11_menu_item *, int, long));
@@ -251,7 +250,7 @@ Cardinal *num_params;
             select_none(wp);
         } else if (ch == '\n' || ch == '\r') {
             ; /* accept */
-        } else if (isdigit(ch)) {
+        } else if (digit(ch)) {
             /* special case: '0' is also the default ball class */
             if (ch == '0' && !menu_info->counting
                 && index(menu_info->curr_menu.gacc, ch))

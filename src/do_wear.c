@@ -773,7 +773,8 @@ Amulet_off()
             setworn((struct obj *) 0, W_AMUL);
             if (!breathless(youmonst.data) && !amphibious(youmonst.data)
                 && !Swimming) {
-                You("suddenly inhale an unhealthy amount of water!");
+                You("suddenly inhale an unhealthy amount of %s!",
+                    hliquid("water"));
                 (void) drown();
             }
             return;

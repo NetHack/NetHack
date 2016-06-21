@@ -227,6 +227,10 @@
 
 #define DARKROOMSYM (Is_rogue_level(&u.uz) ? S_stone : S_darkroom)
 
+#define is_cmap_trap(i) ((i) >= S_arrow_trap && (i) <= S_polymorph_trap)
+#define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
+#define is_cmap_door(i) ((i) >= S_vodoor && (i) <= S_hcdoor)
+
 struct symdef {
     uchar sym;
     const char *explanation;

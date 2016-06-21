@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1463534459 2016/05/18 01:20:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -554,7 +554,8 @@ register struct monst *mtmp;
             if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
                 /* This can happen after a purple worm plucks you off a
                 flying steed while you are over water. */
-                pline("%s sinks as water rushes in and flushes you out.",
+                pline("%s sinks as %s rushes in and flushes you out.",
+                      hliquid("water"),
                       Monnam(mtmp));
             }
             mondead(mtmp);
@@ -907,7 +908,12 @@ struct monst *mtmp;
                     && !resists_ston(mtmp))
                    /* don't engulf boulders and statues or ball&chain */
                    || otmp->oclass == ROCK_CLASS
-                   || otmp == uball || otmp == uchain) {
+                   || otmp == uball || otmp == uchain
+                   /* normally mtmp won't have stepped onto scare monster
+                      scroll, but if it does, don't eat or engulf that
+                      (note: scrolls inside eaten containers will still
+                      become engulfed) */
+                   || otmp->otyp == SCR_SCARE_MONSTER) {
             /* do nothing--neither eaten nor engulfed */
             continue;
 
@@ -939,11 +945,18 @@ struct monst *mtmp;
         } else {
             /* devour */
             ++count;
-            if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-                pline("%s eats %s!", Monnam(mtmp),
-                      distant_name(otmp, doname));
-            else if (flags.verbose)
-                You_hear("a slurping sound.");
+            if (cansee(mtmp->mx, mtmp->my)) {
+                if (flags.verbose)
+                    pline("%s eats %s!", Monnam(mtmp),
+                          distant_name(otmp, doname));
+                /* give this one even if !verbose */
+                if (otmp->oclass == SCROLL_CLASS
+                    && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+                    pline("Yum%c", otmp->blessed ? '!' : '.');
+            } else {
+                if (flags.verbose)
+                    You_hear("a slurping sound.");
+            }
             /* Heal up to the object's weight in hp */
             if (mtmp->mhp < mtmp->mhpmax) {
                 mtmp->mhp += objects[otmp->otyp].oc_weight;
@@ -2146,6 +2159,10 @@ struct monst *mtmp;
                 placebc();
             vision_full_recalc = 1;
             docrt();
+            /* prevent swallower (mtmp might have just poly'd into something
+               without an engulf attack) from immediately re-engulfing */
+            if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
+                mtmp->mspec_used = rnd(2);
         }
         u.ustuck = 0;
     }
@@ -2178,14 +2195,16 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     if (!noconduct) /* KMH, conduct */
         u.uconduct.killer++;
 
-    if (!nomsg)
+    if (!nomsg) {
+        boolean namedpet = has_mname(mtmp) && !Hallucination;
+
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "kill",
             !(wasinside || canspotmon(mtmp)) ? "it"
               : !mtmp->mtame ? mon_nam(mtmp)
-                : x_monnam(mtmp, has_mname(mtmp) ? ARTICLE_NONE : ARTICLE_THE,
-                           "poor", has_mname(mtmp) ? SUPPRESS_SADDLE : 0,
-                           FALSE));
+                : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
+                           "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
+    }
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0
         && (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
@@ -2610,6 +2629,55 @@ struct monst *mtmp;
                                    : makeplural(q_guardian->mname),
                       got_mad == 1 ? "s" : "");
     }
+
+    /* make other peaceful monsters react */
+    if (!context.mon_moving) {
+        struct monst *mon;
+
+        for (mon = fmon; mon; mon = mon->nmon) {
+            if (DEADMONSTER(mon))
+                continue;
+            if (!mindless(mon->data) && mon->mpeaceful
+                && couldsee(mon->mx, mon->my) && !mon->msleeping
+                && mon->mcansee && m_canseeu(mon)) {
+                boolean exclaimed = FALSE;
+
+                if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
+                    if (is_watch(mon->data)) {
+                        verbalize("Halt!  You're under arrest!");
+                        (void) angry_guards(!!Deaf);
+                    } else {
+                        const char *exclam[] = {
+                            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?"
+                        };
+                        if (!rn2(5)) {
+                            verbalize("%s", exclam[mon->m_id % SIZE(exclam)]);
+                            exclaimed = TRUE;
+                        }
+                        if (!mon->isshk && !mon->ispriest
+                            && (mon->data->mlevel < rn2(10))) {
+                            monflee(mon, rn2(50)+25, TRUE, !exclaimed);
+                            exclaimed = TRUE;
+                        }
+                        if (!mon->isshk && !mon->ispriest) {
+                            mon->mpeaceful = 0;
+                            adjalign(-1);
+                            if (!exclaimed)
+                                pline("%s gets angry!", Monnam(mon));
+                        }
+                    }
+                } else if ((mtmp->data == mon->data) && !rn2(3)) {
+                    if (!rn2(4)) {
+                        growl(mon);
+                        exclaimed = TRUE;
+                    }
+                    if (rn2(6))
+                        monflee(mon, rn2(25)+15, TRUE, !exclaimed);
+                }
+            }
+        }
+    }
+
 }
 
 /* wake up a monster, usually making it angry in the process */

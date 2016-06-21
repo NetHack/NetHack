@@ -1700,18 +1700,17 @@ plnamesuffix()
     char *sptr, *eptr;
     int i;
 
-#ifdef GENERIC_USERNAMES
-    {
-        /* some generic user names will be ignored in favor of prompting */
-        const char *uptr = GENERIC_USERNAMES;
-
-        i = (int) strlen(plname);
-        if ((sptr = strstri(uptr, plname)) != 0
-            && (sptr == uptr || sptr[-1] == ' ')
-            && (sptr[i] == ' ' || sptr[i] == '\0'))
-            *plname = '\0'; /* call askname() */
+    /* some generic user names will be ignored in favor of prompting */
+    if (sysopt.genericusers) {
+	if (*sysopt.genericusers == '*') *plname = '\0';
+	else {
+	    i = (int)strlen(plname);
+	    if ((sptr = strstri(sysopt.genericusers, plname)) != 0
+		&& (sptr == sysopt.genericusers || sptr[-1] == ' ')
+		&& (sptr[i] == ' ' || sptr[i] == '\0'))
+		*plname = '\0'; /* call askname() */
+	}
     }
-#endif
 
     do {
         if (!*plname)

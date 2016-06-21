@@ -100,7 +100,7 @@ dosit()
                 u.utrap += rn1(10, 5);
             } else if (u.utraptype == TT_LAVA) {
                 /* Must have fire resistance or they'd be dead already */
-                You("sit in the lava!");
+                You("sit in the %s!", hliquid("lava"));
                 if (Slimed)
                     burn_away_slime();
                 u.utrap += rnd(4);
@@ -122,7 +122,7 @@ dosit()
             You("sit down on the muddy bottom.");
     } else if (is_pool(u.ux, u.uy)) {
     in_water:
-        You("sit in the water.");
+        You("sit in the %s.", hliquid("water"));
         if (!rn2(10) && uarm)
             (void) water_damage(uarm, "armor", TRUE);
         if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS)
@@ -141,13 +141,13 @@ dosit()
         You(sit_message, "ladder");
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
-        You(sit_message, "lava");
+        You(sit_message, hliquid("lava"));
         burn_away_slime();
         if (likes_lava(youmonst.data)) {
-            pline_The("lava feels warm.");
+            pline_The("%s feels warm.", hliquid("lava"));
             return 1;
         }
-        pline_The("lava burns you!");
+        pline_The("%s burns you!", hliquid("lava"));
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
                "sitting on lava", KILLED_BY);
     } else if (is_ice(u.ux, u.uy)) {

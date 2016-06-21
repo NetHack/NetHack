@@ -188,6 +188,7 @@ STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 #ifndef USE_FCNTL
 STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
+STATIC_DCL void FDECL(set_configfile_name, (const char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, BOOLEAN_P,
                                   int, const char *));
@@ -1821,7 +1822,7 @@ const char *filename;
 
 /* ----------  BEGIN CONFIG FILE HANDLING ----------- */
 
-const char *configfile =
+const char *default_configfile =
 #ifdef UNIX
     ".nethackrc";
 #else
@@ -1837,7 +1838,7 @@ const char *configfile =
 #endif
 
 /* used for messaging */
-char lastconfigfile[BUFSZ];
+char configfile[BUFSZ];
 
 #ifdef MSDOS
 /* conflict with speed-dial under windows
@@ -1849,6 +1850,16 @@ char lastconfigfile[BUFSZ];
  */
 const char *backward_compat_configfile = "nethack.cnf";
 #endif
+
+/* remember the name of the file we're accessing;
+   if may be used in option reject messages */
+STATIC_OVL void
+set_configfile_name(fname)
+const char *fname;
+{
+    (void) strncpy(configfile, fname, sizeof configfile - 1);
+    configfile[sizeof configfile - 1] = '\0';
+}
 
 #ifndef MFLOPPY
 #define fopenp fopen
@@ -1865,84 +1876,86 @@ int src;
     char *envp;
 #endif
 
+    if (src == SET_IN_SYS) {
+        /* SYSCF_FILE; if we can't open it, caller will bail */
+        if (filename && *filename) {
+            set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
+            fp = fopenp(configfile, "r");
+        } else
+            fp = (FILE *) 0;
+        return  fp;
+    }
     /* If src != SET_IN_SYS, "filename" is an environment variable, so it
      * should hang around. If set, it is expected to be a full path name
-     * (if relevant) */
-    if (filename) {
+     * (if relevant)
+     */
+    if (filename && *filename) {
+        set_configfile_name(filename);
 #ifdef UNIX
-        if ((src != SET_IN_SYS) && access(filename, 4) == -1) {
-            /* 4 is R_OK on newer systems */
+        if (access(configfile, 4) == -1) { /* 4 is R_OK on newer systems */
             /* nasty sneaky attempt to read file through
              * NetHack's setuid permissions -- this is the only
              * place a file name may be wholly under the player's
              * control (but SYSCF_FILE is not under the player's
              * control so it's OK).
              */
-            raw_printf("Access to %s denied (%d).", filename, errno);
+            raw_printf("Access to %s denied (%d).", configfile, errno);
             wait_synch();
             /* fall through to standard names */
         } else
 #endif
-#ifdef PREFIXES_IN_USE
-            if (src == SET_IN_SYS) {
-            (void) strncpy(lastconfigfile, fqname(filename, SYSCONFPREFIX, 0),
-                           BUFSZ - 1);
-        } else
-#endif
-            /* always honor sysconf first before anything else */
-            (void) strncpy(lastconfigfile, filename, BUFSZ - 1);
-        lastconfigfile[BUFSZ - 1] = '\0';
-        if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
-            return  fp;
-        if ((fp = fopenp(filename, "r")) != (FILE *) 0) {
+        if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
             return  fp;
 #if defined(UNIX) || defined(VMS)
         } else {
             /* access() above probably caught most problems for UNIX */
             raw_printf("Couldn't open requested config file %s (%d).",
-                       filename, errno);
+                       configfile, errno);
             wait_synch();
-/* fall through to standard names */
 #endif
         }
     }
+    /* fall through to standard names */
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
+    set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
         return fp;
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
-        return fp;
+    } else if (strcmp(default_configfile, configfile)) {
+        set_configfile_name(default_configfile);
+        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+            return fp;
+    }
 #ifdef MSDOS
-    if ((fp = fopenp(fqname(backward_compat_configfile, CONFIGPREFIX, 0),
-                     "r")) != (FILE *) 0)
+    set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
         return fp;
-    if ((fp = fopenp(backward_compat_configfile, "r")) != (FILE *) 0)
-        return fp;
+    } else if (strcmp(backwad_compat_configfile, configfile)) {
+        set_configfile_name(backward_compat_configfile);
+        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+            return fp;
+    }
 #endif
 #else
 /* constructed full path names don't need fqname() */
 #ifdef VMS
-    (void) strncpy(lastconfigfile, fqname("nethackini", CONFIGPREFIX, 0),
-                   BUFSZ - 1);
-    lastconfigfile[BUFSZ - 1] = '\0';
-    if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0) {
+    /* no punctuation, so might be a logical name */
+    set_configfile_name(fqname("nethackini", CONFIGPREFIX, 0));
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
-    }
-    (void) strncpy(lastconfigfile, "sys$login:nethack.ini", BUFSZ - 1);
-    lastconfigfile[BUFSZ - 1] = '\0';
-    if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0) {
+    set_configfile_name("sys$login:nethack.ini");
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
-    }
 
     envp = nh_getenv("HOME");
-    if (!envp)
+    if (!envp || !*envp)
         Strcpy(tmp_config, "NetHack.cnf");
     else
-        Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
-
-    (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
-    lastconfigfile[BUFSZ - 1] = '\0';
-    if ((fp = fopenp(tmp_config, "r")) != (FILE *) 0)
+        Sprintf(tmp_config, "%s%s%s", envp,
+                !index(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
+                "NetHack.cnf");
+    set_configfile_name(tmp_config);
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
@@ -1951,43 +1964,41 @@ int src;
     else
         Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
 
-    (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
-    lastconfigfile[BUFSZ - 1] = '\0';
-    if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
+    set_configfile_name(tmp_config);
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
-#if defined(__APPLE__)
+#if defined(__APPLE__) /* UNIX+__APPLE__ => MacOSX */
     /* try an alternative */
     if (envp) {
+        /* OSX-style configuration settings */
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults");
-        (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
-        lastconfigfile[BUFSZ - 1] = '\0';
-        if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
+        set_configfile_name(tmp_config);
+        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
+        /* may be easier for user to edit if filename as '.txt' suffix */
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults.txt");
-        (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
-        lastconfigfile[BUFSZ - 1] = '\0';
-        if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
+        set_configfile_name(tmp_config);
+        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
     }
-#endif
+#endif /*__APPLE__*/
     if (errno != ENOENT) {
         const char *details;
 
-/* e.g., problems when setuid NetHack can't search home
- * directory restricted to user */
-
+        /* e.g., problems when setuid NetHack can't search home
+           directory restricted to user */
 #if defined(NHSTDC) && !defined(NOTSTDC)
         if ((details = strerror(errno)) == 0)
 #endif
             details = "";
         raw_printf("Couldn't open default config file %s %s(%d).",
-                   lastconfigfile, details, errno);
+                   configfile, details, errno);
         wait_synch();
     }
-#endif /* Unix */
-#endif
+#endif /* !VMS => Unix */
+#endif /* !(MICRO || MAC || __BEOS__ || WIN32) */
     return (FILE *) 0;
 }
 
@@ -2252,6 +2263,9 @@ int src;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
+    } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
+        if (sysopt.genericusers) free(sysopt.genericusers);
+        sysopt.genericusers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);

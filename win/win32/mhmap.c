@@ -682,7 +682,7 @@ onPaint(HWND hWnd)
                                         &special, i, j);
                         ch = (char) mgch;
                         if (((special & MG_PET) && iflags.hilite_pet)
-                            || ((special & MG_DETECT)
+                            || ((special & (MG_DETECT | MG_BW_LAVA))
                                 && iflags.use_inverse)) {
                             back_brush =
                                 CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));

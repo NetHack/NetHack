@@ -3719,10 +3719,10 @@ xchar sx, sy;
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The("acid doesn't hurt.");
+            pline_The("%s doesn't hurt.", hliquid("acid"));
             dam = 0;
         } else {
-            pline_The("acid burns!");
+            pline_The("%s burns!", hliquid("acid"));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
         }
@@ -3869,6 +3869,15 @@ const char *fltxt;
         xkilled(mon, XKILL_NOMSG | XKILL_NOCORPSE);
 }
 
+void
+buzz(type,nd,sx,sy,dx,dy)
+int type, nd;
+xchar sx,sy;
+int dx,dy;
+{
+    dobuzz(type, nd, sx, sy, dx, dy, TRUE);
+}
+
 /*
  * type ==   0 to   9 : you shooting a wand
  * type ==  10 to  19 : you casting a spell
@@ -3879,10 +3888,11 @@ const char *fltxt;
  * called with dx = dy = 0 with vertical bolts
  */
 void
-buzz(type, nd, sx, sy, dx, dy)
+dobuzz(type, nd, sx, sy, dx, dy,say)
 register int type, nd;
 register xchar sx, sy;
 register int dx, dy;
+boolean say; /* Announce out of sight hit/miss events if true */
 {
     int range, abstype = abs(type) % 10;
     register xchar lsx, lsy;
@@ -4009,7 +4019,8 @@ register int dx, dy;
                     } else {
                         if (!otmp) {
                             /* normal non-fatal hit */
-                            hit(fltxt, mon, exclam(tmp));
+                            if (say || canseemon(mon))
+                                hit(fltxt, mon, exclam(tmp));
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
@@ -4024,7 +4035,8 @@ register int dx, dy;
                 }
                 range -= 2;
             } else {
-                miss(fltxt, mon);
+                if (say || canseemon(mon))
+                    miss(fltxt, mon);
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0);
@@ -4059,11 +4071,14 @@ register int dx, dy;
 
         if (!ZAP_POS(levl[sx][sy].typ)
             || (closed_door(sx, sy) && range >= 0)) {
-            int bounce;
+            int bounce, bchance;
             uchar rmn;
             boolean fireball;
 
         make_bounce:
+            bchance = (levl[sx][sy].typ == STONE) ? 10
+                : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
+                : 75;
             bounce = 0;
             fireball = (type == ZT_SPELL(ZT_FIRE));
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
@@ -4080,7 +4095,7 @@ register int dx, dy;
                 } else
                     pline_The("%s bounces!", fltxt);
             }
-            if (!dx || !dy || !rn2(20)) {
+            if (!dx || !dy || !rn2(bchance)) {
                 dx = -dx;
                 dy = -dy;
             } else {
@@ -4291,7 +4306,7 @@ short exploding_wand_typ;
             if (lev->typ == WATER) {
                 /* For now, don't let WATER freeze. */
                 if (see_it)
-                    pline_The("water freezes for a moment.");
+                    pline_The("%s freezes for a moment.", hliquid("water"));
                 else
                     You_hear("a soft crackling.");
                 rangemod -= 1000; /* stop */
@@ -4312,11 +4327,11 @@ short exploding_wand_typ;
                 bury_objs(x, y);
                 if (see_it) {
                     if (lava)
-                        Norep("The lava cools and solidifies.");
+                        Norep("The %s cools and solidifies.", hliquid("lava"));
                     else if (moat)
                         Norep("The %s is bridged with ice!", buf);
                     else
-                        Norep("The water freezes.");
+                        Norep("The %s freezes.", hliquid("water"));
                     newsym(x, y);
                 } else if (!lava)
                     You_hear("a crackling sound.");

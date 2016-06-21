@@ -1,4 +1,4 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1450306170 2015/12/16 22:49:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	global.h	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,7 @@
 #define RECORD "record"         /* file containing list of topscorers */
 #define HELP "help"             /* file containing command descriptions */
 #define SHELP "hh"              /* abbreviated form of the same */
+#define KEYHELP "keyhelp"       /* explanatory text for 'whatdoes' command */
 #define DEBUGHELP "wizhelp"     /* file containing debug mode cmds */
 #define RUMORFILE "rumors"      /* file with fortune cookies */
 #define ORACLEFILE "oracles"    /* file with oracular information */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1462663937 2016/05/07 23:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1464485934 2016/05/29 01:38:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -679,6 +679,14 @@ int mode;
             feel_location(x, y);
         if (Passes_walls && may_passwall(x, y)) {
             ; /* do nothing */
+        } else if (Underwater) {
+            /* note: if water_friction() changes direction due to
+               turbulence, new target destination will always be water,
+               so we won't get here, hence don't need to worry about
+               "there" being somewhere the player isn't sure of */
+            if (mode == DO_MOVE)
+                pline("There is an obstacle there.");
+            return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if ((dmgtype(youmonst.data, AD_RUST)
                  || dmgtype(youmonst.data, AD_CORR)) && mode == DO_MOVE
@@ -686,7 +694,7 @@ int mode;
                 return FALSE;
             }
             if (!(Passes_walls || passes_bars(youmonst.data))) {
-                if (iflags.mention_walls)
+                if (mode == DO_MOVE && iflags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;
             }
@@ -702,14 +710,16 @@ int mode;
             return FALSE;
         } else {
             if (mode == DO_MOVE) {
-                if (Is_stronghold(&u.uz) && is_db_wall(x, y))
-                    pline_The("drawbridge is up!");
+                if (is_db_wall(x, y))
+                    pline("That drawbridge is up!");
                 /* sokoban restriction stays even after puzzle is solved */
                 else if (Passes_walls && !may_passwall(x, y)
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
                 else if (iflags.mention_walls)
-                    pline("It's a wall.");
+                    pline("It's %s.", IS_WALL(tmpr->typ) ? "a wall"
+                                        : IS_TREE(tmpr->typ) ? "a tree"
+                                          : "solid stone");
             }
             return FALSE;
         }
@@ -722,6 +732,10 @@ int mode;
             } else if (can_ooze(&youmonst)) {
                 if (mode == DO_MOVE)
                     You("ooze under the door.");
+            } else if (Underwater) {
+                if (mode == DO_MOVE)
+                    pline("There is an obstacle there.");
+                return FALSE;
             } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
                 /* Eat the door. */
                 if (mode == DO_MOVE && still_chewing(x, y))
@@ -757,8 +771,12 @@ int mode;
             if (dx && dy && !Passes_walls
                 && (!doorless_door(x, y) || block_door(x, y))) {
                 /* Diagonal moves into a door are not allowed. */
-                if (Blind && mode == DO_MOVE)
-                    feel_location(x, y);
+                if (mode == DO_MOVE) {
+                    if (Blind)
+                        feel_location(x, y);
+                    if (Underwater || iflags.mention_walls)
+                        You_cant("move diagonally into an intact doorway.");
+                }
                 return FALSE;
             }
         }
@@ -791,8 +809,7 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (context.run == 8
-        && (mode == TEST_MOVE || mode == TEST_TRAP)
+    if (context.run == 8 && (mode != DO_MOVE)
         && (x != u.ux || y != u.uy)) {
         struct trap *t = t_at(x, y);
 
@@ -811,6 +828,8 @@ int mode;
     if (dx && dy && !Passes_walls && IS_DOOR(ust->typ)
         && (!doorless_door(ux, uy) || block_entry(x, y))) {
         /* Can't move at a diagonal out of a doorway with door. */
+        if (mode == DO_MOVE && iflags.mention_walls)
+            You_cant("move diagonally out of an intact doorway.");
         return FALSE;
     }
 
@@ -931,7 +950,44 @@ boolean guess;
                     int nx = x + xdir[ordered[dir]];
                     int ny = y + ydir[ordered[dir]];
 
-                    if (!isok(nx, ny))
+                    /*
+                     * When guessing and trying to travel as close as possible
+                     * to an unreachable target space, don't include spaces
+                     * that would never be picked as a guessed target in the
+                     * travel matrix describing hero-reachable spaces.
+                     * This stops travel from getting confused and moving
+                     * the hero back and forth in certain degenerate
+                     * configurations of sight-blocking obstacles, e.g.
+                     *
+                     *  T         1. Dig this out and carry enough to not be
+                     *   ####       able to squeeze through diagonal gaps.
+                     *   #--.---    Stand at @ and target travel at space T.
+                     *    @.....
+                     *    |.....
+                     *
+                     *  T         2. couldsee() marks spaces marked a and x
+                     *   ####       as eligible guess spaces to move the hero
+                     *   a--.---    towards.  Space a is closest to T, so it
+                     *    @xxxxx    gets chosen.  Travel system moves @ right
+                     *    |xxxxx    to travel to space a.
+                     *
+                     *  T         3. couldsee() marks spaces marked b, c and x
+                     *   ####       as eligible guess spaces to move the hero
+                     *   a--c---    towards.  Since findtravelpath() is called
+                     *    b@xxxx    repeatedly during travel, it doesn't
+                     *    |xxxxx    remember that it wanted to go to space a,
+                     *              so in comparing spaces b and c, b is
+                     *              chosen, since it seems like the closest
+                     *              eligible space to T. Travel system moves @
+                     *              left to go to space b.
+                     *
+                     *            4. Go to 2.
+                     *
+                     * By limiting the travel matrix here, space a in the
+                     * example above is never included in it, preventing
+                     * the cycle.
+                     */
+                    if (!isok(nx, ny) || (guess && !couldsee(nx, ny)))
                         continue;
                     if ((!Passes_walls && !can_ooze(&youmonst)
                          && closed_door(x, y)) || sobj_at(BOULDER, x, y)
@@ -960,8 +1016,7 @@ boolean guess;
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     context.run = 8;
-                                    iflags.travelcc.x = iflags.travelcc.y =
-                                        -1;
+                                    iflags.travelcc.x = iflags.travelcc.y = -1;
                                 }
                                 return TRUE;
                             }
@@ -1134,9 +1189,11 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
             if ((u.utrap & 0xff) == 0) {
                 u.utrap = 0;
                 if (u.usteed)
-                    You("lead %s to the edge of the lava.", steedname);
+                    You("lead %s to the edge of the %s.", steedname,
+                        hliquid("lava"));
                 else
-                    You("pull yourself to the edge of the lava.");
+                    You("pull yourself to the edge of the %s.",
+                        hliquid("lava"));
             }
         }
         u.umoved = TRUE;
@@ -1843,16 +1900,16 @@ boolean newspot;             /* true if called by spoteffects */
             if (Is_waterlevel(&u.uz))
                 You("pop into an air bubble.");
             else if (is_lava(u.ux, u.uy))
-                You("leave the water..."); /* oops! */
+                You("leave the %s...", hliquid("water")); /* oops! */
             else
                 You("are on solid %s again.",
                     is_ice(u.ux, u.uy) ? "ice" : "land");
         } else if (Is_waterlevel(&u.uz)) {
             still_inwater = TRUE;
         } else if (Levitation) {
-            You("pop out of the water like a cork!");
+            You("pop out of the %s like a cork!", hliquid("water"));
         } else if (Flying) {
-            You("fly out of the water.");
+            You("fly out of the %s.", hliquid("water"));
         } else if (Wwalking) {
             You("slowly rise above the surface.");
         } else {
@@ -2363,7 +2420,8 @@ dopickup()
     if (is_pool(u.ux, u.uy)) {
         if (Wwalking || is_floater(youmonst.data) || is_clinger(youmonst.data)
             || (Flying && !Breathless)) {
-            You("cannot dive into the water to pick things up.");
+            You("cannot dive into the %s to pick things up.",
+                hliquid("water"));
             return 0;
         } else if (!Underwater) {
             You_cant("even see the bottom, let alone pick up %s.", something);
@@ -2390,7 +2448,7 @@ dopickup()
         else if (IS_GRAVE(lev->typ))
             You("don't need a gravestone.  Yet.");
         else if (IS_FOUNTAIN(lev->typ))
-            You("could drink the water...");
+            You("could drink the %s...", hliquid("water"));
         else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
             pline("It won't come off the hinges.");
         else

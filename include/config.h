@@ -364,11 +364,6 @@
  */
 #endif /* CHDIR */
 
-/* If GENERIC_USERNAMES is defined, and the player's username is found
- * in the list, prompt for character name instead of using username.
- * A public server should probably disable this. */
-#define GENERIC_USERNAMES "play player game games nethack nethacker"
-
 /*
  * Section 3:   Definitions that may vary with system type.
  *              For example, both schar and uchar should be short ints on
