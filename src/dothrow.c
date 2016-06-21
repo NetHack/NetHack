@@ -547,8 +547,8 @@ int x, y;
         boolean odoor_diag = (IS_DOOR(levl[x][y].typ)
                               && (levl[x][y].doormask & D_ISOPEN)
                               && (u.ux - x) && (u.uy - y));
-        if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)
-            || odoor_diag) {
+
+        if (IS_ROCK(levl[x][y].typ) || closed_door(x, y) || odoor_diag) {
             const char *s;
 
             if (odoor_diag)

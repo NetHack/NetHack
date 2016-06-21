@@ -36,6 +36,7 @@ STATIC_DCL boolean FDECL(figurine_location_checks, (struct obj *,
                                                     coord *, BOOLEAN_P));
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
+STATIC_PTR boolean FDECL(check_jump, (genericptr_t, int, int));
 STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
 
@@ -1450,7 +1451,48 @@ dojump()
     return jump(0);
 }
 
-boolean
+enum jump_trajectory {
+    jAny  = 0, /* any direction => magical jump */
+    jHorz = 1,
+    jVert = 2,
+    jDiag = 3  /* jHorz|jVert */
+};
+
+/* callback routine for walk_path() */
+STATIC_PTR boolean
+check_jump(arg, x, y)
+genericptr arg;
+int x, y;
+{
+    int traj = *(int *) arg;
+    struct rm *lev = &levl[x][y];
+
+    if (Passes_walls)
+        return TRUE;
+    if (IS_STWALL(lev->typ))
+        return FALSE;
+    if (IS_DOOR(lev->typ)) {
+        if (closed_door(x, y))
+            return FALSE;
+        if ((lev->doormask & D_ISOPEN) != 0 && traj != jAny
+            /* reject diagonal jump into or out-of or through open door */
+            && (traj == jDiag
+                /* reject horizontal jump through horizontal open door
+                   and non-horizontal (ie, vertical) jump through
+                   non-horizontal (vertical) open door */
+                || ((traj & jHorz) != 0) == (lev->horizontal != 0)))
+            return FALSE;
+        /* empty doorways aren't restricted */
+    }
+    /* let giants jump over boulders (what about Flying?
+       and is there really enough head room for giants to jump
+       at all, let alone over something tall?) */
+    if (sobj_at(BOULDER, x, y) && !throws_rocks(youmonst.data))
+        return FALSE;
+    return TRUE;
+}
+
+STATIC_OVL boolean
 is_valid_jump_pos(x, y, magic, showmsg)
 int x, y, magic;
 boolean showmsg;
@@ -1466,14 +1508,54 @@ boolean showmsg;
         if (showmsg)
             pline("Too far!");
         return FALSE;
-    } else if (!cansee(x, y)) {
-        if (showmsg)
-            You("cannot see where to land!");
-        return FALSE;
     } else if (!isok(x, y)) {
         if (showmsg)
             You("cannot jump there!");
         return FALSE;
+    } else if (!cansee(x, y)) {
+        if (showmsg)
+            You("cannot see where to land!");
+        return FALSE;
+    } else {
+        coord uc, tc;
+        struct rm *lev = &levl[u.ux][u.uy];
+        /* we want to categorize trajectory for use in determining
+           passage through doorways: horizonal, vertical, or diagonal;
+           since knight's jump and other irregular directions are
+           possible, we flatten those out to simplify door checks */
+        int diag, traj,
+            dx = x - u.ux, dy = y - u.uy,
+            ax = abs(dx), ay = abs(dy);
+
+        /* diag: any non-orthogonal destination classifed as diagonal */
+        diag = (magic || Passes_walls || (!dx && !dy)) ? jAny
+               : !dy ? jHorz : !dx ? jVert : jDiag;
+        /* traj: flatten out the trajectory => some diagonals re-classified */
+        if (ax >= 2 * ay)
+            ay = 0;
+        else if (ay >= 2 * ax)
+            ax = 0;
+        traj = (magic || Passes_walls || (!ax && !ay)) ? jAny
+               : !ay ? jHorz : !ax ? jVert : jDiag;
+        /* walk_path doesn't process the starting spot;
+           this is iffy:  if you're starting on a closed door spot,
+           you _can_ jump diagonally from doorway (without needing
+           Passes_walls); that's intentional but is it correct? */
+        if (diag == jDiag && IS_DOOR(lev->typ)
+            && (lev->doormask & D_ISOPEN) != 0
+            && (traj == jDiag
+                || ((traj & jHorz) != 0) == (lev->horizontal != 0))) {
+            if (showmsg)
+                You_cant("jump diagonally out of a doorway.");
+            return FALSE;
+        }
+        uc.x = u.ux, uc.y = u.uy;
+        tc.x = x, tc.y = y; /* target */
+        if (!walk_path(&uc, &tc, check_jump, (genericptr_t) &traj)) {
+            if (showmsg)
+                There("is an obstacle preventing that jump.");
+            return FALSE;
+        }
     }
     return TRUE;
 }
@@ -1493,7 +1575,8 @@ int state;
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
-                if (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
+                if (isok(x, y)
+                    && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
                     && is_valid_jump_pos(x, y, jumping_is_magic, FALSE))
                     tmp_at(x, y);
             }
