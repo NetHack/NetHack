@@ -814,8 +814,8 @@ register struct obj *obj;
         case CARROT:
             return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case BANANA:
-            return (mptr->mlet == S_YETI)
-                      ? DOGFOOD
+            return (mptr->mlet == S_YETI && herbi)
+                      ? DOGFOOD /* for monkey and ape (tameable), sasquatch */
                       : (herbi || starving)
                          ? ACCFOOD
                          : MANFOOD;
