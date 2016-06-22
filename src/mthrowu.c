@@ -414,6 +414,24 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     return 0;
 }
 
+#define MT_FLIGHTCHECK(pre)                                             \
+    (/* missile hits edge of screen */                                  \
+     !isok(bhitpos.x + dx, bhitpos.y + dy)                              \
+     /* missile hits the wall */                                        \
+     || IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ)               \
+     /* missile hit closed door */                                      \
+     || closed_door(bhitpos.x + dx, bhitpos.y + dy)                     \
+     /* missile might hit iron bars */                                  \
+     /* the random chance for small objects hitting bars is */          \
+     /* skipped when reaching them at point blank range */              \
+     || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS           \
+         && hits_bars(&singleobj,                                       \
+                      bhitpos.x, bhitpos.y,                             \
+                      bhitpos.x + dx, bhitpos.y + dy,                   \
+                      ((pre) ? 0 : !rn2(5)), 0))                        \
+     /* Thrown objects "sink" */                                        \
+     || (!(pre) && IS_SINK(levl[bhitpos.x][bhitpos.y].typ)))
+
 void
 m_throw(mon, x, y, dx, dy, range, obj)
 struct monst *mon;       /* launching monster */
@@ -471,17 +489,7 @@ struct obj *obj;         /* missile (or stack providing it) */
         }
     }
 
-    /* pre-check for doors, walls and boundaries.
-       Also need to pre-check for bars regardless of direction;
-       the random chance for small objects hitting bars is
-       skipped when reaching them at point blank range */
-    if (!isok(bhitpos.x + dx, bhitpos.y + dy)
-        || IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ)
-        || closed_door(bhitpos.x + dx, bhitpos.y + dy)
-        || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS
-            && hits_bars(&singleobj,
-                         bhitpos.x, bhitpos.y,
-                         bhitpos.x + dx, bhitpos.y + dy, 0, 0))) {
+    if (MT_FLIGHTCHECK(TRUE)) {
         (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
         return;
     }
@@ -611,20 +619,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             }
         }
         if (!range /* reached end of path */
-            /* missile hits edge of screen */
-            || !isok(bhitpos.x + dx, bhitpos.y + dy)
-            /* missile hits the wall */
-            || IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ)
-            /* missile hit closed door */
-            || closed_door(bhitpos.x + dx, bhitpos.y + dy)
-            /* missile might hit iron bars */
-            || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS
-                && hits_bars(&singleobj,
-                             bhitpos.x, bhitpos.y,
-                             bhitpos.x + dx, bhitpos.y + dy,
-                             !rn2(5), 0))
-            /* Thrown objects "sink" */
-            || IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+            || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
                 if (m_shot.n > 1 && (cansee(bhitpos.x, bhitpos.y)
                                      || (archer && canseemon(archer))))
@@ -647,6 +642,8 @@ struct obj *obj;         /* missile (or stack providing it) */
             Your1(vision_clears);
     }
 }
+
+#undef MT_FLIGHTCHECK
 
 /* Monster throws item at another monster */
 int
