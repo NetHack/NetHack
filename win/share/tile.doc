@@ -57,8 +57,10 @@ boolean read_text_tile(pixel[TILE_Y][TILE_X]);
 boolean write_text_tile(pixel[TILE_Y][TILE_X]);
 	writes tile
 
-There are two additional shared routines provided for writers:
+There are some additional shared routines provided for writers:
 
+void set_grayscale(boolean g);
+	do grayscale color substitutions when reading the tile text file
 void init_colormap();
 	initialize the output colormap from the input one
 	must be called before opening output file as colormap is part of header

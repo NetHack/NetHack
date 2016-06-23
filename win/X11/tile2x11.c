@@ -177,7 +177,7 @@ char **argv;
     header.per_row = TILES_PER_ROW;
 
     if (argc == 1) {
-        Fprintf(stderr, "usage: %s txt_file1 [txt_file2 ...]\n", argv[0]);
+        Fprintf(stderr, "usage: %s txt_file1 [txt_file2 ...] [-grayscale txt_fileN]\n", argv[0]);
         exit(1);
     }
 
@@ -190,8 +190,15 @@ char **argv;
     /* don't leave garbage at end of partial row */
     (void) memset((genericptr_t) tile_bytes, 0, sizeof(tile_bytes));
 
-    for (i = 1; i < argc; i++)
+    for (i = 1; i < argc; i++) {
+        if (!strncmp(argv[i], "-grayscale", 10)) {
+            set_grayscale(TRUE);
+            if (i < (argc - 1)) i++;
+        } else {
+            set_grayscale(FALSE);
+        }
         process_file(argv[i]);
+    }
     Fprintf(stderr, "Total tiles: %ld\n", header.ntiles);
 
     /* round size up to the end of the row */

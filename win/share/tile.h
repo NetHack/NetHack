@@ -35,6 +35,7 @@ extern boolean FDECL(read_text_tile, (pixel(*) [TILE_X]));
 extern boolean FDECL(write_text_tile, (pixel(*) [TILE_X]));
 extern int NDECL(fclose_text_file);
 
+extern void FDECL(set_grayscale, (boolean));
 extern void NDECL(init_colormap);
 extern void NDECL(merge_colormap);
 
