@@ -1,4 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1454464783 2016/02/03 01:59:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	tiletext.c	$NHDT-Date: 1466687974 2016/06/23 13:19:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.14 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
@@ -37,7 +37,7 @@ static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
     "%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
     "(%d, %d, %d) "
 
-static boolean grayscale = FALSE;
+static int grayscale = 0;
 /* grayscale color mapping */
 static const int graymappings[] = {
  /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
@@ -46,7 +46,7 @@ static const int graymappings[] = {
 
 void
 set_grayscale(g)
-boolean g;
+int g;
 {
     grayscale = g;
 }
