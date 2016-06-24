@@ -690,10 +690,22 @@ Go in that direction until you hit a wall or run into something.
 %.lp
 \item[\tb{m[yuhjklbn]}]
 Prefix:  move without picking up objects or fighting (even if you remember
-a monster there)
+a monster there).\\
+%.lp ""
+A few non-movement commands use the `{\tt m}' prefix to request operating
+via menu (to temporarily override the
+{\it menustyle:Traditional\/}
+option).
+Primarily useful for `{\tt ,}' (pickup) when there is only one class of
+objects present (where there won't be any ``what kinds of objects?'' prompt,
+so no opportunity to answer `{\tt m}' at that prompt).\\
+%.lp ""
+A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+the `{\tt m}' prefix to skip checking for applicable objects on the floor
+and go straight to checking inventory.
 %.lp
 \item[\tb{F[yuhjklbn]}]
-Prefix:  fight a monster (even if you only guess one is there)
+Prefix:  fight a monster (even if you only guess one is there).
 %.lp
 \item[\tb{M[yuhjklbn]}]
 Prefix:  Move far, no pickup.
@@ -775,7 +787,12 @@ the bless\-ed/\-un\-curs\-ed/\-curs\-ed groups may be typed.\\
 Kick something (usually a door).
 %.lp
 \item[\tb{e}]
-Eat food.
+Eat food.\\
+%.lp ""
+Normally checks for edible item(s) on the floor, then if none are found
+or none are chosen, checks for edible item(s) in inventory.
+Precede `{\tt e}' with the `{\tt m}' prefix to bypass attempting to eat
+anything off the floor.
 %.lp
 % Make sure Elbereth is not hyphenated below, the exact spelling matters.
 % (Only specified here to parallel Guidebook.mn; use of \tt font implicity

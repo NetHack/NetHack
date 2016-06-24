@@ -2368,6 +2368,7 @@ doeat()
 
     if (u.uedibility) {
         int res = edibility_prompts(otmp);
+
         if (res) {
             Your(
                "%s stops tingling and your sense of smell returns to normal.",
@@ -2974,7 +2975,8 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
         offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
     /* if we can't touch floor objects then use invent food only */
-    if (!can_reach_floor(TRUE) || (feeding && u.usteed)
+    if (iflags.menu_requested /* command was preceded by 'm' prefix */
+        || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
             && (Wwalking || is_clinger(youmonst.data)
                 || (Flying && !Breathless))))
