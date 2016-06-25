@@ -1,3 +1,12 @@
+This repository contains the following changes to NetHack 3.6.1
+
+    * support to use Visual Studio 2015 to build and run both the console
+	  and graphics interfaces of nethack on windows 10.  Simply install
+	  visual studio 2015 and open sys\win10\nethack.sln with visual
+	  studio.  NOTE: It is likely but not tested that the same solution
+	  works with Windows 7/8/8.1.
+
+
                 NetHack 3.6.1 -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack.
