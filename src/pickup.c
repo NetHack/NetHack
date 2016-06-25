@@ -1630,7 +1630,7 @@ doloot()
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
-    int num_conts;
+    int num_conts = 0;
 
     abort_looting = FALSE;
 
@@ -1653,12 +1653,29 @@ doloot()
     cc.x = u.ux;
     cc.y = u.uy;
 
-lootcont:
+    if (iflags.menu_requested)
+        goto lootmon;
+
+ lootcont:
     if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
         boolean anyfound = FALSE;
 
         if (!able_to_loot(cc.x, cc.y, TRUE))
             return 0;
+
+        if (Blind && !uarmg) {
+            /* if blind and without gloves, attempting to #loot at the
+               location of a cockatrice corpse is fatal before asking
+               whether to manipulate any containers */
+            for (nobj = sobj_at(CORPSE, cc.x, cc.y); nobj;
+                 nobj = nxtobj(nobj, CORPSE, TRUE))
+                if (will_feel_cockatrice(nobj, FALSE)) {
+                    feel_cockatrice(nobj, FALSE);
+                    /* if life-saved (or poly'd into stone golem),
+                       terminate attempt to loot */
+                    return 1;
+                }
+        }
 
         if (num_conts > 1) {
             /* use a menu to loot many containers */
@@ -1722,9 +1739,11 @@ lootcont:
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
         You("need to dig up the grave to effectively loot it...");
     }
+
     /*
      * 3.3.1 introduced directional looting for some things.
      */
+ lootmon:
     if (c != 'y' && mon_beside(u.ux, u.uy)) {
         if (!get_adjacent_loc("Loot in what direction?",
                               "Invalid loot location", u.ux, u.uy, &cc))

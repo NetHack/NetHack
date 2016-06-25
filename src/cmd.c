@@ -3455,6 +3455,9 @@ int NDECL((*cmd_func));
            an item on floor or in invent; 'm' skips picking from floor
            (ie, inventory only) rather than request use of menu operation */
         || cmd_func == doeat || cmd_func == dosacrifice || cmd_func == doapply
+        /* 'm' for removing saddle from adjacent monster without checking
+           for containers at <u.ux,u.uy> */
+        || cmd_func == doloot
         /* 'm' prefix allowed for some extended commands */
         || cmd_func == doextcmd || cmd_func == doextlist)
         return TRUE;

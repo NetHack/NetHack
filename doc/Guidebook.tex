@@ -702,7 +702,9 @@ so no opportunity to answer `{\tt m}' at that prompt).\\
 %.lp ""
 A few other commands (eat food, offer sacrifice, apply tinning-kit) use
 the `{\tt m}' prefix to skip checking for applicable objects on the floor
-and go straight to checking inventory.
+and go straight to checking inventory,
+or (for ``{\tt \#loot}'' to remove a saddle),
+skip containers and go straight to adjacent monsters.
 %.lp
 \item[\tb{F[yuhjklbn]}]
 Prefix:  fight a monster (even if you only guess one is there).
@@ -1136,6 +1138,8 @@ Kick something.
 \item[\tb{\#loot}]
 Loot a box or bag on the floor beneath you, or the saddle 
 from a steed standing next to you.
+Precede with the `{\tt m}' prefix to skip containers at your location
+and go directly to removing a saddle.
 %.lp
 \item[\tb{\#monster}]
 Use a monster's special ability (when polymorphed into monster form).
@@ -1591,14 +1595,24 @@ have the right equipment and skill.  Convincing a wild beast to let
 you saddle it up is difficult to say the least.  Many a dungeoneer
 has had to resort to magic and wizardry in order to forge the alliance.
 Once you do have the beast under your control however, you can
-easily climb in and out of the saddle with the `{\tt \#ride}' command.  Lead
+easily climb in and out of the saddle with the ``{\tt \#ride}'' command.  Lead
 the beast around the dungeon when riding, in the same manner as
 you would move yourself.  It is the beast that you will see displayed
 on the map.
 
 %.pg
-Riding skill is managed by the `{\tt \#enhance}' command.  See the section
+Riding skill is managed by the ``{\tt \#enhance}'' command.  See the section
 on Weapon proficiency for more information about that.
+
+%.pg
+Use the `{\tt a}' (apply) command and pick a saddle in your inventory to
+attempt to put that saddle on an adjacent creature.  If successful,
+it will be transferred to that creature's inventory.
+
+%.pg
+Use the ``{\tt \#loot}'' command while adjacent to a saddled creature to
+try to remove the saddle from that creature.  If successful, it will
+be transferred to your inventory.
 
 %.hn 2
 \subsection*{Bones levels}
