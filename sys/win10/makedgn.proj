@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Build" 
+     Inputs="$(BinDir)dgncomp.exe;$(DatDir)dungeon.pdf"
+	 Outputs="$(DatDir)dungeon">
+	<Exec Command="$(BinDir)dgncomp.exe dungeon.pdf" WorkingDirectory="$(DatDir)"/>
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="$(DatDir)dungeon"/>
+  </Target>
+  <Import Project="defines.proj"/>
+</Project>

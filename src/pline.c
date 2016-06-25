@@ -654,7 +654,7 @@ const char *line;
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to message handler %s failed.\n",
                        env);
-        terminate(EXIT_FAILURE);
+        nethack_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;

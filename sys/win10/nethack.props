@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <RootDir>$(ProjectDir)..\..\</RootDir>
+    <WinShareDir>$(RootDir)win\share\</WinShareDir>
+    <SrcDir>$(RootDir)src\</SrcDir>
+    <IncDir>$(RootDir)include\</IncDir>
+    <SysDir>$(RootDir)sys\</SysDir>
+    <DocDir>$(RootDir)doc\</DocDir>
+    <DatDir>$(RootDir)dat\</DatDir>
+    <UtilDir>$(RootDir)util\</UtilDir>
+    <SysShareDir>$(RootDir)sys\share\</SysShareDir>
+    <BinDir>$(RootDir)bin\$(Configuration)\</BinDir>
+    <ObjDir>$(RootDir)obj\$(Configuration)\$(TargetName)\</ObjDir>
+    <NhWinShareDir>$(RootDir)win\share\</NhWinShareDir>
+    <WinWin32Dir>$(RootDir)win\win32\</WinWin32Dir>
+    <SysWinntDir>$(RootDir)sys\winnt\</SysWinntDir>
+    <WinTtyDir>$(RootDir)win\tty\</WinTtyDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(BinDir)</OutDir>
+    <IntDir>$(ObjDir)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysDir)winnt</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;WIN32;DLB;WIN10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="RootDir">
+      <Value>$(RootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SrcDir">
+      <Value>$(SrcDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="IncDir">
+      <Value>$(IncDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SysDir">
+      <Value>$(SysDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DocDir">
+      <Value>$(DocDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DatDir">
+      <Value>$(DatDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="UtilDir">
+      <Value>$(UtilDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SysShareDir">
+      <Value>$(SysShareDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="WinShareDir">
+      <Value>$(WinShareDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BinDir">
+      <Value>$(BinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ObjDir">
+      <Value>$(ObjDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="NhWinShareDir">
+      <Value>$(NhWinShareDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="WinWin32Dir">
+      <Value>$(WinWin32Dir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SysWinntDir">
+      <Value>$(SysWinntDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="WinTtyDir">
+      <Value>$(WinTtyDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

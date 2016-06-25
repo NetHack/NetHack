@@ -50,5 +50,8 @@ Makefile.gcc-orig
 *.ilk
 # VS2013 extension to auto-whine about questionable code generates these
 *.lastcodeanalysissucceeded
+*.aps
+*.db
+*.opendb
 # Win32-specific ignores end
 

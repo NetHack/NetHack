@@ -744,7 +744,7 @@ xchar ltmp;
         }
 #endif /* ?AMIGA */
         pline("Be seeing you...");
-        terminate(EXIT_SUCCESS);
+        nethack_terminate(EXIT_SUCCESS);
     }
 #endif /* MFLOPPY */
     bufon(nfd);
