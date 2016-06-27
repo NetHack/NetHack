@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1467028559 2016/06/27 11:55:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,7 @@ STATIC_PTR int NDECL(unfaint);
 STATIC_DCL const char *FDECL(food_xname, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(choke, (struct obj *));
 STATIC_DCL void NDECL(recalc_wt);
+STATIC_DCL unsigned FDECL(obj_nutrition, (struct obj *));
 STATIC_DCL struct obj *FDECL(touchfood, (struct obj *));
 STATIC_DCL void NDECL(do_reset_eat);
 STATIC_DCL void FDECL(done_eating, (BOOLEAN_P));
@@ -296,6 +297,32 @@ reset_eat()
     return;
 }
 
+/* base nutrition of a food-class object */
+STATIC_OVL unsigned
+obj_nutrition(otmp)
+struct obj *otmp;
+{
+    unsigned nut = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
+                      : otmp->globby ? otmp->owt
+                         : (unsigned) objects[otmp->otyp].oc_nutrition;
+
+    if (otmp->otyp == LEMBAS_WAFER) {
+        if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+            nut += nut / 4; /* 800 -> 1000 */
+        else if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+            nut -= nut / 4; /* 800 -> 600 */
+        /* prevent polymorph making a partly eaten wafer
+           become more nutritious than an untouched one */
+        if (otmp->oeaten >= nut)
+            otmp->oeaten = (otmp->oeaten < objects[LEMBAS_WAFER].oc_nutrition)
+                              ? (nut - 1) : nut;
+    } else if (otmp->otyp == CRAM_RATION) {
+        if (maybe_polyd(is_dwarf(youmonst.data), Race_if(PM_DWARF)))
+            nut += nut / 6; /* 600 -> 700 */
+    }
+    return nut;
+}
+
 STATIC_OVL struct obj *
 touchfood(otmp)
 struct obj *otmp;
@@ -310,9 +337,7 @@ struct obj *otmp;
 
     if (!otmp->oeaten) {
         costly_alteration(otmp, COST_BITE);
-        otmp->oeaten = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
-                           : otmp->globby ? otmp->owt
-                               : (unsigned) objects[otmp->otyp].oc_nutrition;
+        otmp->oeaten = obj_nutrition(otmp);
     }
 
     if (carried(otmp)) {
@@ -1741,6 +1766,15 @@ struct obj *otmp;
                 make_vomiting((long) rn1(context.victual.reqtime, 14), FALSE);
         }
         break;
+    case LEMBAS_WAFER:
+        if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC))) {
+            pline("%s", "!#?&* elf kibble!");
+            break;
+        } else if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
+            pline("A little goes a long way.");
+            break;
+        }
+        goto give_feedback;
     case MEATBALL:
     case MEAT_STICK:
     case HUGE_CHUNK_OF_MEAT:
@@ -2578,9 +2612,7 @@ doeat()
     }
 
     /* re-calc the nutrition */
-    basenutrit = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
-                     : otmp->globby ? otmp->owt
-                         : (unsigned) objects[otmp->otyp].oc_nutrition;
+    basenutrit = (int) obj_nutrition(otmp);
 
     debugpline3(
      "before rounddiv: victual.reqtime == %d, oeaten == %d, basenutrit == %d",
@@ -3087,10 +3119,9 @@ struct obj *obj;
 {
     long uneaten_amt, full_amount;
 
+    /* get full_amount first; obj_nutrition() might modify obj->oeaten */
+    full_amount = (long) obj_nutrition(obj);
     uneaten_amt = (long) obj->oeaten;
-    full_amount = (long) ((obj->otyp == CORPSE) ? mons[obj->corpsenm].cnutrit
-                            : obj->globby ? obj->owt
-                               : (unsigned) objects[obj->otyp].oc_nutrition);
     if (uneaten_amt > full_amount) {
         impossible(
           "partly eaten food (%ld) more nutritious than untouched food (%ld)",
