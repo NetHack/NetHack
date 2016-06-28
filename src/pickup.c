@@ -2902,20 +2902,27 @@ tipcontainer(box)
 struct obj *box; /* or bag */
 {
     xchar ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
-    boolean empty_it = FALSE,
-            /* Shop handling:  can't rely on the container's own unpaid
-               or no_charge status because contents might differ with it.
-               A carried container's contents will be flagged as unpaid
-               or not, as appropriate, and need no special handling here.
-               Items owned by the hero get sold to the shop without
-               confirmation as with other uncontrolled drops.  A floor
-               container's contents will be marked no_charge if owned by
-               hero, otherwise they're owned by the shop.  By passing
-               the contents through shop billing, they end up getting
-               treated the same as in the carried case.   We do so one
-               item at a time instead of doing whole container at once
-               to reduce the chance of exhausting shk's billing capacity. */
-            maybeshopgoods = !carried(box) && costly_spot(ox, oy);
+    boolean empty_it = FALSE, maybeshopgoods;
+
+    /* box is either held or on floor at hero's spot; no need to check for
+       nesting; when held, we need to update its location to match hero's;
+       for floor, the coordinate updating is redundant */
+    if (get_obj_location(box, &ox, &oy, 0))
+        box->ox = ox, box->oy = oy;
+
+    /* Shop handling:  can't rely on the container's own unpaid
+       or no_charge status because contents might differ with it.
+       A carried container's contents will be flagged as unpaid
+       or not, as appropriate, and need no special handling here.
+       Items owned by the hero get sold to the shop without
+       confirmation as with other uncontrolled drops.  A floor
+       container's contents will be marked no_charge if owned by
+       hero, otherwise they're owned by the shop.  By passing
+       the contents through shop billing, they end up getting
+       treated the same as in the carried case.   We do so one
+       item at a time instead of doing whole container at once
+       to reduce the chance of exhausting shk's billing capacity. */
+    maybeshopgoods = !carried(box) && costly_spot(box->ox, box->oy);
 
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
@@ -2978,7 +2985,7 @@ struct obj *box; /* or bag */
 
     if (empty_it) {
         struct obj *otmp, *nobj;
-        boolean verbose = FALSE, highdrop = !can_reach_floor(TRUE),
+        boolean terse, highdrop = !can_reach_floor(TRUE),
                 altarizing = IS_ALTAR(levl[ox][oy].typ),
                 cursed_mbag = (Is_mbag(box) && box->cursed);
         int held = carried(box);
@@ -2986,20 +2993,27 @@ struct obj *box; /* or bag */
 
         if (u.uswallow)
             highdrop = altarizing = FALSE;
+        terse = !(highdrop || altarizing || costly_spot(box->ox, box->oy));
         box->cknown = 1;
+        /* Terse formatting is
+         * "Objects spill out: obj1, obj2, obj3, ..., objN."
+         * If any other messages intervene between objects, we revert to
+         * "ObjK drops to the floor.", "ObjL drops to the floor.", &c.
+         */
         pline("%s out%c",
               box->cobj->nobj ? "Objects spill" : "An object spills",
-              !(highdrop || altarizing) ? ':' : '.');
+              terse ? ':' : '.');
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
+            otmp->ox = box->ox, otmp->oy = box->oy;
 
             if (box->otyp == ICE_BOX) {
                 removed_from_icebox(otmp); /* resume rotting for corpse */
             } else if (cursed_mbag && !rn2(13)) {
                 loss += mbag_item_gone(held, otmp);
                 /* abbreviated drop format is no longer appropriate */
-                verbose = TRUE;
+                terse = FALSE;
                 continue;
             }
 
@@ -3012,14 +3026,18 @@ struct obj *box; /* or bag */
                 /* might break or fall down stairs; handles altars itself */
                 hitfloor(otmp);
             } else {
-                if (altarizing)
+                if (altarizing) {
                     doaltarobj(otmp);
-                else if (verbose)
+                } else if (!terse) {
                     pline("%s %s to the %s.", Doname2(otmp),
                           otense(otmp, "drop"), surface(ox, oy));
-                else
+                } else {
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
+                    iflags.last_msg = PLNMSG_OBJNAM_ONLY;
+                }
                 dropy(otmp);
+                if (iflags.last_msg != PLNMSG_OBJNAM_ONLY)
+                    terse = FALSE; /* terse formatting has been interrupted */
             }
             if (maybeshopgoods)
                 iflags.suppress_price--; /* reset */
