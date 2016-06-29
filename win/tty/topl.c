@@ -253,7 +253,7 @@ register const char *bp;
 
     for (tl = toplines; n0 >= CO;) {
         otl = tl;
-        for (tl += CO - 1; tl != otl && !isspace(*tl); --tl)
+        for (tl += CO - 1; tl != otl && !isspace((uchar) *tl); --tl)
             ;
         if (tl == otl) {
             /* Eek!  A huge token.  Try splitting after it. */

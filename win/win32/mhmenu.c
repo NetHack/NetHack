@@ -1412,7 +1412,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             }
         }
 
-        if (isdigit(ch)) {
+        if (isdigit((uchar) ch)) {
             int count;
             i = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
             if (i >= 0) {

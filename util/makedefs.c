@@ -653,7 +653,7 @@ const char *id;
 {
     struct grep_var *rv;
 
-    while (*id && isspace(*id))
+    while (*id && isspace((uchar) *id))
         id++;
     if (!*id) {
         Fprintf(stderr, "missing identifier in line %d", grep_lineno);
@@ -700,10 +700,10 @@ char *buf;
     int isif = 1;
     char *buf0 = buf;
 #if 1
-    if (isspace(buf[0]))
+    if (isspace((uchar) buf[0]))
         return &buf[-1]; /* XXX see docs above */
 #else
-    while (buf[0] && isspace(buf[0]))
+    while (buf[0] && isspace((uchar) buf[0]))
         buf++;
 #endif
     switch (buf[0]) {
@@ -754,7 +754,7 @@ char *buf;
     default: {
         char str[10];
 
-        if (isprint(buf[0])) {
+        if (isprint((uchar) buf[0])) {
             str[0] = buf[0];
             str[1] = '\0';
         } else {
