@@ -1204,7 +1204,7 @@ boolean uncomp;
     if (freopen(filename, mode, stream) == (FILE *) 0) {
         (void) fprintf(stderr, "freopen of %s for %scompress failed\n",
                        filename, uncomp ? "un" : "");
-        terminate(EXIT_FAILURE);
+	nethack_terminate(EXIT_FAILURE);
     }
 }
 
@@ -1310,7 +1310,7 @@ boolean uncomp;
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to %scompress %s failed.\n",
                        uncomp ? "un" : "", filename);
-        terminate(EXIT_FAILURE);
+	nethack_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
         pline("Fork to %scompress %s failed.", uncomp ? "un" : "", filename);
