@@ -570,9 +570,23 @@ Figure 2
 Go in that direction until you hit a wall or run into something.
 .lp m[yuhjklbn]
 Prefix:  move without picking up objects or fighting (even if you remember
-a monster there)
+a monster there).
+.lp ""
+A few non-movement commands use the `m' prefix to request operating
+via menu (to temporarily override the
+.op menustyle:Traditional
+option).
+Primarily useful for `,' (pickup) when there is only one class of
+objects present (where there won't be any ``what kinds of objects?'' prompt,
+so no opportunity to answer `m' at that prompt).
+.lp ""
+A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+the `m' prefix to skip checking for applicable objects on the floor
+and go straight to checking inventory,
+or (for ``#loot'' to remove a saddle),
+skip containers and go straight to adjacent monsters.
 .lp F[yuhjklbn]
-Prefix:  fight a monster (even if you only guess one is there)
+Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
 Prefix:  move far, no pickup.
 .lp "g[yuhjklbn]
@@ -640,6 +654,11 @@ D%u - drop only unpaid food.
 Kick something (usually a door).
 .lp e
 Eat food.
+.lp ""
+Normally checks for edible item(s) on the floor, then if none are found
+or none are chosen, checks for edible item(s) in inventory.
+Precede `e' with the `m' prefix to bypass attempting to eat
+anything off the floor.
 .\" Make sure Elbereth is not hyphenated below, the exact spelling matters
 .hw Elbereth
 .lp E
@@ -928,6 +947,8 @@ Kick something.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle
 from a steed standing next to you.
+Precede with the `m' prefix to skip containers at your location
+and go directly to removing a saddle.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
 .lp #name
@@ -1286,13 +1307,21 @@ have the right equipment and skill.  Convincing a wild beast to let
 you saddle it up is difficult to say the least.  Many a dungeoneer
 has had to resort to magic and wizardry in order to forge the alliance.
 Once you do have the beast under your control however, you can
-easily climb in and out of the saddle with the `#ride' command.  Lead
+easily climb in and out of the saddle with the ``#ride'' command.  Lead
 the beast around the dungeon when riding, in the same manner as
 you would move yourself.  It is the beast that you will see displayed
 on the map.
 .pg
-Riding skill is managed by the `#enhance' command.  See the section
+Riding skill is managed by the ``#enhance'' command.  See the section
 on Weapon proficiency for more information about that.
+.pg
+Use the `a' (apply) command and pick a saddle in your inventory to
+attempt to put that saddle on an adjacent creature.  If successful,
+it will be transferred to that creature's inventory.
+.pg
+Use the ``#loot'' command while adjacent to a saddled creature to
+try to remove the saddle from that creature.  If successful, it will
+be transferred to your inventory.
 .hn 2
 Bones levels
 .pg

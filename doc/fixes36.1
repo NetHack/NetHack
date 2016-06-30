@@ -302,6 +302,16 @@ conduct: wishing for an artifact and not getting it because it already exists
 avoid ring of poison resistance as starting equipment for orcish wizard
 gelatinous cube shouldn't be able to eat a scroll of scare monster
 make fireballs or cones of cold cast a skilled or higher not go through walls
+prevent flying monsters from hovering over unreachable underwater objects
+lembas wafer gives increased nutrition to elves, reduced nutrition to orcs;
+	cram ration gives increase nutrition to dwarves
+when #tip's terse object drop format got interrupted by a regular message,
+	it continued using "obj2, obj3, ..." for subsequent objects, where
+	the sentence grammar no longer made sense (the interrupting message
+	still follows the comma of a partial sentence--attempting to fix that
+	seems hopeless; leaving it is better than always using verbose format)
+for #tip inside shop, credit was incorrectly given for spilled gold if that
+	gold's stale location coordinates didn't happen to be inside the shop
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -365,6 +375,7 @@ X11: support pre-selected entries in menu windows
 X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
+X11: use grayscale monster tiles for statues
 
 
 General New Features

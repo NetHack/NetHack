@@ -382,6 +382,7 @@ extern NEARDATA struct instance_flags iflags;
 #define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
 #define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
 #define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
+#define PLNMSG_OBJNAM_ONLY         5 /* xname/doname only, for #tip */
     /* Usage:
      *  pline("some message");
      *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;

@@ -979,14 +979,20 @@ not_special:
                  * mpickstuff() as well.
                  */
                 if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
-                    /* don't get stuck circling around an object that's
-                       underneath
-                       an immobile or hidden monster; paralysis victims
-                       excluded */
+                    /* don't get stuck circling around object that's
+                       underneath an immobile or hidden monster;
+                       paralysis victims excluded */
                     if ((mtoo = m_at(xx, yy)) != 0
                         && (mtoo->msleeping || mtoo->mundetected
                             || (mtoo->mappearance && !mtoo->iswiz)
                             || !mtoo->data->mmove))
+                        continue;
+                    /* the mfndpos() test for whether to allow a move to a
+                       water location accepts flyers, but they can't reach
+                       underwater objects, so being able to move to a spot
+                       is insufficient for deciding whether to do so */
+                    if ((is_pool(xx, yy) && !is_swimmer(ptr))
+                        || (is_lava(xx, yy) && !likes_lava(ptr)))
                         continue;
 
                     if (((likegold && otmp->oclass == COIN_CLASS)
