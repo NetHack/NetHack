@@ -40,6 +40,20 @@ command line, there is also a set of project files and a workspace file
 that allow you to build the Windows Graphical version from Microsoft
 Visual C's IDE (Integrated Development Environment.)
 
+/-------------------------------\
+| NEW EASY BUILD AND RUN METHOD |
+\-------------------------------/
+
+There is a new experimental method for building and running both the
+Console and Graphical versions of NetHack which is far simpler than
+the other methods listed below.
+
+This method requires that you have installed Visual Studio 2015 Express.
+
+To use this method, open sys\win10\nethack.sln in Vistual Studio 2015,
+build and run.  No other changes are needed.
+
+Or, you can proceed with the other methods below.
 
 /-----------------------------------\
 | FIRST STEP - MOVING THINGS AROUND |
