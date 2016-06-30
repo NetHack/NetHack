@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "makedefs", "makedefs.vcxproj", "{58F8A2AF-68E2-4752-B838-2AA4EB156BE6}"
 EndProject
@@ -66,6 +66,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nethackw", "nethackw.vcxpro
 		{A08826B8-24AA-436E-9AED-466014132441} = {A08826B8-24AA-436E-9AED-466014132441}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nhraykey", "nhraykey.vcxproj", "{BFCB7086-8BE3-4800-97A3-350C81C160E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{58F8A2AF-68E2-4752-B838-2AA4EB156BE6} = {58F8A2AF-68E2-4752-B838-2AA4EB156BE6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nh340key", "nh340key.vcxproj", "{B9257B7F-74C2-4FC4-9656-D9AEE403F7CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{58F8A2AF-68E2-4752-B838-2AA4EB156BE6} = {58F8A2AF-68E2-4752-B838-2AA4EB156BE6}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -112,6 +122,14 @@ Global
 		{6C26C7E6-A8EB-45B7-987D-44194CF2BA1E}.Debug|Win32.Build.0 = Debug|Win32
 		{6C26C7E6-A8EB-45B7-987D-44194CF2BA1E}.Release|Win32.ActiveCfg = Release|Win32
 		{6C26C7E6-A8EB-45B7-987D-44194CF2BA1E}.Release|Win32.Build.0 = Release|Win32
+		{BFCB7086-8BE3-4800-97A3-350C81C160E6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BFCB7086-8BE3-4800-97A3-350C81C160E6}.Debug|Win32.Build.0 = Debug|Win32
+		{BFCB7086-8BE3-4800-97A3-350C81C160E6}.Release|Win32.ActiveCfg = Release|Win32
+		{BFCB7086-8BE3-4800-97A3-350C81C160E6}.Release|Win32.Build.0 = Release|Win32
+		{B9257B7F-74C2-4FC4-9656-D9AEE403F7CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9257B7F-74C2-4FC4-9656-D9AEE403F7CE}.Debug|Win32.Build.0 = Debug|Win32
+		{B9257B7F-74C2-4FC4-9656-D9AEE403F7CE}.Release|Win32.ActiveCfg = Release|Win32
+		{B9257B7F-74C2-4FC4-9656-D9AEE403F7CE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

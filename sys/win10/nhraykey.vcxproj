@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(SysWinntDir)nhdefkey.c" />
+    <ClCompile Include="$(SysWinntDir)nhraykey.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C391E5AA-7AB2-4C3C-810F-A19801B434BE}</ProjectGuid>
+    <ProjectGuid>{bfcb7086-8be3-4800-97a3-350c81c160e6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>nhdefkey</RootNamespace>
+    <RootNamespace>nhraykey</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
