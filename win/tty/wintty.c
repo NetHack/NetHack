@@ -2443,22 +2443,27 @@ compress_str(str)
 const char *str;
 {
     static char cbuf[BUFSZ];
-    /* compress in case line too long */
-    if ((int) strlen(str) >= CO) {
-        register const char *bp0 = str;
-        register char *bp1 = cbuf;
 
+    /* compress out consecutive spaces if line is too long;
+       topline wrapping converts space at wrap point into newline,
+       we reverse that here */
+    if ((int) strlen(str) >= CO || index(str, '\n')) {
+        register const char *bp0 = str;
+        char c, nxtc, *bp1 = cbuf, *endbp1 = &cbuf[sizeof cbuf - 1];
+
+        cbuf[0] = cbuf[sizeof cbuf - 1] = '\0'; /* superfluous */
+        nxtc = (*bp0 == '\n') ? ' ' : *bp0;
         do {
-#ifdef CLIPPING
-            if (*bp0 != ' ' || bp0[1] != ' ')
-#else
-            if (*bp0 != ' ' || bp0[1] != ' ' || bp0[2] != ' ')
-#endif
-                *bp1++ = *bp0;
-        } while (*bp0++);
-    } else
-        return str;
-    return cbuf;
+            c = nxtc;
+            nxtc = bp0[1];
+            if (nxtc == '\n')
+                nxtc = ' ';
+            if (c != ' ' || nxtc != ' ')
+                *bp1++ = c;
+        } while (*bp0++ && bp1 < endbp1);
+        str = cbuf;
+    }
+    return str;
 }
 
 void
@@ -2601,7 +2606,7 @@ const char *str;
         }
         if (cw->data[cw->cury])
             free((genericptr_t) cw->data[cw->cury]);
-        n0 = strlen(str) + 1;
+        n0 = (long) strlen(str) + 1L;
         ob = cw->data[cw->cury] = (char *) alloc((unsigned) n0 + 1);
         *ob++ = (char) (attr + 1); /* avoid nuls, for convenience */
         Strcpy(ob, str);

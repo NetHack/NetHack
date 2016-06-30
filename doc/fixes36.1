@@ -347,6 +347,8 @@ tty: if color is disabled and use_inverse is enabled, display lava in inverse
 tty: if "--More--" was written to leftmost column (beginning of second line)
 	while hero was swallowed, cursor would end up in wrong place (at end
 	of status line instead back on map) after message line was cleared
+tty: long message lines which wrap when shown on the top line might be
+	re-displayed incorrectly by ^P for msg_window={full,combo,reverse}
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
