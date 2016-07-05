@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1457660917 2016/03/11 01:48:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1467718299 2016/07/05 11:31:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1414,8 +1414,6 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
                                                : &mons[PM_BLACK_LIGHT],
                                    TRUE);
-            if (!objects[sobj->otyp].oc_uname)
-                docall(sobj);
         }
         break;
     case SCR_TELEPORTATION:
