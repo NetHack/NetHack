@@ -356,6 +356,8 @@ get_scr_size()
     LI = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
     CO = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
 
+    if (CO > 80) CO = 80;
+
     if ((LI < 25) || (CO < 80)) {
         COORD newcoord;
 
