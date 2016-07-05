@@ -302,6 +302,16 @@ conduct: wishing for an artifact and not getting it because it already exists
 avoid ring of poison resistance as starting equipment for orcish wizard
 gelatinous cube shouldn't be able to eat a scroll of scare monster
 make fireballs or cones of cold cast a skilled or higher not go through walls
+prevent flying monsters from hovering over unreachable underwater objects
+lembas wafer gives increased nutrition to elves, reduced nutrition to orcs;
+	cram ration gives increase nutrition to dwarves
+when #tip's terse object drop format got interrupted by a regular message,
+	it continued using "obj2, obj3, ..." for subsequent objects, where
+	the sentence grammar no longer made sense (the interrupting message
+	still follows the comma of a partial sentence--attempting to fix that
+	seems hopeless; leaving it is better than always using verbose format)
+for #tip inside shop, credit was incorrectly given for spilled gold if that
+	gold's stale location coordinates didn't happen to be inside the shop
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -322,6 +332,7 @@ when picking a destination for #jump, '$' to show valid dest. is more accurate
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tiles: wrinkled spellbook had a spurious brown pixel on far right edge of tile
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
@@ -337,6 +348,8 @@ tty: if color is disabled and use_inverse is enabled, display lava in inverse
 tty: if "--More--" was written to leftmost column (beginning of second line)
 	while hero was swallowed, cursor would end up in wrong place (at end
 	of status line instead back on map) after message line was cleared
+tty: long message lines which wrap when shown on the top line might be
+	re-displayed incorrectly by ^P for msg_window={full,combo,reverse}
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
@@ -365,6 +378,7 @@ X11: support pre-selected entries in menu windows
 X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
+X11: use grayscale monster tiles for statues
 
 
 General New Features

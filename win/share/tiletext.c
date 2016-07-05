@@ -1,4 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1454464783 2016/02/03 01:59:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	tiletext.c	$NHDT-Date: 1466687974 2016/06/23 13:19:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.14 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
@@ -36,6 +36,20 @@ static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
 #define FORMAT_STRING                                                       \
     "%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
     "(%d, %d, %d) "
+
+static int grayscale = 0;
+/* grayscale color mapping */
+static const int graymappings[] = {
+ /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
+    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14
+};
+
+void
+set_grayscale(g)
+int g;
+{
+    grayscale = g;
+}
 
 static void
 read_text_colormap(txtfile)
@@ -135,6 +149,13 @@ pixel (*pixels)[TILE_X];
                 return FALSE;
             }
             k = color_index[(int) c[0]];
+            if (grayscale) {
+                if (k > (SIZE(graymappings) - 1))
+                    Fprintf(stderr, "Gray mapping issue %d > %d.\n", k,
+                            SIZE(graymappings) - 1);
+                else
+                    k = graymappings[k];
+            }
             if (k == -1)
                 Fprintf(stderr, "color %c not in colormap!\n", c[0]);
             else {

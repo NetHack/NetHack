@@ -43,7 +43,7 @@ STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
-STATIC_DCL boolean FDECL(spell_hurtle_step, (genericptr_t, int, int));
+STATIC_DCL boolean FDECL(spell_aim_step, (genericptr_t, int, int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -1181,12 +1181,14 @@ boolean atme;
     return 1;
 }
 
+/*ARGSUSED*/
 STATIC_OVL boolean
-spell_hurtle_step(arg, x, y)
-genericptr_t arg;
+spell_aim_step(arg, x, y)
+genericptr_t arg UNUSED;
 int x, y;
 {
-    if (!isok(x,y)) return FALSE;
+    if (!isok(x,y))
+        return FALSE;
     if (!ZAP_POS(levl[x][y].typ)
         && !(IS_DOOR(levl[x][y].typ) && (levl[x][y].doormask & D_ISOPEN)))
         return FALSE;
@@ -1233,7 +1235,7 @@ throwspell()
     uc.x = u.ux;
     uc.y = u.uy;
 
-    walk_path(&uc, &cc, spell_hurtle_step, NULL);
+    walk_path(&uc, &cc, spell_aim_step, (genericptr_t) 0);
 
     u.dx = cc.x;
     u.dy = cc.y;

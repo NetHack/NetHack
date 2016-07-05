@@ -2130,9 +2130,10 @@ boolean unpaid_only;
     return price;
 }
 
+/* count amount of gold inside container 'obj' and any nested containers */
 long
 contained_gold(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     register struct obj *otmp;
     register long value = 0L;
@@ -2867,11 +2868,11 @@ xchar x, y;
     boolean isgold = (obj->oclass == COIN_CLASS);
     boolean only_partially_your_contents = FALSE;
 
+    if (!*u.ushops) /* do cheapest exclusion test first */
+        return;
     if (!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) || !inhishop(shkp))
         return;
     if (!costly_spot(x, y))
-        return;
-    if (!*u.ushops)
         return;
 
     if (obj->unpaid && !container && !isgold) {

@@ -237,6 +237,7 @@ char *argv[];
             }
             initflag = 1;
         }
+        set_grayscale(pass == 3);
         /*		printf("Colormap initialized\n"); */
         while (read_text_tile(tilepixels)) {
             build_bmptile(tilepixels);
@@ -327,11 +328,6 @@ BITMAPINFOHEADER *pbmih;
     pbmih->biClrImportant = (DWORD) 0;
 }
 
-static int graymappings[] = {
-    /* .  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  */
-    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14
-};
-
 static void
 build_bmptile(pixels)
 pixel (*pixels)[TILE_X];
@@ -351,14 +347,6 @@ pixel (*pixels)[TILE_X];
                 Fprintf(stderr, "color not in colormap!\n");
             y = (MAX_Y - 1) - (cur_y + yoffset);
             apply_color = cur_color;
-            if (pass == 3) {
-                /* map to shades of gray */
-                if (cur_color > (SIZE(graymappings) - 1))
-                    Fprintf(stderr, "Gray mapping issue %d %d.\n", cur_color,
-                            SIZE(graymappings) - 1);
-                else
-                    apply_color = graymappings[cur_color];
-            }
 #if BITCOUNT == 4
             x = (cur_x / 2) + xoffset;
             bmp.packtile[y][x] = cur_x % 2

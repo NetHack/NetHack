@@ -8,7 +8,6 @@
 
 #include "tcap.h"
 #include "wintty.h"
-#include <ctype.h>
 
 #ifndef C /* this matches src/cmd.c */
 #define C(c) (0x1f & (c))
@@ -48,8 +47,7 @@ tty_doprev_message()
             do {
                 morc = 0;
                 if (cw->maxcol == cw->maxrow) {
-                    ttyDisplay->dismiss_more =
-                        C('p'); /* <ctrl/P> allowed at --More-- */
+                    ttyDisplay->dismiss_more = C('p'); /* ^P ok at --More-- */
                     redotoplin(toplines);
                     cw->maxcol--;
                     if (cw->maxcol < 0)
@@ -57,8 +55,7 @@ tty_doprev_message()
                     if (!cw->data[cw->maxcol])
                         cw->maxcol = cw->maxrow;
                 } else if (cw->maxcol == (cw->maxrow - 1)) {
-                    ttyDisplay->dismiss_more =
-                        C('p'); /* <ctrl/P> allowed at --More-- */
+                    ttyDisplay->dismiss_more = C('p'); /* ^P ok at --More-- */
                     redotoplin(cw->data[cw->maxcol]);
                     cw->maxcol--;
                     if (cw->maxcol < 0)
@@ -130,6 +127,7 @@ redotoplin(str)
 const char *str;
 {
     int otoplin = ttyDisplay->toplin;
+
     home();
     if (*str & 0x80) {
         /* kludge for the / command, the only time we ever want a */
@@ -251,10 +249,11 @@ register const char *bp;
     (void) strncpy(toplines, bp, TBUFSZ);
     toplines[TBUFSZ - 1] = 0;
 
-    for (tl = toplines; n0 >= CO;) {
+    for (tl = toplines; n0 >= CO; ) {
         otl = tl;
-        for (tl += CO - 1; tl != otl && !isspace(*tl); --tl)
-            ;
+        for (tl += CO - 1; tl != otl; --tl)
+            if (*tl == ' ')
+                break;
         if (tl == otl) {
             /* Eek!  A huge token.  Try splitting after it. */
             tl = index(otl, ' ');
@@ -299,7 +298,7 @@ char c;
         break;
     default:
         if (ttyDisplay->curx == CO - 1)
-            topl_putsym('\n'); /* 1 <= curx <= CO; avoid CO */
+            topl_putsym('\n'); /* 1 <= curx < CO; avoid CO */
 #ifdef WIN32CON
         (void) putchar(c);
 #endif

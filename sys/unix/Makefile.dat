@@ -31,9 +31,11 @@ all:	$(VARDAT) spec_levs quest_levs dungeon
 	(cd ../util ; $(MAKE) tile2bmp)
 
 x11tiles: ../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
-				../win/share/other.txt
+				../win/share/other.txt \
+                                ../win/share/monsters.txt
 	../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
-				../win/share/other.txt
+				../win/share/other.txt \
+                                -grayscale ../win/share/monsters.txt
 
 beostiles: ../util/tile2beos ../win/share/monsters.txt \
 				../win/share/objects.txt \
