@@ -1379,10 +1379,15 @@ boolean your_fault;
             if (!resist(mon, POTION_CLASS, 0, NOTELL))
                 mon->mconf = TRUE;
             break;
-        case POT_INVISIBILITY:
+        case POT_INVISIBILITY: {
+            boolean sawit = canspotmon(mon);
+
             angermon = FALSE;
             mon_set_minvis(mon);
+            if (sawit && !canspotmon(mon) && cansee(mon->mx, mon->my))
+                map_invisible(mon->mx, mon->my);
             break;
+        }
         case POT_SLEEPING:
             /* wakeup() doesn't rouse victims of temporary sleep */
             if (sleep_monst(mon, rnd(12), POTION_CLASS)) {

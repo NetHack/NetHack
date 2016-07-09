@@ -280,6 +280,7 @@ struct obj *otmp;
         mon_set_minvis(mtmp);
         if (!oldinvis && knowninvisible(mtmp)) {
             pline("%s turns transparent!", nambuf);
+            reveal_invis = TRUE;
             learn_it = TRUE;
         }
         break;

@@ -956,11 +956,9 @@ struct monst *mtmp;
  *
  * Pulls a monster from its current position and places a monster at
  * a new x and y.  If oldx is 0, then the monster was not in the
- * levels.monsters
- * array.  However, if oldx is 0, oldy may still have a value because mtmp is
- * a
- * migrating_mon.  Worm tails are always placed randomly around the head of
- * the worm.
+ * levels.monsters array.  However, if oldx is 0, oldy may still have
+ * a value because mtmp is a migrating_mon.  Worm tails are always
+ * placed randomly around the head of the worm.
  */
 void
 rloc_to(mtmp, x, y)
@@ -974,15 +972,15 @@ register int x, y;
         return;
 
     if (oldx) { /* "pick up" monster */
-        if (mtmp->wormno)
+        if (mtmp->wormno) {
             remove_worm(mtmp);
-        else {
+        } else {
             remove_monster(oldx, oldy);
             newsym(oldx, oldy); /* update old location */
         }
     }
 
-    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
     place_monster(mtmp, x, y); /* put monster down */
     update_monster_region(mtmp);
 
