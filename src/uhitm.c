@@ -1894,6 +1894,18 @@ register struct attack *mattk;
         for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
             (void) snuff_lit(otmp);
 
+        /* force vampire in bat, cloud, or wolf form to revert back to
+           vampire form now instead of dealing with that when it dies */
+        if (is_vampshifter(mdef)
+            && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+            You("engulf it, then expel it.");
+            if (canspotmon(mdef))
+                pline("It turns into %s.", a_monnam(mdef));
+            else
+                map_invisible(mdef->mx, mdef->my);
+            return 1;
+        }
+
         /* engulfing a cockatrice or digesting a Rider or Medusa */
         fatal_gulp = (touch_petrifies(pd) && !Stone_resistance)
                      || (mattk->adtyp == AD_DGST
@@ -1937,6 +1949,10 @@ register struct attack *mattk;
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
+                /* Message sequencing BUG: if you gain a level here,
+                 * "welcome to level N+1" is given immediately and
+                 * then "you totally digest <foo>" is given later.
+                 */
                 xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
                 if (mdef->mhp > 0) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
