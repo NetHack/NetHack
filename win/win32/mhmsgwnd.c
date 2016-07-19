@@ -310,7 +310,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 /* check if the string is empty */
                 for (p = data->window_text[MSG_LINES - 1].text;
-                     *p && isspace(*p); p++)
+                     *p && isspace((uchar) *p); p++)
                     ;
 
                 if (*p) {

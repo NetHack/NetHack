@@ -245,7 +245,8 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
 
         /* avoid "The" Orcus's sting was poisoned... */
-        pline("%s%s %s poisoned!", isupper(*reason) ? "" : "The ", reason,
+        pline("%s%s %s poisoned!",
+              isupper((uchar) *reason) ? "" : "The ", reason,
               plural ? "were" : "was");
     }
     if (Poison_resistance) {

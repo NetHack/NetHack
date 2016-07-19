@@ -181,7 +181,7 @@ pixel (*pixels)[TILE_X];
     /* DICE again... it doesn't seem to eat whitespace after the } like
      * it should, so we have to do so manually.
      */
-    while ((*c = fgetc(txtfile)) != EOF && isspace(*c))
+    while ((*c = fgetc(txtfile)) != EOF && isspace((uchar) *c))
         ;
     ungetc(*c, txtfile);
 #endif
