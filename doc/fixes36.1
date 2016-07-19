@@ -312,6 +312,16 @@ when #tip's terse object drop format got interrupted by a regular message,
 	seems hopeless; leaving it is better than always using verbose format)
 for #tip inside shop, credit was incorrectly given for spilled gold if that
 	gold's stale location coordinates didn't happen to be inside the shop
+when confused scroll of light summoned lights, player would be asked what to
+	call the scroll even if scroll of light was already identified
+if a visible monster becomes invisible, mark its spot with the 'remembered,
+	unseen monster' glyph ('I' character or '?' tile)
+monsters can throw cockatrice eggs at hero, but there was no handling for eggs
+	when the missile hit an intervening monster
+clarify that shape-shifted vampires revert to vampire form when petrified or
+	digested; when back in 'V' form, they're vulnerable to such damage
+when poly'd into an engulfer which does digestion damage, a kill resulting in
+	a level gain gave "welcome to level N+1" before "you digest <victim>"
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository

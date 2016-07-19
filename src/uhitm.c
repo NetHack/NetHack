@@ -1894,6 +1894,18 @@ register struct attack *mattk;
         for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
             (void) snuff_lit(otmp);
 
+        /* force vampire in bat, cloud, or wolf form to revert back to
+           vampire form now instead of dealing with that when it dies */
+        if (is_vampshifter(mdef)
+            && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+            You("engulf it, then expel it.");
+            if (canspotmon(mdef))
+                pline("It turns into %s.", a_monnam(mdef));
+            else
+                map_invisible(mdef->mx, mdef->my);
+            return 1;
+        }
+
         /* engulfing a cockatrice or digesting a Rider or Medusa */
         fatal_gulp = (touch_petrifies(pd) && !Stone_resistance)
                      || (mattk->adtyp == AD_DGST
@@ -1937,7 +1949,13 @@ register struct attack *mattk;
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
-                xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
+                /* start_engulf() issues "you engulf <mdef>" above; this
+                   used to specify XKILL_NOMSG but we need "you kill <mdef>"
+                   in case we're also going to get "welcome to level N+1";
+                   "you totally digest <mdef>" will be coming soon (after
+                   several turns) but the level-gain message seems out of
+                   order if the kill message is left implicit */
+                xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
                 if (mdef->mhp > 0) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));

@@ -675,11 +675,25 @@ register struct attack *mattk;
         return MM_MISS;
 
     if (vis) {
+        /* [this two-part formatting dates back to when only one x_monnam
+           result could be included in an expression because the next one
+           would overwrite first's result -- that's no longer the case] */
         Sprintf(buf, "%s swallows", Monnam(magr));
         pline("%s %s.", buf, mon_nam(mdef));
     }
     for (obj = mdef->minvent; obj; obj = obj->nobj)
         (void) snuff_lit(obj);
+
+    if (is_vampshifter(mdef)
+        && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+        if (vis) {
+            /* 'it' -- previous form is no longer available and
+               using that would be excessively verbose */
+            pline("%s expels it.", Monnam(magr));
+            pline("It turns into %s.", a_monnam(mdef));
+        }
+        return MM_HIT; /* bypass mdamagem() */
+    }
 
     /*
      *  All of this manipulation is needed to keep the display correct.

@@ -443,6 +443,8 @@ int spellnum;
                 pline("%s suddenly %s!", Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
             mon_set_minvis(mtmp);
+            if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
+                map_invisible(mtmp->mx, mtmp->my);
             dmg = 0;
         } else
             impossible("no reason for monster to cast disappear spell?");

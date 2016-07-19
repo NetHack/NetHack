@@ -1583,7 +1583,7 @@ mswin_yn_function(const char *question, const char *choices, CHAR_P def)
                 (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
     /* display selection in the message window */
-    if (isprint(ch) && ch != '#') {
+    if (isprint((uchar) ch) && ch != '#') {
         res_ch[0] = ch;
         res_ch[1] = '\x0';
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
@@ -2019,7 +2019,7 @@ mswin_getmsghistory(BOOLEAN_P init)
         if (next_message)
             next_message++;
         if (p)
-            while (p >= retval && isspace(*p))
+            while (p >= retval && isspace((uchar) *p))
                 *p-- = (char) 0; /* delete trailing whitespace */
         return retval;
     }
@@ -2539,23 +2539,32 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
         if (strlen(++colorstring) != 6)
             return;
 
-        red_value = (int) (index(hexadecimals, tolower(*colorstring++))
+        red_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
                            - hexadecimals);
+        ++colorstring;
         red_value *= 16;
-        red_value += (int) (index(hexadecimals, tolower(*colorstring++))
+        red_value += (int) (index(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
+        ++colorstring;
 
-        green_value = (int) (index(hexadecimals, tolower(*colorstring++))
+        green_value = (int) (index(hexadecimals,
+                                   tolower((uchar) *colorstring))
                              - hexadecimals);
+        ++colorstring;
         green_value *= 16;
-        green_value += (int) (index(hexadecimals, tolower(*colorstring++))
+        green_value += (int) (index(hexadecimals,
+                                    tolower((uchar) *colorstring))
                               - hexadecimals);
+        ++colorstring;
 
-        blue_value = (int) (index(hexadecimals, tolower(*colorstring++))
+        blue_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
+        ++colorstring;
         blue_value *= 16;
-        blue_value += (int) (index(hexadecimals, tolower(*colorstring++))
+        blue_value += (int) (index(hexadecimals,
+                                   tolower((uchar) *colorstring))
                              - hexadecimals);
+        ++colorstring;
 
         *colorptr = RGB(red_value, green_value, blue_value);
     } else {

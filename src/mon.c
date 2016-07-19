@@ -2043,6 +2043,9 @@ struct monst *mdef;
     xchar x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
 
+    if (!vamp_stone(mdef)) /* vampshifter reverts to vampire */
+        return;
+
     /* we have to make the statue before calling mondead, to be able to
      * put inventory in it, and we have to check for lifesaving before
      * making the statue....
@@ -2402,9 +2405,8 @@ struct monst *mtmp;
             /* construct a format string before transformation */
             Sprintf(buf, "The lapidifying %s %s %s",
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                             SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
-                                 | SUPPRESS_INVISIBLE | SUPPRESS_IT,
-                             FALSE),
+                             (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
+                              | SUPPRESS_INVISIBLE | SUPPRESS_IT), FALSE),
                     amorphous(mtmp->data) ? "coalesces on the"
                        : is_flyer(mtmp->data) ? "drops to the"
                           : "writhes on the",
@@ -2434,8 +2436,8 @@ struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-                    pline("%s rises from the %s with renewed agility!",
-                            Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
+                pline("%s rises from the %s with renewed agility!",
+                      Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
             }
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */

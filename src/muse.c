@@ -1207,8 +1207,8 @@ register struct monst *mtmp;
 register struct obj *otmp;
 {
     int tmp;
-
     boolean reveal_invis = FALSE;
+
     if (mtmp != &youmonst) {
         mtmp->msleeping = 0;
         if (mtmp->m_ap_type)
@@ -1819,12 +1819,15 @@ struct monst *mtmp;
         Strcpy(nambuf, mon_nam(mtmp));
         mon_set_minvis(mtmp);
         if (vismon && mtmp->minvis) { /* was seen, now invisible */
-            if (canspotmon(mtmp))
+            if (canspotmon(mtmp)) {
                 pline("%s body takes on a %s transparency.",
                       upstart(s_suffix(nambuf)),
                       Hallucination ? "normal" : "strange");
-            else
+            } else {
                 pline("Suddenly you cannot see %s.", nambuf);
+                if (vis)
+                    map_invisible(mtmp->mx, mtmp->my);
+            }
             if (oseen)
                 makeknown(otmp->otyp);
         }

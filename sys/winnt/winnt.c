@@ -119,7 +119,7 @@ char *str;
     char *ptr;
     char drive;
     if ((ptr = index(str, ':')) != (char *) 0) {
-        drive = toupper(*(ptr - 1));
+        drive = toupper((uchar) *(ptr - 1));
         _chdrive((drive - 'A') + 1);
     }
 }
