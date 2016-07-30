@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1457254910 2016/03/06 09:01:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1469840918 2016/07/30 01:08:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -2369,7 +2369,7 @@ boolean by_you;
                 return muse_unslime(mon, obj, (struct trap *) 0, by_you);
 
         if (((t = t_at(mon->mx, mon->my)) == 0 || t->ttyp != FIRE_TRAP)
-            && !mon->mtrapped && !mptr->mmove == 0) {
+            && mptr->mmove && !mon->mtrapped) {
             int xy[2][8], x, y, idx, ridx, nxy = 0;
 
             for (x = mon->mx - 1; x <= mon->mx + 1; ++x)

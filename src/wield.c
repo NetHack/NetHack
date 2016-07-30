@@ -421,10 +421,11 @@ dowieldquiver()
             }
             Strcpy(qbuf, "Ready all of them instead?");
         } else {
+            boolean use_plural = (is_plural(uwep) || pair_of(uwep));
+
             Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
-                    /* uwep->quan is 1, but name might be plural ('boots') */
-                    !is_plural(uwep) ? "that" : "those",
-                    !is_plural(uwep) ? "it" : "them");
+                    !use_plural ? "that" : "those",
+                    !use_plural ? "it" : "them");
         }
         /* require confirmation to ready the main weapon */
         if (ynq(qbuf) != 'y') {
@@ -458,11 +459,12 @@ dowieldquiver()
             }
             Strcpy(qbuf, "Ready all of them instead?");
         } else {
+            boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
+
             Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
-                    !is_plural(uswapwep) ? "That is" : "Those are",
+                    !use_plural ? "That is" : "Those are",
                     u.twoweap ? "second" : "alternate",
-                    /* uswapwep->quan is 1, but name might be plural */
-                    !is_plural(uswapwep) ? "it" : "them");
+                    !use_plural ? "it" : "them");
         }
         /* require confirmation to ready the alternate weapon */
         if (ynq(qbuf) != 'y') {

@@ -1798,7 +1798,7 @@ dodip()
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
-    shortestname = is_plural(obj) ? "them" : "it";
+    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
     /*
      * Bypass safe_qbuf() since it doesn't handle varying suffix without
      * an awful lot of support work.  Format the object once, even though
