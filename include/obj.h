@@ -330,14 +330,17 @@ struct obj {
     ((obj)->otyp == LUCKSTONE || (obj)->otyp == LOADSTONE \
      || (obj)->otyp == FLINT || (obj)->otyp == TOUCHSTONE)
 
-/* misc */
+/* misc helpers, simple enough to be macros */
 #define is_flimsy(otmp)                           \
     (objects[(otmp)->otyp].oc_material <= LEATHER \
      || (otmp)->otyp == RUBBER_HOSE)
-
-/* helpers, simple enough to be macros */
 #define is_plural(o) \
-    ((o)->quan != 1L || (o)->otyp == LENSES || is_gloves(o) || is_boots(o))
+    ((o)->quan != 1L                                                    \
+     /* "the Eyes of the Overworld" are plural, but                     \
+        "a pair of lenses named the Eyes of the Overworld" is not */    \
+     || ((o)->oartifact == ART_EYES_OF_THE_OVERWORLD                    \
+         && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
+#define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1
@@ -366,17 +369,14 @@ struct obj {
  *  Notes for adding new oextra structures:
  *
  *	 1. Add the structure definition and any required macros in an
- *appropriate
- *	    header file that precedes this one.
- *	 2. Add a pointer to your new struct to the oextra struct in this
- *file.
+ *          appropriate header file that precedes this one.
+ *	 2. Add a pointer to your new struct to oextra struct in this file.
  *	 3. Add a referencing macro to this file after the newobj macro above
  *	    (see ONAME, OMONST, OMIN, OLONG, or OMAILCMD for examples).
  *	 4. Add a testing macro after the set of referencing macros
  *	    (see has_oname(), has_omonst(), has_omin(), has_olong(),
  *	    has_omailcmd() for examples).
- *	 5. Create a newXX(otmp) function and possibly a free_XX(otmp)
- *function
+ *	 5. Create newXX(otmp) function and possibly free_XX(otmp) function
  *	    in an appropriate new or existing source file and add a prototype
  *	    for it to include/extern.h.  The majority of these are currently
  *	    located in mkobj.c for convenience.

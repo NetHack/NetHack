@@ -1091,6 +1091,7 @@ dokick()
             goto ouch;
         if (IS_TREE(maploc->typ)) {
             struct obj *treefruit;
+
             /* nothing, fruit or trouble? 75:23.5:1.5% */
             if (rn2(3)) {
                 if (!rn2(6) && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE))
@@ -1101,7 +1102,9 @@ dokick()
                 && (treefruit = rnd_treefruit_at(x, y))) {
                 long nfruit = 8L - rnl(7), nfall;
                 short frtype = treefruit->otyp;
+
                 treefruit->quan = nfruit;
+                treefruit->owt = weight(treefruit);
                 if (is_plural(treefruit))
                     pline("Some %s fall from the tree!", xname(treefruit));
                 else
@@ -1125,6 +1128,7 @@ dokick()
                 int cnt = rnl(4) + 2;
                 int made = 0;
                 coord mm;
+
                 mm.x = x;
                 mm.y = y;
                 while (cnt--) {

@@ -2763,24 +2763,25 @@ struct obj *no_wish;
     }
 
     /*
-    Skip over "pair of ", "pairs of", "set of" and "sets of".
-
-    Accept "3 pair of boots" as well as "3 pairs of boots". It is valid
-    English either way.  See makeplural() for more on pair/pairs.
-
-    We should only double count if the object in question is not
-    referred to as a "pair of".  E.g. We should double if the player
-    types "pair of spears", but not if the player types "pair of
-    lenses".  Luckily (?) all objects that are referred to as pairs
-    -- boots, gloves, and lenses -- are also not mergable, so cnt is
-    ignored anyway.
-    */
+     * Skip over "pair of ", "pairs of", "set of" and "sets of".
+     *
+     * Accept "3 pair of boots" as well as "3 pairs of boots".  It is
+     * valid English either way.  See makeplural() for more on pair/pairs.
+     *
+     * We should only double count if the object in question is not
+     * referred to as a "pair of".  E.g. We should double if the player
+     * types "pair of spears", but not if the player types "pair of
+     * lenses".  Luckily (?) all objects that are referred to as pairs
+     * -- boots, gloves, and lenses -- are also not mergable, so cnt is
+     * ignored anyway.
+     */
     if (!strncmpi(bp, "pair of ", 8)) {
         bp += 8;
         cnt *= 2;
-    } else if (cnt > 1 && !strncmpi(bp, "pairs of ", 9)) {
+    } else if (!strncmpi(bp, "pairs of ", 9)) {
         bp += 9;
-        cnt *= 2;
+        if (cnt > 1)
+            cnt *= 2;
     } else if (!strncmpi(bp, "set of ", 7)) {
         bp += 7;
     } else if (!strncmpi(bp, "sets of ", 8)) {
