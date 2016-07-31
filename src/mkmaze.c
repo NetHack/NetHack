@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1461571093 2016/04/25 07:58:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1469930897 2016/07/31 02:08:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,7 +41,7 @@ STATIC_OVL int
 iswall(x, y)
 int x, y;
 {
-    register int type;
+    int type;
 
     if (!isok(x, y))
         return 0;
@@ -126,7 +126,7 @@ wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     uchar type;
-    register int x, y;
+    int x, y;
     struct rm *lev;
 
     /* sanity check on incoming variables */
@@ -158,7 +158,7 @@ fix_wall_spines(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     uchar type;
-    register int x,y;
+    int x, y;
     struct rm *lev;
     int FDECL((*loc_f), (int, int));
     int bits;
@@ -226,7 +226,7 @@ int x1, y1, x2, y2;
 STATIC_OVL boolean
 okay(x, y, dir)
 int x, y;
-register int dir;
+int dir;
 {
     mz_move(x, y, dir);
     mz_move(x, y, dir);
@@ -460,9 +460,9 @@ static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 void
 fixup_special()
 {
-    register lev_region *r = lregions;
+    lev_region *r = lregions;
     struct d_level lev;
-    register int x, y;
+    int x, y;
     struct mkroom *croom;
     boolean added_branch = FALSE;
 
@@ -600,7 +600,7 @@ fixup_special()
 
         create_secret_door(croom, W_ANY);
     } else if (on_level(&u.uz, &orcus_level)) {
-        register struct monst *mtmp, *mtmp2;
+        struct monst *mtmp, *mtmp2;
 
         /* it's a ghost town, get rid of shopkeepers */
         for (mtmp = fmon; mtmp; mtmp = mtmp2) {
@@ -620,7 +620,7 @@ fixup_special()
 
 void
 makemaz(s)
-register const char *s;
+const char *s;
 {
     int x, y;
     char protofile[20];
@@ -839,7 +839,7 @@ walkfrom(x, y, typ)
 int x, y;
 schar typ;
 {
-    register int q, a, dir;
+    int q, a, dir;
     int dirs[4];
 
     if (!typ) {
@@ -887,7 +887,8 @@ coord *cc;
              && levl[cc->x][cc->y].typ
                     != (level.flags.corrmaze ? CORR : ROOM));
     if (cpt >= 100) {
-        register int x, y;
+        int x, y;
+
         /* last try */
         for (x = 0; x < (x_maze_max >> 1) - 1; x++)
             for (y = 0; y < (y_maze_max >> 1) - 1; y++) {
@@ -915,9 +916,9 @@ coord *cc;
 void
 bound_digging()
 {
-    register int x, y;
-    register unsigned typ;
-    register struct rm *lev;
+    int x, y;
+    unsigned typ;
+    struct rm *lev;
     boolean found, nonwall;
     int xmin, xmax, ymin, ymax;
 
@@ -1024,8 +1025,10 @@ fumaroles()
     for (n = rn2(3) + 2; n; n--) {
         xchar x = rn1(COLNO - 4, 3);
         xchar y = rn1(ROWNO - 4, 3);
+
         if (levl[x][y].typ == LAVAPOOL) {
             NhRegion *r = create_gas_cloud(x, y, 4 + rn2(5), rn1(10, 5));
+
             clear_heros_fault(r);
             snd = TRUE;
             if (distu(x, y) < 15)
@@ -1042,11 +1045,6 @@ fumaroles()
  * Some of these functions would probably logically belong to some
  * other source files, but they are all so nicely encapsulated here.
  */
-
-#ifdef DEBUG
-/* to ease the work of debuggers at this stage */
-#define register
-#endif
 
 #define CONS_OBJ 0
 #define CONS_MON 1
@@ -1071,8 +1069,8 @@ void
 movebubbles()
 {
     static boolean up;
-    register struct bubble *b;
-    register int x, y, i, j;
+    struct bubble *b;
+    int x, y, i, j;
     struct trap *btrap;
     static const struct rm water_pos = { cmap_to_glyph(S_water), WATER, 0, 0,
                                          0, 0, 0, 0, 0, 0 };
@@ -1194,7 +1192,7 @@ movebubbles()
      */
     up = !up;
     for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
-        register int rx = rn2(3), ry = rn2(3);
+        int rx = rn2(3), ry = rn2(3);
 
         mv_bubble(b, b->dx + 1 - (!b->dx ? rx : (rx ? 1 : 0)),
                   b->dy + 1 - (!b->dy ? ry : (ry ? 1 : 0)), FALSE);
@@ -1210,8 +1208,8 @@ movebubbles()
 void
 water_friction()
 {
-    register int x, y, dx, dy;
-    register boolean eff = FALSE;
+    int x, y, dx, dy;
+    boolean eff = FALSE;
 
     if (Swimming && rn2(4))
         return; /* natural swimmers have advantage */
@@ -1245,7 +1243,7 @@ void
 save_waterlevel(fd, mode)
 int fd, mode;
 {
-    register struct bubble *b;
+    struct bubble *b;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
@@ -1268,11 +1266,10 @@ int fd, mode;
 
 void
 restore_waterlevel(fd)
-register int fd;
+int fd;
 {
-    register struct bubble *b = (struct bubble *) 0, *btmp;
-    register int i;
-    int n;
+    struct bubble *b = (struct bubble *) 0, *btmp;
+    int i, n;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
@@ -1305,7 +1302,7 @@ const char *
 waterbody_name(x, y)
 xchar x, y;
 {
-    register struct rm *lev;
+    struct rm *lev;
     schar ltyp;
 
     if (!isok(x, y))
@@ -1344,10 +1341,10 @@ set_wportal()
 STATIC_OVL void
 setup_waterlevel()
 {
-    register int x, y;
-    register int xskip, yskip;
-    register int water_glyph = cmap_to_glyph(S_water);
-    register int air_glyph = cmap_to_glyph(S_air);
+    int x, y;
+    int xskip, yskip;
+    int water_glyph = cmap_to_glyph(S_water),
+        air_glyph = cmap_to_glyph(S_air);
 
     /* ouch, hardcoded... */
 
@@ -1380,7 +1377,7 @@ setup_waterlevel()
 STATIC_OVL void
 unsetup_waterlevel()
 {
-    register struct bubble *b, *bb;
+    struct bubble *b, *bb;
 
     /* free bubbles */
 
@@ -1393,7 +1390,7 @@ unsetup_waterlevel()
 
 STATIC_OVL void
 mk_bubble(x, y, n)
-register int x, y, n;
+int x, y, n;
 {
     /*
      * These bit masks make visually pleasing bubbles on a normal aspect
@@ -1402,14 +1399,15 @@ register int x, y, n;
      * in situ, either.  The first two elements tell the dimensions of
      * the bubble's bounding box.
      */
-    static uchar bm2[] = { 2, 1, 0x3 }, bm3[] = { 3, 2, 0x7, 0x7 },
+    static uchar bm2[] = { 2, 1, 0x3 },
+                 bm3[] = { 3, 2, 0x7, 0x7 },
                  bm4[] = { 4, 3, 0x6, 0xf, 0x6 },
                  bm5[] = { 5, 3, 0xe, 0x1f, 0xe },
                  bm6[] = { 6, 4, 0x1e, 0x3f, 0x3f, 0x1e },
                  bm7[] = { 7, 4, 0x3e, 0x7f, 0x7f, 0x3e },
                  bm8[] = { 8, 4, 0x7e, 0xff, 0xff, 0x7e },
                  *bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
-    register struct bubble *b;
+    struct bubble *b;
 
     if (x >= bxmax || y >= bymax)
         return;
@@ -1455,11 +1453,11 @@ register int x, y, n;
  */
 STATIC_OVL void
 mv_bubble(b, dx, dy, ini)
-register struct bubble *b;
-register int dx, dy;
-register boolean ini;
+struct bubble *b;
+int dx, dy;
+boolean ini;
 {
-    register int x, y, i, j, colli = 0;
+    int x, y, i, j, colli = 0;
     struct container *cons, *ctemp;
 
     /* clouds move slowly */
