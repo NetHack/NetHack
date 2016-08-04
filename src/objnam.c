@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1462067746 2016/05/01 01:55:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1470272345 2016/08/04 00:59:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.177 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3448,14 +3448,14 @@ typfnd:
             otmp->spe = 0; /* No spinach */
             if (dead_species(mntmp, FALSE)) {
                 otmp->corpsenm = NON_PM; /* it's empty */
-            } else if (!(mons[mntmp].geno & G_UNIQ)
+            } else if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
                        && !(mvitals[mntmp].mvflags & G_NOCORPSE)
                        && mons[mntmp].cnutrit != 0) {
                 otmp->corpsenm = mntmp;
             }
             break;
         case CORPSE:
-            if (!(mons[mntmp].geno & G_UNIQ)
+            if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
                 && !(mvitals[mntmp].mvflags & G_NOCORPSE)) {
                 if (mons[mntmp].msound == MS_GUARDIAN)
                     mntmp = genus(mntmp, 1);

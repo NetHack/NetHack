@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1467028559 2016/06/27 11:55:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1470272344 2016/08/04 00:59:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1662,22 +1662,33 @@ struct obj *otmp;
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
     } else {
-        /* [is this right?  omnivores end up always disliking the taste] */
-        boolean yummy = vegan(&mons[mnum])
-                           ? (!carnivorous(youmonst.data)
-                              && herbivorous(youmonst.data))
-                           : (carnivorous(youmonst.data)
-                              && !herbivorous(youmonst.data));
+        /* yummy is always False for omnivores, palatable always True */
+        boolean yummy = (vegan(&mons[mnum])
+                            ? (!carnivorous(youmonst.data)
+                               && herbivorous(youmonst.data))
+                            : (carnivorous(youmonst.data)
+                               && !herbivorous(youmonst.data))),
+                palatable = (vegetarian(&mons[mnum])
+                                ? herbivorous(youmonst.data)
+                                : carnivorous(youmonst.data));
+        const char *pmxnam = food_xname(otmp, FALSE);
 
+        if (!strncmpi(pmxnam, "the ", 4))
+            pmxnam += 4;
         pline("%s%s %s!",
               type_is_pname(&mons[mnum])
-                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
-              food_xname(otmp, FALSE),
+                  ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
+              pmxnam,
+                  /* tiger reference is to TV ads for "Frosted Flakes",
+                     breakfast cereal targeted at kids by "Tony the tiger" */
               Hallucination
                   ? (yummy ? ((u.umonnum == PM_TIGER) ? "is gr-r-reat"
                                                       : "is gnarly")
-                           : "is grody")
-                  : (yummy ? "is delicious" : "tastes terrible"));
+                           : palatable ? "is copacetic"
+                                       : "is grody")
+                  : (yummy ? "tastes delicious"
+                           : palatable ? "tastes okay"
+                                       : "tastes terrible"));
     }
 
     return retcode;
