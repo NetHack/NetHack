@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1461102048 2016/04/19 21:40:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1470357737 2016/08/05 00:42:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -500,6 +500,7 @@ static boolean initial, from_file;
 STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
 STATIC_DCL void FDECL(escapes, (const char *, char *));
 STATIC_DCL void FDECL(rejectoption, (const char *));
+STATIC_DCL void FDECL(badoptmsg, (const char *, const char *));
 STATIC_DCL void FDECL(badoption, (const char *));
 STATIC_DCL char *FDECL(string_for_opt, (char *, BOOLEAN_P));
 STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
@@ -927,38 +928,41 @@ const char *optname;
 }
 
 STATIC_OVL void
-badoption(opts)
+badoptmsg(opts, reason)
 const char *opts;
+const char *reason; /* "Bad syntax" or "Missing value" */
 {
+    const char *linesplit = "";
+
     if (!initial) {
         if (!strncmp(opts, "h", 1) || !strncmp(opts, "?", 1))
             option_help();
         else
-            pline("Bad syntax: %s.  Enter \"?g\" for help.", opts);
+            pline("%s: %s.  Enter \"?g\" for help.", reason, opts);
         return;
-    }
 #ifdef MAC
-    else
+    } else {
         return;
 #endif
+    }
 
+#ifdef WIN32
+    linesplit = "\n";
+#endif
     if (from_file)
-        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", configfile,
-#ifdef WIN32
-                    "\n",
-#else
-                    "",
-#endif
-                    opts);
+        raw_printf("%s in OPTIONS in %s: %s%s.\n",
+                   reason, configfile, linesplit, opts);
     else
-        raw_printf("Bad syntax in NETHACKOPTIONS: %s%s.\n",
-#ifdef WIN32
-                    "\n",
-#else
-                    "",
-#endif
-                    opts);
+        raw_printf("%s in NETHACKOPTIONS: %s%s.\n",
+                   reason, linesplit, opts);
     wait_synch();
+}
+
+STATIC_OVL void
+badoption(opts)
+const char *opts;
+{
+    badoptmsg(opts, "Bad syntax");
 }
 
 STATIC_OVL char *
@@ -975,7 +979,7 @@ boolean val_optional;
 
     if (!colon || !*++colon) {
         if (!val_optional)
-            badoption(opts);
+            badoptmsg(opts, "Missing value");
         return (char *) 0;
     }
     return colon;
@@ -2700,7 +2704,9 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
         if (duplicate || negated)
             return;
-        op = string_for_opt(opts, TRUE);
+        op = string_for_opt(opts, FALSE);
+        if (!op)
+            return;
         if (!strncmpi(op, "normal", 6) || !strcmpi(op, "play")) {
             wizard = discover = FALSE;
         } else if (!strncmpi(op, "explore", 6)
