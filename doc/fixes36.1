@@ -353,6 +353,8 @@ when autopickup is overridden in a shop, always-pick-up exceptions and
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 tiles: wrinkled spellbook had a spurious brown pixel on far right edge of tile
+tiles: when statues are displayed as corresponding monsters, total_tiles_used
+	in generated src/tile.c had incorrect value
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
@@ -399,6 +401,8 @@ X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
 X11: use grayscale monster tiles for statues
+X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
+	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 
 
 General New Features
