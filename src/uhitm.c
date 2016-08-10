@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1460103141 2016/04/08 08:12:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2537,12 +2537,12 @@ boolean wep_was_destroyed;
  */
 void
 passive_obj(mon, obj, mattk)
-register struct monst *mon;
-register struct obj *obj; /* null means pick uwep, uswapwep or uarmg */
+struct monst *mon;
+struct obj *obj;          /* null means pick uwep, uswapwep or uarmg */
 struct attack *mattk;     /* null means we find one internally */
 {
     struct permonst *ptr = mon->data;
-    register int i;
+    int i;
 
     /* if caller hasn't specified an object, use uwep, uswapwep or uarmg */
     if (!obj) {
@@ -2589,7 +2589,7 @@ struct attack *mattk;     /* null means we find one internally */
         break;
     case AD_ENCH:
         if (!mon->mcan) {
-            if (drain_item(obj) && carried(obj)
+            if (drain_item(obj, TRUE) && carried(obj)
                 && (obj->known || obj->oclass == ARMOR_CLASS)) {
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
             }

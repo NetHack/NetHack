@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1464163779 2016/05/25 08:09:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1470819844 2016/08/10 09:04:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1062,8 +1062,9 @@ register struct obj *obj;
  * possibly carried by you or a monster
  */
 boolean
-drain_item(obj)
-register struct obj *obj;
+drain_item(obj, by_you)
+struct obj *obj;
+boolean by_you;
 {
     boolean u_ring;
 
@@ -1078,7 +1079,8 @@ register struct obj *obj;
         return FALSE;
 
     /* Charge for the cost of the object */
-    costly_alteration(obj, COST_DRAIN);
+    if (by_you)
+        costly_alteration(obj, COST_DRAIN);
 
     /* Drain the object and any implied effects */
     obj->spe--;
@@ -1110,6 +1112,10 @@ register struct obj *obj;
         if ((obj->owornmask & W_RING) && u_ring)
             u.udaminc--;
         break;
+    case RIN_PROTECTION:
+        if (u_ring)
+            context.botl = 1; /* bot() will recalc u.uac */
+        break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
@@ -1123,10 +1129,11 @@ register struct obj *obj;
             context.botl = 1;
         }
         break;
-    case RIN_PROTECTION:
-        context.botl = 1;
+    default:
         break;
     }
+    if (context.botl)
+        bot();
     if (carried(obj))
         update_inventory();
     return TRUE;
@@ -1935,7 +1942,7 @@ struct obj *obj, *otmp;
 #endif
             break;
         case SPE_DRAIN_LIFE:
-            (void) drain_item(obj);
+            (void) drain_item(obj, TRUE);
             break;
         case WAN_TELEPORTATION:
         case SPE_TELEPORT_AWAY:

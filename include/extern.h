@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1461967848 2016/04/29 22:10:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.558 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1470819839 2016/08/10 09:03:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.569 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2771,7 +2771,7 @@ E struct monst *FDECL(montraits, (struct obj *, coord *));
 E struct monst *FDECL(revive, (struct obj *, BOOLEAN_P));
 E int FDECL(unturn_dead, (struct monst *));
 E void FDECL(cancel_item, (struct obj *));
-E boolean FDECL(drain_item, (struct obj *));
+E boolean FDECL(drain_item, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(poly_obj, (struct obj *, int));
 E boolean FDECL(obj_resists, (struct obj *, int, int));
 E boolean FDECL(obj_shudders, (struct obj *));

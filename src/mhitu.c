@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456992469 2016/03/03 08:07:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1597,7 +1597,27 @@ register struct attack *mattk;
         if (uncancelled) {
             struct obj *obj = some_armor(&youmonst);
 
-            if (drain_item(obj)) {
+            if (!obj) {
+                /* some rings are susceptible;
+                   amulets and blindfolds aren't (at present) */
+                switch (rn2(5)) {
+                case 0:
+                    break;
+                case 1:
+                    obj = uright;
+                    break;
+                case 2:
+                    obj = uleft;
+                    break;
+                case 3:
+                    obj = uamul;
+                    break;
+                case 4:
+                    obj = ublindf;
+                    break;
+                }
+            }
+            if (drain_item(obj, FALSE)) {
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
             }
         }
@@ -2691,7 +2711,9 @@ register struct attack *mattk;
     }
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (otmp) {
-            (void) drain_item(otmp);
+            /* by_you==True: passive counterattack to hero's action
+               is hero's fault */
+            (void) drain_item(otmp, TRUE);
             /* No message */
         }
         return 1;
