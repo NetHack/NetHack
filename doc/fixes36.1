@@ -331,6 +331,9 @@ when escaping the dungeon, change "you were here" annotation in dungeon
 option parsing will crash if 'playmode' option is present without a value
 any item drained of enchantment was blamed on the player as far as shop
 	billing was concerned, even if caused by disenchanter attack
+if user supplied a specific monster name when asked to choose a monster class,
+	first prefix match was picked rather than best match ("titan" yielded
+	S_quadruped due to being preceded by "titanothere" in mons[])
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
