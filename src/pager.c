@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1466638086 2016/06/22 23:28:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -203,7 +203,7 @@ int x, y, glyph;
 
     if (otmp) {
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
-                     ? distant_name(otmp, doname)
+                     ? distant_name(otmp, doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
         if (fakeobj)
             dealloc_obj(otmp), otmp = 0;

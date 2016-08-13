@@ -345,6 +345,10 @@ rings covered by non-cursed gloves not listed as 'R' candidates
 in baalz_fixup, move any monster away from the two fake pool spots
 switching farlook from xname to doname was giving away information for items
 	located via object detection (quantity of detected gold)
+changing doname to use "some" instead of precise quantity when an item's
+	dknown flag is not set could result in blind hero getting
+	"There is a some jackal corpses here.  Eat one?" and
+	"You can only lift some of the some jackal corpses.  Continue?"
 catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
 fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
 	'remove' menu choices in interactive handling for menu colorings,
