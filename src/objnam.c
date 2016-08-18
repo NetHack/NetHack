@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1462067746 2016/05/01 01:55:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,6 +17,7 @@ STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
+STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
 STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
@@ -580,7 +581,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      brown potion               -- if oc_name_known not set
      potion of object detection -- if discovered
  */
-static char *
+STATIC_OVL char *
 minimal_xname(obj)
 struct obj *obj;
 {
@@ -756,12 +757,17 @@ struct obj *obj;
     return FALSE;
 }
 
-static char *
-doname_base(obj, with_price)
-register struct obj *obj;
-boolean with_price;
+#define DONAME_WITH_PRICE 1
+#define DONAME_VAGUE_QUAN 2
+
+STATIC_OVL char *
+doname_base(obj, doname_flags)
+struct obj *obj;
+unsigned doname_flags;
 {
-    boolean ispoisoned = FALSE;
+    boolean ispoisoned = FALSE,
+            with_price = (doname_flags & DONAME_WITH_PRICE) != 0,
+            vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0;
     boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
@@ -792,7 +798,7 @@ boolean with_price;
     }
 
     if (obj->quan != 1L) {
-        if (dknown)
+        if (dknown || !vague_quan)
             Sprintf(prefix, "%ld ", obj->quan);
         else
             Strcpy(prefix, "some ");
@@ -816,11 +822,11 @@ boolean with_price;
            making the prefix be redundant; note that 'known' flag
            isn't set when emptiness gets discovered because then
            charging magic would yield known number of new charges) */
-        && (obj->otyp == BAG_OF_TRICKS
+        && ((obj->otyp == BAG_OF_TRICKS)
              ? (obj->spe == 0 && !obj->known)
              /* not bag of tricks: empty if container which has no contents */
-             : (Is_container(obj) || obj->otyp == STATUE)
-            && !Has_contents(obj)))
+             : ((Is_container(obj) || obj->otyp == STATUE)
+                && !Has_contents(obj))))
         Strcat(prefix, "empty ");
 
     if (bknown && obj->oclass != COIN_CLASS
@@ -872,11 +878,9 @@ boolean with_price;
         Strcat(prefix, "greased ");
 
     if (cknown && Has_contents(obj)) {
-        /* we count all objects (obj->quantity); perhaps we should
-           count separate stacks instead (or even introduce a user
-           preference option to choose between the two alternatives)
-           since it's somewhat odd so see "containing 1002 items"
-           when there are 2 scrolls plus 1000 gold pieces */
+        /* we count the number of separate stacks, which corresponds
+           to the number of inventory slots needed to be able to take
+           everything out if no merges occur */
         long itemcount = count_contents(obj, FALSE, FALSE, TRUE);
 
         Sprintf(eos(bp), " containing %ld item%s", itemcount,
@@ -960,8 +964,13 @@ boolean with_price;
         if (obj->oeaten)
             Strcat(prefix, "partly eaten ");
         if (obj->otyp == CORPSE) {
-            Sprintf(prefix, "%s ",
-                    corpse_xname(obj, prefix, CXN_ARTICLE | CXN_NOCORPSE));
+            /* (quan == 1) => want corpse_xname() to supply article,
+               (quan != 1) => already have count or "some" as prefix;
+               "corpse" is already in the buffer returned by xname() */
+            unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
+                              | CXN_NOCORPSE);
+
+            Sprintf(prefix, "%s ", corpse_xname(obj, prefix, cxarg));
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))
@@ -1074,23 +1083,43 @@ boolean with_price;
 
 char *
 doname(obj)
-register struct obj *obj;
+struct obj *obj;
 {
-    return doname_base(obj, FALSE);
+    return doname_base(obj, (unsigned) 0);
 }
 
 /* Name of object including price. */
 char *
 doname_with_price(obj)
-register struct obj *obj;
+struct obj *obj;
 {
-    return doname_base(obj, TRUE);
+    return doname_base(obj, DONAME_WITH_PRICE);
+}
+
+/* "some" instead of precise quantity if obj->dknown not set */
+char *
+doname_vague_quan(obj)
+struct obj *obj;
+{
+    /* Used by farlook.
+     * If it hasn't been seen up close and quantity is more than one,
+     * use "some" instead of the quantity: "some gold pieces" rather
+     * than "25 gold pieces".  This is suboptimal, to put it mildly,
+     * because lookhere and pickup report the precise amount.
+     * Picking the item up while blind also shows the precise amount
+     * for inventory display, then dropping it while still blind leaves
+     * obj->dknown unset so the count reverts to "some" for farlook.
+     *
+     * TODO: add obj->qknown flag for 'quantity known' on stackable
+     * items; it could overlay obj->cknown since no containers stack.
+     */
+    return doname_base(obj, DONAME_VAGUE_QUAN);
 }
 
 /* used from invent.c */
 boolean
 not_fully_identified(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS)
@@ -3448,14 +3477,14 @@ typfnd:
             otmp->spe = 0; /* No spinach */
             if (dead_species(mntmp, FALSE)) {
                 otmp->corpsenm = NON_PM; /* it's empty */
-            } else if (!(mons[mntmp].geno & G_UNIQ)
+            } else if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
                        && !(mvitals[mntmp].mvflags & G_NOCORPSE)
                        && mons[mntmp].cnutrit != 0) {
                 otmp->corpsenm = mntmp;
             }
             break;
         case CORPSE:
-            if (!(mons[mntmp].geno & G_UNIQ)
+            if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
                 && !(mvitals[mntmp].mvflags & G_NOCORPSE)) {
                 if (mons[mntmp].msound == MS_GUARDIAN)
                     mntmp = genus(mntmp, 1);

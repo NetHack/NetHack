@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1452660188 2016/01/13 04:43:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1469930895 2016/07/31 02:08:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1311,17 +1311,18 @@ boolean from_configfile;
     /* Now finally, we notify the window port */
     if (!from_configfile)
         status_threshold(idx, status_hilites[idx].anytype,
-                        status_hilites[idx].threshold,
-                        status_hilites[idx].behavior,
-                        status_hilites[idx].coloridx[0],
-                        status_hilites[idx].coloridx[1]);
+                         status_hilites[idx].threshold,
+                         status_hilites[idx].behavior,
+                         status_hilites[idx].coloridx[0],
+                         status_hilites[idx].coloridx[1]);
 
     return TRUE;
 }
 
+/*ARGUSED*/
 void
 status_notify_windowport(all)
-boolean all;
+boolean all UNUSED;
 {
     int idx;
     anything it;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1456992461 2016/03/03 08:07:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1470819842 2016/08/10 09:04:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1522,7 +1522,7 @@ int mdead;
         goto assess_dmg;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mhit && !mdef->mcan && otmp) {
-            (void) drain_item(otmp);
+            (void) drain_item(otmp, FALSE);
             /* No message */
         }
         break;

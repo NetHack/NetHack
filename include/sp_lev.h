@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1470212260 2016/08/03 08:17:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -229,28 +229,31 @@ enum opcode_defs {
 
 #define SP_COORD_X(l) (l & 0xff)
 #define SP_COORD_Y(l) ((l >> 16) & 0xff)
-#define SP_COORD_PACK(x, y) (((x) &0xff) + (((y) &0xff) << 16))
+#define SP_COORD_PACK(x, y) (((x) & 0xff) + (((y) & 0xff) << 16))
 #define SP_COORD_PACK_RANDOM(f) (SP_COORD_IS_RANDOM | (f))
 
 #define SP_REGION_X1(l) (l & 0xff)
 #define SP_REGION_Y1(l) ((l >> 8) & 0xff)
 #define SP_REGION_X2(l) ((l >> 16) & 0xff)
 #define SP_REGION_Y2(l) ((l >> 24) & 0xff)
-#define SP_REGION_PACK(x1, y1, x2, y2)                         \
-    (((x1) &0xff) + (((y1) &0xff) << 8) + (((x2) &0xff) << 16) \
-     + (((y2) &0xff) << 24))
+#define SP_REGION_PACK(x1, y1, x2, y2) \
+    (((x1) & 0xff) + (((y1) & 0xff) << 8) + (((x2) & 0xff) << 16) \
+     + (((y2) & 0xff) << 24))
 
-#define SP_MONST_CLASS(l) (l & 0xff)
-#define SP_MONST_PM(l) ((l >> 8) & 0xffff)
-#define SP_MONST_PACK(m, c) (((m) << 8) + ((char) (c)))
+/* permonst index, object index, and lit value might be negative;
+ * add 10 to accept -1 through -9 while forcing non-negative for bit shift
+ */
+#define SP_MONST_CLASS(l) ((l) & 0xff)
+#define SP_MONST_PM(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_MONST_PACK(pm, cls) (((10 + (pm)) << 8) | ((cls) & 0xff))
 
-#define SP_OBJ_CLASS(l) (l & 0xff)
-#define SP_OBJ_TYP(l) ((l >> 8) & 0xffff)
-#define SP_OBJ_PACK(o, c) (((o) << 8) + ((char) (c)))
+#define SP_OBJ_CLASS(l) ((l) & 0xff)
+#define SP_OBJ_TYP(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_OBJ_PACK(ob, cls) (((10 + (ob)) << 8) | ((cls) & 0xff))
 
-#define SP_MAPCHAR_TYP(l) (l & 0xff)
-#define SP_MAPCHAR_LIT(l) ((l >> 8) & 0xff)
-#define SP_MAPCHAR_PACK(typ, lit) (((lit) << 8) + ((char) (typ)))
+#define SP_MAPCHAR_TYP(l) ((l) & 0xff)
+#define SP_MAPCHAR_LIT(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_MAPCHAR_PACK(typ, lit) (((10 + (lit)) << 8) | ((typ) & 0xff))
 
 struct opvar {
     xchar spovartyp; /* one of SPOVAR_foo */

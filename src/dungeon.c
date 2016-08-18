@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1462486971 2016/05/05 22:22:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1470275509 2016/08/04 01:51:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2864,7 +2864,9 @@ boolean printdun;
         Sprintf(eos(buf), " \"%s\"", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
         Sprintf(eos(buf), " <- You %s here.",
-                (!final || (final == 1 && how == ASCENDED)) ? "are" : "were");
+                (!final || (final == 1 && how == ASCENDED)) ? "are"
+                  : (final == 1 && how == ESCAPED) ? "left from"
+                    : "were");
     putstr(win, !final ? ATR_BOLD : 0, buf);
 
     if (mptr->flags.forgot)

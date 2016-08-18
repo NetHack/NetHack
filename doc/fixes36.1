@@ -29,6 +29,7 @@ negative intrinsic protection shouldn't confer MC=1, "you are warded" (not
 	possible from divine protection but is possible from eating rings)
 make a slight adjustment to the quickmimic() sense wording
 fix typo in passage 1 of The Colour of Magic
+fix typos in passages 2 and 6 of Thud!
 falling asleep when reading dull spellbook ignored sleep resistance
 getpos() complaint about invalid movement keystroke didn't describe meta-chars
 	accurately
@@ -322,6 +323,17 @@ clarify that shape-shifted vampires revert to vampire form when petrified or
 	digested; when back in 'V' form, they're vulnerable to such damage
 when poly'd into an engulfer which does digestion damage, a kill resulting in
 	a level gain gave "welcome to level N+1" before "you digest <victim>"
+any corpse eaten by omnivorous hero always tasted "terrible"
+eating the corpse of a unique non-named monster (Wizard of Yendor, Oracle,
+	Chromatic Dragon, others) gave "The the <monster corpse> tastes ..."
+when escaping the dungeon, change "you were here" annotation in dungeon
+	overview to "you left from here"
+option parsing will crash if 'playmode' option is present without a value
+any item drained of enchantment was blamed on the player as far as shop
+	billing was concerned, even if caused by disenchanter attack
+if user supplied a specific monster name when asked to choose a monster class,
+	first prefix match was picked rather than best match ("titan" yielded
+	S_quadruped due to being preceded by "titanothere" in mons[])
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -333,17 +345,25 @@ rings covered by non-cursed gloves not listed as 'R' candidates
 in baalz_fixup, move any monster away from the two fake pool spots
 switching farlook from xname to doname was giving away information for items
 	located via object detection (quantity of detected gold)
+changing doname to use "some" instead of precise quantity when an item's
+	dknown flag is not set could result in blind hero getting
+	"There is a some jackal corpses here.  Eat one?" and
+	"You can only lift some of the some jackal corpses.  Continue?"
 catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
 fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
 	'remove' menu choices in interactive handling for menu colorings,
 	message types, and autopickup exceptions subject to buffer overflow
 when picking a destination for #jump, '$' to show valid dest. is more accurate
 enchant armor gave "your pair of boots/gloves glow", should have been "glows"
+when autopickup is overridden in a shop, always-pick-up exceptions and
+	pickup_thrown still picked unpaid items up
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 tiles: wrinkled spellbook had a spurious brown pixel on far right edge of tile
+tiles: when statues are displayed as corresponding monsters, total_tiles_used
+	in generated src/tile.c had incorrect value
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
@@ -390,6 +410,8 @@ X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
 X11: use grayscale monster tiles for statues
+X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
+	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 
 
 General New Features
