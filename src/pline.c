@@ -655,6 +655,9 @@ const char *line;
         (void) fprintf(stderr, "Exec to message handler %s failed.\n",
                        env);
         terminate(EXIT_FAILURE);
+    } else if (f > 0) {
+        int status;
+        waitpid(f, &status, 0);
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
