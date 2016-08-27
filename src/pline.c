@@ -336,6 +336,9 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1] = '\0'; /* terminate strncpy or truncate vsprintf */
     }
     raw_print(line);
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    execplinehandler(line);
+#endif
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     VA_END(); /* (see vpline) */
 #endif
