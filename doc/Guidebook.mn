@@ -295,7 +295,7 @@ do other tasks requiring agility or manipulation of objects.
 .lp Constitution
 Constitution affects your ability to recover from injuries and other
 strains on your stamina.
-When strength is low or modest, consitution also affects how much you
+When strength is low or modest, constitution also affects how much you
 can carry.  With sufficiently high strength, the contribution to
 carrying capacity from your constitution no longer matters.
 .lp Intelligence
@@ -2658,7 +2658,7 @@ attack to which it is resistant (default on).  Persistent.
 Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
 .lp statushilites
 Enable coloring of status fields (default off).
-See ``Configuring Status Hilites'' for futher information.
+See ``Configuring Status Hilites'' for further information.
 .lp suppress_alert
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that
@@ -2694,7 +2694,7 @@ When using the `/' or `;' commands to look around on the map with
 on, display coordinates after the description.
 Also works in other situations where you are asked to pick a location.
 .lp ""
-The possibile settings are:
+The possible settings are:
 .sd
 .si
 .CC c "compass ('east' or '3s' or '2n,4w');"

@@ -336,6 +336,9 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1] = '\0'; /* terminate strncpy or truncate vsprintf */
     }
     raw_print(line);
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    execplinehandler(line);
+#endif
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     VA_END(); /* (see vpline) */
 #endif
@@ -655,6 +658,9 @@ const char *line;
         (void) fprintf(stderr, "Exec to message handler %s failed.\n",
                        env);
         terminate(EXIT_FAILURE);
+    } else if (f > 0) {
+        int status;
+        waitpid(f, &status, 0);
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
