@@ -1381,6 +1381,16 @@ domove()
             || (Blind && !Levitation && !Flying && !is_clinger(youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
             if (context.run >= 2) {
+                if (iflags.mention_walls) {
+                    if (trap && trap->tseen) {
+                        int tt = what_trap(trap->ttyp);
+                        You("stop in front of %s.",
+                            an(defsyms[trap_to_defsym(tt)].explanation));
+                    } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
+                        You("stop at the edge of the %s.",
+                            hliquid(is_pool(x,y) ? "water" : "lava"));
+                    }
+                }
                 nomul(0);
                 context.move = 0;
                 return;
@@ -2484,7 +2494,8 @@ lookaround()
 
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
-    if (u.umonnum == PM_GRID_BUG && u.dx && u.dy) {
+    if (NODIAG(u.umonnum) && u.dx && u.dy) {
+        You("cannot move diagonally.");
         nomul(0);
         return;
     }
@@ -2504,8 +2515,11 @@ lookaround()
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
-                        && !context.travel))
+                        && !context.travel)) {
+                    if (iflags.mention_walls)
+                        pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
+                }
             }
 
             if (levl[x][y].typ == STONE)
@@ -2519,8 +2533,11 @@ lookaround()
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 if (x != u.ux && y != u.uy)
                     continue;
-                if (context.run != 1)
+                if (context.run != 1) {
+                    if (iflags.mention_walls)
+                        You("stop in front of the door.");
                     goto stop;
+                }
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
             bcorr:
@@ -2545,20 +2562,30 @@ lookaround()
             } else if ((trap = t_at(x, y)) && trap->tseen) {
                 if (context.run == 1)
                     goto bcorr; /* if you must */
-                if (x == u.ux + u.dx && y == u.uy + u.dy)
+                if (x == u.ux + u.dx && y == u.uy + u.dy) {
+                    if (iflags.mention_walls) {
+                        int tt = what_trap(trap->ttyp);
+                        You("stop in front of %s.",
+                            an(defsyms[trap_to_defsym(tt)].explanation));
+                    }
                     goto stop;
+                }
                 continue;
             } else if (is_pool_or_lava(x, y)) {
                 /* water and lava only stop you if directly in front, and stop
                  * you even if you are running
                  */
                 if (!Levitation && !Flying && !is_clinger(youmonst.data)
-                    && x == u.ux + u.dx && y == u.uy + u.dy)
+                    && x == u.ux + u.dx && y == u.uy + u.dy) {
                     /* No Wwalking check; otherwise they'd be able
                      * to test boots by trying to SHIFT-direction
                      * into a pool and seeing if the game allowed it
                      */
+                    if (iflags.mention_walls)
+                        You("stop at the edge of the %s.",
+                            hliquid(is_pool(x,y) ? "water" : "lava"));
                     goto stop;
+                }
                 continue;
             } else { /* e.g. objects or trap or stairs */
                 if (context.run == 1)
@@ -2576,8 +2603,11 @@ lookaround()
             return;
         } /* end for loops */
 
-    if (corrct > 1 && context.run == 2)
+    if (corrct > 1 && context.run == 2) {
+        if (iflags.mention_walls)
+            pline_The("corridor widens here.");
         goto stop;
+    }
     if ((context.run == 1 || context.run == 3 || context.run == 8) && !noturn
         && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */
