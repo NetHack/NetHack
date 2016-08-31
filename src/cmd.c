@@ -4323,11 +4323,14 @@ dotravel(VOID_ARGS)
         cc.x = u.ux;
         cc.y = u.uy;
     }
+    iflags.getloc_travelmode = TRUE;
     pline("Where do you want to travel to?");
     if (getpos(&cc, TRUE, "the desired destination") < 0) {
         /* user pressed ESC */
+        iflags.getloc_travelmode = FALSE;
         return 0;
     }
+    iflags.getloc_travelmode = FALSE;
     iflags.travelcc.x = u.tx = cc.x;
     iflags.travelcc.y = u.ty = cc.y;
     cmd[0] = CMD_TRAVEL;
