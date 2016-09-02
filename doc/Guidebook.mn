@@ -3352,6 +3352,15 @@ gives you the row and column of your review cursor and the PC cursor.
 These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 .pg
+NetHack can also be compiled with support for sending the game messages
+to an external program, such as a text-to-speech synthesizer. If the #version
+extended command shows "external program as a message handler", your NetHack
+has been compiled with the capability. When compiling NetHack from source
+on Linux and other POSIX systems, define MSGHANDLER to enable it. To use
+the capability, set the environment variable NETHACK_MSGHANDLER to an
+executable, which will be executed with the game message as the program's
+only parameter.
+.pg
 While it is not difficult for experienced users to edit the \fBdefaults.nh\fP
 file to accomplish this, novices may find this task somewhat daunting.
 Included within the ``symbols'' file of all official distributions of NetHack
@@ -3369,10 +3378,20 @@ Load a symbol set for the rogue level that is appropriate for
 use by blind players.
 .lp menustyle:traditional
 This will assist in the interface to speech synthesizers.
+.lp nomenu_overlay
+Show menus on a cleared screen and aligned to the left edge.
 .lp number_pad
 A lot of speech access programs use the number-pad to review the screen.
 If this is the case, disable the number_pad option and use the traditional
 Rogue-like commands.
+.lp autodescribe
+Automatically describe the terrain under the cursor when targeting.
+.lp mention_walls
+Give feedback messages when walking towards a wall or when travel command
+was interrupted.
+.lp whatis_coord:compass
+When targeting with cursor, describe the cursor position with coordinates
+relative to your character.
 .hn 2
 Global Configuration for System Administrators
 .pg
