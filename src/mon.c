@@ -555,8 +555,7 @@ register struct monst *mtmp;
                 /* This can happen after a purple worm plucks you off a
                 flying steed while you are over water. */
                 pline("%s sinks as %s rushes in and flushes you out.",
-                      hliquid("water"),
-                      Monnam(mtmp));
+                      Monnam(mtmp), hliquid("water"));
             }
             mondead(mtmp);
             if (mtmp->mhp > 0) {
