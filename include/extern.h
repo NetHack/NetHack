@@ -796,6 +796,7 @@ E void NDECL(drinksink);
 
 /* ### hack.c ### */
 
+E boolean FDECL(is_valid_travelpt, (int,int));
 E anything *FDECL(uint_to_any, (unsigned));
 E anything *FDECL(long_to_any, (long));
 E anything *FDECL(monst_to_any, (struct monst *));

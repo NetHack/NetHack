@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1461967848 2016/04/29 22:10:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1472809075 2016/09/02 09:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1573,13 +1573,15 @@ unsigned *resultflags;
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
     char buf[BUFSZ], qbuf[QBUFSZ];
 
+    if (!invent) {
+        You("have nothing to %s.", word);
+        if (resultflags)
+            *resultflags = ALL_FINISHED;
+        return 0;
+    }
     if (resultflags)
         *resultflags = 0;
     takeoff = ident = allflag = m_seen = FALSE;
-    if (!invent) {
-        You("have nothing to %s.", word);
-        return 0;
-    }
     add_valid_menu_class(0); /* reset */
     if (taking_off(word)) {
         takeoff = TRUE;

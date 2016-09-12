@@ -336,6 +336,9 @@ if user supplied a specific monster name when asked to choose a monster class,
 	S_quadruped due to being preceded by "titanothere" in mons[])
 change ing_suffix() to not double final 'w' when adding 'ing' ('t=' yielded
 	"You mime throwwing something.")
+using 'D' to drop when not carrying anything finished (after doing nothing)
+	without giving any feedback for menustyles "full" and "partial"
+"you hear a distant <musical note> squeak" might actually be nearby
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -483,6 +486,8 @@ undead #turning takes less time at higher experience level
 peacefuls may react when you attack other peacefuls
 prevent diagonal jumping through open doorways
 different liquids when hallucinating
+when moving a cursor for travel target, show if there is no known travel
+	path to that location, if "autodescribe" is on
 
 
 Platform- and/or Interface-Specific New Features

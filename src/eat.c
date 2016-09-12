@@ -1675,20 +1675,18 @@ struct obj *otmp;
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
-        pline("%s%s %s!",
+        pline("%s%s %s %s%c",
               type_is_pname(&mons[mnum])
-                  ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
+                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
               pmxnam,
+              Hallucination ? "is" : "tastes",
                   /* tiger reference is to TV ads for "Frosted Flakes",
                      breakfast cereal targeted at kids by "Tony the tiger" */
               Hallucination
-                  ? (yummy ? ((u.umonnum == PM_TIGER) ? "is gr-r-reat"
-                                                      : "is gnarly")
-                           : palatable ? "is copacetic"
-                                       : "is grody")
-                  : (yummy ? "tastes delicious"
-                           : palatable ? "tastes okay"
-                                       : "tastes terrible"));
+                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
+                          : palatable ? "copacetic" : "grody")
+                 : (yummy ? "delicious" : palatable ? "okay" : "terrible"),
+              (yummy || !palatable) ? '!' : '.');
     }
 
     return retcode;

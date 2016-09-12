@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1464138044 2016/05/25 01:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1473665044 2016/09/12 07:24:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2198,8 +2198,15 @@ register struct monst *mtmp;
                     pline("%s stops momentarily and appears to cringe.",
                           Monnam(mtmp));
                 }
-            } else
-                You_hear("a distant %s squeak.", trapnote(trap, 1));
+            } else {
+                /* same near/far threshold as mzapmsg() */
+                int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
+                               ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
+
+                You_hear("a %s squeak %s.", trapnote(trap, 1),
+                         (distu(mtmp->mx, mtmp->my) <= range * range)
+                            ? "nearby" : "in the distance");
+            }
             /* wake up nearby monsters */
             wake_nearto(mtmp->mx, mtmp->my, 40);
             break;
