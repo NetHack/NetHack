@@ -7,6 +7,7 @@
 #define NETHACK_CLR_RANDOM green
 #define NETHACK_CLR_HELP   green
 #define NETHACK_BTN_SHAPE  roundedRectangle
+#define NETHACK_BTN_ROUND  20
 #define NETHACK_CMD_BORDER 0
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
@@ -129,12 +130,12 @@ NetHack*player_selection*random.background:   black
 NetHack*player_selection*random.borderColor:  NETHACK_CLR_RANDOM
 NetHack*player_selection*random.borderWidth:  1
 NetHack*player_selection*random.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*player_selection*random.cornerRoundPercent: 1%
+NetHack*player_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*player_selection*quit.foreground:     NETHACK_CLR_QUIT
 NetHack*player_selection*quit.borderColor:    NETHACK_CLR_QUIT
 NetHack*player_selection*quit.borderWidth:    1
 NetHack*player_selection*quit.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*player_selection*quit.cornerRoundPercent: 1%
+NetHack*player_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*player_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*player_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*player_selection*Command.borderWidth: NETHACK_CMD_BORDER
@@ -145,12 +146,12 @@ NetHack*race_selection*random.background:   black
 NetHack*race_selection*random.borderColor:  NETHACK_CLR_RANDOM
 NetHack*race_selection*random.borderWidth:  1
 NetHack*race_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*race_selection*random.cornerRoundPercent: 1%
+NetHack*race_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*race_selection*quit.foreground:     NETHACK_CLR_QUIT
 NetHack*race_selection*quit.borderColor:    NETHACK_CLR_QUIT
 NetHack*race_selection*quit.borderWidth:    1
 NetHack*race_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*race_selection*quit.cornerRoundPercent: 1%
+NetHack*race_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*race_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*race_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*race_selection*Command.borderWidth: NETHACK_CMD_BORDER
@@ -161,12 +162,12 @@ NetHack*gender_selection*random.background:   black
 NetHack*gender_selection*random.borderColor:  NETHACK_CLR_RANDOM
 NetHack*gender_selection*random.borderWidth:  1
 NetHack*gender_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*gender_selection*random.cornerRoundPercent: 1%
+NetHack*gender_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*gender_selection*quit.foreground:     NETHACK_CLR_QUIT
 NetHack*gender_selection*quit.borderColor:    NETHACK_CLR_QUIT
 NetHack*gender_selection*quit.borderWidth:    1
 NetHack*gender_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*gender_selection*quit.cornerRoundPercent: 1%
+NetHack*gender_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*gender_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*gender_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*gender_selection*Command.borderWidth: NETHACK_CMD_BORDER
@@ -177,12 +178,12 @@ NetHack*alignment_selection*random.background:   black
 NetHack*alignment_selection*random.borderColor:  NETHACK_CLR_RANDOM
 NetHack*alignment_selection*random.borderWidth:  1
 NetHack*alignment_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*alignment_selection*random.cornerRoundPercent: 1%
+NetHack*alignment_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*alignment_selection*quit.foreground:     NETHACK_CLR_QUIT
 NetHack*alignment_selection*quit.borderColor:    NETHACK_CLR_QUIT
 NetHack*alignment_selection*quit.borderWidth:    1
 NetHack*alignment_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*alignment_selection*quit.cornerRoundPercent: 1%
+NetHack*alignment_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*alignment_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*alignment_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*alignment_selection*Command.borderWidth: NETHACK_CMD_BORDER
@@ -192,12 +193,12 @@ NetHack*extended_commands*dismiss.foreground:  NETHACK_CLR_QUIT
 NetHack*extended_commands*dismiss.borderColor: NETHACK_CLR_QUIT
 NetHack*extended_commands*dismiss.borderWidth: 1
 NetHack*extended_commands*dismiss.shapeStyle:  NETHACK_BTN_SHAPE
-NetHack*extended_commands*dismiss.cornerRoundPercent: 1%
+NetHack*extended_commands*dismiss.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*extended_commands*help.foreground:     NETHACK_CLR_HELP
 NetHack*extended_commands*help.borderColor:    NETHACK_CLR_HELP
 NetHack*extended_commands*help.borderWidth:    1
 NetHack*extended_commands*help.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*extended_commands*help.cornerRoundPercent: 1%
+NetHack*extended_commands*help.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*extended_commands*Command.foreground:  NETHACK_CLR_FG
 NetHack*extended_commands*Command.borderColor: NETHACK_CLR_FG
 NetHack*extended_commands*Command.borderWidth: NETHACK_CMD_BORDER
@@ -213,37 +214,37 @@ NetHack*extcmd_height_delta: 75
 NetHack*OK.foreground:  green
 NetHack*OK.borderColor: green
 NetHack*OK.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*OK.cornerRoundPercent: 1%
+NetHack*OK.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*okay.foreground:  green
 NetHack*okay.borderColor: green
 NetHack*okay.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*okay.cornerRoundPercent: 1%
+NetHack*okay.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*cancel.foreground:  red
 NetHack*cancel.borderColor: red
 NetHack*cancel.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*cancel.cornerRoundPercent: 1%
+NetHack*cancel.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*all.foreground:  green
 NetHack*all.borderColor: green
 NetHack*all.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*all.cornerRoundPercent: 1%
+NetHack*all.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*none.foreground:  green
 NetHack*none.borderColor: green
 NetHack*none.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*none.cornerRoundPercent: 1%
+NetHack*none.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*invert.foreground:  green
 NetHack*invert.borderColor: green
 NetHack*invert.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*invert.cornerRoundPercent: 1%
+NetHack*invert.cornerRoundPercent: NETHACK_BTN_ROUND
 
 NetHack*search.foreground:  green
 NetHack*search.borderColor: green
 NetHack*search.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*search.cornerRoundPercent: 1%
+NetHack*search.cornerRoundPercent: NETHACK_BTN_ROUND
 
 ! map colors
 ! The foreground color is used as "no color".
