@@ -1,17 +1,27 @@
 ! $NHDT-Date: 1457079198 2016/03/04 08:13:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $
 
+#define NETHACK_FONT       -*-fixed-medium-*-*-*-15-*-*-*-*-*-*-*
+#define NETHACK_CLR_FG     grey
+#define NETHACK_CLR_BG     black
+#define NETHACK_CLR_QUIT   red
+#define NETHACK_CLR_RANDOM green
+#define NETHACK_CLR_HELP   green
+#define NETHACK_BTN_SHAPE  roundedRectangle
+#define NETHACK_CMD_BORDER 0
+
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
 ! The rip window applies if the GRAPHIC_TOMBSTONE option is turned on, and
 ! requires a 12 pixel font for correct appearance.
 !
-NetHack*font:				variable
-NetHack*display_file*font:		fixed
-NetHack*tombstone*font:			fixed
-NetHack*text*rip*font:			-*-times-medium-r-*-*-12-*-*-*-*-*-*-*
-NetHack*menu*font:			fixed
-NetHack*text*font:			fixed
-NetHack*map*font:			nh10
+NetHack*font:              NETHACK_FONT
+NetHack*display_file*font: NETHACK_FONT
+NetHack*map*font:          NETHACK_FONT
+NetHack*text*font:         NETHACK_FONT
+NetHack*menu*font:         NETHACK_FONT
+NetHack*tombstone*font:    NETHACK_FONT
+NetHack*text*rip*font:     -*-times-medium-r-*-*-12-*-*-*-*-*-*-*
+NetHack*text*borderWidth:  0
 
 ! tile_file names a file containing full-color tiles for the map.
 ! If you use a 100dpi (or greater) monitor you may wish to double the
@@ -35,7 +45,7 @@ NetHack.tile_file: x11tiles
 ! The image file
 !NetHack.tombstone: rip.xpm
 ! Text starts at (tombtext_x, tombtext_y) and subsequent lines
-! are displaced by (tombtext_dx, tombtext_dy) pixels.  If you
+! are displaced by (tombtext_dx, tombtext_dy) pixels.
 !NetHack.tombtext_x: 155
 !NetHack.tombtext_y: 78
 !NetHack.tombtext_dx: 0
@@ -73,7 +83,7 @@ NetHack*slow: True
 ! as part of the map when no prompt is active, then invert foreground and
 ! background to stand out when a prompt is issued and waiting for a response.
 ! If 'slow' is False, 'highlight_prompt' will have no effect.
-NetHack*highlight_prompt: True
+NetHack*highlight_prompt: False
 
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12
@@ -92,103 +102,105 @@ NetHack*highlight_prompt: True
 !NetHack*map*rows:	21
 !NetHack*map*columns:	80
 
-! Parts of the fancy status display.
-!
-NetHack*status_condition1.borderWidth:	0
-NetHack*status_condition2.borderWidth:	0
-NetHack*status_condition3.borderWidth:	0
-NetHack*status_leftover.borderWidth:	0
-NetHack*status_info*borderWidth:	0
+NetHack*background: NETHACK_CLR_BG
+NetHack*foreground: NETHACK_CLR_FG
 
-! Sample color screen entries.
-!
-NetHack*nethack.background: 	wheat
-NetHack*map*yellow:		gold
-NetHack*map*brown:		tan
-NetHack*map*gray:		grey85
-NetHack*map*foreground:		wheat
-NetHack*map*background:		grey40
+NetHack*yn_prompt*borderWidth: 0
 
-NetHack*fancy_status.skipAdjust:        True
-NetHack*fancy_status.background:	wheat
-NetHack*status_info*foreground:		Sienna
-NetHack*status_info*background:		wheat
-NetHack*status_info.background:		wheat
-NetHack*status_attributes*foreground:	black
-NetHack*status_attributes*background:	white
-NetHack*status_condition1*foreground:	red
-NetHack*status_condition1*background:	wheat
-NetHack*status_condition2*foreground:	black
-NetHack*status_condition2*background:	wheat
-NetHack*status_condition3*foreground:	black
-NetHack*status_condition3*background:	wheat
-NetHack*Scrollbar*foreground:		Sienna
-NetHack*Scrollbar*background:		wheat
-NetHack*status_info*showGrip:		False
-NetHack*status_attributes*showGrip:	False
-NetHack*status_condition1*showGrip:	False
-NetHack*status_condition2*showGrip:	False
-NetHack*status_condition3*showGrip:	False
+NetHack*Scrollbar*foreground: gray40
+NetHack*Scrollbar*background: gray10
 
-NetHack*player_selection*random.borderColor:	blue
-NetHack*player_selection*random.borderWidth:    2
-NetHack*player_selection*random.foreground:	blue
-NetHack*player_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-NetHack*player_selection*quit.borderColor:	blue
-NetHack*player_selection*quit.foreground:	blue
-NetHack*player_selection*Command.borderColor:	red
-NetHack*player_selection*Command.foreground:	red
-NetHack*player_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+NetHack*fancy_status*background: NETHACK_CLR_BG
+NetHack*fancy_status*foreground: NETHACK_CLR_FG
+NetHack*fancy_status.skipAdjust: True
 
-NetHack*race_selection*random.borderColor:	blue
-NetHack*race_selection*random.borderWidth:	2
-NetHack*race_selection*random.foreground:	blue
-NetHack*race_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-NetHack*race_selection*quit.borderColor:	blue
-NetHack*race_selection*quit.foreground:		blue
-NetHack*race_selection*Command.borderColor:	red
-NetHack*race_selection*Command.foreground:	red
-NetHack*race_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+NetHack*showGrip: False
 
-NetHack*gender_selection*random.borderColor:	blue
-NetHack*gender_selection*random.borderWidth:	2
-NetHack*gender_selection*random.foreground:	blue
-NetHack*gender_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-NetHack*gender_selection*quit.borderColor:	blue
-NetHack*gender_selection*quit.foreground:	blue
-NetHack*gender_selection*Command.borderColor:	red
-NetHack*gender_selection*Command.foreground:	red
-NetHack*gender_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+! text input prompt window
+NetHack*response*textSink*background: red
+NetHack*response*foreground:  NETHACK_CLR_FG
+NetHack*response*background:  NETHACK_CLR_BG
+NetHack*response*borderColor: NETHACK_CLR_FG
+NetHack*response*borderWidth: 1
 
-NetHack*alignment_selection*random.borderColor:	blue
-NetHack*alignment_selection*random.borderWidth:	2
-NetHack*alignment_selection*random.foreground:	blue
-NetHack*alignment_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-NetHack*alignment_selection*quit.borderColor:	blue
-NetHack*alignment_selection*quit.foreground:	blue
-NetHack*alignment_selection*Command.borderColor: red
-NetHack*alignment_selection*Command.foreground:	red
-NetHack*alignment_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+! role selection window
+NetHack*player_selection*random.foreground:   NETHACK_CLR_RANDOM
+NetHack*player_selection*random.background:   black
+NetHack*player_selection*random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*player_selection*random.borderWidth:  1
+NetHack*player_selection*random.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*player_selection*random.cornerRoundPercent: 1%
+NetHack*player_selection*quit.foreground:     NETHACK_CLR_QUIT
+NetHack*player_selection*quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*player_selection*quit.borderWidth:    1
+NetHack*player_selection*quit.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*player_selection*quit.cornerRoundPercent: 1%
+NetHack*player_selection*Command.foreground:  NETHACK_CLR_FG
+NetHack*player_selection*Command.borderColor: NETHACK_CLR_FG
+NetHack*player_selection*Command.borderWidth: NETHACK_CMD_BORDER
 
-NetHack*extended_commands*dismiss.borderColor:	blue
-NetHack*extended_commands*dismiss.foreground:	blue
-NetHack*extended_commands*help.borderColor:	blue
-NetHack*extended_commands*help.foreground:	blue
-NetHack*extended_commands*Command.borderColor:	red
-NetHack*extended_commands*Command.foreground:	red
-NetHack*extended_commands*help.accelerators: #override\n\
-				:<Key>?:	set() notify() unset()
-NetHack*extended_commands*dismiss.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
-!
+! race selection window
+NetHack*race_selection*random.foreground:   NETHACK_CLR_RANDOM
+NetHack*race_selection*random.background:   black
+NetHack*race_selection*random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*race_selection*random.borderWidth:  1
+NetHack*race_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*race_selection*random.cornerRoundPercent: 1%
+NetHack*race_selection*quit.foreground:     NETHACK_CLR_QUIT
+NetHack*race_selection*quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*race_selection*quit.borderWidth:    1
+NetHack*race_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*race_selection*quit.cornerRoundPercent: 1%
+NetHack*race_selection*Command.foreground:  NETHACK_CLR_FG
+NetHack*race_selection*Command.borderColor: NETHACK_CLR_FG
+NetHack*race_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! gender selection window
+NetHack*gender_selection*random.foreground:   NETHACK_CLR_RANDOM
+NetHack*gender_selection*random.background:   black
+NetHack*gender_selection*random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*gender_selection*random.borderWidth:  1
+NetHack*gender_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*gender_selection*random.cornerRoundPercent: 1%
+NetHack*gender_selection*quit.foreground:     NETHACK_CLR_QUIT
+NetHack*gender_selection*quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*gender_selection*quit.borderWidth:    1
+NetHack*gender_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*gender_selection*quit.cornerRoundPercent: 1%
+NetHack*gender_selection*Command.foreground:  NETHACK_CLR_FG
+NetHack*gender_selection*Command.borderColor: NETHACK_CLR_FG
+NetHack*gender_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! alignment selection window
+NetHack*alignment_selection*random.foreground:   NETHACK_CLR_RANDOM
+NetHack*alignment_selection*random.background:   black
+NetHack*alignment_selection*random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*alignment_selection*random.borderWidth:  1
+NetHack*alignment_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*alignment_selection*random.cornerRoundPercent: 1%
+NetHack*alignment_selection*quit.foreground:     NETHACK_CLR_QUIT
+NetHack*alignment_selection*quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*alignment_selection*quit.borderWidth:    1
+NetHack*alignment_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*alignment_selection*quit.cornerRoundPercent: 1%
+NetHack*alignment_selection*Command.foreground:  NETHACK_CLR_FG
+NetHack*alignment_selection*Command.borderColor: NETHACK_CLR_FG
+NetHack*alignment_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! extended commands window
+NetHack*extended_commands*dismiss.foreground:  NETHACK_CLR_QUIT
+NetHack*extended_commands*dismiss.borderColor: NETHACK_CLR_QUIT
+NetHack*extended_commands*dismiss.borderWidth: 1
+NetHack*extended_commands*dismiss.shapeStyle:  NETHACK_BTN_SHAPE
+NetHack*extended_commands*dismiss.cornerRoundPercent: 1%
+NetHack*extended_commands*help.foreground:     NETHACK_CLR_HELP
+NetHack*extended_commands*help.borderColor:    NETHACK_CLR_HELP
+NetHack*extended_commands*help.borderWidth:    1
+NetHack*extended_commands*help.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*extended_commands*help.cornerRoundPercent: 1%
+NetHack*extended_commands*Command.foreground:  NETHACK_CLR_FG
+NetHack*extended_commands*Command.borderColor: NETHACK_CLR_FG
+NetHack*extended_commands*Command.borderWidth: NETHACK_CMD_BORDER
 ! The extended command menu may be too big to fit on the screen so need
 ! a vertical scroll bar.  When truncated, its height will be as tall as
 ! possible unless height_delta is non-zero, in which case there will be
@@ -197,13 +209,64 @@ NetHack*extended_commands*dismiss.accelerators: #override\n\
 ! obscuring the bottom of the menu.
 NetHack*extcmd_height_delta: 75
 
-!
+! menu buttons
+NetHack*OK.foreground:  green
+NetHack*OK.borderColor: green
+NetHack*OK.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*OK.cornerRoundPercent: 1%
+
+NetHack*okay.foreground:  green
+NetHack*okay.borderColor: green
+NetHack*okay.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*okay.cornerRoundPercent: 1%
+
+NetHack*cancel.foreground:  red
+NetHack*cancel.borderColor: red
+NetHack*cancel.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*cancel.cornerRoundPercent: 1%
+
+NetHack*all.foreground:  green
+NetHack*all.borderColor: green
+NetHack*all.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*all.cornerRoundPercent: 1%
+
+NetHack*none.foreground:  green
+NetHack*none.borderColor: green
+NetHack*none.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*none.cornerRoundPercent: 1%
+
+NetHack*invert.foreground:  green
+NetHack*invert.borderColor: green
+NetHack*invert.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*invert.cornerRoundPercent: 1%
+
+NetHack*search.foreground:  green
+NetHack*search.borderColor: green
+NetHack*search.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*search.cornerRoundPercent: 1%
+
+! map colors
+! The foreground color is used as "no color".
+NetHack*map*foreground: NETHACK_CLR_FG
+NetHack*map*background: NETHACK_CLR_BG
+
+NetHack*map*black:          grey15
+NetHack*map*red:            red3
+NetHack*map*green:          green3
+NetHack*map*brown:          DarkOrange3
+NetHack*map*blue:           blue3
+NetHack*map*magenta:        magenta3
+NetHack*map*cyan:           cyan3
+NetHack*map*gray:           gray50
+NetHack*map*orange:         yellow
+NetHack*map*bright_green:   green
+NetHack*map*yellow:         yellow
+NetHack*map*bright_blue:    blue
+NetHack*map*bright_magenta: magenta
+NetHack*map*bright_cyan:    cyan
+NetHack*map*white:          white
 !
 ! The following are the default 15 colors that the nethack map uses.
-! If they don't look good on your screen, change them.
-!
-! The foreground color is used as "no color".
-!
 !NetHack*map*black:		black
 !NetHack*map*red:		red
 !NetHack*map*green:		pale green
