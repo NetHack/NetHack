@@ -4561,7 +4561,8 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
-            end_menu(tmpwin, "Select symbol set:");
+            Sprintf(buf, "Select %ssymbol set:", rogueflag ? "rogue level " : "");
+            end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
                 free((genericptr_t) symset_pick);
