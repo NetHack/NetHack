@@ -2362,7 +2362,8 @@ boolean tinitial, tfrom_file;
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             static char gpcoords[] = { GPCOORDS_NONE, GPCOORDS_COMPASS,
-                                       GPCOORDS_MAP, GPCOORDS_SCREEN, '\0' };
+                                       GPCOORDS_COMFULL, GPCOORDS_MAP,
+                                       GPCOORDS_SCREEN, '\0' };
             char c = lowc(*op);
 
             if (c && index(gpcoords, c))
@@ -4104,6 +4105,10 @@ boolean setinitial, setfromfile;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS,
                  0, ATR_NONE, "compass ('east' or '3s' or '2n,4w')",
                  (gp == GPCOORDS_COMPASS) ? MENU_SELECTED : MENU_UNSELECTED);
+        any.a_char = GPCOORDS_COMFULL;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMFULL,
+                 0, ATR_NONE, "full compass ('east' or '3south' or '2north,4west')",
+                 (gp == GPCOORDS_COMFULL) ? MENU_SELECTED : MENU_UNSELECTED);
         any.a_char = GPCOORDS_MAP;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP,
                  0, ATR_NONE, "map <x,y>",
@@ -4917,6 +4922,7 @@ char *buf;
         Sprintf(buf, "%s",
                 (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
                 : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
+                : (iflags.getpos_coords == GPCOORDS_COMFULL) ? "full compass"
                 : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen"
                 : "none");
     } else if (!strcmp(optname, "scores")) {

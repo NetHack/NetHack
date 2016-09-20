@@ -232,11 +232,11 @@ int gloc;
 }
 
 char *
-dxdy_to_dist_descr(dx, dy)
+dxdy_to_dist_descr(dx, dy, fulldir)
 int dx, dy;
+boolean fulldir;
 {
-    /* [12] suffices, but guard against long translation for direction-name */
-    static char buf[20];
+    static char buf[30];
     int dst;
 
     if (!dx && !dy) {
@@ -245,18 +245,23 @@ int dx, dy;
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
+        const char *dirnames[4][2] = {
+            { "n", "north" },
+            { "s", "south" },
+            { "w", "west" },
+            { "e", "east" } };
         buf[0] = '\0';
         /* 9999: protect buf[] against overflow caused by invalid values */
         if (dy) {
             if (abs(dy) > 9999)
                 dy = sgn(dy) * 9999;
-            Sprintf(eos(buf), "%d%c%s", abs(dy), (dy > 0) ? 's' : 'n',
+            Sprintf(eos(buf), "%d%s%s", abs(dy), dirnames[(dy > 0)][fulldir],
                     dx ? "," : "");
         }
         if (dx) {
             if (abs(dx) > 9999)
                 dx = sgn(dx) * 9999;
-            Sprintf(eos(buf), "%d%c", abs(dx), (dx > 0) ? 'e' : 'w');
+            Sprintf(eos(buf), "%d%s", abs(dx), dirnames[2 + (dx > 0)][fulldir]);
         }
     }
     return buf;
@@ -275,11 +280,13 @@ char *outbuf, cmode;
     switch (cmode) {
     default:
         break;
+    case GPCOORDS_COMFULL:
     case GPCOORDS_COMPASS:
         /* "east", "3s", "2n,4w" */
         dx = x - u.ux;
         dy = y - u.uy;
-        Sprintf(outbuf, "(%s)", dxdy_to_dist_descr(dx, dy));
+        Sprintf(outbuf, "(%s)",
+                dxdy_to_dist_descr(dx, dy, cmode == GPCOORDS_COMFULL));
         break;
     case GPCOORDS_MAP: /* x,y */
         /* upper left corner of map is <1,0>;
