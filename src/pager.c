@@ -53,6 +53,8 @@ const char *new_str;
         return 0;
 
     space_left = BUFSZ - strlen(buf) - 1;
+    if (space_left < 1)
+        return 0;
     (void) strncat(buf, " or ", space_left);
     (void) strncat(buf, new_str, space_left - 4);
     return 1;
@@ -918,6 +920,10 @@ const char **firstmatch;
      * If we are looking at the screen, follow multiple possibilities or
      * an ambiguous explanation by something more detailed.
      */
+
+    if (found > 4)
+        Sprintf(out_str, "%s", "That can be many things");
+
  didlook:
     if (looked) {
         if (found > 1 || need_to_look) {
