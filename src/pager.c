@@ -18,8 +18,17 @@ STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void NDECL(whatdoes_help);
-STATIC_DCL boolean FDECL(help_menu, (int *));
 STATIC_DCL void NDECL(docontact);
+STATIC_DCL void NDECL(dispfile_help);
+STATIC_DCL void NDECL(dispfile_shelp);
+STATIC_DCL void NDECL(dispfile_optionfile);
+STATIC_DCL void NDECL(dispfile_license);
+STATIC_DCL void NDECL(dispfile_debughelp);
+STATIC_DCL void NDECL(hmenu_doextversion);
+STATIC_DCL void NDECL(hmenu_dohistory);
+STATIC_DCL void NDECL(hmenu_dowhatis);
+STATIC_DCL void NDECL(hmenu_dowhatdoes);
+STATIC_DCL void NDECL(hmenu_doextlist);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
@@ -1642,123 +1651,124 @@ docontact()
     destroy_nhwindow(cwin);
 }
 
-/* data for help_menu() */
-static const char *help_menu_items[] = {
-    /*  0*/ "About NetHack (version information).",
-    /*  1*/ "Long description of the game and commands.",
-    /*  2*/ "List of game commands.",
-    /*  3*/ "Concise history of NetHack.",
-    /*  4*/ "Info on a character in the game display.",
-    /*  5*/ "Info on what a given key does.",
-    /*  6*/ "List of game options.",
-    /*  7*/ "Longer explanation of game options.",
-    /*  8*/ "List of extended commands.",
-    /*  9*/ "The NetHack license.",
-    /* 10*/ "Support information.",
-#ifdef PORT_HELP
-    "%s-specific help and commands.",
-#define PORT_HELP_ID 100
-#define WIZHLP_SLOT 12
-#else
-#define WIZHLP_SLOT 11
-#endif
-    "List of wizard-mode commands.", "", (char *) 0
-};
-
-STATIC_OVL boolean
-help_menu(sel)
-int *sel;
+void
+dispfile_help()
 {
-    winid tmpwin = create_nhwindow(NHW_MENU);
-#ifdef PORT_HELP
-    char helpbuf[QBUFSZ];
-#endif
-    int i, n;
-    menu_item *selected;
-    anything any;
-
-    any = zeroany; /* zero all bits */
-    start_menu(tmpwin);
-    if (!wizard)
-        help_menu_items[WIZHLP_SLOT] = "",
-        help_menu_items[WIZHLP_SLOT + 1] = (char *) 0;
-    for (i = 0; help_menu_items[i]; i++)
-#ifdef PORT_HELP
-        /* port-specific line has a %s in it for the PORT_ID */
-        if (help_menu_items[i][0] == '%') {
-            Sprintf(helpbuf, help_menu_items[i], PORT_ID);
-            any.a_int = PORT_HELP_ID + 1;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, helpbuf,
-                     MENU_UNSELECTED);
-        } else
-#endif
-        {
-            any.a_int = (*help_menu_items[i]) ? i + 1 : 0;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     help_menu_items[i], MENU_UNSELECTED);
-        }
-    end_menu(tmpwin, "Select one item:");
-    n = select_menu(tmpwin, PICK_ONE, &selected);
-    destroy_nhwindow(tmpwin);
-    if (n > 0) {
-        *sel = selected[0].item.a_int - 1;
-        free((genericptr_t) selected);
-        return TRUE;
-    }
-    return FALSE;
+    display_file(HELP, TRUE);
 }
+
+void
+dispfile_shelp()
+{
+    display_file(SHELP, TRUE);
+}
+
+void
+dispfile_optionfile()
+{
+    display_file(OPTIONFILE, TRUE);
+}
+
+void
+dispfile_license()
+{
+    display_file(LICENSE, TRUE);
+}
+
+void
+dispfile_debughelp()
+{
+    display_file(DEBUGHELP, TRUE);
+}
+
+void
+hmenu_doextversion()
+{
+    (void) doextversion();
+}
+
+void
+hmenu_dohistory()
+{
+    (void) dohistory();
+}
+
+void
+hmenu_dowhatis()
+{
+    (void) dowhatis();
+}
+
+void
+hmenu_dowhatdoes()
+{
+    (void) dowhatdoes();
+}
+
+void
+hmenu_doextlist()
+{
+    (void) doextlist();
+}
+
+/* data for dohelp() */
+static struct {
+    void (*f)();
+    const char *text;
+} help_menu_items[] = {
+    { hmenu_doextversion, "About NetHack (version information)." },
+    { dispfile_help, "Long description of the game and commands." },
+    { dispfile_shelp, "List of game commands." },
+    { hmenu_dohistory, "Concise history of NetHack." },
+    { hmenu_dowhatis, "Info on a character in the game display." },
+    { hmenu_dowhatdoes, "Info on what a given key does." },
+    { option_help, "List of game options." },
+    { dispfile_optionfile, "Longer explanation of game options." },
+    { hmenu_doextlist, "List of extended commands." },
+    { dispfile_license, "The NetHack license." },
+    { docontact, "Support information." },
+#ifdef PORT_HELP
+    { port_help, "%s-specific help and commands." },
+#endif
+    { dispfile_debughelp, "List of wizard-mode commands." },
+    { NULL, (char *) 0 }
+};
 
 /* the '?' command */
 int
 dohelp()
 {
-    int sel = 0;
+    winid tmpwin = create_nhwindow(NHW_MENU);
+    char helpbuf[QBUFSZ];
+    int i, n;
+    menu_item *selected;
+    anything any;
+    int sel;
+    char *bufptr;
 
-    if (help_menu(&sel)) {
-        switch (sel) {
-        case 0:
-            (void) doextversion();
-            break;
-        case 1:
-            display_file(HELP, TRUE);
-            break;
-        case 2:
-            display_file(SHELP, TRUE);
-            break;
-        case 3:
-            (void) dohistory();
-            break;
-        case 4:
-            (void) dowhatis();
-            break;
-        case 5:
-            (void) dowhatdoes();
-            break;
-        case 6:
-            option_help();
-            break;
-        case 7:
-            display_file(OPTIONFILE, TRUE);
-            break;
-        case 8:
-            (void) doextlist();
-            break;
-        case 9:
-            display_file(LICENSE, TRUE);
-            break;
-        case 10:
-            (void) docontact();
-            break;
-#ifdef PORT_HELP
-        case PORT_HELP_ID:
-            port_help();
-            break;
-#endif
-        default:
-            /* handle slot 11 or 12 */
-            display_file(DEBUGHELP, TRUE);
-            break;
+    any = zeroany; /* zero all bits */
+    start_menu(tmpwin);
+
+    for (i = 0; help_menu_items[i].text; i++) {
+        if (!wizard && help_menu_items[i].f == dispfile_debughelp)
+            continue;
+        if (help_menu_items[i].text[0] == '%') {
+            Sprintf(helpbuf, help_menu_items[i].text, PORT_ID);
+            bufptr = helpbuf;
+        } else {
+            bufptr = (char *)help_menu_items[i].text;
         }
+        any.a_int = i + 1;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 bufptr, MENU_UNSELECTED);
+    }
+    end_menu(tmpwin, "Select one item:");
+    n = select_menu(tmpwin, PICK_ONE, &selected);
+    destroy_nhwindow(tmpwin);
+    if (n > 0) {
+        sel = selected[0].item.a_int - 1;
+        free((genericptr_t) selected);
+        (void)(*help_menu_items[sel].f)();
     }
     return 0;
 }
