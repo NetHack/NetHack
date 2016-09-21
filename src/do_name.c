@@ -54,28 +54,28 @@ const char *goal;
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
-    Sprintf(sbuf, "Use [%c%c%c%c] to move the cursor to %s.", /* hjkl */
+    Sprintf(sbuf, "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
-    putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
-    putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    putstr(tmpwin, 0, "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
+    putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
+    putstr(tmpwin, 0, "Use '@' to move the cursor on yourself.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)
-        putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+        putstr(tmpwin, 0, "Use 'm' or 'M' to move the cursor to next monster.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
-        putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+        putstr(tmpwin, 0, "Use 'o' or 'O' to move the cursor to next object.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* both of these are primarily useful when choosing a travel
            destination for the '_' command */
         putstr(tmpwin, 0,
-               "Use d or D to move the cursor to next door or doorway.");
+               "Use 'd' or 'D' to move the cursor to next door or doorway.");
         putstr(tmpwin, 0,
-               "Use x or X to move the cursor to unexplored location.");
+               "Use 'x' or 'X' to move the cursor to unexplored location.");
     }
     if (!iflags.terrainmode) {
         if (getpos_hilitefunc)
-            putstr(tmpwin, 0, "Use $ to display valid locations.");
-        putstr(tmpwin, 0, "Use # to toggle automatic description.");
+            putstr(tmpwin, 0, "Use '$' to display valid locations.");
+        putstr(tmpwin, 0, "Use '#' to toggle automatic description.");
         if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
             putstr(tmpwin, 0,
                    (iflags.getpos_coords == GPCOORDS_NONE)
@@ -84,20 +84,20 @@ const char *goal;
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
         doing_what_is = (goal == what_is_an_unknown_object);
-        Sprintf(sbuf, "Type a .%s when you are at the right place.",
-                doing_what_is ? " or , or ; or :" : "");
+        Sprintf(sbuf, "Type a '.'%s when you are at the right place.",
+                doing_what_is ? " or ',' or ';' or ':'" : "");
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             putstr(tmpwin, 0,
-        "  : describe current spot, show 'more info', move to another spot.");
+        "  ':' describe current spot, show 'more info', move to another spot.");
             Sprintf(sbuf,
-                    "  . describe current spot,%s move to another spot;",
+                    "  '.' describe current spot,%s move to another spot;",
                     flags.help ? " prompt if 'more info'," : "");
             putstr(tmpwin, 0, sbuf);
             putstr(tmpwin, 0,
-                   "  , describe current spot, move to another spot;");
+                   "  ',' describe current spot, move to another spot;");
             putstr(tmpwin, 0,
-                   "  ; describe current spot, stop looking at things;");
+                   "  ';' describe current spot, stop looking at things;");
         }
     }
     if (!force)
@@ -353,7 +353,7 @@ const char *goal;
     if (!goal)
         goal = "desired location";
     if (flags.verbose) {
-        pline("(For instructions type a ?)");
+        pline("(For instructions type a '?')");
         msg_given = TRUE;
     }
     cx = ccp->x;
@@ -568,7 +568,7 @@ const char *goal;
                     if (!force)
                         Strcpy(note, "aborted");
                     else
-                        Sprintf(note, "use %c%c%c%c or .", /* hjkl */
+                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '.'", /* hjkl */
                                 Cmd.move_W, Cmd.move_S, Cmd.move_N,
                                 Cmd.move_E);
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
