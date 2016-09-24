@@ -102,6 +102,14 @@
 #define CXN_ARTICLE 8   /* include a/an/the prefix */
 #define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
+/* getpos() return values */
+enum getpos_retval {
+    LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */
+    LOOK_QUICK,           /* ',' -- skip "more info?" */
+    LOOK_ONCE,            /* ';' -- skip and stop looping */
+    LOOK_VERBOSE          /* ':' -- show more info w/o asking */
+};
+
 /*
  * This is the way the game ends.  If these are rearranged, the arrays
  * in end.c and topten.c will need to be changed.  Some parts of the

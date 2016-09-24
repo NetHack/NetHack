@@ -958,12 +958,6 @@ const char **firstmatch;
     return found;
 }
 
-/* getpos() return values */
-#define LOOK_TRADITIONAL 0 /* '.' -- ask about "more info?" */
-#define LOOK_QUICK 1       /* ',' -- skip "more info?" */
-#define LOOK_ONCE 2        /* ';' -- skip and stop looping */
-#define LOOK_VERBOSE 3     /* ':' -- show more info w/o asking */
-
 /* also used by getpos hack in do_name.c */
 const char what_is_an_unknown_object[] = "an unknown object";
 
