@@ -8,6 +8,7 @@
 STATIC_DCL void NDECL(stoned_dialogue);
 STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
+STATIC_DCL void NDECL(levitation_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
 STATIC_DCL void NDECL(slip_or_trip);
 STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
@@ -153,6 +154,38 @@ choke_dialogue()
     exercise(A_STR, FALSE);
 }
 
+static NEARDATA const char *const levi_texts[] = {
+    "You float slightly lower.",
+    "You wobble unsteadily %s the %s.",
+    NULL
+};
+
+STATIC_OVL void
+levitation_dialogue()
+{
+    long i = (HLevitation & TIMEOUT) / 2L;
+
+    if (ELevitation)
+        return;
+
+    if (!ACCESSIBLE(levl[u.ux][u.uy].typ)
+        && !is_pool_or_lava(u.ux,u.uy))
+        return;
+
+    if (((HLevitation & TIMEOUT) % 2L) && i >= 0L && i < SIZE(levi_texts)) {
+        const char *s = levi_texts[SIZE(levi_texts) - i - 1L];
+        if (s) {
+            if (index(s, '%')) {
+                boolean danger = is_pool_or_lava(u.ux, u.uy)
+                    && !Is_waterlevel(&u.uz);
+                pline(s, danger ? "over" : "in",
+                      danger ? surface(u.ux, u.uy) : "air");
+            } else
+                pline1(s);
+        }
+    }
+}
+
 static NEARDATA const char *const slime_texts[] = {
     "You are turning a little %s.",   /* 5 */
     "Your limbs are getting oozy.",   /* 4 */
@@ -238,6 +271,8 @@ nh_timeout()
         vomiting_dialogue();
     if (Strangled)
         choke_dialogue();
+    if (Levitation)
+        levitation_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
