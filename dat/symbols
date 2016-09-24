@@ -416,6 +416,7 @@ start: Blank
         S_coin: \032
         S_corr: \032
         S_crwall: \032
+        S_darkroom: \032
         S_dart_trap: \032
         S_demon: \032
         S_digbeam: \032
@@ -477,6 +478,7 @@ start: Blank
         S_mimic_def: \032
         S_mummy: \032
         S_naga: \032
+        S_ndoor: \032
         S_nymph: \032
         S_ogre: \032
         S_orc: \032
@@ -493,6 +495,7 @@ start: Blank
         S_rock: \032
         S_rodent: \032
         S_rolling_boulder_trap: \032
+        S_room: \032
         S_rslant: \032
         S_rust_trap: \032
         S_rustmonst: \032
@@ -540,6 +543,7 @@ start: Blank
         S_vcdoor: \032
         S_vibrating_square: \032
         S_vodoor: \032
+        S_vcdoor: \032
         S_vortex: \032
         S_vwall: \032
         S_wand: \032
