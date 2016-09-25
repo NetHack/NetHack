@@ -1768,6 +1768,23 @@ char **opp;
     return FALSE;
 }
 
+/* Check if character c is illegal as a menu command key */
+boolean
+illegal_menu_cmd_key(c)
+char c;
+{
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033'
+        || c == ' ' || digit(c) || (letter(c) && c != '@'))
+        return TRUE;
+    else { /* reject default object class symbols */
+        int j;
+        for (j = 1; j < MAXOCLASSES; j++)
+            if (c == def_oc_syms[j].sym)
+                return TRUE;
+    }
+    return FALSE;
+}
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -3226,22 +3243,11 @@ boolean tinitial, tfrom_file;
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
                 int j;
                 char c, op_buf[BUFSZ];
-                boolean isbad = FALSE;
 
                 escapes(op, op_buf);
                 c = *op_buf;
 
-                if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-                    || c == ' ' || digit(c) || (letter(c) && c != '@'))
-                    isbad = TRUE;
-                else /* reject default object class symbols */
-                    for (j = 1; j < MAXOCLASSES; j++)
-                        if (c == def_oc_syms[i].sym) {
-                            isbad = TRUE;
-                            break;
-                        }
-
-                if (isbad)
+                if (illegal_menu_cmd_key(c))
                     badoption(opts);
                 else
                     add_menu_cmd_alias(c, default_menu_cmd_info[i].cmd);
