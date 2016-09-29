@@ -123,14 +123,18 @@ vomiting_dialogue()
 }
 
 static NEARDATA const char *const choke_texts[] = {
-    "You find it hard to breathe.", "You're gasping for air.",
-    "You can no longer breathe.", "You're turning %s.", "You suffocate."
+    "You find it hard to breathe.",
+    "You're gasping for air.",
+    "You can no longer breathe.",
+    "You're turning %s.",
+    "You suffocate."
 };
 
 static NEARDATA const char *const choke_texts2[] = {
     "Your %s is becoming constricted.",
     "Your blood is having trouble reaching your brain.",
-    "The pressure on your %s increases.", "Your consciousness is fading.",
+    "The pressure on your %s increases.",
+    "Your consciousness is fading.",
     "You suffocate."
 };
 
@@ -156,14 +160,14 @@ choke_dialogue()
 
 static NEARDATA const char *const levi_texts[] = {
     "You float slightly lower.",
-    "You wobble unsteadily %s the %s.",
-    NULL
+    "You wobble unsteadily %s the %s."
 };
 
 STATIC_OVL void
 levitation_dialogue()
 {
-    long i = (HLevitation & TIMEOUT) / 2L;
+    /* -1 because the last message comes via float_down() */
+    long i = (((HLevitation & TIMEOUT) - 1L) / 2L);
 
     if (ELevitation)
         return;
@@ -172,17 +176,15 @@ levitation_dialogue()
         && !is_pool_or_lava(u.ux,u.uy))
         return;
 
-    if (((HLevitation & TIMEOUT) % 2L) && i >= 0L && i < SIZE(levi_texts)) {
-        const char *s = levi_texts[SIZE(levi_texts) - i - 1L];
-        if (s) {
-            if (index(s, '%')) {
-                boolean danger = is_pool_or_lava(u.ux, u.uy)
-                    && !Is_waterlevel(&u.uz);
-                pline(s, danger ? "over" : "in",
-                      danger ? surface(u.ux, u.uy) : "air");
-            } else
-                pline1(s);
-        }
+    if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
+        const char *s = levi_texts[SIZE(levi_texts) - i];
+        if (index(s, '%')) {
+            boolean danger = is_pool_or_lava(u.ux, u.uy)
+                && !Is_waterlevel(&u.uz);
+            pline(s, danger ? "over" : "in",
+                  danger ? surface(u.ux, u.uy) : "air");
+        } else
+            pline1(s);
     }
 }
 
@@ -1488,6 +1490,26 @@ timer_element *base;
     }
 }
 
+static boolean print_prop_header = TRUE;
+void
+print_prop(win, text, prop)
+winid win;
+const char *text;
+long prop;
+{
+    char buf[BUFSZ];
+    if (prop & TIMEOUT) {
+        if (print_prop_header) {
+            putstr(win, 0, "");
+            putstr(win, 0, "Properties:");
+            putstr(win, 0, "");
+            print_prop_header = FALSE;
+        }
+        Sprintf(buf, " %10s: %ld", text, (prop & TIMEOUT));
+        putstr(win, 0, buf);
+    }
+}
+
 int
 wiz_timeout_queue()
 {
@@ -1504,6 +1526,13 @@ wiz_timeout_queue()
     putstr(win, 0, "Active timeout queue:");
     putstr(win, 0, "");
     print_queue(win, timer_base);
+
+    print_prop_header = TRUE;
+    print_prop(win, "Levitation", HLevitation);
+    print_prop(win, "Stoned", Stoned);
+    print_prop(win, "Vomiting", Vomiting);
+    print_prop(win, "Strangled", Strangled);
+    print_prop(win, "Slimed", Slimed);
 
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
