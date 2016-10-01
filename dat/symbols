@@ -459,6 +459,7 @@ start: Blank
         S_humanoid: \032
         S_hwall: \032
         S_imp: \032
+        S_invisible: \032
         S_jabberwock: \032
         S_jelly: \032
         S_kobold: \032
@@ -543,7 +544,6 @@ start: Blank
         S_vcdoor: \032
         S_vibrating_square: \032
         S_vodoor: \032
-        S_vcdoor: \032
         S_vortex: \032
         S_vwall: \032
         S_wand: \032
