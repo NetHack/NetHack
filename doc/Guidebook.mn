@@ -2698,6 +2698,7 @@ The possible settings are:
 .sd
 .si
 .CC c "compass ('east' or '3s' or '2n,4w');"
+.CC f "full compass ('east' or '3south' or '2north,4west');"
 .CC m "map <x,y> (map column x=0 is not used);"
 .CC s "screen [row,column] (row is offset to match tty usage);"
 .CC n "none (no coordinates shown) [default]."
@@ -3186,6 +3187,7 @@ c	S_cockatrice	(cockatrice)
 $	S_coin	(pile of coins)
 #	S_corr	(corridor)
 -	S_crwall	(wall)
+#	S_darkroom	(dark room)
 ^	S_dart_trap	(dart trap)
 &	S_demon	(major demon)
 *	S_digbeam	(dig beam)

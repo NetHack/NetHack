@@ -54,28 +54,28 @@ const char *goal;
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
-    Sprintf(sbuf, "Use [%c%c%c%c] to move the cursor to %s.", /* hjkl */
+    Sprintf(sbuf, "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
-    putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
-    putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    putstr(tmpwin, 0, "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
+    putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
+    putstr(tmpwin, 0, "Use '@' to move the cursor on yourself.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)
-        putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+        putstr(tmpwin, 0, "Use 'm' or 'M' to move the cursor to next monster.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
-        putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+        putstr(tmpwin, 0, "Use 'o' or 'O' to move the cursor to next object.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* both of these are primarily useful when choosing a travel
            destination for the '_' command */
         putstr(tmpwin, 0,
-               "Use d or D to move the cursor to next door or doorway.");
+               "Use 'd' or 'D' to move the cursor to next door or doorway.");
         putstr(tmpwin, 0,
-               "Use x or X to move the cursor to unexplored location.");
+               "Use 'x' or 'X' to move the cursor to unexplored location.");
     }
     if (!iflags.terrainmode) {
         if (getpos_hilitefunc)
-            putstr(tmpwin, 0, "Use $ to display valid locations.");
-        putstr(tmpwin, 0, "Use # to toggle automatic description.");
+            putstr(tmpwin, 0, "Use '$' to display valid locations.");
+        putstr(tmpwin, 0, "Use '#' to toggle automatic description.");
         if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
             putstr(tmpwin, 0,
                    (iflags.getpos_coords == GPCOORDS_NONE)
@@ -84,20 +84,20 @@ const char *goal;
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
         doing_what_is = (goal == what_is_an_unknown_object);
-        Sprintf(sbuf, "Type a .%s when you are at the right place.",
-                doing_what_is ? " or , or ; or :" : "");
+        Sprintf(sbuf, "Type a '.'%s when you are at the right place.",
+                doing_what_is ? " or ',' or ';' or ':'" : "");
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             putstr(tmpwin, 0,
-        "  : describe current spot, show 'more info', move to another spot.");
+        "  ':' describe current spot, show 'more info', move to another spot.");
             Sprintf(sbuf,
-                    "  . describe current spot,%s move to another spot;",
+                    "  '.' describe current spot,%s move to another spot;",
                     flags.help ? " prompt if 'more info'," : "");
             putstr(tmpwin, 0, sbuf);
             putstr(tmpwin, 0,
-                   "  , describe current spot, move to another spot;");
+                   "  ',' describe current spot, move to another spot;");
             putstr(tmpwin, 0,
-                   "  ; describe current spot, stop looking at things;");
+                   "  ';' describe current spot, stop looking at things;");
         }
     }
     if (!force)
@@ -232,11 +232,11 @@ int gloc;
 }
 
 char *
-dxdy_to_dist_descr(dx, dy)
+dxdy_to_dist_descr(dx, dy, fulldir)
 int dx, dy;
+boolean fulldir;
 {
-    /* [12] suffices, but guard against long translation for direction-name */
-    static char buf[20];
+    static char buf[30];
     int dst;
 
     if (!dx && !dy) {
@@ -245,18 +245,23 @@ int dx, dy;
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
+        const char *dirnames[4][2] = {
+            { "n", "north" },
+            { "s", "south" },
+            { "w", "west" },
+            { "e", "east" } };
         buf[0] = '\0';
         /* 9999: protect buf[] against overflow caused by invalid values */
         if (dy) {
             if (abs(dy) > 9999)
                 dy = sgn(dy) * 9999;
-            Sprintf(eos(buf), "%d%c%s", abs(dy), (dy > 0) ? 's' : 'n',
+            Sprintf(eos(buf), "%d%s%s", abs(dy), dirnames[(dy > 0)][fulldir],
                     dx ? "," : "");
         }
         if (dx) {
             if (abs(dx) > 9999)
                 dx = sgn(dx) * 9999;
-            Sprintf(eos(buf), "%d%c", abs(dx), (dx > 0) ? 'e' : 'w');
+            Sprintf(eos(buf), "%d%s", abs(dx), dirnames[2 + (dx > 0)][fulldir]);
         }
     }
     return buf;
@@ -275,11 +280,13 @@ char *outbuf, cmode;
     switch (cmode) {
     default:
         break;
+    case GPCOORDS_COMFULL:
     case GPCOORDS_COMPASS:
         /* "east", "3s", "2n,4w" */
         dx = x - u.ux;
         dy = y - u.uy;
-        Sprintf(outbuf, "(%s)", dxdy_to_dist_descr(dx, dy));
+        Sprintf(outbuf, "(%s)",
+                dxdy_to_dist_descr(dx, dy, cmode == GPCOORDS_COMFULL));
         break;
     case GPCOORDS_MAP: /* x,y */
         /* upper left corner of map is <1,0>;
@@ -346,7 +353,7 @@ const char *goal;
     if (!goal)
         goal = "desired location";
     if (flags.verbose) {
-        pline("(For instructions type a ?)");
+        pline("(For instructions type a '?')");
         msg_given = TRUE;
     }
     cx = ccp->x;
@@ -561,7 +568,7 @@ const char *goal;
                     if (!force)
                         Strcpy(note, "aborted");
                     else
-                        Sprintf(note, "use %c%c%c%c or .", /* hjkl */
+                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '.'", /* hjkl */
                                 Cmd.move_W, Cmd.move_S, Cmd.move_N,
                                 Cmd.move_E);
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),

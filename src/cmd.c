@@ -3747,6 +3747,16 @@ char c;
     return (boolean) (c == C('r') || (Cmd.num_pad && c == C('l')));
 }
 
+boolean
+prefix_cmd(c)
+char c;
+{
+    return (boolean) (c == 'g' || c == 'G'
+                      || c == 'm' || c == 'M'
+                      || c == 'F'
+                      || (Cmd.num_pad && (c == '5' || c == '-')));
+}
+
 /*
  * uses getdir() but unlike getdir() it specifically
  * produces coordinates using the direction from getdir()
@@ -4193,8 +4203,7 @@ parse()
 
     in_line[0] = foo;
     in_line[1] = '\0';
-    if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' || foo == 'F'
-        || (Cmd.num_pad && (foo == '5' || foo == '-'))) {
+    if (prefix_cmd(foo)) {
         foo = readchar();
         savech((char) foo);
         in_line[1] = foo;

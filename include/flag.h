@@ -173,6 +173,7 @@ struct sysflag {
 #define GPCOORDS_NONE    'n'
 #define GPCOORDS_MAP     'm'
 #define GPCOORDS_COMPASS 'c'
+#define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
 
 struct instance_flags {

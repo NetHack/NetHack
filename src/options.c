@@ -1768,6 +1768,23 @@ char **opp;
     return FALSE;
 }
 
+/* Check if character c is illegal as a menu command key */
+boolean
+illegal_menu_cmd_key(c)
+char c;
+{
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033'
+        || c == ' ' || digit(c) || (letter(c) && c != '@'))
+        return TRUE;
+    else { /* reject default object class symbols */
+        int j;
+        for (j = 1; j < MAXOCLASSES; j++)
+            if (c == def_oc_syms[j].sym)
+                return TRUE;
+    }
+    return FALSE;
+}
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -2362,7 +2379,8 @@ boolean tinitial, tfrom_file;
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             static char gpcoords[] = { GPCOORDS_NONE, GPCOORDS_COMPASS,
-                                       GPCOORDS_MAP, GPCOORDS_SCREEN, '\0' };
+                                       GPCOORDS_COMFULL, GPCOORDS_MAP,
+                                       GPCOORDS_SCREEN, '\0' };
             char c = lowc(*op);
 
             if (c && index(gpcoords, c))
@@ -3225,22 +3243,11 @@ boolean tinitial, tfrom_file;
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
                 int j;
                 char c, op_buf[BUFSZ];
-                boolean isbad = FALSE;
 
                 escapes(op, op_buf);
                 c = *op_buf;
 
-                if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-                    || c == ' ' || digit(c) || (letter(c) && c != '@'))
-                    isbad = TRUE;
-                else /* reject default object class symbols */
-                    for (j = 1; j < MAXOCLASSES; j++)
-                        if (c == def_oc_syms[i].sym) {
-                            isbad = TRUE;
-                            break;
-                        }
-
-                if (isbad)
+                if (illegal_menu_cmd_key(c))
                     badoption(opts);
                 else
                     add_menu_cmd_alias(c, default_menu_cmd_info[i].cmd);
@@ -4104,6 +4111,10 @@ boolean setinitial, setfromfile;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS,
                  0, ATR_NONE, "compass ('east' or '3s' or '2n,4w')",
                  (gp == GPCOORDS_COMPASS) ? MENU_SELECTED : MENU_UNSELECTED);
+        any.a_char = GPCOORDS_COMFULL;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMFULL,
+                 0, ATR_NONE, "full compass ('east' or '3south' or '2north,4west')",
+                 (gp == GPCOORDS_COMFULL) ? MENU_SELECTED : MENU_UNSELECTED);
         any.a_char = GPCOORDS_MAP;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP,
                  0, ATR_NONE, "map <x,y>",
@@ -4561,7 +4572,8 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
-            end_menu(tmpwin, "Select symbol set:");
+            Sprintf(buf, "Select %ssymbol set:", rogueflag ? "rogue level " : "");
+            end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
                 free((genericptr_t) symset_pick);
@@ -4916,6 +4928,7 @@ char *buf;
         Sprintf(buf, "%s",
                 (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
                 : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
+                : (iflags.getpos_coords == GPCOORDS_COMFULL) ? "full compass"
                 : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen"
                 : "none");
     } else if (!strcmp(optname, "scores")) {

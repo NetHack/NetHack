@@ -498,7 +498,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
     } else if (mdef == &youmonst) {
         Your("brain is eaten!");
     } else { /* monster against monster */
-        if (visflag)
+        if (visflag && canspotmon(mdef))
             pline("%s brain is eaten!", s_suffix(Monnam(mdef)));
     }
 
@@ -512,7 +512,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
-            if (visflag)
+            if (visflag && canseemon(magr))
                 pline("%s turns to stone!", Monnam(magr));
             monstone(magr);
             if (magr->mhp > 0) {
@@ -597,7 +597,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
          * monster mind flayer is eating another monster's brain
          */
         if (mindless(pd)) {
-            if (visflag)
+            if (visflag && canspotmon(mdef))
                 pline("%s doesn't notice.", Monnam(mdef));
             return MM_MISS;
         } else if (is_rider(pd)) {
@@ -609,7 +609,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         } else {
             *dmg_p += xtra_dmg;
             give_nutrit = TRUE;
-            if (*dmg_p >= mdef->mhp && visflag)
+            if (*dmg_p >= mdef->mhp && visflag && canspotmon(mdef))
                 pline("%s last thought fades away...",
                       s_suffix(Monnam(mdef)));
         }
