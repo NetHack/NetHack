@@ -34,9 +34,6 @@ boolean resuming;
     monstr_init(); /* monster strengths */
     objects_init();
 
-    if (wizard)
-        add_debug_extended_commands();
-
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
        to use up the save file and require confirmation for explore mode */

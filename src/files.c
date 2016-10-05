@@ -2152,6 +2152,10 @@ int src;
         parseoptions(bufp, TRUE, TRUE);
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
+    } else if (match_varname(buf, "BINDINGS", 4)) {
+        parsebindings(bufp);
+    } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
+        parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
         (void) msgtype_parse_add(bufp);
 #ifdef NOCWD_ASSUMPTIONS

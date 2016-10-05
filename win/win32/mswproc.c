@@ -1726,7 +1726,9 @@ mswin_get_ext_cmd()
                     com_index = -1;
                     for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0;
                          oindex++) {
-                        if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
+                        if ((extcmdlist[oindex].flags & AUTOCOMPLETE)
+                            && !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
+                            && !strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
                             if (com_index == -1) /* no matches yet */
                                 com_index = oindex;
                             else

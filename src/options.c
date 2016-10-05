@@ -833,6 +833,10 @@ int maxlen;
  * has the effect of 'meta'-ing the value which follows (so that the
  * alternate character set will be enabled).
  *
+ * X     normal key X
+ * ^X    control-X
+ * \mX   meta-X
+ *
  * For 3.4.3 and earlier, input ending with "\M", backslash, or caret
  * prior to terminating '\0' would pull that '\0' into the output and then
  * keep processing past it, potentially overflowing the output buffer.
@@ -3241,7 +3245,6 @@ boolean tinitial, tfrom_file;
             if (negated) {
                 bad_negation(fullname, FALSE);
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
-                int j;
                 char c, op_buf[BUFSZ];
 
                 escapes(op, op_buf);
@@ -3473,6 +3476,56 @@ boolean tinitial, tfrom_file;
 
     /* out of valid options */
     badoption(opts);
+}
+
+/* parse key:command */
+void
+parsebindings(bindings)
+char* bindings;
+{
+    char *bind;
+    char key;
+    int i;
+
+    /* break off first binding from the rest; parse the rest */
+    if ((bind = index(bindings, ',')) != 0) {
+        *bind++ = 0;
+        parsebindings(bind);
+    }
+
+    /* parse a single binding: first split around : */
+    if (! (bind = index(bindings, ':'))) return; /* it's not a binding */
+    *bind++ = 0;
+
+    /* read the key to be bound */
+    key = txt2key(bindings);
+    if (!key) {
+        raw_printf("Bad binding %s.", bindings);
+        wait_synch();
+        return;
+    }
+
+    bind = trimspaces(bind);
+
+    /* is it a special key? */
+    if (bind_specialkey(key, bind))
+        return;
+
+    /* is it a menu command? */
+    for (i = 0; i < NUM_MENU_CMDS; i++) {
+        if (!strcmp(default_menu_cmd_info[i].name, bind)) {
+            if (illegal_menu_cmd_key(key)) {
+                char tmp[BUFSZ];
+                Sprintf(tmp, "Bad menu key %s:%s", visctrl(key), bind);
+                badoption(tmp);
+            } else
+                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+            return;
+        }
+    }
+
+    /* extended command? */
+    bind_key(key, bind);
 }
 
 static NEARDATA const char *menutype[] = { "traditional", "combination",
