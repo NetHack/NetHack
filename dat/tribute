@@ -8277,17 +8277,141 @@ for such a long time, you don't know how to spit it out."
 %e title
 #
 #
+# Sir Terry Pratchett's final book, published posthumously.
+# The story is complete, but the length is substantially shorter than
+# other recent Discworld novels.  Presumably it would have been expanded
+# if he had had more time to work on it....
 #
-%title The Shepherd's Crown (1)
+%title The Shepherd's Crown (7)
+# pp. 29-30 (Harper edition)
 %passage 1
-'It's an inconvenience, true enough, and I don't like it at all, but I
-know that you do it for everyone, Mister Death. Is there any other way?'
+"It's an inconvenience, true enough, and I don't like it at all, but I
+know that you do it for everyone, Mr. Death.  Is there any other way?"
 
-NO, THERE ISN'T, I'M AFRAID. WE ARE ALL FLOATING IN THE WINDS OF TIME.
+NO, THERE ISN'T, I'M AFRAID.  WE ARE ALL FLOATING IN THE WINDS OF TIME.
 BUT YOUR CANDLE, MISTRESS WEATHERWAX, WILL FLICKER FOR SOME TIME BEFORE
-IT GOES OUT -- A LITTLE REWARD FOR A LIFE WELL LIVED. FOR I CAN SEE THE
+IT GOES OUT--A LITTLE REWARD FOR A LIFE WELL LIVED.  FOR I CAN SEE THE
 BALANCE AND YOU HAVE LEFT THE WORLD MUCH BETTER THAN YOU FOUND IT, AND
-IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT...
+IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT....
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# p. 30 ('she' is Miss Tick, a travelling witch who finds new witches;
+#        'under water' is spelled as two words; 'ducking' is accurate)
+%passage 2
+She sighed.  It was such a shame when old customs disappeared.  A good
+witch-ducking was something she had liked doing in the bad old days--she
+had even /trained/ for it.  All those swimming lessons, and practice with
+knots at the Quirm College for Young Ladies.  She had been able to defeat
+the mobs under water if necessary.  Or at least work at breaking her own
+record for untying the simple knots they all thought worked on the nasty
+witch.
+
+Now, a bit of pond-dipping had become more like a hobby, and she had a
+nasty feeling that others were copying her after she passed through their
+villages.  She'd even heard talk of a swimming club being started in one
+small hamlet over by Ham-on-Rye.(1)
+
+(1) A popular idea among the young lads, since they felt that everyone--
+and "everyone" definitely included the young ladies--should swim without
+their clothes.
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# p. 37 (passage starts mid-paragraph; 'she' is Tiffany Aching)
+%passage 3
+Not for the first time, she wondered how it was that cats seemed to be
+able to be in one place one moment, and then /almost at the same time/,
+reappear somewhere else.(1)
+
+(1) She did not know it, but a keen young philosopher in Ephebe had
+pondered exactly that same conumdrum, until he was found one morning--
+most of him, anyway--surrounded by a number of purring, and very well fed,
+cats.  No one had seemed keen to continue his experiments after that.
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# pp. 112-113 (the footnote has a misprint of mismatched quotes: "Chuffley')
+%passage 4
+Roland de Chumsfanleigh,(1) the young Baron on the Chalk /did/ want to be
+like his father in many ways.  He knew the old man had been popular--what
+was known as an "old-school Baron," which meant that everyone knew what
+to expect and the guards polished up their armor and saluted, and did
+what was expected of /them/, while the Baron did what was expected of him,
+and pretty much left them alone.
+
+But his father had also been a bit of a bad-tempered bully at times.  And
+/that/ bit Roland wanted to forget about.  He particularly wanted to sound
+the right note when he called round to see Tiffany Aching at Home Farm.
+For they had once been good friends, and to Roland's alarm, Tiffany was
+thought of as a good friend by his wife Letitia.  Any man with sense was
+wise to be fearful of a wife's best friends.  For who knew what ... little
+secrets might be shared.  Roland, having been educated at home and with
+limited knowledge of the world outside the Chalk, feared that "little"
+might be /exactly/ the kind of comment Letitia might share with Tiffany.
+
+(1) Pronounced "Chuffley" under the strange rule that the more gentrified
+a family is, the more peculiar the pronunciation of their name becomes.
+Tiffany had once heard a high-born visitor named Ponsonby-Macklewright
+(/Pwt/) refer to Roland as /Chf/.  She wondered how they managed at dinner
+when /Pwt/ introduced /Chf/ to /Wm/ or /Hmpfh/.  Surely it could lead to
+misunderstandings?
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# p. 158
+%passage 5
+He kicked the helmet of his chief, the Big Man of the clan, and shouted,
+"There's elves here!  I can smell it, ye ken!"
+
+And from every hole in turn, the clan of the Nac Mac Feegle poured out in
+their hundreds to deal with the ancient enemy, waving claymores and swords,
+yodeling their war cries:
+
+"Ach, stickit yer trakkans!"
+
+"Nac Mac Feegle wha hae!"
+
+"Gae awa' wi' ye, yer bogle!"
+
+"Gi'e you sich a guid kickin'!"
+
+"Nae king!  Nae quin!  We will nae be fooled agin!"
+
+There is a concept known as a hustle and bustle, and the Feegles were very
+good at it, cheerfully getting in one another's way in the drive to be the
+first into battle, and it seemed as if each small warrior had a battle cry
+of his own--and he was very ready to fight anyone who tried to take it
+away from him.
+
+"How many elves?" asked Rob Anybody, trying to adjust his spog.
+
+There was a pause.
+
+"One," said Big Yan sheepishly.
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# p. 159 (passage starts mid-paragraph. 'oor' is accurate)
+%passage 6
+"This elf is oor prisoner.  A hostage, ye ken.  That means ye are nae tae
+kill it until ye are told."  He ignored the grumbles from the clan.  "As
+tae the rest o' ye, tak guard around yon stones.  And if they come in
+force, show them what the Feegles can dae!"
+
+Daft Wullie said, "I can play the harmonica."
+
+Rob Anybody sighed.  "Aye, weel, I suppose that puts the willies up me,
+so wud likely keep them awa'."
+
+  [The Shepherd's Crown, by Terry Pratchett]
+%e passage
+# p. 202
+%passage 7
+Sometimes, Tiffany thought, I am so /fed up/ with being young.(1)
+
+(1) A thought that she would most certainly grow out of, assuming she
+survived long enough.
 
   [The Shepherd's Crown, by Terry Pratchett]
 %e passage
