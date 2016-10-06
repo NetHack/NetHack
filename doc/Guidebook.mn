@@ -586,7 +586,8 @@ A few other commands (eat food, offer sacrifice, apply tinning-kit) use
 the `m' prefix to skip checking for applicable objects on the floor
 and go straight to checking inventory,
 or (for ``#loot'' to remove a saddle),
-skip containers and go straight to adjacent monsters.
+skip containers and go straight to adjacent monsters. The prefix will
+make ``#travel'' command show a menu of interesting targets in sight.
 .lp F[yuhjklbn]
 Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
@@ -1119,6 +1120,8 @@ Tip over a container (bag or box) to pour out its contents.
 Autocompletes. Default key is 'M-T'.
 .lp #travel
 Travel to a specific location on the map. Default key is '_'.
+Using the ``request menu'' prefix shows a menu of interesting targets in sight
+without asking to move the cursor.
 .lp #turn
 Turn undead away. Autocompletes. Default key is 'M-t'.
 .lp #twoweapon
@@ -3212,6 +3215,10 @@ When asked for a location, the key to go to previous closest monster. Default is
 When asked for a location, the key to go to next closest object. Default is 'o'.
 .lp getpos.obj.prev
 When asked for a location, the key to go to previous closest object. Default is 'O'.
+.lp getpos.menu
+When asked for a location, show a menu of all interesting targets. Default is 'A'.
+.lp getpos.menu.cansee
+When asked for a location, show a menu of interesting targets in view. Default is 'a'.
 .lp getpos.pick
 When asked for a location, the key to choose the location, and possibly ask for more info. Default is '.'.
 .lp getpos.pick.once

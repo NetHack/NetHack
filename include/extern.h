@@ -379,6 +379,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
+E boolean FDECL(getpos_menu, (coord *, boolean));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));

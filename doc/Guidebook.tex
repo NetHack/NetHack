@@ -706,7 +706,8 @@ A few other commands (eat food, offer sacrifice, apply tinning-kit) use
 the `{\tt m}' prefix to skip checking for applicable objects on the floor
 and go straight to checking inventory,
 or (for ``{\tt \#loot}'' to remove a saddle),
-skip containers and go straight to adjacent monsters.
+skip containers and go straight to adjacent monsters. The prefix will
+make ``{\tt \#travel}'' command show a menu of interesting targets in sight.
 %.lp
 \item[\tb{F[yuhjklbn]}]
 Prefix:  fight a monster (even if you only guess one is there).
@@ -1386,6 +1387,8 @@ Autocompletes. Default key is '{\tt M-T}'.
 %.lp
 \item[\tb{\#travel}]
 Travel to a specific location on the map. Default key is '{\tt _}'.
+Using the ``request menu'' prefix shows a menu of interesting targets in sight
+without asking to move the cursor.
 %.lp
 \item[\tb{\#turn}]
 Turn undead away. Autocompletes. Default key is '{\tt M-t}'.
@@ -3934,6 +3937,12 @@ When asked for a location, the key to go to next closest object. Default is ``{\
 %.lp
 \item{\bb{getpos.obj.prev}}
 When asked for a location, the key to go to previous closest object. Default is ``{\tt O}''.
+%.lp
+\item{\bb{getpos.menu}}
+When asked for a location, show a menu of all interesting targets. Default is '{\tt A}'.
+%.lp
+\item{\bb{getpos.menu.cansee}}
+When asked for a location, show a menu of interesting targets in view. Default is '{\tt a}'.
 %.lp
 \item{\bb{getpos.pick}}
 When asked for a location, the key to choose the location, and possibly ask for more info. Default is ``{\tt .}''.

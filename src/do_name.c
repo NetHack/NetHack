@@ -88,6 +88,12 @@ const char *goal;
                 visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]));
         putstr(tmpwin, 0, sbuf);
     }
+    Sprintf(sbuf, "Use '%s' for a menu of interesting targets in view.",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_MENU_FOV]));
+    putstr(tmpwin, 0, sbuf);
+    Sprintf(sbuf, "Use '%s' for a menu of all interesting targets.",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+    putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
         if (getpos_hilitefunc) {
@@ -174,7 +180,10 @@ enum gloctypes {
     GLOC_DOOR,
     GLOC_EXPLORE,
 
-    NUM_GLOCS
+    NUM_GLOCS,
+
+    GLOC_INTERESTING,
+    GLOC_INTERESTING_FOV
 };
 
 
@@ -222,6 +231,23 @@ int x,y, gloc;
                     || IS_UNEXPLORED_LOC(x - 1, y)
                     || IS_UNEXPLORED_LOC(x, y + 1)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
+    case GLOC_INTERESTING_FOV:
+        if (!cansee(x,y))
+            return FALSE;
+    case GLOC_INTERESTING:
+        return gather_locs_interesting(x,y, GLOC_DOOR)
+            || !(glyph_is_cmap(glyph)
+                 && (is_cmap_wall(glyph_to_cmap(glyph))
+                     || glyph_to_cmap(glyph) == S_tree
+                     || glyph_to_cmap(glyph) == S_ice
+                     || glyph_to_cmap(glyph) == S_air
+                     || glyph_to_cmap(glyph) == S_cloud
+                     || (glyph_to_cmap(glyph) == S_water && Is_waterlevel(&u.uz))
+                     || glyph_to_cmap(glyph) == S_ndoor
+                     || glyph_to_cmap(glyph) == S_room
+                     || glyph_to_cmap(glyph) == S_darkroom
+                     || glyph_to_cmap(glyph) == S_corr
+                     || glyph_to_cmap(glyph) == S_litcorr));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -368,6 +394,61 @@ int cx, cy;
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
+}
+
+boolean
+getpos_menu(ccp, fovonly)
+coord *ccp;
+boolean fovonly;
+{
+    coord *garr = DUMMY;
+    int gcount = 0;
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    menu_item *picks = (menu_item *) 0;
+    char tmpbuf[BUFSZ];
+
+    gather_locs(&garr, &gcount,
+                fovonly ? GLOC_INTERESTING_FOV : GLOC_INTERESTING);
+    if (gcount < 2) { /* gcount always includes the hero */
+        You("cannot %s anything interesting.", fovonly ? "see" : "detect");
+        return FALSE;
+    }
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+
+    for (i = 0; i < gcount; i++) {
+        char fullbuf[BUFSZ];
+        coord tmpcc;
+        const char *firstmatch = "unknown";
+        int sym = 0;
+        any.a_int = i + 1;
+        tmpcc.x = garr[i].x;
+        tmpcc.y = garr[i].y;
+        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch)) {
+            (void) coord_desc(garr[i].x, garr[i].y, tmpbuf, iflags.getpos_coords);
+            Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fullbuf,
+                     MENU_UNSELECTED);
+        }
+    }
+
+    Sprintf(tmpbuf, "Pick a target%s%s",
+            fovonly ? " in view" : "",
+            iflags.getloc_travelmode ? " for travel" : "");
+    end_menu(tmpwin, tmpbuf);
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+        ccp->x = garr[picks->item.a_int - 1].x;
+        ccp->y = garr[picks->item.a_int - 1].y;
+        free((genericptr_t) picks);
+    }
+    free((genericptr_t) garr);
+    return (pick_cnt > 0);
 }
 
 int
@@ -532,6 +613,14 @@ const char *goal;
             if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]
+                   || c == Cmd.spkeys[NHKF_GETPOS_MENU_FOV]) {
+            coord tmpcrd;
+            if (getpos_menu(&tmpcrd, (c == Cmd.spkeys[NHKF_GETPOS_MENU_FOV]))) {
+                cx = tmpcrd.x;
+                cy = tmpcrd.y;
+            }
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
             /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player

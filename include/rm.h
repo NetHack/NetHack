@@ -230,6 +230,7 @@
 #define is_cmap_trap(i) ((i) >= S_arrow_trap && (i) <= S_polymorph_trap)
 #define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
 #define is_cmap_door(i) ((i) >= S_vodoor && (i) <= S_hcdoor)
+#define is_cmap_wall(i) ((i) >= S_stone && (i) <= S_trwall)
 
 struct symdef {
     uchar sym;

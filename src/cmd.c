@@ -3500,7 +3500,9 @@ struct {
     { NHKF_GETPOS_DOOR_PREV, 'D', "getpos.door.prev" },
     { NHKF_GETPOS_UNEX_NEXT, 'x', "getpos.unexplored.next" },
     { NHKF_GETPOS_UNEX_PREV, 'X', "getpos.unexplored.prev" },
-    { NHKF_GETPOS_HELP,      '?', "getpos.help" }
+    { NHKF_GETPOS_HELP,      '?', "getpos.help" },
+    { NHKF_GETPOS_MENU,      'A', "getpos.menu" },
+    { NHKF_GETPOS_MENU_FOV,  'a', "getpos.menu.cansee" }
 };
 
 boolean
@@ -3763,6 +3765,8 @@ int NDECL((*cmd_func));
         /* 'm' for removing saddle from adjacent monster without checking
            for containers at <u.ux,u.uy> */
         || cmd_func == doloot
+        /* travel: pop up a menu of interesting targets in view */
+        || cmd_func == dotravel
         /* 'm' prefix allowed for some extended commands */
         || cmd_func == doextcmd || cmd_func == doextlist)
         return TRUE;
@@ -4665,11 +4669,18 @@ dotravel(VOID_ARGS)
         cc.y = u.uy;
     }
     iflags.getloc_travelmode = TRUE;
-    pline("Where do you want to travel to?");
-    if (getpos(&cc, TRUE, "the desired destination") < 0) {
-        /* user pressed ESC */
-        iflags.getloc_travelmode = FALSE;
-        return 0;
+    if (iflags.menu_requested) {
+        if (!getpos_menu(&cc, TRUE)) {
+            iflags.getloc_travelmode = FALSE;
+            return 0;
+        }
+    } else {
+        pline("Where do you want to travel to?");
+        if (getpos(&cc, TRUE, "the desired destination") < 0) {
+            /* user pressed ESC */
+            iflags.getloc_travelmode = FALSE;
+            return 0;
+        }
     }
     iflags.getloc_travelmode = FALSE;
     iflags.travelcc.x = u.tx = cc.x;
