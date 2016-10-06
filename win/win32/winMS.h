@@ -25,6 +25,7 @@
 #include <commctrl.h>
 #include <tchar.h>
 #include "hack.h"
+#include "color.h"
 
 /* Create an array to keep track of the various windows */
 
@@ -93,6 +94,8 @@ typedef struct mswin_nhwindow_app {
     DWORD
         regNetHackMode; /* NetHack mode means no Windows keys in some places
                            */
+
+    COLORREF regMapColors[CLR_MAX];
 
     LONG regMainMinX;
     LONG regMainMinY;
