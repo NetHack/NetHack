@@ -239,10 +239,13 @@ int x,y, gloc;
             || !(glyph_is_cmap(glyph)
                  && (is_cmap_wall(glyph_to_cmap(glyph))
                      || glyph_to_cmap(glyph) == S_tree
+                     || glyph_to_cmap(glyph) == S_bars
                      || glyph_to_cmap(glyph) == S_ice
                      || glyph_to_cmap(glyph) == S_air
                      || glyph_to_cmap(glyph) == S_cloud
-                     || (glyph_to_cmap(glyph) == S_water && Is_waterlevel(&u.uz))
+                     || glyph_to_cmap(glyph) == S_lava
+                     || glyph_to_cmap(glyph) == S_water
+                     || glyph_to_cmap(glyph) == S_pool
                      || glyph_to_cmap(glyph) == S_ndoor
                      || glyph_to_cmap(glyph) == S_room
                      || glyph_to_cmap(glyph) == S_darkroom
