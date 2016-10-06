@@ -1720,6 +1720,15 @@ hmenu_doextlist()
     (void) doextlist();
 }
 
+void
+domenucontrols()
+{
+    winid cwin = create_nhwindow(NHW_TEXT);
+    show_menu_controls(cwin, FALSE);
+    display_nhwindow(cwin, FALSE);
+    destroy_nhwindow(cwin);
+}
+
 /* data for dohelp() */
 static struct {
     void (*f)();
@@ -1735,6 +1744,7 @@ static struct {
     { dispfile_optionfile, "Longer explanation of game options." },
     { dokeylist, "Full list of keyboard commands" },
     { hmenu_doextlist, "List of extended commands." },
+    { domenucontrols, "List menu control keys" },
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
 #ifdef PORT_HELP

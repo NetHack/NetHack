@@ -3010,6 +3010,9 @@ dokeylist(VOID_ARGS)
     keys_used[(uchar)C('c')] = TRUE;
 #endif
 
+    putstr(datawin, 0, "");
+    show_menu_controls(datawin, TRUE);
+
     if (dokeylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, &keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "General commands:");
@@ -4192,7 +4195,6 @@ boolean nodiag;
         putstr(win, 0, buf);
     };
 }
-
 
 STATIC_OVL boolean
 help_dir(sym, msg)
