@@ -231,7 +231,7 @@ int dir;
     mz_move(x, y, dir);
     mz_move(x, y, dir);
     if (x < 3 || y < 3 || x > x_maze_max || y > y_maze_max
-        || levl[x][y].typ != 0)
+        || levl[x][y].typ != STONE)
         return FALSE;
     return TRUE;
 }

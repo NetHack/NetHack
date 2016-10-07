@@ -888,7 +888,7 @@ wiz_map_levltyp(VOID_ARGS)
         for (x = 1; x < COLNO; x++) {
             terrain = levl[x][y].typ;
             /* assumes there aren't more than 10+26+26 terrain types */
-            row[x - 1] = (char) ((terrain == 0 && !may_dig(x, y))
+            row[x - 1] = (char) ((terrain == STONE && !may_dig(x, y))
                                     ? '*'
                                     : (terrain < 10)
                                        ? '0' + terrain
@@ -896,7 +896,7 @@ wiz_map_levltyp(VOID_ARGS)
                                           ? 'a' + terrain - 10
                                           : 'A' + terrain - 36);
         }
-        if (levl[0][y].typ != 0 || may_dig(0, y))
+        if (levl[0][y].typ != STONE || may_dig(0, y))
             row[x++] = '!';
         row[x] = '\0';
         putstr(win, 0, row);
