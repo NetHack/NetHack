@@ -356,7 +356,7 @@ doextlist(VOID_ARGS)
         if (!wizard && (efp->flags & WIZMODECMD))
             continue;
         Sprintf(buf, "   %-15s %c %s.",
-		efp->ef_txt,
+                efp->ef_txt,
                 (efp->flags & AUTOCOMPLETE) ? '*' : ' ',
                 efp->ef_desc);
         putstr(datawin, 0, buf);
@@ -2829,30 +2829,32 @@ uchar key;
 {
     if (Cmd.commands[key] && Cmd.commands[key]->ef_txt)
         return Cmd.commands[key]->ef_desc;
-    return NULL;
+    return (char *) 0;
 }
 
 void
 bind_key(key, command)
 uchar key;
-char* command;
+const char *command;
 {
-    struct ext_func_tab * extcmd;
+    struct ext_func_tab *extcmd;
 
     /* special case: "nothing" is reserved for unbinding */
     if (!strcmp(command, "nothing")) {
-        Cmd.commands[key] = NULL;
+        Cmd.commands[key] = (struct ext_func_tab *) 0;
         return;
     }
 
-    for(extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
-        if (strcmp(command, extcmd->ef_txt)) continue;
+    for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
+        if (strcmp(command, extcmd->ef_txt))
+            continue;
         Cmd.commands[key] = extcmd;
         return;
     }
 
-    pline("Bad command %s matched with key %c (ASCII %i). "
-          "Ignoring command.\n", command, key, key);
+    pline(
+        "Bad command %s matched with key %c (ASCII %i).  Ignoring command.\n",
+          command, key, key);
 }
 
 /* initialize all keyboard commands */
@@ -2872,7 +2874,7 @@ commands_init()
     /*       'h', 'H' : go west */
     bind_key('h',    "help"); /* if number_pad is set */
     bind_key('j',    "jump"); /* if number_pad is on */
-    /*       'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' : move commands */
+    /*       'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' move commands */
     bind_key('k',    "kick"); /* if number_pad is on */
     bind_key('l',    "loot"); /* if number_pad is on */
     bind_key(C('n'), "annotate"); /* if number_pad is on */
@@ -2901,12 +2903,14 @@ boolean *keys_used; /* boolean keys_used[256] */
     int count = 0;
 
     for (i = 0; i < 256; i++) {
-        const struct ext_func_tab * extcmd;
-        uchar key = (uchar)i;
+        const struct ext_func_tab *extcmd;
+        uchar key = (uchar) i;
 
-        if (keys_used[i]) continue;
-        if (key == ' ' && !flags.rest_on_space) continue;
-        if ((extcmd = Cmd.commands[i]) != NULL) {
+        if (keys_used[i])
+            continue;
+        if (key == ' ' && !flags.rest_on_space)
+            continue;
+        if ((extcmd = Cmd.commands[i]) != (struct ext_func_tab *) 0) {
             if ((cmdflags && !(extcmd->flags & cmdflags))
                 || (exflags && (extcmd->flags & exflags)))
                 continue;
@@ -2932,26 +2936,33 @@ dokeylist(VOID_ARGS)
     uchar key;
     boolean keys_used[256] = {0};
     winid datawin;
-    int	i;
+    int i;
     const struct {
         int nhkf;
         const char *desc;
         boolean numpad;
     } misc_keys[] = {
-        { NHKF_ESC, "escape from the current query/action" },
-        { NHKF_RUSH, "Prefix: rush until something interesting is seen" },
-        { NHKF_RUN, "Prefix: run until something extremely interesting is seen" },
-        { NHKF_RUN2, "Prefix: run until something extremely interesting is seen", TRUE },
-        { NHKF_FIGHT, "Prefix: force fight even if you don't see a monster" },
-        { NHKF_FIGHT2, "Prefix: force fight even if you don't see a monster", TRUE },
-        { NHKF_NOPICKUP, "Prefix: move without picking up objects/fighting" },
-        { NHKF_RUN_NOPICKUP, "Prefix: run without picking up objects/fighting" },
+        { NHKF_ESC, "escape from the current query/action", FALSE },
+        { NHKF_RUSH,
+          "Prefix: rush until something interesting is seen", FALSE },
+        { NHKF_RUN,
+          "Prefix: run until something extremely interesting is seen", FALSE },
+        { NHKF_RUN2,
+          "Prefix: run until something extremely interesting is seen", TRUE },
+        { NHKF_FIGHT,
+          "Prefix: force fight even if you don't see a monster", FALSE },
+        { NHKF_FIGHT2,
+          "Prefix: force fight even if you don't see a monster", TRUE },
+        { NHKF_NOPICKUP,
+          "Prefix: move without picking up objects/fighting", FALSE },
+        { NHKF_RUN_NOPICKUP,
+          "Prefix: run without picking up objects/fighting", FALSE },
         { NHKF_DOINV, "inventory (same as #inventory)", TRUE },
-        { NHKF_REQMENU, "Prefix: request a menu" },
+        { NHKF_REQMENU, "Prefix: request a menu", FALSE },
 #ifdef REDO
-        { NHKF_DOAGAIN , "redo the previous command" },
+        { NHKF_DOAGAIN , "redo the previous command", FALSE },
 #endif
-        { 0, NULL }
+        { 0, (const char *) 0, FALSE }
     };
 
     datawin = create_nhwindow(NHW_TEXT);
@@ -2963,34 +2974,35 @@ dokeylist(VOID_ARGS)
     putstr(datawin, 0, "Directional keys:");
     show_direction_keys(datawin, FALSE);
 
-    keys_used[(uchar)Cmd.move_NW] = keys_used[(uchar)Cmd.move_N]
-        = keys_used[(uchar)Cmd.move_NE] = keys_used[(uchar)Cmd.move_W]
-        = keys_used[(uchar)Cmd.move_E] = keys_used[(uchar)Cmd.move_SW]
-        = keys_used[(uchar)Cmd.move_S] = keys_used[(uchar)Cmd.move_SE] = TRUE;
+    keys_used[(uchar) Cmd.move_NW] = keys_used[(uchar) Cmd.move_N]
+        = keys_used[(uchar) Cmd.move_NE] = keys_used[(uchar) Cmd.move_W]
+        = keys_used[(uchar) Cmd.move_E] = keys_used[(uchar) Cmd.move_SW]
+        = keys_used[(uchar) Cmd.move_S] = keys_used[(uchar) Cmd.move_SE]
+        = TRUE;
 
     if (!iflags.num_pad) {
-        keys_used[(uchar)highc(Cmd.move_NW)]
-            = keys_used[(uchar)highc(Cmd.move_N)]
-            = keys_used[(uchar)highc(Cmd.move_NE)]
-            = keys_used[(uchar)highc(Cmd.move_W)]
-            = keys_used[(uchar)highc(Cmd.move_E)]
-            = keys_used[(uchar)highc(Cmd.move_SW)]
-            = keys_used[(uchar)highc(Cmd.move_S)]
-            = keys_used[(uchar)highc(Cmd.move_SE)] = TRUE;
-        keys_used[(uchar)C(Cmd.move_NW)]
-            = keys_used[(uchar)C(Cmd.move_N)]
-            = keys_used[(uchar)C(Cmd.move_NE)]
-            = keys_used[(uchar)C(Cmd.move_W)]
-            = keys_used[(uchar)C(Cmd.move_E)]
-            = keys_used[(uchar)C(Cmd.move_SW)]
-            = keys_used[(uchar)C(Cmd.move_S)]
-            = keys_used[(uchar)C(Cmd.move_SE)] = TRUE;
+        keys_used[(uchar) highc(Cmd.move_NW)]
+            = keys_used[(uchar) highc(Cmd.move_N)]
+            = keys_used[(uchar) highc(Cmd.move_NE)]
+            = keys_used[(uchar) highc(Cmd.move_W)]
+            = keys_used[(uchar) highc(Cmd.move_E)]
+            = keys_used[(uchar) highc(Cmd.move_SW)]
+            = keys_used[(uchar) highc(Cmd.move_S)]
+            = keys_used[(uchar) highc(Cmd.move_SE)] = TRUE;
+        keys_used[(uchar) C(Cmd.move_NW)]
+            = keys_used[(uchar) C(Cmd.move_N)]
+            = keys_used[(uchar) C(Cmd.move_NE)]
+            = keys_used[(uchar) C(Cmd.move_W)]
+            = keys_used[(uchar) C(Cmd.move_E)]
+            = keys_used[(uchar) C(Cmd.move_SW)]
+            = keys_used[(uchar) C(Cmd.move_S)]
+            = keys_used[(uchar) C(Cmd.move_SE)] = TRUE;
         putstr(datawin, 0, "");
         putstr(datawin, 0,
-               "Shift-<direction> will move in specified direction until you hit");
+          "Shift-<direction> will move in specified direction until you hit");
         putstr(datawin, 0, "        a wall or run into something.");
         putstr(datawin, 0,
-               "Ctrl-<direction> will run in specified direction until something");
+          "Ctrl-<direction> will run in specified direction until something");
         putstr(datawin, 0, "        very interesting is seen.");
     }
 
@@ -3000,35 +3012,37 @@ dokeylist(VOID_ARGS)
         key = Cmd.spkeys[misc_keys[i].nhkf];
         if (key && ((misc_keys[i].numpad && iflags.num_pad)
                     || !misc_keys[i].numpad)) {
-            keys_used[(uchar)key] = TRUE;
+            keys_used[(uchar) key] = TRUE;
             Sprintf(buf, "%-8s %s", key2txt(key, buf2), misc_keys[i].desc);
             putstr(datawin, 0, buf);
         }
     }
 #ifndef NO_SIGNAL
     putstr(datawin, 0, "^c       break out of NetHack (SIGINT)");
-    keys_used[(uchar)C('c')] = TRUE;
+    keys_used[(uchar) C('c')] = TRUE;
 #endif
 
     putstr(datawin, 0, "");
     show_menu_controls(datawin, TRUE);
 
-    if (dokeylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, &keys_used)) {
+    if (dokeylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "General commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD, &keys_used);
+        (void) dokeylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD,
+                                 keys_used);
     }
 
-    if (dokeylist_putcmds(datawin, TRUE, 0, WIZMODECMD, &keys_used)) {
+    if (dokeylist_putcmds(datawin, TRUE, 0, WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Game commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, 0, WIZMODECMD, &keys_used);
+        (void) dokeylist_putcmds(datawin, FALSE, 0, WIZMODECMD, keys_used);
     }
 
-    if (wizard && dokeylist_putcmds(datawin, TRUE, WIZMODECMD, 0, &keys_used)) {
+    if (wizard
+        && dokeylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Wizard-mode commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, WIZMODECMD, 0, &keys_used);
+        (void) dokeylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
     }
 
     display_nhwindow(datawin, FALSE);
@@ -3040,11 +3054,16 @@ cmd_from_func(fn)
 int NDECL((*fn));
 {
     int i;
+
     for (i = 0; i < 256; ++i)
         if (Cmd.commands[i] && Cmd.commands[i]->ef_funct == fn)
-            return (char)i;
-    return 0;
+            return (char) i;
+    return '\0';
 }
+
+/*
+ * wizard mode sanity_check code
+ */
 
 static const char template[] = "%-27s  %4ld  %6ld";
 static const char stats_hdr[] = "                             count  bytes";
@@ -3466,7 +3485,7 @@ struct {
     char key;
     const char *name;
 } const spkeys_binds[] = {
-    { NHKF_ESC,              '\033', NULL }, /* no binding */
+    { NHKF_ESC,              '\033', (char *) 0 }, /* no binding */
     { NHKF_DOAGAIN,          DOAGAIN, "repeat" },
     { NHKF_REQMENU,          'm', "reqmenu" },
     { NHKF_RUN,              'G', "run" },
@@ -3477,8 +3496,8 @@ struct {
     { NHKF_NOPICKUP,         'm', "nopickup" },
     { NHKF_RUN_NOPICKUP,     'M', "run.nopickup" },
     { NHKF_DOINV,            '0', "doinv" },
-    { NHKF_TRAVEL,           CMD_TRAVEL, NULL }, /* no binding */
-    { NHKF_CLICKLOOK,        CMD_CLICKLOOK, NULL }, /* no binding */
+    { NHKF_TRAVEL,           CMD_TRAVEL, (char *) 0 }, /* no binding */
+    { NHKF_CLICKLOOK,        CMD_CLICKLOOK, (char *) 0 }, /* no binding */
     { NHKF_REDRAW,           C('r'), "redraw" },
     { NHKF_REDRAW2,          C('l'), "redraw.numpad" },
     { NHKF_GETDIR_SELF,      '.', "getdir.self" },
@@ -3508,7 +3527,7 @@ struct {
 boolean
 bind_specialkey(key, command)
 uchar key;
-char *command;
+const char *command;
 {
     int i;
     for (i = 0; i < SIZE(spkeys_binds); i++) {
@@ -3527,53 +3546,64 @@ txt2key(txt)
 char *txt;
 {
     txt = trimspaces(txt);
-    if (!*txt) return 0;
+    if (!*txt)
+        return '\0';
 
     /* simple character */
-    if (!txt[1]) return txt[0];
+    if (!txt[1])
+        return txt[0];
 
     /* a few special entries */
-    if (!strcmp(txt, "<enter>")) return '\n';
-    if (!strcmp(txt, "<space>")) return ' ';
-    if (!strcmp(txt, "<esc>"))   return '\033';
+    if (!strcmp(txt, "<enter>"))
+        return '\n';
+    if (!strcmp(txt, "<space>"))
+        return ' ';
+    if (!strcmp(txt, "<esc>"))
+        return '\033';
 
     /* control and meta keys */
     switch (*txt) {
     case 'm': /* can be mx, Mx, m-x, M-x */
     case 'M':
         txt++;
-        if(*txt == '-' && txt[1]) txt++;
-        if (txt[1]) return 0;
-        return M( *txt );
+        if (*txt == '-' && txt[1])
+            txt++;
+        if (txt[1])
+            return '\0';
+        return M(*txt);
     case 'c': /* can be cx, Cx, ^x, c-x, C-x, ^-x */
     case 'C':
     case '^':
         txt++;
-        if(*txt == '-' && txt[1]) txt++;
-        if (txt[1]) return 0;
-        return C( *txt );
+        if (*txt == '-' && txt[1])
+            txt++;
+        if (txt[1])
+            return '\0';
+        return C(*txt);
     }
 
     /* ascii codes: must be three-digit decimal */
     if (*txt >= '0' && *txt <= '9') {
         uchar key = 0;
         int i;
-        for(i = 0; i < 3; i++) {
-            if(txt[i]<'0' || txt[i]>'9') return 0;
-            key = 10 * key + txt[i]-'0';
+
+        for (i = 0; i < 3; i++) {
+            if (txt[i] < '0' || txt[i] > '9')
+                return '\0';
+            key = 10 * key + txt[i] - '0';
         }
         return key;
     }
 
-    return 0;
+    return '\0';
 }
 
 /* returns the text for a one-byte encoding
  * must be shorter than a tab for proper formatting */
-char*
+char *
 key2txt(c, txt)
 uchar c;
-char* txt; /* sufficiently long buffer */
+char *txt; /* sufficiently long buffer */
 {
     if (c == ' ')
         Sprintf(txt, "<space>");
@@ -3586,32 +3616,33 @@ char* txt; /* sufficiently long buffer */
     else if (ISMETA(c))
         Sprintf(txt, "M-%c", UNMETA(c));
     else if (c >= 33 && c <= 126)
-        Sprintf(txt, "%c", c);		/* regular keys: ! through ~ */
+        Sprintf(txt, "%c", c);          /* regular keys: ! through ~ */
     else
-        Sprintf(txt, "A-%i", c);	/* arbitrary ascii combinations */
+        Sprintf(txt, "A-%i", c);        /* arbitrary ascii combinations */
     return txt;
 }
 
 
 void
-parseautocomplete(autocomplete,condition)
-char* autocomplete;
+parseautocomplete(autocomplete, condition)
+char *autocomplete;
 boolean condition;
 {
     struct ext_func_tab *efp;
     register char *autoc;
 
     /* break off first autocomplete from the rest; parse the rest */
-    if ((autoc = index(autocomplete, ','))
-        || (autoc = index(autocomplete, ':'))) {
-        *autoc++ = 0;
+    if ((autoc = index(autocomplete, ',')) != 0
+        || (autoc = index(autocomplete, ':')) != 0) {
+        *autoc++ = '\0';
         parseautocomplete(autoc, condition);
     }
 
     /* strip leading and trailing white space */
     autocomplete = trimspaces(autocomplete);
 
-    if (!*autocomplete) return;
+    if (!*autocomplete)
+        return;
 
     /* take off negation */
     if (*autocomplete == '!') {
@@ -3634,7 +3665,8 @@ boolean condition;
     }
 
     /* not a real extended command */
-    raw_printf("Bad autocomplete: invalid extended command '%s'.", autocomplete);
+    raw_printf("Bad autocomplete: invalid extended command '%s'.",
+               autocomplete);
     wait_synch();
 }
 
@@ -3667,7 +3699,7 @@ boolean initial;
 
         if (backed_dir_cmd) {
             for (i = 0; i < 10; i++) {
-                Cmd.commands[(uchar)Cmd.dirchars[i]] = back_dir_cmd[i];
+                Cmd.commands[(uchar) Cmd.dirchars[i]] = back_dir_cmd[i];
             }
         }
 
@@ -3743,8 +3775,8 @@ boolean initial;
     if (!initial) {
         for (i = 0; i < 10; i++) {
             back_dir_cmd[i] =
-                (struct ext_func_tab *)Cmd.commands[(uchar)Cmd.dirchars[i]];
-            Cmd.commands[(uchar)Cmd.dirchars[i]] = NULL;
+                (struct ext_func_tab *) Cmd.commands[(uchar) Cmd.dirchars[i]];
+            Cmd.commands[(uchar) Cmd.dirchars[i]] = (struct ext_func_tab *) 0;
         }
         backed_dir_cmd = TRUE;
         for (i = 0; i < 8; i++)
@@ -4492,7 +4524,7 @@ parse()
     if (!Cmd.num_pad || (foo = readchar()) == Cmd.spkeys[NHKF_COUNT]) {
         long tmpmulti = multi;
 
-        foo = get_count(NULL, '\0', LARGEST_INT, &tmpmulti);
+        foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti);
         last_multi = multi = tmpmulti;
     }
 #ifdef ALTMETA
@@ -4642,7 +4674,7 @@ readchar()
             sym = '\033';
         else if (sym != '\033')
             sym |= 0200; /* force 8th bit on */
-#endif                   /*ALTMETA*/
+#endif /*ALTMETA*/
     } else if (sym == 0) {
         /* click event */
         readchar_queue = click_to_cmd(x, y, mod);
@@ -4711,7 +4743,7 @@ wiz_port_debug()
         { "show keystroke handler information (tty only)",
           win32con_handler_info },
 #endif
-        { (char *) 0, (void NDECL((*) )) 0 } /* array terminator */
+        { (char *) 0, (void NDECL((*))) 0 } /* array terminator */
     };
 
     num_menu_selections = SIZE(menu_selections) - 1;
