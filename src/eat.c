@@ -1628,7 +1628,7 @@ struct obj *otmp;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
             losestr(rnd(4));
-            losehp(rnd(15), !glob ? "poisonous corpse" : "posionous glob",
+            losehp(rnd(15), !glob ? "poisonous corpse" : "poisonous glob",
                    KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
