@@ -73,6 +73,9 @@ small megabat
 uberhulk
 tofurkey
 +Dudley
+shrinking violet
+shallow one
+spherical cow
 
 # Quendor (Zork, &c.)
 grue
@@ -119,6 +122,7 @@ were-rabbit
 
 # Discworld
 Luggage
+vampiric watermelon
 
 # Lord of the Rings
 Ent
@@ -230,6 +234,7 @@ velociraptor
 corpulent porpoise
 quokka
 potoo
+lemming
 
 # european cryptids
 wolpertinger
@@ -297,6 +302,7 @@ gazebo
 gray goo
 magnetic monopole
 first category perpetual motion device
+big dumb object
 
 # Ultima
 +Lord British
