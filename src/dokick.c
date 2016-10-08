@@ -497,15 +497,20 @@ xchar x, y;
         || kickedobj == uchain)
         return 0;
 
-    if ((trap = t_at(x, y)) != 0
-        && (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
-            || trap->ttyp == WEB)) {
-        if (!trap->tseen)
-            find_trap(trap);
-        You_cant("kick %s that's in a %s!", something,
-                 Hallucination ? "tizzy" : (trap->ttyp == WEB) ? "web"
-                                                               : "pit");
-        return 1;
+    if ((trap = t_at(x, y)) != 0) {
+        if (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
+            || trap->ttyp == WEB) {
+            if (!trap->tseen)
+                find_trap(trap);
+            You_cant("kick %s that's in a %s!", something,
+                     Hallucination ? "tizzy" :
+                     (trap->ttyp == WEB) ? "web" : "pit");
+            return 1;
+        }
+        if (trap->ttyp == STATUE_TRAP) {
+            activate_statue_trap(trap, x,y, FALSE);
+            return 1;
+        }
     }
 
     if (Fumbling && !rn2(3)) {
