@@ -93,6 +93,12 @@ register struct obj *obj;
         && (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
         return TRUE;
 
+    /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
+    if (u.umonnum == PM_GHOUL)
+        return (boolean)((obj->otyp == CORPSE
+                          && !vegan(&mons[obj->corpsenm]))
+                         || (obj->otyp == EGG));
+
     if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj)
         /* [g.cubes can eat containers and retain all contents
             as engulfed items, but poly'd player can't do that] */
@@ -1622,7 +1628,7 @@ struct obj *otmp;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
             losestr(rnd(4));
-            losehp(rnd(15), !glob ? "poisonous corpse" : "posionous glob",
+            losehp(rnd(15), !glob ? "poisonous corpse" : "poisonous glob",
                    KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");

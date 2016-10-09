@@ -184,7 +184,10 @@ E void FDECL(set_occupation, (int (*)(void), const char *, int));
 E char NDECL(pgetchar);
 E void FDECL(pushch, (CHAR_P));
 E void FDECL(savech, (CHAR_P));
-E void NDECL(add_debug_extended_commands);
+E const char *FDECL(key2extcmddesc, (UCHAR_P));
+E boolean FDECL(bind_specialkey, (UCHAR_P, const char *));
+E char FDECL(txt2key, (char *));
+E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
@@ -193,6 +196,8 @@ E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));
+E void FDECL(bind_key, (UCHAR_P, const char *));
+E void NDECL(dokeylist);
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
 E void FDECL(dtoxy, (coord *, int));
 E int FDECL(movecmd, (CHAR_P));
@@ -211,6 +216,7 @@ E void NDECL(end_of_input);
 #endif
 E char NDECL(readchar);
 E void NDECL(sanity_check);
+E char* FDECL(key2txt, (UCHAR_P, char *));
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E boolean FDECL(paranoid_query, (BOOLEAN_P, const char *));
 
@@ -373,6 +379,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
+E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));
@@ -847,6 +854,7 @@ E char *FDECL(lcase, (char *));
 E char *FDECL(ucase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
+E char *FDECL(trimspaces, (char *));
 E char *FDECL(strip_newline, (char *));
 E char *FDECL(eos, (char *));
 E boolean FDECL(str_end_is, (const char *, const char *));
@@ -1664,8 +1672,11 @@ E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
                                   char *, char *));
+E void FDECL(parsebindings, (char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
+E char FDECL(get_menu_cmd_key, (CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
+E void FDECL(show_menu_controls, (winid, BOOLEAN_P));
 E void FDECL(assign_warnings, (uchar *));
 E char *FDECL(nh_getenv, (const char *));
 E void FDECL(set_duplicate_opt_detection, (int));

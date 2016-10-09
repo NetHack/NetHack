@@ -424,8 +424,55 @@ extern NEARDATA struct instance_flags iflags;
 
 #ifdef NHSTDC
 /* forward declaration sufficient to declare pointers */
-struct func_tab; /* from func_tab.h */
+struct ext_func_tab; /* from func_tab.h */
 #endif
+
+/* special key functions */
+enum nh_keyfunc {
+    NHKF_ESC = 0,
+    NHKF_DOAGAIN,
+
+    NHKF_REQMENU,
+
+    /* run ... clicklook need to be in a continuous block */
+    NHKF_RUN,
+    NHKF_RUN2,
+    NHKF_RUSH,
+    NHKF_FIGHT,
+    NHKF_FIGHT2,
+    NHKF_NOPICKUP,
+    NHKF_RUN_NOPICKUP,
+    NHKF_DOINV,
+    NHKF_TRAVEL,
+    NHKF_CLICKLOOK,
+
+    NHKF_REDRAW,
+    NHKF_REDRAW2,
+    NHKF_GETDIR_SELF,
+    NHKF_GETDIR_SELF2,
+    NHKF_GETDIR_HELP,
+    NHKF_COUNT,
+    NHKF_GETPOS_SELF,
+    NHKF_GETPOS_PICK,
+    NHKF_GETPOS_PICK_Q,  /* quick */
+    NHKF_GETPOS_PICK_O,  /* once */
+    NHKF_GETPOS_PICK_V,  /* verbose */
+    NHKF_GETPOS_SHOWVALID,
+    NHKF_GETPOS_AUTODESC,
+    NHKF_GETPOS_MON_NEXT,
+    NHKF_GETPOS_MON_PREV,
+    NHKF_GETPOS_OBJ_NEXT,
+    NHKF_GETPOS_OBJ_PREV,
+    NHKF_GETPOS_DOOR_NEXT,
+    NHKF_GETPOS_DOOR_PREV,
+    NHKF_GETPOS_UNEX_NEXT,
+    NHKF_GETPOS_UNEX_PREV,
+    NHKF_GETPOS_HELP,
+    NHKF_GETPOS_MENU,
+    NHKF_GETPOS_MENU_FOV,
+
+    NUM_NHKF
+};
 
 /* commands[] is used to directly access cmdlist[] instead of looping
    through it to find the entry for a given input character;
@@ -443,7 +490,8 @@ struct cmd {
     char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
-    const struct func_tab *commands[256]; /* indexed by input character */
+    const struct ext_func_tab *commands[256]; /* indexed by input character */
+    char spkeys[NUM_NHKF];
 };
 
 extern NEARDATA struct cmd Cmd;

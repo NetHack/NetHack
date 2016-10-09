@@ -18,6 +18,7 @@
         char *          ucase           (char *)
         char *          upstart         (char *)
         char *          mungspaces      (char *)
+        char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
@@ -157,6 +158,22 @@ char *bp;
         p2--;
     *p2 = '\0';
     return bp;
+}
+
+/* remove leading and trailing whitespace, in place */
+char*
+trimspaces(txt)
+char* txt;
+{
+    char* end;
+
+    while (*txt == ' ' || *txt == '\t')
+        txt++;
+    end = eos(txt);
+    while (--end >= txt && (*end == ' ' || *end == '\t'))
+        *end = '\0';
+
+    return txt;
 }
 
 /* remove \n from end of line; remove \r too if one is there */
@@ -385,13 +402,17 @@ char *sbuf;
     return strcpy(sbuf, buf);
 }
 
+#define VISCTRL_NBUF 5
 /* make a displayable string from a character */
 char *
 visctrl(c)
 char c;
 {
-    Static char ccc[5];
+    Static char visctrl_bufs[VISCTRL_NBUF][5];
+    static int nbuf = 0;
     register int i = 0;
+    char *ccc = visctrl_bufs[nbuf];
+    nbuf = (nbuf + 1) % VISCTRL_NBUF;
 
     if ((uchar) c & 0200) {
         ccc[i++] = 'M';

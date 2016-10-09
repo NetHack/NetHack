@@ -344,6 +344,10 @@ don't show monster vs. monster attack message, if the message refers to
 	a monster that cannot be sensed by the hero
 umber hulk gazing at hidden mimic forces mimic to unhide
 show some timed hero properties in wizard-mode #timeout
+give quest guardians some equipment
+hero polyed into ghoul can only eat non-veggy corpses or eggs
+kicking activates statue traps
+pets start with apport equal to your charisma
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -441,8 +445,8 @@ allow knife and stiletto as possible tin opening tools
 wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Mort, Sourcery, Wyrd Sisters, Pyramids, Guards! Guards!,
-	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff, and
-	Raising Steam
+	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff,
+	Raising Steam, and The Shepherd's Crown
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
 database entries for Cleaver, Sunsword, Frost and Fire brands, and
 	polymorph trap
@@ -496,6 +500,8 @@ when moving a cursor for travel target, show if there is no known travel
 show the reason why travel was interrupted if mention_walls is on
 random horses have a tiny chance of being generated saddled
 give feedback just before timed levitation runs out
+travel accepts 'm' (request menu) prefix
+pressing a or A when cursor positioning shows menu of "interesting" features
 
 
 Platform- and/or Interface-Specific New Features
@@ -514,6 +520,7 @@ X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 	NetHack*status_condition.foreground, .background, and .showGrip
 	resources replaced by status_condition[1-3].*
 X11: more terminal-like default resources
+win32gui: save and load map colors from registry
 
 
 NetHack Community Patches (or Variation) Included
@@ -530,6 +537,7 @@ Ray Chason's MS-DOS port restored to functionality with credit to Reddit user
 	b_helyer for the fix to sys/share/pcmain.c
 Ray Chason's MSDOS port support for some VESA modes
 Darshan Shaligram's pet ranged attack
+Jason Dorje Short's key rebinding
 
 
 Code Cleanup and Reorganization

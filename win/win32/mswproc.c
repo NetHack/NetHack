@@ -8,6 +8,7 @@
 */
 
 #include "hack.h"
+#include "color.h"
 #include "dlb.h"
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
@@ -1726,7 +1727,9 @@ mswin_get_ext_cmd()
                     com_index = -1;
                     for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0;
                          oindex++) {
-                        if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
+                        if ((extcmdlist[oindex].flags & AUTOCOMPLETE)
+                            && !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
+                            && !strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
                             if (com_index == -1) /* no matches yet */
                                 com_index = oindex;
                             else
@@ -2276,6 +2279,25 @@ mswin_read_reg()
     DWORD size;
     DWORD safe_buf;
     char keystring[MAX_PATH];
+    int i;
+    COLORREF default_mapcolors[CLR_MAX] = {
+	RGB(0x55, 0x55, 0x55), /* CLR_BLACK */
+	RGB(0xFF, 0x00, 0x00), /* CLR_RED */
+	RGB(0x00, 0x80, 0x00), /* CLR_GREEN */
+	RGB(0xA5, 0x2A, 0x2A), /* CLR_BROWN */
+	RGB(0x00, 0x00, 0xFF), /* CLR_BLUE */
+	RGB(0xFF, 0x00, 0xFF), /* CLR_MAGENTA */
+	RGB(0x00, 0xFF, 0xFF), /* CLR_CYAN */
+	RGB(0xC0, 0xC0, 0xC0), /* CLR_GRAY */
+	RGB(0xFF, 0xFF, 0xFF), /* NO_COLOR */
+	RGB(0xFF, 0xA5, 0x00), /* CLR_ORANGE */
+	RGB(0x00, 0xFF, 0x00), /* CLR_BRIGHT_GREEN */
+	RGB(0xFF, 0xFF, 0x00), /* CLR_YELLOW */
+	RGB(0x00, 0xC0, 0xFF), /* CLR_BRIGHT_BLUE */
+	RGB(0xFF, 0x80, 0xFF), /* CLR_BRIGHT_MAGENTA */
+	RGB(0x80, 0xFF, 0xFF), /* CLR_BRIGHT_CYAN */
+	RGB(0xFF, 0xFF, 0xFF)  /* CLR_WHITE */
+    };
 
     sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
             SETTINGSKEY);
@@ -2285,6 +2307,9 @@ mswin_read_reg()
        read from the registry, so these defaults apply. */
     GetNHApp()->saveRegistrySettings = 1; /* Normally, we always save */
     GetNHApp()->regNetHackMode = TRUE;
+
+    for (i = 0; i < CLR_MAX; i++)
+        GetNHApp()->regMapColors[i] = default_mapcolors[i];
 
     if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key)
         != ERROR_SUCCESS)
@@ -2338,6 +2363,14 @@ mswin_read_reg()
     NHGETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHGETREG_DWORD
 
+    for (i = 0; i < CLR_MAX; i++) {
+        COLORREF cl;
+        char mapcolorkey[64];
+        sprintf(mapcolorkey, "MapColor%02d", i);
+        if (RegQueryValueEx(key, mapcolorkey, NULL, NULL, (BYTE *)&cl, &size) == ERROR_SUCCESS)
+            GetNHApp()->regMapColors[i] = cl;
+    }
+
     RegCloseKey(key);
 
     /* check the data for validity */
@@ -2356,6 +2389,7 @@ mswin_write_reg()
 {
     HKEY key;
     DWORD disposition;
+    int i;
 
     if (GetNHApp()->saveRegistrySettings) {
         char keystring[MAX_PATH];
@@ -2416,6 +2450,13 @@ mswin_write_reg()
         NHSETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
         NHSETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHSETREG_DWORD
+
+        for (i = 0; i < CLR_MAX; i++) {
+            COLORREF cl = GetNHApp()->regMapColors[i];
+            char mapcolorkey[64];
+            sprintf(mapcolorkey, "MapColor%02d", i);
+            RegSetValueEx(key, mapcolorkey, 0, REG_DWORD, (BYTE *)&cl, sizeof(DWORD));
+        }
 
         RegCloseKey(key);
     }

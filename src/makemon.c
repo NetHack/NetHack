@@ -269,6 +269,58 @@ register struct monst *mtmp;
         } else if (mm == PM_NINJA) { /* extra quest villains */
             (void) mongets(mtmp, rn2(4) ? SHURIKEN : DART);
             (void) mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
+        } else if (ptr->msound == MS_GUARDIAN) {
+            /* quest "guardians" */
+            switch (mm) {
+            case PM_STUDENT:
+            case PM_ATTENDANT:
+            case PM_ABBOT:
+            case PM_ACOLYTE:
+            case PM_GUIDE:
+            case PM_APPRENTICE:
+                if (rn2(2))
+                    (void) mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
+                if (rn2(5))
+                    (void) mongets(mtmp, rn2(3) ? LEATHER_JACKET : LEATHER_CLOAK);
+                if (rn2(3))
+                    (void) mongets(mtmp, rn2(3) ? LOW_BOOTS : HIGH_BOOTS);
+                if (rn2(3))
+                    (void) mongets(mtmp, POT_HEALING);
+                break;
+            case PM_CHIEFTAIN:
+            case PM_PAGE:
+            case PM_ROSHI:
+            case PM_WARRIOR:
+                (void) mongets(mtmp, rn2(3) ? LONG_SWORD : SHORT_SWORD);
+                (void) mongets(mtmp, rn2(3) ? CHAIN_MAIL : LEATHER_ARMOR);
+                if (rn2(2))
+                    (void) mongets(mtmp, rn2(2) ? LOW_BOOTS : HIGH_BOOTS);
+                if (!rn2(3))
+                    (void) mongets(mtmp, LEATHER_CLOAK);
+                if (!rn2(3)) {
+                    (void) mongets(mtmp, BOW);
+                    m_initthrow(mtmp, ARROW, 12);
+                }
+                break;
+            case PM_HUNTER:
+                (void) mongets(mtmp, rn2(3) ? SHORT_SWORD : DAGGER);
+                if (rn2(2))
+                    (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
+                (void) mongets(mtmp, BOW);
+                m_initthrow(mtmp, ARROW, 12);
+                break;
+            case PM_THUG:
+                (void) mongets(mtmp, CLUB);
+                (void) mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
+                if (rn2(2))
+                    (void) mongets(mtmp, LEATHER_GLOVES);
+                (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
+                break;
+            case PM_NEANDERTHAL:
+                (void) mongets(mtmp, CLUB);
+                (void) mongets(mtmp, LEATHER_ARMOR);
+                break;
+            }
         }
         break;
 

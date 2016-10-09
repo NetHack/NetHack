@@ -1371,6 +1371,7 @@ whatdoes_help()
     destroy_nhwindow(tmpwin);
 }
 
+#if 0
 #define WD_STACKLIMIT 5
 struct wd_stack_frame {
     Bitfield(active, 1);
@@ -1501,18 +1502,31 @@ int *depth, lnum;
     }
     return stack[*depth].active ? TRUE : FALSE;
 }
+#endif /* 0 */
 
 char *
 dowhatdoes_core(q, cbuf)
 char q;
 char *cbuf;
 {
-    dlb *fp;
     char buf[BUFSZ];
+#if 0
+    dlb *fp;
     struct wd_stack_frame stack[WD_STACKLIMIT];
     boolean cond;
     int ctrl, meta, depth = 0, lnum = 0;
+#endif /* 0 */
+    const char *ec_desc;
 
+    if ((ec_desc = key2extcmddesc(q)) != NULL) {
+        char keybuf[QBUFSZ];
+
+        Sprintf(buf, "%-8s%s.", key2txt(q, keybuf), ec_desc);
+        Strcpy(cbuf, buf);
+        return cbuf;
+    }
+    return 0;
+#if 0
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
         pline("Cannot open \"%s\" data file!", CMDHELPFILE);
@@ -1568,6 +1582,7 @@ char *cbuf;
     if (depth != 0)
         impossible("cmdhelp: mismatched &? &: &. conditionals.");
     return (char *) 0;
+#endif /* 0 */
 }
 
 int
@@ -1705,6 +1720,15 @@ hmenu_doextlist()
     (void) doextlist();
 }
 
+void
+domenucontrols()
+{
+    winid cwin = create_nhwindow(NHW_TEXT);
+    show_menu_controls(cwin, FALSE);
+    display_nhwindow(cwin, FALSE);
+    destroy_nhwindow(cwin);
+}
+
 /* data for dohelp() */
 static struct {
     void (*f)();
@@ -1718,7 +1742,9 @@ static struct {
     { hmenu_dowhatdoes, "Info on what a given key does." },
     { option_help, "List of game options." },
     { dispfile_optionfile, "Longer explanation of game options." },
+    { dokeylist, "Full list of keyboard commands" },
     { hmenu_doextlist, "List of extended commands." },
+    { domenucontrols, "List menu control keys" },
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
 #ifdef PORT_HELP

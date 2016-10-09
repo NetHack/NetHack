@@ -465,7 +465,9 @@ more info).
 .hn 1
 Commands
 .pg
-Commands are initiated by typing one or two characters.  Some commands,
+Commands can be initiated by typing one or two characters to which
+the command is bound to, or typing the command name in the extended
+commands entry.  Some commands,
 like ``search'', do not require that any more information be collected by
 NetHack.  Other commands might require additional information, for
 example a direction, or an object to be used.  For those commands that
@@ -498,11 +500,11 @@ ESC key.
 .pg
 The list of commands is rather long, but it can be read at any time
 during the game through the `?' command, which accesses a menu of
-helpful texts.  Here are the commands for your reference:
+helpful texts.  Here are the default key bindings for your reference:
 .lp ?
 Help menu:  display one of several help texts available.
 .lp /
-The ``what-is'' command, to
+The ``whatis'' command, to
 tell what a symbol represents.  You may choose to specify a location
 or type a symbol (or even a whole word) to explain.
 Specifying a location is done by moving the cursor to a particular spot
@@ -584,7 +586,8 @@ A few other commands (eat food, offer sacrifice, apply tinning-kit) use
 the `m' prefix to skip checking for applicable objects on the floor
 and go straight to checking inventory,
 or (for ``#loot'' to remove a saddle),
-skip containers and go straight to adjacent monsters.
+skip containers and go straight to adjacent monsters. The prefix will
+make ``#travel'' command show a menu of interesting targets in sight.
 .lp F[yuhjklbn]
 Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
@@ -823,7 +826,7 @@ via the ``#twoweapon'' extended command.
 .lp ""
 (In versions prior to 3.6 this was the command to switch from normal
 play to "explore mode", also known as "discovery mode", which has now
-been moved to ``#explore''.)
+been moved to ``#exploremode''.)
 .lp ^X
 Display basic information about your character.
 .lp ""
@@ -912,7 +915,7 @@ compiled with.
 .lp #adjust
 Adjust inventory letters (most useful when the
 .op fixinv
-option is ``on'').
+option is ``on''). Autocompletes. Default key is 'M-a'.
 .lp ""
 This command allows you to move an item from one particular inventory
 slot to another so that it has a letter which is more meaningful for you
@@ -923,50 +926,113 @@ choosing the item to adjust, enter a count prior to its letter.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the
-``#overview'' command.
+``#overview'' command. Autocompletes. Default key is 'M-A', and '^N' if number_pad is on.
+.lp #apply
+Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
+.lp #attributes
+Show your attributes. Default key is '^X'.
+.lp #autopickup
+Toggle the autopickup -option on/off. Default key is '@'.
+.lp #call
+Call (name) a monster, or a object in inventory, on the floor,
+or in the discoveries list, or add an annotation for the
+current level (same as ``#annotate'').  Default key is 'C'.
+.lp #cast
+Cast a spell. Default key is 'Z'.
 .lp #chat
-Talk to someone.
+Talk to someone. Default key is 'M-c'.
+.lp #close
+Close a door. Default key is 'c'.
 .lp #conduct
-List voluntary challenges you have maintained.
+List voluntary challenges you have maintained. Autocompletes. Default key is 'M-C'.
 .lp ""
 See the section below entitled ``Conduct'' for details.
 .lp "#dip "
-Dip an object into something.
+Dip an object into something. Autocompletes. Default key is 'M-d'.
+.lp #down
+Go down a staircase. Default key is '>'.
+.lp #drop
+Drop an item. Default key is 'd'.
+.lp #droptype
+Drop specific item types. Default key is 'D'.
+.lp "#eat "
+Eat something. Default key is 'e'.
+.lp #engrave
+Engrave writing on the floor. Default key is 'E'.
 .lp #enhance
-Advance or check weapon and spell skills.
+Advance or check weapon and spell skills. Autocompletes. Default key is 'M-e'.
 .lp #exploremode
 Enter the explore mode.
+.lp #fire
+Fire ammunition from quiver. Default key is 'f'.
 .lp #force
-Force a lock.
+Force a lock. Autocompletes. Default key is 'M-f'.
+.lp #glance
+Show what type of thing a map symbol corresponds to. Default key is ';'.
+.lp #help
+Show the help menu. Default key is '?', and 'h' if number_pad is on.
+.lp #history
+Show long version and game history. Default key is 'V'.
+.lp #inventory
+Show your inventory. Default key is 'i'.
+.lp #inventtype
+Inventory specific item types. Default key is 'I'.
 .lp #invoke
-Invoke an object's special powers.
+Invoke an object's special powers. Autocompletes. Default key is 'M-i'.
 .lp #jump
-Jump to another location.
+Jump to another location. Autocompletes. Default key is 'M-j', and 'j' if number_pad is on.
 .lp #kick
-Kick something.
+Kick something. Default key is '^D', and 'k' if number_pad is on.
+.lp #known
+Show what object types have been discovered. Default key is '\'.
+.lp #knownclass
+Show discovered types for one class of objects. Default key is '`'.
+.lp #levelchange
+Change your experience level. Autocompletes. Wizard-mode only.
+.lp #lightsources
+Show mobile light sources. Autocompletes. Wizard-mode only.
+.lp #look
+Look at what is here, under you. Default key is ':'.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle
-from a steed standing next to you.
+from a steed standing next to you. Autocompletes.
 Precede with the `m' prefix to skip containers at your location
-and go directly to removing a saddle.
+and go directly to removing a saddle. Default key is 'M-l', and 'l' if number_pad is on.
+.lp #monpolycontrol
+Control monster polymorphs. Autocompletes. Wizard-mode only.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
+Autocompletes. Default key is 'M-m'.
 .lp #name
-Name a monster, an individual object, or a type of object.  Same as `C'.
+Name a monster, an individual object, or a type of object.  Same as #call.
+Autocompletes. Default keys are 'N', 'M-n', and 'M-N'.
 .lp #offer
-Offer a sacrifice to the gods.
+Offer a sacrifice to the gods. Autocompletes. Default key is 'M-o'.
 .lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
+.lp #open
+Open a door. Default key is 'o'.
+.lp #options
+Show and change option settings. Default key is 'O'.
 .lp #overview
 Display information you've discovered about the dungeon.  Any visited
 level (unless forgotten due to amnesia) with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
-level will be included regardless of annotations.
+level will be included regardless of annotations. Autocompletes.
+Default keys are '^O', and 'M-O'.
+.lp #panic
+Test the panic routine. Autocompletes. Wizard-mode only.
+.lp "#pay "
+Pay your shopping bill. Default key is 'p'.
+.lp #pickup
+Pick up things at the current location. Default key is ','.
+.lp #polyself
+Polymorph self. Autocompletes. Wizard-mode only.
 .lp #pray
-Pray to the gods for help.
+Pray to the gods for help. Autocompletes. Default key is 'M-p'.
 .lp ""
 Praying too soon after receiving prior help is a bad idea.
 (Hint: entering the dungeon alive is treated as having received help.
@@ -976,40 +1042,152 @@ option to make you confirm your intent before praying.  It is enabled
 by default, and you can reset the
 .op paranoid_confirmation
 option to disable it.
+.lp #prevmsg
+Show previously displayed game messages. Default key is '^P'.
+.lp #puton
+Put on an accessory (ring, amulet, etc). Default key is 'P'.
+.lp #quaff
+Quaff (drink) something. Default key is 'q'.
 .lp #quit
-Quit the program without saving your game.
+Quit the program without saving your game. Autocompletes. Default key is 'M-q'.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of 'y' acknowledges that intent.  You can set the
 .op paranoid_confirmation
 option to require a response of "yes" instead.
+.lp #quiver
+Select ammunition for quiver. Default key is 'Q'.
+.lp #read
+Read a scroll, a spellbook, or something else. Default key is 'r'.
+.lp #redraw
+Redraw the screen. Default key is '^R', and '^L' if number_pad is on.
+.lp #remove
+Remove an accessory (ring, amulet, etc). Default key is 'R'.
 .lp #ride
-Ride (or stop riding) a saddled creature.
+Ride (or stop riding) a saddled creature. Autocompletes. Default key is 'M-R'.
 .lp "#rub "
-Rub a lamp or a stone.
+Rub a lamp or a stone. Autocompletes. Default key is 'M-r'.
+.lp #save
+Save the game. Default key is 'S'.
+.lp #search
+Search for traps and secret doors around you. Default key is 's'.
+.lp #seeall
+Show all equipment in use. Default key is '*'.
+.lp #seeamulet
+Show the amulet currently worn. Default key is '"'.
+.lp #seearmor
+Show the armor currently worn. Default key is '['.
+.lp #seegold
+Count your gold. Default key is '$'.
+.lp #seenv
+Show seen vectors. Autocompletes. Wizard-mode only.
+.lp #seerings
+Show the ring(s) currently worn. Default key is '='.
+.lp #seespells
+List and reorder known spells. Default key is '+'.
+.lp #seetools
+Show the tools currently in use. Default key is '('.
+.lp #seetrap
+Show the type of a trap near you. Default key is '^'.
+.lp #seeweapon
+Show the weapon currently wielded. Default key is ')'.
+.lp #shell
+Do a shell escape. Default key is '!'.
 .lp "#sit "
-Sit down.
+Sit down. Autocompletes. Default key is 'M-s'.
+.lp #stats
+Show memory statistics. Autocompletes. Wizard-mode only.
+.lp #suspend
+Suspend the game. Default key is '^Z'.
+.lp #swap
+Swap wielded and secondary weapons. Default key is 'x'.
+.lp #takeoff
+Take off one piece of armor. Default key is 'T'.
+.lp #takeoffall
+Remove all armor. Default key is 'A'.
+.lp #teleport
+Teleport around the level. Default key is '^T'.
 .lp #terrain
 Show bare map without displaying monsters, objects, or traps.
+Autocompletes.
+.lp #throw
+Throw something. Default key is 't'.
+.lp #timeout
+Look at the timeout queue. Autocompletes. Wizard-mode only.
 .lp "#tip "
 Tip over a container (bag or box) to pour out its contents.
+Autocompletes. Default key is 'M-T'.
+.lp #travel
+Travel to a specific location on the map. Default key is '_'.
+Using the ``request menu'' prefix shows a menu of interesting targets in sight
+without asking to move the cursor.
 .lp #turn
-Turn undead.
+Turn undead away. Autocompletes. Default key is 'M-t'.
 .lp #twoweapon
-Toggle two-weapon combat on or off.
+Toggle two-weapon combat on or off. Autocompletes. Default keys
+are 'X', and 'M-2'.
 .lp ""
 Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 .lp #untrap
-Untrap something (trap, door, or chest).
+Untrap something (trap, door, or chest). Default key is 'M-u', and 'u' if number_pad is on.
 .lp ""
 In some circumstances it can also be used to rescue trapped monsters.
+.lp "#up  "
+Go up a staircase. Default key is '<'.
+.lp #vanquished
+List vanquished monsters. Autocompletes. Wizard-mode only.
 .lp #version
 Print compile time options for this version of NetHack.
+Autocompletes. Default key is 'M-v'.
+.lp #versionshort
+Show version string. Default key is 'v'.
+.lp #vision
+Show vision array. Autocompletes. Wizard-mode only.
+.lp #wait
+Rest one move while doing nothing. Default key is '.', and ' ' if
+rest_on_space is on.
+.lp #wear
+Wear a piece of armor. Default key is 'W'.
+.lp #whatdoes
+Tell what a key does. Default key is '&'.
+.lp #whatis
+Show what type of thing a symbol corresponds to. Default key is '/'.
+.lp #wield
+Wield a weapon. Default key is 'w'.
 .lp #wipe
-Wipe off your face.
+Wipe off your face. Autocompletes. Default key is 'M-w'.
+.lp #wizdebug_bury
+Bury objects under and around you. Autocompletes. Wizard-mode only.
+.lp #wizdebug_traveldisplay
+Toggle travel display. Autocompletes. Wizard-mode only.
+.lp #wizdetect
+Search a room. Autocompletes. Wizard-mode only. Default key is '^E'.
+.lp #wizgenesis
+Create a monster. Autocompletes. Wizard-mode only. Default key is '^G'.
+.lp #wizidentify
+Identify all items in inventory. Autocompletes. Wizard-mode only.
+Default key is '^I'.
+.lp #wizintrinsic
+Set intrinsic. Autocompletes. Wizard-mode only.
+.lp #wizlevelport
+Teleport to another level. Autocompletes. Wizard-mode only. Default key is '^V'.
+.lp #wizmap
+Map the level. Autocompletes. Wizard-mode only. Default key is '^F'.
+.lp #wizrumorcheck
+Verify rumor boundaries. Autocompletes. Wizard-mode only.
+.lp #wizsmell
+Smell monster. Autocompletes. Wizard-mode only.
+.lp #wizwhere
+Show locations of special levels. Autocompletes. Wizard-mode only.
+.lp #wizwish
+Wish for something. Autocompletes. Wizard-mode only. Default key is '^W'.
+.lp #wmode
+Show wall modes. Autocompletes. Wizard-mode only.
+.lp "#zap "
+Zap a wand. Default key is 'z'.
 .lp "#?   "
 Help menu:  get the list of available extended commands.
 .lp ""
@@ -2054,10 +2232,32 @@ HACKDIR, must be writeable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
 is kept. Defaults to HACKDIR, must be writeable.
+.lp AUTOCOMPLETE
+Enable or disable an extended command autocompletion.
+Autocompletion has no effect for the X11 windowport.
+You can specify multiple autocompletions. To enable
+autocompletion, list the extended command. Prefix the
+command with ``!'' to disable the autocompletion
+for that command.
+.pg
+Example:
+.sd
+\fBAUTOCOMPLETE=zap,!annotate\fP
+.ed
 .lp AUTOPICKUP_EXCEPTION
 Set exceptions to the
 .op pickup_types
 option. See the ``Configuring Autopickup Exceptions'' section.
+.lp BINDINGS
+Change the key bindings of some special keys, menu accelerators, or
+extended commands. You can specify multiple bindings. Format is key
+followed by the command, separated by a colon.
+See the ``Changing Key Bindings`` section for more information.
+.pg
+Example:
+.sd
+\fBBIND=^X:getpos.autodescribe\fP
+.ed
 .lp MSGTYPE
 Change the way messages are shown in the top status line.
 See the ``Configuring Message Types`` section.
@@ -2955,6 +3155,105 @@ The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from
 autopickup.
 .hn 2
+Changing Key Bindings
+.pg
+It is possible to change the default key bindings of some special commands,
+menu accelerator keys, and extended commands, by using BIND stanzas in the
+configuration file. Format is key, followed by the command to bind to, separated
+by a colon. The key can be a single character (``x''), a control key (``^X'',
+``C-x''), a meta key (``M-x''), or a three-digit decimal ASCII code.
+.pg
+For example:
+.sd
+.si
+BIND=^X:getpos.autodescribe
+BIND={:menu_first_page
+BIND=v:loot
+.ei
+.ed
+.pg
+.lp "Extended command keys"
+You can bind multiple keys to the same extended command. Unbind a key by
+using ``nothing'' as the extended command to bind to. You can also bind
+the ``<esc>'', ``<enter>'', and ``<space>'' keys.
+.lp "Menu accelerator keys"
+The menu control or accelerator keys can also be rebound via OPTIONS-lines
+in the config file. You cannot bind object symbols into menu accelerators.
+.lp "Special command keys"
+Below are the special commands you can rebind. Some of them can be bound to
+same keys with no problems, others are in the same "context", and if bound
+to same keys, only one of those commands will be available. Special command
+can only be bound to a single key.
+.pg
+.lp count
+Prefix key to start a count, to repeat a command this many times. With number_pad only. Default is 'n'.
+.lp doinv
+Show inventory. With number_pad only. Default is '0'.
+.lp fight
+Prefix key to force fight a direction. Default is 'F'.
+.lp fight.numpad
+Prefix key to force fight a direction. With number_pad only. Default is '-'.
+.lp getdir.help
+When asked for a direction, the key to show the help. Default is '?'.
+.lp getdir.self
+When asked for a direction, the key to target yourself. Default is '.'.
+.lp getdir.self2
+When asked for a direction, the key to target yourself. Default is 's'.
+.lp getpos.autodescribe
+When asked for a location, the key to toggle autodescribe. Default is '#'.
+.lp getpos.door.next
+When asked for a location, the key to go to next closest door or doorway. Default is 'd'.
+.lp getpos.door.prev
+When asked for a location, the key to go to previous closest door or doorway. Default is 'D'.
+.lp getpos.help
+When asked for a location, the key to show help. Default is '?'.
+.lp getpos.mon.next
+When asked for a location, the key to go to next closest monster. Default is 'm'.
+.lp getpos.mon.prev
+When asked for a location, the key to go to previous closest monster. Default is 'M'.
+.lp getpos.obj.next
+When asked for a location, the key to go to next closest object. Default is 'o'.
+.lp getpos.obj.prev
+When asked for a location, the key to go to previous closest object. Default is 'O'.
+.lp getpos.menu
+When asked for a location, show a menu of all interesting targets. Default is 'A'.
+.lp getpos.menu.cansee
+When asked for a location, show a menu of interesting targets in view. Default is 'a'.
+.lp getpos.pick
+When asked for a location, the key to choose the location, and possibly ask for more info. Default is '.'.
+.lp getpos.pick.once
+When asked for a location, the key to choose the location, and skip asking for more info. Default is ','.
+.lp getpos.pick.quick
+When asked for a location, the key to choose the location, skip asking for more info, and exit the location asking loop. Default is ';'.
+.lp getpos.pick.verbose
+When asked for a location, the key to choose the location, and show more info without asking. Default is ':'.
+.lp getpos.self
+When asked for a location, the key to go to your location. Default is '@'.
+.lp getpos.unexplored.next
+When asked for a location, the key to go to next closest unexplored location. Default is 'x'.
+.lp getpos.unexplored.prev
+When asked for a location, the key to go to previous closest unexplored location. Default is 'X'.
+.lp getpos.valid
+When asked for a location, the key to go to show valid target locations. Default is '$'.
+.lp nopickup
+Prefix key to move without picking up items. Default is 'm'.
+.lp redraw
+Key to redraw the screen. Default is '^R'.
+.lp redraw.numpad
+Key to redraw the screen. With number_pad only. Default is '^L'.
+.lp repeat
+Key to repeat previous command. Default is '^A'.
+.lp reqmenu
+Prefix key to request menu from some commands. Default is 'm'.
+.lp run
+Prefix key to run towards a direction. Default is 'G'.
+.lp run.nopickup
+Prefix key to run towards a direction without picking up items on the way. Default is 'M'.
+.lp run.numpad
+Prefix key to run towards a direction. With number_pad only. Default is '5'.
+.lp rush
+Prefix key to rush towards a direction. Default is 'g'.
+.hn 2
 Configuring Message Types
 .pg
 You can change the way the messages are shown in the message area, when
@@ -3285,6 +3584,7 @@ s	S_spider	(arachnid or centipede)
 *	S_ss4	(magic shield 4 of 4)
 ^	S_statue_trap	(statue trap)
 	S_stone	(dark part of a room)
+]	S_strange_obj	(strange object)
 -	S_sw_bc	(swallow bottom center)
 `\e'	S_sw_bl	(swallow bottom left)
 /	S_sw_br	(swallow bottom right)

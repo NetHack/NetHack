@@ -469,21 +469,21 @@ static char def_inv_order[MAXOCLASSES] = {
 typedef struct {
     const char *name;
     char cmd;
+    const char *desc;
 } menu_cmd_t;
 
-#define NUM_MENU_CMDS 11
-static const menu_cmd_t default_menu_cmd_info[NUM_MENU_CMDS] = {
-/* 0*/  { "menu_first_page", MENU_FIRST_PAGE },
-        { "menu_last_page", MENU_LAST_PAGE },
-        { "menu_next_page", MENU_NEXT_PAGE },
-        { "menu_previous_page", MENU_PREVIOUS_PAGE },
-        { "menu_select_all", MENU_SELECT_ALL },
-/* 5*/  { "menu_deselect_all", MENU_UNSELECT_ALL },
-        { "menu_invert_all", MENU_INVERT_ALL },
-        { "menu_select_page", MENU_SELECT_PAGE },
-        { "menu_deselect_page", MENU_UNSELECT_PAGE },
-        { "menu_invert_page", MENU_INVERT_PAGE },
-/*10*/  { "menu_search", MENU_SEARCH },
+static const menu_cmd_t default_menu_cmd_info[] = {
+ { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
+ { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
+ { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
+ { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+ { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
+ { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
+ { "menu_invert_all", MENU_INVERT_ALL, "Insert selection" },
+ { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
+ { "menu_deselect_page", MENU_UNSELECT_PAGE, "Unselect items in current page" },
+ { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
+ { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
 };
 
 /*
@@ -832,6 +832,10 @@ int maxlen;
  * The ^-prefix for control characters is also understood, and \[mM]
  * has the effect of 'meta'-ing the value which follows (so that the
  * alternate character set will be enabled).
+ *
+ * X     normal key X
+ * ^X    control-X
+ * \mX   meta-X
  *
  * For 3.4.3 and earlier, input ending with "\M", backslash, or caret
  * prior to terminating '\0' would pull that '\0' into the output and then
@@ -3233,7 +3237,7 @@ boolean tinitial, tfrom_file;
     }
 
     /* check for menu command mapping */
-    for (i = 0; i < NUM_MENU_CMDS; i++) {
+    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
         fullname = default_menu_cmd_info[i].name;
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -3241,7 +3245,6 @@ boolean tinitial, tfrom_file;
             if (negated) {
                 bad_negation(fullname, FALSE);
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
-                int j;
                 char c, op_buf[BUFSZ];
 
                 escapes(op, op_buf);
@@ -3475,6 +3478,56 @@ boolean tinitial, tfrom_file;
     badoption(opts);
 }
 
+/* parse key:command */
+void
+parsebindings(bindings)
+char* bindings;
+{
+    char *bind;
+    char key;
+    int i;
+
+    /* break off first binding from the rest; parse the rest */
+    if ((bind = index(bindings, ',')) != 0) {
+        *bind++ = 0;
+        parsebindings(bind);
+    }
+
+    /* parse a single binding: first split around : */
+    if (! (bind = index(bindings, ':'))) return; /* it's not a binding */
+    *bind++ = 0;
+
+    /* read the key to be bound */
+    key = txt2key(bindings);
+    if (!key) {
+        raw_printf("Bad binding %s.", bindings);
+        wait_synch();
+        return;
+    }
+
+    bind = trimspaces(bind);
+
+    /* is it a special key? */
+    if (bind_specialkey(key, bind))
+        return;
+
+    /* is it a menu command? */
+    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+        if (!strcmp(default_menu_cmd_info[i].name, bind)) {
+            if (illegal_menu_cmd_key(key)) {
+                char tmp[BUFSZ];
+                Sprintf(tmp, "Bad menu key %s:%s", visctrl(key), bind);
+                badoption(tmp);
+            } else
+                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+            return;
+        }
+    }
+
+    /* extended command? */
+    bind_key(key, bind);
+}
+
 static NEARDATA const char *menutype[] = { "traditional", "combination",
                                            "full", "partial" };
 
@@ -3525,6 +3578,18 @@ char from_ch, to_ch;
     }
 }
 
+char
+get_menu_cmd_key(ch)
+char ch;
+{
+    char *found = index(mapped_menu_op, ch);
+    if (found) {
+        int idx = (int) (found - mapped_menu_op);
+        ch = mapped_menu_cmds[idx];
+    }
+    return ch;
+}
+
 /*
  * Map the given character to its corresponding menu command.  If it
  * doesn't match anything, just return the original.
@@ -3539,6 +3604,57 @@ char ch;
         ch = mapped_menu_op[idx];
     }
     return ch;
+}
+
+void
+show_menu_controls(win, dolist)
+winid win;
+boolean dolist;
+{
+    char buf[BUFSZ];
+
+    putstr(win, 0, "Menu control keys:");
+    if (dolist) {
+        int i;
+        for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+            Sprintf(buf, "%-8s %s",
+                    visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
+                    default_menu_cmd_info[i].desc);
+            putstr(win, 0, buf);
+        }
+    } else {
+        putstr(win, 0, "");
+        putstr(win, 0, "          Page    All items");
+        Sprintf(buf, "  Select   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "Deselect   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "  Invert   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)));
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, "   Go to   %s   Next page",
+                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   Previous page",
+                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   First page",
+                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   Last page",
+                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)));
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, "           %s   Search and toggle matching entries",
+                visctrl(get_menu_cmd_key(MENU_SEARCH)));
+        putstr(win, 0, buf);
+    }
 }
 
 #if defined(MICRO) || defined(MAC) || defined(WIN32)

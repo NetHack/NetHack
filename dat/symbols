@@ -513,6 +513,7 @@ start: Blank
         S_ss4: \032
         S_statue_trap: \032
         S_stone: \032
+        S_strange_obj: \032
         S_sw_bc: \032
         S_sw_bl: \032
         S_sw_br: \032
