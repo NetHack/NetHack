@@ -3682,7 +3682,7 @@ boolean initial;
     static const int ylist[] = {
         'y', 'Y', C('y'), M('y'), M('Y'), M(C('y'))
     };
-    static struct ext_func_tab *back_dir_cmd[10];
+    static struct ext_func_tab *back_dir_cmd[8];
     const struct ext_func_tab *cmdtmp;
     boolean flagtemp;
     int c, i, updated = 0;
@@ -3698,7 +3698,7 @@ boolean initial;
     } else {
 
         if (backed_dir_cmd) {
-            for (i = 0; i < 10; i++) {
+            for (i = 0; i < 8; i++) {
                 Cmd.commands[(uchar) Cmd.dirchars[i]] = back_dir_cmd[i];
             }
         }
@@ -3773,7 +3773,7 @@ boolean initial;
     Cmd.move_SW = Cmd.dirchars[7];
 
     if (!initial) {
-        for (i = 0; i < 10; i++) {
+        for (i = 0; i < 8; i++) {
             back_dir_cmd[i] =
                 (struct ext_func_tab *) Cmd.commands[(uchar) Cmd.dirchars[i]];
             Cmd.commands[(uchar) Cmd.dirchars[i]] = (struct ext_func_tab *) 0;
