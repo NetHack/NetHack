@@ -34,11 +34,13 @@
    generate ways to escape from them */
 
 /* different level layout initializers */
-#define LVLINIT_NONE 0
-#define LVLINIT_SOLIDFILL 1
-#define LVLINIT_MAZEGRID 2
-#define LVLINIT_MINES 3
-#define LVLINIT_ROGUE 4
+enum lvlinit_types {
+    LVLINIT_NONE = 0,
+    LVLINIT_SOLIDFILL,
+    LVLINIT_MAZEGRID,
+    LVLINIT_MINES,
+    LVLINIT_ROGUE
+};
 
 /* max. layers of object containment */
 #define MAX_CONTAINMENT 10

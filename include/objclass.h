@@ -131,25 +131,28 @@ extern NEARDATA struct objdescr obj_descr[];
  * All objects have a class. Make sure that all classes have a corresponding
  * symbol below.
  */
-#define RANDOM_CLASS 0 /* used for generating random objects */
-#define ILLOBJ_CLASS 1
-#define WEAPON_CLASS 2
-#define ARMOR_CLASS 3
-#define RING_CLASS 4
-#define AMULET_CLASS 5
-#define TOOL_CLASS 6
-#define FOOD_CLASS 7
-#define POTION_CLASS 8
-#define SCROLL_CLASS 9
-#define SPBOOK_CLASS 10 /* actually SPELL-book */
-#define WAND_CLASS 11
-#define COIN_CLASS 12
-#define GEM_CLASS 13
-#define ROCK_CLASS 14
-#define BALL_CLASS 15
-#define CHAIN_CLASS 16
-#define VENOM_CLASS 17
-#define MAXOCLASSES 18
+enum obj_class_types {
+    RANDOM_CLASS = 0, /* used for generating random objects */
+    ILLOBJ_CLASS,
+    WEAPON_CLASS,
+    ARMOR_CLASS,
+    RING_CLASS,
+    AMULET_CLASS,
+    TOOL_CLASS,
+    FOOD_CLASS,
+    POTION_CLASS,
+    SCROLL_CLASS,
+    SPBOOK_CLASS, /* actually SPELL-book */
+    WAND_CLASS,
+    COIN_CLASS,
+    GEM_CLASS,
+    ROCK_CLASS,
+    BALL_CLASS,
+    CHAIN_CLASS,
+    VENOM_CLASS,
+
+    MAXOCLASSES
+};
 
 #define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class    */
 #define ALL_CLASSES (MAXOCLASSES + 2) /* input to getobj().                 */

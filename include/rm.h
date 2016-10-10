@@ -34,45 +34,47 @@
    defines array type_names[] which contains an entry for each of
    these, so needs to be kept in sync if any new types are added
    or existing ones renumbered.] */
-#define STONE 0
-#define VWALL 1
-#define HWALL 2
-#define TLCORNER 3
-#define TRCORNER 4
-#define BLCORNER 5
-#define BRCORNER 6
-#define CROSSWALL 7 /* For pretty mazes and special levels */
-#define TUWALL 8
-#define TDWALL 9
-#define TLWALL 10
-#define TRWALL 11
-#define DBWALL 12
-#define TREE 13 /* KMH */
-#define SDOOR 14
-#define SCORR 15
-#define POOL 16
-#define MOAT 17 /* pool that doesn't boil, adjust messages */
-#define WATER 18
-#define DRAWBRIDGE_UP 19
-#define LAVAPOOL 20
-#define IRONBARS 21 /* KMH */
-#define DOOR 22
-#define CORR 23
-#define ROOM 24
-#define STAIRS 25
-#define LADDER 26
-#define FOUNTAIN 27
-#define THRONE 28
-#define SINK 29
-#define GRAVE 30
-#define ALTAR 31
-#define ICE 32
-#define DRAWBRIDGE_DOWN 33
-#define AIR 34
-#define CLOUD 35
+enum levl_typ_types {
+    STONE = 0,
+    VWALL,
+    HWALL,
+    TLCORNER,
+    TRCORNER,
+    BLCORNER,
+    BRCORNER,
+    CROSSWALL, /* For pretty mazes and special levels */
+    TUWALL,
+    TDWALL,
+    TLWALL,
+    TRWALL,
+    DBWALL,
+    TREE, /* KMH */
+    SDOOR,
+    SCORR,
+    POOL,
+    MOAT, /* pool that doesn't boil, adjust messages */
+    WATER,
+    DRAWBRIDGE_UP,
+    LAVAPOOL,
+    IRONBARS, /* KMH */
+    DOOR,
+    CORR,
+    ROOM,
+    STAIRS,
+    LADDER,
+    FOUNTAIN,
+    THRONE,
+    SINK,
+    GRAVE,
+    ALTAR,
+    ICE,
+    DRAWBRIDGE_DOWN,
+    AIR,
+    CLOUD,
 
-#define MAX_TYPE 36
-#define INVALID_TYPE 127
+    MAX_TYPE,
+    INVALID_TYPE = 127
+};
 
 /*
  * Avoid using the level types in inequalities:

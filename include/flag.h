@@ -378,26 +378,30 @@ extern NEARDATA struct sysflag sysflags;
 #endif
 extern NEARDATA struct instance_flags iflags;
 
-/* last_msg values */
-#define PLNMSG_UNKNOWN             0 /* arbitrary */
-#define PLNMSG_ONE_ITEM_HERE       1 /* "you see <single item> here" */
-#define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
-#define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
-#define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
-#define PLNMSG_OBJNAM_ONLY         5 /* xname/doname only, for #tip */
-    /* Usage:
-     *  pline("some message");
-     *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
-     *  iflags.last_msg = PLNMSG_some_message;
-     * and subsequent code can adjust the next message if it is affected
-     * by some_message.  The next message will clear iflags.last_msg.
-     */
+/* last_msg values
+ * Usage:
+ *  pline("some message");
+ *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
+ *  iflags.last_msg = PLNMSG_some_message;
+ * and subsequent code can adjust the next message if it is affected
+ * by some_message.  The next message will clear iflags.last_msg.
+ */
+enum plnmsg_types {
+    PLNMSG_UNKNOWN = 0,         /* arbitrary */
+    PLNMSG_ONE_ITEM_HERE,       /* "you see <single item> here" */
+    PLNMSG_TOWER_OF_FLAME,      /* scroll of fire */
+    PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
+    PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
+    PLNMSG_OBJNAM_ONLY          /* xname/doname only, for #tip */
+};
 
 /* runmode options */
-#define RUN_TPORT 0 /* don't update display until movement stops */
-#define RUN_LEAP 1  /* update display every 7 steps */
-#define RUN_STEP 2  /* update display every single step */
-#define RUN_CRAWL 3 /* walk w/ extra delay after each update */
+enum runmode_types {
+    RUN_TPORT = 0, /* don't update display until movement stops */
+    RUN_LEAP,      /* update display every 7 steps */
+    RUN_STEP,      /* update display every single step */
+    RUN_CRAWL      /* walk w/ extra delay after each update */
+};
 
 /* paranoid confirmation prompting */
 /* any yes confirmations also require explicit no (or ESC) to reject */
