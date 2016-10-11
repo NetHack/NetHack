@@ -618,6 +618,96 @@ fixup_special()
     num_lregions = 0;
 }
 
+/* Create a maze with specified corridor width and wall thickness
+ * TODO: rewrite walkfrom so it works on temp space, not levl
+ */
+void
+create_maze(corrwid, wallthick)
+int corrwid;
+int wallthick;
+{
+    int x,y;
+    coord mm;
+    int tmp_xmax = x_maze_max;
+    int tmp_ymax = y_maze_max;
+    int rdx = 0;
+    int rdy = 0;
+    int scale;
+
+    if (wallthick < 1)
+        wallthick = 1;
+    else if (wallthick > 5)
+        wallthick = 5;
+
+    if (corrwid < 1)
+        corrwid = 1;
+    else if (corrwid > 5)
+        corrwid = 5;
+
+    scale = corrwid + wallthick;
+    rdx = (x_maze_max / scale);
+    rdy = (y_maze_max / scale);
+
+    if (level.flags.corrmaze)
+        for (x = 2; x < (rdx*2); x++)
+            for (y = 2; y < (rdy*2); y++)
+                levl[x][y].typ = STONE;
+    else
+        for (x = 2; x <= (rdx*2); x++)
+            for (y = 2; y <= (rdy*2); y++)
+                levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
+
+    /* set upper bounds for maze0xy and walkfrom */
+    x_maze_max = (rdx*2);
+    y_maze_max = (rdy*2);
+
+    /* create maze */
+    maze0xy(&mm);
+    walkfrom((int) mm.x, (int) mm.y, 0);
+
+    /* restore bounds */
+    x_maze_max = tmp_xmax;
+    y_maze_max = tmp_ymax;
+
+    /* scale maze up if needed */
+    if (scale > 2) {
+        char tmpmap[COLNO][ROWNO];
+        int rx = 1,ry = 1;
+
+        /* back up the existing smaller maze */
+        for (x = 1; x < x_maze_max; x++)
+            for (y = 1; y < y_maze_max; y++) {
+                tmpmap[x][y] = levl[x][y].typ;
+            }
+
+        /* do the scaling */
+        rx = x = 2;
+        while (rx < x_maze_max) {
+            int mx = (x % 2) ? corrwid
+                : ((x == 2 || x == ((rdx*2))) ? 1 : wallthick);
+            ry = y = 2;
+            while (ry < y_maze_max) {
+                int dx = 0, dy = 0;
+                int my = (y % 2) ? corrwid
+                    : ((y == 2 || y == ((rdy*2))) ? 1 : wallthick);
+                for (dx = 0; dx < mx; dx++)
+                    for (dy = 0; dy < my; dy++) {
+                        if (rx+dx >= x_maze_max
+                            || ry+dy >= y_maze_max)
+                            break;
+                        levl[rx + dx][ry + dy].typ = tmpmap[x][y];
+                    }
+                ry += my;
+                y++;
+            }
+            rx += mx;
+            x++;
+        }
+
+    }
+}
+
+
 void
 makemaz(s)
 const char *s;
@@ -686,19 +776,12 @@ const char *s;
     level.flags.is_maze_lev = TRUE;
     level.flags.corrmaze = !rn2(3);
 
-    if (level.flags.corrmaze)
-        for (x = 2; x < x_maze_max; x++)
-            for (y = 2; y < y_maze_max; y++)
-                levl[x][y].typ = STONE;
-    else
-        for (x = 2; x <= x_maze_max; x++)
-            for (y = 2; y <= y_maze_max; y++)
-                levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
-
-    maze0xy(&mm);
-    walkfrom((int) mm.x, (int) mm.y, 0);
-    /* put a boulder at the maze center */
-    (void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
+    if (!Invocation_lev(&u.uz) && rn2(2)) {
+        int corrscale = rnd(4);
+        create_maze(corrscale,rnd(4)-corrscale);
+    } else {
+        create_maze(1,1);
+    }
 
     if (!level.flags.corrmaze)
         wallification(2, 2, x_maze_max, y_maze_max);
@@ -880,8 +963,8 @@ coord *cc;
     int cpt = 0;
 
     do {
-        cc->x = 3 + 2 * rn2((x_maze_max >> 1) - 1);
-        cc->y = 3 + 2 * rn2((y_maze_max >> 1) - 1);
+        cc->x = 1 + rn2(x_maze_max);
+        cc->y = 1 + rn2(y_maze_max);
         cpt++;
     } while (cpt < 100
              && levl[cc->x][cc->y].typ
@@ -890,10 +973,10 @@ coord *cc;
         int x, y;
 
         /* last try */
-        for (x = 0; x < (x_maze_max >> 1) - 1; x++)
-            for (y = 0; y < (y_maze_max >> 1) - 1; y++) {
-                cc->x = 3 + 2 * x;
-                cc->y = 3 + 2 * y;
+        for (x = 1; x < x_maze_max; x++)
+            for (y = 1; y < y_maze_max; y++) {
+                cc->x = x;
+                cc->y = y;
                 if (levl[cc->x][cc->y].typ
                     == (level.flags.corrmaze ? CORR : ROOM))
                     return;
