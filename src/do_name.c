@@ -415,6 +415,7 @@ boolean fovonly;
     gather_locs(&garr, &gcount,
                 fovonly ? GLOC_INTERESTING_FOV : GLOC_INTERESTING);
     if (gcount < 2) { /* gcount always includes the hero */
+        free((genericptr_t) garr);
         You("cannot %s anything interesting.", fovonly ? "see" : "detect");
         return FALSE;
     }
