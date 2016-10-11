@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "lev.h"
 #include "func_tab.h"
 
 #ifdef ALTMETA
@@ -123,6 +124,7 @@ STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_map);
+STATIC_PTR int NDECL(wiz_makemap);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
@@ -608,6 +610,21 @@ wiz_identify(VOID_ARGS)
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_identify)));
     return 0;
+}
+
+STATIC_PTR int
+wiz_makemap(VOID_ARGS)
+{
+    if (wizard) {
+        savelev(-1, ledger_no(&u.uz), FREE_SAVE);
+        mklev();
+        reglyph_darkroom();
+        vision_reset();
+        vision_full_recalc = 1;
+        (void) safe_teleds(TRUE);
+        docrt();
+        flush_screen(1);
+    }
 }
 
 /* ^F command - reveal the level map and any traps on it */
@@ -2812,6 +2829,7 @@ struct ext_func_tab extcmdlist[] = {
     { C('i'), "wizidentify", "identify all items in inventory", wiz_identify, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizintrinsic", "set intrinsic", wiz_intrinsic, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { C('v'), "wizlevelport", "teleport to another level", wiz_level_tele, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
+    { '\0', "wizmakemap", "recreate the current level", wiz_makemap, IFBURIED|WIZMODECMD },
     { C('f'), "wizmap", "map the level", wiz_map, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizsmell", "smell monster", wiz_smell, IFBURIED|AUTOCOMPLETE|WIZMODECMD },

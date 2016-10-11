@@ -20,6 +20,7 @@ Debug-Mode Quick Reference:
 #timeout == look at timeout queue
 #vision == show vision array
 #vanquished == disclose counts of dead monsters
+#wizmakemap == recreate the current level
 #wizsmell == smell a monster
 #wizintrinsic == set selected intrinsic timeouts
 #wizrumorcheck == validate first and last rumor for true and false set
