@@ -329,8 +329,9 @@ doextcmd(VOID_ARGS)
             return 0;
         }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
-            pline("'%s' prefix has no effect for this command.",
-                  visctrl(Cmd.spkeys[NHKF_REQMENU]));
+            pline("'%s' prefix has no effect for the %s command.",
+                  visctrl(Cmd.spkeys[NHKF_REQMENU]),
+                  extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
         }
         retval = (*func)();
@@ -346,13 +347,18 @@ doextlist(VOID_ARGS)
     register const struct ext_func_tab *efp;
     char buf[BUFSZ];
     winid datawin;
+    char ch = cmd_from_func(doextcmd);
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
     putstr(datawin, 0, "            Extended Commands List");
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "    Press '#', then type:");
-    putstr(datawin, 0, "");
+    if (ch) {
+        Sprintf(buf, "    Press '%s', then type:",
+                visctrl(ch));
+        putstr(datawin, 0, buf);
+        putstr(datawin, 0, "");
+    }
 
     for (efp = extcmdlist; efp->ef_txt; efp++) {
         if (!wizard && (efp->flags & WIZMODECMD))
