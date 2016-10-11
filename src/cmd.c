@@ -631,6 +631,7 @@ wiz_makemap(VOID_ARGS)
         docrt();
         flush_screen(1);
     }
+    return 0;
 }
 
 /* ^F command - reveal the level map and any traps on it */
