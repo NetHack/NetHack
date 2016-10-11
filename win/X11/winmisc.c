@@ -732,7 +732,7 @@ int ec_indx; /* might be greater than extended_cmd_selected */
     float s_min, s_max;
     Dimension h, hh, wh, vh; /* widget and viewport heights */
     Dimension border_width;
-    int distance;
+    int distance = 0;
     boolean force_top = (ec_indx < 0);
 
     /*
