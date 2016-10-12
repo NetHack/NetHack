@@ -618,6 +618,57 @@ fixup_special()
     num_lregions = 0;
 }
 
+boolean
+maze_inbounds(x,y)
+int x,y;
+{
+    return (x >= 2 && y >= 2
+            && x < x_maze_max && y < y_maze_max && isok(x,y));
+}
+
+void
+maze_remove_deadends(typ)
+xchar typ;
+{
+    int x,y, dir;
+    for (x = 2; x < x_maze_max; x++)
+        for (y = 2; y < y_maze_max; y++)
+            if (ACCESSIBLE(levl[x][y].typ) && (x % 2) && (y % 2)) {
+                char dirok[4];
+                int idx = 0;
+                int idx2 = 0;
+                for (dir = 0; dir < 4; dir++) {
+                    int dx = x;
+                    int dy = y;
+                    int dx2 = x;
+                    int dy2 = y;
+                    mz_move(dx,dy, dir);
+                    if (!maze_inbounds(dx,dy)) {
+                        idx2++;
+                        continue;
+                    }
+                    mz_move(dx2,dy2, dir);
+                    mz_move(dx2,dy2, dir);
+                    if (!maze_inbounds(dx2,dy2)) {
+                        idx2++;
+                        continue;
+                    }
+                    if (!ACCESSIBLE(levl[dx][dy].typ)
+                        && ACCESSIBLE(levl[dx2][dy2].typ)) {
+                        dirok[idx++] = dir;
+                        idx2++;
+                    }
+                }
+                if (idx2 >= 3 && idx > 0) {
+                    dir = dirok[rn2(idx)];
+                    int dx = x;
+                    int dy = y;
+                    mz_move(dx,dy, dir);
+                    levl[dx][dy].typ = typ;
+                }
+            }
+}
+
 /* Create a maze with specified corridor width and wall thickness
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
@@ -664,6 +715,9 @@ int wallthick;
     /* create maze */
     maze0xy(&mm);
     walkfrom((int) mm.x, (int) mm.y, 0);
+
+    if (!rn2(5))
+        maze_remove_deadends((level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
     x_maze_max = tmp_xmax;
