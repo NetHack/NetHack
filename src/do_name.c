@@ -44,6 +44,32 @@ void FDECL((*f), (int));
     getpos_hilitefunc = f;
 }
 
+const char *const gloc_descr[NUM_GLOCS][4] = {
+    { "any monsters", "monster", "next monster", "monsters" },
+    { "any items", "item", "next object", "objects" },
+    { "any doors", "door", "next door or doorway", "doors or doorways" },
+    { "any unexplored areas", "unexplored area", "unexplored location", "unexplored locations" },
+    { "anything interesting", "interesting thing", "anything interesting", "anything interesting" }
+};
+
+
+void
+getpos_help_keyxhelp(tmpwin, k1,k2,gloc)
+winid tmpwin;
+const char *k1;
+const char *k2;
+int gloc;
+{
+    char sbuf[BUFSZ];
+    Sprintf(sbuf, "Use '%s' or '%s' to %s%s%s.",
+            k1, k2,
+            iflags.getloc_usemenu ? "get a menu of "
+            : "move the cursor to ",
+            gloc_descr[gloc][2 + iflags.getloc_usemenu],
+            iflags.getloc_limitview ? " in view" : "");
+    putstr(tmpwin, 0, sbuf);
+}
+
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
 getpos_help(force, goal)
@@ -63,36 +89,38 @@ const char *goal;
            visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
-        Sprintf(sbuf, "Use '%s' or '%s' to move the cursor to next monster.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
-                visctrl(Cmd.spkeys[NHKF_GETPOS_MON_PREV]));
-        putstr(tmpwin, 0, sbuf);
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_MON_PREV]),
+                             GLOC_MONS);
     }
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
-        Sprintf(sbuf, "Use '%s' or '%s' to move the cursor to next object.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
-                visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]));
-        putstr(tmpwin, 0, sbuf);
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]),
+                             GLOC_OBJS);
     }
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
-        /* both of these are primarily useful when choosing a travel
+        /* these are primarily useful when choosing a travel
            destination for the '_' command */
-        Sprintf(sbuf,
-                "Use '%s' or '%s' to move the cursor to next door or doorway.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
-                visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]));
-        putstr(tmpwin, 0, sbuf);
-        Sprintf(sbuf,
-                "Use '%s' or '%s' to move the cursor to unexplored location.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
-                visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]));
-        putstr(tmpwin, 0, sbuf);
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
+                             GLOC_DOOR);
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
+                             GLOC_EXPLORE);
+        getpos_help_keyxhelp(tmpwin,
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
+                             visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
+                             GLOC_INTERESTING);
     }
-    Sprintf(sbuf, "Use '%s' for a menu of interesting targets in view.",
-            visctrl(Cmd.spkeys[NHKF_GETPOS_MENU_FOV]));
-    putstr(tmpwin, 0, sbuf);
-    Sprintf(sbuf, "Use '%s' for a menu of all interesting targets.",
+    Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+    putstr(tmpwin, 0, sbuf);
+    Sprintf(sbuf, "Use '%s' to toggle limiting possible targets to in view only.",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
@@ -174,19 +202,6 @@ const void *b;
     return dist_1 - dist_2;
 }
 
-enum gloctypes {
-    GLOC_MONS = 0,
-    GLOC_OBJS,
-    GLOC_DOOR,
-    GLOC_EXPLORE,
-
-    NUM_GLOCS,
-
-    GLOC_INTERESTING,
-    GLOC_INTERESTING_FOV
-};
-
-
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
      && glyph_is_cmap(levl[(x)][(y)].glyph)             \
@@ -201,6 +216,9 @@ int x,y, gloc;
      *       in order to keep tail/boulder/rock check simple.
      */
     int glyph = glyph_at(x, y);
+
+    if (iflags.getloc_limitview && !cansee(x,y))
+        return FALSE;
 
     switch (gloc) {
     default:
@@ -231,9 +249,6 @@ int x,y, gloc;
                     || IS_UNEXPLORED_LOC(x - 1, y)
                     || IS_UNEXPLORED_LOC(x, y + 1)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
-    case GLOC_INTERESTING_FOV:
-        if (!cansee(x,y))
-            return FALSE;
     case GLOC_INTERESTING:
         return gather_locs_interesting(x,y, GLOC_DOOR)
             || !(glyph_is_cmap(glyph)
@@ -400,9 +415,10 @@ int cx, cy;
 }
 
 boolean
-getpos_menu(ccp, fovonly)
+getpos_menu(ccp, fovonly, gloc)
 coord *ccp;
 boolean fovonly;
+int gloc;
 {
     coord *garr = DUMMY;
     int gcount = 0;
@@ -412,11 +428,12 @@ boolean fovonly;
     menu_item *picks = (menu_item *) 0;
     char tmpbuf[BUFSZ];
 
-    gather_locs(&garr, &gcount,
-                fovonly ? GLOC_INTERESTING_FOV : GLOC_INTERESTING);
+    gather_locs(&garr, &gcount, gloc);
+
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
-        You("cannot %s anything interesting.", fovonly ? "see" : "detect");
+        You("cannot %s %s.",
+            fovonly ? "see" : "detect", gloc_descr[gloc][0]);
         return FALSE;
     }
 
@@ -424,7 +441,8 @@ boolean fovonly;
     start_menu(tmpwin);
     any = zeroany;
 
-    for (i = 0; i < gcount; i++) {
+    /* gather_locs returns array[0] == you. skip it. */
+    for (i = 1; i < gcount; i++) {
         char fullbuf[BUFSZ];
         coord tmpcc;
         const char *firstmatch = "unknown";
@@ -440,8 +458,8 @@ boolean fovonly;
         }
     }
 
-    Sprintf(tmpbuf, "Pick a target%s%s",
-            fovonly ? " in view" : "",
+    Sprintf(tmpbuf, "Pick a target %s%s%s",
+            gloc_descr[gloc][1], fovonly ? " in view" : "",
             iflags.getloc_travelmode ? " for travel" : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -478,10 +496,12 @@ const char *goal;
         NHKF_GETPOS_DOOR_NEXT,
         NHKF_GETPOS_DOOR_PREV,
         NHKF_GETPOS_UNEX_NEXT,
-        NHKF_GETPOS_UNEX_PREV
+        NHKF_GETPOS_UNEX_PREV,
+        NHKF_GETPOS_INTERESTING_NEXT,
+        NHKF_GETPOS_INTERESTING_PREV
     };
     char pick_chars[6];
-    char mMoOdDxX[9];
+    char mMoOdDxX[11];
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
@@ -618,13 +638,24 @@ const char *goal;
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]
-                   || c == Cmd.spkeys[NHKF_GETPOS_MENU_FOV]) {
-            coord tmpcrd;
-            if (getpos_menu(&tmpcrd, (c == Cmd.spkeys[NHKF_GETPOS_MENU_FOV]))) {
-                cx = tmpcrd.x;
-                cy = tmpcrd.y;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
+            iflags.getloc_limitview = !iflags.getloc_limitview;
+            for (i = 0; i < NUM_GLOCS; i++) {
+                if (garr[i]) {
+                    free((genericptr_t) garr[i]);
+                    garr[i] = NULL;
+                }
+                gidx[i] = gcount[i] = 0;
             }
+            pline("%s possible targets to those in sight only.",
+                  iflags.getloc_limitview ? "Limiting" : "Not limiting");
+            msg_given = TRUE;
+            goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
+            iflags.getloc_usemenu = !iflags.getloc_usemenu;
+            pline("%s a menu to show possible targets.",
+                  iflags.getloc_usemenu ? "Using" : "Not using");
+            msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
             /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
@@ -638,6 +669,15 @@ const char *goal;
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
                 gloc = gtmp >> 1;             /* 0..3 */
+
+            if (iflags.getloc_usemenu) {
+                coord tmpcrd;
+                if (getpos_menu(&tmpcrd, iflags.getloc_limitview, gloc)) {
+                    cx = tmpcrd.x;
+                    cy = tmpcrd.y;
+                }
+                goto nxtc;
+            }
 
             if (!garr[gloc]) {
                 gather_locs(&garr[gloc], &gcount[gloc], gloc);

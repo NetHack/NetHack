@@ -2910,6 +2910,14 @@ The
 option is also used with
 the `/m', `/M', `/o', and `/O' sub-commands of `/',
 where the `none' setting is overridden with `map'.
+.lp whatis_inview
+When getting a location on the map, and using the keys to cycle through
+next and previous targets, limit the possible targets to those in view.
+(default off)
+.lp whatis_menu
+When getting a location on the map, and using a key to cycle through
+next and previous targets, use a menu instead to pick a target.
+(default off)
 .lp windowtype
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
@@ -3201,6 +3209,10 @@ When asked for a direction, the key to target yourself. Default is '.'.
 When asked for a direction, the key to target yourself. Default is 's'.
 .lp getpos.autodescribe
 When asked for a location, the key to toggle autodescribe. Default is '#'.
+.lp getpos.all.next
+When asked for a location, the key to go to next closest interesting thing. Default is 'a'.
+.lp getpos.all.prev
+When asked for a location, the key to go to previous closest interesting thing. Default is 'A'.
 .lp getpos.door.next
 When asked for a location, the key to go to next closest door or doorway. Default is 'd'.
 .lp getpos.door.prev
@@ -3216,9 +3228,9 @@ When asked for a location, the key to go to next closest object. Default is 'o'.
 .lp getpos.obj.prev
 When asked for a location, the key to go to previous closest object. Default is 'O'.
 .lp getpos.menu
-When asked for a location, show a menu of all interesting targets. Default is 'A'.
-.lp getpos.menu.cansee
-When asked for a location, show a menu of interesting targets in view. Default is 'a'.
+When asked for a location, and using one of the next or previous keys to cycle through targets, toggle showing a menu instead. Default is '!'.
+.lp getpos.inview
+When asked for a location, and using one of the next or previous keys to cycle through targets, toggle limiting possible targets to those in view only. Default is '"'.
 .lp getpos.pick
 When asked for a location, the key to choose the location, and possibly ask for more info. Default is '.'.
 .lp getpos.pick.once

@@ -194,6 +194,8 @@ struct instance_flags {
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     boolean getloc_travelmode;
+    boolean getloc_limitview;
+    boolean getloc_usemenu;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
@@ -471,11 +473,23 @@ enum nh_keyfunc {
     NHKF_GETPOS_DOOR_PREV,
     NHKF_GETPOS_UNEX_NEXT,
     NHKF_GETPOS_UNEX_PREV,
+    NHKF_GETPOS_INTERESTING_NEXT,
+    NHKF_GETPOS_INTERESTING_PREV,
     NHKF_GETPOS_HELP,
     NHKF_GETPOS_MENU,
-    NHKF_GETPOS_MENU_FOV,
+    NHKF_GETPOS_LIMITVIEW,
 
     NUM_NHKF
+};
+
+enum gloctypes {
+    GLOC_MONS = 0,
+    GLOC_OBJS,
+    GLOC_DOOR,
+    GLOC_EXPLORE,
+    GLOC_INTERESTING,
+
+    NUM_GLOCS
 };
 
 /* commands[] is used to directly access cmdlist[] instead of looping

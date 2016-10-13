@@ -3544,9 +3544,11 @@ struct {
     { NHKF_GETPOS_DOOR_PREV, 'D', "getpos.door.prev" },
     { NHKF_GETPOS_UNEX_NEXT, 'x', "getpos.unexplored.next" },
     { NHKF_GETPOS_UNEX_PREV, 'X', "getpos.unexplored.prev" },
+    { NHKF_GETPOS_INTERESTING_NEXT, 'a', "getpos.all.next" },
+    { NHKF_GETPOS_INTERESTING_PREV, 'A', "getpos.all.prev" },
     { NHKF_GETPOS_HELP,      '?', "getpos.help" },
-    { NHKF_GETPOS_MENU,      'A', "getpos.menu" },
-    { NHKF_GETPOS_MENU_FOV,  'a', "getpos.menu.cansee" }
+    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.inview" },
+    { NHKF_GETPOS_MENU,      '!', "getpos.menu" }
 };
 
 boolean
@@ -4727,7 +4729,7 @@ dotravel(VOID_ARGS)
     }
     iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
-        if (!getpos_menu(&cc, TRUE)) {
+        if (!getpos_menu(&cc, TRUE, GLOC_INTERESTING)) {
             iflags.getloc_travelmode = FALSE;
             return 0;
         }
