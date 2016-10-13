@@ -48,23 +48,26 @@ const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next monster", "monsters" },
     { "any items", "item", "next object", "objects" },
     { "any doors", "door", "next door or doorway", "doors or doorways" },
-    { "any unexplored areas", "unexplored area", "unexplored location", "unexplored locations" },
-    { "anything interesting", "interesting thing", "anything interesting", "anything interesting" }
+    { "any unexplored areas", "unexplored area", "unexplored location",
+      "unexplored locations" },
+    { "anything interesting", "interesting thing", "anything interesting",
+      "anything interesting" }
 };
 
 
 void
-getpos_help_keyxhelp(tmpwin, k1,k2,gloc)
+getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
 winid tmpwin;
 const char *k1;
 const char *k2;
 int gloc;
 {
     char sbuf[BUFSZ];
+
     Sprintf(sbuf, "Use '%s' or '%s' to %s%s%s.",
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of "
-            : "move the cursor to ",
+                                  : "move the cursor to ",
             gloc_descr[gloc][2 + iflags.getloc_usemenu],
             iflags.getloc_limitview ? " in view" : "");
     putstr(tmpwin, 0, sbuf);
@@ -80,10 +83,12 @@ const char *goal;
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
-    Sprintf(sbuf, "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
+    Sprintf(sbuf,
+            "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0, "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
+    putstr(tmpwin, 0,
+           "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
            visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
@@ -119,7 +124,8 @@ const char *goal;
     Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
     putstr(tmpwin, 0, sbuf);
-    Sprintf(sbuf, "Use '%s' to toggle limiting possible targets to in view only.",
+    Sprintf(sbuf,
+            "Use '%s' to toggle limiting possible targets to in view only.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode) {
@@ -155,7 +161,7 @@ const char *goal;
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             Sprintf(sbuf,
-                    "  '%s' describe current spot, show 'more info', move to another spot.",
+       "  '%s' describe current spot, show 'more info', move to another spot.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,

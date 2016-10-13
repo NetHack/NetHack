@@ -619,37 +619,38 @@ fixup_special()
 }
 
 boolean
-maze_inbounds(x,y)
-int x,y;
+maze_inbounds(x, y)
+int x, y;
 {
     return (x >= 2 && y >= 2
-            && x < x_maze_max && y < y_maze_max && isok(x,y));
+            && x < x_maze_max && y < y_maze_max && isok(x, y));
 }
 
 void
 maze_remove_deadends(typ)
 xchar typ;
 {
-    int x,y, dir;
+    char dirok[4];
+    int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
+
+    dirok[0] = 0; /* lint suppression */
     for (x = 2; x < x_maze_max; x++)
         for (y = 2; y < y_maze_max; y++)
             if (ACCESSIBLE(levl[x][y].typ) && (x % 2) && (y % 2)) {
-                char dirok[4];
-                int idx = 0;
-                int idx2 = 0;
+                idx = idx2 = 0;
                 for (dir = 0; dir < 4; dir++) {
-                    int dx = x;
-                    int dy = y;
-                    int dx2 = x;
-                    int dy2 = y;
-                    mz_move(dx,dy, dir);
-                    if (!maze_inbounds(dx,dy)) {
+                    /* note: mz_move() is a macro which modifies
+                       one of its first two parameters */
+                    dx = dx2 = x;
+                    dy = dy2 = y;
+                    mz_move(dx, dy, dir);
+                    if (!maze_inbounds(dx, dy)) {
                         idx2++;
                         continue;
                     }
-                    mz_move(dx2,dy2, dir);
-                    mz_move(dx2,dy2, dir);
-                    if (!maze_inbounds(dx2,dy2)) {
+                    mz_move(dx2, dy2, dir);
+                    mz_move(dx2, dy2, dir);
+                    if (!maze_inbounds(dx2, dy2)) {
                         idx2++;
                         continue;
                     }
@@ -660,10 +661,10 @@ xchar typ;
                     }
                 }
                 if (idx2 >= 3 && idx > 0) {
+                    dx = x;
+                    dy = y;
                     dir = dirok[rn2(idx)];
-                    int dx = x;
-                    int dy = y;
-                    mz_move(dx,dy, dir);
+                    mz_move(dx, dy, dir);
                     levl[dx][dy].typ = typ;
                 }
             }
@@ -700,17 +701,17 @@ int wallthick;
     rdy = (y_maze_max / scale);
 
     if (level.flags.corrmaze)
-        for (x = 2; x < (rdx*2); x++)
-            for (y = 2; y < (rdy*2); y++)
+        for (x = 2; x < (rdx * 2); x++)
+            for (y = 2; y < (rdy * 2); y++)
                 levl[x][y].typ = STONE;
     else
-        for (x = 2; x <= (rdx*2); x++)
-            for (y = 2; y <= (rdy*2); y++)
+        for (x = 2; x <= (rdx * 2); x++)
+            for (y = 2; y <= (rdy * 2); y++)
                 levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
 
     /* set upper bounds for maze0xy and walkfrom */
-    x_maze_max = (rdx*2);
-    y_maze_max = (rdy*2);
+    x_maze_max = (rdx * 2);
+    y_maze_max = (rdy * 2);
 
     /* create maze */
     maze0xy(&mm);
@@ -726,7 +727,7 @@ int wallthick;
     /* scale maze up if needed */
     if (scale > 2) {
         char tmpmap[COLNO][ROWNO];
-        int rx = 1,ry = 1;
+        int rx = 1, ry = 1;
 
         /* back up the existing smaller maze */
         for (x = 1; x < x_maze_max; x++)
@@ -738,12 +739,14 @@ int wallthick;
         rx = x = 2;
         while (rx < x_maze_max) {
             int mx = (x % 2) ? corrwid
-                : ((x == 2 || x == ((rdx*2))) ? 1 : wallthick);
+                             : ((x == 2 || x == (rdx * 2)) ? 1
+                                                           : wallthick);
             ry = y = 2;
             while (ry < y_maze_max) {
                 int dx = 0, dy = 0;
                 int my = (y % 2) ? corrwid
-                    : ((y == 2 || y == ((rdy*2))) ? 1 : wallthick);
+                                 : ((y == 2 || y == (rdy * 2)) ? 1
+                                                               : wallthick);
                 for (dx = 0; dx < mx; dx++)
                     for (dy = 0; dy < my; dy++) {
                         if (rx+dx >= x_maze_max
