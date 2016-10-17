@@ -257,8 +257,7 @@ xchar x, y;
  * Ignore headstones, in case the player names herself "Elbereth".
  *
  * If strict checking is requested, the word is only considered to be
- * present if it is intact and is the first word in the engraving.
- * ("Elbereth burrito" matches; "o Elbereth" does not.)
+ * present if it is intact and is the entire content of the engraving.
  */
 int
 sengr_at(s, x, y, strict)
@@ -269,7 +268,7 @@ boolean strict;
     register struct engr *ep = engr_at(x, y);
 
     if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
-        return strict ? (strncmpi(ep->engr_txt, s, strlen(s)) == 0)
+        return strict ? (fuzzymatch(ep->engr_txt, s, "", TRUE))
                       : (strstri(ep->engr_txt, s) != 0);
     }
     return FALSE;
