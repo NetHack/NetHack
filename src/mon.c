@@ -2593,7 +2593,21 @@ setmangry(mtmp, via_attack)
 struct monst *mtmp;
 boolean via_attack;
 {
-    (void) via_attack; /* AIS: not used yet */
+    if (via_attack && sengr_at("Elbereth", u.ux, u.uy, TRUE)) {
+        You_feel("like a hypocrite.");
+        /* AIS: Yes, I know alignment penalties and bonuses aren't balanced at
+           the moment. This is about correct relative to other "small"
+           penalties; it should be fairly large, as attacking while standing on
+           an Elbereth means that you're requesting peace and then violating
+           your own request. I know 5 isn't actually large, but it's
+           intentionally larger than the 1s and 2s that are normally given for
+           this sort of thing. */
+        adjalign(-5);
+        if (!Blind)
+            pline("The engraving beneath you fades.");
+        del_engr_at(u.ux, u.uy);
+    }
+
     /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
