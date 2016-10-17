@@ -1488,7 +1488,7 @@ boolean your_fault;
         /* target might have been killed */
         if (mon->mhp > 0) {
             if (angermon)
-                wakeup(mon);
+                wakeup(mon, TRUE);
             else
                 mon->msleeping = 0;
         }

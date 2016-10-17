@@ -2695,7 +2695,7 @@ struct obj *obj;
                 pline1(msg_slipsfree);
             }
             if (mtmp)
-                wakeup(mtmp);
+                wakeup(mtmp, TRUE);
         } else
             pline1(msg_snap);
 
@@ -2789,7 +2789,7 @@ struct obj *obj;
             } else {
                 pline1(msg_slipsfree);
             }
-            wakeup(mtmp);
+            wakeup(mtmp, TRUE);
         } else {
             if (mtmp->m_ap_type && !Protection_from_shape_changers
                 && !sensemon(mtmp))

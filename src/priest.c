@@ -795,7 +795,8 @@ angry_priest()
     if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {
         struct epri *eprip = EPRI(priest);
 
-        wakeup(priest);
+        wakeup(priest, FALSE);
+        setmangry(priest, FALSE);
         /*
          * If the altar has been destroyed or converted, let the
          * priest run loose.

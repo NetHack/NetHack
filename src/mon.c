@@ -2583,10 +2583,18 @@ struct monst *mtmp;
     }
 }
 
+/* Called whenever the player attacks mtmp; also called in other situations
+   where mtmp gets annoyed at the player. Handles mtmp getting annoyed at the
+   attack and any ramifications that might have. Useful also in situations where
+   mtmp was already hostile; it checks for situations where the player shouldn't
+   be attacking and any ramifications /that/ might have. */
 void
-setmangry(mtmp)
+setmangry(mtmp, via_attack)
 struct monst *mtmp;
+boolean via_attack;
 {
+    (void) via_attack; /* AIS: not used yet */
+    /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
         return;
@@ -2681,14 +2689,16 @@ struct monst *mtmp;
 
 }
 
-/* wake up a monster, usually making it angry in the process */
+/* wake up a monster, possibly making it angry in the process */
 void
-wakeup(mtmp)
+wakeup(mtmp, via_attack)
 register struct monst *mtmp;
+boolean via_attack;
 {
     mtmp->msleeping = 0;
     finish_meating(mtmp);
-    setmangry(mtmp);
+    if (via_attack)
+        setmangry(mtmp, TRUE);
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
     } else if (context.forcefight && !context.mon_moving

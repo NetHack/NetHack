@@ -400,7 +400,7 @@ invault()
                 }
                 mongone(guard);
             } else {
-                setmangry(guard);
+                setmangry(guard, FALSE);
                 if (Deaf) {
                    if (!Blind)
                         pline("%s mouths something and looks very angry!",
