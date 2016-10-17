@@ -2603,6 +2603,7 @@ boolean via_attack;
            intentionally larger than the 1s and 2s that are normally given for
            this sort of thing. */
         adjalign(-5);
+
         if (!Blind)
             pline("The engraving beneath you fades.");
         del_engr_at(u.ux, u.uy);
