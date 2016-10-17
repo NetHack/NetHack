@@ -271,6 +271,7 @@ boolean strict;
         return strict ? (fuzzymatch(ep->engr_txt, s, "", TRUE))
                       : (strstri(ep->engr_txt, s) != 0);
     }
+
     return FALSE;
 }
 
