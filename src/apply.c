@@ -3210,8 +3210,8 @@ struct obj *obj;
         You("don't have the strength to break %s!", yname(obj));
         return 0;
     }
-    pline("Raising %s high above your %s, you break it in two!", yname(obj),
-          body_part(HEAD));
+    pline("Raising %s high above your %s, you %s it in two!", yname(obj),
+          body_part(HEAD), is_fragile ? "snap" : "break");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.
