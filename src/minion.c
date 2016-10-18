@@ -57,6 +57,13 @@ struct monst *mon;
 
     if (mon) {
         ptr = mon->data;
+
+        if (uwep && uwep->oartifact == ART_DEMONBANE && is_demon(ptr)) {
+            if (canseemon(mon))
+                pline("%s looks puzzled for a moment.", Monnam(mon));
+            return 0;
+        }
+
         atyp = mon->ispriest ? EPRI(mon)->shralign
                              : mon->isminion ? EMIN(mon)->min_align
                                              : (ptr->maligntyp == A_NONE)
