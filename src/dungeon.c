@@ -62,6 +62,7 @@ STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
+STATIC_DCL mapseen *FDECL(find_mapseen_by_str, (const char *));
 STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
 STATIC_DCL void FDECL(traverse_mapseenchn, (BOOLEAN_P, winid,
@@ -1642,25 +1643,35 @@ const char *nam;
     const char *p;
     int idx, idxtoo;
     char buf[BUFSZ];
+    mapseen *mseen;
 
-    /* allow strings like "the oracle level" to find "oracle" */
-    if (!strncmpi(nam, "the ", 4))
-        nam += 4;
-    if ((p = strstri(nam, " level")) != 0 && p == eos((char *) nam) - 6) {
-        nam = strcpy(buf, nam);
-        *(eos(buf) - 6) = '\0';
-    }
-    /* hell is the old name, and wouldn't match; gehennom would match its
-       branch, yielding the castle level instead of the valley of the dead */
-    if (!strcmpi(nam, "gehennom") || !strcmpi(nam, "hell")) {
-        if (In_V_tower(&u.uz))
-            nam = " to Vlad's tower"; /* branch to... */
-        else
-            nam = "valley";
+    /* look at the player's custom level annotations first */
+    if ((mseen = find_mapseen_by_str(nam)) != 0) {
+        dlev = mseen->lev;
+    } else {
+        /* no matching annotation, check whether they used a name we know */
+
+        /* allow strings like "the oracle level" to find "oracle" */
+        if (!strncmpi(nam, "the ", 4))
+            nam += 4;
+        if ((p = strstri(nam, " level")) != 0 && p == eos((char *) nam) - 6) {
+            nam = strcpy(buf, nam);
+            *(eos(buf) - 6) = '\0';
+        }
+        /* hell is the old name, and wouldn't match; gehennom would match its
+           branch, yielding the castle level instead of the valley of the dead */
+        if (!strcmpi(nam, "gehennom") || !strcmpi(nam, "hell")) {
+            if (In_V_tower(&u.uz))
+                nam = " to Vlad's tower"; /* branch to... */
+            else
+                nam = "valley";
+        }
+
+        if ((slev = find_level(nam)) != 0)
+            dlev = slev->dlevel;
     }
 
-    if ((slev = find_level(nam)) != 0) {
-        dlev = slev->dlevel;
+    if (mseen || slev) {
         idx = ledger_no(&dlev);
         if ((dlev.dnum == u.uz.dnum
              /* within same branch, or else main dungeon <-> gehennom */
@@ -1672,7 +1683,7 @@ const char *nam;
                 wizard
                 || (level_info[idx].flags & (FORGOTTEN | VISITED))
                        == VISITED)) {
-            lev = depth(&slev->dlevel);
+            lev = depth(&dlev);
         }
     } else { /* not a specific level; try branch names */
         idx = find_branch(nam, (struct proto_dungeon *) 0);
@@ -2054,6 +2065,20 @@ d_level *lev;
 
     return mptr;
 }
+
+STATIC_OVL mapseen *
+find_mapseen_by_str(s)
+const char *s;
+{
+    mapseen *mptr;
+
+    for (mptr = mapseenchn; mptr; mptr = mptr->next)
+        if (mptr->custom && !strcmpi(s, mptr->custom))
+            break;
+
+    return mptr;
+}
+
 
 void
 forget_mapseen(ledger_num)
