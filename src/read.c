@@ -901,7 +901,7 @@ struct obj *sobj;
     unsigned was_peaceful = mtmp->mpeaceful;
 
     if (sobj->cursed) {
-        setmangry(mtmp);
+        setmangry(mtmp, FALSE);
         if (was_peaceful && !mtmp->mpeaceful)
             return -1;
     } else {

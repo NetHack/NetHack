@@ -426,7 +426,7 @@ struct obj *otmp;
     }
     if (wake) {
         if (mtmp->mhp > 0) {
-            wakeup(mtmp);
+            wakeup(mtmp, TRUE);
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops)
                 hot_pursuit(mtmp);
@@ -4535,12 +4535,9 @@ short exploding_wand_typ;
             You("%s of smoke.", !Blind ? "see a puff" : "smell a whiff");
         }
     if ((mon = m_at(x, y)) != 0) {
-        /* Cannot use wakeup() which also angers the monster */
-        mon->msleeping = 0;
-        if (mon->m_ap_type)
-            seemimic(mon);
+        wakeup(mon, FALSE);
         if (type >= 0) {
-            setmangry(mon);
+            setmangry(mon, TRUE);
             if (mon->ispriest && *in_rooms(mon->mx, mon->my, TEMPLE))
                 ghod_hitsu(mon);
             if (mon->isshk && !*u.ushops)

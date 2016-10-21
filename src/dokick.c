@@ -156,7 +156,7 @@ xchar x, y;
     int i, j;
 
     /* anger target even if wild miss will occur */
-    setmangry(mon);
+    setmangry(mon, TRUE);
 
     if (Levitation && !rn2(3) && verysmall(mon->data)
         && !is_flyer(mon->data)) {
@@ -298,7 +298,7 @@ register struct obj *gold;
 
     if (!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
         && !mtmp->isgd && !is_mercenary(mtmp->data)) {
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     } else if (!mtmp->mcanmove) {
         /* too light to do real damage */
         if (canseemon(mtmp)) {
@@ -312,7 +312,7 @@ register struct obj *gold;
         mtmp->msleeping = 0;
         finish_meating(mtmp);
         if (!mtmp->isgd && !rn2(4)) /* not always pleasing */
-            setmangry(mtmp);
+            setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
             pline("%s catches the gold.", Monnam(mtmp));

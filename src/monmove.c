@@ -320,12 +320,6 @@ int *inrange, *nearby, *scared;
                     || (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
         *scared = 1;
         monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
-
-        /* magical protection won't last forever, so there'll be a
-         * chance of the magic being used up regardless of type */
-        if (sawscary) {
-            wipe_engr_at(seescaryx, seescaryy, 1, TRUE);
-        }
     } else
         *scared = 0;
 }
