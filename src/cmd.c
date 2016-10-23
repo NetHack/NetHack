@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "lev.h"
 #include "func_tab.h"
 
 #ifdef ALTMETA
@@ -123,6 +124,7 @@ STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_map);
+STATIC_PTR int NDECL(wiz_makemap);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
 STATIC_PTR int NDECL(wiz_detect);
@@ -327,8 +329,9 @@ doextcmd(VOID_ARGS)
             return 0;
         }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
-            pline("'%s' prefix has no effect for this command.",
-                  visctrl(Cmd.spkeys[NHKF_REQMENU]));
+            pline("'%s' prefix has no effect for the %s command.",
+                  visctrl(Cmd.spkeys[NHKF_REQMENU]),
+                  extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
         }
         retval = (*func)();
@@ -344,13 +347,18 @@ doextlist(VOID_ARGS)
     register const struct ext_func_tab *efp;
     char buf[BUFSZ];
     winid datawin;
+    char ch = cmd_from_func(doextcmd);
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
     putstr(datawin, 0, "            Extended Commands List");
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "    Press '#', then type:");
-    putstr(datawin, 0, "");
+    if (ch) {
+        Sprintf(buf, "    Press '%s', then type:",
+                visctrl(ch));
+        putstr(datawin, 0, buf);
+        putstr(datawin, 0, "");
+    }
 
     for (efp = extcmdlist; efp->ef_txt; efp++) {
         if (!wizard && (efp->flags & WIZMODECMD))
@@ -607,6 +615,22 @@ wiz_identify(VOID_ARGS)
     } else
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_identify)));
+    return 0;
+}
+
+STATIC_PTR int
+wiz_makemap(VOID_ARGS)
+{
+    if (wizard) {
+        savelev(-1, ledger_no(&u.uz), FREE_SAVE);
+        mklev();
+        reglyph_darkroom();
+        vision_reset();
+        vision_full_recalc = 1;
+        (void) safe_teleds(TRUE);
+        docrt();
+        flush_screen(1);
+    }
     return 0;
 }
 
@@ -2812,6 +2836,7 @@ struct ext_func_tab extcmdlist[] = {
     { C('i'), "wizidentify", "identify all items in inventory", wiz_identify, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizintrinsic", "set intrinsic", wiz_intrinsic, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { C('v'), "wizlevelport", "teleport to another level", wiz_level_tele, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
+    { '\0', "wizmakemap", "recreate the current level", wiz_makemap, IFBURIED|WIZMODECMD },
     { C('f'), "wizmap", "map the level", wiz_map, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
     { '\0', "wizsmell", "smell monster", wiz_smell, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
@@ -3519,9 +3544,11 @@ struct {
     { NHKF_GETPOS_DOOR_PREV, 'D', "getpos.door.prev" },
     { NHKF_GETPOS_UNEX_NEXT, 'x', "getpos.unexplored.next" },
     { NHKF_GETPOS_UNEX_PREV, 'X', "getpos.unexplored.prev" },
+    { NHKF_GETPOS_INTERESTING_NEXT, 'a', "getpos.all.next" },
+    { NHKF_GETPOS_INTERESTING_PREV, 'A', "getpos.all.prev" },
     { NHKF_GETPOS_HELP,      '?', "getpos.help" },
-    { NHKF_GETPOS_MENU,      'A', "getpos.menu" },
-    { NHKF_GETPOS_MENU_FOV,  'a', "getpos.menu.cansee" }
+    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.inview" },
+    { NHKF_GETPOS_MENU,      '!', "getpos.menu" }
 };
 
 boolean
@@ -4702,7 +4729,7 @@ dotravel(VOID_ARGS)
     }
     iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
-        if (!getpos_menu(&cc, TRUE)) {
+        if (!getpos_menu(&cc, TRUE, GLOC_INTERESTING)) {
             iflags.getloc_travelmode = FALSE;
             return 0;
         }

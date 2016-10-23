@@ -1310,8 +1310,8 @@ dogaze()
                             mon_nam(mtmp));
                     if (yn(qbuf) != 'y')
                         continue;
-                    setmangry(mtmp);
                 }
+                setmangry(mtmp, TRUE);
                 if (!mtmp->mcanmove || mtmp->mstun || mtmp->msleeping
                     || !mtmp->mcansee || !haseyes(mtmp->data)) {
                     looked--;

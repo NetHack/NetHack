@@ -609,9 +609,9 @@ level_tele()
         do {
             if (++trycnt == 2) {
                 if (wizard)
-                    Strcat(qbuf, " [type a number or ? for a menu]");
+                    Strcat(qbuf, " [type a number, name, or ? for a menu]");
                 else
-                    Strcat(qbuf, " [type a number]");
+                    Strcat(qbuf, " [type a number or name]");
             }
             getlin(qbuf, buf);
             if (!strcmp(buf, "\033")) { /* cancelled */

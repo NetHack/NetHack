@@ -2583,10 +2583,33 @@ struct monst *mtmp;
     }
 }
 
+/* Called whenever the player attacks mtmp; also called in other situations
+   where mtmp gets annoyed at the player. Handles mtmp getting annoyed at the
+   attack and any ramifications that might have. Useful also in situations where
+   mtmp was already hostile; it checks for situations where the player shouldn't
+   be attacking and any ramifications /that/ might have. */
 void
-setmangry(mtmp)
+setmangry(mtmp, via_attack)
 struct monst *mtmp;
+boolean via_attack;
 {
+    if (via_attack && sengr_at("Elbereth", u.ux, u.uy, TRUE)) {
+        You_feel("like a hypocrite.");
+        /* AIS: Yes, I know alignment penalties and bonuses aren't balanced at
+           the moment. This is about correct relative to other "small"
+           penalties; it should be fairly large, as attacking while standing on
+           an Elbereth means that you're requesting peace and then violating
+           your own request. I know 5 isn't actually large, but it's
+           intentionally larger than the 1s and 2s that are normally given for
+           this sort of thing. */
+        adjalign(-5);
+
+        if (!Blind)
+            pline("The engraving beneath you fades.");
+        del_engr_at(u.ux, u.uy);
+    }
+
+    /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
         return;
@@ -2681,14 +2704,16 @@ struct monst *mtmp;
 
 }
 
-/* wake up a monster, usually making it angry in the process */
+/* wake up a monster, possibly making it angry in the process */
 void
-wakeup(mtmp)
+wakeup(mtmp, via_attack)
 register struct monst *mtmp;
+boolean via_attack;
 {
     mtmp->msleeping = 0;
     finish_meating(mtmp);
-    setmangry(mtmp);
+    if (via_attack)
+        setmangry(mtmp, TRUE);
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
     } else if (context.forcefight && !context.mon_moving

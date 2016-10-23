@@ -2119,7 +2119,7 @@ register struct monst *mtmp;
            Recognizing who made the trap isn't completely
            unreasonable; everybody has their own style. */
         if (trap->madeby_u && rnl(5))
-            setmangry(mtmp);
+            setmangry(mtmp, TRUE);
 
         in_sight = canseemon(mtmp);
         see_it = cansee(mtmp->mx, mtmp->my);
@@ -4541,7 +4541,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         /* monster will be angered; mintrap doesn't handle that */
-        wakeup(mon);
+        wakeup(mon, TRUE);
         ++force_mintrap;
         result = (mintrap(mon) != 0);
         --force_mintrap;

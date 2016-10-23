@@ -230,6 +230,8 @@ static struct Bool_Opt {
 #else
     { "vt_tiledata", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
+    { "whatis_menu", &iflags.getloc_usemenu, FALSE, SET_IN_GAME },
+    { "whatis_inview", &iflags.getloc_limitview, FALSE, SET_IN_GAME },
     { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
     { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
 #ifdef ZEROCOMP

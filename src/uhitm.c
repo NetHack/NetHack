@@ -145,7 +145,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
                 u.ustuck = mtmp;
         }
-        wakeup(mtmp); /* always necessary; also un-mimics mimics */
+        wakeup(mtmp, TRUE); /* always necessary; also un-mimics mimics */
         return TRUE;
     }
 
@@ -190,7 +190,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
      */
     if ((mtmp->mundetected || mtmp->m_ap_type) && sensemon(mtmp)) {
         mtmp->mundetected = 0;
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     }
 
     if (flags.confirm && mtmp->mpeaceful && !Confusion && !Hallucination
@@ -573,7 +573,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     unconventional[0] = '\0';
     saved_oname[0] = '\0';
 
-    wakeup(mon);
+    wakeup(mon, TRUE);
     if (!obj) { /* attack with bare hands */
         if (mdat == &mons[PM_SHADE])
             tmp = 0;
@@ -894,7 +894,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                             pline("%s %s over %s!", what,
                                   vtense(what, "splash"), whom);
                         }
-                        setmangry(mon);
+                        setmangry(mon, TRUE);
                         mon->mcansee = 0;
                         tmp = rn1(25, 21);
                         if (((int) mon->mblinded + tmp) > 127)
@@ -903,7 +903,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                             mon->mblinded += tmp;
                     } else {
                         pline(obj->otyp == CREAM_PIE ? "Splat!" : "Splash!");
-                        setmangry(mon);
+                        setmangry(mon, TRUE);
                     }
                     if (thrown)
                         obfree(obj, (struct obj *) 0);
@@ -2097,7 +2097,7 @@ boolean wouldhavehit;
     else
         You("miss it.");
     if (!mdef->msleeping && mdef->mcanmove)
-        wakeup(mdef);
+        wakeup(mdef, TRUE);
 }
 
 /* attack monster as a monster. */
@@ -2178,7 +2178,7 @@ register struct monst *mon;
                     sum[i] = damageum(mon, mattk);
                     break;
                 }
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 /* maybe this check should be in damageum()? */
                 if (mon->data == &mons[PM_SHADE]
                     && !(mattk->aatyp == AT_KICK && uarmf
@@ -2212,7 +2212,7 @@ register struct monst *mon;
              * already grabbed in a previous attack
              */
             dhit = 1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             if (mon->data == &mons[PM_SHADE])
                 Your("hug passes harmlessly through %s.", mon_nam(mon));
             else if (!sticks(mon->data) && !u.uswallow) {
@@ -2230,7 +2230,7 @@ register struct monst *mon;
 
         case AT_EXPL: /* automatic hit if next to */
             dhit = -1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             sum[i] = explum(mon, mattk);
             break;
 
@@ -2238,7 +2238,7 @@ register struct monst *mon;
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
             if ((dhit = (tmp > rnd(20 + i)))) {
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 if (mon->data == &mons[PM_SHADE])
                     Your("attempt to surround %s is harmless.", mon_nam(mon));
                 else {
@@ -2637,7 +2637,7 @@ struct monst *mtmp;
     if (what)
         pline(fmt, what);
 
-    wakeup(mtmp); /* clears mimicking */
+    wakeup(mtmp, FALSE); /* clears mimicking */
     /* if hero is blind, wakeup() won't display the monster even though
        it's no longer concealed */
     if (!canspotmon(mtmp)
@@ -2695,7 +2695,7 @@ struct obj *otmp; /* source of flash */
             }
             if (mtmp->mhp > 0) {
                 if (!context.mon_moving)
-                    setmangry(mtmp);
+                    setmangry(mtmp, TRUE);
                 if (tmp < 9 && !mtmp->isshk && rn2(4))
                     monflee(mtmp, rn2(4) ? rnd(100) : 0, FALSE, TRUE);
                 mtmp->mcansee = 0;

@@ -22,24 +22,28 @@
     }
 
 /* symbolic names for capacity levels */
-#define UNENCUMBERED 0
-#define SLT_ENCUMBER 1 /* Burdened */
-#define MOD_ENCUMBER 2 /* Stressed */
-#define HVY_ENCUMBER 3 /* Strained */
-#define EXT_ENCUMBER 4 /* Overtaxed */
-#define OVERLOADED 5   /* Overloaded */
+enum encumbrance_types {
+    UNENCUMBERED = 0,
+    SLT_ENCUMBER, /* Burdened */
+    MOD_ENCUMBER, /* Stressed */
+    HVY_ENCUMBER, /* Strained */
+    EXT_ENCUMBER, /* Overtaxed */
+    OVERLOADED    /* Overloaded */
+};
 
 /* weight increment of heavy iron ball */
 #define IRON_BALL_W_INCR 160
 
 /* hunger states - see hu_stat in eat.c */
-#define SATIATED 0
-#define NOT_HUNGRY 1
-#define HUNGRY 2
-#define WEAK 3
-#define FAINTING 4
-#define FAINTED 5
-#define STARVED 6
+enum hunger_state_types {
+    SATIATED = 0,
+    NOT_HUNGRY,
+    HUNGRY,
+    WEAK,
+    FAINTING,
+    FAINTED,
+    STARVED
+};
 
 /* Macros for how a rumor was delivered in outrumor() */
 #define BY_ORACLE 0
@@ -48,13 +52,15 @@
 #define BY_OTHER 9
 
 /* Macros for why you are no longer riding */
-#define DISMOUNT_GENERIC 0
-#define DISMOUNT_FELL 1
-#define DISMOUNT_THROWN 2
-#define DISMOUNT_POLY 3
-#define DISMOUNT_ENGULFED 4
-#define DISMOUNT_BONES 5
-#define DISMOUNT_BYCHOICE 6
+enum dismount_types {
+    DISMOUNT_GENERIC = 0,
+    DISMOUNT_FELL,
+    DISMOUNT_THROWN,
+    DISMOUNT_POLY,
+    DISMOUNT_ENGULFED,
+    DISMOUNT_BONES,
+    DISMOUNT_BYCHOICE
+};
 
 /* Special returns from mapglyph() */
 #define MG_CORPSE  0x01
@@ -73,25 +79,27 @@
 #define SELL_DONTSELL (2)
 
 /* alteration types--keep in synch with costly_alteration(mkobj.c) */
-#define COST_CANCEL 0   /* standard cancellation */
-#define COST_DRAIN 1    /* drain life upon an object */
-#define COST_UNCHRG 2   /* cursed charging */
-#define COST_UNBLSS 3   /* unbless (devalues holy water) */
-#define COST_UNCURS 4   /* uncurse (devalues unholy water) */
-#define COST_DECHNT 5   /* disenchant weapons or armor */
-#define COST_DEGRD 6    /* removal of rustproofing, dulling via engraving */
-#define COST_DILUTE 7   /* potion dilution */
-#define COST_ERASE 8    /* scroll or spellbook blanking */
-#define COST_BURN 9     /* dipped into flaming oil */
-#define COST_NUTRLZ 10  /* neutralized via unicorn horn */
-#define COST_DSTROY 11  /* wand breaking (bill first, useup later) */
-#define COST_SPLAT 12   /* cream pie to own face (ditto) */
-#define COST_BITE 13    /* start eating food */
-#define COST_OPEN 14    /* open tin */
-#define COST_BRKLCK 15  /* break box/chest's lock */
-#define COST_RUST 16    /* rust damage */
-#define COST_ROT 17     /* rotting attack */
-#define COST_CORRODE 18 /* acid damage */
+enum cost_alteration_types {
+    COST_CANCEL = 0,   /* standard cancellation */
+    COST_DRAIN,    /* drain life upon an object */
+    COST_UNCHRG,   /* cursed charging */
+    COST_UNBLSS,   /* unbless (devalues holy water) */
+    COST_UNCURS,   /* uncurse (devalues unholy water) */
+    COST_DECHNT,   /* disenchant weapons or armor */
+    COST_DEGRD,    /* removal of rustproofing, dulling via engraving */
+    COST_DILUTE,   /* potion dilution */
+    COST_ERASE,    /* scroll or spellbook blanking */
+    COST_BURN,     /* dipped into flaming oil */
+    COST_NUTRLZ,   /* neutralized via unicorn horn */
+    COST_DSTROY,   /* wand breaking (bill first, useup later) */
+    COST_SPLAT,    /* cream pie to own face (ditto) */
+    COST_BITE,     /* start eating food */
+    COST_OPEN,     /* open tin */
+    COST_BRKLCK,   /* break box/chest's lock */
+    COST_RUST,     /* rust damage */
+    COST_ROT,      /* rotting attack */
+    COST_CORRODE   /* acid damage */
+};
 
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
@@ -115,22 +123,24 @@ enum getpos_retval {
  * in end.c and topten.c will need to be changed.  Some parts of the
  * code assume that PANIC separates the deaths from the non-deaths.
  */
-#define DIED 0
-#define CHOKING 1
-#define POISONING 2
-#define STARVING 3
-#define DROWNING 4
-#define BURNING 5
-#define DISSOLVED 6
-#define CRUSHING 7
-#define STONING 8
-#define TURNED_SLIME 9
-#define GENOCIDED 10
-#define PANICKED 11
-#define TRICKED 12
-#define QUIT 13
-#define ESCAPED 14
-#define ASCENDED 15
+enum game_end_types {
+    DIED = 0,
+    CHOKING,
+    POISONING,
+    STARVING,
+    DROWNING,
+    BURNING,
+    DISSOLVED,
+    CRUSHING,
+    STONING,
+    TURNED_SLIME,
+    GENOCIDED,
+    PANICKED,
+    TRICKED,
+    QUIT,
+    ESCAPED,
+    ASCENDED
+};
 
 #include "align.h"
 #include "dungeon.h"
@@ -146,18 +156,22 @@ enum getpos_retval {
 NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 
 /* types of calls to bhit() */
-#define ZAPPED_WAND 0
-#define THROWN_WEAPON 1
-#define KICKED_WEAPON 2
-#define FLASHED_LIGHT 3
-#define INVIS_BEAM 4
+enum bhit_call_types {
+    ZAPPED_WAND = 0,
+    THROWN_WEAPON,
+    KICKED_WEAPON,
+    FLASHED_LIGHT,
+    INVIS_BEAM
+};
 
 /* attack mode for hmon() */
-#define HMON_MELEE 0   /* hand-to-hand */
-#define HMON_THROWN 1  /* normal ranged (or spitting while poly'd) */
-#define HMON_KICKED 2  /* alternate ranged */
-#define HMON_APPLIED 3 /* polearm, treated as ranged */
-#define HMON_DRAGGED 4 /* attached iron ball, pulled into mon */
+enum hmon_atkmode_types {
+    HMON_MELEE = 0, /* hand-to-hand */
+    HMON_THROWN,    /* normal ranged (or spitting while poly'd) */
+    HMON_KICKED,    /* alternate ranged */
+    HMON_APPLIED,   /* polearm, treated as ranged */
+    HMON_DRAGGED    /* attached iron ball, pulled into mon */
+};
 
 #define MATCH_WARN_OF_MON(mon)                                               \
     (Warn_of_mon && ((context.warntype.obj                                   \
@@ -315,14 +329,16 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define LAUNCH_KNOWN 0x80  /* the hero caused this by explicit action */
 
 /* Macros for explosion types */
-#define EXPL_DARK 0
-#define EXPL_NOXIOUS 1
-#define EXPL_MUDDY 2
-#define EXPL_WET 3
-#define EXPL_MAGICAL 4
-#define EXPL_FIERY 5
-#define EXPL_FROSTY 6
-#define EXPL_MAX 7
+enum explosion_types {
+    EXPL_DARK = 0,
+    EXPL_NOXIOUS,
+    EXPL_MUDDY,
+    EXPL_WET,
+    EXPL_MAGICAL,
+    EXPL_FIERY,
+    EXPL_FROSTY,
+    EXPL_MAX
+};
 
 /* enlightenment control flags */
 #define BASICENLIGHTENMENT 1 /* show mundane stuff */
@@ -344,25 +360,27 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define XKILL_NOCONDUCT 4
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
-#define ARM 0
-#define EYE 1
-#define FACE 2
-#define FINGER 3
-#define FINGERTIP 4
-#define FOOT 5
-#define HAND 6
-#define HANDED 7
-#define HEAD 8
-#define LEG 9
-#define LIGHT_HEADED 10
-#define NECK 11
-#define SPINE 12
-#define TOE 13
-#define HAIR 14
-#define BLOOD 15
-#define LUNG 16
-#define NOSE 17
-#define STOMACH 18
+enum bodypart_types {
+    ARM = 0,
+    EYE,
+    FACE,
+    FINGER,
+    FINGERTIP,
+    FOOT,
+    HAND,
+    HANDED,
+    HEAD,
+    LEG,
+    LIGHT_HEADED,
+    NECK,
+    SPINE,
+    TOE,
+    HAIR,
+    BLOOD,
+    LUNG,
+    NOSE,
+    STOMACH
+};
 
 /* indices for some special tin types */
 #define ROTTEN_TIN 0

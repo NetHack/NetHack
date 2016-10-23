@@ -50,7 +50,13 @@ nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt \
 	../util/tile2bmp $@
 
 NetHack.ad: ../win/X11/NetHack.ad
-	cp ../win/X11/NetHack.ad NetHack.ad
+# handle "#define foo bar" -lines
+	grep ^#define ../win/X11/NetHack.ad | \
+		sed -e 's/^#define/s/g' -e 's/  */ /g' \
+		    -e 's/$$/ g/g' > NetHack.ad.tmp
+	grep -v ^#define ../win/X11/NetHack.ad | \
+		sed -f NetHack.ad.tmp > NetHack.ad
+	-rm -f NetHack.ad.tmp
 
 pet_mark.xbm: ../win/X11/pet_mark.xbm
 	cp ../win/X11/pet_mark.xbm pet_mark.xbm

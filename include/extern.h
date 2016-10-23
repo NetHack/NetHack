@@ -379,7 +379,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
-E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P));
+E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));
@@ -1358,8 +1358,8 @@ E void FDECL(mnexto, (struct monst *));
 E void FDECL(maybe_mnexto, (struct monst *));
 E boolean FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(m_respond, (struct monst *));
-E void FDECL(setmangry, (struct monst *));
-E void FDECL(wakeup, (struct monst *));
+E void FDECL(setmangry, (struct monst *, boolean));
+E void FDECL(wakeup, (struct monst *, boolean));
 E void NDECL(wake_nearby);
 E void FDECL(wake_nearto, (int, int, int));
 E void FDECL(seemimic, (struct monst *));

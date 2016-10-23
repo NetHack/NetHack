@@ -3543,6 +3543,15 @@ the `{\tt /m}', `{\tt /M}', `{\tt /o}', and `{\tt /O}' sub-commands
 of `{\tt /}',
 where the `{\it none\/}' setting is overridden with `{\it map}'.
 %.lp
+\item[\ib{whatis\verb+_+inview}]
+When getting a location on the map, and using the keys to cycle through
+next and previous targets, limit the possible targets to those in view.
+(default off)
+\item[\ib{whatis\verb+_+menu}]
+When getting a location on the map, and using a key to cycle through
+next and previous targets, use a menu instead to pick a target.
+(default off)
+%.lp
 \item[\ib{windowtype}]
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on version).
@@ -3917,6 +3926,12 @@ When asked for a direction, the key to target yourself. Default is ``{\tt s}''.
 \item{\bb{getpos.autodescribe}}
 When asked for a location, the key to toggle {\it autodescribe\/}. Default is ``{\tt \#}''.
 %.lp
+\item{\bb{getpos.all.next}}
+When asked for a location, the key to go to next closest interesting thing. Default is ``{\tt a}''.
+%.lp
+\item{\bb{getpos.all.prev}}
+When asked for a location, the key to go to previous closest interesting thing. Default is ``{\tt A}''.
+%.lp
 \item{\bb{getpos.door.next}}
 When asked for a location, the key to go to next closest door or doorway. Default is ``{\tt d}''.
 %.lp
@@ -3939,10 +3954,10 @@ When asked for a location, the key to go to next closest object. Default is ``{\
 When asked for a location, the key to go to previous closest object. Default is ``{\tt O}''.
 %.lp
 \item{\bb{getpos.menu}}
-When asked for a location, show a menu of all interesting targets. Default is '{\tt A}'.
+When asked for a location, and using one of the next or previous keys to cycle through targets, toggle showing a menu instead. Default is '{\tt !}'.
 %.lp
-\item{\bb{getpos.menu.cansee}}
-When asked for a location, show a menu of interesting targets in view. Default is '{\tt a}'.
+\item{\bb{getpos.inview}}
+When asked for a location, and using one of the next or previous keys to cycle through targets, toggle limiting possible targets to those in view only. Default is '{\tt "}'.
 %.lp
 \item{\bb{getpos.pick}}
 When asked for a location, the key to choose the location, and possibly ask for more info. Default is ``{\tt .}''.
