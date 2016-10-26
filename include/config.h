@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1447728911 2015/11/17 02:55:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1477489338 2016/10/26 13:42:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -508,7 +508,12 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
-#define CONWAY                        /* Conway's Life level */
+/*
+#define BREAK_360_SAVE_COMPAT
+*/
+#ifdef BREAK_360_SAVE_COMPAT
+# define CONWAY                        /* Conway's Life level */
+#endif
 
 /* End of Section 4 */
 
