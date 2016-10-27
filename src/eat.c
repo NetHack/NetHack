@@ -1674,9 +1674,11 @@ struct obj *otmp;
                                && herbivorous(youmonst.data))
                             : (carnivorous(youmonst.data)
                                && !herbivorous(youmonst.data))),
-                palatable = (vegetarian(&mons[mnum])
-                                ? herbivorous(youmonst.data)
-                                : carnivorous(youmonst.data));
+            palatable = ((vegetarian(&mons[mnum])
+                          ? herbivorous(youmonst.data)
+                          : carnivorous(youmonst.data))
+                         && rn2(10)
+                         && ((rotted < 1) ? TRUE : !rn2(rotted+1)));
         const char *pmxnam = food_xname(otmp, FALSE);
 
         if (!strncmpi(pmxnam, "the ", 4))
