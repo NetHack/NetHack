@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1477489338 2016/10/26 13:42:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1477756258 2016/10/29 15:50:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -508,9 +508,15 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
-/*
-#define BREAK_360_SAVE_COMPAT
-*/
+/* Section 4b - Features causing save file incompatibility
+ * Features listed in this section change the format of save and/or
+ * bones files, so in addition to the warning at the start of Section 4
+ * games using these features will not be compatible with previously saved
+ * games (and may not be compatible with anything in the future as well).
+ * To emphasize the point, you must:
+/* #define BREAK_360_SAVE_COMPAT */
+/* to enable them. */
+
 #ifdef BREAK_360_SAVE_COMPAT
 # define CONWAY                        /* Conway's Life level */
 #endif
