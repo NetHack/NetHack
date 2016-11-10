@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1477756258 2016/10/29 15:50:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1478740241 2016/11/10 01:10:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -513,7 +513,7 @@ typedef unsigned char uchar;
  * bones files, so in addition to the warning at the start of Section 4
  * games using these features will not be compatible with previously saved
  * games (and may not be compatible with anything in the future as well).
- * To emphasize the point, you must:
+ * To emphasize the point, you must: */
 /* #define BREAK_360_SAVE_COMPAT */
 /* to enable them. */
 
