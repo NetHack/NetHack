@@ -582,6 +582,7 @@ mcalcmove(mon)
 struct monst *mon;
 {
     int mmove = mon->data->mmove;
+    int mmove_adj;
 
     /* Note: MSLOW's `+ 1' prevents slowed speed 1 getting reduced to 0;
      *       MFAST's `+ 2' prevents hasted speed 1 from becoming a no-op;
@@ -592,20 +593,23 @@ struct monst *mon;
     else if (mon->mspeed == MFAST)
         mmove = (4 * mmove + 2) / 3;
 
-    if (mon == u.usteed) {
-        if (u.ugallop && context.mv) {
-            /* average movement is 1.50 times normal */
-            mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
-        }
-    } else if (mmove) {
-        /* vary movement points allocated to slightly reduce predictability;
-           random increment (avg +2) exceeds random decrement (avg +1) by
-           a small amount; normal speed monsters will occasionally get an
-           extra move and slow ones won't be quite as slow */
-        mmove += rn2(5) - rn2(3); /* + 0..4 - 0..2, average net +1 */
-        if (mmove < 1)
-            mmove = 1;
+    if (mon == u.usteed && u.ugallop && context.mv) {
+        /* increase movement by a factor of 1.5; also increase variance of
+           movement speed (if it's naturally 24, we don't want it to always
+           become 36) */
+        mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
     }
+
+    /* Randomly round the monster's speed to a multiple of NORMAL_SPEED. This
+       makes it impossible for the player to predict when they'll get a free
+       turn (thus preventing exploits like "melee kiting"), while retaining
+       guarantees about shopkeepers not being outsped by a normal-speed player,
+       normal-speed players being unable to open up a gap when fleeing a
+       normal-speed monster, etc.*/
+    mmove_adj = mmove % NORMAL_SPEED;
+    mmove -= mmove_adj;
+    if (rn2(NORMAL_SPEED) < mmove_adj)
+        mmove += NORMAL_SPEED;
 
     return mmove;
 }
