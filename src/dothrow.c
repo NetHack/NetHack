@@ -985,11 +985,11 @@ sho_obj_return_to_u(obj)
 struct obj *obj;
 {
     /* might already be our location (bounced off a wall) */
-    if (bhitpos.x != u.ux || bhitpos.y != u.uy) {
+    if ((u.dx || u.dy) && (bhitpos.x != u.ux || bhitpos.y != u.uy)) {
         int x = bhitpos.x - u.dx, y = bhitpos.y - u.dy;
 
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
-        while (x != u.ux || y != u.uy) {
+        while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
             delay_output();
             x -= u.dx;
