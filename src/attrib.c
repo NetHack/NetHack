@@ -1002,6 +1002,9 @@ int x;
             && (youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
                 || u.umonnum == PM_INCUBUS))
             return (schar) 18;
+    } else if (x == A_CON) {
+        if (uwep && uwep->oartifact == ART_OGRESMASHER)
+            return (schar) 25;
     } else if (x == A_INT || x == A_WIS) {
         /* yes, this may raise int/wis if player is sufficiently
          * stupid.  there are lower levels of cognition than "dunce".
@@ -1046,6 +1049,9 @@ int attrindx;
         hilimit = STR19(25); /* 125 */
         /* lower limit for Str can also be 25 */
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER)
+            lolimit = hilimit;
+    } else if (attrindx == A_CON) {
+        if (uwep && uwep->oartifact == ART_OGRESMASHER)
             lolimit = hilimit;
     }
     /* this exception is hypothetical; the only other worn item affecting

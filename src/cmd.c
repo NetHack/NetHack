@@ -1638,6 +1638,8 @@ int mode, final, attrindx;
         break;
     case A_CON:
         attrname = "constitution";
+        if (uwep && uwep->oartifact == ART_OGRESMASHER && uwep->cursed)
+            hide_innate_value = TRUE;
         break;
     case A_INT:
         attrname = "intelligence";
