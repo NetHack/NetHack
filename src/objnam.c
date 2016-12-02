@@ -268,7 +268,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     register struct objclass *ocl = &objects[typ];
     int nn = ocl->oc_name_known, omndx = obj->corpsenm;
     const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl);
+    const char *dn = OBJ_DESCR(*ocl) ? OBJ_DESCR(*ocl) : actualn;
     const char *un = ocl->oc_uname;
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
@@ -327,15 +327,15 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcpy(buf, (obj->spe < 3) ? "moist " : "wet ");
 
         if (!dknown)
-            Strcat(buf, dn ? dn : actualn);
+            Strcat(buf, dn);
         else if (nn)
             Strcat(buf, actualn);
         else if (un) {
-            Strcat(buf, dn ? dn : actualn);
+            Strcat(buf, dn);
             Strcat(buf, " called ");
             Strcat(buf, un);
         } else
-            Strcat(buf, dn ? dn : actualn);
+            Strcat(buf, dn);
         /* If we use an() here we'd have to remember never to use */
         /* it whenever calling doname() or xname(). */
         if (typ == FIGURINE && omndx != NON_PM) {
