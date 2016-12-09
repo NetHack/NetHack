@@ -872,12 +872,20 @@ struct trap *trap;
 }
 
 void
-level_tele_trap(trap)
+level_tele_trap(trap, trflags)
 struct trap *trap;
+unsigned trflags;
 {
-    You("%s onto a level teleport trap!",
-        Levitation ? (const char *) "float"
-                   : locomotion(youmonst.data, "step"));
+    char verbbuf[BUFSZ];
+
+    if ((trflags & VIASITTING) != 0)
+        Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+    else
+        Sprintf(verbbuf, "%s onto",
+                Levitation ? (const char *) "float"
+                           : locomotion(youmonst.data, "step"));
+    You("%s a level teleport trap!", verbbuf);
+
     if (Antimagic) {
         shieldeff(u.ux, u.uy);
     }

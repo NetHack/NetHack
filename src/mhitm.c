@@ -742,6 +742,7 @@ register struct attack *mattk;
         if (cansee(dx, dy))
             pline("%s is regurgitated!", Monnam(mdef));
 
+        remove_monster(dx,dy);
         place_monster(magr, ax, ay);
         place_monster(mdef, dx, dy);
         newsym(ax, ay);

@@ -296,9 +296,9 @@ enum hmon_atkmode_types {
 #define FORCETRAP 0x01     /* triggering not left to chance */
 #define NOWEBMSG 0x02      /* suppress stumble into web message */
 #define FORCEBUNGLE 0x04   /* adjustments appropriate for bungling */
-#define RECURSIVETRAP 0x08 /* trap changed into another type this same turn \
-                              */
+#define RECURSIVETRAP 0x08 /* trap changed into another type this same turn */
 #define TOOKPLUNGE 0x10    /* used '>' to enter pit below you */
+#define VIASITTING 0x20    /* #sit while at trap location (affects message) */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE 0   /* really doing the move */

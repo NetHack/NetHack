@@ -453,11 +453,13 @@ start: Blank
         S_hbeam: \032
         S_hcdbridge: \032
         S_hcdoor: \032
+        S_hodbridge: \032
         S_hodoor: \032
         S_hole: \032
         S_human: \032
         S_humanoid: \032
         S_hwall: \032
+        S_ice: \032
         S_imp: \032
         S_invisible: \032
         S_jabberwock: \032
@@ -543,7 +545,9 @@ start: Blank
         S_vbeam: \032
         S_vcdbridge: \032
         S_vcdoor: \032
+        S_venom: \032
         S_vibrating_square: \032
+        S_vodbridge: \032
         S_vodoor: \032
         S_vortex: \032
         S_vwall: \032

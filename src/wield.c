@@ -96,6 +96,10 @@ register struct obj *obj;
         if (!Blind)
             pline("%s shining.", Tobjnam(olduwep, "stop"));
     }
+    if (uwep == obj
+        && ((uwep && uwep->oartifact == ART_OGRESMASHER)
+            || (olduwep && olduwep->oartifact == ART_OGRESMASHER)))
+        context.botl = 1;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.

@@ -132,14 +132,13 @@ boolean resuming;
                         moveamt = youmonst.data->mmove;
 
                         if (Very_fast) { /* speed boots or potion */
-                            /* average movement is 1.67 times normal */
-                            moveamt += NORMAL_SPEED / 2;
-                            if (rn2(3) == 0)
-                                moveamt += NORMAL_SPEED / 2;
-                        } else if (Fast) {
-                            /* average movement is 1.33 times normal */
+                            /* gain a free action on 2/3 of turns */
                             if (rn2(3) != 0)
-                                moveamt += NORMAL_SPEED / 2;
+                                moveamt += NORMAL_SPEED;
+                        } else if (Fast) {
+                            /* gain a free action on 1/3 of turns */
+                            if (rn2(3) == 0)
+                                moveamt += NORMAL_SPEED;
                         }
                     }
 
