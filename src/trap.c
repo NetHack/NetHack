@@ -850,6 +850,7 @@ unsigned trflags;
             webmsgok = (trflags & NOWEBMSG) == 0,
             forcebungle = (trflags & FORCEBUNGLE) != 0,
             plunged = (trflags & TOOKPLUNGE) != 0,
+            viasitting = (trflags & VIASITTING) != 0,
             adj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
     int oldumort;
     int steed_article = ARTICLE_THE;
@@ -1237,7 +1238,7 @@ unsigned trflags;
 
     case LEVEL_TELEP:
         seetrap(trap);
-        level_tele_trap(trap);
+        level_tele_trap(trap, trflags);
         break;
 
     case WEB: /* Our luckless player has stumbled into a web. */
@@ -1253,7 +1254,7 @@ unsigned trflags;
         if (webmsgok) {
             char verbbuf[BUFSZ];
 
-            if (forcetrap) {
+            if (forcetrap || viasitting) {
                 Strcpy(verbbuf, "are caught by");
             } else if (u.usteed) {
                 Sprintf(verbbuf, "lead %s into",
@@ -1382,15 +1383,17 @@ unsigned trflags;
         char verbbuf[BUFSZ];
 
         seetrap(trap);
-        if (u.usteed)
-            Sprintf(verbbuf, "lead %s",
+        if (viasitting)
+            Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+        else if (u.usteed)
+            Sprintf(verbbuf, "lead %s onto",
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
         else
-            Sprintf(verbbuf, "%s", Levitation
-                                       ? (const char *) "float"
-                                       : locomotion(youmonst.data, "step"));
-        You("%s onto a polymorph trap!", verbbuf);
+            Sprintf(verbbuf, "%s onto",
+                    Levitation ? (const char *) "float"
+                               : locomotion(youmonst.data, "step"));
+        You("%s a polymorph trap!", verbbuf);
         if (Antimagic || Unchanging) {
             shieldeff(u.ux, u.uy);
             You_feel("momentarily different.");

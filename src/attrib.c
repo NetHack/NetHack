@@ -272,6 +272,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     if (i == 0 && typ != A_CHA) {
         /* instant kill */
         u.uhp = -1;
+        context.botl = TRUE;
         pline_The("poison was deadly...");
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */

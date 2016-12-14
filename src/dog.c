@@ -430,9 +430,10 @@ boolean with_you;
 
     mtmp->mx = 0; /*(already is 0)*/
     mtmp->my = xyflags;
-    if (xlocale)
-        (void) mnearto(mtmp, xlocale, ylocale, FALSE);
-    else {
+    if (xlocale) {
+        if (!mnearto(mtmp, xlocale, ylocale, FALSE))
+            goto fail_mon_placement;
+    } else {
         if (!rloc(mtmp, TRUE)) {
             /*
              * Failed to place migrating monster,
@@ -440,6 +441,7 @@ boolean with_you;
              * Dump the monster's cargo and leave the monster dead.
              */
             struct obj *obj;
+fail_mon_placement:
             while ((obj = mtmp->minvent) != 0) {
                 obj_extract_self(obj);
                 obj_no_longer_held(obj);

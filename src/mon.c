@@ -2029,6 +2029,8 @@ struct monst *mdef;
     /* hero is thrown from his steed when it disappears */
     if (mdef == u.usteed)
         dismount_steed(DISMOUNT_GENERIC);
+    /* stuck to you? release */
+    unstuck(mdef);
     /* drop special items like the Amulet so that a dismissed Kop or nurse
        can't remove them from the game */
     mdrop_special_objs(mdef);
@@ -2449,6 +2451,16 @@ struct monst *mtmp;
     return TRUE;
 }
 
+/* drop monster into "limbo" - that is, migrate to the current level */
+void
+m_into_limbo(mtmp)
+struct monst *mtmp;
+{
+    unstuck(mtmp);
+    mdrop_special_objs(mtmp);
+    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
+}
+
 /* make monster mtmp next to you (if possible);
    might place monst on far side of a wall or boulder */
 void
@@ -2465,7 +2477,11 @@ struct monst *mtmp;
         return;
     }
 
-    if (!enexto(&mm, u.ux, u.uy, mtmp->data))
+    if (!enexto(&mm, u.ux, u.uy, mtmp->data)) {
+        m_into_limbo(mtmp);
+        return;
+    }
+    if (!isok(mm.x, mm.y))
         return;
     rloc_to(mtmp, mm.x, mm.y);
     if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
@@ -2534,6 +2550,8 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          */
         if (!enexto(&mm, newx, newy, mtmp->data))
             return FALSE;
+        if (!isok(mm.x,mm.y))
+            return FALSE;
         newx = mm.x;
         newy = mm.y;
     }
@@ -2545,12 +2563,10 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
         othermon->mx = othermon->my = 0;
         (void) mnearto(othermon, x, y, FALSE);
         if (othermon->mx == 0 && othermon->my == 0) {
-            /* reloc failed, dump monster into "limbo"
-               (aka migrate to current level) */
+            /* reloc failed */
             othermon->mx = oldx;
             othermon->my = oldy;
-            mdrop_special_objs(othermon);
-            migrate_to_level(othermon, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
+            m_into_limbo(othermon);
         }
     }
 
