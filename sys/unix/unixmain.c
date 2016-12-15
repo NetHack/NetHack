@@ -419,10 +419,14 @@ char *argv[];
         }
     }
 
-    /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS.  Make
-     * an error in next release. */
+#ifdef SYSCF
+    if (argc > 1)
+        raw_printf("MAXPLAYERS are set in sysconf file.\n");
+#else
+    /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     if (argc > 1)
         locknum = atoi(argv[1]);
+#endif
 #ifdef MAX_NR_OF_PLAYERS
     /* limit to compile-time limit */
     if (!locknum || locknum > MAX_NR_OF_PLAYERS)
