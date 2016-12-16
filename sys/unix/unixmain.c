@@ -624,12 +624,13 @@ char *optstr;
     char *pwname;
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
-    if (!pw)
-        return FALSE;
     if (sysopt.check_plname)
         pwname = plname;
-    else
+    else {
+        if (!pw)
+            return FALSE;
         pwname = pw->pw_name;
+    }
     pwlen = strlen(pwname);
     eop = eos(optstr);
     w = optstr;
