@@ -14,12 +14,12 @@
 	is reporting the wrong character but will be operating correctly if
 	it describes ^J when you type ^M.
 
-	A NUL character, typed as ^<space> on some keyboards, ^@ on others,
-	and maybe not typeable at all on yet others.  It is not used as a
-	command, and will be converted into ESC before reaching 'whatdoes'.
-	Unlike ^M, this transformation is performed by NetHack itself.
-	But like ^M, if you type NUL and get feedback about ESC, the
-	situation is expected.
+	A NUL character, which is typed as ^<space> on some keyboards,
+	^@ on others, and maybe not typeable at all on yet others, is not
+	used as a command, and will be converted into ESC before reaching
+	'whatdoes'.  Unlike ^M, this transformation is performed within
+	NetHack.  But like ^M, if you type NUL and get feedback about ESC,
+	the situation is expected.
 
 	ESC itself is a synonym for ^[, and is another source of oddity.
 	Various function keys, including cursor arrow keys, may transmit
