@@ -1853,7 +1853,7 @@ struct obj *otmp;
                         || otmp->otyp == K_RATION
                         || otmp->otyp == C_RATION)
                         ? "bland."
-                        : Hallucination ? "gnarly!" : "delicious!");
+                        : Hallucination ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly") : "delicious!");
         }
         break; /* default */
     } /* switch */
