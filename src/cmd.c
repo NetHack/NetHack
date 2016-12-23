@@ -920,6 +920,7 @@ wiz_map_levltyp(VOID_ARGS)
                                           ? 'a' + terrain - 10
                                           : 'A' + terrain - 36);
         }
+        x--;
         if (levl[0][y].typ != STONE || may_dig(0, y))
             row[x++] = '!';
         row[x] = '\0';
