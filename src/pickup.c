@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1461919368 2016/04/29 08:42:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1470449858 2016/08/06 02:17:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,7 +21,7 @@ STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
 #if 0 /* not used */
 STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
 #endif
-STATIC_DCL boolean FDECL(autopick_testobj, (struct obj *));
+STATIC_DCL boolean FDECL(autopick_testobj, (struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
 STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
@@ -685,30 +685,42 @@ boolean grab; /* forced pickup, rather than forced leave behind? */
     /*
      *  Does the text description of this match an exception?
      */
-    char *objdesc = makesingular(doname(obj));
     struct autopickup_exception
         *ape = (grab) ? iflags.autopickup_exceptions[AP_GRAB]
                       : iflags.autopickup_exceptions[AP_LEAVE];
 
-    while (ape) {
-        if (regex_match(objdesc, ape->regex))
-            return TRUE;
-        ape = ape->next;
+    if (ape) {
+        char *objdesc = makesingular(doname(obj));
+
+        while (ape) {
+            if (regex_match(objdesc, ape->regex))
+                return TRUE;
+            ape = ape->next;
+        }
     }
     return FALSE;
 }
 
-boolean
-autopick_testobj(otmp)
+STATIC_OVL boolean
+autopick_testobj(otmp, calc_costly)
 struct obj *otmp;
+boolean calc_costly;
 {
+    static boolean costly = FALSE;
     const char *otypes = flags.pickup_types;
-    /* pick if in pickup_types and not unpaid item in shop */
-    boolean pickit = ((!*otypes || index(otypes, otmp->oclass))
-                      && !(otmp->where == OBJ_FLOOR
-                           && !otmp->no_charge
-                           && isok(otmp->ox, otmp->oy)
-                           && costly_spot(otmp->ox, otmp->oy)));
+    boolean pickit;
+
+    /* calculate 'costly' just once for a given autopickup operation */
+    if (calc_costly)
+        costly = (otmp->where == OBJ_FLOOR
+                  && costly_spot(otmp->ox, otmp->oy));
+
+    /* first check: reject if an unpaid item in a shop */
+    if (costly && !otmp->no_charge)
+        return FALSE;
+
+    /* check for pickup_types */
+    pickit = (!*otypes || index(otypes, otmp->oclass));
     /* check for "always pick up */
     if (!pickit)
         pickit = is_autopickup_exception(otmp, TRUE);
@@ -737,17 +749,19 @@ menu_item **pick_list; /* list of objects and counts to pick up */
     menu_item *pi; /* pick item */
     struct obj *curr;
     int n;
+    boolean check_costly = TRUE;
 
     /* first count the number of eligible items */
     for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-        if (autopick_testobj(curr))
+        if (autopick_testobj(curr, check_costly))
             ++n;
+        check_costly = FALSE; /* only need to check once per autopickup */
     }
 
     if (n) {
         *pick_list = pi = (menu_item *) alloc(sizeof (menu_item) * n);
         for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-            if (autopick_testobj(curr)) {
+            if (autopick_testobj(curr, FALSE)) {
                 pi[n].item.a_obj = curr;
                 pi[n].count = curr->quan;
                 n++;

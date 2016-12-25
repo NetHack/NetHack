@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1461571093 2016/04/25 07:58:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1469930897 2016/07/31 02:08:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,7 +41,7 @@ STATIC_OVL int
 iswall(x, y)
 int x, y;
 {
-    register int type;
+    int type;
 
     if (!isok(x, y))
         return 0;
@@ -126,7 +126,7 @@ wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     uchar type;
-    register int x, y;
+    int x, y;
     struct rm *lev;
 
     /* sanity check on incoming variables */
@@ -158,7 +158,7 @@ fix_wall_spines(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     uchar type;
-    register int x,y;
+    int x, y;
     struct rm *lev;
     int FDECL((*loc_f), (int, int));
     int bits;
@@ -226,12 +226,12 @@ int x1, y1, x2, y2;
 STATIC_OVL boolean
 okay(x, y, dir)
 int x, y;
-register int dir;
+int dir;
 {
     mz_move(x, y, dir);
     mz_move(x, y, dir);
     if (x < 3 || y < 3 || x > x_maze_max || y > y_maze_max
-        || levl[x][y].typ != 0)
+        || levl[x][y].typ != STONE)
         return FALSE;
     return TRUE;
 }
@@ -460,9 +460,9 @@ static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 void
 fixup_special()
 {
-    register lev_region *r = lregions;
+    lev_region *r = lregions;
     struct d_level lev;
-    register int x, y;
+    int x, y;
     struct mkroom *croom;
     boolean added_branch = FALSE;
 
@@ -600,7 +600,7 @@ fixup_special()
 
         create_secret_door(croom, W_ANY);
     } else if (on_level(&u.uz, &orcus_level)) {
-        register struct monst *mtmp, *mtmp2;
+        struct monst *mtmp, *mtmp2;
 
         /* it's a ghost town, get rid of shopkeepers */
         for (mtmp = fmon; mtmp; mtmp = mtmp2) {
@@ -618,9 +618,156 @@ fixup_special()
     num_lregions = 0;
 }
 
+boolean
+maze_inbounds(x, y)
+int x, y;
+{
+    return (x >= 2 && y >= 2
+            && x < x_maze_max && y < y_maze_max && isok(x, y));
+}
+
+void
+maze_remove_deadends(typ)
+xchar typ;
+{
+    char dirok[4];
+    int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
+
+    dirok[0] = 0; /* lint suppression */
+    for (x = 2; x < x_maze_max; x++)
+        for (y = 2; y < y_maze_max; y++)
+            if (ACCESSIBLE(levl[x][y].typ) && (x % 2) && (y % 2)) {
+                idx = idx2 = 0;
+                for (dir = 0; dir < 4; dir++) {
+                    /* note: mz_move() is a macro which modifies
+                       one of its first two parameters */
+                    dx = dx2 = x;
+                    dy = dy2 = y;
+                    mz_move(dx, dy, dir);
+                    if (!maze_inbounds(dx, dy)) {
+                        idx2++;
+                        continue;
+                    }
+                    mz_move(dx2, dy2, dir);
+                    mz_move(dx2, dy2, dir);
+                    if (!maze_inbounds(dx2, dy2)) {
+                        idx2++;
+                        continue;
+                    }
+                    if (!ACCESSIBLE(levl[dx][dy].typ)
+                        && ACCESSIBLE(levl[dx2][dy2].typ)) {
+                        dirok[idx++] = dir;
+                        idx2++;
+                    }
+                }
+                if (idx2 >= 3 && idx > 0) {
+                    dx = x;
+                    dy = y;
+                    dir = dirok[rn2(idx)];
+                    mz_move(dx, dy, dir);
+                    levl[dx][dy].typ = typ;
+                }
+            }
+}
+
+/* Create a maze with specified corridor width and wall thickness
+ * TODO: rewrite walkfrom so it works on temp space, not levl
+ */
+void
+create_maze(corrwid, wallthick)
+int corrwid;
+int wallthick;
+{
+    int x,y;
+    coord mm;
+    int tmp_xmax = x_maze_max;
+    int tmp_ymax = y_maze_max;
+    int rdx = 0;
+    int rdy = 0;
+    int scale;
+
+    if (wallthick < 1)
+        wallthick = 1;
+    else if (wallthick > 5)
+        wallthick = 5;
+
+    if (corrwid < 1)
+        corrwid = 1;
+    else if (corrwid > 5)
+        corrwid = 5;
+
+    scale = corrwid + wallthick;
+    rdx = (x_maze_max / scale);
+    rdy = (y_maze_max / scale);
+
+    if (level.flags.corrmaze)
+        for (x = 2; x < (rdx * 2); x++)
+            for (y = 2; y < (rdy * 2); y++)
+                levl[x][y].typ = STONE;
+    else
+        for (x = 2; x <= (rdx * 2); x++)
+            for (y = 2; y <= (rdy * 2); y++)
+                levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
+
+    /* set upper bounds for maze0xy and walkfrom */
+    x_maze_max = (rdx * 2);
+    y_maze_max = (rdy * 2);
+
+    /* create maze */
+    maze0xy(&mm);
+    walkfrom((int) mm.x, (int) mm.y, 0);
+
+    if (!rn2(5))
+        maze_remove_deadends((level.flags.corrmaze) ? CORR : ROOM);
+
+    /* restore bounds */
+    x_maze_max = tmp_xmax;
+    y_maze_max = tmp_ymax;
+
+    /* scale maze up if needed */
+    if (scale > 2) {
+        char tmpmap[COLNO][ROWNO];
+        int rx = 1, ry = 1;
+
+        /* back up the existing smaller maze */
+        for (x = 1; x < x_maze_max; x++)
+            for (y = 1; y < y_maze_max; y++) {
+                tmpmap[x][y] = levl[x][y].typ;
+            }
+
+        /* do the scaling */
+        rx = x = 2;
+        while (rx < x_maze_max) {
+            int mx = (x % 2) ? corrwid
+                             : ((x == 2 || x == (rdx * 2)) ? 1
+                                                           : wallthick);
+            ry = y = 2;
+            while (ry < y_maze_max) {
+                int dx = 0, dy = 0;
+                int my = (y % 2) ? corrwid
+                                 : ((y == 2 || y == (rdy * 2)) ? 1
+                                                               : wallthick);
+                for (dx = 0; dx < mx; dx++)
+                    for (dy = 0; dy < my; dy++) {
+                        if (rx+dx >= x_maze_max
+                            || ry+dy >= y_maze_max)
+                            break;
+                        levl[rx + dx][ry + dy].typ = tmpmap[x][y];
+                    }
+                ry += my;
+                y++;
+            }
+            rx += mx;
+            x++;
+        }
+
+    }
+}
+
+
 void
 makemaz(s)
-register const char *s;
+const char *s;
 {
     int x, y;
     char protofile[20];
@@ -686,19 +833,12 @@ register const char *s;
     level.flags.is_maze_lev = TRUE;
     level.flags.corrmaze = !rn2(3);
 
-    if (level.flags.corrmaze)
-        for (x = 2; x < x_maze_max; x++)
-            for (y = 2; y < y_maze_max; y++)
-                levl[x][y].typ = STONE;
-    else
-        for (x = 2; x <= x_maze_max; x++)
-            for (y = 2; y <= y_maze_max; y++)
-                levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
-
-    maze0xy(&mm);
-    walkfrom((int) mm.x, (int) mm.y, 0);
-    /* put a boulder at the maze center */
-    (void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
+    if (!Invocation_lev(&u.uz) && rn2(2)) {
+        int corrscale = rnd(4);
+        create_maze(corrscale,rnd(4)-corrscale);
+    } else {
+        create_maze(1,1);
+    }
 
     if (!level.flags.corrmaze)
         wallification(2, 2, x_maze_max, y_maze_max);
@@ -839,7 +979,7 @@ walkfrom(x, y, typ)
 int x, y;
 schar typ;
 {
-    register int q, a, dir;
+    int q, a, dir;
     int dirs[4];
 
     if (!typ) {
@@ -880,19 +1020,20 @@ coord *cc;
     int cpt = 0;
 
     do {
-        cc->x = 3 + 2 * rn2((x_maze_max >> 1) - 1);
-        cc->y = 3 + 2 * rn2((y_maze_max >> 1) - 1);
+        cc->x = 1 + rn2(x_maze_max);
+        cc->y = 1 + rn2(y_maze_max);
         cpt++;
     } while (cpt < 100
              && levl[cc->x][cc->y].typ
                     != (level.flags.corrmaze ? CORR : ROOM));
     if (cpt >= 100) {
-        register int x, y;
+        int x, y;
+
         /* last try */
-        for (x = 0; x < (x_maze_max >> 1) - 1; x++)
-            for (y = 0; y < (y_maze_max >> 1) - 1; y++) {
-                cc->x = 3 + 2 * x;
-                cc->y = 3 + 2 * y;
+        for (x = 1; x < x_maze_max; x++)
+            for (y = 1; y < y_maze_max; y++) {
+                cc->x = x;
+                cc->y = y;
                 if (levl[cc->x][cc->y].typ
                     == (level.flags.corrmaze ? CORR : ROOM))
                     return;
@@ -915,9 +1056,9 @@ coord *cc;
 void
 bound_digging()
 {
-    register int x, y;
-    register unsigned typ;
-    register struct rm *lev;
+    int x, y;
+    unsigned typ;
+    struct rm *lev;
     boolean found, nonwall;
     int xmin, xmax, ymin, ymax;
 
@@ -1024,8 +1165,10 @@ fumaroles()
     for (n = rn2(3) + 2; n; n--) {
         xchar x = rn1(COLNO - 4, 3);
         xchar y = rn1(ROWNO - 4, 3);
+
         if (levl[x][y].typ == LAVAPOOL) {
             NhRegion *r = create_gas_cloud(x, y, 4 + rn2(5), rn1(10, 5));
+
             clear_heros_fault(r);
             snd = TRUE;
             if (distu(x, y) < 15)
@@ -1042,11 +1185,6 @@ fumaroles()
  * Some of these functions would probably logically belong to some
  * other source files, but they are all so nicely encapsulated here.
  */
-
-#ifdef DEBUG
-/* to ease the work of debuggers at this stage */
-#define register
-#endif
 
 #define CONS_OBJ 0
 #define CONS_MON 1
@@ -1071,8 +1209,8 @@ void
 movebubbles()
 {
     static boolean up;
-    register struct bubble *b;
-    register int x, y, i, j;
+    struct bubble *b;
+    int x, y, i, j;
     struct trap *btrap;
     static const struct rm water_pos = { cmap_to_glyph(S_water), WATER, 0, 0,
                                          0, 0, 0, 0, 0, 0 };
@@ -1194,7 +1332,7 @@ movebubbles()
      */
     up = !up;
     for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
-        register int rx = rn2(3), ry = rn2(3);
+        int rx = rn2(3), ry = rn2(3);
 
         mv_bubble(b, b->dx + 1 - (!b->dx ? rx : (rx ? 1 : 0)),
                   b->dy + 1 - (!b->dy ? ry : (ry ? 1 : 0)), FALSE);
@@ -1210,8 +1348,8 @@ movebubbles()
 void
 water_friction()
 {
-    register int x, y, dx, dy;
-    register boolean eff = FALSE;
+    int x, y, dx, dy;
+    boolean eff = FALSE;
 
     if (Swimming && rn2(4))
         return; /* natural swimmers have advantage */
@@ -1245,7 +1383,7 @@ void
 save_waterlevel(fd, mode)
 int fd, mode;
 {
-    register struct bubble *b;
+    struct bubble *b;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
@@ -1268,11 +1406,10 @@ int fd, mode;
 
 void
 restore_waterlevel(fd)
-register int fd;
+int fd;
 {
-    register struct bubble *b = (struct bubble *) 0, *btmp;
-    register int i;
-    int n;
+    struct bubble *b = (struct bubble *) 0, *btmp;
+    int i, n;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         return;
@@ -1305,7 +1442,7 @@ const char *
 waterbody_name(x, y)
 xchar x, y;
 {
-    register struct rm *lev;
+    struct rm *lev;
     schar ltyp;
 
     if (!isok(x, y))
@@ -1344,10 +1481,10 @@ set_wportal()
 STATIC_OVL void
 setup_waterlevel()
 {
-    register int x, y;
-    register int xskip, yskip;
-    register int water_glyph = cmap_to_glyph(S_water);
-    register int air_glyph = cmap_to_glyph(S_air);
+    int x, y;
+    int xskip, yskip;
+    int water_glyph = cmap_to_glyph(S_water),
+        air_glyph = cmap_to_glyph(S_air);
 
     /* ouch, hardcoded... */
 
@@ -1380,7 +1517,7 @@ setup_waterlevel()
 STATIC_OVL void
 unsetup_waterlevel()
 {
-    register struct bubble *b, *bb;
+    struct bubble *b, *bb;
 
     /* free bubbles */
 
@@ -1393,7 +1530,7 @@ unsetup_waterlevel()
 
 STATIC_OVL void
 mk_bubble(x, y, n)
-register int x, y, n;
+int x, y, n;
 {
     /*
      * These bit masks make visually pleasing bubbles on a normal aspect
@@ -1402,14 +1539,15 @@ register int x, y, n;
      * in situ, either.  The first two elements tell the dimensions of
      * the bubble's bounding box.
      */
-    static uchar bm2[] = { 2, 1, 0x3 }, bm3[] = { 3, 2, 0x7, 0x7 },
+    static uchar bm2[] = { 2, 1, 0x3 },
+                 bm3[] = { 3, 2, 0x7, 0x7 },
                  bm4[] = { 4, 3, 0x6, 0xf, 0x6 },
                  bm5[] = { 5, 3, 0xe, 0x1f, 0xe },
                  bm6[] = { 6, 4, 0x1e, 0x3f, 0x3f, 0x1e },
                  bm7[] = { 7, 4, 0x3e, 0x7f, 0x7f, 0x3e },
                  bm8[] = { 8, 4, 0x7e, 0xff, 0xff, 0x7e },
                  *bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
-    register struct bubble *b;
+    struct bubble *b;
 
     if (x >= bxmax || y >= bymax)
         return;
@@ -1455,11 +1593,11 @@ register int x, y, n;
  */
 STATIC_OVL void
 mv_bubble(b, dx, dy, ini)
-register struct bubble *b;
-register int dx, dy;
-register boolean ini;
+struct bubble *b;
+int dx, dy;
+boolean ini;
 {
-    register int x, y, i, j, colli = 0;
+    int x, y, i, j, colli = 0;
     struct container *cons, *ctemp;
 
     /* clouds move slowly */

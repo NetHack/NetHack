@@ -51,33 +51,36 @@ extern struct mkroom *dnstairs_room, *upstairs_room, *sstairs_room;
 extern NEARDATA coord doors[DOORMAX];
 
 /* values for rtype in the room definition structure */
-#define OROOM 0      /* ordinary room */
-#define COURT 2      /* contains a throne */
-#define SWAMP 3      /* contains pools */
-#define VAULT 4      /* contains piles of gold */
-#define BEEHIVE 5    /* contains killer bees and royal jelly */
-#define MORGUE 6     /* contains corpses, undead and ghosts */
-#define BARRACKS 7   /* contains soldiers and their gear */
-#define ZOO 8        /* floor covered with treasure and monsters */
-#define DELPHI 9     /* contains Oracle and peripherals */
-#define TEMPLE 10    /* contains a shrine */
-#define LEPREHALL 11 /* leprechaun hall (Tom Proudfoot) */
-#define COCKNEST 12  /* cockatrice nest (Tom Proudfoot) */
-#define ANTHOLE 13   /* ants (Tom Proudfoot) */
-#define SHOPBASE 14  /* everything above this is a shop */
-#define ARMORSHOP 15 /* specific shop defines for level compiler */
-#define SCROLLSHOP 16
-#define POTIONSHOP 17
-#define WEAPONSHOP 18
-#define FOODSHOP 19
-#define RINGSHOP 20
-#define WANDSHOP 21
-#define TOOLSHOP 22
-#define BOOKSHOP 23
-#define FODDERSHOP 24 /* health food store */
-#define UNIQUESHOP 25 /* shops here & below not randomly gen'd. */
-#define CANDLESHOP 25
-#define MAXRTYPE 25 /* maximum valid room type */
+enum roomtype_types {
+    OROOM = 0,      /* ordinary room */
+    COURT = 2,      /* contains a throne */
+    SWAMP,      /* contains pools */
+    VAULT,      /* contains piles of gold */
+    BEEHIVE,    /* contains killer bees and royal jelly */
+    MORGUE,     /* contains corpses, undead and ghosts */
+    BARRACKS,   /* contains soldiers and their gear */
+    ZOO,        /* floor covered with treasure and monsters */
+    DELPHI,     /* contains Oracle and peripherals */
+    TEMPLE,     /* contains a shrine */
+    LEPREHALL,  /* leprechaun hall (Tom Proudfoot) */
+    COCKNEST,   /* cockatrice nest (Tom Proudfoot) */
+    ANTHOLE,    /* ants (Tom Proudfoot) */
+    SHOPBASE,   /* everything above this is a shop */
+    ARMORSHOP,  /* specific shop defines for level compiler */
+    SCROLLSHOP,
+    POTIONSHOP,
+    WEAPONSHOP,
+    FOODSHOP,
+    RINGSHOP,
+    WANDSHOP,
+    TOOLSHOP,
+    BOOKSHOP,
+    FODDERSHOP, /* health food store */
+    CANDLESHOP
+};
+
+#define MAXRTYPE (CANDLESHOP) /* maximum valid room type */
+#define UNIQUESHOP (CANDLESHOP) /* shops here & above not randomly gen'd. */
 
 /* Special type for search_special() */
 #define ANY_TYPE (-1)

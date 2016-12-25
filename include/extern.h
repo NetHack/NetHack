@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1461967848 2016/04/29 22:10:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.558 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1471112244 2016/08/13 18:17:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.570 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -184,7 +184,10 @@ E void FDECL(set_occupation, (int (*)(void), const char *, int));
 E char NDECL(pgetchar);
 E void FDECL(pushch, (CHAR_P));
 E void FDECL(savech, (CHAR_P));
-E void NDECL(add_debug_extended_commands);
+E const char *FDECL(key2extcmddesc, (UCHAR_P));
+E boolean FDECL(bind_specialkey, (UCHAR_P, const char *));
+E char FDECL(txt2key, (char *));
+E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
@@ -193,6 +196,8 @@ E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));
+E void FDECL(bind_key, (UCHAR_P, const char *));
+E void NDECL(dokeylist);
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
 E void FDECL(dtoxy, (coord *, int));
 E int FDECL(movecmd, (CHAR_P));
@@ -211,6 +216,7 @@ E void NDECL(end_of_input);
 #endif
 E char NDECL(readchar);
 E void NDECL(sanity_check);
+E char* FDECL(key2txt, (UCHAR_P, char *));
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E boolean FDECL(paranoid_query, (BOOLEAN_P, const char *));
 
@@ -373,6 +379,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
+E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));
@@ -796,6 +803,7 @@ E void NDECL(drinksink);
 
 /* ### hack.c ### */
 
+E boolean FDECL(is_valid_travelpt, (int,int));
 E anything *FDECL(uint_to_any, (unsigned));
 E anything *FDECL(long_to_any, (long));
 E anything *FDECL(monst_to_any, (struct monst *));
@@ -846,6 +854,7 @@ E char *FDECL(lcase, (char *));
 E char *FDECL(ucase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
+E char *FDECL(trimspaces, (char *));
 E char *FDECL(strip_newline, (char *));
 E char *FDECL(eos, (char *));
 E boolean FDECL(str_end_is, (const char *, const char *));
@@ -1342,12 +1351,13 @@ E void FDECL(unstuck, (struct monst *));
 E void FDECL(killed, (struct monst *));
 E void FDECL(xkilled, (struct monst *, int));
 E void FDECL(mon_to_stone, (struct monst *));
+E void FDECL(m_into_limbo, (struct monst *));
 E void FDECL(mnexto, (struct monst *));
 E void FDECL(maybe_mnexto, (struct monst *));
 E boolean FDECL(mnearto, (struct monst *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(m_respond, (struct monst *));
-E void FDECL(setmangry, (struct monst *));
-E void FDECL(wakeup, (struct monst *));
+E void FDECL(setmangry, (struct monst *, BOOLEAN_P));
+E void FDECL(wakeup, (struct monst *, BOOLEAN_P));
 E void NDECL(wake_nearby);
 E void FDECL(wake_nearto, (int, int, int));
 E void FDECL(seemimic, (struct monst *));
@@ -1606,6 +1616,7 @@ E boolean FDECL(the_unique_pm, (struct permonst *));
 E boolean FDECL(erosion_matters, (struct obj *));
 E char *FDECL(doname, (struct obj *));
 E char *FDECL(doname_with_price, (struct obj *));
+E char *FDECL(doname_vague_quan, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *, const char *, unsigned));
 E char *FDECL(cxname, (struct obj *));
@@ -1659,8 +1670,11 @@ E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
                                   char *, char *));
+E void FDECL(parsebindings, (char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
+E char FDECL(get_menu_cmd_key, (CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
+E void FDECL(show_menu_controls, (winid, BOOLEAN_P));
 E void FDECL(assign_warnings, (uchar *));
 E char *FDECL(nh_getenv, (const char *));
 E void FDECL(set_duplicate_opt_detection, (int));
@@ -2268,8 +2282,8 @@ E boolean FDECL(stucksteed, (BOOLEAN_P));
 
 E boolean FDECL(goodpos, (int, int, struct monst *, unsigned));
 E boolean FDECL(enexto, (coord *, XCHAR_P, XCHAR_P, struct permonst *));
-E boolean
-FDECL(enexto_core, (coord *, XCHAR_P, XCHAR_P, struct permonst *, unsigned));
+E boolean FDECL(enexto_core, (coord *, XCHAR_P, XCHAR_P,
+                              struct permonst *, unsigned));
 E void FDECL(teleds, (int, int, BOOLEAN_P));
 E boolean FDECL(safe_teleds, (BOOLEAN_P));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
@@ -2279,13 +2293,13 @@ E int NDECL(dotele);
 E void NDECL(level_tele);
 E void FDECL(domagicportal, (struct trap *));
 E void FDECL(tele_trap, (struct trap *));
-E void FDECL(level_tele_trap, (struct trap *));
+E void FDECL(level_tele_trap, (struct trap *, unsigned));
 E void FDECL(rloc_to, (struct monst *, int, int));
 E boolean FDECL(rloc, (struct monst *, BOOLEAN_P));
 E boolean FDECL(tele_restrict, (struct monst *));
 E void FDECL(mtele_trap, (struct monst *, struct trap *, int));
-E int FDECL(mlevel_tele_trap,
-            (struct monst *, struct trap *, BOOLEAN_P, int));
+E int FDECL(mlevel_tele_trap, (struct monst *, struct trap *,
+                               BOOLEAN_P, int));
 E boolean FDECL(rloco, (struct obj *));
 E int NDECL(random_teleport_level);
 E boolean FDECL(u_teleport_mon, (struct monst *, BOOLEAN_P));
@@ -2771,7 +2785,7 @@ E struct monst *FDECL(montraits, (struct obj *, coord *));
 E struct monst *FDECL(revive, (struct obj *, BOOLEAN_P));
 E int FDECL(unturn_dead, (struct monst *));
 E void FDECL(cancel_item, (struct obj *));
-E boolean FDECL(drain_item, (struct obj *));
+E boolean FDECL(drain_item, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(poly_obj, (struct obj *, int));
 E boolean FDECL(obj_resists, (struct obj *, int, int));
 E boolean FDECL(obj_shudders, (struct obj *));

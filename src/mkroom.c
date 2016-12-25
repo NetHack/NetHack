@@ -380,12 +380,16 @@ struct mkroom *sroom;
         }
     switch (type) {
     case COURT: {
-        struct obj *chest;
+        struct obj *chest, *gold;
         levl[tx][ty].typ = THRONE;
         (void) somexy(sroom, &mm);
-        (void) mkgold((long) rn1(50 * level_difficulty(), 10), mm.x, mm.y);
+        gold = mksobj(GOLD_PIECE, TRUE, FALSE);
+        gold->quan = (long) rn1(50 * level_difficulty(), 10);
+        gold->owt = weight(gold);
         /* the royal coffers */
         chest = mksobj_at(CHEST, mm.x, mm.y, TRUE, FALSE);
+        add_to_container(chest, gold);
+        chest->owt = weight(chest);
         chest->spe = 2; /* so it can be found later */
         level.flags.has_court = 1;
         break;

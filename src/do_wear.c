@@ -1484,6 +1484,10 @@ int
 cursed(otmp)
 register struct obj *otmp;
 {
+    if (!otmp) {
+        impossible("cursed without otmp");
+        return 0;
+    }
     /* Curses, like chickens, come home to roost. */
     if ((otmp == uwep) ? welded(otmp) : (int) otmp->cursed) {
         boolean use_plural = (is_boots(otmp) || is_gloves(otmp)

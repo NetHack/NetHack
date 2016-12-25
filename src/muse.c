@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1457254910 2016/03/06 09:01:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1469840918 2016/07/30 01:08:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1207,8 +1207,8 @@ register struct monst *mtmp;
 register struct obj *otmp;
 {
     int tmp;
-
     boolean reveal_invis = FALSE;
+
     if (mtmp != &youmonst) {
         mtmp->msleeping = 0;
         if (mtmp->m_ap_type)
@@ -1819,12 +1819,15 @@ struct monst *mtmp;
         Strcpy(nambuf, mon_nam(mtmp));
         mon_set_minvis(mtmp);
         if (vismon && mtmp->minvis) { /* was seen, now invisible */
-            if (canspotmon(mtmp))
+            if (canspotmon(mtmp)) {
                 pline("%s body takes on a %s transparency.",
                       upstart(s_suffix(nambuf)),
                       Hallucination ? "normal" : "strange");
-            else
+            } else {
                 pline("Suddenly you cannot see %s.", nambuf);
+                if (vis)
+                    map_invisible(mtmp->mx, mtmp->my);
+            }
             if (oseen)
                 makeknown(otmp->otyp);
         }
@@ -2366,7 +2369,7 @@ boolean by_you;
                 return muse_unslime(mon, obj, (struct trap *) 0, by_you);
 
         if (((t = t_at(mon->mx, mon->my)) == 0 || t->ttyp != FIRE_TRAP)
-            && !mon->mtrapped && !mptr->mmove == 0) {
+            && mptr->mmove && !mon->mtrapped) {
             int xy[2][8], x, y, idx, ridx, nxy = 0;
 
             for (x = mon->mx - 1; x <= mon->mx + 1; ++x)

@@ -352,7 +352,7 @@ int portdebug;
         if (vk == 0xBF)
             ch = M('?');
         else
-            ch = M(tolower(keycode));
+            ch = M(tolower((uchar) keycode));
     } else if (ch < 32 && !isnumkeypad(scan)) {
         /* Control code; ReadConsole seems to filter some of these,
          * including ESC */

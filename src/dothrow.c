@@ -608,7 +608,8 @@ int x, y;
 
     if ((mon = m_at(x, y)) != 0) {
         You("bump into %s.", a_monnam(mon));
-        wakeup(mon);
+        wakeup(mon, FALSE);
+        setmangry(mon, FALSE);
         wake_nearto(x,y, 10);
         return FALSE;
     }
@@ -984,11 +985,11 @@ sho_obj_return_to_u(obj)
 struct obj *obj;
 {
     /* might already be our location (bounced off a wall) */
-    if (bhitpos.x != u.ux || bhitpos.y != u.uy) {
+    if ((u.dx || u.dy) && (bhitpos.x != u.ux || bhitpos.y != u.uy)) {
         int x = bhitpos.x - u.dx, y = bhitpos.y - u.dy;
 
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
-        while (x != u.ux || y != u.uy) {
+        while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
             delay_output();
             x -= u.dx;
@@ -1346,7 +1347,7 @@ boolean maybe_wakeup;
     else
         miss(missile, mon);
     if (maybe_wakeup && !rn2(3))
-        wakeup(mon);
+        wakeup(mon, TRUE);
     return;
 }
 
@@ -1448,7 +1449,8 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
        at leader... (kicked artifact is ok too; HMON_APPLIED could
        occur if quest artifact polearm or grapnel ever gets added) */
     if (hmode != HMON_APPLIED && quest_arti_hits_leader(obj, mon)) {
-        /* not wakeup(), which angers non-tame monsters */
+        /* AIS: changes to wakeup() means that it's now less inappropriate here
+           than it used to be, but the manual version works just as well */
         mon->msleeping = 0;
         mon->mstrategy &= ~STRAT_WAITMASK;
 
@@ -1562,7 +1564,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
         } else {
             tmiss(obj, mon, TRUE);
             if (hmode == HMON_APPLIED)
-                wakeup(mon);
+                wakeup(mon, TRUE);
         }
 
     } else if (otyp == HEAVY_IRON_BALL) {
@@ -1610,7 +1612,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
         }
     } else if (guaranteed_hit) {
         /* this assumes that guaranteed_hit is due to swallowing */
-        wakeup(mon);
+        wakeup(mon, TRUE);
         if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
             if (is_animal(u.ustuck->data)) {
                 minstapetrify(u.ustuck, TRUE);

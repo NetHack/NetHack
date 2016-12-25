@@ -35,13 +35,15 @@ typedef struct stairway { /* basic stairway identifier */
 } stairway;
 
 /* level region types */
-#define LR_DOWNSTAIR 0
-#define LR_UPSTAIR 1
-#define LR_PORTAL 2
-#define LR_BRANCH 3
-#define LR_TELE 4
-#define LR_UPTELE 5
-#define LR_DOWNTELE 6
+enum level_region_types {
+    LR_DOWNSTAIR = 0,
+    LR_UPSTAIR,
+    LR_PORTAL,
+    LR_BRANCH,
+    LR_TELE,
+    LR_UPTELE,
+    LR_DOWNTELE
+};
 
 typedef struct dest_area { /* non-stairway level change identifier */
     xchar lx, ly;          /* "lower" left corner (near [0,0]) */

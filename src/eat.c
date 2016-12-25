@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1467028559 2016/06/27 11:55:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1470272344 2016/08/04 00:59:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.172 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -92,6 +92,12 @@ register struct obj *obj;
     if (metallivorous(youmonst.data) && is_metallic(obj)
         && (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
         return TRUE;
+
+    /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
+    if (u.umonnum == PM_GHOUL)
+        return (boolean)((obj->otyp == CORPSE
+                          && !vegan(&mons[obj->corpsenm]))
+                         || (obj->otyp == EGG));
 
     if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj)
         /* [g.cubes can eat containers and retain all contents
@@ -498,7 +504,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
     } else if (mdef == &youmonst) {
         Your("brain is eaten!");
     } else { /* monster against monster */
-        if (visflag)
+        if (visflag && canspotmon(mdef))
             pline("%s brain is eaten!", s_suffix(Monnam(mdef)));
     }
 
@@ -512,7 +518,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
-            if (visflag)
+            if (visflag && canseemon(magr))
                 pline("%s turns to stone!", Monnam(magr));
             monstone(magr);
             if (magr->mhp > 0) {
@@ -597,7 +603,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
          * monster mind flayer is eating another monster's brain
          */
         if (mindless(pd)) {
-            if (visflag)
+            if (visflag && canspotmon(mdef))
                 pline("%s doesn't notice.", Monnam(mdef));
             return MM_MISS;
         } else if (is_rider(pd)) {
@@ -609,7 +615,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         } else {
             *dmg_p += xtra_dmg;
             give_nutrit = TRUE;
-            if (*dmg_p >= mdef->mhp && visflag)
+            if (*dmg_p >= mdef->mhp && visflag && canspotmon(mdef))
                 pline("%s last thought fades away...",
                       s_suffix(Monnam(mdef)));
         }
@@ -1622,7 +1628,7 @@ struct obj *otmp;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
             losestr(rnd(4));
-            losehp(rnd(15), !glob ? "poisonous corpse" : "posionous glob",
+            losehp(rnd(15), !glob ? "poisonous corpse" : "poisonous glob",
                    KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
@@ -1662,22 +1668,33 @@ struct obj *otmp;
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
     } else {
-        /* [is this right?  omnivores end up always disliking the taste] */
-        boolean yummy = vegan(&mons[mnum])
-                           ? (!carnivorous(youmonst.data)
-                              && herbivorous(youmonst.data))
-                           : (carnivorous(youmonst.data)
-                              && !herbivorous(youmonst.data));
+        /* yummy is always False for omnivores, palatable always True */
+        boolean yummy = (vegan(&mons[mnum])
+                            ? (!carnivorous(youmonst.data)
+                               && herbivorous(youmonst.data))
+                            : (carnivorous(youmonst.data)
+                               && !herbivorous(youmonst.data))),
+            palatable = ((vegetarian(&mons[mnum])
+                          ? herbivorous(youmonst.data)
+                          : carnivorous(youmonst.data))
+                         && rn2(10)
+                         && ((rotted < 1) ? TRUE : !rn2(rotted+1)));
+        const char *pmxnam = food_xname(otmp, FALSE);
 
-        pline("%s%s %s!",
+        if (!strncmpi(pmxnam, "the ", 4))
+            pmxnam += 4;
+        pline("%s%s %s %s%c",
               type_is_pname(&mons[mnum])
                  ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
-              food_xname(otmp, FALSE),
+              pmxnam,
+              Hallucination ? "is" : "tastes",
+                  /* tiger reference is to TV ads for "Frosted Flakes",
+                     breakfast cereal targeted at kids by "Tony the tiger" */
               Hallucination
-                  ? (yummy ? ((u.umonnum == PM_TIGER) ? "is gr-r-reat"
-                                                      : "is gnarly")
-                           : "is grody")
-                  : (yummy ? "is delicious" : "tastes terrible"));
+                 ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
+                          : palatable ? "copacetic" : "grody")
+                 : (yummy ? "delicious" : palatable ? "okay" : "terrible"),
+              (yummy || !palatable) ? '!' : '.');
     }
 
     return retcode;

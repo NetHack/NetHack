@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1460103141 2016/04/08 08:12:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,7 +145,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
                 u.ustuck = mtmp;
         }
-        wakeup(mtmp); /* always necessary; also un-mimics mimics */
+        wakeup(mtmp, TRUE); /* always necessary; also un-mimics mimics */
         return TRUE;
     }
 
@@ -190,7 +190,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
      */
     if ((mtmp->mundetected || mtmp->m_ap_type) && sensemon(mtmp)) {
         mtmp->mundetected = 0;
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     }
 
     if (flags.confirm && mtmp->mpeaceful && !Confusion && !Hallucination
@@ -573,7 +573,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     unconventional[0] = '\0';
     saved_oname[0] = '\0';
 
-    wakeup(mon);
+    wakeup(mon, TRUE);
     if (!obj) { /* attack with bare hands */
         if (mdat == &mons[PM_SHADE])
             tmp = 0;
@@ -894,7 +894,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                             pline("%s %s over %s!", what,
                                   vtense(what, "splash"), whom);
                         }
-                        setmangry(mon);
+                        setmangry(mon, TRUE);
                         mon->mcansee = 0;
                         tmp = rn1(25, 21);
                         if (((int) mon->mblinded + tmp) > 127)
@@ -903,7 +903,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                             mon->mblinded += tmp;
                     } else {
                         pline(obj->otyp == CREAM_PIE ? "Splat!" : "Splash!");
-                        setmangry(mon);
+                        setmangry(mon, TRUE);
                     }
                     if (thrown)
                         obfree(obj, (struct obj *) 0);
@@ -1894,6 +1894,18 @@ register struct attack *mattk;
         for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
             (void) snuff_lit(otmp);
 
+        /* force vampire in bat, cloud, or wolf form to revert back to
+           vampire form now instead of dealing with that when it dies */
+        if (is_vampshifter(mdef)
+            && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+            You("engulf it, then expel it.");
+            if (canspotmon(mdef))
+                pline("It turns into %s.", a_monnam(mdef));
+            else
+                map_invisible(mdef->mx, mdef->my);
+            return 1;
+        }
+
         /* engulfing a cockatrice or digesting a Rider or Medusa */
         fatal_gulp = (touch_petrifies(pd) && !Stone_resistance)
                      || (mattk->adtyp == AD_DGST
@@ -1937,7 +1949,13 @@ register struct attack *mattk;
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
-                xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
+                /* start_engulf() issues "you engulf <mdef>" above; this
+                   used to specify XKILL_NOMSG but we need "you kill <mdef>"
+                   in case we're also going to get "welcome to level N+1";
+                   "you totally digest <mdef>" will be coming soon (after
+                   several turns) but the level-gain message seems out of
+                   order if the kill message is left implicit */
+                xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
                 if (mdef->mhp > 0) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));
@@ -2079,7 +2097,7 @@ boolean wouldhavehit;
     else
         You("miss it.");
     if (!mdef->msleeping && mdef->mcanmove)
-        wakeup(mdef);
+        wakeup(mdef, TRUE);
 }
 
 /* attack monster as a monster. */
@@ -2160,7 +2178,7 @@ register struct monst *mon;
                     sum[i] = damageum(mon, mattk);
                     break;
                 }
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 /* maybe this check should be in damageum()? */
                 if (mon->data == &mons[PM_SHADE]
                     && !(mattk->aatyp == AT_KICK && uarmf
@@ -2194,7 +2212,7 @@ register struct monst *mon;
              * already grabbed in a previous attack
              */
             dhit = 1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             if (mon->data == &mons[PM_SHADE])
                 Your("hug passes harmlessly through %s.", mon_nam(mon));
             else if (!sticks(mon->data) && !u.uswallow) {
@@ -2212,7 +2230,7 @@ register struct monst *mon;
 
         case AT_EXPL: /* automatic hit if next to */
             dhit = -1;
-            wakeup(mon);
+            wakeup(mon, TRUE);
             sum[i] = explum(mon, mattk);
             break;
 
@@ -2220,7 +2238,7 @@ register struct monst *mon;
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
             if ((dhit = (tmp > rnd(20 + i)))) {
-                wakeup(mon);
+                wakeup(mon, TRUE);
                 if (mon->data == &mons[PM_SHADE])
                     Your("attempt to surround %s is harmless.", mon_nam(mon));
                 else {
@@ -2519,12 +2537,12 @@ boolean wep_was_destroyed;
  */
 void
 passive_obj(mon, obj, mattk)
-register struct monst *mon;
-register struct obj *obj; /* null means pick uwep, uswapwep or uarmg */
+struct monst *mon;
+struct obj *obj;          /* null means pick uwep, uswapwep or uarmg */
 struct attack *mattk;     /* null means we find one internally */
 {
     struct permonst *ptr = mon->data;
-    register int i;
+    int i;
 
     /* if caller hasn't specified an object, use uwep, uswapwep or uarmg */
     if (!obj) {
@@ -2571,7 +2589,7 @@ struct attack *mattk;     /* null means we find one internally */
         break;
     case AD_ENCH:
         if (!mon->mcan) {
-            if (drain_item(obj) && carried(obj)
+            if (drain_item(obj, TRUE) && carried(obj)
                 && (obj->known || obj->oclass == ARMOR_CLASS)) {
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
             }
@@ -2619,7 +2637,7 @@ struct monst *mtmp;
     if (what)
         pline(fmt, what);
 
-    wakeup(mtmp); /* clears mimicking */
+    wakeup(mtmp, FALSE); /* clears mimicking */
     /* if hero is blind, wakeup() won't display the monster even though
        it's no longer concealed */
     if (!canspotmon(mtmp)
@@ -2677,7 +2695,7 @@ struct obj *otmp; /* source of flash */
             }
             if (mtmp->mhp > 0) {
                 if (!context.mon_moving)
-                    setmangry(mtmp);
+                    setmangry(mtmp, TRUE);
                 if (tmp < 9 && !mtmp->isshk && rn2(4))
                     monflee(mtmp, rn2(4) ? rnd(100) : 0, FALSE, TRUE);
                 mtmp->mcansee = 0;

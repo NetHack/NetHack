@@ -922,6 +922,18 @@ int how;
             return;
         }
     }
+    if (program_state.panicking
+#ifdef HANGUPHANDLING
+        || program_state.done_hup
+#endif
+        ) {
+        /* skip status update if panicking or disconnected */
+        context.botl = context.botlx = FALSE;
+    } else {
+        /* otherwise force full status update */
+        context.botlx = TRUE;
+        bot();
+    }
 
     if (how == ASCENDED || (!killer.name[0] && how == GENOCIDED))
         killer.format = NO_KILLER_PREFIX;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1450178551 2015/12/15 11:22:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1472006251 2016/08/24 02:37:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@
         char *          ucase           (char *)
         char *          upstart         (char *)
         char *          mungspaces      (char *)
+        char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
@@ -159,6 +160,22 @@ char *bp;
     return bp;
 }
 
+/* remove leading and trailing whitespace, in place */
+char*
+trimspaces(txt)
+char* txt;
+{
+    char* end;
+
+    while (*txt == ' ' || *txt == '\t')
+        txt++;
+    end = eos(txt);
+    while (--end >= txt && (*end == ' ' || *end == '\t'))
+        *end = '\0';
+
+    return txt;
+}
+
 /* remove \n from end of line; remove \r too if one is there */
 char *
 strip_newline(str)
@@ -297,7 +314,7 @@ char *
 ing_suffix(s)
 const char *s;
 {
-    const char *vowel = "aeiouy";
+    static const char vowel[] = "aeiouwy";
     static char buf[BUFSZ];
     char onoff[10];
     char *p;
@@ -305,21 +322,22 @@ const char *s;
     Strcpy(buf, s);
     p = eos(buf);
     onoff[0] = *p = *(p + 1) = '\0';
-    if ((strlen(buf) > 4)
-        && (!strcmpi(p - 3, " on") || !strcmpi(p - 4, " off")
-            || !strcmpi(p - 5, " with"))) {
-        p = strrchr(buf, ' ');
+    if ((p >= &buf[3] && !strcmpi(p - 3, " on"))
+        || (p >= &buf[4] && !strcmpi(p - 4, " off"))
+        || (p >= &buf[5] && !strcmpi(p - 5, " with"))) {
+        p = rindex(buf, ' ');
         Strcpy(onoff, p);
+        *p = '\0';
     }
-    if (!index(vowel, *(p - 1)) && index(vowel, *(p - 2))
-        && !index(vowel, *(p - 3))) {
+    if (p >= &buf[3] && !index(vowel, *(p - 1))
+        && index(vowel, *(p - 2)) && !index(vowel, *(p - 3))) {
         /* tip -> tipp + ing */
         *p = *(p - 1);
         *(p + 1) = '\0';
-    } else if (!strcmpi(p - 2, "ie")) { /* vie -> vy + ing */
+    } else if (p >= &buf[2] && !strcmpi(p - 2, "ie")) { /* vie -> vy + ing */
         *(p - 2) = 'y';
         *(p - 1) = '\0';
-    } else if (*(p - 1) == 'e') /* grease -> greas + ing */
+    } else if (p >= &buf[1] && *(p - 1) == 'e') /* grease -> greas + ing */
         *(p - 1) = '\0';
     Strcat(buf, "ing");
     if (onoff[0])
@@ -384,13 +402,17 @@ char *sbuf;
     return strcpy(sbuf, buf);
 }
 
+#define VISCTRL_NBUF 5
 /* make a displayable string from a character */
 char *
 visctrl(c)
 char c;
 {
-    Static char ccc[5];
+    Static char visctrl_bufs[VISCTRL_NBUF][5];
+    static int nbuf = 0;
     register int i = 0;
+    char *ccc = visctrl_bufs[nbuf];
+    nbuf = (nbuf + 1) % VISCTRL_NBUF;
 
     if ((uchar) c & 0200) {
         ccc[i++] = 'M';

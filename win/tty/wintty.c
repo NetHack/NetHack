@@ -2448,19 +2448,22 @@ const char *str;
        topline wrapping converts space at wrap point into newline,
        we reverse that here */
     if ((int) strlen(str) >= CO || index(str, '\n')) {
-        register const char *bp0 = str;
-        char c, nxtc, *bp1 = cbuf, *endbp1 = &cbuf[sizeof cbuf - 1];
+        const char *in_str = str;
+        char c, *outstr = cbuf, *outend = &cbuf[sizeof cbuf - 1];
+        boolean was_space = TRUE; /* True discards all leading spaces;
+                                     False would retain one if present */
 
-        cbuf[0] = cbuf[sizeof cbuf - 1] = '\0'; /* superfluous */
-        nxtc = (*bp0 == '\n') ? ' ' : *bp0;
-        do {
-            c = nxtc;
-            nxtc = bp0[1];
-            if (nxtc == '\n')
-                nxtc = ' ';
-            if (c != ' ' || nxtc != ' ')
-                *bp1++ = c;
-        } while (*bp0++ && bp1 < endbp1);
+        while ((c = *in_str++) != '\0' && outstr < outend) {
+            if (c == '\n')
+                c = ' ';
+            if (was_space && c == ' ')
+                continue;
+            *outstr++ = c;
+            was_space = (c == ' ');
+        }
+        if ((was_space && outstr > cbuf) || outstr == outend)
+            --outstr; /* remove trailing space or make room for terminator */
+        *outstr = '\0';
         str = cbuf;
     }
     return str;

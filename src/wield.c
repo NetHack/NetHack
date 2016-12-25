@@ -96,6 +96,10 @@ register struct obj *obj;
         if (!Blind)
             pline("%s shining.", Tobjnam(olduwep, "stop"));
     }
+    if (uwep == obj
+        && ((uwep && uwep->oartifact == ART_OGRESMASHER)
+            || (olduwep && olduwep->oartifact == ART_OGRESMASHER)))
+        context.botl = 1;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
@@ -421,10 +425,11 @@ dowieldquiver()
             }
             Strcpy(qbuf, "Ready all of them instead?");
         } else {
+            boolean use_plural = (is_plural(uwep) || pair_of(uwep));
+
             Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
-                    /* uwep->quan is 1, but name might be plural ('boots') */
-                    !is_plural(uwep) ? "that" : "those",
-                    !is_plural(uwep) ? "it" : "them");
+                    !use_plural ? "that" : "those",
+                    !use_plural ? "it" : "them");
         }
         /* require confirmation to ready the main weapon */
         if (ynq(qbuf) != 'y') {
@@ -458,11 +463,12 @@ dowieldquiver()
             }
             Strcpy(qbuf, "Ready all of them instead?");
         } else {
+            boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
+
             Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
-                    !is_plural(uswapwep) ? "That is" : "Those are",
+                    !use_plural ? "That is" : "Those are",
                     u.twoweap ? "second" : "alternate",
-                    /* uswapwep->quan is 1, but name might be plural */
-                    !is_plural(uswapwep) ? "it" : "them");
+                    !use_plural ? "it" : "them");
         }
         /* require confirmation to ready the alternate weapon */
         if (ynq(qbuf) != 'y') {

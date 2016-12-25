@@ -29,6 +29,7 @@ negative intrinsic protection shouldn't confer MC=1, "you are warded" (not
 	possible from divine protection but is possible from eating rings)
 make a slight adjustment to the quickmimic() sense wording
 fix typo in passage 1 of The Colour of Magic
+fix typos in passages 2 and 6 of Thud!
 falling asleep when reading dull spellbook ignored sleep resistance
 getpos() complaint about invalid movement keystroke didn't describe meta-chars
 	accurately
@@ -312,6 +313,57 @@ when #tip's terse object drop format got interrupted by a regular message,
 	seems hopeless; leaving it is better than always using verbose format)
 for #tip inside shop, credit was incorrectly given for spilled gold if that
 	gold's stale location coordinates didn't happen to be inside the shop
+when confused scroll of light summoned lights, player would be asked what to
+	call the scroll even if scroll of light was already identified
+if a visible monster becomes invisible, mark its spot with the 'remembered,
+	unseen monster' glyph ('I' character or '?' tile)
+monsters can throw cockatrice eggs at hero, but there was no handling for eggs
+	when the missile hit an intervening monster
+clarify that shape-shifted vampires revert to vampire form when petrified or
+	digested; when back in 'V' form, they're vulnerable to such damage
+when poly'd into an engulfer which does digestion damage, a kill resulting in
+	a level gain gave "welcome to level N+1" before "you digest <victim>"
+any corpse eaten by omnivorous hero always tasted "terrible"
+eating the corpse of a unique non-named monster (Wizard of Yendor, Oracle,
+	Chromatic Dragon, others) gave "The the <monster corpse> tastes ..."
+when escaping the dungeon, change "you were here" annotation in dungeon
+	overview to "you left from here"
+option parsing will crash if 'playmode' option is present without a value
+any item drained of enchantment was blamed on the player as far as shop
+	billing was concerned, even if caused by disenchanter attack
+if user supplied a specific monster name when asked to choose a monster class,
+	first prefix match was picked rather than best match ("titan" yielded
+	S_quadruped due to being preceded by "titanothere" in mons[])
+change ing_suffix() to not double final 'w' when adding 'ing' ('t=' yielded
+	"You mime throwwing something.")
+using 'D' to drop when not carrying anything finished (after doing nothing)
+	without giving any feedback for menustyles "full" and "partial"
+"you hear a distant <musical note> squeak" might actually be nearby
+differentiate symset and roguesymset option menu prompts
+don't show monster vs. monster attack message, if the message refers to
+	a monster that cannot be sensed by the hero
+umber hulk gazing at hidden mimic forces mimic to unhide
+show some timed hero properties in wizard-mode #timeout
+give quest guardians some equipment
+hero polyed into ghoul can only eat non-veggy corpses or eggs
+kicking activates statue traps
+pets start with apport equal to your charisma
+sometimes generate the random mazes with wide corridors, thick walls,
+	or with dead ends changed to loops
+put throne room gold in the chest
+wielding Trollsbane prevents trolls from reviving
+wielding Demonbane prevents demons summoning friends
+wielding Dragonbane confers reflection
+wielding Ogresmasher grants 25 constitution
+Elbereth must now be on a square by itself to function
+Elbereth now erodes based on attacks by the player, not monsters scared
+novels are made of paper, not gold
+movement speeds are made less predictable by using random rounding, rather
+	than via adding a random offset
+some death by the-poison-was-deadly situations left stale non-zero HP shown
+	on the status line during final disclosure
+when sitting at a trap spot: You sit down. You step on a level teleporter.
+	(likewise for polymorph trap, and similar issue for web)
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -323,16 +375,25 @@ rings covered by non-cursed gloves not listed as 'R' candidates
 in baalz_fixup, move any monster away from the two fake pool spots
 switching farlook from xname to doname was giving away information for items
 	located via object detection (quantity of detected gold)
+changing doname to use "some" instead of precise quantity when an item's
+	dknown flag is not set could result in blind hero getting
+	"There is a some jackal corpses here.  Eat one?" and
+	"You can only lift some of the some jackal corpses.  Continue?"
 catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
 fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
 	'remove' menu choices in interactive handling for menu colorings,
 	message types, and autopickup exceptions subject to buffer overflow
 when picking a destination for #jump, '$' to show valid dest. is more accurate
+enchant armor gave "your pair of boots/gloves glow", should have been "glows"
+when autopickup is overridden in a shop, always-pick-up exceptions and
+	pickup_thrown still picked unpaid items up
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 tiles: wrinkled spellbook had a spurious brown pixel on far right edge of tile
+tiles: when statues are displayed as corresponding monsters, total_tiles_used
+	in generated src/tile.c had incorrect value
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
@@ -379,6 +440,8 @@ X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
 X11: use grayscale monster tiles for statues
+X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
+	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 
 
 General New Features
@@ -398,8 +461,8 @@ allow knife and stiletto as possible tin opening tools
 wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Mort, Sourcery, Wyrd Sisters, Pyramids, Guards! Guards!,
-	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff, and
-	Raising Steam
+	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff,
+	Raising Steam, and The Shepherd's Crown
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
 database entries for Cleaver, Sunsword, Frost and Fire brands, and
 	polymorph trap
@@ -448,6 +511,14 @@ undead #turning takes less time at higher experience level
 peacefuls may react when you attack other peacefuls
 prevent diagonal jumping through open doorways
 different liquids when hallucinating
+when moving a cursor for travel target, show if there is no known travel
+	path to that location, if "autodescribe" is on
+show the reason why travel was interrupted if mention_walls is on
+random horses have a tiny chance of being generated saddled
+give feedback just before timed levitation runs out
+travel accepts 'm' (request menu) prefix
+pressing a or A when cursor positioning shows menu of "interesting" features
+wizard-mode command #wizmakemap to recreate the current level
 
 
 Platform- and/or Interface-Specific New Features
@@ -465,6 +536,8 @@ X11: NetHack*extcmd_height_delta resource can be used to adjust initial size
 X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 	NetHack*status_condition.foreground, .background, and .showGrip
 	resources replaced by status_condition[1-3].*
+X11: more terminal-like default resources
+win32gui: save and load map colors from registry
 
 
 NetHack Community Patches (or Variation) Included
@@ -481,6 +554,7 @@ Ray Chason's MS-DOS port restored to functionality with credit to Reddit user
 	b_helyer for the fix to sys/share/pcmain.c
 Ray Chason's MSDOS port support for some VESA modes
 Darshan Shaligram's pet ranged attack
+Jason Dorje Short's key rebinding
 
 
 Code Cleanup and Reorganization

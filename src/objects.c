@@ -984,7 +984,7 @@ SPELL("freeze sphere",   "hardcover",
 SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER),
 /* tribute book for 3.6 */
 OBJECT(OBJ("novel", "paperback"),
-       BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, HI_PAPER),
+       BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),
        0, SPBOOK_CLASS, 0, 0, 0, 20, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE),
 /* a special, one of a kind, spellbook */
 OBJECT(OBJ("Book of the Dead", "papyrus"),

@@ -1,11 +1,11 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456992469 2016/03/03 08:07:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_VAR NEARDATA struct obj *otmp;
+STATIC_VAR NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *, struct monst *,
@@ -646,6 +646,7 @@ register struct monst *mtmp;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
+        mon_currwep = (struct obj *)0;
         mattk = getmattk(mtmp, &youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
             || (skipnonmagc && mattk->aatyp != AT_MAGC))
@@ -747,18 +748,18 @@ register struct monst *mtmp;
                         break;
                 }
                 if (foundyou) {
-                    otmp = MON_WEP(mtmp);
-                    if (otmp) {
-                        hittmp = hitval(otmp, &youmonst);
+                    mon_currwep = MON_WEP(mtmp);
+                    if (mon_currwep) {
+                        hittmp = hitval(mon_currwep, &youmonst);
                         tmp += hittmp;
-                        mswings(mtmp, otmp);
+                        mswings(mtmp, mon_currwep);
                     }
                     if (tmp > (j = dieroll = rnd(20 + i)))
                         sum[i] = hitmu(mtmp, mattk);
                     else
                         missmu(mtmp, (tmp == j), mattk);
                     /* KMH -- Don't accumulate to-hit bonuses */
-                    if (otmp)
+                    if (mon_currwep)
                         tmp -= hittmp;
                 } else {
                     wildmiss(mtmp, mattk);
@@ -968,6 +969,7 @@ register struct attack *mattk;
                                          : "crushed");
             }
         } else { /* hand to hand weapon */
+            struct obj *otmp = mon_currwep;
             if (mattk->aatyp == AT_WEAP && otmp) {
                 int tmp;
 
@@ -1597,7 +1599,27 @@ register struct attack *mattk;
         if (uncancelled) {
             struct obj *obj = some_armor(&youmonst);
 
-            if (drain_item(obj)) {
+            if (!obj) {
+                /* some rings are susceptible;
+                   amulets and blindfolds aren't (at present) */
+                switch (rn2(5)) {
+                case 0:
+                    break;
+                case 1:
+                    obj = uright;
+                    break;
+                case 2:
+                    obj = uleft;
+                    break;
+                case 3:
+                    obj = uamul;
+                    break;
+                case 4:
+                    obj = ublindf;
+                    break;
+                }
+            }
+            if (drain_item(obj, FALSE)) {
                 pline("%s less effective.", Yobjnam2(obj, "seem"));
             }
         }
@@ -2690,8 +2712,10 @@ register struct attack *mattk;
         return 1;
     }
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
-        if (otmp) {
-            (void) drain_item(otmp);
+        if (mon_currwep) {
+            /* by_you==True: passive counterattack to hero's action
+               is hero's fault */
+            (void) drain_item(mon_currwep, TRUE);
             /* No message */
         }
         return 1;

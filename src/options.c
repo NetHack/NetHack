@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1461102048 2016/04/19 21:40:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1470357737 2016/08/05 00:42:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.279 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -230,6 +230,8 @@ static struct Bool_Opt {
 #else
     { "vt_tiledata", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
+    { "whatis_menu", &iflags.getloc_usemenu, FALSE, SET_IN_GAME },
+    { "whatis_inview", &iflags.getloc_limitview, FALSE, SET_IN_GAME },
     { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
     { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
 #ifdef ZEROCOMP
@@ -469,21 +471,21 @@ static char def_inv_order[MAXOCLASSES] = {
 typedef struct {
     const char *name;
     char cmd;
+    const char *desc;
 } menu_cmd_t;
 
-#define NUM_MENU_CMDS 11
-static const menu_cmd_t default_menu_cmd_info[NUM_MENU_CMDS] = {
-/* 0*/  { "menu_first_page", MENU_FIRST_PAGE },
-        { "menu_last_page", MENU_LAST_PAGE },
-        { "menu_next_page", MENU_NEXT_PAGE },
-        { "menu_previous_page", MENU_PREVIOUS_PAGE },
-        { "menu_select_all", MENU_SELECT_ALL },
-/* 5*/  { "menu_deselect_all", MENU_UNSELECT_ALL },
-        { "menu_invert_all", MENU_INVERT_ALL },
-        { "menu_select_page", MENU_SELECT_PAGE },
-        { "menu_deselect_page", MENU_UNSELECT_PAGE },
-        { "menu_invert_page", MENU_INVERT_PAGE },
-/*10*/  { "menu_search", MENU_SEARCH },
+static const menu_cmd_t default_menu_cmd_info[] = {
+ { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
+ { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
+ { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
+ { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+ { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
+ { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
+ { "menu_invert_all", MENU_INVERT_ALL, "Insert selection" },
+ { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
+ { "menu_deselect_page", MENU_UNSELECT_PAGE, "Unselect items in current page" },
+ { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
+ { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
 };
 
 /*
@@ -500,6 +502,7 @@ static boolean initial, from_file;
 STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
 STATIC_DCL void FDECL(escapes, (const char *, char *));
 STATIC_DCL void FDECL(rejectoption, (const char *));
+STATIC_DCL void FDECL(badoptmsg, (const char *, const char *));
 STATIC_DCL void FDECL(badoption, (const char *));
 STATIC_DCL char *FDECL(string_for_opt, (char *, BOOLEAN_P));
 STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
@@ -832,6 +835,10 @@ int maxlen;
  * has the effect of 'meta'-ing the value which follows (so that the
  * alternate character set will be enabled).
  *
+ * X     normal key X
+ * ^X    control-X
+ * \mX   meta-X
+ *
  * For 3.4.3 and earlier, input ending with "\M", backslash, or caret
  * prior to terminating '\0' would pull that '\0' into the output and then
  * keep processing past it, potentially overflowing the output buffer.
@@ -927,38 +934,41 @@ const char *optname;
 }
 
 STATIC_OVL void
-badoption(opts)
+badoptmsg(opts, reason)
 const char *opts;
+const char *reason; /* "Bad syntax" or "Missing value" */
 {
+    const char *linesplit = "";
+
     if (!initial) {
         if (!strncmp(opts, "h", 1) || !strncmp(opts, "?", 1))
             option_help();
         else
-            pline("Bad syntax: %s.  Enter \"?g\" for help.", opts);
+            pline("%s: %s.  Enter \"?g\" for help.", reason, opts);
         return;
-    }
 #ifdef MAC
-    else
+    } else {
         return;
 #endif
+    }
 
+#ifdef WIN32
+    linesplit = "\n";
+#endif
     if (from_file)
-        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", configfile,
-#ifdef WIN32
-                    "\n",
-#else
-                    "",
-#endif
-                    opts);
+        raw_printf("%s in OPTIONS in %s: %s%s.\n",
+                   reason, configfile, linesplit, opts);
     else
-        raw_printf("Bad syntax in NETHACKOPTIONS: %s%s.\n",
-#ifdef WIN32
-                    "\n",
-#else
-                    "",
-#endif
-                    opts);
+        raw_printf("%s in NETHACKOPTIONS: %s%s.\n",
+                   reason, linesplit, opts);
     wait_synch();
+}
+
+STATIC_OVL void
+badoption(opts)
+const char *opts;
+{
+    badoptmsg(opts, "Bad syntax");
 }
 
 STATIC_OVL char *
@@ -975,7 +985,7 @@ boolean val_optional;
 
     if (!colon || !*++colon) {
         if (!val_optional)
-            badoption(opts);
+            badoptmsg(opts, "Missing value");
         return (char *) 0;
     }
     return colon;
@@ -1764,6 +1774,23 @@ char **opp;
     return FALSE;
 }
 
+/* Check if character c is illegal as a menu command key */
+boolean
+illegal_menu_cmd_key(c)
+char c;
+{
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033'
+        || c == ' ' || digit(c) || (letter(c) && c != '@'))
+        return TRUE;
+    else { /* reject default object class symbols */
+        int j;
+        for (j = 1; j < MAXOCLASSES; j++)
+            if (c == def_oc_syms[j].sym)
+                return TRUE;
+    }
+    return FALSE;
+}
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -2358,7 +2385,8 @@ boolean tinitial, tfrom_file;
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             static char gpcoords[] = { GPCOORDS_NONE, GPCOORDS_COMPASS,
-                                       GPCOORDS_MAP, GPCOORDS_SCREEN, '\0' };
+                                       GPCOORDS_COMFULL, GPCOORDS_MAP,
+                                       GPCOORDS_SCREEN, '\0' };
             char c = lowc(*op);
 
             if (c && index(gpcoords, c))
@@ -2700,7 +2728,9 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
         if (duplicate || negated)
             return;
-        op = string_for_opt(opts, TRUE);
+        op = string_for_opt(opts, FALSE);
+        if (!op)
+            return;
         if (!strncmpi(op, "normal", 6) || !strcmpi(op, "play")) {
             wizard = discover = FALSE;
         } else if (!strncmpi(op, "explore", 6)
@@ -3209,7 +3239,7 @@ boolean tinitial, tfrom_file;
     }
 
     /* check for menu command mapping */
-    for (i = 0; i < NUM_MENU_CMDS; i++) {
+    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
         fullname = default_menu_cmd_info[i].name;
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -3217,24 +3247,12 @@ boolean tinitial, tfrom_file;
             if (negated) {
                 bad_negation(fullname, FALSE);
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
-                int j;
                 char c, op_buf[BUFSZ];
-                boolean isbad = FALSE;
 
                 escapes(op, op_buf);
                 c = *op_buf;
 
-                if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-                    || c == ' ' || digit(c) || (letter(c) && c != '@'))
-                    isbad = TRUE;
-                else /* reject default object class symbols */
-                    for (j = 1; j < MAXOCLASSES; j++)
-                        if (c == def_oc_syms[i].sym) {
-                            isbad = TRUE;
-                            break;
-                        }
-
-                if (isbad)
+                if (illegal_menu_cmd_key(c))
                     badoption(opts);
                 else
                     add_menu_cmd_alias(c, default_menu_cmd_info[i].cmd);
@@ -3462,6 +3480,56 @@ boolean tinitial, tfrom_file;
     badoption(opts);
 }
 
+/* parse key:command */
+void
+parsebindings(bindings)
+char* bindings;
+{
+    char *bind;
+    char key;
+    int i;
+
+    /* break off first binding from the rest; parse the rest */
+    if ((bind = index(bindings, ',')) != 0) {
+        *bind++ = 0;
+        parsebindings(bind);
+    }
+
+    /* parse a single binding: first split around : */
+    if (! (bind = index(bindings, ':'))) return; /* it's not a binding */
+    *bind++ = 0;
+
+    /* read the key to be bound */
+    key = txt2key(bindings);
+    if (!key) {
+        raw_printf("Bad binding %s.", bindings);
+        wait_synch();
+        return;
+    }
+
+    bind = trimspaces(bind);
+
+    /* is it a special key? */
+    if (bind_specialkey(key, bind))
+        return;
+
+    /* is it a menu command? */
+    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+        if (!strcmp(default_menu_cmd_info[i].name, bind)) {
+            if (illegal_menu_cmd_key(key)) {
+                char tmp[BUFSZ];
+                Sprintf(tmp, "Bad menu key %s:%s", visctrl(key), bind);
+                badoption(tmp);
+            } else
+                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+            return;
+        }
+    }
+
+    /* extended command? */
+    bind_key(key, bind);
+}
+
 static NEARDATA const char *menutype[] = { "traditional", "combination",
                                            "full", "partial" };
 
@@ -3512,6 +3580,18 @@ char from_ch, to_ch;
     }
 }
 
+char
+get_menu_cmd_key(ch)
+char ch;
+{
+    char *found = index(mapped_menu_op, ch);
+    if (found) {
+        int idx = (int) (found - mapped_menu_op);
+        ch = mapped_menu_cmds[idx];
+    }
+    return ch;
+}
+
 /*
  * Map the given character to its corresponding menu command.  If it
  * doesn't match anything, just return the original.
@@ -3526,6 +3606,57 @@ char ch;
         ch = mapped_menu_op[idx];
     }
     return ch;
+}
+
+void
+show_menu_controls(win, dolist)
+winid win;
+boolean dolist;
+{
+    char buf[BUFSZ];
+
+    putstr(win, 0, "Menu control keys:");
+    if (dolist) {
+        int i;
+        for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+            Sprintf(buf, "%-8s %s",
+                    visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
+                    default_menu_cmd_info[i].desc);
+            putstr(win, 0, buf);
+        }
+    } else {
+        putstr(win, 0, "");
+        putstr(win, 0, "          Page    All items");
+        Sprintf(buf, "  Select   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "Deselect   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "  Invert   %s       %s",
+                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)),
+                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)));
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, "   Go to   %s   Next page",
+                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   Previous page",
+                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   First page",
+                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)));
+        putstr(win, 0, buf);
+        Sprintf(buf, "           %s   Last page",
+                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)));
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, "           %s   Search and toggle matching entries",
+                visctrl(get_menu_cmd_key(MENU_SEARCH)));
+        putstr(win, 0, buf);
+    }
 }
 
 #if defined(MICRO) || defined(MAC) || defined(WIN32)
@@ -4098,6 +4229,10 @@ boolean setinitial, setfromfile;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS,
                  0, ATR_NONE, "compass ('east' or '3s' or '2n,4w')",
                  (gp == GPCOORDS_COMPASS) ? MENU_SELECTED : MENU_UNSELECTED);
+        any.a_char = GPCOORDS_COMFULL;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMFULL,
+                 0, ATR_NONE, "full compass ('east' or '3south' or '2north,4west')",
+                 (gp == GPCOORDS_COMFULL) ? MENU_SELECTED : MENU_UNSELECTED);
         any.a_char = GPCOORDS_MAP;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP,
                  0, ATR_NONE, "map <x,y>",
@@ -4555,7 +4690,8 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
-            end_menu(tmpwin, "Select symbol set:");
+            Sprintf(buf, "Select %ssymbol set:", rogueflag ? "rogue level " : "");
+            end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
                 free((genericptr_t) symset_pick);
@@ -4910,6 +5046,7 @@ char *buf;
         Sprintf(buf, "%s",
                 (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
                 : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
+                : (iflags.getpos_coords == GPCOORDS_COMFULL) ? "full compass"
                 : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen"
                 : "none");
     } else if (!strcmp(optname, "scores")) {
