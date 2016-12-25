@@ -10,7 +10,7 @@ STATIC_DCL void NDECL(maybe_wail);
 STATIC_DCL int NDECL(moverock);
 STATIC_DCL int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
 STATIC_DCL void NDECL(dosinkfall);
-STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(findtravelpath, (int));
 STATIC_DCL boolean FDECL(trapmove, (int, int, struct trap *));
 STATIC_DCL void NDECL(switch_terrain);
 STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
@@ -18,6 +18,11 @@ STATIC_DCL boolean FDECL(doorless_door, (int, int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 
 #define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
+
+/* mode values for findtravelpath() */
+#define TRAVP_TRAVEL 0
+#define TRAVP_GUESS  1
+#define TRAVP_VALID  2
 
 static anything tmp_anything;
 
@@ -887,21 +892,25 @@ int wiz_debug_cmd_traveldisplay()
  * Returns TRUE if a path was found.
  */
 STATIC_OVL boolean
-findtravelpath(guess)
-boolean guess;
+findtravelpath(mode)
+int mode;
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
-    if (!guess && context.travel1 && distmin(u.ux, u.uy, u.tx, u.ty) == 1
+    if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && context.travel1
+        && distmin(u.ux, u.uy, u.tx, u.ty) == 1
         && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
         context.run = 0;
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
-            u.dx = u.tx - u.ux;
-            u.dy = u.ty - u.uy;
-            nomul(0);
-            iflags.travelcc.x = iflags.travelcc.y = -1;
+            if (mode == TRAVP_TRAVEL) {
+                u.dx = u.tx - u.ux;
+                u.dy = u.ty - u.uy;
+                nomul(0);
+                iflags.travelcc.x = iflags.travelcc.y = -1;
+            }
             return TRUE;
         }
-        context.run = 8;
+        if (mode == TRAVP_TRAVEL)
+            context.run = 8;
     }
     if (u.tx != u.ux || u.ty != u.uy) {
         xchar travel[COLNO][ROWNO];
@@ -917,7 +926,7 @@ boolean guess;
          * goal is the position the player knows of, or might figure out
          * (couldsee) that is closest to the target on a straight path.
          */
-        if (guess) {
+        if (mode == TRAVP_GUESS || mode == TRAVP_VALID) {
             tx = u.ux;
             ty = u.uy;
             ux = u.tx;
@@ -987,7 +996,8 @@ boolean guess;
                      * example above is never included in it, preventing
                      * the cycle.
                      */
-                    if (!isok(nx, ny) || (guess && !couldsee(nx, ny)))
+                    if (!isok(nx, ny)
+                        || ((mode == TRAVP_GUESS) && !couldsee(nx, ny)))
                         continue;
                     if ((!Passes_walls && !can_ooze(&youmonst)
                          && closed_door(x, y)) || sobj_at(BOULDER, x, y)
@@ -1009,10 +1019,11 @@ boolean guess;
                         && (levl[nx][ny].seenv
                             || (!Blind && couldsee(nx, ny)))) {
                         if (nx == ux && ny == uy) {
-                            if (!guess) {
+                            if (mode == TRAVP_TRAVEL || mode == TRAVP_VALID) {
                                 u.dx = x - ux;
                                 u.dy = y - uy;
-                                if (x == u.tx && y == u.ty) {
+                                if (mode == TRAVP_TRAVEL
+                                    && x == u.tx && y == u.ty) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     context.run = 8;
@@ -1052,7 +1063,7 @@ boolean guess;
         }
 
         /* if guessing, find best location in travel matrix and go there */
-        if (guess) {
+        if (mode == TRAVP_GUESS) {
             int px = tx, py = ty; /* pick location */
             int dist, nxtdist, d2, nd2;
 
@@ -1107,7 +1118,7 @@ boolean guess;
             uy = u.uy;
             set = 0;
             n = radius = 1;
-            guess = FALSE;
+            mode = TRAVP_TRAVEL;
             goto noguess;
         }
         return FALSE;
@@ -1118,6 +1129,27 @@ found:
     u.dy = 0;
     nomul(0);
     return FALSE;
+}
+
+boolean
+is_valid_travelpt(x,y)
+int x,y;
+{
+    int tx = u.tx;
+    int ty = u.ty;
+    boolean ret;
+    int g = glyph_at(x,y);
+    if (x == u.ux && y == u.uy)
+        return TRUE;
+    if (isok(x,y) && glyph_is_cmap(g) && S_stone == glyph_to_cmap(g)
+        && !levl[x][y].seenv)
+        return FALSE;
+    u.tx = x;
+    u.ty = y;
+    ret = findtravelpath(TRAVP_VALID);
+    u.tx = tx;
+    u.ty = ty;
+    return ret;
 }
 
 /* try to escape being stuck in a trapped state by walking out of it;
@@ -1381,6 +1413,16 @@ domove()
             || (Blind && !Levitation && !Flying && !is_clinger(youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
             if (context.run >= 2) {
+                if (iflags.mention_walls) {
+                    if (trap && trap->tseen) {
+                        int tt = what_trap(trap->ttyp);
+                        You("stop in front of %s.",
+                            an(defsyms[trap_to_defsym(tt)].explanation));
+                    } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
+                        You("stop at the edge of the %s.",
+                            hliquid(is_pool(x,y) ? "water" : "lava"));
+                    }
+                }
                 nomul(0);
                 context.move = 0;
                 return;
@@ -2484,7 +2526,8 @@ lookaround()
 
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
-    if (u.umonnum == PM_GRID_BUG && u.dx && u.dy) {
+    if (NODIAG(u.umonnum) && u.dx && u.dy) {
+        You("cannot move diagonally.");
         nomul(0);
         return;
     }
@@ -2504,8 +2547,11 @@ lookaround()
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
-                        && !context.travel))
+                        && !context.travel)) {
+                    if (iflags.mention_walls)
+                        pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
+                }
             }
 
             if (levl[x][y].typ == STONE)
@@ -2519,8 +2565,11 @@ lookaround()
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 if (x != u.ux && y != u.uy)
                     continue;
-                if (context.run != 1)
+                if (context.run != 1) {
+                    if (iflags.mention_walls)
+                        You("stop in front of the door.");
                     goto stop;
+                }
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
             bcorr:
@@ -2545,20 +2594,30 @@ lookaround()
             } else if ((trap = t_at(x, y)) && trap->tseen) {
                 if (context.run == 1)
                     goto bcorr; /* if you must */
-                if (x == u.ux + u.dx && y == u.uy + u.dy)
+                if (x == u.ux + u.dx && y == u.uy + u.dy) {
+                    if (iflags.mention_walls) {
+                        int tt = what_trap(trap->ttyp);
+                        You("stop in front of %s.",
+                            an(defsyms[trap_to_defsym(tt)].explanation));
+                    }
                     goto stop;
+                }
                 continue;
             } else if (is_pool_or_lava(x, y)) {
                 /* water and lava only stop you if directly in front, and stop
                  * you even if you are running
                  */
                 if (!Levitation && !Flying && !is_clinger(youmonst.data)
-                    && x == u.ux + u.dx && y == u.uy + u.dy)
+                    && x == u.ux + u.dx && y == u.uy + u.dy) {
                     /* No Wwalking check; otherwise they'd be able
                      * to test boots by trying to SHIFT-direction
                      * into a pool and seeing if the game allowed it
                      */
+                    if (iflags.mention_walls)
+                        You("stop at the edge of the %s.",
+                            hliquid(is_pool(x,y) ? "water" : "lava"));
                     goto stop;
+                }
                 continue;
             } else { /* e.g. objects or trap or stairs */
                 if (context.run == 1)
@@ -2576,8 +2635,11 @@ lookaround()
             return;
         } /* end for loops */
 
-    if (corrct > 1 && context.run == 2)
+    if (corrct > 1 && context.run == 2) {
+        if (iflags.mention_walls)
+            pline_The("corridor widens here.");
         goto stop;
+    }
     if ((context.run == 1 || context.run == 3 || context.run == 8) && !noturn
         && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */

@@ -2008,7 +2008,7 @@ struct monst *mtmp;
     }
 
     mtmp->mburied = TRUE;
-    wakeup(mtmp);       /* at least give it a chance :-) */
+    wakeup(mtmp, FALSE);       /* at least give it a chance :-) */
     newsym(mtmp->mx, mtmp->my);
 }
 

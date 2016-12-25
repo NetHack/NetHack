@@ -338,10 +338,15 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (ismimic)
             seemimic(mtmp);
         mtmp->msleeping = 0;
-        if (vis)
-            hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
-        else if (verbose && !target)
-            pline("%s is hit%s", Monnam(mtmp), exclam(damage));
+        if (vis) {
+            if (otmp->otyp == EGG)
+                pline("Splat! %s is hit with %s egg!", Monnam(mtmp),
+                      otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
+            else
+                hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
+        } else if (verbose && !target)
+            pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat! " : "",
+                  Monnam(mtmp), exclam(damage));
 
         if (otmp->opoisoned && is_poisonable(otmp)) {
             if (resists_poison(mtmp)) {
@@ -369,7 +374,6 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             if (resists_acid(mtmp)) {
                 if (vis || (verbose && !target))
                     pline("%s is unaffected.", Monnam(mtmp));
-                damage = 0;
             } else {
                 if (vis)
                     pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
@@ -377,24 +381,36 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                     pline("It is burned!");
             }
         }
-        mtmp->mhp -= damage;
-        if (mtmp->mhp < 1) {
-            if (vis || (verbose && !target))
-                pline("%s is %s!", Monnam(mtmp),
-                      (nonliving(mtmp->data) || is_vampshifter(mtmp)
-                       || !canspotmon(mtmp)) ? "destroyed" : "killed");
-            /* don't blame hero for unknown rolling boulder trap */
-            if (!context.mon_moving
-                && (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
-                xkilled(mtmp, XKILL_NOMSG);
-            else
-                mondied(mtmp);
+        if (otmp->otyp == EGG && touch_petrifies(&mons[otmp->corpsenm])) {
+            if (!munstone(mtmp, TRUE))
+                minstapetrify(mtmp, TRUE);
+            if (resists_ston(mtmp))
+                damage = 0;
         }
 
-        if (can_blnd((struct monst *) 0, mtmp,
-                     (uchar) ((otmp->otyp == BLINDING_VENOM) ? AT_SPIT
-                                                             : AT_WEAP),
-                     otmp)) {
+        if (mtmp->mhp > 0) { /* might already be dead (if petrified) */
+            mtmp->mhp -= damage;
+            if (mtmp->mhp < 1) {
+                if (vis || (verbose && !target))
+                    pline("%s is %s!", Monnam(mtmp),
+                          (nonliving(mtmp->data) || is_vampshifter(mtmp)
+                           || !canspotmon(mtmp)) ? "destroyed" : "killed");
+                /* don't blame hero for unknown rolling boulder trap */
+                if (!context.mon_moving && (otmp->otyp != BOULDER
+                                            || range >= 0 || otmp->otrapped))
+                    xkilled(mtmp, XKILL_NOMSG);
+                else
+                    mondied(mtmp);
+            }
+        }
+
+        /* blinding venom and cream pie do 0 damage, but verify
+           that the target is still alive anyway */
+        if (mtmp->mhp > 0
+            && can_blnd((struct monst *) 0, mtmp,
+                        (uchar) ((otmp->otyp == BLINDING_VENOM) ? AT_SPIT
+                                                                : AT_WEAP),
+                        otmp)) {
             if (vis && mtmp->mcansee)
                 pline("%s is blinded by %s.", Monnam(mtmp), the(xname(otmp)));
             mtmp->mcansee = 0;

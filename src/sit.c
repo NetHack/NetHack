@@ -113,7 +113,7 @@ dosit()
             }
         } else {
             You("sit down.");
-            dotrap(trap, 0);
+            dotrap(trap, VIASITTING);
         }
     } else if (Underwater || Is_waterlevel(&u.uz)) {
         if (Is_waterlevel(&u.uz))

@@ -2443,22 +2443,30 @@ compress_str(str)
 const char *str;
 {
     static char cbuf[BUFSZ];
-    /* compress in case line too long */
-    if ((int) strlen(str) >= CO) {
-        register const char *bp0 = str;
-        register char *bp1 = cbuf;
 
-        do {
-#ifdef CLIPPING
-            if (*bp0 != ' ' || bp0[1] != ' ')
-#else
-            if (*bp0 != ' ' || bp0[1] != ' ' || bp0[2] != ' ')
-#endif
-                *bp1++ = *bp0;
-        } while (*bp0++);
-    } else
-        return str;
-    return cbuf;
+    /* compress out consecutive spaces if line is too long;
+       topline wrapping converts space at wrap point into newline,
+       we reverse that here */
+    if ((int) strlen(str) >= CO || index(str, '\n')) {
+        const char *in_str = str;
+        char c, *outstr = cbuf, *outend = &cbuf[sizeof cbuf - 1];
+        boolean was_space = TRUE; /* True discards all leading spaces;
+                                     False would retain one if present */
+
+        while ((c = *in_str++) != '\0' && outstr < outend) {
+            if (c == '\n')
+                c = ' ';
+            if (was_space && c == ' ')
+                continue;
+            *outstr++ = c;
+            was_space = (c == ' ');
+        }
+        if ((was_space && outstr > cbuf) || outstr == outend)
+            --outstr; /* remove trailing space or make room for terminator */
+        *outstr = '\0';
+        str = cbuf;
+    }
+    return str;
 }
 
 void
@@ -2601,7 +2609,7 @@ const char *str;
         }
         if (cw->data[cw->cury])
             free((genericptr_t) cw->data[cw->cury]);
-        n0 = strlen(str) + 1;
+        n0 = (long) strlen(str) + 1L;
         ob = cw->data[cw->cury] = (char *) alloc((unsigned) n0 + 1);
         *ob++ = (char) (attr + 1); /* avoid nuls, for convenience */
         Strcpy(ob, str);

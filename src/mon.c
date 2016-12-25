@@ -555,8 +555,7 @@ register struct monst *mtmp;
                 /* This can happen after a purple worm plucks you off a
                 flying steed while you are over water. */
                 pline("%s sinks as %s rushes in and flushes you out.",
-                      hliquid("water"),
-                      Monnam(mtmp));
+                      Monnam(mtmp), hliquid("water"));
             }
             mondead(mtmp);
             if (mtmp->mhp > 0) {
@@ -583,6 +582,7 @@ mcalcmove(mon)
 struct monst *mon;
 {
     int mmove = mon->data->mmove;
+    int mmove_adj;
 
     /* Note: MSLOW's `+ 1' prevents slowed speed 1 getting reduced to 0;
      *       MFAST's `+ 2' prevents hasted speed 1 from becoming a no-op;
@@ -593,20 +593,23 @@ struct monst *mon;
     else if (mon->mspeed == MFAST)
         mmove = (4 * mmove + 2) / 3;
 
-    if (mon == u.usteed) {
-        if (u.ugallop && context.mv) {
-            /* average movement is 1.50 times normal */
-            mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
-        }
-    } else if (mmove) {
-        /* vary movement points allocated to slightly reduce predictability;
-           random increment (avg +2) exceeds random decrement (avg +1) by
-           a small amount; normal speed monsters will occasionally get an
-           extra move and slow ones won't be quite as slow */
-        mmove += rn2(5) - rn2(3); /* + 0..4 - 0..2, average net +1 */
-        if (mmove < 1)
-            mmove = 1;
+    if (mon == u.usteed && u.ugallop && context.mv) {
+        /* increase movement by a factor of 1.5; also increase variance of
+           movement speed (if it's naturally 24, we don't want it to always
+           become 36) */
+        mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
     }
+
+    /* Randomly round the monster's speed to a multiple of NORMAL_SPEED. This
+       makes it impossible for the player to predict when they'll get a free
+       turn (thus preventing exploits like "melee kiting"), while retaining
+       guarantees about shopkeepers not being outsped by a normal-speed player,
+       normal-speed players being unable to open up a gap when fleeing a
+       normal-speed monster, etc.*/
+    mmove_adj = mmove % NORMAL_SPEED;
+    mmove -= mmove_adj;
+    if (rn2(NORMAL_SPEED) < mmove_adj)
+        mmove += NORMAL_SPEED;
 
     return mmove;
 }
@@ -2026,6 +2029,8 @@ struct monst *mdef;
     /* hero is thrown from his steed when it disappears */
     if (mdef == u.usteed)
         dismount_steed(DISMOUNT_GENERIC);
+    /* stuck to you? release */
+    unstuck(mdef);
     /* drop special items like the Amulet so that a dismissed Kop or nurse
        can't remove them from the game */
     mdrop_special_objs(mdef);
@@ -2042,6 +2047,9 @@ struct monst *mdef;
     struct obj *otmp, *obj, *oldminvent;
     xchar x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
+
+    if (!vamp_stone(mdef)) /* vampshifter reverts to vampire */
+        return;
 
     /* we have to make the statue before calling mondead, to be able to
      * put inventory in it, and we have to check for lifesaving before
@@ -2402,9 +2410,8 @@ struct monst *mtmp;
             /* construct a format string before transformation */
             Sprintf(buf, "The lapidifying %s %s %s",
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                             SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
-                                 | SUPPRESS_INVISIBLE | SUPPRESS_IT,
-                             FALSE),
+                             (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
+                              | SUPPRESS_INVISIBLE | SUPPRESS_IT), FALSE),
                     amorphous(mtmp->data) ? "coalesces on the"
                        : is_flyer(mtmp->data) ? "drops to the"
                           : "writhes on the",
@@ -2434,14 +2441,24 @@ struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-                    pline("%s rises from the %s with renewed agility!",
-                            Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
+                pline("%s rises from the %s with renewed agility!",
+                      Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
             }
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
         }
     }
     return TRUE;
+}
+
+/* drop monster into "limbo" - that is, migrate to the current level */
+void
+m_into_limbo(mtmp)
+struct monst *mtmp;
+{
+    unstuck(mtmp);
+    mdrop_special_objs(mtmp);
+    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
 }
 
 /* make monster mtmp next to you (if possible);
@@ -2460,7 +2477,11 @@ struct monst *mtmp;
         return;
     }
 
-    if (!enexto(&mm, u.ux, u.uy, mtmp->data))
+    if (!enexto(&mm, u.ux, u.uy, mtmp->data)) {
+        m_into_limbo(mtmp);
+        return;
+    }
+    if (!isok(mm.x, mm.y))
         return;
     rloc_to(mtmp, mm.x, mm.y);
     if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
@@ -2529,6 +2550,8 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          */
         if (!enexto(&mm, newx, newy, mtmp->data))
             return FALSE;
+        if (!isok(mm.x,mm.y))
+            return FALSE;
         newx = mm.x;
         newy = mm.y;
     }
@@ -2540,12 +2563,10 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
         othermon->mx = othermon->my = 0;
         (void) mnearto(othermon, x, y, FALSE);
         if (othermon->mx == 0 && othermon->my == 0) {
-            /* reloc failed, dump monster into "limbo"
-               (aka migrate to current level) */
+            /* reloc failed */
             othermon->mx = oldx;
             othermon->my = oldy;
-            mdrop_special_objs(othermon);
-            migrate_to_level(othermon, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
+            m_into_limbo(othermon);
         }
     }
 
@@ -2582,10 +2603,33 @@ struct monst *mtmp;
     }
 }
 
+/* Called whenever the player attacks mtmp; also called in other situations
+   where mtmp gets annoyed at the player. Handles mtmp getting annoyed at the
+   attack and any ramifications that might have. Useful also in situations where
+   mtmp was already hostile; it checks for situations where the player shouldn't
+   be attacking and any ramifications /that/ might have. */
 void
-setmangry(mtmp)
+setmangry(mtmp, via_attack)
 struct monst *mtmp;
+boolean via_attack;
 {
+    if (via_attack && sengr_at("Elbereth", u.ux, u.uy, TRUE)) {
+        You_feel("like a hypocrite.");
+        /* AIS: Yes, I know alignment penalties and bonuses aren't balanced at
+           the moment. This is about correct relative to other "small"
+           penalties; it should be fairly large, as attacking while standing on
+           an Elbereth means that you're requesting peace and then violating
+           your own request. I know 5 isn't actually large, but it's
+           intentionally larger than the 1s and 2s that are normally given for
+           this sort of thing. */
+        adjalign(-5);
+
+        if (!Blind)
+            pline("The engraving beneath you fades.");
+        del_engr_at(u.ux, u.uy);
+    }
+
+    /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
         return;
@@ -2680,14 +2724,16 @@ struct monst *mtmp;
 
 }
 
-/* wake up a monster, usually making it angry in the process */
+/* wake up a monster, possibly making it angry in the process */
 void
-wakeup(mtmp)
+wakeup(mtmp, via_attack)
 register struct monst *mtmp;
+boolean via_attack;
 {
     mtmp->msleeping = 0;
     finish_meating(mtmp);
-    setmangry(mtmp);
+    if (via_attack)
+        setmangry(mtmp, TRUE);
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
     } else if (context.forcefight && !context.mon_moving

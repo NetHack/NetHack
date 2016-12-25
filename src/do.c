@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1464487100 2016/05/29 01:58:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,7 +34,8 @@ dodrop()
     result = drop(getobj(&drop_types[i], "drop"));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -739,6 +740,10 @@ doddrop()
 {
     int result = 0;
 
+    if (!invent) {
+        You("have nothing to drop.");
+        return 0;
+    }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
@@ -747,7 +752,8 @@ doddrop()
         result = menu_drop(result);
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -785,6 +791,7 @@ int retry;
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
         unsigned ggoresults = 0;
+
         all_categories = FALSE;
         /* Gather valid classes via traditional NetHack method */
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);

@@ -10,71 +10,71 @@
  * them.  Monster class 0 is not used or defined so we can use it as a
  * NULL character.
  */
-/* clang-format off */
-#define S_ANT           1
-#define S_BLOB          2
-#define S_COCKATRICE    3
-#define S_DOG           4
-#define S_EYE           5
-#define S_FELINE        6
-#define S_GREMLIN       7
-#define S_HUMANOID      8
-#define S_IMP           9
-#define S_JELLY         10
-#define S_KOBOLD        11
-#define S_LEPRECHAUN    12
-#define S_MIMIC         13
-#define S_NYMPH         14
-#define S_ORC           15
-#define S_PIERCER       16
-#define S_QUADRUPED     17
-#define S_RODENT        18
-#define S_SPIDER        19
-#define S_TRAPPER       20
-#define S_UNICORN       21
-#define S_VORTEX        22
-#define S_WORM          23
-#define S_XAN           24
-#define S_LIGHT         25
-#define S_ZRUTY         26
-#define S_ANGEL         27
-#define S_BAT           28
-#define S_CENTAUR       29
-#define S_DRAGON        30
-#define S_ELEMENTAL     31
-#define S_FUNGUS        32
-#define S_GNOME         33
-#define S_GIANT         34
-#define S_invisible     35      /* non-class present in def_monsyms[] */
-#define S_JABBERWOCK    36
-#define S_KOP           37
-#define S_LICH          38
-#define S_MUMMY         39
-#define S_NAGA          40
-#define S_OGRE          41
-#define S_PUDDING       42
-#define S_QUANTMECH     43
-#define S_RUSTMONST     44
-#define S_SNAKE         45
-#define S_TROLL         46
-#define S_UMBER         47
-#define S_VAMPIRE       48
-#define S_WRAITH        49
-#define S_XORN          50
-#define S_YETI          51
-#define S_ZOMBIE        52
-#define S_HUMAN         53
-#define S_GHOST         54
-#define S_GOLEM         55
-#define S_DEMON         56
-#define S_EEL           57
-#define S_LIZARD        58
+enum mon_class_types {
+    S_ANT = 1,
+    S_BLOB,
+    S_COCKATRICE,
+    S_DOG,
+    S_EYE,
+    S_FELINE,
+    S_GREMLIN,
+    S_HUMANOID,
+    S_IMP,
+    S_JELLY,
+    S_KOBOLD,
+    S_LEPRECHAUN,
+    S_MIMIC,
+    S_NYMPH,
+    S_ORC,
+    S_PIERCER,
+    S_QUADRUPED,
+    S_RODENT,
+    S_SPIDER,
+    S_TRAPPER,
+    S_UNICORN,
+    S_VORTEX,
+    S_WORM,
+    S_XAN,
+    S_LIGHT,
+    S_ZRUTY,
+    S_ANGEL,
+    S_BAT,
+    S_CENTAUR,
+    S_DRAGON,
+    S_ELEMENTAL,
+    S_FUNGUS,
+    S_GNOME,
+    S_GIANT,
+    S_invisible,    /* non-class present in def_monsyms[] */
+    S_JABBERWOCK,
+    S_KOP,
+    S_LICH,
+    S_MUMMY,
+    S_NAGA,
+    S_OGRE,
+    S_PUDDING,
+    S_QUANTMECH,
+    S_RUSTMONST,
+    S_SNAKE,
+    S_TROLL,
+    S_UMBER,
+    S_VAMPIRE,
+    S_WRAITH,
+    S_XORN,
+    S_YETI,
+    S_ZOMBIE,
+    S_HUMAN,
+    S_GHOST,
+    S_GOLEM,
+    S_DEMON,
+    S_EEL,
+    S_LIZARD,
 
-#define S_WORM_TAIL     59
-#define S_MIMIC_DEF     60
-/* clang-format on */
+    S_WORM_TAIL,
+    S_MIMIC_DEF,
 
-#define MAXMCLASSES 61 /* number of monster classes */
+    MAXMCLASSES /* number of monster classes */
+};
 
 /*
  * Default characters for monsters.  These correspond to the monster classes

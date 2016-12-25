@@ -4,8 +4,6 @@
 HACKDIR=/usr/games/lib/nethackdir
 export HACKDIR
 HACK=$HACKDIR/nethack
-# NB: MAXNROFPLAYERS is deprecated in favor of MAXPLAYERS in SYSCF.
-MAXNROFPLAYERS=4
 
 # Since Nethack.ad is installed in HACKDIR, add it to XUSERFILESEARCHPATH
 case "x$XUSERFILESEARCHPATH" in
@@ -65,11 +63,4 @@ fi
 
 
 cd $HACKDIR
-case $1 in
-	-s*)
-		exec $HACK "$@"
-		;;
-	*)
-		exec $HACK "$@" $MAXNROFPLAYERS
-		;;
-esac
+exec $HACK "$@"

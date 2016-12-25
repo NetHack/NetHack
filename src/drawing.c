@@ -671,6 +671,7 @@ struct symparse loadsyms[] = {
     { SYM_PCHAR, S_explode7, "S_explode7" },
     { SYM_PCHAR, S_explode8, "S_explode8" },
     { SYM_PCHAR, S_explode9, "S_explode9" },
+    { SYM_OC, ILLOBJ_CLASS + SYM_OFF_O, "S_strange_obj" },
     { SYM_OC, WEAPON_CLASS + SYM_OFF_O, "S_weapon" },
     { SYM_OC, ARMOR_CLASS + SYM_OFF_O, "S_armor" },
     { SYM_OC, ARMOR_CLASS + SYM_OFF_O, "S_armour" },

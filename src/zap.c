@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1464163779 2016/05/25 08:09:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1470819844 2016/08/10 09:04:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -280,6 +280,7 @@ struct obj *otmp;
         mon_set_minvis(mtmp);
         if (!oldinvis && knowninvisible(mtmp)) {
             pline("%s turns transparent!", nambuf);
+            reveal_invis = TRUE;
             learn_it = TRUE;
         }
         break;
@@ -425,7 +426,7 @@ struct obj *otmp;
     }
     if (wake) {
         if (mtmp->mhp > 0) {
-            wakeup(mtmp);
+            wakeup(mtmp, TRUE);
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops)
                 hot_pursuit(mtmp);
@@ -747,7 +748,9 @@ boolean by_hero;
             x = xy.x, y = xy.y;
     }
 
-    if (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ)) {
+    if ((mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))
+        || (mons[montype].mlet == S_TROLL
+            && uwep && uwep->oartifact == ART_TROLLSBANE)) {
         if (by_hero && cansee(x,y))
             pline("%s twitches feebly.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
@@ -1061,8 +1064,9 @@ register struct obj *obj;
  * possibly carried by you or a monster
  */
 boolean
-drain_item(obj)
-register struct obj *obj;
+drain_item(obj, by_you)
+struct obj *obj;
+boolean by_you;
 {
     boolean u_ring;
 
@@ -1077,7 +1081,8 @@ register struct obj *obj;
         return FALSE;
 
     /* Charge for the cost of the object */
-    costly_alteration(obj, COST_DRAIN);
+    if (by_you)
+        costly_alteration(obj, COST_DRAIN);
 
     /* Drain the object and any implied effects */
     obj->spe--;
@@ -1109,6 +1114,10 @@ register struct obj *obj;
         if ((obj->owornmask & W_RING) && u_ring)
             u.udaminc--;
         break;
+    case RIN_PROTECTION:
+        if (u_ring)
+            context.botl = 1; /* bot() will recalc u.uac */
+        break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
@@ -1122,10 +1131,11 @@ register struct obj *obj;
             context.botl = 1;
         }
         break;
-    case RIN_PROTECTION:
-        context.botl = 1;
+    default:
         break;
     }
+    if (context.botl)
+        bot();
     if (carried(obj))
         update_inventory();
     return TRUE;
@@ -1934,7 +1944,7 @@ struct obj *obj, *otmp;
 #endif
             break;
         case SPE_DRAIN_LIFE:
-            (void) drain_item(obj);
+            (void) drain_item(obj, TRUE);
             break;
         case WAN_TELEPORTATION:
         case SPE_TELEPORT_AWAY:
@@ -4525,12 +4535,9 @@ short exploding_wand_typ;
             You("%s of smoke.", !Blind ? "see a puff" : "smell a whiff");
         }
     if ((mon = m_at(x, y)) != 0) {
-        /* Cannot use wakeup() which also angers the monster */
-        mon->msleeping = 0;
-        if (mon->m_ap_type)
-            seemimic(mon);
+        wakeup(mon, FALSE);
         if (type >= 0) {
-            setmangry(mon);
+            setmangry(mon, TRUE);
             if (mon->ispriest && *in_rooms(mon->mx, mon->my, TEMPLE))
                 ghod_hitsu(mon);
             if (mon->isshk && !*u.ushops)

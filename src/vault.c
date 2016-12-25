@@ -400,7 +400,7 @@ invault()
                 }
                 mongone(guard);
             } else {
-                setmangry(guard);
+                setmangry(guard, FALSE);
                 if (Deaf) {
                    if (!Blind)
                         pline("%s mouths something and looks very angry!",
@@ -814,7 +814,7 @@ nextpos:
     else
         ny += dy;
 
-    while ((typ = (crm = &levl[nx][ny])->typ) != 0) {
+    while ((typ = (crm = &levl[nx][ny])->typ) != STONE) {
         /* in view of the above we must have IS_WALL(typ) or typ == POOL */
         /* must be a wall here */
         if (isok(nx + nx - x, ny + ny - y) && !IS_POOL(typ)

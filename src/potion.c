@@ -1379,10 +1379,15 @@ boolean your_fault;
             if (!resist(mon, POTION_CLASS, 0, NOTELL))
                 mon->mconf = TRUE;
             break;
-        case POT_INVISIBILITY:
+        case POT_INVISIBILITY: {
+            boolean sawit = canspotmon(mon);
+
             angermon = FALSE;
             mon_set_minvis(mon);
+            if (sawit && !canspotmon(mon) && cansee(mon->mx, mon->my))
+                map_invisible(mon->mx, mon->my);
             break;
+        }
         case POT_SLEEPING:
             /* wakeup() doesn't rouse victims of temporary sleep */
             if (sleep_monst(mon, rnd(12), POTION_CLASS)) {
@@ -1483,7 +1488,7 @@ boolean your_fault;
         /* target might have been killed */
         if (mon->mhp > 0) {
             if (angermon)
-                wakeup(mon);
+                wakeup(mon, TRUE);
             else
                 mon->msleeping = 0;
         }
@@ -1793,7 +1798,7 @@ dodip()
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
-    shortestname = is_plural(obj) ? "them" : "it";
+    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
     /*
      * Bypass safe_qbuf() since it doesn't handle varying suffix without
      * an awful lot of support work.  Format the object once, even though

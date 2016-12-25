@@ -29,24 +29,24 @@ typedef union any {
                         /* (buggy old Ultrix compiler) */
 
 /* symbolic names for the data types housed in anything */
-/* clang-format off */
-#define ANY_VOID         1
-#define ANY_OBJ          2      /* struct obj */
-#define ANY_MONST        3      /* struct monst (not used) */
-#define ANY_INT          4      /* int */
-#define ANY_CHAR         5      /* char */
-#define ANY_UCHAR        6      /* unsigned char */
-#define ANY_SCHAR        7      /* signed char */
-#define ANY_UINT         8      /* unsigned int */
-#define ANY_LONG         9      /* long */
-#define ANY_ULONG       10      /* unsigned long */
-#define ANY_IPTR        11      /* pointer to int */
-#define ANY_UPTR        12      /* pointer to unsigned int */
-#define ANY_LPTR        13      /* pointer to long */
-#define ANY_ULPTR       14      /* pointer to unsigned long */
-#define ANY_STR         15      /* pointer to null-terminated char string */
-#define ANY_MASK32      16      /* 32-bit mask (stored as unsigned long) */
-/* clang-format on */
+enum any_types {
+    ANY_VOID = 1,
+    ANY_OBJ,         /* struct obj */
+    ANY_MONST,       /* struct monst (not used) */
+    ANY_INT,         /* int */
+    ANY_CHAR,        /* char */
+    ANY_UCHAR,       /* unsigned char */
+    ANY_SCHAR,       /* signed char */
+    ANY_UINT,        /* unsigned int */
+    ANY_LONG,        /* long */
+    ANY_ULONG,       /* unsigned long */
+    ANY_IPTR,        /* pointer to int */
+    ANY_UPTR,        /* pointer to unsigned int */
+    ANY_LPTR,        /* pointer to long */
+    ANY_ULPTR,       /* pointer to unsigned long */
+    ANY_STR,         /* pointer to null-terminated char string */
+    ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
+};
 
 /* menu return list */
 typedef struct mi {
