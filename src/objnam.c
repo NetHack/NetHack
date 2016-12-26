@@ -2839,11 +2839,12 @@ struct obj *no_wish;
          */
         if (!strstri(bp, "wand ") && !strstri(bp, "spellbook ")
             && !strstri(bp, "finger ")) {
-            if (((p = strstri(bp, "tin of ")) != 0)
-                && (tmp = tin_variety_txt(p + 7, &tinv))
-                && (mntmp = name_to_mon(p + 7 + tmp)) >= LOW_PM) {
-                *(p + 3) = 0;
+            if ((p = strstri(bp, "tin of ")) != 0) {
+                tmp = tin_variety_txt(p + 7, &tinv);
                 tvariety = tinv;
+                mntmp = name_to_mon(p + 7 + tmp);
+                typ = TIN;
+                goto typfnd;
             } else if ((p = strstri(bp, " of ")) != 0
                        && (mntmp = name_to_mon(p + 4)) >= LOW_PM)
                 *p = 0;
