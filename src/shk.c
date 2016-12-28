@@ -3307,6 +3307,7 @@ long cost;
             return;
         }
     tmp_dam = (struct damage *) alloc((unsigned) sizeof(struct damage));
+    (void) memset((genericptr_t)tmp_dam, 0, sizeof(struct damage));
     tmp_dam->when = monstermoves;
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
