@@ -1824,6 +1824,7 @@ const char *killername;
     if (k == (struct kinfo *) 0) {
         /* no match, add a new delayed killer to the list */
         k = (struct kinfo *) alloc(sizeof(struct kinfo));
+        (void) memset((genericptr_t)k, 0, sizeof(struct kinfo));
         k->id = id;
         k->next = killer.next;
         killer.next = k;

@@ -385,11 +385,12 @@ long e_time;
 xchar e_type;
 {
     struct engr *ep;
+    unsigned smem = strlen(s) + 1;
 
     if ((ep = engr_at(x, y)) != 0)
         del_engr(ep);
-    ep = newengr(strlen(s) + 1);
-    (void) memset((genericptr_t)ep, 0, sizeof(struct engr));
+    ep = newengr(smem);
+    (void) memset((genericptr_t)ep, 0, smem + sizeof(struct engr));
     ep->nxt_engr = head_engr;
     head_engr = ep;
     ep->engr_x = x;
@@ -401,7 +402,7 @@ xchar e_type;
         exercise(A_WIS, TRUE);
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
-    ep->engr_lth = strlen(s) + 1;
+    ep->engr_lth = smem;
 }
 
 /* delete any engraving at location <x,y> */
