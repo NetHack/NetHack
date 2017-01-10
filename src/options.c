@@ -208,6 +208,7 @@ static struct Bool_Opt {
 #else
     { "statushilites", &iflags.use_status_hilites, FALSE, DISP_IN_GAME },
 #endif
+    { "status_updates", &iflags.status_updates, TRUE, DISP_IN_GAME },
     { "tiled_map", &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME }, /*WC*/
     { "time", &flags.time, FALSE, SET_IN_GAME },
 #ifdef TIMED_DELAY

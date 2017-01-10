@@ -232,6 +232,7 @@ struct instance_flags {
     boolean echo;             /* 1 to echo characters */
     boolean use_menu_color;       /* use color in menus; only if wc_color */
     boolean use_status_hilites;   /* use color in status line */
+    boolean status_updates;   /* allow updates to bottom status lines */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean hilite_pile;          /* mark piles of objects with a hilite */
     boolean autodescribe;     /* autodescribe mode in getpos() */
