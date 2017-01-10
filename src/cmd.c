@@ -1592,9 +1592,43 @@ characteristics_enlightenment(mode, final)
 int mode;
 int final;
 {
+    char buf[BUFSZ];
+    int hp = Upolyd ? u.mh : u.uhp;
+    int hpmax = Upolyd ? u.mhmax : u.uhpmax;
+
     putstr(en_win, 0, ""); /* separator after background */
     putstr(en_win, 0,
            final ? "Final Characteristics:" : "Current Characteristics:");
+
+    if (hp < 0)
+        hp = 0;
+    Sprintf(buf, "%d hit points (max:%d)", hp, hpmax);
+    you_have(buf, "");
+
+    Sprintf(buf, "%d magic power (max:%d)", u.uen, u.uenmax);
+    you_have(buf, "");
+
+    Sprintf(buf, "%d", u.uac);
+    enl_msg("Your armor class ", "is ", "was ", buf, "");
+
+    if (Upolyd) {
+        Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
+    } else {
+        /* flags.showexp does not matter */
+        /* experience level is already shown in the Background section */
+        Sprintf(buf, "%-1ld experience point%s",
+                u.uexp, u.uexp == 1 ? "" : "s");
+    }
+    you_have(buf, "");
+
+    Sprintf(buf, " You entered the dungeon %ld turn%s ago",
+            moves, moves == 1 ? "" : "s");
+    putstr(en_win, 0, buf);
+
+#ifdef SCORE_ON_BOTL
+    Sprintf(buf, "%ld", botl_score());
+    enl_msg("Your score ", "is ", "was ", buf, "");
+#endif
 
     /* bottom line order */
     one_characteristic(mode, final, A_STR); /* strength */
