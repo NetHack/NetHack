@@ -2518,8 +2518,8 @@ struct monst *mtmp;
 /* mnearto()
  * Put monster near (or at) location if possible.
  * Returns:
- *      1 - if a monster was moved from x, y to put mtmp at x, y.
- *      0 - in most cases.
+ *  true if relocation was successful
+ *  false otherwise
  */
 boolean
 mnearto(mtmp, x, y, move_other)
@@ -2532,7 +2532,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     coord mm;
 
     if (mtmp->mx == x && mtmp->my == y)
-        return FALSE;
+        return TRUE;
 
     if (move_other && (othermon = m_at(x, y)) != 0) {
         if (othermon->wormno)
@@ -2570,7 +2570,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
         }
     }
 
-    return FALSE;
+    return TRUE;
 }
 
 /* monster responds to player action; not the same as a passive attack;

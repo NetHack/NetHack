@@ -2859,6 +2859,8 @@ Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
 .lp statushilites
 Enable coloring of status fields (default off).
 See ``Configuring Status Hilites'' for further information.
+.lp status_updates
+Allow updates to the status lines at the bottom of the screen (default true).
 .lp suppress_alert
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that
@@ -3707,6 +3709,10 @@ was interrupted.
 .lp whatis_coord:compass
 When targeting with cursor, describe the cursor position with coordinates
 relative to your character.
+.lp nostatus_updates
+Prevent updates to the status lines at the bottom of the screen, if
+your screen-reader reads those lines. The same information can be
+seen via the #attributes command.
 .hn 2
 Global Configuration for System Administrators
 .pg

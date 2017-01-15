@@ -3479,6 +3479,9 @@ Boldface monsters and ``{\tt --More--}'' (default off).  Persistent.
 Enable coloring of status fields (default off).
 See ``{\it Configuring Status Hilites\/}'' for further information.
 %.lp
+\item[\ib{status\verb+_+updates}]
+Allow updates to the status lines at the bottom of the screen (default true).
+%.lp
 \item[\ib{suppress\verb+_+alert}]
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that 
@@ -4509,6 +4512,11 @@ was interrupted.
 \item[\ib{whatis\verb+_+coord:compass}]
 When targeting with cursor, describe the cursor position with coordinates
 relative to your character.
+%.lp
+\item[\ib{nostatus\verb+_+updates}]
+Prevent updates to the status lines at the bottom of the screen, if
+your screen-reader reads those lines. The same information can be
+seen via the #attributes command.
 \elist
 
 %.hn2

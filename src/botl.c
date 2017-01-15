@@ -213,7 +213,7 @@ bot2()
 void
 bot()
 {
-    if (youmonst.data) {
+    if (youmonst.data && iflags.status_updates) {
         bot1();
         bot2();
     }
@@ -436,7 +436,7 @@ bot()
 
     if (!blinit)
         panic("bot before init.");
-    if (!youmonst.data) {
+    if (!youmonst.data || !iflags.status_updates) {
         context.botl = context.botlx = 0;
         update_all = FALSE;
         return;
