@@ -912,8 +912,15 @@ unsigned doname_flags;
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
-            Sprintf(eos(bp), " (attached to %s)",
-                    a_monnam(find_mid(obj->leashmon, FM_FMON)));
+            struct monst *mlsh = find_mid(obj->leashmon, FM_FMON);
+
+            if (!mlsh) {
+                impossible("leashed monster not on this level");
+                obj->leashmon = 0;
+            } else {
+                Sprintf(eos(bp), " (attached to %s)",
+                        a_monnam(mlsh));
+            }
             break;
         }
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
