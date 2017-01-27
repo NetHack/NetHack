@@ -1638,7 +1638,7 @@ lev_by_name(nam)
 const char *nam;
 {
     schar lev = 0;
-    s_level *slev;
+    s_level *slev = (s_level *)0;
     d_level dlev;
     const char *p;
     int idx, idxtoo;
