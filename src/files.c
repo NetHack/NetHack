@@ -2,6 +2,9 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \
+                                       */
+
 #include "hack.h"
 #include "dlb.h"
 
@@ -2340,6 +2343,17 @@ int src;
             return 0;
         }
         sysopt.tt_oname_maxrank = n;
+    } else if (src == SET_IN_SYS && match_varname(buf, "LIVELOG", 7)) {
+        n = atoi(bufp);
+        if (n < 0 || n > 255) {
+            raw_printf("Illegal value in LIVELOG (must be between 0 and 255).");
+            return 0;
+        }
+#if !defined LIVELOG_ENABLE
+        if (n) raw_printf("WARNING: LIVELOG value configured but LIVELOG_ENABLE not defined. Ignored.");
+#endif
+        sysopt.livelog = n;
+
 
     /* SYSCF PANICTRACE options */
     } else if (src == SET_IN_SYS
@@ -3716,5 +3730,92 @@ int bufsz;
 }
 
 /* ----------  END TRIBUTE ----------- */
+
+/* Live logging - taken directly from 3.4.3-nao code base,
+ * but now uses \t separator instead of : as per xlogfile
+ */
+/* Locks the live log file and writes 'buffer'
+ * IF the ll_type matches sysopt.livelog mask
+ * lltype is included in LL entry for post-process filtering also
+ */
+#if defined LIVELOG_ENABLE
+void
+livelog_write_string(ll_type, buffer)
+u_char ll_type;
+char *buffer;
+{
+#define LLOG_SEP '\t' /* livelog field separator */
+    FILE* livelogfile;
+
+    if(!(ll_type & sysopt.livelog)) return;
+    if(lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
+        if(!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
+            pline("Cannot open live log file!");
+        } else {
+            char tmpbuf[1024+1];
+            char msgbuf[512+1];
+            char *c1 = msgbuf;
+            strncpy(msgbuf, buffer, 512);
+            msgbuf[512] = '\0';
+            while (*c1 != '\0') {
+                if (*c1 == LLOG_SEP) *c1 = '_';
+                c1++;
+            }
+            snprintf(tmpbuf, 1024, "lltype=%d%cplayer=%s%crole=%s%crace=%s%cgender=%s%calign=%s%cturns=%ld%cstarttime=%ld%ccurtime=%ld%cmessage=%s\n",
+                     (ll_type & sysopt.livelog), 
+                     LLOG_SEP,  
+                     plname,
+                     LLOG_SEP,  
+                     urole.filecode,
+                     LLOG_SEP,  
+                     urace.filecode,
+                     LLOG_SEP,  
+                     genders[flags.female].filecode,
+                     LLOG_SEP,  
+                     aligns[1-u.ualign.type].filecode,
+                     LLOG_SEP,  
+                     moves,
+                     LLOG_SEP,  
+                     (long)ubirthday,
+                     LLOG_SEP,  
+                     (long)time(NULL),
+                     LLOG_SEP,  
+                     msgbuf);
+
+            fprintf(livelogfile, tmpbuf);
+            (void) fclose(livelogfile);
+        }
+        unlock_file(LIVELOGFILE);
+    }
+#undef LLOG_SEP
+}
+
+void
+livelog_printf
+VA_DECL2(u_char, ll_type, const char *, fmt)
+{
+    char ll_msgbuf[512];
+    VA_START(fmt);
+    VA_INIT(fmt, char *);
+    vsnprintf(ll_msgbuf, 512, fmt, VA_ARGS);
+    livelog_write_string(ll_type, ll_msgbuf);
+    VA_END();
+}
+
+#else
+
+void
+livelog_write_string(log_type, buffer)
+u_char log_type UNUSED;
+char *buffer UNUSED;
+{
+}
+
+void
+livelog_printf
+VA_DECL2(u_char, ll_type, const char *, fmt)
+} /* would be matched in VA_END() but we don't need this */
+
+#endif /* LIVELOG_ENABLE */
 
 /*files.c*/

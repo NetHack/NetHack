@@ -604,7 +604,10 @@ int mntmp;
     }
 
     /* KMH, conduct */
-    u.uconduct.polyselfs++;
+    if(!u.uconduct.polyselfs++)
+        livelog_printf(LL_CONDUCT,
+            "changed form for the first time, becoming %s",
+            an(mons[mntmp].mname));
 
     /* exercise used to be at the very end but only Wis was affected
        there since the polymorph was always in effect by then */

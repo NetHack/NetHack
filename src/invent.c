@@ -488,21 +488,32 @@ struct obj *obj;
         if (u.uhave.amulet)
             impossible("already have amulet?");
         u.uhave.amulet = 1;
+        /* Player will be able to discover if s/he has the real amulet */
+        /* by monitoring the livelog - but only when it was picked up */
+        /* for the first time */
+        if(!u.uachieve.amulet) 
+            livelog_write_string(LL_ACHIEVE, "acquired the Amulet of Yendor");
         u.uachieve.amulet = 1;
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
         if (u.uhave.menorah)
             impossible("already have candelabrum?");
         u.uhave.menorah = 1;
+        if(!u.uachieve.menorah) 
+            livelog_write_string(LL_ACHIEVE, "acquired the Candelabrum of Invocation");
         u.uachieve.menorah = 1;
     } else if (obj->otyp == BELL_OF_OPENING) {
         if (u.uhave.bell)
             impossible("already have silver bell?");
         u.uhave.bell = 1;
+        if(!u.uachieve.bell) 
+            livelog_write_string(LL_ACHIEVE, "acquired the Bell of Opening");
         u.uachieve.bell = 1;
     } else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (u.uhave.book)
             impossible("already have the book?");
         u.uhave.book = 1;
+        if(!u.uachieve.book) 
+            livelog_write_string(LL_ACHIEVE, "acquired the Book of the Dead");
         u.uachieve.book = 1;
     } else if (obj->oartifact) {
         if (is_quest_artifact(obj)) {
@@ -514,11 +525,15 @@ struct obj *obj;
         set_artifact_intrinsic(obj, 1, W_ART);
     }
     if (obj->otyp == LUCKSTONE && obj->record_achieve_special) {
+        if(!u.uachieve.mines_luckstone) 
+            livelog_write_string(LL_ACHIEVE, "acquired the luckstone from Mines' End");
         u.uachieve.mines_luckstone = 1;
         obj->record_achieve_special = 0;
     } else if ((obj->otyp == AMULET_OF_REFLECTION
                 || obj->otyp == BAG_OF_HOLDING)
                && obj->record_achieve_special) {
+        if(!u.uachieve.finish_sokoban) 
+            livelog_write_string(LL_ACHIEVE, "completed Sokoban");
         u.uachieve.finish_sokoban = 1;
         obj->record_achieve_special = 0;
     }

@@ -167,6 +167,9 @@
  *              PERS_IS_UID  (0 or 1 - person is name or (numeric) userid)
  *            Can force incubi/succubi behavior to be toned down to nymph-like:
  *              SEDUCE       (0 or 1 - runtime disable/enable SEDUCE option)
+ *            Live-logging
+ *              LOVELOG      (0-255 - bitmask for level/type of live-logging
+ *                            See comments in 'sysconf' for details)
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
  *              GDBPATH      (the path to the system gdb(1) program)
@@ -204,6 +207,7 @@
    (whose name can be overridden via #define in global.h if desired) */
 #define LOGFILE  "logfile"  /* larger file for debugging purposes */
 #define XLOGFILE "xlogfile" /* even larger logfile */
+#define LIVELOGFILE "livelog" /* in-game events recorded live */
 #define NEWS     "news"     /* the file containing the latest hack news */
 #define PANICLOG "paniclog" /* log of panic and impossible events */
 
@@ -507,6 +511,9 @@ typedef unsigned char uchar;
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
+
+/* Live-logging - not particularly experimental, but could use more testing */
+#define LIVELOG_ENABLE
 
 /* End of Section 4 */
 

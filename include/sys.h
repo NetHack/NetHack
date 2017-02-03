@@ -22,6 +22,7 @@ struct sysopt {
                        */
     int maxplayers;
     int seduce;
+    int livelog;
     int check_save_uid; /* restoring savefile checks UID? */
     int check_plname; /* use plname for checking wizards/explorers/shellers */
 

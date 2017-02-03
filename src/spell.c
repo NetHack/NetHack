@@ -485,7 +485,9 @@ register struct obj *spellbook;
 
             if (read_tribute("books", tribtitle, 0, (char *) 0, 0,
                              spellbook->o_id)) {
-                u.uconduct.literate++;
+                if(!u.uconduct.literate++)
+                    livelog_printf(LL_CONDUCT,
+                            "became literate by reading %s", tribtitle);
                 check_unpaid(spellbook);
                 makeknown(booktype);
                 if (!u.uevent.read_tribute) {
