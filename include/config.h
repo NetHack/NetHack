@@ -512,8 +512,8 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
-/* Live-logging - not particularly experimental, but could use more testing */
-#define LIVELOG_ENABLE
+/* Live-logging - not particularly experimental, but very optional */
+/* #define LIVELOG_ENABLE */
 
 /* End of Section 4 */
 
