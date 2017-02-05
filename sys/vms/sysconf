@@ -53,6 +53,21 @@
 # Maximum number of score file entries to use for random statue names
 #MAX_STATUENAME_RANK=10
 
+# Use "Live logging" for in-game progress (achievements, wishes, etc)
+# Bitmask for kinds of things you want to log - sum the following values
+# as desired.
+# 0 - No live logging
+# 1 - Traditional 3.4.3-nao style logging (wishes, lifesaves, invocation, planes)
+# 2 - Achievements, as recorded in the achievement bitfield.
+# 4 - Unique kills (Juiblex, Famine, Quest nemesis, etc)
+# 8 - Significant religious events (sacrifice gifts, crowning)
+# 16 - Not used (yet)
+# 32 - Break conduct - can be spammy early-game
+# 64 - Enter new level for the first time (excruciatingly verbose but good for testing)
+# 128 - reserved for temporary debugging and/or tournament use
+# Enabled at compile time by defining LIVELOGFILE in config.h
+# LIVELOG=63
+
 # Show debugging information originating from these source files.
 # Use '*' for all, or list source files separated by spaces.
 # Only available if game has been compiled with DEBUG, and can be

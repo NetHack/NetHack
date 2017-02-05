@@ -22,10 +22,14 @@ sys_early_init()
 {
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
+    sysopt.livelog = 0;
 #ifdef SYSCF
     sysopt.wizards = (char *) 0;
 #else
     sysopt.wizards = dupstr(WIZARD_NAME);
+ #ifdef LIVELOGFILE
+    sysopt.livelog = LIVELOG_DETAIL;
+ #endif
 #endif
 #if defined(SYSCF) || !defined(DEBUGFILES)
     sysopt.debugfiles = (char *) 0;
@@ -37,7 +41,6 @@ sys_early_init()
     sysopt.explorers = (char *) 0;
     sysopt.genericusers = (char *) 0;
     sysopt.maxplayers = 0; /* XXX eventually replace MAX_NR_OF_PLAYERS */
-    sysopt.livelog = 0;
 
     /* record file */
     sysopt.persmax = PERSMAX;

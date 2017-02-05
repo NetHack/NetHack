@@ -138,9 +138,10 @@
 /*
  * Section 2:   Some global parameters and filenames.
  *
- *              LOGFILE, XLOGFILE, NEWS and PANICLOG refer to files in
- *              the playground directory.  Commenting out LOGFILE, XLOGFILE,
- *              NEWS or PANICLOG removes that feature from the game.
+ *              LOGFILE, XLOGFILE, LIVELOGFILE, NEWS and PANICLOG refer to
+ *              files in the playground directory.  Commenting out LOGFILE,
+ *              XLOGFILE, LIVELOGFILE, NEWS or PANICLOG removes that feature
+ *              from the game.
  *
  *              Building with debugging features enabled is now unconditional;
  *              the old WIZARD setting for that has been eliminated.
@@ -168,7 +169,7 @@
  *            Can force incubi/succubi behavior to be toned down to nymph-like:
  *              SEDUCE       (0 or 1 - runtime disable/enable SEDUCE option)
  *            Live-logging
- *              LOVELOG      (0-255 - bitmask for level/type of live-logging
+ *              LIVELOG      (0-255 - bitmask for level/type of live-logging
  *                            See comments in 'sysconf' for details)
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
@@ -207,7 +208,11 @@
    (whose name can be overridden via #define in global.h if desired) */
 #define LOGFILE  "logfile"  /* larger file for debugging purposes */
 #define XLOGFILE "xlogfile" /* even larger logfile */
-#define LIVELOGFILE "livelog" /* in-game events recorded live */
+/* #define LIVELOGFILE "livelog" * in-game events recorded live */
+#ifdef LIVELOGFILE
+/* LL_flags defined in global.h. Value below ignored if SYSCF is enabled */
+#define LIVELOG_DETAIL (LL_TRADITIONAL|LL_ACHIEVE|LL_UKILL|LL_DIVINEGIFT|LL_CONDUCT)
+#endif
 #define NEWS     "news"     /* the file containing the latest hack news */
 #define PANICLOG "paniclog" /* log of panic and impossible events */
 
@@ -511,9 +516,6 @@ typedef unsigned char uchar;
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
-
-/* Live-logging - not particularly experimental, but very optional */
-/* #define LIVELOG_ENABLE */
 
 /* End of Section 4 */
 

@@ -2349,8 +2349,8 @@ int src;
             raw_printf("Illegal value in LIVELOG (must be between 0 and 255).");
             return 0;
         }
-#if !defined LIVELOG_ENABLE
-        if (n) raw_printf("WARNING: LIVELOG value configured but LIVELOG_ENABLE not defined. Ignored.");
+#if !defined LIVELOGFILE
+        if (n) raw_printf("WARNING: LIVELOG value configured but LIVELOGFILE not #defined. Ignored.");
 #endif
         sysopt.livelog = n;
 
@@ -3738,7 +3738,7 @@ int bufsz;
  * IF the ll_type matches sysopt.livelog mask
  * lltype is included in LL entry for post-process filtering also
  */
-#if defined LIVELOG_ENABLE
+#if defined LIVELOGFILE
 void
 livelog_write_string(ll_type, buffer)
 u_char ll_type;
@@ -3802,7 +3802,7 @@ VA_DECL2(u_char, ll_type, const char *, fmt)
     VA_END();
 }
 
-#else
+#else /* LIVELOGFILE */
 
 void
 livelog_write_string(log_type, buffer)
@@ -3816,6 +3816,6 @@ livelog_printf
 VA_DECL2(u_char, ll_type, const char *, fmt)
 } /* would be matched in VA_END() but we don't need this */
 
-#endif /* LIVELOG_ENABLE */
+#endif /* LIVELOGFILE */
 
 /*files.c*/
