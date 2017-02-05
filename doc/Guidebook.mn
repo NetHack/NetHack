@@ -2713,6 +2713,8 @@ require "yes" rather than 'y' to confirm breaking a wand;
 .PL Remove
 require selection from inventory for 'R' and 'T'
 commands even when wearing just one applicable item.
+.PL all
+turn on all of the above.
 .PE
 By default, the pray choice is enabled, the others disabled.
 To disable it without setting
