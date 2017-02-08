@@ -929,7 +929,8 @@ struct monst *mtmp;
                        || otmp->otyp == RIN_SLOW_DIGESTION)
                    /* cockatrice corpses handled above; this
                       touch_petrifies() check catches eggs */
-                   || ((otmp->otyp == CORPSE || otmp->otyp == EGG)
+                   || ((otmp->otyp == CORPSE || otmp->otyp == EGG
+                        || otmp->globby)
                        && ((touch_petrifies(&mons[otmp->corpsenm])
                             && !resists_ston(mtmp))
                            || (otmp->corpsenm == PM_GREEN_SLIME
