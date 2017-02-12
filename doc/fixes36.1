@@ -41,7 +41,7 @@ make a previously-discovered scroll written with marker while blind have its
 don't show the old level when you die going down the stairs because of an
         iron ball
 new high score with ", while helpless" attribute appended would erroneously
-	result in ", while helpless" being appended to all scores
+	result in ", while helpless" being appended to all following entries
 allow bright aliases for colors in menucolors
 avoid hearing yelps when you are deaf
 make corpse visible if stethoscope told you about it being there
@@ -83,7 +83,7 @@ when a pet moves reluctantly, name the top item of the pile it is reluctant
 ensure sufficient messages are given to clarify the transition from detected 
 	vampire bats to fog clouds in Vlad's tower
 fix "killing by kicking something weird" when kicking an object causes death
-guard macros available for mextra fields similar to those for oextra fields
+avoid accessing mextra fields which haven't been allocated
 compile-time option for an alternate paniclog format for public server use
 make monsters forget where they stepped when fleeing or teleporting
 requiver pickup_thrown objects if quiver is empty
@@ -125,10 +125,9 @@ make status hilites use same color names as menucolors
 limit monster spell aggravate monsters to either outside or inside of the
 	Wizard's tower
 prevent revived unique from inheriting a user-defined name
-make hurtling out of water bubble on the Plane of Water handle entering water
+make hurtling out of air bubble on the Plane of Water handle entering water
 fix floor descriptions on the Planes when levitating
 fix warning glyph description when monster symbol coincided the warning symbol
-allow the same color names for status hilites and menucolors
 override MSGTYPE=norep while executing the ':' command
 if a chameleon took vampire form, it would stop periodically changing shape
 corpses obtained from tipping an ice box wouldn't rot away
@@ -302,7 +301,7 @@ conduct: wishing for an artifact and not getting it because it already exists
 	because of quest restrictions or too many artifacts in play does
 avoid ring of poison resistance as starting equipment for orcish wizard
 gelatinous cube shouldn't be able to eat a scroll of scare monster
-make fireballs or cones of cold cast a skilled or higher not go through walls
+make fireballs or cones of cold cast at skilled or higher not go through walls
 prevent flying monsters from hovering over unreachable underwater objects
 lembas wafer gives increased nutrition to elves, reduced nutrition to orcs;
 	cram ration gives increase nutrition to dwarves
