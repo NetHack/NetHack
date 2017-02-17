@@ -1,0 +1,42 @@
+#
+# NetHack 3.6  linux-tty-x11
+# NetHack may be freely redistributed.  See license for details. 
+#
+#-PRE
+# Linux hints file
+# This hints file provides a single-user tty/x11 build for Linux.
+
+
+#PREFIX=/usr
+PREFIX=$(wildcard ~)/nh/install
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/games
+INSTDIR=$(HACKDIR)
+VARDIR = $(HACKDIR)
+
+
+POSTINSTALL= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+
+CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1) $(CFLAGS3)
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\"
+CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS3=-DX11_GRAPHICS
+
+LINK=$(CC)
+
+WINSRC = $(WINTTYSRC) $(WINX11SRC)
+WINOBJ = $(WINTTYOBJ) $(WINX11OBJ)
+WINLIB = $(WINTTYLIB) $(WINX11LIB)
+
+VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+
+WINTTYLIB=-lcurses
+
+CHOWN=true
+CHGRP=true
+VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
+
+# note: needs libxt-dev libxaw7-dev libx11-dev bdftopcf
