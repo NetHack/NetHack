@@ -141,6 +141,8 @@ E int NDECL(getbones);
 
 /* ### botl.c ### */
 
+E char *NDECL(do_statusline1);
+E char *NDECL(do_statusline2);
 E int FDECL(xlev_to_rank, (int));
 E int FDECL(title_to_mon, (const char *, int *, int *));
 E void NDECL(max_rank_sz);
@@ -268,6 +270,7 @@ E void NDECL(warnreveal);
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
+E void NDECL(dump_map);
 E void FDECL(reveal_terrain, (int, int));
 
 /* ### dig.c ### */
@@ -2710,6 +2713,11 @@ E void FDECL(genl_status_update, (int, genericptr_t, int, int));
 E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
 #endif
 #endif
+
+E void FDECL(dump_open_log, (time_t));
+E void NDECL(dump_close_log);
+E void FDECL(dump_redirect, (boolean));
+E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
 
 /* ### wizard.c ### */
 

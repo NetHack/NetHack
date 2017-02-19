@@ -1434,6 +1434,9 @@ static const char *build_opts[] = {
 #ifdef DLB
     "data librarian",
 #endif
+#ifdef DUMPLOG
+    "end-of-game dumplogs",
+#endif
 #ifdef MFLOPPY
     "floppy drive support",
 #endif

@@ -2267,8 +2267,15 @@ int src;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
+    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 7)) {
+#ifdef DUMPLOG
+        if (sysopt.dumplogfile)
+            free((genericptr_t) sysopt.dumplogfile);
+        sysopt.dumplogfile = dupstr(bufp);
+#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
-        if (sysopt.genericusers) free(sysopt.genericusers);
+        if (sysopt.genericusers)
+            free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)

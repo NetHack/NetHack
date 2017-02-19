@@ -13,15 +13,12 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *NDECL(rank);
 
-#ifndef STATUS_VIA_WINDOWPORT
+#if !defined(STATUS_VIA_WINDOWPORT) || defined(DUMPLOG)
 
-STATIC_DCL void NDECL(bot1);
-STATIC_DCL void NDECL(bot2);
-
-STATIC_OVL void
-bot1()
+char *
+do_statusline1()
 {
-    char newbot1[MAXCO];
+    static char newbot1[BUFSZ];
     register char *nb;
     register int i, j;
 
@@ -71,14 +68,13 @@ bot1()
     if (flags.showscore)
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
 #endif
-    curs(WIN_STATUS, 1, 0);
-    putstr(WIN_STATUS, 0, newbot1);
+    return newbot1;
 }
 
-STATIC_OVL void
-bot2()
+char *
+do_statusline2()
 {
-    char newbot2[MAXCO], /* MAXCO: botl.h */
+    static char newbot2[BUFSZ], /* MAXCO: botl.h */
          /* dungeon location (and gold), hero health (HP, PW, AC),
             experience (HD if poly'd, else Exp level and maybe Exp points),
             time (in moves), varying number of status conditions */
@@ -102,7 +98,8 @@ bot2()
     if ((money = money_cnt(invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
-            encglyph(objnum_to_glyph(GOLD_PIECE)), min(money, 999999L));
+            iflags.in_dumplog ? "$" : encglyph(objnum_to_glyph(GOLD_PIECE)),
+            min(money, 999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
     dx = strstri(dloc, "\\G") ? 9 : 0;
@@ -205,22 +202,24 @@ bot2()
         /* only two or three consecutive spaces available to squeeze out */
         mungspaces(newbot2);
     }
-
-    curs(WIN_STATUS, 1, 1);
-    putmixed(WIN_STATUS, 0, newbot2);
+    return newbot2;
 }
 
+#ifndef STATUS_VIA_WINDOWPORT
 void
 bot()
 {
     if (youmonst.data && iflags.status_updates) {
-        bot1();
-        bot2();
+        curs(WIN_STATUS, 1, 0);
+        putstr(WIN_STATUS, 0, do_statusline1());
+        curs(WIN_STATUS, 1, 1);
+        putmixed(WIN_STATUS, 0, do_statusline2());
     }
     context.botl = context.botlx = 0;
 }
-
 #endif /* !STATUS_VIA_WINDOWPORT */
+
+#endif /* !STATUS_VIA_WINDOWPORT || DUMPLOG */
 
 /* convert experience level (1..30) to rank index (0..8) */
 int

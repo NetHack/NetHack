@@ -4589,6 +4589,24 @@ Minimum number of points to get an entry in the score file.
 \item[\ib{PERS\verb+_+IS\verb+_+UID}]
 0 or 1 to use user names or numeric userids, respectively, to identify
 unique people for the score file
+%.lp
+\item[\ib{DUMPLOGFILE}]
+A filename where the end-of-game dumplog is saved.
+Not defining this will prevent dumplog from being created. Only available
+if your game is compiled with DUMPLOG. Allows the following placeholders:
+%.sd
+%.si
+{\tt \%\%}  --- literal `{\tt \%}'\\
+{\tt \%v}  --- version (eg. "3.6.1-0")\\
+{\tt \%u}  --- game UID\\
+{\tt \%t}  --- game start time, UNIX timestamp format\\
+{\tt \%T}  --- current time, UNIX timestamp format\\
+{\tt \%d}  --- game start time, YYYYMMDDhhmmss format\\
+{\tt \%D}  --- current time, YYYYMMDDhhmmss format\\
+{\tt \%n}  --- player name\\
+{\tt \%N}  --- first character of player name
+%.ei
+%.ed
 \elist
 
 %.hn 1
