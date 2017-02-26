@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1448013599 2015/11/20 09:59:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1488075979 2017/02/26 02:26:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1033,27 +1033,35 @@ int behavior UNUSED, under UNUSED, over UNUSED;
 #endif /* STATUS_VIA_WINDOWPORT */
 
 STATIC_VAR struct window_procs dumplog_windowprocs_backup;
-STATIC_PTR FILE* dumplog_file;
+STATIC_PTR FILE *dumplog_file;
 
 #ifdef DUMPLOG
-char *
+STATIC_VAR time_t dumplog_now;
+
+STATIC_DCL char *FDECL(dump_fmtstr, (const char *, char *));
+
+STATIC_OVL char *
 dump_fmtstr(fmt, buf)
-char *fmt;
+const char *fmt;
 char *buf;
 {
-    char *fp = fmt, *bp = buf;
+    const char *fp = fmt;
+    char *bp = buf;
     int slen, len = 0;
     char tmpbuf[BUFSZ];
     char verbuf[BUFSZ];
+    long uid;
+    time_t now;
 
-    time_t now = getnow();
-    int uid = getuid();
+    now = dumplog_now;
+    uid = (long) getuid();
 
     while (fp && *fp && len < BUFSZ-1) {
         if (*fp == '%') {
             fp++;
             switch (*fp) {
-            default: goto finish;
+            default:
+                goto finish;
             case '\0': /* fallthrough */
             case '%':  /* literal % */
                 Sprintf(tmpbuf,"%%");
@@ -1075,13 +1083,13 @@ char *buf;
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */
-                Sprintf(tmpbuf, "%d", uid);
+                Sprintf(tmpbuf, "%ld", uid);
                 break;
             case 'n': /* player name */
-                Sprintf(tmpbuf, "%s", (plname ? plname : "unknown"));
+                Sprintf(tmpbuf, "%s", *plname ? plname : "unknown");
                 break;
             case 'N': /* first character of player name */
-                Sprintf(tmpbuf, "%c", (plname ? *plname : 'u'));
+                Sprintf(tmpbuf, "%c", *plname ? *plname : 'u');
                 break;
             }
 
@@ -1106,7 +1114,6 @@ char *buf;
 }
 #endif /* DUMPLOG */
 
-
 void
 dump_open_log(now)
 time_t now;
@@ -1115,6 +1122,7 @@ time_t now;
     char buf[BUFSZ];
     char *fname;
 
+    dumplog_now = now;
 #ifdef SYSCF
     if (!sysopt.dumplogfile)
         return;
@@ -1122,10 +1130,12 @@ time_t now;
 #else
     fname = dump_fmtstr(DUMPLOG_FILE, buf);
 #endif
-
     dumplog_file = fopen(fname, "w");
     dumplog_windowprocs_backup = windowprocs;
-#endif
+
+#else /*!DUMPLOG*/
+    nhUse(now);
+#endif /*?DUMPLOG*/
 }
 
 void
@@ -1150,7 +1160,7 @@ void
 dump_forward_putstr(win, attr, str, no_forward)
 winid win;
 int attr;
-const char* str;
+const char *str;
 int no_forward;
 {
     if (dumplog_file)
@@ -1159,11 +1169,12 @@ int no_forward;
         putstr(win, attr, str);
 }
 
+/*ARGSUSED*/
 STATIC_OVL void
 dump_putstr(win, attr, str)
-winid win;
-int attr;
-const char* str;
+winid win UNUSED;
+int attr UNUSED;
+const char *str;
 {
     if (dumplog_file)
         fprintf(dumplog_file, "%s\n", str);
@@ -1176,45 +1187,50 @@ int dummy;
     return dummy;
 }
 
+/*ARGUSED*/
 STATIC_OVL void
 dump_clear_nhwindow(win)
-winid win;
+winid win UNUSED;
 {
-
+    return;
 }
 
+/*ARGSUSED*/
 STATIC_OVL void
 dump_display_nhwindow(win, p)
-winid win;
-BOOLEAN_P p;
+winid win UNUSED;
+boolean p UNUSED;
 {
-
+    return;
 }
 
+/*ARGUSED*/
 STATIC_OVL void
 dump_destroy_nhwindow(win)
-winid win;
+winid win UNUSED;
 {
-
+    return;
 }
 
+/*ARGUSED*/
 STATIC_OVL void
 dump_start_menu(win)
-winid win;
+winid win UNUSED;
 {
-
+    return;
 }
 
+/*ARGSUSED*/
 STATIC_OVL void
 dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
-winid win;
-int glyph;
-const ANY_P* identifier;
-CHAR_P ch;
-CHAR_P gch;
-int attr;
-const char* str;
-BOOLEAN_P preselected;
+winid win UNUSED;
+int glyph UNUSED;
+const anything *identifier UNUSED;
+char ch;
+char gch UNUSED;
+int attr UNUSED;
+const char *str;
+boolean preselected UNUSED;
 {
     if (dumplog_file) {
         if (glyph == NO_GLYPH)
@@ -1224,10 +1240,11 @@ BOOLEAN_P preselected;
     }
 }
 
+/*ARGSUSED*/
 STATIC_OVL void
 dump_end_menu(win, str)
-winid win;
-const char* str;
+winid win UNUSED;
+const char *str;
 {
     if (dumplog_file) {
         if (str)
@@ -1238,21 +1255,21 @@ const char* str;
 }
 
 STATIC_OVL int
-dump_select_menu(win, index, item)
-winid win;
-int index;
-MENU_ITEM_P** item;
+dump_select_menu(win, how, item)
+winid win UNUSED;
+int how UNUSED;
+menu_item **item;
 {
-    *item = NULL;
+    *item = (menu_item *) 0;
     return 0;
 }
 
 void
-dump_redirect(flag)
-boolean flag;
+dump_redirect(onoff_flag)
+boolean onoff_flag;
 {
     if (dumplog_file) {
-        if (flag) {
+        if (onoff_flag) {
             windowprocs.win_create_nhwindow = dump_create_nhwindow;
             windowprocs.win_clear_nhwindow = dump_clear_nhwindow;
             windowprocs.win_display_nhwindow = dump_display_nhwindow;
@@ -1265,7 +1282,7 @@ boolean flag;
         } else {
             windowprocs = dumplog_windowprocs_backup;
         }
-        iflags.in_dumplog = flag;
+        iflags.in_dumplog = onoff_flag;
     } else {
         iflags.in_dumplog = FALSE;
     }

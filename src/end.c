@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1461919723 2016/04/29 08:48:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1488075979 2017/02/26 02:26:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,10 @@ STATIC_DCL int NDECL(set_vanq_order);
 STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
+#ifdef DUMPLOG
+STATIC_DCL void NDECL(dump_plines);
+#endif
+STATIC_DCL void FDECL(dump_everything, (int));
 STATIC_DCL int NDECL(num_extinct);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
@@ -672,34 +676,31 @@ STATIC_OVL void
 dump_plines()
 {
     int i;
-    char* str;
-    extern char* saved_plines[];
+    char buf[BUFSZ], **strp;
+    extern char *saved_plines[];
 
+    Strcpy(buf, " ");
     putstr(0, 0, "");
     putstr(0, 0, "Latest messages:");
-    for (i = 0; i < DUMPLOG_MSG_COUNT; ++i)
-    {
-        str = saved_plines[DUMPLOG_MSG_COUNT - 1 - i];
-        if (str) {
-            char buf[BUFSZ];
-            Sprintf(buf, " %s", str);
+    for (i = 0; i < DUMPLOG_MSG_COUNT; ++i) {
+        strp = &saved_plines[DUMPLOG_MSG_COUNT - 1 - i];
+        if (*strp) {
+            copynchars(&buf[1], *strp, BUFSZ - 1 - 1);
             putstr(0, 0, buf);
-        }
 #ifdef FREE_ALL_MEMORY
-        free(str);
+            free(*strp), *strp = 0;
 #endif
+        }
     }
 }
 #endif
 
 STATIC_OVL void
-dump_everything(how, taken)
+dump_everything(how)
 int how;
-boolean taken;
 {
 #ifdef DUMPLOG
-    struct obj* obj;
-    struct topl* topl;
+    struct obj *obj;
     char pbuf[BUFSZ];
 
     dump_redirect(TRUE);
@@ -746,6 +747,8 @@ boolean taken;
     show_overview((how >= PANICKED) ? 1 : 2, how);
     putstr(0, 0, "");
     dump_redirect(FALSE);
+#else
+    nhUse(how);
 #endif
 }
 
@@ -1164,7 +1167,8 @@ int how;
 
     if (strcmp(flags.end_disclose, "none") && how != PANICKED)
         disclose(how, taken);
-    dump_everything(how, taken);
+
+    dump_everything(how);
 
     /* finish_paybill should be called after disclosure but before bones */
     if (bones_ok && taken)
@@ -1820,7 +1824,7 @@ num_genocides()
     return n;
 }
 
-int
+STATIC_OVL int
 num_extinct()
 {
     int i, n = 0;

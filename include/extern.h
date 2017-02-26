@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1471112244 2016/08/13 18:17:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.570 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1488075978 2017/02/26 02:26:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.582 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2716,7 +2716,7 @@ E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
 
 E void FDECL(dump_open_log, (time_t));
 E void NDECL(dump_close_log);
-E void FDECL(dump_redirect, (boolean));
+E void FDECL(dump_redirect, (BOOLEAN_P));
 E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
 
 /* ### wizard.c ### */
