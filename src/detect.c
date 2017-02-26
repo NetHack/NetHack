@@ -25,7 +25,8 @@ STATIC_DCL void FDECL(show_map_spot, (int, int));
 STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
 STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
 STATIC_DCL int FDECL(mfind0, (struct monst *, BOOLEAN_P));
-STATIC_DCL int FDECL(reveal_terrain_getglyph, (int, int, int, unsigned, int, int));
+STATIC_DCL int FDECL(reveal_terrain_getglyph, (int, int, int,
+                                               unsigned, int, int));
 
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
@@ -1717,8 +1718,8 @@ sokoban_detect()
 }
 
 STATIC_DCL int
-reveal_terrain_getglyph(x,y, full, swallowed, default_glyph, which_subset)
-int x,y, full;
+reveal_terrain_getglyph(x, y, full, swallowed, default_glyph, which_subset)
+int x, y, full;
 unsigned swallowed;
 int default_glyph, which_subset;
 {
@@ -1734,17 +1735,15 @@ int default_glyph, which_subset;
        otherwise what the hero remembers for seen locations with
        monsters, objects, and/or traps removed as caller dictates */
     seenv = (full || level.flags.hero_memory)
-        ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
+              ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
     if (full) {
         levl[x][y].seenv = SVALL;
         glyph = back_to_glyph(x, y);
         levl[x][y].seenv = seenv;
     } else {
         levl_glyph = level.flags.hero_memory
-            ? levl[x][y].glyph
-            : seenv
-            ? back_to_glyph(x, y)
-            : default_glyph;
+              ? levl[x][y].glyph
+              : seenv ? back_to_glyph(x, y): default_glyph;
         /* glyph_at() returns the displayed glyph, which might
            be a monster.  levl[][].glyph contains the remembered
            glyph, which will never be a monster (unless it is
@@ -1777,14 +1776,13 @@ int default_glyph, which_subset;
                     && mtmp->m_ap_type == M_AP_FURNITURE) {
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
-                    /* we have a topology type but we want a
-                       screen symbol in order to derive a glyph;
-                       some screen symbols need the flags field
-                       of levl[][] in addition to the type
-                       (to disambiguate STAIRS to S_upstair or
-                       S_dnstair, for example; current flags
-                       might not be intended for remembered
-                       type, but we've got no other choice) */
+                    /* we have a topology type but we want a screen
+                       symbol in order to derive a glyph; some screen
+                       symbols need the flags field of levl[][] in
+                       addition to the type (to disambiguate STAIRS to
+                       S_upstair or S_dnstair, for example; current
+                       flags might not be intended for remembered type,
+                       but we've got no other choice) */
                     schar save_typ = levl[x][y].typ;
 
                     levl[x][y].typ = lastseentyp[x][y];
@@ -1803,7 +1801,7 @@ void
 dump_map()
 {
     int x, y, glyph;
-    int subset = TER_MAP|TER_TRP|TER_OBJ|TER_MON;
+    int subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
     int default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
     char buf[BUFSZ];
 
@@ -1811,6 +1809,7 @@ dump_map()
         for (x = 1; x < COLNO; x++) {
             int ch, color;
             unsigned special;
+
             glyph = reveal_terrain_getglyph(x,y, FALSE, u.uswallow,
                                             default_glyph, subset);
             (void) mapglyph(glyph, &ch, &color, &special, x, y);
