@@ -675,15 +675,17 @@ char *defquery;
 STATIC_OVL void
 dump_plines()
 {
-    int i;
+    int i, j;
     char buf[BUFSZ], **strp;
     extern char *saved_plines[];
+    extern unsigned saved_pline_index;
 
     Strcpy(buf, " ");
     putstr(0, 0, "");
     putstr(0, 0, "Latest messages:");
-    for (i = 0; i < DUMPLOG_MSG_COUNT; ++i) {
-        strp = &saved_plines[DUMPLOG_MSG_COUNT - 1 - i];
+    for (i = 0, j = (int) saved_pline_index; i < DUMPLOG_MSG_COUNT;
+         ++i, j = (j + 1) % DUMPLOG_MSG_COUNT) {
+        strp = &saved_plines[j];
         if (*strp) {
             copynchars(&buf[1], *strp, BUFSZ - 1 - 1);
             putstr(0, 0, buf);

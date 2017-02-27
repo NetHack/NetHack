@@ -15,7 +15,9 @@ static void FDECL(execplinehandler, (const char *));
 #endif
 
 #ifdef DUMPLOG
-char* saved_plines[DUMPLOG_MSG_COUNT] = {0};
+/* also used in end.c */
+unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
+char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
 #endif
 
 /*VARARGS1*/
@@ -84,6 +86,7 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1 - 1] = line[ln - 1];
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
+        ln = BUFSZ - 1;
     }
     if (!iflags.window_inited) {
         raw_print(line);
@@ -92,12 +95,34 @@ VA_DECL(const char *, line)
     }
 
 #ifdef DUMPLOG
-    /* We hook here early to have options-agnostic output. */
-    free(saved_plines[DUMPLOG_MSG_COUNT - 1]);
-    for (ln = 0; ln < DUMPLOG_MSG_COUNT - 1; ++ln)
-        saved_plines[DUMPLOG_MSG_COUNT - ln - 1] = saved_plines[DUMPLOG_MSG_COUNT - ln - 2];
-    saved_plines[0] = malloc(strlen(line) + 1);
-    (void) strcpy(saved_plines[0], line);
+    /* We hook here early to have options-agnostic output.
+     * Unfortunately, that means Norep() isn't honored (general issue) and
+     * that short lines aren't combined into one longer one (tty behavior).
+     */
+    {
+        /*
+         * TODO:
+         *  This essentially duplicates message history, which is
+         *  currently implemented in an interface-specific manner.
+         *  The core should take responsibility for that and have
+         *  this share it.
+         *  Ideally history for prompt lines should be augmented
+         *  with the player's response once that has been specified.
+         */
+        unsigned indx = saved_pline_index; /* next slot to use */
+        char *oldest = saved_plines[indx]; /* current content of that slot */
+
+        if (oldest && (int) strlen(oldest) >= ln) { /* ln==strlen(line) */
+            /* this buffer will gradually shrink until the 'else' is needed;
+               there's no pressing need to track allocation size instead */
+            Strcpy(oldest, line);
+        } else {
+            if (oldest)
+                free((genericptr_t) oldest);
+            saved_plines[indx] = dupstr(line);
+        }
+        saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
+    }
 #endif
 
     msgtyp = msgtype_type(line, no_repeat);
@@ -117,7 +142,7 @@ VA_DECL(const char *, line)
 
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
+    (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
