@@ -531,6 +531,7 @@ struct obj *obj;
         obj->record_achieve_special = 0;
     } else if (is_soko_prize(obj) && obj->record_achieve_special) {
         if(!u.uachieve.finish_sokoban) 
+            livelog_write_string(LL_ACHIEVE, "completed Sokoban");
         u.uachieve.finish_sokoban = 1;
         obj->record_achieve_special = 0;
     }
