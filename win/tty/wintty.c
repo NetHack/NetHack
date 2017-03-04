@@ -478,7 +478,7 @@ makepicks:
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
-                    any.a_int = 0; /* separator, not a choice */
+                    any = zeroany; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
                     role_menu_extra(RS_RACE, win, FALSE);

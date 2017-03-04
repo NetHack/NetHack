@@ -18,7 +18,7 @@ STATIC_DCL void FDECL(use_bell, (struct obj **));
 STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
 STATIC_DCL void FDECL(use_candle, (struct obj **));
 STATIC_DCL void FDECL(use_lamp, (struct obj *));
-STATIC_DCL void FDECL(light_cocktail, (struct obj *));
+STATIC_DCL void FDECL(light_cocktail, (struct obj **));
 STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
@@ -1339,9 +1339,10 @@ struct obj *obj;
 }
 
 STATIC_OVL void
-light_cocktail(obj)
-struct obj *obj; /* obj is a potion of oil */
+light_cocktail(optr)
+struct obj **optr;
 {
+    struct obj *obj = *optr; /* obj is a potion of oil */
     char buf[BUFSZ];
     boolean split1off;
 
@@ -1359,7 +1360,7 @@ struct obj *obj; /* obj is a potion of oil */
          * but its easy.
          */
         freeinv(obj);
-        (void) addinv(obj);
+        *optr = addinv(obj);
         return;
     } else if (Underwater) {
         There("is not enough oxygen to sustain a fire.");
@@ -1392,6 +1393,7 @@ struct obj *obj; /* obj is a potion of oil */
         if (obj)
             obj->nomerge = 0;
     }
+    *optr = obj;
 }
 
 static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
@@ -3586,7 +3588,7 @@ doapply()
         use_lamp(obj);
         break;
     case POT_OIL:
-        light_cocktail(obj);
+        light_cocktail(&obj);
         break;
     case EXPENSIVE_CAMERA:
         res = use_camera(obj);

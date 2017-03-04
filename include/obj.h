@@ -342,6 +342,14 @@ struct obj {
          && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
 #define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
+#define is_mines_prize(o) \
+    ((o)->otyp == LUCKSTONE && Is_mineend_level(&u.uz))
+#define is_soko_prize(o)                \
+    (((o)->otyp == AMULET_OF_REFLECTION \
+      || (o)->otyp == BAG_OF_HOLDING)   \
+     && Is_sokoend_level(&u.uz))
+
+
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1
 #define BURIED_TOO 0x2

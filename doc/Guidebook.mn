@@ -3776,6 +3776,24 @@ to identify unique people for the score file.
 .lp
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
+.lp
+DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
+Not defining this will prevent dumplog from being created. Only available
+if your game is compiled with DUMPLOG. Allows the following placeholders:
+.sd
+.si
+%% - literal '%'
+%v - version (eg. "3.6.1-0")
+%u - game UID
+%t - game start time, UNIX timestamp format
+%T - current time, UNIX timestamp format
+%d - game start time, YYYYMMDDhhmmss format
+%D - current time, YYYYMMDDhhmmss format
+%n - player name
+%N - first character of player name
+.ei
+.ed
+
 .hn 1
 Scoring
 .pg
