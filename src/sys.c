@@ -29,6 +29,7 @@ sys_early_init()
     sysopt.wizards = dupstr(WIZARD_NAME);
  #ifdef LIVELOGFILE
     sysopt.livelog = LIVELOG_DETAIL;
+    sysopt.ll_conduct_turns = 0;
  #endif
 #endif
 #if defined(SYSCF) || !defined(DEBUGFILES)

@@ -2361,6 +2361,13 @@ int src;
 #endif
         sysopt.livelog = n;
 
+    } else if (src == SET_IN_SYS && match_varname(buf, "LLC_TURNS", 9)) {
+        n = atoi(bufp);
+        if (n < 0) {
+            raw_printf("Illegal value in LLC_TURNS (must be a positive integer).");
+            return 0;
+        }
+        sysopt.ll_conduct_turns = n;
 
     /* SYSCF PANICTRACE options */
     } else if (src == SET_IN_SYS
@@ -3755,6 +3762,7 @@ char *buffer;
     FILE* livelogfile;
 
     if(!(ll_type & sysopt.livelog)) return;
+    if((ll_type == LL_CONDUCT) && (moves < sysopt.ll_conduct_turns)) return;
     if(lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
         if(!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
             pline("Cannot open live log file!");
