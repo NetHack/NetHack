@@ -73,6 +73,10 @@ WIZARDS=*
 # Enabled at compile time by defining LIVELOGFILE in config.h
 # LIVELOG=63
 
+# Do not livelog breaking of conducts before this turncount
+# Cuts down on spam
+# LLC_TURNS=3000
+
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.

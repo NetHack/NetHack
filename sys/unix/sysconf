@@ -93,6 +93,10 @@ MAXPLAYERS=10
 # Enabled at compile time by defining LIVELOGFILE in config.h
 # LIVELOG=63
 
+# Do not livelog breaking of conducts before this turncount
+# Cuts down on spam
+LLC_TURNS=3000
+
 # Show debugging information originating from these source files.
 # Use '*' for all, or list source files separated by spaces.
 # Only available if game has been compiled with DEBUG, and can be
