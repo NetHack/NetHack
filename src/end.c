@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1488788512 2017/03/06 08:21:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1489192539 2017/03/11 00:35:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1815,10 +1815,10 @@ boolean ask;
         }
     } else if (defquery == 'a') {
         /* #dovanquished rather than final disclosure, so pline() is ok */
-        pline("No monsters have been vanquished.");
+        pline("No creatures have been vanquished.");
 #ifdef DUMPLOG
     } else if (dumping) {
-        putstr(0, 0, "No monsters were vanquished."); /* not pline() */
+        putstr(0, 0, "No creatures were vanquished."); /* not pline() */
 #endif
     }
 }
