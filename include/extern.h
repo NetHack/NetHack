@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1488075978 2017/02/26 02:26:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.582 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1489192904 2017/03/11 00:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.583 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1801,6 +1801,10 @@ E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
 
 /* ### pline.c ### */
 
+#ifdef DUMPLOG
+E void FDECL(dumplogmsg, (const char *));
+E void NDECL(dumplogfreemessages);
+#endif
 E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 E void NDECL(free_youbuf);
