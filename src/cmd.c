@@ -2737,24 +2737,18 @@ int final;
 /* Macros for meta and ctrl modifiers:
  *   M and C return the meta/ctrl code for the given character;
  *     e.g., (C('c') is ctrl-c
- *   ISMETA and ISCTRL return TRUE iff the code is a meta/ctrl code
- *   UNMETA and UNCTRL are the opposite of M/C and return the key for a given
- *     meta/ctrl code. */
+ */
 #ifndef M
 #ifndef NHSTDC
 #define M(c) (0x80 | (c))
 #else
-#define M(c) ((c) -128)
+#define M(c) ((c) - 128)
 #endif /* NHSTDC */
 #endif
-#define ISMETA(c) (((c) & 0x80) != 0)
-#define UNMETA(c) ((c) & 0x7f)
 
 #ifndef C
 #define C(c) (0x1f & (c))
 #endif
-#define ISCTRL(c) ((uchar)(c) < 0x20)
-#define UNCTRL(c) (ISCTRL(c) ? (0x60 | (c)) : (c))
 
 /* ordered by command name */
 struct ext_func_tab extcmdlist[] = {
@@ -3727,27 +3721,25 @@ char *txt;
     return '\0';
 }
 
-/* returns the text for a one-byte encoding
+/* returns the text for a one-byte encoding;
  * must be shorter than a tab for proper formatting */
 char *
 key2txt(c, txt)
 uchar c;
 char *txt; /* sufficiently long buffer */
 {
+    /* should probably switch to "SPC", "ESC", "RET"
+       since nethack's documentation uses ESC for <escape> */
     if (c == ' ')
         Sprintf(txt, "<space>");
     else if (c == '\033')
         Sprintf(txt, "<esc>");
     else if (c == '\n')
         Sprintf(txt, "<enter>");
-    else if (ISCTRL(c))
-        Sprintf(txt, "^%c", highc(UNCTRL(c)));
-    else if (ISMETA(c))
-        Sprintf(txt, "M-%c", UNMETA(c));
-    else if (c >= 33 && c <= 126)
-        Sprintf(txt, "%c", c);          /* regular keys: ! through ~ */
+    else if (c == '\177')
+        Sprintf(txt, "<del>"); /* "<delete>" won't fit */
     else
-        Sprintf(txt, "A-%i", c);        /* arbitrary ascii combinations */
+        Strcpy(txt, visctrl((char) c));
     return txt;
 }
 
