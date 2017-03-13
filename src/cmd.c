@@ -3741,7 +3741,7 @@ char *txt; /* sufficiently long buffer */
     else if (c == '\n')
         Sprintf(txt, "<enter>");
     else if (ISCTRL(c))
-        Sprintf(txt, "^%c", UNCTRL(c));
+        Sprintf(txt, "^%c", highc(UNCTRL(c)));
     else if (ISMETA(c))
         Sprintf(txt, "M-%c", UNMETA(c));
     else if (c >= 33 && c <= 126)
