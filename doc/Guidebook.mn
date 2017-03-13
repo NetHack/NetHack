@@ -929,6 +929,7 @@ dungeon level.  All levels with annotations are displayed by the
 ``#overview'' command. Autocompletes. Default key is 'M-A', and '^N' if number_pad is on.
 .lp #apply
 Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
+If the tool used acts on items on the floor, using the `m' prefix skips those items.
 .lp #attributes
 Show your attributes. Default key is '^X'.
 .lp #autopickup
@@ -957,6 +958,7 @@ Drop an item. Default key is 'd'.
 Drop specific item types. Default key is 'D'.
 .lp "#eat "
 Eat something. Default key is 'e'.
+The `m' prefix skips eating items on the floor.
 .lp #engrave
 Engrave writing on the floor. Default key is 'E'.
 .lp #enhance
@@ -1008,6 +1010,7 @@ Name a monster, an individual object, or a type of object.  Same as #call.
 Autocompletes. Default keys are 'N', 'M-n', and 'M-N'.
 .lp #offer
 Offer a sacrifice to the gods. Autocompletes. Default key is 'M-o'.
+The `m' prefix skips offering items on the altar.
 .lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
@@ -1029,6 +1032,7 @@ Test the panic routine. Autocompletes. Wizard-mode only.
 Pay your shopping bill. Default key is 'p'.
 .lp #pickup
 Pick up things at the current location. Default key is ','.
+The `m' prefix forces use of a menu.
 .lp #polyself
 Polymorph self. Autocompletes. Wizard-mode only.
 .lp #pray
@@ -1118,6 +1122,7 @@ Look at the timeout queue. Autocompletes. Wizard-mode only.
 .lp "#tip "
 Tip over a container (bag or box) to pour out its contents.
 Autocompletes. Default key is 'M-T'.
+The `m' prefix makes the command use a menu.
 .lp #travel
 Travel to a specific location on the map. Default key is '_'.
 Using the ``request menu'' prefix shows a menu of interesting targets in sight

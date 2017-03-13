@@ -1113,6 +1113,8 @@ and '{\tt \^{}N}' if {\it number\verb+_+pad\/} is on.
 \item[\tb{\#apply}]
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
 Default key is '{\tt a}'.
+If the tool used acts on items on the floor, using the `{\tt m}' prefix
+skips those items.
 %.lp
 \item[\tb{\#attributes}]
 Show your attributes. Default key is '{\tt \^{}X}'.\\
@@ -1154,6 +1156,7 @@ Drop specific item types. Default key is '{\tt D}'.
 %.lp
 \item[\tb{\#eat}]
 Eat something. Default key is '{\tt e}'.
+The `{\tt m}' prefix skips eating items on the floor.
 %.lp
 \item[\tb{\#engrave}]
 Engrave writing on the floor. Default key is '{\tt E}'.
@@ -1230,6 +1233,7 @@ Autocompletes. Default keys are '{\tt N}', '{\tt M-n}', and '{\tt M-N}'.
 %.lp
 \item[\tb{\#offer}]
 Offer a sacrifice to the gods. Autocompletes. Default key is '{\tt M-o}'.\\
+The `{\tt m}' prefix skips offering items on the altar.
 %.lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
@@ -1257,6 +1261,7 @@ Pay your shopping bill. Default key is '{\tt p}'.
 %.lp
 \item[\tb{\#pickup}]
 Pick up things at the current location. Default key is '{\tt ,}'.
+The `{\tt m}' prefix forces use of a menu.
 %.lp
 \item[\tb{\#polyself}]
 Polymorph self. Autocompletes. Wizard-mode only.
@@ -1384,6 +1389,7 @@ Look at the timeout queue. Autocompletes. Wizard-mode only.
 \item[\tb{\#tip}]
 Tip over a container (bag or box) to pour out its contents.
 Autocompletes. Default key is '{\tt M-T}'.
+The `{\tt m}' prefix makes the command use a menu.
 %.lp
 \item[\tb{\#travel}]
 Travel to a specific location on the map. Default key is '{\tt _}'.
