@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1461437814 2016/04/23 18:56:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,53 @@ static char prevmsg[BUFSZ];
 static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static void FDECL(execplinehandler, (const char *));
+#endif
+
+#ifdef DUMPLOG
+/* also used in end.c */
+unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
+char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
+
+/* keep the most recent DUMPLOG_MSG_COUNT messages */
+void
+dumplogmsg(line)
+const char *line;
+{
+    /*
+     * TODO:
+     *  This essentially duplicates message history, which is
+     *  currently implemented in an interface-specific manner.
+     *  The core should take responsibility for that and have
+     *  this share it.
+     */
+    unsigned indx = saved_pline_index; /* next slot to use */
+    char *oldest = saved_plines[indx]; /* current content of that slot */
+
+    if (oldest && strlen(oldest) >= strlen(line)) {
+        /* this buffer will gradually shrink until the 'else' is needed;
+           there's no pressing need to track allocation size instead */
+        Strcpy(oldest, line);
+    } else {
+        if (oldest)
+            free((genericptr_t) oldest);
+        saved_plines[indx] = dupstr(line);
+    }
+    saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
+}
+
+/* called during save (unlike the interface-specific message history,
+   this data isn't saved and restored); end-of-game releases saved_pline[]
+   while writing its contents to the final dump log */
+void
+dumplogfreemessages()
+{
+    unsigned indx;
+
+    for (indx = 0; indx < DUMPLOG_MSG_COUNT; ++indx)
+        if (saved_plines[indx])
+            free((genericptr_t) saved_plines[indx]), saved_plines[indx] = 0;
+    saved_pline_index = 0;
+}
 #endif
 
 /*VARARGS1*/
@@ -87,6 +134,14 @@ VA_DECL(const char *, line)
         return;
     }
 
+#ifdef DUMPLOG
+    /* We hook here early to have options-agnostic output.
+     * Unfortunately, that means Norep() isn't honored (general issue) and
+     * that short lines aren't combined into one longer one (tty behavior).
+     */
+    dumplogmsg(line);
+#endif
+
     msgtyp = msgtype_type(line, no_repeat);
     if (msgtyp == MSGTYP_NOSHOW
         || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
@@ -104,7 +159,7 @@ VA_DECL(const char *, line)
 
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
+    (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 

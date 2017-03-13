@@ -1794,11 +1794,11 @@ struct monst *mtmp, *victim;
     else if (lev_limit > 49)
         lev_limit = (ptr->mlevel > 49 ? 50 : 49);
 
-    /* new form might force gender change */
-    fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
-
     if ((int) ++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
         ptr = &mons[newtype];
+        /* new form might force gender change */
+        fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
+
         if (mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
@@ -1830,8 +1830,9 @@ struct monst *mtmp, *victim;
         set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
+
+        mtmp->female = fem; /* gender might be changing */
     }
-    mtmp->female = fem; /* gender might be changing */
 
     /* sanity checks */
     if ((int) mtmp->m_lev > lev_limit) {

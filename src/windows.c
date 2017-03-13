@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1448013599 2015/11/20 09:59:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1488075979 2017/02/26 02:26:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1031,5 +1031,271 @@ int behavior UNUSED, under UNUSED, over UNUSED;
 }
 #endif /* STATUS_HILITES */
 #endif /* STATUS_VIA_WINDOWPORT */
+
+STATIC_VAR struct window_procs dumplog_windowprocs_backup;
+STATIC_PTR FILE *dumplog_file;
+
+#ifdef DUMPLOG
+STATIC_VAR time_t dumplog_now;
+
+STATIC_DCL char *FDECL(dump_fmtstr, (const char *, char *));
+
+STATIC_OVL char *
+dump_fmtstr(fmt, buf)
+const char *fmt;
+char *buf;
+{
+    const char *fp = fmt;
+    char *bp = buf;
+    int slen, len = 0;
+    char tmpbuf[BUFSZ];
+    char verbuf[BUFSZ];
+    long uid;
+    time_t now;
+
+    now = dumplog_now;
+    uid = (long) getuid();
+
+    /*
+     * Note: %t and %T assume that time_t is a 'long int' number of
+     * seconds since some epoch value.  That's quite iffy....  The
+     * unit of time might be different and the datum size might be
+     * some variant of 'long long int'.  [Their main purpose is to
+     * construct a unique file name rather than record the date and
+     * time; violating the 'long seconds since base-date' assumption
+     * may or may not interfere with that usage.]
+     */
+
+    while (fp && *fp && len < BUFSZ-1) {
+        if (*fp == '%') {
+            fp++;
+            switch (*fp) {
+            default:
+                goto finish;
+            case '\0': /* fallthrough */
+            case '%':  /* literal % */
+                Sprintf(tmpbuf, "%%");
+                break;
+            case 't': /* game start, timestamp */
+                Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                break;
+            case 'T': /* current time, timestamp */
+                Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                break;
+            case 'd': /* game start, YYYYMMDDhhmmss */
+                Sprintf(tmpbuf, "%08ld%06ld",
+                        yyyymmdd(ubirthday), hhmmss(ubirthday));
+                break;
+            case 'D': /* current time, YYYYMMDDhhmmss */
+                Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                break;
+            case 'v': /* version, eg. "3.6.1-0" */
+                Sprintf(tmpbuf, "%s", version_string(verbuf));
+                break;
+            case 'u': /* UID */
+                Sprintf(tmpbuf, "%ld", uid);
+                break;
+            case 'n': /* player name */
+                Sprintf(tmpbuf, "%s", *plname ? plname : "unknown");
+                break;
+            case 'N': /* first character of player name */
+                Sprintf(tmpbuf, "%c", *plname ? *plname : 'u');
+                break;
+            }
+
+            slen = strlen(tmpbuf);
+            if (len + slen < BUFSZ-1) {
+                len += slen;
+                Sprintf(bp, "%s", tmpbuf);
+                bp += slen;
+                if (*fp) fp++;
+            } else
+                break;
+        } else {
+            *bp = *fp;
+            bp++;
+            fp++;
+            len++;
+        }
+    }
+ finish:
+    *bp = '\0';
+    return buf;
+}
+#endif /* DUMPLOG */
+
+void
+dump_open_log(now)
+time_t now;
+{
+#ifdef DUMPLOG
+    char buf[BUFSZ];
+    char *fname;
+
+    dumplog_now = now;
+#ifdef SYSCF
+    if (!sysopt.dumplogfile)
+        return;
+    fname = dump_fmtstr(sysopt.dumplogfile, buf);
+#else
+    fname = dump_fmtstr(DUMPLOG_FILE, buf);
+#endif
+    dumplog_file = fopen(fname, "w");
+    dumplog_windowprocs_backup = windowprocs;
+
+#else /*!DUMPLOG*/
+    nhUse(now);
+#endif /*?DUMPLOG*/
+}
+
+void
+dump_close_log()
+{
+    if (dumplog_file) {
+        fclose(dumplog_file);
+        dumplog_file = NULL;
+    }
+}
+
+void
+dump_putc(ch)
+int ch;
+{
+    /* Not very efficient, but we mostly don't care. */
+    if (dumplog_file)
+        putc(ch, dumplog_file);
+}
+
+void
+dump_forward_putstr(win, attr, str, no_forward)
+winid win;
+int attr;
+const char *str;
+int no_forward;
+{
+    if (dumplog_file)
+        fprintf(dumplog_file, "%s\n", str);
+    if (!no_forward)
+        putstr(win, attr, str);
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_putstr(win, attr, str)
+winid win UNUSED;
+int attr UNUSED;
+const char *str;
+{
+    if (dumplog_file)
+        fprintf(dumplog_file, "%s\n", str);
+}
+
+STATIC_OVL winid
+dump_create_nhwindow(dummy)
+int dummy;
+{
+    return dummy;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_clear_nhwindow(win)
+winid win UNUSED;
+{
+    return;
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_display_nhwindow(win, p)
+winid win UNUSED;
+boolean p UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_destroy_nhwindow(win)
+winid win UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_start_menu(win)
+winid win UNUSED;
+{
+    return;
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
+winid win UNUSED;
+int glyph UNUSED;
+const anything *identifier UNUSED;
+char ch;
+char gch UNUSED;
+int attr UNUSED;
+const char *str;
+boolean preselected UNUSED;
+{
+    if (dumplog_file) {
+        if (glyph == NO_GLYPH)
+            fprintf(dumplog_file, " %s\n", str);
+        else
+            fprintf(dumplog_file, "  %c - %s\n", ch, str);
+    }
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_end_menu(win, str)
+winid win UNUSED;
+const char *str;
+{
+    if (dumplog_file) {
+        if (str)
+            fprintf(dumplog_file, "%s\n", str);
+        else
+            fputs("\n", dumplog_file);
+    }
+}
+
+STATIC_OVL int
+dump_select_menu(win, how, item)
+winid win UNUSED;
+int how UNUSED;
+menu_item **item;
+{
+    *item = (menu_item *) 0;
+    return 0;
+}
+
+void
+dump_redirect(onoff_flag)
+boolean onoff_flag;
+{
+    if (dumplog_file) {
+        if (onoff_flag) {
+            windowprocs.win_create_nhwindow = dump_create_nhwindow;
+            windowprocs.win_clear_nhwindow = dump_clear_nhwindow;
+            windowprocs.win_display_nhwindow = dump_display_nhwindow;
+            windowprocs.win_destroy_nhwindow = dump_destroy_nhwindow;
+            windowprocs.win_start_menu = dump_start_menu;
+            windowprocs.win_add_menu = dump_add_menu;
+            windowprocs.win_end_menu = dump_end_menu;
+            windowprocs.win_select_menu = dump_select_menu;
+            windowprocs.win_putstr = dump_putstr;
+        } else {
+            windowprocs = dumplog_windowprocs_backup;
+        }
+        iflags.in_dumplog = onoff_flag;
+    } else {
+        iflags.in_dumplog = FALSE;
+    }
+}
 
 /*windows.c*/

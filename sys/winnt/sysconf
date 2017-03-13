@@ -18,6 +18,20 @@ WIZARDS=*
 # Only available if game has been compiled with DEBUG.
 #DEBUGFILES=*
 
+# Save end of game dump log to this file.
+# Only available if NetHack was compiled with DUMPLOG
+# Allows following placeholders:
+#   %% literal '%'
+#   %v version (eg. "3.6.1-0")
+#   %u game UID
+#   %t game start time, UNIX timestamp format
+#   %T current time, UNIX timestamp format
+#   %d game start time, YYYYMMDDhhmmss format
+#   %D current time, YYYYMMDDhhmmss format
+#   %n player name
+#   %N first character of player name
+#DUMPLOGFILE=nethack-%n-%d.log
+
 # Limit the number of simultaneous games (see also nethack.sh).
 #MAXPLAYERS=10
 

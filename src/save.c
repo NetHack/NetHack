@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1450231175 2015/12/16 01:59:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1412,6 +1412,9 @@ freedynamicdata()
 #endif /* FREE_ALL_MEMORY */
 #ifdef STATUS_VIA_WINDOWPORT
     status_finish();
+#endif
+#ifdef DUMPLOG
+    dumplogfreemessages();
 #endif
 
     /* last, because it frees data that might be used by panic() to provide

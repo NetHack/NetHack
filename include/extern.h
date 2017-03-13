@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1471112244 2016/08/13 18:17:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.570 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1489192904 2017/03/11 00:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.583 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -141,6 +141,8 @@ E int NDECL(getbones);
 
 /* ### botl.c ### */
 
+E char *NDECL(do_statusline1);
+E char *NDECL(do_statusline2);
 E int FDECL(xlev_to_rank, (int));
 E int FDECL(title_to_mon, (const char *, int *, int *));
 E void NDECL(max_rank_sz);
@@ -268,6 +270,7 @@ E void NDECL(warnreveal);
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
+E void NDECL(dump_map);
 E void FDECL(reveal_terrain, (int, int));
 
 /* ### dig.c ### */
@@ -1801,6 +1804,10 @@ E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
 
 /* ### pline.c ### */
 
+#ifdef DUMPLOG
+E void FDECL(dumplogmsg, (const char *));
+E void NDECL(dumplogfreemessages);
+#endif
 E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 E void NDECL(free_youbuf);
@@ -2713,6 +2720,11 @@ E void FDECL(genl_status_update, (int, genericptr_t, int, int));
 E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
 #endif
 #endif
+
+E void FDECL(dump_open_log, (time_t));
+E void NDECL(dump_close_log);
+E void FDECL(dump_redirect, (BOOLEAN_P));
+E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
 
 /* ### wizard.c ### */
 

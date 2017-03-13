@@ -84,6 +84,20 @@ MAXPLAYERS=10
 # overridden via DEBUGFILES environment variable.
 #DEBUGFILES=*
 
+# Save end of game dump log to this file.
+# Only available if NetHack was compiled with DUMPLOG
+# Allows following placeholders:
+#   %% literal '%'
+#   %v version (eg. "3.6.1-0")
+#   %u game UID
+#   %t game start time, UNIX timestamp format
+#   %T current time, UNIX timestamp format
+#   %d game start time, YYYYMMDDhhmmss format
+#   %D current time, YYYYMMDDhhmmss format
+#   %n player name
+#   %N first character of player name
+#DUMPLOGFILE=/tmp/nethack.%n.%d.log
+
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.
 # By default PANICTRACE is enabled if BETA is defined, otherwise disabled.

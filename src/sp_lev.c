@@ -1951,11 +1951,7 @@ struct mkroom *croom;
      * "prize" and then set record_achieve_special (maps to corpsenm)
      * for the object.  That field will later be checked to find out if
      * the player obtained the prize. */
-    if (otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
-        otmp->record_achieve_special = 1;
-    } else if ((otmp->otyp == AMULET_OF_REFLECTION
-                || otmp->otyp == BAG_OF_HOLDING)
-               && Is_sokoend_level(&u.uz)) {
+    if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
         otmp->record_achieve_special = 1;
     }
 
