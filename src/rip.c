@@ -1,4 +1,4 @@
-/* NetHack 3.6	rip.c	$NHDT-Date: 1450432760 2015/12/18 09:59:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	rip.c	$NHDT-Date: 1488788514 2017/03/06 08:21:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -141,12 +141,21 @@ time_t when;
     Sprintf(buf, "%4ld", year);
     center(YEAR_LINE, buf);
 
-    putstr(tmpwin, 0, "");
+#ifdef DUMPLOG
+    if (tmpwin == 0)
+        dump_forward_putstr(0, 0, "Gave over:", TRUE);
+    else
+#endif
+        putstr(tmpwin, 0, "");
+
     for (; *dp; dp++)
         putstr(tmpwin, 0, *dp);
 
     putstr(tmpwin, 0, "");
-    putstr(tmpwin, 0, "");
+#ifdef DUMPLOG
+    if (tmpwin != 0)
+#endif
+        putstr(tmpwin, 0, "");
 
     for (x = 0; rip_txt[x]; x++) {
         free((genericptr_t) rip[x]);

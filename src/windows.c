@@ -1056,6 +1056,16 @@ char *buf;
     now = dumplog_now;
     uid = (long) getuid();
 
+    /*
+     * Note: %t and %T assume that time_t is a 'long int' number of
+     * seconds since some epoch value.  That's quite iffy....  The
+     * unit of time might be different and the datum size might be
+     * some variant of 'long long int'.  [Their main purpose is to
+     * construct a unique file name rather than record the date and
+     * time; violating the 'long seconds since base-date' assumption
+     * may or may not interfere with that usage.]
+     */
+
     while (fp && *fp && len < BUFSZ-1) {
         if (*fp == '%') {
             fp++;
@@ -1064,13 +1074,13 @@ char *buf;
                 goto finish;
             case '\0': /* fallthrough */
             case '%':  /* literal % */
-                Sprintf(tmpbuf,"%%");
+                Sprintf(tmpbuf, "%%");
                 break;
             case 't': /* game start, timestamp */
-                Sprintf(tmpbuf, "%ld", ubirthday);
+                Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
                 break;
             case 'T': /* current time, timestamp */
-                Sprintf(tmpbuf, "%ld", now);
+                Sprintf(tmpbuf, "%lu", (unsigned long) now);
                 break;
             case 'd': /* game start, YYYYMMDDhhmmss */
                 Sprintf(tmpbuf, "%08ld%06ld",
