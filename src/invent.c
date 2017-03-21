@@ -1313,7 +1313,7 @@ register const char *let, *word;
                 pline("No count allowed with this command.");
                 continue;
             }
-            ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt);
+            ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, TRUE);
             if (tmpcnt) {
                 cnt = tmpcnt;
                 cntgiven = TRUE;
