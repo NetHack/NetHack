@@ -211,7 +211,7 @@
 /* #define LIVELOGFILE "livelog" * in-game events recorded live */
 #ifdef LIVELOGFILE
 /* LL_flags defined in global.h. Value below ignored if SYSCF is enabled */
-#define LIVELOG_DETAIL (LL_TRADITIONAL|LL_ACHIEVE|LL_UKILL|LL_DIVINEGIFT|LL_CONDUCT)
+#define LIVELOG_DETAIL 0xFF
 #endif
 #define NEWS     "news"     /* the file containing the latest hack news */
 #define PANICLOG "paniclog" /* log of panic and impossible events */
