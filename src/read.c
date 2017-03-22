@@ -1971,7 +1971,7 @@ struct obj *obj;
 STATIC_OVL void
 do_class_genocide()
 {
-    int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
+    int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead, ll_done = 0;
     char buf[BUFSZ];
     boolean gameover = FALSE; /* true iff killed self */
 
@@ -2042,9 +2042,12 @@ do_class_genocide()
                     /* This check must be first since player monsters might
                      * have G_GENOD or !G_GENO.
                      */
-                    if(!num_genocides())
-                        livelog_printf(LL_CONDUCT,
-                                "performed %s first genocide (class %c)", uhis(), class);
+                    if(!ll_done++)
+                        if(!num_genocides())
+                            livelog_printf(LL_CONDUCT|LL_GENOCIDE,
+                                "performed %s first genocide (class %c)", uhis(), def_monsyms[class].sym);
+                        else
+                            livelog_printf(LL_GENOCIDE, "genocided class %c", def_monsyms[class].sym);
                     mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
                     reset_rndmonst(i);
                     kill_genocided_monsters();
@@ -2216,8 +2219,10 @@ int how;
     }
     if (how & REALLY) {
         if(!num_genocides())
-            livelog_printf(LL_CONDUCT,
+            livelog_printf(LL_CONDUCT|LL_GENOCIDE,
                     "performed %s first genocide (%s)", uhis(), buf);
+        else
+            livelog_printf(LL_GENOCIDE, "genocided %s", buf);
 
         /* setting no-corpse affects wishing and random tin generation */
         mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);

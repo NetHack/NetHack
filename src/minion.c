@@ -279,9 +279,12 @@ register struct monst *mtmp;
         if ((offer = bribe(mtmp)) >= demand) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
-        } else if (offer > 0L && (long) rnd(40) > (demand - offer)) {
+            livelog_printf(LL_UMONST, "bribes %s with %ld %s for safe passage",
+                  Amonnam(mtmp), offer, currency(offer)); 
             pline("%s scowls at you menacingly, then vanishes.",
                   Amonnam(mtmp));
+            livelog_printf(LL_UMONST, "bribes %s with %ld %s for safe passage",
+                  Amonnam(mtmp), offer, currency(offer)); 
         } else {
             pline("%s gets angry...", Amonnam(mtmp));
             mtmp->mpeaceful = 0;

@@ -1934,9 +1934,9 @@ register struct monst *mtmp;
      */
     if (mtmp->data == &mons[PM_MEDUSA]) {
         u.uachieve.killed_medusa = 1;
-        livelog_write_string(LL_ACHIEVE|LL_UKILL, "killed Medusa");
+        livelog_write_string(LL_ACHIEVE|LL_UMONST, "killed Medusa");
     } else if (unique_corpstat(mtmp->data))
-        livelog_printf(LL_UKILL, "%s %s",
+        livelog_printf(LL_UMONST, "%s %s",
               nonliving(mtmp->data) ? "destroyed" : "killed",
               mon_nam(mtmp));
     

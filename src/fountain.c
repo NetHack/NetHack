@@ -394,7 +394,7 @@ register struct obj *obj;
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;
             exercise(A_WIS, TRUE);
-	    livelog_write_string(LL_DIVINEGIFT, "Received Excalibur");
+	    livelog_write_string(LL_ARTIFACT, "Received Excalibur");
         }
         update_inventory();
         levl[u.ux][u.uy].typ = ROOM;

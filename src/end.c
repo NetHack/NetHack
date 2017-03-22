@@ -1049,7 +1049,7 @@ int how;
         } else {
             killer.name[0] = 0;
             killer.format = 0;
-            livelog_write_string(LL_TRADITIONAL, "averted death");
+            livelog_write_string(LL_LIFESAVE, "averted death");
             return;
         }
     }

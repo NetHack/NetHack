@@ -1875,7 +1875,7 @@ dodip()
 
             /* KMH, conduct */
             if(!u.uconduct.polypiles++)
-                livelog_write_string(LL_CONDUCT, "polymorphed first item");
+                livelog_printf(LL_CONDUCT, "polymorphed %s first item", uhis());
 
             was_wep = (obj == uwep);
             was_swapwep = (obj == uswapwep);

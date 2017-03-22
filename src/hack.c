@@ -418,7 +418,17 @@ xchar x, y;
 
     /* Okay, you've chewed through something */
     if(!u.uconduct.food++)
-        livelog_write_string(LL_CONDUCT, "ate for the first time");
+        livelog_printf(LL_CONDUCT, "ate for the first time, by chewing through %s",
+                boulder
+                    ? "a boulder"
+                    : IS_TREE(lev->typ)
+                        ? "a tree"
+                        : IS_ROCK(lev->typ)
+                            ? "rock"
+                            : (lev->typ == IRONBARS)
+                                ? "iron bars"
+                                : "a door");
+
     u.uhunger += rnd(20);
 
     if (boulder) {

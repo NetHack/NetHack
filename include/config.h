@@ -169,7 +169,7 @@
  *            Can force incubi/succubi behavior to be toned down to nymph-like:
  *              SEDUCE       (0 or 1 - runtime disable/enable SEDUCE option)
  *            Live-logging
- *              LIVELOG      (0-255 - bitmask for level/type of live-logging
+ *              LIVELOG      (0-0xFFFF - bitmask for level/type of live-logging
  *                            See comments in 'sysconf' for details)
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)

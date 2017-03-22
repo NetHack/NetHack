@@ -3755,7 +3755,7 @@ int bufsz;
 #if defined LIVELOGFILE
 void
 livelog_write_string(ll_type, buffer)
-u_char ll_type;
+unsigned int ll_type;
 char *buffer;
 {
 #define LLOG_SEP '\t' /* livelog field separator */
@@ -3807,7 +3807,7 @@ char *buffer;
 
 void
 livelog_printf
-VA_DECL2(u_char, ll_type, const char *, fmt)
+VA_DECL2(unsigned int, ll_type, const char *, fmt)
 {
     char ll_msgbuf[512];
     VA_START(fmt);
@@ -3821,14 +3821,14 @@ VA_DECL2(u_char, ll_type, const char *, fmt)
 
 void
 livelog_write_string(log_type, buffer)
-u_char log_type UNUSED;
+unsigned int log_type UNUSED;
 char *buffer UNUSED;
 {
 }
 
 void
 livelog_printf
-VA_DECL2(u_char, ll_type, const char *, fmt)
+VA_DECL2(unsigned int, ll_type, const char *, fmt)
 } /* would be matched in VA_END() but we don't need this */
 
 #endif /* LIVELOGFILE */

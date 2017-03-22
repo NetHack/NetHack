@@ -240,8 +240,8 @@ register struct obj *obj;
         /* KMH, conduct */
         if(!u.uconduct.gnostic++)
             livelog_printf(LL_CONDUCT,
-                    "performed %s first religious act, by dropping %s on an altar",
-                    uhis(), doname(obj));
+                    "eschewed atheism, by dropping %s on an altar",
+                    doname(obj));
     } else {
         /* coins don't have bless/curse status */
         obj->blessed = obj->cursed = 0;
@@ -1140,7 +1140,7 @@ boolean at_stairs, falling, portal;
             return;  /* must have the Amulet */
         if (!wizard) {/* wizard ^V can bypass Earth level */
             assign_level(newlevel, &earth_level); /* (redundant) */
-            livelog_write_string(LL_TRADITIONAL, "entered the Planes");
+            livelog_write_string(LL_ACHIEVE, "entered the Planes");
         }
     }
     new_ledger = ledger_no(newlevel);
@@ -1291,7 +1291,7 @@ boolean at_stairs, falling, portal;
         }
         mklev();
         new = TRUE; /* made the level */
-        livelog_printf (LL_NEWLEVEL, "entered new level %d, %s.", dunlev(&u.uz),dungeons[u.uz.dnum].dname );
+        livelog_printf (LL_DEBUG, "entered new level %d, %s.", dunlev(&u.uz),dungeons[u.uz.dnum].dname );
     } else {
         /* returning to previously visited level; reload it */
         fd = open_levelfile(new_ledger, whynot);

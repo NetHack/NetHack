@@ -732,7 +732,7 @@ gcrownu()
         u.uevent.uhand_of_elbereth = 1;
         verbalize("I crown thee...  The Hand of Elbereth!");
         livelog_printf(LL_DIVINEGIFT,
-                "was crowned the Hand of Elbereth by %s", u_gname());
+                "was crowned \"The Hand of Elbereth\" by %s", u_gname());
         break;
     case A_NEUTRAL:
         u.uevent.uhand_of_elbereth = 2;
@@ -750,7 +750,7 @@ gcrownu()
             exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
         verbalize("Thou art chosen to %s for My Glory!",
                   already_exists && !in_hand ? "take lives" : "steal souls");
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the glory of %s",
+        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
                 already_exists && !in_hand ? "take lives" : "steal souls",
                 u_gname());
         break;
@@ -1710,7 +1710,7 @@ dosacrifice()
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
-                    livelog_printf (LL_DIVINEGIFT,
+                    livelog_printf (LL_DIVINEGIFT|LL_ARTIFACT,
                             "had %s bestowed upon %s by %s",
                             artiname(otmp->oartifact), 
                             uhim(),
