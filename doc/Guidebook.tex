@@ -4613,6 +4613,30 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 {\tt \%N}  --- first character of player name
 %.ei
 %.ed
+%.lp
+\item[\ib{LIVELOG}]
+A bitmask indicating which in-game events to record in the livelog file,
+which must be compiled into the game as LIVELOGFILE to enable this
+feature.  The following values may be combined:
+%.sd
+%.si
+
+{\tt 0x01}  --- Wishes\\
+{\tt 0x02}  --- Significant achievements (complete sokoban, perform invocation, etc)\\
+{\tt 0x04}  --- Kill, destroy or bribe a unique monster.\\
+{\tt 0x08}  --- Significant religious events (sacrifice gifts, crowning)\\
+{\tt 0x10}  --- Life-saving\\
+{\tt 0x20}  --- Break conduct - see also LLC\_TURNS below.\\
+{\tt 0x40}  --- Artifact obtained (#name Sting, dip for Excalibur)\\
+{\tt 0x80}  --- Genocides\\
+{\tt 0x8000}  --- Livelog debug msgs (currently only 'enter new level')
+%.ei
+%.ed
+
+%.lp
+\item[\ib{LLC\_TURNS}]
+If live-logging conducts is enabled, do not log them before this turncount,
+because conducts broken in the early game are not interesting.
 \elist
 
 %.hn 1

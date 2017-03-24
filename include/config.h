@@ -210,7 +210,8 @@
 #define XLOGFILE "xlogfile" /* even larger logfile */
 /* #define LIVELOGFILE "livelog" * in-game events recorded live */
 #ifdef LIVELOGFILE
-/* LL_flags defined in global.h. Value below ignored if SYSCF is enabled */
+/* LL_flags defined in global.h. Value below is ignored if SYSCF is enabled */
+/* #define LIVELOG_DETAIL (LL_WISH|LL_ACHIEVE|LL_UMONST) */
 #define LIVELOG_DETAIL 0xFF
 #endif
 #define NEWS     "news"     /* the file containing the latest hack news */

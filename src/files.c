@@ -2351,16 +2351,16 @@ int src;
         }
         sysopt.tt_oname_maxrank = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "LIVELOG", 7)) {
-        n = atoi(bufp);
-        if (n < 0 || n > 255) {
-            raw_printf("Illegal value in LIVELOG (must be between 0 and 255).");
+#ifdef LIVELOGFILE
+        n = strtol(bufp,NULL,0); 
+        if (n < 0 || n > 0xFFFF) {
+            raw_printf("Illegal value in LIVELOG (must be between 0 and 0xFFFF).");
             return 0;
         }
-#if !defined LIVELOGFILE
-        if (n) raw_printf("WARNING: LIVELOG value configured but LIVELOGFILE not #defined. Ignored.");
-#endif
         sysopt.livelog = n;
-
+#else
+        raw_printf("WARNING: LIVELOG value configured but LIVELOGFILE not #defined. Ignored.");
+#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "LLC_TURNS", 9)) {
         n = atoi(bufp);
         if (n < 0) {

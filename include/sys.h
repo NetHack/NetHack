@@ -25,7 +25,7 @@ struct sysopt {
                        */
     int maxplayers;
     int seduce;
-    int livelog;       /* event types to livelog */
+    unsigned int livelog;  /* event types to livelog */
     int ll_conduct_turns;  /* do not livelog conducts before this turncount */
     int check_save_uid; /* restoring savefile checks UID? */
     int check_plname; /* use plname for checking wizards/explorers/shellers */
