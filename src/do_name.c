@@ -1129,7 +1129,7 @@ const char *name;
             if(!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT|LL_ARTIFACT, "became literate by naming %s", bare_artifactname(obj));
             else
-                livelog_printf(LL_ARTIFACT, "chose %s to be named \"%s\"", an(xname(obj)), bare_artifactname(obj));
+                livelog_printf(LL_ARTIFACT, "chose %s to be named \"%s\"", ansimpleoname(obj), bare_artifactname(obj));
         }
     }
     if (carried(obj))
