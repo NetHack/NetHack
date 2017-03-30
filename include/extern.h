@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1489192904 2017/03/11 00:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.583 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1490908458 2017/03/30 21:14:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.585 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1806,6 +1806,7 @@ E void FDECL(dumplogmsg, (const char *));
 E void NDECL(dumplogfreemessages);
 #endif
 E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
+E void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
 E void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 E void NDECL(free_youbuf);
 E void VDECL(You, (const char *, ...)) PRINTF_F(1, 2);
