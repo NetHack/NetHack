@@ -2737,24 +2737,18 @@ int final;
 /* Macros for meta and ctrl modifiers:
  *   M and C return the meta/ctrl code for the given character;
  *     e.g., (C('c') is ctrl-c
- *   ISMETA and ISCTRL return TRUE iff the code is a meta/ctrl code
- *   UNMETA and UNCTRL are the opposite of M/C and return the key for a given
- *     meta/ctrl code. */
+ */
 #ifndef M
 #ifndef NHSTDC
 #define M(c) (0x80 | (c))
 #else
-#define M(c) ((c) -128)
+#define M(c) ((c) - 128)
 #endif /* NHSTDC */
 #endif
-#define ISMETA(c) (((c) & 0x80) != 0)
-#define UNMETA(c) ((c) & 0x7f)
 
 #ifndef C
 #define C(c) (0x1f & (c))
 #endif
-#define ISCTRL(c) ((uchar)(c) < 0x20)
-#define UNCTRL(c) (ISCTRL(c) ? (0x60 | (c)) : (c))
 
 /* ordered by command name */
 struct ext_func_tab extcmdlist[] = {
@@ -3727,27 +3721,25 @@ char *txt;
     return '\0';
 }
 
-/* returns the text for a one-byte encoding
+/* returns the text for a one-byte encoding;
  * must be shorter than a tab for proper formatting */
 char *
 key2txt(c, txt)
 uchar c;
 char *txt; /* sufficiently long buffer */
 {
+    /* should probably switch to "SPC", "ESC", "RET"
+       since nethack's documentation uses ESC for <escape> */
     if (c == ' ')
         Sprintf(txt, "<space>");
     else if (c == '\033')
         Sprintf(txt, "<esc>");
     else if (c == '\n')
         Sprintf(txt, "<enter>");
-    else if (ISCTRL(c))
-        Sprintf(txt, "^%c", highc(UNCTRL(c)));
-    else if (ISMETA(c))
-        Sprintf(txt, "M-%c", UNMETA(c));
-    else if (c >= 33 && c <= 126)
-        Sprintf(txt, "%c", c);          /* regular keys: ! through ~ */
+    else if (c == '\177')
+        Sprintf(txt, "<del>"); /* "<delete>" won't fit */
     else
-        Sprintf(txt, "A-%i", c);        /* arbitrary ascii combinations */
+        Strcpy(txt, visctrl((char) c));
     return txt;
 }
 
@@ -4579,11 +4571,12 @@ int x, y, mod;
 }
 
 char
-get_count(allowchars, inkey, maxcount, count)
+get_count(allowchars, inkey, maxcount, count, historical)
 char *allowchars;
 char inkey;
 long maxcount;
 long *count;
+boolean historical; /* whether to include in message history: True => yes */
 {
     char qbuf[QBUFSZ];
     int key;
@@ -4624,10 +4617,19 @@ long *count;
                 Sprintf(qbuf, "Count: %ld", cnt);
                 backspaced = FALSE;
             }
-            pline1(qbuf);
+            /* bypassing pline() keeps intermediate prompt out of
+               DUMPLOG message history */
+            putstr(WIN_MESSAGE, 0, qbuf);
             mark_synch();
         }
     }
+
+    if (historical) {
+        Sprintf(qbuf, "Count: %ld ", *count);
+        (void) key2txt((uchar) key, eos(qbuf));
+        putmsghistory(qbuf, FALSE);
+    }
+
     return key;
 }
 
@@ -4653,7 +4655,7 @@ parse()
     if (!Cmd.num_pad || (foo = readchar()) == Cmd.spkeys[NHKF_COUNT]) {
         long tmpmulti = multi;
 
-        foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti);
+        foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti, FALSE);
         last_multi = multi = tmpmulti;
     }
 #ifdef ALTMETA
@@ -4910,7 +4912,13 @@ yn_function(query, resp, def)
 const char *query, *resp;
 char def;
 {
-    char qbuf[QBUFSZ];
+    char res, qbuf[QBUFSZ];
+#ifdef DUMPLOG
+    extern unsigned saved_pline_index; /* pline.c */
+    unsigned idx = saved_pline_index;
+    /* buffer to hold query+space+formatted_single_char_response */
+    char dumplog_buf[QBUFSZ + 1 + 15]; /* [QBUFSZ+1+7] should suffice */
+#endif
 
     iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
 
@@ -4922,7 +4930,18 @@ char def;
         Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
         query = qbuf;
     }
-    return (*windowprocs.win_yn_function)(query, resp, def);
+    res = (*windowprocs.win_yn_function)(query, resp, def);
+#ifdef DUMPLOG
+    if (idx == saved_pline_index) {
+        /* when idx is still the same as saved_pline_index, the interface
+           didn't put the prompt into saved_plines[]; we put a simplified
+           version in there now (without response choices or default) */
+        Sprintf(dumplog_buf, "%s ", query);
+        (void) key2txt((uchar) res, eos(dumplog_buf));
+        dumplogmsg(dumplog_buf);
+    }
+#endif
+    return res;
 }
 
 /* for paranoid_confirm:quit,die,attack prompting */

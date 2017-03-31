@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1489192904 2017/03/11 00:41:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.583 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1490908458 2017/03/30 21:14:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.585 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -211,7 +211,7 @@ E int FDECL(isok, (int, int));
 E int FDECL(get_adjacent_loc,
             (const char *, const char *, XCHAR_P, XCHAR_P, coord *));
 E const char *FDECL(click_to_cmd, (int, int, int));
-E char FDECL(get_count, (char *, CHAR_P, long, long *));
+E char FDECL(get_count, (char *, CHAR_P, long, long *, BOOLEAN_P));
 #ifdef HANGUPHANDLING
 E void FDECL(hangup, (int));
 E void NDECL(end_of_input);
@@ -1809,6 +1809,7 @@ E void FDECL(dumplogmsg, (const char *));
 E void NDECL(dumplogfreemessages);
 #endif
 E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
+E void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
 E void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 E void NDECL(free_youbuf);
 E void VDECL(You, (const char *, ...)) PRINTF_F(1, 2);

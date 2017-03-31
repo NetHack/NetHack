@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1463787697 2016/05/20 23:41:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1490908468 2017/03/30 21:14:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -331,6 +331,7 @@ register int n;
 
 extern char erase_char; /* from xxxtty.c; don't need kill_char */
 
+/* returns a single keystroke; also sets 'yn_number' */
 char
 tty_yn_function(query, resp, def)
 const char *query, *resp;
@@ -354,6 +355,7 @@ char def;
     boolean doprev = 0;
     char prompt[BUFSZ];
 
+    yn_number = 0L;
     if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
@@ -383,11 +385,12 @@ char def;
         /* not pline("%s ", prompt);
            trailing space is wanted here in case of reprompt */
         Strcat(prompt, " ");
-        pline("%s", prompt);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
     } else {
         /* no restriction on allowed response, so always preserve case */
         /* preserve_case = TRUE; -- moot since we're jumping to the end */
-        pline("%s ", query);
+        Sprintf(prompt, "%s ", query);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
         q = readchar();
         goto clean_up;
     }
@@ -444,6 +447,7 @@ char def;
             char z, digit_string[2];
             int n_len = 0;
             long value = 0;
+
             addtopl("#"), n_len++;
             digit_string[1] = '\0';
             if (q != '#') {
@@ -491,11 +495,16 @@ char def;
         }
     } while (!q);
 
-    if (q != '#') {
-        Sprintf(rtmp, "%c", q);
-        addtopl(rtmp);
-    }
-clean_up:
+ clean_up:
+    if (yn_number)
+        Sprintf(rtmp, "#%ld", yn_number);
+    else
+        (void) key2txt(q, rtmp);
+    /* addtopl(rtmp); -- rewrite toplines instead */
+    Sprintf(toplines, "%s%s", prompt, rtmp);
+#ifdef DUMPLOG
+    dumplogmsg(toplines);
+#endif
     ttyDisplay->inread--;
     ttyDisplay->toplin = 2;
     if (ttyDisplay->intr)
@@ -636,6 +645,9 @@ boolean restoring_msghist;
 {
     static boolean initd = FALSE;
     int idx;
+#ifdef DUMPLOG
+    extern unsigned saved_pline_index; /* pline.c */
+#endif
 
     if (restoring_msghist && !initd) {
         /* we're restoring history from the previous session, but new
@@ -645,18 +657,27 @@ boolean restoring_msghist;
            restored ones are being put into place */
         msghistory_snapshot(TRUE);
         initd = TRUE;
+#ifdef DUMPLOG
+        /* this suffices; there's no need to scrub saved_pline[] pointers */
+        saved_pline_index = 0;
+#endif
     }
 
     if (msg) {
-        /* move most recent message to history, make this become most recent
-         */
+        /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(toplines, msg);
+#ifdef DUMPLOG
+        dumplogmsg(toplines);
+#endif
     } else if (snapshot_mesgs) {
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();
             Strcpy(toplines, snapshot_mesgs[idx]);
+#ifdef DUMPLOG
+            dumplogmsg(toplines);
+#endif
         }
         /* now release the snapshot */
         free_msghistory_snapshot(TRUE);
