@@ -166,16 +166,9 @@ const genericptr vptr2;
     if ((namcmp = strcmpi(nam1, nam2)) != 0)
         return namcmp;
 
-    /* Sort by BUCX.  Map blessed to 4, uncursed to 2, cursed to 1, and
-       unknown to 0. */
-    val1 = obj1->bknown
-              ? (obj1->blessed << 2)
-                   + ((!obj1->blessed && !obj1->cursed) << 1) + obj1->cursed
-              : 0;
-    val2 = obj2->bknown
-              ? (obj2->blessed << 2)
-                   + ((!obj2->blessed && !obj2->cursed) << 1) + obj2->cursed
-              : 0;
+    /* Sort by BUCX. */
+    val1 = obj1->bknown ? (obj1->blessed ? 3 : !obj1->cursed ? 2 : 1) : 0;
+    val2 = obj2->bknown ? (obj2->blessed ? 3 : !obj2->cursed ? 2 : 1) : 0;
     if (val1 != val2)
         return val2 - val1; /* bigger is better */
 
@@ -216,7 +209,7 @@ tiebreak:
     /* They're identical, as far as we're concerned.  We want
        to force a deterministic order, and do so by producing a
        stable sort: maintain the original order of equal items. */
-    return (sli2->indx - sli1->indx);
+    return (sli1->indx - sli2->indx);
 }
 
 void

@@ -1,4 +1,4 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1432512813 2015/05/25 00:13:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	getline.c	$NHDT-Date: 1490908467 2017/03/30 21:14:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,20 +50,13 @@ getlin_hook_proc hook;
     register int c;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
-    char tmpbuf[BUFSZ]; /* [QBUFSZ+1] should suffice */
 
     if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
     ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
-    /*
-     * This used to use pline("%s ", query), but that made getline
-     * prompts be susceptible to suppression via the MSGTYPE mechanism.
-     * Having 'MSGTYPE=hide "# "' was particularly confusing.
-     */
-    Sprintf(tmpbuf, "%s ", query);
-    tty_putstr(WIN_MESSAGE, 0, tmpbuf);
+    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
     *obufp = 0;
     for (;;) {
         (void) fflush(stdout);

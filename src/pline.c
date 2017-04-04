@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1490908465 2017/03/30 21:14:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,7 @@
                                        */
 #include "hack.h"
 
-static boolean no_repeat = FALSE;
+static unsigned pline_flags = 0;
 static char prevmsg[BUFSZ];
 
 static char *FDECL(You_buf, (int));
@@ -98,7 +98,8 @@ VA_DECL(const char *, line)
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
     char pbuf[3 * BUFSZ];
     int ln;
-    xchar msgtyp;
+    int msgtyp;
+    boolean no_repeat;
     /* Do NOT use VA_START and VA_END in here... see above */
 
     if (!line || !*line)
@@ -134,18 +135,23 @@ VA_DECL(const char *, line)
         return;
     }
 
+    msgtyp = MSGTYP_NORMAL;
+    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
 #ifdef DUMPLOG
     /* We hook here early to have options-agnostic output.
      * Unfortunately, that means Norep() isn't honored (general issue) and
      * that short lines aren't combined into one longer one (tty behavior).
      */
-    dumplogmsg(line);
+    if ((pline_flags & SUPPRESS_HISTORY) == 0)
+        dumplogmsg(line);
 #endif
+    if ((pline_flags & OVERRIDE_MSGTYPE) != 0) {
+        msgtyp = msgtype_type(line, no_repeat);
+        if (msgtyp == MSGTYP_NOSHOW
+            || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
+            return;
+    }
 
-    msgtyp = msgtype_type(line, no_repeat);
-    if (msgtyp == MSGTYP_NOSHOW
-        || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
-        return;
     if (vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
@@ -170,15 +176,31 @@ VA_DECL(const char *, line)
 #endif
 }
 
+/* pline() variant which can override MSGTYPE handling or suppress
+   message history (tty interface uses pline() to issue prompts and
+   they shouldn't be blockable via MSGTYPE=hide) */
+/*VARARGS2*/
+void custompline
+VA_DECL2(unsigned, pflags, const char *, line)
+{
+    VA_START(line);
+    VA_INIT(line, const char *);
+    pline_flags = pflags;
+    vpline(line, VA_ARGS);
+    pline_flags = 0;
+    VA_END();
+    return;
+}
+
 /*VARARGS1*/
 void Norep
 VA_DECL(const char *, line)
 {
     VA_START(line);
     VA_INIT(line, const char *);
-    no_repeat = TRUE;
+    pline_flags = PLINE_NOREPEAT;
     vpline(line, VA_ARGS);
-    no_repeat = FALSE;
+    pline_flags = 0;
     VA_END();
     return;
 }

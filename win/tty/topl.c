@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1463787697 2016/05/20 23:41:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1490908468 2017/03/30 21:14:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -385,14 +385,12 @@ char def;
         /* not pline("%s ", prompt);
            trailing space is wanted here in case of reprompt */
         Strcat(prompt, " ");
-        /* pline("%s", prompt); -- see comment in hooked_tty_getlin() */
-        tty_putstr(WIN_MESSAGE, 0, prompt);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
     } else {
         /* no restriction on allowed response, so always preserve case */
         /* preserve_case = TRUE; -- moot since we're jumping to the end */
-        /* pline("%s ", query); -- see above about tty_getlin() */
         Sprintf(prompt, "%s ", query);
-        tty_putstr(WIN_MESSAGE, 0, prompt);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
         q = readchar();
         goto clean_up;
     }
