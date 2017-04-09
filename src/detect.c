@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1463191981 2016/05/14 02:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1491705573 2017/04/09 02:39:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,13 +59,15 @@ int ter_typ;
 const char *ter_explain;
 {
     coord dummy_pos; /* don't care whether player actually picks a spot */
+    boolean save_autodescribe;
 
     dummy_pos.x = u.ux, dummy_pos.y = u.uy; /* starting spot for getpos() */
+    save_autodescribe = iflags.autodescribe;
     iflags.autodescribe = TRUE;
     iflags.terrainmode = ter_typ;
     getpos(&dummy_pos, FALSE, ter_explain);
     iflags.terrainmode = 0;
-    /* leave iflags.autodescribe 'on' even if previously 'off' */
+    iflags.autodescribe = save_autodescribe;
 }
 
 /* extracted from monster_detection() so can be shared by do_vicinity_map() */
