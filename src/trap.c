@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1473665044 2016/09/12 07:24:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.274 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1489745987 2017/03/17 10:19:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4420,6 +4420,8 @@ boolean *noticed; /* set to true iff hero notices the effect; */
     const char *trapdescr, *which;
     boolean ishero = (mon == &youmonst);
 
+    if (!mon)
+        return FALSE;
     if (mon == u.usteed)
         ishero = TRUE;
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
@@ -4478,6 +4480,8 @@ boolean *noticed; /* set to true iff hero notices the effect; */
     unsigned dotrapflags;
     boolean ishero = (mon == &youmonst), result;
 
+    if (!mon)
+        return FALSE;
     if (mon == u.usteed)
         ishero = TRUE;
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
@@ -4521,6 +4525,8 @@ boolean *noticed; /* set to true iff hero notices the effect; */
     struct trap *t;
     boolean ishero = (mon == &youmonst), result;
 
+    if (!mon)
+        return FALSE;
     if (mon == u.usteed)
         ishero = TRUE;
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
