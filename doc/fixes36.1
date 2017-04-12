@@ -370,6 +370,8 @@ g.cubes would eat globs of green slime without harm; engulf those instead
 fix up true rumor about rock moles vs boots
 Bell of Opening could trigger segfault attempting to open some types of traps
 	if hero was mounted
+automatic #overview annotation for quest summons wasn't shown if the quest
+	entry portal was on same level as bigroom or rogue level
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -403,6 +405,9 @@ DUMPLOG: RIP tombstone was printed for characters who survived (ascended,
 artifact creation violated illiterate conduct when artifact name was assigned,
 	behavior intended only for creating Sting or Orcrist via naming
 tty: revert to pline() for issuing prompts (override MSGTYPE=hide differently)
+previous tty-revert fix had the override test backwards, breaking MSGTYPE
+save 'autodescribe' option value prior to detection or #terrain display and
+	restore it after rather than leave it forced on
 
 
 Platform- and/or Interface-Specific Fixes

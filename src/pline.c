@@ -145,7 +145,7 @@ VA_DECL(const char *, line)
     if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
-    if ((pline_flags & OVERRIDE_MSGTYPE) != 0) {
+    if ((pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
         if (msgtyp == MSGTYP_NOSHOW
             || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
