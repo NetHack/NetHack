@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1490908458 2017/03/30 21:14:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.585 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1492733169 2017/04/21 00:06:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.586 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1421,6 +1421,7 @@ E int FDECL(pronoun_gender, (struct monst *));
 E boolean FDECL(levl_follower, (struct monst *));
 E int FDECL(little_to_big, (int));
 E int FDECL(big_to_little, (int));
+E boolean FDECL(big_little_match, (int, int));
 E const char *FDECL(locomotion, (const struct permonst *, const char *));
 E const char *FDECL(stagger, (const struct permonst *, const char *));
 E const char *FDECL(on_fire, (struct permonst *, struct attack *));
