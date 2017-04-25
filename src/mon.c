@@ -1938,7 +1938,7 @@ register struct monst *mtmp;
     } else if (unique_corpstat(mtmp->data))
         livelog_printf(LL_UMONST, "%s %s",
               nonliving(mtmp->data) ? "destroyed" : "killed",
-              mon_nam(mtmp));
+              noit_mon_nam(mtmp));
     
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
