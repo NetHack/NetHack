@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1492733169 2017/04/21 00:06:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.586 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1494107197 2017/05/06 21:46:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.587 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -439,6 +439,7 @@ E int NDECL(Armor_off);
 E int NDECL(Armor_gone);
 E int NDECL(Helmet_off);
 E int NDECL(Gloves_off);
+E int NDECL(Boots_on);
 E int NDECL(Boots_off);
 E int NDECL(Cloak_off);
 E int NDECL(Shield_off);

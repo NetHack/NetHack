@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1455667557 2016/02/17 00:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1494107204 2017/05/06 21:46:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,7 +23,7 @@ STATIC_DCL void FDECL(on_msg, (struct obj *));
 STATIC_DCL void FDECL(toggle_stealth, (struct obj *, long, BOOLEAN_P));
 STATIC_DCL void FDECL(toggle_displacement, (struct obj *, long, BOOLEAN_P));
 STATIC_PTR int NDECL(Armor_on);
-STATIC_PTR int NDECL(Boots_on);
+/* int NDECL(Boots_on); -- moved to extern.h */
 STATIC_PTR int NDECL(Cloak_on);
 STATIC_PTR int NDECL(Helmet_on);
 STATIC_PTR int NDECL(Gloves_on);
@@ -148,7 +148,6 @@ boolean on;
  * [Blindf_on() is an exception and calls setworn() itself.]
  */
 
-STATIC_PTR
 int
 Boots_on(VOID_ARGS)
 {
@@ -1274,7 +1273,7 @@ cancel_don()
     context.takeoff.cancelled_don =
         (afternmv == Boots_on || afternmv == Helmet_on
          || afternmv == Gloves_on || afternmv == Armor_on);
-    afternmv = 0;
+    afternmv = (int NDECL((*))) 0;
     nomovemsg = (char *) 0;
     multi = 0;
     context.takeoff.delay = 0;
