@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1456526165 2016/02/26 22:36:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1493510119 2017/04/29 23:55:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -249,7 +249,7 @@ nh_timeout()
         baseluck -= 1;
 
     if (u.uluck != baseluck
-        && moves % (u.uhave.amulet || u.ugangr ? 300 : 600) == 0) {
+        && moves % ((u.uhave.amulet || u.ugangr) ? 300 : 600) == 0) {
         /* Cursed luckstones stop bad luck from timing out; blessed luckstones
          * stop good luck from timing out; normal luckstones stop both;
          * neither is stopped if you don't have a luckstone.
