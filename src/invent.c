@@ -506,10 +506,12 @@ struct obj *obj;
         }
         set_artifact_intrinsic(obj, 1, W_ART);
     }
-    if (is_mines_prize(obj) && obj->record_achieve_special) {
+    if (obj->otyp == LUCKSTONE && obj->record_achieve_special == 1) {
         u.uachieve.mines_luckstone = 1;
         obj->record_achieve_special = 0;
-    } else if (is_soko_prize(obj) && obj->record_achieve_special) {
+    } else if ((obj->otyp == AMULET_OF_REFLECTION
+                || obj->otyp == BAG_OF_HOLDING)
+               && obj->record_achieve_special == 1) {
         u.uachieve.finish_sokoban = 1;
         obj->record_achieve_special = 0;
     }
