@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1493946186 2017/05/05 01:03:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1494034344 2017/05/06 01:32:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1664,9 +1664,10 @@ STATIC_OVL void
 one_characteristic(mode, final, attrindx)
 int mode, final, attrindx;
 {
+    extern const char *const attrname[]; /* attrib.c */
     boolean hide_innate_value = FALSE, interesting_alimit;
     int acurrent, abase, apeak, alimit;
-    const char *attrname, *paren_pfx;
+    const char *paren_pfx;
     char subjbuf[BUFSZ], valubuf[BUFSZ], valstring[32];
 
     /* being polymorphed or wearing certain cursed items prevents
@@ -1684,30 +1685,24 @@ int mode, final, attrindx;
     }
     switch (attrindx) {
     case A_STR:
-        attrname = "strength";
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER && uarmg->cursed)
             hide_innate_value = TRUE;
         break;
     case A_DEX:
-        attrname = "dexterity";
         break;
     case A_CON:
-        attrname = "constitution";
         if (uwep && uwep->oartifact == ART_OGRESMASHER && uwep->cursed)
             hide_innate_value = TRUE;
         break;
     case A_INT:
-        attrname = "intelligence";
         if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
             hide_innate_value = TRUE;
         break;
     case A_WIS:
-        attrname = "wisdom";
         if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
             hide_innate_value = TRUE;
         break;
     case A_CHA:
-        attrname = "charisma";
         break;
     default:
         return; /* impossible */
@@ -1718,7 +1713,7 @@ int mode, final, attrindx;
 
     acurrent = ACURR(attrindx);
     (void) attrval(attrindx, acurrent, valubuf); /* Sprintf(valubuf,"%d",) */
-    Sprintf(subjbuf, "Your %s ", attrname);
+    Sprintf(subjbuf, "Your %s ", attrname[attrindx]);
 
     if (!hide_innate_value) {
         /* show abase, amax, and/or attrmax if acurr doesn't match abase

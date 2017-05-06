@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1455357587 2016/02/13 09:59:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1494034337 2017/05/06 01:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,10 @@ static const char
     *const minusattr[] = { "weak",    "stupid",
                            "foolish", "clumsy",
                            "fragile", "repulsive" };
+/* also used by enlightenment for non-abbreviated status info */
+const char
+    *const attrname[] = { "strength", "intelligence", "wisdom",
+                          "dexterity", "constitution", "charisma" };
 
 static const struct innate {
     schar ulevel;
@@ -111,7 +115,7 @@ adjattrib(ndx, incr, msgflg)
 int ndx, incr;
 int msgflg; /* positive => no message, zero => message, and */
 {           /* negative => conditional (msg if change made) */
-    int old_acurr;
+    int old_acurr, old_abase;
     boolean abonflg;
     const char *attrstr;
 
@@ -125,6 +129,7 @@ int msgflg; /* positive => no message, zero => message, and */
     }
 
     old_acurr = ACURR(ndx);
+    old_abase = ABASE(ndx);
     if (incr > 0) {
         ABASE(ndx) += incr;
         if (ABASE(ndx) > AMAX(ndx)) {
@@ -149,9 +154,14 @@ int msgflg; /* positive => no message, zero => message, and */
         abonflg = (ABON(ndx) > 0);
     }
     if (ACURR(ndx) == old_acurr) {
-        if (msgflg == 0 && flags.verbose)
-            pline("You're %s as %s as you can get.",
-                  abonflg ? "currently" : "already", attrstr);
+        if (msgflg == 0 && flags.verbose) {
+            if (ABASE(ndx) == old_abase)
+                pline("You're %s as %s as you can get.",
+                      abonflg ? "currently" : "already", attrstr);
+            else /* current stayed the same but base value changed */
+                Your("innate %s has %s.", attrname[ndx],
+                     (incr > 0) ? "improved" : "declined");
+        }
         return FALSE;
     }
 
@@ -223,16 +233,28 @@ int typ;         /* which attribute */
 boolean exclaim; /* emphasis */
 {
     void VDECL((*func), (const char *, ...)) = poiseff[typ].delivery_func;
+    const char *msg_txt = poiseff[typ].effect_msg;
 
-    (*func)("%s%c", poiseff[typ].effect_msg, exclaim ? '!' : '.');
+    /*
+     * "You feel weaker" or "you feel very sick" aren't appropriate when
+     * wearing or wielding something (gauntlets of power, Ogresmasher)
+     * which forces the attribute to maintain its maximum value.
+     * Phrasing for other attributes which might have fixed values
+     * (dunce cap) is such that we don't need message fixups for them.
+     */
+    if (typ == A_STR && ACURR(A_STR) == STR19(25))
+        msg_txt = "innately weaker";
+    else if (typ == A_CON && ACURR(A_CON) == 25)
+        msg_txt = "sick inside";
+
+    (*func)("%s%c", msg_txt, exclaim ? '!' : '.');
 }
 
-/* called when an attack or trap has poisoned the hero (used to be in mon.c)
- */
+/* called when an attack or trap has poisoned hero (used to be in mon.c) */
 void
 poisoned(reason, typ, pkiller, fatal, thrown_weapon)
 const char *reason,    /* controls what messages we display */
-    *pkiller;          /* for score+log file if fatal */
+           *pkiller;   /* for score+log file if fatal */
 int typ, fatal;        /* if fatal is 0, limit damage to adjattrib */
 boolean thrown_weapon; /* thrown weapons are less deadly */
 {
@@ -671,7 +693,9 @@ int r;
         { 0, 0 }
     };
     int i;
-    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++);
+
+    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++)
+        continue;
     return roleabils[i].abil;
 }
 
@@ -996,7 +1020,7 @@ int x;
 #ifdef WIN32_BUG
             return (x = ((tmp <= 3) ? 3 : tmp));
 #else
-        return (schar) ((tmp <= 3) ? 3 : tmp);
+            return (schar) ((tmp <= 3) ? 3 : tmp);
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
