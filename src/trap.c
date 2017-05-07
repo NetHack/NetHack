@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1489745987 2017/03/17 10:19:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1494107206 2017/05/06 21:46:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.278 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2794,6 +2794,9 @@ float_up()
     if (Flying)
         You("are no longer able to control your flight.");
     BFlying |= I_SPECIAL;
+    /* levitation gives maximum carrying capacity, so encumbrance
+       state might be reduced */
+    (void) encumber_msg();
     return;
 }
 
@@ -2837,12 +2840,14 @@ long hmask, emask; /* might cancel timeout */
         BFlying &= ~I_SPECIAL;
         if (Flying) {
             You("have stopped levitating and are now flying.");
+            (void) encumber_msg(); /* carrying capacity might have changed */
             return 1;
         }
     }
     if (u.uswallow) {
         You("float down, but you are still %s.",
             is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
+        (void) encumber_msg();
         return 1;
     }
 
@@ -2923,6 +2928,11 @@ long hmask, emask; /* might cancel timeout */
             }
         }
     }
+
+    /* levitation gives maximum carrying capacity, so having it end
+       potentially triggers greater encumbrance; do this after
+       'come down' messages, before trap activation or autopickup */
+    (void) encumber_msg();
 
     /* can't rely on u.uz0 for detecting trap door-induced level change;
        it gets changed to reflect the new level before we can check it */

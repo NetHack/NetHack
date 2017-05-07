@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1492733171 2017/04/21 00:06:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2606,9 +2606,9 @@ struct monst *mtmp;
 
 /* Called whenever the player attacks mtmp; also called in other situations
    where mtmp gets annoyed at the player. Handles mtmp getting annoyed at the
-   attack and any ramifications that might have. Useful also in situations where
-   mtmp was already hostile; it checks for situations where the player shouldn't
-   be attacking and any ramifications /that/ might have. */
+   attack and any ramifications that might have. Useful also in situations
+   where mtmp was already hostile; it checks for situations where the player
+   shouldn't be attacking and any ramifications /that/ might have. */
 void
 setmangry(mtmp, via_attack)
 struct monst *mtmp;
@@ -2616,13 +2616,13 @@ boolean via_attack;
 {
     if (via_attack && sengr_at("Elbereth", u.ux, u.uy, TRUE)) {
         You_feel("like a hypocrite.");
-        /* AIS: Yes, I know alignment penalties and bonuses aren't balanced at
-           the moment. This is about correct relative to other "small"
-           penalties; it should be fairly large, as attacking while standing on
-           an Elbereth means that you're requesting peace and then violating
-           your own request. I know 5 isn't actually large, but it's
-           intentionally larger than the 1s and 2s that are normally given for
-           this sort of thing. */
+        /* AIS: Yes, I know alignment penalties and bonuses aren't balanced
+           at the moment. This is about correct relative to other "small"
+           penalties; it should be fairly large, as attacking while standing
+           on an Elbereth means that you're requesting peace and then
+           violating your own request. I know 5 isn't actually large, but
+           it's intentionally larger than the 1s and 2s that are normally
+           given for this sort of thing. */
         adjalign(-5);
 
         if (!Blind)
@@ -2668,20 +2668,30 @@ boolean via_attack;
                     ++got_mad;
             }
         }
-        if (got_mad && !Hallucination)
-            pline_The("%s appear%s to be angry too...",
-                      got_mad == 1 ? q_guardian->mname
-                                   : makeplural(q_guardian->mname),
-                      got_mad == 1 ? "s" : "");
+        if (got_mad && !Hallucination) {
+            const char *who = q_guardian->mname;
+
+            if (got_mad > 1)
+                who = makeplural(who);
+            pline_The("%s %s to be angry too...",
+                      who, vtense(who, "appear"));
+        }
     }
 
     /* make other peaceful monsters react */
     if (!context.mon_moving) {
+        static const char *const Exclam[] = {
+            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
+        };
         struct monst *mon;
+        int mndx = monsndx(mtmp->data);
 
         for (mon = fmon; mon; mon = mon->nmon) {
             if (DEADMONSTER(mon))
                 continue;
+            if (mon == mtmp) /* the mpeaceful test catches this since mtmp */
+                continue;    /* is no longer peaceful, but be explicit...  */
+
             if (!mindless(mon->data) && mon->mpeaceful
                 && couldsee(mon->mx, mon->my) && !mon->msleeping
                 && mon->mcansee && m_canseeu(mon)) {
@@ -2692,32 +2702,38 @@ boolean via_attack;
                         verbalize("Halt!  You're under arrest!");
                         (void) angry_guards(!!Deaf);
                     } else {
-                        const char *exclam[] = {
-                            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?"
-                        };
                         if (!rn2(5)) {
-                            verbalize("%s", exclam[mon->m_id % SIZE(exclam)]);
+                            verbalize("%s", Exclam[mon->m_id % SIZE(Exclam)]);
                             exclaimed = TRUE;
                         }
-                        if (!mon->isshk && !mon->ispriest
-                            && (mon->data->mlevel < rn2(10))) {
-                            monflee(mon, rn2(50)+25, TRUE, !exclaimed);
+                        /* shopkeepers and temple priests might gasp in
+                           surprise, but they won't become angry here */
+                        if (mon->isshk || mon->ispriest)
+                            continue;
+
+                        if (mon->data->mlevel < rn2(10)) {
+                            monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
                             exclaimed = TRUE;
                         }
-                        if (!mon->isshk && !mon->ispriest) {
+                        if (mon->mtame) {
+                            /* mustn't set mpeaceful to 0 as below;
+                               perhaps reduce tameness? */
+                        } else {
                             mon->mpeaceful = 0;
                             adjalign(-1);
                             if (!exclaimed)
                                 pline("%s gets angry!", Monnam(mon));
                         }
                     }
-                } else if ((mtmp->data == mon->data) && !rn2(3)) {
+                } else if (mon->data->mlet == mtmp->data->mlet
+                           && big_little_match(mndx, monsndx(mon->data))
+                           && !rn2(3)) {
                     if (!rn2(4)) {
                         growl(mon);
                         exclaimed = TRUE;
                     }
                     if (rn2(6))
-                        monflee(mon, rn2(25)+15, TRUE, !exclaimed);
+                        monflee(mon, rn2(25) + 15, TRUE, !exclaimed);
                 }
             }
         }

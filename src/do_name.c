@@ -412,9 +412,10 @@ int cx, cy;
     cc.y = cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-        pline("%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
-              (iflags.getloc_travelmode && !is_valid_travelpt(cx,cy))
-              ? " (no travel path)" : "");
+        custompline(SUPPRESS_HISTORY,
+                    "%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
+                      ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1446887541 2015/11/07 09:12:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1493510127 2017/04/29 23:55:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,11 +31,11 @@ const struct worn {
              { 0, 0 } };
 
 /* This only allows for one blocking item per property */
-#define w_blocks(o, m)                                                     \
-    ((o->otyp == MUMMY_WRAPPING && ((m) &W_ARMC))                          \
-         ? INVIS                                                           \
-         : (o->otyp == CORNUTHAUM && ((m) &W_ARMH) && !Role_if(PM_WIZARD)) \
-               ? CLAIRVOYANT                                               \
+#define w_blocks(o, m) \
+    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC))                          \
+         ? INVIS                                                            \
+         : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) && !Role_if(PM_WIZARD)) \
+               ? CLAIRVOYANT                                                \
                : 0)
 /* note: monsters don't have clairvoyance, so your role
    has no significant effect on their use of w_blocks() */

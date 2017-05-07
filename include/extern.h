@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1490908458 2017/03/30 21:14:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.585 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1494107197 2017/05/06 21:46:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.587 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -439,6 +439,7 @@ E int NDECL(Armor_off);
 E int NDECL(Armor_gone);
 E int NDECL(Helmet_off);
 E int NDECL(Gloves_off);
+E int NDECL(Boots_on);
 E int NDECL(Boots_off);
 E int NDECL(Cloak_off);
 E int NDECL(Shield_off);
@@ -1424,6 +1425,7 @@ E int FDECL(pronoun_gender, (struct monst *));
 E boolean FDECL(levl_follower, (struct monst *));
 E int FDECL(little_to_big, (int));
 E int FDECL(big_to_little, (int));
+E boolean FDECL(big_little_match, (int, int));
 E const char *FDECL(locomotion, (const struct permonst *, const char *));
 E const char *FDECL(stagger, (const struct permonst *, const char *));
 E const char *FDECL(on_fire, (struct permonst *, struct attack *));

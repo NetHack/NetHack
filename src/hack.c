@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1464485934 2016/05/29 01:38:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1494107206 2017/05/06 21:46:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -552,10 +552,10 @@ dosinkfall()
     /*
      * Interrupt multi-turn putting on/taking off of armor (in which
      * case we reached the sink due to being teleported while busy;
-     * in 3.4.3, Boots_on()/Boots_off() [called via (*aftermv)() when
+     * in 3.4.3, Boots_on()/Boots_off() [called via (*afternmv)() when
      * 'multi' reaches 0] triggered a crash if we were donning/doffing
      * levitation boots [because the Boots_off() below causes 'uarmf'
-     * to be null by the time 'aftermv' gets called]).
+     * to be null by the time 'afternmv' gets called]).
      *
      * Interrupt donning/doffing if we fall onto the sink, or if the
      * code below is going to remove levitation boots even when we
@@ -2766,9 +2766,13 @@ const char *msg_override;
     nomovemsg = 0;
     u.usleep = 0;
     multi_reason = NULL;
-    if (afternmv)
-        (*afternmv)();
-    afternmv = 0;
+    if (afternmv) {
+        int NDECL((*f)) = afternmv;
+        /* clear afternmv before calling it (to override the
+           encumbrance hack for levitation--see weight_cap()) */
+        afternmv = (int NDECL((*))) 0;
+        (void) (*f)();
+    }
 }
 
 STATIC_OVL void
@@ -2843,7 +2847,16 @@ boolean k_format;
 int
 weight_cap()
 {
-    register long carrcap;
+    long carrcap, save_ELev = ELevitation;
+
+    /* boots take multiple turns to wear but any properties they
+       confer are enabled at the start rather than the end; that
+       causes message sequencing issues for boots of levitation
+       so defer their encumbrance benefit until they're fully worn */
+    if (afternmv == Boots_on && (ELevitation & W_ARMF) != 0L) {
+        ELevitation &= ~W_ARMF;
+        float_vs_flight(); /* in case Levitation is blocking Flying */
+    }
 
     carrcap = 25 * (ACURRSTR + ACURR(A_CON)) + 50;
     if (Upolyd) {
@@ -2873,6 +2886,12 @@ weight_cap()
         if (carrcap < 0)
             carrcap = 0;
     }
+
+    if (ELevitation != save_ELev) {
+        ELevitation = save_ELev;
+        float_vs_flight();
+    }
+
     return (int) carrcap;
 }
 

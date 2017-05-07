@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1470966820 2016/08/12 01:53:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1492733172 2017/04/21 00:06:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1007,6 +1007,32 @@ int montype;
             break;
         }
     return montype;
+}
+
+/* determine whether two permonst indices are part of the same progression;
+   existence of progressions with more than one step makes it a bit tricky */
+boolean
+big_little_match(montyp1, montyp2)
+int montyp1, montyp2;
+{
+    int l, b;
+
+    /* simplest case: both are same pm */
+    if (montyp1 == montyp2)
+        return TRUE;
+    /* assume it isn't possible to grow from one class letter to another */
+    if (mons[montyp1].mlet != mons[montyp2].mlet)
+        return FALSE;
+    /* check whether montyp1 can grow up into montyp2 */
+    for (l = montyp1; (b = little_to_big(l)) != l; l = b)
+        if (b == montyp2)
+            return TRUE;
+    /* check whether montyp2 can grow up into montyp1 */
+    for (l = montyp2; (b = little_to_big(l)) != l; l = b)
+        if (b == montyp1)
+            return TRUE;
+    /* neither grows up to become the other; no match */
+    return FALSE;
 }
 
 /*

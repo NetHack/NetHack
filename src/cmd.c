@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1457207033 2016/03/05 19:43:53 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1494034344 2017/05/06 01:32:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1586,7 +1586,10 @@ int final;
     }
 }
 
-/* characteristics: expanded version of bottom line strength, dexterity, &c */
+/* characteristics: expanded version of bottom line strength, dexterity, &c;
+   [3.6.1: now includes all status info (except things already shown in the
+   'background' section), primarily so that blind players can suppress the
+   status line(s) altogether and use ^X feedback on demand to view HP, &c] */
 STATIC_OVL void
 characteristics_enlightenment(mode, final)
 int mode;
@@ -1612,22 +1615,39 @@ int final;
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
     if (Upolyd) {
-        Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
+        switch (mons[u.umonnum].mlevel) {
+        case 0:
+            /* status line currently being explained shows "HD:0" */
+            Strcpy(buf, "0 hit dice (actually 1/2)");
+            break;
+        case 1:
+            Strcpy(buf, "1 hit die");
+            break;
+        default:
+            Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
+            break;
+        }
     } else {
         /* flags.showexp does not matter */
         /* experience level is already shown in the Background section */
         Sprintf(buf, "%-1ld experience point%s",
-                u.uexp, u.uexp == 1 ? "" : "s");
+                u.uexp, plur(u.uexp));
     }
     you_have(buf, "");
 
-    Sprintf(buf, " You entered the dungeon %ld turn%s ago",
-            moves, moves == 1 ? "" : "s");
-    putstr(en_win, 0, buf);
+    /* this is shown even if the 'time' option is off */
+    Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
+    /* same phrasing at end of game:  "entered" is unconditional */
+    enlght_line(You_, "entered ", buf, "");
 
 #ifdef SCORE_ON_BOTL
-    Sprintf(buf, "%ld", botl_score());
-    enl_msg("Your score ", "is ", "was ", buf, "");
+    if (flags.showscore) {
+        /* describes what's shown on status line, which is an approximation;
+           only show it here if player has the 'showscore' option enabled */
+        Sprintf(buf, "%ld%s", botl_score(),
+                !final ? "" : " before end-of-game adjustments");
+        enl_msg("Your score ", "is ", "was ", buf, "");
+    }
 #endif
 
     /* bottom line order */
@@ -1644,9 +1664,10 @@ STATIC_OVL void
 one_characteristic(mode, final, attrindx)
 int mode, final, attrindx;
 {
+    extern const char *const attrname[]; /* attrib.c */
     boolean hide_innate_value = FALSE, interesting_alimit;
     int acurrent, abase, apeak, alimit;
-    const char *attrname, *paren_pfx;
+    const char *paren_pfx;
     char subjbuf[BUFSZ], valubuf[BUFSZ], valstring[32];
 
     /* being polymorphed or wearing certain cursed items prevents
@@ -1664,30 +1685,24 @@ int mode, final, attrindx;
     }
     switch (attrindx) {
     case A_STR:
-        attrname = "strength";
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER && uarmg->cursed)
             hide_innate_value = TRUE;
         break;
     case A_DEX:
-        attrname = "dexterity";
         break;
     case A_CON:
-        attrname = "constitution";
         if (uwep && uwep->oartifact == ART_OGRESMASHER && uwep->cursed)
             hide_innate_value = TRUE;
         break;
     case A_INT:
-        attrname = "intelligence";
         if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
             hide_innate_value = TRUE;
         break;
     case A_WIS:
-        attrname = "wisdom";
         if (uarmh && uarmh->otyp == DUNCE_CAP && uarmh->cursed)
             hide_innate_value = TRUE;
         break;
     case A_CHA:
-        attrname = "charisma";
         break;
     default:
         return; /* impossible */
@@ -1698,7 +1713,7 @@ int mode, final, attrindx;
 
     acurrent = ACURR(attrindx);
     (void) attrval(attrindx, acurrent, valubuf); /* Sprintf(valubuf,"%d",) */
-    Sprintf(subjbuf, "Your %s ", attrname);
+    Sprintf(subjbuf, "Your %s ", attrname[attrindx]);
 
     if (!hide_innate_value) {
         /* show abase, amax, and/or attrmax if acurr doesn't match abase
