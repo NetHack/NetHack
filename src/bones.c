@@ -175,7 +175,14 @@ boolean restore;
             } else if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
                 otmp->otyp = SPE_BLANK_PAPER;
                 curse(otmp);
+            /* these might still be flagged as prizes if the late
+               hero did not pick them up */
+            } else if (otmp->otyp == AMULET_OF_REFLECTION
+                       || otmp->otyp == BAG_OF_HOLDING
+                       || otmp->otyp == LUCKSTONE) {
+                otmp->record_achieve_special = 0;
             }
+                
         }
     }
 }
