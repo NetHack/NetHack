@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1494107204 2017/05/06 21:46:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1494545163 2017/05/11 23:26:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1231,6 +1231,16 @@ struct obj *otmp;
     else if (otmp == uarms)
         result = (afternmv == Shield_on || afternmv == Shield_off
                   || what == WORN_SHIELD);
+    /* these 1-turn items don't need 'afternmv' checks
+       [and may not actually need 'what' checks] */
+    else if (otmp == uamul)
+        result = (what == WORN_AMUL);
+    else if (otmp == uleft)
+        result = (what == LEFT_RING);
+    else if (otmp == uright)
+        result = (what == RIGHT_RING);
+    else if (otmp == ublindf)
+        result = (what == WORN_BLINDF);
 
     return result;
 }
@@ -1259,6 +1269,16 @@ struct obj *otmp;
         result = (afternmv == Gloves_off || what == WORN_GLOVES);
     else if (otmp == uarms)
         result = (afternmv == Shield_off || what == WORN_SHIELD);
+    /* these 1-turn items don't need 'afternmv' checks
+       [and may not actually need 'what' checks] */
+    else if (otmp == uamul)
+        result = (what == WORN_AMUL);
+    else if (otmp == uleft)
+        result = (what == LEFT_RING);
+    else if (otmp == uright)
+        result = (what == RIGHT_RING);
+    else if (otmp == ublindf)
+        result = (what == WORN_BLINDF);
 
     return result;
 }
@@ -2427,7 +2447,9 @@ take_off(VOID_ARGS)
     } else if (doff->what == RIGHT_RING) {
         doff->delay = 1;
     } else if (doff->what == WORN_BLINDF) {
-        doff->delay = 2;
+        /* [this used to be 2, but 'R' (and 'T') only require 1 turn to
+           remove a blindfold, so 'A' shouldn't have been requiring 2] */
+        doff->delay = 1;
     } else {
         impossible("take_off: taking off %lx", doff->what);
         return 0; /* force done */
