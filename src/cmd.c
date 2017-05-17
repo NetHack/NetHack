@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1494976933 2017/05/16 23:22:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1494985492 2017/05/17 01:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4445,10 +4445,13 @@ const char *msg;
                 (sym == '<') ? "upward" : "downward");
     }
 
-    /* if 'cmdassist', display via pline() and we're done (note: asking
+    /* if '!cmdassist', display via pline() and we're done (note: asking
        for help at getdir() prompt forces cmdassist for this operation) */
     if (!viawindow) {
-        if (*buf) {
+        if (prefixhandling) {
+            if (!*buf)
+                Sprintf(buf, "Invalid direction for '%s' prefix.",
+                        visctrl(Cmd.spkeys[spkey]));
             pline("%s", buf);
             return TRUE;
         }
