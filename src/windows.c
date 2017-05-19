@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1488075979 2017/02/26 02:26:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1495232365 2017/05/19 22:19:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1033,7 +1033,7 @@ int behavior UNUSED, under UNUSED, over UNUSED;
 #endif /* STATUS_VIA_WINDOWPORT */
 
 STATIC_VAR struct window_procs dumplog_windowprocs_backup;
-STATIC_PTR FILE *dumplog_file;
+STATIC_VAR FILE *dumplog_file;
 
 #ifdef DUMPLOG
 STATIC_VAR time_t dumplog_now;
@@ -1152,8 +1152,8 @@ void
 dump_close_log()
 {
     if (dumplog_file) {
-        fclose(dumplog_file);
-        dumplog_file = NULL;
+        (void) fclose(dumplog_file);
+        dumplog_file = (FILE *) 0;
     }
 }
 
