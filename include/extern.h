@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1494107197 2017/05/06 21:46:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.587 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1495346095 2017/05/21 05:54:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.588 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,7 +270,9 @@ E void NDECL(warnreveal);
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
+#ifdef DUMPLOG
 E void NDECL(dump_map);
+#endif
 E void FDECL(reveal_terrain, (int, int));
 
 /* ### dig.c ### */
