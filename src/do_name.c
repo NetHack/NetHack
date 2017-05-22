@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1489494376 2017/03/14 12:26:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1495494156 2017/05/22 23:02:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1081,6 +1081,9 @@ register struct obj *obj;
         pline("While engraving, your %s slips.", body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("engrave: \"%s\".", buf);
+        /* violate illiteracy conduct since hero attempted to write
+           a valid artifact name */
+        u.uconduct.literate++;
     }
     ++via_naming; /* This ought to be an argument rather than a static... */
     obj = oname(obj, buf);
