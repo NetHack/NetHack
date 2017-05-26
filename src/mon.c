@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1492733171 2017/04/21 00:06:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1495836090 2017/05/26 22:01:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,7 +11,7 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-STATIC_VAR boolean vamp_rise_msg;
+STATIC_VAR boolean vamp_rise_msg, disintegested;
 
 STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
                                                 const char *));
@@ -1826,16 +1826,21 @@ register struct monst *mtmp;
                 /* alternate message phrasing for some monster types */
                 spec_mon = (nonliving(mtmp->data)
                             || noncorporeal(mtmp->data)
-                            || amorphous(mtmp->data));
+                            || amorphous(mtmp->data)),
+                spec_death = (disintegested /* disintegrated or digested */
+                              || noncorporeal(mtmp->data)
+                              || amorphous(mtmp->data));
 
-            /* construct a format string before transformation */
-            Sprintf(buf, "The %s%s suddenly %s and rises as %%s!",
-                    spec_mon ? "" : "seemingly dead ",
-                    x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+            /* construct a format string before transformation;
+               will be capitalized when used, expects one %s arg */
+            Sprintf(buf, "%s suddenly %s and rises as %%s!",
+                    x_monnam(mtmp,
+                             has_mname(mtmp) ? ARTICLE_NONE : ARTICLE_THE,
+                             spec_mon ? (char *) 0 : "seemingly dead",
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
                                  | SUPPRESS_INVISIBLE | SUPPRESS_IT,
                              FALSE),
-                    spec_mon ? "reconstitutes" : "transforms");
+                    spec_death ? "reconstitutes" : "transforms");
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             if (mtmp->mhpmax <= 0)
@@ -1857,7 +1862,9 @@ register struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-                pline(buf, a_monnam(mtmp));
+                /* was using a_monnam(mtmp) but that's weird if mtmp is named:
+                   "Dracula suddenly transforms and rises as Dracula" */
+                pline(upstart(buf), an(mtmp->data->mname));
                 vamp_rise_msg = TRUE;
             }
             newsym(x, y);
@@ -1887,9 +1894,7 @@ register struct monst *mtmp;
     else if (mtmp->data == &mons[PM_WERERAT])
         set_mon_data(mtmp, &mons[PM_HUMAN_WERERAT], -1);
 
-    /* if MAXMONNO monsters of a given type have died, and it
-     * can be done, extinguish that monster.
-     *
+    /*
      * mvitals[].died does double duty as total number of dead monsters
      * and as experience factor for the player killing more monsters.
      * this means that a dragon dying by other means reduces the
@@ -2145,7 +2150,8 @@ int how;
         be_sad = (mdef->mtame != 0);
 
     /* no corpses if digested or disintegrated */
-    if (how == AD_DGST || how == -AD_RBRE)
+    disintegested = (how == AD_DGST || how == -AD_RBRE);
+    if (disintegested)
         mondead(mdef);
     else
         mondied(mdef);
@@ -2241,16 +2247,18 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         thrownobj = 0;
     }
 
-    vamp_rise_msg = FALSE; /* might get set in mondead() */
+    vamp_rise_msg = FALSE; /* might get set in mondead(); only checked below */
+    disintegested = nocorpse; /* alternate vamp_rise message needed if true */
     /* dispose of monster and make cadaver */
     if (stoned)
         monstone(mtmp);
     else
         mondead(mtmp);
+    disintegested = FALSE; /* reset */
 
     if (mtmp->mhp > 0) { /* monster lifesaved */
         /* Cannot put the non-visible lifesaving message in
-         * lifesaved_monster() since the message appears only when you
+         * lifesaved_monster() since the message appears only when _you_
          * kill it (as opposed to visible lifesaving which always appears).
          */
         stoned = FALSE;

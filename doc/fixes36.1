@@ -382,6 +382,13 @@ removing a blindfold with 'A' took two turns, with 'R' (and 'T') only one,
 	and could result in a panic if the blindfold was stolen during removal
 cmdassist help for movement prefix followed by invalid direction was strange
 	when the direction was up, down, or self disallowed for that prefix
+poor message when shape-shifted vampire reverts to vampire if it has a name:
+	The Dracula suddenly transforms and rises as Dracula.
+poor message when shape-shifted vampire reverts if cause of 'death' was
+	disintegration or digestion and shifted form wasn't amorphous:
+	The vampire bat is disintegrated.  The vampire bat suddenly transforms
+	and rises as a vampire.  (fix: switch to existing alternate phrasing
+	used for amorphous form, "reconstitute" rather than "transform")
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
