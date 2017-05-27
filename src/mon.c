@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1495836090 2017/05/26 22:01:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1495849874 2017/05/27 01:51:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1834,8 +1834,7 @@ register struct monst *mtmp;
             /* construct a format string before transformation;
                will be capitalized when used, expects one %s arg */
             Sprintf(buf, "%s suddenly %s and rises as %%s!",
-                    x_monnam(mtmp,
-                             has_mname(mtmp) ? ARTICLE_NONE : ARTICLE_THE,
+                    x_monnam(mtmp, ARTICLE_THE,
                              spec_mon ? (char *) 0 : "seemingly dead",
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
                                  | SUPPRESS_INVISIBLE | SUPPRESS_IT,
