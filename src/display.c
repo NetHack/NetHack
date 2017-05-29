@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1496101037 2017/05/29 23:37:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -424,24 +424,29 @@ xchar worm_tail;            /* mon is actually a worm tail */
         }
     }
 
-    /* If the mimic is unsuccessfully mimicing something, display the monster
+    /* If the mimic is unsuccessfully mimicing something, display the monster.
      */
     if (!mon_mimic || sensed) {
         int num;
 
         /* [ALI] Only use detected glyphs when monster wouldn't be
          * visible by any other means.
+         *
+         * There are no glyphs for "detected pets" so we have to
+         * decide whether to display such things as detected or as tame.
+         * If both are being highlighted in the same way, it doesn't
+         * matter, but if not, showing them as pets is preferrable.
          */
-        if (sightflags == DETECTED && !mon->mtame) {
-            if (worm_tail)
-                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
-            else
-                num = detected_mon_to_glyph(mon);
-        } else if (mon->mtame && !Hallucination) {
+        if (mon->mtame && !Hallucination) {
             if (worm_tail)
                 num = petnum_to_glyph(PM_LONG_WORM_TAIL);
             else
                 num = pet_to_glyph(mon);
+        } else if (sightflags == DETECTED) {
+            if (worm_tail)
+                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
+            else
+                num = detected_mon_to_glyph(mon);
         } else {
             if (worm_tail)
                 num = monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
@@ -666,7 +671,7 @@ xchar x, y;
             show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
     }
     /* draw monster on top if we can sense it */
-    if ((x != u.ux || y != u.uy) && (mon = m_at(x, y)) && sensemon(mon))
+    if ((x != u.ux || y != u.uy) && (mon = m_at(x, y)) != 0 && sensemon(mon))
         display_monster(x, y, mon,
                         (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))
                             ? PHYSICALLY_SEEN
