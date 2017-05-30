@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1450915435 2015/12/24 00:03:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1496103440 2017/05/30 00:17:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -174,7 +174,7 @@ int expltype;
                     break;
                 }
             }
-            /* can be both you and mtmp if you're swallowed */
+            /* can be both you and mtmp if you're swallowed or riding */
             mtmp = m_at(i + x - 1, j + y - 1);
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
@@ -392,8 +392,7 @@ int expltype;
                 } else {
                     /* call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
-                     * can
-                     * call mondied, not killed, if it's not your blast
+                     * can call mondied, not killed, if it's not your blast
                      */
                     int mdam = dam;
 
@@ -512,12 +511,10 @@ int expltype;
     }
 
     if (shopdamage) {
-        pay_for_damage(adtyp == AD_FIRE
-                           ? "burn away"
-                           : adtyp == AD_COLD
-                                 ? "shatter"
-                                 : adtyp == AD_DISN ? "disintegrate"
-                                                    : "destroy",
+        pay_for_damage((adtyp == AD_FIRE) ? "burn away"
+                          : (adtyp == AD_COLD) ? "shatter"
+                             : (adtyp == AD_DISN) ? "disintegrate"
+                                : "destroy",
                        FALSE);
     }
 
