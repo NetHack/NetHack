@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1495346095 2017/05/21 05:54:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.588 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1496531111 2017/06/03 23:05:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.589 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -404,6 +404,7 @@ E char *FDECL(mon_nam, (struct monst *));
 E char *FDECL(noit_mon_nam, (struct monst *));
 E char *FDECL(Monnam, (struct monst *));
 E char *FDECL(noit_Monnam, (struct monst *));
+E char *FDECL(noname_monnam, (struct monst *, int));
 E char *FDECL(m_monnam, (struct monst *));
 E char *FDECL(y_monnam, (struct monst *));
 E char *FDECL(Adjmonnam, (struct monst *, const char *));

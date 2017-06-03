@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1496531115 2017/06/03 23:05:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1625,13 +1625,11 @@ struct permonst *ptr;
 boolean domsg;
 {
     int reslt = 0;
-    char fmtstr[BUFSZ];
+    char oldmtype[BUFSZ];
 
-    if (domsg) {
-        Sprintf(fmtstr, "You %s %%s where %s was.",
-                sensemon(mon) ? "now detect" : "observe",
-                an(m_monnam(mon)));
-    }
+    /* remember current monster type before shapechange */
+    Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
+
     if (mon->data == ptr) {
         /* already right shape */
         reslt = 1;
@@ -1639,9 +1637,13 @@ boolean domsg;
     } else if (is_vampshifter(mon)) {
         reslt = newcham(mon, ptr, FALSE, FALSE);
     }
+
     if (reslt && domsg) {
-        pline(fmtstr, an(m_monnam(mon)));
+        pline("You %s %s where %s was.",
+              !canseemon(mon) ? "now detect" : "observe",
+              noname_monnam(mon, ARTICLE_A), oldmtype);
     }
+
     return reslt;
 }
 

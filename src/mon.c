@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1495849874 2017/05/27 01:51:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1496531114 2017/06/03 23:05:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3458,7 +3458,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
                     if (is_vampshifter(mtmp)) {
                         Sprintf(msgtrail, " which was a shapeshifted %s",
-                                m_monnam(mtmp));
+                                noname_monnam(mtmp, ARTICLE_NONE));
                     } else if (is_animal(mdat)) {
                         Strcpy(msgtrail, "'s stomach");
                     } else {
@@ -3500,16 +3500,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     newsym(mtmp->mx, mtmp->my);
 
     if (msg) {
-        char *save_mname = 0;
-
-        if (has_mname(mtmp)) {
-            save_mname = MNAME(mtmp);
-            MNAME(mtmp) = (char *) 0;
-        }
-        Strcpy(newname, (mdat == &mons[PM_GREEN_SLIME])
-                            ? "slime"
-                            : x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                                       SUPPRESS_SADDLE, FALSE));
+        Strcpy(newname, noname_monnam(mtmp, ARTICLE_A));
         /* oldname was capitalized above; newname will be lower case */
         if (!strcmpi(newname, "it")) { /* can't see or sense it now */
             if (!!strcmpi(oldname, "it")) /* could see or sense it before */
@@ -3521,8 +3512,6 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
             else
                 pline("%s turns into %s!", oldname, newname);
         }
-        if (save_mname)
-            MNAME(mtmp) = save_mname;
     }
 
     /* when polymorph trap/wand/potion produces a vampire, turn in into

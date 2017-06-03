@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1495494156 2017/05/22 23:02:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1496531112 2017/06/03 23:05:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1392,6 +1392,8 @@ rndghostname()
  * a_monnam:    a newt          it      an invisible orc        Fido
  * m_monnam:    newt            xan     orc                     Fido
  * y_monnam:    your newt     your xan  your invisible orc      Fido
+ * noname_monnam(mon,article):
+ *              article newt    art xan art invisible orc       art dog
  */
 
 /* Bug: if the monster is a priest or shopkeeper, not every one of these
@@ -1412,13 +1414,14 @@ const char *adjective;
 int suppress;
 /* SUPPRESS_IT, SUPPRESS_INVISIBLE, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE.
  * EXACT_NAME: combination of all the above
+ * SUPPRESS_NAME: omit monster's assigned name (unless uniq w/ pname).
  */
 boolean called;
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
     const char *pm_name = mdat->mname;
-    boolean do_hallu, do_invis, do_it, do_saddle;
+    boolean do_hallu, do_invis, do_it, do_saddle, do_name;
     boolean name_at_start, has_adjectives;
     char *bp;
 
@@ -1433,6 +1436,7 @@ boolean called;
             && !program_state.gameover && mtmp != u.usteed
             && !(u.uswallow && mtmp == u.ustuck) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
+    do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
 
     buf[0] = '\0';
 
@@ -1513,7 +1517,7 @@ boolean called;
 
         Strcat(buf, rname);
         name_at_start = bogon_is_pname(rnamecode);
-    } else if (has_mname(mtmp)) {
+    } else if (do_name && has_mname(mtmp)) {
         char *name = MNAME(mtmp);
 
         if (mdat == &mons[PM_GHOST]) {
@@ -1608,7 +1612,7 @@ struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                     (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
-                                       : SUPPRESS_IT,
+                                      : SUPPRESS_IT,
                     FALSE);
 }
 
@@ -1632,7 +1636,17 @@ struct monst *mtmp;
     return  bp;
 }
 
-/* monster's own name */
+/* return "a dog" rather than "Fido", honoring hallucination and visibility */
+char *
+noname_monnam(mtmp, article)
+struct monst *mtmp;
+int article;
+{
+    return x_monnam(mtmp, article, (char *) 0, SUPPRESS_NAME, FALSE);
+}
+
+/* monster's own name -- overrides hallucination and [in]visibility
+   so shouldn't be used in ordinary messages (mainly for disclosure) */
 char *
 m_monnam(mtmp)
 struct monst *mtmp;
