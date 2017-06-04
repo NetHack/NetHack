@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1496531115 2017/06/03 23:05:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1496534703 2017/06/04 00:05:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1250,10 +1250,12 @@ postmov:
                         || (can_fog(mtmp)
                             && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
                                           canspotmon(mtmp))))) {
+                    /* update cached value for vamp_shift() case */
+                    ptr = mtmp->data;
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
-                               || ptr == &mons[PM_YELLOW_LIGHT])
+                               || ptr->mlet == S_LIGHT)
                                   ? "flows"
                                   : "oozes");
                 } else if (here->doormask & D_LOCKED && can_unlock) {
