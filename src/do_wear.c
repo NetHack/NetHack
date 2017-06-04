@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1496547229 2017/06/04 03:33:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1496614914 2017/06/04 22:21:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1200,53 +1200,30 @@ struct obj *obj; /* if null, do all worn items; otherwise just obj itself */
 }
 
 /* check whether the target object is currently being put on (or taken off--
-   also checks for doffing) */
+   also checks for doffing--[why?]) */
 boolean
 donning(otmp)
 struct obj *otmp;
 {
-    /* long what = (occupation == take_off) ? context.takeoff.what : 0L; */
-    long what = context.takeoff.what; /* if nonzero, occupation is implied */
     boolean result = FALSE;
 
     /* 'W' and 'T' set afternmv, 'A' sets context.takeoff.what */
-    if (otmp == uarm)
-        result = (afternmv == Armor_on || afternmv == Armor_off
-                  || what == WORN_ARMOR);
+    if (doffing(otmp))
+        result = TRUE;
+    else if (otmp == uarm)
+        result = (afternmv == Armor_on);
     else if (otmp == uarmu)
-        result = (afternmv == Shirt_on || afternmv == Shirt_off
-                  || what == WORN_SHIRT);
+        result = (afternmv == Shirt_on);
     else if (otmp == uarmc)
-        result = (afternmv == Cloak_on || afternmv == Cloak_off
-                  || what == WORN_CLOAK);
+        result = (afternmv == Cloak_on);
     else if (otmp == uarmf)
-        result = (afternmv == Boots_on || afternmv == Boots_off
-                  || what == WORN_BOOTS);
+        result = (afternmv == Boots_on);
     else if (otmp == uarmh)
-        result = (afternmv == Helmet_on || afternmv == Helmet_off
-                  || what == WORN_HELMET);
+        result = (afternmv == Helmet_on);
     else if (otmp == uarmg)
-        result = (afternmv == Gloves_on || afternmv == Gloves_off
-                  || what == WORN_GLOVES);
+        result = (afternmv == Gloves_on);
     else if (otmp == uarms)
-        result = (afternmv == Shield_on || afternmv == Shield_off
-                  || what == WORN_SHIELD);
-    /* these 1-turn items don't need 'afternmv' checks
-       [and may not actually need 'what' checks] */
-    else if (otmp == uamul)
-        result = (what == WORN_AMUL);
-    else if (otmp == uleft)
-        result = (what == LEFT_RING);
-    else if (otmp == uright)
-        result = (what == RIGHT_RING);
-    else if (otmp == ublindf)
-        result = (what == WORN_BLINDF);
-    else if (otmp == uwep)
-        result = (what == W_WEP);
-    else if (otmp == uswapwep)
-        result = (what == W_SWAPWEP);
-    else if (otmp == uquiver)
-        result = (what == W_QUIVER);
+        result = (afternmv == Shield_on);
 
     return result;
 }
