@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1494545163 2017/05/11 23:26:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1496547229 2017/06/04 03:33:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1241,6 +1241,12 @@ struct obj *otmp;
         result = (what == RIGHT_RING);
     else if (otmp == ublindf)
         result = (what == WORN_BLINDF);
+    else if (otmp == uwep)
+        result = (what == W_WEP);
+    else if (otmp == uswapwep)
+        result = (what == W_SWAPWEP);
+    else if (otmp == uquiver)
+        result = (what == W_QUIVER);
 
     return result;
 }
@@ -1279,6 +1285,12 @@ struct obj *otmp;
         result = (what == RIGHT_RING);
     else if (otmp == ublindf)
         result = (what == WORN_BLINDF);
+    else if (otmp == uwep)
+        result = (what == W_WEP);
+    else if (otmp == uswapwep)
+        result = (what == W_SWAPWEP);
+    else if (otmp == uquiver)
+        result = (what == W_QUIVER);
 
     return result;
 }
@@ -1323,7 +1335,7 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
        by unmul() since the on or off action isn't completing */
-    afternmv = 0;
+    afternmv = (int NDECL((*))) 0;
     if (putting_on || otmp != stolenobj) {
         Sprintf(buf, "You stop %s %s.",
                 putting_on ? "putting on" : "taking off",
