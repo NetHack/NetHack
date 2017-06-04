@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1493510119 2017/04/29 23:55:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1496619133 2017/06/04 23:32:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -613,6 +613,8 @@ long timeout;
         boolean siblings = (hatchcount > 1), redraw = FALSE;
 
         if (cansee_hatchspot) {
+            /* [bug?  m_monnam() yields accurate monster type
+               regardless of hallucination] */
             Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
                     siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
             /* we don't learn the egg type here because learning

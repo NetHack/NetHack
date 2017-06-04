@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1494107206 2017/05/06 21:46:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1526,6 +1526,7 @@ domove()
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
             else if (mtmp->mpeaceful && !Hallucination)
+                /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
                 pline("Pardon me, %s.", m_monnam(mtmp));
             else
                 You("move right into %s.", mon_nam(mtmp));

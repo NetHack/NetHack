@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1470819842 2016/08/10 09:04:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1496619132 2017/06/04 23:32:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -324,11 +324,16 @@ register struct monst *magr, *mdef;
         mdef->mundetected = 0;
         newsym(mdef->mx, mdef->my);
         if (canseemon(mdef) && !sensemon(mdef)) {
-            if (Unaware)
-                You("dream of %s.", (mdef->data->geno & G_UNIQ)
-                                        ? a_monnam(mdef)
-                                        : makeplural(m_monnam(mdef)));
-            else
+            if (Unaware) {
+                boolean justone = (mdef->data->geno & G_UNIQ) != 0L;
+                const char *montype;
+
+                montype = noname_monnam(mdef, justone ? ARTICLE_THE
+                                                      : ARTICLE_NONE);
+                if (!justone)
+                    montype = makeplural(montype);
+                You("dream of %s.", montype);
+            } else
                 pline("Suddenly, you notice %s.", a_monnam(mdef));
         }
     }

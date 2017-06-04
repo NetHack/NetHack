@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1457397477 2016/03/08 00:37:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2060,6 +2060,7 @@ long timeout;
         char and_vanish[BUFSZ];
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
 
+        /* [m_monnam() yields accurate mon type, overriding hallucination] */
         Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
