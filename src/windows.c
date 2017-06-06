@@ -240,7 +240,7 @@ const char *s;
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
-        terminate(EXIT_SUCCESS);
+        nethack_terminate(EXIT_SUCCESS);
     wait_synch();
 }
 

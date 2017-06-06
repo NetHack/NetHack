@@ -734,7 +734,7 @@ const char *line;
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to message handler %s failed.\n",
                        env);
-        terminate(EXIT_FAILURE);
+        nethack_terminate(EXIT_FAILURE);
     } else if (f > 0) {
         int status;
         waitpid(f, &status, 0);

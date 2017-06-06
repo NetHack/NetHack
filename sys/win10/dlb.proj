@@ -1,0 +1,41 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Build"
+     Inputs="$(BinDir)dlb.exe;@(DlbList)"
+	 Outputs="$(DatDir)dlb.lst;$(DatDir)porthelp;$(BinDir)nhdat">
+	<Copy SourceFiles="$(SysWinntDir)porthelp" DestinationFolder="$(DatDir)"/>
+	<WriteLinesToFile File="$(DatDir)dlb.lst" Lines="@(DlbList->'%(filename)%(extension)')" Overwrite="true"/>
+	<Exec Command="$(BinDir)dlb.exe cIf $(DatDir)dlb.lst $(BinDir)nhdat" WorkingDirectory="$(DatDir)"/>
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="$(DatDir)dlb.lst;$(DatDir)porthelp;$(BinDir)nhdat"/>
+  </Target>
+  <Import Project="defines.proj"/>
+</Project>
+<!--
+echo chdir $(RootDir)dat
+chdir $(RootDir)dat
+chdir
+echo data >dlb.lst
+echo oracles >>dlb.lst
+if exist options echo options >>dlb.lst
+if exist ttyoptions echo ttyoptions >>dlb.lst
+if exist guioptions echo guioptions >>dlb.lst
+if NOT exist porthelp copy $(RootDir)sys\winnt\porthelp porthelp
+if exist porthelp echo porthelp >>dlb.lst
+echo quest.dat >>dlb.lst
+echo rumors >>dlb.lst
+echo help >>dlb.lst
+echo hh >>dlb.lst
+echo cmdhelp >>dlb.lst
+echo history >>dlb.lst
+echo opthelp >>dlb.lst
+echo wizhelp >>dlb.lst
+echo dungeon >>dlb.lst
+echo license >>dlb.lst
+for %%N in (*.lev) do echo %%N >>dlb.lst
+$(ToolDir)dlb_main.exe cIf dlb.lst nhdat
+echo chdir $(RootDir)build
+chdir $(RootDir)build
+echo if NOT exist $(RootDir)binary\*.* mkdir $(RootDir)binary
+if NOT exist $(RootDir)binary\*.* mkdir $(RootDir)binary
+-->

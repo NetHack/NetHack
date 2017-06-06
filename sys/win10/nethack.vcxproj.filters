@@ -1,0 +1,593 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(SrcDir)alloc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)apply.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)artifact.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)attrib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)ball.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)bones.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)botl.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)cmd.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dbridge.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)decl.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)detect.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dig.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)display.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dlb.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)do.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)do_name.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)do_wear.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dog.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dogmove.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dokick.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dothrow.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)drawing.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)dungeon.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)eat.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)end.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)engrave.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)exper.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)explode.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)extralev.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)files.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)fountain.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)hack.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)hacklib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)invent.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)light.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)lock.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mail.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)makemon.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mapglyph.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mcastu.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mhitm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mhitu.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)minion.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mklev.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mkmap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mkmaze.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mkobj.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mkroom.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mon.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mondata.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)monmove.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)monst.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mplayer.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)mthrowu.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)muse.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)music.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)o_init.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)objects.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)objnam.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)options.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)pager.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)pickup.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)pline.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)polyself.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)potion.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)pray.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)priest.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)quest.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)questpgr.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)read.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)rect.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)region.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)restore.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)rip.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)rnd.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)role.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)rumors.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)save.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)shk.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)shknam.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)sit.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)sounds.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)sp_lev.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)spell.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)steal.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)steed.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)teleport.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)timeout.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)topten.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)track.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)trap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)u_init.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)uhitm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)vault.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)version.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)vision.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)weapon.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)were.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)wield.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)windows.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)wizard.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)worm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)worn.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)write.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)zap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SrcDir)allmain.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysWinntDir)winnt.c">
+      <Filter>sys_winnnt</Filter>
+    </ClCompile>
+    <ClCompile Include="$(WinTtyDir)wintty.c">
+      <Filter>win_tty</Filter>
+    </ClCompile>
+    <ClCompile Include="$(WinTtyDir)topl.c">
+      <Filter>win_tty</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysShareDir)random.c">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysShareDir)pcunix.c">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysShareDir)pcsys.c">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysShareDir)pcmain.c">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysWinntDir)nttty.c">
+      <Filter>sys_winnnt</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysWinntDir)ntsound.c">
+      <Filter>sys_winnnt</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SysShareDir)nhlan.c">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+    <ClCompile Include="$(WinTtyDir)getline.c">
+      <Filter>win_tty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\monstr.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tile.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\cppregex.cpp">
+      <Filter>sys_share</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(IncDir)align.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)amiconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)artifact.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)artilist.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)attrib.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)beconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)color.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)config.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)config1.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)coord.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)decl.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)dgn_file.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)display.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)dlb.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)dungeon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)engrave.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)extern.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)flag.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)func_tab.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)global.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)hack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)lev.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)macconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)mail.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)mfndpos.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)micro.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)mkroom.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)monattk.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)mondata.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)monflag.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)monst.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)monsym.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)ntconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)obj.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)objclass.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)os2conf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)patchlevel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)pcconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)permonst.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)prop.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)qtext.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)quest.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)rect.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)region.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)rm.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)skills.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)sp_lev.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)spell.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)system.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)tcap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)timeout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)tosconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)tradstdc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)trampoli.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)trap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)unixconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)vision.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)vmsconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)wceconf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SysWinntDir)win32api.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)wingem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)winGnome.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)winprocs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)wintty.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)wintype.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)you.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="$(IncDir)youprop.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{0121af68-338d-41bf-b3d7-85044508c66c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{94a21f8a-cb20-4273-8613-4ba039869a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="win_tty">
+      <UniqueIdentifier>{6bd12fcb-16c8-422f-aece-4df4917645c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys_winnnt">
+      <UniqueIdentifier>{28b2e0ab-e4ff-4205-99ca-6d5046f8c947}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys_share">
+      <UniqueIdentifier>{eacfa7f7-bd51-416f-80b7-49190f09e07e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(SysWinntDir)console.rc">
+      <Filter>include</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

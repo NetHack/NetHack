@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(SrcDir)allmain.c" />
+    <ClCompile Include="$(SrcDir)alloc.c" />
+    <ClCompile Include="$(SrcDir)apply.c" />
+    <ClCompile Include="$(SrcDir)artifact.c" />
+    <ClCompile Include="$(SrcDir)attrib.c" />
+    <ClCompile Include="$(SrcDir)ball.c" />
+    <ClCompile Include="$(SrcDir)bones.c" />
+    <ClCompile Include="$(SrcDir)botl.c" />
+    <ClCompile Include="$(SrcDir)cmd.c" />
+    <ClCompile Include="$(SrcDir)dbridge.c" />
+    <ClCompile Include="$(SrcDir)decl.c" />
+    <ClCompile Include="$(SrcDir)detect.c" />
+    <ClCompile Include="$(SrcDir)dig.c" />
+    <ClCompile Include="$(SrcDir)display.c" />
+    <ClCompile Include="$(SrcDir)dlb.c" />
+    <ClCompile Include="$(SrcDir)do.c" />
+    <ClCompile Include="$(SrcDir)do_name.c" />
+    <ClCompile Include="$(SrcDir)do_wear.c" />
+    <ClCompile Include="$(SrcDir)dog.c" />
+    <ClCompile Include="$(SrcDir)dogmove.c" />
+    <ClCompile Include="$(SrcDir)dokick.c" />
+    <ClCompile Include="$(SrcDir)dothrow.c" />
+    <ClCompile Include="$(SrcDir)drawing.c" />
+    <ClCompile Include="$(SrcDir)dungeon.c" />
+    <ClCompile Include="$(SrcDir)eat.c" />
+    <ClCompile Include="$(SrcDir)end.c" />
+    <ClCompile Include="$(SrcDir)engrave.c" />
+    <ClCompile Include="$(SrcDir)exper.c" />
+    <ClCompile Include="$(SrcDir)explode.c" />
+    <ClCompile Include="$(SrcDir)extralev.c" />
+    <ClCompile Include="$(SrcDir)files.c" />
+    <ClCompile Include="$(SrcDir)fountain.c" />
+    <ClCompile Include="$(SrcDir)hack.c" />
+    <ClCompile Include="$(SrcDir)hacklib.c" />
+    <ClCompile Include="$(SrcDir)invent.c" />
+    <ClCompile Include="$(SrcDir)light.c" />
+    <ClCompile Include="$(SrcDir)lock.c" />
+    <ClCompile Include="$(SrcDir)mail.c" />
+    <ClCompile Include="$(SrcDir)makemon.c" />
+    <ClCompile Include="$(SrcDir)mapglyph.c" />
+    <ClCompile Include="$(SrcDir)mcastu.c" />
+    <ClCompile Include="$(SrcDir)mhitm.c" />
+    <ClCompile Include="$(SrcDir)mhitu.c" />
+    <ClCompile Include="$(SrcDir)minion.c" />
+    <ClCompile Include="$(SrcDir)mklev.c" />
+    <ClCompile Include="$(SrcDir)mkmap.c" />
+    <ClCompile Include="$(SrcDir)mkmaze.c" />
+    <ClCompile Include="$(SrcDir)mkobj.c" />
+    <ClCompile Include="$(SrcDir)mkroom.c" />
+    <ClCompile Include="$(SrcDir)mon.c" />
+    <ClCompile Include="$(SrcDir)mondata.c" />
+    <ClCompile Include="$(SrcDir)monmove.c" />
+    <ClCompile Include="$(SrcDir)monst.c" />
+    <ClCompile Include="$(SrcDir)monstr.c" />
+    <ClCompile Include="$(SrcDir)mplayer.c" />
+    <ClCompile Include="$(SrcDir)mthrowu.c" />
+    <ClCompile Include="$(SrcDir)muse.c" />
+    <ClCompile Include="$(SrcDir)music.c" />
+    <ClCompile Include="$(SysWinntDir)ntsound.c" />
+    <ClCompile Include="$(SrcDir)o_init.c" />
+    <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(SrcDir)objnam.c" />
+    <ClCompile Include="$(SrcDir)options.c" />
+    <ClCompile Include="$(SrcDir)pager.c" />
+    <ClCompile Include="$(SysShareDir)pcmain.c" />
+    <ClCompile Include="$(SysShareDir)pcsys.c" />
+    <ClCompile Include="$(SysShareDir)pcunix.c" />
+    <ClCompile Include="$(SrcDir)pickup.c" />
+    <ClCompile Include="$(SrcDir)pline.c" />
+    <ClCompile Include="$(SrcDir)polyself.c" />
+    <ClCompile Include="$(SrcDir)potion.c" />
+    <ClCompile Include="$(SrcDir)pray.c" />
+    <ClCompile Include="$(SrcDir)priest.c" />
+    <ClCompile Include="$(SrcDir)quest.c" />
+    <ClCompile Include="$(SrcDir)questpgr.c" />
+    <ClCompile Include="$(SysShareDir)random.c" />
+    <ClCompile Include="$(SrcDir)read.c" />
+    <ClCompile Include="$(SrcDir)rect.c" />
+    <ClCompile Include="$(SrcDir)region.c" />
+    <ClCompile Include="$(SrcDir)restore.c" />
+    <ClCompile Include="$(SrcDir)rip.c" />
+    <ClCompile Include="$(SrcDir)rnd.c" />
+    <ClCompile Include="$(SrcDir)role.c" />
+    <ClCompile Include="$(SrcDir)rumors.c" />
+    <ClCompile Include="$(SrcDir)save.c" />
+    <ClCompile Include="$(SrcDir)shk.c" />
+    <ClCompile Include="$(SrcDir)shknam.c" />
+    <ClCompile Include="$(SrcDir)sit.c" />
+    <ClCompile Include="$(SrcDir)sounds.c" />
+    <ClCompile Include="$(SrcDir)sp_lev.c" />
+    <ClCompile Include="$(SrcDir)spell.c" />
+    <ClCompile Include="$(SrcDir)steal.c" />
+    <ClCompile Include="$(SrcDir)steed.c" />
+    <ClCompile Include="$(SrcDir)teleport.c" />
+    <ClCompile Include="$(SrcDir)tile.c" />
+    <ClCompile Include="$(SrcDir)timeout.c" />
+    <ClCompile Include="$(SrcDir)topten.c" />
+    <ClCompile Include="$(SrcDir)track.c" />
+    <ClCompile Include="$(SrcDir)trap.c" />
+    <ClCompile Include="$(SrcDir)u_init.c" />
+    <ClCompile Include="$(SrcDir)uhitm.c" />
+    <ClCompile Include="$(SrcDir)vault.c" />
+    <ClCompile Include="$(SrcDir)version.c" />
+    <ClCompile Include="$(SrcDir)vision.c" />
+    <ClCompile Include="$(SrcDir)weapon.c" />
+    <ClCompile Include="$(SrcDir)were.c" />
+    <ClCompile Include="$(SrcDir)wield.c" />
+    <ClCompile Include="$(SrcDir)windows.c" />
+    <ClCompile Include="$(SysWinntDir)winnt.c" />
+    <ClCompile Include="$(SrcDir)wizard.c" />
+    <ClCompile Include="$(SrcDir)worm.c" />
+    <ClCompile Include="$(SrcDir)worn.c" />
+    <ClCompile Include="$(SrcDir)write.c" />
+    <ClCompile Include="$(SrcDir)zap.c" />
+    <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />
+    <ClCompile Include="$(WinWin32Dir)mhdlg.c" />
+    <ClCompile Include="$(WinWin32Dir)mhfont.c" />
+    <ClCompile Include="$(WinWin32Dir)mhinput.c" />
+    <ClCompile Include="$(WinWin32Dir)mhmain.c" />
+    <ClCompile Include="$(WinWin32Dir)mhmap.c" />
+    <ClCompile Include="$(WinWin32Dir)mhmenu.c" />
+    <ClCompile Include="$(WinWin32Dir)mhmsgwnd.c" />
+    <ClCompile Include="$(WinWin32Dir)mhrip.c" />
+    <ClCompile Include="$(WinWin32Dir)mhsplash.c" />
+    <ClCompile Include="$(WinWin32Dir)mhstatus.c" />
+    <ClCompile Include="$(WinWin32Dir)mhtext.c" />
+    <ClCompile Include="$(WinWin32Dir)mswproc.c" />
+    <ClCompile Include="$(WinWin32Dir)winhack.c" />
+    <ClCompile Include="..\..\src\sys.c" />
+    <ClCompile Include="..\share\cppregex.cpp" />
+    <ClCompile Include="..\share\nhlan.c" />
+    <ClCompile Include="..\winnt\stubs.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(WinWin32Dir)winhack.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(IncDir)align.h" />
+    <ClInclude Include="$(IncDir)amiconf.h" />
+    <ClInclude Include="$(IncDir)artifact.h" />
+    <ClInclude Include="$(IncDir)artilist.h" />
+    <ClInclude Include="$(IncDir)attrib.h" />
+    <ClInclude Include="$(IncDir)beconf.h" />
+    <ClInclude Include="$(IncDir)color.h" />
+    <ClInclude Include="$(IncDir)config.h" />
+    <ClInclude Include="$(IncDir)config1.h" />
+    <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)date.h" />
+    <ClInclude Include="$(IncDir)decl.h" />
+    <ClInclude Include="$(IncDir)dgn_file.h" />
+    <ClInclude Include="$(IncDir)display.h" />
+    <ClInclude Include="$(IncDir)dlb.h" />
+    <ClInclude Include="$(IncDir)dungeon.h" />
+    <ClInclude Include="$(IncDir)engrave.h" />
+    <ClInclude Include="$(IncDir)extern.h" />
+    <ClInclude Include="$(IncDir)flag.h" />
+    <ClInclude Include="$(IncDir)func_tab.h" />
+    <ClInclude Include="$(IncDir)global.h" />
+    <ClInclude Include="$(IncDir)hack.h" />
+    <ClInclude Include="$(IncDir)lev.h" />
+    <ClInclude Include="$(IncDir)macconf.h" />
+    <ClInclude Include="$(IncDir)mail.h" />
+    <ClInclude Include="$(IncDir)mfndpos.h" />
+    <ClInclude Include="$(IncDir)micro.h" />
+    <ClInclude Include="$(IncDir)mkroom.h" />
+    <ClInclude Include="$(IncDir)monattk.h" />
+    <ClInclude Include="$(IncDir)mondata.h" />
+    <ClInclude Include="$(IncDir)monflag.h" />
+    <ClInclude Include="$(IncDir)monst.h" />
+    <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)ntconf.h" />
+    <ClInclude Include="$(IncDir)obj.h" />
+    <ClInclude Include="$(IncDir)objclass.h" />
+    <ClInclude Include="$(IncDir)onames.h" />
+    <ClInclude Include="$(IncDir)os2conf.h" />
+    <ClInclude Include="$(IncDir)patchlevel.h" />
+    <ClInclude Include="$(IncDir)pcconf.h" />
+    <ClInclude Include="$(IncDir)permonst.h" />
+    <ClInclude Include="$(IncDir)pm.h" />
+    <ClInclude Include="$(IncDir)prop.h" />
+    <ClInclude Include="$(IncDir)qtext.h" />
+    <ClInclude Include="$(IncDir)quest.h" />
+    <ClInclude Include="$(IncDir)rect.h" />
+    <ClInclude Include="$(IncDir)region.h" />
+    <ClInclude Include="$(IncDir)rm.h" />
+    <ClInclude Include="$(IncDir)skills.h" />
+    <ClInclude Include="$(IncDir)spell.h" />
+    <ClInclude Include="$(IncDir)sp_lev.h" />
+    <ClInclude Include="$(IncDir)system.h" />
+    <ClInclude Include="$(IncDir)tcap.h" />
+    <ClInclude Include="$(IncDir)timeout.h" />
+    <ClInclude Include="$(IncDir)tosconf.h" />
+    <ClInclude Include="$(IncDir)tradstdc.h" />
+    <ClInclude Include="$(IncDir)trampoli.h" />
+    <ClInclude Include="$(IncDir)trap.h" />
+    <ClInclude Include="$(IncDir)unixconf.h" />
+    <ClInclude Include="$(IncDir)vision.h" />
+    <ClInclude Include="$(IncDir)vis_tab.h" />
+    <ClInclude Include="$(IncDir)vmsconf.h" />
+    <ClInclude Include="$(IncDir)wceconf.h" />
+    <ClInclude Include="$(IncDir)wingem.h" />
+    <ClInclude Include="$(IncDir)winGnome.h" />
+    <ClInclude Include="$(IncDir)winprocs.h" />
+    <ClInclude Include="$(IncDir)wintype.h" />
+    <ClInclude Include="$(IncDir)you.h" />
+    <ClInclude Include="$(IncDir)youprop.h" />
+    <ClInclude Include="$(WinWin32Dir)mhaskyn.h" />
+    <ClInclude Include="$(WinWin32Dir)mhdlg.h" />
+    <ClInclude Include="$(WinWin32Dir)mhfont.h" />
+    <ClInclude Include="$(WinWin32Dir)mhinput.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmain.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmap.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmenu.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmsg.h" />
+    <ClInclude Include="$(WinWin32Dir)mhmsgwnd.h" />
+    <ClInclude Include="$(WinWin32Dir)mhrip.h" />
+    <ClInclude Include="$(WinWin32Dir)mhsplash.h" />
+    <ClInclude Include="$(WinWin32Dir)mhstatus.h" />
+    <ClInclude Include="$(WinWin32Dir)mhtext.h" />
+    <ClInclude Include="$(WinWin32Dir)resource.h" />
+    <ClInclude Include="$(WinWin32Dir)winms.h" />
+    <ClInclude Include="$(SysWinntDir)win32api.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6C26C7E6-A8EB-45B7-987D-44194CF2BA1E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>nethackw</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="nethack.props" />
+    <Import Project="nethack_dbg.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="nethack.props" />
+    <Import Project="nethack_rel.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(NhWinShareDir)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <PreprocessorDefinitions>TTYSTUB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>TTYSTUB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(NhWinShareDir)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Target Name="AfterBuild">
+    <MSBuild Projects="nethackw.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterClean">
+    <MSBuild Projects="nethackw.proj" Targets="Clean" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterRebuild">
+    <MSBuild Projects="nethackw.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+</Project>

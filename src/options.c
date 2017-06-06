@@ -638,7 +638,7 @@ initoptions()
     /* ... and _must_ parse correctly. */
     if (!read_config_file(SYSCF_FILE, SET_IN_SYS)) {
         raw_printf("Error(s) found in SYSCF_FILE, quitting.");
-        terminate(EXIT_FAILURE);
+        nethack_terminate(EXIT_FAILURE);
     }
     /*
      * TODO [maybe]: parse the sysopt entries which are space-separated
