@@ -22,10 +22,15 @@ sys_early_init()
 {
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
+    sysopt.livelog = 0;
 #ifdef SYSCF
     sysopt.wizards = (char *) 0;
 #else
     sysopt.wizards = dupstr(WIZARD_NAME);
+ #ifdef LIVELOGFILE
+    sysopt.livelog = LIVELOG_DETAIL;
+    sysopt.ll_conduct_turns = 0;
+ #endif
 #endif
 #if defined(SYSCF) || !defined(DEBUGFILES)
     sysopt.debugfiles = (char *) 0;

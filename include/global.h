@@ -351,4 +351,13 @@ struct savefile_info {
 #define PANICTRACE_GDB
 #endif
 
+/* LIVELOG message type flags */
+#define LL_TRADITIONAL 1 /* Wish, Lifesave, Invocation, Planes */
+#define LL_ACHIEVE     2 /* Get something in the Achievements bitfield */
+#define LL_UKILL       4 /* unique kills (Juiblex, Famine, Quest nemesis, etc) */
+#define LL_DIVINEGIFT  8 /* Sacrifice gifts, crowning */
+#define LL_NOTUSED    16 /* Not used (yet) */
+#define LL_CONDUCT    32 /* Break conduct - can be spammy early-game */
+#define LL_NEWLEVEL   64 /* Enters new level for first time - extra spammy */
+#define LL_SPECIAL   128 /* For debugging, tournament scoring, etc */ 
 #endif /* GLOBAL_H */

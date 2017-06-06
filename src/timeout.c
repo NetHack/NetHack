@@ -327,7 +327,9 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
                 /* involuntarily break "never changed form" conduct */
-                u.uconduct.polyselfs++;
+                if(!u.uconduct.polyselfs++)
+                    livelog_write_string(LL_CONDUCT,
+                            "changed form for the first time by turning to slime");
                 done(TURNED_SLIME);
                 break;
             case VOMITING:

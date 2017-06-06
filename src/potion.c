@@ -1874,7 +1874,8 @@ dodip()
             short save_otyp = obj->otyp;
 
             /* KMH, conduct */
-            u.uconduct.polypiles++;
+            if(!u.uconduct.polypiles++)
+                livelog_write_string(LL_CONDUCT, "polymorphed first item");
 
             was_wep = (obj == uwep);
             was_swapwep = (obj == uswapwep);

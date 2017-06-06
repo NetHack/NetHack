@@ -484,6 +484,9 @@ struct attack *uattk;
             if (mon->wormno && *mhit)
                 cutworm(mon, x, y, weapon);
         }
+        if(u.uconduct.weaphit && !oldweaphit)
+            livelog_write_string(LL_CONDUCT,
+                    "hit with a wielded weapon for the first time");
     }
     return malive;
 }
