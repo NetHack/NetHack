@@ -251,9 +251,8 @@ register const char *bp;
 
     for (tl = toplines; n0 >= CO; ) {
         otl = tl;
-        for (tl += CO - 1; tl != otl; --tl)
-            if (*tl == ' ')
-                break;
+        for (tl += CO - 1; tl != otl && !isspace((uchar) *tl); --tl)
+            ;
         if (tl == otl) {
             /* Eek!  A huge token.  Try splitting after it. */
             tl = index(otl, ' ');

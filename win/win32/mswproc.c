@@ -2580,30 +2580,27 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
         if (strlen(++colorstring) != 6)
             return;
 
-        red_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value = (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                            - hexadecimals);
         ++colorstring;
         red_value *= 16;
-        red_value += (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value += (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                             - hexadecimals);
         ++colorstring;
 
-        green_value = (int) (index(hexadecimals,
-                                   tolower((uchar) *colorstring))
+        green_value = (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                              - hexadecimals);
         ++colorstring;
         green_value *= 16;
-        green_value += (int) (index(hexadecimals,
-                                    tolower((uchar) *colorstring))
+        green_value += (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                               - hexadecimals);
         ++colorstring;
 
-        blue_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        blue_value = (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                             - hexadecimals);
         ++colorstring;
         blue_value *= 16;
-        blue_value += (int) (index(hexadecimals,
-                                   tolower((uchar) *colorstring))
+        blue_value += (int) (index(hexadecimals, tolower((uchar) *colorstring++))
                              - hexadecimals);
         ++colorstring;
 
