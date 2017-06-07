@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1472006251 2016/08/24 02:37:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1496860756 2017/06/07 18:39:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -33,6 +33,7 @@
         char *          tabexpand       (char *)
         char *          visctrl         (char)
         char *          strsubst        (char *, const char *, const char *)
+        int             strNsubst       (char *,const char *,const char *,int)
         const char *    ordin           (int)
         char *          sitoa           (int)
         int             sgn             (int)
@@ -45,7 +46,7 @@
         boolean         pmatchz         (const char *, const char *)
         int             strncmpi        (const char *, const char *, int)
         char *          strstri         (const char *, const char *)
-        boolean         fuzzymatch      (const char *,const char *,
+        boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
         time_t          getnow          (void)
@@ -442,6 +443,7 @@ const char *orig, *replacement;
     char *found, buf[BUFSZ];
 
     if (bp) {
+        /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
         found = strstr(bp, orig);
         if (found) {
             Strcpy(buf, found + strlen(orig));
@@ -450,6 +452,52 @@ const char *orig, *replacement;
         }
     }
     return bp;
+}
+
+/* substitute the Nth occurrence of a substring within a string (in place);
+   if N is 0, substitute all occurrences; returns the number of subsitutions;
+   maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
+int
+strNsubst(inoutbuf, orig, replacement, n)
+char *inoutbuf; /* current string, and result buffer */
+const char *orig, /* old substring; if "" then insert in front of Nth char */
+           *replacement; /* new substring; if "" then delete old substring */
+int n; /* which occurrence to replace; 0 => all */
+{
+    char *bp, *op, workbuf[BUFSZ];
+    const char *rp;
+    unsigned len = (unsigned) strlen(orig);
+    int ocount = 0, /* number of times 'orig' has been matched */
+        rcount = 0; /* number of subsitutions made */
+
+    for (bp = inoutbuf, op = workbuf; *bp && op < &workbuf[BUFSZ - 1]; ) {
+        if ((!len || !strncmp(bp, orig, len)) && (++ocount == n || n == 0)) {
+            /* Nth match found */
+            for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+                *op++ = *rp++;
+            ++rcount;
+            if (len) {
+                bp += len; /* skip 'orig' */
+                continue;
+            }
+        }
+        /* no match (or len==0) so retain current character */
+        *op++ = *bp++;
+    }
+    if (!len && n == ocount + 1) {
+        /* special case: orig=="" (!len) and n==strlen(inoutbuf)+1,
+           insert in front of terminator (in other words, append);
+           [when orig=="", ocount will have been incremented once for
+           each input char] */
+        for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+            *op++ = *rp++;
+        ++rcount;
+    }
+    if (rcount) {
+        *op = '\0';
+        Strcpy(inoutbuf, workbuf);
+    }
+    return rcount;
 }
 
 /* return the ordinal suffix of a number */

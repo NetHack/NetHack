@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1496531111 2017/06/03 23:05:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.589 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1496860756 2017/06/07 18:39:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.590 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -876,6 +876,7 @@ E boolean FDECL(onlyspace, (const char *));
 E char *FDECL(tabexpand, (char *));
 E char *FDECL(visctrl, (CHAR_P));
 E char *FDECL(strsubst, (char *, const char *, const char *));
+E int FDECL(strNsubst, (char *, const char *, const char *, int));
 E const char *FDECL(ordin, (int));
 E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));

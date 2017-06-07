@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1496619132 2017/06/04 23:32:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1496860757 2017/06/07 18:39:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1558,8 +1558,10 @@ int mdead;
                     tmp = 127;
                 if (magr->mcansee && haseyes(madat) && mdef->mcansee
                     && (perceives(madat) || !mdef->minvis)) {
-                    Sprintf(buf, "%s gaze is reflected by %%s %%s.",
-                            s_suffix(Monnam(mdef)));
+                    /* construct format string; guard against '%' in Monnam */
+                    Strcpy(buf, s_suffix(Monnam(mdef)));
+                    (void) strNsubst(buf, "%", "%%", 0);
+                    Strcat(buf, " gaze is reflected by %s %s.");
                     if (mon_reflects(magr,
                                      canseemon(magr) ? buf : (char *) 0))
                         return (mdead | mhit);
