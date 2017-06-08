@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1496614915 2017/06/04 22:21:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1496959480 2017/06/08 22:04:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -676,10 +676,6 @@ uwepgone()
                 pline("%s shining.", Tobjnam(uwep, "stop"));
         }
         setworn((struct obj *) 0, W_WEP);
-        /* update takeoff mask in case uwep has just gone away while
-           its removal via 'A' was pending, similar to what the various
-           Xyzzy_off(do_wear.c) routines do for armor and accessories */
-        context.takeoff.mask &= ~W_WEP;
         unweapon = TRUE;
         update_inventory();
     }
@@ -690,7 +686,6 @@ uswapwepgone()
 {
     if (uswapwep) {
         setworn((struct obj *) 0, W_SWAPWEP);
-        context.takeoff.mask &= ~W_SWAPWEP;
         update_inventory();
     }
 }
@@ -700,7 +695,6 @@ uqwepgone()
 {
     if (uquiver) {
         setworn((struct obj *) 0, W_QUIVER);
-        context.takeoff.mask &= ~W_QUIVER;
         update_inventory();
     }
 }

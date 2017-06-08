@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1493510127 2017/04/29 23:55:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1496959481 2017/06/08 22:04:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -77,6 +77,9 @@ long mask;
                         if (oobj->oartifact)
                             set_artifact_intrinsic(oobj, 0, mask);
                     }
+                    /* in case wearing or removal is in progress or removal
+                       is pending (via 'A' command for multiple items) */
+                    cancel_doff(oobj, wp->w_mask);
                 }
                 *(wp->w_obj) = obj;
                 if (obj) {
@@ -119,6 +122,10 @@ register struct obj *obj;
         u.twoweap = 0;
     for (wp = worn; wp->w_mask; wp++)
         if (obj == *(wp->w_obj)) {
+            /* in case wearing or removal is in progress or removal
+               is pending (via 'A' command for multiple items) */
+            cancel_doff(obj, wp->w_mask);
+
             *(wp->w_obj) = 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;

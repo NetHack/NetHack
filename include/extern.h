@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1496860756 2017/06/07 18:39:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.590 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1496959470 2017/06/08 22:04:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.591 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -436,6 +436,7 @@ E void FDECL(off_msg, (struct obj *));
 E void FDECL(set_wear, (struct obj *));
 E boolean FDECL(donning, (struct obj *));
 E boolean FDECL(doffing, (struct obj *));
+E void FDECL(cancel_doff, (struct obj *, long));
 E void NDECL(cancel_don);
 E int FDECL(stop_donning, (struct obj *));
 E int NDECL(Armor_off);

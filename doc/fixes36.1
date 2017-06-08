@@ -379,7 +379,9 @@ levitation vs encumbrance message sequencing issues:  putting on boots of
 	and float-up messages, taking off such boots didn't report increase
 	of encumbrance until player took another action
 removing a blindfold with 'A' took two turns, with 'R' (and 'T') only one,
-	and could result in a panic if the blindfold was stolen during removal
+	and could result in a crash if the blindfold was stolen during removal
+removing a blindfold and wielded weapon with 'A' could result in crash if the
+	weapon was destroyed by various methods
 cmdassist help for movement prefix followed by invalid direction was strange
 	when the direction was up, down, or self disallowed for that prefix
 poor message when shape-shifted vampire reverts to vampire if it has a name:
@@ -396,6 +398,7 @@ adult green dragons and the Chromatic Dragon were blinded by gas clouds
 named floating eye (when hit by another monster with reflection) or named
 	silver weapon (when hero hits silver-hating monster) could disrupt
 	message formatting and conceivably trigger crash if name had '%' in it
+crashes for 'A' above were downgraded to impossible "cursed without otmp"
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
