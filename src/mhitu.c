@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1496619132 2017/06/04 23:32:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -486,6 +486,8 @@ register struct monst *mtmp;
                         if (obj->otyp == EGG)
                             obj->spe = 0;
                     }
+                    /* note that m_monnam() overrides hallucination, which is
+                       what we want when message is from mtmp's perspective */
                     if (youmonst.data->mlet == S_EEL
                         || u.umonnum == PM_TRAPPER)
                         pline(
@@ -515,7 +517,7 @@ register struct monst *mtmp;
             map_invisible(mtmp->mx, mtmp->my);
         if (sticky && !youseeit)
             pline("It gets stuck on you.");
-        else
+        else /* see note about m_monnam() above */
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
                   youmonst.data->mname, plname);
         if (sticky)
@@ -536,7 +538,7 @@ register struct monst *mtmp;
                                         && youmonst.mappearance == GOLD_PIECE)
                                            ? "tries to pick you up"
                                            : "disturbs you");
-        else
+        else /* see note about m_monnam() above */
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
                   mimic_obj_name(&youmonst), an(mons[u.umonnum].mname),
                   plname);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1456618998 2016/02/28 00:23:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1496614914 2017/06/04 22:21:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -560,18 +560,19 @@ struct monst *mtmp;
         /* take off outer gear if we're targetting [hypothetical]
            quest artifact suit, shirt, gloves, or rings */
         if ((otmp == uarm || otmp == uarmu) && uarmc)
-            (void) Cloak_off();
+            remove_worn_item(uarmc, FALSE);
         if (otmp == uarmu && uarm)
-            (void) Armor_off();
+            remove_worn_item(uarm, FALSE);
         if ((otmp == uarmg || ((otmp == uright || otmp == uleft) && uarmg))
             && uwep) {
             /* gloves are about to be unworn; unwield weapon(s) first */
-            if (u.twoweap)
-                uswapwepgone(); /* will clear u.twoweap */
-            uwepgone();
+            if (u.twoweap)    /* remove_worn_item(uswapwep) indirectly */
+                remove_worn_item(uswapwep, FALSE); /* clears u.twoweap */
+            remove_worn_item(uwep, FALSE);
         }
         if ((otmp == uright || otmp == uleft) && uarmg)
-            (void) Gloves_off(); /* handles wielded cockatrice corpse */
+            /* calls Gloves_off() to handle wielded cockatrice corpse */
+            remove_worn_item(uarmg, FALSE);
 
         /* finally, steal the target item */
         if (otmp->owornmask)

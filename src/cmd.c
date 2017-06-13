@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1494034344 2017/05/06 01:32:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.256 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1494985492 2017/05/17 01:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -184,8 +184,8 @@ static const char *readchar_queue = "";
 static coord clicklook_cc;
 
 STATIC_DCL char *NDECL(parse);
-STATIC_DCL void FDECL(show_direction_keys, (winid, BOOLEAN_P));
-STATIC_DCL boolean FDECL(help_dir, (CHAR_P, const char *));
+STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
+STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
 
 STATIC_PTR int
 doprev_message(VOID_ARGS)
@@ -3073,7 +3073,11 @@ dokeylist(VOID_ARGS)
     boolean keys_used[256] = {0};
     winid datawin;
     int i;
-    const struct {
+    static const char
+        run_desc[] = "Prefix: run until something very interesting is seen",
+        forcefight_desc[] =
+                     "Prefix: force fight even if you don't see a monster";
+    static const struct {
         int nhkf;
         const char *desc;
         boolean numpad;
@@ -3081,22 +3085,18 @@ dokeylist(VOID_ARGS)
         { NHKF_ESC, "escape from the current query/action", FALSE },
         { NHKF_RUSH,
           "Prefix: rush until something interesting is seen", FALSE },
-        { NHKF_RUN,
-          "Prefix: run until something extremely interesting is seen", FALSE },
-        { NHKF_RUN2,
-          "Prefix: run until something extremely interesting is seen", TRUE },
-        { NHKF_FIGHT,
-          "Prefix: force fight even if you don't see a monster", FALSE },
-        { NHKF_FIGHT2,
-          "Prefix: force fight even if you don't see a monster", TRUE },
+        { NHKF_RUN, run_desc, FALSE },
+        { NHKF_RUN2, run_desc, TRUE },
+        { NHKF_FIGHT, forcefight_desc, FALSE },
+        { NHKF_FIGHT2, forcefight_desc, TRUE } ,
         { NHKF_NOPICKUP,
           "Prefix: move without picking up objects/fighting", FALSE },
         { NHKF_RUN_NOPICKUP,
           "Prefix: run without picking up objects/fighting", FALSE },
-        { NHKF_DOINV, "inventory (same as #inventory)", TRUE },
+        { NHKF_DOINV, "view inventory", TRUE },
         { NHKF_REQMENU, "Prefix: request a menu", FALSE },
 #ifdef REDO
-        { NHKF_DOAGAIN , "redo the previous command", FALSE },
+        { NHKF_DOAGAIN , "re-do: perform the previous command again", FALSE },
 #endif
         { 0, (const char *) 0, FALSE }
     };
@@ -3108,7 +3108,7 @@ dokeylist(VOID_ARGS)
     /* directional keys */
     putstr(datawin, 0, "");
     putstr(datawin, 0, "Directional keys:");
-    show_direction_keys(datawin, FALSE);
+    show_direction_keys(datawin, '.', FALSE); /* '.'==self in direction grid */
 
     keys_used[(uchar) Cmd.move_NW] = keys_used[(uchar) Cmd.move_N]
         = keys_used[(uchar) Cmd.move_NE] = keys_used[(uchar) Cmd.move_W]
@@ -3942,11 +3942,12 @@ int NDECL((*cmd_func));
 }
 
 int
-ch2spkeys(c, start,end)
+ch2spkeys(c, start, end)
 char c;
 int start,end;
 {
     int i;
+
     for (i = start; i <= end; i++)
         if (Cmd.spkeys[i] == c)
             return i;
@@ -3957,6 +3958,7 @@ void
 rhack(cmd)
 register char *cmd;
 {
+    int spkey;
     boolean do_walk, do_rush, prefix_seen, bad_command,
         firsttime = (cmd == 0);
 
@@ -3990,7 +3992,9 @@ register char *cmd;
     /* handle most movement commands */
     do_walk = do_rush = prefix_seen = FALSE;
     context.travel = context.travel1 = 0;
-    switch (ch2spkeys(*cmd, NHKF_RUN,NHKF_CLICKLOOK)) {
+    spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_CLICKLOOK);
+
+    switch (spkey) {
     case NHKF_RUSH:
         if (movecmd(cmd[1])) {
             context.run = 2;
@@ -4161,14 +4165,13 @@ register char *cmd;
 
     if (bad_command) {
         char expcmd[20]; /* we expect 'cmd' to point to 1 or 2 chars */
-        register char c;
+        char c, c1 = cmd[1];
 
         expcmd[0] = '\0';
         while ((c = *cmd++) != '\0')
             Strcat(expcmd, visctrl(c)); /* add 1..4 chars plus terminator */
 
-        if (!prefix_seen || !iflags.cmdassist
-            || !help_dir(0, "Invalid direction key!"))
+        if (!prefix_seen || !help_dir(c1, spkey, "Invalid direction key!"))
             Norep("Unknown command '%s'.", expcmd);
     }
     /* didn't move */
@@ -4319,7 +4322,8 @@ retry:
         if (!index(quitchars, dirsym)) {
             help_requested = (dirsym == Cmd.spkeys[NHKF_GETDIR_HELP]);
             if (help_requested || iflags.cmdassist) {
-                did_help = help_dir((s && *s == '^') ? dirsym : 0,
+                did_help = help_dir((s && *s == '^') ? dirsym : '\0',
+                                    NHKF_ESC,
                                     help_requested ? (const char *) 0
                                                   : "Invalid direction key!");
                 if (help_requested)
@@ -4339,61 +4343,144 @@ retry:
 }
 
 STATIC_OVL void
-show_direction_keys(win, nodiag)
-winid win;
+show_direction_keys(win, centerchar, nodiag)
+winid win; /* should specify a window which is using a fixed-width font... */
+char centerchar; /* '.' or '@' or ' ' */
 boolean nodiag;
 {
     char buf[BUFSZ];
+
+    if (!centerchar)
+        centerchar = ' ';
 
     if (nodiag) {
         Sprintf(buf, "             %c   ", Cmd.move_N);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
-        Sprintf(buf, "          %c- . -%c", Cmd.move_W, Cmd.move_E);
+        Sprintf(buf, "          %c- %c -%c",
+                Cmd.move_W, centerchar, Cmd.move_E);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
         Sprintf(buf, "             %c   ", Cmd.move_S);
         putstr(win, 0, buf);
     } else {
-        Sprintf(buf, "          %c  %c  %c", Cmd.move_NW, Cmd.move_N,
-                Cmd.move_NE);
+        Sprintf(buf, "          %c  %c  %c",
+                Cmd.move_NW, Cmd.move_N, Cmd.move_NE);
         putstr(win, 0, buf);
         putstr(win, 0, "           \\ | / ");
-        Sprintf(buf, "          %c- . -%c", Cmd.move_W, Cmd.move_E);
+        Sprintf(buf, "          %c- %c -%c",
+                Cmd.move_W, centerchar, Cmd.move_E);
         putstr(win, 0, buf);
         putstr(win, 0, "           / | \\ ");
-        Sprintf(buf, "          %c  %c  %c", Cmd.move_SW, Cmd.move_S,
-                Cmd.move_SE);
+        Sprintf(buf, "          %c  %c  %c",
+                Cmd.move_SW, Cmd.move_S, Cmd.move_SE);
         putstr(win, 0, buf);
     };
 }
 
+/* explain choices if player has asked for getdir() help or has given
+   an invalid direction after a prefix key ('F', 'g', 'm', &c), which
+   might be bogus but could be up, down, or self when not applicable */
 STATIC_OVL boolean
-help_dir(sym, msg)
+help_dir(sym, spkey, msg)
 char sym;
+int spkey; /* NHKF_ code for prefix key, if one was used, or for ESC */
 const char *msg;
 {
     static const char wiz_only_list[] = "EFGIVW";
     char ctrl;
     winid win;
     char buf[BUFSZ], buf2[BUFSZ], *explain;
+    const char *dothat, *how;
+    boolean prefixhandling, viawindow;
+
+    /* NHKF_ESC indicates that player asked for help at getdir prompt */
+    viawindow = (spkey == NHKF_ESC || iflags.cmdassist);
+    prefixhandling = (spkey != NHKF_ESC);
+    /*
+     * Handling for prefix keys that don't want special directions.
+     * Delivered via pline if 'cmdassist' is off, or instead of the
+     * general message if it's on.
+     */
+    dothat = "do that";
+    how = " at"; /* for "<action> at yourself"; not used for up/down */
+    switch (spkey) {
+    case NHKF_NOPICKUP:
+        dothat = "move";
+        break;
+    case NHKF_RUSH:
+        dothat = "rush";
+        break;
+    case NHKF_RUN2:
+        if (!Cmd.num_pad)
+            break; /* else FALLTHRU */
+    case NHKF_RUN:
+    case NHKF_RUN_NOPICKUP:
+        dothat = "run";
+        break;
+    case NHKF_FIGHT2:
+        if (!Cmd.num_pad)
+            break; /* else FALLTHRU */
+    case NHKF_FIGHT:
+        dothat = "fight";
+        how = ""; /* avoid "fight at yourself" */
+        break;
+    default:
+        prefixhandling = FALSE;
+        break;
+    }
+
+    buf[0] = '\0';
+    /* for movement prefix followed by '.' or (numpad && 's') to mean 'self';
+       note: '-' for hands (inventory form of 'self') is not handled here */
+    if (prefixhandling
+        && (sym == Cmd.spkeys[NHKF_GETDIR_SELF]
+            || (Cmd.num_pad && sym == Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
+        Sprintf(buf, "You can't %s%s yourself.", dothat, how);
+    /* for movement prefix followed by up or down */
+    } else if (prefixhandling && (sym == '<' || sym == '>')) {
+        Sprintf(buf, "You can't %s %s.", dothat,
+                /* was "upwards" and "downwards", but they're considered
+                   to be variants of canonical "upward" and "downward" */
+                (sym == '<') ? "upward" : "downward");
+    }
+
+    /* if '!cmdassist', display via pline() and we're done (note: asking
+       for help at getdir() prompt forces cmdassist for this operation) */
+    if (!viawindow) {
+        if (prefixhandling) {
+            if (!*buf)
+                Sprintf(buf, "Invalid direction for '%s' prefix.",
+                        visctrl(Cmd.spkeys[spkey]));
+            pline("%s", buf);
+            return TRUE;
+        }
+        /* when 'cmdassist' is off and caller doesn't insist, do nothing */
+        return FALSE;
+    }
 
     win = create_nhwindow(NHW_TEXT);
     if (!win)
         return FALSE;
-    if (msg) {
+
+    if (*buf) {
+        /* show bad-prefix message instead of general invalid-direction one */
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+    } else if (msg) {
         Sprintf(buf, "cmdassist: %s", msg);
         putstr(win, 0, buf);
         putstr(win, 0, "");
     }
-    if (letter(sym) || sym == '[') { /* 'dat/cmdhelp' shows ESC as ^[ */
+
+    if (!prefixhandling && (letter(sym) || sym == '[')) {
+        /* '[': old 'cmdhelp' showed ESC as ^[ */
         sym = highc(sym); /* @A-Z[ (note: letter() accepts '@') */
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!index(wiz_only_list, sym) || wizard)) {
             Sprintf(buf, "Are you trying to use ^%c%s?", sym,
-                    index(wiz_only_list, sym)
-                        ? ""
+                    index(wiz_only_list, sym) ? ""
                         : " as specified in the Guidebook");
             putstr(win, 0, buf);
             putstr(win, 0, "");
@@ -4407,17 +4494,29 @@ const char *msg;
         }
     }
 
-    Sprintf(buf, "Valid direction keys %sare:",
-            NODIAG(u.umonnum) ? "in your current form " : "");
+    Sprintf(buf, "Valid direction keys%s%s%s are:",
+            prefixhandling ? " to " : "", prefixhandling ? dothat : "",
+            NODIAG(u.umonnum) ? " in your current form" : "");
     putstr(win, 0, buf);
-    show_direction_keys(win, NODIAG(u.umonnum));
+    show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));
 
-    putstr(win, 0, "");
-    putstr(win, 0, "          <  up");
-    putstr(win, 0, "          >  down");
-    Sprintf(buf,   "       %4s  direct at yourself",
-            visctrl(Cmd.spkeys[NHKF_GETDIR_SELF]));
-    putstr(win, 0, buf);
+    if (!prefixhandling || spkey == NHKF_NOPICKUP) {
+        /* NOPICKUP: unlike the other prefix keys, 'm' allows up/down for
+           stair traversal; we won't get here when "m<" or "m>" has been
+           given but we include up and down for 'm'+invalid_direction;
+           self is excluded as a viable direction for every prefix */
+        putstr(win, 0, "");
+        putstr(win, 0, "          <  up");
+        putstr(win, 0, "          >  down");
+        if (!prefixhandling) {
+            int selfi = Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
+
+            Sprintf(buf,   "       %4s  direct at yourself",
+                    visctrl(Cmd.spkeys[selfi]));
+            putstr(win, 0, buf);
+        }
+    }
+
     if (msg) {
         /* non-null msg means that this wasn't an explicit user request */
         putstr(win, 0, "");

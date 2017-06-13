@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1470819843 2016/08/10 09:04:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1496860757 2017/06/07 18:39:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1123,9 +1123,13 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
             else if (barehand_silver_rings == 2)
                 fmt = "Your silver rings sear %s!";
             else if (silverobj && saved_oname[0]) {
-                Sprintf(silverobjbuf, "Your %s%s %s %%s!",
+                /* guard constructed format string against '%' in
+                   saved_oname[] from xname(via cxname()) */
+                Sprintf(silverobjbuf, "Your %s%s %s",
                         strstri(saved_oname, "silver") ? "" : "silver ",
                         saved_oname, vtense(saved_oname, "sear"));
+                (void) strNsubst(silverobjbuf, "%", "%%", 0);
+                Strcat(silverobjbuf, " %s!");
                 fmt = silverobjbuf;
             } else
                 fmt = "The silver sears %s!";

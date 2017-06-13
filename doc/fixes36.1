@@ -378,6 +378,27 @@ levitation vs encumbrance message sequencing issues:  putting on boots of
 	levitation reported reduction of encumbrance before finish-wearing
 	and float-up messages, taking off such boots didn't report increase
 	of encumbrance until player took another action
+removing a blindfold with 'A' took two turns, with 'R' (and 'T') only one,
+	and could result in a crash if the blindfold was stolen during removal
+removing a blindfold and wielded weapon with 'A' could result in crash if the
+	weapon was destroyed by various methods
+cmdassist help for movement prefix followed by invalid direction was strange
+	when the direction was up, down, or self disallowed for that prefix
+poor message when shape-shifted vampire reverts to vampire if it has a name:
+	The Dracula suddenly transforms and rises as Dracula.
+poor message when shape-shifted vampire reverts if cause of 'death' was
+	disintegration or digestion and shifted form wasn't amorphous:
+	The vampire bat is disintegrated.  The vampire bat suddenly transforms
+	and rises as a vampire.  (fix: switch to existing alternate phrasing
+	used for amorphous form, "reconstitute" rather than "transform")
+poor message when named vampire shifts shape within view:
+	You observe a Dracula where a Dracula was.
+vampire shifting into fog cloud to pass under door "oozed" rather than "flowed"
+adult green dragons and the Chromatic Dragon were blinded by gas clouds
+named floating eye (when hit by another monster with reflection) or named
+	silver weapon (when hero hits silver-hating monster) could disrupt
+	message formatting and conceivably trigger crash if name had '%' in it
+crashes for 'A' above were downgraded to impossible "cursed without otmp"
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -418,6 +439,13 @@ humanoid pet could become hostile but still remain tame if it observed hero
 	attacking a peaceful creature
 minor ^X/enlightenment bugs: grammar when poly'd into '1 hit dice' critter,
 	missing punctuation for "You entered the dungeon N turns ago"
+when configured with DUMPLOG enabled, artifacts were counted twice towards
+	final score
+once Moloch's Sanctum (or Astral Plane via wizard mode level teleport direct
+	to end-game) was entered, end of game disclosure would reveal that
+	high priests had been incorrectly flagged as extinct
+attempting to name an item as an artifact and failing via hand slip violates
+	illiterate conduct
 
 
 Platform- and/or Interface-Specific Fixes
