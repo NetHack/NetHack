@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1470357737 2016/08/05 00:42:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.279 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1497481179 2017/06/14 22:59:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.287 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2585,7 +2585,7 @@ boolean tinitial, tfrom_file;
                     op = pp + 1;
                 else
                     break; /* no next token */
-            }              /* for(;;) */
+            } /* for(;;) */
         }
         return;
     }
@@ -3497,7 +3497,8 @@ char* bindings;
     }
 
     /* parse a single binding: first split around : */
-    if (! (bind = index(bindings, ':'))) return; /* it's not a binding */
+    if (! (bind = index(bindings, ':')))
+        return; /* it's not a binding */
     *bind++ = 0;
 
     /* read the key to be bound */
@@ -5335,7 +5336,8 @@ register char *opts;
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        if (!parsesymbols(op)) return FALSE;
+        if (!parsesymbols(op))
+            return FALSE;
     }
 
     /* S_sample:string */
