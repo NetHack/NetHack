@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1457572516 2016/03/10 01:15:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1497485548 2017/06/15 00:12:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -366,9 +366,11 @@ newman()
     newuhs(FALSE);
     polyman("feel like a new %s!",
             /* use saved gender we're about to revert to, not current */
-            (u.mfemale && urace.individual.f)
+            ((Upolyd ? u.mfemale : flags.female) && urace.individual.f)
                 ? urace.individual.f
-                : (urace.individual.m) ? urace.individual.m : urace.noun);
+                : (urace.individual.m)
+                   ? urace.individual.m
+                   : urace.noun);
     if (Slimed) {
         Your("body transforms, but there is still slime on you.");
         make_slimed(10L, (const char *) 0);
