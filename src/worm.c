@@ -569,6 +569,28 @@ struct monst *worm;
     }
 }
 
+void
+sanity_check_worm(worm)
+struct monst *worm;
+{
+    struct wseg *curr;
+
+    if (!worm)
+        panic("no worm!");
+    if (!worm->wormno)
+        panic("not a worm?!");
+
+    curr = wtails[worm->wormno];
+
+    while (curr != wheads[worm->wormno]) {
+        if (!isok(curr->wx, curr->wy))
+            panic("worm seg not isok");
+        if (level.monsters[curr->wx][curr->wy] != worm)
+            panic("worm not at seg location");
+        curr = curr->nseg;
+    }
+}
+
 /*
  *  remove_worm()
  *

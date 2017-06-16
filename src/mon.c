@@ -93,6 +93,8 @@ mon_sanity_check()
         else if (level.monsters[x][y] != mtmp)
             impossible("mon (%s) at <%d,%d> is not there!",
                        fmt_ptr((genericptr_t) mtmp), x, y);
+        else if (mtmp->wormno)
+            sanity_check_worm(mtmp);
     }
 
     for (x = 0; x < COLNO; x++)
