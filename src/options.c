@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1497481179 2017/06/14 22:59:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.287 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1498078876 2017/06/21 21:01:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -126,6 +126,7 @@ static struct Bool_Opt {
     { "flush", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
     { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE },
+    { "goldX", &iflags.goldX, FALSE, SET_IN_GAME },
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },

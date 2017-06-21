@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1472809075 2016/09/02 09:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1498078873 2017/06/21 21:01:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1680,7 +1680,7 @@ unsigned *resultflags;
         } else if (sym == 'a') {
             allflag = TRUE;
         } else if (sym == 'A') {
-            /* same as the default */;
+            ; /* same as the default */
         } else if (sym == 'u') {
             add_valid_menu_class('u');
             ckfn = ckunpaid;
@@ -2412,9 +2412,12 @@ int type;
     int count = 0;
 
     for (; list; list = list->nobj) {
-        /* coins are "none of the above" as far as BUCX filtering goes */
-        if (list->oclass == COIN_CLASS)
+        /* coins are either uncursed or unknown based upon option setting */
+        if (list->oclass == COIN_CLASS) {
+            if (type == (iflags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
+                ++count;
             continue;
+        }
         /* priests always know bless/curse state */
         if (Role_if(PM_PRIEST))
             list->bknown = 1;
@@ -2437,10 +2440,21 @@ tally_BUCX(list, bcp, ucp, ccp, xcp, ocp)
 struct obj *list;
 int *bcp, *ucp, *ccp, *xcp, *ocp;
 {
+    /* Future extensions:
+     *  Add parameter for list traversal by either nexthere or nobj.
+     *  Skip current_container when list is invent, uchain when
+     *  first object of list is located on the floor.  'ocp' will then
+     *  have a function again (it was a counter for having skipped gold,
+     *  but that's not skipped anymore).
+     */
     *bcp = *ucp = *ccp = *xcp = *ocp = 0;
     for (; list; list = list->nobj) {
+        /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
-            ++(*ocp); /* "other" */
+            if (iflags.goldX)
+                ++(*xcp);
+            else
+                ++(*ucp);
             continue;
         }
         /* priests always know bless/curse state */
@@ -2583,7 +2597,12 @@ struct obj *obj;
 {
     boolean res = (obj->oclass == this_type);
 
-    if (obj->oclass != COIN_CLASS) {
+    if (obj->oclass == COIN_CLASS) {
+        /* if filtering by bless/curse state, gold is classified as
+           either unknown or uncursed based on user option setting */
+        if (this_type && index("BUCX", this_type))
+            res = (this_type == (iflags.goldX ? 'X' : 'U'));
+    } else {
         switch (this_type) {
         case 'B':
             res = (obj->bknown && obj->blessed);
@@ -2651,9 +2670,9 @@ dotypeinv()
         /* collect a list of classes of objects carried, for use as a prompt
          */
         types[0] = 0;
-        class_count =
-            collect_obj_classes(types, invent, FALSE,
-                                (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
+        class_count = collect_obj_classes(types, invent, FALSE,
+                                          (boolean FDECL((*), (OBJ_P))) 0,
+                                          &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
             types[class_count++] = ' ';
         if (unpaid_count)
@@ -2733,28 +2752,32 @@ dotypeinv()
             return doprgold();
         if (index(types, c) > index(types, '\033')) {
             /* '> ESC' => hidden choice, something known not to be carried */
-            const char *which = 0;
+            const char *before = "", *after = "";
 
             switch (c) {
             case 'B':
-                which = "known to be blessed";
+                before = "known to be blessed ";
                 break;
             case 'U':
-                which = "known to be uncursed";
+                before = "known to be uncursed ";
                 break;
             case 'C':
-                which = "known to be cursed";
+                before = "known to be cursed ";
                 break;
             case 'X':
-                You(
-          "have no objects whose blessed/uncursed/cursed status is unknown.");
+                after = " whose blessed/uncursed/cursed status is unknown";
                 break; /* better phrasing is desirable */
             default:
-                which = "such";
+                /* 'c' is an object class, because we've already handled
+                   all the non-class letters which were put into 'types[]';
+                   could/should move object class names[] array from below
+                   to somewhere above so that we can access it here (via
+                   lcase(strcpy(classnamebuf, names[(int) c]))), but the
+                   game-play value of doing so is low... */
+                before = "such ";
                 break;
             }
-            if (which)
-                You("have no %s objects.", which);
+            You("have no %sobjects%s.", before, after);
             return 0;
         }
         this_type = oclass;
@@ -3368,13 +3391,11 @@ STATIC_VAR NEARDATA const char *names[] = {
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
 };
+STATIC_VAR NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
+STATIC_VAR NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
-static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
-
-static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
-
-static NEARDATA char *invbuf = (char *) 0;
-static NEARDATA unsigned invbufsiz = 0;
+STATIC_VAR NEARDATA char *invbuf = (char *) 0;
+STATIC_VAR NEARDATA unsigned invbufsiz = 0;
 
 char *
 let_to_name(let, unpaid, showsym)

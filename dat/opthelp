@@ -15,6 +15,8 @@ DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
 eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
 extmenu        use a menu for selecting extended commands (#)     [FALSE]
 fixinv         try to retain the same letter for the same object  [TRUE]
+goldX          when filtering objects by bless/curse state,       [FALSE]
+               whether to classify gold as X (unknown) or U (uncursed)
 help           print all available info when using the / command  [TRUE]
 IBMgraphics    use IBM extended characters for the dungeon        [FALSE]
 ignintr        ignore interrupt signal, including breaks          [FALSE]

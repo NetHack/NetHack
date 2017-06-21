@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1497479080 2017/06/14 22:24:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1498078871 2017/06/21 21:01:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -217,6 +217,9 @@ struct instance_flags {
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean echo;             /* 1 to echo characters */
+    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
+       breaking 3.6.[01] save files */
+    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */

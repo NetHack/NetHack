@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1470449858 2016/08/06 02:17:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1498078877 2017/06/21 21:01:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -376,9 +376,21 @@ boolean
 allow_category(obj)
 struct obj *obj;
 {
-    /* unpaid and BUC checks don't apply to coins */
+    /* For coins, if any class filter is specified, accept if coins
+     * are included regardless of whether either unpaid or BUC-status
+     * is also specified since player has explicitly requested coins.
+     * If no class filtering is specified but bless/curse state is,
+     * coins are either unknown or uncursed based on an option setting.
+     */
     if (obj->oclass == COIN_CLASS)
-        return index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
+        return class_filter
+                 ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
+                 : shop_filter /* coins are never unpaid, but check anyway */
+                    ? (obj->unpaid ? TRUE : FALSE)
+                    : bucx_filter
+                       ? (index(valid_menu_classes, iflags.goldX ? 'X' : 'U')
+                          ? TRUE : FALSE)
+                       : TRUE; /* catchall: no filters specified, so accept */
 
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -2116,6 +2128,11 @@ register struct obj *obj;
     return (current_container ? 1 : -1);
 }
 
+/* askchain() filter used by in_container();
+ * returns True if the container is intact and 'obj' isn't it, False if
+ * container is gone (magic bag explosion) or 'obj' is the container itself;
+ * also used by getobj() when picking a single item to stash
+ */
 int
 ck_bag(obj)
 struct obj *obj;
