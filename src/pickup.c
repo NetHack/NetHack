@@ -149,45 +149,54 @@ struct obj *objs;
 boolean here;
 int *menu_on_demand;
 {
-    char ilets[30], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
+    char ilets[36], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
-    boolean not_everything;
+    boolean not_everything, filtered;
     char qbuf[QBUFSZ];
     boolean m_seen;
-    int itemcount;
+    int itemcount, bcnt, ucnt, ccnt, xcnt, ocnt;
 
     oclasses[oclassct = 0] = '\0';
     *one_at_a_time = *everything = m_seen = FALSE;
+    if (menu_on_demand)
+        *menu_on_demand = 0;
     iletct = collect_obj_classes(ilets, objs, here,
                                  (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
-    if (iletct == 0) {
+    if (iletct == 0)
         return FALSE;
-    } else if (iletct == 1) {
+
+    if (iletct == 1) {
         oclasses[0] = def_char_to_objclass(ilets[0]);
         oclasses[1] = '\0';
-        if (itemcount && menu_on_demand) {
-            ilets[iletct++] = 'm';
-            *menu_on_demand = 0;
-            ilets[iletct] = '\0';
-        }
     } else { /* more than one choice available */
-        const char *where = 0;
-        char sym, oc_of_sym, *p;
-
         /* additional choices */
         ilets[iletct++] = ' ';
         ilets[iletct++] = 'a';
         ilets[iletct++] = 'A';
         ilets[iletct++] = (objs == invent ? 'i' : ':');
-        if (menu_on_demand) {
-            ilets[iletct++] = 'm';
-            *menu_on_demand = 0;
-        }
-        ilets[iletct] = '\0';
+    }
+    if (itemcount && menu_on_demand)
+        ilets[iletct++] = 'm';
+
+    tally_BUCX(objs, here, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+    if (bcnt)
+        ilets[iletct++] = 'B';
+    if (ucnt)
+        ilets[iletct++] = 'U';
+    if (ccnt)
+        ilets[iletct++] = 'C';
+    if (xcnt)
+        ilets[iletct++] = 'X';
+    ilets[iletct] = '\0';
+
+    if (iletct > 1) {
+        const char *where = 0;
+        char sym, oc_of_sym, *p;
+
     ask_again:
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
-        not_everything = FALSE;
+        not_everything = filtered = FALSE;
         Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]", action,
                 ilets);
         getlin(qbuf, inbuf);
@@ -213,6 +222,9 @@ int *menu_on_demand;
                 goto ask_again;
             } else if (sym == 'm') {
                 m_seen = TRUE;
+            } else if (index("BUCX", sym)) {
+                add_valid_menu_class(sym); /* 'B','U','C',or 'X' */
+                filtered = TRUE;
             } else {
                 oc_of_sym = def_char_to_objclass(sym);
                 if (index(ilets, sym)) {
@@ -230,9 +242,11 @@ int *menu_on_demand;
                     not_everything = TRUE;
                 }
             }
-        }
+        } /* for p:sym in inbuf */
+
         if (m_seen && menu_on_demand) {
-            *menu_on_demand = (*everything || !oclassct) ? -2 : -3;
+            *menu_on_demand = (((*everything || !oclassct) && !filtered)
+                               ? -2 : -3);
             return FALSE;
         }
         if (!oclassct && (!*everything || not_everything)) {
@@ -325,6 +339,14 @@ struct obj *obj;
 static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
 static boolean class_filter, bucx_filter, shop_filter;
 
+/* check valid_menu_classes[] for an entry; also used by askchain() */
+boolean
+menu_class_present(c)
+int c;
+{
+    return (c && index(valid_menu_classes, c)) ? TRUE : FALSE;
+}
+
 void
 add_valid_menu_class(c)
 int c;
@@ -334,7 +356,7 @@ int c;
     if (c == 0) { /* reset */
         vmc_count = 0;
         class_filter = bucx_filter = shop_filter = FALSE;
-    } else {
+    } else if (!menu_class_present(c)) {
         valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
         switch (c) {
@@ -441,7 +463,7 @@ allow_cat_no_uchain(obj)
 struct obj *obj;
 {
     if (obj != uchain
-        && ((index(valid_menu_classes,'u') && obj->unpaid)
+        && ((index(valid_menu_classes, 'u') && obj->unpaid)
             || index(valid_menu_classes, obj->oclass)))
         return TRUE;
     return FALSE;
@@ -453,8 +475,7 @@ boolean
 is_worn_by_type(otmp)
 register struct obj *otmp;
 {
-    return (boolean) (!!(otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON))
-                      && index(valid_menu_classes, otmp->oclass) != 0);
+    return (is_worn(otmp) && allow_category(otmp)) ? TRUE : FALSE;
 }
 
 /*
@@ -586,8 +607,8 @@ int what; /* should be a long */
         /* old style interface */
         int ct = 0;
         long lcount;
-        boolean all_of_a_type, selective;
-        char oclasses[MAXOCLASSES];
+        boolean all_of_a_type, selective, bycat;
+        char oclasses[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
         struct obj *obj, *obj2;
 
         oclasses[0] = '\0';   /* types to consider (empty for all) */
@@ -616,7 +637,7 @@ int what; /* should be a long */
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
                                &via_menu)) {
                 if (!via_menu)
-                    return 0;
+                    goto pickupdone;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
                 n = query_objlist("Pick up what?", objchain_p, traverse_how,
@@ -626,10 +647,14 @@ int what; /* should be a long */
                 goto menu_pickup;
             }
         }
+        bycat = (menu_class_present('B') || menu_class_present('U')
+                 || menu_class_present('C') || menu_class_present('X'));
 
         for (obj = *objchain_p; obj; obj = obj2) {
             obj2 = FOLLOW(obj, traverse_how);
-            if (!selective && oclasses[0] && !index(oclasses, obj->oclass))
+            if (bycat ? !allow_category(obj)
+                      : (!selective && oclasses[0]
+                         && !index(oclasses, obj->oclass)))
                 continue;
 
             lcount = -1L;
@@ -686,6 +711,8 @@ int what; /* should be a long */
         if (autopickup)
             check_here(n_picked > 0);
     }
+ pickupdone:
+    add_valid_menu_class(0); /* reset */
     return (n_tried > 0);
 }
 
@@ -981,6 +1008,7 @@ int how;               /* type of query */
     boolean collected_type_name;
     char invlet;
     int ccount;
+    boolean FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
     boolean do_unpaid = FALSE;
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
@@ -991,19 +1019,21 @@ int how;               /* type of query */
         return 0;
     if ((qflags & UNPAID_TYPES) && count_unpaid(olist))
         do_unpaid = TRUE;
-    if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED)) {
+    if (qflags & WORN_TYPES)
+        ofilter = is_worn;
+    if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED, ofilter)) {
         do_blessed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED)) {
+    if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED, ofilter)) {
         do_cursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED)) {
+    if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED, ofilter)) {
         do_uncursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN)) {
+    if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN, ofilter)) {
         do_buc_unknown = TRUE;
         num_buc_types++;
     }
@@ -1013,8 +1043,7 @@ int how;               /* type of query */
     if (ccount == 1 && !do_unpaid && num_buc_types <= 1
         && !(qflags & BILLED_TYPES)) {
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
-            if ((qflags & WORN_TYPES)
-                && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
+            if (ofilter && !(*ofilter)(curr))
                 continue;
             break;
         }
@@ -1045,8 +1074,7 @@ int how;               /* type of query */
         collected_type_name = FALSE;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
-                if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
+                if (ofilter && !(*ofilter)(curr))
                     continue;
                 if (!collected_type_name) {
                     any = zeroany;
@@ -1093,7 +1121,9 @@ int how;               /* type of query */
                                        : "Auto-select every item",
                  MENU_UNSELECTED);
     }
-    /* items with b/u/c/unknown if there are any */
+    /* items with b/u/c/unknown if there are any;
+       this cluster of menu entries is in alphabetical order,
+       reversing the usual sequence of 'U' and 'C' in BUCX */
     if (do_blessed) {
         invlet = 'B';
         any = zeroany;
@@ -1120,7 +1150,7 @@ int how;               /* type of query */
         any = zeroany;
         any.a_int = 'X';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items of unknown B/C/U status", MENU_UNSELECTED);
+                 "Items of unknown Bless/Curse status", MENU_UNSELECTED);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
@@ -2507,6 +2537,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                 used |= traditional_loot(FALSE);
             else
                 used |= (menu_loot(0, FALSE) > 0);
+            add_valid_menu_class(0);
         }
     }
 
@@ -2527,6 +2558,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
             used |= traditional_loot(TRUE);
         else
             used |= (menu_loot(0, TRUE) > 0);
+        add_valid_menu_class(0);
     } else if (stash_one) {
         /* put one item into container */
         if ((otmp = getobj(stashable, "stash")) != 0) {
@@ -2556,6 +2588,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                 used |= traditional_loot(FALSE);
             else
                 used |= (menu_loot(0, FALSE) > 0);
+            add_valid_menu_class(0);
         }
     }
 
@@ -2585,7 +2618,7 @@ boolean put_in;
 {
     int FDECL((*actionfunc), (OBJ_P)), FDECL((*checkfunc), (OBJ_P));
     struct obj **objlist;
-    char selection[MAXOCLASSES + 1];
+    char selection[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
     const char *action;
     boolean one_by_one, allflag;
     int used = 0, menu_on_request = 0;
@@ -2633,7 +2666,7 @@ boolean put_in;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = (ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN);
+        mflags = (ALL_TYPES | BUCX_TYPES);
         if (put_in)
             mflags |= CHOOSE_ALL;
         n = query_category(buf, put_in ? invent : current_container->cobj,

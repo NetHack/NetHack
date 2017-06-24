@@ -983,7 +983,9 @@ E void NDECL(reassign);
 E int NDECL(doorganize);
 E void NDECL(free_pickinv_cache);
 E int FDECL(count_unpaid, (struct obj *));
-E int FDECL(count_buc, (struct obj *, int));
+E int FDECL(count_buc, (struct obj *, int, boolean (*)(OBJ_P)));
+E void FDECL(tally_BUCX, (struct obj *, BOOLEAN_P,
+                          int *, int *, int *, int *, int *));
 E long FDECL(count_contents, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(carry_obj_effects, (struct obj *));
 E const char *FDECL(currency, (long));
@@ -1780,6 +1782,7 @@ E void NDECL(getlock);
 E int FDECL(collect_obj_classes, (char *, struct obj *, BOOLEAN_P,
                                   boolean FDECL((*), (OBJ_P)), int *));
 E boolean FDECL(rider_corpse_revival, (struct obj *, BOOLEAN_P));
+E boolean FDECL(menu_class_present, (int));
 E void FDECL(add_valid_menu_class, (int));
 E boolean FDECL(allow_all, (struct obj *));
 E boolean FDECL(allow_category, (struct obj *));

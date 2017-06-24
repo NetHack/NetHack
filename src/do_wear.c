@@ -2541,8 +2541,9 @@ int retry;
     } else if (flags.menu_style == MENU_FULL) {
         all_worn_categories = FALSE;
         n = query_category("What type of things do you want to take off?",
-                           invent, WORN_TYPES | ALL_TYPES, &pick_list,
-                           PICK_ANY);
+                           invent, (WORN_TYPES | ALL_TYPES
+                                    | UNPAID_TYPES | BUCX_TYPES),
+                           &pick_list, PICK_ANY);
         if (!n)
             return 0;
         for (i = 0; i < n; i++) {
@@ -2553,10 +2554,17 @@ int retry;
         }
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
-        all_worn_categories = FALSE;
-        if (ggetobj("take off", select_off, 0, TRUE, (unsigned *) 0) == -2)
-            all_worn_categories = TRUE;
+        unsigned ggofeedback = 0;
+
+        i = ggetobj("take off", select_off, 0, TRUE, &ggofeedback);
+        if (ggofeedback & ALL_FINISHED)
+            return 0;
+        all_worn_categories = (i == -2);
     }
+    if (menu_class_present('u')
+        || menu_class_present('B') || menu_class_present('U')
+        || menu_class_present('C') || menu_class_present('X'))
+        all_worn_categories = FALSE;
 
     n = query_objlist("What do you want to take off?", &invent,
                       (SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT),

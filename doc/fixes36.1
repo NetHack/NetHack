@@ -400,6 +400,10 @@ named floating eye (when hit by another monster with reflection) or named
 	message formatting and conceivably trigger crash if name had '%' in it
 fix "you feel like a new man" if female human hero's polymorph attempt failed
 	while in human form (when already poly'd, "new woman" correctly shown)
+fix the 'A' command to have the 'D' command's fix for C331-1 (quirk for
+	menustyle:Combination; if user included 'a' in "which object classes?"
+	response, to operate on applicable all items, there would still be a
+	followup menu asking to choose specific items)
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -584,6 +588,10 @@ wizard-mode command #wizmakemap to recreate the current level
 'goldX' boolean option to treat gold pieces as X (vs U) during BUCX filtering
 	(should be persistent but is reset each save/restore cycle in order
 	to avoid breaking 3.6.0 save files)
+for menustyle:Traditional and Combination, support BUCX filtering for item
+	pick-up and container put-in and take-out; also for object IDing
+for menustyle:Full and Traditional and Combination, support BUCX filtering
+	for the 'A' command
 
 
 Platform- and/or Interface-Specific New Features
