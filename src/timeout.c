@@ -1530,11 +1530,17 @@ wiz_timeout_queue()
     print_queue(win, timer_base);
 
     print_prop_header = TRUE;
+    print_prop(win, "Confused", Confusion);
+    print_prop(win, "Deaf", HDeaf);
     print_prop(win, "Levitation", HLevitation);
-    print_prop(win, "Stoned", Stoned);
-    print_prop(win, "Vomiting", Vomiting);
-    print_prop(win, "Strangled", Strangled);
+    print_prop(win, "Monster detection", HDetect_monsters);
     print_prop(win, "Slimed", Slimed);
+    print_prop(win, "Slippery hands", Glib);
+    print_prop(win, "Stoned", Stoned);
+    print_prop(win, "Strangled", Strangled);
+    print_prop(win, "Stunned", Stunned);
+    print_prop(win, "Vomiting", Vomiting);
+    print_prop(win, "Wounded legs", HWounded_legs);
 
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
