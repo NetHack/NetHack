@@ -5,7 +5,11 @@
 #ifndef PROP_H
 #define PROP_H
 
-/*** What the properties are ***/
+/*** What the properties are ***
+ *
+ * note:  propertynames[] array in timeout.c must be kept in synch with these.
+ *        Property #0 is not used.
+ */
 /* Resistances to troubles */
 #define FIRE_RES 1
 #define COLD_RES 2

@@ -15,6 +15,45 @@ STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
 STATIC_DCL void FDECL(cleanup_burn, (ANY_P *, long));
 
+/* the order of these must match their numerical sequence in prop.h
+   because the property number is inferred from the array index;
+   used by wizard mode #timeout and #wizintrinsic */
+const char *const propertynames[] = {
+               "0: not used",
+/* Resistances */
+  /*  1..2  */ "fire resistance", "cold resistance",
+  /*  3..4  */ "sleep resistance", "disintegration resistance",
+  /*  5..6  */ "shock resistance", "poison resistance",
+  /*  7..8  */ "acid resistance", "stoning resistance",
+  /*  9..10 */ "drain resistance", "sickness resistance",
+  /* 11..12 */ "invulnerable", "magic resistance",
+/* Troubles */
+  /* 13..16 */ "stunned", "confused", "blinded", "deafness",
+  /* 17..20 */ "fatally sick", "petrifying", "strangling", "vomiting",
+  /* 21..22 */ "slippery fingers", "becoming slime",
+  /* 23..24 */ "hallucinating", "halluicination resistance",
+  /* 25..28 */ "fumbling", "wounded legs", "sleepy", "voracious hunger",
+/* Vision and senses */
+  /* 29..30 */ "see invisible", "telepathic",
+  /* 31..33 */ "warning", "warn:monster", "warn:undead",
+  /* 34..37 */ "searching", "clairvoyant", "infravision", "monster detection",
+/* Appearance and behavior */
+  /* 38..41 */ "adorned (+/-Cha)", "invisible", "displaced", "stealthy",
+  /* 42..43 */ "monster aggrevation", "conflict",
+/* Transportation */
+  /* 44..46 */ "jumping", "teleporting", "teleport control",
+  /* 47..49 */ "levitating", "flying", "water walking",
+  /* 50..52 */ "swimming", "magical breathing", "pass thru walls",
+/* Physical attributes */
+  /* 53..55 */ "slow digestion", "half spell damage", "half physical damage",
+  /* 56..58 */ "HP regeneration", "energy regeneration", "extra protection",
+  /* 59     */ "protection from shape changers",
+  /* 60..62 */ "polymorphing", "polymorph control", "unchanging",
+  /* 63..66 */ "fast", "reflecting", "free action", "fixed abilites",
+  /* 67     */ "life will be saved",
+               0 /* sentinel */
+};
+
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
     "You are slowing down.",            /* 5 */
@@ -57,6 +96,9 @@ stoned_dialogue()
         multi_reason = "getting stoned";
         nomovemsg = You_can_move_again; /* not unconscious */
         break;
+    case 2:
+        if ((HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
+            set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
     default:
         break;
     }
@@ -179,8 +221,9 @@ levitation_dialogue()
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
         const char *s = levi_texts[SIZE(levi_texts) - i];
         if (index(s, '%')) {
-            boolean danger = is_pool_or_lava(u.ux, u.uy)
-                && !Is_waterlevel(&u.uz);
+            boolean danger = (is_pool_or_lava(u.ux, u.uy)
+                              && !Is_waterlevel(&u.uz));
+
             pline(s, danger ? "over" : "in",
                   danger ? surface(u.ux, u.uy) : "air");
         } else
@@ -225,6 +268,8 @@ slime_dialogue()
         if (multi > 0)
             nomul(0);
     }
+    if (i == 2L && (HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
+        set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
     exercise(A_DEX, FALSE);
 }
 
@@ -1473,7 +1518,7 @@ timer_element *base;
     char buf[BUFSZ];
 
     if (!base) {
-        putstr(win, 0, "<empty>");
+        putstr(win, 0, " <empty>");
     } else {
         putstr(win, 0, "timeout  id   kind   call");
         for (curr = base; curr; curr = curr->next) {
@@ -1492,31 +1537,14 @@ timer_element *base;
     }
 }
 
-static boolean print_prop_header = TRUE;
-void
-print_prop(win, text, prop)
-winid win;
-const char *text;
-long prop;
-{
-    char buf[BUFSZ];
-    if (prop & TIMEOUT) {
-        if (print_prop_header) {
-            putstr(win, 0, "");
-            putstr(win, 0, "Properties:");
-            putstr(win, 0, "");
-            print_prop_header = FALSE;
-        }
-        Sprintf(buf, " %10s: %ld", text, (prop & TIMEOUT));
-        putstr(win, 0, buf);
-    }
-}
-
 int
 wiz_timeout_queue()
 {
     winid win;
     char buf[BUFSZ];
+    const char *propname;
+    long intrinsic;
+    int i, count, longestlen, ln;
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR)
@@ -1529,19 +1557,38 @@ wiz_timeout_queue()
     putstr(win, 0, "");
     print_queue(win, timer_base);
 
-    print_prop_header = TRUE;
-    print_prop(win, "Confused", Confusion);
-    print_prop(win, "Deaf", HDeaf);
-    print_prop(win, "Levitation", HLevitation);
-    print_prop(win, "Monster detection", HDetect_monsters);
-    print_prop(win, "Slimed", Slimed);
-    print_prop(win, "Slippery hands", Glib);
-    print_prop(win, "Stoned", Stoned);
-    print_prop(win, "Strangled", Strangled);
-    print_prop(win, "Stunned", Stunned);
-    print_prop(win, "Vomiting", Vomiting);
-    print_prop(win, "Wounded legs", HWounded_legs);
-
+    /* Timed properies:
+     * check every one; the majority can't obtain temporary timeouts in
+     * normal play but those can be forced via the #wizintrinsic command.
+     */
+    count = longestlen = 0;
+    for (i = 1; (propname = propertynames[i]) != 0; ++i) { /* [0] not used */
+        intrinsic = u.uprops[i].intrinsic;
+        if (intrinsic & TIMEOUT) {
+            ++count;
+            if ((ln = (int) strlen(propname)) > longestlen)
+                longestlen = ln;
+        }
+    }
+    putstr(win, 0, "");
+    if (!count) {
+        putstr(win, 0, "No timed properties.");
+    } else {
+        putstr(win, 0, "Timed properties:");
+        putstr(win, 0, "");
+        for (i = 1; (propname = propertynames[i]) != 0; ++i) {
+            intrinsic = u.uprops[i].intrinsic;
+            if (intrinsic & TIMEOUT) {
+                /* timeout value can be up to 16777215 (0x00ffffff) but
+                   width of 4 digits should result in values lining up
+                   almost all the time (if/when they don't, it won't
+                   look nice but the information will still be accurate) */
+                Sprintf(buf, " %*s %4ld", -longestlen, propname,
+                        (intrinsic & TIMEOUT));
+                putstr(win, 0, buf);
+            }
+        }
+    }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 
@@ -1557,6 +1604,7 @@ timer_sanity_check()
     for (curr = timer_base; curr; curr = curr->next)
         if (curr->kind == TIMER_OBJECT) {
             struct obj *obj = curr->arg.a_obj;
+
             if (obj->timed == 0) {
                 pline("timer sanity: untimed obj %s, timer %ld",
                       fmt_ptr((genericptr_t) obj), curr->tid);
