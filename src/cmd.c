@@ -621,13 +621,29 @@ wiz_identify(VOID_ARGS)
 STATIC_PTR int
 wiz_makemap(VOID_ARGS)
 {
+    /* FIXME: doesn't handle riding */
     if (wizard) {
+        struct monst *mtmp;
+
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (mtmp->isshk)
+                setpaid(mtmp);
+        if (Punished) {
+            ballrelease(FALSE);
+            unplacebc();
+        }
+        check_special_room(TRUE);
+        dmonsfree();
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
         mklev();
-        reglyph_darkroom();
         vision_reset();
         vision_full_recalc = 1;
+        cls();
         (void) safe_teleds(TRUE);
+        if (Punished) {
+            unplacebc();
+            placebc();
+        }
         docrt();
         flush_screen(1);
     }

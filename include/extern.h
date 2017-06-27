@@ -2127,6 +2127,7 @@ E void FDECL(store_savefileinfo, (int));
 
 /* ### shk.c ### */
 
+E void FDECL(setpaid, (struct monst *));
 E long FDECL(money2mon, (struct monst *, long));
 E void FDECL(money2u, (struct monst *, long));
 E void FDECL(shkgone, (struct monst *));
