@@ -266,7 +266,7 @@ static struct Comp_Opt {
     { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
-      SET_IN_FILE },
+      SET_IN_GAME },
 #endif
     { "catname", "the name of your (first) cat (e.g., catname:Tabby)",
       PL_PSIZ, DISP_IN_GAME },
@@ -2442,8 +2442,12 @@ boolean tinitial, tfrom_file;
              */
             iflags.bouldersym = (uchar) opts[0];
         }
-        if (!initial)
+        /* for 'initial', update_bouldersym() is done in initoptions_finish(),
+           after all symset options have been processed */
+        if (!initial) {
+            update_bouldersym();
             need_redraw = TRUE;
+        }
         return;
     }
 #endif
@@ -4693,7 +4697,8 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
-            Sprintf(buf, "Select %ssymbol set:", rogueflag ? "rogue level " : "");
+            Sprintf(buf, "Select %ssymbol set:",
+                    rogueflag ? "rogue level " : "");
             end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
