@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1470357737 2016/08/05 00:42:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.279 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1498078876 2017/06/21 21:01:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -126,6 +126,7 @@ static struct Bool_Opt {
     { "flush", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
     { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE },
+    { "goldX", &iflags.goldX, FALSE, SET_IN_GAME },
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },
@@ -265,7 +266,7 @@ static struct Comp_Opt {
     { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
-      SET_IN_FILE },
+      SET_IN_GAME },
 #endif
     { "catname", "the name of your (first) cat (e.g., catname:Tabby)",
       PL_PSIZ, DISP_IN_GAME },
@@ -2441,8 +2442,12 @@ boolean tinitial, tfrom_file;
              */
             iflags.bouldersym = (uchar) opts[0];
         }
-        if (!initial)
+        /* for 'initial', update_bouldersym() is done in initoptions_finish(),
+           after all symset options have been processed */
+        if (!initial) {
+            update_bouldersym();
             need_redraw = TRUE;
+        }
         return;
     }
 #endif
@@ -2585,7 +2590,7 @@ boolean tinitial, tfrom_file;
                     op = pp + 1;
                 else
                     break; /* no next token */
-            }              /* for(;;) */
+            } /* for(;;) */
         }
         return;
     }
@@ -3497,7 +3502,8 @@ char* bindings;
     }
 
     /* parse a single binding: first split around : */
-    if (! (bind = index(bindings, ':'))) return; /* it's not a binding */
+    if (! (bind = index(bindings, ':')))
+        return; /* it's not a binding */
     *bind++ = 0;
 
     /* read the key to be bound */
@@ -4691,7 +4697,8 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
-            Sprintf(buf, "Select %ssymbol set:", rogueflag ? "rogue level " : "");
+            Sprintf(buf, "Select %ssymbol set:",
+                    rogueflag ? "rogue level " : "");
             end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
@@ -5335,7 +5342,8 @@ register char *opts;
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        if (!parsesymbols(op)) return FALSE;
+        if (!parsesymbols(op))
+            return FALSE;
     }
 
     /* S_sample:string */

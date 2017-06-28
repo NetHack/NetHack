@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1461102045 2016/04/19 21:40:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1498078871 2017/06/21 21:01:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -211,33 +211,39 @@ struct instance_flags {
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
-    boolean altmeta; /* Alt-c sends ESC c rather than M-c */
+    boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
+    boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
-    boolean num_pad;          /* use numbers for movement commands */
-    boolean news;             /* print news */
+    boolean echo;             /* 1 to echo characters */
+    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
+       breaking 3.6.[01] save files */
+    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
+    boolean hilite_pile;      /* mark piles of objects with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
-    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
                                * on some non-move commands */
+    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
+    boolean news;             /* print news */
+    boolean num_pad;          /* use numbers for movement commands */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
+    boolean status_updates;   /* allow updates to bottom status lines;
+                               * disable to avoid excessive noise when using
+                               * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
-    boolean zerocomp;         /* write zero-compressed save files */
-    boolean rlecomp; /* run-length comp of levels when writing savefile */
-    uchar num_pad_mode;
-    boolean echo;             /* 1 to echo characters */
-    boolean use_menu_color;       /* use color in menus; only if wc_color */
-    boolean use_status_hilites;   /* use color in status line */
-    boolean status_updates;   /* allow updates to bottom status lines */
     boolean use_background_glyph; /* use background glyph when appropriate */
-    boolean hilite_pile;          /* mark piles of objects with a hilite */
-    boolean autodescribe;     /* autodescribe mode in getpos() */
-#if 0
+    boolean use_menu_color;   /* use color in menus; only if wc_color */
+    boolean use_status_hilites; /* use color in status line */
+    boolean zerocomp;         /* write zero-compressed save files */
+    boolean rlecomp;          /* alternative to zerocomp; run-length encoding
+                               * compression of levels when writing savefile */
+    uchar num_pad_mode;
+#if 0   /* XXXgraphics superseded by symbol sets */
     boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
     boolean  IBMgraphics;       /* use IBM extended character set */
 #ifdef MAC_GRAPHICS_ENV

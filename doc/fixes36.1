@@ -398,7 +398,12 @@ adult green dragons and the Chromatic Dragon were blinded by gas clouds
 named floating eye (when hit by another monster with reflection) or named
 	silver weapon (when hero hits silver-hating monster) could disrupt
 	message formatting and conceivably trigger crash if name had '%' in it
-crashes for 'A' above were downgraded to impossible "cursed without otmp"
+fix "you feel like a new man" if female human hero's polymorph attempt failed
+	while in human form (when already poly'd, "new woman" correctly shown)
+fix the 'A' command to have the 'D' command's fix for C331-1 (quirk for
+	menustyle:Combination; if user included 'a' in "which object classes?"
+	response, to operate on applicable all items, there would still be a
+	followup menu asking to choose specific items)
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -446,6 +451,8 @@ once Moloch's Sanctum (or Astral Plane via wizard mode level teleport direct
 	high priests had been incorrectly flagged as extinct
 attempting to name an item as an artifact and failing via hand slip violates
 	illiterate conduct
+crashes for 'A' above were downgraded to impossible "cursed without otmp"
+wizhelp: ^O is #overview in wizard mode too; #wizwhere shows dungeon layout
 
 
 Platform- and/or Interface-Specific Fixes
@@ -579,6 +586,13 @@ give feedback just before timed levitation runs out
 travel accepts 'm' (request menu) prefix
 pressing a or A when cursor positioning shows menu of "interesting" features
 wizard-mode command #wizmakemap to recreate the current level
+'goldX' boolean option to treat gold pieces as X (vs U) during BUCX filtering
+	(should be persistent but is reset each save/restore cycle in order
+	to avoid breaking 3.6.0 save files)
+for menustyle:Traditional and Combination, support BUCX filtering for item
+	pick-up and container put-in and take-out; also for object IDing
+for menustyle:Full and Traditional and Combination, support BUCX filtering
+	for the 'A' command
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1472809075 2016/09/02 09:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1498078873 2017/06/21 21:01:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,8 +25,6 @@ STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *, const char *,
                                         BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
-STATIC_DCL void FDECL(tally_BUCX, (struct obj *,
-                                   int *, int *, int *, int *, int *));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid, (struct obj *, struct obj **));
@@ -1560,7 +1558,7 @@ unsigned *resultflags;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
-    char sym, *ip, olets[MAXOCLASSES + 5], ilets[MAXOCLASSES + 5];
+    char sym, *ip, olets[MAXOCLASSES + 5], ilets[MAXOCLASSES + 10];
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
     char buf[BUFSZ], qbuf[QBUFSZ];
 
@@ -1587,22 +1585,19 @@ unsigned *resultflags;
 
     if (ident && !iletct) {
         return -1; /* no further identifications */
-    } else if (!takeoff && (unpaid || invent)) {
+    } else if (invent) {
         ilets[iletct++] = ' ';
         if (unpaid)
             ilets[iletct++] = 'u';
-        if (count_buc(invent, BUC_BLESSED))
+        if (count_buc(invent, BUC_BLESSED, ofilter))
             ilets[iletct++] = 'B';
-        if (count_buc(invent, BUC_UNCURSED))
+        if (count_buc(invent, BUC_UNCURSED, ofilter))
             ilets[iletct++] = 'U';
-        if (count_buc(invent, BUC_CURSED))
+        if (count_buc(invent, BUC_CURSED, ofilter))
             ilets[iletct++] = 'C';
-        if (count_buc(invent, BUC_UNKNOWN))
+        if (count_buc(invent, BUC_UNKNOWN, ofilter))
             ilets[iletct++] = 'X';
-        if (invent)
-            ilets[iletct++] = 'a';
-    } else if (takeoff && invent) {
-        ilets[iletct++] = ' ';
+        ilets[iletct++] = 'a';
     }
     ilets[iletct++] = 'i';
     if (!combo)
@@ -1680,21 +1675,12 @@ unsigned *resultflags;
         } else if (sym == 'a') {
             allflag = TRUE;
         } else if (sym == 'A') {
-            /* same as the default */;
+            ; /* same as the default */
         } else if (sym == 'u') {
             add_valid_menu_class('u');
             ckfn = ckunpaid;
-        } else if (sym == 'B') {
-            add_valid_menu_class('B');
-            ckfn = ckvalidcat;
-        } else if (sym == 'U') {
-            add_valid_menu_class('U');
-            ckfn = ckvalidcat;
-        } else if (sym == 'C') {
-            add_valid_menu_class('C');
-            ckfn = ckvalidcat;
-        } else if (sym == 'X') {
-            add_valid_menu_class('X');
+        } else if (index("BUCX", sym)) {
+            add_valid_menu_class(sym); /* 'B','U','C',or 'X' */
             ckfn = ckvalidcat;
         } else if (sym == 'm') {
             m_seen = TRUE;
@@ -1751,7 +1737,7 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
     struct obj *otmp, *otmpo;
     register char sym, ilet;
     register int cnt = 0, dud = 0, tmp;
-    boolean takeoff, nodot, ident, take_out, put_in, first, ininv;
+    boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
     char qbuf[QBUFSZ], qpfx[QBUFSZ];
 
     takeoff = taking_off(word);
@@ -1761,6 +1747,8 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
     nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") || ident
              || takeoff || take_out || put_in);
     ininv = (*objchn == invent);
+    bycat = (menu_class_present('B') || menu_class_present('U')
+             || menu_class_present('C') || menu_class_present('X'));
 
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
@@ -1792,6 +1780,8 @@ nextclass:
     while ((otmp = nxt_unbypassed_obj(*objchn)) != 0) {
         if (ilet == 'z')
             ilet = 'A';
+        else if (ilet == 'Z')
+            ilet = NOINVSYM; /* '#' */
         else
             ilet++;
         if (olets && *olets && otmp->oclass != *olets)
@@ -1801,6 +1791,8 @@ nextclass:
         if (ident && !not_fully_identified(otmp))
             continue;
         if (ckfn && !(*ckfn)(otmp))
+            continue;
+        if (bycat && !ckvalidcat(otmp))
             continue;
         if (!allflag) {
             safeq_xprn_ctx.let = ilet;
@@ -2405,20 +2397,27 @@ struct obj *list;
  * at some point:  bknown is forced for priest[ess], like in xname().
  */
 int
-count_buc(list, type)
+count_buc(list, type, filterfunc)
 struct obj *list;
 int type;
+boolean FDECL((*filterfunc), (OBJ_P));
 {
     int count = 0;
 
     for (; list; list = list->nobj) {
-        /* coins are "none of the above" as far as BUCX filtering goes */
-        if (list->oclass == COIN_CLASS)
-            continue;
         /* priests always know bless/curse state */
         if (Role_if(PM_PRIEST))
-            list->bknown = 1;
+            list->bknown = (list->oclass != COIN_CLASS);
+        /* some actions exclude some or most items */
+        if (filterfunc && !(*filterfunc)(list))
+            continue;
 
+        /* coins are either uncursed or unknown based upon option setting */
+        if (list->oclass == COIN_CLASS) {
+            if (type == (iflags.goldX ? BUC_UNKNOWN : BUC_UNCURSED))
+                ++count;
+            continue;
+        }
         /* check whether this object matches the requested type */
         if (!list->bknown
                 ? (type == BUC_UNKNOWN)
@@ -2432,21 +2431,32 @@ int type;
 
 /* similar to count_buc(), but tallies all states at once
    rather than looking for a specific type */
-STATIC_OVL void
-tally_BUCX(list, bcp, ucp, ccp, xcp, ocp)
+void
+tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp)
 struct obj *list;
+boolean by_nexthere;
 int *bcp, *ucp, *ccp, *xcp, *ocp;
 {
+    /* Future extensions:
+     *  Skip current_container when list is invent, uchain when
+     *  first object of list is located on the floor.  'ocp' will then
+     *  have a function again (it was a counter for having skipped gold,
+     *  but that's not skipped anymore).
+     */
     *bcp = *ucp = *ccp = *xcp = *ocp = 0;
-    for (; list; list = list->nobj) {
-        if (list->oclass == COIN_CLASS) {
-            ++(*ocp); /* "other" */
-            continue;
-        }
+    for ( ; list; list = (by_nexthere ? list->nexthere : list->nobj)) {
         /* priests always know bless/curse state */
         if (Role_if(PM_PRIEST))
-            list->bknown = 1;
-
+            list->bknown = (list->oclass != COIN_CLASS);
+        /* coins are either uncursed or unknown based upon option setting */
+        if (list->oclass == COIN_CLASS) {
+            if (iflags.goldX)
+                ++(*xcp);
+            else
+                ++(*ucp);
+            continue;
+        }
+        /* ordinary items */
         if (!list->bknown)
             ++(*xcp);
         else if (list->blessed)
@@ -2583,7 +2593,12 @@ struct obj *obj;
 {
     boolean res = (obj->oclass == this_type);
 
-    if (obj->oclass != COIN_CLASS) {
+    if (obj->oclass == COIN_CLASS) {
+        /* if filtering by bless/curse state, gold is classified as
+           either unknown or uncursed based on user option setting */
+        if (this_type && index("BUCX", this_type))
+            res = (this_type == (iflags.goldX ? 'X' : 'U'));
+    } else {
         switch (this_type) {
         case 'B':
             res = (obj->bknown && obj->blessed);
@@ -2623,7 +2638,7 @@ dotypeinv()
         return 0;
     }
     unpaid_count = count_unpaid(invent);
-    tally_BUCX(invent, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+    tally_BUCX(invent, FALSE, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
 
     if (flags.menu_style != MENU_TRADITIONAL) {
         if (flags.menu_style == MENU_FULL
@@ -2651,9 +2666,9 @@ dotypeinv()
         /* collect a list of classes of objects carried, for use as a prompt
          */
         types[0] = 0;
-        class_count =
-            collect_obj_classes(types, invent, FALSE,
-                                (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
+        class_count = collect_obj_classes(types, invent, FALSE,
+                                          (boolean FDECL((*), (OBJ_P))) 0,
+                                          &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
             types[class_count++] = ' ';
         if (unpaid_count)
@@ -2733,28 +2748,32 @@ dotypeinv()
             return doprgold();
         if (index(types, c) > index(types, '\033')) {
             /* '> ESC' => hidden choice, something known not to be carried */
-            const char *which = 0;
+            const char *before = "", *after = "";
 
             switch (c) {
             case 'B':
-                which = "known to be blessed";
+                before = "known to be blessed ";
                 break;
             case 'U':
-                which = "known to be uncursed";
+                before = "known to be uncursed ";
                 break;
             case 'C':
-                which = "known to be cursed";
+                before = "known to be cursed ";
                 break;
             case 'X':
-                You(
-          "have no objects whose blessed/uncursed/cursed status is unknown.");
+                after = " whose blessed/uncursed/cursed status is unknown";
                 break; /* better phrasing is desirable */
             default:
-                which = "such";
+                /* 'c' is an object class, because we've already handled
+                   all the non-class letters which were put into 'types[]';
+                   could/should move object class names[] array from below
+                   to somewhere above so that we can access it here (via
+                   lcase(strcpy(classnamebuf, names[(int) c]))), but the
+                   game-play value of doing so is low... */
+                before = "such ";
                 break;
             }
-            if (which)
-                You("have no %s objects.", which);
+            You("have no %sobjects%s.", before, after);
             return 0;
         }
         this_type = oclass;
@@ -3368,13 +3387,11 @@ STATIC_VAR NEARDATA const char *names[] = {
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
 };
+STATIC_VAR NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
+STATIC_VAR NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
-static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
-
-static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
-
-static NEARDATA char *invbuf = (char *) 0;
-static NEARDATA unsigned invbufsiz = 0;
+STATIC_VAR NEARDATA char *invbuf = (char *) 0;
+STATIC_VAR NEARDATA unsigned invbufsiz = 0;
 
 char *
 let_to_name(let, unpaid, showsym)

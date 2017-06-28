@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.203 $ $NHDT-Date: 1456192371 2016/02/23 01:52:51 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ $NHDT-Date: 1498078870 2017/06/21 21:01:10 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -2507,6 +2507,14 @@ The default is to randomly pick an appropriate gender.
 If you prefix the value with `!' or ``no'', you will
 exclude that gender from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
+.lp "goldX   "
+When filtering objects based on bless/curse state (BUCX), whether to
+treat gold pieces as X (unknown bless/curse state, when `on')
+or U (known to be uncursed, when `off', the default).
+Gold is never blessed or cursed, but it is not described as ``uncursed''
+even when the
+.op implicit_uncursed
+option is `off'.
 .lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
