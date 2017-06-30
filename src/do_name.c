@@ -1880,7 +1880,7 @@ static const char *const sir_Terry_novels[] = {
     "Lords and Ladies", "Men at Arms", "Soul Music", "Interesting Times",
     "Maskerade", "Feet of Clay", "Hogfather", "Jingo", "The Last Continent",
     "Carpe Jugulum", "The Fifth Elephant", "The Truth", "Thief of Time",
-    "The Last Hero", "The Amazing Maurice and his Educated Rodents",
+    "The Last Hero", "The Amazing Maurice and His Educated Rodents",
     "Night Watch", "The Wee Free Men", "Monstrous Regiment",
     "A Hat Full of Sky", "Going Postal", "Thud!", "Wintersmith",
     "Making Money", "Unseen Academicals", "I Shall Wear Midnight", "Snuff",
