@@ -15,43 +15,83 @@ STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
 STATIC_DCL void FDECL(cleanup_burn, (ANY_P *, long));
 
-/* the order of these must match their numerical sequence in prop.h
-   because the property number is inferred from the array index;
-   used by wizard mode #timeout and #wizintrinsic */
-const char *const propertynames[] = {
-               "0: not used",
-/* Resistances */
-  /*  1..2  */ "fire resistance", "cold resistance",
-  /*  3..4  */ "sleep resistance", "disintegration resistance",
-  /*  5..6  */ "shock resistance", "poison resistance",
-  /*  7..8  */ "acid resistance", "stoning resistance",
-  /*  9..10 */ "drain resistance", "sickness resistance",
-  /* 11..12 */ "invulnerable", "magic resistance",
-/* Troubles */
-  /* 13..16 */ "stunned", "confused", "blinded", "deafness",
-  /* 17..20 */ "fatally sick", "petrifying", "strangling", "vomiting",
-  /* 21..22 */ "slippery fingers", "becoming slime",
-  /* 23..24 */ "hallucinating", "halluicination resistance",
-  /* 25..28 */ "fumbling", "wounded legs", "sleepy", "voracious hunger",
-/* Vision and senses */
-  /* 29..30 */ "see invisible", "telepathic",
-  /* 31..33 */ "warning", "warn:monster", "warn:undead",
-  /* 34..37 */ "searching", "clairvoyant", "infravision", "monster detection",
-/* Appearance and behavior */
-  /* 38..41 */ "adorned (+/-Cha)", "invisible", "displaced", "stealthy",
-  /* 42..43 */ "monster aggrevation", "conflict",
-/* Transportation */
-  /* 44..46 */ "jumping", "teleporting", "teleport control",
-  /* 47..49 */ "levitating", "flying", "water walking",
-  /* 50..52 */ "swimming", "magical breathing", "pass thru walls",
-/* Physical attributes */
-  /* 53..55 */ "slow digestion", "half spell damage", "half physical damage",
-  /* 56..58 */ "HP regeneration", "energy regeneration", "extra protection",
-  /* 59     */ "protection from shape changers",
-  /* 60..62 */ "polymorphing", "polymorph control", "unchanging",
-  /* 63..66 */ "fast", "reflecting", "free action", "fixed abilites",
-  /* 67     */ "life will be saved",
-               0 /* sentinel */
+/* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
+   for timeout countdown, where most won't occur in normal play */
+const struct propname {
+    int prop_num;
+    const char *prop_name;
+} propertynames[] = {
+    { INVULNERABLE, "invulnerable" },
+    { STONED, "petrifying" },
+    { SLIMED, "becoming slime" },
+    { STRANGLED, "strangling" },
+    { SICK, "fatally sick" },
+    { STUNNED, "stunned" },
+    { CONFUSION, "confused" },
+    { HALLUC, "hallucinating" },
+    { BLINDED, "blinded" },
+    { DEAF, "deafness" },
+    { VOMITING, "vomiting" },
+    { GLIB, "slippery fingers" },
+    { WOUNDED_LEGS, "wounded legs" },
+    { SLEEPY, "sleepy" },
+    { TELEPORT, "teleporting" },
+    { POLYMORPH, "polymorphing" },
+    { LEVITATION, "levitating" },
+    { FAST, "very fast" }, /* timed 'FAST' is very fast */
+    { CLAIRVOYANT, "clairvoyant" },
+    { DETECT_MONSTERS, "monster detection" },
+    { SEE_INVIS, "see invisible" },
+    { INVIS, "invisible" },
+    /* properties beyond here don't have timed values during normal play,
+       so there's no much point in trying to order them sensibly;
+       they're either on or off based on equipment, role, actions, &c */
+    { FIRE_RES, "fire resistance" },
+    { COLD_RES, "cold resistance" },
+    { SLEEP_RES, "sleep resistance" },
+    { DISINT_RES, "disintegration resistance" },
+    { SHOCK_RES, "shock resistance" },
+    { POISON_RES, "poison resistance" },
+    { ACID_RES, "acid resistance" },
+    { STONE_RES, "stoning resistance" },
+    { DRAIN_RES, "drain resistance" },
+    { SICK_RES, "sickness resistance" },
+    { ANTIMAGIC, "magic resistance" },
+    { HALLUC_RES, "hallucination resistance" },
+    { FUMBLING, "fumbling" },
+    { HUNGER, "voracious hunger" },
+    { TELEPAT, "telepathic" },
+    { WARNING, "warning" },
+    { WARN_OF_MON, "warn: monster type or class" },
+    { WARN_UNDEAD, "warn: undead" },
+    { SEARCHING, "searching" },
+    { INFRAVISION, "infravision" },
+    { ADORNED, "adorned (+/- Cha)" },
+    { DISPLACED, "displaced" },
+    { STEALTH, "stealthy" },
+    { AGGRAVATE_MONSTER, "monster aggravation" },
+    { CONFLICT, "conflict" },
+    { JUMPING, "jumping" },
+    { TELEPORT_CONTROL, "teleport control" },
+    { FLYING, "flying" },
+    { WWALKING, "water walking" },
+    { SWIMMING, "swimming" },
+    { MAGICAL_BREATHING, "magical breathing" },
+    { PASSES_WALLS, "pass thru walls" },
+    { SLOW_DIGESTION, "slow digestion" },
+    { HALF_SPDAM, "half spell damage" },
+    { HALF_PHDAM, "half physical damage" },
+    { REGENERATION, "HP regeneration" },
+    { ENERGY_REGENERATION, "energy regeneration" },
+    { PROTECTION, "extra protection" },
+    { PROT_FROM_SHAPE_CHANGERS, "protection from shape changers" },
+    { POLYMORPH_CONTROL, "polymorph control" },
+    { UNCHANGING, "unchanging" },
+    { REFLECTING, "reflecting" },
+    { FREE_ACTION, "free action" },
+    { FIXED_ABIL, "fixed abilites" },
+    { LIFESAVED, "life will be saved" },
+    {  0, 0 },
 };
 
 /* He is being petrified - dialogue by inmet!tower */
@@ -1544,7 +1584,7 @@ wiz_timeout_queue()
     char buf[BUFSZ];
     const char *propname;
     long intrinsic;
-    int i, count, longestlen, ln;
+    int i, p, count, longestlen, ln, specindx = 0;
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR)
@@ -1562,13 +1602,16 @@ wiz_timeout_queue()
      * normal play but those can be forced via the #wizintrinsic command.
      */
     count = longestlen = 0;
-    for (i = 1; (propname = propertynames[i]) != 0; ++i) { /* [0] not used */
-        intrinsic = u.uprops[i].intrinsic;
+    for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+        p = propertynames[i].prop_num;
+        intrinsic = u.uprops[p].intrinsic;
         if (intrinsic & TIMEOUT) {
             ++count;
             if ((ln = (int) strlen(propname)) > longestlen)
                 longestlen = ln;
         }
+        if (specindx == 0 && p == FIRE_RES)
+            specindx = i;
     }
     putstr(win, 0, "");
     if (!count) {
@@ -1576,9 +1619,14 @@ wiz_timeout_queue()
     } else {
         putstr(win, 0, "Timed properties:");
         putstr(win, 0, "");
-        for (i = 1; (propname = propertynames[i]) != 0; ++i) {
-            intrinsic = u.uprops[i].intrinsic;
+        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+            p = propertynames[i].prop_num;
+            intrinsic = u.uprops[p].intrinsic;
             if (intrinsic & TIMEOUT) {
+                if (specindx > 0 && i >= specindx) {
+                    putstr(win, 0, " -- settable via #wizinstrinc only --");
+                    specindx = 0;
+                }
                 /* timeout value can be up to 16777215 (0x00ffffff) but
                    width of 4 digits should result in values lining up
                    almost all the time (if/when they don't, it won't

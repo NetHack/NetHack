@@ -135,6 +135,7 @@ STATIC_PTR int NDECL(wiz_level_change);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
+STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
 STATIC_DCL void NDECL(wiz_map_levltyp);
@@ -1157,29 +1158,37 @@ STATIC_PTR int
 wiz_intrinsic(VOID_ARGS)
 {
     if (wizard) {
-        extern const char *const propertynames[]; /* timeout.c */
+        extern const struct propname {
+            int prop_num;
+            const char *prop_name;
+        } propertynames[]; /* timeout.c */
         static const char wizintrinsic[] = "#wizintrinsic";
         static const char fmt[] = "You are%s %s.";
         winid win;
         anything any;
         char buf[BUFSZ];
-        int i, n, p, amt, typ;
+        int i, j, n, p, amt, typ;
         long oldtimeout, newtimeout;
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
 
+        any = zeroany;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-
-        for (i = 1; (propname = propertynames[i]) != 0; ++i) {
-            if (i == HALLUC_RES) {
+        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+            p = propertynames[i].prop_num;
+            if (p == HALLUC_RES) {
                 /* Grayswandir vs hallucination; ought to be redone to
                    use u.uprops[HALLUC].blocked instead of being treated
                    as a separate property; letting in be manually toggled
                    even only in wizard mode would be asking for trouble... */
                 continue;
             }
-            any.a_int = i;
+            if (p == FIRE_RES) {
+                any.a_int = 0;
+                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--", FALSE);
+            }
+            any.a_int = i + 1; /* +1: avoid 0 */
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, propname, FALSE);
         }
         end_menu(win, "Which intrinsics?");
@@ -1187,8 +1196,9 @@ wiz_intrinsic(VOID_ARGS)
         destroy_nhwindow(win);
 
         amt = 30; /* TODO: prompt for duration */
-        for (i = 0; i < n; ++i) {
-            p = pick_list[i].item.a_int;
+        for (j = 0; j < n; ++j) {
+            i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
+            p = propertynames[i].prop_num;
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
             newtimeout = oldtimeout + (long) amt;
             switch (p) {
@@ -1204,9 +1214,12 @@ wiz_intrinsic(VOID_ARGS)
             case BLINDED:
                 make_blinded(newtimeout, TRUE);
                 break;
+#if 0       /* make_confused() only gives feedback when confusion is
+             * ending so use the 'default' case for it instead */
             case CONFUSION:
                 make_confused(newtimeout, TRUE);
                 break;
+#endif /*0*/
             case DEAF:
                 make_deaf(newtimeout, TRUE);
                 break;
@@ -1236,7 +1249,7 @@ wiz_intrinsic(VOID_ARGS)
                 pline1(buf);
                 break;
             default:
-                pline("Timeout for %s %s %d.", propertynames[p],
+                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
                 incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
