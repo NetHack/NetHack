@@ -177,6 +177,8 @@ int *menu_on_demand;
     }
     if (itemcount && menu_on_demand)
         ilets[iletct++] = 'm';
+    if (count_unpaid(objs))
+        ilets[iletct++] = 'u';
 
     tally_BUCX(objs, here, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
     if (bcnt)
@@ -222,8 +224,8 @@ int *menu_on_demand;
                 goto ask_again;
             } else if (sym == 'm') {
                 m_seen = TRUE;
-            } else if (index("BUCX", sym)) {
-                add_valid_menu_class(sym); /* 'B','U','C',or 'X' */
+            } else if (index("uBUCX", sym)) {
+                add_valid_menu_class(sym); /* 'u' or 'B','U','C',or 'X' */
                 filtered = TRUE;
             } else {
                 oc_of_sym = def_char_to_objclass(sym);
@@ -2666,7 +2668,7 @@ boolean put_in;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = (ALL_TYPES | BUCX_TYPES);
+        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES);
         if (put_in)
             mflags |= CHOOSE_ALL;
         n = query_category(buf, put_in ? invent : current_container->cobj,
