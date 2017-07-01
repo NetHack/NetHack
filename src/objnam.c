@@ -2010,10 +2010,14 @@ char *str;
     return 0;
 }
 
-/* Plural routine; chiefly used for user-defined fruits.  We have to try to
- * account for everything reasonable the player has; something unreasonable
- * can still break the code.  However, it's still a lot more accurate than
- * "just add an s at the end", which Rogue uses...
+/* Plural routine; once upon a time it may have been chiefly used for
+ * user-defined fruits, but it is now used extensively throughout the
+ * program.
+ *
+ * For fruit, we have to try to account for everything reasonable the
+ * player has; something unreasonable can still break the code.
+ * However, it's still a lot more accurate than "just add an 's' at the
+ * end", which Rogue uses...
  *
  * Also used for plural monster names ("Wiped out all homunculi." or the
  * vanquished monsters list) and body parts.  A lot of unique monsters have
@@ -2847,9 +2851,14 @@ struct obj *no_wish;
         if (!strstri(bp, "wand ") && !strstri(bp, "spellbook ")
             && !strstri(bp, "finger ")) {
             if ((p = strstri(bp, "tin of ")) != 0) {
-                tmp = tin_variety_txt(p + 7, &tinv);
-                tvariety = tinv;
-                mntmp = name_to_mon(p + 7 + tmp);
+                if (!strcmpi(p + 7, "spinach")) {
+                    contents = SPINACH;
+                    mntmp = NON_PM;
+                } else {
+                    tmp = tin_variety_txt(p + 7, &tinv);
+                    tvariety = tinv;
+                    mntmp = name_to_mon(p + 7 + tmp);
+                }
                 typ = TIN;
                 goto typfnd;
             } else if ((p = strstri(bp, " of ")) != 0
@@ -2858,35 +2867,32 @@ struct obj *no_wish;
         }
     }
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
-    if (strncmpi(bp, "samurai sword", 13))   /* not the "samurai" monster! */
-        if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
-            if (strncmpi(bp, "ninja-to", 8)) /* not the "ninja" rank */
-                if (strncmpi(bp, "master key",
-                             10)) /* not the "master" rank */
-                    if (strncmpi(bp, "magenta", 7)) /* not the "mage" rank */
-                        if (mntmp < LOW_PM && strlen(bp) > 2
-                            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
-                            int mntmptoo,
-                                mntmplen; /* double check for rank title */
-                            char *obp = bp;
-                            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
-                            bp += mntmp != mntmptoo
-                                      ? (int) strlen(mons[mntmp].mname)
+    if (strncmpi(bp, "samurai sword", 13)  /* not the "samurai" monster! */
+        && strncmpi(bp, "wizard lock", 11) /* not the "wizard" monster! */
+        && strncmpi(bp, "ninja-to", 8)     /* not the "ninja" rank */
+        && strncmpi(bp, "master key", 10)  /* not the "master" rank */
+        && strncmpi(bp, "magenta", 7)) {   /* not the "mage" rank */
+        if (mntmp < LOW_PM && strlen(bp) > 2
+            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
+            int mntmptoo, mntmplen; /* double check for rank title */
+            char *obp = bp;
+
+            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
+            bp += (mntmp != mntmptoo) ? (int) strlen(mons[mntmp].mname)
                                       : mntmplen;
-                            if (*bp == ' ')
-                                bp++;
-                            else if (!strncmpi(bp, "s ", 2))
-                                bp += 2;
-                            else if (!strncmpi(bp, "es ", 3))
-                                bp += 3;
-                            else if (!*bp && !actualn && !dn && !un
-                                     && !oclass) {
-                                /* no referent; they don't really mean a
-                                 * monster type */
-                                bp = obp;
-                                mntmp = NON_PM;
-                            }
-                        }
+            if (*bp == ' ') {
+                bp++;
+            } else if (!strncmpi(bp, "s ", 2)) {
+                bp += 2;
+            } else if (!strncmpi(bp, "es ", 3)) {
+                bp += 3;
+            } else if (!*bp && !actualn && !dn && !un && !oclass) {
+                /* no referent; they don't really mean a monster type */
+                bp = obp;
+                mntmp = NON_PM;
+            }
+        }
+    }
 
     /* first change to singular if necessary */
     if (*bp) {
@@ -2952,7 +2958,8 @@ struct obj *no_wish;
      * gold/money concept.  Maybe we want to add other monetary units as
      * well in the future. (TH)
      */
-    if (!BSTRCMPI(bp, p - 10, "gold piece") || !BSTRCMPI(bp, p - 7, "zorkmid")
+    if (!BSTRCMPI(bp, p - 10, "gold piece")
+        || !BSTRCMPI(bp, p - 7, "zorkmid")
         || !strcmpi(bp, "gold") || !strcmpi(bp, "money")
         || !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
         if (cnt > 5000 && !wizard)
@@ -2975,15 +2982,19 @@ struct obj *no_wish;
 
     /* Search for class names: XXXXX potion, scroll of XXXXX.  Avoid */
     /* false hits on, e.g., rings for "ring mail". */
-    if (strncmpi(bp, "enchant ", 8) && strncmpi(bp, "destroy ", 8)
+    if (strncmpi(bp, "enchant ", 8)
+        && strncmpi(bp, "destroy ", 8)
         && strncmpi(bp, "detect food", 11)
-        && strncmpi(bp, "food detection", 14) && strncmpi(bp, "ring mail", 9)
+        && strncmpi(bp, "food detection", 14)
+        && strncmpi(bp, "ring mail", 9)
         && strncmpi(bp, "studded leather armor", 21)
         && strncmpi(bp, "leather armor", 13)
-        && strncmpi(bp, "tooled horn", 11) && strncmpi(bp, "food ration", 11)
+        && strncmpi(bp, "tooled horn", 11)
+        && strncmpi(bp, "food ration", 11)
         && strncmpi(bp, "meat ring", 9))
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
+
             if (!strncmpi(bp, wrp[i], j)) {
                 oclass = wrpsym[i];
                 if (oclass != AMULET_CLASS) {
@@ -3099,10 +3110,16 @@ srch:
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
 
-            if ((zn = OBJ_NAME(objects[i])) && !strcmpi(actualn, zn)) {
+            if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(actualn, zn)) {
                 typ = i;
                 goto typfnd;
             }
+        }
+        /* "tin of foo" would be caught above, but plain "tin" has
+           a random chance of yielding "tin wand" unless we do this */
+        if (!strcmpi(actualn, "tin")) {
+            typ = TIN;
+            goto typfnd;
         }
     }
 
