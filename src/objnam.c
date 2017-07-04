@@ -90,8 +90,12 @@ releaseobuf(bufp)
 char *bufp;
 {
     /* caller may not know whether bufp is the most recently allocated
-       buffer; if it isn't, do nothing */
-    if (bufp == obufs[obufidx])
+       buffer; if it isn't, do nothing; note that because of the somewhat
+       obscure PREFIX handling for object name formatting by xname(),
+       the pointer our caller has and is passing to us might be into the
+       middle of an obuf rather than the address returned by nextobuf() */
+    if (bufp >= obufs[obufidx]
+        && bufp < obufs[obufidx] + sizeof obufs[obufidx]) /* obufs[][BUFSZ] */
         obufidx = (obufidx - 1 + NUMOBUF) % NUMOBUF;
 }
 
@@ -100,11 +104,11 @@ obj_typename(otyp)
 register int otyp;
 {
     char *buf = nextobuf();
-    register struct objclass *ocl = &objects[otyp];
-    register const char *actualn = OBJ_NAME(*ocl);
-    register const char *dn = OBJ_DESCR(*ocl);
-    register const char *un = ocl->oc_uname;
-    register int nn = ocl->oc_name_known;
+    struct objclass *ocl = &objects[otyp];
+    const char *actualn = OBJ_NAME(*ocl);
+    const char *dn = OBJ_DESCR(*ocl);
+    const char *un = ocl->oc_uname;
+    int nn = ocl->oc_name_known;
 
     if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
         actualn = Japanese_item_name(otyp);
