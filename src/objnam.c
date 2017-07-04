@@ -251,6 +251,135 @@ boolean juice; /* whether or not to append " juice" to the name */
     return buf;
 }
 
+/* look up a named fruit by index (1..127) */
+struct fruit *
+fruit_from_indx(indx)
+int indx;
+{
+    struct fruit *f;
+
+    for (f = ffruit; f; f = f->nextf)
+        if (f->fid == indx)
+            break;
+    return f;
+}
+
+/* look up a named fruit by name */
+struct fruit *
+fruit_from_name(fname, exact, highest_fid)
+const char *fname;
+boolean exact; /* False => prefix or exact match, True = exact match only */
+int *highest_fid; /* optional output; only valid if 'fname' isn't found */
+{
+    struct fruit *f, *tentativef;
+    char *altfname;
+    unsigned k;
+    /*
+     * note: named fruits are case-senstive...
+     */
+
+    if (highest_fid)
+        *highest_fid = 0;
+    /* first try for an exact match */
+    for (f = ffruit; f; f = f->nextf)
+        if (!strcmp(f->fname, fname))
+            return f;
+        else if (highest_fid && f->fid > *highest_fid)
+            *highest_fid = f->fid;
+
+    /* didn't match as-is; if caller is willing to accept a prefix
+       match, try to find one; we want to find the longest prefix that
+       matches, not the first */
+    if (!exact) {
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            if (!strncmp(f->fname, fname, k)
+                && (!fname[k] || fname[k] == ' ')
+                && (!tentativef || k > strlen(tentativef->fname)))
+                tentativef = f;
+        }
+        f = tentativef;
+    }
+    /* if we still don't have a match, try singularizing the target;
+       for exact match, that's trivial, but for prefix, it's hard */
+    if (!f) {
+        altfname = makesingular(fname);
+        for (f = ffruit; f; f = f->nextf) {
+            if (!strcmp(f->fname, altfname))
+                break;
+        }
+        releaseobuf(altfname);
+    }
+    if (!f && !exact) {
+        char fnamebuf[BUFSZ], *p;
+        unsigned fname_k = strlen(fname); /* length of assumed plural fname */
+
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            /* reload fnamebuf[] each iteration in case it gets modified;
+               there's no need to recalculate fname_k */
+            Strcpy(fnamebuf, fname);
+            /* bug? if singular of fname is longer than plural,
+               failing the 'fname_k > k' test could skip a viable
+               candidate; unfortunately, we can't singularize until
+               after stripping off trailing stuff and we can't get
+               accurate fname_k until fname has been singularized;
+               compromise and use 'fname_k >= k' instead of '>',
+               accepting 1 char length discrepancy without risking
+               false match (I hope...) */
+            if (fname_k >= k && (p = index(&fnamebuf[k], ' ')) != 0) {
+                *p = '\0'; /* truncate at 1st space past length of f->fname */
+                altfname = makesingular(fnamebuf);
+                k = strlen(altfname); /* actually revised 'fname_k' */
+                if (!strcmp(f->fname, altfname)
+                    && (!tentativef || k > strlen(tentativef->fname)))
+                    tentativef = f;
+                releaseobuf(altfname); /* avoid churning through all obufs */
+            }
+        }
+        f = tentativef;
+    }
+    return f;
+}
+
+/* sort the named-fruit linked list by fruit index number */
+void
+reorder_fruit(forward)
+boolean forward;
+{
+    struct fruit *f, *allfr[1 + 127];
+    int i, j, k = SIZE(allfr);
+
+    for (i = 0; i < k; ++i)
+        allfr[i] = (struct fruit *) 0;
+    for (f = ffruit; f; f = f->nextf) {
+        /* without sanity checking, this would reduce to 'allfr[f->fid]=f' */
+        j = f->fid;
+        if (j < 1 || j >= k) {
+            impossible("reorder_fruit: fruit index (%d) out of range", j);
+            return; /* don't sort after all; should never happen... */
+        } else if (allfr[j]) {
+            impossible("reorder_fruit: duplicate fruit index (%d)", j);
+            return;
+        }
+        allfr[j] = f;
+    }
+    ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
+    /* slot [0] will always be empty; must start 'i' at 1 to avoid
+       [k - i] being out of bounds during first iteration */
+    for (i = 1; i < k; ++i) {
+        /* for forward ordering, go through indices from high to low;
+           for backward ordering, go from low to high */
+        j = forward ? (k - i) : i;
+        if (allfr[j]) {
+            allfr[j]->nextf = ffruit;
+            ffruit = allfr[j];
+        }
+    }
+}
+
 char *
 xname(obj)
 struct obj *obj;
@@ -388,23 +517,20 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         break;
     case FOOD_CLASS:
         if (typ == SLIME_MOLD) {
-            register struct fruit *f;
+            struct fruit *f = fruit_from_indx(obj->spe);
 
-            for (f = ffruit; f; f = f->nextf) {
-                if (f->fid == obj->spe) {
-                    Strcpy(buf, f->fname);
-                    break;
-                }
-            }
             if (!f) {
                 impossible("Bad fruit #%d?", obj->spe);
                 Strcpy(buf, "fruit");
-            } else if (pluralize) {
-                /* ick; already pluralized fruit names
-                   are allowed--we want to try to avoid
-                   adding a redundant plural suffix */
-                Strcpy(buf, makeplural(makesingular(buf)));
-                pluralize = FALSE;
+            } else {
+                Strcpy(buf, f->fname);
+                if (pluralize) {
+                    /* ick; already pluralized fruit names
+                       are allowed--we want to try to avoid
+                       adding a redundant plural suffix */
+                    Strcpy(buf, makeplural(makesingular(buf)));
+                    pluralize = FALSE;
+                }
             }
             break;
         }
