@@ -1623,7 +1623,10 @@ const char *str;
         buf[0] = lowc(*str);
         Strcpy(&buf[1], str + 1);
         return buf;
-    } else if (*str < 'A' || *str > 'Z') {
+    } else if (*str < 'A' || *str > 'Z'
+               /* treat named fruit as not a proper name, even if player
+                  has assigned a capitalized proper name as his/her fruit */
+               || fruit_from_name(str, TRUE, (int *) 0)) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
     } else {
