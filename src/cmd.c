@@ -135,6 +135,7 @@ STATIC_PTR int NDECL(wiz_level_change);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
+STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
 STATIC_DCL void NDECL(wiz_map_levltyp);
@@ -621,13 +622,29 @@ wiz_identify(VOID_ARGS)
 STATIC_PTR int
 wiz_makemap(VOID_ARGS)
 {
+    /* FIXME: doesn't handle riding */
     if (wizard) {
+        struct monst *mtmp;
+
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (mtmp->isshk)
+                setpaid(mtmp);
+        if (Punished) {
+            ballrelease(FALSE);
+            unplacebc();
+        }
+        check_special_room(TRUE);
+        dmonsfree();
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
         mklev();
-        reglyph_darkroom();
         vision_reset();
         vision_full_recalc = 1;
+        cls();
         (void) safe_teleds(TRUE);
+        if (Punished) {
+            unplacebc();
+            placebc();
+        }
         docrt();
         flush_screen(1);
     }
@@ -1141,41 +1158,106 @@ STATIC_PTR int
 wiz_intrinsic(VOID_ARGS)
 {
     if (wizard) {
+        extern const struct propname {
+            int prop_num;
+            const char *prop_name;
+        } propertynames[]; /* timeout.c */
+        static const char wizintrinsic[] = "#wizintrinsic";
+        static const char fmt[] = "You are%s %s.";
         winid win;
         anything any;
-        int i, n, accelerator;
+        char buf[BUFSZ];
+        int i, j, n, p, amt, typ;
+        long oldtimeout, newtimeout;
+        const char *propname;
         menu_item *pick_list = (menu_item *) 0;
 
-        static const char *const intrinsics[] = {
-            "deafness",
-        };
-
+        any = zeroany;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        accelerator = 0;
-
-        for (i = 0; i < SIZE(intrinsics); ++i) {
-            accelerator = intrinsics[i][0];
-            any.a_int = i + 1;
-            add_menu(win, NO_GLYPH, &any, accelerator, 0,
-                     ATR_NONE, intrinsics[i], FALSE);
+        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+            p = propertynames[i].prop_num;
+            if (p == HALLUC_RES) {
+                /* Grayswandir vs hallucination; ought to be redone to
+                   use u.uprops[HALLUC].blocked instead of being treated
+                   as a separate property; letting in be manually toggled
+                   even only in wizard mode would be asking for trouble... */
+                continue;
+            }
+            if (p == FIRE_RES) {
+                any.a_int = 0;
+                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--", FALSE);
+            }
+            any.a_int = i + 1; /* +1: avoid 0 */
+            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, propname, FALSE);
         }
-        end_menu(win, "Which intrinsic?");
-        n = select_menu(win, PICK_ONE, &pick_list);
+        end_menu(win, "Which intrinsics?");
+        n = select_menu(win, PICK_ANY, &pick_list);
         destroy_nhwindow(win);
 
-        if (n >= 1) {
-            i = pick_list[0].item.a_int-1;
-            free((genericptr_t) pick_list);
-        } else {
-            return 0;
-        }
+        amt = 30; /* TODO: prompt for duration */
+        for (j = 0; j < n; ++j) {
+            i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
+            p = propertynames[i].prop_num;
+            oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
+            newtimeout = oldtimeout + (long) amt;
+            switch (p) {
+            case SICK:
+            case SLIMED:
+            case STONED:
+                if (oldtimeout > 0L && newtimeout > oldtimeout)
+                    newtimeout = oldtimeout;
+                break;
+            }
 
-        if (!strcmp(intrinsics[i], "deafness")) {
-            You("go deaf.");
-            incr_itimeout(&HDeaf, 30);
-            context.botl = TRUE;
+            switch (p) {
+            case BLINDED:
+                make_blinded(newtimeout, TRUE);
+                break;
+#if 0       /* make_confused() only gives feedback when confusion is
+             * ending so use the 'default' case for it instead */
+            case CONFUSION:
+                make_confused(newtimeout, TRUE);
+                break;
+#endif /*0*/
+            case DEAF:
+                make_deaf(newtimeout, TRUE);
+                break;
+            case HALLUC:
+                make_hallucinated(newtimeout, TRUE, 0L);
+                break;
+            case SICK:
+                typ = !rn2(2) ? SICK_VOMITABLE : SICK_NONVOMITABLE;
+                make_sick(newtimeout, wizintrinsic, TRUE, typ);
+                break;
+            case SLIMED:
+                Sprintf(buf, fmt,
+                        !Slimed ? "" : " still", "turning into slime");
+                make_slimed(newtimeout, buf);
+                break;
+            case STONED:
+                Sprintf(buf, fmt,
+                        !Stoned ? "" : " still", "turning into stone");
+                make_stoned(newtimeout, buf, KILLED_BY, wizintrinsic);
+                break;
+            case STUNNED:
+                make_stunned(newtimeout, TRUE);
+                break;
+            case VOMITING:
+                Sprintf(buf, fmt, !Vomiting ? "" : " still", "vomiting");
+                make_vomiting(newtimeout, FALSE);
+                pline1(buf);
+                break;
+            default:
+                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
+                      oldtimeout ? "increased by" : "set to", amt);
+                incr_itimeout(&u.uprops[p].intrinsic, amt);
+                break;
+            }
+            context.botl = 1; /* probably not necessary... */
         }
+        if (n >= 1)
+            free((genericptr_t) pick_list);
     } else
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_intrinsic)));
@@ -2389,14 +2471,15 @@ int final;
     /* named fruit debugging (doesn't really belong here...); to enable,
        include 'fruit' in DEBUGFILES list (even though it isn't a file...) */
     if (wizard && explicitdebug("fruit")) {
-        int fcount = 0;
         struct fruit *f;
-        char buf2[BUFSZ];
 
+        reorder_fruit(TRUE); /* sort by fruit index, from low to high;
+                              * this modifies the ffruit chain, so could
+                              * possibly mask or even introduce a problem,
+                              * but it does useful sanity checking */
         for (f = ffruit; f; f = f->nextf) {
-            Sprintf(buf, "Fruit %d ", ++fcount);
-            Sprintf(buf2, "%s (id %d)", f->fname, f->fid);
-            enl_msg(buf, "is ", "was ", buf2, "");
+            Sprintf(buf, "Fruit #%d ", f->fid);
+            enl_msg(buf, "is ", "was ", f->fname, "");
         }
         enl_msg("The current fruit ", "is ", "was ", pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
@@ -2814,7 +2897,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\\', "known", "show what object types have been discovered",
             dodiscovered, IFBURIED | GENERALCMD },
     { '`', "knownclass", "show discovered types for one class of objects",
-            doclassdisco, IFBURIED|GENERALCMD },
+            doclassdisco, IFBURIED | GENERALCMD },
     { '\0', "levelchange", "change experience level",
             wiz_level_change, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "lightsources", "show mobile light sources",
@@ -2835,11 +2918,11 @@ struct ext_func_tab extcmdlist[] = {
             dosacrifice, AUTOCOMPLETE },
     { 'o', "open", "open a door", doopen },
     { 'O', "options", "show option settings, possibly change them",
-            doset, IFBURIED|GENERALCMD },
+            doset, IFBURIED | GENERALCMD },
     { C('o'), "overview", "show a summary of the explored dungeon",
-            dooverview, IFBURIED|AUTOCOMPLETE },
+            dooverview, IFBURIED | AUTOCOMPLETE },
     { '\0', "panic", "test panic routine (fatal to game)",
-            wiz_panic, IFBURIED|AUTOCOMPLETE|WIZMODECMD },
+            wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { 'p', "pay", "pay your shopping bill", dopay },
     { ',', "pickup", "pick up things at the current location", dopickup },
     { '\0', "polyself", "polymorph self",
@@ -2851,7 +2934,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('p'), "pray", "pray to the gods for help",
             dopray, IFBURIED | AUTOCOMPLETE },
     { C('p'), "prevmsg", "view recent game messages",
-            doprev_message, IFBURIED|GENERALCMD },
+            doprev_message, IFBURIED | GENERALCMD },
     { 'P', "puton", "put on an accessory (ring, amulet, etc)", doputon },
     { 'q', "quaff", "quaff (drink) something", dodrink },
     { M('q'), "quit", "exit without saving current game",
@@ -2900,7 +2983,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "terrain", "show map without obstructions",
             doterrain, IFBURIED | AUTOCOMPLETE },
     { 't', "throw", "throw something", dothrow },
-    { '\0', "timeout", "look at timeout queue",
+    { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
             wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { M('T'), "tip", "empty a container", dotip, AUTOCOMPLETE },
     { '_', "travel", "travel to a specific location on the map", dotravel },

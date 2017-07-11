@@ -5907,13 +5907,231 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 %e title
 #
 #
+# _The_Amazing_Maurice_and_His_Educated_Rodents_ (sometimes spelled with
+# "his" uncapitalized--the book itself uses all uppercase on both the
+# cover and the title page so doesn't help resolve which is correct...)
+# was the first of six Discworld books marketed for "Young Adults" (at
+# least in the US), ages 12 to 16 give or take, so tended to be stocked
+# on different shelves from the rest of Discworld in book stores and
+# libraries.  In the UK, _The_Amazing_Maurice..._ won the Carnegie Medal
+# which is awarded for best children's book of the year.
+# (The other Young Adult Discworld books are the five Tiffany Aching ones.)
 #
-%title The Amazing Maurice and his Educated Rodents (1)
+# _The_Amazing_Maurice..._ may well be the most serious Discworld book.
+# (Don't worry, it has lots of humor/humour in it....)
+#
+%title The Amazing Maurice and His Educated Rodents (10)
+# p. 68 (Harperteen edition; _Mr._Bunnsy_Has_an_Adventure_ is a book
+#        within the book, and a brief quote is shown at the beginning
+#        of each chapter.  This one is from the start of chapter 4.)
 %passage 1
-The important thing about adventures, thought Mr Bunnsy, was that they
+The important thing about adventures, thought Mr. Bunnsy, was that they
 shouldn't be so long as to make you miss mealtimes.
 
-  [The Amazing Maurice and his Educated Rodents, by Terry Pratchett]
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# p. 9 (passage starts mid-paragraph)
+%passage 2
+"Stealing from a thief isn't stealing, 'cos it cancels out."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# pp. 11-12 (rats became intelligent from eating wizards' trash just outside
+#            one of the walls of Unseen University; Maurice insists that he
+#            never did that, implying that he'd eaten some of the rats instead
+#            [never explicitly stated] before he became intelligent himself)
+%passage 3
+They said he was amazing.  The Amazing Maurice, they said.  He'd never
+meant to be amazing.  It just happened.
+
+He'd realized something was odd that day, just after lunch, when he'd
+looked into a reflection in a puddle and thought, /that's me/.  He'd never
+been /aware/ of himself before.  Of course it was hard to remember /how/
+he'd thought before becoming amazing.  It seemed to him that his mind had
+been just a kind of soup.
+
+And then there had been the rats, who lived under the rubbish heap in one
+corner of his territory.  He'd realized there was something educated
+about the rats when he'd jumped on one and it'd said, "Can we talk about
+this?" and part of his amazing new brain had told him you couldn't eat
+someone who could talk.  At least, not until you'd heard what it'd got
+to say.
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# p. 32 (Maurice the cat, Keith the human boy, and the intelligent rat clan are
+#        in the town of Bad Blintz; people are queuing up for rationed food)
+%passage 4
+"Shall we line up too?" asked the kid.
+
+"I shouldn't think so," said Maurice carefully.
+
+"Why not?"
+
+"See those men on the door?  They look like the Watch.  They've got big
+truncheons.  And everyone's showing them a bit of paper as they go past.
+I don't like the look of that," said Maurice.  "That looks like
+/government/ to me."
+
+"We haven't done anything wrong," said the kid.  "Not here, anyway."
+
+"You never know, with governments," said Maurice.  "Just stay here kid.
+I'll take a look."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# p. 52 (speaker is Darktan, the traps expert; "Number One" platoon seems
+#        like an obvious joke here--missed deliberately or accidentally?)
+%passage 5
+"All right, Number Three platoon, you're on widdling duty," he said.  "Go
+and have a good drink."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# p. 110 (opening quote for chapter 6)
+%passage 6
+There were big adventures and small adventures, Mr. Bunnsy knew.  You
+didn't get told what size they were going to be before you started.
+Sometimes you could have a big adventure even when you were standing
+still.
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# pp. 127-128 (searching for a secret door...)
+%passage 7
+Malicia leaned against the wall with incredible nonchalance.
+
+There was not a click.  A panel in the floor did not slide back.
+
+"Probably the wrong place," she said.  "I'll just rest my arm innocently
+on this coat hook."
+
+A sudden door in the wall completely failed to happen.
+
+"Of course, it'd help if there was an ornate candlestick," said Malicia.
+"They're always a surefire secret-passage lever.  Every adventurer knows
+that."
+
+"There isn't a candlestick," said Maurice.
+
+"I know.  Some people totally fail to have any /idea/ of how to design a
+proper secret passage," said Malicia.  She leaned against another piece
+of wall, which had no affect whatsoever.
+
+"I don't think you'll find it that way," said Keith, who was carefully
+examining a trap.
+
+"Oh?  Won't I?" said Malicia.  "Well at least I'm being /constructive/
+about things!  Where would you look, if you're such an expert?"
+
+"Why is there a rat hole in a rat catcher's shed?" said Keith.  "It smells
+of dead rats and wet dogs and poison.  I wouldn't come near this place,
+if I was a rat."
+
+Malicia glared at him.  Then her face wrapped itself in an expression of
+acute concentration, as if she was trying out several ideas in her head.
+
+"Ye-es," she said.  "That usually works, in stories.  It's often the stupid
+person who comes up with the good idea by accident."
+
+She crouched down and peered into the hole.
+
+"There's a sort of little lever," she said.  "I'll just give it a little
+push...."
+
+There was a /clonk/ under the floor, part of it swung back, and Keith
+dropped out of sight.
+
+"Oh, yes," said Malicia.  "I thought something like that would probably
+happen."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# p. 231 (passage ends mid-paragraph)
+%passage 8
+He had to admit that he was cleverer at plans than at underground
+navigation.  He wasn't exactly lost, because cats never get lost.  He
+merely didn't know where everything else was.
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# pp. 298-300 (Keith has challanged the professional rat piper and offered
+#              to rid the town of rats for a much lower price; Sardines is
+#              one of the Educated Rodents, known for dancing all the time;
+#              "hwun/two/three/four/" is run-together "one /two/ three /four/";
+#              quite a long passage primarily for the 'a bit more grimy' gag)
+%passage 9
+[...]
+"But first I shall need to borrow a pipe," Keith went on.
+
+"You haven't got one?" asked the mayor.
+
+"It got broken."
+
+Corporal Knopf nudged the mayor.  "I've got a trombone from when I was in
+the army," he said.  "It won't take a moment to get it."
+
+The rat piper burst out laughing.
+
+"Doesn't that count?" asked the mayor, as Corporal Knopf hurried off.
+
+"What?  A trombone for charming rats?  No, no, let him try.  Can't blame
+a kid for trying.  Good with a trombone, are you?"
+
+"I don't know," said Keith.
+
+"What do you mean, you don't know?"
+
+"I meant I've never played one.  I'd be a lot happier with a flute,
+trumpet, piccolo, cornet, or Lancre bagpipe, but I've seen people playing
+the trombone, and it doesn't look too difficult.  It's only an overgrown
+trumpet, really."
+
+"Hah!" said the piper.  "This I'd like to see--but not hear."
+
+The Watch came running back, rubbing a battered trombone with his sleave
+and therefore making it just a bit more grimy.  Keith took it, wiped the
+mouthpiece, put it to his mouth, moved the slide a few times, and then
+blew one long note.
+
+"Seems to work," he said.  "I expect I can learn as I go along."  He gave
+the rat piper a brief smile.  "Do you want to go first?"
+
+"You won't charm one rat with that mess, kid," said the piper, "but I'm
+glad I'm here to see you try."
+
+Keith gave him a smile again, took a breath, and played.
+
+There was a tune there.  The instrument squeaked and wheezed, because
+Corporal Knopf had occasionally used the thing as a hammer, but there was
+a tune, quite fast, almost jaunty.  You could tap your feet to it.
+
+Someone tapped his feet to it.
+
+Sardines emerged from a crack in a nearby wall, going "hwun/two/three/four/"
+under his breath.  The crowd watched him dance ferociously across the
+cobbles until he disappeared into a drain.  Then they broke into applause.
+
+The piper looked at Keith.
+
+"Did that one have a /hat/ on?" he asked.
+
+"I didn't notice," said Keith.  "Your go."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
+%e passage
+# pp. 309-310
+%passage 10
+"You really /can/ talk?  You can think?" asked the mayor.
+
+Darktan looked up at him.  It had been a long night.  He didn't want to
+remember any of it.  And now it was going to be a longer, harder day.
+He took a deep breath.
+
+"Here's what I suggest," he said.  "You pretend that rats can think, and
+I'll promise to pretend that humans can think, too."
+
+  [The Amazing Maurice and His Educated Rodents, by Terry Pratchett]
 %e passage
 %e title
 #

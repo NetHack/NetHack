@@ -29,7 +29,6 @@ STATIC_VAR const char and_its_contents[] = " and its contents";
 STATIC_VAR const char the_contents_of[] = "the contents of ";
 
 STATIC_DCL void FDECL(append_honorific, (char *));
-STATIC_DCL void FDECL(setpaid, (struct monst *));
 STATIC_DCL long FDECL(addupbill, (struct monst *));
 STATIC_DCL void FDECL(pacify_shk, (struct monst *));
 STATIC_DCL struct bill_x *FDECL(onbill, (struct obj *, struct monst *,
@@ -286,7 +285,7 @@ struct obj *list;
 }
 
 /* either you paid or left the shop or the shopkeeper died */
-STATIC_OVL void
+void
 setpaid(shkp)
 register struct monst *shkp;
 {
