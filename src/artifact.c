@@ -653,16 +653,17 @@ struct monst *mon;
         return 1;
 
     yours = (mon == &youmonst);
-    /* all quest artifacts are self-willed; it this ever changes, `badclass'
+    /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     self_willed = ((oart->spfx & SPFX_INTEL) != 0);
     if (yours) {
         badclass = self_willed
                    && ((oart->role != NON_PM && !Role_if(oart->role))
                        || (oart->race != NON_PM && !Race_if(oart->race)));
-        badalign =
-            (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE
-            && (oart->alignment != u.ualign.type || u.ualign.record < 0);
+        badalign = ((oart->spfx & SPFX_RESTR) != 0
+                    && oart->alignment != A_NONE
+                    && (oart->alignment != u.ualign.type
+                        || u.ualign.record < 0));
     } else if (!is_covetous(mon->data) && !is_mplayer(mon->data)) {
         badclass = self_willed && oart->role != NON_PM
                    && oart != &artilist[ART_EXCALIBUR];
@@ -1493,8 +1494,8 @@ struct obj *obj;
                 obj->age = 0;
                 return 0;
             }
-            b_effect =
-                obj->blessed && (Role_switch == oart->role || !oart->role);
+            b_effect = (obj->blessed
+                        && (Role_switch == oart->role || !oart->role));
             recharge(otmp, b_effect ? 1 : obj->cursed ? -1 : 0);
             update_inventory();
             break;
@@ -1583,9 +1584,8 @@ struct obj *obj;
             } else
                 otmp->quan += rnd(5);
             otmp->owt = weight(otmp);
-            otmp =
-                hold_another_object(otmp, "Suddenly %s out.",
-                                    aobjnam(otmp, "fall"), (const char *) 0);
+            otmp = hold_another_object(otmp, "Suddenly %s out.",
+                                       aobjnam(otmp, "fall"), (char *) 0);
             break;
         }
         }
@@ -1883,8 +1883,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
     if (touch_artifact(obj, &youmonst)) {
         char buf[BUFSZ];
         int dmg = 0, tmp;
-        boolean ag =
-                    (objects[obj->otyp].oc_material == SILVER && Hate_silver),
+        boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
                 bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
