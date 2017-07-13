@@ -1888,7 +1888,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
                 bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
-        if (!ag && !bane && !touch_blasted)
+        if (!ag && !bane)
             return 1;
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
@@ -2008,11 +2008,15 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
 
     dropit = (dropflag > 0); /* drop all or drop weapon */
     /* check secondary weapon first, before possibly unwielding primary */
-    if (u.twoweap)
+    if (u.twoweap) {
+        bypass_obj(uswapwep); /* so loop below won't process it again */
         (void) untouchable(uswapwep, dropit);
+    }
     /* check primary weapon next so that they're handled together */
-    if (uwep)
+    if (uwep) {
+        bypass_obj(uwep); /* so loop below won't process it again */
         (void) untouchable(uwep, dropit);
+    }
 
     /* in case someone is daft enough to add artifact or silver saddle */
     if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
