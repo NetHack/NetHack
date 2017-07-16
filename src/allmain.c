@@ -13,6 +13,7 @@
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif
+STATIC_DCL void FDECL(regen_hp, (int));
 STATIC_DCL void FDECL(interrupt_multi, (const char *));
 
 void
@@ -185,66 +186,20 @@ boolean resuming;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
-                     * If you are allowed to regenerate during the prayer, the
-                     * end-of-prayer calculation messes up on this.
+                     * If you are allowed to regenerate during the prayer,
+                     * the end-of-prayer calculation messes up on this.
                      * Another possible result is rehumanization, which
-                     * requires
-                     * that encumbrance and movement rate be recalculated.
+                     * requires that encumbrance and movement rate be
+                     * recalculated.
                      */
                     if (u.uinvulnerable) {
                         /* for the moment at least, you're in tiptop shape */
                         wtcap = UNENCUMBERED;
-                    } else if (Upolyd && youmonst.data->mlet == S_EEL
-                               && !is_pool(u.ux, u.uy)
-                               && !Is_waterlevel(&u.uz)) {
-                        /* eel out of water loses hp, same as for monsters;
-                           as hp gets lower, rate of further loss slows down
-                           */
-                        if (u.mh > 1 && rn2(u.mh) > rn2(8)
-                            && (!Half_physical_damage || !(moves % 2L))) {
-                            u.mh--;
-                            context.botl = 1;
-                        } else if (u.mh < 1)
-                            rehumanize();
-                    } else if (Upolyd && u.mh < u.mhmax) {
-                        if (u.mh < 1)
-                            rehumanize();
-                        else if (Regeneration
-                                 || (wtcap < MOD_ENCUMBER && !(moves % 20))) {
-                            context.botl = 1;
-                            u.mh++;
-                            if (u.mh >= u.mhmax)
-                                interrupt_multi("You are in full health.");
-                        }
-                    } else if (u.uhp < u.uhpmax
-                               && (wtcap < MOD_ENCUMBER || !u.umoved
-                                   || Regeneration)) {
-                        if (u.ulevel > 9 && !(moves % 3)) {
-                            int heal, Con = (int) ACURR(A_CON);
-
-                            if (Con <= 12) {
-                                heal = 1;
-                            } else {
-                                heal = rnd(Con);
-                                if (heal > u.ulevel - 9)
-                                    heal = u.ulevel - 9;
-                            }
-                            context.botl = 1;
-                            u.uhp += heal;
-                            if (u.uhp > u.uhpmax)
-                                u.uhp = u.uhpmax;
-                            if (u.uhp >= u.uhpmax)
-                                interrupt_multi("You are in full health.");
-                        } else if (Regeneration
-                                   || (u.ulevel <= 9
-                                       && !(moves
-                                            % ((MAXULEV + 12) / (u.ulevel + 2)
-                                               + 1)))) {
-                            context.botl = 1;
-                            u.uhp++;
-                            if (u.uhp >= u.uhpmax)
-                                interrupt_multi("You are in full health.");
-                        }
+                    } else if (!Upolyd ? (u.uhp < u.uhpmax)
+                                       : (u.mh < u.mhmax
+                                          || youmonst.data->mlet == S_EEL)) {
+                        /* maybe heal */
+                        regen_hp(wtcap);
                     }
 
                     /* moving around while encumbered is hard work */
@@ -263,7 +218,7 @@ boolean resuming;
                         }
                     }
 
-                    if ((u.uen < u.uenmax)
+                    if (u.uen < u.uenmax
                         && ((wtcap < MOD_ENCUMBER
                              && (!(moves % ((MAXULEV + 8 - u.ulevel)
                                             * (Role_if(PM_WIZARD) ? 3 : 4)
@@ -273,7 +228,7 @@ boolean resuming;
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
                         context.botl = 1;
-                        if (u.uen >= u.uenmax)
+                        if (u.uen == u.uenmax)
                             interrupt_multi("You feel full of energy.");
                     }
 
@@ -483,6 +438,76 @@ boolean resuming;
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
+}
+
+/* maybe recover some lost health (or lose some when an eel out of water) */
+STATIC_OVL void
+regen_hp(wtcap)
+int wtcap;
+{
+    int heal = 0;
+    boolean reached_full = FALSE,
+            encumbrance_ok = (wtcap < MOD_ENCUMBER || !u.umoved);
+
+    if (Upolyd) {
+        if (u.mh < 1) { /* shouldn't happen... */
+            rehumanize();
+        } else if (youmonst.data->mlet == S_EEL
+                   && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
+            /* eel out of water loses hp, similar to monster eels;
+               as hp gets lower, rate of further loss slows down */
+            if (u.mh > 1 && !Regeneration && rn2(u.mh) > rn2(8)
+                && (!Half_physical_damage || !(moves % 2L)))
+                heal = -1;
+        } else if (u.mh < u.mhmax) {
+            if (Regeneration || (encumbrance_ok && !(moves % 20L)))
+                heal = 1;
+        }
+        if (heal) {
+            context.botl = 1;
+            u.mh += heal;
+            reached_full = (u.mh == u.mhmax);
+        }
+
+    /* !Upolyd */
+    } else {
+        /* [when this code was in-line within moveloop(), there was
+           no !Upolyd check here, so poly'd hero recovered lost u.uhp
+           once u.mh reached u.mhmax; that may have been convenient
+           for the player, but it didn't make sense for gameplay...] */
+        if (u.uhp < u.uhpmax && (encumbrance_ok || Regeneration)) {
+            if (u.ulevel > 9) {
+                if (!(moves % 3L)) {
+                    int Con = (int) ACURR(A_CON);
+
+                    if (Con <= 12) {
+                        heal = 1;
+                    } else {
+                        heal = rnd(Con);
+                        if (heal > u.ulevel - 9)
+                            heal = u.ulevel - 9;
+                    }
+                }
+            } else { /* u.ulevel <= 9 */
+                if (!(moves % (long) ((MAXULEV + 12) / (u.ulevel + 2) + 1)))
+                    heal = 1;
+            }
+            if (Regeneration && !heal)
+                heal = 1;
+
+            if (heal) {
+                context.botl = 1;
+                u.uhp += heal;
+                if (u.uhp > u.uhpmax)
+                    u.uhp = u.uhpmax;
+                /* stop voluntary multi-turn activity if now fully healed */
+                reached_full = (u.uhp == u.uhpmax);
+            }
+        }
+    }
+
+    if (reached_full)
+        interrupt_multi("You are in full health.");
 }
 
 void
