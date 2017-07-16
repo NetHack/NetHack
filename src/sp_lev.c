@@ -3050,6 +3050,7 @@ struct sp_coder *coder;
     while ((nparams++ < (SP_O_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
            && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_O_V_END)) {
         struct opvar *parm;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_O_V_NAME:
@@ -3061,11 +3062,12 @@ struct sp_coder *coder;
                 char monclass = SP_MONST_CLASS(OV_i(parm));
                 int monid = SP_MONST_PM(OV_i(parm));
 
-                if (monid >= 0 && monid < NUMMONS) {
+                if (monid >= LOW_PM && monid < NUMMONS) {
                     tmpobj.corpsenm = monid;
                     break; /* we're done! */
                 } else {
                     struct permonst *pm = (struct permonst *) 0;
+
                     if (def_char_to_monclass(monclass) != MAXMCLASSES) {
                         pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
                     } else {
