@@ -3279,6 +3279,10 @@ When asked for a location, the key to go to next closest unexplored location. De
 When asked for a location, the key to go to previous closest unexplored location. Default is 'X'.
 .lp getpos.valid
 When asked for a location, the key to go to show valid target locations. Default is '$'.
+.lp getpos.valid.next
+When asked for a location, the key to go to next closest valid location. Default is 'z'.
+.lp getpos.valid.prev
+When asked for a location, the key to go to previous closest valid location. Default is 'Z'.
 .lp nopickup
 Prefix key to move without picking up items. Default is 'm'.
 .lp redraw

@@ -916,11 +916,20 @@ struct obj *sobj;
 }
 
 boolean
+get_valid_stinking_cloud_pos(x,y)
+int x,y;
+{
+    return (!(!isok(x,y) || !cansee(x, y)
+              || !ACCESSIBLE(levl[x][y].typ)
+              || distu(x, y) >= 32));
+}
+
+boolean
 is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
 {
-    if (!cansee(x, y) || !ACCESSIBLE(levl[x][y].typ) || distu(x, y) >= 32) {
+    if (get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg)
             You("smell rotten eggs.");
         return FALSE;
@@ -942,7 +951,7 @@ int state;
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
                 y = u.uy + dy;
-                if (isok(x, y) && is_valid_stinking_cloud_pos(x, y, FALSE))
+                if (get_valid_stinking_cloud_pos(x,y))
                     tmp_at(x, y);
             }
     } else {
@@ -1633,7 +1642,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
               already_known ? "stinking " : "");
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions);
+        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
         if (getpos(&cc, TRUE, "the desired position") < 0) {
             pline1(Never_mind);
             break;

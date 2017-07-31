@@ -36,12 +36,15 @@ nextmbuf()
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+static boolean FDECL((*getpos_getvalid), (int,int)) = (boolean FDECL((*), (int,int))) 0;
 
 void
-getpos_sethilite(f)
+getpos_sethilite(f, d)
 void FDECL((*f), (int));
+boolean FDECL((*d), (int,int));
 {
     getpos_hilitefunc = f;
+    getpos_getvalid = d;
 }
 
 const char *const gloc_descr[NUM_GLOCS][4] = {
@@ -135,6 +138,12 @@ const char *goal;
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
+        if (getpos_getvalid) {
+            Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+            putstr(tmpwin, 0, sbuf);
+        }
         if (getpos_hilitefunc) {
             Sprintf(sbuf, "Use '%s' to display valid locations.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
@@ -376,6 +385,8 @@ int x,y, gloc;
                      || glyph_to_cmap(glyph) == S_darkroom
                      || glyph_to_cmap(glyph) == S_corr
                      || glyph_to_cmap(glyph) == S_litcorr));
+    case GLOC_VALID:
+        return (getpos_getvalid && getpos_getvalid(x,y));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -522,7 +533,9 @@ int cx, cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
-                    "%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    (iflags.autodescribe && getpos_getvalid && !getpos_getvalid(cx,cy))
+                    ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
@@ -615,10 +628,12 @@ const char *goal;
         NHKF_GETPOS_UNEX_NEXT,
         NHKF_GETPOS_UNEX_PREV,
         NHKF_GETPOS_INTERESTING_NEXT,
-        NHKF_GETPOS_INTERESTING_PREV
+        NHKF_GETPOS_INTERESTING_PREV,
+        NHKF_GETPOS_VALID_NEXT,
+        NHKF_GETPOS_VALID_PREV
     };
     char pick_chars[6];
-    char mMoOdDxX[11];
+    char mMoOdDxX[13];
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
@@ -922,6 +937,7 @@ const char *goal;
         if (garr[i])
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
+    getpos_getvalid = (boolean FDECL((*), (int,int))) 0;
     return result;
 }
 
