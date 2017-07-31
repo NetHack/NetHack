@@ -1,4 +1,4 @@
-/* NetHack 3.6    tileset.c    $NHDT-Date: 1457207053 2016/03/05 19:44:13 $ $NHDT-Branch: chasonr $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6    tileset.c    $NHDT-Date: 1501463811 2017/07/31 01:16:51 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,7 +25,7 @@ boolean true_color;
         0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
     };
     struct TileSetImage image;
-    FILE *fp = NULL;            /* custodial */
+    FILE *fp;
     char header[16];
     boolean ok;
 
@@ -40,10 +40,11 @@ boolean true_color;
 
     /* Identify the image type */
     fp = fopen(filename, "rb");
-    if (fp == NULL) goto error;
+    if (!fp)
+        goto error;
     memset(header, 0, sizeof(header));
     fread(header, 1, sizeof(header), fp);
-    fclose(fp);
+    fclose(fp), fp = (FILE *) 0;
 
     /* Call the loader appropriate for the image */
     if (memcmp(header, "BM", 2) == 0) {
@@ -56,11 +57,13 @@ boolean true_color;
     } else {
         ok = FALSE;
     }
-    if (!ok) goto error;
+    if (!ok)
+        goto error;
 
     /* Reject if the interface cannot handle direct color and the image does
        not use a palette */
-    if (!true_color && image.indexes == NULL) goto error;
+    if (!true_color && image.indexes == NULL)
+        goto error;
 
     /* Save the palette if present */
     have_palette = image.indexes != NULL;
@@ -87,12 +90,12 @@ boolean true_color;
     /* Split the image into tiles */
     split_tiles(&image);
 
-    fclose(fp);
     free_image(&image);
     return TRUE;
 
 error:
-    if (fp) fclose(fp);
+    if (fp)
+        fclose(fp);
     free_image(&image);
     return FALSE;
 }
@@ -108,6 +111,7 @@ static void
 get_tile_map(image_desc)
 const char *image_desc;
 {
+    return;
 }
 
 void
@@ -115,43 +119,40 @@ free_tiles()
 {
     unsigned i;
 
-    if (tiles != NULL) {
+    if (tiles) {
         for (i = 0; i < num_tiles; ++i) {
-            free(tiles[i].pixels);
-            free(tiles[i].indexes);
+            free((genericptr_t) tiles[i].pixels);
+            free((genericptr_t) tiles[i].indexes);
         }
+        free((genericptr_t) tiles), tiles = NULL;
     }
-    free(tiles);
-    tiles = NULL;
     num_tiles = 0;
 
-    free(blank_tile.pixels);
-    blank_tile.pixels = NULL;
-    free(blank_tile.indexes);
-    blank_tile.indexes = NULL;
+    if (blank_tile.pixels)
+        free((genericptr_t) blank_tile.pixels), blank_tile.pixels = NULL;
+    if (blank_tile.indexes)
+        free((genericptr_t) blank_tile.indexes), blank_tile.indexes = NULL;
 }
 
 static void
 free_image(image)
 struct TileSetImage *image;
 {
-    free(image->pixels);
-    image->pixels = NULL;
-    free(image->indexes);
-    image->indexes = NULL;
-    free(image->image_desc);
-    image->image_desc = NULL;
+    if (image->pixels)
+        free((genericptr_t) image->pixels), image->pixels = NULL;
+    if (image->indexes)
+        free((genericptr_t) image->indexes), image->indexes = NULL;
+    if (image->image_desc)
+        free((genericptr_t) image->image_desc), image->image_desc = NULL;
 }
 
 const struct TileImage *
 get_tile(tile_index)
 unsigned tile_index;
 {
-    if (tile_index >= num_tiles) {
+    if (tile_index >= num_tiles)
         return &blank_tile;
-    } else {
-        return &tiles[tile_index];
-    }
+    return &tiles[tile_index];
 }
 
 static void
@@ -176,10 +177,11 @@ const struct TileSetImage *image;
     for (y1 = 0; y1 < tile_rows; ++y1) {
         for (x1 = 0; x1 < tile_cols; ++x1) {
             struct TileImage *tile = &tiles[y1 * tile_cols + x1];
+
             tile->width = iflags.wc_tile_width;
             tile->height = iflags.wc_tile_height;
             tile->pixels = (struct Pixel *)
-                    alloc(tile_size * sizeof(struct Pixel));
+                    alloc(tile_size * sizeof (struct Pixel));
             if (image->indexes != NULL) {
                 tile->indexes = (unsigned char *) alloc(tile_size);
             }
@@ -187,6 +189,7 @@ const struct TileSetImage *image;
                 for (x2 = 0; x2 < iflags.wc_tile_width; ++x2) {
                     unsigned x = x1 * iflags.wc_tile_width + x2;
                     unsigned y = y1 * iflags.wc_tile_height + y2;
+
                     i = y * image->width + x;
                     j = y2 * tile->width + x2;
                     tile->pixels[j] = image->pixels[i];
@@ -202,7 +205,7 @@ const struct TileSetImage *image;
     blank_tile.width = iflags.wc_tile_width;
     blank_tile.height = iflags.wc_tile_height;
     blank_tile.pixels = (struct Pixel *)
-            alloc(tile_size * sizeof(struct Pixel));
+            alloc(tile_size * sizeof (struct Pixel));
     for (i = 0; i < tile_size; ++i) {
         blank_tile.pixels[i].r = 0;
         blank_tile.pixels[i].g = 0;
