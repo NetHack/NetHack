@@ -389,6 +389,14 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
+struct opvar {
+    xchar spovartyp; /* one of SPOVAR_foo */
+    union {
+        char *str;
+        long l;
+    } vardata;
+};
+
 struct autopickup_exception {
     struct nhregex *regex;
     char *pattern;

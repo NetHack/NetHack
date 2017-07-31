@@ -3741,7 +3741,7 @@ struct {
     { NHKF_GETPOS_INTERESTING_NEXT, 'a', "getpos.all.next" },
     { NHKF_GETPOS_INTERESTING_PREV, 'A', "getpos.all.prev" },
     { NHKF_GETPOS_HELP,      '?', "getpos.help" },
-    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.inview" },
+    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.filter" },
     { NHKF_GETPOS_MENU,      '!', "getpos.menu" }
 };
 
@@ -5030,10 +5030,14 @@ dotravel(VOID_ARGS)
     }
     iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
-        if (!getpos_menu(&cc, TRUE, GLOC_INTERESTING)) {
+        int gf = iflags.getloc_filter;
+        iflags.getloc_filter = GFILTER_VIEW;
+        if (!getpos_menu(&cc, GLOC_INTERESTING)) {
+            iflags.getloc_filter = gf;
             iflags.getloc_travelmode = FALSE;
             return 0;
         }
+        iflags.getloc_filter = gf;
     } else {
         pline("Where do you want to travel to?");
         if (getpos(&cc, TRUE, "the desired destination") < 0) {

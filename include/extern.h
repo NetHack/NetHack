@@ -384,7 +384,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
-E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P, int));
+E boolean FDECL(getpos_menu, (coord *, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));
@@ -2250,6 +2250,11 @@ E boolean
 FDECL(dig_corridor, (coord *, coord *, BOOLEAN_P, SCHAR_P, SCHAR_P));
 E void FDECL(fill_room, (struct mkroom *, BOOLEAN_P));
 E boolean FDECL(load_special, (const char *));
+E xchar FDECL(selection_getpoint, (int, int, struct opvar *));
+E struct opvar *FDECL(selection_opvar, (char *));
+E void FDECL(opvar_free_x, (struct opvar *));
+E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
+E void FDECL(selection_floodfill, (struct opvar *, int, int, BOOLEAN_P));
 
 /* ### spell.c ### */
 

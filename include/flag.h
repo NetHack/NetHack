@@ -176,6 +176,14 @@ struct sysflag {
 #define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
 
+enum getloc_filters {
+    GFILTER_NONE = 0,
+    GFILTER_VIEW,
+    GFILTER_AREA,
+
+    NUM_GFILTER
+};
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -194,7 +202,7 @@ struct instance_flags {
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     boolean getloc_travelmode;
-    boolean getloc_limitview;
+    int getloc_filter;     /* GFILTER_foo */
     boolean getloc_usemenu;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */

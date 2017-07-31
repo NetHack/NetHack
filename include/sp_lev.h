@@ -256,14 +256,6 @@ enum opcode_defs {
 #define SP_MAPCHAR_LIT(l) ((((l) >> 8) & 0xffff) - 10)
 #define SP_MAPCHAR_PACK(typ, lit) (((10 + (lit)) << 8) | ((typ) & 0xff))
 
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
-};
-
 struct splev_var {
     struct splev_var *next;
     char *name;

@@ -235,6 +235,12 @@ enum screen_symbols {
 #define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
 #define is_cmap_door(i) ((i) >= S_vodoor && (i) <= S_hcdoor)
 #define is_cmap_wall(i) ((i) >= S_stone && (i) <= S_trwall)
+#define is_cmap_room(i) ((i) >= S_room && (i) <= S_darkroom)
+#define is_cmap_corr(i) ((i) >= S_corr && (i) <= S_litcorr)
+#define is_cmap_furniture(i) ((i) >= S_upstair && (i) <= S_fountain)
+#define is_cmap_water(i) ((i) == S_pool || (i) == S_water)
+#define is_cmap_lava(i) ((i) == S_lava)
+
 
 struct symdef {
     uchar sym;
