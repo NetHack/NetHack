@@ -1,4 +1,4 @@
-/* NetHack 3.6	wc_trace.c	$NHDT-Date: 1433806611 2015/06/08 23:36:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.6	wc_trace.c	$NHDT-Date: 1501464799 2017/07/31 01:33:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +10,7 @@
 #include <errno.h>
 
 FILE *wc_tracelogf; /* Should be static, but it's just too useful to have
-             * access to this logfile from arbitrary other files. */
+                     * access to this logfile from arbitrary other files. */
 static unsigned int indent_level; /* Some winfuncs call other winfuncs, so
                                    * we need to support nesting. */
 
@@ -560,7 +560,7 @@ char *posbar;
         fprintf(wc_tracelogf, "%supdate_positionbar('%s'(%d))\n", INDENT,
                 posbar, (int) strlen(posbar));
     } else {
-        fprintf(wc_tracelogf, "%supdate_positionbar(NULL)\n");
+        fprintf(wc_tracelogf, "%supdate_positionbar(NULL)\n", INDENT);
     }
     PRE;
     (*tdp->nprocs->win_update_positionbar)(tdp->ndata, posbar);
@@ -901,7 +901,7 @@ void *vp;
     struct trace_data *tdp = vp;
     char *rv;
 
-    fprintf(wc_tracelogf, "%sget_color_string()\n");
+    fprintf(wc_tracelogf, "%sget_color_string()\n", INDENT);
 
     PRE;
     rv = (*tdp->nprocs->win_get_color_string)(tdp->ndata);
@@ -911,7 +911,7 @@ void *vp;
         fprintf(wc_tracelogf, "%s=> '%s'(%d)\n", INDENT, rv,
                 (int) strlen(rv));
     } else {
-        fprintf(wc_tracelogf, "%s=> NULL\n");
+        fprintf(wc_tracelogf, "%s=> NULL\n", INDENT);
     }
 
     return rv;
