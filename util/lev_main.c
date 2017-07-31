@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1448074107 2015/11/21 02:48:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1501461281 2017/07/31 00:34:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -615,14 +615,14 @@ VA_DECL2(sp_lev *, sp, const char *, fmt)
 #ifdef USE_STDARG
 static void
 vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
-{
+
 #else
 static void
 vadd_opvars(sp, fmt, the_args)
 sp_lev *sp;
 const char *fmt;
 va_list the_args;
-{
+
 #endif
 
 #else /* USE_STDARG | USE_VARARG */
@@ -632,7 +632,7 @@ va_list the_args;
 void add_opvars
 VA_DECL2(sp_lev *, sp, const char *, fmt)
 #endif /* USE_STDARG | USE_VARARG */
-
+{
     const char *p, *lp;
     long la;
     /* Do NOT use VA_START and VA_END in here... see above */
@@ -710,7 +710,11 @@ VA_DECL2(sp_lev *, sp, const char *, fmt)
             break;
         }
     }
-    return;
+
+#if !(defined(USE_STDARG) || defined(USE_VARARGS))
+    /* provide closing brace for USE_OLDARGS nested block from VA_DECL2() */
+    VA_END();
+#endif
 }
 
 void
