@@ -498,7 +498,7 @@ long wp_mask;
         for (obj = invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                if (art->cary.adtyp == dtyp) {
+                if (art && art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
@@ -519,7 +519,8 @@ long wp_mask;
         for (obj = invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                spfx &= ~art->cspfx;
+                if (art)
+                    spfx &= ~art->cspfx;
             }
     }
 
