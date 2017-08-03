@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1501725406 2017/08/03 01:56:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1501803108 2017/08/03 23:31:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -435,18 +435,8 @@ VA_DECL(const char *, s)
     Vsprintf(pbuf, s, VA_ARGS);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
-#ifndef USE_OLDARGS
-#define DUMMY_PLINE_ARGS /*empty*/
-#else   /* needed because we follow the definition of pline() itself;
-         * passing 1 arg, pline takes 9 (for USE_OLDARGS) so add 8 dummies */
-#define DUMMY_PLINE_ARGS        , (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
-                                  (vA) 0, (vA) 0, (vA) 0, (vA) 0
-#endif
-    pline("%s", pbuf    /* no comma here; when needed, it's in DUMMY_ARGS */
-          DUMMY_PLINE_ARGS);
-    pline("%s", "Program in disorder - perhaps you'd better #quit."
-          DUMMY_PLINE_ARGS);
-#undef DUMMY_PLINE_ARGS
+    pline("%s", VA_PASS1(pbuf));
+    pline("%s", VA_PASS1("Program in disorder - perhaps you'd better #quit."));
     program_state.in_impossible = 0;
     VA_END();
 }
@@ -478,16 +468,16 @@ const char *line;
         (void) setuid(getuid());
         (void) execv(args[0], (char *const *) args);
         perror((char *) 0);
-        (void) fprintf(stderr, "Exec to message handler %s failed.\n",
-                       env);
+        (void) fprintf(stderr, "Exec to message handler %s failed.\n", env);
         terminate(EXIT_FAILURE);
     } else if (f > 0) {
         int status;
+
         waitpid(f, &status, 0);
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
-        pline("Fork to message handler failed.");
+        pline("%s", VA_PASS1("Fork to message handler failed."));
     }
 }
 #endif /* defined(POSIX_TYPES) || defined(__GNUC__) */

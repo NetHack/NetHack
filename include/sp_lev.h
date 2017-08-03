@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501723399 2017/08/03 01:23:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501803105 2017/08/03 23:31:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -490,6 +490,7 @@ typedef const char *vA;
 #endif
 #undef VA_ARGS  /* redefine with the maximum number actually used */
 #undef VA_SHIFT /* ditto */
+#undef VA_PASS1
 #define VA_ARGS                                                         \
     arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, \
         arg12, arg13, arg14

@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1501723401 2017/08/03 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1501803107 2017/08/03 23:31:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,6 +100,7 @@
 #define VA_END()      \
     va_end(the_args); \
     }
+#define VA_PASS1(a1) a1
 #if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
 #define _VA_LIST_ /* prevents multiple def in stdio.h */
 #endif
@@ -125,6 +126,7 @@
 #define VA_END()      \
     va_end(the_args); \
     }
+#define VA_PASS1(a1) a1
 #else
 
 /*USE_OLDARGS*/
@@ -162,6 +164,9 @@ typedef const char *vA;
      arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = 0)
 #define VA_NEXT(var1, typ1) ((var1 = (typ1) arg1), VA_SHIFT(), var1)
 #define VA_END() }
+/* needed in pline.c, where full number of arguments is known and expected */
+#define VA_PASS1(a1)                                                  \
+    (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #endif
 #endif
 
