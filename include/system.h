@@ -1,4 +1,4 @@
-/* NetHack 3.6	system.h	$NHDT-Date: 1449269772 2015/12/04 22:56:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1501723401 2017/08/03 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,8 +489,17 @@ E int FDECL(vprintf, (const char *, va_list));
 #endif
 #endif
 #else
+#ifdef vprintf
+#undef vprintf
+#endif
 #define vprintf printf
+#ifdef vfprintf
+#undef vfprintf
+#endif
 #define vfprintf fprintf
+#ifdef vsprintf
+#undef vsprintf
+#endif
 #define vsprintf sprintf
 #endif
 #endif /* NEED_VARARGS */
