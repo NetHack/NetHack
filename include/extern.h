@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1496959470 2017/06/08 22:04:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.591 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1501725402 2017/08/03 01:56:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.598 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1309,6 +1309,7 @@ E struct obj *FDECL(obj_nexto, (struct obj *));
 E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
 E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
 E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
+E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
 
 /* ### mkroom.c ### */
 
@@ -1833,12 +1834,6 @@ E void VDECL(There, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
-E const char *FDECL(align_str, (ALIGNTYP_P));
-E void FDECL(mstatusline, (struct monst *));
-E void NDECL(ustatusline);
-E void NDECL(self_invis_message);
-E char *FDECL(piousness, (BOOLEAN_P, const char *));
-E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
 
 /* ### polyself.c ### */
 
@@ -1876,6 +1871,7 @@ E void FDECL(make_stoned, (long, const char *, int, const char *));
 E void FDECL(make_vomiting, (long, BOOLEAN_P));
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
 E void FDECL(make_deaf, (long, BOOLEAN_P));
+E void NDECL(self_invis_message);
 E int NDECL(dodrink);
 E int FDECL(dopotion, (struct obj *));
 E int FDECL(peffects, (struct obj *));
@@ -1932,6 +1928,10 @@ E void NDECL(clearpriests);
 E void FDECL(restpriest, (struct monst *, BOOLEAN_P));
 E void FDECL(newepri, (struct monst *));
 E void FDECL(free_epri, (struct monst *));
+E const char *FDECL(align_str, (ALIGNTYP_P));
+E char *FDECL(piousness, (BOOLEAN_P, const char *));
+E void FDECL(mstatusline, (struct monst *));
+E void NDECL(ustatusline);
 
 /* ### quest.c ### */
 

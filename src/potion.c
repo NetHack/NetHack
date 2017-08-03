@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1455407631 2016/02/13 23:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1501725406 2017/08/03 01:56:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -406,6 +406,16 @@ boolean talk;
         if (talk)
             You(old ? "can hear again." : "are unable to hear anything.");
     }
+}
+
+void
+self_invis_message()
+{
+    pline("%s %s.",
+          Hallucination ? "Far out, man!  You"
+                        : "Gee!  All of a sudden, you",
+          See_invisible ? "can see right through yourself"
+                        : "can't see yourself");
 }
 
 STATIC_OVL void
