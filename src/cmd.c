@@ -1189,7 +1189,12 @@ wiz_intrinsic(VOID_ARGS)
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--", FALSE);
             }
             any.a_int = i + 1; /* +1: avoid 0 */
-            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, propname, FALSE);
+            oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
+            if (oldtimeout)
+                Sprintf(buf, "%-27s [%li]", propname, oldtimeout);
+            else
+                Sprintf(buf, "%s", propname);
+            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
         }
         end_menu(win, "Which intrinsics?");
         n = select_menu(win, PICK_ANY, &pick_list);
