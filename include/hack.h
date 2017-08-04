@@ -34,6 +34,9 @@ enum encumbrance_types {
 /* weight increment of heavy iron ball */
 #define IRON_BALL_W_INCR 160
 
+/* number of turns it takes for vault guard to show up */
+#define VAULT_GUARD_TIME 30
+
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
     SATIATED = 0,

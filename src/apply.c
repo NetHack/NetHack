@@ -445,6 +445,8 @@ struct obj *obj;
     } else {
         You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
+        if (obj->cursed)
+            vault_summon_gd();
     }
 }
 

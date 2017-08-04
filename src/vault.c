@@ -191,6 +191,13 @@ findgd()
     return (struct monst *) 0;
 }
 
+void
+vault_summon_gd()
+{
+    if (vault_occupied(u.urooms) && !findgd())
+        u.uinvault = (VAULT_GUARD_TIME - 1);
+}
+
 char
 vault_occupied(array)
 char *array;
@@ -221,7 +228,8 @@ invault()
     vaultroom -= ROOMOFFSET;
 
     guard = findgd();
-    if (++u.uinvault % 30 == 0 && !guard) { /* if time ok and no guard now. */
+    if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
+        /* if time ok and no guard now. */
         char buf[BUFSZ];
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
