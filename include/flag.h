@@ -204,6 +204,7 @@ struct instance_flags {
     boolean getloc_travelmode;
     int getloc_filter;     /* GFILTER_foo */
     boolean getloc_usemenu;
+    boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
@@ -496,6 +497,7 @@ enum nh_keyfunc {
     NHKF_GETPOS_HELP,
     NHKF_GETPOS_MENU,
     NHKF_GETPOS_LIMITVIEW,
+    NHKF_GETPOS_MOVESKIP,
 
     NUM_NHKF
 };

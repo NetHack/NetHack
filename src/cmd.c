@@ -3749,6 +3749,7 @@ struct {
     { NHKF_GETPOS_INTERESTING_PREV, 'A', "getpos.all.prev" },
     { NHKF_GETPOS_HELP,      '?', "getpos.help" },
     { NHKF_GETPOS_LIMITVIEW, '"', "getpos.filter" },
+    { NHKF_GETPOS_MOVESKIP,  '*', "getpos.moveskip" },
     { NHKF_GETPOS_MENU,      '!', "getpos.menu" }
 };
 

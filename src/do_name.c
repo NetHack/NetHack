@@ -90,13 +90,17 @@ const char *goal;
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
+    const char *const fastmovemode[2] = { "8 units at a time",
+                                          "skipping same glyphs" };
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0,
-           "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
+    Sprintf(sbuf,
+            "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
+            fastmovemode[iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
            visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
@@ -129,6 +133,11 @@ const char *goal;
                              visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
+    Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
+            fastmovemode[!iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
+
     Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
     putstr(tmpwin, 0, sbuf);
@@ -720,8 +729,23 @@ const char *goal;
             } else if (Cmd.alphadirchars[i] == lowc((char) c)
                        || (Cmd.num_pad && Cmd.dirchars[i] == (c & 0177))) {
                 /* a shifted movement letter or Meta-digit */
-                dx = 8 * xdir[i];
-                dy = 8 * ydir[i];
+                if (iflags.getloc_moveskip) {
+                    /* skip same glyphs */
+                    int glyph = glyph_at(cx, cy);
+
+                    dx = xdir[i];
+                    dy = ydir[i];
+                    while (isok(cx + dx, cy + dy)
+                           && glyph == glyph_at(cx + dx, cy + dy)
+                           && isok(cx + dx+xdir[i], cy+dy+ydir[i])
+                           && glyph == glyph_at(cx + dx+xdir[i], cy + dy+ydir[i])) {
+                        dx += xdir[i];
+                        dy += ydir[i];
+                    }
+                } else {
+                    dx = 8 * xdir[i];
+                    dy = 8 * ydir[i];
+                }
             } else
                 continue;
 
@@ -801,6 +825,10 @@ const char *goal;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
+            iflags.getloc_moveskip = !iflags.getloc_moveskip;
+            pline("%skipping over similar terrain when fastmoving the cursor.",
+                  iflags.getloc_moveskip ? "S" : "Not s");
         } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
