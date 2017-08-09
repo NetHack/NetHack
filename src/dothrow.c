@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1502243899 2017/08/09 01:58:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -448,7 +448,22 @@ genericptr_t arg;
     int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
     boolean keep_going = TRUE;
 
-    /* Use Bresenham's Line Algorithm to walk from src to dest */
+    /* Use Bresenham's Line Algorithm to walk from src to dest.
+     *
+     * This should be replaced with a more versatile algorithm
+     * since it handles slanted moves in a suboptimal way.
+     * Going from 'x' to 'y' needs to pass through 'z', and will
+     * fail if there's an obstable there, but it could choose to
+     * pass through 'Z' instead if that way imposes no obstacle.
+     *     ..y          .Zy
+     *     xz.    vs    x..
+     * Perhaps we should check both paths and accept whichever
+     * one isn't blocked.  But then multiple zigs and zags could
+     * potentially produce a meandering path rather than the best
+     * attempt at a straight line.  And (*check_proc)() would
+     * need to work more like 'travel', distinguishing between
+     * testing a possible move and actually attempting that move.
+     */
     dx = dest_cc->x - src_cc->x;
     dy = dest_cc->y - src_cc->y;
     prev_x = x = src_cc->x;
@@ -640,9 +655,11 @@ int x, y;
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
 
-    if (levl[x][y].typ == WATER && Is_waterlevel(&u.uz)) {
-        multi = 0;
-        drown();
+    if (is_pool(x, y) && !u.uinwater
+        && ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
+            || !(Levitation || Flying || Wwalking))) {
+        multi = 0; /* can move, so drown() allows crawling out of water */
+        (void) drown();
         return FALSE;
     }
 
@@ -768,8 +785,7 @@ boolean verbose;
     (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
 }
 
-/* Move a monster through the air for a few squares.
- */
+/* Move a monster through the air for a few squares. */
 void
 mhurtle(mon, dx, dy, range)
 struct monst *mon;
