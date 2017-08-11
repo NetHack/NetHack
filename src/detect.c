@@ -36,9 +36,9 @@ unconstrain_map()
     boolean res = u.uinwater || u.uburied || u.uswallow;
 
     /* bring Underwater, buried, or swallowed hero to normal map */
-    iflags.save_uinwater = u.uinwater, u.uinwater = 0;
-    iflags.save_uburied  = u.uburied,  u.uburied  = 0;
-    iflags.save_uswallow = u.uswallow, u.uswallow = 0;
+    iflags.save_uinwater = u.uinwater; u.uinwater = 0;
+    iflags.save_uburied  = u.uburied;  u.uburied  = 0;
+    iflags.save_uswallow = u.uswallow; u.uswallow = 0;
 
     return res;
 }
@@ -47,9 +47,9 @@ unconstrain_map()
 STATIC_OVL void
 reconstrain_map()
 {
-    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
-    u.uburied  = iflags.save_uburied,  iflags.save_uburied  = 0;
-    u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
+    u.uinwater = iflags.save_uinwater; iflags.save_uinwater = 0;
+    u.uburied  = iflags.save_uburied;  iflags.save_uburied  = 0;
+    u.uswallow = iflags.save_uswallow; iflags.save_uswallow = 0;
 }
 
 /* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
@@ -61,7 +61,7 @@ const char *ter_explain;
     coord dummy_pos; /* don't care whether player actually picks a spot */
     boolean save_autodescribe;
 
-    dummy_pos.x = u.ux, dummy_pos.y = u.uy; /* starting spot for getpos() */
+    dummy_pos.x = u.ux; dummy_pos.y = u.uy; /* starting spot for getpos() */
     save_autodescribe = iflags.autodescribe;
     iflags.autodescribe = TRUE;
     iflags.terrainmode = ter_typ;
@@ -455,8 +455,9 @@ register struct obj *sobj;
     const char *what = confused ? something : "food";
 
     stale = clear_stale_map(oclass, 0);
-    if (u.usteed) /* some situations leave steed with stale coordinates */
-        u.usteed->mx = u.ux, u.usteed->my = u.uy;
+    if (u.usteed) /* some situations leave steed with stale coordinates */ {
+        u.usteed->mx = u.ux; u.usteed->my = u.uy;
+    }
 
     for (obj = fobj; obj; obj = obj->nobj)
         if (o_in(obj, oclass)) {
@@ -634,8 +635,9 @@ int class;            /* an object class, 0 for all */
             do_dknown_of(obj);
     }
 
-    if (u.usteed)
-        u.usteed->mx = u.ux, u.usteed->my = u.uy;
+    if (u.usteed) {
+        u.usteed->mx = u.ux; u.usteed->my = u.uy;
+    }
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -931,8 +933,9 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
     boolean found = FALSE;
     coord cc;
 
-    if (u.usteed)
-        u.usteed->mx = u.ux, u.usteed->my = u.uy;
+    if (u.usteed) {
+        u.usteed->mx = u.ux; u.usteed->my = u.uy;
+    }
 
     /* floor/ceiling traps */
     for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {

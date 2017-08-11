@@ -79,7 +79,7 @@ struct obj *obj;
     } else if ((mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
                             (int FDECL((*), (MONST_P, OBJ_P))) 0,
                             (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj)) != 0) {
-        obj->ox = u.ux, obj->oy = u.uy;
+        obj->ox = u.ux; obj->oy = u.uy;
         (void) flash_hits_mon(mtmp, obj);
     }
     return 1;
@@ -324,7 +324,7 @@ register struct obj *obj;
     context.stethoscope_move = moves;
     context.stethoscope_movement = youmonst.movement;
 
-    bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
+    bhitpos.x = u.ux; bhitpos.y = u.uy; /* tentative, reset below */
     notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
@@ -373,7 +373,7 @@ register struct obj *obj;
                                    SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
 
         /* bhitpos needed by mstatusline() iff mtmp is a long worm */
-        bhitpos.x = rx, bhitpos.y = ry;
+        bhitpos.x = rx; bhitpos.y = ry;
         notonhead = (mtmp->mx != rx || mtmp->my != ry);
 
         if (mtmp->mundetected) {
@@ -487,7 +487,7 @@ struct obj *obj;
                    actually moves because line-of-sight may change */
                 if (mtmp->m_ap_type)
                     seemimic(mtmp);
-                omx = mtmp->mx, omy = mtmp->my;
+                omx = mtmp->mx; omy = mtmp->my;
                 mnexto(mtmp);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
@@ -1553,8 +1553,8 @@ boolean showmsg;
                 You_cant("jump diagonally out of a doorway.");
             return FALSE;
         }
-        uc.x = u.ux, uc.y = u.uy;
-        tc.x = x, tc.y = y; /* target */
+        uc.x = u.ux; uc.y = u.uy;
+        tc.x = x; tc.y = y; /* target */
         if (!walk_path(&uc, &tc, check_jump, (genericptr_t) &traj)) {
             if (showmsg)
                 There("is an obstacle preventing that jump.");
@@ -2468,7 +2468,7 @@ struct obj *otmp;
         return;
     }
     trapinfo.tobj = otmp;
-    trapinfo.tx = u.ux, trapinfo.ty = u.uy;
+    trapinfo.tx = u.ux; trapinfo.ty = u.uy;
     tmp = ACURR(A_DEX);
     trapinfo.time_needed =
         (tmp > 17) ? 2 : (tmp > 12) ? 3 : (tmp > 7) ? 4 : 5;

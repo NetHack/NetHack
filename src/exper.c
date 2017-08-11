@@ -313,10 +313,11 @@ boolean gaining; /* gaining XP via potion vs setting XP for polyself */
 
     minexp = (u.ulevel == 1) ? 0L : newuexp(u.ulevel - 1);
     maxexp = newuexp(u.ulevel);
-    diff = maxexp - minexp, factor = 1L;
+    diff = maxexp - minexp; factor = 1L;
     /* make sure that `diff' is an argument which rn2() can handle */
-    while (diff >= (long) LARGEST_INT)
-        diff /= 2L, factor *= 2L;
+    while (diff >= (long) LARGEST_INT) {
+        diff /= 2L; factor *= 2L;
+    }
     result = minexp + factor * (long) rn2((int) diff);
     /* 3.4.1:  if already at level 30, add to current experience
        points rather than to threshold needed to reach the current

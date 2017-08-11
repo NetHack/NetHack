@@ -107,7 +107,7 @@ moverock()
     register struct trap *ttmp;
     register struct monst *mtmp;
 
-    sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
+    sx = u.ux + u.dx; sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
         /* make sure that this boulder is visible as the top object */
         if (otmp != level.objects[sx][sy])
@@ -1236,7 +1236,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         if (anchored) {
             coord cc;
 
-            cc.x = u.ux, cc.y = u.uy;
+            cc.x = u.ux; cc.y = u.uy;
             /* can move normally within radius 1 of buried ball */
             if (buried_ball(&cc) && dist2(x, y, cc.x, cc.y) <= 2) {
                 /* ugly hack: we need to issue some message here
@@ -1713,16 +1713,16 @@ domove()
             && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            u.ux = u.ux0; u.uy = u.uy0; /* didn't move after all */
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
+            u.ux = u.ux0; u.uy = u.uy0;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            u.ux = u.ux0; u.uy = u.uy0; /* didn't move after all */
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
         } else {
             char pnambuf[BUFSZ];
@@ -2031,7 +2031,7 @@ boolean pick;
 
     ++inspoteffects;
     spotterrain = levl[u.ux][u.uy].typ;
-    spotloc.x = u.ux, spotloc.y = u.uy;
+    spotloc.x = u.ux; spotloc.y = u.uy;
 
     /* moving onto different terrain might cause Levitation to toggle */
     if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))

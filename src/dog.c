@@ -315,7 +315,7 @@ boolean with_you;
     mtmp->mstrategy |= STRAT_ARRIVE;
 
     /* make sure mnexto(rloc_to(set_apparxy())) doesn't use stale data */
-    mtmp->mux = u.ux, mtmp->muy = u.uy;
+    mtmp->mux = u.ux; mtmp->muy = u.uy;
     xyloc = mtmp->mtrack[0].x;
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
@@ -362,22 +362,22 @@ boolean with_you;
         wander = 0;
         break;
     case MIGR_WITH_HERO:
-        xlocale = u.ux, ylocale = u.uy;
+        xlocale = u.ux; ylocale = u.uy;
         break;
     case MIGR_STAIRS_UP:
-        xlocale = xupstair, ylocale = yupstair;
+        xlocale = xupstair; ylocale = yupstair;
         break;
     case MIGR_STAIRS_DOWN:
-        xlocale = xdnstair, ylocale = ydnstair;
+        xlocale = xdnstair; ylocale = ydnstair;
         break;
     case MIGR_LADDER_UP:
-        xlocale = xupladder, ylocale = yupladder;
+        xlocale = xupladder; ylocale = yupladder;
         break;
     case MIGR_LADDER_DOWN:
-        xlocale = xdnladder, ylocale = ydnladder;
+        xlocale = xdnladder; ylocale = ydnladder;
         break;
     case MIGR_SSTAIRS:
-        xlocale = sstairs.sx, ylocale = sstairs.sy;
+        xlocale = sstairs.sx; ylocale = sstairs.sy;
         break;
     case MIGR_PORTAL:
         if (In_endgame(&u.uz)) {
@@ -395,7 +395,7 @@ boolean with_you;
             if (t->ttyp == MAGIC_PORTAL)
                 break;
         if (t) {
-            xlocale = t->tx, ylocale = t->ty;
+            xlocale = t->tx; ylocale = t->ty;
             break;
         } else {
             impossible("mon_arrive: no corresponding portal?");
@@ -413,9 +413,9 @@ boolean with_you;
         if (r && *r) {
             coord c;
             /* somexy() handles irregular rooms */
-            if (somexy(&rooms[*r - ROOMOFFSET], &c))
-                xlocale = c.x, ylocale = c.y;
-            else
+            if (somexy(&rooms[*r - ROOMOFFSET], &c)) {
+                xlocale = c.x; ylocale = c.y;
+            } else
                 xlocale = ylocale = 0;
         } else { /* not in a room */
             int i, j;

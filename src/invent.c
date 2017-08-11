@@ -233,8 +233,9 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
     if (n > 1 && !already_sorted) {
         sliarray = (struct sortloot_item *) alloc(n * sizeof *sliarray);
         for (i = 0, o = *olist; o;
-             ++i, o = by_nexthere ? o->nexthere : o->nobj)
-            sliarray[i].obj = o, sliarray[i].indx = (int) i;
+             ++i, o = by_nexthere ? o->nexthere : o->nobj) {
+            sliarray[i].obj = o; sliarray[i].indx = (int) i;
+        }
 
         qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
         for (i = 0; i < n; ++i) {
@@ -1082,10 +1083,12 @@ register const char *let, *word;
     boolean cntgiven = FALSE;
     long dummymask;
 
-    if (*let == ALLOW_COUNT)
-        let++, allowcnt = 1;
-    if (*let == COIN_CLASS)
-        let++, usegold = TRUE;
+    if (*let == ALLOW_COUNT) {
+        let++; allowcnt = 1;
+    }
+    if (*let == COIN_CLASS) {
+        let++; usegold = TRUE;
+    }
 
     /* Equivalent of an "ugly check" for gold */
     if (usegold && !strcmp(word, "eat")
@@ -1093,10 +1096,12 @@ register const char *let, *word;
             || youmonst.data == &mons[PM_RUST_MONSTER]))
         usegold = FALSE;
 
-    if (*let == ALL_CLASSES)
-        let++, allowall = TRUE;
-    if (*let == ALLOW_NONE)
-        let++, allownone = TRUE;
+    if (*let == ALL_CLASSES) {
+        let++; allowall = TRUE;
+    }
+    if (*let == ALLOW_NONE) {
+        let++; allownone = TRUE;
+    }
     /* "ugly check" for reading fortune cookies, part 1.
      * The normal 'ugly check' keeps the object on the inventory list.
      * We don't want to do that for shirts/cookies, so the check for
@@ -1111,8 +1116,9 @@ register const char *let, *word;
         && throws_rocks(youmonst.data))
         useboulder = TRUE;
 
-    if (allownone)
-        *bp++ = HANDS_SYM, *bp++ = ' '; /* '-' */
+    if (allownone) {
+        *bp++ = HANDS_SYM; *bp++ = ' '; /* '-' */
+    }
     ap = altlets;
 
     if (!flags.invlet_constant)
@@ -1952,9 +1958,11 @@ boolean learning_id; /* true if we just read unknown identify scroll */
 
     unid_cnt = 0;
     the_obj = 0; /* if unid_cnt ends up 1, this will be it */
-    for (obj = invent; obj; obj = obj->nobj)
-        if (not_fully_identified(obj))
-            ++unid_cnt, the_obj = obj;
+    for (obj = invent; obj; obj = obj->nobj) {
+        if (not_fully_identified(obj)) {
+            ++unid_cnt; the_obj = obj;
+        }
+    }
 
     if (!unid_cnt) {
         You("have already identified all %sof your possessions.",
@@ -2815,8 +2823,9 @@ char *buf;
             break; /* "closed door" */
         }
         /* override door description for open drawbridge */
-        if (is_drawbridge_wall(x, y) >= 0)
-            dfeature = "open drawbridge portcullis", cmap = -1;
+        if (is_drawbridge_wall(x, y) >= 0) {
+            dfeature = "open drawbridge portcullis"; cmap = -1;
+        }
     } else if (IS_FOUNTAIN(ltyp))
         cmap = S_fountain; /* "fountain" */
     else if (IS_THRONE(ltyp))
@@ -3442,8 +3451,9 @@ boolean unpaid, showsym;
 void
 free_invbuf()
 {
-    if (invbuf)
-        free((genericptr_t) invbuf), invbuf = (char *) 0;
+    if (invbuf) {
+        free((genericptr_t) invbuf); invbuf = (char *) 0;
+    }
     invbufsiz = 0;
 }
 

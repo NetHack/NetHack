@@ -97,7 +97,7 @@ unsigned seed; /* for semi-controlled randomization */
                    supplying the same arguments later, or a pseudo-random
                    sequence by varying any of them */
                 nxt = seed % lth;
-                seed *= 31, seed %= (BUFSZ - 1);
+                seed *= 31; seed %= (BUFSZ - 1);
                 use_rubout = seed & 3;
             }
             s = &engr[nxt];
@@ -121,7 +121,7 @@ unsigned seed; /* for semi-controlled randomization */
                         if (!seed)
                             j = rn2(strlen(rubouts[i].wipeto));
                         else {
-                            seed *= 31, seed %= (BUFSZ - 1);
+                            seed *= 31; seed %= (BUFSZ - 1);
                             j = seed % (strlen(rubouts[i].wipeto));
                         }
                         *s = rubouts[i].wipeto[j];

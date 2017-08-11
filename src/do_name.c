@@ -910,7 +910,7 @@ const char *goal;
                                 }
                                 continue;
                             foundc:
-                                cx = tx, cy = ty;
+                                cx = tx; cy = ty;
                                 if (msg_given) {
                                     clear_nhwindow(WIN_MESSAGE);
                                     msg_given = FALSE;
@@ -1453,7 +1453,7 @@ namefloorobj()
     struct obj *obj = 0;
     boolean fakeobj = FALSE, use_plural;
 
-    cc.x = u.ux, cc.y = u.uy;
+    cc.x = u.ux; cc.y = u.uy;
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */

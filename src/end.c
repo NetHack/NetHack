@@ -1273,14 +1273,15 @@ int how;
     if (have_windows) {
         wait_synch();
         free_pickinv_cache(); /* extra persistent window if perm_invent */
-        if (WIN_INVEN != WIN_ERR)
-            destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
+        if (WIN_INVEN != WIN_ERR) {
+            destroy_nhwindow(WIN_INVEN);  WIN_INVEN = WIN_ERR;
+        }
         display_nhwindow(WIN_MESSAGE, TRUE);
-        destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
+        destroy_nhwindow(WIN_MAP);  WIN_MAP = WIN_ERR;
 #ifndef STATUS_VIA_WINDOWPORT
-        destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
+        destroy_nhwindow(WIN_STATUS);  WIN_STATUS = WIN_ERR;
 #endif
-        destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;
+        destroy_nhwindow(WIN_MESSAGE);  WIN_MESSAGE = WIN_ERR;
 
         if (!done_stopprint || flags.tombstone)
             endwin = create_nhwindow(NHW_TEXT);
@@ -1447,8 +1448,9 @@ int how;
     dump_close_log();
     /* "So when I die, the first thing I will see in Heaven is a
      * score list?" */
-    if (have_windows && !iflags.toptenwin)
-        exit_nhwindows((char *) 0), have_windows = FALSE;
+    if (have_windows && !iflags.toptenwin) {
+        exit_nhwindows((char *) 0); have_windows = FALSE;
+    }
     topten(how, endtime);
     if (have_windows)
         exit_nhwindows((char *) 0);
@@ -1597,12 +1599,12 @@ const genericptr vptr2;
     default:
     case VANQ_MLVL_MNDX:
         /* sort by monster level */
-        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+        mlev1 = mons[indx1].mlevel; mlev2 = mons[indx2].mlevel;
         res = mlev2 - mlev1; /* mlevel high to low */
         break;
     case VANQ_MSTR_MNDX:
         /* sort by monster toughness */
-        mstr1 = monstr[indx1], mstr2 = monstr[indx2];
+        mstr1 = monstr[indx1]; mstr2 = monstr[indx2];
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
@@ -1614,7 +1616,7 @@ const genericptr vptr2;
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].mname, name2 = mons[indx2].mname;
+        name1 = mons[indx1].mname; name2 = mons[indx2].mname;
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -1623,7 +1625,7 @@ const genericptr vptr2;
            if 'char' happens to be unsigned, (mlet1 - mlet2) would yield
            an inappropriate result when mlet2 is greater than mlet1,
            so force our copies (mcls1, mcls2) to be signed */
-        mcls1 = (schar) mons[indx1].mlet, mcls2 = (schar) mons[indx2].mlet;
+        mcls1 = (schar) mons[indx1].mlet; mcls2 = (schar) mons[indx2].mlet;
         /* S_ANT through S_ZRUTY correspond to lowercase monster classes,
            S_ANGEL through S_ZOMBIE correspond to uppercase, and various
            punctuation characters are used for classes beyond those */
@@ -1643,7 +1645,7 @@ const genericptr vptr2;
         }
         res = mcls1 - mcls2; /* class */
         if (res == 0) {
-            mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+            mlev1 = mons[indx1].mlevel; mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
             if (vanq_sortmode == VANQ_MCLS_HTOL)
                 res = -res; /* mlevel high to low */
@@ -1651,7 +1653,7 @@ const genericptr vptr2;
         break;
     case VANQ_COUNT_H_L:
     case VANQ_COUNT_L_H:
-        died1 = mvitals[indx1].died, died2 = mvitals[indx2].died;
+        died1 = mvitals[indx1].died; died2 = mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
         if (vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
