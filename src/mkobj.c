@@ -665,7 +665,7 @@ int alter_type;
         /* this get_obj_location shouldn't fail, but if it does,
            use hero's location */
         if (!get_obj_location(obj, &ox, &oy, CONTAINED_TOO)) {
-            ox = u.ux, oy = u.uy;
+            ox = u.ux; oy = u.uy;
         }
         if (!costly_spot(ox, oy))
             return;
