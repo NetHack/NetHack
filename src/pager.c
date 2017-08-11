@@ -216,8 +216,9 @@ int x, y, glyph;
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
                      ? distant_name(otmp, doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
-        if (fakeobj)
-            dealloc_obj(otmp), otmp = 0;
+        if (fakeobj) {
+            dealloc_obj(otmp); otmp = 0;
+        }
     } else
         Strcpy(buf, something); /* sanity precaution */
 

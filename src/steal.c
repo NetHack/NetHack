@@ -518,9 +518,11 @@ struct monst *mtmp;
     /* target every quest artifact, not just current role's;
        if hero has more than one, choose randomly so that player
        can't use inventory ordering to influence the theft */
-    for (n = 0, obj = invent; obj; obj = obj->nobj)
-        if (any_quest_artifact(obj))
-            ++n, otmp = obj;
+    for (n = 0, obj = invent; obj; obj = obj->nobj) {
+        if (any_quest_artifact(obj)) {
+            ++n; otmp = obj;
+        }
+    }
     if (n > 1) {
         n = rnd(n);
         for (otmp = invent; otmp; otmp = otmp->nobj)
@@ -544,9 +546,11 @@ struct monst *mtmp;
             return; /* you have nothing of special interest */
 
         /* If we get here, real and fake have been set up. */
-        for (n = 0, obj = invent; obj; obj = obj->nobj)
-            if (obj->otyp == real || (obj->otyp == fake && !mtmp->iswiz))
-                ++n, otmp = obj;
+        for (n = 0, obj = invent; obj; obj = obj->nobj) {
+            if (obj->otyp == real || (obj->otyp == fake && !mtmp->iswiz)) {
+                ++n; otmp = obj;
+            }
+        }
         if (n > 1) {
             n = rnd(n);
             for (otmp = invent; otmp; otmp = otmp->nobj)

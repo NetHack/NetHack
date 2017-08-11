@@ -343,8 +343,8 @@ tty_shutdown()
     kill_hilite();
 #endif
     if (dynamic_HIHE) {
-        free((genericptr_t) nh_HI), nh_HI = (char *) 0;
-        free((genericptr_t) nh_HE), nh_HE = (char *) 0;
+        free((genericptr_t) nh_HI); nh_HI = (char *) 0;
+        free((genericptr_t) nh_HE); nh_HE = (char *) 0;
         dynamic_HIHE = FALSE;
     }
 #endif
@@ -430,13 +430,13 @@ tty_decgraphics_termcap_fixup()
         }
         /* can't use nethack's case-insensitive strstri() here, and some old
            systems don't have strstr(), so use brute force substring search */
-        ae_length = strlen(ae), he_limit = strlen(nh_he);
+        ae_length = strlen(ae); he_limit = strlen(nh_he);
         while (he_limit >= ae_length) {
             if (strncmp(nh_he, ae, ae_length) == 0) {
                 HE_resets_AS = TRUE;
                 break;
             }
-            ++nh_he, --he_limit;
+            ++nh_he; --he_limit;
         }
     }
 #endif

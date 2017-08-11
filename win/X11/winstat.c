@@ -140,8 +140,9 @@ struct xwindow *wp;
     if (wp->status_information) {
         if (wp->popup) {
             nh_XtPopdown(wp->popup);
-            if (!wp->keep_window)
-                XtDestroyWidget(wp->popup), wp->popup = (Widget) 0;
+            if (!wp->keep_window) {
+                XtDestroyWidget(wp->popup); wp->popup = (Widget) 0;
+            }
         }
         free((genericptr_t) wp->status_information);
         wp->status_information = 0;
@@ -1162,8 +1163,9 @@ struct xwindow *wp;
     int i;
     struct X_status_value *sv;
 
-    if (!wp->keep_window)
-        XtDestroyWidget(wp->w), wp->w = (Widget) 0;
+    if (!wp->keep_window) {
+        XtDestroyWidget(wp->w); wp->w = (Widget) 0;
+    }
 
     for (i = 0, sv = shown_stats; i < NUM_STATS; i++, sv++)
         if (sv->type == SV_LABEL) {

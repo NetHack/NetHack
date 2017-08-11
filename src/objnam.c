@@ -3537,7 +3537,7 @@ typfnd:
      * Create the object, then fine-tune it.
      */
     otmp = typ ? mksobj(typ, TRUE, FALSE) : mkobj(oclass, FALSE);
-    typ = otmp->otyp, oclass = otmp->oclass; /* what we actually got */
+    typ = otmp->otyp; oclass = otmp->oclass; /* what we actually got */
 
     if (islit && (typ == OIL_LAMP || typ == MAGIC_LAMP || typ == BRASS_LANTERN
                   || Is_candle(otmp) || typ == POT_OIL)) {

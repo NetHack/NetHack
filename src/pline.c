@@ -225,8 +225,9 @@ int siz;
 void
 free_youbuf()
 {
-    if (you_buf)
-        free((genericptr_t) you_buf), you_buf = (char *) 0;
+    if (you_buf) {
+        free((genericptr_t) you_buf); you_buf = (char *) 0;
+    }
     you_buf_siz = 0;
 }
 

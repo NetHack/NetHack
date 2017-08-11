@@ -553,7 +553,7 @@ release_default_resources()
 
         for (idx = 0; default_resource_data[idx]; idx++)
             free((genericptr_t) default_resource_data[idx]);
-        free((genericptr_t) default_resource_data), default_resource_data = 0;
+        free((genericptr_t) default_resource_data); default_resource_data = 0;
     }
 }
 
@@ -1481,10 +1481,12 @@ XtPointer call_data;
 static void
 release_getline_widgets()
 {
-    if (getline_dialog)
-        XtDestroyWidget(getline_dialog), getline_dialog = (Widget) 0;
-    if (getline_popup)
-        XtDestroyWidget(getline_popup), getline_popup = (Widget) 0;
+    if (getline_dialog) {
+        XtDestroyWidget(getline_dialog); getline_dialog = (Widget) 0;
+    }
+    if (getline_popup) {
+        XtDestroyWidget(getline_popup); getline_popup = (Widget) 0;
+    }
 }
 
 void
@@ -1829,10 +1831,12 @@ Cardinal *num_params;
 static void
 release_yn_widgets()
 {
-    if (yn_label)
-        XtDestroyWidget(yn_label), yn_label = (Widget) 0;
-    if (yn_popup)
-        XtDestroyWidget(yn_popup), yn_popup = (Widget) 0;
+    if (yn_label) {
+        XtDestroyWidget(yn_label); yn_label = (Widget) 0;
+    }
+    if (yn_popup) {
+        XtDestroyWidget(yn_popup); yn_popup = (Widget) 0;
+    }
 }
 
 /* X11-specific edition of yn_function(), the routine called by the core

@@ -2049,24 +2049,26 @@ register struct monst *shkp; /* if angry, impose a surcharge */
             divisor *= 3L;
         }
     }
-    if (uarmh && uarmh->otyp == DUNCE_CAP)
-        multiplier *= 4L, divisor *= 3L;
-    else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV / 2))
-             || (uarmu && !uarm && !uarmc)) /* touristy shirt visible */
-        multiplier *= 4L, divisor *= 3L;
+    if (uarmh && uarmh->otyp == DUNCE_CAP) {
+        multiplier *= 4L; divisor *= 3L;
+    } else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV / 2))
+             || (uarmu && !uarm && !uarmc)) {/* touristy shirt visible */
+        multiplier *= 4L; divisor *= 3L;
+    }
 
-    if (ACURR(A_CHA) > 18)
-        divisor *= 2L;
-    else if (ACURR(A_CHA) == 18)
-        multiplier *= 2L, divisor *= 3L;
-    else if (ACURR(A_CHA) >= 16)
-        multiplier *= 3L, divisor *= 4L;
-    else if (ACURR(A_CHA) <= 5)
+   if (ACURR(A_CHA) > 18) {
+       divisor *= 2L;
+   } else if (ACURR(A_CHA) == 18) {
+       multiplier *= 2L; divisor *= 3L;
+   } else if (ACURR(A_CHA) >= 16) {
+       multiplier *= 3L; divisor *= 4L;
+   } else if (ACURR(A_CHA) <= 5) {
         multiplier *= 2L;
-    else if (ACURR(A_CHA) <= 7)
-        multiplier *= 3L, divisor *= 2L;
-    else if (ACURR(A_CHA) <= 10)
-        multiplier *= 4L, divisor *= 3L;
+   } else if (ACURR(A_CHA) <= 7) {
+       multiplier *= 3L; divisor *= 2L;
+   } else if (ACURR(A_CHA) <= 10) {
+       multiplier *= 4L; divisor *= 3L;
+   }
 
     /* tmp = (tmp * multiplier) / divisor [with roundoff tweak] */
     tmp *= multiplier;
@@ -2253,8 +2255,9 @@ register struct monst *shkp;
                 tmp = (obj->otyp % (6 - shkp->m_id % 3));
                 tmp = (tmp + 3) * obj->quan;
             }
-        } else if (tmp > 1L && !(shkp->m_id % 4))
-            multiplier *= 3L, divisor *= 4L;
+        } else if (tmp > 1L && !(shkp->m_id % 4)) {
+            multiplier *= 3L; divisor *= 4L;
+        }
     }
 
     if (tmp >= 1L) {
@@ -2311,8 +2314,9 @@ boolean include_contents;
     long amt = 0L;
     xchar ox, oy;
 
-    if (!get_obj_location(unp_obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO))
-        ox = u.ux, oy = u.uy; /* (shouldn't happen) */
+    if (!get_obj_location(unp_obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO)) {
+        ox = u.ux; oy = u.uy; /* (shouldn't happen) */
+    }
     if ((shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE))) != 0) {
         bp = onbill(unp_obj, shkp, TRUE);
     } else {
@@ -4099,7 +4103,7 @@ register struct obj *first_obj;
         }
         Sprintf(buf, "%s%s, %s", contentsonly ? the_contents_of : "",
                 doname(otmp), price);
-        putstr(tmpwin, 0, buf), cnt++;
+        putstr(tmpwin, 0, buf); cnt++;
     }
     if (cnt > 1) {
         display_nhwindow(tmpwin, TRUE);

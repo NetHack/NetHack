@@ -1615,8 +1615,9 @@ struct xwindow *wp;
     }
 
     /* Destroy map widget. */
-    if (wp->popup && !wp->keep_window)
-        XtDestroyWidget(wp->popup), wp->popup = (Widget) 0;
+    if (wp->popup && !wp->keep_window) {
+        XtDestroyWidget(wp->popup); wp->popup = (Widget) 0;
+    }
 
     if (wp->keep_window)
         XtRemoveCallback(wp->w, XtNexposeCallback, map_exposed,

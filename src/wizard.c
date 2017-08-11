@@ -649,8 +649,9 @@ resurrect()
                 elapsed /= 50L;
                 if (mtmp->msleeping && rn2((int) elapsed + 1))
                     mtmp->msleeping = 0;
-                if (mtmp->mfrozen == 1) /* would unfreeze on next move */
-                    mtmp->mfrozen = 0, mtmp->mcanmove = 1;
+                if (mtmp->mfrozen == 1) /* would unfreeze on next move */ {
+                    mtmp->mfrozen = 0; mtmp->mcanmove = 1;
+                }
                 if (mtmp->mcanmove && !mtmp->msleeping) {
                     *mmtmp = mtmp->nmon;
                     mon_arrive(mtmp, TRUE);

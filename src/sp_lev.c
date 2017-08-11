@@ -983,14 +983,14 @@ packed_coord pos;
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
     if (levl[try_x][try_y].typ != ROOM) {
         do {
-            try_x = *x, try_y = *y;
+            try_x = *x; try_y = *y;
             get_room_loc(&try_x, &try_y, croom);
         } while (levl[try_x][try_y].typ != ROOM && ++trycnt <= 100);
 
         if (trycnt > 100)
             panic("get_free_room_loc:  can't find a place!");
     }
-    *x = try_x, *y = try_y;
+    *x = try_x; *y = try_y;
 }
 
 boolean
@@ -1570,8 +1570,9 @@ struct mkroom *croom;
     }
 
     /* try to find a close place if someone else is already there */
-    if (MON_AT(x, y) && enexto(&cc, x, y, pm))
-        x = cc.x, y = cc.y;
+    if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
+        x = cc.x; y = cc.y;
+    }
 
     if (m->align != -(MAX_REGISTERS + 2))
         mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
@@ -1581,8 +1582,8 @@ struct mkroom *croom;
         mtmp = makemon(pm, x, y, NO_MM_FLAGS);
 
     if (mtmp) {
-        x = mtmp->mx, y = mtmp->my; /* sanity precaution */
-        m->x = x, m->y = y;
+        x = mtmp->mx; y = mtmp->my; /* sanity precaution */
+        m->x = x; m->y = y;
         /* handle specific attributes for some special monsters */
         if (m->name.str)
             mtmp = christen_monst(mtmp, m->name.str);
@@ -1637,8 +1638,9 @@ struct mkroom *croom;
                             x = m->x;
                             y = m->y;
                             get_location(&x, &y, DRY, croom);
-                            if (MON_AT(x, y) && enexto(&cc, x, y, pm))
-                                x = cc.x, y = cc.y;
+                            if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
+                                x = cc.x; y = cc.y;
+                            }
                         } while (m_bad_boulder_spot(x, y)
                                  && --retrylimit > 0);
                         place_monster(mtmp, x, y);
@@ -2498,7 +2500,7 @@ int humidity;
     } while (!(x % 2) || !(y % 2) || SpLev_Map[x][y]
              || !is_ok_location((schar) x, (schar) y, humidity));
 
-    m->x = (xchar) x, m->y = (xchar) y;
+    m->x = (xchar) x; m->y = (xchar) y;
 }
 
 /*

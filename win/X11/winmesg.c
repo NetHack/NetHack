@@ -212,12 +212,13 @@ struct xwindow *wp;
 {
     if (wp->popup) {
         nh_XtPopdown(wp->popup);
-        if (!wp->keep_window)
-            XtDestroyWidget(wp->popup), wp->popup = (Widget) 0;
+        if (!wp->keep_window) {
+            XtDestroyWidget(wp->popup); wp->popup = (Widget) 0;
+        }
     }
     if (wp->mesg_information) {
         set_circle_buf(wp->mesg_information, 0); /* free buffer list */
-        free((genericptr_t) wp->mesg_information), wp->mesg_information = 0;
+        free((genericptr_t) wp->mesg_information); wp->mesg_information = 0;
     }
     if (wp->keep_window)
         XtRemoveCallback(wp->w, XtNexposeCallback, mesg_exposed,

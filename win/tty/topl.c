@@ -448,11 +448,11 @@ char def;
             int n_len = 0;
             long value = 0;
 
-            addtopl("#"), n_len++;
+            addtopl("#"); n_len++;
             digit_string[1] = '\0';
             if (q != '#') {
                 digit_string[0] = q;
-                addtopl(digit_string), n_len++;
+                addtopl(digit_string); n_len++;
                 value = q - '0';
                 q = '#';
             }
@@ -465,7 +465,7 @@ char def;
                     if (value < 0)
                         break; /* overflow: try again */
                     digit_string[0] = z;
-                    addtopl(digit_string), n_len++;
+                    addtopl(digit_string); n_len++;
                 } else if (z == 'y' || index(quitchars, z)) {
                     if (z == '\033')
                         value = -1; /* abort */
@@ -476,7 +476,7 @@ char def;
                         break;
                     } else {
                         value /= 10;
-                        removetopl(1), n_len--;
+                        removetopl(1); n_len--;
                     }
                 } else {
                     value = -1; /* abort */
@@ -489,7 +489,7 @@ char def;
             else if (value == 0)
                 q = 'n'; /* 0 => "no" */
             else {       /* remove number from top line, then try again */
-                removetopl(n_len), n_len = 0;
+                removetopl(n_len); n_len = 0;
                 q = '\0';
             }
         }
@@ -579,7 +579,7 @@ boolean purged; /* True: took history's pointers, False: just cloned them */
                 free((genericptr_t) snapshot_mesgs[i]);
         }
 
-        free((genericptr_t) snapshot_mesgs), snapshot_mesgs = (char **) 0;
+        free((genericptr_t) snapshot_mesgs); snapshot_mesgs = (char **) 0;
 
         /* history can resume being updated at will now... */
         if (!purged)

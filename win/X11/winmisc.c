@@ -365,7 +365,7 @@ X11_player_selection()
 
         nh_XtPopdown(popup);
         XtDestroyWidget(popup);
-        free((genericptr_t) choices), choices = 0;
+        free((genericptr_t) choices); choices = 0;
 
         if (ps_selected == PS_QUIT || program_state.done_hup) {
             clearlocks();
@@ -417,7 +417,7 @@ X11_player_selection()
 
         if (availcount == 1) {
             flags.initrace = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Pick your %s race", s_suffix(plbuf));
             popup =
@@ -434,7 +434,7 @@ X11_player_selection()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
@@ -485,7 +485,7 @@ X11_player_selection()
 
         if (availcount == 1) {
             flags.initgend = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Your %s gender?", s_suffix(plbuf));
             popup =
@@ -502,7 +502,7 @@ X11_player_selection()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
@@ -551,7 +551,7 @@ X11_player_selection()
 
         if (availcount == 1) {
             flags.initalign = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Your %s alignment?", s_suffix(plbuf));
             popup = make_menu("alignment_selection", qbuf,
@@ -568,7 +568,7 @@ X11_player_selection()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
@@ -610,7 +610,7 @@ release_extended_cmds()
 {
     if (extended_commands) {
         XtDestroyWidget(extended_command_popup);
-        free((genericptr_t) extended_commands), extended_commands = 0;
+        free((genericptr_t) extended_commands); extended_commands = 0;
     }
 }
 
