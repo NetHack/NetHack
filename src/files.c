@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1459987580 2016/04/07 00:06:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1502581476 2017/08/12 23:44:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -617,6 +617,7 @@ const char *name;
 int lev, oflag;
 {
     int reslt, fd;
+
     if (!lftrack.init) {
         lftrack.init = 1;
         lftrack.fd = -1;
@@ -671,7 +672,7 @@ int fd;
     }
     return close(fd);
 }
-#else
+#else /* !HOLD_LOCKFILE_OPEN */
 
 int
 nhclose(fd)
@@ -679,7 +680,7 @@ int fd;
 {
     return close(fd);
 }
-#endif
+#endif /* ?HOLD_LOCKFILE_OPEN */
 
 /* ----------  END LEVEL FILE HANDLING ----------- */
 
@@ -3065,8 +3066,8 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 #ifdef VMS /* must be stream-lf to use UPDATE_RECORD_IN_PLACE */
         if (!file_is_stmlf(fd)) {
             raw_printf(
-                "Warning: scoreboard file %s is not in stream_lf format",
-                fq_record);
+                   "Warning: scoreboard file '%s' is not in stream_lf format",
+                       fq_record);
             wait_synch();
         }
 #endif
@@ -3078,7 +3079,7 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
         (void) chmod(fq_record, FCMASK | 007);
 #endif /* VMS && !SECURE */
     } else {
-        raw_printf("Warning: cannot write scoreboard file %s", fq_record);
+        raw_printf("Warning: cannot write scoreboard file '%s'", fq_record);
         wait_synch();
     }
 #endif /* !UNIX && !VMS */
@@ -3101,22 +3102,25 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 #endif
 
     if ((fd = open(fq_record, O_RDWR)) < 0) {
-/* try to create empty record */
+        /* try to create empty 'record' */
 #if defined(AZTEC_C) || defined(_DCC) \
     || (defined(__GNUC__) && defined(__AMIGA__))
         /* Aztec doesn't use the third argument */
         /* DICE doesn't like it */
-        if ((fd = open(fq_record, O_CREAT | O_RDWR)) < 0) {
+        fd = open(fq_record, O_CREAT | O_RDWR);
 #else
-        if ((fd = open(fq_record, O_CREAT | O_RDWR, S_IREAD | S_IWRITE))
-            < 0) {
+        fd = open(fq_record, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
 #endif
-            raw_printf("Warning: cannot write record %s", tmp);
+        if (fd = < 0) {
+            raw_printf("Warning: cannot write record '%s'", tmp);
             wait_synch();
-        } else
+        } else {
             (void) nhclose(fd);
-    } else /* open succeeded */
+        }
+    } else {
+        /* open succeeded => 'record' exists */
         (void) nhclose(fd);
+    }
 #else /* MICRO || WIN32*/
 
 #ifdef MAC
@@ -3260,6 +3264,7 @@ recover_savefile()
         raw_printf("\nError writing %s; recovery failed.", SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
+        (void) nhclose(lfd);
         delete_savefile();
         return FALSE;
     }
@@ -3269,6 +3274,7 @@ recover_savefile()
                    SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
+        (void) nhclose(lfd);
         delete_savefile();
         return FALSE;
     }
@@ -3279,6 +3285,7 @@ recover_savefile()
                    SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
+        (void) nhclose(lfd);
         delete_savefile();
         return FALSE;
     }
@@ -3288,13 +3295,15 @@ recover_savefile()
                    SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
+        (void) nhclose(lfd);
         delete_savefile();
         return FALSE;
     }
 
     if (!copy_bytes(lfd, sfd)) {
-        (void) nhclose(lfd);
+        (void) nhclose(gfd);
         (void) nhclose(sfd);
+        (void) nhclose(lfd);
         delete_savefile();
         return FALSE;
     }
@@ -3302,7 +3311,7 @@ recover_savefile()
     processed[savelev] = 1;
 
     if (!copy_bytes(gfd, sfd)) {
-        (void) nhclose(lfd);
+        (void) nhclose(gfd);
         (void) nhclose(sfd);
         delete_savefile();
         return FALSE;
@@ -3343,6 +3352,7 @@ recover_savefile()
     for (lev = 0; lev < 256; lev++) {
         if (processed[lev]) {
             const char *fq_lock;
+
             set_levelfile_name(lock, lev);
             fq_lock = fqname(lock, LEVELPREFIX, 3);
             (void) unlink(fq_lock);
