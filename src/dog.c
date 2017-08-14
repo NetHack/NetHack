@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1446808440 2015/11/06 11:14:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1502753406 2017/08/14 23:30:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -736,7 +736,8 @@ struct monst *mon;
 register struct obj *obj;
 {
     struct permonst *mptr = mon->data, *fptr = 0;
-    boolean carni = carnivorous(mptr), herbi = herbivorous(mptr), starving;
+    boolean carni = carnivorous(mptr), herbi = herbivorous(mptr),
+            starving, mblind;
 
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
         return obj->cursed ? TABU : APPORT;
@@ -755,8 +756,10 @@ register struct obj *obj;
             return obj->cursed ? UNDEF : APPORT;
 
         /* a starving pet will eat almost anything */
-        starving =
-            (mon->mtame && !mon->isminion && EDOG(mon)->mhpmax_penalty);
+        starving = (mon->mtame && !mon->isminion
+                    && EDOG(mon)->mhpmax_penalty);
+        /* even carnivores will eat carrots if they're temporarily blind */
+        mblind = (!mon->mcansee && haseyes(mon->data));
 
         /* ghouls prefer old corpses and unhatchable eggs, yum!
            they'll eat fresh non-veggy corpses and hatchable eggs
@@ -813,8 +816,9 @@ register struct obj *obj;
         case TIN:
             return metallivorous(mptr) ? ACCFOOD : MANFOOD;
         case APPLE:
-        case CARROT:
             return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
+        case CARROT:
+            return (herbi || mblind) ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case BANANA:
             return (mptr->mlet == S_YETI && herbi)
                       ? DOGFOOD /* for monkey and ape (tameable), sasquatch */
