@@ -7,7 +7,7 @@
 
 /*** What the properties are ***
  *
- * note:  propertynames[] array in timeout.c must be kept in synch with these.
+ * note:  propertynames[] array in timeout.c has string values for these.
  *        Property #0 is not used.
  */
 /* Resistances to troubles */

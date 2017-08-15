@@ -445,6 +445,8 @@ struct obj *obj;
     } else {
         You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
+        if (obj->cursed)
+            vault_summon_gd();
     }
 }
 
@@ -1564,6 +1566,15 @@ boolean showmsg;
 
 static int jumping_is_magic;
 
+boolean
+get_valid_jump_position(x,y)
+int x,y;
+{
+    return (isok(x, y)
+            && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
+            && is_valid_jump_pos(x, y, jumping_is_magic, FALSE));
+}
+
 void
 display_jump_positions(state)
 int state;
@@ -1577,9 +1588,7 @@ int state;
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
-                if (isok(x, y)
-                    && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
-                    && is_valid_jump_pos(x, y, jumping_is_magic, FALSE))
+                if (get_valid_jump_position(x, y))
                     tmp_at(x, y);
             }
     } else {
@@ -1678,7 +1687,7 @@ int magic; /* 0=Physical, otherwise skill level */
     cc.x = u.ux;
     cc.y = u.uy;
     jumping_is_magic = magic;
-    getpos_sethilite(display_jump_positions);
+    getpos_sethilite(display_jump_positions, get_valid_jump_position);
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
@@ -2851,6 +2860,15 @@ int min_range, max_range;
 static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
+boolean
+get_valid_polearm_position(x,y)
+int x,y;
+{
+    return (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
+            && distu(x, y) >= polearm_range_min
+            && distu(x, y) <= polearm_range_max);
+}
+
 void
 display_polearm_positions(state)
 int state;
@@ -2864,9 +2882,7 @@ int state;
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
-                if (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
-                    && distu(x, y) >= polearm_range_min
-                    && distu(x, y) <= polearm_range_max) {
+                if (get_valid_polearm_position(x, y)) {
                     tmp_at(x, y);
                 }
             }
@@ -2936,7 +2952,7 @@ struct obj *obj;
         cc.x = hitm->mx;
         cc.y = hitm->my;
     }
-    getpos_sethilite(display_polearm_positions);
+    getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
     if (getpos(&cc, TRUE, "the spot to hit") < 0)
         return res; /* ESC; uses turn iff polearm became wielded */
 

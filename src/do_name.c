@@ -36,12 +36,15 @@ nextmbuf()
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+static boolean FDECL((*getpos_getvalid), (int,int)) = (boolean FDECL((*), (int,int))) 0;
 
 void
-getpos_sethilite(f)
+getpos_sethilite(f, d)
 void FDECL((*f), (int));
+boolean FDECL((*d), (int,int));
 {
     getpos_hilitefunc = f;
+    getpos_getvalid = d;
 }
 
 const char *const gloc_descr[NUM_GLOCS][4] = {
@@ -54,6 +57,11 @@ const char *const gloc_descr[NUM_GLOCS][4] = {
       "anything interesting" }
 };
 
+const char *const gloc_filtertxt[NUM_GFILTER] = {
+    "",
+    " in view",
+    " in this area"
+};
 
 void
 getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
@@ -69,7 +77,7 @@ int gloc;
             iflags.getloc_usemenu ? "get a menu of "
                                   : "move the cursor to ",
             gloc_descr[gloc][2 + iflags.getloc_usemenu],
-            iflags.getloc_limitview ? " in view" : "");
+            gloc_filtertxt[iflags.getloc_filter]);
     putstr(tmpwin, 0, sbuf);
 }
 
@@ -82,13 +90,17 @@ const char *goal;
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
+    const char *const fastmovemode[2] = { "8 units at a time",
+                                          "skipping same glyphs" };
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
-    putstr(tmpwin, 0,
-           "Use 'H', 'J', 'K', 'L' to move the cursor 8 units at a time.");
+    Sprintf(sbuf,
+            "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
+            fastmovemode[iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
            visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
@@ -121,15 +133,26 @@ const char *goal;
                              visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
+    Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
+            fastmovemode[!iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
+
     Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
-            "Use '%s' to toggle limiting possible targets to in view only.",
+            "Use '%s' to change the mode of limiting possible targets.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
+        if (getpos_getvalid) {
+            Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+            putstr(tmpwin, 0, sbuf);
+        }
         if (getpos_hilitefunc) {
             Sprintf(sbuf, "Use '%s' to display valid locations.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
@@ -214,6 +237,99 @@ const void *b;
      && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
      && !levl[(x)][(y)].seenv)
 
+static struct opvar *gloc_filter_map = (struct opvar *) 0;
+
+#define GLOC_SAME_AREA(x,y)                                     \
+    (isok((x), (y))                                             \
+     && (selection_getpoint((x),(y), gloc_filter_map)))
+
+static int gloc_filter_floodfill_match_glyph;
+
+int
+gloc_filter_classify_glyph(glyph)
+int glyph;
+{
+    int c;
+
+    if (!glyph_is_cmap(glyph))
+        return 0;
+
+    c = glyph_to_cmap(glyph);
+
+    if (is_cmap_room(c) || is_cmap_furniture(c))
+        return 1;
+    else if (is_cmap_wall(c) || c == S_tree)
+        return 2;
+    else if (is_cmap_corr(c))
+        return 3;
+    else if (is_cmap_water(c))
+        return 4;
+    else if (is_cmap_lava(c))
+        return 5;
+    return 0;
+}
+
+STATIC_OVL int
+gloc_filter_floodfill_matcharea(x,y)
+int x,y;
+{
+    int glyph = back_to_glyph(x, y);
+
+    if (!levl[x][y].seenv)
+        return FALSE;
+
+    if (glyph == gloc_filter_floodfill_match_glyph)
+        return TRUE;
+
+    if (gloc_filter_classify_glyph(glyph) == gloc_filter_classify_glyph(gloc_filter_floodfill_match_glyph))
+        return TRUE;
+
+    return FALSE;
+}
+
+void
+gloc_filter_floodfill(x,y)
+int x,y;
+{
+    gloc_filter_floodfill_match_glyph = back_to_glyph(x,y);
+
+    set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
+    selection_floodfill(gloc_filter_map, x,y, FALSE);
+}
+
+void
+gloc_filter_init()
+{
+    if (iflags.getloc_filter == GFILTER_AREA) {
+        if (!gloc_filter_map) {
+            gloc_filter_map = selection_opvar(NULL);
+        }
+        /* special case: if we're in a doorway, try to figure out which
+           direction we're moving, and use that side of the doorway */
+        if (IS_DOOR(levl[u.ux][u.uy].typ)) {
+            if (u.dx || u.dy) {
+                gloc_filter_floodfill(u.ux + u.dx, u.uy + u.dy);
+            } else {
+                /* TODO: maybe add both sides of the doorway? */
+            }
+        } else {
+            gloc_filter_floodfill(u.ux, u.uy);
+        }
+
+
+    }
+}
+
+void
+gloc_filter_done()
+{
+    if (gloc_filter_map) {
+        opvar_free_x(gloc_filter_map);
+        gloc_filter_map = NULL;
+    }
+}
+
+
 STATIC_OVL boolean
 gather_locs_interesting(x,y, gloc)
 int x,y, gloc;
@@ -223,7 +339,13 @@ int x,y, gloc;
      */
     int glyph = glyph_at(x, y);
 
-    if (iflags.getloc_limitview && !cansee(x,y))
+    if (iflags.getloc_filter == GFILTER_VIEW && !cansee(x,y))
+        return FALSE;
+    if (iflags.getloc_filter == GFILTER_AREA && !GLOC_SAME_AREA(x,y)
+         && !GLOC_SAME_AREA(x-1,y)
+         && !GLOC_SAME_AREA(x,y-1)
+         && !GLOC_SAME_AREA(x+1,y)
+         && !GLOC_SAME_AREA(x,y+1))
         return FALSE;
 
     switch (gloc) {
@@ -272,6 +394,8 @@ int x,y, gloc;
                      || glyph_to_cmap(glyph) == S_darkroom
                      || glyph_to_cmap(glyph) == S_corr
                      || glyph_to_cmap(glyph) == S_litcorr));
+    case GLOC_VALID:
+        return (getpos_getvalid && getpos_getvalid(x,y));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -297,6 +421,9 @@ int gloc;
      * Hero's spot will always sort to array[0] because it will always
      * be the shortest distance (namely, 0 units) away from <u.ux,u.uy>.
      */
+
+    gloc_filter_init();
+
     *cnt_p = idx = 0;
     for (pass = 0; pass < 2; pass++) {
         for (x = 1; x < COLNO; x++)
@@ -318,6 +445,8 @@ int gloc;
         else /* end of second pass */
             qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
     } /* pass */
+
+    gloc_filter_done();
 }
 
 char *
@@ -413,7 +542,9 @@ int cx, cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
-                    "%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    (iflags.autodescribe && getpos_getvalid && !getpos_getvalid(cx,cy))
+                    ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
@@ -422,9 +553,8 @@ int cx, cy;
 }
 
 boolean
-getpos_menu(ccp, fovonly, gloc)
+getpos_menu(ccp, gloc)
 coord *ccp;
-boolean fovonly;
 int gloc;
 {
     coord *garr = DUMMY;
@@ -440,7 +570,8 @@ int gloc;
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
         You("cannot %s %s.",
-            fovonly ? "see" : "detect", gloc_descr[gloc][0]);
+            iflags.getloc_filter == GFILTER_VIEW ? "see" : "detect",
+            gloc_descr[gloc][0]);
         return FALSE;
     }
 
@@ -466,7 +597,8 @@ int gloc;
     }
 
     Sprintf(tmpbuf, "Pick a target %s%s%s",
-            gloc_descr[gloc][1], fovonly ? " in view" : "",
+            gloc_descr[gloc][1],
+            gloc_filtertxt[iflags.getloc_filter],
             iflags.getloc_travelmode ? " for travel" : "");
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -505,10 +637,12 @@ const char *goal;
         NHKF_GETPOS_UNEX_NEXT,
         NHKF_GETPOS_UNEX_PREV,
         NHKF_GETPOS_INTERESTING_NEXT,
-        NHKF_GETPOS_INTERESTING_PREV
+        NHKF_GETPOS_INTERESTING_PREV,
+        NHKF_GETPOS_VALID_NEXT,
+        NHKF_GETPOS_VALID_PREV
     };
     char pick_chars[6];
-    char mMoOdDxX[11];
+    char mMoOdDxX[13];
     int result = 0;
     int cx, cy, i, c;
     int sidx, tx, ty;
@@ -595,8 +729,23 @@ const char *goal;
             } else if (Cmd.alphadirchars[i] == lowc((char) c)
                        || (Cmd.num_pad && Cmd.dirchars[i] == (c & 0177))) {
                 /* a shifted movement letter or Meta-digit */
-                dx = 8 * xdir[i];
-                dy = 8 * ydir[i];
+                if (iflags.getloc_moveskip) {
+                    /* skip same glyphs */
+                    int glyph = glyph_at(cx, cy);
+
+                    dx = xdir[i];
+                    dy = ydir[i];
+                    while (isok(cx + dx, cy + dy)
+                           && glyph == glyph_at(cx + dx, cy + dy)
+                           && isok(cx + dx+xdir[i], cy+dy+ydir[i])
+                           && glyph == glyph_at(cx + dx+xdir[i], cy + dy+ydir[i])) {
+                        dx += xdir[i];
+                        dy += ydir[i];
+                    }
+                } else {
+                    dx = 8 * xdir[i];
+                    dy = 8 * ydir[i];
+                }
             } else
                 continue;
 
@@ -646,7 +795,12 @@ const char *goal;
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
-            iflags.getloc_limitview = !iflags.getloc_limitview;
+            const char *const view_filters[NUM_GFILTER] = {
+                "Not limiting targets",
+                "Limiting targets to in sight",
+                "Limiting targets to in same area"
+            };
+            iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
             for (i = 0; i < NUM_GLOCS; i++) {
                 if (garr[i]) {
                     free((genericptr_t) garr[i]);
@@ -654,8 +808,7 @@ const char *goal;
                 }
                 gidx[i] = gcount[i] = 0;
             }
-            pline("%s possible targets to those in sight only.",
-                  iflags.getloc_limitview ? "Limiting" : "Not limiting");
+            pline("%s.", view_filters[iflags.getloc_filter]);
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
@@ -672,6 +825,10 @@ const char *goal;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
+        } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
+            iflags.getloc_moveskip = !iflags.getloc_moveskip;
+            pline("%skipping over similar terrain when fastmoving the cursor.",
+                  iflags.getloc_moveskip ? "S" : "Not s");
         } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
@@ -679,7 +836,7 @@ const char *goal;
 
             if (iflags.getloc_usemenu) {
                 coord tmpcrd;
-                if (getpos_menu(&tmpcrd, iflags.getloc_limitview, gloc)) {
+                if (getpos_menu(&tmpcrd, gloc)) {
                     cx = tmpcrd.x;
                     cy = tmpcrd.y;
                 }
@@ -808,6 +965,7 @@ const char *goal;
         if (garr[i])
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
+    getpos_getvalid = (boolean FDECL((*), (int,int))) 0;
     return result;
 }
 
@@ -1880,7 +2038,7 @@ static const char *const sir_Terry_novels[] = {
     "Lords and Ladies", "Men at Arms", "Soul Music", "Interesting Times",
     "Maskerade", "Feet of Clay", "Hogfather", "Jingo", "The Last Continent",
     "Carpe Jugulum", "The Fifth Elephant", "The Truth", "Thief of Time",
-    "The Last Hero", "The Amazing Maurice and his Educated Rodents",
+    "The Last Hero", "The Amazing Maurice and His Educated Rodents",
     "Night Watch", "The Wee Free Men", "Monstrous Regiment",
     "A Hat Full of Sky", "Going Postal", "Thud!", "Wintersmith",
     "Making Money", "Unseen Academicals", "I Shall Wear Midnight", "Snuff",

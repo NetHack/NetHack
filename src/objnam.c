@@ -90,8 +90,12 @@ releaseobuf(bufp)
 char *bufp;
 {
     /* caller may not know whether bufp is the most recently allocated
-       buffer; if it isn't, do nothing */
-    if (bufp == obufs[obufidx])
+       buffer; if it isn't, do nothing; note that because of the somewhat
+       obscure PREFIX handling for object name formatting by xname(),
+       the pointer our caller has and is passing to us might be into the
+       middle of an obuf rather than the address returned by nextobuf() */
+    if (bufp >= obufs[obufidx]
+        && bufp < obufs[obufidx] + sizeof obufs[obufidx]) /* obufs[][BUFSZ] */
         obufidx = (obufidx - 1 + NUMOBUF) % NUMOBUF;
 }
 
@@ -100,11 +104,11 @@ obj_typename(otyp)
 register int otyp;
 {
     char *buf = nextobuf();
-    register struct objclass *ocl = &objects[otyp];
-    register const char *actualn = OBJ_NAME(*ocl);
-    register const char *dn = OBJ_DESCR(*ocl);
-    register const char *un = ocl->oc_uname;
-    register int nn = ocl->oc_name_known;
+    struct objclass *ocl = &objects[otyp];
+    const char *actualn = OBJ_NAME(*ocl);
+    const char *dn = OBJ_DESCR(*ocl);
+    const char *un = ocl->oc_uname;
+    int nn = ocl->oc_name_known;
 
     if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
         actualn = Japanese_item_name(otyp);
@@ -251,6 +255,135 @@ boolean juice; /* whether or not to append " juice" to the name */
     return buf;
 }
 
+/* look up a named fruit by index (1..127) */
+struct fruit *
+fruit_from_indx(indx)
+int indx;
+{
+    struct fruit *f;
+
+    for (f = ffruit; f; f = f->nextf)
+        if (f->fid == indx)
+            break;
+    return f;
+}
+
+/* look up a named fruit by name */
+struct fruit *
+fruit_from_name(fname, exact, highest_fid)
+const char *fname;
+boolean exact; /* False => prefix or exact match, True = exact match only */
+int *highest_fid; /* optional output; only valid if 'fname' isn't found */
+{
+    struct fruit *f, *tentativef;
+    char *altfname;
+    unsigned k;
+    /*
+     * note: named fruits are case-senstive...
+     */
+
+    if (highest_fid)
+        *highest_fid = 0;
+    /* first try for an exact match */
+    for (f = ffruit; f; f = f->nextf)
+        if (!strcmp(f->fname, fname))
+            return f;
+        else if (highest_fid && f->fid > *highest_fid)
+            *highest_fid = f->fid;
+
+    /* didn't match as-is; if caller is willing to accept a prefix
+       match, try to find one; we want to find the longest prefix that
+       matches, not the first */
+    if (!exact) {
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            if (!strncmp(f->fname, fname, k)
+                && (!fname[k] || fname[k] == ' ')
+                && (!tentativef || k > strlen(tentativef->fname)))
+                tentativef = f;
+        }
+        f = tentativef;
+    }
+    /* if we still don't have a match, try singularizing the target;
+       for exact match, that's trivial, but for prefix, it's hard */
+    if (!f) {
+        altfname = makesingular(fname);
+        for (f = ffruit; f; f = f->nextf) {
+            if (!strcmp(f->fname, altfname))
+                break;
+        }
+        releaseobuf(altfname);
+    }
+    if (!f && !exact) {
+        char fnamebuf[BUFSZ], *p;
+        unsigned fname_k = strlen(fname); /* length of assumed plural fname */
+
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            /* reload fnamebuf[] each iteration in case it gets modified;
+               there's no need to recalculate fname_k */
+            Strcpy(fnamebuf, fname);
+            /* bug? if singular of fname is longer than plural,
+               failing the 'fname_k > k' test could skip a viable
+               candidate; unfortunately, we can't singularize until
+               after stripping off trailing stuff and we can't get
+               accurate fname_k until fname has been singularized;
+               compromise and use 'fname_k >= k' instead of '>',
+               accepting 1 char length discrepancy without risking
+               false match (I hope...) */
+            if (fname_k >= k && (p = index(&fnamebuf[k], ' ')) != 0) {
+                *p = '\0'; /* truncate at 1st space past length of f->fname */
+                altfname = makesingular(fnamebuf);
+                k = strlen(altfname); /* actually revised 'fname_k' */
+                if (!strcmp(f->fname, altfname)
+                    && (!tentativef || k > strlen(tentativef->fname)))
+                    tentativef = f;
+                releaseobuf(altfname); /* avoid churning through all obufs */
+            }
+        }
+        f = tentativef;
+    }
+    return f;
+}
+
+/* sort the named-fruit linked list by fruit index number */
+void
+reorder_fruit(forward)
+boolean forward;
+{
+    struct fruit *f, *allfr[1 + 127];
+    int i, j, k = SIZE(allfr);
+
+    for (i = 0; i < k; ++i)
+        allfr[i] = (struct fruit *) 0;
+    for (f = ffruit; f; f = f->nextf) {
+        /* without sanity checking, this would reduce to 'allfr[f->fid]=f' */
+        j = f->fid;
+        if (j < 1 || j >= k) {
+            impossible("reorder_fruit: fruit index (%d) out of range", j);
+            return; /* don't sort after all; should never happen... */
+        } else if (allfr[j]) {
+            impossible("reorder_fruit: duplicate fruit index (%d)", j);
+            return;
+        }
+        allfr[j] = f;
+    }
+    ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
+    /* slot [0] will always be empty; must start 'i' at 1 to avoid
+       [k - i] being out of bounds during first iteration */
+    for (i = 1; i < k; ++i) {
+        /* for forward ordering, go through indices from high to low;
+           for backward ordering, go from low to high */
+        j = forward ? (k - i) : i;
+        if (allfr[j]) {
+            allfr[j]->nextf = ffruit;
+            ffruit = allfr[j];
+        }
+    }
+}
+
 char *
 xname(obj)
 struct obj *obj;
@@ -388,23 +521,20 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         break;
     case FOOD_CLASS:
         if (typ == SLIME_MOLD) {
-            register struct fruit *f;
+            struct fruit *f = fruit_from_indx(obj->spe);
 
-            for (f = ffruit; f; f = f->nextf) {
-                if (f->fid == obj->spe) {
-                    Strcpy(buf, f->fname);
-                    break;
-                }
-            }
             if (!f) {
                 impossible("Bad fruit #%d?", obj->spe);
                 Strcpy(buf, "fruit");
-            } else if (pluralize) {
-                /* ick; already pluralized fruit names
-                   are allowed--we want to try to avoid
-                   adding a redundant plural suffix */
-                Strcpy(buf, makeplural(makesingular(buf)));
-                pluralize = FALSE;
+            } else {
+                Strcpy(buf, f->fname);
+                if (pluralize) {
+                    /* ick; already pluralized fruit names
+                       are allowed--we want to try to avoid
+                       adding a redundant plural suffix */
+                    Strcpy(buf, makeplural(makesingular(buf)));
+                    pluralize = FALSE;
+                }
             }
             break;
         }
@@ -1493,7 +1623,10 @@ const char *str;
         buf[0] = lowc(*str);
         Strcpy(&buf[1], str + 1);
         return buf;
-    } else if (*str < 'A' || *str > 'Z') {
+    } else if (*str < 'A' || *str > 'Z'
+               /* treat named fruit as not a proper name, even if player
+                  has assigned a capitalized proper name as his/her fruit */
+               || fruit_from_name(str, TRUE, (int *) 0)) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
     } else {
@@ -2010,10 +2143,14 @@ char *str;
     return 0;
 }
 
-/* Plural routine; chiefly used for user-defined fruits.  We have to try to
- * account for everything reasonable the player has; something unreasonable
- * can still break the code.  However, it's still a lot more accurate than
- * "just add an s at the end", which Rogue uses...
+/* Plural routine; once upon a time it may have been chiefly used for
+ * user-defined fruits, but it is now used extensively throughout the
+ * program.
+ *
+ * For fruit, we have to try to account for everything reasonable the
+ * player has; something unreasonable can still break the code.
+ * However, it's still a lot more accurate than "just add an 's' at the
+ * end", which Rogue uses...
  *
  * Also used for plural monster names ("Wiped out all homunculi." or the
  * vanquished monsters list) and body parts.  A lot of unique monsters have
@@ -2847,9 +2984,14 @@ struct obj *no_wish;
         if (!strstri(bp, "wand ") && !strstri(bp, "spellbook ")
             && !strstri(bp, "finger ")) {
             if ((p = strstri(bp, "tin of ")) != 0) {
-                tmp = tin_variety_txt(p + 7, &tinv);
-                tvariety = tinv;
-                mntmp = name_to_mon(p + 7 + tmp);
+                if (!strcmpi(p + 7, "spinach")) {
+                    contents = SPINACH;
+                    mntmp = NON_PM;
+                } else {
+                    tmp = tin_variety_txt(p + 7, &tinv);
+                    tvariety = tinv;
+                    mntmp = name_to_mon(p + 7 + tmp);
+                }
                 typ = TIN;
                 goto typfnd;
             } else if ((p = strstri(bp, " of ")) != 0
@@ -2858,35 +3000,32 @@ struct obj *no_wish;
         }
     }
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
-    if (strncmpi(bp, "samurai sword", 13))   /* not the "samurai" monster! */
-        if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
-            if (strncmpi(bp, "ninja-to", 8)) /* not the "ninja" rank */
-                if (strncmpi(bp, "master key",
-                             10)) /* not the "master" rank */
-                    if (strncmpi(bp, "magenta", 7)) /* not the "mage" rank */
-                        if (mntmp < LOW_PM && strlen(bp) > 2
-                            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
-                            int mntmptoo,
-                                mntmplen; /* double check for rank title */
-                            char *obp = bp;
-                            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
-                            bp += mntmp != mntmptoo
-                                      ? (int) strlen(mons[mntmp].mname)
+    if (strncmpi(bp, "samurai sword", 13)  /* not the "samurai" monster! */
+        && strncmpi(bp, "wizard lock", 11) /* not the "wizard" monster! */
+        && strncmpi(bp, "ninja-to", 8)     /* not the "ninja" rank */
+        && strncmpi(bp, "master key", 10)  /* not the "master" rank */
+        && strncmpi(bp, "magenta", 7)) {   /* not the "mage" rank */
+        if (mntmp < LOW_PM && strlen(bp) > 2
+            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
+            int mntmptoo, mntmplen; /* double check for rank title */
+            char *obp = bp;
+
+            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
+            bp += (mntmp != mntmptoo) ? (int) strlen(mons[mntmp].mname)
                                       : mntmplen;
-                            if (*bp == ' ')
-                                bp++;
-                            else if (!strncmpi(bp, "s ", 2))
-                                bp += 2;
-                            else if (!strncmpi(bp, "es ", 3))
-                                bp += 3;
-                            else if (!*bp && !actualn && !dn && !un
-                                     && !oclass) {
-                                /* no referent; they don't really mean a
-                                 * monster type */
-                                bp = obp;
-                                mntmp = NON_PM;
-                            }
-                        }
+            if (*bp == ' ') {
+                bp++;
+            } else if (!strncmpi(bp, "s ", 2)) {
+                bp += 2;
+            } else if (!strncmpi(bp, "es ", 3)) {
+                bp += 3;
+            } else if (!*bp && !actualn && !dn && !un && !oclass) {
+                /* no referent; they don't really mean a monster type */
+                bp = obp;
+                mntmp = NON_PM;
+            }
+        }
+    }
 
     /* first change to singular if necessary */
     if (*bp) {
@@ -2952,7 +3091,8 @@ struct obj *no_wish;
      * gold/money concept.  Maybe we want to add other monetary units as
      * well in the future. (TH)
      */
-    if (!BSTRCMPI(bp, p - 10, "gold piece") || !BSTRCMPI(bp, p - 7, "zorkmid")
+    if (!BSTRCMPI(bp, p - 10, "gold piece")
+        || !BSTRCMPI(bp, p - 7, "zorkmid")
         || !strcmpi(bp, "gold") || !strcmpi(bp, "money")
         || !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
         if (cnt > 5000 && !wizard)
@@ -2975,15 +3115,19 @@ struct obj *no_wish;
 
     /* Search for class names: XXXXX potion, scroll of XXXXX.  Avoid */
     /* false hits on, e.g., rings for "ring mail". */
-    if (strncmpi(bp, "enchant ", 8) && strncmpi(bp, "destroy ", 8)
+    if (strncmpi(bp, "enchant ", 8)
+        && strncmpi(bp, "destroy ", 8)
         && strncmpi(bp, "detect food", 11)
-        && strncmpi(bp, "food detection", 14) && strncmpi(bp, "ring mail", 9)
+        && strncmpi(bp, "food detection", 14)
+        && strncmpi(bp, "ring mail", 9)
         && strncmpi(bp, "studded leather armor", 21)
         && strncmpi(bp, "leather armor", 13)
-        && strncmpi(bp, "tooled horn", 11) && strncmpi(bp, "food ration", 11)
+        && strncmpi(bp, "tooled horn", 11)
+        && strncmpi(bp, "food ration", 11)
         && strncmpi(bp, "meat ring", 9))
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
+
             if (!strncmpi(bp, wrp[i], j)) {
                 oclass = wrpsym[i];
                 if (oclass != AMULET_CLASS) {
@@ -3099,10 +3243,16 @@ srch:
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
 
-            if ((zn = OBJ_NAME(objects[i])) && !strcmpi(actualn, zn)) {
+            if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(actualn, zn)) {
                 typ = i;
                 goto typfnd;
             }
+        }
+        /* "tin of foo" would be caught above, but plain "tin" has
+           a random chance of yielding "tin wand" unless we do this */
+        if (!strcmpi(actualn, "tin")) {
+            typ = TIN;
+            goto typfnd;
         }
     }
 

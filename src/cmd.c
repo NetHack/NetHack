@@ -135,6 +135,7 @@ STATIC_PTR int NDECL(wiz_level_change);
 STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
+STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
 STATIC_DCL void NDECL(wiz_map_levltyp);
@@ -1157,38 +1158,52 @@ STATIC_PTR int
 wiz_intrinsic(VOID_ARGS)
 {
     if (wizard) {
-        extern const char *const propertynames[]; /* timeout.c */
+        extern const struct propname {
+            int prop_num;
+            const char *prop_name;
+        } propertynames[]; /* timeout.c */
         static const char wizintrinsic[] = "#wizintrinsic";
         static const char fmt[] = "You are%s %s.";
         winid win;
         anything any;
         char buf[BUFSZ];
-        int i, n, p, amt, typ;
+        int i, j, n, p, amt, typ;
         long oldtimeout, newtimeout;
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
 
+        any = zeroany;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-
-        for (i = 1; (propname = propertynames[i]) != 0; ++i) {
-            if (i == HALLUC_RES) {
+        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+            p = propertynames[i].prop_num;
+            if (p == HALLUC_RES) {
                 /* Grayswandir vs hallucination; ought to be redone to
                    use u.uprops[HALLUC].blocked instead of being treated
                    as a separate property; letting in be manually toggled
                    even only in wizard mode would be asking for trouble... */
                 continue;
             }
-            any.a_int = i;
-            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, propname, FALSE);
+            if (p == FIRE_RES) {
+                any.a_int = 0;
+                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--", FALSE);
+            }
+            any.a_int = i + 1; /* +1: avoid 0 */
+            oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
+            if (oldtimeout)
+                Sprintf(buf, "%-27s [%li]", propname, oldtimeout);
+            else
+                Sprintf(buf, "%s", propname);
+            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
         }
         end_menu(win, "Which intrinsics?");
         n = select_menu(win, PICK_ANY, &pick_list);
         destroy_nhwindow(win);
 
         amt = 30; /* TODO: prompt for duration */
-        for (i = 0; i < n; ++i) {
-            p = pick_list[i].item.a_int;
+        for (j = 0; j < n; ++j) {
+            i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
+            p = propertynames[i].prop_num;
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
             newtimeout = oldtimeout + (long) amt;
             switch (p) {
@@ -1204,9 +1219,12 @@ wiz_intrinsic(VOID_ARGS)
             case BLINDED:
                 make_blinded(newtimeout, TRUE);
                 break;
+#if 0       /* make_confused() only gives feedback when confusion is
+             * ending so use the 'default' case for it instead */
             case CONFUSION:
                 make_confused(newtimeout, TRUE);
                 break;
+#endif /*0*/
             case DEAF:
                 make_deaf(newtimeout, TRUE);
                 break;
@@ -1236,7 +1254,7 @@ wiz_intrinsic(VOID_ARGS)
                 pline1(buf);
                 break;
             default:
-                pline("Timeout for %s %s %d.", propertynames[p],
+                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
                 incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
@@ -2458,14 +2476,15 @@ int final;
     /* named fruit debugging (doesn't really belong here...); to enable,
        include 'fruit' in DEBUGFILES list (even though it isn't a file...) */
     if (wizard && explicitdebug("fruit")) {
-        int fcount = 0;
         struct fruit *f;
-        char buf2[BUFSZ];
 
+        reorder_fruit(TRUE); /* sort by fruit index, from low to high;
+                              * this modifies the ffruit chain, so could
+                              * possibly mask or even introduce a problem,
+                              * but it does useful sanity checking */
         for (f = ffruit; f; f = f->nextf) {
-            Sprintf(buf, "Fruit %d ", ++fcount);
-            Sprintf(buf2, "%s (id %d)", f->fname, f->fid);
-            enl_msg(buf, "is ", "was ", buf2, "");
+            Sprintf(buf, "Fruit #%d ", f->fid);
+            enl_msg(buf, "is ", "was ", f->fname, "");
         }
         enl_msg("The current fruit ", "is ", "was ", pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
@@ -3724,10 +3743,13 @@ struct {
     { NHKF_GETPOS_DOOR_PREV, 'D', "getpos.door.prev" },
     { NHKF_GETPOS_UNEX_NEXT, 'x', "getpos.unexplored.next" },
     { NHKF_GETPOS_UNEX_PREV, 'X', "getpos.unexplored.prev" },
+    { NHKF_GETPOS_VALID_NEXT, 'z', "getpos.valid.next" },
+    { NHKF_GETPOS_VALID_PREV, 'Z', "getpos.valid.prev" },
     { NHKF_GETPOS_INTERESTING_NEXT, 'a', "getpos.all.next" },
     { NHKF_GETPOS_INTERESTING_PREV, 'A', "getpos.all.prev" },
     { NHKF_GETPOS_HELP,      '?', "getpos.help" },
-    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.inview" },
+    { NHKF_GETPOS_LIMITVIEW, '"', "getpos.filter" },
+    { NHKF_GETPOS_MOVESKIP,  '*', "getpos.moveskip" },
     { NHKF_GETPOS_MENU,      '!', "getpos.menu" }
 };
 
@@ -5016,10 +5038,14 @@ dotravel(VOID_ARGS)
     }
     iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
-        if (!getpos_menu(&cc, TRUE, GLOC_INTERESTING)) {
+        int gf = iflags.getloc_filter;
+        iflags.getloc_filter = GFILTER_VIEW;
+        if (!getpos_menu(&cc, GLOC_INTERESTING)) {
+            iflags.getloc_filter = gf;
             iflags.getloc_travelmode = FALSE;
             return 0;
         }
+        iflags.getloc_filter = gf;
     } else {
         pline("Where do you want to travel to?");
         if (getpos(&cc, TRUE, "the desired destination") < 0) {

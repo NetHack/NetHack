@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1496959470 2017/06/08 22:04:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.591 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1502753404 2017/08/14 23:30:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.600 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -384,9 +384,9 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
-E boolean FDECL(getpos_menu, (coord *, BOOLEAN_P, int));
+E boolean FDECL(getpos_menu, (coord *, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
-E void FDECL(getpos_sethilite, (void (*f)(int)));
+E void FDECL(getpos_sethilite, (void (*f)(int), boolean (*d)(int,int)));
 E void FDECL(new_mname, (struct monst *, int));
 E void FDECL(free_mname, (struct monst *));
 E void FDECL(new_oname, (struct obj *, int));
@@ -1312,6 +1312,7 @@ E struct obj *FDECL(obj_nexto, (struct obj *));
 E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
 E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
 E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
+E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
 
 /* ### mkroom.c ### */
 
@@ -1565,6 +1566,7 @@ E int FDECL(rnd_misc_item, (struct monst *));
 E boolean FDECL(searches_for_item, (struct monst *, struct obj *));
 E boolean FDECL(mon_reflects, (struct monst *, const char *));
 E boolean FDECL(ureflects, (const char *, const char *));
+E void FDECL(mcureblindness, (struct monst *, BOOLEAN_P));
 E boolean FDECL(munstone, (struct monst *, BOOLEAN_P));
 E boolean FDECL(munslime, (struct monst *, BOOLEAN_P));
 
@@ -1624,6 +1626,9 @@ E char *FDECL(simple_typename, (int));
 E boolean FDECL(obj_is_pname, (struct obj *));
 E char *FDECL(distant_name, (struct obj *, char *(*)(OBJ_P)));
 E char *FDECL(fruitname, (BOOLEAN_P));
+E struct fruit *FDECL(fruit_from_indx, (int));
+E struct fruit *FDECL(fruit_from_name, (const char *, BOOLEAN_P, int *));
+E void FDECL(reorder_fruit, (BOOLEAN_P));
 E char *FDECL(xname, (struct obj *));
 E char *FDECL(mshot_xname, (struct obj *));
 E boolean FDECL(the_unique_obj, (struct obj *));
@@ -1833,12 +1838,6 @@ E void VDECL(There, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
-E const char *FDECL(align_str, (ALIGNTYP_P));
-E void FDECL(mstatusline, (struct monst *));
-E void NDECL(ustatusline);
-E void NDECL(self_invis_message);
-E char *FDECL(piousness, (BOOLEAN_P, const char *));
-E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
 
 /* ### polyself.c ### */
 
@@ -1876,6 +1875,7 @@ E void FDECL(make_stoned, (long, const char *, int, const char *));
 E void FDECL(make_vomiting, (long, BOOLEAN_P));
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
 E void FDECL(make_deaf, (long, BOOLEAN_P));
+E void NDECL(self_invis_message);
 E int NDECL(dodrink);
 E int FDECL(dopotion, (struct obj *));
 E int FDECL(peffects, (struct obj *));
@@ -1932,6 +1932,10 @@ E void NDECL(clearpriests);
 E void FDECL(restpriest, (struct monst *, BOOLEAN_P));
 E void FDECL(newepri, (struct monst *));
 E void FDECL(free_epri, (struct monst *));
+E const char *FDECL(align_str, (ALIGNTYP_P));
+E char *FDECL(piousness, (BOOLEAN_P, const char *));
+E void FDECL(mstatusline, (struct monst *));
+E void NDECL(ustatusline);
 
 /* ### quest.c ### */
 
@@ -2250,6 +2254,11 @@ E boolean
 FDECL(dig_corridor, (coord *, coord *, BOOLEAN_P, SCHAR_P, SCHAR_P));
 E void FDECL(fill_room, (struct mkroom *, BOOLEAN_P));
 E boolean FDECL(load_special, (const char *));
+E xchar FDECL(selection_getpoint, (int, int, struct opvar *));
+E struct opvar *FDECL(selection_opvar, (char *));
+E void FDECL(opvar_free_x, (struct opvar *));
+E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
+E void FDECL(selection_floodfill, (struct opvar *, int, int, BOOLEAN_P));
 
 /* ### spell.c ### */
 
@@ -2505,6 +2514,7 @@ E int FDECL(hide_privileges, (BOOLEAN_P));
 E void FDECL(newegd, (struct monst *));
 E void FDECL(free_egd, (struct monst *));
 E boolean FDECL(grddead, (struct monst *));
+E void NDECL(vault_summon_gd);
 E char FDECL(vault_occupied, (char *));
 E void NDECL(invault);
 E int FDECL(gd_move, (struct monst *));

@@ -70,7 +70,7 @@ extern NEARDATA struct permonst mons[]; /* the master list of monster types */
 #define FAST_SPEED 15
 #define VERY_FAST 24
 
-#define NON_PM PM_PLAYERMON          /* "not a monster" */
+#define NON_PM (-1)                  /* "not a monster" */
 #define LOW_PM (NON_PM + 1)          /* first monster in mons[] */
 #define SPECIAL_PM PM_LONG_WORM_TAIL /* [normal] < ~ < [special] */
 /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are

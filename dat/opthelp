@@ -177,6 +177,12 @@ whatis_coord  controls whether to include map coordinates when          [n]
               map          -- <x,y>        (map column x=0 is not used)
               screen       -- [row,column] (row is offset to match tty usage)
               none         -- no coordinates shown.
+whatis_filter controls how to filter eligible map coordinates when      [n]
+              getting a map location for eg. the travel command.
+              Value is the one of
+              n - no filtering
+              v - locations in view only
+              a - locations in same area (room, corridor, etc)
 
 Compound options which may be set only on startup are:
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1502753407 2017/08/14 23:30:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -209,7 +209,7 @@ int x, y; /* dog's starting location, might be different from current */
 boolean devour;
 {
     register struct edog *edog = EDOG(mtmp);
-    boolean poly, grow, heal, slimer, deadmimic;
+    boolean poly, grow, heal, eyes, slimer, deadmimic;
     int nutrit;
     long oprice;
     char objnambuf[BUFSZ];
@@ -226,6 +226,7 @@ boolean devour;
     poly = polyfodder(obj);
     grow = mlevelgain(obj);
     heal = mhealup(obj);
+    eyes = (obj->otyp == CARROT);
 
     if (devour) {
         if (mtmp->meating > 1)
@@ -343,6 +344,8 @@ boolean devour;
     }
     if (heal)
         mtmp->mhp = mtmp->mhpmax;
+    if ((eyes || heal) && !mtmp->mcansee)
+        mcureblindness(mtmp, canseemon(mtmp));
     if (deadmimic)
         quickmimic(mtmp);
     return 1;

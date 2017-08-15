@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1496531114 2017/06/03 23:05:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1502753408 2017/08/14 23:30:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -886,9 +886,9 @@ int
 meatobj(mtmp) /* for gelatinous cubes */
 struct monst *mtmp;
 {
-    register struct obj *otmp, *otmp2;
+    struct obj *otmp, *otmp2;
     struct permonst *ptr, *original_ptr = mtmp->data;
-    int poly, grow, heal, count = 0, ecount = 0;
+    int poly, grow, heal, eyes, count = 0, ecount = 0;
     char buf[BUFSZ];
 
     buf[0] = '\0';
@@ -986,6 +986,7 @@ struct monst *mtmp;
             poly = polyfodder(otmp);
             grow = mlevelgain(otmp);
             heal = mhealup(otmp);
+            eyes = (otmp->otyp == CARROT);
             delobj(otmp); /* munch */
             ptr = mtmp->data;
             if (poly) {
@@ -996,6 +997,8 @@ struct monst *mtmp;
             } else if (heal) {
                 mtmp->mhp = mtmp->mhpmax;
             }
+            if ((eyes || heal) && !mtmp->mcansee)
+                mcureblindness(mtmp, canseemon(mtmp));
             /* in case it polymorphed or died */
             if (ptr != original_ptr)
                 return !ptr ? 2 : 1;

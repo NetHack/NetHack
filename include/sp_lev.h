@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1470212260 2016/08/03 08:17:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501803105 2017/08/03 23:31:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -257,14 +257,6 @@ enum opcode_defs {
 #define SP_MAPCHAR_LIT(l) ((((l) >> 8) & 0xffff) - 10)
 #define SP_MAPCHAR_PACK(typ, lit) (((10 + (lit)) << 8) | ((typ) & 0xff))
 
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
-};
-
 struct splev_var {
     struct splev_var *next;
     char *name;
@@ -493,61 +485,52 @@ struct lc_breakdef {
 #ifdef SPEC_LEV
 /* compiling lev_comp rather than nethack */
 #ifdef USE_OLDARGS
-#undef VA_ARGS
-#undef VA_DECL
-#undef VA_DECL2
-#undef VA_SHIFT
+#ifndef VA_TYPE
+typedef const char *vA;
+#define VA_TYPE
+#endif
+#undef VA_ARGS  /* redefine with the maximum number actually used */
+#undef VA_SHIFT /* ditto */
+#undef VA_PASS1
 #define VA_ARGS                                                         \
     arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, \
         arg12, arg13, arg14
-#define VA_DECL(typ1, var1)                                             \
-    (var1, VA_ARGS) typ1 var1;                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, \
-        *arg10, *arg11, *arg12, *arg13, *arg14;                         \
-    {
-#define VA_DECL2(typ1, var1, typ2, var2)                                \
-    (var1, var2, VA_ARGS) typ1 var1;                                    \
-    typ2 var2;                                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, \
-        *arg10, *arg11, *arg12, *arg13, *arg14;                         \
-    {
-/* unlike in the core, lev_comp's VA_SHIFT is completely safe,
-   because callers always pass all these arguments */
+/* Unlike in the core, lev_comp's VA_SHIFT should be completely safe,
+   because callers always pass all these arguments. */
 #define VA_SHIFT()                                                       \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6,    \
      arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = arg10, arg10 = arg11, \
      arg11 = arg12, arg12 = arg13, arg13 = arg14, arg14 = 0)
 /* standard NULL may be either (void *)0 or plain 0, both of
    which would need to be explicitly cast to (char *) here */
-typedef char *Va;
 #define VA_PASS1(a1)                                                         \
-    (Va) a1, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS2(a1, a2)                                              \
-    (Va) a1, (Va) a2, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS3(a1, a2, a3)                                           \
-    (Va) a1, (Va) a2, (Va) a3, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS4(a1, a2, a3, a4)                                        \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS5(a1, a2, a3, a4, a5)                                     \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS7(a1, a2, a3, a4, a5, a6, a7)                               \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS8(a1, a2, a3, a4, a5, a6, a7, a8)                            \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS9(a1, a2, a3, a4, a5, a6, a7, a8, a9)                        \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) a9, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) a9, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13,   \
                   a14)                                                      \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) a9, (Va) a10, (Va) a11, (Va) a12, (Va) a13, (Va) a14
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) a9, (vA) a10, (vA) a11, (vA) a12, (vA) a13, (vA) a14
 #else /*!USE_OLDARGS*/
 /* USE_STDARG and USE_VARARGS don't need to pass dummy arguments
    or cast real ones */

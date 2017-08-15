@@ -1,4 +1,4 @@
-/* NetHack 3.6	pckeys.c	$NHDT-Date: 1457207039 2016/03/05 19:43:59 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	pckeys.c	$NHDT-Date: 1501465420 2017/07/31 01:43:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,8 +39,8 @@ unsigned char shift;
     boolean opening_dialog;
 
     opening_dialog = pl_character[0] ? FALSE : TRUE;
-#ifdef SIMULATE_CURSOR
     switch (scancode) {
+#ifdef SIMULATE_CURSOR
     case 0x3d: /* F3 = toggle cursor type */
         HideCursor();
         cursor_type += 1;
@@ -53,7 +53,6 @@ unsigned char shift;
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
             userpan(1);
         break;
-
     case 0x73: /* Control-left_arrow = scroll horizontal to left */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
             userpan(0);

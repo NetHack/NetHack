@@ -176,6 +176,14 @@ struct sysflag {
 #define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
 
+enum getloc_filters {
+    GFILTER_NONE = 0,
+    GFILTER_VIEW,
+    GFILTER_AREA,
+
+    NUM_GFILTER
+};
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -194,8 +202,9 @@ struct instance_flags {
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     boolean getloc_travelmode;
-    boolean getloc_limitview;
+    int getloc_filter;     /* GFILTER_foo */
     boolean getloc_usemenu;
+    boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
@@ -483,9 +492,12 @@ enum nh_keyfunc {
     NHKF_GETPOS_UNEX_PREV,
     NHKF_GETPOS_INTERESTING_NEXT,
     NHKF_GETPOS_INTERESTING_PREV,
+    NHKF_GETPOS_VALID_NEXT,
+    NHKF_GETPOS_VALID_PREV,
     NHKF_GETPOS_HELP,
     NHKF_GETPOS_MENU,
     NHKF_GETPOS_LIMITVIEW,
+    NHKF_GETPOS_MOVESKIP,
 
     NUM_NHKF
 };
@@ -496,6 +508,7 @@ enum gloctypes {
     GLOC_DOOR,
     GLOC_EXPLORE,
     GLOC_INTERESTING,
+    GLOC_VALID,
 
     NUM_GLOCS
 };

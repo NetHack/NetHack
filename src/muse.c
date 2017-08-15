@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1469840918 2016/07/30 01:08:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1502753408 2017/08/14 23:30:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -603,7 +603,7 @@ struct monst *mtmp;
     int i, fleetim, how = 0;
     struct obj *otmp = m.defensive;
     boolean vis, vismon, oseen;
-    const char *Mnam, *mcsa = "%s can see again.";
+    const char *Mnam;
 
     if ((i = precheck(mtmp, otmp)) != 0)
         return i;
@@ -628,10 +628,7 @@ struct monst *mtmp;
                 pline_The("tip of %s's horn glows!", mon_nam(mtmp));
         }
         if (!mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
+            mcureblindness(mtmp, vismon);
         } else if (mtmp->mconf || mtmp->mstun) {
             mtmp->mconf = mtmp->mstun = 0;
             if (vismon)
@@ -939,12 +936,8 @@ struct monst *mtmp;
         mtmp->mhp += i;
         if (mtmp->mhp > mtmp->mhpmax)
             mtmp->mhp = ++mtmp->mhpmax;
-        if (!otmp->cursed && !mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!otmp->cursed && !mtmp->mcansee)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks better.", Monnam(mtmp));
         if (oseen)
@@ -957,12 +950,8 @@ struct monst *mtmp;
         mtmp->mhp += i;
         if (mtmp->mhp > mtmp->mhpmax)
             mtmp->mhp = (mtmp->mhpmax += (otmp->blessed ? 5 : 2));
-        if (!mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!mtmp->mcansee)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks much better.", Monnam(mtmp));
         if (oseen)
@@ -974,12 +963,8 @@ struct monst *mtmp;
         if (otmp->otyp == POT_SICKNESS)
             unbless(otmp); /* Pestilence */
         mtmp->mhp = (mtmp->mhpmax += (otmp->blessed ? 8 : 4));
-        if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks completely healed.", Monnam(mtmp));
         if (oseen)
@@ -2173,6 +2158,20 @@ const char *fmt, *str;
         return TRUE;
     }
     return FALSE;
+}
+
+/* cure mon's blindness (use_defensive, dog_eat, meatobj) */
+void
+mcureblindness(mon, verbos)
+struct monst *mon;
+boolean verbos;
+{
+    if (!mon->mcansee) {
+        mon->mcansee = 1;
+        mon->mblinded = 0;
+        if (verbos && haseyes(mon->data))
+            pline("%s can see again.", Monnam(mon));
+    }
 }
 
 /* TRUE if the monster ate something */

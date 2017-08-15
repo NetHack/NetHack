@@ -240,6 +240,26 @@ int type;
 }
 
 void
+mk_zoo_thronemon(x,y)
+int x,y;
+{
+    int i = rnd(level_difficulty());
+    int pm = (i > 9) ? PM_OGRE_KING
+        : (i > 5) ? PM_ELVENKING
+        : (i > 2) ? PM_DWARF_KING
+        : PM_GNOME_KING;
+    struct monst *mon = makemon(&mons[pm], x, y, NO_MM_FLAGS);
+
+    if (mon) {
+        mon->msleeping = 1;
+        mon->mpeaceful = 0;
+        set_malign(mon);
+        /* Give him a sceptre to pound in judgment */
+        (void) mongets(mon, MACE);
+    }
+}
+
+void
 fill_zoo(sroom)
 struct mkroom *sroom;
 {
@@ -265,7 +285,7 @@ struct mkroom *sroom;
             ty = mm.y;
         } while (occupied((xchar) tx, (xchar) ty) && --i > 0);
     throne_placed:
-        /* TODO: try to ensure the enthroned monster is an M2_PRINCE */
+        mk_zoo_thronemon(tx, ty);
         break;
     case BEEHIVE:
         tx = sroom->lx + (sroom->hx - sroom->lx + 1) / 2;

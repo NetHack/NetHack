@@ -13,6 +13,25 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *NDECL(rank);
 
+static char *
+get_strength_str()
+{
+    static char buf[32];
+    int st = ACURR(A_STR);
+
+    if (st > 18) {
+        if (st > STR18(100))
+            Sprintf(buf, "%2d", st - 100);
+        else if (st < STR18(100))
+            Sprintf(buf, "18/%02d", st - 18);
+        else
+            Sprintf(buf, "18/**");
+    } else
+        Sprintf(buf, "%-1d", st);
+
+    return buf;
+}
+
 #if !defined(STATUS_VIA_WINDOWPORT) || defined(DUMPLOG)
 
 char *
@@ -48,16 +67,9 @@ do_statusline1()
     j = (int) ((nb + 2) - newbot1); /* strlen(newbot1) but less computation */
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
-    if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100))
-            Sprintf(nb = eos(nb), "St:%2d ", ACURR(A_STR) - 100);
-        else if (ACURR(A_STR) < STR18(100))
-            Sprintf(nb = eos(nb), "St:18/%02d ", ACURR(A_STR) - 18);
-        else
-            Sprintf(nb = eos(nb), "St:18/** ");
-    } else
-        Sprintf(nb = eos(nb), "St:%-1d ", ACURR(A_STR));
-    Sprintf(nb = eos(nb), "Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+
+    Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+            get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
     Sprintf(nb = eos(nb),
@@ -470,18 +482,8 @@ bot()
     valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
-    buf[0] = '\0';
     blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
-    if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100))
-            Sprintf(buf, "%2d", ACURR(A_STR) - 100);
-        else if (ACURR(A_STR) < STR18(100))
-            Sprintf(buf, "18/%02d", ACURR(A_STR) - 18);
-        else
-            Sprintf(buf, "18/**");
-    } else
-        Sprintf(buf, "%-1d", ACURR(A_STR));
-    Strcpy(blstats[idx][BL_STR].val, buf);
+    Strcpy(blstats[idx][BL_STR].val, get_strength_str());
     valset[BL_STR] = TRUE; /* indicate val already set */
 
     /*  Dexterity, constitution, intelligence, wisdom, charisma. */

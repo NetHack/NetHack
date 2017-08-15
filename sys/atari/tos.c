@@ -1,4 +1,4 @@
-/* NetHack 3.6	tos.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.6	tos.c	$NHDT-Date: 1501979358 2017/08/06 00:29:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -271,17 +271,20 @@ char *from, *to;
     int fromfd, tofd, r;
     char *buf;
 
-    if ((fromfd = open(from, O_RDONLY | O_BINARY, 0)) < 0)
+    fromfd = open(from, O_RDONLY | O_BINARY, 0);
+    if (fromfd < 0)
         return -1;
-    if ((tofd = open(to, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK))
-        < 0)
+    tofd = open(to, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+    if (tofd < 0) {
+        close(fromfd);
         return -1;
-    buf = (char *) alloc((size_t) BIGBUF);
+    }
+    buf = (char *) alloc((unsigned) BIGBUF);
     while ((r = read(fromfd, buf, BIGBUF)) > 0)
         write(tofd, buf, r);
     close(fromfd);
     close(tofd);
-    free(buf);
+    free((genericptr_t) buf);
     return 0; /* successful */
 }
 

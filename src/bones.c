@@ -48,14 +48,10 @@ STATIC_OVL void
 goodfruit(id)
 int id;
 {
-    register struct fruit *f;
+    struct fruit *f = fruit_from_indx(-id);
 
-    for (f = ffruit; f; f = f->nextf) {
-        if (f->fid == -id) {
-            f->fid = id;
-            return;
-        }
-    }
+    if (f)
+        f->fid = id;
 }
 
 STATIC_OVL void

@@ -1747,7 +1747,8 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
     nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") || ident
              || takeoff || take_out || put_in);
     ininv = (*objchn == invent);
-    bycat = (menu_class_present('B') || menu_class_present('U')
+    bycat = (menu_class_present('u')
+             || menu_class_present('B') || menu_class_present('U')
              || menu_class_present('C') || menu_class_present('X'));
 
     /* someday maybe we'll sort by 'olets' too (temporarily replace

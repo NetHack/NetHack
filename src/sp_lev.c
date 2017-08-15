@@ -36,7 +36,6 @@ STATIC_DCL struct opvar *FDECL(opvar_new_coord, (int, int));
 #if 0
 STATIC_DCL struct opvar * FDECL(opvar_new_region, (int,int, int,int));
 #endif /*0*/
-STATIC_DCL void FDECL(opvar_free_x, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(opvar_clone, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(opvar_var_conversion, (struct sp_coder *,
                                                       struct opvar *));
@@ -114,8 +113,6 @@ STATIC_DCL void FDECL(spo_altar, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_trap, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_gold, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_corridor, (struct sp_coder *));
-STATIC_DCL struct opvar *FDECL(selection_opvar, (char *));
-STATIC_DCL xchar FDECL(selection_getpoint, (int, int, struct opvar *));
 STATIC_DCL void FDECL(selection_setpoint, (int, int, struct opvar *, XCHAR_P));
 STATIC_DCL struct opvar *FDECL(selection_not, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(selection_logical_oper, (struct opvar *,
@@ -126,11 +123,8 @@ STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
 STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
                                           BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
-STATIC_DCL void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 STATIC_DCL int FDECL(floodfillchk_match_under, (int, int));
 STATIC_DCL int FDECL(floodfillchk_match_accessible, (int, int));
-STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int,
-                                            BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_ellipse, (struct opvar *, int, int,
                                              int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
@@ -3052,6 +3046,7 @@ struct sp_coder *coder;
     while ((nparams++ < (SP_O_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
            && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_O_V_END)) {
         struct opvar *parm;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_O_V_NAME:
@@ -3063,11 +3058,12 @@ struct sp_coder *coder;
                 char monclass = SP_MONST_CLASS(OV_i(parm));
                 int monid = SP_MONST_PM(OV_i(parm));
 
-                if (monid >= 0 && monid < NUMMONS) {
+                if (monid >= LOW_PM && monid < NUMMONS) {
                     tmpobj.corpsenm = monid;
                     break; /* we're done! */
                 } else {
                     struct permonst *pm = (struct permonst *) 0;
+
                     if (def_char_to_monclass(monclass) != MAXMCLASSES) {
                         pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
                     } else {
@@ -3780,7 +3776,7 @@ int dir;
 STATIC_VAR int FDECL((*selection_flood_check_func), (int, int));
 STATIC_VAR schar floodfillchk_match_under_typ;
 
-STATIC_OVL void
+void
 set_selection_floodfillchk(f)
 int FDECL((*f), (int, int));
 {
@@ -3803,7 +3799,7 @@ int x, y;
             || levl[x][y].typ == SCORR);
 }
 
-STATIC_OVL void
+void
 selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
 int x, y;
