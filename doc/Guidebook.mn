@@ -4121,7 +4121,7 @@ version merges work done by the development team since the previous release
 with some of the beloved community patches. Many bugs were fixed and a
 large amount of code was restructured.
 .pg
-\fBThe development team, as well as \fBSteve VanDevender\fP and
+The development team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP ensured that NetHack 3.6 continued to operate on
 various Unix flavors and maintained the X11 interface.
 .pg
