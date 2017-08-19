@@ -2067,7 +2067,7 @@ bail(const char *mesg)
 {
     clearlocks();
     mswin_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 

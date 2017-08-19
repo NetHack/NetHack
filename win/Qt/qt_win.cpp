@@ -4039,7 +4039,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
 		if (dosave0()) {
 		    u.uhp = -1;
 		    NetHackQtBind::qt_exit_nhwindows(0);
-		    terminate(EXIT_SUCCESS);
+		    nh_terminate(EXIT_SUCCESS);
 		}
 		break;
 	    case 1:
@@ -4639,7 +4639,7 @@ void NetHackQtBind::qt_askname()
     // Quit
     clearlocks();
     qt_exit_nhwindows(0);
-    terminate(0);
+    nh_terminate(0);
 }
 
 void NetHackQtBind::qt_get_nh_event()

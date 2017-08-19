@@ -436,7 +436,7 @@ amii_askname()
     if (*plname == '\33') {
         clearlocks();
         exit_nhwindows(NULL);
-        terminate(0);
+        nh_terminate(0);
     }
 }
 
@@ -543,7 +543,7 @@ amii_player_selection()
 		CloseShWindow( cwin );
 		clearlocks();
 		exit_nhwindows(NULL);
-		terminate(0);
+		nh_terminate(0);
 		}
 		else
 		    DisplayBeep( NULL );
@@ -573,7 +573,7 @@ amii_player_selection()
 		CloseShWindow( cwin );
 		clearlocks();
 		exit_nhwindows(NULL);
-		terminate(0);
+		nh_terminate(0);
 		break;
 	    }
 	}
@@ -1368,7 +1368,7 @@ amii_player_selection()
                 free((genericptr_t) selected);
             clearlocks();
             exit_nhwindows(NULL);
-            terminate(0);
+            nh_terminate(0);
             /*NOTREACHED*/
             return;
         }
