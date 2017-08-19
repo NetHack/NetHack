@@ -20,54 +20,54 @@
  * Also used for oc_subtyp.
  */
 #define P_DAGGER 1
-#define P_KNIFE 2
-#define P_AXE 3
-#define P_PICK_AXE 4
-#define P_SHORT_SWORD 5
-#define P_BROAD_SWORD 6
-#define P_LONG_SWORD 7
-#define P_TWO_HANDED_SWORD 8
-#define P_SCIMITAR 9
-#define P_SABER 10
-#define P_CLUB 11 /* Heavy-shafted bludgeon */
-#define P_MACE 12
-#define P_MORNING_STAR 13 /* Spiked bludgeon */
-#define P_FLAIL 14        /* Two pieces hinged or chained together */
-#define P_HAMMER 15       /* Heavy head on the end */
-#define P_QUARTERSTAFF 16 /* Long-shafted bludgeon */
-#define P_POLEARMS 17
-#define P_SPEAR 18 /* includes javelin */
-#define P_TRIDENT 19
-#define P_LANCE 20
-#define P_BOW 21
-#define P_SLING 22
-#define P_CROSSBOW 23
-#define P_DART 24
-#define P_SHURIKEN 25
-#define P_BOOMERANG 26
-#define P_WHIP 27
-#define P_UNICORN_HORN 28 /* last weapon */
+#define P_KNIFE (P_DAGGER+1)
+#define P_AXE (P_KNIFE+1)
+#define P_PICK_AXE (P_AXE+1)
+#define P_SHORT_SWORD (P_PICK_AXE+1)
+#define P_BROAD_SWORD (P_SHORT_SWORD+1)
+#define P_LONG_SWORD (P_BROAD_SWORD+1)
+#define P_TWO_HANDED_SWORD (P_LONG_SWORD+1)
+#define P_SCIMITAR (P_TWO_HANDED_SWORD+1)
+#define P_SABER (P_SCIMITAR+1)
+#define P_CLUB (P_SABER+1) /* Heavy-shafted bludgeon */
+#define P_MACE (P_CLUB+1)
+#define P_MORNING_STAR (P_MACE+1) /* Spiked bludgeon */
+#define P_FLAIL (P_MORNING_STAR+1)        /* Two pieces hinged or chained together */
+#define P_HAMMER (P_FLAIL+1)       /* Heavy head on the end */
+#define P_QUARTERSTAFF (P_HAMMER+1) /* Long-shafted bludgeon */
+#define P_POLEARMS (P_QUARTERSTAFF+1)
+#define P_SPEAR (P_POLEARMS+1) /* includes javelin */
+#define P_TRIDENT (P_SPEAR+1)
+#define P_LANCE (P_TRIDENT+1)
+#define P_BOW (P_LANCE+1)
+#define P_SLING (P_BOW+1)
+#define P_CROSSBOW (P_SLING+1)
+#define P_DART (P_CROSSBOW+1)
+#define P_SHURIKEN (P_DART+1)
+#define P_BOOMERANG (P_SHURIKEN+1)
+#define P_WHIP (P_BOOMERANG+1)
+#define P_UNICORN_HORN (P_WHIP+1) /* last weapon */
 #define P_FIRST_WEAPON P_DAGGER
 #define P_LAST_WEAPON P_UNICORN_HORN
 
 /* Spell Skills added by Larry Stewart-Zerba */
-#define P_ATTACK_SPELL 29
-#define P_HEALING_SPELL 30
-#define P_DIVINATION_SPELL 31
-#define P_ENCHANTMENT_SPELL 32
-#define P_CLERIC_SPELL 33
-#define P_ESCAPE_SPELL 34
-#define P_MATTER_SPELL 35
+#define P_ATTACK_SPELL (P_LAST_WEAPON+1)
+#define P_HEALING_SPELL (P_ATTACK_SPELL+1)
+#define P_DIVINATION_SPELL (P_HEALING_SPELL+1)
+#define P_ENCHANTMENT_SPELL (P_DIVINATION_SPELL+1)
+#define P_CLERIC_SPELL (P_ENCHANTMENT_SPELL+1)
+#define P_ESCAPE_SPELL (P_CLERIC_SPELL+1)
+#define P_MATTER_SPELL (P_ESCAPE_SPELL+1)
 #define P_FIRST_SPELL P_ATTACK_SPELL
 #define P_LAST_SPELL P_MATTER_SPELL
 
 /* Other types of combat */
-#define P_BARE_HANDED_COMBAT 36 /* actually weaponless; gloves are ok */
+#define P_BARE_HANDED_COMBAT (P_LAST_SPELL+1) /* actually weaponless; gloves are ok */
 #define P_MARTIAL_ARTS P_BARE_HANDED_COMBAT /* Role distinguishes */
-#define P_TWO_WEAPON_COMBAT 37              /* Finally implemented */
-#define P_RIDING 38 /* How well you control your steed */
-#define P_LAST_H_TO_H P_RIDING
+#define P_TWO_WEAPON_COMBAT (P_BARE_HANDED_COMBAT+1)              /* Finally implemented */
+#define P_RIDING (P_TWO_WEAPON_COMBAT+1) /* How well you control your steed */
 #define P_FIRST_H_TO_H P_BARE_HANDED_COMBAT
+#define P_LAST_H_TO_H P_RIDING
 
 #define P_NUM_SKILLS (P_LAST_H_TO_H + 1)
 
