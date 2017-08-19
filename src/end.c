@@ -1373,7 +1373,7 @@ int how;
 
         if (!done_stopprint)
             artifact_score(invent, FALSE, endwin); /* list artifacts */
-#if DUMPLOG
+#ifdef DUMPLOG
         dump_redirect(TRUE);
         artifact_score(invent, FALSE, 0);
         dump_redirect(FALSE);
