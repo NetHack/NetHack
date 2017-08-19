@@ -10,6 +10,7 @@ STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
 STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
 STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
+STATIC_DCL int FDECL(gloc_filter_floodfill_matcharea, (int, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));

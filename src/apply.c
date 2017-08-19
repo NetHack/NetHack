@@ -38,6 +38,8 @@ STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
 STATIC_PTR boolean FDECL(check_jump, (genericptr_t, int, int));
 STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(get_valid_jump_position, (int, int));
+STATIC_DCL boolean FDECL(get_valid_polearm_position, (int, int));
 STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
 
 #ifdef AMIGA
@@ -1566,7 +1568,7 @@ boolean showmsg;
 
 static int jumping_is_magic;
 
-boolean
+STATIC_OVL boolean
 get_valid_jump_position(x,y)
 int x,y;
 {
@@ -2860,7 +2862,7 @@ int min_range, max_range;
 static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
-boolean
+STATIC_OVL boolean
 get_valid_polearm_position(x,y)
 int x,y;
 {
