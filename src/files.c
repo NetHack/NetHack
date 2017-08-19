@@ -3111,7 +3111,7 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 #else
         fd = open(fq_record, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
 #endif
-        if (fd = < 0) {
+        if (fd <= 0) {
             raw_printf("Warning: cannot write record '%s'", tmp);
             wait_synch();
         } else {
