@@ -57,6 +57,18 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
+#ifdef DUMPLOG
+STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
+STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_start_menu, (winid));
+STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
+STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
+STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
+#endif /* DUMPLOG */
+
 #ifdef HANGUPHANDLING
 volatile
 #endif
