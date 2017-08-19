@@ -10,7 +10,38 @@ set BUILDPATH=..\..\build
 set BINPATH=..\..\binary
 set VCDir=
 
-:studiocheck
+goto :main
+
+:dirname
+rem Get the dirname of the second argument and set the variable who's
+rem name was specified in the first argument.
+call set %~1=%%~dp2
+call set %~1=%%%~1:~0,-1%%
+goto :EOF
+
+:main
+
+:vscheck2015
+rem cannot use the registry trick as in vc2010
+rem 14 = 2015
+SET VCVERS=14
+rem Finally, let's determine the root folder for this VC installation.
+call set VCROOT=%%VS%VCVERS%0COMNTOOLS%%
+if "%VCROOT:~-1%"=="\" set VCROOT=%VCROOT:~0,-1%
+rem VCROOT=VSDir\Common7\Tools
+call :dirname VCROOT "%VCROOT%"
+rem VCROOT=VSDir\Common7
+call :dirname VCROOT "%VCROOT%"
+rem VCROOT=VSDir
+set VCDir=%VCROOT%\VC
+SET MSVCVERSION=2015
+
+if not defined VCDir goto :studiocheck2010
+if not exist "%VCDir%" goto :studiocheck2010
+
+goto :fallback
+
+:studiocheck2010
 @REM Set fallbacks here for 32-bit VS2010
 SET REGTREE=HKLM\Software\Microsoft\VCExpress\12.0\Setup\VC
 SET MSVCVERSION=2010
