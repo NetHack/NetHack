@@ -40,6 +40,7 @@ sys_early_init()
     sysopt.explorers = (char *) 0;
     sysopt.genericusers = (char *) 0;
     sysopt.maxplayers = 0; /* XXX eventually replace MAX_NR_OF_PLAYERS */
+    sysopt.bones_pools = 0;
 
     /* record file */
     sysopt.persmax = PERSMAX;

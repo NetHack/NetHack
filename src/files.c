@@ -704,6 +704,10 @@ d_level *lev;
         Sprintf(dptr, ".%c", sptr->boneid);
     else
         Sprintf(dptr, ".%d", lev->dlevel);
+#ifdef SYSCF
+    if (sysopt.bones_pools > 1)
+        Sprintf(eos(file), ".%d", (ubirthday % sysopt.bones_pools));
+#endif
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
@@ -2278,6 +2282,9 @@ int src;
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
+    } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+        n = atoi(bufp);
+        sysopt.bones_pools = (n < 0) ? 0 : n;
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
