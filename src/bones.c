@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1450432756 2015/12/18 09:59:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1503309019 2017/08/21 09:50:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -549,7 +549,7 @@ getbones()
 {
     register int fd;
     register int ok;
-    char c, *bonesid, oldbonesid[10];
+    char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
         return 0;
@@ -581,7 +581,15 @@ getbones()
         }
         mread(fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
         mread(fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
-        if (strcmp(bonesid, oldbonesid) != 0) {
+        if (strcmp(bonesid, oldbonesid) != 0
+            /* from 3.3.0 through 3.6.0, bones in the quest branch stored
+               a bogus bonesid in the file; 3.6.1 fixed that, but for
+               3.6.0 bones to remain compatible, we need an extra test;
+               once compatibility with 3.6.x goes away, this can too
+               (we don't try to make this conditional upon the value of
+               VERSION_COMPATIBILITY because then we'd need patchlevel.h) */
+            && (strlen(bonesid) <= 2
+                || strcmp(bonesid + 2, oldbonesid) != 0)) {
             char errbuf[BUFSZ];
 
             Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,

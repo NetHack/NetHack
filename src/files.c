@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1502581476 2017/08/12 23:44:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1503309020 2017/08/21 09:50:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -697,21 +697,47 @@ d_level *lev;
     s_level *sptr;
     char *dptr;
 
-    Sprintf(file, "bon%c%s", dungeons[lev->dnum].boneid,
-            In_quest(lev) ? urole.filecode : "0");
-    dptr = eos(file);
-    if ((sptr = Is_special(lev)) != 0)
-        Sprintf(dptr, ".%c", sptr->boneid);
-    else
-        Sprintf(dptr, ".%d", lev->dlevel);
+    /*
+     * "bonD0.nn"   = bones for level nn in the main dungeon;
+     * "bonM0.T"    = bones for Minetown;
+     * "bonQBar.n"  = bones for level n in the Barbarian quest;
+     * "bon3D0.nn"  = \
+     * "bon3M0.T"   =  > same as above, but for bones pool #3.
+     * "bon3QBar.n" = /
+     *
+     * Return value for content validation skips "bon" and the
+     * pool number (if present), making it feasible for the admin
+     * to manually move a bones file from one pool to another by
+     * renaming it.
+     */
+    Strcpy(file, "bon");
 #ifdef SYSCF
-    if (sysopt.bones_pools > 1)
-        Sprintf(eos(file), ".%d", (ubirthday % sysopt.bones_pools));
+    if (sysopt.bones_pools > 1) {
+        unsigned poolnum = min((unsigned) sysopt.bones_pools, 10);
+
+        poolnum = (unsigned) ubirthday % poolnum; /* 0..9 */
+        Sprintf(eos(file), "%u", poolnum);
+    }
 #endif
+    dptr = eos(file); /* this used to be after the following Sprintf()
+                         and the return value was (dptr - 2) */
+    /* when this naming scheme was adopted, 'filecode' was one letter;
+       3.3.0 turned it into a three letter string (via roles[] in role.c);
+       from that version through 3.6.0, 'dptr' pointed past the filecode
+       and the return value of (dptr - 2)  was wrong for bones produced
+       in the quest branch, skipping the boneid character 'Q' and the
+       first letter of the role's filecode; bones loading still worked
+       because the bonesid used for validation had the same error */
+    Sprintf(dptr, "%c%s", dungeons[lev->dnum].boneid,
+            In_quest(lev) ? urole.filecode : "0");
+    if ((sptr = Is_special(lev)) != 0)
+        Sprintf(eos(dptr), ".%c", sptr->boneid);
+    else
+        Sprintf(eos(dptr), ".%d", lev->dlevel);
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
-    return (dptr - 2);
+    return dptr;
 }
 
 /* set up temporary file name for writing bones, to avoid another game's
@@ -2283,8 +2309,13 @@ int src;
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+        /* max value of 10 guarantees (N % bones.pools) will be one digit
+           so we don't lose control of the length of bones file names */
         n = atoi(bufp);
-        sysopt.bones_pools = (n < 0) ? 0 : n;
+        sysopt.bones_pools = (n <= 0) ? 0 : min(n, 10);
+        /* note: right now bones_pools==0 is the same as bones_pools==1,
+           but we could change that and make bones_pools==0 become an
+           indicator to suppress bones usage altogether */
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
