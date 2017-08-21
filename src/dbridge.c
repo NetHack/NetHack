@@ -1,4 +1,4 @@
-/* NetHack 3.6	dbridge.c	$NHDT-Date: 1449269914 2015/12/04 22:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	dbridge.c	$NHDT-Date: 1503355815 2017/08/21 22:50:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -230,7 +230,6 @@ int *x, *y;
  *     dir is the direction.
  *     flag must be put to TRUE if we want the drawbridge to be opened.
  */
-
 boolean
 create_drawbridge(x, y, dir, flag)
 int x, y, dir;
@@ -375,7 +374,6 @@ struct entity *etmp;
  * Generates capitalized entity name, makes 2nd -> 3rd person conversion on
  * verb, where necessary.
  */
-
 STATIC_OVL const char *
 E_phrase(etmp, verb)
 struct entity *etmp;
@@ -397,7 +395,6 @@ const char *verb;
 /*
  * Simple-minded "can it be here?" routine
  */
-
 STATIC_OVL boolean
 e_survives_at(etmp, x, y)
 struct entity *etmp;
@@ -486,7 +483,6 @@ int xkill_flags, how;
 /*
  * These are never directly affected by a bridge or portcullis.
  */
-
 STATIC_OVL boolean
 automiss(etmp)
 struct entity *etmp;
@@ -498,7 +494,6 @@ struct entity *etmp;
 /*
  * Does falling drawbridge or portcullis miss etmp?
  */
-
 STATIC_OVL boolean
 e_missed(etmp, chunks)
 struct entity *etmp;
@@ -536,7 +531,6 @@ boolean chunks;
 /*
  * Can etmp jump from death?
  */
-
 STATIC_OVL boolean
 e_jumps(etmp)
 struct entity *etmp;
@@ -604,6 +598,11 @@ struct entity *etmp;
         }
     } else {
         if (crm->typ == DRAWBRIDGE_DOWN) {
+            if (is_u(etmp)) {
+                killer.format = NO_KILLER_PREFIX;
+                Strcpy(killer.name,
+                       "crushed to death underneath a drawbridge");
+            }
             pline("%s crushed underneath the drawbridge.",
                   E_phrase(etmp, "are"));             /* no jump */
             e_died(etmp,
@@ -639,11 +638,10 @@ struct entity *etmp;
 
     /*
      * Here's where we try to do relocation.  Assumes that etmp is not
-     * arriving
-     * at the portcullis square while the drawbridge is falling, since this
-     * square
-     * would be inaccessible (i.e. etmp started on drawbridge square) or
-     * unnecessary (i.e. etmp started here) in such a situation.
+     * arriving at the portcullis square while the drawbridge is
+     * falling, since this square would be inaccessible (i.e. etmp
+     * started on drawbridge square) or unnecessary (i.e. etmp started
+     * here) in such a situation.
      */
     debugpline0("Doing relocation.");
     newx = oldx;
@@ -654,12 +652,10 @@ struct entity *etmp;
     debugpline0("Checking new square for occupancy.");
     if (relocates && (e_at(newx, newy))) {
         /*
-         * Standoff problem:  one or both entities must die, and/or both
-         * switch
-         * places.  Avoid infinite recursion by checking first whether the
-         * other
-         * entity is staying put.  Clean up if we happen to move/die in
-         * recursion.
+         * Standoff problem: one or both entities must die, and/or
+         * both switch places.  Avoid infinite recursion by checking
+         * first whether the other entity is staying put.  Clean up if
+         * we happen to move/die in recursion.
          */
         struct entity *other;
 
@@ -763,10 +759,12 @@ struct entity *etmp;
     }
 }
 
+/* clear stale reason for death before returning */
+#define nokiller() (killer.name[0] = '\0', killer.format = 0)
+
 /*
  * Close the drawbridge located at x,y
  */
-
 void
 close_drawbridge(x, y)
 int x, y;
@@ -823,12 +821,12 @@ int x, y;
     newsym(x, y);
     newsym(x2, y2);
     block_point(x2, y2); /* vision */
+    nokiller();
 }
 
 /*
  * Open the drawbridge located at x,y
  */
-
 void
 open_drawbridge(x, y)
 int x, y;
@@ -870,12 +868,12 @@ int x, y;
     unblock_point(x2, y2); /* vision */
     if (Is_stronghold(&u.uz))
         u.uevent.uopened_dbridge = TRUE;
+    nokiller();
 }
 
 /*
  * Let's destroy the drawbridge located at x,y
  */
-
 void
 destroy_drawbridge(x, y)
 int x, y;
@@ -898,6 +896,7 @@ int x, y;
         || (lev1->drawbridgemask & DB_UNDER) == DB_LAVA) {
         struct obj *otmp2;
         boolean lava = (lev1->drawbridgemask & DB_UNDER) == DB_LAVA;
+
         if (lev1->typ == DRAWBRIDGE_UP) {
             if (cansee(x2, y2))
                 pline_The("portcullis of the drawbridge falls into the %s!",
@@ -999,6 +998,7 @@ int x, y;
                 do_entity(etmp1);
         }
     }
+    nokiller();
 }
 
 /*dbridge.c*/
