@@ -485,7 +485,7 @@ static const menu_cmd_t default_menu_cmd_info[] = {
  { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
  { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
  { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
- { "menu_invert_all", MENU_INVERT_ALL, "Insert selection" },
+ { "menu_invert_all", MENU_INVERT_ALL, "Invert selection" },
  { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
  { "menu_deselect_page", MENU_UNSELECT_PAGE, "Unselect items in current page" },
  { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
