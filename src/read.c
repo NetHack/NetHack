@@ -1556,8 +1556,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("Thinking of Maud you forget everything else.");
         exercise(A_WIS, FALSE);
         break;
-    case SCR_FIRE:
+    case SCR_FIRE: {
+        coord cc;
+        int dam;
+
+        cc.x = u.ux;
+        cc.y = u.uy;
         cval = bcsign(sobj);
+        dam = (2 * (rn1(3, 3) + 2 * cval) + 1) / 3;
         useup(sobj);
         sobj = 0; /* it's gone */
         if (!already_known)
@@ -1581,13 +1587,27 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (Underwater) {
             pline_The("%s around you vaporizes violently!", hliquid("water"));
         } else {
-            pline_The("scroll erupts in a tower of flame!");
-            iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
-            burn_away_slime();
+            if (sblessed) {
+                if (!already_known)
+                    pline("This is a scroll of fire!");
+                dam *= 5;
+                pline("Where do you want to center the explosion?");
+                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                (void) getpos(&cc, TRUE, "the desired position");
+                if (is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
+                    /* try to reach too far, get burned */
+                    cc.x = u.ux;
+                    cc.y = u.uy;
+                }
+            } else {
+                pline_The("scroll erupts in a tower of flame!");
+                iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
+                burn_away_slime();
+            }
         }
-        explode(u.ux, u.uy, 11, (2 * (rn1(3, 3) + 2 * cval) + 1) / 3,
-                SCROLL_CLASS, EXPL_FIERY);
+        explode(cc.x, cc.y, 11, dam, SCROLL_CLASS, EXPL_FIERY);
         break;
+    }
     case SCR_EARTH:
         /* TODO: handle steeds */
         if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
