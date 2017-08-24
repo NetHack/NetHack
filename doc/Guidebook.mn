@@ -1126,7 +1126,11 @@ The `m' prefix makes the command use a menu.
 .lp #travel
 Travel to a specific location on the map. Default key is '_'.
 Using the ``request menu'' prefix shows a menu of interesting targets in sight
-without asking to move the cursor.
+without asking to move the cursor. When picking a target with cursor and
+the
+.op autodescribe
+-option is on, the top line will show "(no travel path)" if
+your character does not know of a path to that location.
 .lp #turn
 Turn undead away. Autocompletes. Default key is 'M-t'.
 .lp #twoweapon
