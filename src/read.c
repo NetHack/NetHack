@@ -930,7 +930,7 @@ is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
 {
-    if (get_valid_stinking_cloud_pos(x,y)) {
+    if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg)
             You("smell rotten eggs.");
         return FALSE;
@@ -1594,12 +1594,13 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 pline("Where do you want to center the explosion?");
                 getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
                 (void) getpos(&cc, TRUE, "the desired position");
-                if (is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
+                if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
                     /* try to reach too far, get burned */
                     cc.x = u.ux;
                     cc.y = u.uy;
                 }
-            } else {
+            }
+            if (cc.x == u.ux && cc.y == u.uy) {
                 pline_The("scroll erupts in a tower of flame!");
                 iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
                 burn_away_slime();
