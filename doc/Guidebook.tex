@@ -735,7 +735,7 @@ support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 %.lp
 \item[\tb{.}]
-Rest, do nothing for one turn.
+Wait or rest, do nothing for one turn.
 %.lp
 \item[\tb{a}]
 Apply (use) a tool (pick-axe, key, lamp \ldots).
@@ -1796,8 +1796,8 @@ very well).
 %.pg
 The commands `{\tt /}' and `{\tt ;}' may be used to obtain information
 about those
-monsters who are displayed on the screen.  The command ``{\tt \#name}'', or
-its synonym `{\tt C}', allows you
+monsters who are displayed on the screen.  The command ``{\tt \#name}''
+(by default bound to `{\tt C}'), allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1949,7 +1949,7 @@ When you use one of these objects, if its effect is obvious, {\it NetHack\/}
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``{\tt \#name}''
-command, or its synonym `{\tt C}', for the same purpose at any time, to name
+command, for the same purpose at any time, to name
 all objects of a particular type or just an individual object.
 When you use ``{\tt \#name}'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
@@ -3399,7 +3399,7 @@ exclude that race from being picked randomly.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{rest\verb+_+on\verb+_+space}]
-Make the space bar a synonym for the `{\tt .}' (rest) command (default off).
+Make the space bar a synonym for the `{\tt .}' (\#wait) command (default off).
 Persistent.
 %.lp
 \item[\ib{role}]

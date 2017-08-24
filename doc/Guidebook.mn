@@ -608,7 +608,7 @@ objects, similar to the `M' command.  For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
-Rest, do nothing for one turn.
+Wait or rest, do nothing for one turn.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp A
@@ -1431,8 +1431,8 @@ help you locate them before they locate you (which some monsters can do
 very well).
 .pg
 The commands `/' and `;' may be used to obtain information about those
-monsters who are displayed on the screen.  The command ``#name'', or
-its synonym `C', allows you
+monsters who are displayed on the screen.  The command ``#name''
+(by default bound to `C'), allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1565,7 +1565,7 @@ When you use one of these objects, if its effect is obvious, NetHack
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``#name''
-command, or its synonym `C', for the same purpose at any time, to name
+command, for the same purpose at any time, to name
 all objects of a particular type or just an individual object.
 When you use ``#name'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
@@ -2797,7 +2797,7 @@ If you prefix the value with `!' or ``no'', you will
 exclude that race from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp rest_on_space
-Make the space bar a synonym for the `.' (rest) command (default off).
+Make the space bar a synonym for the `.' (#wait) command (default off).
 Persistent.
 .lp "role    "
 Pick your type of character (ex. ``role:Samurai'');
