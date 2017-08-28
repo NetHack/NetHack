@@ -1,0 +1,7 @@
+Changes made to vs2015 build
+
+1. allow solution to be used in place
+
+To Do
+
+1. win\share\tiletxt.c is copied from win\share\tilemap.c ... use tilemap.c instead directly.

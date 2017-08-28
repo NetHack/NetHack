@@ -1,4 +1,5 @@
 # Build-generated stuff that we don't want
 *.bmp
 *.ico
+*.db
 

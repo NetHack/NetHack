@@ -1,0 +1,15 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="dirs.props"/>
+  <Import Project="files.props"/>
+  <!-- TODO not copying record -->
+  <Target Name="Build" 
+	Inputs="$(SysWinntDir)defaults.nh;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf;$(DocDir)nethack.txt"
+	Outputs="$(BinDir)defaults.nh;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf;">
+
+	<Copy SourceFiles="$(SysWinntDir)defaults.nh;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf;$(DocDir)nethack.txt" DestinationFolder="$(BinDir)"/>
+
+	</Target>
+  <Target Name="Clean">
+	<Delete Files="$(BinDir)defaults.nh;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf;$(BinDir)nethack.txt;"/>
+  </Target>
+</Project>
