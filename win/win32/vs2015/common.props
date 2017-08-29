@@ -15,6 +15,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <ProgramDatabaseFile>$(SymbolsDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">

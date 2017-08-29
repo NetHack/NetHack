@@ -1,21 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <Import Project="config.props" />
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>NetHack</RootNamespace>
   </PropertyGroup>
- 
- <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="console.props" />
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
+
+  <PropertyGroup>
+    <OutDir>$(BinDir)</OutDir>
+  </PropertyGroup>
   
   <ItemDefinitionGroup>
     <ClCompile>
@@ -31,7 +32,6 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  
   <ItemGroup>
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
@@ -215,8 +215,11 @@
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(WinWin32Dir)winhack.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
- <Target Name="AfterBuild">
+  <Target Name="AfterBuild">
     <MSBuild Projects="afternethack.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
   </Target>
   <Target Name="AfterClean">
@@ -225,4 +228,4 @@
   <Target Name="AfterRebuild">
     <MSBuild Projects="afternethack.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
   </Target>
- </Project>
+</Project>

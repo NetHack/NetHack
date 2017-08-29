@@ -14,6 +14,10 @@
   <Import Project="dirs.props" />
   <Import Project="files.props" />
 
+  <PropertyGroup>
+    <OutDir>$(BinDir)</OutDir>
+  </PropertyGroup>
+
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>

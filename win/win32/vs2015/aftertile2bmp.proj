@@ -2,9 +2,9 @@
   <Import Project="dirs.props"/>
   <Import Project="files.props"/>
   <Target Name="Build" 
-     Inputs="$(BinDir)tile2bmp.exe;$(WinShareDir)monsters.txt;$(WinShareDir)objects.txt"
+     Inputs="$(ToolsDir)tile2bmp.exe;$(WinShareDir)monsters.txt;$(WinShareDir)objects.txt"
 	 Outputs="$(WinWin32Dir)tiles.bmp">
-	<Exec Command="$(BinDir)tile2bmp.exe tiles.bmp" WorkingDirectory="$(SrcDir)"/>
+	<Exec Command="$(ToolsDir)tile2bmp.exe tiles.bmp" WorkingDirectory="$(SrcDir)"/>
 	<Move SourceFiles="$(SrcDir)tiles.bmp" DestinationFolder="$(WinWin32Dir)"/>
   </Target>
   <Target Name="Clean">

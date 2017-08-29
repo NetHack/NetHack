@@ -2,9 +2,9 @@
   <Import Project="dirs.props"/>
   <Import Project="files.props"/>
   <Target Name="Build" 
-     Inputs="$(BinDir)dgncomp.exe;$(DatDir)dungeon.pdf"
+     Inputs="$(ToolsDir)dgncomp.exe;$(DatDir)dungeon.pdf"
 	 Outputs="$(DatDir)dungeon">
-	<Exec Command="$(BinDir)dgncomp.exe dungeon.pdf" WorkingDirectory="$(DatDir)"/>
+	<Exec Command="$(ToolsDir)dgncomp.exe dungeon.pdf" WorkingDirectory="$(DatDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="$(DatDir)dungeon"/>

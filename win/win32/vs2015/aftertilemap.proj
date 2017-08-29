@@ -2,9 +2,9 @@
   <Import Project="dirs.props"/>
   <Import Project="files.props"/>
   <Target Name="Build" 
-     Inputs="$(BinDir)tilemap.exe"
+     Inputs="$(ToolsDir)tilemap.exe"
 	 Outputs="$(SrcDir)tile.c">
-	<Exec Command="$(BinDir)tilemap.exe" WorkingDirectory="$(SrcDir)"/>
+	<Exec Command="$(ToolsDir)tilemap.exe" WorkingDirectory="$(SrcDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="$(SrcDir)tile.c"/>
