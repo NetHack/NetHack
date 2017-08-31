@@ -5,4 +5,4 @@
 record
 *.user
 *.opendb
-
+*.log

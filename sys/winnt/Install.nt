@@ -68,6 +68,10 @@ From within the IDE:
 	2. from build menu, select build solution.
 	3. type F5 to start debugging.
 
+You can build all the projects for all platforms and configurations
+using a Visual Studio MSBuild command prompt.  Open the MSBuild command
+prompt, change directory to win\win32\vs2015 and run "build.bat".
+
 /-----------------------------------\
 | FIRST STEP - MOVING THINGS AROUND |
 \-----------------------------------/

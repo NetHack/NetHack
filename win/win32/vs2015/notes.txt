@@ -1,12 +1,6 @@
 Changes made to vs2015 build
 
 To Do
-1. Build other key handler DLLs.
-2. Ensure Release build does not have unexpected files after clean build.
-
-Changes
-1. Removed the use of /FS.
-2. Allow multi-processor compilation.
 
 Questions
 

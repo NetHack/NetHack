@@ -21,8 +21,15 @@
       <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
+	<!--
       <ModuleDefinitionFile>nhdefkey.def</ModuleDefinitionFile>
+	  -->
       <ImportLibrary>$(ToolsDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <ModuleDefinitionFile>nhdefkey.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
