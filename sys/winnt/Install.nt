@@ -45,9 +45,9 @@ command line, there is also a set of project files and a workspace file
 that allow you to build the Windows Graphical version from Microsoft
 Visual C's IDE (Integrated Development Environment.)
 
-/-------------------------------------------------------\
-| Buildig And Running Using Visual Studio 2015          |
-\-------------------------------------------------------/
+/--------------------------------------------------------\
+| Building And Running Using Visual Studio 2015          |
+\--------------------------------------------------------/
 
 If you are NOT using Visual Studio 2015, proceed to "FIRST STEP -
 MOVING THINGS AROUND".
