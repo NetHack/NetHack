@@ -32,6 +32,14 @@ WIZARDS=*
 #   %N first character of player name
 #DUMPLOGFILE=nethack-%n-%d.log
 
+# Number of bones file pools.
+# The pool you belong to is determined at game start. You will
+# load and save bones only from that pool. Generally useful
+# for public servers only.
+# Changing this might make existing bones inaccessible.
+# Disabled by setting to 0, or commenting out.
+#BONES_POOLS=10
+
 # Limit the number of simultaneous games (see also nethack.sh).
 #MAXPLAYERS=10
 

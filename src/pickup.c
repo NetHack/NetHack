@@ -707,7 +707,7 @@ int what; /* should be a long */
 
         /* position may need updating (invisible hero) */
         if (n_picked)
-            newsym(u.ux, u.uy);
+            newsym_force(u.ux, u.uy);
 
         /* check if there's anything else here after auto-pickup is done */
         if (autopickup)

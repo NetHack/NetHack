@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1496103440 2017/05/30 00:17:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1503355817 2017/08/21 22:50:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -90,7 +90,9 @@ int expltype;
 
     if (olet == MON_EXPLODE) {
         str = killer.name;
-        do_hallu = Hallucination && strstri(str, "'s explosion");
+        do_hallu = (Hallucination
+                    && (strstri(str, "'s explosion")
+                        || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
         switch (abs(type) % 10) {
