@@ -1643,8 +1643,9 @@ int retryct;
 #ifdef USE_FCNTL
     lockfd = open(filename, O_RDWR);
     if (lockfd == -1) {
-        HUP raw_printf("Cannot open file %s. This is a program bug.",
+        HUP raw_printf("Cannot open file %s. Is NetHack installed correctly?",
                        filename);
+        return FALSE;
     }
     sflock.l_type = F_WRLCK;
     sflock.l_whence = SEEK_SET;
