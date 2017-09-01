@@ -1675,6 +1675,7 @@ int retryct;
     if (lockfd == -1) {
         HUP raw_printf("Cannot open file %s. Is NetHack installed correctly?",
                        filename);
+        nesting--;
         return FALSE;
     }
     sflock.l_type = F_WRLCK;
