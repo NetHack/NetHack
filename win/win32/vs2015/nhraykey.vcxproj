@@ -21,10 +21,12 @@
       <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-	<!--
-      <ModuleDefinitionFile>nhraykey.def</ModuleDefinitionFile>
-	  -->
       <ImportLibrary>$(ToolsDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <ModuleDefinitionFile>nhraykey.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

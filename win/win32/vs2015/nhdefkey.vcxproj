@@ -21,9 +21,6 @@
       <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-	<!--
-      <ModuleDefinitionFile>nhdefkey.def</ModuleDefinitionFile>
-	  -->
       <ImportLibrary>$(ToolsDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>

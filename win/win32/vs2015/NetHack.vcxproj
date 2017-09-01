@@ -13,11 +13,9 @@
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
-
   <PropertyGroup>
     <OutDir>$(BinDir)</OutDir>
   </PropertyGroup>
-  
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
@@ -214,9 +212,13 @@
     <ClInclude Include="$(IncDir)wintype.h" />
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
+    <ClInclude Include="$(WinWin32Dir)nhresource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="$(WinWin32Dir)winhack.rc" />
+    <ResourceCompile Include="$(WinWin32Dir)NetHack.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="$(WinWin32Dir)nethack.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">
