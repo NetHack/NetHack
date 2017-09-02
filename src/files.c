@@ -199,7 +199,7 @@ STATIC_DCL void FDECL(set_symhandling, (char *, int));
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
 STATIC_DCL void NDECL(free_config_sections);
-STATIC_DCL char *FDECL(choose_random_part, (char *, char));
+STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
 STATIC_DCL boolean FDECL(is_config_section, (const char *));
 STATIC_DCL boolean FDECL(handle_config_section, (char *));
 #ifdef SELF_RECOVER
