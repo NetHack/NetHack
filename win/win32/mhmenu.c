@@ -884,6 +884,11 @@ GetMenuControl(HWND hWnd)
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
+	/* We may continue getting window messages after a window's WM_DESTROY is
+	   called.  We need to handle the case that USERDATA has been freed. */
+	if (data == NULL)
+		return NULL;
+
     if (data->type == MENU_TYPE_TEXT) {
         return GetDlgItem(hWnd, IDC_MENU_TEXT);
     } else {
