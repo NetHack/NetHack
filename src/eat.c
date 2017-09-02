@@ -1708,8 +1708,7 @@ struct obj *otmp;
 {
     const char *old_nomovemsg, *save_nomovemsg;
 
-    debugpline2("start_eating: %lx (victual = %lx)", (unsigned long) otmp,
-                (unsigned long) context.victual.piece);
+    debugpline2("start_eating: %p (victual = %p)", otmp, context.victual.piece);
     debugpline1("reqtime = %d", context.victual.reqtime);
     debugpline1("(original reqtime = %d)", objects[otmp->otyp].oc_delay);
     debugpline1("nmod = %d", context.victual.nmod);

@@ -1170,15 +1170,6 @@ dump_close_log()
 }
 
 void
-dump_putc(ch)
-int ch;
-{
-    /* Not very efficient, but we mostly don't care. */
-    if (dumplog_file)
-        putc(ch, dumplog_file);
-}
-
-void
 dump_forward_putstr(win, attr, str, no_forward)
 winid win;
 int attr;
