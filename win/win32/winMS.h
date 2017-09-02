@@ -226,7 +226,7 @@ extern COLORREF status_fg_color;
 extern COLORREF message_bg_color;
 extern COLORREF message_fg_color;
 
-#define SYSCLR_TO_BRUSH(x) ((HBRUSH)((x) + 1))
+#define SYSCLR_TO_BRUSH(x) ((HBRUSH)(((intptr_t) x) + 1))
 
 /* unicode stuff */
 #define NH_CODEPAGE (SYMHANDLING(H_IBM) ? GetOEMCP() : GetACP())
