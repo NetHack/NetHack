@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="config.props" />
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9DD9C52E-E8C9-4533-BD22-83C055C0AABA}</ProjectGuid>
+  </PropertyGroup>
+  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="console.props" />
+  <Import Project="common.props" />
+  <Import Project="dirs.props" />
+  <Import Project="files.props" />
+ 
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);$(SysShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;YY_NO_UNISTD_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <ClCompile Include="$(SrcDir)alloc.c" />
+    <ClCompile Include="$(SrcDir)decl.c" />
+    <ClCompile Include="$(SrcDir)drawing.c" />
+    <ClCompile Include="$(UtilDir)lev_lex.c" />
+    <ClCompile Include="$(UtilDir)lev_main.c" />
+    <ClCompile Include="$(UtilDir)lev_yacc.c" />
+    <ClCompile Include="$(SrcDir)monst.c" />
+    <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(UtilDir)panic.c" />	
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClInclude Include="$(IncDir)lev_comp.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Choose>
+    <When Condition=" '$(YACC)'!='' "> 
+      <PropertyGroup>
+        <BuildDependsOn>
+          Lex;
+          Yacc;
+          $(BuildDependsOn);
+        </BuildDependsOn>
+      </PropertyGroup>
+	</When>
+	<Otherwise>
+      <PropertyGroup>
+        <BuildDependsOn>
+          NoLex;
+          NoYacc;
+          $(BuildDependsOn);
+        </BuildDependsOn>
+      </PropertyGroup>
+	</Otherwise>
+  </Choose>
+  <Target Name="Yacc" Inputs="$(UtilDir)lev_comp.y" Outputs="$(UtilDir)lev_yacc.c;$(IncDir)lev_comp.h">
+    <Message Text="Running Yacc" Importance="high" />
+    <Exec Command="$(YACC) -d lev_comp.y" WorkingDirectory="$(UtilDir)" />
+	<Move SourceFiles="$(UtilDir)y.tab.c;$(UtilDir)y.tab.h" DestinationFiles="$(UtilDir)lev_yacc.c;$(IncDir)lev_comp.h" />	
+  </Target>
+  <Target Name="Lex" Inputs="$(UtilDir)lev_comp.l" Outputs="$(UtilDir)lev_lex.c">
+    <Message Text="Running Lex" Importance="high" />
+    <Exec Command="$(LEX) lev_comp.l" WorkingDirectory="$(UtilDir)" />
+	<Move SourceFiles="$(UtilDir)lex.yy.c" DestinationFiles="$(UtilDir)lev_lex.c" />	
+  </Target>
+  <Target Name="NoYacc" Inputs="$(SysShareDir)lev_yacc.c;$(SysShareDir)lev_comp.h" Outputs="$(UtilDir)lev_yacc.c;$(IncDir)lev_comp.h">
+    <Message Text="No Yacc using pre-built files" Importance="high" />
+	<Copy SourceFiles="$(SysShareDir)lev_yacc.c;$(SysShareDir)lev_comp.h" DestinationFiles="$(UtilDir)lev_yacc.c;$(IncDir)lev_comp.h" />	
+  </Target>
+  <Target Name="NoLex" Inputs="$(SysShareDir)lev_lex.c" Outputs="$(UtilDir)lev_lex.c">
+    <Message Text="No Lex using pre-built files" Importance="high" />
+	<Copy SourceFiles="$(SysShareDir)lev_lex.c" DestinationFiles="$(UtilDir)lev_lex.c" />	
+  </Target>
+  <Target Name="AfterBuild">
+    <MSBuild Projects="afterlevcomp.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterClean">
+    <MSBuild Projects="afterlevcomp.proj" Targets="Clean" Properties="Configuration=$(Configuration)" />
+	<Delete Files="$(UtilDir)lev_yacc.c;$(IncDir)lev_comp.h;$(UtilDir)lev_lex.c" />
+  </Target>
+  <Target Name="AfterRebuild">
+    <MSBuild Projects="afterlevcomp.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+</Project>
