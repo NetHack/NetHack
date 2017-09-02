@@ -198,12 +198,20 @@ STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
+STATIC_DCL void NDECL(free_config_sections);
+STATIC_DCL char *FDECL(choose_random_part, (char *, char));
+STATIC_DCL boolean FDECL(is_config_section, (const char *));
+STATIC_DCL boolean FDECL(handle_config_section, (char *));
 #ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
 #endif
+
+
+static char *config_section_chosen = (char *) 0;
+static char *config_section_current = (char *) 0;
 
 /*
  * fname_encode()
@@ -2130,6 +2138,91 @@ int prefixid;
 }
 #endif
 
+/* Choose at random one of the sep separated parts from str. Mangles str. */
+STATIC_OVL char *
+choose_random_part(str,sep)
+char *str;
+char sep;
+{
+    int nsep = 1;
+    int csep;
+    int len = 0;
+    char *begin = str;
+
+    if (!str)
+        return (char *) 0;
+
+    while (*str) {
+	if (*str == sep) nsep++;
+	str++;
+    }
+    csep = rn2(nsep);
+    str = begin;
+    while ((csep > 0) && *str) {
+	str++;
+	if (*str == sep) csep--;
+    }
+    if (*str) {
+	if (*str == sep) str++;
+	begin = str;
+	while (*str && *str != sep) {
+	    str++;
+	    len++;
+	}
+	*str = '\0';
+	if (len)
+            return begin;
+    }
+    return (char *) 0;
+}
+
+STATIC_OVL void
+free_config_sections()
+{
+    if (config_section_chosen) {
+        free(config_section_chosen);
+        config_section_chosen = NULL;
+    }
+    if (config_section_current) {
+        free(config_section_current);
+        config_section_current = NULL;
+    }
+}
+
+STATIC_OVL boolean
+is_config_section(str)
+const char *str;
+{
+    const char *a = rindex(str, ']');
+
+    return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
+}
+
+STATIC_OVL boolean
+handle_config_section(buf)
+char *buf;
+{
+    if (is_config_section(buf)) {
+        char *send;
+        if (config_section_current) {
+            free(config_section_current);
+        }
+        config_section_current = dupstr(&buf[1]);
+        send = rindex(config_section_current, ']');
+        *send = '\0';
+        debugpline1("set config section: '%s'", config_section_current);
+        return TRUE;
+    }
+
+    if (config_section_current) {
+        if (!config_section_chosen)
+            return TRUE;
+        if (strcmp(config_section_current, config_section_chosen))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
 int
@@ -2154,6 +2247,9 @@ int src;
     mungspaces(strcpy(buf, origbuf));
     /* lines beginning with '#' are comments; accept empty lines too */
     if (!*buf || *buf == '#' || !strcmp(buf, " "))
+        return 1;
+
+    if (src != SET_IN_SYS && handle_config_section(buf))
         return 1;
 
     /* find the '=' or ':' */
@@ -2183,6 +2279,13 @@ int src;
         ++bufp; /* skip '='; parseoptions() handles spaces */
 
         parseoptions(bufp, TRUE, TRUE);
+    } else if (match_varname(buf, "CHOOSE", 6)) {
+        char *section;
+        if (config_section_chosen)
+            free(config_section_chosen);
+        section = choose_random_part(bufp, ',');
+        if (section)
+            config_section_chosen = dupstr(section);
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "BINDINGS", 4)) {
@@ -2642,6 +2745,7 @@ int src;
 
     /* begin detection of duplicate configfile options */
     set_duplicate_opt_detection(1);
+    free_config_sections();
 
     while (fgets(buf, sizeof buf, fp)) {
 #ifdef notyet
@@ -2665,6 +2769,7 @@ OR: Forbid multiline stuff for alternate config sources.
     }
     (void) fclose(fp);
 
+    free_config_sections();
     /* turn off detection of duplicate configfile options */
     set_duplicate_opt_detection(0);
     return rv;

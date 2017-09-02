@@ -2203,6 +2203,12 @@ can be created with any text editor.
 Any line in the configuration file starting with `#' is treated as a comment.
 Empty lines are ignored.
 .pg
+Any line beginning with `[' and ending in `]' is considered a section
+marker. The text between the square brackets is the section name.
+Lines after a section marker belong to that section, and are
+ignored unless a CHOOSE -statement was used to select that section.
+Section names are case insensitive.
+.pg
 You can use different configuration statements in the file, some
 of which can be used multiple times. In general, the statements are
 written in capital letters, followed by an equals sign, followed by
@@ -2266,6 +2272,19 @@ See the ``Changing Key Bindings`` section for more information.
 Example:
 .sd
 \fBBIND=^X:getpos.autodescribe\fP
+.ed
+.lp CHOOSE
+Chooses at random one of the comma-separated parameters as an active
+section name. Lines in other sections are ignored.
+.pg
+Example:
+.sd
+\fBOPTIONS=color\fP
+\fBCHOOSE=char A,char B\fP
+\fB[char A]\fP
+\fBOPTIONS=role:arc,race:dwa,align:law,gender:fem\fP
+\fB[char B]\fP
+\fBOPTIONS=role:wiz,race:elf,align:cha,gender:mal\fP
 .ed
 .lp MSGTYPE
 Change the way messages are shown in the top status line.

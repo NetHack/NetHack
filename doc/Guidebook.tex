@@ -2689,6 +2689,13 @@ Any line in the configuration file starting with `{\tt \#}' is treated as a comm
 Empty lines are ignored.
 
 %.pg
+Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
+marker. The text between the square brackets is the section name.
+Lines after a section marker belong to that section, and are
+ignored unless a CHOOSE -statement was used to select that section.
+Section names are case insensitive.
+
+%.pg
 You can use different configuration statements in the file, some
 of which can be used multiple times. In general, the statements are
 written in capital letters, followed by an equals sign, followed by
@@ -2773,6 +2780,24 @@ Example:
 %.sd
 \begin{verbatim}
    BIND=^X:getpos.autodescribe
+\end{verbatim}
+%.ed
+
+%.lp
+\item[\bb{CHOOSE}]
+Chooses at random one of the comma-separated parameters as an active
+section name. Lines in other sections are ignored.
+
+%.pg
+Example:
+%.sd
+\begin{verbatim}
+   OPTIONS=color
+   CHOOSE=char A,char B
+   [char A]
+   OPTIONS=role:arc,race:dwa,align:law,gender:fem
+   [char B]
+   OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 \end{verbatim}
 %.ed
 
