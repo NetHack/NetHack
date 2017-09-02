@@ -1,0 +1,20 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="dirs.props"/>
+  <Import Project="files.props"/>
+  <Target Name="Build" 
+     Inputs="$(ToolsDir)uudecode.exe;@(UUFiles)"
+	 Outputs="@(IconFiles);@(BmpFiles);@(RecordFiles)">
+	<Exec Command="$(ToolsDir)uudecode.exe $(SysWinntDir)nhico.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnsel.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnselcnt.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)mnunsel.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)petmark.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)pilemark.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)splash.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)rip.uu" WorkingDirectory="$(WinWin32Dir)"/>
+	<Exec Command="$(ToolsDir)uudecode.exe $(WinWin32Dir)record.uu" WorkingDirectory="$(WinWin32Dir)"/>
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="@(IconFiles);@(BmpFiles);@(RecordFiles)"/>
+  </Target>
+</Project>
