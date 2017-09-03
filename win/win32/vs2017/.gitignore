@@ -1,1 +1,4 @@
 !NetHack.sln
+*.db-shm
+*.db-wal
+
