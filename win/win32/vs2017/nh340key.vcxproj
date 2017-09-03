@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="config.props" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{be04e242-a1e9-4593-b95b-057f37330b76}</ProjectGuid>
+    <ProjectGuid>{BE04E242-A1E9-4593-B95B-057F37330B76}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>nh340key</RootNamespace>
   </PropertyGroup>
