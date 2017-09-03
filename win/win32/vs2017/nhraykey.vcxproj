@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="config.props" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2e1f4bb3-3bd7-43ad-8e64-d3b8a2f5d7b2}</ProjectGuid>
+    <ProjectGuid>{2E1F4BB3-3BD7-43AD-8E64-D3B8A2F5D7B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>nhraykey</RootNamespace>
   </PropertyGroup>
