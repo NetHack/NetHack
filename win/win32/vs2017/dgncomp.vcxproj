@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8A3F81C7-2968-49A8-86BF-2669412AD7DE}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="console.props" />
+  <Import Project="common.props" />
+  <Import Project="dirs.props" />
+  <Import Project="files.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);$(SysShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(SrcDir)alloc.c" />
+    <ClCompile Include="$(SysShareDir)\dgn_lex.c" />
+    <ClCompile Include="$(UtilDir)dgn_main.c" />
+    <ClCompile Include="$(SysShareDir)dgn_yacc.c" />
+    <ClCompile Include="$(UtilDir)panic.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(IncDir)align.h" />
+    <ClInclude Include="$(IncDir)attrib.h" />
+    <ClInclude Include="$(IncDir)color.h" />
+    <ClInclude Include="$(IncDir)config.h" />
+    <ClInclude Include="$(IncDir)config1.h" />
+    <ClInclude Include="$(IncDir)context.h" />
+    <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)decl.h" />
+    <ClInclude Include="$(IncDir)dgn_comp.h" />
+    <ClInclude Include="$(IncDir)dgn_file.h" />
+    <ClInclude Include="$(IncDir)display.h" />
+    <ClInclude Include="$(IncDir)dungeon.h" />
+    <ClInclude Include="$(IncDir)engrave.h" />
+    <ClInclude Include="$(IncDir)flag.h" />
+    <ClInclude Include="$(IncDir)global.h" />
+    <ClInclude Include="$(IncDir)mkroom.h" />
+    <ClInclude Include="$(IncDir)monattk.h" />
+    <ClInclude Include="$(IncDir)monst.h" />
+    <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)ntconf.h" />
+    <ClInclude Include="$(IncDir)obj.h" />
+    <ClInclude Include="$(IncDir)objclass.h" />
+    <ClInclude Include="$(IncDir)onames.h" />
+    <ClInclude Include="$(IncDir)permonst.h" />
+    <ClInclude Include="$(IncDir)pm.h" />
+    <ClInclude Include="$(IncDir)prop.h" />
+    <ClInclude Include="$(IncDir)quest.h" />
+    <ClInclude Include="$(IncDir)rect.h" />
+    <ClInclude Include="$(IncDir)region.h" />
+    <ClInclude Include="$(IncDir)rm.h" />
+    <ClInclude Include="$(IncDir)skills.h" />
+    <ClInclude Include="$(IncDir)spell.h" />
+    <ClInclude Include="$(IncDir)timeout.h" />
+    <ClInclude Include="$(IncDir)tradstdc.h" />
+    <ClInclude Include="$(IncDir)trampoli.h" />
+    <ClInclude Include="$(IncDir)trap.h" />
+    <ClInclude Include="$(IncDir)vision.h" />
+    <ClInclude Include="$(IncDir)winprocs.h" />
+    <ClInclude Include="$(IncDir)wintty.h" />
+    <ClInclude Include="$(IncDir)wintype.h" />
+    <ClInclude Include="$(IncDir)you.h" />
+    <ClInclude Include="$(IncDir)youprop.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Choose>
+    <When Condition=" '$(YACC)'!='' ">
+      <PropertyGroup>
+        <BuildDependsOn>
+          Lex;
+          Yacc;
+          $(BuildDependsOn);
+        </BuildDependsOn>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <BuildDependsOn>
+          NoLex;
+          NoYacc;
+          $(BuildDependsOn);
+        </BuildDependsOn>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Target Name="Yacc" Inputs="$(UtilDir)dgn_comp.y" Outputs="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h">
+    <Message Text="Running Yacc" Importance="high" />
+    <Exec Command="$(YACC) -d dgn_comp.y" WorkingDirectory="$(UtilDir)" />
+    <Move SourceFiles="$(UtilDir)y.tab.c;$(UtilDir)y.tab.h" DestinationFiles="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h" />
+  </Target>
+  <Target Name="Lex" Inputs="$(UtilDir)lev_comp.l" Outputs="$(UtilDir)dgn_lex.c">
+    <Message Text="Running Lex" Importance="high" />
+    <Exec Command="$(LEX) dgn_comp.l" WorkingDirectory="$(UtilDir)" />
+    <Move SourceFiles="$(UtilDir)lex.yy.c" DestinationFiles="$(UtilDir)dgn_lex.c" />
+  </Target>
+  <Target Name="NoYacc" Inputs="$(SysShareDir)dgn_yacc.c;$(SysShareDir)dgn_comp.h" Outputs="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h">
+    <Message Text="No Yacc using pre-built files" Importance="high" />
+    <Copy SourceFiles="$(SysShareDir)dgn_yacc.c;$(SysShareDir)dgn_comp.h" DestinationFiles="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h" />
+  </Target>
+  <Target Name="NoLex" Inputs="$(SysShareDir)dgn_lex.c" Outputs="$(UtilDir)dgn_lex.c">
+    <Message Text="No Lex using pre-built files" Importance="high" />
+    <Copy SourceFiles="$(SysShareDir)dgn_lex.c" DestinationFiles="$(UtilDir)dgn_lex.c" />
+  </Target>
+  <Target Name="AfterBuild">
+    <MSBuild Projects="afterdgncomp.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterClean">
+    <MSBuild Projects="afterdgncomp.proj" Targets="Clean" Properties="Configuration=$(Configuration)" />
+    <Delete Files="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h;$(UtilDir)dgn_lex.c" />
+  </Target>
+  <Target Name="AfterRebuild">
+    <MSBuild Projects="afterdgncomp.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+</Project>
