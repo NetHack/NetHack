@@ -20,7 +20,7 @@
       <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  
+
 
   <ItemGroup>
     <ClCompile Include="..\..\..\util\makedefs.c" />

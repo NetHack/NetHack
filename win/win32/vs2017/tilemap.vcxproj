@@ -5,7 +5,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{93F10526-209E-41D7-BBEA-775787876895}</ProjectGuid>
   </PropertyGroup>
-  
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

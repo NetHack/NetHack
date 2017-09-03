@@ -2,7 +2,7 @@
   <Import Project="dirs.props"/>
   <Import Project="files.props"/>
   <!-- TODO not copying record -->
-  <Target Name="Build" 
+  <Target Name="Build"
 	Inputs="$(SysWinntDir)defaults.nh;$(DocDir)Guidebook.txt;$(DatDir)license;$(SysWinntDir)sysconf;$(DocDir)nethack.txt;$(DatDir)symbols;$(WinWin32Dir)record;$(DatDir)opthelp"
 	Outputs="$(BinDir)defaults.nh;$(BinDir)Guidebook.txt;$(BinDir)license;$(BinDir)sysconf;$(BinDir)symbols;$(BinDir)record;$(BinDir)opthelp">
 

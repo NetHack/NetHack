@@ -75,7 +75,7 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Choose>
-    <When Condition=" '$(YACC)'!='' "> 
+    <When Condition=" '$(YACC)'!='' ">
       <PropertyGroup>
         <BuildDependsOn>
           Lex;
@@ -93,7 +93,7 @@
         </BuildDependsOn>
       </PropertyGroup>
 	</Otherwise>
-  </Choose>  
+  </Choose>
   <Target Name="Yacc" Inputs="$(UtilDir)dgn_comp.y" Outputs="$(UtilDir)dgn_yacc.c;$(IncDir)dgn_comp.h">
     <Message Text="Running Yacc" Importance="high" />
     <Exec Command="$(YACC) -d dgn_comp.y" WorkingDirectory="$(UtilDir)" />
