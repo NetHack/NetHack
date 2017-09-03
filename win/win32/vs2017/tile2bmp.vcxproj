@@ -13,14 +13,14 @@
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
-  
+
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);$(SysShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  
+
   <ItemGroup>
     <ClCompile Include="$(SrcDir)decl.c" />
     <ClCompile Include="$(SrcDir)drawing.c" />
@@ -32,7 +32,7 @@
        <PreprocessorDefinitions>TILETEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 	</ClCompile>
   </ItemGroup>
- 
+
  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 
  <Target Name="AfterBuild">

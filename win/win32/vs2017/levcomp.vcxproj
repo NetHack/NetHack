@@ -5,7 +5,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9DD9C52E-E8C9-4533-BD22-83C055C0AABA}</ProjectGuid>
   </PropertyGroup>
-  
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -13,7 +13,7 @@
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
- 
+
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);$(SysShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -32,13 +32,13 @@
     <ClCompile Include="$(SrcDir)objects.c" />
     <ClCompile Include="$(UtilDir)panic.c" />	
   </ItemGroup>
-  
+
   <ItemGroup>
     <ClInclude Include="$(IncDir)lev_comp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Choose>
-    <When Condition=" '$(YACC)'!='' "> 
+    <When Condition=" '$(YACC)'!='' ">
       <PropertyGroup>
         <BuildDependsOn>
           Lex;

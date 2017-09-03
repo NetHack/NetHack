@@ -5,7 +5,7 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup> 
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" >
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
