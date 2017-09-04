@@ -1708,7 +1708,12 @@ struct obj *otmp;
 {
     const char *old_nomovemsg, *save_nomovemsg;
 
-    debugpline2("start_eating: %p (victual = %p)", otmp, context.victual.piece);
+    debugpline2("start_eating: %s (victual = %s)",
+                /* note: fmt_ptr() returns a static buffer but supports
+                   several such so we don't need to copy the first result
+                   before calling it a second time */
+                fmt_ptr((genericptr_t) otmp),
+                fmt_ptr((genericptr_t) context.victual.piece));
     debugpline1("reqtime = %d", context.victual.reqtime);
     debugpline1("(original reqtime = %d)", objects[otmp->otyp].oc_delay);
     debugpline1("nmod = %d", context.victual.nmod);
