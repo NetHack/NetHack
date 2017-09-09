@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#define NEED_VARARGS
+
 #include "hack.h"
 #include "dlb.h"
 
@@ -198,6 +200,7 @@ STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
+STATIC_DCL void FDECL(config_error_nextline, (const char *));
 STATIC_DCL void NDECL(free_config_sections);
 STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
 STATIC_DCL boolean FDECL(is_config_section, (const char *));
@@ -2240,6 +2243,7 @@ int src;
     char *bufp, *altp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
+    int retval = 1;
 
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
@@ -2257,8 +2261,10 @@ int src;
     altp = index(buf, ':');
     if (!bufp || (altp && altp < bufp))
         bufp = altp;
-    if (!bufp)
+    if (!bufp) {
+        config_error_add("Not a config statement, missing '='");
         return 0;
+    }
     /* skip past '=', then space between it and value, if any */
     ++bufp;
     if (*bufp == ' ')
@@ -2278,7 +2284,8 @@ int src;
             bufp = altp;
         ++bufp; /* skip '='; parseoptions() handles spaces */
 
-        parseoptions(bufp, TRUE, TRUE);
+        if (!parseoptions(bufp, TRUE, TRUE))
+            retval = 0;
     } else if (match_varname(buf, "CHOOSE", 6)) {
         char *section;
         if (config_section_chosen)
@@ -2289,11 +2296,13 @@ int src;
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "BINDINGS", 4)) {
-        parsebindings(bufp);
+        if (!parsebindings(bufp))
+            retval = 0;
     } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
         parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
-        (void) msgtype_parse_add(bufp);
+        if (!msgtype_parse_add(bufp))
+            retval = 0;
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);
@@ -2539,7 +2548,8 @@ int src;
         (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE, 1,
                           "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
-        (void) add_menu_coloring(bufp);
+        if (!add_menu_coloring(bufp))
+            retval = 0;
     } else if (match_varname(buf, "WARNINGS", 5)) {
         (void) get_uchars(fp, buf, bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
@@ -2719,7 +2729,7 @@ int src;
 #endif
     } else
         return 0;
-    return 1;
+    return retval;
 }
 
 #ifdef USER_SOUNDS
@@ -2730,6 +2740,81 @@ const char *filename;
     return (boolean) (access(filename, 4) == 0);
 }
 #endif /* USER_SOUNDS */
+
+static int config_err_line_num = 0;
+static int config_err_num_errors = 0;
+static boolean config_err_origline_shown = FALSE;
+static boolean config_err_fromfile = FALSE;
+static char config_err_origline[4 * BUFSZ];
+static char config_err_source[BUFSZ];
+
+void
+config_error_init(from_file, sourcename)
+boolean from_file;
+const char *sourcename;
+{
+    config_err_line_num = 0;
+    config_err_num_errors = 0;
+    config_err_origline_shown = FALSE;
+    config_err_fromfile = from_file;
+    config_err_origline[0] = '\0';
+    if (sourcename && sourcename[0])
+        Strcpy(config_err_source, sourcename);
+    else
+        config_err_source[0] = '\0';
+}
+
+STATIC_OVL void
+config_error_nextline(line)
+const char *line;
+{
+    config_err_line_num++;
+    config_err_origline_shown = FALSE;
+    if (line && line[0])
+        Strcpy(config_err_origline, line);
+    else
+        config_err_origline[0] = '\0';
+}
+
+/*VARARGS1*/
+void config_error_add
+VA_DECL(const char *, str)
+/*const char *errmsg;*/
+{
+    VA_START(str);
+    VA_INIT(str, char *);
+    char buf[BUFSZ];
+    char lineno[QBUFSZ];
+
+    Vsprintf(buf, str, VA_ARGS);
+
+    config_err_num_errors++;
+    if (!config_err_origline_shown) {
+        pline("\n%s", config_err_origline);
+        config_err_origline_shown = TRUE;
+    }
+    if (config_err_line_num > 0) {
+        Sprintf(lineno, "Line %i: ", config_err_line_num);
+    } else
+        lineno[0] = '\0';
+    pline(" * %s%s.", lineno, (buf && buf[0]) ? buf : "Unknown error");
+
+    VA_END();
+}
+
+int
+config_error_done()
+{
+    int n = config_err_num_errors;
+    if (n) {
+        pline("\n%i error%s in %s.\n", n,
+                   (n > 1) ? "s" : "",
+                   *config_err_source ? config_err_source : configfile);
+        wait_synch();
+    }
+    config_error_init(FALSE, "");
+    return n;
+}
 
 boolean
 read_config_file(filename, src)
@@ -2748,6 +2833,8 @@ int src;
     free_config_sections();
 
     while (fgets(buf, sizeof buf, fp)) {
+        strip_newline(buf);
+        config_error_nextline(buf);
 #ifdef notyet
 /*
 XXX Don't call read() in parse_config_line, read as callback or reassemble
@@ -2755,17 +2842,8 @@ line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
-        if (!parse_config_line(fp, strip_newline(buf), src)) {
-            static const char badoptionline[] = "Bad option line: \"%s\"";
-
-            /* truncate buffer if it's long; this is actually conservative */
-            if (strlen(buf) > BUFSZ - sizeof badoptionline)
-                buf[BUFSZ - sizeof badoptionline] = '\0';
-
-            raw_printf(badoptionline, buf);
-            wait_synch();
+        if (!parse_config_line(fp, buf, src))
             rv = FALSE;
-        }
     }
     (void) fclose(fp);
 

@@ -3056,7 +3056,7 @@ uchar key;
     return (char *) 0;
 }
 
-void
+boolean
 bind_key(key, command)
 uchar key;
 const char *command;
@@ -3066,19 +3066,17 @@ const char *command;
     /* special case: "nothing" is reserved for unbinding */
     if (!strcmp(command, "nothing")) {
         Cmd.commands[key] = (struct ext_func_tab *) 0;
-        return;
+        return TRUE;
     }
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
         if (strcmp(command, extcmd->ef_txt))
             continue;
         Cmd.commands[key] = extcmd;
-        return;
+        return TRUE;
     }
 
-    pline(
-        "Bad command %s matched with key %c (ASCII %i).  Ignoring command.\n",
-          command, key, key);
+    return FALSE;
 }
 
 /* initialize all keyboard commands */
@@ -3091,27 +3089,27 @@ commands_init()
         if (extcmd->key)
             Cmd.commands[extcmd->key] = extcmd;
 
-    bind_key(C('l'), "redraw"); /* if number_pad is set */
+    (void) bind_key(C('l'), "redraw"); /* if number_pad is set */
     /*       'b', 'B' : go sw */
     /*       'F' : fight (one time) */
     /*       'g', 'G' : multiple go */
     /*       'h', 'H' : go west */
-    bind_key('h',    "help"); /* if number_pad is set */
-    bind_key('j',    "jump"); /* if number_pad is on */
+    (void) bind_key('h',    "help"); /* if number_pad is set */
+    (void) bind_key('j',    "jump"); /* if number_pad is on */
     /*       'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' move commands */
-    bind_key('k',    "kick"); /* if number_pad is on */
-    bind_key('l',    "loot"); /* if number_pad is on */
-    bind_key(C('n'), "annotate"); /* if number_pad is on */
-    bind_key(M('n'), "name");
-    bind_key(M('N'), "name");
-    bind_key('u',    "untrap"); /* if number_pad is on */
+    (void) bind_key('k',    "kick"); /* if number_pad is on */
+    (void) bind_key('l',    "loot"); /* if number_pad is on */
+    (void) bind_key(C('n'), "annotate"); /* if number_pad is on */
+    (void) bind_key(M('n'), "name");
+    (void) bind_key(M('N'), "name");
+    (void) bind_key('u',    "untrap"); /* if number_pad is on */
 
     /* alt keys: */
-    bind_key(M('O'), "overview");
-    bind_key(M('2'), "twoweapon");
+    (void) bind_key(M('O'), "overview");
+    (void) bind_key(M('2'), "twoweapon");
 
     /* wait_on_space */
-    bind_key(' ',    "wait");
+    (void) bind_key(' ',    "wait");
 }
 
 int
@@ -4007,7 +4005,7 @@ boolean initial;
         }
         backed_dir_cmd = TRUE;
         for (i = 0; i < 8; i++)
-            bind_key(Cmd.dirchars[i], "nothing");
+            (void) bind_key(Cmd.dirchars[i], "nothing");
     }
 }
 

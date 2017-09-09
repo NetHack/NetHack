@@ -198,7 +198,7 @@ E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));
-E void FDECL(bind_key, (UCHAR_P, const char *));
+E boolean FDECL(bind_key, (UCHAR_P, const char *));
 E void NDECL(dokeylist);
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
 E void FDECL(dtoxy, (coord *, int));
@@ -767,6 +767,9 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
+E void FDECL(config_error_init, (BOOLEAN_P, const char *));
+E void FDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
+E int NDECL(config_error_done);
 E boolean FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
@@ -1679,7 +1682,7 @@ E boolean FDECL(match_optname, (const char *, const char *, int, BOOLEAN_P));
 E void NDECL(initoptions);
 E void NDECL(initoptions_init);
 E void NDECL(initoptions_finish);
-E void FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
+E boolean FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);
@@ -1687,7 +1690,7 @@ E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
                                   char *, char *));
-E void FDECL(parsebindings, (char *));
+E boolean FDECL(parsebindings, (char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(get_menu_cmd_key, (CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
