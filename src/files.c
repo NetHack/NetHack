@@ -2727,8 +2727,10 @@ int src;
 
         qt_compact_mode = atoi(bufp);
 #endif
-    } else
+    } else {
+        config_error_add("Unknown config statement");
         return 0;
+    }
     return retval;
 }
 
