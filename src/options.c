@@ -1820,13 +1820,17 @@ illegal_menu_cmd_key(c)
 char c;
 {
     if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-        || c == ' ' || digit(c) || (letter(c) && c != '@'))
+        || c == ' ' || digit(c) || (letter(c) && c != '@')) {
+        config_error_add("Reserved menu command key '%s'", visctrl(c));
         return TRUE;
-    else { /* reject default object class symbols */
+    } else { /* reject default object class symbols */
         int j;
         for (j = 1; j < MAXOCLASSES; j++)
-            if (c == def_oc_syms[j].sym)
+            if (c == def_oc_syms[j].sym) {
+                config_error_add("Menu command key '%s' is an object class",
+                                 visctrl(c));
                 return TRUE;
+            }
     }
     return FALSE;
 }
@@ -2117,7 +2121,7 @@ boolean tinitial, tfrom_file;
             symset[ROGUESET].name = dupstr(op);
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
-                config_error_add("Unable to load symbol set \"%s\" from \"%s\".",
+                config_error_add("Unable to load symbol set \"%s\" from \"%s\"",
                            op, SYMBOLS);
                 return FALSE;
             } else {
@@ -2141,7 +2145,7 @@ boolean tinitial, tfrom_file;
             symset[PRIMARY].name = dupstr(op);
             if (!read_sym_file(PRIMARY)) {
                 clear_symsetentry(PRIMARY, TRUE);
-                config_error_add("Unable to load symbol set \"%s\" from \"%s\".",
+                config_error_add("Unable to load symbol set \"%s\" from \"%s\"",
                            op, SYMBOLS);
                 return FALSE;
             } else {
@@ -2721,7 +2725,8 @@ boolean tinitial, tfrom_file;
                 else
                     break; /* no next token */
             } /* for(;;) */
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2768,7 +2773,8 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2848,9 +2854,10 @@ boolean tinitial, tfrom_file;
         op = string_for_opt(opts, negated);
         if ((negated && !op) || (!negated && op))
             flags.pile_limit = negated ? 0 : atoi(op);
-        else if (negated)
+        else if (negated) {
             bad_negation(fullname, TRUE);
-        else /* !op */
+            return FALSE;
+        } else /* !op */
             flags.pile_limit = PILE_LIMIT_DFLT;
         /* sanity check */
         if (flags.pile_limit < 0)
@@ -2878,7 +2885,7 @@ boolean tinitial, tfrom_file;
         } else if (!strncmpi(op, "debug", 5) || !strncmpi(op, "wizard", 6)) {
             wizard = TRUE, discover = FALSE;
         } else {
-            config_error_add("Invalid value for \"%s\":%s.", fullname, op);
+            config_error_add("Invalid value for \"%s\":%s", fullname, op);
             return FALSE;
         }
         return retval;
@@ -2897,16 +2904,19 @@ boolean tinitial, tfrom_file;
             else if (!strncmpi(op, "prompt", sizeof("prompt") - 1))
                 iflags.wc_player_selection = VIA_PROMPTS;
             else {
-                config_error_add("Unknown %s parameter '%s'", "pickup_types", op);
+                config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        } else if (negated)
+        } else if (negated) {
             bad_negation(fullname, TRUE);
+            return FALSE;
+        }
         return retval;
     }
 
     /* things to disclose at end of game */
-    if (match_optname(opts, "disclose", 7, TRUE)) {
+    fullname = "disclose";
+    if (match_optname(opts, fullname, 7, TRUE)) {
         /*
          * The order that the end_disclose options are stored:
          *      inventory, attribs, vanquished, genocided,
@@ -2928,14 +2938,13 @@ boolean tinitial, tfrom_file;
          * and the presence of a i,a,g,v, or c without a prefix
          * sets the corresponding value to DISCLOSE_YES_WITHOUT_PROMPT.
          */
-        boolean badopt = FALSE;
         int idx, prefix_val;
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, TRUE);
         if (op && negated) {
-            bad_negation("disclose", TRUE);
+            bad_negation(fullname, TRUE);
             return FALSE;
         }
         /* "disclose" without a value means "all with prompting"
@@ -2988,23 +2997,22 @@ boolean tinitial, tfrom_file;
                 prefix_val = c;
             } else if (c == ' ') {
                 ; /* do nothing */
-            } else
-                badopt = TRUE;
+            } else {
+                config_error_add("Unknown %s parameter '%c'", fullname, *op);
+                return FALSE;
+            }
             op++;
-        }
-        if (badopt) {
-            config_error_add("Unknown %s parameter '%s'", "disclose", op);
-            return FALSE;
         }
         return retval;
     }
 
     /* scores:5t[op] 5a[round] o[wn] */
-    if (match_optname(opts, "scores", 4, TRUE)) {
+    fullname = "scores";
+    if (match_optname(opts, fullname, 4, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (negated) {
-            bad_negation("scores", FALSE);
+            bad_negation(fullname, FALSE);
             return FALSE;
         }
         if (!(op = string_for_opt(opts, FALSE)))
@@ -3038,7 +3046,7 @@ boolean tinitial, tfrom_file;
                 flags.end_own = !negated;
                 break;
             default:
-                config_error_add("Unknown %s parameter '%s'", "scores", op);
+                config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
             while (letter(*++op) || *op == ' ')
@@ -3065,7 +3073,8 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -3233,6 +3242,8 @@ boolean tinitial, tfrom_file;
         } else {
 #if defined(WIN32)
             op = string_for_opt(opts, 0);
+            if (!op)
+                return FALSE;
             map_subkeyvalue(op);
 #endif
         }
@@ -3263,7 +3274,8 @@ boolean tinitial, tfrom_file;
             if (iflags.wc_tile_file)
                 free(iflags.wc_tile_file);
             iflags.wc_tile_file = dupstr(op);
-        }
+        } else
+            return FALSE;
         return retval;
     }
     /* WINCAP
@@ -3307,7 +3319,8 @@ boolean tinitial, tfrom_file;
             char buf[WINTYPELEN];
             nmcpy(buf, op, WINTYPELEN);
             choose_windows(buf);
-        }
+        } else
+            return FALSE;
         return retval;
     }
 #ifdef WINCHAIN
@@ -3320,7 +3333,8 @@ boolean tinitial, tfrom_file;
             char buf[WINTYPELEN];
             nmcpy(buf, op, WINTYPELEN);
             addto_windowchain(buf);
-        }
+        } else
+            return FALSE;
         return retval;
     }
 #endif
@@ -3342,7 +3356,8 @@ boolean tinitial, tfrom_file;
     }
 
     /* menustyle:traditional or combination or full or partial */
-    if (match_optname(opts, "menustyle", 4, TRUE)) {
+    fullname = "menustyle";
+    if (match_optname(opts, fullname, 4, TRUE)) {
         int tmp;
         boolean val_required = (strlen(opts) > 5 && !negated);
 
@@ -3374,7 +3389,7 @@ boolean tinitial, tfrom_file;
             flags.menu_style = MENU_PARTIAL;
             break;
         default:
-            config_error_add("Unknown %s parameter '%s'", "menustyle", op);
+            config_error_add("Unknown %s parameter '%s'", fullname, op);
             return FALSE;
         }
         return retval;
@@ -3407,6 +3422,7 @@ boolean tinitial, tfrom_file;
         if (match_optname(opts, fullname, (int) strlen(fullname), TRUE)) {
             if (negated) {
                 bad_negation(fullname, FALSE);
+                return FALSE;
             } else if ((op = string_for_opt(opts, FALSE)) != 0) {
                 char c, op_buf[BUFSZ];
 
@@ -3414,7 +3430,6 @@ boolean tinitial, tfrom_file;
                 c = *op_buf;
 
                 if (illegal_menu_cmd_key(c)) {
-                    /* TODO FIXME */
                     return FALSE;
                 } else
                     add_menu_cmd_alias(c, default_menu_cmd_info[i].cmd);
@@ -3461,8 +3476,8 @@ boolean tinitial, tfrom_file;
                     switch_symbols(TRUE);
             }
             if (badflag) {
-                pline("Failure to load symbol set %s.", fullname);
-                wait_synch();
+                config_error_add("Failure to load symbol set %s.", fullname);
+                return FALSE;
             }
         }
         return retval;
@@ -3490,8 +3505,8 @@ boolean tinitial, tfrom_file;
                 }
             }
             if (badflag) {
-                pline("Failure to load symbol set %s.", sym_name);
-                wait_synch();
+                config_error_add("Failure to load symbol set %s.", sym_name);
+                return FALSE;
             } else {
                 switch_symbols(TRUE);
                 if (!initial && Is_rogue_level(&u.uz))
@@ -3519,8 +3534,8 @@ boolean tinitial, tfrom_file;
                 }
             }
             if (badflag) {
-                pline("Failure to load symbol set %s.", fullname);
-                wait_synch();
+                config_error_add("Failure to load symbol set %s.", fullname);
+                return FALSE;
             } else {
                 switch_symbols(TRUE);
                 if (!initial && Is_rogue_level(&u.uz))
