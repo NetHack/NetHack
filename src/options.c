@@ -1200,7 +1200,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
      * For now just return.
      */
 #else /* !MAC */
-    config_error_add("%s option specified multiple times: %s.\n",
+    config_error_add("%s option specified multiple times: %s",
                iscompound ? "compound" : "boolean", opts);
 #endif /* ?MAC */
     return;
@@ -1872,21 +1872,23 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, "female", 3, FALSE)) {
         if (duplicate_opt_detection(opts, 0))
             complain_about_duplicate(opts, 0);
-        if (!initial && flags.female == negated)
-            pline("That is not anatomically possible.");
-        else
+        if (!initial && flags.female == negated) {
+            config_error_add("That is not anatomically possible.");
+            return FALSE;
+        } else
             flags.initgend = flags.female = !negated;
-        return FALSE;
+        return retval;
     }
 
     if (match_optname(opts, "male", 4, FALSE)) {
         if (duplicate_opt_detection(opts, 0))
             complain_about_duplicate(opts, 0);
-        if (!initial && flags.female != negated)
-            pline("That is not anatomically possible.");
-        else
+        if (!initial && flags.female != negated) {
+            config_error_add("That is not anatomically possible.");
+            return FALSE;
+        } else
             flags.initgend = flags.female = negated;
-        return FALSE;
+        return retval;
     }
 
 #if defined(MICRO) && !defined(AMIGA)
@@ -1909,7 +1911,8 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s '%s'", fullname, op);
                 return FALSE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -1923,7 +1926,8 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else /* Backwards compatibility */
                 nmcpy(pl_character, op, PL_NSIZ);
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -1936,7 +1940,8 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else /* Backwards compatibility */
                 pl_race = *op;
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -1949,7 +1954,8 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else
                 flags.female = flags.initgend;
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
