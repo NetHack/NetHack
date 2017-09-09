@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,7 +34,8 @@ dodrop()
     result = drop(getobj(&drop_types[i], "drop"));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -100,7 +101,8 @@ boulder_hits_pool(struct obj *otmp, register int rx, register int ry, boolean pu
                 You("find yourself on dry land again!");
             } else if (lava && distu(rx, ry) <= 2) {
                 int dmg;
-                You("are hit by molten lava%c", Fire_resistance ? '.' : '!');
+                You("are hit by molten %s%c",
+                    hliquid("lava"), Fire_resistance ? '.' : '!');
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
@@ -370,18 +372,21 @@ dosinkring(register struct obj *obj)
         You_hear("loud noises coming from the drain.");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
-        pline_The("water flow seems fixed.");
+        pline_The("%s flow seems fixed.", hliquid("water"));
         break;
     case RIN_GAIN_STRENGTH:
-        pline_The("water flow seems %ser now.",
+        pline_The("%s flow seems %ser now.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "weak" : "strong");
         break;
     case RIN_GAIN_CONSTITUTION:
-        pline_The("water flow seems %ser now.",
+        pline_The("%s flow seems %ser now.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "less" : "great");
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
-        pline_The("water flow %s the drain.",
+        pline_The("%s flow %s the drain.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "misses" : "hits");
         break;
     case RIN_INCREASE_DAMAGE:
@@ -447,10 +452,12 @@ dosinkring(register struct obj *obj)
             pline_The("sink seems to blend into the floor for a moment.");
             break;
         case RIN_FIRE_RESISTANCE:
-            pline_The("hot water faucet flashes brightly for a moment.");
+            pline_The("hot %s faucet flashes brightly for a moment.",
+                      hliquid("water"));
             break;
         case RIN_COLD_RESISTANCE:
-            pline_The("cold water faucet flashes brightly for a moment.");
+            pline_The("cold %s faucet flashes brightly for a moment.",
+                      hliquid("water"));
             break;
         case RIN_PROTECTION_FROM_SHAPE_CHAN:
             pline_The("sink looks nothing like a fountain.");
@@ -716,6 +723,10 @@ doddrop()
 {
     int result = 0;
 
+    if (!invent) {
+        You("have nothing to drop.");
+        return 0;
+    }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
@@ -724,7 +735,8 @@ doddrop()
         result = menu_drop(result);
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -761,6 +773,7 @@ menu_drop(int retry)
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
         unsigned ggoresults = 0;
+
         all_categories = FALSE;
         /* Gather valid classes via traditional NetHack method */
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
@@ -1296,7 +1309,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             if (flags.verbose || great_effort)
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
-                      Flying ? "fly" : "climb",
+                      Levitation ? "float" : Flying ? "fly" : "climb",
                       (Flying && at_ladder) ? " along" : "",
                       at_ladder ? "ladder" : "stairs");
         } else { /* down */
@@ -1502,13 +1515,20 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     save_currentstate();
 #endif
 
-    if ((annotation = get_annotation(&u.uz)))
+    if ((annotation = get_annotation(&u.uz)) != 0)
         You("remember this level as %s.", annotation);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
-    context.polearm.hitmon = NULL;
+
+    /* discard context which applied to previous level */
+    maybe_reset_pick(); /* for door or for box not accompanying hero */
+    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
+    iflags.travelcc.x = iflags.travelcc.y = -1; /* travel destination cache */
+    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    /* digging context is level-aware and can actually be resumed if
+       hero returns to the previous level without any intervening dig */
 }
 
 STATIC_OVL void

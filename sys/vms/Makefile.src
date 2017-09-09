@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1447314365 2015/11/12 07:46:05 $	$NHDT-Branch: master $:$NHDT-Revision: 1.27 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1465133388 2016/06/05 13:29:48 $	$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -97,7 +97,7 @@ RANDOBJ = random.obj
 # Other things that have to be reconfigured are in vmsconf.h,
 # and config.h
 
-VERSION  = 3.5.0
+VERSION  = 3.6.1
 
 MAKEDEFS = $(UTL)makedefs.exe;
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1457660917 2016/03/11 01:48:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1467718299 2016/07/05 11:31:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,6 +29,7 @@ STATIC_DCL void forget(int);
 STATIC_DCL int maybe_tame(struct monst *, struct obj *);
 STATIC_DCL boolean is_valid_stinking_cloud_pos(int, int, boolean);
 STATIC_DCL void display_stinking_cloud_positions(int);
+STATIC_DCL boolean get_valid_stinking_cloud_pos(int, int);
 STATIC_PTR void set_lit(int, int, genericptr);
 
 STATIC_OVL boolean
@@ -876,7 +877,7 @@ maybe_tame(struct monst *mtmp, struct obj *sobj)
     unsigned was_peaceful = mtmp->mpeaceful;
 
     if (sobj->cursed) {
-        setmangry(mtmp);
+        setmangry(mtmp, FALSE);
         if (was_peaceful && !mtmp->mpeaceful)
             return -1;
     } else {
@@ -890,10 +891,19 @@ maybe_tame(struct monst *mtmp, struct obj *sobj)
     return 0;
 }
 
+STATIC_OVL boolean
+get_valid_stinking_cloud_pos(x,y)
+int x,y;
+{
+    return (!(!isok(x,y) || !cansee(x, y)
+              || !ACCESSIBLE(levl[x][y].typ)
+              || distu(x, y) >= 32));
+}
+
 boolean
 is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
 {
-    if (!cansee(x, y) || !ACCESSIBLE(levl[x][y].typ) || distu(x, y) >= 32) {
+    if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg)
             You("smell rotten eggs.");
         return FALSE;
@@ -914,7 +924,7 @@ display_stinking_cloud_positions(int state)
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
                 y = u.uy + dy;
-                if (isok(x, y) && is_valid_stinking_cloud_pos(x, y, FALSE))
+                if (get_valid_stinking_cloud_pos(x,y))
                     tmp_at(x, y);
             }
     } else {
@@ -1385,8 +1395,6 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
             (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
                                                : &mons[PM_BLACK_LIGHT],
                                    TRUE);
-            if (!objects[sobj->otyp].oc_uname)
-                docall(sobj);
         }
         break;
     case SCR_TELEPORTATION:
@@ -1519,8 +1527,14 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
             pline("Thinking of Maud you forget everything else.");
         exercise(A_WIS, FALSE);
         break;
-    case SCR_FIRE:
+    case SCR_FIRE: {
+        coord cc;
+        int dam;
+
+        cc.x = u.ux;
+        cc.y = u.uy;
         cval = bcsign(sobj);
+        dam = (2 * (rn1(3, 3) + 2 * cval) + 1) / 3;
         useup(sobj);
         sobj = 0; /* it's gone */
         if (!already_known)
@@ -1542,15 +1556,30 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
             break;
         }
         if (Underwater) {
-            pline_The("water around you vaporizes violently!");
+            pline_The("%s around you vaporizes violently!", hliquid("water"));
         } else {
-            pline_The("scroll erupts in a tower of flame!");
-            iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
-            burn_away_slime();
+            if (sblessed) {
+                if (!already_known)
+                    pline("This is a scroll of fire!");
+                dam *= 5;
+                pline("Where do you want to center the explosion?");
+                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                (void) getpos(&cc, TRUE, "the desired position");
+                if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
+                    /* try to reach too far, get burned */
+                    cc.x = u.ux;
+                    cc.y = u.uy;
+                }
+            }
+            if (cc.x == u.ux && cc.y == u.uy) {
+                pline_The("scroll erupts in a tower of flame!");
+                iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
+                burn_away_slime();
+            }
         }
-        explode(u.ux, u.uy, 11, (2 * (rn1(3, 3) + 2 * cval) + 1) / 3,
-                SCROLL_CLASS, EXPL_FIERY);
+        explode(cc.x, cc.y, 11, dam, SCROLL_CLASS, EXPL_FIERY);
         break;
+    }
     case SCR_EARTH:
         /* TODO: handle steeds */
         if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
@@ -1606,7 +1635,7 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
               already_known ? "stinking " : "");
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions);
+        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
         if (getpos(&cc, TRUE, "the desired position") < 0) {
             pline1(Never_mind);
             break;
@@ -1712,9 +1741,9 @@ drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
         }
         mtmp->mhp -= mdmg;
         if (mtmp->mhp <= 0) {
-            if (byu)
-                xkilled(mtmp, 1);
-            else {
+            if (byu) {
+                killed(mtmp);
+            } else {
                 pline("%s is killed.", Monnam(mtmp));
                 mondied(mtmp);
             }
@@ -2329,7 +2358,8 @@ create_particular()
     struct permonst *whichpm = NULL;
     struct monst *mtmp;
     boolean madeany = FALSE, randmonst = FALSE,
-            maketame, makepeaceful, makehostile, saddled, invisible;
+        maketame, makepeaceful, makehostile, saddled, invisible,
+        sleeping;
     int fem;
 
     tryct = 5;
@@ -2337,7 +2367,7 @@ create_particular()
         monclass = MAXMCLASSES;
         which = urole.malenum; /* an arbitrary index into mons[] */
         maketame = makepeaceful = makehostile = FALSE;
-        saddled = invisible = FALSE;
+        sleeping = saddled = invisible = FALSE;
         fem = -1; /* gender not specified */
         getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
@@ -2346,6 +2376,10 @@ create_particular()
         if ((tmpp = strstri(bufp, "saddled ")) != 0) {
             saddled = TRUE;
             (void) memset(tmpp, ' ', sizeof "saddled " - 1);
+        }
+        if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
+            sleeping = TRUE;
+            (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
         }
         if ((tmpp = strstri(bufp, "invisible ")) != 0) {
             invisible = TRUE;
@@ -2436,6 +2470,8 @@ create_particular()
             }
             if (invisible)
                 mon_set_minvis(mtmp);
+            if (sleeping)
+                mtmp->msleeping = 1;
             madeany = TRUE;
             /* in case we got a doppelganger instead of what was asked
                for, make it start out looking like what was asked for */

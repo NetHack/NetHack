@@ -1,0 +1,58 @@
+	Depending upon hardware or operating system or NetHack's interface,
+	some keystrokes may be off-limits.
+
+	For example, ^S and ^Q are often used for XON/XOFF flow-control,
+	meaning that ^S suspends output and subsequent ^Q resumes suspended
+	output.  When that it the case, neither of those characters will
+	reach NetHack when it is waiting for a command keystroke.  So they
+	aren't used as commands, but 'whatdoes' might not be able to tell
+	you that if they don't get passed through to NetHack.
+
+	^M or <return> or <enter> is likely to be transformed into ^J or
+	<linefeed> or 'newline' before being passed to NetHack for handling.
+	So it isn't used as a command, and 'whatdoes' might seem as if it
+	is reporting the wrong character but will be operating correctly if
+	it describes ^J when you type ^M.
+
+	A NUL character, which is typed as ^<space> on some keyboards,
+	^@ on others, and maybe not typeable at all on yet others, is not
+	used as a command, and will be converted into ESC before reaching
+	'whatdoes'.  Unlike ^M, this transformation is performed within
+	NetHack.  But like ^M, if you type NUL and get feedback about ESC,
+	the situation is expected.
+
+	ESC itself is a synonym for ^[, and is another source of oddity.
+	Various function keys, including cursor arrow keys, may transmit
+	an "escape sequence" of ESC + [ + other stuff, confusing NetHack
+	as to what command was intended since the ESC will be processed
+	and then whatever follows will seem to NetHack like--and be used
+	as--something typed by the user.  (If you press a function key and
+	a menu of the armor your hero is wearing appears, what happened
+	was that an escape sequence was sent to NetHack, its ESC aborted
+	any pending key operation, its '[' was then treated as a command
+	to show worn armor, and the "other stuff" probably got silently
+	discarded as invalid choices while you dismissed the menu.)
+
+	If you have NetHack's 'altmeta' option enabled, meaning that the
+	<alt> or <option> key, when used as shift while typing some other
+	character, transmits ESC and then the other character so NetHack
+	should treat that other character as a meta-character, then ESC
+	takes on added potential for confusion.  Implicit in the handling
+	of a two character sequence ESC + something is the fact that when
+	NetHack sees ESC, it needs to wait for another character before
+	it can decide what to do.  So if you type ESC manually, you'll
+	need to type it a second time or NetHack will sit there waiting.
+	(It will then be treated as if you typed ESC rather than M-ESC.)
+
+	On some systems, typing ^\ will send a QUIT signal to the current
+	process, probably killing it and possibly causing it to save a
+	core dump.  It is not used for any NetHack command, so don't type
+	that character.
+
+	One last note:  characters shown as ^x mean that you should hold
+	down the <control> or <ctrl> key as a shift and then type 'x'.
+	Control characters are all implicitly uppercase, but you don't
+	need to press the shift key while typing them.  The opposite is
+	true for meta-characters:  they can be either case, so you need
+	to use shift as well as <meta> or <alt> to generate an uppercase
+	letter meta-character.

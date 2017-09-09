@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1446808440 2015/11/06 11:14:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1502753406 2017/08/14 23:30:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,7 +38,7 @@ initedog(register struct monst *mtmp)
     mtmp->meating = 0;
     EDOG(mtmp)->droptime = 0;
     EDOG(mtmp)->dropdist = 10000;
-    EDOG(mtmp)->apport = 10;
+    EDOG(mtmp)->apport = ACURR(A_CHA);
     EDOG(mtmp)->whistletime = 0;
     EDOG(mtmp)->hungrytime = 1000 + monstermoves;
     EDOG(mtmp)->ogoal.x = -1; /* force error if used before set */
@@ -422,9 +422,10 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
     mtmp->mx = 0; /*(already is 0)*/
     mtmp->my = xyflags;
-    if (xlocale)
-        (void) mnearto(mtmp, xlocale, ylocale, FALSE);
-    else {
+    if (xlocale) {
+        if (!mnearto(mtmp, xlocale, ylocale, FALSE))
+            goto fail_mon_placement;
+    } else {
         if (!rloc(mtmp, TRUE)) {
             /*
              * Failed to place migrating monster,
@@ -432,6 +433,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
              * Dump the monster's cargo and leave the monster dead.
              */
             struct obj *obj;
+fail_mon_placement:
             while ((obj = mtmp->minvent) != 0) {
                 obj_extract_self(obj);
                 obj_no_longer_held(obj);
@@ -721,7 +723,8 @@ int
 dogfood(struct monst *mon, register struct obj *obj)
 {
     struct permonst *mptr = mon->data, *fptr = 0;
-    boolean carni = carnivorous(mptr), herbi = herbivorous(mptr), starving;
+    boolean carni = carnivorous(mptr), herbi = herbivorous(mptr),
+            starving, mblind;
 
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
         return obj->cursed ? TABU : APPORT;
@@ -740,8 +743,10 @@ dogfood(struct monst *mon, register struct obj *obj)
             return obj->cursed ? UNDEF : APPORT;
 
         /* a starving pet will eat almost anything */
-        starving =
-            (mon->mtame && !mon->isminion && EDOG(mon)->mhpmax_penalty);
+        starving = (mon->mtame && !mon->isminion
+                    && EDOG(mon)->mhpmax_penalty);
+        /* even carnivores will eat carrots if they're temporarily blind */
+        mblind = (!mon->mcansee && haseyes(mon->data));
 
         /* ghouls prefer old corpses and unhatchable eggs, yum!
            they'll eat fresh non-veggy corpses and hatchable eggs
@@ -798,11 +803,12 @@ dogfood(struct monst *mon, register struct obj *obj)
         case TIN:
             return metallivorous(mptr) ? ACCFOOD : MANFOOD;
         case APPLE:
-        case CARROT:
             return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
+        case CARROT:
+            return (herbi || mblind) ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case BANANA:
-            return (mptr->mlet == S_YETI)
-                      ? DOGFOOD
+            return (mptr->mlet == S_YETI && herbi)
+                      ? DOGFOOD /* for monkey and ape (tameable), sasquatch */
                       : (herbi || starving)
                          ? ACCFOOD
                          : MANFOOD;

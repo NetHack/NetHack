@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1446892454 2015/11/07 10:34:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1496087244 2017/05/29 19:47:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -86,18 +86,18 @@ create_region(NhRect *rects, int nrect)
     NhRegion *reg;
 
     reg = (NhRegion *) alloc(sizeof(NhRegion));
+    (void) memset((genericptr_t)reg, 0, sizeof(NhRegion));
     /* Determines bounding box */
     if (nrect > 0) {
         reg->bounding_box = rects[0];
     } else {
-        reg->bounding_box.lx = 99;
-        reg->bounding_box.ly = 99;
-        reg->bounding_box.hx = 0;
+        reg->bounding_box.lx = COLNO;
+        reg->bounding_box.ly = ROWNO;
+        reg->bounding_box.hx = 0; /* 1 */
         reg->bounding_box.hy = 0;
     }
     reg->nrects = nrect;
-    reg->rects =
-        nrect > 0 ? (NhRect *) alloc((sizeof(NhRect)) * nrect) : (NhRect *) 0;
+    reg->rects = (nrect > 0) ? (NhRect *) alloc(nrect * sizeof (NhRect)) : 0;
     for (i = 0; i < nrect; i++) {
         if (rects[i].lx < reg->bounding_box.lx)
             reg->bounding_box.lx = rects[i].lx;
@@ -138,10 +138,10 @@ add_rect_to_reg(NhRegion *reg, NhRect *rect)
 {
     NhRect *tmp_rect;
 
-    tmp_rect = (NhRect *) alloc(sizeof(NhRect) * (reg->nrects + 1));
+    tmp_rect = (NhRect *) alloc((reg->nrects + 1) * sizeof (NhRect));
     if (reg->nrects > 0) {
         (void) memcpy((genericptr_t) tmp_rect, (genericptr_t) reg->rects,
-                      (sizeof(NhRect) * reg->nrects));
+                      reg->nrects * sizeof (NhRect));
         free((genericptr_t) reg->rects);
     }
     tmp_rect[reg->nrects] = *rect;
@@ -168,7 +168,7 @@ add_mon_to_reg(NhRegion *reg, struct monst *mon)
     unsigned *tmp_m;
 
     if (reg->max_monst <= reg->n_monst) {
-        tmp_m = (unsigned *) alloc(sizeof(unsigned)
+        tmp_m = (unsigned *) alloc(sizeof (unsigned)
                                    * (reg->max_monst + MONST_INC));
         if (reg->max_monst > 0) {
             for (i = 0; i < reg->max_monst; i++)
@@ -281,10 +281,10 @@ add_region(NhRegion *reg)
     if (max_regions <= n_regions) {
         tmp_reg = regions;
         regions =
-            (NhRegion **) alloc(sizeof(NhRegion *) * (max_regions + 10));
+            (NhRegion **) alloc((max_regions + 10) * sizeof (NhRegion *));
         if (max_regions > 0) {
             (void) memcpy((genericptr_t) regions, (genericptr_t) tmp_reg,
-                          max_regions * sizeof(NhRegion *));
+                          max_regions * sizeof (NhRegion *));
             free((genericptr_t) tmp_reg);
         }
         max_regions += 10;
@@ -734,6 +734,32 @@ rest_regions(int fd,
             reset_region_mids(regions[i]);
 }
 
+/* to support '#stats' wizard-mode command */
+void
+region_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    NhRegion *rg;
+    int i;
+
+    /* other stats formats take one parameter; this takes two */
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (NhRegion), (long) sizeof (NhRect));
+    *count = (long) n_regions; /* might be 0 even though max_regions isn't */
+    *size = (long) max_regions * (long) sizeof (NhRegion);
+    for (i = 0; i < n_regions; ++i) {
+        rg = regions[i];
+        *size += (long) rg->nrects * (long) sizeof (NhRect);
+        if (rg->enter_msg)
+            *size += (long) (strlen(rg->enter_msg) + 1);
+        if (rg->leave_msg)
+            *size += (long) (strlen(rg->leave_msg) + 1);
+        *size += (long) rg->max_monst * (long) sizeof *rg->monsters;
+    }
+    /* ? */
+}
+
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
 STATIC_OVL void
 reset_region_mids(NhRegion *reg)
@@ -900,13 +926,19 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
     } else { /* A monster is inside the cloud */
         mtmp = (struct monst *) p2;
 
-        /* Non living and non breathing monsters are not concerned */
+        /* Non living and non breathing monsters are not concerned;
+           adult green dragon is not affected by gas cloud, baby one is */
         if (!(nonliving(mtmp->data) || is_vampshifter(mtmp))
-            && !breathless(mtmp->data)) {
+            && !breathless(mtmp->data)
+            /* exclude monsters with poison gas breath attack:
+               adult green dragon and Chromatic Dragon (and iron golem,
+               but nonliving() and breathless() tests also catch that) */
+            && !(attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST)
+                 || attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE))) {
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s coughs!", Monnam(mtmp));
             if (heros_fault(reg))
-                setmangry(mtmp);
+                setmangry(mtmp, TRUE);
             if (haseyes(mtmp->data) && mtmp->mcansee) {
                 mtmp->mblinded = 1;
                 mtmp->mcansee = 0;

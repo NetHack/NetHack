@@ -367,7 +367,10 @@ tactics(register struct monst *mtmp)
             if (!rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, TRUE);
         } else if (sx && (mtmp->mx != sx || mtmp->my != sy)) {
-            (void) mnearto(mtmp, sx, sy, TRUE);
+            if (!mnearto(mtmp, sx, sy, TRUE)) {
+                m_into_limbo(mtmp);
+                return 0;
+            }
         }
         /* if you're not around, cast healing spells */
         if (distu(mtmp->mx, mtmp->my) > (BOLT_LIM * BOLT_LIM))
@@ -420,7 +423,8 @@ tactics(register struct monst *mtmp)
                 return 0;
             }
         } else { /* a monster has it - 'port beside it. */
-            (void) mnearto(mtmp, tx, ty, FALSE);
+            if (!mnearto(mtmp, tx, ty, FALSE))
+                m_into_limbo(mtmp);
             return 0;
         }
     }

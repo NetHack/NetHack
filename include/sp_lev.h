@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501803105 2017/08/03 23:31:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,11 +34,13 @@
    generate ways to escape from them */
 
 /* different level layout initializers */
-#define LVLINIT_NONE 0
-#define LVLINIT_SOLIDFILL 1
-#define LVLINIT_MAZEGRID 2
-#define LVLINIT_MINES 3
-#define LVLINIT_ROGUE 4
+enum lvlinit_types {
+    LVLINIT_NONE = 0,
+    LVLINIT_SOLIDFILL,
+    LVLINIT_MAZEGRID,
+    LVLINIT_MINES,
+    LVLINIT_ROGUE
+};
 
 /* max. layers of object containment */
 #define MAX_CONTAINMENT 10
@@ -218,45 +220,41 @@ enum opcode_defs {
 #define SP_COORD_IS_RANDOM 0x01000000
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */
-#define DRY 0x1
-#define WET 0x2
-#define HOT 0x4
-#define SOLID 0x8
-#define ANY_LOC 0x10     /* even outside the level */
+#define DRY         0x01
+#define WET         0x02
+#define HOT         0x04
+#define SOLID       0x08
+#define ANY_LOC     0x10 /* even outside the level */
 #define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
+#define SPACELOC    0x40 /* like DRY, but accepts furniture too */
 
 #define SP_COORD_X(l) (l & 0xff)
 #define SP_COORD_Y(l) ((l >> 16) & 0xff)
-#define SP_COORD_PACK(x, y) (((x) &0xff) + (((y) &0xff) << 16))
+#define SP_COORD_PACK(x, y) (((x) & 0xff) + (((y) & 0xff) << 16))
 #define SP_COORD_PACK_RANDOM(f) (SP_COORD_IS_RANDOM | (f))
 
 #define SP_REGION_X1(l) (l & 0xff)
 #define SP_REGION_Y1(l) ((l >> 8) & 0xff)
 #define SP_REGION_X2(l) ((l >> 16) & 0xff)
 #define SP_REGION_Y2(l) ((l >> 24) & 0xff)
-#define SP_REGION_PACK(x1, y1, x2, y2)                         \
-    (((x1) &0xff) + (((y1) &0xff) << 8) + (((x2) &0xff) << 16) \
-     + (((y2) &0xff) << 24))
+#define SP_REGION_PACK(x1, y1, x2, y2) \
+    (((x1) & 0xff) + (((y1) & 0xff) << 8) + (((x2) & 0xff) << 16) \
+     + (((y2) & 0xff) << 24))
 
-#define SP_MONST_CLASS(l) (l & 0xff)
-#define SP_MONST_PM(l) ((l >> 8) & 0xffff)
-#define SP_MONST_PACK(m, c) (((m) << 8) + ((char) (c)))
+/* permonst index, object index, and lit value might be negative;
+ * add 10 to accept -1 through -9 while forcing non-negative for bit shift
+ */
+#define SP_MONST_CLASS(l) ((l) & 0xff)
+#define SP_MONST_PM(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_MONST_PACK(pm, cls) (((10 + (pm)) << 8) | ((cls) & 0xff))
 
-#define SP_OBJ_CLASS(l) (l & 0xff)
-#define SP_OBJ_TYP(l) ((l >> 8) & 0xffff)
-#define SP_OBJ_PACK(o, c) (((o) << 8) + ((char) (c)))
+#define SP_OBJ_CLASS(l) ((l) & 0xff)
+#define SP_OBJ_TYP(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_OBJ_PACK(ob, cls) (((10 + (ob)) << 8) | ((cls) & 0xff))
 
-#define SP_MAPCHAR_TYP(l) (l & 0xff)
-#define SP_MAPCHAR_LIT(l) ((l >> 8) & 0xff)
-#define SP_MAPCHAR_PACK(typ, lit) (((lit) << 8) + ((char) (typ)))
-
-struct opvar {
-    xchar spovartyp; /* one of SPOVAR_foo */
-    union {
-        char *str;
-        long l;
-    } vardata;
-};
+#define SP_MAPCHAR_TYP(l) ((l) & 0xff)
+#define SP_MAPCHAR_LIT(l) ((((l) >> 8) & 0xffff) - 10)
+#define SP_MAPCHAR_PACK(typ, lit) (((10 + (lit)) << 8) | ((typ) & 0xff))
 
 struct splev_var {
     struct splev_var *next;
@@ -486,61 +484,52 @@ struct lc_breakdef {
 #ifdef SPEC_LEV
 /* compiling lev_comp rather than nethack */
 #ifdef USE_OLDARGS
-#undef VA_ARGS
-#undef VA_DECL
-#undef VA_DECL2
-#undef VA_SHIFT
+#ifndef VA_TYPE
+typedef const char *vA;
+#define VA_TYPE
+#endif
+#undef VA_ARGS  /* redefine with the maximum number actually used */
+#undef VA_SHIFT /* ditto */
+#undef VA_PASS1
 #define VA_ARGS                                                         \
     arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, \
         arg12, arg13, arg14
-#define VA_DECL(typ1, var1)                                             \
-    (var1, VA_ARGS) typ1 var1;                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, \
-        *arg10, *arg11, *arg12, *arg13, *arg14;                         \
-    {
-#define VA_DECL2(typ1, var1, typ2, var2)                                \
-    (var1, var2, VA_ARGS) typ1 var1;                                    \
-    typ2 var2;                                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, \
-        *arg10, *arg11, *arg12, *arg13, *arg14;                         \
-    {
-/* unlike in the core, lev_comp's VA_SHIFT is completely safe,
-   because callers always pass all these arguments */
+/* Unlike in the core, lev_comp's VA_SHIFT should be completely safe,
+   because callers always pass all these arguments. */
 #define VA_SHIFT()                                                       \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6,    \
      arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = arg10, arg10 = arg11, \
      arg11 = arg12, arg12 = arg13, arg13 = arg14, arg14 = 0)
 /* standard NULL may be either (void *)0 or plain 0, both of
    which would need to be explicitly cast to (char *) here */
-typedef char *Va;
 #define VA_PASS1(a1)                                                         \
-    (Va) a1, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS2(a1, a2)                                              \
-    (Va) a1, (Va) a2, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS3(a1, a2, a3)                                           \
-    (Va) a1, (Va) a2, (Va) a3, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS4(a1, a2, a3, a4)                                        \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) 0, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) 0, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS5(a1, a2, a3, a4, a5)                                     \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) 0, (Va) 0, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) 0, (vA) 0, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS7(a1, a2, a3, a4, a5, a6, a7)                               \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) 0, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) 0, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS8(a1, a2, a3, a4, a5, a6, a7, a8)                            \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS9(a1, a2, a3, a4, a5, a6, a7, a8, a9)                        \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) a9, (Va) 0, (Va) 0, (Va) 0, (Va) 0, (Va) 0
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) a9, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #define VA_PASS14(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13,   \
                   a14)                                                      \
-    (Va) a1, (Va) a2, (Va) a3, (Va) a4, (Va) a5, (Va) a6, (Va) a7, (Va) a8, \
-        (Va) a9, (Va) a10, (Va) a11, (Va) a12, (Va) a13, (Va) a14
+    (vA) a1, (vA) a2, (vA) a3, (vA) a4, (vA) a5, (vA) a6, (vA) a7, (vA) a8, \
+        (vA) a9, (vA) a10, (vA) a11, (vA) a12, (vA) a13, (vA) a14
 #else /*!USE_OLDARGS*/
 /* USE_STDARG and USE_VARARGS don't need to pass dummy arguments
    or cast real ones */

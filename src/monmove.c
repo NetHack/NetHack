@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1456959639 2016/03/02 23:00:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1496534703 2017/06/04 00:05:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -302,12 +302,6 @@ distfleeck(register struct monst *mtmp, int *inrange, int *nearby, int *scared)
                     || (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
         *scared = 1;
         monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
-
-        /* magical protection won't last forever, so there'll be a
-         * chance of the magic being used up regardless of type */
-        if (sawscary) {
-            wipe_engr_at(seescaryx, seescaryy, 1, TRUE);
-        }
     } else
         *scared = 0;
 }
@@ -684,6 +678,36 @@ should_displace(struct monst *mtmp,
     return FALSE;
 }
 
+boolean
+m_digweapon_check(struct monst *mtmp, xchar nix, xchar niy)
+{
+    boolean can_tunnel = 0;
+    struct obj *mw_tmp;
+
+    if (!Is_rogue_level(&u.uz))
+        can_tunnel = tunnels(mtmp->data);
+
+    if (can_tunnel && needspick(mtmp->data)
+        && mtmp->weapon_check != NO_WEAPON_WANTED
+        && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
+            || closed_door(nix, niy))) {
+        if (closed_door(nix, niy)) {
+            if (!(mw_tmp = MON_WEP(mtmp))
+                || !is_pick(mw_tmp)
+                || !is_axe(mw_tmp))
+                mtmp->weapon_check = NEED_PICK_OR_AXE;
+        } else if (IS_TREE(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
+                mtmp->weapon_check = NEED_AXE;
+        } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
+            mtmp->weapon_check = NEED_PICK_AXE;
+        }
+        if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -709,10 +733,10 @@ m_move(register struct monst *mtmp, register int after)
     long info[9];
     long flag;
     int omx = mtmp->mx, omy = mtmp->my;
-    struct obj *mw_tmp;
 
     if (mtmp->mtrapped) {
         int i = mintrap(mtmp);
+
         if (i >= 2) {
             newsym(mtmp->mx, mtmp->my);
             return 2;
@@ -924,14 +948,20 @@ not_special:
                  * mpickstuff() as well.
                  */
                 if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
-                    /* don't get stuck circling around an object that's
-                       underneath
-                       an immobile or hidden monster; paralysis victims
-                       excluded */
+                    /* don't get stuck circling around object that's
+                       underneath an immobile or hidden monster;
+                       paralysis victims excluded */
                     if ((mtoo = m_at(xx, yy)) != 0
                         && (mtoo->msleeping || mtoo->mundetected
                             || (mtoo->mappearance && !mtoo->iswiz)
                             || !mtoo->data->mmove))
+                        continue;
+                    /* the mfndpos() test for whether to allow a move to a
+                       water location accepts flyers, but they can't reach
+                       underwater objects, so being able to move to a spot
+                       is insufficient for deciding whether to do so */
+                    if ((is_pool(xx, yy) && !is_swimmer(ptr))
+                        || (is_lava(xx, yy) && !likes_lava(ptr)))
                         continue;
 
                     if (((likegold && otmp->oclass == COIN_CLASS)
@@ -1085,22 +1115,9 @@ not_special:
         if (mmoved == 1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
             return 3;
 
-        if (mmoved == 1 && can_tunnel && needspick(ptr)
-            && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
-                || closed_door(nix, niy))) {
-            if (closed_door(nix, niy)) {
-                if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)
-                    || !is_axe(mw_tmp))
-                    mtmp->weapon_check = NEED_PICK_OR_AXE;
-            } else if (IS_TREE(levl[nix][niy].typ)) {
-                if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
-                    mtmp->weapon_check = NEED_AXE;
-            } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
-                mtmp->weapon_check = NEED_PICK_AXE;
-            }
-            if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
-                return 3;
-        }
+        if (mmoved == 1 && m_digweapon_check(mtmp, nix,niy))
+            return 3;
+
         /* If ALLOW_U is set, either it's trying to attack you, or it
          * thinks it is.  In either case, attack this spot in preference to
          * all others.
@@ -1208,10 +1225,12 @@ postmov:
                         || (can_fog(mtmp)
                             && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
                                           canspotmon(mtmp))))) {
+                    /* update cached value for vamp_shift() case */
+                    ptr = mtmp->data;
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
-                               || ptr == &mons[PM_YELLOW_LIGHT])
+                               || ptr->mlet == S_LIGHT)
                                   ? "flows"
                                   : "oozes");
                 } else if (here->doormask & D_LOCKED && can_unlock) {
@@ -1571,13 +1590,11 @@ STATIC_OVL int
 vamp_shift(struct monst *mon, struct permonst *ptr, boolean domsg)
 {
     int reslt = 0;
-    char fmtstr[BUFSZ];
+    char oldmtype[BUFSZ];
 
-    if (domsg) {
-        Sprintf(fmtstr, "You %s %%s where %s was.",
-                sensemon(mon) ? "now detect" : "observe",
-                an(m_monnam(mon)));
-    }
+    /* remember current monster type before shapechange */
+    Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
+
     if (mon->data == ptr) {
         /* already right shape */
         reslt = 1;
@@ -1585,9 +1602,13 @@ vamp_shift(struct monst *mon, struct permonst *ptr, boolean domsg)
     } else if (is_vampshifter(mon)) {
         reslt = newcham(mon, ptr, FALSE, FALSE);
     }
+
     if (reslt && domsg) {
-        pline(fmtstr, an(m_monnam(mon)));
+        pline("You %s %s where %s was.",
+              !canseemon(mon) ? "now detect" : "observe",
+              noname_monnam(mon, ARTICLE_A), oldmtype);
     }
+
     return reslt;
 }
 

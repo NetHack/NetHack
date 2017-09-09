@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1431192777 2015/05/09 17:32:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1490908468 2017/03/30 21:14:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,7 +8,6 @@
 
 #include "tcap.h"
 #include "wintty.h"
-#include <ctype.h>
 
 #ifndef C /* this matches src/cmd.c */
 #define C(c) (0x1f & (c))
@@ -48,8 +47,7 @@ tty_doprev_message()
             do {
                 morc = 0;
                 if (cw->maxcol == cw->maxrow) {
-                    ttyDisplay->dismiss_more =
-                        C('p'); /* <ctrl/P> allowed at --More-- */
+                    ttyDisplay->dismiss_more = C('p'); /* ^P ok at --More-- */
                     redotoplin(toplines);
                     cw->maxcol--;
                     if (cw->maxcol < 0)
@@ -57,8 +55,7 @@ tty_doprev_message()
                     if (!cw->data[cw->maxcol])
                         cw->maxcol = cw->maxrow;
                 } else if (cw->maxcol == (cw->maxrow - 1)) {
-                    ttyDisplay->dismiss_more =
-                        C('p'); /* <ctrl/P> allowed at --More-- */
+                    ttyDisplay->dismiss_more = C('p'); /* ^P ok at --More-- */
                     redotoplin(cw->data[cw->maxcol]);
                     cw->maxcol--;
                     if (cw->maxcol < 0)
@@ -129,6 +126,7 @@ STATIC_OVL void
 redotoplin(const char *str)
 {
     int otoplin = ttyDisplay->toplin;
+
     home();
     if (*str & 0x80) {
         /* kludge for the / command, the only time we ever want a */
@@ -228,8 +226,8 @@ update_topl(register const char *bp)
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
     if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) && cw->cury == 0
-        && n0 + (int) strlen(toplines) + 3 < CO - 8 && /* room for --More-- */
-        (notdied = strncmp(bp, "You die", 7))) {
+        && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
+        && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
@@ -237,9 +235,9 @@ update_topl(register const char *bp)
             addtopl(bp);
         return;
     } else if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->toplin == 1)
+        if (ttyDisplay->toplin == 1) {
             more();
-        else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
+        } else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }
@@ -248,10 +246,11 @@ update_topl(register const char *bp)
     (void) strncpy(toplines, bp, TBUFSZ);
     toplines[TBUFSZ - 1] = 0;
 
-    for (tl = toplines; n0 >= CO;) {
+    for (tl = toplines; n0 >= CO; ) {
         otl = tl;
-        for (tl += CO - 1; tl != otl && !isspace(*tl); --tl)
-            ;
+        for (tl += CO - 1; tl != otl; --tl)
+            if (*tl == ' ')
+                break;
         if (tl == otl) {
             /* Eek!  A huge token.  Try splitting after it. */
             tl = index(otl, ' ');
@@ -295,7 +294,7 @@ topl_putsym(char c)
         break;
     default:
         if (ttyDisplay->curx == CO - 1)
-            topl_putsym('\n'); /* 1 <= curx <= CO; avoid CO */
+            topl_putsym('\n'); /* 1 <= curx < CO; avoid CO */
 #ifdef WIN32CON
         (void) putchar(c);
 #endif
@@ -326,6 +325,7 @@ removetopl(register int n)
 
 extern char erase_char; /* from xxxtty.c; don't need kill_char */
 
+/* returns a single keystroke; also sets 'yn_number' */
 char
 tty_yn_function(const char *query, const char *resp, char def)
 /*
@@ -347,6 +347,7 @@ tty_yn_function(const char *query, const char *resp, char def)
     boolean doprev = 0;
     char prompt[BUFSZ];
 
+    yn_number = 0L;
     if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
@@ -376,11 +377,12 @@ tty_yn_function(const char *query, const char *resp, char def)
         /* not pline("%s ", prompt);
            trailing space is wanted here in case of reprompt */
         Strcat(prompt, " ");
-        pline("%s", prompt);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
     } else {
         /* no restriction on allowed response, so always preserve case */
         /* preserve_case = TRUE; -- moot since we're jumping to the end */
-        pline("%s ", query);
+        Sprintf(prompt, "%s ", query);
+        custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s", prompt);
         q = readchar();
         goto clean_up;
     }
@@ -437,6 +439,7 @@ tty_yn_function(const char *query, const char *resp, char def)
             char z, digit_string[2];
             int n_len = 0;
             long value = 0;
+
             addtopl("#"), n_len++;
             digit_string[1] = '\0';
             if (q != '#') {
@@ -484,11 +487,16 @@ tty_yn_function(const char *query, const char *resp, char def)
         }
     } while (!q);
 
-    if (q != '#') {
-        Sprintf(rtmp, "%c", q);
-        addtopl(rtmp);
-    }
-clean_up:
+ clean_up:
+    if (yn_number)
+        Sprintf(rtmp, "#%ld", yn_number);
+    else
+        (void) key2txt(q, rtmp);
+    /* addtopl(rtmp); -- rewrite toplines instead */
+    Sprintf(toplines, "%s%s", prompt, rtmp);
+#ifdef DUMPLOG
+    dumplogmsg(toplines);
+#endif
     ttyDisplay->inread--;
     ttyDisplay->toplin = 2;
     if (ttyDisplay->intr)
@@ -624,6 +632,9 @@ tty_putmsghistory(const char *msg, boolean restoring_msghist)
 {
     static boolean initd = FALSE;
     int idx;
+#ifdef DUMPLOG
+    extern unsigned saved_pline_index; /* pline.c */
+#endif
 
     if (restoring_msghist && !initd) {
         /* we're restoring history from the previous session, but new
@@ -633,18 +644,27 @@ tty_putmsghistory(const char *msg, boolean restoring_msghist)
            restored ones are being put into place */
         msghistory_snapshot(TRUE);
         initd = TRUE;
+#ifdef DUMPLOG
+        /* this suffices; there's no need to scrub saved_pline[] pointers */
+        saved_pline_index = 0;
+#endif
     }
 
     if (msg) {
-        /* move most recent message to history, make this become most recent
-         */
+        /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(toplines, msg);
+#ifdef DUMPLOG
+        dumplogmsg(toplines);
+#endif
     } else if (snapshot_mesgs) {
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();
             Strcpy(toplines, snapshot_mesgs[idx]);
+#ifdef DUMPLOG
+            dumplogmsg(toplines);
+#endif
         }
         /* now release the snapshot */
         free_msghistory_snapshot(TRUE);

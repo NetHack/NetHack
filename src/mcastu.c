@@ -261,8 +261,8 @@ castmu(register struct monst *mtmp, register struct attack *mattk,
     }
 
     /*
-     *	As these are spells, the damage is related to the level
-     *	of the monster casting the spell.
+     * As these are spells, the damage is related to the level
+     * of the monster casting the spell.
      */
     if (!foundyou) {
         dmg = 0;
@@ -433,6 +433,8 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
                 pline("%s suddenly %s!", Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
             mon_set_minvis(mtmp);
+            if (cansee(mtmp->mx, mtmp->my) && !canspotmon(mtmp))
+                map_invisible(mtmp->mx, mtmp->my);
             dmg = 0;
         } else
             impossible("no reason for monster to cast disappear spell?");

@@ -1,10 +1,10 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1457207000 2016/03/05 19:43:20 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1498078871 2017/06/21 21:01:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you change the flag structure make sure you increment EDITLEVEL in   */
-/* patchlevel.h if needed.  Changing the instance_flags structure does	   */
-/* not require incrementing EDITLEVEL.					   */
+/* patchlevel.h if needed.  Changing the instance_flags structure does     */
+/* not require incrementing EDITLEVEL.                                     */
 
 #ifndef FLAG_H
 #define FLAG_H
@@ -48,7 +48,7 @@ struct flag {
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
-    boolean sortloot;        /* sort items alphabetically when looting */
+    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -76,8 +76,10 @@ struct flag {
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */
 #define DISCLOSE_PROMPT_DEFAULT_YES 'y'
 #define DISCLOSE_PROMPT_DEFAULT_NO 'n'
+#define DISCLOSE_PROMPT_DEFAULT_SPECIAL '?' /* v, default a */
 #define DISCLOSE_YES_WITHOUT_PROMPT '+'
 #define DISCLOSE_NO_WITHOUT_PROMPT '-'
+#define DISCLOSE_SPECIAL_WITHOUT_PROMPT '#' /* v, use a */
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
                                                       info upon exit */
     char menu_style;    /* User interface style setting */
@@ -95,7 +97,7 @@ struct flag {
      * characters or letters, because that limits us to 26 roles.
      * They are not booleans, because someday someone may need a neuter
      * gender.  Negative values are used to indicate that the user
-     * hasn't yet specified that particular value.	If you determine
+     * hasn't yet specified that particular value.  If you determine
      * that the user wants a random choice, then you should set an
      * appropriate random value; if you just left the negative value,
      * the user would be asked again!
@@ -171,7 +173,16 @@ struct sysflag {
 #define GPCOORDS_NONE    'n'
 #define GPCOORDS_MAP     'm'
 #define GPCOORDS_COMPASS 'c'
+#define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
+
+enum getloc_filters {
+    GFILTER_NONE = 0,
+    GFILTER_VIEW,
+    GFILTER_AREA,
+
+    NUM_GFILTER
+};
 
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
@@ -184,49 +195,69 @@ struct instance_flags {
     int purge_monsters;    /* # of dead monsters still on fmon list */
     int override_ID;       /* true to force full identification of objects */
     int suppress_price;    /* controls doname() for unpaid objects */
+    int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
+#define TER_MAP    0x01
+#define TER_TRP    0x02
+#define TER_OBJ    0x04
+#define TER_MON    0x08
+#define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
+    boolean getloc_travelmode;
+    int getloc_filter;     /* GFILTER_foo */
+    boolean getloc_usemenu;
+    boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
     boolean mon_polycontrol; /* debug: control monster polymorphs */
-    /* stuff that is related to options and/or user or platform preferences */
+    boolean in_dumplog;    /* doing the dumplog right now? */
+
+    /* stuff that is related to options and/or user or platform preferences
+     */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup; /* for duplication of compound opts in config file */
+    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
-    boolean altmeta; /* Alt-c sends ESC c rather than M-c */
+    boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
+    boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
-    boolean num_pad;          /* use numbers for movement commands */
-    boolean news;             /* print news */
+    boolean echo;             /* 1 to echo characters */
+    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
+       breaking 3.6.[01] save files */
+    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
+    boolean hilite_pile;      /* mark piles of objects with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
-    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
                                * on some non-move commands */
+    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
+    boolean news;             /* print news */
+    boolean num_pad;          /* use numbers for movement commands */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
+    boolean status_updates;   /* allow updates to bottom status lines;
+                               * disable to avoid excessive noise when using
+                               * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
-    boolean zerocomp;         /* write zero-compressed save files */
-    boolean rlecomp; /* run-length comp of levels when writing savefile */
-    uchar num_pad_mode;
-    boolean echo;             /* 1 to echo characters */
-    boolean use_menu_color;       /* use color in menus; only if wc_color */
-    boolean use_status_hilites;   /* use color in status line */
     boolean use_background_glyph; /* use background glyph when appropriate */
-    boolean hilite_pile;          /* mark piles of objects with a hilite */
-    boolean autodescribe;     /* autodescribe mode in getpos() */
-#if 0
-	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
-	boolean  IBMgraphics;	/* use IBM extended character set */
+    boolean use_menu_color;   /* use color in menus; only if wc_color */
+    boolean use_status_hilites; /* use color in status line */
+    boolean zerocomp;         /* write zero-compressed save files */
+    boolean rlecomp;          /* alternative to zerocomp; run-length encoding
+                               * compression of levels when writing savefile */
+    uchar num_pad_mode;
+#if 0   /* XXXgraphics superseded by symbol sets */
+    boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
+    boolean  IBMgraphics;       /* use IBM extended character set */
 #ifdef MAC_GRAPHICS_ENV
-	boolean  MACgraphics;	/* use Macintosh extended character set, as
-				   as defined in the special font HackFont */
+    boolean  MACgraphics;       /* use Macintosh extended character set, as
+                                   as defined in the special font HackFont */
 #endif
 #endif
     uchar bouldersym; /* symbol for boulder display */
@@ -273,6 +304,7 @@ struct instance_flags {
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
     boolean wizweight;        /* display weight of everything in wizard mode */
+
     /*
      * Window capability support.
      */
@@ -337,6 +369,7 @@ struct instance_flags {
     /* copies of values in struct u, used during detection when the
        originals are temporarily cleared; kept here rather than
        locally so that they can be restored during a hangup save */
+    Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
 };
@@ -364,25 +397,30 @@ extern NEARDATA struct sysflag sysflags;
 #endif
 extern NEARDATA struct instance_flags iflags;
 
-/* last_msg values */
-#define PLNMSG_UNKNOWN             0 /* arbitrary */
-#define PLNMSG_ONE_ITEM_HERE       1 /* "you see <single item> here" */
-#define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
-#define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
-#define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
-    /* Usage:
-     *  pline("some message");
-     *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
-     *  iflags.last_msg = PLNMSG_some_message;
-     * and subsequent code can adjust the next message if it is affected
-     * by some_message.  The next message will clear iflags.last_msg.
-     */
+/* last_msg values
+ * Usage:
+ *  pline("some message");
+ *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
+ *  iflags.last_msg = PLNMSG_some_message;
+ * and subsequent code can adjust the next message if it is affected
+ * by some_message.  The next message will clear iflags.last_msg.
+ */
+enum plnmsg_types {
+    PLNMSG_UNKNOWN = 0,         /* arbitrary */
+    PLNMSG_ONE_ITEM_HERE,       /* "you see <single item> here" */
+    PLNMSG_TOWER_OF_FLAME,      /* scroll of fire */
+    PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
+    PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
+    PLNMSG_OBJNAM_ONLY          /* xname/doname only, for #tip */
+};
 
 /* runmode options */
-#define RUN_TPORT 0 /* don't update display until movement stops */
-#define RUN_LEAP 1  /* update display every 7 steps */
-#define RUN_STEP 2  /* update display every single step */
-#define RUN_CRAWL 3 /* walk w/ extra delay after each update */
+enum runmode_types {
+    RUN_TPORT = 0, /* don't update display until movement stops */
+    RUN_LEAP,      /* update display every 7 steps */
+    RUN_STEP,      /* update display every single step */
+    RUN_CRAWL      /* walk w/ extra delay after each update */
+};
 
 /* paranoid confirmation prompting */
 /* any yes confirmations also require explicit no (or ESC) to reject */
@@ -409,8 +447,71 @@ extern NEARDATA struct instance_flags iflags;
 
 #ifdef NHSTDC
 /* forward declaration sufficient to declare pointers */
-struct func_tab; /* from func_tab.h */
+struct ext_func_tab; /* from func_tab.h */
 #endif
+
+/* special key functions */
+enum nh_keyfunc {
+    NHKF_ESC = 0,
+    NHKF_DOAGAIN,
+
+    NHKF_REQMENU,
+
+    /* run ... clicklook need to be in a continuous block */
+    NHKF_RUN,
+    NHKF_RUN2,
+    NHKF_RUSH,
+    NHKF_FIGHT,
+    NHKF_FIGHT2,
+    NHKF_NOPICKUP,
+    NHKF_RUN_NOPICKUP,
+    NHKF_DOINV,
+    NHKF_TRAVEL,
+    NHKF_CLICKLOOK,
+
+    NHKF_REDRAW,
+    NHKF_REDRAW2,
+    NHKF_GETDIR_SELF,
+    NHKF_GETDIR_SELF2,
+    NHKF_GETDIR_HELP,
+    NHKF_COUNT,
+    NHKF_GETPOS_SELF,
+    NHKF_GETPOS_PICK,
+    NHKF_GETPOS_PICK_Q,  /* quick */
+    NHKF_GETPOS_PICK_O,  /* once */
+    NHKF_GETPOS_PICK_V,  /* verbose */
+    NHKF_GETPOS_SHOWVALID,
+    NHKF_GETPOS_AUTODESC,
+    NHKF_GETPOS_MON_NEXT,
+    NHKF_GETPOS_MON_PREV,
+    NHKF_GETPOS_OBJ_NEXT,
+    NHKF_GETPOS_OBJ_PREV,
+    NHKF_GETPOS_DOOR_NEXT,
+    NHKF_GETPOS_DOOR_PREV,
+    NHKF_GETPOS_UNEX_NEXT,
+    NHKF_GETPOS_UNEX_PREV,
+    NHKF_GETPOS_INTERESTING_NEXT,
+    NHKF_GETPOS_INTERESTING_PREV,
+    NHKF_GETPOS_VALID_NEXT,
+    NHKF_GETPOS_VALID_PREV,
+    NHKF_GETPOS_HELP,
+    NHKF_GETPOS_MENU,
+    NHKF_GETPOS_LIMITVIEW,
+    NHKF_GETPOS_MOVESKIP,
+
+    NUM_NHKF
+};
+
+enum gloctypes {
+    GLOC_MONS = 0,
+    GLOC_OBJS,
+    GLOC_DOOR,
+    GLOC_EXPLORE,
+    GLOC_INTERESTING,
+    GLOC_VALID,
+
+    NUM_GLOCS
+};
 
 /* commands[] is used to directly access cmdlist[] instead of looping
    through it to find the entry for a given input character;
@@ -424,11 +525,12 @@ struct cmd {
     boolean num_pad;       /* same as iflags.num_pad except during updates */
     boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
-    boolean swap_yz;       /* German keyboards; use z to move NW, y to zap */
+    boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
     char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
-    const struct func_tab *commands[256]; /* indexed by input character */
+    const struct ext_func_tab *commands[256]; /* indexed by input character */
+    char spkeys[NUM_NHKF];
 };
 
 extern NEARDATA struct cmd Cmd;

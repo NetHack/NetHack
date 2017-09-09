@@ -296,7 +296,7 @@ saveDiskPrompt(int start)
          * whitespace, do not change the value of SAVEF.
          */
         for (bp = buf; *bp; bp++)
-            if (!isspace(*bp)) {
+            if (!isspace((uchar) *bp)) {
                 strncpy(SAVEF, bp, PATHLEN);
                 break;
             }

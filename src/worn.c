@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1446887541 2015/11/07 09:12:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1496959481 2017/06/08 22:04:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,11 +30,11 @@ const struct worn {
              { 0, 0 } };
 
 /* This only allows for one blocking item per property */
-#define w_blocks(o, m)                                                     \
-    ((o->otyp == MUMMY_WRAPPING && ((m) &W_ARMC))                          \
-         ? INVIS                                                           \
-         : (o->otyp == CORNUTHAUM && ((m) &W_ARMH) && !Role_if(PM_WIZARD)) \
-               ? CLAIRVOYANT                                               \
+#define w_blocks(o, m) \
+    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC))                          \
+         ? INVIS                                                            \
+         : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) && !Role_if(PM_WIZARD)) \
+               ? CLAIRVOYANT                                                \
                : 0)
 /* note: monsters don't have clairvoyance, so your role
    has no significant effect on their use of w_blocks() */
@@ -74,6 +74,9 @@ setworn(register struct obj *obj, long mask)
                         if (oobj->oartifact)
                             set_artifact_intrinsic(oobj, 0, mask);
                     }
+                    /* in case wearing or removal is in progress or removal
+                       is pending (via 'A' command for multiple items) */
+                    cancel_doff(oobj, wp->w_mask);
                 }
                 *(wp->w_obj) = obj;
                 if (obj) {
@@ -115,6 +118,10 @@ setnotworn(register struct obj *obj)
         u.twoweap = 0;
     for (wp = worn; wp->w_mask; wp++)
         if (obj == *(wp->w_obj)) {
+            /* in case wearing or removal is in progress or removal
+               is pending (via 'A' command for multiple items) */
+            cancel_doff(obj, wp->w_mask);
+
             *(wp->w_obj) = 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;

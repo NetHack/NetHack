@@ -364,11 +364,6 @@
  */
 #endif /* CHDIR */
 
-/* If GENERIC_USERNAMES is defined, and the player's username is found
- * in the list, prompt for character name instead of using username.
- * A public server should probably disable this. */
-#define GENERIC_USERNAMES "play player game games nethack nethacker"
-
 /*
  * Section 3:   Definitions that may vary with system type.
  *              For example, both schar and uchar should be short ints on
@@ -512,6 +507,32 @@ typedef unsigned char uchar;
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
+
+/* #define DUMPLOG */  /* End-of-game dump logs */
+#ifdef DUMPLOG
+
+#ifndef DUMPLOG_MSG_COUNT
+#define DUMPLOG_MSG_COUNT   50
+#endif
+
+#ifndef DUMPLOG_FILE
+#define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
+/* DUMPLOG_FILE allows following placeholders:
+   %% literal '%'
+   %v version (eg. "3.6.1-0")
+   %u game UID
+   %t game start time, UNIX timestamp format
+   %T current time, UNIX timestamp format
+   %d game start time, YYYYMMDDhhmmss format
+   %D current time, YYYYMMDDhhmmss format
+   %n player name
+   %N first character of player name
+   DUMPLOG_FILE is not used if SYSCF is defined
+*/
+#endif
+
+#endif
+
 
 /* End of Section 4 */
 

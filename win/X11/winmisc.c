@@ -348,7 +348,7 @@ X11_player_selection()
         if (ps_selected == PS_QUIT || program_state.done_hup) {
             clearlocks();
             X11_exit_nhwindows((char *) 0);
-            terminate(0);
+            nh_terminate(0);
         } else if (ps_selected == PS_RANDOM) {
             flags.initrole = ROLE_RANDOM;
         } else if (ps_selected < 0 || ps_selected >= num_roles) {
@@ -417,7 +417,7 @@ X11_player_selection()
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
-                terminate(0);
+                nh_terminate(0);
             } else if (ps_selected == PS_RANDOM) {
                 flags.initrace = ROLE_RANDOM;
             } else if (ps_selected < 0 || ps_selected >= num_races) {
@@ -485,7 +485,7 @@ X11_player_selection()
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
-                terminate(0);
+                nh_terminate(0);
             } else if (ps_selected == PS_RANDOM) {
                 flags.initgend = ROLE_RANDOM;
             } else if (ps_selected < 0 || ps_selected >= num_gends) {
@@ -551,7 +551,7 @@ X11_player_selection()
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
-                terminate(0);
+                nh_terminate(0);
             } else if (ps_selected == PS_RANDOM) {
                 flags.initalign = ROLE_RANDOM;
             } else if (ps_selected < 0 || ps_selected >= num_algns) {
@@ -696,7 +696,7 @@ int ec_indx; /* might be greater than extended_cmd_selected */
     float s_min, s_max;
     Dimension h, hh, wh, vh; /* widget and viewport heights */
     Dimension border_width;
-    int distance;
+    int distance = 0;
     boolean force_top = (ec_indx < 0);
 
     /*

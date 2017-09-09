@@ -125,7 +125,7 @@ bail(const char *mesg)
 {
     clearlocks();
     Gem_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 

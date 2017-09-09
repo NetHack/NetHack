@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1446604115 2015/11/04 02:28:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1492733172 2017/04/21 00:06:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -820,16 +820,12 @@ name_to_monclass(const char *in_str, int *mndx_p)
             if ((p = strstri(x, in_str)) != 0 && (p == x || *(p - 1) == ' '))
                 return i;
         }
-        /* check individual species names; not as thorough as mon_to_name()
-           but our caller can call that directly if desired */
-        for (i = LOW_PM; i < NUMMONS; i++) {
-            x = mons[i].mname;
-            if ((p = strstri(x, in_str)) != 0
-                && (p == x || *(p - 1) == ' ')) {
-                if (mndx_p)
-                    *mndx_p = i;
-                return mons[i].mlet;
-            }
+        /* check individual species names */
+        i = name_to_mon(in_str);
+        if (i != NON_PM) {
+            if (mndx_p)
+                *mndx_p = i;
+            return mons[i].mlet;
         }
     }
     return 0;
@@ -971,6 +967,32 @@ big_to_little(int montype)
             break;
         }
     return montype;
+}
+
+/* determine whether two permonst indices are part of the same progression;
+   existence of progressions with more than one step makes it a bit tricky */
+boolean
+big_little_match(montyp1, montyp2)
+int montyp1, montyp2;
+{
+    int l, b;
+
+    /* simplest case: both are same pm */
+    if (montyp1 == montyp2)
+        return TRUE;
+    /* assume it isn't possible to grow from one class letter to another */
+    if (mons[montyp1].mlet != mons[montyp2].mlet)
+        return FALSE;
+    /* check whether montyp1 can grow up into montyp2 */
+    for (l = montyp1; (b = little_to_big(l)) != l; l = b)
+        if (b == montyp2)
+            return TRUE;
+    /* check whether montyp2 can grow up into montyp1 */
+    for (l = montyp2; (b = little_to_big(l)) != l; l = b)
+        if (b == montyp1)
+            return TRUE;
+    /* neither grows up to become the other; no match */
+    return FALSE;
 }
 
 /*

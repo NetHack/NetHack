@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1451955079 2016/01/05 00:51:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1463217182 2016/05/14 09:13:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,8 @@
 #ifdef POSITIONBAR
 STATIC_DCL void do_positionbar(void);
 #endif
+STATIC_DCL void regen_hp(int);
+STATIC_DCL void interrupt_multi(const char *);
 
 void
 moveloop(boolean resuming)
@@ -31,9 +33,6 @@ moveloop(boolean resuming)
     monst_init();
     monstr_init(); /* monster strengths */
     objects_init();
-
-    if (wizard)
-        add_debug_extended_commands();
 
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
@@ -133,14 +132,13 @@ moveloop(boolean resuming)
                         moveamt = youmonst.data->mmove;
 
                         if (Very_fast) { /* speed boots or potion */
-                            /* average movement is 1.67 times normal */
-                            moveamt += NORMAL_SPEED / 2;
-                            if (rn2(3) == 0)
-                                moveamt += NORMAL_SPEED / 2;
-                        } else if (Fast) {
-                            /* average movement is 1.33 times normal */
+                            /* gain a free action on 2/3 of turns */
                             if (rn2(3) != 0)
-                                moveamt += NORMAL_SPEED / 2;
+                                moveamt += NORMAL_SPEED;
+                        } else if (Fast) {
+                            /* gain a free action on 1/3 of turns */
+                            if (rn2(3) == 0)
+                                moveamt += NORMAL_SPEED;
                         }
                     }
 
@@ -187,60 +185,20 @@ moveloop(boolean resuming)
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
-                     * If you are allowed to regenerate during the prayer, the
-                     * end-of-prayer calculation messes up on this.
+                     * If you are allowed to regenerate during the prayer,
+                     * the end-of-prayer calculation messes up on this.
                      * Another possible result is rehumanization, which
-                     * requires
-                     * that encumbrance and movement rate be recalculated.
+                     * requires that encumbrance and movement rate be
+                     * recalculated.
                      */
                     if (u.uinvulnerable) {
                         /* for the moment at least, you're in tiptop shape */
                         wtcap = UNENCUMBERED;
-                    } else if (Upolyd && youmonst.data->mlet == S_EEL
-                               && !is_pool(u.ux, u.uy)
-                               && !Is_waterlevel(&u.uz)) {
-                        /* eel out of water loses hp, same as for monsters;
-                           as hp gets lower, rate of further loss slows down
-                           */
-                        if (u.mh > 1 && rn2(u.mh) > rn2(8)
-                            && (!Half_physical_damage || !(moves % 2L))) {
-                            u.mh--;
-                            context.botl = 1;
-                        } else if (u.mh < 1)
-                            rehumanize();
-                    } else if (Upolyd && u.mh < u.mhmax) {
-                        if (u.mh < 1)
-                            rehumanize();
-                        else if (Regeneration
-                                 || (wtcap < MOD_ENCUMBER && !(moves % 20))) {
-                            context.botl = 1;
-                            u.mh++;
-                        }
-                    } else if (u.uhp < u.uhpmax
-                               && (wtcap < MOD_ENCUMBER || !u.umoved
-                                   || Regeneration)) {
-                        if (u.ulevel > 9 && !(moves % 3)) {
-                            int heal, Con = (int) ACURR(A_CON);
-
-                            if (Con <= 12) {
-                                heal = 1;
-                            } else {
-                                heal = rnd(Con);
-                                if (heal > u.ulevel - 9)
-                                    heal = u.ulevel - 9;
-                            }
-                            context.botl = 1;
-                            u.uhp += heal;
-                            if (u.uhp > u.uhpmax)
-                                u.uhp = u.uhpmax;
-                        } else if (Regeneration
-                                   || (u.ulevel <= 9
-                                       && !(moves
-                                            % ((MAXULEV + 12) / (u.ulevel + 2)
-                                               + 1)))) {
-                            context.botl = 1;
-                            u.uhp++;
-                        }
+                    } else if (!Upolyd ? (u.uhp < u.uhpmax)
+                                       : (u.mh < u.mhmax
+                                          || youmonst.data->mlet == S_EEL)) {
+                        /* maybe heal */
+                        regen_hp(wtcap);
                     }
 
                     /* moving around while encumbered is hard work */
@@ -259,7 +217,7 @@ moveloop(boolean resuming)
                         }
                     }
 
-                    if ((u.uen < u.uenmax)
+                    if (u.uen < u.uenmax
                         && ((wtcap < MOD_ENCUMBER
                              && (!(moves % ((MAXULEV + 8 - u.ulevel)
                                             * (Role_if(PM_WIZARD) ? 3 : 4)
@@ -269,6 +227,8 @@ moveloop(boolean resuming)
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
                         context.botl = 1;
+                        if (u.uen == u.uenmax)
+                            interrupt_multi("You feel full of energy.");
                     }
 
                     if (!u.uinvulnerable) {
@@ -360,7 +320,7 @@ moveloop(boolean resuming)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
                 && !BClairvoyant && !(moves % 15) && !rn2(2))
-                do_vicinity_map();
+                do_vicinity_map((struct obj *) 0);
             if (u.utrap && u.utraptype == TT_LAVA)
                 sink_into_lava();
             /* when/if hero escapes from lava, he can't just stay there */
@@ -479,6 +439,76 @@ moveloop(boolean resuming)
     }
 }
 
+/* maybe recover some lost health (or lose some when an eel out of water) */
+STATIC_OVL void
+regen_hp(wtcap)
+int wtcap;
+{
+    int heal = 0;
+    boolean reached_full = FALSE,
+            encumbrance_ok = (wtcap < MOD_ENCUMBER || !u.umoved);
+
+    if (Upolyd) {
+        if (u.mh < 1) { /* shouldn't happen... */
+            rehumanize();
+        } else if (youmonst.data->mlet == S_EEL
+                   && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
+            /* eel out of water loses hp, similar to monster eels;
+               as hp gets lower, rate of further loss slows down */
+            if (u.mh > 1 && !Regeneration && rn2(u.mh) > rn2(8)
+                && (!Half_physical_damage || !(moves % 2L)))
+                heal = -1;
+        } else if (u.mh < u.mhmax) {
+            if (Regeneration || (encumbrance_ok && !(moves % 20L)))
+                heal = 1;
+        }
+        if (heal) {
+            context.botl = 1;
+            u.mh += heal;
+            reached_full = (u.mh == u.mhmax);
+        }
+
+    /* !Upolyd */
+    } else {
+        /* [when this code was in-line within moveloop(), there was
+           no !Upolyd check here, so poly'd hero recovered lost u.uhp
+           once u.mh reached u.mhmax; that may have been convenient
+           for the player, but it didn't make sense for gameplay...] */
+        if (u.uhp < u.uhpmax && (encumbrance_ok || Regeneration)) {
+            if (u.ulevel > 9) {
+                if (!(moves % 3L)) {
+                    int Con = (int) ACURR(A_CON);
+
+                    if (Con <= 12) {
+                        heal = 1;
+                    } else {
+                        heal = rnd(Con);
+                        if (heal > u.ulevel - 9)
+                            heal = u.ulevel - 9;
+                    }
+                }
+            } else { /* u.ulevel <= 9 */
+                if (!(moves % (long) ((MAXULEV + 12) / (u.ulevel + 2) + 1)))
+                    heal = 1;
+            }
+            if (Regeneration && !heal)
+                heal = 1;
+
+            if (heal) {
+                context.botl = 1;
+                u.uhp += heal;
+                if (u.uhp > u.uhpmax)
+                    u.uhp = u.uhpmax;
+                /* stop voluntary multi-turn activity if now fully healed */
+                reached_full = (u.uhp == u.uhpmax);
+            }
+        }
+    }
+
+    if (reached_full)
+        interrupt_multi("You are in full health.");
+}
+
 void
 stop_occupation()
 {
@@ -505,6 +535,9 @@ display_gamewindows()
 #endif
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
+    /* in case of early quit where WIN_INVEN could be destroyed before
+       ever having been used, use it here to pacify the Qt interface */
+    start_menu(WIN_INVEN), end_menu(WIN_INVEN, (char *) 0);
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
@@ -544,7 +577,7 @@ newgame()
     context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
     context.tribute.tributesz = sizeof(struct tribute_info);
 
-    for (i = 0; i < NUMMONS; i++)
+    for (i = LOW_PM; i < NUMMONS; i++)
         mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
     init_objects(); /* must be before u_init() */
@@ -685,5 +718,17 @@ do_positionbar()
     update_positionbar(pbar);
 }
 #endif
+
+STATIC_DCL void
+interrupt_multi(msg)
+const char *msg;
+{
+    if (multi > 0 && !context.travel) {
+        nomul(0);
+        if (flags.verbose && msg)
+            Norep("%s", msg);
+    }
+}
+
 
 /*allmain.c*/

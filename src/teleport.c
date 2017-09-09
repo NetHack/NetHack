@@ -590,9 +590,9 @@ level_tele()
         do {
             if (++trycnt == 2) {
                 if (wizard)
-                    Strcat(qbuf, " [type a number or ? for a menu]");
+                    Strcat(qbuf, " [type a number, name, or ? for a menu]");
                 else
-                    Strcat(qbuf, " [type a number]");
+                    Strcat(qbuf, " [type a number or name]");
             }
             getlin(qbuf, buf);
             if (!strcmp(buf, "\033")) { /* cancelled */
@@ -851,11 +851,18 @@ tele_trap(struct trap *trap)
 }
 
 void
-level_tele_trap(struct trap *trap)
+level_tele_trap(struct trap *trap, unsigned trflags)
 {
-    You("%s onto a level teleport trap!",
-        Levitation ? (const char *) "float"
-                   : locomotion(youmonst.data, "step"));
+    char verbbuf[BUFSZ];
+
+    if ((trflags & VIASITTING) != 0)
+        Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+    else
+        Sprintf(verbbuf, "%s onto",
+                Levitation ? (const char *) "float"
+                           : locomotion(youmonst.data, "step"));
+    You("%s a level teleport trap!", verbbuf);
+
     if (Antimagic) {
         shieldeff(u.ux, u.uy);
     }
@@ -933,11 +940,9 @@ rloc_pos_ok(register int x, register int y, /* coordinates of candidate location
  *
  * Pulls a monster from its current position and places a monster at
  * a new x and y.  If oldx is 0, then the monster was not in the
- * levels.monsters
- * array.  However, if oldx is 0, oldy may still have a value because mtmp is
- * a
- * migrating_mon.  Worm tails are always placed randomly around the head of
- * the worm.
+ * levels.monsters array.  However, if oldx is 0, oldy may still have
+ * a value because mtmp is a migrating_mon.  Worm tails are always
+ * placed randomly around the head of the worm.
  */
 void
 rloc_to(struct monst *mtmp, register int x, register int y)
@@ -949,15 +954,15 @@ rloc_to(struct monst *mtmp, register int x, register int y)
         return;
 
     if (oldx) { /* "pick up" monster */
-        if (mtmp->wormno)
+        if (mtmp->wormno) {
             remove_worm(mtmp);
-        else {
+        } else {
             remove_monster(oldx, oldy);
             newsym(oldx, oldy); /* update old location */
         }
     }
 
-    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
     place_monster(mtmp, x, y); /* put monster down */
     update_monster_region(mtmp);
 

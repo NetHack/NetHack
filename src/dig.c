@@ -199,7 +199,7 @@ dig_check(struct monst *madeby, boolean verbose, int x, int y)
         return FALSE;
     } else if (Is_waterlevel(&u.uz)) {
         if (verbose)
-            pline_The("water splashes and subsides.");
+            pline_The("%s splashes and subsides.", hliquid("water"));
         return FALSE;
     } else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR
                 && (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
@@ -717,7 +717,7 @@ liquid_flow(xchar x, xchar y, schar typ, struct trap *ttmp, const char *fillmsg)
     unearth_objs(x, y);
 
     if (fillmsg)
-        pline(fillmsg, typ == LAVAPOOL ? "lava" : "water");
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
     if (u_spot && !(Levitation || Flying)) {
         if (typ == LAVAPOOL)
             (void) lava_effects();
@@ -760,7 +760,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
 
     } else if (is_pool_or_lava(dig_x, dig_y)) {
         pline_The("%s sloshes furiously for a moment, then subsides.",
-                  is_lava(dig_x, dig_y) ? "lava" : "water");
+                  hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
         wake_nearby(); /* splashing */
 
     } else if (lev->typ == DRAWBRIDGE_DOWN
@@ -1966,7 +1966,7 @@ bury_monst(struct monst *mtmp)
     }
 
     mtmp->mburied = TRUE;
-    wakeup(mtmp);       /* at least give it a chance :-) */
+    wakeup(mtmp, FALSE);       /* at least give it a chance :-) */
     newsym(mtmp->mx, mtmp->my);
 }
 

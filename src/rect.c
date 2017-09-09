@@ -1,5 +1,5 @@
 /* NetHack 3.6	rect.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* Copyright (c) 1990 by Jean-Christophe Collet	 */
+/* Copyright (c) 1990 by Jean-Christophe Collet                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

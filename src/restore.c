@@ -725,7 +725,7 @@ restlevelfile(int fd, /* fd used in MFLOPPY only */
         }
 #endif /* ?AMIGA */
         pline("Be seeing you...");
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
     }
 #endif /* MFLOPPY */
     bufon(nfd);

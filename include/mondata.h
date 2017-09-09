@@ -193,7 +193,18 @@
     (vegan(ptr)         \
      || ((ptr)->mlet == S_PUDDING && (ptr) != &mons[PM_BLACK_PUDDING]))
 
+/* monkeys are tameable via bananas but not pacifiable via food,
+   otherwise their theft attack could be nullified too easily;
+   dogs and cats can be tamed by anything they like to eat and are
+   pacified by any other food;
+   horses can be tamed by always-veggy food or lichen corpses but
+   not tamed or pacified by other corpses or tins of veggy critters */
 #define befriend_with_obj(ptr, obj) \
-    ((obj)->oclass == FOOD_CLASS && is_domestic(ptr))
+    (((ptr) == &mons[PM_MONKEY] || (ptr) == &mons[PM_APE])               \
+     ? (obj)->otyp == BANANA                                             \
+     : (is_domestic(ptr) && (obj)->oclass == FOOD_CLASS                  \
+        && ((ptr)->mlet != S_UNICORN                                     \
+            || objects[(obj)->otyp].oc_material == VEGGY                 \
+            || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
 
 #endif /* MONDATA_H */

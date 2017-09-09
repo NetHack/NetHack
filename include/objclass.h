@@ -1,28 +1,28 @@
-/* NetHack 3.6	objclass.h	$NHDT-Date: 1447755971 2015/11/17 10:26:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	objclass.h	$NHDT-Date: 1462067744 2016/05/01 01:55:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OBJCLASS_H
 #define OBJCLASS_H
 
-/* definition of a class of objects */
+/* [misnamed] definition of a type of object */
 
 struct objclass {
-    short oc_name_idx;  /* index of actual name */
-    short oc_descr_idx; /* description when name unknown */
-    char *oc_uname;     /* called by user */
+    short oc_name_idx;              /* index of actual name */
+    short oc_descr_idx;             /* description when name unknown */
+    char *oc_uname;                 /* called by user */
     Bitfield(oc_name_known, 1);
-    Bitfield(oc_merge, 1);      /* merge otherwise equal objects */
-    Bitfield(oc_uses_known, 1); /* obj->known affects full description */
-                                /* otherwise, obj->dknown and obj->bknown */
-                                /* tell all, and obj->known should always */
-                                /* be set for proper merging behavior */
-    Bitfield(oc_pre_discovered, 1); /* Already known at start of game; */
-    /* won't be listed as a discovery. */
-    Bitfield(oc_magic, 1);   /* inherently magical object */
-    Bitfield(oc_charged, 1); /* may have +n or (n) charges */
-    Bitfield(oc_unique, 1);  /* special one-of-a-kind object */
-    Bitfield(oc_nowish, 1);  /* cannot wish for this object */
+    Bitfield(oc_merge, 1);          /* merge otherwise equal objects */
+    Bitfield(oc_uses_known, 1);     /* obj->known affects full description;
+                                       otherwise, obj->dknown and obj->bknown
+                                       tell all, and obj->known should always
+                                       be set for proper merging behavior. */
+    Bitfield(oc_pre_discovered, 1); /* Already known at start of game;
+                                       won't be listed as a discovery. */
+    Bitfield(oc_magic, 1);          /* inherently magical object */
+    Bitfield(oc_charged, 1);        /* may have +n or (n) charges */
+    Bitfield(oc_unique, 1);         /* special one-of-a-kind object */
+    Bitfield(oc_nowish, 1);         /* cannot wish for this object */
 
     Bitfield(oc_big, 1);
 #define oc_bimanual oc_big /* for weapons & tools used as weapons */
@@ -131,25 +131,28 @@ extern NEARDATA struct objdescr obj_descr[];
  * All objects have a class. Make sure that all classes have a corresponding
  * symbol below.
  */
-#define RANDOM_CLASS 0 /* used for generating random objects */
-#define ILLOBJ_CLASS 1
-#define WEAPON_CLASS 2
-#define ARMOR_CLASS 3
-#define RING_CLASS 4
-#define AMULET_CLASS 5
-#define TOOL_CLASS 6
-#define FOOD_CLASS 7
-#define POTION_CLASS 8
-#define SCROLL_CLASS 9
-#define SPBOOK_CLASS 10 /* actually SPELL-book */
-#define WAND_CLASS 11
-#define COIN_CLASS 12
-#define GEM_CLASS 13
-#define ROCK_CLASS 14
-#define BALL_CLASS 15
-#define CHAIN_CLASS 16
-#define VENOM_CLASS 17
-#define MAXOCLASSES 18
+enum obj_class_types {
+    RANDOM_CLASS = 0, /* used for generating random objects */
+    ILLOBJ_CLASS,
+    WEAPON_CLASS,
+    ARMOR_CLASS,
+    RING_CLASS,
+    AMULET_CLASS,
+    TOOL_CLASS,
+    FOOD_CLASS,
+    POTION_CLASS,
+    SCROLL_CLASS,
+    SPBOOK_CLASS, /* actually SPELL-book */
+    WAND_CLASS,
+    COIN_CLASS,
+    GEM_CLASS,
+    ROCK_CLASS,
+    BALL_CLASS,
+    CHAIN_CLASS,
+    VENOM_CLASS,
+
+    MAXOCLASSES
+};
 
 #define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class    */
 #define ALL_CLASSES (MAXOCLASSES + 2) /* input to getobj().                 */

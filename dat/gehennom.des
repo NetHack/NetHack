@@ -521,27 +521,37 @@ TRAP:"magic", random
 MAZE:"baalz",' '
 FLAGS: noteleport,corrmaze
 GEOMETRY:right,center
+# the two pools are fakes used to mark spots which need special wall fixups
+# the two iron bars are eyes and spots to their left will be made diggable
 MAP
 -------------------------------------------------
-|                    ---               ----      
-|          ----      |   ------------  |         
-| ------      |  --------|..........|---         
-| |....|  -------|...........--------------      
+|                   ----               ----      
+|          ----     |     -----------  |         
+| ------      |  ---------|.........|--P         
+| F....|  -------|...........--------------      
 ---....|--|..................S............|----  
-....--....S..----------------|............S...|  
++...--....S..----------------|............S...|  
 ---....|--|..................|............|----  
-| |....|  -------|...........-----S--------      
-| ------      |  --------|..........|---         
-|          ----     |    ------------  |         
-|                   ---                ----      
+| F....|  -------|...........-----S--------      
+| ------      |  ---------|.........|--P         
+|          ----     |     -----------  |         
+|                   ----               ----      
 -------------------------------------------------
 ENDMAP
 STAIR:levregion(01,00,15,20),levregion(15,1,70,16),up
 BRANCH:levregion(01,00,15,20),levregion(15,1,70,16)
 TELEPORT_REGION:levregion(01,00,15,20),levregion(15,1,70,16)
-NON_DIGGABLE:(00,00,46,12)
+# this actually leaves the farthest right column diggable
+NON_DIGGABLE:(00,00,47,12)
 MAZEWALK:(00,06),west
 STAIR:(44,06),down
+DOOR:locked,(00,06)
+IF [50%] {
+   TERRAIN:(34,08),'-'
+   TERRAIN:(34,04),'S'
+   TERRAIN:(29,05),'|'
+   TERRAIN:(29,07),'S'
+}
 # The fellow in residence
 MONSTER:('&',"Baalzebub"),(35,06)
 # Some random weapons and armor.

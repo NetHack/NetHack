@@ -54,6 +54,9 @@ static int explcolors[] = {
     (currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
 #endif
 
+#define is_objpile(x,y) (!Hallucination && level.objects[(x)][(y)] \
+                         && level.objects[(x)][(y)]->nexthere)
+
 /*ARGSUSED*/
 int
 mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
@@ -80,7 +83,7 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
         else
             obj_color(STATUE);
         special |= MG_STATUE;
-        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+        if (is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) { /* warn flash */
         idx = offset + SYM_OFF_W;
@@ -121,11 +124,17 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
                 color = NO_COLOR;
 #ifdef TEXTCOLOR
         /* provide a visible difference if normal and lit corridor
-         * use the same symbol */
+           use the same symbol */
         } else if (iflags.use_color && offset == S_litcorr
                    && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
 #endif
+        /* try to provide a visible difference between water and lava
+           if they use the same symbol and color is disabled */
+        } else if (!iflags.use_color && offset == S_lava
+                   && (showsyms[idx] == showsyms[S_pool + SYM_OFF_P]
+                       || showsyms[idx] == showsyms[S_water + SYM_OFF_P])) {
+            special |= MG_BW_LAVA;
         } else {
             cmap_color(offset);
         }
@@ -147,8 +156,7 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
             }
         } else
             obj_color(offset);
-        if (offset != BOULDER && level.objects[x][y]
-            && level.objects[x][y]->nexthere)
+        if (offset != BOULDER && is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
         idx = mons[offset].mlet + SYM_OFF_M;
@@ -167,7 +175,7 @@ mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
         else
             mon_color(offset);
         special |= MG_CORPSE;
-        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+        if (is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) { /* mon detect */
         idx = mons[offset].mlet + SYM_OFF_M;

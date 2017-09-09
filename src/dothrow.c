@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1502243899 2017/08/09 01:58:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -441,7 +441,22 @@ walk_path(coord *src_cc, coord *dest_cc,
     int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
     boolean keep_going = TRUE;
 
-    /* Use Bresenham's Line Algorithm to walk from src to dest */
+    /* Use Bresenham's Line Algorithm to walk from src to dest.
+     *
+     * This should be replaced with a more versatile algorithm
+     * since it handles slanted moves in a suboptimal way.
+     * Going from 'x' to 'y' needs to pass through 'z', and will
+     * fail if there's an obstable there, but it could choose to
+     * pass through 'Z' instead if that way imposes no obstacle.
+     *     ..y          .Zy
+     *     xz.    vs    x..
+     * Perhaps we should check both paths and accept whichever
+     * one isn't blocked.  But then multiple zigs and zags could
+     * potentially produce a meandering path rather than the best
+     * attempt at a straight line.  And (*check_proc)() would
+     * need to work more like 'travel', distinguishing between
+     * testing a possible move and actually attempting that move.
+     */
     dx = dest_cc->x - src_cc->x;
     dy = dest_cc->y - src_cc->y;
     prev_x = x = src_cc->x;
@@ -535,9 +550,15 @@ hurtle_step(genericptr_t arg, int x, int y)
     }
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
-        if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
+        boolean odoor_diag = (IS_DOOR(levl[x][y].typ)
+                              && (levl[x][y].doormask & D_ISOPEN)
+                              && (u.ux - x) && (u.uy - y));
+
+        if (IS_ROCK(levl[x][y].typ) || closed_door(x, y) || odoor_diag) {
             const char *s;
 
+            if (odoor_diag)
+                You("hit the door edge!");
             pline("Ouch!");
             if (IS_TREE(levl[x][y].typ))
                 s = "bumping into a tree";
@@ -593,7 +614,8 @@ hurtle_step(genericptr_t arg, int x, int y)
 
     if ((mon = m_at(x, y)) != 0) {
         You("bump into %s.", a_monnam(mon));
-        wakeup(mon);
+        wakeup(mon, FALSE);
+        setmangry(mon, FALSE);
         wake_nearto(x,y, 10);
         return FALSE;
     }
@@ -624,9 +646,11 @@ hurtle_step(genericptr_t arg, int x, int y)
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
 
-    if (levl[x][y].typ == WATER && Is_waterlevel(&u.uz)) {
-        multi = 0;
-        drown();
+    if (is_pool(x, y) && !u.uinwater
+        && ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
+            || !(Levitation || Flying || Wwalking))) {
+        multi = 0; /* can move, so drown() allows crawling out of water */
+        (void) drown();
         return FALSE;
     }
 
@@ -716,7 +740,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
             u.utraptype == TT_WEB
                 ? "web"
                 : u.utraptype == TT_LAVA
-                      ? "lava"
+                      ? hliquid("lava")
                       : u.utraptype == TT_INFLOOR
                             ? surface(u.ux, u.uy)
                             : u.utraptype == TT_BURIEDBALL ? "buried ball"
@@ -748,8 +772,7 @@ hurtle(int dx, int dy, int range, boolean verbose)
     (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
 }
 
-/* Move a monster through the air for a few squares.
- */
+/* Move a monster through the air for a few squares. */
 void
 mhurtle(struct monst *mon, int dx, int dy, int range)
 {
@@ -956,11 +979,11 @@ STATIC_OVL void
 sho_obj_return_to_u(struct obj *obj)
 {
     /* might already be our location (bounced off a wall) */
-    if (bhitpos.x != u.ux || bhitpos.y != u.uy) {
+    if ((u.dx || u.dy) && (bhitpos.x != u.ux || bhitpos.y != u.uy)) {
         int x = bhitpos.x - u.dx, y = bhitpos.y - u.dy;
 
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
-        while (x != u.ux || y != u.uy) {
+        while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
             delay_output();
             x -= u.dx;
@@ -1310,7 +1333,7 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
     else
         miss(missile, mon);
     if (maybe_wakeup && !rn2(3))
-        wakeup(mon);
+        wakeup(mon, TRUE);
     return;
 }
 
@@ -1411,7 +1434,8 @@ thitmonst(register struct monst *mon,
        at leader... (kicked artifact is ok too; HMON_APPLIED could
        occur if quest artifact polearm or grapnel ever gets added) */
     if (hmode != HMON_APPLIED && quest_arti_hits_leader(obj, mon)) {
-        /* not wakeup(), which angers non-tame monsters */
+        /* AIS: changes to wakeup() means that it's now less inappropriate here
+           than it used to be, but the manual version works just as well */
         mon->msleeping = 0;
         mon->mstrategy &= ~STRAT_WAITMASK;
 
@@ -1525,7 +1549,7 @@ thitmonst(register struct monst *mon,
         } else {
             tmiss(obj, mon, TRUE);
             if (hmode == HMON_APPLIED)
-                wakeup(mon);
+                wakeup(mon, TRUE);
         }
 
     } else if (otyp == HEAVY_IRON_BALL) {
@@ -1573,7 +1597,7 @@ thitmonst(register struct monst *mon,
         }
     } else if (guaranteed_hit) {
         /* this assumes that guaranteed_hit is due to swallowing */
-        wakeup(mon);
+        wakeup(mon, TRUE);
         if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
             if (is_animal(u.ustuck->data)) {
                 minstapetrify(u.ustuck, TRUE);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1455667557 2016/02/17 00:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1496959478 2017/06/08 22:04:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,7 +23,7 @@ STATIC_DCL void on_msg(struct obj *);
 STATIC_DCL void toggle_stealth(struct obj *, long, boolean);
 STATIC_DCL void toggle_displacement(struct obj *, long, boolean);
 STATIC_PTR int Armor_on(void);
-STATIC_PTR int Boots_on(void);
+/* int Boots_on(void); -- moved to extern.h */
 STATIC_PTR int Cloak_on(void);
 STATIC_PTR int Helmet_on(void);
 STATIC_PTR int Gloves_on(void);
@@ -144,7 +144,6 @@ toggle_displacement(struct obj *obj,
  * [Blindf_on() is an exception and calls setworn() itself.]
  */
 
-STATIC_PTR
 int
 Boots_on(VOID_ARGS)
 {
@@ -768,7 +767,8 @@ Amulet_off()
             setworn((struct obj *) 0, W_AMUL);
             if (!breathless(youmonst.data) && !amphibious(youmonst.data)
                 && !Swimming) {
-                You("suddenly inhale an unhealthy amount of water!");
+                You("suddenly inhale an unhealthy amount of %s!",
+                    hliquid("water"));
                 (void) drown();
             }
             return;
@@ -1185,36 +1185,29 @@ set_wear(struct obj *obj) /* if null, do all worn items; otherwise just obj itse
 }
 
 /* check whether the target object is currently being put on (or taken off--
-   also checks for doffing) */
+   also checks for doffing--[why?]) */
 boolean
 donning(struct obj *otmp)
 {
-    /* long what = (occupation == take_off) ? context.takeoff.what : 0L; */
-    long what = context.takeoff.what; /* if nonzero, occupation is implied */
     boolean result = FALSE;
 
-    /* 'W' and 'T' set afternmv, 'A' sets context.takeoff.what */
-    if (otmp == uarm)
-        result = (afternmv == Armor_on || afternmv == Armor_off
-                  || what == WORN_ARMOR);
+    /* 'W' (or 'P' used for armor) sets afternmv */
+    if (doffing(otmp))
+        result = TRUE;
+    else if (otmp == uarm)
+        result = (afternmv == Armor_on);
     else if (otmp == uarmu)
-        result = (afternmv == Shirt_on || afternmv == Shirt_off
-                  || what == WORN_SHIRT);
+        result = (afternmv == Shirt_on);
     else if (otmp == uarmc)
-        result = (afternmv == Cloak_on || afternmv == Cloak_off
-                  || what == WORN_CLOAK);
+        result = (afternmv == Cloak_on);
     else if (otmp == uarmf)
-        result = (afternmv == Boots_on || afternmv == Boots_off
-                  || what == WORN_BOOTS);
+        result = (afternmv == Boots_on);
     else if (otmp == uarmh)
-        result = (afternmv == Helmet_on || afternmv == Helmet_off
-                  || what == WORN_HELMET);
+        result = (afternmv == Helmet_on);
     else if (otmp == uarmg)
-        result = (afternmv == Gloves_on || afternmv == Gloves_off
-                  || what == WORN_GLOVES);
+        result = (afternmv == Gloves_on);
     else if (otmp == uarms)
-        result = (afternmv == Shield_on || afternmv == Shield_off
-                  || what == WORN_SHIELD);
+        result = (afternmv == Shield_on);
 
     return result;
 }
@@ -1227,7 +1220,7 @@ doffing(struct obj *otmp)
     long what = context.takeoff.what;
     boolean result = FALSE;
 
-    /* 'T' (also 'W') sets afternmv, 'A' sets context.takeoff.what */
+    /* 'T' (or 'R' used for armor) sets afternmv, 'A' sets takeoff.what */
     if (otmp == uarm)
         result = (afternmv == Armor_off || what == WORN_ARMOR);
     else if (otmp == uarmu)
@@ -1242,10 +1235,48 @@ doffing(struct obj *otmp)
         result = (afternmv == Gloves_off || what == WORN_GLOVES);
     else if (otmp == uarms)
         result = (afternmv == Shield_off || what == WORN_SHIELD);
+    /* these 1-turn items don't need 'afternmv' checks */
+    else if (otmp == uamul)
+        result = (what == WORN_AMUL);
+    else if (otmp == uleft)
+        result = (what == LEFT_RING);
+    else if (otmp == uright)
+        result = (what == RIGHT_RING);
+    else if (otmp == ublindf)
+        result = (what == WORN_BLINDF);
+    else if (otmp == uwep)
+        result = (what == W_WEP);
+    else if (otmp == uswapwep)
+        result = (what == W_SWAPWEP);
+    else if (otmp == uquiver)
+        result = (what == W_QUIVER);
 
     return result;
 }
 
+/* despite their names, cancel_don() and cancel_doff() both apply to both
+   donning and doffing... */
+void
+cancel_doff(obj, slotmask)
+struct obj *obj;
+long slotmask;
+{
+    /* Called by setworn() for old item in specified slot or by setnotworn()
+     * for specified item.  We don't want to call cancel_don() if we got
+     * here via <X>_off() -> setworn((struct obj *)0) -> cancel_doff()
+     * because that would stop the 'A' command from continuing with next
+     * selected item.  So do_takeoff() sets a flag in takeoff.mask for us.
+     * [For taking off an individual item with 'T'/'R'/'w-', it doesn't
+     * matter whether cancel_don() gets called here--the item has already
+     * been removed by now.]
+     */
+    if (!(context.takeoff.mask & I_SPECIAL) && donning(obj))
+        cancel_don(); /* applies to doffing too */
+    context.takeoff.mask &= ~slotmask;
+}
+
+/* despite their names, cancel_don() and cancel_doff() both apply to both
+   donning and doffing... */
 void
 cancel_don()
 {
@@ -1256,7 +1287,7 @@ cancel_don()
     context.takeoff.cancelled_don =
         (afternmv == Boots_on || afternmv == Helmet_on
          || afternmv == Gloves_on || afternmv == Armor_on);
-    afternmv = 0;
+    afternmv = (int (*)(void)) 0;
     nomovemsg = (char *) 0;
     multi = 0;
     context.takeoff.delay = 0;
@@ -1281,11 +1312,11 @@ stop_donning(struct obj *stolenobj) /* no message if stolenobj is already being 
 
     /* donning() returns True when doffing too; doffing() is more specific */
     putting_on = !doffing(otmp);
-    /* cancel_don() looks at afternmv; it also serves as cancel_doff() */
+    /* cancel_don() looks at afternmv; it can also cancel doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
        by unmul() since the on or off action isn't completing */
-    afternmv = 0;
+    afternmv = (int (*)(void)) 0;
     if (putting_on || otmp != stolenobj) {
         Sprintf(buf, "You stop %s %s.",
                 putting_on ? "putting on" : "taking off",
@@ -1462,6 +1493,10 @@ doremring()
 int
 cursed(register struct obj *otmp)
 {
+    if (!otmp) {
+        impossible("cursed without otmp");
+        return 0;
+    }
     /* Curses, like chickens, come home to roost. */
     if ((otmp == uwep) ? welded(otmp) : (int) otmp->cursed) {
         boolean use_plural = (is_boots(otmp) || is_gloves(otmp)
@@ -2257,6 +2292,7 @@ do_takeoff()
     struct obj *otmp = (struct obj *) 0;
     struct takeoff_info *doff = &context.takeoff;
 
+    context.takeoff.mask |= I_SPECIAL; /* set flag for cancel_doff() */
     if (doff->what == W_WEP) {
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
@@ -2316,6 +2352,7 @@ do_takeoff()
     } else {
         impossible("do_takeoff: taking off %lx", doff->what);
     }
+    context.takeoff.mask &= ~I_SPECIAL; /* clear cancel_doff() flag */
 
     return otmp;
 }
@@ -2333,10 +2370,9 @@ take_off(VOID_ARGS)
         if (doff->delay > 0) {
             doff->delay--;
             return 1; /* still busy */
-        } else {
-            if ((otmp = do_takeoff()))
-                off_msg(otmp);
         }
+        if ((otmp = do_takeoff()) != 0)
+            off_msg(otmp);
         doff->mask &= ~doff->what;
         doff->what = 0L;
     }
@@ -2391,7 +2427,9 @@ take_off(VOID_ARGS)
     } else if (doff->what == RIGHT_RING) {
         doff->delay = 1;
     } else if (doff->what == WORN_BLINDF) {
-        doff->delay = 2;
+        /* [this used to be 2, but 'R' (and 'T') only require 1 turn to
+           remove a blindfold, so 'A' shouldn't have been requiring 2] */
+        doff->delay = 1;
     } else {
         impossible("take_off: taking off %lx", doff->what);
         return 0; /* force done */
@@ -2470,8 +2508,9 @@ menu_remarm(int retry)
     } else if (flags.menu_style == MENU_FULL) {
         all_worn_categories = FALSE;
         n = query_category("What type of things do you want to take off?",
-                           invent, WORN_TYPES | ALL_TYPES, &pick_list,
-                           PICK_ANY);
+                           invent, (WORN_TYPES | ALL_TYPES
+                                    | UNPAID_TYPES | BUCX_TYPES),
+                           &pick_list, PICK_ANY);
         if (!n)
             return 0;
         for (i = 0; i < n; i++) {
@@ -2482,10 +2521,17 @@ menu_remarm(int retry)
         }
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
-        all_worn_categories = FALSE;
-        if (ggetobj("take off", select_off, 0, TRUE, (unsigned *) 0) == -2)
-            all_worn_categories = TRUE;
+        unsigned ggofeedback = 0;
+
+        i = ggetobj("take off", select_off, 0, TRUE, &ggofeedback);
+        if (ggofeedback & ALL_FINISHED)
+            return 0;
+        all_worn_categories = (i == -2);
     }
+    if (menu_class_present('u')
+        || menu_class_present('B') || menu_class_present('U')
+        || menu_class_present('C') || menu_class_present('X'))
+        all_worn_categories = FALSE;
 
     n = query_objlist("What do you want to take off?", &invent,
                       (SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT),

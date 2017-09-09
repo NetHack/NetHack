@@ -1,4 +1,4 @@
-/* NetHack 3.6  tile.h       $NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6  tile.h       $NHDT-Date: 1466687973 2016/06/23 13:19:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
 typedef unsigned char pixval;
 
 typedef struct pixel_s {
@@ -35,6 +35,7 @@ extern boolean read_text_tile(pixel(*) [TILE_X]);
 extern boolean write_text_tile(pixel(*) [TILE_X]);
 extern int fclose_text_file(void);
 
+extern void set_grayscale(int);
 extern void init_colormap(void);
 extern void merge_colormap(void);
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1451955080 2016/01/05 00:51:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1464222344 2016/05/26 00:25:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -81,9 +81,21 @@ static long laststattime;
 #endif
 
 void
+free_maildata()
+{
+    if (mailbox)
+        free((genericptr_t) mailbox), mailbox = (char *) 0;
+}
+
+void
 getmailstatus()
 {
-    if (!mailbox && !(mailbox = nh_getenv("MAIL"))) {
+    char *emailbox;
+    if ((emailbox = nh_getenv("MAIL")) != 0) {
+        mailbox = (char *) alloc((unsigned) strlen(emailbox));
+        Strcpy(mailbox, emailbox);
+    }
+    if (!mailbox) {
 #ifdef MAILPATH
 #ifdef AMS
         struct passwd ppasswd;
@@ -623,7 +635,7 @@ readmail(struct obj *otmp UNUSED)
 
     if (child(1)) {
         (void) execl(mr, mr, (char *) 0);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 #else
 #ifndef AMS /* AMS mailboxes are directories */

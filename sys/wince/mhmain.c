@@ -487,7 +487,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hangup(1);
 #else
         dosave0();
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
 #endif
     }
         return 0;
@@ -503,7 +503,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         free((PNHMainWindow) GetWindowLong(hWnd, GWL_USERDATA));
         SetWindowLong(hWnd, GWL_USERDATA, (LONG) 0);
 
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
     } break;
 
     /*-----------------------------------------------------------------------*/

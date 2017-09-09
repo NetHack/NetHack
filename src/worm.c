@@ -551,6 +551,28 @@ place_wsegs(struct monst *worm)
     }
 }
 
+void
+sanity_check_worm(worm)
+struct monst *worm;
+{
+    struct wseg *curr;
+
+    if (!worm)
+        panic("no worm!");
+    if (!worm->wormno)
+        panic("not a worm?!");
+
+    curr = wtails[worm->wormno];
+
+    while (curr != wheads[worm->wormno]) {
+        if (!isok(curr->wx, curr->wy))
+            panic("worm seg not isok");
+        if (level.monsters[curr->wx][curr->wy] != worm)
+            panic("worm not at seg location");
+        curr = curr->nseg;
+    }
+}
+
 /*
  *  remove_worm()
  *
@@ -652,6 +674,14 @@ random_dir(register xchar x, register xchar y, register xchar *nx, register xcha
     *ny += (*nx == x                  /* same kind of thing with y */
               ? (y > 1 ? (y < ROWNO ? (rn2(2) ? 1 : -1) : -1) : 1)
               : (y > 1 ? (y < ROWNO ? (rn2(3) - 1) : -rn2(2)) : rn2(2)));
+}
+
+/* for size_monst(cmd.c) to support #stats */
+int
+size_wseg(worm)
+struct monst *worm;
+{
+    return (int) (count_wsegs(worm) * sizeof (struct wseg));
 }
 
 /*  count_wsegs()

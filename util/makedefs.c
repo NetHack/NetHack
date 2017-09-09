@@ -640,7 +640,7 @@ grep_check_id(const char *id)
 {
     struct grep_var *rv;
 
-    while (*id && isspace(*id))
+    while (*id && isspace((uchar) *id))
         id++;
     if (!*id) {
         Fprintf(stderr, "missing identifier in line %d", grep_lineno);
@@ -685,10 +685,10 @@ do_grep_control(char *buf)
     int isif = 1;
     char *buf0 = buf;
 #if 1
-    if (isspace(buf[0]))
+    if (isspace((uchar) buf[0]))
         return &buf[-1]; /* XXX see docs above */
 #else
-    while (buf[0] && isspace(buf[0]))
+    while (buf[0] && isspace((uchar) buf[0]))
         buf++;
 #endif
     switch (buf[0]) {
@@ -739,7 +739,7 @@ do_grep_control(char *buf)
     default: {
         char str[10];
 
-        if (isprint(buf[0])) {
+        if (isprint((uchar) buf[0])) {
             str[0] = buf[0];
             str[1] = '\0';
         } else {
@@ -1404,6 +1404,9 @@ static const char *build_opts[] = {
 #ifdef DLB
     "data librarian",
 #endif
+#ifdef DUMPLOG
+    "end-of-game dumplogs",
+#endif
 #ifdef MFLOPPY
     "floppy drive support",
 #endif
@@ -2012,7 +2015,6 @@ do_oracles()
 void
 do_dungeon()
 {
-    int rcnt = 0;
     char *line;
 
     Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
@@ -2038,7 +2040,6 @@ do_dungeon()
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
-        rcnt++;
         if (line[0] == '#') {
             free(line);
             continue; /* discard comments */
@@ -2188,9 +2189,6 @@ do_permonst()
     }
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#ifndef PM_H\n#define PM_H\n");
-
-    if (strcmp(mons[0].mname, "playermon") != 0)
-        Fprintf(ofp, "\n#define\tPM_PLAYERMON\t(-1)");
 
     for (i = 0; mons[i].mlet; i++) {
         SpinCursor(3);

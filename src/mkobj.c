@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454715975 2016/02/05 23:46:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1501725405 2017/08/03 01:56:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -704,7 +704,8 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp->where = OBJ_FREE;
     otmp->dknown = index(dknowns, let) ? 0 : 1;
     if ((otmp->otyp >= ELVEN_SHIELD && otmp->otyp <= ORCISH_SHIELD)
-        || otmp->otyp == SHIELD_OF_REFLECTION)
+        || otmp->otyp == SHIELD_OF_REFLECTION
+        || objects[otmp->otyp].oc_merge)
         otmp->dknown = 0;
     if (!objects[otmp->otyp].oc_uses_known)
         otmp->known = 1;
@@ -840,9 +841,6 @@ mksobj(int otyp, boolean init, boolean artif)
             case OILSKIN_SACK:
             case BAG_OF_HOLDING:
                 mkbox_cnts(otmp);
-                break;
-            case LEASH:
-                otmp->leashmon = 0;
                 break;
             case EXPENSIVE_CAMERA:
             case TINNING_KIT:
@@ -1002,6 +1000,9 @@ mksobj(int otyp, boolean init, boolean artif)
     case EGG:
         /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
+        break;
+    case LEASH:
+        otmp->leashmon = 0;
         break;
     case SPE_NOVEL:
         otmp->novelidx = -1; /* "none of the above"; will be changed */
@@ -2497,9 +2498,10 @@ sanity_check_worn(struct obj *obj)
 struct obj *
 obj_nexto(struct obj *otmp)
 {
-    if (!otmp)
+    if (!otmp) {
         impossible("obj_nexto: wasn't given an object to check");
-
+        return (struct obj *) 0;
+    }
     return obj_nexto_xy(otmp, otmp->ox, otmp->oy, TRUE);
 }
 
@@ -2621,6 +2623,37 @@ obj_meld(struct obj **obj1, struct obj **obj2)
 
     impossible("obj_meld: not called with two actual objects");
     return (struct obj *) 0;
+}
+
+/* give a message if hero notices two globs merging [used to be in pline.c] */
+void
+pudding_merge_message(otmp, otmp2)
+struct obj *otmp;
+struct obj *otmp2;
+{
+    boolean visible = (cansee(otmp->ox, otmp->oy)
+                       || cansee(otmp2->ox, otmp2->oy)),
+            onfloor = (otmp->where == OBJ_FLOOR || otmp2->where == OBJ_FLOOR),
+            inpack = (carried(otmp) || carried(otmp2));
+
+    /* the player will know something happened inside his own inventory */
+    if ((!Blind && visible) || inpack) {
+        if (Hallucination) {
+            if (onfloor) {
+                You_see("parts of the floor melting!");
+            } else if (inpack) {
+                Your("pack reaches out and grabs something!");
+            }
+            /* even though we can see where they should be,
+             * they'll be out of our view (minvent or container)
+             * so don't actually show anything */
+        } else if (onfloor || inpack) {
+            pline("The %s coalesce%s.", makeplural(obj_typename(otmp->otyp)),
+                  inpack ? " inside your pack" : "");
+        }
+    } else {
+        You_hear("a faint sloshing sound.");
+    }
 }
 
 /*mkobj.c*/

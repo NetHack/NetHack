@@ -29,6 +29,7 @@ negative intrinsic protection shouldn't confer MC=1, "you are warded" (not
 	possible from divine protection but is possible from eating rings)
 make a slight adjustment to the quickmimic() sense wording
 fix typo in passage 1 of The Colour of Magic
+fix typos in passages 2 and 6 of Thud!
 falling asleep when reading dull spellbook ignored sleep resistance
 getpos() complaint about invalid movement keystroke didn't describe meta-chars
 	accurately
@@ -40,7 +41,7 @@ make a previously-discovered scroll written with marker while blind have its
 don't show the old level when you die going down the stairs because of an
         iron ball
 new high score with ", while helpless" attribute appended would erroneously
-	result in ", while helpless" being appended to all scores
+	result in ", while helpless" being appended to all following entries
 allow bright aliases for colors in menucolors
 avoid hearing yelps when you are deaf
 make corpse visible if stethoscope told you about it being there
@@ -53,6 +54,7 @@ dipping fruit juice into enlightenment gave different result than the inverse
 make travel walk up to a trap and stop when the trap blocks the only
 	way forward, instead of trying to go straight line
 travel will displace pets rather than stop
+discard travel cache when moving to a different dungeon level
 do not autopickup unpaid items in shops
 death due an unseen gas spore's explosion resulted in "killed by a died"
 allow optional parameter "true", "yes", "false", or "no" for boolean options
@@ -81,7 +83,7 @@ when a pet moves reluctantly, name the top item of the pile it is reluctant
 ensure sufficient messages are given to clarify the transition from detected 
 	vampire bats to fog clouds in Vlad's tower
 fix "killing by kicking something weird" when kicking an object causes death
-guard macros available for mextra fields similar to those for oextra fields
+avoid accessing mextra fields which haven't been allocated
 compile-time option for an alternate paniclog format for public server use
 make monsters forget where they stepped when fleeing or teleporting
 requiver pickup_thrown objects if quiver is empty
@@ -123,10 +125,9 @@ make status hilites use same color names as menucolors
 limit monster spell aggravate monsters to either outside or inside of the
 	Wizard's tower
 prevent revived unique from inheriting a user-defined name
-make hurtling out of water bubble on the Plane of Water handle entering water
+make hurtling out of air bubble on the Plane of Water handle entering water
 fix floor descriptions on the Planes when levitating
 fix warning glyph description when monster symbol coincided the warning symbol
-allow the same color names for status hilites and menucolors
 override MSGTYPE=norep while executing the ':' command
 if a chameleon took vampire form, it would stop periodically changing shape
 corpses obtained from tipping an ice box wouldn't rot away
@@ -185,6 +186,7 @@ wand/spell/breath zaps that reached the edge of the level on the Plane of Air
 stop amulets and other items which aren't affected by erosion damage from
 	being subjected to erosion damage
 grammar bit: polyself w/ gender change yielded "you turn into a Elvenking"
+grammar bit when hallucinating: "you kill poor goblin" ('the' missing for pet)
 some blindness cures ignored u.ucreamed
 some instances of stun or confusion timers were being overridden rather than
 	incremented when new stun or confusion damage was suffered
@@ -197,13 +199,286 @@ when using the 'O' command for regexp options (autopickup exceptions,
 	at a time [after 'add', return to add/list/remove menu]
 commands invoked by uppercase meta characters: M-A, M-C, M-N, M-O, M-R, M-T
 	were missing from '? c' list of game commands (dat/hh)
+tweak Baalzebub's lair and clean up the map display for it
+symbol set definitions didn't recognize S_darkroom and S_vibrating_square
+wizard mode enlightenment was reporting "very fast innately" (which is not
+	possible) for very fast hero who was innately fast
+when attacking a monster with a rust or corrosion or acid passive
+	counter-attack, grease wasn't protecting the attacker's weapon
+the Bell of Opening now correctly reports when it opens a trapdoor/hole
+knocking can no longer send a monster through a trapdoor/hole and desaddle it
+game no longer gets confused when you break an unpaid shop item while inside
+	a different shop
+shopkeepers now correctly handle nested containers and gold in containers
+for menustyle traditional, 'D' followed by (B|U|C|X)&m presented a menu of
+	everything, not just invent subset matching specified BUCX categories
+for menustyles traditional or combination, 'A' (or object ID) followed by i
+	displayed an inventory of everything rather than just worn items (or
+	not fully identified items)
+exploding chest trap would destroy uchain while still worn if uball carried
+if monster shapechange message "<foo> turns into <bar>!" was given, <bar>
+	could be "it" (if <foo> sensed telepathically and <bar> is mindless)
+automatic annotation for Ft.Ludios level got applied when a drawbridge became
+	mapped, but entry there is a secret door rather than a drawbridge
+sortloot changed to group holy water and unholy water with water instead of
+	placing them among the h- and u-named items
+sortloot changed to place diluted potion of foo after potion of foo instead
+	of listing all diluted potions followed by all non-diluted ones
+digging down on a grave converted the terrain to floor but did not create a
+	pit and uncover the grave's contents; digging again--on floor--did
+when feel_location removed a remembered-unseen-monster glyph from a known
+	water location while hero was levitating, the map was redrawn showing
+	floor instead of water at that spot
+Vlad's tower2 and tower3 didn't show up in wizard-mode ^O output or ^V? menu
+remove extra space from "All of your  <stack-of-potions> boil and explode."
+	(also applies to potions freezing and to scrolls burning)
+effects of cursed potion of levitation were skipped if already levitating
+when engulfed, having swallower be killed by angry deity trying to zap hero
+	no longer violates pacifist conduct (other penalties--reduced luck or
+	alignment--still apply if target is something you shouldn't kill)
+likewise when a monster kills inself trying to prevent turning to stone or
+	into slime that's been caused by the player, pacifism is not affected
+metabolism adjustments: hero poly'd into metallivore form still needs to eat;
+	being fainted or unconscious from other than sleep now consumes
+	nutrition at lower rate, like being asleep already did;
+	starvation threshold shortened due to slower food use while fainting
+after using detection magic or #terrain while underwater, then leaving water
+	and saving while on land, save would flag you as underwater again and
+	then restore would limit the map display accordingly; next move would
+	notice, retify things, and report "you are on solid land again"
+change #terrain used while underwater to view the regular map rather than the
+	crippled underwater one
+can see or feel adjacent lava or ice when underwater
+farlook when underwater now reports "land" for adjacent non-{water,lava,ice}
+	and "unreconnoitered" for non-adjacent anything, instead of "dark part
+	of a room" for the former and either dark-room or "unexplored" for the
+	latter depending upon whether the spot had previously been scouted
+monster who accidentally killed itself by zapping wand of fire or fire horn
+	at self to prevent turning into slime was not properly killed off;
+	it wouldn't benefit from an amulet of life saving and would trigger
+	impossible "dmonsfree: N removed doesn't match M pending"
+resurrecting a shopkeeper corpse caused crash (replmon -> replshk -> inhishop
+	-> no eshk data for temporary monster being replaced with revived shk)
+new character with OPTIONS=role:Valk,race:!human,align:!lawful yielded
+	"Shall I pick your Dwarven Valkyrie's for you?" where !human forces
+	dwarf and dwarf forces lawful, contradicting align:!lawful
+new character with OPTIONS=role:Valk,race:random yielded
+	"Shall I pick your Valkyrie's race and alignment for you?" instead
+	of honoring race:random without asking
+while in shop, undead turning at self causing carried, hero owned corpse to
+	resurrect claimed it belonged to shopkeeper
+while in shop, stone-to-flesh at self causing carried, hero owned figurine
+	or statue to animate claimed it belonged to shopkeeper
+reviving one of a stack of N corpses in a shop charged a usage fee for all N;
+	remaining N-1 were owned by hero if carried but by shop if on floor
+gremlin wailing in agony should wake up nearby monsters
+add more lighting variance to the second bigroom variant
+when getpos was picking a location, typing '^' to move to the next known trap
+	skipped some detected traps if their location was unseen
+describe detected door traps and chest traps as trapped door and trapped chest
+	instead of bear trap; bear trap tile is still used on map though
+thrown potion that killed peaceful monster would cause "the <mon> gets argry"
+	after the message about it being killed
+when poly'd into a hider and engulfed, attempt to hide via #monster was blocked
+	but feedback said "can't hide while held" rather than "while engulfed"
+various monster/object/food/gold/trap detections were inconsistent in how they
+	behaved if performed while engulfed or underwater
+show in inventory which monster a leash is attached to
+using /? to look up something by name, supplying multiple spaces (with no
+	other characters) as the name triggered impossible "singular of null?"
+add support for the 'altmeta' option to the 'what-does' command ('&' or '?f')
+when wielded weapon becomes untouchable (after alignment change or polymorph)
+	hero could be 'blasted by its power' twice in succession
+at startup, if sysconf had been read but user's own config file couldn't be
+	read, sysconf got processed again as if it contained user's options
+don't give "you cannot pass through the bars" when travel is testing possible
+	paths in the vicinity of iron bars
+if blind and no gloves, using 'm<dir>' to move and then 'e' could be used to
+	locate cockatrice corpse without fatal touching (by declining to eat)
+it's cannabilism for a were<foo> to eat a <foo> corpse
+conduct: wishing for an artifact and not getting it because it already exists
+	counts as wishing for an artifact, just like when not getting it
+	because of quest restrictions or too many artifacts in play does
+avoid ring of poison resistance as starting equipment for orcish wizard
+gelatinous cube shouldn't be able to eat a scroll of scare monster
+make fireballs or cones of cold cast at skilled or higher not go through walls
+prevent flying monsters from hovering over unreachable underwater objects
+lembas wafer gives increased nutrition to elves, reduced nutrition to orcs;
+	cram ration gives increase nutrition to dwarves
+when #tip's terse object drop format got interrupted by a regular message,
+	it continued using "obj2, obj3, ..." for subsequent objects, where
+	the sentence grammar no longer made sense (the interrupting message
+	still follows the comma of a partial sentence--attempting to fix that
+	seems hopeless; leaving it is better than always using verbose format)
+for #tip inside shop, credit was incorrectly given for spilled gold if that
+	gold's stale location coordinates didn't happen to be inside the shop
+when confused scroll of light summoned lights, player would be asked what to
+	call the scroll even if scroll of light was already identified
+if a visible monster becomes invisible, mark its spot with the 'remembered,
+	unseen monster' glyph ('I' character or '?' tile)
+monsters can throw cockatrice eggs at hero, but there was no handling for eggs
+	when the missile hit an intervening monster
+clarify that shape-shifted vampires revert to vampire form when petrified or
+	digested; when back in 'V' form, they're vulnerable to such damage
+when poly'd into an engulfer which does digestion damage, a kill resulting in
+	a level gain gave "welcome to level N+1" before "you digest <victim>"
+any corpse eaten by omnivorous hero always tasted "terrible"
+eating the corpse of a unique non-named monster (Wizard of Yendor, Oracle,
+	Chromatic Dragon, others) gave "The the <monster corpse> tastes ..."
+when escaping the dungeon, change "you were here" annotation in dungeon
+	overview to "you left from here"
+option parsing will crash if 'playmode' option is present without a value
+any item drained of enchantment was blamed on the player as far as shop
+	billing was concerned, even if caused by disenchanter attack
+if user supplied a specific monster name when asked to choose a monster class,
+	first prefix match was picked rather than best match ("titan" yielded
+	S_quadruped due to being preceded by "titanothere" in mons[])
+change ing_suffix() to not double final 'w' when adding 'ing' ('t=' yielded
+	"You mime throwwing something.")
+using 'D' to drop when not carrying anything finished (after doing nothing)
+	without giving any feedback for menustyles "full" and "partial"
+"you hear a distant <musical note> squeak" might actually be nearby
+differentiate symset and roguesymset option menu prompts
+don't show monster vs. monster attack message, if the message refers to
+	a monster that cannot be sensed by the hero
+umber hulk gazing at hidden mimic forces mimic to unhide
+show some timed hero properties in wizard-mode #timeout
+give quest guardians some equipment
+hero polyed into ghoul can only eat non-veggy corpses or eggs
+kicking activates statue traps
+pets start with apport equal to your charisma
+sometimes generate the random mazes with wide corridors, thick walls,
+	or with dead ends changed to loops
+put throne room gold in the chest
+wielding Trollsbane prevents trolls from reviving
+wielding Demonbane prevents demons summoning friends
+wielding Dragonbane confers reflection
+wielding Ogresmasher grants 25 constitution
+Elbereth must now be on a square by itself to function
+Elbereth now erodes based on attacks by the player, not monsters scared
+novels are made of paper, not gold
+movement speeds are made less predictable by using random rounding, rather
+	than via adding a random offset
+some death by the-poison-was-deadly situations left stale non-zero HP shown
+	on the status line during final disclosure
+when sitting at a trap spot: You sit down. You step on a level teleporter.
+	(likewise for polymorph trap, and similar issue for web)
+show all statusline information in #attributes
+add option status_updates to prevent bottom of screen status line updates
+fix achievement recording bug with mines and sokoban prizes
+g.cubes would eat globs of green slime without harm; engulf those instead
+fix up true rumor about rock moles vs boots
+Bell of Opening could trigger segfault attempting to open some types of traps
+	if hero was mounted
+automatic #overview annotation for quest summons wasn't shown if the quest
+	entry portal was on same level as bigroom or rogue level
+gaining or losing strength while wearing gauntlets of power could give
+	misleading message about already being as strong or weak as possible
+levitation vs encumbrance message sequencing issues:  putting on boots of
+	levitation reported reduction of encumbrance before finish-wearing
+	and float-up messages, taking off such boots didn't report increase
+	of encumbrance until player took another action
+removing a blindfold with 'A' took two turns, with 'R' (and 'T') only one,
+	and could result in a crash if the blindfold was stolen during removal
+removing a blindfold and wielded weapon with 'A' could result in crash if the
+	weapon was destroyed by various methods
+cmdassist help for movement prefix followed by invalid direction was strange
+	when the direction was up, down, or self disallowed for that prefix
+poor message when shape-shifted vampire reverts to vampire if it has a name:
+	The Dracula suddenly transforms and rises as Dracula.
+poor message when shape-shifted vampire reverts if cause of 'death' was
+	disintegration or digestion and shifted form wasn't amorphous:
+	The vampire bat is disintegrated.  The vampire bat suddenly transforms
+	and rises as a vampire.  (fix: switch to existing alternate phrasing
+	used for amorphous form, "reconstitute" rather than "transform")
+poor message when named vampire shifts shape within view:
+	You observe a Dracula where a Dracula was.
+vampire shifting into fog cloud to pass under door "oozed" rather than "flowed"
+adult green dragons and the Chromatic Dragon were blinded by gas clouds
+named floating eye (when hit by another monster with reflection) or named
+	silver weapon (when hero hits silver-hating monster) could disrupt
+	message formatting and conceivably trigger crash if name had '%' in it
+fix "you feel like a new man" if female human hero's polymorph attempt failed
+	while in human form (when already poly'd, "new woman" correctly shown)
+fix the 'A' command to have the 'D' command's fix for C331-1 (quirk for
+	menustyle:Combination; if user included 'a' in "which object classes?"
+	response, to operate on applicable all items, there would still be a
+	followup menu asking to choose specific items)
+eating 1 tin from stack of N (for N >= 2) on shop's floor forced hero to buy 2
+using a cursed whistle in a vault will summon the guard immediately
+throne room's throne is occupied by a king
+using a grappling hook and getting pulled toward the target into water would
+	drown hero without any chance to crawl out
+blinded monster who eats a carrot will have blindness cured (hero already did)
+the "bonesid" written into bones files when they're created so that they can
+	be validated when loaded was incorrect for bones in the quest branch
+	("QBar.2" ended up being "ar.2", "QKni.4" ended up as "ni.4", and so
+	forth) but worked anyway, because validation used same incorrect value
+surviving a gas spore's explosion would leave that explosion as a stale reason
+	for death which might show up strangely ("crushed to death by a gas
+	spore's explosion" when killed by an opening drawbridge)
+add database entry for "martial arts"
+starting inventory for rogues specified +9 lock pick, where +/-N is meaningless
+fix pile mark when picking up all-but-one items while invisible
 
-post-3.6.0: fix "object lost" panic during pickup caused by sortloot revamp
-post-3.6.0: more sortloot revisions
+
+Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
+------------------------------------------------------------------
+fix "object lost" panic during pickup caused by sortloot revamp
+more sortloot revisions
+fix inventory menu for response of '?' to getobj (more sortloot revamp fallout)
+rings covered by non-cursed gloves not listed as 'R' candidates
+in baalz_fixup, move any monster away from the two fake pool spots
+switching farlook from xname to doname was giving away information for items
+	located via object detection (quantity of detected gold)
+changing doname to use "some" instead of precise quantity when an item's
+	dknown flag is not set could result in blind hero getting
+	"There is a some jackal corpses here.  Eat one?" and
+	"You can only lift some of the some jackal corpses.  Continue?"
+catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
+fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
+	'remove' menu choices in interactive handling for menu colorings,
+	message types, and autopickup exceptions subject to buffer overflow
+when picking a destination for #jump, '$' to show valid dest. is more accurate
+enchant armor gave "your pair of boots/gloves glow", should have been "glows"
+when autopickup is overridden in a shop, always-pick-up exceptions and
+	pickup_thrown still picked unpaid items up
+the fix for giving an alternate grow up message when a monster becomes a new
+	form with the opposite sex (female gnome into male gnome lord, for
+	example) had the logic wrong
+DUMPLOG: genocided and extinct species was always a blank line;
+	vanquished creatures was just a blank line if nothing had been killed
+DUMPLOG: RIP tombstone was printed for characters who survived (ascended,
+	escaped dungeon, quit, trickery or panic)
+artifact creation violated illiterate conduct when artifact name was assigned,
+	behavior intended only for creating Sting or Orcrist via naming
+tty: revert to pline() for issuing prompts (override MSGTYPE=hide differently)
+previous tty-revert fix had the override test backwards, breaking MSGTYPE
+save 'autodescribe' option value prior to detection or #terrain display and
+	restore it after rather than leave it forced on
+humanoid pet could become hostile but still remain tame if it observed hero
+	attacking a peaceful creature
+minor ^X/enlightenment bugs: grammar when poly'd into '1 hit dice' critter,
+	missing punctuation for "You entered the dungeon N turns ago"
+when configured with DUMPLOG enabled, artifacts were counted twice towards
+	final score
+once Moloch's Sanctum (or Astral Plane via wizard mode level teleport direct
+	to end-game) was entered, end of game disclosure would reveal that
+	high priests had been incorrectly flagged as extinct
+attempting to name an item as an artifact and failing via hand slip violates
+	illiterate conduct
+crashes for 'A' above were downgraded to impossible "cursed without otmp"
+wizhelp: ^O is #overview in wizard mode too; #wizwhere shows dungeon layout
+wishing for tins sometimes yielded a tin wand
+replace the fix for preventing putting on a helm of opposite alignment from
+	causing wielded Excalibur from blasting hero twice
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tiles: wrinkled spellbook had a spurious brown pixel on far right edge of tile
+tiles: when statues are displayed as corresponding monsters, total_tiles_used
+	in generated src/tile.c had incorrect value
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
@@ -213,6 +488,15 @@ tty: responding with <return> or <enter> during role, race, &c selection
 tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
 	to avoid conflicts with <curses.h>
 tty: skip selector letter and selection indicator (-,+,#) during menu coloring
+tty: '>' no longer closes a menu window
+tty: if color is disabled and use_inverse is enabled, display lava in inverse
+	video so that it is visually distinguishable from water
+tty: if "--More--" was written to leftmost column (beginning of second line)
+	while hero was swallowed, cursor would end up in wrong place (at end
+	of status line instead back on map) after message line was cleared
+tty: long message lines which wrap when shown on the top line might be
+	re-displayed incorrectly by ^P for msg_window={full,combo,reverse}
+tty: MSGTYPE=hide could interfere with display of prompts
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
@@ -227,10 +511,16 @@ unix: Makefile.{src,utl} ignored CPPFLAGS which is expanded by the default .c
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 win32gui: handle menu_color attribute
+win32gui: name-from-discoveries list menu selector characters were punctuation
+	instead of letters, repeated for each class; caused by the core bug
+	of erroneously specifying space as a selector for class header lines
 MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
 MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
 	is functional
+Qt: could issue impossible "Destroy called before we know if Menu or Text"
+	followed by crash caused by deferencing a Null pointer if player quit
+	immediately after creating character and declined to disclose anything
 X11: core bug for '`' (backtick) and #terrain commands was only noticed by
 	X11 interface: impossible "add_menu: called before start_menu"
 X11: enable a scroll bar in menu windows
@@ -238,6 +528,9 @@ X11: support pre-selected entries in menu windows
 X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
 X11: color didn't work when the map was displayed as text rather than tiles
+X11: use grayscale monster tiles for statues
+X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
+	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 
 
 General New Features
@@ -257,8 +550,8 @@ allow knife and stiletto as possible tin opening tools
 wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Mort, Sourcery, Wyrd Sisters, Pyramids, Guards! Guards!,
-	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff, and
-	Raising Steam
+	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff,
+	Raising Steam, and The Shepherd's Crown
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
 database entries for Cleaver, Sunsword, Frost and Fire brands, and
 	polymorph trap
@@ -273,10 +566,68 @@ feedback from probing of long worm now includes number of segments it has
 monk starts with 'shuriken' pre-discovered (despite language issue...)
 item-using monster on or next to a fire trap can use it to be cured of
 	turning into slime
-wizard mode ^G can now specify "male" or "female" when creating a monster
+wizard mode ^G can now specify "sleeping", "male" or "female" when
+	creating a monster
 REPRODUCIBLE_BUILD is new config.h setting to fetch build date+time from
 	environment instead of using current date+time, so that later rebuild
 	could duplicate the original (disabled by default; tested for Unix)
+default value for vibrating square symbol changed from yellow '^' to purple '~'
+allow symbol set values to be specified via char within single quotes
+add symbols set "plain", same as default except it uses '+' for corner walls
+extend wizard-mode '#stats' command
+'Q' to ready an item for quick-throwing ('f') now allows the wielded weapon to
+	be moved to quiver; if quantity is more than 1, it offers to split the
+	stack and leave 1 wielded, otherwise it requires confirmation
+'Q' will accept an item count to manually split a stack as part of it being
+	quivered, provided the stack isn't already in the quiver slot
+during end of game disclosure, the vanquished monsters list can be sorted in
+	one of several ways by answering 'a' to "disclose vanquished monsters?"
+when #terrain is displaying a censored version of the map (no monsters, &c),
+	moving the cursor will display farlook's brief autodescribe feedback
+when monster/object/trap detection temporarily clears the map to highlight the
+	results of such detection, farlook autodescibe can be used to view it
+interrupt a multi turn action if hp or pw is restored to maximum
+pressing d or D when cursor positioning targets doors and doorways
+pressing x or X when cursor positioning targets possibly unexplored location
+	(potentially useful when using '_' [not mouse] to invoke travel)
+swallowers can't re-engulf hero immediately after spitting him/her out
+werejackals can summon foxes and coyotes; werewolves can summon wargs
+allow taming monkeys and apes with bananas
+GENERICUSERS is now a sysconf statement instead of compile-time option
+fountains are bright blue
+ray bounceback chance depends on the wall type
+undead #turning takes less time at higher experience level
+peacefuls may react when you attack other peacefuls
+prevent diagonal jumping through open doorways
+different liquids when hallucinating
+when moving a cursor for travel target, show if there is no known travel
+	path to that location, if "autodescribe" is on
+show the reason why travel was interrupted if mention_walls is on
+random horses have a tiny chance of being generated saddled
+give feedback just before timed levitation runs out
+travel accepts 'm' (request menu) prefix
+pressing a or A when cursor positioning shows menu of "interesting" features
+pressing z or Z when cursor positioning cycles through valid locations for
+	jumping, hitting with polearm, or casting a stinking cloud
+when moving a cursor for a jump, polearm, or stinking cloud targeting, show
+	if the location is illegal, if "autodescribe" is on
+wizard-mode command #wizmakemap to recreate the current level
+'goldX' boolean option to treat gold pieces as X (vs U) during BUCX filtering
+	(should be persistent but is reset each save/restore cycle in order
+	to avoid breaking 3.6.0 save files)
+for menustyle:Traditional and Combination, support BUCX filtering for item
+	pick-up and container put-in and take-out; also for object IDing
+for menustyle:Full and Traditional and Combination, support BUCX filtering
+	for the 'A' command
+option whatis_filter to set filtering for eligible map locations when cursor
+	positioning
+blinded hero or monster who eats a nurse corpse will have blindness cured
+blinded hero or monster who breathes vapor from broken potion of healing,
+	extra healing, or full healing might have blindness cured (depends on
+	potion: full == always; extra == if not-cursed; plain == if blessed)
+sysconf definition BONES_POOLS to allow more bones files per level
+blessed scroll of fire lets you choose explosion location like stinking cloud
+optional sections in the config file, selected with CHOOSE
 
 
 Platform- and/or Interface-Specific New Features
@@ -294,22 +645,30 @@ X11: NetHack*extcmd_height_delta resource can be used to adjust initial size
 X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 	NetHack*status_condition.foreground, .background, and .showGrip
 	resources replaced by status_condition[1-3].*
+X11: more terminal-like default resources
+win32gui: save and load map colors from registry
 
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Malcolm Ryan's improved tin opener
-Ray Chason's keyboard may stop responding after locking or unlocking a door when
-	using altkeyhandler=nhraykey.dll 
-Ray Chason's fix: window interfaces that support transparency may give away unseen
-	parts of the map
+Ray Chason's keyboard may stop responding after locking or unlocking a door
+	when using altkeyhandler=nhraykey.dll
+Ray Chason's fix: window interfaces that support transparency may give away
+	unseen parts of the map
 Ray Chason's xprname should honor iflags.menu_tab_sep
 Ray Chason's punctuation for "That foo is really a mimic."
 Ray Chason's proper background tiles for lava and water
 Ray Chason's MS-DOS port restored to functionality with credit to Reddit user 
 	b_helyer for the fix to sys/share/pcmain.c
 Ray Chason's MSDOS port support for some VESA modes
+Darshan Shaligram's pet ranged attack
+Jason Dorje Short's key rebinding
+Maxime Bacoux's new DUMPLOG: compile-time option to enable logging of
+	 end-of-game information into a text file
 
 
 Code Cleanup and Reorganization
 -------------------------------
+removed some unused variables and dead code
+the level generator no longer uses the native pRNG

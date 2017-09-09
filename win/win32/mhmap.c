@@ -9,6 +9,7 @@
 #include "mhinput.h"
 #include "mhfont.h"
 
+#include "color.h"
 #include "patchlevel.h"
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
@@ -682,7 +683,7 @@ onPaint(HWND hWnd)
                                         &special, i, j);
                         ch = (char) mgch;
                         if (((special & MG_PET) && iflags.hilite_pet)
-                            || ((special & MG_DETECT)
+                            || ((special & (MG_DETECT | MG_BW_LAVA))
                                 && iflags.use_inverse)) {
                             back_brush =
                                 CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
@@ -1025,41 +1026,8 @@ nhglyph2charcolor(short g, uchar *ch, int *color)
 COLORREF
 nhcolor_to_RGB(int c)
 {
-    switch (c) {
-    case CLR_BLACK:
-        return RGB(0x55, 0x55, 0x55);
-    case CLR_RED:
-        return RGB(0xFF, 0x00, 0x00);
-    case CLR_GREEN:
-        return RGB(0x00, 0x80, 0x00);
-    case CLR_BROWN:
-        return RGB(0xA5, 0x2A, 0x2A);
-    case CLR_BLUE:
-        return RGB(0x00, 0x00, 0xFF);
-    case CLR_MAGENTA:
-        return RGB(0xFF, 0x00, 0xFF);
-    case CLR_CYAN:
-        return RGB(0x00, 0xFF, 0xFF);
-    case CLR_GRAY:
-        return RGB(0xC0, 0xC0, 0xC0);
-    case NO_COLOR:
-        return RGB(0xFF, 0xFF, 0xFF);
-    case CLR_ORANGE:
-        return RGB(0xFF, 0xA5, 0x00);
-    case CLR_BRIGHT_GREEN:
-        return RGB(0x00, 0xFF, 0x00);
-    case CLR_YELLOW:
-        return RGB(0xFF, 0xFF, 0x00);
-    case CLR_BRIGHT_BLUE:
-        return RGB(0x00, 0xC0, 0xFF);
-    case CLR_BRIGHT_MAGENTA:
-        return RGB(0xFF, 0x80, 0xFF);
-    case CLR_BRIGHT_CYAN:
-        return RGB(0x80, 0xFF, 0xFF); /* something close to aquamarine */
-    case CLR_WHITE:
-        return RGB(0xFF, 0xFF, 0xFF);
-    default:
-        return RGB(0x00, 0x00, 0x00); /* black */
-    }
+    if (c >= 0 && c < CLR_MAX)
+        return GetNHApp()->regMapColors[c];
+    return RGB(0x00, 0x00, 0x00);
 }
 

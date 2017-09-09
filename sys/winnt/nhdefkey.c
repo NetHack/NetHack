@@ -162,7 +162,7 @@ int __declspec(dllexport) __stdcall ProcessKeystroke(HANDLE hConIn, INPUT_RECORD
         if (vk == 0xBF)
             ch = M('?');
         else
-            ch = M(tolower(keycode));
+            ch = M(tolower((uchar) keycode));
     }
     /* Attempt to work better with international keyboards. */
     else {

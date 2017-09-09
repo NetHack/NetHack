@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1450231175 2015/12/16 01:59:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,7 +94,7 @@ dosave()
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
             exit_nhwindows("Be seeing you...");
-            terminate(EXIT_SUCCESS);
+            nh_terminate(EXIT_SUCCESS);
         } else
             (void) doredraw();
     }
@@ -115,6 +115,8 @@ dosave0()
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
     u.uinvulnerable = 0;
+    if (iflags.save_uswallow)
+        u.uswallow = 1, iflags.save_uswallow = 0;
     if (iflags.save_uinwater)
         u.uinwater = 1, iflags.save_uinwater = 0;
     if (iflags.save_uburied)
@@ -699,7 +701,7 @@ def_bwrite(register int fd, register genericptr_t loc, register unsigned num)
     if (failed) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
         if (program_state.done_hup)
-            terminate(EXIT_FAILURE);
+            nh_terminate(EXIT_FAILURE);
         else
 #endif
             panic("cannot write %u bytes to file #%d", num, fd);
@@ -800,7 +802,7 @@ zerocomp_bflush(register int fd)
         if (write(fd, outbuf, outbufp) != outbufp) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
             if (program_state.done_hup)
-                terminate(EXIT_FAILURE);
+                nh_terminate(EXIT_FAILURE);
             else
 #endif
                 zerocomp_bclose(fd); /* panic (outbufp != 0) */
@@ -823,7 +825,7 @@ zerocomp_bwrite(int fd, genericptr_t loc, register unsigned num)
         if ((unsigned) write(fd, loc, num) != num) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
             if (program_state.done_hup)
-                terminate(EXIT_FAILURE);
+                nh_terminate(EXIT_FAILURE);
             else
 #endif
                 panic("cannot write %u bytes to file #%d", num, fd);
@@ -1276,6 +1278,9 @@ free_dungeons()
 void
 freedynamicdata()
 {
+#if defined(UNIX) && defined(MAIL)
+    free_maildata();
+#endif
     unload_qtlist();
     free_menu_coloring();
     free_invbuf();           /* let_to_name (invent.c) */
@@ -1351,6 +1356,9 @@ freedynamicdata()
 #endif /* FREE_ALL_MEMORY */
 #ifdef STATUS_VIA_WINDOWPORT
     status_finish();
+#endif
+#ifdef DUMPLOG
+    dumplogfreemessages();
 #endif
 
     /* last, because it frees data that might be used by panic() to provide

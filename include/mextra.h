@@ -144,14 +144,16 @@ struct emin {
  **     formerly edog.h -- pet extension
  */
 /*      various types of pet food, the lower, the better liked */
-#define DOGFOOD 0
-#define CADAVER 1
-#define ACCFOOD 2
-#define MANFOOD 3
-#define APPORT  4
-#define POISON  5
-#define UNDEF   6
-#define TABU    7
+enum dogfood_types {
+    DOGFOOD = 0,
+    CADAVER,
+    ACCFOOD,
+    MANFOOD,
+    APPORT,
+    POISON,
+    UNDEF,
+    TABU
+};
 
 struct edog {
     long droptime;            /* moment dog dropped object */

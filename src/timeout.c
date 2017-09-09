@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1456526165 2016/02/26 22:36:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1496619133 2017/06/04 23:32:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,11 +8,91 @@
 STATIC_DCL void stoned_dialogue(void);
 STATIC_DCL void vomiting_dialogue(void);
 STATIC_DCL void choke_dialogue(void);
+STATIC_DCL void levitation_dialogue(void);
 STATIC_DCL void slime_dialogue(void);
 STATIC_DCL void slip_or_trip(void);
 STATIC_DCL void see_lamp_flicker(struct obj *, const char *);
 STATIC_DCL void lantern_message(struct obj *);
 STATIC_DCL void cleanup_burn(ANY_P *, long);
+
+/* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
+   for timeout countdown, where most won't occur in normal play */
+const struct propname {
+    int prop_num;
+    const char *prop_name;
+} propertynames[] = {
+    { INVULNERABLE, "invulnerable" },
+    { STONED, "petrifying" },
+    { SLIMED, "becoming slime" },
+    { STRANGLED, "strangling" },
+    { SICK, "fatally sick" },
+    { STUNNED, "stunned" },
+    { CONFUSION, "confused" },
+    { HALLUC, "hallucinating" },
+    { BLINDED, "blinded" },
+    { DEAF, "deafness" },
+    { VOMITING, "vomiting" },
+    { GLIB, "slippery fingers" },
+    { WOUNDED_LEGS, "wounded legs" },
+    { SLEEPY, "sleepy" },
+    { TELEPORT, "teleporting" },
+    { POLYMORPH, "polymorphing" },
+    { LEVITATION, "levitating" },
+    { FAST, "very fast" }, /* timed 'FAST' is very fast */
+    { CLAIRVOYANT, "clairvoyant" },
+    { DETECT_MONSTERS, "monster detection" },
+    { SEE_INVIS, "see invisible" },
+    { INVIS, "invisible" },
+    /* properties beyond here don't have timed values during normal play,
+       so there's no much point in trying to order them sensibly;
+       they're either on or off based on equipment, role, actions, &c */
+    { FIRE_RES, "fire resistance" },
+    { COLD_RES, "cold resistance" },
+    { SLEEP_RES, "sleep resistance" },
+    { DISINT_RES, "disintegration resistance" },
+    { SHOCK_RES, "shock resistance" },
+    { POISON_RES, "poison resistance" },
+    { ACID_RES, "acid resistance" },
+    { STONE_RES, "stoning resistance" },
+    { DRAIN_RES, "drain resistance" },
+    { SICK_RES, "sickness resistance" },
+    { ANTIMAGIC, "magic resistance" },
+    { HALLUC_RES, "hallucination resistance" },
+    { FUMBLING, "fumbling" },
+    { HUNGER, "voracious hunger" },
+    { TELEPAT, "telepathic" },
+    { WARNING, "warning" },
+    { WARN_OF_MON, "warn: monster type or class" },
+    { WARN_UNDEAD, "warn: undead" },
+    { SEARCHING, "searching" },
+    { INFRAVISION, "infravision" },
+    { ADORNED, "adorned (+/- Cha)" },
+    { DISPLACED, "displaced" },
+    { STEALTH, "stealthy" },
+    { AGGRAVATE_MONSTER, "monster aggravation" },
+    { CONFLICT, "conflict" },
+    { JUMPING, "jumping" },
+    { TELEPORT_CONTROL, "teleport control" },
+    { FLYING, "flying" },
+    { WWALKING, "water walking" },
+    { SWIMMING, "swimming" },
+    { MAGICAL_BREATHING, "magical breathing" },
+    { PASSES_WALLS, "pass thru walls" },
+    { SLOW_DIGESTION, "slow digestion" },
+    { HALF_SPDAM, "half spell damage" },
+    { HALF_PHDAM, "half physical damage" },
+    { REGENERATION, "HP regeneration" },
+    { ENERGY_REGENERATION, "energy regeneration" },
+    { PROTECTION, "extra protection" },
+    { PROT_FROM_SHAPE_CHANGERS, "protection from shape changers" },
+    { POLYMORPH_CONTROL, "polymorph control" },
+    { UNCHANGING, "unchanging" },
+    { REFLECTING, "reflecting" },
+    { FREE_ACTION, "free action" },
+    { FIXED_ABIL, "fixed abilites" },
+    { LIFESAVED, "life will be saved" },
+    {  0, 0 },
+};
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
@@ -56,6 +136,9 @@ stoned_dialogue()
         multi_reason = "getting stoned";
         nomovemsg = You_can_move_again; /* not unconscious */
         break;
+    case 2:
+        if ((HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
+            set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
     default:
         break;
     }
@@ -122,14 +205,18 @@ vomiting_dialogue()
 }
 
 static NEARDATA const char *const choke_texts[] = {
-    "You find it hard to breathe.", "You're gasping for air.",
-    "You can no longer breathe.", "You're turning %s.", "You suffocate."
+    "You find it hard to breathe.",
+    "You're gasping for air.",
+    "You can no longer breathe.",
+    "You're turning %s.",
+    "You suffocate."
 };
 
 static NEARDATA const char *const choke_texts2[] = {
     "Your %s is becoming constricted.",
     "Your blood is having trouble reaching your brain.",
-    "The pressure on your %s increases.", "Your consciousness is fading.",
+    "The pressure on your %s increases.",
+    "Your consciousness is fading.",
     "You suffocate."
 };
 
@@ -151,6 +238,37 @@ choke_dialogue()
         }
     }
     exercise(A_STR, FALSE);
+}
+
+static NEARDATA const char *const levi_texts[] = {
+    "You float slightly lower.",
+    "You wobble unsteadily %s the %s."
+};
+
+STATIC_OVL void
+levitation_dialogue()
+{
+    /* -1 because the last message comes via float_down() */
+    long i = (((HLevitation & TIMEOUT) - 1L) / 2L);
+
+    if (ELevitation)
+        return;
+
+    if (!ACCESSIBLE(levl[u.ux][u.uy].typ)
+        && !is_pool_or_lava(u.ux,u.uy))
+        return;
+
+    if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
+        const char *s = levi_texts[SIZE(levi_texts) - i];
+        if (index(s, '%')) {
+            boolean danger = (is_pool_or_lava(u.ux, u.uy)
+                              && !Is_waterlevel(&u.uz));
+
+            pline(s, danger ? "over" : "in",
+                  danger ? surface(u.ux, u.uy) : "air");
+        } else
+            pline1(s);
+    }
 }
 
 static NEARDATA const char *const slime_texts[] = {
@@ -190,6 +308,8 @@ slime_dialogue()
         if (multi > 0)
             nomul(0);
     }
+    if (i == 2L && (HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
+        set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
     exercise(A_DEX, FALSE);
 }
 
@@ -214,7 +334,7 @@ nh_timeout()
         baseluck -= 1;
 
     if (u.uluck != baseluck
-        && moves % (u.uhave.amulet || u.ugangr ? 300 : 600) == 0) {
+        && moves % ((u.uhave.amulet || u.ugangr) ? 300 : 600) == 0) {
         /* Cursed luckstones stop bad luck from timing out; blessed luckstones
          * stop good luck from timing out; normal luckstones stop both;
          * neither is stopped if you don't have a luckstone.
@@ -238,6 +358,8 @@ nh_timeout()
         vomiting_dialogue();
     if (Strangled)
         choke_dialogue();
+    if (Levitation)
+        levitation_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
@@ -569,6 +691,8 @@ hatch_egg(anything *arg, long timeout)
         boolean siblings = (hatchcount > 1), redraw = FALSE;
 
         if (cansee_hatchspot) {
+            /* [bug?  m_monnam() yields accurate monster type
+               regardless of hallucination] */
             Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
                     siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
             /* we don't learn the egg type here because learning
@@ -1410,7 +1534,7 @@ print_queue(winid win, timer_element *base)
     char buf[BUFSZ];
 
     if (!base) {
-        putstr(win, 0, "<empty>");
+        putstr(win, 0, " <empty>");
     } else {
         putstr(win, 0, "timeout  id   kind   call");
         for (curr = base; curr; curr = curr->next) {
@@ -1434,6 +1558,9 @@ wiz_timeout_queue()
 {
     winid win;
     char buf[BUFSZ];
+    const char *propname;
+    long intrinsic;
+    int i, p, count, longestlen, ln, specindx = 0;
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR)
@@ -1446,6 +1573,46 @@ wiz_timeout_queue()
     putstr(win, 0, "");
     print_queue(win, timer_base);
 
+    /* Timed properies:
+     * check every one; the majority can't obtain temporary timeouts in
+     * normal play but those can be forced via the #wizintrinsic command.
+     */
+    count = longestlen = 0;
+    for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+        p = propertynames[i].prop_num;
+        intrinsic = u.uprops[p].intrinsic;
+        if (intrinsic & TIMEOUT) {
+            ++count;
+            if ((ln = (int) strlen(propname)) > longestlen)
+                longestlen = ln;
+        }
+        if (specindx == 0 && p == FIRE_RES)
+            specindx = i;
+    }
+    putstr(win, 0, "");
+    if (!count) {
+        putstr(win, 0, "No timed properties.");
+    } else {
+        putstr(win, 0, "Timed properties:");
+        putstr(win, 0, "");
+        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
+            p = propertynames[i].prop_num;
+            intrinsic = u.uprops[p].intrinsic;
+            if (intrinsic & TIMEOUT) {
+                if (specindx > 0 && i >= specindx) {
+                    putstr(win, 0, " -- settable via #wizinstrinc only --");
+                    specindx = 0;
+                }
+                /* timeout value can be up to 16777215 (0x00ffffff) but
+                   width of 4 digits should result in values lining up
+                   almost all the time (if/when they don't, it won't
+                   look nice but the information will still be accurate) */
+                Sprintf(buf, " %*s %4ld", -longestlen, propname,
+                        (intrinsic & TIMEOUT));
+                putstr(win, 0, buf);
+            }
+        }
+    }
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 
@@ -1461,6 +1628,7 @@ timer_sanity_check()
     for (curr = timer_base; curr; curr = curr->next)
         if (curr->kind == TIMER_OBJECT) {
             struct obj *obj = curr->arg.a_obj;
+
             if (obj->timed == 0) {
                 pline("timer sanity: untimed obj %s, timer %ld",
                       fmt_ptr((genericptr_t) obj), curr->tid);
@@ -1505,6 +1673,7 @@ start_timer(long when, short kind, short func_index, anything *arg)
         panic("start_timer");
 
     gnu = (timer_element *) alloc(sizeof(timer_element));
+    (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
     gnu->next = 0;
     gnu->tid = timer_id++;
     gnu->timeout = monstermoves + when;
@@ -1940,6 +2109,23 @@ restore_timers(int fd,
         if (ghostly)
             curr->timeout += adjust;
         insert_timer(curr);
+    }
+}
+
+/* to support '#stats' wizard-mode command */
+void
+timer_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    timer_element *te;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (timer_element));
+    *count = *size = 0L;
+    for (te = timer_base; te; te = te->next) {
+        ++*count;
+        *size += (long) sizeof *te;
     }
 }
 

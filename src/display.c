@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1457207034 2016/03/05 19:43:54 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1496101037 2017/05/29 23:37:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -411,24 +411,29 @@ display_monster(register xchar x, register xchar y, /* display position */
         }
     }
 
-    /* If the mimic is unsuccessfully mimicing something, display the monster
+    /* If the mimic is unsuccessfully mimicing something, display the monster.
      */
     if (!mon_mimic || sensed) {
         int num;
 
         /* [ALI] Only use detected glyphs when monster wouldn't be
          * visible by any other means.
+         *
+         * There are no glyphs for "detected pets" so we have to
+         * decide whether to display such things as detected or as tame.
+         * If both are being highlighted in the same way, it doesn't
+         * matter, but if not, showing them as pets is preferrable.
          */
-        if (sightflags == DETECTED && !mon->mtame) {
-            if (worm_tail)
-                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
-            else
-                num = detected_mon_to_glyph(mon);
-        } else if (mon->mtame && !Hallucination) {
+        if (mon->mtame && !Hallucination) {
             if (worm_tail)
                 num = petnum_to_glyph(PM_LONG_WORM_TAIL);
             else
                 num = pet_to_glyph(mon);
+        } else if (sightflags == DETECTED) {
+            if (worm_tail)
+                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
+            else
+                num = detected_mon_to_glyph(mon);
         } else {
             if (worm_tail)
                 num = monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
@@ -514,8 +519,7 @@ feel_location(xchar x, xchar y)
     if (!isok(x, y))
         return;
     lev = &(levl[x][y]);
-    /* If the hero's memory of an invisible monster is accurate, we want to
-     * keep
+    /* If hero's memory of an invisible monster is accurate, we want to keep
      * him from detecting the same monster over and over again on each turn.
      * We must return (so we don't erase the monster).  (We must also, in the
      * search function, be sure to skip over previously detected 'I's.)
@@ -523,8 +527,10 @@ feel_location(xchar x, xchar y)
     if (glyph_is_invisible(lev->glyph) && m_at(x, y))
         return;
 
-    /* The hero can't feel non pool locations while under water. */
-    if (Underwater && !Is_waterlevel(&u.uz) && !is_pool(x, y))
+    /* The hero can't feel non pool locations while under water
+       except for lava and ice. */
+    if (Underwater && !Is_waterlevel(&u.uz)
+        && !is_pool_or_lava(x, y) && !is_ice(x, y))
         return;
 
     /* Set the seen vector as if the hero had seen it.
@@ -556,6 +562,8 @@ feel_location(xchar x, xchar y)
         } else if (IS_DOOR(lev->typ)) {
             map_background(x, y, 1);
         } else if (IS_ROOM(lev->typ) || IS_POOL(lev->typ)) {
+            boolean do_room_glyph;
+
             /*
              * An open room or water location.  Normally we wouldn't touch
              * this, but we have to get rid of remembered boulder symbols.
@@ -581,20 +589,18 @@ feel_location(xchar x, xchar y)
              * We could also just display what is currently on the top of the
              * object stack (if anything).
              */
-            if (lev->glyph == objnum_to_glyph(BOULDER)) {
-                if (lev->typ != ROOM && lev->seenv) {
+            do_room_glyph = FALSE;
+            if (lev->glyph == objnum_to_glyph(BOULDER)
+                || glyph_is_invisible(lev->glyph)) {
+                if (lev->typ != ROOM && lev->seenv)
                     map_background(x, y, 1);
-                } else {
-                    lev->glyph = (flags.dark_room && iflags.use_color
-                                  && !Is_rogue_level(&u.uz))
-                                     ? cmap_to_glyph(S_darkroom)
-                                     : (lev->waslit ? cmap_to_glyph(S_room)
-                                                    : cmap_to_glyph(S_stone));
-                    show_glyph(x, y, lev->glyph);
-                }
-            } else if ((lev->glyph >= cmap_to_glyph(S_stone)
-                        && lev->glyph < cmap_to_glyph(S_darkroom))
-                       || glyph_is_invisible(levl[x][y].glyph)) {
+                else
+                    do_room_glyph = TRUE;
+            } else if (lev->glyph >= cmap_to_glyph(S_stone)
+                       && lev->glyph < cmap_to_glyph(S_darkroom)) {
+                do_room_glyph = TRUE;
+            }
+            if (do_room_glyph) {
                 lev->glyph = (flags.dark_room && iflags.use_color
                               && !Is_rogue_level(&u.uz))
                                  ? cmap_to_glyph(S_darkroom)
@@ -649,7 +655,7 @@ feel_location(xchar x, xchar y)
             show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
     }
     /* draw monster on top if we can sense it */
-    if ((x != u.ux || y != u.uy) && (mon = m_at(x, y)) && sensemon(mon))
+    if ((x != u.ux || y != u.uy) && (mon = m_at(x, y)) != 0 && sensemon(mon))
         display_monster(x, y, mon,
                         (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))
                             ? PHYSICALLY_SEEN
@@ -684,18 +690,9 @@ newsym(register int x, register int y)
         return;
     }
     if (Underwater && !Is_waterlevel(&u.uz)) {
-        /* don't do anything unless (x,y) is an adjacent underwater position
-         */
-        int dx, dy;
-        if (!is_pool(x, y))
-            return;
-        dx = x - u.ux;
-        if (dx < 0)
-            dx = -dx;
-        dy = y - u.uy;
-        if (dy < 0)
-            dy = -dy;
-        if (dx > 1 || dy > 1)
+        /* when underwater, don't do anything unless <x,y> is an
+           adjacent water or lava or ice position */
+        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || distu(x, y) > 2)
             return;
     }
 
@@ -997,9 +994,10 @@ swallowed(int first)
     static xchar lastx, lasty; /* last swallowed position */
     int swallower, left_ok, rght_ok;
 
-    if (first)
+    if (first) {
         cls();
-    else {
+        bot();
+    } else {
         register int x, y;
 
         /* Clear old location */
@@ -1082,9 +1080,13 @@ under_water(int mode)
                     show_glyph(x, y, cmap_to_glyph(S_stone));
     }
 
+    /*
+     * TODO?  Should this honor Xray radius rather than force radius 1?
+     */
+
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
-            if (isok(x, y) && is_pool(x, y)) {
+            if (isok(x, y) && (is_pool_or_lava(x, y) || is_ice(x, y))) {
                 if (Blind && !(x == u.ux && y == u.uy))
                     show_glyph(x, y, cmap_to_glyph(S_stone));
                 else

@@ -1,6 +1,6 @@
 $ ! vms/install.com -- set up nethack 'playground'
 $ !
-$ ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+$ ! $NHDT-Date: 1465133391 2016/06/05 13:29:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
@@ -24,7 +24,8 @@ $
 $	! note: all filespecs contain some punctuation,
 $	!	to avoid inadvertent logical name interaction
 $	play_files = "PERM.,RECORD.,LOGFILE.,PANICLOG."
-$	help_files = "HELP.,HH.,CMDHELP.,WIZHELP.,OPTHELP.,HISTORY.,LICENSE."
+$	help_files = "HELP.,HH.,CMDHELP.,KEYHELP.,WIZHELP.,OPTHELP.," -
+		   + "HISTORY.,LICENSE."
 $	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE."
 $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"

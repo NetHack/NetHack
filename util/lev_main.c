@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1448074107 2015/11/21 02:48:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1501723418 2017/08/03 01:23:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -277,7 +277,7 @@ main(int argc, char **argv)
             }
             fin = freopen(fname, "r", stdin);
             if (!fin) {
-                lc_pline("Can't open \"%s\" for input.\n", fname);
+                lc_pline("Can't open \"%s\" for input.\n", VA_PASS1(fname));
                 perror(fname);
                 errors_encountered = TRUE;
             } else {
@@ -567,7 +567,6 @@ void add_opvars(sp_lev *sp, const char *fmt, ...)
 static void
 vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
 {
-
     const char *p, *lp;
     long la;
     /* Do NOT use VA_START and VA_END in here... see above */
@@ -579,56 +578,56 @@ vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
         case 'i': /* integer */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_int(ov, la = va_arg(the_args, long) );
+            set_opvar_int(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'c': /* coordinate */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_coord(ov, la = va_arg(the_args, long) );
+            set_opvar_coord(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'r': /* region */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_region(ov, la = va_arg(the_args, long) );
+            set_opvar_region(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'm': /* mapchar */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_mapchar(ov, la = va_arg(the_args, long) );
+            set_opvar_mapchar(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'M': /* monster */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_monst(ov, la = va_arg(the_args, long) );
+            set_opvar_monst(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'O': /* object */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_obj(ov, la = va_arg(the_args, long) );
+            set_opvar_obj(ov, la = va_arg(the_args, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 's': /* string */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_str(ov, lp = va_arg(the_args, const char *) );
+            set_opvar_str(ov, lp = va_arg(the_args, const char *));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'v': /* variable */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_var(ov, lp = va_arg(the_args, const char *) );
+            set_opvar_var(ov, lp = va_arg(the_args, const char *));
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
@@ -636,16 +635,16 @@ vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
         {
             long i = la = va_arg(the_args, int);
             if (i < 0 || i >= MAX_SP_OPCODES)
-                lc_pline("add_opvars: unknown opcode '%ld'.", i);
+                lc_pline("add_opvars: unknown opcode '%ld'.", VA_PASS1(i));
             add_opcode(sp, i, NULL);
             break;
         }
         default:
-            lc_pline("add_opvars: illegal format character '%c'.", *p);
+            lc_pline("add_opvars: illegal format character '%ld'.",
+                     VA_PASS1((long) *p));
             break;
         }
     }
-    return;
 }
 
 void
@@ -700,7 +699,8 @@ funcdef_new(long addr, char *name)
     struct lc_funcdefs *f = New(struct lc_funcdefs);
 
     if (!f) {
-        lc_error("Could not alloc function definition for '%s'.", name);
+        lc_error("Could not alloc function definition for '%s'.",
+                 VA_PASS1(name));
         return NULL;
     }
     f->next = NULL;
@@ -774,7 +774,8 @@ vardef_new(long typ, char *name)
     struct lc_vardefs *f = New(struct lc_vardefs);
 
     if (!f) {
-        lc_error("Could not alloc variable definition for '%s'.", name);
+        lc_error("Could not alloc variable definition for '%s'.",
+                 VA_PASS1(name));
         return NULL;
     }
     f->next = NULL;
@@ -792,7 +793,7 @@ vardef_free_all(struct lc_vardefs *fchain)
 
     while (tmp) {
         if (be_verbose && (tmp->n_used == 0))
-            lc_warning("Unused variable '%s'", tmp->name);
+            lc_warning("Unused variable '%s'", VA_PASS1(tmp->name));
         nxt = tmp->next;
         Free(tmp->name);
         Free(tmp);
@@ -827,7 +828,7 @@ spovar2str(long spovar)
     spovar &= ~SPOVAR_ARRAY;
     switch (spovar) {
     default:
-        lc_error("spovar2str(%ld)", spovar);
+        lc_error("spovar2str(%ld)", VA_PASS1(spovar));
         break;
     case SPOVAR_INT:
         n = "integer";
@@ -878,9 +879,11 @@ check_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
     if ((tmp = vardef_defined(vd, varname, 1)) != 0) {
         if (tmp->var_type != vartype)
             lc_error("Trying to use variable '%s' as %s, when it is %s.",
-                     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+                     VA_PASS3(varname,
+                              spovar2str(vartype),
+                              spovar2str(tmp->var_type)));
     } else
-        lc_error("Variable '%s' not defined.", varname);
+        lc_error("Variable '%s' not defined.", VA_PASS1(varname));
 }
 
 struct lc_vardefs *
@@ -891,7 +894,9 @@ add_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
     if ((tmp = vardef_defined(vd, varname, 1)) != 0) {
         if (tmp->var_type != vartype)
             lc_error("Trying to redefine variable '%s' as %s, when it is %s.",
-                     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+                     VA_PASS3(varname,
+                              spovar2str(vartype),
+                              spovar2str(tmp->var_type)));
     } else {
         tmp = vardef_new(vartype, varname);
         tmp->next = vd;
@@ -917,7 +922,8 @@ reverse_jmp_opcode(int opcode)
     case SPO_JGE:
         return SPO_JL;
     default:
-        lc_error("Cannot reverse comparison jmp opcode %d.", opcode);
+        lc_error("Cannot reverse comparison jmp opcode %ld.",
+                 VA_PASS1((long) opcode));
         return SPO_NULL;
     }
 }
@@ -958,7 +964,8 @@ opvar_clone(struct opvar *ov)
             tmpov->vardata.str[len] = '\0';
         } break;
         default: {
-            lc_error("Unknown opvar_clone value type (%d)!", ov->spovartyp);
+            lc_error("Unknown opvar_clone value type (%ld)!",
+                     VA_PASS1((long) ov->spovartyp));
         } /* default */
         } /* switch */
         return tmpov;
@@ -983,9 +990,10 @@ start_level_def(sp_lev **splev, char *ldfname)
     struct lc_funcdefs *f;
 
     if (index(ldfname, '.'))
-        lc_error("Invalid dot ('.') in level name '%s'.", ldfname);
+        lc_error("Invalid dot ('.') in level name '%s'.", VA_PASS1(ldfname));
     if ((int) strlen(ldfname) > 14)
-        lc_error("Level names limited to 14 characters ('%s').", ldfname);
+        lc_error("Level names limited to 14 characters ('%s').",
+                 VA_PASS1(ldfname));
     f = function_definitions;
     while (f) {
         f->n_called = 0;
@@ -1068,8 +1076,8 @@ get_monster_id(char *s, char c)
         if (!class || class == mons[i].mlet)
             if (!case_insensitive_comp(s, mons[i].mname)) {
                 if (be_verbose)
-                    lc_warning("Monster type \"%s\" matches \"%s\".", s,
-                               mons[i].mname);
+                    lc_warning("Monster type \"%s\" matches \"%s\".",
+                               VA_PASS2(s, mons[i].mname));
                 return i;
             }
     return ERR;
@@ -1102,7 +1110,8 @@ get_object_id(char *s, char c /* class */)
         objname = obj_descr[i].oc_name;
         if (objname && !case_insensitive_comp(s, objname)) {
             if (be_verbose)
-                lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
+                lc_warning("Object type \"%s\" matches \"%s\".",
+                           VA_PASS2(s, objname));
             return i;
         }
     }
@@ -1205,14 +1214,14 @@ add_opcode(sp_lev *sp, int opc, genericptr_t dat)
     _opcode *tmp;
 
     if ((opc < 0) || (opc >= MAX_SP_OPCODES))
-        lc_error("Unknown opcode '%d'", opc);
+        lc_error("Unknown opcode '%ld'", VA_PASS1((long) opc));
 
     tmp = (_opcode *) alloc(sizeof(_opcode) * (nop + 1));
     if (!tmp) { /* lint suppression */
         /*NOTREACHED*/
 #if 0
         /* not possible; alloc() never returns Null */
-        lc_error("Could not alloc opcode space");
+        lc_error("%s", VA_PASS1("Could not alloc opcode space"));
 #endif
         return;
     }
@@ -1281,9 +1290,9 @@ scan_map(char *map, sp_lev *sp)
         for (i = 0; i < len; i++)
             if ((tmpmap[max_hig][i] = what_map_char(map[i]))
                 == INVALID_TYPE) {
-                lc_warning("Invalid character '%c' @ (%d, %d) - replacing "
-                           "with stone",
-                           map[i], max_hig, i);
+                lc_warning(
+                "Invalid character '%ld' @ (%ld, %ld) - replacing with stone",
+                           VA_PASS3((long) map[i], (long) max_hig, (long) i));
                 tmpmap[max_hig][i] = STONE;
             }
         while (i < max_len)
@@ -1298,8 +1307,9 @@ scan_map(char *map, sp_lev *sp)
     max_y_map = max_hig - 1;
 
     if (max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
-        lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len,
-                 max_hig, MAP_X_LIM, MAP_Y_LIM);
+        lc_error("Map too large at (%ld x %ld), max is (%ld x %ld)",
+                 VA_PASS4((long) max_len, (long) max_hig,
+                          (long) MAP_X_LIM, (long) MAP_Y_LIM));
     }
 
     mbuf = (char *) alloc(((max_hig - 1) * max_len) + (max_len - 1) + 2);
@@ -1309,7 +1319,8 @@ scan_map(char *map, sp_lev *sp)
 
     mbuf[((max_hig - 1) * max_len) + (max_len - 1) + 1] = '\0';
 
-    add_opvars(sp, "siio", VA_PASS4(mbuf, max_hig, max_len, SPO_MAP));
+    add_opvars(sp, "siio", VA_PASS4(mbuf, (long) max_hig, (long) max_len,
+                                    SPO_MAP));
 
     for (dy = 0; dy < max_hig; dy++)
         Free(tmpmap[dy]);

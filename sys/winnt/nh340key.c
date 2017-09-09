@@ -148,7 +148,7 @@ int __declspec(dllexport) __stdcall ProcessKeystroke(HANDLE hConIn, INPUT_RECORD
         if (vk == 0xBF)
             ch = M('?');
         else
-            ch = M(tolower(keycode));
+            ch = M(tolower((uchar) keycode));
     }
     if (ch == '\r')
         ch = '\n';

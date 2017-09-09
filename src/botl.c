@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1452660188 2016/01/13 04:43:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1469930895 2016/07/31 02:08:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,15 +13,31 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *rank(void);
 
-#ifndef STATUS_VIA_WINDOWPORT
-
-STATIC_DCL void bot1(void);
-STATIC_DCL void bot2(void);
-
-STATIC_OVL void
-bot1()
+static char *
+get_strength_str()
 {
-    char newbot1[MAXCO];
+    static char buf[32];
+    int st = ACURR(A_STR);
+
+    if (st > 18) {
+        if (st > STR18(100))
+            Sprintf(buf, "%2d", st - 100);
+        else if (st < STR18(100))
+            Sprintf(buf, "18/%02d", st - 18);
+        else
+            Sprintf(buf, "18/**");
+    } else
+        Sprintf(buf, "%-1d", st);
+
+    return buf;
+}
+
+#if !defined(STATUS_VIA_WINDOWPORT) || defined(DUMPLOG)
+
+char *
+do_statusline1()
+{
+    static char newbot1[BUFSZ];
     register char *nb;
     register int i, j;
 
@@ -51,16 +67,9 @@ bot1()
     j = (int) ((nb + 2) - newbot1); /* strlen(newbot1) but less computation */
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
-    if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100))
-            Sprintf(nb = eos(nb), "St:%2d ", ACURR(A_STR) - 100);
-        else if (ACURR(A_STR) < STR18(100))
-            Sprintf(nb = eos(nb), "St:18/%02d ", ACURR(A_STR) - 18);
-        else
-            Sprintf(nb = eos(nb), "St:18/** ");
-    } else
-        Sprintf(nb = eos(nb), "St:%-1d ", ACURR(A_STR));
-    Sprintf(nb = eos(nb), "Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+
+    Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+            get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
     Sprintf(nb = eos(nb),
@@ -71,14 +80,13 @@ bot1()
     if (flags.showscore)
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
 #endif
-    curs(WIN_STATUS, 1, 0);
-    putstr(WIN_STATUS, 0, newbot1);
+    return newbot1;
 }
 
-STATIC_OVL void
-bot2()
+char *
+do_statusline2()
 {
-    char newbot2[MAXCO], /* MAXCO: botl.h */
+    static char newbot2[BUFSZ], /* MAXCO: botl.h */
          /* dungeon location (and gold), hero health (HP, PW, AC),
             experience (HD if poly'd, else Exp level and maybe Exp points),
             time (in moves), varying number of status conditions */
@@ -102,7 +110,8 @@ bot2()
     if ((money = money_cnt(invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
-            encglyph(objnum_to_glyph(GOLD_PIECE)), min(money, 999999L));
+            iflags.in_dumplog ? "$" : encglyph(objnum_to_glyph(GOLD_PIECE)),
+            min(money, 999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
     dx = strstri(dloc, "\\G") ? 9 : 0;
@@ -205,22 +214,24 @@ bot2()
         /* only two or three consecutive spaces available to squeeze out */
         mungspaces(newbot2);
     }
-
-    curs(WIN_STATUS, 1, 1);
-    putmixed(WIN_STATUS, 0, newbot2);
+    return newbot2;
 }
 
+#ifndef STATUS_VIA_WINDOWPORT
 void
 bot()
 {
-    if (youmonst.data) {
-        bot1();
-        bot2();
+    if (youmonst.data && iflags.status_updates) {
+        curs(WIN_STATUS, 1, 0);
+        putstr(WIN_STATUS, 0, do_statusline1());
+        curs(WIN_STATUS, 1, 1);
+        putmixed(WIN_STATUS, 0, do_statusline2());
     }
     context.botl = context.botlx = 0;
 }
-
 #endif /* !STATUS_VIA_WINDOWPORT */
+
+#endif /* !STATUS_VIA_WINDOWPORT || DUMPLOG */
 
 /* convert experience level (1..30) to rank index (0..8) */
 int
@@ -428,7 +439,7 @@ bot()
 
     if (!blinit)
         panic("bot before init.");
-    if (!youmonst.data) {
+    if (!youmonst.data || !iflags.status_updates) {
         context.botl = context.botlx = 0;
         update_all = FALSE;
         return;
@@ -463,18 +474,8 @@ bot()
     valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
-    buf[0] = '\0';
     blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
-    if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100))
-            Sprintf(buf, "%2d", ACURR(A_STR) - 100);
-        else if (ACURR(A_STR) < STR18(100))
-            Sprintf(buf, "18/%02d", ACURR(A_STR) - 18);
-        else
-            Sprintf(buf, "18/**");
-    } else
-        Sprintf(buf, "%-1d", ACURR(A_STR));
-    Strcpy(blstats[idx][BL_STR].val, buf);
+    Strcpy(blstats[idx][BL_STR].val, get_strength_str());
     valset[BL_STR] = TRUE; /* indicate val already set */
 
     /*  Dexterity, constitution, intelligence, wisdom, charisma. */
@@ -1290,16 +1291,17 @@ assign_hilite(char *sa, char *sb, char *sc, char *sd, boolean from_configfile)
     /* Now finally, we notify the window port */
     if (!from_configfile)
         status_threshold(idx, status_hilites[idx].anytype,
-                        status_hilites[idx].threshold,
-                        status_hilites[idx].behavior,
-                        status_hilites[idx].coloridx[0],
-                        status_hilites[idx].coloridx[1]);
+                         status_hilites[idx].threshold,
+                         status_hilites[idx].behavior,
+                         status_hilites[idx].coloridx[0],
+                         status_hilites[idx].coloridx[1]);
 
     return TRUE;
 }
 
+/*ARGUSED*/
 void
-status_notify_windowport(boolean all)
+status_notify_windowport(boolean all UNUSED)
 {
     int idx;
     anything it;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1455357587 2016/02/13 09:59:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1494034337 2017/05/06 01:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,10 @@ static const char
     *const minusattr[] = { "weak",    "stupid",
                            "foolish", "clumsy",
                            "fragile", "repulsive" };
+/* also used by enlightenment for non-abbreviated status info */
+const char
+    *const attrname[] = { "strength", "intelligence", "wisdom",
+                          "dexterity", "constitution", "charisma" };
 
 static const struct innate {
     schar ulevel;
@@ -101,6 +105,7 @@ static const struct innate {
 
 STATIC_DCL void exerper(void);
 STATIC_DCL void postadjabil(long *);
+STATIC_DCL const struct innate *role_abil(int);
 STATIC_DCL const struct innate *check_innate_abil(long *, long);
 STATIC_DCL int innately(long *);
 
@@ -110,7 +115,7 @@ adjattrib(int ndx,
           int incr,
           int msgflg) /* positive => no message, zero => message, and */
 {                     /* negative => conditional (msg if change made) */
-    int old_acurr;
+    int old_acurr, old_abase;
     boolean abonflg;
     const char *attrstr;
 
@@ -124,6 +129,7 @@ adjattrib(int ndx,
     }
 
     old_acurr = ACURR(ndx);
+    old_abase = ABASE(ndx);
     if (incr > 0) {
         ABASE(ndx) += incr;
         if (ABASE(ndx) > AMAX(ndx)) {
@@ -148,9 +154,14 @@ adjattrib(int ndx,
         abonflg = (ABON(ndx) > 0);
     }
     if (ACURR(ndx) == old_acurr) {
-        if (msgflg == 0 && flags.verbose)
-            pline("You're %s as %s as you can get.",
-                  abonflg ? "currently" : "already", attrstr);
+        if (msgflg == 0 && flags.verbose) {
+            if (ABASE(ndx) == old_abase)
+                pline("You're %s as %s as you can get.",
+                      abonflg ? "currently" : "already", attrstr);
+            else /* current stayed the same but base value changed */
+                Your("innate %s has %s.", attrname[ndx],
+                     (incr > 0) ? "improved" : "declined");
+        }
         return FALSE;
     }
 
@@ -217,12 +228,24 @@ poisontell(int typ,         /* which attribute */
            boolean exclaim) /* emphasis */
 {
     void (*func)(const char *, ...) = poiseff[typ].delivery_func;
+    const char *msg_txt = poiseff[typ].effect_msg;
 
-    (*func)("%s%c", poiseff[typ].effect_msg, exclaim ? '!' : '.');
+    /*
+     * "You feel weaker" or "you feel very sick" aren't appropriate when
+     * wearing or wielding something (gauntlets of power, Ogresmasher)
+     * which forces the attribute to maintain its maximum value.
+     * Phrasing for other attributes which might have fixed values
+     * (dunce cap) is such that we don't need message fixups for them.
+     */
+    if (typ == A_STR && ACURR(A_STR) == STR19(25))
+        msg_txt = "innately weaker";
+    else if (typ == A_CON && ACURR(A_CON) == 25)
+        msg_txt = "sick inside";
+
+    (*func)("%s%c", msg_txt, exclaim ? '!' : '.');
 }
 
-/* called when an attack or trap has poisoned the hero (used to be in mon.c)
- */
+/* called when an attack or trap has poisoned hero (used to be in mon.c) */
 void
 poisoned(const char *reason,        /* controls what messages we display */
          int typ,                   /* if fatal is 0, limit damage to adjattrib */
@@ -239,7 +262,8 @@ poisoned(const char *reason,        /* controls what messages we display */
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
 
         /* avoid "The" Orcus's sting was poisoned... */
-        pline("%s%s %s poisoned!", isupper(*reason) ? "" : "The ", reason,
+        pline("%s%s %s poisoned!",
+              isupper((uchar) *reason) ? "" : "The ", reason,
               plural ? "were" : "was");
     }
     if (Poison_resistance) {
@@ -265,6 +289,7 @@ poisoned(const char *reason,        /* controls what messages we display */
     if (i == 0 && typ != A_CHA) {
         /* instant kill */
         u.uhp = -1;
+        context.botl = TRUE;
         pline_The("poison was deadly...");
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */
@@ -634,54 +659,41 @@ postadjabil(long *ability)
 }
 
 STATIC_OVL const struct innate *
+role_abil(int r)
+{
+    const struct {
+        short role;
+        const struct innate *abil;
+    } roleabils[] = {
+        { PM_ARCHEOLOGIST, arc_abil },
+        { PM_BARBARIAN, bar_abil },
+        { PM_CAVEMAN, cav_abil },
+        { PM_HEALER, hea_abil },
+        { PM_KNIGHT, kni_abil },
+        { PM_MONK, mon_abil },
+        { PM_PRIEST, pri_abil },
+        { PM_RANGER, ran_abil },
+        { PM_ROGUE, rog_abil },
+        { PM_SAMURAI, sam_abil },
+        { PM_TOURIST, tou_abil },
+        { PM_VALKYRIE, val_abil },
+        { PM_WIZARD, wiz_abil },
+        { 0, 0 }
+    };
+    int i;
+
+    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++)
+        continue;
+    return roleabils[i].abil;
+}
+
+STATIC_OVL const struct innate *
 check_innate_abil(long *ability, long frommask)
 {
     const struct innate *abil = 0;
 
     if (frommask == FROMEXPER)
-        switch (Role_switch) {
-        case PM_ARCHEOLOGIST:
-            abil = arc_abil;
-            break;
-        case PM_BARBARIAN:
-            abil = bar_abil;
-            break;
-        case PM_CAVEMAN:
-            abil = cav_abil;
-            break;
-        case PM_HEALER:
-            abil = hea_abil;
-            break;
-        case PM_KNIGHT:
-            abil = kni_abil;
-            break;
-        case PM_MONK:
-            abil = mon_abil;
-            break;
-        case PM_PRIEST:
-            abil = pri_abil;
-            break;
-        case PM_RANGER:
-            abil = ran_abil;
-            break;
-        case PM_ROGUE:
-            abil = rog_abil;
-            break;
-        case PM_SAMURAI:
-            abil = sam_abil;
-            break;
-        case PM_TOURIST:
-            abil = tou_abil;
-            break;
-        case PM_VALKYRIE:
-            abil = val_abil;
-            break;
-        case PM_WIZARD:
-            abil = wiz_abil;
-            break;
-        default:
-            break;
-        }
+        abil = role_abil(Role_switch);
     else if (frommask == FROMRACE)
         switch (Race_switch) {
         case PM_DWARF:
@@ -715,10 +727,10 @@ check_innate_abil(long *ability, long frommask)
 #define FROM_NONE 0
 #define FROM_ROLE 1 /* from experience at level 1 */
 #define FROM_RACE 2
-#define FROM_EXP  3 /* from experience for some level > 1 */
-#define FROM_FORM 4
-#define FROM_LYCN 5
-
+#define FROM_INTR 3 /* intrinsically (eating some corpse or prayer reward) */
+#define FROM_EXP  4 /* from experience for some level > 1 */
+#define FROM_FORM 5
+#define FROM_LYCN 6
 
 /* check whether particular ability has been obtained via innate attribute */
 STATIC_OVL int
@@ -730,6 +742,8 @@ innately(long *ability)
         return (iptr->ulevel == 1) ? FROM_ROLE : FROM_EXP;
     if ((iptr = check_innate_abil(ability, FROMRACE)) != 0)
         return FROM_RACE;
+    if ((*ability & FROMOUTSIDE) != 0L)
+        return FROM_INTR;
     if ((*ability & FROMFORM) != 0L)
         return FROM_FORM;
     return FROM_NONE;
@@ -743,6 +757,8 @@ is_innate(int propidx)
     /* innately() would report FROM_FORM for this; caller wants specificity */
     if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
         return FROM_LYCN;
+    if (propidx == FAST && Very_fast)
+        return FROM_NONE; /* can't become very fast innately */
     if ((innateness = innately(&u.uprops[propidx].intrinsic)) != FROM_NONE)
         return innateness;
     if (propidx == JUMPING && Role_if(PM_KNIGHT)
@@ -772,21 +788,45 @@ from_what(int propidx)  /* special cases can have negative values */
             struct obj *obj = (struct obj *) 0;
             int innateness = is_innate(propidx);
 
-            if (innateness == FROM_EXP)
+            /*
+             * Properties can be obtained from multiple sources and we
+             * try to pick the most significant one.  Classification
+             * priority is not set in stone; current precedence is:
+             * "from the start" (from role or race at level 1),
+             * "from outside" (eating corpse, divine reward, blessed potion),
+             * "from experience" (from role or race at level 2+),
+             * "from current form" (while polymorphed),
+             * "from timed effect" (potion or spell),
+             * "from worn/wielded equipment" (Firebrand, elven boots, &c),
+             * "from carried equipment" (mainly quest artifacts).
+             * There are exceptions.  Versatile jumping from spell or boots
+             * takes priority over knight's innate but limited jumping.
+             */
+            if (propidx == BLINDED && u.uroleplay.blind)
+                Sprintf(buf, " from birth");
+            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
+                Strcpy(buf, " innately");
+            else if (innateness == FROM_INTR) /* [].intrinsic & FROMOUTSIDE */
+                Strcpy(buf, " intrinsically");
+            else if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
             else if (innateness == FROM_LYCN)
                 Strcpy(buf, " due to your lycanthropy");
             else if (innateness == FROM_FORM)
                 Strcpy(buf, " from current creature form");
-            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
-                Strcpy(buf, " innately");
+            else if (propidx == FAST && Very_fast)
+                Sprintf(buf, because_of,
+                        ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
+                          : ((EFast & W_ARMF) != 0L && uarmf->dknown
+                             && objects[uarmf->otyp].oc_name_known)
+                              ? ysimple_name(uarmf) /* speed boots */
+                                : EFast ? "worn equipment"
+                                  : something);
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
                 Sprintf(buf, because_of, obj->oartifact
                                              ? bare_artifactname(obj)
                                              : ysimple_name(obj));
-            else if (propidx == BLINDED && u.uroleplay.blind)
-                Sprintf(buf, " from birth");
             else if (propidx == BLINDED && Blindfolded_only)
                 Sprintf(buf, because_of, ysimple_name(ublindf));
 
@@ -829,50 +869,7 @@ adjabil(int oldlevel, int newlevel)
     register const struct innate *abil, *rabil;
     long prevabil, mask = FROMEXPER;
 
-    switch (Role_switch) {
-    case PM_ARCHEOLOGIST:
-        abil = arc_abil;
-        break;
-    case PM_BARBARIAN:
-        abil = bar_abil;
-        break;
-    case PM_CAVEMAN:
-        abil = cav_abil;
-        break;
-    case PM_HEALER:
-        abil = hea_abil;
-        break;
-    case PM_KNIGHT:
-        abil = kni_abil;
-        break;
-    case PM_MONK:
-        abil = mon_abil;
-        break;
-    case PM_PRIEST:
-        abil = pri_abil;
-        break;
-    case PM_RANGER:
-        abil = ran_abil;
-        break;
-    case PM_ROGUE:
-        abil = rog_abil;
-        break;
-    case PM_SAMURAI:
-        abil = sam_abil;
-        break;
-    case PM_TOURIST:
-        abil = tou_abil;
-        break;
-    case PM_VALKYRIE:
-        abil = val_abil;
-        break;
-    case PM_WIZARD:
-        abil = wiz_abil;
-        break;
-    default:
-        abil = 0;
-        break;
-    }
+    abil = role_abil(Role_switch);
 
     switch (Race_switch) {
     case PM_ELF:
@@ -1004,13 +1001,16 @@ acurr(int x)
 #ifdef WIN32_BUG
             return (x = ((tmp <= 3) ? 3 : tmp));
 #else
-        return (schar) ((tmp <= 3) ? 3 : tmp);
+            return (schar) ((tmp <= 3) ? 3 : tmp);
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
             && (youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
                 || u.umonnum == PM_INCUBUS))
             return (schar) 18;
+    } else if (x == A_CON) {
+        if (uwep && uwep->oartifact == ART_OGRESMASHER)
+            return (schar) 25;
     } else if (x == A_INT || x == A_WIS) {
         /* yes, this may raise int/wis if player is sufficiently
          * stupid.  there are lower levels of cognition than "dunce".
@@ -1054,6 +1054,9 @@ extremeattr(int attrindx) /* does attrindx's value match its max or min? */
         hilimit = STR19(25); /* 125 */
         /* lower limit for Str can also be 25 */
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER)
+            lolimit = hilimit;
+    } else if (attrindx == A_CON) {
+        if (uwep && uwep->oartifact == ART_OGRESMASHER)
             lolimit = hilimit;
     }
     /* this exception is hypothetical; the only other worn item affecting

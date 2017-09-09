@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.203 $ $NHDT-Date: 1456192371 2016/02/23 01:52:51 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ $NHDT-Date: 1498078870 2017/06/21 21:01:10 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -295,7 +295,7 @@ do other tasks requiring agility or manipulation of objects.
 .lp Constitution
 Constitution affects your ability to recover from injuries and other
 strains on your stamina.
-When strength is low or modest, consitution also affects how much you
+When strength is low or modest, constitution also affects how much you
 can carry.  With sufficiently high strength, the contribution to
 carrying capacity from your constitution no longer matters.
 .lp Intelligence
@@ -345,7 +345,7 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 .op time
 option set.
-.lp Status
+.lp "Status  "
 Hunger:
 your current hunger status.
 Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
@@ -354,7 +354,7 @@ Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
 Not shown when \fBNormal\fP.
 .lp ""
 Encumbrance:
-an indication of how what your are carrying affects your ability to move.
+an indication of how what you are carrying affects your ability to move.
 Values are \fBUnencumbered\fP, \fBEncumbered\fP, \fBStressed\fP,
 \fBStrained\fP, \fBOvertaxed\fP, and \fBOverloaded\fP.
 Not shown when \fBUnencumbered\fP.
@@ -368,7 +368,7 @@ Fatal conditions:
 .lp ""
 Non-fatal conditions:
 \fBBlind\fP (can't see), \fBDeaf\fP (can't hear),
-\fBStun\fB (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
+\fBStun\fP (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
 .lp ""
 Movement modifiers:
 \fBLev\fP (levitating), \fBFly\fP (flying), \fBRide\fP (riding).
@@ -465,7 +465,9 @@ more info).
 .hn 1
 Commands
 .pg
-Commands are initiated by typing one or two characters.  Some commands,
+Commands can be initiated by typing one or two characters to which
+the command is bound to, or typing the command name in the extended
+commands entry.  Some commands,
 like ``search'', do not require that any more information be collected by
 NetHack.  Other commands might require additional information, for
 example a direction, or an object to be used.  For those commands that
@@ -498,11 +500,11 @@ ESC key.
 .pg
 The list of commands is rather long, but it can be read at any time
 during the game through the `?' command, which accesses a menu of
-helpful texts.  Here are the commands for your reference:
+helpful texts.  Here are the default key bindings for your reference:
 .lp ?
 Help menu:  display one of several help texts available.
 .lp /
-The ``what-is'' command, to
+The ``whatis'' command, to
 tell what a symbol represents.  You may choose to specify a location
 or type a symbol (or even a whole word) to explain.
 Specifying a location is done by moving the cursor to a particular spot
@@ -570,9 +572,24 @@ Figure 2
 Go in that direction until you hit a wall or run into something.
 .lp m[yuhjklbn]
 Prefix:  move without picking up objects or fighting (even if you remember
-a monster there)
+a monster there).
+.lp ""
+A few non-movement commands use the `m' prefix to request operating
+via menu (to temporarily override the
+.op menustyle:Traditional
+option).
+Primarily useful for `,' (pickup) when there is only one class of
+objects present (where there won't be any ``what kinds of objects?'' prompt,
+so no opportunity to answer `m' at that prompt).
+.lp ""
+A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+the `m' prefix to skip checking for applicable objects on the floor
+and go straight to checking inventory,
+or (for ``#loot'' to remove a saddle),
+skip containers and go straight to adjacent monsters. The prefix will
+make ``#travel'' command show a menu of interesting targets in sight.
 .lp F[yuhjklbn]
-Prefix:  fight a monster (even if you only guess one is there)
+Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
 Prefix:  move far, no pickup.
 .lp "g[yuhjklbn]
@@ -591,7 +608,7 @@ objects, similar to the `M' command.  For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
-Rest, do nothing for one turn.
+Wait or rest, do nothing for one turn.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp A
@@ -640,6 +657,11 @@ D%u - drop only unpaid food.
 Kick something (usually a door).
 .lp e
 Eat food.
+.lp ""
+Normally checks for edible item(s) on the floor, then if none are found
+or none are chosen, checks for edible item(s) in inventory.
+Precede `e' with the `m' prefix to bypass attempting to eat
+anything off the floor.
 .\" Make sure Elbereth is not hyphenated below, the exact spelling matters
 .hw Elbereth
 .lp E
@@ -691,6 +713,14 @@ a further menu or prompt will appear once you've closed this menu.
 The available options
 are listed later in this Guidebook.  Options are usually set before the
 game rather than with the `O' command; see the section on options below.
+.lp ^O
+Show overview or show dungeon layout
+.lp ""
+In normal play and in explore mode, a shortcut for the ``#overview''
+extended command to list interesting dungeon levels visited.
+.lp ""
+In debug mode, an extra command which lists the placement of all special
+levels.
 .lp p
 Pay your shopping bill.
 .lp P
@@ -796,7 +826,7 @@ via the ``#twoweapon'' extended command.
 .lp ""
 (In versions prior to 3.6 this was the command to switch from normal
 play to "explore mode", also known as "discovery mode", which has now
-been moved to ``#explore''.)
+been moved to ``#exploremode''.)
 .lp ^X
 Display basic information about your character.
 .lp ""
@@ -876,6 +906,7 @@ Escape to a shell.
 .lp #
 Perform an extended command.
 .lp ""
+.pg
 As you can see, the authors of NetHack
 used up all the letters, so this is a way to introduce the less frequently
 used commands.
@@ -884,7 +915,7 @@ compiled with.
 .lp #adjust
 Adjust inventory letters (most useful when the
 .op fixinv
-option is ``on'').
+option is ``on''). Autocompletes. Default key is 'M-a'.
 .lp ""
 This command allows you to move an item from one particular inventory
 slot to another so that it has a letter which is more meaningful for you
@@ -895,48 +926,117 @@ choosing the item to adjust, enter a count prior to its letter.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the
-``#overview'' command.
+``#overview'' command. Autocompletes. Default key is 'M-A', and '^N' if number_pad is on.
+.lp #apply
+Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
+If the tool used acts on items on the floor, using the `m' prefix skips those items.
+.lp #attributes
+Show your attributes. Default key is '^X'.
+.lp #autopickup
+Toggle the autopickup -option on/off. Default key is '@'.
+.lp #call
+Call (name) a monster, or a object in inventory, on the floor,
+or in the discoveries list, or add an annotation for the
+current level (same as ``#annotate'').  Default key is 'C'.
+.lp #cast
+Cast a spell. Default key is 'Z'.
 .lp #chat
-Talk to someone.
+Talk to someone. Default key is 'M-c'.
+.lp #close
+Close a door. Default key is 'c'.
 .lp #conduct
-List voluntary challenges you have maintained.
+List voluntary challenges you have maintained. Autocompletes. Default key is 'M-C'.
 .lp ""
 See the section below entitled ``Conduct'' for details.
 .lp "#dip "
-Dip an object into something.
+Dip an object into something. Autocompletes. Default key is 'M-d'.
+.lp #down
+Go down a staircase. Default key is '>'.
+.lp #drop
+Drop an item. Default key is 'd'.
+.lp #droptype
+Drop specific item types. Default key is 'D'.
+.lp "#eat "
+Eat something. Default key is 'e'.
+The `m' prefix skips eating items on the floor.
+.lp #engrave
+Engrave writing on the floor. Default key is 'E'.
 .lp #enhance
-Advance or check weapon and spell skills.
+Advance or check weapon and spell skills. Autocompletes. Default key is 'M-e'.
 .lp #exploremode
 Enter the explore mode.
+.lp #fire
+Fire ammunition from quiver. Default key is 'f'.
 .lp #force
-Force a lock.
+Force a lock. Autocompletes. Default key is 'M-f'.
+.lp #glance
+Show what type of thing a map symbol corresponds to. Default key is ';'.
+.lp #help
+Show the help menu. Default key is '?', and 'h' if number_pad is on.
+.lp #history
+Show long version and game history. Default key is 'V'.
+.lp #inventory
+Show your inventory. Default key is 'i'.
+.lp #inventtype
+Inventory specific item types. Default key is 'I'.
 .lp #invoke
-Invoke an object's special powers.
+Invoke an object's special powers. Autocompletes. Default key is 'M-i'.
 .lp #jump
-Jump to another location.
+Jump to another location. Autocompletes. Default key is 'M-j', and 'j' if number_pad is on.
 .lp #kick
-Kick something.
+Kick something. Default key is '^D', and 'k' if number_pad is on.
+.lp #known
+Show what object types have been discovered. Default key is '\'.
+.lp #knownclass
+Show discovered types for one class of objects. Default key is '`'.
+.lp #levelchange
+Change your experience level. Autocompletes. Wizard-mode only.
+.lp #lightsources
+Show mobile light sources. Autocompletes. Wizard-mode only.
+.lp #look
+Look at what is here, under you. Default key is ':'.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle
-from a steed standing next to you.
+from a steed standing next to you. Autocompletes.
+Precede with the `m' prefix to skip containers at your location
+and go directly to removing a saddle. Default key is 'M-l', and 'l' if number_pad is on.
+.lp #monpolycontrol
+Control monster polymorphs. Autocompletes. Wizard-mode only.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
+Autocompletes. Default key is 'M-m'.
 .lp #name
-Name a monster, an individual object, or a type of object.  Same as `C'.
+Name a monster, an individual object, or a type of object.  Same as #call.
+Autocompletes. Default keys are 'N', 'M-n', and 'M-N'.
 .lp #offer
-Offer a sacrifice to the gods.
+Offer a sacrifice to the gods. Autocompletes. Default key is 'M-o'.
+The `m' prefix skips offering items on the altar.
 .lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
+.lp #open
+Open a door. Default key is 'o'.
+.lp #options
+Show and change option settings. Default key is 'O'.
 .lp #overview
 Display information you've discovered about the dungeon.  Any visited
 level (unless forgotten due to amnesia) with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
-level will be included regardless of annotations.
+level will be included regardless of annotations. Autocompletes.
+Default keys are '^O', and 'M-O'.
+.lp #panic
+Test the panic routine. Autocompletes. Wizard-mode only.
+.lp "#pay "
+Pay your shopping bill. Default key is 'p'.
+.lp #pickup
+Pick up things at the current location. Default key is ','.
+The `m' prefix forces use of a menu.
+.lp #polyself
+Polymorph self. Autocompletes. Wizard-mode only.
 .lp #pray
-Pray to the gods for help.
+Pray to the gods for help. Autocompletes. Default key is 'M-p'.
 .lp ""
 Praying too soon after receiving prior help is a bad idea.
 (Hint: entering the dungeon alive is treated as having received help.
@@ -946,42 +1046,160 @@ option to make you confirm your intent before praying.  It is enabled
 by default, and you can reset the
 .op paranoid_confirmation
 option to disable it.
+.lp #prevmsg
+Show previously displayed game messages. Default key is '^P'.
+.lp #puton
+Put on an accessory (ring, amulet, etc). Default key is 'P'.
+.lp #quaff
+Quaff (drink) something. Default key is 'q'.
 .lp #quit
-Quit the program without saving your game.
+Quit the program without saving your game. Autocompletes. Default key is 'M-q'.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of 'y' acknowledges that intent.  You can set the
 .op paranoid_confirmation
 option to require a response of "yes" instead.
+.lp #quiver
+Select ammunition for quiver. Default key is 'Q'.
+.lp #read
+Read a scroll, a spellbook, or something else. Default key is 'r'.
+.lp #redraw
+Redraw the screen. Default key is '^R', and '^L' if number_pad is on.
+.lp #remove
+Remove an accessory (ring, amulet, etc). Default key is 'R'.
 .lp #ride
-Ride (or stop riding) a saddled creature.
+Ride (or stop riding) a saddled creature. Autocompletes. Default key is 'M-R'.
 .lp "#rub "
-Rub a lamp or a stone.
+Rub a lamp or a stone. Autocompletes. Default key is 'M-r'.
+.lp #save
+Save the game. Default key is 'S'.
+.lp #search
+Search for traps and secret doors around you. Default key is 's'.
+.lp #seeall
+Show all equipment in use. Default key is '*'.
+.lp #seeamulet
+Show the amulet currently worn. Default key is '"'.
+.lp #seearmor
+Show the armor currently worn. Default key is '['.
+.lp #seegold
+Count your gold. Default key is '$'.
+.lp #seenv
+Show seen vectors. Autocompletes. Wizard-mode only.
+.lp #seerings
+Show the ring(s) currently worn. Default key is '='.
+.lp #seespells
+List and reorder known spells. Default key is '+'.
+.lp #seetools
+Show the tools currently in use. Default key is '('.
+.lp #seetrap
+Show the type of a trap near you. Default key is '^'.
+.lp #seeweapon
+Show the weapon currently wielded. Default key is ')'.
+.lp #shell
+Do a shell escape. Default key is '!'.
 .lp "#sit "
-Sit down.
+Sit down. Autocompletes. Default key is 'M-s'.
+.lp #stats
+Show memory statistics. Autocompletes. Wizard-mode only.
+.lp #suspend
+Suspend the game. Default key is '^Z'.
+.lp #swap
+Swap wielded and secondary weapons. Default key is 'x'.
+.lp #takeoff
+Take off one piece of armor. Default key is 'T'.
+.lp #takeoffall
+Remove all armor. Default key is 'A'.
+.lp #teleport
+Teleport around the level. Default key is '^T'.
 .lp #terrain
 Show bare map without displaying monsters, objects, or traps.
+Autocompletes.
+.lp #throw
+Throw something. Default key is 't'.
+.lp #timeout
+Look at the timeout queue. Autocompletes. Wizard-mode only.
 .lp "#tip "
 Tip over a container (bag or box) to pour out its contents.
+Autocompletes. Default key is 'M-T'.
+The `m' prefix makes the command use a menu.
+.lp #travel
+Travel to a specific location on the map. Default key is '_'.
+Using the ``request menu'' prefix shows a menu of interesting targets in sight
+without asking to move the cursor. When picking a target with cursor and
+the
+.op autodescribe
+-option is on, the top line will show "(no travel path)" if
+your character does not know of a path to that location.
 .lp #turn
-Turn undead.
+Turn undead away. Autocompletes. Default key is 'M-t'.
 .lp #twoweapon
-Toggle two-weapon combat on or off.
+Toggle two-weapon combat on or off. Autocompletes. Default keys
+are 'X', and 'M-2'.
 .lp ""
 Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 .lp #untrap
-Untrap something (trap, door, or chest).
+Untrap something (trap, door, or chest). Default key is 'M-u', and 'u' if number_pad is on.
 .lp ""
 In some circumstances it can also be used to rescue trapped monsters.
+.lp "#up  "
+Go up a staircase. Default key is '<'.
+.lp #vanquished
+List vanquished monsters. Autocompletes. Wizard-mode only.
 .lp #version
 Print compile time options for this version of NetHack.
+Autocompletes. Default key is 'M-v'.
+.lp #versionshort
+Show version string. Default key is 'v'.
+.lp #vision
+Show vision array. Autocompletes. Wizard-mode only.
+.lp #wait
+Rest one move while doing nothing. Default key is '.', and ' ' if
+rest_on_space is on.
+.lp #wear
+Wear a piece of armor. Default key is 'W'.
+.lp #whatdoes
+Tell what a key does. Default key is '&'.
+.lp #whatis
+Show what type of thing a symbol corresponds to. Default key is '/'.
+.lp #wield
+Wield a weapon. Default key is 'w'.
 .lp #wipe
-Wipe off your face.
+Wipe off your face. Autocompletes. Default key is 'M-w'.
+.lp #wizdebug_bury
+Bury objects under and around you. Autocompletes. Wizard-mode only.
+.lp #wizdebug_traveldisplay
+Toggle travel display. Autocompletes. Wizard-mode only.
+.lp #wizdetect
+Search a room. Autocompletes. Wizard-mode only. Default key is '^E'.
+.lp #wizgenesis
+Create a monster. Autocompletes. Wizard-mode only. Default key is '^G'.
+.lp #wizidentify
+Identify all items in inventory. Autocompletes. Wizard-mode only.
+Default key is '^I'.
+.lp #wizintrinsic
+Set intrinsic. Autocompletes. Wizard-mode only.
+.lp #wizlevelport
+Teleport to another level. Autocompletes. Wizard-mode only. Default key is '^V'.
+.lp #wizmap
+Map the level. Autocompletes. Wizard-mode only. Default key is '^F'.
+.lp #wizrumorcheck
+Verify rumor boundaries. Autocompletes. Wizard-mode only.
+.lp #wizsmell
+Smell monster. Autocompletes. Wizard-mode only.
+.lp #wizwhere
+Show locations of special levels. Autocompletes. Wizard-mode only.
+.lp #wizwish
+Wish for something. Autocompletes. Wizard-mode only. Default key is '^W'.
+.lp #wmode
+Show wall modes. Autocompletes. Wizard-mode only.
+.lp "#zap "
+Zap a wand. Default key is 'z'.
 .lp "#?   "
 Help menu:  get the list of available extended commands.
+.lp ""
 .pg
 If your keyboard has a meta key (which, when pressed in combination
 with another key, modifies it by setting the `meta' [8th, or `high']
@@ -1049,6 +1267,7 @@ option to have nethack combine them into meta+key.
 #version
 .lp M-w
 #wipe
+.lp ""
 .pg
 If the
 .op number_pad
@@ -1212,8 +1431,8 @@ help you locate them before they locate you (which some monsters can do
 very well).
 .pg
 The commands `/' and `;' may be used to obtain information about those
-monsters who are displayed on the screen.  The command ``#name'', or
-its synonym `C', allows you
+monsters who are displayed on the screen.  The command ``#name''
+(by default bound to `C'), allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1275,13 +1494,21 @@ have the right equipment and skill.  Convincing a wild beast to let
 you saddle it up is difficult to say the least.  Many a dungeoneer
 has had to resort to magic and wizardry in order to forge the alliance.
 Once you do have the beast under your control however, you can
-easily climb in and out of the saddle with the `#ride' command.  Lead
+easily climb in and out of the saddle with the ``#ride'' command.  Lead
 the beast around the dungeon when riding, in the same manner as
 you would move yourself.  It is the beast that you will see displayed
 on the map.
 .pg
-Riding skill is managed by the `#enhance' command.  See the section
+Riding skill is managed by the ``#enhance'' command.  See the section
 on Weapon proficiency for more information about that.
+.pg
+Use the `a' (apply) command and pick a saddle in your inventory to
+attempt to put that saddle on an adjacent creature.  If successful,
+it will be transferred to that creature's inventory.
+.pg
+Use the ``#loot'' command while adjacent to a saddled creature to
+try to remove the saddle from that creature.  If successful, it will
+be transferred to your inventory.
 .hn 2
 Bones levels
 .pg
@@ -1338,7 +1565,7 @@ When you use one of these objects, if its effect is obvious, NetHack
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``#name''
-command, or its synonym `C', for the same purpose at any time, to name
+command, for the same purpose at any time, to name
 all objects of a particular type or just an individual object.
 When you use ``#name'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
@@ -1958,11 +2185,151 @@ Setting the options
 .pg
 Options may be set in a number of ways.  Within the game, the `O'
 command allows you to view all options and change most of them.
-You can also set options automatically by placing them in the
-NETHACKOPTIONS environment variable or in a configuration file.
+You can also set options automatically by placing them in a configuration
+file, or in the NETHACKOPTIONS environment variable.
 Some versions of NetHack also have front-end programs that allow
 you to set options before starting the game or a global configuration
 for system administrators.
+.hn 2
+Using a configuration file
+.pg
+The default name of the configuration file varies on different
+operating systems. On DOS and Windows, it is ``defaults.nh''
+in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
+and Mac OS X it is ``.nethackrc'' in the user's home directory.
+The file may not exist, but it is a normal ASCII text file and
+can be created with any text editor.
+.pg
+Any line in the configuration file starting with `#' is treated as a comment.
+Empty lines are ignored.
+.pg
+Any line beginning with `[' and ending in `]' is considered a section
+marker. The text between the square brackets is the section name.
+Lines after a section marker belong to that section, and are
+ignored unless a CHOOSE -statement was used to select that section.
+Section names are case insensitive.
+.pg
+You can use different configuration statements in the file, some
+of which can be used multiple times. In general, the statements are
+written in capital letters, followed by an equals sign, followed by
+settings particular to that statement. Here is a list of allowed statements:
+.lp OPTIONS
+There are two types of options, boolean and compound options.
+Boolean options toggle a setting on or off, while compound options
+take more diverse values.
+Prefix a boolean option with `no' or `!' to turn it off.
+For compound options, the option name and value are separated by a colon.
+Some options are persistent, and apply only to new games.
+You can specify multiple OPTIONS statements, and multiple options
+in a single OPTIONS statement.
+.pg
+Example:
+.sd
+\fBOPTIONS=dogname:Fido\fP
+\fBOPTIONS=!legacy,autopickup,pickup_types:$"=/!?+\fP
+.ed
+.lp HACKDIR
+Default location of files NetHack needs. On Windows HACKDIR
+defaults to the location of the NetHack.exe or NetHackw.exe file
+so setting HACKDIR to override that is not usually necessary or recommended.
+.lp LEVELDIR
+The location that in-progress level files are stored. Defaults to HACKDIR,
+must be writeable.
+.lp SAVEDIR
+The location where saved games are kept. Defaults to HACKDIR, must be
+writeable.
+.lp BONESDIR
+The location that bones files are kept. Defaults to HACKDIR, must be
+writeable.
+.lp LOCKDIR
+The location that file synchronization locks are stored. Defaults to
+HACKDIR, must be writeable.
+.lp TROUBLEDIR
+The location that a record of game aborts and self-diagnosed game problems
+is kept. Defaults to HACKDIR, must be writeable.
+.lp AUTOCOMPLETE
+Enable or disable an extended command autocompletion.
+Autocompletion has no effect for the X11 windowport.
+You can specify multiple autocompletions. To enable
+autocompletion, list the extended command. Prefix the
+command with ``!'' to disable the autocompletion
+for that command.
+.pg
+Example:
+.sd
+\fBAUTOCOMPLETE=zap,!annotate\fP
+.ed
+.lp AUTOPICKUP_EXCEPTION
+Set exceptions to the
+.op pickup_types
+option. See the ``Configuring Autopickup Exceptions'' section.
+.lp BINDINGS
+Change the key bindings of some special keys, menu accelerators, or
+extended commands. You can specify multiple bindings. Format is key
+followed by the command, separated by a colon.
+See the ``Changing Key Bindings`` section for more information.
+.pg
+Example:
+.sd
+\fBBIND=^X:getpos.autodescribe\fP
+.ed
+.lp CHOOSE
+Chooses at random one of the comma-separated parameters as an active
+section name. Lines in other sections are ignored.
+.pg
+Example:
+.sd
+\fBOPTIONS=color\fP
+\fBCHOOSE=char A,char B\fP
+\fB[char A]\fP
+\fBOPTIONS=role:arc,race:dwa,align:law,gender:fem\fP
+\fB[char B]\fP
+\fBOPTIONS=role:wiz,race:elf,align:cha,gender:mal\fP
+.ed
+.lp MSGTYPE
+Change the way messages are shown in the top status line.
+See the ``Configuring Message Types`` section.
+.lp MENUCOLOR
+Highlight menu lines with different colors.
+See the ``Configuring Menu Colors`` section.
+.lp SYMBOLS
+Override one or more symbols in the symbols files.
+See the ``Modifying NetHack Symbols'' section.
+.pg
+Example:
+.sd
+\fBSYMBOLS=S_boulder:0\fP
+.ed
+.lp WIZKIT
+Wizard-mode extra items, in a text file containing item names,
+one per line, up to a maximum of 128 lines. Each line is processed
+by the function that handles wishing.
+.pg
+Example:
+.sd
+\fBWIZKIT=~/wizkit.txt\fP
+.ed
+.lp SOUNDDIR
+Define the directory that contains the sound files.
+See the ``Configuring User Sounds'' section.
+.lp SOUND
+Define a sound mapping. See the ``Configuring User Sounds'' section.
+.pg
+Here is a short example of config file contents:
+.sd
+\fB# Set your character's role, race, gender, and alignment.\fP
+\fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
+
+\fB# Turn on autopickup, and set automatically picked up object types\fP
+\fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
+\fB# Show colored text if possible\fP
+\fBOPTIONS=color\fP
+\fB# Show lit corridors differently\fP
+\fBOPTIONS=lit_corridor\fP
+
+\fB# No startup splash screen. Windows GUI only.\fP
+\fBOPTIONS=!splash_screen\fP
+.ed
 .hn 2
 Using the NETHACKOPTIONS environment variable
 .pg
@@ -1986,48 +2353,9 @@ $ \fBNETHACKOPTIONS="autoquiver,!autopickup,name:Blue Meanie,fruit:papaya"\fP
 $ \fBexport NETHACKOPTIONS\fP
 .ed
 in \fIsh\fP or \fIksh\fP.
-.hn 2
-Using a configuration file
 .pg
-Any line in the configuration file starting with `#' is treated as a comment.
-Any line in the configuration file starting with ``OPTIONS='' may be
-filled out with options in the same syntax as in NETHACKOPTIONS.
-Any line starting with ``SYMBOLS=''
-is taken as defining the corresponding symbol
-in a different syntax, a sequence of decimal numbers giving
-the character position in the current font to be used in displaying
-each entry. Such a sequence can be continued to multiple lines by
-putting a `\e'
-at the end of each line to be continued.
-.pg
-Any line starting with ``AUTOPICKUP_EXCEPTION='' is taken
-as defining an exception to the
-.op pickup_types
-option.
-There is a section of this Guidebook that discusses that.
-.pg
-The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is ``defaults.nh''
-in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
-and Mac OS X it is ``.nethackrc'' in the user's home directory.
-NETHACKOPTIONS can also be set to the full name of a file you
+NETHACKOPTIONS can also be set to the full name of a configuration file you
 want to use (possibly preceded by an `@').
-.pg
-Here is a short example of config file contents:
-.sd
-\fB# Set your character's role, race, gender, and alignment.\fP
-\fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
-
-\fB# Turn on autopickup, and set automatically picked up object types\fP
-\fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
-\fB# Show colored text if possible\fP
-\fBOPTIONS=color\fP
-\fB# Show lit corridors differently\fP
-\fBOPTIONS=lit_corridor\fP
-
-\fB# No startup splash screen. Windows GUI only.\fP
-\fBOPTIONS=!splash_screen\fP
-.ed
 .hn 2
 Customization options
 .pg
@@ -2140,6 +2468,20 @@ lets you refine how it behaves.  Here are the valid prefixes:
 .CC - "do not disclose it and do not prompt."
 .ei
 .ed
+The listing of vanquished monsters can be sorted,
+so there are two additional choices for `v':
+.sd
+.si
+.CC ? "prompt you and default to ask on the prompt;"
+.CC # "disclose it without prompting, ask for sort order."
+.ei
+.ed
+Asking refers to picking one of the orderings from a menu.
+The `+' disclose without prompting choice,
+or being prompted and answering `y' rather than `a',
+will default to showing monsters in the traditional order,
+from high level to low level.
+.lp ""
 Omitted categories are implicitly added with `n' prefix.
 Specified categories with omitted prefix implicitly use `+' prefix.
 Order of the disclosure categories does not matter, program display for
@@ -2188,6 +2530,14 @@ The default is to randomly pick an appropriate gender.
 If you prefix the value with `!' or ``no'', you will
 exclude that gender from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
+.lp "goldX   "
+When filtering objects based on bless/curse state (BUCX), whether to
+treat gold pieces as X (unknown bless/curse state, when `on')
+or U (known to be uncursed, when `off', the default).
+Gold is never blessed or cursed, but it is not described as ``uncursed''
+even when the
+.op implicit_uncursed
+option is `off'.
 .lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
@@ -2363,7 +2713,7 @@ is the same as specifying 0.
 (Settings 2 and 4 are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `5', `Alt-5' acts as `G'
 and `Alt-0' acts as `I'.
-Setting -1 is to accommodate some German keyboards which have the
+Setting -1 is to accommodate some QWERTZ keyboards which have the
 location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
@@ -2399,6 +2749,8 @@ require "yes" rather than 'y' to confirm breaking a wand;
 .PL Remove
 require selection from inventory for 'R' and 'T'
 commands even when wearing just one applicable item.
+.PL all
+turn on all of the above.
 .PE
 By default, the pray choice is enabled, the others disabled.
 To disable it without setting
@@ -2464,7 +2816,7 @@ If you prefix the value with `!' or ``no'', you will
 exclude that race from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp rest_on_space
-Make the space bar a synonym for the `.' (rest) command (default off).
+Make the space bar a synonym for the `.' (#wait) command (default off).
 Persistent.
 .lp "role    "
 Pick your type of character (ex. ``role:Samurai'');
@@ -2544,7 +2896,9 @@ attack to which it is resistant (default on).  Persistent.
 Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
 .lp statushilites
 Enable coloring of status fields (default off).
-See ``Configuring Status Hilites'' for futher information.
+See ``Configuring Status Hilites'' for further information.
+.lp status_updates
+Allow updates to the status lines at the bottom of the screen (default true).
 .lp suppress_alert
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that
@@ -2580,10 +2934,11 @@ When using the `/' or `;' commands to look around on the map with
 on, display coordinates after the description.
 Also works in other situations where you are asked to pick a location.
 .lp ""
-The possibile settings are:
+The possible settings are:
 .sd
 .si
 .CC c "compass ('east' or '3s' or '2n,4w');"
+.CC f "full compass ('east' or '3south' or '2north,4west');"
 .CC m "map <x,y> (map column x=0 is not used);"
 .CC s "screen [row,column] (row is offset to match tty usage);"
 .CC n "none (no coordinates shown) [default]."
@@ -2595,6 +2950,32 @@ The
 option is also used with
 the `/m', `/M', `/o', and `/O' sub-commands of `/',
 where the `none' setting is overridden with `map'.
+.lp whatis_filter
+When getting a location on the map, and using the keys to cycle through
+next and previous targets, allows filtering the possible targets.
+.lp ""
+.sd
+.si
+.CC n "no filtering [default]"
+.CC v "in view only"
+.CC a "in same area only"
+.ei
+.ed
+.lp ""
+The area-filter tries to be slightly predictive - if you're standing on a doorway,
+it will consider the area on the side of the door you were last moving towards.
+.lp ""
+Filtering can also be changed when getting a location with the ``getpos.filter''
+key.
+.lp whatis_menu
+When getting a location on the map, and using a key to cycle through
+next and previous targets, use a menu instead to pick a target.
+(default off)
+.lp whatis_moveskip
+When getting a location on the map, and using shifted movement keys or
+meta-digit keys to fast-move, instead of moving 8 units at a time,
+move by skipping the same glyphs.
+(default off)
 .lp windowtype
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
@@ -2840,6 +3221,117 @@ The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from
 autopickup.
 .hn 2
+Changing Key Bindings
+.pg
+It is possible to change the default key bindings of some special commands,
+menu accelerator keys, and extended commands, by using BIND stanzas in the
+configuration file. Format is key, followed by the command to bind to, separated
+by a colon. The key can be a single character (``x''), a control key (``^X'',
+``C-x''), a meta key (``M-x''), or a three-digit decimal ASCII code.
+.pg
+For example:
+.sd
+.si
+BIND=^X:getpos.autodescribe
+BIND={:menu_first_page
+BIND=v:loot
+.ei
+.ed
+.pg
+.lp "Extended command keys"
+You can bind multiple keys to the same extended command. Unbind a key by
+using ``nothing'' as the extended command to bind to. You can also bind
+the ``<esc>'', ``<enter>'', and ``<space>'' keys.
+.lp "Menu accelerator keys"
+The menu control or accelerator keys can also be rebound via OPTIONS-lines
+in the config file. You cannot bind object symbols into menu accelerators.
+.lp "Special command keys"
+Below are the special commands you can rebind. Some of them can be bound to
+same keys with no problems, others are in the same "context", and if bound
+to same keys, only one of those commands will be available. Special command
+can only be bound to a single key.
+.pg
+.lp count
+Prefix key to start a count, to repeat a command this many times. With number_pad only. Default is 'n'.
+.lp doinv
+Show inventory. With number_pad only. Default is '0'.
+.lp fight
+Prefix key to force fight a direction. Default is 'F'.
+.lp fight.numpad
+Prefix key to force fight a direction. With number_pad only. Default is '-'.
+.lp getdir.help
+When asked for a direction, the key to show the help. Default is '?'.
+.lp getdir.self
+When asked for a direction, the key to target yourself. Default is '.'.
+.lp getdir.self2
+When asked for a direction, the key to target yourself. Default is 's'.
+.lp getpos.autodescribe
+When asked for a location, the key to toggle autodescribe. Default is '#'.
+.lp getpos.all.next
+When asked for a location, the key to go to next closest interesting thing. Default is 'a'.
+.lp getpos.all.prev
+When asked for a location, the key to go to previous closest interesting thing. Default is 'A'.
+.lp getpos.door.next
+When asked for a location, the key to go to next closest door or doorway. Default is 'd'.
+.lp getpos.door.prev
+When asked for a location, the key to go to previous closest door or doorway. Default is 'D'.
+.lp getpos.help
+When asked for a location, the key to show help. Default is '?'.
+.lp getpos.mon.next
+When asked for a location, the key to go to next closest monster. Default is 'm'.
+.lp getpos.mon.prev
+When asked for a location, the key to go to previous closest monster. Default is 'M'.
+.lp getpos.obj.next
+When asked for a location, the key to go to next closest object. Default is 'o'.
+.lp getpos.obj.prev
+When asked for a location, the key to go to previous closest object. Default is 'O'.
+.lp getpos.menu
+When asked for a location, and using one of the next or previous keys to cycle through targets, toggle showing a menu instead. Default is '!'.
+.lp getpos.moveskip
+When asked for a location, and using the shifted movement keys or meta-digit keys to fast-move around, move by skipping the same glyphs instead of by 8 units. Default is '*'.
+.lp getpos.filter
+When asked for a location, change the filtering mode when using one of the next
+or previous keys to cycle through targets. Toggles between no filtering, in view
+only, and in the same area only. Default is '"'.
+.lp getpos.pick
+When asked for a location, the key to choose the location, and possibly ask for more info. Default is '.'.
+.lp getpos.pick.once
+When asked for a location, the key to choose the location, and skip asking for more info. Default is ','.
+.lp getpos.pick.quick
+When asked for a location, the key to choose the location, skip asking for more info, and exit the location asking loop. Default is ';'.
+.lp getpos.pick.verbose
+When asked for a location, the key to choose the location, and show more info without asking. Default is ':'.
+.lp getpos.self
+When asked for a location, the key to go to your location. Default is '@'.
+.lp getpos.unexplored.next
+When asked for a location, the key to go to next closest unexplored location. Default is 'x'.
+.lp getpos.unexplored.prev
+When asked for a location, the key to go to previous closest unexplored location. Default is 'X'.
+.lp getpos.valid
+When asked for a location, the key to go to show valid target locations. Default is '$'.
+.lp getpos.valid.next
+When asked for a location, the key to go to next closest valid location. Default is 'z'.
+.lp getpos.valid.prev
+When asked for a location, the key to go to previous closest valid location. Default is 'Z'.
+.lp nopickup
+Prefix key to move without picking up items. Default is 'm'.
+.lp redraw
+Key to redraw the screen. Default is '^R'.
+.lp redraw.numpad
+Key to redraw the screen. With number_pad only. Default is '^L'.
+.lp repeat
+Key to repeat previous command. Default is '^A'.
+.lp reqmenu
+Prefix key to request menu from some commands. Default is 'm'.
+.lp run
+Prefix key to run towards a direction. Default is 'G'.
+.lp run.nopickup
+Prefix key to run towards a direction without picking up items on the way. Default is 'M'.
+.lp run.numpad
+Prefix key to run towards a direction. With number_pad only. Default is '5'.
+.lp rush
+Prefix key to rush towards a direction. Default is 'g'.
+.hn 2
 Configuring Message Types
 .pg
 You can change the way the messages are shown in the message area, when
@@ -3072,6 +3564,7 @@ c	S_cockatrice	(cockatrice)
 $	S_coin	(pile of coins)
 #	S_corr	(corridor)
 -	S_crwall	(wall)
+#	S_darkroom	(dark room)
 ^	S_dart_trap	(dart trap)
 &	S_demon	(major demon)
 *	S_digbeam	(dig beam)
@@ -3116,6 +3609,7 @@ h	S_humanoid	(humanoid)
 -	S_hwall	(horizontal wall)
 .	S_ice	(ice)
 i	S_imp	(imp or minor demon)
+I	S_invisible	(invisible monster)
 J	S_jabberwock	(jabberwock)
 j	S_jelly	(jelly)
 k	S_kobold	(kobold)
@@ -3169,6 +3663,7 @@ s	S_spider	(arachnid or centipede)
 *	S_ss4	(magic shield 4 of 4)
 ^	S_statue_trap	(statue trap)
 	S_stone	(dark part of a room)
+]	S_strange_obj	(strange object)
 -	S_sw_bc	(swallow bottom center)
 `\e'	S_sw_bl	(swallow bottom left)
 /	S_sw_br	(swallow bottom right)
@@ -3238,6 +3733,15 @@ gives you the row and column of your review cursor and the PC cursor.
 These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 .pg
+NetHack can also be compiled with support for sending the game messages
+to an external program, such as a text-to-speech synthesizer. If the #version
+extended command shows "external program as a message handler", your NetHack
+has been compiled with the capability. When compiling NetHack from source
+on Linux and other POSIX systems, define MSGHANDLER to enable it. To use
+the capability, set the environment variable NETHACK_MSGHANDLER to an
+executable, which will be executed with the game message as the program's
+only parameter.
+.pg
 While it is not difficult for experienced users to edit the \fBdefaults.nh\fP
 file to accomplish this, novices may find this task somewhat daunting.
 Included within the ``symbols'' file of all official distributions of NetHack
@@ -3255,10 +3759,30 @@ Load a symbol set for the rogue level that is appropriate for
 use by blind players.
 .lp menustyle:traditional
 This will assist in the interface to speech synthesizers.
+.lp nomenu_overlay
+Show menus on a cleared screen and aligned to the left edge.
 .lp number_pad
 A lot of speech access programs use the number-pad to review the screen.
 If this is the case, disable the number_pad option and use the traditional
 Rogue-like commands.
+.lp autodescribe
+Automatically describe the terrain under the cursor when targeting.
+.lp mention_walls
+Give feedback messages when walking towards a wall or when travel command
+was interrupted.
+.lp whatis_coord:compass
+When targeting with cursor, describe the cursor position with coordinates
+relative to your character.
+.lp whatis_filter:area
+When targeting with cursor, filter possible locations so only those in
+the same area (eg. same room, or same corridor) are considered.
+.lp whatis_moveskip
+When targeting with cursor and using fast-move, skip the same glyphs instead
+of moving 8 units at a time.
+.lp nostatus_updates
+Prevent updates to the status lines at the bottom of the screen, if
+your screen-reader reads those lines. The same information can be
+seen via the #attributes command.
 .hn 2
 Global Configuration for System Administrators
 .pg
@@ -3320,6 +3844,24 @@ to identify unique people for the score file.
 .lp
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
+.lp
+DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
+Not defining this will prevent dumplog from being created. Only available
+if your game is compiled with DUMPLOG. Allows the following placeholders:
+.sd
+.si
+%% - literal '%'
+%v - version (eg. "3.6.1-0")
+%u - game UID
+%t - game start time, UNIX timestamp format
+%T - current time, UNIX timestamp format
+%d - game start time, YYYYMMDDhhmmss format
+%D - current time, YYYYMMDDhhmmss format
+%n - player name
+%N - first character of player name
+.ei
+.ed
+
 .hn 1
 Scoring
 .pg
@@ -3602,7 +4144,7 @@ version merges work done by the development team since the previous release
 with some of the beloved community patches. Many bugs were fixed and a
 large amount of code was restructured.
 .pg
-\fBThe development team, as well as \fBSteve VanDevender\fP and
+The development team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP ensured that NetHack 3.6 continued to operate on
 various Unix flavors and maintained the X11 interface.
 .pg
@@ -3623,6 +4165,7 @@ released 3.6.1 as a bug fix release in January 2016.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg
+.hn 2
 SHOUT-OUTS
 .pg
 The devteam would like to give a special "shout-out" to thank the generous

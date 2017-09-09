@@ -17,6 +17,13 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#undef Protection /* We have a global name space collision.  No source file
+                     using win32api.h should be using the Protection macro
+                     from youprop.h.
+                     A better fix would be to ensure we include all window
+                     header files before we start clobbering the global name
+                     space with NetHack specific macros. */
+
 #include <windows.h>
 #include <commctrl.h>
 

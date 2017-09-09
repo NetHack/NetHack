@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1457397477 2016/03/08 00:37:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,7 @@ STATIC_DCL void use_bell(struct obj **);
 STATIC_DCL void use_candelabrum(struct obj *);
 STATIC_DCL void use_candle(struct obj **);
 STATIC_DCL void use_lamp(struct obj *);
-STATIC_DCL void light_cocktail(struct obj *);
+STATIC_DCL void light_cocktail(struct obj **);
 STATIC_PTR void display_jump_positions(int);
 STATIC_DCL void use_tinning_kit(struct obj *);
 STATIC_DCL void use_figurine(struct obj **);
@@ -36,7 +36,10 @@ STATIC_DCL boolean figurine_location_checks(struct obj *,
                                                     coord *, boolean);
 STATIC_DCL void add_class(char *, char);
 STATIC_DCL void setapplyclasses(char *);
+STATIC_PTR boolean check_jump(genericptr_t, int, int);
 STATIC_DCL boolean is_valid_jump_pos(int, int, int, boolean);
+STATIC_DCL boolean get_valid_jump_position(int, int);
+STATIC_DCL boolean get_valid_polearm_position(int, int);
 STATIC_DCL boolean find_poleable_mon(coord *, int, int);
 
 #ifdef AMIGA
@@ -439,6 +442,8 @@ use_whistle(struct obj *obj)
     } else {
         You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
+        if (obj->cursed)
+            vault_summon_gd();
     }
 }
 
@@ -723,7 +728,7 @@ check_leash(register xchar x, register xchar y)
                        that's the result of his actions; gain experience,
                        lose pacifism, take alignment and luck hit, make
                        corpse less likely to remain tame after revival */
-                    xkilled(mtmp, 0); /* no "you kill it" message */
+                    xkilled(mtmp, XKILL_NOMSG);
                     /* life-saving doesn't ordinarily reset this */
                     if (mtmp->mhp > 0)
                         u.uconduct.killer = save_pacifism;
@@ -1315,10 +1320,10 @@ use_lamp(struct obj *obj)
     }
 }
 
-/* obj is a potion of oil */
 STATIC_OVL void
-light_cocktail(struct obj *obj)
+light_cocktail(struct obj **optr)
 {
+    struct obj *obj = *optr; /* obj is a potion of oil */
     char buf[BUFSZ];
     boolean split1off;
 
@@ -1336,7 +1341,7 @@ light_cocktail(struct obj *obj)
          * but its easy.
          */
         freeinv(obj);
-        (void) addinv(obj);
+        *optr = addinv(obj);
         return;
     } else if (Underwater) {
         There("is not enough oxygen to sustain a fire.");
@@ -1369,6 +1374,7 @@ light_cocktail(struct obj *obj)
         if (obj)
             obj->nomerge = 0;
     }
+    *optr = obj;
 }
 
 static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
@@ -1428,7 +1434,46 @@ dojump()
     return jump(0);
 }
 
-boolean
+enum jump_trajectory {
+    jAny  = 0, /* any direction => magical jump */
+    jHorz = 1,
+    jVert = 2,
+    jDiag = 3  /* jHorz|jVert */
+};
+
+/* callback routine for walk_path() */
+STATIC_PTR boolean
+check_jump(genericptr arg, int x, int y)
+{
+    int traj = *(int *) arg;
+    struct rm *lev = &levl[x][y];
+
+    if (Passes_walls)
+        return TRUE;
+    if (IS_STWALL(lev->typ))
+        return FALSE;
+    if (IS_DOOR(lev->typ)) {
+        if (closed_door(x, y))
+            return FALSE;
+        if ((lev->doormask & D_ISOPEN) != 0 && traj != jAny
+            /* reject diagonal jump into or out-of or through open door */
+            && (traj == jDiag
+                /* reject horizontal jump through horizontal open door
+                   and non-horizontal (ie, vertical) jump through
+                   non-horizontal (vertical) open door */
+                || ((traj & jHorz) != 0) == (lev->horizontal != 0)))
+            return FALSE;
+        /* empty doorways aren't restricted */
+    }
+    /* let giants jump over boulders (what about Flying?
+       and is there really enough head room for giants to jump
+       at all, let alone over something tall?) */
+    if (sobj_at(BOULDER, x, y) && !throws_rocks(youmonst.data))
+        return FALSE;
+    return TRUE;
+}
+
+STATIC_OVL boolean
 is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
 {
     if (!magic && !(HJumping & ~INTRINSIC) && !EJumping && distu(x, y) != 5) {
@@ -1442,19 +1487,67 @@ is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
         if (showmsg)
             pline("Too far!");
         return FALSE;
-    } else if (!cansee(x, y)) {
-        if (showmsg)
-            You("cannot see where to land!");
-        return FALSE;
     } else if (!isok(x, y)) {
         if (showmsg)
             You("cannot jump there!");
         return FALSE;
+    } else if (!cansee(x, y)) {
+        if (showmsg)
+            You("cannot see where to land!");
+        return FALSE;
+    } else {
+        coord uc, tc;
+        struct rm *lev = &levl[u.ux][u.uy];
+        /* we want to categorize trajectory for use in determining
+           passage through doorways: horizonal, vertical, or diagonal;
+           since knight's jump and other irregular directions are
+           possible, we flatten those out to simplify door checks */
+        int diag, traj,
+            dx = x - u.ux, dy = y - u.uy,
+            ax = abs(dx), ay = abs(dy);
+
+        /* diag: any non-orthogonal destination classifed as diagonal */
+        diag = (magic || Passes_walls || (!dx && !dy)) ? jAny
+               : !dy ? jHorz : !dx ? jVert : jDiag;
+        /* traj: flatten out the trajectory => some diagonals re-classified */
+        if (ax >= 2 * ay)
+            ay = 0;
+        else if (ay >= 2 * ax)
+            ax = 0;
+        traj = (magic || Passes_walls || (!ax && !ay)) ? jAny
+               : !ay ? jHorz : !ax ? jVert : jDiag;
+        /* walk_path doesn't process the starting spot;
+           this is iffy:  if you're starting on a closed door spot,
+           you _can_ jump diagonally from doorway (without needing
+           Passes_walls); that's intentional but is it correct? */
+        if (diag == jDiag && IS_DOOR(lev->typ)
+            && (lev->doormask & D_ISOPEN) != 0
+            && (traj == jDiag
+                || ((traj & jHorz) != 0) == (lev->horizontal != 0))) {
+            if (showmsg)
+                You_cant("jump diagonally out of a doorway.");
+            return FALSE;
+        }
+        uc.x = u.ux, uc.y = u.uy;
+        tc.x = x, tc.y = y; /* target */
+        if (!walk_path(&uc, &tc, check_jump, (genericptr_t) &traj)) {
+            if (showmsg)
+                There("is an obstacle preventing that jump.");
+            return FALSE;
+        }
     }
     return TRUE;
 }
 
 static int jumping_is_magic;
+
+STATIC_OVL boolean
+get_valid_jump_position(int x,int y)
+{
+    return (isok(x, y)
+            && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
+            && is_valid_jump_pos(x, y, jumping_is_magic, FALSE));
+}
 
 void
 display_jump_positions(int state)
@@ -1468,8 +1561,7 @@ display_jump_positions(int state)
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
-                if (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
-                    && is_valid_jump_pos(x, y, jumping_is_magic, FALSE))
+                if (get_valid_jump_position(x, y))
                     tmp_at(x, y);
             }
     } else {
@@ -1568,7 +1660,7 @@ jump(int magic)
     cc.x = u.ux;
     cc.y = u.uy;
     jumping_is_magic = magic;
-    getpos_sethilite(display_jump_positions);
+    getpos_sethilite(display_jump_positions, get_valid_jump_position);
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
@@ -1596,7 +1688,7 @@ jump(int magic)
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                You("pull yourself above the lava!");
+                You("pull yourself above the %s!", hliquid("lava"));
                 u.utrap = 0;
                 return 1;
             case TT_BURIEDBALL:
@@ -1945,6 +2037,7 @@ fig_transform(anything *arg, long timeout)
         char and_vanish[BUFSZ];
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
 
+        /* [m_monnam() yields accurate mon type, overriding hallucination] */
         Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
@@ -2144,20 +2237,6 @@ use_grease(struct obj *obj)
     update_inventory();
 }
 
-static struct trapinfo {
-    struct obj *tobj;
-    xchar tx, ty;
-    int time_needed;
-    boolean force_bungle;
-} trapinfo;
-
-void
-reset_trapset()
-{
-    trapinfo.tobj = 0;
-    trapinfo.force_bungle = 0;
-}
-
 /* touchstones - by Ken Arnold */
 STATIC_OVL void
 use_stone(struct obj *tstone)
@@ -2284,6 +2363,20 @@ use_stone(struct obj *tstone)
     else
         pline(scritch);
     return;
+}
+
+static struct trapinfo {
+    struct obj *tobj;
+    xchar tx, ty;
+    int time_needed;
+    boolean force_bungle;
+} trapinfo;
+
+void
+reset_trapset()
+{
+    trapinfo.tobj = 0;
+    trapinfo.force_bungle = 0;
 }
 
 /* Place a landmine/bear trap.  Helge Hafting */
@@ -2574,7 +2667,7 @@ use_whip(struct obj *obj)
                 pline1(msg_slipsfree);
             }
             if (mtmp)
-                wakeup(mtmp);
+                wakeup(mtmp, TRUE);
         } else
             pline1(msg_snap);
 
@@ -2668,7 +2761,7 @@ use_whip(struct obj *obj)
             } else {
                 pline1(msg_slipsfree);
             }
-            wakeup(mtmp);
+            wakeup(mtmp, TRUE);
         } else {
             if (mtmp->m_ap_type && !Protection_from_shape_changers
                 && !sensemon(mtmp))
@@ -2725,6 +2818,14 @@ find_poleable_mon(coord *pos, int min_range, int max_range)
 static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
+STATIC_OVL boolean
+get_valid_polearm_position(int x,int y)
+{
+    return (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
+            && distu(x, y) >= polearm_range_min
+            && distu(x, y) <= polearm_range_max);
+}
+
 void
 display_polearm_positions(int state)
 {
@@ -2737,9 +2838,7 @@ display_polearm_positions(int state)
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
                 y = dy + (int) u.uy;
-                if (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
-                    && distu(x, y) >= polearm_range_min
-                    && distu(x, y) <= polearm_range_max) {
+                if (get_valid_polearm_position(x, y)) {
                     tmp_at(x, y);
                 }
             }
@@ -2808,7 +2907,7 @@ use_pole(struct obj *obj)
         cc.x = hitm->mx;
         cc.y = hitm->my;
     }
-    getpos_sethilite(display_polearm_positions);
+    getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
     if (getpos(&cc, TRUE, "the spot to hit") < 0)
         return res; /* ESC; uses turn iff polearm became wielded */
 
@@ -3082,8 +3181,8 @@ do_break_wand(struct obj *obj)
         You("don't have the strength to break %s!", yname(obj));
         return 0;
     }
-    pline("Raising %s high above your %s, you break it in two!", yname(obj),
-          body_part(HEAD));
+    pline("Raising %s high above your %s, you %s it in two!", yname(obj),
+          body_part(HEAD), is_fragile ? "snap" : "break");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.
@@ -3455,7 +3554,7 @@ doapply()
         use_lamp(obj);
         break;
     case POT_OIL:
-        light_cocktail(obj);
+        light_cocktail(&obj);
         break;
     case EXPENSIVE_CAMERA:
         res = use_camera(obj);

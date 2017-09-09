@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1456907854 2016/03/02 08:37:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -214,7 +214,7 @@ bail(const char *mesg)
 {
     clearlocks();
     tty_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 
@@ -351,9 +351,6 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     (void) signal(SIGWINCH, (SIG_RET_TYPE) winch_handler);
 #endif
 
-    /* add one a space forward menu command alias */
-    add_menu_cmd_alias(' ', MENU_NEXT_PAGE);
-
     tty_clear_nhwindow(BASE_WINDOW);
 
     tty_putstr(BASE_WINDOW, 0, "");
@@ -471,7 +468,7 @@ makepicks:
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
-                    any.a_int = 0; /* separator, not a choice */
+                    any = zeroany; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
                     role_menu_extra(RS_RACE, win, FALSE);
@@ -1781,9 +1778,11 @@ process_menu_window(winid window, struct WinDesc *cw)
                        lines (including fake ones that simulate grayed-out
                        entries, so we don't rely on curr->identifier here) */
                     attr_n = 0; /* whole line */
-                    if (curr->str[0] && curr->str[1] && curr->str[2]
-                        && curr->str[1] == ' ' && index("-+#", curr->str[2]))
-                        attr_n = 2 + 1; /* after selection indicator */
+                    if (curr->str[0] && curr->str[1] == ' '
+                        && curr->str[2] && index("-+#", curr->str[2])
+                        && curr->str[3] == ' ')
+                        /* [0]=letter, [1]==space, [2]=[-+#], [3]=space */
+                        attr_n = 4; /* [4:N]=entry description */
 
                     /*
                      * Don't use xputs() because (1) under unix it calls
@@ -1836,6 +1835,7 @@ process_menu_window(winid window, struct WinDesc *cw)
 
             /* set extra chars.. */
             Strcat(resp, default_menu_cmds);
+            Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
             Strcat(resp, mapped_menu_cmds);
@@ -1919,12 +1919,15 @@ process_menu_window(winid window, struct WinDesc *cw)
                 break;
             }
         /* else fall through */
+        case ' ':
         case MENU_NEXT_PAGE:
             if (cw->npages > 0 && curr_page != cw->npages - 1) {
                 curr_page++;
                 page_start = 0;
-            } else
-                finished = TRUE; /* questionable behavior */
+            } else if (morc == ' ') {
+                /* ' ' finishes menus here, but stop '>' doing the same. */
+                finished = TRUE;
+            }
             break;
         case MENU_PREVIOUS_PAGE:
             if (cw->npages > 0 && curr_page != 0) {
@@ -2388,22 +2391,30 @@ STATIC_OVL const char *
 compress_str(const char *str)
 {
     static char cbuf[BUFSZ];
-    /* compress in case line too long */
-    if ((int) strlen(str) >= CO) {
-        register const char *bp0 = str;
-        register char *bp1 = cbuf;
 
-        do {
-#ifdef CLIPPING
-            if (*bp0 != ' ' || bp0[1] != ' ')
-#else
-            if (*bp0 != ' ' || bp0[1] != ' ' || bp0[2] != ' ')
-#endif
-                *bp1++ = *bp0;
-        } while (*bp0++);
-    } else
-        return str;
-    return cbuf;
+    /* compress out consecutive spaces if line is too long;
+       topline wrapping converts space at wrap point into newline,
+       we reverse that here */
+    if ((int) strlen(str) >= CO || index(str, '\n')) {
+        const char *in_str = str;
+        char c, *outstr = cbuf, *outend = &cbuf[sizeof cbuf - 1];
+        boolean was_space = TRUE; /* True discards all leading spaces;
+                                     False would retain one if present */
+
+        while ((c = *in_str++) != '\0' && outstr < outend) {
+            if (c == '\n')
+                c = ' ';
+            if (was_space && c == ' ')
+                continue;
+            *outstr++ = c;
+            was_space = (c == ' ');
+        }
+        if ((was_space && outstr > cbuf) || outstr == outend)
+            --outstr; /* remove trailing space or make room for terminator */
+        *outstr = '\0';
+        str = cbuf;
+    }
+    return str;
 }
 
 void
@@ -2543,7 +2554,7 @@ tty_putstr(winid window, int attr, const char *str)
         }
         if (cw->data[cw->cury])
             free((genericptr_t) cw->data[cw->cury]);
-        n0 = strlen(str) + 1;
+        n0 = (long) strlen(str) + 1L;
         ob = cw->data[cw->cury] = (char *) alloc((unsigned) n0 + 1);
         *ob++ = (char) (attr + 1); /* avoid nuls, for convenience */
         Strcpy(ob, str);
@@ -2595,7 +2606,7 @@ tty_display_file(const char *fname, boolean complain)
             }
             if (complain)
                 sleep(10); /* want to wait_synch() but stdin is gone */
-            terminate(EXIT_FAILURE);
+            nh_terminate(EXIT_FAILURE);
         }
         (void) close(fd);
 #ifdef notyet
@@ -2956,10 +2967,17 @@ docorner(register int xmin, register int ymax)
     register int y;
     register struct WinDesc *cw = wins[WIN_MAP];
 
+#if 0   /* this optimization is not valuable enough to justify
+           abusing core internals... */
     if (u.uswallow) { /* Can be done more efficiently */
         swallowed(1);
+        /* without this flush, if we happen to follow --More-- displayed in
+           leftmost column, the cursor gets left in the wrong place after
+           <docorner<more<update_topl<tty_putstr calls unwind back to core */
+        flush_screen(0);
         return;
     }
+#endif /*0*/
 
 #if defined(SIGWINCH) && defined(CLIPPING)
     if (ymax > LI)
@@ -3136,7 +3154,8 @@ tty_print_glyph(winid window, xchar x, xchar y, int glyph, int bkglyph UNUSED)
     /* must be after color check; term_end_color may turn off inverse too */
     if (((special & MG_PET) && iflags.hilite_pet)
         || ((special & MG_OBJPILE) && iflags.hilite_pile)
-        || ((special & MG_DETECT) && iflags.use_inverse)) {
+        || ((special & MG_DETECT) && iflags.use_inverse)
+        || ((special & MG_BW_LAVA) && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
         reverse_on = TRUE;
     }

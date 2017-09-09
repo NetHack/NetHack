@@ -73,7 +73,8 @@ STATIC_PTR int
 picklock(VOID_ARGS)
 {
     if (xlock.box) {
-        if ((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy)) {
+        if (xlock.box->where != OBJ_FLOOR
+            || xlock.box->ox != u.ux || xlock.box->oy != u.uy) {
             return ((xlock.usedtime = 0)); /* you or it moved */
         }
     } else { /* door */
@@ -224,6 +225,14 @@ reset_pick()
     xlock.box = 0;
 }
 
+/* level change; don't reset if hero is carrying xlock.box with him/her */
+void
+maybe_reset_pick()
+{
+    if (!xlock.box || !carried(xlock.box))
+        reset_pick();
+}
+
 /* for doapply(); if player gives a direction or resumes an interrupted
    previous attempt then it costs hero a move even if nothing ultimately
    happens; when told "can't do that" before being asked for direction
@@ -301,7 +310,7 @@ pick_lock(struct obj *pick)
             pline("Doing that would probably melt %s.", yname(pick));
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_pool(u.ux, u.uy) && !Underwater) {
-            pline_The("water has no lock.");
+            pline_The("%s has no lock.", hliquid("water"));
             return PICKLOCK_LEARNED_SOMETHING;
         }
 
@@ -602,6 +611,9 @@ doopen_indir(int x, int y)
             There("is no obvious way to open the drawbridge.");
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
             pline_The("drawbridge is already open.");
+        else if (container_at(cc.x, cc.y, TRUE))
+            pline("%s like something lootable over there.",
+                  Blind ? "Feels" : "Seems");
         else
             You("%s no door there.", Blind ? "feel" : "see");
         return res;

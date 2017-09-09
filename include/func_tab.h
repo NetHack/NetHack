@@ -5,17 +5,18 @@
 #ifndef FUNC_TAB_H
 #define FUNC_TAB_H
 
-struct func_tab {
-    char f_char;
-    boolean can_if_buried;
-    int (*f_funct)(void);
-    const char *f_text;
-};
+/* extended command flags */
+#define IFBURIED     0x01 /* can do command when buried */
+#define AUTOCOMPLETE 0x02 /* command autocompletes */
+#define WIZMODECMD   0x04 /* wizard-mode command */
+#define GENERALCMD   0x08 /* general command, does not take game time */
 
 struct ext_func_tab {
+    uchar key;
     const char *ef_txt, *ef_desc;
     int (*ef_funct)(void);
-    boolean can_if_buried;
+    int flags;
+    const char *f_text;
 };
 
 extern struct ext_func_tab extcmdlist[];

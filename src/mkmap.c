@@ -234,8 +234,8 @@ flood_fill_rm(int sx, register int sy, register int rmno, boolean lit, boolean a
 }
 
 /*
- *	If we have drawn a map without walls, this allows us to
- *	auto-magically wallify it.  Taken from lev_main.c.
+ * If we have drawn a map without walls, this allows us to
+ * auto-magically wallify it.  Taken from lev_main.c.
  */
 STATIC_OVL void
 wallify_map()

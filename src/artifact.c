@@ -470,7 +470,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
         for (obj = invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                if (art->cary.adtyp == dtyp) {
+                if (art && art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
@@ -491,7 +491,8 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
         for (obj = invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
-                spfx &= ~art->cspfx;
+                if (art)
+                    spfx &= ~art->cspfx;
             }
     }
 
@@ -623,16 +624,17 @@ touch_artifact(struct obj *obj, struct monst *mon)
         return 1;
 
     yours = (mon == &youmonst);
-    /* all quest artifacts are self-willed; it this ever changes, `badclass'
+    /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     self_willed = ((oart->spfx & SPFX_INTEL) != 0);
     if (yours) {
         badclass = self_willed
                    && ((oart->role != NON_PM && !Role_if(oart->role))
                        || (oart->race != NON_PM && !Race_if(oart->race)));
-        badalign =
-            (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE
-            && (oart->alignment != u.ualign.type || u.ualign.record < 0);
+        badalign = ((oart->spfx & SPFX_RESTR) != 0
+                    && oart->alignment != A_NONE
+                    && (oart->alignment != u.ualign.type
+                        || u.ualign.record < 0));
     } else if (!is_covetous(mon->data) && !is_mplayer(mon->data)) {
         badclass = self_willed && oart->role != NON_PM
                    && oart != &artilist[ART_EXCALIBUR];
@@ -1448,8 +1450,8 @@ arti_invoke(struct obj *obj)
                 obj->age = 0;
                 return 0;
             }
-            b_effect =
-                obj->blessed && (Role_switch == oart->role || !oart->role);
+            b_effect = (obj->blessed
+                        && (Role_switch == oart->role || !oart->role));
             recharge(otmp, b_effect ? 1 : obj->cursed ? -1 : 0);
             update_inventory();
             break;
@@ -1538,9 +1540,8 @@ arti_invoke(struct obj *obj)
             } else
                 otmp->quan += rnd(5);
             otmp->owt = weight(otmp);
-            otmp =
-                hold_another_object(otmp, "Suddenly %s out.",
-                                    aobjnam(otmp, "fall"), (const char *) 0);
+            otmp = hold_another_object(otmp, "Suddenly %s out.",
+                                       aobjnam(otmp, "fall"), (char *) 0);
             break;
         }
         }
@@ -1826,8 +1827,7 @@ retouch_object(struct obj **objp,   /* might be destroyed or unintentionally dro
     if (touch_artifact(obj, &youmonst)) {
         char buf[BUFSZ];
         int dmg = 0, tmp;
-        boolean ag =
-                    (objects[obj->otyp].oc_material == SILVER && Hate_silver),
+        boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
                 bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
@@ -1948,11 +1948,15 @@ retouch_equipment(int dropflag)/* 0==don't drop, 1==drop all, 2==drop weapon */
 
     dropit = (dropflag > 0); /* drop all or drop weapon */
     /* check secondary weapon first, before possibly unwielding primary */
-    if (u.twoweap)
+    if (u.twoweap) {
+        bypass_obj(uswapwep); /* so loop below won't process it again */
         (void) untouchable(uswapwep, dropit);
+    }
     /* check primary weapon next so that they're handled together */
-    if (uwep)
+    if (uwep) {
+        bypass_obj(uwep); /* so loop below won't process it again */
         (void) untouchable(uwep, dropit);
+    }
 
     /* in case someone is daft enough to add artifact or silver saddle */
     if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {

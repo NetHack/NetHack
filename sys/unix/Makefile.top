@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.top	$NHDT-Date: 1449621572 2015/12/09 00:39:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $
+# NetHack 3.6  Makefile.top	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $
 
 # Root of source tree:
 NHSROOT=.
@@ -76,7 +76,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 # end of configuration
 #
 
-DATHELP = help hh cmdhelp history opthelp wizhelp
+DATHELP = help hh cmdhelp keyhelp history opthelp wizhelp
 
 SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev \
 	juiblex.lev knox.lev medusa-?.lev minend-?.lev minefill.lev \

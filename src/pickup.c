@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1457400916 2016/03/08 01:35:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1498078877 2017/06/21 21:01:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,11 +21,13 @@ STATIC_DCL boolean all_but_uchain(struct obj *);
 #if 0 /* not used */
 STATIC_DCL boolean allow_cat_no_uchain(struct obj *);
 #endif
+STATIC_DCL boolean autopick_testobj(struct obj *, boolean);
 STATIC_DCL int autopick(struct obj *, int, menu_item **);
 STATIC_DCL int count_categories(struct obj *, int);
 STATIC_DCL long carry_count(struct obj *, struct obj *, long,
-                                    boolean, int *, int *);
-STATIC_DCL int lift_object(struct obj *, struct obj *, long *, boolean);
+                            boolean, int *, int *);
+STATIC_DCL int lift_object(struct obj *, struct obj *, long *,
+                           boolean);
 STATIC_DCL boolean mbag_explodes(struct obj *, int);
 STATIC_PTR int in_container(struct obj *);
 STATIC_PTR int out_container(struct obj *);
@@ -37,7 +39,6 @@ STATIC_DCL int traditional_loot(boolean);
 STATIC_DCL int menu_loot(int, boolean);
 STATIC_DCL char in_or_out_menu(const char *, struct obj *, boolean,
                                boolean, boolean, boolean);
-STATIC_DCL int container_at(int, int, boolean);
 STATIC_DCL boolean able_to_loot(int, int, boolean);
 STATIC_DCL boolean reverse_loot(void);
 STATIC_DCL boolean mon_beside(int, int);
@@ -137,45 +138,56 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
               const char *action, struct obj *objs, boolean here,
               int *menu_on_demand)
 {
-    char ilets[30], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
+    char ilets[36], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
-    boolean not_everything;
+    boolean not_everything, filtered;
     char qbuf[QBUFSZ];
     boolean m_seen;
-    int itemcount;
+    int itemcount, bcnt, ucnt, ccnt, xcnt, ocnt;
 
     oclasses[oclassct = 0] = '\0';
     *one_at_a_time = *everything = m_seen = FALSE;
+    if (menu_on_demand)
+        *menu_on_demand = 0;
     iletct = collect_obj_classes(ilets, objs, here,
                                  (boolean (*)(OBJ_P)) 0, &itemcount);
-    if (iletct == 0) {
+    if (iletct == 0)
         return FALSE;
-    } else if (iletct == 1) {
+
+    if (iletct == 1) {
         oclasses[0] = def_char_to_objclass(ilets[0]);
         oclasses[1] = '\0';
-        if (itemcount && menu_on_demand) {
-            ilets[iletct++] = 'm';
-            *menu_on_demand = 0;
-            ilets[iletct] = '\0';
-        }
     } else { /* more than one choice available */
-        const char *where = 0;
-        char sym, oc_of_sym, *p;
-
         /* additional choices */
         ilets[iletct++] = ' ';
         ilets[iletct++] = 'a';
         ilets[iletct++] = 'A';
         ilets[iletct++] = (objs == invent ? 'i' : ':');
-        if (menu_on_demand) {
-            ilets[iletct++] = 'm';
-            *menu_on_demand = 0;
-        }
-        ilets[iletct] = '\0';
+    }
+    if (itemcount && menu_on_demand)
+        ilets[iletct++] = 'm';
+    if (count_unpaid(objs))
+        ilets[iletct++] = 'u';
+
+    tally_BUCX(objs, here, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+    if (bcnt)
+        ilets[iletct++] = 'B';
+    if (ucnt)
+        ilets[iletct++] = 'U';
+    if (ccnt)
+        ilets[iletct++] = 'C';
+    if (xcnt)
+        ilets[iletct++] = 'X';
+    ilets[iletct] = '\0';
+
+    if (iletct > 1) {
+        const char *where = 0;
+        char sym, oc_of_sym, *p;
+
     ask_again:
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
-        not_everything = FALSE;
+        not_everything = filtered = FALSE;
         Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]", action,
                 ilets);
         getlin(qbuf, inbuf);
@@ -201,6 +213,9 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
                 goto ask_again;
             } else if (sym == 'm') {
                 m_seen = TRUE;
+            } else if (index("uBUCX", sym)) {
+                add_valid_menu_class(sym); /* 'u' or 'B','U','C',or 'X' */
+                filtered = TRUE;
             } else {
                 oc_of_sym = def_char_to_objclass(sym);
                 if (index(ilets, sym)) {
@@ -218,9 +233,11 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
                     not_everything = TRUE;
                 }
             }
-        }
+        } /* for p:sym in inbuf */
+
         if (m_seen && menu_on_demand) {
-            *menu_on_demand = (*everything || !oclassct) ? -2 : -3;
+            *menu_on_demand = (((*everything || !oclassct) && !filtered)
+                               ? -2 : -3);
             return FALSE;
         }
         if (!oclassct && (!*everything || not_everything)) {
@@ -307,6 +324,14 @@ n_or_more(struct obj *obj)
 static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
 static boolean class_filter, bucx_filter, shop_filter;
 
+/* check valid_menu_classes[] for an entry; also used by askchain() */
+boolean
+menu_class_present(c)
+int c;
+{
+    return (c && index(valid_menu_classes, c)) ? TRUE : FALSE;
+}
+
 void
 add_valid_menu_class(int c)
 {
@@ -315,7 +340,7 @@ add_valid_menu_class(int c)
     if (c == 0) { /* reset */
         vmc_count = 0;
         class_filter = bucx_filter = shop_filter = FALSE;
-    } else {
+    } else if (!menu_class_present(c)) {
         valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
         switch (c) {
@@ -354,9 +379,21 @@ allow_all(struct obj *obj UNUSED)
 boolean
 allow_category(struct obj *obj)
 {
-    /* unpaid and BUC checks don't apply to coins */
+    /* For coins, if any class filter is specified, accept if coins
+     * are included regardless of whether either unpaid or BUC-status
+     * is also specified since player has explicitly requested coins.
+     * If no class filtering is specified but bless/curse state is,
+     * coins are either unknown or uncursed based on an option setting.
+     */
     if (obj->oclass == COIN_CLASS)
-        return index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
+        return class_filter
+                 ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
+                 : shop_filter /* coins are never unpaid, but check anyway */
+                    ? (obj->unpaid ? TRUE : FALSE)
+                    : bucx_filter
+                       ? (index(valid_menu_classes, iflags.goldX ? 'X' : 'U')
+                          ? TRUE : FALSE)
+                       : TRUE; /* catchall: no filters specified, so accept */
 
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -406,7 +443,7 @@ STATIC_OVL boolean
 allow_cat_no_uchain(struct obj *obj)
 {
     if (obj != uchain
-        && ((index(valid_menu_classes,'u') && obj->unpaid)
+        && ((index(valid_menu_classes, 'u') && obj->unpaid)
             || index(valid_menu_classes, obj->oclass)))
         return TRUE;
     return FALSE;
@@ -417,8 +454,7 @@ allow_cat_no_uchain(struct obj *obj)
 boolean
 is_worn_by_type(register struct obj *otmp)
 {
-    return (boolean) (!!(otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON))
-                      && index(valid_menu_classes, otmp->oclass) != 0);
+    return (is_worn(otmp) && allow_category(otmp)) ? TRUE : FALSE;
 }
 
 /*
@@ -549,8 +585,8 @@ pickup(int what) /* should be a long */
         /* old style interface */
         int ct = 0;
         long lcount;
-        boolean all_of_a_type, selective;
-        char oclasses[MAXOCLASSES];
+        boolean all_of_a_type, selective, bycat;
+        char oclasses[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
         struct obj *obj, *obj2;
 
         oclasses[0] = '\0';   /* types to consider (empty for all) */
@@ -579,7 +615,7 @@ pickup(int what) /* should be a long */
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
                                &via_menu)) {
                 if (!via_menu)
-                    return 0;
+                    goto pickupdone;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
                 n = query_objlist("Pick up what?", objchain_p, traverse_how,
@@ -589,10 +625,14 @@ pickup(int what) /* should be a long */
                 goto menu_pickup;
             }
         }
+        bycat = (menu_class_present('B') || menu_class_present('U')
+                 || menu_class_present('C') || menu_class_present('X'));
 
         for (obj = *objchain_p; obj; obj = obj2) {
             obj2 = FOLLOW(obj, traverse_how);
-            if (!selective && oclasses[0] && !index(oclasses, obj->oclass))
+            if (bycat ? !allow_category(obj)
+                      : (!selective && oclasses[0]
+                         && !index(oclasses, obj->oclass)))
                 continue;
 
             lcount = -1L;
@@ -643,12 +683,14 @@ pickup(int what) /* should be a long */
 
         /* position may need updating (invisible hero) */
         if (n_picked)
-            newsym(u.ux, u.uy);
+            newsym_force(u.ux, u.uy);
 
         /* check if there's anything else here after auto-pickup is done */
         if (autopickup)
             check_here(n_picked > 0);
     }
+ pickupdone:
+    add_valid_menu_class(0); /* reset */
     return (n_tried > 0);
 }
 
@@ -659,17 +701,50 @@ is_autopickup_exception(struct obj *obj,
     /*
      *  Does the text description of this match an exception?
      */
-    char *objdesc = makesingular(doname(obj));
     struct autopickup_exception
         *ape = (grab) ? iflags.autopickup_exceptions[AP_GRAB]
                       : iflags.autopickup_exceptions[AP_LEAVE];
 
-    while (ape) {
-        if (regex_match(objdesc, ape->regex))
-            return TRUE;
-        ape = ape->next;
+    if (ape) {
+        char *objdesc = makesingular(doname(obj));
+
+        while (ape) {
+            if (regex_match(objdesc, ape->regex))
+                return TRUE;
+            ape = ape->next;
+        }
     }
     return FALSE;
+}
+
+STATIC_OVL boolean
+autopick_testobj(struct obj *otmp, boolean calc_costly)
+{
+    static boolean costly = FALSE;
+    const char *otypes = flags.pickup_types;
+    boolean pickit;
+
+    /* calculate 'costly' just once for a given autopickup operation */
+    if (calc_costly)
+        costly = (otmp->where == OBJ_FLOOR
+                  && costly_spot(otmp->ox, otmp->oy));
+
+    /* first check: reject if an unpaid item in a shop */
+    if (costly && !otmp->no_charge)
+        return FALSE;
+
+    /* check for pickup_types */
+    pickit = (!*otypes || index(otypes, otmp->oclass));
+    /* check for "always pick up */
+    if (!pickit)
+        pickit = is_autopickup_exception(otmp, TRUE);
+    /* then for "never pick up */
+    if (pickit)
+        pickit = !is_autopickup_exception(otmp, FALSE);
+    /* pickup_thrown overrides pickup_types and exceptions */
+    if (!pickit)
+        pickit = (flags.pickup_thrown && otmp->was_thrown);
+    return pickit;
 }
 
 /*
@@ -687,42 +762,19 @@ autopick(struct obj *olist,         /* the object list */
     menu_item *pi; /* pick item */
     struct obj *curr;
     int n;
-    boolean pickit;
-    const char *otypes = flags.pickup_types;
+    boolean check_costly = TRUE;
 
     /* first count the number of eligible items */
     for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-        /* pick if in pickup_types and not unpaid item in shop */
-        pickit = ((!*otypes || index(otypes, curr->oclass))
-                  && !(curr->where == OBJ_FLOOR
-                       && !curr->no_charge
-                       && isok(curr->ox, curr->oy)
-                       && costly_spot(curr->ox, curr->oy)));
-        /* check for "always pick up */
-        if (!pickit)
-            pickit = is_autopickup_exception(curr, TRUE);
-        /* then for "never pick up */
-        if (pickit)
-            pickit = !is_autopickup_exception(curr, FALSE);
-        /* pickup_thrown overrides pickup_types and exceptions */
-        if (!pickit)
-            pickit = (flags.pickup_thrown && curr->was_thrown);
-        /* finally, do we count this object? */
-        if (pickit)
+        if (autopick_testobj(curr, check_costly))
             ++n;
+        check_costly = FALSE; /* only need to check once per autopickup */
     }
 
     if (n) {
         *pick_list = pi = (menu_item *) alloc(sizeof (menu_item) * n);
         for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-            pickit = (!*otypes || index(otypes, curr->oclass));
-            if (!pickit)
-                pickit = is_autopickup_exception(curr, TRUE);
-            if (pickit)
-                pickit = !is_autopickup_exception(curr, FALSE);
-            if (!pickit)
-                pickit = (flags.pickup_thrown && curr->was_thrown);
-            if (pickit) {
+            if (autopick_testobj(curr, FALSE)) {
                 pi[n].item.a_obj = curr;
                 pi[n].count = curr->quan;
                 n++;
@@ -759,7 +811,7 @@ query_objlist(const char *qstr,                 /* query string */
               int how,                          /* type of query */
               boolean (*allow)(OBJ_P)) /* allow function */
 {
-    int i, n, actualn;
+    int i, n;
     winid win;
     struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
     char *pack;
@@ -778,7 +830,6 @@ query_objlist(const char *qstr,                 /* query string */
             last = curr;
             n++;
         }
-    actualn = n;
     if (engulfer) {
         ++n;
         /* don't autoselect swallowed hero if it's the only choice */
@@ -928,6 +979,7 @@ query_category(const char *qstr,        /* query string */
     boolean collected_type_name;
     char invlet;
     int ccount;
+    boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
     boolean do_unpaid = FALSE;
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
@@ -938,19 +990,21 @@ query_category(const char *qstr,        /* query string */
         return 0;
     if ((qflags & UNPAID_TYPES) && count_unpaid(olist))
         do_unpaid = TRUE;
-    if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED)) {
+    if (qflags & WORN_TYPES)
+        ofilter = is_worn;
+    if ((qflags & BUC_BLESSED) && count_buc(olist, BUC_BLESSED, ofilter)) {
         do_blessed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED)) {
+    if ((qflags & BUC_CURSED) && count_buc(olist, BUC_CURSED, ofilter)) {
         do_cursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED)) {
+    if ((qflags & BUC_UNCURSED) && count_buc(olist, BUC_UNCURSED, ofilter)) {
         do_uncursed = TRUE;
         num_buc_types++;
     }
-    if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN)) {
+    if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN, ofilter)) {
         do_buc_unknown = TRUE;
         num_buc_types++;
     }
@@ -960,8 +1014,7 @@ query_category(const char *qstr,        /* query string */
     if (ccount == 1 && !do_unpaid && num_buc_types <= 1
         && !(qflags & BILLED_TYPES)) {
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
-            if ((qflags & WORN_TYPES)
-                && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
+            if (ofilter && !(*ofilter)(curr))
                 continue;
             break;
         }
@@ -992,8 +1045,7 @@ query_category(const char *qstr,        /* query string */
         collected_type_name = FALSE;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
-                if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
+                if (ofilter && !(*ofilter)(curr))
                     continue;
                 if (!collected_type_name) {
                     any = zeroany;
@@ -1040,7 +1092,9 @@ query_category(const char *qstr,        /* query string */
                                        : "Auto-select every item",
                  MENU_UNSELECTED);
     }
-    /* items with b/u/c/unknown if there are any */
+    /* items with b/u/c/unknown if there are any;
+       this cluster of menu entries is in alphabetical order,
+       reversing the usual sequence of 'U' and 'C' in BUCX */
     if (do_blessed) {
         invlet = 'B';
         any = zeroany;
@@ -1067,7 +1121,7 @@ query_category(const char *qstr,        /* query string */
         any = zeroany;
         any.a_int = 'X';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 "Items of unknown B/C/U status", MENU_UNSELECTED);
+                 "Items of unknown Bless/Curse status", MENU_UNSELECTED);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
@@ -1482,7 +1536,7 @@ encumber_msg()
 }
 
 /* Is there a container at x,y. Optional: return count of containers at x,y */
-STATIC_OVL int
+int
 container_at(int x, int y, boolean countem)
 {
     struct obj *cobj, *nobj;
@@ -1515,7 +1569,7 @@ able_to_loot(int x, int y,
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
         You("cannot %s things that are deep in the %s.", verb,
-            is_lava(x, y) ? "lava" : "water");
+            hliquid(is_lava(x, y) ? "lava" : "water"));
         return FALSE;
     } else if (nolimbs(youmonst.data)) {
         pline("Without limbs, you cannot %s anything.", verb);
@@ -1595,7 +1649,7 @@ doloot()
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
-    int num_conts;
+    int num_conts = 0;
 
     abort_looting = FALSE;
 
@@ -1618,12 +1672,29 @@ doloot()
     cc.x = u.ux;
     cc.y = u.uy;
 
-lootcont:
+    if (iflags.menu_requested)
+        goto lootmon;
+
+ lootcont:
     if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
         boolean anyfound = FALSE;
 
         if (!able_to_loot(cc.x, cc.y, TRUE))
             return 0;
+
+        if (Blind && !uarmg) {
+            /* if blind and without gloves, attempting to #loot at the
+               location of a cockatrice corpse is fatal before asking
+               whether to manipulate any containers */
+            for (nobj = sobj_at(CORPSE, cc.x, cc.y); nobj;
+                 nobj = nxtobj(nobj, CORPSE, TRUE))
+                if (will_feel_cockatrice(nobj, FALSE)) {
+                    feel_cockatrice(nobj, FALSE);
+                    /* if life-saved (or poly'd into stone golem),
+                       terminate attempt to loot */
+                    return 1;
+                }
+        }
 
         if (num_conts > 1) {
             /* use a menu to loot many containers */
@@ -1687,9 +1758,11 @@ lootcont:
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
         You("need to dig up the grave to effectively loot it...");
     }
+
     /*
      * 3.3.1 introduced directional looting for some things.
      */
+ lootmon:
     if (c != 'y' && mon_beside(u.ux, u.uy)) {
         if (!get_adjacent_loc("Loot in what direction?",
                               "Invalid loot location", u.ux, u.uy, &cc))
@@ -1803,8 +1876,8 @@ reverse_loot()
                 boxdummy = zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
                 (void) boxlock(coffers, &boxdummy);
             }
-        } else if (levl[x][y].looted != T_LOOTED &&
-                   (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
+        } else if (levl[x][y].looted != T_LOOTED
+                   && (mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
             freeinv(goldob);
             add_to_minv(mon, goldob);
             pline("The exchequer accepts your contribution.");
@@ -1981,15 +2054,14 @@ in_container(register struct obj *obj)
         (void) snuff_lit(obj);
 
     if (floor_container && costly_spot(u.ux, u.uy)) {
-        if (obj->oclass == COIN_CLASS) {
-            ; /* defer gold until after put-in message */
-        } else if (current_container->no_charge && !obj->unpaid) {
-            /* don't sell when putting the item into your own container */
-            obj->no_charge = 1;
-        } else {
+        /* defer gold until after put-in message */
+        if (obj->oclass != COIN_CLASS) {
             /* sellobj() will take an unpaid item off the shop bill */
             was_unpaid = obj->unpaid ? TRUE : FALSE;
-            sellobj_state(SELL_DELIBERATE);
+            /* don't sell when putting the item into your own container,
+             * but handle billing correctly */
+            sellobj_state(current_container->no_charge
+                          ? SELL_DONTSELL : SELL_DELIBERATE);
             sellobj(obj, u.ux, u.uy);
             sellobj_state(SELL_NORMAL);
         }
@@ -2043,6 +2115,11 @@ in_container(register struct obj *obj)
     return (current_container ? 1 : -1);
 }
 
+/* askchain() filter used by in_container();
+ * returns True if the container is intact and 'obj' isn't it, False if
+ * container is gone (magic bag explosion) or 'obj' is the container itself;
+ * also used by getobj() when picking a single item to stash
+ */
 int
 ck_bag(struct obj *obj)
 {
@@ -2408,6 +2485,7 @@ use_container(struct obj **objp, int held,
                 used |= traditional_loot(FALSE);
             else
                 used |= (menu_loot(0, FALSE) > 0);
+            add_valid_menu_class(0);
         }
     }
 
@@ -2428,6 +2506,7 @@ use_container(struct obj **objp, int held,
             used |= traditional_loot(TRUE);
         else
             used |= (menu_loot(0, TRUE) > 0);
+        add_valid_menu_class(0);
     } else if (stash_one) {
         /* put one item into container */
         if ((otmp = getobj(stashable, "stash")) != 0) {
@@ -2436,11 +2515,7 @@ use_container(struct obj **objp, int held,
             } else {
                 /* couldn't put selected item into container for some
                    reason; might need to undo splitobj() */
-                for (curr = invent; curr; curr = curr->nobj)
-                    if (curr->nobj == otmp)
-                        break;
-                if (curr && curr->invlet == otmp->invlet)
-                    (void) merged(&curr, &otmp);
+                (void) unsplitobj(otmp);
             }
         }
     }
@@ -2461,6 +2536,7 @@ use_container(struct obj **objp, int held,
                 used |= traditional_loot(FALSE);
             else
                 used |= (menu_loot(0, FALSE) > 0);
+            add_valid_menu_class(0);
         }
     }
 
@@ -2489,7 +2565,7 @@ traditional_loot(boolean put_in)
 {
     int (*actionfunc)(OBJ_P), (*checkfunc)(OBJ_P);
     struct obj **objlist;
-    char selection[MAXOCLASSES + 1];
+    char selection[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
     const char *action;
     boolean one_by_one, allflag;
     int used = 0, menu_on_request = 0;
@@ -2535,7 +2611,7 @@ menu_loot(int retry, boolean put_in)
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = (ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN);
+        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES);
         if (put_in)
             mflags |= CHOOSE_ALL;
         n = query_category(buf, put_in ? invent : current_container->cobj,
@@ -2831,20 +2907,27 @@ STATIC_OVL void
 tipcontainer(struct obj *box) /* or bag */
 {
     xchar ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
-    boolean empty_it = FALSE,
-            /* Shop handling:  can't rely on the container's own unpaid
-               or no_charge status because contents might differ with it.
-               A carried container's contents will be flagged as unpaid
-               or not, as appropriate, and need no special handling here.
-               Items owned by the hero get sold to the shop without
-               confirmation as with other uncontrolled drops.  A floor
-               container's contents will be marked no_charge if owned by
-               hero, otherwise they're owned by the shop.  By passing
-               the contents through shop billing, they end up getting
-               treated the same as in the carried case.   We do so one
-               item at a time instead of doing whole container at once
-               to reduce the chance of exhausting shk's billing capacity. */
-            maybeshopgoods = !carried(box) && costly_spot(ox, oy);
+    boolean empty_it = FALSE, maybeshopgoods;
+
+    /* box is either held or on floor at hero's spot; no need to check for
+       nesting; when held, we need to update its location to match hero's;
+       for floor, the coordinate updating is redundant */
+    if (get_obj_location(box, &ox, &oy, 0))
+        box->ox = ox, box->oy = oy;
+
+    /* Shop handling:  can't rely on the container's own unpaid
+       or no_charge status because contents might differ with it.
+       A carried container's contents will be flagged as unpaid
+       or not, as appropriate, and need no special handling here.
+       Items owned by the hero get sold to the shop without
+       confirmation as with other uncontrolled drops.  A floor
+       container's contents will be marked no_charge if owned by
+       hero, otherwise they're owned by the shop.  By passing
+       the contents through shop billing, they end up getting
+       treated the same as in the carried case.   We do so one
+       item at a time instead of doing whole container at once
+       to reduce the chance of exhausting shk's billing capacity. */
+    maybeshopgoods = !carried(box) && costly_spot(box->ox, box->oy);
 
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
@@ -2907,7 +2990,7 @@ tipcontainer(struct obj *box) /* or bag */
 
     if (empty_it) {
         struct obj *otmp, *nobj;
-        boolean verbose = FALSE, highdrop = !can_reach_floor(TRUE),
+        boolean terse, highdrop = !can_reach_floor(TRUE),
                 altarizing = IS_ALTAR(levl[ox][oy].typ),
                 cursed_mbag = (Is_mbag(box) && box->cursed);
         int held = carried(box);
@@ -2915,20 +2998,27 @@ tipcontainer(struct obj *box) /* or bag */
 
         if (u.uswallow)
             highdrop = altarizing = FALSE;
+        terse = !(highdrop || altarizing || costly_spot(box->ox, box->oy));
         box->cknown = 1;
+        /* Terse formatting is
+         * "Objects spill out: obj1, obj2, obj3, ..., objN."
+         * If any other messages intervene between objects, we revert to
+         * "ObjK drops to the floor.", "ObjL drops to the floor.", &c.
+         */
         pline("%s out%c",
               box->cobj->nobj ? "Objects spill" : "An object spills",
-              !(highdrop || altarizing) ? ':' : '.');
+              terse ? ':' : '.');
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
+            otmp->ox = box->ox, otmp->oy = box->oy;
 
             if (box->otyp == ICE_BOX) {
                 removed_from_icebox(otmp); /* resume rotting for corpse */
             } else if (cursed_mbag && !rn2(13)) {
                 loss += mbag_item_gone(held, otmp);
                 /* abbreviated drop format is no longer appropriate */
-                verbose = TRUE;
+                terse = FALSE;
                 continue;
             }
 
@@ -2941,14 +3031,18 @@ tipcontainer(struct obj *box) /* or bag */
                 /* might break or fall down stairs; handles altars itself */
                 hitfloor(otmp);
             } else {
-                if (altarizing)
+                if (altarizing) {
                     doaltarobj(otmp);
-                else if (verbose)
+                } else if (!terse) {
                     pline("%s %s to the %s.", Doname2(otmp),
                           otense(otmp, "drop"), surface(ox, oy));
-                else
+                } else {
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
+                    iflags.last_msg = PLNMSG_OBJNAM_ONLY;
+                }
                 dropy(otmp);
+                if (iflags.last_msg != PLNMSG_OBJNAM_ONLY)
+                    terse = FALSE; /* terse formatting has been interrupted */
             }
             if (maybeshopgoods)
                 iflags.suppress_price--; /* reset */

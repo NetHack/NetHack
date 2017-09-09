@@ -296,6 +296,23 @@ restore_light_sources(int fd)
     }
 }
 
+/* to support '#stats' wizard-mode command */
+void
+light_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    light_source *ls;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (light_source));
+    *count = *size = 0L;
+    for (ls = light_base; ls; ls = ls->next) {
+        ++*count;
+        *size += (long) sizeof *ls;
+    }
+}
+
 /* Relink all lights that are so marked. */
 void
 relink_light_sources(boolean ghostly)

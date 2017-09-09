@@ -150,7 +150,7 @@ kick_monster(struct monst *mon, xchar x, xchar y)
     int i, j;
 
     /* anger target even if wild miss will occur */
-    setmangry(mon);
+    setmangry(mon, TRUE);
 
     if (Levitation && !rn2(3) && verysmall(mon->data)
         && !is_flyer(mon->data)) {
@@ -290,7 +290,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
 
     if (!likes_gold(mtmp->data) && !mtmp->isshk && !mtmp->ispriest
         && !mtmp->isgd && !is_mercenary(mtmp->data)) {
-        wakeup(mtmp);
+        wakeup(mtmp, TRUE);
     } else if (!mtmp->mcanmove) {
         /* too light to do real damage */
         if (canseemon(mtmp)) {
@@ -304,7 +304,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
         mtmp->msleeping = 0;
         finish_meating(mtmp);
         if (!mtmp->isgd && !rn2(4)) /* not always pleasing */
-            setmangry(mtmp);
+            setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
             pline("%s catches the gold.", Monnam(mtmp));
@@ -485,15 +485,20 @@ really_kick_object(xchar x, xchar y)
         || kickedobj == uchain)
         return 0;
 
-    if ((trap = t_at(x, y)) != 0
-        && (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
-            || trap->ttyp == WEB)) {
-        if (!trap->tseen)
-            find_trap(trap);
-        You_cant("kick %s that's in a %s!", something,
-                 Hallucination ? "tizzy" : (trap->ttyp == WEB) ? "web"
-                                                               : "pit");
-        return 1;
+    if ((trap = t_at(x, y)) != 0) {
+        if (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
+            || trap->ttyp == WEB) {
+            if (!trap->tseen)
+                find_trap(trap);
+            You_cant("kick %s that's in a %s!", something,
+                     Hallucination ? "tizzy" :
+                     (trap->ttyp == WEB) ? "web" : "pit");
+            return 1;
+        }
+        if (trap->ttyp == STATUE_TRAP) {
+            activate_statue_trap(trap, x,y, FALSE);
+            return 1;
+        }
     }
 
     if (Fumbling && !rn2(3)) {
@@ -933,7 +938,7 @@ dokick()
     }
     if (is_pool(x, y) ^ !!u.uinwater) {
         /* objects normally can't be removed from water by kicking */
-        You("splash some water around.");
+        You("splash some %s around.", hliquid("water"));
         return 1;
     }
 
@@ -1077,6 +1082,7 @@ dokick()
             goto ouch;
         if (IS_TREE(maploc->typ)) {
             struct obj *treefruit;
+
             /* nothing, fruit or trouble? 75:23.5:1.5% */
             if (rn2(3)) {
                 if (!rn2(6) && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE))
@@ -1087,7 +1093,9 @@ dokick()
                 && (treefruit = rnd_treefruit_at(x, y))) {
                 long nfruit = 8L - rnl(7), nfall;
                 short frtype = treefruit->otyp;
+
                 treefruit->quan = nfruit;
+                treefruit->owt = weight(treefruit);
                 if (is_plural(treefruit))
                     pline("Some %s fall from the tree!", xname(treefruit));
                 else
@@ -1111,6 +1119,7 @@ dokick()
                 int cnt = rnl(4) + 2;
                 int made = 0;
                 coord mm;
+
                 mm.x = x;
                 mm.y = y;
                 while (cnt--) {

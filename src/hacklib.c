@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1450178551 2015/12/15 11:22:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1496860756 2017/06/07 18:39:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,6 +18,7 @@
         char *          ucase           (char *)
         char *          upstart         (char *)
         char *          mungspaces      (char *)
+        char *          trimspaces      (char *)
         char *          strip_newline   (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
@@ -32,6 +33,7 @@
         char *          tabexpand       (char *)
         char *          visctrl         (char)
         char *          strsubst        (char *, const char *, const char *)
+        int             strNsubst       (char *,const char *,const char *,int)
         const char *    ordin           (int)
         char *          sitoa           (int)
         int             sgn             (int)
@@ -44,7 +46,7 @@
         boolean         pmatchz         (const char *, const char *)
         int             strncmpi        (const char *, const char *, int)
         char *          strstri         (const char *, const char *)
-        boolean         fuzzymatch      (const char *,const char *,
+        boolean         fuzzymatch      (const char *, const char *,
                                          const char *, boolean)
         void            setrandom       (void)
         time_t          getnow          (void)
@@ -149,6 +151,22 @@ mungspaces(char *bp)
         p2--;
     *p2 = '\0';
     return bp;
+}
+
+/* remove leading and trailing whitespace, in place */
+char*
+trimspaces(txt)
+char* txt;
+{
+    char* end;
+
+    while (*txt == ' ' || *txt == '\t')
+        txt++;
+    end = eos(txt);
+    while (--end >= txt && (*end == ' ' || *end == '\t'))
+        *end = '\0';
+
+    return txt;
 }
 
 /* remove \n from end of line; remove \r too if one is there */
@@ -278,7 +296,7 @@ s_suffix(const char *s)
 char *
 ing_suffix(const char *s)
 {
-    const char *vowel = "aeiouy";
+    static const char vowel[] = "aeiouwy";
     static char buf[BUFSZ];
     char onoff[10];
     char *p;
@@ -286,21 +304,22 @@ ing_suffix(const char *s)
     Strcpy(buf, s);
     p = eos(buf);
     onoff[0] = *p = *(p + 1) = '\0';
-    if ((strlen(buf) > 4)
-        && (!strcmpi(p - 3, " on") || !strcmpi(p - 4, " off")
-            || !strcmpi(p - 5, " with"))) {
-        p = strrchr(buf, ' ');
+    if ((p >= &buf[3] && !strcmpi(p - 3, " on"))
+        || (p >= &buf[4] && !strcmpi(p - 4, " off"))
+        || (p >= &buf[5] && !strcmpi(p - 5, " with"))) {
+        p = rindex(buf, ' ');
         Strcpy(onoff, p);
+        *p = '\0';
     }
-    if (!index(vowel, *(p - 1)) && index(vowel, *(p - 2))
-        && !index(vowel, *(p - 3))) {
+    if (p >= &buf[3] && !index(vowel, *(p - 1))
+        && index(vowel, *(p - 2)) && !index(vowel, *(p - 3))) {
         /* tip -> tipp + ing */
         *p = *(p - 1);
         *(p + 1) = '\0';
-    } else if (!strcmpi(p - 2, "ie")) { /* vie -> vy + ing */
+    } else if (p >= &buf[2] && !strcmpi(p - 2, "ie")) { /* vie -> vy + ing */
         *(p - 2) = 'y';
         *(p - 1) = '\0';
-    } else if (*(p - 1) == 'e') /* grease -> greas + ing */
+    } else if (p >= &buf[1] && *(p - 1) == 'e') /* grease -> greas + ing */
         *(p - 1) = '\0';
     Strcat(buf, "ing");
     if (onoff[0])
@@ -361,12 +380,16 @@ tabexpand(char *sbuf)
     return strcpy(sbuf, buf);
 }
 
+#define VISCTRL_NBUF 5
 /* make a displayable string from a character */
 char *
 visctrl(char c)
 {
-    Static char ccc[5];
+    Static char visctrl_bufs[VISCTRL_NBUF][5];
+    static int nbuf = 0;
     register int i = 0;
+    char *ccc = visctrl_bufs[nbuf];
+    nbuf = (nbuf + 1) % VISCTRL_NBUF;
 
     if ((uchar) c & 0200) {
         ccc[i++] = 'M';
@@ -394,6 +417,7 @@ strsubst(char *bp, const char *orig, const char *replacement)
     char *found, buf[BUFSZ];
 
     if (bp) {
+        /* [this could be replaced by strNsubst(bp, orig, replacement, 1)] */
         found = strstr(bp, orig);
         if (found) {
             Strcpy(buf, found + strlen(orig));
@@ -402,6 +426,52 @@ strsubst(char *bp, const char *orig, const char *replacement)
         }
     }
     return bp;
+}
+
+/* substitute the Nth occurrence of a substring within a string (in place);
+   if N is 0, substitute all occurrences; returns the number of subsitutions;
+   maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
+int
+strNsubst(inoutbuf, orig, replacement, n)
+char *inoutbuf; /* current string, and result buffer */
+const char *orig, /* old substring; if "" then insert in front of Nth char */
+           *replacement; /* new substring; if "" then delete old substring */
+int n; /* which occurrence to replace; 0 => all */
+{
+    char *bp, *op, workbuf[BUFSZ];
+    const char *rp;
+    unsigned len = (unsigned) strlen(orig);
+    int ocount = 0, /* number of times 'orig' has been matched */
+        rcount = 0; /* number of subsitutions made */
+
+    for (bp = inoutbuf, op = workbuf; *bp && op < &workbuf[BUFSZ - 1]; ) {
+        if ((!len || !strncmp(bp, orig, len)) && (++ocount == n || n == 0)) {
+            /* Nth match found */
+            for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+                *op++ = *rp++;
+            ++rcount;
+            if (len) {
+                bp += len; /* skip 'orig' */
+                continue;
+            }
+        }
+        /* no match (or len==0) so retain current character */
+        *op++ = *bp++;
+    }
+    if (!len && n == ocount + 1) {
+        /* special case: orig=="" (!len) and n==strlen(inoutbuf)+1,
+           insert in front of terminator (in other words, append);
+           [when orig=="", ocount will have been incremented once for
+           each input char] */
+        for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+            *op++ = *rp++;
+        ++rcount;
+    }
+    if (rcount) {
+        *op = '\0';
+        Strcpy(inoutbuf, workbuf);
+    }
+    return rcount;
 }
 
 /* return the ordinal suffix of a number */

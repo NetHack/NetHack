@@ -1,23 +1,29 @@
 Debug-Mode Quick Reference:
 
-^E  ==  detect secret doors and traps.
-^F  ==  do magic mapping.
-^G  ==  create monster.
-^I  ==  identify items in pack.
-^O  ==  tell locations of special levels.
-^T  ==  do intra-level teleport.
-^V  ==  do trans-level teleport.
-^W  ==  make wish.
-^X  ==  show attributes including intrinsic attributes.
+^E  ==  detect secret doors and traps
+^F  ==  map level; reveals traps and secret corridors but not secret doors
+^G  ==  create monster by name or class
+^I  ==  identify items in pack
+^T  ==  do intra-level teleport
+^V  ==  do trans-level teleport; '?' yields menu of special destinations
+^W  ==  make a wish for an item or a trap or a limited subset of terrain
+^X  ==  show status, attributes, and characteristics (extended enlightenment)
 
-#levelchange == change experience level
-#lightsources == show mobile light sources
+#levelchange    == set hero's experience level
+#lightsources   == show mobile light sources
 #monpolycontrol == control monster polymorphs
-#panic == panic test
-#polyself == polymorph self
-#seenv == show seen vectors
-#stats == show memory statistics
-#timeout == look at timeout queue
-#vision == show vision array
-#wmode == show wall modes
+#panic          == panic test (warning: current game will be terminated)
+#polyself       == polymorph self
+#seenv          == show seen vectors
+#stats          == show memory statistics
+#terrain        == show current level (more options than in normal play)
+#timeout        == look at timeout queue and hero's timed intrinsics
+#vanquished     == disclose counts of dead monsters sorted in various ways
+#vision         == show vision array
+#wizintrinsic   == set selected intrinsic timeouts
+#wizmakemap     == recreate the current dungeon level
+#wizrumorcheck  == validate first and last rumor for true and false set
+#wizsmell       == smell a monster
+#wizwhere       == show dungeon placement of all special levels
+#wmode          == show wall modes
 

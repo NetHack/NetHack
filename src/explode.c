@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1450915435 2015/12/24 00:03:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1503355817 2017/08/21 22:50:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,8 +39,7 @@ explode(int x, int y,
     int idamres, idamnonres;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
-    int explmask[3][3];
-    /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
+    int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
             do_hallu = FALSE, inside_engulfer;
     char hallu_buf[BUFSZ];
@@ -90,7 +89,9 @@ explode(int x, int y,
 
     if (olet == MON_EXPLODE) {
         str = killer.name;
-        do_hallu = Hallucination && strstri(str, "'s explosion");
+        do_hallu = (Hallucination
+                    && (strstri(str, "'s explosion")
+                        || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
         switch (abs(type) % 10) {
@@ -174,7 +175,7 @@ explode(int x, int y,
                     break;
                 }
             }
-            /* can be both you and mtmp if you're swallowed */
+            /* can be both you and mtmp if you're swallowed or riding */
             mtmp = m_at(i + x - 1, j + y - 1);
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
@@ -392,8 +393,7 @@ explode(int x, int y,
                 } else {
                     /* call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
-                     * can
-                     * call mondied, not killed, if it's not your blast
+                     * can call mondied, not killed, if it's not your blast
                      */
                     int mdam = dam;
 
@@ -413,13 +413,27 @@ explode(int x, int y,
                     mtmp->mhp -= (idamres + idamnonres);
                 }
                 if (mtmp->mhp <= 0) {
-                    if (mdef ? (mtmp == mdef) : !context.mon_moving)
+                    if (!context.mon_moving) {
                         killed(mtmp);
-                    else
+                    } else if (mdef && mtmp == mdef) {
+                        /* 'mdef' killed self trying to cure being turned
+                         * into slime due to some action by the player.
+                         * Hero gets the credit (experience) and most of
+                         * the blame (possible loss of alignment and/or
+                         * luck and/or telepathy depending on mtmp) but
+                         * doesn't break pacifism.  xkilled()'s message
+                         * would be "you killed <mdef>" so give our own.
+                         */
+                        if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
+                            pline("%s is %s!", Monnam(mtmp),
+                                  nonliving(mtmp->data) ? "destroyed"
+                                                        : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT);
+                    } else
                         monkilled(mtmp, "", (int) adtyp);
                 } else if (!context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
-                    setmangry(mtmp);
+                    setmangry(mtmp, TRUE);
                 }
             }
 
@@ -498,12 +512,10 @@ explode(int x, int y,
     }
 
     if (shopdamage) {
-        pay_for_damage(adtyp == AD_FIRE
-                           ? "burn away"
-                           : adtyp == AD_COLD
-                                 ? "shatter"
-                                 : adtyp == AD_DISN ? "disintegrate"
-                                                    : "destroy",
+        pay_for_damage((adtyp == AD_FIRE) ? "burn away"
+                          : (adtyp == AD_COLD) ? "shatter"
+                             : (adtyp == AD_DISN) ? "disintegrate"
+                                : "destroy",
                        FALSE);
     }
 
