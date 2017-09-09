@@ -1200,9 +1200,8 @@ int iscompound; /* 0 == boolean option, 1 == compound */
      * For now just return.
      */
 #else /* !MAC */
-    raw_printf("\nWarning - %s option specified multiple times: %s.\n",
+    config_error_add("%s option specified multiple times: %s.\n",
                iscompound ? "compound" : "boolean", opts);
-    wait_synch();
 #endif /* ?MAC */
     return;
 }

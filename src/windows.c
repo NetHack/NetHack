@@ -238,22 +238,25 @@ const char *s;
         exit(EXIT_FAILURE);
     }
     if (!winchoices[1].procs) {
-        raw_printf("Window type %s not recognized.  The only choice is: %s.",
+        config_error_add("Window type %s not recognized.  The only choice is: %s",
                    s, winchoices[0].procs->name);
     } else {
-        raw_printf("Window type %s not recognized.  Choices are:", s);
+        char buf[BUFSZ];
+        boolean first = TRUE;
+        buf[0] = '\0';
         for (i = 0; winchoices[i].procs; i++) {
             if ('+' == winchoices[i].procs->name[0])
                 continue;
             if ('-' == winchoices[i].procs->name[0])
                 continue;
-            raw_printf("        %s", winchoices[i].procs->name);
+            Sprintf(eos(buf), "%s%s", first ? "" : ",", winchoices[i].procs->name);
+            first = FALSE;
         }
+        config_error_add("Window type %s not recognized.  Choices are: %s", s, buf);
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
         nh_terminate(EXIT_SUCCESS);
-    wait_synch();
 }
 
 #ifdef WINCHAIN

@@ -2293,6 +2293,10 @@ int src;
         section = choose_random_part(bufp, ',');
         if (section)
             config_section_chosen = dupstr(section);
+        else {
+            config_error_add("No config section to choose");
+            retval = 0;
+        }
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "BINDINGS", 4)) {
