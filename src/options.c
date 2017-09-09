@@ -510,7 +510,7 @@ STATIC_DCL char *FDECL(string_for_opt, (char *, BOOLEAN_P));
 STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
 STATIC_DCL void FDECL(bad_negation, (const char *, BOOLEAN_P));
 STATIC_DCL int FDECL(change_inv_order, (char *));
-STATIC_DCL void FDECL(warning_opts, (char *, const char *));
+STATIC_DCL boolean FDECL(warning_opts, (char *, const char *));
 STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
 STATIC_DCL boolean FDECL(duplicate_opt_detection, (const char *, int));
 STATIC_DCL void FDECL(complain_about_duplicate, (const char *, int));
@@ -1026,22 +1026,35 @@ char *op;
 {
     int oc_sym, num;
     char *sp, buf[QBUFSZ];
+    int retval = 1;
 
     num = 0;
     if (!index(op, GOLD_SYM))
         buf[num++] = COIN_CLASS;
 
     for (sp = op; *sp; sp++) {
+        boolean fail = FALSE;
         oc_sym = def_char_to_objclass(*sp);
         /* reject bad or duplicate entries */
-        if (oc_sym == MAXOCLASSES /* not an object class char */
+        if (oc_sym == MAXOCLASSES) { /* not an object class char */
+            config_error_add("Not an object class '%c'", *sp);
+            retval = 0;
+            fail = TRUE;
+        } else if (!index(flags.inv_order, oc_sym)) {
             /* VENOM_CLASS, RANDOM_CLASS, and ILLOBJ_CLASS are excluded
                because they aren't in def_inv_order[] so don't make it
                into flags.inv_order, hence always fail this index() test */
-            || !index(flags.inv_order, oc_sym) || index(sp + 1, *sp))
-            return 0;
+            config_error_add("Object class '%c' not allowed", *sp);
+            retval = 0;
+            fail = TRUE;
+        } else if (index(sp + 1, *sp)) {
+            config_error_add("Duplicate object class '%c'", *sp);
+            retval = 0;
+            fail = TRUE;
+        }
         /* retain good ones */
-        buf[num++] = (char) oc_sym;
+        if (!fail)
+            buf[num++] = (char) oc_sym;
     }
     buf[num] = '\0';
 
@@ -1052,10 +1065,10 @@ char *op;
     buf[MAXOCLASSES - 1] = '\0';
 
     Strcpy(flags.inv_order, buf);
-    return 1;
+    return retval;
 }
 
-STATIC_OVL void
+STATIC_OVL boolean
 warning_opts(opts, optype)
 register char *opts;
 const char *optype;
@@ -1064,7 +1077,7 @@ const char *optype;
     int length, i;
 
     if (!(opts = string_for_env_opt(optype, opts, FALSE)))
-        return;
+        return FALSE;
     escapes(opts, opts);
 
     length = (int) strlen(opts);
@@ -1074,6 +1087,7 @@ const char *optype;
                                      : opts[i] ? (uchar) opts[i]
                                                : def_warnsyms[i].sym;
     assign_warnings(translate);
+    return TRUE;
 }
 
 void
@@ -1970,9 +1984,10 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if ((op = string_for_env_opt(fullname, opts, negated)) != 0) {
-            if (negated)
+            if (negated) {
                 bad_negation(fullname, TRUE);
-            else
+                return FALSE;
+            } else
                 switch (lowc(*op)) {
                 case 'd': /* dog */
                     preferred_pet = 'd';
@@ -2010,8 +2025,10 @@ boolean tinitial, tfrom_file;
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             nmcpy(catname, op, PL_PSIZ);
+        } else
+            return FALSE;
         sanitize_name(catname);
         return retval;
     }
@@ -2023,8 +2040,10 @@ boolean tinitial, tfrom_file;
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             nmcpy(dogname, op, PL_PSIZ);
+        } else
+            return FALSE;
         sanitize_name(dogname);
         return retval;
     }
@@ -2036,8 +2055,10 @@ boolean tinitial, tfrom_file;
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             nmcpy(horsename, op, PL_PSIZ);
+        } else
+            return FALSE;
         sanitize_name(horsename);
         return retval;
     }
@@ -2057,7 +2078,7 @@ boolean tinitial, tfrom_file;
                 iflags.num_pad_mode = 0;
             }
         } else if (negated) {
-            bad_negation("number_pad", TRUE);
+            bad_negation(fullname, TRUE);
             return FALSE;
         } else {
             int mode = atoi(op);
@@ -2096,15 +2117,16 @@ boolean tinitial, tfrom_file;
             symset[ROGUESET].name = dupstr(op);
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
-                raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
+                config_error_add("Unable to load symbol set \"%s\" from \"%s\".",
                            op, SYMBOLS);
-                wait_synch();
+                return FALSE;
             } else {
                 if (!initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
                 need_redraw = TRUE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2119,14 +2141,15 @@ boolean tinitial, tfrom_file;
             symset[PRIMARY].name = dupstr(op);
             if (!read_sym_file(PRIMARY)) {
                 clear_symsetentry(PRIMARY, TRUE);
-                raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
+                config_error_add("Unable to load symbol set \"%s\" from \"%s\".",
                            op, SYMBOLS);
-                wait_synch();
+                return FALSE;
             } else {
                 switch_symbols(symset[PRIMARY].name != (char *) 0);
                 need_redraw = TRUE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2149,18 +2172,22 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
     /* menucolor:"regex_string"=color */
     fullname = "menucolor";
     if (match_optname(opts, fullname, 9, TRUE)) {
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+            return FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             if (!add_menu_coloring(op))
                 return FALSE;
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2454,7 +2481,8 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2483,7 +2511,8 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             }
             }
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2494,9 +2523,8 @@ boolean tinitial, tfrom_file;
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else
-            warning_opts(opts, fullname);
-        return retval;
+        }
+        return warning_opts(opts, fullname);
     }
 
 #ifdef BACKWARD_COMPAT
@@ -2549,8 +2577,10 @@ boolean tinitial, tfrom_file;
         if (negated) {
             bad_negation(fullname, FALSE);
             return FALSE;
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             nmcpy(plname, op, PL_NSIZ);
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2567,7 +2597,8 @@ boolean tinitial, tfrom_file;
             (void) strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
             load_keyboard_handler();
 #endif
-        }
+        } else
+            return FALSE;
         return retval;
     }
 
@@ -2589,8 +2620,10 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        } else if (negated)
+        } else if (negated) {
             bad_negation(fullname, TRUE);
+            return FALSE;
+        }
         return retval;
     }
     /* WINCAP
@@ -2613,8 +2646,10 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s parameter '%s'", fullname, op);
                 return FALSE;
             }
-        } else if (negated)
+        } else if (negated) {
             bad_negation(fullname, TRUE);
+            return FALSE;
+        }
         return retval;
     }
     /* the order to list the pack */
