@@ -197,7 +197,7 @@ E int enter_explore_mode(void);
 E void enlightenment(int, int);
 E void youhiding(boolean, int);
 E void show_conduct(int);
-E void bind_key(uchar, const char *);
+E boolean bind_key(uchar, const char *);
 E void dokeylist(void);
 E int xytod(schar, schar);
 E void dtoxy(coord *, int);
@@ -763,6 +763,9 @@ E void unlock_file(const char *);
 #ifdef USER_SOUNDS
 E boolean can_read_file(const char *);
 #endif
+E void config_error_init(boolean, const char *);
+E void config_error_add(const char *, ...) PRINTF_F(1, 2);
+E int config_error_done(void);
 E boolean read_config_file(const char *, int);
 E void check_recordfile(const char *);
 E void read_wizkit(void);
@@ -1673,15 +1676,15 @@ E boolean match_optname(const char *, const char *, int, boolean);
 E void initoptions(void);
 E void initoptions_init(void);
 E void initoptions_finish(void);
-E void parseoptions(char *, boolean, boolean);
+E boolean parseoptions(char *, boolean, boolean);
 E int doset(void);
 E int dotogglepickup(void);
 E void option_help(void);
 E void next_opt(winid, const char *);
 E int fruitadd(char *, struct fruit *);
 E int choose_classes_menu(const char *, int, boolean,
-                                  char *, char *);
-E void parsebindings(char *);
+                          char *, char *);
+E boolean parsebindings(char *);
 E void add_menu_cmd_alias(char, char);
 E char get_menu_cmd_key(char);
 E char map_menu_cmd(char);

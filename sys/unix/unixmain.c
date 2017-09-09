@@ -401,7 +401,9 @@ process_options(int argc, char *argv[])
             }
             break;
         case 'w': /* windowtype */
+            config_error_init(FALSE, "command line");
             choose_windows(&argv[0][2]);
+            config_error_done();
             break;
         case '@':
             flags.randomall = 1;
