@@ -161,7 +161,7 @@ void engine_free(void *ptr)
     free(ptr);
 }
 
-int engine_main(int argc, char *argv[], engine_callbacks * inCallbacks)
+int engine_setcallbacks(engine_callbacks * inCallbacks)
 {
     callbacks = *inCallbacks;
     /* TODO we should instead set the pointer to the procs in the table */
@@ -169,6 +169,9 @@ int engine_main(int argc, char *argv[], engine_callbacks * inCallbacks)
         tty_procs = *callbacks.tty_procs;
     if (callbacks.mswin_procs != NULL)
         mswin_procs = *callbacks.mswin_procs;
-    return main(argc, argv);
 }
 
+int engine_main(int argc, char *argv[])
+{
+	return main(argc, argv);
+}

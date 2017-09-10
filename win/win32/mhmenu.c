@@ -65,7 +65,7 @@ typedef struct mswin_nethack_menu_window {
     BOOL is_active;
 } NHMenuWindow, *PNHMenuWindow;
 
-extern short glyph2tile[];
+ENGINE_DATA extern short glyph2tile[];
 
 static WNDPROC wndProcListViewOrig = NULL;
 static WNDPROC editControlWndProc = NULL;

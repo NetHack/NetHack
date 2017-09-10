@@ -15,7 +15,7 @@
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
 
-extern short glyph2tile[];
+ENGINE_DATA extern short glyph2tile[];
 
 #define TILEBMP_X(ntile) ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
 #define TILEBMP_Y(ntile) ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)

@@ -136,6 +136,7 @@
     <ClInclude Include="$(IncDir)display.h" Filter="header"/>
     <ClInclude Include="$(IncDir)dlb.h" Filter="header"/>
     <ClInclude Include="$(IncDir)dungeon.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)engine.h" Filter="header"/>
     <ClInclude Include="$(IncDir)engrave.h" Filter="header"/>
     <ClInclude Include="$(IncDir)extern.h" Filter="header"/>
     <ClInclude Include="$(IncDir)flag.h" Filter="header"/>

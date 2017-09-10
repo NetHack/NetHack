@@ -41,7 +41,7 @@ E int otg_temp;
 
 ENGINE_DATA E NEARDATA int in_doagain;
 
-E struct dgn_topology { /* special dungeon levels for speed */
+ENGINE_DATA E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_oracle_level;
     d_level d_bigroom_level; /* unused */
     d_level d_rogue_level;
@@ -162,8 +162,8 @@ ENGINE_DATA E boolean restoring;
 
 ENGINE_DATA E const char quitchars[];
 E const char vowels[];
-E const char ynchars[];
-E const char ynqchars[];
+ENGINE_DATA E const char ynchars[];
+ENGINE_DATA E const char ynqchars[];
 ENGINE_DATA E const char ynaqchars[];
 E const char ynNaqchars[];
 ENGINE_DATA E NEARDATA long yn_number;
@@ -184,7 +184,7 @@ E NEARDATA struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
-E long done_money;
+ENGINE_DATA E long done_money;
 ENGINE_DATA E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];

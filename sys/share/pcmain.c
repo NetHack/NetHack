@@ -73,7 +73,7 @@ STATIC_DCL char *FDECL(exepath, (char *));
 
 int FDECL(main, (int, char **));
 
-extern boolean FDECL(pcmain, (int, char **));
+ENGINE_FUNC extern boolean FDECL(pcmain, (int, char **));
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 void NDECL(startup);

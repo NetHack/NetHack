@@ -194,7 +194,7 @@ extern void FDECL(interject, (int));
 
 /* this was part of the MICRO stuff in the past */
 extern const char *alllevels, *allbones;
-extern char hackdir[];
+ENGINE_FUNC extern char hackdir[];
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *) 0)

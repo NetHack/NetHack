@@ -24,7 +24,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;_LIB;ENGINE_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;DLB;MSWIN_GRAPHICS;_LIB;ENGINE_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -166,6 +166,7 @@
     <ClInclude Include="$(IncDir)display.h" />
     <ClInclude Include="$(IncDir)dlb.h" />
     <ClInclude Include="$(IncDir)dungeon.h" />
+    <ClInclude Include="$(IncDir)engine.h" />
     <ClInclude Include="$(IncDir)engrave.h" />
     <ClInclude Include="$(IncDir)extern.h" />
     <ClInclude Include="$(IncDir)flag.h" />

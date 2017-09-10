@@ -20,7 +20,7 @@ E char *FDECL(fmt_ptr, (const genericptr));
 
 /* ### allmain.c ### */
 
-E void FDECL(moveloop, (BOOLEAN_P));
+ENGINE_FUNC E void FDECL(moveloop, (BOOLEAN_P));
 E void NDECL(stop_occupation);
 E void NDECL(display_gamewindows);
 E void NDECL(newgame);
@@ -192,7 +192,7 @@ E char FDECL(txt2key, (char *));
 E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
-E int NDECL(doextlist);
+ENGINE_FUNC E int NDECL(doextlist);
 ENGINE_FUNC E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
@@ -655,7 +655,7 @@ E boolean FDECL(Popeye, (int));
 /* ### end.c ### */
 
 E void FDECL(done1, (int));
-E int NDECL(done2);
+ENGINE_FUNC E int NDECL(done2);
 #ifdef USE_TRAMPOLI
 E void FDECL(done_intr, (int));
 #endif
@@ -663,7 +663,7 @@ E void FDECL(done_in_by, (struct monst *, int));
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 ENGINE_FUNC E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
-E void FDECL(done, (int));
+ENGINE_FUNC E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
 ENGINE_FUNC E void FDECL(nh_terminate, (int)) NORETURN;
@@ -957,7 +957,7 @@ E void FDECL(prinv, (const char *, struct obj *, long));
 E char *FDECL(xprname,
               (struct obj *, const char *, CHAR_P, BOOLEAN_P, long, long));
 E int NDECL(ddoinv);
-E char FDECL(display_inventory, (const char *, BOOLEAN_P));
+ENGINE_DATA E char FDECL(display_inventory, (const char *, BOOLEAN_P));
 E int FDECL(display_binventory, (int, int, BOOLEAN_P));
 E struct obj *FDECL(display_cinventory, (struct obj *));
 E struct obj *FDECL(display_minventory, (struct monst *, int, char *));
@@ -1682,7 +1682,7 @@ E void NDECL(initoptions_finish);
 E void FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
-E void NDECL(option_help);
+ENGINE_FUNC E void NDECL(option_help);
 E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
@@ -1695,7 +1695,7 @@ E void FDECL(show_menu_controls, (winid, BOOLEAN_P));
 E void FDECL(assign_warnings, (uchar *));
 ENGINE_FUNC E char *FDECL(nh_getenv, (const char *));
 E void FDECL(set_duplicate_opt_detection, (int));
-E void FDECL(set_wc_option_mod_status, (unsigned long, int));
+ENGINE_FUNC E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 ENGINE_FUNC E void FDECL(set_option_mod_status, (const char *, int));
 E int FDECL(add_autopickup_exception, (const char *));
@@ -1724,13 +1724,13 @@ E boolean FDECL(object_from_map, (int,int,int,struct obj **));
 E int FDECL(do_screen_description, (coord, BOOLEAN_P, int, char *,
                                     const char **));
 E int FDECL(do_look, (int, coord *));
-E int NDECL(dowhatis);
+ENGINE_FUNC E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
-E int NDECL(dowhatdoes);
+ENGINE_FUNC E int NDECL(dowhatdoes);
 E char *FDECL(dowhatdoes_core, (CHAR_P, char *));
 E int NDECL(dohelp);
-E int NDECL(dohistory);
+ENGINE_FUNC E int NDECL(dohistory);
 
 /* ### pcmain.c ### */
 
@@ -2081,7 +2081,7 @@ ENGINE_FUNC E boolean FDECL(setrolefilter, (const char *));
 ENGINE_FUNC E boolean NDECL(gotrolefilter);
 ENGINE_FUNC E void NDECL(clearrolefilter);
 ENGINE_FUNC E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
-E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
+ENGINE_FUNC E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
 ENGINE_FUNC E void NDECL(plnamesuffix);
 ENGINE_FUNC E void FDECL(role_selection_prolog, (int, winid));
 ENGINE_FUNC E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
@@ -2102,7 +2102,7 @@ E void NDECL(rumor_check);
 
 /* ### save.c ### */
 
-E int NDECL(dosave);
+ENGINE_FUNC E int NDECL(dosave);
 E int NDECL(dosave0);
 E boolean FDECL(tricked_fileremoved, (int, char *));
 #ifdef INSURANCE
@@ -2234,7 +2234,7 @@ ENGINE_FUNC E void FDECL(play_sound_for_message, (const char *));
 
 /* ### sys.c ### */
 
-E void NDECL(sys_early_init);
+ENGINE_FUNC E void NDECL(sys_early_init);
 E void NDECL(sysopt_release);
 E void FDECL(sysopt_seduce_set, (int));
 
@@ -2375,7 +2375,7 @@ E void NDECL(timer_sanity_check);
 
 /* ### topten.c ### */
 
-E void FDECL(formatkiller, (char *, unsigned, int, BOOLEAN_P));
+ENGINE_FUNC E void FDECL(formatkiller, (char *, unsigned, int, BOOLEAN_P));
 E void FDECL(topten, (int, time_t));
 E void FDECL(prscore, (int, char **));
 E struct toptenentry *NDECL(get_rnd_toptenentry);
@@ -2526,7 +2526,7 @@ E void FDECL(vault_gd_watching, (unsigned int));
 /* ### version.c ### */
 
 E char *FDECL(version_string, (char *));
-E char *FDECL(getversionstring, (char *));
+ENGINE_FUNC E char *FDECL(getversionstring, (char *));
 E int NDECL(doversion);
 E int NDECL(doextversion);
 #ifdef MICRO
@@ -2725,7 +2725,7 @@ void NDECL(commit_windowchain);
 #endif
 E boolean NDECL(genl_can_suspend_no);
 ENGINE_FUNC E boolean NDECL(genl_can_suspend_yes);
-E char FDECL(genl_message_menu, (CHAR_P, int, const char *));
+ENGINE_FUNC E char FDECL(genl_message_menu, (CHAR_P, int, const char *));
 E void FDECL(genl_preference_update, (const char *));
 E char *FDECL(genl_getmsghistory, (BOOLEAN_P));
 E void FDECL(genl_putmsghistory, (const char *, BOOLEAN_P));

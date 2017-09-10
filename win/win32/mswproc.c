@@ -2079,7 +2079,7 @@ initMapTiles(void)
     TCHAR wbuf[MAX_PATH];
     int tl_num;
     SIZE map_size;
-    extern int total_tiles_used;
+    ENGINE_DATA extern int total_tiles_used;
 
     /* no file - no tile */
     if (!(iflags.wc_tile_file && *iflags.wc_tile_file))

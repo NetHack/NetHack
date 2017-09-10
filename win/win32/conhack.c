@@ -38,5 +38,6 @@ int main(int argc, char *argv[])
     callbacks.synch_cursor = synch_cursor;
     callbacks.more = more;
     callbacks.tty_procs = &tty_procs;
-    engine_main(argc, argv, &callbacks);
+	engine_setcallbacks(&callbacks);
+    engine_main(argc, argv);
 }
