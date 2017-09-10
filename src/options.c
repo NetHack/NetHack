@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1498078876 2017/06/21 21:01:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.288 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1505084668 2017/09/10 23:04:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1107,26 +1107,22 @@ char *op;
 const char *optn;
 {
     char buf[BUFSZ];
-    boolean rejectver = FALSE;
     unsigned long fnv = get_feature_notice_ver(op); /* version.c */
 
     if (fnv == 0L)
         return 0;
-    if (fnv > get_current_feature_ver())
-        rejectver = TRUE;
-    else
-        flags.suppress_alert = fnv;
-    if (rejectver) {
+    if (fnv > get_current_feature_ver()) {
         if (!initial) {
             You_cant("disable new feature alerts for future versions.");
         } else {
-            Sprintf(buf,
-                    "\n%s=%s Invalid reference to a future version ignored",
-                    optn, op);
-            config_error_add(buf);
+            config_error_add(
+                        "%s=%s Invalid reference to a future version ignored",
+                             optn, op);
         }
         return 0;
     }
+
+    flags.suppress_alert = fnv;
     if (!initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
@@ -1664,7 +1660,7 @@ boolean
 add_menu_coloring(tmpstr)
 char *tmpstr;
 {
-    int i, c = NO_COLOR, a = ATR_NONE;
+    int c = NO_COLOR, a = ATR_NONE;
     char *tmps, *cs, *amp;
     char str[BUFSZ];
 
