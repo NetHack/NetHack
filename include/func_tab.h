@@ -19,6 +19,6 @@ struct ext_func_tab {
     const char *f_text;
 };
 
-extern struct ext_func_tab extcmdlist[];
+ENGINE_FUNC extern struct ext_func_tab extcmdlist[];
 
 #endif /* FUNC_TAB_H */

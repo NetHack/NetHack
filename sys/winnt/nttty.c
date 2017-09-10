@@ -20,6 +20,10 @@
 #include <sys\stat.h>
 #include "win32api.h"
 
+#if ENGINE_IMPORT
+#define free engine_free
+#endif
+
 /*
  * The following WIN32 Console API routines are used in this file.
  *
@@ -56,8 +60,8 @@ CONSOLE_SCREEN_BUFFER_INFO csbi, origcsbi;
 COORD ntcoord;
 INPUT_RECORD ir;
 
-extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
-extern int redirect_stdout;
+ENGINE_DATA extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
+ENGINE_DATA extern int redirect_stdout;
 
 /* Flag for whether NetHack was launched via the GUI, not the command line.
  * The reason we care at all, is so that we can get
@@ -1037,6 +1041,25 @@ VA_DECL(const char *, fmt)
     VA_END();
     return;
 }
+
+#ifdef ENGINE_IMPORT
+void vmsmsg(const char * fmt, va_list the_args)
+{
+    char buf[ROWNO * COLNO]; /* worst case scenario */
+    Vsprintf(buf, fmt, VA_ARGS);
+    if (redirect_stdout)
+        fprintf(stdout, "%s", buf);
+    else {
+        if (!init_ttycolor_completed)
+            init_ttycolor();
+
+        xputs(buf);
+        if (ttyDisplay)
+            curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
+    }
+    return;
+}
+#endif
 
 /* fatal error */
 /*VARARGS1*/

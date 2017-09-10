@@ -209,6 +209,7 @@ enum hmon_atkmode_types {
 
 #include "extern.h"
 #include "winprocs.h"
+#include "engine.h"
 #include "sys.h"
 
 #ifdef USE_TRAMPOLI

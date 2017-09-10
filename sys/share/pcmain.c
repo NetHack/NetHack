@@ -54,7 +54,7 @@ extern void FDECL(nethack_exit, (int));
 
 #ifdef WIN32
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
-extern int redirect_stdout;       /* from sys/share/pcsys.c */
+ENGINE_DATA extern int redirect_stdout;       /* from sys/share/pcsys.c */
 extern int GUILaunched;
 HANDLE hStdOut;
 char *NDECL(exename);

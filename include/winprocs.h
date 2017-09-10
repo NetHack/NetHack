@@ -86,7 +86,7 @@ struct window_procs {
     boolean NDECL((*win_can_suspend));
 };
 
-extern
+ENGINE_DATA extern
 #ifdef HANGUPHANDLING
     volatile
 #endif

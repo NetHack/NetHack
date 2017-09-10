@@ -533,6 +533,21 @@ typedef unsigned char uchar;
 
 #endif
 
+#ifdef ENGINE_EXPORT
+#define ENGINE_DATA __declspec(dllexport)
+#elif ENGINE_IMPORT
+#define ENGINE_DATA __declspec(dllimport)
+#else
+#define ENGINE_DATA
+#endif
+
+#ifdef ENGINE_EXPORT
+#define ENGINE_FUNC __declspec(dllexport)
+#elif ENGINE_IMPORT
+#define ENGINE_FUNC __declspec(dllimport)
+#else
+#define ENGINE_FUNC
+#endif
 
 /* End of Section 4 */
 

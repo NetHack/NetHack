@@ -36,6 +36,10 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
+#if ENGINE_IMPORT
+#define free engine_free
+#endif
+
 #ifdef TTY_TILES_ESCCODES
 extern short glyph2tile[];
 #define TILE_ANSI_COMMAND 'z'
@@ -45,10 +49,10 @@ extern short glyph2tile[];
 #define AVTC_INLINE_SYNC   3
 #endif
 
-extern char mapped_menu_cmds[]; /* from options.c */
+ENGINE_DATA extern char mapped_menu_cmds[]; /* from options.c */
 
 /* this is only needed until tty_status_* routines are written */
-extern NEARDATA winid WIN_STATUS;
+ENGINE_DATA extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {

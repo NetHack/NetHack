@@ -50,5 +50,7 @@ Makefile.gcc-orig
 *.ilk
 # VS2013 extension to auto-whine about questionable code generates these
 *.lastcodeanalysissucceeded
+# VS2017
+.vs
 # Win32-specific ignores end
 

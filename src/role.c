@@ -757,7 +757,7 @@ const struct Gender genders[] = {
 };
 
 /* Table of all alignments */
-const struct Align aligns[] = {
+ENGINE_DATA const struct Align aligns[] = {
     { "law", "lawful", "Law", ROLE_LAWFUL, A_LAWFUL },
     { "balance", "neutral", "Neu", ROLE_NEUTRAL, A_NEUTRAL },
     { "chaos", "chaotic", "Cha", ROLE_CHAOTIC, A_CHAOTIC },

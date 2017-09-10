@@ -5123,7 +5123,7 @@ char def;
 {
     char res, qbuf[QBUFSZ];
 #ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
+    ENGINE_DATA extern unsigned saved_pline_index; /* pline.c */
     unsigned idx = saved_pline_index;
     /* buffer to hold query+space+formatted_single_char_response */
     char dumplog_buf[QBUFSZ + 1 + 15]; /* [QBUFSZ+1+7] should suffice */

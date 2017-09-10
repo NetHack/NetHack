@@ -678,7 +678,7 @@ dump_plines()
     int i, j;
     char buf[BUFSZ], **strp;
     extern char *saved_plines[];
-    extern unsigned saved_pline_index;
+    ENGINE_DATA extern unsigned saved_pline_index;
 
     Strcpy(buf, " "); /* one space for indentation */
     putstr(0, 0, "Latest messages:");

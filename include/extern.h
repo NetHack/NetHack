@@ -151,7 +151,7 @@ E long NDECL(botl_score);
 #endif
 E int FDECL(describe_level, (char *));
 E const char *FDECL(rank_of, (int, SHORT_P, BOOLEAN_P));
-E void NDECL(bot);
+ENGINE_FUNC E void NDECL(bot);
 #ifdef STATUS_VIA_WINDOWPORT
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
@@ -183,9 +183,9 @@ E int NDECL(wiz_wish);
 #endif /* USE_TRAMPOLI */
 E void NDECL(reset_occupations);
 E void FDECL(set_occupation, (int (*)(void), const char *, int));
-E char NDECL(pgetchar);
+ENGINE_FUNC E char NDECL(pgetchar);
 E void FDECL(pushch, (CHAR_P));
-E void FDECL(savech, (CHAR_P));
+ENGINE_FUNC E void FDECL(savech, (CHAR_P));
 E const char *FDECL(key2extcmddesc, (UCHAR_P));
 E boolean FDECL(bind_specialkey, (UCHAR_P, const char *));
 E char FDECL(txt2key, (char *));
@@ -193,7 +193,7 @@ E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
-E int NDECL(extcmd_via_menu);
+ENGINE_FUNC E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
@@ -213,12 +213,12 @@ E int FDECL(get_adjacent_loc,
 E const char *FDECL(click_to_cmd, (int, int, int));
 E char FDECL(get_count, (char *, CHAR_P, long, long *, BOOLEAN_P));
 #ifdef HANGUPHANDLING
-E void FDECL(hangup, (int));
+ENGINE_FUNC E void FDECL(hangup, (int));
 E void NDECL(end_of_input);
 #endif
-E char NDECL(readchar);
+ENGINE_FUNC E char NDECL(readchar);
 E void NDECL(sanity_check);
-E char* FDECL(key2txt, (UCHAR_P, char *));
+ENGINE_FUNC E char* FDECL(key2txt, (UCHAR_P, char *));
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E boolean FDECL(paranoid_query, (BOOLEAN_P, const char *));
 
@@ -335,11 +335,11 @@ E void NDECL(set_mimic_blocking);
 E void NDECL(see_objects);
 E void NDECL(see_traps);
 E void NDECL(curs_on_u);
-E int NDECL(doredraw);
-E void NDECL(docrt);
+ENGINE_FUNC E int NDECL(doredraw);
+ENGINE_FUNC E void NDECL(docrt);
 E void FDECL(show_glyph, (int, int, int));
 E void NDECL(clear_glyph_buffer);
-E void FDECL(row_refresh, (int, int, int));
+ENGINE_FUNC E void FDECL(row_refresh, (int, int, int));
 E void NDECL(cls);
 E void FDECL(flush_screen, (int));
 E int FDECL(back_to_glyph, (XCHAR_P, XCHAR_P));
@@ -570,7 +570,7 @@ E xchar FDECL(dunlevs_in_dungeon, (d_level *));
 E xchar FDECL(ledger_to_dnum, (XCHAR_P));
 E xchar FDECL(ledger_to_dlev, (XCHAR_P));
 E xchar FDECL(deepest_lev_reached, (BOOLEAN_P));
-E boolean FDECL(on_level, (d_level *, d_level *));
+ENGINE_FUNC E boolean FDECL(on_level, (d_level *, d_level *));
 E void FDECL(next_level, (BOOLEAN_P));
 E void FDECL(prev_level, (BOOLEAN_P));
 E void FDECL(u_on_newpos, (int, int));
@@ -661,12 +661,12 @@ E void FDECL(done_intr, (int));
 #endif
 E void FDECL(done_in_by, (struct monst *, int));
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
-E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
+ENGINE_FUNC E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
-E void FDECL(nh_terminate, (int)) NORETURN;
+ENGINE_FUNC E void FDECL(nh_terminate, (int)) NORETURN;
 E int NDECL(dovanquished);
 E int NDECL(num_genocides);
 E void FDECL(delayed_killer, (int, int, const char *));
@@ -740,7 +740,7 @@ E void FDECL(set_levelfile_name, (char *, int));
 E int FDECL(create_levelfile, (int, char *));
 E int FDECL(open_levelfile, (int, char *));
 E void FDECL(delete_levelfile, (int));
-E void NDECL(clearlocks);
+ENGINE_FUNC E void NDECL(clearlocks);
 E int FDECL(create_bonesfile, (d_level *, char **, char *));
 #ifdef MFLOPPY
 E void NDECL(cancel_bonesfile);
@@ -790,7 +790,7 @@ E int FDECL(nhclose, (int));
 E void NDECL(really_close);
 #endif
 #ifdef DEBUG
-E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
+ENGINE_FUNC E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
 E boolean FDECL(read_tribute, (const char *, const char *, int,
                                char *, int, unsigned));
@@ -981,7 +981,7 @@ E char *FDECL(let_to_name, (CHAR_P, BOOLEAN_P, BOOLEAN_P));
 E void NDECL(free_invbuf);
 E void NDECL(reassign);
 E int NDECL(doorganize);
-E void NDECL(free_pickinv_cache);
+ENGINE_FUNC E void NDECL(free_pickinv_cache);
 E int FDECL(count_unpaid, (struct obj *));
 E int FDECL(count_buc, (struct obj *, int, boolean (*)(OBJ_P)));
 E void FDECL(tally_BUCX, (struct obj *, BOOLEAN_P,
@@ -1136,9 +1136,9 @@ E boolean FDECL(usmellmon, (struct permonst *));
 
 /* ### mapglyph.c ### */
 
-E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
+ENGINE_FUNC E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
 E char *FDECL(encglyph, (int));
-E void FDECL(genl_putmixed, (winid, int, const char *));
+ENGINE_FUNC E void FDECL(genl_putmixed, (winid, int, const char *));
 
 /* ### mcastu.c ### */
 
@@ -1642,7 +1642,7 @@ E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname,
               (struct obj *, char *(*)(OBJ_P), char *(*)(OBJ_P), unsigned));
 E const char *FDECL(singular, (struct obj *, char *(*)(OBJ_P)));
-E char *FDECL(an, (const char *));
+ENGINE_FUNC E char *FDECL(an, (const char *));
 E char *FDECL(An, (const char *));
 E char *FDECL(The, (const char *));
 E char *FDECL(the, (const char *));
@@ -1690,14 +1690,14 @@ E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
 E void FDECL(parsebindings, (char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(get_menu_cmd_key, (CHAR_P));
-E char FDECL(map_menu_cmd, (CHAR_P));
+ENGINE_FUNC E char FDECL(map_menu_cmd, (CHAR_P));
 E void FDECL(show_menu_controls, (winid, BOOLEAN_P));
 E void FDECL(assign_warnings, (uchar *));
-E char *FDECL(nh_getenv, (const char *));
+ENGINE_FUNC E char *FDECL(nh_getenv, (const char *));
 E void FDECL(set_duplicate_opt_detection, (int));
 E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
-E void FDECL(set_option_mod_status, (const char *, int));
+ENGINE_FUNC E void FDECL(set_option_mod_status, (const char *, int));
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
 E int FDECL(load_symset, (const char *, int));
@@ -1709,7 +1709,7 @@ E int FDECL(sym_val, (const char *));
 E const char *FDECL(clr2colorname, (int));
 E int FDECL(match_str2clr, (char *));
 E boolean FDECL(add_menu_coloring, (char *));
-E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+ENGINE_FUNC E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
 E int FDECL(msgtype_type, (const char *, BOOLEAN_P));
@@ -1739,6 +1739,9 @@ E int NDECL(dohistory);
 E void FDECL(chdirx, (char *, BOOLEAN_P));
 #endif /* CHDIR */
 E boolean NDECL(authorize_wizard_mode);
+#ifndef __MINGW32__
+E int FDECL(main, (int, char **));
+#endif
 #endif /* MICRO || WIN32 */
 
 /* ### pcsys.c ### */
@@ -1754,7 +1757,7 @@ E int FDECL(saveDiskPrompt, (int));
 E void NDECL(gameDiskPrompt);
 #endif
 E void FDECL(append_slash, (char *));
-E void FDECL(getreturn, (const char *));
+ENGINE_FUNC E void FDECL(getreturn, (const char *));
 #ifndef AMIGA
 E void VDECL(msmsg, (const char *, ...));
 #endif
@@ -1817,11 +1820,11 @@ E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
 /* ### pline.c ### */
 
 #ifdef DUMPLOG
-E void FDECL(dumplogmsg, (const char *));
+ENGINE_FUNC E void FDECL(dumplogmsg, (const char *));
 E void NDECL(dumplogfreemessages);
 #endif
-E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
-E void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
+ENGINE_FUNC E void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
+ENGINE_FUNC E void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
 E void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
 E void NDECL(free_youbuf);
 E void VDECL(You, (const char *, ...)) PRINTF_F(1, 2);
@@ -1833,8 +1836,8 @@ E void VDECL(You_see, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(pline_The, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(There, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
-E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
-E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
+ENGINE_FUNC E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
+ENGINE_FUNC E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
 
 /* ### polyself.c ### */
 
@@ -1962,7 +1965,7 @@ E void NDECL(deliver_splev_message);
 /* ### random.c ### */
 
 #if defined(RANDOM) && !defined(__GO32__) /* djgpp has its own random */
-E void FDECL(srandom, (unsigned));
+ENGINE_FUNC E void FDECL(srandom, (unsigned));
 E char *FDECL(initstate, (unsigned, char *, int));
 E char *FDECL(setstate, (char *));
 E long NDECL(random);
@@ -2028,7 +2031,7 @@ E void FDECL(trickery, (char *));
 E void FDECL(getlev, (int, int, XCHAR_P, BOOLEAN_P));
 E void FDECL(get_plname_from_file, (int, char *));
 #ifdef SELECTSAVED
-E int FDECL(restore_menu, (winid));
+ENGINE_FUNC E int FDECL(restore_menu, (winid));
 #endif
 E void NDECL(minit);
 E boolean FDECL(lookup_id_mapping, (unsigned, unsigned *));
@@ -2040,7 +2043,7 @@ E void FDECL(set_savepref, (const char *));
 
 /* ### rip.c ### */
 
-E void FDECL(genl_outrip, (winid, int, time_t));
+ENGINE_FUNC E void FDECL(genl_outrip, (winid, int, time_t));
 
 /* ### rnd.c ### */
 
@@ -2053,35 +2056,35 @@ E int FDECL(rnz, (int));
 
 /* ### role.c ### */
 
-E boolean FDECL(validrole, (int));
-E boolean FDECL(validrace, (int, int));
-E boolean FDECL(validgend, (int, int, int));
-E boolean FDECL(validalign, (int, int, int));
-E int NDECL(randrole);
-E int FDECL(randrace, (int));
-E int FDECL(randgend, (int, int));
-E int FDECL(randalign, (int, int));
+ENGINE_FUNC E boolean FDECL(validrole, (int));
+ENGINE_FUNC E boolean FDECL(validrace, (int, int));
+ENGINE_FUNC E boolean FDECL(validgend, (int, int, int));
+ENGINE_FUNC E boolean FDECL(validalign, (int, int, int));
+ENGINE_FUNC E int NDECL(randrole);
+ENGINE_FUNC E int FDECL(randrace, (int));
+ENGINE_FUNC E int FDECL(randgend, (int, int));
+ENGINE_FUNC E int FDECL(randalign, (int, int));
 E int FDECL(str2role, (const char *));
 E int FDECL(str2race, (const char *));
 E int FDECL(str2gend, (const char *));
 E int FDECL(str2align, (const char *));
-E boolean FDECL(ok_role, (int, int, int, int));
-E int FDECL(pick_role, (int, int, int, int));
-E boolean FDECL(ok_race, (int, int, int, int));
-E int FDECL(pick_race, (int, int, int, int));
-E boolean FDECL(ok_gend, (int, int, int, int));
-E int FDECL(pick_gend, (int, int, int, int));
-E boolean FDECL(ok_align, (int, int, int, int));
-E int FDECL(pick_align, (int, int, int, int));
-E void NDECL(rigid_role_checks);
-E boolean FDECL(setrolefilter, (const char *));
-E boolean NDECL(gotrolefilter);
-E void NDECL(clearrolefilter);
-E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
+ENGINE_FUNC E boolean FDECL(ok_role, (int, int, int, int));
+ENGINE_FUNC E int FDECL(pick_role, (int, int, int, int));
+ENGINE_FUNC E boolean FDECL(ok_race, (int, int, int, int));
+ENGINE_FUNC E int FDECL(pick_race, (int, int, int, int));
+ENGINE_FUNC E boolean FDECL(ok_gend, (int, int, int, int));
+ENGINE_FUNC E int FDECL(pick_gend, (int, int, int, int));
+ENGINE_FUNC E boolean FDECL(ok_align, (int, int, int, int));
+ENGINE_FUNC E int FDECL(pick_align, (int, int, int, int));
+ENGINE_FUNC E void NDECL(rigid_role_checks);
+ENGINE_FUNC E boolean FDECL(setrolefilter, (const char *));
+ENGINE_FUNC E boolean NDECL(gotrolefilter);
+ENGINE_FUNC E void NDECL(clearrolefilter);
+ENGINE_FUNC E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
 E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
-E void NDECL(plnamesuffix);
-E void FDECL(role_selection_prolog, (int, winid));
-E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
+ENGINE_FUNC E void NDECL(plnamesuffix);
+ENGINE_FUNC E void FDECL(role_selection_prolog, (int, winid));
+ENGINE_FUNC E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
 E void NDECL(role_init);
 E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
@@ -2226,7 +2229,7 @@ E void FDECL(beg, (struct monst *));
 E int NDECL(dotalk);
 #ifdef USER_SOUNDS
 E int FDECL(add_sound_mapping, (const char *));
-E void FDECL(play_sound_for_message, (const char *));
+ENGINE_FUNC E void FDECL(play_sound_for_message, (const char *));
 #endif
 
 /* ### sys.c ### */
@@ -2535,7 +2538,7 @@ E boolean FDECL(uptodate, (int, const char *));
 E void FDECL(store_version, (int));
 E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);
-E const char *FDECL(copyright_banner_line, (int));
+ENGINE_FUNC E const char *FDECL(copyright_banner_line, (int));
 
 #ifdef RUNTIME_PORT_ID
 E void FDECL(append_port_id, (char *));
@@ -2721,7 +2724,7 @@ void FDECL(addto_windowchain, (const char *s));
 void NDECL(commit_windowchain);
 #endif
 E boolean NDECL(genl_can_suspend_no);
-E boolean NDECL(genl_can_suspend_yes);
+ENGINE_FUNC E boolean NDECL(genl_can_suspend_yes);
 E char FDECL(genl_message_menu, (CHAR_P, int, const char *));
 E void FDECL(genl_preference_update, (const char *));
 E char *FDECL(genl_getmsghistory, (BOOLEAN_P));

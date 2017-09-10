@@ -9,6 +9,10 @@
 #include "tcap.h"
 #include "wintty.h"
 
+#if ENGINE_IMPORT
+#define free engine_free
+#endif
+
 #ifndef C /* this matches src/cmd.c */
 #define C(c) (0x1f & (c))
 #endif
@@ -646,7 +650,7 @@ boolean restoring_msghist;
     static boolean initd = FALSE;
     int idx;
 #ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
+    ENGINE_DATA extern unsigned saved_pline_index; /* pline.c */
 #endif
 
     if (restoring_msghist && !initd) {

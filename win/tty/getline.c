@@ -21,7 +21,7 @@ typedef boolean FDECL((*getlin_hook_proc), (char *));
 
 STATIC_DCL void FDECL(hooked_tty_getlin,
                       (const char *, char *, getlin_hook_proc));
-extern int NDECL(extcmd_via_menu); /* cmd.c */
+ENGINE_FUNC extern int NDECL(extcmd_via_menu); /* cmd.c */
 
 extern char erase_char, kill_char; /* from appropriate tty.c file */
 

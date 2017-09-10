@@ -16,7 +16,7 @@ static void FDECL(execplinehandler, (const char *));
 
 #ifdef DUMPLOG
 /* also used in end.c */
-unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
+ENGINE_DATA unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
 char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
 
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
