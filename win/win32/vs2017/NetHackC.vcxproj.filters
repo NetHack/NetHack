@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="dirs.props" />
   <ItemGroup>
     <Filter Include="source">
       <UniqueIdentifier>{39687cc3-0b9f-43c0-886b-7471156335ac}</UniqueIdentifier>
