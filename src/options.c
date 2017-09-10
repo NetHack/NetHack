@@ -637,7 +637,7 @@ initoptions()
 #ifdef SYSCF_FILE
     /* If SYSCF_FILE is specified, it _must_ exist... */
     assure_syscf_file();
-    config_error_init(TRUE, SYSCF_FILE);
+    config_error_init(TRUE, SYSCF_FILE, FALSE);
 
     /* ... and _must_ parse correctly. */
     if (!read_config_file(SYSCF_FILE, SET_IN_SYS)) {
@@ -791,25 +791,25 @@ initoptions_finish()
                 opts++; /* @filename */
             /* looks like a filename */
             if (strlen(opts) < BUFSZ / 2) {
-                config_error_init(TRUE, opts);
+                config_error_init(TRUE, opts, CONFIG_ERROR_SECURE);
                 read_config_file(opts, SET_IN_FILE);
                 config_error_done();
             }
         } else {
-            config_error_init(TRUE, (char *) 0);
+            config_error_init(TRUE, (char *) 0, FALSE);
             read_config_file((char *) 0, SET_IN_FILE);
             config_error_done();
             /* let the total length of options be long;
              * parseoptions() will check each individually
              */
-            config_error_init(FALSE, "NETHACKOPTIONS");
+            config_error_init(FALSE, "NETHACKOPTIONS", FALSE);
             (void) parseoptions(opts, TRUE, FALSE);
             config_error_done();
         }
     } else
 #endif
         {
-            config_error_init(TRUE, (char *) 0);
+            config_error_init(TRUE, (char *) 0, FALSE);
             read_config_file((char *) 0, SET_IN_FILE);
             config_error_done();
         }

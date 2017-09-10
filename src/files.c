@@ -200,7 +200,7 @@ STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
-STATIC_DCL void FDECL(config_error_nextline, (const char *));
+STATIC_DCL boolean FDECL(config_error_nextline, (const char *));
 STATIC_DCL void NDECL(free_config_sections);
 STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
 STATIC_DCL boolean FDECL(is_config_section, (const char *));
@@ -2751,18 +2751,21 @@ static int config_err_line_num = 0;
 static int config_err_num_errors = 0;
 static boolean config_err_origline_shown = FALSE;
 static boolean config_err_fromfile = FALSE;
+static boolean config_err_secure = FALSE;
 static char config_err_origline[4 * BUFSZ];
 static char config_err_source[BUFSZ];
 
 void
-config_error_init(from_file, sourcename)
+config_error_init(from_file, sourcename, secure)
 boolean from_file;
 const char *sourcename;
+boolean secure;
 {
     config_err_line_num = 0;
     config_err_num_errors = 0;
     config_err_origline_shown = FALSE;
     config_err_fromfile = from_file;
+    config_err_secure = secure;
     config_err_origline[0] = '\0';
     if (sourcename && sourcename[0])
         Strcpy(config_err_source, sourcename);
@@ -2770,22 +2773,26 @@ const char *sourcename;
         config_err_source[0] = '\0';
 }
 
-STATIC_OVL void
+STATIC_OVL boolean
 config_error_nextline(line)
 const char *line;
 {
+    if (config_err_num_errors && config_err_secure)
+        return FALSE;
+
     config_err_line_num++;
     config_err_origline_shown = FALSE;
     if (line && line[0])
         Strcpy(config_err_origline, line);
     else
         config_err_origline[0] = '\0';
+
+    return TRUE;
 }
 
 /*VARARGS1*/
 void config_error_add
 VA_DECL(const char *, str)
-/*const char *errmsg;*/
 {
     VA_START(str);
     VA_INIT(str, char *);
@@ -2795,15 +2802,18 @@ VA_DECL(const char *, str)
     Vsprintf(buf, str, VA_ARGS);
 
     config_err_num_errors++;
-    if (!config_err_origline_shown) {
+    if (!config_err_origline_shown && !config_err_secure) {
         pline("\n%s", config_err_origline);
         config_err_origline_shown = TRUE;
     }
-    if (config_err_line_num > 0) {
+    if (config_err_line_num > 0 && !config_err_secure) {
         Sprintf(lineno, "Line %i: ", config_err_line_num);
     } else
         lineno[0] = '\0';
-    pline(" * %s%s.", lineno, (buf && buf[0]) ? buf : "Unknown error");
+    pline("%s %s%s.",
+          config_err_secure ? "Error:" : " *",
+          lineno,
+          (buf && buf[0]) ? buf : "Unknown error");
 
     VA_END();
 }
@@ -2818,7 +2828,7 @@ config_error_done()
                    *config_err_source ? config_err_source : configfile);
         wait_synch();
     }
-    config_error_init(FALSE, "");
+    config_error_init(FALSE, "", FALSE);
     return n;
 }
 
@@ -2840,7 +2850,10 @@ int src;
 
     while (fgets(buf, sizeof buf, fp)) {
         strip_newline(buf);
-        config_error_nextline(buf);
+        if (!config_error_nextline(buf)) {
+            rv = FALSE;
+            break;
+        }
 #ifdef notyet
 /*
 XXX Don't call read() in parse_config_line, read as callback or reassemble

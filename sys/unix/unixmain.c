@@ -405,7 +405,7 @@ char *argv[];
             }
             break;
         case 'w': /* windowtype */
-            config_error_init(FALSE, "command line");
+            config_error_init(FALSE, "command line", FALSE);
             choose_windows(&argv[0][2]);
             config_error_done();
             break;

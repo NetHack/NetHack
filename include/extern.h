@@ -767,7 +767,7 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
-E void FDECL(config_error_init, (BOOLEAN_P, const char *));
+E void FDECL(config_error_init, (BOOLEAN_P, const char *, BOOLEAN_P));
 E void FDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
 E int NDECL(config_error_done);
 E boolean FDECL(read_config_file, (const char *, int));
