@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1505170344 2017/09/11 22:52:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1505172128 2017/09/11 23:22:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -229,7 +229,7 @@ unsigned whichchains;
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
-            if ((qarti = find_qarti(fmon->minvent)) != 0)
+            if ((qarti = find_qarti(mtmp->minvent)) != 0)
                 break;
         }
     if (!qarti && (whichchains & (1 << OBJ_MIGRATING)) != 0) {
@@ -237,7 +237,7 @@ unsigned whichchains;
         for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
-            if ((qarti = find_qarti(fmon->minvent)) != 0)
+            if ((qarti = find_qarti(mtmp->minvent)) != 0)
                 break;
         }
         if (!qarti)
