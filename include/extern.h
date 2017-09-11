@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1502753404 2017/08/14 23:30:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.600 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1957,6 +1957,7 @@ E void NDECL(unload_qtlist);
 E short FDECL(quest_info, (int));
 E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj *));
+E struct obj *FDECL(find_quest_artifact, (unsigned));
 E void FDECL(com_pager, (int));
 E void FDECL(qt_pager, (int));
 E struct permonst *NDECL(qt_montype);
