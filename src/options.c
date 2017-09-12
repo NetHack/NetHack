@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1505084668 2017/09/10 23:04:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1505214875 2017/09/12 11:14:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1229,7 +1229,10 @@ STATIC_VAR const struct paranoia_opts {
        takes precedence and "all" isn't present in the interactive menu,
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
-       is just a synonym for "Confirm") */
+       is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
+       latter requires at least two letters; "wand"-break vs "Were"-change,
+       both require at least two letters during config processing and use
+       case-senstivity for 'O's interactive menu */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
     { PARANOID_QUIT, "quit", 1, "explore", 1,
@@ -1240,12 +1243,14 @@ STATIC_VAR const struct paranoia_opts {
       "yes vs y to save bones data when dying in debug mode" },
     { PARANOID_HIT, "attack", 1, "hit", 1,
       "yes vs y to attack a peaceful monster" },
+    { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
+      "yes vs y to break a wand via (a)pply" },
+    { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
+      "yes vs y to change form when lycanthropy is controllable" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
       "y to pray (supersedes old \"prayconfirm\" option)" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       "always pick from inventory for Remove and Takeoff" },
-    { PARANOID_BREAKWAND, "wand", 1, "breakwand", 2,
-      "yes vs y to break a wand" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
@@ -2712,7 +2717,8 @@ boolean tinitial, tfrom_file;
                 if (i == SIZE(paranoia)) {
                     /* didn't match anything, so arg is bad;
                        any flags already set will stay set */
-                    config_error_add("Unknown %s parameter '%s'", fullname, op);
+                    config_error_add("Unknown %s parameter '%s'",
+                                     fullname, op);
                     return FALSE;
                 }
                 /* move on to next token */
@@ -5210,20 +5216,9 @@ char *buf;
         char tmpbuf[QBUFSZ];
 
         tmpbuf[0] = '\0';
-        if (ParanoidConfirm)
-            Strcat(tmpbuf, " Confirm");
-        if (ParanoidQuit)
-            Strcat(tmpbuf, " quit");
-        if (ParanoidDie)
-            Strcat(tmpbuf, " die");
-        if (ParanoidBones)
-            Strcat(tmpbuf, " bones");
-        if (ParanoidHit)
-            Strcat(tmpbuf, " attack");
-        if (ParanoidPray)
-            Strcat(tmpbuf, " pray");
-        if (ParanoidRemove)
-            Strcat(tmpbuf, " Remove");
+        for (i = 0; paranoia[i].flagmask != 0; ++i)
+            if (flags.paranoia_bits & paranoia[i].flagmask)
+                Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
         Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
     } else if (!strcmp(optname, "pettype")) {
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"

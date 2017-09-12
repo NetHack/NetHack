@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1498078871 2017/06/21 21:01:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1505214875 2017/09/12 11:14:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -60,15 +60,16 @@ struct flag {
     unsigned long suppress_alert;
 #define NEW_MOON 0
 #define FULL_MOON 4
-    int paranoia_bits; /* alternate confirmation prompting */
-#define PARANOID_CONFIRM 0x01
-#define PARANOID_QUIT 0x02
-#define PARANOID_DIE 0x04
-#define PARANOID_BONES 0x08
-#define PARANOID_HIT 0x10
-#define PARANOID_PRAY 0x20
-#define PARANOID_REMOVE 0x40
-#define PARANOID_BREAKWAND 0x80
+    unsigned paranoia_bits; /* alternate confirmation prompting */
+#define PARANOID_CONFIRM    0x0001
+#define PARANOID_QUIT       0x0002
+#define PARANOID_DIE        0x0004
+#define PARANOID_BONES      0x0008
+#define PARANOID_HIT        0x0010
+#define PARANOID_PRAY       0x0020
+#define PARANOID_REMOVE     0x0040
+#define PARANOID_BREAKWAND  0x0080
+#define PARANOID_WERECHANGE 0x0100
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char inv_order[MAXOCLASSES];
@@ -441,6 +442,9 @@ enum runmode_types {
 #define ParanoidRemove ((flags.paranoia_bits & PARANOID_REMOVE) != 0)
 /* breakwand: Applying a wand */
 #define ParanoidBreakwand ((flags.paranoia_bits & PARANOID_BREAKWAND) != 0)
+/* werechange: accepting randomly timed werecreature change to transform
+   from human to creature or vice versa while having polymorph control */
+#define ParanoidWerechange ((flags.paranoia_bits & PARANOID_WERECHANGE) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */
