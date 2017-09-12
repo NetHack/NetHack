@@ -161,7 +161,7 @@ void engine_free(void *ptr)
     free(ptr);
 }
 
-int engine_setcallbacks(engine_callbacks * inCallbacks)
+void engine_setcallbacks(engine_callbacks * inCallbacks)
 {
     callbacks = *inCallbacks;
     /* TODO we should instead set the pointer to the procs in the table */

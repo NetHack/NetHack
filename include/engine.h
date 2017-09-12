@@ -36,7 +36,7 @@ typedef struct engine_callbacks {
 } engine_callbacks;
 
 #if defined(ENGINE_EXPORT) || defined(ENGINE_IMPORT)
-ENGINE_FUNC int engine_setcallbacks( engine_callbacks *);
+ENGINE_FUNC void engine_setcallbacks( engine_callbacks *);
 ENGINE_FUNC int engine_main(int argc, char * argv[]);
 ENGINE_FUNC void engine_free(void * ptr);
 #endif /* ENGINE_EXPORT || ENGINE_IMPORT */

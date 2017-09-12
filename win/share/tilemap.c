@@ -472,7 +472,7 @@ FILE *ofp;
 }
 
 int
-main()
+main(int argc, char* argv[])
 {
     register int i;
     char filename[30];
