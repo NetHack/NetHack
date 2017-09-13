@@ -84,7 +84,7 @@ struct window_procs mswin_procs = {
         | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_MENU
         | WC_FONTSIZ_TEXT | WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE
         | WC_VARY_MSGCOUNT | WC_WINDOWCOLORS | WC_PLAYER_SELECTION
-        | WC_SPLASH_SCREEN | WC_POPUP_DIALOG,
+        | WC_SPLASH_SCREEN | WC_POPUP_DIALOG | WC_MOUSE_SUPPORT,
     0L, mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
     mswin_resume_nhwindows, mswin_create_nhwindow, mswin_clear_nhwindow,
@@ -212,6 +212,7 @@ mswin_init_nhwindows(int *argc, char **argv)
     iflags.toptenwin = 1;
     set_option_mod_status("toptenwin", SET_IN_FILE);
     //set_option_mod_status("perm_invent", SET_IN_FILE);
+    set_option_mod_status("mouse_support", SET_IN_GAME);
 
     /* initialize map tiles bitmap */
     initMapTiles();
@@ -1382,9 +1383,11 @@ mswin_nh_poskey(int *x, int *y, int *mod)
         mswin_main_loop();
 
     if (event->type == NHEVENT_MOUSE) {
-        *mod = event->ms.mod;
-        *x = event->ms.x;
-        *y = event->ms.y;
+	if (iflags.wc_mouse_support) {
+            *mod = event->ms.mod;
+            *x = event->ms.x;
+            *y = event->ms.y;
+        }
         key = 0;
     } else {
         key = event->kbd.ch;
