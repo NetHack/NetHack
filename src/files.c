@@ -192,7 +192,7 @@ STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
 STATIC_DCL void FDECL(set_configfile_name, (const char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (char *, char *, uchar *, BOOLEAN_P,
+STATIC_DCL int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
                                   int, const char *));
 boolean FDECL(proc_wizkit_line, (char *));
 boolean FDECL(parse_config_line, (char *));
@@ -2055,8 +2055,7 @@ int src;
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
 STATIC_OVL int
-get_uchars(buf, bufp, list, modlist, size, name)
-char *buf;        /* read buffer, must be of size BUFSZ */
+get_uchars(bufp, list, modlist, size, name)
 char *bufp;       /* current pointer */
 uchar *list;      /* return list */
 boolean modlist;  /* TRUE: list is being modified in place */
@@ -2535,13 +2534,13 @@ char *origbuf;
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
-        (void) get_uchars(buf, bufp, &iflags.bouldersym, TRUE, 1,
+        (void) get_uchars(bufp, &iflags.bouldersym, TRUE, 1,
                           "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
             retval = FALSE;
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(buf, bufp, translate, FALSE, WARNCOUNT,
+        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "SYMBOLS", 4)) {
@@ -2754,10 +2753,11 @@ const char *line;
 void config_error_add
 VA_DECL(const char *, str)
 {
-    VA_START(str);
-    VA_INIT(str, char *);
     char buf[BUFSZ];
     char lineno[QBUFSZ];
+
+    VA_START(str);
+    VA_INIT(str, char *);
 
     Vsprintf(buf, str, VA_ARGS);
 
@@ -2773,7 +2773,7 @@ VA_DECL(const char *, str)
     pline("%s %s%s.",
           config_err_secure ? "Error:" : " *",
           lineno,
-          (buf && buf[0]) ? buf : "Unknown error");
+          *buf ? buf : "Unknown error");
 
     VA_END();
 }
