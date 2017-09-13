@@ -2262,7 +2262,7 @@ char *origbuf;
     bufp = find_optparam(buf);
     if (!bufp) {
         config_error_add("Not a config statement, missing '='");
-        return 0;
+        return FALSE;
     }
     /* skip past '=', then space between it and value, if any */
     ++bufp;
@@ -2439,8 +2439,8 @@ char *origbuf;
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
         if (src != SET_IN_SYS && n != 0) {
-            raw_printf("Illegal value in SEDUCE");
-            return 0;
+            config_error_add("Illegal value in SEDUCE");
+            return FALSE;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
@@ -2448,45 +2448,45 @@ char *origbuf;
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
-            raw_printf("Illegal value in MAXPLAYERS (maximum is 25).");
-            return 0;
+            config_error_add("Illegal value in MAXPLAYERS (maximum is 25).");
+            return FALSE;
         }
         sysopt.maxplayers = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf("Illegal value in PERSMAX (minimum is 1).");
-            return 0;
+            config_error_add("Illegal value in PERSMAX (minimum is 1).");
+            return FALSE;
         }
         sysopt.persmax = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
-            raw_printf("Illegal value in PERS_IS_UID (must be 0 or 1).");
-            return 0;
+            config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
+            return FALSE;
         }
         sysopt.pers_is_uid = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
-            raw_printf("Illegal value in ENTRYMAX (minimum is 10).");
-            return 0;
+            config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
+            return FALSE;
         }
         sysopt.entrymax = n;
     } else if ((src == SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf("Illegal value in POINTSMIN (minimum is 1).");
-            return 0;
+            config_error_add("Illegal value in POINTSMIN (minimum is 1).");
+            return FALSE;
         }
         sysopt.pointsmin = n;
     } else if (src == SET_IN_SYS
                && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf(
+            config_error_add(
                 "Illegal value in MAX_STATUENAME_RANK (minimum is 1).");
-            return 0;
+            return FALSE;
         }
         sysopt.tt_oname_maxrank = n;
 
@@ -2496,8 +2496,8 @@ char *origbuf;
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
         if (n < 0 || n > 2) {
-            raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
-            return 0;
+            config_error_add("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
+            return FALSE;
         }
 #endif
         sysopt.panictrace_libc = n;
@@ -2506,16 +2506,16 @@ char *origbuf;
         n = atoi(bufp);
 #if defined(PANICTRACE)
         if (n < 0 || n > 2) {
-            raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
-            return 0;
+            config_error_add("Illegal value in PANICTRACE_GDB (not 0,1,2).");
+            return FALSE;
         }
 #endif
         sysopt.panictrace_gdb = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            raw_printf("File specified in GDBPATH does not exist.");
-            return 0;
+            config_error_add("File specified in GDBPATH does not exist.");
+            return FALSE;
         }
 #endif
         if (sysopt.gdbpath)
@@ -2524,8 +2524,8 @@ char *origbuf;
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            raw_printf("File specified in GREPPATH does not exist.");
-            return 0;
+            config_error_add("File specified in GREPPATH does not exist.");
+            return FALSE;
         }
 #endif
         if (sysopt.greppath)
@@ -2692,7 +2692,7 @@ char *origbuf;
 #endif
     } else {
         config_error_add("Unknown config statement");
-        return 0;
+        return FALSE;
     }
     return retval;
 }
