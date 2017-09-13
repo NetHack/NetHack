@@ -194,6 +194,7 @@ STATIC_DCL void FDECL(set_configfile_name, (const char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars, (char *, char *, uchar *, BOOLEAN_P,
                                   int, const char *));
+boolean FDECL(proc_wizkit_line, (char *));
 boolean FDECL(parse_config_line, (char *));
 STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
 STATIC_DCL FILE *NDECL(fopen_sym_file);
@@ -2247,7 +2248,7 @@ char *origbuf;
 #ifdef SYSCF
     int n;
 #endif
-    char *bufp, *altp, buf[4 * BUFSZ];
+    char *bufp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
     boolean retval = TRUE;
@@ -2796,9 +2797,8 @@ read_config_file(filename, src)
 const char *filename;
 int src;
 {
-    char buf[4 * BUFSZ];
     FILE *fp;
-    boolean rv = TRUE; /* assume successful parse */
+    boolean rv = TRUE;
 
     if (!(fp = fopen_config_file(filename, src)))
         return FALSE;
