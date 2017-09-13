@@ -191,6 +191,7 @@ struct instance_flags {
      * behaviour of various NetHack functions and probably warrant
      * a structure of their own elsewhere some day.
      */
+    int parse_config_file_src;  /* hack for parse_config_line() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
     int purge_monsters;    /* # of dead monsters still on fmon list */

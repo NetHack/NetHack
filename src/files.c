@@ -192,9 +192,10 @@ STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
 STATIC_DCL void FDECL(set_configfile_name, (const char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, BOOLEAN_P,
+STATIC_DCL int FDECL(get_uchars, (char *, char *, uchar *, BOOLEAN_P,
                                   int, const char *));
-int FDECL(parse_config_line, (FILE *, char *, int));
+boolean FDECL(parse_config_line, (char *));
+STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
@@ -2047,14 +2048,13 @@ int src;
 }
 
 /*
- * Retrieve a list of integers from a file into a uchar array.
+ * Retrieve a list of integers from buf into a uchar array.
  *
  * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
 STATIC_OVL int
-get_uchars(fp, buf, bufp, list, modlist, size, name)
-FILE *fp;         /* input file pointer */
+get_uchars(buf, bufp, list, modlist, size, name)
 char *buf;        /* read buffer, must be of size BUFSZ */
 char *bufp;       /* current pointer */
 uchar *list;      /* return list */
@@ -2101,13 +2101,7 @@ const char *name; /* name of option for error message */
             break;
 
         case '\\':
-            if (fp == (FILE *) 0)
-                goto gi_error;
-            do {
-                if (!fgets(buf, BUFSZ, fp))
-                    goto gi_error;
-            } while (buf[0] == '#');
-            bufp = buf;
+            goto gi_error;
             break;
 
         default:
@@ -2228,11 +2222,24 @@ char *buf;
 
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
-int
-parse_config_line(fp, origbuf, src)
-FILE *fp;
+/* find the '=' or ':' */
+char *
+find_optparam(buf)
+const char *buf;
+{
+    char *bufp, *altp;
+
+    bufp = index(buf, '=');
+    altp = index(buf, ':');
+    if (!bufp || (altp && altp < bufp))
+        bufp = altp;
+
+    return bufp;
+}
+
+boolean
+parse_config_line(origbuf)
 char *origbuf;
-int src;
 {
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
     static boolean ramdisk_specified = FALSE;
@@ -2243,24 +2250,16 @@ int src;
     char *bufp, *altp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
-    int retval = 1;
+    boolean retval = TRUE;
+    int src = iflags.parse_config_file_src;
 
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
     mungspaces(strcpy(buf, origbuf));
-    /* lines beginning with '#' are comments; accept empty lines too */
-    if (!*buf || *buf == '#' || !strcmp(buf, " "))
-        return 1;
-
-    if (src != SET_IN_SYS && handle_config_section(buf))
-        return 1;
 
     /* find the '=' or ':' */
-    bufp = index(buf, '=');
-    altp = index(buf, ':');
-    if (!bufp || (altp && altp < bufp))
-        bufp = altp;
+    bufp = find_optparam(buf);
     if (!bufp) {
         config_error_add("Not a config statement, missing '='");
         return 0;
@@ -2278,35 +2277,21 @@ int src;
         /* hack: un-mungspaces to allow consecutive spaces in
            general options until we verify that this is unnecessary;
            '=' or ':' is guaranteed to be present */
-        bufp = index(origbuf, '=');
-        altp = index(origbuf, ':');
-        if (!bufp || (altp && altp < bufp))
-            bufp = altp;
+        bufp = find_optparam(origbuf);
         ++bufp; /* skip '='; parseoptions() handles spaces */
 
         if (!parseoptions(bufp, TRUE, TRUE))
-            retval = 0;
-    } else if (match_varname(buf, "CHOOSE", 6)) {
-        char *section;
-        if (config_section_chosen)
-            free(config_section_chosen);
-        section = choose_random_part(bufp, ',');
-        if (section)
-            config_section_chosen = dupstr(section);
-        else {
-            config_error_add("No config section to choose");
-            retval = 0;
-        }
+            retval = FALSE;
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "BINDINGS", 4)) {
         if (!parsebindings(bufp))
-            retval = 0;
+            retval = FALSE;
     } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
         parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
         if (!msgtype_parse_add(bufp))
-            retval = 0;
+            retval = FALSE;
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);
@@ -2549,46 +2534,20 @@ int src;
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
-        (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE, 1,
+        (void) get_uchars(buf, bufp, &iflags.bouldersym, TRUE, 1,
                           "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
-            retval = 0;
+            retval = FALSE;
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(fp, buf, bufp, translate, FALSE, WARNCOUNT,
+        (void) get_uchars(buf, bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "SYMBOLS", 4)) {
-        char *op, symbuf[BUFSZ];
-        boolean morelines;
-
-        do {
-            /* check for line continuation (trailing '\') */
-            op = eos(bufp);
-            morelines = (--op >= bufp && *op == '\\');
-            if (morelines) {
-                *op = '\0';
-                /* strip trailing space now that '\' is gone */
-                if (--op >= bufp && *op == ' ')
-                    *op = '\0';
-            }
-            /* parse here */
-            if (!parsesymbols(bufp)) {
-                raw_printf("Error in SYMBOLS definition '%s'.\n", bufp);
-                wait_synch();
-            }
-            if (morelines) {
-                do {
-                    *symbuf = '\0';
-                    if (!fgets(symbuf, BUFSZ, fp)) {
-                        morelines = FALSE;
-                        break;
-                    }
-                    mungspaces(symbuf);
-                    bufp = symbuf;
-                } while (*bufp == '#');
-            }
-        } while (morelines);
+        if (!parsesymbols(bufp)) {
+            config_error_add("Error in SYMBOLS definition '%s'", bufp);
+            retval = FALSE;
+        }
         switch_symbols(TRUE);
     } else if (match_varname(buf, "WIZKIT", 6)) {
         (void) strncpy(wizkit, bufp, WIZKIT_MAX - 1);
@@ -2847,23 +2806,9 @@ int src;
     /* begin detection of duplicate configfile options */
     set_duplicate_opt_detection(1);
     free_config_sections();
+    iflags.parse_config_file_src = src;
 
-    while (fgets(buf, sizeof buf, fp)) {
-        strip_newline(buf);
-        if (!config_error_nextline(buf)) {
-            rv = FALSE;
-            break;
-        }
-#ifdef notyet
-/*
-XXX Don't call read() in parse_config_line, read as callback or reassemble
-line at this level.
-OR: Forbid multiline stuff for alternate config sources.
-*/
-#endif
-        if (!parse_config_line(fp, buf, src))
-            rv = FALSE;
-    }
+    rv = parse_conf_file(fp, parse_config_line);
     (void) fclose(fp);
 
     free_config_sections();
@@ -2970,47 +2915,171 @@ struct obj *obj;
     }
 }
 
+
+boolean
+proc_wizkit_line(buf)
+char *buf;
+{
+    struct obj *otmp = readobjnam(buf, (struct obj *) 0);
+
+    if (otmp) {
+        if (otmp != &zeroobj)
+            wizkit_addinv(otmp);
+    } else {
+        /* .60 limits output line width to 79 chars */
+        config_error_add("Bad wizkit item: \"%.60s\"", buf);
+        return FALSE;
+    }
+    return TRUE;
+}
+
 void
 read_wizkit()
 {
     FILE *fp;
-    char *ep, buf[BUFSZ];
-    struct obj *otmp;
-    boolean bad_items = FALSE, skip = FALSE;
 
     if (!wizard || !(fp = fopen_wizkit_file()))
         return;
 
     program_state.wizkit_wishing = 1;
-    while (fgets(buf, (int) (sizeof buf), fp)) {
-        ep = index(buf, '\n');
+    config_error_init(TRUE, "WIZKIT", FALSE);
+
+    parse_conf_file(fp, proc_wizkit_line);
+    (void) fclose(fp);
+
+    config_error_done();
+    program_state.wizkit_wishing = 0;
+
+    return;
+}
+
+/* parse_conf_file
+ *
+ * Read from file fp, handling comments, empty lines, config sections,
+ * CHOOSE, and line continuation, calling proc for every valid line.
+ *
+ * Continued lines are merged together with one space in between.
+ */
+STATIC_OVL boolean
+parse_conf_file(fp, proc)
+FILE *fp;
+boolean FDECL((*proc), (char *));
+{
+    char inbuf[4 * BUFSZ];
+    boolean rv = TRUE; /* assume successful parse */
+    char *ep;
+    boolean skip = FALSE, morelines = FALSE;
+    char *buf = (char *) 0;
+
+    free_config_sections();
+
+    while (fgets(inbuf, (int) (sizeof inbuf), fp)) {
+        ep = index(inbuf, '\n');
         if (skip) { /* in case previous line was too long */
             if (ep)
                 skip = FALSE; /* found newline; next line is normal */
         } else {
-            if (!ep)
+            if (!ep) {
+                config_error_add("Line too long, skipping");
                 skip = TRUE; /* newline missing; discard next fgets */
-            else
+            } else {
+                char *tmpbuf = (char *) 0;
+                int len;
+                boolean ignoreline = FALSE;
+                boolean oldline = FALSE;
+
                 *ep = '\0'; /* remove newline */
 
-            if (buf[0]) {
-                otmp = readobjnam(buf, (struct obj *) 0);
-                if (otmp) {
-                    if (otmp != &zeroobj)
-                        wizkit_addinv(otmp);
-                } else {
-                    /* .60 limits output line width to 79 chars */
-                    raw_printf("Bad wizkit item: \"%.60s\"", buf);
-                    bad_items = TRUE;
+                /* line continuation (trailing '\') */
+                morelines = (--ep >= inbuf && *ep == '\\');
+                if (morelines)
+                    *ep = '\0';
+
+                /* trim off spaces at end of line */
+                while (--ep >= inbuf && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
+                    *ep = '\0';
+
+                if (!config_error_nextline(inbuf)) {
+                    rv = FALSE;
+                    if (buf)
+                        free(buf), buf = (char *) 0;
+                    break;
                 }
+
+                ep = inbuf;
+                while (*ep == ' ' || *ep == '\t') ep++;
+
+                /* lines beginning with '#' are comments. ignore empty lines. */
+                if (!*ep || *ep == '#')
+                    ignoreline = TRUE;
+
+                if (buf)
+                    oldline = TRUE;
+
+                /* merge now read line with previous ones, if necessary */
+                if (!ignoreline) {
+                    len = strlen(inbuf) + 1;
+                    if (buf)
+                        len += strlen(buf);
+                    tmpbuf = (char *) alloc(len);
+                    if (buf) {
+                        Sprintf(tmpbuf, "%s %s", buf, inbuf);
+                        free(buf);
+                    } else
+                        Strcpy(tmpbuf, inbuf);
+                    buf = tmpbuf;
+                }
+
+                if (morelines || (ignoreline && !oldline))
+                    continue;
+
+                if (handle_config_section(ep)) {
+                    free(buf);
+                    buf = (char *) 0;
+                    continue;
+                }
+
+                /* from here onwards, we'll handle buf only */
+
+                if (match_varname(buf, "CHOOSE", 6)) {
+                    char *section;
+                    char *bufp = find_optparam(buf);
+                    if (!bufp) {
+                        config_error_add("Format is CHOOSE=section1,section2,...");
+                        rv = FALSE;
+                        free(buf);
+                        buf = (char *) 0;
+                        continue;
+                    }
+                    bufp++;
+                    if (config_section_chosen)
+                        free(config_section_chosen);
+                    section = choose_random_part(bufp, ',');
+                    if (section)
+                        config_section_chosen = dupstr(section);
+                    else {
+                        config_error_add("No config section to choose");
+                        rv = FALSE;
+                    }
+                    free(buf);
+                    buf = (char *) 0;
+                    continue;
+                }
+
+                if (!proc(buf))
+                    rv = FALSE;
+
+                free(buf);
+                buf = (char *) 0;
             }
         }
     }
-    program_state.wizkit_wishing = 0;
-    if (bad_items)
-        wait_synch();
-    (void) fclose(fp);
-    return;
+
+    if (buf)
+        free(buf);
+
+    free_config_sections();
+    return rv;
 }
 
 extern struct symsetentry *symset_list;  /* options.c */
