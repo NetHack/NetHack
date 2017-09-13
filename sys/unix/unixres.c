@@ -33,7 +33,7 @@ uid_t *ruid, *euid, *suid;
     if (!f)
         return -1;
 
-    return f(ruid, euid, suid);
+    return (*f)(ruid, euid, suid);
 }
 
 static int
@@ -46,7 +46,7 @@ gid_t *rgid, *egid, *sgid;
     if (!f)
         return -1;
 
-    return f(rgid, egid, sgid);
+    return (*f)(rgid, egid, sgid);
 }
 
 #else
@@ -74,6 +74,7 @@ uid_t *ruid, *euid, *suid;
     int retval;
     int pfd[2];
     struct stat st;
+
     if (pipe(pfd))
         return -1;
     retval = fstat(pfd[0], &st);
@@ -107,6 +108,7 @@ gid_t *rgid, *egid, *sgid;
     int retval;
     int pfd[2];
     struct stat st;
+
     if (pipe(pfd))
         return -1;
     retval = fstat(pfd[0], &st);
@@ -146,6 +148,7 @@ nh_getresuid(ruid, euid, suid)
 uid_t *ruid, *euid, *suid;
 {
     int retval = real_getresuid(ruid, euid, suid);
+
     if (!retval && hiding_privileges)
         *euid = *suid = *ruid;
     return retval;
@@ -155,6 +158,7 @@ uid_t
 nh_getuid()
 {
     uid_t ruid, euid, suid;
+
     (void) real_getresuid(&ruid, &euid, &suid);
     return ruid;
 }
@@ -163,6 +167,7 @@ uid_t
 nh_geteuid()
 {
     uid_t ruid, euid, suid;
+
     (void) real_getresuid(&ruid, &euid, &suid);
     if (hiding_privileges)
         euid = ruid;
@@ -174,6 +179,7 @@ nh_getresgid(rgid, egid, sgid)
 gid_t *rgid, *egid, *sgid;
 {
     int retval = real_getresgid(rgid, egid, sgid);
+
     if (!retval && hiding_privileges)
         *egid = *sgid = *rgid;
     return retval;
@@ -183,6 +189,7 @@ gid_t
 nh_getgid()
 {
     gid_t rgid, egid, sgid;
+
     (void) real_getresgid(&rgid, &egid, &sgid);
     return rgid;
 }
@@ -191,6 +198,7 @@ gid_t
 nh_getegid()
 {
     gid_t rgid, egid, sgid;
+
     (void) real_getresgid(&rgid, &egid, &sgid);
     if (hiding_privileges)
         egid = rgid;

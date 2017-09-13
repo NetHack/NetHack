@@ -97,19 +97,18 @@ char *argv[];
     choose_windows(DEFAULT_WINDOW_SYS);
 
 #ifdef CHDIR /* otherwise no chdir() */
-             /*
-              * See if we must change directory to the playground.
-              * (Perhaps hack runs suid and playground is inaccessible
-              *  for the player.)
-              * The environment variable HACKDIR is overridden by a
-              *  -d command line option (must be the first option given)
-              */
+    /*
+     * See if we must change directory to the playground.
+     * (Perhaps hack runs suid and playground is inaccessible
+     *  for the player.)
+     * The environment variable HACKDIR is overridden by a
+     *  -d command line option (must be the first option given).
+     */
     dir = nh_getenv("NETHACKDIR");
     if (!dir)
         dir = nh_getenv("HACKDIR");
-#endif
+
     if (argc > 1) {
-#ifdef CHDIR
         if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
@@ -127,30 +126,33 @@ char *argv[];
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
         }
-        if (argc > 1)
+    }
 #endif /* CHDIR */
 
-            /*
-             * Now we know the directory containing 'record' and
-             * may do a prscore().  Exclude `-style' - it's a Qt option.
-             */
-            if (!strncmp(argv[1], "-s", 2) && strncmp(argv[1], "-style", 6)) {
+    if (argc > 1) {
+        /*
+         * Now we know the directory containing 'record' and
+         * may do a prscore().  Exclude `-style' - it's a Qt option.
+         */
+        if (!strncmp(argv[1], "-s", 2) && strncmp(argv[1], "-style", 6)) {
 #ifdef CHDIR
-                chdirx(dir, 0);
+            chdirx(dir, 0);
 #endif
 #ifdef SYSCF
-                initoptions();
+            initoptions();
 #endif
 #ifdef PANICTRACE
-                ARGV0 = argv[0]; /* save for possible stack trace */
+            ARGV0 = hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
-                panictrace_setsignals(TRUE);
+            panictrace_setsignals(TRUE);
 #endif
 #endif
-                prscore(argc, argv);
-                exit(EXIT_SUCCESS);
-            }
-    }
+            prscore(argc, argv);
+            /* FIXME: shouldn't this be using nh_terminate() to free
+               up any memory allocated by initoptions() */
+            exit(EXIT_SUCCESS);
+        }
+    } /* argc > 1 */
 
 /*
  * Change directories before we initialize the window system so
@@ -168,7 +170,7 @@ char *argv[];
 #endif
     initoptions();
 #ifdef PANICTRACE
-    ARGV0 = argv[0]; /* save for possible stack trace */
+    ARGV0 = hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
     panictrace_setsignals(TRUE);
 #endif
@@ -217,7 +219,7 @@ char *argv[];
          * dash matches role, race, gender, or alignment.
          */
         /* guard against user names with hyphens in them */
-        int len = strlen(plname);
+        int len = (int) strlen(plname);
         /* append the current role, if any, so that last dash is ours */
         if (++len < (int) sizeof plname)
             (void) strncat(strcat(plname, "-"), pl_character,
@@ -252,17 +254,17 @@ char *argv[];
     dlb_init(); /* must be before newgame() */
 
     /*
-     *  Initialize the vision system.  This must be before mklev() on a
-     *  new game or before a level restore on a saved game.
+     * Initialize the vision system.  This must be before mklev() on a
+     * new game or before a level restore on a saved game.
      */
     vision_init();
 
     display_gamewindows();
 
-/*
- * First, try to find and restore a save file for specified character.
- * We'll return here if new game player_selection() renames the hero.
- */
+    /*
+     * First, try to find and restore a save file for specified character.
+     * We'll return here if new game player_selection() renames the hero.
+     */
 attempt_restore:
     if ((fd = restore_saved_game()) >= 0) {
         const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
@@ -283,9 +285,10 @@ attempt_restore:
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
-                if (yn("Do you want to keep the save file?") == 'n')
+                /* this seems like a candidate for paranoid_confirmation... */
+                if (yn("Do you want to keep the save file?") == 'n') {
                     (void) delete_savefile();
-                else {
+                } else {
                     (void) chmod(fq_save, FCMASK); /* back to readable */
                     nh_compress(fq_save);
                 }
@@ -316,10 +319,12 @@ attempt_restore:
         wd_message();
     }
 
+    /* moveloop() never returns but isn't flagged NORETURN */
     moveloop(resuming);
+
     exit(EXIT_SUCCESS);
     /*NOTREACHED*/
-    return (0);
+    return 0;
 }
 
 static void
@@ -363,14 +368,15 @@ char *argv[];
             break;
 #endif
         case 'u':
-            if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
-            else if (argc > 1) {
+            if (argv[0][2]) {
+                (void) strncpy(plname, argv[0] + 2, sizeof plname - 1);
+            } else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
-            } else
+                (void) strncpy(plname, argv[0], sizeof plname - 1);
+            } else {
                 raw_print("Player name expected after -u");
+            }
             break;
         case 'I':
         case 'i':
@@ -457,10 +463,10 @@ boolean wr;
         (void) setuid(getuid()); /* Ron Wessels */
 #endif
     } else {
-/* non-default data files is a sign that scores may not be
- * compatible, or perhaps that a binary not fitting this
- * system's layout is being used.
- */
+        /* non-default data files is a sign that scores may not be
+         * compatible, or perhaps that a binary not fitting this
+         * system's layout is being used.
+         */
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
@@ -483,9 +489,10 @@ boolean wr;
         error("Cannot chdir to %s.", dir);
     }
 
-    /* warn the player if we can't write the record file */
-    /* perhaps we should also test whether . is writable */
-    /* unfortunately the access system-call is worthless */
+    /* warn the player if we can't write the record file
+     * perhaps we should also test whether . is writable
+     * unfortunately the access system-call is worthless.
+     */
     if (wr) {
 #ifdef VAR_PLAYGROUND
         fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
@@ -576,6 +583,7 @@ boolean
 authorize_wizard_mode()
 {
     struct passwd *pw = get_unix_pw();
+
     if (pw && sysopt.wizards && sysopt.wizards[0]) {
         if (check_user_string(sysopt.wizards))
             return TRUE;
@@ -628,6 +636,7 @@ char *optstr;
     int pwlen;
     char *eop, *w;
     char *pwname;
+
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
     if (!pw)
