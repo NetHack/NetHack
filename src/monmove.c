@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1505180840 2017/09/12 01:47:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1505265968 2017/09/13 01:26:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -752,6 +752,7 @@ register int after;
     boolean uses_items = 0, setlikes = 0;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
+    boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
     struct monst *mtoo;
     schar mmoved = 0; /* not strictly nec.: chi >= 0 will do */
@@ -1249,7 +1250,7 @@ postmov:
                     && (amorphous(ptr)
                         || (can_fog(mtmp)
                             && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
-                                          canspotmon(mtmp))))) {
+                                          sawmon)))) {
                     /* update cached value for vamp_shift() case */
                     ptr = mtmp->data;
                     if (flags.verbose && canseemon(mtmp))
