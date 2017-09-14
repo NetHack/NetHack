@@ -3300,7 +3300,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                     if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN
                         && *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) {
                         shopdoor = TRUE;
-                        add_damage(bhitpos.x, bhitpos.y, 400L);
+                        add_damage(bhitpos.x, bhitpos.y, SHOP_DOOR_COST);
                     }
                 }
                 break;
@@ -4410,7 +4410,7 @@ short exploding_wand_typ;
                     lev->typ = ROOM;
                     if (see_it)
                         newsym(x, y);
-                    add_damage(x, y, (type >= 0) ? 300L : 0L);
+                    add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
                     if (type >= 0)
                         *shopdamage = TRUE;
                 } else {
@@ -4508,7 +4508,7 @@ short exploding_wand_typ;
         if (new_doormask >= 0) { /* door gets broken */
             if (*in_rooms(x, y, SHOPBASE)) {
                 if (type >= 0) {
-                    add_damage(x, y, 400L);
+                    add_damage(x, y, SHOP_DOOR_COST);
                     *shopdamage = TRUE;
                 } else /* caused by monster */
                     add_damage(x, y, 0L);

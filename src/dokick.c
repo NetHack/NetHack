@@ -1278,7 +1278,7 @@ dokick()
         feel_newsym(x, y); /* we know we broke it */
         unblock_point(x, y); /* vision */
         if (shopdoor) {
-            add_damage(x, y, 400L);
+            add_damage(x, y, SHOP_DOOR_COST);
             pay_for_damage("break", FALSE);
         }
         if (in_town(x, y))

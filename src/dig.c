@@ -404,7 +404,7 @@ dig(VOID_ARGS)
             }
         } else if (IS_WALL(lev->typ)) {
             if (shopedge) {
-                add_damage(dpx, dpy, 10L * ACURRSTR);
+                add_damage(dpx, dpy, SHOP_WALL_DMG);
                 dmgtxt = "damage";
             }
             if (level.flags.is_maze_lev) {
@@ -424,7 +424,7 @@ dig(VOID_ARGS)
         } else if (closed_door(dpx, dpy)) {
             digtxt = "You break through the door.";
             if (shopedge) {
-                add_damage(dpx, dpy, 400L);
+                add_damage(dpx, dpy, SHOP_DOOR_COST);
                 dmgtxt = "break";
             }
             if (!(lev->doormask & D_TRAPPED))
@@ -1485,7 +1485,7 @@ zap_dig()
             }
         } else if (closed_door(zx, zy) || room->typ == SDOOR) {
             if (*in_rooms(zx, zy, SHOPBASE)) {
-                add_damage(zx, zy, 400L);
+                add_damage(zx, zy, SHOP_DOOR_COST);
                 shopdoor = TRUE;
             }
             if (room->typ == SDOOR)
@@ -1502,7 +1502,7 @@ zap_dig()
             if (IS_WALL(room->typ)) {
                 if (!(room->wall_info & W_NONDIGGABLE)) {
                     if (*in_rooms(zx, zy, SHOPBASE)) {
-                        add_damage(zx, zy, 200L);
+                        add_damage(zx, zy, SHOP_WALL_COST);
                         shopwall = TRUE;
                     }
                     room->typ = ROOM;
@@ -1530,7 +1530,7 @@ zap_dig()
                 break;
             if (IS_WALL(room->typ) || room->typ == SDOOR) {
                 if (*in_rooms(zx, zy, SHOPBASE)) {
-                    add_damage(zx, zy, 200L);
+                    add_damage(zx, zy, SHOP_WALL_COST);
                     shopwall = TRUE;
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
