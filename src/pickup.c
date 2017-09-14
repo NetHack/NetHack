@@ -2348,13 +2348,18 @@ explain_container_prompt(more_containers)
 boolean more_containers;
 {
     static const char *const explaintext[] = {
-        "Container actions:", "", " : -- Look: examine contents",
-        " o -- Out: take things out", " i -- In: put things in",
+        "Container actions:",
+        "",
+        " : -- Look: examine contents",
+        " o -- Out: take things out",
+        " i -- In: put things in",
         " b -- Both: first take things out, then put things in",
         " r -- Reversed: put things in, then take things out",
         " s -- Stash: put one item in", "",
-        " n -- Next: loot next selected container", " q -- Quit: finished",
-        " ? -- Help: display this text.", "", 0
+        " n -- Next: loot next selected container",
+        " q -- Quit: finished",
+        " ? -- Help: display this text.",
+        "", 0
     };
     const char *const *txtpp;
     winid win;
@@ -2392,7 +2397,7 @@ struct obj **objp;
 int held;
 boolean more_containers; /* True iff #loot multiple and this isn't last one */
 {
-    struct obj *curr, *otmp, *obj = *objp;
+    struct obj *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,
         stash_one, inokay, outokay, outmaybe;
     char c, emptymsg[BUFSZ], qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
@@ -2439,7 +2444,11 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         used = 1;
     }
 
-    if ((loss = boh_loss(current_container, held)) != 0) {
+    cursed_mbag = Is_mbag(current_container)
+        && current_container->cursed
+        && Has_contents(current_container);
+    if (cursed_mbag
+        && (loss = boh_loss(current_container, held)) != 0) {
         used = 1;
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
         current_container->owt = weight(current_container);
