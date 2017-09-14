@@ -1,4 +1,4 @@
-/* NetHack 3.6	quest.c	$NHDT-Date: 1446191878 2015/10/30 07:57:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	quest.c	$NHDT-Date: 1505170343 2017/09/11 22:52:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -68,7 +68,20 @@ on_goal()
         qt_pager(QT_FIRSTGOAL);
         Qstat(made_goal) = 1;
     } else {
-        qt_pager(QT_NEXTGOAL);
+        /*
+         * Some QT_NEXTGOAL messages reference the quest artifact;
+         * find out if it is still present.  If not, request an
+         * alternate message (qt_pager() will revert to delivery
+         * of QT_NEXTGOAL if current role doesn't have QT_ALTGOAL).
+         * Note: if hero is already carrying it, it is treated as
+         * being absent from the level for quest message purposes.
+         */
+        unsigned whichobjchains = ((1 << OBJ_FLOOR)
+                                   | (1 << OBJ_MINVENT)
+                                   | (1 << OBJ_BURIED));
+        struct obj *qarti = find_quest_artifact(whichobjchains);
+
+        qt_pager(qarti ? QT_NEXTGOAL : QT_ALTGOAL);
         if (Qstat(made_goal) < 7)
             Qstat(made_goal)++;
     }
@@ -176,6 +189,7 @@ expulsion(boolean seal)
     schedule_goto(dest, FALSE, FALSE, portal_flag, (char *) 0, (char *) 0);
     if (seal) { /* remove the portal to the quest - sealing it off */
         int reexpelled = u.uevent.qexpelled;
+
         u.uevent.qexpelled = 1;
         remdun_mapseen(quest_dnum);
         /* Delete the near portal now; the far (main dungeon side)

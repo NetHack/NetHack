@@ -738,7 +738,10 @@ location other than the current position.
 Wait or rest, do nothing for one turn.
 %.lp
 \item[\tb{a}]
-Apply (use) a tool (pick-axe, key, lamp \ldots).
+Apply (use) a tool (pick-axe, key, lamp \ldots).\\
+%.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 %.lp
 \item[\tb{A}]
 Remove one or more worn items, such as armor.\\
@@ -1112,9 +1115,12 @@ and '{\tt \^{}N}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#apply}]
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
-Default key is '{\tt a}'.
+Default key is '{\tt a}'.\\
 If the tool used acts on items on the floor, using the `{\tt m}' prefix
-skips those items.
+skips those items.\\
+%.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 %.lp
 \item[\tb{\#attributes}]
 Show your attributes. Default key is '{\tt \^{}X}'.\\
@@ -3323,7 +3329,7 @@ prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray}'
 %.sd
 %.si
 \newlength{\pcwidth}
-\settowidth{\pcwidth}{\tt Confirm}
+\settowidth{\pcwidth}{\tt Were-change}
 \addtolength{\pcwidth}{\labelsep}
 \blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
 \item[{\tt Confirm}]
@@ -3342,13 +3348,18 @@ bones data when dying in debug mode
 \item[{\tt attack~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm attacking
 a peaceful monster;
+\item[{\tt wand-break}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
+a wand;
+\item[{\tt Were-change}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
+due to lycanthropy
+when hero has polymorph control;
 \item[{\tt pray~~~}]
 require `{\tt y}' to confirm an attempt to pray rather
 than immediately praying; on by default;
-\item[{\tt wand}]
-require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
-a wand;
-\item[{\tt Remove~}] require selection from inventory for `{\tt R}' and `{\tt T}'
+\item[{\tt Remove~}] require selection from inventory for `{\tt R}'
+and `{\tt T}'
 commands even when wearing just one applicable item.
 \item[{\tt all~~~~}]
 turn on all of the above.

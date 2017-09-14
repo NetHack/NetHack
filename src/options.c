@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1498078876 2017/06/21 21:01:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.288 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1505214875 2017/09/12 11:14:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -633,7 +633,7 @@ initoptions()
 #ifdef SYSCF_FILE
     /* If SYSCF_FILE is specified, it _must_ exist... */
     assure_syscf_file();
-    config_error_init(TRUE, SYSCF_FILE);
+    config_error_init(TRUE, SYSCF_FILE, FALSE);
 
     /* ... and _must_ parse correctly. */
     if (!read_config_file(SYSCF_FILE, SET_IN_SYS)) {
@@ -787,25 +787,25 @@ initoptions_finish()
                 opts++; /* @filename */
             /* looks like a filename */
             if (strlen(opts) < BUFSZ / 2) {
-                config_error_init(TRUE, opts);
+                config_error_init(TRUE, opts, CONFIG_ERROR_SECURE);
                 read_config_file(opts, SET_IN_FILE);
                 config_error_done();
             }
         } else {
-            config_error_init(TRUE, (char *) 0);
+            config_error_init(TRUE, (char *) 0, FALSE);
             read_config_file((char *) 0, SET_IN_FILE);
             config_error_done();
             /* let the total length of options be long;
              * parseoptions() will check each individually
              */
-            config_error_init(FALSE, "NETHACKOPTIONS");
+            config_error_init(FALSE, "NETHACKOPTIONS", FALSE);
             (void) parseoptions(opts, TRUE, FALSE);
             config_error_done();
         }
     } else
 #endif
         {
-            config_error_init(TRUE, (char *) 0);
+            config_error_init(TRUE, (char *) 0, FALSE);
             read_config_file((char *) 0, SET_IN_FILE);
             config_error_done();
         }
@@ -1084,26 +1084,22 @@ STATIC_OVL int
 feature_alert_opts(char *op, const char *optn)
 {
     char buf[BUFSZ];
-    boolean rejectver = FALSE;
     unsigned long fnv = get_feature_notice_ver(op); /* version.c */
 
     if (fnv == 0L)
         return 0;
-    if (fnv > get_current_feature_ver())
-        rejectver = TRUE;
-    else
-        flags.suppress_alert = fnv;
-    if (rejectver) {
+    if (fnv > get_current_feature_ver()) {
         if (!initial) {
             You_cant("disable new feature alerts for future versions.");
         } else {
-            Sprintf(buf,
-                    "\n%s=%s Invalid reference to a future version ignored",
-                    optn, op);
-            config_error_add(buf);
+            config_error_add(
+                        "%s=%s Invalid reference to a future version ignored",
+                             optn, op);
         }
         return 0;
     }
+
+    flags.suppress_alert = fnv;
     if (!initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
@@ -1207,7 +1203,10 @@ STATIC_VAR const struct paranoia_opts {
        takes precedence and "all" isn't present in the interactive menu,
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
-       is just a synonym for "Confirm") */
+       is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
+       latter requires at least two letters; "wand"-break vs "Were"-change,
+       both require at least two letters during config processing and use
+       case-senstivity for 'O's interactive menu */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
     { PARANOID_QUIT, "quit", 1, "explore", 1,
@@ -1218,12 +1217,14 @@ STATIC_VAR const struct paranoia_opts {
       "yes vs y to save bones data when dying in debug mode" },
     { PARANOID_HIT, "attack", 1, "hit", 1,
       "yes vs y to attack a peaceful monster" },
+    { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
+      "yes vs y to break a wand via (a)pply" },
+    { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
+      "yes vs y to change form when lycanthropy is controllable" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
       "y to pray (supersedes old \"prayconfirm\" option)" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       "always pick from inventory for Remove and Takeoff" },
-    { PARANOID_BREAKWAND, "wand", 1, "breakwand", 2,
-      "yes vs y to break a wand" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
@@ -1623,7 +1624,7 @@ add_menu_coloring_parsed(char *str, int c, int a)
 boolean
 add_menu_coloring(char *tmpstr)
 {
-    int i, c = NO_COLOR, a = ATR_NONE;
+    int c = NO_COLOR, a = ATR_NONE;
     char *tmps, *cs, *amp;
     char str[BUFSZ];
 
@@ -2665,7 +2666,8 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
                 if (i == SIZE(paranoia)) {
                     /* didn't match anything, so arg is bad;
                        any flags already set will stay set */
-                    config_error_add("Unknown %s parameter '%s'", fullname, op);
+                    config_error_add("Unknown %s parameter '%s'",
+                                     fullname, op);
                     return FALSE;
                 }
                 /* move on to next token */
@@ -5145,20 +5147,9 @@ get_compopt_value(const char *optname, char *buf)
         char tmpbuf[QBUFSZ];
 
         tmpbuf[0] = '\0';
-        if (ParanoidConfirm)
-            Strcat(tmpbuf, " Confirm");
-        if (ParanoidQuit)
-            Strcat(tmpbuf, " quit");
-        if (ParanoidDie)
-            Strcat(tmpbuf, " die");
-        if (ParanoidBones)
-            Strcat(tmpbuf, " bones");
-        if (ParanoidHit)
-            Strcat(tmpbuf, " attack");
-        if (ParanoidPray)
-            Strcat(tmpbuf, " pray");
-        if (ParanoidRemove)
-            Strcat(tmpbuf, " Remove");
+        for (i = 0; paranoia[i].flagmask != 0; ++i)
+            if (flags.paranoia_bits & paranoia[i].flagmask)
+                Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
         Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
     } else if (!strcmp(optname, "pettype")) {
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"

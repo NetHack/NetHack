@@ -770,7 +770,7 @@ process_options(int argc, char *argv[])
                             NHWinMainInit();
                         }
             */
-            config_error_init(FALSE, "command line");
+            config_error_init(FALSE, "command line", FALSE);
             choose_windows(&argv[0][2]);
             config_error_done();
             break;

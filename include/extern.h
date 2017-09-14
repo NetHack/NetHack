@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1502753404 2017/08/14 23:30:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.600 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -763,7 +763,7 @@ E void unlock_file(const char *);
 #ifdef USER_SOUNDS
 E boolean can_read_file(const char *);
 #endif
-E void config_error_init(boolean, const char *);
+E void config_error_init(boolean, const char *, boolean);
 E void config_error_add(const char *, ...) PRINTF_F(1, 2);
 E int config_error_done(void);
 E boolean read_config_file(const char *, int);
@@ -792,7 +792,7 @@ E void really_close(void);
 E boolean debugcore(const char *, boolean);
 #endif
 E boolean read_tribute(const char *, const char *, int,
-                               char *, int, unsigned);
+                       char *, int, unsigned);
 E boolean Death_quote(char *, int);
 
 /* ### fountain.c ### */
@@ -1951,6 +1951,7 @@ E void unload_qtlist(void);
 E short quest_info(int);
 E const char *ldrname(void);
 E boolean is_quest_artifact(struct obj *);
+E struct obj *find_quest_artifact(unsigned);
 E void com_pager(int);
 E void qt_pager(int);
 E struct permonst *qt_montype(void);

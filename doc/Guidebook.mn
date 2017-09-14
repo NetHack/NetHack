@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ $NHDT-Date: 1498078870 2017/06/21 21:01:10 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.233 $ $NHDT-Date: 1505214878 2017/09/12 11:14:38 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -611,6 +611,9 @@ location other than the current position.
 Wait or rest, do nothing for one turn.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
+.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 .lp A
 Remove one or more worn items, such as armor.
 .lp ""
@@ -926,10 +929,16 @@ choosing the item to adjust, enter a count prior to its letter.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the
-``#overview'' command. Autocompletes. Default key is 'M-A', and '^N' if number_pad is on.
+``#overview'' command. Autocompletes. Default key is 'M-A', and '^N'
+if number_pad is on.
 .lp #apply
 Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
-If the tool used acts on items on the floor, using the `m' prefix skips those items.
+.lp ""
+If the tool used acts on items on the floor, using the `m' prefix skips
+those items.
+.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 .lp #attributes
 Show your attributes. Default key is '^X'.
 .lp #autopickup
@@ -2726,7 +2735,7 @@ at the end from the previous order.
 .lp paranoid_confirmation
 A space separated list of specific situations where alternate
 prompting is desired.  The default is paranoid_confirmation:pray.
-.PS Confirm
+.PS Were-change
 .PL Confirm
 for any prompts which are set to require "yes" rather than 'y', also
 require "no" to reject instead of accepting any non-yes response as no
@@ -2741,11 +2750,14 @@ require "yes" rather than 'y' to confirm saving
 bones data when dying in debug mode;
 .PL attack
 require "yes" rather than 'y' to confirm attacking a peaceful monster;
+.PL wand-break
+require "yes" rather than 'y' to confirm breaking a wand;
+.PL Were-change
+require "yes" rather than 'y' to confirm changing form due to lycanthropy
+when hero has polymorph control;
 .PL pray
 require 'y' to confirm an attempt to pray rather
 than immediately praying; on by default;
-.PL wand
-require "yes" rather than 'y' to confirm breaking a wand;
 .PL Remove
 require selection from inventory for 'R' and 'T'
 commands even when wearing just one applicable item.
