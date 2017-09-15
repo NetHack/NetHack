@@ -234,6 +234,27 @@ typedef uchar nhsym;
 #endif
 #endif
 
+/*
+ * If the port did not define ENGINE_DATA and ENGINE_FUNC, define
+ * them here to do nothing.
+ *
+ * ENGINE_DATA and ENGINE_FUNC are used to decorate global functions
+ * and global data that are exported from the NetHack game engine
+ * usable by a port's windowing system.
+ *
+ * The windows port uses this mechanism to build a common game engine
+ * library which is shared by its multiple windowing systems.
+ *
+ */
+
+#ifndef ENGINE_DATA
+#define ENGINE_DATA
+#endif
+
+#ifndef ENGINE_FUNC
+#define ENGINE_FUNC
+#endif
+
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
 #define HANGUPHANDLING
 #endif
