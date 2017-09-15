@@ -39,6 +39,9 @@ void NDECL(monst_init);
  *      resistances, resistances conferred (both MR_* defines),
  *      3 * flag bitmaps (M1_*, M2_*, and M3_* defines respectively)
  *      symbol color (C(x) macro)
+ *
+ *      For AT_BREA attacks, '# sides' is ignored; 6 is used for most
+ *      damage types, 25 for sleep, not applicable for death or poison.
  */
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, col) \
     {                                                                      \
@@ -253,7 +256,7 @@ NEARDATA struct permonst mons[] = {
         M2_NOPOLY | M2_WERE | M2_HOSTILE, M3_INFRAVISIBLE, CLR_BROWN),
     MON("winter wolf cub", S_DOG, LVL(5, 12, 4, 0, -5),
         (G_NOHELL | G_GENO | G_SGROUP | 2),
-        A(ATTK(AT_BITE, AD_PHYS, 1, 8), ATTK(AT_BREA, AD_COLD, 1, 8), NO_ATTK,
+        A(ATTK(AT_BITE, AD_PHYS, 1, 8), ATTK(AT_BREA, AD_COLD, 1, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(250, 200, MS_BARK, MZ_SMALL), MR_COLD, MR_COLD,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, 0, CLR_CYAN),
@@ -1211,8 +1214,9 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_ORANGE),
+    /* disintegration breath is actually all or nothing, not 1d255 */
     MON("black dragon", S_DRAGON, LVL(15, 9, -1, 20, -6), (G_GENO | 1),
-        A(ATTK(AT_BREA, AD_DISN, 4, 10), ATTK(AT_BITE, AD_PHYS, 3, 8),
+        A(ATTK(AT_BREA, AD_DISN, 1, 255), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
           NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_DISINT, MR_DISINT,
@@ -2988,7 +2992,7 @@ struct permonst _mons2[] = {
      */
     MON("Chromatic Dragon", S_DRAGON, LVL(16, 12, 0, 30, -14),
         (G_NOGEN | G_UNIQ),
-        A(ATTK(AT_BREA, AD_RBRE, 6, 8), ATTK(AT_MAGC, AD_SPEL, 0, 0),
+        A(ATTK(AT_BREA, AD_RBRE, 6, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
           ATTK(AT_CLAW, AD_SAMU, 2, 8), ATTK(AT_BITE, AD_PHYS, 4, 8),
           ATTK(AT_BITE, AD_PHYS, 4, 8), ATTK(AT_STNG, AD_PHYS, 1, 6)),
         SIZ(WT_DRAGON, 1700, MS_NEMESIS, MZ_GIGANTIC),
