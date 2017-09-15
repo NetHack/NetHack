@@ -2109,6 +2109,39 @@ int ledger_num;
     }
 }
 
+void
+rm_mapseen(ledger_num)
+int ledger_num;
+{
+    mapseen *mptr, *mprev = (mapseen *)0;
+    struct cemetery *bp, *bpnext;
+
+    for (mptr = mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
+        if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel == ledger_num)
+            break;
+
+    if (!mptr)
+        return;
+
+    if (mptr->custom)
+        free((genericptr_t) mptr->custom);
+
+    bp = mptr->final_resting_place;
+    while (bp) {
+        bpnext = bp->next;
+        free(bp);
+        bp = bpnext;
+    }
+
+    if (mprev) {
+        mprev->next = mptr->next;
+        free(mptr);
+    } else {
+        mapseenchn = mptr->next;
+        free(mptr);
+    }
+}
+
 STATIC_OVL void
 save_mapseen(fd, mptr)
 int fd;

@@ -626,6 +626,7 @@ wiz_makemap(VOID_ARGS)
     if (wizard) {
         struct monst *mtmp;
 
+        rm_mapseen(ledger_no(&u.uz));
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (mtmp->isshk)
                 setpaid(mtmp);

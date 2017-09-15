@@ -607,6 +607,7 @@ E int NDECL(donamelevel);
 E int NDECL(dooverview);
 E void FDECL(show_overview, (int, int));
 E void FDECL(forget_mapseen, (int));
+E void FDECL(rm_mapseen, (int));
 E void FDECL(init_mapseen, (d_level *));
 E void NDECL(recalc_mapseen);
 E void FDECL(mapseen_temple, (struct monst *));
