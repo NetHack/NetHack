@@ -883,7 +883,7 @@ int spell;
 boolean atme;
 {
     int energy, damage, chance, n, intell;
-    int skill, role_skill;
+    int skill, role_skill, res = 0;
     boolean confused = (Confusion != 0);
     boolean physical_damage = FALSE;
     struct obj *pseudo;
@@ -933,13 +933,29 @@ boolean atme;
         return 1;
     }
 
-    if (u.uhave.amulet) {
+    /* if the cast attempt is already going to fail due to insufficient
+       energy (ie, u.uen < energy), the Amulet's drain effect won't kick
+       in and no turn will be consumed; however, when it does kick in,
+       the attempt may fail due to lack of energy after the draining, in
+       which case a turn will be used up in addition to the energy loss */
+    if (u.uhave.amulet && u.uen >= energy) {
         You_feel("the amulet draining your energy away.");
-        energy += rnd(2 * energy);
+        /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
+           so if amulet-induced cost was more than u.uen, nothing
+           (except the "don't have enough energy" message) happened
+           and player could just try again (and again and again...);
+           now we drain some energy immediately, which has a
+           side-effect of not increasing the hunger aspect of casting */
+        u.uen -= rnd(2 * energy);
+        if (u.uen < 0)
+            u.uen = 0;
+        context.botl = 1;
+        res = 1; /* time is going to elapse even if spell doesn't get cast */
     }
+
     if (energy > u.uen) {
         You("don't have enough energy to cast that spell.");
-        return 0;
+        return res;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
             int hungr = energy * 2;

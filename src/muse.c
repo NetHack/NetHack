@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1502753408 2017/08/14 23:30:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1505181522 2017/09/12 01:58:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1129,6 +1129,24 @@ struct monst *mtmp;
             m.offensive = obj;
             m.has_offense = MUSE_WAN_STRIKING;
         }
+#if 0   /* use_offensive() has had some code to support wand of teleportation
+         * for a long time, but find_offensive() never selected one;
+         * so for the time being, this is still disabled */
+        nomore(MUSE_WAN_TELEPORTATION);
+        if (obj->otyp == WAN_TELEPORTATION && obj->spe > 0
+            /* don't give controlled hero a free teleport */
+            && !Teleport_control
+            /* do try to move hero to a more vulnerable spot */
+            && (onscary(u.ux, u.uy, mtmp)
+                || (u.ux == xupstair && u.uy == yupstair)
+                || (u.ux == xdnstair && u.uy == ydnstair)
+                || (u.ux == sstairs.sx && u.uy == sstairs.sy)
+                || (u.ux == xupladder && u.uy == yupladder)
+                || (u.ux == xdnladder && u.uy == ydnladder))) {
+            m.offensive = obj;
+            m.has_offense = MUSE_WAN_TELEPORTATION;
+        }
+#endif
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && multi >= 0) {
             m.offensive = obj;
@@ -1233,6 +1251,7 @@ register struct obj *otmp;
                 makeknown(WAN_STRIKING);
         }
         break;
+#if 0   /* disabled because find_offensive() never picks WAN_TELEPORTATION */
     case WAN_TELEPORTATION:
         if (mtmp == &youmonst) {
             if (zap_oseen)
@@ -1247,6 +1266,7 @@ register struct obj *otmp;
                 (void) rloc(mtmp, TRUE);
         }
         break;
+#endif
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);

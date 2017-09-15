@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1496860757 2017/06/07 18:39:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1504999944 2017/09/09 23:32:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1275,6 +1275,7 @@ register struct attack *mattk;
                         | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
                 boolean couldspot = canspotmon(magr);
+
                 (void) rloc(magr, TRUE);
                 if (vis && couldspot && !canspotmon(magr))
                     pline("%s suddenly disappears!", buf);
@@ -1284,7 +1285,8 @@ register struct attack *mattk;
         break;
     case AD_DREN:
         if (!cancelled && !rn2(4))
-            xdrainenergym(mdef, vis && canspotmon(mdef) && mattk->aatyp != AT_ENGL);
+            xdrainenergym(mdef, (boolean) (vis && canspotmon(mdef)
+                                           && mattk->aatyp != AT_ENGL));
         tmp = 0;
         break;
     case AD_DRST:

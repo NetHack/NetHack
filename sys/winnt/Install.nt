@@ -21,14 +21,18 @@ tty and graphical win32 versions of NetHack 3.6.1.
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
 
+  o A copy of Microsoft Visual Studio 2017 Express
+
+    OR
+
   o A copy of Microsoft Visual Studio 2015 Express
 
-	OR
+    OR
 
   o A copy of Microsoft Visual Studio 2013 Express
     The current NetHack code has not been tested with earlier versions 
     of the compiler.
-    
+
     OR
 
   o A copy of MinGW. MinGW is a collection of header 
@@ -46,31 +50,36 @@ that allow you to build the Windows Graphical version from Microsoft
 Visual C's IDE (Integrated Development Environment.)
 
 /--------------------------------------------------------\
-| Building And Running Using Visual Studio 2015          |
+| Building And Running Using Visual Studio 2015 or       |
+|                            Visual Studio 2017          |
 \--------------------------------------------------------/
 
-If you are NOT using Visual Studio 2015, proceed to "FIRST STEP -
-MOVING THINGS AROUND".
+If you are NOT using Visual Studio 2015 or Visual Studio 2017, proceed
+to "FIRST STEP - MOVING THINGS AROUND".
 
-When using Visual Studio 2015, you do not need to move things around.
-You simply need to load the Visual Studio 2015 NetHack solution file
+When using either Visual Studio 2015 or Visual Studio 2017, you do not
+need to move things around.  You simply need to load the solution file
 within the IDE, build the solution and run the version of NetHack
 you wish to run.
 
 The Visual Studio 2015 NetHack solution file can be found here:
     win\win32\vs2015\NetHack.sln
 
-From a command prompt, you can launch and load this solution file by:
-	start win\win32\vs2015\NetHack.sln
+The Visual Studio 2017 NetHack solution file can be found here:
+    win\win32\vs2017\NetHack.sln
 
-From within the IDE:
-	1. select the build configuration you wish to use.
-	2. from build menu, select build solution.
-	3. type F5 to start debugging.
+So the steps are:
+    1. Launch the IDE.
+    2. Open the appropriate solution file.
+    3. Select the build configuration you wish to use.
+    4. From build menu, select build solution.
+    5. Type F5 to start debugging.
 
-You can build all the projects for all platforms and configurations
-using a Visual Studio MSBuild command prompt.  Open the MSBuild command
-prompt, change directory to win\win32\vs2015 and run "build.bat".
+You can also build all the projects for all platforms and configurations
+using a "build.bat" batch file found in the same directory as the solution.
+
+Change to the appropriate directory (i.e. win\win32\vs2015 for VS2015 builds)
+and run "build.bat".
 
 /-----------------------------------\
 | FIRST STEP - MOVING THINGS AROUND |
@@ -80,11 +89,11 @@ The first step in building either version of NetHack is to execute
 sys\winnt\nhsetup.bat to move some files to their required locations.  
 
 From the command prompt:
-	cd sys\winnt
-	nhsetup
+        cd sys\winnt
+        nhsetup
 
 From a Windows explorer window:
-	double-click on nhsetup.bat
+        double-click on nhsetup.bat
 
 A "binary" directory will be created off the top of the NetHack source
 tree to house the completed build.

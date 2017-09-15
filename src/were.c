@@ -1,4 +1,4 @@
-/* NetHack 3.6	were.c	$NHDT-Date: 1432512763 2015/05/25 00:12:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6	were.c	$NHDT-Date: 1505214877 2017/09/12 11:14:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -183,7 +183,7 @@ you_were()
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
                 an(mons[u.ulycn].mname + 4));
-        if (yn(qbuf) == 'n')
+        if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
     }
     (void) polymon(u.ulycn);
@@ -200,8 +200,11 @@ boolean purify;
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(youmonst.data)
-        && (!controllable_poly || yn("Remain in beast form?") == 'n'))
+        && (!controllable_poly
+            || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
         rehumanize();
+    else if (is_were(youmonst.data) && !u.mtimedone)
+        u.mtimedone = rn1(200, 200); /* 40% of initial were change */
 }
 
 /* lycanthropy is being caught or cured, but no shape change is involved */

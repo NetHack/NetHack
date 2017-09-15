@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1505299155 2017/09/13 10:39:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -328,11 +328,20 @@ int x, y;
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_WARNMON) {
-                if (Hallucination)
+                if (Hallucination) {
                     Strcat(monbuf, "paranoid delusion");
-                else
-                    Sprintf(eos(monbuf), "warned of %s",
-                            makeplural(mtmp->data->mname));
+                } else {
+                    unsigned long mW = (context.warntype.obj
+                                        | context.warntype.polyd),
+                                  m2 = mtmp->data->mflags2;
+                    const char *whom = ((mW & M2_HUMAN & m2) ? "human"
+                                        : (mW & M2_ELF & m2) ? "elf"
+                                          : (mW & M2_ORC & m2) ? "orc"
+                                            : (mW & M2_DEMON & m2) ? "demon"
+                                              : mtmp->data->mname);
+
+                    Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
+                }
                 how_seen &= ~MONSEEN_WARNMON;
                 if (how_seen)
                     Strcat(monbuf, ", ");
