@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(SrcDir)allmain.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)alloc.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)apply.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)artifact.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)attrib.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)ball.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)bones.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)botl.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)cmd.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dbridge.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)decl.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)detect.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dig.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)display.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dlb.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)do.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dog.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dogmove.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dokick.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dothrow.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)do_name.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)do_wear.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)drawing.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)dungeon.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)eat.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)end.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)engine.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)engrave.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)exper.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)explode.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)extralev.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)files.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)fountain.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)hack.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)hacklib.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)invent.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)light.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)lock.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mail.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)makemon.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mapglyph.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mcastu.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mhitm.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mhitu.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)minion.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mklev.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mkmap.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mkmaze.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mkobj.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mkroom.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mon.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mondata.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)monmove.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)monst.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)monstr.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mplayer.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)mthrowu.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)muse.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)music.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)objects.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)objnam.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)options.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)o_init.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)pager.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)pickup.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)pline.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)polyself.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)potion.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)pray.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)priest.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)quest.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)questpgr.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)read.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)rect.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)region.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)restore.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)rip.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)rnd.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)role.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)rumors.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)save.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)shk.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)shknam.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)sit.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)sounds.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)spell.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)sp_lev.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)steal.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)steed.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)sys.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)teleport.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)tile.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)timeout.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)topten.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)track.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)trap.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)uhitm.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)u_init.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)vault.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)version.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)vision.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)weapon.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)were.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)wield.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)windows.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)wizard.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)worm.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)worn.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)write.c" Filter="source"/>
+    <ClCompile Include="$(SrcDir)zap.c" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)cppregex.cpp" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)pcmain.c" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)pcsys.c" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)nhlan.c" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)pcunix.c" Filter="source"/>
+    <ClCompile Include="$(SysShareDir)random.c" Filter="source"/>
+    <ClCompile Include="$(SysWinntDir)ntsound.c" Filter="source"/>
+    <ClCompile Include="$(SysWinntDir)winnt.c" Filter="source"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(IncDir)align.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)artifact.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)artilist.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)attrib.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)botl.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)color.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)config.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)config1.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)context.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)coord.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)date.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)decl.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)display.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)dlb.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)dungeon.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)engine.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)engrave.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)extern.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)flag.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)func_tab.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)global.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)hack.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)lev.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)mextra.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)mfndpos.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)mkroom.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)monattk.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)mondata.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)monflag.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)monst.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)monsym.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)ntconf.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)obj.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)objclass.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)onames.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)patchlevel.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)permonst.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)pm.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)prop.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)qtext.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)quest.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)rect.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)region.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)rm.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)skills.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)spell.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)sp_lev.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)timeout.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)tradstdc.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)trap.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)vision.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)winprocs.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)wintty.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)wintype.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)you.h" Filter="header"/>
+    <ClInclude Include="$(IncDir)youprop.h" Filter="header"/>
+    <ClInclude Include="$(WinWin32Dir)nhresource.h" Filter="header"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(WinWin32Dir)NetHack.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="$(WinWin32Dir)nethack.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{dd4ae5db-fba7-4561-b278-8380f8090596}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header">
+      <UniqueIdentifier>{2695ae26-6a71-4007-ba79-4aa2f2a312e1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -60,7 +60,7 @@ static BOOL more_prompt_check(HWND hWnd);
 /* check if "--more--" prompt needs to be displayed */
 
 #ifdef USER_SOUNDS
-extern void play_sound_for_message(const char *str);
+ENGINE_FUNC extern void play_sound_for_message(const char *str);
 #endif
 
 HWND

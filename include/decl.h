@@ -39,9 +39,9 @@ E NEARDATA int warn_obj_cnt; /* count of monsters meeting criteria */
 E int x_maze_max, y_maze_max;
 E int otg_temp;
 
-E NEARDATA int in_doagain;
+ENGINE_DATA E NEARDATA int in_doagain;
 
-E struct dgn_topology { /* special dungeon levels for speed */
+ENGINE_DATA E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_oracle_level;
     d_level d_bigroom_level; /* unused */
     d_level d_rogue_level;
@@ -139,7 +139,7 @@ E NEARDATA char tune[6];
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 E struct linfo level_info[MAXLINFO];
 
-E NEARDATA struct sinfo {
+ENGINE_DATA E NEARDATA struct sinfo {
     int gameover;  /* self explanatory? */
     int stopprint; /* inhibit further end of game disclosure */
 #ifdef HANGUPHANDLING
@@ -158,15 +158,15 @@ E NEARDATA struct sinfo {
     int wizkit_wishing;
 } program_state;
 
-E boolean restoring;
+ENGINE_DATA E boolean restoring;
 
-E const char quitchars[];
+ENGINE_DATA E const char quitchars[];
 E const char vowels[];
-E const char ynchars[];
-E const char ynqchars[];
-E const char ynaqchars[];
+ENGINE_DATA E const char ynchars[];
+ENGINE_DATA E const char ynqchars[];
+ENGINE_DATA E const char ynaqchars[];
 E const char ynNaqchars[];
-E NEARDATA long yn_number;
+ENGINE_DATA E NEARDATA long yn_number;
 
 E const char disclosure_options[];
 
@@ -184,8 +184,8 @@ E NEARDATA struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
-E long done_money;
-E NEARDATA char plname[PL_NSIZ];
+ENGINE_DATA E long done_money;
+ENGINE_DATA E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
@@ -243,10 +243,10 @@ E NEARDATA struct obj *current_wand, *thrownobj, *kickedobj;
 
 E NEARDATA struct obj zeroobj; /* for init; &zeroobj used as special value */
 
-E NEARDATA anything zeroany;   /* init'd and defined in decl.c */
+ENGINE_DATA E NEARDATA anything zeroany;   /* init'd and defined in decl.c */
 
 #include "you.h"
-E NEARDATA struct you u;
+ENGINE_DATA E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;
 E NEARDATA struct u_realtime urealtime;
 
@@ -324,11 +324,12 @@ E NEARDATA boolean vision_full_recalc; /* TRUE if need vision recalc */
 E NEARDATA char **viz_array;           /* could see/in sight row pointers */
 
 /* Window system stuff */
-E NEARDATA winid WIN_MESSAGE;
+ENGINE_DATA E NEARDATA winid WIN_MESSAGE;
 #ifndef STATUS_VIA_WINDOWPORT
-E NEARDATA winid WIN_STATUS;
+ENGINE_DATA E NEARDATA winid WIN_STATUS;
 #endif
-E NEARDATA winid WIN_MAP, WIN_INVEN;
+ENGINE_DATA E NEARDATA winid WIN_MAP;
+ENGINE_DATA E NEARDATA winid WIN_INVEN;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)
@@ -339,9 +340,9 @@ E NEARDATA winid WIN_MAP, WIN_INVEN;
 #define Sprintf1(buf, cstr) Sprintf(buf, "%s", cstr)
 #define panic1(cstr) panic("%s", cstr)
 
-E char toplines[];
+ENGINE_DATA E char toplines[];
 #ifndef TCAP_H
-E struct tc_gbl_data {   /* also declared in tcap.h */
+ENGINE_DATA E struct tc_gbl_data {   /* also declared in tcap.h */
     char *tc_AS, *tc_AE; /* graphics start and end (tty font swapping) */
     int tc_LI, tc_CO;    /* lines and columns */
 } tc_gbl_data;

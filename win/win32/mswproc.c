@@ -1310,7 +1310,7 @@ mswin_raw_print(const char *str)
     TCHAR wbuf[255];
     logDebug("mswin_raw_print(%s)\n", str);
     if (str && *str) {
-        extern int redirect_stdout;
+        ENGINE_DATA extern int redirect_stdout;
         if (!redirect_stdout)
             NHMessageBox(GetNHApp()->hMainWnd,
                          NH_A2W(str, wbuf, sizeof(wbuf)),
@@ -2082,7 +2082,7 @@ initMapTiles(void)
     TCHAR wbuf[MAX_PATH];
     int tl_num;
     SIZE map_size;
-    extern int total_tiles_used;
+    ENGINE_DATA extern int total_tiles_used;
 
     /* no file - no tile */
     if (!(iflags.wc_tile_file && *iflags.wc_tile_file))

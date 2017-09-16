@@ -165,7 +165,7 @@ struct Role {
     /* dictionary entries (dat/data.bas) */
 };
 
-extern const struct Role roles[]; /* table of available roles */
+ENGINE_DATA extern const struct Role roles[]; /* table of available roles */
 extern struct Role urole;
 #define Role_if(X) (urole.malenum == (X))
 #define Role_switch (urole.malenum)
@@ -217,7 +217,7 @@ struct Race {
     /* dictionary entries (dat/data.bas) */
 };
 
-extern const struct Race races[]; /* Table of available races */
+ENGINE_DATA extern const struct Race races[]; /* Table of available races */
 extern struct Race urace;
 #define Race_if(X) (urace.malenum == (X))
 #define Race_switch (urace.malenum)
@@ -234,7 +234,7 @@ struct Gender {
 #define ROLE_GENDERS 2    /* number of permitted player genders
                              increment to 3 if you allow neuter roles */
 
-extern const struct Gender genders[]; /* table of available genders */
+ENGINE_DATA extern const struct Gender genders[]; /* table of available genders */
 #define uhe()      (genders[flags.female ? 1 : 0].he)
 #define uhim()     (genders[flags.female ? 1 : 0].him)
 #define uhis()     (genders[flags.female ? 1 : 0].his)
@@ -252,7 +252,7 @@ struct Align {
 };
 #define ROLE_ALIGNS 3     /* number of permitted player alignments */
 
-extern const struct Align aligns[]; /* table of available alignments */
+ENGINE_DATA extern const struct Align aligns[]; /* table of available alignments */
 
 /*** Information about the player ***/
 struct you {

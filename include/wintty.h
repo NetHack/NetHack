@@ -227,7 +227,7 @@ E void FDECL(tty_status_threshold, (int, int, anything, int, int, int));
 E void NDECL(tty_start_screen);
 E void NDECL(tty_end_screen);
 
-E void FDECL(genl_outrip, (winid, int, time_t));
+ENGINE_FUNC E void FDECL(genl_outrip, (winid, int, time_t));
 
 E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
 E void FDECL(tty_putmsghistory, (const char *, BOOLEAN_P));

@@ -75,6 +75,41 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
+/*
+ * NetHack and NetHackW share a common dynamic link library (DLL) named
+ * nethack.dll which encapsulates the NetHack game engine.
+ *
+ * We use ENGINE_FUNC and ENGINE_DATA macros to declare the set of
+ * global functions and global data that are exported by engine.dll.
+ *
+ * When building engine.dll, we define ENGINE_EXPORT causing all
+ * declarations decorated with ENGINE_DATA or ENGINE_FUNC to
+ * use the Microsoft specific language extension __declspec(dllexport)
+ * to export the global data or global function from engine.dll.
+ *
+ * When building NetHack and NetHackW, we define ENGINE_IMPORT
+ * causing all declarations decorated with ENGINE_DATA or ENGINE_FUNC to
+ * use the Microsoft specific language extension __declspec(dllimport)
+ * to declare that the global data or global function is available
+ * from a DLL import library.
+ */
+
+#ifdef ENGINE_EXPORT
+#define ENGINE_DATA __declspec(dllexport)
+#elif ENGINE_IMPORT
+#define ENGINE_DATA __declspec(dllimport)
+#else
+#define ENGINE_DATA
+#endif
+
+#ifdef ENGINE_EXPORT
+#define ENGINE_FUNC __declspec(dllexport)
+#elif ENGINE_IMPORT
+#define ENGINE_FUNC __declspec(dllimport)
+#else
+#define ENGINE_FUNC
+#endif
+
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
@@ -194,7 +229,7 @@ extern void FDECL(interject, (int));
 
 /* this was part of the MICRO stuff in the past */
 extern const char *alllevels, *allbones;
-extern char hackdir[];
+ENGINE_FUNC extern char hackdir[];
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *) 0)

@@ -393,11 +393,11 @@ struct instance_flags {
 #endif
 #define preload_tiles wc_preload_tiles
 
-extern NEARDATA struct flag flags;
+ENGINE_DATA extern NEARDATA struct flag flags;
 #ifdef SYSFLAGS
 extern NEARDATA struct sysflag sysflags;
 #endif
-extern NEARDATA struct instance_flags iflags;
+ENGINE_DATA extern NEARDATA struct instance_flags iflags;
 
 /* last_msg values
  * Usage:

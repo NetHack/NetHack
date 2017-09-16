@@ -391,8 +391,8 @@ char *name;
 }
 
 #ifdef WIN32
-boolean getreturn_enabled;
-int redirect_stdout;
+ENGINE_DATA boolean getreturn_enabled;
+ENGINE_DATA int redirect_stdout;
 #endif
 
 void

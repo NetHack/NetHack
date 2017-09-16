@@ -64,8 +64,9 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-extern boolean FDECL(pcmain, (int, char **));
+ENGINE_FUNC extern boolean FDECL(pcmain, (int, char **));
 static void __cdecl mswin_moveloop(void *);
+static void setcallbacks(void);
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -87,6 +88,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
+
+	setcallbacks();
 
     sys_early_init();
 
@@ -394,4 +397,14 @@ _nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
     DeleteDC(hdcSave);
 
     return TRUE;
+}
+
+void setcallbacks(void)
+{
+	engine_callbacks callbacks = { NULL };
+
+	callbacks.mswin_destroy_reg = mswin_destroy_reg;
+	callbacks.mswin_procs = &mswin_procs;
+
+	engine_setcallbacks(&callbacks);
 }
