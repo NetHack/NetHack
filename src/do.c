@@ -1254,6 +1254,7 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
     substitute_tiles(newlevel);
 #endif
+    check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
      */

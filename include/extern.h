@@ -142,6 +142,7 @@ E int NDECL(getbones);
 /* ### botl.c ### */
 
 E char *NDECL(do_statusline1);
+E void NDECL(check_gold_symbol);
 E char *NDECL(do_statusline2);
 E int FDECL(xlev_to_rank, (int));
 E int FDECL(title_to_mon, (const char *, int *, int *));

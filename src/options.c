@@ -3651,6 +3651,7 @@ boolean tinitial, tfrom_file;
     /* Is it a symbol? */
     if (strstr(opts, "S_") == opts && parsesymbols(opts)) {
         switch_symbols(TRUE);
+        check_gold_symbol();
         return retval;
     }
 
@@ -4152,6 +4153,7 @@ doset() /* changing options via menu by Per Liboriussen */
 
     destroy_nhwindow(tmpwin);
     if (need_redraw) {
+        check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
     }

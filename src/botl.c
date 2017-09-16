@@ -83,6 +83,16 @@ do_statusline1()
     return newbot1;
 }
 
+void
+check_gold_symbol()
+{
+    int goldch, goldoc;
+    unsigned int goldos;
+    int goldglyph = objnum_to_glyph(GOLD_PIECE);
+    (void) mapglyph(goldglyph, &goldch, &goldoc, &goldos, 0, 0);
+    iflags.invis_goldsym = ((char)goldch <= ' ');
+}
+
 char *
 do_statusline2()
 {
@@ -110,7 +120,8 @@ do_statusline2()
     if ((money = money_cnt(invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
-            iflags.in_dumplog ? "$" : encglyph(objnum_to_glyph(GOLD_PIECE)),
+            (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
+            : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
