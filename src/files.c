@@ -198,6 +198,7 @@ boolean FDECL(proc_wizkit_line, (char *));
 boolean FDECL(parse_config_line, (char *));
 STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
 STATIC_DCL FILE *NDECL(fopen_sym_file);
+boolean FDECL(proc_symset_line, (char *));
 STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
@@ -2706,13 +2707,18 @@ const char *filename;
 }
 #endif /* USER_SOUNDS */
 
-static int config_err_line_num = 0;
-static int config_err_num_errors = 0;
-static boolean config_err_origline_shown = FALSE;
-static boolean config_err_fromfile = FALSE;
-static boolean config_err_secure = FALSE;
-static char config_err_origline[4 * BUFSZ];
-static char config_err_source[BUFSZ];
+struct _config_error_frame {
+    int line_num;
+    int num_errors;
+    boolean origline_shown;
+    boolean fromfile;
+    boolean secure;
+    char origline[4 * BUFSZ];
+    char source[BUFSZ];
+    struct _config_error_frame *next;
+};
+
+struct _config_error_frame *config_error_data = (struct _config_error_frame *)0;
 
 void
 config_error_init(from_file, sourcename, secure)
@@ -2720,31 +2726,41 @@ boolean from_file;
 const char *sourcename;
 boolean secure;
 {
-    config_err_line_num = 0;
-    config_err_num_errors = 0;
-    config_err_origline_shown = FALSE;
-    config_err_fromfile = from_file;
-    config_err_secure = secure;
-    config_err_origline[0] = '\0';
+    struct _config_error_frame *tmp = (struct _config_error_frame *)
+        alloc(sizeof(struct _config_error_frame));
+
+    tmp->line_num = 0;
+    tmp->num_errors = 0;
+    tmp->origline_shown = FALSE;
+    tmp->fromfile = from_file;
+    tmp->secure = secure;
+    tmp->origline[0] = '\0';
     if (sourcename && sourcename[0])
-        Strcpy(config_err_source, sourcename);
+        Strcpy(tmp->source, sourcename);
     else
-        config_err_source[0] = '\0';
+        tmp->source[0] = '\0';
+
+    tmp->next = config_error_data;
+    config_error_data = tmp;
 }
 
 STATIC_OVL boolean
 config_error_nextline(line)
 const char *line;
 {
-    if (config_err_num_errors && config_err_secure)
+    if (!config_error_data)
         return FALSE;
 
-    config_err_line_num++;
-    config_err_origline_shown = FALSE;
+    if (config_error_data->num_errors
+        && config_error_data->secure)
+        return FALSE;
+
+    config_error_data->line_num++;
+    config_error_data->origline_shown = FALSE;
     if (line && line[0])
-        Strcpy(config_err_origline, line);
+        Strcpy(config_error_data->origline, line);
     else
-        config_err_origline[0] = '\0';
+        config_error_data->origline[0] = '\0';
 
     return TRUE;
 }
@@ -2761,17 +2777,22 @@ VA_DECL(const char *, str)
 
     Vsprintf(buf, str, VA_ARGS);
 
-    config_err_num_errors++;
-    if (!config_err_origline_shown && !config_err_secure) {
-        pline("\n%s", config_err_origline);
-        config_err_origline_shown = TRUE;
+    if (!config_error_data)
+        return;
+
+    config_error_data->num_errors++;
+    if (!config_error_data->origline_shown
+        && !config_error_data->secure) {
+        pline("\n%s", config_error_data->origline);
+        config_error_data->origline_shown = TRUE;
     }
-    if (config_err_line_num > 0 && !config_err_secure) {
-        Sprintf(lineno, "Line %i: ", config_err_line_num);
+    if (config_error_data->line_num > 0
+        && !config_error_data->secure) {
+        Sprintf(lineno, "Line %i: ", config_error_data->line_num);
     } else
         lineno[0] = '\0';
     pline("%s %s%s.",
-          config_err_secure ? "Error:" : " *",
+          config_error_data->secure ? "Error:" : " *",
           lineno,
           *buf ? buf : "Unknown error");
 
@@ -2781,14 +2802,24 @@ VA_DECL(const char *, str)
 int
 config_error_done()
 {
-    int n = config_err_num_errors;
+    int n;
+    struct _config_error_frame *tmp = config_error_data;
+
+    if (!config_error_data)
+        return 0;
+    n = config_error_data->num_errors;
     if (n) {
         pline("\n%i error%s in %s.\n", n,
                    (n > 1) ? "s" : "",
-                   *config_err_source ? config_err_source : configfile);
+                   *config_error_data->source
+              ? config_error_data->source : configfile);
         wait_synch();
     }
-    config_error_init(FALSE, "", FALSE);
+
+    config_error_data = tmp->next;
+
+    free(tmp);
+
     return n;
 }
 
@@ -3088,6 +3119,7 @@ extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 static int symset_count = 0;             /* for pick-list building only */
 static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
+static int symset_which_set = 0;
 
 STATIC_OVL
 FILE *
@@ -3107,7 +3139,6 @@ int
 read_sym_file(which_set)
 int which_set;
 {
-    char buf[4 * BUFSZ];
     FILE *fp;
 
     if (!(fp = fopen_sym_file()))
@@ -3115,13 +3146,13 @@ int which_set;
 
     symset_count = 0;
     chosen_symset_start = chosen_symset_end = FALSE;
-    while (fgets(buf, 4 * BUFSZ, fp)) {
-        if (!parse_sym_line(buf, which_set)) {
-            raw_printf("Bad symbol line:  \"%.50s\"", buf);
-            wait_synch();
-        }
-    }
+    symset_which_set = which_set;
+
+    config_error_init(TRUE, "symbols", FALSE);
+
+    parse_conf_file(fp, proc_symset_line);
     (void) fclose(fp);
+
     if (!chosen_symset_start && !chosen_symset_end) {
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
@@ -3131,15 +3162,24 @@ int which_set;
                            " -_", TRUE)
                 || !strcmpi(symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
+        config_error_done();
         return (symset[which_set].name == 0) ? 1 : 0;
     }
-    if (!chosen_symset_end) {
-        raw_printf("Missing finish for symset \"%s\"",
+    if (!chosen_symset_end)
+        config_error_add("Missing finish for symset \"%s\"",
                    symset[which_set].name ? symset[which_set].name
                                           : "unknown");
-        wait_synch();
-    }
+
+    config_error_done();
+
     return 1;
+}
+
+boolean
+proc_symset_line(buf)
+char *buf;
+{
+    return !((boolean) parse_sym_line(buf, symset_which_set));
 }
 
 /* returns 0 on error */
@@ -3155,8 +3195,7 @@ int which_set;
     /* convert each instance of whitespace (tabs, consecutive spaces)
        into a single space; leading and trailing spaces are stripped */
     mungspaces(buf);
-    if (!*buf || *buf == '#' || !strcmp(buf, " "))
-        return 1;
+
     /* remove trailing comment, if any (this isn't strictly needed for
        individual symbols, and it won't matter if "X#comment" without
        separating space slips through; for handling or set description,
@@ -3178,6 +3217,7 @@ int which_set;
             chosen_symset_start = FALSE;
             return 1;
         }
+        config_error_add("No \"finish\"");
         return 0;
     }
     /* skip '=' and space which follows, if any */
@@ -3186,8 +3226,10 @@ int which_set;
         ++bufp;
 
     symp = match_sym(buf);
-    if (!symp)
+    if (!symp) {
+        config_error_add("Unknown sym keyword");
         return 0;
+    }
 
     if (!symset[which_set].name) {
         /* A null symset name indicates that we're just
