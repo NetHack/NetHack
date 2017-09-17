@@ -1498,12 +1498,7 @@ char *pattern;
     if (!regex_compile(pattern, tmp->regex)) {
         static const char *re_error = "MSGTYPE regex error";
 
-        if (!iflags.window_inited)
-            config_error_add("%s: %s", re_error, regex_error_desc(tmp->regex));
-        else {
-            pline("%s: %s", re_error, regex_error_desc(tmp->regex));
-            wait_synch();
-        }
+        config_error_add("%s: %s", re_error, regex_error_desc(tmp->regex));
         regex_free(tmp->regex);
         free((genericptr_t) tmp);
         return FALSE;
@@ -1669,11 +1664,7 @@ int c, a;
     tmp = (struct menucoloring *) alloc(sizeof (struct menucoloring));
     tmp->match = regex_init();
     if (!regex_compile(str, tmp->match)) {
-        if (!iflags.window_inited)
-            raw_printf("\n%s: %s\n", re_error, regex_error_desc(tmp->match));
-        else
-            pline("%s: %s", re_error, regex_error_desc(tmp->match));
-        wait_synch();
+        config_error_add("%s: %s", re_error, regex_error_desc(tmp->match));
         regex_free(tmp->match);
         free(tmp);
         return FALSE;
@@ -4673,6 +4664,7 @@ boolean setinitial, setfromfile;
             if (*mtbuf == '\033')
                 return TRUE;
             if (*mtbuf
+                && test_regex_pattern(mtbuf, (const char *)0)
                 && (mttyp = query_msgtype()) != -1
                 && !msgtype_add(mttyp, mtbuf)) {
                 pline("Error adding the message type.");
@@ -5438,20 +5430,14 @@ const char *mapping;
                || (n == 2 && end == '#')) {
         grab = FALSE;
     } else {
-        if (!iflags.window_inited)
-            raw_print(APE_syntax_error); /* from options file */
-        else
-            pline("%s", APE_syntax_error); /* via 'O' command */
+        config_error_add("%s", APE_syntax_error);
         return 0;
     }
 
     ape = (struct autopickup_exception *) alloc(sizeof *ape);
     ape->regex = regex_init();
     if (!regex_compile(text, ape->regex)) {
-        if (!iflags.window_inited)
-            raw_print(APE_regex_error);
-        else
-            pline("%s", APE_regex_error);
+        config_error_add("%s: %s", APE_regex_error, regex_error_desc(ape->regex));
         regex_free(ape->regex);
         free((genericptr_t) ape);
         return 0;
