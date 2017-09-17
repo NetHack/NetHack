@@ -586,8 +586,6 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         if (data->type != MENU_TYPE_MENU)
             break;
-        if (strlen(msg_data->str) == 0)
-            break;
 
         if (data->menu.size == data->menu.allocated) {
             data->menu.allocated += 10;
