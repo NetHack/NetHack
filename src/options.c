@@ -524,6 +524,7 @@ STATIC_DCL int NDECL(query_msgtype);
 STATIC_DCL boolean FDECL(msgtype_add, (int, char *));
 STATIC_DCL void FDECL(free_one_msgtype, (int));
 STATIC_DCL int NDECL(msgtype_count);
+STATIC_DCL boolean FDECL(test_regex_pattern, (const char *, const char *));
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
@@ -1627,6 +1628,32 @@ char *str;
         config_error_add("Malformed MSGTYPE");
     }
     return FALSE;
+}
+
+STATIC_OVL boolean
+test_regex_pattern(str, errmsg)
+const char *str;
+const char *errmsg;
+{
+    static const char re_error[] = "Regex error";
+    struct nhregex *match;
+    boolean retval = TRUE;
+
+    if (!str)
+        return FALSE;
+
+    match = regex_init();
+    if (!match) {
+        config_error_add("NHregex error");
+        return FALSE;
+    }
+
+    if (!regex_compile(str, match)) {
+        config_error_add("%s: %s", errmsg ? errmsg : re_error, regex_error_desc(match));
+        retval = FALSE;
+    }
+    regex_free(match);
+    return retval;
 }
 
 boolean
@@ -4707,6 +4734,7 @@ boolean setinitial, setfromfile;
             if (*mcbuf == '\033')
                 return TRUE;
             if (*mcbuf
+                && test_regex_pattern(mcbuf, (const char *)0)
                 && (mcclr = query_color()) != -1
                 && (mcattr = query_attr((char *) 0)) != -1
                 && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {

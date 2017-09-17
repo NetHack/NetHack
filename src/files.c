@@ -2777,8 +2777,11 @@ VA_DECL(const char *, str)
 
     Vsprintf(buf, str, VA_ARGS);
 
-    if (!config_error_data)
+    if (!config_error_data) {
+        pline("%s.", *buf ? buf : "Unknown error");
+        wait_synch();
         return;
+    }
 
     config_error_data->num_errors++;
     if (!config_error_data->origline_shown
