@@ -603,6 +603,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->menu.items[new_item].attr = msg_data->attr;
         strncpy(data->menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
+	/* prevent & being interpreted as a mnemonic start */
+        strNsubst(data->menu.items[new_item].str, "&", "&&", 0);
         data->menu.items[new_item].presel = msg_data->presel;
 
         /* calculate tabstop size */
