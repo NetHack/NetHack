@@ -2735,9 +2735,10 @@ boolean secure;
     tmp->fromfile = from_file;
     tmp->secure = secure;
     tmp->origline[0] = '\0';
-    if (sourcename && sourcename[0])
-        Strcpy(tmp->source, sourcename);
-    else
+    if (sourcename && sourcename[0]) {
+        (void) strncpy(tmp->source, sourcename, sizeof(tmp->source)-1);
+        tmp->source[sizeof(tmp->source)-1] = '\0';
+    } else
         tmp->source[0] = '\0';
 
     tmp->next = config_error_data;
@@ -2748,19 +2749,21 @@ STATIC_OVL boolean
 config_error_nextline(line)
 const char *line;
 {
-    if (!config_error_data)
+    struct _config_error_frame *ced = config_error_data;
+
+    if (!ced)
         return FALSE;
 
-    if (config_error_data->num_errors
-        && config_error_data->secure)
+    if (ced->num_errors && ced->secure)
         return FALSE;
 
-    config_error_data->line_num++;
-    config_error_data->origline_shown = FALSE;
-    if (line && line[0])
-        Strcpy(config_error_data->origline, line);
-    else
-        config_error_data->origline[0] = '\0';
+    ced->line_num++;
+    ced->origline_shown = FALSE;
+    if (line && line[0]) {
+        strncpy(ced->origline, line, sizeof(ced->origline)-1);
+        ced->origline[sizeof(ced->origline)-1] = '\0';
+    } else
+        ced->origline[0] = '\0';
 
     return TRUE;
 }
