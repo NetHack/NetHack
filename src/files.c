@@ -2760,7 +2760,7 @@ const char *line;
     ced->line_num++;
     ced->origline_shown = FALSE;
     if (line && line[0]) {
-        strncpy(ced->origline, line, sizeof(ced->origline)-1);
+        (void) strncpy(ced->origline, line, sizeof(ced->origline)-1);
         ced->origline[sizeof(ced->origline)-1] = '\0';
     } else
         ced->origline[0] = '\0';
