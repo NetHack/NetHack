@@ -145,13 +145,13 @@ stoned_dialogue()
     exercise(A_DEX, FALSE);
 }
 
-/* He is getting sicker and sicker prior to vomiting */
+/* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
     "are feeling mildly nauseated.", /* 14 */
     "feel slightly confused.",       /* 11 */
     "can't seem to think straight.", /* 8 */
     "feel incredibly sick.",         /* 5 */
-    "suddenly vomit!"                /* 2 */
+    "are about to vomit."            /* 2 */
 };
 
 STATIC_OVL void
@@ -189,11 +189,20 @@ vomiting_dialogue()
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
             txt = "gag uncontrolably.";
+        else if (Hallucination)
+            /* "hurl" is short for "hurl chunks" which is slang for
+               relatively violent vomiting... */
+            txt = "are about to hurl!";
         break;
     case 0:
         stop_occupation();
         if (!cantvomit(youmonst.data))
             morehungry(20);
+        /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
+           since you've just been through the earlier messages of the
+           countdown, and it was still possible to move around between
+           that message and vomit() -> numul(-2) -> "You can move again." */
+        You("vomit!");
         vomit();
         break;
     default:
