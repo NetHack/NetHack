@@ -372,7 +372,7 @@ register struct obj *sobj;
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
     return 0;
 
-outgoldmap:
+	outgoldmap:
     cls();
 
     (void) unconstrain_map();
@@ -641,8 +641,7 @@ int class;            /* an object class, 0 for all */
         if (DEADMONSTER(mtmp))
             continue;
         for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-            if ((!class && !boulder) || o_in(obj, class)
-                || o_in(obj, boulder))
+            if ((!class && !boulder) || o_in(obj, class) || o_in(obj, boulder))
                 ct++;
             if (do_dknown)
                 do_dknown_of(obj);
@@ -1386,8 +1385,7 @@ genericptr_t num;
             seemimic(mtmp);
             (*(int *) num)++;
         }
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+        if (mtmp->mundetected && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
             mtmp->mundetected = 0;
             newsym(zx, zy);
             (*(int *) num)++;
@@ -1564,8 +1562,7 @@ boolean via_warning;
         return 1;
     }
     if (!canspotmon(mtmp)) {
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL))
+        if (mtmp->mundetected && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL))
             if (via_warning) {
                 Your("warning senses cause you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
@@ -1599,8 +1596,7 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
         if (!aflag)
             pline("What are you looking for?  The exit?");
     } else {
-        int fund = (uwep && uwep->oartifact
-                    && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
+        int fund = (uwep && uwep->oartifact && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
 
         if (ublindf && ublindf->otyp == LENSES && !Blind)
             fund += 2; /* JDS: lenses help searching */
@@ -1646,8 +1642,7 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     /* see if an invisible monster has moved--if Blind,
                      * feel_location() already did it
                      */
-                    if (!aflag && !mtmp && !Blind
-                        && glyph_is_invisible(levl[x][y].glyph)) {
+                    if (!aflag && !mtmp && !Blind && glyph_is_invisible(levl[x][y].glyph)) {
                         unmap_object(x, y);
                         newsym(x, y);
                     }
@@ -1743,9 +1738,7 @@ int default_glyph, which_subset;
         glyph = back_to_glyph(x, y);
         levl[x][y].seenv = seenv;
     } else {
-        levl_glyph = level.flags.hero_memory
-              ? levl[x][y].glyph
-              : seenv ? back_to_glyph(x, y): default_glyph;
+        levl_glyph = level.flags.hero_memory ? levl[x][y].glyph : seenv ? back_to_glyph(x, y): default_glyph;
         /* glyph_at() returns the displayed glyph, which might
            be a monster.  levl[][].glyph contains the remembered
            glyph, which will never be a monster (unless it is
@@ -1774,8 +1767,7 @@ int default_glyph, which_subset;
             } else {
                 /* look for a mimic here posing as furniture;
                    if we don't find one, we'll have to fake it */
-                if ((mtmp = m_at(x, y)) != 0
-                    && mtmp->m_ap_type == M_AP_FURNITURE) {
+                if ((mtmp = m_at(x, y)) != 0 && mtmp->m_ap_type == M_AP_FURNITURE) {
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
                     /* we have a topology type but we want a screen
