@@ -722,9 +722,10 @@ int mode;
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
                 else if (iflags.mention_walls)
-                    pline("It's %s.", IS_WALL(tmpr->typ) ? "a wall"
-                                        : IS_TREE(tmpr->typ) ? "a tree"
-                                          : "solid stone");
+                    pline("It's %s.",
+                          (IS_WALL(tmpr->typ) || tmpr->typ == SDOOR) ? "a wall"
+                          : IS_TREE(tmpr->typ) ? "a tree"
+                          : "solid stone");
             }
             return FALSE;
         }
