@@ -726,4 +726,10 @@ rename_disco()
     return;
 }
 
+void
+o_init_early_init()
+{
+	memset(disco, 0, sizeof(disco));
+}
+
 /*o_init.c*/

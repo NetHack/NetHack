@@ -10,6 +10,10 @@
 #endif
 #include "lint.h"
 
+/* UNDEFINED is used to initialize variables that are always set before they 
+   are referenced and do not need to be initialized */
+#define UNDEFINED 0
+
 #define TELL 1
 #define NOTELL 0
 #define ON 1

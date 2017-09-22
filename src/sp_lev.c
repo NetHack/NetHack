@@ -5926,6 +5926,19 @@ give_up:
     return result;
 }
 
+void
+sp_lev_early_init()
+{
+    /* review whether we need to initialize these */
+    lev_message = 0;
+    lregions = 0;
+    num_lregions = 0;
+    splev_init_present = FALSE;
+    icedpools = FALSE;
+    container_idx = 0;
+    invent_carrying_monster = NULL;
+}
+
 #ifdef _MSC_VER
  #pragma warning(pop)
 #endif

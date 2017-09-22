@@ -3867,4 +3867,10 @@ boolean as_if_seen;
     return n;
 }
 
+void
+invent_early_init()
+{
+	lastinvnr = 51;
+}
+
 /*invent.c*/

@@ -1590,7 +1590,7 @@ boolean showmsg;
     return TRUE;
 }
 
-static int jumping_is_magic;
+static int jumping_is_magic = UNDEFINED;
 
 STATIC_OVL boolean
 get_valid_jump_position(x,y)
@@ -2883,8 +2883,8 @@ int min_range, max_range;
     return TRUE;
 }
 
-static int polearm_range_min = -1;
-static int polearm_range_max = -1;
+static int polearm_range_min = UNDEFINED;
+static int polearm_range_max = UNDEFINED;
 
 STATIC_OVL boolean
 get_valid_polearm_position(x,y)
@@ -3731,6 +3731,12 @@ boolean is_horn;
         unfixable_trbl++;
 
     return unfixable_trbl;
+}
+
+void
+apply_early_init()
+{
+    /* do nothing */
 }
 
 /*apply.c*/

@@ -963,6 +963,11 @@ int otyp;
     return TRUE;
 }
 
+static NEARDATA short nocreate = STRANGE_OBJECT;
+static NEARDATA short nocreate2 = STRANGE_OBJECT;
+static NEARDATA short nocreate3 = STRANGE_OBJECT;
+static NEARDATA short nocreate4 = STRANGE_OBJECT;
+
 STATIC_OVL void
 ini_inv(trop)
 register struct trobj *trop;
@@ -984,10 +989,6 @@ register struct trobj *trop;
             }
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
-            static NEARDATA short nocreate = STRANGE_OBJECT;
-            static NEARDATA short nocreate2 = STRANGE_OBJECT;
-            static NEARDATA short nocreate3 = STRANGE_OBJECT;
-            static NEARDATA short nocreate4 = STRANGE_OBJECT;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
@@ -1143,6 +1144,18 @@ register struct trobj *trop;
 #endif
         trop++;
     }
+}
+
+void
+u_init_early_init()
+{
+    nocreate = STRANGE_OBJECT;
+    nocreate2 = STRANGE_OBJECT;
+    nocreate3 = STRANGE_OBJECT;
+    nocreate4 = STRANGE_OBJECT;
+
+    u.uhp = 1; /* prevent RIP on early quits */
+    u.ux = 0;  /* prevent flush_screen() */
 }
 
 /*u_init.c*/

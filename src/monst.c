@@ -26,7 +26,6 @@
 #define C(color)
 #endif
 
-void NDECL(monst_init);
 /*
  *      Entry Format:   (from permonst.h)
  *
@@ -100,7 +99,7 @@ void NDECL(monst_init);
  */
 
 #ifndef SPLITMON_2
-NEARDATA struct permonst mons[] = {
+NEARDATA const struct permonst const_mons[] = {
     /*
      * ants
      */
@@ -3231,6 +3230,14 @@ struct permonst _mons2[] = {
 void
 monst_init()
 {
+    return;
+}
+
+struct permonst mons[SIZE(const_mons)];
+void
+monst_early_init()
+{
+    memcpy(mons, const_mons, sizeof(mons));
     return;
 }
 

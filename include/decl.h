@@ -265,7 +265,7 @@ E NEARDATA struct mvitals {
     uchar mvflags;
 } mvitals[NUMMONS];
 
-E NEARDATA struct c_color_names {
+E NEARDATA const struct c_color_names {
     const char *const c_black, *const c_amber, *const c_golden,
         *const c_light_blue, *const c_red, *const c_green, *const c_silver,
         *const c_blue, *const c_purple, *const c_white, *const c_orange;
@@ -285,7 +285,7 @@ E NEARDATA struct c_color_names {
 /* The names of the colors used for gems, etc. */
 E const char *c_obj_colors[];
 
-E struct c_common_strings {
+E const struct c_common_strings {
     const char *const c_nothing_happens, *const c_thats_enough_tries,
         *const c_silly_thing_to, *const c_shudder_for_moment,
         *const c_something, *const c_Something, *const c_You_can_move_again,
@@ -384,7 +384,7 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 
 E char *fqn_prefix[PREFIX_COUNT];
 #ifdef PREFIXES_IN_USE
-E char *fqn_prefix_names[PREFIX_COUNT];
+E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;

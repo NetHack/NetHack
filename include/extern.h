@@ -26,6 +26,7 @@ E void NDECL(display_gamewindows);
 E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
+E void NDECL(early_init);
 
 /* ### apply.c ### */
 
@@ -50,6 +51,7 @@ E boolean FDECL(tinnable, (struct obj *));
 E void NDECL(reset_trapset);
 E void FDECL(fig_transform, (ANY_P *, long));
 E int FDECL(unfixable_trouble_count, (BOOLEAN_P));
+E void NDECL(apply_early_init);
 
 /* ### artifact.c ### */
 
@@ -242,6 +244,7 @@ E void FDECL(destroy_drawbridge, (int, int));
 /* ### decl.c ### */
 
 E void NDECL(decl_init);
+E void NDECL(decl_early_init);
 
 /* ### detect.c ### */
 
@@ -680,6 +683,7 @@ E char *FDECL(build_english_list, (char *));
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
 E void FDECL(panictrace_setsignals, (BOOLEAN_P));
 #endif
+E void NDECL(end_early_init);
 
 /* ### engrave.c ### */
 
@@ -995,6 +999,7 @@ E long FDECL(count_contents, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(carry_obj_effects, (struct obj *));
 E const char *FDECL(currency, (long));
 E void FDECL(silly_thing, (const char *, struct obj *));
+E void NDECL(invent_early_init);
 
 /* ### ioctl.c ### */
 
@@ -1138,6 +1143,7 @@ E void FDECL(mkmonmoney, (struct monst *, long));
 E int FDECL(bagotricks, (struct obj *, BOOLEAN_P, int *));
 E boolean FDECL(propagate, (int, BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(usmellmon, (struct permonst *));
+E void NDECL(makemon_early_init);
 
 /* ### mapglyph.c ### */
 
@@ -1468,6 +1474,7 @@ E boolean FDECL(undesirable_disp, (struct monst *, XCHAR_P, XCHAR_P));
 /* ### monst.c ### */
 
 E void NDECL(monst_init);
+E void NDECL(monst_early_init);
 
 /* ### monstr.c ### */
 
@@ -1616,10 +1623,12 @@ E void FDECL(undiscover_object, (int));
 E int NDECL(dodiscovered);
 E int NDECL(doclassdisco);
 E void NDECL(rename_disco);
+E void NDECL(o_init_early_init);
 
 /* ### objects.c ### */
 
 E void NDECL(objects_init);
+E void NDECL(objects_early_init);
 
 /* ### objnam.c ### */
 
@@ -1818,6 +1827,7 @@ E int FDECL(use_container, (struct obj **, int, BOOLEAN_P));
 E int FDECL(loot_mon, (struct monst *, int *, boolean *));
 E int NDECL(dotip);
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
+E void NDECL(pickup_early_init);
 
 /* ### pline.c ### */
 
@@ -2262,6 +2272,7 @@ E struct opvar *FDECL(selection_opvar, (char *));
 E void FDECL(opvar_free_x, (struct opvar *));
 E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 E void FDECL(selection_floodfill, (struct opvar *, int, int, BOOLEAN_P));
+E void NDECL(sp_lev_early_init);
 
 /* ### spell.c ### */
 
@@ -2445,6 +2456,7 @@ E void NDECL(sokoban_guilt);
 /* ### u_init.c ### */
 
 E void NDECL(u_init);
+E void NDECL(u_init_early_init);
 
 /* ### uhitm.c ### */
 

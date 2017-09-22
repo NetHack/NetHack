@@ -2226,4 +2226,12 @@ int *seencount;  /* secondary output */
     return moncount;
 }
 
+void
+makemon_early_init()
+{
+    rndmonst_state.choice_count = -1;
+    memset(rndmonst_state.mchoices, 0, sizeof(rndmonst_state.mchoices));
+}
+
+
 /*makemon.c*/

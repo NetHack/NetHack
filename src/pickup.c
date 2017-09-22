@@ -1522,10 +1522,11 @@ struct obj *otmp;
  * prints a message if encumbrance changed since the last check and
  * returns the new encumbrance value (from near_capacity()).
  */
+static int oldcap = UNENCUMBERED;
+
 int
 encumber_msg()
 {
-    static int oldcap = UNENCUMBERED;
     int newcap = near_capacity();
 
     if (oldcap < newcap) {
@@ -3134,6 +3135,12 @@ struct obj *box; /* or bag */
         if (held)
             (void) encumber_msg();
     }
+}
+
+void
+pickup_early_init()
+{
+    oldcap = UNENCUMBERED;
 }
 
 /*pickup.c*/
