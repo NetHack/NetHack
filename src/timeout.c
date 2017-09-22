@@ -188,7 +188,7 @@ vomiting_dialogue()
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
-            txt = "gag uncontrolably.";
+            txt = "gag uncontrollably.";
         else if (Hallucination)
             /* "hurl" is short for "hurl chunks" which is slang for
                relatively violent vomiting... */
@@ -196,13 +196,17 @@ vomiting_dialogue()
         break;
     case 0:
         stop_occupation();
-        if (!cantvomit(youmonst.data))
+        if (!cantvomit(youmonst.data)) {
             morehungry(20);
-        /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
-           since you've just been through the earlier messages of the
-           countdown, and it was still possible to move around between
-           that message and vomit() -> numul(-2) -> "You can move again." */
-        You("vomit!");
+            /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
+               since you've just been through the earlier messages of the
+               countdown, and it was still possible to move around between
+               that message and "You can move again." (from vomit()'s
+               nomul(-2)) with no intervening message; give one here to
+               have a more specific at which hero became unable to move
+               [vomit() issues its own message for the cantvomit() case] */
+            You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+        }
         vomit();
         break;
     default:
