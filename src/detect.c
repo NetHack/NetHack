@@ -372,7 +372,7 @@ register struct obj *sobj;
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
     return 0;
 
-	outgoldmap:
+outgoldmap:
     cls();
 
     (void) unconstrain_map();
