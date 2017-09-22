@@ -2416,6 +2416,7 @@ E void NDECL(climb_pit);
 E boolean FDECL(fire_damage, (struct obj *, BOOLEAN_P, XCHAR_P, XCHAR_P));
 E int FDECL(fire_damage_chain,
             (struct obj *, BOOLEAN_P, BOOLEAN_P, XCHAR_P, XCHAR_P));
+E boolean FDECL(lava_damage, (struct obj *, XCHAR_P, XCHAR_P));
 E void acid_damage(struct obj *);
 E int FDECL(water_damage, (struct obj *, const char *, BOOLEAN_P));
 E void FDECL(water_damage_chain, (struct obj *, BOOLEAN_P));
