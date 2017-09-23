@@ -444,7 +444,7 @@ unsigned corpseflags;
         bypass_obj(obj);
 
     if (has_mname(mtmp))
-        obj = oname(obj, MNAME(mtmp));
+        obj = oname(obj, MNAME(mtmp), FALSE);
 
     /*  Avoid "It was hidden under a green mold corpse!"
      *  during Blind combat. An unseen monster referred to as "it"
@@ -2108,7 +2108,7 @@ struct monst *mdef;
            item-conferred attributes */
         otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
         if (has_mname(mdef))
-            otmp = oname(otmp, MNAME(mdef));
+            otmp = oname(otmp, MNAME(mdef), FALSE);
         while ((obj = oldminvent) != 0) {
             oldminvent = obj->nobj;
             (void) add_to_container(otmp, obj);

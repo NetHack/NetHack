@@ -192,7 +192,7 @@ aligntyp alignment; /* target alignment, or A_NONE */
             otmp = mksobj((int) a->otyp, TRUE, FALSE);
 
         if (otmp) {
-            otmp = oname(otmp, a->name);
+            otmp = oname(otmp, a->name, FALSE);
             otmp->oartifact = m;
             artiexist[m] = TRUE;
         }

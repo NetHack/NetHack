@@ -3757,7 +3757,7 @@ typfnd:
                 name = novelname;
         }
 
-        otmp = oname(otmp, name);
+        otmp = oname(otmp, name, FALSE);
         /* name==aname => wished for artifact (otmp->oartifact => got it) */
         if (otmp->oartifact || name == aname) {
             otmp->quan = 1L;

@@ -1813,7 +1813,7 @@ struct mkroom *croom;
     /* set_corpsenm() took care of egg hatch and corpse timers */
 
     if (named)
-        otmp = oname(otmp, o->name.str);
+        otmp = oname(otmp, o->name.str, FALSE);
 
     if (o->eroded) {
         if (o->eroded < 0) {

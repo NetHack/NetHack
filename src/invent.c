@@ -397,7 +397,7 @@ struct obj **potmp, **pobj;
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
         if (!has_oname(otmp) && has_oname(obj))
-            otmp = *potmp = oname(otmp, ONAME(obj));
+            otmp = *potmp = oname(otmp, ONAME(obj), FALSE);
         obj_extract_self(obj);
 
         /* really should merge the timeouts */

@@ -398,7 +398,7 @@ struct mail_info *info;
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
 
         if (info->object_nam)
-            obj = oname(obj, info->object_nam);
+            obj = oname(obj, info->object_nam, FALSE);
         if (info->response_cmd)
             new_omailcmd(obj, info->response_cmd);
 
