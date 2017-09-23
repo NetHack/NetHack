@@ -733,7 +733,6 @@ const char *msg;
 
 void early_init()
 {
-    apply_early_init();
     decl_early_init();
     end_early_init();
     invent_early_init();

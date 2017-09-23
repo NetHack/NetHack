@@ -51,7 +51,6 @@ E boolean FDECL(tinnable, (struct obj *));
 E void NDECL(reset_trapset);
 E void FDECL(fig_transform, (ANY_P *, long));
 E int FDECL(unfixable_trouble_count, (BOOLEAN_P));
-E void NDECL(apply_early_init);
 
 /* ### artifact.c ### */
 
