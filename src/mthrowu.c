@@ -115,7 +115,7 @@ int x, y;
              && ((t->ttyp == PIT) || (t->ttyp == SPIKED_PIT)))) {
         int objgone = 0;
 
-        if (down_gate(x, y) != -1)
+        if (down_gate(x, y, NULL) != -1)
             objgone = ship_object(obj, x, y, FALSE);
         if (!objgone) {
             if (!flooreffects(obj, x, y, "fall")) {
