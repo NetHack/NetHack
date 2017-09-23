@@ -125,6 +125,7 @@ static struct Bool_Opt {
 #else
     { "flush", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
+    { "force_invmenu", &iflags.force_invmenu, FALSE, SET_IN_GAME },
     { "fullscreen", &iflags.wc2_fullscreen, FALSE, SET_IN_FILE },
     { "goldX", &iflags.goldX, FALSE, SET_IN_GAME },
     { "help", &flags.help, TRUE, SET_IN_GAME },

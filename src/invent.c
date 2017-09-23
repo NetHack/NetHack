@@ -23,7 +23,7 @@ STATIC_PTR int FDECL(ckvalidcat, (struct obj *));
 STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
 STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *, const char *,
-                                        BOOLEAN_P, long *));
+                                        const char *, BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
@@ -1080,6 +1080,8 @@ register const char *let, *word;
     xchar foox = 0;
     long cnt;
     boolean cntgiven = FALSE;
+    boolean msggiven = FALSE;
+    boolean oneloop = FALSE;
     long dummymask;
 
     if (*let == ALLOW_COUNT)
@@ -1288,15 +1290,24 @@ register const char *let, *word;
     for (;;) {
         cnt = 0;
         cntgiven = FALSE;
-        if (!buf[0]) {
-            Sprintf(qbuf, "What do you want to %s? [*]", word);
-        } else {
-            Sprintf(qbuf, "What do you want to %s? [%s or ?*]", word, buf);
-        }
+        Sprintf(qbuf, "What do you want to %s?", word);
         if (in_doagain)
             ilet = readchar();
-        else
+        else if (iflags.force_invmenu) {
+            /* don't overwrite a possible quitchars */
+            if (!oneloop)
+                ilet = *let ? '?' : '*';
+            if (!msggiven)
+                putmsghistory(qbuf, FALSE);
+            msggiven = TRUE;
+            oneloop = TRUE;
+        } else {
+            if (!buf[0])
+                Strcat(qbuf, " [*]");
+            else
+                Sprintf(eos(qbuf), " [%s or ?*]", buf);
             ilet = yn_function(qbuf, (char *) 0, '\0');
+        }
         if (digit(ilet)) {
             long tmpcnt = 0;
 
@@ -1335,13 +1346,17 @@ register const char *let, *word;
             }
             return (allownone ? &zeroobj : (struct obj *) 0);
         }
+redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
            select-from-invent before checking whether gold has been picked */
         if (ilet == '?' || ilet == '*') {
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
             long ctmp = 0;
+            char menuquery[QBUFSZ];
 
-            qbuf[0] = '\0';
+            menuquery[0] = qbuf[0] = '\0';
+            if (iflags.force_invmenu)
+                Sprintf(menuquery, "What do you want to %s?", word);
             if (!strcmp(word, "grease"))
                 Sprintf(qbuf, "your %s", makeplural(body_part(FINGER)));
             else if (!strcmp(word, "write with"))
@@ -1357,6 +1372,7 @@ register const char *let, *word;
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;
             ilet = display_pickinv(allowed_choices, *qbuf ? qbuf : (char *) 0,
+                                   menuquery,
                                    TRUE, allowcnt ? &ctmp : (long *) 0);
             if (!ilet)
                 continue;
@@ -1367,6 +1383,8 @@ register const char *let, *word;
                     pline1(Never_mind);
                 return (struct obj *) 0;
             }
+            if (ilet == '*')
+                goto redo_menu;
             if (allowcnt && ctmp >= 0) {
                 cnt = ctmp;
                 cntgiven = TRUE;
@@ -2144,9 +2162,10 @@ free_pickinv_cache()
  * any count returned from the menu selection is placed here.
  */
 STATIC_OVL char
-display_pickinv(lets, xtra_choice, want_reply, out_cnt)
+display_pickinv(lets, xtra_choice, query, want_reply, out_cnt)
 register const char *lets;
 const char *xtra_choice; /* "fingers", pick hands rather than an object */
+const char *query;
 boolean want_reply;
 long *out_cnt;
 {
@@ -2204,7 +2223,7 @@ long *out_cnt;
     if (!flags.invlet_constant)
         reassign();
 
-    if (n == 1) {
+    if (n == 1 && !iflags.force_invmenu) {
         /* when only one item of interest, use pline instead of menus;
            we actually use a fake message-line menu in order to allow
            the user to perform selection at the --More-- prompt for tty */
@@ -2284,7 +2303,15 @@ nextclass:
             goto nextclass;
         }
     }
-    end_menu(win, (char *) 0);
+
+    if (iflags.force_invmenu && lets && want_reply) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Special", MENU_UNSELECTED);
+        any.a_char = '*';
+        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "(list everything)", MENU_UNSELECTED);
+    }
+
+    end_menu(win, query && *query ? query : (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
     if (n > 0) {
@@ -2310,7 +2337,8 @@ display_inventory(lets, want_reply)
 const char *lets;
 boolean want_reply;
 {
-    return display_pickinv(lets, (char *) 0, want_reply, (long *) 0);
+    return display_pickinv(lets, (char *) 0, (char *) 0,
+                           want_reply, (long *) 0);
 }
 
 /*
