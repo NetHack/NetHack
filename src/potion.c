@@ -590,7 +590,7 @@ register struct obj *otmp;
         if (!otmp->blessed && !otmp->cursed) {
             pline("This tastes like %s.", hliquid("water"));
             u.uhunger += rnd(10);
-            newuhs(FALSE);
+            newuhs(FALSE, FALSE);
             break;
         }
         unkn++;
@@ -648,7 +648,7 @@ register struct obj *otmp;
         if (!otmp->odiluted)
             healup(1, 0, FALSE, FALSE);
         u.uhunger += 10 * (2 + bcsign(otmp));
-        newuhs(FALSE);
+        newuhs(FALSE, FALSE);
         exercise(A_WIS, FALSE);
         if (otmp->cursed) {
             You("pass out.");
@@ -712,7 +712,7 @@ register struct obj *otmp;
                 otmp->odiluted ? "reconstituted " : "", fruitname(TRUE));
         if (otmp->otyp == POT_FRUIT_JUICE) {
             u.uhunger += (otmp->odiluted ? 5 : 10) * (2 + bcsign(otmp));
-            newuhs(FALSE);
+            newuhs(FALSE, FALSE);
             break;
         }
         if (!otmp->cursed) {

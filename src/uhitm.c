@@ -1953,7 +1953,7 @@ register struct attack *mattk;
                 if (!!(otmp = mlifesaver(mdef)))
                     m_useup(mdef, otmp);
 
-                newuhs(FALSE);
+                newuhs(FALSE, FALSE);
                 /* start_engulf() issues "you engulf <mdef>" above; this
                    used to specify XKILL_NOMSG but we need "you kill <mdef>"
                    in case we're also going to get "welcome to level N+1";
