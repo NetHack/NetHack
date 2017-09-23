@@ -7,6 +7,8 @@
 #include "dlb.h"
 #include "lev.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 #define DUNGEON_FILE "dungeon"
 
 #define X_START "x-strt"
@@ -24,8 +26,9 @@ struct proto_dungeon {
     int n_brs;  /* number of tmpbranch entries */
 };
 
-int n_dgns;     /* number of dungeons (also used in mklev.c and do.c) */
-static branch *branches = (branch *) 0;        /* dungeon branch list */
+int n_dgns = UNDEFINED; /* number of dungeons 
+                          (also used in mklev.c and do.c) */
+static branch *branches = (branch *) 0;     /* dungeon branch list */
 
 mapseen *mapseenchn = (struct mapseen *) 0; /*DUNGEON_OVERVIEW*/
 
