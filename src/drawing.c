@@ -7,6 +7,8 @@
 
 /* Relevant header information in rm.h, objclass.h, and monsym.h. */
 
+/* NOTE: early initialization in this module is currently not needed */
+
 #ifdef C
 #undef C
 #endif
@@ -17,9 +19,9 @@
 #define C(n)
 #endif
 
-struct symsetentry symset[NUM_GRAPHICS];
+struct symsetentry symset[NUM_GRAPHICS] = { 0 };
 
-int currentgraphics = 0;
+int currentgraphics = UNDEFINED;
 
 nhsym showsyms[SYM_MAX] = DUMMY; /* symbols to be displayed */
 nhsym l_syms[SYM_MAX] = DUMMY;   /* loaded symbols          */
@@ -378,6 +380,8 @@ init_showsyms()
         else if (i == SYM_INVISIBLE)
             showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
+
+    currentgraphics = DEFAULT_GRAPHICS;
 }
 
 /* initialize defaults for the loadable symset */
