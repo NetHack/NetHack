@@ -7,6 +7,8 @@
 #include "hack.h"
 #include <ctype.h>
 
+/* NOTE: early initialization in this module is currently not needed */
+
 /* part of the output on gain or loss of attribute */
 static const char
     *const plusattr[] = { "strong", "smart", "wise",

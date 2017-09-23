@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "lev.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 extern char bones[]; /* from files.c */
 #ifdef MFLOPPY
 extern long bytes_counted;
