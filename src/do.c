@@ -7,6 +7,8 @@
 #include "hack.h"
 #include "lev.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 STATIC_DCL void FDECL(trycall, (struct obj *));
 STATIC_DCL void NDECL(polymorph_sink);
 STATIC_DCL boolean NDECL(teleport_sink);
@@ -874,7 +876,7 @@ drop_done:
 }
 
 /* on a ladder, used in goto_level */
-static NEARDATA boolean at_ladder = FALSE;
+static NEARDATA boolean at_ladder = UNDEFINED;
 
 /* the '>' command */
 int
@@ -1041,8 +1043,6 @@ doup()
     at_ladder = FALSE;
     return 1;
 }
-
-d_level save_dlevel = { 0, 0 };
 
 /* check that we can write out the current level */
 STATIC_OVL int
