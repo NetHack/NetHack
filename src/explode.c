@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 /* Note: Arrays are column first, while the screen is row first */
 static int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
                                { S_explode2, S_explode5, S_explode8 },
