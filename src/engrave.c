@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "lev.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 STATIC_VAR NEARDATA struct engr *head_engr;
 
 char *
