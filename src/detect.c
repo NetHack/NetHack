@@ -10,6 +10,8 @@
 #include "hack.h"
 #include "artifact.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 extern boolean known; /* from read.c */
 
 STATIC_DCL boolean NDECL(unconstrain_map);

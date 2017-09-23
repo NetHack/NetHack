@@ -4,7 +4,9 @@
 
 #include "hack.h"
 
-static NEARDATA boolean did_dig_msg;
+/* NOTE: early initialization in this module is currently not needed */
+
+static NEARDATA boolean did_dig_msg = UNDEFINED;
 
 STATIC_DCL boolean NDECL(rm_waslit);
 STATIC_DCL void FDECL(mkcavepos,

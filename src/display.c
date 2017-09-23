@@ -117,6 +117,8 @@
  */
 #include "hack.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 STATIC_DCL void FDECL(display_monster,
                       (XCHAR_P, XCHAR_P, struct monst *, int, XCHAR_P));
 STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
