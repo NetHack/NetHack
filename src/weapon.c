@@ -331,7 +331,7 @@ struct monst *mon;
 
         /* if the weapon is going to get a double damage bonus, adjust
            this bonus so that effectively it's added after the doubling */
-        if (bonus > 1 && otmp->oartifact && spec_dbon(otmp, mon, 25) >= 25)
+        if (bonus > 1 && otmp->oartifact && spec_dbon(otmp, mon, 25, NULL) >= 25)
             bonus = (bonus + 1) / 2;
 
         tmp += bonus;

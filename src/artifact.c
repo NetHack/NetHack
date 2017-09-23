@@ -23,7 +23,7 @@ STATIC_DCL boolean FDECL(bane_applies, (const struct artifact *,
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj *));
 STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
-                                struct obj *, int *, int, BOOLEAN_P, char *));
+                           struct obj *, int *, int, BOOLEAN_P, char *, int));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
 STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
@@ -37,9 +37,6 @@ STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
    Note: this will still break if they have more than about half the number
    of hit points that will fit in a 15 bit integer. */
 #define FATAL_DAMAGE_MODIFIER 200
-
-/* coordinate effects from spec_dbon() with messages in artifact_hit() */
-STATIC_OVL int spec_dbon_applies = 0;
 
 /* flags including which artifacts have already been created */
 static boolean artiexist[1 + NROFARTIFACTS + 1];
@@ -836,12 +833,14 @@ struct monst *mon;
 
 /* special damage bonus */
 int
-spec_dbon(otmp, mon, tmp)
+spec_dbon(otmp, mon, tmp, spec_dbon_applies_ptr)
 struct obj *otmp;
 struct monst *mon;
 int tmp;
+int * spec_dbon_applies_ptr;
 {
     register const struct artifact *weap = get_artifact(otmp);
+    int spec_dbon_applies;
 
     if (!weap || (weap->attk.adtyp == AD_PHYS /* check for `NO_ATTK' */
                   && weap->attk.damn == 0 && weap->attk.damd == 0))
@@ -852,6 +851,8 @@ int tmp;
         spec_dbon_applies = TRUE;
     else
         spec_dbon_applies = spec_applies(weap, mon);
+
+    if (spec_dbon_applies_ptr) *spec_dbon_applies_ptr = spec_dbon_applies;
 
     if (spec_dbon_applies)
         return weap->attk.damd ? rnd((int) weap->attk.damd) : max(tmp, 1);
@@ -951,13 +952,14 @@ static const char *const mb_verb[2][4] = {
 
 /* called when someone is being hit by Magicbane */
 STATIC_OVL boolean
-Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee)
+Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee, spec_dbon_applies)
 struct monst *magr, *mdef; /* attacker and defender */
 struct obj *mb;            /* Magicbane */
 int *dmgptr;               /* extra damage target will suffer */
 int dieroll;               /* d20 that has already scored a hit */
 boolean vis;               /* whether the action can be seen */
 char *hittee;              /* target's name: "you" or mon_nam(mdef) */
+int spec_dbon_applies;     /* special damage bonus applies */
 {
     struct permonst *old_uasmon;
     const char *verb, *fakename;
@@ -1155,6 +1157,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     const char *wepdesc;
     static const char you[] = "you";
     char hittee[BUFSZ];
+    int spec_dbon_applies;
 
     Strcpy(hittee, youdefend ? you : mon_nam(mdef));
 
@@ -1162,7 +1165,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
      * the exception being for level draining, which is specially
      * handled.  Messages are done in this function, however.
      */
-    *dmgptr += spec_dbon(otmp, mdef, *dmgptr);
+    *dmgptr += spec_dbon(otmp, mdef, *dmgptr, &spec_dbon_applies);
 
     if (youattack && youdefend) {
         impossible("attacking yourself with weapon?");
@@ -1225,7 +1228,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 
     if (attacks(AD_STUN, otmp) && dieroll <= MB_MAX_DIEROLL) {
         /* Magicbane's special attacks (possibly modifies hittee[]) */
-        return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
+        return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee,
+            spec_dbon_applies);
     }
 
     if (!spec_dbon_applies) {
