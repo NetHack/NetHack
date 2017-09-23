@@ -9,6 +9,8 @@
 #include <string.h>
 #endif
 
+/* NOTE: early initialization in this module is currently not needed */
+
 #define DATAPREFIX 4
 
 #if defined(OVERLAY)
