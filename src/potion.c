@@ -4,9 +4,9 @@
 
 #include "hack.h"
 
-boolean notonhead = FALSE;
+boolean notonhead = UNDEFINED;
 
-static NEARDATA int nothing, unkn;
+static NEARDATA int nothing = UNDEFINED, unkn = UNDEFINED;
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
 STATIC_DCL long FDECL(itimeout, (long));
