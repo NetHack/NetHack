@@ -83,8 +83,8 @@ extern int amii_numcolors;
 #include "display.h"
 
 boolean restoring = FALSE;
-static NEARDATA struct fruit *oldfruit;
-static NEARDATA long omoves;
+static NEARDATA struct fruit *oldfruit = UNDEFINED;
+static NEARDATA long omoves = UNDEFINED;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
