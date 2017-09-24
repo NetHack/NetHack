@@ -61,7 +61,7 @@ struct monst { struct monst *dummy; };  /* lint: struct obj's union */
                cost,sdam,ldam,oc1,oc2,nut,color)  { obj }
 #define None (char *) 0 /* less visual distraction for 'no description' */
 
-NEARDATA struct objdescr const_obj_descr[] =
+NEARDATA const struct objdescr const_obj_descr[] =
 #else
 /* second pass -- object definitions */
 #define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
@@ -75,7 +75,7 @@ NEARDATA struct objdescr const_obj_descr[] =
 #define HARDGEM(n) (0)
 #endif
 
-NEARDATA struct objclass const_objects[] =
+NEARDATA const struct objclass const_objects[] =
 #endif
 {
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
