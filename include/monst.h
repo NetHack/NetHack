@@ -110,6 +110,9 @@ struct monst {
 
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 
+    Bitfield(disintegested, 1); /* disintegrated or digested */
+    Bitfield(vamp_rise_msg, 1); /* vampire rising message printed */
+
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */
 #ifdef NHSTDC
 #define STRAT_APPEARMSG 0x80000000UL
