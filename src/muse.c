@@ -10,7 +10,9 @@
 
 extern const int monstr[];
 
-boolean m_using = FALSE;
+boolean m_using = FALSE; /* set to true during mbhit/buzz processing.  Used
+                          * to distinguish when player killed monster vs.
+                          * monster killed monster. */
 
 /* Let monsters use magic items.  Arbitrary assumptions: Monsters only use
  * scrolls when they can see, monsters know when wands have 0 charges,
@@ -47,14 +49,14 @@ static struct musable {
     /* =0, no capability; otherwise, different numbers.
      * If it's an object, the object is also set (it's 0 otherwise).
      */
-} m;
-static int trapx, trapy;
-static boolean zap_oseen; /* for wands which use mbhitm and are zapped at
-                           * players.  We usually want an oseen local to
-                           * the function, but this is impossible since the
-                           * function mbhitm has to be compatible with the
-                           * normal zap routines, and those routines don't
-                           * remember who zapped the wand. */
+} m = { UNDEFINED };
+static int trapx = UNDEFINED, trapy = UNDEFINED;
+static boolean zap_oseen = UNDEFINED; /* for wands which use mbhitm and are
+                        * zapped at players.  We usually want an oseen local
+                        * to the function, but this is impossible since the
+                        * function mbhitm has to be compatible with the
+                        * normal zap routines, and those routines don't
+                        * remember who zapped the wand. */
 
 /* Any preliminary checks which may result in the monster being unable to use
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do
