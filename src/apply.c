@@ -497,7 +497,7 @@ struct obj *obj;
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
                     if (canspotmon(mtmp))
                         ++pet_cnt;
-                    if (mintrap(mtmp) == 2)
+                    if (mintrap(mtmp, FALSE) == 2)
                         change_luck(-1);
                 }
             }

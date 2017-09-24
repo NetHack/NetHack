@@ -48,7 +48,7 @@ dowatersnakes()
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
                                 NO_MM_FLAGS)) != 0
                 && t_at(mtmp->mx, mtmp->my))
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, FALSE);
     } else
         pline_The("fountain bubbles furiously for a moment, then calms.");
 }
@@ -75,7 +75,7 @@ dowaterdemon()
                 /* give a wish and discard the monster (mtmp set to null) */
                 mongrantswish(&mtmp);
             } else if (t_at(mtmp->mx, mtmp->my))
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, FALSE);
         }
     } else
         pline_The("fountain bubbles furiously for a moment, then calms.");
@@ -96,7 +96,7 @@ dowaternymph()
             You_hear("a seductive voice.");
         mtmp->msleeping = 0;
         if (t_at(mtmp->mx, mtmp->my))
-            (void) mintrap(mtmp);
+            (void) mintrap(mtmp, FALSE);
     } else if (!Blind)
         pline("A large bubble rises to the surface and pops.");
     else

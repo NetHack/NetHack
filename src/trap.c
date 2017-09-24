@@ -37,9 +37,6 @@ STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned,
                                                         struct obj *));
 STATIC_DCL void NDECL(maybe_finish_sokoban);
 
-/* mintrap() should take a flags argument, but for time being we use this */
-STATIC_VAR int force_mintrap = 0;
-
 STATIC_VAR const char *const a_your[2] = { "a", "your" };
 STATIC_VAR const char *const A_Your[2] = { "A", "Your" };
 STATIC_VAR const char tower_of_flame[] = "tower of flame";
@@ -1288,7 +1285,7 @@ unsigned trflags;
                 u.usteed->my = u.uy;
 
                 /* mintrap currently does not return 2(died) for webs */
-                if (mintrap(u.usteed)) {
+                if (mintrap(u.usteed, forcetrap)) {
                     u.usteed->mtrapped = 0;
                     if (strongmonst(u.usteed->data))
                         str = 17;
@@ -2053,8 +2050,9 @@ schar dx, dy;
 }
 
 int
-mintrap(mtmp)
+mintrap(mtmp, force_mintrap)
 register struct monst *mtmp;
+boolean force_mintrap;
 {
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
     boolean trapkilled = FALSE;
@@ -2590,7 +2588,7 @@ register struct monst *mtmp;
                 trapkilled = TRUE;
             } else {
                 /* monsters recursively fall into new pit */
-                if (mintrap(mtmp) == 2)
+                if (mintrap(mtmp, force_mintrap) == 2)
                     trapkilled = TRUE;
             }
             /* a boulder may fill the new pit, crushing monster */
@@ -4508,9 +4506,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         /* dotrap calls mintrap when mounted hero encounters a web */
         if (u.usteed)
             dotrapflags |= NOWEBMSG;
-        ++force_mintrap;
         dotrap(t, dotrapflags);
-        --force_mintrap;
         result = (u.utrap != 0);
     } else {
         if (mon->mtrapped)
@@ -4518,9 +4514,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         /* you notice it if you see the trap close/tremble/whatever
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
-        ++force_mintrap;
-        result = (mintrap(mon) != 0);
-        --force_mintrap;
+        result = (mintrap(mon, TRUE) != 0);
     }
     return result;
 }
@@ -4562,9 +4556,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         /* monster will be angered; mintrap doesn't handle that */
         wakeup(mon, TRUE);
-        ++force_mintrap;
-        result = (mintrap(mon) != 0);
-        --force_mintrap;
+        result = (mintrap(mon, TRUE) != 0);
         /* mon might now be on the migrating monsters list */
     }
     return result;

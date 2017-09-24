@@ -718,7 +718,7 @@ int x, y;
         place_monster(mon, x, y);
         newsym(mon->mx, mon->my);
         set_apparxy(mon);
-        (void) mintrap(mon);
+        (void) mintrap(mon, FALSE);
         return TRUE;
     }
     return FALSE;

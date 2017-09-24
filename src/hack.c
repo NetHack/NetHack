@@ -1741,7 +1741,7 @@ domove()
                 pnambuf);
 
             /* check for displacing it into pools and traps */
-            switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
+            switch (minliquid(mtmp) ? 2 : mintrap(mtmp, FALSE)) {
             case 0:
                 break;
             case 1: /* trapped */

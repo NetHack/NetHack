@@ -2418,7 +2418,7 @@ E struct monst *FDECL(activate_statue_trap,
 E void FDECL(dotrap, (struct trap *, unsigned));
 E void FDECL(seetrap, (struct trap *));
 E void FDECL(feeltrap, (struct trap *));
-E int FDECL(mintrap, (struct monst *));
+E int FDECL(mintrap, (struct monst *, BOOLEAN_P));
 E void FDECL(instapetrify, (const char *));
 E void FDECL(minstapetrify, (struct monst *, BOOLEAN_P));
 E void FDECL(selftouch, (const char *));
