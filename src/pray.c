@@ -48,9 +48,9 @@ static const char *godvoices[] = {
 };
 
 /* values calculated when prayer starts, and used when completed */
-static aligntyp p_aligntyp;
-static int p_trouble;
-static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
+static aligntyp p_aligntyp = UNDEFINED;
+static int p_trouble = UNDEFINED;
+static int p_type = UNDEFINED; /* (-1)-3:(-1)=really naughty, 3=really good */
 
 #define PIOUS 20
 #define DEVOUT 14
