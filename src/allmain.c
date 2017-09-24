@@ -741,6 +741,7 @@ void early_init()
     o_init_early_init();
     objects_early_init();
     pickup_early_init();
+    pline_early_init();
     sp_lev_early_init();
     u_init_early_init();
 }
