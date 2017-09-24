@@ -2146,6 +2146,7 @@ E void FDECL(store_plname_in_file, (int));
 E void NDECL(free_dungeons);
 E void NDECL(freedynamicdata);
 E void FDECL(store_savefileinfo, (int));
+E void NDECL(save_early_init);
 
 /* ### shk.c ### */
 
