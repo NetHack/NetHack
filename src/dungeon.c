@@ -57,6 +57,7 @@ STATIC_DCL boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
 STATIC_DCL void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
                                    BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
+STATIC_DCL char FDECL(chr_u_on_lvl, (d_level *));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
                                      struct lchoice *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
@@ -247,7 +248,7 @@ dlb *stream;
         panic(
   "Premature EOF on dungeon description file!\r\nExpected %d bytes - got %d.",
               (size * nitems), (size * cnt));
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 }
 
@@ -1794,6 +1795,13 @@ int type;
     return " (unknown)";
 }
 
+STATIC_OVL char
+chr_u_on_lvl(dlev)
+d_level *dlev;
+{
+    return u.uz.dnum == dlev->dnum && u.uz.dlevel == dlev->dlevel ? '*' : ' ';
+}
+
 /* Print all child branches between the lower and upper bounds. */
 STATIC_OVL void
 print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices_p)
@@ -1811,7 +1819,9 @@ struct lchoice *lchoices_p;
     for (br = branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
-            Sprintf(buf, "   %s to %s: %d", br_string(br->type),
+            Sprintf(buf, "%c %s to %s: %d",
+                    bymenu ? chr_u_on_lvl(&br->end1) : ' ',
+                    br_string(br->type),
                     dungeons[br->end2.dnum].dname, depth(&br->end1));
             if (bymenu)
                 tport_menu(win, buf, lchoices_p, &br->end1,
@@ -1885,7 +1895,9 @@ xchar *rdgn;
             print_branch(win, i, last_level, slev->dlevel.dlevel, bymenu,
                          &lchoices);
 
-            Sprintf(buf, "   %s: %d", slev->proto, depth(&slev->dlevel));
+            Sprintf(buf, "%c %s: %d",
+                    chr_u_on_lvl(&slev->dlevel),
+                    slev->proto, depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (tune %s)", tune);
             if (bymenu)
@@ -2106,6 +2118,39 @@ int ledger_num;
         (void) memset((genericptr_t) mptr->msrooms, 0, sizeof mptr->msrooms);
         for (bp = mptr->final_resting_place; bp; bp = bp->next)
             bp->bonesknown = FALSE;
+    }
+}
+
+void
+rm_mapseen(ledger_num)
+int ledger_num;
+{
+    mapseen *mptr, *mprev = (mapseen *)0;
+    struct cemetery *bp, *bpnext;
+
+    for (mptr = mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
+        if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel == ledger_num)
+            break;
+
+    if (!mptr)
+        return;
+
+    if (mptr->custom)
+        free((genericptr_t) mptr->custom);
+
+    bp = mptr->final_resting_place;
+    while (bp) {
+        bpnext = bp->next;
+        free(bp);
+        bp = bpnext;
+    }
+
+    if (mprev) {
+        mprev->next = mptr->next;
+        free(mptr);
+    } else {
+        mapseenchn = mptr->next;
+        free(mptr);
     }
 }
 

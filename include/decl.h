@@ -421,7 +421,7 @@ struct plinemsg_type {
 E struct plinemsg_type *plinemsg_types;
 
 #ifdef PANICTRACE
-E char *ARGV0;
+E const char *ARGV0;
 #endif
 
 #ifdef DROPLEVEL

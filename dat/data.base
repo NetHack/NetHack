@@ -426,8 +426,8 @@ barbed devil
 	Barbed devils lack any real special abilities, though they
 	are quite difficult to kill.
 # takes "bat or bird" when specifying 'B'
-~combat
-~wombat
+~*combat
+~*wombat
 *bat
 bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
@@ -3179,6 +3179,15 @@ mars
 	explain why he became a god of death and finally a god of war.
 	He is the son of Jupiter and Juno.
 		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+martial arts
+unarmed combat
+bare*handed combat
+        "What else can we do? None of this is fast enough." "It will have
+        to be." He stood up, a tall, broad wall of a man.  "Why don't you
+        ask around, see if anyone in the neighborhoods knows anything
+        about martial arts.  You need more than a book or two to learn
+        good dependable unarmed combat."
+                [ Parable of the Sower, by Octavia Butler ]
 master assassin
 	He strolled down the stairs, followed by a number of assassins.
 	When he was directly in front of Ymor he said: "I've come for

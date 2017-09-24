@@ -20,6 +20,13 @@
 #endif
 #endif
 
+#undef Protection /* We have a global name space collision.  No source file
+                     using win32api.h should be using the Protection macro
+                     from youprop.h.
+                     A better fix would be to ensure we include all window
+                     header files before we start clobbering the global name
+                     space with NetHack specific macros. */
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
@@ -226,7 +233,7 @@ extern COLORREF status_fg_color;
 extern COLORREF message_bg_color;
 extern COLORREF message_fg_color;
 
-#define SYSCLR_TO_BRUSH(x) ((HBRUSH)((x) + 1))
+#define SYSCLR_TO_BRUSH(x) ((HBRUSH)(((intptr_t) x) + 1))
 
 /* unicode stuff */
 #define NH_CODEPAGE (SYMHANDLING(H_IBM) ? GetOEMCP() : GetACP())

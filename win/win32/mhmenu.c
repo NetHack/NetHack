@@ -586,8 +586,6 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         if (data->type != MENU_TYPE_MENU)
             break;
-        if (strlen(msg_data->str) == 0)
-            break;
 
         if (data->menu.size == data->menu.allocated) {
             data->menu.allocated += 10;
@@ -605,6 +603,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->menu.items[new_item].attr = msg_data->attr;
         strncpy(data->menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
+	/* prevent & being interpreted as a mnemonic start */
+        strNsubst(data->menu.items[new_item].str, "&", "&&", 0);
         data->menu.items[new_item].presel = msg_data->presel;
 
         /* calculate tabstop size */
@@ -883,6 +883,11 @@ GetMenuControl(HWND hWnd)
     PNHMenuWindow data;
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+	/* We may continue getting window messages after a window's WM_DESTROY is
+	   called.  We need to handle the case that USERDATA has been freed. */
+	if (data == NULL)
+		return NULL;
 
     if (data->type == MENU_TYPE_TEXT) {
         return GetDlgItem(hWnd, IDC_MENU_TEXT);

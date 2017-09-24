@@ -44,6 +44,28 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
 #OPTIONS=perm_invent
 
+
+# Highlight menu lines with different colors. You need to define the colors
+# with MENUCOLOR lines.
+#  Toggle menucolor use on or off
+OPTIONS=menucolors
+# Define color used for a certain menu line. Format is
+#    MENUCOLOR="regular expression"=color
+# or
+#    MENUCOLOR="regular expression"=color&attribute
+#  Show all blessed items in green
+MENUCOLOR=" blessed " = green
+#  Show all holy water in green
+MENUCOLOR=" holy " = green
+#  Show all cursed items in red
+MENUCOLOR=" cursed " = red
+#  Show all unholy water in red
+MENUCOLOR=" unholy " = red
+#  Show all cursed worn items in orange and underlined
+MENUCOLOR=" cursed .* (being worn)" = orange&underline
+
+
+
 # Turn off all status hilites.
 #OPTIONS=!statushilites
 #
@@ -53,6 +75,9 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 # number_pad option can have an optional value of 0 (off), 1 (on), 
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
 OPTIONS=time,noshowexp,number_pad:2,lit_corridor
+
+# Make commands that ask for an inventory item pop up a menu
+OPTIONS=force_invmenu
 
 #
 # If you want to get rid of "use #quit to quit..." use:

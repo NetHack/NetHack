@@ -29,6 +29,7 @@ STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
 STATIC_DCL int FDECL(lift_object, (struct obj *, struct obj *, long *,
                                    BOOLEAN_P));
 STATIC_DCL boolean FDECL(mbag_explodes, (struct obj *, int));
+STATIC_DCL long FDECL(boh_loss, (struct obj *container, int));
 STATIC_PTR int FDECL(in_container, (struct obj *));
 STATIC_PTR int FDECL(out_container, (struct obj *));
 STATIC_DCL void FDECL(removed_from_icebox, (struct obj *));
@@ -707,7 +708,7 @@ int what; /* should be a long */
 
         /* position may need updating (invisible hero) */
         if (n_picked)
-            newsym(u.ux, u.uy);
+            newsym_force(u.ux, u.uy);
 
         /* check if there's anything else here after auto-pickup is done */
         if (autopickup)
@@ -840,7 +841,7 @@ menu_item **pick_list;            /* return list of items picked */
 int how;                          /* type of query */
 boolean FDECL((*allow), (OBJ_P)); /* allow function */
 {
-    int i, n, actualn;
+    int i, n;
     winid win;
     struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
     char *pack;
@@ -859,7 +860,6 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
             last = curr;
             n++;
         }
-    actualn = n;
     if (engulfer) {
         ++n;
         /* don't autoselect swallowed hero if it's the only choice */
@@ -2019,6 +2019,28 @@ int depthin;
     return FALSE;
 }
 
+STATIC_OVL long
+boh_loss(container, held)
+struct obj *container;
+int held;
+{
+    /* sometimes toss objects if a cursed magic bag */
+    if (Is_mbag(container) && container->cursed && Has_contents(container)) {
+        long loss = 0L;
+        struct obj *curr, *otmp;
+
+        for (curr = container->cobj; curr; curr = otmp) {
+            otmp = curr->nobj;
+            if (!rn2(13)) {
+                obj_extract_self(curr);
+                loss += mbag_item_gone(held, curr);
+            }
+        }
+        return loss;
+    }
+    return 0;
+}
+
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
 STATIC_PTR int
 in_container(obj)
@@ -2326,13 +2348,18 @@ explain_container_prompt(more_containers)
 boolean more_containers;
 {
     static const char *const explaintext[] = {
-        "Container actions:", "", " : -- Look: examine contents",
-        " o -- Out: take things out", " i -- In: put things in",
+        "Container actions:",
+        "",
+        " : -- Look: examine contents",
+        " o -- Out: take things out",
+        " i -- In: put things in",
         " b -- Both: first take things out, then put things in",
         " r -- Reversed: put things in, then take things out",
         " s -- Stash: put one item in", "",
-        " n -- Next: loot next selected container", " q -- Quit: finished",
-        " ? -- Help: display this text.", "", 0
+        " n -- Next: loot next selected container",
+        " q -- Quit: finished",
+        " ? -- Help: display this text.",
+        "", 0
     };
     const char *const *txtpp;
     winid win;
@@ -2370,11 +2397,12 @@ struct obj **objp;
 int held;
 boolean more_containers; /* True iff #loot multiple and this isn't last one */
 {
-    struct obj *curr, *otmp, *obj = *objp;
+    struct obj *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,
         stash_one, inokay, outokay, outmaybe;
     char c, emptymsg[BUFSZ], qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
     int used = 0;
+    long loss;
 
     abort_looting = FALSE;
     emptymsg[0] = '\0';
@@ -2415,22 +2443,14 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         observe_quantum_cat(current_container);
         used = 1;
     }
-    /* sometimes toss objects if a cursed magic bag */
-    cursed_mbag = (Is_mbag(current_container) && current_container->cursed
-                   && Has_contents(current_container));
-    if (cursed_mbag) {
-        long loss = 0L;
 
-        for (curr = current_container->cobj; curr; curr = otmp) {
-            otmp = curr->nobj;
-            if (!rn2(13)) {
-                obj_extract_self(curr);
-                loss += mbag_item_gone(held, curr);
-                used = 1;
-            }
-        }
-        if (loss)
-            You("owe %ld %s for lost merchandise.", loss, currency(loss));
+    cursed_mbag = Is_mbag(current_container)
+        && current_container->cursed
+        && Has_contents(current_container);
+    if (cursed_mbag
+        && (loss = boh_loss(current_container, held)) != 0) {
+        used = 1;
+        You("owe %ld %s for lost merchandise.", loss, currency(loss));
         current_container->owt = weight(current_container);
     }
     inokay = (invent != 0

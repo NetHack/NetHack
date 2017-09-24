@@ -469,7 +469,7 @@ const char *line;
         (void) execv(args[0], (char *const *) args);
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to message handler %s failed.\n", env);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     } else if (f > 0) {
         int status;
 

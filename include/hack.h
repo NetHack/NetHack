@@ -37,6 +37,12 @@ enum encumbrance_types {
 /* number of turns it takes for vault guard to show up */
 #define VAULT_GUARD_TIME 30
 
+#define SHOP_DOOR_COST 400L /* cost of a destroyed shop door */
+#define SHOP_BARS_COST 300L /* cost of iron bars */
+#define SHOP_HOLE_COST 200L /* cost of making hole/trapdoor */
+#define SHOP_WALL_COST 200L /* cost of destroying a wall */
+#define SHOP_WALL_DMG  (10L * ACURRSTR) /* damaging a wall */
+
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
     SATIATED = 0,

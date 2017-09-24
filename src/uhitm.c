@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1496860757 2017/06/07 18:39:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1504999056 2017/09/09 23:17:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1609,8 +1609,9 @@ register struct attack *mattk;
             pline("%s suddenly seems weaker!", Monnam(mdef));
             mdef->mhpmax -= xtmp;
             mdef->mhp -= xtmp;
-            /* !m_lev: level 0 monster is killed rather than drop to -1 */
-            if (mdef->mhp <= 0 && !mdef->m_lev) {
+            /* !m_lev: level 0 monster is killed regardless of hit points
+               rather than drop to level -1 */
+            if (mdef->mhp <= 0 || !mdef->m_lev) {
                 pline("%s dies!", Monnam(mdef));
                 xkilled(mdef, XKILL_NOMSG);
             } else

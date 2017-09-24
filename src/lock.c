@@ -112,7 +112,7 @@ picklock(VOID_ARGS)
             xlock.door->doormask = D_NODOOR;
             unblock_point(u.ux + u.dx, u.uy + u.dy);
             if (*in_rooms(u.ux + u.dx, u.uy + u.dy, SHOPBASE))
-                add_damage(u.ux + u.dx, u.uy + u.dy, 0L);
+                add_damage(u.ux + u.dx, u.uy + u.dy, SHOP_DOOR_COST);
             newsym(u.ux + u.dx, u.uy + u.dy);
         } else if (xlock.door->doormask & D_LOCKED)
             xlock.door->doormask = D_CLOSED;
@@ -659,7 +659,7 @@ int x, y;
             b_trapped("door", FINGER);
             door->doormask = D_NODOOR;
             if (*in_rooms(cc.x, cc.y, SHOPBASE))
-                add_damage(cc.x, cc.y, 0L);
+                add_damage(cc.x, cc.y, SHOP_DOOR_COST);
         } else
             door->doormask = D_ISOPEN;
         feel_newsym(cc.x, cc.y); /* the hero knows she opened it */

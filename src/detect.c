@@ -1571,9 +1571,9 @@ boolean via_warning;
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
-            mtmp->mundetected = 0;
-            newsym(x, y);
-            goto find;
+        mtmp->mundetected = 0;
+        newsym(x, y);
+        goto find;
     }
     return 0;
 }

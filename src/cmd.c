@@ -381,8 +381,10 @@ doextlist(VOID_ARGS)
 #define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 
 /*
- * This is currently used only by the tty port and is
- * controlled via runtime option 'extmenu'.
+ * This is currently used only by the tty interface and is
+ * controlled via runtime option 'extmenu'.  (Most other interfaces
+ * already use a menu all the time for extended commands.)
+ *
  * ``# ?'' is counted towards the limit of the number of commands,
  * so we actually support MAX_EXT_CMD-1 "real" extended commands.
  *
@@ -399,9 +401,10 @@ extcmd_via_menu()
     char buf[BUFSZ];
     char cbuf[QBUFSZ], prompt[QBUFSZ], fmtstr[20];
     int i, n, nchoices, acount;
-    int ret, biggest;
+    int ret, len, biggest;
     int accelerator, prevaccelerator;
     int matchlevel = 0;
+    boolean wastoolong, one_per_line;
 
     ret = 0;
     cbuf[0] = '\0';
@@ -416,10 +419,8 @@ extcmd_via_menu()
                 continue;
             if (!matchlevel || !strncmp(efp->ef_txt, cbuf, matchlevel)) {
                 choices[i] = efp;
-                if ((int) strlen(efp->ef_desc) > biggest) {
-                    biggest = strlen(efp->ef_desc);
-                    Sprintf(fmtstr, "%%-%ds", biggest + 15);
-                }
+                if ((len = (int) strlen(efp->ef_desc)) > biggest)
+                    biggest = len;
                 if (++i > MAX_EXT_CMD) {
 #if defined(BETA)
                     impossible(
@@ -434,25 +435,33 @@ extcmd_via_menu()
         choices[i] = (struct ext_func_tab *) 0;
         nchoices = i;
         /* if we're down to one, we have our selection so get out of here */
-        if (nchoices == 1) {
-            for (i = 0; extcmdlist[i].ef_txt != (char *) 0; i++)
-                if ((extcmdlist[i].flags & AUTOCOMPLETE)
-                    && !(!wizard && (extcmdlist[i].flags & WIZMODECMD))
-                    && !strncmpi(extcmdlist[i].ef_txt, cbuf, matchlevel)) {
-                    ret = i;
-                    break;
-                }
+        if (nchoices  <= 1) {
+            ret = (nchoices == 1) ? (int) (choices[0] - extcmdlist) : -1;
             break;
         }
 
         /* otherwise... */
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
+        Sprintf(fmtstr, "%%-%ds", biggest + 15);
+        prompt[0] = '\0';
+        wastoolong = FALSE; /* True => had to wrap due to line width
+                             * ('w' in wizard mode) */
+        /* -3: two line menu header, 1 line menu footer (for prompt) */
+        one_per_line = (nchoices < ROWNO - 3);
         accelerator = prevaccelerator = 0;
         acount = 0;
         for (i = 0; choices[i]; ++i) {
             accelerator = choices[i]->ef_txt[matchlevel];
-            if (accelerator != prevaccelerator || nchoices < (ROWNO - 3)) {
+            if (accelerator != prevaccelerator || one_per_line)
+                wastoolong = FALSE;
+            if (accelerator != prevaccelerator || one_per_line
+                || (acount >= 2
+                    /* +4: + sizeof " or " - sizeof "" */
+                    && (strlen(prompt) + 4 + strlen(choices[i]->ef_txt)
+                        /* -6: enough room for 1 space left margin
+                         *   + "%c - " menu selector + 1 space right margin */
+                        >= min(sizeof prompt, COLNO - 6)))) {
                 if (acount) {
                     /* flush extended cmds for that letter already in buf */
                     Sprintf(buf, fmtstr, prompt);
@@ -460,15 +469,17 @@ extcmd_via_menu()
                     add_menu(win, NO_GLYPH, &any, any.a_char, 0, ATR_NONE,
                              buf, FALSE);
                     acount = 0;
+                    if (!(accelerator != prevaccelerator || one_per_line))
+                        wastoolong = TRUE;
                 }
             }
             prevaccelerator = accelerator;
-            if (!acount || nchoices < (ROWNO - 3)) {
-                Sprintf(prompt, "%s [%s]", choices[i]->ef_txt,
-                        choices[i]->ef_desc);
+            if (!acount || one_per_line) {
+                Sprintf(prompt, "%s%s [%s]", wastoolong ? "or " : "",
+                        choices[i]->ef_txt, choices[i]->ef_desc);
             } else if (acount == 1) {
-                Sprintf(prompt, "%s or %s", choices[i - 1]->ef_txt,
-                        choices[i]->ef_txt);
+                Sprintf(prompt, "%s%s or %s", wastoolong ? "or " : "",
+                        choices[i - 1]->ef_txt, choices[i]->ef_txt);
             } else {
                 Strcat(prompt, " or ");
                 Strcat(prompt, choices[i]->ef_txt);
@@ -626,6 +637,7 @@ wiz_makemap(VOID_ARGS)
     if (wizard) {
         struct monst *mtmp;
 
+        rm_mapseen(ledger_no(&u.uz));
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (mtmp->isshk)
                 setpaid(mtmp);
@@ -2857,7 +2869,7 @@ int final;
 struct ext_func_tab extcmdlist[] = {
     { '#', "#", "perform an extended command",
             doextcmd, IFBURIED | GENERALCMD },
-    { M('?'), "?", "get this list of extended commands",
+    { M('?'), "?", "list all extended commands",
             doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD },
     { M('a'), "adjust", "adjust inventory letters",
             doorganize, IFBURIED | AUTOCOMPLETE },
@@ -3056,7 +3068,7 @@ uchar key;
     return (char *) 0;
 }
 
-void
+boolean
 bind_key(key, command)
 uchar key;
 const char *command;
@@ -3066,19 +3078,17 @@ const char *command;
     /* special case: "nothing" is reserved for unbinding */
     if (!strcmp(command, "nothing")) {
         Cmd.commands[key] = (struct ext_func_tab *) 0;
-        return;
+        return TRUE;
     }
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
         if (strcmp(command, extcmd->ef_txt))
             continue;
         Cmd.commands[key] = extcmd;
-        return;
+        return TRUE;
     }
 
-    pline(
-        "Bad command %s matched with key %c (ASCII %i).  Ignoring command.\n",
-          command, key, key);
+    return FALSE;
 }
 
 /* initialize all keyboard commands */
@@ -3091,27 +3101,27 @@ commands_init()
         if (extcmd->key)
             Cmd.commands[extcmd->key] = extcmd;
 
-    bind_key(C('l'), "redraw"); /* if number_pad is set */
+    (void) bind_key(C('l'), "redraw"); /* if number_pad is set */
     /*       'b', 'B' : go sw */
     /*       'F' : fight (one time) */
     /*       'g', 'G' : multiple go */
     /*       'h', 'H' : go west */
-    bind_key('h',    "help"); /* if number_pad is set */
-    bind_key('j',    "jump"); /* if number_pad is on */
+    (void) bind_key('h',    "help"); /* if number_pad is set */
+    (void) bind_key('j',    "jump"); /* if number_pad is on */
     /*       'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N' move commands */
-    bind_key('k',    "kick"); /* if number_pad is on */
-    bind_key('l',    "loot"); /* if number_pad is on */
-    bind_key(C('n'), "annotate"); /* if number_pad is on */
-    bind_key(M('n'), "name");
-    bind_key(M('N'), "name");
-    bind_key('u',    "untrap"); /* if number_pad is on */
+    (void) bind_key('k',    "kick"); /* if number_pad is on */
+    (void) bind_key('l',    "loot"); /* if number_pad is on */
+    (void) bind_key(C('n'), "annotate"); /* if number_pad is on */
+    (void) bind_key(M('n'), "name");
+    (void) bind_key(M('N'), "name");
+    (void) bind_key('u',    "untrap"); /* if number_pad is on */
 
     /* alt keys: */
-    bind_key(M('O'), "overview");
-    bind_key(M('2'), "twoweapon");
+    (void) bind_key(M('O'), "overview");
+    (void) bind_key(M('2'), "twoweapon");
 
     /* wait_on_space */
-    bind_key(' ',    "wait");
+    (void) bind_key(' ',    "wait");
 }
 
 int
@@ -4007,7 +4017,7 @@ boolean initial;
         }
         backed_dir_cmd = TRUE;
         for (i = 0; i < 8; i++)
-            bind_key(Cmd.dirchars[i], "nothing");
+            (void) bind_key(Cmd.dirchars[i], "nothing");
     }
 }
 
@@ -4965,7 +4975,7 @@ end_of_input()
     if (iflags.window_inited)
         exit_nhwindows((char *) 0);
     clearlocks();
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/ /* not necessarily true for vms... */
     return;
 }

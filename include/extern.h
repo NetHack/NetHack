@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1502753404 2017/08/14 23:30:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.600 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -142,6 +142,7 @@ E int NDECL(getbones);
 /* ### botl.c ### */
 
 E char *NDECL(do_statusline1);
+E void NDECL(check_gold_symbol);
 E char *NDECL(do_statusline2);
 E int FDECL(xlev_to_rank, (int));
 E int FDECL(title_to_mon, (const char *, int *, int *));
@@ -198,7 +199,7 @@ E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E void FDECL(show_conduct, (int));
-E void FDECL(bind_key, (UCHAR_P, const char *));
+E boolean FDECL(bind_key, (UCHAR_P, const char *));
 E void NDECL(dokeylist);
 E int FDECL(xytod, (SCHAR_P, SCHAR_P));
 E void FDECL(dtoxy, (coord *, int));
@@ -607,6 +608,7 @@ E int NDECL(donamelevel);
 E int NDECL(dooverview);
 E void FDECL(show_overview, (int, int));
 E void FDECL(forget_mapseen, (int));
+E void FDECL(rm_mapseen, (int));
 E void FDECL(init_mapseen, (d_level *));
 E void NDECL(recalc_mapseen);
 E void FDECL(mapseen_temple, (struct monst *));
@@ -666,7 +668,7 @@ E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
 E void FDECL(done, (int));
 E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
                                   BOOLEAN_P, BOOLEAN_P));
-E void FDECL(terminate, (int)) NORETURN;
+E void FDECL(nh_terminate, (int)) NORETURN;
 E int NDECL(dovanquished);
 E int NDECL(num_genocides);
 E void FDECL(delayed_killer, (int, int, const char *));
@@ -767,6 +769,9 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
+E void FDECL(config_error_init, (BOOLEAN_P, const char *, BOOLEAN_P));
+E void FDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
+E int NDECL(config_error_done);
 E boolean FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
@@ -1682,7 +1687,7 @@ E boolean FDECL(match_optname, (const char *, const char *, int, BOOLEAN_P));
 E void NDECL(initoptions);
 E void NDECL(initoptions_init);
 E void NDECL(initoptions_finish);
-E void FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
+E boolean FDECL(parseoptions, (char *, BOOLEAN_P, BOOLEAN_P));
 E int NDECL(doset);
 E int NDECL(dotogglepickup);
 E void NDECL(option_help);
@@ -1690,7 +1695,7 @@ E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
 E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
                                   char *, char *));
-E void FDECL(parsebindings, (char *));
+E boolean FDECL(parsebindings, (char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(get_menu_cmd_key, (CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
@@ -1957,6 +1962,7 @@ E void NDECL(unload_qtlist);
 E short FDECL(quest_info, (int));
 E const char *NDECL(ldrname);
 E boolean FDECL(is_quest_artifact, (struct obj *));
+E struct obj *FDECL(find_quest_artifact, (unsigned));
 E void FDECL(com_pager, (int));
 E void FDECL(qt_pager, (int));
 E struct permonst *NDECL(qt_montype);
@@ -2413,6 +2419,7 @@ E void NDECL(climb_pit);
 E boolean FDECL(fire_damage, (struct obj *, BOOLEAN_P, XCHAR_P, XCHAR_P));
 E int FDECL(fire_damage_chain,
             (struct obj *, BOOLEAN_P, BOOLEAN_P, XCHAR_P, XCHAR_P));
+E boolean FDECL(lava_damage, (struct obj *, XCHAR_P, XCHAR_P));
 E void acid_damage(struct obj *);
 E int FDECL(water_damage, (struct obj *, const char *, BOOLEAN_P));
 E void FDECL(water_damage_chain, (struct obj *, BOOLEAN_P));

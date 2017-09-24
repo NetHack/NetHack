@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1496619133 2017/06/04 23:32:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1505214876 2017/09/12 11:14:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,13 +145,13 @@ stoned_dialogue()
     exercise(A_DEX, FALSE);
 }
 
-/* He is getting sicker and sicker prior to vomiting */
+/* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
     "are feeling mildly nauseated.", /* 14 */
     "feel slightly confused.",       /* 11 */
     "can't seem to think straight.", /* 8 */
     "feel incredibly sick.",         /* 5 */
-    "suddenly vomit!"                /* 2 */
+    "are about to vomit."            /* 2 */
 };
 
 STATIC_OVL void
@@ -188,12 +188,25 @@ vomiting_dialogue()
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
-            txt = "gag uncontrolably.";
+            txt = "gag uncontrollably.";
+        else if (Hallucination)
+            /* "hurl" is short for "hurl chunks" which is slang for
+               relatively violent vomiting... */
+            txt = "are about to hurl!";
         break;
     case 0:
         stop_occupation();
-        if (!cantvomit(youmonst.data))
+        if (!cantvomit(youmonst.data)) {
             morehungry(20);
+            /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
+               since you've just been through the earlier messages of the
+               countdown, and it was still possible to move around between
+               that message and "You can move again." (from vomit()'s
+               nomul(-2)) with no intervening message; give one here to
+               have a more specific at which hero became unable to move
+               [vomit() issues its own message for the cantvomit() case] */
+            You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+        }
         vomit();
         break;
     default:
@@ -363,6 +376,8 @@ nh_timeout()
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
+        else if (is_were(youmonst.data))
+            you_unwere(FALSE); /* if polycontrl, asks whether to rehumanize */
         else
             rehumanize();
     }

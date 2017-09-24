@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BA3DD34C-04B7-40D0-B373-9329AA9E8945}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="console.props" />
+  <Import Project="common.props" />
+  <Import Project="dirs.props" />
+  <Import Project="files.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysWinntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\util\makedefs.c" />
+    <ClCompile Include="..\..\..\src\monst.c" />
+    <ClCompile Include="..\..\..\src\objects.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\config.h" />
+    <ClInclude Include="..\..\..\include\config1.h" />
+    <ClInclude Include="..\..\..\include\context.h" />
+    <ClInclude Include="..\..\..\include\coord.h" />
+    <ClInclude Include="..\..\..\include\global.h" />
+    <ClInclude Include="..\..\..\include\monattk.h" />
+    <ClInclude Include="..\..\..\include\monflag.h" />
+    <ClInclude Include="..\..\..\include\monsym.h" />
+    <ClInclude Include="..\..\..\include\ntconf.h" />
+    <ClInclude Include="..\..\..\include\objclass.h" />
+    <ClInclude Include="..\..\..\include\patchlevel.h" />
+    <ClInclude Include="..\..\..\include\qtext.h" />
+    <ClInclude Include="..\..\..\include\tradstdc.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="AfterBuild">
+    <MSBuild Projects="aftermakedefs.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterClean">
+    <MSBuild Projects="aftermakedefs.proj" Targets="Clean" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="AfterRebuild">
+    <MSBuild Projects="aftermakedefs.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+</Project>

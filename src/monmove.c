@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1496534703 2017/06/04 00:05:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1505265968 2017/09/13 01:26:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -134,8 +134,6 @@ onscary(x, y, mtmp)
 int x, y;
 struct monst *mtmp;
 {
-    boolean epresent = sengr_at("Elbereth", x, y, TRUE);
-
     /* creatures who are directly resistant to magical scaring:
      * Rodney, lawful minions, angels, the Riders */
     if (mtmp->iswiz || is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL]
@@ -152,16 +150,18 @@ struct monst *mtmp;
     if (sobj_at(SCR_SCARE_MONSTER, x, y))
         return TRUE;
 
-    /* creatures who don't (or can't) fear a written Elbereth:
+    /*
+     * Creatures who don't (or can't) fear a written Elbereth:
      * all the above plus shopkeepers, guards, blind or
      * peaceful monsters, humans, and minotaurs.
      *
-     * if the player isn't actually on the square OR the player's image
-     * isn't displaced to the square, no protection is being granted
+     * If the player isn't actually on the square OR the player's image
+     * isn't displaced to the square, no protection is being granted.
      *
      * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
-     * Astral Plane; the influence of the Valar only reaches so far.  */
-    return (epresent
+     * Astral Plane; the influence of the Valar only reaches so far.
+     */
+    return (sengr_at("Elbereth", x, y, TRUE)
             && ((u.ux == x && u.uy == y)
                 || (Displaced && mtmp->mux == x && mtmp->muy == y))
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
@@ -752,6 +752,7 @@ register int after;
     boolean uses_items = 0, setlikes = 0;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
+    boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
     struct monst *mtoo;
     schar mmoved = 0; /* not strictly nec.: chi >= 0 will do */
@@ -1249,7 +1250,7 @@ postmov:
                     && (amorphous(ptr)
                         || (can_fog(mtmp)
                             && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
-                                          canspotmon(mtmp))))) {
+                                          sawmon)))) {
                     /* update cached value for vamp_shift() case */
                     ptr = mtmp->data;
                     if (flags.verbose && canseemon(mtmp))

@@ -735,10 +735,13 @@ support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 %.lp
 \item[\tb{.}]
-Rest, do nothing for one turn.
+Wait or rest, do nothing for one turn.
 %.lp
 \item[\tb{a}]
-Apply (use) a tool (pick-axe, key, lamp \ldots).
+Apply (use) a tool (pick-axe, key, lamp \ldots).\\
+%.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 %.lp
 \item[\tb{A}]
 Remove one or more worn items, such as armor.\\
@@ -1112,9 +1115,12 @@ and '{\tt \^{}N}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#apply}]
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
-Default key is '{\tt a}'.
+Default key is '{\tt a}'.\\
 If the tool used acts on items on the floor, using the `{\tt m}' prefix
-skips those items.
+skips those items.\\
+%.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 %.lp
 \item[\tb{\#attributes}]
 Show your attributes. Default key is '{\tt \^{}X}'.\\
@@ -1394,7 +1400,9 @@ The `{\tt m}' prefix makes the command use a menu.
 \item[\tb{\#travel}]
 Travel to a specific location on the map. Default key is '{\tt _}'.
 Using the ``request menu'' prefix shows a menu of interesting targets in sight
-without asking to move the cursor.
+without asking to move the cursor. When picking a target with cursor and
+the {\it autodescribe\/}-option is on, the top line will show "(no travel path)" if
+your character does not know of a path to that location.
 %.lp
 \item[\tb{\#turn}]
 Turn undead away. Autocompletes. Default key is '{\tt M-t}'.
@@ -1674,6 +1682,7 @@ complete all of the levels according to the traditional rules of
 Sokoban.  Some allowances are permitted in case the player gets stuck;
 however, they will lower your luck.
 
+%.hn 2
 \subsection*{Stairs (`{\tt <}', `{\tt >}')}
 
 %.pg
@@ -1707,6 +1716,7 @@ you travel up or down stairs, and occasionally one of these creatures
 will displace you during the climb.  When that occurs, the pet or other
 monster will arrive on the staircase and you will end up nearby.
 
+%.hn 2
 \subsection*{Ladders (`{\tt <}', `{\tt >}')}
 
 %.pg
@@ -1792,8 +1802,8 @@ very well).
 %.pg
 The commands `{\tt /}' and `{\tt ;}' may be used to obtain information
 about those
-monsters who are displayed on the screen.  The command ``{\tt \#name}'', or
-its synonym `{\tt C}', allows you
+monsters who are displayed on the screen.  The command ``{\tt \#name}''
+(by default bound to `{\tt C}'), allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1945,7 +1955,7 @@ When you use one of these objects, if its effect is obvious, {\it NetHack\/}
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``{\tt \#name}''
-command, or its synonym `{\tt C}', for the same purpose at any time, to name
+command, for the same purpose at any time, to name
 all objects of a particular type or just an individual object.
 When you use ``{\tt \#name}'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
@@ -2682,7 +2692,14 @@ can be created with any text editor.
 
 %.pg
 Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
-Empty lines are ignore.
+Empty lines are ignored.
+
+%.pg
+Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
+marker. The text between the square brackets is the section name.
+Lines after a section marker belong to that section, and are
+ignored unless a CHOOSE -statement was used to select that section.
+Section names are case insensitive.
 
 %.pg
 You can use different configuration statements in the file, some
@@ -2769,6 +2786,24 @@ Example:
 %.sd
 \begin{verbatim}
    BIND=^X:getpos.autodescribe
+\end{verbatim}
+%.ed
+
+%.lp
+\item[\bb{CHOOSE}]
+Chooses at random one of the comma-separated parameters as an active
+section name. Lines in other sections are ignored.
+
+%.pg
+Example:
+%.sd
+\begin{verbatim}
+   OPTIONS=color
+   CHOOSE=char A,char B
+   [char A]
+   OPTIONS=role:arc,race:dwa,align:law,gender:fem
+   [char B]
+   OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 \end{verbatim}
 %.ed
 
@@ -3054,6 +3089,10 @@ An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
 Persistent.
 %.lp
+\item[\ib{force\_invmenu}]
+Commands asking for an inventory item show a menu instead of
+a text query with possible menu letters. Default is off.
+%.lp
 \item[\ib{fruit}]
 Name a fruit after something you enjoy eating (ex.\ ``{\tt fruit:mango}'')
 (default ``{\tt slime mold}''). Basically a nostalgic whimsy that
@@ -3294,7 +3333,7 @@ prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray}'
 %.sd
 %.si
 \newlength{\pcwidth}
-\settowidth{\pcwidth}{\tt Confirm}
+\settowidth{\pcwidth}{\tt Were-change}
 \addtolength{\pcwidth}{\labelsep}
 \blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
 \item[{\tt Confirm}]
@@ -3313,13 +3352,18 @@ bones data when dying in debug mode
 \item[{\tt attack~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm attacking
 a peaceful monster;
+\item[{\tt wand-break}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
+a wand;
+\item[{\tt Were-change}]
+require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
+due to lycanthropy
+when hero has polymorph control;
 \item[{\tt pray~~~}]
 require `{\tt y}' to confirm an attempt to pray rather
 than immediately praying; on by default;
-\item[{\tt wand}]
-require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
-a wand;
-\item[{\tt Remove~}] require selection from inventory for `{\tt R}' and `{\tt T}'
+\item[{\tt Remove~}] require selection from inventory for `{\tt R}'
+and `{\tt T}'
 commands even when wearing just one applicable item.
 \item[{\tt all~~~~}]
 turn on all of the above.
@@ -3395,7 +3439,7 @@ exclude that race from being picked randomly.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{rest\verb+_+on\verb+_+space}]
-Make the space bar a synonym for the `{\tt .}' (rest) command (default off).
+Make the space bar a synonym for the `{\tt .}' (\#wait) command (default off).
 Persistent.
 %.lp
 \item[\ib{role}]
@@ -4571,7 +4615,7 @@ of moving 8 units at a time.
 \item[\ib{nostatus\verb+_+updates}]
 Prevent updates to the status lines at the bottom of the screen, if
 your screen-reader reads those lines. The same information can be
-seen via the #attributes command.
+seen via the {\tt \#attributes} command.
 \elist
 
 %.hn2

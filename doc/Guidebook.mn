@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ $NHDT-Date: 1498078870 2017/06/21 21:01:10 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.233 $ $NHDT-Date: 1505214878 2017/09/12 11:14:38 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -608,9 +608,12 @@ objects, similar to the `M' command.  For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
-Rest, do nothing for one turn.
+Wait or rest, do nothing for one turn.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
+.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 .lp A
 Remove one or more worn items, such as armor.
 .lp ""
@@ -926,10 +929,16 @@ choosing the item to adjust, enter a count prior to its letter.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the
-``#overview'' command. Autocompletes. Default key is 'M-A', and '^N' if number_pad is on.
+``#overview'' command. Autocompletes. Default key is 'M-A', and '^N'
+if number_pad is on.
 .lp #apply
 Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
-If the tool used acts on items on the floor, using the `m' prefix skips those items.
+.lp ""
+If the tool used acts on items on the floor, using the `m' prefix skips
+those items.
+.lp ""
+If used on a wand, that wand will be broken, releasing its magic in the
+process.  Confirmation is required.
 .lp #attributes
 Show your attributes. Default key is '^X'.
 .lp #autopickup
@@ -1126,7 +1135,11 @@ The `m' prefix makes the command use a menu.
 .lp #travel
 Travel to a specific location on the map. Default key is '_'.
 Using the ``request menu'' prefix shows a menu of interesting targets in sight
-without asking to move the cursor.
+without asking to move the cursor. When picking a target with cursor and
+the
+.op autodescribe
+-option is on, the top line will show "(no travel path)" if
+your character does not know of a path to that location.
 .lp #turn
 Turn undead away. Autocompletes. Default key is 'M-t'.
 .lp #twoweapon
@@ -1427,8 +1440,8 @@ help you locate them before they locate you (which some monsters can do
 very well).
 .pg
 The commands `/' and `;' may be used to obtain information about those
-monsters who are displayed on the screen.  The command ``#name'', or
-its synonym `C', allows you
+monsters who are displayed on the screen.  The command ``#name''
+(by default bound to `C'), allows you
 to assign a name to a monster, which may be useful to help distinguish
 one from another when multiple monsters are present.  Assigning a name
 which is just a space will remove any prior name.
@@ -1561,7 +1574,7 @@ When you use one of these objects, if its effect is obvious, NetHack
 will remember what it is for you.  If its effect isn't extremely
 obvious, you will be asked what you want to call this type of object
 so you will recognize it later.  You can also use the ``#name''
-command, or its synonym `C', for the same purpose at any time, to name
+command, for the same purpose at any time, to name
 all objects of a particular type or just an individual object.
 When you use ``#name'' on an object which has already been named,
 specifying a space as the value will remove the prior name instead
@@ -2199,6 +2212,12 @@ can be created with any text editor.
 Any line in the configuration file starting with `#' is treated as a comment.
 Empty lines are ignored.
 .pg
+Any line beginning with `[' and ending in `]' is considered a section
+marker. The text between the square brackets is the section name.
+Lines after a section marker belong to that section, and are
+ignored unless a CHOOSE -statement was used to select that section.
+Section names are case insensitive.
+.pg
 You can use different configuration statements in the file, some
 of which can be used multiple times. In general, the statements are
 written in capital letters, followed by an equals sign, followed by
@@ -2262,6 +2281,19 @@ See the ``Changing Key Bindings`` section for more information.
 Example:
 .sd
 \fBBIND=^X:getpos.autodescribe\fP
+.ed
+.lp CHOOSE
+Chooses at random one of the comma-separated parameters as an active
+section name. Lines in other sections are ignored.
+.pg
+Example:
+.sd
+\fBOPTIONS=color\fP
+\fBCHOOSE=char A,char B\fP
+\fB[char A]\fP
+\fBOPTIONS=role:arc,race:dwa,align:law,gender:fem\fP
+\fB[char B]\fP
+\fBOPTIONS=role:wiz,race:elf,align:cha,gender:mal\fP
 .ed
 .lp MSGTYPE
 Change the way messages are shown in the top status line.
@@ -2492,6 +2524,9 @@ Cannot be set with the `O' command.
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
 Persistent.
+.lp force_invmenu
+Commands asking for an inventory item show a menu instead of
+a text query with possible menu letters. Default is off.
 .lp "fruit   "
 Name a fruit after something you enjoy eating (ex. ``fruit:mango'')
 (default ``slime mold'').  Basically a nostalgic whimsy that NetHack uses
@@ -2703,7 +2738,7 @@ at the end from the previous order.
 .lp paranoid_confirmation
 A space separated list of specific situations where alternate
 prompting is desired.  The default is paranoid_confirmation:pray.
-.PS Confirm
+.PS Were-change
 .PL Confirm
 for any prompts which are set to require "yes" rather than 'y', also
 require "no" to reject instead of accepting any non-yes response as no
@@ -2718,11 +2753,14 @@ require "yes" rather than 'y' to confirm saving
 bones data when dying in debug mode;
 .PL attack
 require "yes" rather than 'y' to confirm attacking a peaceful monster;
+.PL wand-break
+require "yes" rather than 'y' to confirm breaking a wand;
+.PL Were-change
+require "yes" rather than 'y' to confirm changing form due to lycanthropy
+when hero has polymorph control;
 .PL pray
 require 'y' to confirm an attempt to pray rather
 than immediately praying; on by default;
-.PL wand
-require "yes" rather than 'y' to confirm breaking a wand;
 .PL Remove
 require selection from inventory for 'R' and 'T'
 commands even when wearing just one applicable item.
@@ -2793,7 +2831,7 @@ If you prefix the value with `!' or ``no'', you will
 exclude that race from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp rest_on_space
-Make the space bar a synonym for the `.' (rest) command (default off).
+Make the space bar a synonym for the `.' (#wait) command (default off).
 Persistent.
 .lp "role    "
 Pick your type of character (ex. ``role:Samurai'');
@@ -4121,7 +4159,7 @@ version merges work done by the development team since the previous release
 with some of the beloved community patches. Many bugs were fixed and a
 large amount of code was restructured.
 .pg
-\fBThe development team, as well as \fBSteve VanDevender\fP and
+The development team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP ensured that NetHack 3.6 continued to operate on
 various Unix flavors and maintained the X11 interface.
 .pg
@@ -4142,6 +4180,7 @@ released 3.6.1 as a bug fix release in January 2016.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg
+.hn 2
 SHOUT-OUTS
 .pg
 The devteam would like to give a special "shout-out" to thank the generous

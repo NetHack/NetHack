@@ -680,7 +680,7 @@ mswin_exit_nhwindows(const char *str)
     // Don't do any of this (?) - exit_nhwindows does not terminate
     // the application
     // DestroyWindow(GetNHApp()->hMainWnd);
-    // terminate(EXIT_SUCCESS);
+    // nh_terminate(EXIT_SUCCESS);
 }
 
 /* Prepare the window to be suspended. */
@@ -1726,7 +1726,7 @@ bail(const char *mesg)
 {
     clearlocks();
     mswin_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 

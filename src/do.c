@@ -190,7 +190,7 @@ const char *verb;
         newsym(x, y);
         return TRUE;
     } else if (is_lava(x, y)) {
-        return fire_damage(obj, FALSE, x, y);
+        return lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make
@@ -1254,6 +1254,7 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
     substitute_tiles(newlevel);
 #endif
+    check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
      */

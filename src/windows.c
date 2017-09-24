@@ -57,6 +57,18 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
+#ifdef DUMPLOG
+STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
+STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_start_menu, (winid));
+STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
+STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
+STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
+#endif /* DUMPLOG */
+
 #ifdef HANGUPHANDLING
 volatile
 #endif
@@ -226,22 +238,25 @@ const char *s;
         exit(EXIT_FAILURE);
     }
     if (!winchoices[1].procs) {
-        raw_printf("Window type %s not recognized.  The only choice is: %s.",
+        config_error_add("Window type %s not recognized.  The only choice is: %s",
                    s, winchoices[0].procs->name);
     } else {
-        raw_printf("Window type %s not recognized.  Choices are:", s);
+        char buf[BUFSZ];
+        boolean first = TRUE;
+        buf[0] = '\0';
         for (i = 0; winchoices[i].procs; i++) {
             if ('+' == winchoices[i].procs->name[0])
                 continue;
             if ('-' == winchoices[i].procs->name[0])
                 continue;
-            raw_printf("        %s", winchoices[i].procs->name);
+            Sprintf(eos(buf), "%s%s", first ? "" : ",", winchoices[i].procs->name);
+            first = FALSE;
         }
+        config_error_add("Window type %s not recognized.  Choices are: %s", s, buf);
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
-        terminate(EXIT_SUCCESS);
-    wait_synch();
+        nh_terminate(EXIT_SUCCESS);
 }
 
 #ifdef WINCHAIN
@@ -1155,15 +1170,6 @@ dump_close_log()
         (void) fclose(dumplog_file);
         dumplog_file = (FILE *) 0;
     }
-}
-
-void
-dump_putc(ch)
-int ch;
-{
-    /* Not very efficient, but we mostly don't care. */
-    if (dumplog_file)
-        putc(ch, dumplog_file);
 }
 
 void

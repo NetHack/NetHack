@@ -641,7 +641,7 @@ struct obj *otmp UNUSED;
 
     if (child(1)) {
         (void) execl(mr, mr, (char *) 0);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 #else
 #ifndef AMS /* AMS mailboxes are directories */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1502753408 2017/08/14 23:30:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.242 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1505266804 2017/09/13 01:40:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1994,6 +1994,8 @@ boolean was_swallowed; /* digestion */
             Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
             killer.format = KILLED_BY_AN;
             explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
+            killer.name[0] = '\0';
+            killer.format = 0;
             return FALSE;
         }
     }
@@ -3034,9 +3036,9 @@ decide_to_shapeshift(mon, shiftflags)
 struct monst *mon;
 int shiftflags;
 {
-    struct permonst *ptr;
-    unsigned was_female = mon->female;
-    boolean msg = FALSE;
+    struct permonst *ptr = 0;
+    unsigned mndx, was_female = mon->female;
+    boolean msg = FALSE, dochng = FALSE;
 
     if ((shiftflags & SHIFT_MSG)
         || ((shiftflags & SHIFT_SEENMSG) && sensemon(mon)))
@@ -3045,28 +3047,48 @@ int shiftflags;
     if (!is_vampshifter(mon)) {
         /* regular shapeshifter */
         if (!rn2(6))
-            (void) newcham(mon, (struct permonst *) 0, FALSE, msg);
+            dochng = TRUE;
     } else {
         /* The vampire has to be in good health (mhp) to maintain
          * its shifted form.
          *
-         * If we're shifted and getting low on hp, maybe shift back.
+         * If we're shifted and getting low on hp, maybe shift back, or
+         * if we're a fog cloud at full hp, maybe pick a different shape.
          * If we're not already shifted and in good health, maybe shift.
          */
         if (mon->data->mlet != S_VAMPIRE) {
             if ((mon->mhp <= (mon->mhpmax + 5) / 6) && rn2(4)
-                && mon->cham >= LOW_PM)
-                (void) newcham(mon, &mons[mon->cham], FALSE, msg);
+                && mon->cham >= LOW_PM) {
+                ptr = &mons[mon->cham];
+                dochng = TRUE;
+            } else if (mon->data == &mons[PM_FOG_CLOUD]
+                     && mon->mhp == mon->mhpmax && !rn2(4)
+                     && (!canseemon(mon)
+                         || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
+                /* if a fog cloud, maybe change to wolf or vampire bat;
+                   those are more likely to take damage--at least when
+                   tame--and then switch back to vampire; they'll also
+                   switch to fog cloud if they encounter a closed door */
+                mndx = pickvampshape(mon);
+                if (mndx >= LOW_PM) {
+                    ptr = &mons[mndx];
+                    dochng = (ptr != mon->data);
+                }
+            }
         } else {
             if (mon->mhp >= 9 * mon->mhpmax / 10 && !rn2(6)
                 && (!canseemon(mon)
                     || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM))
-                (void) newcham(mon, (struct permonst *) 0, FALSE, msg);
+                dochng = TRUE; /* 'ptr' stays Null */
         }
-        /* override the 10% chance for sex change */
-        ptr = mon->data;
-        if (!is_male(ptr) && !is_female(ptr) && !is_neuter(ptr))
-            mon->female = was_female;
+    }
+    if (dochng) {
+        if (newcham(mon, ptr, FALSE, msg) && is_vampshifter(mon)) {
+            /* for vampshift, override the 10% chance for sex change */
+            ptr = mon->data;
+            if (!is_male(ptr) && !is_female(ptr) && !is_neuter(ptr))
+                mon->female = was_female;
+        }
     }
 }
 

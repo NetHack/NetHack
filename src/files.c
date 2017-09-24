@@ -1,6 +1,8 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1502581476 2017/08/12 23:44:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1503309020 2017/08/21 09:50:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+
+#define NEED_VARARGS
 
 #include "hack.h"
 #include "dlb.h"
@@ -190,20 +192,32 @@ STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
 STATIC_DCL void FDECL(set_configfile_name, (const char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, BOOLEAN_P,
+STATIC_DCL int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
                                   int, const char *));
-int FDECL(parse_config_line, (FILE *, char *, int));
+boolean FDECL(proc_wizkit_line, (char *));
+boolean FDECL(parse_config_line, (char *));
+STATIC_DCL boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
 STATIC_DCL FILE *NDECL(fopen_sym_file);
+boolean FDECL(proc_symset_line, (char *));
 STATIC_DCL void FDECL(set_symhandling, (char *, int));
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
+STATIC_DCL boolean FDECL(config_error_nextline, (const char *));
+STATIC_DCL void NDECL(free_config_sections);
+STATIC_DCL char *FDECL(choose_random_part, (char *, CHAR_P));
+STATIC_DCL boolean FDECL(is_config_section, (const char *));
+STATIC_DCL boolean FDECL(handle_config_section, (char *));
 #ifdef SELF_RECOVER
 STATIC_DCL boolean FDECL(copy_bytes, (int, int));
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
 #endif
+
+
+static char *config_section_chosen = (char *) 0;
+static char *config_section_current = (char *) 0;
 
 /*
  * fname_encode()
@@ -697,17 +711,47 @@ d_level *lev;
     s_level *sptr;
     char *dptr;
 
-    Sprintf(file, "bon%c%s", dungeons[lev->dnum].boneid,
+    /*
+     * "bonD0.nn"   = bones for level nn in the main dungeon;
+     * "bonM0.T"    = bones for Minetown;
+     * "bonQBar.n"  = bones for level n in the Barbarian quest;
+     * "bon3D0.nn"  = \
+     * "bon3M0.T"   =  > same as above, but for bones pool #3.
+     * "bon3QBar.n" = /
+     *
+     * Return value for content validation skips "bon" and the
+     * pool number (if present), making it feasible for the admin
+     * to manually move a bones file from one pool to another by
+     * renaming it.
+     */
+    Strcpy(file, "bon");
+#ifdef SYSCF
+    if (sysopt.bones_pools > 1) {
+        unsigned poolnum = min((unsigned) sysopt.bones_pools, 10);
+
+        poolnum = (unsigned) ubirthday % poolnum; /* 0..9 */
+        Sprintf(eos(file), "%u", poolnum);
+    }
+#endif
+    dptr = eos(file); /* this used to be after the following Sprintf()
+                         and the return value was (dptr - 2) */
+    /* when this naming scheme was adopted, 'filecode' was one letter;
+       3.3.0 turned it into a three letter string (via roles[] in role.c);
+       from that version through 3.6.0, 'dptr' pointed past the filecode
+       and the return value of (dptr - 2)  was wrong for bones produced
+       in the quest branch, skipping the boneid character 'Q' and the
+       first letter of the role's filecode; bones loading still worked
+       because the bonesid used for validation had the same error */
+    Sprintf(dptr, "%c%s", dungeons[lev->dnum].boneid,
             In_quest(lev) ? urole.filecode : "0");
-    dptr = eos(file);
     if ((sptr = Is_special(lev)) != 0)
-        Sprintf(dptr, ".%c", sptr->boneid);
+        Sprintf(eos(dptr), ".%c", sptr->boneid);
     else
-        Sprintf(dptr, ".%d", lev->dlevel);
+        Sprintf(eos(dptr), ".%d", lev->dlevel);
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
-    return (dptr - 2);
+    return dptr;
 }
 
 /* set up temporary file name for writing bones, to avoid another game's
@@ -1205,7 +1249,7 @@ boolean uncomp;
     if (freopen(filename, mode, stream) == (FILE *) 0) {
         (void) fprintf(stderr, "freopen of %s for %scompress failed\n",
                        filename, uncomp ? "un" : "");
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 }
 
@@ -1311,7 +1355,7 @@ boolean uncomp;
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to %scompress %s failed.\n",
                        uncomp ? "un" : "", filename);
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     } else if (f == -1) {
         perror((char *) 0);
         pline("Fork to %scompress %s failed.", uncomp ? "un" : "", filename);
@@ -1643,8 +1687,10 @@ int retryct;
 #ifdef USE_FCNTL
     lockfd = open(filename, O_RDWR);
     if (lockfd == -1) {
-        HUP raw_printf("Cannot open file %s. This is a program bug.",
+        HUP raw_printf("Cannot open file %s. Is NetHack installed correctly?",
                        filename);
+        nesting--;
+        return FALSE;
     }
     sflock.l_type = F_WRLCK;
     sflock.l_whence = SEEK_SET;
@@ -2004,15 +2050,13 @@ int src;
 }
 
 /*
- * Retrieve a list of integers from a file into a uchar array.
+ * Retrieve a list of integers from buf into a uchar array.
  *
  * NOTE: zeros are inserted unless modlist is TRUE, in which case the list
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
 STATIC_OVL int
-get_uchars(fp, buf, bufp, list, modlist, size, name)
-FILE *fp;         /* input file pointer */
-char *buf;        /* read buffer, must be of size BUFSZ */
+get_uchars(bufp, list, modlist, size, name)
 char *bufp;       /* current pointer */
 uchar *list;      /* return list */
 boolean modlist;  /* TRUE: list is being modified in place */
@@ -2058,13 +2102,7 @@ const char *name; /* name of option for error message */
             break;
 
         case '\\':
-            if (fp == (FILE *) 0)
-                goto gi_error;
-            do {
-                if (!fgets(buf, BUFSZ, fp))
-                    goto gi_error;
-            } while (buf[0] == '#');
-            bufp = buf;
+            goto gi_error;
             break;
 
         default:
@@ -2098,13 +2136,111 @@ int prefixid;
 }
 #endif
 
+/* Choose at random one of the sep separated parts from str. Mangles str. */
+STATIC_OVL char *
+choose_random_part(str,sep)
+char *str;
+char sep;
+{
+    int nsep = 1;
+    int csep;
+    int len = 0;
+    char *begin = str;
+
+    if (!str)
+        return (char *) 0;
+
+    while (*str) {
+	if (*str == sep) nsep++;
+	str++;
+    }
+    csep = rn2(nsep);
+    str = begin;
+    while ((csep > 0) && *str) {
+	str++;
+	if (*str == sep) csep--;
+    }
+    if (*str) {
+	if (*str == sep) str++;
+	begin = str;
+	while (*str && *str != sep) {
+	    str++;
+	    len++;
+	}
+	*str = '\0';
+	if (len)
+            return begin;
+    }
+    return (char *) 0;
+}
+
+STATIC_OVL void
+free_config_sections()
+{
+    if (config_section_chosen) {
+        free(config_section_chosen);
+        config_section_chosen = NULL;
+    }
+    if (config_section_current) {
+        free(config_section_current);
+        config_section_current = NULL;
+    }
+}
+
+STATIC_OVL boolean
+is_config_section(str)
+const char *str;
+{
+    const char *a = rindex(str, ']');
+
+    return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
+}
+
+STATIC_OVL boolean
+handle_config_section(buf)
+char *buf;
+{
+    if (is_config_section(buf)) {
+        char *send;
+        if (config_section_current) {
+            free(config_section_current);
+        }
+        config_section_current = dupstr(&buf[1]);
+        send = rindex(config_section_current, ']');
+        *send = '\0';
+        debugpline1("set config section: '%s'", config_section_current);
+        return TRUE;
+    }
+
+    if (config_section_current) {
+        if (!config_section_chosen)
+            return TRUE;
+        if (strcmp(config_section_current, config_section_chosen))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 #define match_varname(INP, NAM, LEN) match_optname(INP, NAM, LEN, TRUE)
 
-int
-parse_config_line(fp, origbuf, src)
-FILE *fp;
+/* find the '=' or ':' */
+char *
+find_optparam(buf)
+const char *buf;
+{
+    char *bufp, *altp;
+
+    bufp = index(buf, '=');
+    altp = index(buf, ':');
+    if (!bufp || (altp && altp < bufp))
+        bufp = altp;
+
+    return bufp;
+}
+
+boolean
+parse_config_line(origbuf)
 char *origbuf;
-int src;
 {
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
     static boolean ramdisk_specified = FALSE;
@@ -2112,25 +2248,23 @@ int src;
 #ifdef SYSCF
     int n;
 #endif
-    char *bufp, *altp, buf[4 * BUFSZ];
+    char *bufp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
+    boolean retval = TRUE;
+    int src = iflags.parse_config_file_src;
 
     /* convert any tab to space, condense consecutive spaces into one,
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
     mungspaces(strcpy(buf, origbuf));
-    /* lines beginning with '#' are comments; accept empty lines too */
-    if (!*buf || *buf == '#' || !strcmp(buf, " "))
-        return 1;
 
     /* find the '=' or ':' */
-    bufp = index(buf, '=');
-    altp = index(buf, ':');
-    if (!bufp || (altp && altp < bufp))
-        bufp = altp;
-    if (!bufp)
-        return 0;
+    bufp = find_optparam(buf);
+    if (!bufp) {
+        config_error_add("Not a config statement, missing '='");
+        return FALSE;
+    }
     /* skip past '=', then space between it and value, if any */
     ++bufp;
     if (*bufp == ' ')
@@ -2144,21 +2278,21 @@ int src;
         /* hack: un-mungspaces to allow consecutive spaces in
            general options until we verify that this is unnecessary;
            '=' or ':' is guaranteed to be present */
-        bufp = index(origbuf, '=');
-        altp = index(origbuf, ':');
-        if (!bufp || (altp && altp < bufp))
-            bufp = altp;
+        bufp = find_optparam(origbuf);
         ++bufp; /* skip '='; parseoptions() handles spaces */
 
-        parseoptions(bufp, TRUE, TRUE);
+        if (!parseoptions(bufp, TRUE, TRUE))
+            retval = FALSE;
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "BINDINGS", 4)) {
-        parsebindings(bufp);
+        if (!parsebindings(bufp))
+            retval = FALSE;
     } else if (match_varname(buf, "AUTOCOMPLETE", 5)) {
         parseautocomplete(bufp, TRUE);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
-        (void) msgtype_parse_add(bufp);
+        if (!msgtype_parse_add(bufp))
+            retval = FALSE;
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);
@@ -2278,6 +2412,14 @@ int src;
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
+    } else if (src == SET_IN_SYS && match_varname(buf, "BONES_POOLS", 10)) {
+        /* max value of 10 guarantees (N % bones.pools) will be one digit
+           so we don't lose control of the length of bones file names */
+        n = atoi(bufp);
+        sysopt.bones_pools = (n <= 0) ? 0 : min(n, 10);
+        /* note: right now bones_pools==0 is the same as bones_pools==1,
+           but we could change that and make bones_pools==0 become an
+           indicator to suppress bones usage altogether */
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
@@ -2298,8 +2440,8 @@ int src;
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
         if (src != SET_IN_SYS && n != 0) {
-            raw_printf("Illegal value in SEDUCE");
-            return 0;
+            config_error_add("Illegal value in SEDUCE");
+            return FALSE;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
@@ -2307,45 +2449,45 @@ int src;
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
-            raw_printf("Illegal value in MAXPLAYERS (maximum is 25).");
-            return 0;
+            config_error_add("Illegal value in MAXPLAYERS (maximum is 25).");
+            return FALSE;
         }
         sysopt.maxplayers = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf("Illegal value in PERSMAX (minimum is 1).");
-            return 0;
+            config_error_add("Illegal value in PERSMAX (minimum is 1).");
+            return FALSE;
         }
         sysopt.persmax = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
-            raw_printf("Illegal value in PERS_IS_UID (must be 0 or 1).");
-            return 0;
+            config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
+            return FALSE;
         }
         sysopt.pers_is_uid = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
-            raw_printf("Illegal value in ENTRYMAX (minimum is 10).");
-            return 0;
+            config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
+            return FALSE;
         }
         sysopt.entrymax = n;
     } else if ((src == SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf("Illegal value in POINTSMIN (minimum is 1).");
-            return 0;
+            config_error_add("Illegal value in POINTSMIN (minimum is 1).");
+            return FALSE;
         }
         sysopt.pointsmin = n;
     } else if (src == SET_IN_SYS
                && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
-            raw_printf(
+            config_error_add(
                 "Illegal value in MAX_STATUENAME_RANK (minimum is 1).");
-            return 0;
+            return FALSE;
         }
         sysopt.tt_oname_maxrank = n;
 
@@ -2355,8 +2497,8 @@ int src;
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
         if (n < 0 || n > 2) {
-            raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
-            return 0;
+            config_error_add("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
+            return FALSE;
         }
 #endif
         sysopt.panictrace_libc = n;
@@ -2365,16 +2507,16 @@ int src;
         n = atoi(bufp);
 #if defined(PANICTRACE)
         if (n < 0 || n > 2) {
-            raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
-            return 0;
+            config_error_add("Illegal value in PANICTRACE_GDB (not 0,1,2).");
+            return FALSE;
         }
 #endif
         sysopt.panictrace_gdb = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            raw_printf("File specified in GDBPATH does not exist.");
-            return 0;
+            config_error_add("File specified in GDBPATH does not exist.");
+            return FALSE;
         }
 #endif
         if (sysopt.gdbpath)
@@ -2383,8 +2525,8 @@ int src;
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            raw_printf("File specified in GREPPATH does not exist.");
-            return 0;
+            config_error_add("File specified in GREPPATH does not exist.");
+            return FALSE;
         }
 #endif
         if (sysopt.greppath)
@@ -2393,45 +2535,20 @@ int src;
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
-        (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE, 1,
+        (void) get_uchars(bufp, &iflags.bouldersym, TRUE, 1,
                           "BOULDER");
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
-        (void) add_menu_coloring(bufp);
+        if (!add_menu_coloring(bufp))
+            retval = FALSE;
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(fp, buf, bufp, translate, FALSE, WARNCOUNT,
+        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "SYMBOLS", 4)) {
-        char *op, symbuf[BUFSZ];
-        boolean morelines;
-
-        do {
-            /* check for line continuation (trailing '\') */
-            op = eos(bufp);
-            morelines = (--op >= bufp && *op == '\\');
-            if (morelines) {
-                *op = '\0';
-                /* strip trailing space now that '\' is gone */
-                if (--op >= bufp && *op == ' ')
-                    *op = '\0';
-            }
-            /* parse here */
-            if (!parsesymbols(bufp)) {
-                raw_printf("Error in SYMBOLS definition '%s'.\n", bufp);
-                wait_synch();
-            }
-            if (morelines) {
-                do {
-                    *symbuf = '\0';
-                    if (!fgets(symbuf, BUFSZ, fp)) {
-                        morelines = FALSE;
-                        break;
-                    }
-                    mungspaces(symbuf);
-                    bufp = symbuf;
-                } while (*bufp == '#');
-            }
-        } while (morelines);
+        if (!parsesymbols(bufp)) {
+            config_error_add("Error in SYMBOLS definition '%s'", bufp);
+            retval = FALSE;
+        }
         switch_symbols(TRUE);
     } else if (match_varname(buf, "WIZKIT", 6)) {
         (void) strncpy(wizkit, bufp, WIZKIT_MAX - 1);
@@ -2574,9 +2691,11 @@ int src;
 
         qt_compact_mode = atoi(bufp);
 #endif
-    } else
-        return 0;
-    return 1;
+    } else {
+        config_error_add("Unknown config statement");
+        return FALSE;
+    }
+    return retval;
 }
 
 #ifdef USER_SOUNDS
@@ -2588,43 +2707,148 @@ const char *filename;
 }
 #endif /* USER_SOUNDS */
 
+struct _config_error_frame {
+    int line_num;
+    int num_errors;
+    boolean origline_shown;
+    boolean fromfile;
+    boolean secure;
+    char origline[4 * BUFSZ];
+    char source[BUFSZ];
+    struct _config_error_frame *next;
+};
+
+struct _config_error_frame *config_error_data = (struct _config_error_frame *)0;
+
+void
+config_error_init(from_file, sourcename, secure)
+boolean from_file;
+const char *sourcename;
+boolean secure;
+{
+    struct _config_error_frame *tmp = (struct _config_error_frame *)
+        alloc(sizeof(struct _config_error_frame));
+
+    tmp->line_num = 0;
+    tmp->num_errors = 0;
+    tmp->origline_shown = FALSE;
+    tmp->fromfile = from_file;
+    tmp->secure = secure;
+    tmp->origline[0] = '\0';
+    if (sourcename && sourcename[0]) {
+        (void) strncpy(tmp->source, sourcename, sizeof(tmp->source)-1);
+        tmp->source[sizeof(tmp->source)-1] = '\0';
+    } else
+        tmp->source[0] = '\0';
+
+    tmp->next = config_error_data;
+    config_error_data = tmp;
+}
+
+STATIC_OVL boolean
+config_error_nextline(line)
+const char *line;
+{
+    struct _config_error_frame *ced = config_error_data;
+
+    if (!ced)
+        return FALSE;
+
+    if (ced->num_errors && ced->secure)
+        return FALSE;
+
+    ced->line_num++;
+    ced->origline_shown = FALSE;
+    if (line && line[0]) {
+        (void) strncpy(ced->origline, line, sizeof(ced->origline)-1);
+        ced->origline[sizeof(ced->origline)-1] = '\0';
+    } else
+        ced->origline[0] = '\0';
+
+    return TRUE;
+}
+
+/*VARARGS1*/
+void config_error_add
+VA_DECL(const char *, str)
+{
+    char buf[BUFSZ];
+    char lineno[QBUFSZ];
+
+    VA_START(str);
+    VA_INIT(str, char *);
+
+    Vsprintf(buf, str, VA_ARGS);
+
+    if (!config_error_data) {
+        pline("%s.", *buf ? buf : "Unknown error");
+        wait_synch();
+        return;
+    }
+
+    config_error_data->num_errors++;
+    if (!config_error_data->origline_shown
+        && !config_error_data->secure) {
+        pline("\n%s", config_error_data->origline);
+        config_error_data->origline_shown = TRUE;
+    }
+    if (config_error_data->line_num > 0
+        && !config_error_data->secure) {
+        Sprintf(lineno, "Line %i: ", config_error_data->line_num);
+    } else
+        lineno[0] = '\0';
+    pline("%s %s%s.",
+          config_error_data->secure ? "Error:" : " *",
+          lineno,
+          *buf ? buf : "Unknown error");
+
+    VA_END();
+}
+
+int
+config_error_done()
+{
+    int n;
+    struct _config_error_frame *tmp = config_error_data;
+
+    if (!config_error_data)
+        return 0;
+    n = config_error_data->num_errors;
+    if (n) {
+        pline("\n%i error%s in %s.\n", n,
+                   (n > 1) ? "s" : "",
+                   *config_error_data->source
+              ? config_error_data->source : configfile);
+        wait_synch();
+    }
+
+    config_error_data = tmp->next;
+
+    free(tmp);
+
+    return n;
+}
+
 boolean
 read_config_file(filename, src)
 const char *filename;
 int src;
 {
-    char buf[4 * BUFSZ];
     FILE *fp;
-    boolean rv = TRUE; /* assume successful parse */
+    boolean rv = TRUE;
 
     if (!(fp = fopen_config_file(filename, src)))
         return FALSE;
 
     /* begin detection of duplicate configfile options */
     set_duplicate_opt_detection(1);
+    free_config_sections();
+    iflags.parse_config_file_src = src;
 
-    while (fgets(buf, sizeof buf, fp)) {
-#ifdef notyet
-/*
-XXX Don't call read() in parse_config_line, read as callback or reassemble
-line at this level.
-OR: Forbid multiline stuff for alternate config sources.
-*/
-#endif
-        if (!parse_config_line(fp, strip_newline(buf), src)) {
-            static const char badoptionline[] = "Bad option line: \"%s\"";
-
-            /* truncate buffer if it's long; this is actually conservative */
-            if (strlen(buf) > BUFSZ - sizeof badoptionline)
-                buf[BUFSZ - sizeof badoptionline] = '\0';
-
-            raw_printf(badoptionline, buf);
-            wait_synch();
-            rv = FALSE;
-        }
-    }
+    rv = parse_conf_file(fp, parse_config_line);
     (void) fclose(fp);
 
+    free_config_sections();
     /* turn off detection of duplicate configfile options */
     set_duplicate_opt_detection(0);
     return rv;
@@ -2728,47 +2952,171 @@ struct obj *obj;
     }
 }
 
+
+boolean
+proc_wizkit_line(buf)
+char *buf;
+{
+    struct obj *otmp = readobjnam(buf, (struct obj *) 0);
+
+    if (otmp) {
+        if (otmp != &zeroobj)
+            wizkit_addinv(otmp);
+    } else {
+        /* .60 limits output line width to 79 chars */
+        config_error_add("Bad wizkit item: \"%.60s\"", buf);
+        return FALSE;
+    }
+    return TRUE;
+}
+
 void
 read_wizkit()
 {
     FILE *fp;
-    char *ep, buf[BUFSZ];
-    struct obj *otmp;
-    boolean bad_items = FALSE, skip = FALSE;
 
     if (!wizard || !(fp = fopen_wizkit_file()))
         return;
 
     program_state.wizkit_wishing = 1;
-    while (fgets(buf, (int) (sizeof buf), fp)) {
-        ep = index(buf, '\n');
+    config_error_init(TRUE, "WIZKIT", FALSE);
+
+    parse_conf_file(fp, proc_wizkit_line);
+    (void) fclose(fp);
+
+    config_error_done();
+    program_state.wizkit_wishing = 0;
+
+    return;
+}
+
+/* parse_conf_file
+ *
+ * Read from file fp, handling comments, empty lines, config sections,
+ * CHOOSE, and line continuation, calling proc for every valid line.
+ *
+ * Continued lines are merged together with one space in between.
+ */
+STATIC_OVL boolean
+parse_conf_file(fp, proc)
+FILE *fp;
+boolean FDECL((*proc), (char *));
+{
+    char inbuf[4 * BUFSZ];
+    boolean rv = TRUE; /* assume successful parse */
+    char *ep;
+    boolean skip = FALSE, morelines = FALSE;
+    char *buf = (char *) 0;
+
+    free_config_sections();
+
+    while (fgets(inbuf, (int) (sizeof inbuf), fp)) {
+        ep = index(inbuf, '\n');
         if (skip) { /* in case previous line was too long */
             if (ep)
                 skip = FALSE; /* found newline; next line is normal */
         } else {
-            if (!ep)
+            if (!ep) {
+                config_error_add("Line too long, skipping");
                 skip = TRUE; /* newline missing; discard next fgets */
-            else
+            } else {
+                char *tmpbuf = (char *) 0;
+                int len;
+                boolean ignoreline = FALSE;
+                boolean oldline = FALSE;
+
                 *ep = '\0'; /* remove newline */
 
-            if (buf[0]) {
-                otmp = readobjnam(buf, (struct obj *) 0);
-                if (otmp) {
-                    if (otmp != &zeroobj)
-                        wizkit_addinv(otmp);
-                } else {
-                    /* .60 limits output line width to 79 chars */
-                    raw_printf("Bad wizkit item: \"%.60s\"", buf);
-                    bad_items = TRUE;
+                /* line continuation (trailing '\') */
+                morelines = (--ep >= inbuf && *ep == '\\');
+                if (morelines)
+                    *ep = '\0';
+
+                /* trim off spaces at end of line */
+                while (--ep >= inbuf && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
+                    *ep = '\0';
+
+                if (!config_error_nextline(inbuf)) {
+                    rv = FALSE;
+                    if (buf)
+                        free(buf), buf = (char *) 0;
+                    break;
                 }
+
+                ep = inbuf;
+                while (*ep == ' ' || *ep == '\t') ep++;
+
+                /* lines beginning with '#' are comments. ignore empty lines. */
+                if (!*ep || *ep == '#')
+                    ignoreline = TRUE;
+
+                if (buf)
+                    oldline = TRUE;
+
+                /* merge now read line with previous ones, if necessary */
+                if (!ignoreline) {
+                    len = strlen(inbuf) + 1;
+                    if (buf)
+                        len += strlen(buf);
+                    tmpbuf = (char *) alloc(len);
+                    if (buf) {
+                        Sprintf(tmpbuf, "%s %s", buf, inbuf);
+                        free(buf);
+                    } else
+                        Strcpy(tmpbuf, inbuf);
+                    buf = tmpbuf;
+                }
+
+                if (morelines || (ignoreline && !oldline))
+                    continue;
+
+                if (handle_config_section(ep)) {
+                    free(buf);
+                    buf = (char *) 0;
+                    continue;
+                }
+
+                /* from here onwards, we'll handle buf only */
+
+                if (match_varname(buf, "CHOOSE", 6)) {
+                    char *section;
+                    char *bufp = find_optparam(buf);
+                    if (!bufp) {
+                        config_error_add("Format is CHOOSE=section1,section2,...");
+                        rv = FALSE;
+                        free(buf);
+                        buf = (char *) 0;
+                        continue;
+                    }
+                    bufp++;
+                    if (config_section_chosen)
+                        free(config_section_chosen);
+                    section = choose_random_part(bufp, ',');
+                    if (section)
+                        config_section_chosen = dupstr(section);
+                    else {
+                        config_error_add("No config section to choose");
+                        rv = FALSE;
+                    }
+                    free(buf);
+                    buf = (char *) 0;
+                    continue;
+                }
+
+                if (!proc(buf))
+                    rv = FALSE;
+
+                free(buf);
+                buf = (char *) 0;
             }
         }
     }
-    program_state.wizkit_wishing = 0;
-    if (bad_items)
-        wait_synch();
-    (void) fclose(fp);
-    return;
+
+    if (buf)
+        free(buf);
+
+    free_config_sections();
+    return rv;
 }
 
 extern struct symsetentry *symset_list;  /* options.c */
@@ -2777,6 +3125,7 @@ extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 static int symset_count = 0;             /* for pick-list building only */
 static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
+static int symset_which_set = 0;
 
 STATIC_OVL
 FILE *
@@ -2796,7 +3145,6 @@ int
 read_sym_file(which_set)
 int which_set;
 {
-    char buf[4 * BUFSZ];
     FILE *fp;
 
     if (!(fp = fopen_sym_file()))
@@ -2804,13 +3152,13 @@ int which_set;
 
     symset_count = 0;
     chosen_symset_start = chosen_symset_end = FALSE;
-    while (fgets(buf, 4 * BUFSZ, fp)) {
-        if (!parse_sym_line(buf, which_set)) {
-            raw_printf("Bad symbol line:  \"%.50s\"", buf);
-            wait_synch();
-        }
-    }
+    symset_which_set = which_set;
+
+    config_error_init(TRUE, "symbols", FALSE);
+
+    parse_conf_file(fp, proc_symset_line);
     (void) fclose(fp);
+
     if (!chosen_symset_start && !chosen_symset_end) {
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
@@ -2820,15 +3168,24 @@ int which_set;
                            " -_", TRUE)
                 || !strcmpi(symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
+        config_error_done();
         return (symset[which_set].name == 0) ? 1 : 0;
     }
-    if (!chosen_symset_end) {
-        raw_printf("Missing finish for symset \"%s\"",
+    if (!chosen_symset_end)
+        config_error_add("Missing finish for symset \"%s\"",
                    symset[which_set].name ? symset[which_set].name
                                           : "unknown");
-        wait_synch();
-    }
+
+    config_error_done();
+
     return 1;
+}
+
+boolean
+proc_symset_line(buf)
+char *buf;
+{
+    return !((boolean) parse_sym_line(buf, symset_which_set));
 }
 
 /* returns 0 on error */
@@ -2844,8 +3201,7 @@ int which_set;
     /* convert each instance of whitespace (tabs, consecutive spaces)
        into a single space; leading and trailing spaces are stripped */
     mungspaces(buf);
-    if (!*buf || *buf == '#' || !strcmp(buf, " "))
-        return 1;
+
     /* remove trailing comment, if any (this isn't strictly needed for
        individual symbols, and it won't matter if "X#comment" without
        separating space slips through; for handling or set description,
@@ -2867,6 +3223,7 @@ int which_set;
             chosen_symset_start = FALSE;
             return 1;
         }
+        config_error_add("No \"finish\"");
         return 0;
     }
     /* skip '=' and space which follows, if any */
@@ -2875,8 +3232,10 @@ int which_set;
         ++bufp;
 
     symp = match_sym(buf);
-    if (!symp)
+    if (!symp) {
+        config_error_add("Unknown sym keyword");
         return 0;
+    }
 
     if (!symset[which_set].name) {
         /* A null symset name indicates that we're just
@@ -3111,7 +3470,7 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 #else
         fd = open(fq_record, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
 #endif
-        if (fd = < 0) {
+        if (fd <= 0) {
             raw_printf("Warning: cannot write record '%s'", tmp);
             wait_synch();
         } else {

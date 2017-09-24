@@ -394,6 +394,8 @@ poor message when shape-shifted vampire reverts if cause of 'death' was
 poor message when named vampire shifts shape within view:
 	You observe a Dracula where a Dracula was.
 vampire shifting into fog cloud to pass under door "oozed" rather than "flowed"
+vampires in fog cloud shape would tend to stay that way unless killed; give
+	them a chance to change to bat or wolf shape if not seen or far away
 adult green dragons and the Chromatic Dragon were blinded by gas clouds
 named floating eye (when hit by another monster with reflection) or named
 	silver weapon (when hero hits silver-hating monster) could disrupt
@@ -409,6 +411,41 @@ using a cursed whistle in a vault will summon the guard immediately
 throne room's throne is occupied by a king
 using a grappling hook and getting pulled toward the target into water would
 	drown hero without any chance to crawl out
+blinded monster who eats a carrot will have blindness cured (hero already did)
+the "bonesid" written into bones files when they're created so that they can
+	be validated when loaded was incorrect for bones in the quest branch
+	("QBar.2" ended up being "ar.2", "QKni.4" ended up as "ni.4", and so
+	forth) but worked anyway, because validation used same incorrect value
+surviving a gas spore's explosion would leave that explosion as a stale reason
+	for death which might show up strangely ("crushed to death by a gas
+	spore's explosion" when killed by an opening drawbridge)
+add database entry for "martial arts"
+starting inventory for rogues specified +9 lock pick, where +/-N is meaningless
+fix pile mark when picking up all-but-one items while invisible
+improve config file error reporting
+when polymorphed into something with a passive counterattack, being 'killed'
+	and returning to normal form allows a subset of counterattacks to
+	continue after telling the player than the hero has reverted; change
+	"Mon is splashed by your acid" to "Mon is splashed by acid" in that
+	situation so that the message sequence doesn't look quite so strange
+when returning to quest nemesis' level, the message for some roles (A,S,T,W)
+	referred to sensing presence of the quest artifact even if had been
+	removed from that level; give an alternate message in that situation
+when the Amulet increased spell casting cost, nothing actually happened (aside
+	from the message about feeling the Amulet drain the hero's power) if
+	hero lacked sufficient energy to cast the spell
+if was possible to leash an adjacent pet while engulfed
+if leash or unleash attempt was directed at "remembered, unseen monster" glyph
+	and yielded "there's no creature there", the glyph wasn't removed
+wizmode level teleport menu indicates on what level you currently are
+fix invisible gold symbol in status line when S_coin was set to space
+fix buffer overflow in wizard mode for '#' command when 'extmenu' option is on
+"you suddenly vomit" was given two turns before actually vomiting, so you
+	could get that message, move a bit, then get "you can move again"
+	after the 2 turn freeze applied along with the actual vomit
+fix mention_walls reporting secret doors as solid walls
+corpses and other flammable items not subject to direct burning or fire-based
+	erosion which were thrown or dropped into lava remained intact
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -461,6 +498,10 @@ wizhelp: ^O is #overview in wizard mode too; #wizwhere shows dungeon layout
 wishing for tins sometimes yielded a tin wand
 replace the fix for preventing putting on a helm of opposite alignment from
 	causing wielded Excalibur from blasting hero twice
+hero poly'd into vampire could drain monster down to 0 HP without killing it,
+	triggering impossible "dmonsfree: 1 removed doesn't match 0 pending"
+"you observe a fog cloud where a vampire/bat was" if an unseen vampire on the
+	far side of a closed door shifted shape to pass under that door
 
 
 Platform- and/or Interface-Specific Fixes
@@ -503,6 +544,7 @@ win32gui: handle menu_color attribute
 win32gui: name-from-discoveries list menu selector characters were punctuation
 	instead of letters, repeated for each class; caused by the core bug
 	of erroneously specifying space as a selector for class header lines
+win32gui: allow toggling mouse_support off
 MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
 MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
@@ -520,6 +562,8 @@ X11: color didn't work when the map was displayed as text rather than tiles
 X11: use grayscale monster tiles for statues
 X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
 	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
+PANICTRACE: PANICTRACE_GDB used wrong value for ARGV0 when launching gdb if
+	'nethack -dpath' was used to specify non-default playground directory
 
 
 General New Features
@@ -610,6 +654,18 @@ for menustyle:Full and Traditional and Combination, support BUCX filtering
 	for the 'A' command
 option whatis_filter to set filtering for eligible map locations when cursor
 	positioning
+blinded hero or monster who eats a nurse corpse will have blindness cured
+blinded hero or monster who breathes vapor from broken potion of healing,
+	extra healing, or full healing might have blindness cured (depends on
+	potion: full == always; extra == if not-cursed; plain == if blessed)
+sysconf definition BONES_POOLS to allow more bones files per level
+blessed scroll of fire lets you choose explosion location like stinking cloud
+optional sections in the config file, selected with CHOOSE
+new paranoid_confirm settings: wand-break to require "yes" rather than 'y'
+	to break a wand via (a)pply, and Were-change to require "yes" rather
+	than 'y' when hero inflicted with lycanthropy has polymorph control
+option force_invmenu to make commands asking for inventory items always
+	use a menu instead of a text line query
 
 
 Platform- and/or Interface-Specific New Features
