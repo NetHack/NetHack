@@ -3172,7 +3172,7 @@ domagictrap()
                                  and zero out oextra */
             pseudo.otyp = SCR_REMOVE_CURSE;
             HConfusion = 0L;
-            (void) seffects(&pseudo);
+            (void) seffects(&pseudo, NULL);
             HConfusion = save_conf;
             break;
         }
