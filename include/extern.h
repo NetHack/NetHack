@@ -1858,7 +1858,7 @@ E void NDECL(set_uasmon);
 E void NDECL(float_vs_flight);
 E void NDECL(change_sex);
 E void FDECL(polyself, (int));
-E int FDECL(polymon, (int));
+E int FDECL(polymon, (int, BOOLEAN_P));
 E void NDECL(rehumanize);
 E int NDECL(dobreathe);
 E int NDECL(dospit);

@@ -27,15 +27,11 @@ STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon, (int));
 STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon, (int));
-STATIC_DCL void NDECL(newman);
+STATIC_DCL void FDECL(newman, (BOOLEAN_P));
 STATIC_DCL void NDECL(polysense);
 
 STATIC_VAR const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
-
-/* controls whether taking on new form or becoming new man can also
-   change sex (ought to be an arg to polymon() and newman() instead) */
-STATIC_VAR int sex_change_ok = 0;
 
 /* update the youmonst.data structure pointer and intrinsics */
 void
@@ -266,7 +262,8 @@ change_sex()
 }
 
 STATIC_OVL void
-newman()
+newman(sex_change_ok)
+boolean sex_change_ok;
 {
     int i, oldlvl, newlvl, hpmax, enmax;
 
@@ -547,9 +544,9 @@ int psflags;
            so don't follow up with another polymon or newman;
            sex_change_ok left disabled here */
         if (mntmp == PM_HUMAN)
-            newman(); /* werecritter */
+            newman(FALSE); /* werecritter */
         else
-            (void) polymon(mntmp);
+            (void) polymon(mntmp, FALSE);
         goto made_change; /* maybe not, but this is right anyway */
     }
 
@@ -566,14 +563,12 @@ int psflags;
     /* The below polyok() fails either if everything is genocided, or if
      * we deliberately chose something illegal to force newman().
      */
-    sex_change_ok++;
     if (!polyok(&mons[mntmp]) || (!forcecontrol && !rn2(5))
         || your_race(&mons[mntmp])) {
-        newman();
+        newman(TRUE);
     } else {
-        (void) polymon(mntmp);
+        (void) polymon(mntmp, TRUE);
     }
-    sex_change_ok--; /* reset */
 
 made_change:
     new_light = emits_light(youmonst.data);
@@ -591,8 +586,9 @@ made_change:
 /* (try to) make a mntmp monster out of the player;
    returns 1 if polymorph successful */
 int
-polymon(mntmp)
+polymon(mntmp, sex_change_ok)
 int mntmp;
+boolean sex_change_ok;
 {
     char buf[BUFSZ];
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
