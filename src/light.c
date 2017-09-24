@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
 
+/* NOTE: early initialization in this module is currently not needed */
+
 /*
  * Mobile light sources.
  *

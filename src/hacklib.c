@@ -3,6 +3,8 @@
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* NOTE: early initialization in this module is currently not needed */
+
 #include "hack.h" /* for config.h+extern.h */
 /*=
     Assorted 'small' utility routines.  They're virtually independent of
@@ -61,6 +63,7 @@
         int             night           (void)
         int             midnight        (void)
 =*/
+
 #ifdef LINT
 #define Static /* pacify lint */
 #else

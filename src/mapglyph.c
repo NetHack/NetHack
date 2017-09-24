@@ -2,6 +2,8 @@
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* NOTE: early initialization in this module is currently not needed */
+
 #include "hack.h"
 #if defined(TTY_GRAPHICS)
 #include "wintty.h" /* for prototype of has_color() only */
@@ -9,7 +11,7 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
-static int explcolors[] = {
+static const int explcolors[] = {
     CLR_BLACK,   /* dark    */
     CLR_GREEN,   /* noxious */
     CLR_BROWN,   /* muddy   */

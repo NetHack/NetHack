@@ -49,7 +49,7 @@ struct sortloot_item {
     struct obj *obj;
     int indx;
 };
-unsigned sortlootmode = 0;
+unsigned sortlootmode = UNDEFINED;
 
 /* qsort comparison routine for sortloot() */
 STATIC_OVL int CFDECLSPEC

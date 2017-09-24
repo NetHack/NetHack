@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 STATIC_PTR int NDECL(picklock);
 STATIC_PTR int NDECL(forcelock);
 
@@ -260,7 +262,7 @@ struct obj *pick;
 
     /* check whether we're resuming an interrupted previous attempt */
     if (xlock.usedtime && picktyp == xlock.picktyp) {
-        static char no_longer[] = "Unfortunately, you can no longer %s %s.";
+        static const char no_longer[] = "Unfortunately, you can no longer %s %s.";
 
         if (nohands(youmonst.data)) {
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
