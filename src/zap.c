@@ -16,9 +16,6 @@ static NEARDATA int poly_zapped;
 
 extern boolean notonhead; /* for long worms */
 
-/* kludge to use mondied instead of killed */
-extern boolean m_using;
-
 STATIC_DCL void FDECL(polyuse, (struct obj *, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
