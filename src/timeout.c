@@ -535,7 +535,7 @@ nh_timeout()
                      * are to make noise when you fumble.  Adjustments
                      * to this number must be thoroughly play tested.
                      */
-                    if ((inv_weight() > -500)) {
+                    if ((above_capacity() > -500)) {
                         You("make a lot of noise!");
                         wake_nearby();
                     }

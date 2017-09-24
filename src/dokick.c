@@ -227,8 +227,8 @@ xchar x, y;
         return;
     }
 
-    i = -inv_weight();
     j = weight_cap();
+    i = j - player_weight();
 
     if (i < (j * 3) / 10) {
         if (!rn2((i < j / 10) ? 2 : (i < j / 5) ? 3 : 4)) {
@@ -939,7 +939,7 @@ dokick()
             int range;
 
             range =
-                ((int) youmonst.data->cwt + (weight_cap() + inv_weight()));
+                ((int) youmonst.data->cwt + (player_weight()));
             if (range < 1)
                 range = 1; /* divide by zero avoidance */
             range = (3 * (int) mdat->cwt) / range;

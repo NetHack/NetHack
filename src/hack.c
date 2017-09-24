@@ -330,7 +330,7 @@ moverock()
             }
 
             if (!u.usteed
-                && (((!invent || inv_weight() <= -850)
+                && (((!invent || above_capacity() <= -850)
                      && (!u.dx || !u.dy || (IS_ROCK(levl[u.ux][sy].typ)
                                             && IS_ROCK(levl[sx][u.uy].typ))))
                     || verysmall(youmonst.data))) {
@@ -641,7 +641,7 @@ struct monst *mon;
         return 1;
 
     /* lugging too much junk? */
-    amt = (mon == &youmonst) ? inv_weight() + weight_cap()
+    amt = (mon == &youmonst) ? player_weight()
                              : curr_mon_load(mon);
     if (amt > 600)
         return 2;
@@ -2896,12 +2896,8 @@ weight_cap()
     return (int) carrcap;
 }
 
-static int wc; /* current weight_cap(); valid after call to inv_weight() */
-
-/* returns how far beyond the normal capacity the player is currently. */
-/* inv_weight() is negative if the player is below normal capacity. */
-int
-inv_weight()
+/* returns player weight */
+int player_weight()
 {
     register struct obj *otmp = invent;
     register int wt = 0;
@@ -2913,8 +2909,16 @@ inv_weight()
             wt += otmp->owt;
         otmp = otmp->nobj;
     }
-    wc = weight_cap();
-    return (wt - wc);
+
+    return wt;
+}
+
+/* returns how far beyond the normal capacity the player is currently. */
+/* above_capacity() is negative if the player is below normal capacity. */
+int
+above_capacity()
+{
+    return (player_weight() - weight_cap());
 }
 
 /*
@@ -2925,7 +2929,9 @@ int
 calc_capacity(xtra_wt)
 int xtra_wt;
 {
-    int cap, wt = inv_weight() + xtra_wt;
+    int pw = player_weight();
+    int wc = weight_cap();
+    int cap, wt = (pw - wc) + xtra_wt;
 
     if (wt <= 0)
         return UNENCUMBERED;
@@ -2944,9 +2950,7 @@ near_capacity()
 int
 max_capacity()
 {
-    int wt = inv_weight();
-
-    return (wt - (2 * wc));
+    return (player_weight() - (3 * weight_cap()));
 }
 
 boolean

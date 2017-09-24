@@ -3883,7 +3883,7 @@ boolean force_failure;
     /* duplicate tight-space checks from test_move */
     if (u.dx && u.dy && bad_rock(youmonst.data, u.ux, ttmp->ty)
         && bad_rock(youmonst.data, ttmp->tx, u.uy)) {
-        if ((invent && (inv_weight() + weight_cap() > 600))
+        if ((invent && (player_weight() > 600))
             || bigmonst(youmonst.data)) {
             /* don't allow untrap if they can't get thru to it */
             You("are unable to reach the %s!",
@@ -4166,7 +4166,7 @@ struct trap *ttmp;
     }
 
     /* is the monster too heavy? */
-    wt = inv_weight() + mtmp->data->cwt;
+    wt = above_capacity() + mtmp->data->cwt;
     if (!try_lift(mtmp, ttmp, wt, FALSE))
         return 1;
 

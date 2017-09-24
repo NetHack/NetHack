@@ -890,7 +890,7 @@ u_init()
         }
 
     /* make sure you can carry all you have - especially for Tourists */
-    while (inv_weight() > 0) {
+    while (above_capacity() > 0) {
         if (adjattrib(A_STR, 1, TRUE))
             continue;
         if (adjattrib(A_CON, 1, TRUE))

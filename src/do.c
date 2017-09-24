@@ -1025,7 +1025,7 @@ doup()
         return 1;
     }
     if (near_capacity() > SLT_ENCUMBER) {
-        /* No levitation check; inv_weight() already allows for it */
+        /* No levitation check; above_capacity() already allows for it */
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
         return 1;

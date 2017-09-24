@@ -609,7 +609,7 @@ int x, y;
         if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
             && bad_rock(youmonst.data, x, u.uy)) {
             boolean too_much =
-                (invent && (inv_weight() + weight_cap() > 600));
+                (invent && (player_weight() > 600));
             /* Move at a diagonal. */
             if (bigmonst(youmonst.data) || too_much) {
                 You("%sget forcefully wedged into a crevice.",
