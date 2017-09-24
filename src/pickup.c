@@ -66,8 +66,8 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 /* A variable set in use_container(), to be used by the callback routines
    in_container() and out_container() from askchain() and use_container().
    Also used by menu_loot() and container_gone(). */
-static NEARDATA struct obj *current_container;
-static NEARDATA boolean abort_looting;
+static NEARDATA struct obj *current_container = UNDEFINED;
+static NEARDATA boolean abort_looting = UNDEFINED;
 #define Icebox (current_container->otyp == ICE_BOX)
 
 static const char
@@ -325,7 +325,7 @@ boolean picked_some;
 }
 
 /* Value set by query_objlist() for n_or_more(). */
-static long val_for_n_or_more;
+static long val_for_n_or_more = UNDEFINED;
 
 /* query_objlist callback: return TRUE if obj's count is >= reference value */
 STATIC_OVL boolean
@@ -339,8 +339,9 @@ struct obj *obj;
 
 /* list of valid menu classes for query_objlist() and allow_category callback
    (with room for all object classes, 'u'npaid, BUCX, and terminator) */
-static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
-static boolean class_filter, bucx_filter, shop_filter;
+static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1] = { UNDEFINED };
+static boolean class_filter = UNDEFINED, bucx_filter = UNDEFINED,
+               shop_filter = UNDEFINED;
 
 /* check valid_menu_classes[] for an entry; also used by askchain() */
 boolean
@@ -1518,12 +1519,15 @@ struct obj *otmp;
     return addinv(otmp); /* might merge it with other objects */
 }
 
+/* oldcap retains the last level of encumberence messaged to user during
+ * the course of a game.
+ */
+static int oldcap = UNENCUMBERED;
+
 /*
  * prints a message if encumbrance changed since the last check and
  * returns the new encumbrance value (from near_capacity()).
  */
-static int oldcap = UNENCUMBERED;
-
 int
 encumber_msg()
 {
