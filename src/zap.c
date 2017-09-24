@@ -4965,7 +4965,7 @@ int damage, tell;
     if (damage) {
         mtmp->mhp -= damage;
         if (mtmp->mhp < 1) {
-            if (m_using)
+            if (context.mon_moving)
                 monkilled(mtmp, "", AD_RBRE);
             else
                 killed(mtmp);
