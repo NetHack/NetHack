@@ -6,6 +6,8 @@
 
 #include "hack.h"
 
+/* NOTE: early initialization in this module is currently not needed */
+
 STATIC_DCL void NDECL(dowatersnakes);
 STATIC_DCL void NDECL(dowaterdemon);
 STATIC_DCL void NDECL(dowaternymph);
