@@ -2102,6 +2102,7 @@ E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
 E void NDECL(role_init);
 E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
+E void NDECL(role_early_init);
 
 /* ### rumors.c ### */
 
