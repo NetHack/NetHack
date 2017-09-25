@@ -5,11 +5,12 @@
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
-                                       int, int, struct attack *));
+                                       int, int, struct attack *, int));
 STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *, struct attack *));
-STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int));
+STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
+                                       int));
 STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst * mtmp,
@@ -23,8 +24,7 @@ STATIC_DCL void FDECL(nohandglow, (struct monst *));
 STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
 
 extern boolean notonhead; /* for long worms */
-/* The below might become a parameter instead if we use it a lot */
-static int dieroll;
+
 /* Used to flag attacks caused by Stormbringer's maliciousness. */
 static boolean override_confirmation = FALSE;
 
@@ -434,12 +434,13 @@ atk_done:
 
 /* really hit target monster; returns TRUE if it still lives */
 STATIC_OVL boolean
-known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk)
+known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, dieroll)
 register struct monst *mon;
 struct obj *weapon;
 int *mhit;
 int rollneeded, armorpenalty; /* for monks */
 struct attack *uattk;
+int dieroll;
 {
     register boolean malive = TRUE;
 
@@ -463,7 +464,7 @@ struct attack *uattk;
         /* we hit the monster; be careful: it might die or
            be knocked into a different location */
         notonhead = (mon->mx != x || mon->my != y);
-        malive = hmon(mon, weapon, HMON_MELEE);
+        malive = hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             /* monster still alive */
             if (!rn2(25) && mon->mhp < mon->mhpmax / 2
@@ -499,11 +500,12 @@ struct attack *uattk;
     int armorpenalty, attknum = 0, x = u.ux + u.dx, y = u.uy + u.dy,
                       tmp = find_roll_to_hit(mon, uattk->aatyp, uwep,
                                              &attknum, &armorpenalty);
+    int dieroll;
     int mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
 
     if (tmp > dieroll)
         exercise(A_DEX, TRUE);
-    malive = known_hitum(mon, uwep, &mhit, tmp, armorpenalty, uattk);
+    malive = known_hitum(mon, uwep, &mhit, tmp, armorpenalty, uattk, dieroll);
     /* second attack for two-weapon combat; won't occur if Stormbringer
        overrode confirmation (assumes Stormbringer is primary weapon)
        or if the monster was killed or knocked to different location */
@@ -511,7 +513,8 @@ struct attack *uattk;
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
         mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
-        malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk);
+        malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk,
+                             dieroll);
     }
     if (wepbefore && !uwep)
         wep_was_destroyed = TRUE;
@@ -521,16 +524,17 @@ struct attack *uattk;
 
 /* general "damage monster" routine; return True if mon still alive */
 boolean
-hmon(mon, obj, thrown)
+hmon(mon, obj, thrown, dieroll)
 struct monst *mon;
 struct obj *obj;
 int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
+int dieroll;
 {
     boolean result, anger_guards;
 
     anger_guards = (mon->mpeaceful
                     && (mon->ispriest || mon->isshk || is_watch(mon->data)));
-    result = hmon_hitmon(mon, obj, thrown);
+    result = hmon_hitmon(mon, obj, thrown, dieroll);
     if (mon->ispriest && !rn2(2))
         ghod_hitsu(mon);
     if (anger_guards)
@@ -540,10 +544,11 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
 
 /* guts of hmon() */
 STATIC_OVL boolean
-hmon_hitmon(mon, obj, thrown)
+hmon_hitmon(mon, obj, thrown, dieroll)
 struct monst *mon;
 struct obj *obj;
 int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
+int dieroll;
 {
     int tmp;
     struct permonst *mdat = mon->data;
@@ -2115,6 +2120,7 @@ register struct monst *mon;
     struct obj *weapon;
     boolean altwep = FALSE, weapon_used = FALSE;
     int i, tmp, armorpenalty, sum[NATTK], nsum = 0, dhit = 0, attknum = 0;
+    int dieroll;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
@@ -2140,7 +2146,8 @@ register struct monst *mon;
                                    &armorpenalty);
             dhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
             /* Enemy dead, before any special abilities used */
-            if (!known_hitum(mon, weapon, &dhit, tmp, armorpenalty, mattk)) {
+            if (!known_hitum(mon, weapon, &dhit, tmp, armorpenalty, mattk,
+                             dieroll)) {
                 sum[i] = 2;
                 break;
             } else
