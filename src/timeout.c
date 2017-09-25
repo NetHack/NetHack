@@ -203,7 +203,7 @@ vomiting_dialogue()
                countdown, and it was still possible to move around between
                that message and "You can move again." (from vomit()'s
                nomul(-2)) with no intervening message; give one here to
-               have a more specific at which hero became unable to move
+               have more specific point at which hero became unable to move
                [vomit() issues its own message for the cantvomit() case] */
             You("%s!", !Hallucination ? "vomit" : "hurl chunks");
         }
