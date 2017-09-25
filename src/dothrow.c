@@ -1386,6 +1386,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
     register int disttmp; /* distance modifier */
     int otyp = obj->otyp, hmode;
     boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
+    int dieroll;
 
     hmode = (obj == uwep) ? HMON_APPLIED
               : (obj == kickedobj) ? HMON_KICKED
@@ -1533,13 +1534,13 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
             tmp += weapon_hit_bonus(obj);
         }
 
-        if (tmp >= rnd(20)) {
+        if (tmp >= (dieroll = rnd(20))) {
             boolean wasthrown = (thrownobj != 0);
 
             /* attack hits mon */
             if (hmode == HMON_APPLIED)
                 u.uconduct.weaphit++;
-            if (hmon(mon, obj, hmode)) { /* mon still alive */
+            if (hmon(mon, obj, hmode, dieroll)) { /* mon still alive */
                 cutworm(mon, bhitpos.x, bhitpos.y, obj);
             }
             exercise(A_DEX, TRUE);
@@ -1585,11 +1586,11 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
     } else if (otyp == HEAVY_IRON_BALL) {
         exercise(A_STR, TRUE);
-        if (tmp >= rnd(20)) {
+        if (tmp >= (dieroll = rnd(20))) {
             int was_swallowed = guaranteed_hit;
 
             exercise(A_DEX, TRUE);
-            if (!hmon(mon, obj, hmode)) { /* mon killed */
+            if (!hmon(mon, obj, hmode, dieroll)) { /* mon killed */
                 if (was_swallowed && !u.uswallow && obj == uball)
                     return 1; /* already did placebc() */
             }
@@ -1599,9 +1600,9 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
     } else if (otyp == BOULDER) {
         exercise(A_STR, TRUE);
-        if (tmp >= rnd(20)) {
+        if (tmp >= (dieroll = rnd(20))) {
             exercise(A_DEX, TRUE);
-            (void) hmon(mon, obj, hmode);
+            (void) hmon(mon, obj, hmode, dieroll);
         } else {
             tmiss(obj, mon, TRUE);
         }
@@ -1609,7 +1610,8 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
     } else if ((otyp == EGG || otyp == CREAM_PIE || otyp == BLINDING_VENOM
                 || otyp == ACID_VENOM)
                && (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
-        (void) hmon(mon, obj, hmode);
+        dieroll = rnd(20); /* what dieroll should we use here? */
+        (void) hmon(mon, obj, hmode, dieroll);
         return 1; /* hmon used it up */
 
     } else if (obj->oclass == POTION_CLASS
