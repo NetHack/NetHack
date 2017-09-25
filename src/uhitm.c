@@ -731,7 +731,8 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
             else
                 setuwep((struct obj *) 0);
             freeinv(obj);
-            potionhit(mon, obj, TRUE);
+            potionhit(mon, obj,
+                      hand_to_hand ? POTHIT_HERO_BASH : POTHIT_HERO_THROW);
             if (mon->mhp <= 0)
                 return FALSE; /* killed */
             hittxt = TRUE;

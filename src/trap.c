@@ -844,7 +844,7 @@ register struct trap *trap;
 unsigned trflags;
 {
     register int ttype = trap->ttyp;
-    register struct obj *otmp;
+    struct obj *otmp;
     boolean already_seen = trap->tseen,
             forcetrap = (trflags & FORCETRAP) != 0,
             webmsgok = (trflags & NOWEBMSG) == 0,
@@ -915,8 +915,9 @@ unsigned trflags;
         otmp->opoisoned = 0;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        } else if (thitu(8, dmgval(otmp, &youmonst), otmp, "arrow")) {
-            obfree(otmp, (struct obj *) 0);
+        } else if (thitu(8, dmgval(otmp, &youmonst), &otmp, "arrow")) {
+            if (otmp)
+                obfree(otmp, (struct obj *) 0);
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind)
@@ -944,13 +945,15 @@ unsigned trflags;
         oldumort = u.umortality;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        } else if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
-            if (otmp->opoisoned)
-                poisoned("dart", A_CON, "little dart",
-                         /* if damage triggered life-saving,
-                            poison is limited to attrib loss */
-                         (u.umortality > oldumort) ? 0 : 10, TRUE);
-            obfree(otmp, (struct obj *) 0);
+        } else if (thitu(7, dmgval(otmp, &youmonst), &otmp, "little dart")) {
+            if (otmp) {
+                if (otmp->opoisoned)
+                    poisoned("dart", A_CON, "little dart",
+                             /* if damage triggered life-saving,
+                                poison is limited to attrib loss */
+                             (u.umortality > oldumort) ? 0 : 10, TRUE);
+                obfree(otmp, (struct obj *) 0);
+            }
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind)
@@ -1802,7 +1805,7 @@ int style;
             if (multi)
                 nomul(0);
             if (thitu(9 + singleobj->spe, dmgval(singleobj, &youmonst),
-                      singleobj, (char *) 0))
+                      &singleobj, (char *) 0))
                 stop_occupation();
         }
         if (style == ROLL) {

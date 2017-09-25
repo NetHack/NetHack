@@ -884,7 +884,7 @@ boolean hitsroof;
     /* object now hits you */
 
     if (obj->oclass == POTION_CLASS) {
-        potionhit(&youmonst, obj, TRUE);
+        potionhit(&youmonst, obj, POTHIT_HERO_THROW);
     } else if (breaktest(obj)) {
         int otyp = obj->otyp;
         int blindinc;
@@ -1086,7 +1086,7 @@ boolean
                    && rn2(6)) {
             /* alternative to prayer or wand of opening/spell of knock
                for dealing with cursed saddle:  throw holy water > */
-            potionhit(u.usteed, obj, TRUE);
+            potionhit(u.usteed, obj, POTHIT_HERO_THROW);
         } else {
             hitfloor(obj);
         }
@@ -1614,7 +1614,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
     } else if (obj->oclass == POTION_CLASS
                && (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
-        potionhit(mon, obj, TRUE);
+        potionhit(mon, obj, POTHIT_HERO_THROW);
         return 1;
 
     } else if (befriend_with_obj(mon->data, obj)
