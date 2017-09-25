@@ -966,7 +966,7 @@ anything *arg;
 long timeout;
 {
     struct obj *obj = arg->a_obj;
-    boolean canseeit, many, menorah, need_newsym;
+    boolean canseeit, many, menorah, need_newsym, need_invupdate;
     xchar x, y;
     char whose[BUFSZ];
 
@@ -983,6 +983,7 @@ long timeout;
 
             if (menorah) {
                 obj->spe = 0; /* no more candles */
+                obj->owt = weight(obj);
             } else if (Is_candle(obj) || obj->otyp == POT_OIL) {
                 /* get rid of candles and burning oil potions;
                    we know this object isn't carried by hero,
@@ -1007,7 +1008,7 @@ long timeout;
     } else {
         canseeit = FALSE;
     }
-    need_newsym = FALSE;
+    need_newsym = need_invupdate = FALSE;
 
     /* obj->age is the age remaining at this point.  */
     switch (obj->otyp) {
@@ -1016,6 +1017,8 @@ long timeout;
         if (canseeit) {
             switch (obj->where) {
             case OBJ_INVENT:
+                need_invupdate = TRUE;
+                /*FALLTHRU*/
             case OBJ_MINVENT:
                 pline("%spotion of oil has burnt away.", whose);
                 break;
@@ -1077,6 +1080,8 @@ long timeout;
             if (canseeit || obj->where == OBJ_INVENT) {
                 switch (obj->where) {
                 case OBJ_INVENT:
+                    need_invupdate = TRUE;
+                    /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
                         pline("%slantern has run out of power.", whose);
@@ -1154,6 +1159,8 @@ long timeout;
                 if (menorah) {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        need_invupdate = TRUE;
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%scandelabrum's flame%s.", whose,
                               many ? "s die" : " dies");
@@ -1166,15 +1173,18 @@ long timeout;
                 } else {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        /* no need_invupdate for update_inventory() necessary;
+                           useupall() -> freeinv() handles it */
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
                         break;
                     case OBJ_FLOOR:
                         /*
-                        You see some wax candles consumed!
-                        You see a wax candle consumed!
-                        */
+                          You see some wax candles consumed!
+                          You see a wax candle consumed!
+                         */
                         You_see("%s%s consumed!", many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
@@ -1192,6 +1202,7 @@ long timeout;
 
             if (menorah) {
                 obj->spe = 0;
+                obj->owt = weight(obj);
             } else {
                 if (carried(obj)) {
                     useupall(obj);
@@ -1205,7 +1216,7 @@ long timeout;
                 }
                 obj = (struct obj *) 0;
             }
-            break;
+            break; /* case [age ==] 0 */
 
         default:
             /*
@@ -1218,8 +1229,7 @@ long timeout;
 
         if (obj && obj->age)
             begin_burn(obj, TRUE);
-
-        break;
+        break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
         impossible("burn_object: unexpeced obj %s", xname(obj));
@@ -1227,6 +1237,8 @@ long timeout;
     }
     if (need_newsym)
         newsym(x, y);
+    if (need_invupdate)
+        update_inventory();
 }
 
 /*

@@ -42,6 +42,7 @@ struct obj {
 
     schar spe; /* quality of weapon, weptool, armor or ring (+ or -);
                   number of charges for wand or charged tool ( >= -1 );
+                  number of candles attached to candelabrum;
                   marks your eggs, tin variety and spinach tins;
                   Schroedinger's Box (1) or royal coffers for a court (2);
                   tells which fruit a fruit is;

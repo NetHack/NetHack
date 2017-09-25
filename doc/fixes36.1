@@ -443,11 +443,13 @@ fix buffer overflow in wizard mode for '#' command when 'extmenu' option is on
 "you suddenly vomit" was given two turns before actually vomiting, so you
 	could get that message, move a bit, then get "you can move again"
 	after the 2 turn freeze applied along with the actual vomit
-fix mention_walls reporting secret doors as solid walls
 corpses and other flammable items not subject to direct burning or fire-based
 	erosion which were thrown or dropped into lava remained intact
 if a potion on the floor survived a land mine explosion and got propelled at
 	the hero, it didn't behave like a potion if it hit
+adjust candelabrum's weight when candles are attached
+when lit candelabrum burned out, persistent inventory window showed that it
+	was no longer lit but still showed phantom candles attached
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -504,6 +506,7 @@ hero poly'd into vampire could drain monster down to 0 HP without killing it,
 	triggering impossible "dmonsfree: 1 removed doesn't match 0 pending"
 "you observe a fog cloud where a vampire/bat was" if an unseen vampire on the
 	far side of a closed door shifted shape to pass under that door
+fix mention_walls reporting secret doors as solid stone
 
 
 Platform- and/or Interface-Specific Fixes

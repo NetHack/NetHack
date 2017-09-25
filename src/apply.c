@@ -1224,6 +1224,9 @@ struct obj **optr;
             end_burn(obj, TRUE);
         /* candles are now gone */
         useupall(obj);
+        /* candelabrum's weight is changing */
+        otmp->owt = weight(otmp);
+        update_inventory();
     }
 }
 
