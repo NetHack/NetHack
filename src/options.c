@@ -3963,6 +3963,12 @@ int nset;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
+int
+count_apes()
+{
+    return count_ape_maps((int *) 0, (int *) 0);
+}
+
 enum opt_other_enums {
     OPT_OTHER_MSGTYPE = -4,
     OPT_OTHER_MENUCOLOR = -3,
@@ -3971,17 +3977,18 @@ enum opt_other_enums {
     /* these must be < 0 */
 };
 
-/* presently only used when determining longest option name */
 static struct other_opts {
     const char *name;
     int optflags;
     enum opt_other_enums code;
+    int NDECL((*othr_count_func));
 } othropt[] = {
-    { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC },
-    { "menucolors", SET_IN_GAME, OPT_OTHER_MENUCOLOR },
-    { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE },
+    { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC, count_apes },
+    { "menucolors", SET_IN_GAME, OPT_OTHER_MENUCOLOR, count_menucolors },
+    { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE, msgtype_count },
 #ifdef STATUS_HILITES
-    { "status hilite rules", SET_IN_GAME, OPT_OTHER_STATHILITE },
+    { "status hilite rules", SET_IN_GAME, OPT_OTHER_STATHILITE,
+      count_status_hilites },
 #endif
     { (char *) 0, 0, (enum opt_other_enums) 0 },
 };
@@ -4110,16 +4117,10 @@ doset() /* changing options via menu by Per Liboriussen */
              "Other settings:",
              MENU_UNSELECTED);
 
-    opts_add_others(tmpwin, "autopickup exceptions", OPT_OTHER_APEXC,
-                    NULL, count_ape_maps((int *) 0, (int *) 0));
-    opts_add_others(tmpwin, "menucolors", OPT_OTHER_MENUCOLOR,
-                    NULL, count_menucolors());
-    opts_add_others(tmpwin, "message types", OPT_OTHER_MSGTYPE,
-                    NULL, msgtype_count());
-#ifdef STATUS_HILITES
-    opts_add_others(tmpwin, "status hilite rules", OPT_OTHER_STATHILITE,
-                    NULL, count_status_hilites());
-#endif
+    for (i = 0; othropt[i].name; i++)
+        opts_add_others(tmpwin, othropt[i].name, othropt[i].code,
+                        NULL, othropt[i].othr_count_func());
+
 #ifdef PREFIXES_IN_USE
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
