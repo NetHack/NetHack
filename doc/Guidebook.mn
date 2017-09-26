@@ -2569,7 +2569,7 @@ with tiles, generally displays a small plus-symbol beside the object
 on the top of the pile.
 .lp hitpointbar
 Show a hit point bar graph behind your name and title.
-Only available for TTY, and only when statushilites is on.
+Only available for TTY and Windows GUI, and only when statushilites is on.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
