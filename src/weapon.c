@@ -388,7 +388,7 @@ static NEARDATA const int pwep[] = { HALBERD,       BARDICHE, SPETUM,
                                      BEC_DE_CORBIN, FAUCHARD, PARTISAN,
                                      LANCE };
 
-static struct obj *propellor;
+static struct obj *propellor = UNDEFINED;
 
 /* select a ranged weapon for the monster */
 struct obj *

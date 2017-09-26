@@ -11,8 +11,8 @@
  */
 #define MAGIC_COOKIE 1000
 
-static NEARDATA boolean obj_zapped;
-static NEARDATA int poly_zapped;
+static NEARDATA boolean obj_zapped = UNDEFINED;
+static NEARDATA int poly_zapped = UNDEFINED;
 
 extern boolean notonhead; /* for long worms */
 
