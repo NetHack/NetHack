@@ -500,8 +500,8 @@ struct attack *uattk;
     int armorpenalty, attknum = 0, x = u.ux + u.dx, y = u.uy + u.dy,
                       tmp = find_roll_to_hit(mon, uattk->aatyp, uwep,
                                              &attknum, &armorpenalty);
-    int dieroll;
-    int mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+    int dieroll = rnd(20);
+    int mhit = (tmp > dieroll || u.uswallow);
 
     if (tmp > dieroll)
         exercise(A_DEX, TRUE);
@@ -512,7 +512,8 @@ struct attack *uattk;
     if (u.twoweap && !override_confirmation && malive && m_at(x, y) == mon) {
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
-        mhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+        dieroll = rnd(20);
+        mhit = (tmp > dieroll || u.uswallow);
         malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk,
                              dieroll);
     }
@@ -2143,7 +2144,8 @@ register struct monst *mon;
             altwep = !altwep; /* toggle for next attack */
             tmp = find_roll_to_hit(mon, AT_WEAP, weapon, &attknum,
                                    &armorpenalty);
-            dhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+            dieroll = rnd(20);
+            dhit = (tmp > dieroll || u.uswallow);
             /* Enemy dead, before any special abilities used */
             if (!known_hitum(mon, weapon, &dhit, tmp, armorpenalty, mattk,
                              dieroll)) {
@@ -2175,7 +2177,8 @@ register struct monst *mon;
         case AT_TENT:
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
-            dhit = (tmp > (dieroll = rnd(20)) || u.uswallow);
+            dieroll = rnd(20);
+            dhit = (tmp > dieroll || u.uswallow);
             if (dhit) {
                 int compat;
 

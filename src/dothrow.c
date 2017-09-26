@@ -1496,6 +1496,8 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
         return 0;
     }
 
+    dieroll = rnd(20);
+
     if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
         || obj->oclass == GEM_CLASS) {
         if (hmode == HMON_KICKED) {
@@ -1536,7 +1538,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
             tmp += weapon_hit_bonus(obj);
         }
 
-        if (tmp >= (dieroll = rnd(20))) {
+        if (tmp >= dieroll) {
             boolean wasthrown = (thrownobj != 0);
 
             /* attack hits mon */
@@ -1588,7 +1590,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
     } else if (otyp == HEAVY_IRON_BALL) {
         exercise(A_STR, TRUE);
-        if (tmp >= (dieroll = rnd(20))) {
+        if (tmp >= dieroll) {
             int was_swallowed = guaranteed_hit;
 
             exercise(A_DEX, TRUE);
@@ -1602,7 +1604,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
     } else if (otyp == BOULDER) {
         exercise(A_STR, TRUE);
-        if (tmp >= (dieroll = rnd(20))) {
+        if (tmp >= dieroll) {
             exercise(A_DEX, TRUE);
             (void) hmon(mon, obj, hmode, dieroll);
         } else {
@@ -1612,7 +1614,6 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
     } else if ((otyp == EGG || otyp == CREAM_PIE || otyp == BLINDING_VENOM
                 || otyp == ACID_VENOM)
                && (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
-        dieroll = rnd(20); /* what dieroll should we use here? */
         (void) hmon(mon, obj, hmode, dieroll);
         return 1; /* hmon used it up */
 
