@@ -1027,7 +1027,6 @@ boolean is_restoring;
     POST;
 }
 
-#ifdef STATUS_VIA_WINDOWPORT
 void
 trace_status_init(vp)
 void *vp;
@@ -1084,10 +1083,11 @@ boolean enable;
 }
 
 void
-trace_status_update(vp, idx, ptr, chg, percent)
+trace_status_update(vp, idx, ptr, chg, color, colormasks)
 void *vp;
 int idx, chg, percent;
 genericptr_t ptr;
+unsigned long *colormasks;
 {
     struct trace_data *tdp = vp;
 
@@ -1095,32 +1095,9 @@ genericptr_t ptr;
             ptr, chg, percent);
 
     PRE;
-    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, percent);
+    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, color colormasks);
     POST;
 }
-
-#ifdef STATUS_HILITES
-void
-trace_status_threshold(vp, fldidx, thresholdtype, threshold, behavior, under,
-                       over)
-void *vp;
-int fldidx, thresholdtype;
-int behavior, under, over;
-anything threshold;
-{
-    struct trace_data *tdp = vp;
-
-    /* XXX how do we print an anything?  We don't. */
-    fprintf(wc_tracelogf, "%sstatus_threshold(%d, %d, -, %d, %d, %d)\n",
-            INDENT, fldidx, thresholdtype, behavior, under, over);
-
-    PRE;
-    (*tdp->nprocs->win_status_threshold)(tdp->ndata, fldidx, thresholdtype,
-                                         threshold, behavior, under, over);
-    POST;
-}
-#endif
-#endif
 
 boolean
 trace_can_suspend(vp)
@@ -1179,12 +1156,7 @@ struct chain_procs trace_procs = {
 
     trace_outrip, trace_preference_update, trace_getmsghistory,
     trace_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     trace_status_init, trace_status_finish, trace_status_enablefield,
     trace_status_update,
-#ifdef STATUS_HILITES
-    trace_status_threshold,
-#endif
-#endif
     trace_can_suspend,
 };

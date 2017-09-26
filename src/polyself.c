@@ -107,9 +107,11 @@ set_uasmon()
             youmonst.movement = new_speed * youmonst.movement / old_speed;
     }
 
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_initialize(REASSESS_ONLY);
 #endif
+
+    polysense();
 }
 
 /* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */

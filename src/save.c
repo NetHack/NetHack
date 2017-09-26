@@ -1410,7 +1410,7 @@ freedynamicdata()
     /* free_pickinv_cache();  --  now done from really_done()... */
     free_symsets();
 #endif /* FREE_ALL_MEMORY */
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_finish();
 #endif
 #ifdef DUMPLOG

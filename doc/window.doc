@@ -401,7 +401,7 @@ status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)
 		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
 		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- There are MAXBLSTATS status fields (from botl.h)
-status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
+status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color, long *colormasks)
 		-- update the value of a status field.
 		-- the fldindex identifies which field is changing and
 		   is an integer index value from botl.h
@@ -417,58 +417,124 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
 		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
 		   If fldindex is BL_CONDITION, then ptr is a long value with
 		   any or none of the following bits set (from botl.h):
-			BL_MASK_BLIND		0x00000001L
-			BL_MASK_CONF		0x00000002L
-			BL_MASK_FOODPOIS	0x00000004L
-			BL_MASK_ILL		0x00000008L
-			BL_MASK_HALLU		0x00000010L
-			BL_MASK_STUNNED		0x00000020L
-			BL_MASK_SLIMED		0x00000040L
+                        BL_MASK_STONE           0x00000001L
+                        BL_MASK_SLIME           0x00000002L
+                        BL_MASK_STRNGL          0x00000004L
+                        BL_MASK_FOODPOIS        0x00000008L
+                        BL_MASK_TERMILL         0x00000010L
+                        BL_MASK_BLIND           0x00000020L
+                        BL_MASK_DEAF            0x00000040L
+                        BL_MASK_STUN            0x00000080L
+                        BL_MASK_CONF            0x00000100L
+                        BL_MASK_HALLU           0x00000200L
+                        BL_MASK_LEV             0x00000400L
+                        BL_MASK_FLY             0x00000800L
+                        BL_MASK_RIDE            0x00001000L
 		-- The value passed for BL_GOLD includes a leading
 		   symbol for GOLD "$:nnn". If the window port needs to use 
 		   the textual gold amount without the leading "$:" the port 
 		   will have to add 2 to the passed "ptr" for the BL_GOLD case.
+                -- color is an unsigned int.
+                   int & 0x00FF = color CLR_*
+                   int >> 8 = attribute (if any)
+
+                   This contains the color and attribute that the field should
+                   be displayed in.
+
+                   This is relevant for everything except BL_CONDITION fldindex.
+                   If fldindex is BL_CONDITION, this parameter should be ignored,
+                   as condition hilighting is done via the next colormasks
+                   parameter instead.
+
+                -- colormasks - pointer to cond_hilites[] array of colormasks.
+
+                   Only relevant for BL_CONDITION fldindex. The window port
+                   should ignore this parameter for other fldindex values.
+
+                   Each condition bit must only ever appear in one of the
+                   CLR_ array members, but can appear in multiple HL_ATTCLR_
+                   offsets (because more than one attribute can co-exist).
+
+                   For the user's chosen set of BL_MASK_ condition bits,
+                   They are stored internally in the cond_hilites[] array,
+                   at the array offset aligned to the color those condtion
+                   bits should display in.
+
+                   For example, if the user has chosen to display strngl
+                   and stone and termill in red and inverse,
+
+                        BL_MASK_SLIME           0x00000002
+                        BL_MASK_STRNGL          0x00000004
+                        BL_MASK_TERMILL         0x00000010
+
+                   The bitmask corresponding to those conditions is
+                   0x00000016 (or 00010110 in binary) and the color
+                   is at offset 1 (CLR_RED).
+
+                   Here is how that is stored in the cond_hilites[] array:
+
+                   +------+----------------------+--------------------+
+                   |array |                      |                    |
+                   |offset| macro for indexing   |   bitmask          |
+                   |------+----------------------+--------------------+
+                   |   0  |   CLR_BLACK          |                    |
+                   +------+----------------------+--------------------+
+                   |   1  |   CLR_RED            |   00010110         |
+                   +------+----------------------+--------------------+
+                   |   2  |   CLR_GREEN          |                    |
+                   +------+----------------------+--------------------+
+                   |   3  |   CLR_BROWN          |                    |
+                   +------+----------------------+--------------------+
+                   |   4  |   CLR_BLUE           |                    |
+                   +------+----------------------+--------------------+
+                   |   5  |   CLR_MAGENTA        |                    |
+                   +------+----------------------+--------------------+
+                   |   6  |   CLR_CYAN           |                    |
+                   +------+----------------------+--------------------+
+                   |   7  |   CLR_GRAY           |                    |
+                   +------+----------------------+--------------------+
+                   |   8  |   NO_COLOR           |                    |
+                   +------+----------------------+--------------------+
+                   |   9  |   CLR_ORANGE         |                    |
+                   +------+----------------------+--------------------+
+                   |  10  |   CLR_BRIGHT_GREEN   |                    |
+                   +------+----------------------+--------------------+
+                   |  11  |   CLR_BRIGHT_YELLOW  |                    |
+                   +------+----------------------+--------------------+
+                   |  12  |   CLR_BRIGHT_BLUE    |                    |
+                   +------+----------------------+--------------------+
+                   |  13  |   CLR_BRIGHT_MAGENTA |                    |
+                   +------+----------------------+--------------------+
+                   |  14  |   CLR_BRIGHT_CYAN    |                    |
+                   +------+----------------------+--------------------+
+                   |  15  |   CLR_WHITE          |                    |
+                   +------+----------------------+--------------------+
+                   |  16  |   HL_ATTCLR_DIM      |                    | CLR_MAX
+                   +------+----------------------+--------------------+
+                   |  17  |   HL_ATTCLR_BLINK    |                    |
+                   +------+----------------------+--------------------+
+                   |  18  |   HL_ATTCLR_ULINE    |                    |
+                   +------+----------------------+--------------------+
+                   |  19  |   HL_ATTCLR_INVERSE  |   00010110         |
+                   +------+----------------------+--------------------+
+                   |  20  |   HL_ATTCLR_BOLD     |                    |
+                   +------+----------------------+--------------------+
+                   |  21  |  beyond array boundary                    | BL_ATTCLR_MAX
+
+                   The window port can AND (&) the bits passed in the
+                   ptr argument to status_update() with any non-zero
+                   entries in the cond_hilites[] array to determine
+                   the color and attributes for displaying the
+                   condition on the screen for the user.
+
+                   If the bit for a particular condition does not
+                   appear in any of the cond_hilites[] array offsets,
+                   that condition should be displayed in the default
+                   color and attributes.
 
 status_finish() -- called when it is time for the window port to tear down
 		   the status display and free allocated memory, etc.
 
-status_threshold(int fldidx, int threshholdtype, anything threshold, 
-					int behavior, int under, int over)
-		-- called when a hiliting preference is added, changed, or
-		   removed.
-		-- the fldindex identifies which field is having its hiliting
-		   preference set. It is an integer index value from botl.h
-		-- fldindex could be any one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
-		   BL_LEVELDESC, BL_EXP, BL_CONDITION
-		-- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
-		-- threshold is an "anything" union which can contain the 
-		   datatype value.
-		-- behavior is used to define how threshold is used and can
-		   be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
-		   or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
-		   or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
-		   threshold value as a precentage of the maximum possible
-		   value. BL_TH_VAL_ABSOLUTE means that the threshold is an
-		   actual value. BL_TH_UPDOWN means that threshold is not
-		   used, and the two below/above hilite values indicate how
-		   to display something going down (under) or rising (over).		    
-		-- under is the hilite attribute used if value is below the 
-		   threshold. The attribute can be BL_HILITE_NONE, 
-		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
-		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
-		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
-		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
-		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
-		-- over is the hilite attribute used if value is at or above 
-		   the threshold. The attribute can be BL_HILITE_NONE, 
-		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
-		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
-		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
-		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
-		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
 
 E.  Misc. Routines
 
@@ -703,6 +769,7 @@ to support:
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
@@ -723,6 +790,7 @@ font_status	-- port should use a font by this name for status display.
 font_text	-- port should use a font by this name for text windows.
 fullscreen      -- port should try to use the whole screen.
 hilite_pet	-- port should mark pets in some special way on the map.
+hitpointbar	-- port should show a graphical bar representing hit points
 map_mode	-- port should display the map in the manner specified.
 player_selection
 		-- dialog or prompts for choosing character.

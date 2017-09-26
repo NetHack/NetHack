@@ -42,9 +42,7 @@ void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
 int FDECL(process_keystroke,
           (INPUT_RECORD *, boolean *, BOOLEAN_P numberpad, int portdebug));
-#ifdef TEXTCOLOR
 static void NDECL(init_ttycolor);
-#endif
 static void NDECL(really_move_cursor);
 
 /* Win32 Console handles for input and output */
@@ -111,8 +109,10 @@ static DWORD ccount, acount;
 #ifndef CLR_MAX
 #define CLR_MAX 16
 #endif
+
 int ttycolors[CLR_MAX];
 int ttycolors_inv[CLR_MAX];
+
 #define MAX_OVERRIDES 256
 unsigned char key_overrides[MAX_OVERRIDES];
 static char nullstr[] = "";
@@ -158,7 +158,7 @@ gettty()
     init_ttycolor();
 #else
     for (k = 0; k < CLR_MAX; ++k)
-        ttycolors[k] = 7;
+        ttycolors[k] = NO_COLOR;
 #endif
 }
 
@@ -692,6 +692,7 @@ tty_delay_output()
 static void
 init_ttycolor()
 {
+#ifdef TEXTCOLOR
     ttycolors[CLR_BLACK]        = FOREGROUND_INTENSITY; /* fix by Quietust */
     ttycolors[CLR_RED]          = FOREGROUND_RED;
     ttycolors[CLR_GREEN]        = FOREGROUND_GREEN;
@@ -728,6 +729,15 @@ init_ttycolor()
     ttycolors_inv[CLR_BRIGHT_CYAN] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_INTENSITY;
     ttycolors_inv[CLR_WHITE]       = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED
                                        | BACKGROUND_INTENSITY;
+#else
+    int k;
+    ttycolors[0] = FOREGROUND_INTENSITY;
+    ttycolors_inv[0] = BACKGROUND_INTENSITY;
+    for (k = 1; k < SIZE(ttycolors); ++k) {
+        ttycolors[k] = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED;
+        ttycolors_inv[k] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
+    }
+#endif
     init_ttycolor_completed = TRUE;
 }
 #endif /* TEXTCOLOR */
@@ -739,7 +749,7 @@ has_color(int color)
     if ((color >= 0) && (color < CLR_MAX))
         return 1;
 #else
-    if ((color == CLR_BLACK) || (color == CLR_WHITE))
+    if ((color == CLR_BLACK) || (color == CLR_WHITE) || (color == NO_COLOR))
         return 1;
 #endif
     else
@@ -794,7 +804,7 @@ term_start_color(int color)
         console.current_nhcolor = color;
     } else
 #endif
-    console.current_nhcolor = color;
+    console.current_nhcolor = NO_COLOR;
 }
 
 void

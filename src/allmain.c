@@ -59,15 +59,12 @@ boolean resuming;
         context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
-    } else {                   /* restore old game */
-#ifndef WIN32
-        update_inventory(); /* for perm_invent */
-#endif
+    }
+    context.botlx = TRUE; /* for STATUS_HILITES */
+    update_inventory(); /* for perm_invent */
+    if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
     }
-#ifdef WIN32
-    update_inventory(); /* for perm_invent */
-#endif
 
     (void) encumber_msg(); /* in case they auto-picked up something */
     if (defer_see_monsters) {
@@ -317,6 +314,7 @@ boolean resuming;
             /* once-per-hero-took-time things go here */
             /******************************************/
 
+            status_eval_next_unhilite();
             if (context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
@@ -529,7 +527,7 @@ void
 display_gamewindows()
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_initialize(0);
 #else
     WIN_STATUS = create_nhwindow(NHW_STATUS);
@@ -553,7 +551,7 @@ display_gamewindows()
      * The mac port is not DEPENDENT on the order of these
      * displays, but it looks a lot better this way...
      */
-#ifndef STATUS_VIA_WINDOWPORT
+#ifndef STATUS_HILITES
     display_nhwindow(WIN_STATUS, FALSE);
 #endif
     display_nhwindow(WIN_MESSAGE, FALSE);

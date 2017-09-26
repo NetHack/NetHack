@@ -3141,6 +3141,10 @@ on the top of the pile.
 Name your starting horse (ex.\ ``{\tt horsename:Trigger}'').
 Cannot be set with the `{\tt O}' command.
 %.lp
+\item[\ib{hitpointbar}]
+Show a hit point bar graph behind your name and title.
+Only available for TTY, and only when statushilites is on.
+%.lp
 \item[\ib{ignintr}]
 Ignore interrupt signals, including breaks (default off).  Persistent.
 %.lp
@@ -3535,7 +3539,8 @@ attack to which it is resistant (default on).  Persistent.
 Boldface monsters and ``{\tt --More--}'' (default off).  Persistent.
 %.lp
 \item[\ib{statushilites}]
-Enable coloring of status fields (default off).
+Controls how many turns status hilite behaviors highlight
+the field. If negated or set to zero, disables status hiliting.
 See ``{\it Configuring Status Hilites\/}'' for further information.
 %.lp
 \item[\ib{status\verb+_+updates}]
@@ -4271,18 +4276,23 @@ The pattern should be a regular expression.
 Your copy of NetHack may have been compiled with support for {\it Status Hilites}.
 If so, you can customize your game display by setting thresholds to 
 change the color or appearance of fields in the status display.
-
+%.pg
+The format for defining status colors is:
+\begin{verbatim}
+    OPTION=hilite_status: field-name/behavior/color&attributes
+\end{verbatim}
+%.pg
 For example, the following line in your config file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
 \begin{verbatim}
-    OPTION=hilite_status: hitpoints/30%/red/normal
+    OPTION=hilite_status: hitpoints/<30%/red/normal
 \end{verbatim}
 %.pg
 For another example, the following line in your config file will cause
 wisdom to be displayed red if it drops and green if it rises.
 \begin{verbatim}
-    OPTION=hilite_status: wisdom/updown/red/green
+    OPTION=hilite_status: wisdom/down/red/up/green
 \end{verbatim}
 You can adjust the display of the following status fields:
 %.sd
@@ -4301,6 +4311,56 @@ experience & condition\\
 \end{tabular}
 \end{center}
 %.ed
+%.lp ""
+The pseudo-field `characteristics' can be used to set all six
+of Str, Dex, Con, Int, Wis, and Cha at once.  `HD' is `hit dice',
+an approximation of experience level displayed when polymorphed.
+`experience', `time', and `score' are conditionally displayed
+depending upon your other option settings.
+
+%.lp ""
+Instead of a behavior, `condition' takes the following condition flags:
+{\it stone}, {\it slime}, {\it strngl}, {\it foodpois}, {\it termill},
+{\it blind}, {\it deaf}, {\it stun}, {\it conf}, {\it hallu},
+{\it lev}, {\it fly}, and {\it ride}.  You can use `major\_troubles' as an alias
+for stone through termill, `minor\_troubles' for blind through hallu,
+`movement' for lev, fly, and ride, and `all' for every condition.
+
+%.lp ""
+Allowed behaviors are "always", "up", "down", "changed", a
+percentage or absolute number threshold, or a text to match against.
+
+\blist{}
+%.lp "*"
+\item{\bb{}}
+"always" will set the default attributes for that field.
+%.lp "*"
+\item{\bb{}}
+"up" and "down" set the field attributes for when the field
+value changes upwards or downwards. This attribute times out after
+statushilites turns.
+%.lp "*"
+\item{\bb{}}
+"changed" sets the field attribute for when the field value
+changes. This attribute times out after statushilites turns.
+%.lp "*"
+\item{\bb{}}
+percentage sets the field attribute when the field value
+matches the percentage. If the percentage is prefixed with `{\tt <}'
+or `{\tt >}', it also matches when value is below or above the percentage.
+Only valid for `power' and `hitpoints' fields.
+%.lp "*"
+\item{\bb{}}
+absolute value sets the attribute when the field value
+matches that number. If the number is prefixed with `{\tt <}'
+or `{\tt >}', it also matches when value is below or above.
+%.lp "*"
+\item{\bb{}}
+text match sets the attribute when the field value
+matches the text. Text matches can only be used for `alignment',
+`carrying-capacity', and `dungeon-level'.
+%.ei
+\elist
 
 %.lp ""
 Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
@@ -4309,12 +4369,32 @@ Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
 {\it lightcyan}, and {\it white}.
 
 %.lp ""
-Behaviours can occur based on percentage thresholds, updown, or absolute values.
+Allowed attributes are {\it bold}, {\it inverse}, {\it underline},
+{\it blink}, {\it dim}, and {\it normal}.
+Note that the platform used may interpret the attributes any way it
+wants.
+
+%.lp ""
 The in-game options menu can help you determine the correct syntax for a 
 config file.
 
 %.lp ""
-The whole feature can be disable by setting option {\it statushilites} off.
+The whole feature can be disable by setting option {\it statushilites} to 0.
+
+%.lp ""
+Example hilites:
+\begin{verbatim}
+    OPTION=hilite_status: gold/up/yellow/down/brown
+    OPTION=hilite_status: characteristics/up/green/down/red
+    OPTION=hilite_status: hitpoints/100%/gray&normal
+    OPTION=hilite_status: hitpoints/<100%/green&normal
+    OPTION=hilite_status: hitpoints/<66%/yellow&normal
+    OPTION=hilite_status: hitpoints/<50%/orange&normal
+    OPTION=hilite_status: hitpoints/<33%/red&bold
+    OPTION=hilite_status: hitpoints/<15%/red&inverse
+    OPTION=hilite_status: condition/major/orange&inverse
+    OPTION=hilite_status: condition/lev+fly/red&inverse
+\end{verbatim}
 
 %.lp
 %.hn 2

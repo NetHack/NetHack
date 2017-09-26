@@ -498,9 +498,7 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
-/* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line
-                                       updating process */
-/* #define STATUS_HILITES */        /* support hilites of status fields */
+#define STATUS_HILITES         /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */
 

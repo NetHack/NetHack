@@ -1277,7 +1277,7 @@ int how;
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
-#ifndef STATUS_VIA_WINDOWPORT
+#ifndef STATUS_HILITES
         destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
 #endif
         destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;

@@ -131,6 +131,9 @@ static struct Bool_Opt {
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },
+#ifdef STATUS_HILITES
+    { "hitpointbar", &iflags.wc2_hitpointbar, FALSE, SET_IN_GAME }, /*WC2*/
+#endif
 #ifndef MAC
     { "ignintr", &flags.ignintr, FALSE, SET_IN_GAME },
 #else
@@ -205,11 +208,6 @@ static struct Bool_Opt {
     { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
     { "standout", &flags.standout, FALSE, SET_IN_GAME },
-#if defined(STATUS_VIA_WINDOWPORT) && defined(STATUS_HILITES)
-    { "statushilites", &iflags.use_status_hilites, TRUE, SET_IN_GAME },
-#else
-    { "statushilites", &iflags.use_status_hilites, FALSE, DISP_IN_GAME },
-#endif
     { "status_updates", &iflags.status_updates, TRUE, DISP_IN_GAME },
     { "tiled_map", &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME }, /*WC*/
     { "time", &flags.time, FALSE, SET_IN_GAME },
@@ -376,6 +374,13 @@ static struct Comp_Opt {
 #ifdef MSDOS
     { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
+#ifdef STATUS_HILITES
+    { "statushilites",
+      "0=no status highlighting, N=show highlights for N turns",
+      20, SET_IN_GAME },
+#else
+    { "statushilites", "highlight control", 20, SET_IN_FILE },
+#endif
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
     { "roguesymset",
@@ -516,10 +521,7 @@ STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
 STATIC_DCL boolean FDECL(duplicate_opt_detection, (const char *, int));
 STATIC_DCL void FDECL(complain_about_duplicate, (const char *, int));
 
-STATIC_DCL int FDECL(match_str2attr, (const char *));
 STATIC_DCL const char *FDECL(attr2attrname, (int));
-STATIC_DCL int NDECL(query_color);
-STATIC_DCL int FDECL(query_attr, (const char *));
 STATIC_DCL const char * FDECL(msgtype2name, (int));
 STATIC_DCL int NDECL(query_msgtype);
 STATIC_DCL boolean FDECL(msgtype_add, (int, char *));
@@ -1279,9 +1281,9 @@ static const struct {
     { "light magenta", CLR_BRIGHT_MAGENTA },
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
+    { "no color", NO_COLOR },
     { NULL, CLR_BLACK }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
-    { "nocolor", NO_COLOR },
     { "purple", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
     { "bright purple", CLR_BRIGHT_MAGENTA },
@@ -1302,7 +1304,10 @@ static const struct {
     { "dim", ATR_DIM },
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
-    { "inverse", ATR_INVERSE }
+    { "inverse", ATR_INVERSE },
+    { NULL, ATR_NONE }, /* everything after this is an alias */
+    { "normal", ATR_NONE },
+    { "uline", ATR_ULINE }
 };
 
 const char *
@@ -1321,7 +1326,7 @@ int
 match_str2clr(str)
 char *str;
 {
-    int i, c = NO_COLOR;
+    int i, c = CLR_MAX;
 
     /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
        (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
@@ -1353,9 +1358,10 @@ int attr;
     return (char *) 0;
 }
 
-STATIC_OVL int
-match_str2attr(str)
+int
+match_str2attr(str, complain)
 const char *str;
+boolean complain;
 {
     int i, a = -1;
 
@@ -1366,14 +1372,15 @@ const char *str;
             break;
         }
 
-    if (a == -1)
+    if (a == -1 && complain)
         config_error_add("Unknown text attribute '%s'", str);
 
     return a;
 }
 
-STATIC_OVL int
-query_color()
+int
+query_color(prompt)
+const char *prompt;
 {
     winid tmpwin;
     anything any;
@@ -1390,7 +1397,7 @@ query_color()
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name,
                  MENU_UNSELECTED);
     }
-    end_menu(tmpwin, "Pick a color");
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -1401,7 +1408,7 @@ query_color()
     return -1;
 }
 
-STATIC_OVL int
+int
 query_attr(prompt)
 const char *prompt;
 {
@@ -1420,7 +1427,7 @@ const char *prompt;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, attrnames[i].attr,
                  attrnames[i].name, MENU_UNSELECTED);
     }
-    end_menu(tmpwin, prompt ? prompt : "Pick an attribute");
+    end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -1706,7 +1713,7 @@ char *tmpstr;
 
     if (amp) {
         tmps = amp + 1; /* advance past '&' */
-        a = match_str2attr(tmps);
+        a = match_str2attr(tmps, TRUE);
         if (a == -1)
             return FALSE;
     }
@@ -3427,7 +3434,7 @@ boolean tinitial, tfrom_file;
         } else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
             return FALSE;
         }
-        tmpattr = match_str2attr(opts);
+        tmpattr = match_str2attr(opts, TRUE);
         if (tmpattr == -1)
             return FALSE;
         else
@@ -3458,21 +3465,37 @@ boolean tinitial, tfrom_file;
             return retval;
         }
     }
-#if defined(STATUS_VIA_WINDOWPORT) && defined(STATUS_HILITES)
+#ifdef STATUS_HILITES
     /* hilite fields in status prompt */
     if (match_optname(opts, "hilite_status", 13, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, TRUE);
         if (op && negated) {
-            clear_status_hilites(tfrom_file);
+            clear_status_hilites();
             return retval;
         } else if (!op) {
             config_error_add("Value is mandatory for hilite_status");
             return FALSE;
         }
-        if (!set_status_hilites(op, tfrom_file)) /* TODO: error msg? */
+        if (!parse_status_hl1(op, tfrom_file))
             return FALSE;
+        return retval;
+    }
+
+    /* control over whether highlights should be displayed, and for how long */
+    fullname = "statushilites";
+    if (match_optname(opts, fullname, 9, TRUE)) {
+        if (negated) {
+            iflags.hilite_delta = 0L;
+        } else {
+            op = string_for_opt(opts, TRUE);
+            iflags.hilite_delta = (!op || !*op) ? 3L : atol(op);
+            if (iflags.hilite_delta < 0L)
+                iflags.hilite_delta = 1L;
+        }
+        if (!tfrom_file)
+            reset_status_hilites();
         return retval;
     }
 #endif
@@ -3624,7 +3647,7 @@ boolean tinitial, tfrom_file;
                 || boolopt[i].addr == &flags.showscore
 #endif
                 || boolopt[i].addr == &flags.showexp) {
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
                 status_initialize(REASSESS_ONLY);
 #endif
                 context.botl = TRUE;
@@ -3649,6 +3672,9 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.hilite_pet) {
+                need_redraw = TRUE;
+            } else if ((boolopt[i].addr) == &iflags.wc2_hitpointbar) {
+                status_initialize(REASSESS_ONLY);
                 need_redraw = TRUE;
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
@@ -3954,10 +3980,8 @@ static struct other_opts {
     { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC },
     { "menucolors", SET_IN_GAME, OPT_OTHER_MENUCOLOR },
     { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE },
-#ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
-    { "status_hilites", SET_IN_GAME, OPT_OTHER_STATHILITE },
-#endif
+    { "status hilite rules", SET_IN_GAME, OPT_OTHER_STATHILITE },
 #endif
     { (char *) 0, 0, (enum opt_other_enums) 0 },
 };
@@ -4092,13 +4116,9 @@ doset() /* changing options via menu by Per Liboriussen */
                     NULL, count_menucolors());
     opts_add_others(tmpwin, "message types", OPT_OTHER_MSGTYPE,
                     NULL, msgtype_count());
-#ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
-    get_status_hilites(buf2, 60);
-    if (!*buf2)
-        Sprintf(buf2, "%s", "(none)");
-    opts_add_others(tmpwin, "status_hilites", OPT_OTHER_STATHILITE, buf2, 0);
-#endif
+    opts_add_others(tmpwin, "status hilite rules", OPT_OTHER_STATHILITE,
+                    NULL, count_status_hilites());
 #endif
 #ifdef PREFIXES_IN_USE
     any = zeroany;
@@ -4123,16 +4143,14 @@ doset() /* changing options via menu by Per Liboriussen */
             if (opt_indx == OPT_OTHER_APEXC) {
                 (void) special_handling("autopickup_exception", setinitial,
                                         fromfile);
-#ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
             } else if (opt_indx == OPT_OTHER_STATHILITE) {
                 if (!status_hilite_menu()) {
                     pline("Bad status hilite(s) specified.");
                 } else {
-                    if (wc2_supported("status_hilites"))
-                        preference_update("status_hilites");
+                    if (wc2_supported("hilite_status"))
+                        preference_update("hilite_status");
                 }
-#endif
 #endif
             } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
                     (void) special_handling("menucolors", setinitial,
@@ -4728,7 +4746,7 @@ boolean setinitial, setfromfile;
                 return TRUE;
             if (*mcbuf
                 && test_regex_pattern(mcbuf, (const char *)0)
-                && (mcclr = query_color()) != -1
+                && (mcclr = query_color((char *) 0)) != -1
                 && (mcattr = query_attr((char *) 0)) != -1
                 && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
                 pline("Error adding the menu color.");
@@ -5305,6 +5323,14 @@ char *buf;
 #ifdef MSDOS
     } else if (!strcmp(optname, "soundcard")) {
         Sprintf(buf, "%s", to_be_done);
+#endif
+#ifdef STATUS_HILITES
+    } else if (!strcmp("statushilites", optname)) {
+        if (!iflags.hilite_delta)
+            Strcpy(buf, "0 (off: don't highlight status fields)");
+        else
+            Sprintf(buf, "%ld (on: highlight status for %ld turns)",
+                    iflags.hilite_delta, iflags.hilite_delta);
 #endif
     } else if (!strcmp(optname, "suppress_alert")) {
         if (flags.suppress_alert == 0L)
@@ -6010,7 +6036,8 @@ struct wc_Opt wc2_options[] = { { "fullscreen", WC2_FULLSCREEN },
                                 { "softkeyboard", WC2_SOFTKEYBOARD },
                                 { "wraptext", WC2_WRAPTEXT },
                                 { "use_darkgray", WC2_DARKGRAY },
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
+                                { "hitpointbar", WC2_HITPOINTBAR },
                                 { "hilite_status", WC2_HILITE_STATUS },
 #endif
                                 { (char *) 0, 0L } };

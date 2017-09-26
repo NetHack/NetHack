@@ -73,13 +73,8 @@ struct window_procs mswin_procs = {
     /* other defs that really should go away (they're tty specific) */
     mswin_start_screen, mswin_end_screen, mswin_outrip,
     mswin_preference_update, genl_getmsghistory, genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_no,
 };
 

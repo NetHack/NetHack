@@ -125,13 +125,8 @@ struct window_procs X11_procs = {
     genl_outrip,
 #endif
     X11_preference_update, genl_getmsghistory, genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_no, /* XXX may not always be correct */
 };
 
