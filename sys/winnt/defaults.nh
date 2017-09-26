@@ -76,6 +76,9 @@ MENUCOLOR=" cursed .* (being worn)" = orange&underline
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
 OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 
+# Make commands that ask for an inventory item pop up a menu
+OPTIONS=force_invmenu
+
 #
 # If you want to get rid of "use #quit to quit..." use:
 OPTIONS=suppress_alert:3.3.1

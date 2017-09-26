@@ -1243,24 +1243,28 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
     return res;
 }
 
+/* potion obj hits monster mon, which might be youmonst; obj always use up */
 void
-potionhit(mon, obj, your_fault)
-register struct monst *mon;
-register struct obj *obj;
-boolean your_fault;
+potionhit(mon, obj, how)
+struct monst *mon;
+struct obj *obj;
+int how;
 {
     const char *botlnam = bottlename();
     boolean isyou = (mon == &youmonst);
     int distance, tx, ty;
     struct obj *saddle = (struct obj *) 0;
-    boolean hit_saddle = FALSE;
+    boolean hit_saddle = FALSE, your_fault = (how <= POTHIT_HERO_THROW);
 
     if (isyou) {
         tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
-        losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(rnd(2)),
+               (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
+                                           : "thrown potion",
+               KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
         /* sometimes it hits the saddle */
@@ -1314,6 +1318,7 @@ boolean your_fault;
         case POT_ACID:
             if (!Acid_resistance) {
                 int dmg;
+
                 pline("This burns%s!",
                       obj->blessed ? " a little"
                                    : obj->cursed ? " a lot" : "");

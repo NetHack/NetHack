@@ -145,13 +145,13 @@ stoned_dialogue()
     exercise(A_DEX, FALSE);
 }
 
-/* He is getting sicker and sicker prior to vomiting */
+/* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
     "are feeling mildly nauseated.", /* 14 */
     "feel slightly confused.",       /* 11 */
     "can't seem to think straight.", /* 8 */
     "feel incredibly sick.",         /* 5 */
-    "suddenly vomit!"                /* 2 */
+    "are about to vomit."            /* 2 */
 };
 
 STATIC_OVL void
@@ -188,12 +188,25 @@ vomiting_dialogue()
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
-            txt = "gag uncontrolably.";
+            txt = "gag uncontrollably.";
+        else if (Hallucination)
+            /* "hurl" is short for "hurl chunks" which is slang for
+               relatively violent vomiting... */
+            txt = "are about to hurl!";
         break;
     case 0:
         stop_occupation();
-        if (!cantvomit(youmonst.data))
+        if (!cantvomit(youmonst.data)) {
             morehungry(20);
+            /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
+               since you've just been through the earlier messages of the
+               countdown, and it was still possible to move around between
+               that message and "You can move again." (from vomit()'s
+               nomul(-2)) with no intervening message; give one here to
+               have more specific point at which hero became unable to move
+               [vomit() issues its own message for the cantvomit() case] */
+            You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+        }
         vomit();
         break;
     default:
@@ -953,7 +966,7 @@ anything *arg;
 long timeout;
 {
     struct obj *obj = arg->a_obj;
-    boolean canseeit, many, menorah, need_newsym;
+    boolean canseeit, many, menorah, need_newsym, need_invupdate;
     xchar x, y;
     char whose[BUFSZ];
 
@@ -970,6 +983,7 @@ long timeout;
 
             if (menorah) {
                 obj->spe = 0; /* no more candles */
+                obj->owt = weight(obj);
             } else if (Is_candle(obj) || obj->otyp == POT_OIL) {
                 /* get rid of candles and burning oil potions;
                    we know this object isn't carried by hero,
@@ -994,7 +1008,7 @@ long timeout;
     } else {
         canseeit = FALSE;
     }
-    need_newsym = FALSE;
+    need_newsym = need_invupdate = FALSE;
 
     /* obj->age is the age remaining at this point.  */
     switch (obj->otyp) {
@@ -1003,6 +1017,8 @@ long timeout;
         if (canseeit) {
             switch (obj->where) {
             case OBJ_INVENT:
+                need_invupdate = TRUE;
+                /*FALLTHRU*/
             case OBJ_MINVENT:
                 pline("%spotion of oil has burnt away.", whose);
                 break;
@@ -1064,6 +1080,8 @@ long timeout;
             if (canseeit || obj->where == OBJ_INVENT) {
                 switch (obj->where) {
                 case OBJ_INVENT:
+                    need_invupdate = TRUE;
+                    /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
                         pline("%slantern has run out of power.", whose);
@@ -1141,6 +1159,8 @@ long timeout;
                 if (menorah) {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        need_invupdate = TRUE;
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%scandelabrum's flame%s.", whose,
                               many ? "s die" : " dies");
@@ -1153,15 +1173,18 @@ long timeout;
                 } else {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        /* no need_invupdate for update_inventory() necessary;
+                           useupall() -> freeinv() handles it */
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
                         break;
                     case OBJ_FLOOR:
                         /*
-                        You see some wax candles consumed!
-                        You see a wax candle consumed!
-                        */
+                          You see some wax candles consumed!
+                          You see a wax candle consumed!
+                         */
                         You_see("%s%s consumed!", many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
@@ -1179,6 +1202,7 @@ long timeout;
 
             if (menorah) {
                 obj->spe = 0;
+                obj->owt = weight(obj);
             } else {
                 if (carried(obj)) {
                     useupall(obj);
@@ -1192,7 +1216,7 @@ long timeout;
                 }
                 obj = (struct obj *) 0;
             }
-            break;
+            break; /* case [age ==] 0 */
 
         default:
             /*
@@ -1205,8 +1229,7 @@ long timeout;
 
         if (obj && obj->age)
             begin_burn(obj, TRUE);
-
-        break;
+        break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
         impossible("burn_object: unexpeced obj %s", xname(obj));
@@ -1214,6 +1237,8 @@ long timeout;
     }
     if (need_newsym)
         newsym(x, y);
+    if (need_invupdate)
+        update_inventory();
 }
 
 /*

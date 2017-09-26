@@ -1540,7 +1540,7 @@ E void FDECL(Delay, (int));
 
 /* ### mthrowu.c ### */
 
-E int FDECL(thitu, (int, int, struct obj *, const char *));
+E int FDECL(thitu, (int, int, struct obj **, const char *));
 E int FDECL(ohitmon, (struct monst *, struct obj *, int, BOOLEAN_P));
 E void FDECL(thrwmu, (struct monst *));
 E int FDECL(spitmu, (struct monst *, struct attack *));
@@ -1894,7 +1894,7 @@ E int FDECL(dopotion, (struct obj *));
 E int FDECL(peffects, (struct obj *));
 E void FDECL(healup, (int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(strange_feeling, (struct obj *, const char *));
-E void FDECL(potionhit, (struct monst *, struct obj *, BOOLEAN_P));
+E void FDECL(potionhit, (struct monst *, struct obj *, int));
 E void FDECL(potionbreathe, (struct obj *));
 E int NDECL(dodip);
 E void FDECL(mongrantswish, (struct monst **));
@@ -2430,6 +2430,7 @@ E void NDECL(climb_pit);
 E boolean FDECL(fire_damage, (struct obj *, BOOLEAN_P, XCHAR_P, XCHAR_P));
 E int FDECL(fire_damage_chain,
             (struct obj *, BOOLEAN_P, BOOLEAN_P, XCHAR_P, XCHAR_P));
+E boolean FDECL(lava_damage, (struct obj *, XCHAR_P, XCHAR_P));
 E void acid_damage(struct obj *);
 E int FDECL(water_damage, (struct obj *, const char *, BOOLEAN_P));
 E void FDECL(water_damage_chain, (struct obj *, BOOLEAN_P));

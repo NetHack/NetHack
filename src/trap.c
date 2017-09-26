@@ -841,7 +841,7 @@ register struct trap *trap;
 unsigned trflags;
 {
     register int ttype = trap->ttyp;
-    register struct obj *otmp;
+    struct obj *otmp;
     boolean already_seen = trap->tseen,
             forcetrap = (trflags & FORCETRAP) != 0,
             webmsgok = (trflags & NOWEBMSG) == 0,
@@ -912,8 +912,9 @@ unsigned trflags;
         otmp->opoisoned = 0;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        } else if (thitu(8, dmgval(otmp, &youmonst), otmp, "arrow")) {
-            obfree(otmp, (struct obj *) 0);
+        } else if (thitu(8, dmgval(otmp, &youmonst), &otmp, "arrow")) {
+            if (otmp)
+                obfree(otmp, (struct obj *) 0);
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind)
@@ -941,13 +942,15 @@ unsigned trflags;
         oldumort = u.umortality;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        } else if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
-            if (otmp->opoisoned)
-                poisoned("dart", A_CON, "little dart",
-                         /* if damage triggered life-saving,
-                            poison is limited to attrib loss */
-                         (u.umortality > oldumort) ? 0 : 10, TRUE);
-            obfree(otmp, (struct obj *) 0);
+        } else if (thitu(7, dmgval(otmp, &youmonst), &otmp, "little dart")) {
+            if (otmp) {
+                if (otmp->opoisoned)
+                    poisoned("dart", A_CON, "little dart",
+                             /* if damage triggered life-saving,
+                                poison is limited to attrib loss */
+                             (u.umortality > oldumort) ? 0 : 10, TRUE);
+                obfree(otmp, (struct obj *) 0);
+            }
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind)
@@ -1799,7 +1802,7 @@ int style;
             if (multi)
                 nomul(0);
             if (thitu(9 + singleobj->spe, dmgval(singleobj, &youmonst),
-                      singleobj, (char *) 0))
+                      &singleobj, (char *) 0))
                 stop_occupation();
         }
         if (style == ROLL) {
@@ -3285,6 +3288,7 @@ xchar x, y;
 {
     struct obj *obj, *nobj;
     int num = 0;
+
     for (obj = chain; obj; obj = nobj) {
         nobj = here ? obj->nexthere : obj->nobj;
         if (fire_damage(obj, force, x, y))
@@ -3294,6 +3298,51 @@ xchar x, y;
     if (num && (Blind && !couldsee(x, y)))
         You("smell smoke.");
     return num;
+}
+
+/* obj has been thrown or dropped into lava; damage is worse than mere fire */
+boolean
+lava_damage(obj, x, y)
+struct obj *obj;
+xchar x, y;
+{
+    int otyp = obj->otyp, ocls = obj->oclass;
+
+    /* the Amulet, invocation items, and Rider corpses are never destroyed
+       (let Book of the Dead fall through to fire_damage() to get feedback) */
+    if (obj_resists(obj, 0, 0) && otyp != SPE_BOOK_OF_THE_DEAD)
+        return FALSE;
+    /* destroy liquid (venom), wax, veggy, flesh, paper (except for scrolls
+       and books--let fire damage deal with them), cloth, leather, wood, bone
+       unless it's inherently or explicitly fireproof or contains something;
+       note: potions are glass so fall through to fire_damage() and boil */
+    if (objects[otyp].oc_material < DRAGON_HIDE
+        && ocls != SCROLL_CLASS && ocls != SPBOOK_CLASS
+        && objects[otyp].oc_oprop != FIRE_RES
+        && otyp != WAN_FIRE && otyp != FIRE_HORN
+        /* assumes oerodeproof isn't overloaded for some other purpose on
+           non-eroding items */
+        && !obj->oerodeproof
+        /* fire_damage() knows how to deal with containers and contents */
+        && !Has_contents(obj)) {
+        if (cansee(x, y)) {
+            /* this feedback is pretty clunky and can become very verbose
+               when former contents of a burned container get here via
+               flooreffects() */
+            if (obj == thrownobj || obj == kickedobj)
+                pline("%s %s up!", is_plural(obj) ? "They" : "It",
+                      otense(obj, "burn"));
+            else
+                You_see("%s hit lava and burn up!", doname(obj));
+        }
+        if (carried(obj)) { /* shouldn't happen */
+            remove_worn_item(obj, TRUE);
+            useupall(obj);
+        } else
+            delobj(obj);
+        return TRUE;
+    }
+    return fire_damage(obj, TRUE, x, y);
 }
 
 void

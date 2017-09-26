@@ -3129,9 +3129,15 @@ vomit() /* A good idea from David Neves */
         Your("jaw gapes convulsively.");
     else
         make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
-    nomul(-2);
-    multi_reason = "vomiting";
-    nomovemsg = You_can_move_again;
+
+    /* nomul()/You_can_move_again used to be unconditional, which was
+       viable while eating but not for Vomiting countdown where hero might
+       be immobilized for some other reason at the time vomit() is called */
+    if (multi >= -2) {
+        nomul(-2);
+        multi_reason = "vomiting";
+        nomovemsg = You_can_move_again;
+    }
 }
 
 int

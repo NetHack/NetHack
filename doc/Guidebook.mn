@@ -2524,6 +2524,9 @@ Cannot be set with the `O' command.
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
 Persistent.
+.lp force_invmenu
+Commands asking for an inventory item show a menu instead of
+a text query with possible menu letters. Default is off.
 .lp "fruit   "
 Name a fruit after something you enjoy eating (ex. ``fruit:mango'')
 (default ``slime mold'').  Basically a nostalgic whimsy that NetHack uses

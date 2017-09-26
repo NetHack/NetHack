@@ -229,6 +229,7 @@ struct instance_flags {
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean echo;             /* 1 to echo characters */
+    boolean force_invmenu;    /* always menu when handling inventory */
     /* FIXME: goldX belongs in flags, but putting it in iflags avoids
        breaking 3.6.[01] save files */
     boolean goldX;            /* for BUCX filtering, whether gold is X or U */
