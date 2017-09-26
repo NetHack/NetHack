@@ -5,8 +5,6 @@
 #include "hack.h"
 #include <limits.h>
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL long FDECL(newuexp, (int));
 STATIC_DCL int FDECL(enermod, (int));
 

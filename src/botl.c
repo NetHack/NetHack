@@ -5,9 +5,6 @@
 #include "hack.h"
 #include <limits.h>
 
-/* NOTE: early initialization in this module is currently not needed
-         assuming STATUS_VIA_WINDOWPORT is not defined */
-
 /* TODO: review and implement early initialization needed for
          STATUS_VIA_WINDOWPORT and STATUS_HILITES */
 

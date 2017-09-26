@@ -6,8 +6,6 @@
 #include "lev.h"
 #include "func_tab.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = UNDEFINED;
 #endif

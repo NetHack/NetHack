@@ -7,8 +7,6 @@
 
 /* Relevant header information in rm.h, objclass.h, and monsym.h. */
 
-/* NOTE: early initialization in this module is currently not needed */
-
 #ifdef C
 #undef C
 #endif

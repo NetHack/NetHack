@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 /* #define DEBUG */ /* uncomment for debugging */
 
 STATIC_DCL void NDECL(maybe_wail);

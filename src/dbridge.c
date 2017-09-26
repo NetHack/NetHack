@@ -19,8 +19,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 struct entity {
     struct monst *emon;     /* youmonst for the player */
     struct permonst *edata; /* must be non-zero for record to be valid */

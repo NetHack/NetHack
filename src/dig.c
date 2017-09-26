@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 static NEARDATA boolean did_dig_msg = UNDEFINED;
 
 STATIC_DCL boolean NDECL(rm_waslit);

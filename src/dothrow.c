@@ -6,8 +6,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL int FDECL(throw_obj, (struct obj *, int));
 STATIC_DCL boolean FDECL(ok_to_throw, (int *));
 STATIC_DCL void NDECL(autoquiver);

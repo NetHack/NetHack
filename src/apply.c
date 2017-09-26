@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 extern boolean notonhead; /* for long worms */
 
 STATIC_DCL int FDECL(use_camera, (struct obj *));

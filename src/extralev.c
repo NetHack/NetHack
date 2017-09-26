@@ -8,8 +8,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 struct rogueroom {
     xchar rlx, rly;
     xchar dx, dy;

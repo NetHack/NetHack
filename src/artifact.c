@@ -6,8 +6,6 @@
 #include "artifact.h"
 #include "artilist.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 /*
  * Note:  both artilist[] and artiexist[] have a dummy element #0,
  *        so loops over them should normally start at #1.  The primary

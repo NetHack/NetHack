@@ -10,8 +10,6 @@
 #include "hack.h"
 #include "artifact.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL boolean NDECL(unconstrain_map);
 STATIC_DCL void NDECL(reconstrain_map);
 STATIC_DCL void FDECL(browse_map, (int, const char *));

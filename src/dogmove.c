@@ -6,8 +6,6 @@
 
 #include "mfndpos.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 extern boolean notonhead;
 
 typedef struct dog_goal {

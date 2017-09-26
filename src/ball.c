@@ -7,8 +7,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL int NDECL(bc_order);
 STATIC_DCL void NDECL(litter);
 

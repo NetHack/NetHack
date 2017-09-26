@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,

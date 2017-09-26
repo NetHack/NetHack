@@ -7,8 +7,6 @@
 #include "dlb.h"
 #include "lev.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 #define DUNGEON_FILE "dungeon"
 
 #define X_START "x-strt"

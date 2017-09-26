@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 static NEARDATA const char see_yourself[] = "see yourself";
 static NEARDATA const char unknown_type[] = "Unknown type of %s (%d)";
 static NEARDATA const char c_armor[] = "armor", c_suit[] = "suit",

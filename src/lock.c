@@ -4,8 +4,6 @@
 
 #include "hack.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_PTR int NDECL(picklock);
 STATIC_PTR int NDECL(forcelock);
 

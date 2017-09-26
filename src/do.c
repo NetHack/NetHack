@@ -7,8 +7,6 @@
 #include "hack.h"
 #include "lev.h"
 
-/* NOTE: early initialization in this module is currently not needed */
-
 STATIC_DCL void FDECL(trycall, (struct obj *));
 STATIC_DCL void NDECL(polymorph_sink);
 STATIC_DCL boolean NDECL(teleport_sink);
