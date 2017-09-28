@@ -17,7 +17,7 @@
 #define C(n)
 #endif
 
-struct symsetentry symset[NUM_GRAPHICS] = { 0 };
+struct symsetentry symset[NUM_GRAPHICS] = { { 0 } };
 
 int currentgraphics = UNDEFINED;
 

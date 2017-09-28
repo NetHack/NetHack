@@ -1320,11 +1320,11 @@ xchar mx, my, fx, fy;
 
 /* do_clear_area client */
 STATIC_PTR void
-wantdoor(x, y, context)
+wantdoor(x, y, contextptr)
 int x, y;
-genericptr_t context;
+genericptr_t contextptr;
 {
-    wantdoor_context_t * wdc = (wantdoor_context_t *)context;
+    wantdoor_context_t * wdc = (wantdoor_context_t *)contextptr;
     int ndist;
 
     if (wdc->fardist > (ndist = distu(x, y))) {
