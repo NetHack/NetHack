@@ -1161,7 +1161,7 @@ trapmove(x, y, desttrap)
 int x, y;              /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
 struct trap *desttrap; /* nonnull if another trap at <x,y> */
 {
-    boolean anchored;
+    boolean anchored = FALSE;
     const char *predicament, *culprit;
     char *steedname = !u.usteed ? (char *) 0 : y_monnam(u.usteed);
 
@@ -1180,6 +1180,8 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         /* [why does diagonal movement give quickest escape?] */
         if ((u.dx && u.dy) || !rn2(5))
             u.utrap--;
+        if (!u.utrap)
+            goto wriggle_free;
         break;
     case TT_PIT:
         if (desttrap && desttrap->tseen
@@ -1271,6 +1273,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
                     Norep("You are %s %s.", predicament, culprit);
             }
         } else {
+wriggle_free:
             if (u.usteed)
                 pline("%s finally %s free.", upstart(steedname),
                       !anchored ? "lurches" : "wrenches the ball");
