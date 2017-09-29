@@ -158,7 +158,8 @@ const char *verb;
                           (mtmp) ? "" : " with you");
             if (mtmp) {
                 if (!passes_walls(mtmp->data) && !throws_rocks(mtmp->data)) {
-                    if (hmon(mtmp, obj, TRUE) && !is_whirly(mtmp->data))
+                    int dieroll = rnd(20);
+                    if (hmon(mtmp, obj, TRUE, dieroll) && !is_whirly(mtmp->data))
                         return FALSE; /* still alive */
                 }
                 mtmp->mtrapped = 0;
