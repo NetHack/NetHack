@@ -122,7 +122,7 @@ int x, y;
                     && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
         int objgone = 0;
 
-        if (down_gate(x, y) != -1)
+        if (down_gate(x, y, NULL) != -1)
             objgone = ship_object(obj, x, y, FALSE);
         if (!objgone) {
             if (!flooreffects(obj, x, y, "fall")) {
@@ -633,7 +633,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             if (hitu && singleobj->otyp == EGG) {
                 if (!Stoned && !Stone_resistance
                     && !(poly_when_stoned(youmonst.data)
-                         && polymon(PM_STONE_GOLEM))) {
+                         && polymon(PM_STONE_GOLEM, FALSE))) {
                     make_stoned(5L, (char *) 0, KILLED_BY, "");
                 }
             }

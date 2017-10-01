@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-static NEARDATA boolean did_dig_msg;
+static NEARDATA boolean did_dig_msg = UNDEFINED;
 
 STATIC_DCL boolean NDECL(rm_waslit);
 STATIC_DCL void FDECL(mkcavepos,
@@ -630,7 +630,7 @@ int ttyp;
                     pline("%s %s over the pit.", Monnam(mtmp),
                           (is_flyer(mtmp->data)) ? "flies" : "floats");
             } else if (mtmp != madeby)
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, FALSE);
         }
     } else { /* was TRAPDOOR now a HOLE*/
 

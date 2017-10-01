@@ -729,5 +729,21 @@ const char *msg;
     }
 }
 
+void early_init()
+{
+    decl_early_init();
+    end_early_init();
+    invent_early_init();
+    makemon_early_init();
+    monst_early_init();
+    o_init_early_init();
+    objects_early_init();
+    pickup_early_init();
+    pline_early_init();
+    role_early_init();
+    save_early_init();
+    sp_lev_early_init();
+    u_init_early_init();
+}
 
 /*allmain.c*/

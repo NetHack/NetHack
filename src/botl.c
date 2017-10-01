@@ -5,12 +5,16 @@
 #include "hack.h"
 #include <limits.h>
 
+/* TODO: review and implement early initialization needed for
+         STATUS_VIA_WINDOWPORT and STATUS_HILITES */
+
 extern const char *hu_stat[]; /* defined in eat.c */
 
 const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 
-STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
+STATIC_OVL NEARDATA int mrank_sz = UNDEFINED; /* loaded by max_rank_sz 
+                                                 (from u_init or restore) */
 STATIC_DCL const char *NDECL(rank);
 STATIC_DCL void NDECL(bot_via_windowport);
 

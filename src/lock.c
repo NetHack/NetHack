@@ -260,7 +260,7 @@ struct obj *pick;
 
     /* check whether we're resuming an interrupted previous attempt */
     if (xlock.usedtime && picktyp == xlock.picktyp) {
-        static char no_longer[] = "Unfortunately, you can no longer %s %s.";
+        static const char no_longer[] = "Unfortunately, you can no longer %s %s.";
 
         if (nohands(youmonst.data)) {
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";

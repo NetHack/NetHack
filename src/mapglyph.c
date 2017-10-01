@@ -9,7 +9,7 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
-static int explcolors[] = {
+static const int explcolors[] = {
     CLR_BLACK,   /* dark    */
     CLR_GREEN,   /* noxious */
     CLR_BROWN,   /* muddy   */

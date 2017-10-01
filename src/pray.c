@@ -48,9 +48,9 @@ static const char *godvoices[] = {
 };
 
 /* values calculated when prayer starts, and used when completed */
-static aligntyp p_aligntyp;
-static int p_trouble;
-static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
+static aligntyp p_aligntyp = UNDEFINED;
+static int p_trouble = UNDEFINED;
+static int p_type = UNDEFINED; /* (-1)-3:(-1)=really naughty, 3=really good */
 
 #define PIOUS 20
 #define DEVOUT 14
@@ -786,7 +786,7 @@ gcrownu()
         } else if (obj && obj->otyp == LONG_SWORD && !obj->oartifact) {
             if (!Blind)
                 Your("sword shines brightly for a moment.");
-            obj = oname(obj, artiname(ART_EXCALIBUR));
+            obj = oname(obj, artiname(ART_EXCALIBUR), FALSE);
             if (obj && obj->oartifact == ART_EXCALIBUR)
                 u.ugifts++;
         }
@@ -803,7 +803,7 @@ gcrownu()
             obj->dknown = TRUE;
         } else if (!already_exists) {
             obj = mksobj(LONG_SWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_VORPAL_BLADE));
+            obj = oname(obj, artiname(ART_VORPAL_BLADE), FALSE);
             obj->spe = 1;
             at_your_feet("A sword");
             dropy(obj);
@@ -825,7 +825,7 @@ gcrownu()
             obj->dknown = TRUE;
         } else if (!already_exists) {
             obj = mksobj(RUNESWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_STORMBRINGER));
+            obj = oname(obj, artiname(ART_STORMBRINGER), FALSE);
             obj->spe = 1;
             at_your_feet(An(swordbuf));
             dropy(obj);

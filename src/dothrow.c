@@ -607,7 +607,7 @@ int x, y;
         if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
             && bad_rock(youmonst.data, x, u.uy)) {
             boolean too_much =
-                (invent && (inv_weight() + weight_cap() > 600));
+                (invent && (player_weight() > 600));
             /* Move at a diagonal. */
             if (bigmonst(youmonst.data) || too_much) {
                 You("%sget forcefully wedged into a crevice.",
@@ -716,7 +716,7 @@ int x, y;
         place_monster(mon, x, y);
         newsym(mon->mx, mon->my);
         set_apparxy(mon);
-        (void) mintrap(mon);
+        (void) mintrap(mon, FALSE);
         return TRUE;
     }
     return FALSE;
@@ -902,7 +902,7 @@ boolean hitsroof;
         case EGG:
             if (petrifier && !Stone_resistance
                 && !(poly_when_stoned(youmonst.data)
-                     && polymon(PM_STONE_GOLEM))) {
+                     && polymon(PM_STONE_GOLEM, FALSE))) {
                 /* egg ends up "all over your face"; perhaps
                    visored helmet should still save you here */
                 if (uarmh)
@@ -964,7 +964,7 @@ boolean hitsroof;
             }
         } else if (petrifier && !Stone_resistance
                    && !(poly_when_stoned(youmonst.data)
-                        && polymon(PM_STONE_GOLEM))) {
+                        && polymon(PM_STONE_GOLEM, FALSE))) {
         petrify:
             killer.format = KILLED_BY;
             Strcpy(killer.name, "elementary physics"); /* "what goes up..." */

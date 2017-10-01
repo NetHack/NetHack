@@ -161,10 +161,10 @@ void NDECL(do_rumors);
 void NDECL(do_oracles);
 void NDECL(do_vision);
 
-extern void NDECL(monst_init);   /* monst.c */
-extern void NDECL(objects_init); /* objects.c */
+extern void NDECL(monst_early_init);   /* monst.c */
+extern void NDECL(objects_early_init); /* objects.c */
 
-static void NDECL(link_sanity_check);
+static void NDECL(early_init);
 static char *FDECL(name_file, (const char *, const char *));
 static void FDECL(delete_file, (const char *template, const char *));
 static FILE *FDECL(getfp, (const char *, const char *, const char *));
@@ -287,13 +287,10 @@ char *argv[];
 #endif
 
 static void
-link_sanity_check()
+early_init()
 {
-    /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
-    monst_init();
-    objects_init();
+    monst_early_init();
+    objects_early_init();
 }
 
 void
@@ -302,7 +299,7 @@ char *options;
 {
     boolean more_than_one;
 
-    link_sanity_check();
+    early_init();
 
     /* construct the current version number */
     make_version();
@@ -447,7 +444,7 @@ do_ext_makedefs(int argc, char **argv)
 {
     int todo = 0;
 
-    link_sanity_check();
+    early_init();
 
     argc--;
     argv++; /* skip program name */

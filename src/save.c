@@ -71,7 +71,7 @@ static struct save_procs {
 #endif
 
 /* need to preserve these during save to avoid accessing freed memory */
-static unsigned ustuck_id = 0, usteed_id = 0;
+static unsigned ustuck_id = UNDEFINED, usteed_id = UNDEFINED;
 
 int
 dosave()
@@ -362,11 +362,12 @@ char *whynot;
 }
 
 #ifdef INSURANCE
+static boolean havestate = UNDEFINED;
+
 void
 savestateinlock()
 {
     int fd, hpid;
-    static boolean havestate = TRUE;
     char whynot[BUFSZ];
 
     /* When checkpointing is on, the full state needs to be written
@@ -1516,5 +1517,13 @@ co_false()
 }
 
 #endif /* MFLOPPY */
+
+void
+save_early_init()
+{
+#ifdef INSURANCE
+    havestate = TRUE;
+#endif
+}
 
 /*save.c*/

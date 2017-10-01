@@ -186,7 +186,7 @@ you_were()
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
     }
-    (void) polymon(u.ulycn);
+    (void) polymon(u.ulycn, FALSE);
 }
 
 void

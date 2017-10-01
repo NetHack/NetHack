@@ -19,19 +19,32 @@
 
 #include "hack.h"
 
+struct entity {
+    struct monst *emon;     /* youmonst for the player */
+    struct permonst *edata; /* must be non-zero for record to be valid */
+    int ex, ey;
+};
+
+#define ENTITIES 2
+
+struct drawbridge {
+    struct entity occupants[ENTITIES];
+};
+
 STATIC_DCL void FDECL(get_wall_for_db, (int *, int *));
-STATIC_DCL struct entity *FDECL(e_at, (int, int));
+STATIC_DCL struct entity *FDECL(e_at, (int, int, struct drawbridge *));
 STATIC_DCL void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
 STATIC_DCL void FDECL(u_to_e, (struct entity *));
 STATIC_DCL void FDECL(set_entity, (int, int, struct entity *));
 STATIC_DCL const char *FDECL(e_nam, (struct entity *));
 STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
 STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
-STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
+STATIC_DCL void FDECL(e_died, (struct entity *, int, int,
+                                struct drawbridge *));
 STATIC_DCL boolean FDECL(automiss, (struct entity *));
 STATIC_DCL boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
-STATIC_DCL void FDECL(do_entity, (struct entity *));
+STATIC_DCL void FDECL(do_entity, (struct entity *, struct drawbridge *));
 
 boolean
 is_pool(x, y)
@@ -282,33 +295,25 @@ boolean flag;
     return  TRUE;
 }
 
-struct entity {
-    struct monst *emon;     /* youmonst for the player */
-    struct permonst *edata; /* must be non-zero for record to be valid */
-    int ex, ey;
-};
-
-#define ENTITIES 2
-
-static NEARDATA struct entity occupants[ENTITIES];
-
 STATIC_OVL
 struct entity *
-e_at(x, y)
+e_at(x, y, db)
 int x, y;
+struct drawbridge *db;
 {
     int entitycnt;
 
     for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++)
-        if ((occupants[entitycnt].edata) && (occupants[entitycnt].ex == x)
-            && (occupants[entitycnt].ey == y))
+        if ((db->occupants[entitycnt].edata) 
+            && (db->occupants[entitycnt].ex == x)
+            && (db->occupants[entitycnt].ey == y))
             break;
     debugpline1("entitycnt = %d", entitycnt);
 #ifdef D_DEBUG
     wait_synch();
 #endif
     return (entitycnt == ENTITIES) ? (struct entity *) 0
-                                   : &(occupants[entitycnt]);
+                                   : &(db->occupants[entitycnt]);
 }
 
 STATIC_OVL void
@@ -420,9 +425,10 @@ int x, y;
 }
 
 STATIC_OVL void
-e_died(etmp, xkill_flags, how)
+e_died(etmp, xkill_flags, how, db)
 struct entity *etmp;
 int xkill_flags, how;
+struct drawbridge * db;
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
@@ -471,9 +477,9 @@ int xkill_flags, how;
 
         /* dead long worm handling */
         for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++) {
-            if (etmp != &(occupants[entitycnt])
-                && etmp->emon == occupants[entitycnt].emon)
-                occupants[entitycnt].edata = (struct permonst *) 0;
+            if (etmp != &(db->occupants[entitycnt])
+                && etmp->emon == db->occupants[entitycnt].emon)
+                db->occupants[entitycnt].edata = (struct permonst *) 0;
         }
 #undef mk_message
 #undef mk_corpse
@@ -556,8 +562,9 @@ struct entity *etmp;
 }
 
 STATIC_OVL void
-do_entity(etmp)
+do_entity(etmp, db)
 struct entity *etmp;
+struct drawbridge * db;
 {
     int newx, newy, at_portcullis, oldx, oldy;
     boolean must_jump = FALSE, relocates = FALSE, e_inview;
@@ -607,7 +614,7 @@ struct entity *etmp;
                   E_phrase(etmp, "are"));             /* no jump */
             e_died(etmp,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
-                   CRUSHING); /* no corpse */
+                   CRUSHING, db); /* no corpse */
             return;       /* Note: Beyond this point, we know we're  */
         }                 /* not at an opened drawbridge, since all  */
         must_jump = TRUE; /* *missable* creatures survive on the     */
@@ -626,7 +633,7 @@ struct entity *etmp;
                 e_died(etmp,
                        XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG
                                                   : XKILL_NOMSG),
-                       CRUSHING);
+                       CRUSHING, db);
                 /* no corpse */
                 return;
             }
@@ -650,7 +657,7 @@ struct entity *etmp;
     if ((newx == oldx) && (newy == oldy))
         get_wall_for_db(&newx, &newy);
     debugpline0("Checking new square for occupancy.");
-    if (relocates && (e_at(newx, newy))) {
+    if (relocates && (e_at(newx, newy, db))) {
         /*
          * Standoff problem: one or both entities must die, and/or
          * both switch places.  Avoid infinite recursion by checking
@@ -659,20 +666,21 @@ struct entity *etmp;
          */
         struct entity *other;
 
-        other = e_at(newx, newy);
+        other = e_at(newx, newy, db);
         debugpline1("New square is occupied by %s", e_nam(other));
         if (e_survives_at(other, newx, newy) && automiss(other)) {
             relocates = FALSE; /* "other" won't budge */
             debugpline1("%s suicide.", E_phrase(etmp, "commit"));
         } else {
             debugpline1("Handling %s", e_nam(other));
-            while ((e_at(newx, newy) != 0) && (e_at(newx, newy) != etmp))
-                do_entity(other);
+            while ((e_at(newx, newy, db) != 0)
+                && (e_at(newx, newy, db) != etmp))
+                do_entity(other, db);
             debugpline1("Checking existence of %s", e_nam(etmp));
 #ifdef D_DEBUG
             wait_synch();
 #endif
-            if (e_at(oldx, oldy) != etmp) {
+            if (e_at(oldx, oldy, db) != etmp) {
                 debugpline1("%s moved or died in recursion somewhere",
                             E_phrase(etmp, "have"));
 #ifdef D_DEBUG
@@ -682,7 +690,8 @@ struct entity *etmp;
             }
         }
     }
-    if (relocates && !e_at(newx, newy)) { /* if e_at() entity = worm tail */
+    /* if e_at() entity = worm tail */
+    if (relocates && !e_at(newx, newy, db)) { 
         debugpline1("Moving %s", e_nam(etmp));
         if (!is_u(etmp)) {
             remove_monster(etmp->ex, etmp->ey);
@@ -719,7 +728,7 @@ struct entity *etmp;
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "closing drawbridge");
-            e_died(etmp, XKILL_NOMSG, CRUSHING);
+            e_died(etmp, XKILL_NOMSG, CRUSHING, db);
             return;
         }
         debugpline1("%s in here", E_phrase(etmp, "survive"));
@@ -754,7 +763,7 @@ struct entity *etmp;
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
                  : is_lava(etmp->ex, etmp->ey) ? BURNING
-                   : CRUSHING); /*no corpse*/
+                   : CRUSHING, db); /*no corpse*/
         return;
     }
 }
@@ -772,6 +781,7 @@ int x, y;
     register struct rm *lev1, *lev2;
     struct trap *t;
     int x2, y2;
+    struct drawbridge db;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_DOWN)
@@ -801,11 +811,11 @@ int x, y;
         break;
     }
     lev2->wall_info = W_NONDIGGABLE;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* Do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tail */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(db.occupants[0]));
+    set_entity(x2, y2, &(db.occupants[1]));
+    do_entity(&(db.occupants[0]), &db);     /* Do set_entity after first */
+    set_entity(x2, y2, &(db.occupants[1])); /* do_entity for worm tail */
+    do_entity(&(db.occupants[1]), &db);
     if (OBJ_AT(x, y) && !Deaf)
         You_hear("smashing and crushing.");
     (void) revive_nasty(x, y, (char *) 0);
@@ -834,6 +844,7 @@ int x, y;
     register struct rm *lev1, *lev2;
     struct trap *t;
     int x2, y2;
+    struct drawbridge db;
 
     lev1 = &levl[x][y];
     if (lev1->typ != DRAWBRIDGE_UP)
@@ -850,11 +861,11 @@ int x, y;
     lev2 = &levl[x2][y2];
     lev2->typ = DOOR;
     lev2->doormask = D_NODOOR;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tails */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(db.occupants[0]));
+    set_entity(x2, y2, &(db.occupants[1]));
+    do_entity(&(db.occupants[0]), &db);     /* do set_entity after first */
+    set_entity(x2, y2, &(db.occupants[1])); /* do_entity for worm tails */
+    do_entity(&(db.occupants[1]), &db);
     (void) revive_nasty(x, y, (char *) 0);
     delallobj(x, y);
     if ((t = t_at(x, y)) != 0)
@@ -883,7 +894,8 @@ int x, y;
     struct obj *otmp;
     int x2, y2, i;
     boolean e_inview;
-    struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);
+    struct drawbridge db;
+    struct entity *etmp1 = &(db.occupants[0]), *etmp2 = &(db.occupants[1]);
 
     lev1 = &levl[x][y];
     if (!IS_DRAWBRIDGE(lev1->typ))
@@ -961,7 +973,7 @@ int x, y;
             Strcpy(killer.name, "exploding drawbridge");
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
-                   CRUSHING); /*no corpse*/
+                   CRUSHING, &db); /*no corpse*/
         } /* nothing which is vulnerable can survive this */
     }
     set_entity(x, y, etmp1);
@@ -993,9 +1005,9 @@ int x, y;
             Strcpy(killer.name, "collapsing drawbridge");
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
-                   CRUSHING); /*no corpse*/
+                   CRUSHING, &db); /*no corpse*/
             if (levl[etmp1->ex][etmp1->ey].typ == MOAT)
-                do_entity(etmp1);
+                do_entity(etmp1, &db);
         }
     }
     nokiller();

@@ -10,8 +10,6 @@
 #include "hack.h"
 #include "artifact.h"
 
-extern boolean known; /* from read.c */
-
 STATIC_DCL boolean NDECL(unconstrain_map);
 STATIC_DCL void NDECL(reconstrain_map);
 STATIC_DCL void FDECL(browse_map, (int, const char *));
@@ -291,8 +289,9 @@ unsigned material;
 
 /* look for gold, on the floor or in monsters' possession */
 int
-gold_detect(sobj)
+gold_detect(sobj, gold_found)
 register struct obj *sobj;
+boolean * gold_found;
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -300,7 +299,7 @@ register struct obj *sobj;
     boolean stale, ugold = FALSE, steedgold = FALSE;
     int ter_typ = TER_DETECT | TER_OBJ;
 
-    known = stale = clear_stale_map(COIN_CLASS,
+    *gold_found = stale = clear_stale_map(COIN_CLASS,
                                     (unsigned) (sobj->blessed ? GOLD : 0));
 
     /* look for gold carried by monsters (might be in a container) */
@@ -311,7 +310,7 @@ register struct obj *sobj;
             if (mtmp == u.usteed) {
                 steedgold = TRUE;
             } else {
-                known = TRUE;
+                *gold_found = TRUE;
                 goto outgoldmap; /* skip further searching */
             }
         } else {
@@ -321,7 +320,7 @@ register struct obj *sobj;
                     if (mtmp == u.usteed) {
                         steedgold = TRUE;
                     } else {
-                        known = TRUE;
+                        *gold_found = TRUE;
                         goto outgoldmap; /* skip further searching */
                     }
                 }
@@ -331,17 +330,17 @@ register struct obj *sobj;
     /* look for gold objects */
     for (obj = fobj; obj; obj = obj->nobj) {
         if (sobj->blessed && o_material(obj, GOLD)) {
-            known = TRUE;
+            *gold_found = TRUE;
             if (obj->ox != u.ux || obj->oy != u.uy)
                 goto outgoldmap;
         } else if (o_in(obj, COIN_CLASS)) {
-            known = TRUE;
+            *gold_found = TRUE;
             if (obj->ox != u.ux || obj->oy != u.uy)
                 goto outgoldmap;
         }
     }
 
-    if (!known) {
+    if (!*gold_found) {
         /* no gold found on floor or monster's inventory.
            adjust message if you have gold in your inventory */
         if (sobj) {
@@ -444,8 +443,9 @@ outgoldmap:
 /* returns 1 if nothing was detected   */
 /* returns 0 if something was detected */
 int
-food_detect(sobj)
+food_detect(sobj, food_found)
 register struct obj *sobj;
+boolean * food_found;
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -478,7 +478,7 @@ register struct obj *sobj;
     }
 
     if (!ct && !ctu) {
-        known = stale && !confused;
+        *food_found = stale && !confused;
         if (stale) {
             docrt();
             You("sense a lack of %s nearby.", what);
@@ -506,7 +506,7 @@ register struct obj *sobj;
         }
         return !stale;
     } else if (!ct) {
-        known = TRUE;
+        *food_found = TRUE;
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
@@ -517,7 +517,7 @@ register struct obj *sobj;
         struct obj *temp;
         int ter_typ = TER_DETECT | TER_OBJ;
 
-        known = TRUE;
+        *food_found = TRUE;
         cls();
         (void) unconstrain_map();
         for (obj = fobj; obj; obj = obj->nobj)

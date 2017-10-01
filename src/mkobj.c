@@ -366,7 +366,7 @@ struct obj *obj2, *obj1;
     if (!obj2->oextra)
         obj2->oextra = newoextra();
     if (has_oname(obj1))
-        oname(obj2, ONAME(obj1));
+        oname(obj2, ONAME(obj1), FALSE);
     if (has_omonst(obj1)) {
         if (!OMONST(obj2))
             newomonst(obj2);
@@ -1036,7 +1036,7 @@ boolean artif;
         break;
     case SPE_NOVEL:
         otmp->novelidx = -1; /* "none of the above"; will be changed */
-        otmp = oname(otmp, noveltitle(&otmp->novelidx));
+        otmp = oname(otmp, noveltitle(&otmp->novelidx), FALSE);
         break;
     }
 
@@ -1614,7 +1614,7 @@ const char *nm;
 
     otmp = mkcorpstat(objtype, (struct monst *) 0, ptr, x, y, corpstatflags);
     if (nm)
-        otmp = oname(otmp, nm);
+        otmp = oname(otmp, nm, FALSE);
     return otmp;
 }
 

@@ -153,7 +153,6 @@ makedog()
     register struct obj *otmp;
     const char *petname;
     int pettype;
-    static int petname_used = 0;
 
     if (preferred_pet == 'n')
         return ((struct monst *) 0);
@@ -191,7 +190,7 @@ makedog()
         put_saddle_on_mon(otmp, mtmp);
     }
 
-    if (!petname_used++ && *petname)
+    if (*petname)
         mtmp = christen_monst(mtmp, petname);
 
     initedog(mtmp);
@@ -601,7 +600,7 @@ boolean pets_only; /* true for ascension or final escape */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
             stay_behind = FALSE;
             if (mtmp->mtrapped)
-                (void) mintrap(mtmp); /* try to escape */
+                (void) mintrap(mtmp, FALSE); /* try to escape */
             if (mtmp == u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */

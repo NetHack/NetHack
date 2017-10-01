@@ -106,9 +106,11 @@ struct monst {
 
     Bitfield(iswiz, 1);     /* is the Wizard of Yendor */
     Bitfield(wormno, 5);    /* at most 31 worms on any level */
-    /* 2 free bits */
-
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
+    Bitfield(disintegested, 1); /* disintegrated or digested */
+    Bitfield(vamp_rise_msg, 1); /* vampire rising message printed */
+
+    /* 0 bits remaning */
 
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */
 #ifdef NHSTDC

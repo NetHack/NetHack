@@ -244,7 +244,7 @@ static struct opvar *gloc_filter_map = (struct opvar *) 0;
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), gloc_filter_map)))
 
-static int gloc_filter_floodfill_match_glyph;
+static int gloc_filter_floodfill_match_glyph = UNDEFINED;
 
 int
 gloc_filter_classify_glyph(glyph)
@@ -1171,8 +1171,6 @@ do_mname()
         (void) christen_monst(mtmp, buf);
 }
 
-STATIC_VAR int via_naming = 0;
-
 /*
  * This routine used to change the address of 'obj' so be unsafe if not
  * used with extreme care.  Applying a name to an object no longer
@@ -1244,15 +1242,14 @@ register struct obj *obj;
            a valid artifact name */
         u.uconduct.literate++;
     }
-    ++via_naming; /* This ought to be an argument rather than a static... */
-    obj = oname(obj, buf);
-    --via_naming; /* ...but oname() is used in a lot of places, so defer. */
+    obj = oname(obj, buf, TRUE);
 }
 
 struct obj *
-oname(obj, name)
+oname(obj, name, via_naming)
 struct obj *obj;
 const char *name;
+boolean via_naming;
 {
     int lth;
     char buf[PL_PSIZ];

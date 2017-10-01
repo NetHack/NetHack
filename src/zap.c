@@ -11,13 +11,10 @@
  */
 #define MAGIC_COOKIE 1000
 
-static NEARDATA boolean obj_zapped;
-static NEARDATA int poly_zapped;
+static NEARDATA boolean obj_zapped = UNDEFINED;
+static NEARDATA int poly_zapped = UNDEFINED;
 
 extern boolean notonhead; /* for long worms */
-
-/* kludge to use mondied instead of killed */
-extern boolean m_using;
 
 STATIC_DCL void FDECL(polyuse, (struct obj *, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
@@ -2464,7 +2461,7 @@ boolean ordinary;
 
         if (u.umonnum == PM_STONE_GOLEM) {
             learn_it = TRUE;
-            (void) polymon(PM_FLESH_GOLEM);
+            (void) polymon(PM_FLESH_GOLEM, FALSE);
         }
         if (Stoned) {
             learn_it = TRUE;
@@ -4965,7 +4962,7 @@ int damage, tell;
     if (damage) {
         mtmp->mhp -= damage;
         if (mtmp->mhp < 1) {
-            if (m_using)
+            if (context.mon_moving)
                 monkilled(mtmp, "", AD_RBRE);
             else
                 killed(mtmp);

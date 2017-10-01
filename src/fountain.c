@@ -46,7 +46,7 @@ dowatersnakes()
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
                                 NO_MM_FLAGS)) != 0
                 && t_at(mtmp->mx, mtmp->my))
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, FALSE);
     } else
         pline_The("fountain bubbles furiously for a moment, then calms.");
 }
@@ -73,7 +73,7 @@ dowaterdemon()
                 /* give a wish and discard the monster (mtmp set to null) */
                 mongrantswish(&mtmp);
             } else if (t_at(mtmp->mx, mtmp->my))
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, FALSE);
         }
     } else
         pline_The("fountain bubbles furiously for a moment, then calms.");
@@ -94,7 +94,7 @@ dowaternymph()
             You_hear("a seductive voice.");
         mtmp->msleeping = 0;
         if (t_at(mtmp->mx, mtmp->my))
-            (void) mintrap(mtmp);
+            (void) mintrap(mtmp, FALSE);
     } else if (!Blind)
         pline("A large bubble rises to the surface and pops.");
     else
@@ -259,7 +259,7 @@ drinkfountain()
     if (fate < 10) {
         pline_The("cool draught refreshes you.");
         u.uhunger += rnd(10); /* don't choke on water */
-        newuhs(FALSE);
+        newuhs(FALSE, FALSE);
         if (mgkftn)
             return;
     } else {
@@ -388,7 +388,7 @@ register struct obj *obj;
             pline(
               "From the murky depths, a hand reaches up to bless the sword.");
             pline("As the hand retreats, the fountain disappears!");
-            obj = oname(obj, artiname(ART_EXCALIBUR));
+            obj = oname(obj, artiname(ART_EXCALIBUR), FALSE);
             discover_artifact(ART_EXCALIBUR);
             bless(obj);
             obj->oeroded = obj->oeroded2 = 0;

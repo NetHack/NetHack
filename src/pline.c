@@ -6,8 +6,8 @@
                                        */
 #include "hack.h"
 
-static unsigned pline_flags = 0;
-static char prevmsg[BUFSZ];
+static unsigned pline_flags = 0; /* set and always cleared prior to return */
+static char prevmsg[BUFSZ] = { 0 };
 
 static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
@@ -481,5 +481,11 @@ const char *line;
     }
 }
 #endif /* defined(POSIX_TYPES) || defined(__GNUC__) */
+
+void
+pline_early_init()
+{
+    prevmsg[0] = '\0';
+}
 
 /*pline.c*/

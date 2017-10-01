@@ -9,8 +9,7 @@
     (martial_bonus() || is_bigfoot(youmonst.data) \
      || (uarmf && uarmf->otyp == KICKING_BOOTS))
 
-static NEARDATA struct rm *maploc, nowhere;
-static NEARDATA const char *gate_str;
+static NEARDATA struct rm nowhere = { UNDEFINED };
 
 /* kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
@@ -22,8 +21,9 @@ STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
 STATIC_DCL void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
 STATIC_DCL int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
-STATIC_DCL char *FDECL(kickstr, (char *, const char *));
-STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
+STATIC_DCL char *FDECL(kickstr, (char *, const char *, struct rm *));
+STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long,
+                                            const char *));
 STATIC_DCL void FDECL(drop_to, (coord *, SCHAR_P));
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
@@ -110,7 +110,7 @@ register boolean clumsy;
                 place_monster(mon, mdx, mdy);
                 newsym(mon->mx, mon->my);
                 set_apparxy(mon);
-                if (mintrap(mon) == 2)
+                if (mintrap(mon, FALSE) == 2)
                     trapkilled = TRUE;
             }
         }
@@ -225,8 +225,8 @@ xchar x, y;
         return;
     }
 
-    i = -inv_weight();
     j = weight_cap();
+    i = j - player_weight();
 
     if (i < (j * 3) / 10) {
         if (!rn2((i < j / 10) ? 2 : (i < j / 5) ? 3 : 4)) {
@@ -523,7 +523,8 @@ xchar x, y;
         You("kick %s with your bare %s.",
             corpse_xname(kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
-        if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+        if (poly_when_stoned(youmonst.data) 
+            && polymon(PM_STONE_GOLEM, FALSE)) {
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
@@ -715,9 +716,10 @@ xchar x, y;
 
 /* cause of death if kicking kills kicker */
 STATIC_OVL char *
-kickstr(buf, kickobjnam)
+kickstr(buf, kickobjnam, maploc)
 char *buf;
 const char *kickobjnam;
+struct rm *maploc;
 {
     const char *what;
 
@@ -765,6 +767,7 @@ dokick()
     register struct monst *mtmp;
     boolean no_kick = FALSE;
     char buf[BUFSZ], kickobjnam[BUFSZ];
+    struct rm *maploc;
 
     kickobjnam[0] = '\0';
     if (nolimbs(youmonst.data) || slithy(youmonst.data)) {
@@ -935,7 +938,7 @@ dokick()
             int range;
 
             range =
-                ((int) youmonst.data->cwt + (weight_cap() + inv_weight()));
+                ((int) youmonst.data->cwt + (player_weight()));
             if (range < 1)
                 range = 1; /* divide by zero avoidance */
             range = (3 * (int) mdat->cwt) / range;
@@ -1225,7 +1228,8 @@ dokick()
             if (!rn2(3))
                 set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
             dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
-            losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
+            losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam, maploc),
+                   KILLED_BY);
             if (Is_airlevel(&u.uz) || Levitation)
                 hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
             return 1;
@@ -1364,11 +1368,12 @@ xchar dlev;          /* if !0 send to dlev near player */
     long oct, dct, price, debit, robbed;
     boolean angry, costly, isrock;
     coord cc;
+    const char * gate_str = NULL;
 
     if (!OBJ_AT(x, y))
         return;
 
-    toloc = down_gate(x, y);
+    toloc = down_gate(x, y, &gate_str);
     drop_to(&cc, toloc);
     if (!cc.y)
         return;
@@ -1492,10 +1497,11 @@ boolean shop_floor_obj;
     struct trap *t;
     boolean nodrop, unpaid, container, impact = FALSE;
     long n = 0L;
+    const char * gate_str = NULL;
 
     if (!otmp)
         return FALSE;
-    if ((toloc = down_gate(x, y)) == MIGR_NOWHERE)
+    if ((toloc = down_gate(x, y, &gate_str)) == MIGR_NOWHERE)
         return FALSE;
     drop_to(&cc, toloc);
     if (!cc.y)
@@ -1526,7 +1532,7 @@ boolean shop_floor_obj;
     }
 
     if (cansee(x, y))
-        otransit_msg(otmp, nodrop, n);
+        otransit_msg(otmp, nodrop, n, gate_str);
 
     if (nodrop) {
         if (impact)
@@ -1672,10 +1678,11 @@ boolean near_hero;
 }
 
 STATIC_OVL void
-otransit_msg(otmp, nodrop, num)
+otransit_msg(otmp, nodrop, num, gate_str)
 register struct obj *otmp;
 register boolean nodrop;
 long num;
+const char * gate_str;
 {
     char obuf[BUFSZ];
 
@@ -1699,30 +1706,31 @@ long num;
 
 /* migration destination for objects which fall down to next level */
 schar
-down_gate(x, y)
+down_gate(x, y, gate_str)
 xchar x, y;
+const char ** gate_str;
 {
     struct trap *ttmp;
 
-    gate_str = 0;
+    if(gate_str) *gate_str = 0;
     /* this matches the player restriction in goto_level() */
     if (on_level(&u.uz, &qstart_level) && !ok_to_quest())
         return MIGR_NOWHERE;
 
     if ((xdnstair == x && ydnstair == y)
         || (sstairs.sx == x && sstairs.sy == y && !sstairs.up)) {
-        gate_str = "down the stairs";
+        if(gate_str) *gate_str = "down the stairs";
         return (xdnstair == x && ydnstair == y) ? MIGR_STAIRS_UP
                                                 : MIGR_SSTAIRS;
     }
     if (xdnladder == x && ydnladder == y) {
-        gate_str = "down the ladder";
+        if (gate_str) *gate_str = "down the ladder";
         return MIGR_LADDER_UP;
     }
 
     if (((ttmp = t_at(x, y)) != 0 && ttmp->tseen)
         && (ttmp->ttyp == TRAPDOOR || ttmp->ttyp == HOLE)) {
-        gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
+        if(gate_str) *gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
                                             : "through the hole";
         return MIGR_RANDOM;
     }

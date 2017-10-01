@@ -761,7 +761,7 @@ register int after;
     int omx = mtmp->mx, omy = mtmp->my;
 
     if (mtmp->mtrapped) {
-        int i = mintrap(mtmp);
+        int i = mintrap(mtmp, FALSE);
 
         if (i >= 2) {
             newsym(mtmp->mx, mtmp->my);
@@ -1231,7 +1231,7 @@ postmov:
 
         if (mmoved == 1) {
             newsym(omx, omy); /* update the old position */
-            if (mintrap(mtmp) >= 2) {
+            if (mintrap(mtmp, FALSE) >= 2) {
                 if (mtmp->mx)
                     newsym(mtmp->mx, mtmp->my);
                 return 2; /* it died */

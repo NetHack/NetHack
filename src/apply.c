@@ -495,7 +495,7 @@ struct obj *obj;
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
                     if (canspotmon(mtmp))
                         ++pet_cnt;
-                    if (mintrap(mtmp) == 2)
+                    if (mintrap(mtmp, FALSE) == 2)
                         change_luck(-1);
                 }
             }
@@ -1593,7 +1593,7 @@ boolean showmsg;
     return TRUE;
 }
 
-static int jumping_is_magic;
+static int jumping_is_magic = UNDEFINED;
 
 STATIC_OVL boolean
 get_valid_jump_position(x,y)
@@ -2806,7 +2806,7 @@ struct obj *obj;
                         && touch_petrifies(&mons[otmp->corpsenm]) && !uarmg
                         && !Stone_resistance
                         && !(poly_when_stoned(youmonst.data)
-                             && polymon(PM_STONE_GOLEM))) {
+                             && polymon(PM_STONE_GOLEM, FALSE))) {
                         char kbuf[BUFSZ];
 
                         Sprintf(kbuf, "%s corpse",
@@ -2885,8 +2885,8 @@ int min_range, max_range;
     return TRUE;
 }
 
-static int polearm_range_min = -1;
-static int polearm_range_max = -1;
+static int polearm_range_min = UNDEFINED;
+static int polearm_range_max = UNDEFINED;
 
 STATIC_OVL boolean
 get_valid_polearm_position(x,y)

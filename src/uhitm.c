@@ -26,7 +26,7 @@ STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
 extern boolean notonhead; /* for long worms */
 
 /* Used to flag attacks caused by Stormbringer's maliciousness. */
-static boolean override_confirmation = FALSE;
+static boolean override_confirmation = UNDEFINED;
 
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
 
@@ -1315,7 +1315,7 @@ struct obj *otmp;
         return FALSE;
 
 #if 0   /* no poly_when_stoned() critter has theft capability */
-    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM, FALSE)) {
         display_nhwindow(WIN_MESSAGE, FALSE);   /* --More-- */
         return TRUE;
     }
@@ -1960,7 +1960,7 @@ register struct attack *mattk;
                 if (!!(otmp = mlifesaver(mdef)))
                     m_useup(mdef, otmp);
 
-                newuhs(FALSE);
+                newuhs(FALSE, FALSE);
                 /* start_engulf() issues "you engulf <mdef>" above; this
                    used to specify XKILL_NOMSG but we need "you kill <mdef>"
                    in case we're also going to get "welcome to level N+1";
@@ -2395,7 +2395,7 @@ boolean wep_was_destroyed;
                 || (protector == (W_ARMC | W_ARMG) && (!uarmc || !uarmg))) {
                 if (!Stone_resistance
                     && !(poly_when_stoned(youmonst.data)
-                         && polymon(PM_STONE_GOLEM))) {
+                         && polymon(PM_STONE_GOLEM, FALSE))) {
                     done_in_by(mon, STONING); /* "You turn to stone..." */
                     return 2;
                 }

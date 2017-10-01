@@ -19,8 +19,8 @@ STATIC_OVL boolean
 no_bones_level(lev)
 d_level *lev;
 {
-    extern d_level save_dlevel; /* in do.c */
     s_level *sptr;
+    d_level save_dlevel = { 0, 0 };
 
     if (ledger_no(&save_dlevel))
         assign_level(lev, &save_dlevel);

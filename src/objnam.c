@@ -41,7 +41,8 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
-STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
+STATIC_OVL const struct Jitem Japanese_items[] = {
+                                             { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
                                              { GLAIVE, "naginata" },
@@ -208,11 +209,6 @@ struct obj *obj;
     return TRUE;
 }
 
-/* used by distant_name() to pass extra information to xname_flags();
-   it would be much cleaner if this were a parameter, but that would
-   require all of the xname() and doname() calls to be modified */
-static int distantname = 0;
-
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
  * we don't want to set dknown if it's not set already.
  */
@@ -231,9 +227,9 @@ char *FDECL((*func), (OBJ_P));
      * object is within X-ray radius and only treat it as distant when
      * beyond that radius.  Logic is iffy but result might be interesting.
      */
-    ++distantname;
+    obj->distantname = TRUE;
     str = (*func)(obj);
-    --distantname;
+    obj->distantname = FALSE;
     return str;
 }
 
@@ -419,7 +415,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind && !distantname)
+    if (!Blind && !obj->distantname)
         obj->dknown = TRUE;
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -2024,7 +2020,7 @@ struct sing_plur {
 /* word pairs that don't fit into formula-based transformations;
    also some suffices which have very few--often one--matches or
    which aren't systematically reversible (knives, staves) */
-static struct sing_plur one_off[] = {
+static const struct sing_plur one_off[] = {
     { "child",
       "children" },      /* (for wise guys who give their food funny names) */
     { "cubus", "cubi" }, /* in-/suc-cubus */
@@ -2566,7 +2562,7 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
    absence of spaces and/or hyphens (such as "pickaxe" vs "pick axe"
    vs "pick-axe") then there is no need for inclusion in this list;
    likewise for ``"of" inversions'' ("boots of speed" vs "speed boots") */
-struct alt_spellings {
+const struct alt_spellings {
     const char *sp;
     int ob;
 } spellings[] = {
@@ -3042,7 +3038,7 @@ struct obj *no_wish;
 
     /* Alternate spellings (pick-ax, silver sabre, &c) */
     {
-        struct alt_spellings *as = spellings;
+        const struct alt_spellings *as = spellings;
 
         while (as->sp) {
             if (fuzzymatch(bp, as->sp, " -", TRUE)) {
@@ -3267,7 +3263,7 @@ srch:
     typ = 0;
 
     if (actualn) {
-        struct Jitem *j = Japanese_items;
+        const struct Jitem *j = Japanese_items;
 
         while (j->item) {
             if (actualn && !strcmpi(actualn, j->name)) {
@@ -3760,7 +3756,7 @@ typfnd:
                 name = novelname;
         }
 
-        otmp = oname(otmp, name);
+        otmp = oname(otmp, name, FALSE);
         /* name==aname => wished for artifact (otmp->oartifact => got it) */
         if (otmp->oartifact || name == aname) {
             otmp->quan = 1L;
@@ -3821,7 +3817,7 @@ STATIC_OVL const char *
 Japanese_item_name(i)
 int i;
 {
-    struct Jitem *j = Japanese_items;
+    const struct Jitem *j = Japanese_items;
 
     while (j->item) {
         if (i == j->item)

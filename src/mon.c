@@ -11,8 +11,6 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-STATIC_VAR boolean vamp_rise_msg, disintegested;
-
 STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
                                                 const char *));
 STATIC_DCL boolean FDECL(restrap, (struct monst *));
@@ -444,7 +442,7 @@ unsigned corpseflags;
         bypass_obj(obj);
 
     if (has_mname(mtmp))
-        obj = oname(obj, MNAME(mtmp));
+        obj = oname(obj, MNAME(mtmp), FALSE);
 
     /*  Avoid "It was hidden under a green mold corpse!"
      *  during Blind combat. An unseen monster referred to as "it"
@@ -1832,7 +1830,7 @@ register struct monst *mtmp;
                 spec_mon = (nonliving(mtmp->data)
                             || noncorporeal(mtmp->data)
                             || amorphous(mtmp->data)),
-                spec_death = (disintegested /* disintegrated or digested */
+                spec_death = (mtmp->disintegested /* disintegrated or digested */
                               || noncorporeal(mtmp->data)
                               || amorphous(mtmp->data));
 
@@ -1869,7 +1867,7 @@ register struct monst *mtmp;
                 /* was using a_monnam(mtmp) but that's weird if mtmp is named:
                    "Dracula suddenly transforms and rises as Dracula" */
                 pline(upstart(buf), an(mtmp->data->mname));
-                vamp_rise_msg = TRUE;
+                mtmp->vamp_rise_msg = TRUE;
             }
             newsym(x, y);
             return;
@@ -2108,7 +2106,7 @@ struct monst *mdef;
            item-conferred attributes */
         otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
         if (has_mname(mdef))
-            otmp = oname(otmp, MNAME(mdef));
+            otmp = oname(otmp, MNAME(mdef), FALSE);
         while ((obj = oldminvent) != 0) {
             oldminvent = obj->nobj;
             (void) add_to_container(otmp, obj);
@@ -2156,11 +2154,12 @@ int how;
         be_sad = (mdef->mtame != 0);
 
     /* no corpses if digested or disintegrated */
-    disintegested = (how == AD_DGST || how == -AD_RBRE);
-    if (disintegested)
+    mdef->disintegested = (how == AD_DGST || how == -AD_RBRE);
+    if (mdef->disintegested)
         mondead(mdef);
     else
         mondied(mdef);
+    mdef->disintegested = FALSE;
 
     if (be_sad && mdef->mhp <= 0)
         You("have a sad feeling for a moment, then it passes.");
@@ -2253,14 +2252,16 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         thrownobj = 0;
     }
 
-    vamp_rise_msg = FALSE; /* might get set in mondead(); only checked below */
-    disintegested = nocorpse; /* alternate vamp_rise message needed if true */
+    mtmp->vamp_rise_msg = FALSE; /* can be set in mondead()
+                                    only checked below */
+    mtmp->disintegested = nocorpse; /* alternate vamp_rise message needed
+                                       if true */
     /* dispose of monster and make cadaver */
     if (stoned)
         monstone(mtmp);
     else
         mondead(mtmp);
-    disintegested = FALSE; /* reset */
+    mtmp->disintegested = FALSE; /* reset */
 
     if (mtmp->mhp > 0) { /* monster lifesaved */
         /* Cannot put the non-visible lifesaving message in
@@ -2268,7 +2269,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
          * kill it (as opposed to visible lifesaving which always appears).
          */
         stoned = FALSE;
-        if (!cansee(x, y) && !vamp_rise_msg)
+        if (!cansee(x, y) && !mtmp->vamp_rise_msg)
             pline("Maybe not...");
         return;
     }

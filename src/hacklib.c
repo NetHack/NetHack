@@ -62,6 +62,7 @@
         int             night           (void)
         int             midnight        (void)
 =*/
+
 #ifdef LINT
 #define Static /* pacify lint */
 #else

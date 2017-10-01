@@ -70,7 +70,8 @@ struct obj *otmp;
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
+        if (!(poly_when_stoned(youmonst.data)
+            && polymon(PM_STONE_GOLEM, FALSE))) {
             Sprintf(kbuf, "attempting to saddle %s", an(mtmp->data->mname));
             instapetrify(kbuf);
         }
@@ -603,7 +604,7 @@ int reason; /* Player was thrown off etc. */
 
                 /* Put your steed in your trap */
                 if (save_utrap)
-                    (void) mintrap(mtmp);
+                    (void) mintrap(mtmp, FALSE);
             }
             /* Couldn't... try placing the steed */
         } else if (enexto(&cc, u.ux, u.uy, mtmp->data)) {

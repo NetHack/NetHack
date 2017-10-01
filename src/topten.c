@@ -1230,7 +1230,7 @@ struct obj *otmp;
         return (struct obj *) 0;
 
     set_corpsenm(otmp, classmon(tt->plrole, (tt->plgend[0] == 'F')));
-    otmp = oname(otmp, tt->name);
+    otmp = oname(otmp, tt->name, FALSE);
 
     return otmp;
 }

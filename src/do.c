@@ -875,7 +875,7 @@ drop_done:
 }
 
 /* on a ladder, used in goto_level */
-static NEARDATA boolean at_ladder = FALSE;
+static NEARDATA boolean at_ladder = UNDEFINED;
 
 /* the '>' command */
 int
@@ -1024,7 +1024,7 @@ doup()
         return 1;
     }
     if (near_capacity() > SLT_ENCUMBER) {
-        /* No levitation check; inv_weight() already allows for it */
+        /* No levitation check; above_capacity() already allows for it */
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
         return 1;
@@ -1042,8 +1042,6 @@ doup()
     at_ladder = FALSE;
     return 1;
 }
-
-d_level save_dlevel = { 0, 0 };
 
 /* check that we can write out the current level */
 STATIC_OVL int

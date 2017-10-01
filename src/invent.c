@@ -49,7 +49,7 @@ struct sortloot_item {
     struct obj *obj;
     int indx;
 };
-unsigned sortlootmode = 0;
+unsigned sortlootmode = UNDEFINED;
 
 /* qsort comparison routine for sortloot() */
 STATIC_OVL int CFDECLSPEC
@@ -397,7 +397,7 @@ struct obj **potmp, **pobj;
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
         if (!has_oname(otmp) && has_oname(obj))
-            otmp = *potmp = oname(otmp, ONAME(obj));
+            otmp = *potmp = oname(otmp, ONAME(obj), FALSE);
         obj_extract_self(obj);
 
         /* really should merge the timeouts */
@@ -3893,6 +3893,12 @@ boolean as_if_seen;
         only.x = only.y = 0;
     }
     return n;
+}
+
+void
+invent_early_init()
+{
+	lastinvnr = 51;
 }
 
 /*invent.c*/
