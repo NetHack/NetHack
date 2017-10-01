@@ -2520,7 +2520,16 @@ const char *str;
         nb = str;
         for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
             if (!*nb) {
+#ifndef STATUS_HILITES
                 if (*ob || context.botlx) {
+#else
+                /* STATUS_HILITES will call cl_end() when finished
+                 * its sequence of putstr's.  We don't want to call
+                 * cl_end() with each putstr() which may cause flashing
+                 * in the Windows port
+                 */
+                if (context.botlx) {
+#endif
                     /* last char printed may be in middle of line */
                     tty_curs(WIN_STATUS, i, cw->cury);
                     cl_end();
@@ -3695,6 +3704,7 @@ unsigned long *colormasks;
             }
         }
     }
+    cl_end();
     curs(WIN_STATUS, 1, 1);
     for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
         int fldidx2 = fieldorder[1][i];
@@ -3750,6 +3760,7 @@ unsigned long *colormasks;
 	    }
         }
     }
+    cl_end();
     return;
 }
 
