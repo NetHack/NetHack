@@ -251,7 +251,10 @@ struct instance_flags {
     boolean toptenwin;        /* ending list in window instead of stdout */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
-    boolean use_status_hilites; /* use color in status line */
+#ifdef STATUS_HILITES
+    long hilite_delta;     /* number of moves to leave a temp hilite lit */
+    long unhilite_deadline; /* time when oldest temp hilite should be unlit */
+#endif
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
@@ -360,6 +363,7 @@ struct instance_flags {
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
     boolean wc2_darkgray; /* try to use dark-gray color for black glyphs */
+    boolean wc2_hitpointbar;    /* show graphical bar representing hit points */
     boolean cmdassist;    /* provide detailed assistance for some commands */
     boolean clicklook;    /* allow right-clicking for look */
     boolean obsolete; /* obsolete options can point at this, it isn't used */

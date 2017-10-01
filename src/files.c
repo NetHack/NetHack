@@ -2540,6 +2540,11 @@ char *origbuf;
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
             retval = FALSE;
+    } else if (match_varname(buf, "HILITE_STATUS", 6)) {
+#ifdef STATUS_HILITES
+        if (!parse_status_hl1(bufp, TRUE))
+            retval = FALSE;
+#endif
     } else if (match_varname(buf, "WARNINGS", 5)) {
         (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");

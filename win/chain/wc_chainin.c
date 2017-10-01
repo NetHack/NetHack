@@ -462,7 +462,6 @@ boolean is_restoring;
     (*cibase->nprocs->win_putmsghistory)(cibase->ndata, msg, is_restoring);
 }
 
-#ifdef STATUS_VIA_WINDOWPORT
 void
 chainin_status_init()
 {
@@ -487,28 +486,14 @@ boolean enable;
 }
 
 void
-chainin_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
+chainin_status_update(idx, ptr, chg, percent, color, colormasks)
+int idx, chg, percent, color;
 genericptr_t ptr;
+unsigned long *colormasks;
 {
     (*cibase->nprocs->win_status_update)(cibase->ndata, idx, ptr, chg,
-                                         percent);
+                                         percent, color, colormasks);
 }
-
-#ifdef STATUS_HILITES
-void
-chainin_status_threshold(fldidx, thresholdtype, threshold, behavior, under,
-                         over)
-int fldidx, thresholdtype;
-int behavior, under, over;
-anything threshold;
-{
-    (*cibase->nprocs->win_status_threshold)(cibase->ndata, fldidx,
-                                            thresholdtype, threshold,
-                                            behavior, under, over);
-}
-#endif
-#endif
 
 boolean
 chainin_can_suspend()
@@ -561,12 +546,7 @@ struct window_procs chainin_procs = {
 
     chainin_outrip, chainin_preference_update, chainin_getmsghistory,
     chainin_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     chainin_status_init, chainin_status_finish, chainin_status_enablefield,
     chainin_status_update,
-#ifdef STATUS_HILITES
-    chainin_status_threshold,
-#endif
-#endif
     chainin_can_suspend,
 };

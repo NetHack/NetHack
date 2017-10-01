@@ -29,11 +29,12 @@ extern boolean notonhead; /* for long worms */
 
 /* hero is hit by something other than a monster */
 int
-thitu(tlev, dam, obj, name)
+thitu(tlev, dam, objp, name)
 int tlev, dam;
-struct obj *obj;
-const char *name; /* if null, then format `obj' */
+struct obj **objp;
+const char *name; /* if null, then format `*objp' */
 {
+    struct obj *obj = objp ? *objp : 0;
     const char *onm, *knm;
     boolean is_acid;
     int kprefix = KILLED_BY_AN;
@@ -42,8 +43,8 @@ const char *name; /* if null, then format `obj' */
     if (!name) {
         if (!obj)
             panic("thitu: name & obj both null?");
-        name =
-            strcpy(onmbuf, (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
+        name = strcpy(onmbuf,
+                      (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
         knm = strcpy(knmbuf, killer_xname(obj));
         kprefix = KILLED_BY; /* killer_name supplies "an" if warranted */
     } else {
@@ -70,14 +71,20 @@ const char *name; /* if null, then format `obj' */
         else
             You("are hit by %s%s", onm, exclam(dam));
 
-        if (obj && objects[obj->otyp].oc_material == SILVER && Hate_silver) {
-            /* extra damage already applied by dmgval() */
-            pline_The("silver sears your flesh!");
-            exercise(A_CON, FALSE);
-        }
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
+        } else if (obj && obj->oclass == POTION_CLASS) {
+            /* an explosion which scatters objects might hit hero with one
+               (potions deliberately thrown at hero are handled by m_throw) */
+            potionhit(&youmonst, obj, POTHIT_OTHER_THROW);
+            *objp = obj = 0; /* potionhit() uses up the potion */
         } else {
+            if (obj && objects[obj->otyp].oc_material == SILVER
+                && Hate_silver) {
+                /* extra damage already applied by dmgval() */
+                pline_The("silver sears your flesh!");
+                exercise(A_CON, FALSE);
+            }
             if (is_acid)
                 pline("It burns!");
             losehp(dam, knm, kprefix); /* acid damage */
@@ -110,9 +117,9 @@ int x, y;
     else
         create = 1;
 
-    if (create
-        && !((mtmp = m_at(x, y)) && (mtmp->mtrapped) && (t = t_at(x, y))
-             && ((t->ttyp == PIT) || (t->ttyp == SPIKED_PIT)))) {
+    if (create && !((mtmp = m_at(x, y)) != 0 && mtmp->mtrapped
+                    && (t = t_at(x, y)) != 0
+                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
         int objgone = 0;
 
         if (down_gate(x, y) != -1)
@@ -329,7 +336,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         mtmp->msleeping = 0;
         if (vis)
             otmp->dknown = 1;
-        potionhit(mtmp, otmp, FALSE);
+        /* probably thrown by a monster rather than 'other', but the
+           distinction only matters when hitting the hero */
+        potionhit(mtmp, otmp, POTHIT_OTHER_THROW);
         return 1;
     } else {
         damage = dmgval(otmp, mtmp);
@@ -549,7 +558,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             if (singleobj->oclass == POTION_CLASS) {
                 if (!Blind)
                     singleobj->dknown = 1;
-                potionhit(&youmonst, singleobj, FALSE);
+                potionhit(&youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }
             oldumort = u.umortality;
@@ -565,7 +574,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             /* fall through */
             case CREAM_PIE:
             case BLINDING_VENOM:
-                hitu = thitu(8, 0, singleobj, (char *) 0);
+                hitu = thitu(8, 0, &singleobj, (char *) 0);
                 break;
             default:
                 dam = dmgval(singleobj, &youmonst);
@@ -585,7 +594,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                 hitv += 8 + singleobj->spe;
                 if (dam < 1)
                     dam = 1;
-                hitu = thitu(hitv, dam, singleobj, (char *) 0);
+                hitu = thitu(hitv, dam, &singleobj, (char *) 0);
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {
                 char onmbuf[BUFSZ], knmbuf[BUFSZ];
@@ -888,7 +897,7 @@ struct monst *mtmp;
         if (dam < 1)
             dam = 1;
 
-        (void) thitu(hitv, dam, otmp, (char *) 0);
+        (void) thitu(hitv, dam, &otmp, (char *) 0);
         stop_occupation();
         return;
     }

@@ -153,16 +153,16 @@ E long NDECL(botl_score);
 E int FDECL(describe_level, (char *));
 E const char *FDECL(rank_of, (int, SHORT_P, BOOLEAN_P));
 E void NDECL(bot);
-#ifdef STATUS_VIA_WINDOWPORT
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
 E void FDECL(status_notify_windowport, (BOOLEAN_P));
+E void NDECL(status_eval_next_unhilite);
 #ifdef STATUS_HILITES
-E boolean FDECL(set_status_hilites, (char *op, BOOLEAN_P));
-E void FDECL(clear_status_hilites, (BOOLEAN_P));
-E char *FDECL(get_status_hilites, (char *, int));
+E boolean FDECL(parse_status_hl1, (char *op, BOOLEAN_P));
+E void NDECL(clear_status_hilites);
+E void NDECL(reset_status_hilites);
+E int NDECL(count_status_hilites);
 E boolean NDECL(status_hilite_menu);
-#endif
 #endif
 
 /* ### cmd.c ### */
@@ -869,6 +869,7 @@ E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
 E char *FDECL(trimspaces, (char *));
 E char *FDECL(strip_newline, (char *));
+E char *FDECL(stripchars, (char *, const char *, const char *));
 E char *FDECL(eos, (char *));
 E boolean FDECL(str_end_is, (const char *, const char *));
 E char *FDECL(strkitten, (char *, CHAR_P));
@@ -1536,7 +1537,7 @@ E void FDECL(Delay, (int));
 
 /* ### mthrowu.c ### */
 
-E int FDECL(thitu, (int, int, struct obj *, const char *));
+E int FDECL(thitu, (int, int, struct obj **, const char *));
 E int FDECL(ohitmon, (struct monst *, struct obj *, int, BOOLEAN_P));
 E void FDECL(thrwmu, (struct monst *));
 E int FDECL(spitmu, (struct monst *, struct attack *));
@@ -1714,8 +1715,11 @@ E boolean FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
 E int FDECL(sym_val, (const char *));
+E int FDECL(query_color, (const char *));
+E int FDECL(query_attr, (const char *));
 E const char *FDECL(clr2colorname, (int));
 E int FDECL(match_str2clr, (char *));
+E int FDECL(match_str2attr, (const char *, BOOLEAN_P));
 E boolean FDECL(add_menu_coloring, (char *));
 E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
@@ -1886,7 +1890,7 @@ E int FDECL(dopotion, (struct obj *));
 E int FDECL(peffects, (struct obj *));
 E void FDECL(healup, (int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(strange_feeling, (struct obj *, const char *));
-E void FDECL(potionhit, (struct monst *, struct obj *, BOOLEAN_P));
+E void FDECL(potionhit, (struct monst *, struct obj *, int));
 E void FDECL(potionbreathe, (struct obj *));
 E int NDECL(dodip);
 E void FDECL(mongrantswish, (struct monst **));
@@ -2458,7 +2462,7 @@ E void FDECL(check_caitiff, (struct monst *));
 E int FDECL(find_roll_to_hit,
             (struct monst *, UCHAR_P, struct obj *, int *, int *));
 E boolean FDECL(attack, (struct monst *));
-E boolean FDECL(hmon, (struct monst *, struct obj *, int));
+E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
 E int FDECL(damageum, (struct monst *, struct attack *));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, BOOLEAN_P, int, UCHAR_P, BOOLEAN_P));
@@ -2739,16 +2743,11 @@ E void FDECL(genl_putmsghistory, (const char *, BOOLEAN_P));
 #ifdef HANGUPHANDLING
 E void NDECL(nhwindows_hangup);
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
 E void NDECL(genl_status_init);
 E void NDECL(genl_status_finish);
 E void FDECL(genl_status_enablefield,
              (int, const char *, const char *, BOOLEAN_P));
-E void FDECL(genl_status_update, (int, genericptr_t, int, int));
-#ifdef STATUS_HILITES
-E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
-#endif
-#endif
+E void FDECL(genl_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 
 E void FDECL(dump_open_log, (time_t));
 E void NDECL(dump_close_log);

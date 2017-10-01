@@ -20,6 +20,7 @@
         char *          mungspaces      (char *)
         char *          trimspaces      (char *)
         char *          strip_newline   (char *)
+        char *          stripchars      (char *, const char *, const char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
         char *          strkitten       (char *,char)
@@ -431,6 +432,31 @@ char c;
     }
     ccc[i] = '\0';
     return ccc;
+}
+
+/* strip all the chars in stuff_to_strip from orig */
+/* caller is responsible for ensuring that bp is a
+   valid pointer to a BUFSZ buffer */
+char *
+stripchars(bp, stuff_to_strip, orig)
+char *bp;
+const char *stuff_to_strip, *orig;
+{
+    int i = 0;
+    char *s = bp;
+
+    if (s) {
+        while (s && *orig && i < (BUFSZ - 1)) {
+            if (!index(stuff_to_strip, *orig)) {
+                *s++ = *orig;
+                i++;
+            }
+            orig++;
+        }
+        *s = '\0';
+    } else
+        impossible("no output buf in stripchars");
+    return bp;
 }
 
 /* substitute a word or phrase in a string (in place) */

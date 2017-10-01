@@ -1224,6 +1224,9 @@ struct obj **optr;
             end_burn(obj, TRUE);
         /* candles are now gone */
         useupall(obj);
+        /* candelabrum's weight is changing */
+        otmp->owt = weight(otmp);
+        update_inventory();
     }
 }
 
@@ -2786,9 +2789,8 @@ struct obj *obj;
                         int hitu, hitvalu;
 
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu,
-                                     dmgval(otmp, &youmonst),
-                                     otmp, (char *)0);
+                        hitu = thitu(hitvalu, dmgval(otmp, &youmonst),
+                                     &otmp, (char *)0);
                         if (hitu) {
                             pline_The("%s hits you as you try to snatch it!",
                                       the(onambuf));

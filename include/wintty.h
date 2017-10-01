@@ -215,13 +215,8 @@ E short FDECL(set_tty_font_name, (winid, char *));
 #endif
 E char *NDECL(tty_get_color_string);
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
 E void NDECL(tty_status_init);
-E void FDECL(tty_status_update, (int, genericptr_t, int, int));
-#ifdef STATUS_HILITES
-E void FDECL(tty_status_threshold, (int, int, anything, int, int, int));
-#endif
-#endif
+E void FDECL(tty_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(tty_start_screen);

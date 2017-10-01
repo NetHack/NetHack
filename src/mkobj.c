@@ -1339,7 +1339,7 @@ int
 weight(obj)
 register struct obj *obj;
 {
-    int wt = objects[obj->otyp].oc_weight;
+    int wt = (int) objects[obj->otyp].oc_weight;
 
     /* glob absorpsion means that merging globs accumulates weight while
        quantity stays 1, so update 'wt' to reflect that, unless owt is 0,
@@ -1390,6 +1390,8 @@ register struct obj *obj;
         return (int) ((obj->quan + 50L) / 100L);
     } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
         return (int) obj->owt; /* kludge for "very" heavy iron ball */
+    } else if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->spe) {
+        return wt + obj->spe * (int) objects[TALLOW_CANDLE].oc_weight;
     }
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }

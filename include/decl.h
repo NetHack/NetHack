@@ -325,9 +325,7 @@ E NEARDATA char **viz_array;           /* could see/in sight row pointers */
 
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;
-#ifndef STATUS_VIA_WINDOWPORT
 E NEARDATA winid WIN_STATUS;
-#endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */

@@ -1106,8 +1106,11 @@ unsigned doname_flags;
                "corpse" is already in the buffer returned by xname() */
             unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
                               | CXN_NOCORPSE);
+            char *cxstr = corpse_xname(obj, prefix, cxarg);
 
-            Sprintf(prefix, "%s ", corpse_xname(obj, prefix, cxarg));
+            Sprintf(prefix, "%s ", cxstr);
+            /* avoid having doname(corpse) consume an extra obuf */
+            releaseobuf(cxstr);
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))

@@ -40,8 +40,9 @@ struct obj {
     unsigned owt;
     long quan; /* number of items */
 
-    schar spe; /* quality of weapon, armor or ring (+ or -);
+    schar spe; /* quality of weapon, weptool, armor or ring (+ or -);
                   number of charges for wand or charged tool ( >= -1 );
+                  number of candles attached to candelabrum;
                   marks your eggs, tin variety and spinach tins;
                   Schroedinger's Box (1) or royal coffers for a court (2);
                   tells which fruit a fruit is;
@@ -372,6 +373,12 @@ struct obj {
 #define ER_GREASED 1   /* protected by grease */
 #define ER_DAMAGED 2   /* object was damaged in some way */
 #define ER_DESTROYED 3 /* object was destroyed */
+
+/* propeller method for potionhit() */
+#define POTHIT_HERO_BASH   0 /* wielded by hero */
+#define POTHIT_HERO_THROW  1 /* thrown by hero */
+#define POTHIT_MONST_THROW 2 /* thrown by a monster */
+#define POTHIT_OTHER_THROW 3 /* propelled by some other means [scatter()] */
 
 /*
  *  Notes for adding new oextra structures:

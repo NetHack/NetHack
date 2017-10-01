@@ -73,16 +73,11 @@ struct window_procs {
     void FDECL((*win_preference_update), (const char *));
     char *FDECL((*win_getmsghistory), (BOOLEAN_P));
     void FDECL((*win_putmsghistory), (const char *, BOOLEAN_P));
-#ifdef STATUS_VIA_WINDOWPORT
     void NDECL((*win_status_init));
     void NDECL((*win_status_finish));
     void FDECL((*win_status_enablefield),
                (int, const char *, const char *, BOOLEAN_P));
-    void FDECL((*win_status_update), (int, genericptr_t, int, int));
-#ifdef STATUS_HILITES
-    void FDECL((*win_status_threshold), (int, int, anything, int, int, int));
-#endif
-#endif
+    void FDECL((*win_status_update), (int, genericptr_t, int, int, int, unsigned long *));
     boolean NDECL((*win_can_suspend));
 };
 
@@ -160,16 +155,11 @@ extern
 #define preference_update (*windowprocs.win_preference_update)
 #define getmsghistory (*windowprocs.win_getmsghistory)
 #define putmsghistory (*windowprocs.win_putmsghistory)
-#ifdef STATUS_VIA_WINDOWPORT
 /* there is a status_initialize() in botl.c,
  * which calls win_status_init() directly; same with status_finish.
  */
 #define status_enablefield (*windowprocs.win_status_enablefield)
 #define status_update (*windowprocs.win_status_update)
-#ifdef STATUS_HILITES
-#define status_threshold (*windowprocs.win_status_threshold)
-#endif
-#endif
 
 /*
  * WINCAP
@@ -221,7 +211,10 @@ extern
 #define WC2_HILITE_STATUS 0x0008L /* 04 hilite fields in status         */
 #define WC2_SELECTSAVED   0x0010L /* 05 saved game selection menu       */
 #define WC2_DARKGRAY      0x0020L /* 06 use bold black for black glyphs */
-                                  /* 26 free bits */
+#define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points */
+#define WC2_FLUSH_STATUS  0x0080L /* 08 call status_update(BL_FLUSH)
+                                        after updating status window fields */
+                                  /* 24 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2
@@ -362,17 +355,11 @@ struct chain_procs {
     void FDECL((*win_preference_update), (CARGS, const char *));
     char *FDECL((*win_getmsghistory), (CARGS, BOOLEAN_P));
     void FDECL((*win_putmsghistory), (CARGS, const char *, BOOLEAN_P));
-#ifdef STATUS_VIA_WINDOWPORT
     void FDECL((*win_status_init), (CARGS));
     void FDECL((*win_status_finish), (CARGS));
     void FDECL((*win_status_enablefield),
                (CARGS, int, const char *, const char *, BOOLEAN_P));
-    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int));
-#ifdef STATUS_HILITES
-    void FDECL((*win_status_threshold),
-               (CARGS, int, int, anything, int, int, int));
-#endif
-#endif
+    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int, unsigned long));
     boolean FDECL((*win_can_suspend), (CARGS));
 };
 #endif /* WINCHAIN */

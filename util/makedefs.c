@@ -1515,14 +1515,11 @@ static const char *build_opts[] = {
 #ifdef SHELL
     "shell command",
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
-# ifdef STATUS_HILITES
-    "status via windowport with highlighting",
-# else
-    "status via windowport without highlighting",
-# endif
-#else
     "traditional status display",
+#ifdef STATUS_HILITES
+    "status via windowport with highlighting",
+#else
+    "status via windowport without highlighting",
 #endif
 #ifdef SUSPEND
     "suspend command",

@@ -2567,6 +2567,9 @@ The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a small plus-symbol beside the object
 on the top of the pile.
+.lp hitpointbar
+Show a hit point bar graph behind your name and title.
+Only available for TTY and Windows GUI, and only when statushilites is on.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
@@ -2910,7 +2913,8 @@ attack to which it is resistant (default on).  Persistent.
 .lp standout
 Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
 .lp statushilites
-Enable coloring of status fields (default off).
+Controls how many turns status hilite behaviors highlight
+the field. If negated or set to zero, disables status hiliting.
 See ``Configuring Status Hilites'' for further information.
 .lp status_updates
 Allow updates to the status lines at the bottom of the screen (default true).
@@ -3479,17 +3483,22 @@ Your copy of NetHack may have been compiled with support for ``Status Hilites''.
 If so, you can customize your game display by setting thresholds to
 change the color or appearance of fields in the status display.
 .pg
+The format for defining status colors is:
+.si
+.lp "OPTION=hilite_status: field-name/behavior/color&attributes"
+.ei
+.pg
 For example, the following line in your config file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
 .si
-.lp "OPTION=hilite_status: hitpoints/30%/red/normal"
+.lp "OPTION=hilite_status: hitpoints/<30%/red/normal"
 .ei
 .pg
 For another example, the following line in your config file will cause
 wisdom to be displayed red if it drops and green if it rises.
 .si
-.lp "OPTION=hilite_status: wisdom/updown/red/green"
+.lp "OPTION=hilite_status: wisdom/down/red/up/green"
 .ei
 .pg
 You can adjust the display of the following status fields:
@@ -3508,18 +3517,73 @@ experience	condition
 .\"TABLE_END  Do not delete this line.
 .TE
 .lp ""
+The pseudo-field `characteristics' can be used to set all six
+of Str, Dex, Con, Int, Wis, and Cha at once.  `HD' is `hit dice',
+an approximation of experience level displayed when polymorphed.
+`experience', `time', and `score' are conditionally displayed
+depending upon your other option settings.
+.lp ""
+Instead of a behavior, `condition' takes the following condition flags:
+stone, slime, strngl, foodpois, termill, blind, deaf, stun, conf, hallu,
+lev, fly, and ride.  You can use `major_troubles' as an alias
+for stone through termill, `minor_troubles' for blind through hallu,
+`movement' for lev, fly, and ride, and `all' for every condition.
+.lp ""
+Allowed behaviors are "always", "up", "down", "changed", a
+percentage or absolute number threshold, or a text to match against.
+.si
+.lp "*"
+"always" will set the default attributes for that field.
+.lp "*"
+"up" and "down" set the field attributes for when the field
+value changes upwards or downwards. This attribute times out after
+statushilites turns.
+.lp "*"
+"changed" sets the field attribute for when the field value
+changes. This attribute times out after statushilites turns.
+.lp "*"
+percentage sets the field attribute when the field value
+matches the percentage. If the percentage is prefixed with '<'
+or '>', it also matches when value is below or above the percentage.
+Only valid for `power' and `hitpoints' fields.
+.lp "*"
+absolute value sets the attribute when the field value
+matches that number. If the number is prefixed with '<'
+or '>', it also matches when value is below or above.
+.lp "*"
+text match sets the attribute when the field value
+matches the text. Text matches can only be used for `alignment',
+`carrying-capacity', and `dungeon-level'.
+.ei
+.lp ""
 Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
 orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
 .lp ""
-Allowed attributes are bold, inverse, normal.
+Allowed attributes are bold, inverse, underline, blink, dim, and normal.
 Note that the platform used may interpret the attributes any way it
 wants.
 .lp ""
-Behaviours can occur based on percentage thresholds, updown, or absolute values.
 The in-game options menu can help you determine the correct syntax for a
 config file.
 .lp ""
-The whole feature can be disabled by setting option statushilites off.
+The whole feature  can  be  disabled  by  setting  option
+statushilites to 0.
+.lp ""
+Example hilites:
+.sd
+.si
+OPTION=hilite_status: gold/up/yellow/down/brown
+OPTION=hilite_status: characteristics/up/green/down/red
+OPTION=hilite_status: hitpoints/100%/gray&normal
+OPTION=hilite_status: hitpoints/<100%/green&normal
+OPTION=hilite_status: hitpoints/<66%/yellow&normal
+OPTION=hilite_status: hitpoints/<50%/orange&normal
+OPTION=hilite_status: hitpoints/<33%/red&bold
+OPTION=hilite_status: hitpoints/<15%/red&inverse
+OPTION=hilite_status: condition/major/orange&inverse
+OPTION=hilite_status: condition/lev+fly/red&inverse
+.ei
+.ed
 .pg
 .hn 2
 Modifying NetHack Symbols
