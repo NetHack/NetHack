@@ -2787,8 +2787,13 @@ wake_nearby()
             mtmp->msleeping = 0;
             if (!unique_corpstat(mtmp->data))
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
-            if (mtmp->mtame && !mtmp->isminion)
-                EDOG(mtmp)->whistletime = moves;
+            if (mtmp->mtame) {
+                if (!mtmp->isminion)
+                    EDOG(mtmp)->whistletime = moves;
+                /* Clear mtrack. This is to fix up a pet who is
+                   stuck "fleeing" its master. */
+                memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+            }
         }
     }
 }
