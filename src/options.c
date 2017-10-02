@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1505214875 2017/09/12 11:14:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.302 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1506908974 2017/10/02 01:49:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -131,9 +131,7 @@ static struct Bool_Opt {
     { "help", &flags.help, TRUE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },
-#ifdef STATUS_HILITES
     { "hitpointbar", &iflags.wc2_hitpointbar, FALSE, SET_IN_GAME }, /*WC2*/
-#endif
 #ifndef MAC
     { "ignintr", &flags.ignintr, FALSE, SET_IN_GAME },
 #else
@@ -2172,8 +2170,9 @@ boolean tinitial, tfrom_file;
             symset[PRIMARY].name = dupstr(op);
             if (!read_sym_file(PRIMARY)) {
                 clear_symsetentry(PRIMARY, TRUE);
-                config_error_add("Unable to load symbol set \"%s\" from \"%s\"",
-                           op, SYMBOLS);
+                config_error_add(
+                               "Unable to load symbol set \"%s\" from \"%s\"",
+                                 op, SYMBOLS);
                 return FALSE;
             } else {
                 switch_symbols(symset[PRIMARY].name != (char *) 0);
@@ -2866,7 +2865,8 @@ boolean tinitial, tfrom_file;
                 op++;
             }
             if (badopt) {
-                config_error_add("Unknown %s parameter '%s'", "pickup_types", op);
+                config_error_add("Unknown %s parameter '%s'",
+                                 "pickup_types", op);
                 return FALSE;
             }
         }
@@ -3351,6 +3351,7 @@ boolean tinitial, tfrom_file;
             return FALSE;
         return retval;
     }
+
 #ifdef WINCHAIN
     fullname = "windowchain";
     if (match_optname(opts, fullname, 3, TRUE)) {
@@ -3465,9 +3466,9 @@ boolean tinitial, tfrom_file;
             return retval;
         }
     }
-#ifdef STATUS_HILITES
     /* hilite fields in status prompt */
     if (match_optname(opts, "hilite_status", 13, TRUE)) {
+#ifdef STATUS_HILITES
         if (duplicate)
             complain_about_duplicate(opts, 1);
         op = string_for_opt(opts, TRUE);
@@ -3481,11 +3482,16 @@ boolean tinitial, tfrom_file;
         if (!parse_status_hl1(op, tfrom_file))
             return FALSE;
         return retval;
+#else
+        config_error_add("'hilite_status' is not supported");
+        return FALSE;
+#endif
     }
 
     /* control over whether highlights should be displayed, and for how long */
     fullname = "statushilites";
     if (match_optname(opts, fullname, 9, TRUE)) {
+#ifdef STATUS_HILITES
         if (negated) {
             iflags.hilite_delta = 0L;
         } else {
@@ -3497,8 +3503,11 @@ boolean tinitial, tfrom_file;
         if (!tfrom_file)
             reset_status_hilites();
         return retval;
-    }
+#else
+        config_error_add("'statushilites' is not supported");
+        return FALSE;
 #endif
+    }
 
 #if defined(BACKWARD_COMPAT)
     fullname = "DECgraphics";
@@ -3673,9 +3682,11 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.hilite_pet) {
                 need_redraw = TRUE;
-            } else if ((boolopt[i].addr) == &iflags.wc2_hitpointbar) {
+#ifdef STATUS_HILITES
+            } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
                 status_initialize(REASSESS_ONLY);
                 need_redraw = TRUE;
+#endif
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
                 need_redraw = TRUE;
@@ -6037,10 +6048,10 @@ struct wc_Opt wc2_options[] = { { "fullscreen", WC2_FULLSCREEN },
                                 { "softkeyboard", WC2_SOFTKEYBOARD },
                                 { "wraptext", WC2_WRAPTEXT },
                                 { "use_darkgray", WC2_DARKGRAY },
-#ifdef STATUS_HILITES
                                 { "hitpointbar", WC2_HITPOINTBAR },
                                 { "hilite_status", WC2_HILITE_STATUS },
-#endif
+                                /* statushilites doesn't have its own bit */
+                                { "statushilites", WC2_HILITE_STATUS },
                                 { (char *) 0, 0L } };
 
 /*

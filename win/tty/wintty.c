@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1506903624 2017/10/02 00:20:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1506908980 2017/10/02 01:49:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,20 +53,22 @@ extern NEARDATA winid WIN_STATUS;
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
+    (0
 #ifdef MSDOS
-    WC_TILED_MAP | WC_ASCII_MAP |
+     | WC_TILED_MAP | WC_ASCII_MAP
 #endif
 #if defined(WIN32CON)
-        WC_MOUSE_SUPPORT |
+     | WC_MOUSE_SUPPORT
 #endif
-        WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
+     | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
+    (0
 #if defined(SELECTSAVED)
-    WC2_SELECTSAVED |
+     | WC2_SELECTSAVED
 #endif
 #if defined(STATUS_HILITES)
-    WC2_HITPOINTBAR | WC2_FLUSH_STATUS |
+     | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
 #endif
-        WC2_DARKGRAY,
+     | WC2_DARKGRAY),
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
