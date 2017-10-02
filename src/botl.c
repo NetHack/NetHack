@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1469930895 2016/07/31 02:08:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1506903619 2017/10/02 00:20:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,7 +12,9 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *NDECL(rank);
+#ifdef STATUS_HILITES
 STATIC_DCL void NDECL(bot_via_windowport);
+#endif
 
 static char *
 get_strength_str()
@@ -1060,6 +1062,7 @@ int anytype;
     return buf;
 }
 
+#ifdef STATUS_HILITES
 STATIC_OVL void
 s_to_anything(a, buf, anytype)
 anything *a;
@@ -1107,6 +1110,7 @@ int anytype;
     }
     return;
 }
+#endif /* STATUS_HILITES */
 
 STATIC_OVL int
 percentage(bl, maxbl)

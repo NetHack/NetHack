@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1506903624 2017/10/02 00:20:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3431,25 +3431,25 @@ extern winid WIN_STATUS;
 static long tty_condition_bits;
 static int tty_status_colors[MAXBLSTATS];
 int hpbar_percent, hpbar_color;
-#endif /* STATUS_HILITES */
 
 static int FDECL(condcolor, (long, unsigned long *));
 static int FDECL(condattr, (long, unsigned long *));
-
+#endif /* STATUS_HILITES */
 
 void
 tty_status_init()
 {
+#ifdef STATUS_HILITES
     int i;
+
+    for (i = 0; i < MAXBLSTATS; ++i)
+        tty_status_colors[i] = NO_COLOR; /* no color */
+    tty_condition_bits = 0L;
+    hpbar_percent = 0, hpbar_color = NO_COLOR;
+#endif /* STATUS_HILITES */
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
-
-#ifdef STATUS_HILITES
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        tty_status_colors[i] = NO_COLOR; /* no color */
-    }
-#endif /* STATUS_HILITES */
 }
 
 /*
@@ -3581,7 +3581,7 @@ unsigned long *colormasks;
     int coloridx = NO_COLOR;
 #endif
     char *text = (char *) ptr;
-    static boolean oncearound = FALSE; /* prevent premature partial status display */
+    static boolean oncearound = FALSE; /* prevent premature partial display */
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
           BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
@@ -3773,7 +3773,6 @@ int condcolor(bm, bmarray)
 long bm;
 unsigned long *bmarray;
 {
-#ifdef STATUS_HILITES
     int i;
 
     if (bm && bmarray)
@@ -3781,7 +3780,6 @@ unsigned long *bmarray;
             if (bmarray[i] && (bm & bmarray[i]))
                 return i;
         }
-#endif
     return NO_COLOR;
 }
 #endif /* TEXTCOLOR */
@@ -3819,7 +3817,6 @@ unsigned long *bmarray;
     return attr;
 }
 #endif /* STATUS_HILITES */
-
 
 #endif /* TTY_GRAPHICS */
 
