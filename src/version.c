@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1449328116 2015/12/05 15:08:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1506993902 2017/10/03 01:25:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,7 +17,7 @@
 
 #define BETA_INFO ""
 
-STATIC_DCL void FDECL(insert_rtoptions, (winid,char *,const char *));
+STATIC_DCL void FDECL(insert_rtoption, (char *));
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
@@ -57,9 +57,8 @@ int
 doextversion()
 {
     dlb *f;
-    char *pd, buf[BUFSZ];
+    char buf[BUFSZ];
     winid win = create_nhwindow(NHW_TEXT);
-    boolean rtadded = FALSE;
 
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
@@ -74,8 +73,7 @@ doextversion()
         /*
          * already inserted above:
          * + outdented program name and version plus build date and time
-         * dat/options; display the contents with lines prefixed by '-'
-         * deleted:
+         * dat/options; display contents with lines prefixed by '-' deleted:
          * - blank-line
          * -     indented program name and version
          *   blank-line
@@ -108,16 +106,9 @@ doextversion()
             if (prolog || !*buf)
                 continue;
 
-            if (!rtadded) {
-                const char *catchphrase = ", and basic NetHack features.";
+            if (index(buf, ':'))
+                insert_rtoption(buf);
 
-                pd = strstri(buf, catchphrase);
-                if (pd) {
-                    *pd = '\0';
-                    insert_rtoptions(win, buf, &catchphrase[2]);
-                    rtadded = TRUE; /* only do it once */
-               }
-            }
             if (*buf)
                 putstr(win, 0, buf);
         }
@@ -130,10 +121,19 @@ doextversion()
 
 extern const char regex_id[];
 
-static const char *rt_opts[] = {
-    "pattern matching via", regex_id,
+/*
+ * makedefs should put the first token into dat/options; we'll substitute
+ * the second value for it.  The token must contain at least one colon
+ * so that we can spot it, and should not contain spaces so that makedefs
+ * won't split it across lines.  Ideally the length should be close to
+ * that of the substituted value since we don't do phrase-splitting/line-
+ * wrapping when displaying it.
+ */
+static struct rt_opt {
+    const char *token, *value;
+} rt_opts[] = {
+    { ":PATMATCH:", regex_id },
 };
-static const char indent[] = "    ";
 
 /*
  * 3.6.0
@@ -142,57 +142,17 @@ static const char indent[] = "    ";
  * game image, so we insert those options here.
  */
 STATIC_OVL void
-insert_rtoptions(win, buf, finalphrase)
-winid win;
+insert_rtoption(buf)
 char *buf;
-const char *finalphrase;
 {
-    char rtbuf[BUFSZ];
-    int l, i;
-    const char *s1 = 0, *s2 = 0, *s3 = 0, *s4 = 0;
+    int i;
 
-    if ((int) strlen(buf) >= (BUFSZ - 1))
-        return;
-
-    strcpy(rtbuf, buf);
-    for (i = 0; i < (SIZE(rt_opts) + 1); i += 2) {
-        if (i < SIZE(rt_opts)) {
-            s1 = ", ";
-            s2 = rt_opts[i];
-            s3 = " ";
-            s4 = rt_opts[i+1];
-        } else {
-            s1 = " ";
-            s2 = finalphrase;
-            s3 = "";
-            s4 = "";
-        }
-        l = (int) strlen(rtbuf) + (int) strlen(s1) + (int) strlen(s2)
-            + (int) strlen(s3) + (int) strlen(s4) + 1;
-        if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
-            Strcat(rtbuf, s1);
-            Strcat(rtbuf, s2);
-            Strcat(rtbuf, s3);
-            Strcat(rtbuf, s4);
-        } else {
-            putstr(win, 0, rtbuf);
-            if (i >= SIZE(rt_opts))
-                s1 = "";
-            l = (int) strlen(indent) + (int) strlen(s1) + (int) strlen(s2)
-                + (int) strlen(s3) + (int) strlen(s4) + 1;
-            if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
-                Strcpy(rtbuf, indent);
-                Strcat(rtbuf, s1);
-                Strcat(rtbuf, s2);
-                Strcat(rtbuf, s3);
-                Strcat(rtbuf, s4);
-            }
-        }
+    for (i = 0; i < SIZE(rt_opts); ++i) {
+        if (strstri(buf, rt_opts[i].token))
+            (void) strsubst(buf, rt_opts[i].token, rt_opts[i].value);
+        /* we don't break out of the loop after a match; there might be
+           other matches on the same line */
     }
-
-    if (l)
-        putstr(win, 0, rtbuf);
-    *buf = '\0';
 }
 
 #ifdef MICRO
