@@ -271,8 +271,15 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 /* check for "--more--" */
                 if (!data->nevermore && more_prompt_check(hWnd)) {
                     int okkey = 0;
-                    int chop;
+                    char tmptext[MAXWINDOWTEXT + 1];
+
                     // @@@ Ok respnses
+
+                    /* save original text */
+                    strcpy(tmptext, data->window_text[MSG_LINES - 1].text);
+
+                    /* text could end newline so strip it*/
+                    strip_newline(data->window_text[MSG_LINES - 1].text);
 
                     /* append more prompt and inticate the update */
                     strncat(
@@ -301,10 +308,9 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                         }
                     }
 
-                    /* erase the "--more--" prompt */
-                    chop = strlen(data->window_text[MSG_LINES - 1].text)
-                           - strlen(MORE);
-                    data->window_text[MSG_LINES - 1].text[chop] = '\0';
+                    /* restore original text */
+                    strcpy(data->window_text[MSG_LINES - 1].text, tmptext);
+
                     data->lines_not_seen = 0;
                 }
 
@@ -601,6 +607,7 @@ onPaint(HWND hWnd)
                     - (client_rt.bottom - ps.rcPaint.bottom) / data->yChar);
         y = min(ps.rcPaint.bottom, client_rt.bottom);
         for (i = LastLine; i >= FirstLine; i--) {
+            char tmptext[MAXWINDOWTEXT + 1];
             x = data->xChar * (2 - data->xPos);
 
             draw_rt.left = x;
@@ -612,8 +619,10 @@ onPaint(HWND hWnd)
                 hdc, mswin_get_font(NHW_MESSAGE, data->window_text[i].attr,
                                     hdc, FALSE));
 
-            /* convert to UNICODE */
-            NH_A2W(data->window_text[i].text, wbuf, sizeof(wbuf));
+            /* convert to UNICODE stripping newline */
+            strcpy(tmptext, data->window_text[i].text);
+            strip_newline(tmptext);
+            NH_A2W(tmptext, wbuf, sizeof(wbuf));
             wlen = _tcslen(wbuf);
             setMsgTextColor(hdc, i < (MSG_LINES - data->lines_last_turn));
 #ifdef MSG_WRAP_TEXT
@@ -765,6 +774,10 @@ can_append_text(HWND hWnd, int attr, const char *text)
     if (data->window_text[MSG_LINES - 1].attr != attr)
         return FALSE;
 
+    /* cannot append if current line ends in newline */
+    if (str_end_is(data->window_text[MSG_LINES - 1].text, "\n"))
+        return FALSE;
+
     /* check if the maximum string langth will be exceeded */
     if (strlen(data->window_text[MSG_LINES - 1].text) + 2
             + /* space characters */
@@ -772,10 +785,11 @@ can_append_text(HWND hWnd, int attr, const char *text)
         >= MAXWINDOWTEXT)
         return FALSE;
 
-    /* check if the text is goinf to fin into a single line */
+    /* check if the text is going to fit into a single line */
     strcpy(tmptext, data->window_text[MSG_LINES - 1].text);
     strcat(tmptext, "  ");
     strcat(tmptext, text);
+    strip_newline(tmptext);
     strcat(tmptext, MORE);
 
     hdc = GetDC(hWnd);
@@ -836,6 +850,8 @@ more_prompt_check(HWND hWnd)
                                     hdc, FALSE));
 
         strcpy(tmptext, data->window_text[MSG_LINES - i - 1].text);
+        strip_newline(tmptext);
+
         if (i == 0)
             strcat(tmptext, MORE);
 
