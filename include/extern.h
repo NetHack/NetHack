@@ -924,6 +924,11 @@ E int NDECL(phase_of_the_moon);
 E boolean NDECL(friday_13th);
 E int NDECL(night);
 E int NDECL(midnight);
+E void FDECL(strbuf_init, (strbuf_t *));
+E void FDECL(strbuf_append, (strbuf_t *, const char *));
+E void FDECL(strbuf_reserve, (strbuf_t *, int));
+E void FDECL(strbuf_empty, (strbuf_t *));
+E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 
 /* ### invent.c ### */
 
