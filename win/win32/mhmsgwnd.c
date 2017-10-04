@@ -245,6 +245,25 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     data = (PNHMessageWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (wParam) {
     case MSNH_MSG_PUTSTR: {
+        /* Add the passed in message to the existing text.  Support the
+         * adding of text that ends in newline.  A newline in text
+         * will force any subsequent text that is added to be added on
+         * a new output line.
+         *
+         * TODO: Text can be added with newlines occuring within the text not
+         *       just at the end.  As currently implemented, this can causes
+         *       the text to be rendered such that the text following the
+         *       newline is rendered on a new line.  This can cause a poor
+         *       user experience when the user has set only a single text line
+         *       for the message window.  In this case, the user will not see
+         *       any line other then the last line of text and the --MORE--
+         *       message thus missing any text that appears before the last
+         *       embedded newling.  This does not meet the requirements of the
+         *       message window.
+         *       This code should be changed to do the right thing and split
+         *       the text so that only lines that end in newlines are added to
+         *       the stored window text.
+         */
         PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr) lParam;
         SCROLLINFO si;
         char *p;

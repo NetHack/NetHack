@@ -1296,7 +1296,8 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
 }
 
 /*
- * mswin_raw_print_accumulate()
+ * mswin_raw_print_accumulate() accumulate the given text into
+ *   raw_print_strbuf.
  */
 void
 mswin_raw_print_accumulate(const char * str, boolean bold)
@@ -1308,14 +1309,15 @@ mswin_raw_print_accumulate(const char * str, boolean bold)
 }
 
 /*
- * mswin_raw_print_flush()
+ * mswin_raw_print_flush() - display any text found in raw_print_strbuf in a
+ *   dialog box and clear raw_print_strbuf.
  */
 void
 mswin_raw_print_flush()
 {
     if (raw_print_strbuf.str != NULL) {
         int wlen = strlen(raw_print_strbuf.str) + 1;
-        TCHAR * wbuf = (TCHAR *) malloc(wlen * sizeof(TCHAR));
+        TCHAR * wbuf = (TCHAR *) alloc(wlen * sizeof(TCHAR));
         if (wbuf != NULL) {
             NHMessageBox(GetNHApp()->hMainWnd,
                             NH_A2W(raw_print_strbuf.str, wbuf, wlen),

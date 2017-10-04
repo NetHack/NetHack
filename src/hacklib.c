@@ -1105,12 +1105,14 @@ midnight()
     return (getlt()->tm_hour == 0);
 }
 
+/* strbuf_init() inittializes strbuf state for use */
 void strbuf_init(strbuf_t * strbuf)
 {
     strbuf->str = NULL;
     strbuf->len = 0;
 }
 
+/* strbuf_append() appends given str to strbuf->str */
 void strbuf_append(strbuf_t * strbuf, const char * str)
 {
     if (strbuf->str == NULL)
@@ -1121,6 +1123,7 @@ void strbuf_append(strbuf_t * strbuf, const char * str)
     strcat(strbuf->str, str);
 }
 
+/* strbuf_reserve() ensure strbuf->str has storage for len characters */
 void strbuf_reserve(strbuf_t * strbuf, int len)
 {
     if (strbuf->str == NULL) {
@@ -1132,13 +1135,13 @@ void strbuf_reserve(strbuf_t * strbuf, int len)
     if (len > strbuf->len) {
         char * oldbuf = strbuf->str;
         strbuf->len = len + sizeof(strbuf->buf);
-        strbuf->str = (char *) malloc(len);
-        if (strbuf->str == NULL) panic("Failed allocating %u bytes", len);
+        strbuf->str = (char *) alloc(len);
         strcpy(strbuf->str, oldbuf);
         if (oldbuf != strbuf->buf) free(oldbuf);
     }
 }
 
+/* strbuf_empty() frees allocated memory and set strbuf to initial state */
 void strbuf_empty(strbuf_t * strbuf)
 {
     if (strbuf->str != strbuf->buf)
@@ -1146,6 +1149,7 @@ void strbuf_empty(strbuf_t * strbuf)
     strbuf_init(strbuf);
 }
 
+/* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
 void strbuf_nl_to_crlf(strbuf_t * strbuf)
 {
     if (strbuf->str) {
