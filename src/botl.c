@@ -2334,7 +2334,7 @@ int fld;
 }
 
 int
-count_status_hilites()
+count_status_hilites(VOID_ARGS)
 {
     int count;
     status_hilite_linestr_gather();

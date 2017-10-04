@@ -1593,7 +1593,7 @@ int hide_mask;
 }
 
 STATIC_OVL int
-msgtype_count()
+msgtype_count(VOID_ARGS)
 {
     int c = 0;
     struct plinemsg_type *tmp = plinemsg_types;
@@ -1791,7 +1791,7 @@ int idx; /* 0 .. */
 }
 
 STATIC_OVL int
-count_menucolors()
+count_menucolors(VOID_ARGS)
 {
     int count = 0;
     struct menucoloring *tmp = menu_colorings;
@@ -3975,7 +3975,7 @@ int nset;
 }
 
 int
-count_apes()
+count_apes(VOID_ARGS)
 {
     return count_ape_maps((int *) 0, (int *) 0);
 }
