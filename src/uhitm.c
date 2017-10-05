@@ -532,6 +532,11 @@ struct attack *uattk;
         if (!mtmp)
             continue;
 
+        /* Don't cleave things we can't see */
+        if (mon != mtmp && !canspotmon(mtmp) &&
+            !glyph_is_invisible(levl[x + xdir[i]][y + ydir[i]].glyph))
+            continue;
+
         /* Unless the player was hitting a peaceful primarily,
            let the player avoid peacefuls as part of the arc. */
         if (!mon->mpeaceful && !mon->mtame &&
