@@ -532,6 +532,11 @@ struct attack *uattk;
         if (!mtmp)
             continue;
 
+        /* Unless the player was hitting a peaceful primarily,
+           let the player avoid peacefuls as part of the arc. */
+        if (!mon->mpeaceful && !mon->mtame &&
+            (mtmp->mpeaceful || mtmp->mtame))
+            continue;
 
         tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
                                &attknum, &armorpenalty);
