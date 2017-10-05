@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1506908974 2017/10/02 01:49:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.309 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1507164574 2017/10/05 00:49:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.311 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2557,11 +2557,12 @@ boolean tinitial, tfrom_file;
         return warning_opts(opts, fullname);
     }
 
-#ifdef BACKWARD_COMPAT
     /* boulder:symbol */
     fullname = "boulder";
     if (match_optname(opts, fullname, 7, TRUE)) {
+#ifdef BACKWARD_COMPAT
         int clash = 0;
+
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (negated) {
@@ -2582,7 +2583,7 @@ boolean tinitial, tfrom_file;
                symbol which is not good - reject it*/
             config_error_add(
                 "Badoption - boulder symbol '%c' conflicts with a %s symbol.",
-                opts[0], (clash == 1) ? "monster" : "warning");
+                             opts[0], (clash == 1) ? "monster" : "warning");
         } else {
             /*
              * Override the default boulder symbol.
@@ -2596,8 +2597,12 @@ boolean tinitial, tfrom_file;
             need_redraw = TRUE;
         }
         return retval;
-    }
+#else
+        config_error_add("'%s' no longer supported; use S_boulder:c instead",
+                         fullname);
+        return FALSE;
 #endif
+    }
 
     /* name:string */
     fullname = "name";
@@ -3467,7 +3472,8 @@ boolean tinitial, tfrom_file;
         }
     }
     /* hilite fields in status prompt */
-    if (match_optname(opts, "hilite_status", 13, TRUE)) {
+    fullname = "hilite_status";
+    if (match_optname(opts, fullname, 13, TRUE)) {
 #ifdef STATUS_HILITES
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -3483,7 +3489,7 @@ boolean tinitial, tfrom_file;
             return FALSE;
         return retval;
 #else
-        config_error_add("'hilite_status' is not supported");
+        config_error_add("'%s' is not supported", fullname);
         return FALSE;
 #endif
     }
@@ -3504,14 +3510,14 @@ boolean tinitial, tfrom_file;
             reset_status_hilites();
         return retval;
 #else
-        config_error_add("'statushilites' is not supported");
+        config_error_add("'%s' is not supported", fullname);
         return FALSE;
 #endif
     }
 
-#if defined(BACKWARD_COMPAT)
     fullname = "DECgraphics";
     if (match_optname(opts, fullname, 3, TRUE)) {
+#ifdef BACKWARD_COMPAT
         boolean badflag = FALSE;
 
         if (duplicate)
@@ -3534,9 +3540,16 @@ boolean tinitial, tfrom_file;
             }
         }
         return retval;
-    }
+#else
+        config_error_add("'%s' no longer supported; use 'symset:%s' instead",
+                         fullname, fullname);
+        return FALSE;
+#endif
+    } /* "DECgraphics" */
+
     fullname = "IBMgraphics";
     if (match_optname(opts, fullname, 3, TRUE)) {
+#ifdef BACKWARD_COMPAT
         const char *sym_name = fullname;
         boolean badflag = FALSE;
 
@@ -3567,11 +3580,16 @@ boolean tinitial, tfrom_file;
             }
         }
         return retval;
-    }
+#else
+        config_error_add("'%s' no longer supported; use 'symset:%s' instead",
+                         fullname, fullname);
+        return FALSE;
 #endif
-#ifdef MAC_GRAPHICS_ENV
+    } /* "IBMgraphics" */
+
     fullname = "MACgraphics";
     if (match_optname(opts, fullname, 3, TRUE)) {
+#if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
         boolean badflag = FALSE;
 
         if (duplicate)
@@ -3596,8 +3614,18 @@ boolean tinitial, tfrom_file;
             }
         }
         return retval;
-    }
+#else   /* !(MAC_GRAPHICS_ENV && BACKWARD_COMPAT) */
+        config_error_add("'%s' %s; use 'symset:%s' instead",
+                         fullname,
+#ifdef MAC_GRAPHICS_ENV /* implies BACKWARD_COMPAT is not defined */
+                         "no longer supported",
+#else
+                         "is not supported",
 #endif
+                         fullname);
+        return FALSE;
+#endif  /* ?(MAC_GRAPHICS_ENV && BACKWARD_COMPAT) */
+    } /* "MACgraphics" */
 
     /* OK, if we still haven't recognized the option, check the boolean
      * options list
@@ -3621,7 +3649,9 @@ boolean tinitial, tfrom_file;
 
             if (op) {
                 if (negated) {
-                    config_error_add("Negated boolean '%s' should not have a parameter", boolopt[i].name);
+                    config_error_add(
+                           "Negated boolean '%s' should not have a parameter",
+                                     boolopt[i].name);
                     return FALSE;
                 }
                 if (!strcmp(op, "true") || !strcmp(op, "yes")) {
