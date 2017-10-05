@@ -92,6 +92,7 @@ E const char *FDECL(glow_color, (int));
 E void FDECL(Sting_effects, (int));
 E int FDECL(retouch_object, (struct obj **, BOOLEAN_P));
 E void FDECL(retouch_equipment, (int));
+E void NDECL(mkot_trap_warn);
 
 /* ### attrib.c ### */
 

@@ -27,6 +27,7 @@ STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
 STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
+STATIC_DCL int FDECL(count_surround_traps, (int, int));
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -2049,6 +2050,41 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
 
     if (!--nesting)
         clear_bypasses(); /* reset upon final exit */
+}
+
+static int mkot_trap_warn_count = 0;
+
+STATIC_OVL int
+count_surround_traps(x,y)
+int x,y;
+{
+    int dx, dy, ret = 0;
+    struct trap *ttmp;
+
+    for (dx = x-1; dx < x+2; dx++)
+        for (dy = y-1; dy < y+2; dy++)
+            if (isok(dx,dy) && (ttmp = t_at(dx,dy))
+                && !ttmp->tseen)
+                ret++;
+    return ret;
+}
+
+void
+mkot_trap_warn()
+{
+    if (!uarmg && uwep
+        && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+        const char *const heat[7] = { "cold", "slightly warm", "warm",
+                                      "very warm", "hot", "very hot",
+                                      "like fire" };
+        int ntraps = count_surround_traps(u.ux, u.uy);
+
+        if (ntraps != mkot_trap_warn_count)
+            pline_The("key feels %s%c", heat[(ntraps > 6) ? 6 : ntraps],
+                      ntraps > 3 ? '!' : '.');
+        mkot_trap_warn_count = ntraps;
+    } else
+        mkot_trap_warn_count = 0;
 }
 
 /*artifact.c*/
