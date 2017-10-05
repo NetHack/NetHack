@@ -652,7 +652,7 @@ initoptions()
      * lists of usernames into arrays with one name per element.
      */
 #endif
-#endif
+#endif /* SYSCF */
     initoptions_finish();
 }
 
@@ -809,12 +809,12 @@ initoptions_finish()
             config_error_done();
         }
     } else
-#endif
-        {
-            config_error_init(TRUE, (char *) 0, FALSE);
-            read_config_file((char *) 0, SET_IN_FILE);
-            config_error_done();
-        }
+#endif /* !MAC */
+    /*else*/ {
+        config_error_init(TRUE, (char *) 0, FALSE);
+        read_config_file((char *) 0, SET_IN_FILE);
+        config_error_done();
+    }
 
     (void) fruitadd(pl_fruit, (struct fruit *) 0);
     /*
@@ -828,6 +828,19 @@ initoptions_finish()
     if (iflags.bouldersym)
         update_bouldersym();
     reglyph_darkroom();
+
+#ifdef STATUS_HILITES
+    /*
+     * A multi-interface binary might only support status highlighting
+     * for some of the interfaces; check whether we asked for it but are
+     * using one which doesn't.
+     */
+    if (iflags.hilite_delta && !wc2_supported("statushilites")) {
+        raw_printf("Status highlighting not supported for %s interface.",
+                   windowprocs.name);
+        iflags.hilite_delta = 0;
+    }
+#endif
     return;
 }
 
@@ -4158,9 +4171,13 @@ doset() /* changing options via menu by Per Liboriussen */
              "Other settings:",
              MENU_UNSELECTED);
 
-    for (i = 0; othropt[i].name; i++)
-        opts_add_others(tmpwin, othropt[i].name, othropt[i].code,
-                        NULL, othropt[i].othr_count_func());
+    for (i = 0; (name = othropt[i].name) != 0; i++) {
+        if ((is_wc_option(name) && !wc_supported(name))
+            || (is_wc2_option(name) && !wc2_supported(name)))
+            continue;
+        opts_add_others(tmpwin, name, othropt[i].code,
+                        (char *) 0, othropt[i].othr_count_func());
+    }
 
 #ifdef PREFIXES_IN_USE
     any = zeroany;
@@ -6080,6 +6097,8 @@ struct wc_Opt wc2_options[] = { { "fullscreen", WC2_FULLSCREEN },
                                 { "use_darkgray", WC2_DARKGRAY },
                                 { "hitpointbar", WC2_HITPOINTBAR },
                                 { "hilite_status", WC2_HILITE_STATUS },
+                                /* name shown in 'O' menu is different */
+                                { "status hilite rules", WC2_HILITE_STATUS },
                                 /* statushilites doesn't have its own bit */
                                 { "statushilites", WC2_HILITE_STATUS },
                                 { (char *) 0, 0L } };
