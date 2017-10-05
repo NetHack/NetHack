@@ -499,6 +499,8 @@ struct attack *uattk;
     int i = 0;
     int x = u.ux;
     int y = u.uy;
+    int dx = 0;
+    int dy = 0;
     int count = 3;
     boolean malive = TRUE;
     struct monst *mtmp;
@@ -526,15 +528,24 @@ struct attack *uattk;
         else
             i--;
 
+        dx = x + xdir[i];
+        dy = y + ydir[i];
         mtmp = NULL;
-        if (isok(x + xdir[i], y + ydir[i]))
-            mtmp = m_at(x + xdir[i], y + ydir[i]);
-        if (!mtmp)
+
+        if (isok(dx, dy))
+            mtmp = m_at(dx, dy);
+        if (!mtmp) {
+            /* Unmap invisibiltiy markers */
+            if (glyph_is_invisible(levl[dx][dy].glyph)) {
+                unmap_object(dx, dy);
+                newsym(dx, dy);
+            }
             continue;
+        }
 
         /* Don't cleave things we can't see */
         if (mon != mtmp && !canspotmon(mtmp) &&
-            !glyph_is_invisible(levl[x + xdir[i]][y + ydir[i]].glyph))
+            !glyph_is_invisible(levl[dx][dy].glyph))
             continue;
 
         /* Unless the player was hitting a peaceful primarily,
