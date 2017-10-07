@@ -168,6 +168,9 @@ E boolean NDECL(status_hilite_menu);
 
 /* ### cmd.c ### */
 
+E int NDECL(doconduct);
+E int NDECL(domonability);
+E char FDECL(cmd_from_func, (int NDECL((*))));
 E boolean FDECL(redraw_cmd, (CHAR_P));
 #ifdef USE_TRAMPOLI
 E int NDECL(doextcmd);

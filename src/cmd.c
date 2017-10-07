@@ -117,7 +117,6 @@ static int NDECL((*timed_occ_fn));
 STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
 STATIC_PTR int NDECL(doextcmd);
-STATIC_PTR int NDECL(domonability);
 STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doterrain);
 STATIC_PTR int NDECL(wiz_wish);
@@ -164,9 +163,7 @@ STATIC_DCL boolean FDECL(accept_menu_prefix, (int NDECL((*))));
 STATIC_DCL int NDECL(wiz_port_debug);
 #endif
 STATIC_PTR int NDECL(wiz_rumor_check);
-STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
 STATIC_PTR int NDECL(doattributes);
-STATIC_PTR int NDECL(doconduct); /**/
 
 STATIC_DCL void FDECL(enlght_line, (const char *, const char *, const char *,
                                     const char *));
@@ -523,7 +520,7 @@ extcmd_via_menu()
 #endif /* TTY_GRAPHICS */
 
 /* #monster command - use special monster ability while polymorphed */
-STATIC_PTR int
+int
 domonability(VOID_ARGS)
 {
     if (can_breathe(youmonst.data))
@@ -2734,7 +2731,7 @@ int msgflag;          /* for variant message phrasing */
 /* KMH, #conduct
  * (shares enlightenment's tense handling)
  */
-STATIC_PTR int
+int
 doconduct(VOID_ARGS)
 {
     show_conduct(0);
@@ -3283,7 +3280,7 @@ dokeylist(VOID_ARGS)
     destroy_nhwindow(datawin);
 }
 
-STATIC_OVL char
+char
 cmd_from_func(fn)
 int NDECL((*fn));
 {

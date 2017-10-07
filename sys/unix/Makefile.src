@@ -201,6 +201,22 @@ WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
 WINQTSRC = ../win/Qt/qt_win.cpp ../win/Qt/qt_clust.cpp ../win/Qt/qttableview.cpp
 WINQTOBJ = qt_win.o qt_clust.o qttableview.o tile.o
 #
+# Files for a Qt 4 or 5 port
+#
+WINQT4SRC = ../win/Qt4/qt4bind.cpp ../win/Qt4/qt4click.cpp \
+	../win/Qt4/qt4clust.cpp ../win/Qt4/qt4delay.cpp \
+	../win/Qt4/qt4glyph.cpp ../win/Qt4/qt4icon.cpp ../win/Qt4/qt4inv.cpp \
+	../win/Qt4/qt4key.cpp ../win/Qt4/qt4line.cpp ../win/Qt4/qt4main.cpp \
+	../win/Qt4/qt4map.cpp ../win/Qt4/qt4menu.cpp ../win/Qt4/qt4msg.cpp \
+	../win/Qt4/qt4plsel.cpp ../win/Qt4/qt4rip.cpp ../win/Qt4/qt4set.cpp \
+	../win/Qt4/qt4stat.cpp ../win/Qt4/qt4str.cpp ../win/Qt4/qt4streq.cpp \
+	../win/Qt4/qt4svsel.cpp ../win/Qt4/qt4win.cpp ../win/Qt4/qt4xcmd.cpp \
+	../win/Qt4/qt4yndlg.cpp
+WINQT4OBJ = qt4bind.o qt4click.o qt4clust.o qt4delay.o qt4glyph.o qt4icon.o \
+	qt4inv.o qt4key.o qt4line.o qt4main.o qt4map.o qt4menu.o qt4msg.o \
+	qt4plsel.o qt4rip.o qt4set.o qt4stat.o qt4str.o qt4streq.o qt4svsel.o \
+	qt4win.o qt4xcmd.o qt4yndlg.o tile.o
+#
 # Files for a Gnome port
 #
 WINGNOMESRC = ../win/gnome/gnaskstr.c ../win/gnome/gnbind.c \
@@ -253,8 +269,11 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 # WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11 -lm
 # WINX11LIB = -lXaw -lXmu -lXpm -lXext -lXt -lX11 -lSM -lICE -lm # BSD/OS 2.0
 #
-# libraries for Qt
+# libraries for Qt 3
 WINQTLIB = -L$(QTDIR)/lib -lqt
+#
+# libraries for Qt 4
+WINQT4LIB = `pkg-config QtGui --libs`
 #
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
@@ -360,7 +379,7 @@ GENCSRC = monstr.c vis_tab.c	#tile.c
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
-WINCXXSRC = $(WINQTSRC) $(WINBESRC)
+WINCXXSRC = $(WINQTSRC) $(WINQT4SRC) $(WINBESRC)
 
 # Files for window system chaining.  Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
@@ -486,7 +505,7 @@ objects.o:
 	$(CC) $(CFLAGS) -c objects.c
 	@rm -f $(MAKEDEFS)
 
-# Qt windowport meta-object-compiler output
+# Qt 3 windowport meta-object-compiler output
 qt_kde0.moc: ../include/qt_kde0.h
 	$(QTDIR)/bin/moc -o qt_kde0.moc ../include/qt_kde0.h
 
@@ -495,6 +514,28 @@ qt_win.moc: ../include/qt_win.h
 
 qttableview.moc: ../include/qttableview.h
 	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
+
+# Qt 4 windowport meta-object-compiler output
+qt4kde0.moc : ../win/Qt4/qt4kde0.h
+	$(QTDIR)/bin/moc -o qt4kde0.moc ../win/Qt4/qt4kde0.h
+qt4main.moc : ../win/Qt4/qt4main.h
+	$(QTDIR)/bin/moc -o qt4main.moc ../win/Qt4/qt4main.h
+qt4map.moc : ../win/Qt4/qt4map.h
+	$(QTDIR)/bin/moc -o qt4map.moc ../win/Qt4/qt4map.h
+qt4menu.moc : ../win/Qt4/qt4menu.h
+	$(QTDIR)/bin/moc -o qt4menu.moc ../win/Qt4/qt4menu.h
+qt4msg.moc : ../win/Qt4/qt4msg.h
+	$(QTDIR)/bin/moc -o qt4msg.moc ../win/Qt4/qt4msg.h
+qt4plsel.moc : ../win/Qt4/qt4plsel.h
+	$(QTDIR)/bin/moc -o qt4plsel.moc ../win/Qt4/qt4plsel.h
+qt4set.moc : ../win/Qt4/qt4set.h
+	$(QTDIR)/bin/moc -o qt4set.moc ../win/Qt4/qt4set.h
+qt4stat.moc : ../win/Qt4/qt4stat.h
+	$(QTDIR)/bin/moc -o qt4stat.moc ../win/Qt4/qt4stat.h
+qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
+	$(QTDIR)/bin/moc -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
+	$(QTDIR)/bin/moc -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
@@ -737,6 +778,52 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
+qt4bind.o : ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4bind.cpp
+qt4click.o : ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4click.cpp
+qt4clust.o : ../win/Qt4/qt4clust.cpp $(HACK_H) ../win/Qt4/qt4clust.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4clust.cpp
+qt4delay.o : ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4delay.cpp
+qt4glyph.o : ../win/Qt4/qt4glyph.cpp $(HACK_H) ../win/Qt4/qt4glyph.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4glyph.cpp
+qt4icon.o : ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4icon.cpp
+qt4inv.o : ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4inv.cpp
+qt4key.o : ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4key.cpp
+qt4line.o : ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4line.cpp
+qt4main.o : ../win/Qt4/qt4main.cpp $(HACK_H) qt4main.moc ../win/Qt4/qt4main.h qt4kde0.moc
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4main.cpp
+qt4map.o : ../win/Qt4/qt4map.cpp $(HACK_H) qt4map.moc ../win/Qt4/qt4map.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4map.cpp
+qt4menu.o : ../win/Qt4/qt4menu.cpp $(HACK_H) qt4menu.moc ../win/Qt4/qt4menu.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4menu.cpp
+qt4msg.o : ../win/Qt4/qt4msg.cpp $(HACK_H) qt4msg.moc ../win/Qt4/qt4msg.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4msg.cpp
+qt4plsel.o : ../win/Qt4/qt4plsel.cpp $(HACK_H) qt4plsel.moc ../win/Qt4/qt4plsel.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4plsel.cpp
+qt4rip.o : ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4rip.cpp
+qt4set.o : ../win/Qt4/qt4set.cpp $(HACK_H) qt4set.moc ../win/Qt4/qt4set.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4set.cpp
+qt4stat.o : ../win/Qt4/qt4stat.cpp $(HACK_H) qt4stat.moc ../win/Qt4/qt4stat.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4stat.cpp
+qt4str.o : ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4str.cpp
+qt4streq.o : ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4streq.cpp
+qt4svsel.o : ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4svsel.cpp
+qt4win.o : ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4win.cpp
+qt4xcmd.o : ../win/Qt4/qt4xcmd.cpp $(HACK_H) qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4xcmd.cpp
+qt4yndlg.o : ../win/Qt4/qt4yndlg.cpp $(HACK_H) qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4yndlg.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
 wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
