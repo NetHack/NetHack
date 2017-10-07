@@ -246,7 +246,18 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         data->is_active = FALSE;
         LayoutMenu(hWnd); // hide dialog buttons
         mswin_popup_destroy(hWnd);
+
+        /* If we just used the permanent inventory window to pick something,
+         * set the menu back to its display inventory state.
+         */
+        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
+            && how != PICK_NONE) {
+            data->menu.prompt[0] = '\0';
+            SetMenuListType(hWnd, PICK_NONE);
+            LayoutMenu(hWnd);
+        }
     }
+
     return ret_val;
 }
 /*-----------------------------------------------------------------------------*/
