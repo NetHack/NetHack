@@ -529,8 +529,10 @@ struct attack *uattk;
         mtmp = NULL;
         if (isok(x + xdir[i], y + ydir[i]))
             mtmp = m_at(x + xdir[i], y + ydir[i]);
-        if (!mtmp)
+        if (!mtmp) {
+            (void) unmap_invisible(x + xdir[i], y + ydir[i]);
             continue;
+        }
 
 
         tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
