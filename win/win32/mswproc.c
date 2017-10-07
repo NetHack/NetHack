@@ -2202,7 +2202,10 @@ mswin_popup_destroy(HWND hWnd)
     }
     DrawMenuBar(GetNHApp()->hMainWnd);
 
-    ShowWindow(hWnd, SW_HIDE);
+    /* Don't hide the permanent inventory window ... leave it showing */
+    if (!flags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
+        ShowWindow(hWnd, SW_HIDE);
+
     GetNHApp()->hPopupWnd = NULL;
 
     mswin_layout_main_window(hWnd);
