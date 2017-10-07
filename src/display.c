@@ -277,6 +277,19 @@ register xchar x, y;
     }
 }
 
+boolean
+unmap_invisible(x, y)
+int x, y;
+{
+    if (isok(x,y) && glyph_is_invisible(levl[x][y].glyph)) {
+        unmap_object(x, y);
+        newsym(x, y);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
 /*
  * unmap_object()
  *

@@ -3958,10 +3958,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
             /* reveal/unreveal invisible monsters before tmp_at() */
             if (mon && !canspotmon(mon))
                 map_invisible(sx, sy);
-            else if (!mon && glyph_is_invisible(levl[sx][sy].glyph)) {
-                unmap_object(sx, sy);
-                newsym(sx, sy);
-            }
+            else if (!mon)
+                (void) unmap_invisible(sx, sy);
             if (ZAP_POS(levl[sx][sy].typ)
                 || (isok(lsx, lsy) && cansee(lsx, lsy)))
                 tmp_at(sx, sy);

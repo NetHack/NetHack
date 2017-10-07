@@ -321,6 +321,7 @@ E void FDECL(map_background, (XCHAR_P, XCHAR_P, int));
 E void FDECL(map_trap, (struct trap *, int));
 E void FDECL(map_object, (struct obj *, int));
 E void FDECL(map_invisible, (XCHAR_P, XCHAR_P));
+E boolean FDECL(unmap_invisible, (int, int));
 E void FDECL(unmap_object, (int, int));
 E void FDECL(map_location, (int, int, int));
 E void FDECL(feel_newsym, (XCHAR_P, XCHAR_P));
