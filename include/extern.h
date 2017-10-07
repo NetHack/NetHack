@@ -1723,7 +1723,7 @@ E const char *FDECL(clr2colorname, (int));
 E int FDECL(match_str2clr, (char *));
 E int FDECL(match_str2attr, (const char *, BOOLEAN_P));
 E boolean FDECL(add_menu_coloring, (char *));
-E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+E boolean FDECL(get_menu_coloring, (const char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
 E int FDECL(msgtype_type, (const char *, BOOLEAN_P));

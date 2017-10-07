@@ -32,17 +32,13 @@ extern "C" {
 extern "C" int qt_compact_mode;
 // end temporary
 
-#ifdef MENU_COLOR
 extern "C" struct menucoloring *menu_colorings;
-#endif
 
 namespace nethack_qt4 {
 
 // temporary
 void centerOnMain( QWidget* w );
 // end temporary
-
-static boolean get_menu_coloring(char const *str, int *color, int *attr);
 
 QSize NetHackQtTextListBox::sizeHint() const
 {
@@ -194,38 +190,16 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P* identifier,
 		+ str.mid(bracket+2);
 	}
     }
-#ifdef MENU_COLOR
     int mcolor, mattr;
     if (attr == 0
-    && get_menu_coloring(str.toLatin1().constData(), &mcolor, &mattr)) {
+        && get_menu_coloring(str.toLatin1().constData(), &mcolor, &mattr)) {
 	itemlist[itemcount].attr = mattr;
 	itemlist[itemcount].color = mcolor;
     }
-#endif
     ++itemcount;
 
     if (glyph!=NO_GLYPH) has_glyphs=true;
 }
-
-#ifdef MENU_COLOR
-static boolean
-get_menu_coloring(char const *str, int *color, int *attr)
-{
-    struct menucoloring *tmpmc;
-    if (iflags.use_menu_color)
-	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-# ifdef MENU_COLOR_REGEX
-	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-# else
-	    if (pmatch(tmpmc->match, str)) {
-# endif
-		*color = tmpmc->color;
-		*attr = tmpmc->attr;
-		return TRUE;
-	    }
-    return FALSE;
-}
-#endif /* MENU_COLOR */
 
 void NetHackQtMenuWindow::EndMenu(const QString& p)
 {
@@ -417,11 +391,9 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     table->item(row, 4)->setFlags(Qt::ItemIsEnabled);
     WidenColumn(4, fm.width(text));
 
-#ifdef MENU_COLOR
     if (mi.color != -1) {
 	twi->setForeground(colors[mi.color]);
     }
-#endif
 
     QFont itemfont(table->font());
     switch (mi.attr) {
