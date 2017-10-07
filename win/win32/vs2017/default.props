@@ -5,6 +5,7 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
+    <LocalDebuggerWorkingDirectory>$(BinDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" >
     <UseDebugLibraries>true</UseDebugLibraries>
