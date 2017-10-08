@@ -269,7 +269,7 @@ E void FDECL(cvt_sdoor_to_door, (struct rm *));
 E void FDECL(findone, (int, int, genericptr_t));
 E void FDECL(openone, (int, int, genericptr_t));
 #endif
-E int NDECL(findit);
+E int FDECL(findit, (int));
 E int NDECL(openit);
 E boolean FDECL(detecting, (void (*)(int, int, genericptr)));
 E void FDECL(find_trap, (struct trap *));

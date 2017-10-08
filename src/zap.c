@@ -2087,7 +2087,7 @@ register struct obj *obj;
         break;
     case WAN_SECRET_DOOR_DETECTION:
     case SPE_DETECT_UNSEEN:
-        if (!findit())
+        if (!findit(BOLT_LIM))
             return;
         if (!Blind)
             known = TRUE;

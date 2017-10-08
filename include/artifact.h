@@ -59,7 +59,7 @@ struct artifact {
 #define TAMING (LAST_PROP + 1)
 #define HEALING (LAST_PROP + 2)
 #define ENERGY_BOOST (LAST_PROP + 3)
-#define UNTRAP (LAST_PROP + 4)
+#define DETECT_UNSEEN (LAST_PROP + 4)
 #define CHARGE_OBJ (LAST_PROP + 5)
 #define LEV_TELE (LAST_PROP + 6)
 #define CREATE_PORTAL (LAST_PROP + 7)

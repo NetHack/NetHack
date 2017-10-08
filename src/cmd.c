@@ -711,7 +711,7 @@ STATIC_PTR int
 wiz_detect(VOID_ARGS)
 {
     if (wizard)
-        (void) findit();
+        (void) findit(0);
     else
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_detect)));

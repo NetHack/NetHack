@@ -1084,7 +1084,7 @@ struct obj **optr;
 #ifdef AMIGA
             amii_speaker(obj, "AeFeaeFeAefegw", AMII_OKAY_VOLUME);
 #endif
-            if (findit() != 0)
+            if (findit(BOLT_LIM) != 0)
                 learno = TRUE;
             else
                 pline1(nothing_happens);

@@ -1481,11 +1481,17 @@ struct obj *obj;
                 goto nothing_special;
             break;
         }
-        case UNTRAP: {
-            if (!untrap(TRUE)) {
-                obj->age = 0; /* don't charge for changing their mind */
-                return 0;
-            }
+        case DETECT_UNSEEN: {
+            /* 4 if cursed, 8 if uncursed, 16 if blessed.
+               Doubled if role is appropriate. */
+            int range = 4;
+            if (!obj->cursed)
+                range *= 2;
+            if (obj->blessed)
+                range *= 2;
+            if (oart->role == Role_switch || !oart->role)
+                range *= 2;
+            (void) findit(range);
             break;
         }
         case CHARGE_OBJ: {

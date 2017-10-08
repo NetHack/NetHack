@@ -1463,13 +1463,23 @@ genericptr_t num;
 
 /* returns number of things found */
 int
-findit()
+findit(range)
+int range;
 {
     int num = 0;
 
-    if (u.uswallow)
+    if (u.uswallow && range)
         return 0;
-    do_clear_area(u.ux, u.uy, BOLT_LIM, findone, (genericptr_t) &num);
+    /* If range is zero, do the entire level. */
+    if (range)
+        do_clear_area(u.ux, u.uy, range, findone, (genericptr_t) &num);
+    else {
+        int x;
+        int y;
+        for (x = 1; x < COLNO; x++)
+            for (y = 0; y < ROWNO; y++)
+                findone(x, y, &num);
+    }
     return num;
 }
 
