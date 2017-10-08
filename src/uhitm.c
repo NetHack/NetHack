@@ -8,6 +8,7 @@ STATIC_DCL boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
                                        int, int, struct attack *, int));
 STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
+STATIC_DCL boolean FDECL(hitum_cleave, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
                                        int));
@@ -489,6 +490,65 @@ int dieroll;
     return malive;
 }
 
+/* hit the monster next to you and the monsters to the left and right of it */
+STATIC_OVL boolean
+hitum_cleave(mon, uattk)
+struct monst *mon;
+struct attack *uattk;
+{
+    int i = 0;
+    int x = u.ux;
+    int y = u.uy;
+    int count = 3;
+    boolean malive = TRUE;
+    struct monst *mtmp;
+
+    /* find the direction we're swinging */
+    while (i < 8) {
+        if (xdir[i] == u.dx && ydir[i] == u.dy)
+            break;
+        i++;
+    }
+
+    if (i == 8) {
+        impossible("hitum_cleave: failed to find target monster?");
+        return TRUE;
+    }
+    i = (i + 2) % 8;
+
+    /* swing from right to left */
+    while (count-- && uwep) {
+        boolean result;
+        int tmp, dieroll, mhit, attknum, armorpenalty;
+
+        if (!i)
+            i = 7;
+        else
+            i--;
+
+        mtmp = NULL;
+        if (isok(x + xdir[i], y + ydir[i]))
+            mtmp = m_at(x + xdir[i], y + ydir[i]);
+        if (!mtmp) {
+            (void) unmap_invisible(x + xdir[i], y + ydir[i]);
+            continue;
+        }
+
+
+        tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
+                               &attknum, &armorpenalty);
+        dieroll = rnd(20);
+        mhit = (tmp > dieroll);
+        result = known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
+                             uattk, dieroll);
+        (void) passive(mtmp, mhit, DEADMONSTER(mtmp), AT_WEAP, !uwep);
+        if (mon == mtmp)
+            malive = result;
+    }
+
+    return malive;
+}
+
 /* hit target monster; returns TRUE if it still lives */
 STATIC_OVL boolean
 hitum(mon, uattk)
@@ -502,6 +562,10 @@ struct attack *uattk;
                                              &attknum, &armorpenalty);
     int dieroll = rnd(20);
     int mhit = (tmp > dieroll || u.uswallow);
+
+    if (uwep && uwep->oartifact == ART_CLEAVER
+        && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum))
+        return hitum_cleave(mon, uattk);
 
     if (tmp > dieroll)
         exercise(A_DEX, TRUE);

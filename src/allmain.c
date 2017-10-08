@@ -267,6 +267,7 @@ boolean resuming;
                         (void) dosearch0(1);
                     if (Warning)
                         warnreveal();
+                    mkot_trap_warn();
                     dosounds();
                     do_storms();
                     gethungry();

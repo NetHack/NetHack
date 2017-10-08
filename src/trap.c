@@ -4242,8 +4242,9 @@ boolean force;
     struct trap *ttmp;
     struct monst *mtmp;
     const char *trapdescr;
-    boolean here, useplural, confused = (Confusion || Hallucination),
-                             trap_skipped = FALSE, deal_with_floor_trap;
+    boolean here, useplural, deal_with_floor_trap,
+            confused = (Confusion || Hallucination),
+            trap_skipped = FALSE;
     int boxcnt = 0;
     char the_trap[BUFSZ], qbuf[QBUFSZ];
 
@@ -4255,6 +4256,11 @@ boolean force;
         pline_The("perils lurking there are beyond your grasp.");
         return 0;
     }
+    /* 'force' is true for #invoke; make it be true for #untrap if
+       carrying MKoT */
+    if (!force && has_magic_key(&youmonst))
+        force = TRUE;
+
     ttmp = t_at(x, y);
     if (ttmp && !ttmp->tseen)
         ttmp = 0;
@@ -4434,7 +4440,7 @@ boolean force;
         return 0;
     }
 
-    if ((levl[x][y].doormask & D_TRAPPED
+    if (((levl[x][y].doormask & D_TRAPPED) != 0
          && (force || (!confused && rn2(MAXULEV - u.ulevel + 11) < 10)))
         || (!force && confused && !rn2(3))) {
         You("find a trap on the door!");

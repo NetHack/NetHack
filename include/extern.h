@@ -78,8 +78,8 @@ E int FDECL(spec_dbon, (struct obj *, struct monst *, int));
 E void FDECL(discover_artifact, (XCHAR_P));
 E boolean FDECL(undiscovered_artifact, (XCHAR_P));
 E int FDECL(disp_artifact_discoveries, (winid));
-E boolean FDECL(artifact_hit,
-                (struct monst *, struct monst *, struct obj *, int *, int));
+E boolean FDECL(artifact_hit, (struct monst *, struct monst *, struct obj *,
+                               int *, int));
 E int NDECL(doinvoke);
 E boolean FDECL(finesse_ahriman, (struct obj *));
 E void FDECL(arti_speak, (struct obj *));
@@ -92,6 +92,9 @@ E const char *FDECL(glow_color, (int));
 E void FDECL(Sting_effects, (int));
 E int FDECL(retouch_object, (struct obj **, BOOLEAN_P));
 E void FDECL(retouch_equipment, (int));
+E void NDECL(mkot_trap_warn);
+E boolean FDECL(is_magic_key, (struct monst *, struct obj *));
+E struct obj *FDECL(has_magic_key, (struct monst *));
 
 /* ### attrib.c ### */
 
@@ -167,6 +170,9 @@ E boolean NDECL(status_hilite_menu);
 
 /* ### cmd.c ### */
 
+E int NDECL(doconduct);
+E int NDECL(domonability);
+E char FDECL(cmd_from_func, (int NDECL((*))));
 E boolean FDECL(redraw_cmd, (CHAR_P));
 #ifdef USE_TRAMPOLI
 E int NDECL(doextcmd);
@@ -320,6 +326,7 @@ E void FDECL(map_background, (XCHAR_P, XCHAR_P, int));
 E void FDECL(map_trap, (struct trap *, int));
 E void FDECL(map_object, (struct obj *, int));
 E void FDECL(map_invisible, (XCHAR_P, XCHAR_P));
+E boolean FDECL(unmap_invisible, (int, int));
 E void FDECL(unmap_object, (int, int));
 E void FDECL(map_location, (int, int, int));
 E void FDECL(feel_newsym, (XCHAR_P, XCHAR_P));
@@ -1721,7 +1728,7 @@ E const char *FDECL(clr2colorname, (int));
 E int FDECL(match_str2clr, (char *));
 E int FDECL(match_str2attr, (const char *, BOOLEAN_P));
 E boolean FDECL(add_menu_coloring, (char *));
-E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+E boolean FDECL(get_menu_coloring, (const char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
 E int FDECL(msgtype_type, (const char *, BOOLEAN_P));

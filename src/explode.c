@@ -219,11 +219,8 @@ int expltype;
             }
             if (mtmp && cansee(i + x - 1, j + y - 1) && !canspotmon(mtmp))
                 map_invisible(i + x - 1, j + y - 1);
-            else if (!mtmp && glyph_is_invisible(
-                                  levl[i + x - 1][j + y - 1].glyph)) {
-                unmap_object(i + x - 1, j + y - 1);
-                newsym(i + x - 1, j + y - 1);
-            }
+            else if (!mtmp)
+                (void) unmap_invisible(i + x - 1, j + y - 1);
             if (cansee(i + x - 1, j + y - 1))
                 visible = TRUE;
             if (explmask[i][j] == 1)

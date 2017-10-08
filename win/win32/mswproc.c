@@ -86,7 +86,7 @@ struct window_procs mswin_procs = {
         | WC_VARY_MSGCOUNT | WC_WINDOWCOLORS | WC_PLAYER_SELECTION
         | WC_SPLASH_SCREEN | WC_POPUP_DIALOG | WC_MOUSE_SUPPORT,
 #ifdef STATUS_HILITES
-    WC2_HITPOINTBAR | WC2_FLUSH_STATUS |
+    WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_HILITE_STATUS |
 #endif
     0L, mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
@@ -2202,7 +2202,10 @@ mswin_popup_destroy(HWND hWnd)
     }
     DrawMenuBar(GetNHApp()->hMainWnd);
 
-    ShowWindow(hWnd, SW_HIDE);
+    /* Don't hide the permanent inventory window ... leave it showing */
+    if (!flags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
+        ShowWindow(hWnd, SW_HIDE);
+
     GetNHApp()->hPopupWnd = NULL;
 
     mswin_layout_main_window(hWnd);

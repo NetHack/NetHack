@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1459208813 2016/03/28 23:46:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1506993895 2017/10/03 01:24:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -1451,20 +1451,26 @@ static const char *build_opts[] = {
 #ifdef DUMPLOG
     "end-of-game dumplogs",
 #endif
-#ifdef MFLOPPY
-    "floppy drive support",
-#endif
-#ifdef INSURANCE
-    "insurance files for recovering from crashes",
-#endif
 #ifdef HOLD_LOCKFILE_OPEN
     "exclusive lock on level 0 file",
 #endif
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     "external program as a message handler",
 #endif
+#ifdef MFLOPPY
+    "floppy drive support",
+#endif
+#ifdef INSURANCE
+    "insurance files for recovering from crashes",
+#endif
 #ifdef LOGFILE
     "log file",
+#endif
+#ifdef XLOGFILE
+    "extended log file",
+#endif
+#ifdef PANICLOG
+    "errors and warnings log file",
 #endif
 #ifdef MAIL
     "mail daemon",
@@ -1486,6 +1492,8 @@ static const char *build_opts[] = {
 #endif
 #endif
 #endif
+    /* pattern matching method will be substituted by nethack at run time */
+    "pattern matching via :PATMATCH:",
 #ifdef SELECTSAVED
     "restore saved games via menu",
 #endif
@@ -1553,7 +1561,8 @@ static const char *build_opts[] = {
 #ifdef SYSCF
     "system configuration at run-time",
 #endif
-    save_bones_compat_buf, "and basic NetHack features"
+    save_bones_compat_buf,
+    "and basic NetHack features"
 };
 
 struct win_info {
@@ -1618,8 +1627,7 @@ windowing_sanity()
         for (i = 0; window_opts[i].id; ++i)
             if (!strcmp(window_opts[i].id, DEFAULT_WINDOW_SYS))
                 break;
-        if (!window_opts[i]
-                 .id) { /* went through whole list without a match */
+        if (!window_opts[i].id) { /* went through whole list without a match */
             Fprintf(stderr, "Configuration error: DEFAULT_WINDOW_SYS (%s)\n",
                     DEFAULT_WINDOW_SYS);
             Fprintf(stderr,
@@ -1663,7 +1671,8 @@ do_options()
     Fprintf(ofp, "\nOptions compiled into this edition:\n");
     length = COLNO + 1; /* force 1st item onto new line */
     for (i = 0; i < SIZE(build_opts); i++) {
-        str = strcpy(buf, build_opts[i]);
+        str = strcat(strcpy(buf, build_opts[i]),
+                     (i < SIZE(build_opts) - 1) ? "," : ".");
         while (*str) {
             word = index(str, ' ');
             if (word)
@@ -1675,7 +1684,6 @@ do_options()
             Fprintf(ofp, "%s", str), length += strlen(str);
             str += strlen(str) + (word ? 1 : 0);
         }
-        Fprintf(ofp, (i < SIZE(build_opts) - 1) ? "," : "."), length++;
     }
 
     winsyscnt = SIZE(window_opts) - 1;

@@ -4,16 +4,18 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(picklock);
-STATIC_PTR int NDECL(forcelock);
-
 /* at most one of `door' and `box' should be non-null at any given time */
 STATIC_VAR NEARDATA struct xlock_s {
     struct rm *door;
     struct obj *box;
     int picktyp, /* key|pick|card for unlock, sharp vs blunt for #force */
         chance, usedtime;
+    boolean magic_key;
 } xlock;
+
+/* occupation callbacks */
+STATIC_PTR int NDECL(picklock);
+STATIC_PTR int NDECL(forcelock);
 
 STATIC_DCL const char *NDECL(lock_action);
 STATIC_DCL boolean FDECL(obstructed, (int, int, BOOLEAN_P));
@@ -104,6 +106,40 @@ picklock(VOID_ARGS)
 
     if (rn2(100) >= xlock.chance)
         return 1; /* still busy */
+
+    /* using the Master Key of Thievery finds traps if its bless/curse
+       state is adequate (non-cursed for rogues, blessed for others;
+       checked when setting up 'xlock') */
+    if ((!xlock.door ? (int) xlock.box->otrapped
+                     : (xlock.door->doormask & D_TRAPPED) != 0)
+        && xlock.magic_key) {
+        xlock.chance += 20; /* less effort needed next time */
+        /* unfortunately we don't have a 'tknown' flag to record
+           "known to be trapped" so declining to disarm and then
+           retrying lock manipulation will find it all over again */
+        if (yn("You find a trap!  Do you want to try to disarm it?") == 'y') {
+            const char *what;
+            boolean alreadyunlocked;
+
+            /* disarming while using magic key always succeeds */
+            if (xlock.door) {
+                xlock.door->doormask &= ~D_TRAPPED;
+                what = "door";
+                alreadyunlocked = !(xlock.door->doormask & D_LOCKED);
+            } else {
+                xlock.box->otrapped = 0;
+                what = (xlock.box->otyp == CHEST) ? "chest" : "box";
+                alreadyunlocked = !xlock.box->olocked;
+            }
+            You("succeed in disarming the trap.  The %s is still %slocked.",
+                what, alreadyunlocked ? "un" : "");
+            exercise(A_WIS, TRUE);
+        } else {
+            You("stop %s.", lock_action());
+            exercise(A_WIS, FALSE);
+        }
+        return ((xlock.usedtime = 0));
+    }
 
     You("succeed in %s.", lock_action());
     if (xlock.door) {
@@ -225,6 +261,7 @@ void
 reset_pick()
 {
     xlock.usedtime = xlock.chance = xlock.picktyp = 0;
+    xlock.magic_key = FALSE;
     xlock.door = 0;
     xlock.box = 0;
 }
@@ -264,6 +301,7 @@ struct obj *pick;
 
         if (nohands(youmonst.data)) {
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
+
             if (picktyp == CREDIT_CARD)
                 what = "card";
             pline(no_longer, "hold the", what);
@@ -277,6 +315,7 @@ struct obj *pick;
             const char *action = lock_action();
 
             You("resume your attempt at %s.", action);
+            xlock.magic_key = is_magic_key(&youmonst, pick);
             set_occupation(picklock, action, 0);
             return PICKLOCK_DID_SOMETHING;
         }
@@ -291,8 +330,9 @@ struct obj *pick;
         return PICKLOCK_DID_NOTHING;
     }
 
-    if ((picktyp != LOCK_PICK && picktyp != CREDIT_CARD
-         && picktyp != SKELETON_KEY)) {
+    if (picktyp != LOCK_PICK
+        && picktyp != CREDIT_CARD
+        && picktyp != SKELETON_KEY) {
         impossible("picking lock with object %d?", picktyp);
         return PICKLOCK_DID_NOTHING;
     }
@@ -375,7 +415,6 @@ struct obj *pick;
                 if (otmp->cursed)
                     ch /= 2;
 
-                xlock.picktyp = picktyp;
                 xlock.box = otmp;
                 xlock.door = 0;
                 break;
@@ -407,7 +446,7 @@ struct obj *pick;
         } else if (mtmp && is_door_mappear(mtmp)) {
             /* "The door actually was a <mimic>!" */
             stumble_onto_mimic(mtmp);
-            /* mimic might keep the key (50% chance, 10% for PYEC) */
+            /* mimic might keep the key (50% chance, 10% for PYEC or MKoT) */
             maybe_absorb_item(mtmp, pick, 50, 10);
             return PICKLOCK_LEARNED_SOMETHING;
         }
@@ -462,6 +501,7 @@ struct obj *pick;
     context.move = 0;
     xlock.chance = ch;
     xlock.picktyp = picktyp;
+    xlock.magic_key = is_magic_key(&youmonst, pick);
     xlock.usedtime = 0;
     set_occupation(picklock, lock_action(), 0);
     return PICKLOCK_DID_SOMETHING;
@@ -531,6 +571,7 @@ doforce()
             xlock.box = otmp;
             xlock.chance = objects[uwep->otyp].oc_wldam * 2;
             xlock.picktyp = picktyp;
+            xlock.magic_key = FALSE;
             xlock.usedtime = 0;
             break;
         }

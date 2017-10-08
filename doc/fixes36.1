@@ -350,12 +350,6 @@ pets start with apport equal to your charisma
 sometimes generate the random mazes with wide corridors, thick walls,
 	or with dead ends changed to loops
 put throne room gold in the chest
-wielding Trollsbane prevents trolls from reviving
-wielding Demonbane prevents demons summoning friends
-wielding Dragonbane confers reflection
-wielding Ogresmasher grants 25 constitution
-Elbereth must now be on a square by itself to function
-Elbereth now erodes based on attacks by the player, not monsters scared
 novels are made of paper, not gold
 movement speeds are made less predictable by using random rounding, rather
 	than via adding a random offset
@@ -453,6 +447,10 @@ when lit candelabrum burned out, persistent inventory window showed that it
 improve hilite_status, allowing multiple stops per field, and temporarily or
 	permanently hilited fields
 give feedback when released from a bear trap
+#version output sometimes had ", and basic NetHack features." on its own line
+	depending upon how the dynamically inserted pattern-match phrase fit
+#version output left out "pattern matching via <method>" if the basic NetHack
+	features entry was split across two lines
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -675,6 +673,17 @@ new paranoid_confirm settings: wand-break to require "yes" rather than 'y'
 option force_invmenu to make commands asking for inventory items always
 	use a menu instead of a text line query
 option hitpointbar to show a bar graph of hit points behind title field
+wielding Trollsbane prevents troll corpses from reviving
+wielding Demonbane prevents demons summoning friends
+wielding Dragonbane confers reflection
+wielding Ogresmasher grants 25 constitution
+Cleaver can hit three adjacent monsters with one swing
+Master Key of Thievery warns about undetected traps if wielded without gloves
+Master Key of Thievery always finds door and chest traps if used to lock or
+	unlock a trapped door or chest while non-cursed (for rogues) or
+	blessed (for non-rogues); player is offered the opportunity to disarm
+"Elbereth" must now be the only engraved text on a square to function
+"Elbereth" now erodes based on attacks by the player, not monsters scared
 
 
 Platform- and/or Interface-Specific New Features
@@ -709,6 +718,7 @@ Ray Chason's proper background tiles for lava and water
 Ray Chason's MS-DOS port restored to functionality with credit to Reddit user 
 	b_helyer for the fix to sys/share/pcmain.c
 Ray Chason's MSDOS port support for some VESA modes
+Ray Chason's Qt4 windowport
 Darshan Shaligram's pet ranged attack
 Jason Dorje Short's key rebinding
 Maxime Bacoux's new DUMPLOG: compile-time option to enable logging of

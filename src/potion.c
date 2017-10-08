@@ -1243,7 +1243,7 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
     return res;
 }
 
-/* potion obj hits monster mon, which might be youmonst; obj always use up */
+/* potion obj hits monster mon, which might be youmonst; obj always used up */
 void
 potionhit(mon, obj, how)
 struct monst *mon;

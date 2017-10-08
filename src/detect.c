@@ -1394,9 +1394,7 @@ genericptr_t num;
         }
         if (!canspotmon(mtmp) && !glyph_is_invisible(levl[zx][zy].glyph))
             map_invisible(zx, zy);
-    } else if (glyph_is_invisible(levl[zx][zy].glyph)) {
-        unmap_object(zx, zy);
-        newsym(zx, zy);
+    } else if (unmap_invisible(zx, zy)) {
         (*(int *) num)++;
     }
 }
@@ -1646,11 +1644,8 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     /* see if an invisible monster has moved--if Blind,
                      * feel_location() already did it
                      */
-                    if (!aflag && !mtmp && !Blind
-                        && glyph_is_invisible(levl[x][y].glyph)) {
-                        unmap_object(x, y);
-                        newsym(x, y);
-                    }
+                    if (!aflag && !mtmp && !Blind)
+                        (void) unmap_invisible(x, y);
 
                     if ((trap = t_at(x, y)) && !trap->tseen && !rnl(8)) {
                         nomul(0);

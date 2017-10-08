@@ -110,8 +110,6 @@ set_uasmon()
 #ifdef STATUS_HILITES
     status_initialize(REASSESS_ONLY);
 #endif
-
-    polysense();
 }
 
 /* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */
