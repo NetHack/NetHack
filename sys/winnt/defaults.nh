@@ -98,7 +98,7 @@ OPTIONS=suppress_alert:3.3.1
 # possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|fit_to_screen
-OPTIONS=map_mode:tiles,scroll_margin:5
+OPTIONS=map_mode:tiles,scroll_margin:10
 
 # Message window settings
 OPTIONS=font_message:Arial,font_size_message:9,align_message:top
