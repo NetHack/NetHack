@@ -18,7 +18,6 @@ STATIC_PTR int NDECL(picklock);
 STATIC_PTR int NDECL(forcelock);
 
 STATIC_DCL const char *NDECL(lock_action);
-STATIC_DCL boolean FDECL(is_magic_key, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(obstructed, (int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
 
@@ -273,21 +272,6 @@ maybe_reset_pick()
 {
     if (!xlock.box || !carried(xlock.box))
         reset_pick();
-}
-
-/* Master Key is magic key if its bless/curse state meets our criteria:
-   not cursed for rogues or blessed for non-rogues */
-STATIC_OVL boolean
-is_magic_key(mon, obj)
-struct monst *mon; /* if null, non-rogue is assumed */
-struct obj *obj;
-{
-    if (((obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY)
-         && ((mon == &youmonst) ? Role_if(PM_ROGUE)
-                                : (mon && mon->data == &mons[PM_ROGUE])))
-        ? !obj->cursed : obj->blessed)
-        return TRUE;
-    return FALSE;
 }
 
 /* for doapply(); if player gives a direction or resumes an interrupted

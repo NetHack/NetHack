@@ -1246,6 +1246,16 @@ postmov:
                 boolean btrapped = (here->doormask & D_TRAPPED) != 0,
                         observeit = canseeit && canspotmon(mtmp);
 
+                /* if mon has MKoT, disarm door trap; no message given */
+                if (btrapped && has_magic_key(mtmp)) {
+                    /* BUG: this lets a vampire or blob or a doorbuster
+                       holding the Key disarm the trap even though it isn't
+                       using that Key when squeezing under or smashing the
+                       door.  Not significant enough to worry about; perhaps
+                       the Key's magic is more powerful for monsters? */
+                    here->doormask &= ~D_TRAPPED;
+                    btrapped = FALSE;
+                }
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && (amorphous(ptr)
                         || (can_fog(mtmp)

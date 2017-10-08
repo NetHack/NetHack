@@ -4256,6 +4256,11 @@ boolean force;
         pline_The("perils lurking there are beyond your grasp.");
         return 0;
     }
+    /* 'force' is true for #invoke; make it be true for #untrap if
+       carrying MKoT */
+    if (!force && has_magic_key(&youmonst))
+        force = TRUE;
+
     ttmp = t_at(x, y);
     if (ttmp && !ttmp->tseen)
         ttmp = 0;
