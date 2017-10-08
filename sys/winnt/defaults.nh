@@ -36,12 +36,17 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
 #OPTIONS=dogname:Fido,catname:Morris,fruit:guava
 #OPTIONS=horsename:Silver
-#OPTIONS=autopickup,pickup_types:$"=/!?+
+
+# Disable autopickup
+OPTIONS=!autopickup
+
+# When autopickup is on, automatically pick up these types of objects
+#OPTIONS=pickup_types:$"=/!?+
+
 #OPTIONS=packorder:")[%?+/=!(*0_`
 #OPTIONS=scores:10 top/2 around/own
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
-#OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
 #OPTIONS=perm_invent
 
 
