@@ -26,7 +26,9 @@ extern "C" {
 #endif
 #include "qt4bind.h"
 #include "qt4click.h"
+#ifdef TIMED_DELAY
 #include "qt4delay.h"
+#endif
 #include "qt4xcmd.h"
 #include "qt4key.h"
 #include "qt4map.h"
@@ -581,8 +583,10 @@ void NetHackQtBind::qt_number_pad(int)
 
 void NetHackQtBind::qt_delay_output()
 {
-    NetHackQtDelay delay(15);
+#ifdef TIMED_DELAY
+    NetHackQtDelay delay(50);
     delay.wait();
+#endif
 }
 
 void NetHackQtBind::qt_start_screen()
