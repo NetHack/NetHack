@@ -366,20 +366,27 @@ set_moreluck()
 void
 restore_attrib()
 {
-    int i;
+    int i, equilibrium;;
+
+    /*
+     * Note:  this gets called on every turn but ATIME() is never set
+     * to non-zero anywhere, and ATEMP() is only used for strength loss
+     * from hunger, so it doesn't actually do anything.
+     */
 
     for (i = 0; i < A_MAX; i++) { /* all temporary losses/gains */
-
-        if (ATEMP(i) && ATIME(i)) {
+        equilibrium = (i == A_STR && u.uhs >= WEAK) ? -1 : 0;
+        if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
-                ATEMP(i) += ATEMP(i) > 0 ? -1 : 1;
-
+                ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
+                context.botl = 1;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    (void) encumber_msg();
+    if (context.botl)
+        (void) encumber_msg();
 }
 
 #define AVAL 50 /* tune value for exercise gains */

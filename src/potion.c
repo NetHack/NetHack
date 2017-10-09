@@ -565,8 +565,8 @@ register struct obj *otmp;
             i = rn2(A_MAX); /* start at a random point */
             for (ii = 0; ii < A_MAX; ii++) {
                 lim = AMAX(i);
-                if (i == A_STR && u.uhs >= 3)
-                    --lim; /* WEAK */
+                /* this used to adjust 'lim' for A_STR when u.uhs was
+                   WEAK or worse, but that's handled via ATEMP(A_STR) now */
                 if (ABASE(i) < lim) {
                     ABASE(i) = lim;
                     context.botl = 1;

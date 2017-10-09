@@ -1951,9 +1951,8 @@ struct obj *obj;
         if (ABASE(idx) >= AMAX(idx))
             continue;
         val_limit = AMAX(idx);
-        /* don't recover strength lost from hunger */
-        if (idx == A_STR && u.uhs >= WEAK)
-            val_limit--;
+        /* this used to adjust 'val_limit' for A_STR when u.uhs was
+           WEAK or worse, but that's handled via ATEMP(A_STR) now */
         if (Fixed_abil) {
             /* potion/spell of restore ability override sustain ability
                intrinsic but unicorn horn usage doesn't */

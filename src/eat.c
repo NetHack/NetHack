@@ -112,8 +112,11 @@ register struct obj *obj;
 void
 init_uhunger()
 {
+    context.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
     u.uhunger = 900;
     u.uhs = NOT_HUNGRY;
+    if (ATEMP(A_STR) < 0)
+        ATEMP(A_STR) = 0;
 }
 
 /* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */
@@ -2961,10 +2964,23 @@ boolean incr;
     }
 
     if (newhs != u.uhs) {
-        if (newhs >= WEAK && u.uhs < WEAK)
-            losestr(1); /* this may kill you -- see below */
-        else if (newhs < WEAK && u.uhs >= WEAK)
-            losestr(-1);
+        if (newhs >= WEAK && u.uhs < WEAK) {
+            /* this used to be losestr(1) which had the potential to
+               be fatal (still handled below) by reducing HP if it
+               tried to take base strength below minimum of 3 */
+            ATEMP(A_STR) = -1; /* temporary loss overrides Fixed_abil */
+            /* defer context.botl status update until after hunger message */
+        } else if (newhs < WEAK && u.uhs >= WEAK) {
+            /* this used to be losestr(-1) which could be abused by
+               becoming weak while wearing ring of sustain ability,
+               removing ring, eating to 'restore' strength which boosted
+               strength by a point each time the cycle was performed;
+               substituting "while polymorphed" for sustain ability and
+               "rehumanize" for ring removal might have done that too */
+            ATEMP(A_STR) = 0; /* repair of loss also overrides Fixed_abil */
+            /* defer context.botl status update until after hunger message */
+        }
+
         switch (newhs) {
         case HUNGRY:
             if (Hallucination) {
