@@ -254,6 +254,8 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
             && how != PICK_NONE) {
             data->menu.prompt[0] = '\0';
             SetMenuListType(hWnd, PICK_NONE);
+            for (i = 0; i < data->menu.size; i++)
+                data->menu.items[i].count = 0;
             LayoutMenu(hWnd);
         }
     }
