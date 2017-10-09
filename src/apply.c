@@ -1769,10 +1769,10 @@ int magic; /* 0=Physical, otherwise skill level */
             temp = -temp;
         if (range < temp)
             range = temp;
-        (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
-        /* hurtle_step results in (u.ux, u.uy) == (cc.x, cc.y) and usually
-         * moves the ball if punished, but does not handle all the effects
-         * of landing on the final position.
+        (void) walk_path(&uc, &cc, hurtle_jump, (genericptr_t) &range);
+        /* hurtle_jump -> hurtle_step results in <u.ux,u.uy> == <cc.x,cc.y>
+         * and usually moves the ball if punished, but does not handle all
+         * the effects of landing on the final position.
          */
         teleds(cc.x, cc.y, FALSE);
         sokoban_guilt();

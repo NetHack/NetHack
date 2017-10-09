@@ -519,6 +519,25 @@ genericptr_t arg;
     return FALSE;
 }
 
+/* hack for hurtle_step() -- it ought to be changed to take an argument
+   indicating lev/fly-to-dest vs lev/fly-to-dest-minus-one-land-on-dest
+   vs drag-to-dest; original callers use first mode, jumping wants second,
+   grappling hook backfire and thrown chained ball need third */
+boolean
+hurtle_jump(arg, x, y)
+genericptr_t arg;
+int x, y;
+{
+    boolean res;
+    long save_EWwalking = EWwalking;
+
+    /* prevent jumping over water from being placed in that water */
+    EWwalking |= I_SPECIAL;
+    res = hurtle_step(arg, x, y);
+    EWwalking = save_EWwalking;
+    return res;
+}
+
 /*
  * Single step for the hero flying through the air from jumping, flying,
  * etc.  Called from hurtle() and jump() via walk_path().  We expect the
