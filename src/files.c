@@ -1973,9 +1973,11 @@ int src;
         if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
     }
+#if defined(WIN32)
     set_configfile_name(fqname(default_configfile, HACKPREFIX, 0));
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
+#endif
 #ifdef MSDOS
     set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
