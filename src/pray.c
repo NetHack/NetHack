@@ -343,7 +343,7 @@ int trouble;
             u.utrap = 0;
         break;
     case TROUBLE_STARVING:
-        losestr(-1);
+        /* temporarily lost strength recovery now handled by init_uhunger() */
         /*FALLTHRU*/
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));

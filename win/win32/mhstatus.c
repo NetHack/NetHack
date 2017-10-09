@@ -347,8 +347,9 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
             else if (atr & HL_DIM)
                 fntatr = ATR_DIM;
             fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
-            nFg = (clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr) 
-                                              : status_fg_color;
+            nFg = (clr == NO_COLOR ? status_fg_color :
+                   ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
+                                                : status_fg_color));
             nBg = status_bg_color;
 
             GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
