@@ -1966,13 +1966,16 @@ int src;
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
     set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
         return fp;
-    } else if (strcmp(default_configfile, configfile)) {
+    if (strcmp(default_configfile, configfile)) {
         set_configfile_name(default_configfile);
         if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
     }
+    set_configfile_name(fqname(default_configfile, HACKPREFIX, 0));
+    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+        return fp;
 #ifdef MSDOS
     set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
