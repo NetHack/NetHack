@@ -104,7 +104,7 @@ register_main_window_class()
     wcex.hInstance = GetNHApp()->hApp;
     wcex.hIcon = LoadIcon(GetNHApp()->hApp, (LPCTSTR) IDI_NETHACKW);
     wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
     wcex.lpszMenuName = (TCHAR *) IDC_NETHACKW;
     wcex.lpszClassName = szMainWindowClass;
 
