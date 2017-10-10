@@ -71,6 +71,7 @@ NetHackQtMapViewport::NetHackQtMapViewport(NetHackQtClickBuffer& click_sink) :
 	change(10)
 {
     pet_annotation = QPixmap(qt_compact_mode ? pet_mark_small_xpm : pet_mark_xpm);
+    pile_annotation = QPixmap(pile_mark_xpm);
 
     Clear();
     cursor.setX(0);
@@ -157,29 +158,33 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 			QString(QChar(ch)).left(1)
 		    );
 		}
-		if (glyph_is_pet(g)
 #ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
+		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pile_annotation);
+                }
 #endif
-		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
-		}
-	    }
-	}
+            }
+        }
 
 	painter.setFont(font());
     } else {
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
+		int color;
+		int ch;
+		unsigned special;
+		mapglyph(g, &ch, &color, &special, i, j);
 		qt_settings->glyphs().drawCell(painter, g, i, j);
-		if (glyph_is_pet(g)
 #ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
+		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pile_annotation);
+                }
 #endif
-		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
-		}
 	    }
 	}
     }
@@ -649,6 +654,7 @@ NetHackQtMapWindow::NetHackQtMapWindow(NetHackQtClickBuffer& click_sink) :
     viewport.setPalette(palette);
 
     pet_annotation = QPixmap(qt_compact_mode ? pet_mark_small_xpm : pet_mark_xpm);
+    pile_annotation = QPixmap(pile_mark_xpm);
 
     cursor.setX(0);
     cursor.setY(0);
@@ -835,13 +841,13 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    Qt::AlignCenter,
 		    QString(QChar(ch)).left(1)
 		);
-		if (glyph_is_pet(g)
 #ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
+		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pile_annotation);
+                }
 #endif
-		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
-		}
 	    }
 	}
 
@@ -850,14 +856,18 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
+		int color;
+		int ch;
+		unsigned special;
+		mapglyph(g, &ch, &color, &special, i, j);
 		qt_settings->glyphs().drawCell(painter, g, i, j);
-		if (glyph_is_pet(g)
 #ifdef TEXTCOLOR
-		    && ::iflags.hilite_pet
+		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pile_annotation);
+                }
 #endif
-		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
-		}
 	    }
 	}
     }
