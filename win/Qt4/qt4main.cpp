@@ -861,14 +861,17 @@ void NetHackQtMainWindow::doKeys(const QString& k)
 void NetHackQtMainWindow::AddMessageWindow(NetHackQtMessageWindow* window)
 {
     message=window;
-    hsplitter->insertWidget(0, message->Widget());
+    if (!qt_compact_mode)
+        hsplitter->insertWidget(0, message->Widget());
     ShowIfReady();
 }
 
 void NetHackQtMainWindow::AddMapWindow(NetHackQtMapWindow2* window)
 {
+
     map=window;
-    vsplitter->insertWidget(1, map->Widget());
+    if (!qt_compact_mode)
+        vsplitter->insertWidget(1, map->Widget());
     ShowIfReady();
     connect(map,SIGNAL(resized()),this,SLOT(layout()));
 }
@@ -876,7 +879,8 @@ void NetHackQtMainWindow::AddMapWindow(NetHackQtMapWindow2* window)
 void NetHackQtMainWindow::AddStatusWindow(NetHackQtStatusWindow* window)
 {
     status=window;
-    hsplitter->insertWidget(2, status->Widget());
+    if (!qt_compact_mode)
+        hsplitter->insertWidget(2, status->Widget());
     ShowIfReady();
 }
 
