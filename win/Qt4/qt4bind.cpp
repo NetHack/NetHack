@@ -683,7 +683,7 @@ struct window_procs Qt_procs = {
     nethack_qt4::NetHackQtBind::qt_destroy_nhwindow,
     nethack_qt4::NetHackQtBind::qt_curs,
     nethack_qt4::NetHackQtBind::qt_putstr,
-    nethack_qt4::NetHackQtBind::qt_putstr, /* FIXME: should be qt_putmixed() */
+    genl_putmixed,
     nethack_qt4::NetHackQtBind::qt_display_file,
     nethack_qt4::NetHackQtBind::qt_start_menu,
     nethack_qt4::NetHackQtBind::qt_add_menu,
