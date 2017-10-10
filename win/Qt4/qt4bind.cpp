@@ -641,11 +641,18 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
     if (msg) {
         //raw_printf("msg='%s'", msg);
         window->PutStr(ATR_NONE, QString::fromLatin1(msg));
+#ifdef DUMPLOG
+        dumplogmsg(msg);
+#endif
     } else if (msgs_saved) {
         /* restore strings */
         int i;
-        for (i = 0; i < msgs_strings->size(); i++)
+        for (i = 0; i < msgs_strings->size(); i++) {
             window->PutStr(ATR_NONE, msgs_strings->at((i)));
+#ifdef DUMPLOG
+            dumplogmsg(msgs_strings->at(i).toLatin1().constData());
+#endif
+        }
         delete msgs_strings;
         msgs_initd = false;
     }
