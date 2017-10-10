@@ -114,6 +114,7 @@ static int NDECL(dosuspend_core); /**/
 
 static int NDECL((*timed_occ_fn));
 
+STATIC_PTR int NDECL(doherecmdmenu);
 STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
 STATIC_PTR int NDECL(doextcmd);
@@ -181,6 +182,8 @@ STATIC_DCL void FDECL(attributes_enlightenment, (int, int));
 static const char *readchar_queue = "";
 static coord clicklook_cc;
 
+STATIC_DCL void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)), const char *));
+STATIC_DCL char FDECL(here_cmd_menu, (BOOLEAN_P));
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
@@ -2899,6 +2902,7 @@ struct ext_func_tab extcmdlist[] = {
     { ';', "glance", "show what type of thing a map symbol corresponds to",
             doquickwhatis, IFBURIED | GENERALCMD },
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },
+    { '\0', "herecmdmenu", "show menu of commands you can do here", doherecmdmenu, IFBURIED },
     { 'V', "history", "show long version and game history",
             dohistory, IFBURIED | GENERALCMD },
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
@@ -4658,6 +4662,124 @@ register int x, y;
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1;
 }
 
+STATIC_PTR int
+doherecmdmenu(VOID_ARGS)
+{
+    char ch = here_cmd_menu(TRUE);
+
+    if (ch)
+        return 1;
+
+    return 0;
+}
+
+STATIC_OVL void
+add_herecmd_menuitem(win, func, text)
+winid win;
+int NDECL((*func));
+const char *text;
+{
+    char ch;
+    anything any;
+
+    if ((ch = cmd_from_func(func)) != '\0') {
+        any.a_void = (genericptr_t)func;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, text, MENU_UNSELECTED);
+    }
+}
+
+STATIC_OVL char
+here_cmd_menu(doit)
+boolean doit;
+{
+    winid win;
+    anything any;
+    char ch;
+    char buf[BUFSZ];
+    schar typ = levl[u.ux][u.uy].typ;
+    int npick;
+    menu_item *picks = (menu_item *) 0;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+
+    if (IS_FOUNTAIN(typ) || IS_SINK(typ)) {
+        Sprintf(buf, "Drink from the %s",
+                defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
+        add_herecmd_menuitem(win, dodrink, buf);
+    }
+
+    if (IS_FOUNTAIN(typ))
+        add_herecmd_menuitem(win, dodip,
+                             "Dip something into the fountain");
+
+    if (IS_THRONE(typ))
+        add_herecmd_menuitem(win, dosit,
+                             "Sit on the throne");
+
+    if ((u.ux == xupstair && u.uy == yupstair)
+        || (u.ux == sstairs.sx && u.uy == sstairs.sy
+            && sstairs.up)
+        || (u.ux == xupladder && u.uy == yupladder)) {
+        Sprintf(buf, "Go up the %s",
+                (u.ux == xupladder && u.uy == yupladder)
+                ? "ladder" : "stairs");
+        add_herecmd_menuitem(win, doup, buf);
+    }
+
+    if ((u.ux == xdnstair && u.uy == ydnstair)
+        || (u.ux == sstairs.sx && u.uy == sstairs.sy
+            && !sstairs.up)
+        || (u.ux == xdnladder && u.uy == ydnladder)) {
+        Sprintf(buf, "Go down the %s",
+                (u.ux == xupladder && u.uy == yupladder)
+                ? "ladder" : "stairs");
+        add_herecmd_menuitem(win, dodown, buf);
+    }
+
+    if (OBJ_AT(u.ux, u.uy)) {
+        struct obj *otmp = level.objects[u.ux][u.uy];
+        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        add_herecmd_menuitem(win, dopickup, buf);
+
+        if (Is_container(otmp)) {
+            Sprintf(buf, "Loot %s", doname(otmp));
+            add_herecmd_menuitem(win, doloot, buf);
+        }
+
+        if (otmp->oclass == FOOD_CLASS) {
+            Sprintf(buf, "Eat %s", doname(otmp));
+            add_herecmd_menuitem(win, doeat, buf);
+        }
+    }
+
+    if (invent)
+        add_herecmd_menuitem(win, dodrop, "Drop items");
+
+    add_herecmd_menuitem(win, donull, "Rest one turn");
+    add_herecmd_menuitem(win, dosearch, "Search around you");
+    add_herecmd_menuitem(win, dolook, "Look at what is here");
+
+    end_menu(win, "What do you want to do?");
+    npick = select_menu(win, PICK_ONE, &picks);
+    destroy_nhwindow(win);
+    if (npick > 0) {
+        if (doit) {
+            int NDECL((*func)) = picks->item.a_void;
+            int ret = func();
+
+            free((genericptr_t)picks);
+            return (char)ret;
+        } else {
+            ch = cmd_from_func(picks->item.a_void);
+            free((genericptr_t)picks);
+            return ch;
+        }
+    }
+    return '\0';
+}
+
+
 static NEARDATA int last_multi;
 
 /*
@@ -4692,6 +4814,11 @@ int x, y, mod;
         }
 
         if (x == 0 && y == 0) {
+            if (iflags.herecmd_menu) {
+                cmd[0] = here_cmd_menu(FALSE);
+                return cmd;
+            }
+
             /* here */
             if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
                 || IS_SINK(levl[u.ux][u.uy].typ)) {
