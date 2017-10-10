@@ -502,6 +502,9 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 
 void NetHackQtMenuWindow::All()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -512,6 +515,9 @@ void NetHackQtMenuWindow::All()
 }
 void NetHackQtMenuWindow::ChooseNone()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -522,6 +528,9 @@ void NetHackQtMenuWindow::ChooseNone()
 }
 void NetHackQtMenuWindow::Invert()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -532,6 +541,9 @@ void NetHackQtMenuWindow::Invert()
 }
 void NetHackQtMenuWindow::Search()
 {
+    if (how != PICK_NONE)
+        return;
+
     NetHackQtStringRequestor requestor(this, "Search for:");
     char line[256];
     if (requestor.Get(line)) {
