@@ -541,7 +541,7 @@ void NetHackQtMenuWindow::Invert()
 }
 void NetHackQtMenuWindow::Search()
 {
-    if (how != PICK_NONE)
+    if (how == PICK_NONE)
         return;
 
     NetHackQtStringRequestor requestor(this, "Search for:");
