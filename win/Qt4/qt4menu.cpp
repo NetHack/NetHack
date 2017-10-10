@@ -132,6 +132,7 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     grid->setRowStretch(2, 1);
     setFocusPolicy(Qt::StrongFocus);
     table->setFocusPolicy(Qt::NoFocus);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(cellToggleSelect(int,int)));
 
     setLayout(grid);
 }
@@ -558,6 +559,11 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 	    accept();
 	}
     }
+}
+
+void NetHackQtMenuWindow::cellToggleSelect(int i, int j)
+{
+    ToggleSelect(i);
 }
 
 void NetHackQtMenuWindow::DoSelection(bool)
