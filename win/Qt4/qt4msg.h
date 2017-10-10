@@ -22,6 +22,7 @@ public:
 	virtual QWidget* Widget();
 	virtual void Clear();
 	virtual void Display(bool block);
+        virtual const char *GetStr(bool init);
 	virtual void PutStr(int attr, const QString& text);
 
 	void Scroll(int dx, int dy);
@@ -31,6 +32,7 @@ public:
 private:
 	QListWidget* list;
 	bool changed;
+        int currgetmsg;
 	NetHackQtMapWindow2* map;
 
 private slots:
