@@ -184,6 +184,7 @@ static coord clicklook_cc;
 
 STATIC_DCL void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)), const char *));
 STATIC_DCL char FDECL(here_cmd_menu, (BOOLEAN_P));
+STATIC_DCL char FDECL(there_cmd_menu, (int, int));
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
@@ -4689,6 +4690,46 @@ const char *text;
 }
 
 STATIC_OVL char
+there_cmd_menu(x, y)
+int x, y;
+{
+    winid win;
+    anything any;
+    char ch;
+    char buf[BUFSZ];
+    schar typ = levl[x][y].typ;
+    int npick;
+    menu_item *picks = (menu_item *) 0;
+    struct trap *ttmp;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+
+    if (IS_DOOR(typ)) {
+        int dm = levl[x][y].doormask;
+        if ((dm & (D_CLOSED|D_LOCKED))) {
+            add_herecmd_menuitem(win, dokick, "Kick the door");
+            add_herecmd_menuitem(win, doopen, "Open the door");
+        } else if ((dm & D_ISOPEN)) {
+            add_herecmd_menuitem(win, doclose, "Close the door");
+        }
+    }
+
+    if (typ <= SCORR)
+        add_herecmd_menuitem(win, dosearch, "Search for secret doors");
+
+    end_menu(win, "What do you want to do?");
+    npick = select_menu(win, PICK_ONE, &picks);
+    destroy_nhwindow(win);
+    if (npick > 0) {
+        ch = cmd_from_func(picks->item.a_void);
+        free((genericptr_t)picks);
+        return ch;
+    }
+    return '\0';
+}
+
+STATIC_OVL char
 here_cmd_menu(doit)
 boolean doit;
 {
@@ -4857,6 +4898,13 @@ int x, y, mod;
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
             cmd[1] = Cmd.dirchars[dir];
             cmd[2] = '\0';
+            if (iflags.herecmd_menu) {
+                cmd[0] = there_cmd_menu(u.ux + x, u.uy + y);
+                if (cmd[0] == '\0')
+                    cmd[1] = '\0';
+                return cmd;
+            }
+
             if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
                 /* slight assistance to the player: choose kick/open for them
                  */
