@@ -15,6 +15,7 @@ typedef union any {
     int a_int;
     char a_char;
     schar a_schar;
+    uchar a_uchar;
     unsigned int a_uint;
     long a_long;
     unsigned long a_ulong;
@@ -23,6 +24,8 @@ typedef union any {
     unsigned long *a_ulptr;
     unsigned *a_uptr;
     const char *a_string;
+    int NDECL((*a_nfunc));
+    unsigned long a_mask32; /* used by status highlighting */
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */
@@ -45,6 +48,7 @@ enum any_types {
     ANY_LPTR,        /* pointer to long */
     ANY_ULPTR,       /* pointer to unsigned long */
     ANY_STR,         /* pointer to null-terminated char string */
+    ANY_NFUNC,       /* pointer to function taking no args, returning int */
     ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
 };
 
