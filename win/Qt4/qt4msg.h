@@ -26,6 +26,7 @@ public:
 	virtual void PutStr(int attr, const QString& text);
 
 	void Scroll(int dx, int dy);
+        void ClearMessages();
 
 	void setMap(NetHackQtMapWindow2*);
 

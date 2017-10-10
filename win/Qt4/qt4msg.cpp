@@ -73,6 +73,12 @@ void NetHackQtMessageWindow::Clear()
 	map->clearMessages();
 }
 
+void NetHackQtMessageWindow::ClearMessages()
+{
+    if (list)
+        list->clear();
+}
+
 void NetHackQtMessageWindow::Display(bool block)
 {
     if (changed) {
@@ -86,7 +92,7 @@ const char * NetHackQtMessageWindow::GetStr(bool init)
     if (init)
         currgetmsg = 0;
 
-    QListWidgetItem *item = list->item(++currgetmsg);
+    QListWidgetItem *item = list->item(currgetmsg++);
     if (item) {
         QString str = item->text();
         //raw_printf("getstr[%i]='%s'", currgetmsg, str.toLatin1().constData());
