@@ -482,11 +482,11 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 	    accept();
 	else if (key==MENU_SEARCH)
 	    Search();
-	else if (key==MENU_SELECT_ALL)
+	else if (key==MENU_SELECT_ALL || key==MENU_SELECT_PAGE)
 	    All();
-	else if (key==MENU_INVERT_ALL)
+	else if (key==MENU_INVERT_ALL || key==MENU_INVERT_PAGE)
 	    Invert();
-	else if (key==MENU_UNSELECT_ALL)
+	else if (key==MENU_UNSELECT_ALL || key==MENU_UNSELECT_PAGE)
 	    ChooseNone();
 	else if (('0' <= key && key <= '9') || key == '\b')
 	    InputCount(key);
