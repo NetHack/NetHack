@@ -497,51 +497,48 @@ int NetHackQtBind::qt_doprev_message()
 char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, CHAR_P def)
 {
     QString question(QString::fromLatin1(question_));
+    QString message;
+    char yn_esc_map='\033';
+
+    if (choices) {
+        // anything beyond <esc> is hidden>
+        QString choicebuf = choices;
+        size_t cb = choicebuf.indexOf('\033');
+        choicebuf = choicebuf.mid(0U, cb);
+        message = QString("%1 [%2] ").arg(question, choicebuf);
+        if (def) message += QString("(%1) ").arg(QChar(def));
+        // escape maps to 'q' or 'n' or default, in that order
+        yn_esc_map = (index(choices, 'q') ? 'q' :
+                      (index(choices, 'n') ? 'n' : def));
+    } else {
+        message = question;
+    }
 
     if (qt_settings->ynInMessages() && WIN_MESSAGE!=WIN_ERR) {
 	// Similar to X11 windowport `slow' feature.
 
-	QString message;
-	char yn_esc_map='\033';
-
-	if (choices) {
-	    // anything beyond <esc> is hidden>
-	    QString choicebuf = choices;
-	    size_t cb = choicebuf.indexOf('\033');
-	    choicebuf = choicebuf.mid(0U, cb);
-	    message = QString("%1 [%2] ").arg(question, choicebuf);
-	    if (def) message += QString("(%1) ").arg(QChar(def));
-	    // escape maps to 'q' or 'n' or default, in that order
-	    yn_esc_map = (index(choices, 'q') ? 'q' :
-		     (index(choices, 'n') ? 'n' : def));
-	} else {
-	    message = question;
-	}
+	int result = -1;
 
 #ifdef USE_POPUPS
-	// Improve some special-cases (DIRKS 08/02/23)
-	if (strcmp (choices,"ynq") == 0) {
-	    switch (QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2))
-	    {
-	      case 0: return 'y';
-	      case 1: return 'n';
-	      case 2: return 'q';
-	    }
-	}
+        if (choices) {
+            if (!strcmp(choices,"ynq"))
+                result = QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2);
+            else if (!strcmp(choices,"yn"))
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1);
+            else if (!strcmp(choices, "rl"))
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Right", "&Left",0,1);
 
-	if (strcmp (choices,"yn") == 0) {
-	    switch (QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1))
-	    {
-	      case 0: return 'y';
-	      case 1: return 'n';
-	    }
-	}
+            if (result >= 0 && result < strlen(choices)) {
+                char yn_resp = choices[result];
+                message += QString(" %1").arg(yn_resp);
+                result = yn_resp;
+            }
+        }
 #endif
 
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
-	int result=-1;
-	while (result<0) {
+	while (result < 0) {
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
@@ -562,7 +559,12 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
 	return result;
     } else {
 	NetHackQtYnDialog dialog(mainWidget(),question,choices,def);
-	return dialog.Exec();
+	char ret = dialog.Exec();
+        if (!(ret == '\0' || ret == '\033') && choices)
+            message += QString(" %1").arg(ret);
+        else if (def)
+            message += QString(" %1").arg(def);
+	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
     }
 }
 
