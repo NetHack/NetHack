@@ -136,6 +136,7 @@ struct window_procs X11_procs = {
 static winid NDECL(find_free_window);
 static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
                                 XrmValuePtr, Cardinal *));
+static boolean FDECL(new_resource_macro, (String, unsigned));
 static void NDECL(load_default_resources);
 static void NDECL(release_default_resources);
 #ifdef X11_HANGUP_SIGNAL
@@ -480,7 +481,43 @@ Widget w;
 #endif
 }
 
-static String *default_resource_data = 0; /* NULL-terminated array */
+static String *default_resource_data = 0, /* NULL-terminated arrays */
+              *def_rsrc_macr = 0, /* macro names */
+              *def_rsrc_valu = 0; /* macro values */
+
+/* caller found "#define"; parse into macro name and its expansion value */
+static boolean
+new_resource_macro(inbuf, numdefs)
+String inbuf; /* points past '#define' rather than to start of buffer */
+unsigned numdefs; /* array slot to fill */
+{
+    String p, q;
+
+    /* we expect inbuf to be terminated by newline; get rid of it */
+    q = eos(inbuf);
+    if (q > inbuf && q[-1] == '\n')
+        q[-1] = '\0';
+
+    /* figure out macro's name */
+    for (p = inbuf; *p == ' ' || *p == '\t'; ++p)
+        continue; /* skip whitespace */
+    for (q = p; *q && *q != ' ' && *q != '\t'; ++q)
+        continue; /* token consists of non-whitespace */
+    Strcat(q, " "); /* guarantee something beyond '#define FOO' */
+    *q++ = '\0'; /* p..(q-1) contains macro name */
+    if (!*p) /* invalid definition: '#define' followed by nothing */
+        return FALSE;
+    def_rsrc_macr[numdefs] = dupstr(p);
+
+    /* figure out macro's value; empty value is supported but not expected */
+    while (*q == ' ' || *q == '\t')
+        ++q; /* skip whitespace between name and value */
+    for (p = eos(q); --p > q && (*p == ' ' || *p == '\t'); )
+        continue; /* discard trailing whitespace */
+    *++p = '\0'; /* q..p containes macro value */
+    def_rsrc_valu[numdefs] = dupstr(q);
+    return TRUE;
+}
 
 /* read the template NetHack.ad into default_resource_data[] to supply
    fallback resources to XtAppInitialize() */
@@ -489,8 +526,8 @@ load_default_resources()
 {
     FILE *fp;
     String inbuf;
-    unsigned insiz, linelen, longlen, numlines;
-    boolean comment = FALSE; /* lint suppression */
+    unsigned insiz, linelen, longlen, numlines, numdefs, midx;
+    boolean comment, isdef;
 
     /*
      * Running nethack via the shell script adds $HACKDIR to the path used
@@ -499,7 +536,11 @@ load_default_resources()
      * load its contents into memory so that the application startup call
      * in X11_init_nhwindows() can use them as fallback resources.
      *
-     * No attempt to support the 'include' directive has been made.
+     * No attempt to support the 'include' directive has been made, nor
+     * backslash+newline continuation lines.  Macro expansion (at most
+     * one substitution per line) is supported.  '#define' to introduce
+     * a macro must be at start of line (no whitespace before or after
+     * the '#' character).
      */
     fp = fopen("./NetHack.ad", "r");
     if (!fp)
@@ -509,35 +550,84 @@ load_default_resources()
     insiz = BUFSIZ; /* stdio BUFSIZ, not nethack BUFSZ */
     inbuf = (String) alloc(insiz);
     linelen = longlen = 0;
-    numlines = 0;
+    numlines = numdefs = 0;
+    comment = isdef = FALSE; /* lint suppression */
     while (fgets(inbuf, insiz, fp)) {
-        if (!linelen) /* inbuf has start of record; treat empty as comment */
+        if (!linelen) {
+            /* !linelen: inbuf has start of record; treat empty as comment */
             comment = (*inbuf == '!' || *inbuf == '\n');
+            isdef = !strncmp(inbuf, "#define", 7);
+            ++numdefs;
+        }
         linelen += strlen(inbuf);
         if (!index(inbuf, '\n'))
             continue;
         if (linelen > longlen)
             longlen = linelen;
         linelen = 0;
-        if (!comment)
+        if (!comment && !isdef)
             ++numlines;
     }
-    free((genericptr_t) inbuf);
     insiz = longlen + 1;
-    inbuf = (String) alloc(insiz);
+    if (numdefs) { /* don't alloc if 0; no need for any terminator */
+        def_rsrc_macr = (String *) alloc(numdefs * sizeof (String));
+        def_rsrc_valu = (String *) alloc(numdefs * sizeof (String));
+        insiz += BUFSIZ; /* include room for macro expansion within buffer */
+    }
+    if (insiz > BUFSIZ) {
+        free((genericptr_t) inbuf);
+        inbuf = (String) alloc(insiz);
+    }
     ++numlines; /* room for terminator */
     default_resource_data = (String *) alloc(numlines * sizeof (String));
 
-    /* now read the file into the array */
+    /* now re-read the file, storing its contents into the allocated array
+       after performing macro substitutions */
     (void) rewind(fp);
-    numlines = 0;
+    numlines = numdefs = 0;
     while (fgets(inbuf, insiz, fp)) {
-        if (*inbuf != '!' && *inbuf != '\n')
+        if (!strncmp(inbuf, "#define", 7)) {
+            if (new_resource_macro(&inbuf[7], numdefs))
+                ++numdefs;
+        } else if (*inbuf != '!' && *inbuf != '\n') {
+            if (numdefs) {
+                /*
+                 * Macro expansion:  we assume at most one substitution
+                 * per line.  That's all that our sample NetHack.ad uses.
+                 *
+                 * If we ever need more, this will have to become a lot
+                 * more sophisticated.  It will need to find the first
+                 * instance within inbuf[] rather than first macro which
+                 * appears, and to avoid finding names within substituted
+                 * expansion values.
+                 *
+                 * Any substitution which would exceed the buffer size is
+                 * skipped.  A sophisticated implementation would need to
+                 * be prepared to allocate a bigger buffer when needed.
+                 */
+                linelen = strlen(inbuf);
+                for (midx = 0; midx < numdefs; ++midx) {
+                    if ((linelen + strlen(def_rsrc_valu[midx])
+                         < insiz - strlen(def_rsrc_macr[midx]))
+                        && strNsubst(inbuf, def_rsrc_macr[midx],
+                                     def_rsrc_valu[midx], 1))
+                        break;
+                }
+            }
             default_resource_data[numlines++] = dupstr(inbuf);
+        }
     }
     default_resource_data[numlines] = (String) 0;
     (void) fclose(fp);
     free((genericptr_t) inbuf);
+    if (def_rsrc_macr) { /* implies def_rsrc_valu is non-Null too */
+        for (midx = 0; midx < numdefs; ++midx) {
+            free((genericptr_t) def_rsrc_macr[midx]);
+            free((genericptr_t) def_rsrc_valu[midx]);
+        }
+        free((genericptr_t) def_rsrc_macr), def_rsrc_macr = 0;
+        free((genericptr_t) def_rsrc_valu), def_rsrc_valu = 0;
+    }
 }
 
 static void
@@ -550,6 +640,7 @@ release_default_resources()
             free((genericptr_t) default_resource_data[idx]);
         free((genericptr_t) default_resource_data), default_resource_data = 0;
     }
+    /* def_rsrc_macr[] and def_rsrc_valu[] have already been released */
 }
 
 /* Global Functions ======================================================= */
