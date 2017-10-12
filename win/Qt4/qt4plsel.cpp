@@ -178,7 +178,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     connect(name, SIGNAL(textChanged(const QString&)),
 	    this, SLOT(selectName(const QString&)) );
     name->setFocus();
-    QGroupBox* genderbox = new QGroupBox("Sex",this);
+    QGroupBox* genderbox = new QGroupBox("Gender",this);
     QButtonGroup *gendergroup = new QButtonGroup(this);
     QGroupBox* alignbox = new QGroupBox("Alignment",this);
     QButtonGroup *aligngroup = new QButtonGroup(this);
