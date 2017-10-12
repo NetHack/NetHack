@@ -184,9 +184,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     QGroupBox* alignbox = new QGroupBox("Alignment",this);
     QButtonGroup *aligngroup = new QButtonGroup(this);
     QVBoxLayout* vbgb = new QVBoxLayout(genderbox);
-    vbgb->addSpacing(fontMetrics().height()*3/4);
     QVBoxLayout* vbab = new QVBoxLayout(alignbox);
-    vbab->addSpacing(fontMetrics().height());
     QLabel* logo = new QLabel(nh_attribution, this);
 
     l->addWidget( namebox, 0,0,1,3 );
