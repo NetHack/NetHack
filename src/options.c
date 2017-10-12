@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1507164574 2017/10/05 00:49:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.311 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1507846854 2017/10/12 22:20:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3720,8 +3720,19 @@ boolean tinitial, tfrom_file;
                 vision_full_recalc = 1; /* delayed recalc */
                 if (iflags.use_color)
                     need_redraw = TRUE; /* darkroom refresh */
-            } else if (boolopt[i].addr == &iflags.wc_tiled_map
-                       || boolopt[i].addr == &flags.showrace
+            } else if (boolopt[i].addr == &iflags.wc_ascii_map) {
+                /* toggling ascii_map; set tiled_map to its opposite;
+                   what does it mean to turn off ascii map if tiled map
+                   isn't supported? -- right now, we do nothing */
+                iflags.wc_tiled_map = negated;
+                need_redraw = TRUE;
+            } else if (boolopt[i].addr == &iflags.wc_tiled_map) {
+                /* toggling tiled_map; set ascii_map to its opposite;
+                   as with ascii_map, what does it mean to turn off tiled
+                   map if ascii map isn't supported? */
+                iflags.wc_ascii_map = negated;
+                need_redraw = TRUE;
+            } else if (boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.hilite_pet) {
@@ -5524,7 +5535,8 @@ const char *mapping;
     ape = (struct autopickup_exception *) alloc(sizeof *ape);
     ape->regex = regex_init();
     if (!regex_compile(text, ape->regex)) {
-        config_error_add("%s: %s", APE_regex_error, regex_error_desc(ape->regex));
+        config_error_add("%s: %s", APE_regex_error,
+                         regex_error_desc(ape->regex));
         regex_free(ape->regex);
         free((genericptr_t) ape);
         return 0;
@@ -6183,13 +6195,11 @@ STATIC_OVL boolean
 wc_supported(optnam)
 const char *optnam;
 {
-    int k = 0;
+    int k;
 
-    while (wc_options[k].wc_name) {
-        if (!strcmp(wc_options[k].wc_name, optnam)
-            && (windowprocs.wincap & wc_options[k].wc_bit))
-            return TRUE;
-        k++;
+    for (k = 0; wc_options[k].wc_name; ++k) {
+        if (!strcmp(wc_options[k].wc_name, optnam))
+            return (windowprocs.wincap & wc_options[k].wc_bit) ? TRUE : FALSE;
     }
     return FALSE;
 }
@@ -6243,13 +6253,12 @@ STATIC_OVL boolean
 wc2_supported(optnam)
 const char *optnam;
 {
-    int k = 0;
+    int k;
 
-    while (wc2_options[k].wc_name) {
-        if (!strcmp(wc2_options[k].wc_name, optnam)
-            && (windowprocs.wincap2 & wc2_options[k].wc_bit))
-            return TRUE;
-        k++;
+    for (k = 0; wc2_options[k].wc_name; ++k) {
+        if (!strcmp(wc2_options[k].wc_name, optnam))
+            return (windowprocs.wincap2 & wc2_options[k].wc_bit) ? TRUE
+                                                                 : FALSE;
     }
     return FALSE;
 }
