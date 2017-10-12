@@ -6,6 +6,7 @@
 
 extern "C" {
 #include "hack.h"
+#include "date.h"
 }
 #undef Invisible
 #undef Warning
@@ -37,7 +38,7 @@ namespace nethack_qt4 {
 void centerOnMain( QWidget* w );
 // end temporary
 
-static const char nh_attribution[] = "<center><big>NetHack</big>"
+static const char nh_attribution[] = "<center><big>NetHack " VERSION_STRING "</big>"
 	"<br><small>by the NetHack DevTeam</small></center>";
 
 class NhPSListViewItem : public QTableWidgetItem {
