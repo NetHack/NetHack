@@ -159,8 +159,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 	  |         |   |         |   +--------------+
 	3 |         |   |         |   ...stretch...
 	  |         |   |         |   
-	4 |         |   |         |   [  Play  ]
-	5 |         |   |         |   [  Quit  ]
+	4 |         |   |         |   [ Random ]
+	5 |         |   |         |   [  Play  ]
+	6 |         |   |         |   [  Quit  ]
 	  +---------+   +---------+   
     */
 
@@ -192,22 +193,25 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 #ifdef QT_CHOOSE_RACE_FIRST
     race = new NhPSListView(this);
     role = new NhPSListView(this);
-    l->addWidget( race, 1,0,5,1 );
-    l->addWidget( role, 1,1,5,1 );
+    l->addWidget( race, 1,0,6,1 );
+    l->addWidget( role, 1,1,6,1 );
 #else
     role = new NhPSListView(this);
     race = new NhPSListView(this);
-    l->addWidget( role, 1,0,5,1 );
-    l->addWidget( race, 1,1,5,1 );
+    l->addWidget( role, 1,0,6,1 );
+    l->addWidget( race, 1,1,6,1 );
 #endif
 
     l->addWidget( genderbox, 1, 2 );
     l->addWidget( alignbox, 2, 2 );
     l->addWidget( logo, 3, 2, Qt::AlignCenter );
-    l->setRowStretch( 3, 5 );
+    l->setRowStretch( 3, 6 );
 
     int i;
     int nrole;
+
+    chosen_gend = flags.initgend;
+    chosen_align = flags.initalign;
 
     // XXX QListView unsorted goes in rev.
     for (nrole=0; roles[nrole].name.m; nrole++)
@@ -255,14 +259,45 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     }
     connect( aligngroup, SIGNAL(buttonPressed(int)), this, SLOT(selectAlignment(int)) );
 
+    QPushButton* rnd = new QPushButton("Random",this);
+    l->addWidget( rnd, 4, 2 );
+    rnd->setDefault(false);
+    connect( rnd, SIGNAL(clicked()), this, SLOT(Randomize()) );
+
     QPushButton* ok = new QPushButton("Play",this);
-    l->addWidget( ok, 4, 2 );
+    l->addWidget( ok, 5, 2 );
     ok->setDefault(true);
     connect( ok, SIGNAL(clicked()), this, SLOT(accept()) );
 
     QPushButton* cancel = new QPushButton("Quit",this);
-    l->addWidget( cancel, 5, 2 );
+    l->addWidget( cancel, 6, 2 );
     connect( cancel, SIGNAL(clicked()), this, SLOT(reject()) );
+
+    Randomize();
+}
+
+void NetHackQtPlayerSelector::Randomize()
+{
+    int nrole = role->rowCount();
+    int nrace = race->rowCount();
+
+    boolean picksomething = (flags.initrole == ROLE_NONE
+                             || flags.initrace == ROLE_NONE
+                             || flags.initgend == ROLE_NONE
+                             || flags.initalign == ROLE_NONE);
+
+    if (flags.randomall && picksomething) {
+        if (flags.initrole == ROLE_NONE)
+            flags.initrole == ROLE_RANDOM;
+        if (flags.initrace == ROLE_NONE)
+            flags.initrace == ROLE_RANDOM;
+        if (flags.initgend == ROLE_NONE)
+            flags.initgend == ROLE_RANDOM;
+        if (flags.initalign == ROLE_NONE)
+            flags.initalign == ROLE_RANDOM;
+    }
+
+    rigid_role_checks();
 
     // Randomize race and role, unless specified in config
     int ro = flags.initrole;
@@ -280,7 +315,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 	}
     }
 
-    // make sure we have a valid combination, honoring 
+    // make sure we have a valid combination, honoring
     // the users request if possible.
     bool choose_race_first;
 #ifdef QT_CHOOSE_RACE_FIRST
@@ -333,11 +368,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     role->setCurrentCell(ro, 0);
 
     race->setCurrentCell(ra, 0);
-
-    flags.initrace = race->currentRow();
-    flags.initrole = role->currentRow();
 }
-
 
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
@@ -379,7 +410,7 @@ void NetHackQtPlayerSelector::selectRole(int crow, int ccol, int prow, int pcol)
     }
 #endif
 
-    flags.initrole = role->currentRow();
+    //flags.initrole = role->currentRow();
     setupOthers();
 }
 
@@ -417,7 +448,7 @@ void NetHackQtPlayerSelector::selectRace(int crow, int ccol, int prow, int pcol)
     }
 #endif
 
-    flags.initrace = race->currentRow();
+    //flags.initrace = race->currentRow();
     setupOthers();
 }
 
@@ -461,12 +492,12 @@ void NetHackQtPlayerSelector::setupOthers()
 
 void NetHackQtPlayerSelector::selectGender(int i)
 {
-    flags.initgend = i;
+    chosen_gend = i;
 }
 
 void NetHackQtPlayerSelector::selectAlignment(int i)
 {
-    flags.initalign = i;
+    chosen_align = i;
 }
 
 void NetHackQtPlayerSelector::Quit()
@@ -494,6 +525,10 @@ bool NetHackQtPlayerSelector::Choose()
     }
 
     if ( exec() ) {
+        flags.initrace = race->currentRow();
+        flags.initrole = role->currentRow();
+        flags.initgend = chosen_gend;
+        flags.initalign = chosen_align;
 	return true;
     } else {
 	return false;

@@ -21,6 +21,7 @@ public:
 public slots:
 	void Quit();
 	void Random();
+        void Randomize();
 
 	void selectName(const QString& n);
 	void selectRole(int current, int, int previous, int);
@@ -38,6 +39,8 @@ private:
 	QRadioButton **gender;
 	QRadioButton **alignment;
 	bool fully_specified_role;
+        int chosen_gend;
+        int chosen_align;
 };
 
 } // namespace nethack_qt4
