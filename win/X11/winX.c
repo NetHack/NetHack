@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1457079197 2016/03/04 08:13:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1507846693 2017/10/12 22:18:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -97,7 +97,11 @@ extern NEARDATA winid WIN_STATUS;
 
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
-    "X11", WC_COLOR | WC_HILITE_PET | WC_TILED_MAP, 0L, X11_init_nhwindows,
+    "X11",
+    (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
+     | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
+    0L, /* WC2 flag mask */
+    X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
     X11_suspend_nhwindows, X11_resume_nhwindows, X11_create_nhwindow,
     X11_clear_nhwindow, X11_display_nhwindow, X11_destroy_nhwindow, X11_curs,
