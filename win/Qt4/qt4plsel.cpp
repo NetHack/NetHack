@@ -286,13 +286,13 @@ void NetHackQtPlayerSelector::Randomize()
 
     if (flags.randomall && picksomething) {
         if (flags.initrole == ROLE_NONE)
-            flags.initrole == ROLE_RANDOM;
+            flags.initrole = ROLE_RANDOM;
         if (flags.initrace == ROLE_NONE)
-            flags.initrace == ROLE_RANDOM;
+            flags.initrace = ROLE_RANDOM;
         if (flags.initgend == ROLE_NONE)
-            flags.initgend == ROLE_RANDOM;
+            flags.initgend = ROLE_RANDOM;
         if (flags.initalign == ROLE_NONE)
-            flags.initalign == ROLE_RANDOM;
+            flags.initalign = ROLE_RANDOM;
     }
 
     rigid_role_checks();
