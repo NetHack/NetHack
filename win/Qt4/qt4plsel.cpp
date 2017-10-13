@@ -6,7 +6,6 @@
 
 extern "C" {
 #include "hack.h"
-#include "date.h"
 }
 #undef Invisible
 #undef Warning
@@ -38,7 +37,7 @@ namespace nethack_qt4 {
 void centerOnMain( QWidget* w );
 // end temporary
 
-static const char nh_attribution[] = "<center><big>NetHack " VERSION_STRING "</big>"
+static const char nh_attribution[] = "<center><big>NetHack %1</big>"
 	"<br><small>by the NetHack DevTeam</small></center>";
 
 class NhPSListViewItem : public QTableWidgetItem {
@@ -185,7 +184,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     QButtonGroup *aligngroup = new QButtonGroup(this);
     QVBoxLayout* vbgb = new QVBoxLayout(genderbox);
     QVBoxLayout* vbab = new QVBoxLayout(alignbox);
-    QLabel* logo = new QLabel(nh_attribution, this);
+    char versionbuf[QBUFSZ];
+    QLabel* logo = new QLabel(QString(nh_attribution).arg(version_string(versionbuf)), this);
 
     l->addWidget( namebox, 0,0,1,3 );
 #ifdef QT_CHOOSE_RACE_FIRST
