@@ -2484,6 +2484,7 @@ E void NDECL(port_help);
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
 E boolean FDECL(check_user_string, (char *));
+E char *NDECL(get_login_name);
 #endif /* UNIX */
 
 /* ### unixtty.c ### */

@@ -99,7 +99,7 @@ extern NEARDATA winid WIN_STATUS;
 struct window_procs X11_procs = {
     "X11",
     (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
-     | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
+     | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
     0L, /* WC2 flag mask */
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
@@ -1126,6 +1126,9 @@ static XtActionsRec actions[] = {
     { nhStr("ec_key"), ec_key },                 /* extended commands */
     { nhStr("ec_delete"), ec_delete },           /* ext-com menu delete */
     { nhStr("ps_key"), ps_key },                 /* player selection */
+    { nhStr("plsel_quit"), plsel_quit },   /* player selection dialog */
+    { nhStr("plsel_play"), plsel_play },   /* player selection dialog */
+    { nhStr("plsel_rnd"), plsel_randomize }, /* player selection dialog */
     { nhStr("race_key"), race_key },             /* race selection */
     { nhStr("gend_key"), gend_key },             /* gender selection */
     { nhStr("algn_key"), algn_key },             /* alignment selection */
@@ -1271,6 +1274,7 @@ char **argv;
     (void) seteuid(savuid);
 
     x_inited = TRUE; /* X is now initialized */
+    plsel_ask_name = FALSE;
 
     release_default_resources();
 
@@ -1469,6 +1473,20 @@ X11_askname()
 {
     Widget popup, dialog;
     Arg args[1];
+    char *defplname = (char *)0;
+
+#ifdef UNIX
+    defplname = get_login_name();
+#endif
+    (void) strncpy(plname, defplname ? defplname : "Mumbles",
+                   sizeof plname - 1);
+    plname[sizeof plname - 1] = '\0';
+
+    if (iflags.wc_player_selection == VIA_DIALOG) {
+        /* X11_player_selection_dialog() handles name query */
+        plsel_ask_name = TRUE;
+        return;
+    } /* else iflags.wc_player_selection == VIA_PROMPTS */
 
     XtSetArg(args[0], XtNallowShellResize, True);
 
@@ -1481,7 +1499,7 @@ X11_askname()
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, nhStr(""), PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */

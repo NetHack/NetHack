@@ -4,7 +4,8 @@
 #define NETHACK_CLR_FG     grey
 #define NETHACK_CLR_BG     black
 #define NETHACK_CLR_QUIT   red
-#define NETHACK_CLR_RANDOM green
+#define NETHACK_CLR_RANDOM yellow
+#define NETHACK_CLR_PLAY   green
 #define NETHACK_CLR_HELP   green
 #define NETHACK_BTN_SHAPE  roundedRectangle
 #define NETHACK_BTN_ROUND  20
@@ -119,12 +120,54 @@ NetHack*showGrip: False
 
 ! text input prompt window
 NetHack*response*textSink*background: red
+NetHack*textSink*background: red
+
 NetHack*response*foreground:  NETHACK_CLR_FG
 NetHack*response*background:  NETHACK_CLR_BG
 NetHack*response*borderColor: NETHACK_CLR_FG
 NetHack*response*borderWidth: 1
 
-! role selection window
+! player selection dialog (OPTIONS=player_selection:dialog)
+!NetHack*player_selection_dialog.height:   420
+!NetHack*player_selection_dialog.width:   403
+
+!NetHack*player_selection_dialog*foreground:   black
+!NetHack*player_selection_dialog*background:   white
+NetHack*player_selection_dialog*name_label.borderWidth:   0
+NetHack*player_selection_dialog*race_label.borderWidth:   0
+NetHack*player_selection_dialog*role_label.borderWidth:   0
+NetHack*player_selection_dialog*gender_label.borderWidth: 0
+NetHack*player_selection_dialog*align_label.borderWidth:  0
+NetHack*player_selection_dialog*button_vp.borderWidth:    0
+
+NetHack*player_selection_dialog*name_input.borderWidth:   1
+NetHack*player_selection_dialog*name_input.borderColor:   NETHACK_CLR_FG
+
+NetHack*player_selection_dialog*role_vp.borderColor:   NETHACK_CLR_FG
+NetHack*player_selection_dialog*race_vp.borderColor:   NETHACK_CLR_FG
+NetHack*player_selection_dialog*gender_vp.borderColor: NETHACK_CLR_FG
+NetHack*player_selection_dialog*align_vp.borderColor:  NETHACK_CLR_FG
+
+NetHack*player_selection_dialog*random.foreground:   NETHACK_CLR_RANDOM
+NetHack*player_selection_dialog*random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*player_selection_dialog*random.borderWidth:  1
+NetHack*player_selection_dialog*random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*player_selection_dialog*random.cornerRoundPercent: NETHACK_BTN_ROUND
+
+NetHack*player_selection_dialog*quit.foreground:     NETHACK_CLR_QUIT
+NetHack*player_selection_dialog*quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*player_selection_dialog*quit.borderWidth:    1
+NetHack*player_selection_dialog*quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*player_selection_dialog*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+
+NetHack*player_selection_dialog*play.foreground:     NETHACK_CLR_PLAY
+NetHack*player_selection_dialog*play.borderColor:    NETHACK_CLR_PLAY
+NetHack*player_selection_dialog*play.borderWidth:    1
+NetHack*player_selection_dialog*play.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*player_selection_dialog*play.cornerRoundPercent: NETHACK_BTN_ROUND
+
+
+! role selection window  (OPTIONS=player_selection:prompts)
 NetHack*player_selection*random.foreground:   NETHACK_CLR_RANDOM
 NetHack*player_selection*random.background:   black
 NetHack*player_selection*random.borderColor:  NETHACK_CLR_RANDOM

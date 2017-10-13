@@ -696,4 +696,18 @@ get_unix_pw()
     return pw;
 }
 
+char *
+get_login_name()
+{
+    static char buf[BUFSZ];
+    struct passwd *pw = get_unix_pw();
+
+    buf[0] = '\0';
+
+    if (pw)
+        (void)strcpy(buf, pw->pw_name);
+
+    return buf;
+}
+
 /*unixmain.c*/
