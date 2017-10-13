@@ -763,6 +763,7 @@ time_t when; /* date+time at end of game */
     dump_redirect(FALSE);
 #else
     nhUse(how);
+    nhUse(when);
 #endif
 }
 
