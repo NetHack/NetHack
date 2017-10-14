@@ -832,8 +832,8 @@ Widget form;
                                              asciiTextWidgetClass, name_form,
                                              args, num_args);
 
+    XtInstallAccelerators(plsel_name_input, plsel_name_input);
     if (plsel_ask_name) {
-        XtInstallAccelerators(plsel_name_input, plsel_name_input);
         XtSetKeyboardFocus(form, plsel_name_input);
     } else {
         XtSetArg(args[0], nhStr(XtNdisplayCaret), False);
@@ -1203,7 +1203,6 @@ X11_player_selection_dialog()
 
     ps_selected = -1;
 
-    positionpopup(popup, TRUE); /* center,bottom */
     nh_XtPopup(popup, (int) XtGrabExclusive, form);
 
     /* The callback will enable the event loop exit. */
