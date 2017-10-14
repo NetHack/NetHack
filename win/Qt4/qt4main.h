@@ -41,6 +41,7 @@ public:
 	NetHackQtMainWindow(NetHackQtKeyBuffer&);
 
 	void AddMessageWindow(NetHackQtMessageWindow* window);
+	NetHackQtMessageWindow * GetMessageWindow();
 	void AddMapWindow(NetHackQtMapWindow2* window);
 	void AddStatusWindow(NetHackQtStatusWindow* window);
 	void RemoveWindow(NetHackQtWindow* window);

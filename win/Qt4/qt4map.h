@@ -33,6 +33,7 @@ private:
 	unsigned short& Glyph(int x, int y) { return glyph[y][x]; }
 	QPoint cursor;
 	QPixmap pet_annotation;
+        QPixmap pile_annotation;
 	NetHackQtClickBuffer& clicksink;
 	Clusterizer change;
 

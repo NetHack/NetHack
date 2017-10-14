@@ -91,7 +91,7 @@ merge_text_colormap()
 
         if (j == header.ncolors) { /* couldn't find it */
 #ifdef PRINT_COLORMAP
-            printf("color %2d: %3d %3d %3d\n", header.ncolors,
+            Fprintf(stdout, "color %2d: %3d %3d %3d\n", header.ncolors,
                    ColorMap[CM_RED][i], ColorMap[CM_GREEN][i],
                    ColorMap[CM_BLUE][i]);
 #endif
@@ -117,7 +117,7 @@ char *fname;
     }
     merge_text_colormap();
     count = convert_tiles(&curr_tb, header.ntiles);
-    Fprintf(stderr, "%s: %lu tiles\n", fname, count);
+    Fprintf(stdout, "%s: %lu tiles\n", fname, count);
     header.ntiles += count;
     fclose_text_file();
 }
@@ -157,7 +157,7 @@ FILE *fp;
         Fprintf(fp, "\",\n");
     }
 
-    return fprintf(fp, "};\n") >= 0;
+    return Fprintf(fp, "};\n") >= 0;
 }
 #endif /* USE_XPM */
 
@@ -199,7 +199,7 @@ char **argv;
         }
         process_file(argv[i]);
     }
-    Fprintf(stderr, "Total tiles: %ld\n", header.ntiles);
+    Fprintf(stdout, "Total tiles: %ld\n", header.ntiles);
 
     /* round size up to the end of the row */
     if ((header.ntiles % header.per_row) != 0) {

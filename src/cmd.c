@@ -114,6 +114,8 @@ static int NDECL(dosuspend_core); /**/
 
 static int NDECL((*timed_occ_fn));
 
+STATIC_PTR int NDECL(doherecmdmenu);
+STATIC_PTR int NDECL(dotherecmdmenu);
 STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
 STATIC_PTR int NDECL(doextcmd);
@@ -181,6 +183,10 @@ STATIC_DCL void FDECL(attributes_enlightenment, (int, int));
 static const char *readchar_queue = "";
 static coord clicklook_cc;
 
+STATIC_DCL void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
+                                             const char *));
+STATIC_DCL char FDECL(here_cmd_menu, (BOOLEAN_P));
+STATIC_DCL char FDECL(there_cmd_menu, (BOOLEAN_P, int, int));
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
@@ -2899,6 +2905,8 @@ struct ext_func_tab extcmdlist[] = {
     { ';', "glance", "show what type of thing a map symbol corresponds to",
             doquickwhatis, IFBURIED | GENERALCMD },
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },
+    { '\0', "herecmdmenu", "show menu of commands you can do here",
+            doherecmdmenu, IFBURIED },
     { 'V', "history", "show long version and game history",
             dohistory, IFBURIED | GENERALCMD },
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
@@ -2996,6 +3004,9 @@ struct ext_func_tab extcmdlist[] = {
     { C('t'), "teleport", "teleport around the level", dotele, IFBURIED },
     { '\0', "terrain", "show map without obstructions",
             doterrain, IFBURIED | AUTOCOMPLETE },
+    { '\0', "therecmdmenu",
+            "show menu of commands you can do from here to adjacent spot",
+            dotherecmdmenu },
     { 't', "throw", "throw something", dothrow },
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
             wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
@@ -4658,6 +4669,251 @@ register int x, y;
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1;
 }
 
+/* #herecmdmenu command */
+STATIC_PTR int
+doherecmdmenu(VOID_ARGS)
+{
+    char ch = here_cmd_menu(TRUE);
+
+    return ch ? 1 : 0;
+}
+
+/* #therecmdmenu command, a way to test there_cmd_menu without mouse */
+STATIC_PTR int
+dotherecmdmenu(VOID_ARGS)
+{
+    char ch;
+
+    if (!getdir((const char *) 0) || !isok(u.ux + u.dx, u.uy + u.dy))
+        return 0;
+
+    if (u.dx || u.dy)
+        ch = there_cmd_menu(TRUE, u.ux + u.dx, u.uy + u.dy);
+    else
+        ch = here_cmd_menu(TRUE);
+
+    return ch ? 1 : 0;
+}
+
+STATIC_OVL void
+add_herecmd_menuitem(win, func, text)
+winid win;
+int NDECL((*func));
+const char *text;
+{
+    char ch;
+    anything any;
+
+    if ((ch = cmd_from_func(func)) != '\0') {
+        any = zeroany;
+        any.a_nfunc = func;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, text, MENU_UNSELECTED);
+    }
+}
+
+STATIC_OVL char
+there_cmd_menu(doit, x, y)
+boolean doit;
+int x, y;
+{
+    winid win;
+    char ch;
+    char buf[BUFSZ];
+    schar typ = levl[x][y].typ;
+    int npick, K = 0;
+    menu_item *picks = (menu_item *) 0;
+    struct trap *ttmp;
+    struct monst *mtmp;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+
+    if (IS_DOOR(typ)) {
+        boolean key_or_pick, card;
+        int dm = levl[x][y].doormask;
+
+        if ((dm & (D_CLOSED | D_LOCKED))) {
+            add_herecmd_menuitem(win, doopen, "Open the door"), ++K;
+            /* unfortunately there's no lknown flag for doors to
+               remember the locked/unlocked state */
+            key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
+            card = (carrying(CREDIT_CARD) != 0);
+            if (key_or_pick || card) {
+                Sprintf(buf, "%sunlock the door",
+                        key_or_pick ? "lock or " : "");
+                add_herecmd_menuitem(win, doapply, upstart(buf)), ++K;
+            }
+            /* unfortunately there's no tknown flag for doors (or chests)
+               to remember whether a trap had been found */
+            add_herecmd_menuitem(win, dountrap,
+                                 "Search the door for a trap"), ++K;
+            /* [what about #force?] */
+            add_herecmd_menuitem(win, dokick, "Kick the door"), ++K;
+        } else if ((dm & D_ISOPEN)) {
+            add_herecmd_menuitem(win, doclose, "Close the door"), ++K;
+        }
+    }
+
+    if (typ <= SCORR)
+        add_herecmd_menuitem(win, dosearch, "Search for secret doors"), ++K;
+
+    if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
+        add_herecmd_menuitem(win, doidtrap, "Examine trap"), ++K;
+        if (ttmp->ttyp != VIBRATING_SQUARE)
+            add_herecmd_menuitem(win, dountrap, "Attempt to disarm trap"), ++K;
+    }
+
+    mtmp = m_at(x, y);
+    if (mtmp && !canspotmon(mtmp))
+        mtmp = 0;
+    if (mtmp && which_armor(mtmp, W_SADDLE)) {
+        char *mnam = x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                              SUPPRESS_SADDLE, FALSE);
+
+        if (!u.usteed) {
+            Sprintf(buf, "Ride %s", mnam);
+            add_herecmd_menuitem(win, doride, buf), ++K;
+        }
+        Sprintf(buf, "Remove saddle from %s", mnam);
+        add_herecmd_menuitem(win, doloot, buf), ++K;
+    }
+    if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
+        && carrying(SADDLE)) {
+        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp)), ++K;
+        add_herecmd_menuitem(win, doapply, buf);
+    }
+#if 0
+    if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
+        /* "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature" */
+    } else {
+        /* "Move %s", direction */
+    }
+#endif
+
+    if (K) {
+        end_menu(win, "What do you want to do?");
+        npick = select_menu(win, PICK_ONE, &picks);
+    } else {
+        pline("No applicable actions.");
+        npick = 0;
+    }
+    destroy_nhwindow(win);
+    ch = '\0';
+    if (npick > 0) {
+        int NDECL((*func)) = picks->item.a_nfunc;
+        free((genericptr_t) picks);
+
+        if (doit) {
+            int ret = (*func)();
+
+            ch = (char) ret;
+        } else {
+            ch = cmd_from_func(func);
+        }
+    }
+    return ch;
+}
+
+STATIC_OVL char
+here_cmd_menu(doit)
+boolean doit;
+{
+    winid win;
+    char ch;
+    char buf[BUFSZ];
+    schar typ = levl[u.ux][u.uy].typ;
+    int npick;
+    menu_item *picks = (menu_item *) 0;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+
+    if (IS_FOUNTAIN(typ) || IS_SINK(typ)) {
+        Sprintf(buf, "Drink from the %s",
+                defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
+        add_herecmd_menuitem(win, dodrink, buf);
+    }
+    if (IS_FOUNTAIN(typ))
+        add_herecmd_menuitem(win, dodip,
+                             "Dip something into the fountain");
+    if (IS_THRONE(typ))
+        add_herecmd_menuitem(win, dosit,
+                             "Sit on the throne");
+
+    if ((u.ux == xupstair && u.uy == yupstair)
+        || (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up)
+        || (u.ux == xupladder && u.uy == yupladder)) {
+        Sprintf(buf, "Go up the %s",
+                (u.ux == xupladder && u.uy == yupladder)
+                ? "ladder" : "stairs");
+        add_herecmd_menuitem(win, doup, buf);
+    }
+    if ((u.ux == xdnstair && u.uy == ydnstair)
+        || (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)
+        || (u.ux == xdnladder && u.uy == ydnladder)) {
+        Sprintf(buf, "Go down the %s",
+                (u.ux == xupladder && u.uy == yupladder)
+                ? "ladder" : "stairs");
+        add_herecmd_menuitem(win, dodown, buf);
+    }
+    if (u.usteed) { /* another movement choice */
+        Sprintf(buf, "Dismount %s",
+                x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
+                         SUPPRESS_SADDLE, FALSE));
+        add_herecmd_menuitem(win, doride, buf);
+    }
+
+#if 0
+    if (Upolyd) { /* before objects */
+        Sprintf(buf, "Use %s special ability",
+                s_suffix(mons[u.umonnum].mname));
+        add_herecmd_menuitem(win, domonability, buf);
+    }
+#endif
+
+    if (OBJ_AT(u.ux, u.uy)) {
+        struct obj *otmp = level.objects[u.ux][u.uy];
+
+        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        add_herecmd_menuitem(win, dopickup, buf);
+
+        if (Is_container(otmp)) {
+            Sprintf(buf, "Loot %s", doname(otmp));
+            add_herecmd_menuitem(win, doloot, buf);
+        }
+        if (otmp->oclass == FOOD_CLASS) {
+            Sprintf(buf, "Eat %s", doname(otmp));
+            add_herecmd_menuitem(win, doeat, buf);
+        }
+    }
+
+    if (invent)
+        add_herecmd_menuitem(win, dodrop, "Drop items");
+
+    add_herecmd_menuitem(win, donull, "Rest one turn");
+    add_herecmd_menuitem(win, dosearch, "Search around you");
+    add_herecmd_menuitem(win, dolook, "Look at what is here");
+
+    end_menu(win, "What do you want to do?");
+    npick = select_menu(win, PICK_ONE, &picks);
+    destroy_nhwindow(win);
+    ch = '\0';
+    if (npick > 0) {
+        int NDECL((*func)) = picks->item.a_nfunc;
+        free((genericptr_t) picks);
+
+        if (doit) {
+            int ret = (*func)();
+
+            ch = (char) ret;
+        } else {
+            ch = cmd_from_func(func);
+        }
+    }
+    return ch;
+}
+
+
 static NEARDATA int last_multi;
 
 /*
@@ -4692,6 +4948,11 @@ int x, y, mod;
         }
 
         if (x == 0 && y == 0) {
+            if (iflags.herecmd_menu) {
+                cmd[0] = here_cmd_menu(FALSE);
+                return cmd;
+            }
+
             /* here */
             if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
                 || IS_SINK(levl[u.ux][u.uy].typ)) {
@@ -4730,6 +4991,13 @@ int x, y, mod;
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
             cmd[1] = Cmd.dirchars[dir];
             cmd[2] = '\0';
+            if (iflags.herecmd_menu) {
+                cmd[0] = there_cmd_menu(FALSE, u.ux + x, u.uy + y);
+                if (cmd[0] == '\0')
+                    cmd[1] = '\0';
+                return cmd;
+            }
+
             if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
                 /* slight assistance to the player: choose kick/open for them
                  */
@@ -5096,6 +5364,7 @@ wiz_port_debug()
     num_menu_selections = SIZE(menu_selections) - 1;
     if (num_menu_selections > 0) {
         menu_item *pick_list;
+
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
         for (k = 0; k < num_menu_selections; ++k) {

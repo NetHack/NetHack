@@ -22,15 +22,18 @@ public:
 	virtual QWidget* Widget();
 	virtual void Clear();
 	virtual void Display(bool block);
+        virtual const char *GetStr(bool init);
 	virtual void PutStr(int attr, const QString& text);
 
 	void Scroll(int dx, int dy);
+        void ClearMessages();
 
 	void setMap(NetHackQtMapWindow2*);
 
 private:
 	QListWidget* list;
 	bool changed;
+        int currgetmsg;
 	NetHackQtMapWindow2* map;
 
 private slots:

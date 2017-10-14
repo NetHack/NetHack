@@ -132,6 +132,7 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     grid->setRowStretch(2, 1);
     setFocusPolicy(Qt::StrongFocus);
     table->setFocusPolicy(Qt::NoFocus);
+    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(cellToggleSelect(int,int)));
 
     setLayout(grid);
 }
@@ -482,11 +483,11 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 	    accept();
 	else if (key==MENU_SEARCH)
 	    Search();
-	else if (key==MENU_SELECT_ALL)
+	else if (key==MENU_SELECT_ALL || key==MENU_SELECT_PAGE)
 	    All();
-	else if (key==MENU_INVERT_ALL)
+	else if (key==MENU_INVERT_ALL || key==MENU_INVERT_PAGE)
 	    Invert();
-	else if (key==MENU_UNSELECT_ALL)
+	else if (key==MENU_UNSELECT_ALL || key==MENU_UNSELECT_PAGE)
 	    ChooseNone();
 	else if (('0' <= key && key <= '9') || key == '\b')
 	    InputCount(key);
@@ -501,6 +502,9 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 
 void NetHackQtMenuWindow::All()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -511,6 +515,9 @@ void NetHackQtMenuWindow::All()
 }
 void NetHackQtMenuWindow::ChooseNone()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -521,6 +528,9 @@ void NetHackQtMenuWindow::ChooseNone()
 }
 void NetHackQtMenuWindow::Invert()
 {
+    if (how != PICK_ANY)
+        return;
+
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
@@ -531,6 +541,9 @@ void NetHackQtMenuWindow::Invert()
 }
 void NetHackQtMenuWindow::Search()
 {
+    if (how == PICK_NONE)
+        return;
+
     NetHackQtStringRequestor requestor(this, "Search for:");
     char line[256];
     if (requestor.Get(line)) {
@@ -558,6 +571,11 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 	    accept();
 	}
     }
+}
+
+void NetHackQtMenuWindow::cellToggleSelect(int i, int j)
+{
+    ToggleSelect(i);
 }
 
 void NetHackQtMenuWindow::DoSelection(bool)

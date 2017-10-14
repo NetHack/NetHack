@@ -66,6 +66,7 @@ public slots:
 	void Search();
 
 	void ToggleSelect(int);
+        void cellToggleSelect(int, int);
 	void DoSelection(bool);
 
 protected:

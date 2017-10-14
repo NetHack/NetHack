@@ -35,6 +35,7 @@ NetHackQtMessageWindow::NetHackQtMessageWindow() :
     list->setFocusPolicy(Qt::NoFocus);
     ::iflags.window_inited = 1;
     map = 0;
+    currgetmsg = 0;
     connect(qt_settings,SIGNAL(fontChanged()),this,SLOT(updateFont()));
     updateFont();
 }
@@ -72,12 +73,32 @@ void NetHackQtMessageWindow::Clear()
 	map->clearMessages();
 }
 
+void NetHackQtMessageWindow::ClearMessages()
+{
+    if (list)
+        list->clear();
+}
+
 void NetHackQtMessageWindow::Display(bool block)
 {
     if (changed) {
 	list->repaint();
 	changed=false;
     }
+}
+
+const char * NetHackQtMessageWindow::GetStr(bool init)
+{
+    if (init)
+        currgetmsg = 0;
+
+    QListWidgetItem *item = list->item(currgetmsg++);
+    if (item) {
+        QString str = item->text();
+        //raw_printf("getstr[%i]='%s'", currgetmsg, str.toLatin1().constData());
+        return str.toLatin1().constData();
+    }
+    return NULL;
 }
 
 void NetHackQtMessageWindow::PutStr(int attr, const QString& text)

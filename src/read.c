@@ -1714,6 +1714,7 @@ boolean confused, helmet_protects, byu, skip_uswallow;
         }
     } else
         dmg = 0;
+    wake_nearto(u.ux, u.uy, 4 * 4);
     /* Must be before the losehp(), for bones files */
     if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
         place_object(otmp2, u.ux, u.uy);
@@ -1779,7 +1780,10 @@ boolean confused, byu;
                 pline("%s is killed.", Monnam(mtmp));
                 mondied(mtmp);
             }
+        } else {
+            wakeup(mtmp, byu);
         }
+        wake_nearto(x, y, 4 * 4);
     } else if (u.uswallow && mtmp == u.ustuck) {
         obfree(otmp2, (struct obj *) 0);
         /* fall through to player */

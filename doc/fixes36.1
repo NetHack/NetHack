@@ -451,6 +451,8 @@ give feedback when released from a bear trap
 	depending upon how the dynamically inserted pattern-match phrase fit
 #version output left out "pattern matching via <method>" if the basic NetHack
 	features entry was split across two lines
+recovery of strength lost due to weakness from hunger was vulnerable to abuse
+monsters hit by scroll of earth boulder did not get angry
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -508,6 +510,8 @@ hero poly'd into vampire could drain monster down to 0 HP without killing it,
 "you observe a fog cloud where a vampire/bat was" if an unseen vampire on the
 	far side of a closed door shifted shape to pass under that door
 fix mention_walls reporting secret doors as solid stone
+jumping over water unintentionally moved hero through that water, causing
+	drowning if not able to water walk or fly
 
 
 Platform- and/or Interface-Specific Fixes
@@ -684,6 +688,8 @@ Master Key of Thievery always finds door and chest traps if used to lock or
 	blessed (for non-rogues); player is offered the opportunity to disarm
 "Elbereth" must now be the only engraved text on a square to function
 "Elbereth" now erodes based on attacks by the player, not monsters scared
+option herecmd_menu to make a mouse click on your character pop up
+	a context menu, and extended command #herecmdmenu to do the same
 
 
 Platform- and/or Interface-Specific New Features
@@ -703,6 +709,8 @@ X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 	resources replaced by status_condition[1-3].*
 X11: more terminal-like default resources
 win32gui: save and load map colors from registry
+X11: add new character selection dialog, and obey player_selection:dialog
+unix: reduce makefile verbosity by default
 
 
 NetHack Community Patches (or Variation) Included

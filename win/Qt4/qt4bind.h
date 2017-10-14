@@ -78,6 +78,9 @@ public:
 	static void qt_start_screen();
 	static void qt_end_screen();
 
+        static char *qt_getmsghistory(BOOLEAN_P init);
+        static void qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring);
+
 	static void qt_outrip(winid wid, int how, time_t when);
 	static int qt_kbhit();
 
@@ -85,6 +88,10 @@ public:
 
 private:
 	virtual bool notify(QObject *receiver, QEvent *event);
+
+        static QStringList *msgs_strings;
+        static boolean msgs_saved;
+        static boolean msgs_initd;
 };
 
 } // namespace nethack_qt4

@@ -18,6 +18,7 @@ extern "C" {
 #undef max
 
 #include <QtGui/QtGui>
+#include <QStringList>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #include <QtMultimedia/QSound>
@@ -119,6 +120,9 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     main = new NetHackQtMainWindow(keybuffer);
     connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
     qt_settings=new NetHackQtSettings(main->width(),main->height());
+    msgs_strings = new QStringList();
+    msgs_initd = false;
+    msgs_saved = false;
 }
 
 void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
@@ -493,51 +497,48 @@ int NetHackQtBind::qt_doprev_message()
 char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, CHAR_P def)
 {
     QString question(QString::fromLatin1(question_));
+    QString message;
+    char yn_esc_map='\033';
+
+    if (choices) {
+        // anything beyond <esc> is hidden>
+        QString choicebuf = choices;
+        size_t cb = choicebuf.indexOf('\033');
+        choicebuf = choicebuf.mid(0U, cb);
+        message = QString("%1 [%2] ").arg(question, choicebuf);
+        if (def) message += QString("(%1) ").arg(QChar(def));
+        // escape maps to 'q' or 'n' or default, in that order
+        yn_esc_map = (index(choices, 'q') ? 'q' :
+                      (index(choices, 'n') ? 'n' : def));
+    } else {
+        message = question;
+    }
 
     if (qt_settings->ynInMessages() && WIN_MESSAGE!=WIN_ERR) {
 	// Similar to X11 windowport `slow' feature.
 
-	QString message;
-	char yn_esc_map='\033';
-
-	if (choices) {
-	    // anything beyond <esc> is hidden>
-	    QString choicebuf = choices;
-	    size_t cb = choicebuf.indexOf('\033');
-	    choicebuf = choicebuf.mid(0U, cb);
-	    message = QString("%1 [%2] ").arg(question, choicebuf);
-	    if (def) message += QString("(%1) ").arg(QChar(def));
-	    // escape maps to 'q' or 'n' or default, in that order
-	    yn_esc_map = (index(choices, 'q') ? 'q' :
-		     (index(choices, 'n') ? 'n' : def));
-	} else {
-	    message = question;
-	}
+	int result = -1;
 
 #ifdef USE_POPUPS
-	// Improve some special-cases (DIRKS 08/02/23)
-	if (strcmp (choices,"ynq") == 0) {
-	    switch (QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2))
-	    {
-	      case 0: return 'y';
-	      case 1: return 'n';
-	      case 2: return 'q';
-	    }
-	}
+        if (choices) {
+            if (!strcmp(choices,"ynq"))
+                result = QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2);
+            else if (!strcmp(choices,"yn"))
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1);
+            else if (!strcmp(choices, "rl"))
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Right", "&Left",0,1);
 
-	if (strcmp (choices,"yn") == 0) {
-	    switch (QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1))
-	    {
-	      case 0: return 'y';
-	      case 1: return 'n';
-	    }
-	}
+            if (result >= 0 && result < strlen(choices)) {
+                char yn_resp = choices[result];
+                message += QString(" %1").arg(yn_resp);
+                result = yn_resp;
+            }
+        }
 #endif
 
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
-	int result=-1;
-	while (result<0) {
+	while (result < 0) {
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
@@ -558,7 +559,12 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
 	return result;
     } else {
 	NetHackQtYnDialog dialog(mainWidget(),question,choices,def);
-	return dialog.Exec();
+	char ret = dialog.Exec();
+        if (!(ret == '\0' || ret == '\033') && choices)
+            message += QString(" %1").arg(ret);
+        else if (def)
+            message += QString(" %1").arg(def);
+	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
     }
 }
 
@@ -603,6 +609,55 @@ void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->UseRIP(how, when);
+}
+
+char * NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
+{
+    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    if (window)
+        return (char *)window->GetStr(init);
+    return NULL;
+}
+
+void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
+{
+    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    if (!window)
+        return;
+
+    if (is_restoring && !msgs_initd) {
+        /* we're restoring history from the previous session, but new
+           messages have already been issued this session */
+        int i = 0;
+        const char *str;
+
+        while ((str = window->GetStr((i == 0)))) {
+            msgs_strings->append(str);
+            i++;
+        }
+        msgs_initd = true;
+        msgs_saved = (i > 0);
+        window->ClearMessages();
+    }
+
+    if (msg) {
+        //raw_printf("msg='%s'", msg);
+        window->PutStr(ATR_NONE, QString::fromLatin1(msg));
+#ifdef DUMPLOG
+        dumplogmsg(msg);
+#endif
+    } else if (msgs_saved) {
+        /* restore strings */
+        int i;
+        for (i = 0; i < msgs_strings->size(); i++) {
+            window->PutStr(ATR_NONE, msgs_strings->at((i)));
+#ifdef DUMPLOG
+            dumplogmsg(msgs_strings->at(i).toLatin1().constData());
+#endif
+        }
+        delete msgs_strings;
+        msgs_initd = false;
+    }
 }
 
 bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
@@ -658,6 +713,9 @@ NetHackQtKeyBuffer NetHackQtBind::keybuffer;
 NetHackQtClickBuffer NetHackQtBind::clickbuffer;
 NetHackQtMainWindow* NetHackQtBind::main=0;
 QFrame* NetHackQtBind::splash=0;
+QStringList *NetHackQtBind::msgs_strings;
+boolean NetHackQtBind::msgs_saved = false;
+boolean NetHackQtBind::msgs_initd = false;
 
 static void Qt_positionbar(char *) {}
 
@@ -683,7 +741,7 @@ struct window_procs Qt_procs = {
     nethack_qt4::NetHackQtBind::qt_destroy_nhwindow,
     nethack_qt4::NetHackQtBind::qt_curs,
     nethack_qt4::NetHackQtBind::qt_putstr,
-    nethack_qt4::NetHackQtBind::qt_putstr, /* FIXME: should be qt_putmixed() */
+    genl_putmixed,
     nethack_qt4::NetHackQtBind::qt_display_file,
     nethack_qt4::NetHackQtBind::qt_start_menu,
     nethack_qt4::NetHackQtBind::qt_add_menu,
@@ -728,7 +786,8 @@ struct window_procs Qt_procs = {
 #endif
     genl_preference_update,
 
-    genl_getmsghistory, genl_putmsghistory,
+    nethack_qt4::NetHackQtBind::qt_getmsghistory,
+    nethack_qt4::NetHackQtBind::qt_putmsghistory,
     genl_status_init,
     genl_status_finish, genl_status_enablefield,
 #ifdef STATUS_HILITES

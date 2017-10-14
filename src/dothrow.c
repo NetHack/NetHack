@@ -519,6 +519,25 @@ genericptr_t arg;
     return FALSE;
 }
 
+/* hack for hurtle_step() -- it ought to be changed to take an argument
+   indicating lev/fly-to-dest vs lev/fly-to-dest-minus-one-land-on-dest
+   vs drag-to-dest; original callers use first mode, jumping wants second,
+   grappling hook backfire and thrown chained ball need third */
+boolean
+hurtle_jump(arg, x, y)
+genericptr_t arg;
+int x, y;
+{
+    boolean res;
+    long save_EWwalking = EWwalking;
+
+    /* prevent jumping over water from being placed in that water */
+    EWwalking |= I_SPECIAL;
+    res = hurtle_step(arg, x, y);
+    EWwalking = save_EWwalking;
+    return res;
+}
+
 /*
  * Single step for the hero flying through the air from jumping, flying,
  * etc.  Called from hurtle() and jump() via walk_path().  We expect the
@@ -606,8 +625,8 @@ int x, y;
         }
         if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
             && bad_rock(youmonst.data, x, u.uy)) {
-            boolean too_much =
-                (invent && (inv_weight() + weight_cap() > 600));
+            boolean too_much = (invent && (inv_weight() + weight_cap() > 600));
+
             /* Move at a diagonal. */
             if (bigmonst(youmonst.data) || too_much) {
                 You("%sget forcefully wedged into a crevice.",
@@ -621,14 +640,43 @@ int x, y;
         }
     }
 
-    if ((mon = m_at(x, y)) != 0) {
-        You("bump into %s.", a_monnam(mon));
+    if ((mon = m_at(x, y)) != 0
+#if 0   /* we can't include these two exceptions unless we know we're
+         * going to end up past the current spot rather than on it;
+         * for that, we need to know that the range is not exhausted
+         * and also that the next spot doesn't contain an obstacle */
+        && !(mon->mundetected && hides_under(mon) && (Flying || Levitation))
+        && !(mon->mundetected && mon->data->mlet == S_EEL
+             && (Flying || Levitation || Wwalking))
+#endif
+        ) {
+        const char *mnam, *pronoun;
+        int glyph = glyph_at(x, y);
+
+        mon->mundetected = 0; /* wakeup() will handle mimic */
+        mnam = a_monnam(mon); /* after unhiding */
+        pronoun = mhim(mon);
+        if (!strcmp(mnam, "it")) {
+            /* mhim() uses pronoun_gender() which forces neuter if monster
+               can't be seen; we want him/her for humanoid sensed by touch */
+            if (!strcmp(pronoun, "it") && humanoid(mon->data))
+                pronoun = genders[mon->female].him;
+            mnam = !strcmp(pronoun, "it") ? "something" : "someone";
+        }
+        if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
+            You("find %s by bumping into %s.", mnam, pronoun);
+        else
+            You("bump into %s.", mnam);
         wakeup(mon, FALSE);
+        if (!canspotmon(mon))
+            map_invisible(mon->mx, mon->my);
         setmangry(mon, FALSE);
-        wake_nearto(x,y, 10);
+        wake_nearto(x, y, 10);
         return FALSE;
     }
-    if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
+
+    if ((u.ux - x) && (u.uy - y)
+        && bad_rock(youmonst.data, u.ux, y)
         && bad_rock(youmonst.data, x, u.uy)) {
         /* Move at a diagonal. */
         if (Sokoban) {

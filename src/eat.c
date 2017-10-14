@@ -112,8 +112,11 @@ register struct obj *obj;
 void
 init_uhunger()
 {
+    context.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
     u.uhunger = 900;
     u.uhs = NOT_HUNGRY;
+    if (ATEMP(A_STR) < 0)
+        ATEMP(A_STR) = 0;
 }
 
 /* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */
@@ -2440,10 +2443,7 @@ doeat()
      * mails, players who polymorph back to human in the middle of their
      * metallic meal, etc....
      */
-    if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
-                        : touch_artifact(otmp, &youmonst))) {
-        return 1;
-    } else if (!is_edible(otmp)) {
+    if (!is_edible(otmp)) {
         You("cannot eat that!");
         return 0;
     } else if ((otmp->owornmask & (W_ARMOR | W_TOOL | W_AMUL | W_SADDLE))
@@ -2451,6 +2451,9 @@ doeat()
         /* let them eat rings */
         You_cant("eat %s you're wearing.", something);
         return 0;
+    } else if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
+                               : touch_artifact(otmp, &youmonst))) {
+        return 1; /* got blasted so use a turn */
     }
     if (is_metallic(otmp) && u.umonnum == PM_RUST_MONSTER
         && otmp->oerodeproof) {
@@ -2465,13 +2468,26 @@ doeat()
         /* The regurgitated object's rustproofing is gone now */
         otmp->oerodeproof = 0;
         make_stunned((HStun & TIMEOUT) + (long) rn2(10), TRUE);
-        You("spit %s out onto the %s.", the(xname(otmp)),
-            surface(u.ux, u.uy));
-        if (carried(otmp)) {
-            freeinv(otmp);
-            dropy(otmp);
+        /*
+         * We don't expect rust monsters to be wielding welded weapons
+         * or wearing cursed rings which were rustproofed, but guard
+         * against the possibility just in case.
+         */
+        if (welded(otmp) || (otmp->cursed && (otmp->owornmask & W_RING))) {
+            otmp->bknown = 1; /* for ring; welded() does this for weapon */
+            You("spit out %s.", the(xname(otmp)));
+        } else {
+            You("spit %s out onto the %s.", the(xname(otmp)),
+                surface(u.ux, u.uy));
+            if (carried(otmp)) {
+                /* no need to check for leash in use; it's not metallic */
+                if (otmp->owornmask)
+                    remove_worn_item(otmp, FALSE);
+                freeinv(otmp);
+                dropy(otmp);
+            }
+            stackobj(otmp);
         }
-        stackobj(otmp);
         return 1;
     }
     /* KMH -- Slow digestion is... indigestible */
@@ -2961,10 +2977,23 @@ boolean incr;
     }
 
     if (newhs != u.uhs) {
-        if (newhs >= WEAK && u.uhs < WEAK)
-            losestr(1); /* this may kill you -- see below */
-        else if (newhs < WEAK && u.uhs >= WEAK)
-            losestr(-1);
+        if (newhs >= WEAK && u.uhs < WEAK) {
+            /* this used to be losestr(1) which had the potential to
+               be fatal (still handled below) by reducing HP if it
+               tried to take base strength below minimum of 3 */
+            ATEMP(A_STR) = -1; /* temporary loss overrides Fixed_abil */
+            /* defer context.botl status update until after hunger message */
+        } else if (newhs < WEAK && u.uhs >= WEAK) {
+            /* this used to be losestr(-1) which could be abused by
+               becoming weak while wearing ring of sustain ability,
+               removing ring, eating to 'restore' strength which boosted
+               strength by a point each time the cycle was performed;
+               substituting "while polymorphed" for sustain ability and
+               "rehumanize" for ring removal might have done that too */
+            ATEMP(A_STR) = 0; /* repair of loss also overrides Fixed_abil */
+            /* defer context.botl status update until after hunger message */
+        }
+
         switch (newhs) {
         case HUNGRY:
             if (Hallucination) {
