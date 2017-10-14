@@ -381,13 +381,23 @@ XEvent *event;
 String *params;
 Cardinal *num_params;
 {
+    Arg args[2];
+    Boolean state;
+
     nhUse(w);
     nhUse(event);
     nhUse(params);
     nhUse(num_params);
 
-    plsel_dialog_acceptvalues();
-    exit_x_event = TRUE; /* leave event loop */
+    XtSetArg(args[0], nhStr(XtNsensitive), &state);
+    XtGetValues(plsel_btn_play, args, ONE);
+
+    if (state) {
+        plsel_dialog_acceptvalues();
+        exit_x_event = TRUE; /* leave event loop */
+    } else {
+        X11_nhbell();
+    }
 }
 
 /* ARGSUSED */
