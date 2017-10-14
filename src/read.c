@@ -1771,6 +1771,7 @@ boolean confused, byu;
                           xname(helmet), mhim(mtmp));
             }
         }
+        wakeup(mtmp, byu);
         mtmp->mhp -= mdmg;
         if (mtmp->mhp <= 0) {
             if (byu) {
