@@ -117,7 +117,7 @@ char *fname;
     }
     merge_text_colormap();
     count = convert_tiles(&curr_tb, header.ntiles);
-    Fprintf(stderr, "%s: %lu tiles\n", fname, count);
+    printf("%s: %lu tiles\n", fname, count);
     header.ntiles += count;
     fclose_text_file();
 }
@@ -199,7 +199,7 @@ char **argv;
         }
         process_file(argv[i]);
     }
-    Fprintf(stderr, "Total tiles: %ld\n", header.ntiles);
+    printf("Total tiles: %ld\n", header.ntiles);
 
     /* round size up to the end of the row */
     if ((header.ntiles % header.per_row) != 0) {
