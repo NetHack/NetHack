@@ -2443,10 +2443,7 @@ doeat()
      * mails, players who polymorph back to human in the middle of their
      * metallic meal, etc....
      */
-    if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
-                        : touch_artifact(otmp, &youmonst))) {
-        return 1;
-    } else if (!is_edible(otmp)) {
+    if (!is_edible(otmp)) {
         You("cannot eat that!");
         return 0;
     } else if ((otmp->owornmask & (W_ARMOR | W_TOOL | W_AMUL | W_SADDLE))
@@ -2454,6 +2451,9 @@ doeat()
         /* let them eat rings */
         You_cant("eat %s you're wearing.", something);
         return 0;
+    } else if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
+                               : touch_artifact(otmp, &youmonst))) {
+        return 1; /* got blasted so use a turn */
     }
     if (is_metallic(otmp) && u.umonnum == PM_RUST_MONSTER
         && otmp->oerodeproof) {
@@ -2468,13 +2468,26 @@ doeat()
         /* The regurgitated object's rustproofing is gone now */
         otmp->oerodeproof = 0;
         make_stunned((HStun & TIMEOUT) + (long) rn2(10), TRUE);
-        You("spit %s out onto the %s.", the(xname(otmp)),
-            surface(u.ux, u.uy));
-        if (carried(otmp)) {
-            freeinv(otmp);
-            dropy(otmp);
+        /*
+         * We don't expect rust monsters to be wielding welded weapons
+         * or wearing cursed rings which were rustproofed, but guard
+         * against the possibility just in case.
+         */
+        if (welded(otmp) || (otmp->cursed && (otmp->owornmask & W_RING))) {
+            otmp->bknown = 1; /* for ring; welded() does this for weapon */
+            You("spit out %s.", the(xname(otmp)));
+        } else {
+            You("spit %s out onto the %s.", the(xname(otmp)),
+                surface(u.ux, u.uy));
+            if (carried(otmp)) {
+                /* no need to check for leash in use; it's not metallic */
+                if (otmp->owornmask)
+                    remove_worn_item(otmp, FALSE);
+                freeinv(otmp);
+                dropy(otmp);
+            }
+            stackobj(otmp);
         }
-        stackobj(otmp);
         return 1;
     }
     /* KMH -- Slow digestion is... indigestible */
