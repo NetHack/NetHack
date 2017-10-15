@@ -2081,6 +2081,8 @@ char def;            /* default response if user hits <space> or <return> */
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
 
+    pline("%s%c", buf, (yn_return != '\033') ? yn_return : '\0');
+
     return yn_return;
 }
 
