@@ -260,8 +260,6 @@ mswin_init_nhwindows(int *argc, char **argv)
 void
 mswin_player_selection(void)
 {
-    int nRole;
-
     logDebug("mswin_player_selection()\n");
 
     if (iflags.wc_player_selection == VIA_DIALOG) {
@@ -311,7 +309,7 @@ mswin_player_selection(void)
             }
         } else {
             /* select a role */
-            if (mswin_player_selection_window(&nRole) == IDCANCEL) {
+            if (!mswin_player_selection_window()) {
                 bail(0);
             }
         }
