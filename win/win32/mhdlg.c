@@ -10,6 +10,8 @@
 #include "resource.h"
 #include "mhdlg.h"
 
+#include <assert.h>
+
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
 struct getlin_data {
@@ -257,33 +259,42 @@ ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 /*---------------------------------------------------------------*/
 /* player selector dialog data */
-struct plsel_data {
-    int *selection;
-};
+typedef struct plsel_data {
+    int config_race;
+    int config_role;
+    int config_gender;
+    int config_alignment;
+} plsel_data_t;
 
 INT_PTR CALLBACK PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
 static void plselInitDialog(HWND hWnd);
-static void plselAdjustLists(HWND hWnd, int changed_opt);
-static int plselFinalSelection(HWND hWnd, int *selection);
+static void plselAdjustLists(HWND hWnd);
+static boolean plselRandomize(plsel_data_t * data);
 
-int
-mswin_player_selection_window(int *selection)
+boolean
+mswin_player_selection_window()
 {
     INT_PTR ret;
-    struct plsel_data data;
+    plsel_data_t data;
+    boolean ok = TRUE;
 
-    /* init dialog data */
-    ZeroMemory(&data, sizeof(data));
-    data.selection = selection;
+    /* save away configuration settings */
+    data.config_role = flags.initrole;
+    data.config_race = flags.initrace;
+    data.config_gender = flags.initgend;
+    data.config_alignment = flags.initalign;
 
-    /* create modal dialog */
-    ret = DialogBoxParam(
-        GetNHApp()->hApp, MAKEINTRESOURCE(IDD_PLAYER_SELECTOR),
-        GetNHApp()->hMainWnd, PlayerSelectorDlgProc, (LPARAM) &data);
-    if (ret == -1)
-        panic("Cannot create getlin window");
+    if (!plselRandomize(&data)) {
+        /* create modal dialog */
+        ret = DialogBoxParam(
+            GetNHApp()->hApp, MAKEINTRESOURCE(IDD_PLAYER_SELECTOR),
+            GetNHApp()->hMainWnd, PlayerSelectorDlgProc, (LPARAM) &data);
+        if (ret == -1)
+            panic("Cannot create getlin window");
+        ok = (ret == IDOK);
+    }
 
-    return (int) ret;
+    return ok;
 }
 
 INT_PTR CALLBACK
@@ -315,8 +326,8 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         /* init dialog */
         plselInitDialog(hWnd);
 
-        /* set focus on the role checkbox (random) field */
-        SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_RANDOM));
+        /* set focus on the role list */
+        SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST));
 
         /* tell windows we set the focus */
         return FALSE;
@@ -327,85 +338,60 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (LOWORD(wParam)) {
         /* OK button was clicked */
         case IDOK:
-            if (plselFinalSelection(hWnd, data->selection)) {
-                EndDialog(hWnd, wParam);
-            } else {
-                NHMessageBox(
-                    hWnd, TEXT("Cannot match this role. Try something else."),
-                    MB_ICONSTOP | MB_OK);
-            }
+            EndDialog(hWnd, wParam);
             return TRUE;
 
         /* CANCEL button was clicked */
         case IDCANCEL:
-            *data->selection = -1;
             EndDialog(hWnd, wParam);
             return TRUE;
 
-        /* following are events from dialog controls:
-           "random" checkboxes send BN_CLICKED messages;
-           role/race/... combo-boxes send CBN_SELENDOK
-           if something was selected;
-        */
-        case IDC_PLSEL_ROLE_RANDOM:
-            if (HIWORD(wParam) == BN_CLICKED) {
-                /* enable corresponding list window if "random"
-                   checkbox was "unchecked" */
-                EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST),
-                             SendMessage((HWND) lParam, BM_GETCHECK, 0, 0)
-                                 == BST_UNCHECKED);
-            }
-            break;
-
-        case IDC_PLSEL_RACE_RANDOM:
-            if (HIWORD(wParam) == BN_CLICKED) {
-                EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST),
-                             SendMessage((HWND) lParam, BM_GETCHECK, 0, 0)
-                                 == BST_UNCHECKED);
-            }
-            break;
-
-        case IDC_PLSEL_GENDER_RANDOM:
-            if (HIWORD(wParam) == BN_CLICKED) {
-                EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST),
-                             SendMessage((HWND) lParam, BM_GETCHECK, 0, 0)
-                                 == BST_UNCHECKED);
-            }
-            break;
-
-        case IDC_PLSEL_ALIGN_RANDOM:
-            if (HIWORD(wParam) == BN_CLICKED) {
-                EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST),
-                             SendMessage((HWND) lParam, BM_GETCHECK, 0, 0)
-                                 == BST_UNCHECKED);
-            }
-            break;
+        case IDC_PLSEL_RANDOM:
+            plselRandomize(data);
+            plselAdjustLists(hWnd);
+            return TRUE;
 
         case IDC_PLSEL_ROLE_LIST:
-            if (HIWORD(wParam) == CBN_SELENDOK) {
-                /* filter out invalid options if
-                   the selection was made */
-                plselAdjustLists(hWnd, LOWORD(wParam));
+            if (HIWORD(wParam) == LBN_SELCHANGE) {
+                HWND role_control = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
+
+                int selection = SendMessage(role_control, LB_GETCURSEL, 0, 0);
+                if (selection != LB_ERR)
+                    flags.initrole = (int) SendMessage(role_control, LB_GETITEMDATA, selection, 0);
+
+                plselAdjustLists(hWnd);
             }
             break;
 
         case IDC_PLSEL_RACE_LIST:
-            if (HIWORD(wParam) == CBN_SELENDOK) {
-                plselAdjustLists(hWnd, LOWORD(wParam));
+            if (HIWORD(wParam) == LBN_SELCHANGE) {
+                HWND race_control = GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST);
+                int selection = SendMessage(race_control, LB_GETCURSEL, 0, 0);
+                if (selection != LB_ERR)
+                    flags.initrace = (int) SendMessage(race_control, LB_GETITEMDATA, selection, 0);
+
+                plselAdjustLists(hWnd);
             }
             break;
 
-        case IDC_PLSEL_GENDER_LIST:
-            if (HIWORD(wParam) == CBN_SELENDOK) {
-                plselAdjustLists(hWnd, LOWORD(wParam));
+        case IDC_PLSEL_GENDER_MALE:
+        case IDC_PLSEL_GENDER_FEMALE:
+            if (HIWORD(wParam) == BN_CLICKED) {
+                flags.initgend = LOWORD(wParam) - IDC_PLSEL_GENDER_MALE;
+                plselAdjustLists(hWnd);
             }
             break;
 
-        case IDC_PLSEL_ALIGN_LIST:
-            if (HIWORD(wParam) == CBN_SELENDOK) {
-                plselAdjustLists(hWnd, LOWORD(wParam));
+
+        case IDC_PLSEL_ALIGN_LAWFUL:
+        case IDC_PLSEL_ALIGN_NEUTRAL:
+        case IDC_PLSEL_ALIGN_CHAOTIC:
+            if (HIWORD(wParam) == BN_CLICKED) {
+                flags.initalign = LOWORD(wParam) - IDC_PLSEL_ALIGN_LAWFUL;
+                plselAdjustLists(hWnd);
             }
             break;
+
         }
         break;
     }
@@ -413,20 +399,20 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void
-setComboBoxValue(HWND hWnd, int combo_box, int value)
+setListBoxValue(HWND hWnd, int list_box, int value)
 {
     int index_max =
-        (int) SendDlgItemMessage(hWnd, combo_box, CB_GETCOUNT, 0, 0);
+        (int) SendDlgItemMessage(hWnd, list_box, LB_GETCOUNT, 0, 0);
     int index;
     int value_to_set = LB_ERR;
     for (index = 0; index < index_max; index++) {
-        if (SendDlgItemMessage(hWnd, combo_box, CB_GETITEMDATA,
+        if (SendDlgItemMessage(hWnd, list_box, LB_GETITEMDATA,
                                (WPARAM) index, 0) == value) {
             value_to_set = index;
             break;
         }
     }
-    SendDlgItemMessage(hWnd, combo_box, CB_SETCURSEL, (WPARAM) value_to_set,
+    SendDlgItemMessage(hWnd, list_box, LB_SETCURSEL, (WPARAM) value_to_set,
                        0);
 }
 
@@ -434,376 +420,193 @@ setComboBoxValue(HWND hWnd, int combo_box, int value)
 void
 plselInitDialog(HWND hWnd)
 {
+    struct plsel_data * data = (plsel_data_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     TCHAR wbuf[BUFSZ];
 
     /* set player name */
     SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
 
-    /* check flags for consistency */
-    if (flags.initrole >= 0) {
-        if (flags.initrace >= 0
-            && !validrace(flags.initrole, flags.initrace)) {
-            flags.initrace = ROLE_NONE;
-        }
-
-        if (flags.initgend >= 0
-            && !validgend(flags.initrole, flags.initrace, flags.initgend)) {
-            flags.initgend = ROLE_NONE;
-        }
-
-        if (flags.initalign >= 0
-            && !validalign(flags.initrole, flags.initrace, flags.initalign)) {
-            flags.initalign = ROLE_NONE;
-        }
-    }
+    plselRandomize(data);
 
     /* populate select boxes */
-    plselAdjustLists(hWnd, -1);
+    plselAdjustLists(hWnd);
 
-    /* intialize roles list */
-    if (flags.initrole < 0
-        || !ok_role(flags.initrole, ROLE_NONE, ROLE_NONE, ROLE_NONE)) {
-        CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_CHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), FALSE);
-    } else {
-        CheckDlgButton(hWnd, IDC_PLSEL_ROLE_RANDOM, BST_UNCHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST), TRUE);
-        setComboBoxValue(hWnd, IDC_PLSEL_ROLE_LIST, flags.initrole);
-    }
-
-    /* intialize races list */
-    if (flags.initrace < 0
-        || !ok_race(flags.initrole, flags.initrace, ROLE_NONE, ROLE_NONE)) {
-        CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_CHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), FALSE);
-    } else {
-        CheckDlgButton(hWnd, IDC_PLSEL_RACE_RANDOM, BST_UNCHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST), TRUE);
-        setComboBoxValue(hWnd, IDC_PLSEL_RACE_LIST, flags.initrace);
-    }
-
-    /* intialize genders list */
-    if (flags.initgend < 0
-        || !ok_gend(flags.initrole, flags.initrace, flags.initgend,
-                    ROLE_NONE)) {
-        CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_CHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), FALSE);
-    } else {
-        CheckDlgButton(hWnd, IDC_PLSEL_GENDER_RANDOM, BST_UNCHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST), TRUE);
-        setComboBoxValue(hWnd, IDC_PLSEL_GENDER_LIST, flags.initgend);
-    }
-
-    /* intialize alignments list */
-    if (flags.initalign < 0
-        || !ok_align(flags.initrole, flags.initrace, flags.initgend,
-                     flags.initalign)) {
-        CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_CHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), FALSE);
-    } else {
-        CheckDlgButton(hWnd, IDC_PLSEL_ALIGN_RANDOM, BST_UNCHECKED);
-        EnableWindow(GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST), TRUE);
-        setComboBoxValue(hWnd, IDC_PLSEL_ALIGN_LIST, flags.initalign);
-    }
 }
 
-/* adjust role/race/alignment/gender list - filter out
-   invalid combinations
-   changed_sel points to the list where selection occurred
-   (-1 if unknown)
-*/
 void
-plselAdjustLists(HWND hWnd, int changed_sel)
+plselAdjustLists(HWND hWnd)
 {
-    HWND control_role, control_race, control_gender, control_align;
-    int initrole, initrace, initgend, initalign;
+    HWND control_role, control_race;
+    HWND control_genders[ROLE_GENDERS];
+    HWND control_aligns[ROLE_ALIGNS];
     int i;
     LRESULT ind;
-    int valid_opt;
     TCHAR wbuf[255];
 
     /* get control handles */
     control_role = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
     control_race = GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST);
-    control_gender = GetDlgItem(hWnd, IDC_PLSEL_GENDER_LIST);
-    control_align = GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LIST);
+    for(i = 0; i < ROLE_GENDERS; i++)
+        control_genders[i] = GetDlgItem(hWnd, IDC_PLSEL_GENDER_MALE + i);
+    for(i = 0; i < ROLE_ALIGNS; i++)
+        control_aligns[i] = GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LAWFUL + i);
 
-    /* get current selections */
-    ind = SendMessage(control_role, CB_GETCURSEL, 0, 0);
-    initrole = (ind == LB_ERR)
-                   ? flags.initrole
-                   : (int) SendMessage(control_role, CB_GETITEMDATA, ind, 0);
-
-    ind = SendMessage(control_race, CB_GETCURSEL, 0, 0);
-    initrace = (ind == LB_ERR)
-                   ? flags.initrace
-                   : (int) SendMessage(control_race, CB_GETITEMDATA, ind, 0);
-
-    ind = SendMessage(control_gender, CB_GETCURSEL, 0, 0);
-    initgend = (ind == LB_ERR) ? flags.initgend
-                               : (int) SendMessage(control_gender,
-                                                   CB_GETITEMDATA, ind, 0);
-
-    ind = SendMessage(control_align, CB_GETCURSEL, 0, 0);
-    initalign = (ind == LB_ERR) ? flags.initalign
-                                : (int) SendMessage(control_align,
-                                                    CB_GETITEMDATA, ind, 0);
-
-    /* intialize roles list */
-    if (changed_sel == -1) {
-        valid_opt = 0;
-
-        /* reset content and populate the list */
-        SendMessage(control_role, CB_RESETCONTENT, 0, 0);
-        for (i = 0; roles[i].name.m; i++) {
-            if (initgend >= 0 && flags.female && roles[i].name.f)
+    /* populate role list */
+    SendMessage(control_role, LB_RESETCONTENT, 0, 0);
+    for (i = 0; roles[i].name.m; i++)
+        if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
+            assert(flags.initgend >= 0);
+            if (flags.female && roles[i].name.f)
                 ind = SendMessage(
-                    control_role, CB_ADDSTRING, (WPARAM) 0,
+                    control_role, LB_ADDSTRING, (WPARAM) 0,
                     (LPARAM) NH_A2W(roles[i].name.f, wbuf, sizeof(wbuf)));
             else
                 ind = SendMessage(
-                    control_role, CB_ADDSTRING, (WPARAM) 0,
+                    control_role, LB_ADDSTRING, (WPARAM) 0,
                     (LPARAM) NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)));
 
-            SendMessage(control_role, CB_SETITEMDATA, (WPARAM) ind,
+            SendMessage(control_role, LB_SETITEMDATA, (WPARAM) ind,
                         (LPARAM) i);
-            if (i == initrole) {
-                SendMessage(control_role, CB_SETCURSEL, (WPARAM) ind,
+
+            if (i == flags.initrole)
+                SendMessage(control_role, LB_SETCURSEL, (WPARAM) ind,
                             (LPARAM) 0);
-                valid_opt = 1;
+        }
+
+    /* populate race list */
+    SendMessage(control_race, LB_RESETCONTENT, 0, 0);
+    for (i = 0; races[i].noun; i++)
+        if (ok_race(flags.initrole, i, flags.initgend, flags.initalign)) {
+            ind = SendMessage(
+                control_race, LB_ADDSTRING, (WPARAM) 0,
+                (LPARAM) NH_A2W(races[i].noun, wbuf, sizeof(wbuf)));
+            SendMessage(control_race, LB_SETITEMDATA, (WPARAM)ind,
+                (LPARAM)i);
+            if (i == flags.initrace) 
+                SendMessage(control_race, LB_SETCURSEL, (WPARAM) ind,
+                            (LPARAM) 0);
+        }
+
+
+    /* intialize gender radio buttons */
+    for (i = 0; i < ROLE_GENDERS; i++) {
+        Button_Enable(control_genders[i], FALSE);
+        Button_SetCheck(control_genders[i], BST_UNCHECKED);
+        if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign)) {
+            Button_Enable(control_genders[i], TRUE);
+            if (i == flags.initgend) {
+                Button_SetCheck(control_genders[i], BST_CHECKED);
             }
         }
-
-        /* set selection to the previously selected role
-           if it is still valid */
-        if (!valid_opt) {
-            initrole = ROLE_NONE;
-            initrace = ROLE_NONE;
-            initgend = ROLE_NONE;
-            initalign = ROLE_NONE;
-            SendMessage(control_role, CB_SETCURSEL, (WPARAM) -1, (LPARAM) 0);
-        }
-
-        /* trigger change of the races list */
-        changed_sel = IDC_PLSEL_ROLE_LIST;
     }
 
-    /* intialize races list */
-    if (changed_sel == IDC_PLSEL_ROLE_LIST) {
-        valid_opt = 0;
-
-        /* reset content and populate the list */
-        SendMessage(control_race, CB_RESETCONTENT, 0, 0);
-        for (i = 0; races[i].noun; i++)
-            if (ok_race(initrole, i, ROLE_NONE, ROLE_NONE)) {
-                ind = SendMessage(
-                    control_race, CB_ADDSTRING, (WPARAM) 0,
-                    (LPARAM) NH_A2W(races[i].noun, wbuf, sizeof(wbuf)));
-                SendMessage(control_race, CB_SETITEMDATA, (WPARAM) ind,
-                            (LPARAM) i);
-                if (i == initrace) {
-                    SendMessage(control_race, CB_SETCURSEL, (WPARAM) ind,
-                                (LPARAM) 0);
-                    valid_opt = 1;
-                }
+    /* intialize alignment radio buttons */
+    for (i = 0; i < ROLE_ALIGNS; i++) {
+        Button_Enable(control_aligns[i], FALSE);
+        Button_SetCheck(control_aligns[i], BST_UNCHECKED);
+        if (ok_align(flags.initrole, flags.initrace, flags.initgend, i)) {
+            Button_Enable(control_aligns[i], TRUE);
+            if (i == flags.initalign) {
+                Button_SetCheck(control_aligns[i], BST_CHECKED);
             }
-
-        /* set selection to the previously selected race
-           if it is still valid */
-        if (!valid_opt) {
-            initrace = ROLE_NONE;
-            initgend = ROLE_NONE;
-            initalign = ROLE_NONE;
-            SendMessage(control_race, CB_SETCURSEL, (WPARAM) -1, (LPARAM) 0);
-        }
-
-        /* trigger change of the genders list */
-        changed_sel = IDC_PLSEL_RACE_LIST;
-    }
-
-    /* intialize genders list */
-    if (changed_sel == IDC_PLSEL_RACE_LIST) {
-        valid_opt = 0;
-
-        /* reset content and populate the list */
-        SendMessage(control_gender, CB_RESETCONTENT, 0, 0);
-        for (i = 0; i < ROLE_GENDERS; i++)
-            if (ok_gend(initrole, initrace, i, ROLE_NONE)) {
-                ind = SendMessage(
-                    control_gender, CB_ADDSTRING, (WPARAM) 0,
-                    (LPARAM) NH_A2W(genders[i].adj, wbuf, sizeof(wbuf)));
-                SendMessage(control_gender, CB_SETITEMDATA, (WPARAM) ind,
-                            (LPARAM) i);
-                if (i == initgend) {
-                    SendMessage(control_gender, CB_SETCURSEL, (WPARAM) ind,
-                                (LPARAM) 0);
-                    valid_opt = 1;
-                }
-            }
-
-        /* set selection to the previously selected gender
-           if it is still valid */
-        if (!valid_opt) {
-            initgend = ROLE_NONE;
-            initalign = ROLE_NONE;
-            SendMessage(control_gender, CB_SETCURSEL, (WPARAM) -1,
-                        (LPARAM) 0);
-        }
-
-        /* trigger change of the alignments list */
-        changed_sel = IDC_PLSEL_GENDER_LIST;
-    }
-
-    /* intialize alignments list */
-    if (changed_sel == IDC_PLSEL_GENDER_LIST) {
-        valid_opt = 0;
-
-        /* reset content and populate the list */
-        SendMessage(control_align, CB_RESETCONTENT, 0, 0);
-        for (i = 0; i < ROLE_ALIGNS; i++)
-            if (ok_align(initrole, initrace, initgend, i)) {
-                ind = SendMessage(
-                    control_align, CB_ADDSTRING, (WPARAM) 0,
-                    (LPARAM) NH_A2W(aligns[i].adj, wbuf, sizeof(wbuf)));
-                SendMessage(control_align, CB_SETITEMDATA, (WPARAM) ind,
-                            (LPARAM) i);
-                if (i == initalign) {
-                    SendMessage(control_align, CB_SETCURSEL, (WPARAM) ind,
-                                (LPARAM) 0);
-                    valid_opt = 1;
-                }
-            }
-
-        /* set selection to the previously selected alignment
-           if it is still valid */
-        if (!valid_opt) {
-            initalign = ROLE_NONE;
-            SendMessage(control_align, CB_SETCURSEL, (WPARAM) -1, (LPARAM) 0);
         }
     }
 }
 
 /* player made up his mind - get final selection here */
 int
-plselFinalSelection(HWND hWnd, int *selection)
+plselFinalSelection(HWND hWnd)
 {
-    LRESULT ind;
+    int role = flags.initrole;
+    int race = flags.initrace;
+    int gender = flags.initgend;
+    int alignment = flags.initalign;
 
-    UNREFERENCED_PARAMETER(selection);
-
-    /* get current selections */
-    if (SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_RANDOM, BM_GETCHECK, 0, 0)
-        == BST_CHECKED) {
-        flags.initrole = ROLE_RANDOM;
-    } else {
-        ind =
-            SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST, CB_GETCURSEL, 0, 0);
-        flags.initrole =
-            (ind == LB_ERR)
-                ? ROLE_RANDOM
-                : (int) SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST,
-                                           CB_GETITEMDATA, ind, 0);
-    }
-
-    if (SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_RANDOM, BM_GETCHECK, 0, 0)
-        == BST_CHECKED) {
-        flags.initrace = ROLE_RANDOM;
-    } else {
-        ind =
-            SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST, CB_GETCURSEL, 0, 0);
-        flags.initrace =
-            (ind == LB_ERR)
-                ? ROLE_RANDOM
-                : (int) SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST,
-                                           CB_GETITEMDATA, ind, 0);
-    }
-
-    if (SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_RANDOM, BM_GETCHECK, 0, 0)
-        == BST_CHECKED) {
-        flags.initgend = ROLE_RANDOM;
-    } else {
-        ind = SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST, CB_GETCURSEL, 0,
-                                 0);
-        flags.initgend =
-            (ind == LB_ERR)
-                ? ROLE_RANDOM
-                : (int) SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST,
-                                           CB_GETITEMDATA, ind, 0);
-    }
-
-    if (SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_RANDOM, BM_GETCHECK, 0, 0)
-        == BST_CHECKED) {
-        flags.initalign = ROLE_RANDOM;
-    } else {
-        ind = SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST, CB_GETCURSEL, 0,
-                                 0);
-        flags.initalign =
-            (ind == LB_ERR)
-                ? ROLE_RANDOM
-                : (int) SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST,
-                                           CB_GETITEMDATA, ind, 0);
-    }
-
-    /* check the role */
-    if (flags.initrole == ROLE_RANDOM) {
-        flags.initrole = pick_role(flags.initrace, flags.initgend,
-                                   flags.initalign, PICK_RANDOM);
-        if (flags.initrole < 0) {
-            NHMessageBox(hWnd, TEXT("Incompatible role!"),
-                         MB_ICONSTOP | MB_OK);
-            return FALSE;
-        }
-    }
-
-    /* Select a race, if necessary */
-    /* force compatibility with role */
-    if (flags.initrace == ROLE_RANDOM
-        || !validrace(flags.initrole, flags.initrace)) {
-        /* pre-selected race not valid */
-        if (flags.initrace == ROLE_RANDOM) {
-            flags.initrace = pick_race(flags.initrole, flags.initgend,
-                                       flags.initalign, PICK_RANDOM);
-        }
-
-        if (flags.initrace < 0) {
-            NHMessageBox(hWnd, TEXT("Incompatible race!"),
-                         MB_ICONSTOP | MB_OK);
-            return FALSE;
-        }
-    }
-
-    /* Select a gender, if necessary */
-    /* force compatibility with role/race, try for compatibility with
-     * pre-selected alignment */
-    if (flags.initgend < 0
-        || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
-        /* pre-selected gender not valid */
-        if (flags.initgend == ROLE_RANDOM) {
-            flags.initgend = pick_gend(flags.initrole, flags.initrace,
-                                       flags.initalign, PICK_RANDOM);
-        }
-
-        if (flags.initgend < 0) {
-            NHMessageBox(hWnd, TEXT("Incompatible gender!"),
-                         MB_ICONSTOP | MB_OK);
-            return FALSE;
-        }
-    }
-
-    /* Select an alignment, if necessary */
-    /* force compatibility with role/race/gender */
-    if (flags.initalign < 0
-        || !validalign(flags.initrole, flags.initrace, flags.initalign)) {
-        /* pre-selected alignment not valid */
-        if (flags.initalign == ROLE_RANDOM) {
-            flags.initalign = pick_align(flags.initrole, flags.initrace,
-                                         flags.initgend, PICK_RANDOM);
-        } else {
-            NHMessageBox(hWnd, TEXT("Incompatible alignment!"),
-                         MB_ICONSTOP | MB_OK);
-            return FALSE;
-        }
-    }
+    assert(role != ROLE_RANDOM && role != ROLE_NONE);
+    assert(race != ROLE_RANDOM && race != ROLE_NONE);
+    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+    assert(ok_role(role, race, gender, alignment));
+    assert(ok_race(role, race, gender, alignment));
+    assert(ok_gend(role, race, gender, alignment));
+    assert(ok_align(role, race, gender, alignment));
 
     return TRUE;
+}
+
+static boolean plselRandomize(plsel_data_t * data)
+{
+    boolean fully_specified = TRUE;
+
+    // restore back to configuration settings
+    flags.initrole = data->config_role;
+    flags.initrace = data->config_race;
+    flags.initgend = data->config_gender;
+    flags.initalign = data->config_alignment;
+
+    if (!flags.randomall) {
+        if(flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE
+            || flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE)
+            fully_specified = FALSE;
+    }
+
+    if (flags.initrole == ROLE_NONE)
+        flags.initrole = ROLE_RANDOM;
+    if (flags.initrace == ROLE_NONE)
+        flags.initrace = ROLE_RANDOM;
+    if (flags.initgend == ROLE_NONE)
+        flags.initgend = ROLE_RANDOM;
+    if (flags.initalign == ROLE_NONE)
+        flags.initalign = ROLE_RANDOM;
+
+    rigid_role_checks();
+
+    int role = flags.initrole;
+    int race = flags.initrace;
+    int gender = flags.initgend;
+    int alignment = flags.initalign;
+
+    assert(role != ROLE_RANDOM && role != ROLE_NONE);
+    assert(race != ROLE_RANDOM && race != ROLE_NONE);
+    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+
+    if (!ok_role(role, race, gender, alignment)) {
+        fully_specified = FALSE;
+        flags.initrole = ROLE_RANDOM;
+    }
+
+    if (!ok_race(role, race, gender, alignment)) {
+        fully_specified = FALSE;
+        flags.initrace = ROLE_RANDOM;
+    }
+
+    if (!ok_gend(role, race, gender, alignment)) {
+        fully_specified = FALSE;
+        flags.initgend = ROLE_RANDOM;
+    }
+
+    if(!ok_align(role, race, gender, alignment))
+    {
+        fully_specified = FALSE;
+        flags.initalign = ROLE_RANDOM;
+    }
+
+    rigid_role_checks();
+
+    role = flags.initrole;
+    race = flags.initrace;
+    gender = flags.initgend;
+    alignment = flags.initalign;
+
+    assert(role != ROLE_RANDOM && role != ROLE_NONE);
+    assert(race != ROLE_RANDOM && race != ROLE_NONE);
+    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+    assert(ok_role(role, race, gender, alignment));
+    assert(ok_race(role, race, gender, alignment));
+    assert(ok_gend(role, race, gender, alignment));
+    assert(ok_align(role, race, gender, alignment));
+
+    return fully_specified;
 }
