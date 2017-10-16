@@ -2674,24 +2674,29 @@ char *origbuf;
     } else if (match_varname(buf, "SOUND", 5)) {
         add_sound_mapping(bufp);
 #endif
-#ifdef QT_GRAPHICS
-        /* These should move to wc_ options */
     } else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
+#ifdef QT_GRAPHICS
         extern char *qt_tilewidth;
 
         if (qt_tilewidth == NULL)
             qt_tilewidth = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
+#ifdef QT_GRAPHICS
         extern char *qt_tileheight;
 
         if (qt_tileheight == NULL)
             qt_tileheight = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_FONTSIZE", 11)) {
+#ifdef QT_GRAPHICS
         extern char *qt_fontsize;
 
         if (qt_fontsize == NULL)
             qt_fontsize = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_COMPACT", 10)) {
+#ifdef QT_GRAPHICS
         extern int qt_compact_mode;
 
         qt_compact_mode = atoi(bufp);
