@@ -1219,6 +1219,7 @@ char **argv;
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
+    XtSetArg(args[num_args], XtNtitle, "NetHack"); num_args++;
 
     toplevel = XtAppInitialize(&app_context, "NetHack",     /* application  */
                                (XrmOptionDescList) 0, 0,    /* options list */
