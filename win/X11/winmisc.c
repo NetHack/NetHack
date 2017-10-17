@@ -345,10 +345,10 @@ plsel_dialog_acceptvalues()
     Arg args[2];
     String s;
 
-    flags.initrace = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
-    flags.initrole = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
-    flags.initgend = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0]))-1;
-    flags.initalign = xtp2i(XawToggleGetCurrent(plsel_align_radios[0]))-1;
+    flags.initrace = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
+    flags.initrole = xtp2i(XawToggleGetCurrent(plsel_role_radios[0])) - 1;
+    flags.initgend = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    flags.initalign = xtp2i(XawToggleGetCurrent(plsel_align_radios[0])) - 1;
 
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
@@ -701,13 +701,23 @@ gendertoggleCallback(w, client, call)
 Widget w;
 XtPointer client, call;
 {
-    int r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    int i, r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
 
     nhUse(w);
     nhUse(client);
     nhUse(call);
 
     plsel_set_play_button(r < 0);
+
+    for (i = 0; roles[i].name.m; i++) {
+        if (roles[i].name.f) {
+            Arg args[2];
+
+            XtSetArg(args[0], XtNlabel,
+                     (r < 1) ? roles[i].name.m : roles[i].name.f);
+            XtSetValues(plsel_role_radios[i], args, ONE);
+        }
+    }
 }
 
 static void
@@ -903,8 +913,6 @@ X11_player_selection_dialog()
      *  the same width for the label text but different decorations--
      *  room for radio button box--of the other widgets results in the
      *  total width being different);
-     *  update caveman/cavewoman and priest/priestess role labels when
-     *  gender gets set to a particular value;
      *  add 'random' to each of the four boxes and Choose to the Random/
      *  Play/Quit buttons; if none of the four 'random's are currently
      *  selected, gray-out Choose; conversely, when Choose or Play is
@@ -1112,9 +1120,8 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Alignment"); num_args++;
-    alignlabel = XtCreateManagedWidget("align_label",
-                                       labelWidgetClass, align_form,
-                                       args, num_args);
+    alignlabel = XtCreateManagedWidget("align_label", labelWidgetClass,
+                                       align_form, args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
