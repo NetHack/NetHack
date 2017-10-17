@@ -1135,7 +1135,7 @@ void strbuf_reserve(strbuf_t * strbuf, int len)
     if (len > strbuf->len) {
         char * oldbuf = strbuf->str;
         strbuf->len = len + sizeof(strbuf->buf);
-        strbuf->str = (char *) alloc(len);
+        strbuf->str = (char *) alloc(strbuf->len);
         strcpy(strbuf->str, oldbuf);
         if (oldbuf != strbuf->buf) free(oldbuf);
     }

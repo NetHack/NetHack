@@ -139,6 +139,15 @@ char *argv[];
 /* use STDERR by default
 _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
 _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
+/* Heap Debugging
+    _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+        | _CRTDBG_ALLOC_MEM_DF
+        | _CRTDBG_CHECK_ALWAYS_DF
+        | _CRTDBG_CHECK_CRT_DF
+        | _CRTDBG_DELAY_FREE_MEM_DF
+        | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetBreakAlloc(1423);
+*/
 # endif
 #endif
 
