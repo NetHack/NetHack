@@ -270,6 +270,7 @@ INT_PTR CALLBACK PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
 static void plselInitDialog(HWND hWnd);
 static void plselAdjustLists(HWND hWnd);
 static boolean plselRandomize(plsel_data_t * data);
+static BOOL plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 boolean
 mswin_player_selection_window()
@@ -333,6 +334,35 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return FALSE;
         break;
 
+    case WM_DRAWITEM:
+        if (wParam == IDC_PLSEL_ROLE_LIST ||  wParam == IDC_PLSEL_RACE_LIST)
+            return plselDrawItem(hWnd, wParam, lParam);
+        break;
+
+    case WM_NOTIFY:
+        {
+            LPNMHDR nmhdr = (LPNMHDR)lParam;
+
+            if (nmhdr->code == NM_CLICK) {
+                LPNMLISTVIEW lpnmitem = (LPNMLISTVIEW) lParam;
+                int i = lpnmitem->iItem;
+                if (i == -1)
+                    return FALSE;
+                if (nmhdr->idFrom == IDC_PLSEL_ROLE_LIST) {
+                    if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
+                        flags.initrole = i;
+                        plselAdjustLists(hWnd);
+                    }
+                } else {
+                    if (ok_race(flags.initrole, i, flags.initgend, flags.initalign)) {
+                        flags.initrace = i;
+                        plselAdjustLists(hWnd);
+                    }
+                }
+            }
+        }
+        break;
+
     case WM_COMMAND:
         data = (struct plsel_data *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
         switch (LOWORD(wParam)) {
@@ -350,29 +380,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             plselRandomize(data);
             plselAdjustLists(hWnd);
             return TRUE;
-
-        case IDC_PLSEL_ROLE_LIST:
-            if (HIWORD(wParam) == LBN_SELCHANGE) {
-                HWND role_control = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
-
-                int selection = SendMessage(role_control, LB_GETCURSEL, 0, 0);
-                if (selection != LB_ERR)
-                    flags.initrole = (int) SendMessage(role_control, LB_GETITEMDATA, selection, 0);
-
-                plselAdjustLists(hWnd);
-            }
-            break;
-
-        case IDC_PLSEL_RACE_LIST:
-            if (HIWORD(wParam) == LBN_SELCHANGE) {
-                HWND race_control = GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST);
-                int selection = SendMessage(race_control, LB_GETCURSEL, 0, 0);
-                if (selection != LB_ERR)
-                    flags.initrace = (int) SendMessage(race_control, LB_GETITEMDATA, selection, 0);
-
-                plselAdjustLists(hWnd);
-            }
-            break;
 
         case IDC_PLSEL_GENDER_MALE:
         case IDC_PLSEL_GENDER_FEMALE:
@@ -398,30 +405,22 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-void
-setListBoxValue(HWND hWnd, int list_box, int value)
-{
-    int index_max =
-        (int) SendDlgItemMessage(hWnd, list_box, LB_GETCOUNT, 0, 0);
-    int index;
-    int value_to_set = LB_ERR;
-    for (index = 0; index < index_max; index++) {
-        if (SendDlgItemMessage(hWnd, list_box, LB_GETITEMDATA,
-                               (WPARAM) index, 0) == value) {
-            value_to_set = index;
-            break;
-        }
-    }
-    SendDlgItemMessage(hWnd, list_box, LB_SETCURSEL, (WPARAM) value_to_set,
-                       0);
-}
-
 /* initialize player selector dialog */
 void
 plselInitDialog(HWND hWnd)
 {
     struct plsel_data * data = (plsel_data_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     TCHAR wbuf[BUFSZ];
+    LVCOLUMN lvcol;
+    HWND control_role = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
+    HWND control_race = GetDlgItem(hWnd, IDC_PLSEL_RACE_LIST);
+
+    ZeroMemory(&lvcol, sizeof(lvcol));
+    lvcol.mask = LVCF_WIDTH;
+    lvcol.cx = GetSystemMetrics(SM_CXFULLSCREEN);
+
+    ListView_InsertColumn(control_role, 0, &lvcol);
+    ListView_InsertColumn(control_race, 0, &lvcol);
 
     /* set player name */
     SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
@@ -440,8 +439,7 @@ plselAdjustLists(HWND hWnd)
     HWND control_genders[ROLE_GENDERS];
     HWND control_aligns[ROLE_ALIGNS];
     int i;
-    LRESULT ind;
-    TCHAR wbuf[255];
+    TCHAR wbuf[BUFSZ];
 
     /* get control handles */
     control_role = GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST);
@@ -452,41 +450,39 @@ plselAdjustLists(HWND hWnd)
         control_aligns[i] = GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LAWFUL + i);
 
     /* populate role list */
-    SendMessage(control_role, LB_RESETCONTENT, 0, 0);
-    for (i = 0; roles[i].name.m; i++)
-        if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
-            assert(flags.initgend >= 0);
-            if (flags.female && roles[i].name.f)
-                ind = SendMessage(
-                    control_role, LB_ADDSTRING, (WPARAM) 0,
-                    (LPARAM) NH_A2W(roles[i].name.f, wbuf, sizeof(wbuf)));
-            else
-                ind = SendMessage(
-                    control_role, LB_ADDSTRING, (WPARAM) 0,
-                    (LPARAM) NH_A2W(roles[i].name.m, wbuf, sizeof(wbuf)));
+    SendMessage(control_role, LVM_DELETEALLITEMS, 0, 0);
+    for (i = 0; roles[i].name.m; i++) {
+        LVITEM lvitem;
+        ZeroMemory(&lvitem, sizeof(lvitem));
 
-            SendMessage(control_role, LB_SETITEMDATA, (WPARAM) ind,
-                        (LPARAM) i);
-
-            if (i == flags.initrole)
-                SendMessage(control_role, LB_SETCURSEL, (WPARAM) ind,
-                            (LPARAM) 0);
+        lvitem.mask = LVIF_STATE | LVIF_TEXT;
+        lvitem.iItem = i;
+        lvitem.iSubItem = 0;
+        lvitem.state = i == flags.initrole ? LVIS_SELECTED : 0;
+        if (flags.female && roles[i].name.f)
+            lvitem.pszText = NH_A2W(roles[i].name.f, wbuf, BUFSZ);
+        else
+            lvitem.pszText = NH_A2W(roles[i].name.m, wbuf, BUFSZ);
+        if (ListView_InsertItem(control_role, &lvitem) == -1) {
+            panic("cannot insert menu item");
         }
+    }
 
     /* populate race list */
-    SendMessage(control_race, LB_RESETCONTENT, 0, 0);
-    for (i = 0; races[i].noun; i++)
-        if (ok_race(flags.initrole, i, flags.initgend, flags.initalign)) {
-            ind = SendMessage(
-                control_race, LB_ADDSTRING, (WPARAM) 0,
-                (LPARAM) NH_A2W(races[i].noun, wbuf, sizeof(wbuf)));
-            SendMessage(control_race, LB_SETITEMDATA, (WPARAM)ind,
-                (LPARAM)i);
-            if (i == flags.initrace) 
-                SendMessage(control_race, LB_SETCURSEL, (WPARAM) ind,
-                            (LPARAM) 0);
-        }
+    SendMessage(control_race, LVM_DELETEALLITEMS, 0, 0);
+    for (i = 0; races[i].noun; i++) {
+        LVITEM lvitem;
+        ZeroMemory(&lvitem, sizeof(lvitem));
 
+        lvitem.mask = LVIF_STATE | LVIF_TEXT;
+        lvitem.iItem = i;
+        lvitem.iSubItem = 0;
+        lvitem.state = i == flags.initrace ? LVIS_SELECTED : 0;
+        lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
+        if (ListView_InsertItem(control_race, &lvitem) == -1) {
+            panic("cannot insert menu item");
+        }
+    }
 
     /* intialize gender radio buttons */
     for (i = 0; i < ROLE_GENDERS; i++) {
@@ -609,4 +605,61 @@ static boolean plselRandomize(plsel_data_t * data)
     assert(ok_align(role, race, gender, alignment));
 
     return fully_specified;
+}
+
+/*-----------------------------------------------------------------------------*/
+BOOL
+plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+     LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT) lParam;
+
+    /* If there are no list box items, skip this message. */
+    if (lpdis->itemID < 0)
+        return FALSE;
+
+    HWND control = GetDlgItem(hWnd, wParam);
+    int i = lpdis->itemID;
+
+    const char * string;
+
+    boolean ok;
+    boolean selected;
+
+    if (wParam == IDC_PLSEL_ROLE_LIST) {
+        ok = ok_role(i, flags.initrace, flags.initgend, flags.initalign);
+        if (flags.female && roles[i].name.f)
+            string = roles[i].name.f;
+        else
+            string = roles[i].name.m;
+        selected = (flags.initrole == i);
+    } else {
+        ok = ok_race(flags.initrole, i, flags.initgend, flags.initalign);
+        string = races[i].noun;
+        selected = (flags.initrace == i);
+    }
+
+    SetBkMode(lpdis->hDC, OPAQUE);
+    HBRUSH brush;
+    if (selected) {
+        brush = CreateSolidBrush(RGB(0, 0, 0));
+        SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+        SetBkColor(lpdis->hDC, RGB(0, 0, 0));
+    } else {
+        brush = CreateSolidBrush(RGB(255, 255, 255));
+        if (!ok)
+            SetTextColor(lpdis->hDC, RGB(220, 0, 0));
+        else
+            SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+        SetBkColor(lpdis->hDC, RGB(255, 255, 255));
+    }
+
+    FillRect(lpdis->hDC, &lpdis->rcItem, brush);
+    RECT rect = lpdis->rcItem;
+    rect.left += 5;
+    DrawTextA(lpdis->hDC, string, strlen(string), &rect,
+        DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+
+    DeleteObject(brush);
+
+    return TRUE;
 }
