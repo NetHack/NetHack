@@ -3622,7 +3622,7 @@ doorganize() /* inventory organizer by Del Lamb */
             pline1(Never_mind);
             return 0;
         }
-        if ((letter(let) && let != '@') || index(buf, let))
+        if ((letter(let) && let != '@') || index(buf, let) && let != '-')
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
