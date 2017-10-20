@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1508479720 2017/10/20 06:08:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.618 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1423,6 +1423,7 @@ E boolean FDECL(hates_silver, (struct permonst *));
 E boolean FDECL(mon_hates_silver, (struct monst *));
 E boolean FDECL(passes_bars, (struct permonst *));
 E boolean FDECL(can_blow, (struct monst *));
+E boolean FDECL(can_chant, (struct monst *));
 E boolean FDECL(can_be_strangled, (struct monst *));
 E boolean FDECL(can_track, (struct permonst *));
 E boolean FDECL(breakarm, (struct permonst *));

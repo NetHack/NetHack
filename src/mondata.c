@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1492733172 2017/04/21 00:06:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1508479720 2017/10/20 06:08:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -325,13 +325,25 @@ struct permonst *mptr;
 /* returns True if monster can blow (whistle, etc) */
 boolean
 can_blow(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     if ((is_silent(mtmp->data) || mtmp->data->msound == MS_BUZZ)
         && (breathless(mtmp->data) || verysmall(mtmp->data)
             || !has_head(mtmp->data) || mtmp->data->mlet == S_EEL))
         return FALSE;
     if ((mtmp == &youmonst) && Strangled)
+        return FALSE;
+    return TRUE;
+}
+
+/* for casting spells and reading scrolls while blind */
+boolean
+can_chant(mtmp)
+struct monst *mtmp;
+{
+    if ((mtmp == &youmonst && Strangled)
+        || is_silent(mtmp->data) || !has_head(mtmp->data)
+        || mtmp->data->msound == MS_BUZZ || mtmp->data->msound == MS_BURBLE)
         return FALSE;
     return TRUE;
 }
