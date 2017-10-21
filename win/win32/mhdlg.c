@@ -258,7 +258,7 @@ ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 /*---------------------------------------------------------------*/
-/* player selector dialog data */
+/* player selector dialog */
 typedef struct plsel_data {
     int config_race;
     int config_role;
@@ -270,6 +270,7 @@ typedef struct plsel_data {
     HWND control_aligns[ROLE_ALIGNS];
     int role_count;
     int race_count;
+    HWND focus;
 } plsel_data_t;
 
 INT_PTR CALLBACK PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
@@ -333,11 +334,8 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         /* init dialog */
         plselInitDialog(hWnd);
 
-        /* set focus on the role list */
-        SetFocus(GetDlgItem(hWnd, IDC_PLSEL_ROLE_LIST));
-
-        /* tell windows we set the focus */
-        return FALSE;
+        /* tell windows to set the focus */
+        return TRUE;
         break;
 
     case WM_DRAWITEM:
@@ -348,22 +346,80 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_NOTIFY:
         {
             LPNMHDR nmhdr = (LPNMHDR)lParam;
+            HWND control = nmhdr->hwndFrom;
+
             data = (struct plsel_data *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-            if (nmhdr->code == NM_CLICK) {
-                LPNMLISTVIEW lpnmitem = (LPNMLISTVIEW) lParam;
-                int i = lpnmitem->iItem;
-                if (i == -1)
-                    return FALSE;
-                if (nmhdr->idFrom == IDC_PLSEL_ROLE_LIST) {
-                    flags.initrole = i;
-                    plselAdjustSelections(hWnd);
-                } else {
-                    if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
-                        flags.initrace = i;
+            switch (nmhdr->code) {
+            case LVN_KEYDOWN:
+                {
+                    LPNMLVKEYDOWN lpnmkeydown = (LPNMLVKEYDOWN) lParam;
+
+                    if (lpnmkeydown->wVKey == ' ') {
+                        if (control == data->control_role) {
+                            int i = ListView_GetNextItem(data->control_role, -1, LVNI_FOCUSED);
+                            assert(i == -1 || ListView_GetNextItem(data->control_role, i, LVNI_FOCUSED) == -1);
+                            flags.initrole = i;
+                            plselAdjustSelections(hWnd);
+                        } else if (control == data->control_race) {
+                            int i = ListView_GetNextItem(data->control_race, -1, LVNI_FOCUSED);
+                            assert(i == -1 || ListView_GetNextItem(data->control_race, i, LVNI_FOCUSED) == -1);
+                            if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
+                                flags.initrace = i;
+                                plselAdjustSelections(hWnd);
+                            }
+                        }
+                    }
+                }
+            break;
+            case NM_CLICK:
+                {
+                    LPNMLISTVIEW lpnmitem = (LPNMLISTVIEW)lParam;
+                    int i = lpnmitem->iItem;
+                    if (i == -1)
+                        return FALSE;
+                    if (control == data->control_role) {
+                        flags.initrole = i;
+                        plselAdjustSelections(hWnd);
+                    } else if(control == data->control_race) {
+                        if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
+                            flags.initrace = i;
+                            plselAdjustSelections(hWnd);
+                        }
+                    }
+                }
+                break;
+            case NM_KILLFOCUS:
+                {
+                    char buf[64];
+                    sprintf(buf, "KILLFOCUS %lx\n", (unsigned long) control);
+                    OutputDebugStringA(buf);
+
+                    if (data->focus == data->control_race) {
+                        data->focus = NULL;
+                        ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
+                    } else if (data->focus == data->control_role) {
+                        data->focus = NULL;
+                        ListView_RedrawItems(data->control_role, 0, data->role_count - 1);
+                    }
+                }
+                break;
+            case NM_SETFOCUS:
+                {
+                    char buf[64];
+                    sprintf(buf, "SETFOCUS %lx\n", (unsigned long) control);
+                    OutputDebugStringA(buf);
+                    data->focus = control;
+
+                    if (control == data->control_race) {
+                        data->focus = data->control_race;
+                        plselAdjustSelections(hWnd);
+                    } else if (control == data->control_role) {
+                        data->focus = data->control_role;
                         plselAdjustSelections(hWnd);
                     }
                 }
+                break;
             }
         }
         break;
@@ -440,7 +496,8 @@ plselInitDialog(HWND hWnd)
         lvitem.mask = LVIF_STATE | LVIF_TEXT;
         lvitem.iItem = i;
         lvitem.iSubItem = 0;
-        lvitem.state = i == flags.initrole ? LVIS_SELECTED : 0;
+        lvitem.state = 0;
+        lvitem.stateMask = LVIS_FOCUSED;
         if (flags.female && roles[i].name.f)
             lvitem.pszText = NH_A2W(roles[i].name.f, wbuf, BUFSZ);
         else
@@ -461,7 +518,8 @@ plselInitDialog(HWND hWnd)
         lvitem.mask = LVIF_STATE | LVIF_TEXT;
         lvitem.iItem = i;
         lvitem.iSubItem = 0;
-        lvitem.state = i == flags.initrace ? LVIS_SELECTED : 0;
+        lvitem.state = 0;
+        lvitem.stateMask = LVIS_FOCUSED;
         lvitem.pszText = NH_A2W(races[i].noun, wbuf, BUFSZ);
         if (ListView_InsertItem(data->control_race, &lvitem) == -1) {
             panic("cannot insert menu item");
@@ -475,6 +533,18 @@ plselInitDialog(HWND hWnd)
     for(int i = 0; i < ROLE_ALIGNS; i++)
         data->control_aligns[i] = GetDlgItem(hWnd, IDC_PLSEL_ALIGN_LAWFUL + i);
 
+    /* set gender radio button state */
+    for (int i = 0; i < ROLE_GENDERS; i++)
+        Button_Enable(data->control_genders[i], TRUE);
+
+    Button_SetCheck(data->control_genders[0], BST_CHECKED);
+
+    /* set alignment radio button state */
+    for (int i = 0; i < ROLE_ALIGNS; i++)
+        Button_Enable(data->control_aligns[i], TRUE);
+
+    Button_SetCheck(data->control_aligns[0], BST_CHECKED);
+
     /* set player name */
     SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
 
@@ -482,6 +552,17 @@ plselInitDialog(HWND hWnd)
 
     /* populate select boxes */
     plselAdjustSelections(hWnd);
+
+    /* set tab order */
+    SetWindowPos(GetDlgItem(hWnd, IDCANCEL), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetWindowPos(GetDlgItem(hWnd, IDC_PLSEL_RANDOM), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetWindowPos(GetDlgItem(hWnd, IDOK), NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    for(int i = ROLE_GENDERS - 1; i >= 0; i--)
+        SetWindowPos(data->control_genders[i], NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    for(int i = ROLE_ALIGNS - 1; i >= 0; i--)
+        SetWindowPos(data->control_aligns[i], NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetWindowPos(data->control_race, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetWindowPos(data->control_role, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 }
 
@@ -504,27 +585,26 @@ plselAdjustSelections(HWND hWnd)
 
     /* set gender radio button state */
     for (int i = 0; i < ROLE_GENDERS; i++) {
-        Button_Enable(data->control_genders[i], FALSE);
-        Button_SetCheck(data->control_genders[i], BST_UNCHECKED);
-        if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign)) {
-            Button_Enable(data->control_genders[i], TRUE);
-            if (i == flags.initgend) {
-                Button_SetCheck(data->control_genders[i], BST_CHECKED);
-            }
-        }
+        BOOL enable = ok_gend(flags.initrole, flags.initrace, i, flags.initalign);
+        Button_Enable(data->control_genders[i], enable);
+        LRESULT state = Button_GetCheck(data->control_genders[i]);
+        if (state == BST_CHECKED && flags.initgend != i)
+            Button_SetCheck(data->control_genders[i], BST_UNCHECKED);
+        if (state == BST_UNCHECKED && flags.initgend == i)
+            Button_SetCheck(data->control_genders[i], BST_CHECKED);
     }
 
     /* set alignment radio button state */
     for (int i = 0; i < ROLE_ALIGNS; i++) {
-        Button_Enable(data->control_aligns[i], FALSE);
-        Button_SetCheck(data->control_aligns[i], BST_UNCHECKED);
-        if (ok_align(flags.initrole, flags.initrace, flags.initgend, i)) {
-            Button_Enable(data->control_aligns[i], TRUE);
-            if (i == flags.initalign) {
-                Button_SetCheck(data->control_aligns[i], BST_CHECKED);
-            }
-        }
+        BOOL enable = ok_align(flags.initrole, flags.initrace, flags.initgend, i);
+        Button_Enable(data->control_aligns[i], enable);
+        LRESULT state = Button_GetCheck(data->control_aligns[i]);
+        if (state == BST_CHECKED && flags.initalign != i)
+            Button_SetCheck(data->control_aligns[i], BST_UNCHECKED);
+        if (state == BST_UNCHECKED && flags.initalign == i)
+            Button_SetCheck(data->control_aligns[i], BST_CHECKED);
     }
+
 }
 
 /* player made up his mind - get final selection here */
@@ -630,6 +710,7 @@ BOOL
 plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
      LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT) lParam;
+    struct plsel_data * data = (plsel_data_t *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     /* If there are no list box items, skip this message. */
     if (lpdis->itemID < 0)
@@ -637,6 +718,12 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     HWND control = GetDlgItem(hWnd, wParam);
     int i = lpdis->itemID;
+
+    {
+        char buf[64];
+        sprintf(buf, "DRAW %lx %d\n", (unsigned long)control, i);
+        OutputDebugStringA(buf);
+    }
 
     const char * string;
 
@@ -650,6 +737,7 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             string = roles[i].name.m;
         selected = (flags.initrole == i);
     } else {
+        assert(wParam == IDC_PLSEL_RACE_LIST);
         ok = ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM);
         string = races[i].noun;
         selected = (flags.initrace == i);
@@ -675,6 +763,25 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     rect.left += 5;
     DrawTextA(lpdis->hDC, string, strlen(string), &rect,
         DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+
+    if (data->focus == control) {
+        if (lpdis->itemState & LVIS_FOCUSED) {
+            /* draw focus rect */
+            RECT client_rt;
+
+            GetClientRect(lpdis->hwndItem, &client_rt);
+            SetRect(&rect, client_rt.left, lpdis->rcItem.top,
+                    client_rt.left + ListView_GetColumnWidth(lpdis->hwndItem, 0),
+                    lpdis->rcItem.bottom);
+            DrawFocusRect(lpdis->hDC, &rect);
+
+            {
+                char buf[64];
+                sprintf(buf, "FOCUS %lx %d\n", (unsigned long)control, i);
+                OutputDebugStringA(buf);
+            }
+        }
+    }
 
     DeleteObject(brush);
 
