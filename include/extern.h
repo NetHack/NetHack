@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1508549428 2017/10/21 01:30:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.619 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1426,6 +1426,7 @@ E boolean FDECL(hates_silver, (struct permonst *));
 E boolean FDECL(mon_hates_silver, (struct monst *));
 E boolean FDECL(passes_bars, (struct permonst *));
 E boolean FDECL(can_blow, (struct monst *));
+E boolean FDECL(can_chant, (struct monst *));
 E boolean FDECL(can_be_strangled, (struct monst *));
 E boolean FDECL(can_track, (struct permonst *));
 E boolean FDECL(breakarm, (struct permonst *));
@@ -1832,6 +1833,7 @@ E int FDECL(use_container, (struct obj **, int, BOOLEAN_P));
 E int FDECL(loot_mon, (struct monst *, int *, boolean *));
 E int NDECL(dotip);
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
+E boolean FDECL(autopick_testobj, (struct obj *, BOOLEAN_P));
 
 /* ### pline.c ### */
 

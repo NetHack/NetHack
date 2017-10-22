@@ -1219,6 +1219,7 @@ char **argv;
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
+    XtSetArg(args[num_args], XtNtitle, "NetHack"); num_args++;
 
     toplevel = XtAppInitialize(&app_context, "NetHack",     /* application  */
                                (XrmOptionDescList) 0, 0,    /* options list */
@@ -2080,6 +2081,8 @@ char def;            /* default response if user hits <space> or <return> */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
+
+    pline("%s%c", buf, (yn_return != '\033') ? yn_return : '\0');
 
     return yn_return;
 }

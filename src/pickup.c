@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1498078877 2017/06/21 21:01:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1508549438 2017/10/21 01:30:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,7 +21,6 @@ STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
 #if 0 /* not used */
 STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
 #endif
-STATIC_DCL boolean FDECL(autopick_testobj, (struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
 STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
@@ -743,7 +742,7 @@ boolean grab; /* forced pickup, rather than forced leave behind? */
     return FALSE;
 }
 
-STATIC_OVL boolean
+boolean
 autopick_testobj(otmp, calc_costly)
 struct obj *otmp;
 boolean calc_costly;

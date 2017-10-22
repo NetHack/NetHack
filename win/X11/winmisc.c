@@ -345,10 +345,10 @@ plsel_dialog_acceptvalues()
     Arg args[2];
     String s;
 
-    flags.initrace = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
-    flags.initrole = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
-    flags.initgend = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0]))-1;
-    flags.initalign = xtp2i(XawToggleGetCurrent(plsel_align_radios[0]))-1;
+    flags.initrace = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
+    flags.initrole = xtp2i(XawToggleGetCurrent(plsel_role_radios[0])) - 1;
+    flags.initgend = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    flags.initalign = xtp2i(XawToggleGetCurrent(plsel_align_radios[0])) - 1;
 
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
@@ -434,7 +434,6 @@ boolean setcurr;
     Arg args[2];
     int j, valid;
     int c = 0;
-
     int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
     int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
 
@@ -458,10 +457,8 @@ boolean setcurr;
     if (!validrace(ro, c))
         c = valid;
 
-    if (setcurr) {
-        int tmpc = c+1;
-        XawToggleSetCurrent(plsel_role_radios[0], i2xtp(tmpc));
-    }
+    if (setcurr)
+        XawToggleSetCurrent(plsel_role_radios[0], i2xtp(c + 1));
 
     valid = -1;
 
@@ -478,10 +475,8 @@ boolean setcurr;
     if (!validrace(ro, c))
         c = valid;
 
-    if (setcurr) {
-        int tmpc = c+1;
-        XawToggleSetCurrent(plsel_race_radios[0], i2xtp(tmpc));
-    }
+    if (setcurr)
+        XawToggleSetCurrent(plsel_race_radios[0], i2xtp(c + 1));
 
     X11_player_selection_setupOthers();
 }
@@ -491,12 +486,8 @@ X11_player_selection_randomize()
 {
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
-    int ro, ra;
-    boolean fully_specified_role;
-    boolean choose_race_first;
-    int a, g;
-    int tmpx;
-
+    int ro, ra, a, g;
+    boolean fully_specified_role, choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
                              || flags.initgend == ROLE_NONE
@@ -570,10 +561,10 @@ X11_player_selection_randomize()
         a = rn2(ROLE_ALIGNS);
     }
 
-    tmpx = g+1; XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(tmpx));
-    tmpx = a+1; XawToggleSetCurrent(plsel_align_radios[0], i2xtp(tmpx));
-    tmpx = ra+1; XawToggleSetCurrent(plsel_race_radios[0], i2xtp(tmpx));
-    tmpx = ro+1; XawToggleSetCurrent(plsel_role_radios[0], i2xtp(tmpx));
+    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(g + 1));
+    XawToggleSetCurrent(plsel_align_radios[0], i2xtp(a + 1));
+    XawToggleSetCurrent(plsel_race_radios[0], i2xtp(ra + 1));
+    XawToggleSetCurrent(plsel_role_radios[0], i2xtp(ro + 1));
     plsel_set_sensitivities(FALSE);
 }
 
@@ -581,22 +572,18 @@ void
 X11_player_selection_setupOthers()
 {
     Arg args[2];
-    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
-    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
-
-    int valid = -1;
-    int c = 0;
-    int j;
-    int k;
-
-    int gchecked = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0]))-1;
-    int achecked = xtp2i(XawToggleGetCurrent(plsel_align_radios[0]))-1;
+    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
+    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0])) - 1;
+    int valid = -1, c = 0, j;
+    int gchecked = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    int achecked = xtp2i(XawToggleGetCurrent(plsel_align_radios[0])) - 1;
 
     if (ro < 0 || ra < 0)
         return;
 
     for (j = 0; j < ROLE_GENDERS; j++) {
         boolean v = validgend(ro, ra, j);
+
         if (j == gchecked)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
@@ -607,13 +594,13 @@ X11_player_selection_setupOthers()
     if (!validgend(ro, ra, c))
         c = valid;
 
-    k = c+1;
-    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(k));
+    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(c + 1));
 
     valid = -1;
 
     for (j = 0; j < ROLE_ALIGNS; j++) {
         boolean v = validalign(ro, ra, j);
+
         if (j == achecked)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
@@ -624,8 +611,7 @@ X11_player_selection_setupOthers()
     if (!validalign(ro, ra, c))
         c = valid;
 
-    k = c+1;
-    XawToggleSetCurrent(plsel_align_radios[0], i2xtp(k));
+    XawToggleSetCurrent(plsel_align_radios[0], i2xtp(c + 1));
 }
 
 static void
@@ -636,9 +622,8 @@ XtPointer client, call;
     Arg args[2];
     int j, valid;
     int c = 0;
-
-    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
-    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
+    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
+    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0])) - 1;
 
     nhUse(w);
     nhUse(client);
@@ -653,6 +638,7 @@ XtPointer client, call;
 
     for (j = 0; roles[j].name.m; j++) {
         boolean v = validrace(j, ra);
+
         if (j == ro)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
@@ -663,7 +649,7 @@ XtPointer client, call;
     if (!validrace(c, ra))
         c = valid;
 
-    j = c+1;
+    j = c + 1;
     XawToggleSetCurrent(plsel_role_radios[0], i2xtp(j));
 
     X11_player_selection_setupOthers();
@@ -675,12 +661,10 @@ Widget w;
 XtPointer client, call;
 {
     Arg args[2];
-
     int j, valid;
     int c = 0;
-
-    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0]))-1;
-    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0]))-1;
+    int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
+    int ro = xtp2i(XawToggleGetCurrent(plsel_role_radios[0])) - 1;
 
     nhUse(w);
     nhUse(client);
@@ -695,6 +679,7 @@ XtPointer client, call;
 
     for (j = 0; races[j].noun; j++) {
         boolean v = validrace(ro, j);
+
         if (j == ra)
             c = j;
         XtSetArg(args[0], nhStr(XtNsensitive), v);
@@ -716,13 +701,23 @@ gendertoggleCallback(w, client, call)
 Widget w;
 XtPointer client, call;
 {
-    int r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
+    int i, r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
 
     nhUse(w);
     nhUse(client);
     nhUse(call);
 
     plsel_set_play_button(r < 0);
+
+    for (i = 0; roles[i].name.m; i++) {
+        if (roles[i].name.f) {
+            Arg args[2];
+
+            XtSetArg(args[0], XtNlabel,
+                     (r < 1) ? roles[i].name.m : roles[i].name.f);
+            XtSetValues(plsel_role_radios[i], args, ONE);
+        }
+    }
 }
 
 static void
@@ -888,6 +883,45 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], XtNwidth, winwid); num_args++;
     XtSetValues(name_vp, args, num_args);
 
+    /*
+     * Layout; role is centered rather than first:
+     *
+     *   +------------------------------------+
+     *   | name                               |
+     *   +------------------------------------+
+     *   +--------+   +------------+   +---------+
+     *   | human  |   |archeologist|   |  male   |
+     *   |  elf   |   | barbarian  |   | female  |
+     *   | dwarf  |   |  caveman   |   +---------+
+     *   | gnome  |   |   healer   |   +---------+
+     *   |  orc   |   |   knight   |   | lawful  |
+     *   +--------+   |    monk    |   | neutral |
+     *                |   priest   |   | chaotic |
+     *                |   rogue    |   +---------+
+     *                |   ranger   |   +--------+
+     *                |  samurai   |   + Random +
+     *                |  tourist   |   +  Play  +
+     *                |  valkyrie  |   +  Quit  +
+     *                |   wizard   |   +--------+
+     *                +------------+
+     *
+     * TODO:
+     *  make name box same width as race+gap+role+gap+gender/alignment
+     *  (resize it after the other boxes have been placed);
+     *  make Random/Play/Quit buttons same width as gender/alignment and
+     *  align bottom of them with bottom of role (they already specify
+     *  the same width for the label text but different decorations--
+     *  room for radio button box--of the other widgets results in the
+     *  total width being different);
+     *  add 'random' to each of the four boxes and Choose to the Random/
+     *  Play/Quit buttons; if none of the four 'random's are currently
+     *  selected, gray-out Choose; conversely, when Choose or Play is
+     *  clicked on, make the random assignments for any/all of the four
+     *  boxes which have 'random' selected.
+     *  Maybe:  move gender box underneath race, bottom aligned with role
+     *  and move alignment up to where gender currently is.  If that's
+     *  done, move role column first and race+gender to middle.
+     */
 
     /********************************************/
 
@@ -965,9 +999,8 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Role"); num_args++;
-    rolelabel = XtCreateManagedWidget("role_label",
-                                      labelWidgetClass, role_form,
-                                      args, num_args);
+    rolelabel = XtCreateManagedWidget("role_label", labelWidgetClass,
+                                      role_form, args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -986,7 +1019,7 @@ X11_player_selection_dialog()
         continue;
     plsel_n_roles = i;
 
-    plsel_role_radios = (Widget *)alloc(sizeof(Widget) * plsel_n_roles);
+    plsel_role_radios = (Widget *) alloc(sizeof (Widget) * plsel_n_roles);
 
     /* role radio buttons */
     for (i = 0; roles[i].name.m; i++) {
@@ -1002,10 +1035,8 @@ X11_player_selection_dialog()
                      plsel_role_radios[0]); num_args++;
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
 
-        rolewidget = XtCreateManagedWidget(roles[i].name.m,
-                                           toggleWidgetClass,
-                                           role_form2,
-                                           args, num_args);
+        rolewidget = XtCreateManagedWidget(roles[i].name.m, toggleWidgetClass,
+                                           role_form2, args, num_args);
         XtAddCallback(rolewidget, XtNcallback, roletoggleCallback, i2xtp(i));
         tmpwidget = rolewidget;
         plsel_role_radios[i] = rolewidget;
@@ -1016,7 +1047,7 @@ X11_player_selection_dialog()
 
     /* Gender*/
 
-    plsel_gend_radios = (Widget *)alloc(sizeof(Widget) * ROLE_GENDERS);
+    plsel_gend_radios = (Widget *) alloc(sizeof (Widget) * ROLE_GENDERS);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), name_vp); num_args++;
@@ -1030,9 +1061,8 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Gender"); num_args++;
-    gendlabel = XtCreateManagedWidget("gender_label",
-                                      labelWidgetClass, gend_form,
-                                      args, num_args);
+    gendlabel = XtCreateManagedWidget("gender_label", labelWidgetClass,
+                                      gend_form, args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -1057,7 +1087,8 @@ X11_player_selection_dialog()
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), gend_radio_m); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNradioGroup), plsel_gend_radios[0]); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNradioGroup),
+             plsel_gend_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
     plsel_gend_radios[1] = gend_radio_f
         =  XtCreateManagedWidget("Female", toggleWidgetClass,
@@ -1074,7 +1105,7 @@ X11_player_selection_dialog()
 
     /* Alignment */
 
-    plsel_align_radios = (Widget *)alloc(sizeof(Widget) * ROLE_ALIGNS);
+    plsel_align_radios = (Widget *) alloc(sizeof (Widget) * ROLE_ALIGNS);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), gend_form); num_args++;
@@ -1089,9 +1120,8 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNlabel), "Alignment"); num_args++;
-    alignlabel = XtCreateManagedWidget("align_label",
-                                       labelWidgetClass, align_form,
-                                       args, num_args);
+    alignlabel = XtCreateManagedWidget("align_label", labelWidgetClass,
+                                       align_form, args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
@@ -1115,7 +1145,8 @@ X11_player_selection_dialog()
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_l); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNradioGroup), plsel_align_radios[0]); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNradioGroup),
+             plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
     plsel_align_radios[1] = align_radio_n
         = XtCreateManagedWidget("Neutral", toggleWidgetClass,
@@ -1123,12 +1154,12 @@ X11_player_selection_dialog()
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_n); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNradioGroup), plsel_align_radios[0]); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNradioGroup),
+             plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 3); num_args++;
-    plsel_align_radios[2] = align_radio_c =  XtCreateManagedWidget("Chaotic",
-                                           toggleWidgetClass,
-                                           align_form2,
-                                           args, num_args);
+    plsel_align_radios[2] = align_radio_c
+        =  XtCreateManagedWidget("Chaotic", toggleWidgetClass,
+                                 align_form2, args, num_args);
 
     XawToggleUnsetCurrent(plsel_align_radios[0]);
 
@@ -1257,7 +1288,7 @@ X11_player_selection_prompts()
         /* select a role */
         for (num_roles = 0; roles[num_roles].name.m; ++num_roles)
             continue;
-        choices = (const char **) alloc(sizeof(char *) * num_roles);
+        choices = (const char **) alloc(sizeof (char *) * num_roles);
         for (;;) {
             availcount = 0;
             for (i = 0; i < num_roles; i++) {

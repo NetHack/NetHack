@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1508549436 2017/10/21 01:30:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -315,14 +315,30 @@ moverock()
                 feel_location(sx, sy);
         cannot_push:
             if (throws_rocks(youmonst.data)) {
+                boolean
+                    canpickup = (!Sokoban
+                                 /* similar exception as in can_lift():
+                                    when poly'd into a giant, you can
+                                    pick up a boulder if you have a free
+                                    slot or into the overflow ('#') slot
+                                    unless already carrying at least one */
+                              && (inv_cnt(FALSE) < 52 || !carrying(BOULDER))),
+                    willpickup = (canpickup && autopick_testobj(otmp, TRUE));
+
                 if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
                     You("aren't skilled enough to %s %s from %s.",
-                        (flags.pickup && !Sokoban) ? "pick up" : "push aside",
+                        willpickup ? "pick up" : "push aside",
                         the(xname(otmp)), y_monnam(u.usteed));
                 } else {
-                    pline("However, you can easily %s.",
-                          (flags.pickup && !Sokoban) ? "pick it up"
-                                                     : "push it aside");
+                    /*
+                     * willpickup:  you easily pick it up
+                     * canpickup:   you could easily pick it up
+                     * otherwise:   you easily push it aside
+                     */
+                    pline("However, you %seasily %s.",
+                          (willpickup || !canpickup) ? "" : "could ",
+                          (willpickup || canpickup) ? "pick it up"
+                                                    : "push it aside");
                     sokoban_guilt();
                     break;
                 }

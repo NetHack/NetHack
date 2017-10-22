@@ -392,7 +392,7 @@ struct obj **potmp, **pobj;
         otmp->quan += obj->quan;
         /* temporary special case for gold objects!!!! */
         if (otmp->oclass == COIN_CLASS)
-            otmp->owt = weight(otmp);
+            otmp->owt = weight(otmp), otmp->bknown = 0;
         /* and puddings!!!1!!one! */
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
@@ -1223,6 +1223,8 @@ register const char *let, *word;
              || (!strcmp(word, "charge") && !is_chargeable(otmp))
              || (!strcmp(word, "open") && otyp != TIN)
              || (!strcmp(word, "call") && !objtyp_is_callable(otyp))
+             || (!strcmp(word, "adjust") && otmp->oclass == COIN_CLASS
+                 && !usegold)
              ) {
                 foo--;
             }
@@ -3537,12 +3539,16 @@ int
 doorganize() /* inventory organizer by Del Lamb */
 {
     struct obj *obj, *otmp, *splitting, *bumped;
-    int ix, cur, trycnt;
+    int ix, cur, trycnt, goldstacks;
     char let;
-    char alphabet[52 + 1], buf[52 + 1];
+#define GOLD_INDX   0
+#define GOLD_OFFSET 1
+#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
+    char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
-    char allowall[3]; /* { ALLOW_COUNT, ALL_CLASSES, 0 } */
+    char allowall[4]; /* { ALLOW_COUNT, ALL_CLASSES, 0, 0 } */
     const char *adj_type;
+    boolean ever_mind = FALSE;
 
     if (!invent) {
         You("aren't carrying anything to adjust.");
@@ -3555,6 +3561,20 @@ doorganize() /* inventory organizer by Del Lamb */
     allowall[0] = ALLOW_COUNT;
     allowall[1] = ALL_CLASSES;
     allowall[2] = '\0';
+    for (goldstacks = 0, otmp = invent; otmp; otmp = otmp->nobj) {
+        /* gold should never end up in a letter slot, nor should two '$'
+           slots occur, but if they ever do, allow #adjust to handle them
+           (in the past, things like this have happened, usually due to
+           bknown being erroneously set on one stack, clear on another;
+           object merger isn't fooled by that anymore) */
+        if (otmp->oclass == COIN_CLASS
+            && (otmp->invlet != GOLD_SYM || ++goldstacks > 1)) {
+            allowall[1] = COIN_CLASS;
+            allowall[2] = ALL_CLASSES;
+            allowall[3] = '\0';
+            break;
+        }
+    }
     if (!(obj = getobj(allowall, "adjust")))
         return 0;
 
@@ -3568,39 +3588,43 @@ doorganize() /* inventory organizer by Del Lamb */
         }
 
     /* initialize the list with all lower and upper case letters */
-    for (ix = 0, let = 'a'; let <= 'z';)
-        alphabet[ix++] = let++;
+    lets[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
+    for (ix = GOLD_OFFSET, let = 'a'; let <= 'z';)
+        lets[ix++] = let++;
     for (let = 'A'; let <= 'Z';)
-        alphabet[ix++] = let++;
-    alphabet[ix] = '\0';
+        lets[ix++] = let++;
+    lets[OVRFLW_INDX] = ' ';
+    lets[sizeof lets - 1] = '\0';
     /* for floating inv letters, truncate list after the first open slot */
     if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < 52)
-        alphabet[ix + (splitting ? 0 : 1)] = '\0';
+        lets[ix + (splitting ? 0 : 1)] = '\0';
 
-    /* blank out all the letters currently in use in the inventory */
-    /* except those that will be merged with the selected object   */
+    /* blank out all the letters currently in use in the inventory
+       except those that will be merged with the selected object */
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (otmp != obj && !mergable(otmp, obj)) {
             let = otmp->invlet;
             if (let >= 'a' && let <= 'z')
-                alphabet[let - 'a'] = ' ';
+                lets[GOLD_OFFSET + let - 'a'] = ' ';
             else if (let >= 'A' && let <= 'Z')
-                alphabet[let - 'A' + 26] = ' ';
+                lets[GOLD_OFFSET + let - 'A' + 26] = ' ';
+            /* overflow defaults to off, but it we find a stack using that
+               slot, switch to on -- the opposite of normal invlet handling */
+            else if (let == NOINVSYM)
+                lets[OVRFLW_INDX] = NOINVSYM;
         }
 
     /* compact the list by removing all the blanks */
-    for (ix = cur = 0; alphabet[ix]; ix++)
-        if (alphabet[ix] != ' ')
-            buf[cur++] = alphabet[ix];
-    if (!cur && obj->invlet == NOINVSYM)
-        buf[cur++] = NOINVSYM;
-    buf[cur] = '\0';
+    for (ix = cur = 0; lets[ix]; ix++)
+        if (lets[ix] != ' ' && cur++ < ix)
+            lets[cur - 1] = lets[ix];
+    lets[cur] = '\0';
     /* and by dashing runs of letters */
     if (cur > 5)
-        compactify(buf);
+        compactify(lets);
 
     /* get 'to' slot to use as destination */
-    Sprintf(qbuf, "Adjust letter to what [%s]%s?", buf,
+    Sprintf(qbuf, "Adjust letter to what [%s]%s?", lets,
             invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
         let = yn_function(qbuf, (char *) 0, '\0');
@@ -3619,10 +3643,19 @@ doorganize() /* inventory organizer by Del Lamb */
         noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
-            pline1(Never_mind);
+            if (!ever_mind)
+                pline1(Never_mind);
             return 0;
+        } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
+            pline("Only gold coins may be moved into the '%c' slot.",
+                  GOLD_SYM);
+            ever_mind = TRUE;
+            goto noadjust;
         }
-        if ((letter(let) && let != '@') || index(buf, let))
+        /* letter() classifies '@' as one; compactify() can put '-' in lets;
+           the only thing of interest that index() might find is '$' or '#'
+           since letter() catches everything else that we put into lets[] */
+        if ((letter(let) && let != '@') || (index(lets, let) && let != '-'))
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;

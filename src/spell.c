@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1450584420 2015/12/20 04:07:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1508479722 2017/10/20 06:08:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -643,6 +643,9 @@ rejectcasting()
     /* rejections which take place before selecting a particular spell */
     if (Stunned) {
         You("are too impaired to cast a spell.");
+        return TRUE;
+    } else if (!can_chant(&youmonst)) {
+        You("are unable to chant the incantation.");
         return TRUE;
     } else if (!freehand()) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed

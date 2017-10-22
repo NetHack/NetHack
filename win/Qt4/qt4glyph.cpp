@@ -130,7 +130,7 @@ void NetHackQtGlyphs::setSize(int w, int h)
 	    w*img.width()/tilefile_tile_W,
 	    h*img.height()/tilefile_tile_H,
 	    Qt::IgnoreAspectRatio,
-	    Qt::SmoothTransformation
+	    Qt::FastTransformation
 	);
 	pm.convertFromImage(scaled,Qt::ThresholdDither|Qt::PreferDither);
 	QApplication::restoreOverrideCursor();
