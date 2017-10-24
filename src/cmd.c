@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1494985492 2017/05/17 01:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1508880573 2017/10/24 21:29:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.275 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3005,7 +3005,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "terrain", "show map without obstructions",
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
-            "show menu of commands you can do from here to adjacent spot",
+            "menu of commands you can do from here to adjacent spot",
             dotherecmdmenu },
     { 't', "throw", "throw something", dothrow },
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
