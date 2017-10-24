@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1508827593 2017/10/24 06:46:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1508879840 2017/10/24 21:17:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -198,13 +198,14 @@ static NEARDATA char xsize, ysize;
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
-boolean splev_init_present = FALSE;
-boolean icedpools = FALSE;
 
-struct obj *container_obj[MAX_CONTAINMENT];
-int container_idx = 0;
+static boolean splev_init_present = FALSE;
+static boolean icedpools = FALSE;
+static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
-struct monst *invent_carrying_monster = NULL;
+static struct obj *container_obj[MAX_CONTAINMENT];
+static int container_idx = 0;
+static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
 
@@ -1944,7 +1945,6 @@ struct mkroom *croom;
 
     if (o->id != -1) {
         static const char prize_warning[] = "multiple prizes on %s level";
-        static int mcount = 0, scount = 0;
 
         /* if this is a specific item of the right type and it is being
            created on the right level, flag it as the designated item
@@ -1954,17 +1954,17 @@ struct mkroom *croom;
         if (Is_mineend_level(&u.uz)) {
             if (otmp->otyp == iflags.mines_prize_type) {
                 otmp->record_achieve_special = MINES_PRIZE;
-                if (++mcount > 1)
+                if (++mines_prize_count > 1)
                     impossible(prize_warning, "mines end");
             }
         } else if (Is_sokoend_level(&u.uz)) {
             if (otmp->otyp == iflags.soko_prize_type1) {
                 otmp->record_achieve_special = SOKO_PRIZE1;
-                if (++scount > 1)
+                if (++soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             } else if (otmp->otyp == iflags.soko_prize_type2) {
                 otmp->record_achieve_special = SOKO_PRIZE2;
-                if (++scount > 1)
+                if (++soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             }
         }
@@ -5201,7 +5201,7 @@ sp_lev *lvl;
     long room_stack = 0;
     unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder =
-        (struct sp_coder *) alloc(sizeof(struct sp_coder));
+        (struct sp_coder *) alloc(sizeof (struct sp_coder));
 
     coder->frame = frame_new(0);
     coder->stack = NULL;
@@ -5215,9 +5215,14 @@ sp_lev *lvl;
 
     splev_init_present = FALSE;
     icedpools = FALSE;
+    /* achievement tracking; static init would suffice except we need to
+       reset if #wizmakemap is used to recreate mines' end or sokoban end;
+       once either level is created, these values can be forgotten */
+    mines_prize_count = soko_prize_count = 0;
 
     if (wizard) {
         char *met = nh_getenv("SPCODER_MAX_RUNTIME");
+
         if (met && met[0] == '1')
             max_execution = (1 << 30) - 1;
     }
