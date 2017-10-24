@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1449269920 2015/12/04 22:58:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1508827593 2017/10/24 06:46:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.89 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1881,6 +1881,7 @@ struct mkroom *croom;
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];
+
             remove_object(otmp);
             if (cobj) {
                 (void) add_to_container(cobj, otmp);
@@ -1941,12 +1942,32 @@ struct mkroom *croom;
         }
     }
 
-    /* Nasty hack here: try to determine if this is the Mines or Sokoban
-     * "prize" and then set record_achieve_special (maps to corpsenm)
-     * for the object.  That field will later be checked to find out if
-     * the player obtained the prize. */
-    if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
-        otmp->record_achieve_special = 1;
+    if (o->id != -1) {
+        static const char prize_warning[] = "multiple prizes on %s level";
+        static int mcount = 0, scount = 0;
+
+        /* if this is a specific item of the right type and it is being
+           created on the right level, flag it as the designated item
+           used to detect a special achievement (to whit, reaching and
+           exploring the target level, although the exploration part
+           might be short-circuited if a monster brings object to hero) */
+        if (Is_mineend_level(&u.uz)) {
+            if (otmp->otyp == iflags.mines_prize_type) {
+                otmp->record_achieve_special = MINES_PRIZE;
+                if (++mcount > 1)
+                    impossible(prize_warning, "mines end");
+            }
+        } else if (Is_sokoend_level(&u.uz)) {
+            if (otmp->otyp == iflags.soko_prize_type1) {
+                otmp->record_achieve_special = SOKO_PRIZE1;
+                if (++scount > 1)
+                    impossible(prize_warning, "sokoban end");
+            } else if (otmp->otyp == iflags.soko_prize_type2) {
+                otmp->record_achieve_special = SOKO_PRIZE2;
+                if (++scount > 1)
+                    impossible(prize_warning, "sokoban end");
+            }
+        }
     }
 
     stackobj(otmp);

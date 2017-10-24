@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1507846854 2017/10/12 22:20:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.315 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1508827592 2017/10/24 06:46:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.316 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -723,6 +723,12 @@ initoptions_init()
     iflags.bouldersym = 0;
 
     iflags.travelcc.x = iflags.travelcc.y = -1;
+
+    /* for "special achievement" tracking (see obj.h,
+       create_object(sp_lev.c), addinv_core1(invent.c) */
+    iflags.mines_prize_type = LUCKSTONE;
+    iflags.soko_prize_type1 = BAG_OF_HOLDING;
+    iflags.soko_prize_type2 = AMULET_OF_REFLECTION;
 
     /* assert( sizeof flags.inv_order == sizeof def_inv_order ); */
     (void) memcpy((genericptr_t) flags.inv_order,

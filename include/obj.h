@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1456618994 2016/02/28 00:23:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1508827590 2017/10/24 06:46:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -343,13 +343,19 @@ struct obj {
          && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
 #define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
+/* 'PRIZE' values override obj->corpsenm so prizes mustn't be object types
+   which use that field for monster type (or other overloaded purpose) */
+#define MINES_PRIZE 1
+#define SOKO_PRIZE1 2
+#define SOKO_PRIZE2 3
 #define is_mines_prize(o) \
-    ((o)->otyp == LUCKSTONE && Is_mineend_level(&u.uz))
-#define is_soko_prize(o)                \
-    (((o)->otyp == AMULET_OF_REFLECTION \
-      || (o)->otyp == BAG_OF_HOLDING)   \
-     && Is_sokoend_level(&u.uz))
-
+    ((o)->otyp == iflags.mines_prize_type                \
+     && (o)->record_achieve_special == MINES_PRIZE)
+#define is_soko_prize(o) \
+    (((o)->otyp == iflags.soko_prize_type1               \
+      && (o)->record_achieve_special == SOKO_PRIZE1)     \
+     || ((o)->otyp == iflags.soko_prize_type2            \
+         && (o)->record_achieve_special == SOKO_PRIZE2))
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1
