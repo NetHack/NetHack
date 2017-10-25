@@ -584,6 +584,9 @@ X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
 	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 PANICTRACE: PANICTRACE_GDB used wrong value for ARGV0 when launching gdb if
 	'nethack -dpath' was used to specify non-default playground directory
+win32gui: gather raw_print error messages into a single dialog window
+win32tty: fix display errors when using a font with double wide or ambiguous
+	width characters
 
 
 General New Features
@@ -721,6 +724,7 @@ X11: more terminal-like default resources
 win32gui: save and load map colors from registry
 X11: add new character selection dialog, and obey player_selection:dialog
 unix: reduce makefile verbosity by default
+win32gui: new player selection dialog
 
 
 NetHack Community Patches (or Variation) Included
