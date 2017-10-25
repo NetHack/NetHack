@@ -45,7 +45,9 @@ int FDECL(process_keystroke,
 static void NDECL(init_ttycolor);
 static void NDECL(really_move_cursor);
 static void NDECL(check_and_set_font);
-static void NDECL(restore_font);
+static boolean NDECL(check_font_widths);
+static void NDECL(set_known_good_console_font);
+static void NDECL(restore_original_console_font);
 
 /* Win32 Console handles for input and output */
 HANDLE hConIn;
@@ -155,6 +157,8 @@ KEYHANDLERNAME pKeyHandlerName;
 void
 gettty()
 {
+    console_font_changed = FALSE;
+
     check_and_set_font();
 
 #ifndef TEXTCOLOR
@@ -181,7 +185,7 @@ const char *s;
     if (s)
         raw_print(s);
 
-    restore_font();
+    restore_original_console_font();
 }
 
 /* called by init_nhwindows() and resume_nhwindows() */
@@ -866,6 +870,8 @@ const char *pref;
         toggle_mouse_support();
 #endif
     }
+    if (stricmp(pref, "symset") == 0)
+        check_and_set_font();
     return;
 }
 
@@ -1488,11 +1494,26 @@ static int CALLBACK EnumFontCallback(
     return 0;
 }
 
+/* check_and_set_font ensures that the current font will render the symbols
+ * that are currently being used correctly.  If they will not be rendered
+ * correctly, then it will change the font to a known good font.
+ */
 void
 check_and_set_font()
 {
-    console_font_changed = FALSE;
+    if (!check_font_widths()) {
+        raw_print("WARNING: glyphs too wide in console font."
+                  "  Changing code page to 437 and font to Consolas\n");
+        set_known_good_console_font();
+    }
+}
 
+/* check_font_widths returns TRUE if all glyphs in current console font
+ * fit within the width of a single console cell.
+ */
+boolean
+check_font_widths()
+{
     CONSOLE_FONT_INFOEX console_font_info;
     console_font_info.cbSize = sizeof(console_font_info);
     BOOL success = GetCurrentConsoleFontEx(hConOut, FALSE,
@@ -1517,7 +1538,7 @@ check_and_set_font()
 
     if (matching_log_font.lfHeight == 0) {
         raw_print("Unable to enumerate system fonts\n");
-        return;
+        return FALSE;
     }
 
     /* create font matching console font */
@@ -1529,7 +1550,7 @@ check_and_set_font()
 
     if (console_font == NULL) {
         raw_print("Uanble to create console font\n");
-        return;
+        return FALSE;
     }
 
     /* select font */
@@ -1549,8 +1570,10 @@ check_and_set_font()
     /* deterine which glyphs are used */
     boolean used[256];
     memset(used, 0, sizeof(used));
-    for (int i = 0; i < SYM_MAX; i++)
-        used[showsyms[i]] = TRUE;
+    for (int i = 0; i < SYM_MAX; i++) {
+        used[l_syms[i]] = TRUE;
+        used[r_syms[i]] = TRUE;
+    }
 
     int wcUsedCount = 0;
     wchar_t wcUsed[256];
@@ -1577,37 +1600,49 @@ check_and_set_font()
         }
     }
 
-    if (!all_glyphs_fit) {
-        raw_print("WARNING: glyphs too wide in console font."
-                  "  Changing code page to 437 and font to Consolas\n");
-
-        console_font_changed = TRUE;
-        original_console_font_info = console_font_info;
-        original_console_code_page = GetConsoleOutputCP();
-
-        wcscpy_s(console_font_info.FaceName,
-            sizeof(console_font_info.FaceName)
-              / sizeof(console_font_info.FaceName[0]),
-            L"Consolas");
-
-        success = SetConsoleOutputCP(437);
-        if (!success)
-            raw_print("Unable to set console code page to 437\n");
-
-        success = SetCurrentConsoleFontEx(hConOut, FALSE, &console_font_info);
-        if (!success)
-            raw_print("Unable to set console font to Consolas\n");
-    }
-
 clean_up:
 
     SelectObject(hDC, saved_font);
     DeleteObject(console_font);
 
+    return all_glyphs_fit;
 }
 
+/* set_known_good_console_font sets the code page and font used by the console
+ * to settings know to work well with NetHack.  It also saves the orignal
+ * settings so that they can be restored prior to NetHack exit.
+ */
 void
-restore_font()
+set_known_good_console_font()
+{
+    CONSOLE_FONT_INFOEX console_font_info;
+    console_font_info.cbSize = sizeof(console_font_info);
+    BOOL success = GetCurrentConsoleFontEx(hConOut, FALSE,
+                                            &console_font_info);
+
+    console_font_changed = TRUE;
+    original_console_font_info = console_font_info;
+    original_console_code_page = GetConsoleOutputCP();
+
+    wcscpy_s(console_font_info.FaceName,
+        sizeof(console_font_info.FaceName)
+            / sizeof(console_font_info.FaceName[0]),
+        L"Consolas");
+
+    success = SetConsoleOutputCP(437);
+    if (!success)
+        raw_print("Unable to set console code page to 437\n");
+
+    success = SetCurrentConsoleFontEx(hConOut, FALSE, &console_font_info);
+    if (!success)
+        raw_print("Unable to set console font to Consolas\n");
+}
+
+/* restore_original_console_font will restore the console font and code page
+ * settings to what they were when NetHack was launched.
+ */
+void
+restore_original_console_font()
 {
     if (console_font_changed) {
         BOOL success;

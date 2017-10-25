@@ -5108,6 +5108,7 @@ boolean setinitial, setfromfile;
                 assign_graphics(ROGUESET);
         } else if (!rogueflag)
             assign_graphics(PRIMARY);
+        preference_update("symset");
         need_redraw = TRUE;
         return TRUE;
 
