@@ -164,6 +164,7 @@ void mswin_cliparound(int x, int y);
 void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
+void mswin_raw_print_flush();
 int mswin_nhgetch(void);
 int mswin_nh_poskey(int *x, int *y, int *mod);
 void mswin_nhbell(void);

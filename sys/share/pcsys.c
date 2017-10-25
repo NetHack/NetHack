@@ -546,6 +546,8 @@ msexit()
         getreturn("to end");
     synch_cursor();
 #endif
+    getreturn_enabled = TRUE;
+    wait_synch();
     return;
 }
 #endif /* MICRO || WIN32 || OS2 */

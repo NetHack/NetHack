@@ -151,6 +151,12 @@ enum game_end_types {
     ASCENDED
 };
 
+typedef struct strbuf {
+    int    len;
+    char * str;
+    char   buf[256];
+} strbuf_t;
+
 #include "align.h"
 #include "dungeon.h"
 #include "monsym.h"
