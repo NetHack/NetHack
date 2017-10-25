@@ -2593,7 +2593,7 @@ int fld;
         nopts++;
     }
 
-    if (fld != BL_CAP && (at == ANY_INT || at == ANY_LONG || at == ANY_UINT)) {
+    if (fld != BL_CAP && fld != BL_HUNGER && (at == ANY_INT || at == ANY_LONG || at == ANY_UINT)) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
@@ -2609,7 +2609,7 @@ int fld;
         nopts++;
     }
 
-    if (initblstats[fld].anytype == ANY_STR || fld == BL_CAP) {
+    if (initblstats[fld].anytype == ANY_STR || fld == BL_CAP || fld == BL_HUNGER) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
@@ -2878,7 +2878,7 @@ choose_value:
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, aligntxt[rv]);
         } else if (fld == BL_HUNGER) {
-            const char *hutxt[] = {"Satiated", "", "Hungry", "Weak",
+            const char *hutxt[] = {"Satiated", (char *)0, "Hungry", "Weak",
                                    "Fainting", "Fainted", "Starved"};
             int rv = query_arrayvalue(qry_buf,
                                       hutxt,
