@@ -1794,7 +1794,7 @@ boolean from_configfile;
             numeric = TRUE;
             tmp = tmpbuf;
             if (strlen(tmp) > 0) {
-                dt = blstats[0][fld].anytype;
+                dt = initblstats[fld].anytype;
                 if (percent)
                     dt = ANY_INT;
                 (void) s_to_anything(&hilite.value, tmp, dt);
