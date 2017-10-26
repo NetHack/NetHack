@@ -4191,6 +4191,13 @@ genericptr_t arg;
         if (typ < D_CLOSED)
             typ = D_CLOSED;
     }
+
+    if (((isok(x-1,y) && IS_DOORJOIN(levl[x-1][y].typ)) || !isok(x-1,y))
+        || (isok(x+1,y) && IS_DOORJOIN(levl[x+1][y].typ)) || !isok(x+1,y))
+        levl[x][y].horizontal = 1;
+    else
+        levl[x][y].horizontal = 0;
+
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }
