@@ -1107,66 +1107,80 @@ midnight()
 }
 
 /* strbuf_init() initializes strbuf state for use */
-void strbuf_init(strbuf_t * strbuf)
+void
+strbuf_init(strbuf)
+strbuf_t *strbuf;
 {
     strbuf->str = NULL;
     strbuf->len = 0;
 }
 
 /* strbuf_append() appends given str to strbuf->str */
-void strbuf_append(strbuf_t * strbuf, const char * str)
+void
+strbuf_append(strbuf, str)
+strbuf_t *strbuf;
+const char *str;
 {
-    if (strbuf->str == NULL)
-        strbuf_reserve(strbuf, strlen(str) + 1);
-    else
-        strbuf_reserve(strbuf, strlen(strbuf->str) + strlen(str) + 1);
+    int len = (int) strlen(str) + 1;
 
-    strcat(strbuf->str, str);
+    strbuf_reserve(strbuf,
+                   len + (strbuf->str ? (int) strlen(strbuf->str) : 0));
+    Strcat(strbuf->str, str);
 }
 
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
-void strbuf_reserve(strbuf_t * strbuf, int len)
+void
+strbuf_reserve(strbuf, len)
+strbuf_t *strbuf;
+int len;
 {
     if (strbuf->str == NULL) {
         strbuf->str = strbuf->buf;
         strbuf->str[0] = '\0';
-        strbuf->len = sizeof(strbuf->buf);
+        strbuf->len = (int) sizeof strbuf->buf;
     }
 
     if (len > strbuf->len) {
-        char * oldbuf = strbuf->str;
-        strbuf->len = len + sizeof(strbuf->buf);
+        char *oldbuf = strbuf->str;
+
+        strbuf->len = len + (int) sizeof strbuf->buf;
         strbuf->str = (char *) alloc(strbuf->len);
-        strcpy(strbuf->str, oldbuf);
-        if (oldbuf != strbuf->buf) free(oldbuf);
+        Strcpy(strbuf->str, oldbuf);
+        if (oldbuf != strbuf->buf)
+            free((genericptr_t) oldbuf);
     }
 }
 
 /* strbuf_empty() frees allocated memory and set strbuf to initial state */
-void strbuf_empty(strbuf_t * strbuf)
+void
+strbuf_empty(strbuf)
+strbuf_t *strbuf;
 {
-    if (strbuf->str != strbuf->buf)
-        free(strbuf->str);
+    if (strbuf->str != NULL && strbuf->str != strbuf->buf)
+        free((genericptr_t) strbuf->str);
     strbuf_init(strbuf);
 }
 
 /* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
-void strbuf_nl_to_crlf(strbuf_t * strbuf)
+void
+strbuf_nl_to_crlf(strbuf)
+strbuf_t *strbuf;
 {
     if (strbuf->str) {
-        int len = strlen(strbuf->str);
+        int len = (int) strlen(strbuf->str);
         int count = 0;
-        char * cp = strbuf->str;
-        while (*cp) if (*cp++ == '\n') count++;
+        char *cp = strbuf->str;
+
+        while (*cp)
+            if (*cp++ == '\n')
+                count++;
         if (count) {
             strbuf_reserve(strbuf, len + count + 1);
-            cp = strbuf->str + len + count;
-            while (count) {
-                if ((*cp-- = cp[-count]) == '\n') {
-                    *cp-- = '\r';
-                    count--;
+            for (cp = strbuf->str + len + count; count; --cp)
+                if ((*cp = cp[-count]) == '\n') {
+                    *--cp = '\r';
+                    --count;
                 }
-            }
         }
     }
 }
