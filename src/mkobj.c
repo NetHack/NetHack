@@ -223,6 +223,7 @@ boolean init, artif;
     return otmp;
 }
 
+/* mkobj(): select a type of item from a class, use mksobj() to create it */
 struct obj *
 mkobj(oclass, artif)
 char oclass;
@@ -277,7 +278,7 @@ struct obj *box;
             n = 0;
             break;
         }
-    /*else FALLTHRU*/
+        /*else FALLTHRU*/
     case BAG_OF_HOLDING:
         n = 1;
         break;
@@ -712,6 +713,7 @@ static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
                                 SCROLL_CLASS, GEM_CLASS,  SPBOOK_CLASS,
                                 WEAPON_CLASS, TOOL_CLASS, 0 };
 
+/* mksobj(): create a specific type of object */
 struct obj *
 mksobj(otyp, init, artif)
 int otyp;
@@ -743,7 +745,7 @@ boolean artif;
     otmp->cknown = 0;
     otmp->corpsenm = NON_PM;
 
-    if (init)
+    if (init) {
         switch (let) {
         case WEAPON_CLASS:
             otmp->quan = is_multigen(otmp) ? (long) rn1(6, 6) : 1L;
@@ -773,9 +775,8 @@ boolean artif;
                        && (--tryct > 0));
                 if (tryct == 0) {
                     /* perhaps rndmonnum() only wants to make G_NOCORPSE
-                       monsters on
-                       this level; let's create an adventurer's corpse
-                       instead, then */
+                       monsters on this level; create an adventurer's
+                       corpse instead, then */
                     otmp->corpsenm = PM_HUMAN;
                 }
                 /* timer set below */
@@ -889,14 +890,13 @@ boolean artif;
             case BAG_OF_TRICKS:
                 otmp->spe = rnd(20);
                 break;
-            case FIGURINE: {
-                int tryct2 = 0;
+            case FIGURINE:
+                tryct = 0;
                 do
                     otmp->corpsenm = rndmonnum();
-                while (is_human(&mons[otmp->corpsenm]) && tryct2++ < 30);
+                while (is_human(&mons[otmp->corpsenm]) && tryct++ < 30);
                 blessorcurse(otmp, 4);
                 break;
-            }
             case BELL_OF_OPENING:
                 otmp->spe = 3;
                 break;
@@ -918,15 +918,12 @@ boolean artif;
                 curse(otmp);
             } else
                 blessorcurse(otmp, 10);
+            break;
         case VENOM_CLASS:
         case CHAIN_CLASS:
         case BALL_CLASS:
             break;
-        case POTION_CLASS:
-            otmp->fromsink = 0;
-            if (otmp->otyp == POT_OIL)
-                otmp->age = MAX_OIL_IN_FLASK; /* amount of oil */
-        /* fall through */
+        case POTION_CLASS: /* note: potions get some additional init below */
         case SCROLL_CLASS:
 #ifdef MAIL
             if (otmp->otyp != SCR_MAIL)
@@ -1012,27 +1009,36 @@ boolean artif;
                        objects[otmp->otyp].oc_class);
             return (struct obj *) 0;
         }
+    }
 
     /* some things must get done (corpsenm, timers) even if init = 0 */
-    switch (otmp->otyp) {
+    switch ((otmp->oclass == POTION_CLASS && otmp->otyp != POT_OIL)
+            ? POT_WATER
+            : otmp->otyp) {
     case CORPSE:
         if (otmp->corpsenm == NON_PM) {
             otmp->corpsenm = undead_to_corpse(rndmonnum());
             if (mvitals[otmp->corpsenm].mvflags & (G_NOCORPSE | G_GONE))
                 otmp->corpsenm = urole.malenum;
         }
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case STATUE:
     case FIGURINE:
         if (otmp->corpsenm == NON_PM)
             otmp->corpsenm = rndmonnum();
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case EGG:
-        /* case TIN: */
+    /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
         break;
+    case POT_OIL:
+        otmp->age = MAX_OIL_IN_FLASK; /* amount of oil */
+        /*FALLTHRU*/
+    case POT_WATER: /* POTION_CLASS */
+        otmp->fromsink = 0; /* overloads corpsenm, which was set to NON_PM */
+        break;
     case LEASH:
-        otmp->leashmon = 0;
+        otmp->leashmon = 0; /* overloads corpsenm, which was set to NON_PM */
         break;
     case SPE_NOVEL:
         otmp->novelidx = -1; /* "none of the above"; will be changed */
