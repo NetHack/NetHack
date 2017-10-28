@@ -2180,6 +2180,7 @@ const char *query;
 boolean want_reply;
 long *out_cnt;
 {
+    static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp;
     char ilet, ret;
     char *invlet = flags.inv_order;
@@ -2226,7 +2227,7 @@ long *out_cnt;
         ++n;
 
     if (n == 0) {
-        pline("Not carrying anything.");
+        pline("%s.", not_carrying_anything);
         return 0;
     }
 
@@ -2314,14 +2315,24 @@ nextclass:
             goto nextclass;
         }
     }
-
     if (iflags.force_invmenu && lets && want_reply) {
         any = zeroany;
-        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Special", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                 "Special", MENU_UNSELECTED);
         any.a_char = '*';
-        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "(list everything)", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
+                 "(list everything)", MENU_UNSELECTED);
     }
-
+    /* for permanent inventory where we intend to show everything but
+       nothing has been listed (because there isn't anyhing to list;
+       recognized via any.a_char still being zero; the n==0 case above
+       gets skipped for perm_invent), put something into the menu */
+    if (flags.perm_invent && !lets && !any.a_char) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, 0,
+                 not_carrying_anything, MENU_UNSELECTED);
+        want_reply = FALSE;
+    }
     end_menu(win, query && *query ? query : (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
