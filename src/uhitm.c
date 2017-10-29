@@ -3254,8 +3254,10 @@ light_hits_gremlin(mon, dmg)
 struct monst *mon;
 int dmg;
 {
-    pline("%s %s!", Monnam(mon),
-          (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
+    if (canspotmon(mon)) {
+        pline("%s %s!", Monnam(mon),
+            (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
+    }
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);
     if (DEADMONSTER(mon)) {
@@ -3263,8 +3265,13 @@ int dmg;
             monkilled(mon, (char *) 0, AD_BLND);
         else
             killed(mon);
-    } else if (cansee(mon->mx, mon->my) && !canspotmon(mon)) {
-        map_invisible(mon->mx, mon->my);
+    } else {
+        if (cansee(mon->mx, mon->my) && !canspotmon(mon)) {
+            map_invisible(mon->mx, mon->my);
+        }
+        if (!g.context.mon_moving) {
+            setmangry(mon, FALSE);
+        }
     }
 }
 
