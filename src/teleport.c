@@ -519,7 +519,8 @@ struct obj *scroll;
         if (!wizard || yn("Override?") != 'y')
             return FALSE;
     }
-    if ((Teleport_control && !Stunned) || wizard) {
+    if ((Teleport_control && !Stunned) || (scroll && scroll->blessed)
+         || wizard) {
         if (unconscious()) {
             pline("Being unconscious, you cannot control your teleport.");
         } else {
@@ -545,11 +546,6 @@ struct obj *scroll;
             pline("Sorry...");
             result = TRUE;
         }
-    } else if (scroll && scroll->blessed) {
-        /* (this used to be handled in seffects()) */
-        if (yn("Do you wish to teleport?") == 'n')
-            return TRUE;
-        result = TRUE;
     }
 
     g.telescroll = scroll;
