@@ -55,6 +55,7 @@ char *argv[];
 #endif
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
+    boolean plsel_once = FALSE;
 
     sys_early_init();
 
@@ -237,19 +238,6 @@ char *argv[];
         (void) signal(SIGQUIT, SIG_IGN);
         (void) signal(SIGINT, SIG_IGN);
     }
-    /*
-     * getlock() complains and quits if there is already a game
-     * in progress for current character name (when locknum == 0)
-     * or if there are too many active games (when locknum > 0).
-     * When proceeding, it creates an empty <lockname>.0 file to
-     * designate the current game.
-     * getlock() constructs <lockname> based on the character
-     * name (for !locknum) or on first available of alock, block,
-     * clock, &c not currently in use in the playground directory
-     * (for locknum > 0).
-     */
-    getlock();
-    program_state.preserve_locks = 0; /* after getlock() */
 
     dlb_init(); /* must be before newgame() */
 
@@ -266,7 +254,24 @@ char *argv[];
      * We'll return here if new game player_selection() renames the hero.
      */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+
+    /*
+     * getlock() complains and quits if there is already a game
+     * in progress for current character name (when locknum == 0)
+     * or if there are too many active games (when locknum > 0).
+     * When proceeding, it creates an empty <lockname>.0 file to
+     * designate the current game.
+     * getlock() constructs <lockname> based on the character
+     * name (for !locknum) or on first available of alock, block,
+     * clock, &c not currently in use in the playground directory
+     * (for locknum > 0).
+     */
+    if (*plname) {
+        getlock();
+        program_state.preserve_locks = 0; /* after getlock() */
+    }
+
+    if (*plname && (fd = restore_saved_game()) >= 0) {
         const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -297,12 +302,17 @@ attempt_restore:
     }
 
     if (!resuming) {
+        boolean neednewlock = (!*plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
            and skip selection this time if that didn't succeed */
-        if (!iflags.renameinprogress) {
-            player_selection();
+        if (!iflags.renameinprogress || iflags.defer_plname || neednewlock) {
+            if (!plsel_once)
+                player_selection();
+            plsel_once = TRUE;
+            if (neednewlock && *plname)
+                goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
                    if locking alphabetically, the existing lock file

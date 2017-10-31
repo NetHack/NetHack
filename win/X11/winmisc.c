@@ -352,8 +352,13 @@ plsel_dialog_acceptvalues()
 
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
+
     (void) strncpy(plname, (char *) s, sizeof plname - 1);
     plname[sizeof plname - 1] = '\0';
+    (void) mungspaces(plname);
+    if (strlen(plname) < 1)
+        (void) strcpy(plname, "Mumbles");
+    iflags.renameinprogress = FALSE;
 }
 
 /* ARGSUSED */
@@ -1553,6 +1558,17 @@ void
 X11_player_selection()
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
+        if (!*plname) {
+#ifdef UNIX
+            char *defplname = get_login_name();
+#else
+            char *defplname = (char *)0;
+#endif
+            (void) strncpy(plname, defplname ? defplname : "Mumbles",
+                           sizeof plname - 1);
+            plname[sizeof plname - 1] = '\0';
+            iflags.renameinprogress = TRUE;
+        }
         X11_player_selection_dialog();
     } else { /* iflags.wc_player_selection == VIA_PROMPTS */
         X11_player_selection_prompts();
