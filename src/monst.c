@@ -1870,9 +1870,9 @@ struct permonst _mons2[] = {
           | M2_MALE | M2_MAGIC | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, HI_ZAP),
 #endif
-    MON("Vlad the Impaler", S_VAMPIRE, LVL(14, 18, -3, 80, -10),
+    MON("Vlad the Impaler", S_VAMPIRE, LVL(28, 26, -6, 80, -10),
         (G_NOGEN | G_NOCORPSE | G_UNIQ),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_DRLI, 1, 10),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_BITE, AD_DRLI, 1, 12),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_VAMPIRE, MZ_HUMAN), MR_SLEEP | MR_POISON, 0,
         M1_FLY | M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
