@@ -111,6 +111,7 @@ confused scroll of light summons tame cancelled lights
 potions of hallucination can give enlightenment
 add a small chance of surviving food poisoning
 deliberate level teleporter activation ignores magic resistance
+auto-id scroll of remove curse when a known buc-state was changed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

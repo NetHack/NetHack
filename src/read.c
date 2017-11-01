@@ -1138,6 +1138,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         if (shop_h2o)
                             costly_alteration(obj, COST_UNCURS);
                         uncurse(obj);
+                        /* if the object was known to be cursed and is now known not to be,
+                           make the scroll known; it's trivial to identify anyway by comparing
+                           inventory before and after */
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                            learnscrolltyp(SCR_REMOVE_CURSE);
+                        }
                     }
                 }
             }
