@@ -3163,7 +3163,9 @@ status_hilites_viewall()
     datawin = create_nhwindow(NHW_TEXT);
 
     while (hlstr) {
-        Sprintf(buf, "OPTIONS=hilite_status: %s", hlstr->str);
+        Sprintf(buf, "OPTIONS=hilite_status: %.*s",
+                (int)(BUFSZ - sizeof "OPTIONS=hilite_status: " - 1),
+                hlstr->str);
         putstr(datawin, 0, buf);
         hlstr = hlstr->next;
     }
