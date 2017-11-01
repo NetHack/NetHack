@@ -266,10 +266,10 @@ struct obj *box;
         n = 20;
         break;
     case CHEST:
-        n = 5;
+        n = box->olocked ? 7 : 5;
         break;
     case LARGE_BOX:
-        n = 3;
+        n = box->olocked ? 5 : 3;
         break;
     case SACK:
     case OILSKIN_SACK:
