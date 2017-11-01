@@ -1086,11 +1086,18 @@ int after; /* this is extra fast monster movement */
             continue;
 
         /* lessen the chance of backtracking to previous position(s) */
-        k = has_edog ? uncursedcnt : cnt;
-        for (j = 0; j < MTSZ && j < k - 1; j++)
-            if (nx == mtmp->mtrack[j].x && ny == mtmp->mtrack[j].y)
-                if (rn2(MTSZ * (k - j)))
-                    goto nxti;
+        /* This causes unintended issues for pets trying to follow
+           the hero. Thus, only run it if not leashed and >5 tiles
+           away. */
+        if (!mtmp->mleashed &&
+            distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 5) {
+            k = has_edog ? uncursedcnt : cnt;
+            for (j = 0; j < MTSZ && j < k - 1; j++)
+                if (nx == mtmp->mtrack[j].x &&
+                    ny == mtmp->mtrack[j].y)
+                    if (rn2(MTSZ * (k - j)))
+                        goto nxti;
+        }
 
         j = ((ndist = GDIST(nx, ny)) - nidist) * appr;
         if ((j == 0 && !rn2(++chcnt)) || j < 0
