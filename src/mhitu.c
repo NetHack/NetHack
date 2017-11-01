@@ -1851,6 +1851,7 @@ struct attack *mattk;
     struct obj *otmp2;
     int i;
     boolean physical_damage = FALSE;
+    boolean mon_killed = FALSE;
 
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;
@@ -2064,6 +2065,29 @@ struct attack *mattk;
             drain_en(tmp);
         tmp = 0;
         break;
+    case AD_SLIM:
+        /* engulf attack always hits regardless of magic cancellation */
+        if (mtmp->mcan) {
+            /* still engulfed, but don't get slimed */
+            break;
+        }
+        if (flaming(g.youmonst.data)) {
+            pline("Your body burns through %s!", mon_nam(mtmp));
+            /* kills the slime from the inside out - give experience but don't
+             * break pacifist because this wasn't an active kill */
+            xkilled(mtmp, XKILL_NOMSG | XKILL_NOCORPSE | XKILL_NOCONDUCT);
+            mon_killed = TRUE;
+        } else if (Unchanging || noncorporeal(g.youmonst.data)
+                   || g.youmonst.data == &mons[PM_GREEN_SLIME]) {
+            You("are covered in slime, but seem unaffected.");
+        } else if (!Slimed) {
+            You("don't feel very well.");
+            make_slimed(10L, (char *) 0);
+            delayed_killer(SLIMED, KILLED_BY_AN, mtmp->data->mname);
+        } else {
+            pline("Yuck!");
+        }
+        break;
     default:
         physical_damage = TRUE;
         tmp = 0;
@@ -2083,7 +2107,8 @@ struct attack *mattk;
         pline("%s very hurriedly %s you!", Monnam(mtmp),
               is_animal(mtmp->data) ? "regurgitates" : "expels");
         expels(mtmp, mtmp->data, FALSE);
-    } else if (!u.uswldtim || g.youmonst.data->msize >= MZ_HUGE) {
+    } else if (!mon_killed
+               && (!u.uswldtim || g.youmonst.data->msize >= MZ_HUGE)) {
         /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already

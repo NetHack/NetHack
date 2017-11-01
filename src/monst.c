@@ -1724,8 +1724,8 @@ struct permonst _mons2[] = {
         M2_HOSTILE | M2_NEUTER, 0, 6, CLR_BROWN),
     MON("green slime", S_PUDDING, LVL(6, 6, 6, 0, 0),
         (G_HELL | G_GENO | G_NOCORPSE | 1),
-        A(ATTK(AT_TUCH, AD_SLIM, 1, 4), ATTK(AT_NONE, AD_SLIM, 0, 0), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_TUCH, AD_SLIM, 1, 4), ATTK(AT_ENGL, AD_SLIM, 1, 1),
+          ATTK(AT_NONE, AD_SLIM, 0, 0), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(400, 150, MS_SILENT, MZ_LARGE),
         MR_COLD | MR_ELEC | MR_POISON | MR_ACID | MR_STONE, 0,
         M1_BREATHLESS | M1_AMORPHOUS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
