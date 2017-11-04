@@ -85,7 +85,8 @@ enum levl_typ_types {
 #define IS_STWALL(typ) ((typ) <= DBWALL) /* STONE <= (typ) <= DBWALL */
 #define IS_ROCK(typ) ((typ) < POOL)      /* absolutely nonaccessible */
 #define IS_DOOR(typ) ((typ) == DOOR)
-#define IS_TREE(typ) \
+#define IS_DOORJOIN(typ) (IS_ROCK(typ) || (typ) == IRONBARS)
+#define IS_TREE(typ)                                            \
     ((typ) == TREE || (level.flags.arboreal && (typ) == STONE))
 #define ACCESSIBLE(typ) ((typ) >= DOOR) /* good position */
 #define IS_ROOM(typ) ((typ) >= ROOM)    /* ROOM, STAIRS, furniture.. */
@@ -300,6 +301,8 @@ extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 extern int currentgraphics; /* from drawing.c */
 extern nhsym showsyms[];
+extern nhsym l_syms[];
+extern nhsym r_syms[];
 
 extern struct symsetentry symset[NUM_GRAPHICS]; /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))

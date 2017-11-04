@@ -1274,8 +1274,11 @@ int how;
     if (have_windows) {
         wait_synch();
         free_pickinv_cache(); /* extra persistent window if perm_invent */
-        if (WIN_INVEN != WIN_ERR)
+        if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
+            /* precaution in case any late update_inventory() calls occur */
+            flags.perm_invent = 0;
+        }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
 #ifndef STATUS_HILITES
@@ -1315,7 +1318,7 @@ int how;
                 ? (const char *) ((flags.female && urole.name.f)
                     ? urole.name.f
                     : urole.name.m)
-            : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
+                : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
 
@@ -1350,6 +1353,7 @@ int how;
             Schroedingers_cat = odds_and_ends(invent, CAT_CHECK);
         if (Schroedingers_cat) {
             int mhp, m_lev = adj_lev(&mons[PM_HOUSECAT]);
+
             mhp = d(m_lev, 8);
             nowrap_add(u.urexp, mhp);
             Strcat(eos(pbuf), " and Schroedinger's cat");

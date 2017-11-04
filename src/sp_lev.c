@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1449269920 2015/12/04 22:58:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1508879840 2017/10/24 21:17:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -198,13 +198,14 @@ static NEARDATA char xsize, ysize;
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
-boolean splev_init_present = FALSE;
-boolean icedpools = FALSE;
 
-struct obj *container_obj[MAX_CONTAINMENT];
-int container_idx = 0;
+static boolean splev_init_present = FALSE;
+static boolean icedpools = FALSE;
+static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
-struct monst *invent_carrying_monster = NULL;
+static struct obj *container_obj[MAX_CONTAINMENT];
+static int container_idx = 0;
+static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
 
@@ -1881,6 +1882,7 @@ struct mkroom *croom;
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];
+
             remove_object(otmp);
             if (cobj) {
                 (void) add_to_container(cobj, otmp);
@@ -1941,12 +1943,31 @@ struct mkroom *croom;
         }
     }
 
-    /* Nasty hack here: try to determine if this is the Mines or Sokoban
-     * "prize" and then set record_achieve_special (maps to corpsenm)
-     * for the object.  That field will later be checked to find out if
-     * the player obtained the prize. */
-    if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
-        otmp->record_achieve_special = 1;
+    if (o->id != -1) {
+        static const char prize_warning[] = "multiple prizes on %s level";
+
+        /* if this is a specific item of the right type and it is being
+           created on the right level, flag it as the designated item
+           used to detect a special achievement (to whit, reaching and
+           exploring the target level, although the exploration part
+           might be short-circuited if a monster brings object to hero) */
+        if (Is_mineend_level(&u.uz)) {
+            if (otmp->otyp == iflags.mines_prize_type) {
+                otmp->record_achieve_special = MINES_PRIZE;
+                if (++mines_prize_count > 1)
+                    impossible(prize_warning, "mines end");
+            }
+        } else if (Is_sokoend_level(&u.uz)) {
+            if (otmp->otyp == iflags.soko_prize_type1) {
+                otmp->record_achieve_special = SOKO_PRIZE1;
+                if (++soko_prize_count > 1)
+                    impossible(prize_warning, "sokoban end");
+            } else if (otmp->otyp == iflags.soko_prize_type2) {
+                otmp->record_achieve_special = SOKO_PRIZE2;
+                if (++soko_prize_count > 1)
+                    impossible(prize_warning, "sokoban end");
+            }
+        }
     }
 
     stackobj(otmp);
@@ -4176,6 +4197,13 @@ genericptr_t arg;
         if (typ < D_CLOSED)
             typ = D_CLOSED;
     }
+
+    if (((isok(x-1,y) && IS_DOORJOIN(levl[x-1][y].typ)) || !isok(x-1,y))
+        || (isok(x+1,y) && IS_DOORJOIN(levl[x+1][y].typ)) || !isok(x+1,y))
+        levl[x][y].horizontal = 1;
+    else
+        levl[x][y].horizontal = 0;
+
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }
@@ -5186,7 +5214,7 @@ sp_lev *lvl;
     long room_stack = 0;
     unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder =
-        (struct sp_coder *) alloc(sizeof(struct sp_coder));
+        (struct sp_coder *) alloc(sizeof (struct sp_coder));
 
     coder->frame = frame_new(0);
     coder->stack = NULL;
@@ -5200,9 +5228,14 @@ sp_lev *lvl;
 
     splev_init_present = FALSE;
     icedpools = FALSE;
+    /* achievement tracking; static init would suffice except we need to
+       reset if #wizmakemap is used to recreate mines' end or sokoban end;
+       once either level is created, these values can be forgotten */
+    mines_prize_count = soko_prize_count = 0;
 
     if (wizard) {
         char *met = nh_getenv("SPCODER_MAX_RUNTIME");
+
         if (met && met[0] == '1')
             max_execution = (1 << 30) - 1;
     }

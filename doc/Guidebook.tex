@@ -1186,6 +1186,9 @@ Show what type of thing a map symbol corresponds to. Default key is '{\tt ;}'.
 \item[\tb{\#help}]
 Show the help menu. Default key is '{\tt ?}', and '{\tt h}' if {\it number\verb+_+pad\/} is on.
 %.lp
+\item[\tb{\#herecmdmenu}]
+Show a menu of possible actions in your current location.
+%.lp
 \item[\tb{\#history}]
 Show long version and game history. Default key is '{\tt V}'.
 %.lp
@@ -1385,6 +1388,9 @@ Teleport around the level. Default key is '{\tt \^{}T}'.
 \item[\tb{\#terrain}]
 Show bare map without displaying monsters, objects, or traps.
 Autocompletes.
+%.lp
+\item[\tb{\#therecmdmenu}]
+Show a menu of possible actions in a location next to you.
 %.lp
 \item[\tb{\#throw}]
 Throw something. Default key is '{\tt t}'.
@@ -3125,8 +3131,9 @@ interrupted with the ``{\tt More info?}'' prompt, but it also means that you
 might miss some interesting and/or important information.  Persistent.
 %.lp
 \item[\ib{herecmd\verb+_+menu}]
-When using a windowport that supports mouse and clicking on yourself, show
-a menu of possible actions for this location. Same as herecmdmenu command.
+When using a windowport that supports mouse and clicking on yourself or
+next to you, show a menu of possible actions for the location.
+Same as herecmdmenu and therecmdmenu commands.
 %.lp
 \item[\ib{hilite\verb+_+pet}]
 Visually distinguish pets from similar animals (default off).

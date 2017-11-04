@@ -462,6 +462,15 @@ when poly'd into a giant and moving onto a boulder's spot, you could get "you
 	it up", "you are carrying too much stuff to pick up another boulder"
 improve #adjust command's handling of the '$' and '#' inventory slots
 prevent #adjust from allowing anything to be moved into the special '-' slot
+sometimes rings dropped into sinks can be found in the pipes
+doors in special levels were always generated in vertical orientation
+assigning a type name to a potion on the floor which is actually a mimic could
+	prompt "Call a stream of <potion-type> fluid:" (bogus 'fromsink')
+with perm_invent option enabled and no inventory, 'i' put up an empty menu
+charisma affects the leeway in demon lord bribes
+make Vlad slightly tougher
+reduce the amount of gold laying on the floor
+locked chests and large boxes contain more stuff
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -521,6 +530,7 @@ hero poly'd into vampire could drain monster down to 0 HP without killing it,
 fix mention_walls reporting secret doors as solid stone
 jumping over water unintentionally moved hero through that water, causing
 	drowning if not able to water walk or fly
+try again to fix achievement recording bug with mines and sokoban prizes
 
 
 Platform- and/or Interface-Specific Fixes
@@ -583,6 +593,9 @@ X11/USE_XPM: [post-3.6.0 issue] the 'tiles' bug of incorrect total_tiles_used
 	for STATUES_LOOK_LIKE_MONSTERS broke XPM manipulation of tiles data
 PANICTRACE: PANICTRACE_GDB used wrong value for ARGV0 when launching gdb if
 	'nethack -dpath' was used to specify non-default playground directory
+win32gui: gather raw_print error messages into a single dialog window
+win32tty: fix display errors when using a font with double wide or ambiguous
+	width characters
 
 
 General New Features
@@ -720,6 +733,7 @@ X11: more terminal-like default resources
 win32gui: save and load map colors from registry
 X11: add new character selection dialog, and obey player_selection:dialog
 unix: reduce makefile verbosity by default
+win32gui: new player selection dialog
 
 
 NetHack Community Patches (or Variation) Included

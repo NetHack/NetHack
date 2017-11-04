@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1498078873 2017/06/21 21:01:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1508827592 2017/10/24 06:46:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -504,12 +504,21 @@ struct obj *obj;
         }
         set_artifact_intrinsic(obj, 1, W_ART);
     }
-    if (is_mines_prize(obj) && obj->record_achieve_special) {
+
+    /* "special achievements" aren't discoverable during play, they
+       end up being recorded in XLOGFILE at end of game, nowhere else;
+       record_achieve_special overloads corpsenm which is ordinarily
+       initialized to NON_PM (-1) rather than to 0; any special prize
+       must never be a corpse, egg, tin, figurine, or statue because
+       their use of obj->corpsenm for monster type would conflict,
+       nor be a leash (corpsenm overloaded for m_id of leashed
+       monster) or a novel (corpsenm overloaded for novel index) */
+    if (is_mines_prize(obj)) {
         u.uachieve.mines_luckstone = 1;
-        obj->record_achieve_special = 0;
-    } else if (is_soko_prize(obj) && obj->record_achieve_special) {
+        obj->record_achieve_special = NON_PM;
+    } else if (is_soko_prize(obj)) {
         u.uachieve.finish_sokoban = 1;
-        obj->record_achieve_special = 0;
+        obj->record_achieve_special = NON_PM;
     }
 }
 
@@ -2171,6 +2180,7 @@ const char *query;
 boolean want_reply;
 long *out_cnt;
 {
+    static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp;
     char ilet, ret;
     char *invlet = flags.inv_order;
@@ -2217,7 +2227,7 @@ long *out_cnt;
         ++n;
 
     if (n == 0) {
-        pline("Not carrying anything.");
+        pline("%s.", not_carrying_anything);
         return 0;
     }
 
@@ -2305,14 +2315,24 @@ nextclass:
             goto nextclass;
         }
     }
-
     if (iflags.force_invmenu && lets && want_reply) {
         any = zeroany;
-        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Special", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                 "Special", MENU_UNSELECTED);
         any.a_char = '*';
-        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "(list everything)", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
+                 "(list everything)", MENU_UNSELECTED);
     }
-
+    /* for permanent inventory where we intend to show everything but
+       nothing has been listed (because there isn't anyhing to list;
+       recognized via any.a_char still being zero; the n==0 case above
+       gets skipped for perm_invent), put something into the menu */
+    if (flags.perm_invent && !lets && !any.a_char) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, 0,
+                 not_carrying_anything, MENU_UNSELECTED);
+        want_reply = FALSE;
+    }
     end_menu(win, query && *query ? query : (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);

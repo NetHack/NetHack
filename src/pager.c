@@ -195,7 +195,7 @@ struct obj **obj_p;
            glyph among floor and buried objects; when !Blind, any buried
            object's glyph will have been replaced by whatever is present
            on the surface as soon as we moved next to its spot */
-        && otmp->where == OBJ_FLOOR /* not buried */
+        && (fakeobj || otmp->where == OBJ_FLOOR) /* not buried */
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */

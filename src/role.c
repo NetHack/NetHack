@@ -1714,7 +1714,7 @@ plnamesuffix()
 
     do {
         if (!*plname)
-            askname(); /* fill plname[] if necessary */
+            askname(); /* fill plname[] if necessary, or set defer_plname */
 
         /* Look for tokens delimited by '-' */
         if ((eptr = index(plname, '-')) != (char *) 0)
@@ -1735,7 +1735,7 @@ plnamesuffix()
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!*plname);
+    } while (!*plname && !iflags.defer_plname);
 
     /* commas in the plname confuse the record file, convert to spaces */
     for (sptr = plname; *sptr; sptr++) {

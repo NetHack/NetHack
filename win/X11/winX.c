@@ -1474,18 +1474,11 @@ X11_askname()
 {
     Widget popup, dialog;
     Arg args[1];
-    char *defplname = (char *)0;
-
-#ifdef UNIX
-    defplname = get_login_name();
-#endif
-    (void) strncpy(plname, defplname ? defplname : "Mumbles",
-                   sizeof plname - 1);
-    plname[sizeof plname - 1] = '\0';
 
     if (iflags.wc_player_selection == VIA_DIALOG) {
         /* X11_player_selection_dialog() handles name query */
         plsel_ask_name = TRUE;
+        iflags.defer_plname = TRUE;
         return;
     } /* else iflags.wc_player_selection == VIA_PROMPTS */
 

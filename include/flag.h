@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1505214875 2017/09/12 11:14:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1508827590 2017/10/24 06:46:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -191,6 +191,7 @@ struct instance_flags {
      * behaviour of various NetHack functions and probably warrant
      * a structure of their own elsewhere some day.
      */
+    boolean defer_plname;  /* X11 hack: askname() might not set plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
     int parse_config_file_src;  /* hack for parse_config_line() */
@@ -349,25 +350,24 @@ struct instance_flags {
     int wc_fontsiz_menu;    /* font size for the menu window       */
     int wc_fontsiz_text;    /* font size for text windows          */
     int wc_scroll_amount;   /* scroll this amount at scroll_margin */
-    int wc_scroll_margin;   /* scroll map when this far from
-                                    the edge */
+    int wc_scroll_margin;   /* scroll map when this far from the edge */
     int wc_map_mode;        /* specify map viewing options, mostly
-                                    for backward compatibility */
+                             * for backward compatibility */
     int wc_player_selection;    /* method of choosing character */
     boolean wc_splash_screen;   /* display an opening splash screen or not */
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
-                                        in the message window */
+                                 * in the message window */
     boolean wc_eight_bit_input; /* allow eight bit input               */
     boolean wc_mouse_support;   /* allow mouse support */
     boolean wc2_fullscreen;     /* run fullscreen */
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
-    boolean wc2_darkgray; /* try to use dark-gray color for black glyphs */
-    boolean wc2_hitpointbar;    /* show graphical bar representing hit points */
-    boolean cmdassist;    /* provide detailed assistance for some commands */
-    boolean clicklook;    /* allow right-clicking for look */
-    boolean obsolete; /* obsolete options can point at this, it isn't used */
+    boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
+    boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
+    boolean cmdassist;     /* provide detailed assistance for some commands */
+    boolean clicklook;          /* allow right-clicking for look */
+    boolean obsolete;  /* obsolete options can point at this, it isn't used */
     struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
 #define AP_GRAB 1
@@ -381,6 +381,11 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
+    /* item types used to acomplish "special achievements"; find the target
+       object and you'll be flagged as having achieved something... */
+    short mines_prize_type;     /* luckstone */
+    short soko_prize_type1;     /* bag of holding or    */
+    short soko_prize_type2;     /* amulet of reflection */
 };
 
 /*
