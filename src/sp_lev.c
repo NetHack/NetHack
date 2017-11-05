@@ -1435,7 +1435,7 @@ create_trap(t, croom)
 trap *t;
 struct mkroom *croom;
 {
-    schar x, y;
+    schar x = -1, y = -1;
     coord tm;
 
     if (croom)
@@ -1994,7 +1994,7 @@ create_altar(a, croom)
 altar *a;
 struct mkroom *croom;
 {
-    schar sproom, x, y;
+    schar sproom, x = -1, y = -1;
     aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
