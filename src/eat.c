@@ -1616,6 +1616,8 @@ struct obj *otmp;
                 sick_time = (Sick > 1L) ? Sick - 1L : 1L;
             make_sick(sick_time, corpse_xname(otmp, "rotted", CXN_NORMAL),
                       TRUE, SICK_VOMITABLE);
+
+            pline("(It must have died too long ago to be safe to eat.)");
         }
         if (carried(otmp))
             useup(otmp);
