@@ -362,19 +362,6 @@ const struct Role roles[NUM_ROLES+1] = {
       -4 },
     { { "Ranger", 0 },
       {
-#if 0 /* OBSOLETE */
-        {"Edhel",   "Elleth"},
-        {"Edhel",   "Elleth"},         /* elf-maid */
-        {"Ohtar",   "Ohtie"},          /* warrior */
-        {"Kano",    "Kanie"},          /* commander (Q.) ['a] educated guess,
-                                          until further research- SAC */
-        {"Arandur"," Aranduriel"}, /* king's servant, minister (Q.) - guess */
-        {"Hir",         "Hiril"},      /* lord, lady (S.) ['ir] */
-        {"Aredhel",     "Arwen"},      /* noble elf, maiden (S.) */
-        {"Ernil",       "Elentariel"}, /* prince (S.), elf-maiden (Q.) */
-        {"Elentar",     "Elentari"},   /* Star-king, -queen (Q.) */
-        "Solonor Thelandira", "Aerdrie Faenya", "Lolth", /* Elven */
-#endif
         { "Tenderfoot", 0 },
         { "Lookout", 0 },
         { "Trailblazer", 0 },
@@ -384,7 +371,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Archer", 0 },
         { "Sharpshooter", 0 },
         { "Marksman", "Markswoman" } },
-      "Mercury", "_Venus", "Mars", /* Roman/planets */
+      "Apollo", "_Diana", "Mars", /* Roman/planets */
       "Ran",
       "Orion's camp",
       "the cave of the wumpus",
