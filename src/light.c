@@ -712,20 +712,19 @@ struct obj *obj;
         radius = (obj->spe < 4) ? 2 : (obj->spe < 7) ? 3 : 4;
     } else if (Is_candle(obj)) {
         /*
-         *      Range is incremented by powers of 7 so that it will take
-         *      wizard mode quantities of candles to get more light than
-         *      from a lamp, without imposing an arbitrary limit.
-         *       1..6   candles, range 2;
-         *       7..48  candles, range 3;
-         *      49..342 candles, range 4; &c.
+         *      Range is incremented quadratically. You can get the same
+         *      amount of light as from a lamp with 4 candles, and
+         *      even better light with 9 candles, and so on.
+         *       1..3  candles, range 2;
+         *       4..8  candles, range 3;
+         *       9..15 candles, range 4; &c.
          */
         long n = obj->quan;
 
         radius = 1; /* always incremented at least once */
-        do {
+        while(radius*radius <= n) {
             radius++;
-            n /= 7L;
-        } while (n > 0L);
+        }
     } else {
         /* we're only called for lit candelabrum or candles */
         /* impossible("candlelight for %d?", obj->otyp); */
