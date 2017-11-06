@@ -40,12 +40,12 @@ static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
 static boolean FDECL((*getpos_getvalid), (int,int)) = (boolean FDECL((*), (int,int))) 0;
 
 void
-getpos_sethilite(f, d)
-void FDECL((*f), (int));
-boolean FDECL((*d), (int,int));
+getpos_sethilite(gp_hilitef, gp_getvalidf)
+void FDECL((*gp_hilitef), (int));
+boolean FDECL((*gp_getvalidf), (int,int));
 {
-    getpos_hilitefunc = f;
-    getpos_getvalid = d;
+    getpos_hilitefunc = gp_hilitef;
+    getpos_getvalid = gp_getvalidf;
 }
 
 const char *const gloc_descr[NUM_GLOCS][4] = {
