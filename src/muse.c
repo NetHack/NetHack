@@ -675,7 +675,7 @@ struct monst *mtmp;
                 mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
             return 2;
         }
-        if ((mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) && !rn2(3)) {
+        if (mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) {
             if (vismon)
                 pline("%s seems disoriented for a moment.", Monnam(mtmp));
             return 2;
@@ -858,24 +858,10 @@ struct monst *mtmp;
         m_flee(mtmp);
         if (ledger_no(&u.uz) == 1)
             goto escape; /* impossible; level 1 upstairs are SSTAIRS */
-        if (Inhell && mon_has_amulet(mtmp) && !rn2(4)
-            && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
-            if (vismon)
-                pline(
-    "As %s climbs the stairs, a mysterious force momentarily surrounds %s...",
-                      mon_nam(mtmp), mhim(mtmp));
-            /* simpler than for the player; this will usually be
-               the Wizard and he'll immediately go right to the
-               upstairs, so there's not much point in having any
-               chance for a random position on the current level */
-            migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM,
-                             (coord *) 0);
-        } else {
-            if (vismon)
-                pline("%s escapes upstairs!", Monnam(mtmp));
-            migrate_to_level(mtmp, ledger_no(&u.uz) - 1, MIGR_STAIRS_DOWN,
-                             (coord *) 0);
-        }
+        if (vismon)
+            pline("%s escapes upstairs!", Monnam(mtmp));
+        migrate_to_level(mtmp, ledger_no(&u.uz) - 1, MIGR_STAIRS_DOWN,
+                            (coord *) 0);
         return 2;
     case MUSE_DOWNSTAIRS:
         m_flee(mtmp);
