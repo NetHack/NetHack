@@ -770,6 +770,8 @@ to support:
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
+  |  scr_tile_width    | WC2_SCR_TILE_SIZE  | wc2_scr_tile_width |int     |
+  |  scr_tile_height   | WC2_SCR_TILE_SIZE  | wc2_scr_tile_height|int     |
   +--------------------+--------------------+--------------------+--------+
 
 align_message	-- where to place message window (top, bottom, left, right)
@@ -803,12 +805,14 @@ selectsaved     -- if port can display a menu of the user's saved games do so.
 softkeyboard    -- handhelds should display an on-screen keyboard if possible.
 splash_screen   -- port should/should not display an opening splashscreen.
 tiled_map	-- port should display a tiled map if it can.
-tile_width	-- port should display tiles with this width or round to closest
-		   if it can.
-tile_height	-- port should display tiles with this height or round to closest
-		   if it can.
 tile_file	-- open this alternative tile file. The file name is likely to be
 		   window-port or platform specific.
+tile_width	-- if tile_file given then width of tiles in tile_map in pixels.
+tile_height	-- if tile_file given then height of tiles in tile_map in pixels.
+scr_tile_width  -- port should render map tiles with given width in pixels.
+scr_tile_height -- port should render map tiles with given height in pixels.
+
+
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.

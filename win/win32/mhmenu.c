@@ -938,7 +938,7 @@ onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             && !IS_MAP_ASCII(iflags.wc_map_mode)) {
             lpmis->itemHeight =
                 max(lpmis->itemHeight,
-                    (UINT) max(tm.tmHeight, GetNHApp()->mapTile_Y) + 2);
+                    (UINT) max(tm.tmHeight, iflags.wc_tile_height) + 2);
         } else {
             lpmis->itemHeight =
                 max(lpmis->itemHeight, (UINT) max(tm.tmHeight, TILE_Y) + 2);
@@ -1063,12 +1063,12 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
             ntile = glyph2tile[item->glyph];
             t_x =
-                (ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X;
+                (ntile % GetNHApp()->mapTilesPerLine) * iflags.wc_tile_width;
             t_y =
-                (ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y;
+                (ntile / GetNHApp()->mapTilesPerLine) * iflags.wc_tile_height;
 
             y = (lpdis->rcItem.bottom + lpdis->rcItem.top
-                 - GetNHApp()->mapTile_Y) / 2;
+                 - iflags.wc_tile_height) / 2;
 
             if (GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles) {
                 /* using original nethack tiles - apply image transparently */
@@ -1077,11 +1077,11 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                                           TILE_BK_COLOR);
             } else {
                 /* using custom tiles - simple blt */
-                BitBlt(lpdis->hDC, x, y, GetNHApp()->mapTile_X,
-                       GetNHApp()->mapTile_Y, tileDC, t_x, t_y, SRCCOPY);
+                BitBlt(lpdis->hDC, x, y, iflags.wc_tile_width,
+                       iflags.wc_tile_height, tileDC, t_x, t_y, SRCCOPY);
             }
             SelectObject(tileDC, saveBmp);
-            x += GetNHApp()->mapTile_X;
+            x += iflags.wc_tile_width;
         } else {
             const char *sel_ind;
             switch (item->count) {

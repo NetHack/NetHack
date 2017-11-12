@@ -90,6 +90,7 @@ struct window_procs mswin_procs = {
 #ifdef STATUS_HILITES
     WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_HILITE_STATUS |
 #endif
+        WC2_SCR_TILE_SIZE |
     0L, mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
     mswin_resume_nhwindows, mswin_create_nhwindow, mswin_clear_nhwindow,
@@ -196,6 +197,10 @@ mswin_init_nhwindows(int *argc, char **argv)
         iflags.wc_tile_width = TILE_X;
     if (iflags.wc_tile_height == 0)
         iflags.wc_tile_height = TILE_Y;
+    if (iflags.wc2_scr_tile_width == 0)
+        iflags.wc2_scr_tile_width = TILE_X;
+    if (iflags.wc2_scr_tile_height == 0)
+        iflags.wc2_scr_tile_height = TILE_Y;
 
     if (iflags.wc_vary_msgcount == 0)
         iflags.wc_vary_msgcount = 4;
@@ -220,6 +225,9 @@ mswin_init_nhwindows(int *argc, char **argv)
     /* set tile-related options to readonly */
     set_wc_option_mod_status(WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE,
                              DISP_IN_GAME);
+
+    /* set screen tile option to change in the game */
+    set_wc2_option_mod_status(WC2_SCR_TILE_SIZE, SET_IN_GAME);
 
     /* set font-related options to change in the game */
     set_wc_option_mod_status(
@@ -2024,6 +2032,12 @@ mswin_preference_update(const char *pref)
         mswin_update_inventory();
         return;
     }
+
+    if (stricmp(pref, "scr_tile_width") == 0 ||
+        stricmp(pref, "scr_tile_height") == 0) {
+        mswin_layout_main_window(NULL);
+        return;
+    }
 }
 
 #define TEXT_BUFFER_SIZE 4096
@@ -2156,12 +2170,10 @@ initMapTiles(void)
     }
 
     GetNHApp()->bmpMapTiles = hBmp;
-    GetNHApp()->mapTile_X = iflags.wc_tile_width;
-    GetNHApp()->mapTile_Y = iflags.wc_tile_height;
     GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
 
-    map_size.cx = GetNHApp()->mapTile_X * COLNO;
-    map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
+    map_size.cx = iflags.wc2_scr_tile_width * COLNO;
+    map_size.cy = iflags.wc2_scr_tile_height * ROWNO;
     mswin_map_stretch(mswin_hwnd_from_winid(WIN_MAP), &map_size, TRUE);
     return TRUE;
 }

@@ -214,7 +214,8 @@ extern
 #define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points */
 #define WC2_FLUSH_STATUS  0x0080L /* 08 call status_update(BL_FLUSH)
                                         after updating status window fields */
-                                  /* 24 free bits */
+#define WC2_SCR_TILE_SIZE 0x0100L /* 09 support spec of screen tile size */
+                                  /* 23 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

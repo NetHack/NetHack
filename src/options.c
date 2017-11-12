@@ -390,9 +390,13 @@ static struct Comp_Opt {
 #endif
     { "suppress_alert", "suppress alerts about version-specific features", 8,
       SET_IN_GAME },
-    { "tile_width", "width of tiles", 20, DISP_IN_GAME },   /*WC*/
-    { "tile_height", "height of tiles", 20, DISP_IN_GAME }, /*WC*/
+    { "tile_width", "width of tiles in tile file", 20, DISP_IN_GAME },  /*WC*/
+    { "tile_height", "height of tiles in tile file", 20, DISP_IN_GAME },/*WC*/
     { "tile_file", "name of tile file", 70, DISP_IN_GAME }, /*WC*/
+    { "scr_tile_width", "width of map tiles on screen", 20, 
+        DISP_IN_GAME }, /*WC2*/
+    { "scr_tile_height", "height of map tiles on screen", 20,
+        DISP_IN_GAME }, /*WC2*/
     { "traps", "the symbols to use in drawing traps", MAXTCHARS + 1,
       SET_IN_FILE },
     { "vary_msgcount", "show more old messages at a time", 20,
@@ -3346,6 +3350,36 @@ boolean tinitial, tfrom_file;
         }
         return retval;
     }
+    /* WINCAP2
+     * scr_tile_height:nn */
+    fullname = "scr_tile_height";
+    if (match_optname(opts, fullname, sizeof("scr_tile_height") - 1, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        op = string_for_opt(opts, negated);
+        if ((negated && !op) || (!negated && op)) {
+            iflags.wc2_scr_tile_height = negated ? 0 : atoi(op);
+        } else if (negated) {
+            bad_negation(fullname, TRUE);
+            return FALSE;
+        }
+        return retval;
+    }
+    /* WINCAP2
+     * scr_tile_width:nn */
+    fullname = "scr_tile_width";
+    if (match_optname(opts, fullname, sizeof("scr_tile_width") - 1, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        op = string_for_opt(opts, negated);
+        if ((negated && !op) || (!negated && op)) {
+            iflags.wc2_scr_tile_width = negated ? 0 : atoi(op);
+        } else if (negated) {
+            bad_negation(fullname, TRUE);
+            return FALSE;
+        }
+        return retval;
+    }
     /* WINCAP
      * vary_msgcount:nn */
     fullname = "vary_msgcount";
@@ -5434,6 +5468,16 @@ char *buf;
             Sprintf(buf, "%d", iflags.wc_tile_width);
         else
             Strcpy(buf, defopt);
+    } else if (!strcmp(optname, "scr_tile_width")) {
+        if (iflags.wc2_scr_tile_width)
+            Sprintf(buf, "%d", iflags.wc2_scr_tile_width);
+        else
+            Strcpy(buf, defopt);
+    } else if (!strcmp(optname, "scr_tile_height")) {
+        if (iflags.wc2_scr_tile_height)
+            Sprintf(buf, "%d", iflags.wc2_scr_tile_height);
+        else
+            Strcpy(buf, defopt);
     } else if (!strcmp(optname, "traps")) {
         Sprintf(buf, "%s", to_be_done);
     } else if (!strcmp(optname, "vary_msgcount")) {
@@ -6121,6 +6165,8 @@ struct wc_Opt wc2_options[] = { { "fullscreen", WC2_FULLSCREEN },
                                 { "status hilite rules", WC2_HILITE_STATUS },
                                 /* statushilites doesn't have its own bit */
                                 { "statushilites", WC2_HILITE_STATUS },
+                                { "scr_tile_width", WC2_SCR_TILE_SIZE },
+                                { "scr_tile_height", WC2_SCR_TILE_SIZE },
                                 { (char *) 0, 0L } };
 
 /*

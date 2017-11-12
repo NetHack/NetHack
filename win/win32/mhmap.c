@@ -17,8 +17,10 @@
 
 extern short glyph2tile[];
 
-#define TILEBMP_X(ntile) ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
-#define TILEBMP_Y(ntile) ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
+#define TILEBMP_X(ntile) \
+     ((ntile % GetNHApp()->mapTilesPerLine) * iflags.wc_tile_width)
+#define TILEBMP_Y(ntile) \
+     ((ntile / GetNHApp()->mapTilesPerLine) * iflags.wc_tile_height)
 
 /* map window data */
 typedef struct mswin_nethack_map_window {
@@ -115,10 +117,13 @@ mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 
     /* set new screen tile size */
     data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    data->xScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cx : lpsz->cx) / COLNO);
-    data->yScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cy : lpsz->cy) / ROWNO);
+    if (data->bFitToScreenMode) {
+        data->xScrTile = wnd_size.cx / COLNO;
+        data->yScrTile =  wnd_size.cy / ROWNO;
+    } else {
+        data->xScrTile = iflags.wc2_scr_tile_width;
+        data->yScrTile = iflags.wc2_scr_tile_height;
+    }
 
     /* set map origin point */
     data->map_orig.x =
@@ -221,96 +226,91 @@ mswin_map_mode(HWND hWnd, int mode)
     oldMode = data->mapMode;
     data->mapMode = mode;
 
+    RECT client_rt;
+    GetClientRect(hWnd, &client_rt);
+    mapSize.cx = client_rt.right - client_rt.left;
+    mapSize.cy = client_rt.bottom - client_rt.top;
+
     switch (data->mapMode) {
     case MAP_MODE_ASCII4x6:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 4 * COLNO;
-        mapSize.cy = 6 * ROWNO;
+        iflags.wc2_scr_tile_width = 4;
+        iflags.wc2_scr_tile_height = 6;
         break;
 
     case MAP_MODE_ASCII6x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 6 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        iflags.wc2_scr_tile_width = 6;
+        iflags.wc2_scr_tile_height = 8;
         break;
 
     case MAP_MODE_ASCII8x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        iflags.wc2_scr_tile_width = 8;
+        iflags.wc2_scr_tile_height = 8;
         break;
 
     case MAP_MODE_ASCII16x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        iflags.wc2_scr_tile_width = 16;
+        iflags.wc2_scr_tile_height = 8;
         break;
 
     case MAP_MODE_ASCII7x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 7 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        iflags.wc2_scr_tile_width = 7;
+        iflags.wc2_scr_tile_height = 12;
         break;
 
     case MAP_MODE_ASCII8x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        iflags.wc2_scr_tile_width = 8;
+        iflags.wc2_scr_tile_height = 12;
         break;
 
     case MAP_MODE_ASCII16x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        iflags.wc2_scr_tile_width = 16;
+        iflags.wc2_scr_tile_height = 12;
         break;
 
     case MAP_MODE_ASCII12x16:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 12 * COLNO;
-        mapSize.cy = 16 * ROWNO;
+        iflags.wc2_scr_tile_width = 12;
+        iflags.wc2_scr_tile_height = 16;
         break;
 
     case MAP_MODE_ASCII10x18:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 10 * COLNO;
-        mapSize.cy = 18 * ROWNO;
+        iflags.wc2_scr_tile_width = 10;
+        iflags.wc2_scr_tile_height = 18;
         break;
 
-    case MAP_MODE_ASCII_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_ASCII_FIT_TO_SCREEN:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        break;
 
-    case MAP_MODE_TILES_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_TILES_FIT_TO_SCREEN:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        break;
 
     case MAP_MODE_TILES:
     default:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = GetNHApp()->mapTile_X * COLNO;
-        mapSize.cy = GetNHApp()->mapTile_Y * ROWNO;
+        iflags.wc2_scr_tile_width = iflags.wc_tile_width;
+        iflags.wc2_scr_tile_height = iflags.wc_tile_height;
         break;
     }
 
@@ -383,15 +383,9 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         RECT rt;
         SIZE size;
 
-        if (data->bFitToScreenMode) {
-            size.cx = LOWORD(lParam);
-            size.cy = HIWORD(lParam);
-        } else {
-            /* mapping factor is unchaged we just need to adjust scroll bars
-             */
-            size.cx = data->xScrTile * COLNO;
-            size.cy = data->yScrTile * ROWNO;
-        }
+        size.cx = LOWORD(lParam);
+        size.cy = HIWORD(lParam);
+
         mswin_map_stretch(hWnd, &size, TRUE);
 
         /* update window placement */
@@ -610,8 +604,8 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     data->bAsciiMode = FALSE;
 
-    data->xScrTile = GetNHApp()->mapTile_X;
-    data->yScrTile = GetNHApp()->mapTile_Y;
+    data->xScrTile = iflags.wc2_scr_tile_width;
+    data->yScrTile = iflags.wc2_scr_tile_height;
 
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 }
@@ -739,8 +733,8 @@ onPaint(HWND hWnd)
 
                         StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
                                    data->xScrTile, data->yScrTile, tileDC,
-                                   t_x, t_y, GetNHApp()->mapTile_X,
-                                   GetNHApp()->mapTile_Y, SRCCOPY);
+                                   t_x, t_y, iflags.wc_tile_width,
+                                   iflags.wc_tile_height, SRCCOPY);
                         layer ++;
                     }
 
@@ -754,13 +748,13 @@ onPaint(HWND hWnd)
                             (*GetNHApp()->lpfnTransparentBlt)(
                                 hDC, glyph_rect.left, glyph_rect.top,
                                 data->xScrTile, data->yScrTile, tileDC,
-                                t_x, t_y, GetNHApp()->mapTile_X,
-                                GetNHApp()->mapTile_Y, TILE_BK_COLOR);
+                                t_x, t_y, iflags.wc_tile_width,
+                                iflags.wc_tile_height, TILE_BK_COLOR);
                         } else {
                             StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
                                        data->xScrTile, data->yScrTile, tileDC,
-                                       t_x, t_y, GetNHApp()->mapTile_X,
-                                       GetNHApp()->mapTile_Y, SRCCOPY);
+                                       t_x, t_y, iflags.wc_tile_width,
+                                       iflags.wc_tile_height, SRCCOPY);
                         }
 
                         layer ++;

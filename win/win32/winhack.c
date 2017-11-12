@@ -121,8 +121,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     if (_nethack_app.bmpSplash == NULL)
         panic("cannot load splash bitmap");
     _nethack_app.bmpMapTiles = _nethack_app.bmpTiles;
-    _nethack_app.mapTile_X = TILE_X;
-    _nethack_app.mapTile_Y = TILE_Y;
     _nethack_app.mapTilesPerLine = TILES_PER_LINE;
 
     _nethack_app.bNoHScroll = FALSE;

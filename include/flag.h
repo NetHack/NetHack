@@ -365,6 +365,8 @@ struct instance_flags {
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
     boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
+    int wc2_scr_tile_width;  /* width of tile on screen                  */
+    int wc2_scr_tile_height; /* height of tile on screen                 */
     boolean cmdassist;     /* provide detailed assistance for some commands */
     boolean clicklook;          /* allow right-clicking for look */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */

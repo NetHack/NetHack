@@ -87,8 +87,6 @@ typedef struct mswin_nhwindow_app {
     HBITMAP bmpMapTiles; /* custom tiles bitmap */
     HBITMAP bmpRip;
     HBITMAP bmpSplash;
-    int mapTile_X;       /* tile width */
-    int mapTile_Y;       /* tile height */
     int mapTilesPerLine; /* number of tile per row in the bitmap */
 
     boolean bNoHScroll; /* disable cliparound for horizontal grid (map) */
