@@ -3154,12 +3154,18 @@ skipfloor:
 void
 vomit() /* A good idea from David Neves */
 {
-    if (cantvomit(youmonst.data))
+    if (cantvomit(youmonst.data)) {
         /* doesn't cure food poisoning; message assumes that we aren't
            dealing with some esoteric body_part() */
         Your("jaw gapes convulsively.");
-    else
+    } else {
         make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
+        /* if not enough in stomach to actually vomit then dry heave;
+           vomiting_dialog() gives a vomit message when its countdown
+           reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */
+        if (u.uhs >= FAINTING)
+            Your("%s heaves convulsively!", body_part(STOMACH));
+    }
 
     /* nomul()/You_can_move_again used to be unconditional, which was
        viable while eating but not for Vomiting countdown where hero might

@@ -437,6 +437,7 @@ fix buffer overflow in wizard mode for '#' command when 'extmenu' option is on
 "you suddenly vomit" was given two turns before actually vomiting, so you
 	could get that message, move a bit, then get "you can move again"
 	after the 2 turn freeze applied along with the actual vomit
+give an alternate message if you vomit when stomach is empty (ie, fainting)
 corpses and other flammable items not subject to direct burning or fire-based
 	erosion which were thrown or dropped into lava remained intact
 if a potion on the floor survived a land mine explosion and got propelled at
@@ -557,6 +558,7 @@ tty: if "--More--" was written to leftmost column (beginning of second line)
 tty: long message lines which wrap when shown on the top line might be
 	re-displayed incorrectly by ^P for msg_window={full,combo,reverse}
 tty: MSGTYPE=hide could interfere with display of prompts
+tty: treat carriage return as a newline for input text and --More-- prompts
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
@@ -597,7 +599,6 @@ PANICTRACE: PANICTRACE_GDB used wrong value for ARGV0 when launching gdb if
 win32gui: gather raw_print error messages into a single dialog window
 win32tty: fix display errors when using a font with double wide or ambiguous
 	width characters
-tty: treat carriage return as a newline for input text and more-prompts
 
 
 General New Features
