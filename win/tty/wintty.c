@@ -1167,6 +1167,8 @@ tty_askname()
         while ((c = tty_nhgetch()) != '\n') {
             if (c == EOF)
                 c = '\033';
+            if (c == '\r')
+                break;
             if (c == '\033') {
                 ct = 0;
                 break;
