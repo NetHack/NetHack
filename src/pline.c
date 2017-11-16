@@ -436,7 +436,8 @@ VA_DECL(const char *, s)
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     pline("%s", VA_PASS1(pbuf));
-    pline("%s", VA_PASS1("Program in disorder - perhaps you'd better #quit."));
+    pline(
+        "Program in disorder!  (Saving and reloading may fix this problem.)");
     program_state.in_impossible = 0;
     VA_END();
 }
