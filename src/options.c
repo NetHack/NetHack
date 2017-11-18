@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1510536906 2017/11/13 01:35:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1510963525 2017/11/18 00:05:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3721,6 +3721,17 @@ boolean tinitial, tfrom_file;
             if (boolopt[i].addr == &iflags.zerocomp)
                 set_savepref(iflags.zerocomp ? "zerocomp" : "externalcomp");
 #endif
+            if (boolopt[i].addr == &iflags.wc_ascii_map) {
+                /* toggling ascii_map; set tiled_map to its opposite;
+                   what does it mean to turn off ascii map if tiled map
+                   isn't supported? -- right now, we do nothing */
+                iflags.wc_tiled_map = negated;
+            } else if (boolopt[i].addr == &iflags.wc_tiled_map) {
+                /* toggling tiled_map; set ascii_map to its opposite;
+                   as with ascii_map, what does it mean to turn off tiled
+                   map if ascii map isn't supported? */
+                iflags.wc_ascii_map = negated;
+            }
             /* only do processing below if setting with doset() */
             if (initial)
                 return retval;
@@ -3750,22 +3761,12 @@ boolean tinitial, tfrom_file;
                 vision_full_recalc = 1; /* delayed recalc */
                 if (iflags.use_color)
                     need_redraw = TRUE; /* darkroom refresh */
-            } else if (boolopt[i].addr == &iflags.wc_ascii_map) {
-                /* toggling ascii_map; set tiled_map to its opposite;
-                   what does it mean to turn off ascii map if tiled map
-                   isn't supported? -- right now, we do nothing */
-                iflags.wc_tiled_map = negated;
-                need_redraw = TRUE;
-            } else if (boolopt[i].addr == &iflags.wc_tiled_map) {
-                /* toggling tiled_map; set ascii_map to its opposite;
-                   as with ascii_map, what does it mean to turn off tiled
-                   map if ascii map isn't supported? */
-                iflags.wc_ascii_map = negated;
-                need_redraw = TRUE;
             } else if (boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
-                       || boolopt[i].addr == &iflags.hilite_pet) {
+                       || boolopt[i].addr == &iflags.hilite_pet
+                       || boolopt[i].addr == &iflags.wc_ascii_map
+                       || boolopt[i].addr == &iflags.wc_tiled_map) {
                 need_redraw = TRUE;
 #ifdef STATUS_HILITES
             } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
