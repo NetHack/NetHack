@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1501803108 2017/08/03 23:31:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1510990667 2017/11/18 07:37:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -436,7 +436,8 @@ VA_DECL(const char *, s)
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     pline("%s", VA_PASS1(pbuf));
-    pline("%s", VA_PASS1("Program in disorder - perhaps you'd better #quit."));
+    pline(VA_PASS1(
+       "Program in disorder!  (Saving and reloading may fix this problem.)"));
     program_state.in_impossible = 0;
     VA_END();
 }

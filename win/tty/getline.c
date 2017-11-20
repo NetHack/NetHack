@@ -129,11 +129,7 @@ getlin_hook_proc hook;
 #endif                            /* NEWAUTOCOMP */
             } else
                 tty_nhbell();
-#if defined(apollo)
         } else if (c == '\n' || c == '\r') {
-#else
-        } else if (c == '\n') {
-#endif
 #ifndef NEWAUTOCOMP
             *bufp = 0;
 #endif /* not NEWAUTOCOMP */
@@ -213,7 +209,7 @@ register const char *s; /* chars allowed besides return */
         !program_state.done_hup &&
 #endif
         (c = tty_nhgetch()) != EOF) {
-        if (c == '\n')
+        if (c == '\n' || c == '\r')
             break;
 
         if (iflags.cbreak) {
@@ -223,7 +219,7 @@ register const char *s; /* chars allowed besides return */
                 morc = '\033';
                 break;
             }
-            if ((s && index(s, c)) || c == x) {
+            if ((s && index(s, c)) || c == x || (x == '\n' && c == '\r')) {
                 morc = (char) c;
                 break;
             }

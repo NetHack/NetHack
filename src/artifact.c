@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1451081581 2015/12/25 22:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1496,8 +1496,8 @@ struct obj *obj;
                 obj->age = 0;
                 return 0;
             }
-            b_effect = (obj->blessed
-                        && (Role_switch == oart->role || !oart->role));
+            b_effect = (obj->blessed && (oart->role == Role_switch
+                                         || oart->role == NON_PM));
             recharge(otmp, b_effect ? 1 : obj->cursed ? -1 : 0);
             update_inventory();
             break;

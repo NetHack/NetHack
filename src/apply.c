@@ -1861,8 +1861,8 @@ struct obj *obj;
                 verbalize(you_buy_it);
             useupf(corpse, 1L);
         }
-        can = hold_another_object(can, "You make, but cannot pick up, %s.",
-                                  doname(can), (const char *) 0);
+        (void) hold_another_object(can, "You make, but cannot pick up, %s.",
+                                   doname(can), (const char *) 0);
     } else
         impossible("Tinning failed.");
 }
@@ -2807,8 +2807,8 @@ struct obj *obj;
                         pline("Snatching %s is a fatal mistake.", kbuf);
                         instapetrify(kbuf);
                     }
-                    otmp = hold_another_object(
-                        otmp, "You drop %s!", doname(otmp), (const char *) 0);
+                    (void) hold_another_object(otmp, "You drop %s!",
+                                               doname(otmp), (const char *) 0);
                     break;
                 default:
                     /* to floor beneath mon */

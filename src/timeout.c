@@ -204,8 +204,10 @@ vomiting_dialogue()
                that message and "You can move again." (from vomit()'s
                nomul(-2)) with no intervening message; give one here to
                have more specific point at which hero became unable to move
-               [vomit() issues its own message for the cantvomit() case] */
-            You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+               [vomit() issues its own message for the cantvomit() case
+               and for the FAINTING-or-worse case where stomach is empty] */
+            if (u.uhs < FAINTING)
+                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
         }
         vomit();
         break;

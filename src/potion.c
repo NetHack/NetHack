@@ -577,6 +577,18 @@ register struct obj *otmp;
                 if (++i >= A_MAX)
                     i = 0;
             }
+
+            /* when using the potion (not the spell) also restore lost levels,
+               to make the potion more worth keeping around for players with
+               the spell or with a unihorn; this is better than full healing
+               in that it can restore all of them, not just half, and a
+               blessed potion restores them all at once */
+            if (otmp->otyp == POT_RESTORE_ABILITY &&
+                u.ulevel < u.ulevelmax) {
+                do {
+                    pluslvl(FALSE);
+                } while (u.ulevel < u.ulevelmax && otmp->blessed);
+            }
         }
         break;
     case POT_HALLUCINATION:

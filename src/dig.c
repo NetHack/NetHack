@@ -1863,16 +1863,33 @@ bury_objs(x, y)
 int x, y;
 {
     struct obj *otmp, *otmp2;
+    struct monst *shkp;
+    long loss = 0L;
+    boolean costly;
+
+    costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))
+              && costly_spot(x, y));
 
     if (level.objects[x][y] != (struct obj *) 0) {
         debugpline2("bury_objs: at <%d,%d>", x, y);
     }
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
+    for (otmp = level.objects[x][y]; otmp; otmp = otmp2) {
+        if (costly) {
+            loss += stolen_value(otmp, x, y, (boolean) shkp->mpeaceful, TRUE);
+            if (otmp->oclass != COIN_CLASS)
+                otmp->no_charge = 1;
+        }
         otmp2 = bury_an_obj(otmp, (boolean *) 0);
+    }
 
     /* don't expect any engravings here, but just in case */
     del_engr_at(x, y);
     newsym(x, y);
+
+    if (costly && loss) {
+        You("owe %s %ld %s for burying merchandise.", mon_nam(shkp), loss,
+            currency(loss));
+    }
 }
 
 /* move objects from buriedobjlist to fobj/nexthere lists */

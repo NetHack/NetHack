@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1451084423 2015/12/25 23:00:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	monst.c	$NHDT-Date: 1510531569 2017/11/13 00:06:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2369,8 +2369,8 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_POIS | M1_SWIM,
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_BLUE),
-/* standard demons & devils
- */
+    /* standard demons & devils
+     */
 #define SEDUCTION_ATTACKS_YES                                     \
     A(ATTK(AT_BITE, AD_SSEX, 0, 0), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
       ATTK(AT_CLAW, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK)
@@ -2395,8 +2395,8 @@ struct permonst _mons2[] = {
         MR_FIRE | MR_POISON, 0, M1_HUMANOID | M1_FLY | M1_POIS,
         M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY | M2_MALE,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GRAY),
-    /* Used by AD&D for a type of demon, originally one of the Furies */
-    /* and spelled this way */
+    /* Used by AD&D for a type of demon, originally one of the Furies
+       and spelled this way */
     MON("erinys", S_DEMON, LVL(7, 12, 2, 30, 10),
         (G_HELL | G_NOCORPSE | G_SGROUP | 2),
         A(ATTK(AT_WEAP, AD_DRST, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -2567,7 +2567,8 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    /* Riders -- the Four Horsemen of the Apocalypse ("War" == player)
+    /* Riders -- the Four Horsemen of the Apocalypse ("War" == player);
+     * depicted with '&' but do not have M2_DEMON set.
      */
     MON("Death", S_DEMON, LVL(30, 12, -5, 100, 0), (G_UNIQ | G_NOGEN),
         A(ATTK(AT_TUCH, AD_DETH, 8, 8), ATTK(AT_TUCH, AD_DETH, 8, 8), NO_ATTK,
@@ -2593,8 +2594,8 @@ struct permonst _mons2[] = {
         M1_FLY | M1_HUMANOID | M1_REGEN | M1_SEE_INVIS | M1_TPORT_CNTRL,
         M2_NOPOLY | M2_STALK | M2_HOSTILE | M2_PNAME | M2_STRONG | M2_NASTY,
         M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, HI_LORD),
-/* other demons
- */
+    /* other demons
+     */
 #ifdef MAIL
     MON("mail daemon", S_DEMON, LVL(56, 24, 10, 127, 0),
         (G_NOGEN | G_NOCORPSE),
@@ -2711,14 +2712,12 @@ struct permonst _mons2[] = {
 
     /*
      * dummy monster needed for visual interface
-     */
-    /* (marking it unique prevents figurines)
+     * (marking it unique prevents figurines)
      */
     MON("long worm tail", S_WORM_TAIL, LVL(0, 0, 0, 0, 0),
         (G_NOGEN | G_NOCORPSE | G_UNIQ),
         A(NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, 0, 0), 0, 0, 0L, M2_NOPOLY, 0, CLR_BROWN),
-
     /* Note:
      * Worm tail must be between the normal monsters and the special
      * quest & pseudo-character ones because an optimization in the
@@ -2862,8 +2861,8 @@ struct permonst _mons2[] = {
             | M2_COLLECT | M2_MAGIC,
         M3_CLOSE | M3_INFRAVISIBLE, HI_LORD),
 #if 0 /* OBSOLETE */
-        /* Two for elves - one of each sex.
-         */
+    /* Two for elves - one of each sex.
+     */
     MON("Earendil", S_HUMAN,
         LVL(20, 12, 0, 50, -20), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
