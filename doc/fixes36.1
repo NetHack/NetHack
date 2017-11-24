@@ -473,6 +473,11 @@ make Vlad slightly tougher
 reduce the amount of gold laying on the floor
 locked chests and large boxes contain more stuff
 make shopkeepers bill hero for burying merchandise
+monster holding hero takes double damage from an explosion for reaching into
+	adjacent spot, but it was being inflicted even when hero was swallowed
+	or beyond the explosion radius
+poly'd hero holding monster now takes double damage (if monster is within
+	explosion radious) instead of inflicting that upon the monster
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
