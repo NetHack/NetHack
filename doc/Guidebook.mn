@@ -944,7 +944,7 @@ Show your attributes. Default key is '^X'.
 .lp #autopickup
 Toggle the autopickup -option on/off. Default key is '@'.
 .lp #call
-Call (name) a monster, or a object in inventory, on the floor,
+Call (name) a monster, or an object in inventory, on the floor,
 or in the discoveries list, or add an annotation for the
 current level (same as ``#annotate'').  Default key is 'C'.
 .lp #cast
@@ -997,7 +997,7 @@ Jump to another location. Autocompletes. Default key is 'M-j', and 'j' if number
 .lp #kick
 Kick something. Default key is '^D', and 'k' if number_pad is on.
 .lp #known
-Show what object types have been discovered. Default key is '\'.
+Show what object types have been discovered. Default key is '\\'.
 .lp #knownclass
 Show discovered types for one class of objects. Default key is '`'.
 .lp #levelchange
