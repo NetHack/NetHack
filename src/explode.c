@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1503355817 2017/08/21 22:50:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1511483825 2017/11/24 00:37:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -401,8 +401,18 @@ int expltype;
                             pline("%s resists the %s!", Monnam(mtmp), str);
                         mdam = (dam + 1) / 2;
                     }
-                    if (mtmp == u.ustuck)
+                    /* if grabber is reaching into hero's spot and
+                       hero's spot is within explosion radius, grabber
+                       gets hit by double damage */
+                    if (mtmp == u.ustuck && !u.uswallow
+                        && !(Upolyd && sticks(youmonst.data))
+                        && distu(x, y) <= 2)
                         mdam *= 2;
+                    /* being resistant to opposite type of damage makes
+                       target more vulnerable to current type of damage
+                       (being resistant to current type has already cut
+                       damage in half, so this effectively restores it
+                       to full for targets who resist both types) */
                     if (resists_cold(mtmp) && adtyp == AD_FIRE)
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
@@ -468,6 +478,13 @@ int expltype;
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {
+            /* if poly'd hero is grabbing another victim, do double damage */
+            /* [FIXME: if u.ustuck was killed above, we'll miss it here.]  */
+            if (u.ustuck && !u.uswallow && (Upolyd && sticks(youmonst.data))
+                && dist2((int) u.ustuck->mx, (int) u.ustuck->my, x, y) <= 2)
+                damu *= 2;
+            /* [FIXME too: hero ought to get same fire-resistant vs cold
+             *  and cold-resistant vs fire double damage as monsters.] */
             if (Upolyd)
                 u.mh -= damu;
             else
