@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1511483825 2017/11/24 00:37:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1511658058 2017/11/26 01:00:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,7 +42,8 @@ int expltype;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
-            do_hallu = FALSE, inside_engulfer;
+            do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
+    coord grabxy;
     char hallu_buf[BUFSZ];
     short exploding_wand_typ = 0;
 
@@ -87,6 +88,30 @@ int expltype;
     /* if hero is engulfed and caused the explosion, only hero and
        engulfer will be affected */
     inside_engulfer = (u.uswallow && type >= 0);
+    /* held but not engulfed implies holder is reaching into second spot
+       so might get hit by double damage */
+    grabbed = grabbing = FALSE;
+    if (u.ustuck && !u.uswallow) {
+        if (Upolyd && sticks(youmonst.data))
+            grabbing = TRUE;
+        else
+            grabbed = TRUE;
+        grabxy.x = u.ustuck->mx;
+        grabxy.y = u.ustuck->my;
+    } else
+        grabxy.x = grabxy.y = 0; /* lint suppression */
+    /* FIXME:
+     *  It is possible for a grabber to be outside the explosion
+     *  radius and reaching inside to hold the hero.  If so, it ought
+     *  to take damage (the extra half of double damage).  It is also
+     *  possible for poly'd hero to be outside the radius and reaching
+     *  in to hold a monster.  Hero should take damage in that situation.
+     *
+     *  Probably the simplest way to handle this would be to expand
+     *  the radius used when collecting targets but exclude everything
+     *  beyond the regular radius which isn't reaching inside.  Then
+     *  skip harm to gear of any extended targets when inflicting damage.
+     */
 
     if (olet == MON_EXPLODE) {
         str = killer.name;
@@ -404,15 +429,12 @@ int expltype;
                     /* if grabber is reaching into hero's spot and
                        hero's spot is within explosion radius, grabber
                        gets hit by double damage */
-                    if (mtmp == u.ustuck && !u.uswallow
-                        && !(Upolyd && sticks(youmonst.data))
-                        && distu(x, y) <= 2)
+                    if (grabbed && mtmp == u.ustuck && distu(x, y) <= 2)
                         mdam *= 2;
                     /* being resistant to opposite type of damage makes
                        target more vulnerable to current type of damage
-                       (being resistant to current type has already cut
-                       damage in half, so this effectively restores it
-                       to full for targets who resist both types) */
+                       (when target is also resistant to current type,
+                       we won't get here) */
                     if (resists_cold(mtmp) && adtyp == AD_FIRE)
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
@@ -478,13 +500,13 @@ int expltype;
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {
-            /* if poly'd hero is grabbing another victim, do double damage */
-            /* [FIXME: if u.ustuck was killed above, we'll miss it here.]  */
-            if (u.ustuck && !u.uswallow && (Upolyd && sticks(youmonst.data))
-                && dist2((int) u.ustuck->mx, (int) u.ustuck->my, x, y) <= 2)
+            /* if poly'd hero is grabbing another victim, hero takes
+               double damage (note: don't rely on u.ustuck here because
+               that victim might have been killed when hit by the blast) */
+            if (grabbing && dist2((int) grabxy.x, (int) grabxy.y, x, y) <= 2)
                 damu *= 2;
-            /* [FIXME too: hero ought to get same fire-resistant vs cold
-             *  and cold-resistant vs fire double damage as monsters.] */
+            /* hero does not get same fire-resistant vs cold and
+               cold-resistant vs fire double damage as monsters [why not?] */
             if (Upolyd)
                 u.mh -= damu;
             else
