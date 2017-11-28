@@ -666,12 +666,12 @@ NEARDATA struct permonst mons_init[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         M3_INFRAVISIBLE | M3_INFRAVISION, 5, HI_ZAP),
-    MON("orc-captain", S_ORC, LVL(5, 5, 10, 0, -5), (G_GENO | 1),
+    MON("orc-captain", S_ORC, LVL(5, 9, 10, 0, -5), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1350, 350, MS_ORC, MZ_HUMAN), MR_POISON, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
+        M2_ORC | M2_LORD | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 7, HI_LORD),
     /*
      * piercers
