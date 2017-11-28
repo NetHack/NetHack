@@ -1035,14 +1035,13 @@ peffect_speed(struct obj *otmp)
         return;
     }
 
-    if (!Very_fast) { /* wwf@doe.carleton.ca */
-        You("are suddenly moving %sfaster.", Fast ? "" : "much ");
-    } else {
-        Your("%s get new energy.", makeplural(body_part(LEG)));
-        gp.potion_unkn++;
+    speed_up(rn1(10, 100 + 60 * bcsign(otmp)));
+
+    /* non-cursed potion grants intrinsic speed */
+    if (is_speed && !otmp->cursed && !(HFast & INTRINSIC)) {
+        Your("quickness feels very natural.");
+        HFast |= FROMOUTSIDE;
     }
-    exercise(A_DEX, TRUE);
-    incr_itimeout(&HFast, rn1(10, 100 + 60 * bcsign(otmp)));
 }
 
 static void
@@ -2783,6 +2782,19 @@ split_mon(
         }
     }
     return mtmp2;
+}
+
+/* Character becomes very fast temporarily. */
+void
+speed_up(long duration)
+{
+   if (!Very_fast)
+       You("are suddenly moving %sfaster.", Fast ? "" : "much ");
+   else
+       Your("%s get new energy.", makeplural(body_part(LEG)));
+
+   exercise(A_DEX, TRUE);
+   incr_itimeout(&HFast, duration);
 }
 
 /*potion.c*/

@@ -2234,6 +2234,7 @@ extern void mongrantswish(struct monst **);
 extern void djinni_from_bottle(struct obj *);
 extern struct monst *split_mon(struct monst *, struct monst *);
 extern const char *bottlename(void);
+extern void speed_up(long);
 
 /* ### pray.c ### */
 
