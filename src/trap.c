@@ -2166,7 +2166,7 @@ trapeffect_poly_trap(
         if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
         } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-            (void) newcham(mtmp, (struct permonst *) 0, FALSE, in_sight);
+            (void) newcham(mtmp, (struct permonst *) 0, FALSE, TRUE);
             if (in_sight)
                 seetrap(trap);
         }
@@ -2617,7 +2617,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
         if (!resists_magm(steed) && !resist(steed, WAND_CLASS, 0, NOTELL)) {
             struct permonst *mdat = steed->data;
 
-            (void) newcham(steed, (struct permonst *) 0, FALSE, FALSE);
+            (void) newcham(steed, (struct permonst *) 0, FALSE, TRUE);
             if (!can_saddle(steed) || !can_ride(steed)) {
                 dismount_steed(DISMOUNT_POLY);
             } else {
