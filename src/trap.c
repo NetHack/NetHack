@@ -1636,7 +1636,7 @@ struct obj *otmp;
         if (!resists_magm(steed) && !resist(steed, WAND_CLASS, 0, NOTELL)) {
             struct permonst *mdat = steed->data;
 
-            (void) newcham(steed, (struct permonst *) 0, FALSE, FALSE);
+            (void) newcham(steed, (struct permonst *) 0, FALSE, TRUE);
             if (!can_saddle(steed) || !can_ride(steed)) {
                 dismount_steed(DISMOUNT_POLY);
             } else {
@@ -2667,7 +2667,7 @@ register struct monst *mtmp;
             if (resists_magm(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
             } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-                if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+                if (newcham(mtmp, (struct permonst *) 0, FALSE, TRUE))
                     /* we're done with mptr but keep it up to date */
                     mptr = mtmp->data;
                 if (in_sight)

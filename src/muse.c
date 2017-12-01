@@ -1862,15 +1862,13 @@ struct monst *mtmp;
         return 2;
     case MUSE_WAN_POLYMORPH:
         mzapwand(mtmp, otmp, TRUE);
-        (void) newcham(mtmp, muse_newcham_mon(mtmp), TRUE, FALSE);
+        (void) newcham(mtmp, muse_newcham_mon(mtmp), TRUE, TRUE);
         if (oseen)
             makeknown(WAN_POLYMORPH);
         return 2;
     case MUSE_POT_POLYMORPH:
         mquaffmsg(mtmp, otmp);
-        if (vismon)
-            pline("%s suddenly mutates!", Monnam(mtmp));
-        (void) newcham(mtmp, muse_newcham_mon(mtmp), FALSE, FALSE);
+        (void) newcham(mtmp, muse_newcham_mon(mtmp), FALSE, TRUE);
         if (oseen)
             makeknown(POT_POLYMORPH);
         m_useup(mtmp, otmp);
@@ -1893,7 +1891,7 @@ struct monst *mtmp;
             worm_move(mtmp);
         newsym(g.trapx, g.trapy);
 
-        (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
+        (void) newcham(mtmp, (struct permonst *) 0, FALSE, TRUE);
         return 2;
     case MUSE_BULLWHIP:
         /* attempt to disarm hero */
