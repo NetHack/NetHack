@@ -284,19 +284,31 @@ mnsel.uu        mnselcnt.uu     mnunsel.uu      mswproc.c       petmark.uu
 pilemark.uu     record.uu       resource.h      rip.uu          splash.uu
 tiles.mak       winMS.h         winhack.c       winhack.rc
 
-win/win32/vs2010:
-(files for Visual Studio 2010 Express Edition builds)
-dgncomp.vcxproj     dgnstuff.vcxproj    dlb_main.vcxproj    levcomp.vcxproj
-levstuff.vcxproj    makedefs.vcxproj    NetHack.sln         NetHackW.vcxproj
-recover.vcxproj     tile2bmp.vcxproj    tilemap.vcxproj     tiles.vcxproj
+win/win32/vs2015:
+(files for Visual Studio 2015 Express Edition builds)
+afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj 
+afternethack.proj  afterrecover.proj  aftertile2bmp.proj  aftertilemap.proj
+afteruudecode.proj build.bat          common.props        config.props
+console.props      default.props      default_dll.props   dgncomp.vcxproj
+dirs.props         dlb.vcxproj        dll.props           files.props
+levcomp.vcxproj    makedefs.vcxproj   NetHack.sln         NetHack.vcxproj
+NetHackW.vcxproj   nh340key.def       nh340key.vcxproj    nhdefkey.def
+nhdefkey.vcxproj   nhraykey.def       nhraykey.vcxproj    notes.txt
+recover.vcxproj    tile2bmp.vcxproj   tilemap.vcxproj     tiles.vcxproj
 uudecode.vcxproj
 
-win/win32/vs2013:
-(files for Visual Studio 2013 Express Edition builds)
-dgncomp.vcxproj     dgnstuff.vcxproj    dlb_main.vcxproj    levcomp.vcxproj
-levstuff.vcxproj    makedefs.vcxproj    NetHack.sln         NetHack.vcxproj
-NetHackW.vcxproj    nhdefkey.vcxproj    recover.vcxproj     tile2bmp.vcxproj
-tilemap.vcxproj     tiles.vcxproj       uudecode.vcxproj
+win/win32/vs2017:
+(files for Visual Studio 2017 Community Edition builds)
+afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj
+afternethack.proj  afterrecover.proj  aftertile2bmp.proj  aftertilemap.proj
+afteruudecode.proj build.bat          common.props        config.props
+console.props      default.props      default_dll.props   dgncomp.vcxproj
+dirs.props         dlb.vcxproj        dll.props           files.props
+levcomp.vcxproj    makedefs.vcxproj   NetHack.sln         NetHack.vcxproj
+NetHackW.vcxproj   nh340key.def       nh340key.vcxproj    nhdefkey.def
+nhdefkey.vcxproj   nhraykey.def       nhraykey.vcxproj    recover.vcxproj
+tile2bmp.vcxproj   tilemap.vcxproj    tiles.vcxproj       uudecode.vcxproj
+
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
