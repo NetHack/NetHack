@@ -1,5 +1,5 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1451610993 2016/01/01 01:16:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2015
+#       Copyright (c) NetHack PC Development Team 1993-2017
 #
 #==============================================================================
 # Build Tools Environment
@@ -9,7 +9,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2010 Express, with the Platform SDK
 #            - Microsoft Visual Studio 2013 Express
-#            - Microsoft Visual Studio 2015 Express (pre-release)
+#            - Microsoft Visual Studio 2017 Community Edition
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
@@ -35,7 +35,9 @@
 # is too old or untested.
 #
 
-!IF "$(_NMAKE_VER)" == "14.00.22310.1"
+!IF "$(_NMAKE_VER)" == "14.11.25547.0"
+VSVER=2017
+!ELSEIF "$(_NMAKE_VER)" == "14.00.22310.1"
 VSVER=2015
 !ELSEIF "$(_NMAKE_VER)" == "12.00.21005.1"
 VSVER=2013
@@ -69,9 +71,13 @@ VSVER=0000		#untested version
 TARGET_CPU=x86
 
 !ELSE
+!IF ($(VSVER) == 0000)
+!ERROR Unsupported and untested version of Visual Studio
+!ELSE
 # For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
 # DO NOT DELETE THE FOLLOWING LINE
 !include <win32.mak>
+!ENDIF
 !ENDIF
 #
 #---------------------------------------------------------------
@@ -179,18 +185,18 @@ DLBFLG =
 TARGET_CPU=x86
 !ENDIF
 
-!IF "$(_NMAKE_VER)" == "10.00.40219.01"
-CL2013=
+!IF ($(VSVER) == 2010)
+CL_RECENT=
 !ELSE
 ! IF ($(VSVER) > 2010)
-CL2013=-sdl
+CL_RECENT=-sdl
 ! ENDIF
 !ENDIF
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
 	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" -EHsc -fp:precise -Gd -GF -GS -Gy \
-	$(CL2013) -WX- -Zc:forScope -Zc:wchar_t -Zi
+	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
 cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
 crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
 
