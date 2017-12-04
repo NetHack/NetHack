@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1508827592 2017/10/24 06:46:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1512096431 2017/12/01 02:47:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -617,8 +617,7 @@ void
 carry_obj_effects(obj)
 struct obj *obj;
 {
-    /* Cursed figurines can spontaneously transform
-       when carried. */
+    /* Cursed figurines can spontaneously transform when carried. */
     if (obj->otyp == FIGURINE) {
         if (obj->cursed && obj->corpsenm != NON_PM
             && !dead_species(obj->corpsenm, TRUE)) {
@@ -1473,6 +1472,9 @@ redo_menu:
             else if (otmp->otyp == LOADSTONE && otmp->cursed)
                 /* kludge for canletgo()'s can't-drop-this message */
                 otmp->corpsenm = (int) cnt;
+        } else if (!strcmp(word, "adjust")) {
+            /* specifying stack's full count means something to #adjust */
+            otmp->nomerge = 1;
         }
     }
     return otmp;
@@ -3568,7 +3570,7 @@ doorganize() /* inventory organizer by Del Lamb */
     char qbuf[QBUFSZ];
     char allowall[4]; /* { ALLOW_COUNT, ALL_CLASSES, 0, 0 } */
     const char *adj_type;
-    boolean ever_mind = FALSE;
+    boolean ever_mind = FALSE, dont_collect = FALSE;
 
     if (!invent) {
         You("aren't carrying anything to adjust.");
@@ -3600,12 +3602,19 @@ doorganize() /* inventory organizer by Del Lamb */
 
     /* figure out whether user gave a split count to getobj() */
     splitting = bumped = 0;
-    for (otmp = invent; otmp; otmp = otmp->nobj)
-        if (otmp->nobj == obj) { /* knowledge of splitobj() operation */
-            if (otmp->invlet == obj->invlet)
-                splitting = otmp;
-            break;
-        }
+    if (obj->nomerge) {
+        /* player specified full count; no split occurred and we'll
+           avoid collecting compatible stacks when moving this one */
+        obj->nomerge = 0;
+        dont_collect = TRUE;
+    } else {
+        for (otmp = invent; otmp; otmp = otmp->nobj)
+            if (otmp->nobj == obj) { /* knowledge of splitobj() operation */
+                if (otmp->invlet == obj->invlet)
+                    splitting = otmp;
+                break;
+            }
+    }
 
     /* initialize the list with all lower and upper case letters */
     lets[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
@@ -3659,7 +3668,7 @@ doorganize() /* inventory organizer by Del Lamb */
             /* adjusting to same slot is meaningful since all
                compatible stacks get collected along the way,
                but splitting to same slot is not */
-            || (splitting && let == obj->invlet)) {
+            || ((splitting || dont_collect) && let == obj->invlet)) {
         noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
@@ -3692,7 +3701,7 @@ doorganize() /* inventory organizer by Del Lamb */
     extract_nobj(obj, &invent);
 
     for (otmp = invent; otmp;) {
-        if (!splitting) {
+        if (!splitting && !dont_collect) {
             if (merged(&otmp, &obj)) {
                 adj_type = "Merging:";
                 obj = otmp;
@@ -3730,7 +3739,7 @@ doorganize() /* inventory organizer by Del Lamb */
                 if (merged(&otmp, &obj)) {
                     obj = otmp;
                     extract_nobj(obj, &invent);
-                } else if (inv_cnt(FALSE) >= 52) {
+                } else if (inv_cnt(FALSE) >= 52 && !dont_collect) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
                     Your("pack is too full.");

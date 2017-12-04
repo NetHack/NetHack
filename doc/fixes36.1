@@ -473,6 +473,11 @@ make Vlad slightly tougher
 reduce the amount of gold laying on the floor
 locked chests and large boxes contain more stuff
 make shopkeepers bill hero for burying merchandise
+monster holding hero takes double damage from an explosion for reaching into
+	adjacent spot, but it was being inflicted even when hero was swallowed
+	or beyond the explosion radius
+poly'd hero holding monster now takes double damage (if monster is within
+	explosion radious) instead of inflicting that upon the monster
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -715,6 +720,9 @@ Master Key of Thievery always finds door and chest traps if used to lock or
 "Elbereth" now erodes based on attacks by the player, not monsters scared
 option herecmd_menu to make a mouse click on your character pop up
 	a context menu, and extended command #herecmdmenu to do the same
+for #adjust, specifying a split count which matches an inventory slot's full
+	size will move or swap that stack without combining other compatible
+	stacks (except for the one in the destination slot, if applicable)
 
 
 Platform- and/or Interface-Specific New Features
