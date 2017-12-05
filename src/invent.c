@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1512096431 2017/12/01 02:47:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1512473628 2017/12/05 11:33:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1472,9 +1472,6 @@ redo_menu:
             else if (otmp->otyp == LOADSTONE && otmp->cursed)
                 /* kludge for canletgo()'s can't-drop-this message */
                 otmp->corpsenm = (int) cnt;
-        } else if (!strcmp(word, "adjust")) {
-            /* specifying stack's full count means something to #adjust */
-            otmp->nomerge = 1;
         }
     }
     return otmp;
@@ -3539,10 +3536,18 @@ reassign()
  *      then a 'to' slot for its destination.  Open slots and those
  *      filled by compatible stacks are listed as likely candidates
  *      but user can pick any inventory letter (including 'from').
- *      All compatible items found are gathered into the 'from'
- *      stack as it is moved.  If the 'to' slot isn't empty and
- *      doesn't merge, then its stack is swapped to the 'from' slot.
  *
+ *  to == from, 'from' has a name
+ *      All compatible items (same name or no name) are gathered
+ *      into the 'from' stack.  No count is allowed.
+ *  to == from, 'from' does not have a name
+ *      All compatible items without a name are gathered into the
+ *      'from' stack.  No count is allowed.  Compatible stacks with
+ *      names are left as-is.
+ *  to != from, no count
+ *      Move 'from' to 'to'.  If 'to' is not empty, merge 'from'
+ *      into it if possible, otherwise swap it with the 'from' slot.
+ *  to != from, count given
  *      If the user specifies a count when choosing the 'from' slot,
  *      and that count is less than the full size of the stack,
  *      then the stack will be split.  The 'count' portion is moved
@@ -3552,10 +3557,19 @@ reassign()
  *      will be moved to an open slot; if there isn't any open slot
  *      available, the adjustment attempt fails.
  *
- *      Splitting has one special case:  if 'to' slot is non-empty
- *      and is compatible with 'from' in all respects except for
- *      user-assigned names, the 'count' portion being moved is
- *      effectively renamed so that it will merge with 'to' stack.
+ *      To minimize merging for 'from == to', unnamed stacks will
+ *      merge with named 'from' but named ones won't merge with
+ *      unnamed 'from'.  Otherwise attempting to collect all unnamed
+ *      stacks would lump the first compatible named stack with them
+ *      and give them its name.
+ *
+ *      To maximize merging for 'from != to', compatible stacks will
+ *      merge when either lacks a name (or they already have the same
+ *      name).  When no count is given and one stack has a name and
+ *      the other doesn't, the merged result will have that name.
+ *      However, when splitting results in a merger, the name of the
+ *      destination overrides that of the source, even if destination
+ *      is unnamed and source is named.
  */
 int
 doorganize() /* inventory organizer by Del Lamb */
@@ -3569,8 +3583,9 @@ doorganize() /* inventory organizer by Del Lamb */
     char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
     char allowall[4]; /* { ALLOW_COUNT, ALL_CLASSES, 0, 0 } */
+    char *objname, *otmpname;
     const char *adj_type;
-    boolean ever_mind = FALSE, dont_collect = FALSE;
+    boolean ever_mind = FALSE, collect;
 
     if (!invent) {
         You("aren't carrying anything to adjust.");
@@ -3602,19 +3617,12 @@ doorganize() /* inventory organizer by Del Lamb */
 
     /* figure out whether user gave a split count to getobj() */
     splitting = bumped = 0;
-    if (obj->nomerge) {
-        /* player specified full count; no split occurred and we'll
-           avoid collecting compatible stacks when moving this one */
-        obj->nomerge = 0;
-        dont_collect = TRUE;
-    } else {
-        for (otmp = invent; otmp; otmp = otmp->nobj)
-            if (otmp->nobj == obj) { /* knowledge of splitobj() operation */
-                if (otmp->invlet == obj->invlet)
-                    splitting = otmp;
-                break;
-            }
-    }
+    for (otmp = invent; otmp; otmp = otmp->nobj)
+        if (otmp->nobj == obj) { /* knowledge of splitobj() operation */
+            if (otmp->invlet == obj->invlet)
+                splitting = otmp;
+            break;
+        }
 
     /* initialize the list with all lower and upper case letters */
     lets[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
@@ -3668,7 +3676,7 @@ doorganize() /* inventory organizer by Del Lamb */
             /* adjusting to same slot is meaningful since all
                compatible stacks get collected along the way,
                but splitting to same slot is not */
-            || ((splitting || dont_collect) && let == obj->invlet)) {
+            || (splitting && let == obj->invlet)) {
         noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
@@ -3691,8 +3699,9 @@ doorganize() /* inventory organizer by Del Lamb */
         pline("Select an inventory slot letter."); /* else try again */
     }
 
+    collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = !splitting ? "Moving:" : "Splitting:";
+    adj_type = collect ? "Collecting" : !splitting ? "Moving:" : "Splitting:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -3701,45 +3710,52 @@ doorganize() /* inventory organizer by Del Lamb */
     extract_nobj(obj, &invent);
 
     for (otmp = invent; otmp;) {
-        if (!splitting && !dont_collect) {
-            if (merged(&otmp, &obj)) {
+        /* it's tempting to pull this outside the loop, but merged() could
+           free ONAME(obj) [via obfree()] and replace it with ONAME(otmp) */
+        objname = has_oname(obj) ? ONAME(obj) : (char *) 0;
+
+        if (collect) {
+            /* Collecting: #adjust an inventory stack into its same slot;
+               keep it there and merge other compatible stacks into it.
+               Traditional inventory behavior is to merge unnamed stacks
+               with compatible named ones; we only want that if it is
+               the 'from' stack (obj) with a name and candidate (otmp)
+               without one, not unnamed 'from' with named candidate. */
+            otmpname = has_oname(otmp) ? ONAME(otmp) : (char *) 0;
+            if ((!otmpname || (objname && !strcmp(objname, otmpname)))
+                && merged(&otmp, &obj)) {
                 adj_type = "Merging:";
                 obj = otmp;
                 otmp = otmp->nobj;
                 extract_nobj(obj, &invent);
                 continue; /* otmp has already been updated */
-            } else if (otmp->invlet == let) {
+            }
+        } else if (otmp->invlet == let) {
+            /* Moving or splitting: don't merge extra compatible stacks.
+               Found 'otmp' in destination slot; merge if compatible,
+               otherwise bump whatever is there to an open slot. */
+            if (!splitting) {
                 adj_type = "Swapping:";
                 otmp->invlet = obj->invlet;
-            }
-        } else {
-            /* splitting: don't merge extra compatible stacks;
-               if destination is compatible, do merge with it,
-               otherwise bump whatever is there to an open slot */
-            if (otmp->invlet == let) {
-                int olth = 0;
-
-                if (has_oname(obj))
-                    olth = strlen(ONAME(obj));
-                /* ugly hack:  if these objects aren't going to merge
-                   solely because they have conflicting user-assigned
-                   names, strip off the name of the one being moved */
-                if (olth && !obj->oartifact && !mergable(otmp, obj)) {
-                    char *holdname = ONAME(obj);
-
+            } else {
+                /* strip 'from' name if it has one */
+                if (objname && !obj->oartifact)
                     ONAME(obj) = (char *) 0;
-                    /* restore name iff merging is still not possible */
-                    if (!mergable(otmp, obj)) {
-                        ONAME(obj) = holdname;
-                        holdname = (char *) 0;
-                    } else
-                        free((genericptr_t) holdname);
+                if (!mergable(otmp, obj)) {
+                    /* won't merge; put 'from' name back */
+                    if (objname)
+                        ONAME(obj) = objname;
+                } else {
+                    /* will merge; discard 'from' name */
+                    if (objname)
+                        free((genericptr_t) objname), objname = 0;
                 }
 
                 if (merged(&otmp, &obj)) {
+                    adj_type = "Splitting and merging:";
                     obj = otmp;
                     extract_nobj(obj, &invent);
-                } else if (inv_cnt(FALSE) >= 52 && !dont_collect) {
+                } else if (inv_cnt(FALSE) >= 52) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
                     Your("pack is too full.");
@@ -3748,9 +3764,9 @@ doorganize() /* inventory organizer by Del Lamb */
                     bumped = otmp;
                     extract_nobj(bumped, &invent);
                 }
-                break;
-            } /* found 'to' slot */
-        }     /* splitting */
+            } /* moving vs splitting */
+            break; /* not collecting and found 'to' slot */
+        } /* collect */
         otmp = otmp->nobj;
     }
 
