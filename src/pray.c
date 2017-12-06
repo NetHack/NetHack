@@ -1523,6 +1523,7 @@ dosacrifice()
                 /* Moloch's high altar */
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
+                pline("An invisible choir chants in Latin, and you are bathed in darkness...");
                 /*[apparently shrug/snarl can be sensed without being seen]*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());
