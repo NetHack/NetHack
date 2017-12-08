@@ -478,6 +478,12 @@ monster holding hero takes double damage from an explosion for reaching into
 	or beyond the explosion radius
 poly'd hero holding monster now takes double damage (if monster is within
 	explosion radious) instead of inflicting that upon the monster
+when trying to swap places with a pet and failing due to pet being unable
+	to move diagonally to hero's spot (grid bug or too tight squeeze), if
+	pet became untame the map would briefly show hero at pet's location
+when trying to swap places with a pet and failing due to pet being trapped
+	or disallowed diagonal move, the arrive-on-new-spot code (autopickup,
+	trap triggering) executed even though hero didn't ultimately move
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
