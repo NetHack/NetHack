@@ -1802,28 +1802,9 @@ domove_core()
      * be caught by the normal falling-monster code.
      */
     if (is_safepet(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if trapped, there's a chance the pet goes wild */
-        if (mtmp->mtrapped) {
-            if (!rn2(mtmp->mtame)) {
-                mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
-                if (mtmp->mleashed)
-                    m_unleash(mtmp, TRUE);
-                growl(mtmp);
-            } else {
-                yelp(mtmp);
-            }
-        }
-
-        /* seemimic/newsym should be done before moving hero, otherwise
-           the display code will draw the hero here before we possibly
-           cancel the swap below (we can ignore steed mx,my here) */
-        u.ux = u.ux0, u.uy = u.uy0;
         mtmp->mundetected = 0;
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
-        else if (!mtmp->mtame)
-            newsym(mtmp->mx, mtmp->my);
-        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && is_pit(trap->ttyp)
@@ -1855,7 +1836,27 @@ domove_core()
             if (u.usteed)
                 u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+        } else if (mtmp->mpeaceful && !mtmp->mtame
+                   && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+                       || t_at(u.ux0, u.uy0) != NULL
+                       || mtmp->m_id == g.quest_status.leader_m_id)) {
+            /* displacing peaceful into unsafe or trapped space, or trying to
+             * displace quest leader */
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            You("stop.  %s doesn't want to swap places.",
+                upstart(y_monnam(mtmp)));
         } else {
+            /* if trapped, there's a chance the pet goes wild */
+            if (mtmp->mtrapped) {
+                if (!rn2(mtmp->mtame)) {
+                    mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
+                    if (mtmp->mleashed)
+                        m_unleash(mtmp, TRUE);
+                    growl(mtmp);
+                } else {
+                    yelp(mtmp);
+                }
+            }
             char pnambuf[BUFSZ];
 
             /* save its current description in case of polymorph */
@@ -1866,7 +1867,7 @@ domove_core()
             newsym(x, y);
             newsym(u.ux0, u.uy0);
 
-            You("%s %s.", mtmp->mtame ? "swap places with" : "frighten",
+            You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 pnambuf);
 
             /* check for displacing it into pools and traps */
