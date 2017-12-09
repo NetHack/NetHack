@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1495232357 2017/05/19 22:19:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1512803167 2017/12/09 07:06:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1142,11 +1142,6 @@ int how;
     else if (how == TURNED_SLIME)
         u.ugrave_arise = PM_GREEN_SLIME;
 
-    /* if pets will contribute to score, populate mydogs list now
-       (bones creation isn't a factor, but pline() messaging is) */
-    if (how == ESCAPED || how == ASCENDED)
-        keepdogs(TRUE);
-
     if (how == QUIT) {
         killer.format = NO_KILLER_PREFIX;
         if (u.uhp < 1) {
@@ -1193,6 +1188,13 @@ int how;
 
         dump_everything(how, endtime);
     }
+
+    /* if pets will contribute to score, populate mydogs list now
+       (bones creation isn't a factor, but pline() messaging is; used to
+       be done ever sooner, but we need it to come after dump_everything()
+       so that any accompanying pets are still on the map during dump) */
+    if (how == ESCAPED || how == ASCENDED)
+        keepdogs(TRUE);
 
     /* finish_paybill should be called after disclosure but before bones */
     if (bones_ok && taken)
