@@ -5125,6 +5125,7 @@ parse()
     register int foo;
     boolean prezero = FALSE;
 
+    iflags.in_parse = TRUE;
     multi = 0;
     context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
@@ -5191,6 +5192,8 @@ parse()
     clear_nhwindow(WIN_MESSAGE);
     if (prezero)
         in_line[0] = Cmd.spkeys[NHKF_ESC];
+
+    iflags.in_parse = FALSE;
     return in_line;
 }
 
