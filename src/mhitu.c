@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1505001092 2017/09/09 23:51:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1512808564 2017/12/09 08:36:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1629,8 +1629,11 @@ register struct attack *mattk;
         dmg = 0;
         break;
     }
-    if (u.uhp < 1)
-        done_in_by(mtmp, DIED);
+    if ((Upolyd ? u.mh : u.uhp) < 1) {
+        /* already dead? call rehumanize() or done_in_by() as appropriate */
+        mdamageu(mtmp, 1);
+        dmg = 0;
+    }
 
     /*  Negative armor class reduces damage done instead of fully protecting
      *  against hits.
