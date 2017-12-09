@@ -4,3 +4,6 @@
 *.hqx -text
 *.sln -text
 *.vcxproj -text
+*.doc !diff
+*.DOC !diff
+
