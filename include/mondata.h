@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1513130015 2017/12/13 01:53:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -175,9 +175,10 @@
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
-#define nonliving(ptr)                                          \
-    (is_golem(ptr) || is_undead(ptr) || (ptr)->mlet == S_VORTEX \
-     || (ptr) == &mons[PM_MANES])
+/* used to vary a few messages */
+#define weirdnonliving(ptr) (is_golem(ptr) || (ptr)->mlet == S_VORTEX)
+#define nonliving(ptr) \
+    (is_undead(ptr) || (ptr) == &mons[PM_MANES] || weirdnonliving(ptr))
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */

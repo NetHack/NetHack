@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1497485548 2017/06/15 00:12:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1513130017 2017/12/13 01:53:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.115 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -189,12 +189,7 @@ const char *fmt, *arg;
 
     You(fmt, arg);
     /* check whether player foolishly genocided self while poly'd */
-    if ((mvitals[urole.malenum].mvflags & G_GENOD)
-        || (urole.femalenum != NON_PM
-            && (mvitals[urole.femalenum].mvflags & G_GENOD))
-        || (mvitals[urace.malenum].mvflags & G_GENOD)
-        || (urace.femalenum != NON_PM
-            && (mvitals[urace.femalenum].mvflags & G_GENOD))) {
+    if (ugenocided()) {
         /* intervening activity might have clobbered genocide info */
         struct kinfo *kptr = find_delayed_killer(POLYMORPH);
 
@@ -1811,6 +1806,33 @@ polysense()
         context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;
     }
+}
+
+/* True iff hero's role or race has been genocided */
+boolean
+ugenocided()
+{
+    return (boolean) ((mvitals[urole.malenum].mvflags & G_GENOD)
+                      || (urole.femalenum != NON_PM
+                          && (mvitals[urole.femalenum].mvflags & G_GENOD))
+                      || (mvitals[urace.malenum].mvflags & G_GENOD)
+                      || (urace.femalenum != NON_PM
+                          && (mvitals[urace.femalenum].mvflags & G_GENOD)));
+}
+
+/* how hero feels "inside" after self-genocide of role or race */
+const char *
+udeadinside()
+{
+    /* self-genocide used to always say "you feel dead inside" but that
+       seems silly when you're polymorphed into something undead;
+       monkilled() distinguishes between living (killed) and non (destroyed)
+       for monster death message; we refine the nonliving aspect a bit */
+    return !nonliving(youmonst.data)
+             ? "dead"          /* living, including demons */
+             : !weirdnonliving(youmonst.data)
+                 ? "condemned" /* undead plus manes */
+                 : "empty";    /* golems plus vortices */
 }
 
 /*polyself.c*/
