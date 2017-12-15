@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1511658058 2017/11/26 01:00:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1513297345 2017/12/15 00:22:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -443,8 +443,12 @@ int expltype;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
                 if (mtmp->mhp <= 0) {
+                    int xkflg = ((adtyp == AD_FIRE
+                                  && completelyburns(mtmp->data))
+                                 ? XKILL_NOCORPSE : 0);
+
                     if (!context.mon_moving) {
-                        killed(mtmp);
+                        xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
                          * into slime due to some action by the player.
@@ -456,11 +460,15 @@ int expltype;
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
                             pline("%s is %s!", Monnam(mtmp),
-                                  nonliving(mtmp->data) ? "destroyed"
-                                                        : "killed");
-                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT);
-                    } else
+                                  xkflg ? "burned completely"
+                                        : nonliving(mtmp->data) ? "destroyed"
+                                                                : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
+                    } else {
+                        if (xkflg)
+                            adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
+                    }
                 } else if (!context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);

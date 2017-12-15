@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1512808564 2017/12/09 08:36:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1513297347 2017/12/15 00:22:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1030,9 +1030,8 @@ register struct attack *mattk;
         hitmsg(mtmp, mattk);
         if (uncancelled) {
             pline("You're %s!", on_fire(youmonst.data, mattk));
-            if (youmonst.data == &mons[PM_STRAW_GOLEM]
-                || youmonst.data == &mons[PM_PAPER_GOLEM]) {
-                You("roast!");
+            if (completelyburns(youmonst.data)) { /* paper or straw golem */
+                You("go up in flames!");
                 /* KMH -- this is okay with unchanging */
                 rehumanize();
                 break;

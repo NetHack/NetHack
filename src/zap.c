@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1505475171 2017/09/15 11:32:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.267 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1513297348 2017/12/15 00:22:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4022,10 +4022,22 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     if (tmp == MAGIC_COOKIE) { /* disintegration */
                         disintegrate_mon(mon, type, fltxt);
                     } else if (mon->mhp < 1) {
-                        if (type < 0)
+                        if (type < 0) {
+                            /* mon has just been killed by another monster */
                             monkilled(mon, fltxt, AD_RBRE);
-                        else
-                            killed(mon);
+                        } else {
+                            int xkflags = XKILL_GIVEMSG; /* killed(mon); */
+
+                            /* killed by hero; we know 'type' isn't negative;
+                               if it's fire, highly flammable monsters leave
+                               no corpse; don't bother reporting that they
+                               "burn completely" -- unnecessary verbosity */
+                            if ((type % 10 == ZT_FIRE)
+                                /* paper golem or straw golem */
+                                && completelyburns(mon->data))
+                                xkflags |= XKILL_NOCORPSE;
+                            xkilled(mon, xkflags);
+                        }
                     } else {
                         if (!otmp) {
                             /* normal non-fatal hit */
