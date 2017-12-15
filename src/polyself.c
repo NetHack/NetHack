@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1513130017 2017/12/13 01:53:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1513298347 2017/12/15 00:39:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1010,10 +1010,16 @@ void
 rehumanize()
 {
     /* You can't revert back while unchanging */
-    if (Unchanging && (u.mh < 1)) {
-        killer.format = NO_KILLER_PREFIX;
-        Strcpy(killer.name, "killed while stuck in creature form");
-        done(DIED);
+    if (Unchanging) {
+        if (u.mh < 1) {
+            killer.format = NO_KILLER_PREFIX;
+            Strcpy(killer.name, "killed while stuck in creature form");
+            done(DIED);
+        } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
+            Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
+            uamul->dknown = 1;
+            makeknown(AMULET_OF_UNCHANGING);
+        }
     }
 
     if (emits_light(youmonst.data))
