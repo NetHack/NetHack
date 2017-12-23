@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1496959478 2017/06/08 22:04:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1514072526 2017/12/23 23:42:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1617,6 +1617,14 @@ boolean noisy;
     int err = 0;
     const char *which;
 
+    /* this is the same check as for 'W' (dowear), but different message,
+       in case we get here via 'P' (doputon) */
+    if (verysmall(youmonst.data) || nohands(youmonst.data)) {
+        if (noisy)
+            You("can't wear any armor in your current form.");
+        return 0;
+    }
+
     which = is_cloak(otmp)
                 ? c_cloak
                 : is_shirt(otmp)
@@ -1964,7 +1972,7 @@ dowear()
 
     /* cantweararm() checks for suits of armor, not what we want here;
        verysmall() or nohands() checks for shields, gloves, etc... */
-    if ((verysmall(youmonst.data) || nohands(youmonst.data))) {
+    if (verysmall(youmonst.data) || nohands(youmonst.data)) {
         pline("Don't even bother.");
         return 0;
     }
