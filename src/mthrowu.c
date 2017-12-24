@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446887531 2015/11/07 09:12:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -26,6 +26,7 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
 };
 
 extern boolean notonhead; /* for long worms */
+STATIC_VAR int mesg_given; /* for m_throw()/thitu() 'miss' message */
 
 /* hero is hit by something other than a monster */
 int
@@ -37,7 +38,7 @@ const char *name; /* if null, then format `*objp' */
     struct obj *obj = objp ? *objp : 0;
     const char *onm, *knm;
     boolean is_acid;
-    int kprefix = KILLED_BY_AN;
+    int kprefix = KILLED_BY_AN, dieroll;
     char onmbuf[BUFSZ], knmbuf[BUFSZ];
 
     if (!name) {
@@ -59,10 +60,15 @@ const char *name; /* if null, then format `*objp' */
             : an(name);
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
-    if (u.uac + tlev <= rnd(20)) {
-        if (Blind || !flags.verbose)
+    if (u.uac + tlev <= (dieroll = rnd(20))) {
+        ++mesg_given;
+        if (Blind || !flags.verbose) {
             pline("It misses.");
-        else
+        } else if (u.uac + tlev <= dieroll - 2) {
+            if (onm != onmbuf)
+                Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
+            pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
+        } else
             You("are almost hit by %s.", onm);
         return 0;
     } else {
@@ -518,6 +524,7 @@ struct obj *obj;         /* missile (or stack providing it) */
         (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
         return;
     }
+    mesg_given = 0; /* a 'missile misses' message has not yet been shown */
 
     /* Note: drop_throw may destroy singleobj.  Since obj must be destroyed
      * early to avoid the dagger bug, anyone who modifies this code should
@@ -646,8 +653,10 @@ struct obj *obj;         /* missile (or stack providing it) */
         if (!range /* reached end of path */
             || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
-                if (m_shot.n > 1 && (cansee(bhitpos.x, bhitpos.y)
-                                     || (archer && canseemon(archer))))
+                if (m_shot.n > 1
+                    && (!mesg_given || bhitpos.x != u.ux || bhitpos.y != u.uy)
+                    && (cansee(bhitpos.x, bhitpos.y)
+                        || (archer && canseemon(archer))))
                     pline("%s misses.", The(mshot_xname(singleobj)));
                 (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
             }
@@ -659,6 +668,7 @@ struct obj *obj;         /* missile (or stack providing it) */
     tmp_at(bhitpos.x, bhitpos.y);
     delay_output();
     tmp_at(DISP_END, 0);
+    mesg_given = 0; /* reset */
 
     if (blindinc) {
         u.ucreamed += blindinc;
