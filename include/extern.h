@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1508549428 2017/10/21 01:30:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.619 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1513130012 2017/12/13 01:53:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.621 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1884,6 +1884,8 @@ E const char *FDECL(mbodypart, (struct monst *, int));
 E const char *FDECL(body_part, (int));
 E int NDECL(poly_gender);
 E void FDECL(ugolemeffects, (int, int));
+E boolean NDECL(ugenocided);
+E const char *NDECL(udeadinside);
 
 /* ### potion.c ### */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1508479721 2017/10/20 06:08:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1513130018 2017/12/13 01:53:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2088,7 +2088,7 @@ do_class_genocide()
                         u.uhp = -1;
                         if (Upolyd) {
                             if (!feel_dead++)
-                                You_feel("dead inside.");
+                                You_feel("%s inside.", udeadinside());
                         } else {
                             if (!feel_dead++)
                                 You("die.");
@@ -2269,7 +2269,7 @@ int how;
             /* KMH -- Unchanging prevents rehumanization */
             if (Upolyd && ptr != youmonst.data) {
                 delayed_killer(POLYMORPH, killer.format, killer.name);
-                You_feel("dead inside.");
+                You_feel("%s inside.", udeadinside());
             } else
                 done(GENOCIDED);
         } else if (ptr == youmonst.data) {

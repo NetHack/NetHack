@@ -478,6 +478,20 @@ monster holding hero takes double damage from an explosion for reaching into
 	or beyond the explosion radius
 poly'd hero holding monster now takes double damage (if monster is within
 	explosion radious) instead of inflicting that upon the monster
+when trying to swap places with a pet and failing due to pet being unable
+	to move diagonally to hero's spot (grid bug or too tight squeeze), if
+	pet became untame the map would briefly show hero at pet's location
+when trying to swap places with a pet and failing due to pet being trapped
+	or disallowed diagonal move, the arrive-on-new-spot code (autopickup,
+	trap triggering) executed even though hero didn't ultimately move
+being "dead inside" (self-genocide while polymorphed) conferred partial
+	invulnerability--normal monster behavior stopped attacking hero
+if a fiery monster, wand of fire, or fiery explosion burned up a paper golem,
+	it could still leave blank scrolls
+hero poly'd into paper or straw golem reverts to human if burned up even when
+	Unchanging without any explanation given
+hero polymorphed into form which can't wear armor via 'W' (eliciting "don't
+	even bother") could wear it via 'P'
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -508,6 +522,8 @@ DUMPLOG: genocided and extinct species was always a blank line;
 	vanquished creatures was just a blank line if nothing had been killed
 DUMPLOG: RIP tombstone was printed for characters who survived (ascended,
 	escaped dungeon, quit, trickery or panic)
+DUMPLOG: pets who accompany hero during ascension or dungeon escape were
+	already gone by the time known portion of the level map was dumped
 artifact creation violated illiterate conduct when artifact name was assigned,
 	behavior intended only for creating Sting or Orcrist via naming
 tty: revert to pline() for issuing prompts (override MSGTYPE=hide differently)
@@ -538,6 +554,9 @@ fix mention_walls reporting secret doors as solid stone
 jumping over water unintentionally moved hero through that water, causing
 	drowning if not able to water walk or fly
 try again to fix achievement recording bug with mines and sokoban prizes
+the fix for secret doors on special levels always having vertical orientation
+	resulted in some--but not all--secret doors within vertical walls
+	being displayed as horizontal walls while still hidden
 
 
 Platform- and/or Interface-Specific Fixes
@@ -720,9 +739,9 @@ Master Key of Thievery always finds door and chest traps if used to lock or
 "Elbereth" now erodes based on attacks by the player, not monsters scared
 option herecmd_menu to make a mouse click on your character pop up
 	a context menu, and extended command #herecmdmenu to do the same
-for #adjust, specifying a split count which matches an inventory slot's full
-	size will move or swap that stack without combining other compatible
-	stacks (except for the one in the destination slot, if applicable)
+change #adjust's behavior when collecting compatible stacks; that used to
+	occur for any #adjust which lacked a split count, now it only happens
+	when 'adjusting' into a stack's own inventory slot
 
 
 Platform- and/or Interface-Specific New Features

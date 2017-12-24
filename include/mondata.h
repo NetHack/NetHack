@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -175,9 +175,14 @@
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
-#define nonliving(ptr)                                          \
-    (is_golem(ptr) || is_undead(ptr) || (ptr)->mlet == S_VORTEX \
-     || (ptr) == &mons[PM_MANES])
+/* used to vary a few messages */
+#define weirdnonliving(ptr) (is_golem(ptr) || (ptr)->mlet == S_VORTEX)
+#define nonliving(ptr) \
+    (is_undead(ptr) || (ptr) == &mons[PM_MANES] || weirdnonliving(ptr))
+
+/* no corpse (ie, blank scrolls) if killed by fire */
+#define completelyburns(ptr) \
+    ((ptr) == &mons[PM_PAPER_GOLEM] || (ptr) == &mons[PM_STRAW_GOLEM])
 
 /* Used for conduct with corpses, tins, and digestion attacks */
 /* G_NOCORPSE monsters might still be swallowed as a purple worm */

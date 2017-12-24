@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.240 $ $NHDT-Date: 1512098127 2017/12/01 03:15:27 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.241 $ $NHDT-Date: 1512473628 2017/12/05 11:33:48 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -930,11 +930,19 @@ being moved.
 ``#adjust'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.
 .lp ""
-When no count is given, other compatible stacks are merged with the source
-stack as it's moved to the destination.  When a split count is given, the
-only stack that might be merged is the one already in the destination.
-To move a whole stack without having other compatible ones merge with it,
-specify a ``split'' count which matches the full stack size.
+Adjusting without a count used to collect all compatible stacks when
+moving to the destination.  That behavior has been changed; to gather
+compatible stacks, ``#adjust'' a stack into its own inventory slot.
+If it has a name assigned, other stacks with the same name or with
+no name will merge provided that all their other attributes match.
+If it does not have a name, only other stacks with no name are eligible.
+In either case, otherwise compatible stacks with a different name
+will not be merged.  This contrasts with using ``#adjust'' to move
+from one slot to a different slot.  In that situation, moving (no
+count given) a compatible stack will merge if either stack has a
+name when the other doesn't and give that name to the result, while
+splitting (count given) will ignore the source stack's name when
+deciding whether to merge with the destination stack.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the

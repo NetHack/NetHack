@@ -1464,6 +1464,12 @@ coord *tm;
         case 0:
             /* elf corpses are the rarest as they're the most useful */
             victim_mnum = PM_ELF;
+            /* elven adventurers get sleep resistance early; so don't
+               generate elf corpses on sleeping gas traps unless a)
+               we're on dlvl 2 (1 is impossible) and b) we pass a coin
+               flip */
+            if (kind == SLP_GAS_TRAP && !(lvl <= 2 && rn2(2)))
+                victim_mnum = PM_HUMAN;
             break;
         case 1: case 2:
             victim_mnum = PM_DWARF;

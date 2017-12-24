@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1463217182 2016/05/14 09:13:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1513130016 2017/12/13 01:53:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -647,6 +647,13 @@ boolean new_game; /* false => restoring an old game */
 {
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
+
+    /* skip "welcome back" if restoring a doomed character */
+    if (!new_game && Upolyd && ugenocided()) {
+        /* death via self-genocide is pending */
+        pline("You're back, but you still feel %s inside.", udeadinside());
+        return;
+    }
 
     /*
      * The "welcome back" message always describes your innate form

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1508549436 2017/10/21 01:30:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1512771130 2017/12/08 22:12:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1720,26 +1720,38 @@ domove()
                 yelp(mtmp);
             }
         }
+
+        /* seemimic/newsym should be done before moving hero, otherwise
+           the display code will draw the hero here before we possibly
+           cancel the swap below (we can ignore steed mx,my here) */
+        u.ux = u.ux0, u.uy = u.uy0;
         mtmp->mundetected = 0;
         if (mtmp->m_ap_type)
             seemimic(mtmp);
         else if (!mtmp->mtame)
             newsym(mtmp->mx, mtmp->my);
+        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
             u.ux = u.ux0, u.uy = u.uy0;
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
         } else {
             char pnambuf[BUFSZ];
@@ -1836,7 +1848,8 @@ domove()
     if (Punished) /* put back ball and chain */
         move_bc(0, bc_control, ballx, bally, chainx, chainy);
 
-    spoteffects(TRUE);
+    if (u.umoved)
+        spoteffects(TRUE);
 
     /* delay next move because of ball dragging */
     /* must come after we finished picking up, in spoteffects() */

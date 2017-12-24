@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1501725405 2017/08/03 01:56:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1513298759 2017/12/15 00:45:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2168,7 +2168,8 @@ static const char NEARDATA /* pline formats for insane_object() */
     ofmt0[] = "%s obj %s %s: %s",
     ofmt3[] = "%s [not null] %s %s: %s",
     /* " held by mon %p (%s)" will be appended, filled by M,mon_nam(M) */
-    mfmt1[] = "%s obj %s %s (%s)", mfmt2[] = "%s obj %s %s (%s) *not*";
+    mfmt1[] = "%s obj %s %s (%s)",
+    mfmt2[] = "%s obj %s %s (%s) *not*";
 
 /* Check all object lists for consistency. */
 void
@@ -2176,6 +2177,13 @@ obj_sanity_check()
 {
     int x, y;
     struct obj *obj;
+
+    /*
+     * TODO:
+     *  Should check whether the obj->bypass and/or obj->nomerge bits
+     *  are set.  Those are both used for temporary purposes and should
+     *  be clear between moves.
+     */
 
     objlist_sanity(fobj, OBJ_FLOOR, "floor sanity");
 
@@ -2186,12 +2194,12 @@ obj_sanity_check()
         for (y = 0; y < ROWNO; y++)
             for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
-                if (obj->where != OBJ_FLOOR || x == 0 || obj->ox != x
-                    || obj->oy != y) {
+                if (obj->where != OBJ_FLOOR || x == 0
+                    || obj->ox != x || obj->oy != y) {
                     char at_fmt[BUFSZ];
 
-                    Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>", x,
-                            y, obj->ox, obj->oy);
+                    Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
+                            x, y, obj->ox, obj->oy);
                     insane_object(obj, at_fmt, "location sanity",
                                   (struct monst *) 0);
                 }
@@ -2219,7 +2227,11 @@ obj_sanity_check()
     if (kickedobj)
         insane_object(kickedobj, ofmt3, "kickedobj sanity",
                       (struct monst *) 0);
-    /* [how about current_wand too?] */
+    /* current_wand isn't removed from invent while in use, but should
+       be Null between moves when we're called */
+    if (current_wand)
+        insane_object(current_wand, ofmt3, "current_wand sanity",
+                      (struct monst *) 0);
 }
 
 /* sanity check for objects on specified list (fobj, &c) */
