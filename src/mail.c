@@ -92,7 +92,7 @@ getmailstatus()
 {
     char *emailbox;
     if ((emailbox = nh_getenv("MAIL")) != 0) {
-        mailbox = (char *) alloc((unsigned) strlen(emailbox));
+        mailbox = (char *) alloc((unsigned) strlen(emailbox) + 1);
         Strcpy(mailbox, emailbox);
     }
     if (!mailbox) {
