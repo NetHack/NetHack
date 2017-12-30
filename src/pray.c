@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1450577672 2015/12/20 02:14:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1514593198 2017/12/30 00:19:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -265,18 +265,21 @@ worst_cursed_item()
        with taking off a ring or putting on a shield */
     if (welded(uwep) && (uright || bimanual(uwep))) { /* weapon */
         otmp = uwep;
-        /* gloves come next, due to rings */
+    /* gloves come next, due to rings */
     } else if (uarmg && uarmg->cursed) { /* gloves */
         otmp = uarmg;
-        /* then shield due to two handed weapons and spells */
+    /* then shield due to two handed weapons and spells */
     } else if (uarms && uarms->cursed) { /* shield */
         otmp = uarms;
-        /* then cloak due to body armor */
+    /* then cloak due to body armor */
     } else if (uarmc && uarmc->cursed) { /* cloak */
         otmp = uarmc;
     } else if (uarm && uarm->cursed) { /* suit */
         otmp = uarm;
-    } else if (uarmh && uarmh->cursed) { /* helmet */
+    /* if worn helmet of opposite alignment is making you an adherent
+       of the current god, he/she/it won't uncurse that for you */
+    } else if (uarmh && uarmh->cursed /* helmet */
+               && uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT) {
         otmp = uarmh;
     } else if (uarmf && uarmf->cursed) { /* boots */
         otmp = uarmf;
@@ -290,13 +293,13 @@ worst_cursed_item()
         otmp = uright;
     } else if (ublindf && ublindf->cursed) { /* eyewear */
         otmp = ublindf; /* must be non-blinding lenses */
-        /* if weapon wasn't handled above, do it now */
+    /* if weapon wasn't handled above, do it now */
     } else if (welded(uwep)) { /* weapon */
         otmp = uwep;
-        /* active secondary weapon even though it isn't welded */
+    /* active secondary weapon even though it isn't welded */
     } else if (uswapwep && uswapwep->cursed && u.twoweap) {
         otmp = uswapwep;
-        /* all worn items ought to be handled by now */
+    /* all worn items ought to be handled by now */
     } else {
         for (otmp = invent; otmp; otmp = otmp->nobj) {
             if (!otmp->cursed)
@@ -336,9 +339,7 @@ int trouble;
         break;
     case TROUBLE_LAVA:
         You("are back on solid ground.");
-        /* teleport should always succeed, but if not,
-         * just untrap them.
-         */
+        /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(FALSE))
             u.utrap = 0;
         break;
@@ -386,8 +387,7 @@ int trouble;
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
                     what = leftglow;
-            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
-                       != 0) {
+            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uright)
                     what = rightglow;
             }
@@ -1070,7 +1070,9 @@ aligntyp g_align;
             else
                 You("are surrounded by %s aura.", an(hcolor(NH_LIGHT_BLUE)));
             for (otmp = invent; otmp; otmp = otmp->nobj) {
-                if (otmp->cursed) {
+                if (otmp->cursed
+                    && (otmp != uarmh /* [see worst_cursed_item()] */
+                        || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
                     if (!Blind) {
                         pline("%s %s.", Yobjnam2(otmp, "softly glow"),
                               hcolor(NH_AMBER));
