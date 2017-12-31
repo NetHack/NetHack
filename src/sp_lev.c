@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1513879435 2017/12/21 18:03:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1514720301 2017/12/31 11:38:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1593,7 +1593,7 @@ struct mkroom *croom;
          * eventually be expanded.
          */
         if (m->appear_as.str
-            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)
+            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham >= LOW_PM)
             && !Protection_from_shape_changers) {
             int i;
 
