@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1514720301 2017/12/31 11:38:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1514769572 2018/01/01 01:19:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1589,11 +1589,14 @@ struct mkroom *croom;
             mtmp = christen_monst(mtmp, m->name.str);
 
         /*
-         * This is currently hardwired for mimics only.  It should
-         * eventually be expanded.
+         * This doesn't complain if an attempt is made to give a
+         * non-mimic/non-shapechanger an appearance or to give a
+         * shapechanger a non-monster shape, it just refuses to comply.
          */
         if (m->appear_as.str
-            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham >= LOW_PM)
+            && ((mtmp->data->mlet == S_MIMIC)
+                /* shapechanger (chameleons, et al, and vampires) */
+                || (mtmp->cham >= LOW_PM && m->appear == M_AP_MONSTER))
             && !Protection_from_shape_changers) {
             int i;
 
@@ -1658,7 +1661,29 @@ struct mkroom *croom;
                     mndx = select_newcham_form(mtmp);
                 else
                     mndx = name_to_mon(m->appear_as.str);
-                if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
+
+                if (mndx == NON_PM || (is_vampshifter(mtmp)
+                                       && !validvamp(mtmp, &mndx, S_HUMAN))) {
+                    impossible("create_monster: invalid %s (\"%s\")",
+                               (mtmp->data->mlet == S_MIMIC)
+                                 ? "mimic appearance"
+                                 : (mtmp->data == &mons[PM_WIZARD_OF_YENDOR])
+                                     ? "Wizard appearance"
+                                     : is_vampshifter(mtmp)
+                                         ? "vampire shape"
+                                         : "chameleon shape",
+                               m->appear_as.str);
+                } else if (&mons[mndx] == mtmp->data) {
+                    /* explicitly forcing a mimic to appear as itself */
+                    mtmp->m_ap_type = M_AP_NOTHING;
+                    mtmp->mappearance = 0;
+                } else if (mtmp->data->mlet == S_MIMIC
+                           || mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) {
+                    /* this is ordinarily only used for Wizard clones
+                       and hasn't been exhaustively tested for mimics */
+                    mtmp->m_ap_type = M_AP_MONSTER;
+                    mtmp->mappearance = mndx;
+                } else { /* chameleon or vampire */
                     struct permonst *mdat = &mons[mndx];
                     struct permonst *olddata = mtmp->data;
 
