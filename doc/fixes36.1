@@ -498,6 +498,11 @@ if a special level specified the appearance of a mimic and mimics had been
 	genocided prior to creating the level, whatever random monster took
 	the mimic's place got its intended appearance
 redundant "hit by gush of water" message if poly'd into iron golem or gremlin
+a shop object stolen from outside the shop (via grappling hook) would be left
+	marked as 'unpaid' after the shop robbery took place, resulting in
+	"unpaid_cost: object wasn't on any bill" when looking at inventory
+a shop object stolen from outside the shop could trigger a crash if that shop
+	had never been entered by the hero
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
