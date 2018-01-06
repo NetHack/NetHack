@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1508827590 2017/10/24 06:46:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1514071158 2017/12/23 23:19:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -48,7 +48,42 @@ struct flag {
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
+    /* The story so far:
+     * 'sortloot' originally took a True/False value but was changed
+     * to use a letter instead.  3.6.0 was released without changing its
+     * type from 'boolean' to 'char'.  A compiler was smart enough to
+     * complain that assigning any of the relevant letters was not 0 or 1
+     * so not appropriate for boolean (by a configuration which used
+     * SKIP_BOOLEAN to bypass nethack's 'boolean' and use a C++-compatible
+     * one).  So the type was changed to 'xchar', which is guaranteed to
+     * match the size of 'boolean' (this guarantee only applies for the
+     * !SKIP_BOOLEAN config, unfortunately).  Since xchar does not match
+     * actual use, the type was later changed to 'char'.  But that would
+     * break 3.6.0 savefile compatibility for configurations which typedef
+     * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
+     * systems that use unsigned characters without a way to force them
+     * to be signed.)  So, the type has been changed back to 'xchar' for
+     * 3.6.1.
+     *
+     * TODO:  change to 'char' (and move out of this block of booleans,
+     * and get rid of these comments...) once 3.6.0 savefile compatibility
+     * eventually ends.
+     */
+#ifndef SKIP_BOOLEAN
+    /* this is the normal configuration; assigning a character constant
+       for a normal letter to an 'xchar' variable should always work even
+       if 'char' is unsigned since character constants are actually 'int'
+       and letters are within the range where signedness shouldn't matter */
+    xchar   sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+#else
+    /* with SKIP_BOOLEAN, we have no idea what underlying type is being
+       used, other than it isn't 'xchar' (although its size might match
+       that) or a bitfield (because it must be directly addressable);
+       it's probably either 'char' for compactness or 'int' for access,
+       but we don't know which and it might be something else anyway;
+       flip a coin here and guess 'char' for compactness */
     char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+#endif
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */

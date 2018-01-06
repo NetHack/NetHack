@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1494107206 2017/05/06 21:46:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.278 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1514855666 2018/01/02 01:14:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1103,7 +1103,7 @@ unsigned trflags;
             if (uarmc)
                 (void) water_damage(uarmc, cloak_simple_name(uarmc), TRUE);
             else if (uarm)
-                (void) water_damage(uarm, "armor", TRUE);
+                (void) water_damage(uarm, suit_simple_name(uarm), TRUE);
             else if (uarmu)
                 (void) water_damage(uarmu, "shirt", TRUE);
         }
@@ -1112,11 +1112,9 @@ unsigned trflags;
         if (u.umonnum == PM_IRON_GOLEM) {
             int dam = u.mhmax;
 
-            pline("%s you!", A_gush_of_water_hits);
             You("are covered with rust!");
             losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
         } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
-            pline("%s you!", A_gush_of_water_hits);
             (void) split_mon(&youmonst, (struct monst *) 0);
         }
 
@@ -2292,7 +2290,8 @@ register struct monst *mtmp;
                     (void) water_damage(target, cloak_simple_name(target),
                                         TRUE);
                 else if ((target = which_armor(mtmp, W_ARM)) != 0)
-                    (void) water_damage(target, "armor", TRUE);
+                    (void) water_damage(target, suit_simple_name(target),
+                                        TRUE);
                 else if ((target = which_armor(mtmp, W_ARMU)) != 0)
                     (void) water_damage(target, "shirt", TRUE);
             }

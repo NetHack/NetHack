@@ -490,6 +490,19 @@ if a fiery monster, wand of fire, or fiery explosion burned up a paper golem,
 	it could still leave blank scrolls
 hero poly'd into paper or straw golem reverts to human if burned up even when
 	Unchanging without any explanation given
+hero polymorphed into form which can't wear armor via 'W' (eliciting "don't
+	even bother") could wear it via 'P'
+make multi-shot missiles fired by monsters be less verbose when they miss
+can no longer play controlled notes on musical instrument if impaired
+if a special level specified the appearance of a mimic and mimics had been
+	genocided prior to creating the level, whatever random monster took
+	the mimic's place got its intended appearance
+redundant "hit by gush of water" message if poly'd into iron golem or gremlin
+a shop object stolen from outside the shop (via grappling hook) would be left
+	marked as 'unpaid' after the shop robbery took place, resulting in
+	"unpaid_cost: object wasn't on any bill" when looking at inventory
+a shop object stolen from outside the shop could trigger a crash if that shop
+	had never been entered by the hero
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -735,11 +748,14 @@ Master Key of Thievery always finds door and chest traps if used to lock or
 	blessed (for non-rogues); player is offered the opportunity to disarm
 "Elbereth" must now be the only engraved text on a square to function
 "Elbereth" now erodes based on attacks by the player, not monsters scared
-option herecmd_menu to make a mouse click on your character pop up
+add option herecmd_menu to make a mouse click on your character pop up
 	a context menu, and extended command #herecmdmenu to do the same
 change #adjust's behavior when collecting compatible stacks; that used to
 	occur for any #adjust which lacked a split count, now it only happens
 	when 'adjusting' into a stack's own inventory slot
+a prayer result which results in uncursing some or all of the hero's items
+	won't uncurse a worn helm of opposite alignment since that would
+	facilitate the hero switching to another god by taking it off
 
 
 Platform- and/or Interface-Specific New Features

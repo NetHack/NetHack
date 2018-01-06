@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1452660194 2016/01/13 04:43:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1514504228 2017/12/28 23:37:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,7 @@
  * This file contains the different functions designed to manipulate the
  * musical instruments and their various effects.
  *
- * Actually the list of instruments / effects is :
+ * The list of instruments / effects is :
  *
  * (wooden) flute       may calm snakes if player has enough dexterity
  * magic flute          may put monsters to sleep:  area of effect depends
@@ -450,8 +450,7 @@ STATIC_OVL int
 do_improvisation(instr)
 struct obj *instr;
 {
-    int damage, do_spec = !Confusion;
-#if defined(MAC) || defined(AMIGA) || defined(VPIX_MUSIC) || defined(PCMUSIC)
+    int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
 
     itmp = *instr;
@@ -476,23 +475,55 @@ struct obj *instr;
 #ifdef PCMUSIC
     pc_speaker(&itmp, "C");
 #endif
-#endif /* MAC || AMIGA || VPIX_MUSIC || PCMUSIC */
 
-    if (!do_spec)
+#define PLAY_NORMAL   0
+#define PLAY_STUNNED  1
+#define PLAY_CONFUSED 2
+#define PLAY_HALLU    4
+    mode = PLAY_NORMAL;
+    if (Stunned)
+        mode |= PLAY_STUNNED;
+    if (Confusion)
+        mode |= PLAY_CONFUSED;
+    if (Hallucination)
+        mode |= PLAY_HALLU;
+
+    switch (mode) {
+    case PLAY_NORMAL:
+        You("start playing %s.", yname(instr));
+        break;
+    case PLAY_STUNNED:
+        You("produce an obnoxious droning sound.");
+        break;
+    case PLAY_CONFUSED:
+        You("produce a raucous noise.");
+        break;
+    case PLAY_HALLU:
+        You("produce a kaleidoscopic display of floating butterfiles.");
+        break;
+    /* TODO? give some or all of these combinations their own feedback;
+       hallucination ones should reference senses other than hearing... */
+    case PLAY_STUNNED | PLAY_CONFUSED:
+    case PLAY_STUNNED | PLAY_HALLU:
+    case PLAY_CONFUSED | PLAY_HALLU:
+    case PLAY_STUNNED | PLAY_CONFUSED | PLAY_HALLU:
+    default:
         pline("What you produce is quite far from music...");
-    else
-        You("start playing %s.", the(xname(instr)));
+        break;
+    }
+#undef PLAY_NORMAL
+#undef PLAY_STUNNED
+#undef PLAY_CONFUSED
+#undef PLAY_HALLU
 
-    switch (instr->otyp) {
+    switch (itmp.otyp) { /* note: itmp.otyp might differ from instr->otyp */
     case MAGIC_FLUTE: /* Make monster fall asleep */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
-            You("produce %s music.", Hallucination ? "piped" : "soft");
-            put_monsters_to_sleep(u.ulevel * 5);
-            exercise(A_DEX, TRUE);
-            break;
-        }              /* else FALLTHRU */
+        You("produce %s music.", Hallucination ? "piped" : "soft");
+        put_monsters_to_sleep(u.ulevel * 5);
+        exercise(A_DEX, TRUE);
+        break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
@@ -502,66 +533,59 @@ struct obj *instr;
         break;
     case FIRE_HORN:  /* Idem wand of fire */
     case FROST_HORN: /* Idem wand of cold */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
-            if (!getdir((char *) 0)) {
-                pline("%s.", Tobjnam(instr, "vibrate"));
-                break;
-            } else if (!u.dx && !u.dy && !u.dz) {
-                if ((damage = zapyourself(instr, TRUE)) != 0) {
-                    char buf[BUFSZ];
-
-                    Sprintf(buf, "using a magical horn on %sself", uhim());
-                    losehp(damage, buf, KILLED_BY); /* fire or frost damage */
-                }
-            } else {
-                buzz((instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1,
-                     rn1(6, 6), u.ux, u.uy, u.dx, u.dy);
-            }
-            makeknown(instr->otyp);
+        if (!getdir((char *) 0)) {
+            pline("%s.", Tobjnam(instr, "vibrate"));
             break;
-        }             /* else FALLTHRU */
+        } else if (!u.dx && !u.dy && !u.dz) {
+            if ((damage = zapyourself(instr, TRUE)) != 0) {
+                char buf[BUFSZ];
+
+                Sprintf(buf, "using a magical horn on %sself", uhim());
+                losehp(damage, buf, KILLED_BY); /* fire or frost damage */
+            }
+        } else {
+            buzz((instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1,
+                 rn1(6, 6), u.ux, u.uy, u.dx, u.dy);
+        }
+        makeknown(instr->otyp);
+        break;
     case TOOLED_HORN: /* Awaken or scare monsters */
         You("produce a frightful, grave sound.");
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
-        You("extract a loud noise from %s.", the(xname(instr)));
+        You("extract a loud noise from %s.", yname(instr));
         awaken_soldiers(&youmonst);
         exercise(A_WIS, FALSE);
         break;
     case MAGIC_HARP: /* Charm monsters */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
-            pline("%s very attractive music.", Tobjnam(instr, "produce"));
-            charm_monsters((u.ulevel - 1) / 3 + 1);
-            exercise(A_DEX, TRUE);
-            break;
-        }             /* else FALLTHRU */
+        pline("%s very attractive music.", Tobjnam(instr, "produce"));
+        charm_monsters((u.ulevel - 1) / 3 + 1);
+        exercise(A_DEX, TRUE);
+        break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-        pline("%s %s.", The(xname(instr)),
+        pline("%s %s.", Yname2(instr),
               do_spec ? "produces a lilting melody" : "twangs");
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
         break;
     case DRUM_OF_EARTHQUAKE: /* create several pits */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
-            You("produce a heavy, thunderous rolling!");
-            pline_The("entire %s is shaking around you!",
-                      generic_lvl_desc());
-            do_earthquake((u.ulevel - 1) / 3 + 1);
-            /* shake up monsters in a much larger radius... */
-            awaken_monsters(ROWNO * COLNO);
-            makeknown(DRUM_OF_EARTHQUAKE);
-            break;
-        }              /* else FALLTHRU */
+        You("produce a heavy, thunderous rolling!");
+        pline_The("entire %s is shaking around you!", generic_lvl_desc());
+        do_earthquake((u.ulevel - 1) / 3 + 1);
+        /* shake up monsters in a much larger radius... */
+        awaken_monsters(ROWNO * COLNO);
+        makeknown(DRUM_OF_EARTHQUAKE);
+        break;
     case LEATHER_DRUM: /* Awaken monsters */
         You("beat a deafening row!");
         awaken_monsters(u.ulevel * 40);
@@ -571,7 +595,7 @@ struct obj *instr;
         break;
     default:
         impossible("What a weird instrument (%d)!", instr->otyp);
-        break;
+        return 0;
     }
     return 2; /* That takes time */
 }
@@ -598,11 +622,13 @@ struct obj *instr;
         You("are incapable of playing %s.", the(distant_name(instr, xname)));
         return 0;
     }
-    if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE) {
+    if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE
+        && !(Stunned || Confusion || Hallucination)) {
         c = ynq("Improvise?");
         if (c == 'q')
             goto nevermind;
     }
+
     if (c == 'n') {
         if (u.uevent.uheard_tune == 2)
             c = ynq("Play the passtune?");
