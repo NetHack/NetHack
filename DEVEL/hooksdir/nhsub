@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # nhsub
-# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
+# $NHDT-Date: 1515274284 2018/01/06 21:31:24 $
 
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
@@ -496,7 +496,7 @@ Do not write any files.
 Force, version 1:  
 Perform substitution even if the file has not changed,
 except no dot files are processed unless listed directly on the command line.
-This prevents accidents with editor temprorary files while recursing.  Note
+This prevents accidents with editor temporary files while recursing.  Note
 that this overloads the C<-f> option of C<git add> and C<git commit>.
 
 =item C<-F>
