@@ -3430,12 +3430,16 @@ boolean force;
             pline("Water gets into your %s!", ostr);
 
         water_damage_chain(obj->cobj, FALSE);
-        return ER_NOTHING;
+        return ER_DAMAGED; /* contents were damaged */
     } else if (obj->otyp == OILSKIN_SACK) {
         if (carried(obj))
             pline("Some water slides right off your %s.", ostr);
         makeknown(OILSKIN_SACK);
-        return ER_NOTHING;
+        /* not actually damaged, but because we /didn't/ get the "water
+           gets into!" message, the player now has more information and
+           thus we need to waste any potion they may have used (also,
+           flavourwise the water is now on the floor) */
+        return ER_DAMAGED;
     } else if (!force && (Luck + 5) > rn2(20)) {
         /*  chance per item of sustaining damage:
             *   max luck:               10%
