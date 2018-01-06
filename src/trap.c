@@ -3431,6 +3431,11 @@ boolean force;
 
         water_damage_chain(obj->cobj, FALSE);
         return ER_NOTHING;
+    } else if (obj->otyp == OILSKIN_SACK) {
+        if (carried(obj))
+            pline("Some water slides right off your %s.", ostr);
+        makeknown(OILSKIN_SACK);
+        return ER_NOTHING;
     } else if (!force && (Luck + 5) > rn2(20)) {
         /*  chance per item of sustaining damage:
             *   max luck:               10%
