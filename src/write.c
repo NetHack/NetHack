@@ -87,7 +87,15 @@ struct obj *objlist;
     return FALSE;
 }
 
-static NEARDATA const char write_on[] = { SCROLL_CLASS, SPBOOK_CLASS, 0 };
+STATIC_OVL int
+write_ok(obj)
+struct obj *obj;
+{
+    if (obj &&
+        (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS))
+        return 2;
+    return 0;
+}
 
 /* write -- applying a magic marker */
 int
@@ -115,7 +123,7 @@ register struct obj *pen;
     }
 
     /* get paper to write on */
-    paper = getobj(write_on, "write on");
+    paper = getobj("write on", write_ok, FALSE, FALSE);
     if (!paper)
         return 0;
     /* can't write on a novel (unless/until it's been converted into a blank

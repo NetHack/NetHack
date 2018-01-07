@@ -56,18 +56,6 @@ char msgbuf[BUFSZ];
 #define nonrotting_food(otyp) \
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
-STATIC_OVL NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
-STATIC_OVL NEARDATA const char offerfodder[] = { FOOD_CLASS, AMULET_CLASS,
-                                                 0 };
-
-/* Gold must come first for getobj(). */
-STATIC_OVL NEARDATA const char allobj[] = {
-    COIN_CLASS,   WEAPON_CLASS, ARMOR_CLASS,  POTION_CLASS,
-    SCROLL_CLASS, WAND_CLASS,   RING_CLASS,   AMULET_CLASS,
-    FOOD_CLASS,   TOOL_CLASS,   GEM_CLASS,    ROCK_CLASS,
-    BALL_CLASS,   CHAIN_CLASS,  SPBOOK_CLASS, 0
-};
-
 STATIC_OVL boolean force_save_hs = FALSE;
 
 /* see hunger states in hack.h - texts used on bottom line */
@@ -78,35 +66,56 @@ const char *hu_stat[] = { "Satiated", "        ", "Hungry  ", "Weak    ",
  * Decide whether a particular object can be eaten by the possibly
  * polymorphed character.  Not used for monster checks.
  */
-boolean
+int
 is_edible(obj)
 register struct obj *obj;
 {
+    if (!obj)
+        return 0;
+
+    if (obj == &zeroobj) {
+        struct trap *ttmp = t_at(u.ux, u.uy);
+        if (!ttmp || !ttmp->tseen || ttmp->ttyp != BEAR_TRAP)
+            return 0;
+
+        if (!metallivorous(youmonst.data))
+            return 0;
+
+        return 2;
+    }
+
+    if (!obj)
+        return 0;
+
     /* protect invocation tools but not Rider corpses (handled elsewhere)*/
     /* if (obj->oclass != FOOD_CLASS && obj_resists(obj, 0, 0)) */
     if (objects[obj->otyp].oc_unique)
-        return FALSE;
+        return 0;
     /* above also prevents the Amulet from being eaten, so we must never
        allow fake amulets to be eaten either [which is already the case] */
 
     if (metallivorous(youmonst.data) && is_metallic(obj)
         && (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
-        return TRUE;
+        return 2;
 
     /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
-    if (u.umonnum == PM_GHOUL)
-        return (boolean)((obj->otyp == CORPSE
-                          && !vegan(&mons[obj->corpsenm]))
-                         || (obj->otyp == EGG));
+    if (u.umonnum == PM_GHOUL) {
+        if ((obj->otyp == CORPSE && !vegan(&mons[obj->corpsenm])) ||
+            obj->otyp == EGG)
+            return 2;
+        return 0;
+    }
 
     if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj)
         /* [g.cubes can eat containers and retain all contents
             as engulfed items, but poly'd player can't do that] */
         && !Has_contents(obj))
-        return TRUE;
+        return 2;
 
-    /* return (boolean) !!index(comestibles, obj->oclass); */
-    return (boolean) (obj->oclass == FOOD_CLASS);
+    if (obj->oclass == FOOD_CLASS)
+        return 2;
+
+    return 0;
 }
 
 void
@@ -2684,6 +2693,16 @@ doeat()
     return 1;
 }
 
+STATIC_OVL int
+is_tin(obj)
+struct obj *obj;
+{
+    if (obj && obj->otyp == TIN)
+        return 2;
+
+    return 0;
+}
+
 int
 use_tin_opener(obj)
 struct obj *obj;
@@ -2709,7 +2728,7 @@ struct obj *obj;
         res = 1;
     }
 
-    otmp = getobj(comestibles, "open");
+    otmp = getobj("open", is_tin, FALSE, FALSE);
     if (!otmp)
         return res;
 
@@ -3045,6 +3064,47 @@ boolean incr;
     }
 }
 
+STATIC_OVL int
+corpse_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass != FOOD_CLASS)
+        return 0;
+
+    if (obj->otyp == CORPSE)
+        return 2;
+
+    return 1; /* allow the user to try, but discourage it */
+}
+
+STATIC_OVL int
+offer_ok(obj)
+struct obj *obj;
+{
+    if (!obj || (obj->oclass != FOOD_CLASS && obj->oclass != AMULET_CLASS))
+        return 0;
+
+    if (obj->oclass == AMULET_CLASS &&
+        (obj->otyp == AMULET_OF_YENDOR ||
+         (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known)))
+        return 2;
+
+    return corpse_ok(obj);
+}
+
+STATIC_OVL int
+tin_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass != FOOD_CLASS)
+        return 0;
+
+    if (tinnable(obj))
+        return 2;
+
+    return corpse_ok(obj);
+}
+
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
  */
@@ -3059,93 +3119,45 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     boolean feeding = !strcmp(verb, "eat"),    /* corpsecheck==0 */
         offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
-    /* if we can't touch floor objects then use invent food only */
+    boolean floor_ok = TRUE;
     if (iflags.menu_requested /* command was preceded by 'm' prefix */
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
             && (Wwalking || is_clinger(youmonst.data)
                 || (Flying && !Breathless))))
-        goto skipfloor;
+        floor_ok = FALSE;
 
-    if (feeding && metallivorous(youmonst.data)) {
-        struct obj *gold;
-        struct trap *ttmp = t_at(u.ux, u.uy);
-
-        if (ttmp && ttmp->tseen && ttmp->ttyp == BEAR_TRAP) {
-            /* If not already stuck in the trap, perhaps there should
-               be a chance to becoming trapped?  Probably not, because
-               then the trap would just get eaten on the _next_ turn... */
-            Sprintf(qbuf, "There is a bear trap here (%s); eat it?",
-                    (u.utrap && u.utraptype == TT_BEARTRAP) ? "holding you"
-                                                            : "armed");
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
-                u.utrap = u.utraptype = 0;
-                deltrap(ttmp);
-                return mksobj(BEARTRAP, TRUE, FALSE);
-            } else if (c == 'q') {
-                return (struct obj *) 0;
-            }
-        }
-
-        if (youmonst.data != &mons[PM_RUST_MONSTER]
-            && (gold = g_at(u.ux, u.uy)) != 0) {
-            if (gold->quan == 1L)
-                Sprintf(qbuf, "There is 1 gold piece here; eat it?");
-            else
-                Sprintf(qbuf, "There are %ld gold pieces here; eat them?",
-                        gold->quan);
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
-                return gold;
-            } else if (c == 'q') {
-                return (struct obj *) 0;
-            }
-        }
+    if (feeding)
+        otmp = getobj(verb, is_edible, FALSE, floor_ok);
+    else if (offering)
+        otmp = getobj(verb, offer_ok, FALSE, floor_ok);
+    else if (corpsecheck == 1)
+        otmp = getobj(verb, corpse_ok, FALSE, floor_ok);
+    else if (corpsecheck == 2)
+        otmp = getobj(verb, tin_ok, FALSE, floor_ok);
+    else {
+        impossible("floorfood: unknown request (%s)", verb);
+        return NULL;
     }
 
-    /* Is there some food (probably a heavy corpse) here on the ground? */
-    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
-        if (corpsecheck
-                ? (otmp->otyp == CORPSE
-                   && (corpsecheck == 1 || tinnable(otmp)))
-                : feeding ? (otmp->oclass != COIN_CLASS && is_edible(otmp))
-                          : otmp->oclass == FOOD_CLASS) {
-            char qsfx[QBUFSZ];
-            boolean one = (otmp->quan == 1L);
-
-            /* if blind and without gloves, attempting to eat (or tin or
-               offer) a cockatrice corpse is fatal before asking whether
-               or not to use it; otherwise, 'm<dir>' followed by 'e' could
-               be used to locate cockatrice corpses without touching them */
-            if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
-                feel_cockatrice(otmp, FALSE);
-                /* if life-saved (or poly'd into stone golem), terminate
-                   attempt to eat off floor */
-                return (struct obj *) 0;
-            }
-            /* "There is <an object> here; <verb> it?" or
-               "There are <N objects> here; <verb> one?" */
-            Sprintf(qbuf, "There %s ", otense(otmp, "are"));
-            Sprintf(qsfx, " here; %s %s?", verb, one ? "it" : "one");
-            (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
-                             one ? something : (const char *) "things");
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y')
-                return  otmp;
-            else if (c == 'q')
-                return (struct obj *) 0;
+    if (otmp == &zeroobj) { /* trap */
+        struct trap *trap = t_at(u.ux, u.uy);
+        if (!trap) {
+            impossible("Eating non-trap dungeon feature?");
+            return NULL;
         }
+
+        u.utrap = u.utraptype = 0;
+        deltrap(trap);
+        return mksobj(BEARTRAP, TRUE, FALSE);
     }
 
-skipfloor:
-    /* We cannot use ALL_CLASSES since that causes getobj() to skip its
-     * "ugly checks" and we need to check for inedible items.
-     */
-    otmp = getobj(feeding ? allobj : offering ? offerfodder : comestibles,
-                  verb);
-    if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
-        if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
-            You_cant("%s that!", verb);
-            return (struct obj *) 0;
-        }
+    if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS) &&
+        (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp)))) {
+        You_cant("%s that!", verb);
+        return NULL;
+    }
+
     return otmp;
 }
 

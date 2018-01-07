@@ -19,15 +19,29 @@ STATIC_DCL boolean FDECL(toss_up, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj * obj));
 STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t, int, int));
 
-static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
-                                           ALL_CLASSES, WEAPON_CLASS, 0 };
-/* different default choices when wielding a sling (gold must be included) */
-static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
-                                         GEM_CLASS, 0 };
-
 /* thrownobj (decl.c) tracks an object until it lands */
 
 extern boolean notonhead; /* for long worms */
+
+STATIC_OVL int
+throw_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj == &zeroobj)
+        return 0;
+
+    if (obj && obj->quan == 1 &&
+        (obj == uwep || (obj == uswapwep && u.twoweap)))
+        return 1;
+
+    if (!obj || obj->oclass == WEAPON_CLASS || obj->oclass == COIN_CLASS)
+        return 2;
+
+    if (uslinging() && obj->oclass == GEM_CLASS)
+        return 2;
+
+    return 1;
+}
 
 /* Throw the selected object, asking for direction */
 STATIC_OVL int
@@ -275,7 +289,11 @@ dothrow()
     if (!ok_to_throw(&shotlimit))
         return 0;
 
-    obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+    /* Removed: forbidding the user to select a count for throwing non-gold.
+       Removed to allow users to use both "t3a" and "3ta" for the same effect.
+       This check was in getobj beforehand, not here. */
+    obj = getobj("throw", throw_ok, TRUE, FALSE);
+
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
@@ -377,7 +395,7 @@ dofire()
         /* if autoquiver is disabled or has failed, prompt for missile;
            fill quiver with it if it's not wielded */
         if (!obj) {
-            obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+            obj = getobj("throw", throw_ok, TRUE, FALSE);
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
                 setuqwep(obj); /* demi-autoquiver */

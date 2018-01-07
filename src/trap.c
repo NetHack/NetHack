@@ -4069,9 +4069,25 @@ struct trap *ttmp;
     return 1;
 }
 
-/* getobj will filter down to cans of grease and known potions of oil */
-static NEARDATA const char oil[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
-                                     0 };
+STATIC_OVL int
+oil_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return 0;
+
+    if (obj->otyp == CAN_OF_GREASE)
+        return 2;
+
+    if (obj->otyp == POT_OIL && obj->dknown &&
+        objects[POT_OIL].oc_name_known)
+        return 2;
+
+    if (obj->oclass == POTION_CLASS)
+        return 1; /* let players try any potion, but don't encourage it */
+
+    return 0;
+}
 
 /* it may not make much sense to use grease on floor boards, but so what? */
 STATIC_OVL int
@@ -4082,7 +4098,7 @@ struct trap *ttmp;
     boolean bad_tool;
     int fails;
 
-    obj = getobj(oil, "untrap with");
+    obj = getobj("untrap with", oil_ok, FALSE, FALSE);
     if (!obj)
         return 0;
 

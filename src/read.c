@@ -13,9 +13,22 @@
 
 boolean known;
 
-static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
-                                          SPBOOK_CLASS, 0 };
-static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
+/* Allow reading anything (except bare hands), but only encourage scrolls and
+   books.
+   TODO: arguably we want to allow reading the floor, but with !menustyle:full,
+   this would get annoying quick... */
+STATIC_OVL int
+readable(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return 0;
+
+    if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
+        return 2;
+
+    return 1;
+}
 
 STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
 STATIC_DCL char * FDECL(erode_obj_text, (struct obj *, char *));
@@ -177,7 +190,7 @@ doread()
     known = FALSE;
     if (check_capacity((char *) 0))
         return 0;
-    scroll = getobj(readable, "read");
+    scroll = getobj("read", readable, FALSE, FALSE);
     if (!scroll)
         return 0;
 
@@ -414,23 +427,26 @@ register const char *color;
 
 /* Is the object chargeable?  For purposes of inventory display; it is
    possible to be able to charge things for which this returns FALSE. */
-boolean
+int
 is_chargeable(obj)
 struct obj *obj;
 {
+    if (!obj || obj == &zeroobj)
+        return 0;
+
     if (obj->oclass == WAND_CLASS)
-        return TRUE;
+        return 2;
+
     /* known && !oc_name_known is possible after amnesia/mind flayer */
-    if (obj->oclass == RING_CLASS)
-        return (boolean) (objects[obj->otyp].oc_charged
-                          && (obj->known
-                              || (obj->dknown
-                                  && objects[obj->otyp].oc_name_known)));
-    if (is_weptool(obj)) /* specific check before general tools */
-        return FALSE;
-    if (obj->oclass == TOOL_CLASS)
-        return (boolean) objects[obj->otyp].oc_charged;
-    return FALSE; /* why are weapons/armor considered charged anyway? */
+    if (obj->oclass == RING_CLASS && objects[obj->otyp].oc_charged &&
+        (obj->known || (!obj->dknown && objects[obj->otyp].oc_name_known)))
+        return 2;
+
+    if (obj->oclass == TOOL_CLASS && !is_weptool(obj) &&
+        objects[obj->otyp].oc_charged)
+        return 2;
+
+    return 1;
 }
 
 /* recharge an object; curse_bless is -1 if the recharging implement
@@ -1505,7 +1521,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
            was already delivered */
         useup(sobj);
         sobj = 0; /* it's gone */
-        otmp = getobj(all_count, "charge");
+        otmp = getobj("charge", is_chargeable, TRUE, FALSE);
         if (otmp)
             recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
         break;

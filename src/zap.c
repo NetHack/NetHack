@@ -2135,7 +2135,14 @@ struct obj *otmp;
     useup(otmp);
 }
 
-static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
+STATIC_OVL int
+zap_ok(obj)
+struct obj *obj;
+{
+    if (obj && obj->oclass == WAND_CLASS)
+        return 2;
+    return 0;
+}
 
 /* 'z' command (or 'y' if numbed_pad==-1) */
 int
@@ -2146,7 +2153,7 @@ dozap()
 
     if (check_capacity((char *) 0))
         return 0;
-    obj = getobj(zap_syms, "zap");
+    obj = getobj("zap", zap_ok, FALSE, FALSE);
     if (!obj)
         return 0;
 

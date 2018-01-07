@@ -273,14 +273,16 @@ enum hmon_atkmode_types {
 #define ALL_FINISHED 0x01 /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE 0x1       /* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x2 /* if only 1 object, don't ask */
-#define USE_INVLET 0x4        /* use object's invlet */
-#define INVORDER_SORT 0x8     /* sort objects by packorder */
-#define SIGNAL_NOMENU 0x10    /* return -1 rather than 0 if none allowed */
-#define SIGNAL_ESCAPE 0x20    /* return -2 rather than 0 for ESC */
-#define FEEL_COCKATRICE 0x40  /* engage cockatrice checks and react */
-#define INCLUDE_HERO 0x80     /* show hero among engulfer's inventory */
+#define BY_NEXTHERE 0x1        /* follow objlist by nexthere field */
+#define AUTOSELECT_SINGLE 0x2  /* if only 1 object, don't ask */
+#define USE_INVLET 0x4         /* use object's invlet */
+#define INVORDER_SORT 0x8      /* sort objects by packorder */
+#define SIGNAL_NOMENU 0x10     /* return -1 rather than 0 if none allowed */
+#define SIGNAL_ESCAPE 0x20     /* return -2 rather than 0 for ESC */
+#define FEEL_COCKATRICE 0x40   /* engage cockatrice checks and react */
+#define INCLUDE_HERO 0x80      /* show hero among engulfer's inventory */
+#define HIDE_DISCOURAGED 0x100 /* only show objects where allow() returns 2 */
+#define INCLUDE_FEATURE  0x200 /* include dungeon features */
 
 /* Flags to control query_category() */
 /* BY_NEXTHERE used by query_category() too, so skip 0x01 */

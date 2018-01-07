@@ -240,16 +240,41 @@ register struct obj *obj;
 
 /*** Commands to change particular slot(s) ***/
 
-static NEARDATA const char wield_objs[] = {
-    ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0
-};
-static NEARDATA const char ready_objs[] = {
-    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0
-};
-static NEARDATA const char bullets[] = { /* (note: different from dothrow.c) */
-    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE,
-    GEM_CLASS, WEAPON_CLASS, 0
-};
+STATIC_OVL int
+wield_ok(obj)
+struct obj *obj;
+{
+    if (obj == &zeroobj)
+        return 0;
+
+    if (!obj || obj->oclass == WEAPON_CLASS ||
+        (obj->oclass == TOOL_CLASS && is_weptool(obj)))
+        return 2;
+
+    return 1;
+}
+
+STATIC_OVL int
+ready_ok(obj)
+struct obj *obj;
+{
+    if (obj == &zeroobj)
+        return 0;
+
+    if (obj && obj->quan == 1 &&
+        (obj == uwep || (obj == uswapwep && u.twoweap)))
+        return 1;
+
+    if (!obj || obj->oclass == WEAPON_CLASS || obj->oclass == COIN_CLASS)
+        return 2;
+
+    if ((uslinging() || (uswapwep &&
+                         objects[uswapwep->otyp].oc_skill == P_SLING)) &&
+        obj->oclass == GEM_CLASS)
+        return 2;
+
+    return 1;
+}
 
 int
 dowield()
@@ -265,7 +290,7 @@ dowield()
     }
 
     /* Prompt for a new weapon */
-    if (!(wep = getobj(wield_objs, "wield")))
+    if (!(wep = getobj("wield", wield_ok, TRUE, FALSE)))
         /* Cancelled */
         return 0;
     else if (wep == uwep) {
@@ -364,12 +389,7 @@ dowieldquiver()
     /* Prompt for a new quiver: "What do you want to ready?"
        (Include gems/stones as likely candidates if either primary
        or secondary weapon is a sling.) */
-    quivee_types = (uslinging()
-                    || (uswapwep
-                        && objects[uswapwep->otyp].oc_skill == P_SLING))
-                   ? bullets
-                   : ready_objs;
-    newquiver = getobj(quivee_types, "ready");
+    newquiver = getobj("ready", ready_ok, TRUE, FALSE);
 
     if (!newquiver) {
         /* Cancelled */

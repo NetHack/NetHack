@@ -7,7 +7,6 @@
 boolean notonhead = FALSE;
 
 static NEARDATA int nothing, unkn;
-static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
 STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long, int));
@@ -440,6 +439,46 @@ ghost_from_bottle()
     nomovemsg = "You regain your composure.";
 }
 
+STATIC_OVL int
+drinkable(obj)
+struct obj *obj;
+{
+    if (obj && obj->oclass == POTION_CLASS && obj->where == OBJ_INVENT)
+        return 2;
+
+    if (obj == &zeroobj && can_reach_floor(FALSE) &&
+        (IS_FOUNTAIN(levl[u.ux][u.uy].typ) ||
+         IS_SINK(levl[u.ux][u.uy].typ)))
+        return 2;
+
+    return 0;
+}
+
+STATIC_OVL int
+dip_ok(obj)
+struct obj *obj;
+{
+    if (obj == &zeroobj) {
+        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
+            return 2;
+
+        if (Levitation ||
+            (u.usteed && !is_swimmer(u.usteed->data) &&
+             P_SKILL(P_RIDING) < P_BASIC))
+            return 0;
+
+        if (is_pool(u.ux, u.uy))
+            return 2;
+
+        return 0;
+    }
+
+    if (obj && obj->oclass == POTION_CLASS && obj->where == OBJ_INVENT)
+        return 2;
+
+    return 0;
+}
+
 /* "Quaffing is like drinking, except you spill more." - Terry Pratchett */
 int
 dodrink()
@@ -451,25 +490,8 @@ dodrink()
         pline("If you can't breathe air, how can you drink liquid?");
         return 0;
     }
-    /* Is there a fountain to drink from here? */
-    if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
-        /* not as low as floor level but similar restrictions apply */
-        && can_reach_floor(FALSE)) {
-        if (yn("Drink from the fountain?") == 'y') {
-            drinkfountain();
-            return 1;
-        }
-    }
-    /* Or a kitchen sink? */
-    if (IS_SINK(levl[u.ux][u.uy].typ)
-        /* not as low as floor level but similar restrictions apply */
-        && can_reach_floor(FALSE)) {
-        if (yn("Drink from the sink?") == 'y') {
-            drinksink();
-            return 1;
-        }
-    }
-    /* Or are you surrounded by water? */
+
+    /* Are you surrounded by water? */
     if (Underwater && !u.uswallow) {
         if (yn("Drink the water around you?") == 'y') {
             pline("Do you know what lives in this water?");
@@ -477,9 +499,26 @@ dodrink()
         }
     }
 
-    otmp = getobj(beverages, "drink");
+    otmp = getobj("drink from", drinkable, FALSE, TRUE);
     if (!otmp)
         return 0;
+
+    if (otmp == &zeroobj) {
+        /* Is there a fountain to drink from here? */
+        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+            drinkfountain();
+            return 1;
+        }
+
+        /* Or a kitchen sink? */
+        if (IS_SINK(levl[u.ux][u.uy].typ)) {
+            drinksink();
+            return 1;
+        }
+
+        impossible("bad zeroobj drink?");
+        return 0;
+    }
 
     /* quan > 1 used to be left to useup(), but we need to force
        the current potion to be unworn, and don't want to do
@@ -1837,61 +1876,34 @@ dodip()
 
     allowall[0] = ALL_CLASSES;
     allowall[1] = '\0';
-    if (!(obj = getobj(allowall, "dip")))
+    if (!(obj = getobj("dip", allow_any_obj, FALSE, FALSE)))
         return 0;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
     shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
-    /*
-     * Bypass safe_qbuf() since it doesn't handle varying suffix without
-     * an awful lot of support work.  Format the object once, even though
-     * the fountain and pool prompts offer a lot more room for it.
-     * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
-     * of buffer overflow but drew bug reports because it omits user-
-     * supplied type name.
-     * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
-     */
-    Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
-                             /* 128 - (24 + 54 + 1) leaves 49 for <object> */
-                             QBUFSZ - sizeof "What do you want to dip \
- into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+    /* "What do you want to dip <the object> into? [xyz or ?*] " */
+    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
+    potion = getobj(qbuf, dip_ok, FALSE, TRUE);
 
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
-    if (IS_FOUNTAIN(here)) {
-        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
-                flags.verbose ? obuf : shortestname);
-        /* "Dip <the object> into the fountain?" */
-        if (yn(qbuf) == 'y') {
+    if (potion == &zeroobj) {
+        if (IS_FOUNTAIN(here)) {
             dipfountain(obj);
             return 1;
-        }
-    } else if (is_pool(u.ux, u.uy)) {
-        const char *pooltype = waterbody_name(u.ux, u.uy);
-
-        Sprintf(qbuf, "%s%s into the %s?", Dip_,
-                flags.verbose ? obuf : shortestname, pooltype);
-        /* "Dip <the object> into the {pool, moat, &c}?" */
-        if (yn(qbuf) == 'y') {
-            if (Levitation) {
-                floating_above(pooltype);
-            } else if (u.usteed && !is_swimmer(u.usteed->data)
-                       && P_SKILL(P_RIDING) < P_BASIC) {
-                rider_cant_reach(); /* not skilled enough to reach */
-            } else {
-                if (obj->otyp == POT_ACID)
-                    obj->in_use = 1;
-                if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
-                    useup(obj);
-            }
+        } else if (is_pool(u.ux, u.uy)) {
+            if (obj->otyp == POT_ACID)
+                obj->in_use = 1;
+            if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
+                useup(obj);
             return 1;
-        }
+        } else
+            impossible("bad zeroobj dip?");
+
+        return 0;
     }
 
-    /* "What do you want to dip <the object> into? [xyz or ?*] " */
-    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
-    potion = getobj(beverages, qbuf);
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {

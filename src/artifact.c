@@ -1385,9 +1385,25 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     return FALSE;
 }
 
-static NEARDATA const char recharge_type[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
-static NEARDATA const char invoke_types[] = { ALL_CLASSES, 0 };
-/* #invoke: an "ugly check" filters out most objects */
+STATIC_OVL int
+invocable(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return 0;
+
+    if (obj->oartifact || objects[obj->otyp].oc_unique ||
+        (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known) ||
+        obj->otyp == CRYSTAL_BALL || obj->otyp == MIRROR ||
+        obj->otyp == MAGIC_LAMP ||
+        (obj->otyp == OIL_LAMP && !objects[OIL_LAMP].oc_name_known))
+        return 2;
+
+    if (obj->otyp == FAKE_AMULET_OF_YENDOR || obj->otyp == OIL_LAMP)
+        return 1;
+
+    return 0;
+}
 
 /* the #invoke command */
 int
@@ -1395,7 +1411,7 @@ doinvoke()
 {
     struct obj *obj;
 
-    obj = getobj(invoke_types, "invoke");
+    obj = getobj("invoke", invocable, FALSE, FALSE);
     if (!obj)
         return 0;
     if (!retouch_object(&obj, FALSE))
@@ -1489,7 +1505,7 @@ struct obj *obj;
             break;
         }
         case CHARGE_OBJ: {
-            struct obj *otmp = getobj(recharge_type, "charge");
+            struct obj *otmp = getobj("charge", is_chargeable, TRUE, FALSE);
             boolean b_effect;
 
             if (!otmp) {

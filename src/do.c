@@ -20,18 +20,15 @@ STATIC_DCL void NDECL(final_level);
 
 extern int n_dgns; /* number of dungeons, from dungeon.c */
 
-static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
-                                            ALL_CLASSES, 0 };
-
 /* 'd' command: drop one inventory item */
 int
 dodrop()
 {
-    int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
+    int result;
 
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
-    result = drop(getobj(&drop_types[i], "drop"));
+    result = drop(getobj("drop", allow_any_obj, TRUE, FALSE));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
     if (result)
@@ -526,10 +523,6 @@ const char *word;
         /* getobj() kludge sets corpsenm to user's specified count
            when refusing to split a stack of cursed loadstones */
         if (*word) {
-            /* getobj() ignores a count for throwing since that is
-               implicitly forced to be 1; replicate its kludge... */
-            if (!strcmp(word, "throw") && obj->quan > 1L)
-                obj->corpsenm = 1;
             pline("For some reason, you cannot %s%s the stone%s!", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
         }
@@ -837,7 +830,7 @@ int retry;
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &invent,
                           (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
-                          all_categories ? allow_all : allow_category);
+                          all_categories ? allow_any_obj : allow_category);
         if (n > 0) {
             /*
              * picklist[] contains a set of pointers into inventory, but

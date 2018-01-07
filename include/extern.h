@@ -633,7 +633,7 @@ E int NDECL(opentin);
 E int NDECL(unfaint);
 #endif
 E void NDECL(eatmupdate);
-E boolean FDECL(is_edible, (struct obj *));
+E int FDECL(is_edible, (struct obj *));
 E void NDECL(init_uhunger);
 E int NDECL(Hear_again);
 E void NDECL(reset_eat);
@@ -962,7 +962,11 @@ E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int, int));
 E boolean FDECL(splittable, (struct obj *));
-E struct obj *FDECL(getobj, (const char *, const char *));
+E int FDECL(allow_floor, (struct obj *));
+E int FDECL(allow_any_obj, (struct obj *));
+E int FDECL(allow_any, (struct obj *));
+E struct obj *FDECL(getobj, (const char *, int (*)(OBJ_P), BOOLEAN_P,
+                             BOOLEAN_P));
 E int FDECL(ggetobj, (const char *, int (*)(OBJ_P), int,
                       BOOLEAN_P, unsigned *));
 E int FDECL(askchain, (struct obj **, const char *, int, int (*)(OBJ_P),
@@ -1654,7 +1658,7 @@ E boolean FDECL(erosion_matters, (struct obj *));
 E char *FDECL(doname, (struct obj *));
 E char *FDECL(doname_with_price, (struct obj *));
 E char *FDECL(doname_vague_quan, (struct obj *));
-E boolean FDECL(not_fully_identified, (struct obj *));
+E int FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *, const char *, unsigned));
 E char *FDECL(cxname, (struct obj *));
 E char *FDECL(cxname_singular, (struct obj *));
@@ -1812,8 +1816,7 @@ E int FDECL(collect_obj_classes, (char *, struct obj *, BOOLEAN_P,
 E boolean FDECL(rider_corpse_revival, (struct obj *, BOOLEAN_P));
 E boolean FDECL(menu_class_present, (int));
 E void FDECL(add_valid_menu_class, (int));
-E boolean FDECL(allow_all, (struct obj *));
-E boolean FDECL(allow_category, (struct obj *));
+E int FDECL(allow_category, (struct obj *));
 E boolean FDECL(is_worn_by_type, (struct obj *));
 E int FDECL(ck_bag, (struct obj *));
 #ifdef USE_TRAMPOLI
@@ -1825,7 +1828,7 @@ E int FDECL(pickup_object, (struct obj *, long, BOOLEAN_P));
 E int FDECL(query_category, (const char *, struct obj *, int,
                              menu_item **, int));
 E int FDECL(query_objlist, (const char *, struct obj **, int,
-                            menu_item **, int, boolean (*)(OBJ_P)));
+                            menu_item **, int, int (*)(OBJ_P)));
 E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
 E int FDECL(container_at, (int, int, BOOLEAN_P));
@@ -2000,7 +2003,7 @@ E long NDECL(random);
 E void FDECL(learnscroll, (struct obj *));
 E char *FDECL(tshirt_text, (struct obj *, char *));
 E int NDECL(doread);
-E boolean FDECL(is_chargeable, (struct obj *));
+E int FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *, int));
 E void FDECL(forget_objects, (int));
 E void FDECL(forget_levels, (int));

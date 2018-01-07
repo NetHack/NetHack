@@ -1256,14 +1256,15 @@ struct obj *obj;
     return doname_base(obj, DONAME_VAGUE_QUAN);
 }
 
-/* used from invent.c */
-boolean
+/* used from invent.c with query_objlist */
+int
 not_fully_identified(otmp)
 struct obj *otmp;
 {
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS)
-        return FALSE; /* always fully ID'd */
+        return 0; /* always fully ID'd */
+
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown
 #ifdef MAIL
@@ -1272,12 +1273,12 @@ struct obj *otmp;
         || !otmp->bknown
 #endif
         || !objects[otmp->otyp].oc_name_known)
-        return TRUE;
+        return 2;
     if ((!otmp->cknown && (Is_container(otmp) || otmp->otyp == STATUE))
         || (!otmp->lknown && Is_box(otmp)))
-        return TRUE;
+        return 2;
     if (otmp->oartifact && undiscovered_artifact(otmp->oartifact))
-        return TRUE;
+        return 2;
     /* otmp->rknown is the only item of interest if we reach here */
     /*
      *  Note:  if a revision ever allows scrolls to become fireproof or
@@ -1288,10 +1289,11 @@ struct obj *otmp;
         || (otmp->oclass != ARMOR_CLASS && otmp->oclass != WEAPON_CLASS
             && !is_weptool(otmp)            /* (redundant) */
             && otmp->oclass != BALL_CLASS)) /* (useless) */
-        return FALSE;
-    else /* lack of `rknown' only matters for vulnerable objects */
-        return (boolean) (is_rustprone(otmp) || is_corrodeable(otmp)
-                          || is_flammable(otmp));
+        return 0;
+    else if (is_rustprone(otmp) || is_corrodeable(otmp) ||
+             is_flammable(otmp))
+        return 2;
+    return 0;
 }
 
 /* format a corpse name (xname() omits monster type; doname() calls us);

@@ -1301,6 +1301,19 @@ static NEARDATA const char callable[] = {
     GEM_CLASS,    SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0
 };
 
+STATIC_OVL int
+call_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj == &zeroobj)
+        return 0;
+
+    if (objtyp_is_callable(obj->otyp))
+        return 2;
+
+    return 1;
+}
+
 boolean
 objtyp_is_callable(i)
 int i;
@@ -1318,7 +1331,7 @@ docallcmd()
     winid win;
     anything any;
     menu_item *pick_list = 0;
-    char ch, allowall[2];
+    char ch;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
 
@@ -1363,14 +1376,12 @@ docallcmd()
         do_mname();
         break;
     case 'i': /* name an individual object in inventory */
-        allowall[0] = ALL_CLASSES;
-        allowall[1] = '\0';
-        obj = getobj(allowall, "name");
+        obj = getobj("name", allow_any_obj, FALSE, FALSE);
         if (obj)
             do_oname(obj);
         break;
     case 'o': /* name a type of object in inventory */
-        obj = getobj(callable, "call");
+        obj = getobj("call", call_ok, FALSE, FALSE);
         if (obj) {
             /* behave as if examining it in inventory;
                this might set dknown if it was picked up

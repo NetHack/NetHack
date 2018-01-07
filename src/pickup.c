@@ -16,10 +16,10 @@ STATIC_DCL boolean FDECL(query_classes, (char *, boolean *, boolean *,
                                          BOOLEAN_P, int *));
 STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
-STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
-STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
+STATIC_DCL int FDECL(n_or_more, (struct obj *));
+STATIC_DCL int FDECL(all_but_uchain, (struct obj *));
 #if 0 /* not used */
-STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
+STATIC_DCL int FDECL(allow_cat_no_uchain, (struct obj *));
 #endif
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
@@ -327,13 +327,15 @@ boolean picked_some;
 static long val_for_n_or_more;
 
 /* query_objlist callback: return TRUE if obj's count is >= reference value */
-STATIC_OVL boolean
+STATIC_OVL int
 n_or_more(obj)
 struct obj *obj;
 {
     if (obj == uchain)
-        return FALSE;
-    return (boolean) (obj->quan >= val_for_n_or_more);
+        return 0;
+    if (obj->quan >= val_for_n_or_more)
+        return 2;
+    return 0;
 }
 
 /* list of valid menu classes for query_objlist() and allow_category callback
@@ -380,23 +382,16 @@ int c;
 }
 
 /* query_objlist callback: return TRUE if not uchain */
-STATIC_OVL boolean
+STATIC_OVL int
 all_but_uchain(obj)
 struct obj *obj;
 {
-    return (boolean) (obj != uchain);
+    if (obj && obj != uchain)
+        return 2;
+    return 0;
 }
 
-/* query_objlist callback: return TRUE */
-/*ARGUSED*/
-boolean
-allow_all(obj)
-struct obj *obj UNUSED;
-{
-    return TRUE;
-}
-
-boolean
+int
 allow_category(obj)
 struct obj *obj;
 {
@@ -406,15 +401,18 @@ struct obj *obj;
      * If no class filtering is specified but bless/curse state is,
      * coins are either unknown or uncursed based on an option setting.
      */
-    if (obj->oclass == COIN_CLASS)
-        return class_filter
-                 ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
-                 : shop_filter /* coins are never unpaid, but check anyway */
-                    ? (obj->unpaid ? TRUE : FALSE)
-                    : bucx_filter
-                       ? (index(valid_menu_classes, iflags.goldX ? 'X' : 'U')
-                          ? TRUE : FALSE)
-                       : TRUE; /* catchall: no filters specified, so accept */
+    if (obj->oclass == COIN_CLASS) {
+        if (class_filter
+            ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
+            : shop_filter /* coins are never unpaid, but check anyway */
+            ? (obj->unpaid ? TRUE : FALSE)
+            : bucx_filter
+            ? (index(valid_menu_classes, iflags.goldX ? 'X' : 'U')
+               ? TRUE : FALSE)
+            : TRUE) /* catchall: no filters specified, so accept */
+            return 2;
+        return 0;
+    }
 
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -438,12 +436,12 @@ struct obj *obj;
 
     /* if class is expected but obj's class is not in the list, reject */
     if (class_filter && !index(valid_menu_classes, obj->oclass))
-        return FALSE;
+        return 0;
     /* if unpaid is expected and obj isn't unpaid, reject (treat a container
        holding any unpaid object as unpaid even if isn't unpaid itself) */
     if (shop_filter && !obj->unpaid
         && !(Has_contents(obj) && count_unpaid(obj->cobj) > 0))
-        return FALSE;
+        return 0;
     /* check for particular bless/curse state */
     if (bucx_filter) {
         /* first categorize this object's bless/curse state */
@@ -452,23 +450,23 @@ struct obj *obj;
 
         /* if its category is not in the list, reject */
         if (!index(valid_menu_classes, bucx))
-            return FALSE;
+            return 0;
     }
     /* obj didn't fail any of the filter checks, so accept */
-    return TRUE;
+    return 2;
 }
 
 #if 0 /* not used */
 /* query_objlist callback: return TRUE if valid category (class), no uchain */
-STATIC_OVL boolean
+STATIC_OVL int
 allow_cat_no_uchain(obj)
 struct obj *obj;
 {
     if (obj != uchain
         && ((index(valid_menu_classes, 'u') && obj->unpaid)
             || index(valid_menu_classes, obj->oclass)))
-        return TRUE;
-    return FALSE;
+        return 2;
+    return 0;
 }
 #endif
 
@@ -644,7 +642,7 @@ int what; /* should be a long */
                     traverse_how |= INVORDER_SORT;
                 n = query_objlist("Pick up what?", objchain_p, traverse_how,
                                   &pick_list, PICK_ANY,
-                                  (via_menu == -2) ? allow_all
+                                  (via_menu == -2) ? allow_any_obj
                                                    : allow_category);
                 goto menu_pickup;
             }
@@ -830,6 +828,8 @@ menu_item **pick_list; /* list of objects and counts to pick up */
  *      SIGNAL_ESCAPE     - Return -1 rather than 0 if player uses ESC to
  *                          pick nothing.
  *      FEEL_COCKATRICE   - touch corpse.
+ *      HIDE_DISCOURAGED  - hides allowed but discouraged items
+ *      INCLUDE_FEATURE   - if allow() allows it, include dungeon features
  */
 int
 query_objlist(qstr, olist_p, qflags, pick_list, how, allow)
@@ -838,31 +838,37 @@ struct obj **olist_p;             /* the list to pick from */
 int qflags;                       /* options to control the query */
 menu_item **pick_list;            /* return list of items picked */
 int how;                          /* type of query */
-boolean FDECL((*allow), (OBJ_P)); /* allow function */
+int FDECL((*allow), (OBJ_P));     /* allow function */
 {
     int i, n;
+    int allowmin = 1;
+    if (qflags & HIDE_DISCOURAGED)
+        allowmin = 2;
     winid win;
-    struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
+    struct obj *curr, *last, *olist = *olist_p;
     char *pack;
     anything any;
     boolean printed_type_name, first,
-            sorted = (qflags & INVORDER_SORT) != 0,
-            engulfer = (qflags & INCLUDE_HERO) != 0;
+        sorted = (qflags & INVORDER_SORT) != 0,
+        engulfer = (qflags & INCLUDE_HERO) != 0;
+    boolean feature;
+    feature = ((qflags & INCLUDE_FEATURE) && (*allow)(&zeroobj) >= allowmin);
 
     *pick_list = (menu_item *) 0;
-    if (!olist && !engulfer)
+    if (!olist && !engulfer && !feature)
         return 0;
 
     /* count the number of items allowed */
     for (n = 0, last = 0, curr = olist; curr; curr = FOLLOW(curr, qflags))
-        if ((*allow)(curr)) {
+        if ((*allow)(curr) >= allowmin) {
             last = curr;
             n++;
         }
-    if (engulfer) {
+    if (engulfer || feature) {
         ++n;
         /* don't autoselect swallowed hero if it's the only choice */
-        qflags &= ~AUTOSELECT_SINGLE;
+        if (engulfer)
+            qflags &= ~AUTOSELECT_SINGLE;
     }
 
     if (n == 0) /* nothing to pick here */
@@ -908,7 +914,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 (void) look_here(0, FALSE);
                 return 0;
             }
-            if ((*allow)(curr)) {
+            if ((*allow)(curr) >= allowmin) {
                 /* if sorting, print type name (once only) */
                 if (sorted && !printed_type_name) {
                     any = zeroany;
@@ -932,23 +938,37 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         pack++;
     } while (sorted && *pack);
 
-    if (engulfer) {
+    if (engulfer || feature) {
         char buf[BUFSZ];
+        struct trap *trap = t_at(u.ux, u.uy);
 
         any = zeroany;
         if (sorted && n > 1) {
-            Sprintf(buf, "%s Creatures",
-                    is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
+            if (engulfer)
+                Sprintf(buf, "%s Creatures",
+                        is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
+            else if (trap)
+                Strcpy(buf, "Traps");
+            else
+                Strcpy(buf, "Dungeon Features");
+
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
                      MENU_UNSELECTED);
         }
-        fake_hero_object = zeroobj;
-        fake_hero_object.quan = 1L; /* not strictly necessary... */
-        any.a_obj = &fake_hero_object;
-        add_menu(win, mon_to_glyph(&youmonst), &any,
-                 /* fake inventory letter, no group accelerator */
-                 CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
-                 MENU_UNSELECTED);
+        any.a_obj = &zeroobj;
+        if (engulfer)
+            add_menu(win, mon_to_glyph(&youmonst), &any,
+                     /* fake inventory letter, no group accelerator */
+                     CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
+                     MENU_UNSELECTED);
+        else {
+            int sym = back_to_glyph(u.ux, u.uy);
+            if (trap)
+                sym = trap_to_defsym(what_trap(trap->ttyp));
+            add_menu(win, cmap_to_glyph(sym), &any,
+                     0, 0, ATR_NONE, an(defsyms[sym].explanation),
+                     MENU_UNSELECTED);
+        }
     }
 
     end_menu(win, qstr);
@@ -960,23 +980,27 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         int k;
 
         /* fix up counts:  -1 means no count used => pick all;
-           if fake_hero_object was picked, discard that choice */
+           if zeroobj was picked if engulfed, discard that choice */
         for (i = k = 0, mi = *pick_list; i < n; i++, mi++) {
-            if (mi->item.a_obj == &fake_hero_object)
-                continue;
-            if (mi->count == -1L || mi->count > mi->item.a_obj->quan)
+            /* for zeroobj, only allow counts of 0 and 1 */
+            if (mi->item.a_obj == &zeroobj) {
+                if (engulfer)
+                    continue;
+                if (mi->count)
+                    mi->count = 1;
+            } else if (mi->count == -1L || mi->count > mi->item.a_obj->quan)
                 mi->count = mi->item.a_obj->quan;
             if (k < i)
                 (*pick_list)[k] = *mi;
             ++k;
         }
         if (!k) {
-            /* fake_hero was only choice so discard whole list */
+            /* zeroobj was only choice so discard whole list */
             free((genericptr_t) *pick_list);
             *pick_list = 0;
             n = 0;
         } else if (k < n) {
-            /* other stuff plus fake_hero; last slot is now unused */
+            /* other stuff plus zeroobj; last slot is now unused */
             (*pick_list)[k].item = zeroany;
             (*pick_list)[k].count = 0L;
             n = k;
@@ -2204,7 +2228,13 @@ int
 ck_bag(obj)
 struct obj *obj;
 {
-    return (current_container && obj != current_container);
+    if (current_container && obj != current_container)
+        return 2;
+
+    if (current_container)
+        return 1; /* keep the topological exercise YAFM */
+
+    return 0;
 }
 
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
@@ -2595,8 +2625,10 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
             used |= (menu_loot(0, TRUE) > 0);
         add_valid_menu_class(0);
     } else if (stash_one) {
-        /* put one item into container */
-        if ((otmp = getobj(stashable, "stash")) != 0) {
+        /* Put one item into the container.
+           Currently, we only allow inventory items. Maybe we should also allow
+           floor items? */
+        if ((otmp = getobj("stash", ck_bag, FALSE, FALSE)) != 0) {
             if (in_container(otmp)) {
                 used = 1;
             } else {
@@ -2736,7 +2768,7 @@ boolean put_in;
         Sprintf(buf, "%s what?", action);
         n = query_objlist(buf, put_in ? &invent : &(current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
-                          all_categories ? allow_all : allow_category);
+                          all_categories ? allow_any_obj : allow_category);
         if (n) {
             n_looted = n;
             for (i = 0; i < n; i++) {
@@ -2843,7 +2875,28 @@ boolean outokay, inokay, alreadyused, more_containers;
     return (n == 0 && more_containers) ? 'n' : 'q'; /* next or quit */
 }
 
-static const char tippables[] = { ALL_CLASSES, TOOL_CLASS, 0 };
+STATIC_OVL int
+tip_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj == &zeroobj)
+        return 0;
+
+    if (Is_container(obj))
+        return 2;
+
+    /* only allow containers on the floor */
+    if (obj->where != OBJ_INVENT)
+        return 0;
+
+    /* also encourage known horns of plenty. */
+    if (obj->otyp == HORN_OF_PLENTY && obj->dknown &&
+        objects[obj->otyp].oc_name_known)
+        return 2;
+
+    /* allow trying anything else in inventory */
+    return 1;
+}
 
 /* #tip command -- empty container contents onto floor */
 int
@@ -2863,87 +2916,7 @@ dotip()
     /* at present, can only tip things at current spot, not adjacent ones */
     cc.x = u.ux, cc.y = u.uy;
 
-    /* check floor container(s) first; at most one will be accessed */
-    if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
-        Sprintf(buf, "You can't tip %s while carrying so much.",
-                !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
-        if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-            if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
-                              || iflags.menu_requested)) {
-                /* use menu to pick a container to tip */
-                int n, i;
-                winid win;
-                anything any;
-                menu_item *pick_list = (menu_item *) 0;
-                struct obj dummyobj, *otmp;
-
-                any = zeroany;
-                win = create_nhwindow(NHW_MENU);
-                start_menu(win);
-
-                for (cobj = level.objects[cc.x][cc.y], i = 0; cobj;
-                     cobj = cobj->nexthere)
-                    if (Is_container(cobj)) {
-                        ++i;
-                        any.a_obj = cobj;
-                        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                                 doname(cobj), MENU_UNSELECTED);
-                    }
-                if (invent) {
-                    any = zeroany;
-                    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                             "", MENU_UNSELECTED);
-                    any.a_obj = &dummyobj;
-                    /* use 'i' for inventory unless there are so many
-                       containers that it's already being used */
-                    i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
-                    add_menu(win, NO_GLYPH, &any, i, 0, ATR_NONE,
-                             "tip something being carried", MENU_SELECTED);
-                }
-                end_menu(win, "Tip which container?");
-                n = select_menu(win, PICK_ONE, &pick_list);
-                destroy_nhwindow(win);
-                /*
-                 * Deal with quirk of preselected item in pick-one menu:
-                 * n ==  0 => picked preselected entry, toggling it off;
-                 * n ==  1 => accepted preselected choice via SPACE or RETURN;
-                 * n ==  2 => picked something other than preselected entry;
-                 * n == -1 => cancelled via ESC;
-                 */
-                otmp = (n <= 0) ? (struct obj *) 0 : pick_list[0].item.a_obj;
-                if (n > 1 && otmp == &dummyobj)
-                    otmp = pick_list[1].item.a_obj;
-                if (pick_list)
-                    free((genericptr_t) pick_list);
-                if (otmp && otmp != &dummyobj) {
-                    tipcontainer(otmp);
-                    return 1;
-                }
-                if (n == -1)
-                    return 0;
-                /* else pick-from-invent below */
-            } else {
-                for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
-                    nobj = cobj->nexthere;
-                    if (!Is_container(cobj))
-                        continue;
-                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
-                                      cobj,
-                                      doname, ansimpleoname, "container"));
-                    if (c == 'q')
-                        return 0;
-                    if (c == 'n')
-                        continue;
-                    tipcontainer(cobj);
-                    /* can only tip one container at a time */
-                    return 1;
-                }
-            }
-        }
-    }
-
-    /* either no floor container(s) or couldn't tip one or didn't tip any */
-    cobj = getobj(tippables, "tip");
+    cobj = getobj("tip5", tip_ok, FALSE, TRUE);
     if (!cobj)
         return 0;
 

@@ -426,10 +426,19 @@ freehand()
             || (!bimanual(uwep) && (!uarms || !uarms->cursed)));
 }
 
-static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
-                                          TOOL_CLASS,  WEAPON_CLASS,
-                                          WAND_CLASS,  GEM_CLASS,
-                                          RING_CLASS,  0 };
+STATIC_OVL int
+stylus(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass == TOOL_CLASS || obj->oclass == WEAPON_CLASS ||
+        obj->oclass == WAND_CLASS || obj->oclass == GEM_CLASS ||
+        obj->oclass == RING_CLASS)
+        return 2;
+
+    if (obj != &zeroobj)
+        return 1;
+    return 0;
+}
 
 /* Mohs' Hardness Scale:
  *  1 - Talc             6 - Orthoclase
@@ -533,7 +542,7 @@ doengrave()
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
      */
 
-    otmp = getobj(styluses, "write with");
+    otmp = getobj("write with", stylus, FALSE, FALSE);
     if (!otmp) /* otmp == zeroobj if fingers */
         return 0;
 

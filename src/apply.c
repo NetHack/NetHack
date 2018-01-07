@@ -1423,10 +1423,22 @@ struct obj **optr;
 
 static NEARDATA const char cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 };
 
+STATIC_OVL int
+rub_ok(obj)
+struct obj *obj;
+{
+    if (obj &&
+        (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP ||
+         obj->otyp == BRASS_LANTERN || is_graystone(obj)))
+        return 2;
+
+    return 0;
+}
+
 int
 dorub()
 {
-    struct obj *obj = getobj(cuddly, "rub");
+    struct obj *obj = getobj("rub", rub_ok, FALSE, FALSE);
 
     if (obj && obj->oclass == GEM_CLASS) {
         if (is_graystone(obj)) {
@@ -2244,8 +2256,6 @@ struct obj **optr;
     *optr = 0;
 }
 
-static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
-
 STATIC_OVL void
 use_grease(obj)
 struct obj *obj;
@@ -2268,7 +2278,7 @@ struct obj *obj;
             dropx(obj);
             return;
         }
-        otmp = getobj(lubricables, "grease");
+        otmp = getobj("grease", allow_any, FALSE, FALSE);
         if (!otmp)
             return;
         if (inaccessible_equipment(otmp, "grease", FALSE))
@@ -2296,6 +2306,19 @@ struct obj *obj;
     update_inventory();
 }
 
+STATIC_OVL int
+touchstone_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj == &zeroobj)
+        return 0;
+
+    if (obj && (obj->oclass == COIN_CLASS || obj->oclass == GEM_CLASS))
+        return 2;
+
+    return 1;
+}
+
 /* touchstones - by Ken Arnold */
 STATIC_OVL void
 use_stone(tstone)
@@ -2306,20 +2329,20 @@ struct obj *tstone;
     const char *streak_color, *choices;
     char stonebuf[QBUFSZ];
     static const char scritch[] = "\"scritch, scritch\"";
-    static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
-    static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
 
     /* in case it was acquired while blinded */
     if (!Blind)
         tstone->dknown = 1;
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */
-    choices = (tstone->otyp == TOUCHSTONE && tstone->dknown
-               && objects[TOUCHSTONE].oc_name_known)
-                  ? coins_gems
-                  : allowall;
     Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
-    if ((obj = getobj(choices, stonebuf)) == 0)
+    if (tstone->otyp == TOUCHSTONE && tstone->dknown &&
+        objects[TOUCHSTONE].oc_name_known)
+        obj = getobj(stonebuf, touchstone_ok, FALSE, FALSE);
+    else
+        obj = getobj(stonebuf, allow_any_obj, FALSE, FALSE);
+
+    if (!obj)
         return;
 
     if (obj == tstone && obj->quan == 1L) {
@@ -3495,6 +3518,42 @@ char class_list[];
         add_class(class_list, FOOD_CLASS);
 }
 
+STATIC_OVL int
+apply_ok(obj)
+struct obj *obj;
+{
+    /* maybe we should allow triggering traps? */
+    if (!obj || obj == &zeroobj)
+        return 0;
+
+    /* allow lootables to be applied everywhere */
+    if (Is_container(obj))
+        return 2;
+
+    if (obj->where != OBJ_INVENT)
+        return 0;
+
+    if (obj->oclass == TOOL_CLASS || is_pole(obj) || is_axe(obj))
+        return 2;
+
+    if (obj->oclass == POTION_CLASS &&
+        (obj->otyp == POT_OIL || !obj->dknown ||
+         (!objects[obj->otyp].oc_name_known &&
+          !objects[POT_OIL].oc_name_known)))
+        return 2;
+
+    if (is_graystone(obj) &&
+        (obj->otyp == TOUCHSTONE || !obj->dknown ||
+         (!objects[obj->otyp].oc_name_known &&
+          !objects[TOUCHSTONE].oc_name_known)))
+        return 2;
+
+    if (obj->otyp == CREAM_PIE || obj->otyp == EUCALYPTUS_LEAF)
+        return 2;
+
+    return 1;
+}
+
 /* the 'a' command */
 int
 doapply()
@@ -3507,13 +3566,17 @@ doapply()
         return 0;
 
     setapplyclasses(class_list); /* tools[] */
-    obj = getobj(class_list, "use or apply");
+    obj = getobj("use or apply", apply_ok, TRUE, TRUE);
     if (!obj)
         return 0;
 
     if (!retouch_object(&obj, FALSE))
         return 1; /* evading your grasp costs a turn; just be
                      grateful that you don't drop it as well */
+
+    /* floor containers */
+    if (obj->where != OBJ_INVENT)
+        return use_container(&obj, 0, FALSE);
 
     if (obj->oclass == WAND_CLASS)
         return do_break_wand(obj);
