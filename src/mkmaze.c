@@ -7,6 +7,9 @@
 #include "lev.h" /* save & restore info */
 
 #define CONWAY_DEBUG
+#ifdef CONWAY_DEBUG
+static int conway_moved = 2;
+#endif
 
 /* from sp_lev.c, for fixup_special() */
 extern lev_region *lregions;
@@ -1833,12 +1836,17 @@ static void
 conway_cleanup() {
 #ifdef CONWAY_DEBUG
     paniclog("trace","conway_cleanup()");
+    if(!conway_moved){
+	panic("conway cleanup with no moves");
+    }
 #endif
     if (ls) {
 	    free(ls);
+	    ls = NULL;
     }
     if (lslev) {
 	    free(lslev);
+	    lslev = NULL;
     }
     DROPLEVEL_UNWIND(helddroplevel);
 }
@@ -1847,6 +1855,7 @@ conway_cleanup() {
 void
 conway_restore() {
 #ifdef CONWAY_DEBUG
+    conway_moved = 0;
     paniclog("trace","conway_restore()");
 #endif
     DROPLEVEL_WINDUP(conway_cleanup);
@@ -1862,12 +1871,14 @@ conway_setup() {
     int subtype = rn2(3);
     char *force = nh_getenv("SPLEVTYPE2");
 #ifdef CONWAY_DEBUG
+    if(conway_moved != 2)
+	impossible("moved != 2 in conway_setup");
     paniclog("trace","conway_setup()");
 #endif
     conway_restore();
-    if (force) {
-	    int tmp = atoi(force);
-	    if (tmp>=0 && tmp <=2)
+    if (force && *force) {
+	int tmp = atoi(force);
+	if (tmp>=0 && tmp <=2)
             subtype = tmp;
     }
     switch(subtype) {
@@ -1967,8 +1978,18 @@ void
 conway_update() {
     int x, y;
 
+#ifdef CONWAY_DEBUG
+    conway_moved = 1;
+#endif
     if (!lslev)
+#ifdef CONWAY_DEBUG
+	{
+	    impossible("DEBUG: conway update doing emergency recovery");
+	    conway_setup();
+	}
+#else
         panic("conway_update: lslev=null");
+#endif
 
 	/* Be unpredictable: Life updates about half of the time, but not on
 	alternate moves. */

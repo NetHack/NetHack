@@ -1138,6 +1138,9 @@ boolean at_stairs, falling, portal;
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
+#ifdef CONWAY
+     char need_late_reload_call = 0;
+#endif
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1211,6 +1214,10 @@ boolean at_stairs, falling, portal;
     fd = currentlevel_rewrite();
     if (fd < 0)
         return;
+#ifdef DROPLEVEL
+    /* We're now committed to the level change. */
+    if(dropleveltempsfn) (*dropleveltempsfn)();
+#endif
 
     if (falling) /* assuming this is only trap door or hole */
         impact_drop((struct obj *) 0, u.ux, u.uy, newlevel->dlevel);
@@ -1308,9 +1315,8 @@ boolean at_stairs, falling, portal;
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
 #ifdef CONWAY
-        if(level.flags.conway){
-		conway_restore();
-        }
+		/* XXX move into DROPLEVEL framework? */
+	need_late_reload_call = 1;
 #endif
     }
     reglyph_darkroom();
@@ -1553,6 +1559,15 @@ boolean at_stairs, falling, portal;
     assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
 #ifdef INSURANCE
     save_currentstate();
+#endif
+#ifdef CONWAY
+    if (need_late_reload_call){
+		/* This MUST be after save_currenstate() to prevent freeing
+		 * the state table we just allocated. */
+        if(level.flags.conway){
+	    conway_restore();
+        }
+    }
 #endif
 
     if ((annotation = get_annotation(&u.uz)) != 0)
