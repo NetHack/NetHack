@@ -351,6 +351,7 @@ E void FDECL(row_refresh, (int, int, int));
 E void NDECL(cls);
 E void FDECL(flush_screen, (int));
 E int FDECL(back_to_glyph, (XCHAR_P, XCHAR_P));
+E int FDECL(back_to_defsym, (XCHAR_P, XCHAR_P));
 E int FDECL(zapdir_to_glyph, (int, int, int));
 E int FDECL(glyph_at, (XCHAR_P, XCHAR_P));
 E void NDECL(set_wall_state);

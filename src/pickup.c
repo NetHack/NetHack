@@ -964,7 +964,7 @@ int FDECL((*allow), (OBJ_P));     /* allow function */
                      CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
                      MENU_UNSELECTED);
         else {
-            int sym = back_to_glyph(u.ux, u.uy);
+            int sym = back_to_defsym(u.ux, u.uy);
             if (trap)
                 sym = trap_to_defsym(what_trap(trap->ttyp));
             add_menu(win, cmap_to_glyph(sym), &any,

@@ -1566,6 +1566,13 @@ int
 back_to_glyph(x, y)
 xchar x, y;
 {
+    return cmap_to_glyph(back_to_defsym(x, y));
+}
+
+int
+back_to_defsym(x, y)
+xchar x, y;
+{
     int idx;
     struct rm *ptr = &(levl[x][y]);
 
@@ -1684,7 +1691,7 @@ xchar x, y;
         break;
     }
 
-    return cmap_to_glyph(idx);
+    return idx;
 }
 
 /*

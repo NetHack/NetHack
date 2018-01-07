@@ -1257,12 +1257,12 @@ boolean allow_floor;
     /* things on the floor for old-style prompts */
     if (feature && oldstyle) {
         struct trap *trap = t_at(u.ux, u.uy);
-        int sym = back_to_glyph(u.ux, u.uy);
+        int sym = back_to_defsym(u.ux, u.uy);
         if (trap)
-            sym = trap_to_glyph(trap);
+            sym = trap_to_defsym(what_trap(trap->ttyp));
 
         Sprintf(qbuf, "%s the %s?", upperwhat,
-                an(defsyms[sym].explanation));
+                defsyms[sym].explanation);
 
         c = ynq(qbuf);
         if (c == 'y')
