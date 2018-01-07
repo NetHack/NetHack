@@ -14,7 +14,7 @@ STATIC_DCL void NDECL(reorder_invent);
 STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL int FDECL(worn_wield_only, (struct obj *));
-STATIC_DCL boolean FDECL(only_here, (struct obj *));
+STATIC_DCL int FDECL(only_here, (struct obj *));
 STATIC_DCL void FDECL(compactify, (char *));
 STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
@@ -1540,13 +1540,13 @@ wearing_armor()
                       || uarmh || uarms || uarmu);
 }
 
-boolean
+int
 is_worn(otmp)
 struct obj *otmp;
 {
-    return (otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE | W_WEAPON))
-            ? TRUE
-            : FALSE;
+    if (otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE | W_WEAPON))
+        return 2;
+    return 0;
 }
 
 /* extra xprname() input that askchain() can't pass through safe_qbuf() */
@@ -1588,7 +1588,7 @@ boolean combo; /* combination menu flag */
 unsigned *resultflags;
 {
     int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    int FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    int FDECL((*ofilter), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -2456,7 +2456,7 @@ int
 count_buc(list, type, filterfunc)
 struct obj *list;
 int type;
-boolean FDECL((*filterfunc), (OBJ_P));
+int FDECL((*filterfunc), (OBJ_P));
 {
     int count = 0;
 
@@ -2723,7 +2723,7 @@ dotypeinv()
          */
         types[0] = 0;
         class_count = collect_obj_classes(types, invent, FALSE,
-                                          (boolean FDECL((*), (OBJ_P))) 0,
+                                          (int FDECL((*), (OBJ_P))) 0,
                                           &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
             types[class_count++] = ' ';
@@ -3938,11 +3938,13 @@ register struct obj *obj;
 /* query objlist callback: return TRUE if obj is at given location */
 static coord only;
 
-STATIC_OVL boolean
+STATIC_OVL int
 only_here(obj)
 struct obj *obj;
 {
-    return (obj->ox == only.x && obj->oy == only.y);
+    if (obj->ox == only.x && obj->oy == only.y)
+        return 2;
+    return 0;
 }
 
 /*

@@ -108,7 +108,7 @@ collect_obj_classes(ilets, otmp, here, filter, itemcount)
 char ilets[];
 register struct obj *otmp;
 boolean here;
-boolean FDECL((*filter), (OBJ_P));
+int FDECL((*filter), (OBJ_P));
 int *itemcount;
 {
     register int iletct = 0;
@@ -161,7 +161,7 @@ int *menu_on_demand;
     if (menu_on_demand)
         *menu_on_demand = 0;
     iletct = collect_obj_classes(ilets, objs, here,
-                                 (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
+                                 (int FDECL((*), (OBJ_P))) 0, &itemcount);
     if (iletct == 0)
         return FALSE;
 
@@ -471,11 +471,13 @@ struct obj *obj;
 #endif
 
 /* query_objlist callback: return TRUE if valid class and worn */
-boolean
+int
 is_worn_by_type(otmp)
 register struct obj *otmp;
 {
-    return (is_worn(otmp) && allow_category(otmp)) ? TRUE : FALSE;
+    if (is_worn(otmp) && allow_category(otmp))
+        return 2;
+    return 0;
 }
 
 /*
@@ -1033,7 +1035,7 @@ int how;               /* type of query */
     boolean collected_type_name;
     char invlet;
     int ccount;
-    boolean FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    int FDECL((*ofilter), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
     boolean do_unpaid = FALSE;
     boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
             do_buc_unknown = FALSE;
