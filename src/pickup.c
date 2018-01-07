@@ -39,7 +39,7 @@ STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
 STATIC_DCL int FDECL(menu_loot, (int, BOOLEAN_P));
 STATIC_DCL char FDECL(in_or_out_menu, (const char *, struct obj *, BOOLEAN_P,
                                        BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
 STATIC_DCL int FDECL(do_loot_cont, (struct obj **, int, int));
@@ -1628,14 +1628,30 @@ boolean countem;
     return container_count;
 }
 
+int
+floor_loot_ok(obj)
+struct obj *obj;
+{
+    if (Is_container(obj)) {
+        if (able_to_loot(obj->ox, obj->oy, TRUE, TRUE))
+            return 2;
+        return 1;
+    }
+    return 0;
+}
+
 STATIC_OVL boolean
-able_to_loot(x, y, looting)
+able_to_loot(x, y, looting, silent)
 int x, y;
 boolean looting; /* loot vs tip */
+boolean silent;
 {
     const char *verb = looting ? "loot" : "tip";
 
     if (!can_reach_floor(TRUE)) {
+        if (silent)
+            return FALSE;
+
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach(); /* not skilled enough to reach */
         else
@@ -1644,15 +1660,18 @@ boolean looting; /* loot vs tip */
     } else if ((is_pool(x, y) && (looting || !Underwater)) || is_lava(x, y)) {
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
-        You("cannot %s things that are deep in the %s.", verb,
-            hliquid(is_lava(x, y) ? "lava" : "water"));
+        if (!silent)
+            You("cannot %s things that are deep in the %s.", verb,
+                hliquid(is_lava(x, y) ? "lava" : "water"));
         return FALSE;
     } else if (nolimbs(youmonst.data)) {
-        pline("Without limbs, you cannot %s anything.", verb);
+        if (!silent)
+            pline("Without limbs, you cannot %s anything.", verb);
         return FALSE;
     } else if (looting && !freehand()) {
-        pline("Without a free %s, you cannot loot anything.",
-              body_part(HAND));
+        if (!silent)
+            pline("Without a free %s, you cannot loot anything.",
+                  body_part(HAND));
         return FALSE;
     }
     return TRUE;
@@ -1757,7 +1776,7 @@ doloot()
     if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
         boolean anyfound = FALSE;
 
-        if (!able_to_loot(cc.x, cc.y, TRUE))
+        if (!able_to_loot(cc.x, cc.y, TRUE, FALSE))
             return 0;
 
         if (Blind && !uarmg) {
@@ -2884,12 +2903,15 @@ struct obj *obj;
     if (!obj || obj == &zeroobj)
         return 0;
 
-    if (Is_container(obj))
-        return 2;
-
-    /* only allow containers on the floor */
-    if (obj->where != OBJ_INVENT)
+    /* floor containers */
+    if (obj->where != OBJ_INVENT) {
+        if (Is_container(obj)) {
+            if (able_to_loot(obj->ox, obj->oy, FALSE, TRUE))
+                return 2;
+            return 1;
+        }
         return 0;
+    }
 
     /* also encourage known horns of plenty. */
     if (obj->otyp == HORN_OF_PLENTY && obj->dknown &&
@@ -2918,8 +2940,11 @@ dotip()
     /* at present, can only tip things at current spot, not adjacent ones */
     cc.x = u.ux, cc.y = u.uy;
 
-    cobj = getobj("tip5", tip_ok, FALSE, TRUE);
+    cobj = getobj("tip", tip_ok, FALSE, TRUE);
     if (!cobj)
+        return 0;
+    if (cobj->where != OBJ_INVENT &&
+        !able_to_loot(cobj->ox, cobj->oy, FALSE, FALSE))
         return 0;
 
     /* normal case */

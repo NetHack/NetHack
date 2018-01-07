@@ -3527,11 +3527,8 @@ struct obj *obj;
         return 0;
 
     /* allow lootables to be applied everywhere */
-    if (Is_container(obj))
-        return 2;
-
     if (obj->where != OBJ_INVENT)
-        return 0;
+        return floor_loot_ok(obj);
 
     if (obj->oclass == TOOL_CLASS || is_pole(obj) || is_axe(obj))
         return 2;
