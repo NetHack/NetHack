@@ -1222,37 +1222,12 @@ boolean allow_floor;
         }
     }
 
-    /* add the " or ?*" part */
-    if (!*buf) {
-        if (!altinv) { /* nothing at all */
-            pline("You don't have anything to %s.", what);
-            return NULL;
-        }
-    }
-
-    if (!*buf) /* no encouraged selections */
-        Strcpy(buf, "*");
-    else if (inv) { /* encouraged inventory objects */
-        lets['?'] = TRUE;
-        Sprintf(eos(buf), " or ?*", buf);
-    } else if (altinv) /* valid (but not encouraged) inventory objects */
-        Sprintf(eos(buf), " or *", buf);
-
-    /* Yes, allow this even if !inv && !altinv. This allows use to give
-       feedback to the player as to how nothing in the inventory is a
-       valid choice. */
-    lets['*'] = TRUE;
-
-    /* Done with letter selections. */
-
     /* create an uppercase version of what, for menustyle:non-full with floor
        prompts */
     int whatlen = strlen(what);
     char upperwhat[whatlen + 1];
     Strcpy(upperwhat, what);
     *upperwhat = highc(*upperwhat);
-
-    /* done with preparing, now do the actual prompt */
 
     /* things on the floor for old-style prompts */
     if (feature && oldstyle) {
@@ -1309,6 +1284,32 @@ boolean allow_floor;
             }
         }
     }
+
+    /* add the " or ?*" part */
+    if (!*buf) {
+        if (!altinv) { /* nothing at all */
+            pline("You don't have anything%s to %s.",
+                  floor || feature ? " else" : "", what);
+            return NULL;
+        }
+    }
+
+    if (!*buf) /* no encouraged selections */
+        Strcpy(buf, "*");
+    else if (inv) { /* encouraged inventory objects */
+        lets['?'] = TRUE;
+        Sprintf(eos(buf), " or ?*", buf);
+    } else if (altinv) /* valid (but not encouraged) inventory objects */
+        Sprintf(eos(buf), " or *", buf);
+
+    /* Yes, allow this even if !inv && !altinv. This allows use to give
+       feedback to the player as to how nothing in the inventory is a
+       valid choice. */
+    lets['*'] = TRUE;
+
+    /* Done with letter selections. */
+
+    /* done with preparing, now do the actual prompt */
 
     boolean first = TRUE;
     for (;;) {
