@@ -1232,13 +1232,15 @@ boolean allow_floor;
 
     if (!*buf) /* no encouraged selections */
         Strcpy(buf, "*");
-    else if (!inv) /* only suggesting floor/bare hands */
-        Sprintf(eos(buf), " or *", buf);
-    else {
+    else if (inv) { /* encouraged inventory objects */
         lets['?'] = TRUE;
         Sprintf(eos(buf), " or ?*", buf);
-    }
+    } else if (altinv) /* valid (but not encouraged) inventory objects */
+        Sprintf(eos(buf), " or *", buf);
 
+    /* Yes, allow this even if !inv && !altinv. This allows use to give
+       feedback to the player as to how nothing in the inventory is a
+       valid choice. */
     lets['*'] = TRUE;
 
     /* Done with letter selections. */
