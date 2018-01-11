@@ -1123,7 +1123,7 @@ boolean allow_floor;
     boolean altlets[256] = {0};
     boolean invlets[256] = {0};
     char buf[BUFSZ] = "";
-    char qbuf[QBUFSZ];
+    char qbuf[QBUFSZ] = "";
     char qsfx[QBUFSZ]; /* for old-style floor prompts */
     int i, n, c;
     register char ilet;
@@ -1140,6 +1140,8 @@ boolean allow_floor;
         oldstyle = TRUE;
 
     /* inventory */
+    n = 0;
+    reorder_invent(); /* ensure it's sorted alphabetically */
     for (obj = invent; obj; obj = obj->nobj) {
         invlets[obj->invlet] = TRUE;
         c = (*obj_ok)(obj);
@@ -1147,10 +1149,13 @@ boolean allow_floor;
             altlets[obj->invlet] = TRUE;
             altinv = TRUE;
         } else if (c > 1) {
+            qbuf[n++] = obj->invlet;
             inv = TRUE;
             lets[obj->invlet] = TRUE;
         }
     }
+
+    compactify(qbuf);
 
     /* floor items */
     if (allow_floor) {
@@ -1162,9 +1167,6 @@ boolean allow_floor;
                     return NULL; /* abort, even if life saved/polymorphed */
                 }
 
-                /* we create a menu later on if user chooses ',' */
-                if (!oldstyle)
-                    lets[','] = TRUE;
                 floor = TRUE;
                 /* don't break, we want to check for trice */
             }
@@ -1172,55 +1174,29 @@ boolean allow_floor;
     }
 
     /* dungeon features */
-    if (allow_floor && (*obj_ok)(&zeroobj)) {
-        if (!oldstyle)
-            lets[','] = TRUE;
+    if (allow_floor && (*obj_ok)(&zeroobj))
         feature = TRUE;
-    }
-
-    /* nothing/bare hands */
-    if ((*obj_ok)(NULL))
-        lets[HANDS_SYM] = TRUE;
-
-    /* Set up the letter choices in the prompt. */
-    n = 0;
 
     /* non-inventory letters */
-    if (lets[HANDS_SYM])
+    n = 0;
+
+    /* nothing/bare hands */
+    if ((*obj_ok)(NULL)) {
+        lets[HANDS_SYM] = TRUE;
         buf[n++] = HANDS_SYM;
-    if (lets[','])
-        buf[n++] = ',';
-
-    /* inventory */
-    if (inv) {
-        if (n)
-            buf[n++] = ' '; /* spacing */
-
-        for (i = 0; i < 256; i++) {
-            /* we want an order of a-zA-Z, not A-Za-z */
-            c = i;
-            if ('A' <= c && c <= 'Z')
-                c = lowc(c);
-            else if ('a' <= c && c <= 'z')
-                c = highc(c);
-
-            /* these aren't inventory letters */
-            if (i == HANDS_SYM || i == ',' || i == '?' || i == '*')
-                continue;
-
-            if (!lets[c])
-                continue;
-
-            /* consolidate series of letters (abc -> a-c) */
-            if (c == 255 || !lets[c + 1])
-                buf[n++] = c; /* end, or no, series */
-            else if (!c || !lets[c - 1]) {
-                buf[n++] = c; /* beginning of potential series */
-                if (c < 254 && lets[c + 1] && lets[c + 2])
-                    buf[n++] = '-'; /* part of a series */
-            }
-        }
     }
+
+    /* floor objects/feature */
+    if (!oldstyle && (floor || feature)) {
+        lets[','] = TRUE;
+        buf[n++] = ',';
+    }
+
+    /* spacing */
+    if (n && inv)
+        buf[n++] = ' ';
+
+    Strcpy(eos(buf), qbuf);
 
     /* create an uppercase version of what, for menustyle:non-full with floor
        prompts */
