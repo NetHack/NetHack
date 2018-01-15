@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1508549438 2017/10/21 01:30:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1515144225 2018/01/05 09:23:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1495,15 +1495,30 @@ struct obj *
 pick_obj(otmp)
 struct obj *otmp;
 {
+    struct obj *result;
+    int ox = otmp->ox, oy = otmp->oy;
+    boolean robshop = (!u.uswallow && otmp != uball && costly_spot(ox, oy));
+
     obj_extract_self(otmp);
-    if (!u.uswallow && otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
+    otmp->nomerge = 1;
+    result = addinv(otmp);
+    otmp->nomerge = 0;
+    newsym(ox, oy);
+
+    /* this used to be done before addinv(), but remote_burglary()
+       calls rob_shop() which calls setpaid() after moving costs of
+       unpaid items to shop debt; setpaid() calls clear_unpaid() for
+       lots of object chains, but 'otmp' wasn't on any of those so
+       remained flagged as an unpaid item in inventory, triggering
+       impossible() every time inventory was examined... */
+    if (robshop) {
         char saveushops[5], fakeshop[2];
 
         /* addtobill cares about your location rather than the object's;
            usually they'll be the same, but not when using telekinesis
            (if ever implemented) or a grappling hook */
         Strcpy(saveushops, u.ushops);
-        fakeshop[0] = *in_rooms(otmp->ox, otmp->oy, SHOPBASE);
+        fakeshop[0] = *in_rooms(ox, oy, SHOPBASE);
         fakeshop[1] = '\0';
         Strcpy(u.ushops, fakeshop);
         /* sets obj->unpaid if necessary */
@@ -1511,10 +1526,9 @@ struct obj *otmp;
         Strcpy(u.ushops, saveushops);
         /* if you're outside the shop, make shk notice */
         if (!index(u.ushops, *fakeshop))
-            remote_burglary(otmp->ox, otmp->oy);
+            remote_burglary(ox, oy);
     }
-    newsym(otmp->ox, otmp->oy);
-    return addinv(otmp); /* might merge it with other objects */
+    return result;
 }
 
 /*

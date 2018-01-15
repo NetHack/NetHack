@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1464138042 2016/05/25 01:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1515144230 2018/01/05 09:23:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2353,6 +2353,12 @@ struct monst *shkp;
         You("got that for free!");
         return;
     }
+
+    /* normally bill_p gets set up whenever you enter the shop, but obj
+       might be going onto the bill because hero just snagged it with
+       a grappling hook from outside without ever having been inside */
+    if (!eshkp->bill_p)
+        eshkp->bill_p = &(eshkp->bill[0]);
 
     bct = eshkp->billct;
     bp = &(eshkp->bill_p[bct]);

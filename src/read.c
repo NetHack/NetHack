@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1513130018 2017/12/13 01:53:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -102,10 +102,10 @@ char *buf;
         "Go team ant!",
         "Got newt?",
         "Hello, my darlings!", /* Charlie Drake */
-        "Hey! Nymphs! Steal This T-Shirt!",
+        "Hey!  Nymphs!  Steal This T-Shirt!",
         "I <3 Dungeon of Doom",
         "I <3 Maud",
-        "I am a Valkyrie. If you see me running, try to keep up.",
+        "I am a Valkyrie.  If you see me running, try to keep up.",
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
         "Plunder Island Brimstone Beach Club", /* Monkey Island */
@@ -141,6 +141,16 @@ char *buf;
         "Pudding farmer",
         "Vegetarian",
         "Hello, I'm War!",
+        "It is better to light a candle than to curse the darkness",
+        "It is easier to curse the darkness than to light a candle",
+        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
+           Theory" although they didn't create it (and an actual T-shirt
+           with pentagonal diagram showing which choices defeat which) */
+        "rock--paper--scissors--lizard--Spock!",
+        /* "All men must die -- all men must serve" challange and response
+           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
+           TV show "Game of Thrones" (probably an actual T-shirt too...) */
+        "/Valar morghulis/ -- /Valar dohaeris/",
     };
 
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
@@ -191,7 +201,8 @@ doread()
         useup(scroll);
         return 1;
     } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
-        char buf[BUFSZ];
+        char buf[BUFSZ], *mesg;
+        const char *endpunct;
 
         if (Blind) {
             You_cant("feel any Braille writing.");
@@ -205,15 +216,25 @@ doread()
             return 0;
         }
         u.uconduct.literate++;
-        if (flags.verbose)
+        /* populate 'buf[]' */
+        mesg = (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
+                                         : apron_text(scroll, buf);
+        endpunct = "";
+        if (flags.verbose) {
+            int ln = (int) strlen(mesg);
+
+            /* we will be displaying a sentence; need ending punctuation */
+            if (ln > 0 && !index(".!?", mesg[ln - 1]))
+                endpunct = ".";
             pline("It reads:");
-        pline("\"%s\"", (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                                  : apron_text(scroll, buf));
+        }
+        pline("\"%s\"%s", mesg, endpunct);
         return 1;
     } else if (scroll->otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
             "Leprechaun Gold Tru$t - Shamrock Card",
-            "Magic Memory Vault Charge Card", "Larn National Bank", /* Larn */
+            "Magic Memory Vault Charge Card",
+            "Larn National Bank",                /* Larn */
             "First Bank of Omega",               /* Omega */
             "Bank of Zork - Frobozz Magic Card", /* Zork */
             "Ankh-Morpork Merchant's Guild Barter Card",
@@ -238,13 +259,14 @@ doread()
                       : card_msgs[scroll->o_id % (SIZE(card_msgs) - 1)]);
         }
         /* Make a credit card number */
-        pline("\"%d0%d %ld%d1 0%d%d0\"",
+        pline("\"%d0%d %ld%d1 0%d%d0\"%s",
               (((int) scroll->o_id % 89) + 10),
               ((int) scroll->o_id % 4),
               ((((long) scroll->o_id * 499L) % 899999L) + 100000L),
               ((int) scroll->o_id % 10),
               (!((int) scroll->o_id % 3)),
-              (((int) scroll->o_id * 7) % 10));
+              (((int) scroll->o_id * 7) % 10),
+              (flags.verbose || Blind) ? "." : "");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->otyp == CAN_OF_GREASE) {
@@ -257,7 +279,7 @@ doread()
         }
         if (flags.verbose)
             pline("It reads:");
-        pline("\"Magic Marker(TM) Red Ink Marker Pen. Water Soluble.\"");
+        pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oclass == COIN_CLASS) {
@@ -265,7 +287,7 @@ doread()
             You("feel the embossed words:");
         else if (flags.verbose)
             You("read:");
-        pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
+        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
@@ -291,7 +313,7 @@ doread()
             You_cant("feel any Braille writing.");
             return 0;
         }
-        pline("The wrapper reads: \"%s\"",
+        pline("The wrapper reads: \"%s\".",
               wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
         u.uconduct.literate++;
         return 1;

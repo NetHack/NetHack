@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1445622451 2015/10/23 17:47:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $
+# NetHack 3.6  macosx10.11 $NHDT-Date: 1515549543 2018/01/10 01:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -172,6 +172,7 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE

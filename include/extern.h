@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1513130012 2017/12/13 01:53:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.621 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1514769568 2018/01/01 01:19:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.622 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1400,6 +1400,7 @@ E void FDECL(restore_cham, (struct monst *));
 E boolean FDECL(hideunder, (struct monst *));
 E void FDECL(hide_monst, (struct monst *));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
+E boolean FDECL(validvamp, (struct monst *, int *, int));
 E int FDECL(select_newcham_form, (struct monst *));
 E void FDECL(mgender_from_permonst, (struct monst *, struct permonst *));
 E int FDECL(newcham,

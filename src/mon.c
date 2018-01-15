@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1505266804 2017/09/13 01:40:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1514769571 2018/01/01 01:19:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,7 +23,6 @@ STATIC_DCL void FDECL(kill_eggs, (struct obj *));
 STATIC_DCL int FDECL(pickvampshape, (struct monst *));
 STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
 STATIC_DCL boolean FDECL(validspecmon, (struct monst *, int));
-STATIC_DCL boolean FDECL(validvamp, (struct monst *, int *, int));
 STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
@@ -3162,7 +3161,7 @@ int mndx;
 }
 
 /* prevent wizard mode user from specifying invalid vampshifter shape */
-STATIC_OVL boolean
+boolean
 validvamp(mon, mndx_p, monclass)
 struct monst *mon;
 int *mndx_p, monclass;
