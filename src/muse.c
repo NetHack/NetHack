@@ -6,6 +6,15 @@
  * Monster item usage routines.
  */
 
+/* CHANGE NOTES */
+/* Uncommented code allowing monsters to use scrolls of fire */
+/* Monsters now attempt to use wands of cancellation */
+/* Monsters now throw potions of polymorph as well as drink them */
+/* Monsters now throw potions of hallucination */
+/* Monsters now activate figurines */
+/* Monsters now use wands of wishing in order to wish for various items. */
+/* Monsters now apply bullwhips much more often. */
+
 #include "hack.h"
 
 extern const int monstr[];
@@ -38,6 +47,7 @@ STATIC_DCL boolean FDECL(muse_unslime, (struct monst *, struct obj *,
                                         struct trap *, BOOLEAN_P));
 STATIC_DCL int FDECL(cures_sliming, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(green_mon, (struct monst *));
+STATIC_DCL void FDECL(mmake_wish, (struct monst *));
 
 static struct musable {
     struct obj *offensive;
@@ -1050,6 +1060,9 @@ try_again:
 /*#define MUSE_WAN_TELEPORTATION 15*/
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
+#define MUSE_WAN_CANCELLATION 18
+#define MUSE_POT_POLYMORPH_THROW 19
+#define MUSE_POT_HALLUCINATION 20
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1092,6 +1105,11 @@ struct monst *mtmp;
             if (obj->otyp == WAN_SLEEP && obj->spe > 0 && multi >= 0) {
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_SLEEP;
+            }
+            nomore(MUSE_WAN_CANCELLATION);
+            if (obj->otyp == WAN_CANCELLATION && obj->spe > 0 && multi >= 0) {
+                m.offensive = obj;
+                m.has_offense = MUSE_WAN_CANCELLATION;
             }
             nomore(MUSE_WAN_FIRE);
             if (obj->otyp == WAN_FIRE && obj->spe > 0) {
@@ -1147,6 +1165,16 @@ struct monst *mtmp;
             m.has_offense = MUSE_WAN_TELEPORTATION;
         }
 #endif
+        nomore(MUSE_POT_HALLUCINATION);
+        if (obj->otyp == POT_HALLUCINATION && multi >= 0) {
+            m.offensive = obj;
+            m.has_offense = MUSE_POT_HALLUCINATION;
+        }
+        nomore(MUSE_POT_POLYMORPH_THROW);
+        if (obj->otyp == POT_POLYMORPH) {
+            m.offensive = obj;
+            m.has_offense = MUSE_POT_SLEEPING;
+        }
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && multi >= 0) {
             m.offensive = obj;
@@ -1189,7 +1217,6 @@ struct monst *mtmp;
             m.offensive = obj;
             m.has_offense = MUSE_SCR_EARTH;
         }
-#if 0
         nomore(MUSE_SCR_FIRE);
         if (obj->otyp == SCR_FIRE && resists_fire(mtmp)
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
@@ -1197,7 +1224,6 @@ struct monst *mtmp;
             m.offensive = obj;
             m.has_offense = MUSE_SCR_FIRE;
         }
-#endif /* 0 */
     }
     return (boolean) !!m.has_offense;
 #undef nomore
@@ -1423,6 +1449,7 @@ struct monst *mtmp;
         return (mtmp->mhp <= 0) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
+    case MUSE_WAN_CANCELLATION:
         zap_oseen = oseen;
         mzapmsg(mtmp, otmp, FALSE);
         otmp->spe--;
@@ -1475,7 +1502,6 @@ struct monst *mtmp;
 
         return (mtmp->mhp <= 0) ? 1 : 2;
     }
-#if 0
     case MUSE_SCR_FIRE: {
         boolean vis = cansee(mtmp->mx, mtmp->my);
 
@@ -1522,12 +1548,13 @@ struct monst *mtmp;
         }
         return 2;
     }
-#endif /* 0 */
     case MUSE_POT_PARALYSIS:
     case MUSE_POT_BLINDNESS:
     case MUSE_POT_CONFUSION:
     case MUSE_POT_SLEEPING:
     case MUSE_POT_ACID:
+    case MUSE_POT_POLYMORPH_THROW:
+    case MUSE_POT_HALLUCINATION:
         /* Note: this setting of dknown doesn't suffice.  A monster
          * which is out of sight might throw and it hits something _in_
          * sight, a problem not existing with wands because wand rays
@@ -1608,6 +1635,8 @@ struct monst *mtmp;
 #define MUSE_WAN_SPEED_MONSTER 7
 #define MUSE_BULLWHIP 8
 #define MUSE_POT_POLYMORPH 9
+#define MUSE_WAN_WISHING 10
+#define MUSE_FIGURINE 11
 
 boolean
 find_misc(mtmp)
@@ -1677,11 +1706,21 @@ struct monst *mtmp;
             m.misc = obj;
             m.has_misc = MUSE_POT_GAIN_LEVEL;
         }
+        nomore(MUSE_FIGURINE);
+        if (obj->otyp == FIGURINE && !mtmp->mpeaceful) {
+            m.misc = obj;
+            m.has_misc = MUSE_FIGURINE;
+        }
+        nomore(MUSE_WAN_WISHING);
+        if (obj->otyp == WAN_WISHING && obj->spe > 0) {
+            m.misc = obj;
+            m.has_misc = MUSE_WAN_WISHING;
+        }
         nomore(MUSE_BULLWHIP);
         if (obj->otyp == BULLWHIP && !mtmp->mpeaceful
             /* the random test prevents whip-wielding
                monster from attempting disarm every turn */
-            && uwep && !rn2(5) && obj == MON_WEP(mtmp)
+            && uwep && !rn2(2) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
             && mtmp->mux == u.ux && mtmp->muy == u.uy
             && distu(mtmp->mx, mtmp->my) <= 2
@@ -1770,6 +1809,30 @@ struct monst *mtmp;
     oseen = otmp && vismon;
 
     switch (m.has_misc) {
+    case MUSE_FIGURINE: {
+        coord cc;
+        struct permonst *pm;
+        struct monst *mon;
+        int mndx = otmp->corpsenm;
+
+        pm = &mons[mndx];
+        pline("%s activates a figurine!", Monnam(mtmp));
+        /* activating a figurine provides one way to exceed the
+           maximum number of the target critter created--unless
+           it has a special limit (erinys, Nazgul) */
+        if ((mvitals[mndx].mvflags & G_EXTINCT)
+            && mbirth_limit(mndx) != MAXMONNO) {
+                pline("... but the figurine refused.");
+            break; /* mtmp is null */
+        }
+        if (!enexto(&cc, mtmp->mx, mtmp->my, pm))
+            return 0;
+        m_useup(mtmp, otmp);
+        mon = makemon(pm, cc.x, cc.y, NO_MM_FLAGS);
+        mon->mpeaceful = 0;
+        set_malign(mon);
+        return 2;
+    }
     case MUSE_POT_GAIN_LEVEL:
         mquaffmsg(mtmp, otmp);
         if (otmp->cursed) {
@@ -1862,6 +1925,15 @@ struct monst *mtmp;
         (void) newcham(mtmp, muse_newcham_mon(mtmp), TRUE, FALSE);
         if (oseen)
             makeknown(WAN_POLYMORPH);
+        return 2;
+    case MUSE_WAN_WISHING:
+        mzapmsg(mtmp, otmp, FALSE);
+        otmp->spe--;
+        if (vismon)
+            pline("%s makes a wish!", Monnam(mtmp));
+        if (oseen)
+            makeknown(WAN_WISHING);
+        mmake_wish(mtmp);
         return 2;
     case MUSE_POT_POLYMORPH:
         mquaffmsg(mtmp, otmp);
@@ -2054,14 +2126,16 @@ struct obj *obj;
         if (typ == WAN_POLYMORPH)
             return (boolean) (monstr[monsndx(mon->data)] < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
-            || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER)
+            || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER
+            || typ == WAN_CANCELLATION || typ == WAN_WISHING)
             return TRUE;
         break;
     case POTION_CLASS:
         if (typ == POT_HEALING || typ == POT_EXTRA_HEALING
             || typ == POT_FULL_HEALING || typ == POT_POLYMORPH
             || typ == POT_GAIN_LEVEL || typ == POT_PARALYSIS
-            || typ == POT_SLEEPING || typ == POT_ACID || typ == POT_CONFUSION)
+            || typ == POT_SLEEPING || typ == POT_ACID || typ == POT_CONFUSION
+            || typ == POT_HALLUCINATION)
             return TRUE;
         if (typ == POT_BLINDNESS && !attacktype(mon->data, AT_GAZE))
             return TRUE;
@@ -2084,6 +2158,8 @@ struct obj *obj;
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
+        if (typ == FIGURINE)
+            return TRUE;
         break;
     case FOOD_CLASS:
         if (typ == CORPSE)
@@ -2585,4 +2661,30 @@ struct monst *mon;
     return FALSE;
 }
 
+/* The monster chooses what to wish for. This code is based off the code in
+   makemon.c. */
+STATIC_OVL void
+mmake_wish(mon)
+struct monst *mon;
+{
+    register int cnt;
+    register struct obj *otmp;
+    switch(rn2(10)) {
+        case 1:
+            for (cnt = 0; cnt < 1 + rn2(3); cnt++) {
+                otmp = mksobj(POT_GAIN_LEVEL, FALSE, FALSE);
+                bless(otmp);
+                (void) mpickobj(mon, otmp);
+            }
+            break;
+        case 2:
+            otmp = mksobj(FIGURINE, FALSE, FALSE);
+            otmp->corpsenm = PM_ARCHON;
+            bless(otmp);
+            (void) mpickobj(mon, otmp);
+            break;
+        default:
+            (void) mongets(mon, WAN_DEATH);
+    }
+}
 /*muse.c*/
