@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* CHANGE NOTES */
+/* CHANGE NOTES 1/22/18 */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
