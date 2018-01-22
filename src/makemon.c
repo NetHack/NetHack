@@ -1230,9 +1230,12 @@ int mmflags;
         mtmp->msleeping = 1;
         break;
     case S_JABBERWOCK:
+        if (rn2(5) && !u.uhave.amulet)
+            mtmp->msleeping = 1;
     case S_NYMPH:
         if (rn2(5) && !u.uhave.amulet)
             mtmp->msleeping = 1;
+        mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
         break;
     case S_ORC:
         if (Race_if(PM_ELF))
@@ -1246,6 +1249,10 @@ int mmflags;
         if (Inhell && is_bat(ptr))
             mon_adjust_speed(mtmp, 2, (struct obj *) 0);
         break;
+    case S_HUMAN:
+    case S_KOP:
+        if (!type_is_pname(ptr))
+            mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
     }
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,

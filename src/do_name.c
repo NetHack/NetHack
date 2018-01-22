@@ -1530,11 +1530,39 @@ static const char *const ghostnames[] = {
     "Stephan", "Lance Braccus", "Shadowhawk"
 };
 
+static const char *const malhumnames[] = {
+    "Samuel",    "John",   "Alejandro",  "Mickey",  "Bert",      "Ernie",
+    "Larry",    "Curly",  "Shemp",      "Moe",     "Jake",      "Jackson",
+    "Liam",     "Lucas",  "Oliver",     "Jayden",  "Sebastian", "Wyatt",
+    "Connor",   "Owen",   "Ben",        "Levi",    "Hikaru",    "Timmy",
+    "Johnny",   "Spike",  "Josiah",     "Justin",  "Erin",      "Sarah",
+    "Jimbo",    "Bob",    "Shadow",     "Dimitri", "Harry",     "Donald",
+    "Jerry",    "Dale",   "Arthur",     "Drew",    "Neo"
+};
+
+static const char *const femhumnames[] = {
+    "Tiffany",  "Sally",    "Anya",    "Jane",   "Erin",   "Emma",   "Olivia",
+    "Sofia",    "Wendy",    "Astrid",  "Sylva",  "Terra",  "Kyrie",  "Savannah",
+    "Kennedy",  "Autumn",   "Bella",   "Ivy",    "Freya",  "Kate",   "Zena",
+    "Regina",   "Cosette",  "Chloe",   "Lyra",   "John",   "Alexa",  "Brooke",
+    "Siri",     "Violet",   "Pell",    "Sam",    "Wanda",  "Lois",   "Bianca",
+    "Trinity",  "Carmen",   "Megan",   "Sky",    "Rose",   "Roxy",   "Julie",
+    "Fran",     "Frieda",   "Lana",    "Tanya",
+};
+
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
 const char *
 rndghostname()
 {
     return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))] : (const char *) plname;
+}
+
+const char *
+rndhumname(feminine)
+{
+    if (feminine)
+        return femhumnames[rn2(SIZE(femhumnames))];
+    return malhumnames[rn2(SIZE(malhumnames))];
 }
 
 /*
