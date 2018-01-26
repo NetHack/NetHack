@@ -755,8 +755,8 @@ init_dungeons()
      */
     if (iflags.window_inited)
         clear_nhwindow(WIN_MAP);
-    /* if (!check_version(&vers_info, DUNGEON_FILE, TRUE))
-        panic("Dungeon description not valid.");*/
+    if (!check_version(&vers_info, DUNGEON_FILE, TRUE))
+        panic("Dungeon description not valid.");
 
     /*
      * Read in each dungeon and transfer the results to the internal
