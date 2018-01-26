@@ -177,6 +177,8 @@ makedog()
             petname = "Idefix"; /* Obelix */
         if (Role_if(PM_RANGER))
             petname = "Sirius"; /* Orion's dog */
+        if (Role_if(PM_CARTOMANCER))
+            petname = "Joey";
     }
 
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);

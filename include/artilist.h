@@ -174,6 +174,11 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       DFNS(AD_MAGM), NO_CARY, CONFLICT, A_LAWFUL, PM_CAVEMAN, NON_PM, 2500L,
       NO_COLOR),
 
+    A("The Holographic Void Lily", CREDIT_CARD,
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DEFN),
+      (SPFX_EREGEN | SPFX_HSPDAM), 0, NO_ATTK, NO_DFNS, NO_CARY,
+      CHARGE_OBJ, A_CHAOTIC, PM_CARTOMANCER, NON_PM, 7000L, NO_COLOR),
+
 #if 0 /* OBSOLETE */
 A("The Palantir of Westernesse",        CRYSTAL_BALL,
         (SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL),

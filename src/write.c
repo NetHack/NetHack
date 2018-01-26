@@ -239,6 +239,12 @@ found:
         return 1;
     }
 
+    /* cartomancers feel guilty for counterfeiting */
+    if (Role_if(PM_CARTOMANCER) && paper->oclass == SCROLL_CLASS) {
+        You("feel incredibly guilty at the thought of forging a card!");
+        adjalign(-3);
+    }
+
     /* we're really going to write now, so calculate cost
      */
     actualcost = rn1(basecost / 2, basecost / 2);

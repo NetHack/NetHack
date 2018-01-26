@@ -18,7 +18,7 @@ engrave.txt     epitaph.txt     gehennom.des    help            hh
 history         keyhelp         knox.des        license         medusa.des
 mines.des       opthelp         oracle.des      oracles.txt     quest.txt
 rumors.fal      rumors.tru      sokoban.des     symbols         tower.des
-tribute         wizhelp         yendor.des
+tribute         wizhelp         yendor.des      Cartomancer.des
 
 doc:
 (files for all versions)
@@ -286,7 +286,7 @@ tiles.mak       winMS.h         winhack.c       winhack.rc
 
 win/win32/vs2015:
 (files for Visual Studio 2015 Express Edition builds)
-afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj 
+afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj
 afternethack.proj  afterrecover.proj  aftertile2bmp.proj  aftertilemap.proj
 afteruudecode.proj build.bat          common.props        config.props
 console.props      default.props      default_dll.props   dgncomp.vcxproj
@@ -323,6 +323,7 @@ dungeon
 Arc-fila.lev    Arc-filb.lev    Arc-goal.lev    Arc-loca.lev    Arc-strt.lev
 Bar-fila.lev    Bar-filb.lev    Bar-goal.lev    Bar-loca.lev    Bar-strt.lev
 Cav-fila.lev    Cav-filb.lev    Cav-goal.lev    Cav-loca.lev    Cav-strt.lev
+Car-fila.lev    Car-filb.lev    Car-goal.lev    Car-loca.lev    Car-strt.lev
 Hea-fila.lev    Hea-filb.lev    Hea-goal.lev    Hea-loca.lev    Hea-strt.lev
 Kni-fila.lev    Kni-filb.lev    Kni-goal.lev    Kni-loca.lev    Kni-strt.lev
 Mon-fila.lev    Mon-filb.lev    Mon-goal.lev    Mon-loca.lev    Mon-strt.lev
@@ -388,7 +389,7 @@ uudecode.exe
 
 DEVEL:
 (files for people developing changes to NetHack)
-code_features.txt   code_style.txt  Developer.txt   git_recipes.txt 
+code_features.txt   code_style.txt  Developer.txt   git_recipes.txt
 nhgitset.pl
 
 DEVEL/DOTGIT:

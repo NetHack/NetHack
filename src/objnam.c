@@ -28,6 +28,11 @@ struct Jitem {
     const char *name;
 };
 
+struct Caritem {
+    int item;
+    const char *name;
+};
+
 #define BSTRCMPI(base, ptr, str) ((ptr) < base || strcmpi((ptr), str))
 #define BSTRNCMPI(base, ptr, str, num) \
     ((ptr) < base || strncmpi((ptr), str, num))
@@ -55,7 +60,17 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
 
+STATIC_OVL struct Caritem Cartomancer_items[] = {
+  { LARGE_BOX, "deck box" },
+  { LOCK_PICK, "worthless card" },
+  { SHURIKEN, "razor card" },
+  { HAWAIIAN_SHIRT, "graphic tee" },
+  { EXPENSIVE_CAMERA, "holographic card" },
+  { CREDIT_CARD, "banned card" },
+  { 0, "" } };
+
 STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
+STATIC_DCL const char *FDECL(Cartomancer_item_name, (int i));
 
 STATIC_OVL char *
 strprepend(s, pref)
@@ -112,6 +127,8 @@ register int otyp;
 
     if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
         actualn = Japanese_item_name(otyp);
+    if (Role_if(PM_CARTOMANCER) && Cartomancer_item_name(otyp))
+        actualn = Cartomancer_item_name(otyp);
     switch (ocl->oc_class) {
     case COIN_CLASS:
         Strcpy(buf, "coin");
@@ -120,7 +137,10 @@ register int otyp;
         Strcpy(buf, "potion");
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "scroll");
+        if (Role_if(PM_CARTOMANCER))
+            Strcpy(buf, "spell card");
+        else
+            Strcpy(buf, "scroll");
         break;
     case WAND_CLASS:
         Strcpy(buf, "wand");
@@ -409,6 +429,8 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);
+    if (Role_if(PM_CARTOMANCER) && Cartomancer_item_name(typ))
+        actualn = Cartomancer_item_name(typ);
 
     buf[0] = '\0';
     /*
@@ -605,7 +627,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         }
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "scroll");
+        if (Role_if(PM_CARTOMANCER))
+            Strcpy(buf, "spell card");
+        else
+            Strcpy(buf, "scroll");
         if (!dknown)
             break;
         if (nn) {
@@ -3268,6 +3293,7 @@ srch:
 
     if (actualn) {
         struct Jitem *j = Japanese_items;
+        struct Caritem *c = Cartomancer_items;
 
         while (j->item) {
             if (actualn && !strcmpi(actualn, j->name)) {
@@ -3275,6 +3301,13 @@ srch:
                 goto typfnd;
             }
             j++;
+        }
+        while (c->item) {
+            if (actualn && !strcmpi(actualn, c->name)) {
+                typ = c->item;
+                goto typfnd;
+            }
+            c++;
         }
     }
     /* if we've stripped off "armor" and failed to match anything
@@ -3827,6 +3860,20 @@ int i;
         if (i == j->item)
             return j->name;
         j++;
+    }
+    return (const char *) 0;
+}
+
+STATIC_OVL const char *
+Cartomancer_item_name(i)
+int i;
+{
+    struct Caritem *c = Cartomancer_items;
+
+    while (c->item) {
+        if (i == c->item)
+            return c->name;
+        c++;
     }
     return (const char *) 0;
 }

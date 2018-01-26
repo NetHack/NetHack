@@ -325,9 +325,12 @@ doread()
         const char *what = 0;
         if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
-        else if (!scroll->dknown)
-            what = "formula on the scroll";
-        if (what) {
+        else if (!scroll->dknown) {
+            if (Role_if(PM_CARTOMANCER))
+                what = "text on the card";
+            else
+                what = "formula on the scroll";
+        } if (what) {
             pline("Being blind, you cannot read the %s.", what);
             return 0;
         }
@@ -372,20 +375,35 @@ doread()
         nodisappear = (scroll->otyp == SCR_FIRE
                        || (scroll->otyp == SCR_REMOVE_CURSE
                            && scroll->cursed));
-        if (Blind)
-            pline(nodisappear
-                      ? "You %s the formula on the scroll."
-                      : "As you %s the formula on it, the scroll disappears.",
-                  silently ? "cogitate" : "pronounce");
-        else
-            pline(nodisappear ? "You read the scroll."
-                              : "As you read the scroll, it disappears.");
-        if (confused) {
+        if (Blind) {
+            if (Role_if(PM_CARTOMANCER))
+                pline(nodisappear
+                          ? "You %s the text on the card."
+                          : "As you %s the text on it, the card disappears.",
+                      silently ? "cogitate" : "pronounce");
+            else
+                pline(nodisappear
+                          ? "You %s the formula on the scroll."
+                          : "As you %s the formula on it, the scroll disappears.",
+                      silently ? "cogitate" : "pronounce");
+        } else {
+            if (Role_if(PM_CARTOMANCER))
+                pline(nodisappear ? "You play the spell card."
+                                  : "As you play the card, it disappears.");
+            else
+                pline(nodisappear ? "You read the scroll."
+                                  : "As you read the scroll, it disappears.");
+        } if (confused) {
             if (Hallucination)
                 pline("Being so trippy, you screw up...");
-            else
-                pline("Being confused, you %s the magic words...",
-                      silently ? "misunderstand" : "mispronounce");
+            else {
+                if (Role_if(PM_CARTOMANCER))
+                    pline("Being confused, you %s the rules text...",
+                          silently ? "misunderstand" : "misread");
+                else
+                    pline("Being confused, you %s the magic words...",
+                          silently ? "misunderstand" : "mispronounce");
+                  }
         }
     }
     if (!seffects(scroll)) {
@@ -1008,10 +1026,13 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #ifdef MAIL
     case SCR_MAIL:
         known = TRUE;
-        if (sobj->spe == 2)
-            /* "stamped scroll" created via magic marker--without a stamp */
-            pline("This scroll is marked \"postage due\".");
-        else if (sobj->spe)
+        if (sobj->spe == 2) {
+            if (Role_if(PM_CARTOMANCER))
+                pline("The rules on this card read \"postage due\".");
+            else
+                /* "stamped scroll" created via magic marker--without a stamp */
+                pline("This scroll is marked \"postage due\".");
+        } else if (sobj->spe)
             /* scroll of mail obtained from bones file or from wishing;
              * note to the puzzled: the game Larn actually sends you junk
              * mail if you win!
@@ -1256,6 +1277,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_BLANK_PAPER:
         if (Blind)
             You("don't remember there being any magic words on this scroll.");
+        else if(Role_if(PM_CARTOMANCER))
+            pline("This card is useless!");
         else
             pline("This scroll seems to be blank.");
         known = TRUE;
@@ -1271,7 +1294,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                                   : "the power of the Force against you!"));
 
         if (scursed) {
-            pline_The("scroll disintegrates.");
+            if (Role_if(PM_CARTOMANCER))
+                pline_The("spell card disintegrates.");
+            else
+                pline_The("scroll disintegrates.");
         } else {
             for (obj = invent; obj; obj = obj->nobj) {
                 long wornmask;
@@ -1429,8 +1455,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     }
     case SCR_GENOCIDE:
-        if (!already_known)
-            You("have found a scroll of genocide!");
+        if (!already_known) {
+            if (Role_if(PM_CARTOMANCER))
+                You("have found a forbidden spell card!");
+            else
+                You("have found a scroll of genocide!");
+        }
         known = TRUE;
         if (sblessed)
             do_class_genocide();
@@ -1477,11 +1507,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         sobj = 0; /* it's gone */
         if (confused)
             You("identify this as an identify scroll.");
-        else if (!already_known || !invent)
+        else if (!already_known || !invent) {
             /* force feedback now if invent became
                empty after using up this scroll */
-            pline("This is an identify scroll.");
-        if (!already_known)
+            if (Role_if(PM_CARTOMANCER))
+                pline("This is an identify card.");
+            else
+                pline("This is an identify scroll.");
+        } if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
         /*FALLTHRU*/
     case SPE_IDENTIFY:
@@ -1519,7 +1552,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         /* known = TRUE; -- handled inline here */
         if (!already_known) {
-            pline("This is a charging scroll.");
+            if (Role_if(PM_CARTOMANCER))
+                pline("This is a charging card.");
+            else
+                pline("This is a charging scroll.");
             learnscroll(sobj);
         }
         /* use it up now to prevent it from showing in the
@@ -1605,8 +1641,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                     You_feel("a pleasant warmth in your %s.",
                              makeplural(body_part(HAND)));
             } else {
-                pline_The("scroll catches fire and you burn your %s.",
-                          makeplural(body_part(HAND)));
+                if (Role_if(PM_CARTOMANCER))
+                    pline_The("card catches fire and you burn your %s.",
+                              makeplural(body_part(HAND)));
+                else
+                    pline_The("scroll catches fire and you burn your %s.",
+                              makeplural(body_part(HAND)));
                 losehp(1, "scroll of fire", KILLED_BY_AN);
             }
             break;
@@ -1615,8 +1655,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline_The("%s around you vaporizes violently!", hliquid("water"));
         } else {
             if (sblessed) {
-                if (!already_known)
-                    pline("This is a scroll of fire!");
+                if (!already_known) {
+                    if (Role_if(PM_CARTOMANCER))
+                        pline("This is a spell card of fire!");
+                    else
+                        pline("This is a scroll of fire!");
+                }
                 dam *= 5;
                 pline("Where do you want to center the explosion?");
                 getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
@@ -1628,7 +1672,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 }
             }
             if (cc.x == u.ux && cc.y == u.uy) {
-                pline_The("scroll erupts in a tower of flame!");
+                if (Role_if(PM_CARTOMANCER))
+                    pline_The("spell card erupts in a tower of flame!");
+                else
+                    pline_The("scroll erupts in a tower of flame!");
                 iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
                 burn_away_slime();
             }
@@ -1684,8 +1731,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_STINKING_CLOUD: {
         coord cc;
 
-        if (!already_known)
-            You("have found a scroll of stinking cloud!");
+        if (!already_known) {
+            if (Role_if(PM_CARTOMANCER))
+                You("have found a spell card of stinking cloud!");
+            else
+                You("have found a scroll of stinking cloud!");
+        }
         known = TRUE;
         pline("Where do you want to center the %scloud?",
               already_known ? "stinking " : "");

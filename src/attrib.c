@@ -36,7 +36,9 @@ static const struct innate {
   cav_abil[] = { { 7, &(HFast), "quick", "slow" },
                  { 15, &(HWarning), "sensitive", "" },
                  { 0, 0, 0, 0 } },
-
+  car_abil[] = { { 1, &(HSearching), "perceptive", "" },
+                 { 7, &(HWarning), "sensitive", "" },
+                 { 0, 0, 0, 0 } },
   hea_abil[] = { { 1, &(HPoison_resistance), "", "" },
                  { 15, &(HWarning), "sensitive", "" },
                  { 0, 0, 0, 0 } },
@@ -687,6 +689,7 @@ int r;
         { PM_ARCHEOLOGIST, arc_abil },
         { PM_BARBARIAN, bar_abil },
         { PM_CAVEMAN, cav_abil },
+        { PM_CARTOMANCER, car_abil},
         { PM_HEALER, hea_abil },
         { PM_KNIGHT, kni_abil },
         { PM_MONK, mon_abil },

@@ -1,0 +1,326 @@
+# NetHack 3.6	Cartomancer.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1991 by M. Stephenson
+# NetHack may be freely redistributed.  See license for details.
+#
+#	The "start" level for the quest.
+#
+#	Here you meet your (besieged) class leader, Shaman Karnov
+#	and receive your quest assignment.
+#
+MAZE: "Car-strt",' '
+FLAGS: noteleport,hardfloor
+GEOMETRY:center,center
+MAP
+............................................................................
+............................................................................
+............................................................................
+............................................................................
+............|-----------------------++-----------------------|..............
+............|......................|..|......................|..............
+............|......................|..|.{{{{{{{{{{{{{{{{{{{{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|-----------+----------|..|.{..................{.|..............
+............|......................|..S....................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{{{{{{{{{{{{{{{{{{{{.|..............
+............|......................|..|......................|..............
+............|-----------------------++-----------------------|..............
+............................................................................
+............................................................................
+............................................................................
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+# Stairs
+STAIR:(17,07),down
+# Portal arrival point
+BRANCH:(07,17,07,17),(0,0,0,0)
+# Doors
+DOOR:locked,(24,09)
+DOOR:locked,(36,04)
+DOOR:locked,(37,04)
+DOOR:locked,(36,16)
+DOOR:locked,(37,16)
+# The Lord of the Cards
+MONSTER:('@',"Lord of the Cards"),(17,08)
+# The treasure of the Lord of the Cards
+OBJECT:('(',"chest"),(18,05)
+# students of the card training school
+MONSTER:('@',"student"),(47,07)
+MONSTER:('@',"student"),(47,13)
+MONSTER:('@',"student"),(18,07)
+MONSTER:('@',"student"),(19,13)
+MONSTER:('@',"student"),(20,07)
+MONSTER:('@',"student"),(21,13)
+MONSTER:('@',"student"),(22,07)
+MONSTER:('@',"student"),(23,13)
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Monsters summoned by Dal Zethire.
+MONSTER: ('N',"guardian naga"),(08,22),hostile
+MONSTER: ('S',"cobra"),(08,20),hostile
+MONSTER: ('N',"guardian naga"),(08,21),hostile
+MONSTER: ('S',"cobra"),(03,14),hostile
+MONSTER: ('S',"cobra"),(05,14),hostile
+MONSTER: ('S',"cobra"),(07,14),hostile
+MONSTER: ('S',"cobra"),random,hostile
+MONSTER: ('N',"guardian naga"),(55,15),hostile
+MONSTER: ('S',"cobra"),random,hostile
+MONSTER: ('S',"cobra"),random,hostile
+MONSTER: ('S',"cobra"),random,hostile
+MONSTER: ('S',"cobra"),random,hostile
+
+#
+#	The "locate" level for the quest.
+#
+#	Here you have to find the arena to go
+#	further towards your assigned quest.
+#
+
+MAZE: "Car-loca",' '
+FLAGS: hardfloor, noteleport
+GEOMETRY:center,center
+MAP
+............................................................................
+............................................................................
+............................................................................
+............................................................................
+............|-----------------------++-----------------------|..............
+............|......................|..|......................|..............
+............|......................|..|.{{{{{{{{{{{{{{{{{{{{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|-----------S----------|..|.{..................{.|..............
+............|......................|..S....................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{..................{.|..............
+............|......................|..|.{{{{{{{{{{{{{{{{{{{{.|..............
+............|......................|..|......................|..............
+............|-----------S-----------++-----------------------|..............
+............................................................................
+............................................................................
+............................................................................
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+# Doors
+DOOR:locked,(24,09)
+# Stairs
+STAIR:(17,07),up
+STAIR:(51,10),down
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Objects
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:('N',"guardian naga"),(17, 07),hostile
+MONSTER:('N',"guardian naga"),(18,08),hostile
+MONSTER:('N',"guardian naga"),(18,09),hostile
+MONSTER:('N',"guardian naga"),(17,10),hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+MONSTER:'S',random,hostile
+
+#
+#	The "goal" level for the quest.
+#
+#	Here you meet Tiamat your nemesis monster.  You have to
+#	defeat Tiamat in combat to gain the artifact you have
+#	been assigned to retrieve.
+#
+
+MAZE: "Car-goal", ' '
+GEOMETRY:center,center
+MAP
+
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+                 .......................................
+
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+# Stairs
+STAIR:random,up
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Objects
+OBJECT:('(',"credit card"),(23,10),blessed,0,name:"The Holographic Void Lily"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# monsters.
+MONSTER:('@',"Dal Zethire"),(23,10)
+MONSTER:'N',random,hostile
+MONSTER:'N',random,hostile
+WALLIFY
+
+#
+#	The "fill" levels for the quest.
+#
+#	These levels are used to fill out any levels not occupied by specific
+#	levels as defined above. "filla" is the upper filler, between the
+#	start and locate levels, and "fillb" the lower between the locate
+#	and goal levels.
+#
+
+LEVEL: "Car-fila"
+#
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'N', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'N', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: ('S', "cobra"), random
+  MONSTER: ('S', "cobra"), random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'S', random, hostile
+  MONSTER: ('N', "guardian naga"), random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'S', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'N', random, hostile
+}
+
+RANDOM_CORRIDORS
+
+LEVEL: "Car-filb"
+#
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'S', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'N', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: 'Z', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'S', random, hostile
+  MONSTER: ('N', "guardian naga"), random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'S', random, hostile
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('S', "pit viper"), random
+}
+
+RANDOM_CORRIDORS

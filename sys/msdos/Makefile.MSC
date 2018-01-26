@@ -63,7 +63,7 @@ LEXYYC = lexyy.c
 
 #
 # Uncomment this line if you want to include support for ALT-numeric
-# sequences, such as ALT-2 for toggling #twoweapon mode.  
+# sequences, such as ALT-2 for toggling #twoweapon mode.
 # Note that this code did not get a thorough testing prior to 3.4.x
 #NEWALT=/DNEW_ALT
 
@@ -127,8 +127,8 @@ SPECOPTS =
 # Set to 1 for 80186 and above only
 # Set to 2 for 80286 and above only
 # Set to 3 for 80386 and above only
-# 
-MACHINE_CODE = 
+#
+MACHINE_CODE =
 
 #
 #  Utility Objects.
@@ -366,7 +366,7 @@ DLB =
 ! ENDIF
 
 ########################################################
-#  
+#
 # TARGETS
 
 
@@ -440,7 +440,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(SPLEVDES)
 	cd $(SRC)
 #	-@if exist $(O)sp_lev.tag del $(O)sp_lev.tag
 	@echo sp_levs done >$(O)sp_lev.tag
-	
+
 $(O)utility.tag: $(INCL)\date.h $(INCL)\trap.h  \
         $(INCL)\onames.h $(INCL)\pm.h monstr.c vis_tab.c \
 	$(U)lev_comp.exe $(U)dgn_comp.exe $(U)recover.exe $(TILEUTIL)
@@ -706,7 +706,7 @@ $(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
 	   @echo.
 	   @echo For now, we will copy the prebuilt dgn_yacc.c from
 	   @echo $(SSHR) to $(U)dgn_yacc.c, and copy the prebuilt
-	   @echo dgn_comp.h from $(SSHR) to $(INCL)\dgn_comp.h 
+	   @echo dgn_comp.h from $(SSHR) to $(INCL)\dgn_comp.h
 	   @echo and use those.
 	   @echo.
 	   copy $(SSHR)\dgn_yacc.c $@ >nul
@@ -806,7 +806,7 @@ tile2bin.exe: tile2bin.o $(TEXTIO)
 til2bin2.exe: til2bin2.o $(TEXTIO2)
 	@$(LINK) $(LFLAGS) til2bin2.o $(TEXTIO2),$@,$(@B);
 
-thintile.exe: thintile.o 
+thintile.exe: thintile.o
 	@$(LINK) $(LFLAGS) thintile.o,$@,$(@B);
 
 thintile.o:  $(HACK_H) $(WSHR)\tile.h $(WSHR)\thintile.c
@@ -832,7 +832,7 @@ tiletex2.o:  $(CONFIG_H) $(WSHR)\tile.h $(WSHR)\tiletext.c
 tiletxt.o: $(CONFIG_H)	$(WSHR)\tile.h tilemap.c
 	-@$(CC) $(CFLAGS) $(SPECOPTS) -DTILETEXT /Zg tilemap.c >$(@B).pro
 	@$(CC) $(CFLAGS) $(SPECOPTS) -DTILETEXT /Fo$@ tilemap.c
-  
+
 tiletxt2.o: $(CONFIG_H)	$(WSHR)\tile.h tilemap.c
 	-@$(CC) $(CFLAGS) $(SPECOPTS) -DTILETEXT /Zg tilemap.c >$(@B).pro
 	@$(CC) $(CFLAGS) $(SPECOPTS) -DTILETEXT -DTILE_X=8 /Fo$@ tilemap.c
@@ -964,6 +964,11 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
 	echo CAV-GOAL.LEV  >>dlb.lst
 	echo CAV-LOCA.LEV  >>dlb.lst
 	echo CAV-STRT.LEV  >>dlb.lst
+	echo CAR-FILA.LEV  >>dlb.lst
+	echo CAR-FILB.LEV  >>dlb.lst
+	echo CAR-GOAL.LEV  >>dlb.lst
+	echo CAR-LOCA.LEV  >>dlb.lst
+	echo CAR-STRT.LEV  >>dlb.lst
 	echo EARTH.LEV     >>dlb.lst
 	echo FAKEWIZ1.LEV  >>dlb.lst
 	echo FAKEWIZ2.LEV  >>dlb.lst

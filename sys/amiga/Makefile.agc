@@ -109,7 +109,7 @@ OBJSPEC = -o
 PNSPEC	= -o
 LNSPEC = -o
 CCLINK	= gcc -noixemul
-CLFLAGS = -O3 
+CLFLAGS = -O3
 INCLSPEC = -I
 DEFSPEC = -D
 IGNSPEC = -j
@@ -224,6 +224,10 @@ CDFILES1= $(SLIB)Cav-fila.lev $(SLIB)Cav-filb.lev $(SLIB)Cav-loca.lev \
 	$(SLIB)Cav-strt.lev
 CDFILES= $(SLIB)Cav-goal.lev $(CDFILES1)
 
+CRFILES1= $(SLIB)Car-fila.lev $(SLIB)Car-filb.lev $(SLIB)Car-loca.lev \
+	$(SLIB)Car-strt.lev
+CRFILES= $(SLIB)Car-goal.lev $(CRFILES1)
+
 HDFILES1= $(SLIB)Hea-fila.lev $(SLIB)Hea-filb.lev $(SLIB)Hea-loca.lev \
 	$(SLIB)Hea-strt.lev
 HDFILES= $(SLIB)Hea-goal.lev $(HDFILES1)
@@ -264,7 +268,7 @@ WDFILES1= $(SLIB)Wiz-fila.lev $(SLIB)Wiz-filb.lev $(SLIB)Wiz-loca.lev \
 	$(SLIB)Wiz-strt.lev
 WDFILES= $(SLIB)Wiz-goal.lev $(WDFILES1)
 
-XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(HDFILES) $(KDFILES) \
+XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(CRFILES) $(HDFILES) $(KDFILES) \
 		$(MDFILES) $(PDFILES) $(RDFILES) $(RANFILES) $(SDFILES) $(TDFILES) \
 		$(VDFILES) $(WDFILES)
 
@@ -325,7 +329,7 @@ LIBFILES= \
 
 all:  $(COMPACT_HEADERS) $(SBIN)lev_comp $(SBIN)dgn_comp $(SBIN)NetHack \
 	$(SBIN)dlb $(NETHACK)recover #$(NETHACK)HackCli $(SBIN)splitter \
-#	$(NETHACK)HackWB 
+#	$(NETHACK)HackWB
 
 install: inst-data inst-dungeon inst-fonts inst-sounds inst-tiles \
 	 $(NETHACK)recover $(NETHACK)NetHack $(NETHACK)nhdat
@@ -399,6 +403,7 @@ spotless:  clean
 #	-delete $(ADFILES)
 #	-delete $(BDFILES)
 #	-delete $(CDFILES)
+#	-delete $(CRFILES)
 #	-delete $(HDFILES)
 #	-delete $(KDFILES)
 #	-delete $(MDFILES)
@@ -411,7 +416,7 @@ spotless:  clean
 #	-delete $(WDFILES)
 	-delete $(I)onames.h $(I)pm.h $(I)date.h
 	-delete $(NHS)tile.c $(NHS)monstr.c
-	-delete $(I)tile.h 
+	-delete $(I)tile.h
 #	-echo to $(I)onames.h "" noline
 #	-c:wait 2
 #	-echo to $(I)pm.h "" noline
@@ -648,7 +653,7 @@ $(OO)splitter.o:	$(ASP)/splitter.c $(ASP)/split.h $(ASP)/amiout.h $(ASP)/arg.h
 		$(ASP)/splitter.c
 
 $(OO)arg.o:	$(ASP)/arg.c $(ASP)/arg.h
-	$(CC) $(WBCFLAGS) $(SPLFLAGS) $(OBJSPEC)$(OO)arg.o $(ASP)/arg.c 
+	$(CC) $(WBCFLAGS) $(SPLFLAGS) $(OBJSPEC)$(OO)arg.o $(ASP)/arg.c
 
 # Create/copy other stuff into NetHack: directory:
 
@@ -790,7 +795,7 @@ $(ENDGAME1):	$(SLIB)astral.lev
 $(SLIB)astral.lev:	$(DAT)endgame.des $(SBIN)lev_comp
 
 GEHENNOM1= $(SLIB)asmodeus.lev $(SLIB)baalz.lev $(SLIB)juiblex.lev \
-  $(SLIB)orcus.lev $(SLIB)sanctum.lev 
+  $(SLIB)orcus.lev $(SLIB)sanctum.lev
 $(GEHENNOM1):	$(SLIB)valley.lev
 
 $(SLIB)valley.lev:	$(DAT)gehennom.des $(SBIN)lev_comp
@@ -838,6 +843,10 @@ $(SLIB)Bar-goal.lev:	$(DAT)Barb.des $(SBIN)lev_comp
 $(CDFILES1):	$(SLIB)Cav-goal.lev
 
 $(SLIB)Cav-goal.lev:	$(DAT)Caveman.des $(SBIN)lev_comp
+
+$(CRFILES1):	$(SLIB)Car-goal.lev
+
+$(SLIB)Car-goal.lev:	$(DAT)Cartomancer.des $(SBIN)lev_comp
 
 $(HDFILES1):	$(SLIB)Hea-goal.lev
 
@@ -1267,9 +1276,9 @@ $(I)global.h:  $(I)coord.h $(I)pcconf.h $(I)amiconf.h
 	-setdate $(I)global.h
 	-c:wait 2
 
-$(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h 
-		$(I)monsym.h $(I)mkroom.h $(I)objclass.h $(I)flag.h $(I)rm.h 
-		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h 
+$(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h
+		$(I)monsym.h $(I)mkroom.h $(I)objclass.h $(I)flag.h $(I)rm.h
+		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h
 		$(I)rect.h $(I)region.h $(I)trampoli.h $(I)sys.h
 	-setdate $(I)hack.h
 	-c:wait 2

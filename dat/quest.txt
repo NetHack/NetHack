@@ -819,6 +819,249 @@ casts its influence throughout our world.
 "Sacrifice the Amulet on the altar.  Thus shall %d become supreme!"
 %E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
 #
+#	Cartomancer
+#
+%Cc Car 00001
+You find yourself standing in sight of %H. However, something is horribly wrong.
+Cards lay scattered about the ground like common trash, and strange shapes
+lumber about! The usual sounds of card games being played are oddly absent.
+%E [You arrive back at %H, but something is wrong here.]
+%Cp Car 00002
+Once again, you arrive back at %H.
+%E
+%Cp Car 00003
+For some reason, you think that this may be the last time you will
+enter %H.
+%E
+%Cp Car 00005
+"When %n sent his minions, they stole all of my rarest cards!"
+%E
+%Cp Car 00006
+"You seem a much more experienced player than when we last met, %p."
+%E
+%Cp Car 00007
+"Have you collected any interesting cards during your journey?"
+%E
+%Cp Car 00008
+"%p, you must defeat %n, for our sake."
+%E
+%Cp Car 00009
+"%lC was unable to defeat %n, although their game was mighty."
+%E
+%Cp Car 00010
+"Do you know what time it is?"
+%E
+%Cp Car 00011
+"I look to %d for guidance in these hard times."
+%E
+%Cp Car 00012
+"What has become of %o?"
+%E
+%Cp Car 00013
+"Please, %p, tell us the story of your game with %n. What cards did you use?"
+%E
+%Cp Car 00014
+"My deepest thanks, %p."
+%E
+%Cc Car 00015
+"%pC, how good to see you!.
+
+"We are in dire need of your help, my %S.
+
+"But first, I must examine your cards, and determine if your deck is
+strong enough. Defeat me with your cards, and prove yourself worthy!"
+%E ["You have returned.  We are in dire need of your help."]
+%Cp Car 00016
+"Again, you return to us, %p.  I shall grant you a rematch."
+%E
+%Cp Car 00017
+"Ah, %p.  Come to try again? Perhaps you are worthier now."
+%E
+%Cc Car 00018
+"%pC!  You clearly have no love for your cards, and do not believe in
+them.
+
+"I expel you from %H!  Your performance brings me shame.""
+
+"You shall not see %H again."
+%E ["You did not love your cards..."]
+%Cc Car 00019
+"Alas, %p, you clearly love your cards, but your skill with them is still
+immature. Your loss to me tells me all I need to know.
+
+"Improve your deck, and pray to %d for guidance. Only then may you
+return and face me again."
+%E ["%rA is too inexperienced.  Come back when you have become stronger."]
+%Cc Car 00020
+"Alas, %p, your skill with your cards is great, but you have yet to
+truly find love for your cards. Until you do this, you stand no chance
+against %n. Talk to your cards, and pray to %d for guidance. Only then may you
+return and face me again."
+%E ["You no longer follow the path of the %a.  Leave and seek answers."]
+%Cc Car 00021
+"You have soundly defeated me, %p.  You are ready.
+
+"Just after you left to improve your deck, %n appeared and battled us
+into submission with his monster-summoning cards. The beasts you saw here
+are but a fraction of the horde he summoned. He stole the decks of many of
+your fellow students.
+
+"Worst of all, he stole from us %o, the most powerful of all known cards.
+If he should play a game with it, he could destroy the very fabric of
+reality.
+
+"You must find %i, and take back %o from %n. It is your destiny.
+
+"Please, %p, recover %o for us, and return it here. And remember: Believe in
+your cards, and they shall come through for you."
+%E [Find and defeat %n, recover %o, and return with it.]
+%Cp Car 00025
+"%nC is immune to her own breath weapons.
+You should use magic upon her that she does not use herself."
+%E
+%Cp Car 00026
+"When you encounter %n, remember your training with me."
+%E
+%Cp Car 00027
+"Strike quickly, before %n can draw an opening hand."
+%E
+%Cp Car 00028
+"%n plays a deck focused on summoning snakes and nagas."
+%E
+%Cp Car 00029
+"If %o is played on the first turn, it may as well be over."
+%E
+%Cp Car 00030
+"Possessing %o is not the same as knowing how to use it. A card is
+only as powerful as the player behind it."
+%E
+%Cp Car 00031
+"Be careful, %n is a wily player."
+%E
+%Cp Car 00032
+"I would send some of my students with you, but few of them have their decks
+still intact."
+%E
+%Cp Car 00033
+"Play to your strengths, that is in a %a style."
+%E
+%Cp Car 00034
+"Use all of your spell cards against %n."
+%E
+%Cc Car 00035
+You descend in the basement cavern of the school. You %x a trail of torn
+spell cards, and you cannot help but to notice the numerous skeletons
+dressed in the garb of your school. Evidently you are not the first
+student to be sent after %n...
+%E [You %x many torn spell cards, and notice bones of previous students.]
+%Cp Car 00036
+Once again, you approach %i.
+%E
+%Cc Car 00040
+You find yourself in an enormous arena, with a high, vaulted ceiling.
+It sounds as if a magnificent crowd is cheering, but no such crowd is present.
+
+Instead, %n is there, shuffling their deck and cackling.
+With a flick of their wrist, they draw seven cards. The game has begun.
+%E [You enter an arena.  %nC is waiting for you.]
+%Cp Car 00041
+Once again, you find yourself in %ns arena.
+%E
+%Cc Car 00050
+"Another pathetic student of %l, here to challenge me to a card game?
+I doubt you have even held a deck before! I shall battle you, and show
+you the true meaning of defeat!"
+%E [%nC brags about their prowess with spell cards.]
+%Cp Car 00051
+"Trying to run away, %c? Cowardice no different than forfeit!"
+%E
+%Cp Car 00052
+"Please, %c, you disappoint me! Your cards are worthless!"
+%E
+%Cp Car 00053
+"You are running low on spell cards, %c. Will this be a victory by
+lack of a deck?"
+%E
+%Cp Car 00060
+"%o is the perfect complement to my perfect deck!"
+%E
+%Cp Car 00061
+"Tsk tsk tsk, %c. I really expected better from you."
+%E
+%Cp Car 00062
+"%l only cast me from the school because I was too skillful!"
+%E
+%Cp Car 00063
+"Love for your cards? Don't make me laugh. I shall defeat you through
+skill alone!"
+%E
+%Cp Car 00064
+"Your mentor %l fell to me. What makes you think you will do any better?"
+%E
+%Cp Car 00065
+"%d cannot help you now, %c."
+%E
+%Cp Car 00066
+"A mere %r cannot hope to defeat me."
+%E
+%Cp Car 00067
+"You fool! You cannot begin to imagine the cards that lurk in my deck!"
+%E
+%Cp Car 00068
+"The rules are meaningless, for I hold all the cards!"
+%E
+%Cp Car 00069
+"You look nervous, %c. Have you finally realized how outclassed you are?"
+%E
+%Cc Car 00070
+As you pick up %o you realize it is the perfect complement to your
+spell cards. In fact, it is the perfect complement to any deck. No
+wonder it was banned.
+
+You realize that with this card, you can do anything.
+%E [%oC belongs to you now.]
+%Cc Car 00080
+%"I see now," gasps %n. "It was never about the power of the cards,
+or the skill of the player, but about the love the player has for
+their cards. Thank you, %c, you have taught me much."
+
+With that, %n collapses. They will never oppose you again.
+%E
+%Cc Car 00081
+%lC sees the glimmer of %o in your deck. He offers to battle
+you, and you soundly defeat him.
+After you have won, he smiles and says:
+
+    Congratulations! You have done what I could not.
+    As a fellow competitor, I bow to your prowess.
+
+    Please, %p, keep %o and use it in your quest. You
+    are truly worthy to wield its power.
+%E ["Keep %o.  It will help in your quest for the Amulet of Yendor."]
+%Cc Car 00082
+%l takes %o in his hand and runs his finger along the edge.
+Then he shakes his head.
+
+"It chose you, not me. I am not worthy of it.
+Go back to %Z and fulfill your destiny."
+%E ["You are worthier of %o.  Return to %Z to search for the Amulet.]
+%Cp Car 00090
+"%pC!  Welcome back.
+Care for a quck game, for old time's sake?"
+%E
+%Cc Car 00091
+"I see you have the Amulet, %p.
+
+"There is no more time for friendly games. Here is what you must do:
+
+"Leave the dungeon behind.  The Amulet will then transport you
+into the Astral Planes, where you shall face the last, most terrible
+duel of all.
+
+"Sacrifice the Amulet on the altar, and become the greatest player of
+spell cards to have ever lived."
+%E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
+#
 #	Healer
 #
 %Cc Hea 00001
@@ -905,7 +1148,7 @@ arts on the unsuspecting."
 %Cc Hea 00019
 "Alas, %p, you are yet too inexperienced to deal with the rigors
 of such a task.  You must be able to draw on the knowledge of botany,
-alchemy and veterinary practices before I can send you on this quest 
+alchemy and veterinary practices before I can send you on this quest
 with good conscience.
 
 "Return when you wear %Ra's caduceus."
