@@ -60,36 +60,6 @@ sub POST {
 	&do_hook("POST");
 }
 
-###
-### store githash and gitbranch in dat/gitinfo.txt
-###
-
-sub nhversioning {
-    use strict;
-    use warnings;
-
-    my $git_sha = `git rev-parse HEAD`;
-    $git_sha =~ s/\s+//g;
-    my $git_branch = `git rev-parse --abbrev-ref HEAD`;
-    $git_branch =~ s/\s+//g;
-
-    if (open my $fh, '<', 'dat/gitinfo.txt') {
-        while(my $line = <$fh>) {
-            if ((index $line, $git_sha) >= 0) {
-                close $fh;
-                print "No update made to dat/gitinfo.txt, existing githash=".$git_sha."\n";
-                return;
-            }
-        }
-        close $fh;
-    }
-    if (open my $fh, '>', 'dat/gitinfo.txt') {
-        print $fh 'githash='.$git_sha."\n";
-        print $fh 'gitbranch='.$git_branch."\n";
-        print "An updated dat/gitinfo.txt was written, githash=".$git_sha."\n";
-    }
-}
-
 # PRIVATE
 sub do_hook {
 	my($p) = @_;
