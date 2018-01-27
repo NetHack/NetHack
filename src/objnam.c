@@ -64,6 +64,7 @@ STATIC_OVL struct Caritem Cartomancer_items[] = {
   { LARGE_BOX, "deck box" },
   { LOCK_PICK, "worthless card" },
   { SHURIKEN, "razor card" },
+  { SCR_GENOCIDE, "forbidden card" },
   { HAWAIIAN_SHIRT, "graphic tee" },
   { EXPENSIVE_CAMERA, "holographic card" },
   { CREDIT_CARD, "banned card" },

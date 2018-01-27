@@ -725,7 +725,7 @@ u_init()
     case PM_CARTOMANCER:
         ini_inv(Cartomancer);
         skill_init(Skill_Car);
-        knows_object(SHURIKEN);
+        knows_object(SCR_GENOCIDE);
         break;
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
