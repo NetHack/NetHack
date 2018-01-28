@@ -568,6 +568,9 @@ try again to fix achievement recording bug with mines and sokoban prizes
 the fix for secret doors on special levels always having vertical orientation
 	resulted in some--but not all--secret doors within vertical walls
 	being displayed as horizontal walls while still hidden
+the fix intended for "a shop object stolen from outside the shop (via
+	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
+	preventing any picked up item from merging with compatible stack
 
 
 Platform- and/or Interface-Specific Fixes
@@ -634,6 +637,8 @@ PANICTRACE: PANICTRACE_GDB used wrong value for ARGV0 when launching gdb if
 win32gui: gather raw_print error messages into a single dialog window
 win32tty: fix display errors when using a font with double wide or ambiguous
 	width characters
+Amiga (untested): 'makedefs -z' didn't handle FILE_PREFIX correctly when
+	building vis_tab.h and vis_tab.c
 
 
 General New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1515144225 2018/01/05 09:23:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1516581051 2018/01/22 00:30:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1500,17 +1500,16 @@ struct obj *otmp;
     boolean robshop = (!u.uswallow && otmp != uball && costly_spot(ox, oy));
 
     obj_extract_self(otmp);
-    otmp->nomerge = 1;
-    result = addinv(otmp);
-    otmp->nomerge = 0;
     newsym(ox, oy);
 
-    /* this used to be done before addinv(), but remote_burglary()
-       calls rob_shop() which calls setpaid() after moving costs of
-       unpaid items to shop debt; setpaid() calls clear_unpaid() for
-       lots of object chains, but 'otmp' wasn't on any of those so
-       remained flagged as an unpaid item in inventory, triggering
-       impossible() every time inventory was examined... */
+    /* for shop items, addinv() needs to be after addtobill() (so that
+       object merger can take otmp->unpaid into account) but before
+       remote_robbery() (which calls rob_shop() which calls setpaid()
+       after moving costs of unpaid items to shop debt; setpaid()
+       calls clear_unpaid() for lots of object chains, but 'otmp' isn't
+       on any of those between obj_extract_self() and addinv(); for
+       3.6.0, 'otmp' remained flagged as an unpaid item in inventory
+       and triggered impossible() every time inventory was examined) */
     if (robshop) {
         char saveushops[5], fakeshop[2];
 
@@ -1524,10 +1523,14 @@ struct obj *otmp;
         /* sets obj->unpaid if necessary */
         addtobill(otmp, TRUE, FALSE, FALSE);
         Strcpy(u.ushops, saveushops);
-        /* if you're outside the shop, make shk notice */
-        if (!index(u.ushops, *fakeshop))
-            remote_burglary(ox, oy);
+        robshop = otmp->unpaid && !index(u.ushops, *fakeshop);
     }
+
+    result = addinv(otmp);
+    /* if you're taking a shop item from outside the shop, make shk notice */
+    if (robshop)
+        remote_burglary(ox, oy);
+
     return result;
 }
 
