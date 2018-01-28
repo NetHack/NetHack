@@ -1235,7 +1235,11 @@ int mmflags;
     case S_NYMPH:
         if (rn2(5) && !u.uhave.amulet)
             mtmp->msleeping = 1;
-        mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
+        if (!type_is_pname(ptr)
+            && !(ptr->msound == MS_NEMESIS || ptr->msound == MS_LEADER)
+            && !is_elf(ptr) && !(is_dwarf(ptr))) {
+            mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
+        }
         break;
     case S_ORC:
         if (Race_if(PM_ELF))
@@ -1251,8 +1255,11 @@ int mmflags;
         break;
     case S_HUMAN:
     case S_KOP:
-        if (!type_is_pname(ptr))
+        if (!type_is_pname(ptr)
+            && !(ptr->msound == MS_NEMESIS || ptr->msound == MS_LEADER)
+            && !is_elf(ptr) && !(is_dwarf(ptr))) {
             mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
+        }
     }
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,

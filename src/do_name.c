@@ -1532,12 +1532,13 @@ static const char *const ghostnames[] = {
 
 static const char *const malhumnames[] = {
     "Samuel",    "John",   "Alejandro",  "Mickey",  "Bert",      "Ernie",
-    "Larry",    "Curly",  "Shemp",      "Moe",     "Jake",      "Jackson",
-    "Liam",     "Lucas",  "Oliver",     "Jayden",  "Sebastian", "Wyatt",
-    "Connor",   "Owen",   "Ben",        "Levi",    "Hikaru",    "Timmy",
-    "Johnny",   "Spike",  "Josiah",     "Justin",  "Erin",      "Sarah",
-    "Jimbo",    "Bob",    "Shadow",     "Dimitri", "Harry",     "Donald",
-    "Jerry",    "Dale",   "Arthur",     "Drew",    "Neo"
+    "Larry",    "Curly",  "Shemp",      "Moe",      "Jake",      "Jackson",
+    "Liam",     "Lucas",  "Oliver",     "Jayden",   "Sebastian", "Wyatt",
+    "Connor",   "Owen",   "Ben",        "Levi",     "Hikaru",    "Timmy",
+    "Johnny",   "Spike",  "Josiah",     "Justin",   "Erin",      "Sarah",
+    "Jimbo",    "Bob",    "Shadow",     "Dimitri",  "Harry",     "Donald",
+    "Jerry",    "Dale",   "Arthur",     "Drew",     "Neo",       "Leo",
+    "Trevor",   "Pike",   "Barret",     "Red",      "Roy"
 };
 
 static const char *const femhumnames[] = {
@@ -1547,7 +1548,8 @@ static const char *const femhumnames[] = {
     "Regina",   "Cosette",  "Chloe",   "Lyra",   "John",   "Alexa",  "Brooke",
     "Siri",     "Violet",   "Pell",    "Sam",    "Wanda",  "Lois",   "Bianca",
     "Trinity",  "Carmen",   "Megan",   "Sky",    "Rose",   "Roxy",   "Julie",
-    "Fran",     "Frieda",   "Lana",    "Tanya",
+    "Fran",     "Frieda",   "Lana",    "Tanya",  "Sally",  "Rika",   "Sil",
+    "Valeska",  "Yellow",   "Lucy",    "Patty",  "Celia"
 };
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
@@ -1559,6 +1561,7 @@ rndghostname()
 
 const char *
 rndhumname(feminine)
+boolean feminine;
 {
     if (feminine)
         return femhumnames[rn2(SIZE(femhumnames))];
