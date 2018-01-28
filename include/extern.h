@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1514769568 2018/01/01 01:19:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.622 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1517128658 2018/01/28 08:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.624 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2473,13 +2473,14 @@ E void NDECL(u_init);
 E void FDECL(erode_armor, (struct monst *, int));
 E boolean FDECL(attack_checks, (struct monst *, struct obj *));
 E void FDECL(check_caitiff, (struct monst *));
-E int FDECL(find_roll_to_hit,
-            (struct monst *, UCHAR_P, struct obj *, int *, int *));
+E int FDECL(find_roll_to_hit, (struct monst *, UCHAR_P, struct obj *,
+                               int *, int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
 E int FDECL(damageum, (struct monst *, struct attack *));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
-E int FDECL(passive, (struct monst *, BOOLEAN_P, int, UCHAR_P, BOOLEAN_P));
+E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
+                      UCHAR_P, BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *, struct obj *, struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *, struct obj *));
