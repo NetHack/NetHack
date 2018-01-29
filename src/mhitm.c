@@ -1537,6 +1537,22 @@ int mdead;
         if (!rn2(6))
             acid_damage(MON_WEP(magr));
         goto assess_dmg;
+    /* Grudge patch. */
+    case AD_MAGM:
+      /* wrath of gods for attacking Oracle */
+        if(resists_magm(magr)) {
+            if(canseemon(magr)) {
+                shieldeff(magr->mx, magr->my);
+                pline("A hail of magic missiles narrowly misses %s!",
+                    mon_nam(magr));
+              }
+        } else {
+            if(canseemon(magr))
+                pline(magr->data == &mons[PM_WOODCHUCK] ? "ZOT!" :
+                    "%s is hit by magic missiles appearing from thin air!",
+                    Monnam(magr));
+            goto assess_dmg;
+        } break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mhit && !mdef->mcan && otmp) {
             (void) drain_item(otmp, FALSE);
