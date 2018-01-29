@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# $NHDT-Date$
 
 #STARTUP-START
 BEGIN {
@@ -22,11 +21,6 @@ BEGIN {
     chomp $gitdir;
     push(@INC, $gitdir.$PDS."hooks");
 }
-
 use NHgithook;
-#STARTUP-END
 
-&NHgithook::PRE;
 &NHgithook::nhversioning;
-&NHgithook::POST;
-exit 0;

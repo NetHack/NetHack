@@ -737,5 +737,87 @@ const char *msg;
     }
 }
 
+/*
+ * Argument processing helpers - for xxmain() to share
+ * and call.
+ *
+ * These should return TRUE if the argument matched,
+ * whether the processing of the argument was
+ * successful or not.
+ *
+ * Most of these do their thing, then after returning
+ * to xxmain(), the code exits without starting a game.
+ *
+ */
+
+static struct early_opt earlyopts[] = {
+    {ARG_DEBUG, "debug", 5, FALSE},
+    {ARG_VERSION, "version", 4, TRUE},
+};
+
+boolean
+argcheck(argc, argv, e_arg)
+int argc;
+char *argv[];
+enum earlyarg e_arg;
+{
+    int i, idx;
+    boolean match = FALSE;
+    char *userea = (char *)0, *dashdash = "";
+
+    for (idx = 0; idx < SIZE(earlyopts); idx++) {
+        if (earlyopts[idx].e == e_arg)
+            break;
+    }
+    if ((idx >= SIZE(earlyopts)) || (argc <= 1))
+            return FALSE;
+
+    for (i = 1; i < argc; ++i) {
+        if (argv[i][0] != '-')
+            continue;
+        if (argv[i][1] == '-') {
+            userea = &argv[i][2];
+            dashdash = "-";
+        } else {
+            userea = &argv[i][1];
+        }
+        match = match_optname(userea, earlyopts[idx].name,
+                    earlyopts[idx].minlength, earlyopts[idx].valallowed);
+        if (match) break;
+    }
+
+    if (match) {
+        switch(e_arg) {
+            case ARG_DEBUG:
+                        break;
+            case ARG_VERSION: {
+                        boolean insert_into_pastebuf = FALSE;
+                        const char *extended_opt = index(userea,':');
+
+                        if (!extended_opt)
+                            extended_opt = index(userea, '=');
+
+                        if (extended_opt) {
+                            extended_opt++;
+                            if (match_optname(extended_opt, "paste",
+                                                   5, FALSE)) {
+                                insert_into_pastebuf = TRUE;
+                            } else {
+                                raw_printf(
+                     "-%sversion can only be extended with -%sversion:paste.\n",
+                                            dashdash, dashdash);
+                                return TRUE;
+            		    }
+        		}
+                        early_version_info(insert_into_pastebuf);
+                        return TRUE;
+                        break;
+            }
+            default:
+                        break;
+        }
+    };
+    return FALSE;
+}
 
 /*allmain.c*/

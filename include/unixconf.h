@@ -387,5 +387,9 @@
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
 
+#ifdef __APPLE__
+# define RUNTIME_PASTEBUF_SUPPORT
+#endif
+
 #endif /* UNIXCONF_H */
 #endif /* UNIX */

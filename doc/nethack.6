@@ -55,6 +55,9 @@ nethack \- Exploring The Mazes of Menace
 [
 .I playernames
 ]
+[
+.B \-\-version
+]
 .ad
 .hy 14
 .\" Make sure path is not hyphenated below
@@ -207,6 +210,17 @@ The playground must contain several auxiliary files such as help files,
 the list of top scorers, and a subdirectory
 .I save
 where games are saved.
+.PP
+.B \-\-version
+can be used to cause NetHack to show the version information it
+was compiled with, then exit. That will include the
+.I git
+commit hash if the information was available when the game was compiled.
+On some platforms, such as windows and macosx, a variation 
+.B \-\-version:paste
+can be used to cause NetHack to show the version information, then exit,
+while also leaving a copy of the version information in the paste buffer 
+or clipboard for potential insertion into things like bug reports.
 .SH AUTHORS
 .PP
 Jay Fenlason (+ Kenny Woodland, Mike Thome and Jon Payne) wrote the
