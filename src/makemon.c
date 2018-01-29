@@ -1235,9 +1235,8 @@ int mmflags;
     case S_NYMPH:
         if (rn2(5) && !u.uhave.amulet)
             mtmp->msleeping = 1;
-        if (!type_is_pname(ptr)
-            && !(ptr->msound == MS_NEMESIS || ptr->msound == MS_LEADER)
-            && !is_elf(ptr) && !(is_dwarf(ptr))) {
+        if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
+            && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)) {
             mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
         }
         break;
@@ -1255,8 +1254,8 @@ int mmflags;
         break;
     case S_HUMAN:
     case S_KOP:
-        if (!type_is_pname(ptr)
-            && !(ptr->msound == MS_NEMESIS || ptr->msound == MS_LEADER)
+        if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
+            && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)
             && !is_elf(ptr) && !(is_dwarf(ptr))) {
             mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
         }
