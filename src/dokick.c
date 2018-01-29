@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1446955295 2015/11/08 04:01:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1517128663 2018/01/28 08:37:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,7 +116,7 @@ register boolean clumsy;
         }
     }
 
-    (void) passive(mon, TRUE, mon->mhp > 0, AT_KICK, FALSE);
+    (void) passive(mon, uarmf, TRUE, mon->mhp > 0, AT_KICK, FALSE);
     if (mon->mhp <= 0 && !trapkilled)
         killed(mon);
 
@@ -162,7 +162,7 @@ xchar x, y;
         && !is_flyer(mon->data)) {
         pline("Floating in the air, you miss wildly!");
         exercise(A_DEX, FALSE);
-        (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+        (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
         return;
     }
 
@@ -213,13 +213,13 @@ xchar x, y;
             } else if (tmp > (kickdieroll = rnd(20))) {
                 You("kick %s.", mon_nam(mon));
                 sum = damageum(mon, uattk);
-                (void) passive(mon, (boolean) (sum > 0), (sum != 2), AT_KICK,
-                               FALSE);
+                (void) passive(mon, uarmf, (boolean) (sum > 0),
+                               (sum != 2), AT_KICK, FALSE);
                 if (sum == 2)
                     break; /* Defender died */
             } else {
                 missum(mon, uattk, (tmp + armorpenalty > kickdieroll));
-                (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+                (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             }
         }
         return;
@@ -233,7 +233,7 @@ xchar x, y;
             if (martial() && !rn2(2))
                 goto doit;
             Your("clumsy kick does no damage.");
-            (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+            (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             return;
         }
         if (i < j / 10)
@@ -257,7 +257,7 @@ doit:
         if (!nohands(mon->data) && !rn2(martial() ? 5 : 3)) {
             pline("%s blocks your %skick.", Monnam(mon),
                   clumsy ? "clumsy " : "");
-            (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+            (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
             return;
         } else {
             maybe_mnexto(mon);
@@ -274,7 +274,7 @@ doit:
                                                             ? "slides"
                                                             : "jumps",
                       clumsy ? "easily" : "nimbly", clumsy ? "clumsy " : "");
-                (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
+                (void) passive(mon, uarmf, FALSE, 1, AT_KICK, FALSE);
                 return;
             }
         }
