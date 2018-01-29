@@ -569,6 +569,7 @@ makevtele()
     makeniche(TELEP_TRAP);
 }
 
+/* Pasi Kallinen's Underground rivers patch. */
 STATIC_OVL void
 makeriver(x1,y1,x2,y2,lava)
 int x1,y1,x2,y2;
@@ -586,7 +587,7 @@ boolean lava;
       	int rnum = levl[cx][cy].roomno - ROOMOFFSET;
       	chance = 0;
       	if (rnum >= 0 && rooms[rnum].rtype != OROOM) chance = 0;
-      	else if (levl[cx][cy].typ == CORR) chance = 15;
+      	else if (levl[cx][cy].typ == CORR) chance = 5;
       	else if (levl[cx][cy].typ == ROOM) chance = 30;
       	else if (IS_ROCK(levl[cx][cy].typ)) chance = 100;
 
