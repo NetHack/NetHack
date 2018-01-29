@@ -326,23 +326,23 @@ int interjection_type;
  */
 #ifndef _M_IX86
 #ifdef _M_X64
-#define TARGET_PORT "(x64) "
+#define TARGET_PORT "x64"
 #endif
 #ifdef _M_IA64
-#define TARGET_PORT "(IA64) "
+#define TARGET_PORT "IA64"
 #endif
 #endif
 
 #ifndef TARGET_PORT
-#define TARGET_PORT "(x86) "
+#define TARGET_PORT "x86"
 #endif
 
-void
-append_port_id(buf)
+char *
+get_port_id(buf)
 char *buf;
 {
-    char *portstr = TARGET_PORT;
-    Sprintf(eos(buf), " %s", portstr);
+    Strcpy(buf, TARGET_PORT);
+    return buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
