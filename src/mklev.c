@@ -569,6 +569,84 @@ makevtele()
     makeniche(TELEP_TRAP);
 }
 
+STATIC_OVL void
+makeriver(x1,y1,x2,y2,lava)
+int x1,y1,x2,y2;
+boolean lava;
+{
+    int cx,cy;
+    int dx, dy;
+    int chance;
+    int count = 0;
+
+    cx = x1;
+    cy = y1;
+
+    while (count++ < 2000) {
+      	int rnum = levl[cx][cy].roomno - ROOMOFFSET;
+      	chance = 0;
+      	if (rnum >= 0 && rooms[rnum].rtype != OROOM) chance = 0;
+      	else if (levl[cx][cy].typ == CORR) chance = 15;
+      	else if (levl[cx][cy].typ == ROOM) chance = 30;
+      	else if (IS_ROCK(levl[cx][cy].typ)) chance = 100;
+
+      	if (rn2(100) < chance && !t_at(cx,cy)) {
+      	    if (lava) {
+            		levl[cx][cy].typ = LAVAPOOL;
+            		levl[cx][cy].lit = 1;
+      	    } else
+      		  levl[cx][cy].typ = !rn2(3) ? POOL : MOAT;
+      	}
+
+      	if (cx == x2 && cy == y2) break;
+
+      	if (cx < x2 && !rn2(3)) dx = 1;
+      	else if (cx > x2 && !rn2(3)) dx = -1;
+      	else dx = 0;
+
+      	if (cy < y2 && !rn2(3)) dy = 1;
+      	else if (cy > y2 && !rn2(3)) dy = -1;
+      	else dy = 0;
+
+      	switch (rn2(16)) {
+          	default: break;
+          	case 1: dx--; dy--; break;
+          	case 2: dx++; dy--; break;
+          	case 3: dx--; dy++; break;
+          	case 4: dx++; dy++; break;
+          	case 5: dy--; break;
+          	case 6: dy++; break;
+          	case 7: dx--; break;
+          	case 8: dx++; break;
+      	}
+
+      	if (dx < -1) dx = -1;
+      	else if (dx > 1) dx = 1;
+      	if (dy < -1) dy = -1;
+      	else if (dy > 1) dy = 1;
+
+      	cx += dx;
+      	cy += dy;
+
+      	if (cx < 0) cx = 0;
+      	else if (cx >= COLNO) cx = COLNO-1;
+      	if (cy < 0) cy = 0;
+      	else if (cy >= ROWNO) cy = ROWNO-1;
+    }
+}
+
+STATIC_OVL void
+mkrivers()
+{
+    int nriv = rn2(3) + 1;
+    boolean lava = rn2(100) < depth(&u.uz);
+    while (nriv--) {
+      	if (rn2(2)) makeriver(0, rn2(ROWNO), COLNO-1, rn2(ROWNO), lava);
+      	else makeriver(rn2(COLNO), 0, rn2(COLNO), ROWNO-1, lava);
+    }
+}
+
+
 /* clear out various globals that keep information on the current level.
  * some of this is only necessary for some types of levels (maze, normal,
  * special) but it's easier to put it all in one place than make sure
@@ -775,6 +853,8 @@ makelevel()
             mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
             mkroom(ANTHOLE);
+        else if (u_depth > 13 && !rn2(7))
+            mkrivers();
         else if (u_depth > 14 && !rn2(4)
                  && !(mvitals[PM_SOLDIER].mvflags & G_GONE))
             mkroom(BARRACKS);

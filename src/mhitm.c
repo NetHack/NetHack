@@ -1537,7 +1537,7 @@ int mdead;
         if (!rn2(6))
             acid_damage(MON_WEP(magr));
         goto assess_dmg;
-    /* Grudge patch. */
+    /* Nephi's Grudge patch. */
     case AD_MAGM:
       /* wrath of gods for attacking Oracle */
         if(resists_magm(magr)) {

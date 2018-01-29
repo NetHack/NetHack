@@ -1475,7 +1475,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
        like to eat shriekers, so attack the latter when feasible */
     if (ma == &mons[PM_PURPLE_WORM] && md == &mons[PM_SHRIEKER])
         return ALLOW_M | ALLOW_TM;
-    /* Grudge patch. */
+    /* Nephi's Grudge patch. */
     /* Since the quest guardians are under siege, it makes sense to have
        them fight hostiles.  (But we don't want the quest leader to be in
        danger.) */
