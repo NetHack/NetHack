@@ -169,6 +169,11 @@ read 'File' (1161,"Wiz-filb.lev") "Wiz-filb.lev";
 read 'File' (1162,"Wiz-goal.lev") "Wiz-goal.lev";
 read 'File' (1163,"Wiz-loca.lev") "Wiz-loca.lev";
 read 'File' (1164,"Wiz-strt.lev") "Wiz-strt.lev";
+read 'File' (1165,"Car-fila.lev") "Car-fila.lev";
+read 'File' (1166,"Car-filb.lev") "Car-filb.lev";
+read 'File' (1167,"Car-goal.lev") "Car-goal.lev";
+read 'File' (1168,"Car-loca.lev") "Car-loca.lev";
+read 'File' (1169,"Car-strt.lev") "Car-strt.lev";
 #else
 read 'File' (1000,"cmdhelp") ":dat:cmdhelp";
 read 'File' (1001,"help") ":dat:help";
@@ -298,4 +303,9 @@ read 'File' (1161,"Wiz-filb.lev") ":lib:Wiz-filb.lev";
 read 'File' (1162,"Wiz-goal.lev") ":lib:Wiz-goal.lev";
 read 'File' (1163,"Wiz-loca.lev") ":lib:Wiz-loca.lev";
 read 'File' (1164,"Wiz-strt.lev") ":lib:Wiz-strt.lev";
+read 'File' (1165,"Car-fila.lev") ":lib:Car-fila.lev";
+read 'File' (1166,"Car-filb.lev") ":lib:Car-filb.lev";
+read 'File' (1167,"Car-goal.lev") ":lib:Car-goal.lev";
+read 'File' (1168,"Car-loca.lev") ":lib:Car-loca.lev";
+read 'File' (1169,"Car-strt.lev") ":lib:Car-strt.lev";
 #endif

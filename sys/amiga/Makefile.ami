@@ -639,7 +639,7 @@ spotless:  clean
 #	-delete $(WDFILES)
 	-delete $(I)onames.h $(I)pm.h $(I)date.h
 	-delete $(NHS)tile.c $(NHS)monstr.c
-	-delete $(I)tile.h 
+	-delete $(I)tile.h
 #	-echo to $(I)onames.h "" noline
 #	-wait 2
 #	-echo to $(I)pm.h "" noline
@@ -921,7 +921,7 @@ $(OO)splitter.o:	$(ASP)/splitter.c $(ASP)/split.h $(ASP)/amiout.h $(ASP)/arg.h
 		$(ASP)/splitter.c
 
 $(OO)arg.o:	$(ASP)/arg.c $(ASP)/arg.h
-	$(CC) $(WBCFLAGS) $(SPLFLAGS) $(OBJSPEC)$(OO)arg.o $(ASP)/arg.c 
+	$(CC) $(WBCFLAGS) $(SPLFLAGS) $(OBJSPEC)$(OO)arg.o $(ASP)/arg.c
 
 # Create/copy other stuff into NetHack: directory:
 
@@ -1071,7 +1071,7 @@ $(SLIB)astral.lev:	$(DAT)endgame.des $(SBIN)lev_comp
 #none
 
 GEHENNOM1= $(SLIB)asmodeus.lev $(SLIB)baalz.lev $(SLIB)juiblex.lev \
-  $(SLIB)orcus.lev $(SLIB)sanctum.lev 
+  $(SLIB)orcus.lev $(SLIB)sanctum.lev
 $(GEHENNOM1):	$(SLIB)valley.lev
 
 $(SLIB)valley.lev:	$(DAT)gehennom.des $(SBIN)lev_comp
@@ -1606,9 +1606,9 @@ $(I)global.h:  $(I)coord.h $(I)pcconf.h $(I)amiconf.h
 	-setdate $(I)global.h
 	-wait 2
 
-$(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h 
+$(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h
 		$(I)monsym.h $(I)mkroom.h $(I)objclass.h $(I)flag.h $(I)rm.h
-		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h 
+		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h
 		$(I)rect.h $(I)region.h $(I)trampoli.h $(I)sys.h
 	-setdate $(I)hack.h
 	-wait 2

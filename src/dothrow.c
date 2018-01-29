@@ -137,6 +137,7 @@ int shotlimit;
             if (skill == -P_SLING || skill == P_SPEAR)
                 multishot++;
             break;
+        case PM_CARTOMANCER:
         case PM_MONK:
             /* allow higher volley count despite skill limitation */
             if (skill == -P_SHURIKEN)

@@ -529,6 +529,7 @@ QUEST_LEVS = \
  Arc-goal.lev Arc-fila.lev Arc-filb.lev Arc-loca.lev Arc-strt.lev \
  Bar-goal.lev Bar-fila.lev Bar-filb.lev Bar-loca.lev Bar-strt.lev \
  Cav-goal.lev Cav-fila.lev Cav-filb.lev Cav-loca.lev Cav-strt.lev \
+ Car-goal.lev Car-fila.lev Car-filb.lev Car-loca.lev Car-strt.lev \
  Hea-goal.lev Hea-fila.lev Hea-filb.lev Hea-loca.lev Hea-strt.lev \
  Kni-goal.lev Kni-fila.lev Kni-filb.lev Kni-loca.lev Kni-strt.lev \
  Mon-goal.lev Mon-fila.lev Mon-filb.lev Mon-loca.lev Mon-strt.lev \
@@ -553,7 +554,7 @@ VOBJ011 = $(OBJ)\allmain.o
 VOBJ012 = $(OBJ)\alloc.o
 VOBJ013 = $(OBJ)\apply.o
 VOBJ014 = $(OBJ)\artifact.o
-VOBJ021 = $(OBJ)\attrib.o 
+VOBJ021 = $(OBJ)\attrib.o
 VOBJ022 = $(OBJ)\ball.o
 VOBJ023 = $(OBJ)\bones.o
 VOBJ024 = $(OBJ)\botl.o
@@ -1787,4 +1788,3 @@ rip.xpm: $(WINX11)\rip.xpm
 $(OBJ)\tile2x11.o : $(WINX11)\tile2x11.c $(INCL)\tile2x11.h
 	$(CC) $(CFLAGS) -o$(OBJ)\tile2x11.o -c $(WINX11)\tile2x11.c \
 		-I$(WINSHARE)
-

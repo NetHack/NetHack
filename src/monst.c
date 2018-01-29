@@ -2741,6 +2741,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_MALE | M2_COLLECT,
         M3_INFRAVISIBLE, HI_DOMESTIC),
+    MON("cartomancer", S_HUMAN, LVL(10, 12, 10, 3, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE, HI_DOMESTIC),
     MON("cavewoman", S_HUMAN, LVL(10, 12, 10, 0, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -2851,6 +2858,14 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
+        M3_CLOSE | M3_INFRAVISIBLE, HI_LORD),
+    MON("Lord of the Cards", S_HUMAN, LVL(20, 12, 0, 60, 0),
+        (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_MAGC, AD_SPEL, 2, 8), ATTK(AT_MAGC, AD_SPEL, 2, 8), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_LEADER, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_CLOSE | M3_INFRAVISIBLE, HI_LORD),
 #if 0 /* OBSOLETE */
     /* Two for elves - one of each sex.
@@ -3003,6 +3018,16 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_HOSTILE | M2_FEMALE | M2_STALK | M2_STRONG | M2_NASTY
             | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, HI_LORD),
+    MON("Dal Zethire", S_HUMAN, LVL(15, 12, 0, 80, -10),
+        (G_NOGEN | G_UNIQ | G_NOCORPSE),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
+          ATTK(AT_CLAW, AD_SAMU, 1, 4), NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_NEMESIS, MZ_HUMAN), MR_STONE, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_HOSTILE | M2_STALK | M2_NASTY
+            | M2_COLLECT | M2_MAGIC | M2_PNAME,
+        M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, CLR_RED),
 #if 0 /* OBSOLETE */
     MON("Goblin King", S_ORC,
         LVL(15, 12, 10, 0, -15), (G_NOGEN | G_UNIQ),

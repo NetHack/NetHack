@@ -46,6 +46,14 @@ static struct trobj Barbarian[] = {
     { FOOD_RATION, 0, FOOD_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
+static struct trobj Cartomancer[] = {
+    { HAWAIIAN_SHIRT, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
+    { DAGGER, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
+    { SHURIKEN, 0, GEM_CLASS, 15, UNDEF_BLESS },
+    { UNDEF_TYP, UNDEF_SPE, SCROLL_CLASS, 4, UNDEF_BLESS },
+    { SCR_CREATE_MONSTER, 0, SCROLL_CLASS, 3, UNDEF_BLESS },
+    { 0, 0, 0, 0, 0 }
+};
 static struct trobj Cave_man[] = {
 #define C_AMMO 2
     { CLUB, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
@@ -275,6 +283,31 @@ static const struct def_skill Skill_B[] = {
     { P_RIDING, P_BASIC },
     { P_TWO_WEAPON_COMBAT, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_MASTER },
+    { P_NONE, 0 }
+};
+static const struct def_skill Skill_Car[] = {
+    { P_DAGGER, P_EXPERT },
+    { P_KNIFE, P_SKILLED },
+    { P_AXE, P_BASIC },
+    { P_SHORT_SWORD, P_BASIC },
+    { P_CLUB, P_BASIC },
+    { P_MACE, P_BASIC },
+    { P_QUARTERSTAFF, P_BASIC },
+    { P_POLEARMS, P_BASIC },
+    { P_SPEAR, P_BASIC },
+    { P_TRIDENT, P_BASIC },
+    { P_SLING, P_SKILLED },
+    { P_DART, P_EXPERT },
+    { P_SHURIKEN, P_EXPERT },
+    { P_ATTACK_SPELL, P_EXPERT },
+    { P_HEALING_SPELL, P_BASIC },
+    { P_DIVINATION_SPELL, P_EXPERT },
+    { P_ENCHANTMENT_SPELL, P_SKILLED },
+    { P_CLERIC_SPELL, P_SKILLED },
+    { P_ESCAPE_SPELL, P_EXPERT },
+    { P_MATTER_SPELL, P_EXPERT },
+    { P_RIDING, P_BASIC },
+    { P_BARE_HANDED_COMBAT, P_SKILLED },
     { P_NONE, 0 }
 };
 static const struct def_skill Skill_C[] = {
@@ -689,6 +722,11 @@ u_init()
         ini_inv(Cave_man);
         skill_init(Skill_C);
         break;
+    case PM_CARTOMANCER:
+        ini_inv(Cartomancer);
+        skill_init(Skill_Car);
+        knows_object(SCR_GENOCIDE);
+        break;
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
         ini_inv(Healer);
@@ -807,7 +845,8 @@ u_init()
          * Non-warriors get an instrument.  We use a kludge to
          * get only non-magic instruments.
          */
-        if (Role_if(PM_PRIEST) || Role_if(PM_WIZARD)) {
+        if (Role_if(PM_PRIEST) || Role_if(PM_CARTOMANCER)
+            || Role_if(PM_WIZARD)) {
             static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
                                     BELL,         BUGLE,       LEATHER_DRUM };
             Instrument[0].trotyp = trotyp[rn2(SIZE(trotyp))];
@@ -919,6 +958,9 @@ int otyp;
         break;
     case PM_CAVEMAN:
         skills = Skill_C;
+        break;
+    case PM_CARTOMANCER:
+        skills = Skill_Car;
         break;
     case PM_HEALER:
         skills = Skill_H;
