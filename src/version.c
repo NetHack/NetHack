@@ -15,8 +15,6 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO ""
-
 STATIC_DCL void FDECL(insert_rtoption, (char *));
 
 /* fill buffer with short version (so caller can avoid including date.h) */
@@ -32,13 +30,26 @@ char *
 getversionstring(buf)
 char *buf;
 {
+    int details = 0;
+
     Strcpy(buf, VERSION_ID);
-#if defined(BETA) && defined(BETA_INFO)
-    Sprintf(eos(buf), " %s", BETA_INFO);
-#endif
 #if defined(RUNTIME_PORT_ID)
-    append_port_id(buf);
+    details++;
 #endif
+
+    if (details) {
+        int c = 0;
+        char tmpbuf[BUFSZ];
+        char *tmp = (char *)0;
+
+        Sprintf(eos(buf), " (");
+#if defined(RUNTIME_PORT_ID)
+        tmp = get_port_id(tmpbuf);        
+        if (tmp)
+            Sprintf(eos(buf), "%s%s", c++ ? "," : "", tmp);
+#endif
+        Sprintf(eos(buf), ")");
+    }
     return buf;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1506993895 2017/10/03 01:24:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1516697571 2018/01/23 08:52:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -2816,7 +2816,7 @@ do_vision()
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
+    Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
         exit(EXIT_FAILURE);
@@ -2839,10 +2839,15 @@ do_vision()
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(filename, SOURCE_TEMPLATE, VIS_TAB_C);
+    Sprintf(eos(filename), SOURCE_TEMPLATE, VIS_TAB_C);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
+        /* creating vis_tab.c failed; remove the vis_tab.h we just made */
+        filename[0] = '\0';
+#ifdef FILE_PREFIX
+        Strcat(filename, file_prefix);
+#endif
+        Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }
