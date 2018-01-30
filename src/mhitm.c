@@ -1360,6 +1360,46 @@ register struct attack *mattk;
         /* there's no msomearmor() function, so just do damage */
         /* if (cancelled) break; */
         break;
+    case AD_VOID:
+        if (cancelled)
+            break;
+        if (mdef->data == &mons[PM_DEATH]) {
+            mdef->mhpmax += mdef->mhpmax / 2;
+            if (mdef->mhpmax >= 1000)
+                mdef->mhpmax = 1000 - 1;
+            mdef->mhp = mdef->mhpmax;
+            tmp = 0;
+            break;
+        }
+        if (resists_disint(mdef)) {
+            pline("%s resists the touch of the void!", Monnam(mdef));
+        } else if (mdef->misc_worn_check & W_ARMS) {
+            /* destroy shield; victim survives */
+            pline("%s absorbs the shield of %s!",
+                Monnam(magr), mon_nam(mdef));
+            m_useup(mdef, which_armor(mdef, W_ARMS));
+        } else if (mdef->misc_worn_check & W_ARMC) {
+            /* destroy cloak, victim survives */
+            pline("%s absorbs the cloak of %s!",
+                Monnam(magr), mon_nam(mdef));
+            m_useup(mdef, which_armor(mdef, W_ARMC));
+        } else if (mdef->misc_worn_check & W_ARM) {
+            /* destroy body armor, victim survives */
+            pline("%s absorbs the armor of %s!",
+                Monnam(magr), mon_nam(mdef));
+            m_useup(mdef, which_armor(mdef, W_ARM));
+        } else {
+            /* no body armor, victim dies; destroy cloak
+               and shirt now in case target gets life-saved */
+               pline("%s is utterly consumed by %s!",
+                   Monnam(magr), mon_nam(mdef));
+            tmp = mdef->mhp + 1;
+            if (which_armor(mdef, W_ARMC) != 0)
+                m_useup(mdef, which_armor(mdef, W_ARMC));
+            if (which_armor(mdef, W_ARMU) != 0)
+                m_useup(mdef, which_armor(mdef, W_ARMU));
+        }
+        break;
     default:
         tmp = 0;
         break;

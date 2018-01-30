@@ -1251,6 +1251,16 @@ NEARDATA struct permonst mons[] = {
                       | M1_OVIPAROUS | M1_CARNIVORE | M1_ACID,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_YELLOW),
+    MON("void dragon", S_DRAGON, LVL(25, 9, -1, 20, -6), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_VOID, 3, 8),
+          ATTK(AT_CLAW, AD_VOID, 1, 4), ATTK(AT_CLAW, AD_VOID, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC),
+        MR_DISINT | MR_STONE | MR_COLD, MR_DISINT,
+        M1_FLY | M1_TUNNEL | M1_AMORPHOUS | M1_THICK_HIDE | M1_NOHANDS
+            | M1_SEE_INVIS | M1_CARNIVORE | M1_BREATHLESS | M1_UNSOLID,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BLACK),
     /*
      * Elementals
      */

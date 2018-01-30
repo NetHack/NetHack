@@ -77,6 +77,7 @@
 #define AD_SLIM 40  /* turns you into green slime */
 #define AD_ENCH 41  /* remove enchantment (disenchanter) */
 #define AD_CORR 42  /* corrode armor (black pudding) */
+#define AD_VOID 43  /* disintegrate the target (void dragon) */
 
 #define AD_CLRC 240 /* random clerical spell */
 #define AD_SPEL 241 /* random magic spell */

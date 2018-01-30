@@ -1624,6 +1624,40 @@ register struct attack *mattk;
             }
         }
         break;
+    case AD_VOID:
+        hitmsg(mtmp, mattk);
+        if (uncancelled) {
+            if (Disint_resistance) {
+                You("are not disintegrated.");
+                break;
+            } else if (uarms) {
+                /* destroy shield; other possessions are safe */
+                (void) destroy_arm(uarms);
+                break;
+            } else if (uarmc) {
+                /* destroy suit. This is nerfed slightly from regular
+                   disintegration, simply because void attacks are
+                   already so powerful. */
+                (void) destroy_arm(uarm);
+                break;
+            } else if (uarm) {
+                /* destory cloak */
+                (void) destroy_arm(uarm);
+                break;
+            }
+            /* no shield or suit, you're dead; wipe out cloak
+               and/or shirt in case of life-saving or bones */
+            if (uarmc)
+                (void) destroy_arm(uarmc);
+            if (uarmu)
+                (void) destroy_arm(uarmu);
+            You("touch the raw void...");
+            u.ugrave_arise = NON_PM;
+            killer.format = KILLED_BY_AN;
+            Strcpy(killer.name, mtmp->data->mname);
+            done(DIED);
+        }
+        break;
     default:
         dmg = 0;
         break;
