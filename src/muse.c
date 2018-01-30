@@ -1720,7 +1720,7 @@ struct monst *mtmp;
         if (obj->otyp == BULLWHIP && !mtmp->mpeaceful
             /* the random test prevents whip-wielding
                monster from attempting disarm every turn */
-            && uwep && !rn2(2) && obj == MON_WEP(mtmp)
+            && uwep && !rn2(5) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
             && mtmp->mux == u.ux && mtmp->muy == u.uy
             && distu(mtmp->mx, mtmp->my) <= 2
