@@ -1251,16 +1251,35 @@ NEARDATA struct permonst mons[] = {
                       | M1_OVIPAROUS | M1_CARNIVORE | M1_ACID,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_YELLOW),
-    MON("void dragon", S_DRAGON, LVL(25, 9, -1, 20, -6), (G_GENO | 1),
+    MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 5, 8), ATTK(AT_CLAW, AD_PHYS, 10, 2),
+        ATTK(AT_CLAW, AD_PHYS, 10, 2), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+            | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_CYAN),
+    MON("ooze dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_ACID | MR_STONE,
+        MR_STONE, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS |
+                  M1_AMORPHOUS | M1_CARNIVORE | M1_ACID,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BRIGHT_GREEN),
+    MON("void dragon", S_DRAGON, LVL(30, 9, -10, 20, 0),
+        (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_VOID, 3, 8),
           ATTK(AT_CLAW, AD_VOID, 1, 4), ATTK(AT_CLAW, AD_VOID, 1, 4), NO_ATTK,
           NO_ATTK),
-        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC),
+        SIZ(WT_DRAGON, 1500, MS_SILENT, MZ_GIGANTIC),
         MR_DISINT | MR_STONE | MR_COLD, MR_DISINT,
-        M1_FLY | M1_TUNNEL | M1_AMORPHOUS | M1_THICK_HIDE | M1_NOHANDS
-            | M1_SEE_INVIS | M1_CARNIVORE | M1_BREATHLESS | M1_UNSOLID,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_BLACK),
+        M1_FLY | M1_TUNNEL | M1_UNSOLID | M1_THICK_HIDE | M1_NOHANDS
+            | M1_SEE_INVIS | M1_CARNIVORE | M1_BREATHLESS,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC |
+        M2_NOPOLY,
+        0, CLR_BRIGHT_BLUE),
     /*
      * Elementals
      */
@@ -2703,6 +2722,13 @@ struct permonst _mons2[] = {
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS
             | M1_OVIPAROUS | M1_CARNIVORE,
         M2_STRONG | M2_HOSTILE, 0, CLR_BROWN),
+    MON("velociraptor", S_LIZARD, LVL(7, 18, 5, 0, 0), (G_GENO | G_SGROUP | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
+          ATTK(AT_CLAW, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_GROWL, MZ_MEDIUM), 0, 0,
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS
+            | M1_CARNIVORE,
+        M2_STRONG | M2_HOSTILE, 0, CLR_WHITE),
     MON("salamander", S_LIZARD, LVL(8, 12, -1, 0, -9), (G_HELL | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 8), ATTK(AT_TUCH, AD_FIRE, 1, 6),
           ATTK(AT_HUGS, AD_PHYS, 2, 6), ATTK(AT_HUGS, AD_FIRE, 3, 6), NO_ATTK,
@@ -2711,6 +2737,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_SLITHY | M1_THICK_HIDE | M1_POIS,
         M2_STALK | M2_HOSTILE | M2_COLLECT | M2_MAGIC, M3_INFRAVISIBLE,
         CLR_ORANGE),
+    MON("T-Rex", S_LIZARD, LVL(10, 9, 5, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 5, 10), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 500, MS_ROAR, MZ_HUGE), 0, 0,
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS
+            | M1_CARNIVORE,
+        M2_STRONG | M2_HOSTILE, 0, CLR_WHITE),
 
     /*
      * dummy monster needed for visual interface
