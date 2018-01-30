@@ -1476,6 +1476,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
     if (ma == &mons[PM_PURPLE_WORM] && md == &mons[PM_SHRIEKER])
         return ALLOW_M | ALLOW_TM;
     /* Nephi's Grudge patch. */
+
     /* Since the quest guardians are under siege, it makes sense to have
        them fight hostiles.  (But we don't want the quest leader to be in
        danger.) */
@@ -1484,23 +1485,34 @@ struct monst *magr, /* monster that is currently deciding where to move */
     /* and vice versa */
     if(md->msound==MS_GUARDIAN && magr->mpeaceful==FALSE)
    	    return ALLOW_M|ALLOW_TM;
+
   	/* elves vs. orcs */
   	if(is_elf(ma) && is_orc(md))
   		  return ALLOW_M|ALLOW_TM;
   	/* and vice versa */
   	if(is_elf(md) && is_orc(ma))
   		  return ALLOW_M|ALLOW_TM;
+
   	/* angels vs. demons */
   	if(ma->mlet==S_ANGEL && is_demon(md))
   		  return ALLOW_M|ALLOW_TM;
   	/* and vice versa */
   	if(md->mlet==S_ANGEL && is_demon(ma))
   		  return ALLOW_M|ALLOW_TM;
+
   	/* woodchucks vs. The Oracle */
   	if(ma == &mons[PM_WOODCHUCK] && md == &mons[PM_ORACLE])
   		  return ALLOW_M|ALLOW_TM;
+
   	/* ravens like eyes */
   	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
+  		  return ALLOW_M|ALLOW_TM;
+
+    /* renegade shopkeepers just don't like people */
+    if(ma == &mons[PM_RENEGADE_SHOPKEEPER] && md->mlet == S_HUMAN)
+  		  return ALLOW_M|ALLOW_TM;
+    /* and vice versa */
+    if(md->mlet == S_HUMAN && ma == &mons[PM_RENEGADE_SHOPKEEPER])
   		  return ALLOW_M|ALLOW_TM;
     return 0L;
 }

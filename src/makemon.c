@@ -600,6 +600,7 @@ register struct monst *mtmp;
             case PM_SOLDIER:
                 mac = 3;
                 break;
+            case PM_RENEGADE_SHOPKEEPER:
             case PM_SERGEANT:
                 mac = 0;
                 break;
@@ -662,7 +663,8 @@ register struct monst *mtmp;
                     (void) mongets(mtmp, BUGLE);
             } else if (ptr == &mons[PM_WATCHMAN] && rn2(3))
                 (void) mongets(mtmp, TIN_WHISTLE);
-        } else if (ptr == &mons[PM_SHOPKEEPER]) {
+        } else if (ptr == &mons[PM_SHOPKEEPER] ||
+            ptr == &mons[PM_RENEGADE_SHOPKEEPER]) {
             (void) mongets(mtmp, SKELETON_KEY);
             switch (rn2(4)) {
             /* MAJOR fall through ... */

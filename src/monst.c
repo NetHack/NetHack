@@ -1252,8 +1252,8 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_YELLOW),
     MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 5, 8), ATTK(AT_CLAW, AD_PHYS, 10, 2),
-        ATTK(AT_CLAW, AD_PHYS, 10, 2), NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
+        ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
             | M1_CARNIVORE,
@@ -1370,6 +1370,13 @@ NEARDATA struct permonst mons[] = {
         M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, 0, CLR_MAGENTA),
+    MON("legendary lichen", S_FUNGUS, LVL(4, 3, 9, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_TUCH, AD_PHYS, 2, 4), ATTK(AT_TUCH, AD_STCK, 0, 0),
+            NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(20, 200, MS_SILENT, MZ_SMALL), 0, 0,
+        M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
+            | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER | M2_LORD, 0, HI_LORD),
     /*
      * Gnomes
      */
@@ -1888,7 +1895,6 @@ struct permonst _mons2[] = {
         M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_LORD
             | M2_MALE | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, CLR_BLUE),
-#if 0 /* DEFERRED */
     MON("vampire mage", S_VAMPIRE,
         LVL(20, 14, -4, 50, -9), (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_CLAW, AD_DRLI, 2, 8), ATTK(AT_BITE, AD_DRLI, 1, 8),
@@ -1898,7 +1904,6 @@ struct permonst _mons2[] = {
         M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_LORD
           | M2_MALE | M2_MAGIC | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, HI_ZAP),
-#endif
     MON("Vlad the Impaler", S_VAMPIRE, LVL(28, 26, -6, 80, -10),
         (G_NOGEN | G_NOCORPSE | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_BITE, AD_DRLI, 1, 12),
@@ -2219,6 +2224,13 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, MS_SELL, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_PEACEFUL
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE, HI_DOMESTIC),
+    MON("renegade shopkeeper", S_HUMAN, LVL(12, 18, 0, 50, 0), (G_GENO | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 4), ATTK(AT_WEAP, AD_PHYS, 4, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_SELL, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_HOSTILE
+                    | M2_STALK | M2_MERC | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
     MON("guard", S_HUMAN, LVL(12, 12, 10, 40, 10), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
