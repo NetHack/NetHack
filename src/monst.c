@@ -1242,15 +1242,6 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_GREEN),
-    MON("yellow dragon", S_DRAGON, LVL(15, 9, -1, 20, 7), (G_GENO | 1),
-        A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
-          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
-          NO_ATTK),
-        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_ACID | MR_STONE,
-        MR_STONE, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS
-                      | M1_OVIPAROUS | M1_CARNIVORE | M1_ACID,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_YELLOW),
     MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
         ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
@@ -1258,7 +1249,7 @@ NEARDATA struct permonst mons[] = {
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_CYAN),
+        0, CLR_BRIGHT_CYAN),
     MON("ooze dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
@@ -1277,9 +1268,17 @@ NEARDATA struct permonst mons[] = {
         MR_DISINT | MR_STONE | MR_COLD, MR_DISINT,
         M1_FLY | M1_TUNNEL | M1_UNSOLID | M1_THICK_HIDE | M1_NOHANDS
             | M1_SEE_INVIS | M1_CARNIVORE | M1_BREATHLESS,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC |
-        M2_NOPOLY,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_BLUE),
+    MON("yellow dragon", S_DRAGON, LVL(15, 9, -1, 20, 7), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_ACID | MR_STONE,
+        MR_STONE, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS
+                      | M1_OVIPAROUS | M1_CARNIVORE | M1_ACID,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_YELLOW),
     /*
      * Elementals
      */

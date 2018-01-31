@@ -1778,6 +1778,15 @@ int atyp;
     case GREEN_DRAGON_SCALE_MAIL:
     case GREEN_DRAGON_SCALES:
         return PM_GREEN_DRAGON;
+    case RAZOR_DRAGON_SCALE_MAIL:
+    case RAZOR_DRAGON_SCALES:
+        return PM_RAZOR_DRAGON;
+    case OOZE_DRAGON_SCALE_MAIL:
+    case OOZE_DRAGON_SCALES:
+        return PM_OOZE_DRAGON;
+    case VOID_DRAGON_SCALE_MAIL:
+    case VOID_DRAGON_SCALES:
+        return PM_VOID_DRAGON;
     case YELLOW_DRAGON_SCALE_MAIL:
     case YELLOW_DRAGON_SCALES:
         return PM_YELLOW_DRAGON;

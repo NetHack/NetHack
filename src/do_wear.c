@@ -270,6 +270,14 @@ Cloak_on(VOID_ARGS)
     case CLOAK_OF_MAGIC_RESISTANCE:
     case ROBE:
     case LEATHER_CLOAK:
+    case IRON_MANTLE:
+    case FLOWING_DRESS:
+    case SNAPPY_TUXEDO:
+        break;
+    case CLOAK_OF_FLIGHT:
+        pline("%s into a magnificent pair of wings!",
+            Tobjnam(uarmc, "transform"));
+        makeknown(uarmc->otyp);
         break;
     case CLOAK_OF_PROTECTION:
         makeknown(uarmc->otyp);
@@ -329,6 +337,10 @@ Cloak_off(VOID_ARGS)
     case OILSKIN_CLOAK:
     case ROBE:
     case LEATHER_CLOAK:
+    case IRON_MANTLE:
+    case CLOAK_OF_FLIGHT:
+    case FLOWING_DRESS:
+    case SNAPPY_TUXEDO:
         break;
     case ELVEN_CLOAK:
         toggle_stealth(otmp, oldprop, FALSE);
@@ -579,6 +591,7 @@ Shield_on(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case TOWER_SHIELD:
         break;
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
@@ -602,6 +615,7 @@ Shield_off(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case TOWER_SHIELD:
         break;
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
