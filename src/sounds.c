@@ -209,6 +209,21 @@ dosounds()
             }
         }
     }
+    if (level.flags.has_den && !rn2(200)) {
+        static const char *const zoo_msg[3] = {
+            "the baying of hounds.",
+            "angry snarling.", "Sher Kahn!",
+        };
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if ((mtmp->msleeping || is_animal(mtmp->data))
+                && mon_in_room(mtmp, DEN)) {
+                You_hear1(zoo_msg[rn2(2) + hallu]);
+                return;
+            }
+        }
+    }
     if (level.flags.has_shop && !rn2(200)) {
         if (!(sroom = search_special(ANY_SHOP))) {
             /* strange... */

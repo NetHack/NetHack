@@ -690,6 +690,7 @@ clear_level_structures()
     level.flags.has_court = 0;
     level.flags.has_morgue = level.flags.graveyard = 0;
     level.flags.has_beehive = 0;
+    level.flags.has_den = 0;
     level.flags.has_barracks = 0;
     level.flags.has_temple = 0;
     level.flags.has_swamp = 0;
@@ -832,7 +833,6 @@ makelevel()
 
     {
         register int u_depth = depth(&u.uz);
-
         if (wizard && nh_getenv("SHOPTYPE"))
             mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
@@ -854,6 +854,8 @@ makelevel()
             mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
             mkroom(ANTHOLE);
+        else if (u_depth > 12 && !rn2(8))
+            mkroom(DEN);
         else if (u_depth > 13 && !rn2(7))
             mkrivers();
         else if (u_depth > 14 && !rn2(4)

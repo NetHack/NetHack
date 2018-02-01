@@ -387,6 +387,13 @@ NEARDATA struct permonst mons[] = {
         SIZ(600, 300, MS_GROWL, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISIBLE,
         CLR_YELLOW),
+    /* Lions hunt in packs, and the females do most of the hunting */
+    MON("lion", S_FELINE, LVL(6, 12, 6, 0, 0), (G_GENO | G_SGROUP | 2),
+        A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
+          ATTK(AT_BITE, AD_PHYS, 1, 10), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(600, 300, MS_GROWL, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE | M2_FEMALE,
+        M3_INFRAVISIBLE, CLR_YELLOW),
     /*
      * gremlins and gargoyles
      */

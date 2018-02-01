@@ -57,6 +57,7 @@ enum roomtype_types {
     SWAMP,      /* contains pools */
     VAULT,      /* contains piles of gold */
     BEEHIVE,    /* contains killer bees and royal jelly */
+    DEN,        /* contains wild animals */
     MORGUE,     /* contains corpses, undead and ghosts */
     BARRACKS,   /* contains soldiers and their gear */
     ZOO,        /* floor covered with treasure and monsters */

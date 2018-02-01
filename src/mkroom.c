@@ -58,6 +58,9 @@ int roomtype;
         case BEEHIVE:
             mkzoo(BEEHIVE);
             break;
+        case DEN:
+            mkzoo(DEN);
+            break;
         case MORGUE:
             mkzoo(MORGUE);
             break;
@@ -106,6 +109,10 @@ mkshop()
             }
             if (*ep == 'b' || *ep == 'B') {
                 mkzoo(BEEHIVE);
+                return;
+            }
+            if (*ep == 'd' || *ep == 'D') {
+                mkzoo(DEN);
                 return;
             }
             if (*ep == 't' || *ep == 'T' || *ep == '\\') {
@@ -337,10 +344,12 @@ struct mkroom *sroom;
                                          ? &mons[PM_LEPRECHAUN]
                                          : (type == COCKNEST)
                                              ? &mons[PM_COCKATRICE]
-                                             : (type == ANTHOLE)
-                                                 ? antholemon()
-                                                 : (struct permonst *) 0,
-                          sx, sy, NO_MM_FLAGS);
+                                             : (type == DEN)
+                                                 ? denmon()
+                                                 : (type == ANTHOLE)
+                                                     ? antholemon()
+                                                     : (struct permonst *) 0,
+                              sx, sy, NO_MM_FLAGS);
             if (mon) {
                 mon->msleeping = 1;
                 if (type == COURT && mon->mpeaceful) {
@@ -429,6 +438,9 @@ struct mkroom *sroom;
     case BEEHIVE:
         level.flags.has_beehive = 1;
         break;
+    case DEN:
+        level.flags.has_den = 1;
+        break;
     }
 }
 
@@ -505,6 +517,25 @@ antholemon()
 
     return ((mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
                                              : &mons[mtyp]);
+}
+
+struct permonst *
+denmon()
+{
+    int i = rn2(60) + rn2(3 * level_difficulty());
+
+    if (i > 100)
+        return &mons[PM_MUMAK];
+    else if (i > 75)
+        return mkclass(S_QUADRUPED, 0);
+    else if (i > 70)
+        return &mons[PM_WOLF];
+    else if (i > 50)
+        return &mons[PM_LION];
+    else if (i > 30)
+        return mkclass(S_FELINE, 0);
+    else
+        return mkclass(S_DOG, 0);
 }
 
 STATIC_OVL void

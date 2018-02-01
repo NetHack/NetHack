@@ -2386,6 +2386,9 @@ register boolean newlev;
         case BEEHIVE:
             You("enter a giant beehive!");
             break;
+        case DEN:
+            You("enter a den of wild beasts!");
+            break;
         case COCKNEST:
             You("enter a disgusting nest!");
             break;
@@ -2449,6 +2452,9 @@ register boolean newlev;
                     break;
                 case BEEHIVE:
                     level.flags.has_beehive = 0;
+                    break;
+                case DEN:
+                    level.flags.has_den = 0;
                     break;
                 }
             }
