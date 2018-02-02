@@ -1,11 +1,13 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1451610993 2016/01/01 01:16:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2017
 #
+# Edited 2/01/18 by NullCGT
+#
 #==============================================================================
 # Build Tools Environment
 #
 #       NetHack 3.6.x Makefile for MS Visual Studio Visual C++ compiler
-#  
+#
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2010 Express, with the Platform SDK
 #            - Microsoft Visual Studio 2013 Express
@@ -27,11 +29,11 @@
 #              .y                           yacc   (such as bison)
 #              .l                           lex    (such as flex)
 #
-#   If you have any questions read the sys/winnt/Install.nt file included 
+#   If you have any questions read the sys/winnt/Install.nt file included
 #   with the distribution.
 #==============================================================================
-# Before we get started, this section is used to determine the version of 
-# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
+# Before we get started, this section is used to determine the version of
+# Visual Studio we are using.  We set VSVER to 0000 to flag any version that
 # is too old or untested.
 #
 
@@ -90,7 +92,7 @@ GAMEDIR = ..\binary               # Game directory
 #---------------------------------------------------------------
 # 3. Do you want debug information in the executable?
 #
-  
+
 DEBUGINFO = Y
 
 #==============================================================================
@@ -110,7 +112,7 @@ DEBUGINFO = Y
 #
 #==============================================================================
 
-#  Set the gamedir according to your preference.  
+#  Set the gamedir according to your preference.
 #  If not present prior to compilation it gets created.
 
 #
@@ -126,7 +128,7 @@ SSYS  = ..\sys\share # Shared system files
 MSWSYS= ..\sys\winnt # mswin specific files
 TTY   = ..\win\tty   # window port files (tty)
 MSWIN = ..\win\win32 # window port files (WIN32)
-WSHR  = ..\win\share # Tile support files 
+WSHR  = ..\win\share # Tile support files
 
 #
 #  Object directory.
@@ -142,8 +144,8 @@ rc=Rc
 #==========================================
 # Exe File Info.
 #==========================================
- 
-#        
+
+#
 #
 # Optional high-quality BSD random number generation routines
 # (see pcconf.h). Set to nothing if not used.
@@ -333,32 +335,32 @@ PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 #
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
-VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
-VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
-VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
-VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
-VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
-VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
-VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
-VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
-VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
-VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
-VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
-VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
-VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
-VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
-VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
-VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o     
-VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o    
-VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o  
-VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
+VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o
+VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o
+VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
+VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
+VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
+VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
+VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o
+VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
+VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o
+VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o
+VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o
+VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o
+VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o
+VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o
+VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o
+VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o
+VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o
+VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o
 VOBJ23 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
 VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
-VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
+VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -569,7 +571,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\caveman.des $(DAT)\healer.des   $(DAT)\knight.des \
 	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
 	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
-	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des
+	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des \
+  $(DAT)\cartomancer.des
 	cd $(DAT)
 	$(U)levcomp bigroom.des
 	$(U)levcomp castle.des
@@ -585,6 +588,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)levcomp arch.des
 	$(U)levcomp barb.des
 	$(U)levcomp caveman.des
+  $(U)levcomp cartomancer.des
 	$(U)levcomp healer.des
 	$(U)levcomp knight.des
 	$(U)levcomp monk.des
@@ -622,26 +626,26 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 #  The game targets.
 #==========================================
 
-#  The section for linking the NetHack image looks a little strange at 
-#  first, especially if you are used to UNIX makes, or NDMAKE.  It is 
-#  Microsoft nmake specific, and it gets around the problem of the 
-#  link command line being too long for the linker.  An "in-line" linker 
+#  The section for linking the NetHack image looks a little strange at
+#  first, especially if you are used to UNIX makes, or NDMAKE.  It is
+#  Microsoft nmake specific, and it gets around the problem of the
+#  link command line being too long for the linker.  An "in-line" linker
 #  response file is generated temporarily.
 #
 #  It takes advantage of the following features of nmake:
 #
-#  Inline files : 
+#  Inline files :
 #			Specifying the "<<" means to start an inline file.
-#                 	Another "<<" at the start of a line closes the 
+#                 	Another "<<" at the start of a line closes the
 #                 	inline file.
 #
 #  Substitution within Macros:
 #                       $(mymacro:string1=string2) replaces every
-#                       occurrence of string1 with string2 in the 
-#                       macro mymacro.  Special ascii key codes may be 
-#                       used in the substitution text by preceding it 
+#                       occurrence of string1 with string2 in the
+#                       macro mymacro.  Special ascii key codes may be
+#                       used in the substitution text by preceding it
 #                       with ^ as we have done below.  Every occurence
-#                       of a <tab> in $(ALLOBJ) is replaced by 
+#                       of a <tab> in $(ALLOBJ) is replaced by
 #                       <+><return><tab>.
 
 GAMEOBJ=$(ALLOBJ:^	=^
@@ -658,7 +662,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #    libs: $(LIBS) $(conlibs) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o $(GUIOBJ)
 # otherwise:
-#    libs: $(LIBS) $(conlibs) 
+#    libs: $(LIBS) $(conlibs)
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)tile.o $(O)guistub.o
 
 
@@ -764,7 +768,7 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 #
 #  Secondary Targets.
 #
-    
+
 #==========================================
 # Makedefs Stuff
 #==========================================
@@ -823,12 +827,12 @@ $(U)uudecode.exe: $(O)uudecode.o
 $(O)uudecode.o: $(SSYS)\uudecode.c
 	@$(cc) $(cflagsBuild) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
-$(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
+$(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu
 	chdir $(MSWSYS)
 	..\..\util\uudecode.exe nhico.uu
 	chdir ..\..\src
 
-$(MSWIN)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
+$(MSWIN)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu
 	chdir $(MSWIN)
 	..\..\util\uudecode.exe ../../sys/winnt/nhico.uu
 	chdir ..\..\src
@@ -981,7 +985,7 @@ $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
 
 $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) /Fo$@ $(SRC)\dlb.c
-	
+
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) /Fo$@ $(UTIL)\dlb_main.c
 
@@ -1237,7 +1241,7 @@ clean:
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
 	rem
 	rem defer to the steps in ..\win\win32\levstuff.mak
-	rem 
+	rem
 	nmake -nologo -f ..\win\win32\levstuff.mak clean
 	rem
 	rem defer to the steps in ..\win\win32\dgnstuff.mak
@@ -1305,14 +1309,14 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 $(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
 
-# 
+#
 # util dependencies
 #
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)panic.c
 
-# 
+#
 # sys/share dependencies
 #
 
@@ -1320,10 +1324,10 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\cppregex.cpp
 
 #
-# The rest are stolen from sys/unix/Makefile.src, 
+# The rest are stolen from sys/unix/Makefile.src,
 # with the following changes:
 #   * ../include changed to $(INCL)
-#   * slashes changed to back-slashes 
+#   * slashes changed to back-slashes
 #   * -c (which is included in CFLAGS) substituted with -Fo$@
 #   * $(CFLAGS) replaced with $(cflagsBuild)
 #   * $(CC) replaced with @$(CC)
@@ -1576,4 +1580,3 @@ $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
 
 # end of file
-

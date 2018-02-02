@@ -2,6 +2,8 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 /*  attribute modification routines. */
 
 #include "hack.h"

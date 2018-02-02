@@ -2,6 +2,8 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));

@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h"
 #include "func_tab.h"

@@ -6,14 +6,13 @@
  * Monster item usage routines.
  */
 
-/* CHANGE NOTES 1/22/18 */
+/* Edited on 2/01/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
 /* Monsters now throw potions of hallucination */
 /* Monsters now activate figurines */
 /* Monsters now use wands of wishing in order to wish for various items. */
-/* Monsters now apply bullwhips much more often. */
 
 #include "hack.h"
 

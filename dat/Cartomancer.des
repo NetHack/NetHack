@@ -3,6 +3,8 @@
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
+# File created 2/01/18 by NullCGT
+#
 #	The "start" level for the quest.
 #
 #	Here you meet your (besieged) class leader, Shaman Karnov
@@ -68,9 +70,9 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters summoned by Dal Zethire.
-MONSTER: ('N',"guardian naga"),(08,22),hostile
+MONSTER: ('N',"guardian naga"),(22,08),hostile
 MONSTER: ('S',"cobra"),(08,20),hostile
-MONSTER: ('N',"guardian naga"),(08,21),hostile
+MONSTER: ('N',"guardian naga"),(21,08),hostile
 MONSTER: ('S',"cobra"),(03,14),hostile
 MONSTER: ('S',"cobra"),(05,14),hostile
 MONSTER: ('S',"cobra"),(07,14),hostile
@@ -174,8 +176,8 @@ MONSTER:'S',random,hostile
 #
 #	The "goal" level for the quest.
 #
-#	Here you meet Tiamat your nemesis monster.  You have to
-#	defeat Tiamat in combat to gain the artifact you have
+#	Here you meet Dal Zethire your nemesis monster.  You have to
+#	defeat Dal Zethire in combat to gain the artifact you have
 #	been assigned to retrieve.
 #
 
@@ -204,13 +206,13 @@ MAP
 
 ENDMAP
 # Dungeon Description
-REGION:(00,00,75,19),lit,"ordinary"
+REGION:(00,00,33,19),lit,"ordinary"
 # Stairs
-STAIR:random,up
+STAIR:(19,01),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:('(',"credit card"),(23,10),blessed,0,name:"The Holographic Void Lily"
+OBJECT:('(',"credit card"),(33,18),blessed,0,name:"The Holographic Void Lily"
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
@@ -222,7 +224,7 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # monsters.
-MONSTER:('@',"Dal Zethire"),(23,10)
+MONSTER:('@',"Dal Zethire"),(33,18)
 MONSTER:'N',random,hostile
 MONSTER:'N',random,hostile
 WALLIFY

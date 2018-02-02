@@ -2,6 +2,8 @@
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
 
+# Edited on 2/01/18 by NullCGT
+
 ###
 ### modified for gcc by Teemu Suikki (zu@iki.fi)
 ###

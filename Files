@@ -2,6 +2,7 @@ This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
+Edited 2/01/18 by NullCGT
 
 
 .:

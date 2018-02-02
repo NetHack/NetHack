@@ -2,6 +2,8 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 /*
  * This file contains the various functions that are related to the special
  * levels.

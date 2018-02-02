@@ -2,6 +2,8 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 /*
  * Polymorph self routine.
  *

@@ -2,6 +2,8 @@
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_DCL const char *NDECL(dev_name);

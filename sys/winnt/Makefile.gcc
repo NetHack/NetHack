@@ -507,7 +507,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/caveman.des $(DAT)/healer.des   $(DAT)/knight.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
-	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des
+	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
+	 $(DAT)/cartomancer.des
 	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
 	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)
@@ -522,6 +523,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/arch.des)
 	$(subst /,\,$(U)levcomp $(DAT)/barb.des)
 	$(subst /,\,$(U)levcomp $(DAT)/caveman.des)
+	$(subst /,\,$(U)levcomp $(DAT)/cartomancer.des)
 	$(subst /,\,$(U)levcomp $(DAT)/healer.des)
 	$(subst /,\,$(U)levcomp $(DAT)/knight.des)
 	$(subst /,\,$(U)levcomp $(DAT)/monk.des)
@@ -551,7 +553,7 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/winhack.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/splash.bmp
 	@$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
 
-$(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
+$(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico
 	@$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
 
 #==========================================
@@ -577,7 +579,7 @@ $(GAMEDIR)/NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(O)nhdefkey.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c
 
 $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 	@echo Linking $@
@@ -585,7 +587,7 @@ $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nh340key.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c
 
 $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
 	@echo Linking $@
@@ -593,7 +595,7 @@ $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nhraykey.o:
-		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c 
+		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c
 
 $(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o $(O)gamedir.tag
 	@echo Linking $@
@@ -1116,7 +1118,7 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 #	with -o$@
 #   * targets prefixed with $(O)
 #   * $(CC) changed to $(cc)
-# but otherwise untouched. 
+# but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #

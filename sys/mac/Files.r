@@ -2,6 +2,7 @@
 #include "date.h"
 #include "patchlevel.h"
 
+/* Edited 2/01/18 by NullCGT */
 
 /* Carbon 'carb' resource
  * has been made obsolete by the 'plst' resource below.

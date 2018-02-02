@@ -2,6 +2,8 @@
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 #include "hack.h"
 
 #define is_bigfoot(x) ((x) == &mons[PM_SASQUATCH])

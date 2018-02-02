@@ -2,6 +2,8 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited 2/01/18 by NullCGT */
+
 /*
  * This file contains the main function for the parser
  * and some useful functions needed by yacc

@@ -2,6 +2,8 @@
 #	Copyright (c) NetHack PC Development Team 1997 - 2012.
 #	PC NetHack 3.4x Makefile for MSC V1.52c (16 bit compiler)
 #
+# Edited 2/01/18 by NullCGT
+#
 #	For questions or comments: nethack-bugs@nethack.org
 #
 #	In addition to your C compiler,

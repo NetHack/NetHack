@@ -142,11 +142,12 @@ spec_levs: ../util/lev_comp \
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \
-	Arch.des Barb.des Caveman.des Healer.des Knight.des Monk.des \
+	Arch.des Barb.des Caveman.des Cartomancer.des Healer.des Knight.des Monk.des \
 	Priest.des Ranger.des Rogue.des Samurai.des Tourist.des Valkyrie.des \
 	Wizard.des
 	../util/lev_comp Arch.des
 	../util/lev_comp Barb.des
+	../util/lev_comp Cartomancer.des
 	../util/lev_comp Caveman.des
 	../util/lev_comp Healer.des
 	../util/lev_comp Knight.des

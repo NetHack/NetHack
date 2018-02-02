@@ -2,6 +2,8 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/01/18 by NullCGT */
+
 /*
  * The data in this file is processed twice, to construct two arrays.
  * On the first pass, only object name and object description matter.

@@ -712,8 +712,8 @@ O  = $(OBJ)\				# comment so \ isn't last char
 U  = $(UTIL)\				# comment so \ isn't last char
 
 SPLEVDES = $(DAT)\Arch.des $(DAT)\Barb.des $(DAT)\bigroom.des \
-	$(DAT)\castle.des $(DAT)\Caveman.des $(DAT)\endgame.des \
-	$(DAT)\gehennom.des $(DAT)\Healer.des $(DAT)\Knight.des \
+	$(DAT)\castle.des $(DAT)\Caveman.des $(DAT)\Cartomancer.des \
+	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\Healer.des $(DAT)\Knight.des \
 	$(DAT)\knox.des $(DAT)\Monk.des $(DAT)\medusa.des \
 	$(DAT)\mines.des $(DAT)\oracle.des $(DAT)\Priest.des \
 	$(DAT)\Ranger.des $(DAT)\Rogue.des $(DAT)\Samurai.des \
@@ -734,24 +734,24 @@ MAKEOBJS       = $(O)makedefs.o	$(O)monst.o	$(O)objects.o
 
 SPLEVOBJS	=$(O)lev_yacc.o $(O)lev_$(LEX).o $(O)lev_main.o \
 		$(O)alloc.o $(O)decl.o $(O)drawing.o $(O)monst.o \
-		$(O)objects.o $(O)panic.o $(O)stubvid.o 
+		$(O)objects.o $(O)panic.o $(O)stubvid.o
 
 DGNCOMPOBJS	=$(O)dgn_yacc.o $(O)dgn_$(LEX).o $(O)dgn_main.o \
-		$(O)alloc.o $(O)panic.o 
+		$(O)alloc.o $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
-GIFREADERS	=$(O)gifread.o $(O)alloc.o $(O)panic.o 
+GIFREADERS	=$(O)gifread.o $(O)alloc.o $(O)panic.o
 
 TEXT_IO	=$(O)tiletext.o $(O)tiletxt.o $(O)drawing.o \
-		$(O)decl.o $(O)monst.o $(O)objects.o $(O)stubvid.o 
+		$(O)decl.o $(O)monst.o $(O)objects.o $(O)stubvid.o
 
 PPMWRITERS     = $(O)ppmwrite.o	$(O)alloc.o	$(O)panic.o
 
-GIFREAD2	=$(O)gifread2.o $(O)alloc.o $(O)panic.o 
+GIFREAD2	=$(O)gifread2.o $(O)alloc.o $(O)panic.o
 
 TEXT_IO2	=$(O)tiletex2.o $(O)tiletxt2.o $(O)drawing.o \
-		$(O)decl.o $(O)monst.o $(O)objects.o $(O)stubvid.o 
+		$(O)decl.o $(O)monst.o $(O)objects.o $(O)stubvid.o
 
 PPMWRIT2       = $(O)ppmwrit2.o $(O)alloc.o	$(O)panic.o
 
@@ -975,6 +975,7 @@ $(DAT)\sp_lev.tag: $(U)utility.tag $(SPLEVDES)
 	$(U)lev_comp arch.des
 	$(U)lev_comp barb.des
 	$(U)lev_comp caveman.des
+	$(U)lev_comp cartomancer.des
 	$(U)lev_comp healer.des
 	$(U)lev_comp knight.des
 	$(U)lev_comp monk.des
@@ -1067,7 +1068,7 @@ $(U)lev_comp.exe:  $(SPLEVOBJS)
 	$(LINK) $(LFLAGSU) @&&!
 		$(O)stubvid.o $(O)panic.o $(O)objects.o $(O)monst.o +
 		$(O)drawing.o $(O)decl.o $(O)alloc.o $(O)lev_main.o +
-		$(O)lev_$(LEX).o $(O)lev_yacc.o 
+		$(O)lev_$(LEX).o $(O)lev_yacc.o
 		$@
 		$(@B)
 		$(BCMDL);
@@ -1136,7 +1137,7 @@ $(U)dgn_comp.exe: $(DGNCOMPOBJS)
     @echo Linking $@...
 	$(LINK) $(LFLAGSU) @&&!
 		$(O)panic.o $(O)alloc.o $(O)dgn_main.o $(O)dgn_$(LEX).o +
-		$(O)dgn_yacc.o 
+		$(O)dgn_yacc.o
 		$@
 		$(@B)
 		$(BCMDL);
@@ -1316,7 +1317,7 @@ $(U)tile2bin.exe: $(O)tile2bin.o $(TEXT_IO)
 	$(LINK) $(LFLAGSU) @&&!
 		$(O)tile2bin.o+
 		$(O)stubvid.o $(O)objects.o $(O)monst.o $(O)decl.o +
-		$(O)drawing.o $(O)tiletxt.o $(O)tiletext.o 
+		$(O)drawing.o $(O)tiletxt.o $(O)tiletext.o
 		$@
 		$(@B)
 		$(BCMDL);
@@ -1327,7 +1328,7 @@ $(U)til2bin2.exe: $(O)til2bin2.o $(TEXT_IO2)
 	$(LINK) $(LFLAGSU) @&&!
 		$(O)til2bin2.o+
 		$(O)stubvid.o $(O)objects.o $(O)monst.o $(O)decl.o +
-		$(O)drawing.o $(O)tiletxt2.o $(O)tiletex2.o 
+		$(O)drawing.o $(O)tiletxt2.o $(O)tiletex2.o
 		$@
 		$(@B)
 		$(BCMDL);

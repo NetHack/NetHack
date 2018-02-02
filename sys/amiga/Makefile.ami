@@ -431,6 +431,10 @@ CDFILES1= $(SLIB)Cav-fila.lev $(SLIB)Cav-filb.lev $(SLIB)Cav-loca.lev \
 	$(SLIB)Cav-strt.lev
 CDFILES= $(SLIB)Cav-goal.lev $(CDFILES1)
 
+CRFILES1= $(SLIB)Car-fila.lev $(SLIB)Car-filb.lev $(SLIB)Car-loca.lev \
+	$(SLIB)Car-strt.lev
+CRFILES= $(SLIB)Car-goal.lev $(CRFILES1)
+
 HDFILES1= $(SLIB)Hea-fila.lev $(SLIB)Hea-filb.lev $(SLIB)Hea-loca.lev \
 	$(SLIB)Hea-strt.lev
 HDFILES= $(SLIB)Hea-goal.lev $(HDFILES1)
@@ -471,7 +475,7 @@ WDFILES1= $(SLIB)Wiz-fila.lev $(SLIB)Wiz-filb.lev $(SLIB)Wiz-loca.lev \
 	$(SLIB)Wiz-strt.lev
 WDFILES= $(SLIB)Wiz-goal.lev $(WDFILES1)
 
-XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(HDFILES) $(KDFILES) \
+XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(CRFILES) $(HDFILES) $(KDFILES) \
 		$(MDFILES) $(PDFILES) $(RDFILES) $(RANFILES) $(SDFILES) $(TDFILES) \
 		$(VDFILES) $(WDFILES)
 
@@ -627,6 +631,7 @@ spotless:  clean
 #	-delete $(ADFILES)
 #	-delete $(BDFILES)
 #	-delete $(CDFILES)
+#	-delete $(CRFILES)
 #	-delete $(HDFILES)
 #	-delete $(KDFILES)
 #	-delete $(MDFILES)
@@ -1140,6 +1145,12 @@ $(CDFILES1):	$(SLIB)Cav-goal.lev
 
 $(SLIB)Cav-goal.lev:	$(DAT)Caveman.des $(SBIN)lev_comp
 #SFD_INSTEAD $(SBIN)lev_comp $(DAT)Caveman.des
+#none
+
+$(CRFILES1):	$(SLIB)Car-goal.lev
+
+$(SLIB)Car-goal.lev:	$(DAT)Cartomancer.des $(SBIN)lev_comp
+#SFD_INSTEAD $(SBIN)lev_comp $(DAT)Cartomancer.des
 #none
 
 $(HDFILES1):	$(SLIB)Hea-goal.lev

@@ -2,6 +2,8 @@
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
+# File changed 2/01/18 by NullCGT
+#
 #	The quest text file for NetHack 3.4
 #
 #	These are the "standard" message numbers from qtext.h.  All class
@@ -916,8 +918,8 @@ reality.
 your cards, and they shall come through for you."
 %E [Find and defeat %n, recover %o, and return with it.]
 %Cp Car 00025
-"%nC is immune to her own breath weapons.
-You should use magic upon her that she does not use herself."
+"%oC is capable of summoning monsters, as well as turning the user into a
+powerful spellcaster."
 %E
 %Cp Car 00026
 "When you encounter %n, remember your training with me."

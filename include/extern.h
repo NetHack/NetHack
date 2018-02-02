@@ -1,6 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1517128658 2018/01/28 08:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.624 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
+/* File changed 2/01/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H

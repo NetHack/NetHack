@@ -1,6 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* File changed 2/01/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -177,7 +178,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     A("The Holographic Void Lily", CREDIT_CARD,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DEFN),
       (SPFX_EREGEN | SPFX_HSPDAM), 0, NO_ATTK, NO_DFNS, NO_CARY,
-      CHARGE_OBJ, A_CHAOTIC, PM_CARTOMANCER, NON_PM, 7000L, NO_COLOR),
+      SUMMONING, A_CHAOTIC, PM_CARTOMANCER, NON_PM, 7000L, NO_COLOR),
 
 #if 0 /* OBSOLETE */
 A("The Palantir of Westernesse",        CRYSTAL_BALL,

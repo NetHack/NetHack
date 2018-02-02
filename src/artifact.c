@@ -1442,6 +1442,20 @@ struct obj *obj;
             (void) seffects(&pseudo);
             break;
         }
+        case SUMMONING: {
+            struct obj pseudo;
+            struct obj pseudo2;
+
+            pseudo =
+                zeroobj; /* neither cursed nor blessed, zero oextra too */
+            pseudo2 =
+                zeroobj; /* neither cursed nor blessed, zero oextra too */
+            pseudo.otyp = SCR_CREATE_MONSTER;
+            (void) seffects(&pseudo);
+            pseudo2.otyp = SCR_TAMING;
+            (void) seffects(&pseudo2);
+            break;
+        }
         case HEALING: {
             int healamt = (u.uhpmax + 1 - u.uhp) / 2;
             long creamed = (long) u.ucreamed;
