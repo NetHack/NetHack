@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Modified 2/02/18 by NullCGT */
+
 #include "hack.h"
 
 /* Disintegration rays have special treatment; corpses are never left.
@@ -2075,7 +2077,27 @@ zapnodir(obj)
 register struct obj *obj;
 {
     boolean known = FALSE;
-
+    /* This code for wonder seems redundant, but is actually necessary
+       in order to catch various cases for engraving and keeping Wands
+       from being identified erroneously. */
+    boolean wonder = FALSE;
+    if (obj->otyp == WAN_WONDER) {
+        switch (rn2(3)) {
+        case 0:
+            obj->otyp = WAN_LIGHT;
+            break;
+        case 1:
+            obj->otyp = WAN_SECRET_DOOR_DETECTION;
+            break;
+        case 2:
+            obj->otyp = WAN_CREATE_MONSTER;
+            break;
+        case 3:
+            obj->otyp = WAN_ENLIGHTENMENT;
+            break;
+        }
+        wonder = TRUE;
+    }
     switch (obj->otyp) {
     case WAN_LIGHT:
     case SPE_LIGHT:
@@ -2112,6 +2134,10 @@ register struct obj *obj;
         pline_The("feeling subsides.");
         exercise(A_WIS, TRUE);
         break;
+    }
+    if (wonder) {
+        obj->otyp = WAN_WONDER;
+        known = FALSE;
     }
     if (known) {
         if (!objects[obj->otyp].oc_name_known)
@@ -2197,8 +2223,47 @@ struct obj *obj;
 boolean ordinary;
 {
     boolean learn_it = FALSE;
+    boolean wonder = FALSE;
     int damage = 0;
-
+    if (obj->otyp == WAN_WONDER) {
+        switch (rn2(10)) {
+        /* Not a complete list, just some interesting effects. */
+        case 0:
+            obj->otyp = WAN_STRIKING;
+            break;
+        case 1:
+            obj->otyp = WAN_LIGHTNING;
+            break;
+        case 2:
+            obj->otyp = WAN_FIRE;
+            break;
+        case 3:
+            obj->otyp = WAN_MAGIC_MISSILE;
+            break;
+        case 4:
+            obj->otyp = WAN_COLD;
+            break;
+        case 5:
+            obj->otyp = WAN_POLYMORPH;
+            break;
+        case 6:
+            obj->otyp = WAN_LIGHT;
+            break;
+        case 7:
+            obj->otyp = WAN_UNDEAD_TURNING;
+            break;
+        case 8:
+            obj->otyp = WAN_TELEPORTATION;
+            break;
+        case 9:
+            obj->otyp = WAN_DEATH;
+            break;
+        default:
+            obj->otyp = WAN_SLEEP;
+            break;
+        }
+        wonder = TRUE;
+    }
     switch (obj->otyp) {
     case WAN_STRIKING:
     case SPE_FORCE_BOLT:
@@ -2495,6 +2560,11 @@ boolean ordinary;
     default:
         impossible("zapyourself: object %d used?", obj->otyp);
         break;
+    }
+    /* wand of wonder case */
+    if (wonder) {
+        learn_it = FALSE;
+        obj->otyp = WAN_WONDER;
     }
     /* if effect was observable then discover the wand type provided
        that the wand itself has been seen */
@@ -2915,7 +2985,20 @@ weffects(obj)
 struct obj *obj;
 {
     int otyp = obj->otyp;
+    int wondertemp;
     boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
+    boolean wonder = FALSE;
+
+    if (otyp == WAN_WONDER) {
+        wondertemp = WAN_LIGHT + rn2(WAN_LIGHTNING - WAN_LIGHT);
+        if (wondertemp == WAN_WISHING)
+            wondertemp = WAN_UNDEAD_TURNING;
+        if (wondertemp == WAN_WONDER)
+            wondertemp = WAN_POLYMORPH;
+        obj->otyp = wondertemp;
+        otyp = wondertemp;
+        wonder = TRUE;
+    }
 
     exercise(A_WIS, TRUE);
     if (u.usteed && (objects[otyp].oc_dir != NODIR) && !u.dx && !u.dy
@@ -2951,6 +3034,10 @@ struct obj *obj;
         else
             impossible("weffects: unexpected spell or wand");
         disclose = TRUE;
+    }
+    if (wonder) {
+        obj->otyp = WAN_WONDER;
+        disclose = FALSE;
     }
     if (disclose) {
         learnwand(obj);

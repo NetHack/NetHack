@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Modified 2/02/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h"
 
@@ -470,6 +472,7 @@ doengrave()
     boolean ptext = TRUE;     /* TRUE if we must prompt for engrave text */
     boolean teleengr = FALSE; /* TRUE if we move the old engraving */
     boolean zapwand = FALSE;  /* TRUE if we remove a wand charge */
+    boolean wonder = FALSE;   /* TRUE if the wand is a wand of wonder */
     xchar type = DUST;        /* Type of engraving made */
     char buf[BUFSZ];          /* Buffer for final/poly engraving text */
     char ebuf[BUFSZ];         /* Buffer for initial engraving text */
@@ -638,6 +641,11 @@ doengrave()
             if (!can_reach_floor(TRUE))
                 ptext = FALSE;
 
+            if (otmp->otyp == WAN_WONDER) {
+                otmp->otyp = WAN_LIGHT + rn2(WAN_LIGHTNING - WAN_LIGHT);
+                wonder = TRUE;
+            }
+
             switch (otmp->otyp) {
             /* DUST wands */
             default:
@@ -648,6 +656,8 @@ doengrave()
             case WAN_CREATE_MONSTER:
             case WAN_WISHING:
             case WAN_ENLIGHTENMENT:
+                if (wonder)
+                    otmp->otyp = WAN_WONDER;
                 zapnodir(otmp);
                 break;
             /* IMMEDIATE wands */
@@ -871,6 +881,11 @@ doengrave()
      * End of implement setup
      */
 
+    /* Cleanup wand of wonder */
+    if (wonder) {
+        otmp->otyp = WAN_WONDER;
+        doknown = FALSE;
+    }
     /* Identify stylus */
     if (doknown) {
         learnwand(otmp);

@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/02/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -1021,7 +1021,8 @@ WAND("secret door detection",
 WAND("enlightenment", "crystal", 15, 150, 1, NODIR, GLASS, HI_GLASS),
 WAND("create monster",  "maple", 45, 200, 1, NODIR, WOOD, HI_WOOD),
 WAND("wishing",          "pine",  5, 500, 1, NODIR, WOOD, HI_WOOD),
-WAND("nothing",           "oak", 25, 100, 0, IMMEDIATE, WOOD, HI_WOOD),
+WAND("nothing",           "oak", 20, 100, 0, IMMEDIATE, WOOD, HI_WOOD),
+WAND("wonder",         "plastic", 5, 100, 0, IMMEDIATE, PLASTIC, CLR_RED),
 WAND("striking",        "ebony", 75, 150, 1, IMMEDIATE, WOOD, HI_WOOD),
 WAND("make invisible", "marble", 45, 150, 1, IMMEDIATE, MINERAL, HI_MINERAL),
 WAND("slow monster",      "tin", 50, 150, 1, IMMEDIATE, METAL, HI_METAL),
@@ -1043,7 +1044,9 @@ WAND("death",            "long",  5, 500, 1, RAY, IRON, HI_METAL),
 WAND("lightning",      "curved", 40, 175, 1, RAY, IRON, HI_METAL),
 /* extra descriptions, shuffled into use at start of new game */
 WAND(None,             "forked",  0, 150, 1, 0, WOOD, HI_WOOD),
+WAND(None,             "holly",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "spiked",  0, 150, 1, 0, IRON, HI_METAL),
+WAND(None,            "titanium",  0, 150, 1, 0, IRON, HI_METAL),
 WAND(None,            "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 #undef WAND
 
