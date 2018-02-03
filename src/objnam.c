@@ -4075,9 +4075,6 @@ struct obj *no_wish;
         case SPE_BOOK_OF_THE_DEAD:
             typ = SPE_BLANK_PAPER;
             break;
-        case MAGIC_LAMP:
-            typ = OIL_LAMP;
-            break;
         default:
             /* catch any other non-wishable objects (venom) */
             if (objects[typ].oc_nowish)
