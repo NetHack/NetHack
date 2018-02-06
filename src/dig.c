@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1449269915 2015/12/04 22:58:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1517913682 2018/02/06 10:41:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -708,8 +708,8 @@ int ttyp;
                     }
                     if (mtmp->isshk)
                         make_angry_shk(mtmp, 0, 0);
-                    migrate_to_level(mtmp, ledger_no(&tolevel), MIGR_RANDOM,
-                                     (coord *) 0);
+                    migrate_to_level(mtmp, ledger_no(&tolevel),
+                                     MIGR_RANDOM, (coord *) 0);
                 }
             }
         }
@@ -842,7 +842,7 @@ coord *cc;
                     "As you dig, the hole fills with %s!");
         return TRUE;
 
-        /* the following two are here for the wand of digging */
+    /* the following two are here for the wand of digging */
     } else if (IS_THRONE(lev->typ)) {
         pline_The("throne is too hard to break apart.");
 
@@ -914,9 +914,8 @@ coord *cc;
     case 0:
     case 1:
         You("unearth a corpse.");
-        if (!!(otmp = mk_tt_object(CORPSE, dig_x, dig_y)))
+        if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0)
             otmp->age -= 100; /* this is an *OLD* corpse */
-        ;
         break;
     case 2:
         if (!Blind)
@@ -1069,13 +1068,14 @@ struct obj *obj;
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");
                 wake_nearby();
-            } else if (IS_TREE(lev->typ))
+            } else if (IS_TREE(lev->typ)) {
                 You("need an axe to cut down a tree.");
-            else if (IS_ROCK(lev->typ))
+            } else if (IS_ROCK(lev->typ)) {
                 You("need a pick to dig rock.");
-            else if (!ispick && (sobj_at(STATUE, rx, ry)
-                                 || sobj_at(BOULDER, rx, ry))) {
+            } else if (!ispick && (sobj_at(STATUE, rx, ry)
+                                   || sobj_at(BOULDER, rx, ry))) {
                 boolean vibrate = !rn2(3);
+
                 pline("Sparks fly as you whack the %s.%s",
                       sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
                       vibrate ? " The axe-handle vibrates violently!" : "");
@@ -1087,6 +1087,7 @@ struct obj *obj;
                        && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
                 int idx;
+
                 for (idx = 0; idx < 8; idx++) {
                     if (xdir[idx] == u.dx && ydir[idx] == u.dy)
                         break;
@@ -1094,6 +1095,7 @@ struct obj *obj;
                 /* idx is valid if < 8 */
                 if (idx < 8) {
                     int adjidx = (idx + 4) % 8;
+
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
                     pline("You clear some debris from between the pits.");
@@ -1102,21 +1104,24 @@ struct obj *obj;
                        && (trap_with_u = t_at(u.ux, u.uy))) {
                 You("swing %s, but the rubble has no place to go.",
                     yobjnam(obj, (char *) 0));
-            } else
+            } else {
                 You("swing %s through thin air.", yobjnam(obj, (char *) 0));
+            }
         } else {
             static const char *const d_action[6] = { "swinging", "digging",
                                                      "chipping the statue",
                                                      "hitting the boulder",
                                                      "chopping at the door",
                                                      "cutting the tree" };
+
             did_dig_msg = FALSE;
             context.digging.quiet = FALSE;
             if (context.digging.pos.x != rx || context.digging.pos.y != ry
                 || !on_level(&context.digging.level, &u.uz)
                 || context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
-                    && !context.digging.down && context.digging.pos.x == u.ux
+                    && !context.digging.down
+                    && context.digging.pos.x == u.ux
                     && context.digging.pos.y == u.uy
                     && (moves <= context.digging.lastdigtime + 2
                         && moves >= context.digging.lastdigtime)) {
@@ -1271,8 +1276,9 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
         draft_message(FALSE); /* "You feel a draft." */
         return FALSE;
-    } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) /* no dig */
+    } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) { /* no dig */
         return FALSE;
+    }
 
     /* Only rock, trees, and walls fall through to this point. */
     if ((here->wall_info & W_NONDIGGABLE) != 0) {
