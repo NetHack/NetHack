@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1514504228 2017/12/28 23:37:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1517877381 2018/02/06 00:36:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,7 +76,9 @@ int distance;
                 && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
-                     && !resist(mtmp, TOOL_CLASS, 0, NOTELL))
+                     && !resist(mtmp, TOOL_CLASS, 0, NOTELL)
+                     /* some monsters are immune */
+                     && onscary(0, 0, mtmp))
                 monflee(mtmp, 0, FALSE, TRUE);
         }
     }

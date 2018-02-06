@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1512808567 2017/12/09 08:36:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,10 +135,18 @@ int x, y;
 struct monst *mtmp;
 {
     /* creatures who are directly resistant to magical scaring:
-     * Rodney, lawful minions, angels, the Riders */
+     * Rodney, lawful minions, Angels, the Riders, shopkeepers
+     * inside their own shop, priests inside their own temple */
     if (mtmp->iswiz || is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL]
-        || is_rider(mtmp->data))
+        || is_rider(mtmp->data)
+        || (mtmp->isshk && inhishop(mtmp))
+        || (mtmp->ispriest && inhistemple(mtmp)))
         return FALSE;
+
+    /* <0,0> is used by musical scaring to check for the above;
+     * it doesn't care about scrolls or engravings or dungeon branch */
+    if (x == 0 && y == 0)
+        return TRUE;
 
     /* should this still be true for defiled/molochian altars? */
     if (IS_ALTAR(levl[x][y].typ)
@@ -152,8 +160,9 @@ struct monst *mtmp;
 
     /*
      * Creatures who don't (or can't) fear a written Elbereth:
-     * all the above plus shopkeepers, guards, blind or
-     * peaceful monsters, humans, and minotaurs.
+     * all the above plus shopkeepers (even if poly'd into non-human),
+     * vault guards (also even if poly'd), blind or peaceful monsters,
+     * humans and elves, and minotaurs.
      *
      * If the player isn't actually on the square OR the player's image
      * isn't displaced to the square, no protection is being granted.
