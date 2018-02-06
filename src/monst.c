@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/05/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -388,7 +388,7 @@ NEARDATA struct permonst mons[] = {
           ATTK(AT_BITE, AD_PHYS, 1, 10), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(600, 300, MS_GROWL, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISIBLE,
-        CLR_YELLOW),
+        CLR_ORANGE),
     /* Lions hunt in packs, and the females do most of the hunting */
     MON("lion", S_FELINE, LVL(6, 12, 6, 0, 0), (G_GENO | G_SGROUP | 2),
         A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
@@ -1554,6 +1554,13 @@ struct permonst _mons2[] = {
     /*
      * Liches
      */
+    MON("worm that walks", S_LICH, LVL(11, 6, 0, 30, -9),
+        (G_GENO | G_NOCORPSE | 1),
+        A(ATTK(AT_TUCH, AD_DRCO, 1, 10), ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK,
+        NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1200, 100, MS_MUMBLE, MZ_HUMAN), MR_SLEEP | MR_POISON,
+        MR_POISON, M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
+        M2_UNDEAD | M2_HOSTILE | M2_MAGIC, M3_INFRAVISION, CLR_GREEN),
     MON("lich", S_LICH, LVL(11, 6, 0, 30, -9), (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_TUCH, AD_COLD, 1, 10), ATTK(AT_MAGC, AD_SPEL, 0, 0),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2608,6 +2615,16 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
+    MON("King in Yellow", S_DEMON, LVL(118, 15, -7, 100, 0),
+        (G_NOGEN | G_NOCORPSE | G_UNIQ),
+        A(ATTK(AT_MAGC, AD_CLRC, 6, 10), ATTK(AT_TENT, AD_DCAY, 12, 2),
+          ATTK(AT_TENT, AD_DCAY, 12, 2), ATTK(AT_TENT, AD_PLYS, 12, 2),
+          ATTK(AT_TENT, AD_DISE, 12, 2), ATTK(AT_TENT, AD_CURS, 12, 2)),
+        SIZ(1500, 500, MS_GURGLE, MZ_LARGE), MR_POISON | MR_STONE | MR_SLEEP |
+          MR_DISINT | MR_ELEC, 0,
+        M1_SEE_INVIS | M1_FLY | M1_BREATHLESS | M1_NOHEAD | M1_AMORPHOUS,
+        M2_NOPOLY | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_MALE,
+        M3_WANTSALL | M3_INFRAVISIBLE | M3_INFRAVISION, CLR_YELLOW),
     /* Riders -- the Four Horsemen of the Apocalypse ("War" == player);
      * depicted with '&' but do not have M2_DEMON set.
      */

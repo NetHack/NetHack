@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 2/02/18 by NullCGT */
+/* Modified 2/05/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -402,6 +402,14 @@ xchar e_type;
     /* engraving Elbereth shows wisdom */
     if (!in_mklev && !strcmp(s, "Elbereth"))
         exercise(A_WIS, TRUE);
+    if (!in_mklev && (!strcmp(s, "The Yellow Sign") ||
+        !strcmp(s, "the Yellow Sign"))) {
+        pline_The("weird, twisting sign burns itself into your mind!");
+        /* Could actually decrease confusion and stunning. */
+        exercise(A_WIS, FALSE);
+        make_confused(rnd(50), FALSE);
+        make_stunned(rnd(50), FALSE);
+    }
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
     ep->engr_lth = smem;

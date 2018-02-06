@@ -1,6 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Edited 2/05/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1205,7 +1206,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     }
     if (attacks(AD_ELEC, otmp)) {
         if (realizes_damage)
-            pline_The("massive hammer hits%s %s%c",
+            pline_The("godly weapon hits%s %s%c",
                       !spec_dbon_applies ? "" : "!  Lightning strikes",
                       hittee, !spec_dbon_applies ? '.' : '!');
         if (!rn2(5))
@@ -1341,7 +1342,20 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 if (otmp->oartifact == ART_STORMBRINGER)
                     pline_The("%s blade draws the %s from %s!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
-                else
+                else if (otmp->oartifact == ART_GAE_BULG)
+                    pline_The("terrible barbs of the %s spear tear into %s!",
+                              hcolor(NH_RED), mon_nam(mdef));
+                else if (otmp->oartifact == ART_GAE_BUIDHE)
+                    pline_The("yellow spear inflicts a cursed wound on %s!",
+                              mon_nam(mdef));
+                else if (otmp->oartifact == ART_GAE_DEARG) {
+                    if (rnd(3) == 0
+                        && cancel_monst(mdef, otmp, TRUE, TRUE, FALSE)) {
+                            pline_The("%s spear destroys the magic of %s!",
+                                      hcolor(NH_RED), mon_nam(mdef));
+                    }
+                    return TRUE;
+                } else
                     pline("%s draws the %s from %s!",
                           The(distant_name(otmp, xname)), life,
                           mon_nam(mdef));
@@ -1370,7 +1384,18 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                          life);
             else if (otmp->oartifact == ART_STORMBRINGER)
                 pline_The("%s blade drains your %s!", hcolor(NH_BLACK), life);
-            else
+            else if (otmp->oartifact == ART_GAE_BULG)
+                pline_The("terrible barbs of the spear tear into you!");
+            else if (otmp->oartifact == ART_GAE_BUIDHE)
+                pline_The("yellow spear inflicts a cursed wound on you!");
+            else if (otmp->oartifact == ART_GAE_DEARG) {
+                if (rnd(3) == 0 &&
+                    cancel_monst(&youmonst, otmp, TRUE, FALSE, FALSE)) {
+                        pline_The("%s spear destroys your magic!",
+                                  hcolor(NH_RED));
+                }
+                return TRUE;
+            } else
                 pline("%s drains your %s!", The(distant_name(otmp, xname)),
                       life);
             losexp("life drainage");
@@ -1454,6 +1479,11 @@ struct obj *obj;
             (void) seffects(&pseudo);
             pseudo2.otyp = SCR_TAMING;
             (void) seffects(&pseudo2);
+            break;
+        }
+        case KING: {
+            You("contact a being from beyond this realm!");
+            makemon(&mons[PM_KING_IN_YELLOW], u.ux, u.uy, NO_MM_FLAGS);
             break;
         }
         case HEALING: {

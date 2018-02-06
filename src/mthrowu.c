@@ -1,6 +1,7 @@
 /* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Edited 2/05/18 by NullCGT */
 
 #include "hack.h"
 
@@ -72,7 +73,9 @@ const char *name; /* if null, then format `*objp' */
             You("are almost hit by %s.", onm);
         return 0;
     } else {
-        if (Blind || !flags.verbose)
+        if (obj->oartifact == ART_GAE_BULG) {
+            You("are impaled by Gae Bulg!");
+        } else if (Blind || !flags.verbose)
             You("are hit%s", exclam(dam));
         else
             You("are hit by %s%s", onm, exclam(dam));
@@ -402,7 +405,11 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             if (resists_ston(mtmp))
                 damage = 0;
         }
-
+        if (otmp->oartifact == ART_GAE_BULG && cansee(mtmp->mx, mtmp->my)) {
+            pline_The("barbed spear flies through the air and impales %s!",
+                      mon_nam(mtmp));
+            damage += 200;
+        }
         if (mtmp->mhp > 0) { /* might already be dead (if petrified) */
             mtmp->mhp -= damage;
             if (mtmp->mhp < 1) {
@@ -585,6 +592,9 @@ struct obj *obj;         /* missile (or stack providing it) */
                 break;
             default:
                 dam = dmgval(singleobj, &youmonst);
+                if (singleobj->oartifact == ART_GAE_BULG) {
+                    dam += 200;
+                }
                 hitv = 3 - distmin(u.ux, u.uy, mon->mx, mon->my);
                 if (hitv < -4)
                     hitv = -4;

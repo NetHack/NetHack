@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/05/18 by NullCGT */
 
 /* Contains code for 't' (throw) */
 
@@ -1123,7 +1123,8 @@ boolean
         bhitpos.x = mon->mx;
         bhitpos.y = mon->my;
     } else if (u.dz) {
-        if (u.dz < 0 && Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR
+        if (u.dz < 0 && Role_if(PM_VALKYRIE) &&
+            (obj->oartifact == ART_MJOLLNIR || obj->oartifact == ART_GUNGNIR)
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
@@ -1257,7 +1258,8 @@ boolean
         thrownobj = (struct obj *) 0;
     } else {
         /* the code following might become part of dropy() */
-        if (obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE)
+        if ((obj->oartifact == ART_MJOLLNIR || obj->oartifact == ART_GUNGNIR)
+            && Role_if(PM_VALKYRIE)
             && rn2(100)) {
             /* we must be wearing Gauntlets of Power to get here */
             sho_obj_return_to_u(obj); /* display its flight */

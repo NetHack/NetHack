@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/05/18 by NullCGT */
 
 #include "hack.h"
 
@@ -799,6 +799,17 @@ int dieroll;
                     if (obj->opoisoned && is_poisonable(obj))
                         ispoisoned = TRUE;
                 }
+                if (thrown == HMON_THROWN
+                    && obj->oartifact == ART_GAE_BULG && !noncorporeal(mdat) &&
+                    !amorphous(mdat)) {
+                        tmp += 200;
+                        pline("You throw %s as a last resort... it flies true and impales %s!", yname(obj), mon_nam(mon));
+                        /* chance that Gae Bulg is lost... */
+                        if (rnd(3) < 2) {
+                            pline("The deadly spear vanishes...");
+                            obfree(obj, (struct obj *) 0);
+                        }
+                    }
             }
         } else if (obj->oclass == POTION_CLASS) {
             if (obj->quan > 1L)

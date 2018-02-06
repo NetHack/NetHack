@@ -1,6 +1,7 @@
 /* NetHack 3.6	artifact.h	$NHDT-Date: 1433050871 2015/05/31 05:41:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified 2/05/18 by NullCGT */
 
 #ifndef ARTIFACT_H
 #define ARTIFACT_H
@@ -59,6 +60,7 @@ struct artifact {
 enum invoke_prop_types {
     TAMING = (LAST_PROP + 1),
     SUMMONING,
+    KING,
     HEALING,
     ENERGY_BOOST,
     UNTRAP,

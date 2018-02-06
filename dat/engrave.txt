@@ -10,6 +10,12 @@ Owlbreath
 Galadriel
 Kilroy was here
 
+# House of Leaves (added by NullCGT 2/05/18)
+This is not for you.
+
+# Robert W. Chambers (added by NullCGT 2/05/18)
+The Yellow Sign
+
 # Journey to the Center of the Earth
 A.S. ->
 <- A.S.

@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1517128658 2018/01/28 08:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.624 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/01/18 by NullCGT */
+/* File changed 2/05/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -1467,6 +1467,7 @@ E boolean FDECL(mb_trapped, (struct monst *));
 E boolean FDECL(monhaskey, (struct monst *, BOOLEAN_P));
 E void FDECL(mon_regen, (struct monst *, BOOLEAN_P));
 E int FDECL(dochugw, (struct monst *));
+E boolean FDECL(onconfuse, (int, int, struct monst *));
 E boolean FDECL(onscary, (int, int, struct monst *));
 E void FDECL(monflee, (struct monst *, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(mon_yells, (struct monst *, const char *));

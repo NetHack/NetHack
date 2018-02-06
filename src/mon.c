@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/05/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1993,7 +1993,17 @@ boolean was_swallowed; /* digestion */
 {
     struct permonst *mdat = mon->data;
     int i, tmp;
-
+    /* A worm that walks naturally dissolves into worms */
+    if (mdat == &mons[PM_WORM_THAT_WALKS]) {
+        if (cansee(mon->mx, mon->my) && !was_swallowed) {
+            pline_The("body of %s dissolves into maggots!", mon_nam(mon));
+            create_critters(rnd(10), &mons[PM_BABY_LONG_WORM], TRUE);
+        } else if (!was_swallowed) {
+            You_hear("the slithering of many bodies.");
+            create_critters(rnd(10), &mons[PM_BABY_LONG_WORM], TRUE);
+        }
+        return FALSE;
+    }
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)
             pline("%s body crumbles into dust.", s_suffix(Monnam(mon)));

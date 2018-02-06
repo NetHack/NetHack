@@ -1,6 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1512808567 2017/12/09 08:36:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Edited 2/05/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -130,6 +131,19 @@ register struct monst *mtmp;
 }
 
 boolean
+onconfuse(x, y, mtmp)
+int x, y;
+struct monst *mtmp;
+{
+  return ((sengr_at("the Yellow Sign", x, y, TRUE) ||
+            sengr_at("The Yellow Sign", x, y, TRUE))
+          && ((u.ux == x && u.uy == y)
+              || (Displaced && mtmp->mux == x && mtmp->muy == y))
+          && !(!mtmp->mcansee
+               || mtmp->data == &mons[PM_KING_IN_YELLOW]));
+}
+
+boolean
 onscary(x, y, mtmp)
 int x, y;
 struct monst *mtmp;
@@ -153,7 +167,7 @@ struct monst *mtmp;
     /*
      * Creatures who don't (or can't) fear a written Elbereth:
      * all the above plus shopkeepers, guards, blind or
-     * peaceful monsters, humans, and minotaurs.
+     * peaceful monsters, humans, eldritch abominations, and minotaurs.
      *
      * If the player isn't actually on the square OR the player's image
      * isn't displaced to the square, no protection is being granted.
@@ -167,6 +181,7 @@ struct monst *mtmp;
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
                  || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN
                  || mtmp->data == &mons[PM_MINOTAUR]
+                 || mtmp->data == &mons[PM_KING_IN_YELLOW]
                  || Inhell || In_endgame(&u.uz)));
 }
 
@@ -295,6 +310,7 @@ int *inrange, *nearby, *scared;
 {
     int seescaryx, seescaryy;
     boolean sawscary = FALSE;
+    boolean sawconfuse = FALSE;
 
     *inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
                 <= (BOLT_LIM * BOLT_LIM));
@@ -322,6 +338,10 @@ int *inrange, *nearby, *scared;
         monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
     } else
         *scared = 0;
+    sawconfuse = onconfuse(seescaryx, seescaryy, mtmp);
+    if (*nearby && sawconfuse) {
+      mtmp->mconf = 1;
+    }
 }
 
 /* perform a special one-time action for a monster; returns -1 if nothing
