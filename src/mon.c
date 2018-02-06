@@ -1510,6 +1510,10 @@ struct monst *magr, /* monster that is currently deciding where to move */
   	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
   		  return ALLOW_M|ALLOW_TM;
 
+    /* Sankis turned on her own, while on fire */
+    if(ma == &mons[PM_LORD_SANKIS] && md == is_dwarf(md))
+  		  return ALLOW_M|ALLOW_TM;
+
     /* renegade shopkeepers just don't like people */
     if(ma == &mons[PM_RENEGADE_SHOPKEEPER] && md->mlet == S_HUMAN)
   		  return ALLOW_M|ALLOW_TM;
@@ -1994,14 +1998,16 @@ boolean was_swallowed; /* digestion */
     struct permonst *mdat = mon->data;
     int i, tmp;
     /* A worm that walks naturally dissolves into worms */
-    if (mdat == &mons[PM_WORM_THAT_WALKS]) {
+    if (mdat == &mons[PM_WORM_THAT_WALKS] || mdat == &mons[PM_LORD_OF_WORMS]) {
         if (cansee(mon->mx, mon->my) && !was_swallowed) {
             pline_The("body of %s dissolves into maggots!", mon_nam(mon));
-            create_critters(rnd(10), &mons[PM_BABY_LONG_WORM], TRUE);
         } else if (!was_swallowed) {
             You_hear("the slithering of many bodies.");
-            create_critters(rnd(10), &mons[PM_BABY_LONG_WORM], TRUE);
         }
+        if (mdat == &mons[PM_WORM_THAT_WALKS])
+            create_critters(rnd(10), &mons[PM_DEATH_MAGGOT], TRUE);
+        else
+            create_critters(rnd(20), &mons[PM_DEATH_MAGGOT], TRUE);
         return FALSE;
     }
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {

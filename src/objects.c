@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/02/18 by NullCGT */
+/* Edited on 2/05/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -689,7 +689,7 @@ TOOL("lenses",              None, 1, 0, 0, 0,  5,  3, 80, GLASS, HI_GLASS),
 TOOL("blindfold",           None, 1, 0, 0, 0, 50,  2, 20, CLOTH, CLR_BLACK),
 TOOL("towel",               None, 1, 0, 0, 0, 50,  2, 50, CLOTH, CLR_MAGENTA),
 TOOL("saddle",              None, 1, 0, 0, 0,  5,200,150, LEATHER, HI_LEATHER),
-TOOL("leash",               None, 1, 0, 0, 0, 65, 12, 20, LEATHER, HI_LEATHER),
+TOOL("leash",               None, 1, 0, 0, 0, 60, 12, 20, LEATHER, HI_LEATHER),
 TOOL("stethoscope",         None, 1, 0, 0, 0, 25,  4, 75, IRON, HI_METAL),
 TOOL("tinning kit",         None, 1, 0, 0, 1, 15,100, 30, IRON, HI_METAL),
 TOOL("tin opener",          None, 1, 0, 0, 0, 35,  4, 30, IRON, HI_METAL),
@@ -698,8 +698,9 @@ TOOL("figurine",            None, 1, 0, 1, 0, 25, 50, 80, MINERAL, HI_MINERAL),
         /* monster type specified by obj->corpsenm */
 TOOL("magic marker",        None, 1, 0, 1, 1, 15,  2, 50, PLASTIC, CLR_RED),
 /* traps */
-TOOL("land mine",           None, 1, 0, 0, 0, 0, 300,180, IRON, CLR_RED),
-TOOL("beartrap",            None, 1, 0, 0, 0, 0, 200, 60, IRON, HI_METAL),
+/* made beartraps and land mines generate randomly to add some variety */
+TOOL("land mine",           None, 1, 0, 0, 0, 3, 300,180, IRON, CLR_RED),
+TOOL("beartrap",            None, 1, 0, 0, 0, 2, 200, 60, IRON, HI_METAL),
 /* instruments;
    "If tin whistles are made out of tin, what do they make foghorns out of?" */
 TOOL("tin whistle",    "whistle", 0, 0, 0, 0,100, 3, 10, METAL, HI_METAL),

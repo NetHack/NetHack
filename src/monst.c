@@ -454,6 +454,15 @@ NEARDATA struct permonst mons[] = {
         M2_DWARF | M2_STRONG | M2_PRINCE | M2_MALE | M2_GREEDY | M2_JEWELS
             | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
+    MON("Lord Sankis", S_HUMANOID, LVL(8, 9, 10, 20, 0), (G_UNIQ | 1),
+        A(ATTK(AT_WEAP, AD_FIRE, 2, 6), ATTK(AT_WEAP, AD_FIRE, 2, 6), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), MR_FIRE, 0,
+        M1_TUNNEL | M1_BREATHLESS | M1_AMPHIBIOUS | M1_NEEDPICK | M1_HUMANOID |
+        M1_OMNIVORE,
+        M2_DWARF | M2_STRONG | M2_PRINCE | M2_FEMALE | M2_GREEDY | M2_JEWELS
+            | M2_COLLECT | M2_PNAME | M2_HOSTILE,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_ORANGE),
     MON("mind flayer", S_HUMANOID, LVL(9, 12, 5, 90, -8), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_TENT, AD_DRIN, 2, 1),
           ATTK(AT_TENT, AD_DRIN, 2, 1), ATTK(AT_TENT, AD_DRIN, 2, 1), NO_ATTK,
@@ -862,6 +871,14 @@ NEARDATA struct permonst mons[] = {
         SIZ(1800, 350, MS_NEIGH, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE,
         M2_WANDER | M2_STRONG | M2_DOMESTIC, M3_INFRAVISIBLE, CLR_BROWN),
+    MON("nightmare", S_UNICORN, LVL(10, 24, 4, 0, 0), (G_HELL | G_GENO | 2),
+        A(ATTK(AT_KICK, AD_FIRE, 1, 12), ATTK(AT_KICK, AD_FIRE, 1, 12),
+          ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_FIRE | MR_POISON, 0,
+        M1_ANIMAL | M1_NOHANDS,
+        M2_WANDER | M2_STRONG | M2_DOMESTIC | M2_DEMON | M2_HOSTILE |
+        M2_MINION,
+        M3_INFRAVISIBLE, CLR_RED),
     /*
      * vortices
      */
@@ -918,6 +935,12 @@ NEARDATA struct permonst mons[] = {
     /*
      * worms
      */
+     MON("death maggot", S_WORM, LVL(1, 12, 5, 0, 0), (G_GENO | G_SGROUP | 1),
+         A(ATTK(AT_BITE, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+           NO_ATTK),
+         SIZ(600, 250, MS_SILENT, MZ_TINY), 0, 0,
+         M1_ANIMAL | M1_SLITHY | M1_NOLIMBS | M1_CARNIVORE | M1_NOTAKE,
+         M2_HOSTILE | M2_UNDEAD, 0, CLR_GREEN),
     MON("baby long worm", S_WORM, LVL(5, 3, 5, 0, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -1102,13 +1125,13 @@ NEARDATA struct permonst mons[] = {
      * As reptiles, dragons are cold-blooded and thus aren't seen
      * with infravision.  Red dragons are the exception.
      */
-    MON("baby gray dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby gray dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_GRAY),
-    MON("baby silver dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby silver dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
@@ -1123,44 +1146,44 @@ NEARDATA struct permonst mons[] = {
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_CYAN),
 #endif
-    MON("baby red dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby red dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_FIRE, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, M3_INFRAVISIBLE,
         CLR_RED),
-    MON("baby white dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby white dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_COLD, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_WHITE),
-    MON("baby orange dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby orange dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_SLEEP, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_ORANGE),
-    MON("baby black dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby black dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_DISINT, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_BLACK),
-    MON("baby blue dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby blue dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_ELEC, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_BLUE),
-    MON("baby green dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby green dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_POISON, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_GREEN),
-    MON("baby yellow dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+    MON("baby yellow dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_ACID | MR_STONE, 0,
@@ -1251,12 +1274,13 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_GREEN),
+    /* If you see an elder dragon, run. */
     MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
         ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
-            | M1_CARNIVORE,
+            | M1_METALLIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_CYAN),
     MON("ooze dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
@@ -1592,6 +1616,15 @@ struct permonst _mons2[] = {
         M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
         M2_UNDEAD | M2_HOSTILE | M2_MAGIC, M3_WANTSBOOK | M3_INFRAVISION,
         HI_LORD),
+    MON("lord of worms", S_LICH, LVL(25, 9, -6, 90, -15),
+        (G_HELL | G_GENO | G_NOCORPSE | 1),
+        A(ATTK(AT_TUCH, AD_DRCO, 5, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1200, 100, MS_MUMBLE, MZ_HUMAN),
+        MR_FIRE | MR_SLEEP | MR_ELEC | MR_POISON, MR_FIRE,
+        M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
+        M2_UNDEAD | M2_HOSTILE | M2_MAGIC, M3_WANTSBOOK | M3_INFRAVISION,
+        CLR_BRIGHT_GREEN),
     /*
      * Mummies
      */
@@ -2083,6 +2116,14 @@ struct permonst _mons2[] = {
         M2_UNDEAD | M2_WANDER | M2_HOSTILE | M2_STRONG | M2_COLLECT
             | M2_NASTY,
         M3_INFRAVISION, CLR_WHITE),
+    MON("zombie dragon", S_ZOMBIE, LVL(14, 8, -1, 20, -4), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 3, 8), ATTK(AT_CLAW, AD_PHYS, 1, 4),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_SILENT, MZ_GIGANTIC), MR_FIRE, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_BREATHLESS |
+        M1_MINDLESS,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_MAGIC,
+        M3_INFRAVISIBLE, CLR_ORANGE),
     /*
      * golems
      */
