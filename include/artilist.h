@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/05/18 by NullCGT */
+/* File changed 2/06/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -95,6 +95,11 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     A("Gae Buidhe", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
       DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, PM_RANGER, NON_PM,
       7000L, CLR_YELLOW),
+
+    A("Sharur", MACE,
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
+      0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, NON_PM,
+      NON_PM, 4000L, CLR_YELLOW),
 
     A("Cleaver", BATTLE_AXE, SPFX_RESTR, 0, 0, PHYS(3, 6), NO_DFNS, NO_CARY,
       0, A_NEUTRAL, PM_BARBARIAN, NON_PM, 1500L, NO_COLOR),
@@ -236,9 +241,8 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
       DFNS(AD_MAGM), NO_CARY, ENLIGHTENING, A_NEUTRAL, PM_MONK, NON_PM,
       2500L, NO_COLOR),
 
-    A("The King in Yellow", SPE_LIGHT,
-      (SPFX_HALRES),
-      (SPFX_ESP | SPFX_HSPDAM), 0, NO_ATTK, NO_DFNS, NO_CARY,
+    A("The King in Yellow", SPE_FINGER_OF_DEATH,
+      (SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
       KING, A_NONE, NON_PM, NON_PM, 30L, NO_COLOR),
 
     A("The Mitre of Holiness", HELM_OF_BRILLIANCE,

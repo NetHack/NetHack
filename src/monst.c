@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 2/06/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -875,7 +875,7 @@ NEARDATA struct permonst mons[] = {
         A(ATTK(AT_KICK, AD_FIRE, 1, 12), ATTK(AT_KICK, AD_FIRE, 1, 12),
           ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_FIRE | MR_POISON, 0,
-        M1_ANIMAL | M1_NOHANDS,
+        M1_ANIMAL | M1_NOHANDS | M1_FLY,
         M2_WANDER | M2_STRONG | M2_DOMESTIC | M2_DEMON | M2_HOSTILE |
         M2_MINION,
         M3_INFRAVISIBLE, CLR_RED),
@@ -1031,6 +1031,14 @@ NEARDATA struct permonst mons[] = {
         M1_HUMANOID | M1_SEE_INVIS,
         M2_MINION | M2_STALK | M2_NASTY | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_YELLOW),
+    MON("lamassu", S_ANGEL, LVL(12, 12, -3, 50, 0), (G_NOHELL | G_NOCORPSE | 2),
+        A(ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_CLAW, AD_PHYS, 3, 4),
+          ATTK(AT_BITE, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_CLRC, 2, 6),
+          NO_ATTK, NO_ATTK),
+        SIZ(600, 300, MS_CUSS, MZ_LARGE), MR_FIRE, 0,
+        M1_ANIMAL | M1_SEE_INVIS | M1_CARNIVORE | M1_FLY,
+        M2_HOSTILE | M2_STALK | M2_NASTY | M2_STRONG | M2_MINION,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_BROWN),
     /* Angels start with the emin extension attached, and usually have
        the isminion flag set; however, non-minion Angels can be tamed
        and will switch to edog (guardian Angel is handled specially and

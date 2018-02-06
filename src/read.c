@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 2/06/18 by NullCGT */
 
 #include "hack.h"
 
@@ -185,7 +185,6 @@ doread()
 {
     register struct obj *scroll;
     boolean confused, nodisappear;
-    struct monst *mtmp;
 
     known = FALSE;
     if (check_capacity((char *) 0))
@@ -365,18 +364,6 @@ doread()
         && scroll->otyp != SPE_BLANK_PAPER && scroll->otyp != SCR_BLANK_PAPER
         && scroll->otyp != SPE_NOVEL)
         u.uconduct.literate++;
-
-    if (scroll->oartifact == ART_KING_IN_YELLOW) {
-        You("find that you cannot look away from the play, and your mind is filled with visions of a ruined city. Your fate is now sealed.");
-        mtmp = makemon(&mons[PM_KING_IN_YELLOW], u.ux, u.uy, NO_MM_FLAGS);
-        if (!In_endgame(&u.uz)) {
-            /* based on muse.c code */
-            d_level flev;
-            get_level(&flev, random_teleport_level());
-            migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
-                             (coord *) 0);
-        }
-    }
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll);

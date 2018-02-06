@@ -2,6 +2,8 @@
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/06/18 by NullCGT */
+
 #include "hack.h"
 
 /* spellmenu arguments; 0 thru n-1 used as spl_book[] index when swapping */
@@ -344,6 +346,7 @@ learn(VOID_ARGS)
     char splname[BUFSZ];
     boolean costly = TRUE;
     struct obj *book = context.spbook.book;
+    struct monst *mtmp;
 
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
     if (context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2))
@@ -416,7 +419,28 @@ learn(VOID_ARGS)
             book->spestudied++;
             You(i > 0 ? "add %s to your repertoire." : "learn %s.", splname);
         }
+
         makeknown((int) booktype);
+    }
+    if (book->oartifact == ART_KING_IN_YELLOW && book->spestudied == 1) {
+        You("find that you cannot look away from the boook, and your mind is filled with visions of a ruined city. Your fate is now sealed.");
+        /* Make and teleport the king to a random level */
+        mtmp = makemon(&mons[PM_KING_IN_YELLOW], u.ux, u.uy, NO_MM_FLAGS);
+        if (!In_endgame(&u.uz) && !u.uhave.amulet) {
+            /* based on muse.c code */
+            d_level flev;
+            get_level(&flev, random_teleport_level());
+            migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
+                             (coord *) 0);
+        }
+        /* add some other handy benefits */
+        exercise(A_WIS, TRUE);
+        exercise(A_CHA, TRUE);
+        pluslvl(FALSE);
+        HSleep_resistance |= FROMOUTSIDE;
+        HClairvoyant |= FROMOUTSIDE;
+        /* increase the stuided count of the book */
+        book->spestudied++;
     }
 
     if (book->cursed) { /* maybe a demon cursed it */
@@ -524,7 +548,8 @@ register struct obj *spellbook;
 
         /* Books are often wiser than their readers (Rus.) */
         spellbook->in_use = TRUE;
-        if (!spellbook->blessed && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
+        if (!spellbook->blessed && spellbook->otyp != SPE_BOOK_OF_THE_DEAD
+            && spellbook->oartifact != ART_KING_IN_YELLOW) {
             if (spellbook->cursed) {
                 too_hard = TRUE;
             } else {

@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 2/05/18 by NullCGT */
+/* Edited 2/06/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1432,6 +1432,7 @@ STATIC_OVL int
 arti_invoke(obj)
 struct obj *obj;
 {
+    struct monst *mtmp;
     register const struct artifact *oart = get_artifact(obj);
     if (!obj) {
         impossible("arti_invoke without obj");
@@ -1484,6 +1485,15 @@ struct obj *obj;
         case KING: {
             You("contact a being from beyond this realm!");
             makemon(&mons[PM_KING_IN_YELLOW], u.ux, u.uy, NO_MM_FLAGS);
+            break;
+        }
+        case LION: {
+            pline("%s transforms into a glorious winged lion!",
+                  xname(obj));
+            mtmp = makemon(&mons[PM_LAMASSU], u.ux, u.uy, NO_MM_FLAGS);
+            tamedog(mtmp, (struct obj *) 0);
+            christen_monst(mtmp, "Sharur");
+            useup(obj);
             break;
         }
         case HEALING: {

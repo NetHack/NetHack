@@ -1511,7 +1511,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
   		  return ALLOW_M|ALLOW_TM;
 
     /* Sankis turned on her own, while on fire */
-    if(ma == &mons[PM_LORD_SANKIS] && md == is_dwarf(md))
+    if(ma == &mons[PM_LORD_SANKIS] && is_dwarf(md))
   		  return ALLOW_M|ALLOW_TM;
 
     /* renegade shopkeepers just don't like people */

@@ -61,6 +61,7 @@ enum invoke_prop_types {
     TAMING = (LAST_PROP + 1),
     SUMMONING,
     KING,
+    LION,
     HEALING,
     ENERGY_BOOST,
     UNTRAP,
