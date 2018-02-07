@@ -2,6 +2,8 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/07/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_PTR int NDECL(prayer_done);
@@ -1312,9 +1314,12 @@ dosacrifice()
             value = monstr[otmp->corpsenm] + 1;
             if (otmp->oeaten)
                 value = eaten_stat(value, otmp);
+            if (uwep == PM_BONE_KNIFE) {
+                value += 2;
+            }
         }
 
-        if (your_race(ptr)) {
+        if (your_race(ptr) || if(uwep == BONE_KNIFE && uwep->cursed)) {
             if (is_demon(youmonst.data)) {
                 You("find the idea very satisfying.");
                 exercise(A_WIS, TRUE);

@@ -170,8 +170,10 @@ WEAPON("scalpel", None,
        1, 1, 0,  0,   5,   6,  3,  3, 2, S,   P_KNIFE, METAL, HI_METAL),
 WEAPON("knife", None,
        1, 1, 0, 20,   5,   4,  3,  2, 0, P|S, P_KNIFE, IRON, HI_METAL),
+WEAPON("bone knife", "sacrificial knife",
+      1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("stiletto", None,
-       1, 1, 0,  5,   5,   4,  3,  2, 0, P|S, P_KNIFE, IRON, HI_METAL),
+       1, 1, 0,  2,   5,   4,  3,  2, 0, P|S, P_KNIFE, IRON, HI_METAL),
 /* 3.6: worm teeth and crysknives now stack;
    when a stack of teeth is enchanted at once, they fuse into one crysknife;
    when a stack of crysknives drops, the whole stack reverts to teeth */
@@ -200,7 +202,7 @@ WEAPON("scimitar", "curved sword",
 WEAPON("silver saber", None,
        1, 0, 0,  6,  40,  75,  8,  8, 0, S,   P_SABER, SILVER, HI_SILVER),
 WEAPON("broadsword", None,
-       1, 0, 0,  8,  70,  10,  4,  6, 0, S,   P_BROAD_SWORD, IRON, HI_METAL),
+       1, 0, 0,  7,  70,  10,  4,  6, 0, S,   P_BROAD_SWORD, IRON, HI_METAL),
         /* +d4 small, +1 large */
 WEAPON("elven broadsword", "runed broadsword",
        0, 0, 0,  4,  70,  10,  6,  6, 0, S,   P_BROAD_SWORD, WOOD, HI_WOOD),
@@ -208,18 +210,18 @@ WEAPON("elven broadsword", "runed broadsword",
 WEAPON("long sword", None,
        1, 0, 0, 50,  40,  15,  8, 12, 0, S,   P_LONG_SWORD, IRON, HI_METAL),
 WEAPON("two-handed sword", None,
-       1, 0, 1, 22, 150,  50, 12,  6, 0, S,   P_TWO_HANDED_SWORD,
+       1, 0, 1, 21, 150,  50, 12,  6, 0, S,   P_TWO_HANDED_SWORD,
                                                             IRON, HI_METAL),
         /* +2d6 large */
 WEAPON("katana", "samurai sword",
        0, 0, 0,  4,  40,  80, 10, 12, 1, S,   P_LONG_SWORD, IRON, HI_METAL),
 /* special swords set up for artifacts */
 WEAPON("tsurugi", "long samurai sword",
-       0, 0, 1,  0,  60, 500, 16,  8, 2, S,   P_TWO_HANDED_SWORD,
+       0, 0, 1,  1,  60, 500, 16,  8, 2, S,   P_TWO_HANDED_SWORD,
                                                             METAL, HI_METAL),
         /* +2d6 large */
 WEAPON("runesword", "runed broadsword",
-       0, 0, 0,  0,  40, 300,  4,  6, 0, S,   P_BROAD_SWORD, IRON, CLR_BLACK),
+       0, 0, 0,  1,  40, 300,  4,  6, 0, S,   P_BROAD_SWORD, IRON, CLR_BLACK),
         /* +d4 small, +1 large; Stormbringer: +5d2 +d8 from level drain */
 
 /* polearms */
@@ -1048,6 +1050,9 @@ WAND(None,             "forked",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "holly",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "spiked",  0, 150, 1, 0, IRON, HI_METAL),
 WAND(None,            "titanium",  0, 150, 1, 0, IRON, HI_METAL),
+WAND(None,            "bone",  0, 150, 1, 0, BONE, CLR_WHITE),
+WAND(None,            "golden",  0, 150, 1, 0, GOLD, HI_GOLD),
+WAND(None,            "mithril",  0, 150, 1, 0, GOLD, HI_MITHRIL),
 WAND(None,            "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 #undef WAND
 
