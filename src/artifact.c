@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 2/06/18 by NullCGT */
+/* Edited 2/07/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1913,7 +1913,8 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
     if (uwep
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
-            || uwep->oartifact == ART_GRIMTOOTH)) {
+            || uwep->oartifact == ART_GRIMTOOTH
+            || uwep->oartifact == ART_VLADSBANE)) {
         if (orc_count == -1 && warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */

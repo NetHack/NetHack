@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 2/07/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -2827,8 +2827,7 @@ struct permonst _mons2[] = {
         A(ATTK(AT_BITE, AD_PHYS, 5, 10), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 500, MS_ROAR, MZ_HUGE), 0, 0,
-        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS
-            | M1_CARNIVORE,
+        M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_STRONG | M2_HOSTILE, 0, CLR_WHITE),
 
     /*

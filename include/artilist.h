@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/06/18 by NullCGT */
+/* File changed 2/07/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -78,7 +78,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     */
     A("Gae Bulg", JAVELIN, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
       DRLI(3, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
-      9000L, CLR_RED),
+      9000L, NO_COLOR),
 
     /*
     *      Gae Dearg cancels those it strikes. Possibly in the future it
@@ -87,32 +87,52 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     */
     A("Gae Dearg", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
       DRLI(2, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
-      7000L, CLR_RED),
+      7000L, NO_COLOR),
 
     /*
     *      Gae Buidhe inflicts cursed wounds (drains levels).
     */
     A("Gae Buidhe", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
       DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
-      7000L, CLR_YELLOW),
+      7000L, NO_COLOR),
 
+    /*
+    *       Some "worse" sacrifice gifts are needed to avoid making #offer
+    *       overpowered.
+    */
     A("Wispknife", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
       PHYS(3, 4), NO_DFNS, NO_CARY, 0, A_CHAOTIC,
       NON_PM, NON_PM, 400L, NO_COLOR),
 
+    /*
+    *       Based on the LOTR arrow, but could represent any arrow. Technically
+    *       probably not magical originally, but including an artifact arrow
+    *       seemed like a fun idea.
+    */
     A("Black Arrow", ARROW, (SPFX_RESTR), 0, 0, PHYS(10, 10), NO_DFNS, NO_CARY,
-      0, A_NONE, NON_PM, NON_PM, 1000L, CLR_BLACK),
-
-    A("Seafoam", TRIDENT, (SPFX_RESTR | SPFX_BREATHE), 0, 0, PHYS(3,7),
-      NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1500L, CLR_BLUE),
+      0, A_NONE, NON_PM, NON_PM, 1000L, NO_COLOR),
 
     /*
-    * Based on Sumerian legends
+    *       Seafoam grants waterbreathing, and is generated rustproof.
+    */
+    A("Seafoam", TRIDENT, (SPFX_RESTR | SPFX_BREATHE), 0, 0, PHYS(3,7),
+      NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1500L, NO_COLOR),
+
+    /*
+    *       Based on Sumerian legends. Extremely powerful.
     */
     A("Sharur", MACE,
-      (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
+      (SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
       0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, NON_PM,
-      NON_PM, 4000L, CLR_YELLOW),
+      NON_PM, 4000L, NO_COLOR),
+
+    /*
+    *        Just for fun.
+    */
+    A("Vladsbane", FOOD_RATION,
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_WARN | SPFX_DFLAG2), 0, M2_UNDEAD,
+      PHYS(1, 0), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 200L,
+      CLR_MAGENTA),
 
     A("Cleaver", BATTLE_AXE, SPFX_RESTR, 0, 0, PHYS(3, 6), NO_DFNS, NO_CARY,
       0, A_NEUTRAL, PM_BARBARIAN, NON_PM, 1500L, NO_COLOR),
