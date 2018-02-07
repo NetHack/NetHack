@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.h	$NHDT-Date: 1433050871 2015/05/31 05:41:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Modified 2/05/18 by NullCGT */
+/* Modified 2/06/18 by NullCGT */
 
 #ifndef ARTIFACT_H
 #define ARTIFACT_H
@@ -40,6 +40,7 @@
 #define SPFX_XRAY 0x02000000L    /* gives X-RAY vision to player */
 #define SPFX_REFLECT 0x04000000L /* Reflection */
 #define SPFX_PROTECT 0x08000000L /* Protection */
+#define SPFX_BREATHE 0x10000000L /* Magical breathing */
 
 struct artifact {
     short otyp;

@@ -77,7 +77,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      monsters attacking them with Gae Bulg.
     */
     A("Gae Bulg", JAVELIN, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(3, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, PM_RANGER, NON_PM,
+      DRLI(3, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       9000L, CLR_RED),
 
     /*
@@ -86,16 +86,29 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      in DRLI, and occurs 1/3 of the time.
     */
     A("Gae Dearg", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(2, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, PM_RANGER, NON_PM,
+      DRLI(2, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       7000L, CLR_RED),
 
     /*
     *      Gae Buidhe inflicts cursed wounds (drains levels).
     */
     A("Gae Buidhe", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, PM_RANGER, NON_PM,
+      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       7000L, CLR_YELLOW),
 
+    A("Wispknife", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
+      PHYS(3, 4), NO_DFNS, NO_CARY, 0, A_CHAOTIC,
+      NON_PM, NON_PM, 400L, NO_COLOR),
+
+    A("Black Arrow", ARROW, (SPFX_RESTR), 0, 0, PHYS(10, 10), NO_DFNS, NO_CARY,
+      0, A_NONE, NON_PM, NON_PM, 1000L, CLR_BLACK),
+
+    A("Seafoam", TRIDENT, (SPFX_RESTR | SPFX_BREATHE), 0, 0, PHYS(3,7),
+      NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1500L, CLR_BLUE),
+
+    /*
+    * Based on Sumerian legends
+    */
     A("Sharur", MACE,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
       0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, NON_PM,

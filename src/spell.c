@@ -439,7 +439,7 @@ learn(VOID_ARGS)
         pluslvl(FALSE);
         HSleep_resistance |= FROMOUTSIDE;
         HClairvoyant |= FROMOUTSIDE;
-        /* increase the stuided count of the book */
+        /* increase the studied count of the book */
         book->spestudied++;
     }
 

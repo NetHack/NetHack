@@ -622,6 +622,12 @@ long wp_mask;
         else
             EProtection &= ~wp_mask;
     }
+    if (spfx & SPFX_BREATHE) {
+        if (on)
+            EMagical_breathing |= wp_mask;
+        else
+            EMagical_breathing &= ~wp_mask;
+    }
 
     if (wp_mask == W_ART && !on && oart->inv_prop) {
         /* might have to turn off invoked power too */
@@ -1485,6 +1491,7 @@ struct obj *obj;
         case KING: {
             You("contact a being from beyond this realm!");
             makemon(&mons[PM_KING_IN_YELLOW], u.ux, u.uy, NO_MM_FLAGS);
+            useup(obj);
             break;
         }
         case LION: {
@@ -1826,6 +1833,7 @@ long *abil;
         { &EHalf_spell_damage, SPFX_HSPDAM },
         { &EHalf_physical_damage, SPFX_HPHDAM },
         { &EReflecting, SPFX_REFLECT },
+        { &EMagical_breathing, SPFX_BREATHE },
     };
     int k;
 

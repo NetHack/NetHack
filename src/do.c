@@ -4,6 +4,8 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
+/* Edited on 2/06/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h"
 
@@ -1166,8 +1168,12 @@ boolean at_stairs, falling, portal;
      *   -2    5.21   4.17   0.0
      *   -3    2.08   0.0    0.0
      */
+     /*
+     *  Mysterious force now only affects you if you are hallucinating.
+     *  So there. Other effects will be given to the amulet to compensate?
+     */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
-        && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
+        && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3) && HHallucination) {
         if (!rn2(4)) {
             int odds = 3 + (int) u.ualign.type,   /* 2..4 */
                 diff = odds <= 1 ? 0 : rn2(odds); /* paranoia */

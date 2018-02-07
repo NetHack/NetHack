@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/06/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
@@ -906,6 +908,9 @@ boolean artif;
             case FIRE_HORN:
             case DRUM_OF_EARTHQUAKE:
                 otmp->spe = rn1(5, 4);
+                break;
+            case ART_SEAFOAM:
+                otmp->oerodeproof = TRUE;
                 break;
             }
             break;
