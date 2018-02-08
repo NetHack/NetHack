@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1517128658 2018/01/28 08:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.624 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1284,6 +1284,7 @@ E struct obj *FDECL(splitobj, (struct obj *, long));
 E struct obj *FDECL(unsplitobj, (struct obj *));
 E void NDECL(clear_splitobjs);
 E void FDECL(replace_object, (struct obj *, struct obj *));
+E struct obj *FDECL(unknwn_contnr_contents, (struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
 E void FDECL(costly_alteration, (struct obj *, int));
 E struct obj *FDECL(mksobj, (int, BOOLEAN_P, BOOLEAN_P));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1513298759 2017/12/15 00:45:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1518053380 2018/02/08 01:29:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -577,6 +577,23 @@ struct obj *otmp;
         panic("replace_object: obj position");
         break;
     }
+}
+
+/* is 'obj' inside a container whose contents aren't known?
+   if so, return the outermost container meeting that criterium */
+struct obj *
+unknwn_contnr_contents(obj)
+struct obj *obj;
+{
+    struct obj *result = 0, *parent;
+
+    while (obj->where == OBJ_CONTAINED) {
+        parent = obj->ocontainer;
+        if (!parent->cknown)
+            result = parent;
+        obj = parent;
+    }
+    return result;
 }
 
 /*
