@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 2/07/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -1052,7 +1052,7 @@ WAND(None,             "spiked",  0, 150, 1, 0, IRON, HI_METAL),
 WAND(None,            "titanium",  0, 150, 1, 0, IRON, HI_METAL),
 WAND(None,            "bone",  0, 150, 1, 0, BONE, CLR_WHITE),
 WAND(None,            "golden",  0, 150, 1, 0, GOLD, HI_GOLD),
-WAND(None,            "mithril",  0, 150, 1, 0, GOLD, HI_MITHRIL),
+WAND(None,            "mithril",  0, 150, 1, 0, MITHRIL, HI_SILVER),
 WAND(None,            "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 #undef WAND
 

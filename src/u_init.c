@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/07/18 by NullCGT */
 
 #include "hack.h"
 
@@ -219,6 +219,10 @@ static struct inv_sub {
     /* { PM_ELF, SMALL_SHIELD, ELVEN_SHIELD }, */
     { PM_ELF, CLOAK_OF_DISPLACEMENT, ELVEN_CLOAK },
     { PM_ELF, CRAM_RATION, LEMBAS_WAFER },
+    { PM_MERFOLK, SPEAR, TRIDENT },
+    { PM_MERFOLK, MACE, TRIDENT },
+    { PM_MERFOLK, BOW, CROSSBOW },
+    { PM_MERFOLK, ARROW, CROSSBOW_BOLT },
     { PM_ORC, DAGGER, ORCISH_DAGGER },
     { PM_ORC, SPEAR, ORCISH_SPEAR },
     { PM_ORC, SHORT_SWORD, ORCISH_SHORT_SWORD },
@@ -880,6 +884,7 @@ u_init()
         knows_object(DWARVISH_ROUNDSHIELD);
         break;
 
+    case PM_MERFOLK:
     case PM_GNOME:
         break;
 

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/07/18 by NullCGT */
 
 #include "hack.h"
 
@@ -697,6 +697,27 @@ const struct Race races[] = {
         /*  Str    Int Wis Dex Con Cha */
         { 3, 3, 3, 3, 3, 3 },
         { 18, 20, 20, 18, 16, 18 },
+        /* Init   Lower  Higher */
+        { 1, 0, 0, 1, 1, 0 }, /* Hit points */
+        { 2, 0, 3, 0, 3, 0 }  /* Energy */
+    },
+    {
+        "merfolk",
+        "merfolkish",
+        "merfolkkind",
+        "Mer",
+        { 0, 0 },
+        PM_MERFOLK,
+        NON_PM,
+        PM_HUMAN_MUMMY,
+        PM_HUMAN_ZOMBIE,
+        MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_NEUTRAL | ROLE_LAWFUL,
+        MH_HUMAN,
+        MH_HUMAN,
+        MH_ORC,
+        /*  Str    Int Wis Dex Con Cha */
+        { 3, 3, 3, 3, 3, 3 },
+        { 18, 18, 20, 16, 18, 16 },
         /* Init   Lower  Higher */
         { 1, 0, 0, 1, 1, 0 }, /* Hit points */
         { 2, 0, 3, 0, 3, 0 }  /* Energy */

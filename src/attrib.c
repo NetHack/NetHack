@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/07/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -99,6 +99,11 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   gno_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  mer_abil[] = { { 1, &HSwimming, "", ""},
+                 { 7, &HMagical_breathing, "yourself sprout gills",
+                                           "your gills retract" },
                  { 0, 0, 0, 0 } },
 
   orc_abil[] = { { 1, &HInfravision, "", "" },
@@ -737,6 +742,9 @@ long frommask;
         case PM_HUMAN:
             abil = hum_abil;
             break;
+        case PM_MERFOLK:
+            abil = mer_abil;
+            break;
         default:
             break;
         }
@@ -902,6 +910,9 @@ int oldlevel, newlevel;
     abil = role_abil(Role_switch);
 
     switch (Race_switch) {
+    case PM_MERFOLK:
+        rabil = mer_abil;
+        break;
     case PM_ELF:
         rabil = elf_abil;
         break;
