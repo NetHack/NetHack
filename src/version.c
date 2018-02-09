@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1517140532 2018/01/28 11:55:32 $  $NHDT-Branch: nhmall-githash3 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1519155525 2018/02/20 19:38:45 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,7 +46,9 @@ char *buf;
 #endif
 
     if (details) {
+#if defined(RUNTIME_PORT_ID) || defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
         int c = 0;
+#endif
 #if defined(RUNTIME_PORT_ID)
         char tmpbuf[BUFSZ];
         char *tmp = (char *)0;

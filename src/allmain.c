@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1513130016 2017/12/13 01:53:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1518193644 2018/02/09 16:27:24 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -763,7 +763,8 @@ enum earlyarg e_arg;
 {
     int i, idx;
     boolean match = FALSE;
-    char *userea = (char *)0, *dashdash = "";
+    char *userea = (char *)0;
+    const char *dashdash = "";
 
     for (idx = 0; idx < SIZE(earlyopts); idx++) {
         if (earlyopts[idx].e == e_arg)

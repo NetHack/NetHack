@@ -1,7 +1,7 @@
 #
 # NHgithook.pm
 # NetHack Git Hook Module
-# $NHDT-Date$
+# $NHDT-Date: 1519164205 2018/02/20 22:03:25 $
 
 package NHgithook;
 use Cwd;
@@ -72,6 +72,7 @@ sub nhversioning {
     $git_sha =~ s/\s+//g;
     my $git_branch = `git rev-parse --abbrev-ref HEAD`;
     $git_branch =~ s/\s+//g;
+    die "git rev-parse failed" unless(length $git_sha and length $git_branch);
 
     if (open my $fh, '<', 'dat/gitinfo.txt') {
         while(my $line = <$fh>) {
@@ -82,11 +83,15 @@ sub nhversioning {
             }
         }
         close $fh;
+    } else {
+	print "WARNING: Can't find dat directory\n" unless(-d "dat");
     }
     if (open my $fh, '>', 'dat/gitinfo.txt') {
         print $fh 'githash='.$git_sha."\n";
         print $fh 'gitbranch='.$git_branch."\n";
         print "An updated dat/gitinfo.txt was written, githash=".$git_sha."\n";
+    } else {
+	print "WARNING: Unable to open dat/gitinfo.txt: $!\n";
     }
 }
 

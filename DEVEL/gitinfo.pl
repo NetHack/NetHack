@@ -20,6 +20,13 @@ BEGIN {
     $gitdir = `git rev-parse --git-dir`;
     chomp $gitdir;
     push(@INC, $gitdir.$PDS."hooks");
+
+	# special case for this script only: allow
+	# it to run from DEVEL or $TOP
+    if (-f "hooksdir/NHgithook.pm" || -f "DEVEL/hooksdir/NHgithook.pm"){
+	push(@INC, "DEVEL/hooksdir");
+    }
+    chdir("..") if (-f "hooksdir/NHgithook.pm");
 }
 use NHgithook;
 
