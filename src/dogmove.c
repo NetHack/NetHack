@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/10/18 by NullCGT */
+
 #include "hack.h"
 
 #include "mfndpos.h"
@@ -454,8 +456,7 @@ int udist;
                         obj_extract_self(otmp);
                         newsym(omx, omy);
                         (void) mpickobj(mtmp, otmp);
-                        if (attacktype(mtmp->data, AT_WEAP)
-                            && mtmp->weapon_check == NEED_WEAPON) {
+                        if (attacktype(mtmp->data, AT_WEAP)) {
                             mtmp->weapon_check = NEED_HTH_WEAPON;
                             (void) mon_wield_item(mtmp);
                         }

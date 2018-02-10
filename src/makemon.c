@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 2/10/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1259,7 +1259,7 @@ int mmflags;
             mtmp->msleeping = 1;
         if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
             && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)) {
-            mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
+            mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         }
         break;
     case S_ORC:
@@ -1279,7 +1279,7 @@ int mmflags;
         if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
             && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)
             && !is_elf(ptr) && !(is_dwarf(ptr))) {
-            mtmp = christen_monst(mtmp, rndhumname(is_female(ptr)));
+            mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         }
     }
     if ((ct = emits_light(mtmp->data)) > 0)

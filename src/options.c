@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/10/18 by NullCGT */
+
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
 #include "objclass.h"
@@ -2052,6 +2054,9 @@ boolean tinitial, tfrom_file;
                     break;
                 case 'n': /* no pet */
                     preferred_pet = 'n';
+                    break;
+                case '@':
+                    preferred_pet = '@';
                     break;
                 case '*': /* random */
                     preferred_pet = '\0';
