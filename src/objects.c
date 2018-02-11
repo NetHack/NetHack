@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 2/11/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -293,7 +293,9 @@ WEAPON("flail", None,
 
 /* misc */
 WEAPON("bullwhip", None,
-       1, 0, 0,  2,  20,   4,  2,  1, 0, 0,   P_WHIP, LEATHER, CLR_BROWN),
+       1, 0, 0,  1,  20,   4,  2,  1, 0, 0,   P_WHIP, LEATHER, CLR_BROWN),
+WEAPON("razor whip", None,
+      1, 0, 0,  1,  50,   10,  4,  4, 0, 0,   P_WHIP, IRON, HI_METAL),
 
 /* bows */
 BOW("bow", None,               1, 24, 30, 60, 0, WOOD, P_BOW, HI_WOOD),
@@ -501,7 +503,9 @@ SHIELD("Uruk-hai shield", "white-handed shield",
 SHIELD("orcish shield", "red-eyed shield",
        0, 0, 0,          0, 2, 0,  50,  7, 9, 0,  IRON, CLR_RED),
 SHIELD("large shield", None,
-       1, 0, 1,          0, 5, 0, 100, 10, 8, 0,  IRON, HI_METAL),
+       1, 0, 1,          0, 3, 0, 100, 10, 8, 0,  IRON, HI_METAL),
+SHIELD("hide shield", None,
+      1, 0, 1,          0, 2, 0, 25, 8, 8, 0,  LEATHER, CLR_ORANGE),
 SHIELD("tower shield", None,
       1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
 SHIELD("dwarvish roundshield", "large round shield",
@@ -626,11 +630,14 @@ RING("protection from shape changers", "shiny",
     OBJECT(OBJ(name, desc),                                            \
            BITS(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, P_NONE, IRON),        \
            power, AMULET_CLASS, prob, 0, 20, 150, 0, 0, 0, 0, 20, HI_METAL)
-AMULET("amulet of ESP",                "circular", TELEPAT, 175),
+AMULET("amulet of ESP",                "circular", TELEPAT, 100),
+AMULET("amulet of drain resistance",     "convex", DRAIN_RES, 75),
 AMULET("amulet of life saving",       "spherical", LIFESAVED, 75),
-AMULET("amulet of strangulation",          "oval", STRANGLED, 135),
-AMULET("amulet of restful sleep",    "triangular", SLEEPY, 135),
+AMULET("amulet of strangulation",          "oval", STRANGLED, 90),
+AMULET("amulet of nausea",           "pentagonal", 0, 70),
+AMULET("amulet of restful sleep",    "triangular", SLEEPY, 65),
 AMULET("amulet versus poison",        "pyramidal", POISON_RES, 165),
+AMULET("amulet of danger",         "skull-shaped", INFRAVISION, 45),
 AMULET("amulet of change",               "square", 0, 130),
 AMULET("amulet of unchanging",          "concave", UNCHANGING, 45),
 AMULET("amulet of reflection",        "hexagonal", REFLECTING, 75),

@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/11/18 by NulLCGT */
+
 #include "hack.h"
 #include "dgn_file.h"
 #include "dlb.h"
@@ -1627,6 +1629,9 @@ level_difficulty()
              * posed by W_tower.
              */
 #endif /*0*/
+    }
+    if (uamul && uamul->otyp == AMULET_OF_DANGER) {
+        res += 15;
     }
     return (xchar) res;
 }

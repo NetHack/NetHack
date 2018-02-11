@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 2/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -936,7 +936,9 @@ boolean artif;
                 context.made_amulet = TRUE;
             if (rn2(10) && (otmp->otyp == AMULET_OF_STRANGULATION
                             || otmp->otyp == AMULET_OF_CHANGE
-                            || otmp->otyp == AMULET_OF_RESTFUL_SLEEP)) {
+                            || otmp->otyp == AMULET_OF_RESTFUL_SLEEP
+                            || otmp->otyp == AMULET_OF_NAUSEA
+                            || otmp->otyp == AMULET_OF_DANGER)) {
                 curse(otmp);
             } else
                 blessorcurse(otmp, 10);

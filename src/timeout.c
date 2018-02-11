@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/11/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
 
@@ -433,8 +435,11 @@ nh_timeout()
                 done(TURNED_SLIME);
                 break;
             case VOMITING:
-                make_vomiting(0L, TRUE);
-                break;
+                if (uamul->otyp == AMULET_OF_NAUSEA) {
+                    make_vomiting((long) rnd(100), FALSE);
+                } else  {
+                    make_vomiting(0L, TRUE);
+                } break;
             case SICK:
                 You("die from your illness.");
                 if (kptr && kptr->name[0]) {

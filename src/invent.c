@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/10/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1205,7 +1205,8 @@ register const char *let, *word;
                  /* Picks, axes, pole-weapons, bullwhips */
                  && ((otmp->oclass == WEAPON_CLASS
                       && !is_pick(otmp) && !is_axe(otmp)
-                      && !is_pole(otmp) && otyp != BULLWHIP)
+                      && !is_pole(otmp) && otyp != BULLWHIP
+                      && otyp != RAZOR_WHIP)
                      || (otmp->oclass == POTION_CLASS
                          /* only applicable potion is oil, and it will only
                             be offered as a choice when already discovered */

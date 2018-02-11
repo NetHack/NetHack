@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/11/18 by NullCGT */
+
 #include "hack.h"
 
 extern boolean notonhead; /* for long worms */
@@ -2588,7 +2590,7 @@ struct obj *obj;
     struct monst *mtmp;
     struct obj *otmp;
     int rx, ry, proficient, res = 0;
-    const char *msg_slipsfree = "The bullwhip slips free.";
+    const char *msg_slipsfree = "The whip slips free.";
     const char *msg_snap = "Snap!";
 
     if (obj != uwep) {
@@ -2632,10 +2634,10 @@ struct obj *obj;
         proficient = 0;
 
     if (u.uswallow && attack(u.ustuck)) {
-        There("is not enough room to flick your bullwhip.");
+        There("is not enough room to flick your whip.");
 
     } else if (Underwater) {
-        There("is too much resistance to flick your bullwhip.");
+        There("is too much resistance to flick your whip.");
 
     } else if (u.dz < 0) {
         You("flick a bug off of the %s.", ceiling(u.ux, u.uy));
@@ -2657,7 +2659,7 @@ struct obj *obj;
                 return 1;
             }
             if (otmp && proficient) {
-                You("wrap your bullwhip around %s on the %s.",
+                You("wrap your whip around %s on the %s.",
                     an(singular(otmp, xname)), surface(u.ux, u.uy));
                 if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
                     pline1(msg_slipsfree);
@@ -2667,14 +2669,14 @@ struct obj *obj;
         dam = rnd(2) + dbon() + obj->spe;
         if (dam <= 0)
             dam = 1;
-        You("hit your %s with your bullwhip.", body_part(FOOT));
-        Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
+        You("hit your %s with your whip.", body_part(FOOT));
+        Sprintf(buf, "killed %sself with %s whip", uhim(), uhis());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
         context.botl = 1;
         return 1;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
-        pline_The("bullwhip slips out of your %s.", body_part(HAND));
+        pline_The("whip slips out of your %s.", body_part(HAND));
         dropx(obj);
 
     } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -2717,7 +2719,7 @@ struct obj *obj;
 
             cc.x = rx;
             cc.y = ry;
-            You("wrap your bullwhip around %s.", wrapped_what);
+            You("wrap your whip around %s.", wrapped_what);
             if (proficient && rn2(proficient + 2)) {
                 if (!mtmp || enexto(&cc, rx, ry, youmonst.data)) {
                     You("yank yourself out of the pit!");
@@ -2752,7 +2754,7 @@ struct obj *obj;
             } else
                 mon_hand = 0; /* lint suppression */
 
-            You("wrap your bullwhip around %s.", yname(otmp));
+            You("wrap your whip around %s.", yname(otmp));
             if (gotit && mwelded(otmp)) {
                 pline("%s welded to %s %s%c",
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
@@ -2828,7 +2830,7 @@ struct obj *obj;
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
             else
-                You("flick your bullwhip towards %s.", mon_nam(mtmp));
+                You("flick your whip towards %s.", mon_nam(mtmp));
             if (proficient) {
                 if (attack(mtmp))
                     return 1;
@@ -3537,6 +3539,7 @@ doapply()
     case CREAM_PIE:
         res = use_cream_pie(obj);
         break;
+    case RAZOR_WHIP:
     case BULLWHIP:
         res = use_whip(obj);
         break;

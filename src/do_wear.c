@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -593,6 +593,7 @@ Shield_on(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case HIDE_SHIELD:
     case TOWER_SHIELD:
         break;
     default:
@@ -617,6 +618,7 @@ Shield_off(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case HIDE_SHIELD:
     case TOWER_SHIELD:
         break;
     default:
@@ -713,6 +715,8 @@ Amulet_on()
     case AMULET_OF_REFLECTION:
     case AMULET_OF_MAGICAL_BREATHING:
     case FAKE_AMULET_OF_YENDOR:
+    case AMULET_OF_DRAIN_RESISTANCE:
+    case AMULET_OF_DANGER:
         break;
     case AMULET_OF_UNCHANGING:
         if (Slimed)
@@ -750,6 +754,9 @@ Amulet_on()
             pline("It constricts your throat!");
         }
         break;
+    case AMULET_OF_NAUSEA:
+        make_vomiting((long) rnd(100), FALSE);
+        break;
     case AMULET_OF_RESTFUL_SLEEP: {
         long newnap = (long) rnd(100), oldnap = (HSleepy & TIMEOUT);
 
@@ -780,6 +787,8 @@ Amulet_off()
     case AMULET_OF_CHANGE:
     case AMULET_OF_UNCHANGING:
     case FAKE_AMULET_OF_YENDOR:
+    case AMULET_OF_DRAIN_RESISTANCE:
+    case AMULET_OF_DANGER:
         break;
     case AMULET_OF_MAGICAL_BREATHING:
         if (Underwater) {
@@ -811,6 +820,9 @@ Amulet_off()
         if (!ESleepy && !(HSleepy & ~TIMEOUT))
             HSleepy &= ~TIMEOUT; /* clear timeout bits */
         return;
+    case AMULET_OF_NAUSEA:
+        make_vomiting(0L, FALSE);
+        break;
     case AMULET_OF_YENDOR:
         break;
     }

@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/11/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
@@ -1716,7 +1716,8 @@ struct monst *mtmp;
             m.has_misc = MUSE_WAN_WISHING;
         }
         nomore(MUSE_BULLWHIP);
-        if (obj->otyp == BULLWHIP && !mtmp->mpeaceful
+        if ((obj->otyp == BULLWHIP || obj->otyp == RAZOR_WHIP)
+            && !mtmp->mpeaceful
             /* the random test prevents whip-wielding
                monster from attempting disarm every turn */
             && uwep && !rn2(5) && obj == MON_WEP(mtmp)

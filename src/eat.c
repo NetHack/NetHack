@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/11/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_PTR int NDECL(eatmdone);
@@ -2042,6 +2044,12 @@ struct obj *otmp;
             if (newnap < oldnap || oldnap == 0L)
                 HSleepy = (HSleepy & ~TIMEOUT) | newnap;
             break;
+        }
+        case AMULET_OF_NAUSEA: {
+            make_vomiting((long) rn1(15, 10), FALSE);
+        }
+        case AMULET_OF_DANGER: {
+            You("feel more dangerous!");
         }
         case RIN_SUSTAIN_ABILITY:
         case AMULET_OF_LIFE_SAVING:
