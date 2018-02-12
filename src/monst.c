@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1145,7 +1145,6 @@ NEARDATA struct permonst mons[] = {
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, DRAGON_SILVER),
-#if 0 /* DEFERRED */
     MON("baby shimmering dragon", S_DRAGON,
         LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6),
@@ -1153,7 +1152,6 @@ NEARDATA struct permonst mons[] = {
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_CYAN),
-#endif
     MON("baby red dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -1215,7 +1213,6 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, DRAGON_SILVER),
-#if 0 /* DEFERRED */
     MON("shimmering dragon", S_DRAGON,
         LVL(15, 9, -1, 20, 4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_MAGM, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
@@ -1226,7 +1223,6 @@ NEARDATA struct permonst mons[] = {
           | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_CYAN),
-#endif
     MON("red dragon", S_DRAGON, LVL(15, 9, -1, 20, -4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_FIRE, 6, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
@@ -1283,7 +1279,9 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_GREEN),
     /* If you see an elder dragon, run. */
-    MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
+    /* Razor dragons have no breath weapon, but are incredibly fast and deal
+       extremely large amounts of damage. */
+    MON("razor dragon", S_DRAGON, LVL(30, 18, -10, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
         ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
@@ -1291,7 +1289,9 @@ NEARDATA struct permonst mons[] = {
             | M1_METALLIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_CYAN),
-    MON("ooze dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
+    /* Ooze dragons are a good reason to have acid reistance. Probably the
+       least dangerous of the elder dragons. */
+    MON("ooze dragon", S_DRAGON, LVL(30, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK),
@@ -1300,7 +1300,10 @@ NEARDATA struct permonst mons[] = {
                   M1_AMORPHOUS | M1_CARNIVORE | M1_ACID,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_GREEN),
-    MON("void dragon", S_DRAGON, LVL(30, 9, -10, 20, 0),
+    /* Void dragons are essentially death on legs. Their void attacks are
+       capable of eating through even the best-prepared character in only a few
+       turns. They may need to be reduced in power at some point. */
+    MON("void dragon", S_DRAGON, LVL(35, 9, -10, 20, 0),
         (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_VOID, 3, 8),
           ATTK(AT_CLAW, AD_VOID, 1, 4), ATTK(AT_CLAW, AD_VOID, 1, 4), NO_ATTK,

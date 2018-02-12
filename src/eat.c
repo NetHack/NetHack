@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2053,6 +2053,7 @@ struct obj *otmp;
         }
         case RIN_SUSTAIN_ABILITY:
         case AMULET_OF_LIFE_SAVING:
+        case AMULET_OF_DRAIN_RESISTANCE:
         case AMULET_OF_REFLECTION: /* nice try */
             /* can't eat Amulet of Yendor or fakes,
              * and no oc_prop even if you could -3.

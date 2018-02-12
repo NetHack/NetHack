@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -148,9 +148,7 @@ int mndx;
         break;
     case PM_VAMPIRE:
     case PM_VAMPIRE_LORD:
-#if 0 /* DEFERRED */
     case PM_VAMPIRE_MAGE:
-#endif
     case PM_HUMAN_ZOMBIE:
     case PM_HUMAN_MUMMY:
         mndx = PM_HUMAN;
@@ -288,9 +286,7 @@ unsigned corpseflags;
     switch (mndx) {
     case PM_GRAY_DRAGON:
     case PM_SILVER_DRAGON:
-#if 0 /* DEFERRED */
     case PM_SHIMMERING_DRAGON:
-#endif
     case PM_RED_DRAGON:
     case PM_ORANGE_DRAGON:
     case PM_WHITE_DRAGON:
@@ -2659,6 +2655,13 @@ struct monst *mtmp;
                 (void) makemon(&mons[PM_PURPLE_WORM], 0, 0, NO_MM_FLAGS);
             else
                 (void) makemon((struct permonst *) 0, 0, 0, NO_MM_FLAGS);
+        }
+        aggravate();
+    }
+    if (mtmp->data->msound == MS_ROAR) {
+        if (!Deaf) {
+            pline("%s roars!", Monnam(mtmp));
+            stop_occupation();
         }
         aggravate();
     }

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -959,9 +959,7 @@ static const short grownups[][2] = {
     { PM_BAT, PM_GIANT_BAT },
     { PM_BABY_GRAY_DRAGON, PM_GRAY_DRAGON },
     { PM_BABY_SILVER_DRAGON, PM_SILVER_DRAGON },
-#if 0 /* DEFERRED */
     {PM_BABY_SHIMMERING_DRAGON, PM_SHIMMERING_DRAGON},
-#endif
     { PM_BABY_RED_DRAGON, PM_RED_DRAGON },
     { PM_BABY_WHITE_DRAGON, PM_WHITE_DRAGON },
     { PM_BABY_ORANGE_DRAGON, PM_ORANGE_DRAGON },
@@ -989,10 +987,11 @@ static const short grownups[][2] = {
     { PM_ACOLYTE, PM_PRIEST },
     { PM_APPRENTICE, PM_WIZARD },
     { PM_MANES, PM_LEMURE },
+    { PM_LICHEN, PM_LEGENDARY_LICHEN },
+    { PM_WORM_THAT_WALKS, PM_LORD_OF_WORMS},
     { PM_KEYSTONE_KOP, PM_KOP_SERGEANT },
     { PM_KOP_SERGEANT, PM_KOP_LIEUTENANT },
     { PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN },
-    { PM_LICHEN, PM_LEGENDARY_LICHEN },
     { NON_PM, NON_PM }
 };
 

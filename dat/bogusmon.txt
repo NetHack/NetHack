@@ -1,5 +1,6 @@
 # Hallucinatory monsters
 #
+# Edited on 2/12/18 by NullCGT
 #
 # prefix codes:
 # dash          -  female, personal name
@@ -15,9 +16,7 @@ gnu
 killer penguin
 giant cockroach
 giant slug
-maggot
 pterodactyl
-tyrannosaurus rex
 basilisk
 beholder
 nightmare
@@ -76,6 +75,7 @@ tofurkey
 shrinking violet
 shallow one
 spherical cow
+protagonist
 
 # Quendor (Zork, &c.)
 grue
@@ -404,6 +404,7 @@ zergling
 existential angst
 figment of your imagination
 flash of insight
+bad thoughts
 
 # Fish
 ghoti
@@ -428,6 +429,9 @@ clown
 mime
 peddler
 haggler
+
+# Pirates of Penzance
+modern major general
 
 # soundex and typos of monsters
 gloating eye

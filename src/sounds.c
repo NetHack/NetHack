@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -340,6 +340,7 @@ register struct monst *mtmp;
         break;
     case MS_ROAR:
         ret = "roar";
+        aggravate();
         break;
     case MS_BUZZ:
         ret = "buzz";

@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -383,9 +383,7 @@ HELM("helm of telepathy", "visored helmet",
    needed to create them */
 DRGN_ARMR("gray dragon scale mail",    1, ANTIMAGIC,  1200, 1, CLR_GRAY),
 DRGN_ARMR("silver dragon scale mail",  1, REFLECTING, 1200, 1, DRAGON_SILVER),
-#if 0 /* DEFERRED */
 DRGN_ARMR("shimmering dragon scale mail", 1, DISPLACED, 1200, 1, CLR_CYAN),
-#endif
 DRGN_ARMR("red dragon scale mail",     1, FIRE_RES,    900, 1, CLR_RED),
 DRGN_ARMR("white dragon scale mail",   1, COLD_RES,    900, 1, CLR_WHITE),
 DRGN_ARMR("orange dragon scale mail",  1, SLEEP_RES,   900, 1, CLR_ORANGE),
@@ -401,9 +399,7 @@ DRGN_ARMR("yellow dragon scale mail",  1, ACID_RES,    900, 1, CLR_YELLOW),
    magical properties but are produced "naturally" */
 DRGN_ARMR("gray dragon scales",        0, ANTIMAGIC,   700, 7, CLR_GRAY),
 DRGN_ARMR("silver dragon scales",      0, REFLECTING,  700, 7, DRAGON_SILVER),
-#if 0 /* DEFERRED */
 DRGN_ARMR("shimmering dragon scales",  0, DISPLACED,   700, 7, CLR_CYAN),
-#endif
 DRGN_ARMR("red dragon scales",         0, FIRE_RES,    500, 7, CLR_RED),
 DRGN_ARMR("white dragon scales",       0, COLD_RES,    500, 7, CLR_WHITE),
 DRGN_ARMR("orange dragon scales",      0, SLEEP_RES,   500, 7, CLR_ORANGE),

@@ -6,13 +6,14 @@
  * Monster item usage routines.
  */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 2/12/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
 /* Monsters now throw potions of hallucination */
 /* Monsters now activate figurines */
 /* Monsters now use wands of wishing in order to wish for various items. */
+/* Dragons can use miscelaneous and defensive items. */
 
 #include "hack.h"
 
@@ -329,7 +330,8 @@ struct monst *mtmp;
      * silly trying to use the same cursed horn round after round
      */
     if (mtmp->mconf || mtmp->mstun || !mtmp->mcansee) {
-        if (!is_unicorn(mtmp->data) && !nohands(mtmp->data)) {
+        if (!is_unicorn(mtmp->data) && (!nohands(mtmp->data) ||
+            is_dragon(mtmp->data))) {
             for (obj = mtmp->minvent; obj; obj = obj->nobj)
                 if (obj->otyp == UNICORN_HORN && !obj->cursed)
                     break;
@@ -370,7 +372,7 @@ struct monst *mtmp;
      * These would be hard to combine because of the control flow.
      * Pestilence won't use healing even when blind.
      */
-    if (!mtmp->mcansee && !nohands(mtmp->data)
+    if (!mtmp->mcansee && (!nohands(mtmp->data) || is_dragon(mtmp->data))
         && mtmp->data != &mons[PM_PESTILENCE]) {
         if (m_use_healing(mtmp))
             return TRUE;
@@ -382,7 +384,7 @@ struct monst *mtmp;
         return FALSE;
 
     if (mtmp->mpeaceful) {
-        if (!nohands(mtmp->data)) {
+        if (!nohands(mtmp->data) || is_dragon(mtmp->data)) {
             if (m_use_healing(mtmp))
                 return TRUE;
         }
@@ -464,7 +466,7 @@ struct monst *mtmp;
         }
     }
 
-    if (nohands(mtmp->data)) /* can't use objects */
+    if (nohands(mtmp->data) && !is_dragon(mtmp->data)) /* can't use objects */
         goto botm;
 
     if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE)) != 0) {
@@ -1076,6 +1078,8 @@ struct monst *mtmp;
 
     m.offensive = (struct obj *) 0;
     m.has_offense = 0;
+    /* This is left unedited, since we want dragons to prefer their breath
+       weapons and claws over anything else.*/
     if (mtmp->mpeaceful || is_animal(mtmp->data) || mindless(mtmp->data)
         || nohands(mtmp->data))
         return FALSE;
@@ -1686,7 +1690,7 @@ struct monst *mtmp;
                         }
                     }
     }
-    if (nohands(mdat))
+    if (nohands(mdat) && !is_dragon(mdat))
         return 0;
 
 #define nomore(x)       if (m.has_misc == x) continue
@@ -2669,11 +2673,10 @@ struct monst *mon;
 {
     register int cnt;
     register struct obj *otmp;
-    switch(rn2(10)) {
+    switch(rn2(4)) {
         case 1:
             for (cnt = 0; cnt < 1 + rn2(3); cnt++) {
                 otmp = mksobj(POT_GAIN_LEVEL, FALSE, FALSE);
-                bless(otmp);
                 (void) mpickobj(mon, otmp);
             }
             break;
@@ -2684,7 +2687,14 @@ struct monst *mon;
             (void) mpickobj(mon, otmp);
             break;
         default:
-            (void) mongets(mon, WAN_DEATH);
+            if (is_dragon(mon->data)) {
+                /* Dragons are already tough enough, and they want more money,
+                   so they wish for the maximum amount of gold.*/
+                (void) mkmonmoney(mon, 5000);
+            }
+            else {
+                (void) mongets(mon, WAN_DEATH);
+            }
     }
 }
 /*muse.c*/
