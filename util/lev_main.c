@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited 2/01/18 by NullCGT */
+/* Edited 2/15/18 by NullCGT */
 
 /*
  * This file contains the main function for the parser
@@ -254,7 +254,7 @@ char **argv;
         ":dat:endgame.des", ":dat:gehennom.des", ":dat:knox.des",
         ":dat:medusa.des",  ":dat:mines.des",    ":dat:oracle.des",
         ":dat:sokoban.des", ":dat:tower.des",    ":dat:yendor.des",
-        ":dat:Cartomancer.des"
+        ":dat:Cartomancer.des", ":dat:void.des",
     };
 
     argc = SIZE(mac_argv);

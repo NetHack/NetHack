@@ -2,7 +2,7 @@
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
 
-# Edited on 2/01/18 by NullCGT
+# Edited on 2/15/18 by NullCGT
 
 ###
 ### modified for gcc by Teemu Suikki (zu@iki.fi)
@@ -306,7 +306,7 @@ INSTDUNGEONFILES1= \
 	$(SLIB)soko3-2.lev	$(SLIB)soko4-1.lev	$(SLIB)soko4-2.lev \
 	$(SLIB)tower1.lev	$(SLIB)tower2.lev	$(SLIB)tower3.lev \
 	$(SLIB)valley.lev	$(SLIB)water.lev	$(SLIB)wizard1.lev \
-	$(SLIB)wizard2.lev	$(SLIB)wizard3.lev \
+	$(SLIB)wizard2.lev	$(SLIB)wizard3.lev  $(SLIB)void.lev \
 	$(XDFILES)
 
 INSTDUNGEONFILES= $(NETHACK)NetHack.cnf $(INSTDUNGEONFILES1)
@@ -788,6 +788,8 @@ BGM= $(SLIB)bigrm-2.lev $(SLIB)bigrm-3.lev $(SLIB)bigrm-4.lev $(SLIB)bigrm-5.lev
 $(BGM):	$(SLIB)bigrm-1.lev
 
 $(SLIB)bigrm-1.lev: $(DAT)bigroom.des $(SBIN)lev_comp
+
+$(SLIB)void.lev: $(DAT)void.des $(SBIN)lev_comp
 
 $(SLIB)castle.lev:  $(DAT)castle.des $(SBIN)lev_comp
 

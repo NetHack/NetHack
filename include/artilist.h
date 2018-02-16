@@ -100,8 +100,8 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       Some "worse" sacrifice gifts are needed to avoid making #offer
     *       overpowered.
     */
-    A("Wispknife", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
-      PHYS(3, 4), NO_DFNS, NO_CARY, 0, A_CHAOTIC,
+    A("Carnwennan", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
+      PHYS(3, 4), NO_DFNS, NO_CARY, 0, A_LAWFUL,
       NON_PM, NON_PM, 400L, NO_COLOR),
 
     /*
@@ -127,12 +127,23 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       NON_PM, 4000L, NO_COLOR),
 
     /*
+    *        Based on Greek mythology.
+    */
+    A("Helm of Darkness", CORNUTHAUM, (SPFX_INVIS | SPFX_STLTH),
+      0, 0, NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE,
+      NON_PM, NON_PM, 1500L, NO_COLOR),
+
+    /*
     *        Just for fun.
     */
     A("Vladsbane", FOOD_RATION,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_WARN | SPFX_DFLAG2), 0, M2_UNDEAD,
       PHYS(1, 0), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 200L,
       CLR_MAGENTA),
+
+    A("The King in Yellow", SPE_FINGER_OF_DEATH,
+      (SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
+      KING, A_NONE, NON_PM, NON_PM, 30L, NO_COLOR),
 
     A("Cleaver", BATTLE_AXE, SPFX_RESTR, 0, 0, PHYS(3, 6), NO_DFNS, NO_CARY,
       0, A_NEUTRAL, PM_BARBARIAN, NON_PM, 1500L, NO_COLOR),
@@ -273,10 +284,6 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_XRAY), 0, 0, NO_ATTK,
       DFNS(AD_MAGM), NO_CARY, ENLIGHTENING, A_NEUTRAL, PM_MONK, NON_PM,
       2500L, NO_COLOR),
-
-    A("The King in Yellow", SPE_FINGER_OF_DEATH,
-      (SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
-      KING, A_NONE, NON_PM, NON_PM, 30L, NO_COLOR),
 
     A("The Mitre of Holiness", HELM_OF_BRILLIANCE,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_DFLAG2 | SPFX_INTEL | SPFX_PROTECT), 0,

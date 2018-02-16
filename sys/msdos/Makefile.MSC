@@ -2,7 +2,7 @@
 #	Copyright (c) NetHack PC Development Team 1997 - 2012.
 #	PC NetHack 3.4x Makefile for MSC V1.52c (16 bit compiler)
 #
-# Edited 2/01/18 by NullCGT
+# Edited 2/15/18 by NullCGT
 #
 #	For questions or comments: nethack-bugs@nethack.org
 #
@@ -150,7 +150,8 @@ SPLEVDES = $(DAT)\Arch.des $(DAT)\Barb.des $(DAT)\bigroom.des \
 	$(DAT)\mines.des $(DAT)\oracle.des $(DAT)\Priest.des \
 	$(DAT)\Ranger.des $(DAT)\Rogue.des $(DAT)\Samurai.des \
 	$(DAT)\Tourist.des $(DAT)\tower.des $(DAT)\Valkyrie.des \
-	$(DAT)\Wizard.des $(DAT)\yendor.des
+	$(DAT)\Wizard.des $(DAT)\yendor.des $(DAT)\Cartomancer.des \
+	$(DAT)\void.des
 
 VGAOBJ      = vidvga.o
 
@@ -428,6 +429,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(SPLEVDES)
 	$(U)lev_comp yendor.des
 	$(U)lev_comp arch.des
 	$(U)lev_comp barb.des
+	$(U)lev_comp cartomancer.des
 	$(U)lev_comp caveman.des
 	$(U)lev_comp healer.des
 	$(U)lev_comp knight.des
@@ -439,6 +441,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(SPLEVDES)
 	$(U)lev_comp tourist.des
 	$(U)lev_comp valkyrie.des
 	$(U)lev_comp wizard.des
+	$(U)lev_comp void.des
 	cd $(SRC)
 #	-@if exist $(O)sp_lev.tag del $(O)sp_lev.tag
 	@echo sp_levs done >$(O)sp_lev.tag
@@ -961,6 +964,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
 	echo BIGRM-4.LEV   >>dlb.lst
 	echo BIGRM-5.LEV   >>dlb.lst
 	echo CASTLE.LEV    >>dlb.lst
+	echo VOID.LEV    >>dlb.lst
 	echo CAV-FILA.LEV  >>dlb.lst
 	echo CAV-FILB.LEV  >>dlb.lst
 	echo CAV-GOAL.LEV  >>dlb.lst

@@ -9,7 +9,7 @@
 
 #define BETA  /* development or beta testing [MRS] */
 
-#define DEBUG 
+#define DEBUG
 
 /*
  * Files expected to exist in the playground directory.

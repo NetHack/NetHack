@@ -1,5 +1,7 @@
 # NetHack 3.6	Makefile.gcc	$NHDT-Date: 1434804544 2015/06/20 12:49:04 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $
 #
+# Edited on 2/15/18 by NullCGT
+#
 #==============================================================================
 #
 #   Win32 Compilers Tested:
@@ -508,7 +510,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
-	 $(DAT)/cartomancer.des
+	 $(DAT)/cartomancer.des $(DAT)/void.des
 	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
 	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)
@@ -534,6 +536,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/tourist.des)
 	$(subst /,\,$(U)levcomp $(DAT)/valkyrie.des)
 	$(subst /,\,$(U)levcomp $(DAT)/wizard.des)
+	$(subst /,\,$(U)levcomp $(DAT)/void.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
@@ -1005,6 +1008,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
 	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
 	$(subst /,\,if exist $(DAT)/castle.lev   del $(DAT)/castle.lev)
+	$(subst /,\,if exist $(DAT)/void.lev   del $(DAT)/void.lev)
 	$(subst /,\,if exist $(DAT)/data    del $(DAT)/data)
 	$(subst /,\,if exist $(DAT)/dungeon      del $(DAT)/dungeon)
 	$(subst /,\,if exist $(DAT)/dungeon.pdf  del $(DAT)/dungeon.pdf)

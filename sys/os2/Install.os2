@@ -170,6 +170,7 @@
     soko2-1.lev    soko2-2.lev    soko3-1.lev    soko3-2.lev    soko4-1.lev
     soko4-2.lev    tower1.lev     tower2.lev     tower3.lev     valley.lev
     water.lev      wizard1.lev    wizard2.lev    wizard3.lev    wizhelp
+    void.lev
 
     Yes.  It's 112 files for a full featured NetHack 3.4.  If any of the files
     are missing, try to rerun make.  If that doesn't help, you'll have to try

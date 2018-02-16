@@ -1,6 +1,7 @@
 #	NetHack Makefile.
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
+# Edited on 2/15/18 by NullCGT
 
 ###
 ### INTRODUCTION
@@ -1067,6 +1068,8 @@ $(SLIB)bigrm-1.lev: $(DAT)bigroom.des $(SBIN)lev_comp
 #none
 
 $(SLIB)castle.lev:  $(DAT)castle.des $(SBIN)lev_comp
+
+$(SLIB)void.lev:  $(DAT)void.des $(SBIN)lev_comp
 
 ENDGAME1= $(SLIB)air.lev $(SLIB)earth.lev $(SLIB)fire.lev $(SLIB)water.lev
 $(ENDGAME1):	$(SLIB)astral.lev

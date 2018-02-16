@@ -1,0 +1,91 @@
+# NetHack 3.6	void.des
+# Edited on 2/15/18 by NullCGT
+# NetHack may be freely redistributed.  See license for details.
+#
+# This level contains the void. It has items scattered around, but
+# is extremely dangerous. The level design itself is rather boring,
+# but what would you expect from a plane of nonexistence?
+
+LEVEL:"void"
+FLAGS:noteleport
+GEOMETRY:center,center
+MAP
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+...............................................................
+ENDMAP
+
+
+# Nothing is diggable
+NON_DIGGABLE:(00,00,75,19)
+# It's the void, so naturally it is all dark.
+REGION:(00,00,75,19),unlit,"ordinary"
+# Stairs
+STAIR: (65, 10), up
+# A few lost monsters
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+# Void Monsters
+MONSTER:('R',"disenchanter"),random
+MONSTER:('P',"black pudding"),random
+MONSTER:('P',"black pudding"),random
+MONSTER:('P',"black pudding"),random
+MONSTER:('v',"energy vortex"),random
+MONSTER:('v',"energy vortex"),random
+MONSTER:('v',"energy vortex"),random
+MONSTER:('v',"energy vortex"),random
+MONSTER:('v',"energy vortex"),random
+# The void dragon
+MONSTER:('D',"void dragon"),(10, 10)
+# Objects
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random

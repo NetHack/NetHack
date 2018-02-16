@@ -2,6 +2,8 @@
 #	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #
+# Edited on 2/15/18 by NullCGT
+#
 #	Gnu gcc compiler for msdos (djgpp)
 #	Requires Gnu Make utility (V3.79.1 or greater) supplied with djgpp
 #
@@ -98,7 +100,7 @@ LEXYYC = lexyy~1.c
 
 USE_DLB = Y
 
-# djgpp includes ls.exe and touch.exe in fil41b.zip from the v2gnu 
+# djgpp includes ls.exe and touch.exe in fil41b.zip from the v2gnu
 # folder so be sure to include that when downloading djgpp. Doing
 # so will make changing this unnecessary.
 
@@ -110,14 +112,14 @@ LS = ls -1		# ls.exe from djgpp distribution
 # set SUPPRESS_GRAPHICS to Y
 # (Note: binary will require ANSI.SYS driver or equivalent loaded)
 # SUPPRESS_GRAPHICS = Y
-SUPPRESS_GRAPHICS = 
+SUPPRESS_GRAPHICS =
 
 # ZLIB Support
 # To support zlib compression in bones and save files, you must
 # define ZLIB_COMP in include/config.h.
 # You must also have a zlib library to link NetHack with, and
 # for the djgpp build, you need one compatible with djgpp.
-# At the time that this was written (post-NetHack 3.4.3) the 
+# At the time that this was written (post-NetHack 3.4.3) the
 # following URL was a valid place to get a pre-built djgpp library
 # to add to your djgpp tools directory tree.
 # http://www.delorie.com/pub/djgpp/current/v2tk/zlib114b.zip
@@ -271,13 +273,13 @@ TILOBJ2      =
 TEXTIO       =
 TEXTIO2      =
 TILE_BMP     =
-TILEUTIL     = 
-TILEFILES    = 
-TILEFILES2   = 
-GIFREADERS   = 
-GIFREAD2     = 
-PPMWRITERS   = 
-PPMWRIT2     = 
+TILEUTIL     =
+TILEFILES    =
+TILEFILES2   =
+GIFREADERS   =
+GIFREAD2     =
+PPMWRITERS   =
+PPMWRIT2     =
 
 else
 
@@ -415,7 +417,7 @@ endif
 
 all :   install
 
-install: $(GAMEFILE) $(O)install.tag 
+install: $(GAMEFILE) $(O)install.tag
 	@echo Done.
 
 default: $(GAMEFILE)
@@ -827,7 +829,7 @@ $(U)til2bin2.exe: $(O)til2bin2.o $(TEXTIO2)
 	@ar ru temp.a $(TEXTIO2)
 	$(LINK) $(LFLAGS) -o$@ $(O)til2bin2.o temp.a
 
-$(U)thintile.exe: $(O)thintile.o 
+$(U)thintile.exe: $(O)thintile.o
 	$(LINK) $(LFLAGS) -o$@ $(O)thintile.o
 
 $(O)thintile.o:  $(HACK_H) $(WSHR)/tile.h $(WSHR)/thintile.c
@@ -854,7 +856,7 @@ $(O)tiletex2.o:  $(CONFIG_H) $(TILE_H) $(WSHR)/tiletext.c
 
 $(O)tiletxt.o: $(CONFIG_H) $(TILE_H) $(WSHR)/tilemap.c
 	$(CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILETEXT -o$@ $(WSHR)/tilemap.c
-  
+
 $(O)tiletxt2.o: $(CONFIG_H) $(TILE_H) $(WSHR)/tilemap.c
 	$(CC) $(cflags) -I$(MSYS) -I$(WSHR) -DTILETEXT -DTILE_X=8 -o$@ $(WSHR)/tilemap.c
 #
@@ -958,7 +960,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(DAT)/caveman.des   $(DAT)/healer.des   $(DAT)/knight.des \
 	$(DAT)/monk.des      $(DAT)/priest.des   $(DAT)/ranger.des \
 	$(DAT)/rogue.des     $(DAT)/samurai.des  $(DAT)/tourist.des \
-	$(DAT)/valkyrie.des  $(DAT)/wizard.des
+	$(DAT)/valkyrie.des  $(DAT)/wizard.des $(DAT)/cartomancer.des \
+	$(DAT)/void.des
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,$(U)lev_comp bigroom.des)
 	@$(subst /,\,$(U)lev_comp castle.des)
@@ -973,6 +976,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	@$(subst /,\,$(U)lev_comp yendor.des)
 	@$(subst /,\,$(U)lev_comp arch.des)
 	@$(subst /,\,$(U)lev_comp barb.des)
+	@$(subst /,\,$(U)lev_comp cartomancer.des)
 	@$(subst /,\,$(U)lev_comp caveman.des)
 	@$(subst /,\,$(U)lev_comp healer.des)
 	@$(subst /,\,$(U)lev_comp knight.des)
@@ -984,6 +988,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	@$(subst /,\,$(U)lev_comp tourist.des)
 	@$(subst /,\,$(U)lev_comp valkyrie.des)
 	@$(subst /,\,$(U)lev_comp wizard.des)
+	@$(subst /,\,$(U)lev_comp void.des)
 	@$(subst /,\,cd $(SRC))
 	@$(subst /,\,echo sp_levs done > $@)
 
@@ -1069,10 +1074,10 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 #
 # The rest are stolen from sys/unix/Makefile.src,
 # with the following changes:
-#  o -c (which is included in cflags) substituted with -o$@ , 
-#  o an explicit build instruction for dlb.o because it requires 
+#  o -c (which is included in cflags) substituted with -o$@ ,
+#  o an explicit build instruction for dlb.o because it requires
 #    a .h file in ../sys/msdos.
-#  o the PATCHLEV_H macro is substitued for $(INCL)/patchlevel.h 
+#  o the PATCHLEV_H macro is substitued for $(INCL)/patchlevel.h
 #    to work around a long filename issue.
 #  o $(CFLAGS) changed to $(cflags)
 # Other than that, these dependencies are untouched.
@@ -1320,4 +1325,3 @@ $(O)bmptiles.o: $(WSHR)/bmptiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/in
 $(O)giftiles.o: $(WSHR)/giftiles.c $(INCL)/config.h $(INCL)/tileset.h $(INCL)/integer.h
 
 # end of file
-
