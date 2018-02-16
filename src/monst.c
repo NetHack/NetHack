@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -876,8 +876,7 @@ NEARDATA struct permonst mons[] = {
           ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_FIRE | MR_POISON, 0,
         M1_ANIMAL | M1_NOHANDS | M1_FLY,
-        M2_WANDER | M2_STRONG | M2_DOMESTIC | M2_DEMON | M2_HOSTILE |
-        M2_MINION,
+        M2_WANDER | M2_STRONG | M2_DEMON | M2_HOSTILE | M2_MINION,
         M3_INFRAVISIBLE, CLR_RED),
     /*
      * vortices
@@ -935,7 +934,7 @@ NEARDATA struct permonst mons[] = {
     /*
      * worms
      */
-     MON("death maggot", S_WORM, LVL(1, 12, 5, 0, 0), (G_GENO | G_SGROUP | 1),
+     MON("death maggot", S_WORM, LVL(1, 12, 5, 0, 0), (G_GENO | G_SGROUP | 2),
          A(ATTK(AT_BITE, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
            NO_ATTK),
          SIZ(600, 250, MS_SILENT, MZ_TINY), 0, 0,
@@ -2012,6 +2011,13 @@ struct permonst _mons2[] = {
     /*
      * Apelike beasts
      */
+    /* not to be confused with lemure */
+    MON("lemur", S_YETI, LVL(0, 12, 8, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_CLAW, AD_SITM, 0, 0), ATTK(AT_BITE, AD_PHYS, 1, 2), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(100, 50, MS_GROWL, MZ_SMALL), 0, 0,
+        M1_ANIMAL | M1_HUMANOID | M1_HERBIVORE, 0, M3_INFRAVISIBLE,
+        CLR_GRAY),
     /* tameable via banana; does not grow up into ape...
        not flagged as domestic, so no guilt penalty for eating non-pet one */
     MON("monkey", S_YETI, LVL(2, 12, 6, 0, 0), (G_GENO | 1),
@@ -2150,6 +2156,13 @@ struct permonst _mons2[] = {
         SIZ(400, 0, MS_SILENT, MZ_LARGE), MR_COLD | MR_SLEEP | MR_POISON, 0,
         M1_BREATHLESS | M1_MINDLESS | M1_HUMANOID, M2_HOSTILE | M2_NEUTER, 0,
         HI_PAPER),
+    MON("animated statue", S_GOLEM, LVL(3, 12, 5, 0, 0), (G_NOCORPSE | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(450, 0, MS_SILENT, MZ_LARGE),
+        MR_COLD | MR_SLEEP | MR_POISON | MR_STONE, 0,
+        M1_BREATHLESS | M1_MINDLESS | M1_HUMANOID, M2_HOSTILE | M2_NEUTER, 0,
+        CLR_GRAY),
     MON("rope golem", S_GOLEM, LVL(4, 9, 8, 0, 0), (G_NOCORPSE | 1),
         A(ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           ATTK(AT_HUGS, AD_PHYS, 6, 1), NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2717,12 +2730,26 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_STALK | M2_PEACEFUL, M3_INFRAVISIBLE | M3_INFRAVISION,
         CLR_BRIGHT_BLUE),
 #endif
+    MON("desert jinn", S_DEMON, LVL(4, 12, 6, 10, 0), (G_GENO | 2),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_WEAP, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+          SIZ(WT_HUMAN, 400, MS_DJINNI, MZ_HUMAN), MR_POISON | MR_FIRE, MR_FIRE,
+          M1_HUMANOID | M1_OMNIVORE, M2_GREEDY | M2_JEWELS | M2_COLLECT,
+          M3_INFRAVISIBLE, CLR_ORANGE),
     MON("djinni", S_DEMON, LVL(7, 12, 4, 30, 0), (G_NOGEN | G_NOCORPSE),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1500, 400, MS_DJINNI, MZ_HUMAN), MR_POISON | MR_STONE, 0,
         M1_HUMANOID | M1_FLY | M1_POIS, M2_NOPOLY | M2_STALK | M2_COLLECT,
         M3_INFRAVISIBLE, CLR_YELLOW),
+    MON("marid", S_DEMON, LVL(18, 15, -5, 75, 0), (G_NOCORPSE | G_GENO | 1),
+        A(ATTK(AT_SPIT, AD_ACID, 3, 4), ATTK(AT_MAGC, AD_SPEL, 0, 0),
+          ATTK(AT_CLAW, AD_PHYS, 4, 4), ATTK(AT_CLAW, AD_PHYS, 4, 4),
+          NO_ATTK, NO_ATTK),
+        SIZ(1500, 400, MS_DJINNI, MZ_HUGE), MR_POISON | MR_STONE | MR_ACID, 0,
+        M1_FLY | M1_POIS | M1_SWIM | M1_BREATHLESS,
+        M2_STALK | M2_COLLECT | M2_STRONG | M2_NASTY | M2_HOSTILE,
+        M3_INFRAVISION, CLR_BLUE),
     /*
      * sea monsters
      */
@@ -2747,6 +2774,15 @@ struct permonst _mons2[] = {
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,
         M2_HOSTILE, 0, CLR_RED),
+    /* pun on seahorse */
+    MON("sea horse", S_EEL, LVL(6, 20, 5, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 8), ATTK(AT_BITE, AD_PHYS, 1, 3),
+          ATTK(AT_TUCH, AD_WRAP, 0, 0),
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1500, 300, MS_NEIGH, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_SWIM | M1_AMPHIBIOUS |
+        M1_SLITHY,
+        M2_WANDER | M2_STRONG | M2_DOMESTIC, M3_INFRAVISIBLE, CLR_BROWN),
     MON("shark", S_EEL, LVL(7, 12, 2, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

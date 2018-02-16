@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
@@ -1064,6 +1064,8 @@ try_again:
 #define MUSE_WAN_CANCELLATION 18
 #define MUSE_POT_POLYMORPH_THROW 19
 #define MUSE_POT_HALLUCINATION 20
+#define MUSE_WAN_ACID 21
+#define MUSE_WAN_POISON_GAS 22
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1128,6 +1130,16 @@ struct monst *mtmp;
             if (obj->otyp == WAN_COLD && obj->spe > 0) {
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_COLD;
+            }
+            nomore(MUSE_WAN_ACID);
+            if (obj->otyp == WAN_ACID && obj->spe > 0) {
+                m.offensive = obj;
+                m.has_offense = MUSE_WAN_ACID;
+            }
+            nomore(MUSE_WAN_POISON_GAS);
+            if (obj->otyp == WAN_POISON_GAS && obj->spe > 0) {
+                m.offensive = obj;
+                m.has_offense = MUSE_WAN_POISON_GAS;
             }
             nomore(MUSE_FROST_HORN);
             if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
@@ -1424,6 +1436,8 @@ struct monst *mtmp;
     case MUSE_WAN_SLEEP:
     case MUSE_WAN_FIRE:
     case MUSE_WAN_COLD:
+    case MUSE_WAN_ACID:
+    case MUSE_WAN_POISON_GAS:
     case MUSE_WAN_LIGHTNING:
     case MUSE_WAN_MAGIC_MISSILE:
         mzapmsg(mtmp, otmp, FALSE);

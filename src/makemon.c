@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/10/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -509,11 +509,14 @@ register struct monst *mtmp;
         case PM_YEENOGHU:
             (void) mongets(mtmp, FLAIL);
             break;
+        case PM_DESERT_JINN:
+            (void) mongets(mtmp, SHORT_SWORD);
+            (void) mongets(mtmp, SHORT_SWORD);
         }
         /* prevent djinn and mail daemons from leaving objects when
          * they vanish
          */
-        if (!is_demon(ptr))
+        if (!is_demon(ptr) && mm != PM_MARID && mm != PM_DESERT_JINN)
             break;
         /*FALLTHRU*/
     default:
@@ -741,6 +744,10 @@ register struct monst *mtmp;
             if (!rn2(4))
                 otmp->oerodeproof = 1;
             (void) mpickobj(mtmp, otmp);
+        } else if (ptr == &mons[PM_WORM_THAT_WALKS] && !rn2(3)) {
+            (void) mongets(mtmp, MACE);
+        } else if (ptr == &mons[PM_LORD_OF_WORMS] && !rn2(13)) {
+            (void) mongets(mtmp, BONE_KNIFE);
         }
         break;
     case S_MUMMY:
@@ -1944,6 +1951,8 @@ int type;
     case PM_STRAW_GOLEM:
         return 20;
     case PM_PAPER_GOLEM:
+        return 20;
+    case PM_ANIMATED_STATUE:
         return 20;
     case PM_ROPE_GOLEM:
         return 30;

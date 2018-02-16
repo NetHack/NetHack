@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -740,10 +740,10 @@ register struct monst *mtmp;
         nomovemsg = 0;
         break;
     case MS_LAUGH: {
-        static const char *const laugh_msg[4] = {
-            "giggles.", "chuckles.", "snickers.", "laughs.",
+        static const char *const laugh_msg[5] = {
+            "giggles.", "chuckles.", "snickers.", "laughs.", "guffaws.",
         };
-        pline_msg = laugh_msg[rn2(4)];
+        pline_msg = laugh_msg[rn2(5)];
     } break;
     case MS_MUMBLE:
         pline_msg = "mumbles incomprehensibly.";
@@ -754,15 +754,15 @@ register struct monst *mtmp;
         } else if (mtmp->mpeaceful) {
             if (ptr == &mons[PM_WATER_DEMON])
                 pline_msg = "gurgles.";
+            if (ptr == &mons[PM_DESERT_JINN])
+                pline_msg = "discusses the nature of free will.";
             else
                 verbl_msg = "I'm free!";
         } else {
             if (ptr != &mons[PM_PRISONER])
                 verbl_msg = "This will teach you not to disturb me!";
-#if 0
             else
-                verbl_msg = "??????????";
-#endif
+                verbl_msg = "How dare you attempt speak to me!";
         }
         break;
     case MS_BOAST: /* giants */

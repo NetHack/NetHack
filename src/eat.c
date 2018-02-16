@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -708,7 +708,8 @@ register int pm;
         break;
     case PM_DEATH:
     case PM_PESTILENCE:
-    case PM_FAMINE: {
+    case PM_FAMINE:
+    case PM_KING_IN_YELLOW: {
         pline("Eating that is instantly fatal.");
         Sprintf(killer.name, "unwisely ate the body of %s", mons[pm].mname);
         killer.format = NO_KILLER_PREFIX;

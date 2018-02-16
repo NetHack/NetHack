@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -3298,6 +3298,9 @@ struct obj *obj;
         goto wanexpl;
     case WAN_FIRE:
         expltype = EXPL_FIERY;
+    case WAN_ACID:
+    case WAN_POISON_GAS:
+        expltype = EXPL_NOXIOUS;
     case WAN_COLD:
         if (expltype == EXPL_MAGICAL)
             expltype = EXPL_FROSTY;

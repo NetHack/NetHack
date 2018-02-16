@@ -720,6 +720,18 @@ doengrave()
                             surface(u.ux, u.uy));
                 }
                 break;
+            case WAN_POISON_GAS:
+                if (!Blind) {
+                    if (Hallucination) {
+                        Sprintf(post_engr_text,
+                        "The bugs on the %s cough!", surface(u.ux, u.uy));
+                    } else {
+                        Sprintf(post_engr_text,
+                        "The bugs on the %s stop moving!", surface(u.ux, u.uy));
+                    }
+                }
+                create_gas_cloud(u.ux, u.uy, 1, 4);
+                break;
             case WAN_COLD:
                 if (!Blind)
                     Strcpy(post_engr_text,
@@ -777,6 +789,19 @@ doengrave()
                 }
                 Strcpy(post_engr_text, Blind ? "You feel the wand heat up."
                                              : "Flames fly from the wand.");
+                break;
+            case WAN_ACID:
+                ptext = TRUE;
+                type = BURN;
+                if (!objects[otmp->otyp].oc_name_known && !Blind) {
+                    if (flags.verbose)
+                        pline("This %s is a wand of acid!", xname(otmp));
+                    doknown = TRUE;
+                }
+                if (!Blind) {
+                    Strcpy(post_engr_text,
+                            "Acid sprays from the wand.");
+                }
                 break;
             case WAN_LIGHTNING:
                 ptext = TRUE;

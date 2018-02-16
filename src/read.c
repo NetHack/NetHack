@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1908,8 +1908,10 @@ int chg; /* recharging */
         break;
     case WAN_COLD:
     case WAN_FIRE:
+    case WAN_ACID:
     case WAN_LIGHTNING:
     case WAN_MAGIC_MISSILE:
+    case WAN_POISON_GAS:
         k = 8;
         break;
     case WAN_NOTHING:

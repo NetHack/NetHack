@@ -472,8 +472,8 @@ MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
-MONSTER:('E',"water elemental"),random,hostile
-MONSTER:('E',"water elemental"),random,hostile
+MONSTER:('&',"marid"),random,hostile
+MONSTER:('&',"marid"),random,hostile
 
 
 MAZE:"astral",' '

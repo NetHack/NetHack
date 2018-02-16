@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -1131,6 +1131,7 @@ struct attack *mattk;
         what = "melting";
         break;
     case PM_STONE_GOLEM:
+    case PM_ANIMATED_STATUE:
     case PM_CLAY_GOLEM:
     case PM_GOLD_GOLEM:
     case PM_AIR_ELEMENTAL:

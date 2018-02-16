@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 2/02/18 by NullCGT */
+/* Modified 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -61,7 +61,7 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
     {
         "magic missile", /* Wands must be 0-9 */
         "bolt of fire", "bolt of cold", "sleep ray", "death ray",
-        "bolt of lightning", "", "", "", "",
+        "bolt of lightning", "blast of poison gas", "geyser of acid", "", "",
 
         "magic missile", /* Spell equivalents must be 10-19 */
         "fireball", "cone of cold", "sleep ray", "finger of death",
@@ -382,7 +382,8 @@ struct obj *otmp;
             learn_it = TRUE;
         break;
     case SPE_STONE_TO_FLESH:
-        if (monsndx(mtmp->data) == PM_STONE_GOLEM) {
+        if (monsndx(mtmp->data) == PM_STONE_GOLEM ||
+            monsndx(mtmp->data) == PM_ANIMATED_STATUE) {
             char *name = Monnam(mtmp);
 
             /* turn into flesh golem */
@@ -2226,36 +2227,24 @@ boolean ordinary;
     boolean wonder = FALSE;
     int damage = 0;
     if (obj->otyp == WAN_WONDER) {
-        switch (rn2(10)) {
+        switch (rn2(7)) {
         /* Not a complete list, just some interesting effects. */
-        case 0:
-            obj->otyp = WAN_STRIKING;
-            break;
         case 1:
             obj->otyp = WAN_LIGHTNING;
             break;
         case 2:
-            obj->otyp = WAN_FIRE;
-            break;
-        case 3:
             obj->otyp = WAN_MAGIC_MISSILE;
             break;
-        case 4:
-            obj->otyp = WAN_COLD;
-            break;
-        case 5:
+        case 3:
             obj->otyp = WAN_POLYMORPH;
             break;
-        case 6:
-            obj->otyp = WAN_LIGHT;
-            break;
-        case 7:
+        case 4:
             obj->otyp = WAN_UNDEAD_TURNING;
             break;
-        case 8:
+        case 5:
             obj->otyp = WAN_TELEPORTATION;
             break;
-        case 9:
+        case 6:
             obj->otyp = WAN_DEATH;
             break;
         default:
@@ -2301,6 +2290,28 @@ boolean ordinary;
         You("explode a fireball on top of yourself!");
         explode(u.ux, u.uy, 11, d(6, 6), WAND_CLASS, EXPL_FIERY);
         break;
+
+    case WAN_ACID:
+        learn_it = TRUE;
+        if (Acid_resistance) {
+            shieldeff(u.ux, u.uy);
+            You("take a hot bath.");
+            ugolemeffects(AD_ACID, d(12, 6));
+        } else {
+            You("are melting! What a world!");
+            damage = d(12, 6);
+        }
+        (void) erode_armor(&youmonst, ERODE_CORRODE);
+        break;
+
+    case WAN_POISON_GAS:
+        learn_it = TRUE;
+        if (!Deaf) {
+            pline("Whoosh!");
+        }
+        (void) create_gas_cloud(u.ux, u.uy, 1, 8);
+        break;
+
     case WAN_FIRE:
     case FIRE_HORN:
         learn_it = TRUE;
@@ -3028,7 +3039,7 @@ struct obj *obj;
         else if (otyp >= SPE_MAGIC_MISSILE && otyp <= SPE_FINGER_OF_DEATH)
             buzz(otyp - SPE_MAGIC_MISSILE + 10, u.ulevel / 2 + 1, u.ux, u.uy,
                  u.dx, u.dy);
-        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_LIGHTNING)
+        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_ACID)
             buzz(otyp - WAN_MAGIC_MISSILE,
                  (otyp == WAN_MAGIC_MISSILE) ? 2 : 6, u.ux, u.uy, u.dx, u.dy);
         else
