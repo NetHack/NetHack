@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -2885,20 +2885,31 @@ cloneu()
     struct monst *mon;
     int mndx = monsndx(youmonst.data);
 
-    if (u.mh <= 1)
-        return (struct monst *) 0;
-    if (mvitals[mndx].mvflags & G_EXTINCT)
-        return (struct monst *) 0;
-    mon = makemon(youmonst.data, u.ux, u.uy, NO_MINVENT | MM_EDOG);
+    if (Upolyd) {
+        if (u.mh <= 1)
+            return (struct monst *) 0;
+        if (mvitals[mndx].mvflags & G_EXTINCT)
+            return (struct monst *) 0;
+        mon = makemon(youmonst.data, u.ux, u.uy, NO_MINVENT | MM_EDOG);
+    } else {
+        mon = makemon(&mons[urace.malenum], u.ux, u.uy, NO_MINVENT | MM_EDOG);
+    }
     if (!mon)
         return NULL;
     mon->mcloned = 1;
     mon = christen_monst(mon, plname);
     initedog(mon);
-    mon->m_lev = youmonst.data->mlevel;
-    mon->mhpmax = u.mhmax;
-    mon->mhp = u.mh / 2;
-    u.mh -= mon->mhp;
+    if (Upolyd) {
+        mon->m_lev = youmonst.data->mlevel;
+        mon->mhpmax = u.mhmax;
+        mon->mhp = u.mh / 2;
+        u.mh -= mon->mhp;
+    } else {
+        mon->m_lev = u.ulevel;
+        mon->mhpmax = u.uhpmax;
+        mon->mhp = u.uhp / 2;
+        u.uhp -= mon->mhp;
+    }
     context.botl = 1;
     return mon;
 }

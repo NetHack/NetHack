@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1052,6 +1052,7 @@ register struct trobj *trop;
             while (otyp == WAN_WISHING || otyp == nocreate
                    || otyp == nocreate2 || otyp == nocreate3
                    || otyp == nocreate4 || otyp == RIN_LEVITATION
+                   || otyp == SCR_CLONING
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID

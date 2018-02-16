@@ -1,7 +1,7 @@
 /* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 2/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -48,6 +48,7 @@ register struct obj *otmp;
     case SCR_SCARE_MONSTER:
     case SCR_STINKING_CLOUD:
     case SCR_TAMING:
+    case SCR_CLONING:
     case SCR_TELEPORTATION:
         return 20;
     case SCR_GENOCIDE:

@@ -1731,6 +1731,15 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         punish(sobj);
         break;
+    case SCR_CLONING:
+        known = TRUE;
+        if (!Hallucination) {
+            You("clone yourself!");
+        } else {
+            You("realize that you were the clone all along!");
+        }
+        cloneu();
+        break;
     case SCR_STINKING_CLOUD: {
         coord cc;
 
