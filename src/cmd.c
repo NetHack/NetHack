@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1513130017 2017/12/13 01:53:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1518861485 2018/02/17 09:58:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.278 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2767,7 +2767,7 @@ int final;
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");
-    /* But beverages are okay */
+        /* but beverages are okay */
     else if (!u.uconduct.unvegan)
         you_have_X("followed a strict vegan diet");
     else if (!u.uconduct.unvegetarian)
@@ -4246,7 +4246,7 @@ register char *cmd;
     } else if (*cmd == ' ' && !flags.rest_on_space) {
         bad_command = TRUE; /* skip cmdlist[] loop */
 
-        /* handle all other commands */
+    /* handle all other commands */
     } else {
         register const struct ext_func_tab *tlist;
         int res, NDECL((*func));
