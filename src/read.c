@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 2/17/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1733,7 +1733,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     case SCR_CLONING:
         known = TRUE;
-        if (!Hallucination) {
+        if (confused) {
+            dropy(mksobj(uwep->otyp, TRUE, TRUE));
+            pline("You clone your weapon!");
+            break;
+        } else if (!Hallucination) {
             You("clone yourself!");
         } else {
             You("realize that you were the clone all along!");
