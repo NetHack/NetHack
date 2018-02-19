@@ -32,8 +32,11 @@ while.  Please do not send save files, binary screen grabs, or other large
 things.
 ------------------------------------------------------------------------------
 2. git repositories
-The public NetHack git repository is available (read-only) on SourceForge at:
-  git://git.code.sf.net/p/nethack/NHsource
+A public repository of the latest NetHack code that we've made 
+available can be obtained via git from either of two locations:
+    https://github.com/NetHack/NetHack
+      or
+    https://sourceforge.net/p/nethack/NetHack/
 
 XXX need to discuss what branches are available
 ------------------------------------------------------------------------------
