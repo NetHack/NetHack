@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/18/18 by NullCGT */
+
 #include "hack.h"
 
 /* monster mage spells */
@@ -17,6 +19,7 @@
 #define MGC_SUMMON_MONS 9
 #define MGC_CLONE_WIZ 10
 #define MGC_DEATH_TOUCH 11
+#define MGC_SONIC_SCREAM 12
 
 /* monster cleric spells */
 #define CLC_OPEN_WOUNDS 0
@@ -99,8 +102,9 @@ int spellval;
     case 15:
         return MGC_SUMMON_MONS;
     case 14:
-    case 13:
         return MGC_AGGRAVATION;
+    case 13:
+        return MGC_SONIC_SCREAM;
     case 12:
     case 11:
     case 10:
@@ -476,6 +480,16 @@ int spellnum;
             if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
                 mtmp->mhp = mtmp->mhpmax;
             dmg = 0;
+        }
+        break;
+    case MGC_SONIC_SCREAM:
+        if (!Deaf) {
+            pline("A deafening screech rips through the air around you!");
+            dmg = d(6, 6);
+            if (Half_spell_damage)
+                dmg = (dmg + 1) / 2;
+        } else {
+            You_feel("a brief hum.");
         }
         break;
     case MGC_PSI_BOLT:

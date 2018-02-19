@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 2/19/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1277,42 +1277,66 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_GREEN),
-    /* If you see an elder dragon, run. */
-    /* Razor dragons have no breath weapon, but are incredibly fast and deal
-       extremely large amounts of damage. */
-    MON("razor dragon", S_DRAGON, LVL(30, 18, -10, 20, 7), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
-        ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
-        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
-            | M1_METALLIVORE,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_BRIGHT_CYAN),
     /* Ooze dragons are a good reason to have acid reistance. Probably the
        least dangerous of the elder dragons. */
     MON("ooze dragon", S_DRAGON, LVL(30, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK),
-        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_ACID | MR_STONE,
-        MR_STONE, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS |
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_ACID | MR_POISON,
+        MR_POISON, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS |
                   M1_AMORPHOUS | M1_CARNIVORE | M1_ACID,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_GREEN),
+    /* If you see an elder dragon, run. These monsters were added to increase
+       challenge in the late game, and all of them are extremely nasty. */
+    /* Razor dragons have no breath weapon, but are incredibly fast and deal
+       extremely large amounts of damage. */
+    MON("razor dragon", S_DRAGON, LVL(30, 18, -10, 20, 7), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
+        ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS
+            | M1_METALLIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BRIGHT_CYAN),
+    /* filth dragons are less mobile than the other elder dragons, but
+       their illness attacks are highly dangerous. */
+    MON("filth dragon", S_DRAGON, LVL(30, 9, -10, 20, -7), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_DRST, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_DISE, 1, 4), ATTK(AT_CLAW, AD_DISE, 1, 4),
+          NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_POISON,
+        MR_POISON, M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS |
+                  M1_CARNIVORE | M1_POIS | M1_REGEN,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BROWN),
+    /* Hex dragons are powerful spellcasters, and can move around the map
+       with teleportation and wall walking.*/
+    MON("hex dragon", S_DRAGON, LVL(30, 9, -10, 20, -6), (G_GENO | 1),
+        A(ATTK(AT_MAGC, AD_SPEL, 4, 6), ATTK(AT_BITE, AD_CURS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_MUMBLE, MZ_GIGANTIC), MR_DISINT, MR_DISINT,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_WALLWALK
+            | M1_CARNIVORE | M1_TPORT,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BRIGHT_BLUE),
     /* Void dragons are essentially death on legs. Their void attacks are
        capable of eating through even the best-prepared character in only a few
        turns. They may need to be reduced in power at some point. */
     MON("void dragon", S_DRAGON, LVL(35, 9, -10, 20, 0),
         (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_VOID, 3, 8),
-          ATTK(AT_CLAW, AD_VOID, 1, 4), ATTK(AT_CLAW, AD_VOID, 1, 4), NO_ATTK,
+          ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4), NO_ATTK,
           NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_SILENT, MZ_GIGANTIC),
         MR_DISINT | MR_STONE | MR_COLD, MR_DISINT,
         M1_FLY | M1_TUNNEL | M1_UNSOLID | M1_THICK_HIDE | M1_NOHANDS
             | M1_SEE_INVIS | M1_CARNIVORE | M1_BREATHLESS,
-        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_BRIGHT_BLUE),
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC |
+        M2_NOPOLY,
+        0, HI_LORD),
     MON("yellow dragon", S_DRAGON, LVL(15, 9, -1, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,

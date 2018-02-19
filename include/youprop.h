@@ -2,6 +2,8 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/19/18 by NullCGT */
+
 #ifndef YOUPROP_H
 #define YOUPROP_H
 
@@ -67,7 +69,9 @@
 
 /* Intrinsics only */
 #define HSick_resistance u.uprops[SICK_RES].intrinsic
-#define Sick_resistance (HSick_resistance || defends(AD_DISE, uwep))
+#define ESick_resistance u.uprops[SICK_RES].extrinsic
+#define Sick_resistance (HSick_resistance || ESick_resistance \
+                          || defends(AD_DISE, uwep))
 
 #define Invulnerable u.uprops[INVULNERABLE].intrinsic /* [Tom] */
 

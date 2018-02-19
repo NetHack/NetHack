@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/19/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -293,6 +293,11 @@ unsigned corpseflags;
     case PM_BLACK_DRAGON:
     case PM_BLUE_DRAGON:
     case PM_GREEN_DRAGON:
+    case PM_OOZE_DRAGON:
+    case PM_RAZOR_DRAGON:
+    case PM_FILTH_DRAGON:
+    case PM_HEX_DRAGON:
+    case PM_VOID_DRAGON:
     case PM_YELLOW_DRAGON:
         /* Make dragon scales.  This assumes that the order of the
            dragons is the same as the order of the scales. */

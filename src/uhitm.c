@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 2/19/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1138,8 +1138,10 @@ int dieroll;
         hittxt = TRUE;
     } else if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
         /* VERY small chance of stunning opponent if unarmed. */
-        if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) && !bigmonst(mdat)
-            && !thick_skinned(mdat)) {
+        if ((rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) ||
+            (rnd(50) < P_SKILL(P_BARE_HANDED_COMBAT) &&
+              uarmg->otyp == BOXING_GLOVES))
+            && !bigmonst(mdat) && !thick_skinned(mdat)) {
             if (canspotmon(mon))
                 pline("%s %s from your powerful strike!", Monnam(mon),
                       makeplural(stagger(mon->data, "stagger")));

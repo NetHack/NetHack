@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/12/18 by NullCGT */
+/* Edited on 2/19/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -343,13 +343,15 @@ BOW("crossbow", None,          1, 45, 50, 40, 0, WOOD, P_CROSSBOW, HI_WOOD),
 
 /* helmets */
 HELM("elven leather helm", "leather hat",
-     0, 0,           0,  6, 1,  3,  8,  9, 0, LEATHER, HI_LEATHER),
+     0, 0,           0,  4, 1,  3,  8,  9, 0, LEATHER, HI_LEATHER),
 HELM("orcish helm", "iron skull cap",
      0, 0,           0,  6, 1, 30, 10,  9, 0, IRON, CLR_BLACK),
 HELM("dwarvish iron helm", "hard hat",
      0, 0,           0,  6, 1, 40, 20,  8, 0, IRON, HI_METAL),
 HELM("fedora", None,
      1, 0,           0,  0, 0,  3,  1, 10, 0, CLOTH, CLR_BROWN),
+HELM("earmuff", None,
+     1, 0,        DEAF,  2, 1,  3, 10, 10, 0, CLOTH, CLR_ORANGE),
 HELM("cornuthaum", "conical hat",
      0, 1, CLAIRVOYANT,  3, 1,  4, 80, 10, 1, CLOTH, CLR_BLUE),
         /* name coined by devteam; confers clairvoyance for wizards,
@@ -390,9 +392,11 @@ DRGN_ARMR("orange dragon scale mail",  1, SLEEP_RES,   900, 1, CLR_ORANGE),
 DRGN_ARMR("black dragon scale mail",   1, DISINT_RES, 1200, 1, CLR_BLACK),
 DRGN_ARMR("blue dragon scale mail",    1, SHOCK_RES,   900, 1, CLR_BLUE),
 DRGN_ARMR("green dragon scale mail",   1, POISON_RES,  900, 1, CLR_GREEN),
-DRGN_ARMR("razor dragon scale mail",   1, FAST,  1200, 1, CLR_BRIGHT_CYAN),
-DRGN_ARMR("ooze dragon scale mail",   1, ACID_RES,  900, 1, CLR_BRIGHT_GREEN),
-DRGN_ARMR("void dragon scale mail",   1, DISINT_RES,  1200, 1, CLR_BRIGHT_BLUE),
+DRGN_ARMR("ooze dragon scale mail",    1, ACID_RES,    900, 1, CLR_BRIGHT_GREEN),
+DRGN_ARMR("razor dragon scale mail",   1, FAST,       1200, 1, CLR_BRIGHT_CYAN),
+DRGN_ARMR("filth dragon scale mail",   1, SICK_RES,   1200, 1, CLR_BROWN),
+DRGN_ARMR("hex dragon scale mail",     1, ANTIMAGIC,  1200, 1, CLR_BRIGHT_BLUE),
+DRGN_ARMR("void dragon scale mail",    1, DISINT_RES, 1200, 1, CLR_MAGENTA),
 DRGN_ARMR("yellow dragon scale mail",  1, ACID_RES,    900, 1, CLR_YELLOW),
 /* For now, only dragons leave these. */
 /* 3.4.1: dragon scales left classified as "non-magic"; they confer
@@ -406,10 +410,12 @@ DRGN_ARMR("orange dragon scales",      0, SLEEP_RES,   500, 7, CLR_ORANGE),
 DRGN_ARMR("black dragon scales",       0, DISINT_RES,  700, 7, CLR_BLACK),
 DRGN_ARMR("blue dragon scales",        0, SHOCK_RES,   500, 7, CLR_BLUE),
 DRGN_ARMR("green dragon scales",       0, POISON_RES,  500, 7, CLR_GREEN),
-DRGN_ARMR("razor dragon scales",       0, FAST,  500, 7, CLR_BRIGHT_CYAN),
-DRGN_ARMR("ooze dragon scales",       0, POISON_RES,  500, 7, CLR_BRIGHT_GREEN),
-DRGN_ARMR("void dragon scales",       0, DISINT_RES,  500, 7, CLR_BRIGHT_BLUE),
-DRGN_ARMR("yellow dragon scales",      0, ACID_RES,    500, 7, CLR_YELLOW),
+DRGN_ARMR("razor dragon scales",       0, FAST,        500, 7, CLR_BRIGHT_CYAN),
+DRGN_ARMR("ooze dragon scales",        0, POISON_RES,  700, 7, CLR_BRIGHT_GREEN),
+DRGN_ARMR("filth dragon scales",       0, SICK_RES,    700, 7, CLR_BROWN),
+DRGN_ARMR("hex dragon scales",         0, ANTIMAGIC,   700, 7, CLR_BRIGHT_BLUE),
+DRGN_ARMR("void dragon scales",        0, DISINT_RES,  700, 7, CLR_MAGENTA),
+DRGN_ARMR("yellow dragon scales",      0, ACID_RES,    700, 7, CLR_YELLOW),
 #undef DRGN_ARMR
 /* other suits */
 ARMOR("plate mail", None,
@@ -501,9 +507,9 @@ SHIELD("orcish shield", "red-eyed shield",
 SHIELD("large shield", None,
        1, 0, 1,          0, 3, 0, 100, 10, 8, 0,  IRON, HI_METAL),
 SHIELD("hide shield", None,
-      1, 0, 1,          0, 2, 0, 25, 8, 8, 0,  LEATHER, CLR_ORANGE),
-SHIELD("tower shield", None,
-      1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
+       1, 0, 1,          0, 2, 0, 25, 8, 8, 0,  LEATHER, CLR_ORANGE),
+SHIELD("tower shield", "large rectangular shield",
+       1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
 SHIELD("dwarvish roundshield", "large round shield",
        0, 0, 0,          0, 4, 0, 100, 10, 8, 0,  IRON, HI_METAL),
 SHIELD("shield of reflection", "polished silver shield",
@@ -519,9 +525,13 @@ GLOVES("leather gloves", "old gloves",
 GLOVES("gauntlets of fumbling", "padded gloves",
        0, 1, FUMBLING,  8, 1, 10, 50, 9, 0,  LEATHER, HI_LEATHER),
 GLOVES("gauntlets of power", "riding gloves",
-       0, 1,        0,  8, 1, 30, 50, 9, 0,  IRON, CLR_BROWN),
+       0, 1,        0,  4, 1, 30, 50, 9, 0,  IRON, CLR_BROWN),
+GLOVES("rogues gloves", "fingerless gloves",
+     0, 1,  SEARCHING,  4, 1, 10, 50, 9, 0,  LEATHER, HI_LEATHER),
+GLOVES("boxing gloves", "boiled gloves",
+      0, 1,        0,  4, 1, 10, 50, 9, 0,  LEATHER, HI_LEATHER),
 GLOVES("gauntlets of dexterity", "fencing gloves",
-       0, 1,        0,  8, 1, 10, 50, 9, 0,  LEATHER, HI_LEATHER),
+       0, 1,        0,  4, 1, 10, 50, 9, 0,  LEATHER, HI_LEATHER),
 
 /* boots */
 BOOTS("low boots", "walking shoes",

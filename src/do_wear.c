@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 2/19/18 by NullCGT */
 
 #include "hack.h"
 
@@ -388,6 +388,7 @@ Helmet_on(VOID_ARGS)
     case DWARVISH_IRON_HELM:
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
+    case EARMUFF:
         break;
     case HELM_OF_BRILLIANCE:
         adj_abon(uarmh, uarmh->spe);
@@ -452,6 +453,7 @@ Helmet_off(VOID_ARGS)
     case ELVEN_LEATHER_HELM:
     case DWARVISH_IRON_HELM:
     case ORCISH_HELM:
+    case EARMUFF:
         break;
     case DUNCE_CAP:
         context.botl = 1;
@@ -494,6 +496,8 @@ Gloves_on(VOID_ARGS)
 
     switch (uarmg->otyp) {
     case LEATHER_GLOVES:
+    case BOXING_GLOVES:
+    case ROGUES_GLOVES:
         break;
     case GAUNTLETS_OF_FUMBLING:
         if (!oldprop && !(HFumbling & ~TIMEOUT))
@@ -547,6 +551,8 @@ Gloves_off(VOID_ARGS)
 
     switch (uarmg->otyp) {
     case LEATHER_GLOVES:
+    case BOXING_GLOVES:
+    case ROGUES_GLOVES:
         break;
     case GAUNTLETS_OF_FUMBLING:
         if (!oldprop && !(HFumbling & ~TIMEOUT))
