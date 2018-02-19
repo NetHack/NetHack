@@ -577,6 +577,11 @@ the fix for secret doors on special levels always having vertical orientation
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
+unix: freeing mailbox data at game end crashed if MAIL came from environment
+unix: fix for freeing MAIL introduced a one-byte buffer overrun which could
+	interfere with malloc/free operation
+unix: fix for freeing MAIL also introduced a memory leak whenever new mail
+	is detected and MAIL comes from the environment
 
 
 Platform- and/or Interface-Specific Fixes
