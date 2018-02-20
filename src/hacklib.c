@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1496860756 2017/06/07 18:39:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1518922474 2018/02/18 02:54:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -451,7 +451,7 @@ const char *stuff_to_strip, *orig;
     char *s = bp;
 
     if (s) {
-        while (s && *orig && i < (BUFSZ - 1)) {
+        while (*orig && i < (BUFSZ - 1)) {
             if (!index(stuff_to_strip, *orig)) {
                 *s++ = *orig;
                 i++;

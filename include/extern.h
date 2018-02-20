@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1514769568 2018/01/01 01:19:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.622 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1284,6 +1284,7 @@ E struct obj *FDECL(splitobj, (struct obj *, long));
 E struct obj *FDECL(unsplitobj, (struct obj *));
 E void NDECL(clear_splitobjs);
 E void FDECL(replace_object, (struct obj *, struct obj *));
+E struct obj *FDECL(unknwn_contnr_contents, (struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
 E void FDECL(costly_alteration, (struct obj *, int));
 E struct obj *FDECL(mksobj, (int, BOOLEAN_P, BOOLEAN_P));
@@ -2473,13 +2474,14 @@ E void NDECL(u_init);
 E void FDECL(erode_armor, (struct monst *, int));
 E boolean FDECL(attack_checks, (struct monst *, struct obj *));
 E void FDECL(check_caitiff, (struct monst *));
-E int FDECL(find_roll_to_hit,
-            (struct monst *, UCHAR_P, struct obj *, int *, int *));
+E int FDECL(find_roll_to_hit, (struct monst *, UCHAR_P, struct obj *,
+                               int *, int *));
 E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
 E int FDECL(damageum, (struct monst *, struct attack *));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
-E int FDECL(passive, (struct monst *, BOOLEAN_P, int, UCHAR_P, BOOLEAN_P));
+E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
+                      UCHAR_P, BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *, struct obj *, struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *, struct obj *));
@@ -2567,7 +2569,7 @@ E unsigned long NDECL(get_current_feature_ver);
 E const char *FDECL(copyright_banner_line, (int));
 
 #ifdef RUNTIME_PORT_ID
-E void FDECL(append_port_id, (char *));
+E char *FDECL(get_port_id, (char *));
 #endif
 
 /* ### video.c ### */

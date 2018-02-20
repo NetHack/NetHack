@@ -1,5 +1,5 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1451610993 2016/01/01 01:16:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2017
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1518220654 2018/02/09 23:57:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
+#       Copyright (c) NetHack PC Development Team 1993-2018
 #
 #==============================================================================
 # Build Tools Environment
@@ -29,69 +29,37 @@
 #
 #   If you have any questions read the sys/winnt/Install.nt file included 
 #   with the distribution.
-#==============================================================================
-# Before we get started, this section is used to determine the version of 
-# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
-# is too old or untested.
-#
-
-!IF "$(_NMAKE_VER)" == "14.11.25547.0"
-VSVER=2017
-!ELSEIF "$(_NMAKE_VER)" == "14.00.22310.1"
-VSVER=2015
-!ELSEIF "$(_NMAKE_VER)" == "12.00.21005.1"
-VSVER=2013
-!ELSEIF "$(_NMAKE_VER)" == "11.00.50727.1"
-VSVER=2012
-!ELSEIF "$(_NMAKE_VER)" == "10.00.40219.01"
-VSVER=2010
-!ELSE
-VSVER=0000		#untested version
-!ENDIF
-
-#==============================================================================
+#========================================================================================
 # BUILD DECISIONS SECTION
 #
-# There are currently only 3 decisions that you have to make.
-#	1. 32-bit or 64-bit?
-#	2. Where do you want your build to end up?
-#	3. Do you want debug information in the executable?
+# There are currently only 3 decisions that you can choose to make, and none are 
+# required:
+#	1. Where do you want your build to end up?
+#	2. Do you want debug information in the executable?
+#	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
 #
+#-----------------------------------------------------------------------------------------
+#=========================================================================================
+
 #---------------------------------------------------------------
-#==============================================================================
-# 1. 32-bit or 64-bit? (comment/uncomment appropriate TARGET_CPU line)
-#
+# 1. Where do you want the game to be built (which folder)?
 
-!IF ($(VSVER) >= 2012)
-#
-# 64 bit
-#TARGET_CPU=x64
-#
-# 32 bit
-TARGET_CPU=x86
-
-!ELSE
-!IF ($(VSVER) == 0000)
-!ERROR Unsupported and untested version of Visual Studio
-!ELSE
-# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
-# DO NOT DELETE THE FOLLOWING LINE
-!include <win32.mak>
-!ENDIF
-!ENDIF
-#
+GAMEDIR = ..\binary               # Default game build directory
+ 
 #---------------------------------------------------------------
-# 2. Where do you want the game to be built (which folder)?
-#
-
-GAMEDIR = ..\binary               # Game directory
-
-#
-#---------------------------------------------------------------
-# 3. Do you want debug information in the executable?
-#
+# 2. Do you want debug information available to the executable?
   
 DEBUGINFO = Y
+
+#---------------------------------------------------------------
+# 3. This Makefile will attempt to auto-detect your selected target architecture
+#    based on Visual Studio command prompt configuration settins etc.
+#    However, if you want to manually override generation of a 
+#    32-bit or 64-bit build target, you can uncomment the apppropriate
+#    TARGET_CPU line below.
+#
+#TARGET_CPU=x64
+#TARGET_CPU=x86
 
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -180,6 +148,76 @@ DLBFLG =
 # Setting up the compiler and linker
 #==========================================
 #==========================================
+
+# Before we get started, this section is used to determine the version of 
+# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
+# is too old or untested.
+#
+
+#!MESSAGE $(MAKEFLAGS)
+#!MESSAGE $(MAKEDIR)
+#!MESSAGE $(MAKE)
+
+MAKEVERSION=$(_NMAKE_VER:.= )
+MAKEVERSION=$(MAKEVERSION: =)
+#!MESSAGE $(_NMAKE_VER)
+#!MESSAGE $(MAKEVERSION)
+
+VSNEWEST=2017
+!IF ($(MAKEVERSION) < 1000000000)
+VSVER=0000		#untested ancient version
+!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
+VSVER=2010
+!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
+VSVER=2012
+!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
+VSVER=2013
+!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
+VSVER=2015
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1412258351)
+VSVER=$(VSNEWEST)
+!ELSEIF ($(MAKEVERSION) > 1412258350)
+VSVER=2999              #untested future version
+!ENDIF
+
+!IF ($(VSVER) >= 2012)
+!MESSAGE Autodetected Visual Studio $(VSVER)
+!ELSEIF ($(VSVER) == 2999
+!MESSAGE The version of Visual Studio is newer than the most recent at
+!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
+!MESSAGE Because it is newer we'll proceed expecting that the 
+!MESSAGE VS$(VSNEWEST) processing will still work.
+!ELSEIF ($(VSVER) == 0000)
+!MESSAGE The version of Visual Studio appears to be quite old, older
+!MESSAGE than VS2010 which is the oldest supported version by this
+!MESSAGE Makefile, so we'll stop now.
+!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
+# DO NOT DELETE THE FOLLOWING LINE
+!include <win32.mak>
+! ENDIF
+
+#----------------------------------------------------------------
+
+#These will be in the environment variables with one of the VS2017
+#developer command prompts.
+#VSCMD_ARG_HOST_ARCH=x64
+#VSCMD_ARG_TGT_ARCH=x86
+
+!IFDEF VSCMD_ARG_HOST_ARCH
+!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
+!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
+! IFNDEF TARGET_CPU
+!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
+TARGET_CPU=x64
+!  ELSE
+TARGET_CPU=x86
+!  ENDIF
+! ENDIF
+!ENDIF
 
 !IF "$(TARGET_CPU)" == ""
 TARGET_CPU=x86
@@ -937,22 +975,15 @@ $(O)obj.tag:
 #==========================================
 
 envchk:
-!	IF ($(VSVER) < 2010)
-	@echo Your Visual Studio version is too old or untested ($(_NMAKE_VER))
-!ERROR Your Visual Studio version is too old or untested ($(_NMAKE_VER))
-!	ENDIF
 !	IF "$(TARGET_CPU)"=="x64"
-	@echo Windows x64 64-bit build
+	@echo Windows x64 64-bit target build
 !	ELSE
-	@echo Windows x86 32-bit build
+	@echo Windows x86 32-bit target build
 !	ENDIF
 !	IF "$(CL)"!=""
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
 !	ENDIF
-	   @echo ----
-	   @echo NOTE: This build will include tile support.
-	   @echo ----
 
 #==========================================
 #=========== SECONDARY TARGETS ============

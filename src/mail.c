@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1464222344 2016/05/26 00:25:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1519070343 2018/02/19 19:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -90,38 +90,44 @@ free_maildata()
 void
 getmailstatus()
 {
-    char *emailbox;
-    if ((emailbox = nh_getenv("MAIL")) != 0) {
-        mailbox = (char *) alloc((unsigned) strlen(emailbox));
-        Strcpy(mailbox, emailbox);
-    }
-    if (!mailbox) {
+    if (mailbox) {
+        ; /* no need to repeat the setup */
+    } else if ((mailbox = nh_getenv("MAIL")) != 0) {
+        mailbox = dupstr(mailbox);
 #ifdef MAILPATH
+    } else  {
 #ifdef AMS
         struct passwd ppasswd;
 
-        (void) memcpy(&ppasswd, getpwuid(getuid()), sizeof(struct passwd));
+        (void) memcpy(&ppasswd, getpwuid(getuid()), sizeof (struct passwd));
         if (ppasswd.pw_dir) {
-            mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)
-                                     + sizeof(AMS_MAILBOX));
+            /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
+            mailbox = (char *) alloc((unsigned) (strlen(ppasswd.pw_dir)
+                                                 + sizeof AMS_MAILBOX));
             Strcpy(mailbox, ppasswd.pw_dir);
             Strcat(mailbox, AMS_MAILBOX);
-        } else
-            return;
+        }
 #else
         const char *pw_name = getpwuid(getuid())->pw_name;
-        mailbox = (char *) alloc(sizeof(MAILPATH) + strlen(pw_name));
+
+        /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
+        mailbox = (char *) alloc((unsigned) (strlen(pw_name)
+                                             + sizeof MAILPATH));
         Strcpy(mailbox, MAILPATH);
         Strcat(mailbox, pw_name);
 #endif /* AMS */
-#else
-        return;
-#endif
+#endif /* MAILPATH */
     }
-    if (stat(mailbox, &omstat)) {
+
+    debugpline3("mailbox=%c%s%c",
+                mailbox ? '\"' : '<',
+                mailbox ? mailbox : "null",
+                mailbox ? '\"' : '>');
+
+    if (mailbox && stat(mailbox, &omstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\".", mailbox);
-        mailbox = 0;
+        free_maildata(); /* set 'mailbox' to Null */
 #else
         omstat.st_mtime = 0;
 #endif
@@ -495,7 +501,7 @@ ckmailstatus()
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
-        mailbox = 0;
+        free_maildata();
 #else
         nmstat.st_mtime = 0;
 #endif

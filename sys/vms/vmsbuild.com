@@ -1,6 +1,6 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.6.1"
-$ ! $NHDT-Date: 1465133393 2016/06/05 13:29:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
+$ ! $NHDT-Date: 1518661015 2018/02/15 02:16:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]
@@ -175,7 +175,7 @@ $ ! final setup
 $	nethacklib = "[-.src]nethack.olb"
 $	create nethack.opt
 ! nethack.opt
-nethack.olb/Library/Include=(vmsmain)
+nethack.olb/Include=(vmsmain)/Library
 sys$library:starlet.olb/Include=(lib$initialize)
 psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
 iosegment=128
