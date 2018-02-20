@@ -1103,6 +1103,9 @@ register int x, y;
 int mmflags;
 {
     register struct monst *mtmp;
+    register struct permonst *first_mon;
+    register struct permonst *second_mon;
+    register struct permonst *final_mon;
     int mndx, mcham, ct, mitem;
     boolean anymon = (!ptr);
     boolean byyou = (x == u.ux && y == u.uy);
@@ -1287,6 +1290,28 @@ int mmflags;
             && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)
             && !is_elf(ptr) && !(is_dwarf(ptr))) {
             mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
+        }
+    case S_QUANTMECH:
+        if (mndx == PM_AMALGAMATION) {
+
+           first_mon = rndmonst();
+           second_mon = rndmonst();
+           final_mon = mtmp->data;
+
+            final_mon->mattk[0] = first_mon->mattk[0];
+            final_mon->mattk[1] = second_mon->mattk[1];
+            final_mon->mattk[2] = first_mon->mattk[2];
+            final_mon->mattk[3] = second_mon->mattk[3];
+            final_mon->mattk[4] = first_mon->mattk[4];
+            final_mon->mattk[5] = second_mon->mattk[5];
+            final_mon->msound = first_mon->msound;
+            final_mon->mmove = second_mon->mmove;
+            final_mon->mlevel = first_mon->mlevel;
+            final_mon->ac = first_mon->ac;
+            final_mon->mmove = second_mon->mmove;
+            final_mon->msize = second_mon->msize;
+
+            mtmp->data = final_mon;
         }
     }
     if ((ct = emits_light(mtmp->data)) > 0)
