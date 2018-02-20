@@ -1415,12 +1415,19 @@ register struct obj *obj;
     otemp.quan = 1L;
     otemp.oextra = (struct oextra *) 0;
 
-    if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink)
+    if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink) {
         /* kludge, meaning it's sink water */
         Sprintf(qbuf, "Call a stream of %s fluid:",
-                OBJ_DESCR(objects[otemp.otyp]));
-    else
-        Sprintf(qbuf, "Call %s:", an(xname(&otemp)));
+            OBJ_DESCR(objects[otemp.otyp]));
+    } else {
+        char tmpbuf[BUFSZ], *tmpname = an(xname(&otemp));
+
+        if (strlen(tmpname) < (BUFSZ - 1)) {
+            Strcpy(tmpbuf, tmpname);
+            tmpbuf[QBUFSZ - 7] = '\0'; /* need room for "Call :"*/
+            Sprintf(qbuf, "Call %s:", tmpbuf);
+        }
+    }
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;

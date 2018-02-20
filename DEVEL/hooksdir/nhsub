@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # nhsub
-# $NHDT-Date: 1515274284 2018/01/06 21:31:24 $
+# $NHDT-Date: 1518800857 2018/02/16 17:07:37 $
 
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
@@ -245,6 +245,7 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 # XXX had o modifier, why?
 	return unless($count>0);
 	return if($opt{n});
+	my $mode = 0777 & (stat($file))[2];
 
 	my $ofile = $file . ".nht";
 	open(TOUT, ">", $ofile) or die "Can't open $ofile";
@@ -263,6 +264,8 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 	}
 
 	close TOUT or die "Can't close $ofile";
+		# Do the right thing for *nix and hope for the best elsewhere:
+	chmod($mode, $ofile)==1 or warn "Can't set filemode on $ofile";
 	rename $ofile, $file or die "Can't rename $ofile to $file";
 }
 

@@ -11,7 +11,7 @@
  *              For "UNIX" select BSD, ULTRIX, SYSV, or HPUX in unixconf.h.
  *              A "VMS" option is not needed since the VMS C-compilers
  *              provide it (no need to change sec#1, vmsconf.h handles it).
- *              MacOSX uses the UNIX configruation, not the old MAC one.
+ *              MacOSX uses the UNIX configuration, not the old MAC one.
  */
 
 #define UNIX /* delete if no fork(), exec() available */

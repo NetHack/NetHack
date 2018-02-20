@@ -256,11 +256,12 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    if ((argc != 2)
+    if ((argc == 1) ||
+        ((argc != 2)
 #ifdef FILE_PREFIX
         && (argc != 3)
 #endif
-        && !(argv[1][0] == '-' && argv[1][1] == '-')) {
+        && !(argv[1][0] == '-' && argv[1][1] == '-'))) {
         Fprintf(stderr, "Bad arg count (%d).\n", argc - 1);
         (void) fflush(stderr);
         return 1;

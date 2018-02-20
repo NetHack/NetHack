@@ -277,7 +277,7 @@ when getpos was picking a location, typing '^' to move to the next known trap
 	skipped some detected traps if their location was unseen
 describe detected door traps and chest traps as trapped door and trapped chest
 	instead of bear trap; bear trap tile is still used on map though
-thrown potion that killed peaceful monster would cause "the <mon> gets argry"
+thrown potion that killed peaceful monster would cause "the <mon> gets angry"
 	after the message about it being killed
 when poly'd into a hider and engulfed, attempt to hide via #monster was blocked
 	but feedback said "can't hide while held" rather than "while engulfed"
@@ -503,6 +503,14 @@ a shop object stolen from outside the shop (via grappling hook) would be left
 	"unpaid_cost: object wasn't on any bill" when looking at inventory
 a shop object stolen from outside the shop could trigger a crash if that shop
 	had never been entered by the hero
+shopkeepers in their own shop and priests in their own temple are no longer
+	frightened by hero standing on scroll of scare monster
+the Wizard, Angels and lawful minions, the Riders, shopkeep/priest in own room
+	are never frightened by tooled horns
+'Iu' would reveal unknown container contents if carrying one unpaid item inside
+	a hero-owned container whose contents weren't known
+docall wasn't taking the space allocation needed for the object name + "Call :" 
+        into account in the prompt string
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -571,6 +579,11 @@ the fix for secret doors on special levels always having vertical orientation
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
+unix: freeing mailbox data at game end crashed if MAIL came from environment
+unix: fix for freeing MAIL introduced a one-byte buffer overrun which could
+	interfere with malloc/free operation
+unix: fix for freeing MAIL also introduced a memory leak whenever new mail
+	is detected and MAIL comes from the environment
 
 
 Platform- and/or Interface-Specific Fixes
