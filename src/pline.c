@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1510990667 2017/11/18 07:37:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1519183957 2018/02/21 03:32:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -129,14 +129,7 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
     }
-    if (!iflags.window_inited) {
-        raw_print(line);
-        iflags.last_msg = PLNMSG_UNKNOWN;
-        return;
-    }
 
-    msgtyp = MSGTYP_NORMAL;
-    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
 #ifdef DUMPLOG
     /* We hook here early to have options-agnostic output.
      * Unfortunately, that means Norep() isn't honored (general issue) and
@@ -145,10 +138,26 @@ VA_DECL(const char *, line)
     if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
+
+    if (!iflags.window_inited) {
+        raw_print(line);
+        iflags.last_msg = PLNMSG_UNKNOWN;
+        return;
+    }
+
+    msgtyp = MSGTYP_NORMAL;
+    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
     if ((pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
         if (msgtyp == MSGTYP_NOSHOW
             || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
+            /* FIXME: we need a way to tell our caller that this message
+             * was suppressed so that caller doesn't set iflags.last_msg
+             * for something that hasn't been shown, otherwise a subsequent
+             * message which uses alternate wording based on that would be
+             * doing so out of context and probably end up seeming silly.
+             * (Not an issue for no-repeat but matters for no-show.)
+             */
             return;
     }
 
