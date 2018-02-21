@@ -25,6 +25,7 @@ CONTENTS
 5. variable expansion
 6. reserved names
 7. nhadd/nhcommit
+8. DEVEL hooks
 ------------------------------------------------------------------------------
 1. email
 Email to devteam@nethack.org will usually get a response, but it may take a
@@ -212,3 +213,14 @@ D. Using your own hooks
    "perldoc DEVEL/hooksdir/nhsub".
    
 ------------------------------------------------------------------------------
+8. DEVEL hooks
+
+   If you copy DEVEL/hooksdir/* into .git/hooks, you'll benefit from
+   having a new dat/gitinfo.txt created for several common git operations
+   that are likely to result in a new git sha. During the nethack build
+   process, makedefs will transform the values contained in
+   dat/gitinfo.txt into #define's in include/date.h which the NetHack 
+   source will utilize.
+
+------------------------------------------------------------------------------
+
