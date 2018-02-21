@@ -122,7 +122,10 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
-    http://www.nethack.org/ 
+    https://www.nethack.org/common/contact.html or
+    http://www.nethack.org/common/contact.html
+Please include the version information from #version or the command line
+option --version in the apropriate field.
 
 A public repository of the latest NetHack code that we've made
 available can be obtained via git here:
