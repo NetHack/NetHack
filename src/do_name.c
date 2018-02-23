@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1519281849 2018/02/22 06:44:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1519420054 2018/02/23 21:07:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,7 @@ STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
+STATIC_PTR char *FDECL(docall_xname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);
 STATIC_DCL char *FDECL(bogusmon, (char *,char *));
 
@@ -1405,33 +1406,56 @@ docallcmd()
     return 0;
 }
 
+/* for use by safe_qbuf() */
+STATIC_PTR char *
+docall_xname(obj)
+struct obj *obj;
+{
+    struct obj otemp;
+
+    otemp = *obj;
+    otemp.oextra = (struct oextra *) 0;
+    otemp.quan = 1L;
+    /* in case water is already known, convert "[un]holy water" to "water" */
+    otemp.blessed = otemp.cursed = 0;
+    /* remove attributes that are doname() caliber but get formatted
+       by xname(); most of these fixups aren't really needed because the
+       relevant type of object isn't callable so won't reach this far */
+    if (otemp.oclass == WEAPON_CLASS)
+        otemp.opoisoned = 0; /* not poisoned */
+    else if (otemp.oclass == POTION_CLASS)
+        otemp.odiluted = 0; /* not diluted */
+    else if (otemp.otyp == TOWEL || otemp.otyp == STATUE)
+        otemp.spe = 0; /* not wet or historic */
+    else if (otemp.otyp == TIN)
+        otemp.known = 0; /* suppress tin type (homemade, &c) and mon type */
+    else if (otemp.otyp == FIGURINE)
+        otemp.corpsenm = NON_PM; /* suppress mon type */
+    else if (otemp.otyp == HEAVY_IRON_BALL)
+        otemp.owt = objects[HEAVY_IRON_BALL].oc_weight; /* not "very heavy" */
+    else if (otemp.oclass == FOOD_CLASS && otemp.globby)
+        otemp.owt = 120; /* 6*20, neither a small glob nor a large one */
+
+    return an(xname(&otemp));
+}
+
 void
 docall(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     char buf[BUFSZ], qbuf[QBUFSZ];
-    struct obj otemp;
-    register char **str1;
+    char **str1;
 
     if (!obj->dknown)
         return; /* probably blind */
-    otemp = *obj;
-    otemp.quan = 1L;
-    otemp.oextra = (struct oextra *) 0;
 
-    if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink) {
+    if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* kludge, meaning it's sink water */
         Sprintf(qbuf, "Call a stream of %s fluid:",
-            OBJ_DESCR(objects[otemp.otyp]));
-    } else {
-        char tmpbuf[BUFSZ], *tmpname = an(xname(&otemp));
-
-        if (strlen(tmpname) < (BUFSZ - 1)) {
-            Strcpy(tmpbuf, tmpname);
-            tmpbuf[QBUFSZ - 7] = '\0'; /* need room for "Call :"*/
-            Sprintf(qbuf, "Call %s:", tmpbuf);
-        }
-    }
+                OBJ_DESCR(objects[obj->otyp]));
+    else
+        (void) safe_qbuf(qbuf, "Call ", ":", obj,
+                         docall_xname, simpleonames, "thing");
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;
