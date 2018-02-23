@@ -576,6 +576,9 @@ try again to fix achievement recording bug with mines and sokoban prizes
 the fix for secret doors on special levels always having vertical orientation
 	resulted in some--but not all--secret doors within vertical walls
 	being displayed as horizontal walls while still hidden
+and the previous fix for the for secret doors didn't work if the level hadn't
+	been wallified yet (Cav quest) so horizontal wall with secret door
+	mis-displayed as a vertical wall segment could occur
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
