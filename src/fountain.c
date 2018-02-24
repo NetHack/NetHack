@@ -585,12 +585,11 @@ drinksink()
         obfree(otmp, (struct obj *) 0);
         break;
     case 5:
-        if (!(levl[u.ux][u.uy].looted & S_LRING)) {
+        /* look for a ring buried beneath the sink ("in the pipe") */
+        otmp = ring_from_sink(u.ux, u.uy);
+        if (otmp) {
             You("find a ring in the sink!");
-            (void) mkobj_at(RING_CLASS, u.ux, u.uy, TRUE);
-            levl[u.ux][u.uy].looted |= S_LRING;
             exercise(A_WIS, TRUE);
-            newsym(u.ux, u.uy);
         } else
             pline("Some dirty %s backs up in the drain.", hliquid("water"));
         break;
@@ -638,6 +637,28 @@ drinksink()
             rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot",
             hliquid("water"));
     }
+}
+
+/* If there is a ring buried under a sink, pop it out and place it on the sink.
+ * Return the ring that appeared or NULL if there was no ring there.
+ * The caller should handle messages. */
+struct obj *
+ring_from_sink(sink_x, sink_y)
+xchar sink_x, sink_y;
+{
+    struct obj* otmp;
+    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        if (otmp->ox == sink_x && otmp->oy == sink_y
+            && otmp->oclass == RING_CLASS) {
+            break;
+        }
+    }
+    if (otmp) {
+        obj_extract_self(otmp);
+        place_object(otmp, sink_x, sink_y);
+        newsym(sink_x, sink_y);
+    }
+    return otmp;
 }
 
 /*fountain.c*/

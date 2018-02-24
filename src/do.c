@@ -593,7 +593,7 @@ register struct obj *obj;
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
-    } else if (!rn2(5)) {
+    } else if (rn2(5)) {
         freeinv(obj);
         obj->in_use = FALSE;
         obj->ox = u.ux;

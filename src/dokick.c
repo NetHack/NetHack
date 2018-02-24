@@ -1194,14 +1194,12 @@ dokick()
                           : !Deaf
                               ? "You hear a sloshing sound"  /* Deaf-aware */
                               : "Something splashes you in the", buf);
-                if (!(g.maploc->looted & S_LRING)) { /* once per sink */
+                struct obj * otmp = ring_from_sink(x, y);
+                if (otmp) {
                     if (!Blind)
                         You_see("a ring shining in its midst.");
-                    (void) mkobj_at(RING_CLASS, x, y, TRUE);
-                    newsym(x, y);
                     exercise(A_DEX, TRUE);
                     exercise(A_WIS, TRUE); /* a discovery! */
-                    g.maploc->looted |= S_LRING;
                 }
                 return 1;
             }

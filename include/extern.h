@@ -864,6 +864,7 @@ E void NDECL(drinkfountain);
 E void FDECL(dipfountain, (struct obj *));
 E void FDECL(breaksink, (int, int));
 E void NDECL(drinksink);
+E struct obj* FDECL(ring_from_sink, (XCHAR_P, XCHAR_P));
 
 /* ### hack.c ### */
 
