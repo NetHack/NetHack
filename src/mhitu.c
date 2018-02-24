@@ -1156,8 +1156,8 @@ register struct attack *mattk;
     case AD_MEMR:
         hitmsg(mtmp, mattk);
         if (uncancelled) {
-            if (hallucination) {
-                pline("Your brain does a flip-flop!")
+            if (Hallucination) {
+                pline("Your brain does a flip-flop!");
             } else {
                 pline("Your memories seem muddled for a moment.");
             }

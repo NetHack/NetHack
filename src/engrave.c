@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 2/05/18 by NullCGT */
+/* Modified 2/23/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -407,6 +407,7 @@ xchar e_type;
         pline_The("weird, twisting sign burns itself into your mind!");
         /* Could actually decrease confusion and stunning. */
         exercise(A_WIS, FALSE);
+        adjalign(-3);
         make_confused(rnd(50), FALSE);
         make_stunned(rnd(50), FALSE);
     }
