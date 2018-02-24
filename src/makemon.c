@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 2/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1103,9 +1103,11 @@ register int x, y;
 int mmflags;
 {
     register struct monst *mtmp;
+    # if 0
     register struct permonst *first_mon;
     register struct permonst *second_mon;
     register struct permonst *final_mon;
+    # endif
     int mndx, mcham, ct, mitem;
     boolean anymon = (!ptr);
     boolean byyou = (x == u.ux && y == u.uy);
@@ -1291,12 +1293,14 @@ int mmflags;
             && !is_elf(ptr) && !(is_dwarf(ptr))) {
             mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         }
+    /* dummied out amalgamation code */
+    #if 0
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION) {
 
           first_mon = rndmonst();
           second_mon = rndmonst();
-          final_mon = mtmp->data;
+          final_mon = newmonst();
           final_mon->mlevel = max(first_mon->mlevel, second_mon->mlevel);
           final_mon->mmove = max(first_mon->mmove, second_mon->mmove);
           final_mon->ac = max(first_mon->ac, second_mon->ac);
@@ -1318,6 +1322,7 @@ int mmflags;
 
           mtmp->data = final_mon;
         }
+    #endif
     }
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,
