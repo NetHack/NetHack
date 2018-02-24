@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1514769572 2018/01/01 01:19:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1519399521 2018/02/23 15:25:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4213,7 +4213,7 @@ genericptr_t arg;
 {
     xchar typ = *(xchar *) arg;
     xchar x = dx, y = dy;
-    boolean left_or_right, up_and_down;
+    boolean wleft, wright, wup, wdown;
 
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
         levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
@@ -4237,21 +4237,31 @@ genericptr_t arg;
      *
      * A secret door with no adjacent walls is also feasible and makes
      * even less sense.  It will be displayed as a vertical wall while
-     * hidden and become a vertical door when found.
+     * hidden and become a vertical door when found.  Before resorting
+     * to that, we check for solid rock which hasn't been wallified
+     * yet (cf lower leftside of leader's room in Cav quest).
      */
-    left_or_right = ((isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ)
-                                         || IS_DOOR(levl[x - 1][y].typ)
-                                         || levl[x - 1][y].typ == SDOOR))
-                     || (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ)
-                                            || IS_DOOR(levl[x + 1][y].typ)
-                                            || levl[x + 1][y].typ == SDOOR)));
-    up_and_down = ((isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ)
-                                       || IS_DOOR(levl[x][y - 1].typ)
-                                       || levl[x][y - 1].typ == SDOOR))
-                   && (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ)
-                                          || IS_DOOR(levl[x][y + 1].typ)
-                                          || levl[x][y + 1].typ == SDOOR)));
-    levl[x][y].horizontal = (left_or_right && !up_and_down) ? 1 : 0;
+    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ)
+                                 || IS_DOOR(levl[x - 1][y].typ)
+                                 || levl[x - 1][y].typ == SDOOR));
+    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ)
+                                 || IS_DOOR(levl[x + 1][y].typ)
+                                 || levl[x + 1][y].typ == SDOOR));
+    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ)
+                                 || IS_DOOR(levl[x][y - 1].typ)
+                                 || levl[x][y - 1].typ == SDOOR));
+    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ)
+                                 || IS_DOOR(levl[x][y + 1].typ)
+                                 || levl[x][y + 1].typ == SDOOR));
+    if (!wleft && !wright && !wup && !wdown) {
+        /* out of bounds is treated as implicit wall; should be academic
+           because we don't expect to have doors so near the level's edge */
+        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
+        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
+        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
+        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
+    }
+    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }

@@ -277,7 +277,7 @@ when getpos was picking a location, typing '^' to move to the next known trap
 	skipped some detected traps if their location was unseen
 describe detected door traps and chest traps as trapped door and trapped chest
 	instead of bear trap; bear trap tile is still used on map though
-thrown potion that killed peaceful monster would cause "the <mon> gets argry"
+thrown potion that killed peaceful monster would cause "the <mon> gets angry"
 	after the message about it being killed
 when poly'd into a hider and engulfed, attempt to hide via #monster was blocked
 	but feedback said "can't hide while held" rather than "while engulfed"
@@ -509,6 +509,8 @@ the Wizard, Angels and lawful minions, the Riders, shopkeep/priest in own room
 	are never frightened by tooled horns
 'Iu' would reveal unknown container contents if carrying one unpaid item inside
 	a hero-owned container whose contents weren't known
+docall wasn't taking the space allocation needed for the object name + "Call :" 
+        into account in the prompt string
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -574,9 +576,20 @@ try again to fix achievement recording bug with mines and sokoban prizes
 the fix for secret doors on special levels always having vertical orientation
 	resulted in some--but not all--secret doors within vertical walls
 	being displayed as horizontal walls while still hidden
+and the previous fix for the for secret doors didn't work if the level hadn't
+	been wallified yet (Cav quest) so horizontal wall with secret door
+	mis-displayed as a vertical wall segment could occur
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
+unix: freeing mailbox data at game end crashed if MAIL came from environment
+unix: fix for freeing MAIL introduced a one-byte buffer overrun which could
+	interfere with malloc/free operation
+unix: fix for freeing MAIL also introduced a memory leak whenever new mail
+	is detected and MAIL comes from the environment
+when clairvoyance lets you move the cursor to examine the map (if it occurs
+	when engulfed or underwater or when blessed clairvoyance finds a
+	monster), the "for instructions type '?'" prompt could be confusing
 
 
 Platform- and/or Interface-Specific Fixes
