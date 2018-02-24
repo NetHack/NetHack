@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 2/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1294,24 +1294,29 @@ int mmflags;
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION) {
 
-           first_mon = rndmonst();
-           second_mon = rndmonst();
-           final_mon = mtmp->data;
+          first_mon = rndmonst();
+          second_mon = rndmonst();
+          final_mon = mtmp->data;
+          final_mon->mlevel = max(first_mon->mlevel, second_mon->mlevel);
+          final_mon->mmove = max(first_mon->mmove, second_mon->mmove);
+          final_mon->ac = max(first_mon->ac, second_mon->ac);
+          /* should find a more efficient way to do attacks */
+          final_mon->mattk[0] = first_mon->mattk[0];
+          final_mon->mattk[1] = second_mon->mattk[1];
+          final_mon->mattk[2] = first_mon->mattk[2];
+          final_mon->mattk[3] = second_mon->mattk[3];
+          final_mon->mattk[4] = first_mon->mattk[4];
+          final_mon->mattk[5] = second_mon->mattk[5];
+          final_mon->msound = first_mon->msound;
+          final_mon->msize = second_mon->msize;
+          final_mon->cwt = second_mon->cwt;
+          final_mon->cnutrit = first_mon->cnutrit;
+          final_mon->mflags1 = first_mon->mflags1;
+          final_mon->mflags2 = second_mon->mflags2;
+          final_mon->mresists = first_mon->mresists;
+          final_mon->mconveys = second_mon->mconveys;
 
-            final_mon->mattk[0] = first_mon->mattk[0];
-            final_mon->mattk[1] = second_mon->mattk[1];
-            final_mon->mattk[2] = first_mon->mattk[2];
-            final_mon->mattk[3] = second_mon->mattk[3];
-            final_mon->mattk[4] = first_mon->mattk[4];
-            final_mon->mattk[5] = second_mon->mattk[5];
-            final_mon->msound = first_mon->msound;
-            final_mon->mmove = second_mon->mmove;
-            final_mon->mlevel = first_mon->mlevel;
-            final_mon->ac = first_mon->ac;
-            final_mon->mmove = second_mon->mmove;
-            final_mon->msize = second_mon->msize;
-
-            mtmp->data = final_mon;
+          mtmp->data = final_mon;
         }
     }
     if ((ct = emits_light(mtmp->data)) > 0)

@@ -2,6 +2,8 @@
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/23/18 by NullCGT */
+
 #include "hack.h"
 #include "tcap.h"
 
@@ -99,7 +101,7 @@ const struct class_sym def_monsyms[MAXMCLASSES] = {
     { DEF_NAGA, "", "naga" },
     { DEF_OGRE, "", "ogre" },
     { DEF_PUDDING, "", "pudding or ooze" },
-    { DEF_QUANTMECH, "", "quantum mechanic" },
+    { DEF_QUANTMECH, "", "aberrant being" },
     { DEF_RUSTMONST, "", "rust monster or disenchanter" },
     { DEF_SNAKE, "", "snake" },
     { DEF_TROLL, "", "troll" },

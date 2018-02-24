@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 2/23/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h" /* save & restore info */
 
@@ -386,8 +388,10 @@ register int oindx;
         /* clear last slot */
         if (found)
             disco[dindx - 1] = 0;
-        else
+        else {
+            pline("bad obj: %d", oindx);
             impossible("named object not in disco");
+        }
         update_inventory();
     }
 }

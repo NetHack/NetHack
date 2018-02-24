@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 2/23/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -268,6 +268,11 @@ NEARDATA struct permonst mons[] = {
         SIZ(850, 350, MS_BARK, MZ_MEDIUM), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISIBLE,
         CLR_BROWN),
+    MON("memory hound", S_DOG, LVL(7, 12, 2, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_BITE, AD_MEMR, 2, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(250, 200, MS_HISS, MZ_SMALL), MR_COLD, MR_COLD,
+        M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISION, CLR_BLUE),
     MON("winter wolf", S_DOG, LVL(7, 12, 4, 20, 0), (G_NOHELL | G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BREA, AD_COLD, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2681,6 +2686,16 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE | M2_COLLECT,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
+    MON("Lord of the Foocubi", S_DEMON, LVL(80, 18, -6, 80, -15),
+        (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
+        A(ATTK(AT_GAZE, AD_BLND, 4, 6), ATTK(AT_WEAP, AD_PHYS, 3, 6),
+          ATTK(AT_WEAP, AD_PHYS, 3, 6), ATTK(AT_CLAW, AD_SEDU, 0, 0),
+          ATTK(AT_CLAW, AD_SEDU, 0, 0), NO_ATTK),
+        SIZ(900, 500, MS_SEDUCE, MZ_HUMAN), MR_FIRE | MR_POISON, 0,
+        M1_FLY | M1_SEE_INVIS | M1_POIS | M1_TPORT_CNTRL | M1_TPORT,
+        M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY
+            | M2_LORD | M2_COLLECT,
+        M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
     MON("Baalzebub", S_DEMON, LVL(89, 9, -5, 85, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_BITE, AD_DRST, 2, 6), ATTK(AT_GAZE, AD_STUN, 2, 6), NO_ATTK,
@@ -2691,6 +2706,16 @@ struct permonst _mons2[] = {
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_WAITFORU | M3_INFRAVISIBLE | M3_INFRAVISION,
         HI_LORD),
+    MON("Mephisto", S_DEMON, LVL(105, 12, -7, 90, 20),
+        (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
+        A(ATTK(AT_MAGC, AD_SPEL, 1, 4), ATTK(AT_MAGC, AD_FIRE, 6, 6),
+          ATTK(AT_CLAW, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1500, 500, MS_CUSS, MZ_HUGE), MR_FIRE | MR_COLD | MR_POISON, 0,
+        M1_FLY | M1_SEE_INVIS | M1_HUMANOID | M1_POIS,
+        M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_STRONG
+            | M2_NASTY | M2_PRINCE | M2_MALE,
+        M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
     MON("Asmodeus", S_DEMON, LVL(105, 12, -7, 90, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 4, 4), ATTK(AT_MAGC, AD_COLD, 6, 6), NO_ATTK,

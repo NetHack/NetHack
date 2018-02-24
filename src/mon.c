@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 2/23/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -3941,6 +3941,7 @@ struct permonst *mdat;
         */
         case PM_HORNED_DEVIL:
         case PM_BALROG:
+        case PM_MEPHISTO:
         case PM_ASMODEUS:
         case PM_DISPATER:
         case PM_YEENOGHU:

@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 2/23/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -160,6 +160,8 @@ WEAPON("dagger", None,
        1, 1, 0, 30,  10,   4,  4,  3, 2, P,   P_DAGGER, IRON, HI_METAL),
 WEAPON("elven dagger", "runed dagger",
        0, 1, 0, 10,  10,   4,  5,  3, 2, P,   P_DAGGER, WOOD, HI_WOOD),
+WEAPON("bone knife", "sacrificial knife",
+     1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("orcish dagger", "crude dagger",
        0, 1, 0, 12,  10,   4,  3,  3, 2, P,   P_DAGGER, IRON, CLR_BLACK),
 WEAPON("silver dagger", None,
@@ -170,8 +172,6 @@ WEAPON("scalpel", None,
        1, 1, 0,  0,   5,   6,  3,  3, 2, S,   P_KNIFE, METAL, HI_METAL),
 WEAPON("knife", None,
        1, 1, 0, 20,   5,   4,  3,  2, 0, P|S, P_KNIFE, IRON, HI_METAL),
-WEAPON("bone knife", "sacrificial knife",
-      1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("stiletto", None,
        1, 1, 0,  2,   5,   4,  3,  2, 0, P|S, P_KNIFE, IRON, HI_METAL),
 /* 3.6: worm teeth and crysknives now stack;
@@ -500,6 +500,8 @@ SHIELD("small shield", None,
        1, 0, 0,          0, 6, 0,  30,  3, 9, 0,  WOOD, HI_WOOD),
 SHIELD("elven shield", "blue and green shield",
        0, 0, 0,          0, 2, 0,  40,  7, 8, 0,  WOOD, CLR_GREEN),
+SHIELD("tower shield", "large rectangular shield",
+      1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
 SHIELD("Uruk-hai shield", "white-handed shield",
        0, 0, 0,          0, 2, 0,  50,  7, 9, 0,  IRON, HI_METAL),
 SHIELD("orcish shield", "red-eyed shield",
@@ -508,8 +510,6 @@ SHIELD("large shield", None,
        1, 0, 1,          0, 3, 0, 100, 10, 8, 0,  IRON, HI_METAL),
 SHIELD("hide shield", None,
        1, 0, 1,          0, 2, 0, 25, 8, 8, 0,  LEATHER, CLR_ORANGE),
-SHIELD("tower shield", "large rectangular shield",
-       1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
 SHIELD("dwarvish roundshield", "large round shield",
        0, 0, 0,          0, 4, 0, 100, 10, 8, 0,  IRON, HI_METAL),
 SHIELD("shield of reflection", "polished silver shield",

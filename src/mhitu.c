@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 2/23/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1152,6 +1152,17 @@ register struct attack *mattk;
         (void) adjattrib(A_INT, -rnd(2), FALSE);
         forget_levels(25);  /* lose memory of 25% of levels */
         forget_objects(25); /* lose memory of 25% of objects */
+        break;
+    case AD_MEMR:
+        hitmsg(mtmp, mattk);
+        if (uncancelled) {
+            if (hallucination) {
+                pline("Your brain does a flip-flop!")
+            } else {
+                pline("Your memories seem muddled for a moment.");
+            }
+            forget_objects(2); /* lose memory of 2% of objects */
+        }
         break;
     case AD_PLYS:
         hitmsg(mtmp, mattk);
