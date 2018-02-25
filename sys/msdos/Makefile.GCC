@@ -648,8 +648,8 @@ $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 #==========================================
 
 $(U)lev_comp.exe:  $(SPLEVOBJS)
-	@rm -f temp.a
-	@ar ru temp.a $(SPLEVOBJS)
+	-rm -f temp.a
+	ar ru temp.a $(SPLEVOBJS)
 	$(LINK) $(LFLAGS) -o$@ temp.a
 
 ifeq ($(YACC_LEX),Y)
@@ -813,18 +813,18 @@ $(DAT)/nhtiles.bmp: $(TILEFILES) $(U)tile2bmp.exe
 	@$(subst /,\,chdir $(SRC))
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXTIO)
-	@rm -f temp.a
-	@ar ru temp.a $(TEXTIO)
+	-rm -f temp.a
+	ar ru temp.a $(TEXTIO)
 	$(LINK) $(LFLAGS) -o$@ $(O)tile2bmp.o temp.a
 
 $(U)tile2bin.exe: $(O)tile2bin.o $(TEXTIO)
-	@rm -f temp.a
-	@ar ru temp.a $(TEXTIO)
+	-rm -f temp.a
+	ar ru temp.a $(TEXTIO)
 	$(LINK) $(LFLAGS) -o$@ $(O)tile2bin.o temp.a
 
 $(U)til2bin2.exe: $(O)til2bin2.o $(TEXTIO2)
-	@rm -f temp.a
-	@ar ru temp.a $(TEXTIO2)
+	-rm -f temp.a
+	ar ru temp.a $(TEXTIO2)
 	$(LINK) $(LFLAGS) -o$@ $(O)til2bin2.o temp.a
 
 $(U)thintile.exe: $(O)thintile.o 
