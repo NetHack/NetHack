@@ -59,6 +59,12 @@ echo "Copying ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
 copy ..\..\include\patchl~1.h ..\..\include\patchlev.h
 if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
 ren ..\..\include\patchl~1.h patchlev.old
+:long2c
+echo "Copying ..\..\sys\share\pmatch~1.c -> ..\..\sys\share\pmatchre.c"
+copy ..\..\sys\share\pmatch~1.c ..\..\sys\share\pmatchre.c
+:long2d
+echo "Copying ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
+copy ..\..\sys\share\posixr~1.c ..\..\sys\share\posixreg.c
 :long2ok
 
 REM Missing guidebook is not fatal to the build process
