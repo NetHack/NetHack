@@ -311,12 +311,18 @@ NEARDATA struct permonst mons[] = {
         SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
         M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS,
         M2_HOSTILE | M2_NEUTER, 0, CLR_GRAY),
-    MON("floating eye", S_EYE, LVL(2, 1, 9, 10, 0), (G_GENO | 5),
+    MON("floating eye", S_EYE, LVL(2, 1, 9, 10, 0), (G_GENO | 3),
         A(ATTK(AT_NONE, AD_PLYS, 0, 70), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
         M1_FLY | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_BLUE),
+    MON("weeping eye", S_EYE, LVL(2, 1, 9, 10, 0), (G_GENO | 2),
+        A(ATTK(AT_NONE, AD_RUST, 0, 70), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
+        M1_FLY | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_CYAN),
     MON("freezing sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_NOHELL | G_GENO | 2),
         A(ATTK(AT_EXPL, AD_COLD, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -352,6 +358,12 @@ NEARDATA struct permonst mons[] = {
     /*
      * felines
      */
+   MON("serval", S_FELINE, LVL(0, 18, 6, 0, 0), (G_GENO | G_SGROUP | 2),
+       A(ATTK(AT_BITE, AD_PHYS, 1, 1), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+         NO_ATTK),
+       SIZ(150, 150, MS_MEW, MZ_SMALL), 0, 0,
+       M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_WANDER,
+       M3_INFRAVISIBLE, CLR_BROWN),
     MON("kitten", S_FELINE, LVL(2, 18, 6, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -942,7 +954,7 @@ NEARDATA struct permonst mons[] = {
      MON("death maggot", S_WORM, LVL(1, 12, 5, 0, 0), (G_GENO | G_SGROUP | 2),
          A(ATTK(AT_BITE, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
            NO_ATTK),
-         SIZ(600, 250, MS_SILENT, MZ_TINY), 0, 0,
+         SIZ(50, 50, MS_SILENT, MZ_TINY), 0, 0,
          M1_ANIMAL | M1_SLITHY | M1_NOLIMBS | M1_CARNIVORE | M1_NOTAKE,
          M2_HOSTILE | M2_UNDEAD, 0, CLR_GREEN),
     MON("baby long worm", S_WORM, LVL(5, 3, 5, 0, 0), G_GENO,
@@ -1390,6 +1402,15 @@ NEARDATA struct permonst mons[] = {
         M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
             | M1_UNSOLID | M1_AMPHIBIOUS | M1_SWIM,
         M2_STRONG | M2_NEUTER, 0, CLR_BLUE),
+    MON("fusion elemental", S_ELEMENTAL, LVL(25, 18, 2, 30, 0),
+        (G_NOCORPSE | 1),
+        A(ATTK(AT_CLAW, AD_FIRE, 2, 6), ATTK(AT_CLAW, AD_PHYS, 2, 6),
+          ATTK(AT_CLAW, AD_PHYS, 2, 6), ATTK(AT_ENGL, AD_PHYS, 1, 10),
+          NO_ATTK, NO_ATTK),
+        SIZ(0, 0, MS_SILENT, MZ_GIGANTIC), MR_POISON | MR_STONE | MR_FIRE, 0,
+        M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
+            | M1_UNSOLID | M1_FLY | M1_SWIM | M1_WALLWALK,
+        M2_STRONG | M2_NEUTER, 0, CLR_RED),
     /*
      * Fungi
      */

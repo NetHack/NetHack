@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/18/18 by NullCGT */
+/* Edited on 2/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -20,6 +20,8 @@
 #define MGC_CLONE_WIZ 10
 #define MGC_DEATH_TOUCH 11
 #define MGC_SONIC_SCREAM 12
+#define MGC_GAS_CLOUD 13
+#define MGC_SLIME_SPRAY 14
 
 /* monster cleric spells */
 #define CLC_OPEN_WOUNDS 0
@@ -113,9 +115,11 @@ int spellval;
     case 8:
         return MGC_DESTRY_ARMR;
     case 7:
+        return MGC_SLIME_SPRAY;
     case 6:
         return MGC_WEAKEN_YOU;
     case 5:
+        return MGC_GAS_CLOUD;
     case 4:
         return MGC_DISAPPEAR;
     case 3:
@@ -485,12 +489,26 @@ int spellnum;
     case MGC_SONIC_SCREAM:
         if (!Deaf) {
             pline("A deafening screech rips through the air around you!");
-            dmg = d(6, 6);
+            dmg = d(4, 6);
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
         } else {
             You_feel("a brief hum.");
         }
+        break;
+    case MGC_SLIME_SPRAY:
+        if (3 - rn2(20) < u.uac + dmg) {
+            You("are sprayed with slime!");
+            incr_itimeout(&Glib, rnd(10));
+        } else if (!Blind) {
+            pline("A blast of slime flies by you!");
+        }
+        break;
+    case MGC_GAS_CLOUD:
+        if (!Blinded) {
+            pline("A noxious cloud swirls around you!");
+        }
+        create_gas_cloud(u.ux, u.uy, 1, min(dmg + 1, 6));
         break;
     case MGC_PSI_BOLT:
         /* prior to 3.4.0 Antimagic was setting the damage to 1--this

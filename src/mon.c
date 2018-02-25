@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 2/24/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2009,6 +2009,18 @@ boolean was_swallowed; /* digestion */
             create_critters(rnd(10), &mons[PM_DEATH_MAGGOT], TRUE);
         else
             create_critters(rnd(20), &mons[PM_DEATH_MAGGOT], TRUE);
+        return FALSE;
+    }
+    /* A fusion elemental dissolves into elementals */
+    if (mdat == &mons[PM_FUSION_ELEMENTAL]) {
+        if (cansee(mon->mx, mon->my) && !was_swallowed) {
+            pline_The("body of %s splits into its separate elements!",
+                      mon_nam(mon));
+        }
+        create_critters(1, &mons[PM_EARTH_ELEMENTAL], TRUE);
+        create_critters(1, &mons[PM_WATER_ELEMENTAL], TRUE);
+        create_critters(1, &mons[PM_FIRE_ELEMENTAL], TRUE);
+        create_critters(1, &mons[PM_AIR_ELEMENTAL], TRUE);
         return FALSE;
     }
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
