@@ -1977,7 +1977,7 @@ int src;
     set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
         return fp;
-    } else if (strcmp(backwad_compat_configfile, configfile)) {
+    } else if (strcmp(backward_compat_configfile, configfile)) {
         set_configfile_name(backward_compat_configfile);
         if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;

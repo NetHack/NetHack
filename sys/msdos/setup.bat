@@ -1,10 +1,10 @@
 @echo off
 REM    NetHack 3.6 setup.bat   $NHDT-Date: 1432512792 2015/05/25 00:13:12 $ $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
-REM    Copyright (c) NetHack PC Development Team 1990 - 2012
+REM    Copyright (c) NetHack PC Development Team 1990 - 2018
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
-echo   Copyright (c) NetHack PC Development Team 1990 - 2012
+echo   Copyright (c) NetHack PC Development Team 1990 - 2018
 echo   NetHack may be freely redistributed.  See license for details.
 echo.
 REM setup batch file for msdos, see Install.dos for details.

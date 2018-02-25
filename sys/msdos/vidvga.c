@@ -758,7 +758,7 @@ vga_Init(void)
      *
      */
     tile_file = iflags.wc_tile_file;
-    if (tile_file == NULL || tile_file == '\0') {
+    if (tile_file == NULL || *tile_file == '\0') {
         tile_file = "nhtiles.bmp";
     }
     if (!read_tiles(tile_file, FALSE))
