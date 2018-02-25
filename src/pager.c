@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1505299155 2017/09/13 10:39:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1519529752 2018/02/25 03:35:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -510,8 +510,6 @@ boolean user_typed_name, without_asking;
     char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
     char *ep, *dbase_str;
     unsigned long txt_offset = 0L;
-    int chk_skip, pass = 1;
-    boolean found_in_file = FALSE, skipping_entry = FALSE, yes_to_moreinfo;
     winid datawin = WIN_ERR;
 
     fp = dlb_fopen(DATAFILE, "r");
@@ -519,12 +517,10 @@ boolean user_typed_name, without_asking;
         pline("Cannot open data file!");
         return;
     }
-
-    /*
-     * If someone passed us garbage, prevent fault.
-     */
-    if (!inp || (inp && strlen(inp) > (BUFSZ - 1))) {
-        pline("bad do_look buffer passed!");
+    /* If someone passed us garbage, prevent fault. */
+    if (!inp || strlen(inp) > (BUFSZ - 1)) {
+        impossible("bad do_look buffer passed (%s)!",
+                   !inp ? "null" : "too long");
         return;
     }
 
@@ -538,6 +534,18 @@ boolean user_typed_name, without_asking;
         dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
 
+    /*
+     * TODO:
+     * The switch from xname() to doname_vague_quan() in look_at_obj()
+     * had the unintendded side-effect of making names picked from
+     * pointing at map objects become harder to simplify for lookup.
+     * We should split the prefix and suffix handling used by wish
+     * parsing and also wizmode monster generation out into separate
+     * routines and use those routines here.  This currently lacks
+     * erosion handling and probably lots of other bits and pieces
+     * that wishing already understands and most of this duplicates
+     * stuff already done for wish handling or monster generation.
+     */
     if (!strncmp(dbase_str, "interior of ", 12))
         dbase_str += 12;
     if (!strncmp(dbase_str, "a ", 2))
@@ -546,6 +554,15 @@ boolean user_typed_name, without_asking;
         dbase_str += 3;
     else if (!strncmp(dbase_str, "the ", 4))
         dbase_str += 4;
+    else if (!strncmp(dbase_str, "some ", 5))
+        dbase_str += 5;
+    else if (digit(*dbase_str)) {
+        /* remove count prefix ("2 ya") which can come from looking at map */
+        while (digit(*dbase_str))
+            ++dbase_str;
+        if (*dbase_str == ' ')
+            ++dbase_str;
+    }
     if (!strncmp(dbase_str, "tame ", 5))
         dbase_str += 5;
     else if (!strncmp(dbase_str, "peaceful ", 9))
@@ -554,29 +571,65 @@ boolean user_typed_name, without_asking;
         dbase_str += 10;
     if (!strncmp(dbase_str, "saddled ", 8))
         dbase_str += 8;
+    if (!strncmp(dbase_str, "blessed ", 8))
+        dbase_str += 8;
+    else if (!strncmp(dbase_str, "uncursed ", 9))
+        dbase_str += 9;
+    else if (!strncmp(dbase_str, "cursed ", 7))
+        dbase_str += 7;
+    if (!strncmp(dbase_str, "empty ", 6))
+        dbase_str += 6;
+    if (!strncmp(dbase_str, "partly used ", 12))
+        dbase_str += 12;
+    else if (!strncmp(dbase_str, "partly eaten ", 13))
+        dbase_str += 13;
     if (!strncmp(dbase_str, "statue of ", 10))
         dbase_str[6] = '\0';
     else if (!strncmp(dbase_str, "figurine of ", 12))
         dbase_str[8] = '\0';
+    /* remove enchantment ("+0 aklys"); [for 3.6.0 and earlier, this wasn't
+       needed because looking at items on the map used xname() rather than
+       doname() hence known enchantment was implicitly suppressed] */
+    if (*dbase_str && index("+-", dbase_str[0]) && digit(dbase_str[1])) {
+        ++dbase_str; /* skip sign */
+        while (digit(*dbase_str))
+            ++dbase_str;
+        if (*dbase_str == ' ')
+            ++dbase_str;
+    }
+    /* "towel", "wet towel", and "moist towel" share one data.base entry;
+       for "wet towel", we keep prefix so that the prompt will ask about
+       "wet towel"; for "moist towel", we also want to ask about "wet towel".
+       (note: strncpy() only terminates output string if the specified
+       count is bigger than the length of the substring being copied) */
+    if (!strncmp(dbase_str, "moist towel", 11))
+        (void) strncpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {
-        /* adjust the input to remove "named " and convert to lower case */
-        char *alt = 0; /* alternate description */
+        long pass1offset = -1L;
+        int chk_skip, pass = 1;
+        boolean yes_to_moreinfo, found_in_file, pass1found_in_file,
+                skipping_entry;
+        char *ap, *alt = 0; /* alternate description */
 
-        if ((ep = strstri(dbase_str, " named ")) != 0)
+        /* adjust the input to remove "named " and "called " */
+        if ((ep = strstri(dbase_str, " named ")) != 0) {
             alt = ep + 7;
-        else if ((ep = strstri(dbase_str, " called ")) != 0) {
-            if (strlen(ep + 8) < BUFSZ - 1) {
-                Strcpy(givenname, ep + 8);
-                givenname[BUFSZ-1] = '\0';
-                alt = &givenname[0];
-            }
-        }
-        if (!ep)
+            if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
+                ep = ap; /* "named" is alt but truncate at "called" */
+        } else if ((ep = strstri(dbase_str, " called ")) != 0) {
+            copynchars(givenname, ep + 8, BUFSZ - 1);
+            alt = givenname;
+        } else
             ep = strstri(dbase_str, ", ");
         if (ep && ep > dbase_str)
             *ep = '\0';
+        /* remove charges or "(lit)" or wizmode "(N aum)" */
+        if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
+            *ep = '\0';
+        if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
+            *ap = '\0';
 
         /*
          * If the object is named, then the name is the alternate description;
@@ -588,21 +641,18 @@ boolean user_typed_name, without_asking;
         if (!alt)
             alt = makesingular(dbase_str);
 
-        if (!strcmp(alt, dbase_str))
-            pass = 0;
-
-        for (; pass >= 0; pass--) {
+        pass1found_in_file = FALSE;
+        for (pass = !strcmp(alt, dbase_str) ? 0 : 1; pass >= 0; --pass) {
+            found_in_file = skipping_entry = FALSE;
             txt_offset = 0L;
             if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
                 impossible("can't get to start of 'data' file");
-                dlb_fclose(fp);
-                return;
+                goto checkfile_done;
             }
             /* skip first record; read second */
             if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
                 impossible("can't read 'data' file");
-                (void) dlb_fclose(fp);
-                return;
+                goto checkfile_done;
             } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1
                        || txt_offset == 0L)
                 goto bad_data_file;
@@ -629,13 +679,15 @@ boolean user_typed_name, without_asking;
                             continue;
                         } else {
                             found_in_file = TRUE;
+                            if (pass == 1)
+                                pass1found_in_file = TRUE;
                             break;
                         }
                     }
                 }
             }
             if (found_in_file) {
-                long entry_offset;
+                long entry_offset, fseekoffset;
                 int entry_count;
                 int i;
 
@@ -644,37 +696,33 @@ boolean user_typed_name, without_asking;
                     if (!dlb_fgets(buf, BUFSZ, fp))
                         goto bad_data_file;
                 } while (!digit(*buf));
-                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-                bad_data_file:
-                    impossible("'data' file in wrong format or corrupted");
-                    /* window will exist if came here from below via 'goto' */
-                    if (datawin != WIN_ERR)
-                        destroy_nhwindow(datawin);
-                    (void) dlb_fclose(fp);
-                    return;
-                }
+                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2)
+                    goto bad_data_file;
+                fseekoffset = (long) txt_offset + entry_offset;
+                if (pass == 1)
+                    pass1offset = fseekoffset;
+                else if (fseekoffset == pass1offset)
+                    goto checkfile_done;
 
                 yes_to_moreinfo = FALSE;
                 if (!user_typed_name && !without_asking) {
-                    unsigned maxt = strlen("More info about \"\"?");
                     char *entrytext = pass ? alt : dbase_str;
-                    char question[BUFSZ];
+                    char question[QBUFSZ];
 
-                    if (strlen(entrytext) < BUFSZ - maxt) {
-                        Strcpy(question, "More info about \"");
-                        Strcat(question, entrytext);
-                        Strcat(question, "\"?");
-                    }
+                    Strcpy(question, "More info about \"");
+                    /* +2 => length of "\"?" */
+                    copynchars(eos(question), entrytext,
+                               (int) (sizeof question - 1
+                                      - (strlen(question) + 2)));
+                    Strcat(question, "\"?");
                     if (yn(question) == 'y')
                         yes_to_moreinfo = TRUE;
                 }
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
-                    if (dlb_fseek(fp, (long) txt_offset + entry_offset,
-                                  SEEK_SET) < 0) {
+                    if (dlb_fseek(fp, fseekoffset, SEEK_SET) < 0) {
                         pline("? Seek error on 'data' file!");
-                        (void) dlb_fclose(fp);
-                        return;
+                        goto checkfile_done;
                     }
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
@@ -686,13 +734,21 @@ boolean user_typed_name, without_asking;
                         putstr(datawin, 0, buf + 1);
                     }
                     display_nhwindow(datawin, FALSE);
-                    destroy_nhwindow(datawin);
+                    destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
-            } else if (user_typed_name && pass == 0)
+            } else if (user_typed_name && pass == 0 && !pass1found_in_file)
                 pline("I don't have any information on those things.");
         }
     }
+    goto checkfile_done; /* skip error feedback */
+
+ bad_data_file:
+    impossible("'data' file in wrong format or corrupted");
+ checkfile_done:
+    if (datawin != WIN_ERR)
+        destroy_nhwindow(datawin);
     (void) dlb_fclose(fp);
+    return;
 }
 
 int
@@ -1133,10 +1189,8 @@ coord *click_cc;
                     pline("Pick an object.");
 
                 ans = getpos(&cc, quick, what_is_an_unknown_object);
-                if (ans < 0 || cc.x < 0) {
-                    flags.verbose = save_verbose;
-                    return 0; /* done */
-                }
+                if (ans < 0 || cc.x < 0)
+                    break; /* done */
                 flags.verbose = FALSE; /* only print long question once */
             }
         }
@@ -1146,8 +1200,7 @@ coord *click_cc;
 
         /* Finally, print out our explanation. */
         if (found) {
-            /* Used putmixed() because there may be an encoded glyph present
-             */
+            /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
 
             /* check the data file for information about this thing */

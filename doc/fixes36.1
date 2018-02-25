@@ -509,8 +509,10 @@ the Wizard, Angels and lawful minions, the Riders, shopkeep/priest in own room
 	are never frightened by tooled horns
 'Iu' would reveal unknown container contents if carrying one unpaid item inside
 	a hero-owned container whose contents weren't known
-docall wasn't taking the space allocation needed for the object name + "Call :" 
-        into account in the prompt string
+docall for type of object could overflow its prompt buffer if there was a very
+	long type name previously assigned
+whatis lookup for 'more info?' would behave strangely for plural names, either
+	entered by player or from "N foo" stacks on the map
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository

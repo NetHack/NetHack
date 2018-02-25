@@ -54,10 +54,13 @@ suit or piece of armor
 		[ When Help Collides, by J. D. Berry ]
 aclys
 aklys
+thonged club
 	A short studded or spiked club attached to a cord allowing
 	it to be drawn back to the wielder after having been thrown.
 	It should not be confused with the atlatl, which is a device
 	used to throw spears for longer distances.
+
+	(NetHack's "aklys" is just a club and won't return if thrown.)
 ~agate ring
 agate*
 	Translucent, cryptocrystalline variety of quartz and a subvariety
@@ -5053,6 +5056,8 @@ tourist
 	Tourist, Rincewind had decided, meant "idiot".
 		[ The Colour of Magic, by Terry Pratchett ]
 towel
+wet towel
+moist towel
 	The Hitchhiker's Guide to the Galaxy has a few things to say
 	on the subject of towels.
 	A towel, it says, is about the most massively useful thing
