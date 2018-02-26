@@ -595,6 +595,8 @@ unix: fix for freeing MAIL also introduced a memory leak whenever new mail
 when clairvoyance lets you move the cursor to examine the map (if it occurs
 	when engulfed or underwater or when blessed clairvoyance finds a
 	monster), the "for instructions type '?'" prompt could be confusing
+prevent Mjollnir from being auto-quivered if it's been thrown without return
+	and then picked back up while quiver slot is empty
 
 
 Platform- and/or Interface-Specific Fixes
@@ -785,6 +787,9 @@ change #adjust's behavior when collecting compatible stacks; that used to
 a prayer result which results in uncursing some or all of the hero's items
 	won't uncurse a worn helm of opposite alignment since that would
 	facilitate the hero switching to another god by taking it off
+wielded aklys behaves like Mjollnir when thrown--it usually returns; unlike
+	Mjollnir, it isn't limited to Valkyries or need gauntlets of power
+	(so far, hero-only; an aklys won't return if thrown by a monster)
 
 
 Platform- and/or Interface-Specific New Features

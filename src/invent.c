@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1518053384 2018/02/08 01:29:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1519672703 2018/02/26 19:18:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -598,6 +598,11 @@ struct obj *obj;
 
     /* fill empty quiver if obj was thrown */
     if (flags.pickup_thrown && !uquiver && obj_was_thrown
+        /* if Mjollnir is thrown and fails to return, we want to
+           auto-pick it when we move to its spot, but not into quiver;
+           aklyses behave like Mjollnir when thrown while wielded, but
+           we lack sufficient information here make them exceptions */
+        && obj->oartifact != ART_MJOLLNIR
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
 added:
