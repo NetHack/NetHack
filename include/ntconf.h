@@ -69,6 +69,12 @@
 #define PORT_DEBUG /* include ability to debug international keyboard issues \
                       */
 
+#define RUNTIME_PORT_ID /* trigger run-time port identification for \
+                         * identification of exe CPU architecture   \
+                         */
+#define RUNTIME_PASTEBUF_SUPPORT
+
+
 #define SAFERHANGUP /* Define SAFERHANGUP to delay hangup processing   \
                      * until the main command loop. 'safer' because it \
                      * avoids certain cheats and also avoids losing    \
@@ -116,11 +122,6 @@ extern void FDECL(interject, (int));
 #pragma warning(disable : 4101) /* unreferenced local variable */
 #endif
 #endif /* _MSC_VER */
-
-
-#define RUNTIME_PORT_ID /* trigger run-time port identification for \
-                         * identification of exe CPU architecture   \
-                         */
 
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)

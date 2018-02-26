@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1459122529 2016/03/27 23:48:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1519228664 2018/02/21 15:57:44 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.51 $
 
 # Root of source tree:
 NHSROOT=..
@@ -610,6 +610,9 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
+	if [[ ! -f ../dat/gitinfo.txt ]]; then \
+	  (cd ..;perl -IDEVEL/hooksdir -MNHgithook -e '&NHgithook::nhversioning') || true; \
+	fi
 	../util/makedefs -v
 
 

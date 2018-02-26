@@ -7,7 +7,7 @@ NAME
 
 SYNOPSIS
        nethack [ -d directory ] [ -n ] [ -p profession ] [ -r race ] [ -[DX] ]
-       [ -u playername ] [ -dec ] [ -ibm ]
+       [ -u playername ] [ -dec ] [ -ibm ] [ --version[:paste] ]
 
        nethack [ -d directory ] -s [ -v ] [ -p profession ] [ -r race ] [
        playernames ]

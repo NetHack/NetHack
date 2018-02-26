@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1506993902 2017/10/03 01:25:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1519155525 2018/02/20 19:38:45 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -13,6 +13,13 @@
 #include "patchlev.h"
 #else
 #include "patchlevel.h"
+#endif
+
+#if defined(NETHACK_GIT_SHA)
+const char * NetHack_git_sha = NETHACK_GIT_SHA;
+#endif
+#if defined(NETHACK_GIT_BRANCH)
+const char * NetHack_git_branch = NETHACK_GIT_BRANCH;
 #endif
 
 STATIC_DCL void FDECL(insert_rtoption, (char *));
@@ -30,23 +37,36 @@ char *
 getversionstring(buf)
 char *buf;
 {
-    int details = 0;
+    boolean details = FALSE;
 
     Strcpy(buf, VERSION_ID);
-#if defined(RUNTIME_PORT_ID)
-    details++;
+#if defined(RUNTIME_PORT_ID) || \
+    defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
+    details = TRUE;
 #endif
 
     if (details) {
+#if defined(RUNTIME_PORT_ID) || defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
         int c = 0;
+#endif
+#if defined(RUNTIME_PORT_ID)
         char tmpbuf[BUFSZ];
         char *tmp = (char *)0;
+#endif
 
         Sprintf(eos(buf), " (");
 #if defined(RUNTIME_PORT_ID)
         tmp = get_port_id(tmpbuf);        
         if (tmp)
             Sprintf(eos(buf), "%s%s", c++ ? "," : "", tmp);
+#endif
+#if defined(NETHACK_GIT_SHA)
+        if (NetHack_git_sha)
+            Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_sha);
+#endif
+#if defined(NETHACK_GIT_BRANCH)
+        if (NetHack_git_branch)
+            Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_branch);
 #endif
         Sprintf(eos(buf), ")");
     }
@@ -128,6 +148,37 @@ doextversion()
         destroy_nhwindow(win);
     }
     return 0;
+}
+
+void early_version_info(pastebuf)
+boolean pastebuf;
+{
+    char buf[BUFSZ], buf2[BUFSZ];
+    char *tmp = getversionstring(buf);
+
+    /* this is early enough that we have to do
+       our own line-splitting */
+    if (tmp) {
+        tmp = strstri(buf," (");
+        if (tmp) *tmp++ = '\0';
+    }
+
+    Sprintf(buf2, "%s\n", buf);
+    if (tmp) Sprintf(eos(buf2), "%s\n", tmp);
+    raw_printf("%s", buf2);
+
+    if (pastebuf) {
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+        /*
+         * Call a platform/port-specific routine to insert the
+         * version information into a paste buffer. Useful for
+         * easy inclusion in bug reports.
+         */
+        port_insert_pastebuf(buf2);
+#else
+        raw_printf("%s", "Paste buffer copy is not available.\n");
+#endif
+    }
 }
 
 extern const char regex_id[];
