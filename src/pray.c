@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1514593198 2017/12/30 00:19:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1519662898 2018/02/26 16:34:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1496,7 +1496,7 @@ dosacrifice()
                 u.uachieve.ascended = 1;
                 pline(
                "An invisible choir sings, and you are bathed in radiance...");
-                godvoice(altaralign, "Congratulations, mortal!");
+                godvoice(altaralign, "Mortal, thou hast done well!");
                 display_nhwindow(WIN_MESSAGE, FALSE);
                 verbalize(
           "In return for thy service, I grant thee the gift of Immortality!");
