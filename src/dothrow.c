@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1519672703 2018/02/26 19:18:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1519752483 2018/02/27 17:28:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1308,10 +1308,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                    that slot is empty at the time; since hero will need to
                    explicitly rewield the weapon to get throw-and-return
                    capability back anyway, quivered or not shouldn't matter */
-                pline("%s fails to return!",
-                      upstart(obj->oartifact ? ONAME(obj)
-                                             : thesimpleoname(obj)));
-                /* continue with placing 'obj' at target location */
+                pline("%s to return!", Tobjnam(obj, "fail"));
+                /* continue below with placing 'obj' at target location */
             }
         }
 
