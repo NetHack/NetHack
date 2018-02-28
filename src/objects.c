@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 2/28/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -796,7 +796,8 @@ FOOD("pear",                 10,  1,  2, 0, VEGGY,  50, CLR_BRIGHT_GREEN),
 FOOD("melon",                10,  1,  5, 0, VEGGY, 100, CLR_BRIGHT_GREEN),
 FOOD("banana",               10,  1,  2, 0, VEGGY,  80, CLR_YELLOW),
 FOOD("carrot",               15,  1,  2, 0, VEGGY,  50, CLR_ORANGE),
-FOOD("sprig of wolfsbane",    7,  1,  1, 0, VEGGY,  40, CLR_GREEN),
+FOOD("pinch of catnip",       3,  1,  1, 0, VEGGY,  40, CLR_GREEN),
+FOOD("sprig of wolfsbane",    4,  1,  1, 0, VEGGY,  40, CLR_GREEN),
 FOOD("clove of garlic",       7,  1,  1, 0, VEGGY,  40, CLR_WHITE),
 /* name of slime mold is changed based on player's OPTION=fruit:something
    and bones data might have differently named ones from prior games */

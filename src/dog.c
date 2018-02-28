@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/10/18 by NullCGT */
+/* Edited on 2/28/18 by NullCGT */
 
 #include "hack.h"
 
@@ -843,6 +843,8 @@ register struct obj *obj;
                          : MANFOOD;
         case TIN:
             return metallivorous(mptr) ? ACCFOOD : MANFOOD;
+        case PINCH_OF_CATNIP:
+            return is_feline(mptr) ? DOGFOOD : MANFOOD;
         case APPLE:
             return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case CARROT:

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 2/28/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1811,6 +1811,14 @@ struct obj *otmp;
     case HUGE_CHUNK_OF_MEAT:
     case MEAT_RING:
         goto give_feedback;
+    case PINCH_OF_CATNIP:
+        if (is_feline(youmonst.data)) {
+            pline("Wow! That was excellent!");
+            make_confused(HConfusion + d(2, 4), FALSE);
+        } else {
+            pline("Blech! That was not very enjoyable.");
+        }
+        break;
     case CLOVE_OF_GARLIC:
         if (is_undead(youmonst.data)) {
             make_vomiting((long) rn1(context.victual.reqtime, 5), FALSE);
