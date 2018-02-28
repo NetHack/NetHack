@@ -1120,7 +1120,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         bhitpos.y = mon->my;
     } else if (u.dz) {
         if (u.dz < 0
-            /* Mjnollnir must we wielded to be thrown--caller verifies this;
+            /* Mjollnir must we wielded to be thrown--caller verifies this;
                aklys must we wielded as primary to return when thrown */
             && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR)
                 || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0))
@@ -1256,7 +1256,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             (void) mpickobj(u.ustuck, obj);
         thrownobj = (struct obj *) 0;
     } else {
-        /* Mjnollnir must we wielded to be thrown--caller verifies this;
+        /* Mjollnir must we wielded to be thrown--caller verifies this;
            aklys must we wielded as primary to return when thrown */
         if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
             || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0)) {
