@@ -339,7 +339,7 @@ BEGIN
             VALUE "FileDescription", "NetHack for Windows - Graphical Interface"
             VALUE "FileVersion", "3.6.1"
             VALUE "InternalName", "NetHackW"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2017.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2018.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
             VALUE "OriginalFilename", "NetHackW.exe"
             VALUE "PrivateBuild", "140606"
             VALUE "ProductName", "NetHack"

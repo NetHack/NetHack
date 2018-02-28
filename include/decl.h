@@ -422,6 +422,15 @@ E struct plinemsg_type *plinemsg_types;
 E const char *ARGV0;
 #endif
 
+enum earlyarg {ARG_DEBUG, ARG_VERSION};
+
+struct early_opt {
+    enum earlyarg e;
+    const char *name;
+    int minlength;
+    boolean valallowed;
+};
+
 #undef E
 
 #endif /* DECL_H */
