@@ -1,0 +1,55 @@
+# NetHack may be freely redistributed.  See license for details.
+#
+# Statuary
+#
+# By NullCGT, based on Oracle.des
+
+LEVEL: "statuary"
+
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  TRAP: "statue", random
+  TRAP: "statue", random
+  OBJECT: random,random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  MONSTER: ('c',"cockatrice"),random
+  TRAP: "statue", random
+  TRAP: "statue", random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: "statue", random
+  MONSTER: random, random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  CONTAINER:('`',"statue"),random {
+      [100%]: OBJECT:('/',random)
+      [50%]: OBJECT:('/',random)
+      [50%]: OBJECT:('/',random)
+  }
+  MONSTER: random, random
+  MONSTER: random, random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: "statue", random
+  TRAP: "statue", random
+  MONSTER: random, random
+}
+
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: "statue", random
+  MONSTER: random, random
+}
+
+RANDOM_CORRIDORS

@@ -1,7 +1,7 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1518220654 2018/02/09 23:57:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
-# Edited 2/15/18 by NullCGT
+# Edited 3/1/18 by NullCGT
 #
 #==============================================================================
 # Build Tools Environment
@@ -610,7 +610,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
 	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
 	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des \
-  $(DAT)\cartomancer.des  $(DAT)\void.des
+  $(DAT)\cartomancer.des  $(DAT)\void.des $(DAT)\statuary.des \
 	cd $(DAT)
 	$(U)levcomp bigroom.des
 	$(U)levcomp castle.des
@@ -621,7 +621,9 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)levcomp medusa.des
 	$(U)levcomp oracle.des
 	$(U)levcomp sokoban.des
+	$(U)levcomp statuary.des
 	$(U)levcomp tower.des
+	$(U)levcomp void.des
 	$(U)levcomp yendor.des
 	$(U)levcomp arch.des
 	$(U)levcomp barb.des
@@ -637,7 +639,6 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)levcomp tourist.des
 	$(U)levcomp valkyrie.des
 	$(U)levcomp wizard.des
-	$(U)levcomp void.des
 	cd $(SRC)
 	echo sp_levs done > $(O)sp_lev.tag
 
@@ -1198,6 +1199,7 @@ spotless: clean
 	if exist $(DAT)\baalz.lev	del $(DAT)\baalz.lev
 	if exist $(DAT)\bigrm-*.lev	del $(DAT)\bigrm-*.lev
 	if exist $(DAT)\castle.lev	del $(DAT)\castle.lev
+	if exist $(DAT)\statuary.lev	del $(DAT)\statuary.lev
 	if exist $(DAT)\void.lev	del $(DAT)\void.lev
 	if exist $(DAT)\data		del $(DAT)\data
 	if exist $(DAT)\dungeon		del $(DAT)\dungeon

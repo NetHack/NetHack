@@ -1125,8 +1125,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (u.dz < 0
             /* Mjollnir must we wielded to be thrown--caller verifies this;
                aklys must we wielded as primary to return when thrown */
-            && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR
-                || obj->oartifact == ART_GUNGNIR)
+            && ((Role_if(PM_VALKYRIE) && (obj->oartifact == ART_MJOLLNIR
+                || obj->oartifact == ART_GUNGNIR))
                 || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0))
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
@@ -1260,34 +1260,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             (void) mpickobj(u.ustuck, obj);
         thrownobj = (struct obj *) 0;
     } else {
-<<<<<<< HEAD
-        /* the code following might become part of dropy() */
-        if ((obj->oartifact == ART_MJOLLNIR || obj->oartifact == ART_GUNGNIR)
-            && Role_if(PM_VALKYRIE)
-            && rn2(100)) {
-            /* we must be wearing Gauntlets of Power to get here */
-            sho_obj_return_to_u(obj); /* display its flight */
-
-            if (!impaired && rn2(100)) {
-                pline("%s to your hand!", Tobjnam(obj, "return"));
-                obj = addinv(obj);
-                (void) encumber_msg();
-                setuwep(obj);
-                u.twoweap = twoweap;
-                if (cansee(bhitpos.x, bhitpos.y))
-                    newsym(bhitpos.x, bhitpos.y);
-            } else {
-                int dmg = rn2(2);
-                if (!dmg) {
-                    pline(Blind ? "%s lands %s your %s."
-                                : "%s back to you, landing %s your %s.",
-                          Blind ? Something : Tobjnam(obj, "return"),
-                          Levitation ? "beneath" : "at",
-                          makeplural(body_part(FOOT)));
-=======
         /* Mjollnir must we wielded to be thrown--caller verifies this;
            aklys must we wielded as primary to return when thrown */
-        if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
+        if (((obj->oartifact == ART_MJOLLNIR || obj->oartifact == ART_GUNGNIR)
+            && Role_if(PM_VALKYRIE))
             || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0)) {
             if (rn2(100)) {
                 sho_obj_return_to_u(obj); /* display its flight */
@@ -1300,7 +1276,6 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                     u.twoweap = twoweap;
                     if (cansee(bhitpos.x, bhitpos.y))
                         newsym(bhitpos.x, bhitpos.y);
->>>>>>> ee64ef548264cde0ea3de2bfe5e7064fb3588aa4
                 } else {
                     int dmg = rn2(2);
 

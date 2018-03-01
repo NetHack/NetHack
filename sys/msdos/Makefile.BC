@@ -2,7 +2,7 @@
 # Copyright (c) Yitzhak Sapir, 1999-2006.
 # NetHack may be freely distributed.  See license for details.
 #
-# Edited on 2/15/18 by NullCGT
+# Edited on 3/1/18 by NullCGT
 
 # PC NetHack 3.6 Makefile for Borland C++ 3.1 and 4.5.
 #
@@ -719,7 +719,8 @@ SPLEVDES = $(DAT)\Arch.des $(DAT)\Barb.des $(DAT)\bigroom.des \
 	$(DAT)\mines.des $(DAT)\oracle.des $(DAT)\Priest.des \
 	$(DAT)\Ranger.des $(DAT)\Rogue.des $(DAT)\Samurai.des \
 	$(DAT)\Tourist.des $(DAT)\tower.des $(DAT)\Valkyrie.des \
-	$(DAT)\Wizard.des $(DAT)\yendor.des  $(DAT)\void.des
+	$(DAT)\Wizard.des $(DAT)\yendor.des  $(DAT)\void.des \
+	$(DAT)\statuary.des
 
 #
 # Utility Objects.
@@ -971,7 +972,9 @@ $(DAT)\sp_lev.tag: $(U)utility.tag $(SPLEVDES)
 	$(U)lev_comp medusa.des
 	$(U)lev_comp oracle.des
 	$(U)lev_comp sokoban.des
+	$(U)lev_comp statuary.des
 	$(U)lev_comp tower.des
+	$(U)lev_comp void.des
 	$(U)lev_comp yendor.des
 	$(U)lev_comp arch.des
 	$(U)lev_comp barb.des
@@ -987,7 +990,6 @@ $(DAT)\sp_lev.tag: $(U)utility.tag $(SPLEVDES)
 	$(U)lev_comp tourist.des
 	$(U)lev_comp valkyrie.des
 	$(U)lev_comp wizard.des
-	$(U)lev_comp void.des
 	cd $(SRC)
 	echo sp_levs done > $(DAT)\sp_lev.tag
 

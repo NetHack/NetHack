@@ -2,7 +2,7 @@
 #include "date.h"
 #include "patchlevel.h"
 
-/* Edited 2/15/18 by NullCGT */
+/* Edited 3/1/18 by NullCGT */
 
 /* Carbon 'carb' resource
  * has been made obsolete by the 'plst' resource below.
@@ -176,6 +176,7 @@ read 'File' (1167,"Car-goal.lev") "Car-goal.lev";
 read 'File' (1168,"Car-loca.lev") "Car-loca.lev";
 read 'File' (1169,"Car-strt.lev") "Car-strt.lev";
 read 'File' (1170,"void.lev") "void.lev";
+read 'File' (1171,"statuary.lev") "statuary.lev";
 #else
 read 'File' (1000,"cmdhelp") ":dat:cmdhelp";
 read 'File' (1001,"help") ":dat:help";
@@ -311,4 +312,5 @@ read 'File' (1167,"Car-goal.lev") ":lib:Car-goal.lev";
 read 'File' (1168,"Car-loca.lev") ":lib:Car-loca.lev";
 read 'File' (1169,"Car-strt.lev") ":lib:Car-strt.lev";
 read 'File' (1170,"void.lev") ":lib:void.lev";
+read 'File' (1171,"statuary.lev") ":lib:statuary.lev";
 #endif

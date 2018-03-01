@@ -254,7 +254,7 @@ char **argv;
         ":dat:endgame.des", ":dat:gehennom.des", ":dat:knox.des",
         ":dat:medusa.des",  ":dat:mines.des",    ":dat:oracle.des",
         ":dat:sokoban.des", ":dat:tower.des",    ":dat:yendor.des",
-        ":dat:Cartomancer.des", ":dat:void.des",
+        ":dat:Cartomancer.des", ":dat:void.des", ":dat:statuary.des"
     };
 
     argc = SIZE(mac_argv);

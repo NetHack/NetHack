@@ -1,7 +1,7 @@
 #	NetHack Makefile.
 # NetHack 3.6  Makefile.top	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $
 
-# Edited 2/15/18 by NullCGT
+# Edited 3/1/18 by NullCGT
 
 # Root of source tree:
 NHSROOT=.
@@ -85,7 +85,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev \
 	minetn-?.lev oracle.lev orcus.lev sanctum.lev soko?-?.lev \
 	tower?.lev valley.lev wizard?.lev \
 	astral.lev air.lev earth.lev fire.lev water.lev \
-	void.lev
+	statuary.lev void.lev
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
 DATNODLB = $(VARDATND) license symbols
