@@ -4,6 +4,8 @@ $ ! $NHDT-Date: 1465133391 2016/06/05 13:29:51 $  $NHDT-Branch: NetHack-3.6.0 $:
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
+$ ! Edited on 3/1/18 by NullCGT
+$ !
 $ ! Note: this command procedure is also used by the top level Makefile
 $ ! if you build and install with MMS or MMK.  In that situation, only the
 $ ! Makefile will need any editing.
@@ -39,11 +41,13 @@ $	spec_files = "AIR.LEV,ASMODEUS.LEV,ASTRAL.LEV,BAALZ.LEV,BIGRM-%.LEV," -
 		   + "WATER.LEV,WIZARD%.LEV"
 $	spec_input = "bigroom.des castle.des endgame.des " -
 		   + "gehennom.des knox.des medusa.des mines.des " -
-		   + "oracle.des sokoban.des tower.des yendor.des"
+		   + "oracle.des sokoban.des tower.des yendor.des" -
+			 + "void.des statuary.des"
 $	qstl_files = "%%%-GOAL.LEV,%%%-FIL%.LEV,%%%-LOCA.LEV,%%%-STRT.LEV"
 $	qstl_input = "Arch.des Barb.des Caveman.des Healer.des " -
 		   + "Knight.des Monk.des Priest.des Ranger.des Rogue.des " -
-		   + "Samurai.des Tourist.des Wizard.des Valkyrie.des"
+		   + "Samurai.des Tourist.des Wizard.des Valkyrie.des" -
+			 + "Cartomancer.des"
 $	dngn_files = "DUNGEON."
 $	dngn_input = "dungeon.pdf"
 $	dlb_files  = help_files + "," + data_files + "," -

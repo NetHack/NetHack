@@ -1,6 +1,8 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
 #	NetHack 3.6	Makefile.dat	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $	$NHDT-Branch: master $:$NHDT-Revision: 1.8 $
 
+# Edited on 3/1/18 by NullCGT
+
 #  Copy this file to [.dat]Makefile.; no editing needed.
 
 MAKE	= $(MMS)
@@ -32,7 +34,8 @@ QUESTLEVS = Arch.des Barb.des Caveman.des Cartomancer.des Healer.des \
 	Knight.des Monk.des Priest.des Ranger.des Rogue.des Samurai.des Tourist.des \
 	Valkyrie.des Wizard.des
 SPECLEVS  = bigroom.des castle.des endgame.des gehennom.des knox.des \
-	medusa.des mines.des oracle.des sokoban.des tower.des yendor.des
+	medusa.des mines.des oracle.des sokoban.des statuary.des tower.des \
+	void.des yendor.des
 
 all :	$(VARDAT) $(DUNGEON) $(MARKERS) $(DLB)
       @ $(ECHO) "data files are up to date."

@@ -1,6 +1,8 @@
 #	NetHack Makefile.
 # NetHack 3.6  Makefile.dat	$NHDT-Date: 1447844574 2015/11/18 11:02:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $
 
+# Edited on 3/1/18 by NullCGT
+
 # Root of source tree:
 NHSROOT=..
 
@@ -127,7 +129,7 @@ options:	../util/makedefs
 
 spec_levs: ../util/lev_comp \
 	bigroom.des castle.des endgame.des gehennom.des knox.des medusa.des \
-	mines.des oracle.des sokoban.des tower.des yendor.des
+	mines.des oracle.des sokoban.des statuary.des tower.des void.des yendor.des
 	../util/lev_comp bigroom.des
 	../util/lev_comp castle.des
 	../util/lev_comp endgame.des
@@ -137,7 +139,9 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp mines.des
 	../util/lev_comp oracle.des
 	../util/lev_comp sokoban.des
+	../util/lev_comp statuary.des
 	../util/lev_comp tower.des
+	../util/lev_comp void.des
 	../util/lev_comp yendor.des
 	touch spec_levs
 
