@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/28/18 by NullCGT */
+/* Edited on 3/1/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -161,7 +161,7 @@ WEAPON("dagger", None,
 WEAPON("elven dagger", "runed dagger",
        0, 1, 0, 10,  10,   4,  5,  3, 2, P,   P_DAGGER, WOOD, HI_WOOD),
 WEAPON("bone knife", "sacrificial knife",
-     1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
+       1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("orcish dagger", "crude dagger",
        0, 1, 0, 12,  10,   4,  3,  3, 2, P,   P_DAGGER, IRON, CLR_BLACK),
 WEAPON("silver dagger", None,
@@ -184,7 +184,9 @@ WEAPON("crysknife", None,
 
 /* axes */
 WEAPON("axe", None,
-       1, 0, 0, 40,  60,   8,  6,  4, 0, S,   P_AXE, IRON, HI_METAL),
+       1, 0, 0, 30,  60,   8,  6,  4, 0, S,   P_AXE, IRON, HI_METAL),
+WEAPON("throwing axe", None,
+       1, 1, 0, 10,  60,   10,  5,  3, 0, S,   P_AXE, IRON, HI_METAL),
 WEAPON("battle-axe", "double-headed axe",       /* "double-bitted"? */
        0, 0, 1, 10, 120,  40,  8,  6, 0, S,   P_AXE, IRON, HI_METAL),
 

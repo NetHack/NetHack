@@ -4,6 +4,8 @@
 
 /* shknam.c -- initialize a shop */
 
+/* Edited on 3/1/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
@@ -204,7 +206,7 @@ static const char *const shkhealthfoods[] = {
 const struct shclass shtypes[] = {
     { "general store",
       RANDOM_CLASS,
-      42,
+      40,
       D_SHOP,
       { { 100, RANDOM_CLASS },
         { 0, 0 },
@@ -312,14 +314,14 @@ const struct shclass shtypes[] = {
       shkbooks },
     { "archery emporium",
       WEAPON_CLASS,
-      5,
+      2,
       D_SHOP,
       { { 25, -BOW },
         { 25, -ARROW },
         { 20, -ELVEN_BOW },
         { 20, -ELVEN_ARROW },
-        { 10, -SILVER_ARROW },
-        { 0, 0 } },
+        { 5, -SILVER_ARROW },
+        { 5, WEAPON_CLASS } },
       shkweapons },
     { "health food store",
       FOOD_CLASS,

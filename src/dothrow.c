@@ -1043,7 +1043,8 @@ struct obj *obj;
                       || (is_blade(obj) && !is_sword(obj)
                           && (objects[obj->otyp].oc_dir & PIERCE))
                       /* special cases [might want to add AXE] */
-                      || obj->otyp == WAR_HAMMER || obj->otyp == AKLYS);
+                      || obj->otyp == WAR_HAMMER || obj->otyp == AKLYS
+                      || obj->otyp == THROWING_AXE);
 }
 
 /* the currently thrown object is returning to you (not for boomerangs) */
