@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/10/18 by NullCGT */
+/* Edited on 3/2/18 by NullCGT */
 
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
@@ -134,6 +134,7 @@ static struct Bool_Opt {
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },
     { "hitpointbar", &iflags.wc2_hitpointbar, FALSE, SET_IN_GAME }, /*WC2*/
+    { "intrinsicswap", &flags.intrinsicswap, TRUE, DISP_IN_GAME },
 #ifndef MAC
     { "ignintr", &flags.ignintr, FALSE, SET_IN_GAME },
 #else

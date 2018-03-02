@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/24/18 by NullCGT */
+/* Edited on 3/2/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -2402,6 +2402,12 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_LORD | M2_PEACEFUL | M2_COLLECT,
         M3_INFRAVISIBLE, CLR_WHITE),
+    MON("master of cats", S_HUMAN, LVL(14, 18, 5, 50, 0), (G_UNIQ | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
+          ATTK(AT_BITE, AD_PHYS, 1, 10), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HISS, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_CARNIVORE, M2_NOPOLY | M2_HUMAN | M2_LORD,
+        M3_INFRAVISION | M3_INFRAVISIBLE, HI_LORD),
     /* high priests always have epri and always have ispriest set */
     MON("high priest", S_HUMAN, LVL(25, 15, 7, 70, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_KICK, AD_PHYS, 2, 8),

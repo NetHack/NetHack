@@ -6,6 +6,8 @@
 /* patchlevel.h if needed.  Changing the instance_flags structure does     */
 /* not require incrementing EDITLEVEL.                                     */
 
+/* Edited on 3/2/18 by NullCGT */
+
 #ifndef FLAG_H
 #define FLAG_H
 
@@ -34,6 +36,7 @@ struct flag {
     boolean help;            /* look in data file for info about stuff */
     boolean ignintr;         /* ignore interrupts */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
+    boolean intrinsicswap;   /* only allow a single resistance through food */
     boolean invlet_constant; /* let objects keep their inventory symbol */
     boolean legacy;          /* print game entry "story" */
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */

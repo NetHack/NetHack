@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/24/18 by NullCGT */
+/* Edited on 3/2/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1810,12 +1810,24 @@ struct monst *mtmp;
     boolean surviver;
     struct obj *lifesave = mlifesaver(mtmp);
 
-    if (lifesave) {
+    if (lifesave || monsndx(mtmp->data) == PM_MASTER_OF_CATS) {
         /* not canseemon; amulets are on the head, so you don't want
          * to show this for a long worm with only a tail visible.
          * Nor do you check invisibility, because glowing and
          * disintegrating amulets are always visible. */
-        if (cansee(mtmp->mx, mtmp->my)) {
+        if (monsndx(mtmp->data) == PM_MASTER_OF_CATS) {
+          if (canseemon(mtmp)) {
+            pline("But wait...");
+            pline("%s had lives to spare!", Monnam(mtmp));
+          }
+            if (!In_endgame(&u.uz) && !u.uhave.amulet) {
+                /* based on muse.c code */
+                d_level flev;
+                get_level(&flev, random_teleport_level());
+                migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
+                                 (coord *) 0);
+            }
+        } else if (cansee(mtmp->mx, mtmp->my)) {
             pline("But wait...");
             pline("%s medallion begins to glow!", s_suffix(Monnam(mtmp)));
             makeknown(AMULET_OF_LIFE_SAVING);
@@ -1829,7 +1841,9 @@ struct monst *mtmp;
             }
             pline_The("medallion crumbles to dust!");
         }
-        m_useup(mtmp, lifesave);
+        if (lifesave) {
+            m_useup(mtmp, lifesave);
+        }
 
         surviver = !(mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);
         mtmp->mcanmove = 1;
@@ -2022,6 +2036,20 @@ boolean was_swallowed; /* digestion */
         create_critters(1, &mons[PM_FIRE_ELEMENTAL], TRUE);
         create_critters(1, &mons[PM_AIR_ELEMENTAL], TRUE);
         return FALSE;
+    }
+    /* The master of cats has nine lives, symbolized by going up in level 9
+       times. */
+    if (mdat == &mons[PM_MASTER_OF_CATS]) {
+        /* this is an AWFUL hack, but for now I think its better than creating
+           an entire mextra struct. It could be interesting to add a field in
+           the mon struct to determine how many times that monster has returned
+           to life. */
+        if (mdat->mlevel < 22) {
+            lifesaved_monster(mon);
+            grow_up(mon, (struct monst *) 0);
+            mdat->mlevel++;
+            return FALSE;
+        }
     }
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)

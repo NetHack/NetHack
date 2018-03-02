@@ -1,6 +1,6 @@
 # Hallucinatory monsters
 #
-# Edited on 2/12/18 by NullCGT
+# Edited on 3/2/18 by NullCGT
 #
 # prefix codes:
 # dash          -  female, personal name
@@ -106,6 +106,7 @@ creeping coins
 
 # Greek legend
 hydra
+satyr
 siren
 
 # Monty Python
@@ -230,7 +231,6 @@ slow loris
 sea cucumber
 tapeworm
 liger
-velociraptor
 corpulent porpoise
 quokka
 potoo
@@ -271,6 +271,10 @@ netsplit
 wiki
 peer
 COBOL
+segmentation fault
+goto statement
+spaghetti code
+recursion
 
 # bugs
 bohrbug

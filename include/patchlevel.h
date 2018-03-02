@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/2/18 by NullCGT */
+
 /* NetHack 3.6.1 */
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 6
@@ -13,7 +15,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 0
+#define EDITLEVEL 1
 
 #define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2018"
 #define COPYRIGHT_BANNER_B \
@@ -37,7 +39,7 @@
 
 /*  Patch 1, [insert date here]
  *  A couple of dozen bug fixes.
- *  
+ *
  */
 
 /*

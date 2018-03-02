@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/28/18 by NullCGT */
+/* Edited on 3/2/18 by NullCGT */
 
 #include "hack.h"
 
@@ -823,6 +823,36 @@ register struct permonst *ptr;
     return res;
 }
 
+/* This is used for removing all obtained resistances when eating a corpse.
+   For now, keeping this to just resistances, since those are fairly trivial
+   to obtain. */
+void
+remresists()
+{
+    /* immediately return if intrinsicswap is disabled.  */
+    if (!flags.intrinsicswap) {
+        return;
+    }
+    /* otherwise, drop all intrinsic resistances gained through corpses.
+       Sticking with just these for now, because some of the others are
+       hard enough to obtain. */
+    if (HFire_resistance & FROMOUTSIDE) {
+        HFire_resistance &= ~INTRINSIC;
+    }
+    if (HCold_resistance & FROMOUTSIDE) {
+        HCold_resistance &= ~INTRINSIC;
+    }
+    if (HDisint_resistance & FROMOUTSIDE) {
+        HDisint_resistance &= ~INTRINSIC;
+    }
+    if (HShock_resistance & FROMOUTSIDE) {
+        HShock_resistance &= ~INTRINSIC;
+    }
+    if (HSleep_resistance & FROMOUTSIDE) {
+        HSleep_resistance &= ~INTRINSIC;
+    }
+}
+
 /* givit() tries to give you an intrinsic based on the monster's level
  * and what type of intrinsic it is trying to give you.
  */
@@ -864,6 +894,7 @@ register struct permonst *ptr;
     case FIRE_RES:
         debugpline0("Trying to give fire resistance");
         if (!(HFire_resistance & FROMOUTSIDE)) {
+            remresists();
             You(Hallucination ? "be chillin'." : "feel a momentary chill.");
             HFire_resistance |= FROMOUTSIDE;
         }
@@ -871,6 +902,7 @@ register struct permonst *ptr;
     case SLEEP_RES:
         debugpline0("Trying to give sleep resistance");
         if (!(HSleep_resistance & FROMOUTSIDE)) {
+            remresists();
             You_feel("wide awake.");
             HSleep_resistance |= FROMOUTSIDE;
         }
@@ -878,6 +910,7 @@ register struct permonst *ptr;
     case COLD_RES:
         debugpline0("Trying to give cold resistance");
         if (!(HCold_resistance & FROMOUTSIDE)) {
+            remresists();
             You_feel("full of hot air.");
             HCold_resistance |= FROMOUTSIDE;
         }
@@ -885,6 +918,7 @@ register struct permonst *ptr;
     case DISINT_RES:
         debugpline0("Trying to give disintegration resistance");
         if (!(HDisint_resistance & FROMOUTSIDE)) {
+            remresists();
             You_feel(Hallucination ? "totally together, man." : "very firm.");
             HDisint_resistance |= FROMOUTSIDE;
         }
@@ -892,6 +926,7 @@ register struct permonst *ptr;
     case SHOCK_RES: /* shock (electricity) resistance */
         debugpline0("Trying to give shock resistance");
         if (!(HShock_resistance & FROMOUTSIDE)) {
+            remresists();
             if (Hallucination)
                 You_feel("grounded in reality.");
             else
