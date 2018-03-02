@@ -2,6 +2,8 @@
 #	Copyright (c) 1990-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
+# Edited on 3/1/18 by NullCGT
+#
 #	The dungeon description file for the "standard" 3.1 NetHack.
 #
 #	Note:	The order of the definition of dungeons in this file
@@ -22,6 +24,7 @@ LEVELDESC:	roguelike
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
+RNDLEVEL:	"statuary" "S" @ (18, 2) 60 10
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 10
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
