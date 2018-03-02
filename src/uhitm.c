@@ -540,7 +540,7 @@ struct attack *uattk;
         mhit = (tmp > dieroll);
         result = known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                              uattk, dieroll);
-        (void) passive(mtmp, uwep, mhit, DEADMONSTER(mtmp), AT_WEAP, !uwep);
+        (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
         if (mon == mtmp)
             malive = result;
     }
