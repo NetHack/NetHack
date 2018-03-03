@@ -3183,12 +3183,12 @@ mars
 martial arts
 unarmed combat
 bare*handed combat
-        "What else can we do? None of this is fast enough." "It will have
-        to be." He stood up, a tall, broad wall of a man.  "Why don't you
-        ask around, see if anyone in the neighborhoods knows anything
-        about martial arts.  You need more than a book or two to learn
-        good dependable unarmed combat."
-                [ Parable of the Sower, by Octavia Butler ]
+	"What else can we do? None of this is fast enough." "It will have
+	to be." He stood up, a tall, broad wall of a man.  "Why don't you
+	ask around, see if anyone in the neighborhoods knows anything
+	about martial arts.  You need more than a book or two to learn
+	good dependable unarmed combat."
+		[ Parable of the Sower, by Octavia Butler ]
 master assassin
 	He strolled down the stairs, followed by a number of assassins.
 	When he was directly in front of Ymor he said: "I've come for
@@ -3943,6 +3943,30 @@ user
 	Might just kill you.
 		[ It's a Jungle Out There, by Randy Newman ]
 #			[ theme song from "Monk" ]
+polearm
+* polearm
+partisan
+ranseur
+spetum
+glaive
+halberd
+bardiche
+angled poleaxe
+long poleaxe
+voulge
+pole cleaver
+fauchard
+pole sickle
+guisarme
+bill-guisarme
+lucern hammer
+bec de corbin
+	Many of the weapons of the Middle Ages were poled or long-shafted
+	arms.  Unlike the ancient spear or javelin, however, they were not
+	intended to be thrown.  Some were devices with simple single- or
+	double-edged blades and nothing more, while others combined
+	the pick, spear, and hammer or axe all in one weapon.
+		[ Heraldry and Armor of the Middle Ages, by Marvin H. Pakula ]
 polymorph trap
 	One morning, as Gregor Samsa was waking up from anxious dreams,
 	he discovered that in bed he had been changed into a monstrous
