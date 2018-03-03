@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1519752483 2018/02/27 17:28:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1520103267 2018/03/03 18:54:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1078,6 +1078,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
     notonhead = FALSE; /* reset potentially stale value */
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
         boolean slipok = TRUE;
+
         if (ammo_and_launcher(obj, uwep))
             pline("%s!", Tobjnam(obj, "misfire"));
         else {
@@ -1129,6 +1130,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                   ceiling(u.ux, u.uy));
             obj = addinv(obj);
             (void) encumber_msg();
+            if (obj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
+                setuqwep((struct obj *) 0);
             setuwep(obj);
             u.twoweap = twoweap;
         } else if (u.dz < 0) {
@@ -1206,6 +1209,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             range = 20; /* you must be giant */
         else if (obj->oartifact == ART_MJOLLNIR)
             range = (range + 1) / 2; /* it's heavy */
+        else if (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0)
+            /* if an aklys is going to return, range is limited by the
+               length of the attached cord [implicit aspect of item] */
+            range = min(range, BOLT_LIM / 2);
         else if (obj == uball && u.utrap && u.utraptype == TT_INFLOOR)
             range = 1;
 
@@ -1267,6 +1274,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                     pline("%s to your hand!", Tobjnam(obj, "return"));
                     obj = addinv(obj);
                     (void) encumber_msg();
+                    /* addinv autoquivers an aklys if quiver is empty;
+                       if obj is quivered, remove it before wielding */
+                    if (obj->owornmask & W_QUIVER)
+                        setuqwep((struct obj *) 0);
                     setuwep(obj);
                     u.twoweap = twoweap;
                     if (cansee(bhitpos.x, bhitpos.y))
