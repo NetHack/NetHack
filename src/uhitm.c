@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1517128664 2018/01/28 08:37:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.173 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1520043553 2018/03/03 02:19:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,8 +14,7 @@ STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
                                        int));
 STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
 STATIC_DCL void NDECL(demonpet);
-STATIC_DCL boolean FDECL(m_slips_free, (struct monst * mtmp,
-                                        struct attack *mattk));
+STATIC_DCL boolean FDECL(m_slips_free, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(explum, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(start_engulf, (struct monst *));
 STATIC_DCL void NDECL(end_engulf);
@@ -489,63 +488,85 @@ int dieroll;
     return malive;
 }
 
-/* hit the monster next to you and the monsters to the left and right of it */
+/* hit the monster next to you and the monsters to the left and right of it;
+   return False if the primary target is killed, True otherwise */
 STATIC_OVL boolean
-hitum_cleave(mon, uattk)
-struct monst *mon;
-struct attack *uattk;
+hitum_cleave(target, uattk)
+struct monst *target; /* non-Null; forcefight at nothing doesn't cleave... */
+struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
 {
-    int i = 0;
-    int x = u.ux;
-    int y = u.uy;
-    int count = 3;
-    boolean malive = TRUE;
-    struct monst *mtmp;
+    /* swings will be delivered in alternate directions; with consecutive
+       attacks it will simulate normal swing and backswing; when swings
+       are non-consecutive, hero will sometimes start a series of attacks
+       with a backswing--that doesn't impact actual play, just spoils the
+       simulation attempt a bit */
+    static boolean clockwise = FALSE;
+    unsigned i;
+    int count, umort, x = u.ux, y = u.uy;
 
-    /* find the direction we're swinging */
-    while (i < 8) {
+    /* find the direction toward primary target */
+    for (i = 0; i < 8; ++i)
         if (xdir[i] == u.dx && ydir[i] == u.dy)
             break;
-        i++;
-    }
-
     if (i == 8) {
-        impossible("hitum_cleave: failed to find target monster?");
-        return TRUE;
+        impossible("hitum_cleave: unknown target direction [%d,%d,%d]?",
+                   u.dx, u.dy, u.dz);
+        return TRUE; /* target hasn't been killed */
     }
-    i = (i + 2) % 8;
+    clockwise = !clockwise; /* alternate */
+    /* adjust direction by two so that loop's increment (for clockwise)
+       or decrement (for counter-clockwise) will point at the spot next
+       to primary target */
+    if (clockwise)
+        i = (i + 6) % 8;
+    else
+        i = (i + 2) % 8;
+    umort = u.umortality; /* used to detect life-saving */
 
-    /* swing from right to left */
-    while (count-- && uwep) {
-        boolean result;
-        int tmp, dieroll, mhit, attknum, armorpenalty;
+    /*
+     * Three attacks:  adjacent to primary, primary, adjacent on other
+     * side.  Primary target must be present or we wouldn't have gotten
+     * here (forcefight at thin air won't 'cleave').  However, the
+     * first attack might kill it (gas spore explosion, weak long worm
+     * occupying both spots) so we don't assume that it's still present
+     * on the second attack.
+     */
+    for (count = 3; count > 0; --count) {
+        struct monst *mtmp;
+        int tx, ty, tmp, dieroll, mhit, attknum, armorpenalty;
 
-        if (!i)
-            i = 7;
+        if (clockwise)
+            i = (i + 1) % 8; /* ++i, wrap 8 to i=0 */
         else
-            i--;
+            i = (i + 7) % 8; /* --i, wrap -1 to i=7 */
 
-        mtmp = NULL;
-        if (isok(x + xdir[i], y + ydir[i]))
-            mtmp = m_at(x + xdir[i], y + ydir[i]);
+        tx = x + xdir[i], ty = y + ydir[i]; /* current target location */
+        if (!isok(tx, ty))
+            continue;
+        mtmp = m_at(tx, ty);
         if (!mtmp) {
-            (void) unmap_invisible(x + xdir[i], y + ydir[i]);
+            if (glyph_is_invisible(levl[tx][ty].glyph))
+                (void) unmap_invisible(tx, ty);
             continue;
         }
-
 
         tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
                                &attknum, &armorpenalty);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
-        result = known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
-                             uattk, dieroll);
+        (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
+                           uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
-        if (mon == mtmp)
-            malive = result;
+
+        /* stop attacking if weapon is gone or hero got killed and
+           life-saved after passive counter-attack */
+        if (!uwep || u.umortality > umort)
+            break;
     }
 
-    return malive;
+    /* return False if primary target died, True otherwise; note: if 'target'
+       was nonNull upon entry then it's still nonNull even if *target died */
+    return (target && DEADMONSTER(target)) ? FALSE : TRUE;
 }
 
 /* hit target monster; returns TRUE if it still lives */
@@ -562,7 +583,10 @@ struct attack *uattk;
     int dieroll = rnd(20);
     int mhit = (tmp > dieroll || u.uswallow);
 
-    if (uwep && uwep->oartifact == ART_CLEAVER
+    /* Cleaver attacks three spots, one on either side of 'mon';
+       it can't we part of dual-wielding but we guard against that anyway;
+       cleave return value reflects status of primary target ('mon') */
+    if (uwep && uwep->oartifact == ART_CLEAVER && !u.twoweap
         && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum))
         return hitum_cleave(mon, uattk);
 
@@ -718,7 +742,10 @@ int dieroll;
                 tmp = dmgval(obj, mon);
                 /* a minimal hit doesn't exercise proficiency */
                 valid_weapon_attack = (tmp > 1);
-                if (!valid_weapon_attack || mon == u.ustuck || u.twoweap) {
+                if (!valid_weapon_attack || mon == u.ustuck || u.twoweap
+                    /* Cleaver can hit up to three targets at once so don't
+                       let it also hit from behind or shatter foes' weapons */
+                    || (hand_to_hand && obj->oartifact == ART_CLEAVER)) {
                     ; /* no special bonuses */
                 } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd
                            /* multi-shot throwing is too powerful here */
