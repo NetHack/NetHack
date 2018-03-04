@@ -140,6 +140,31 @@ boolean only_if_injured; /* determines whether maxhp <= 5 matters */
     return (boolean) (curhp <= 5 || curhp * divisor <= maxhp);
 }
 
+/* return True if surrounded by impassible rock, regardless of the state
+   of your own location (for example, inside a doorless closet) */
+boolean
+stuck_in_wall()
+{
+    int i, j, x, y, count = 0;
+
+    if (Passes_walls)
+        return FALSE;
+    for (i = -1; i <= 1; i++) {
+        x = u.ux + i;
+        for (j = -1; j <= 1; j++) {
+            if (!i && !j)
+                continue;
+            y = u.uy + j;
+            if (!isok(x, y)
+                || (IS_ROCK(levl[x][y].typ)
+                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
+                ++count;
+        }
+    }
+    return (count == 8) ? TRUE : FALSE;
+}
+
 /*
  * Return 0 if nothing particular seems wrong, positive numbers for
  * serious trouble, and negative numbers for comparative annoyances.
@@ -158,7 +183,7 @@ STATIC_OVL int
 in_trouble()
 {
     struct obj *otmp;
-    int i, j, count = 0;
+    int i;
 
     /*
      * major troubles
@@ -183,19 +208,8 @@ in_trouble()
         return TROUBLE_LYCANTHROPE;
     if (near_capacity() >= EXT_ENCUMBER && AMAX(A_STR) - ABASE(A_STR) > 3)
         return TROUBLE_COLLAPSING;
-
-    for (i = -1; i <= 1; i++)
-        for (j = -1; j <= 1; j++) {
-            if (!i && !j)
-                continue;
-            if (!isok(u.ux + i, u.uy + j)
-                || IS_ROCK(levl[u.ux + i][u.uy + j].typ)
-                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
-                count++;
-        }
-    if (count == 8 && !Passes_walls)
+    if (stuck_in_wall())
         return TROUBLE_STUCK_IN_WALL;
-
     if (Cursed_obj(uarmf, LEVITATION_BOOTS)
         || stuck_ring(uleft, RIN_LEVITATION)
         || stuck_ring(uright, RIN_LEVITATION))
@@ -396,9 +410,22 @@ int trouble;
         }
         break;
     case TROUBLE_STUCK_IN_WALL:
-        Your("surroundings change.");
         /* no control, but works on no-teleport levels */
-        (void) safe_teleds(FALSE);
+        if (safe_teleds(FALSE)) {
+            Your("surroundings change.");
+        } else {
+            /* safe_teleds() couldn't find a safe place; perhaps the
+               level is completely full.  As a last resort, confer
+               intrinsic wall/rock-phazing.  Hero might get stuck
+               again fairly soon....
+               Without something like this, fix_all_troubles can get
+               stuck in an infinite loop trying to fix STUCK_IN_WALL
+               and repeatedly failing. */
+            set_itimeout(&HPasses_walls, (long) d(4, 4));
+            /* how else could you move between packed rocks or among
+               lattice forming "solid" rock? */
+            You_feel("much slimmer.");
+        }
         break;
     case TROUBLE_CURSED_LEVITATION:
         if (Cursed_obj(uarmf, LEVITATION_BOOTS)) {
