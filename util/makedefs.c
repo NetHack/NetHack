@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1516697571 2018/01/23 08:52:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1520022901 2018/03/02 20:35:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -52,7 +52,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
+static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2018/03/02";
 #endif
 
 /* names of files to be generated */

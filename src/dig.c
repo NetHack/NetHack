@@ -1714,36 +1714,47 @@ struct obj *
 buried_ball(cc)
 coord *cc;
 {
-    xchar check_x, check_y;
-    struct obj *otmp, *otmp2;
+    int odist, bdist = COLNO;
+    struct obj *otmp, *ball = 0;
 
-    if (u.utraptype == TT_BURIEDBALL)
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
-            otmp2 = otmp->nobj;
+    /* FIXME:
+     *  This is just approximate; if multiple buried balls meet the
+     *  criterium (within 2 steps of tethered hero's present location)
+     *  it will find an arbitrary one rather than the one which used
+     *  to be uball.  Once 3.6.{0,1} save file compatibility is broken,
+     *  we should add context.buriedball_oid and then we can find the
+     *  actual former uball, which might be extra heavy or christened
+     *  or not the one buried directly underneath the target spot.
+     *
+     *  [Why does this search within a radius of two when trapmove()
+     *  only lets hero get one step away from the buried ball?]
+     */
+
+    if (u.utrap && u.utraptype == TT_BURIEDBALL)
+        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
-            /* try the exact location first */
+            /* if found at the target spot, we're done */
             if (otmp->ox == cc->x && otmp->oy == cc->y)
                 return otmp;
-            /* Now try the vicinity */
-            /*
-             * (x-2,y-2)       (x+2,y-2)
-             *           (x,y)
-             * (x-2,y+2)       (x+2,y+2)
+            /* find nearest within allowable vicinity: +/-2
+             *  4 5 8
+             *  1 2 5
+             *  0 1 4
              */
-            for (check_x = cc->x - 2; check_x <= cc->x + 2; ++check_x)
-                for (check_y = cc->y - 2; check_y <= cc->y + 2; ++check_y) {
-                    if (check_x == cc->x && check_y == cc->y)
-                        continue;
-                    if (isok(check_x, check_y)
-                        && (otmp->ox == check_x && otmp->oy == check_y)) {
-                        cc->x = check_x;
-                        cc->y = check_y;
-                        return otmp;
-                    }
-                }
+            odist = dist2(otmp->ox, otmp->oy, cc->x, cc->y);
+            if (odist <= 8 && (!ball || odist < bdist)) {
+                /* remember nearest buried ball but keep checking others */
+                ball = otmp;
+                bdist = odist;
+            }
         }
-    return (struct obj *) 0;
+    if (ball) {
+        /* found, but not at < cc->x, cc->y > */
+        cc->x = ball->ox;
+        cc->y = ball->oy;
+    }
+    return ball;
 }
 
 void
@@ -1751,6 +1762,7 @@ buried_ball_to_punishment()
 {
     coord cc;
     struct obj *ball;
+
     cc.x = u.ux;
     cc.y = u.uy;
     ball = buried_ball(&cc);
@@ -1774,6 +1786,7 @@ buried_ball_to_freedom()
 {
     coord cc;
     struct obj *ball;
+
     cc.x = u.ux;
     cc.y = u.uy;
     ball = buried_ball(&cc);
@@ -1913,7 +1926,8 @@ int x, y;
     for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox == x && otmp->oy == y) {
-            if (bball && otmp == bball && u.utraptype == TT_BURIEDBALL) {
+            if (bball && otmp == bball
+                && u.utrap && u.utraptype == TT_BURIEDBALL) {
                 buried_ball_to_punishment();
             } else {
                 obj_extract_self(otmp);

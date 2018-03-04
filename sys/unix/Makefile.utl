@@ -481,4 +481,4 @@ spotless: clean
 	-rm -f ../include/tile.h tiletxt.c
 	-rm -f makedefs lev_comp dgn_comp recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
-		tilemap tileedit
+		tilemap tileedit tile2bmp
