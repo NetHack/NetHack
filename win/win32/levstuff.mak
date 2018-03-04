@@ -44,8 +44,7 @@ tools:
 !IFNDEF YACC
 	   @echo Using pre-built lev_comp.h
 	   chdir ..\include
-	   copy /y ..\sys\share\lev_comp.h
-	   copy /b lev_comp.h+,,
+	   copy /b ..\sys\share\lev_comp.h +,,
 	   chdir ..\src
 !ELSE
 	   @echo Generating lev_yacc.c and lev_comp.h
@@ -62,8 +61,7 @@ tools:
 !IFNDEF YACC
 	   @echo Using pre-built lev_yacc.c
 	   chdir ..\util
-	   copy /y ..\sys\share\lev_yacc.c
-	   copy /b lev_yacc.c+,,
+	   copy /b ..\sys\share\lev_yacc.c +,,
 	   chdir ..\src
 !ELSE
 	   @echo Generating lev_yacc.c and lev_comp.h
@@ -80,8 +78,7 @@ tools:
 !IFNDEF LEX
 	   @echo Using pre-built lev_lex.c
 	   chdir ..\util
-	   copy /y ..\sys\share\lev_lex.c
-	   copy /b lev_lex.c+,,
+	   copy /b ..\sys\share\lev_lex.c +,,
            chdir ..\src
 !ELSE
 	   @echo Generating lev_lex.c
