@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520177086 2018/03/04 15:24:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520177858 2018/03/04 15:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.111 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
 #==============================================================================
@@ -1230,6 +1230,7 @@ spotless: clean
 	if exist $(DAT)\water.lev	 del $(DAT)\water.lev
 	if exist $(DAT)\wizard?.lev	 del $(DAT)\wizard?.lev
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
+	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
 	if exist $(SRC)\monstr.c         del $(SRC)\monstr.c
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
@@ -1238,6 +1239,15 @@ spotless: clean
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
+        if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
+        if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
+        if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
+        if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
+        if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
+        if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
+        if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
+        if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
+        if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
 	if exist $(U)recover.exe         del $(U)recover.exe
 	if exist $(U)tile2bmp.exe        del $(U)tile2bmp.exe
 	if exist $(U)tilemap.exe         del $(U)tilemap.exe
