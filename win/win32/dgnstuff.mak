@@ -45,7 +45,8 @@ tools:
 !IF "$(YACC)"==""
 	   @echo Using pre-built dgn_comp.h
 	   chdir ..\include
-	   copy /b ..\sys\share\dgn_comp.h +,,
+	   copy /y ..\sys\share\dgn_comp.h
+	   copy /b dgn_comp.h+,,
 	   chdir ..\src
 !ELSE
 	   chdir ..\util
@@ -61,7 +62,8 @@ tools:
 !IF "$(YACC)"==""
 	   @echo Using pre-built dgn_yacc.c
 	   chdir ..\util
-	   copy /b ..\sys\share\dgn_yacc.c +,,
+	   copy /y ..\sys\share\dgn_yacc.c
+	   copy /b dgn_yacc.c+,,
 	   chdir ..\src
 !ELSE
 	   chdir ..\util
@@ -77,7 +79,8 @@ tools:
 !IF "$(LEX)"==""
 	   @echo Using pre-built dgn_lex.c
 	   chdir ..\util
-	   copy /b ..\sys\share\dgn_lex.c +,,
+	   copy /y ..\sys\share\dgn_lex.c
+	   copy /b dgn_lex.c+,,
 	   chdir ..\src
 !ELSE
 	   chdir ..\util
