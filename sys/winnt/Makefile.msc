@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1518220654 2018/02/09 23:57:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520172650 2018/03/04 14:10:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.107 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
 #==============================================================================
@@ -985,7 +985,7 @@ $(O)obj.tag:
 # options.
 #==========================================
 
-$(O)envchk.tag:
+$(O)envchk.tag: $(O)obj.tag 
 !	IF "$(TARGET_CPU)"=="x64"
 	@echo Windows x64 64-bit target build
 !	ELSE
@@ -1274,7 +1274,7 @@ clean:
 	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
 	if exist $(O)nhraykey.map del $(O)nhraykey.map
 	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
-	if exist $(O)envchk.tag      del $(O)envchk.tag
+	if exist $(O)envchk.tag   del $(O)envchk.tag
 	if exist $(O)obj.tag      del $(O)obj.tag
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
