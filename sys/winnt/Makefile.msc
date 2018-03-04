@@ -569,7 +569,7 @@ default : install
 
 all :	install
 
-install: envchk $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
+install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
 	 @echo Done.
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
@@ -913,14 +913,19 @@ $(MSWIN)\splash.bmp: $(U)uudecode.exe $(MSWIN)\splash.uu
 # defer to the steps in ..\win\win32\levstuff.mak
 #
 
-$(U)lev_yacc.c $(INCL)\lev_comp.h: $(U)lev_comp.y
-	nmake -nologo -f ..\win\win32\levstuff.mak default
+$(U)lev_yacc.c:
+	nmake -nologo -f ..\win\win32\levstuff.mak $(U)lev_yacc.c
+
+$(U)lev_lex.c:
+	nmake -nologo -f ..\win\win32\levstuff.mak $(U)lev_lex.c
+
+$(INCL)\lev_comp.h:
+	nmake -nologo -f ..\win\win32\levstuff.mak $(INCL)\lev_comp.h
 
 $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)lev_yacc.c
 
-$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) \
-               $(U)lev_lex.c
+$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) $(U)lev_lex.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)lev_lex.c
 
 $(O)lev_main.o:	$(U)lev_main.c $(HACK_H) $(SP_LEV_H)
@@ -939,8 +944,14 @@ $(U)levcomp.exe: $(LEVCOMPOBJS)
 #
 # defer to the steps in ..\win\win32\dgnstuff.mak
 #
-$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
-	nmake -nologo -f ..\win\win32\dgnstuff.mak default
+$(U)dgn_yacc.c:
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(U)dgn_yacc.c
+
+$(INCL)\dgn_comp.h:
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(INCL)\dgn_comp.h
+
+$(U)dgn_lex.c:
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(U)dgn_lex.c
 
 $(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)dgn_yacc.c
@@ -974,7 +985,7 @@ $(O)obj.tag:
 # options.
 #==========================================
 
-envchk:
+$(O)envchk.tag:
 !	IF "$(TARGET_CPU)"=="x64"
 	@echo Windows x64 64-bit target build
 !	ELSE
@@ -984,6 +995,7 @@ envchk:
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
 !	ENDIF
+        echo envchk >$@
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -1262,6 +1274,7 @@ clean:
 	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
 	if exist $(O)nhraykey.map del $(O)nhraykey.map
 	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
+	if exist $(O)envchk.tag      del $(O)envchk.tag
 	if exist $(O)obj.tag      del $(O)obj.tag
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
