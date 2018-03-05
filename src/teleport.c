@@ -198,6 +198,8 @@ STATIC_OVL boolean
 tele_jump_ok(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
+    if (!isok(x2, y2))
+        return FALSE;
     if (dndest.nlx > 0) {
         /* if inside a restricted region, can't teleport outside */
         if (within_bounded_area(x1, y1, dndest.nlx, dndest.nly, dndest.nhx,
@@ -1135,8 +1137,7 @@ struct trap *trap;
 boolean force_it;
 int in_sight;
 {
-    int tt = trap->ttyp;
-    struct permonst *mptr = mtmp->data;
+    int tt = (trap ? trap->ttyp : NO_TRAP);
 
     if (mtmp == u.ustuck) /* probably a vortex */
         return 0;         /* temporary? kludge */
@@ -1157,8 +1158,8 @@ int in_sight;
             }
         } else if (tt == MAGIC_PORTAL) {
             if (In_endgame(&u.uz)
-                && (mon_has_amulet(mtmp) || is_home_elemental(mptr))) {
-                if (in_sight && mptr->mlet != S_ELEMENTAL) {
+                && (mon_has_amulet(mtmp) || is_home_elemental(mtmp->data))) {
+                if (in_sight && mtmp->data->mlet != S_ELEMENTAL) {
                     pline("%s seems to shimmer for a moment.", Monnam(mtmp));
                     seetrap(trap);
                 }
@@ -1167,27 +1168,44 @@ int in_sight;
                 assign_level(&tolevel, &trap->dst);
                 migrate_typ = MIGR_PORTAL;
             }
-        } else { /* (tt == LEVEL_TELEP) */
+        } else if (tt == LEVEL_TELEP || tt == NO_TRAP) {
             int nlev;
 
-            if (mon_has_amulet(mtmp) || In_endgame(&u.uz)) {
+            if (mon_has_amulet(mtmp) || In_endgame(&u.uz)
+                /* NO_TRAP is used when forcing a monster off the level;
+                   onscary(0,0,) is true for the Wizard, Riders, lawful
+                   minions, Angels of any alignment, shopkeeper or priest
+                   currently inside his or her own special room */
+                || (tt == NO_TRAP && onscary(0, 0, mtmp))) {
                 if (in_sight)
                     pline("%s seems very disoriented for a moment.",
                           Monnam(mtmp));
                 return 0;
             }
-            nlev = random_teleport_level();
-            if (nlev == depth(&u.uz)) {
-                if (in_sight)
-                    pline("%s shudders for a moment.", Monnam(mtmp));
-                return 0;
+            if (tt == NO_TRAP) {
+                /* creature is being forced off the level to make room;
+                   it will try to return to this level (at a random spot
+                   rather than its current one) if the level is left by
+                   the hero and then revisited */
+                assign_level(&tolevel, &u.uz);
+            } else {
+                nlev = random_teleport_level();
+                if (nlev == depth(&u.uz)) {
+                    if (in_sight)
+                        pline("%s shudders for a moment.", Monnam(mtmp));
+                    return 0;
+                }
+                get_level(&tolevel, nlev);
             }
-            get_level(&tolevel, nlev);
+        } else {
+            impossible("mlevel_tele_trap: unexpected trap type (%d)", tt);
+            return 0;
         }
 
         if (in_sight) {
             pline("Suddenly, %s disappears out of sight.", mon_nam(mtmp));
-            seetrap(trap);
+            if (trap)
+                seetrap(trap);
         }
         migrate_to_level(mtmp, ledger_no(&tolevel), migrate_typ, (coord *) 0);
         return 3; /* no longer on this level */
