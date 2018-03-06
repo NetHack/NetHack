@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1519228664 2018/02/21 15:57:44 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.51 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1520201829 2018/03/04 22:17:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.52 $
 
 # Root of source tree:
 NHSROOT=..
@@ -606,13 +606,13 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 #	file far more complex.  Since "hack.h" depends on most of the include
 #	files, we kludge around this by making date.h dependent on hack.h,
 #	even though it doesn't include this file.
+#	Do NOT include ../dat/gitinfo.txt as either a prerequisite or target.
+#	'makedefs -v' processes it when present and ignores it if not.
 #
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
-	if [[ ! -f ../dat/gitinfo.txt ]]; then \
-	  (cd ..;perl -IDEVEL/hooksdir -MNHgithook -e '&NHgithook::nhversioning') || true; \
-	fi
+	-$(SHELL) ../sys/unix/gitinfo.sh  #../dat/gitinfo.txt for 'makedefs -v'
 	../util/makedefs -v
 
 

@@ -1296,9 +1296,8 @@ merge_bestcolor(bestcolor, newcolor)
 int *bestcolor;
 int newcolor;
 {
-    int batr, bclr, natr, nclr;
+    int natr = HL_UNDEF, nclr = NO_COLOR;
 
-    split_clridx(*bestcolor, &bclr, &batr);
     split_clridx(newcolor, &nclr, &natr);
 
     if (nclr != NO_COLOR)
