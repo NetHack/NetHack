@@ -2,6 +2,8 @@
 /* Copyright (c) 1989, by Norm Meluch and Stephen Spackman	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/06/18 by NullCGT */
+
 #ifndef TRAMPOLI_H
 #define TRAMPOLI_H
 
@@ -176,6 +178,7 @@
 
 /* ### pray.c ### */
 #define doturn() doturn_()
+#define scrollpray() scrollpray_()
 #define dopray() dopray_()
 #define prayer_done() prayer_done_()
 #define dosacrifice() dosacrifice_()

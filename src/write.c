@@ -1,7 +1,7 @@
 /* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 3/6/18 by NullCGT */
 
 #include "hack.h"
 
@@ -52,6 +52,9 @@ register struct obj *otmp;
     case SCR_TELEPORTATION:
         return 20;
     case SCR_GENOCIDE:
+    case SCR_PURE_LAW:
+    case SCR_TRUE_NEUTRALITY:
+    case SCR_RAW_CHAOS:
         return 30;
     case SCR_BLANK_PAPER:
     default:

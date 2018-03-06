@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/05/18 by NullCGT */
+/* Edited on 3/06/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -1927,6 +1927,7 @@ E int NDECL(prayer_done);
 #endif
 E int NDECL(dosacrifice);
 E boolean FDECL(can_pray, (BOOLEAN_P));
+E int NDECL(scrollpray);
 E int NDECL(dopray);
 E const char *NDECL(u_gname);
 E int NDECL(doturn);

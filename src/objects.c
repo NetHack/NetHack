@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/1/18 by NullCGT */
+/* Edited on 3/6/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -866,7 +866,7 @@ SCROLL("enchant armor",              "ZELGO MER",  1,  63,  80),
 SCROLL("destroy armor",         "JUYED AWK YACC",  1,  45, 100),
 SCROLL("confuse monster",                 "NR 9",  1,  53, 100),
 SCROLL("scare monster",   "XIXAXA XOXAXA XUXAXA",  1,  35, 100),
-SCROLL("remove curse",             "PRATYAVAYAH",  1,  65,  80),
+SCROLL("remove curse",             "PRATYAVAYAH",  1,  60,  80),
 SCROLL("enchant weapon",         "DAIYEN FOOELS",  1,  80,  60),
 SCROLL("create monster",       "LEP GEX VEN ZEA",  1,  45, 200),
 SCROLL("taming",                   "PRIRUTSENIE",  1,  10, 200),
@@ -876,9 +876,12 @@ SCROLL("teleportation",        "VENZAR BORGAVVE",  1,  55, 100),
 SCROLL("gold detection",                 "THARR",  1,  33, 100),
 SCROLL("food detection",               "YUM YUM",  1,  25, 100),
 SCROLL("identify",                  "KERNOD WEL",  1, 180,  20),
+SCROLL("pure law",                   "TRATS ARL",  1,   5, 200),
+SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200),
+SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200),
 SCROLL("magic mapping",              "ELAM EBOW",  1,  45, 100),
-SCROLL("amnesia",                   "DUAM XNAHT",  1,  35, 200),
-SCROLL("fire",                  "ANDOVA BEGARIN",  1,  30, 100),
+SCROLL("amnesia",                   "DUAM XNAHT",  1,  30, 200),
+SCROLL("fire",                  "ANDOVA BEGARIN",  1,  25, 100),
 SCROLL("earth",                          "KIRJE",  1,  18, 200),
 SCROLL("punishment",            "VE FORBRYDERNE",  1,  15, 300),
 SCROLL("charging",                "HACKEM MUCHE",  1,  15, 300),

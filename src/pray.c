@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 3/6/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1809,6 +1809,28 @@ boolean praying; /* false means no messages should be given */
        This case should be uncommon enough to live with... */
 
     return !praying ? (boolean) (p_type == 3 && !Inhell) : TRUE;
+}
+
+/* scroll prayer, based on dopray */
+int
+scrollpray()
+{
+    u.uconduct.gnostic++;
+    /* set up p_type and p_alignment */
+    if (!can_pray(TRUE))
+        return 0;
+    p_type = 3;
+    nomul(-3);
+    multi_reason = "praying";
+    nomovemsg = "You finish your prayer.";
+    afternmv = prayer_done;
+    if (!Inhell) {
+        /* if you've been true to your god you can't die while you pray */
+        if (!Blind)
+            You("are surrounded by a shimmering light.");
+        u.uinvulnerable = TRUE;
+    }
+    return 1;
 }
 
 /* #pray commmand */

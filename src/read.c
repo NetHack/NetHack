@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/17/18 by NullCGT */
+/* Edited on 3/6/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1537,6 +1537,33 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("You're not carrying anything to be identified.");
         }
         break;
+    case SCR_PURE_LAW:
+        if (u.ualign.type == A_LAWFUL) {
+            You_feel("very devout!");
+            known = TRUE;
+            scrollpray();
+        } else {
+            summon_minion(A_LAWFUL, TRUE);
+        }
+        break;
+    case SCR_TRUE_NEUTRALITY:
+        if (u.ualign.type == A_NEUTRAL) {
+            You_feel("very devout!");
+            known = TRUE;
+            scrollpray();
+        } else {
+            summon_minion(A_NEUTRAL, TRUE);
+        }
+        break;
+    case SCR_RAW_CHAOS:
+        if (u.ualign.type == A_CHAOTIC) {
+            You_feel("very devout!");
+            known = TRUE;
+            scrollpray();
+        } else {
+            summon_minion(A_CHAOTIC, TRUE);
+        }
+        break;
     case SCR_CHARGING:
         if (confused) {
             if (scursed) {
@@ -1734,8 +1761,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_CLONING:
         known = TRUE;
         if (confused) {
-            dropy(mksobj(uwep->otyp, TRUE, TRUE));
-            pline("You clone your weapon!");
+            if (uwep) {
+                dropy(mksobj(uwep->otyp, TRUE, TRUE));
+                pline("You clone your weapon!");
+            } else {
+                strange_feeling(sobj, "You feel duplicitous.");
+            }
             break;
         } else if (!Hallucination) {
             You("clone yourself!");
