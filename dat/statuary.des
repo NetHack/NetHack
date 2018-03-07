@@ -31,8 +31,7 @@ ROOM: "ordinary" , random, random, random, random {
 ROOM: "ordinary" , random, random, random, random {
   OBJECT: random, random
   CONTAINER:('`',"statue"),random {
-      [50%]: OBJECT:('/',"striking")
-      [50%]: OBJECT:('/',"cold")
+      OBJECT:('/',"wonder")
   }
   MONSTER: random, random
   MONSTER: random, random

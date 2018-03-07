@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/2/18 by NullCGT */
+/* Edited on 3/6/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1000,6 +1000,15 @@ NEARDATA struct permonst mons[] = {
     /*
      * lights
      */
+    MON("will-o'-the-wisp", S_LIGHT, LVL(2, 9, 2, 0, 0),
+        (G_NOCORPSE | G_SGROUP | G_GENO | 4),
+        A(ATTK(AT_TUCH, AD_ELEC, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK,
+               NO_ATTK, NO_ATTK), SIZ(0, 0, MS_SILENT, MZ_SMALL),
+        MR_FIRE | MR_COLD | MR_ELEC | MR_DISINT | MR_SLEEP | MR_POISON
+            | MR_ACID | MR_STONE,
+        0, M1_FLY | M1_BREATHLESS | M1_AMORPHOUS | M1_NOEYES | M1_NOLIMBS
+               | M1_NOHEAD | M1_MINDLESS | M1_UNSOLID | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER | M2_WANDER, M3_INFRAVISIBLE, CLR_WHITE),
     MON("yellow light", S_LIGHT, LVL(3, 15, 0, 0, 0),
         (G_NOCORPSE | G_GENO | 4), A(ATTK(AT_EXPL, AD_BLND, 10, 20), NO_ATTK,
                                      NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
