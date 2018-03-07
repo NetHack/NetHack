@@ -75,21 +75,28 @@ sub nhversioning {
     die "git rev-parse failed" unless(length $git_sha and length $git_branch);
 
     if (open my $fh, '<', 'dat/gitinfo.txt') {
-        while(my $line = <$fh>) {
+        my $hashok = 0;
+        my $branchok = 0;
+        while (my $line = <$fh>) {
             if ((index $line, $git_sha) >= 0) {
-                close $fh;
-                print "No update made to dat/gitinfo.txt, existing githash=".$git_sha."\n";
-                return;
+                $hashok++;
+            }
+            if ((index $line, $git_branch) >= 0) {
+                $branchok++;
             }
         }
         close $fh;
+        if ($hashok && $branchok) {
+            print "dat/gitinfo.txt unchanged, githash=".$git_sha."\n";
+            return;
+        }
     } else {
 	print "WARNING: Can't find dat directory\n" unless(-d "dat");
     }
     if (open my $fh, '>', 'dat/gitinfo.txt') {
         print $fh 'githash='.$git_sha."\n";
         print $fh 'gitbranch='.$git_branch."\n";
-        print "An updated dat/gitinfo.txt was written, githash=".$git_sha."\n";
+        print "dat/gitinfo.txt updated, githash=".$git_sha."\n";
     } else {
 	print "WARNING: Unable to open dat/gitinfo.txt: $!\n";
     }
