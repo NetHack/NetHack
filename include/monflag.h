@@ -2,6 +2,8 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/7/18 by NullCGT */
+
 #ifndef MONFLAG_H
 #define MONFLAG_H
 
@@ -174,6 +176,7 @@
 #define MH_DWARF M2_DWARF
 #define MH_GNOME M2_GNOME
 #define MH_ORC M2_ORC
+#define MH_WERE M2_WERE
 
 /* for mons[].geno (constant during game) */
 #define G_UNIQ 0x1000     /* generated only once */

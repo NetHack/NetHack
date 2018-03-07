@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/09/18 by NullCGT */
+/* Edited on 3/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -135,8 +135,8 @@ const struct Role roles[] = {
       S_HUMANOID,
       S_GIANT,
       ART_SCEPTRE_OF_MIGHT,
-      MH_HUMAN | MH_DWARF | MH_GNOME | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL
-          | ROLE_NEUTRAL,
+      MH_HUMAN | MH_DWARF | MH_GNOME | ROLE_MALE | ROLE_FEMALE
+          | ROLE_LAWFUL | ROLE_NEUTRAL,
       /* Str Int Wis Dex Con Cha */
       { 10, 7, 7, 7, 8, 6 },
       { 30, 6, 7, 20, 30, 7 },
@@ -784,6 +784,27 @@ const struct Race races[] = {
         /* Init   Lower  Higher */
         { 1, 0, 0, 1, 0, 0 }, /* Hit points */
         { 1, 0, 1, 0, 1, 0 }  /* Energy */
+    },
+    {
+        "werewolf",
+        "lycanthrope",
+        "lycanthrope-kind",
+        "Wer",
+        { "man", "woman" },
+        PM_HUMAN_WEREWOLF,
+        NON_PM,
+        PM_HUMAN_MUMMY,
+        PM_HUMAN_ZOMBIE,
+        MH_ORC | ROLE_MALE | ROLE_FEMALE | ROLE_CHAOTIC | ROLE_NEUTRAL,
+        MH_WERE,
+        0,
+        MH_GNOME | MH_ORC | MH_ELF,
+        /*    Str     Int Wis Dex Con Cha */
+        { 3, 3, 3, 3, 3, 3 },
+        { STR18(100), 18, 18, 20, 20, 18 },
+        /* Init   Lower  Higher */
+        { 2, 0, 0, 2, 1, 0 }, /* Hit points */
+        { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     /* Array terminator */
     { 0, 0, 0, 0 }

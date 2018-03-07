@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/7/18 by NullCGT */
+
 #include "hack.h"
 
 void
@@ -187,6 +189,7 @@ you_were()
             return;
     }
     (void) polymon(u.ulycn);
+    (void) angry_guards(FALSE);
 }
 
 void
@@ -194,8 +197,7 @@ you_unwere(purify)
 boolean purify;
 {
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
-
-    if (purify) {
+    if (purify && !Race_if(PM_HUMAN_WEREWOLF)) {
         You_feel("purified.");
         set_ulycn(NON_PM); /* cure lycanthropy */
     }

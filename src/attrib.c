@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/07/18 by NullCGT */
+/* Edited on 3/7/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -739,6 +739,7 @@ long frommask;
         case PM_ORC:
             abil = orc_abil;
             break;
+        case PM_HUMAN_WEREWOLF:
         case PM_HUMAN:
             abil = hum_abil;
             break;
@@ -919,6 +920,7 @@ int oldlevel, newlevel;
     case PM_ORC:
         rabil = orc_abil;
         break;
+    case PM_HUMAN_WEREWOLF:
     case PM_HUMAN:
     case PM_DWARF:
     case PM_GNOME:
