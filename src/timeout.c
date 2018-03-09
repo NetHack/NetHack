@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 3/9/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
@@ -488,6 +488,9 @@ nh_timeout()
                 }
                 u.usick_type = 0;
                 done(POISONING);
+                break;
+            case REFLECTING:
+                You("are no longer as shiny.");
                 break;
             case FAST:
                 if (!Very_fast)

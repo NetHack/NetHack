@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/24/18 by NullCGT */
+/* Edited on 3/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -598,7 +598,7 @@ register struct monst *mtmp;
      */
     switch (ptr->mlet) {
     case S_HUMAN:
-        if (is_mercenary(ptr)) {
+        if (is_mercenary(ptr) && !(monsndx(ptr) == PM_RENEGADE_SHOPKEEPER)) {
             register int mac;
 
             switch (monsndx(ptr)) {
@@ -608,7 +608,6 @@ register struct monst *mtmp;
             case PM_SOLDIER:
                 mac = 3;
                 break;
-            case PM_RENEGADE_SHOPKEEPER:
             case PM_SERGEANT:
                 mac = 0;
                 break;

@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/9/18 by NullCGT */
+
 #include "hack.h"
 
 boolean notonhead = FALSE;
@@ -887,6 +889,19 @@ register struct obj *otmp;
                 itmp = (otmp->blessed || ii == 1) ? 0 : -1;
                 if (adjattrib(i, 1, itmp) && !otmp->blessed)
                     break;
+            }
+        }
+        break;
+    case POT_REFLECTION:
+        if (otmp->cursed) {
+            pline("Its like drinking glue!");
+            unkn++;
+        } else {
+            pline("You are covered in a mirror-like sheen!");
+            if (otmp->blessed) {
+                incr_itimeout(&HReflecting, rn1(50, 250));
+            } else {
+                incr_itimeout(&HReflecting, rn1(10, 20));
             }
         }
         break;

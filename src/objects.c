@@ -829,6 +829,7 @@ FOOD("tin",                  75,  0, 10, 1, METAL,   0, HI_METAL),
            BITS(0, 1, 0, 0, mgc, 0, 0, 0, 0, 0, 0, P_NONE, GLASS),      \
            power, POTION_CLASS, prob, 0, 20, cost, 0, 0, 0, 0, 10, color)
 POTION("gain ability",           "ruby",  1, 0, 42, 300, CLR_RED),
+POTION("reflection",         "metallic",  1, REFLECTING, 10, 300, CLR_GRAY),
 POTION("restore ability",        "pink",  1, 0, 40, 100, CLR_BRIGHT_MAGENTA),
 POTION("confusion",            "orange",  1, CONFUSION, 42, 100, CLR_ORANGE),
 POTION("blindness",            "yellow",  1, BLINDED, 40, 150, CLR_YELLOW),
@@ -852,7 +853,7 @@ POTION("booze",                 "brown",  0, 0, 42,  50, CLR_BROWN),
 POTION("sickness",              "fizzy",  0, 0, 42,  50, CLR_CYAN),
 POTION("fruit juice",            "dark",  0, 0, 42,  50, CLR_BLACK),
 POTION("acid",                  "white",  0, 0, 10, 250, CLR_WHITE),
-POTION("oil",                   "murky",  0, 0, 30, 250, CLR_BROWN),
+POTION("oil",                   "murky",  0, 0, 20, 250, CLR_BROWN),
 /* fixed description
  */
 POTION("water",                 "clear",  0, 0, 92, 100, CLR_CYAN),
