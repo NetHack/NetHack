@@ -972,6 +972,7 @@ register struct attack *mattk;
             struct obj *otmp = mon_currwep;
 
             if (mattk->aatyp == AT_WEAP && otmp) {
+                struct obj *marmg;
                 int tmp;
 
                 if (otmp->otyp == CORPSE
@@ -983,6 +984,9 @@ register struct attack *mattk;
                         goto do_stone;
                 }
                 dmg += dmgval(otmp, &youmonst);
+                if ((marmg = which_armor(mtmp, W_ARMG)) != 0
+                    && marmg->otyp == GAUNTLETS_OF_POWER)
+                    dmg += rn1(4, 3); /* 3..6 */
                 if (dmg <= 0)
                     dmg = 1;
                 if (!(otmp->oartifact
@@ -1003,7 +1007,10 @@ register struct attack *mattk;
                     tmp -= rnd(-u.uac);
                 if (tmp < 1)
                     tmp = 1;
-                if (u.mh - tmp > 1 && objects[otmp->otyp].oc_material == IRON
+                if (u.mh - tmp > 1
+                    && (objects[otmp->otyp].oc_material == IRON
+                        /* relevant 'metal' objects are scalpel and tsurugi */
+                        || objects[otmp->otyp].oc_material == METAL)
                     && (u.umonnum == PM_BLACK_PUDDING
                         || u.umonnum == PM_BROWN_PUDDING)) {
                     if (tmp > 1)
