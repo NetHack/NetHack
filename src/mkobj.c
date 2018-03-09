@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/11/18 by NullCGT */
+/* Edited on 3/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -916,6 +916,14 @@ boolean artif;
                 while (is_human(&mons[otmp->corpsenm]) && tryct++ < 30);
                 blessorcurse(otmp, 4);
                 break;
+            case MASK:
+                tryct = 0;
+                do
+                    otmp->corpsenm = rndmonnum();
+                while (is_human(&mons[otmp->corpsenm]) &&
+                        !polyok(&mons[otmp->corpsenm]) && tryct++ < 30);
+                blessorcurse(otmp, 4);
+                break;
             case BELL_OF_OPENING:
                 otmp->spe = 3;
                 break;
@@ -1048,6 +1056,7 @@ boolean artif;
         /*FALLTHRU*/
     case STATUE:
     case FIGURINE:
+    case MASK:
         if (otmp->corpsenm == NON_PM)
             otmp->corpsenm = rndmonnum();
         /*FALLTHRU*/

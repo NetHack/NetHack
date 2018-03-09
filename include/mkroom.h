@@ -1,7 +1,7 @@
 /* NetHack 3.6	mkroom.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/01/18 by NullCGT */
+/* File changed 3/7/18 by NullCGT */
 
 #ifndef MKROOM_H
 #define MKROOM_H
@@ -78,6 +78,7 @@ enum roomtype_types {
     TOOLSHOP,
     BOOKSHOP,
     ARCHERYSHOP,
+    JUNKSHOP,
     FODDERSHOP, /* health food store */
     CANDLESHOP
 };

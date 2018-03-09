@@ -5,6 +5,8 @@
 /* This file contains the command routines dowhatis() and dohelp() and */
 /* a few other help related facilities */
 
+/* Edited on 3/7/18 by NullCGT */
+
 #include "hack.h"
 #include "dlb.h"
 
@@ -587,6 +589,8 @@ boolean user_typed_name, without_asking;
         dbase_str[6] = '\0';
     else if (!strncmp(dbase_str, "figurine of ", 12))
         dbase_str[8] = '\0';
+    else if (!strncmp(dbase_str, "mask of ", 8))
+        dbase_str[4] = '\0';
     /* remove enchantment ("+0 aklys"); [for 3.6.0 and earlier, this wasn't
        needed because looking at items on the map used xname() rather than
        doname() hence known enchantment was implicitly suppressed] */
@@ -1388,7 +1392,7 @@ doidtrap()
     commands:  basic letters vs digits, 'g' vs 'G' for '5', phone
     keypad vs normal layout of digits, and QWERTZ keyboard swap between
     y/Y/^Y/M-y/M-Y/M-^Y and z/Z/^Z/M-z/M-Z/M-^Z.)
-    
+
     The interpretor understands
      '&#' for comment,
      '&? option' for 'if' (also '&? !option'
@@ -1399,7 +1403,7 @@ doidtrap()
      '&:' for 'else' (also '&: #comment';
                       0 or 1 instance for a given 'if'), and
      '&.' for 'endif' (also '&. #comment'; required for each 'if').
-    
+
     The option handling is a bit of a mess, with no generality for
     which options to deal with and only a comma separated list of
     integer values for the '=value' part.  number_pad is the only

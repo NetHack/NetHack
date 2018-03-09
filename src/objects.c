@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/6/18 by NullCGT */
+/* Edited on 3/8/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -711,7 +711,8 @@ TOOL("stethoscope",         None, 1, 0, 0, 0, 25,  4, 75, IRON, HI_METAL),
 TOOL("tinning kit",         None, 1, 0, 0, 1, 15,100, 30, IRON, HI_METAL),
 TOOL("tin opener",          None, 1, 0, 0, 0, 35,  4, 30, IRON, HI_METAL),
 TOOL("can of grease",       None, 1, 0, 0, 1, 15, 15, 20, IRON, HI_METAL),
-TOOL("figurine",            None, 1, 0, 1, 0, 25, 50, 80, MINERAL, HI_MINERAL),
+TOOL("figurine",            None, 1, 0, 1, 0, 15, 50, 80, MINERAL, HI_MINERAL),
+TOOL("mask",                None, 1, 0, 1, 0, 10, 20,150, WOOD, HI_WOOD),
         /* monster type specified by obj->corpsenm */
 TOOL("magic marker",        None, 1, 0, 1, 1, 15,  2, 50, PLASTIC, CLR_RED),
 /* traps */
@@ -899,6 +900,7 @@ SCROLL(None,         "GARVEN DEH",  1,   0, 100),
 SCROLL(None,            "READ ME",  1,   0, 100),
 SCROLL(None,      "ETAOIN SHRDLU",  1,   0, 100),
 SCROLL(None,        "LOREM IPSUM",  1,   0, 100),
+SCROLL(None,         "REDEM SHIN",  1,   0, 100),
 SCROLL(None,              "FNORD",  1,   0, 100), /* Illuminati */
 SCROLL(None,            "KO BATE",  1,   0, 100), /* Kurd Lasswitz */
 SCROLL(None,      "ABRA KA DABRA",  1,   0, 100), /* traditional incantation */
@@ -1066,16 +1068,19 @@ WAND("sleep",           "runed", 50, 175, 1, RAY, IRON, HI_METAL),
 WAND("death",            "long",  5, 500, 1, RAY, IRON, HI_METAL),
 WAND("lightning",      "curved", 40, 175, 1, RAY, IRON, HI_METAL),
 WAND("poison gas",  "octagonal", 20, 175, 1, RAY, IRON, HI_METAL),
-WAND("acid",           "twisted", 20, 175, 1, RAY, WOOD, HI_WOOD),
+WAND("acid",          "twisted", 20, 175, 1, RAY, WOOD, HI_WOOD),
 /* extra descriptions, shuffled into use at start of new game */
 WAND(None,             "forked",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "holly",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "spiked",  0, 150, 1, 0, IRON, HI_METAL),
-WAND(None,            "titanium",  0, 150, 1, 0, IRON, HI_METAL),
-WAND(None,            "bone",  0, 150, 1, 0, BONE, CLR_WHITE),
-WAND(None,            "golden",  0, 150, 1, 0, GOLD, HI_GOLD),
-WAND(None,            "mithril",  0, 150, 1, 0, MITHRIL, HI_SILVER),
-WAND(None,            "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
+WAND(None,             "pliable",  0, 150, 1, 0, WOOD, HI_WOOD),
+WAND(None,             "titanium",  0, 150, 1, 0, IRON, HI_METAL),
+WAND(None,             "bone",  0, 150, 1, 0, BONE, CLR_WHITE),
+WAND(None,             "dragon-bone",  0, 150, 1, 0, BONE, CLR_WHITE),
+WAND(None,             "golden",  0, 150, 1, 0, GOLD, HI_GOLD),
+WAND(None,             "mithril",  0, 150, 1, 0, MITHRIL, HI_SILVER),
+WAND(None,             "thin",  0, 150, 1, 0, IRON, HI_METAL),
+WAND(None,             "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 #undef WAND
 
 /* coins ... - so far, gold is all there is */

@@ -2252,7 +2252,8 @@ register struct monst *mtmp;
     mtmp->m_ap_type = ap_type;
     mtmp->mappearance = appear;
     if (ap_type == M_AP_OBJECT && (appear == STATUE || appear == CORPSE
-                                   || appear == FIGURINE || appear == EGG)) {
+                                   || appear == FIGURINE || appear == EGG
+                                   || appear == MASK)) {
         newmcorpsenm(mtmp);
         MCORPSENM(mtmp) = rndmonnum();
         if (appear == EGG && !can_be_hatched(MCORPSENM(mtmp)))

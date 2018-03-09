@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 3/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -496,7 +496,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, dn);
         /* If we use an() here we'd have to remember never to use */
         /* it whenever calling doname() or xname(). */
-        if (typ == FIGURINE && omndx != NON_PM) {
+        if ((typ == FIGURINE || typ == MASK) && omndx != NON_PM) {
             Sprintf(eos(buf), " of a%s %s",
                     index(vowels, *mons[omndx].mname) ? "n" : "",
                     mons[omndx].mname);
@@ -3694,6 +3694,7 @@ typfnd:
             set_corpsenm(otmp, mntmp);
             break;
         case FIGURINE:
+        case MASK:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
 #ifdef MAIL
                 && mntmp != PM_MAIL_DAEMON

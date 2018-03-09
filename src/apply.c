@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/16/18 by NullCGT */
+/* Edited on 3/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -23,6 +23,7 @@ STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj **));
 STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
+STATIC_DCL void FDECL(use_mask, (struct obj **));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
 STATIC_DCL void FDECL(use_trap, (struct obj *));
@@ -2214,6 +2215,33 @@ boolean quietly;
 }
 
 STATIC_OVL void
+use_mask(optr)
+struct obj **optr;
+{
+    register struct obj *obj = *optr;
+    if (!polyok(&mons[obj->corpsenm])) {
+        pline("%s violently, then splits in two!", Tobjnam(obj, "shudder"));
+        useup(obj);
+        return;
+    }
+    if (!Unchanging) {
+        if (obj->cursed) {
+            You1(shudder_for_moment);
+            losehp(rnd(30), "system shock", KILLED_BY_AN);
+            pline("%s, then splits in two!", Tobjnam(obj, "shudder"));
+        } else {
+            pline("You place the mask on your %s, and a change comes over you!",
+                  body_part(FACE));
+            polymon(obj->corpsenm);
+        }
+        useup(obj);
+    } else {
+        pline("Unfortunately, no mask will hide what you truly are.");
+    }
+
+}
+
+STATIC_OVL void
 use_figurine(optr)
 struct obj **optr;
 {
@@ -3648,6 +3676,9 @@ doapply()
         break;
     case TIN_OPENER:
         res = use_tin_opener(obj);
+        break;
+    case MASK:
+        use_mask(&obj);
         break;
     case FIGURINE:
         use_figurine(&obj);
