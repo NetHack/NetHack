@@ -359,7 +359,7 @@ struct chain_procs {
     void FDECL((*win_status_finish), (CARGS));
     void FDECL((*win_status_enablefield),
                (CARGS, int, const char *, const char *, BOOLEAN_P));
-    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int, unsigned long));
+    void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int, int, unsigned long *));
     boolean FDECL((*win_can_suspend), (CARGS));
 };
 #endif /* WINCHAIN */
