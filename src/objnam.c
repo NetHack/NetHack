@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1520696604 2018/03/10 15:43:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2094,7 +2094,8 @@ const char *const *alt_as_is; /* another set like as_is[] */
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
-    if (!strcmpi(basestr, "slice")) {
+    if (!strcmpi(basestr, "slice")
+        || !strcmpi(basestr, "mongoose")) {
         if (to_plural)
             (void) strkitten(basestr, 's');
         return TRUE;
