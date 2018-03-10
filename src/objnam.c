@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1520696604 2018/03/10 15:43:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.187 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2033,14 +2033,18 @@ static struct sing_plur one_off[] = {
     { "erinys", "erinyes" },
     { "foot", "feet" },
     { "fungus", "fungi" },
+    { "goose", "geese" },
     { "knife", "knives" },
     { "labrum", "labra" }, /* candelabrum */
     { "louse", "lice" },
     { "mouse", "mice" },
     { "mumak", "mumakil" },
     { "nemesis", "nemeses" },
+    { "ovum", "ova" },
+    { "ox", "oxen" },
     { "rtex", "rtices" }, /* vortex */
     { "tooth", "teeth" },
+    { "serum", "sera" },
     { "staff", "staves" },
     { 0, 0 }
 };
@@ -2050,10 +2054,11 @@ static const char *const as_is[] = {
     "boots",   "shoes",     "gloves",    "lenses",   "scales",
     "eyes",    "gauntlets", "iron bars",
     /* both singular and plural are spelled the same */
-    "deer",    "fish",      "tuna",      "yaki",     "-hai",
-    "krill",   "manes",     "ninja",     "sheep",    "ronin",
-    "roshi",   "shito",     "tengu",     "ki-rin",   "Nazgul",
-    "gunyoki", "piranha",   "samurai",   "shuriken", 0,
+    "deer",    "elk",       "fish",      "tuna",      "yaki",
+    "-hai",    "krill",     "manes",     "moose",     "ninja",
+    "sheep",   "ronin",     "roshi",     "shito",     "tengu",
+    "ki-rin",  "Nazgul",    "gunyoki",   "piranha",   "samurai",
+    "shuriken", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
