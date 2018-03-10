@@ -332,6 +332,14 @@ RANDOBJ =
 # used by `make depend' to reconstruct this Makefile; you shouldn't need this
 AWK	= nawk
 
+# when using 'makedefs -v', also force dat/gitinfo.txt to be up to date;
+# changing this to 0 will change the behavior to only make that file if
+# it doesn't already exist; to skip it completely, create an empty file
+# of that name and also set this to 0; there shouldn't be any need to
+# skip it--if nethack's sources don't reside in a git repository than
+# the script which creates that file will fail benignly and 'makedefs -v'
+# will proceed without it
+GITINFO=1
 
 #VERBOSEMAKE = 1
 
@@ -612,7 +620,7 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
-	-$(SHELL) ../sys/unix/gitinfo.sh  #../dat/gitinfo.txt for 'makedefs -v'
+	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
 	../util/makedefs -v
 
 
