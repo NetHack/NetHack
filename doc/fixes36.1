@@ -190,7 +190,7 @@ grammar bit when hallucinating: "you kill poor goblin" ('the' missing for pet)
 some blindness cures ignored u.ucreamed
 some instances of stun or confusion timers were being overridden rather than
 	incremented when new stun or confusion damage was suffered
-female gnome who gains level can grow up into male-only gnome lord; give an
+female gnome who gains level can grow up into male-only gnome lord; give
 	an alternate message instead of prohibiting the promotion
 kicked weapon which successfully hits monster vanishes from play
 unseen landmine explosion could result in "The <monst-type> statue crumbles."
@@ -295,7 +295,7 @@ don't give "you cannot pass through the bars" when travel is testing possible
 	paths in the vicinity of iron bars
 if blind and no gloves, using 'm<dir>' to move and then 'e' could be used to
 	locate cockatrice corpse without fatal touching (by declining to eat)
-it's cannabilism for a were<foo> to eat a <foo> corpse
+it's cannibalism for a were<foo> to eat a <foo> corpse
 conduct: wishing for an artifact and not getting it because it already exists
 	counts as wishing for an artifact, just like when not getting it
 	because of quest restrictions or too many artifacts in play does
@@ -304,7 +304,7 @@ gelatinous cube shouldn't be able to eat a scroll of scare monster
 make fireballs or cones of cold cast at skilled or higher not go through walls
 prevent flying monsters from hovering over unreachable underwater objects
 lembas wafer gives increased nutrition to elves, reduced nutrition to orcs;
-	cram ration gives increase nutrition to dwarves
+	cram ration gives increased nutrition to dwarves
 when #tip's terse object drop format got interrupted by a regular message,
 	it continued using "obj2, obj3, ..." for subsequent objects, where
 	the sentence grammar no longer made sense (the interrupting message
@@ -414,6 +414,7 @@ surviving a gas spore's explosion would leave that explosion as a stale reason
 	for death which might show up strangely ("crushed to death by a gas
 	spore's explosion" when killed by an opening drawbridge)
 add database entry for "martial arts"
+add catch-all database entry for the polearms
 starting inventory for rogues specified +9 lock pick, where +/-N is meaningless
 fix pile mark when picking up all-but-one items while invisible
 improve config file error reporting
@@ -509,8 +510,17 @@ the Wizard, Angels and lawful minions, the Riders, shopkeep/priest in own room
 	are never frightened by tooled horns
 'Iu' would reveal unknown container contents if carrying one unpaid item inside
 	a hero-owned container whose contents weren't known
-docall wasn't taking the space allocation needed for the object name + "Call :" 
-        into account in the prompt string
+docall for type of object could overflow its prompt buffer if there was a very
+	long type name previously assigned
+whatis lookup for 'more info?' would behave strangely for plural names, either
+	entered by player or from "N foo" stacks on the map
+you should not hear a whistle if you are deaf
+change the deity's "congratulations" message upon ascension to something which
+	sounds a bit more archaic to fit better with the other messages
+prayer boon of 'fix all troubles' could get stuck in an infinite loop for
+	TROUBLE_STUCK_IN_WALL if there was no spot to teleport into available
+It shouldn't be considered hypocrisy if you speed up your pet while standing 
+	on Elbereth
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -576,6 +586,9 @@ try again to fix achievement recording bug with mines and sokoban prizes
 the fix for secret doors on special levels always having vertical orientation
 	resulted in some--but not all--secret doors within vertical walls
 	being displayed as horizontal walls while still hidden
+and the previous fix for the for secret doors didn't work if the level hadn't
+	been wallified yet (Cav quest) so horizontal wall with secret door
+	mis-displayed as a vertical wall segment could occur
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
@@ -584,6 +597,11 @@ unix: fix for freeing MAIL introduced a one-byte buffer overrun which could
 	interfere with malloc/free operation
 unix: fix for freeing MAIL also introduced a memory leak whenever new mail
 	is detected and MAIL comes from the environment
+when clairvoyance lets you move the cursor to examine the map (if it occurs
+	when engulfed or underwater or when blessed clairvoyance finds a
+	monster), the "for instructions type '?'" prompt could be confusing
+prevent Mjollnir from being auto-quivered if it's been thrown without return
+	and then picked back up while quiver slot is empty
 
 
 Platform- and/or Interface-Specific Fixes
@@ -621,6 +639,8 @@ unix: race condition with parallel make: src/Makefile might start building
 unix: Makefile.{src,utl} ignored CPPFLAGS which is expanded by the default .c
 	rule by GNU make so if user had a value for that in the environment,
 	it would apply to some files but not others; explicitly override it
+unix: enable code guarded by USE_WIN_IOCTL by default unless prevented by
+	uncommenting #define AVOID_WIN_IOCTL in include/unixconf.h
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 win32gui: handle menu_color attribute
@@ -774,6 +794,9 @@ change #adjust's behavior when collecting compatible stacks; that used to
 a prayer result which results in uncursing some or all of the hero's items
 	won't uncurse a worn helm of opposite alignment since that would
 	facilitate the hero switching to another god by taking it off
+wielded aklys behaves like Mjollnir when thrown--it usually returns; unlike
+	Mjollnir, it isn't limited to Valkyries or need gauntlets of power
+	(so far, hero-only; an aklys won't return if thrown by a monster)
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1459122529 2016/03/27 23:48:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1520201829 2018/03/04 22:17:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.52 $
 
 # Root of source tree:
 NHSROOT=..
@@ -332,6 +332,14 @@ RANDOBJ =
 # used by `make depend' to reconstruct this Makefile; you shouldn't need this
 AWK	= nawk
 
+# when using 'makedefs -v', also force dat/gitinfo.txt to be up to date;
+# changing this to 0 will change the behavior to only make that file if
+# it doesn't already exist; to skip it completely, create an empty file
+# of that name and also set this to 0; there shouldn't be any need to
+# skip it--if nethack's sources don't reside in a git repository than
+# the script which creates that file will fail benignly and 'makedefs -v'
+# will proceed without it
+GITINFO=1
 
 #VERBOSEMAKE = 1
 
@@ -606,10 +614,13 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 #	file far more complex.  Since "hack.h" depends on most of the include
 #	files, we kludge around this by making date.h dependent on hack.h,
 #	even though it doesn't include this file.
+#	Do NOT include ../dat/gitinfo.txt as either a prerequisite or target.
+#	'makedefs -v' processes it when present and ignores it if not.
 #
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
 ../include/date.h:	$(VERSOURCES) $(HACK_H)
+	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
 	../util/makedefs -v
 
 

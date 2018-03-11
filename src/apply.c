@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1519598527 2018/02/25 22:42:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -442,7 +442,11 @@ struct obj *obj;
     } else if (Underwater) {
         You("blow bubbles through %s.", yname(obj));
     } else {
-        You(whistle_str, obj->cursed ? "shrill" : "high");
+        if (Deaf)
+            You_feel("rushing air tickle your %s.",
+                        body_part(NOSE));
+        else
+            You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
         if (obj->cursed)
             vault_summon_gd();

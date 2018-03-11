@@ -85,6 +85,14 @@ Generate
 .I date.h
 and
 .I options
+file. It will read 
+.I dat/gitinfo.txt
+,only if it is present, to obtain 
+.B githash=
+and 
+.B gitbranch=
+ info and include related preprocessor #defines in
+.I date.h
 file.
 .br
 .TP

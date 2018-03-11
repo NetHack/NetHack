@@ -26,6 +26,7 @@ E void NDECL(display_gamewindows);
 E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
+E boolean FDECL(argcheck, (int, char **, enum earlyarg));
 
 /* ### apply.c ### */
 
@@ -1919,6 +1920,7 @@ E const char *NDECL(bottlename);
 /* ### pray.c ### */
 
 E boolean FDECL(critically_low_hp, (BOOLEAN_P));
+E boolean NDECL(stuck_in_wall);
 #ifdef USE_TRAMPOLI
 E int NDECL(prayer_done);
 #endif
@@ -2570,9 +2572,13 @@ E void FDECL(store_version, (int));
 E unsigned long FDECL(get_feature_notice_ver, (char *));
 E unsigned long NDECL(get_current_feature_ver);
 E const char *FDECL(copyright_banner_line, (int));
+E void FDECL(early_version_info, (BOOLEAN_P));
 
 #ifdef RUNTIME_PORT_ID
 E char *FDECL(get_port_id, (char *));
+#endif
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+E void FDECL(port_insert_pastebuf, (char *));
 #endif
 
 /* ### video.c ### */

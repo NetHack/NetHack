@@ -2033,14 +2033,18 @@ static struct sing_plur one_off[] = {
     { "erinys", "erinyes" },
     { "foot", "feet" },
     { "fungus", "fungi" },
+    { "goose", "geese" },
     { "knife", "knives" },
     { "labrum", "labra" }, /* candelabrum */
     { "louse", "lice" },
     { "mouse", "mice" },
     { "mumak", "mumakil" },
     { "nemesis", "nemeses" },
+    { "ovum", "ova" },
+    { "ox", "oxen" },
     { "rtex", "rtices" }, /* vortex */
     { "tooth", "teeth" },
+    { "serum", "sera" },
     { "staff", "staves" },
     { 0, 0 }
 };
@@ -2050,10 +2054,11 @@ static const char *const as_is[] = {
     "boots",   "shoes",     "gloves",    "lenses",   "scales",
     "eyes",    "gauntlets", "iron bars",
     /* both singular and plural are spelled the same */
-    "deer",    "fish",      "tuna",      "yaki",     "-hai",
-    "krill",   "manes",     "ninja",     "sheep",    "ronin",
-    "roshi",   "shito",     "tengu",     "ki-rin",   "Nazgul",
-    "gunyoki", "piranha",   "samurai",   "shuriken", 0,
+    "deer",    "elk",       "fish",      "tuna",      "yaki",
+    "-hai",    "krill",     "manes",     "moose",     "ninja",
+    "sheep",   "ronin",     "roshi",     "shito",     "tengu",
+    "ki-rin",  "Nazgul",    "gunyoki",   "piranha",   "samurai",
+    "shuriken", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
@@ -2089,7 +2094,8 @@ const char *const *alt_as_is; /* another set like as_is[] */
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
-    if (!strcmpi(basestr, "slice")) {
+    if (!strcmpi(basestr, "slice")
+        || !strcmpi(basestr, "mongoose")) {
         if (to_plural)
             (void) strkitten(basestr, 's');
         return TRUE;

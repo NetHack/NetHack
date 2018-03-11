@@ -35,6 +35,9 @@
 /* globals required within here */
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+typedef HWND(WINAPI *GETCONSOLEWINDOW)();
+static HWND GetConsoleHandle(void);
+static HWND GetConsoleHwnd(void);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -315,6 +318,119 @@ int interjection_type;
     if (interjection_type >= 0 && interjection_type < INTERJECTION_TYPES)
         msmsg(interjection_buf[interjection_type]);
 }
+
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+
+void port_insert_pastebuf(buf)
+char *buf;
+{
+    /* This implementation will utilize the windows clipboard
+     * to accomplish this.
+     */
+
+    char *tmp = buf;
+    HWND hwndConsole = GetConsoleHandle();
+    HGLOBAL hglbCopy; 
+    WCHAR *w, w2[2];
+    int cc, rc, abytes;
+    LPWSTR lpwstrCopy;
+    HANDLE hresult;
+
+    if (!buf || (hwndConsole == NULL))
+        return; 
+ 
+    cc = strlen(buf);
+    /* last arg=0 means "tell me the size of the buffer that I need" */
+    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w2, 0);
+    if (!rc) return;
+
+    abytes = rc * sizeof(WCHAR);
+    w = (WCHAR *)alloc(abytes);     
+    /* Housekeeping need: +free(w) */
+
+    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w, rc);
+    if (!rc) {
+        free(w);
+        return;
+    }
+    if (!OpenClipboard(hwndConsole)) {
+        free(w);
+        return;
+    }
+    /* Housekeeping need: +CloseClipboard(), free(w) */
+
+    EmptyClipboard(); 
+
+    /* allocate global mem obj to hold the text */
+ 
+    hglbCopy = GlobalAlloc(GMEM_MOVEABLE, abytes);
+    if (hglbCopy == NULL) { 
+        CloseClipboard(); 
+        free(w);
+        return;
+    } 
+    /* Housekeeping need: +GlobalFree(hglbCopy), CloseClipboard(), free(w) */
+ 
+    lpwstrCopy = (LPWSTR)GlobalLock(hglbCopy);
+    /* Housekeeping need: +GlobalUnlock(hglbCopy), GlobalFree(hglbCopy),
+                            CloseClipboard(), free(w) */
+
+    memcpy(lpwstrCopy, w, abytes);
+    GlobalUnlock(hglbCopy);
+    /* Housekeeping need: GlobalFree(hglbCopy), CloseClipboard(), free(w) */
+
+    /* put it on the clipboard */
+    hresult = SetClipboardData(CF_UNICODETEXT, hglbCopy);
+    if (!hresult) {
+        raw_printf("Error copying to clipboard.\n");
+        GlobalFree(hglbCopy); /* only needed if clipboard didn't accept data */
+    }
+    /* Housekeeping need: CloseClipboard(), free(w) */
+ 
+    CloseClipboard(); 
+    free(w);
+    return;
+}
+
+static HWND
+GetConsoleHandle(void)
+{
+    HMODULE hMod = GetModuleHandle("kernel32.dll");
+    GETCONSOLEWINDOW pfnGetConsoleWindow =
+        (GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
+    if (pfnGetConsoleWindow)
+        return pfnGetConsoleWindow();
+    else
+        return GetConsoleHwnd();
+}
+
+static HWND
+GetConsoleHwnd(void)
+{
+    int iterations = 0;
+    HWND hwndFound = 0;
+    char OldTitle[1024], NewTitle[1024], TestTitle[1024];
+
+    /* Get current window title */
+    GetConsoleTitle(OldTitle, sizeof OldTitle);
+
+    (void) sprintf(NewTitle, "NETHACK%d/%d", GetTickCount(),
+                   GetCurrentProcessId());
+    SetConsoleTitle(NewTitle);
+
+    GetConsoleTitle(TestTitle, sizeof TestTitle);
+    while (strcmp(TestTitle, NewTitle) != 0) {
+        iterations++;
+        /* sleep(0); */
+        GetConsoleTitle(TestTitle, sizeof TestTitle);
+    }
+    hwndFound = FindWindow(NULL, NewTitle);
+    SetConsoleTitle(OldTitle);
+    /*       printf("%d iterations\n", iterations); */
+    return hwndFound;
+}
+
+#endif
 
 #ifdef RUNTIME_PORT_ID
 /*

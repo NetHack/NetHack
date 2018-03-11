@@ -275,6 +275,7 @@ levitation_dialogue()
 
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
         const char *s = levi_texts[SIZE(levi_texts) - i];
+
         if (index(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
@@ -336,6 +337,30 @@ burn_away_slime()
     }
 }
 
+/* Intrinsic Passes_walls is temporary when your god is trying to fix
+   all troubles and then TROUBLE_STUCK_IN_WALL calls safe_teleds() but
+   it can't find anywhere to place you.  If that happens you get a small
+   value for (HPasses_walls & TIMEOUT) to move somewhere yourself.
+   Message given is "you feel much slimmer" as a joke hint that you can
+   move between things which are closely packed--like the substance of
+   solid rock! */
+static NEARDATA const char *const phaze_texts[] = {
+    "You start to feel bloated.",
+    "You are feeling rather flabby.",
+};
+
+STATIC_OVL void
+phaze_dialogue()
+{
+    long i = ((HPasses_walls & TIMEOUT) / 2L);
+
+    if (EPasses_walls || (HPasses_walls & ~TIMEOUT))
+        return;
+
+    if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
+        pline1(phaze_texts[SIZE(phaze_texts) - i]);
+}
+
 void
 nh_timeout()
 {
@@ -373,8 +398,10 @@ nh_timeout()
         vomiting_dialogue();
     if (Strangled)
         choke_dialogue();
-    if (Levitation)
+    if (HLevitation & TIMEOUT)
         levitation_dialogue();
+    if (HPasses_walls & TIMEOUT)
+        phaze_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
@@ -525,6 +552,15 @@ nh_timeout()
                 break;
             case LEVITATION:
                 (void) float_down(I_SPECIAL | TIMEOUT, 0L);
+                break;
+            case PASSES_WALLS:
+                if (!Passes_walls) {
+                    if (stuck_in_wall())
+                        You_feel("hemmed in again.");
+                    else
+                        pline("You're back to your %s self again.",
+                              !Upolyd ? "normal" : "unusual");
+                }
                 break;
             case STRANGLED:
                 killer.format = KILLED_BY;

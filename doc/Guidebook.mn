@@ -4292,46 +4292,36 @@ in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Janet Walz	Nathan Eady
-Alex Kompel	Janne Salmijarvi	Norm Meluch
-Andreas Dorn	Jean-Christophe Collet	Olaf Seibert
-Andy Church	Jeff Bailey	Pasi Kallinen
-Andy Swanson	Jochen Erwied	Pat Rankin
-Ari Huttunen	John Kallen	Paul Winner
-Barton House	John Rupley	Pierre Martineau
-Benson I. Margulies	John S. Bien	Ralf Brown
-Bill Dyer	Johnny Lee	Ray Chason
-Boudewijn Waijers	Jon W{tte	Richard Addison
-Bruce Cox	Jonathan Handler	Richard Beigel
-Bruce Holloway	Joshua Delahunty	Richard P. Hughey
-Bruce Mewborne	Keizo Yamamoto	Rob Menke
-Carl Schelin	Ken Arnold	Robin Bandy
-Chris Russo	Ken Arromdee	Robin Johnson
-David Cohrs	Ken Lorber	Roderick Schertler
-David Damerell	Ken Washikita	Roland McGrath
-David Gentzel	Kevin Darcy	Ron Van Iwaarden
-David Hairston	Kevin Hugo	Ronnen Miller
-Dean Luick	Kevin Sitze	Ross Brown
-Del Lamb	Kevin Smolkowski	Sascha Wostmann
-Derek S. Ray	Kevin Sweet	Scott Bigham
-Deron Meranda	Lars Huttar	Scott R. Turner
-Dion Nicolaas	Leon Arnott	Sean Hunt
-Dylan O'Donnell	M. Drew Streib	Stephen Spackman
-Eric Backus	Malcolm Ryan	Stefan Thielscher
-Eric Hendrickson	Mark Gooderum	Stephen White
-Eric R. Smith	Mark Modrall	Steve Creps
-Eric S. Raymond	Marvin Bressler	Steve Linhart
-Erik Andersen	Matthew Day	Steve VanDevender
-Frederick Roeber	Merlyn LeRoy	Teemu Suikki
-Gil Neiger	Michael Allison	Tim Lennan
-Greg Laskin	Michael Feir	Timo Hakulinen
-Greg Olson	Michael Hamel	Tom Almy
-Gregg Wonderly	Michael Sokolov	Tom West
-Hao-yang Wang	Mike Engber	Warren Cheung
-Helge Hafting	Mike Gallop	Warwick Allison
-Irina Rempt-Drijfhout	Mike Passaretti	Yitzhak Sapir
-Izchak Miller	Mike Stephenson
-J. Ali Harlow	Mikko Juola
+Adam Aronow	Erik Andersen	Kevin Sitze	Ray Chason
+Alex Kompel	Frederick Roeber	Kevin Smolkowski	Richard Addison
+Alex Smith	Gil Neiger	Kevin Sweet	Richard Beigel
+Andreas Dorn	Greg Laskin	Lars Huttar	Richard P. Hughey
+Andy Church	Greg Olson	Leon Arnott	Rob Menke
+Andy Swanson	Gregg Wonderly	M. Drew Streib	Robin Bandy
+Ari Huttunen	Hao-yang Wang	Malcolm Ryan	Robin Johnson
+Barton House	Helge Hafting	Mark Gooderum	Roderick Schertler
+Benson I. Margulies	Irina Rempt-Drijfhout	Mark Modrall	Roland McGrath
+Bill Dyer	Izchak Miller	Marvin Bressler	Ron Van Iwaarden
+Boudewijn Waijers	J. Ali Harlow	Matthew Day	Ronnen Miller
+Bruce Cox	Janet Walz	Merlyn LeRoy	Ross Brown
+Bruce Holloway	Janne Salmijarvi	Michael Allison	Sascha Wostmann
+Bruce Mewborne	Jean-Christophe Collet	Michael Feir	Scott Bigham
+Carl Schelin	Jeff Bailey	Michael Hamel	Scott R. Turner
+Chris Russo	Jochen Erwied	Michael Sokolov	Sean Hunt
+David Cohrs	John Kallen	Mike Engber	Stephen Spackman
+David Damerell	John Rupley	Mike Gallop	Stefan Thielscher
+David Gentzel	John S. Bien	Mike Passaretti	Stephen White
+David Hairston	Johnny Lee	Mike Stephenson	Steve Creps
+Dean Luick	Jon W{tte	Mikko Juola	Steve Linhart
+Del Lamb	Jonathan Handler	Nathan Eady	Steve VanDevender
+Derek S. Ray	Joshua Delahunty	Norm Meluch	Teemu Suikki
+Deron Meranda	Keizo Yamamoto	Olaf Seibert	Tim Lennan
+Dion Nicolaas	Ken Arnold	Pasi Kallinen	Timo Hakulinen
+Dylan O'Donnell	Ken Arromdee	Pat Rankin	Tom Almy
+Eric Backus	Ken Lorber	Patric Mueller	Tom West
+Eric Hendrickson	Ken Washikita	Paul Winner	Warren Cheung
+Eric R. Smith	Kevin Darcy	Pierre Martineau	Warwick Allison
+Eric S. Raymond	Kevin Hugo	Ralf Brown	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
 

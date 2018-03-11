@@ -1,10 +1,10 @@
 @echo off
 REM    NetHack 3.6 setup.bat   $NHDT-Date: 1432512792 2015/05/25 00:13:12 $ $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
-REM    Copyright (c) NetHack PC Development Team 1990 - 2012
+REM    Copyright (c) NetHack PC Development Team 1990 - 2018
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
-echo   Copyright (c) NetHack PC Development Team 1990 - 2012
+echo   Copyright (c) NetHack PC Development Team 1990 - 2018
 echo   NetHack may be freely redistributed.  See license for details.
 echo.
 REM setup batch file for msdos, see Install.dos for details.
@@ -59,6 +59,12 @@ echo "Copying ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
 copy ..\..\include\patchl~1.h ..\..\include\patchlev.h
 if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
 ren ..\..\include\patchl~1.h patchlev.old
+:long2c
+echo "Copying ..\..\sys\share\pmatch~1.c -> ..\..\sys\share\pmatchre.c"
+copy ..\..\sys\share\pmatch~1.c ..\..\sys\share\pmatchre.c
+:long2d
+echo "Copying ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
+copy ..\..\sys\share\posixr~1.c ..\..\sys\share\posixreg.c
 :long2ok
 
 REM Missing guidebook is not fatal to the build process

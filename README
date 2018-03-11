@@ -1,24 +1,39 @@
                 NetHack 3.6.1 -- General information
 
-NetHack 3.6 is an enhancement to the dungeon exploration game NetHack.
-It is a distant descendent of Rogue and Hack, and a direct descendent of
-NetHack 3.4. In order to avoid confusion with interim development code 
-that was posted online in 2014 by others, there is no NetHack 3.5 release.
+NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
+which is a distant descendent of Rogue and Hack, and a direct descendent of
+NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.1 contains several dozen bugfixes.
-
-The file doc/fixes36.1 in the source distribution has a full list of each. 
+NetHack 3.6.1 contains several hundred bug fixes to NetHack 3.6.0. The 
+file doc/fixes36.1 in the source distribution has a full list of them. 
 The text in there was written for the development team's own use and is 
 provided "as is", so please do not ask us to further explain the entries 
 in that file. Some entries might be considered "spoilers", particularly
 in the "new features" section.
 
-Here are some additional general notes that are not considered spoilers:
- * Some code paths and long-established game features have been made 
-   part of the base build and no longer conditional on compile settings.
- * Several treasured NetHack community patches, or a variation of 
-   them, have been rolled in to the base NetHack source tree, incuding: 
-   menucolors, pickup thrown, statue glyphs, dungeon overview, sortloot.
+Below you will find some other general notes that were not considered
+spoilers:
+* additional Terry Pratchett tribute passages
+* enhanced map position picking
+* new status line conditions Stone Strngl Deaf Lev Fly Ride
+* updated status hilites and several interface enhancements
+* new paranoid_confirm settings
+* a new extended command #kick
+* the vanquished monsters list can be sorted during end of game disclosure
+* fountains are bright blue
+* travel accepts 'm' (request menu) prefix
+* pressing a or A when cursor positioning shows menu of "interesting" features
+* pressing z or Z when cursor positioning can cycle through valid locations
+* add option herecmd_menu to make a mouse click on your character pop up a menu
+* #adjust's behavior altered when collecting compatible stacks
+* Some community patches that were included:
+    - Malcolm Ryan's improved tin opener
+    - Ray Chason's MSDOS port support for some VESA modes
+    - Ray Chason's Qt4 windowport
+    - Darshan Shaligram's pet ranged attack
+    - Jason Dorje Short's key rebinding
+    - Maxime Bacoux's new DUMPLOG
+* updated database entries for several things
 
                         - - - - - - - - - - -
 
@@ -65,6 +80,9 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
 	Mac OS X 10.9
 	OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
+
+    Instructions have been provided by way of community contribution on:
+        msdos protected mode using djgpp
 
     Previous versions of NetHack were tested and known to run on the 
     following systems, but it is unknown if they can still build and 
@@ -122,7 +140,10 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
 If you have problems building the game, or you find bugs in it, we recommend 
 filing a bug report from our "Contact Us" web page at:
-    http://www.nethack.org/ 
+    https://www.nethack.org/common/contact.html or
+    http://www.nethack.org/common/contact.html
+Please include the version information from #version or the command line
+option --version in the apropriate field.
 
 A public repository of the latest NetHack code that we've made
 available can be obtained via git here:

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1496531112 2017/06/03 23:05:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1519420054 2018/02/23 21:07:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,8 +6,7 @@
 
 STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
-STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
-                                                  const void *));
+STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
 STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
 STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL int FDECL(gloc_filter_floodfill_matcharea, (int, int));
@@ -15,6 +14,7 @@ STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
+STATIC_PTR char *FDECL(docall_xname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);
 STATIC_DCL char *FDECL(bogusmon, (char *,char *));
 
@@ -37,12 +37,13 @@ nextmbuf()
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
-static boolean FDECL((*getpos_getvalid), (int,int)) = (boolean FDECL((*), (int,int))) 0;
+static boolean FDECL((*getpos_getvalid), (int, int)) =
+                                           (boolean FDECL((*), (int, int))) 0;
 
 void
 getpos_sethilite(gp_hilitef, gp_getvalidf)
 void FDECL((*gp_hilitef), (int));
-boolean FDECL((*gp_getvalidf), (int,int));
+boolean FDECL((*gp_getvalidf), (int, int));
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -138,16 +139,18 @@ const char *goal;
             visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
-
-    Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
-            visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
-    putstr(tmpwin, 0, sbuf);
-    Sprintf(sbuf,
-            "Use '%s' to change the mode of limiting possible targets.",
-            visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
-    putstr(tmpwin, 0, sbuf);
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
+        Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
+                visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+        putstr(tmpwin, 0, sbuf);
+        Sprintf(sbuf,
+                "Use '%s' to change the mode of limiting possible targets.",
+                visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+        putstr(tmpwin, 0, sbuf);
+    }
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
+
         if (getpos_getvalid) {
             Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
@@ -282,20 +285,21 @@ int x,y;
     if (glyph == gloc_filter_floodfill_match_glyph)
         return TRUE;
 
-    if (gloc_filter_classify_glyph(glyph) == gloc_filter_classify_glyph(gloc_filter_floodfill_match_glyph))
+    if (gloc_filter_classify_glyph(glyph)
+        == gloc_filter_classify_glyph(gloc_filter_floodfill_match_glyph))
         return TRUE;
 
     return FALSE;
 }
 
 void
-gloc_filter_floodfill(x,y)
-int x,y;
+gloc_filter_floodfill(x, y)
+int x, y;
 {
-    gloc_filter_floodfill_match_glyph = back_to_glyph(x,y);
+    gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
-    selection_floodfill(gloc_filter_map, x,y, FALSE);
+    selection_floodfill(gloc_filter_map, x, y, FALSE);
 }
 
 void
@@ -330,23 +334,20 @@ gloc_filter_done()
     }
 }
 
-
 STATIC_OVL boolean
-gather_locs_interesting(x,y, gloc)
-int x,y, gloc;
+gather_locs_interesting(x, y, gloc)
+int x, y, gloc;
 {
     /* TODO: if glyph is a pile glyph, convert to ordinary one
      *       in order to keep tail/boulder/rock check simple.
      */
     int glyph = glyph_at(x, y);
 
-    if (iflags.getloc_filter == GFILTER_VIEW && !cansee(x,y))
+    if (iflags.getloc_filter == GFILTER_VIEW && !cansee(x, y))
         return FALSE;
-    if (iflags.getloc_filter == GFILTER_AREA && !GLOC_SAME_AREA(x,y)
-         && !GLOC_SAME_AREA(x-1,y)
-         && !GLOC_SAME_AREA(x,y-1)
-         && !GLOC_SAME_AREA(x+1,y)
-         && !GLOC_SAME_AREA(x,y+1))
+    if (iflags.getloc_filter == GFILTER_AREA && !GLOC_SAME_AREA(x, y)
+        && !GLOC_SAME_AREA(x - 1, y) && !GLOC_SAME_AREA(x, y - 1)
+        && !GLOC_SAME_AREA(x + 1, y) && !GLOC_SAME_AREA(x, y + 1))
         return FALSE;
 
     switch (gloc) {
@@ -480,7 +481,8 @@ boolean fulldir;
         if (dx) {
             if (abs(dx) > 9999)
                 dx = sgn(dx) * 9999;
-            Sprintf(eos(buf), "%d%s", abs(dx), dirnames[2 + (dx > 0)][fulldir]);
+            Sprintf(eos(buf), "%d%s", abs(dx),
+                    dirnames[2 + (dx > 0)][fulldir]);
         }
     }
     return buf;
@@ -544,8 +546,9 @@ int cx, cy;
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
-                    (iflags.autodescribe && getpos_getvalid && !getpos_getvalid(cx,cy))
-                    ? " (illegal)" : "",
+                    (iflags.autodescribe
+                     && getpos_getvalid && !getpos_getvalid(cx, cy))
+                      ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
@@ -590,8 +593,10 @@ int gloc;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
         if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch)) {
-            (void) coord_desc(garr[i].x, garr[i].y, tmpbuf, iflags.getpos_coords);
-            Sprintf(fullbuf, "%s%s%s", firstmatch, (*tmpbuf ? " " : ""), tmpbuf);
+            (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
+                              iflags.getpos_coords);
+            Sprintf(fullbuf, "%s%s%s", firstmatch,
+                    (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fullbuf,
                      MENU_UNSELECTED);
         }
@@ -738,8 +743,9 @@ const char *goal;
                     dy = ydir[i];
                     while (isok(cx + dx, cy + dy)
                            && glyph == glyph_at(cx + dx, cy + dy)
-                           && isok(cx + dx+xdir[i], cy+dy+ydir[i])
-                           && glyph == glyph_at(cx + dx+xdir[i], cy + dy+ydir[i])) {
+                           && isok(cx + dx + xdir[i], cy + dy + ydir[i])
+                           && glyph == glyph_at(cx + dx + xdir[i],
+                                                cy + dy + ydir[i])) {
                         dx += xdir[i];
                         dy += ydir[i];
                     }
@@ -928,10 +934,9 @@ const char *goal;
 
                     if (!force)
                         Strcpy(note, "aborted");
-                    else
-                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'", /* hjkl */
-                                Cmd.move_W, Cmd.move_S, Cmd.move_N,
-                                Cmd.move_E,
+                    else /* hjkl */
+                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
+                                Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E,
                                 visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
@@ -966,7 +971,7 @@ const char *goal;
         if (garr[i])
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
-    getpos_getvalid = (boolean FDECL((*), (int,int))) 0;
+    getpos_getvalid = (boolean FDECL((*), (int, int))) 0;
     return result;
 }
 
@@ -1401,33 +1406,56 @@ docallcmd()
     return 0;
 }
 
+/* for use by safe_qbuf() */
+STATIC_PTR char *
+docall_xname(obj)
+struct obj *obj;
+{
+    struct obj otemp;
+
+    otemp = *obj;
+    otemp.oextra = (struct oextra *) 0;
+    otemp.quan = 1L;
+    /* in case water is already known, convert "[un]holy water" to "water" */
+    otemp.blessed = otemp.cursed = 0;
+    /* remove attributes that are doname() caliber but get formatted
+       by xname(); most of these fixups aren't really needed because the
+       relevant type of object isn't callable so won't reach this far */
+    if (otemp.oclass == WEAPON_CLASS)
+        otemp.opoisoned = 0; /* not poisoned */
+    else if (otemp.oclass == POTION_CLASS)
+        otemp.odiluted = 0; /* not diluted */
+    else if (otemp.otyp == TOWEL || otemp.otyp == STATUE)
+        otemp.spe = 0; /* not wet or historic */
+    else if (otemp.otyp == TIN)
+        otemp.known = 0; /* suppress tin type (homemade, &c) and mon type */
+    else if (otemp.otyp == FIGURINE)
+        otemp.corpsenm = NON_PM; /* suppress mon type */
+    else if (otemp.otyp == HEAVY_IRON_BALL)
+        otemp.owt = objects[HEAVY_IRON_BALL].oc_weight; /* not "very heavy" */
+    else if (otemp.oclass == FOOD_CLASS && otemp.globby)
+        otemp.owt = 120; /* 6*20, neither a small glob nor a large one */
+
+    return an(xname(&otemp));
+}
+
 void
 docall(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     char buf[BUFSZ], qbuf[QBUFSZ];
-    struct obj otemp;
-    register char **str1;
+    char **str1;
 
     if (!obj->dknown)
         return; /* probably blind */
-    otemp = *obj;
-    otemp.quan = 1L;
-    otemp.oextra = (struct oextra *) 0;
 
-    if (objects[otemp.otyp].oc_class == POTION_CLASS && otemp.fromsink) {
+    if (obj->oclass == POTION_CLASS && obj->fromsink)
         /* kludge, meaning it's sink water */
         Sprintf(qbuf, "Call a stream of %s fluid:",
-            OBJ_DESCR(objects[otemp.otyp]));
-    } else {
-        char tmpbuf[BUFSZ], *tmpname = an(xname(&otemp));
-
-        if (strlen(tmpname) < (BUFSZ - 1)) {
-            Strcpy(tmpbuf, tmpname);
-            tmpbuf[QBUFSZ - 7] = '\0'; /* need room for "Call :"*/
-            Sprintf(qbuf, "Call %s:", tmpbuf);
-        }
-    }
+                OBJ_DESCR(objects[obj->otyp]));
+    else
+        (void) safe_qbuf(qbuf, "Call ", ":", obj,
+                         docall_xname, simpleonames, "thing");
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
         return;

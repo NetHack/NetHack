@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# $NHDT-Date$
 
 #STARTUP-START
 BEGIN {
@@ -21,12 +20,14 @@ BEGIN {
     $gitdir = `git rev-parse --git-dir`;
     chomp $gitdir;
     push(@INC, $gitdir.$PDS."hooks");
+
+	# special case for this script only: allow
+	# it to run from DEVEL or $TOP
+    if (-f "hooksdir/NHgithook.pm" || -f "DEVEL/hooksdir/NHgithook.pm"){
+	push(@INC, "DEVEL/hooksdir");
+    }
+    chdir("..") if (-f "hooksdir/NHgithook.pm");
 }
-
 use NHgithook;
-#STARTUP-END
 
-&NHgithook::PRE;
 &NHgithook::nhversioning;
-&NHgithook::POST;
-exit 0;

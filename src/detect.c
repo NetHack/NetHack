@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1495346103 2017/05/21 05:55:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1519281847 2018/02/22 06:44:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1324,6 +1324,10 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
 
     if (!level.flags.hero_memory || unconstrained || mdetected) {
         flush_screen(1);                 /* flush temp screen */
+        /* the getpos() prompt from browse_map() is only shown when
+           flags.verbose is set, but make this unconditional so that
+           not-verbose users become aware of the prompting situation */
+        You("sense your surroundings.");
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
         if (extended)

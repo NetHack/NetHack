@@ -26,5 +26,6 @@ use NHgithook;
 #STARTUP-END
 
 &NHgithook::PRE;
+&NHgithook::nhversioning;
 &NHgithook::POST;
 exit 0;

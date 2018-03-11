@@ -4,7 +4,7 @@
  |___/\___|\_/\___|_\___/ .__/\___|_|
                         |_|
 
-$NHDT-Date: 1518800857 2018/02/16 17:07:37 $
+$NHDT-Date: 1519228647 2018/02/21 15:57:27 $
 
 Welcome to the NetHack Infrastructure Developer's Guide.
 
@@ -25,6 +25,7 @@ CONTENTS
 5. variable expansion
 6. reserved names
 7. nhadd/nhcommit
+8. hooks
 ------------------------------------------------------------------------------
 1. email
 Email to devteam@nethack.org will usually get a response, but it may take a
@@ -37,7 +38,8 @@ The public NetHack git repository is available (read-only) at:
     or
   https://github.com/NetHack/NetHack.git
 
-XXX need to discuss what branches are available
+Branches:
+NetHack-3.6.0	The 3.6.0 release code and subsequent fixes and additions.
 ------------------------------------------------------------------------------
 3. bug reporting
 Please use the form at http://www.nethack.org/common/contact.html (or send
@@ -94,7 +96,8 @@ C. Configure the repository:
 		-v verbose
 		-n dry run
    You can re-run nhgitset.pl as often as needed; occasionally we will
-   update it and ask you to run it again.
+   update it (or something it installs) and you will need to run it again
+   so the changes take effect.
 D. aliases
    Two aliases are installed by nhgitset.pl:
 	nhadd
@@ -211,3 +214,19 @@ D. Using your own hooks
    "perldoc DEVEL/hooksdir/nhsub".
    
 ------------------------------------------------------------------------------
+8. hooks
+
+   nhgitset.pl also installs hooks into .git/hooks.  These hooks provide
+   a framework which allows local hook code to co-exist with hook code we
+   supply - see DEVEL/hooksdir/NHgithook.pm for details.
+
+   We currently use the following hooks:
+    post-checkout
+    post-commit
+    post-merge
+   These are used to generate dat/gitinfo.txt which provides the data that
+   ends up available through the game command #version and the command line
+   option --version.
+
+------------------------------------------------------------------------------
+

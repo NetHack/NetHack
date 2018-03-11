@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1516697571 2018/01/23 08:52:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1520022901 2018/03/02 20:35:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -52,7 +52,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
+static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2018/03/02";
 #endif
 
 /* names of files to be generated */
@@ -72,6 +72,7 @@ static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
 #define QTXT_O_FILE "quest.dat"
 #define VIS_TAB_H "vis_tab.h"
 #define VIS_TAB_C "vis_tab.c"
+#define GITINFO_FILE "gitinfo.txt"
 /* locations for those files */
 #ifdef AMIGA
 #define FILE_PREFIX
@@ -177,6 +178,7 @@ static char *FDECL(bannerc_string, (char *, const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
                            (const char *, int *, long *, unsigned long));
+static boolean FDECL(get_gitinfo, (char *, char *));
 static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
@@ -209,6 +211,7 @@ static char *FDECL(fgetline, (FILE*));
 static char *FDECL(tmpdup, (const char *));
 static char *FDECL(limit, (char *, int));
 static char *FDECL(eos, (char *));
+static int FDECL(case_insensitive_comp, (const char *, const char *));
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
@@ -1253,6 +1256,7 @@ do_date()
 #else
     time_t clocktim = 0;
 #endif
+    char githash[BUFSZ], gitbranch[BUFSZ];
     char *c, cbuf[60], buf[BUFSZ];
     const char *ul_sfx;
 
@@ -1386,6 +1390,10 @@ do_date()
     Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
             bannerc_string(buf, cbuf));
     Fprintf(ofp, "\n");
+    if (get_gitinfo(githash, gitbranch)) {
+        Fprintf(ofp, "#define NETHACK_GIT_SHA \"%s\"\n", githash);
+        Fprintf(ofp, "#define NETHACK_GIT_BRANCH \"%s\"\n", gitbranch);
+    }
 #ifdef AMIGA
     {
         struct tm *tm = localtime((time_t *) &clocktim);
@@ -1398,6 +1406,84 @@ do_date()
 #endif
     Fclose(ofp);
     return;
+}
+
+boolean
+get_gitinfo(githash, gitbranch)
+char *githash, *gitbranch;
+{
+    FILE *gifp;
+    size_t len;
+    char infile[600];
+    char *line, *strval, *opt, *c, *end;
+    boolean havebranch = FALSE, havehash = FALSE;
+
+    if (!githash || !gitbranch) return FALSE;
+
+    Sprintf(infile, DATA_IN_TEMPLATE, GITINFO_FILE);
+    if (!(gifp = fopen(infile, RDTMODE))) {
+        /* perror(infile); */
+        return FALSE;
+    }
+
+    /* read the gitinfo file */
+    while ((line = fgetline(gifp)) != 0) {
+        strval = index(line, '=');
+        if (strval && strlen(strval) < (BUFSZ-1)) {
+            opt = line;
+            *strval++ = '\0';
+            /* strip off the '\n' */
+            if ((c = index(strval, '\n')) != 0)
+                *c = '\0'; 
+            if ((c = index(opt, '\n')) != 0)
+                *c = '\0';
+            /* strip leading and trailing white space */
+            while (*strval == ' ' || *strval == '\t')
+                strval++;
+            end = eos(strval);
+            while (--end >= strval && (*end == ' ' || *end == '\t'))
+            *end = '\0';
+            while (*opt == ' ' || *opt == '\t')
+                opt++;
+            end = eos(opt);
+            while (--end >= opt && (*end == ' ' || *end == '\t'))
+            *end = '\0';
+
+            len = strlen(opt);
+            if ((len >= strlen("gitbranch")) && !case_insensitive_comp(opt, "gitbranch")) {
+                Strcpy(gitbranch, strval);
+                havebranch = TRUE;
+            }
+            if ((len >= strlen("githash")) && !case_insensitive_comp(opt, "githash")) {
+                Strcpy(githash, strval);
+                havehash = TRUE;
+            }
+	}
+    }
+    Fclose(gifp);
+    if (havebranch && havehash)
+        return TRUE;
+    return FALSE;
+}
+
+static int
+case_insensitive_comp(s1, s2)
+const char *s1;
+const char *s2;
+{
+    uchar u1, u2;
+
+    for (;; s1++, s2++) {
+        u1 = (uchar) *s1;
+        if (isupper(u1))
+            u1 = tolower(u1);
+        u2 = (uchar) *s2;
+        if (isupper(u2))
+            u2 = tolower(u2);
+        if (u1 == '\0' || u1 != u2)
+            break;
+    }
+    return u1 - u2;
 }
 
 static char save_bones_compat_buf[BUFSZ];
