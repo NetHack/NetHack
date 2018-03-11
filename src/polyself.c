@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1513298347 2017/12/15 00:39:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1520797126 2018/03/11 19:38:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -964,7 +964,7 @@ int alone;
 {
     struct obj *otmp;
     const char *what, *which, *whichtoo;
-    boolean candropwep, candropswapwep;
+    boolean candropwep, candropswapwep, updateinv = TRUE;
 
     if (uwep) {
         /* !alone check below is currently superfluous but in the
@@ -989,17 +989,26 @@ int alone;
                 You("find you must %s %s %s!", what,
                     the_your[!!strncmp(which, "corpse", 6)], which);
             }
+            /* if either uwep or wielded uswapwep is flagged as 'in_use'
+               then don't drop it or explicitly update inventory; leave
+               those actions to caller (or caller's caller, &c) */
             if (u.twoweap) {
                 otmp = uswapwep;
                 uswapwepgone();
-                if (candropswapwep)
+                if (otmp->in_use)
+                    updateinv = FALSE;
+                else if (candropswapwep)
                     dropx(otmp);
             }
             otmp = uwep;
             uwepgone();
-            if (candropwep)
+            if (otmp->in_use)
+                updateinv = FALSE;
+            else if (candropwep)
                 dropx(otmp);
-            update_inventory();
+
+            if (updateinv)
+                update_inventory();
         } else if (!could_twoweap(youmonst.data)) {
             untwoweapon();
         }
