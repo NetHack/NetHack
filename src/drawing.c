@@ -2,7 +2,7 @@
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 #include "hack.h"
 #include "tcap.h"
@@ -53,7 +53,7 @@ const struct class_sym def_oc_syms[MAXOCLASSES] = {
     { ROCK_SYM, "large stones", "boulder or statue" },
     { BALL_SYM, "iron balls", "iron ball" },
     { CHAIN_SYM, "chains", "iron chain" },
-    { VENOM_SYM, "venoms", "splash of venom" }
+    { VENOM_SYM, "monster parts", "monster projectile" }
 };
 
 /* Default monster class symbols.  See monsym.h. */

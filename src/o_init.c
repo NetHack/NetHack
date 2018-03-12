@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/23/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h" /* save & restore info */
@@ -222,13 +222,16 @@ int *lo_p, *hi_p; /* output: range that item belongs among */
         break;
     case RING_CLASS:
     case WAND_CLASS:
-    case VENOM_CLASS:
         /* entire class */
         *lo_p = bases[ocls];
         for (i = *lo_p; objects[i].oc_class == ocls; i++)
             continue;
         *hi_p = i - 1;
         break;
+    case VENOM_CLASS:
+        /* don't shuffle quills */
+        if (otyp >= BLINDING_VENOM && otyp <= ACID_VENOM)
+            *lo_p = BLINDING_VENOM, *hi_p = ACID_VENOM;
     }
 
     /* artifact checking might ask about item which isn't part of any range
@@ -245,11 +248,11 @@ shuffle_all()
     /* entire classes; obj_shuffle_range() handles their exceptions */
     static char shuffle_classes[] = {
         AMULET_CLASS, POTION_CLASS, RING_CLASS,  SCROLL_CLASS,
-        SPBOOK_CLASS, WAND_CLASS,   VENOM_CLASS,
+        SPBOOK_CLASS, WAND_CLASS,
     };
     /* sub-class type ranges (one item from each group) */
     static short shuffle_types[] = {
-        HELMET, LEATHER_GLOVES, CLOAK_OF_PROTECTION, SPEED_BOOTS,
+        HELMET, LEATHER_GLOVES, CLOAK_OF_PROTECTION, SPEED_BOOTS, VENOM_CLASS,
     };
     int first, last, idx;
 

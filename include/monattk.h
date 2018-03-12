@@ -1,7 +1,7 @@
 /* NetHack 3.6	monattk.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 /* Copyright 1988, M. Stephenson */
-/* File changed 2/23/18 by NullCGT */
+/* File changed 3/11/18 by NullCGT */
 
 #ifndef MONATTK_H
 #define MONATTK_H
@@ -80,6 +80,7 @@
 #define AD_CORR 42  /* corrode armor (black pudding) */
 #define AD_VOID 43  /* disintegrate the target (void dragon) */
 #define AD_MEMR 44  /* forget 1% of items (thought eater) */
+#define AD_QUIL 45  /* quills (porcupine and manticore) */
 
 #define AD_CLRC 240 /* random clerical spell */
 #define AD_SPEL 241 /* random magic spell */

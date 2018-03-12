@@ -1,7 +1,7 @@
 /* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 2/05/18 by NullCGT */
+/* Edited 3/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -748,12 +748,15 @@ struct attack *mattk;
 
     if (mtmp->mcan) {
         if (!Deaf)
-            pline("A dry rattle comes from %s throat.",
+            pline("A dry rattle comes from %s body.",
                   s_suffix(mon_nam(mtmp)));
         return 0;
     }
     if (m_lined_up(mtarg, mtmp)) {
         switch (mattk->adtyp) {
+        case AD_QUIL:
+            otmp = mksobj(QUILL, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
@@ -766,8 +769,13 @@ struct attack *mattk;
             break;
         }
         if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my))) {
-            if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
+            if (canseemon(mtmp)) {
+                if (otmp->otyp == QUILL) {
+                    pline("%s fires a quill!", Monnam(mtmp));
+                } else {
+                    pline("%s spits venom!", Monnam(mtmp));
+                }
+            }
             target = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
@@ -955,6 +963,9 @@ struct attack *mattk;
     }
     if (lined_up(mtmp)) {
         switch (mattk->adtyp) {
+        case AD_QUIL:
+            otmp = mksobj(QUILL, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
@@ -968,8 +979,11 @@ struct attack *mattk;
         }
         if (!rn2(BOLT_LIM
                  - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
-            if (canseemon(mtmp))
+            if (canseemon(mtmp) && otmp->otyp != QUILL) {
                 pline("%s spits venom!", Monnam(mtmp));
+            } else if (canseemon(mtmp)) {
+                pline("%s launches a quill!", Monnam(mtmp));
+            }
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);

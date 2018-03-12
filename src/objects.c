@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/8/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -1182,13 +1182,16 @@ OBJECT(OBJ("iron chain", None),
 /* Venom is normally a transitory missile (spit by various creatures)
  * but can be wished for in wizard mode so could occur in bones data.
  */
-OBJECT(OBJ("blinding venom", "splash of venom"),
+OBJECT(OBJ("blinding venom", "splash of green venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
-       VENOM_CLASS, 500, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
-OBJECT(OBJ("acid venom", "splash of venom"),
+       VENOM_CLASS, 500, 0, 1, 0, 0, 0, 0, 0, 0, CLR_GREEN),
+OBJECT(OBJ("acid venom", "splash of yellow venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
-       VENOM_CLASS, 500, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
+       VENOM_CLASS, 500, 0, 1, 0, 6, 6, 0, 0, 0, CLR_YELLOW),
         /* +d6 small or large */
+OBJECT(OBJ("quill", "bony quill"),
+      BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, BONE), 0,
+      VENOM_CLASS, 0, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
 
 /* fencepost, the deadly Array Terminator -- name [1st arg] *must* be NULL */
 OBJECT(OBJ(None, None),

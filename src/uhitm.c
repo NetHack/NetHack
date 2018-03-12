@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/28/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2711,6 +2711,16 @@ boolean wep_was_destroyed;
         case AD_STUN: /* specifically yellow mold */
             if (!Stunned)
                 make_stunned((long) tmp, TRUE);
+            break;
+        case AD_QUIL:
+            if (monnear(mon, u.ux, u.uy) && mhit) {
+                if (Blind || !flags.verbose) {
+                    You("are jabbed by something sharp!");
+                } else {
+                    You("are jabbed by %s quills!", s_suffix(mon_nam(mon)));
+                    mdamageu(mon, tmp);
+                }
+            }
             break;
         case AD_FIRE:
             if (monnear(mon, u.ux, u.uy)) {

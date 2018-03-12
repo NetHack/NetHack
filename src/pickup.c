@@ -6,6 +6,8 @@
  *      Contains code for picking objects up, and container use.
  */
 
+/* Edited on 3/11/18 by NullCGT */
+
 #include "hack.h"
 
 #define CONTAINED_SYM '>' /* from invent.c */
@@ -2971,7 +2973,7 @@ dotip()
                || cobj->otyp == LEMBAS_WAFER) {
         spillage = "crumbs";
     } else if (cobj->oclass == VENOM_CLASS) {
-        spillage = "venom";
+        spillage = "disgusting refuse";
     }
     if (spillage) {
         buf[0] = '\0';

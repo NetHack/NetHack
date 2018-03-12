@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/05/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 /* Contains code for 't' (throw) */
 
@@ -2002,6 +2002,7 @@ struct obj *obj;
     case MELON:
     case ACID_VENOM:
     case BLINDING_VENOM:
+    case QUILL:
         return 1;
     default:
         return 0;

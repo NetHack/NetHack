@@ -2,7 +2,7 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 3/11/18 by NullCGT */
 
 /*
  * Polymorph self routine.
@@ -758,7 +758,7 @@ int mntmp;
         if (can_breathe(youmonst.data))
             pline(use_thec, monsterc, "use your breath weapon");
         if (attacktype(youmonst.data, AT_SPIT))
-            pline(use_thec, monsterc, "spit venom");
+            pline(use_thec, monsterc, "use your ranged attack");
         if (youmonst.data->mlet == S_NYMPH)
             pline(use_thec, monsterc, "remove an iron ball");
         if (attacktype(youmonst.data, AT_GAZE))
@@ -1090,6 +1090,9 @@ dospit()
         impossible("bad spit attack?");
     } else {
         switch (mattk->adtyp) {
+        case AD_QUIL:
+            otmp = mksobj(QUILL, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
