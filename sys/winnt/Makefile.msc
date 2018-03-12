@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520177858 2018/03/04 15:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.111 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
 #==============================================================================
@@ -1239,6 +1239,7 @@ spotless: clean
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
+	if exist $(INCL)\win32api.h      del $(INCL)\win32api.h
         if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
         if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
         if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
