@@ -4,7 +4,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 3/12/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -1188,7 +1188,7 @@ boolean at_stairs, falling, portal;
                 assign_level(newlevel, &u.uz);
 
             new_ledger = ledger_no(newlevel);
-
+            pline("You suddenly remember that the mysterious force exists!");
             pline("A mysterious force momentarily surrounds you...");
             if (on_level(newlevel, &u.uz)) {
                 (void) safe_teleds(FALSE);

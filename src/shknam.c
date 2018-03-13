@@ -4,7 +4,7 @@
 
 /* shknam.c -- initialize a shop */
 
-/* Edited on 3/1/18 by NullCGT */
+/* Edited on 3/13/18 by NullCGT */
 
 #include "hack.h"
 
@@ -332,7 +332,7 @@ const struct shclass shtypes[] = {
         { 9, -WAN_NOTHING },
         { 1, -WAN_WONDER },
         { 5, -LOADSTONE },
-        { 5, -BELL } },
+        { 5, -SCR_BLANK_PAPER } },
       shkweapons },
     { "health food store",
       FOOD_CLASS,

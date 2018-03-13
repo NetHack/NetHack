@@ -1,0 +1,183 @@
+                   GlazeHack -- Changelog
+
+This changelog documents all the features that differ from vanilla nethack.
+Beware of SPOILERS for both Nethack and GlazeHack all the way through this
+document, particularly in the monsters and items section.
+
+General Changes
+- Gaining a resistance other than poison resistance through food will cause you
+  to lose your other resistances. This feature can be toggled off in your
+  preferences file.
+- Decreased floating eye spawn rate to make blind telepathy harder to obtain.
+- Mysterious force now only affects you when you are hallucinating (you
+  suddenly hallucinate that you are playing vanilla nethack!)
+- There are different descriptions for venom which are randomized each game.
+  This may break realism slightly, but does help with distinguishing what kind
+  of venom an unfamiliar monster might be spitting.
+- Tigers now are colored orange, in order to make room for lions, which are
+  colored yellow.
+- Disarmed bear traps and land mines can rarely be generated.
+- The Oracle now drops hints in major consultations about the new features
+  in GlazeHack. Attempts have been made to make this fit as seamlessly as
+  possible into the existing tone.
+- Additional graves, hallucinations, rumors, scroll and wand names,  and
+  the like.
+- Non-weapon artifacts can now be granted through sacrifice.
+- Spellcasting monsters have access to a much larger variety of dangerous
+  spells.
+- Engraving "The Yellow Sign" will cause bad things to happen to you and those
+  around you.
+- Monster wielding behavior was changed so monsters are more aggressive about
+  wielding new items.
+- VENOM_CLASS and Q_CLASS are referred to differently in game.
+- Guards, Nymphs, and Kops are generated with names.
+- Nephi's grudge patch has been implemented and expanded, so monsters will
+  attack certain other monsters they are opposed to.
+- Dragons have been made subtly more difficult. Hostile monsters with the "roar"
+  sound will occasionally roar when the player is nearby, aggravating monsters
+  on the level. Additionally, dragons are counted as having hands for the
+  purposes of using defensive and utility items.
+- Monsters now use a much wider array of items. This includes wands of wishing.
+- Transforming into a lycanthrope now angers guards.
+- Runeswords and tsurugis can be randomly generated, but they are incredibly
+  rare.
+- Just like SLASH'EM, baby dragons can be generated.
+- Vampire mages un-deferred.
+- If preferred pet is set to '@', the player spawns with an adventuring party.
+  This is very experimental, and probably should not be used.
+
+New Races
+- Merfolk: Start with swimming, and eventually learn to breath water. This is
+  made up for by low maxed stats.
+- Werewolf: Similar to humans, but with permanent, incurable lycanthropy.
+  Can be considered a "challenge race."
+
+New Roles
+- Cartomancer: A spellcaster with a focus on spell cards (scrolls). They start
+  with a number of scrolls, and whenever they use one it has a chance of not
+  being consumed. Unfortunately, their skill selection is awful, and they
+  receive a harsh alignment penalty for using magic markers (you feel guilty
+  for forging a card). The entire role affectionately parodies various trading
+  card games and the shows that center on them.
+
+New Artifacts
+- Gungnir: Odin's spear. Very similar to Mjollnir, but not quite as powerful and
+  does not require gauntlets of power to be thrown.
+- Gae Bulg: Javelin with level-drain abilities. Throwing it at an enemy likely
+  consumes it, but on a hit will instantly kill nearly anything.
+- Gae Dearg: Spear with a chance of cancelling those it strikes.
+- Gae Buidhe: Spear with level-drain abilities.
+- Carnwennan: The dagger of King Arthur. Grants stealth and searching.
+- Black Arrow: An artifact arrow with a large damage and to-hit bonus.
+- Seafoam: A trident granting the ability to breathe water.
+- Sharur: A talking warhmamer from Sumerian mythology with a large number of
+  abilities. Overpowered to the point that it will likely become a quest
+  artifact in the future. Invoking it turns it into a flying lion.
+- Helm of Darkness: Loosely based on the helm of Hades. A corunthaum granting
+  invisibility and stealth.
+- Vladsbane: A joke artifact which cannot be randomly generated. It's a food
+  ration that warns you of undead. Really.
+- The King in Yellow: A spellbook of finger of death that grants several
+  powerful intrinsics upon reading. Reading or invoking it summons the optional
+  superboss of the same name, and very likely ends your game in a matter of
+  turns. If you find it, it also grants hallucination resistance while held, so
+  it's not 100% useless.
+- The Holographic Void Lily: The cartomancer quest artifact. Greatly increases
+  spellcasting abilities.
+
+Dungeon Generation
+- Statuary level: A level with many statues and statue traps. One statue
+  contains a wand of wonder.
+- The Void: A dangerous one level branch with a very large amount of loot, but
+  filled with a number of extremely annoying void-themed monsters and a single
+  void dragon.
+- Beast den: A special room which contains a number of wild animals.
+- Archery Shops: Sell arrows and bows.
+- Junk Shops: Function as a general store, but a large selection of what they
+  sell is useless.
+- Underground Rivers: Paxed's underground rivers patch has been implemented.
+
+New Monster Spells
+- Sonic Scream: Deals massive damage to a single non-deaf target.
+- Gas Cloud: Generates a small stinking cloud around the target.
+- Slime Spray: Makes the target slippery, possibly causing them to drop their
+  wielded items.
+
+New Items
+- Bone Knife
+- Throwing Axe
+- Razor Whip
+- Earmuff
+- Flowing Dress
+- Snappy Tuxedo
+- Iron Mantle
+- Cloak of Flight
+- Tower Shield
+- Hide Shield
+- Rogues Gloves
+- Boxing Gloves
+- Amulet of Drain Resistance
+- Amulet of Nausea
+- Amulet of Danger
+- Mask
+- Pinch of Catnip
+- Potion of Reflection
+- Scroll of Cloning
+- Scroll of Pure Law
+- Scroll of True Neutrality
+- Scroll of Raw Chaos
+- Wand of Wonder
+- Wand of Acid
+- Wand of Poison Gas
+- Bony Quill
+- Ooze Dragon Scale Mail
+- Razor Dragon Scale Mail
+- Filth Dragon Scale Mail
+- Hex Dragon Scale Mail
+- Void Dragon Scales
+- Ooze Dragon Scales
+- Razor Dragon Scales
+- Filth Dragon Scales
+- Hex Dragon Scales
+- Void Dragon Scales
+
+New Monsters
+- Memory Hound
+- Weeping Eye
+- Serval
+- Lion
+- Porcupine
+- Manticore
+- Nightmare
+- Death maggot
+- Lamassu
+- Ooze Dragon
+- Razor Dragon
+- Filth Dragon
+- Hex Dragon
+- Void Dragon
+- Fusion Elemental
+- Legendary Lichen
+- Worm that Walks
+- Lord of Worms
+- Lemur
+- Zombie Dragon
+- Animated Statue
+- Renegade Shopkeeper
+- Desert Jinn
+- Marid
+- Merfolk
+- Sea Horse
+- Velociraptor
+- T-Rex
+- Cartomancer
+
+New Unique Monsters
+- Lord Sankis
+- Master of Cats
+- Lord of the Foocubi
+- Mephisto
+- King in Yellow
+- Lord of the Cards
+- Cartomancer
+- Dal Zethire

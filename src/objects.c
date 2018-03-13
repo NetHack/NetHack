@@ -1182,16 +1182,30 @@ OBJECT(OBJ("iron chain", None),
 /* Venom is normally a transitory missile (spit by various creatures)
  * but can be wished for in wizard mode so could occur in bones data.
  */
-OBJECT(OBJ("blinding venom", "splash of green venom"),
+OBJECT(OBJ("blinding venom", "splash of noxious venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
        VENOM_CLASS, 500, 0, 1, 0, 0, 0, 0, 0, 0, CLR_GREEN),
-OBJECT(OBJ("acid venom", "splash of yellow venom"),
+OBJECT(OBJ("acid venom", "splash of sizzling venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
        VENOM_CLASS, 500, 0, 1, 0, 6, 6, 0, 0, 0, CLR_YELLOW),
         /* +d6 small or large */
+/* other colors of venom to be shuffled in. */
+OBJECT(OBJ(None, "splash of smelly venom"),
+      BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
+      VENOM_CLASS, 0, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
+OBJECT(OBJ(None, "splash of shiny venom"),
+      BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
+      VENOM_CLASS, 0, 0, 1, 0, 0, 0, 0, 0, 0, CLR_CYAN),
+OBJECT(OBJ(None, "splash of clear venom"),
+      BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
+      VENOM_CLASS, 0, 0, 1, 0, 0, 0, 0, 0, 0, CLR_GRAY),
+OBJECT(OBJ(None, "splash of steaming venom"),
+      BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
+      VENOM_CLASS, 0, 0, 1, 0, 0, 0, 0, 0, 0, CLR_ORANGE),
+/* manticore quills */
 OBJECT(OBJ("quill", "bony quill"),
       BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, BONE), 0,
-      VENOM_CLASS, 0, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
+      VENOM_CLASS, 0, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
 
 /* fencepost, the deadly Array Terminator -- name [1st arg] *must* be NULL */
 OBJECT(OBJ(None, None),

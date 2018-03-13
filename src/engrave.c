@@ -410,6 +410,8 @@ xchar e_type;
         adjalign(-3);
         make_confused(rnd(50), FALSE);
         make_stunned(rnd(50), FALSE);
+        forget_levels(3); 
+        forget_objects(3);
     }
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);

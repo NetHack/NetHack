@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 3/13/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -752,7 +752,7 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, CLR_CYAN),
     MON("manticore", S_QUADRUPED, LVL(10, 12, 3, 10, 0), (G_GENO | 2),
         A(ATTK(AT_NONE, AD_QUIL, 3, 3), ATTK(AT_BITE, AD_PHYS, 2, 4),
-          ATTK(AT_SPIT, AD_QUIL, 3, 3), NO_ATTK, NO_ATTK, NO_ATTK),
+          ATTK(AT_SPIT, AD_QUIL, 5, 2), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2500, 500, MS_HISS, MZ_LARGE), MR_SLEEP, MR_SLEEP,
         M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, CLR_YELLOW),

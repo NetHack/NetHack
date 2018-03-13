@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/07/18 by NullCGT */
+/* File changed 3/12/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -77,7 +77,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      monsters attacking them with Gae Bulg.
     */
     A("Gae Bulg", JAVELIN, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(3, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
+      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       9000L, NO_COLOR),
 
     /*
@@ -93,7 +93,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      Gae Buidhe inflicts cursed wounds (drains levels).
     */
     A("Gae Buidhe", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
+      DRLI(3, 3), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       7000L, NO_COLOR),
 
     /*
@@ -101,8 +101,8 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       overpowered.
     */
     A("Carnwennan", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
-      PHYS(3, 4), NO_DFNS, NO_CARY, 0, A_LAWFUL,
-      NON_PM, NON_PM, 400L, NO_COLOR),
+      PHYS(3, 3), NO_DFNS, NO_CARY, 0, A_LAWFUL,
+      PM_KNIGHT, NON_PM, 400L, NO_COLOR),
 
     /*
     *       Based on the LOTR arrow, but could represent any arrow. Technically

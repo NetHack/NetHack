@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 3/12/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -160,6 +160,9 @@ int mndx;
     case PM_ETTIN_ZOMBIE:
     case PM_ETTIN_MUMMY:
         mndx = PM_ETTIN;
+        break;
+    case PM_ZOMBIE_DRAGON:
+        mndx =  PM_RED_DRAGON;
         break;
     default:
         break;
@@ -371,6 +374,7 @@ unsigned corpseflags;
         obj->owt = weight(obj);
         free_mname(mtmp);
         break;
+    case PM_ANIMATED_STATUE:
     case PM_STONE_GOLEM:
         corpstatflags &= ~CORPSTAT_INIT;
         obj =
@@ -2704,9 +2708,11 @@ struct monst *mtmp;
         aggravate();
     }
     if (mtmp->data->msound == MS_ROAR) {
-        if (!Deaf) {
+        if (!Deaf && canseemon(mtmp)) {
             pline("%s roars!", Monnam(mtmp));
             stop_occupation();
+        } else if (!Deaf) {
+            You_hear("a mighty roar!");
         }
         aggravate();
     }

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/9/18 by NullCGT */
+/* Edited on 3/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -188,7 +188,7 @@ register struct monst *mtmp;
             (void) mongets(mtmp, (mm != PM_ETTIN) ? BOULDER : CLUB);
         break;
     case S_EEL:
-        if (rn2(2))
+        if (rn2(2) && mm == PM_MERFOLK)
             (void) mongets(mtmp, TRIDENT);
     case S_HUMAN:
         if (is_mercenary(ptr)) {
