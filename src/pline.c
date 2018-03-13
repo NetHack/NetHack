@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1519183957 2018/02/21 03:32:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1520964541 2018/03/13 18:09:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -96,6 +96,7 @@ void pline
 VA_DECL(const char *, line)
 #endif /* USE_STDARG | USE_VARARG */
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
+    static int in_pline = 0;
     char pbuf[3 * BUFSZ];
     int ln;
     int msgtyp;
@@ -138,11 +139,14 @@ VA_DECL(const char *, line)
     if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
-
-    if (!iflags.window_inited) {
+    /* use raw_print() if we're called too early (or perhaps too late
+       during shutdown) or if we're being called recursively (probably
+       via debugpline() in the interface code) */
+    if (in_pline++ || !iflags.window_inited) {
+        /* [we should probably be using raw_printf("\n%s", line) here] */
         raw_print(line);
         iflags.last_msg = PLNMSG_UNKNOWN;
-        return;
+        goto pline_done;
     }
 
     msgtyp = MSGTYP_NORMAL;
@@ -158,7 +162,7 @@ VA_DECL(const char *, line)
              * doing so out of context and probably end up seeming silly.
              * (Not an issue for no-repeat but matters for no-show.)
              */
-            return;
+            goto pline_done;
     }
 
     if (vision_full_recalc)
@@ -177,6 +181,10 @@ VA_DECL(const char *, line)
     (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+
+ pline_done:
+    --in_pline;
+    return;
 
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     /* provide closing brace for the nested block

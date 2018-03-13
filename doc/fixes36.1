@@ -524,6 +524,8 @@ It shouldn't be considered hypocrisy if you speed up your pet while standing
 fix 'object lost' panic if hero with lycanthropy but in human form is wielding
 	a potion of unholy water which gets boiled/exploded by fire, causing
 	were-transformation and drop of wielded weapon
+prevent segfault if pline() is called recursively (which could happen if the
+	interface code issues a debugpline() while processing putstr())
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
