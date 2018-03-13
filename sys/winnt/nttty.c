@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1454381842 2016/02/02 02:57:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1520825872 2018/03/12 03:37:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -366,11 +366,16 @@ nttty_kbhit()
 void
 get_scr_size()
 {
+    int lines, cols;
+    
     GetConsoleScreenBufferInfo(hConOut, &csbi);
+    
+    lines = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
+    cols = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
 
-    LI = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
-    CO = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
-
+    LI = lines;
+    CO = min(cols, 80);
+    
     if ((LI < 25) || (CO < 80)) {
         COORD newcoord;
 

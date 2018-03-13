@@ -620,7 +620,7 @@ boolean enable;
 void
 chainout_status_update(vp, idx, ptr, chg, percent, color, colormasks)
 void *vp;
-int idx, chg, percent;
+int idx, chg, percent, color;
 genericptr_t ptr;
 unsigned long *colormasks;
 {

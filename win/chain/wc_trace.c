@@ -1083,9 +1083,9 @@ boolean enable;
 }
 
 void
-trace_status_update(vp, idx, ptr, chg, color, colormasks)
+trace_status_update(vp, idx, ptr, chg, percent, color, colormasks)
 void *vp;
-int idx, chg, percent;
+int idx, chg, percent, color;
 genericptr_t ptr;
 unsigned long *colormasks;
 {
@@ -1095,7 +1095,7 @@ unsigned long *colormasks;
             ptr, chg, percent);
 
     PRE;
-    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, color colormasks);
+    (*tdp->nprocs->win_status_update)(tdp->ndata, idx, ptr, chg, percent, color, colormasks);
     POST;
 }
 
