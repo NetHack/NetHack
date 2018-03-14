@@ -71,6 +71,7 @@ struct flag {
 #define PARANOID_BREAKWAND  0x0080
 #define PARANOID_WERECHANGE 0x0100
 #define PARANOID_EATING     0x0200
+#define PARANOID_SWIM       0x0400
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
@@ -477,6 +478,9 @@ enum runmode_types {
 /* continue eating: prompt given _after_first_bite_ when eating something
    while satiated */
 #define ParanoidEating ((flags.paranoia_bits & PARANOID_EATING) != 0)
+/* swim: require prefixing stepping into water or lava from a non-similar square
+ * with 'm' */
+#define ParanoidSwim ((flags.paranoia_bits & PARANOID_SWIM) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */

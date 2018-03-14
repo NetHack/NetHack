@@ -1372,7 +1372,10 @@ domove_core()
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE,        /* dragging ball will skip a move */
-            u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
+            u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0),
+            u_grounded_form = !(is_flyer(g.youmonst.data)
+                                || is_floater(g.youmonst.data)
+                                || is_clinger(g.youmonst.data));
 
     if (g.context.travel) {
         if (!findtravelpath(FALSE))
@@ -1741,6 +1744,32 @@ domove_core()
             nomul(0);
         }
         return;
+    }
+
+    /* Paranoid checks for dangerous moves into water or lava */
+    if (ParanoidSwim && !Levitation && !Flying && u_grounded_form
+        && !Stunned && !Confusion && levl[x][y].seenv
+        && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
+            || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
+        boolean known_wwalking, known_lwalking;
+        known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
+                          && objects[WATER_WALKING_BOOTS].oc_name_known
+                          && !u.usteed);
+        known_lwalking = (known_wwalking && Fire_resistance &&
+                          uarmf->oerodeproof && uarmf->rknown);
+        /* This can be exploited to informally identify the ring of fire
+         * resistance if the player is wearing it unidentified and has
+         * identified fireproof boots of water walking and is walking over lava.
+         * However, this is such a marginal case that it may not be worth
+         * fixing. */
+        if (!g.context.nopick) { /* not moving with 'm' */
+            if ((is_pool(x, y) && !known_wwalking)
+                || (is_lava(x, y) && !known_lwalking)) {
+                g.context.move = 0;
+                nomul(0);
+                return;
+            }
+        }
     }
 
     /* Move ball and chain.  */
