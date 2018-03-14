@@ -41,7 +41,7 @@
 #define SPFX_REFLECT 0x04000000L /* Reflection */
 #define SPFX_PROTECT 0x08000000L /* Protection */
 #define SPFX_BREATHE 0x10000000L /* Magical breathing */
-#define SPFX_INVIS 0x20000000L /* Magical breathing */
+#define SPFX_CANC 0x20000000L /* Pure cancellation */
 
 struct artifact {
     short otyp;

@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 3/12/18 by NullCGT */
+/* File changed 3/14/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -85,8 +85,8 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      should cancel their armor? This is currently handled in a case
     *      in DRLI, and occurs 1/3 of the time.
     */
-    A("Gae Dearg", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(2, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
+    A("Gae Dearg", ELVEN_SPEAR, (SPFX_RESTR | SPFX_ATTK | SPFX_CANC), 0, 0,
+      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       7000L, NO_COLOR),
 
     /*
@@ -122,16 +122,16 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       Based on Sumerian legends. Extremely powerful.
     */
     A("Sharur", MACE,
-      (SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
+      (SPFX_RESTR | SPFX_NOGEN | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
       0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, NON_PM,
       NON_PM, 4000L, NO_COLOR),
 
     /*
-    *        Based on Greek mythology.
+    *       Based on the bindings used to trap Fenrir. This hook can grapple
+    *       things regardless of size, and has a massive range.
     */
-    A("Helm of Darkness", CORNUTHAUM, (SPFX_INVIS | SPFX_STLTH),
-      0, 0, NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE,
-      NON_PM, NON_PM, 1500L, NO_COLOR),
+    A("Gleipnir", GRAPPLING_HOOK, (SPFX_RESTR), 0, 0, PHYS(5, 8),
+      NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1700L, NO_COLOR),
 
     /*
     *        Just for fun.
@@ -142,7 +142,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       CLR_MAGENTA),
 
     A("The King in Yellow", SPE_FINGER_OF_DEATH,
-      (SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
+      (SPFX_HALRES | SPFX_RESTR), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
       KING, A_NONE, NON_PM, NON_PM, 30L, NO_COLOR),
 
     A("Cleaver", BATTLE_AXE, SPFX_RESTR, 0, 0, PHYS(3, 6), NO_DFNS, NO_CARY,

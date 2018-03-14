@@ -380,6 +380,10 @@ STATIC_PTR
 int
 Helmet_on(VOID_ARGS)
 {
+    struct obj *otmp = uarmh;
+    int otyp = otmp->otyp;
+    long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_HELMET;
+
     switch (uarmh->otyp) {
     case FEDORA:
     case HELMET:

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/9/18 by NullCGT */
+/* Edited on 3/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -3140,6 +3140,8 @@ struct obj *obj;
         max_range = 5;
     else
         max_range = 8;
+    if (obj->oartifact == ART_GLEIPNIR)
+        max_range = max_range * 3;
     if (distu(cc.x, cc.y) > max_range) {
         pline("Too far!");
         return res;
@@ -3207,7 +3209,8 @@ struct obj *obj;
             break;
         notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
         save_confirm = flags.confirm;
-        if (verysmall(mtmp->data) && !rn2(4)
+        if (((verysmall(mtmp->data) && !rn2(4)) ||
+            (obj->oartifact == ART_GLEIPNIR))
             && enexto(&cc, u.ux, u.uy, (struct permonst *) 0)) {
             flags.confirm = FALSE;
             (void) attack_checks(mtmp, uwep);

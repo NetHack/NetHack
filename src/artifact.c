@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 2/07/18 by NullCGT */
+/* Edited 3/14/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1338,6 +1338,28 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             }
         }
     }
+    if (spec_ability(otmp, SPFX_CANC) && !rn2(3)) {
+        if (!youdefend) {
+            if (vis) {
+                if (cancel_monst(mdef, otmp, TRUE, FALSE, FALSE)) {
+                        pline_The("%s spear cancels %s!",
+                                  hcolor(NH_RED), mon_nam(mdef));
+                }
+                return vis;
+            }
+        } else {
+            if (Blind) {
+                You_feel(" oddly empty.");
+            } else if (otmp->oartifact == ART_GAE_DEARG) {
+                  if (rnd(3) == 1 &&
+                      cancel_monst(&youmonst, otmp, TRUE, FALSE, FALSE)) {
+                          pline_The("%s spear destroys your magic!",
+                                    hcolor(NH_RED));
+                  }
+                  return TRUE;
+              }
+        }
+    }
     if (spec_ability(otmp, SPFX_DRLI)) {
         /* some non-living creatures (golems, vortices) are
            vulnerable to life drain effects */
@@ -1354,14 +1376,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 else if (otmp->oartifact == ART_GAE_BUIDHE)
                     pline_The("yellow spear inflicts a cursed wound on %s!",
                               mon_nam(mdef));
-                else if (otmp->oartifact == ART_GAE_DEARG) {
-                    if (rnd(3) == 0
-                        && cancel_monst(mdef, otmp, TRUE, TRUE, FALSE)) {
-                            pline_The("%s spear destroys the magic of %s!",
-                                      hcolor(NH_RED), mon_nam(mdef));
-                    }
-                    return TRUE;
-                } else
+                else
                     pline("%s draws the %s from %s!",
                           The(distant_name(otmp, xname)), life,
                           mon_nam(mdef));
@@ -1375,7 +1390,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 mdef->mhpmax -= drain;
                 mdef->m_lev--;
                 drain /= 2;
-                if (drain)
+                if (drain && otmp->oartifact == ART_STORMBRINGER)
                     healup(drain, 0, FALSE, FALSE);
             }
             return vis;
@@ -1394,14 +1409,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 pline_The("terrible barbs of the spear tear into you!");
             else if (otmp->oartifact == ART_GAE_BUIDHE)
                 pline_The("yellow spear inflicts a cursed wound on you!");
-            else if (otmp->oartifact == ART_GAE_DEARG) {
-                if (rnd(3) == 0 &&
-                    cancel_monst(&youmonst, otmp, TRUE, FALSE, FALSE)) {
-                        pline_The("%s spear destroys your magic!",
-                                  hcolor(NH_RED));
-                }
-                return TRUE;
-            } else
+            else
                 pline("%s drains your %s!", The(distant_name(otmp, xname)),
                       life);
             losexp("life drainage");
