@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1521144299 2018/03/15 20:04:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2043,9 +2043,9 @@ static struct sing_plur one_off[] = {
     { "ovum", "ova" },
     { "ox", "oxen" },
     { "rtex", "rtices" }, /* vortex */
-    { "tooth", "teeth" },
     { "serum", "sera" },
     { "staff", "staves" },
+    { "tooth", "teeth" },
     { 0, 0 }
 };
 
@@ -2065,8 +2065,7 @@ static const char *const as_is[] = {
        variant instead of attempting to support both. */
 };
 
-/* singularize/pluralize decisions common to both makesingular & makeplural
- */
+/* singularize/pluralize decisions common to both makesingular & makeplural */
 STATIC_OVL boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)
 char *basestr, *endstring;    /* base string, pointer to eos(string) */
@@ -2090,14 +2089,20 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
-    /* avoid false hit on one_off[].plur == "lice";
+    /* avoid false hit on one_off[].plur == "lice" or .sing == "goose";
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
     if (!strcmpi(basestr, "slice")
         || !strcmpi(basestr, "mongoose")) {
         if (to_plural)
-            (void) strkitten(basestr, 's');
+            Strcasecpy(endstring, "s");
+        return TRUE;
+    }
+    /* skip "ox" -> "oxen" entry when pluralizing "<something>ox" */
+    if (to_plural && strlen(basestr) > 2 && !strcmpi(endstring - 2, "ox")) {
+        /* "fox" -> "foxes" */
+        Strcasecpy(endstring, "es");
         return TRUE;
     }
     for (sp = one_off; sp->sing; sp++) {
@@ -2209,7 +2214,7 @@ const char *oldstr;
     spot--;
     while (spot > str && *spot == ' ')
         spot--; /* Strip blanks from end */
-    *(spot + 1) = 0;
+    *(spot + 1) = '\0';
     /* Now spot is the last character of the string */
 
     len = strlen(str);
