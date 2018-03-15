@@ -2035,15 +2035,38 @@ donamelevel()
 {
     mapseen *mptr;
     char nbuf[BUFSZ]; /* Buffer for response */
+    char tmpbuf[BUFSZ]; /* Temporary buffer */
+    boolean aadd; /* Add to annotation */
 
     if (!(mptr = find_mapseen(&u.uz)))
         return 0;
 
+    aadd = FALSE;
     if (mptr->custom) {
-        char tmpbuf[BUFSZ];
-        Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
-                strlen(mptr->custom) > 30 ? "..." : "");
-        getlin(tmpbuf, nbuf);
+        register char c = 'n';
+
+        /* Give player a choice to add to the annotation if it's not full */
+        if (BUFSZ - (int) strlen(mptr->custom) - 1)
+            c = ynq("Do you want to add to the current annotation?");
+        if (c == 'q') {
+            pline1(Never_mind);
+            return 0;
+        }
+
+        if (c == 'n') {
+            Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?",
+                    mptr->custom, strlen(mptr->custom) > 30 ? "..." : "");
+            getlin(tmpbuf, nbuf);
+        } else {
+            Sprintf(tmpbuf,
+                    "What do you want to add to the annotation \"%.30s%s\"?",
+                    mptr->custom, strlen(mptr->custom) > 30 ? "..." : "");
+            getlin(tmpbuf, nbuf);
+            Strcpy(tmpbuf, mptr->custom);
+            if (*nbuf && (*nbuf == ' ' || *nbuf == '\t'))
+                (void) strcat(tmpbuf, " ");
+            aadd = TRUE;
+        }
     } else
         getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033'))
@@ -2058,7 +2081,16 @@ donamelevel()
     }
     /* add new annotation, unless it's empty or a single space */
     if (*nbuf && strcmp(nbuf, " ")) {
-        mptr->custom = dupstr(nbuf);
+
+        /* add to existing annotation */
+        if (aadd) {
+            if ((strlen(tmpbuf) + strlen(nbuf)) > (BUFSZ - 1))
+                You("cannot remember it all.");
+            (void) strncat(tmpbuf, nbuf, BUFSZ - (int) strlen(tmpbuf) - 1);
+            (void) mungspaces(tmpbuf);
+        }
+
+        mptr->custom = dupstr(aadd ? tmpbuf : nbuf);
         mptr->custom_lth = strlen(mptr->custom);
     }
     return 0;
