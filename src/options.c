@@ -1311,6 +1311,8 @@ static const struct paranoia_opts {
       "y to pray (supersedes old \"prayconfirm\" option)" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       "always pick from inventory for Remove and Takeoff" },
+    { PARANOID_TRAP, "trap", 1, "move-trap", 1,
+      "yes to move onto a trap" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */

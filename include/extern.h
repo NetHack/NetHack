@@ -144,7 +144,7 @@ E void FDECL(Lift_covet_and_placebc, (int, const char *, int));
 #define unplacebc_and_covet_placebc() \
             Unplacebc_and_covet_placebc(__FUNCTION__, __LINE__)
 #define lift_covet_and_placebc(x) \
-            Lift_covet_and_placebc(x, __FUNCTION__, __LINE__) 
+            Lift_covet_and_placebc(x, __FUNCTION__, __LINE__)
 #endif
 E void FDECL(set_bc, (int));
 E void FDECL(move_bc, (int, int, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
@@ -2606,6 +2606,7 @@ E struct monst *FDECL(animate_statue,
                       (struct obj *, XCHAR_P, XCHAR_P, int, int *));
 E struct monst *FDECL(activate_statue_trap,
                       (struct trap *, XCHAR_P, XCHAR_P, BOOLEAN_P));
+E int FDECL(immune_to_trap, (struct monst*, xchar));
 E void FDECL(set_utrap, (unsigned, unsigned));
 E void FDECL(reset_utrap, (BOOLEAN_P));
 E void FDECL(dotrap, (struct trap *, unsigned));

@@ -85,4 +85,11 @@ enum trap_types {
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
 
+/* Return codes from immune_to_trap. */
+enum trap_immunities {
+    TRAP_NOT_IMMUNE = 0,
+    TRAP_CLEARLY_IMMUNE,
+    TRAP_HIDDEN_IMMUNE
+};
+
 #endif /* TRAP_H */

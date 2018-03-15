@@ -1725,6 +1725,39 @@ domove_core()
     if (u_rooted())
         return;
 
+    /* warn player before walking into known traps */
+    trap = t_at(x, y);
+    if (trap && trap->tseen && (!g.context.nopick || g.context.run)
+        && !Stunned && !Confusion && ParanoidTrap
+        && (immune_to_trap(&g.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
+            || Hallucination)) {
+        /* note on hallucination: all traps still show as ^, but the hero can't
+         * tell what they are, so warn of every trap. */
+        char qbuf[QBUFSZ];
+        xchar traptype = (Hallucination ? rnd(TRAPNUM - 1) : trap->ttyp);
+        boolean into = FALSE; /* "onto" the trap vs "into" */
+        switch (traptype) {
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TELEP_TRAP:
+        case LEVEL_TELEP:
+        case MAGIC_PORTAL:
+        case WEB:
+            into = TRUE;
+        }
+        snprintf(qbuf, QBUFSZ, "Really %s %sto that %s?",
+                 locomotion(g.youmonst.data, "step"),
+                 (into ? "in" : "on"),
+                 defsyms[trap_to_defsym(traptype)].explanation);
+        if (!paranoid_query(ParanoidTrap, qbuf)) {
+            nomul(0);
+            g.context.move = 0;
+            return;
+        }
+    }
+
     if (u.utrap) {
         boolean moved = trapmove(x, y, trap);
 
