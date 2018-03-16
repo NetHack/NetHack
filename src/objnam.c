@@ -22,6 +22,7 @@ STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
 
 struct Jitem {
     int item;
@@ -2105,6 +2106,17 @@ const char *const *alt_as_is; /* another set like as_is[] */
         Strcasecpy(endstring, "es");
         return TRUE;
     }
+    if (to_plural) {
+        if (!strcmpi(endstring - 3, "man")
+            && badman(basestr, to_plural)) {
+            Strcasecpy(endstring, "s");
+            return TRUE;
+        }
+    } else {
+        if (!strcmpi(endstring - 3, "men")
+            && badman(basestr, to_plural))
+            return TRUE;
+    }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
         same = to_plural ? sp->plur : sp->sing;
@@ -2245,9 +2257,8 @@ const char *oldstr;
 
     /* man/men ("Wiped out all cavemen.") */
     if (len >= 3 && !strcmpi(spot - 2, "man")
-        /* exclude shamans and humans */
-        && (len < 6 || strcmpi(spot - 5, "shaman"))
-        && (len < 5 || strcmpi(spot - 4, "human"))) {
+        /* exclude shamans and humans etc */
+        && !badman(str, TRUE)) {
         Strcasecpy(spot - 1, "en");
         goto bottom;
     }
@@ -2422,7 +2433,8 @@ const char *oldstr;
 
     } else { /* input doesn't end in 's' */
 
-        if (!BSTRCMPI(bp, p - 3, "men")) {
+        if (!BSTRCMPI(bp, p - 3, "men")
+            && !badman(bp, FALSE)) {
             Strcasecpy(p - 2, "an");
             goto bottom;
         }
@@ -2447,6 +2459,50 @@ bottom:
         Strcat(bp, excess);
 
     return bp;
+}
+
+boolean
+badman(basestr, to_plural)
+const char *basestr;
+boolean to_plural;            /* true => makeplural, false => makesingular */
+{
+    int i, al;
+    char *endstr;
+    /* these are all the prefixes for *man that don't have a *men plural */
+    const char *no_men[] = {
+        "albu", "antihu", "anti", "ata", "auto", "cai",
+        "cay", "ceru", "corner", "decu", "des", "dura", "fir",
+        "glass", "hanu", "het", "infrahu", "inhu", "land",
+        "meat", "nonhu", "otto", "out", "prehu", "protohu",
+        "subhu", "superhu", "talis", "unhu", "sha",
+        "hu", "un", "le", "re", "so", "to", "at", "a",
+    };
+    /* these are all the prefixes for *men that don't have a *man singular */
+    const char *no_man[] = {
+        "acu", "ceru", "cogno", "cycla", "fleh", "hegu", "preno", "sonar",
+        "dai", "exa", "fla", "sta", "teg", "tegu", "vela",
+        "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya", "o"
+    };
+
+    if (!basestr || strlen(basestr) < 4)
+        return FALSE;
+
+    endstr = eos((char *)basestr);
+
+    if (to_plural) {
+        for (i = 0; i < SIZE(no_men); i++) {
+            al = (int) strlen(no_men[i]);
+            if (!BSTRNCMPI(basestr, endstr - (al + 3), no_men[i], al))
+                return TRUE;
+        }
+    } else {
+        for (i = 0; i < SIZE(no_man); i++) {
+            al = (int) strlen(no_man[i]);
+            if (!BSTRNCMPI(basestr, endstr - (al + 3), no_man[i], al))
+                return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* compare user string against object name string using fuzzy matching */
