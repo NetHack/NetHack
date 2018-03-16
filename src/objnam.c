@@ -2100,8 +2100,10 @@ const char *const *alt_as_is; /* another set like as_is[] */
             Strcasecpy(endstring, "s");
         return TRUE;
     }
-    /* skip "ox" -> "oxen" entry when pluralizing "<something>ox" */
-    if (to_plural && strlen(basestr) > 2 && !strcmpi(endstring - 2, "ox")) {
+    /* skip "ox" -> "oxen" entry when pluralizing "<something>ox"
+       unless it is muskox */
+    if (to_plural && strlen(basestr) > 2 && !strcmpi(endstring - 2, "ox")
+        && strcmpi(endstring - 6, "muskox")) {
         /* "fox" -> "foxes" */
         Strcasecpy(endstring, "es");
         return TRUE;
