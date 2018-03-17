@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/18/16 by NullCGT */
+
 #include "hack.h"
 
 void
@@ -220,6 +222,8 @@ demon_talk(mtmp)
 register struct monst *mtmp;
 {
     long cash, demand, offer;
+    struct obj *otmp = 0, *obj = 0;
+    int n = 0;
 
     if (uwep && uwep->oartifact == ART_EXCALIBUR) {
         pline("%s looks very angry.", Amonnam(mtmp));
@@ -227,6 +231,10 @@ register struct monst *mtmp;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
         return 0;
+    }
+    if (uwep && uwep->oartifact == ART_DEMONBANE) {
+        pline("%s laughs and says, \" such a puny weapon is nothing to me.\"",
+              Amonnam(mtmp));
     }
 
     if (is_fainted()) {
@@ -257,12 +265,66 @@ register struct monst *mtmp;
             (void) rloc(mtmp, TRUE);
         return (1);
     }
+
+    /* based off steal.c code */
+    for (n = 0, obj = invent; obj; obj = obj->nobj){
+        if ((obj->oartifact &&
+            obj->oartifact != ART_STING && obj->oartifact != ART_ORCRIST
+            && obj->otyp != AMULET_OF_YENDOR && obj->otyp != BELL_OF_OPENING
+            && obj->otyp != CANDELABRUM_OF_INVOCATION &&
+            obj->otyp != SPE_BOOK_OF_THE_DEAD) || obj->otyp == WAN_WISHING
+            || obj->otyp == BAG_OF_HOLDING)
+            ++n, otmp = obj;
+    }
+    if (n > 1) {
+        n = rnd(n);
+        for (otmp = invent; otmp; otmp = otmp->nobj)
+            if ((otmp->oartifact || obj->otyp == WAN_WISHING ||
+                obj->otyp == BAG_OF_HOLDING) && !--n)
+                break;
+    }
+    if (otmp) {
+        pline("%s speaks to you. \"I see you have %s in your possession...\"",
+              Amonnam(mtmp), xname(otmp));
+        /* copied from steal.c */
+        if (yn("Give up your artifact?") == 'y') {
+            if ((otmp == uarm || otmp == uarmu) && uarmc)
+                remove_worn_item(uarmc, FALSE);
+            if (otmp == uarmu && uarm)
+                remove_worn_item(uarm, FALSE);
+            if ((otmp == uarmg || ((otmp == uright || otmp == uleft) && uarmg))
+                && uwep) {
+                /* gloves are about to be unworn; unwield weapon(s) first */
+                if (u.twoweap)    /* remove_worn_item(uswapwep) indirectly */
+                    remove_worn_item(uswapwep, FALSE); /* clears u.twoweap */
+                remove_worn_item(uwep, FALSE);
+            }
+            if ((otmp == uright || otmp == uleft) && uarmg)
+                /* calls Gloves_off() to handle wielded cockatrice corpse */
+                remove_worn_item(uarmg, FALSE);
+
+            /* finally, steal the target item */
+            if (otmp->owornmask)
+                remove_worn_item(otmp, TRUE);
+            /* I shudder to think of the situation where this would happen. */
+            if (otmp->unpaid)
+                subfrombill(otmp, shop_keeper(*u.ushops));
+            freeinv(otmp);
+            (void) mpickobj(mtmp, otmp);
+            pline("%s takes %s from you!", Monnam(mtmp), the(xname(otmp)));
+            pline("%s laughs and vanishes. \"I look forward to seeing what becomes of your little quest.\"",
+                  Amonnam(mtmp));
+            mongone(mtmp);
+            return (1);
+        }
+    }
+
     cash = money_cnt(invent);
     demand =
-        (cash * (rnd(80) + 20 * Athome))
-        / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
+        rn1(1000, 1000)
+        + (1000 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
 
-    if (!demand || multi < 0) { /* you have no gold or can't move */
+    if (!demand || multi < 0 || cash <= 0) {/* you have no gold or can't move */
         mtmp->mpeaceful = 0;
         set_malign(mtmp);
         return 0;
@@ -276,7 +338,10 @@ register struct monst *mtmp;
         pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
               currency(demand));
 
-        if ((offer = bribe(mtmp)) >= demand) {
+        if ((offer = bribe(mtmp)) == demand + 1) {
+            pline("%s vanishes, commenting on the cheekiness of mortals.",
+                  Amonnam(mtmp));
+        } else if (offer >= demand) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
         } else if (offer > 0L

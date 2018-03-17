@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -380,9 +380,6 @@ STATIC_PTR
 int
 Helmet_on(VOID_ARGS)
 {
-    struct obj *otmp = uarmh;
-    int otyp = otmp->otyp;
-    long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_HELMET;
 
     switch (uarmh->otyp) {
     case FEDORA:

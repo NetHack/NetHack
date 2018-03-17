@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/13/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1315,9 +1315,11 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE | M1_POIS,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_GREEN),
+    /* If you see an elder dragon, run. These monsters were added to increase
+       challenge in the late game, and all of them are extremely nasty. */
     /* Ooze dragons are a good reason to have acid reistance. Probably the
        least dangerous of the elder dragons. */
-    MON("ooze dragon", S_DRAGON, LVL(30, 9, -10, 20, -7), (G_GENO | 1),
+    MON("ooze dragon", S_DRAGON, LVL(20, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK),
@@ -1326,11 +1328,9 @@ NEARDATA struct permonst mons[] = {
                   M1_AMORPHOUS | M1_CARNIVORE | M1_ACID,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_BRIGHT_GREEN),
-    /* If you see an elder dragon, run. These monsters were added to increase
-       challenge in the late game, and all of them are extremely nasty. */
     /* Razor dragons have no breath weapon, but are incredibly fast and deal
        extremely large amounts of damage. */
-    MON("razor dragon", S_DRAGON, LVL(30, 18, -10, 20, 7), (G_GENO | 1),
+    MON("razor dragon", S_DRAGON, LVL(20, 18, -10, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
         ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
@@ -1340,7 +1340,7 @@ NEARDATA struct permonst mons[] = {
         0, CLR_BRIGHT_CYAN),
     /* filth dragons are less mobile than the other elder dragons, but
        their illness attacks are highly dangerous. */
-    MON("filth dragon", S_DRAGON, LVL(30, 9, -10, 20, -7), (G_GENO | 1),
+    MON("filth dragon", S_DRAGON, LVL(20, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_DRST, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_DISE, 1, 4), ATTK(AT_CLAW, AD_DISE, 1, 4),
           NO_ATTK, NO_ATTK),
@@ -1351,7 +1351,7 @@ NEARDATA struct permonst mons[] = {
         0, CLR_BROWN),
     /* Hex dragons are powerful spellcasters, and can move around the map
        with teleportation and wall walking.*/
-    MON("hex dragon", S_DRAGON, LVL(30, 9, -10, 20, -6), (G_GENO | 1),
+    MON("hex dragon", S_DRAGON, LVL(20, 9, -10, 20, -6), (G_GENO | 1),
         A(ATTK(AT_MAGC, AD_SPEL, 4, 6), ATTK(AT_BITE, AD_CURS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
           NO_ATTK),
@@ -1363,7 +1363,7 @@ NEARDATA struct permonst mons[] = {
     /* Void dragons are essentially death on legs. Their void attacks are
        capable of eating through even the best-prepared character in only a few
        turns. They may need to be reduced in power at some point. */
-    MON("void dragon", S_DRAGON, LVL(35, 9, -10, 20, 0),
+    MON("void dragon", S_DRAGON, LVL(20, 9, -10, 20, 0),
         (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_VOID, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4), NO_ATTK,
@@ -1424,7 +1424,7 @@ NEARDATA struct permonst mons[] = {
             | M1_UNSOLID | M1_AMPHIBIOUS | M1_SWIM,
         M2_STRONG | M2_NEUTER, 0, CLR_BLUE),
     MON("fusion elemental", S_ELEMENTAL, LVL(25, 18, 2, 30, 0),
-        (G_NOCORPSE | 1),
+        (G_NOCORPSE | G_GENO | 1),
         A(ATTK(AT_CLAW, AD_FIRE, 2, 6), ATTK(AT_CLAW, AD_PHYS, 2, 6),
           ATTK(AT_CLAW, AD_PHYS, 2, 6), ATTK(AT_ENGL, AD_PHYS, 1, 10),
           NO_ATTK, NO_ATTK),
@@ -2684,7 +2684,7 @@ struct permonst _mons2[] = {
     /* Named demon lords & princes plus Arch-Devils.
      * (their order matters; see minion.c)
      */
-    MON("Juiblex", S_DEMON, LVL(50, 3, -7, 65, -15),
+    MON("Juiblex", S_DEMON, LVL(50, 3, -17, 65, -15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_ENGL, AD_DISE, 4, 10), ATTK(AT_SPIT, AD_ACID, 3, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2695,7 +2695,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_LORD | M2_MALE,
         M3_WAITFORU | M3_WANTSAMUL | M3_INFRAVISION, CLR_BRIGHT_GREEN),
-    MON("Yeenoghu", S_DEMON, LVL(56, 18, -5, 80, -15),
+    MON("Yeenoghu", S_DEMON, LVL(56, 18, -15, 80, -15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 3, 6), ATTK(AT_WEAP, AD_CONF, 2, 8),
           ATTK(AT_CLAW, AD_PLYS, 1, 6), ATTK(AT_MAGC, AD_MAGM, 2, 6), NO_ATTK,
@@ -2705,7 +2705,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_LORD | M2_MALE | M2_COLLECT,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Orcus", S_DEMON, LVL(66, 9, -6, 85, -20),
+    MON("Orcus", S_DEMON, LVL(66, 9, -16, 85, -20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 3, 6), ATTK(AT_CLAW, AD_PHYS, 3, 4),
           ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_MAGC, AD_SPEL, 8, 6),
@@ -2717,7 +2717,7 @@ struct permonst _mons2[] = {
         M3_WAITFORU | M3_WANTSBOOK | M3_WANTSAMUL | M3_INFRAVISIBLE
             | M3_INFRAVISION,
         HI_LORD),
-    MON("Geryon", S_DEMON, LVL(72, 3, -3, 75, 15),
+    MON("Geryon", S_DEMON, LVL(72, 3, -13, 75, 15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 3, 6), ATTK(AT_CLAW, AD_PHYS, 3, 6),
           ATTK(AT_STNG, AD_DRST, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2726,7 +2726,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Dispater", S_DEMON, LVL(78, 15, -2, 80, 15),
+    MON("Dispater", S_DEMON, LVL(78, 15, -12, 80, 15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 6), ATTK(AT_MAGC, AD_SPEL, 6, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2735,7 +2735,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE | M2_COLLECT,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Lord of the Foocubi", S_DEMON, LVL(80, 18, -6, 80, -15),
+    MON("Lord of the Foocubi", S_DEMON, LVL(80, 18, -16, 80, -15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_GAZE, AD_BLND, 4, 6), ATTK(AT_WEAP, AD_PHYS, 3, 6),
           ATTK(AT_WEAP, AD_PHYS, 3, 6), ATTK(AT_CLAW, AD_SEDU, 0, 0),
@@ -2745,7 +2745,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY
             | M2_LORD | M2_COLLECT,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Baalzebub", S_DEMON, LVL(89, 9, -5, 85, 20),
+    MON("Baalzebub", S_DEMON, LVL(89, 9, -15, 85, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_BITE, AD_DRST, 2, 6), ATTK(AT_GAZE, AD_STUN, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2755,9 +2755,9 @@ struct permonst _mons2[] = {
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_WAITFORU | M3_INFRAVISIBLE | M3_INFRAVISION,
         HI_LORD),
-    MON("Mephisto", S_DEMON, LVL(105, 12, -7, 90, 20),
+    MON("Mephisto", S_DEMON, LVL(105, 12, -17, 90, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
-        A(ATTK(AT_MAGC, AD_SPEL, 1, 4), ATTK(AT_MAGC, AD_FIRE, 6, 6),
+        A(ATTK(AT_BUTT, AD_PHYS, 4, 4), ATTK(AT_MAGC, AD_FIRE, 6, 6),
           ATTK(AT_CLAW, AD_PHYS, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1500, 500, MS_CUSS, MZ_HUGE), MR_FIRE | MR_COLD | MR_POISON, 0,
@@ -2765,7 +2765,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_STRONG
             | M2_NASTY | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Asmodeus", S_DEMON, LVL(105, 12, -7, 90, 20),
+    MON("Asmodeus", S_DEMON, LVL(105, 12, -17, 90, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 4, 4), ATTK(AT_MAGC, AD_COLD, 6, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2775,7 +2775,7 @@ struct permonst _mons2[] = {
             | M2_NASTY | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_WAITFORU | M3_INFRAVISIBLE | M3_INFRAVISION,
         HI_LORD),
-    MON("Demogorgon", S_DEMON, LVL(106, 15, -8, 95, -20),
+    MON("Demogorgon", S_DEMON, LVL(106, 15, -18, 95, -20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
         A(ATTK(AT_MAGC, AD_SPEL, 8, 6), ATTK(AT_STNG, AD_DRLI, 1, 4),
           ATTK(AT_CLAW, AD_DISE, 1, 6), ATTK(AT_CLAW, AD_DISE, 1, 6), NO_ATTK,
@@ -2785,7 +2785,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_PNAME | M2_NASTY
             | M2_PRINCE | M2_MALE,
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("King in Yellow", S_DEMON, LVL(118, 15, -7, 100, 0),
+    MON("King in Yellow", S_DEMON, LVL(118, 15, -20, 100, 0),
         (G_NOGEN | G_NOCORPSE | G_UNIQ),
         A(ATTK(AT_MAGC, AD_CLRC, 6, 10), ATTK(AT_TENT, AD_DCAY, 12, 2),
           ATTK(AT_TENT, AD_DCAY, 12, 2), ATTK(AT_TENT, AD_PLYS, 12, 2),
@@ -2847,7 +2847,7 @@ struct permonst _mons2[] = {
         SIZ(1500, 400, MS_DJINNI, MZ_HUMAN), MR_POISON | MR_STONE, 0,
         M1_HUMANOID | M1_FLY | M1_POIS, M2_NOPOLY | M2_STALK | M2_COLLECT,
         M3_INFRAVISIBLE, CLR_YELLOW),
-    MON("marid", S_DEMON, LVL(18, 15, -5, 75, 0), (G_NOCORPSE | G_GENO | 1),
+    MON("marid", S_DEMON, LVL(14, 15, -5, 75, 0), (G_NOCORPSE | G_GENO | 1),
         A(ATTK(AT_SPIT, AD_ACID, 3, 4), ATTK(AT_MAGC, AD_SPEL, 0, 0),
           ATTK(AT_CLAW, AD_PHYS, 4, 4), ATTK(AT_CLAW, AD_PHYS, 4, 4),
           NO_ATTK, NO_ATTK),

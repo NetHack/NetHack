@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/24/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -298,11 +298,20 @@ boolean foundyou;
 
     switch (mattk->adtyp) {
     case AD_FIRE:
-        pline("You're enveloped in flames.");
-        if (Fire_resistance) {
-            shieldeff(u.ux, u.uy);
-            pline("But you resist the effects.");
-            dmg = 0;
+        if (is_demon(mtmp->data)) {
+            pline("You're enveloped in blazing pillar of hellfire!");
+            if (Fire_resistance) {
+                shieldeff(u.ux, u.uy);
+                pline("You only partially resist the effects.");
+                dmg = (dmg + 1) / 2;
+            }
+        } else {
+            pline("You're enveloped in flames.");
+            if (Fire_resistance) {
+                shieldeff(u.ux, u.uy);
+                pline("But you resist the effects.");
+                dmg = 0;
+            }
         }
         burn_away_slime();
         break;

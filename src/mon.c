@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/12/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1525,6 +1525,13 @@ struct monst *magr, /* monster that is currently deciding where to move */
     /* and vice versa */
     if(md->mlet == S_HUMAN && ma == &mons[PM_RENEGADE_SHOPKEEPER])
   		  return ALLOW_M|ALLOW_TM;
+
+    /* Asmodeus and Mephisto dislike one another. */
+    if(ma == &mons[PM_MEPHISTO] && md == &mons[PM_ASMODEUS])
+        return ALLOW_M|ALLOW_TM;
+    if(ma == &mons[PM_ASMODEUS] && md == &mons[PM_MEPHISTO])
+        return ALLOW_M|ALLOW_TM;
+
     return 0L;
 }
 
