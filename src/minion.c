@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/18/16 by NullCGT */
+/* Edited on 3/17/16 by NullCGT */
 
 #include "hack.h"
 
@@ -225,7 +225,7 @@ register struct monst *mtmp;
     struct obj *otmp = 0, *obj = 0;
     int n = 0;
 
-    if (uwep && uwep->oartifact == ART_EXCALIBUR) {
+    if (uwep && uwep->oartifact == ART_EXCALIBUR || mon_has_amulet(mtmp)) {
         pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
@@ -329,11 +329,6 @@ register struct monst *mtmp;
         set_malign(mtmp);
         return 0;
     } else {
-        /* make sure that the demand is unmeetable if the monster
-           has the Amulet, preventing monster from being satisfied
-           and removed from the game (along with said Amulet...) */
-        if (mon_has_amulet(mtmp))
-            demand = cash + (long) rn1(1000, 40);
 
         pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
               currency(demand));

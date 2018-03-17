@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/16/18 by NullCGT */
+/* Edited on 3/17/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -575,7 +575,8 @@ register struct monst *mtmp;
     if ((mtmp->cham == NON_PM) && is_demon(mdat) && !range2
         && mtmp->data != &mons[PM_BALROG] && mtmp->data != &mons[PM_SUCCUBUS]
         && mtmp->data != &mons[PM_INCUBUS])
-        if (!mtmp->mcan && !rn2(13))
+        if ((!mtmp->mcan && !rn2(13)) ||
+             (!mtmp->mcan && !rn2(4) && mtmp->data == &mons[PM_NALZOK]))
             (void) msummon(mtmp);
 
     /*  Special lycanthrope handling code */

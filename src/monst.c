@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/16/18 by NullCGT */
+/* Edited on 3/17/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -3273,7 +3273,7 @@ struct permonst _mons2[] = {
     MON("Thoth Amon", S_HUMAN, LVL(16, 12, 0, 10, -14),
         (G_NOGEN | G_UNIQ | G_NOCORPSE),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
-          ATTK(AT_MAGC, AD_SPEL, 0, 0), ATTK(AT_CLAW, AD_SAMU, 1, 4), NO_ATTK,
+          ATTK(AT_MAGC, AD_CLRC, 0, 0), ATTK(AT_CLAW, AD_SAMU, 1, 4), NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_NEMESIS, MZ_HUMAN), MR_POISON | MR_STONE, 0,
         M1_HUMANOID | M1_OMNIVORE,
@@ -3330,7 +3330,7 @@ struct permonst _mons2[] = {
         CLR_GRAY),
     MON("Ixoth", S_DRAGON, LVL(15, 12, -1, 20, -14), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_BREA, AD_FIRE, 8, 6), ATTK(AT_BITE, AD_PHYS, 4, 8),
-          ATTK(AT_MAGC, AD_SPEL, 0, 0), ATTK(AT_CLAW, AD_PHYS, 2, 4),
+          ATTK(AT_MAGC, AD_SPEL, 0, 0), ATTK(AT_CLAW, AD_STUN, 2, 4),
           ATTK(AT_CLAW, AD_SAMU, 2, 4), NO_ATTK),
         SIZ(WT_DRAGON, 1600, MS_NEMESIS, MZ_GIGANTIC), MR_FIRE | MR_STONE,
         MR_FIRE,
@@ -3401,7 +3401,7 @@ struct permonst _mons2[] = {
         HI_LORD),
     MON("Dark One", S_HUMAN, LVL(15, 12, 0, 80, -10),
         (G_NOGEN | G_UNIQ | G_NOCORPSE),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
           ATTK(AT_CLAW, AD_SAMU, 1, 4), ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_NEMESIS, MZ_HUMAN), MR_STONE, 0,

@@ -2,7 +2,7 @@
 
 This changelog documents all the features that differ from vanilla nethack.
 Beware of SPOILERS for both Nethack and GlazeHack all the way through this
-document, particularly in the monsters and items section.
+document.
 
 General Changes
 - Gaining a resistance other than poison resistance through food will cause you
@@ -45,6 +45,17 @@ General Changes
 - Vampire mages un-deferred.
 - If preferred pet is set to '@', the player spawns with an adventuring party.
   This is very experimental, and probably should not be used.
+- Some of the less powerful or less unique quest nemeses have been changed to
+  be more challenging or interesting (see below)
+- Bribing demon lords has been greatly expanded. They now can potentially ask
+  for powerful items in your inventory instead of gold.
+
+Quest Nemesis Changes
+- Lord Surtur can create level-shaking earthquakes when he attacks.
+- Nalzok now has a much higher chance of summoning other demons on hit.
+- Ixoth's claw attack can stun the opponent.
+- The Dark One now casts spells twice per turn.
+- Thoth Amon now casts a mix of clerical and mage spells.
 
 New Races
 - Merfolk: Start with swimming, and eventually learn to breath water. This is
@@ -75,7 +86,8 @@ New Artifacts
 - Seafoam: A trident that grants the ability to breathe water.
 - Sharur: A talking warhmamer from Sumerian mythology with a large number of
   abilities. Overpowered to the point that it will likely become a quest
-  artifact in the future. Invoking it turns it into a flying lion.
+  artifact in the future. Invoking it turns it into a flying lion. Must be
+  wished for.
 - Vladsbane: A joke artifact which cannot be randomly generated. It's a food
   ration that warns you of undead. Really.
 - The King in Yellow: A spellbook of finger of death that grants several
@@ -85,6 +97,9 @@ New Artifacts
   it's not 100% useless.
 - The Holographic Void Lily: The cartomancer quest artifact. Greatly increases
   spellcasting abilities.
+- Gleipnir: The bindings of the wolf Fenrir. A grappling hook with extremely
+  long range, improved damage and to-hit, and the ability to hook creatures
+  of any size.
 
 Dungeon Generation
 - Statuary level: A level with many statues and statue traps. One statue
