@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1953,6 +1953,12 @@ register struct attack *mattk;
             if (which_armor(mdef, W_ARMU) != 0)
                 m_useup(mdef, which_armor(mdef, W_ARMU));
         }
+        break;
+    case AD_PITS:
+        pline("Your strike shakes the entire world around you!");
+        do_earthquake((u.ulevel - 1) / 3 + 1);
+        /* shake up monsters in a much larger radius... */
+        awaken_monsters(ROWNO * COLNO);
         break;
     default:
         tmp = 0;

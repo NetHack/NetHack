@@ -3391,7 +3391,7 @@ struct permonst _mons2[] = {
      * Note: the Master of Thieves was defined above.
      */
     MON("Lord Surtur", S_GIANT, LVL(15, 12, 2, 50, 12), (G_NOGEN | G_UNIQ),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 10), ATTK(AT_WEAP, AD_PHYS, 2, 10),
+        A(ATTK(AT_WEAP, AD_PITS, 2, 10), ATTK(AT_WEAP, AD_PHYS, 2, 10),
           ATTK(AT_CLAW, AD_SAMU, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2250, 850, MS_NEMESIS, MZ_HUGE), MR_FIRE | MR_STONE, MR_FIRE,
         M1_HUMANOID | M1_OMNIVORE,

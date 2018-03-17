@@ -26,14 +26,14 @@
  *                      called here chasms.
  */
 
+/* Edited on 3/16/18 by NullCGT */
+
 #include "hack.h"
 
-STATIC_DCL void FDECL(awaken_monsters, (int));
 STATIC_DCL void FDECL(put_monsters_to_sleep, (int));
 STATIC_DCL void FDECL(charm_snakes, (int));
 STATIC_DCL void FDECL(calm_nymphs, (int));
 STATIC_DCL void FDECL(charm_monsters, (int));
-STATIC_DCL void FDECL(do_earthquake, (int));
 STATIC_DCL int FDECL(do_improvisation, (struct obj *));
 
 #ifdef UNIX386MUSIC
@@ -57,7 +57,7 @@ void FDECL(amii_speaker, (struct obj *, char *, int));
  * Wake every monster in range...
  */
 
-STATIC_OVL void
+void
 awaken_monsters(distance)
 int distance;
 {
@@ -236,7 +236,7 @@ int distance;
 /* Generate earthquake :-) of desired force.
  * That is:  create random chasms (pits).
  */
-STATIC_OVL void
+void
 do_earthquake(force)
 int force;
 {

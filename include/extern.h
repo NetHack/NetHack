@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 3/06/18 by NullCGT */
+/* Edited on 3/16/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -1595,7 +1595,9 @@ E boolean FDECL(munslime, (struct monst *, BOOLEAN_P));
 
 /* ### music.c ### */
 
+E void FDECL(awaken_monsters, (int));
 E void FDECL(awaken_soldiers, (struct monst *));
+E void FDECL(do_earthquake, (int));
 E int FDECL(do_play_instrument, (struct obj *));
 
 /* ### nhlan.c ### */
