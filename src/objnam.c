@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1521144299 2018/03/15 20:04:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1521254016 2018/03/17 02:33:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2243,7 +2243,6 @@ const char *oldstr;
     {
         static const char *const already_plural[] = {
             "ae",  /* algae, larvae, &c */
-            "men", /* also catches women, watchmen */
             "matzot", 0,
         };
 
@@ -2469,7 +2468,7 @@ const char *basestr;
 boolean to_plural;            /* true => makeplural, false => makesingular */
 {
     int i, al;
-    char *endstr;
+    char *endstr, *spot;
     /* these are all the prefixes for *man that don't have a *men plural */
     const char *no_men[] = {
         "albu", "antihu", "anti", "ata", "auto", "cai",
@@ -2494,13 +2493,17 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
     if (to_plural) {
         for (i = 0; i < SIZE(no_men); i++) {
             al = (int) strlen(no_men[i]);
-            if (!BSTRNCMPI(basestr, endstr - (al + 3), no_men[i], al))
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_men[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
                 return TRUE;
         }
     } else {
         for (i = 0; i < SIZE(no_man); i++) {
             al = (int) strlen(no_man[i]);
-            if (!BSTRNCMPI(basestr, endstr - (al + 3), no_man[i], al))
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_man[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
                 return TRUE;
         }
     }
