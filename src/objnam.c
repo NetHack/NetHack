@@ -2472,18 +2472,18 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
     char *endstr, *spot;
     /* these are all the prefixes for *man that don't have a *men plural */
     const char *no_men[] = {
-        "albu", "antihu", "anti", "ata", "auto", "cai",
-        "cay", "ceru", "corner", "decu", "des", "dura", "fir",
-        "glass", "hanu", "het", "infrahu", "inhu", "land",
-        "meat", "nonhu", "otto", "out", "prehu", "protohu",
+        "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
+        "ceru", "corner", "decu", "des", "dura", "fir", "hanu", "het",
+        "infrahu", "inhu", "nonhu", "otto", "out", "prehu", "protohu",
         "subhu", "superhu", "talis", "unhu", "sha",
         "hu", "un", "le", "re", "so", "to", "at", "a",
     };
     /* these are all the prefixes for *men that don't have a *man singular */
     const char *no_man[] = {
-        "acu", "ceru", "cogno", "cycla", "fleh", "hegu", "preno", "sonar",
-        "dai", "exa", "fla", "sta", "teg", "tegu", "vela",
-        "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya", "o"
+        "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
+        "hegu", "preno", "sonar", "dai", "exa", "fla", "sta", "teg", "tegu",
+        "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
+        "o", "a",
     };
 
     if (!basestr || strlen(basestr) < 4)
