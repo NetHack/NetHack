@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1521254016 2018/03/17 02:33:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1521377345 2018/03/18 12:49:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -995,10 +995,10 @@ unsigned doname_flags;
 
     if (lknown && Is_box(obj)) {
         if (obj->obroken)
-            /* 3.6.0 used "unlockable" here but that could be misunderstood
-               to mean "capable of being unlocked" rather than the intended
-               "not capable of being locked" */
-            Strcat(prefix, "lock-damaged ");
+            /* 3.6.0 used an "unlockable" prefix here but that could be
+               misunderstood to mean "capable of being unlocked" rather
+               than the intended "not capable of being locked" */
+            Strcat(bp, " with a broken lock");
         else if (obj->olocked)
             Strcat(prefix, "locked ");
         else

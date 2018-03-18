@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1446955300 2015/11/08 04:01:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1521377334 2018/03/18 12:48:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -550,8 +550,8 @@ doforce()
         if (Is_box(otmp)) {
             if (otmp->obroken) {
                 There("is %s here%s.", doname(otmp),
-                      /* The displayed name will have already been prefixed
-                       * with "lock-damaged" if otmp->lknown is already set
+                      /* The displayed name will have already stated
+                       * "with a broken lock" if otmp->lknown is already set
                        * so suppress the additional notification about the
                        * lock in that case. */
                       !otmp->lknown ? ", but its lock is already broken" : "");
