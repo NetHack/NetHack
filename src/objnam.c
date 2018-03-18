@@ -2481,8 +2481,8 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
     /* these are all the prefixes for *men that don't have a *man singular */
     const char *no_man[] = {
         "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
-        "hegu", "preno", "sonar", "dai", "exa", "fla", "sta", "teg", "tegu",
-        "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
+        "hegu", "preno", "sonar", "speci", "dai", "exa", "fla", "sta", "teg",
+        "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
         "o", "a",
     };
 
