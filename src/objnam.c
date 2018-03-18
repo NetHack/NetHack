@@ -2043,6 +2043,7 @@ static struct sing_plur one_off[] = {
     { "nemesis", "nemeses" },
     { "ovum", "ova" },
     { "ox", "oxen" },
+    { "passerby", "passersby" },
     { "rtex", "rtices" }, /* vortex */
     { "serum", "sera" },
     { "staff", "staves" },
@@ -2055,11 +2056,11 @@ static const char *const as_is[] = {
     "boots",   "shoes",     "gloves",    "lenses",   "scales",
     "eyes",    "gauntlets", "iron bars",
     /* both singular and plural are spelled the same */
-    "deer",    "elk",       "fish",      "tuna",      "yaki",
-    "-hai",    "krill",     "manes",     "moose",     "ninja",
-    "sheep",   "ronin",     "roshi",     "shito",     "tengu",
-    "ki-rin",  "Nazgul",    "gunyoki",   "piranha",   "samurai",
-    "shuriken", 0,
+    "bison",   "deer",      "elk",       "fish",      "fowl",
+    "tuna",    "yaki",      "-hai",      "krill",     "manes",
+    "moose",   "ninja",     "sheep",     "ronin",     "roshi",
+    "shito",   "tengu",     "ki-rin",    "Nazgul",    "gunyoki",
+    "piranha", "samurai",   "shuriken", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
