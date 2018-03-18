@@ -998,7 +998,7 @@ unsigned doname_flags;
             /* 3.6.0 used "unlockable" here but that could be misunderstood
                to mean "capable of being unlocked" rather than the intended
                "not capable of being locked" */
-            Strcat(prefix, "broken ");
+            Strcat(prefix, "lock-damaged ");
         else if (obj->olocked)
             Strcat(prefix, "locked ");
         else

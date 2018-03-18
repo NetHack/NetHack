@@ -548,9 +548,18 @@ doforce()
     xlock.box = (struct obj *) 0;
     for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
         if (Is_box(otmp)) {
-            if (otmp->obroken || !otmp->olocked) {
-                There("is %s here, but its lock is already %s.", doname(otmp),
-                      otmp->obroken ? "broken" : "unlocked");
+            if (otmp->obroken) {
+                There("is %s here%s.", doname(otmp),
+                      /* The displayed name will have already been prefixed
+                       * with "lock-damaged" if otmp->lknown is already set
+                       * so suppress the additional notification about the
+                       * lock in that case. */
+                      !otmp->lknown ? ", but its lock is already broken" : "");
+                otmp->lknown = 1;
+                continue;
+            } else if (!otmp->olocked) {
+                There("is %s here, but its lock is already unlocked.",
+                      doname(otmp));
                 otmp->lknown = 1;
                 continue;
             }
