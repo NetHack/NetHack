@@ -527,6 +527,9 @@ fix 'object lost' panic if hero with lycanthropy but in human form is wielding
 prevent segfault if pline() is called recursively (which could happen if the
 	interface code issues a debugpline() while processing putstr())
 open at yourself is the same as #loot
+when #force reports that a chest's lock is already broken or already unlocked,
+	force it to be described as "a chest", even when its lock state is
+	already known, rather than as "a broken chest" or "an unlocked chest"
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
