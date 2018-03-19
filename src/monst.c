@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/17/18 by NullCGT */
+/* Edited on 3/19/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -2795,6 +2795,16 @@ struct permonst _mons2[] = {
         M1_SEE_INVIS | M1_FLY | M1_BREATHLESS | M1_NOHEAD | M1_AMORPHOUS,
         M2_NOPOLY | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_MALE,
         M3_WANTSALL | M3_INFRAVISIBLE | M3_INFRAVISION, CLR_YELLOW),
+    /* Not technically a rider, but along the same lines. Only used in the
+       deck of fate at this point. */
+    MON("Grim Reaper", S_DEMON, LVL(30, 12, -5, 100, 0), (G_NOGEN | G_NOCORPSE),
+        A(ATTK(AT_TUCH, AD_DETH, 8, 8), ATTK(AT_TUCH, AD_DETH, 8, 8), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 1, MS_WAIL, MZ_HUMAN),
+        MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON | MR_STONE, 0,
+        M1_FLY | M1_HUMANOID | M1_REGEN | M1_SEE_INVIS | M1_TPORT_CNTRL,
+        M2_NOPOLY | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY,
+        M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, HI_LORD),
     /* Riders -- the Four Horsemen of the Apocalypse ("War" == player);
      * depicted with '&' but do not have M2_DEMON set.
      */

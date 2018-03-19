@@ -48,7 +48,9 @@ General Changes
 - Some of the less powerful or less unique quest nemeses have been changed to
   be more challenging or interesting (see below)
 - Bribing demon lords has been greatly expanded. They now can potentially ask
-  for powerful items in your inventory instead of gold.
+  for powerful items in your inventory instead of gold, and you can also use
+  decks of cards to gamble on your immortal soul with them.
+- All demon lords have had their AC significantly lowered.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -136,6 +138,8 @@ New Items
 - Amulet of Nausea
 - Amulet of Danger
 - Mask
+- Playing card deck
+- Deck of fate
 - Pinch of Catnip
 - Potion of Reflection
 - Scroll of Cloning

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/14/18 by NullCGT */
+/* Edited on 3/19/18 by NullCGT */
 
 #include "hack.h"
 
@@ -296,6 +296,190 @@ int rx, ry, *resp;
 }
 
 static const char hollow_str[] = "a hollow sound.  This must be a secret %s!";
+
+void
+use_deck(obj)
+struct obj *obj;
+{
+    char buf[BUFSZ];
+    long draws;
+    int index, pm, n;
+    struct monst *mtmp;
+
+    if (obj->otyp == PLAYING_CARD_DECK) {
+        if ((obj->cursed && Luck == 13) || Luck <= 0) {
+            pline("You draw a hand of five cards. It's not very good...");
+        } else if ((obj->cursed && Luck >= 5) || Luck < 5) {
+            pline("You draw a hand of five cards. Two pair!");
+        } else if ((obj->cursed && Luck > 0) || Luck < 13) {
+            pline("You draw a hand of five cards. Full house!");
+        } else if ((obj->cursed && Luck <= 0) || Luck == 13) {
+            pline("You draw a hand of five cards. Wow, a royal flush!");
+        }
+        /* if blessed, indicate the luck value directly. */
+        if (obj->blessed && Luck > 0) {
+            pline("You shuffle the deck %d times.", Luck);
+        } else {
+            pline("You don't bother shuffling the deck.");
+        }
+        return;
+    }
+    /* deck of fate */
+    makeknown(obj->otyp);
+    getlin("How many cards will you draw?", buf);
+    if (sscanf(buf, "%ld", &draws) != 1)
+        draws = 0L;
+    if (buf <= 0L || draws <= 0L) {
+        pline("You decide not to try your luck.");
+        pline("The pack of cards vanishes in a puff of smoke.");
+        useup(obj);
+        return;
+    }
+    pline("You begin to draw from the deck of fate...");
+    /* It would make sense not to give messages if blind, but that would make
+       this already long string of spaghetti code even longer :( */
+    for ( ; draws > 0; draws--) {
+        index = rnd(22);
+        // wishes and disasters can be modified through BCU
+        if (obj->cursed && index > 1) {
+          index--;
+        }
+        if (obj->blessed && index < 22) {
+          index++;
+        }
+        switch(index) {
+            case 1:
+                pline("You draw The Tower...");
+                explode(u.ux, u.uy, 15, rnd(30), TOOL_CLASS, EXPL_MAGICAL);
+                explode(u.ux, u.uy, 11, rnd(30), TOOL_CLASS, EXPL_FIERY);
+                (void) cancel_monst(&youmonst, obj, TRUE, FALSE, TRUE);
+            case 2:
+                pline("You draw the Wheel of Fortune... Two cards flip out of the deck.");
+                draws += 2;
+                break;
+            case 3:
+                if (!Blind) {
+                    pline("You draw The Devil... Moloch's visage on the card grins at you.");
+                } else {
+                    pline("You draw The Devil...");
+                }
+                if ((pm = dlord(A_NONE)) != NON_PM)
+                    makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
+                break;
+            case 4:
+                pline("You draw The Fool...");
+                (void) adjattrib(A_INT, -rnd(3), FALSE);
+                (void) adjattrib(A_WIS, -rnd(3), FALSE);
+                forget_objects(10);
+                break;
+            case 5:
+                pline("You draw Death...");
+                makemon(&mons[PM_GRIM_REAPER], u.ux, u.uy, NO_MM_FLAGS);
+                pline("The Grim Reaper gently sets their hand upon the deck, stopping your draws.");
+                draws = 0;
+                break;
+            case 6:
+                pline("You draw Judgement...");
+                punish(obj);
+                break;
+            case 7:
+                pline("You draw The Emperor...");
+                attrcurse();
+                attrcurse();
+                break;
+            case 8:
+                pline("You draw The Hermit...");
+                forget_objects(100);
+                aggravate();
+                break;
+            case 9:
+                pline("You draw The Hanged Man...");
+                mtmp = makemon(&mons[PM_ROPE_GOLEM], u.ux, u.uy, NO_MM_FLAGS);
+                break;
+            case 10:
+                pline("You draw Justice...");
+                nomul(-(rn1(30, 20)));
+                multi_reason = "frozen by fate";
+                nomovemsg = You_can_move_again;
+                break;
+            case 11:
+                /* traditionally a good card? */
+                pline("You draw Temperance...");
+                destroy_arm(some_armor(&youmonst));
+                destroy_arm(some_armor(&youmonst));
+                break;
+            case 12:
+                pline("You draw The Lovers!");
+                for (n = 0; n < 2; n++) {
+                    if (!rn2(2))
+                        mtmp = makemon(&mons[PM_SUCCUBUS],
+                                       u.ux, u.uy, NO_MM_FLAGS);
+                    else
+                        mtmp = makemon(&mons[PM_INCUBUS],
+                                       u.ux, u.uy, NO_MM_FLAGS);
+                    mtmp->mpeaceful = 1;
+                }
+                break;
+            case 13:
+                if (!Blind) {
+                    pline("You draw the Magician! The figure on the card winks!");
+                }
+                    pline("You draw the Magician!");
+                u.uenmax += rn1(20,10);
+                u.uenmax = u.uenmax;
+                break;
+            case 14:
+                pline("You draw Strength!");
+                (void) adjattrib(A_STR, rn1(5, 4), FALSE);
+                break;
+            case 15:
+                pline("You draw The High Priestess! You feel more devout.");
+                adjalign(10);
+                break;
+            case 16:
+                pline("You draw The Hierophant!");
+                levl[u.ux][u.uy].typ = ALTAR;
+                break;
+            case 17:
+                pline("You draw the Emperess!");
+                levl[u.ux][u.uy].typ = THRONE;
+                break;
+            case 18:
+                pline("You draw The Chariot! Your steed has arrived.");
+                mtmp = makemon(&mons[PM_NIGHTMARE],
+                               u.ux, u.uy, NO_MM_FLAGS);
+                (void) tamedog(mtmp, (struct obj *) 0);
+                break;
+            case 19:
+                pline("You draw the Sun! You are bathed in warmth!");
+                /* as praying */
+                if (!(HProtection & INTRINSIC)) {
+                    HProtection |= FROMOUTSIDE;
+                    if (!u.ublessed)
+                        u.ublessed = rn1(3, 2);
+                } else
+                    u.ublessed++;
+                break;
+            case 20:
+                pline("You draw The Moon! Your luck is beginning to change!");
+                change_luck(5);
+                break;
+            case 21:
+                pline("You draw the Star!");
+                identify_pack(0, FALSE);
+                break;
+            case 22:
+                pline("You draw The World!");
+                makewish();
+                break;
+            default:
+                pline("You draw the twenty-three of cups, apparently.");
+        }
+    }
+    pline("The pack of cards vanishes in a puff of smoke.");
+    useup(obj);
+    return;
+}
 
 /* Strictly speaking it makes no sense for usage of a stethoscope to
    not take any time; however, unless it did, the stethoscope would be
@@ -3682,6 +3866,10 @@ doapply()
         break;
     case MASK:
         use_mask(&obj);
+        break;
+    case PLAYING_CARD_DECK:
+    case DECK_OF_FATE:
+        use_deck(obj);
         break;
     case FIGURINE:
         use_figurine(&obj);

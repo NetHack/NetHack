@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/17/16 by NullCGT */
+/* Edited on 3/19/16 by NullCGT */
 
 #include "hack.h"
 
@@ -225,7 +225,9 @@ register struct monst *mtmp;
     struct obj *otmp = 0, *obj = 0;
     int n = 0;
 
-    if (uwep && uwep->oartifact == ART_EXCALIBUR || mon_has_amulet(mtmp)) {
+    /* amulet check moved to here because of potential issues with
+       disappearance. */
+    if ((uwep && uwep->oartifact == ART_EXCALIBUR) || mon_has_amulet(mtmp)) {
         pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
@@ -273,17 +275,54 @@ register struct monst *mtmp;
             && obj->otyp != AMULET_OF_YENDOR && obj->otyp != BELL_OF_OPENING
             && obj->otyp != CANDELABRUM_OF_INVOCATION &&
             obj->otyp != SPE_BOOK_OF_THE_DEAD) || obj->otyp == WAN_WISHING
-            || obj->otyp == BAG_OF_HOLDING)
+            || obj->otyp == BAG_OF_HOLDING || obj->otyp == PLAYING_CARD_DECK
+            || obj->otyp == DECK_OF_FATE)
             ++n, otmp = obj;
     }
     if (n > 1) {
         n = rnd(n);
         for (otmp = invent; otmp; otmp = otmp->nobj)
             if ((otmp->oartifact || obj->otyp == WAN_WISHING ||
-                obj->otyp == BAG_OF_HOLDING) && !--n)
+                obj->otyp == BAG_OF_HOLDING || obj->otyp == PLAYING_CARD_DECK ||
+                obj->otyp == DECK_OF_FATE) && !--n)
                 break;
     }
-    if (otmp) {
+    if ((otmp && otmp->otyp == DECK_OF_FATE) ||
+        (otmp && otmp->otyp == PLAYING_CARD_DECK)) {
+        pline("%s notes you have a deck of cards in your possession.",
+              Amonnam(mtmp));
+        pline("%s offers to play you for dominion of your soul.",
+              Amonnam(mtmp));
+        if (yn("Play cards with the demon?") == 'n') {
+            pline("%s gets angry...", Amonnam(mtmp));
+            mtmp->mpeaceful = 0;
+            set_malign(mtmp);
+            return 0;
+        } else {
+            use_deck(otmp);
+            if (otmp->otyp == DECK_OF_FATE) {
+                /* expand in the future to allow demon drawing :) */
+                pline("%s realizes what deck you are playing with and vanishes with a panicked look!",
+                      Amonnam(mtmp));
+                mongone(mtmp);
+                return (1);
+            } else {
+                if (rnd(13) > Luck) {
+                    pline("Unfortunately, %s beats you.", Amonnam(mtmp));
+                    pline("%s vanishes, saying that they will see you in the afterlife.",
+                          Amonnam(mtmp));
+                    mongone(mtmp);
+                    return (1);
+                } else {
+                    pline("You hand beats %s!", Amonnam(mtmp));
+                    pline("%s gets angry...", Amonnam(mtmp));
+                    mtmp->mpeaceful = 0;
+                    set_malign(mtmp);
+                    return 0;
+                }
+            }
+        }
+    } else if (otmp) {
         pline("%s speaks to you. \"I see you have %s in your possession...\"",
               Amonnam(mtmp), xname(otmp));
         /* copied from steal.c */
@@ -319,6 +358,7 @@ register struct monst *mtmp;
         }
     }
 
+
     cash = money_cnt(invent);
     demand =
         rn1(1000, 1000)
@@ -333,7 +373,7 @@ register struct monst *mtmp;
         pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
               currency(demand));
 
-        if ((offer = bribe(mtmp)) == demand + 1) {
+        if ((offer = bribe(mtmp)) == demand + 1 || offer == demand) {
             pline("%s vanishes, commenting on the cheekiness of mortals.",
                   Amonnam(mtmp));
         } else if (offer >= demand) {

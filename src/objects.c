@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 3/19/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -160,7 +160,7 @@ WEAPON("dagger", None,
        1, 1, 0, 30,  10,   4,  4,  3, 2, P,   P_DAGGER, IRON, HI_METAL),
 WEAPON("elven dagger", "runed dagger",
        0, 1, 0, 10,  10,   4,  5,  3, 2, P,   P_DAGGER, WOOD, HI_WOOD),
-WEAPON("bone knife", "sacrificial knife",
+WEAPON("bone knife", None,
        1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("orcish dagger", "crude dagger",
        0, 1, 0, 12,  10,   4,  3,  3, 2, P,   P_DAGGER, IRON, CLR_BLACK),
@@ -502,7 +502,7 @@ SHIELD("small shield", None,
        1, 0, 0,          0, 6, 0,  30,  3, 9, 0,  WOOD, HI_WOOD),
 SHIELD("elven shield", "blue and green shield",
        0, 0, 0,          0, 2, 0,  40,  7, 8, 0,  WOOD, CLR_GREEN),
-SHIELD("tower shield", "large rectangular shield",
+SHIELD("tower shield", None,
       1, 0, 1,          0, 2, 0, 200, 20, 7, 0,  IRON, HI_METAL),
 SHIELD("Uruk-hai shield", "white-handed shield",
        0, 0, 0,          0, 2, 0,  50,  7, 9, 0,  IRON, HI_METAL),
@@ -701,17 +701,22 @@ TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW),
 /* other tools */
 TOOL("expensive camera",    None, 1, 0, 0, 1, 15, 12,200, PLASTIC, CLR_BLACK),
 TOOL("mirror",   "looking glass", 0, 0, 0, 0, 45, 13, 10, GLASS, HI_SILVER),
+TOOL("playing card deck",
+                 "pack of cards", 0, 0, 0, 0, 20, 80, 10, LEATHER, HI_LEATHER),
+TOOL("deck of fate",
+                 "pack of cards", 0, 0, 0, 0,  5,300, 10, LEATHER, HI_LEATHER),
 TOOL("crystal ball", "glass orb", 0, 0, 1, 1, 15,150, 60, GLASS, HI_GLASS),
 TOOL("lenses",              None, 1, 0, 0, 0,  5,  3, 80, GLASS, HI_GLASS),
 TOOL("blindfold",           None, 1, 0, 0, 0, 50,  2, 20, CLOTH, CLR_BLACK),
 TOOL("towel",               None, 1, 0, 0, 0, 50,  2, 50, CLOTH, CLR_MAGENTA),
 TOOL("saddle",              None, 1, 0, 0, 0,  5,200,150, LEATHER, HI_LEATHER),
-TOOL("leash",               None, 1, 0, 0, 0, 60, 12, 20, LEATHER, HI_LEATHER),
+TOOL("leash",               None, 1, 0, 0, 0, 35, 12, 20, LEATHER, HI_LEATHER),
 TOOL("stethoscope",         None, 1, 0, 0, 0, 25,  4, 75, IRON, HI_METAL),
 TOOL("tinning kit",         None, 1, 0, 0, 1, 15,100, 30, IRON, HI_METAL),
 TOOL("tin opener",          None, 1, 0, 0, 0, 35,  4, 30, IRON, HI_METAL),
 TOOL("can of grease",       None, 1, 0, 0, 1, 15, 15, 20, IRON, HI_METAL),
 TOOL("figurine",            None, 1, 0, 1, 0, 15, 50, 80, MINERAL, HI_MINERAL),
+        /* monster type specified by obj->corpsenm */
 TOOL("mask",                None, 1, 0, 1, 0, 10, 20,150, WOOD, HI_WOOD),
         /* monster type specified by obj->corpsenm */
 TOOL("magic marker",        None, 1, 0, 1, 1, 15,  2, 50, PLASTIC, CLR_RED),
