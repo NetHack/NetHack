@@ -1293,14 +1293,20 @@ boolean allow_floor;
             obj = res;
             res = NULL;
 
+            ilet = ',';
+            if (obj != &zeroobj && obj->where == OBJ_INVENT)
+                ilet = obj->invlet;
+
             if (!cnt) { /* picked 0 of something */
                 if (flags.verbose)
                     pline1(Never_mind);
                 return NULL;
             }
 
-            if (obj == &zeroobj || cnt < 0 || cnt == obj->quan)
+            if (obj == &zeroobj || cnt < 0 || cnt == obj->quan) {
+                savech(ilet);
                 return obj;
+            }
 
             if (cnt > obj->quan) {
                 You("don't have that many!  You only have %ld.", obj->quan);
@@ -1316,6 +1322,7 @@ boolean allow_floor;
                 /* kludge for canletgo()'s can't-drop-this message */
                 obj->corpsenm = (int) cnt;
 
+            savech(ilet);
             return obj;
         }
 
@@ -1323,8 +1330,10 @@ boolean allow_floor;
         ilet = 0;
 
         Sprintf(qbuf, "What do you want to %s?", what);
-        if (in_doagain)
+        if (in_doagain) {
             ilet = readchar();
+            pline("ilet:%c", ilet);
+        }
         else if (iflags.force_invmenu) {
             if (!first) /* if we're still here, we escaped */
                 ilet = quitchars[0];
@@ -1366,6 +1375,7 @@ boolean allow_floor;
                 return NULL;
             }
 
+            savech(ilet);
             return &zeroobj;
         }
 
