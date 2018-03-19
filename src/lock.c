@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1446955300 2015/11/08 04:01:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1521377334 2018/03/18 12:48:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -548,9 +548,18 @@ doforce()
     xlock.box = (struct obj *) 0;
     for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
         if (Is_box(otmp)) {
-            if (otmp->obroken || !otmp->olocked) {
-                There("is %s here, but its lock is already %s.", doname(otmp),
-                      otmp->obroken ? "broken" : "unlocked");
+            if (otmp->obroken) {
+                There("is %s here%s.", doname(otmp),
+                      /* The displayed name will have already stated
+                       * "with a broken lock" if otmp->lknown is already set
+                       * so suppress the additional notification about the
+                       * lock in that case. */
+                      !otmp->lknown ? ", but its lock is already broken" : "");
+                otmp->lknown = 1;
+                continue;
+            } else if (!otmp->olocked) {
+                There("is %s here, but its lock is already unlocked.",
+                      doname(otmp));
                 otmp->lknown = 1;
                 continue;
             }
@@ -630,8 +639,9 @@ int x, y;
     } else if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
         return 0;
 
+    /* open at yourself/up/down */
     if ((cc.x == u.ux) && (cc.y == u.uy))
-        return 0;
+        return doloot();
 
     if (stumble_on_door_mimic(cc.x, cc.y))
         return 1;

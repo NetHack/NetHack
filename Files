@@ -228,10 +228,23 @@ mdgrep.pl       panic.c         recover.c
 dgn_comp.l      dgn_comp.y      lev_comp.l      lev_comp.y
 
 win/Qt:
-(files for the Qt widget library - X11, Windows, Mac OS X, or Qtopia)
+(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
 Info.plist      Install.Qt      knethack.lnk    knh-mini.xpm    knh.xpm
 nhicns.uu       nhsplash.xpm    qt_clust.cpp    qt_win.cpp      qttableview.cpp
 tileedit.cpp    tileedit.h      qpe-nethack.control
+
+win/Qt4:
+(files for the Qt 4 widget library - X11, Windows, Mac OS X)
+qt4bind.cpp     qt4bind.h       qt4click.cpp    qt4click.h      qt4clust.cpp
+qt4clust.h      qt4delay.cpp    qt4delay.h      qt4glyph.cpp    qt4glyph.h
+qt4icon.cpp     qt4icon.h       qt4inv.cpp      qt4inv.h        qt4kde0.h
+qt4key.cpp      qt4key.h        qt4line.cpp     qt4line.h       qt4main.cpp
+qt4main.h       qt4map.cpp      qt4map.h        qt4menu.cpp     qt4menu.h
+qt4msg.cpp      qt4msg.h        qt4plsel.cpp    qt4plsel.h      qt4rip.cpp
+qt4rip.h        qt4set.cpp      qt4set.h        qt4stat.cpp     qt4stat.h
+qt4str.cpp      qt4streq.cpp    qt4streq.h      qt4str.h        qt4svsel.cpp
+qt4svsel.h      qt4win.cpp      qt4win.h        qt4xcmd.cpp     qt4xcmd.h
+qt4yndlg.cpp    qt4yndlg.h
 
 win/X11:
 (files for X versions)
