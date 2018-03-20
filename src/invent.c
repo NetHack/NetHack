@@ -1330,10 +1330,8 @@ boolean allow_floor;
         ilet = 0;
 
         Sprintf(qbuf, "What do you want to %s?", what);
-        if (in_doagain) {
+        if (in_doagain)
             ilet = readchar();
-            pline("ilet:%c", ilet);
-        }
         else if (iflags.force_invmenu) {
             if (!first) /* if we're still here, we escaped */
                 ilet = quitchars[0];
@@ -1394,9 +1392,6 @@ boolean allow_floor;
         }
 
         if (ilet == ',' || ilet == '?' || ilet == '*') {
-            if (ilet == ',' && !floor)
-                return &zeroobj; /* dungeon feature */
-
             boolean show_discouraged = FALSE;
             int qflags = (INVORDER_SORT | SIGNAL_ESCAPE);
             menu_item *selection = NULL;
