@@ -471,7 +471,7 @@ NEARDATA struct permonst mons[] = {
         M2_DWARF | M2_STRONG | M2_PRINCE | M2_MALE | M2_GREEDY | M2_JEWELS
             | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Lord Sankis", S_HUMANOID, LVL(8, 9, 10, 20, 0), (G_UNIQ | 1),
+    MON("Emperor Sankis", S_HUMANOID, LVL(8, 9, 10, 20, 0), (G_UNIQ | 1),
         A(ATTK(AT_WEAP, AD_FIRE, 2, 6), ATTK(AT_WEAP, AD_FIRE, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), MR_FIRE, 0,

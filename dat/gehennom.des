@@ -3,7 +3,7 @@
 #	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 # NetHack may be freely redistributed.  See license for details.
 #
-# Edited by NullCGT on 3/16/18
+# Edited by NullCGT on 3/20/18
 #
 
 # Filler levels for gehennom, based on the code in mines.des.
@@ -64,6 +64,138 @@ TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
+
+# cavern filled with demons
+MAZE: "gehenfill-b" , ' '
+INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
+# towered caverns
+MAZE: "gehenfill-c" , random
+INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
+# general level
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+# hidden room 2
+GEOMETRY:left,bottom
+MAP
+--------
+|......|
+|......|
+S......S
+S......S
+|......|
+|......|
+--------
+ENDMAP
+REGION:(01,01,06,06),unlit,"ordinary"
+STAIR: random, up
+MONSTER: '&', random
+MONSTER: '&', random
+MONSTER: '&', random
+TRAP: random, random
+TRAP: random, random
+OBJECT: random, random
+# hidden room 1
+GEOMETRY:right,top
+MAP
+--------
+|......|
+|......|
+S......S
+S......S
+|......|
+|......|
+--------
+ENDMAP
+REGION:(01,01,06,06),unlit,"ordinary"
+STAIR: random, down
+MONSTER: 'D', random
+MONSTER: 'D', random
 
 MAZE: "valley", ' '
 FLAGS: noteleport,hardfloor,nommap
@@ -586,17 +718,17 @@ GEOMETRY:right,center
 # the two iron bars are eyes and spots to their left will be made diggable
 MAP
 -------------------------------------------------
-|                   ----               ----      
-|          ----     |     -----------  |         
-| ------      |  ---------|.........|--P         
-| F....|  -------|...........--------------      
----....|--|..................S............|----  
-+...--....S..----------------|............S...|  
----....|--|..................|............|----  
-| F....|  -------|...........-----S--------      
-| ------      |  ---------|.........|--P         
-|          ----     |     -----------  |         
-|                   ----               ----      
+|                   ----               ----
+|          ----     |     -----------  |
+| ------      |  ---------|.........|--P
+| F....|  -------|...........--------------
+---....|--|..................S............|----
++...--....S..----------------|............S...|
+---....|--|..................|............|----
+| F....|  -------|...........-----S--------
+| ------      |  ---------|.........|--P
+|          ----     |     -----------  |
+|                   ----               ----
 -------------------------------------------------
 ENDMAP
 STAIR:levregion(01,00,15,20),levregion(15,1,70,16),up
