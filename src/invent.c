@@ -1403,8 +1403,6 @@ boolean allow_floor;
             struct obj **objchain = &invent;
             if (ilet == ',') {
                 qflags |= (BY_NEXTHERE | FEEL_COCKATRICE);
-                if (!floor || !feature)
-                    qflags |= AUTOSELECT_SINGLE;
                 if (feature)
                     qflags |= INCLUDE_FEATURE;
 
