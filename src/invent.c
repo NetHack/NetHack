@@ -1262,12 +1262,10 @@ boolean allow_floor;
     }
 
     /* add the " or ?*" part */
-    if (!*buf) {
-        if (!altinv) { /* nothing at all */
-            pline("You don't have anything%s to %s.",
-                  floor || feature ? " else" : "", what);
-            return NULL;
-        }
+    if (!*buf && !res && !altinv) {
+        pline("You don't have anything%s to %s.",
+              floor || feature ? " else" : "", what);
+        return NULL;
     }
 
     if (!*buf) /* no encouraged selections */
