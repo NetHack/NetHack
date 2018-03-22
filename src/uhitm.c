@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1520043553 2018/03/03 02:19:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1521684760 2018/03/22 02:12:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -513,14 +513,10 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
                    u.dx, u.dy, u.dz);
         return TRUE; /* target hasn't been killed */
     }
-    clockwise = !clockwise; /* alternate */
     /* adjust direction by two so that loop's increment (for clockwise)
        or decrement (for counter-clockwise) will point at the spot next
        to primary target */
-    if (clockwise)
-        i = (i + 6) % 8;
-    else
-        i = (i + 2) % 8;
+    i = (i + (clockwise ? 6 : 2)) % 8;
     umort = u.umortality; /* used to detect life-saving */
 
     /*
@@ -535,10 +531,8 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
         struct monst *mtmp;
         int tx, ty, tmp, dieroll, mhit, attknum, armorpenalty;
 
-        if (clockwise)
-            i = (i + 1) % 8; /* ++i, wrap 8 to i=0 */
-        else
-            i = (i + 7) % 8; /* --i, wrap -1 to i=7 */
+        /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
+        i = (i + (clockwise ? 1 : 7)) % 8;
 
         tx = x + xdir[i], ty = y + ydir[i]; /* current target location */
         if (!isok(tx, ty))
@@ -563,6 +557,8 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
         if (!uwep || u.umortality > umort)
             break;
     }
+    /* set up for next time */
+    clockwise = !clockwise; /* alternate */
 
     /* return False if primary target died, True otherwise; note: if 'target'
        was nonNull upon entry then it's still nonNull even if *target died */
@@ -583,8 +579,8 @@ struct attack *uattk;
     int dieroll = rnd(20);
     int mhit = (tmp > dieroll || u.uswallow);
 
-    /* Cleaver attacks three spots, one on either side of 'mon';
-       it can't we part of dual-wielding but we guard against that anyway;
+    /* Cleaver attacks three spots, 'mon' and one on either side of 'mon';
+       it can't be part of dual-wielding but we guard against that anyway;
        cleave return value reflects status of primary target ('mon') */
     if (uwep && uwep->oartifact == ART_CLEAVER && !u.twoweap
         && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum))

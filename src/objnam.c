@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1521507553 2018/03/20 00:59:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,6 +22,7 @@ STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
 
 struct Jitem {
     int item;
@@ -2042,10 +2043,11 @@ static struct sing_plur one_off[] = {
     { "nemesis", "nemeses" },
     { "ovum", "ova" },
     { "ox", "oxen" },
+    { "passerby", "passersby" },
     { "rtex", "rtices" }, /* vortex */
-    { "tooth", "teeth" },
     { "serum", "sera" },
     { "staff", "staves" },
+    { "tooth", "teeth" },
     { 0, 0 }
 };
 
@@ -2054,19 +2056,18 @@ static const char *const as_is[] = {
     "boots",   "shoes",     "gloves",    "lenses",   "scales",
     "eyes",    "gauntlets", "iron bars",
     /* both singular and plural are spelled the same */
-    "deer",    "elk",       "fish",      "tuna",      "yaki",
-    "-hai",    "krill",     "manes",     "moose",     "ninja",
-    "sheep",   "ronin",     "roshi",     "shito",     "tengu",
-    "ki-rin",  "Nazgul",    "gunyoki",   "piranha",   "samurai",
-    "shuriken", 0,
+    "bison",   "deer",      "elk",       "fish",      "fowl",
+    "tuna",    "yaki",      "-hai",      "krill",     "manes",
+    "moose",   "ninja",     "sheep",     "ronin",     "roshi",
+    "shito",   "tengu",     "ki-rin",    "Nazgul",    "gunyoki",
+    "piranha", "samurai",   "shuriken", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
        variant instead of attempting to support both. */
 };
 
-/* singularize/pluralize decisions common to both makesingular & makeplural
- */
+/* singularize/pluralize decisions common to both makesingular & makeplural */
 STATIC_OVL boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)
 char *basestr, *endstring;    /* base string, pointer to eos(string) */
@@ -2090,15 +2091,34 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
-    /* avoid false hit on one_off[].plur == "lice";
+    /* avoid false hit on one_off[].plur == "lice" or .sing == "goose";
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
     if (!strcmpi(basestr, "slice")
         || !strcmpi(basestr, "mongoose")) {
         if (to_plural)
-            (void) strkitten(basestr, 's');
+            Strcasecpy(endstring, "s");
         return TRUE;
+    }
+    /* skip "ox" -> "oxen" entry when pluralizing "<something>ox"
+       unless it is muskox */
+    if (to_plural && strlen(basestr) > 2 && !strcmpi(endstring - 2, "ox")
+        && strcmpi(endstring - 6, "muskox")) {
+        /* "fox" -> "foxes" */
+        Strcasecpy(endstring, "es");
+        return TRUE;
+    }
+    if (to_plural) {
+        if (!strcmpi(endstring - 3, "man")
+            && badman(basestr, to_plural)) {
+            Strcasecpy(endstring, "s");
+            return TRUE;
+        }
+    } else {
+        if (!strcmpi(endstring - 3, "men")
+            && badman(basestr, to_plural))
+            return TRUE;
     }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
@@ -2209,7 +2229,7 @@ const char *oldstr;
     spot--;
     while (spot > str && *spot == ' ')
         spot--; /* Strip blanks from end */
-    *(spot + 1) = 0;
+    *(spot + 1) = '\0';
     /* Now spot is the last character of the string */
 
     len = strlen(str);
@@ -2224,7 +2244,6 @@ const char *oldstr;
     {
         static const char *const already_plural[] = {
             "ae",  /* algae, larvae, &c */
-            "men", /* also catches women, watchmen */
             "matzot", 0,
         };
 
@@ -2240,9 +2259,8 @@ const char *oldstr;
 
     /* man/men ("Wiped out all cavemen.") */
     if (len >= 3 && !strcmpi(spot - 2, "man")
-        /* exclude shamans and humans */
-        && (len < 6 || strcmpi(spot - 5, "shaman"))
-        && (len < 5 || strcmpi(spot - 4, "human"))) {
+        /* exclude shamans and humans etc */
+        && !badman(str, TRUE)) {
         Strcasecpy(spot - 1, "en");
         goto bottom;
     }
@@ -2417,7 +2435,8 @@ const char *oldstr;
 
     } else { /* input doesn't end in 's' */
 
-        if (!BSTRCMPI(bp, p - 3, "men")) {
+        if (!BSTRCMPI(bp, p - 3, "men")
+            && !badman(bp, FALSE)) {
             Strcasecpy(p - 2, "an");
             goto bottom;
         }
@@ -2442,6 +2461,54 @@ bottom:
         Strcat(bp, excess);
 
     return bp;
+}
+
+boolean
+badman(basestr, to_plural)
+const char *basestr;
+boolean to_plural;            /* true => makeplural, false => makesingular */
+{
+    int i, al;
+    char *endstr, *spot;
+    /* these are all the prefixes for *man that don't have a *men plural */
+    const char *no_men[] = {
+        "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
+        "ceru", "corner", "decu", "des", "dura", "fir", "hanu", "het",
+        "infrahu", "inhu", "nonhu", "otto", "out", "prehu", "protohu",
+        "subhu", "superhu", "talis", "unhu", "sha",
+        "hu", "un", "le", "re", "so", "to", "at", "a",
+    };
+    /* these are all the prefixes for *men that don't have a *man singular */
+    const char *no_man[] = {
+        "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
+        "hegu", "preno", "sonar", "speci", "dai", "exa", "fla", "sta", "teg",
+        "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
+        "o", "a",
+    };
+
+    if (!basestr || strlen(basestr) < 4)
+        return FALSE;
+
+    endstr = eos((char *)basestr);
+
+    if (to_plural) {
+        for (i = 0; i < SIZE(no_men); i++) {
+            al = (int) strlen(no_men[i]);
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_men[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
+                return TRUE;
+        }
+    } else {
+        for (i = 0; i < SIZE(no_man); i++) {
+            al = (int) strlen(no_man[i]);
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_man[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
+                return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* compare user string against object name string using fuzzy matching */
@@ -2603,6 +2670,8 @@ struct alt_spellings {
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
     { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
+    /* if we ever add other sizes, move this to o_ranges[] with "bag" */
+    { "box", LARGE_BOX },
     /* normally we wouldn't have to worry about unnecessary <space>, but
        " stone" will get stripped off, preventing a wishymatch; that actually
        lets "flint stone" be a match, so we also accept bogus "flintstone" */
@@ -2696,7 +2765,7 @@ struct obj *no_wish;
     register struct obj *otmp;
     int cnt, spe, spesgn, typ, very, rechrg;
     int blessed, uncursed, iscursed, ispoisoned, isgreased;
-    int eroded, eroded2, erodeproof;
+    int eroded, eroded2, erodeproof, locked, unlocked, broken;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
@@ -2722,9 +2791,11 @@ struct obj *no_wish;
     char *un, *dn, *actualn, *origbp = bp;
     const char *name = 0;
 
-    cnt = spe = spesgn = typ = very = rechrg = blessed = uncursed = iscursed =
-        ispoisoned = isgreased = eroded = eroded2 = erodeproof = halfeaten =
-            islit = unlabeled = ishistoric = isdiluted = trapped = 0;
+    cnt = spe = spesgn = typ = 0;
+    very = rechrg = blessed = uncursed = iscursed = ispoisoned =
+        isgreased = eroded = eroded2 = erodeproof = halfeaten =
+        islit = unlabeled = ishistoric = isdiluted = trapped =
+        locked = unlocked = broken = 0;
     tvariety = RANDOM_TIN;
     mntmp = NON_PM;
 #define UNDEFINED 0
@@ -2812,6 +2883,13 @@ struct obj *no_wish;
                 trapped = 1;
         } else if (!strncmpi(bp, "untrapped ", l = 10)) {
             trapped = 2; /* not trapped */
+        /* locked, unlocked, broken: box/chest lock states */
+        } else if (!strncmpi(bp, "locked ", l = 7)) {
+            locked = 1, unlocked = broken = 0;
+        } else if (!strncmpi(bp, "unlocked ", l = 9)) {
+            unlocked = 1, locked = broken = 0;
+        } else if (!strncmpi(bp, "broken ", l = 7)) {
+            broken = 1, locked = unlocked = 0;
         } else if (!strncmpi(bp, "greased ", l = 8)) {
             isgreased = 1;
         } else if (!strncmpi(bp, "very ", l = 5)) {
@@ -3217,7 +3295,10 @@ retry:
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p - 6, " glass") || !strcmpi(bp, "glass")) {
         register char *g = bp;
-        if (strstri(g, "broken"))
+
+        /* treat "broken glass" as a non-existent item; since "broken" is
+           also a chest/box prefix it might have been stripped off above */
+        if (broken || strstri(g, "broken"))
             return (struct obj *) 0;
         if (!strncmpi(g, "worthless ", 10))
             g += 10;
@@ -3736,6 +3817,28 @@ typfnd:
     if (trapped) {
         if (Is_box(otmp) || typ == TIN)
             otmp->otrapped = (trapped == 1);
+    }
+    /* empty for containers rather than for tins */
+    if (contents == EMPTY) {
+        if (otmp->otyp == BAG_OF_TRICKS || otmp->otyp == HORN_OF_PLENTY) {
+            if (otmp->spe > 0)
+                otmp->spe = 0;
+        } else if (Has_contents(otmp)) {
+            /* this assumes that artifacts can't be randomly generated
+               inside containers */
+            delete_contents(otmp);
+            otmp->owt = weight(otmp);
+        }
+    }
+    /* set locked/unlocked/broken */
+    if (Is_box(otmp)) {
+        if (locked) {
+            otmp->olocked = 1, otmp->obroken = 0;
+        } else if (unlocked) {
+            otmp->olocked = 0, otmp->obroken = 0;
+        } else if (broken) {
+            otmp->olocked = 0, otmp->obroken = 1;
+        }
     }
 
     if (isgreased)

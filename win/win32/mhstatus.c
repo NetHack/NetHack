@@ -2,6 +2,7 @@
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include <assert.h>
 #include "winMS.h"
 #include "mhstatus.h"
 #include "mhmsg.h"
@@ -352,16 +353,21 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                       : status_fg_color));
             nBg = status_bg_color;
 
-            GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+            sz.cy = -1;
             if (*f == BL_TITLE && iflags.wc2_hitpointbar) {
                 HBRUSH back_brush = CreateSolidBrush(nhcolor_to_RGB(hpbar_color));
                 RECT barrect;
 
-                /* first draw title normally */
+                /* prepare for drawing */
                 SelectObject(hdc, fnt);
                 SetBkMode(hdc, OPAQUE);
                 SetBkColor(hdc, status_bg_color);
                 SetTextColor(hdc, nhcolor_to_RGB(hpbar_color));
+
+                /* get bounding rectangle */
+                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+
+                /* first draw title normally */
                 DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
 
                 /* calc bar length */
@@ -386,12 +392,20 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     nFg = nBg;
                     nBg = tmp;
                 }
+
+                /* prepare for drawing */
                 SelectObject(hdc, fnt);
                 SetBkMode(hdc, OPAQUE);
                 SetBkColor(hdc, nBg);
                 SetTextColor(hdc, nFg);
+
+                /* get bounding rectangle */
+                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+
+                /* draw */
                 DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
             }
+            assert(sz.cy >= 0);
 
             rt.left += sz.cx;
             cy = max(cy, sz.cy);

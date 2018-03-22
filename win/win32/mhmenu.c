@@ -160,10 +160,11 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         ap = data->menu.gacc;
         for (i = 0; i < data->menu.size; i++) {
             if (data->menu.items[i].accelerator != 0) {
-                next_char = (char) (data->menu.items[i].accelerator + 1);
+                if (isalpha(data->menu.items[i].accelerator)) {
+                    next_char = (char)(data->menu.items[i].accelerator + 1);
+                }
             } else if (NHMENU_IS_SELECTABLE(data->menu.items[i])) {
-                if ((next_char >= 'a' && next_char <= 'z')
-                    || (next_char >= 'A' && next_char <= 'Z')) {
+                if (isalpha(next_char)) {
                     data->menu.items[i].accelerator = next_char;
                 } else {
                     if (next_char > 'z')

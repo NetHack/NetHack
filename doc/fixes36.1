@@ -521,6 +521,17 @@ prayer boon of 'fix all troubles' could get stuck in an infinite loop for
 	TROUBLE_STUCK_IN_WALL if there was no spot to teleport into available
 It shouldn't be considered hypocrisy if you speed up your pet while standing 
 	on Elbereth
+fix 'object lost' panic if hero with lycanthropy but in human form is wielding
+	a potion of unholy water which gets boiled/exploded by fire, causing
+	were-transformation and drop of wielded weapon
+prevent segfault if pline() is called recursively (which could happen if the
+	interface code issues a debugpline() while processing putstr())
+open at yourself is the same as #loot
+when #force reports that a chest's lock is already broken or already unlocked,
+	force it to be described as "a chest", even when its lock state is
+	already known, rather than as "a broken chest" or "an unlocked chest"
+honor wish for "locked", "unlocked", or "broken" chest or box
+honor wish for "empty" container including statue, bag-o-tricks, horn-o-plenty
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -602,6 +613,7 @@ when clairvoyance lets you move the cursor to examine the map (if it occurs
 	monster), the "for instructions type '?'" prompt could be confusing
 prevent Mjollnir from being auto-quivered if it's been thrown without return
 	and then picked back up while quiver slot is empty
+plural of "fox" is not "foxen"
 
 
 Platform- and/or Interface-Specific Fixes
@@ -735,7 +747,7 @@ swallowers can't re-engulf hero immediately after spitting him/her out
 werejackals can summon foxes and coyotes; werewolves can summon wargs
 allow taming monkeys and apes with bananas
 GENERICUSERS is now a sysconf statement instead of compile-time option
-fountains are bright blue
+fountains are bright blue, graves are white
 ray bounceback chance depends on the wall type
 undead #turning takes less time at higher experience level
 peacefuls may react when you attack other peacefuls

@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1502753790 2017/08/14 23:36:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1520797133 2018/03/11 19:38:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1563,6 +1563,11 @@ register struct obj *obj;
     int i, ii, isdone, kn = 0;
     boolean cureblind = FALSE;
 
+    /* potion of unholy water might be wielded; prevent
+       you_were() -> drop_weapon() from dropping it so that it
+       remains in inventory where our caller expects it to be */
+    obj->in_use = 1;
+
     switch (obj->otyp) {
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
@@ -1714,7 +1719,7 @@ register struct obj *obj;
         break;
      */
     }
-    /* note: no obfree() */
+    /* note: no obfree() -- that's our caller's responsibility */
     if (obj->dknown) {
         if (kn)
             makeknown(obj->otyp);

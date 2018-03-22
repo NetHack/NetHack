@@ -166,7 +166,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '<', "ladder up", C(CLR_BROWN) },           /* upladder */
        { '>', "ladder down", C(CLR_BROWN) },         /* dnladder */
        { '_', "altar", C(CLR_GRAY) },                /* altar */
-       { '|', "grave", C(CLR_GRAY) },                /* grave */
+       { '|', "grave", C(CLR_WHITE) },               /* grave */
        { '\\', "opulent throne", C(HI_GOLD) },       /* throne */
 /*30*/ { '#', "sink", C(CLR_GRAY) },                 /* sink */
        { '{', "fountain", C(CLR_BRIGHT_BLUE) },      /* fountain */
