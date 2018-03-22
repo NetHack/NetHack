@@ -1390,6 +1390,9 @@ boolean allow_floor;
         }
 
         if (ilet == ',' || ilet == '?' || ilet == '*') {
+            if (ilet == ',' && !floor)
+                return &zeroobj; /* dungeon feature */
+
             boolean show_discouraged = FALSE;
             int qflags = (INVORDER_SORT | SIGNAL_ESCAPE);
             menu_item *selection = NULL;
