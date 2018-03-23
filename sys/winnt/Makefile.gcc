@@ -1,6 +1,6 @@
 # NetHack 3.6	Makefile.gcc	$NHDT-Date: 1434804544 2015/06/20 12:49:04 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $
 #
-# Edited on 3/1/18 by NullCGT
+# Edited on 3/22/18 by NullCGT
 #
 #==============================================================================
 #
@@ -1005,6 +1005,8 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/???-strt.lev      del $(DAT)/???-strt.lev)
 	$(subst /,\,if exist $(DAT)/air.lev      del $(DAT)/air.lev)
 	$(subst /,\,if exist $(DAT)/asmodeus.lev      del $(DAT)/asmodeus.lev)
+	$(subst /,\,if exist $(DAT)/foogardens.lev      del $(DAT)/foogardens.lev)
+	$(subst /,\,if exist $(DAT)/mephisto.lev      del $(DAT)/mephisto.lev)
 	$(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
 	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
 	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)

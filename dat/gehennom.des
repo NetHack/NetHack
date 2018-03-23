@@ -197,6 +197,165 @@ STAIR: random, down
 MONSTER: 'D', random
 MONSTER: 'D', random
 
+# Mephisto's lair
+MAZE: "mephisto", ' '
+FLAGS: noteleport
+GEOMETRY:center,center
+MAP
+LL..........................................................................
+LLL...........................................................LL............
+L......LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLL...........
+.......L-----------------------------------------------S-L...LLLL......L....
+.......LS...............................................|L....LLL.....LL....
+.......L|...............................................|L..................
+...L...L|...............................................|L..................
+.......L|...............................................|L..................
+.......L|...............................................|L..................
+.......L|...............................................|L..................
+.......L|...............................................|L..................
+.......L|...............................................|L..................
+..L....L|...............................................|L..................
+.......L|...............................................|L......L...........
+.......L|...............................................|L.....LLL..........
+...L...L|...............................................SL.....LLL..........
+.......L-S-----------------------------------------------L......L..........L
+L......LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL................LL
+...L......................................................................LL
+..........................................................................LL
+ENDMAP
+NON_DIGGABLE:(00,00,75,19)
+REGION:(00,00,75,19),unlit,"ordinary"
+STAIR: (31,09), down
+STAIR: (60,00), up
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: random, random
+MONSTER: ('&', "mephisto"), (31,09)
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
+# The foocubus level
+MAZE: "foogardens", ' '
+FLAGS: noteleport,nommap
+GEOMETRY:center,center
+MAP
+..........................T........}}}}}}}}}}}........|--------------------|
+.................T...................}}}}}}}}}..T.....|......S.............|
+.....T......T........T.......T........}}}}}}}}}.....T.|......|.............|
+.........T.....T..................T.......}}}}}.......|......|.............|
+..T.........................T..............}}}}..T....|......|.............|
+............T.........T.................T..}}}}...T...|......|.............|
+............................................}}}}......|......|.............|
+......T.........T........T.....T.............}}}}.....|---S---------------S|
+.......................TTTT........T.........}}}}}}}}}|......|.............|
+..........T.....T......TTT...................}}}}}}}}}|......|.............|
+....T........T.....T....TT..T.....T.........}}}}}.....|---S---------------S|
+T.......T.............T.................T...}}}}}.....|......|.............|
+TT.............T.........T.TT...............}}}}}..T..|......|.............|
+TT..T.............................T..........}}}T.....|......|.............|
+TT.....T.....T........T...T...T.......T......}}}......|......|.............|
+T.........T........T.........................}}}}...T.|......|.............|
+.....T.........T...............T.........T....}}}}....|......S.............|
+.......................T............T.........}}}}}...|--------------------|
+...........T..............T.......T...........}}}}}}..............T.........
+T......T.T...T........T................T......}}}}}.......T...........T.....
+ENDMAP
+NON_DIGGABLE:(00,00,75,19)
+REGION:(00,00,75,19),unlit,"ordinary"
+DRAWBRIDGE:(53,08),east,closed
+DRAWBRIDGE:(53,09),east,closed
+STAIR:(02,08),up
+STAIR:(56,08),down
+# random monsters in random spots
+MONSTER:('&',"succubus"),random
+MONSTER:('&',"succubus"),random
+MONSTER:('&',"succubus"),random
+MONSTER:('&',"succubus"),random
+MONSTER:('&',"succubus"),random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:('&',"incubus"),random
+MONSTER:('&',"incubus"),random
+MONSTER:('&',"incubus"),random
+MONSTER:('&',"incubus"),random
+MONSTER:('&',"incubus"),random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER: ';',(45,09)
+MONSTER: ';',(44,06)
+MONSTER: ';',(40,00)
+# the demon lord and their gaurdians
+MONSTER:('&',"lord of the foocubi"),(56,08)
+MONSTER:('&',"succubus"),(57,08)
+MONSTER:('&',"incubus"),(57,09)
+MONSTER:('&',"succubus"),(62,13)
+MONSTER:('&',"incubus"),(62,14)
+MONSTER:('&',"incubus"),(62,04)
+MONSTER:('&',"succubus"),(62,03)
+# traps and objects
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+
+
 MAZE: "valley", ' '
 FLAGS: noteleport,hardfloor,nommap
 GEOMETRY:center,center

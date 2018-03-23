@@ -2,7 +2,7 @@
 #	Copyright (c) NetHack PC Development Team 1997 - 2012.
 #	PC NetHack 3.4x Makefile for MSC V1.52c (16 bit compiler)
 #
-# Edited 3/1/18 by NullCGT
+# Edited 3/22/18 by NullCGT
 #
 #	For questions or comments: nethack-bugs@nethack.org
 #
@@ -952,6 +952,8 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
 	echo ARC-LOCA.LEV  >>dlb.lst
 	echo ARC-STRT.LEV  >>dlb.lst
 	echo ASMODEUS.LEV  >>dlb.lst
+	echo FOOGARDENS.LEV >>dlb.lst
+	echo MEPHISTO.LEV  >>dlb.lst
 	echo ASTRAL.LEV    >>dlb.lst
 	echo BAALZ.LEV     >>dlb.lst
 	echo BAR-FILA.LEV  >>dlb.lst

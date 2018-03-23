@@ -1,7 +1,7 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
-# Edited 3/1/18 by NullCGT
+# Edited 3/22/18 by NullCGT
 #
 #==============================================================================
 # Build Tools Environment
@@ -1207,6 +1207,8 @@ spotless: clean
 	if exist $(DAT)\???-strt.lev	 del $(DAT)\???-strt.lev
 	if exist $(DAT)\air.lev		 del $(DAT)\air.lev
 	if exist $(DAT)\asmodeus.lev	 del $(DAT)\asmodeus.lev
+	if exist $(DAT)\foogardens.lev	 del $(DAT)\foogardens.lev
+	if exist $(DAT)\mephisto.lev	 del $(DAT)\mephisto.lev
 	if exist $(DAT)\astral.lev	 del $(DAT)\astral.lev
 	if exist $(DAT)\baalz.lev	 del $(DAT)\baalz.lev
 	if exist $(DAT)\bigrm-*.lev	 del $(DAT)\bigrm-*.lev

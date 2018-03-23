@@ -2,7 +2,7 @@
 #	Copyright (c) 1990-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
-# Edited on 3/1/18 by NullCGT
+# Edited on 3/22/18 by NullCGT
 #
 #	The dungeon description file for the "standard" 3.1 NetHack.
 #
@@ -66,6 +66,8 @@ LEVEL:		"sanctum" "none" @ (-1, 0)
 LEVEL:		"juiblex" "J" @ (4, 4)
 LEVEL:		"baalz" "B" @ (6, 4)
 LEVEL:		"asmodeus" "A" @ (2, 6)
+LEVEL:		"mephisto" "M" @ (2, 6)
+LEVEL:		"foogardens" "L" @ (2, 6)
 LEVEL:		"wizard1" "none" @ (11, 6)
 CHAINLEVEL:	"wizard2" "X" "wizard1" + (1, 0)
 CHAINLEVEL:	"wizard3" "Y" "wizard1" + (2, 0)

@@ -2,7 +2,7 @@ This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
-Edited 3/1/18 by NullCGT
+Edited 3/22/18 by NullCGT
 
 
 .:
@@ -360,6 +360,7 @@ orcus.lev       sanctum.lev     soko1-1.lev     soko1-2.lev     soko2-1.lev
 soko2-2.lev     soko3-1.lev     soko3-2.lev     soko4-1.lev     soko4-2.lev
 tower1.lev      tower2.lev      tower3.lev      valley.lev      water.lev
 wizard1.lev     wizard2.lev     wizard3.lev     void.lev        statuary.lev
+foogardens.lev  mephisto.lev
 (tile files optionally generated for X ports at playground creation time)
 pet_mark.xbm    rip.xpm         x11tiles
 (files generated for Qt interface on Mac OS X)

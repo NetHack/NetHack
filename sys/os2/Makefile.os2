@@ -2,7 +2,7 @@
 #	OS/2 NetHack 3.6 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
-# Edited 3/1/18 by NullCGT
+# Edited 3/22/18 by NullCGT
 #
 #	Several compilers exist for OS/2 but, currently only GCC emx is tested
 #	and used for releases.  make programs other than dmake are not tested.
@@ -526,7 +526,7 @@ SPEC_LEVS = \
  wizard3.lev  astral.lev   air.lev earth.lev    fire.lev     water.lev \
  soko1-1.lev  soko1-2.lev  soko2-1.lev  soko2-2.lev  \
  soko3-1.lev  soko3-2.lev  soko4-1.lev  soko4-2.lev  \
- void.lev     statuary.lev
+ void.lev     statuary.lev foogardens.lev mephisto.lev
 
 QUEST_LEVS = \
  Arc-goal.lev Arc-fila.lev Arc-filb.lev Arc-loca.lev Arc-strt.lev \
@@ -1113,6 +1113,8 @@ dlb_yup : dlb
 	-$(RM) $(GAMEDIR)\opthelp
 	-$(RM) $(GAMEDIR)\wizhelp
 	-$(RM) $(GAMEDIR)\asmodeus.lev
+  -$(RM) $(GAMEDIR)\foogardens.lev
+  -$(RM) $(GAMEDIR)\mephisto.lev
 	-$(RM) $(GAMEDIR)\baalz.lev
 	-$(RM) $(GAMEDIR)\bigrm-?.lev
 	-$(RM) $(GAMEDIR)\castle.lev
