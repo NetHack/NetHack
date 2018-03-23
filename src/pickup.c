@@ -968,7 +968,9 @@ int FDECL((*allow), (OBJ_P));     /* allow function */
             if (trap)
                 sym = trap_to_defsym(what_trap(trap->ttyp));
             add_menu(win, cmap_to_glyph(sym), &any,
-                     0, 0, ATR_NONE, an(defsyms[sym].explanation),
+                     0, 0, ATR_NONE,
+                     an(trap ? defsyms[sym].explanation :
+                        dfeature_at(u.ux, u.uy, buf)),
                      MENU_UNSELECTED);
         }
     }
