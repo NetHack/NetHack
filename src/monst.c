@@ -106,6 +106,12 @@ NEARDATA struct permonst mons[] = {
     /*
      * ants
      */
+    MON("giant fly", S_ANT, LVL(1, 12, 3, 0, 0), (G_GENO | G_SGROUP | 3),
+        A(ATTK(AT_BITE, AD_PHYS, 1, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(10, 10, MS_SILENT, MZ_TINY), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_OVIPAROUS | M1_CARNIVORE | M1_FLY,
+        M2_HOSTILE, 0, CLR_ORANGE),
     MON("giant ant", S_ANT, LVL(2, 18, 3, 0, 0), (G_GENO | G_SGROUP | 3),
         A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -2556,6 +2562,15 @@ struct permonst _mons2[] = {
             | M1_SEE_INVIS,
         M2_NOPOLY | M2_UNDEAD | M2_WANDER | M2_STALK | M2_HOSTILE | M2_NASTY,
         M3_INFRAVISION, CLR_BLACK),
+    MON("banshee", S_GHOST, LVL(15, 10, 10, 0, 0), (G_NOCORPSE),
+        A(ATTK(AT_TUCH, AD_PHYS, 2, 6), ATTK(AT_TUCH, AD_PHYS, 2, 6), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 0, MS_WAIL, MZ_HUMAN),
+        MR_COLD | MR_DISINT | MR_SLEEP | MR_POISON | MR_STONE, 0,
+        M1_FLY | M1_BREATHLESS | M1_WALLWALK | M1_HUMANOID | M1_UNSOLID
+            | M1_SEE_INVIS,
+        M2_NOPOLY | M2_UNDEAD | M2_WANDER | M2_STALK | M2_HOSTILE | M2_NASTY,
+        M3_INFRAVISION, CLR_CYAN),
     /*
      * (major) demons
      */

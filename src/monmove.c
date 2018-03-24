@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 2/12/18 by NullCGT */
+/* Edited 3/23/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -428,6 +428,9 @@ register struct monst *mtmp;
         (void) rloc(mtmp, TRUE);
         return 0;
     }
+    if (mdat == &mons[PM_BANSHEE] && couldsee(mtmp->mx, mtmp->my) &&
+        ABASE(A_STR) > 3 && rnd(2) == 1)
+        m_respond(mtmp);
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
         m_respond(mtmp);
     if (mdat->msound == MS_ROAR && !um_dist(mtmp->mx, mtmp->my, 10) &&

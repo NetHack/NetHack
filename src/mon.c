@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/22/18 by NullCGT */
+/* Edited on 3/23/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2702,6 +2702,14 @@ void
 m_respond(mtmp)
 struct monst *mtmp;
 {
+    if (mtmp->data == &mons[PM_BANSHEE]) {
+        if (!Deaf) {
+            pline("%s unleashes a bloodcurdling wail!", Monnam(mtmp));
+            stop_occupation();
+            losestr(rnd(3));
+        }
+        aggravate();
+    }
     if (mtmp->data->msound == MS_SHRIEK) {
         if (!Deaf) {
             pline("%s shrieks.", Monnam(mtmp));
@@ -2720,7 +2728,7 @@ struct monst *mtmp;
             pline("%s roars!", Monnam(mtmp));
             stop_occupation();
         } else if (!Deaf) {
-            You_hear("a mighty roar!");
+            You_hear("a loud roar!");
         }
         aggravate();
     }

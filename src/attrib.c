@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 3/23/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -347,7 +347,8 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
 
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) {
-            if (otmp->cursed)
+            if (otmp->cursed ||
+               (otmp->oartifact && otmp->oartifact == ART_LUCKLESS_FOLLY))
                 bonchance -= otmp->quan;
             else if (otmp->blessed)
                 bonchance += otmp->quan;
