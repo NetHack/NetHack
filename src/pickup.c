@@ -2651,7 +2651,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         /* Put one item into the container.
            Currently, we only allow inventory items. Maybe we should also allow
            floor items? */
-        if ((otmp = getobj("stash", ck_bag, FALSE, FALSE)) != 0) {
+        if ((otmp = getobj("stash", ck_bag, TRUE, FALSE)) != 0) {
             if (in_container(otmp)) {
                 used = 1;
             } else {
