@@ -230,7 +230,7 @@ invault()
     guard = findgd();
     if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
         /* if time ok and no guard now. */
-        char buf[BUFSZ];
+        char buf[BUFSZ] = DUMMY;
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
         long umoney;

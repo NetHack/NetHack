@@ -2017,7 +2017,7 @@ STATIC_OVL void
 do_class_genocide()
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     boolean gameover = FALSE; /* true iff killed self */
 
     for (j = 0;; j++) {
@@ -2169,7 +2169,7 @@ int how;
 /* 3 = forced genocide of player */
 /* 5 (4 | 1) = normal genocide from throne */
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     register int i, killplayer = 0;
     register int mndx;
     register struct permonst *ptr;
@@ -2425,7 +2425,7 @@ struct obj *from_obj;
 boolean
 create_particular()
 {
-    char buf[BUFSZ], *bufp, monclass;
+    char buf[BUFSZ] = DUMMY, *bufp, monclass;
     char *tmpp;
     int which, tryct, i, firstchoice = NON_PM;
     struct permonst *whichpm = NULL;

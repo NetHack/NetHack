@@ -149,7 +149,7 @@ struct obj *objs;
 boolean here;
 int *menu_on_demand;
 {
-    char ilets[36], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
+    char ilets[36], inbuf[BUFSZ] = DUMMY; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
     boolean not_everything, filtered;
     char qbuf[QBUFSZ];

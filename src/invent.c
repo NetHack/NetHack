@@ -1593,7 +1593,7 @@ unsigned *resultflags;
     int oletct, iletct, unpaid, oc_of_sym;
     char sym, *ip, olets[MAXOCLASSES + 5], ilets[MAXOCLASSES + 10];
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
-    char buf[BUFSZ], qbuf[QBUFSZ];
+    char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!invent) {
         You("have nothing to %s.", word);

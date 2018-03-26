@@ -609,7 +609,7 @@ int
 do_play_instrument(instr)
 struct obj *instr;
 {
-    char buf[BUFSZ], c = 'y';
+    char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
     int x, y;
     boolean ok;

@@ -1033,7 +1033,7 @@ coord *click_cc;
 {
     boolean quick = (mode == 1); /* use cursor; don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
-    char out_str[BUFSZ];
+    char out_str[BUFSZ] = DUMMY;
     const char *firstmatch = 0;
     struct permonst *pm = 0;
     int i = '\0', ans = 0;

@@ -56,8 +56,13 @@ getlin_hook_proc hook;
     cw->flags &= ~WIN_STOP;
     ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
+#ifdef EDIT_GETLIN
+    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s %s", query, bufp);
+    bufp = eos(obufp);
+#else
     custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
     *obufp = 0;
+#endif
     for (;;) {
         (void) fflush(stdout);
         Strcat(strcat(strcpy(toplines, query), " "), obufp);

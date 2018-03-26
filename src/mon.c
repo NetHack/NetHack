@@ -3266,7 +3266,7 @@ struct monst *mon;
 
     /* for debugging: allow control of polymorphed monster */
     if (wizard && iflags.mon_polycontrol) {
-        char pprompt[BUFSZ], buf[BUFSZ];
+        char pprompt[BUFSZ], buf[BUFSZ] = DUMMY;
         int monclass;
 
         Sprintf(pprompt, "Change %s @ %s into what kind of monster?",

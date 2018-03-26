@@ -2034,17 +2034,24 @@ int
 donamelevel()
 {
     mapseen *mptr;
-    char nbuf[BUFSZ]; /* Buffer for response */
+    char nbuf[BUFSZ] = DUMMY; /* Buffer for response */
 
     if (!(mptr = find_mapseen(&u.uz)))
         return 0;
 
+#ifdef EDIT_GETLIN
+    if (mptr->custom) {
+        (void) strncpy(nbuf, mptr->custom, BUFSZ);
+        nbuf[BUFSZ-1] = '\0';
+    }
+#else
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
                 strlen(mptr->custom) > 30 ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
+#endif
         getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033'))
         return 0;

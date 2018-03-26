@@ -298,7 +298,7 @@ long
 bribe(mtmp)
 struct monst *mtmp;
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     long offer;
     long umoney = money_cnt(invent);
 

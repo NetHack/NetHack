@@ -83,6 +83,9 @@ bool NetHackQtStringRequestor::Get(char* buffer, int maxchar)
 	resize(fontMetrics().width(prompt.text())*2+50,fontMetrics().height()*4);
     }
 
+#ifdef EDIT_GETLIN
+    input.setText(buffer);
+#endif
     centerOnMain(this);
     show();
     input.setFocus();
