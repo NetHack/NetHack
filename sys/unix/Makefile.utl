@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1454712070 2016/02/05 22:41:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1522193681 2018/03/27 23:34:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
 
 # Root of source tree:
 NHSROOT=..
@@ -271,12 +271,18 @@ lev_yacc.c: lev_comp.y
 
 lev_lex.c: lev_comp.l
 	$(LEX) $(FLEXDIST) lev_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' $(LEXYYC) > $@ \
+	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
+	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
 		&& rm $(LEXYYC)
 #	note: flex code construction using m4 macros results in some trailing
 #	spaces; <space><space><star> is basic RE substitute for <space><plus>
 #	and we don't bother stripping trailing tabs because that gets messy;
 #	make expands <dollar><dollar> into <dollar> which is RE end-of-line.
+#	flex also creates yyunput() as a static routine, but lev_comp doesn't
+#	use it so compiler complaints can ensue; recent flex versions honor
+#	NO_YY_UNPUT to suppress it, but older ones don't; making it global to
+#	avoid an "unused function" warning is simpler than trying to remove
+#	the whole thing (although full 'lint' may still complain).
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -308,7 +314,8 @@ dgn_yacc.c: dgn_comp.y
 
 dgn_lex.c: dgn_comp.l
 	$(LEX) $(FLEXDIST) dgn_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' $(LEXYYC) > $@ \
+	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' \
+	    -e 's#static void yyunput#void yyunput#' $(LEXYYC) > $@ \
 		&& rm $(LEXYYC)
 #	note: <space><space><star> is basic RE substitute for <space><plus>
 
