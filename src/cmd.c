@@ -3429,6 +3429,11 @@ rhack(char *cmd)
     }
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
         g.context.move = FALSE;
+        /* a clever player might try to press Escape to escape from a
+         * monster... */
+        if (u.ustuck && !sticks(g.youmonst.data)) {
+            pline("You cannot escape from %s!", mon_nam(u.ustuck));
+        }
         return;
     }
     /* DOAGAIN might be '\0'; if so, don't execute it even if *cmd is too */
