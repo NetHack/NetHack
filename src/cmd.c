@@ -4862,6 +4862,11 @@ register char *cmd;
     }
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
         g.context.move = FALSE;
+        /* a clever player might try to press Escape to escape from a
+         * monster... */
+        if (u.ustuck && !sticks(g.youmonst.data)) {
+            pline("You cannot escape from %s!", mon_nam(u.ustuck));
+        }
         return;
     }
     if (*cmd == DOAGAIN && !g.in_doagain && g.saveq[0]) {
