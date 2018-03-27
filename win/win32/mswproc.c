@@ -1657,8 +1657,13 @@ mswin_getlin(const char *question, char *input)
         mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, question, 0);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, " ", 1);
+#ifdef EDIT_GETLIN
+        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, input, 0);
+        len = strlen(input);
+#else
         input[0] = '\0';
         len = 0;
+#endif
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
         done = FALSE;
         while (!done) {
