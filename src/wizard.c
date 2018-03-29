@@ -7,6 +7,8 @@
 /*             - dewimped and given some maledictions. -3. */
 /*             - generalized for 3.1 (mike@bullns.on01.bull.ca) */
 
+/* Edited on 3/29/18 by NullCGT */
+
 #include "hack.h"
 #include "qtext.h"
 
@@ -33,16 +35,17 @@ static NEARDATA const int nasties[] = {
     PM_OWLBEAR, PM_PURPLE_WORM, PM_XAN, PM_UMBER_HULK,
     PM_XORN, PM_ZRUTY, PM_LEOCROTTA, PM_BALUCHITHERIUM,
     PM_CARNIVOROUS_APE, PM_FIRE_ELEMENTAL, PM_JABBERWOCK,
-    PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME,
+    PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME, PM_MANTICORE,
     /* chaotic */
     PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LORD,
     PM_MASTER_MIND_FLAYER, PM_DISENCHANTER, PM_WINGED_GARGOYLE,
     PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_LORD, PM_ELVENKING,
-    PM_OGRE_KING, PM_CAPTAIN, PM_GREMLIN,
+    PM_OGRE_KING, PM_CAPTAIN, PM_GREMLIN, PM_NIGHTMARE,
     /* lawful */
     PM_SILVER_DRAGON, PM_ORANGE_DRAGON, PM_GREEN_DRAGON,
     PM_YELLOW_DRAGON, PM_GUARDIAN_NAGA, PM_FIRE_GIANT,
     PM_ALEAX, PM_COUATL, PM_HORNED_DEVIL, PM_BARBED_DEVIL,
+    PM_BANSHEE
     /* (titans, ki-rin, and golden nagas are suitably nasty, but
        they're summoners so would aggravate excessive summoning) */
 };

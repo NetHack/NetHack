@@ -1,6 +1,6 @@
                    GlazeHack -- Changelog
 
-This changelog documents all the features that differ from vanilla nethack.
+This changelog documents all the features that differ from vanilla Nethack.
 Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
@@ -10,7 +10,7 @@ General Changes
   preferences file.
 - Decreased floating eye spawn rate to make blind telepathy harder to obtain.
 - Mysterious force now only affects you when you are hallucinating (you
-  suddenly hallucinate that you are playing vanilla nethack!)
+  suddenly hallucinate that you are playing vanilla Nethack!)
 - There are different descriptions for venom which are randomized each game.
   This may break realism slightly, but does help with distinguishing what kind
   of venom an unfamiliar monster might be spitting.
@@ -48,10 +48,11 @@ General Changes
   be more challenging or interesting (see below)
 - Bribing demon lords has been greatly expanded. They now can potentially ask
   for powerful items in your inventory instead of gold, and you can also use
-  decks of cards to gamble on your immortal soul with them.
+  decks of cards to gamble on your immortal soul with them. Challenging them
+  with a deck of fate is a Bad Idea.
 - All demon lords have had their AC significantly lowered.
 - The wailing of the banshee message was changed slightly to account for the
-  addition of banshees to the game.
+  addition of wailing banshees.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -116,7 +117,7 @@ New Items
 - Bone Knife
 - Throwing Axe
 - Razor Whip
-- Earmuff
+- Earmuff (pluralization to "Earmuffs" is currently WIP)
 - Flowing Dress
 - Snappy Tuxedo
 - Iron Mantle

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/22/18 by NullCGT */
+/* Edited on 3/29/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -989,6 +989,7 @@ static const short grownups[][2] = {
     { PM_APPRENTICE, PM_WIZARD },
     { PM_MANES, PM_LEMURE },
     { PM_LICHEN, PM_LEGENDARY_LICHEN },
+    { PM_DEATH_MAGGOT, PM_WORM_THAT_WALKS},
     { PM_WORM_THAT_WALKS, PM_LORD_OF_WORMS},
     { PM_KEYSTONE_KOP, PM_KOP_SERGEANT },
     { PM_KOP_SERGEANT, PM_KOP_LIEUTENANT },
