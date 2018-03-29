@@ -1,7 +1,7 @@
 # NetHack 3.6	bootstrp.mak	$NHDT-Date: 1432512801 2015/05/25 00:13:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 #       Copyright (c) Michael Allison
 #
-#				Edited 3/1/18 by NullCGT
+#				Edited 3/29/18 by NullCGT
 #
 #       NetHack Windows CE bootstrap file for MS Visual C++ V6.x and
 #       above and MS NMAKE
@@ -248,6 +248,7 @@ $(O)sp_lev.tag:  $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
 	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des \
 	$(DAT)\cartomancer.des  $(DAT)\void.des $(DAT)\statuary.des \
+	$(DAT)\drag.des 
 	cd $(DAT)
 	$(U)lev_comp bigroom.des
 	$(U)lev_comp castle.des
@@ -266,6 +267,7 @@ $(O)sp_lev.tag:  $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)lev_comp barb.des
 	$(U)lev_comp cartomancer.des
 	$(U)lev_comp caveman.des
+	$(U)lev_comp drag.des
 	$(U)lev_comp healer.des
 	$(U)lev_comp knight.des
 	$(U)lev_comp monk.des

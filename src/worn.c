@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/29/18 by NulLCGT */
+
 #include "hack.h"
 
 STATIC_DCL void FDECL(m_lose_armor, (struct monst *, struct obj *));
@@ -970,6 +972,9 @@ struct obj *obj;
         return 1;
     /* Unacceptable Exceptions: */
     /* Checks for object that certain races should never use go here */
+    if (ptr == &mons[PM_DRAGONMASTER] &&
+        (Is_dragon_mail(obj) || Is_dragon_scales(obj)))
+        return -1;
     /*  return -1; */
 
     return 0;

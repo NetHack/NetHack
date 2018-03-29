@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/28/18 by NullCGT */
+/* Edited on 3/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -214,7 +214,8 @@ makedog()
 
     context.startingpet_mid = mtmp->m_id;
     /* Horses already wear a saddle */
-    if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
+    if ((pettype == PM_PONY || pettype == PM_BABY_RED_DRAGON)
+        && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
         put_saddle_on_mon(otmp, mtmp);
     }

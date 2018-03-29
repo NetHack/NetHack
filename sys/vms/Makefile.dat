@@ -1,7 +1,7 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
 #	NetHack 3.6	Makefile.dat	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $	$NHDT-Branch: master $:$NHDT-Revision: 1.8 $
 
-# Edited on 3/1/18 by NullCGT
+# Edited on 3/29/18 by NullCGT
 
 #  Copy this file to [.dat]Makefile.; no editing needed.
 
@@ -32,7 +32,7 @@ X11TILES= x11tiles.;
 # note: the level lists need to be space separated
 QUESTLEVS = Arch.des Barb.des Caveman.des Cartomancer.des Healer.des \
 	Knight.des Monk.des Priest.des Ranger.des Rogue.des Samurai.des Tourist.des \
-	Valkyrie.des Wizard.des
+	Valkyrie.des Wizard.des	Drag.des
 SPECLEVS  = bigroom.des castle.des endgame.des gehennom.des knox.des \
 	medusa.des mines.des oracle.des sokoban.des statuary.des tower.des \
 	void.des yendor.des

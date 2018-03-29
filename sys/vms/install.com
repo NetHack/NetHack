@@ -47,7 +47,7 @@ $	qstl_files = "%%%-GOAL.LEV,%%%-FIL%.LEV,%%%-LOCA.LEV,%%%-STRT.LEV"
 $	qstl_input = "Arch.des Barb.des Caveman.des Healer.des " -
 		   + "Knight.des Monk.des Priest.des Ranger.des Rogue.des " -
 		   + "Samurai.des Tourist.des Wizard.des Valkyrie.des" -
-			 + "Cartomancer.des"
+			 + "Cartomancer.des Drag.des"
 $	dngn_files = "DUNGEON."
 $	dngn_input = "dungeon.pdf"
 $	dlb_files  = help_files + "," + data_files + "," -

@@ -2,7 +2,7 @@
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 3/29/18 by NullCGT */
 
 #include "hack.h"
 
@@ -196,6 +196,11 @@ register boolean special;
                 helm = rn2(2) ? HELM_OF_BRILLIANCE : HELM_OF_TELEPATHY;
             if (rn2(2))
                 shield = STRANGE_OBJECT;
+            break;
+        case PM_DRAGONMASTER:
+            if (rn2(4))
+                weapon = BROADSWORD;
+            armor = rnd_class(PLATE_MAIL, CHAIN_MAIL);
             break;
         case PM_KNIGHT:
             if (rn2(4))

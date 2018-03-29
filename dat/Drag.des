@@ -1,0 +1,281 @@
+# NetHack 3.6	Drag.des
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1991 by M. Stephenson
+# NetHack may be freely redistributed.  See license for details.
+# Based on Barb.des
+#
+MAZE: "Dra-strt",' '
+FLAGS: noteleport,hardfloor
+GEOMETRY:center,center
+MAP
+.................................PPPPPPPPPPPP...............................
+..................................PPPPPPPPPP................................
+...................................PPPPPPP..................................
+....................................PPPPPP..................................
+....................................PPPPP...................................
+....................................PPPPP...................................
+....................................PPPPP...................................
+....................................PPPPP...................................
+............................................................................
+....................................PPPP....................................
+....................................PPPP....................................
+...................................PPPPP....................................
+..................................PPPPPP....................................
+.................................PPPPPPPP...................................
+................................PPPPPPPPPP..................................
+...............................PPPPPPPPPPPP.................................
+..............................PPPPPPPPPPPPPPP...............................
+.............................PPPPPPPPPPPPPPPPP..............................
+............................PPPPPPPPPPPPPPPPPPP.............................
+...........................PPPPPPPPPPPPPPPPPPPPPP...........................
+ENDMAP
+
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+# Stairs
+STAIR:(09,09),down
+# Portal arrival point
+BRANCH:(68,02,68,02),(0,19,0,19)
+# Guardian
+MONSTER:('D',"Drakemother"),(10,07)
+# The Drakemother's hoard
+OBJECT:('(',"chest"),(09,06)
+OBJECT:('(',"chest"),(09,07)
+OBJECT:('(',"chest"),(10,06)
+OBJECT:('(',"chest"),(10,07)
+# The Drakemother's children
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+MONSTER:('D',"drake"),random
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Not very many traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# water monsters
+MONSTER:';',(37,01),hostile
+MONSTER:';',(37,04),hostile
+MONSTER:';',(37,10),hostile
+MONSTER:';',(37,12),hostile
+MONSTER:';',(37,16),hostile
+# Undead
+MONSTER:('W',"wraith"),random,hostile
+MONSTER:('W',"wraith"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+MONSTER:('V',"vampire"),random,hostile
+
+#
+#	The "locate" level for the quest.
+#
+#	May be impassable without levitation.
+#
+#
+
+MAZE: "Dra-loca",' '
+FLAGS: hardfloor
+INIT_MAP: mines, '.' , 'P' , true , true , unlit , false
+NOMAP
+# Dungeon Description
+REGION:(00,00,75,19),unlit,"ordinary"
+# Stairs
+STAIR:random,up
+STAIR:random,down
+# Objects
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# Random traps (Heavily trapped)
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Random monsters.
+MONSTER:'Z' ,random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:'V' ,random,hostile
+MONSTER:'V' ,random,hostile
+MONSTER:'V' ,random,hostile
+MONSTER:'V' ,random,hostile
+
+#
+#	The "goal" level for the quest.
+#
+#	You must battle the betrayer and his pet dragon.
+#
+
+MAZE: "Dra-goal", ' '
+GEOMETRY:center,center
+MAP
+...............................................................
+..........................................     ................
+............................................     ..............
+.......  ................    ..................  ..............
+.......  .................  ...........  ......................
+....   ..........   ......  ........... .......................
+...  ............   ...........................................
+...  ............   ..................................   ......
+.................   ..................  ..............   ......
+.....................................   ............   ........
+........    .......................................... ........
+..........  ..............  .......................    ........
+.......... ..............   ...................................
+......... ..............     ..................................
+......... ...............     .........   .....................
+.........  ............................ . .....................
+.......................................  ...........   ........
+....................................................     ......
+.............   .....................  .............      .....
+..............  ....................... ..............   ......
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),lit,"ordinary"
+# Stairs
+STAIR:random,up
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Objects
+OBJECT:(')',"mace"),(25,08),blessed,0,name:"Sharur"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# monsters.
+MONSTER:('@',"Slipscale the Betrayer"),(25,08)
+MONSTER:('D',"dragon of the Betrayer"),(24,07)
+MONSTER:('Z', "zombie dragon"),random
+MONSTER:('Z', "zombie dragon"),random
+MONSTER:('Z', "zombie dragon"),random
+MONSTER:('Z', "zombie dragon"),random
+MONSTER:('Z', "zombie dragon"),random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
+# traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+
+#
+#	The "fill" levels for the quest.
+#
+#	These levels are used to fill out any levels not occupied by specific
+#	levels as defined above. "filla" is the upper filler, between the
+#	start and locate levels, and "fillb" the lower between the locate
+#	and goal levels.
+#
+
+MAZE: "Dra-fila" , ' '
+INIT_MAP: mines, '.' , ' ' , true , true , unlit , false
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+#
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'V' ,random,hostile
+
+MAZE: "Dra-filb" , ' '
+INIT_MAP: mines, '.' , ' ' , true , true , unlit , true
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+TRAP: random, random
+#
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'Z' ,random,hostile
+MONSTER:'V' ,random,hostile
+MONSTER:'V' ,random,hostile

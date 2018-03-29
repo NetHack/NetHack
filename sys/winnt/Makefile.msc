@@ -1,7 +1,7 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
-# Edited 3/22/18 by NullCGT
+# Edited 3/29/18 by NullCGT
 #
 #==============================================================================
 # Build Tools Environment
@@ -610,7 +610,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
 	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
 	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des \
-  $(DAT)\cartomancer.des  $(DAT)\void.des $(DAT)\statuary.des \
+	$(DAT)\cartomancer.des  $(DAT)\void.des $(DAT)\statuary.des \
+	$(DAT)\drag.des
 	cd $(DAT)
 	$(U)levcomp bigroom.des
 	$(U)levcomp castle.des
@@ -628,7 +629,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)levcomp arch.des
 	$(U)levcomp barb.des
 	$(U)levcomp caveman.des
-  $(U)levcomp cartomancer.des
+	$(U)levcomp cartomancer.des
+	$(U)levcomp drag.des
 	$(U)levcomp healer.des
 	$(U)levcomp knight.des
 	$(U)levcomp monk.des

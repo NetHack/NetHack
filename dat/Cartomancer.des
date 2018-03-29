@@ -206,7 +206,7 @@ MAP
 
 ENDMAP
 # Dungeon Description
-REGION:(00,00,33,19),lit,"ordinary"
+REGION:(00,00,75,19),lit,"ordinary"
 # Stairs
 STAIR:(19,01),up
 # Non diggable walls

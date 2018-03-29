@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 3/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -193,6 +193,47 @@ const struct Role roles[] = {
       10,
       A_INT,
       SPE_CREATE_MONSTER,
+      -4 },
+    { { "Dragonmaster", 0 },
+      { { "Servant of Scales", 0 },
+        { "Page of Wings", 0 },
+        { "Page of Claws", 0 },
+        { "Page of Scales", 0 },
+        { "Knight of the Skies", 0 },
+        { "Knight of Talons", 0 },
+        { "Knight of Scales", 0 },
+        { "Knight of Power", 0 },
+        { "Knight of Breath", 0 } },
+      "Enki", "Enlil", "_Ereshkigal", /* Sumerian */
+      "Dra",
+      "the Sacred Nesting Grounds",
+      "the Draconic Boneyard",
+      PM_DRAGONMASTER,
+      NON_PM,
+      PM_BABY_RED_DRAGON,
+      PM_DRAKEMOTHER,
+      PM_DRAKE,
+      PM_SLIPSCALE_THE_BETRAYER,
+      PM_VAMPIRE,
+      PM_WRAITH,
+      S_ZOMBIE,
+      S_VAMPIRE,
+      ART_SHARUR,
+      MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_NEUTRAL,
+      /* Str Int Wis Dex Con Cha */
+      { 13, 17, 14, 8, 8, 8 },
+      { 30, 15, 15, 10, 20, 10 },
+      /* Init   Lower  Higher */
+      { 14, 0, 0, 8, 2, 0 }, /* Hit points */
+      { 1, 4, 0, 1, 0, 2 },
+      10, /* Energy */
+      10,
+      8,
+      -2,
+      0,
+      9,
+      A_INT,
+      SPE_FIREBALL,
       -4 },
     { { "Healer", 0 },
       { { "Rhizotomist", 0 },

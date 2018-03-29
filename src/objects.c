@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/19/18 by NullCGT */
+/* Edited on 3/29/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -273,6 +273,9 @@ WEAPON("bec de corbin", "beaked polearm",
 /* bludgeons */
 WEAPON("mace", None,
        1, 0, 0, 40,  30,   5,  6,  6, 0, B,   P_MACE, IRON, HI_METAL),
+        /* +1 small */
+WEAPON("ornate mace", None,
+       1, 0, 0, 0,  30,   5,  6,  6, 0, B,   P_MACE, GOLD, HI_METAL),
         /* +1 small */
 WEAPON("morning star", None,
        1, 0, 0, 12, 120,  10,  4,  6, 0, B,   P_MORNING_STAR, IRON, HI_METAL),

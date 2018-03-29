@@ -2,7 +2,7 @@
 # Copyright (c) Yitzhak Sapir, 1999-2006.
 # NetHack may be freely distributed.  See license for details.
 #
-# Edited on 3/1/18 by NullCGT
+# Edited on 3/29/18 by NullCGT
 
 # PC NetHack 3.6 Makefile for Borland C++ 3.1 and 4.5.
 #
@@ -720,7 +720,7 @@ SPLEVDES = $(DAT)\Arch.des $(DAT)\Barb.des $(DAT)\bigroom.des \
 	$(DAT)\Ranger.des $(DAT)\Rogue.des $(DAT)\Samurai.des \
 	$(DAT)\Tourist.des $(DAT)\tower.des $(DAT)\Valkyrie.des \
 	$(DAT)\Wizard.des $(DAT)\yendor.des  $(DAT)\void.des \
-	$(DAT)\statuary.des
+	$(DAT)\statuary.des $(DAT)\Drag.des
 
 #
 # Utility Objects.
@@ -980,6 +980,7 @@ $(DAT)\sp_lev.tag: $(U)utility.tag $(SPLEVDES)
 	$(U)lev_comp barb.des
 	$(U)lev_comp caveman.des
 	$(U)lev_comp cartomancer.des
+	$(U)lev_comp drag.des
 	$(U)lev_comp healer.des
 	$(U)lev_comp knight.des
 	$(U)lev_comp monk.des

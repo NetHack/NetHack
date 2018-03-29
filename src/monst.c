@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/22/18 by NullCGT */
+/* Edited on 3/29/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -3060,6 +3060,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_FEMALE | M2_COLLECT,
         M3_INFRAVISIBLE, HI_DOMESTIC),
+    MON("dragonmaster", S_HUMAN, LVL(10, 12, 10, 1, 0), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
+        HI_DOMESTIC),
     MON("healer", S_HUMAN, LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -3210,6 +3217,16 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
         M3_CLOSE | M3_INFRAVISIBLE, HI_LORD),
+    MON("Drakemother", S_DRAGON, LVL(25, 18, -1, 20, -4), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_FIRE, 6, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_LEADER, MZ_GIGANTIC), MR_FIRE, MR_FIRE,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+            | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC |
+        M2_FEMALE,
+        M3_INFRAVISIBLE, HI_LORD),
     MON("Grand Master", S_HUMAN, LVL(25, 12, 0, 70, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 4, 10), ATTK(AT_KICK, AD_PHYS, 2, 8),
           ATTK(AT_MAGC, AD_CLRC, 2, 8), ATTK(AT_MAGC, AD_CLRC, 2, 8), NO_ATTK,
@@ -3364,6 +3381,26 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_MALE | M2_PNAME | M2_HOSTILE | M2_STRONG | M2_NASTY
             | M2_STALK | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, CLR_RED),
+    MON("Slipscale the Betrayer", S_HUMAN, LVL(15, 12, 0, 40, -13),
+        (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 6), ATTK(AT_WEAP, AD_PHYS, 2, 6),
+          ATTK(AT_CLAW, AD_SAMU, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_NEMESIS, MZ_HUMAN), MR_STONE | MR_COLD, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_HOSTILE | M2_STRONG | M2_STALK
+            | M2_NASTY | M2_MALE | M2_COLLECT | M2_MAGIC,
+        M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, HI_LORD),
+    /* not a nemesis, but a pet of one */
+    MON("dragon of the Betrayer", S_DRAGON, LVL(15, 9, -1, 20, -5),
+        (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_SAMU, 1, 4), ATTK(AT_CLAW, AD_SAMU, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, MR_COLD,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+            | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        M3_WANTSARTI | M3_WAITFORU, CLR_WHITE),
     MON("Master Kaen", S_HUMAN, LVL(25, 12, -10, 10, -20), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 16, 2), ATTK(AT_CLAW, AD_PHYS, 16, 2),
           ATTK(AT_MAGC, AD_CLRC, 0, 0), ATTK(AT_CLAW, AD_SAMU, 1, 4), NO_ATTK,
@@ -3445,6 +3482,13 @@ struct permonst _mons2[] = {
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, HI_DOMESTIC),
+    MON("drake", S_DRAGON, LVL(5, 12, 2, 10, 0), G_NOGEN,
+        A(ATTK(AT_BREA, AD_FIRE, 2, 3), ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_GUARDIAN, MZ_GIGANTIC), 0, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
+        M2_PEACEFUL | M2_STRONG | M2_GREEDY | M2_JEWELS, M3_INFRAVISIBLE,
+        HI_DOMESTIC),
     MON("chieftain", S_HUMAN, LVL(5, 12, 10, 10, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

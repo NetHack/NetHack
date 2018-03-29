@@ -3,11 +3,11 @@
 # Edited on 3/2/18 by NullCGT
 #
 # prefix codes:
-# dash          -  female, personal name
-# underscore    _  female, general name
-# plus          +  male, personal name
-# vertical bar  |  male, general name
-# equals        =  gender not specified, personal name
+# dash		-  female, personal name
+# underscore	_  female, general name
+# plus		+  male, personal name
+# vertical bar	|  male, general name
+# equals	=  gender not specified, personal name
 
 # misc.
 jumbo shrimp

@@ -1,6 +1,6 @@
 # NetHack 3.6	Makefile.gcc	$NHDT-Date: 1434804544 2015/06/20 12:49:04 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $
 #
-# Edited on 3/22/18 by NullCGT
+# Edited on 3/29/18 by NullCGT
 #
 #==============================================================================
 #
@@ -510,7 +510,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/monk.des    $(DAT)/priest.des   $(DAT)/ranger.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
-	 $(DAT)/cartomancer.des $(DAT)/void.des
+	 $(DAT)/cartomancer.des $(DAT)/void.des $(DAT)/drag.des
 	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
 	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)
@@ -528,6 +528,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/barb.des)
 	$(subst /,\,$(U)levcomp $(DAT)/caveman.des)
 	$(subst /,\,$(U)levcomp $(DAT)/cartomancer.des)
+	$(subst /,\,$(U)levcomp $(DAT)/drag.des)
 	$(subst /,\,$(U)levcomp $(DAT)/healer.des)
 	$(subst /,\,$(U)levcomp $(DAT)/knight.des)
 	$(subst /,\,$(U)levcomp $(DAT)/monk.des)

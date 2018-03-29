@@ -2723,7 +2723,7 @@ struct monst *mtmp;
         }
         aggravate();
     }
-    if (mtmp->data->msound == MS_ROAR) {
+    if (mtmp->data->msound == MS_ROAR && !mtmp->mtame && mtmp->mpeaceful == 0) {
         if (!Deaf && canseemon(mtmp)) {
             pline("%s roars!", Monnam(mtmp));
             stop_occupation();

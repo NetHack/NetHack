@@ -2,7 +2,7 @@
 #	OS/2 NetHack 3.6 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
-# Edited 3/22/18 by NullCGT
+# Edited 3/29/18 by NullCGT
 #
 #	Several compilers exist for OS/2 but, currently only GCC emx is tested
 #	and used for releases.  make programs other than dmake are not tested.
@@ -1287,6 +1287,8 @@ $(GAMEDIR)\dungeon : $(DAT)\dungeon.def $(TEMP)\makedefs.exe $(TEMP)\dgn_comp.ex
 AFILES = $(GAMEDIR)\Arc-goal.lev
 BFILES = $(GAMEDIR)\Bar-goal.lev
 CFILES = $(GAMEDIR)\Cav-goal.lev
+ZFILES = $(GAMEDIR)\Car-goal.lev
+DFILES = $(GAMEDIR)\Dra-goal.lev
 HFILES = $(GAMEDIR)\Hea-goal.lev
 KFILES = $(GAMEDIR)\Kni-goal.lev
 MFILES = $(GAMEDIR)\Mon-goal.lev
@@ -1300,6 +1302,7 @@ WFILES = $(GAMEDIR)\Wiz-goal.lev
 
 XFILES = $(AFILES) $(BFILES) $(CFILES) $(HFILES) $(KFILES) $(MFILES) \
 	 $(PFILES) $(RANFILES) $(RFILES) $(SFILES) $(TFILES) $(VFILES) $(WFILES)
+	 $(ZFILES) $(DFILES)
 
 spec_lev : $(GAMEDIR)\astral.lev $(GAMEDIR)\bigrm-1.lev $(GAMEDIR)\castle.lev \
 	   $(GAMEDIR)\knox.lev $(GAMEDIR)\medusa-1.lev $(GAMEDIR)\minefill.lev \
@@ -1400,8 +1403,10 @@ $(BFILES) : $(DAT)\Barb.des $(TEMP)\lev_comp.exe
 	$(MAKEB) QQ=Bar QF=Barb do_quest
 $(CFILES) : $(DAT)\Caveman.des $(TEMP)\lev_comp.exe
 	$(MAKEB) QQ=Cav QF=Caveman do_quest
-$(CFILES) : $(DAT)\Cartomancer.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Cav QF=Cartomancer do_quest
+$(ZFILES) : $(DAT)\Cartomancer.des $(TEMP)\lev_comp.exe
+	$(MAKEB) QQ=Car QF=Cartomancer do_quest
+$(DFILES) : $(DAT)\Drag.des $(TEMP)\lev_comp.exe
+	$(MAKEB) QQ=Dra QF=Drag do_quest
 $(HFILES) : $(DAT)\Healer.des $(TEMP)\lev_comp.exe
 	$(MAKEB) QQ=Hea QF=Healer do_quest
 $(KFILES) : $(DAT)\Knight.des $(TEMP)\lev_comp.exe

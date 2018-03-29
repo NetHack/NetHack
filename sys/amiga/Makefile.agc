@@ -2,7 +2,7 @@
 # Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.
 # NetHack may be freely redistributed.  See license for details.
 
-# Edited on 3/22/18 by NullCGT
+# Edited on 3/29/18 by NullCGT
 
 ###
 ### modified for gcc by Teemu Suikki (zu@iki.fi)
@@ -230,6 +230,10 @@ CRFILES1= $(SLIB)Car-fila.lev $(SLIB)Car-filb.lev $(SLIB)Car-loca.lev \
 	$(SLIB)Car-strt.lev
 CRFILES= $(SLIB)Car-goal.lev $(CRFILES1)
 
+DRFILES1= $(SLIB)Dra-fila.lev $(SLIB)Dra-filb.lev $(SLIB)Dra-loca.lev \
+	$(SLIB)Dra-strt.lev
+DRFILES= $(SLIB)Dra-goal.lev $(DRFILES1)
+
 HDFILES1= $(SLIB)Hea-fila.lev $(SLIB)Hea-filb.lev $(SLIB)Hea-loca.lev \
 	$(SLIB)Hea-strt.lev
 HDFILES= $(SLIB)Hea-goal.lev $(HDFILES1)
@@ -272,7 +276,7 @@ WDFILES= $(SLIB)Wiz-goal.lev $(WDFILES1)
 
 XDFILES=	$(ADFILES) $(BDFILES) $(CDFILES) $(CRFILES) $(HDFILES) $(KDFILES) \
 		$(MDFILES) $(PDFILES) $(RDFILES) $(RANFILES) $(SDFILES) $(TDFILES) \
-		$(VDFILES) $(WDFILES)
+		$(VDFILES) $(WDFILES) $(DRFILES)
 
 SOUNDFILES= \
 	$(SBIN)cvtsnd \
@@ -407,6 +411,7 @@ spotless:  clean
 #	-delete $(BDFILES)
 #	-delete $(CDFILES)
 #	-delete $(CRFILES)
+#	-delete $(DRFILES)
 #	-delete $(HDFILES)
 #	-delete $(KDFILES)
 #	-delete $(MDFILES)
@@ -854,6 +859,10 @@ $(SLIB)Cav-goal.lev:	$(DAT)Caveman.des $(SBIN)lev_comp
 $(CRFILES1):	$(SLIB)Car-goal.lev
 
 $(SLIB)Car-goal.lev:	$(DAT)Cartomancer.des $(SBIN)lev_comp
+
+$(DRFILES1):	$(SLIB)Dra-goal.lev
+
+$(SLIB)Dra-goal.lev:	$(DAT)Drag.des $(SBIN)lev_comp
 
 $(HDFILES1):	$(SLIB)Hea-goal.lev
 

@@ -2,7 +2,7 @@
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
-# File changed 2/01/18 by NullCGT
+# File changed 3/28/18 by NullCGT
 #
 #	The quest text file for NetHack 3.4
 #
@@ -1062,6 +1062,230 @@ duel of all.
 
 "Sacrifice the Amulet on the altar, and become the greatest player of
 spell cards to have ever lived."
+%E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
+#
+#	Dragonmaster
+#
+%Cc Dra 00001
+You suddenly find yourself at %H. The nests of dragons are all around you,
+and you are surrounded by waterfalls and a myriad of beautiful flowers.
+Dragons of all shapes and colors wheel through the stormy skies
+above, swooping and diving through the clouds.
+
+You are finally home, and look forward to seeing the dragons that raised you
+again.
+
+However, something is wrong. The air is filled with angry roars and keening.
+A few of the nests are singed, and some of them are on fire. Here and
+there are piles of scales, and pieces of broken shell are scattered all about.
+
+Thunder lows above, and lightning flashes. Your blood begins to boil. Someone
+must pay for these atrocities.
+%E [You arrive at %H, but something is amiss.]
+%Cp Dra 00002
+Once again, you arrive at %H.  You must speak to %l about getting vengance.
+%E
+%Cp Dra 00003
+For what may be the final time, you arrive at %H.
+%E
+%Cp Dra 00005
+"ROAR!"
+%E
+%Cp Dra 00006
+"Roar!"
+%E
+%Cp Dra 00007
+"Roar!!!"
+%E
+%Cp Dra 00008
+"ROAR!!!"
+%E
+%Cp Dra 00009
+"GROAR!"
+%E
+%Cp Dra 00010
+"ROAR!"
+%E
+%Cp Dra 00011
+"Roar!"
+%E
+%Cp Dra 00012
+"Roar!!!"
+%E
+%Cp Dra 00013
+"GROAR!"
+%E
+%Cp Dra 00014
+"ROAR!"
+%E
+%Cc Dra 00015
+"%p! You have returned to us in our time of peril!
+
+I must test your skills in order to determine if you have the strength
+to be our champion."
+%E ["You have returned at a time of great peril."]
+%Cp Dra 00016
+"%p, you have returned.  Are you strong enough now to be our champion?"
+%E
+%Cp Dra 00017
+"You have returned again, %p. Are you yet skilled enough?"
+%E
+%Cc Dra 00018
+"You still think you are worthy to be our champion? You disgust me,
+%p! Leave this place and never return!"
+
+"You shall not be the one to enact our vengance upon %n."
+%E ["You are unworthy to be the champion of your homeland."]
+%Cc Dra 00019
+"%p, I am afraid you are not yet strong enough to seek %n.
+Only %Ra with the help of %d could ever hope to take revenge on our foe."
+%E ["You are too weak.  Come back when you are %Ra."]
+%Cc Dra 00020
+"%pC!  You have not kept to the path of %a!
+If you attempt to revenge yourself upon %n in this state, you will only
+doom your own soul.  You must purify yourself.
+Go forth, and return when you have thought hard on what you must do."
+%E ["You have wandered from the path of the %a.  Come back when you are ready."]
+%Cc Dra 00021
+"You have probably already guessed what has happened, %p.
+Our old nemesis %n attacked our nests and destroyed our eggs. %ni also had
+the gall to steal the greatest treasure of our horde, the mighty %o.
+
+"You must go to %i.  Once there, you can slay
+%n for his atrocities. Bring us back %o as proof that you have killed %ni."
+
+"Go forth, %p, and be our champion."
+%E ["Find %n, defeat %ni, and return %o to us."]
+%Cp Dra 00025
+"%nC was raised as you were, and knows all of the secret arts you do."
+%E
+%Cp Dra 00026
+"%nC will no doubt be accompanied by their draconic companion."
+%E
+%Cp Dra 00027
+"You must take revenge for the loss of our children."
+%E
+%Cp Dra 00028
+"Be careful, since %i is a sacred place, but is also very dangerous."
+%E
+%Cp Dra 00029
+"Do not be afraid to call on %d for help in your quest."
+%E
+%Cp Dra 00030
+"Legends say that %o can speak; perhaps it will aid you as well."
+%E
+%Cp Dra 00031
+"Use the training we gave you to defeat %n."
+%E
+%Cp Dra 00032
+"%d will be the wind beneath your wings."
+%E
+%Cp Dra 00033
+"Do not lose yourself in vengance. We value you more than we do the
+death of %n."
+%E
+%Cp Dra 00034
+"I am sure you will do great things one day, %p."
+%E
+%Cc Dra 00035
+The air here is cool, and above you arch the enormous bones of dragons long
+since dead. You have reached %i.
+%E [You have reached %i.]
+%Cp Dra 00036
+You have returned again to %i.
+%E
+%Cc Dra 00040
+Sweat prickles across your body, although the air grows even colder. You have
+reached the deepest part of %i.  This is where %n must be hiding.
+%E [You have found the hiding place of %n.]
+%Cp Dra 00041
+You feel a chill again.
+%E
+%Cc Dra 00050
+"So, this is who %l sent to fight me. It seems that the dragons are not
+merely content with losing their eggs, but their %R as well. I am glad
+that unlike you, I saw the benefits to leaving them.
+
+"Let us duel, %p."
+%E [%nC challenges you."]
+%Cp Dra 00051
+"I was raised by the dragons just as you were, %p. Yet I am far stronger"
+%E
+%Cp Dra 00052
+"Once I defeat you, I will allow my dragon to feed on your body!"
+%E
+%Cp Dra 00053
+"You call yourself %ca, yet this is all you can muster?"
+%E
+%Cp Dra 00060
+"Do not make me laugh!"
+%E
+%Cp Dra 00061
+"Fool! I outclass you in every way!"
+%E
+%Cp Dra 00062
+"Thinking about running away? You disappoint me, %p."
+%E
+%Cp Dra 00063
+"You may have been raised by dragons, but you have none of their strength."
+%E
+%Cp Dra 00064
+"%d cannot save you now."
+%E
+%Cp Dra 00065
+"Your attempts to kill me are truly pitiful."
+%E
+%Cp Dra 00066
+"This boneyard shall be your grave as well."
+%E
+%Cp Dra 00067
+"Pathetic, pathetic, pathetic!"
+%E
+%Cp Dra 00068
+"Are you afraid, %p?"
+%E
+%Cp Dra 00069
+"I was far more worthy of being raised by %l than you were, %p."
+%E
+%Cc Dra 00070
+As you touch %o, you feel the power of it flow through your body.
+You feel that if you asked it to, it would fight at your side.
+%E [You feel the power of %o flowing through you.]
+%Cc Dra 00080
+%nC collapses, their body spent. Your vengance over the loss of your
+siblings is complete. You cannot help but feel slightly sad, however. In
+different circumstances, %n could have been your friend, and you
+could have grown up together under the watchful eye of %l.
+%E [%nC has been slain.]
+%Cc Dra 00081
+When %l sees %o, she nods, and roars:
+
+    Well done, %p. Although your actions will not return the eggs
+    we have lost, I can be at peace knowing that %n will not
+    trouble us again. Truly, it was a mistake to raise %ni as my
+    own.
+
+    Take %o and continue in your quest. Return to me when you have
+    found what you seek.
+
+%E [%lC tells you to take %o, and to return when you have triumphed.]
+%Cc Dra 00082
+%l looks at %o, then back at you.
+
+"It is yours now. It is but a fragment of our hoard, and you have a greater
+need of it than we do."
+%E ["%lC refuses %o.  Return to %Z to search for the Amulet."]
+%Cp Dra 00090
+"Ah, %p. Your quest goes well, I hope?"
+%E
+%Cc Dra 00091
+"Congratulations, %p. You posses the Amulet of Yendor! It is truly a
+great addition to your hoard.
+
+In truth, however, the Amulet has a greater purpose, as do you. Take the
+Amulet to the Astral Plane, and offer it upon the altar to %d.
+
+Go forth, %p. Become more than what you are."
 %E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
 #
 #	Healer

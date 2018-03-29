@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 3/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -63,6 +63,13 @@ static struct trobj Cave_man[] = {
     { FLINT, 0, GEM_CLASS, 15, UNDEF_BLESS }, /* quan is variable */
     { ROCK, 0, GEM_CLASS, 3, 0 },             /* yields 18..33 */
     { LEATHER_ARMOR, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
+    { 0, 0, 0, 0, 0 }
+};
+static struct trobj Dragonmaster[] = {
+    { BROADSWORD, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
+    { SCALE_MAIL, 1, ARMOR_CLASS, 1, UNDEF_BLESS },
+    { FOOD_RATION, 0, FOOD_CLASS, 2, 0 },
+    { TRIPE_RATION, 0, FOOD_CLASS, 2, 0 },
     { 0, 0, 0, 0, 0 }
 };
 static struct trobj Healer[] = {
@@ -337,6 +344,36 @@ static const struct def_skill Skill_C[] = {
     { P_BOOMERANG, P_EXPERT },
     { P_UNICORN_HORN, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_MASTER },
+    { P_NONE, 0 }
+};
+static const struct def_skill Skill_D[] = {
+    { P_DAGGER, P_BASIC },
+    { P_KNIFE, P_BASIC },
+    { P_AXE, P_BASIC },
+    { P_PICK_AXE, P_BASIC },
+    { P_SHORT_SWORD, P_BASIC },
+    { P_BROAD_SWORD, P_EXPERT },
+    { P_LONG_SWORD, P_SKILLED },
+    { P_TWO_HANDED_SWORD, P_SKILLED },
+    { P_SCIMITAR, P_BASIC },
+    { P_SABER, P_SKILLED },
+    { P_CLUB, P_BASIC },
+    { P_MACE, P_SKILLED },
+    { P_MORNING_STAR, P_SKILLED },
+    { P_FLAIL, P_BASIC },
+    { P_HAMMER, P_BASIC },
+    { P_POLEARMS, P_EXPERT },
+    { P_SPEAR, P_EXPERT },
+    { P_TRIDENT, P_BASIC },
+    { P_LANCE, P_EXPERT },
+    { P_BOW, P_BASIC },
+    { P_CROSSBOW, P_SKILLED },
+    { P_ATTACK_SPELL, P_SKILLED },
+    { P_HEALING_SPELL, P_SKILLED },
+    { P_CLERIC_SPELL, P_SKILLED },
+    { P_RIDING, P_EXPERT },
+    { P_TWO_WEAPON_COMBAT, P_SKILLED },
+    { P_BARE_HANDED_COMBAT, P_BASIC },
     { P_NONE, 0 }
 };
 static const struct def_skill Skill_H[] = {
@@ -733,6 +770,11 @@ u_init()
         skill_init(Skill_Car);
         knows_object(SCR_GENOCIDE);
         break;
+    case PM_DRAGONMASTER:
+        ini_inv(Dragonmaster);
+        knows_class(WEAPON_CLASS);
+        knows_class(ARMOR_CLASS);
+        break;
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
         ini_inv(Healer);
@@ -972,6 +1014,9 @@ int otyp;
         break;
     case PM_CARTOMANCER:
         skills = Skill_Car;
+        break;
+    case PM_DRAGONMASTER:
+        skills = Skill_D;
         break;
     case PM_HEALER:
         skills = Skill_H;

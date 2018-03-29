@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 3/23/18 by NullCGT */
+/* File changed 3/29/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -120,9 +120,9 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     /*
     *       Based on Sumerian legends. Extremely powerful.
     */
-    A("Sharur", MACE,
+    A("Sharur", ORNATE_MACE,
       (SPFX_RESTR | SPFX_NOGEN | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
-      0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, NON_PM,
+      0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, PM_DRAGONMASTER,
       NON_PM, 4000L, NO_COLOR),
 
     /*
