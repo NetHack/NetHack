@@ -1393,8 +1393,11 @@ boolean allow_floor;
         }
 
         if (ilet == ',' || ilet == '?' || ilet == '*') {
-            if (ilet == ',' && !floor)
-                return &zeroobj; /* dungeon feature */
+            if (ilet == ',' && !floor) {
+                /* dungeon feature */
+                res = &zeroobj;
+                continue;
+            }
 
             boolean show_discouraged = FALSE;
             int qflags = (INVORDER_SORT | SIGNAL_ESCAPE);
