@@ -3040,7 +3040,8 @@ struct monst *mon;
 int shiftflags;
 {
     struct permonst *ptr = 0;
-    unsigned mndx, was_female = mon->female;
+    int mndx;
+    unsigned was_female = mon->female;
     boolean msg = FALSE, dochng = FALSE;
 
     if ((shiftflags & SHIFT_MSG)
