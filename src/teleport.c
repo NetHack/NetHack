@@ -595,7 +595,7 @@ level_tele()
     register int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     boolean force_dest = FALSE;
 
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))

@@ -2740,7 +2740,7 @@ choose_value:
 
     if (behavior == BL_TH_VAL_PERCENTAGE
         || behavior == BL_TH_VAL_ABSOLUTE) {
-        char inbuf[BUFSZ], buf[BUFSZ];
+        char inbuf[BUFSZ] = DUMMY, buf[BUFSZ];
         int val;
         boolean skipltgt = FALSE;
         boolean gotnum = FALSE;
@@ -2902,7 +2902,7 @@ choose_value:
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, rolelist[rv]);
         } else {
-            char inbuf[BUFSZ];
+            char inbuf[BUFSZ] = DUMMY;
 
             inbuf[0] = '\0';
             getlin(qry_buf, inbuf);

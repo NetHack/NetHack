@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1521377334 2018/03/18 12:48:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1521499715 2018/03/19 22:48:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -548,18 +548,14 @@ doforce()
     xlock.box = (struct obj *) 0;
     for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
         if (Is_box(otmp)) {
-            if (otmp->obroken) {
-                There("is %s here%s.", doname(otmp),
-                      /* The displayed name will have already stated
-                       * "with a broken lock" if otmp->lknown is already set
-                       * so suppress the additional notification about the
-                       * lock in that case. */
-                      !otmp->lknown ? ", but its lock is already broken" : "");
-                otmp->lknown = 1;
-                continue;
-            } else if (!otmp->olocked) {
-                There("is %s here, but its lock is already unlocked.",
-                      doname(otmp));
+            if (otmp->obroken || !otmp->olocked) {
+                /* force doname() to omit known "broken" or "unlocked"
+                   prefix so that the message isn't worded redundantly;
+                   since we're about to set lknown, there's no need to
+                   remember and then reset its current value */
+                otmp->lknown = 0;
+                There("is %s here, but its lock is already %s.",
+                      doname(otmp), otmp->obroken ? "broken" : "unlocked");
                 otmp->lknown = 1;
                 continue;
             }

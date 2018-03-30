@@ -527,6 +527,11 @@ fix 'object lost' panic if hero with lycanthropy but in human form is wielding
 prevent segfault if pline() is called recursively (which could happen if the
 	interface code issues a debugpline() while processing putstr())
 open at yourself is the same as #loot
+when #force reports that a chest's lock is already broken or already unlocked,
+	force it to be described as "a chest", even when its lock state is
+	already known, rather than as "a broken chest" or "an unlocked chest"
+honor wish for "locked", "unlocked", or "broken" chest or box
+honor wish for "empty" container including statue, bag-o-tricks, horn-o-plenty
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -609,8 +614,6 @@ when clairvoyance lets you move the cursor to examine the map (if it occurs
 prevent Mjollnir from being auto-quivered if it's been thrown without return
 	and then picked back up while quiver slot is empty
 plural of "fox" is not "foxen"
-change wording from "broken chest" to "chest with a broken lock" and during
-	#force" suppress redundant info when lock state is already known
 
 
 Platform- and/or Interface-Specific Fixes
@@ -828,6 +831,8 @@ win32gui: save and load map colors from registry
 X11: add new character selection dialog, and obey player_selection:dialog
 unix: reduce makefile verbosity by default
 win32gui: new player selection dialog
+tty, X11, qt4, win32gui: compile-time option to allow some prompts remember
+	the input
 
 
 NetHack Community Patches (or Variation) Included

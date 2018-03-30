@@ -5148,7 +5148,8 @@ int triesleft;
 void
 makewish()
 {
-    char buf[BUFSZ], promptbuf[BUFSZ];
+    static char buf[BUFSZ] = DUMMY;
+    char promptbuf[BUFSZ];
     struct obj *otmp, nothing;
     int tries = 0;
 

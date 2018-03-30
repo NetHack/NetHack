@@ -1306,7 +1306,8 @@ int how;
        for normal end of game, genocide doesn't either */
     if (how <= GENOCIDED) {
         dump_redirect(TRUE);
-        genl_outrip(0, how, endtime);
+        if (iflags.in_dumplog)
+            genl_outrip(0, how, endtime);
         dump_redirect(FALSE);
     }
 #endif
@@ -1387,7 +1388,8 @@ int how;
             artifact_score(invent, FALSE, endwin); /* list artifacts */
 #ifdef DUMPLOG
         dump_redirect(TRUE);
-        artifact_score(invent, FALSE, 0);
+        if (iflags.in_dumplog)
+            artifact_score(invent, FALSE, 0);
         dump_redirect(FALSE);
 #endif
 

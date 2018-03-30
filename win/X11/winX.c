@@ -1623,7 +1623,11 @@ char *input;
        slide left hiding some chars at the beginning of the response but
        making room to type more.  [Prior to 3.6.1, width wasn't specifiable
        and answer box always got sized to match the width of the prompt.] */
+#ifdef EDIT_GETLIN
+    SetDialogResponse(getline_dialog, input, 60); /* set default answer */
+#else
     SetDialogResponse(getline_dialog, nhStr(""), 60); /* set default answer */
+#endif
     positionpopup(getline_popup, TRUE);           /* center,bottom */
 
     nh_XtPopup(getline_popup, (int) XtGrabExclusive, getline_dialog);
