@@ -2597,7 +2597,7 @@ recalc_mapseen()
                 }
                 if (is_drawbridge_wall(x, y) < 0)
                     break;
-            /* else FALLTHRU */
+                /*FALLTHRU*/
             case DBWALL:
             case DRAWBRIDGE_DOWN:
                 if (Is_stronghold(&u.uz))

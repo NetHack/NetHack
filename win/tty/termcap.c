@@ -1171,6 +1171,7 @@ int n;
     case ATR_ULINE:
         if (nh_US)
             return nh_US;
+        /*FALLTHRU*/
     case ATR_BOLD:
     case ATR_BLINK:
 #if defined(TERMLIB) && defined(TEXTCOLOR)
@@ -1192,6 +1193,7 @@ int n;
     case ATR_ULINE:
         if (nh_UE)
             return nh_UE;
+        /*FALLTHRU*/
     case ATR_BOLD:
     case ATR_BLINK:
         return nh_HE;

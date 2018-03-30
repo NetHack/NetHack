@@ -957,6 +957,7 @@ boolean hitsroof;
                     Your("%s fails to protect you.", helm_simple_name(uarmh));
                 goto petrify;
             }
+            /*FALLTHRU*/
         case CREAM_PIE:
         case BLINDING_VENOM:
             pline("You've got it all over your %s!", body_part(FACE));
@@ -2014,6 +2015,7 @@ boolean in_view;
     default: /* glass or crystal wand */
         if (obj->oclass != WAND_CLASS)
             impossible("breaking odd object?");
+        /*FALLTHRU*/
     case CRYSTAL_PLATE_MAIL:
     case LENSES:
     case MIRROR:

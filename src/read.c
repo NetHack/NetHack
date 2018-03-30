@@ -1551,6 +1551,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             /* do_mapping() already reveals secret passages */
         }
         known = TRUE;
+        /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
             Your("%s spins as %s blocks the spell!", body_part(HEAD),

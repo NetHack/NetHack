@@ -2408,6 +2408,7 @@ boolean ordinary;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
         damage = d(obj->spe, 25);
+        /*FALLTHRU*/
     case EXPENSIVE_CAMERA:
         if (!damage)
             damage = 5;
@@ -4138,7 +4139,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
 
                 switch (bounce) {
                 case 0:
-                    dx = -dx; /* fall into... */
+                    dx = -dx;
+                    /*FALLTHRU*/
                 case 1:
                     dy = -dy;
                     break;

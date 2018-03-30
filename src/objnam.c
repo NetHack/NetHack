@@ -453,6 +453,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case WEAPON_CLASS:
         if (is_poisonable(obj) && obj->opoisoned)
             Strcpy(buf, "poisoned ");
+        /*FALLTHRU*/
     case VENOM_CLASS:
     case TOOL_CLASS:
         if (typ == LENSES)
@@ -3710,7 +3711,7 @@ typfnd:
             otmp->spe = (rn2(10) ? -1 : 0);
             break;
         }
-    /* fall through, if wizard */
+        /*FALLTHRU*/
     default:
         otmp->spe = spe;
     }

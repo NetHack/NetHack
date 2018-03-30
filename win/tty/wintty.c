@@ -1527,7 +1527,7 @@ winid window;
     case NHW_MAP:
         /* cheap -- clear the whole thing and tell nethack to redraw botl */
         context.botlx = 1;
-    /* fall into ... */
+        /*FALLTHRU*/
     case NHW_BASE:
         clear_screen();
         break;
@@ -1917,7 +1917,8 @@ struct WinDesc *cw;
             /* special case: '0' is also the default ball class */
             if (!counting && index(gacc, morc))
                 goto group_accel;
-        /* fall through to count the zero */
+            /* fall through to count the zero */
+            /*FALLTHRU*/
         case '1':
         case '2':
         case '3':
@@ -2197,6 +2198,7 @@ boolean blocking; /* with ttys, all windows are blocking */
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
             return;
         }
+        /*FALLTHRU*/
     case NHW_BASE:
         (void) fflush(stdout);
         break;

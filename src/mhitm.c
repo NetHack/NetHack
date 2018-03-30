@@ -575,6 +575,7 @@ struct attack *mattk;
                     Sprintf(buf, "%s squeezes", magr_name);
                     break;
                 }
+                /*FALLTHRU*/
             default:
                 Sprintf(buf, "%s hits", magr_name);
             }

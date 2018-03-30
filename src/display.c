@@ -391,6 +391,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
         default:
             impossible("display_monster:  bad m_ap_type value [ = %d ]",
                        (int) mon->m_ap_type);
+            /*FALLTHRU*/
         case M_AP_NOTHING:
             show_glyph(x, y, mon_to_glyph(mon));
             break;

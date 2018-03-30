@@ -708,6 +708,7 @@ doengrave()
                            "A few ice cubes drop from the wand.");
                 if (!oep || (oep->engr_type != BURN))
                     break;
+                /*FALLTHRU*/
             case WAN_CANCELLATION:
             case WAN_MAKE_INVISIBLE:
                 if (oep && oep->engr_type != HEADSTONE) {

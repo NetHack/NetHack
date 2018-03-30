@@ -396,18 +396,21 @@ attrcurse()
             You_feel("warmer.");
             break;
         }
+        /*FALLTHRU*/
     case 2:
         if (HTeleportation & INTRINSIC) {
             HTeleportation &= ~INTRINSIC;
             You_feel("less jumpy.");
             break;
         }
+        /*FALLTHRU*/
     case 3:
         if (HPoison_resistance & INTRINSIC) {
             HPoison_resistance &= ~INTRINSIC;
             You_feel("a little sick!");
             break;
         }
+        /*FALLTHRU*/
     case 4:
         if (HTelepat & INTRINSIC) {
             HTelepat &= ~INTRINSIC;
@@ -416,18 +419,21 @@ attrcurse()
             Your("senses fail!");
             break;
         }
+        /*FALLTHRU*/
     case 5:
         if (HCold_resistance & INTRINSIC) {
             HCold_resistance &= ~INTRINSIC;
             You_feel("cooler.");
             break;
         }
+        /*FALLTHRU*/
     case 6:
         if (HInvis & INTRINSIC) {
             HInvis &= ~INTRINSIC;
             You_feel("paranoid.");
             break;
         }
+        /*FALLTHRU*/
     case 7:
         if (HSee_invisible & INTRINSIC) {
             HSee_invisible &= ~INTRINSIC;
@@ -435,18 +441,21 @@ attrcurse()
                                      : "thought you saw something");
             break;
         }
+        /*FALLTHRU*/
     case 8:
         if (HFast & INTRINSIC) {
             HFast &= ~INTRINSIC;
             You_feel("slower.");
             break;
         }
+        /*FALLTHRU*/
     case 9:
         if (HStealth & INTRINSIC) {
             HStealth &= ~INTRINSIC;
             You_feel("clumsy.");
             break;
         }
+        /*FALLTHRU*/
     case 10:
         /* intrinsic protection is just disabled, not set back to 0 */
         if (HProtection & INTRINSIC) {
@@ -454,12 +463,14 @@ attrcurse()
             You_feel("vulnerable.");
             break;
         }
+        /*FALLTHRU*/
     case 11:
         if (HAggravate_monster & INTRINSIC) {
             HAggravate_monster &= ~INTRINSIC;
             You_feel("less attractive.");
             break;
         }
+        /*FALLTHRU*/
     default:
         break;
     }

@@ -668,10 +668,13 @@ register struct monst *mtmp;
             /* MAJOR fall through ... */
             case 0:
                 (void) mongets(mtmp, WAN_MAGIC_MISSILE);
+                /*FALLTHRU*/
             case 1:
                 (void) mongets(mtmp, POT_EXTRA_HEALING);
+                /*FALLTHRU*/
             case 2:
                 (void) mongets(mtmp, POT_HEALING);
+                /*FALLTHRU*/
             case 3:
                 (void) mongets(mtmp, WAN_STRIKING);
             }
