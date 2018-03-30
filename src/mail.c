@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 3/29/18 by NullCGT */
+
 #include "hack.h"
 
 #ifdef MAIL
@@ -454,7 +456,7 @@ struct obj *otmp UNUSED;
 {
     static char *junk[] = {
         NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
-        "Please disregard previous letter.", "Welcome to NetHack.",
+        "Please disregard previous letter.", "Welcome to GlazeHack.",
 #ifdef AMIGA
         "Only Amiga makes it possible.", "CATS have all the answers.",
 #endif

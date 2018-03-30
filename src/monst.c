@@ -1462,6 +1462,14 @@ NEARDATA struct permonst mons[] = {
         M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_POIS | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, 0, CLR_YELLOW),
+    MON("volatile mushroom", S_FUNGUS, LVL(1, 0, 9, 0, 0),
+        (G_GENO | G_LGROUP | 1),
+        A(ATTK(AT_BOOM, AD_PHYS, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(50, 30, MS_SILENT, MZ_SMALL), MR_POISON, MR_POISON,
+        M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
+            | M1_POIS | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER, 0, CLR_ORANGE),
     MON("green mold", S_FUNGUS, LVL(1, 0, 9, 0, 0), (G_GENO | 1),
         A(ATTK(AT_NONE, AD_ACID, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

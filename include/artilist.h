@@ -126,6 +126,13 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       NON_PM, 4000L, NO_COLOR),
 
     /*
+    *       May or may not be an obscure reference. Gains strength based
+    *       on moon phase, which I think is a feature of an artifact in
+    *       another variant.
+    */
+    A("Unlimited Moon", FLAIL, SPFX_RESTR, 0, 0, PHYS(2, 2), COLD(0, 0),
+      NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 1500L, NO_COLOR),
+    /*
     *       Based on the bindings used to trap Fenrir. This hook can grapple
     *       things regardless of size, and has a massive range.
     */

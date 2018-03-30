@@ -6,7 +6,7 @@ document.
 
 General Changes
 - Gaining a resistance other than poison resistance through food will cause you
-  to lose your other resistances. This feature can be toggled off in your
+  to lose your other resistances. This feature can be toggled off in the
   preferences file.
 - Decreased floating eye spawn rate to make blind telepathy harder to obtain.
 - Mysterious force now only affects you when you are hallucinating (you
@@ -53,13 +53,22 @@ General Changes
 - All demon lords have had their AC significantly lowered.
 - The wailing of the banshee message was changed slightly to account for the
   addition of wailing banshees.
+- The addition of so many artifacts changes things. On one hand, the player is
+  more likely to find artifacts throughout the dungeon, due to many new artifact
+  types. On the other hand, adding artifacts made the Astral Plane slightly more
+  difficult, since player monsters now have a greater number of artifacts to
+  be generated with.
+- Summon nasties has been expanded to accommodate new monsters.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
-- Nalzok now has a much higher chance of summoning other demons on hit.
+- Nalzok now has a much higher chance of summoning other demons on hit than
+  demons found in gehennom.
 - Ixoth's claw attack can stun the opponent.
 - The Dark One now casts spells twice per turn.
 - Thoth Amon now casts a mix of clerical and mage spells.
+- Ixoth and the Chromatic Dragon are both affected by dragon changes, and as
+  such are potentially nastier.
 
 New Races
 - Merfolk: Start with swimming, and eventually learn to breath water. This is
@@ -88,12 +97,14 @@ New Artifacts
 - Gae Buidhe
 - Carnwennan
 - Seafoam
-- Sharur
 - Luckless Folly
 - Dismounter
 - Final Death
+- Unlimited Moon
+- Black Arrow
 - Vladsbane (joke artifact, must be wished for)
 - The King in Yellow
+- Sharur
 - The Holographic Void Lily
 
 Dungeon Generation

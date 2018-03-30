@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/23/18 by NullCGT */
+/* Edited on 3/29/18 by NullCGT */
 
 #include "hack.h"
 
@@ -304,9 +304,13 @@ int *attk_count, *role_roll_penalty;
         tmp += weapon_hit_bonus((struct obj *) 0);
     }
 
+    /* handle the to-hits of Luckless Folly and Unliited moon */
     if (weapon && weapon->oartifact &&
         weapon->oartifact == ART_LUCKLESS_FOLLY) {
         tmp -= 2 * Luck;
+    } else if (weapon && weapon->oartifact &&
+        weapon->oartifact == ART_UNLIMITED_MOON) {
+        tmp += phase_of_the_moon();
     }
 
     return tmp;
@@ -799,10 +803,14 @@ int dieroll;
                         return TRUE;
                     hittxt = TRUE;
                 }
-                /* handle the damage bonus of Luckless Folly */
+                /* handle the damages of Luckless Folly and Unliited moon */
                 if (obj->oartifact && obj->oartifact == ART_LUCKLESS_FOLLY) {
                     tmp -= 2 * Luck;
+                } else if (obj && obj->oartifact &&
+                    obj->oartifact == ART_UNLIMITED_MOON) {
+                    tmp += phase_of_the_moon();
                 }
+
                 if (objects[obj->otyp].oc_material == SILVER
                     && mon_hates_silver(mon)) {
                     silvermsg = TRUE;

@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 3/14/18 by NullCGT */
+/* Edited 3/29/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1749,7 +1749,9 @@ boolean
 artifact_light(obj)
 struct obj *obj;
 {
-    return (boolean) (get_artifact(obj) && obj->oartifact == ART_SUNSWORD);
+    return (boolean) (get_artifact(obj) &&
+                        ((obj->oartifact == ART_SUNSWORD) ||
+                        (obj->oartifact == ART_UNLIMITED_MOON)));
 }
 
 /* KMH -- Talking artifacts are finally implemented */
