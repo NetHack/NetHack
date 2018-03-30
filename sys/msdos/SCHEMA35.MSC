@@ -4,6 +4,8 @@
 ; This overlay schema is for use only when NetHack is built
 ; using packaged-functions for function-level linking.
 ;
+; Edited on 3/30/18 by NullCGT
+;
 ; Overlay tuning level: 0
 ;
 functions:0 _main _dosave0 _moveloop _bwrite _random _rn2 _newsym _show_glyph _on_level _txt_gotoxy _txt_get_cursor
@@ -163,7 +165,7 @@ functions:137 _maze0xy _maze1xy _mazexy _mb_trapped _mbag_explodes _mbhit _mbhit
 functions:138 _md_rush _md_start _md_stop _mdig_tunnel
 functions:139 _meatobj _melt_ice _menu_drop _menu_identify _menu_loot _menu_remarm _mergable _merge_choice
 functions:140 _merged _mfndpos _midnight _migrate_to_level _mineralize _minit _miniwalk _minstapetrify
-functions:140 _On_stairs _on_start _On_W_tower_level _oname _onbill _online2 _only_here _onlyspace
+functions:140 _onconfuse _On_stairs _on_start _On_W_tower_level _oname _onbill _online2 _only_here _onlyspace
 functions:141 _mintrap 
 functions:142 _mk_bubble _mk_knox_portal _mk_mplayer _mk_named_object _mk_roamer _mk_tt_object _mkaltar _mkbox_cnts
 functions:143 _mkcavearea _mkcavepos _mkclass _mkcorpstat _mkfount _mkgold _mkgoldobj _mkinvokearea
@@ -217,14 +219,14 @@ functions:192 _restore_saved_game _restore_timers _restore_waterlevel _restpries
 functions:193 _reverse _revive _revive_corpse _revive_egg _revive_mon _revive_nasty _reward_untrap _rhack
 functions:194 _right_side _rile_shk _Ring_gone _Ring_off _Ring_off_or_gone _Ring_on _rloc _rloc_engr
 functions:195 _rloc_pos_ok _rloc_to _rloco _rm_waslit _rnd_class _rnd_defensive_item
-functions:196 _rnd_misc_item _rnd_offensive_item _rnd_rect _rndcurse _rnddoor _rndexp _rndghostname _rndmonnam
+functions:196 _rnd_misc_item _rnd_offensive_item _rnd_rect _rndcurse _rnddoor _rndexp _rndhumname _rndghostname _rndmonnam
 functions:197 _rndmonnum _rndmonst _rndtrap _rne _rnl _rnz _rogue_vision _roguecorr
 functions:198 _roguejoin _roguename _rot_corpse _rot_organic _rottenfood _rounddiv _row_refresh _run_timers
 functions:199 _rust_dmg _s_suffix _safe_teleds _saleable _same_price _sanity_check _save_artifacts _save_currentstate
 functions:200 _save_dungeon _save_engravings _save_light_sources _save_oracles _save_room _save_rooms _save_savefile_name _save_timers
 functions:201 _save_waterlevel _save_worm _savebones _savech _savedamage _saveDiskPrompt _savefruitchn _savegamestate
 functions:202 _savelev _savelev0 _savelevchn _savelife _savemonchn _savenames _saveobjchn _savestateinlock
-functions:203 _savetrapchn _scatter _schedule_goto _score_wanted _search_door _search_special _searches_for_item _see_lamp_flicker
+functions:203 _savetrapchn _scatter _schedule_goto _score_wanted _scrollpray _search_door _search_special _searches_for_item _see_lamp_flicker
 functions:204 _see_monsters _see_objects _see_traps _see_wsegs _seemimic _seetrap _seffects _select_hwep
 functions:205 _select_off _select_rwep _selftouch _sellobj _sellobj_state _sengr_at _sense_trap
 functions:206 _set_all_on_page _set_apparxy _set_artifact_intrinsic _set_bc _set_bonesfile_name _set_bonestemp_name _set_corn _set_cost
@@ -445,7 +447,7 @@ functions:405 _conjoined_pits _consume_obj_charge _consume_oeaten _consume_tin _
 ;functions:407 _count_buc _count_contents _critically_low_hp _cures_sliming _cures_stoning _currency _cxname _dealloc_killer
 functions:408 _dealloc_mextra _dealloc_monst _dealloc_oextra
 functions:409 _decal_planar _decide_to_shapeshift _def_bclose _def_bflush _def_bufoff _def_bufon _def_bwrite _def_minit _def_mread
-functions:410 _defends_when_carried _delayed_killer _deliver_splev_message _detect_obj_traps _detect_wsegs _detecting
+functions:410 _defends_when_carried _delayed_killer _deliver_splev_message _denmon _detect_obj_traps _detect_wsegs _detecting
 functions:411 _disarm_holdingtrap _discardexcess _disintegrate_mon _display_pickinv _display_used_invlets _distant_monnam _dmgtype_fromattack _do_class_genocide
 functions:412 _docallcmd _dochat _doclassdisco _docontact _dogaze _domonnoise _donamelevel _doorless_door _dooverview _dooverview_or_wiz_where 
 functions:413 _dopoly _doterrain _dotip _dotravel _dovanquished _dowhatdoes_core _drop_uswapwep _dxdy_moveok _eat_brains _eatmupdate
@@ -505,7 +507,7 @@ functions:466 _tin_details _tin_variety _tin_variety_txt _tipcontainer _Tobjnam 
 functions:467 _traditional_loot _trapmove _trapnote
 ;functions:468 _tty_destroy_nhwindow _tty_getmsghistory _tty_putmsghistory
 ;functions:469 _u_on_rndspot _ubreatheu _uchangealign _unchanger _undesirable_disp _unfixable_trouble_count _unplaced_floater _unreachable_level
-functions:470 _unset_seenv _untouchable _update_l_symset _update_r_symset _upstart _use_cream_pie _use_pick_axe2 _use_stone
+functions:470 _unset_seenv _untouchable _update_l_symset _update_r_symset _upstart _use_cream_pie _use_deck _use_pick_axe2 _use_stone
 functions:471 _usmellmon _uteetering_at_seen_pit _validate _validate_prefix_locations _validspecmon _validvamp _vamp_shift
 functions:472 _vault_gd_watching _veggy_item _version_string _vtense _walking_on_water _wand_explode _watch_dig
 functions:473 _waterbody_name _wc_set_font_name _wc_set_window_colors _wc_supported _wc2_supported _weapon_descr
