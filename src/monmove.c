@@ -1041,6 +1041,7 @@ not_special:
                          || (likeobjs && index(practical, otmp->oclass)
                              && (otmp->otyp != CORPSE
                                  || (otmp-> otyp == CORPSE
+                                     && !is_demon(mtmp)
                                      && !is_rider(&mons[otmp->corpsenm]))))
                          || (likemagic && index(magical, otmp->oclass))
                          || (uses_items && searches_for_item(mtmp, otmp))
