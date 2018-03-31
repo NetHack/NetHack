@@ -821,7 +821,7 @@ register int after;
         return 0; /* do not leave hiding place */
 
     /* Offering takes presedence over everything else.*/
-    if (IS_ALTAR(levl[mtmp->mx][mtmp->my].typ)) {
+    if (IS_ALTAR(levl[mtmp->mx][mtmp->my].typ) && !is_demon(ptr)) {
         offer = moffer(mtmp);
         if (offer != 0) {
             return offer;

@@ -1262,7 +1262,7 @@ register struct monst *mtmp;
                     /* grew up into genocided monster */
                     return 2;
                 /* very small chance that monsters can sacrifice for artifact */
-                } else if (rn2(10 + (2 * u.ugifts * nartifacts))) {
+                } else if (rn2(10 + (2 * u.ugifts * nartifact_exist()))) {
                     godvoice(a_align(mtmp->mx, mtmp->my),
                             "Use my gift wisely!");
                     gift = mk_artifact((struct obj *) 0,
@@ -1274,13 +1274,22 @@ register struct monst *mtmp;
       } else if (otmp->otyp == AMULET_OF_YENDOR && In_endgame(&u.uz) &&
                  a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) {
             /* This will ALSO hopefully never happen. */
-            pline("%s raises the Amulet of Yendor high above the altar and offers it to the heavens!",
+            pline("%s raises the Amulet of Yendor high above the altar!",
                   Monnam(mtmp));
-            pline("%s accepts the Amulet and gains dominion over the gods, and %s ascends to demigodhood!",
-                  a_gname_at(mtmp->mx, mtmp->my), mon_nam(mtmp));
-            pline("Luckily for you, %s does not smite you with their newfound power, and you are allowed to live.",
-                  mon_nam(mtmp));
             useup(otmp);
+            if (is_demon(mtmp->data) || mtmp->iswiz) {
+                pline("%s gains ultimate power.",
+                      Monnam(mtmp));
+                pline("then brutally snuffs out your life.");
+                Sprintf(killer.name, "%s wrath", s_suffix(Monnam(mtmp)));
+                killer.format = KILLED_BY;
+                done(DIED);
+            } else {
+                pline("%s accepts the Amulet and gains dominion over the gods, and %s ascends to demigodhood!",
+                      a_gname_at(mtmp->mx, mtmp->my), mon_nam(mtmp));
+                pline("Luckily for you, %s does not smite you with their newfound power, and you are allowed to live.",
+                      mon_nam(mtmp));
+            }
             done(ESCAPED);
             return 3;
         }
