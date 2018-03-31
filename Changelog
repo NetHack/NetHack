@@ -5,10 +5,13 @@ Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
 General Changes
-- Monsters are now capable of sacrificing corpses on altars. If a monster on
-  the astral plane somehow obtains the Amulet of Yendor and makes it to an
-  altar, they will attempt to sacrifice it and gain immortality, causing an
-  instant loss.
+- Monsters are now capable of sacrificing corpses on altars, and all monsters
+  that like objects will now pick up corpses (as opposed to just nymphs).
+  In rare cases, this can result in monsters being gifted artifacts.
+-If a monster on the Astral Plane somehow obtains the Amulet of Yendor and
+  makes it to an altar, they will attempt to sacrifice it and gain immortality,
+  causing an instant loss. Getting this to happen is probably about as difficult
+  as winning the game.
 - Gaining a resistance other than poison resistance through food will cause you
   to lose your other resistances. This feature can be toggled off in the
   preferences file.

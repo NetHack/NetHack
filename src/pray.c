@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/6/18 by NullCGT */
+/* Edited on 3/31/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1227,6 +1227,65 @@ boolean bless_water;
               (bless_water ? hcolor(NH_LIGHT_BLUE) : hcolor(NH_BLACK)));
     }
     return (boolean) (changed > 0L);
+}
+
+boolean
+moffer(mtmp)
+register struct monst *mtmp;
+{
+    register struct obj *otmp;
+    register struct obj *gift;
+    /* loop based on select_hwep */
+    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
+        /* valid corpse and altar combination with which to sacrifice */
+        if (otmp->otyp == CORPSE &&
+            a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp &&
+            (otmp->corpsenm == PM_ACID_BLOB
+             || (monstermoves <= peek_at_iced_corpse_age(otmp) + 50))) {
+                pline("%s offers %s upon the altar.",
+                      Monnam(mtmp), doname(otmp));
+                /* monsters might try to offer cockatrice corpses. */
+                if (touch_petrifies(&mons[otmp->corpsenm])) {
+                      minstapetrify(mtmp, FALSE);
+                      return 2;
+                }
+                /* I hope that this edge case never occurs, especially since
+                   monsters don't pick up rider corpses. */
+                if (rider_corpse_revival(otmp, FALSE)) {
+                    return 3;
+                }
+                pline("The sacrifice of %s is consumed in a burst of flame!",
+                      mon_nam(mtmp));
+                useup(otmp);
+                /* monsters get experiments from sacrificing instead of luck */
+                if (!grow_up(mtmp, (struct monst *) 0)) {
+                    /* grew up into genocided monster */
+                    return 2;
+                /* very small chance that monsters can sacrifice for artifact */
+                } else if (rn2(10 + (2 * u.ugifts * nartifacts))) {
+                    godvoice(a_align(mtmp->mx, mtmp->my),
+                            "Use my gift wisely!");
+                    gift = mk_artifact((struct obj *) 0,
+                           a_align(mtmp->mx, mtmp->my));
+                    place_object(gift, mtmp->mx, mtmp->my);
+                }
+            return 3;
+        /* if nothing else to offer, try offering the amulet of yendor. */
+      } else if (otmp->otyp == AMULET_OF_YENDOR && In_endgame(&u.uz) &&
+                 a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) {
+            /* This will ALSO hopefully never happen. */
+            pline("%s raises the Amulet of Yendor high above the altar and offers it to the heavens!",
+                  Monnam(mtmp));
+            pline("%s accepts the Amulet and gains dominion over the gods, and %s ascends to demigodhood!",
+                  a_gname_at(mtmp->mx, mtmp->my), mon_nam(mtmp));
+            pline("Luckily for you, %s does not smite you with their newfound power, and you are allowed to live.",
+                  mon_nam(mtmp));
+            useup(otmp);
+            done(ESCAPED);
+            return 3;
+        }
+    }
+    return 0;
 }
 
 STATIC_OVL void
