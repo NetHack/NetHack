@@ -2,7 +2,7 @@
 #	Copyright (c) 1990-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
-# Edited on 3/22/18 by NullCGT
+# Edited on 3/30/18 by NullCGT
 #
 #	The dungeon description file for the "standard" 3.1 NetHack.
 #
@@ -30,7 +30,7 @@ CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
 RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
-BRANCH:   "The Void" @ (-2,0)
+BRANCH:		"The Void" @ (-2,0)
 LEVEL:		"castle" "none" @ (-1, 0)
 CHAINBRANCH:	"Gehennom" "castle" + (0, 0) no_down
 BRANCH:		"The Elemental Planes" @ (1, 0) no_down up

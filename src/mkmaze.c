@@ -491,7 +491,7 @@ fixup_special()
                 s_level *sp = find_level(r->rname.str);
                 lev = sp->dlevel;
             }
-        /* fall into... */
+            /*FALLTHRU*/
 
         case LR_UPSTAIR:
         case LR_DOWNSTAIR:

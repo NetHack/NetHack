@@ -1468,7 +1468,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (sblessed)
             do_class_genocide();
         else
-            do_genocide(!scursed | (2 * !!Confusion));
+            do_genocide((!scursed) | (2 * !!Confusion));
         break;
     case SCR_LIGHT:
         if (!confused || rn2(5)) {
@@ -1617,6 +1617,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             /* do_mapping() already reveals secret passages */
         }
         known = TRUE;
+        /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
             Your("%s spins as %s blocks the spell!", body_part(HEAD),

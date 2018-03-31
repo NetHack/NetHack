@@ -11,6 +11,7 @@ extern boolean notonhead;
 
 STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
 STATIC_DCL int FDECL(disturb, (struct monst *));
+STATIC_DCL boolean FDECL(moffer, (struct monst *));
 STATIC_DCL void FDECL(release_hero, (struct monst *));
 STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
@@ -795,6 +796,7 @@ register int after;
     long info[9];
     long flag;
     int omx = mtmp->mx, omy = mtmp->my;
+    int offer;
 
     if (mtmp->mtrapped) {
         int i = mintrap(mtmp);
@@ -816,6 +818,14 @@ register int after;
     }
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))
         return 0; /* do not leave hiding place */
+
+    /* Offering takes presedence over everything else.*/
+    if (IS_ALTAR(levl[mtmp->mx][mtmp->my].typ)) {
+        offer = moffer(mtmp);
+        if (offer != 0) {
+            return offer;
+        }
+    }
 
     set_apparxy(mtmp);
     /* where does mtmp think you are? */
@@ -946,7 +956,6 @@ not_special:
             }
         }
     }
-
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
                && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
@@ -1025,7 +1034,8 @@ not_special:
                     if ((is_pool(xx, yy) && !is_swimmer(ptr))
                         || (is_lava(xx, yy) && !likes_lava(ptr)))
                         continue;
-
+                    /* adding a check here to allow for monsters grabbing
+                       corpses when there is an altar available. */
                     if (((likegold && otmp->oclass == COIN_CLASS)
                          || (likeobjs && index(practical, otmp->oclass)
                              && (otmp->otyp != CORPSE
@@ -1475,6 +1485,44 @@ postmov:
         }
     }
     return mmoved;
+}
+
+boolean
+moffer(mtmp)
+register struct monst *mtmp;
+{
+    register struct obj *otmp;
+    /* loop based on select_hwep */
+    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
+        /* valid corpse and altar combination with which to sacrifice */
+        if (otmp->otyp == CORPSE &&
+            (a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) &&
+            (otmp->corpsenm == PM_ACID_BLOB
+             || (monstermoves <= peek_at_iced_corpse_age(otmp) + 50))) {
+            pline("%s offers %s upon the altar.", Monnam(mtmp), doname(otmp));
+            /* monsters might try to offer cockatrice corpses. */
+            if (touch_petrifies(otmp->corpsenm)) {
+                  minstapetrify(mtmp, FALSE);
+                  return 2;
+            }
+            pline("The sacrifice of %s is consumed in a burst of flame!",
+                  mon_nam(mtmp));
+            return 3;
+        /* if nothing else to offer, try offering the amulet of yendor. */
+        } else if (otmp->otyp == AMULET_OF_YENDOR && In_endgame(&u.uz)) {
+            /* This will hopefully never happen. */
+            pline("%s raises the Amulet of Yendor high above the altar and offers it to the heavens!",
+                  Monnam(mtmp));
+            pline("%s accepts their gift, and %s ascends to demigodhood!",
+                  a_gname_at(mtmp->mx, mtmp->my), mon_nam(mtmp));
+            pline("Luckily for you, %s does not smite you with their newfound power, and you are allowed to live.",
+                  mon_nam(mtmp));
+            useup(otmp);
+            done(ESCAPED);
+            return 3;
+        }
+    }
+    return 0;
 }
 
 void

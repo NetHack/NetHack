@@ -483,7 +483,7 @@ char *buf, *monbuf;
                 Strcpy(buf, "stone");
                 break;
             }
-            /*else FALLTHRU*/
+            /*FALLTHRU*/
         default:
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;

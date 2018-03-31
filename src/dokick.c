@@ -850,6 +850,7 @@ dokick()
                 pline("%s burps loudly.", Monnam(u.ustuck));
                 break;
             }
+            /*FALLTHRU*/
         default:
             Your("feeble kick has no effect.");
             break;
@@ -1331,7 +1332,8 @@ schar loc;
         } else if (In_endgame(&u.uz) || Is_botlevel(&u.uz)) {
             cc->y = cc->x = 0;
             break;
-        } /* else fall to the next cases */
+        }
+        /*FALLTHRU*/
     case MIGR_STAIRS_UP:
     case MIGR_LADDER_UP:
         cc->x = u.uz.dnum;

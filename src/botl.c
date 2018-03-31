@@ -1355,7 +1355,6 @@ int *colorptr;
         /* there are hilites set here */
         int max_pc = 0, min_pc = 100;
         int max_val = 0, min_val = LARGEST_INT;
-        boolean changed = FALSE;
         boolean exactmatch = FALSE;
 
         hl = blstats[idx][fldidx].thresholds;
@@ -1382,14 +1381,11 @@ int *colorptr;
             case BL_TH_UPDOWN:
                 if (chg < 0 && hl->rel == LT_VALUE) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
-                    changed = TRUE;
                 } else if (chg > 0 && hl->rel == GT_VALUE) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
-                    changed = TRUE;
                 } else if (hl->rel == EQ_VALUE && chg) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = max_val = hl->value.a_int;
-                    changed = TRUE;
                 }
                 break;
             case BL_TH_VAL_ABSOLUTE:

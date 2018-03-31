@@ -2465,7 +2465,7 @@ register struct monst *mtmp;
                     mtmp->mtrapped = 1;
                     break;
                 }
-            /* fall though */
+                /*FALLTHRU*/
             default:
                 if (mptr->mlet == S_GIANT
                     /* exclude baby dragons and relatively short worms */

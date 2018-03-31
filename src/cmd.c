@@ -4122,7 +4122,8 @@ register char *cmd;
         break;
     case NHKF_RUN2:
         if (!Cmd.num_pad)
-            break; /* else FALLTHRU */
+            break;
+        /*FALLTHRU*/
     case NHKF_RUN:
         if (movecmd(lowc(cmd[1]))) {
             context.run = 3;
@@ -4132,7 +4133,8 @@ register char *cmd;
         break;
     case NHKF_FIGHT2:
         if (!Cmd.num_pad)
-            break; /* else FALLTHRU */
+            break;
+        /*FALLTHRU*/
     /* Effects of movement commands and invisible monsters:
      * m: always move onto space (even if 'I' remembered)
      * F: always attack space (even if 'I' not remembered)
@@ -4531,14 +4533,16 @@ const char *msg;
         break;
     case NHKF_RUN2:
         if (!Cmd.num_pad)
-            break; /* else FALLTHRU */
+            break;
+        /*FALLTHRU*/
     case NHKF_RUN:
     case NHKF_RUN_NOPICKUP:
         dothat = "run";
         break;
     case NHKF_FIGHT2:
         if (!Cmd.num_pad)
-            break; /* else FALLTHRU */
+            break;
+        /*FALLTHRU*/
     case NHKF_FIGHT:
         dothat = "fight";
         how = ""; /* avoid "fight at yourself" */

@@ -302,7 +302,7 @@ int force;
                 case THRONE:
                     if (cansee(x, y))
                         pline_The("throne falls into a chasm.");
-                /* Falls into next case */
+                    /*FALLTHRU*/
                 case ROOM:
                 case CORR: /* Try to make a pit */
                 do_pit:

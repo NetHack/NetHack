@@ -1876,6 +1876,7 @@ nextclass:
         switch (sym) {
         case 'a':
             allflag = 1;
+            /*FALLTHRU*/
         case 'y':
             tmp = (*fn)(otmp);
             if (tmp < 0) {
@@ -1892,6 +1893,7 @@ nextclass:
             cnt += tmp;
             if (--mx == 0)
                 goto ret;
+            /*FALLTHRU*/
         case 'n':
             if (nodot)
                 dud++;

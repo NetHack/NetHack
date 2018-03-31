@@ -5,6 +5,10 @@ Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
 General Changes
+- Monsters are now capable of sacrificing corpses on altars. If a monster on
+  the astral plane somehow obtains the Amulet of Yendor and makes it to an
+  altar, they will attempt to sacrifice it and gain immortality, causing an
+  instant loss.
 - Gaining a resistance other than poison resistance through food will cause you
   to lose your other resistances. This feature can be toggled off in the
   preferences file.
@@ -45,7 +49,7 @@ General Changes
 - If preferred pet is set to '@', the player spawns with an adventuring party.
   This is very experimental, and probably should not be used.
 - Some of the less powerful or less unique quest nemeses have been changed to
-  be more challenging or interesting (see below)
+  be more challenging or interesting (see below).
 - Bribing demon lords has been greatly expanded. They now can potentially ask
   for powerful items in your inventory instead of gold, and you can also use
   decks of cards to gamble on your immortal soul with them. Challenging them
@@ -66,7 +70,8 @@ Quest Nemesis Changes
   demons found in gehennom.
 - Ixoth's claw attack can stun the opponent.
 - The Dark One now casts spells twice per turn.
-- Thoth Amon now casts a mix of clerical and mage spells.
+- Thoth Amon now casts a mix of clerical and mage spells. The changes to monster
+  sacrifice at altars could also cause some interesting effects.
 - Ixoth and the Chromatic Dragon are both affected by dragon changes, and as
   such are potentially nastier.
 
