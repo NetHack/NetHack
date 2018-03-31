@@ -1343,26 +1343,31 @@ losespells()
  *      are learned, they get inserted into sorted order rather than be
  *      appended to the end of the list?
  */
-static const char *spl_sortchoices[] = {
+enum spl_sort_types {
+    SORTBY_LETTER = 0,
+    SORTBY_ALPHA,
+    SORTBY_LVL_LO,
+    SORTBY_LVL_HI,
+    SORTBY_SKL_AL,
+    SORTBY_SKL_LO,
+    SORTBY_SKL_HI,
+    SORTBY_CURRENT,
+    SORTRETAINORDER,
+
+    NUM_SPELL_SORTBY
+};
+
+static const char *spl_sortchoices[NUM_SPELL_SORTBY] = {
     "by casting letter",
-#define SORTBY_LETTER 0
     "alphabetically",
-#define SORTBY_ALPHA 1
     "by level, low to high",
-#define SORTBY_LVL_LO 2
     "by level, high to low",
-#define SORTBY_LVL_HI 3
     "by skill group, alphabetized within each group",
-#define SORTBY_SKL_AL 4
     "by skill group, low to high level within group",
-#define SORTBY_SKL_LO 5
     "by skill group, high to low level within group",
-#define SORTBY_SKL_HI 6
     "maintain current ordering",
-#define SORTBY_CURRENT 7
     /* a menu choice rather than a sort choice */
     "reassign casting letters to retain current order",
-#define SORTRETAINORDER 8
 };
 static int spl_sortmode = 0;   /* index into spl_sortchoices[] */
 static int *spl_orderindx = 0; /* array of spl_book[] indices */

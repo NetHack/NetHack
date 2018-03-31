@@ -25,10 +25,12 @@ struct container {
     genericptr_t list;
 };
 
-#define CONS_OBJ 0
-#define CONS_MON 1
-#define CONS_HERO 2
-#define CONS_TRAP 3
+enum bubble_contains_types {
+    CONS_OBJ = 0,
+    CONS_MON,
+    CONS_HERO,
+    CONS_TRAP
+};
 
 struct bubble {
     xchar x, y;   /* coordinates of the upper left corner */
