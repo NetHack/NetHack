@@ -532,6 +532,10 @@ when #force reports that a chest's lock is already broken or already unlocked,
 	already known, rather than as "a broken chest" or "an unlocked chest"
 honor wish for "locked", "unlocked", or "broken" chest or box
 honor wish for "empty" container including statue, bag-o-tricks, horn-o-plenty
+gas spore explosion killing a gas spore which triggers a recursive explosion
+	would have killer reason for outer call clobbered by inner one; when
+	they were both "gas spore's explosion" it wouldn't be noticeable (see
+	corresponding post-3.6.0 entry for more...)
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -614,6 +618,11 @@ when clairvoyance lets you move the cursor to examine the map (if it occurs
 prevent Mjollnir from being auto-quivered if it's been thrown without return
 	and then picked back up while quiver slot is empty
 plural of "fox" is not "foxen"
+gas spore explosion killing a gas spore which triggers a recursive explosion
+	would have killer reason for outer call clobbered by inner one;
+	"You are hit by the gas spore's explosion!" (inner call, followed by)
+	"You are hit by the !" (outer call, possibly repeated for multiple
+	explosions causing multiple levels of recursion)
 
 
 Platform- and/or Interface-Specific Fixes
