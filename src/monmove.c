@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 3/23/18 by NullCGT */
+/* Edited 3/31/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -1496,12 +1496,12 @@ register struct monst *mtmp;
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         /* valid corpse and altar combination with which to sacrifice */
         if (otmp->otyp == CORPSE &&
-            (a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) &&
+            /*(a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) &&*/
             (otmp->corpsenm == PM_ACID_BLOB
              || (monstermoves <= peek_at_iced_corpse_age(otmp) + 50))) {
             pline("%s offers %s upon the altar.", Monnam(mtmp), doname(otmp));
             /* monsters might try to offer cockatrice corpses. */
-            if (touch_petrifies(otmp->corpsenm)) {
+            if (touch_petrifies(&mons[otmp->corpsenm])) {
                   minstapetrify(mtmp, FALSE);
                   return 2;
             }
