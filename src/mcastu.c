@@ -20,9 +20,9 @@ enum mcast_mage_spells {
     MGC_SUMMON_MONS,
     MGC_CLONE_WIZ,
     MGC_DEATH_TOUCH
-    #define MGC_SONIC_SCREAM 12
-    #define MGC_GAS_CLOUD 13
-    #define MGC_SLIME_SPRAY
+    MGC_SONIC_SCREAM
+    MGC_GAS_CLOUD
+    MGC_SLIME_SPRAY
 };
 
 /* monster cleric spells */
