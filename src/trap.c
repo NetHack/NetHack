@@ -1650,6 +1650,8 @@ struct obj *otmp;
         steedhit = TRUE;
         break;
     case POLY_TRAP:
+        deltrap(trap);
+        newsym(steed->mx, steed->my);
         if (!resists_magm(steed) && !resist(steed, WAND_CLASS, 0, NOTELL)) {
             struct permonst *mdat = steed->data;
 
@@ -2683,11 +2685,14 @@ register struct monst *mtmp;
             if (resists_magm(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
             } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-                if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+                if (newcham(mtmp, (struct permonst *) 0, FALSE, TRUE)) {
                     /* we're done with mptr but keep it up to date */
                     mptr = mtmp->data;
-                if (in_sight)
+                    deltrap(trap);
+                }
+                if (in_sight) {
                     seetrap(trap);
+                }
             }
             break;
         case ROLLING_BOULDER_TRAP:
