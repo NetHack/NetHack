@@ -1184,11 +1184,6 @@ fumaroles()
  * other source files, but they are all so nicely encapsulated here.
  */
 
-#define CONS_OBJ 0
-#define CONS_MON 1
-#define CONS_HERO 2
-#define CONS_TRAP 3
-
 static struct bubble *bbubbles, *ebubbles;
 
 static struct trap *wportal;

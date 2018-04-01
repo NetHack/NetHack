@@ -16,12 +16,14 @@ STATIC_DCL int FDECL(adj_pit_checks, (coord *, char *));
 STATIC_DCL void FDECL(pit_flow, (struct trap *, SCHAR_P));
 
 /* Indices returned by dig_typ() */
-#define DIGTYP_UNDIGGABLE 0
-#define DIGTYP_ROCK 1
-#define DIGTYP_STATUE 2
-#define DIGTYP_BOULDER 3
-#define DIGTYP_DOOR 4
-#define DIGTYP_TREE 5
+enum dig_types {
+    DIGTYP_UNDIGGABLE = 0,
+    DIGTYP_ROCK,
+    DIGTYP_STATUE,
+    DIGTYP_BOULDER,
+    DIGTYP_DOOR,
+    DIGTYP_TREE
+};
 
 STATIC_OVL boolean
 rm_waslit()
