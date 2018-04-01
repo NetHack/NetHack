@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/16/18 by NullCGT */
+/* Edited on 4/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -19,9 +19,9 @@ enum mcast_mage_spells {
     MGC_AGGRAVATION,
     MGC_SUMMON_MONS,
     MGC_CLONE_WIZ,
-    MGC_DEATH_TOUCH
-    MGC_SONIC_SCREAM
-    MGC_GAS_CLOUD
+    MGC_DEATH_TOUCH,
+    MGC_SONIC_SCREAM,
+    MGC_GAS_CLOUD,
     MGC_SLIME_SPRAY
 };
 

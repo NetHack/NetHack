@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/1/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -750,6 +750,13 @@ NEARDATA struct permonst mons[] = {
         SIZ(1200, 500, MS_IMITATE, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_OMNIVORE, M2_HOSTILE | M2_STRONG,
         M3_INFRAVISIBLE, CLR_RED),
+    MON("earthshark", S_QUADRUPED, LVL(7, 12, 2, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(500, 350, MS_SILENT, MZ_LARGE), 0, 0,
+        M1_WALLWALK | M1_ANIMAL | M1_SLITHY | M1_NOHANDS
+            | M1_CARNIVORE | M1_OVIPAROUS | M1_THICK_HIDE | M1_NOTAKE,
+        M2_HOSTILE | M2_STRONG, 0, CLR_GRAY),
     MON("wumpus", S_QUADRUPED, LVL(8, 3, 2, 10, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 3, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -850,6 +857,12 @@ NEARDATA struct permonst mons[] = {
         M1_CONCEAL | M1_ANIMAL | M1_NOHANDS | M1_OVIPAROUS | M1_POIS
             | M1_CARNIVORE,
         M2_HOSTILE, 0, CLR_RED),
+    MON("monstrous spider", S_SPIDER, LVL(8, 15, 4, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_DRST, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(200, 200, MS_SILENT, MZ_HUGE), MR_POISON, MR_POISON,
+        M1_ANIMAL | M1_NOHANDS | M1_OVIPAROUS | M1_POIS | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG, 0, CLR_ORANGE),
     /*
      * trappers, lurkers, &c
      */
@@ -1357,11 +1370,11 @@ NEARDATA struct permonst mons[] = {
         0, CLR_BROWN),
     /* Hex dragons are powerful spellcasters, and can move around the map
        with teleportation and wall walking.*/
-    MON("hex dragon", S_DRAGON, LVL(20, 9, -10, 20, -6), (G_GENO | 1),
+    MON("hex dragon", S_DRAGON, LVL(20, 9, -10, 80, -6), (G_GENO | 1),
         A(ATTK(AT_MAGC, AD_SPEL, 4, 6), ATTK(AT_BITE, AD_CURS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
           NO_ATTK),
-        SIZ(WT_DRAGON, 1500, MS_MUMBLE, MZ_GIGANTIC), MR_DISINT, MR_DISINT,
+        SIZ(WT_DRAGON, 1500, MS_MUMBLE, MZ_GIGANTIC), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_WALLWALK
             | M1_CARNIVORE | M1_TPORT,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
@@ -2950,6 +2963,13 @@ struct permonst _mons2[] = {
         SIZ(1800, 1000, MS_SILENT, MZ_HUGE), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
         M2_NOPOLY | M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, CLR_RED),
+    MON("elder kraken", S_EEL, LVL(30, 3, 6, 0, -3), (G_GENO | G_NOGEN),
+        A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_MAGC, AD_SPEL, 4, 4),
+          ATTK(AT_HUGS, AD_WRAP, 2, 6), ATTK(AT_BITE, AD_PHYS, 5, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(1800, 1000, MS_SILENT, MZ_HUGE), 0, 0,
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
+        M2_NOPOLY | M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, HI_LORD),
     /*
      * lizards, &c
      */

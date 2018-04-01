@@ -38,7 +38,8 @@ General Changes
 - VENOM_CLASS and Q_CLASS are referred to differently in game.
 - Guards, Nymphs, and Kops are generated with names.
 - Nephi's grudge patch has been implemented and expanded, so monsters will
-  attack certain other monsters they are opposed to.
+  attack certain other monsters they are opposed to. This dovetails nicely with
+  altar changes.
 - Dragons have been made subtly more difficult. Hostile monsters with the "roar"
   sound will occasionally roar when the player is nearby, aggravating monsters
   on the level. Additionally, dragons are counted as having hands for the
@@ -174,6 +175,9 @@ New Items
 
 New Monsters
 - Giant Fly
+- Earthshark
+- Will-O'-The-Wisp
+- Monstrous spider
 - Memory Hound
 - Weeping Eye
 - Serval
@@ -203,8 +207,9 @@ New Monsters
 - Velociraptor
 - T-Rex
 - Banshee
-- Cartomancer
-- Dragonmaster
+- Elder Kraken
+- Cartomancer (Player Monster)
+- Dragonmaster (Player Monster)
 - Drake (Dragonmaster Quest)
 
 New Unique Monsters

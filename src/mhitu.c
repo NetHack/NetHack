@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/17/18 by NullCGT */
+/* Edited on 4/11/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -2316,6 +2316,30 @@ struct attack *mattk;
             } else {
                 u_slow_down();
                 stop_occupation();
+            }
+        }
+        break;
+    case AD_DISN:
+        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
+            && multi >= 0 && !rn2(10) && !Disint_resistance) {
+            if (cancelled) {
+                react = 3;
+            } else {
+
+            }
+        }
+        break;
+    case AD_CNCL:
+    /* traditionally the beholder's central eye can do this constantly, so
+       very high chance. */
+        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
+            && multi >= 0 && !rn2(3)) {
+            if (cancelled) {
+                react = 3;
+            } else {
+                pline("The %s gazes at you with its central eye.",
+                    Monnam(mtmp));
+                cancel_monst(&youmonst, (struct obj *) 0, TRUE, FALSE, FALSE);
             }
         }
         break;

@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 3/31/18 by NullCGT */
+/* Edited 4/1/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -1041,7 +1041,7 @@ not_special:
                          || (likeobjs && index(practical, otmp->oclass)
                              && (otmp->otyp != CORPSE
                                  || (otmp-> otyp == CORPSE
-                                     && !is_demon(mtmp)
+                                     && !is_demon(mtmp->data)
                                      && !is_rider(&mons[otmp->corpsenm]))))
                          || (likemagic && index(magical, otmp->oclass))
                          || (uses_items && searches_for_item(mtmp, otmp))

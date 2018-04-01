@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/1/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -946,6 +946,7 @@ static const short grownups[][2] = {
     { PM_URUK_HAI, PM_ORC_CAPTAIN },
     { PM_SEWER_RAT, PM_GIANT_RAT },
     { PM_CAVE_SPIDER, PM_GIANT_SPIDER },
+    { PM_GIANT_SPIDER, PM_MONSTROUS_SPIDER },
     { PM_OGRE, PM_OGRE_LORD },
     { PM_OGRE_LORD, PM_OGRE_KING },
     { PM_ELF, PM_ELF_LORD },
