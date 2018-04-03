@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/3/18 by NullCGT */
+
 #include "hack.h"
 #include "lev.h"
 
@@ -1131,6 +1133,14 @@ struct monst *mtmp;
         bwrite(fd, (genericptr_t) &buflen, sizeof(int));
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EDOG(mtmp), buflen);
+
+        if (EAMA(mtmp))
+            buflen = sizeof(struct eama);
+        else
+            buflen = 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) EAMA(mtmp), buflen);
 
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */

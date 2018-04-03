@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 3/31/18 by NullCGT */
+/* Edited on 4/3/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -1126,6 +1126,8 @@ E void FDECL(readmail, (struct obj *));
 
 /* ### makemon.c ### */
 
+E void FDECL(neweama, (struct monst *));
+E void FDECL(free_eama, (struct monst *));
 E void FDECL(dealloc_monst, (struct monst *));
 E boolean FDECL(is_home_elemental, (struct permonst *));
 E struct monst *FDECL(clone_mon, (struct monst *, XCHAR_P, XCHAR_P));

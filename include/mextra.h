@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/3/18 by NullCGT */
+
 #ifndef MEXTRA_H
 #define MEXTRA_H
 
@@ -168,6 +170,11 @@ struct edog {
     Bitfield(killed_by_u, 1); /* you attempted to kill him */
 };
 
+struct eama {
+    struct permonst *m1; /* first monster */
+    struct permonst *m2; /* first monster */
+};
+
 /***
  **     mextra.h -- collection of all monster extensions
  */
@@ -178,6 +185,7 @@ struct mextra {
     struct eshk *eshk;
     struct emin *emin;
     struct edog *edog;
+    struct eama *eama;
     int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse */
 };
 
@@ -187,6 +195,7 @@ struct mextra {
 #define ESHK(mon) ((mon)->mextra->eshk)
 #define EMIN(mon) ((mon)->mextra->emin)
 #define EDOG(mon) ((mon)->mextra->edog)
+#define EAMA(mon) ((mon)->mextra->eama)
 #define MCORPSENM(mon) ((mon)->mextra->mcorpsenm)
 
 #define has_mname(mon) ((mon)->mextra && MNAME(mon))
@@ -195,6 +204,7 @@ struct mextra {
 #define has_eshk(mon)  ((mon)->mextra && ESHK(mon))
 #define has_emin(mon)  ((mon)->mextra && EMIN(mon))
 #define has_edog(mon)  ((mon)->mextra && EDOG(mon))
+#define has_eama(mon)  ((mon)->mextra && EAMA(mon))
 #define has_mcorpsenm(mon) ((mon)->mextra && MCORPSENM(mon) != NON_PM)
 
 #endif /* MEXTRA_H */

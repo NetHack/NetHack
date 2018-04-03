@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/23/18 by NullCGT */
+/* Edited on 4/3/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1740,6 +1740,11 @@ struct monst *mtmp2, *mtmp1;
             newedog(mtmp2);
         *EDOG(mtmp2) = *EDOG(mtmp1);
     }
+    if (EAMA(mtmp1)) {
+        if (!EAMA(mtmp2))
+            neweama(mtmp2);
+        *EAMA(mtmp2) = *EAMA(mtmp1);
+    }
     if (has_mcorpsenm(mtmp1))
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
@@ -1763,6 +1768,8 @@ struct monst *m;
             free((genericptr_t) x->emin);
         if (x->edog)
             free((genericptr_t) x->edog);
+        if (x->eama)
+            free((genericptr_t) x->eama);
         /* [no action needed for x->mcorpsenm] */
 
         free((genericptr_t) x);

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 4/3/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -3464,6 +3464,8 @@ boolean incl_wsegs;
             sz += (int) sizeof (struct emin);
         if (EDOG(mtmp))
             sz += (int) sizeof (struct edog);
+        if (EAMA(mtmp))
+            sz += (int) sizeof (struct eama);
         /* mextra->mcorpsenm doesn't point to more memory */
     }
     return sz;

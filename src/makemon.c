@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/12/18 by NullCGT */
+/* Edited on 4/3/18 by NullCGT */
 
 #include "hack.h"
 
@@ -32,6 +32,31 @@ extern const int monstr[];
 #define m_initlgrp(mtmp, x, y) m_initgrp(mtmp, x, y, 10)
 #define toostrong(monindx, lev) (monstr[monindx] > lev)
 #define tooweak(monindx, lev) (monstr[monindx] < lev)
+
+void
+neweama(mtmp)
+struct monst *mtmp;
+{
+    if (!mtmp->mextra)
+        mtmp->mextra = newmextra();
+    if (!EAMA(mtmp)) {
+        EAMA(mtmp) = (struct eama *) alloc(sizeof(struct eama));
+        (void) memset((genericptr_t) EAMA(mtmp), 0, sizeof(struct eama));
+    }
+    /* set up the monster components */
+    EAMA(mtmp)->m1 = rndmonst();
+    EAMA(mtmp)->m2 = rndmonst();
+}
+
+void
+free_eama(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && EAMA(mtmp)) {
+        free((genericptr_t) EAMA(mtmp));
+        EAMA(mtmp) = (struct eama *) 0;
+    }
+}
 
 boolean
 is_home_elemental(ptr)
@@ -1022,6 +1047,7 @@ newmextra()
     mextra->eshk = 0;
     mextra->emin = 0;
     mextra->edog = 0;
+    mextra->eama = 0;
     mextra->mcorpsenm = NON_PM;
     return mextra;
 }
@@ -1198,6 +1224,8 @@ int mmflags;
         newemin(mtmp);
     if (mmflags & MM_EDOG)
         newedog(mtmp);
+    if (mmflags & MM_EAMA)
+        neweama(mtmp);
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -1295,36 +1323,19 @@ int mmflags;
             && !is_elf(ptr) && !(is_dwarf(ptr))) {
             mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         }
+        break;
     /* dummied out amalgamation code */
-    #if 0
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION) {
-
-          first_mon = rndmonst();
-          second_mon = rndmonst();
-          final_mon = newmonst();
-          final_mon->mlevel = max(first_mon->mlevel, second_mon->mlevel);
-          final_mon->mmove = max(first_mon->mmove, second_mon->mmove);
-          final_mon->ac = max(first_mon->ac, second_mon->ac);
-          /* should find a more efficient way to do attacks */
-          final_mon->mattk[0] = first_mon->mattk[0];
-          final_mon->mattk[1] = second_mon->mattk[1];
-          final_mon->mattk[2] = first_mon->mattk[2];
-          final_mon->mattk[3] = second_mon->mattk[3];
-          final_mon->mattk[4] = first_mon->mattk[4];
-          final_mon->mattk[5] = second_mon->mattk[5];
-          final_mon->msound = first_mon->msound;
-          final_mon->msize = second_mon->msize;
-          final_mon->cwt = second_mon->cwt;
-          final_mon->cnutrit = first_mon->cnutrit;
-          final_mon->mflags1 = first_mon->mflags1;
-          final_mon->mflags2 = second_mon->mflags2;
-          final_mon->mresists = first_mon->mresists;
-          final_mon->mconveys = second_mon->mconveys;
-
-          mtmp->data = final_mon;
+            neweama(mtmp);
+            char buf[BUFSZ];
+            strcpy(buf, "half ");
+            strcat(buf, EAMA(mtmp)->m1->mname);
+            strcat(buf, ", half ");
+            strcat(buf, EAMA(mtmp)->m2->mname);
+            mtmp = christen_monst(mtmp, buf);
         }
-    #endif
+        break;
     }
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,
