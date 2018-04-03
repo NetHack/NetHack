@@ -37,6 +37,10 @@ STATIC_DCL void NDECL(unsetup_waterlevel);
         }                                                        \
     } while (0)
 
+/* Returns TRUE if the terrain at the given location is in-bounds and is a
+ * wall, door, secret door, or iron bars.
+ * Despite the name, any door will return TRUE here, even if it's open, broken,
+ * or missing. */
 STATIC_OVL int
 iswall(x, y)
 int x, y;
@@ -50,6 +54,8 @@ int x, y;
             || type == SDOOR || type == IRONBARS);
 }
 
+/* Same as iswall(), except also returns TRUE if the terrain at the given
+ * location is stone. */
 STATIC_OVL int
 iswall_or_stone(x, y)
 int x, y;
@@ -120,7 +126,8 @@ int wall_there, dx, dy;
     return spine;
 }
 
-/* Remove walls totally surrounded by stone */
+/* Remove walls totally surrounded by stone.
+ * Arguments specify the rectangle in which to do this. */
 void
 wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
@@ -152,7 +159,8 @@ int x1, y1, x2, y2;
         }
 }
 
-/* Correct wall types so they extend and connect to each other */
+/* Correct wall types so they extend and connect to each other, within the
+ * given rectangle. */
 void
 fix_wall_spines(x1, y1, x2, y2)
 int x1, y1, x2, y2;
@@ -215,6 +223,8 @@ int x1, y1, x2, y2;
         }
 }
 
+/* Cleans up walls within the given rectangle. Does NOT change stone into
+ * walls. */
 void
 wallification(x1, y1, x2, y2)
 int x1, y1, x2, y2;
@@ -223,6 +233,15 @@ int x1, y1, x2, y2;
     fix_wall_spines(x1, y1, x2, y2);
 }
 
+/* Returns TRUE if the spot two steps in dir direction from the given location
+ * is:
+ * 1: Stone terrain.
+ * 2: More than 3 steps away from the left and top maze edges. (x=0 doesn't
+ *    exist, so it makes sense that the maze wall starts at x=3, but I'm not
+ *    sure why the upper wall can't start at y=0 and the maze at y=1).
+ * 3: Otherwise within the maze.
+ * Used exclusively in walkfrom() to determine whether it should carve a path
+ * to a new space. */
 STATIC_OVL boolean
 okay(x, y, dir)
 int x, y;
@@ -236,7 +255,9 @@ int dir;
     return TRUE;
 }
 
-/* find random starting point for maze generation */
+/* Choose a random starting point for maze generation.
+ * The point is guaranteed to be on the maze grid: that is, it must have odd x
+ * and y coordinates and have 3 <= x < x_maze_max and 3 <= y < y_maze_max */
 STATIC_OVL void
 maze0xy(cc)
 coord *cc;
@@ -265,7 +286,8 @@ xchar lx, ly, hx, hy;
 }
 
 /* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
-   and place something (based on rtype) in that region */
+   and place something (based on rtype) in that region.
+   If lx = 0, it will try the whole level rather than a subregion. */
 void
 place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 xchar lx, ly, hx, hy;
@@ -313,6 +335,13 @@ d_level *lev;
     impossible("Couldn't place lregion type %d!", rtype);
 }
 
+/* Try to place something based on rtype specifically at (x,y).
+ * If the location is bad (occupied, has a trap, or is within the rectangle
+ * (nlx, nly, nhx, nhy), it'll fail, UNLESS oneshot is specified, in which case
+ * it'll try to make it non-bad by removing a trap.
+ * oneshot basically means we're only trying this space, so don't tell the
+ * caller to try somewhere else.
+ */
 STATIC_OVL boolean
 put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)
 xchar x, y;
@@ -616,6 +645,9 @@ fixup_special()
     num_lregions = 0;
 }
 
+/* Return TRUE iff the given location is within the valid maze area.
+ * Terrain type and whether the location is a possible intersection are not
+ * checked. */
 boolean
 maze_inbounds(x, y)
 int x, y;
@@ -624,6 +656,11 @@ int x, y;
             && x < x_maze_max && y < y_maze_max && isok(x, y));
 }
 
+/* Remove all dead ends from the maze.
+ * Does this by looking for spots that have 3 or more directions in which they
+ * are separated from another open space 2 squares away by some inaccessible
+ * terrain. Then it picks a random one of these directions and replaces the
+ * wall between them with whatever terrain typ is. */
 void
 maze_remove_deadends(typ)
 xchar typ;
@@ -972,6 +1009,16 @@ schar typ;
 }
 #else /* !MICRO */
 
+/* Main guts of the maze generator.
+ * First converts this space to typ, unless it's a door (presumably for special
+ * levels).
+ * From the given location, search all four directions for a valid place to
+ * carve a path (it must be STONE to be valid, see okay()).
+ * If more than one direction can have a path carved, pick one randomly, carve
+ * the path there, then recurse on it.
+ * This algorithm is a depth-first search and is generally known as "Recursive
+ * Backtracker". It tends to generate long twisty passages with some long and
+ * some short twisty dead-end side branches. */
 void
 walkfrom(x, y, typ)
 int x, y;
@@ -1009,8 +1056,12 @@ schar typ;
 }
 #endif /* ?MICRO */
 
-/* find random point in generated corridors,
-   so we don't create items in moats, bunkers, or walls */
+/* Finds a random point in the maze area which has the designated floor type of
+ * the maze (CORR if the corrmaze flag is set, ROOM otherwise).
+ * This is to avoid creating items, monsters, and features in illegal terrain
+ * like moats, bunkers, or walls.
+ * Argument is a pointer to coord that will be set by this function.
+ * Panics if it cannot find any valid points. */
 void
 mazexy(cc)
 coord *cc;
@@ -1135,6 +1186,8 @@ bound_digging()
             }
 }
 
+/* Creates a magic portal at the given location, pointing to the given dungeon
+ * number and level. */
 void
 mkportal(x, y, todnum, todlevel)
 xchar x, y, todnum, todlevel;
@@ -1154,6 +1207,9 @@ xchar x, y, todnum, todlevel;
     return;
 }
 
+/* Selects d3+1 points on the level; create a large gas cloud on top of any of
+ * these that are LAVAPOOL terrain.
+ * Used only on the Plane of Fire. */
 void
 fumaroles()
 {
@@ -1431,6 +1487,9 @@ int fd;
     was_waterlevel = TRUE;
 }
 
+/* Return a string representing the type of liquid at the given x and y.
+ * Assumes that the terrain type at this location is in fact some sort of
+ * water, lava, or ice. */
 const char *
 waterbody_name(x, y)
 xchar x, y;
@@ -1461,6 +1520,8 @@ xchar x, y;
     return hliquid("water");
 }
 
+/* Set the global variable wportal to point to the magic portal on the current
+ * level. */
 STATIC_OVL void
 set_wportal()
 {
