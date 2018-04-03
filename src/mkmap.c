@@ -25,6 +25,7 @@ static char *new_locations;
 int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */
 static int n_loc_filled;
 
+/* Unconditionally sets the whole map's terrain to bg_typ. */
 STATIC_OVL void
 init_map(bg_typ)
 schar bg_typ;
@@ -36,6 +37,9 @@ schar bg_typ;
             levl[i][j].typ = bg_typ;
 }
 
+/* Randomly replaces 2/5 of squares on the level that have bg_typ terrain
+ * with terrain of fg_typ.
+ * Used to "seed" the random cavern-like generation. */
 STATIC_OVL void
 init_fill(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -55,6 +59,9 @@ schar bg_typ, fg_typ;
     }
 }
 
+/* Return the terrain type at the given location, or bg_typ if out of bounds.
+ * Used in determining the count of "live" neighbors in cavernous generation
+ * (outside the map all counts as dead). */
 STATIC_OVL schar
 get_map(col, row, bg_typ)
 int col, row;
@@ -68,6 +75,20 @@ schar bg_typ;
 static int dirs[16] = { -1, -1 /**/, -1, 0 /**/,  -1, 1 /**/, 0, -1 /**/,
                         0,  1 /**/,  1,  -1 /**/, 1,  0 /**/, 1, 1 };
 
+/* First pass of the cavernous generation: essentially one iteration of
+ * Conway's Game of Life applied to levl.
+ *
+ * Evaluate each cell's neighbors to see if they are "alive" (fg_typ terrain)
+ * or "dead" (bg_typ terrain), counting the edge of the map as dead.
+ * If a dead cell has 5 or more alive neighbors it turns into fg_typ (becoming
+ * alive). If an alive cell has 2 or fewer alive neighbors it turns into bg_typ
+ * (becoming dead). Cells with 3 or 4 alive neighbors remain the way they are.
+ *
+ * Note that this is NOT storing the results in a backup buffer. It edits levl
+ * as it goes, meaning that the results for some cells may be affected by the
+ * previous results. Not sure why it doesn't use new_locations like the other
+ * pass_* functions do.
+ */
 STATIC_OVL void
 pass_one(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -102,6 +123,12 @@ schar bg_typ, fg_typ;
 
 #define new_loc(i, j) *(new_locations + ((j) * (WIDTH + 1)) + (i))
 
+/* Second pass at the game of life cellular automaton, except unlike the last
+ * time, all it is doing is converting cells with exactly 5 neighbors into dead
+ * cells.
+ *
+ * This time, it stores results in a temporary buffer, then copies them over
+ * after it finishes. */
 STATIC_OVL void
 pass_two(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -126,6 +153,13 @@ schar bg_typ, fg_typ;
             levl[i][j].typ = new_loc(i, j);
 }
 
+/* Third pass at the cellular automaton: kill any live cells with fewer than 3
+ * live neighbors.
+ *
+ * Like pass_two, it uses the new_locations temporary buffer and doesn't save
+ * changes to levl until it's finished determining all the cell states.
+ *
+ * According to code below, this is used to tune map smoothing.*/
 STATIC_OVL void
 pass_three(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -269,6 +303,13 @@ wallify_map()
             }
 }
 
+/* Connects all the discrete blobs of fg_typ on the level with "corridors" made
+ * of fg_typ.
+ * Does this by finding the blobs via floodfill and labeling each as a separate
+ * irregular room, then picking a random coordinate within the
+ * already-connected rooms and some other room that isn't connected yet.
+ * If any blob is of size 3 or less, it'll be removed instead of being
+ * connected. */
 STATIC_OVL void
 join_map(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -342,6 +383,14 @@ joinm:
     }
 }
 
+/* Post-processing of a level to set some final attributes which may be defined
+ * in a special level or otherwise.
+ * If lit is TRUE, the entire level will be lit, excluding rock terrain.
+ * If walled is TRUE, the level will be wallified.
+ * If icedpools is TRUE, any ice on the level will be treated as a pool rather
+ * than a moat.
+ * Also automatically sets any lava terrain to be lit.
+ */
 STATIC_OVL void
 finish_map(fg_typ, bg_typ, lit, walled, icedpools)
 schar fg_typ, bg_typ;
@@ -448,6 +497,14 @@ unsigned roomno;
 #define N_P2_ITER 1 /* tune map generation via this value */
 #define N_P3_ITER 2 /* tune map smoothing via this value */
 
+/* Fully create a level with the cavernous generation filler algorithm.
+ * Extracts its parameters from the fields of its init_lev argument, which
+ * control smoothing, joining, wallification, and lighting.
+ *
+ * N_P1_ITER and friends control the number of times that each pass_* function
+ * will be run. Note that pass_three is called only if init_lev->smoothed is
+ * TRUE, regardless of what N_P3_ITER is.
+ */
 void
 mkmap(init_lev)
 lev_init *init_lev;
