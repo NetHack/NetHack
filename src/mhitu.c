@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/4/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -269,11 +269,20 @@ struct attack *alt_attk_buf;
     struct attack *attk = &mptr->mattk[indx];
     struct obj *weap = (magr == &youmonst) ? uwep : MON_WEP(magr);
 
+    /* TODO: this code can easily be condensed. */
     if (has_eama(magr)) {
-        if (indx % 2 == 0) {
-            attk = &EAMA(magr)->m1->mattk[indx];
-        } else {
-            attk = &EAMA(magr)->m2->mattk[indx];
+        if (magr->data == &mons[PM_AMALGAMATION]) {
+            if (indx % 2 == 0) {
+                attk = &EAMA(magr)->m1->mattk[indx];
+            } else {
+                attk = &EAMA(magr)->m2->mattk[indx];
+            }
+        } else if (magr->data == &mons[PM_BAD_CLONE]) {
+            if (indx % 2 == 0) {
+                attk = &EAMA(magr)->m1->mattk[indx / 2];
+            } else {
+                attk = &EAMA(magr)->m2->mattk[indx / 2];
+            }
         }
     }
     /* prevent a monster with two consecutive disease or hunger attacks

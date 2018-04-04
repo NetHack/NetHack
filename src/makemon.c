@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/4/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1324,16 +1324,15 @@ int mmflags;
             mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         }
         break;
-    /* dummied out amalgamation code */
     case S_QUANTMECH:
-        if (mndx == PM_AMALGAMATION) {
+        if (mndx == PM_AMALGAMATION || mndx == PM_BAD_CLONE) {
             neweama(mtmp);
+            /* set up name */
             char buf[BUFSZ];
-            strcpy(buf, "half ");
-            strcat(buf, EAMA(mtmp)->m1->mname);
-            strcat(buf, ", half ");
-            strcat(buf, EAMA(mtmp)->m2->mname);
+            sprintf(buf, "Experiment %d: %s / %s", rnd(100),
+                    EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
             mtmp = christen_monst(mtmp, buf);
+
         }
         break;
     }
