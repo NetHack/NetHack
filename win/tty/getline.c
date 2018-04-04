@@ -1,4 +1,4 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1490908467 2017/03/30 21:14:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	getline.c	$NHDT-Date: 1522796701 2018/04/03 23:05:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -290,6 +290,7 @@ tty_get_ext_cmd()
      *                      ? ext_cmd_getlin_hook
      *                      : (getlin_hook_proc) 0);
      */
+    buf[0] = '\0';
     hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc) 0
                                            : ext_cmd_getlin_hook);
     (void) mungspaces(buf);

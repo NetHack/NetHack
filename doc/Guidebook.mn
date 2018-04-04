@@ -4290,7 +4290,7 @@ in this, the list of Dungeoneers:
 
 .TS S
 center;
-c c c.
+c c c c.
 .\"TABLE_START
 Adam Aronow	Erik Andersen	Kevin Sitze	Ray Chason
 Alex Kompel	Frederick Roeber	Kevin Smolkowski	Richard Addison
