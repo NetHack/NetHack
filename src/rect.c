@@ -14,6 +14,11 @@ STATIC_DCL boolean FDECL(intersect, (NhRect *, NhRect *, NhRect *));
  */
 
 #define MAXRECT 50
+
+/* According to 1.3d and 3.0.0 source, these represent the minimum amount of
+ * required space around a room in any direction, counting the walls as part of
+ * the room.
+ * Rooms' XLIM and YLIM buffers can overlap with other rooms. */
 #define XLIM 4
 #define YLIM 3
 
@@ -22,9 +27,11 @@ static int rect_cnt;
 
 /*
  * Initialisation of internal structures. Should be called for every
- * new level to be build...
+ * new level to be built.
+ * Specifically, this creates one giant rectangle spanning the entire level.
+ * Note: if levels can never go below x=3 or y=2, why does this code allow
+ * otherwise?
  */
-
 void
 init_rect()
 {
@@ -34,11 +41,8 @@ init_rect()
     rect[0].hy = ROWNO - 1;
 }
 
-/*
- * Search Index of one precise NhRect.
- *
- */
-
+/* Find and return the index of one precise NhRect, or -1 if it doesn't exist
+ * in the rect array. */
 int
 get_rect_ind(r)
 NhRect *r;
@@ -58,10 +62,9 @@ NhRect *r;
     return -1;
 }
 
-/*
- * Search a free rectangle that include the one given in arg
+/* Look through the rect array for a free rectangle that completely contains
+ * the given rectangle, and return it, or NULL if no such rectangle exists.
  */
-
 NhRect *
 get_rect(r)
 NhRect *r;
@@ -81,10 +84,7 @@ NhRect *r;
     return 0;
 }
 
-/*
- * Get some random NhRect from the list.
- */
-
+/* Pick and return a random NhRect. */
 NhRect *
 rnd_rect()
 {
@@ -92,11 +92,10 @@ rnd_rect()
 }
 
 /*
- * Search intersection between two rectangles (r1 & r2).
- * return TRUE if intersection exist and put it in r3.
- * otherwise returns FALSE
+ * Compute the intersection between the rectangles r1 and r2.
+ * If they don't intersect at all, return FALSE.
+ * If they do, set r3 to be the intersection, and return TRUE.
  */
-
 STATIC_OVL boolean
 intersect(r1, r2, r3)
 NhRect *r1, *r2, *r3;
@@ -115,10 +114,7 @@ NhRect *r1, *r2, *r3;
     return TRUE;
 }
 
-/*
- * Remove a rectangle from the list of free NhRect.
- */
-
+/* Remove the given rectangle from the rect array. */
 void
 remove_rect(r)
 NhRect *r;
@@ -130,10 +126,7 @@ NhRect *r;
         rect[ind] = rect[--rect_cnt];
 }
 
-/*
- * Add a NhRect to the list.
- */
-
+/* Add the given rectangle to the rect array. */
 void
 add_rect(r)
 NhRect *r;
@@ -150,13 +143,16 @@ NhRect *r;
     rect_cnt++;
 }
 
-/*
- * Okay, here we have two rectangles (r1 & r2).
+/* Split up r1 into multiple smaller rectangles because of r2 being placed.
+ * Assumes that r2 is completely contained within r1, and that r1 exists in
+ * the rect[] array.
+ * Specifically, this will try to make up to four new rectangles out of r1
  * r1 was already in the list and r2 is included in r1.
- * What we want is to allocate r2, that is split r1 into smaller rectangles
- * then remove it.
+ * The code that adds the new rectangles appears to add them only if they could
+ * feasibly hold another room.
+ * Note that the smaller rectangles can and do intersect! They'll intersect
+ * anywhere that isn't directly in line with r2.
  */
-
 void
 split_rects(r1, r2)
 NhRect *r1, *r2;
@@ -167,17 +163,43 @@ NhRect *r1, *r2;
     old_r = *r1;
     remove_rect(r1);
 
-    /* Walk down since rect_cnt & rect[] will change... */
+    /* Recurse this function on any other rectangles in rect[] that happen to
+     * intersect.
+     * Under the assumptions of this function, that r1 did in fact completely
+     * contain r2, and that r1 was in the list, shouldn't this loop not
+     * actually do anything? */
     for (i = rect_cnt - 1; i >= 0; i--)
         if (intersect(&rect[i], r2, &r))
             split_rects(&rect[i], &r);
 
+    /* If r2's left edge is at least 2*YLIM + 6 spaces to the right of old_r's
+     * left edge, add a new rectangle with the same coordinates as old_r except
+     * that its right edge is set to near r2's left edge, with one unoccupied
+     * buffer space in between.
+     * This guarantees that the new shrunken rectangle will be at least
+     * 2*YLIM + 4 spaces wide (4 being the minimum width/height for a room
+     * counting walls).
+     * Special case if old_r was on the right edge of the map:
+     * r2's left edge only needs to be at least YLIM + 7 spaces to the right of
+     * old_r's left edge, and the new shrunken rectangle will be at least
+     * YLIM + 5 spaces wide.
+     *
+     * Possible bug here? This is for when old_r is touching the bottom of
+     * the map, and it's considering the case where r2 is comparatively closer
+     * to the bottom than old_r.ly.
+     * We'd end up creating a shrunken rectangle that's only YLIM+5 spaces high
+     * to the *top* of r2.
+     * It seems like the not-multiplying-YLIM-by-2 code is intended to address
+     * the fact that new rectangles on the bottom of the map only need a buffer
+     * of YLIM in one direction. But the rectangle being created here isn't on
+     * the bottom of the map at all. */
     if (r2->ly - old_r.ly - 1
         > (old_r.hy < ROWNO - 1 ? 2 * YLIM : YLIM + 1) + 4) {
         r = old_r;
         r.hy = r2->ly - 2;
         add_rect(&r);
     }
+    /* Do this exact same process for the other three directions. */
     if (r2->lx - old_r.lx - 1
         > (old_r.hx < COLNO - 1 ? 2 * XLIM : XLIM + 1) + 4) {
         r = old_r;
