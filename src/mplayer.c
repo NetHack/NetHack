@@ -2,7 +2,7 @@
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/5/18 by NullCGT */
 
 #include "hack.h"
 
@@ -313,13 +313,16 @@ register boolean special;
             while (quan--)
                 (void) mpickobj(mtmp, mkobj(RANDOM_CLASS, FALSE));
         }
-        quan = rnd(3);
+        /* While this will lead to less potions of paralysis in the endgame,
+           mplayers are also less likely to get wands that will be reflected
+           by the player, making them more deadly. */
+        /* quan = rnd(3);
         while (quan--)
-            (void) mongets(mtmp, rnd_offensive_item(mtmp));
-        quan = rnd(3);
+            (void) mongets(mtmp, rnd_offensive_item(mtmp)); */
+        quan = rnd(4);
         while (quan--)
             (void) mongets(mtmp, rnd_defensive_item(mtmp));
-        quan = rnd(3);
+        quan = rnd(4);
         while (quan--)
             (void) mongets(mtmp, rnd_misc_item(mtmp));
     }

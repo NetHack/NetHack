@@ -4,7 +4,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 3/12/18 by NullCGT */
+/* Edited on 4/5/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -1581,7 +1581,7 @@ final_level()
     }
 
     /* create some player-monsters */
-    create_mplayers(rn1(4, 3), TRUE);
+    create_mplayers(rn1(8, 3), TRUE);
 
     /* create a guardian angel next to player, if worthy */
     gain_guardian_angel();

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/4/18 by NullCGT */
+/* Edited on 4/5/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1400,8 +1400,12 @@ register struct attack *mattk;
         /* when the Wizard or quest nemesis hits, there's a 1/20 chance
            to steal a quest artifact (any, not just the one for the hero's
            own role) or the Amulet or one of the invocation tools */
-        if (!rn2(20))
+        if (!rn2(20)) {
             stealamulet(mtmp);
+            if (In_endgame(&u.uz) && mon_has_amulet(mtmp)) {
+                monflee(mtmp, 20, FALSE, TRUE);
+            }
+        }
         break;
 
     case AD_TLPT:

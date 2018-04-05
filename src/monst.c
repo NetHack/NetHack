@@ -3175,12 +3175,12 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_FEMALE | M2_COLLECT,
         M3_INFRAVISIBLE, HI_DOMESTIC),
-    /* wizards can cast spells */
+    /* wizards can cast spells and have teleportation */
     MON("wizard", S_HUMAN, LVL(10, 12, 10, 3, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_SAMU, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
-        M1_HUMANOID | M1_OMNIVORE,
+        M1_HUMANOID | M1_OMNIVORE | M1_TPORT,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
     /*

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/5/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1543,6 +1543,10 @@ struct monst *magr, /* monster that is currently deciding where to move */
     if(ma == &mons[PM_ASMODEUS] && md == &mons[PM_MEPHISTO])
         return ALLOW_M|ALLOW_TM;
 
+    /* Endgame amulet theft / fleeing */
+    if(mon_has_amulet(magr) && In_endgame(&u.uz)) {
+        return ALLOW_M|ALLOW_TM;
+    }
     return 0L;
 }
 

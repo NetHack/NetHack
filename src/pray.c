@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/31/18 by NullCGT */
+/* Edited on 4/5/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1593,7 +1593,13 @@ dosacrifice()
                 pline("Fortunately, %s permits you to live...", a_gname());
                 pline(cloud_of_smoke, hcolor(NH_ORANGE));
                 done(ESCAPED);
-            } else { /* super big win */
+            } else {
+                /* just for fun */
+                if (!Deaf) {
+                    pline("A voice booms out...");
+                    verbalize("So thou thought thou couldst defeat me, fool.");
+                }
+                /* super big win */
                 adjalign(10);
                 u.uachieve.ascended = 1;
                 pline(
