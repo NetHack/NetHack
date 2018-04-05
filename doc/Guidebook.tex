@@ -1450,7 +1450,7 @@ Go up a staircase. Default key is '{\tt <}'.
 List vanquished monsters. Autocompletes. Wizard-mode only.
 %.lp
 \item[\tb{\#version}]
-Print compile time options for this version of {\it NetHack}.
+Print compile time options for this version of {\it NetHack\/}.
 Autocompletes. Default key is '{\tt M-v}'.
 %.lp
 \item[\tb{\#versionshort}]
@@ -1535,7 +1535,7 @@ on the {\it Amiga\/}, set the {\it altmeta\/} option to get this behavior.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
-option to have nethack combine them into meta\+key.
+option to have {\it NetHack\/} combine them into meta\+key.
 \blist{}
 %.lp 
 \item[\tb{M-?}]
@@ -1936,7 +1936,7 @@ last victory.
 
 %.pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In {\it NetHack}, this is accomplished automatically by walking over
+it up.  In {\it NetHack\/}, this is accomplished automatically by walking over
 the object (unless you turn off the {\it autopickup\/}
 option (see below), or move with the `{\tt m}' prefix (see above)), or
 manually by using the `{\tt ,}' command.
@@ -1956,7 +1956,7 @@ will get slower and you'll burn calories faster, requiring food more frequently
 to cope with it.  Eventually, you'll be so overloaded that you'll either have
 to discard some of what you're carrying or collapse under its weight.
 %.pg
-NetHack will tell you how badly you have loaded yourself.  The symbols
+{\it NetHack\/} will tell you how badly you have loaded yourself.  The symbols
 `Burdened', `Stressed', `Strained', `Overtaxed' and `Overloaded' are
 displayed on the bottom line display to indicate your condition.
 
@@ -2708,7 +2708,7 @@ for system administrators.
 %.pg
 The default name of the configuration file varies on different
 operating systems. On DOS and Windows, it is ``defaults.nh''
-in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
+in the same folder as {\it nethack.exe\/} or {\it nethackW.exe\/}. On Unix, Linux
 and Mac OS X it is ``.nethackrc'' in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
@@ -2753,8 +2753,8 @@ Example:
 
 %.lp
 \item[\bb{HACKDIR}]
-Default location of files NetHack needs. On Windows HACKDIR
-defaults to the location of the NetHack.exe or NetHackw.exe file
+Default location of files {\it NetHack\/} needs. On Windows HACKDIR
+defaults to the location of the {\it NetHack.exe\/} or {\it NetHackw.exe\/} file
 so setting HACKDIR to override that is not usually necessary or recommended.
 %.lp
 \item[\bb{LEVELDIR}]
@@ -2841,7 +2841,7 @@ See the ``Configuring Menu Colors`` section.
 %.lp
 \item[\bb{SYMBOLS}]
 Override one or more symbols in the symbols files.
-See the ``Modifying NetHack Symbols'' section.
+See the ``Modifying {\it NetHack\/} Symbols'' section.
 %.pg
 Example:
 %.sd
@@ -3121,7 +3121,7 @@ Name a fruit after something you enjoy eating (ex.\ ``{\tt fruit:mango}'')
 (default ``{\tt slime mold}''). Basically a nostalgic whimsy that
 {\it NetHack\/} uses from time to time.  You should set this to something you
 find more appetizing than slime mold.  Apples, oranges, pears, bananas, and
-melons already exist in {\it NetHack}, so don't use those.
+melons already exist in {\it NetHack\/}, so don't use those.
 %.lp
 \item[\ib{gender}]
 Your starting gender ({\tt gender:male} or {\tt gender:female}).
@@ -3575,7 +3575,7 @@ See ``{\it Configuring Status Hilites\/}'' for further information.
 Allow updates to the status lines at the bottom of the screen (default true).
 %.lp
 \item[\ib{suppress\verb+_+alert}]
-This option may be set to a NetHack version level to suppress
+This option may be set to a {\it NetHack\/} version level to suppress
 alert notification messages about feature changes for that 
 and prior versions (ex.\ ``{\tt suppress\verb+_+alert:3.3.1}'')
 %.lp
@@ -3598,9 +3598,9 @@ program.)  Persistent.
 Draw a tombstone graphic upon your death (default on).  Persistent.
 %.lp
 \item[\ib{toptenwin}]
-Put the ending display in a NetHack window instead of on stdout (default off).
+Put the ending display in a {\it NetHack\/} window instead of on stdout (default off).
 Setting this option makes the score list visible when a windowing version
-of NetHack is started without a parent window, but it no longer leaves
+of {\it NetHack\/} is started without a parent window, but it no longer leaves
 the score list around after game end on a terminal or emulating window.
 %.lp
 \item[\ib{travel}]
@@ -3708,91 +3708,91 @@ with the `{\tt O}' command.
  Where to align or place the status window (top, bottom, left, or right).
 %.lp
 \item[\ib{ascii\verb+_+map}]
-NetHack should display an ascii map if it can.
+If {\it NetHack\/} can, it should display an ascii map.
 %.lp
 \item[\ib{color}]
-NetHack should display color if it can for different monsters, 
-objects, and dungeon features
+If {\it NetHack\/} can, it shoudl display color for different monsters objects, and dungeon features. 
+
 %.lp
 \item[\ib{eight\verb+_+bit\verb+_+tty}]
 Pass eight-bit character values (for example, specified with the {\it
 traps \/} option) straight through to your terminal (default off).
 %.lp
 \item[\ib{font\verb+_+map}]
-NetHack should use a font by the chosen name for the map window.
+If {\it NetHack\/} can, it should use a font by the chosen name for the map window.
 %.lp
 \item[\ib{font\verb+_+menu}]
-NetHack should use a font by the chosen name for menu windows.
+If {\it NetHack\/} can, it should use a font by the chosen name for menu windows.
 %.lp
 \item[\ib{font\verb+_+message}]
-NetHack should use a font by the chosen name for the message window.
+If {\it NetHack\/} can, it should use a font by the chosen name for the message window.
 %.lp
 \item[\ib{font\verb+_+status}]
-NetHack should use a font by the chosen name for the status window.
+If {\it NetHack\/} can, it should use a font by the chosen name for the status window.
 %.lp
 \item[\ib{font\verb+_+text}]
-NetHack should use a font by the chosen name for text windows.
+If {\it NetHack\/} can, it should use a font by the chosen name for text windows.
 %.lp
 \item[\ib{font\verb+_+size\verb+_+map}]
-NetHack should use this size font for the map window.
+If {\it NetHack\/} can, it should use this size font for the map window.
 %.lp
 \item[\ib{font\verb+_+size\verb+_+menu}]
-NetHack should use this size font for menu windows.
+If {\it NetHack\/} can, it  should use this size font for menu windows.
 %.lp
 \item[\ib{font\verb+_+size\verb+_+message}]
-NetHack should use this size font for the message window.
+If {\it NetHack\/} can, it should use this size font for the message window.
 %.lp
 \item[\ib{font\verb+_+size\verb+_+status}]
-NetHack should use this size font for the status window.
+If {\it NetHack\/} can, it should use this size font for the status window.
 %.lp
 \item[\ib{font\verb+_+size\verb+_+text}]
-NetHack should use this size font for text windows.
+If {\it NetHack\/} can, it should use this size font for text windows.
 %.lp
 \item[\ib{fullscreen}]
-NetHack should try and display on the entire screen rather than in a window.
+If {\it NetHack\/} can, it should try and display on the entire screen rather than in a window.
 %.lp
 \item[\ib{large\verb+_+font}]
-NetHack should use a large font.
+If {\it NetHack\/} can, it should use a large font.
 %.lp
 \item[\ib{map\verb+_+mode}]
-NetHack should display the map in the manner specified.
+If {\it NetHack\/} can, it should display the map in the manner specified.
 %.lp
 \item[\ib{mouse\verb+_+support}]
 Allow use of the mouse for input and travel.
 %.lp
 \item[\ib{player\verb+_+selection}]
-NetHack should pop up dialog boxes or use prompts for character selection.
+If {\it NetHack\/} can, it should pop up dialog boxes or use prompts for character selection.
 %.lp
 \item[\ib{popup\verb+_+dialog}]
-NetHack should pop up dialog boxes for input.
+If {\it NetHack\/} can, it should pop up dialog boxes for input.
 %.lp
 \item[\ib{preload\verb+_+tiles}]
-NetHack should preload tiles into memory.
+If {\it NetHack\/} can, it should preload tiles into memory.
 For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{scroll\verb+_+amount}]
-NetHack should scroll the display by this number of cells
+If {\it NetHack\/} can, it should scroll the display by this number of cells
 when the hero reaches the scroll\verb+_+margin.
 %.lp
 \item[\ib{scroll\verb+_+margin}]
-NetHack should scroll the display when the hero or cursor
+If {\it NetHack\/} can, it should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 %.lp
 \item[\ib{selectsaved}]
-NetHack should display a menu of existing saved games for the player to
+If {\it NetHack\/} can, it should display a menu of existing saved games for the player to
 choose from at game startup, if it can. Not all ports support this option.
 %.lp
 \item[\ib{softkeyboard}]
-Display an onscreen keyboard.  Handhelds are most likely to support this option.
+If {\it NetHack\/} can, it should display an onscreen keyboard.  Handhelds are most likely to support this option.
 %.lp
 \item[\ib{splash\verb+_+screen}]
-NetHack should display an opening splash screen when it starts up (default yes).
+If {\it NetHack\/} can, it should display an opening splash screen when it starts up (default yes).
 %.lp
 \item[\ib{tiled\verb+_+map}]
-NetHack should display a tiled map if it can.
+If {\it NetHack\/} can, it should display a tiled map if it can.
 %.lp
 \item[\ib{tile\verb+_+file}]
 Specify the name of an alternative tile file to override the default.
@@ -3807,17 +3807,17 @@ Specify the preferred width of each tile in a tile capable port
 Use bold black instead of blue for black glyphs (TTY only).
 %.lp
 \item[\ib{use\verb+_+inverse}]
-NetHack should display inverse when the game specifies it.
+If {\it NetHack\/} can, it should display inverse when the game specifies it.
 %.lp
 \item[\ib{vary\verb+_+msgcount}]
-NetHack should display this number of messages at a time in the message window.
+If {\it NetHack\/} can, it should display this number of messages at a time in the message window.
 %.lp
 \item[\ib{windowcolors}]
-NetHack should display windows with the specified foreground/background 
+If {\it NetHack\/} can, it should display windows with the specified foreground/background 
 colors if it can.
 %.lp
 \item[\ib{wraptext}]
-NetHack port should wrap long lines of text if they don't fit in 
+If {\it NetHack\/} can, it should wrap long lines of text if they don't fit in 
 the visible area of the window.
 \elist
 
@@ -3842,7 +3842,7 @@ functions as a meta-shift for that key (default on).
 %.lp
 \item[\ib{altmeta}]
 On other (non-Amiga) systems where this option is available, it can be
-set to tell nethack to convert a two character sequence beginning with
+set to tell {\it NetHack\/} to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
 
 %.lp ""
@@ -3850,7 +3850,7 @@ This conversion is only done for commands, not for other input prompts.
 Note that typing one or more digits as a count prefix prior to a
 command---preceded by {\tt n} if the {\it number\verb+_+pad\/}
 option is set---is also subject to this conversion, so attempting to
-abort the count by typing ESC will leave nethack waiting for another
+abort the count by typing ESC will leave {\it NetHack\/} waiting for another
 character to complete the two character sequence.  Type a second ESC to
 finish cancelling such a count.  At other prompts a single ESC suffices.
 %.lp
@@ -3882,9 +3882,9 @@ Cannot be set with the `{\tt O}' command.
 \item[\ib{subkeyvalue}]
 ({\it Win32 tty NetHack \/} only).
 May be used to alter the value of keystrokes that the operating system
-returns to NetHack to help compensate for international keyboard issues.
+returns to {\it NetHack\/} to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92
-will return 92 to NetHack, if 171 was originally going to be returned.
+will return 92 to {\it NetHack\/}, if 171 was originally going to be returned.
 You can use multiple subkeyvalue statements in the config file if needed.
 Cannot be set with the `{\tt O}' command.
 %.lp
@@ -3918,9 +3918,9 @@ Cannot be set with the `{\tt O}' command.
 
 %.pg
 Regular expressions are normally POSIX extended regular expressions. It is
-possible to compile NetHack without regular expression support on a platform where
+possible to compile {\it NetHack\/} without regular expression support on a platform where
 there is no regular expression library. While this is not true of any modern
-platform, if your NetHack was built this way, patterns are instead glob
+platform, if your {\it NetHack\/} was built this way, patterns are instead glob
 patterns. This applies to Autopickup exceptions, Message types, Menu colors,
 and User sounds.
 
@@ -4172,7 +4172,7 @@ the pattern to match. The pattern should be a regular expression.
 \elist
 
 %.lp ""
-Here's an example of message types using NetHack's internal
+Here's an example of message types using {\it NetHack's\/} internal
 pattern matching facility:
 
 \begin{verbatim}
@@ -4236,7 +4236,7 @@ Note that the platform used may interpret the attributes any way it
 wants.
 
 %.lp ""
-Here's an example of menu colors using NetHack's internal
+Here's an example of menu colors using {\it NetHack's\/} internal
 pattern matching facility:
 
 \begin{verbatim}
@@ -4301,7 +4301,7 @@ The pattern should be a regular expression.
 \subsection*{Configuring Status Hilites}
 
 %.pg
-Your copy of NetHack may have been compiled with support for {\it Status Hilites}.
+Your copy of {\it NetHack\/} may have been compiled with support for {\it Status Hilites}.
 If so, you can customize your game display by setting thresholds to 
 change the color or appearance of fields in the status display.
 %.pg
@@ -4426,10 +4426,10 @@ Example hilites:
 
 %.lp
 %.hn 2
-\subsection*{Modifying NetHack Symbols}
+\subsection*{Modifying {\it NetHack\/} Symbols}
 
 %.pg
-NetHack can load entire symbol sets from the symbol file.
+{\it NetHack\/} can load entire symbol sets from the symbol file.
 
 %.pg
 The options that are used to select a particular symbol set from the 
@@ -4643,11 +4643,11 @@ Default  & Symbol Name                & Description\\
 
 %.lp
 %.hn 2
-\subsection*{Configuring NetHack for Play by the Blind}
+\subsection*{Configuring {\it NetHack\/} for Play by the Blind}
 
 %.pg
-NetHack can be set up to use only standard ASCII characters for making
-maps of the dungeons. This makes the MS-DOS versions of NetHack completely
+{\it NetHack\/} can be set up to use only standard ASCII characters for making
+maps of the dungeons. This makes the MS-DOS versions of {\it NetHack\/} completely
 accessible to the blind who use speech and/or Braille access technologies.
 Players will require a good working knowledge of their screen-reader's
 review features, and will have to know how to navigate horizontally and
@@ -4662,10 +4662,10 @@ gives you the row and column of your review cursor and the PC cursor.
 These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 %.pg
-NetHack can also be compiled with support for sending the game messages
+{\it NetHack\/} can also be compiled with support for sending the game messages
 to an external program, such as a text-to-speech synthesizer. If the \#version
-extended command shows "external program as a message handler", your NetHack
-has been compiled with the capability. When compiling NetHack from source
+extended command shows "external program as a message handler", your {\it NetHack\/}
+has been compiled with the capability. When compiling {\it NetHack\/} from source
 on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it. To use
 the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
 executable, which will be executed with the game message as the program's
@@ -4673,7 +4673,7 @@ only parameter.
 %.pg
 While it is not difficult for experienced users to edit the {\it defaults.nh\/}
 file to accomplish this, novices may find this task somewhat daunting.
-Included within the symbol file of all official distributions of NetHack 
+Included within the symbol file of all official distributions of {\it NetHack\/} 
 is a symset called {\it NHAccess\/}.  Selecting that symset in your
 configuration file will cause the game to run in a manner accessible 
 to the blind. After you have gained some experience with the game 
@@ -4730,12 +4730,12 @@ seen via the {\tt \#attributes} command.
 \subsection*{Global Configuration for System Administrators}
 
 %.pg
-If NetHack is compiled with the SYSCF option, a system administrator
+If {\it NetHack\/} is compiled with the SYSCF option, a system administrator
 should set up a global configuration; this is a file in the 
 same format as the traditional per-user configuration file (see above).
 
 This file should be named sysconf and placed in the same directory as
-the other NetHack support files.
+the other {\it NetHack\/} support files.
 The options recognized in this file are listed below. Any option not
 set uses a compiled-in default (which may not be appropriate for your
 system).
@@ -5006,7 +5006,7 @@ was responsible for the VMS version of {\it NetHack\/} 3.1.
 \medskip
 \nd {\it Dean Luick}, with help from {\it David Cohrs}, developed {\it NetHack\/}
 3.1 for X11.
-{\it Warwick Allison} wrote a tiled version of NetHack for the Atari;
+{\it Warwick Allison} wrote a tiled version of {\it NetHack\/} for the Atari;
 he later contributed the tiles to the DevTeam and tile support was
 then added to other platforms.
 
@@ -5044,7 +5044,7 @@ Working independently, {\it Stephen White} wrote {\it NetHack Plus}.
 and his own {\it NetHack$--$} to produce {\it SLASH}.
 {\it Larry Stewart-Zerba} and {\it Warwick Allison} improved the spell
 casting system with the Wizard Patch.
-{\it Warwick Allison} also ported NetHack to use the Qt interface.
+{\it Warwick Allison} also ported {\it NetHack\/} to use the Qt interface.
 
 %.pg
 \medskip
@@ -5052,7 +5052,7 @@ casting system with the Wizard Patch.
 to produce {\it Slash'em\/}, and
 with the help of {\it Kevin Hugo}, added more features.
 Kevin later joined the
-DevTeam and incorporated the best of these ideas into NetHack 3.3.
+DevTeam and incorporated the best of these ideas into {\it NetHack\/} 3.3.
 
 %.pg
 \medskip
@@ -5088,7 +5088,7 @@ The 3.4 development team initially consisted of
 {\it David Cohrs}, {\it Jessie Collet}, {\it Kevin Hugo}, {\it Ken Lorber},
 {\it Dean Luick}, {\it Pat Rankin}, {\it Mike Stephenson}, 
 {\it Janet Walz}, and {\it Paul Winner}, with {\it  Warwick Allison} joining 
-just before the release of NetHack 3.4.0 in March 2002.
+just before the release of {\it NetHack\/} 3.4.0 in March 2002.
 
 %.pg
 \medskip
@@ -5102,7 +5102,7 @@ runs on:
 
 %.pg
 \medskip
-\nd {\it Michael Allison} maintained NetHack 3.4 for the MS-DOS platform.
+\nd {\it Michael Allison} maintained {\it NetHack\/} 3.4 for the MS-DOS platform.
 {\it Paul Winner} and {\it Yitzhak Sapir} provided encouragement.
 
 %.pg
@@ -5119,9 +5119,9 @@ enhanced the Macintosh port of 3.4.
 
 %.pg
 \medskip
-\nd {\it Ron Van Iwaarden} was the sole maintainer of NetHack for OS/2 the past
+\nd {\it Ron Van Iwaarden} was the sole maintainer of {\it NetHack\/} for OS/2 the past
 several releases. Unfortunately Ron's last OS/2 machine stopped working in
-early 2006. A great many thanks to Ron for keeping NetHack alive on OS/2 
+early 2006. A great many thanks to Ron for keeping {\it NetHack\/} alive on OS/2 
 all these years.
 
 %.pg
@@ -5137,16 +5137,31 @@ resurrected it for 3.3.1.
 
 %.pg
 \medskip
-The release of NetHack 3.4.3 in December 2003 marked the beginning of a 
+The release of {\it NetHack\/} 3.4.3 in December 2003 marked the beginning of a 
 long release hiatus. 3.4.3 proved to be a remarkably stable version that
 provided continued enjoyment by the community for more than a decade. The 
 devteam slowly and quietly continued to work on the game behind the scenes 
 during the tenure of 3.4.3. It was during that same period that several new 
-variants emerged within the NetHack community. Notably sporkhack by 
-Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors 
+variants emerged within the {\it NetHack\/} community. Notably sporkhack by 
+Derek S. Ray, {\it unnethack\/} by Patric Mueller, {\it nitrohack\/} and its successors 
 originally by Daniel Thaler and then by Alex Smith, and 
-Dynahack by Tung Nguyen. Some of those variants continue to be developed, 
+{\it Dynahack\/} by Tung Nguyen. Some of those variants continue to be developed, 
 maintained, and enjoyed by the community to this day.
+
+%.pg
+\medskip
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through the process of debugging it as a suitable release,
+it was decided that the version numbers present on that code snapshot would 
+be retired and never used in an official {\it NetHack\/} release. An announcement 
+was posted on the devteam's official {\it nethack.org\/} website to that effect, 
+stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release 
+version.
+
+%.pg
+\medskip
+In January 2015, preparation began for the release of NetHack 3.6.
 
 %.pg
 \medskip
@@ -5156,56 +5171,63 @@ as 3.6.0, the development team consisted of {\it Warwick Allison},
 {\it David Cohrs}, {\it Jessie Collet}, 
 {\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
 {\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
-Leading up to the release of 3.6.0 in early 2015, new members
+In early 2015, ahead of the release of 3.6.0, new members
 {\it Sean Hunt}, {\it Pasi Kallinen}, and {\it Derek S. Ray}
-joined the NetHack development team.
+joined the {\it NetHack\/} development team.
 
 %.pg
 \medskip
-In September 2014, an interim snapshot of the code under development was 
-released publicly by other parties. Since that code was a work-in-progress 
-and had not gone through the process of debugging it as a suitable release,
-it was decided that the version numbers present on that code snapshot would 
-be retired and never used in an official NetHack release. An announcement 
-was posted on the devteam's official nethack.org website to that effect, 
-stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release 
-version.
+The 3.6 versions of the game are special in a particular way.  Near the end of
+the development of 3.6.0, one of the significant inspirations for many of
+the humorous and fun features found in the game, author Terry Pratchett,
+passed away.  The 3.6 versions of the game include a tribute to him.
 
 %.pg
 \medskip
-In November 2014, preparation began for the release of NetHack 3.6. The 3.6
-version merges work done by the development team since the previous release 
-with some of the beloved community patches. Many bugs were fixed and a 
-large amount of code was restructured.
+3.6.0 was released in December 2015, and merged work done by the development
+team since the release of 3.4.3 with some of the beloved community 
+patches.  Many bugs were fixed and some code was restructured.
+
+%.pg
+\medskip
+In 2018, several hundred bug fixes for 3.6.0 and some new features 
+were assembled and released as NetHack 3.6.1. The development team at 
+the time of release of 3.6.1 consisted of {\it Michael Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet}, {\it Pasi Kallinen}, {\it Ken Lorber}, 
+{\it Dean Luick}, {\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
+{\it Alex Smith}, {\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
 
 %.pg
 \medskip
 The development team, as well as {\it Steve VanDevender} and 
-{\it Kevin Smolkowski} ensured that NetHack 3.6 continued to operate on 
+{\it Kevin Smolkowski}, ensured that {\it NetHack\/} 3.6 continued to operate on 
 various Unix flavors and maintained the X11 interface. 
 
 %.pg
 {\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick} 
-maintained the port of NetHack 3.6 for Mac.
+maintained the port of {\it NetHack\/} 3.6 for Mac OSX.
 
 %.pg
 \medskip
-{\it Michael Allison}, {\it Derek S. Ray}, {\it Yitzhak Sapir}, 
-{\it Alex Kompel}, and {\it Dion Nicolaas} maintained the port of 
-NetHack 3.6 for Microsoft Windows.
+{\it Michael Allison}, {\it David Cohrs}, {\it Barton House}, {\it Pasi Kallinen}, 
+{\it Alex Kompel}, {\it Dion Nicolaas}, {\it Derek S. Ray} and  {\it Yitzhak Sapir} 
+maintained the port of  {\it NetHack\/} 3.6 for Microsoft Windows.
 
 %.pg
 \medskip
-The 3.6 development team consisting of
-{\it Michael Allison}, {\it Warwick Allison}, {\it Ken Arromdee},
-{\it David Cohrs}, {\it Jessie Collet}, {\it Sean Hunt}, 
-{\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
-{\it Mike Stephenson}, {\it Derek S. Ray}, {\it Janet Walz}, and {\it Paul Winner}
-released 3.6.1 as a bug fix release in January 2016.
+{\it Pat Rankin} attempted to keep the VMS port running for NetHack 3.6.1,
+hindered by limited access.  {it Kevin Smolkowski} has updated and tested it
+for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
+and Integrity (aka Itanium aka IA64) but not VAX.
 
 %.pg
 \medskip
-\nd The official NetHack web site is maintained by {\it Ken Lorber} at 
+{\it Ray Chason}  resurrected the msdos port for 3.6.1 and contributed the
+necessary updates to the community at large.
+
+%.pg
+\medskip
+\nd The official {\it NetHack\/} web site is maintained by {\it Ken Lorber} at 
 {\catcode`\#=11
 \special{html:<a href="http://www.nethack.org/">}}
 http:{\tt /}{\tt /}www.nethack.org{\tt /}.
@@ -5215,16 +5237,13 @@ http:{\tt /}{\tt /}www.nethack.org{\tt /}.
 %.pg
 %.hn 2
 
-\subsection*{Shout Outs}
-\nd The devteam would like to give a special "shout-out" to thank the generous 
-people primarily responsible for the public NetHack servers available for 
-playing the game at nethack.alt.org and devnull.net. In addition to providing 
-a way for the public to play a game of NetHack from almost anywhere, they 
-have hosted annual NetHack tournaments for many, many years. 
-%.pg 
-\nd On behalf of the NetHack community, thank you very much to 
-{\it M. Drew Streib}, {\it Pasi Kallinen} and {\it Robin Bandy}.
+\subsection*{Special Thanks}
+\nd On behalf ot the {\it NetHack\/} community, thank you very much once 
+again to {\it M. Drew Streib}, {\it Pasi Kallinen} and {\it Robin Bandy} for
+providing public {\it NetHack\/} servers at  {\it nethack.alt.org\/} and {\it devnull.net\/} 
+and/or for hosting  annual {\it NetHack\/} tournaments. 
 \clearpage
+
 %.hn
 \section*{Dungeoneers}
 %.pg
