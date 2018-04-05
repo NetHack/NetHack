@@ -5,6 +5,8 @@ Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
 General Changes
+- Deadly poison is no longer an instant kill, and instead does 1-13 extra
+  damage. This change does not affect monsters.
 - Monsters are now capable of sacrificing corpses on altars, and all monsters
   that like objects will now pick up corpses (as opposed to just nymphs).
   In rare cases, this can result in monsters being gifted artifacts.
