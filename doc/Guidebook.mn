@@ -3049,67 +3049,67 @@ Where to align or place the message window (top, bottom, left, or right)
 .lp align_status
 Where to align or place the status window (top, bottom, left, or right).
 .lp ascii_map
-NetHack should display an ascii character map if it can.
+If NetHack can, it should display an ascii character map if it can.
 .lp color
-NetHack should display color if it can for different monsters,
+If NetHack can, it should display color if it can for different monsters,
 objects, and dungeon features
 .lp eight_bit_tty
-NetHack should pass eight-bit character values (for example, specified with the
+If NetHack can, it should pass eight-bit character values (for example, specified with the
 .op traps
 option) straight through to your terminal (default off).
 .lp font_map
-NetHack should use a font by the chosen name for the map window.
+if NetHack can, it should use a font by the chosen name for the map window.
 .lp font_menu
-NetHack should use a font by the chosen name for menu windows.
+If NetHack can, it should use a font by the chosen name for menu windows.
 .lp font_message
-NetHack should use a font by the chosen name for the message window.
+If NetHack can, it should use a font by the chosen name for the message window.
 .lp font_status
-NetHack should use a font by the chosen name for the status window.
+If NetHack can, it should use a font by the chosen name for the status window.
 .lp font_text
-NetHack should use a font by the chosen name for text windows.
+If NetHack can, it should use a font by the chosen name for text windows.
 .lp font_size_map
-NetHack should use this size font for the map window.
+If NetHack can, it should use this size font for the map window.
 .lp font_size_menu
-NetHack should use this size font for menu windows.
+If NetHack can, it should use this size font for menu windows.
 .lp font_size_message
-NetHack should use this size font for the message window.
+If NetHack can, it should use this size font for the message window.
 .lp font_size_status
-NetHack should use this size font for the status window.
+If NetHack can, it should use this size font for the status window.
 .lp font_size_text
-NetHack should use this size font for text windows.
+If NetHack can, it should use this size font for text windows.
 .lp fullscreen
-NetHack should try and display on the entire screen rather than in a window.
+If NetHack can, it should try and display on the entire screen rather than in a window.
 .lp large_font
-NetHack should use a large font.
+If NetHack can, it should use a large font.
 .lp map_mode
-NetHack should display the map in the manner specified.
+If NetHack can, it should display the map in the manner specified.
 .lp mouse_support
 Allow use of the mouse for input and travel.
 .lp player_selection
-NetHack should pop up dialog boxes, or use prompts for character selection.
+If NetHack can, it should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog
-NetHack should pop up dialog boxes for input.
+If NetHack can, it should pop up dialog boxes for input.
 .lp preload_tiles
-NetHack should preload tiles into memory.
+If NetHack can, it should preload tiles into memory.
 For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `O' command.
 .lp scroll_amount
-NetHack should scroll the display by this number of cells
+If NetHack can, it should scroll the display by this number of cells
 when the hero reaches the scroll_margin.
 .lp scroll_margin
-NetHack should scroll the display when the hero or cursor
+If NetHack can, it should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 .lp selectsaved
-NetHack should display a menu of existing saved games for the player to
+If NetHack can, it should display a menu of existing saved games for the player to
 choose from at game startup, if it can. Not all ports support this option.
 .lp softkeyboard
 Display an onscreen keyboard.  Handhelds are most likely to support this option.
 .lp splash_screen
-NetHack should display an opening splash screen when it starts up (default yes).
+If NetHack can, it should display an opening splash screen when it starts up (default yes).
 .lp tiled_map
-NetHack should display a tiled map if it can.
+If NetHack can, it should display a tiled map if it can.
 .lp tile_file
 Specify the name of an alternative tile file to override the default.
 .lp tile_height
@@ -3119,15 +3119,15 @@ Specify the preferred width of each tile in a tile capable port
 .lp use_darkgray
 Use bold black instead of blue for black glyphs (TTY only).
 .lp use_inverse
-NetHack should display inverse when the game specifies it.
+If NetHack can, it should display inverse when the game specifies it.
 .lp vary_msgcount
-NetHack should display this number of messages at a time in
+If NetHack can, it should display this number of messages at a time in
 the message window.
 .lp windowcolors
-NetHack should display windows with the specified foreground/background
+If NetHack can, it should display windows with the specified foreground/background
 colors if it can.
 .lp wraptext
-NetHack port should wrap long lines of text if they don't fit in
+If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.
 .hn 2
 Platform-specific Customization options
