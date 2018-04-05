@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1520103267 2018/03/03 18:54:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1522967321 2018/04/05 22:28:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -360,8 +360,14 @@ dofire()
      * If quiver is empty, we use autoquiver to fill it when the
      * corresponding option is on.  If the option is off or if
      * autoquiver doesn't select anything, we ask what to throw.
-     * For the last, if player's response is a stack, we put
-     * that stack into quiver slot provided it's not wielded.
+     * Then we put the chosen item into the quiver slot unless
+     * it is already in another slot.  [Matters most if it is a
+     * stack but also matters for single item if this throw gets
+     * aborted (ESC at the direction prompt).  Already wielded
+     * item is excluded because wielding might be necessary
+     * (Mjollnir) or make the throw behave differently (aklys),
+     * and alt-wielded item is excluded because switching slots
+     * would end two-weapon combat even if throw gets aborted.]
      */
     if (!ok_to_throw(&shotlimit))
         return 0;
