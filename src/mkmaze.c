@@ -799,7 +799,16 @@ int wallthick;
     }
 }
 
-
+/* Topmost maze level and special level creation routine.
+ * Called from within makelevel() from inside mklev().
+ * We currently expect the following strings as arguments:
+ *   Literal special level identifier, e.g. "Hea-filb" or "oracle".
+ *   Empty string "", in which case this will either figure out which special
+ *   level identifier to use based on the dungeon prototype name, or generate
+ *   a random maze if there isn't a prototype level for this branch.
+ * A random maze will also be created if the special level fails to be loaded
+ * (this will provide the player with an impossible()).
+ */
 void
 makemaz(s)
 const char *s;
@@ -810,22 +819,31 @@ const char *s;
     coord mm;
 
     if (*s) {
+        /* specific special level file, or prototype name if > 1 variant */
         if (sp && sp->rndlevs)
+            /* e.g. "medusa-1", "bigrm-5" */
             Sprintf(protofile, "%s-%d", s, rnd((int) sp->rndlevs));
         else
+            /* e.g. "orcus", "Sam-fila", "astral" */
             Strcpy(protofile, s);
     } else if (*(dungeons[u.uz.dnum].proto)) {
         if (dunlevs_in_dungeon(&u.uz) > 1) {
             if (sp && sp->rndlevs)
+                /* e.g. "soko3-1" */
                 Sprintf(protofile, "%s%d-%d", dungeons[u.uz.dnum].proto,
                         dunlev(&u.uz), rnd((int) sp->rndlevs));
             else
+                /* e.g. "tower1", "wizard1" */
                 Sprintf(protofile, "%s%d", dungeons[u.uz.dnum].proto,
                         dunlev(&u.uz));
         } else if (sp && sp->rndlevs) {
+            /* Not actually used. Would be used if there are any one-level
+             * branches that have multiple level variants. If Fort Ludios had
+             * multiple variants, it would be covered here. */
             Sprintf(protofile, "%s-%d", dungeons[u.uz.dnum].proto,
                     rnd((int) sp->rndlevs));
         } else
+            /* e.g. "knox" */
             Strcpy(protofile, dungeons[u.uz.dnum].proto);
 
     } else
@@ -865,9 +883,11 @@ const char *s;
         impossible("Couldn't load \"%s\" - making a maze.", protofile);
     }
 
+    /* Set up to create a maze level */
     level.flags.is_maze_lev = TRUE;
     level.flags.corrmaze = !rn2(3);
 
+    /* 50% chance of corridors / walls up to 4 wide */
     if (!Invocation_lev(&u.uz) && rn2(2)) {
         int corrscale = rnd(4);
         create_maze(corrscale,rnd(4)-corrscale);
@@ -875,15 +895,20 @@ const char *s;
         create_maze(1,1);
     }
 
+    /* Some mazes are carved from stone and don't have walls */
     if (!level.flags.corrmaze)
         wallification(2, 2, x_maze_max, y_maze_max);
 
+    /* pick a starting maze location, put the upstairs there */
     mazexy(&mm);
     mkstairs(mm.x, mm.y, 1, (struct mkroom *) 0); /* up */
     if (!Invocation_lev(&u.uz)) {
+        /* ditto for downstairs */
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0); /* down */
-    } else { /* choose "vibrating square" location */
+    } else {
+        /* This is the invocation level; choose the location for the "vibrating
+         * square". */
 #define x_maze_min 2
 #define y_maze_min 2
 /*
@@ -930,26 +955,34 @@ const char *s;
     /* place branch stair or portal */
     place_branch(Is_branchlev(&u.uz), 0, 0);
 
+    /* Note: This code assumes the only mazes will appear in Gehennom or below
+     * Medusa, and places stuff accordingly. */
+    /* 11-18 random objects, 50% gems, 50% random */
     for (x = rn1(8, 11); x; x--) {
         mazexy(&mm);
         (void) mkobj_at(rn2(2) ? GEM_CLASS : 0, mm.x, mm.y, TRUE);
     }
+    /* 2-11 randomly placed boulders */
     for (x = rn1(10, 2); x; x--) {
         mazexy(&mm);
         (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
     }
+    /* 0-2 random minotaurs */
     for (x = rn2(3); x; x--) {
         mazexy(&mm);
         (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
     }
+    /* 7-11 random other monsters */
     for (x = rn1(5, 7); x; x--) {
         mazexy(&mm);
         (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
     }
+    /* 7-12 piles of gold */
     for (x = rn1(6, 7); x; x--) {
         mazexy(&mm);
         (void) mkgold(0L, mm.x, mm.y);
     }
+    /* 7-12 traps */
     for (x = rn1(6, 7); x; x--)
         mktrap(0, 1, (struct mkroom *) 0, (coord *) 0);
 }
