@@ -1244,7 +1244,7 @@ On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
 .op altmeta
-option to have nethack combine them into meta+key.
+option to have NetHack combine them into meta+key.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
@@ -3144,7 +3144,7 @@ On Amiga, this option controls whether typing `Alt' plus another key
 functions as a meta-shift for that key (default on).
 .lp altmeta
 On other (non-Amiga) systems where this option is available, it can be
-set to tell nethack to convert a two character sequence beginning with
+set to tell NetHack to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
 .lp ""
 This conversion is only done for commands, not for other input prompts.
@@ -3152,7 +3152,7 @@ Note that typing one or more digits as a count prefix prior to a
 command--preceded by \fBn\fP if the
 .op number_pad
 option is set--is also subject to this conversion, so attempting to
-abort the count by typing ESC will leave nethack waiting for another
+abort the count by typing ESC will leave NetHack waiting for another
 character to complete the two character sequence.  Type a second ESC to
 finish cancelling such a count.  At other prompts a single ESC suffices.
 .lp "BIOS    "
