@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/5/18 by NullCGT */
+/* Edited on 4/6/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -359,6 +359,8 @@ unsigned corpseflags;
     case PM_ORC_ZOMBIE:
     case PM_ELF_ZOMBIE:
     case PM_HUMAN_ZOMBIE:
+    case PM_ZOMBIE_DRAGON:
+    case PM_DRAUGR:
     case PM_GIANT_ZOMBIE:
     case PM_ETTIN_ZOMBIE:
         num = undead_to_corpse(mndx);
@@ -379,6 +381,7 @@ unsigned corpseflags;
         free_mname(mtmp);
         break;
     case PM_CLAY_GOLEM:
+    case PM_SLUDGE_GOLEM:
         obj = mksobj_at(ROCK, x, y, FALSE, FALSE);
         obj->quan = (long) (rn2(20) + 50);
         obj->owt = weight(obj);
@@ -1530,13 +1533,6 @@ struct monst *magr, /* monster that is currently deciding where to move */
        (is_dwarf(md) || md->mlet == S_QUADRUPED))
   		  return ALLOW_M|ALLOW_TM;
 
-    /* renegade shopkeepers just don't like people */
-    if(ma == &mons[PM_RENEGADE_SHOPKEEPER] && md->mlet == S_HUMAN)
-  		  return ALLOW_M|ALLOW_TM;
-    /* and vice versa */
-    if(md->mlet == S_HUMAN && ma == &mons[PM_RENEGADE_SHOPKEEPER])
-  		  return ALLOW_M|ALLOW_TM;
-
     /* Asmodeus and Mephisto dislike one another. */
     if(ma == &mons[PM_MEPHISTO] && md == &mons[PM_ASMODEUS])
         return ALLOW_M|ALLOW_TM;
@@ -2044,6 +2040,7 @@ struct monst *magr;    /* killer, if swallowed */
 boolean was_swallowed; /* digestion */
 {
     struct permonst *mdat = mon->data;
+    struct obj *obj = (struct obj *) 0;
     int i, tmp;
     /* A worm that walks naturally dissolves into worms */
     if (mdat == &mons[PM_WORM_THAT_WALKS] || mdat == &mons[PM_LORD_OF_WORMS]) {
@@ -2122,7 +2119,15 @@ boolean was_swallowed; /* digestion */
 
             Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
             killer.format = KILLED_BY_AN;
-            explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
+            if (mdat == &mons[PM_PHOENIX]) {
+                explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_FIERY);
+                /* eggs have to be done here instead of in the corpse
+                   function because otherwise the explosion destroys the egg */
+                obj = mksobj_at(EGG, mon->mx, mon->my, TRUE, FALSE);
+                obj->corpsenm = PM_PHOENIX;
+            } else {
+                explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
+            }
             killer.name[0] = '\0';
             killer.format = 0;
             return FALSE;

@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/1/18 by NullCGT */
+/* Edited 4/6/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -192,6 +192,7 @@ struct monst *mtmp;
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
                  || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN
                  || mtmp->data == &mons[PM_MINOTAUR]
+                 || mtmp->data == &mons[PM_GIANT_PRAYING_MANTIS]
                  || mtmp->data == &mons[PM_KING_IN_YELLOW]
                  || Inhell || In_endgame(&u.uz)));
 }

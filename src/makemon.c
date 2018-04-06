@@ -623,7 +623,7 @@ register struct monst *mtmp;
      */
     switch (ptr->mlet) {
     case S_HUMAN:
-        if (is_mercenary(ptr) && !(monsndx(ptr) == PM_RENEGADE_SHOPKEEPER)) {
+        if (is_mercenary(ptr)) {
             register int mac;
 
             switch (monsndx(ptr)) {
@@ -695,8 +695,7 @@ register struct monst *mtmp;
                     (void) mongets(mtmp, BUGLE);
             } else if (ptr == &mons[PM_WATCHMAN] && rn2(3))
                 (void) mongets(mtmp, TIN_WHISTLE);
-        } else if (ptr == &mons[PM_SHOPKEEPER] ||
-            ptr == &mons[PM_RENEGADE_SHOPKEEPER]) {
+        } else if (ptr == &mons[PM_SHOPKEEPER]) {
             (void) mongets(mtmp, SKELETON_KEY);
             switch (rn2(4)) {
             /* MAJOR fall through ... */
@@ -2017,6 +2016,8 @@ int type;
         return 60;
     case PM_GLASS_GOLEM:
         return 60;
+    case PM_SLUDGE_GOLEM:
+        return 120;
     case PM_IRON_GOLEM:
         return 80;
     default:

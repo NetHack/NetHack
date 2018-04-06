@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 3/29/18 by NullCGT */
+/* File changed 4/6/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -102,14 +102,6 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     A("Carnwennan", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
       PHYS(3, 3), NO_DFNS, NO_CARY, 0, A_LAWFUL,
       PM_KNIGHT, NON_PM, 400L, NO_COLOR),
-
-    /*
-    *       Based on the LOTR arrow, but could represent any arrow. Technically
-    *       probably not magical originally, but including an artifact arrow
-    *       seemed like a fun idea.
-    */
-    A("Black Arrow", ARROW, (SPFX_RESTR), 0, 0, PHYS(10, 10), NO_DFNS, NO_CARY,
-      0, A_NONE, NON_PM, NON_PM, 1000L, NO_COLOR),
 
     /*
     *       Seafoam grants waterbreathing, and is generated rustproof.

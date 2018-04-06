@@ -1,6 +1,6 @@
 # Hallucinatory monsters
 #
-# Edited on 3/2/18 by NullCGT
+# Edited on 4/6/18 by NullCGT
 #
 # prefix codes:
 # dash		-  female, personal name
@@ -21,7 +21,6 @@ basilisk
 beholder
 nightmare
 efreeti
-marid
 rot grub
 bookworm
 master lichen
@@ -253,8 +252,6 @@ hippocampus
 hippogriff
 kelpie
 catoblepas
-phoenix
-amphisbaena
 
 # Unusually animate body parts
 bouncing eye
