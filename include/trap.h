@@ -21,7 +21,7 @@ struct trap {
     coord launch;
     Bitfield(ttyp, 5);
     Bitfield(tseen, 1);
-    Bitfield(once, 1);
+    Bitfield(once, 1); /* has the trap been triggered previously? */
     Bitfield(madeby_u, 1); /* So monsters may take offence when you trap
                               them.	Recognizing who made the trap isn't
                               completely unreasonable, everybody has

@@ -170,6 +170,9 @@ E NEARDATA long yn_number;
 
 E const char disclosure_options[];
 
+/* smeq - stores room numbers for the purposes of determining which rooms have
+ * been connected yet, and which haven't.
+ * Not sure why this isn't just stored in struct mkroom directly. */
 E NEARDATA int smeq[];
 E NEARDATA int doorindex;
 E NEARDATA char *save_cm;

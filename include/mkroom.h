@@ -48,6 +48,9 @@ extern NEARDATA struct mkroom *subrooms;
 
 extern struct mkroom *dnstairs_room, *upstairs_room, *sstairs_room;
 
+/* Holds the coordinates of all doors on the level.
+ * mkroom structs each have a fdoor which is their first door in this array.
+ */
 extern NEARDATA coord doors[DOORMAX];
 
 /* values for rtype in the room definition structure */
