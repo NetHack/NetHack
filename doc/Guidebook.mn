@@ -1303,20 +1303,17 @@ If the
 .op number_pad
 option is on, some additional letter commands are available:
 .lp h
-Help menu:  display one of several help texts available, like ``?''.
+#help
 .lp j
-Jump to another location.  Same as ``#jump'' or ``M-j''.
+#jump
 .lp k
-Kick something (usually a door).  Same as `^D'.
+#kick
 .lp l
-Loot a box or bag on the floor beneath you, or the saddle
-from a steed standing next to you.  Same as ``#loot'' or ``M-l''.
+#loot
 .lp N
-Name a monster, an individual object, or a type of object.  Same
-as ``#name'' (or ``M-n'') which is the same as the `C'
-command.
+#name
 .lp u
-Untrap a trap, door, or chest.  Same as ``#untrap'' or ``M-u''.
+#untrap
 
 .hn 1
 Rooms and corridors
