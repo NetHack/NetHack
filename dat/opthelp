@@ -2,6 +2,7 @@ Boolean options not under specific compile flags (with default values in []):
 (You can learn which options exist in your version by checking your current
 option setting, which is reached via the 'O' cmd.)
 
+acoustics      can your character hear anything                   [TRUE]
 autodescribe   describe the terrain under cursor                  [FALSE]
 autodig        dig if moving and wielding digging tool            [FALSE]
 autoopen       walking into a door attempts to open it            [TRUE]
@@ -9,23 +10,31 @@ autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some      [FALSE]
                suitable inventory weapon to fill the quiver
 BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
+blind          your character is permanently blind                [FALSE]
+bones          allow loading bones files                          [TRUE]
+clicklook      look at map by clicking right mouse button         [FALSE]
 cmdassist      give help for errors on direction & other commands [TRUE]
 confirm        ask before hitting tame or peaceful monsters       [TRUE]
-DECgraphics    use DEC/VT line-drawing characters for the dungeon [FALSE]
+dark_room      show floor not in sight in different color         [TRUE]
 eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
 extmenu        use a menu for selecting extended commands (#)     [FALSE]
 fixinv         try to retain the same letter for the same object  [TRUE]
+force_invmenu  commands asking for inventory item show a menu     [FALSE]
 goldX          when filtering objects by bless/curse state,       [FALSE]
                whether to classify gold as X (unknown) or U (uncursed)
 help           print all available info when using the / command  [TRUE]
-IBMgraphics    use IBM extended characters for the dungeon        [FALSE]
+herecmd_menu   show menu of some possible commands when clicking
+               on yourself or next to you with mouse              [FALSE]
 ignintr        ignore interrupt signal, including breaks          [FALSE]
 implicit_uncursed  omit "uncursed" from inventory, if possible    [TRUE]
 legacy         print introductory message                         [TRUE]
 lit_corridor   show a dark corridor as lit if in sight            [FALSE]
 lootabc        use a/b/c rather than o/i/b when looting           [FALSE]
-menu_overlay   overlay menus on the screen and align to right     [TRUE]
 mail           enable the mail daemon                             [TRUE]
+mention_walls  give feedback when walking against a wall          [FALSE]
+menu_objsyms   show object symbols in menus if it is selectable   [FALSE]
+menu_overlay   overlay menus on the screen and align to right     [TRUE]
+nudist         start your character without armor                 [FALSE]
 null           allow nulls to be sent to your terminal            [TRUE]
                try turning this option off (forcing NetHack to use its own
                delay code) if moving objects seem to teleport across rooms
@@ -36,16 +45,15 @@ pushweapon     when wielding a new weapon, put your previously    [FALSE]
 rawio          allow the use of raw I/O                           [FALSE]
 rest_on_space  count the space bar as a rest character            [FALSE]
 safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]
+sanity_check   perform data sanity checks                         [FALSE]
 showexp        display your accumulated experience points         [FALSE]
 showrace       show yourself by your race rather than by role     [FALSE]
 silent         don't use your terminal's bell sound               [TRUE]
 sortpack       group similar kinds of objects in inventory        [TRUE]
-sound          enable messages about what your character hears    [TRUE]
-               (note: this has nothing to do with your computer's audio
-               capabilities, and the game resets it periodically)
 sparkle        display sparkly effect for resisted magical        [TRUE]
                attacks (e.g. fire attack on fire-resistant monster)
 standout       use standout mode for --More-- on messages         [FALSE]
+status_updates update the status lines                            [TRUE]
 time           display elapsed game time, in moves                [FALSE]
 tombstone      print tombstone when you die                       [TRUE]
 toptenwin      print topten in a window rather than stdout        [FALSE]
@@ -54,6 +62,8 @@ travel         enable the command to travel to a map location via [TRUE]
 use_darkgray   use bold black instead of blue for black glyphs.   [TRUE]
 use_inverse    display detected monsters in highlighted manner    [FALSE]
 verbose        print more commentary during the game              [TRUE]
+whatis_menu    show menu when getting a map location              [FALSE]
+whatis_moveskip skip same glyphs when getting a map location      [FALSE]
 
 
 There are further boolean options controlled by compilation flags.
@@ -74,6 +84,7 @@ showscore      display your approximate accumulated score         [FALSE]
 Boolean options if TEXTCOLOR was set at compile time:
 color          use different colors for objects on screen [TRUE for micros]
 hilite_pet     display pets in a highlighted manner               [FALSE]
+hilite_pile    display item piles in a highlighted manner         [FALSE]
 
 Boolean option if TIMED_DELAY was set at compile time (tty interface only):
 timed_delay    on unix and VMS, use a timer instead of sending    [TRUE]
@@ -91,6 +102,9 @@ Boolean option if USE_TILES was set at compile time (MSDOS protected mode only):
 preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
                the start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.
+
+Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
+vt_tiledata    insert extra data escae code markers into output   [FALSE]
 
 Any Boolean option can be negated by prefixing it with a '!' or 'no'.
 

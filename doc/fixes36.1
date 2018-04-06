@@ -605,6 +605,9 @@ the fix for secret doors on special levels always having vertical orientation
 and the previous fix for the for secret doors didn't work if the level hadn't
 	been wallified yet (Cav quest) so horizontal wall with secret door
 	mis-displayed as a vertical wall segment could occur
+and both the previous fixes only worked if the level description contained
+	an explicit DOOR directive rather than just '+' or 'S' on the map
+	(as with lower right area of Cav 'locate' level)
 the fix intended for "a shop object stolen from outside the shop (via
 	grappling hook) would be left marked as 'unpaid'" broke normal pickup,
 	preventing any picked up item from merging with compatible stack
