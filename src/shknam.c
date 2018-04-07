@@ -717,7 +717,11 @@ register struct mkroom *sroom;
     if ((sh = shkinit(shp, sroom)) < 0)
         return;
 
-    /* make sure no doorways without doors, and no trapped doors, in shops */
+    /* Fix any types of doors that are inappropriate for shops:
+     *   Doorways without doors - convert to open door
+     *   Secret doors - make non-secret
+     *   Trapped doors - make locked instead
+     */
     sx = doors[sroom->fdoor].x;
     sy = doors[sroom->fdoor].y;
     if (levl[sx][sy].doormask == D_NODOOR) {
@@ -731,6 +735,9 @@ register struct mkroom *sroom;
     if (levl[sx][sy].doormask & D_TRAPPED)
         levl[sx][sy].doormask = D_LOCKED;
 
+    /* If the door ended up locked for any reason, the shop is "closed", but
+     * can be unlocked by the hero at any time.
+     * Place an engraving warning that there's a shop here. */
     if (levl[sx][sy].doormask == D_LOCKED) {
         register int m = sx, n = sy;
 

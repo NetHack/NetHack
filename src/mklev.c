@@ -499,9 +499,22 @@ register struct mkroom *aroom;
  * Sets the doormask randomly. Contains the guts of the random probabilities
  * that determine what doorstate the door gets, and whether it becomes trapped.
  *
- * Doors are never generated broken. Shop doors tend to be generated open, and
- * never generate trapped. (They can be locked, though, in which case the shop
- * becomes closed for inventory.) Secret doors always generate closed or locked.
+ * Doors are never generated broken. Secret doors always generate closed or
+ * locked.
+ *
+ * Shop doors are a strange case: if this function is aware that it's adding a
+ * secret door to a shop, it will take pains to guarantee that the door will
+ * never generate trapped.
+ * However, at the time that we're joining up rooms and calling this function,
+ * we haven't yet established whether any of them are special rooms or shops.
+ * (You can't tell whether it's going to be a shop unless you can guarantee it
+ * has one door, and at room-joining time we can't guarantee that.)
+ * It turns out that what _actually_ happens with shops, after verifying they
+ * have one doorway after everything is joined up, is that they will fix their
+ * door themselves in stock_room().
+ * The shdoor code in this function will only actually run if we had already
+ * generated a shop and then decided to create another door on its wall. It's
+ * unlikely that this would ever happen.
  */
 STATIC_OVL void
 dosdoor(x, y, aroom, type)
