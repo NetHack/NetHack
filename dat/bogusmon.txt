@@ -1,6 +1,6 @@
 # Hallucinatory monsters
 #
-# Edited on 4/6/18 by NullCGT
+# Edited on 4/7/18 by NullCGT
 #
 # prefix codes:
 # dash		-  female, personal name
@@ -8,6 +8,14 @@
 # plus		+  male, personal name
 # vertical bar	|  male, general name
 # equals	=  gender not specified, personal name
+
+# self-deprecation / this variant
+questionable addition
+poorly balanced monster
+
+# cataclysm
+smoker zombie
+shady zombie
 
 # misc.
 jumbo shrimp
@@ -19,7 +27,6 @@ giant slug
 pterodactyl
 basilisk
 beholder
-nightmare
 efreeti
 rot grub
 bookworm
@@ -75,6 +82,15 @@ shrinking violet
 shallow one
 spherical cow
 protagonist
+=Nethack
++Rodney
+explosive weasel
+animated chainsaw
+wren
+studio audience
+pumpkin king
+cliche
+overused trope
 
 # Quendor (Zork, &c.)
 grue
@@ -107,6 +123,7 @@ creeping coins
 hydra
 satyr
 siren
+nemean lion
 
 # Monty Python
 killer bunny
@@ -220,7 +237,7 @@ Predator
 mother-in-law
 
 # Actual creatures
-praying mantis
+okapi
 beluga whale
 chicken
 coelacanth
@@ -272,6 +289,7 @@ segmentation fault
 goto statement
 spaghetti code
 recursion
+deferred feature
 
 # bugs
 bohrbug
@@ -295,6 +313,9 @@ hearse
 roomba
 miniature blimp
 dust speck
+silver dragon scale mail
+amulet of reflection
+wand of wishing
 
 # DnD monster
 gazebo
@@ -327,6 +348,8 @@ rebus
 # Their actual character
 apostrophe golem
 voluptuous ampersand
+turgid exclamation point
+fragile question mark
 
 # Web comics and animation
 +Bob the angry flower
@@ -362,6 +385,7 @@ tie-thulu
 +Domo-kun
 looooooooooooong cat
 nyan cat
++Dat Boi
 
 # the Internet is made for cat pix
 ceiling cat
@@ -397,6 +421,8 @@ enderman
 
 # Pun
 wight supremacist
+bad pun
+groaner
 
 # Starcraft 2
 zergling
@@ -455,11 +481,14 @@ baby bong worm
 baby long word
 baby parable worm
 barfed devil
+blue dragoon
 beer wight
 boor wight
 brawny mold
 rave spider
+clod giant
 clue golem
+cockathrice
 bust vortex
 errata elemental
 elastic eel
@@ -487,15 +516,20 @@ guardian nacho
 hell hound pun
 high purist
 hairnet devil
+holistic sphere
 ice trowel
 killer beet
++Mefisto
 feather golem
 lounge worm
+monochromatic dragon
 mountain lymph
 pager golem
 pie fiend
 prophylactic worm
+razor flagon
 sock mole
+lockatrice
 rogue piercer
 seesawing sphere
 simile mimic
@@ -505,6 +539,7 @@ scone giant
 umbrella hulk
 vampire mace
 verbal jabberwock
+waiter elemental
 water lemon
 water melon
 winged grizzly

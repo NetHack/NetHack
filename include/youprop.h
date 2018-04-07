@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/19/18 by NullCGT */
+/* Edited on 4/7/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H
@@ -112,12 +112,13 @@
 #define HHalluc_resistance u.uprops[HALLUC_RES].intrinsic
 #define EHalluc_resistance u.uprops[HALLUC_RES].extrinsic
 #define Halluc_resistance (HHalluc_resistance || EHalluc_resistance)
-#define Hallucination (HHallucination && !Halluc_resistance)
+#define Hallucination ((HHallucination && !Halluc_resistance) || \
+                        u.uroleplay.hallu)
 
 /* Timeout, plus a worn mask */
 #define HDeaf u.uprops[DEAF].intrinsic
 #define EDeaf u.uprops[DEAF].extrinsic
-#define Deaf (HDeaf || EDeaf)
+#define Deaf (HDeaf || EDeaf || u.uroleplay.deaf)
 
 #define HFumbling u.uprops[FUMBLING].intrinsic
 #define EFumbling u.uprops[FUMBLING].extrinsic

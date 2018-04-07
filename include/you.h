@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/7/18 by NullCGT */
+
 #ifndef YOU_H
 #define YOU_H
 
@@ -96,6 +98,8 @@ struct u_conduct {     /* number of times... */
 
 struct u_roleplay {
     boolean blind;  /* permanently blind */
+    boolean hallu;  /* permanently hallucinating */
+    boolean deaf;   /* permanently deaf */
     boolean nudist; /* has not worn any armor, ever */
     long numbones;  /* # of bones files loaded  */
 };

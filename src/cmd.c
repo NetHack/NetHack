@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/7/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -1958,7 +1958,8 @@ int final;
     if (Confusion)
         you_are("confused", "");
     if (Hallucination)
-        you_are("hallucinating", "");
+        Sprintf(buf, "%s hallucinating",
+                u.uroleplay.blind ? "permanently" : "temporarily");
     if (Blind) {
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
@@ -2768,6 +2769,10 @@ int final;
         you_have_been("blind from birth");
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
+    if (u.uroleplay.hallu)
+        you_have_been("hallucinating for your entire life");
+    if (u.uroleplay.deaf)
+        you_have_been("deaf from birth");
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");

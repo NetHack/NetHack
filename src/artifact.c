@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 3/29/18 by NullCGT */
+/* Edited 4/7/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -539,6 +539,10 @@ long wp_mask;
          * that can print a message--need to guard against being printed
          * when restoring a game
          */
+        if (u.uroleplay.hallu) {
+            u.uroleplay.hallu = FALSE;
+            pline("The world no longer makes any sense to you!");
+        }
         (void) make_hallucinated((long) !on, restoring ? FALSE : TRUE,
                                  wp_mask);
     }
