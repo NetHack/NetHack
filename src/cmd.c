@@ -2770,7 +2770,7 @@ int final;
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
     if (u.uroleplay.hallu)
-        you_have_been("hallucinating for your entire life");
+        you_have_been("hallucinating from birth");
     if (u.uroleplay.deaf)
         you_have_been("deaf from birth");
 

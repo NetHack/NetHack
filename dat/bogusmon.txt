@@ -9,9 +9,20 @@
 # vertical bar	|  male, general name
 # equals	=  gender not specified, personal name
 
+# M.U.G.E.N.
+wayward hitbox
+null-tier character
+palette swap
+
+# Eldritch Abominations
+=Cthulu
+=Yog-Sothoth
+=Nyarlathotep
+
 # self-deprecation / this variant
 questionable addition
 poorly balanced monster
+obscure reference
 
 # cataclysm
 smoker zombie
@@ -64,6 +75,7 @@ stuffed raccoon puppet
 viking
 wee green blobbie
 wereplatypus
+wereshopkeeper
 hag of bolding
 blancmange
 raging nerd
@@ -91,6 +103,13 @@ studio audience
 pumpkin king
 cliche
 overused trope
+-War
+runaway shopping cart
+modern art
+angry onion
+reanimator
+overclocked microwave
+chronomancer
 
 # Quendor (Zork, &c.)
 grue
@@ -124,6 +143,7 @@ hydra
 satyr
 siren
 nemean lion
+-Scylla
 
 # Monty Python
 killer bunny
@@ -373,8 +393,11 @@ little green man
 # Portal
 weighted Companion Cube
 
-# /b/
-/b/tard
+# corruptions and glitches
++ZZAZZ
+MissingNo
+-M
+=Test0
 
 # South Park
 manbearpig
@@ -386,11 +409,13 @@ tie-thulu
 looooooooooooong cat
 nyan cat
 +Dat Boi
+bode
 
 # the Internet is made for cat pix
 ceiling cat
 basement cat
 monorail cat
+knife cat
 
 # POWDER
 tridude
@@ -432,6 +457,7 @@ existential angst
 figment of your imagination
 flash of insight
 bad thoughts
+hopes and dreams
 
 # Fish
 ghoti
@@ -456,6 +482,8 @@ clown
 mime
 peddler
 haggler
+math problem
+bad RNG
 
 # Pirates of Penzance
 modern major general
@@ -490,6 +518,7 @@ clod giant
 clue golem
 cockathrice
 bust vortex
+ear piercer
 errata elemental
 elastic eel
 electrocardiogram eel
@@ -513,6 +542,7 @@ gnome dummy
 gooier ooze
 green slide
 guardian nacho
+hearth elemental
 hell hound pun
 high purist
 hairnet devil

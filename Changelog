@@ -4,6 +4,14 @@ This changelog documents all the features that differ from vanilla Nethack.
 Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
+Toggleable Options
+- Intrinsicswap: Gaining a resistance other than poison resistance through food
+  will cause you to lose your other resistances. False by default.
+- Deaf: A roleplay option and conduct that allows you to play a deaf character.
+- Hallucinating: A roleplay option and conduct that allows you to play a
+  permanently hallucinating character. Using an artifact to gain hallucination
+  resistance will break this.
+
 General Changes
 - Deadly poison is no longer an instant kill, and instead does 1-13 extra
   damage. This change does not affect monsters.
@@ -20,9 +28,6 @@ General Changes
   somewhat, but all of them are now capable of stealing the amulet with their
   attacks.
 - Upon stealing the amulet, if in the endgame a monster will try to flee.
-- Gaining a resistance other than poison resistance through food will cause you
-  to lose your other resistances. This feature can be toggled off in the
-  preferences file.
 - Decreased floating eye spawn rate to make blind telepathy harder to obtain.
 - Mysterious force now only affects you when you are hallucinating (you
   suddenly hallucinate that you are playing vanilla Nethack!)
