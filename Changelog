@@ -4,9 +4,10 @@ This changelog documents all the features that differ from vanilla Nethack.
 Beware of SPOILERS for both Nethack and GlazeHack all the way through this
 document.
 
-Toggleable Options
+New Options
 - Intrinsicswap: Gaining a resistance other than poison resistance through food
-  will cause you to lose your other resistances. False by default.
+  will cause you to lose your other resistances. Experimental balancing option,
+  must be manually enabled.
 - Deaf: A roleplay option and conduct that allows you to play a deaf character.
 - Hallucinating: A roleplay option and conduct that allows you to play a
   permanently hallucinating character. Using an artifact to gain hallucination
@@ -14,6 +15,10 @@ Toggleable Options
 - Clumsy: A roleplay option and conduct that allows you to play a permanently
   fumbling character. Probably not terribly hard to ascend with, just very
   frustrating.
+- Ill-fated: A challenge mode where the dungeon difficulty is automatically
+  upped by 50.
+- Pet names for birds and dragons can be specified with birdname and dragonname
+  respectively. Birds can be set as the preferred pet with "b".
 
 General Changes
 - Deadly poison is no longer an instant kill, and instead does 1-13 extra
@@ -137,10 +142,10 @@ New Artifacts
 - Dismounter
 - Final Death
 - Unlimited Moon
-- Vladsbane (joke artifact, must be wished for)
-- The King in Yellow
 - Sharur
 - The Holographic Void Lily
+- Vladsbane (joke artifact, must be wished for)
+- The King in Yellow (summons an optional boss)
 
 Dungeon Generation
 - Statuary level: A level with many statues and statue traps. One statue
@@ -244,6 +249,9 @@ New Monsters
 - Cow
 - Phoenix
 - Spectre
+- Little Bird
+- Falcon
+- Giant Falcon
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Drake (Dragonmaster Quest)
