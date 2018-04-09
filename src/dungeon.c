@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1517912411 2018/02/06 10:20:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1523232258 2018/04/09 00:04:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2034,27 +2034,33 @@ int
 donamelevel()
 {
     mapseen *mptr;
-    char nbuf[BUFSZ] = DUMMY; /* Buffer for response */
+    char nbuf[BUFSZ]; /* Buffer for response */
 
     if (!(mptr = find_mapseen(&u.uz)))
         return 0;
 
+    nbuf[0] = '\0';
 #ifdef EDIT_GETLIN
     if (mptr->custom) {
         (void) strncpy(nbuf, mptr->custom, BUFSZ);
-        nbuf[BUFSZ-1] = '\0';
+        nbuf[BUFSZ - 1] = '\0';
     }
 #else
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
+
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
-                strlen(mptr->custom) > 30 ? "..." : "");
+                (strlen(mptr->custom) > 30) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
 #endif
         getlin("What do you want to call this dungeon level?", nbuf);
-    if (index(nbuf, '\033'))
+
+    /* empty input or ESC means don't add or change annotation;
+       space-only means discard current annotation without adding new one */
+    if (!*nbuf || *nbuf == '\033')
         return 0;
+    /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
 
     /* discard old annotation, if any */
@@ -2063,7 +2069,8 @@ donamelevel()
         mptr->custom = (char *) 0;
         mptr->custom_lth = 0;
     }
-    /* add new annotation, unless it's empty or a single space */
+    /* add new annotation, unless it's all spaces (which will be an
+       empty string after mungspaces() above) */
     if (*nbuf && strcmp(nbuf, " ")) {
         mptr->custom = dupstr(nbuf);
         mptr->custom_lth = strlen(mptr->custom);
