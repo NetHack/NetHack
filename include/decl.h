@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/09/18 by NullCGT */
+
 #ifndef DECL_H
 #define DECL_H
 
@@ -186,7 +188,9 @@ E NEARDATA struct kinfo {
 
 E long done_money;
 E NEARDATA char plname[PL_NSIZ];
+E NEARDATA char birdname[];
 E NEARDATA char dogname[];
+E NEARDATA char dragonname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;

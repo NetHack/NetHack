@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/8/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
@@ -270,6 +270,8 @@ static struct Comp_Opt {
     { "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
     { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
     { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
+    { "birdname", "the name of your (first) bird (e.g., birdname:Polly)" ,
+      PL_PSIZ, DISP_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
       SET_IN_GAME },
@@ -280,6 +282,8 @@ static struct Comp_Opt {
       sizeof(flags.end_disclose) * 2, SET_IN_GAME },
     { "dogname", "the name of your (first) dog (e.g., dogname:Fang)", PL_PSIZ,
       DISP_IN_GAME },
+    { "dragonname", "the name of your (first) dragon (e.g., dragonname:Flame)" ,
+      PL_PSIZ, DISP_IN_GAME },
     { "dungeon", "the symbols to use in drawing the dungeon map",
       MAXDCHARS + 1, SET_IN_FILE },
     { "effects", "the symbols to use in drawing special effects",
@@ -2108,6 +2112,21 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 
+    fullname = "dragonname";
+    if (match_optname(opts, fullname, 3, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            nmcpy(dragonname, op, PL_PSIZ);
+        } else
+            return FALSE;
+        sanitize_name(dragonname);
+        return retval;
+    }
+
     fullname = "horsename";
     if (match_optname(opts, fullname, 5, TRUE)) {
         if (duplicate)
@@ -2120,6 +2139,21 @@ boolean tinitial, tfrom_file;
         } else
             return FALSE;
         sanitize_name(horsename);
+        return retval;
+    }
+
+    fullname = "birdname";
+    if (match_optname(opts, fullname, 5, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        if (negated) {
+            bad_negation(fullname, FALSE);
+            return FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            nmcpy(birdname, op, PL_PSIZ);
+        } else
+            return FALSE;
+        sanitize_name(birdname);
         return retval;
     }
 
@@ -5211,6 +5245,8 @@ char *buf;
         Sprintf(buf, "%s",
                 iflags.altkeyhandler[0] ? iflags.altkeyhandler : "default");
 #endif
+    else if (!strcmp(optname, "birdname"))
+        Sprintf(buf, "%s", birdname[0] ? birdname : none);
 #ifdef BACKWARD_COMPAT
     else if (!strcmp(optname, "boulder"))
         Sprintf(buf, "%c",
@@ -5229,6 +5265,8 @@ char *buf;
         }
     else if (!strcmp(optname, "dogname"))
         Sprintf(buf, "%s", dogname[0] ? dogname : none);
+    else if (!strcmp(optname, "dragonname"))
+        Sprintf(buf, "%s", dragonname[0] ? dragonname : none);
     else if (!strcmp(optname, "dungeon"))
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "effects"))

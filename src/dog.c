@@ -198,7 +198,11 @@ makedog()
         petname = dogname;
     else if (pettype == PM_PONY)
         petname = horsename;
-    else if (pettype == PM_KITTEN)
+    else if (pettype == PM_LITTLE_BIRD)
+        petname = birdname;
+    else if (pettype == PM_BABY_RED_DRAGON)
+        petname = dragonname;
+    else
         petname = catname;
 
     /* default pet names */

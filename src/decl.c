@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/09/18 by NullCGT */
+
 #include "hack.h"
 
 int NDECL((*afternmv));
@@ -201,7 +203,9 @@ NEARDATA struct monst zeromonst = DUMMY;
 NEARDATA anything zeroany;
 
 /* originally from dog.c */
+NEARDATA char birdname[PL_PSIZ] = DUMMY;
 NEARDATA char dogname[PL_PSIZ] = DUMMY;
+NEARDATA char dragonname[PL_PSIZ] = DUMMY;
 NEARDATA char catname[PL_PSIZ] = DUMMY;
 NEARDATA char horsename[PL_PSIZ] = DUMMY;
 char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
