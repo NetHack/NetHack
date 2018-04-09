@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 4/07/18 by NullCGT */
 
 #define NEED_VARARGS /* comment line for pre-compiled headers */
 
@@ -502,9 +502,13 @@ int how;
         u.ugrave_arise = PM_VAMPIRE;
     else if (mptr == &mons[PM_GHOUL])
         u.ugrave_arise = PM_GHOUL;
+    else if (mptr == &mons[PM_BANSHEE])
+        u.ugrave_arise = PM_BANSHEE;
     else if (mptr == &mons[PM_WORM_THAT_WALKS] ||
               mptr == &mons[PM_LORD_OF_WORMS])
         u.ugrave_arise = PM_WORM_THAT_WALKS;
+    else if (mptr == &mons[PM_SPECTRE] || u.ulevel > 10)
+        u.ugrave_arise = PM_SPECTRE;
     /* this could happen if a high-end vampire kills the hero
        when ordinary vampires are genocided; ditto for wraiths */
     if (u.ugrave_arise >= LOW_PM

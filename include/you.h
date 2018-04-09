@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/7/18 by NullCGT */
+/* Edited on 4/8/18 by NullCGT */
 
 #ifndef YOU_H
 #define YOU_H
@@ -67,6 +67,8 @@ struct u_achieve {
     Bitfield(finish_sokoban, 1);  /* obtained the sokoban prize */
 
     Bitfield(killed_medusa, 1);
+    Bitfield(killed_king, 1);   /* slew the King in Yellow */
+    Bitfield(killed_demogorgon, 1);  /* slew Demogorgon */
 };
 
 struct u_realtime {
@@ -100,7 +102,9 @@ struct u_roleplay {
     boolean blind;  /* permanently blind */
     boolean hallu;  /* permanently hallucinating */
     boolean deaf;   /* permanently deaf */
+    boolean clumsy; /* permanetnly fumbling */
     boolean nudist; /* has not worn any armor, ever */
+    boolean illfated; /* massively increased dungeon danger */
     long numbones;  /* # of bones files loaded  */
 };
 

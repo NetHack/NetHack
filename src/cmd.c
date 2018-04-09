@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/7/18 by NullCGT */
+/* Edited on 4/8/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2142,6 +2142,10 @@ int final;
         else
             you_are("not wearing any armor", "");
     }
+    /* report ill-fatedness */
+    if (u.uroleplay.illfated) {
+        you_are("going to meet a terrible fate", "");
+    }
 }
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
@@ -2765,14 +2769,20 @@ int final;
     en_win = create_nhwindow(NHW_MENU);
     putstr(en_win, 0, "Voluntary challenges:");
 
+    if (u.uroleplay.clumsy)
+        you_have_been("forever fumbling");
+    if (u.uroleplay.clumsy)
+        you_have_been("fighting your fate");
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
     if (u.uroleplay.hallu)
-        you_have_been("hallucinating from birth");
+        you_have_been("hallucinating forever");
     if (u.uroleplay.deaf)
         you_have_been("deaf from birth");
+    if (u.uroleplay.illfated)
+        you_have_been("fighting against your fate");
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");

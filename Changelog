@@ -10,7 +10,10 @@ Toggleable Options
 - Deaf: A roleplay option and conduct that allows you to play a deaf character.
 - Hallucinating: A roleplay option and conduct that allows you to play a
   permanently hallucinating character. Using an artifact to gain hallucination
-  resistance will break this.
+  resistance will break this, as will drinking a potion of sickness.
+- Clumsy: A roleplay option and conduct that allows you to play a permanently
+  fumbling character. Probably not terribly hard to ascend with, just very
+  frustrating.
 
 General Changes
 - Deadly poison is no longer an instant kill, and instead does 1-13 extra
@@ -81,6 +84,11 @@ General Changes
   be generated with.
 - Summon nasties has been expanded to accommodate new monsters.
 - New demon lords!
+- High level adventurers will arise as spectres in their bones files, a more
+  powerful type of ghost which is capable of using weapons. Inspired by an
+  archived YANI by AmyBSOD and aosdict.
+- Additional achievements are tracked in the xlogfile that pertain to this
+  variant.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -230,6 +238,7 @@ New Monsters
 - Sludge Golem
 - Cow
 - Phoenix
+- Spectre
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Drake (Dragonmaster Quest)

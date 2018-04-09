@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/7/18 by NullCGT */
+/* Edited on 4/8/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -844,6 +844,8 @@ int propidx; /* special cases can have negative values */
              */
             if (propidx == BLINDED && u.uroleplay.blind)
                 Sprintf(buf, " from birth");
+            else if (propidx == FUMBLING && u.uroleplay.clumsy)
+                Sprintf(buf, " due to clumsiness");
             else if (propidx == DEAF && u.uroleplay.deaf)
                 Sprintf(buf, " from birth");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)

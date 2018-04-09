@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NulLCGT */
+/* Edited on 4/8/18 by NulLCGT */
 
 #include "hack.h"
 #include "dgn_file.h"
@@ -1632,6 +1632,9 @@ level_difficulty()
     }
     if (uamul && uamul->otyp == AMULET_OF_DANGER) {
         res += 15;
+    }
+    if (u.uroleplay.illfated) {
+        res += 50;
     }
     return (xchar) res;
 }

@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/7/18 by NullCGT */
+/* Edited on 4/8/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H
@@ -122,7 +122,7 @@
 
 #define HFumbling u.uprops[FUMBLING].intrinsic
 #define EFumbling u.uprops[FUMBLING].extrinsic
-#define Fumbling (HFumbling || EFumbling)
+#define Fumbling (HFumbling || EFumbling || u.uroleplay.clumsy)
 
 #define HWounded_legs u.uprops[WOUNDED_LEGS].intrinsic
 #define EWounded_legs u.uprops[WOUNDED_LEGS].extrinsic

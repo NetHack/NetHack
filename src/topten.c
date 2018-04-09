@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/08/18 by NullCGT */
+
 #include "hack.h"
 #include "dlb.h"
 #ifdef SHORT_FILENAMES
@@ -459,6 +461,18 @@ encodeachieve()
         r |= 1L << 12;
     if (u.uroleplay.nudist)
         r |= 1L << 13;
+    if (u.uachieve.killed_king)
+        r |= 1L << 14;
+    if (u.uachieve.killed_demogorgon)
+        r |= 1L << 15;
+    if (u.uroleplay.deaf)
+        r |= 1L << 16;
+    if (u.uroleplay.clumsy)
+        r |= 1L << 17;
+    if (u.uroleplay.hallu)
+        r |= 1L << 18;
+    if (u.uroleplay.illfated)
+        r |= 1L << 19;
 
     return r;
 }
