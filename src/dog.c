@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/24/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -63,8 +63,17 @@ pet_type()
         return  PM_KITTEN;
     else if (preferred_pet == 'd')
         return  PM_LITTLE_DOG;
+    else if (preferred_pet == 'b')
+        return PM_LITTLE_BIRD;
     else
-        return  rn2(2) ? PM_KITTEN : PM_LITTLE_DOG;
+        switch(rn2(3)) {
+            case 0:
+                return PM_KITTEN;
+            case 1:
+                return PM_LITTLE_BIRD;
+            default:
+                return PM_LITTLE_DOG;
+        }
 }
 
 struct monst *
@@ -189,7 +198,7 @@ makedog()
         petname = dogname;
     else if (pettype == PM_PONY)
         petname = horsename;
-    else
+    else if (pettype == PM_KITTEN)
         petname = catname;
 
     /* default pet names */

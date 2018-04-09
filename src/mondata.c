@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/1/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -927,6 +927,8 @@ static const short grownups[][2] = {
     { PM_CHICKATRICE, PM_COCKATRICE },
     { PM_LITTLE_DOG, PM_DOG },
     { PM_DOG, PM_LARGE_DOG },
+    { PM_LITTLE_BIRD, PM_FALCON },
+    { PM_FALCON, PM_GIANT_FALCON },
     { PM_HELL_HOUND_PUP, PM_HELL_HOUND },
     { PM_WINTER_WOLF_CUB, PM_WINTER_WOLF },
     { PM_KITTEN, PM_HOUSECAT },

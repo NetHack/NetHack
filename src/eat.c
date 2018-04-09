@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/2/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -696,6 +696,9 @@ register int pm;
     case PM_KITTEN:
     case PM_HOUSECAT:
     case PM_LARGE_CAT:
+    case PM_LITTLE_BIRD:
+    /*case PM_FALCON:
+    case PM_GIANT_FALCON:*/
         /* cannibals are allowed to eat domestic animals without penalty */
         if (!CANNIBAL_ALLOWED()) {
             You_feel("that eating the %s was a bad idea.", mons[pm].mname);

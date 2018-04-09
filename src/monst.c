@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/8/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1171,18 +1171,36 @@ NEARDATA struct permonst mons[] = {
         SIZ(30, 30, MS_SQEEK, MZ_SMALL), 0, 0,
         M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
         M2_WANDER | M2_HOSTILE, M3_INFRAVISIBLE, CLR_RED),
+    MON("little bird", S_BAT, LVL(2, 22, 6, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(150, 150, MS_SQAWK, MZ_SMALL), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_DOMESTIC, M3_INFRAVISIBLE,
+        HI_DOMESTIC),
     MON("raven", S_BAT, LVL(4, 20, 6, 0, 0), (G_GENO | 2),
         A(ATTK(AT_BITE, AD_PHYS, 1, 6), ATTK(AT_CLAW, AD_BLND, 1, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(40, 20, MS_SQAWK, MZ_SMALL), 0, 0,
         M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
         M2_WANDER | M2_HOSTILE, M3_INFRAVISIBLE, CLR_BLACK),
+    MON("falcon", S_BAT, LVL(4, 22, 5, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(400, 200, MS_SQAWK, MZ_MEDIUM), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_DOMESTIC, M3_INFRAVISIBLE,
+        HI_DOMESTIC),
     MON("vampire bat", S_BAT, LVL(5, 20, 6, 0, 0), (G_GENO | 2),
         A(ATTK(AT_BITE, AD_PHYS, 1, 6), ATTK(AT_BITE, AD_DRST, 0, 0), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(30, 20, MS_SQEEK, MZ_SMALL), MR_SLEEP | MR_POISON, 0,
         M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_POIS | M1_REGEN | M1_OMNIVORE,
         M2_HOSTILE, M3_INFRAVISIBLE, CLR_BLACK),
+    MON("giant falcon", S_BAT, LVL(6, 21, 4, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(800, 250, MS_SQAWK, MZ_MEDIUM), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_STRONG | M2_DOMESTIC,
+        M3_INFRAVISIBLE, HI_DOMESTIC),
     MON("phoenix", S_BAT, LVL(15, 20, -7, 40, 7), (G_GENO | G_NOCORPSE | 2),
         A(ATTK(AT_BITE, AD_FIRE, 2, 6), ATTK(AT_CLAW, AD_PHYS, 3, 6),
           ATTK(AT_CLAW, AD_PHYS, 3, 6), ATTK(AT_BOOM, AD_FIRE, 5, 6),
