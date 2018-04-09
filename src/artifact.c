@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/7/18 by NullCGT */
+/* Edited 4/9/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1300,7 +1300,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 return TRUE;
             }
         } else if (otmp->oartifact == ART_VORPAL_BLADE
-                   && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK])) {
+                   && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK]
+                                || mdef->data == &mons[PM_VORPAL_JABBERWOCK])) {
             static const char *const behead_msg[2] = { "%s beheads %s!",
                                                        "%s decapitates %s!" };
 

@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/6/18 by NullCGT */
+/* Edited 4/9/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -241,9 +241,7 @@ register struct monst *mtmp;
         && (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10)))
         && (!(mtmp->data->mlet == S_NYMPH
               || mtmp->data == &mons[PM_JABBERWOCK]
-#if 0 /* DEFERRED */
               || mtmp->data == &mons[PM_VORPAL_JABBERWOCK]
-#endif
               || mtmp->data->mlet == S_LEPRECHAUN) || !rn2(50))
         && (Aggravate_monster
             || (mtmp->data->mlet == S_DOG || mtmp->data->mlet == S_HUMAN)

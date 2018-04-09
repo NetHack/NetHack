@@ -65,7 +65,7 @@ General Changes
 - Runeswords and tsurugis can be randomly generated, but they are incredibly
   rare.
 - Just like SLASH'EM, baby dragons can be generated.
-- Vampire mages un-deferred.
+- Vampire mages and Vorpal Jabberwocks un-deferred.
 - If preferred pet is set to '@', the player spawns with an adventuring party.
   This is very experimental, and probably should not be used.
 - Some of the less powerful or less unique quest nemeses have been changed to
@@ -89,6 +89,8 @@ General Changes
   archived YANI by AmyBSOD and aosdict.
 - Additional achievements are tracked in the xlogfile that pertain to this
   variant.
+- Pets can now potentially become stunned or invisible by eating the right
+  kind of corpse.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.

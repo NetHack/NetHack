@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/10/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -211,7 +211,7 @@ int x, y; /* dog's starting location, might be different from current */
 boolean devour;
 {
     register struct edog *edog = EDOG(mtmp);
-    boolean poly, grow, heal, eyes, slimer, deadmimic;
+    boolean poly, grow, heal, eyes, slimer, deadmimic, stunner, invis;
     int nutrit;
     long oprice;
     char objnambuf[BUFSZ];
@@ -225,6 +225,10 @@ boolean devour;
                                          || obj->corpsenm == PM_LARGE_MIMIC
                                          || obj->corpsenm == PM_GIANT_MIMIC));
     slimer = (obj->otyp == CORPSE && obj->corpsenm == PM_GREEN_SLIME);
+    stunner = (obj->otyp == CORPSE && (obj->corpsenm == PM_GIANT_BAT
+                                         || obj->corpsenm == PM_BAT
+                                         || obj->corpsenm == PM_STALKER));
+    invis = (obj->otyp == CORPSE && (obj->corpsenm == PM_STALKER));
     poly = polyfodder(obj);
     grow = mlevelgain(obj);
     heal = mhealup(obj);
@@ -350,6 +354,14 @@ boolean devour;
         mcureblindness(mtmp, canseemon(mtmp));
     if (deadmimic)
         quickmimic(mtmp);
+    if (stunner)
+        mtmp->mstun = 1;
+    if (invis) {
+        if (mtmp->minvis != 1)
+            mtmp->minvis = 1;
+        else
+            mtmp->perminvis = 1;
+    }
     return 1;
 }
 
