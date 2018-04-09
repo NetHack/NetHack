@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/4/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -537,6 +537,14 @@ register struct monst *mtmp;
         case PM_DESERT_JINN:
             (void) mongets(mtmp, SHORT_SWORD);
             (void) mongets(mtmp, SHORT_SWORD);
+            break;
+        case PM_GRIM_REAPER:
+            otmp = mksobj(GRAIN_SCYTHE, FALSE, FALSE);
+            otmp = oname(otmp, artiname(ART_REAPER));
+            curse(otmp);
+            otmp->oerodeproof = TRUE;
+            mpickobj(mtmp, otmp);
+            break;
         }
         /* prevent djinn and mail daemons from leaving objects when
          * they vanish
@@ -1372,6 +1380,8 @@ int mmflags;
         mitem = BELL_OF_OPENING;
     } else if (mndx == PM_PESTILENCE) {
         mitem = POT_SICKNESS;
+    } else if (mndx == PM_DEATH) {
+        mitem = GRAIN_SCYTHE;
     }
     if (mitem && allow_minvent)
         (void) mongets(mtmp, mitem);

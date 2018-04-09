@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -951,6 +951,9 @@ register struct monst *mtmp;
 
         } else if (ms_Death && !rn2(10)) {
             pline_msg = "is busy reading a copy of Sandman #8.";
+        } else if (uwep && uwep->oartifact &&
+                   uwep->oartifact == ART_WAR_S_SWORD) {
+            verbal_msg = "Quite a sword you have there...";
         } else
             verbl_msg = "Who do you think you are, War?";
         break;

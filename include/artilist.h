@@ -1,7 +1,7 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 4/6/18 by NullCGT */
+/* File changed 4/9/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -149,11 +149,27 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 200L,
       NO_COLOR),
 
+    /*
+    *       Also a fairly standard bane.
+    */
     A("Final Death", BULLWHIP, (SPFX_RESTR | SPFX_DFLAG2 | SPFX_DEFN),
       0, M2_UNDEAD,
       PHYS(5, 0), DRLI(0,0), NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 200L,
       NO_COLOR),
 
+    /*
+    *       If not granted through sacrifice, the Grim Reaper is generated
+    *       with this.
+    */
+    A("Reaper", GRAIN_SCYTHE, (SPFX_RESTR | SPFX_DEFN), 0, 0, COLD(3, 20),
+      DRLI(0, 0), NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 6000L, NO_COLOR),
+
+    /*
+    *       Definitely no canonical problems here.
+    */
+    A("War\'s Sword", TWO_HANDED_SWORD,
+      (SPFX_RESTR | SPFX_CONFLICT), 0, 0, PHYS(3, 3), NO_DFNS, NO_CARY, 0,
+      A_NONE, NON_PM, NON_PM, 7000L, NO_COLOR),
     /*
     *        Just for fun.
     */

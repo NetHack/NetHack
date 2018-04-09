@@ -532,6 +532,15 @@ long wp_mask;
         else
             ESearching &= ~wp_mask;
     }
+    if (spfx & SPFX_CONFLICT) {
+        if (on) {
+            pline("This weapon feels good in your hands.");
+            EConflict |= wp_mask;
+        } else {
+            You("Reluctantly relinquish the sword.");
+            EConflict &= ~wp_mask;
+        }
+    }
     if (spfx & SPFX_HALRES) {
         /* make_hallucinated must (re)set the mask itself to get
          * the display right */
@@ -1212,10 +1221,16 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return realizes_damage;
     }
     if (attacks(AD_COLD, otmp)) {
-        if (realizes_damage)
-            pline_The("ice-cold blade %s %s%c",
-                      !spec_dbon_applies ? "hits" : "freezes", hittee,
-                      !spec_dbon_applies ? '.' : '!');
+        if (realizes_damage) {
+          if (otmp->oartifact == ART_REAPER)
+              pline_The("deathly cold scythe %s %s%c",
+                        !spec_dbon_applies ? "hits" : "chills", hittee,
+                        !spec_dbon_applies ? '.' : '!');
+          else
+              pline_The("ice-cold blade %s %s%c",
+                        !spec_dbon_applies ? "hits" : "freezes", hittee,
+                        !spec_dbon_applies ? '.' : '!');
+        }
         if (!rn2(4))
             (void) destroy_mitem(mdef, POTION_CLASS, AD_COLD);
         return realizes_damage;

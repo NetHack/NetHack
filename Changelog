@@ -29,6 +29,8 @@ General Changes
 - If a monster on the Astral Plane somehow obtains the Amulet of Yendor and
   makes it to an altar, they will attempt to sacrifice it and gain immortality,
   causing an instant loss.
+- Many new artifacts have been added, spanning many different item classes. As
+  such, randomly generated artifacts may be slightly more common.
 - Increased number of player monsters in the endgame.
 - Player monsters no longer spawn with offensive items, making them much more
   likely to employ their artifacts. Player monsters also have a larger variety
@@ -44,6 +46,10 @@ General Changes
   of venom an unfamiliar monster might be spitting.
 - Tigers now are colored orange, in order to make room for lions, which are
   colored yellow.
+- Horned devils are now yellow to make room for dust devils, which are
+  brown.
+- Barbed devils now have a passive physical damage attack involving their
+  barbs.
 - Disarmed bear traps and land mines can rarely be generated.
 - The Oracle now drops hints in major consultations about the new features
   in GlazeHack. Attempts have been made to make this fit as seamlessly as
@@ -99,6 +105,7 @@ General Changes
 - Birds are now a potential kind of pet. You begin with a little bird, which can
   grow up into a falcon and then into a giant falcon. They are balanced around
   the existing pet options.
+- Death is generated with a scythe.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -142,8 +149,10 @@ New Artifacts
 - Dismounter
 - Final Death
 - Unlimited Moon
-- Sharur
-- The Holographic Void Lily
+- Reaper
+- War's Sword
+- Sharur (Dragonmaster quest artifact)
+- The Holographic Void Lily (Cartomancer quest artifact)
 - Vladsbane (joke artifact, must be wished for)
 - The King in Yellow (summons an optional boss)
 
@@ -168,6 +177,7 @@ New Items
 - Bone Knife
 - Throwing Axe
 - Razor Whip
+- Grain Scythe
 - Earmuff (pluralization to "Earmuffs" is currently WIP)
 - Flowing Dress
 - Snappy Tuxedo
@@ -252,6 +262,7 @@ New Monsters
 - Little Bird
 - Falcon
 - Giant Falcon
+- Dust Devil
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Drake (Dragonmaster Quest)

@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -263,6 +263,8 @@ WEAPON("guisarme", "pruning hook",
 WEAPON("bill-guisarme", "hooked polearm",
        0, 0, 1,  4, 120,   7,  4, 10, 0, P|S, P_POLEARMS, IRON, HI_METAL),
         /* +1d4 small */
+WEAPON("grain scythe", "scythe",
+       0, 0, 1,  0,  60,   5,  8,  10, 0, S, P_POLEARMS, IRON, HI_METAL),
 /* other */
 WEAPON("lucern hammer", "pronged polearm",
        0, 0, 1,  5, 150,   7,  4,  6, 0, B|P, P_POLEARMS, IRON, HI_METAL),
