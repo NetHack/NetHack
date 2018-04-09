@@ -953,7 +953,7 @@ register struct monst *mtmp;
             pline_msg = "is busy reading a copy of Sandman #8.";
         } else if (uwep && uwep->oartifact &&
                    uwep->oartifact == ART_WAR_S_SWORD) {
-            verbal_msg = "Quite a sword you have there...";
+            verbl_msg = "Quite a sword you have there...";
         } else
             verbl_msg = "Who do you think you are, War?";
         break;

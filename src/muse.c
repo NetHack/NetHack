@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 3/9/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
@@ -2265,6 +2265,11 @@ const char *fmt, *str;
     } else if (EReflecting & W_ARM) {
         if (fmt && str)
             pline(fmt, str, uskin ? "luster" : "armor");
+        return TRUE;
+    } else if (EReflecting & W_ARMC) {
+        if (fmt && str)
+            pline(fmt, str, "cloak");
+            makeknown(CLOAK_OF_REFLECTION);
         return TRUE;
     } else if (youmonst.data == &mons[PM_SILVER_DRAGON]) {
         if (fmt && str)

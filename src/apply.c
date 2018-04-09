@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/19/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2417,6 +2417,9 @@ struct obj **optr;
             pline("You place the mask on your %s, and a change comes over you!",
                   body_part(FACE));
             polymon(obj->corpsenm);
+        }
+        if (obj->blessed) {
+            HUnchanging |= FROMOUTSIDE;
         }
         useup(obj);
     } else {

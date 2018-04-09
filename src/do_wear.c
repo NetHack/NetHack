@@ -275,6 +275,7 @@ Cloak_on(VOID_ARGS)
     case IRON_MANTLE:
     case FLOWING_DRESS:
     case SNAPPY_TUXEDO:
+    case CLOAK_OF_REFLECTION:
         break;
     case CLOAK_OF_FLIGHT:
         pline("%s into a magnificent pair of wings!",
@@ -286,6 +287,10 @@ Cloak_on(VOID_ARGS)
         break;
     case ELVEN_CLOAK:
         toggle_stealth(uarmc, oldprop, TRUE);
+        break;
+    case SECOND_SKIN:
+        pline("%s to fit your body very tightly.",
+            Tobjnam(uarmc, "mold"));
         break;
     case CLOAK_OF_DISPLACEMENT:
         toggle_displacement(uarmc, oldprop, TRUE);
@@ -343,6 +348,8 @@ Cloak_off(VOID_ARGS)
     case CLOAK_OF_FLIGHT:
     case FLOWING_DRESS:
     case SNAPPY_TUXEDO:
+    case SECOND_SKIN:
+    case CLOAK_OF_REFLECTION:
         break;
     case ELVEN_CLOAK:
         toggle_stealth(otmp, oldprop, FALSE);
