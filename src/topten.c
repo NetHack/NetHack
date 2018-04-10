@@ -27,7 +27,7 @@
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
 #ifndef NAMSZ
 /* Changing NAMSZ can break your existing record/logfile */
-#define NAMSZ 10
+#define NAMSZ PL_NSIZ
 #endif
 #define DTHSZ 100
 #define ROLESZ 3

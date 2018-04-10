@@ -23,6 +23,9 @@ static boolean FDECL(status_hilite_menu_fld, (int));
 static void NDECL(status_hilites_viewall);
 #endif
 
+/* limit of the player's name in the status window */
+#define BOTL_NSIZ 16
+
 static char *
 get_strength_str()
 {
@@ -60,7 +63,7 @@ do_statusline1()
     Strcpy(newbot1, g.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
-    newbot1[10] = 0;
+    newbot1[BOTL_NSIZ] = '\0';
     Sprintf(nb = eos(newbot1), " the ");
 
     if (Upolyd) {
@@ -721,26 +724,26 @@ bot_via_windowport()
     /*
      *  Player name and title.
      */
-    Strcpy(nb = buf, g.plname);
-    nb[0] = highc(nb[0]);
-    titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
-    i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
-    /* if "Name the Rank/monster" is too long, we truncate the name
-       but always keep at least 10 characters of it; when hitpintbar is
-       enabled, anything beyond 30 (long monster name) will be truncated */
-    if (i > 30) {
-        i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
-        nb[max(i, 10)] = '\0';
-    }
-    Strcpy(nb = eos(nb), " the ");
-    Strcpy(nb = eos(nb), titl);
-    if (Upolyd) { /* when poly'd, capitalize monster name */
-        for (i = 0; nb[i]; i++)
-            if (i == 0 || nb[i - 1] == ' ')
-                nb[i] = highc(nb[i]);
-    }
-    Sprintf(g.blstats[idx][BL_TITLE].val, "%-30s", buf);
-    g.valset[BL_TITLE] = TRUE; /* indicate val already set */
+     Strcpy(nb = buf, g.plname);
+     nb[0] = highc(nb[0]);
+     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
+     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
+     /* if "Name the Rank/monster" is too long, we truncate the name
+        but always keep at least BOTL_NSIZ characters of it; when hitpintbar is
+        enabled, anything beyond 30 (long monster name) will be truncated */
+     if (i > 30) {
+         i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
+         nb[max(i, BOTL_NSIZ)] = '\0';
+     }
+     Strcpy(nb = eos(nb), " the ");
+     Strcpy(nb = eos(nb), titl);
+     if (Upolyd) { /* when poly'd, capitalize monster name */
+         for (i = 0; nb[i]; i++)
+             if (i == 0 || nb[i - 1] == ' ')
+                 nb[i] = highc(nb[i]);
+     }
+     Sprintf(g.blstats[idx][BL_TITLE].val, "%-30s", buf);
+     g.valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
     g.blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
