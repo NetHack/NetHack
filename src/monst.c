@@ -2691,6 +2691,12 @@ struct permonst _mons2[] = {
 #define SEDUCTION_ATTACKS_NO                                      \
     A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
       ATTK(AT_BITE, AD_DRLI, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK)
+    MON("infernal", S_DEMON, LVL(0, 12, 10, 0, 0), G_NOGEN, /* for corpses */
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_STRONG |
+        M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, HI_DOMESTIC),
     MON("succubus", S_DEMON, LVL(6, 12, 0, 70, -9), (G_NOCORPSE | 1),
         SEDUCTION_ATTACKS_YES, SIZ(WT_HUMAN, 400, MS_SEDUCE, MZ_HUMAN),
         MR_FIRE | MR_POISON, 0, M1_HUMANOID | M1_FLY | M1_POIS,

@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/8/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -92,6 +92,10 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
+  ang_abil[] = { { 1, &HFlying, "", "" },
+                 { 1, &HAggravate_monster, "", "" },
+                 { 0, 0, 0, 0 } },
+
   dwa_abil[] = { { 1, &HInfravision, "", "" },
                  { 0, 0, 0, 0 } },
 
@@ -100,6 +104,11 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   gno_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  inf_abil[] = { { 1, &HInfravision, "", ""},
+                 { 7, &HRegeneration, "itchy",
+                                           "less itchy" },
                  { 0, 0, 0, 0 } },
 
   mer_abil[] = { { 1, &HSwimming, "", ""},
@@ -748,6 +757,10 @@ long frommask;
         case PM_MERFOLK:
             abil = mer_abil;
             break;
+        case PM_INFERNAL:
+            abil = inf_abil;
+        case PM_ANGEL:
+            abil = ang_abil;
         default:
             break;
         }
@@ -917,6 +930,12 @@ int oldlevel, newlevel;
     abil = role_abil(Role_switch);
 
     switch (Race_switch) {
+    case PM_INFERNAL:
+        rabil = inf_abil;
+        break;
+    case PM_ANGEL:
+        rabil = ang_abil;
+        break;
     case PM_MERFOLK:
         rabil = mer_abil;
         break;

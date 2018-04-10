@@ -1325,6 +1325,8 @@ int mmflags;
         break;
     case S_HUMAN:
     case S_KOP:
+        if (Race_if(PM_INFERNAL))
+            mtmp->mpeaceful = FALSE;
         if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
             && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)
             && !is_elf(ptr) && !(is_dwarf(ptr))) {

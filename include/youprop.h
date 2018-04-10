@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/8/18 by NullCGT */
+/* Edited on 4/9/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H
@@ -370,6 +370,7 @@
    redundant but allows the function calls to be skipped most of the time */
 #define Unaware (multi < 0 && (unconscious() || is_fainted()))
 
-#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(youmonst.data))
+#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(youmonst.data) || \
+                     Race_if(PM_INFERNAL))
 
 #endif /* YOUPROP_H */

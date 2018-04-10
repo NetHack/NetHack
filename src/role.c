@@ -722,6 +722,27 @@ const struct Race races[] = {
         { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
+        "angel",
+        "angelic",
+        "celestialkind",
+        "Ang",
+        { 0, 0 },
+        PM_ANGEL,
+        NON_PM,
+        PM_HUMAN_MUMMY,
+        PM_HUMAN_ZOMBIE,
+        MH_HUMAN | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL,
+        MH_HUMAN,
+        0,
+        0,
+        /*    Str     Int Wis Dex Con Cha */
+        { 3, 3, 3, 3, 3, 3 },
+        { 18, 18, 18, 18, 16, 20 },
+        /* Init   Lower  Higher */
+        { 2, 0, 0, 2, 1, 0 }, /* Hit points */
+        { 1, 0, 2, 0, 2, 0 }  /* Energy */
+    },
+    {
         "elf",
         "elven",
         "elvenkind",
@@ -741,6 +762,27 @@ const struct Race races[] = {
         /* Init   Lower  Higher */
         { 1, 0, 0, 1, 1, 0 }, /* Hit points */
         { 2, 0, 3, 0, 3, 0 }  /* Energy */
+    },
+    {
+        "infernal",
+        "infernal",
+        "demonkind",
+        "Inf",
+        { 0, 0 },
+        PM_INFERNAL,
+        NON_PM,
+        NON_PM,
+        NON_PM,
+        MH_ORC | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_CHAOTIC,
+        MH_ORC,
+        0,
+        MH_GNOME | MH_ORC | MH_HUMAN | MH_DWARF | MH_ELF,
+        /*    Str     Int Wis Dex Con Cha */
+        { 3, 3, 3, 3, 3, 3 },
+        { STR18(100), 18, 18, 18, 18, 20 },
+        /* Init   Lower  Higher */
+        { 2, 0, 0, 2, 1, 0 }, /* Hit points */
+        { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
         "merfolk",

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/19/16 by NullCGT */
+/* Edited on 4/9/16 by NullCGT */
 
 #include "hack.h"
 
@@ -227,7 +227,8 @@ register struct monst *mtmp;
 
     /* amulet check moved to here because of potential issues with
        disappearance. */
-    if ((uwep && uwep->oartifact == ART_EXCALIBUR) || mon_has_amulet(mtmp)) {
+    if ((uwep && uwep->oartifact == ART_EXCALIBUR) || mon_has_amulet(mtmp)
+        || Race_if(PM_ANGEL)) {
         pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
