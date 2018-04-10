@@ -1630,18 +1630,6 @@ boolean countem;
     return container_count;
 }
 
-int
-floor_loot_ok(obj)
-struct obj *obj;
-{
-    if (Is_container(obj)) {
-        if (able_to_loot(obj->ox, obj->oy, TRUE, TRUE))
-            return 2;
-        return 1;
-    }
-    return 0;
-}
-
 STATIC_OVL boolean
 able_to_loot(x, y, looting, silent)
 int x, y;
