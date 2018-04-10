@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/6/18 by NullCGT */
+/* Edited on 4/10/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2110,7 +2110,10 @@ register struct attack *mattk;
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
-            You("engulf it, then expel it.");
+            if (has_head(youmonst.data))
+                You("swallow it, then spit it out.");
+            else
+                You("engulf it, then expel it.");
             if (canspotmon(mdef))
                 pline("It turns into %s.", a_monnam(mdef));
             else
@@ -2133,7 +2136,10 @@ register struct attack *mattk;
 
             if (!type_is_pname(pd))
                 mname = an(mname);
-            You("englut %s.", mon_nam(mdef));
+            if (has_head(youmonst.data))
+                You("swallow %s.", mon_nam(mdef));
+            else
+                You("englut %s.", mon_nam(mdef));
             Sprintf(kbuf, "swallowing %s whole", mname);
             instapetrify(kbuf);
         } else {
