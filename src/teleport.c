@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1523306912 2018/04/09 20:48:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -595,7 +595,7 @@ level_tele()
     register int newlev;
     d_level newlevel;
     const char *escape_by_flying = 0; /* when surviving dest of -N */
-    char buf[BUFSZ] = DUMMY;
+    char buf[BUFSZ];
     boolean force_dest = FALSE;
 
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
@@ -609,12 +609,22 @@ level_tele()
 
         Strcpy(qbuf, "To what level do you want to teleport?");
         do {
+            if (iflags.menu_requested) {
+                /* wizard mode 'm ^V' skips prompting on first pass
+                   (note: level Tport via menu won't have any second pass) */
+                iflags.menu_requested = FALSE;
+                if (wizard)
+                    goto levTport_menu;
+            }
             if (++trycnt == 2) {
                 if (wizard)
                     Strcat(qbuf, " [type a number, name, or ? for a menu]");
                 else
                     Strcat(qbuf, " [type a number or name]");
             }
+            *buf = '\0'; /* EDIT_GETLIN: if we're on second or later pass,
+                            the previous input was invalid so don't use it
+                            as getlin()'s preloaded default answer */
             getlin(qbuf, buf);
             if (!strcmp(buf, "\033")) { /* cancelled */
                 if (Confusion && rnl(5)) {
@@ -629,9 +639,12 @@ level_tele()
                 goto random_levtport;
             }
             if (wizard && !strcmp(buf, "?")) {
-                schar destlev = 0;
-                xchar destdnum = 0;
+                schar destlev;
+                xchar destdnum;
 
+            levTport_menu:
+                destlev = 0;
+                destdnum = 0;
                 newlev = (int) print_dungeon(TRUE, &destlev, &destdnum);
                 if (!newlev)
                     return;

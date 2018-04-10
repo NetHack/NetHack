@@ -537,6 +537,8 @@ gas spore explosion killing a gas spore which triggers a recursive explosion
 	they were both "gas spore's explosion" it wouldn't be noticeable (see
 	corresponding post-3.6.0 entry for more...)
 wizard mode 'sanity_check' gave spurious "mon not on map" warnings when mounted
+at the prompt for entering a level annotation, responding with <return>
+	erroneously removed old annotation; use <space><return> to do that
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -629,6 +631,7 @@ gas spore explosion killing a gas spore which triggers a recursive explosion
 	explosions causing multiple levels of recursion)
 if multiple bands of blank lines were squeezed out of DUMPLOG's map, spurious
 	blank lines appeared in the final map output
+cursor positioning autodescribe of a statue while hallucinating was blank
 
 
 Platform- and/or Interface-Specific Fixes
@@ -824,6 +827,8 @@ a prayer result which results in uncursing some or all of the hero's items
 wielded aklys behaves like Mjollnir when thrown--it usually returns; unlike
 	Mjollnir, it isn't limited to Valkyries or need gauntlets of power
 	(so far, hero-only; an aklys won't return if thrown by a monster)
+allow 'm' prefix for wizard mode level teleport command (^V) to bypass prompt
+	for destination and use menu of special level locations
 
 
 Platform- and/or Interface-Specific New Features
