@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/6/18 by NullCGT */
+/* Edited on 4/10/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1839,6 +1839,8 @@ struct attack *mattk;
             pline("%s lunges forward and plucks you off %s!", Monnam(mtmp),
                   buf);
             dismount_steed(DISMOUNT_ENGULFED);
+        } else if (has_head(mtmp->data)) {
+            pline("%s swallows you!", Monnam(mtmp));
         } else
             pline("%s engulfs you!", Monnam(mtmp));
         stop_occupation();
