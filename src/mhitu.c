@@ -979,7 +979,11 @@ register struct attack *mattk;
                     dmg = 0;
                 } else {
                     u.ustuck = mtmp;
-                    pline("%s grabs you!", Monnam(mtmp));
+                    if (Hallucination) {
+                        pline("%s wrestles you!", Monnam(mtmp));
+                    } else {
+                        pline("%s grabs you!", Monnam(mtmp));
+                    }
                 }
             } else if (u.ustuck == mtmp) {
                 exercise(A_STR, FALSE);
@@ -1310,8 +1314,13 @@ register struct attack *mattk;
                             moat ? "moat" : "pool of water",
                             an(mtmp->data->mname));
                     done(DROWNING);
-                } else if (mattk->aatyp == AT_HUGS)
-                    You("are being crushed.");
+                } else if (mattk->aatyp == AT_HUGS) {
+                    if (Hallucination) {
+                        pline("%s suplexes you!", Monnam(mtmp));
+                    } else {
+                        You("are being crushed.");
+                    }
+                }
             } else {
                 dmg = 0;
                 if (flags.verbose)
@@ -1769,7 +1778,8 @@ register struct attack *mattk;
              * already at or below minimum threshold; do nothing */
             context.botl = 1;
         }
-
+        if (Hallucination && dmg > 0.5 * u.uhpmax && !rn2(5))
+            pline("The studio audience boos!");
         mdamageu(mtmp, dmg);
     }
 
