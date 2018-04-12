@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 2/16/18 by NullCGT */
+/* Modified 4/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1269,8 +1269,11 @@ int okind;
         pm_index = PM_IRON_GOLEM;
         material = "metal ";
         break;
-    case COPPER:
     case SILVER:
+        pm_index = PM_SILVER_GOLEM;
+        material = "metal ";
+        break;
+    case COPPER:
     case PLATINUM:
     case GEMSTONE:
     case MINERAL:

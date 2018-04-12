@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 4/12/18 by NullCGT */
 /* Uncommented code allowing monsters to use scrolls of fire */
 /* Monsters now attempt to use wands of cancellation */
 /* Monsters now throw potions of polymorph as well as drink them */
@@ -2235,6 +2235,10 @@ const char *str;
         /* Silver dragons only reflect when mature; babies do not */
         if (str)
             pline(str, s_suffix(mon_nam(mon)), "scales");
+        return TRUE;
+    } else if (mon->data == &mons[PM_SILVER_GOLEM]) {
+        if (str)
+            pline(str, s_suffix(mon_nam(mon)), "body");
         return TRUE;
     }
     return FALSE;

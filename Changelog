@@ -107,6 +107,8 @@ General Changes
   the existing pet options.
 - Death is generated with a scythe.
 - Monsters with heads now "swallow" you instead of "engulfing" you.
+- If you are playing an infernal or polymorphed into a silver-hating creature,
+  silver will deal an extra 1-20 damage to you.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -262,6 +264,7 @@ New Monsters
 - Bad Clone
 - Draugr
 - Amphisbaena
+- Silver Golem
 - Sludge Golem
 - Cow
 - Phoenix

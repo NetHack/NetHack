@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/10/18 by NullCGT */
+/* Edited on 4/12/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1021,6 +1021,7 @@ register struct attack *mattk;
                     && Hate_silver) {
                     pline_The("silver sears your flesh!");
                     exercise(A_CON, FALSE);
+                    dmg += rnd(20);
                 }
                 /* this redundancy necessary because you have
                    to take the damage _before_ being cloned;
@@ -1049,6 +1050,14 @@ register struct attack *mattk;
             } else if (mattk->aatyp != AT_TUCH || dmg != 0
                        || mtmp != u.ustuck)
                 hitmsg(mtmp, mattk);
+        }
+        if (is_silver(mtmp->data) && Hate_silver) {
+            struct obj *otmp = mon_currwep;
+            if (!otmp) {
+                pline_The("silver sears your flesh!");
+                exercise(A_CON, FALSE);
+                dmg += rnd(20);
+            }
         }
         break;
     case AD_DISE:
