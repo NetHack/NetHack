@@ -1,4 +1,4 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1522796701 2018/04/03 23:05:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	getline.c	$NHDT-Date: 1523619111 2018/04/13 11:31:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,13 +56,19 @@ getlin_hook_proc hook;
     cw->flags &= ~WIN_STOP;
     ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
+
+    /* issue the prompt */
+    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
 #ifdef EDIT_GETLIN
-    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s %s", query, bufp);
+    /* bufp is input/output; treat current contents (presumed to be from
+       previous getlin()) as default input */
+    addtopl(obufp);
     bufp = eos(obufp);
 #else
-    custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
-    *obufp = 0;
+    /* !EDIT_GETLIN: bufp is output only; init it to empty */
+    *bufp = '\0';
 #endif
+
     for (;;) {
         (void) fflush(stdout);
         Strcat(strcat(strcpy(toplines, query), " "), obufp);

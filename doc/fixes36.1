@@ -632,6 +632,10 @@ gas spore explosion killing a gas spore which triggers a recursive explosion
 if multiple bands of blank lines were squeezed out of DUMPLOG's map, spurious
 	blank lines appeared in the final map output
 cursor positioning autodescribe of a statue while hallucinating was blank
+tty+EDIT_GETLIN: if prompt plus existing output buffer contents (result of
+	a prior getlin() used as default input) was long enough to wrap to
+	second line, the wrap point could be different from when the previous
+	input was typed, resulting it strange erase-char/kill-chars behavior
 
 
 Platform- and/or Interface-Specific Fixes
