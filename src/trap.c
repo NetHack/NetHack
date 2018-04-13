@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1127,6 +1127,19 @@ unsigned trflags;
         dofiretrap((struct obj *) 0);
         break;
 
+    case BUZZSAW_TRAP:
+        seetrap(trap);
+        pline("Spinning buzzsaws erupt from the %s under you!",
+              surface(u.ux, u.uy));
+        if (Levitation || Flying) {
+            pline("The blades spin uselessly beneath you.");
+        } else if (u.usteed && steedintrap(trap, (struct obj *) 0)) {
+            ;
+        } else {
+            losehp(Maybe_Half_Phys(d(4,6)), "spinning blade", KILLED_BY_AN);
+        }
+        break;
+
     case PIT:
     case SPIKED_PIT:
         /* KMH -- You can't escape the Sokoban level traps */
@@ -1557,6 +1570,10 @@ struct obj *otmp;
         break;
     case LANDMINE:
         trapkilled = thitm(0, steed, (struct obj *) 0, rnd(16), FALSE);
+        steedhit = TRUE;
+        break;
+    case BUZZSAW_TRAP:
+        trapkilled = thitm(0, steed, (struct obj *) 0, d(4, 6), FALSE);
         steedhit = TRUE;
         break;
     case PIT:
@@ -2371,6 +2388,22 @@ register struct monst *mtmp;
                 melt_ice(mtmp->mx, mtmp->my, (char *) 0);
             if (see_it)
                 seetrap(trap);
+            break;
+        case BUZZSAW_TRAP:
+            if (in_sight) {
+                pline("Spinning buzzsaws erupt from the %s under %s!",
+                      surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
+            } else if (see_it) {
+                pline("Spinning buzzsaws erupt from %s!",
+                      surface(mtmp->mx, mtmp->my));
+            }
+            if (is_flyer(mptr) || is_floater(mptr)) {
+                pline("The blades do not reach %s.", mon_nam(mtmp));
+            } else if (thitm(0, mtmp, (struct obj *) 0, d(4, 6), FALSE))
+                trapkilled = TRUE;
+            if (see_it) {
+                seetrap(trap);
+            }
             break;
         case PIT:
         case SPIKED_PIT:

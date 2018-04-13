@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited 3/29/18 by NullCGT */
+/* Edited 4/13/18 by NullCGT */
 
 /*
  * This file contains the main function for the parser
@@ -161,6 +161,7 @@ static struct {
                    { "sleep gas", SLP_GAS_TRAP },
                    { "rust", RUST_TRAP },
                    { "fire", FIRE_TRAP },
+                   { "buzzsaw", BUZZSAW_TRAP },
                    { "pit", PIT },
                    { "spiked pit", SPIKED_PIT },
                    { "hole", HOLE },

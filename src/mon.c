@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1461,6 +1461,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                                 && !is_whirly(mdat) && !unsolid(mdat)))
                         && (ttmp->ttyp != FIRE_TRAP || !resists_fire(mon))
                         && (ttmp->ttyp != SQKY_BOARD || !is_flyer(mdat))
+                        && (ttmp->ttyp != BUZZSAW_TRAP || !is_flyer(mdat))
                         && (ttmp->ttyp != WEB
                             || (!amorphous(mdat) && !webmaker(mdat)
                                 && !is_whirly(mdat) && !unsolid(mdat)))

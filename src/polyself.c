@@ -2,7 +2,7 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 /*
  * Polymorph self routine.
@@ -1226,6 +1226,7 @@ dospinweb()
         case BEAR_TRAP:
         case ROCKTRAP:
         case FIRE_TRAP:
+        case BUZZSAW_TRAP:
         case LANDMINE:
         case SLP_GAS_TRAP:
         case RUST_TRAP:

@@ -4,6 +4,8 @@
 
 /* note for 3.1.0 and later: no longer manipulated by 'makedefs' */
 
+/* Edited on 4/13/18 by NullCGT */
+
 #ifndef TRAP_H
 #define TRAP_H
 
@@ -65,6 +67,7 @@ enum trap_types {
     SLP_GAS_TRAP,
     RUST_TRAP,
     FIRE_TRAP,
+    BUZZSAW_TRAP,
     PIT,
     SPIKED_PIT,
     HOLE,

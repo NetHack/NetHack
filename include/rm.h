@@ -1,7 +1,7 @@
 /* NetHack 3.6	rm.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 2/01/18 by NullCGT */
+/* File changed 4/13/18 by NullCGT */
 
 #ifndef RM_H
 #define RM_H
@@ -169,6 +169,7 @@ enum screen_symbols {
     S_sleeping_gas_trap,
     S_rust_trap,
     S_fire_trap,
+    S_buzzsaw_trap,
     S_pit,
     S_spiked_pit,
     S_hole,

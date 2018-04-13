@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 
@@ -474,7 +474,7 @@ int *dy, *xx, *yy;
 static NEARDATA const char *trap_engravings[TRAPNUM] = {
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
-    (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0,
+    (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
     /* 14..16: trap door, teleport, level-teleport */
     "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
@@ -1394,6 +1394,10 @@ coord *tm;
                 break;
             case SPIKED_PIT:
                 if (lvl < 5)
+                    kind = NO_TRAP;
+                break;
+            case BUZZSAW_TRAP:
+                if (lvl < 6)
                     kind = NO_TRAP;
                 break;
             case LANDMINE:

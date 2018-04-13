@@ -12,6 +12,8 @@
 # having the high bit set (in hexadecimal, \x80 is combined with
 # a character code between \x60 and \x7f).
 
+# Edited by NullCGT on 4/13/18
+
 start: DECgraphics
 	Handling: DEC
 	S_vwall: \xf8			# meta-x, vertical rule
@@ -170,23 +172,23 @@ start: RogueIBM
 	S_wand: \xe7
 	S_vwall: \xba			# all walls now use
 	S_hwall: \xcd			# double line graphics
-	S_tlcorn: \xc9 
-	S_trcorn: \xbb 
-	S_blcorn: \xc8 
-	S_brcorn: \xbc 
-	S_crwall: \xce 
-	S_tuwall: \xca 
-	S_tdwall: \xcb 
-	S_tlwall: \xb9 
-	S_trwall: \xcc 
-	S_ndoor: \xce 
-	S_vodoor: \xce 
-	S_hodoor: \xce 
-	S_room: \xfa			# centered dot 
-	S_corr: \xb1 
-	S_litcorr: \xb2 
-	S_upstair: \xf0			# Greek Xi 
-	S_dnstair: \xf0 
+	S_tlcorn: \xc9
+	S_trcorn: \xbb
+	S_blcorn: \xc8
+	S_brcorn: \xbc
+	S_crwall: \xce
+	S_tuwall: \xca
+	S_tdwall: \xcb
+	S_tlwall: \xb9
+	S_trwall: \xcc
+	S_ndoor: \xce
+	S_vodoor: \xce
+	S_hodoor: \xce
+	S_room: \xfa			# centered dot
+	S_corr: \xb1
+	S_litcorr: \xb2
+	S_upstair: \xf0			# Greek Xi
+	S_dnstair: \xf0
 finish
 
 start: RogueEpyx
@@ -196,45 +198,46 @@ start: RogueEpyx
 	Color: Yes
 	S_vwall: \xba			# all walls now use
 	S_hwall: \xcd			# double line graphics
-	S_tlcorn: \xc9 
-	S_trcorn: \xbb 
-	S_blcorn: \xc8 
-	S_brcorn: \xbc 
-	S_crwall: \xce 
-	S_tuwall: \xca 
-	S_tdwall: \xcb 
-	S_tlwall: \xb9 
-	S_trwall: \xcc 
-	S_ndoor: \xce 
-	S_vodoor: \xce 
-	S_hodoor: \xce 
-	S_room: \xfa			# centered dot 
-	S_corr: \xb1 
-	S_litcorr: \xb2 
-	S_upstair: \xf0			# Greek Xi 
-	S_dnstair: \xf0 
-	S_arrow_trap: \x04		# diamond (cards) 
-	S_dart_trap: \x04 
-	S_falling_rock_trap: \x04 
-	S_squeaky_board: \x04 
-	S_bear_trap: \x04 
-	S_land_mine: \x04 
-	S_rolling_boulder_trap: \x04 
-	S_sleeping_gas_trap: \x04 
-	S_rust_trap: \x04 
-	S_fire_trap: \x04 
-	S_pit: \x04 
-	S_spiked_pit: \x04 
-	S_hole: \x04 
-	S_trap_door: \x04 
-	S_teleportation_trap: \x04 
-	S_level_teleporter: \x04 
-	S_magic_portal: \x04 
-	S_web: \x04 
-	S_statue_trap: \x04 
-	S_magic_trap: \x04 
-	S_anti_magic_trap: \x04 
-	S_polymorph_trap: \x04 
+	S_tlcorn: \xc9
+	S_trcorn: \xbb
+	S_blcorn: \xc8
+	S_brcorn: \xbc
+	S_crwall: \xce
+	S_tuwall: \xca
+	S_tdwall: \xcb
+	S_tlwall: \xb9
+	S_trwall: \xcc
+	S_ndoor: \xce
+	S_vodoor: \xce
+	S_hodoor: \xce
+	S_room: \xfa			# centered dot
+	S_corr: \xb1
+	S_litcorr: \xb2
+	S_upstair: \xf0			# Greek Xi
+	S_dnstair: \xf0
+	S_arrow_trap: \x04		# diamond (cards)
+	S_dart_trap: \x04
+	S_falling_rock_trap: \x04
+	S_squeaky_board: \x04
+	S_bear_trap: \x04
+	S_land_mine: \x04
+	S_rolling_boulder_trap: \x04
+	S_sleeping_gas_trap: \x04
+	S_rust_trap: \x04
+	S_fire_trap: \x04
+	S_buzzsaw_trap: \x04
+	S_pit: \x04
+	S_spiked_pit: \x04
+	S_hole: \x04
+	S_trap_door: \x04
+	S_teleportation_trap: \x04
+	S_level_teleporter: \x04
+	S_magic_portal: \x04
+	S_web: \x04
+	S_statue_trap: \x04
+	S_magic_trap: \x04
+	S_anti_magic_trap: \x04
+	S_polymorph_trap: \x04
 	S_weapon: \x18			# up arrow
 # ^J	S_armor: \x0a			# Vert rect with o
 	S_armor: \x5b			# default: '['
@@ -272,26 +275,26 @@ start: RogueWindows
 	S_wand: \xe7
 	S_vwall: \xba			# all walls now use
 	S_hwall: \xcd			# double line graphics
-	S_tlcorn: \xc9 
-	S_trcorn: \xbb 
-	S_blcorn: \xc8 
-	S_brcorn: \xbc 
-	S_crwall: \xce 
-	S_tuwall: \xca 
-	S_tdwall: \xcb 
-	S_tlwall: \xb9 
-	S_trwall: \xcc 
-	S_ndoor: \xce 
-	S_vodoor: \xce 
-	S_hodoor: \xce 
-	S_room: \xfa			# centered dot 
-	S_corr: \xb1 
-	S_litcorr: \xb2 
-	S_upstair: \xf0			# Greek Xi 
-	S_dnstair: \xf0 
+	S_tlcorn: \xc9
+	S_trcorn: \xbb
+	S_blcorn: \xc8
+	S_brcorn: \xbc
+	S_crwall: \xce
+	S_tuwall: \xca
+	S_tdwall: \xcb
+	S_tlwall: \xb9
+	S_trwall: \xcc
+	S_ndoor: \xce
+	S_vodoor: \xce
+	S_hodoor: \xce
+	S_room: \xfa			# centered dot
+	S_corr: \xb1
+	S_litcorr: \xb2
+	S_upstair: \xf0			# Greek Xi
+	S_dnstair: \xf0
 finish
 
-# Recommended symset for blind players 
+# Recommended symset for blind players
 # courtesy Michael Feir
 start: NHAccess
 	Description: Recommended for blind players
@@ -304,7 +307,7 @@ start: NHAccess
 	S_brcorn: \124
 	S_crwall: \045
 	S_tuwall: \045
-	S_tdwall: \045 
+	S_tdwall: \045
 	S_tlwall: \124
 	S_trwall: \124
 	S_ndoor: \046
@@ -316,7 +319,7 @@ start: NHAccess
 	S_tree: \035
 	S_room: \035
 	S_corr: \060
-	S_litcorr: \062 
+	S_litcorr: \062
 	S_upstair: \060
 	S_dnstair: \062
 	S_upladder: \095
@@ -325,35 +328,36 @@ start: NHAccess
 	S_grave: \126
 	S_throne: \126
 	S_sink: \126
-	S_fountain: \126 
+	S_fountain: \126
 	S_pool: \042
 	S_ice: \042
 	S_lava: \035
 	S_vodbridge: \035
-	S_hodbridge: \032 
+	S_hodbridge: \032
 	S_vcdbridge: \035
 	S_hcdbridge: \126
 	S_arrow_trap: \094
 	S_dart_trap: \094
-	S_falling_rock_trap: \094 
+	S_falling_rock_trap: \094
 	S_squeaky_board: \094
 	S_bear_trap: \094
 	S_land_mine: \094
-	S_rolling_boulder_trap: \094 
+	S_rolling_boulder_trap: \094
 	S_sleeping_gas_trap: \094
 	S_rust_trap: \094
 	S_fire_trap: \094
+	S_buzzsaw_trap: \094
 	S_pit: \094
 	S_spiked_pit: \094
 	S_hole: \094
-	S_trap_door: \094 
+	S_trap_door: \094
 	S_teleportation_trap: \094
 	S_level_teleporter: \094
 	S_magic_portal: \094
 	S_web: \094
-	S_statue_trap: \094 
+	S_statue_trap: \094
 	S_magic_trap: \094
-	S_anti_magic_trap: \094 
+	S_anti_magic_trap: \094
 	S_polymorph_trap: \094
 	S_vbeam: \124
 	S_hbeam: \095
@@ -375,7 +379,7 @@ start: NHAccess
 	S_sw_bl: \092
 	S_sw_bc: \045
 	S_sw_br: \047
-	S_explode1: \047 
+	S_explode1: \047
 	S_explode2: \045
 	S_explode3: \092
 	S_explode4: \058
@@ -409,6 +413,7 @@ start: Blank
         S_boomright: \032
         S_boulder: \032
         S_brcorn: \032
+				S_buzzsaw_trap: \032
         S_centaur: \032
         S_chain: \032
         S_cloud: \032

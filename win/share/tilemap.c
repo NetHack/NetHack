@@ -7,6 +7,10 @@
  *	then again with it defined to produce tiletxt.{o,obj}.
  */
 
+/*
+ * Edited by NullCGT on 4/13/18
+ */
+
 #include "hack.h"
 
 const char *FDECL(tilename, (int, int));
@@ -573,6 +577,7 @@ struct {
 {S_sleeping_gas_trap,    "sleeping gas trap", "sleeping gas trap"},
 {S_rust_trap,            "rust trap", "rust trap"},
 {S_fire_trap,            "fire trap", "fire trap"},
+{S_buzzsaw_trap,         "buzzsaw trap", "buzzsaw trap"},
 {S_pit,                  "pit", "pit"},
 {S_spiked_pit,           "spiked pit", "spiked pit"},
 {S_hole,                 "hole", "hole"},
@@ -632,4 +637,3 @@ const char *encountered, *expected;
     }
     return FALSE;
 }
-

@@ -2,7 +2,7 @@
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 #include "tcap.h"
@@ -192,6 +192,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "sleeping gas trap", C(HI_ZAP) },      /* trap */
 /*50*/ { '^', "rust trap", C(CLR_BLUE) },            /* trap */
        { '^', "fire trap", C(CLR_ORANGE) },          /* trap */
+       { '^', "buzzsaw trap", C(CLR_CYAN) },         /* trap */
        { '^', "pit", C(CLR_BLACK) },                 /* trap */
        { '^', "spiked pit", C(CLR_BLACK) },          /* trap */
        { '^', "hole", C(CLR_BROWN) },                /* trap */
@@ -630,6 +631,7 @@ struct symparse loadsyms[] = {
     { SYM_PCHAR, S_sleeping_gas_trap, "S_sleeping_gas_trap" },
     { SYM_PCHAR, S_rust_trap, "S_rust_trap" },
     { SYM_PCHAR, S_fire_trap, "S_fire_trap" },
+    { SYM_PCHAR, S_buzzsaw_trap, "S_buzzsaw_trap" },
     { SYM_PCHAR, S_pit, "S_pit" },
     { SYM_PCHAR, S_spiked_pit, "S_spiked_pit" },
     { SYM_PCHAR, S_hole, "S_hole" },
