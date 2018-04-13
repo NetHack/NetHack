@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 4/12/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -274,7 +274,10 @@ WEAPON("bec de corbin", "beaked polearm",
 
 /* bludgeons */
 WEAPON("mace", None,
-       1, 0, 0, 40,  30,   5,  6,  6, 0, B,   P_MACE, IRON, HI_METAL),
+       1, 0, 0, 36,  30,   5,  6,  6, 0, B,   P_MACE, IRON, HI_METAL),
+        /* +1 small */
+WEAPON("silver mace", None,
+       1, 0, 0, 4,  30,   5,  6,  6, 0, B,   P_MACE, SILVER, HI_SILVER),
         /* +1 small */
 WEAPON("ornate mace", None,
        1, 0, 0, 0,  30,   5,  6,  6, 0, B,   P_MACE, GOLD, HI_METAL),
@@ -399,7 +402,7 @@ DRGN_ARMR("orange dragon scale mail",  1, SLEEP_RES,   900, 1, CLR_ORANGE),
 DRGN_ARMR("black dragon scale mail",   1, DISINT_RES, 1200, 1, CLR_BLACK),
 DRGN_ARMR("blue dragon scale mail",    1, SHOCK_RES,   900, 1, CLR_BLUE),
 DRGN_ARMR("green dragon scale mail",   1, POISON_RES,  900, 1, CLR_GREEN),
-DRGN_ARMR("ooze dragon scale mail",    1, ACID_RES,    900, 1, CLR_BRIGHT_GREEN),
+DRGN_ARMR("ooze dragon scale mail",    1, ACID_RES,   1200, 1, CLR_BRIGHT_GREEN),
 DRGN_ARMR("razor dragon scale mail",   1, FAST,       1200, 1, CLR_BRIGHT_CYAN),
 DRGN_ARMR("filth dragon scale mail",   1, SICK_RES,   1200, 1, CLR_BROWN),
 DRGN_ARMR("hex dragon scale mail",     1, ANTIMAGIC,  1200, 1, CLR_BRIGHT_BLUE),
@@ -417,7 +420,7 @@ DRGN_ARMR("orange dragon scales",      0, SLEEP_RES,   500, 7, CLR_ORANGE),
 DRGN_ARMR("black dragon scales",       0, DISINT_RES,  700, 7, CLR_BLACK),
 DRGN_ARMR("blue dragon scales",        0, SHOCK_RES,   500, 7, CLR_BLUE),
 DRGN_ARMR("green dragon scales",       0, POISON_RES,  500, 7, CLR_GREEN),
-DRGN_ARMR("razor dragon scales",       0, FAST,        500, 7, CLR_BRIGHT_CYAN),
+DRGN_ARMR("razor dragon scales",       0, FAST,        700, 7, CLR_BRIGHT_CYAN),
 DRGN_ARMR("ooze dragon scales",        0, POISON_RES,  700, 7, CLR_BRIGHT_GREEN),
 DRGN_ARMR("filth dragon scales",       0, SICK_RES,    700, 7, CLR_BROWN),
 DRGN_ARMR("hex dragon scales",         0, ANTIMAGIC,   700, 7, CLR_BRIGHT_BLUE),
