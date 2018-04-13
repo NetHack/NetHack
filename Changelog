@@ -75,7 +75,6 @@ General Changes
 - Transforming into a lycanthrope now angers guards.
 - Runeswords and tsurugis can be randomly generated, but they are incredibly
   rare.
-- Just like SLASH'EM, baby dragons can be generated.
 - Vampire mages and Vorpal Jabberwocks un-deferred.
 - If preferred pet is set to '@', the player spawns with an adventuring party.
   This is very experimental, and probably should not be used.
