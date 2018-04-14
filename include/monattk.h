@@ -1,7 +1,7 @@
 /* NetHack 3.6	monattk.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 /* Copyright 1988, M. Stephenson */
-/* File changed 4/12/18 by NullCGT */
+/* File changed 4/13/18 by NullCGT */
 
 #ifndef MONATTK_H
 #define MONATTK_H
@@ -83,6 +83,7 @@
 #define AD_QUIL 45  /* quills (porcupine and manticore) */
 #define AD_PITS 46  /* cause an earthquake (Lord Surtur) */
 #define AD_CNCL 47  /* cancel the player (beholder) */
+#define AD_DSRM 48  /* disarm the player */
 /*#define AD_SILV 48 */
 
 #define AD_CLRC 240 /* random clerical spell */

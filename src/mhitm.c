@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/10/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -906,6 +906,7 @@ register struct attack *mattk;
         goto physical;
     case AD_WERE:
     case AD_HEAL:
+    case AD_DSRM:
     case AD_PHYS:
     physical:
         if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {

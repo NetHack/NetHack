@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1595,6 +1595,7 @@ register struct attack *mattk;
         goto physical;
     case AD_WERE: /* no special effect on monsters */
     case AD_HEAL: /* likewise */
+    case AD_DSRM:
     case AD_PHYS:
     physical:
         if (mattk->aatyp == AT_WEAP) {

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -983,6 +983,7 @@ static const short grownups[][2] = {
     { PM_SOLDIER, PM_SERGEANT },
     { PM_SERGEANT, PM_LIEUTENANT },
     { PM_LIEUTENANT, PM_CAPTAIN },
+    { PM_MARTIAL_ARTIST, PM_MARTIAL_MASTER },
     { PM_WATCHMAN, PM_WATCH_CAPTAIN },
     { PM_ALIGNED_PRIEST, PM_HIGH_PRIEST },
     { PM_STUDENT, PM_ARCHEOLOGIST },

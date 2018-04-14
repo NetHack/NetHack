@@ -177,6 +177,8 @@ Dungeon Generation
 - Junk Shops: Function as a general store, but a large selection of what they
   sell is useless.
 - Underground Rivers: Paxed's underground rivers patch has been implemented.
+- Mephisto's Lair
+- The Lord of the Foocubi's Lair
 
 New Monster Spells
 - Sonic Scream
@@ -275,6 +277,10 @@ New Monsters
 - Falcon
 - Giant Falcon
 - Dust Devil
+- Swordfish
+- Martial Artist
+- Martial Master
+- Mystic Scarab
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Drake (Dragonmaster Quest)
@@ -284,6 +290,7 @@ New Unique Monsters
 - Master of Cats
 - Lord of the Foocubi
 - Mephisto
+- Buer
 - King in Yellow
 - Lord of the Cards
 - Grim Reaper

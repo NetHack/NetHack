@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1115,6 +1115,13 @@ register struct attack *mattk;
                 destroy_item(RING_CLASS, AD_ELEC);
         } else
             dmg = 0;
+        break;
+    case AD_DSRM:
+        hitmsg(mtmp, mattk);
+        if (uncancelled && !rn2(4) && uwep) {
+            pline("%s disarms you!", Monnam(mtmp));
+            dropx(uwep);
+        }
         break;
     case AD_SLEE:
         hitmsg(mtmp, mattk);
