@@ -1,6 +1,6 @@
-                   GlazeHack -- General information
+                   SpliceHack -- General information
 
-GlazeHack is an in-progress fork of NetHack 3.6.1, made with the goal of adding
+SpliceHack is an in-progress fork of NetHack 3.6.1, made with the goal of adding
 additional monsters, items, special levels, and game features without changing
 too much of the core gameplay. The end goal is a "kitchen sink" variant similar
 to SLASH'EM that is still intuitive and easy to pick up and play for anyone
@@ -13,8 +13,8 @@ work in progress, and as such bugs and balance issues may exist. A wiki can
 be found on the github page and there are encyclopedia entries for some new
 additions, but as of this moment neither is complete.
 
-GlazeHack follows the conditions put forth in the license provided by the
+SpliceHack follows the conditions put forth in the license provided by the
 NetHack Dev Team (see dat/license). If you are aware of any licensing issues
-with GlazeHack, please contact us through github.
+with SpliceHack, please contact us through github.
 
                   -- Good luck, and happy Hacking --

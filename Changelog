@@ -1,7 +1,7 @@
-                   GlazeHack -- Changelog
+                   SpliceHack -- Changelog
 
 This changelog documents all the features that differ from vanilla Nethack.
-Beware of SPOILERS for both Nethack and GlazeHack all the way through this
+Beware of SPOILERS for both Nethack and SpliceHack all the way through this
 document.
 
 New Options
@@ -52,7 +52,7 @@ General Changes
   barbs.
 - Disarmed bear traps and land mines can rarely be generated.
 - The Oracle now drops hints in major consultations about the new features
-  in GlazeHack. Attempts have been made to make this fit as seamlessly as
+  in SpliceHack. Attempts have been made to make this fit as seamlessly as
   possible into the existing tone.
 - Additional graves, hallucinations, rumors, scroll and wand names,  and
   the like.

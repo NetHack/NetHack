@@ -4,7 +4,7 @@
 
 /* various code that was replicated in *main.c */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/13/18 by NullCGT */
 
 #include "hack.h"
 
@@ -666,8 +666,8 @@ boolean new_game; /* false => restoring an old game */
                 : currentgend != flags.initgend))
         Sprintf(eos(buf), " %s", genders[currentgend].adj);
 
-    pline(new_game ? "%s %s, welcome to GlazeHack!  You are a%s %s %s."
-                   : "%s %s, the%s %s %s, welcome back to GlazeHack!",
+    pline(new_game ? "%s %s, welcome to SpliceHack!  You are a%s %s %s."
+                   : "%s %s, the%s %s %s, welcome back to SpliceHack!",
           Hello((struct monst *) 0), plname, buf, urace.adj,
           (currentgend && urole.name.f) ? urole.name.f : urole.name.m);
 }
