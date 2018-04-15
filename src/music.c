@@ -26,7 +26,7 @@
  *                      called here chasms.
  */
 
-/* Edited on 3/16/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -287,6 +287,10 @@ int force;
                 case SINK:
                     if (cansee(x, y))
                         pline_The("kitchen sink falls into a chasm.");
+                    goto do_pit;
+                case FURNACE:
+                    if (cansee(x, y))
+                        pline_The("furnace falls into a chasm.");
                     goto do_pit;
                 case ALTAR:
                     if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))

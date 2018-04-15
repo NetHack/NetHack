@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -11,6 +11,7 @@
 /* conversion of result to int is reasonable */
 
 STATIC_DCL void FDECL(mkfount, (int, struct mkroom *));
+STATIC_DCL void FDECL(mkfurnace, (struct mkroom *));
 STATIC_DCL void FDECL(mksink, (struct mkroom *));
 STATIC_DCL void FDECL(mkaltar, (struct mkroom *));
 STATIC_DCL void FDECL(mkgrave, (struct mkroom *));
@@ -686,6 +687,7 @@ clear_level_structures()
 
     level.flags.nfountains = 0;
     level.flags.nsinks = 0;
+    level.flags.nfurnaces = 0;
     level.flags.has_shop = 0;
     level.flags.has_vault = 0;
     level.flags.has_zoo = 0;
@@ -907,6 +909,8 @@ skip0:
             mkfount(0, croom);
         if (!rn2(60))
             mksink(croom);
+        if (!rn2(60))
+            mkfurnace(croom);
         if (!rn2(60))
             mkaltar(croom);
         x = 80 - (depth(&u.uz) * 2);
@@ -1647,6 +1651,26 @@ struct mkroom *croom;
         levl[m.x][m.y].blessedftn = 1;
 
     level.flags.nfountains++;
+}
+
+STATIC_OVL void
+mkfurnace(croom)
+struct mkroom *croom;
+{
+    coord m;
+    register int tryct = 0;
+
+    do {
+        if (++tryct > 200)
+            return;
+        if (!somexy(croom, &m))
+            return;
+    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+
+    /* Put a furnace at m.x, m.y */
+    levl[m.x][m.y].typ = FURNACE;
+
+    level.flags.nfurnaces++;
 }
 
 STATIC_OVL void

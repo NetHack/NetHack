@@ -108,6 +108,9 @@ General Changes
 - Monsters with heads now "swallow" you instead of "engulfing" you.
 - If you are playing an infernal or polymorphed into a silver-hating creature,
   silver will deal an extra 1-20 damage to you.
+- Furnaces will spawn in the dungeon. Useful for getting rid of items you don't
+  want lying around, and for dipping lavaproof items in for possible effects.
+  Please do not try drinking out of a furnace.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
@@ -144,8 +147,9 @@ New Roles
   dragon scales and dragon scale mail, which makes their midgame very difficult.
   Their quest artifact is Sharur, a talking ornate mace.
 
-New Traps
+New Dungeon Features
 - Buzzsaw Trap
+- Furnaces
 
 New Artifacts
 - Gungnir

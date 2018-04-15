@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited by NullCGT on 4/14/18 */
+
 #include "hack.h"
 
 static NEARDATA boolean did_dig_msg;
@@ -569,6 +571,9 @@ int ttyp;
         return;
     } else if (IS_SINK(lev->typ)) {
         breaksink(x, y);
+        return;
+    } else if (IS_FURNACE(lev->typ)) {
+        breakfurnace(x, y);
         return;
     } else if (lev->typ == DRAWBRIDGE_DOWN
                || (is_drawbridge_wall(x, y) >= 0)) {
@@ -1633,6 +1638,9 @@ char *msg;
 #endif
     } else if (IS_SINK(ltyp)) {
         Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
+        return FALSE;
+    } else if (IS_FURNACE(ltyp)) {
+        Strcpy(msg, "A piping hot pipe remains below the furnace.");
         return FALSE;
     } else if ((cc->x == xupladder && cc->y == yupladder) /* ladder up */
                || (cc->x == xdnladder && cc->y == ydnladder)) { /* " down */

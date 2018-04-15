@@ -8,7 +8,7 @@
  */
 
 /*
- * Edited by NullCGT on 4/13/18
+ * Edited by NullCGT on 4/14/18
  */
 
 #include "hack.h"
@@ -556,6 +556,7 @@ struct {
 {S_grave,    "grave", "grave"},
 {S_throne,   "throne", "opulent throne"},
 {S_sink,     "sink", "sink"},
+{S_furnace,  "furnace", "furnace"},
 {S_fountain, "fountain", "fountain"},
 {S_pool,     "pool", "water"},
 {S_ice,      "ice", "ice"},

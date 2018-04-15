@@ -1,7 +1,7 @@
 /* NetHack 3.6	rm.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 4/13/18 by NullCGT */
+/* File changed 4/14/18 by NullCGT */
 
 #ifndef RM_H
 #define RM_H
@@ -66,6 +66,7 @@ enum levl_typ_types {
     FOUNTAIN,
     THRONE,
     SINK,
+    FURNACE,
     GRAVE,
     ALTAR,
     ICE,
@@ -97,6 +98,7 @@ enum levl_typ_types {
 #define IS_THRONE(typ) ((typ) == THRONE)
 #define IS_FOUNTAIN(typ) ((typ) == FOUNTAIN)
 #define IS_SINK(typ) ((typ) == SINK)
+#define IS_FURNACE(typ) ((typ) == FURNACE)
 #define IS_GRAVE(typ) ((typ) == GRAVE)
 #define IS_ALTAR(typ) ((typ) == ALTAR)
 #define IS_DRAWBRIDGE(typ) \
@@ -145,6 +147,7 @@ enum screen_symbols {
     S_grave,
     S_throne,
     S_sink,
+    S_furnace,
     S_fountain,
     S_pool,
     S_ice,
@@ -553,6 +556,7 @@ struct cemetery {
 struct levelflags {
     uchar nfountains; /* number of fountains on level */
     uchar nsinks;     /* number of sinks on the level */
+    uchar nfurnaces;  /* number of furnaces on the level */
     /* Several flags that give hints about what's on the level */
     Bitfield(has_shop, 1);
     Bitfield(has_vault, 1);

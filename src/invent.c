@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/10/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2898,6 +2898,8 @@ char *buf;
         dfeature = "pool of water";
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
+    else if (IS_FURNACE(ltyp))
+        cmap = S_furnace; /* "furnace" */
     else if (IS_ALTAR(ltyp)) {
         Sprintf(altbuf, "%saltar to %s (%s)",
                 ((lev->altarmask & AM_SHRINE)

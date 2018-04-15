@@ -2,7 +2,7 @@
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/6/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -740,6 +740,8 @@ const char *kickobjnam;
         what = "a headstone";
     else if (IS_SINK(maploc->typ))
         what = "a sink";
+    else if (IS_FURNACE(maploc->typ))
+        what = "a furnace";
     else if (IS_ALTAR(maploc->typ))
         what = "an altar";
     else if (IS_DRAWBRIDGE(maploc->typ))
@@ -1062,6 +1064,21 @@ dokick()
             if (uarmf && rn2(3))
                 if (water_damage(uarmf, "metal boots", TRUE) == ER_NOTHING) {
                     Your("boots get wet.");
+                    /* could cause short-lived fumbling here */
+                }
+            exercise(A_DEX, TRUE);
+            return 1;
+        }
+        if (IS_FURNACE(maploc->typ)) {
+            if (Levitation)
+                goto dumb;
+            You("kick %s.", (Blind ? something : "the furnace"));
+            if (!rn2(3))
+                goto ouch;
+            /* make metal boots burn */
+            if (uarmf && rn2(3))
+                if (fire_damage(uarmf, FALSE, u.ux, u.uy)) {
+                    Your("boots burn.");
                     /* could cause short-lived fumbling here */
                 }
             exercise(A_DEX, TRUE);

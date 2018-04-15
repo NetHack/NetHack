@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -50,6 +50,12 @@ dosounds()
             "a slow drip.", "a gurgling noise.", "dishes being washed!",
         };
         You_hear1(sink_msg[rn2(2) + hallu]);
+    }
+    if (level.flags.nfurnaces && !rn2(300)) {
+        static const char *const furnace_msg[3] = {
+            "a slow bubbling.", "crackling flames.", "logs in the fireplace!",
+        };
+        You_hear1(furnace_msg[rn2(2) + hallu]);
     }
     if (level.flags.has_court && !rn2(200)) {
         static const char *const throne_msg[4] = {

@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 /*
  * This file contains the various functions that are related to the special
@@ -662,14 +662,14 @@ shuffle_alignments()
 }
 
 /*
- * Count the different features (sinks, fountains) in the level.
+ * Count the different features (sinks, fountains, furnaces) in the level.
  */
 STATIC_OVL void
 count_features()
 {
     xchar x, y;
 
-    level.flags.nfountains = level.flags.nsinks = 0;
+    level.flags.nfountains = level.flags.nsinks = level.flags.nfurnaces = 0;
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO; x++) {
             int typ = levl[x][y].typ;
@@ -677,6 +677,8 @@ count_features()
                 level.flags.nfountains++;
             else if (typ == SINK)
                 level.flags.nsinks++;
+            else if (typ == FURNACE)
+                level.flags.nfurnaces++;
         }
 }
 

@@ -12,7 +12,7 @@
 # having the high bit set (in hexadecimal, \x80 is combined with
 # a character code between \x60 and \x7f).
 
-# Edited by NullCGT on 4/13/18
+# Edited by NullCGT on 4/14/18
 
 start: DECgraphics
 	Handling: DEC
@@ -328,6 +328,7 @@ start: NHAccess
 	S_grave: \126
 	S_throne: \126
 	S_sink: \126
+	S_furnace: \126
 	S_fountain: \126
 	S_pool: \042
 	S_ice: \042
@@ -442,6 +443,7 @@ start: Blank
         S_explode9: \032
         S_eye: \032
         S_falling_rock_trap: \032
+				S_furnace: \032
         S_feline: \032
         S_fire_trap: \032
         S_flashbeam: \032

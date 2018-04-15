@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/22/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -529,7 +529,7 @@ register xchar ox, oy;
     newsym(ox, oy);
 }
 
-static NEARDATA const char fell_on_sink[] = "fell onto a sink";
+static NEARDATA const char fell_on_sink[] = "fell onto a dungeon utility";
 
 STATIC_OVL void
 dosinkfall()
@@ -2072,7 +2072,8 @@ boolean pick;
         goto spotdone;
 
     check_special_room(FALSE);
-    if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
+    if ((IS_SINK(levl[u.ux][u.uy].typ) || IS_FURNACE(levl[u.ux][u.uy].typ))
+         && Levitation)
         dosinkfall();
     if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
         boolean pit;
@@ -2525,6 +2526,8 @@ dopickup()
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
         else if (IS_SINK(lev->typ))
             pline_The("plumbing connects it to the floor.");
+        else if (IS_FURNACE(lev->typ))
+            pline_The("it seems as if it is part of the floor.");
         else if (IS_GRAVE(lev->typ))
             You("don't need a gravestone.  Yet.");
         else if (IS_FOUNTAIN(lev->typ))

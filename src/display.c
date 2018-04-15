@@ -114,6 +114,8 @@
  *                each typ.
  *      horizontal - Indicates whether the wall or door is horizontal or
  *                vertical.
+ *
+ * Edited on 4/14/18 by NullCGT
  */
 #include "hack.h"
 
@@ -1628,6 +1630,9 @@ xchar x, y;
     case SINK:
         idx = S_sink;
         break;
+    case FURNACE:
+        idx = S_furnace;
+        break;
     case ALTAR:
         idx = S_altar;
         break;
@@ -1833,7 +1838,7 @@ static const char *type_names[MAX_TYPE] = {
     "SDOOR", "SCORR", "POOL", "MOAT", "WATER", "DRAWBRIDGE_UP", "LAVAPOOL",
     "IRON_BARS", "DOOR", "CORR", "ROOM", "STAIRS", "LADDER", "FOUNTAIN",
     "THRONE", "SINK", "GRAVE", "ALTAR", "ICE", "DRAWBRIDGE_DOWN", "AIR",
-    "CLOUD"
+    "CLOUD", "FURNACE",
 };
 
 static const char *

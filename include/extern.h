@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/15/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -822,8 +822,11 @@ E void FDECL(gush, (int, int, genericptr_t));
 E void FDECL(dryup, (XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void NDECL(drinkfountain);
 E void FDECL(dipfountain, (struct obj *));
+E void FDECL(breakfurnace, (int, int));
 E void FDECL(breaksink, (int, int));
 E void NDECL(drinksink);
+E void NDECL(drinkfurnace);
+E void FDECL(dipfurnace, (struct obj *));
 
 /* ### hack.c ### */
 

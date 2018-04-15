@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/7/18 by NullCGT */
+/* Edited on 4/15/18 by NullCGT */
 
 #include "hack.h"
 
@@ -468,6 +468,15 @@ dodrink()
         && can_reach_floor(FALSE)) {
         if (yn("Drink from the sink?") == 'y') {
             drinksink();
+            return 1;
+        }
+    }
+    /* Or a furnace? */
+    if (IS_FURNACE(levl[u.ux][u.uy].typ)
+        /* not as low as floor level but similar restrictions apply */
+        && can_reach_floor(FALSE)) {
+        if (yn("Drink from the furnace?") == 'y') {
+            drinkfurnace();
             return 1;
         }
     }
@@ -1886,6 +1895,14 @@ dodip()
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
             dipfountain(obj);
+            return 1;
+        }
+    } else if (IS_FURNACE(here)) {
+        Sprintf(qbuf, "%s%s into the furnace?", Dip_,
+                flags.verbose ? obuf : shortestname);
+        /* "Dip <the object> into the fountain?" */
+        if (yn(qbuf) == 'y') {
+            dipfurnace(obj);
             return 1;
         }
     } else if (is_pool(u.ux, u.uy)) {

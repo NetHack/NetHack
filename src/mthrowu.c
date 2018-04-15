@@ -1,7 +1,7 @@
 /* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 3/11/18 by NullCGT */
+/* Edited 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -468,7 +468,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                       bhitpos.x + dx, bhitpos.y + dy,                   \
                       ((pre) ? 0 : !rn2(5)), 0))                        \
      /* Thrown objects "sink" */                                        \
-     || (!(pre) && IS_SINK(levl[bhitpos.x][bhitpos.y].typ)))
+     || (!(pre) && (IS_SINK(levl[bhitpos.x][bhitpos.y].typ) ||          \
+         IS_FURNACE(levl[bhitpos.x][bhitpos.y].typ))))
 
 void
 m_throw(mon, x, y, dx, dy, range, obj)

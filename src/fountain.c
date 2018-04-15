@@ -4,6 +4,8 @@
 
 /* Code for drinking from fountains. */
 
+/* Edited on 4/15/18 by NullCGT */
+
 #include "hack.h"
 
 STATIC_DCL void NDECL(dowatersnakes);
@@ -11,6 +13,7 @@ STATIC_DCL void NDECL(dowaterdemon);
 STATIC_DCL void NDECL(dowaternymph);
 STATIC_PTR void FDECL(gush, (int, int, genericptr_t));
 STATIC_DCL void NDECL(dofindgem);
+STATIC_DCL void FDECL(blowupfurnace, (int, int));
 
 /* used when trying to dip in or drink from fountain or sink or pool while
    levitating above it, or when trying to move downwards in that state */
@@ -217,6 +220,36 @@ boolean isyou;
         if (isyou && in_town(x, y))
             (void) angry_guards(FALSE);
     }
+}
+
+void
+dipfurnace(obj)
+register struct obj *obj;
+{
+    burn_away_slime();
+    switch(rnd(30)) {
+        case 1:
+        case 2:
+        case 3:
+            bless(obj);
+            break;
+        case 4:
+        case 5:
+        case 6:
+            obj->oerodeproof = 1;
+            break;
+        case 7:
+            blowupfurnace(u.ux, u.uy);
+            break;
+        case 8: /* Strange feeling */
+            pline("A strange tingling runs up your %s.", body_part(ARM));
+            break;
+        case 9: /* Strange feeling */
+            You_feel("a sudden flare of heat.");
+            break;
+    }
+    lava_damage(obj, u.ux, u.uy);
+    update_inventory();
 }
 
 void
@@ -502,6 +535,64 @@ register struct obj *obj;
     }
     update_inventory();
     dryup(u.ux, u.uy, TRUE);
+}
+
+void
+breakfurnace(x, y)
+int x, y;
+{
+    if (cansee(x, y) || (x == u.ux && y == u.uy))
+        pline_The("furnace breaks apart and spills its contents!");
+    level.flags.nfurnaces--;
+    levl[x][y].doormask = 0;
+    levl[x][y].typ = LAVAPOOL;
+    newsym(x, y);
+}
+
+void
+blowupfurnace(x, y)
+int x, y;
+{
+    if (cansee(x, y) || (x == u.ux && y == u.uy))
+        pline_The("furnace rumbles, then explodes into smithereens!");
+    level.flags.nfurnaces--;
+    levl[x][y].doormask = 0;
+    newsym(x, y);
+    explode(u.ux, u.uy, 11, rnd(30), TOOL_CLASS, EXPL_FIERY);
+}
+
+void
+drinkfurnace()
+{
+    if (Levitation) {
+        floating_above("furnace");
+        return;
+    } if (!likes_lava(youmonst.data)) {
+        pline("Glug glug glug...");
+        /* ugly hack, look away */
+        losehp(999, "trying to drink lava", KILLED_BY);
+        return;
+    }
+    burn_away_slime();
+    switch(rn2(20)) {
+    case 0:
+        pline("You chug some lava. Yum!");
+        u.uhunger += rnd(50);
+        break;
+    case 1:
+        breakfurnace(u.ux, u.uy);
+        break;
+    case 2:
+    case 3:
+        pline_The("%s moves as though of its own will!", hliquid("lava"));
+        if ((mvitals[PM_FIRE_ELEMENTAL].mvflags & G_GONE)
+            || !makemon(&mons[PM_FIRE_ELEMENTAL], u.ux, u.uy, NO_MM_FLAGS))
+            pline("But it settles down.");
+        break;
+    default:
+        pline("You take a sip of the lava.");
+        u.uhunger += rnd(5);
+    }
 }
 
 void

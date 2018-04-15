@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/14/18 by NullCGT */
+
 #ifndef DUNGEON_H
 #define DUNGEON_H
 
@@ -198,6 +200,7 @@ typedef struct mapseen {
         /* feature knowledge that must be calculated from levl array */
         Bitfield(nfount, 2);
         Bitfield(nsink, 2);
+        Bitfield(nfurnace, 2);
         Bitfield(naltar, 2);
         Bitfield(nthrone, 2);
 

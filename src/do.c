@@ -4,7 +4,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 4/5/18 by NullCGT */
+/* Edited on 4/14/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"

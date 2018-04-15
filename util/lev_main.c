@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited 4/13/18 by NullCGT */
+/* Edited 4/14/18 by NullCGT */
 
 /*
  * This file contains the main function for the parser
@@ -207,6 +207,8 @@ static struct {
     { "wand shop", WANDSHOP },
     { "tool shop", TOOLSHOP },
     { "book shop", BOOKSHOP },
+    { "junk shop", JUNKSHOP },
+    { "archery shop", ARCHERYSHOP },
     { "health food shop", FODDERSHOP },
     { "candle shop", CANDLESHOP },
     { 0, 0 }
@@ -1305,6 +1307,8 @@ char c;
         return (THRONE);
     case 'K':
         return (SINK);
+    case 'U':
+        return (FURNACE);
     case '}':
         return (MOAT);
     case 'P':

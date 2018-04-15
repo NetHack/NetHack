@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/12/18 by NullCGT */
+/* Modified 4/14/18 by NullCGT */
 
 #include "hack.h"
 
@@ -3433,7 +3433,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 && (is_pool(bhitpos.x, bhitpos.y)
                     || is_lava(bhitpos.x, bhitpos.y)))
                 break;
-            if (IS_SINK(typ) && weapon != FLASHED_LIGHT)
+            if ((IS_SINK(typ) || IS_FURNACE(typ)) && weapon != FLASHED_LIGHT)
                 break; /* physical objects fall onto sink */
         }
         /* limit range of ball so hero won't make an invalid move */
