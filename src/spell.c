@@ -2,7 +2,7 @@
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/06/18 by NullCGT */
+/* Edited on 4/15/18 by NullCGT */
 
 #include "hack.h"
 
@@ -210,6 +210,7 @@ struct obj *book2;
 {
     struct monst *mtmp, *mtmp2;
     coord mm;
+    int pm = PM_JUIBLEX;
 
     You("turn the pages of the Book of the Dead...");
     makeknown(SPE_BOOK_OF_THE_DEAD);
@@ -266,6 +267,18 @@ struct obj *book2;
             u.uevent.udemigod = 1; /* wizdead() */
             if (!u.udg_cnt || u.udg_cnt > soon)
                 u.udg_cnt = soon;
+            /* Awaken all the ndemons and scatter them throughout the game. The
+               ascension run is no easy task :D */
+            pline("You feel like you are being watched...");
+            for (pm = PM_JUIBLEX; pm <= PM_DEMOGORGON; pm++) {
+                mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
+                mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
+                /* based on muse.c code */
+                d_level flev;
+                get_level(&flev, random_teleport_level());
+                migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
+                                 (coord *) 0);
+            }
         } else { /* at least one artifact not prepared properly */
             You("have a feeling that %s is amiss...", something);
             goto raise_dead;

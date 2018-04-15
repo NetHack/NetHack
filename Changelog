@@ -111,6 +111,9 @@ General Changes
 - Furnaces will spawn in the dungeon. Useful for getting rid of items you don't
   want lying around, and for dipping lavaproof items in for possible effects.
   Please do not try drinking out of a furnace.
+- Upon performing the invocation ritual, all unique demons that have not yet
+  been generated will appear and immediately teleport to random levels in the
+  game.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
