@@ -503,7 +503,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1455415233 2016/02/14 02:00:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1522193682 2018/03/27 23:34:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -617,7 +617,7 @@ extern int yywrap FDECL(FDECL_dummy, (void ));
 
 #ifndef YY_NO_UNPUT
 
-static void yyunput FDECL(FDECL_dummy, (int c,char *buf_ptr  ));
+void yyunput FDECL(FDECL_dummy, (int c,char *buf_ptr  ));
 #endif
 
 #ifndef yytext_ptr
@@ -1282,7 +1282,7 @@ static yy_state_type yy_try_NUL_trans (yy_current_state )
 
 #ifndef YY_NO_UNPUT
 
-static void yyunput (c,yy_bp )
+void yyunput (c,yy_bp )
         int c;
         char * yy_bp;
 {

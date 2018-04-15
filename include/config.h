@@ -514,6 +514,11 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
+/* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
+   so some prompts will remember the previously input text
+   (within the same session) */
+/* #define EDIT_GETLIN */
+
 /* Section 4b - Features causing save file incompatibility
  * Features listed in this section change the format of save and/or
  * bones files, so in addition to the warning at the start of Section 4

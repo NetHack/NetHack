@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1519281847 2018/02/22 06:44:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1522891623 2018/04/05 01:27:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1802,7 +1802,7 @@ int default_glyph, which_subset;
 void
 dump_map()
 {
-    int x, y, glyph, skippedrows;
+    int x, y, glyph, skippedrows, lastnonblank;
     int subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
     int default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
     char buf[BUFSZ];
@@ -1820,19 +1820,22 @@ dump_map()
     toprow = TRUE;
     for (y = 0; y < ROWNO; y++) {
         blankrow = TRUE; /* assume blank until we discover otherwise */
+        lastnonblank = -1; /* buf[] index rather than map's x */
         for (x = 1; x < COLNO; x++) {
             int ch, color;
             unsigned special;
 
-            glyph = reveal_terrain_getglyph(x,y, FALSE, u.uswallow,
+            glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
             (void) mapglyph(glyph, &ch, &color, &special, x, y);
             buf[x - 1] = ch;
-            if (ch != ' ')
+            if (ch != ' ') {
                 blankrow = FALSE;
+                lastnonblank = x - 1;
+            }
         }
         if (!blankrow) {
-            buf[x - 2] = '\0';
+            buf[lastnonblank + 1] = '\0';
             if (toprow) {
                 skippedrows = 0;
                 toprow = FALSE;
@@ -1840,6 +1843,7 @@ dump_map()
             for (x = 0; x < skippedrows; x++)
                 putstr(0, 0, "");
             putstr(0, 0, buf); /* map row #y */
+            skippedrows = 0;
         } else {
             ++skippedrows;
         }

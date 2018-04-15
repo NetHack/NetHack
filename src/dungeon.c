@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1517912411 2018/02/06 10:20:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1523308357 2018/04/09 21:12:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -966,7 +966,7 @@ init_dungeons()
            instead of 0, so adjust the start point to shift endgame up */
         if (dunlevs_in_dungeon(&x->dlevel) > 1 - dungeons[i].depth_start)
             dungeons[i].depth_start -= 1;
-        /* TO DO: strip "dummy" out all the way here,
+        /* TODO: strip "dummy" out all the way here,
            so that it's hidden from <ctrl/O> feedback. */
     }
 
@@ -1848,8 +1848,8 @@ xchar *rdgn;
     branch *br;
     anything any;
     struct lchoice lchoices;
-
     winid win = create_nhwindow(NHW_MENU);
+
     if (bymenu) {
         start_menu(win);
         lchoices.idx = 0;
@@ -1952,26 +1952,35 @@ xchar *rdgn;
         Sprintf(buf, "Invocation position @ (%d,%d), hero @ (%d,%d)",
                 inv_pos.x, inv_pos.y, u.ux, u.uy);
         putstr(win, 0, buf);
-    }
-    /*
-     * The following is based on the assumption that the inter-level portals
-     * created by the level compiler (not the dungeon compiler) only exist
-     * one per level (currently true, of course).
-     */
-    else if (Is_earthlevel(&u.uz) || Is_waterlevel(&u.uz)
-             || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)) {
+    } else {
         struct trap *trap;
+
+        /* if current level has a magic portal, report its location;
+           this assumes that there is at most one magic portal on any
+           given level; quest and ft.ludios have pairs (one in main
+           dungeon matched with one in the corresponding branch), the
+           elemental planes have singletons (connection to next plane) */
+        *buf = '\0';
         for (trap = ftrap; trap; trap = trap->ntrap)
             if (trap->ttyp == MAGIC_PORTAL)
                 break;
 
-        putstr(win, 0, "");
         if (trap)
-            Sprintf(buf, "Portal @ (%d,%d), hero @ (%d,%d)", trap->tx,
-                    trap->ty, u.ux, u.uy);
-        else
-            Sprintf(buf, "No portal found.");
-        putstr(win, 0, buf);
+            Sprintf(buf, "Portal @ (%d,%d), hero @ (%d,%d)",
+                    trap->tx, trap->ty, u.ux, u.uy);
+
+        /* only report "no portal found" when actually expecting a portal */
+        else if (Is_earthlevel(&u.uz) || Is_waterlevel(&u.uz)
+                 || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)
+                 || Is_qstart(&u.uz) || at_dgn_entrance("The Quest")
+                 || Is_knox(&u.uz))
+            Strcpy(buf, "No portal found.");
+
+        /* only give output if we found a portal or expected one and didn't */
+        if (*buf) {
+            putstr(win, 0, "");
+            putstr(win, 0, buf);
+        }
     }
 
     display_nhwindow(win, TRUE);
@@ -2039,15 +2048,28 @@ donamelevel()
     if (!(mptr = find_mapseen(&u.uz)))
         return 0;
 
+    nbuf[0] = '\0';
+#ifdef EDIT_GETLIN
+    if (mptr->custom) {
+        (void) strncpy(nbuf, mptr->custom, BUFSZ);
+        nbuf[BUFSZ - 1] = '\0';
+    }
+#else
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
+
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
-                strlen(mptr->custom) > 30 ? "..." : "");
+                (strlen(mptr->custom) > 30) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
+#endif
         getlin("What do you want to call this dungeon level?", nbuf);
-    if (index(nbuf, '\033'))
+
+    /* empty input or ESC means don't add or change annotation;
+       space-only means discard current annotation without adding new one */
+    if (!*nbuf || *nbuf == '\033')
         return 0;
+    /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
 
     /* discard old annotation, if any */
@@ -2056,7 +2078,8 @@ donamelevel()
         mptr->custom = (char *) 0;
         mptr->custom_lth = 0;
     }
-    /* add new annotation, unless it's empty or a single space */
+    /* add new annotation, unless it's all spaces (which will be an
+       empty string after mungspaces() above) */
     if (*nbuf && strcmp(nbuf, " ")) {
         mptr->custom = dupstr(nbuf);
         mptr->custom_lth = strlen(mptr->custom);
@@ -2590,7 +2613,7 @@ recalc_mapseen()
                 }
                 if (is_drawbridge_wall(x, y) < 0)
                     break;
-            /* else FALLTHRU */
+                /*FALLTHRU*/
             case DBWALL:
             case DRAWBRIDGE_DOWN:
                 if (Is_stronghold(&u.uz))

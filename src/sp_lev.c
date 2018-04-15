@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1519399521 2018/02/23 15:25:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1522701334 2018/04/02 20:35:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -52,6 +52,7 @@ STATIC_DCL void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
 STATIC_DCL void NDECL(shuffle_alignments);
 STATIC_DCL void NDECL(count_features);
 STATIC_DCL void NDECL(remove_boundary_syms);
+STATIC_DCL void FDECL(set_door_orientation, (int, int));
 STATIC_DCL void FDECL(maybe_add_door, (int, int, struct mkroom *));
 STATIC_DCL void NDECL(link_doors_rooms);
 STATIC_DCL void NDECL(fill_rooms);
@@ -702,7 +703,55 @@ remove_boundary_syms()
     }
 }
 
-void
+/* used by sel_set_door() and link_doors_rooms() */
+STATIC_OVL void
+set_door_orientation(x, y)
+int x, y;
+{
+    boolean wleft, wright, wup, wdown;
+
+    /* If there's a wall or door on either the left side or right
+     * side (or both) of this secret door, make it be horizontal.
+     *
+     * It is feasible to put SDOOR in a corner, tee, or crosswall
+     * position, although once the door is found and opened it won't
+     * make a lot sense (diagonal access required).  Still, we try to
+     * handle that as best as possible.  For top or bottom tee, using
+     * horizontal is the best we can do.  For corner or crosswall,
+     * either horizontal or vertical are just as good as each other;
+     * we produce horizontal for corners and vertical for crosswalls.
+     * For left or right tee, using vertical is best.
+     *
+     * A secret door with no adjacent walls is also feasible and makes
+     * even less sense.  It will be displayed as a vertical wall while
+     * hidden and become a vertical door when found.  Before resorting
+     * to that, we check for solid rock which hasn't been wallified
+     * yet (cf lower leftside of leader's room in Cav quest).
+     */
+    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ)
+                                 || IS_DOOR(levl[x - 1][y].typ)
+                                 || levl[x - 1][y].typ == SDOOR));
+    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ)
+                                 || IS_DOOR(levl[x + 1][y].typ)
+                                 || levl[x + 1][y].typ == SDOOR));
+    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ)
+                                 || IS_DOOR(levl[x][y - 1].typ)
+                                 || levl[x][y - 1].typ == SDOOR));
+    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ)
+                                 || IS_DOOR(levl[x][y + 1].typ)
+                                 || levl[x][y + 1].typ == SDOOR));
+    if (!wleft && !wright && !wup && !wdown) {
+        /* out of bounds is treated as implicit wall; should be academic
+           because we don't expect to have doors so near the level's edge */
+        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
+        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
+        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
+        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
+    }
+    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
+}
+
+STATIC_OVL void
 maybe_add_door(x, y, droom)
 int x, y;
 struct mkroom *droom;
@@ -711,7 +760,7 @@ struct mkroom *droom;
         add_door(x, y, droom);
 }
 
-void
+STATIC_OVL void
 link_doors_rooms()
 {
     int x, y;
@@ -720,6 +769,11 @@ link_doors_rooms()
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO; x++)
             if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
+                /* in case this door was a '+' or 'S' from the
+                   MAP...ENDMAP section without an explicit DOOR
+                   directive, set/clear levl[][].horizontal for it */
+                set_door_orientation(x, y);
+
                 for (tmpi = 0; tmpi < nroom; tmpi++) {
                     maybe_add_door(x, y, &rooms[tmpi]);
                     for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
@@ -4213,7 +4267,6 @@ genericptr_t arg;
 {
     xchar typ = *(xchar *) arg;
     xchar x = dx, y = dy;
-    boolean wleft, wright, wup, wdown;
 
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
         levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
@@ -4222,46 +4275,7 @@ genericptr_t arg;
         if (typ < D_CLOSED)
             typ = D_CLOSED;
     }
-
-    /* If there's a wall or door on either the left side or right
-     * side (or both) of this secret door, make it be horizontal.
-     *
-     * It is feasible to put SDOOR in a corner, tee, or crosswall
-     * position, although once the door is found and opened it won't
-     * make a lot sense (diagonal access required).  Still, we try to
-     * handle that as best as possible.  For top or bottom tee, using
-     * horizontal is the best we can do.  For corner or crosswall,
-     * either horizontal or vertical are just as good as each other;
-     * we produce horizontal for corners and vertical for crosswalls.
-     * For left or right tee, using vertical is best.
-     *
-     * A secret door with no adjacent walls is also feasible and makes
-     * even less sense.  It will be displayed as a vertical wall while
-     * hidden and become a vertical door when found.  Before resorting
-     * to that, we check for solid rock which hasn't been wallified
-     * yet (cf lower leftside of leader's room in Cav quest).
-     */
-    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ)
-                                 || IS_DOOR(levl[x - 1][y].typ)
-                                 || levl[x - 1][y].typ == SDOOR));
-    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ)
-                                 || IS_DOOR(levl[x + 1][y].typ)
-                                 || levl[x + 1][y].typ == SDOOR));
-    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ)
-                                 || IS_DOOR(levl[x][y - 1].typ)
-                                 || levl[x][y - 1].typ == SDOOR));
-    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ)
-                                 || IS_DOOR(levl[x][y + 1].typ)
-                                 || levl[x][y + 1].typ == SDOOR));
-    if (!wleft && !wright && !wup && !wdown) {
-        /* out of bounds is treated as implicit wall; should be academic
-           because we don't expect to have doors so near the level's edge */
-        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
-        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
-        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
-        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
-    }
-    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
+    set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }

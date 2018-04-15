@@ -940,15 +940,21 @@ winid tmpwin; /* supplied by dodiscover() */
  * stun attack.  As of 3.4.1, those effects can occur but
  * will be slightly less likely than they were in 3.3.x.]
  */
+
+enum mb_effect_indices {
+    MB_INDEX_PROBE = 0,
+    MB_INDEX_STUN,
+    MB_INDEX_SCARE,
+    MB_INDEX_CANCEL,
+
+    NUM_MB_INDICES
+};
+
 #define MB_MAX_DIEROLL 8 /* rolls above this aren't magical */
-static const char *const mb_verb[2][4] = {
+static const char *const mb_verb[2][NUM_MB_INDICES] = {
     { "probe", "stun", "scare", "cancel" },
     { "prod", "amaze", "tickle", "purge" },
 };
-#define MB_INDEX_PROBE 0
-#define MB_INDEX_STUN 1
-#define MB_INDEX_SCARE 2
-#define MB_INDEX_CANCEL 3
 
 /* called when someone is being hit by Magicbane */
 STATIC_OVL boolean

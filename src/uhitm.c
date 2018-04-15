@@ -2396,6 +2396,7 @@ register struct monst *mon;
                  || youmonst.data->mlet == S_ORC
                  || youmonst.data->mlet == S_GNOME) && !weapon_used)
                 goto use_weapon;
+            /*FALLTHRU*/
 
         case AT_NONE:
         case AT_BOOM:

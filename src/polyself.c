@@ -384,7 +384,7 @@ void
 polyself(psflags)
 int psflags;
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     int old_light, new_light, mntmp, class, tryct;
     boolean forcecontrol = (psflags == 1), monsterpoly = (psflags == 2),
             draconian = (uarm && Is_dragon_armor(uarm)),

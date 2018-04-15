@@ -391,7 +391,7 @@ register struct monst *mtmp;
                 mtmp->mhp += rnd(8);
                 return 1;
             }
-    /* fall through :-) */
+        /*FALLTHRU*/
 
     case STRAT_NONE: /* harass */
         if (!rn2(!mtmp->mflee ? 5 : 33))

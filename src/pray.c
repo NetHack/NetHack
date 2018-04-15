@@ -957,6 +957,7 @@ aligntyp g_align;
         switch (min(action, 5)) {
         case 5:
             pat_on_head = 1;
+            /*FALLTHRU*/
         case 4:
             do
                 fix_worst_trouble(trouble);
@@ -1056,7 +1057,7 @@ aligntyp g_align;
                     break;
                 }
             }
-        /* Otherwise, falls into next case */
+            /*FALLTHRU*/
         case 2:
             if (!Blind)
                 You("are surrounded by %s glow.", an(hcolor(NH_GOLDEN)));
@@ -1148,7 +1149,8 @@ aligntyp g_align;
             if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
                 gcrownu();
                 break;
-            } /* else FALLTHRU */
+            }
+            /*FALLTHRU*/
         case 6: {
             struct obj *otmp;
             int sp_no, trycnt = u.ulevel + 1;

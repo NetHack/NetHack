@@ -1316,7 +1316,7 @@ register struct attack *mattk;
                     return 3;
             break;
         }
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
         if (is_animal(mtmp->data)) {
@@ -1553,7 +1553,8 @@ register struct attack *mattk;
                 done(DIED);
                 dmg = 0;
                 break;
-            }    /* else FALLTHRU */
+            }
+            /*FALLTHRU*/
         default: /* case 16: ... case 5: */
             You_feel("your life force draining away...");
             permdmg = 1; /* actual damage done below */

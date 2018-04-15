@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1513297345 2017/12/15 00:22:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1522454717 2018/03/31 00:05:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,7 +44,7 @@ int expltype;
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
             do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
     coord grabxy;
-    char hallu_buf[BUFSZ];
+    char hallu_buf[BUFSZ], killr_buf[BUFSZ];
     short exploding_wand_typ = 0;
 
     if (olet == WAND_CLASS) { /* retributive strike */
@@ -114,7 +114,9 @@ int expltype;
      */
 
     if (olet == MON_EXPLODE) {
-        str = killer.name;
+        /* when explode() is called recursively, killer.name might change so
+           we need to retain a copy of the current value for this explosion */
+        str = strcpy(killr_buf, killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
                         || strstri(str, "s' explosion")));

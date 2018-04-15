@@ -278,7 +278,7 @@ struct obj *box;
             n = 0;
             break;
         }
-        /*else FALLTHRU*/
+        /*FALLTHRU*/
     case BAG_OF_HOLDING:
         n = 1;
         break;
@@ -884,6 +884,7 @@ boolean artif;
             case LARGE_BOX:
                 otmp->olocked = !!(rn2(5));
                 otmp->otrapped = !(rn2(10));
+                /*FALLTHRU*/
             case ICE_BOX:
             case SACK:
             case OILSKIN_SACK:

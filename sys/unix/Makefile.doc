@@ -27,9 +27,11 @@ PSCMD = groff
 # Use the "cat" GUIDECMD if nroff and/or tbl and/or col are not installed
 # Not appropriate for creating Guidebook.txt.
 # GUIDECMD = cat Guidebook.txt
-# The following works better with groff-1.18, eg on Linux
-# GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
-GUIDECMD = $(GUIDE_PREFORMAT) | nroff | $(COLCMD)
+#
+# Single page. Might need adjustment to .pl value
+# GUIDECMD= $(GUIDE_PREFORMAT) | perl -pe 's/^(.mt)$$/.pl 4720v\n.in 0\n.po 8\n.ll 64m\n$$1/' | nroff -c -Tascii | $(COLCMD)
+#
+GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
 
 # Only generate output for the current configuration:
 NHGREP = $(MAKEDEFS) --grep --input - --output -

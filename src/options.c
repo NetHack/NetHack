@@ -27,11 +27,13 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #define PREFER_TILED FALSE
 #endif
 
-#define MESSAGE_OPTION 1
-#define STATUS_OPTION 2
-#define MAP_OPTION 3
-#define MENU_OPTION 4
-#define TEXT_OPTION 5
+enum window_option_types {
+    MESSAGE_OPTION = 1,
+    STATUS_OPTION,
+    MAP_OPTION,
+    MENU_OPTION,
+    TEXT_OPTION
+};
 
 #define PILE_LIMIT_DFLT 5
 
@@ -2836,7 +2838,7 @@ boolean tinitial, tfrom_file;
     fullname = "pickup_types";
     if (match_optname(opts, fullname, 8, TRUE)) {
         char ocl[MAXOCLASSES + 1], tbuf[MAXOCLASSES + 1], qbuf[QBUFSZ],
-             abuf[BUFSZ];
+            abuf[BUFSZ] = DUMMY;
         int oc_sym;
         boolean badopt = FALSE, compat = (strlen(opts) <= 6), use_menu;
 
@@ -4100,7 +4102,7 @@ int
 doset() /* changing options via menu by Per Liboriussen */
 {
     static boolean made_fmtstr = FALSE;
-    char buf[BUFSZ], buf2[BUFSZ];
+    char buf[BUFSZ], buf2[BUFSZ] = DUMMY;
     const char *name;
     int i = 0, pass, boolcount, pick_cnt, pick_idx, opt_indx;
     boolean *bool_p;
@@ -4779,7 +4781,7 @@ boolean setinitial, setfromfile;
             iflags.menu_headings = mhattr;
     } else if (!strcmp("msgtype", optname)) {
         int opt_idx, nmt, mttyp;
-        char mtbuf[BUFSZ];
+        char mtbuf[BUFSZ] = DUMMY;
 
     msgtypes_again:
         nmt = msgtype_count();
@@ -4841,7 +4843,7 @@ boolean setinitial, setfromfile;
         }
     } else if (!strcmp("menucolors", optname)) {
         int opt_idx, nmc, mcclr, mcattr;
-        char mcbuf[BUFSZ];
+        char mcbuf[BUFSZ] = DUMMY;
 
     menucolors_again:
         nmc = count_menucolors();
@@ -4912,7 +4914,7 @@ boolean setinitial, setfromfile;
         }
     } else if (!strcmp("autopickup_exception", optname)) {
         int opt_idx, pass, totalapes = 0, numapes[2] = { 0, 0 };
-        char apebuf[1 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
+        char apebuf[1 + BUFSZ] = DUMMY; /* so &apebuf[1] is BUFSZ long for getlin() */
         struct autopickup_exception *ape;
 
     ape_again:

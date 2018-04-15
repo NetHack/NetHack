@@ -1812,7 +1812,7 @@ struct obj *otmp;
             make_vomiting((long) rn1(context.victual.reqtime, 5), FALSE);
             break;
         }
-        /* else FALLTHRU */
+        /*FALLTHRU*/
     default:
         if (otmp->otyp == SLIME_MOLD && !otmp->cursed
             && otmp->spe == context.current_fruit) {

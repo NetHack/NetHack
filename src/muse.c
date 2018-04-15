@@ -1005,7 +1005,7 @@ try_again:
             goto try_again;
         if (!rn2(3))
             return WAN_TELEPORTATION;
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case 0:
     case 1:
         return SCR_TELEPORTATION;
@@ -1013,7 +1013,7 @@ try_again:
     case 10:
         if (!rn2(3))
             return WAN_CREATE_MONSTER;
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case 2:
         return SCR_CREATE_MONSTER;
     case 3:

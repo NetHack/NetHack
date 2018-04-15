@@ -3101,6 +3101,7 @@ xchar x, y;
         switch (sell_response ? sell_response : ynaq(qbuf)) {
         case 'q':
             sell_response = 'n';
+            /*FALLTHRU*/
         case 'n':
             if (container)
                 dropped_container(obj, shkp, FALSE);
@@ -3110,6 +3111,7 @@ xchar x, y;
             break;
         case 'a':
             sell_response = 'y';
+            /*FALLTHRU*/
         case 'y':
             if (container)
                 dropped_container(obj, shkp, TRUE);

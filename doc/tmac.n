@@ -53,6 +53,13 @@
 .\"	occurred when the the "fo" trap position was reset just beneath
 .\"	the current line; the footnote overflow trap would kick in and
 .\"	never be closed.
+.\" **********
+.\" Version 1.6.361	April 15, 2018
+.\"	The version distributed with NetHack 3.6.1 has changed the
+.\"	trademark notice for "UNIX"(tm) [ux macro] to reflect current
+.\"	ownership: The Open Group.  [The pd and vx macros are also long
+.\"	out of date: DEC -> Compaq -> HP -> ? but haven't been changed;
+.\"	need confirmation that Hewlett Packard is the current owner.]
 .\"
 .\"
 .\" **********
@@ -618,7 +625,8 @@
 .	nr ux +1			\" mark footnote as dropped
 \\&\\$2\\s-1UNIX\\s0\\*(rg\\$1
 .	fn				\" put out the footnote
-\\&\\*(rgUNIX is a registered trademark of AT&T.
+.\" was "\\&\\*(rgUNIX is a registered trademark of AT&T."
+\\&\\*(rgUNIX is a registered trademark of The Open Group.
 .	ef				\" short and sweet ...
 .\}
 ..

@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.241 $ $NHDT-Date: 1512473628 2017/12/05 11:33:48 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1523736800 2018/04/14 20:13:20 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 22, 2016
+.ds f2 "April 14, 2018
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -1244,7 +1244,7 @@ On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
 .op altmeta
-option to have nethack combine them into meta+key.
+option to have NetHack combine them into meta+key.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
@@ -1303,20 +1303,17 @@ If the
 .op number_pad
 option is on, some additional letter commands are available:
 .lp h
-Help menu:  display one of several help texts available, like ``?''.
+#help
 .lp j
-Jump to another location.  Same as ``#jump'' or ``M-j''.
+#jump
 .lp k
-Kick something (usually a door).  Same as `^D'.
+#kick
 .lp l
-Loot a box or bag on the floor beneath you, or the saddle
-from a steed standing next to you.  Same as ``#loot'' or ``M-l''.
+#loot
 .lp N
-Name a monster, an individual object, or a type of object.  Same
-as ``#name'' (or ``M-n'') which is the same as the `C'
-command.
+#name
 .lp u
-Untrap a trap, door, or chest.  Same as ``#untrap'' or ``M-u''.
+#untrap
 
 .hn 1
 Rooms and corridors
@@ -1367,7 +1364,7 @@ complete all of the levels according to the traditional rules of
 Sokoban.  Some allowances are permitted in case the player gets stuck;
 however, they will lower your luck.
 .hn 2
-Stairs (`<', `>')
+Stairs and ladders (`<', `>')
 .pg
 In general, each level in the dungeon will have a staircase going up
 (`<') to the previous level and another going down (`>') to the next
@@ -1395,8 +1392,6 @@ and some other monsters will follow along if they're close enough when
 you travel up or down stairs, and occasionally one of these creatures
 will displace you during the climb.  When that occurs, the pet or other
 monster will arrive on the staircase and you will end up nearby.
-.hn 2
-Ladders (`<', `>')
 .pg
 Ladders serve the same purpose as staircases, and the two types of
 inter-level connections are nearly indistinguishable during game play.
@@ -3049,67 +3044,68 @@ Where to align or place the message window (top, bottom, left, or right)
 .lp align_status
 Where to align or place the status window (top, bottom, left, or right).
 .lp ascii_map
-NetHack should display an ascii character map if it can.
+If NetHack can, it should display an ascii character map if it can.
 .lp color
-NetHack should display color if it can for different monsters,
-objects, and dungeon features
+If NetHack can, it should display color if it can for different monsters,
+objects, and dungeon features.
 .lp eight_bit_tty
-NetHack should pass eight-bit character values (for example, specified with the
+If NetHack can, it should pass eight-bit character values (for example,
+specified with the
 .op traps
 option) straight through to your terminal (default off).
 .lp font_map
-NetHack should use a font by the chosen name for the map window.
+if NetHack can, it should use a font by the chosen name for the map window.
 .lp font_menu
-NetHack should use a font by the chosen name for menu windows.
+If NetHack can, it should use a font by the chosen name for menu windows.
 .lp font_message
-NetHack should use a font by the chosen name for the message window.
+If NetHack can, it should use a font by the chosen name for the message window.
 .lp font_status
-NetHack should use a font by the chosen name for the status window.
+If NetHack can, it should use a font by the chosen name for the status window.
 .lp font_text
-NetHack should use a font by the chosen name for text windows.
+If NetHack can, it should use a font by the chosen name for text windows.
 .lp font_size_map
-NetHack should use this size font for the map window.
+If NetHack can, it should use this size font for the map window.
 .lp font_size_menu
-NetHack should use this size font for menu windows.
+If NetHack can, it should use this size font for menu windows.
 .lp font_size_message
-NetHack should use this size font for the message window.
+If NetHack can, it should use this size font for the message window.
 .lp font_size_status
-NetHack should use this size font for the status window.
+If NetHack can, it should use this size font for the status window.
 .lp font_size_text
-NetHack should use this size font for text windows.
+If NetHack can, it should use this size font for text windows.
 .lp fullscreen
-NetHack should try and display on the entire screen rather than in a window.
+If NetHack can, it should try and display on the entire screen rather than in a window.
 .lp large_font
-NetHack should use a large font.
+If NetHack can, it should use a large font.
 .lp map_mode
-NetHack should display the map in the manner specified.
+If NetHack can, it should display the map in the manner specified.
 .lp mouse_support
 Allow use of the mouse for input and travel.
 .lp player_selection
-NetHack should pop up dialog boxes, or use prompts for character selection.
+If NetHack can, it should pop up dialog boxes, or use prompts for character selection.
 .lp popup_dialog
-NetHack should pop up dialog boxes for input.
+If NetHack can, it should pop up dialog boxes for input.
 .lp preload_tiles
-NetHack should preload tiles into memory.
+If NetHack can, it should preload tiles into memory.
 For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `O' command.
 .lp scroll_amount
-NetHack should scroll the display by this number of cells
+If NetHack can, it should scroll the display by this number of cells
 when the hero reaches the scroll_margin.
 .lp scroll_margin
-NetHack should scroll the display when the hero or cursor
+If NetHack can, it should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 .lp selectsaved
-NetHack should display a menu of existing saved games for the player to
+If NetHack can, it should display a menu of existing saved games for the player to
 choose from at game startup, if it can. Not all ports support this option.
 .lp softkeyboard
 Display an onscreen keyboard.  Handhelds are most likely to support this option.
 .lp splash_screen
-NetHack should display an opening splash screen when it starts up (default yes).
+If NetHack can, it should display an opening splash screen when it starts up (default yes).
 .lp tiled_map
-NetHack should display a tiled map if it can.
+If NetHack can, it should display a tiled map if it can.
 .lp tile_file
 Specify the name of an alternative tile file to override the default.
 .lp tile_height
@@ -3119,15 +3115,15 @@ Specify the preferred width of each tile in a tile capable port
 .lp use_darkgray
 Use bold black instead of blue for black glyphs (TTY only).
 .lp use_inverse
-NetHack should display inverse when the game specifies it.
+If NetHack can, it should display inverse when the game specifies it.
 .lp vary_msgcount
-NetHack should display this number of messages at a time in
+If NetHack can, it should display this number of messages at a time in
 the message window.
 .lp windowcolors
-NetHack should display windows with the specified foreground/background
+If NetHack can, it should display windows with the specified foreground/background
 colors if it can.
 .lp wraptext
-NetHack port should wrap long lines of text if they don't fit in
+If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.
 .hn 2
 Platform-specific Customization options
@@ -3144,7 +3140,7 @@ On Amiga, this option controls whether typing `Alt' plus another key
 functions as a meta-shift for that key (default on).
 .lp altmeta
 On other (non-Amiga) systems where this option is available, it can be
-set to tell nethack to convert a two character sequence beginning with
+set to tell NetHack to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
 .lp ""
 This conversion is only done for commands, not for other input prompts.
@@ -3152,7 +3148,7 @@ Note that typing one or more digits as a count prefix prior to a
 command--preceded by \fBn\fP if the
 .op number_pad
 option is set--is also subject to this conversion, so attempting to
-abort the count by typing ESC will leave nethack waiting for another
+abort the count by typing ESC will leave NetHack waiting for another
 character to complete the two character sequence.  Type a second ESC to
 finish cancelling such a count.  At other prompts a single ESC suffices.
 .lp "BIOS    "
@@ -4224,16 +4220,6 @@ successors originally by \fBDaniel Thaler\fP and then by \fBAlex Smith\fP,
 and Dynahack by \fBTung Nguyen\fP. Some of those variants continue to be
 developed, maintained, and enjoyed by the community to this day.
 .pg
-At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of \fBWarwick Allison\fP,
-\fBMichael Allison\fP, \fBKen Arromdee\fP,
-\fBDavid Cohrs\fP, \fBJessie Collet\fP,
-\fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP,
-\fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
-Leading up to the release of 3.6.0 in early 2015, new members
-\fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
-joined the NetHack development team.
-.pg
 In September 2014, an interim snapshot of the code under development was
 released publicly by other parties. Since that code was a work-in-progress
 and had not gone through the process of debugging it as a suitable release,
@@ -4243,43 +4229,65 @@ was posted on the devteam's official nethack.org website to that effect,
 stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
 version.
 .pg
-In November 2014, preparation began for the release of NetHack 3.6. The 3.6
-version merges work done by the development team since the previous release
-with some of the beloved community patches. Many bugs were fixed and a
-large amount of code was restructured.
+In January 2015, preparation began for the release of NetHack 3.6.
+.pg
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of \fBWarwick Allison\fP,
+\fBMichael Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP,
+\fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP,
+\fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
+In early 2015, ahead of the release of 3.6.0, new members
+\fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
+joined the NetHack development team.
+.pg
+The 3.6 versions of the game are special in a particular way. Near the end of
+the development of 3.6.0, one of the significant inspirations for many of
+the humorous and fun features found in the game, author Terry Pratchett,
+passed away. The 3.6 versions of the game include a tribute to him.
+.pg
+3.6.0 was released in December 2015, and merged work done by the development
+team since the release of 3.4.3 with some of the beloved community
+patches. Many bugs were fixed and some code was restructured.
+.pg
+In 2018, several hundred bug fixes for 3.6.0 and some new features
+were assembled and released as NetHack 3.6.1. The development team at
+the time of release of 3.6.1 consisted of
+\fBWarwick Allison\fP,\fBMichael Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,
+\fBKen Lorber\fP, \fBDean Luick\fP, \fBPatric Mueller\fP,
+\fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
+\fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 .pg
 The development team, as well as \fBSteve VanDevender\fP and
-\fBKevin Smolkowski\fP ensured that NetHack 3.6 continued to operate on
+\fBKevin Smolkowski\fP, ensured that NetHack 3.6 continued to operate on
 various Unix flavors and maintained the X11 interface.
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
-maintained the port of NetHack 3.6 for Mac.
+maintained the port of NetHack 3.6 for Mac OSX.
 .pg
-\fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP,
-\fBAlex Kompel\fP, and \fBDion Nicolaas\fP maintained the port of
+\fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBarton House\fP,
+\fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,
+\fBDerek S. Ray\fP and \fBYitzhak Sapir\fP maintained the port of
 NetHack 3.6 for Microsoft Windows.
 .pg
-The 3.6 development team consisting of
-\fBMichael Allison\fP, \fBWarwick Allison\fP, \fBKen Arromdee\fP,
-\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSean Hunt\fP,
-\fBPasi Kallinen\fP, \fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP,
-\fBMike Stephenson\fP, \fBDerek S. Ray\fP, \fBJanet Walz\fP, and
-\fBPaul Winner\fP
-released 3.6.1 as a bug fix release in January 2016.
+\fBPat Rankin\fP attempted to keep the VMS port running for NetHack 3.6.1,
+hindered by limited access. \fBKevin Smolkowski\fP has updated and tested it
+for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
+and Integrity (aka Itanium aka IA64) but not VAX.
+.pg
+\fBRay Chason\fP resurrected the msdos port for 3.6.1 and contributed the
+necessary updates to the community at large.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg
 .hn 2
-SHOUT-OUTS
+SPECIAL THANKS
 .pg
-The devteam would like to give a special "shout-out" to thank the generous
-people primarily responsible for the public NetHack servers available for
-playing the game at nethack.alt.org and devnull.net. In addition to providing
-a way for the public to play a game of NetHack from almost anywhere, they
-have hosted annual NetHack tournaments for many, many years.
-.pg
-On behalf of the NetHack community, thank you very much to
-\fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP.
+On behalf of the NetHack community, thank you very much once
+again to \fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP
+for providing public NetHack servers at nethack.alt.org and devnull.net
+and/or for hosting annual NetHack tournaments.
 .pg
 			   - - - - - - - - - -
 .pg
@@ -4292,36 +4300,46 @@ in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Erik Andersen	Kevin Sitze	Ray Chason
-Alex Kompel	Frederick Roeber	Kevin Smolkowski	Richard Addison
-Alex Smith	Gil Neiger	Kevin Sweet	Richard Beigel
-Andreas Dorn	Greg Laskin	Lars Huttar	Richard P. Hughey
-Andy Church	Greg Olson	Leon Arnott	Rob Menke
-Andy Swanson	Gregg Wonderly	M. Drew Streib	Robin Bandy
-Ari Huttunen	Hao-yang Wang	Malcolm Ryan	Robin Johnson
-Barton House	Helge Hafting	Mark Gooderum	Roderick Schertler
-Benson I. Margulies	Irina Rempt-Drijfhout	Mark Modrall	Roland McGrath
-Bill Dyer	Izchak Miller	Marvin Bressler	Ron Van Iwaarden
-Boudewijn Waijers	J. Ali Harlow	Matthew Day	Ronnen Miller
-Bruce Cox	Janet Walz	Merlyn LeRoy	Ross Brown
-Bruce Holloway	Janne Salmijarvi	Michael Allison	Sascha Wostmann
-Bruce Mewborne	Jean-Christophe Collet	Michael Feir	Scott Bigham
-Carl Schelin	Jeff Bailey	Michael Hamel	Scott R. Turner
-Chris Russo	Jochen Erwied	Michael Sokolov	Sean Hunt
-David Cohrs	John Kallen	Mike Engber	Stephen Spackman
-David Damerell	John Rupley	Mike Gallop	Stefan Thielscher
-David Gentzel	John S. Bien	Mike Passaretti	Stephen White
-David Hairston	Johnny Lee	Mike Stephenson	Steve Creps
-Dean Luick	Jon W{tte	Mikko Juola	Steve Linhart
-Del Lamb	Jonathan Handler	Nathan Eady	Steve VanDevender
-Derek S. Ray	Joshua Delahunty	Norm Meluch	Teemu Suikki
-Deron Meranda	Keizo Yamamoto	Olaf Seibert	Tim Lennan
-Dion Nicolaas	Ken Arnold	Pasi Kallinen	Timo Hakulinen
-Dylan O'Donnell	Ken Arromdee	Pat Rankin	Tom Almy
-Eric Backus	Ken Lorber	Patric Mueller	Tom West
-Eric Hendrickson	Ken Washikita	Paul Winner	Warren Cheung
-Eric R. Smith	Kevin Darcy	Pierre Martineau	Warwick Allison
-Eric S. Raymond	Kevin Hugo	Ralf Brown	Yitzhak Sapir
+Adam Aronow	J. Ali Harlow	Mikko Juola
+Alex Kompel	Janet Walz	Nathan Eady
+Alex Smith	Janne Salmijarvi	Norm Meluch
+Andreas Dorn	Jean-Christophe Collet	Olaf Seibert
+Andy Church	Jeff Bailey	Pasi Kallinen
+Andy Swanson	Jochen Erwied	Pat Rankin
+Ari Huttunen	John Kallen	Patric Mueller
+Barton House	John Rupley	Paul Winner
+Benson I. Margulies	John S. Bien	Pierre Martineau
+Bill Dyer	Johnny Lee	Ralf Brown
+Boudewijn Waijers	Jon W{tte	Ray Chason
+Bruce Cox	Jonathan Handler	Richard Addison
+Bruce Holloway	Joshua Delahunty	Richard Beigel
+Bruce Mewborne	Keizo Yamamoto	Richard P. Hughey
+Carl Schelin	Ken Arnold	Rob Menke
+Chris Russo	Ken Arromdee	Robin Bandy
+David Cohrs	Ken Lorber	Robin Johnson
+David Damerell	Ken Washikita	Roderick Schertler
+David Gentzel	Kevin Darcy	Roland McGrath
+David Hairston	Kevin Hugo	Ron Van Iwaarden
+Dean Luick	Kevin Sitze	Ronnen Miller
+Del Lamb	Kevin Smolkowski	Ross Brown
+Derek S. Ray	Kevin Sweet	Sascha Wostmann
+Deron Meranda	Lars Huttar	Scott Bigham
+Dion Nicolaas	Leon Arnott	Scott R. Turner
+Dylan O'Donnell	M. Drew Streib	Sean Hunt
+Eric Backus	Malcolm Ryan	Stephen Spackman
+Eric Hendrickson	Mark Gooderum	Stefan Thielscher
+Eric R. Smith	Mark Modrall	Stephen White
+Eric S. Raymond	Marvin Bressler	Steve Creps
+Erik Andersen	Matthew Day	Steve Linhart
+Frederick Roeber	Merlyn LeRoy	Steve VanDevender
+Gil Neiger	Michael Allison	Teemu Suikki
+Greg Laskin	Michael Feir	Tim Lennan
+Greg Olson	Michael Hamel	Timo Hakulinen
+Gregg Wonderly	Michael Sokolov	Tom Almy
+Hao-yang Wang	Mike Engber	Tom West
+Helge Hafting	Mike Gallop	Warren Cheung
+Irina Rempt-Drijfhout	Mike Passaretti	Warwick Allison
+Izchak Miller	Mike Stephenson	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
 

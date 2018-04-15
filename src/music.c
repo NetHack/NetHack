@@ -302,7 +302,7 @@ int force;
                 case THRONE:
                     if (cansee(x, y))
                         pline_The("throne falls into a chasm.");
-                /* Falls into next case */
+                    /*FALLTHRU*/
                 case ROOM:
                 case CORR: /* Try to make a pit */
                 do_pit:
@@ -478,10 +478,10 @@ struct obj *instr;
     pc_speaker(&itmp, "C");
 #endif
 
-#define PLAY_NORMAL   0
-#define PLAY_STUNNED  1
-#define PLAY_CONFUSED 2
-#define PLAY_HALLU    4
+#define PLAY_NORMAL   0x00
+#define PLAY_STUNNED  0x01
+#define PLAY_CONFUSED 0x02
+#define PLAY_HALLU    0x04
     mode = PLAY_NORMAL;
     if (Stunned)
         mode |= PLAY_STUNNED;
@@ -609,7 +609,7 @@ int
 do_play_instrument(instr)
 struct obj *instr;
 {
-    char buf[BUFSZ], c = 'y';
+    char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
     int x, y;
     boolean ok;

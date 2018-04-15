@@ -3300,10 +3300,12 @@ struct obj *obj;
         goto wanexpl;
     case WAN_FIRE:
         expltype = EXPL_FIERY;
+        /*FALLTHRU*/
     case WAN_COLD:
         if (expltype == EXPL_MAGICAL)
             expltype = EXPL_FROSTY;
         dmg *= 2;
+        /*FALLTHRU*/
     case WAN_MAGIC_MISSILE:
     wanexpl:
         explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
