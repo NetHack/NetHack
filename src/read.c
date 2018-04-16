@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/6/18 by NullCGT */
+/* Edited on 4/16/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1279,7 +1279,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     }
     case SCR_BLANK_PAPER:
         if (Blind)
-            You("don't remember there being any magic words on this scroll.");
+            You("don't remember there being any magic words on this item.");
         else if(Role_if(PM_CARTOMANCER))
             pline("This card is useless!");
         else
@@ -1759,7 +1759,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         punish(sobj);
         break;
-    case SCR_CLONING:
+    case SCR_CLONING: {
+        register struct monst *mtmp;
         known = TRUE;
         if (confused) {
             if (uwep) {
@@ -1774,8 +1775,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         } else {
             You("realize that you were the clone all along!");
         }
-        cloneu();
+        mtmp = cloneu();
+        if (scursed)
+            mtmp->mtame = mtmp->mpeaceful = 0;
         break;
+    }
     case SCR_STINKING_CLOUD: {
         coord cc;
 

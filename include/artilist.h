@@ -1,7 +1,8 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* File changed 4/15/18 by NullCGT */
+
+/* File changed 4/16/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -26,6 +27,7 @@ static const char *artifact_names[] = {
 #define     PHYS(a,b)   {0,AD_PHYS,a,b}         /* physical */
 #define     DRLI(a,b)   {0,AD_DRLI,a,b}         /* life drain */
 #define     COLD(a,b)   {0,AD_COLD,a,b}
+#define     ACID(a,b)   {0,AD_ACID,a,b}
 #define     FIRE(a,b)   {0,AD_FIRE,a,b}
 #define     ELEC(a,b)   {0,AD_ELEC,a,b}         /* electrical shock */
 #define     STUN(a,b)   {0,AD_STUN,a,b}         /* magical attack */
@@ -170,6 +172,20 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     A("War\'s Sword", TWO_HANDED_SWORD,
       (SPFX_RESTR | SPFX_CONFLICT), 0, 0, PHYS(3, 3), NO_DFNS, NO_CARY, 0,
       A_NONE, NON_PM, NON_PM, 7000L, NO_COLOR),
+
+    /*
+    *       Similar to the brands.
+    */
+    A("Acidfall", LONG_SWORD, (SPFX_RESTR | SPFX_ATTK | SPFX_DEFN), 0, 0,
+      ACID(5, 0), ACID(0, 0), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
+      NO_COLOR),
+
+    /*
+     *      Blinding mace.
+    */
+    A("Sunspot", MACE, (SPFX_RESTR | SPFX_BLIND), 0, 0,
+      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
+      NO_COLOR),
     /*
     *        Just for fun.
     */
@@ -298,7 +314,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
 
     A("The Holographic Void Lily", CREDIT_CARD,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DEFN),
-      (SPFX_EREGEN | SPFX_REFLECT), 0, NO_ATTK, NO_DFNS, NO_CARY,
+      (SPFX_EREGEN | SPFX_HSPDAM | SPFX_REFLECT), 0, NO_ATTK, NO_DFNS, NO_CARY,
       SUMMONING, A_CHAOTIC, PM_CARTOMANCER, NON_PM, 7000L, NO_COLOR),
 
 #if 0 /* OBSOLETE */
@@ -381,6 +397,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
 #undef PHYS
 #undef DRLI
 #undef COLD
+#undef ACID
 #undef FIRE
 #undef ELEC
 #undef STUN

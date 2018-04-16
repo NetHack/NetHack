@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.h	$NHDT-Date: 1433050871 2015/05/31 05:41:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Modified 4/9/18 by NullCGT */
+/* Modified 4/16/18 by NullCGT */
 
 #ifndef ARTIFACT_H
 #define ARTIFACT_H
@@ -43,6 +43,7 @@
 #define SPFX_BREATHE 0x10000000L /* Magical breathing */
 #define SPFX_CANC 0x20000000L /* Pure cancellation */
 #define SPFX_CONFLICT 0x40000000L /* Weapon causes slotless conflict */
+#define SPFX_BLIND 0x80000000L /* Weapon blinds on hit */
 
 struct artifact {
     short otyp;

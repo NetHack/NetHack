@@ -1,7 +1,7 @@
 /* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/9/18 by NullCGT */
+/* Edited 4/16/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -483,6 +483,8 @@ long wp_mask;
         mask = &EFire_resistance;
     else if (dtyp == AD_COLD)
         mask = &ECold_resistance;
+    else if (dtyp == AD_ACID)
+        mask = &EAcid_resistance;
     else if (dtyp == AD_ELEC)
         mask = &EShock_resistance;
     else if (dtyp == AD_MAGM)
@@ -808,6 +810,8 @@ struct monst *mtmp;
             return !(yours ? Fire_resistance : resists_fire(mtmp));
         case AD_COLD:
             return !(yours ? Cold_resistance : resists_cold(mtmp));
+        case AD_ACID:
+            return !(yours ? Acid_resistance : resists_acid(mtmp));
         case AD_ELEC:
             return !(yours ? Shock_resistance : resists_elec(mtmp));
         case AD_MAGM:
@@ -1235,6 +1239,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             (void) destroy_mitem(mdef, POTION_CLASS, AD_COLD);
         return realizes_damage;
     }
+    if (attacks(AD_ACID, otmp)) {
+        if (realizes_damage)
+            pline_The("sizzling mace %s %s%c",
+                      !spec_dbon_applies ? "hits" : "melts", hittee,
+                      !spec_dbon_applies ? '.' : '!');
+        return realizes_damage;
+    }
     if (attacks(AD_ELEC, otmp)) {
         if (realizes_damage)
             pline_The("godly weapon hits%s %s%c",
@@ -1366,13 +1377,11 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     }
     if (spec_ability(otmp, SPFX_CANC) && !rn2(3)) {
         if (!youdefend) {
-            if (vis) {
-                if (cancel_monst(mdef, otmp, TRUE, FALSE, FALSE)) {
-                        pline_The("%s spear cancels %s!",
-                                  hcolor(NH_RED), mon_nam(mdef));
-                }
-                return vis;
+            if (cancel_monst(mdef, otmp, TRUE, FALSE, FALSE) && vis) {
+                    pline_The("%s spear cancels %s!",
+                              hcolor(NH_RED), mon_nam(mdef));
             }
+            return vis;
         } else {
             if (Blind) {
                 You_feel(" oddly empty.");
@@ -1384,6 +1393,21 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                   }
                   return TRUE;
               }
+        }
+    }
+    if (spec_ability(otmp, SPFX_BLIND) && !rn2(3)) {
+        if (!youdefend) {
+            if (!Blind) {
+                pline("The mace flashes with blinding light, blinding %s!",
+                      mon_nam(mdef));
+                mdef->mcansee = 0;
+                mdef->mblinded = 17;
+                return TRUE;
+            }
+        } else if (!Blind) {
+            pline("Your vision is consumed in a flash of blinding light!");
+            make_blinded(Blinded + 17, FALSE);
+            return TRUE;
         }
     }
     if (spec_ability(otmp, SPFX_DRLI)) {
@@ -1824,6 +1848,7 @@ long *abil;
     } abil2adtyp[] = {
         { &EFire_resistance, AD_FIRE },
         { &ECold_resistance, AD_COLD },
+        { &EAcid_resistance, AD_ACID },
         { &EShock_resistance, AD_ELEC },
         { &EAntimagic, AD_MAGM },
         { &EDisint_resistance, AD_DISN },
