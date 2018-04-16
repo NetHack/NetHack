@@ -1,4 +1,20 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1523736800 2018/04/14 20:13:20 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.253 $ $NHDT-Date: 1523842417 2018/04/16 01:33:37 $
+.\"
+.\" This is an excerpt for the 'roff' man page from the 'groff' package.
+.\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
+.\"|||
+.\"| o Never include empty or blank lines in a roff document.  Instead,  use
+.\"|   the empty request (a line consisting of a dot only) or a line comment
+.\"|   .\" if a structuring element is needed.
+.\"| o Never start a line with whitespace because this can lead to unexpect-
+.\"|   ed  behavior.  Indented paragraphs can be constructed in a controlled
+.\"|   way by roff requests.
+.\"| o Start each sentence on a line of its own, for the spacing after a dot
+.\"|   is handled differently depending on whether it terminates an abbrevi-
+.\"|   ation or a sentence.  To distinguish both cases, do a line break  af-
+.\"|   ter each sentence.
+.\"|||
+.\"
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -52,6 +68,23 @@
 .\"  the full width of the column, print " - " and the definition
 \\h'|\\n(CYu'\\fB\\$1\\fP\\h'|\\n(CZu'\ -\ \\$2
 ..
+.\" '.UX' is verbatim copy of tmac.n's '.ux' with the exception that
+.\" the trademark owner for "UNIX" has been updated.  (tmac.n contains
+.\" a comment asking that modified versions not be distributed, so we
+.\" are using this substitute instead of modifying that file.)
+.de UX					\" print "UNIX"
+.ie \\n(ux \\&\\$2\\s-1UNIX\\s0\\$1
+.el \{\
+.	nr ux +1			\" mark footnote as dropped
+\\&\\$2\\s-1UNIX\\s0\\*(rg\\$1
+.	fn				\" put out the footnote
+\\&\\*(rgUNIX is a registered trademark of The Open Group.
+.	ef				\" short and sweet ...
+.\}
+..
+.
+.\" finally, start the actual Guidebook...
+.
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -86,7 +119,7 @@ After all, when other adventurers came back this way after spending time
 in the caverns, they usually seemed better off than when they passed
 through the first time.  And who was to say that all of those who did
 not return had not just kept going?
-
+.
 .pg
 Asking around, you hear about a bauble, called the Amulet of Yendor by some,
 which, if you can find it, will bring you great wealth.  One legend you were
@@ -102,16 +135,16 @@ if you encounter any of the terrifying and magical creatures of
 your dreams along the way.  You spend one last night fortifying yourself
 at the local inn, becoming more and more depressed as you watch the odds
 of your success being posted on the inn's walls getting lower and lower.
-
+.
 .pg
-  In the morning you awake, collect your belongings, and
+In the morning you awake, collect your belongings, and
 set off for the dungeon.  After several days of uneventful
 travel, you see the ancient ruins that mark the entrance to the
 Mazes of Menace.  It is late at night, so you make camp at the entrance
 and spend the night sleeping under the open skies.  In the morning, you
 gather your gear, eat what may be your last meal outside, and enter the
 dungeon...
-
+.
 .hn 1
 What is going on here?
 .pg
@@ -244,7 +277,7 @@ understand what NetHack is doing with the screen.  The NetHack screen
 replaces the ``You see ...'' descriptions of text adventure games.
 Figure 1 is a sample of what a NetHack screen might look like.
 The way the screen looks for you depends on your platform.
-
+.
 .TS S
 center tab(~);
 a.
@@ -267,7 +300,7 @@ _
 .TE
 .ce 1
 Figure 1
-
+.
 .hn 2
 The status lines (bottom)
 .pg
@@ -461,7 +494,7 @@ The `F' and `m' commands may be useful here.
 You need not memorize all these symbols; you can ask the game what any
 symbol represents with the `/' command (see the next section for
 more info).
-
+.
 .hn 1
 Commands
 .pg
@@ -562,12 +595,12 @@ y  k  u	7  8  9
 h- . -l	4- . -6
 / | \e	/ | \e
 b  j  n	1  2  3
-	(if \fBnumber_pad\fP is set)
+\ 	(if \fBnumber_pad\fP is set)
 .TE
 .ed
 .ce 1
 Figure 2
-
+.
 .lp [YUHJKLBN]
 Go in that direction until you hit a wall or run into something.
 .lp m[yuhjklbn]
@@ -855,7 +888,7 @@ Z. - to cast at yourself, use `.' for the direction.
 .ed
 .lp ^Z
 Suspend the game
-.ux " versions with job control only)." (
+.UX " versions with job control only)." (
 .lp :
 Look at what is here.
 .lp ;
@@ -1314,7 +1347,7 @@ option is on, some additional letter commands are available:
 #name
 .lp u
 #untrap
-
+.
 .hn 1
 Rooms and corridors
 .pg
@@ -1446,7 +1479,7 @@ any other customers.
 If a shop is "closed for inventory", it will not open of its own accord.
 .lp * 2
 Shops do not get restocked with new items, regardless of inventory depletion.
-
+.
 .hn 1
 Monsters
 .pg
@@ -1544,7 +1577,7 @@ damage.  You can plunder the deceased adventurer's possessions;
 however, they are likely to be cursed.  Beware of whatever killed the
 former player; it is probably still lurking around, gloating over its
 last victory.
-
+.
 .hn 1
 Objects
 .pg
@@ -1820,7 +1853,7 @@ the equivalent of no armor, and lower numbers meaning better armor.
 Each suit of armor which exists in AD&D gives the same protection in
 NetHack.  Here is an (incomplete) list of the armor classes provided by
 various suits of armor:
-
+.
 .TS S
 center;
 a n.
@@ -2089,7 +2122,7 @@ Gold adds to your score, and you can buy things in shops with it.
 There are a number
 of monsters in the dungeon that may be influenced by the amount of gold
 you are carrying (shopkeepers aside).
-
+.
 .hn 1
 Conduct
 .pg
@@ -2198,7 +2231,7 @@ wish for any items is a challenge, as is a game without wishing for
 an artifact (even if the artifact immediately disappears).  When the
 game offers you an opportunity to make a wish for an item, you may
 choose ``nothing'' if you want to decline.
-
+.
 .hn 1
 Options
 .pg
@@ -2219,8 +2252,12 @@ for system administrators.
 Using a configuration file
 .pg
 The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is ``defaults.nh''
-in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
+operating systems.
+On DOS and Windows, it is ``defaults.nh''
+in the same folder as nethack.exe or nethackW.exe.
+On
+.UX ,
+Linux,
 and Mac OS X it is ``.nethackrc'' in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
@@ -2344,14 +2381,14 @@ Here is a short example of config file contents:
 .sd
 \fB# Set your character's role, race, gender, and alignment.\fP
 \fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
-
+\fB#\fP
 \fB# Turn on autopickup, and set automatically picked up object types\fP
 \fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
 \fB# Show colored text if possible\fP
 \fBOPTIONS=color\fP
 \fB# Show lit corridors differently\fP
 \fBOPTIONS=lit_corridor\fP
-
+\fB#\fP
 \fB# No startup splash screen. Windows GUI only.\fP
 \fBOPTIONS=!splash_screen\fP
 .ed
@@ -3634,10 +3671,13 @@ center;
 c s s
 c1 l1 l.
 .\"TABLE_START
-NetHack Symbols
+.\" because description is wide, centered title seems off, so pad it a bit
+.\" note that each backslash precedes one space of padding (including the
+.\" last one; in other words, there's a trailing space here)
+NetHack Symbols\ \ \ \ \ \ \ 
 Default	Symbol Name	Description
 \_	\_	\_
-	S_air	(air)
+\ 	S_air	(air)
 \&_	S_altar	(altar)
 "	S_amulet	(amulet)
 A	S_angel	(angelic being)
@@ -3655,7 +3695,7 @@ b	S_blob	(blob)
 +	S_book	(spellbook)
 )	S_boomleft	(boomerang open left)
 (	S_boomright	(boomerang open right)
-`	S_boulder	(boulder)
+\`	S_boulder	(boulder)
 -	S_brcorn	(bottom right corner)
 C	S_centaur	(centaur)
 \&_	S_chain	(iron chain)
@@ -3676,11 +3716,11 @@ D	S_dragon	(dragon)
 E	S_elemental	(elemental)
 /	S_explode1	(explosion top left)
 -	S_explode2	(explosion top center)
-`\e'	S_explode3	(explosion top right)
+\\	S_explode3	(explosion top right)
 |	S_explode4	(explosion middle left)
-	S_explode5	(explosion middle center)
+\ 	S_explode5	(explosion middle center)
 |	S_explode6	(explosion middle right)
-`\e'	S_explode7	(explosion bottom left)
+\\	S_explode7	(explosion bottom left)
 -	S_explode8	(explosion bottom center)
 /	S_explode9	(explosion bottom right)
 e	S_eye	(eye or sphere)
@@ -3692,22 +3732,22 @@ f	S_feline	(cat or other feline)
 {	S_fountain	(fountain)
 F	S_fungus	(fungus or mold)
 *	S_gem	(gem or rock)
-	S_ghost	(ghost)
+\ 	S_ghost	(ghost)
 H	S_giant	(giant humanoid)
 G	S_gnome	(gnome)
 '	S_golem	(golem)
 |	S_grave	(grave)
 g	S_gremlin	(gremlin)
--	S_hbeam	(wall)
+-	S_hbeam	(horizontal beam [zap animation])
 #	S_hcdbridge	(horizontal raised drawbridge)
-+	S_hcdoor	(closed door)
-.	S_hodbridge	(horizontal lowered drawbridge)
-|	S_hodoor	(open door)
++	S_hcdoor	(closed door in horizontal wall)
+\.	S_hodbridge	(horizontal lowered drawbridge)
+|	S_hodoor	(open door in horizontal wall)
 ^	S_hole	(hole)
 @	S_human	(human or elf)
 h	S_humanoid	(humanoid)
 -	S_hwall	(horizontal wall)
-.	S_ice	(ice)
+\.	S_ice	(ice)
 i	S_imp	(imp or minor demon)
 I	S_invisible	(invisible monster)
 J	S_jabberwock	(jabberwock)
@@ -3722,14 +3762,14 @@ L	S_lich	(lich)
 y	S_light	(light)
 #	S_litcorr	(lit corridor)
 :	S_lizard	(lizard)
-`\e'	S_lslant	(wall)
+\\	S_lslant	(diagonal beam [zap animation])
 ^	S_magic_portal	(magic portal)
 ^	S_magic_trap	(magic trap)
 m	S_mimic	(mimic)
 ]	S_mimic_def	(mimic)
 M	S_mummy	(mummy)
 N	S_naga	(naga)
-.	S_ndoor	(doorway)
+\.	S_ndoor	(doorway witout door)
 n	S_nymph	(nymph)
 O	S_ogre	(ogre)
 o	S_orc	(orc)
@@ -3743,11 +3783,11 @@ P	S_pudding	(pudding or ooze)
 q	S_quadruped	(quadruped)
 Q	S_quantmech	(quantum mechanic)
 \&=	S_ring	(ring)
-`	S_rock	(boulder or statue)
+\`	S_rock	(boulder or statue)
 r	S_rodent	(rodent)
 ^	S_rolling_boulder_trap	(rolling boulder trap)
-.	S_room	(floor of a room)
-/	S_rslant	(wall)
+\.	S_room	(floor of a room)
+/	S_rslant	(diagonal beam [zap animation])
 ^	S_rust_trap	(rust trap)
 R	S_rustmonst	(rust monster or disenchanter)
 ?	S_scroll	(scroll)
@@ -3762,19 +3802,19 @@ s	S_spider	(arachnid or centipede)
 @	S_ss3	(magic shield 3 of 4)
 *	S_ss4	(magic shield 4 of 4)
 ^	S_statue_trap	(statue trap)
-	S_stone	(dark part of a room)
+\ 	S_stone	(dark part of a room)
 ]	S_strange_obj	(strange object)
 -	S_sw_bc	(swallow bottom center)
-`\e'	S_sw_bl	(swallow bottom left)
+\\	S_sw_bl	(swallow bottom left)
 /	S_sw_br	(swallow bottom right)
 |	S_sw_ml	(swallow middle left)
 |	S_sw_mr	(swallow middle right)
 -	S_sw_tc	(swallow top center)
 /	S_sw_tl	(swallow top left)
-`\e'	S_sw_tr	(swallow top right)
+\\	S_sw_tr	(swallow top right)
 -	S_tdwall	(wall)
 ^	S_teleportation_trap	(teleportation trap)
-\	S_throne	(opulent throne)
+\\	S_throne	(opulent throne)
 -	S_tlcorn	(top left corner)
 |	S_tlwall	(wall)
 (	S_tool	(useful item (pick-axe\, key\, lamp...))
@@ -3790,13 +3830,13 @@ u	S_unicorn	(unicorn or horse)
 <	S_upladder	(ladder up)
 <	S_upstair	(staircase up)
 V	S_vampire	(vampire)
-|	S_vbeam	(wall)
+|	S_vbeam	(vertical beam [zap animation])
 #	S_vcdbridge	(vertical raised drawbridge)
-+	S_vcdoor	(closed door)
-.	S_venom	(splash of venom)
++	S_vcdoor	(closed door in vertical wall)
+\.	S_venom	(splash of venom)
 ^	S_vibrating_square	(vibrating square)
-.	S_vodbridge	(vertical lowered drawbridge)
--	S_vodoor	(open door)
+\.	S_vodbridge	(vertical lowered drawbridge)
+-	S_vodoor	(open door in vertical wall)
 v	S_vortex	(vortex)
 |	S_vwall	(vertical wall)
 /	S_wand	(wand)
@@ -3961,7 +4001,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 %N - first character of player name
 .ei
 .ed
-
+.
 .hn 1
 Scoring
 .pg
@@ -3985,7 +4025,7 @@ all your gold, but if you swing and live, you might find more.
 .pg
 If you just want to see what the current top players/games list is, you
 can type \fBnethack -s all\fP on most versions.
-
+.
 .hn 1
 Explore mode
 .pg
@@ -4026,12 +4066,12 @@ there's no connection between ``wizard mode'' and the Wizard role).
 And on any system, the program might have been configured to omit debug
 mode entirely.  Attempting to start a game in debug mode when not allowed
 or not available will result in falling back to explore mode instead.
-
+.
 .hn
 Credits
 .pg
 The original \fIhack\fP game was modeled on the Berkeley
-.ux
+.UX
 \fIrogue\fP game.  Large portions of this paper were shamelessly
 cribbed from \fIA Guide to the Dungeons of Doom\fP, by Michael C. Toy
 and Kenneth C. R. C. Arnold.  Small portions were adapted from
@@ -4039,7 +4079,7 @@ and Kenneth C. R. C. Arnold.  Small portions were adapted from
 .pg
 NetHack is the product of literally dozens of people's work.
 Main events in the course of the game development are described below:
-
+.
 .pg
 \fBJay Fenlason\fP wrote the original Hack, with help from
 \fBKenny Woodland\fP, \fBMike Thome\fP and \fBJon Payne\fP.
@@ -4047,7 +4087,7 @@ Main events in the course of the game development are described below:
 \fBAndries Brouwer\fP did a major re-write, transforming Hack into a
 very different game, and published (at least) three versions (1.0.1,
 1.0.2, and 1.0.3) for
-.ux
+.UX
 machines to the Usenet.
 .pg
 \fBDon G. Kneller\fP ported Hack 1.0.3 to Microsoft C and MS-DOS, producing PC
@@ -4261,7 +4301,9 @@ the time of release of 3.6.1 consisted of
 .pg
 The development team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP, ensured that NetHack 3.6 continued to operate on
-various Unix flavors and maintained the X11 interface.
+various
+.UX
+flavors and maintained the X11 interface.
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
 maintained the port of NetHack 3.6 for Mac OSX.
@@ -4289,13 +4331,13 @@ again to \fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP
 for providing public NetHack servers at nethack.alt.org and devnull.net
 and/or for hosting annual NetHack tournaments.
 .pg
-			   - - - - - - - - - -
+\ 			   - - - - - - - - - -
 .pg
 From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The Gods of
 the Dungeon sometimes make note of the names of the worst of these miscreants
 in this, the list of Dungeoneers:
-
+.
 .TS S
 center;
 c c c.
@@ -4342,7 +4384,7 @@ Irina Rempt-Drijfhout	Mike Passaretti	Warwick Allison
 Izchak Miller	Mike Stephenson	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
-
+.pg
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.
 .\"Atari and 1040ST are trademarks of Atari, Inc.
