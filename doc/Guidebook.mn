@@ -1,6 +1,6 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.253 $ $NHDT-Date: 1523842417 2018/04/16 01:33:37 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.254 $ $NHDT-Date: 1523867058 2018/04/16 08:24:18 $
 .\"
-.\" This is an excerpt for the 'roff' man page from the 'groff' package.
+.\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
 .\"|||
 .\"| o Never include empty or blank lines in a roff document.  Instead,  use
@@ -22,6 +22,7 @@
 .ds f0 "\*(vr
 .ds f1
 .ds f2 "April 14, 2018
+.
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -676,19 +677,41 @@ In answer to the question
 you should type zero or more object symbols possibly followed by
 `a' and/or `i' and/or `u' and/or `m'.  In addition, one or more of
 the blessed/uncursed/cursed groups may be typed.
-.sd
-.si
-DB  - drop all objects known to be blessed.
-DU  - drop all objects known to be uncursed.
-DC  - drop all objects known to be cursed.
-DX  - drop all objects of unknown B/U/C status.
-Da  - drop all objects, without asking for confirmation.
-Di  - examine your inventory before dropping anything.
-Du  - drop only unpaid objects (when in a shop).
-Dm  - use a menu to pick which object(s) to drop.
-D%u - drop only unpaid food.
-.ei
-.ed
+.PS D%u
+.PL DB
+drop all objects known to be blessed.
+.PL DU
+drop all objects known to be uncursed.
+.PL DC
+drop all objects known to be cursed.
+.PL DX
+drop all objects of unknown B/U/C status.
+.PL Da
+drop all objects, without asking for confirmation.
+.PL Di
+examine your inventory before dropping anything.
+.PL Du
+drop only unpaid objects (when in a shop).
+.PL Dm
+use a menu to pick which object(s) to drop.
+.PL D%u
+drop only unpaid food.
+.PE
+The last example shows a combination.
+There are three categories of object filtering: class (`!' for
+potions, `?' for scrolls, and so on), shop status (`u' for unpaid, in
+other words, owned by the shop), and bless/curse state (`B', `U',
+`C', and `X' as shown above).
+If you specify more than one value in a category (such as `!?' for
+potions and scrolls or `BU' for blessed and uncursed), an inventory
+object will meet the criteria if it matches any of the specified
+values (so `!?' means `!' or '?').
+If you specify more than one category, an inventory object must meet
+each of the category criteria (so `%u' means class `%' and unpaid `u').
+Lastly, you may specify multiple values within multiple categories:
+`!?BU' will select all potions and scrolls which are known to be
+blessed or uncursed.
+(In versions prior to 3.6, filter combinations behaved differently.)
 .lp ^D
 Kick something (usually a door).
 .lp e
@@ -724,18 +747,24 @@ List your inventory (everything you're carrying).
 .lp I
 List selected parts of your inventory, usually be specifying the character
 for a particular set of objects, like `[' for armor or `!' for potions.
-.sd
-.si
-I* - list all gems in inventory;
-Iu - list all unpaid items;
-Ix - list all used up items that are on your shopping bill;
-IB - list all items known to be blessed;
-IU - list all items known to be uncursed;
-IC - list all items known to be cursed;
-IX - list all items whose bless/curse status is known;
-I$ - count your money.
-.ei
-.ed
+.PS IX
+.PL I*
+list all gems in inventory;
+.PL Iu
+list all unpaid items;
+.PL Ix
+list all used up items that are on your shopping bill;
+.PL IB
+list all items known to be blessed;
+.PL IU
+list all items known to be uncursed;
+.PL IC
+list all items known to be cursed;
+.PL IX
+list all items whose bless/curse status is known;
+.PL I$
+count your money.
+.PE
 .lp o
 Open a door.
 .lp O
@@ -3988,19 +4017,27 @@ random statue names (default is 10).
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
 Not defining this will prevent dumplog from being created. Only available
 if your game is compiled with DUMPLOG. Allows the following placeholders:
-.sd
-.si
-%% - literal '%'
-%v - version (eg. "3.6.1-0")
-%u - game UID
-%t - game start time, UNIX timestamp format
-%T - current time, UNIX timestamp format
-%d - game start time, YYYYMMDDhhmmss format
-%D - current time, YYYYMMDDhhmmss format
-%n - player name
-%N - first character of player name
-.ei
-.ed
+.\" note: %M is not an entry in the table, but 'M' is the widest letter
+.PS %M
+.PL %%
+literal '%'
+.PL %v
+version (eg. "3.6.1-0")
+.PL %u
+game UID
+.PL %t
+game start time, UNIX timestamp format
+.PL %T
+current time, UNIX timestamp format
+.PL %d
+game start time, YYYYMMDDhhmmss format
+.PL %D
+current time, YYYYMMDDhhmmss format
+.PL %n
+player name
+.PL %N
+first character of player name
+.PE
 .
 .hn 1
 Scoring
@@ -4331,7 +4368,9 @@ again to \fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP
 for providing public NetHack servers at nethack.alt.org and devnull.net
 and/or for hosting annual NetHack tournaments.
 .pg
-\ 			   - - - - - - - - - -
+.ce
+- - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too far
+.                          \" to the right, so pad them with a few spaces
 .pg
 From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The Gods of
