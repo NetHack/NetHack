@@ -1509,17 +1509,7 @@ struct obj *obj;
             break;
         }
         case SUMMONING: {
-            struct obj pseudo;
-            struct obj pseudo2;
-
-            pseudo =
-                zeroobj; /* neither cursed nor blessed, zero oextra too */
-            pseudo2 =
-                zeroobj; /* neither cursed nor blessed, zero oextra too */
-            pseudo.otyp = SCR_CREATE_MONSTER;
-            (void) seffects(&pseudo);
-            pseudo2.otyp = SCR_TAMING;
-            (void) seffects(&pseudo2);
+            create_critters(rnd(10), (struct permonst *) 0, TRUE);
             break;
         }
         case KING: {
