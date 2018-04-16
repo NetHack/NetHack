@@ -71,8 +71,8 @@ then added to other platforms.
 
 The 3.2 development team, comprised of Michael Allison, Ken Arromdee, David
 Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
-Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz, and
-Paul Winner, released version 3.2 in April of 1996.
+Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz,
+and Paul Winner, released version 3.2 in April of 1996.
 
 Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
@@ -110,8 +110,8 @@ Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith,
 Mike Stephenson, Janet Walz, and Paul Winner, released 3.3.0 in
 December 1999 and 3.3.1 in August of 2000.
 
-Version 3.3 offered many firsts. It was the first version to separate race
-and profession. The Elf class was removed in preference to an elf race,
+Version 3.3 offered many firsts.  It was the first version to separate race
+and profession.  The Elf class was removed in preference to an elf race,
 and the races of dwarves, gnomes, and orcs made their first appearance in
 the game alongside the familiar human race.  Monk and Ranger roles joined
 Archeologists, Barbarians, Cavemen, Healers, Knights, Priests, Rogues,
@@ -172,26 +172,26 @@ would never be a 3.4.4, 3.5, or 3.5.0 official release version.
 In January 2015, preparation began for the release of NetHack 3.6.
 
 At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of Warwick Allison, 
+as 3.6.0, the development team consisted of Warwick Allison,
 Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet, Ken Lorber,
 Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and Paul Winner.
 Leading up to the release of 3.6.0 in early 2015, new members Sean Hunt,
 Pasi Kallinen, and Derek S. Ray joined the NetHack development team.
 
-The 3.6 versions of the game are special in a particular way.  Near the end of
-the development of 3.6.0, one of the significant inspirations for many of
-the humorous and fun features found in the game, author Terry Pratchett,
+The 3.6 versions of the game are special in a particular way.  Near the end
+of the development of 3.6.0, one of the significant inspirations for many
+of the humorous and fun features found in the game, author Terry Pratchett,
 passed away.  The 3.6 versions of the game include a tribute to him.
 
 3.6.0 was released in December 2015, and merged work done by the development
-team since the release of 3.4.3 with some of the beloved community 
-patches.  Many bugs were fixed and some code was restructured.
+team since the release of 3.4.3 with some of the beloved community patches.
+Many bugs were fixed and some code was restructured.
 
-In 2018, several hundred bug fixes for 3.6.0 and some new features 
-were assembled and released as NetHack 3.6.1. The development team at 
+In 2018, several hundred bug fixes for 3.6.0 and some new features
+were assembled and released as NetHack 3.6.1.  The development team at
 the time of release of 3.6.1 consisted of Warwick Allison,
-Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet, Pasi Kallinen, 
-Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin, Derek S. Ray, 
+Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet, Pasi Kallinen,
+Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin, Derek S. Ray,
 Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
 
 The development team, as well as Steve VanDevender and Kevin Smolkowski
@@ -201,8 +201,8 @@ as well as maintaining the X11 interface.
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
 of NetHack 3.6.1 for Mac OSX.
 
-Michael Allison, David Cohrs, Barton House, Pasi Kallinen, Alex Kompel, 
-Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of 
+Michael Allison, David Cohrs, Barton House, Pasi Kallinen, Alex Kompel,
+Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
 NetHack 3.6.1 for Microsoft Windows.
 
 Pat Rankin attempted to keep the VMS port running for NetHack 3.6.1,
@@ -223,10 +223,10 @@ NetHack tournaments.
 
                            - - - - - - - - - -
 
->From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The gods of
-the dungeon sometimes make note of the names of the worst of these miscreants
-in this, the list of Dungeoneers:
+From time to time, some depraved individual out there in netland sends a
+particularly intriguing modification to help out with the game.  The gods
+of the dungeon sometimes make note of the names of the worst of these
+miscreants in this, the list of Dungeoneers:
 
     Adam Aronow               J. Ali Harlow             Mikko Juola
     Alex Kompel               Janet Walz                Nathan Eady
