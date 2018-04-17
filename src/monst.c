@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/16/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -2461,14 +2461,14 @@ struct permonst _mons2[] = {
           ATTK(AT_KICK, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
-        CLR_YELLOW),
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT | M2_HOSTILE,
+        M3_INFRAVISIBLE, CLR_YELLOW),
     MON("martial master", S_HUMAN, LVL(9, 12, 2, 20, 0), (2),
         A(ATTK(AT_CLAW, AD_DSRM, 1, 8), ATTK(AT_KICK, AD_STUN, 1, 8),
           ATTK(AT_KICK, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_HOSTILE, M3_INFRAVISIBLE,
         CLR_YELLOW),
     MON("elf", S_HUMAN, LVL(10, 12, 10, 2, -3), G_NOGEN, /* for corpses */
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
