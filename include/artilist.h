@@ -99,11 +99,11 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
 
     /*
     *       Some "worse" sacrifice gifts are needed to avoid making #offer
-    *       overpowered.
+    *       overpowered. Used to be PM_KNIGHT.
     */
     A("Carnwennan", KNIFE, (SPFX_RESTR | SPFX_SEARCH | SPFX_STLTH), 0, 0,
       PHYS(3, 3), NO_DFNS, NO_CARY, 0, A_LAWFUL,
-      PM_KNIGHT, NON_PM, 400L, NO_COLOR),
+      NON_PM, NON_PM, 400L, NO_COLOR),
 
     /*
     *       Seafoam grants waterbreathing, and is generated rustproof.
@@ -141,7 +141,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       to damage and hit, but playing with -13 luck would be really hard.
     */
     A("Luckless Folly", SHORT_SWORD, (SPFX_RESTR | SPFX_LUCK), 0, 0,
-      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
+      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM, 3000L,
       NO_COLOR),
 
     /*
@@ -174,18 +174,44 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       A_NONE, NON_PM, NON_PM, 7000L, NO_COLOR),
 
     /*
-    *       Similar to the brands.
+    *       Similar to the brands. Does not destroy items, but also resisted
+    *       by quite a few monsters.
     */
     A("Acidfall", LONG_SWORD, (SPFX_RESTR | SPFX_ATTK | SPFX_DEFN), 0, 0,
       ACID(5, 0), ACID(0, 0), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
       NO_COLOR),
 
     /*
-     *      Blinding mace.
+    *      Blinding mace.
     */
     A("Sunspot", MACE, (SPFX_RESTR | SPFX_BLIND), 0, 0,
-      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
+      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 2000L,
       NO_COLOR),
+
+    /*
+    *      Shield of King Arthur.
+    */
+    A("Pridwen", LARGE_SHIELD,
+      (SPFX_RESTR | SPFX_HPHDAM), 0, 0,
+      NO_ATTK, NO_DFNS, NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 1500L,
+      CLR_MAGENTA),
+
+    /*
+    *      Shield of King Arthur.
+    */
+    A("Balance", QUARTERSTAFF,
+      (SPFX_RESTR | SPFX_TCTRL), 0, 0,
+      PHYS(2, 6), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 500L,
+      CLR_MAGENTA),
+
+    /*
+    *      Self-explanatory.
+    */
+    A("Seven-League Boots", SPEED_BOOTS,
+      (SPFX_RESTR | SPFX_JUMP), 0, 0,
+      NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1000L,
+      CLR_MAGENTA),
+
     /*
     *        Just for fun.
     */

@@ -44,6 +44,7 @@
 #define SPFX_CANC 0x20000000L /* Pure cancellation */
 #define SPFX_CONFLICT 0x40000000L /* Weapon causes slotless conflict */
 #define SPFX_BLIND 0x80000000L /* Weapon blinds on hit */
+#define SPFX_JUMP 0x1F000000L /* jumping */
 
 struct artifact {
     short otyp;

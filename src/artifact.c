@@ -643,6 +643,12 @@ long wp_mask;
         else
             EMagical_breathing &= ~wp_mask;
     }
+    if (spfx & SPFX_JUMP) {
+        if (on)
+            EJumping |= wp_mask;
+        else
+            EJumping &= ~wp_mask;
+    }
 
     if (wp_mask == W_ART && !on && oart->inv_prop) {
         /* might have to turn off invoked power too */
@@ -1885,6 +1891,7 @@ long *abil;
         { &EHalf_physical_damage, SPFX_HPHDAM },
         { &EReflecting, SPFX_REFLECT },
         { &EMagical_breathing, SPFX_BREATHE },
+        { &EJumping, SPFX_JUMP },
     };
     int k;
 
