@@ -7,7 +7,7 @@
 /*             - dewimped and given some maledictions. -3. */
 /*             - generalized for 3.1 (mike@bullns.on01.bull.ca) */
 
-/* Edited on 4/6/18 by NullCGT */
+/* Edited on 4/18/18 by NullCGT */
 
 #include "hack.h"
 #include "qtext.h"
@@ -688,6 +688,7 @@ intervene()
     switch (which) {
     case 0:
         You_feel("anxious.");
+        break;
     case 1:
         You_feel("vaguely nervous.");
         break;
