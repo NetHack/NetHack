@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 4/15/18 by NullCGT */
+/* Edited on 4/18/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -566,6 +566,7 @@ E boolean FDECL(cursed_object_at, (int, int));
 
 /* ### dungeon.c ### */
 
+E void NDECL(dungeon_crumble);
 E void FDECL(save_dungeon, (int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(restore_dungeon, (int));
 E void FDECL(insert_branch, (branch *, BOOLEAN_P));

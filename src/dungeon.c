@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/14/18 by NulLCGT */
+/* Edited on 4/18/18 by NulLCGT */
 
 #include "hack.h"
 #include "dgn_file.h"
@@ -2395,6 +2395,11 @@ mapseen *mptr;
                       || mptr->custom || mptr->br
                       || (mptr->lev.dlevel
                           == dungeons[mptr->lev.dnum].dunlev_ureached));
+}
+
+void dungeon_crumble() {
+    pline("The dungeon is crumbling around you!");
+    do_earthquake(3);
 }
 
 /* recalculate mapseen for the current level */

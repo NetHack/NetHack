@@ -4,7 +4,7 @@
 
 /* various code that was replicated in *main.c */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/18/18 by NullCGT */
 
 #include "hack.h"
 
@@ -116,11 +116,13 @@ boolean resuming;
                     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
                         mtmp->movement += mcalcmove(mtmp);
 
-                    if (!rn2(u.uevent.udemigod
-                                 ? 25
-                                 : (depth(&u.uz) > depth(&stronghold_level))
-                                       ? 50
-                                       : 70))
+                    if (!rn2(u.uevent.udemigod && !(In_endgame(&u.uz))
+                                 ? min(25, depth(&u.uz) + 1)
+                                 : u.uevent.udemigod
+                                     ? 25
+                                     : (depth(&u.uz) > depth(&stronghold_level))
+                                           ? 50
+                                           : 70))
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
@@ -286,6 +288,15 @@ boolean resuming;
                         if (!u.udg_cnt) {
                             intervene();
                             u.udg_cnt = rn1(200, 50);
+                        }
+                    }
+                    if (u.uevent.udemigod && !u.uinvulnerable &&
+                        !In_endgame(&u.uz)) {
+                        if (u.uin_cnt)
+                            u.uin_cnt--;
+                        if (!u.uin_cnt) {
+                            dungeon_crumble();
+                            u.uin_cnt = rn1(15, 15);
                         }
                     }
                     restore_attrib();

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/8/18 by NullCGT */
+/* Edited on 4/18/18 by NullCGT */
 
 #ifndef YOU_H
 #define YOU_H
@@ -343,6 +343,7 @@ struct you {
     /* 1 free bit! */
 
     unsigned udg_cnt;           /* how long you have been demigod */
+    unsigned uin_cnt;           /* how long since the invocation */
     struct u_achieve uachieve;  /* achievements */
     struct u_event uevent;      /* certain events have happened */
     struct u_have uhave;        /* you're carrying special objects */

@@ -56,7 +56,7 @@ General Changes
   possible into the existing tone.
 - Additional graves, hallucinations, rumors, scroll and wand names,  and
   the like.
-- Spellcasting monsters have access to a much larger variety of dangerous
+- Spellcasting monsters have access to a larger variety of dangerous
   spells.
 - Engraving "The Yellow Sign" will cause bad things to happen to you and those
   around you.
@@ -93,7 +93,6 @@ General Changes
   difficult, since player monsters now have a greater number of artifacts to
   be generated with.
 - Summon nasties has been expanded to accommodate new monsters.
-- New demon lords!
 - High level adventurers will arise as spectres in their bones files, a more
   powerful type of ghost which is capable of using weapons. Inspired by an
   archived YANI by AmyBSOD and aosdict.
@@ -113,7 +112,10 @@ General Changes
   Please do not try drinking out of a furnace.
 - Upon performing the invocation ritual, all unique demons that have not yet
   been generated will appear and immediately teleport to random levels in the
-  game.
+  game. The dungeon will begin to crumble, causing earthquakes centered on you
+  occasionally. As you begin to ascend the dungeon, monster spawn rate will
+  speed up.
+- While you have the amulet, leprechauns are generated awake.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/12/18 by NullCGT */
+/* Edited on 4/18/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1298,7 +1298,8 @@ int mmflags;
         (void) hideunder(mtmp);
         break;
     case S_LEPRECHAUN:
-        mtmp->msleeping = 1;
+        if (!u.uhave.amulet)
+            mtmp->msleeping = 1;
         break;
     case S_JABBERWOCK:
         if (rn2(5) && !u.uhave.amulet)
