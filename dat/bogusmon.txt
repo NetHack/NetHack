@@ -1,6 +1,6 @@
 # Hallucinatory monsters
 #
-# Edited on 4/7/18 by NullCGT
+# Edited on 4/17/18 by NullCGT
 #
 # prefix codes:
 # dash		-  female, personal name
@@ -110,6 +110,8 @@ angry onion
 reanimator
 overclocked microwave
 chronomancer
+lotus eater lad
+|king of all birds
 
 # Quendor (Zork, &c.)
 grue
@@ -134,6 +136,9 @@ emu
 kestrel
 xeroc
 venus flytrap
+
+# Too real
+hallucination
 
 # Wizardry
 creeping coins
@@ -408,14 +413,13 @@ tie-thulu
 +Domo-kun
 looooooooooooong cat
 nyan cat
-+Dat Boi
-bode
 
 # the Internet is made for cat pix
 ceiling cat
 basement cat
 monorail cat
 knife cat
+bode
 
 # POWDER
 tridude
