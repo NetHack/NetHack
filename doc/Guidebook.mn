@@ -483,7 +483,7 @@ An altar, or an iron chain.
 A fountain.
 .lp }
 A pool of water or moat or a pool of lava.
-.lp \\
+.lp \\\\
 An opulent throne.
 .lp "a-zA-Z and other symbols"
 Letters and certain other symbols represent the various inhabitants
@@ -968,7 +968,7 @@ pick ``reassign casting letters''.
 (Any spells learned after that will
 be added to the end of the list rather than be inserted into the sorted
 ordering.)
-.lp \\
+.lp \\\\
 Show what types of objects have been discovered.
 .lp `
 Show discovered types for one class of objects.
