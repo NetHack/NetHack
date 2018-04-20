@@ -1028,7 +1028,7 @@ May be preceded by `{\tt m}' to force a selection menu.
 Toggle the {\it autopickup\/} option on and off.
 %.lp
 \item[\tb{\^{}}]
-Ask for the type of a trap you found earlier.
+Ask for the type of an adjacent trap you found earlier.
 %.lp
 \item[\tb{)}]
 Tell what weapon you are wielding.
@@ -1364,7 +1364,7 @@ List and reorder known spells. Default key is '{\tt +}'.
 Show the tools currently in use. Default key is '{\tt (}'.
 %.lp
 \item[\tb{\#seetrap}]
-Show the type of a trap near you. Default key is '{\tt \^{}}'.
+Show the type of an adjacent trap. Default key is '{\tt \^{}}'.
 %.lp
 \item[\tb{\#seeweapon}]
 Show the weapon currently wielded. Default key is '{\tt )}'.
@@ -4443,7 +4443,7 @@ file option. Symbols are specified as {\it name:value\/} pairs. Note that
 {\it NetHack\/} escape-processes the {\it value\/} string in conventional C
 fashion.  This means that `\verb+\+' is a prefix to take the following
 character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
-The special escape form
+The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the
 `{\tt \^{}}' prefix causes the following character to be treated as a control
 character.
@@ -4632,7 +4632,18 @@ Default                      & Symbol Name                & Description\\
 \end{longtable}%
 }
 
-%.lp
+%.pg
+There is one additional class of object, described as ``strange object'',
+which will occasionally be the shape taken on by mimics and shown as
+`{\tt \verb+]+}'
+for maps displayed as text characters.
+Although the displayed character is the same as the default value for
+`S\verb+_+mimic\verb+_+def', it is a different symbol and there is no
+corresponding
+`S\verb+_\+strange\verb+_+object' symbol nor any way to assign an
+alternate value for it.
+
+%.pg
 %.hn 2
 \subsection*{Configuring {\it NetHack\/} for Play by the Blind}
 
