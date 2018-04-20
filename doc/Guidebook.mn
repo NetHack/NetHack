@@ -1,11 +1,28 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1523736800 2018/04/14 20:13:20 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1524190235 2018/04/20 02:10:35 $
+.\"
+.\" This is an excerpt from the 'roff' man page from the 'groff' package.
+.\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
+.\"|||
+.\"| o Never include empty or blank lines in a roff document.  Instead,  use
+.\"|   the empty request (a line consisting of a dot only) or a line comment
+.\"|   .\" if a structuring element is needed.
+.\"| o Never start a line with whitespace because this can lead to unexpect-
+.\"|   ed  behavior.  Indented paragraphs can be constructed in a controlled
+.\"|   way by roff requests.
+.\"| o Start each sentence on a line of its own, for the spacing after a dot
+.\"|   is handled differently depending on whether it terminates an abbrevi-
+.\"|   ation or a sentence.  To distinguish both cases, do a line break  af-
+.\"|   ter each sentence.
+.\"|||
+.\"
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 14, 2018
+.ds f2 "April 19, 2018
+.
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -52,19 +69,29 @@
 .\"  the full width of the column, print " - " and the definition
 \\h'|\\n(CYu'\\fB\\$1\\fP\\h'|\\n(CZu'\ -\ \\$2
 ..
+.\" '.UX' is verbatim copy of tmac.n's '.ux' with the exception that
+.\" the trademark owner for "UNIX" has been updated.  (tmac.n contains
+.\" a comment asking that modified versions not be distributed, so we
+.\" are using this substitute instead of modifying that file.)
+.de UX					\" print "UNIX"
+.ie \\n(ux \\&\\$2\\s-1UNIX\\s0\\$1
+.el \{\
+.	nr ux +1			\" mark footnote as dropped
+\\&\\$2\\s-1UNIX\\s0\\*(rg\\$1
+.	fn				\" put out the footnote
+\\&\\*(rgUNIX is a registered trademark of The Open Group.
+.	ef				\" short and sweet ...
+.\}
+..
+.
+.\" finally, start the actual Guidebook...
+.
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Original version - Eric S. Raymond
 (Edited and expanded for 3.6 by Mike Stephenson and others)
-.hu
-Preface - Version 3.6
-.pg
-This version of the game is special in a particular way.  Near the end of
-the development of 3.6, one of the significant inspirations for many of the
-humorous and fun features found in the game, author \fITerry Pratchett\fP,
-passed away.  We have dedicated this version of the game in his memory.
 .hn 1
 Introduction
 .pg
@@ -86,7 +113,7 @@ After all, when other adventurers came back this way after spending time
 in the caverns, they usually seemed better off than when they passed
 through the first time.  And who was to say that all of those who did
 not return had not just kept going?
-
+.
 .pg
 Asking around, you hear about a bauble, called the Amulet of Yendor by some,
 which, if you can find it, will bring you great wealth.  One legend you were
@@ -102,16 +129,16 @@ if you encounter any of the terrifying and magical creatures of
 your dreams along the way.  You spend one last night fortifying yourself
 at the local inn, becoming more and more depressed as you watch the odds
 of your success being posted on the inn's walls getting lower and lower.
-
+.
 .pg
-  In the morning you awake, collect your belongings, and
+In the morning you awake, collect your belongings, and
 set off for the dungeon.  After several days of uneventful
 travel, you see the ancient ruins that mark the entrance to the
 Mazes of Menace.  It is late at night, so you make camp at the entrance
 and spend the night sleeping under the open skies.  In the morning, you
 gather your gear, eat what may be your last meal outside, and enter the
 dungeon...
-
+.
 .hn 1
 What is going on here?
 .pg
@@ -244,7 +271,8 @@ understand what NetHack is doing with the screen.  The NetHack screen
 replaces the ``You see ...'' descriptions of text adventure games.
 Figure 1 is a sample of what a NetHack screen might look like.
 The way the screen looks for you depends on your platform.
-
+.
+.ft CR \" set font to constant-width Roman
 .TS S
 center tab(~);
 a.
@@ -265,9 +293,10 @@ Dlvl:1 $:0  HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
 
 _
 .TE
+.ft \" revert to previous font
 .ce 1
 Figure 1
-
+.
 .hn 2
 The status lines (bottom)
 .pg
@@ -313,7 +342,7 @@ coincide.  Your alignment influences how other
 monsters react toward you.  Monsters of a like alignment are more likely
 to be non-aggressive, while those of an opposing alignment are more likely
 to be seriously offended at your presence.
-.lp "Dungeon Level
+.lp "Dungeon Level"
 How deep you are in the dungeon.  You start at level one and the number
 increases as you go deeper into the dungeon.  Some levels are special,
 and are identified by a name and not a number.  The Amulet of Yendor is
@@ -321,7 +350,7 @@ reputed to be somewhere beneath the twentieth level.
 .lp "Gold  "
 The number of gold pieces you are openly carrying.  Gold which you have
 concealed in containers is not counted.
-.lp "Hit Points
+.lp "Hit Points"
 Your current and maximum hit points.  Hit points indicate how much
 damage you can take before you die.  The more you get hit in a fight,
 the lower they get.  You can regain hit points by resting, or by using
@@ -331,7 +360,7 @@ number your hit points can reach.
 Spell points.  This tells you how much mystic energy (\fImana\fP)
 you have available for spell casting.  Again, resting will regenerate the
 amount available.
-.lp "Armor Class
+.lp "Armor Class"
 A measure of how effectively your armor stops blows from unfriendly
 creatures.  The lower this number is, the more effective the armor; it
 is quite possible to have negative armor class.
@@ -398,7 +427,7 @@ so far.  Each symbol on the screen represents something.  You can set
 various graphics options to change some of the symbols the game uses;
 otherwise, the game will use default symbols.  Here is a list of what the
 default symbols mean:
-.lp "- and |
+.lp "- and | "
 The walls of a room, or an open door.  Or a grave (|).
 .lp .
 The floor of a room, ice, or a doorless doorway.
@@ -433,7 +462,7 @@ A ring.
 A potion.
 .lp (
 A useful item (pick-axe, key, lamp...).
-.lp """
+.lp \(dq \" \(dq == double quote
 An amulet or a spider web.
 .lp *
 A gem or rock (possibly valuable, possibly worthless).
@@ -447,9 +476,9 @@ An altar, or an iron chain.
 A fountain.
 .lp }
 A pool of water or moat or a pool of lava.
-.lp "\e
+.lp \\\\
 An opulent throne.
-.lp "a-zA-Z and other symbols
+.lp "a-zA-Z and other symbols"
 Letters and certain other symbols represent the various inhabitants
 of the Mazes of Menace.  Watch out, they can be nasty and vicious.
 Sometimes, however, they can be helpful.
@@ -461,7 +490,7 @@ The `F' and `m' commands may be useful here.
 You need not memorize all these symbols; you can ask the game what any
 symbol represents with the `/' command (see the next section for
 more info).
-
+.
 .hn 1
 Commands
 .pg
@@ -553,7 +582,8 @@ one-step movement commands cause you to fight monsters; the others
 (below) are ``safe.''
 .sd
 .\" note: the two number pad layouts are separated by a tab on each line;
-.\"       converting those tabs to spaces will screw up the formatting
+.\"       converting those tabs to spaces will screw up the formatting;
+.\"       the '(if ... set)' line starts with <backslash><space><tab>
 .TS S
 center;
 c c.
@@ -562,12 +592,12 @@ y  k  u	7  8  9
 h- . -l	4- . -6
 / | \e	/ | \e
 b  j  n	1  2  3
-	(if \fBnumber_pad\fP is set)
+\ 	(if \fBnumber_pad\fP is set)
 .TE
 .ed
 .ce 1
 Figure 2
-
+.
 .lp [YUHJKLBN]
 Go in that direction until you hit a wall or run into something.
 .lp m[yuhjklbn]
@@ -592,9 +622,9 @@ make ``#travel'' command show a menu of interesting targets in sight.
 Prefix:  fight a monster (even if you only guess one is there).
 .lp M[yuhjklbn]
 Prefix:  move far, no pickup.
-.lp "g[yuhjklbn]
+.lp "g[yuhjklbn]"
 Prefix:  move until something interesting is found.
-.lp "G[yuhjklbn] or <CONTROL->[yuhjklbn]
+.lp "G[yuhjklbn] or <CONTROL->[yuhjklbn]"
 Prefix:  same as `g', but forking of corridors is not considered interesting.
 .lp _
 Travel to a map location via a shortest-path algorithm.
@@ -643,19 +673,41 @@ In answer to the question
 you should type zero or more object symbols possibly followed by
 `a' and/or `i' and/or `u' and/or `m'.  In addition, one or more of
 the blessed/uncursed/cursed groups may be typed.
-.sd
-.si
-DB  - drop all objects known to be blessed.
-DU  - drop all objects known to be uncursed.
-DC  - drop all objects known to be cursed.
-DX  - drop all objects of unknown B/U/C status.
-Da  - drop all objects, without asking for confirmation.
-Di  - examine your inventory before dropping anything.
-Du  - drop only unpaid objects (when in a shop).
-Dm  - use a menu to pick which object(s) to drop.
-D%u - drop only unpaid food.
-.ei
-.ed
+.PS D%u
+.PL DB
+drop all objects known to be blessed.
+.PL DU
+drop all objects known to be uncursed.
+.PL DC
+drop all objects known to be cursed.
+.PL DX
+drop all objects of unknown B/U/C status.
+.PL Da
+drop all objects, without asking for confirmation.
+.PL Di
+examine your inventory before dropping anything.
+.PL Du
+drop only unpaid objects (when in a shop).
+.PL Dm
+use a menu to pick which object(s) to drop.
+.PL D%u
+drop only unpaid food.
+.PE
+The last example shows a combination.
+There are three categories of object filtering: class (`!' for
+potions, `?' for scrolls, and so on), shop status (`u' for unpaid, in
+other words, owned by the shop), and bless/curse state (`B', `U',
+`C', and `X' as shown above).
+If you specify more than one value in a category (such as `!?' for
+potions and scrolls or `BU' for blessed and uncursed), an inventory
+object will meet the criteria if it matches any of the specified
+values (so `!?' means `!' or '?').
+If you specify more than one category, an inventory object must meet
+each of the category criteria (so `%u' means class `%' and unpaid `u').
+Lastly, you may specify multiple values within multiple categories:
+`!?BU' will select all potions and scrolls which are known to be
+blessed or uncursed.
+(In versions prior to 3.6, filter combinations behaved differently.)
 .lp ^D
 Kick something (usually a door).
 .lp e
@@ -677,8 +729,7 @@ E- - write in the dust with your fingers.
 .lp ""
 Engraving the word ``Elbereth'' will cause most monsters to not attack
 you hand-to-hand (but if you attack, you will rub it out); this is
-often useful to give yourself a breather.  (This feature may be compiled out
-of the game, so your version might not have it.)
+often useful to give yourself a breather.
 .lp f
 Fire one of the objects placed in your quiver (or quiver sack, or that you
 have at the ready).  You may select
@@ -691,18 +742,24 @@ List your inventory (everything you're carrying).
 .lp I
 List selected parts of your inventory, usually be specifying the character
 for a particular set of objects, like `[' for armor or `!' for potions.
-.sd
-.si
-I* - list all gems in inventory;
-Iu - list all unpaid items;
-Ix - list all used up items that are on your shopping bill;
-IB - list all items known to be blessed;
-IU - list all items known to be uncursed;
-IC - list all items known to be cursed;
-IX - list all items whose bless/curse status is known;
-I$ - count your money.
-.ei
-.ed
+.PS IX
+.PL I*
+list all gems in inventory;
+.PL Iu
+list all unpaid items;
+.PL Ix
+list all used up items that are on your shopping bill;
+.PL IB
+list all items known to be blessed;
+.PL IU
+list all items known to be uncursed;
+.PL IC
+list all items known to be cursed;
+.PL IX
+list all items whose bless/curse status is known;
+.PL I$
+count your money.
+.PE
 .lp o
 Open a door.
 .lp O
@@ -855,7 +912,9 @@ Z. - to cast at yourself, use `.' for the direction.
 .ed
 .lp ^Z
 Suspend the game
-.ux " versions with job control only)." (
+.\" .UX: print "UNIX" now and a trademark footnote at bottom of current page;
+.\"  2nd arg (literal '(') _precedes_ it, 1st arg (quoted string) follows it
+.UX " versions with job control only)." (
 .lp :
 Look at what is here.
 .lp ;
@@ -876,7 +935,7 @@ Tell what weapon you are wielding.
 Tell what armor you are wearing.
 .lp =
 Tell what rings you are wearing.
-.lp """
+.lp \(dq \" \(dq == double quote
 Tell what amulet you are wearing.
 .lp (
 Tell what tools you are using.
@@ -895,12 +954,14 @@ the order in which your spells are listed, either by sorting the entire
 list or by picking one spell from the menu then picking another to swap
 places with it.  Swapping pairs of spells changes their casting letters,
 so the change lasts after the current `+' command finishes.  Sorting
-the whole list is temporary.  To make the most recent sort order persist
+the whole list is temporary.
+To make the most recent sort order persist
 beyond the current `+' command, choose the sort option again and then
-pick "reassign casting letters".  (Any spells learned after that will
+pick ``reassign casting letters''.
+(Any spells learned after that will
 be added to the end of the list rather than be inserted into the sorted
 ordering.)
-.lp "\e
+.lp \\\\
 Show what types of objects have been discovered.
 .lp `
 Show discovered types for one class of objects.
@@ -925,7 +986,7 @@ slot to another so that it has a letter which is more meaningful for you
 or that it will appear in a particular location when inventory listings
 are displayed.
 You can move to a currently empty slot, or if the destination is
-occupied--and won't merge--the item there will swap slots with the one
+occupied \(em and won't merge \(em the item there will swap slots with the one
 being moved.
 ``#adjust'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.
@@ -945,9 +1006,13 @@ splitting (count given) will ignore the source stack's name when
 deciding whether to merge with the destination stack.
 .lp #annotate
 Allows you to specify one line of text to associate with the current
-dungeon level.  All levels with annotations are displayed by the
-``#overview'' command. Autocompletes. Default key is 'M-A', and '^N'
-if number_pad is on.
+dungeon level.
+All levels with annotations are displayed by the
+``#overview'' command.
+Autocompletes.
+Default key is 'M-A', and '^N' if
+.op number_pad
+is on.
 .lp #apply
 Apply (use) a tool such as a pick-axe, a key, or a lamp. Default key is 'a'.
 .lp ""
@@ -971,7 +1036,9 @@ Talk to someone. Default key is 'M-c'.
 .lp #close
 Close a door. Default key is 'c'.
 .lp #conduct
-List voluntary challenges you have maintained. Autocompletes. Default key is 'M-C'.
+List voluntary challenges you have maintained.
+Autocompletes.
+Default key is 'M-C'.
 .lp ""
 See the section below entitled ``Conduct'' for details.
 .lp "#dip "
@@ -998,7 +1065,9 @@ Force a lock. Autocompletes. Default key is 'M-f'.
 .lp #glance
 Show what type of thing a map symbol corresponds to. Default key is ';'.
 .lp #help
-Show the help menu. Default key is '?', and 'h' if number_pad is on.
+Show the help menu. Default key is '?', and 'h' if
+.op number_pad
+is on.
 .lp #herecmdmenu
 Show a menu of possible actions in your current location.
 .lp #history
@@ -1010,9 +1079,16 @@ Inventory specific item types. Default key is 'I'.
 .lp #invoke
 Invoke an object's special powers. Autocompletes. Default key is 'M-i'.
 .lp #jump
-Jump to another location. Autocompletes. Default key is 'M-j', and 'j' if number_pad is on.
+Jump to another location.
+Autocompletes.
+Default key is 'M-j', and 'j' if
+.op number_pad
+is on.
 .lp #kick
-Kick something. Default key is '^D', and 'k' if number_pad is on.
+Kick something.
+Default key is '^D', and 'k' if
+.op number_pad
+is on.
 .lp #known
 Show what object types have been discovered. Default key is '\\'.
 .lp #knownclass
@@ -1027,7 +1103,10 @@ Look at what is here, under you. Default key is ':'.
 Loot a box or bag on the floor beneath you, or the saddle
 from a steed standing next to you. Autocompletes.
 Precede with the `m' prefix to skip containers at your location
-and go directly to removing a saddle. Default key is 'M-l', and 'l' if number_pad is on.
+and go directly to removing a saddle.
+Default key is 'M-l', and 'l' if
+.op number_pad
+is on.
 .lp #monpolycontrol
 Control monster polymorphs. Autocompletes. Wizard-mode only.
 .lp #monster
@@ -1087,13 +1166,16 @@ Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of 'y' acknowledges that intent.  You can set the
 .op paranoid_confirmation
-option to require a response of "yes" instead.
+option to require a response of ``yes'' instead.
 .lp #quiver
 Select ammunition for quiver. Default key is 'Q'.
 .lp #read
 Read a scroll, a spellbook, or something else. Default key is 'r'.
 .lp #redraw
-Redraw the screen. Default key is '^R', and '^L' if number_pad is on.
+Redraw the screen.
+Default key is '^R', and '^L' if
+.op number_pad
+is on.
 .lp #remove
 Remove an accessory (ring, amulet, etc). Default key is 'R'.
 .lp #ride
@@ -1107,7 +1189,7 @@ Search for traps and secret doors around you. Default key is 's'.
 .lp #seeall
 Show all equipment in use. Default key is '*'.
 .lp #seeamulet
-Show the amulet currently worn. Default key is '"'.
+Show the amulet currently worn. Default key is '\(dq'. \" double quote
 .lp #seearmor
 Show the armor currently worn. Default key is '['.
 .lp #seegold
@@ -1159,7 +1241,7 @@ Using the ``request menu'' prefix shows a menu of interesting targets in sight
 without asking to move the cursor. When picking a target with cursor and
 the
 .op autodescribe
--option is on, the top line will show "(no travel path)" if
+option is on, the top line will show ``(no travel path)'' if
 your character does not know of a path to that location.
 .lp #turn
 Turn undead away. Autocompletes. Default key is 'M-t'.
@@ -1171,7 +1253,10 @@ Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 .lp #untrap
-Untrap something (trap, door, or chest). Default key is 'M-u', and 'u' if number_pad is on.
+Untrap something (trap, door, or chest).
+Default key is 'M-u', and 'u' if
+.op number_pad
+is on.
 .lp ""
 In some circumstances it can also be used to rescue trapped monsters.
 .lp "#up  "
@@ -1212,7 +1297,10 @@ Default key is '^I'.
 .lp #wizintrinsic
 Set intrinsic. Autocompletes. Wizard-mode only.
 .lp #wizlevelport
-Teleport to another level. Autocompletes. Wizard-mode only. Default key is '^V'.
+Teleport to another level.
+Autocompletes.
+Wizard-mode only.
+Default key is '^V'.
 .lp #wizmap
 Map the level. Autocompletes. Wizard-mode only. Default key is '^F'.
 .lp #wizrumorcheck
@@ -1248,7 +1336,9 @@ option to have NetHack combine them into meta+key.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
-#twoweapon (unless the number_pad option is enabled)
+#twoweapon (unless the
+.op number_pad
+option is enabled)
 .lp M-a
 #adjust
 .lp M-A
@@ -1314,7 +1404,7 @@ option is on, some additional letter commands are available:
 #name
 .lp u
 #untrap
-
+.
 .hn 1
 Rooms and corridors
 .pg
@@ -1443,10 +1533,10 @@ outside the shop.
 While the shopkeeper watches you like a hawk, he will generally ignore
 any other customers.
 .lp * 2
-If a shop is "closed for inventory", it will not open of its own accord.
+If a shop is ``closed for inventory'', it will not open of its own accord.
 .lp * 2
 Shops do not get restocked with new items, regardless of inventory depletion.
-
+.
 .hn 1
 Monsters
 .pg
@@ -1479,7 +1569,7 @@ moving into its location, you'll be asked to confirm your intent.  By
 default an answer of 'y' acknowledges that intent,
 which can be error prone if you're using 'y' to move.  You can set the
 .op paranoid_confirmation
-option to require a response of "yes" instead.
+option to require a response of ``yes'' instead.
 .pg
 If you can't see a monster (if it is invisible, or if you are blinded),
 the symbol `I' will be shown when you learn of its presence.
@@ -1544,7 +1634,7 @@ damage.  You can plunder the deceased adventurer's possessions;
 however, they are likely to be cursed.  Beware of whatever killed the
 former player; it is probably still lurking around, gloating over its
 last victory.
-
+.
 .hn 1
 Objects
 .pg
@@ -1659,8 +1749,8 @@ The chance that an attack will successfully hit a monster, and the amount
 of damage such a hit will do, depends upon many factors.  Among them are:
 type of weapon, quality of weapon (enchantment and/or erosion), experience
 level, strength, dexterity, encumbrance, and proficiency (see below).  The
-monster's armor class - a general defense rating, not necessarily due to
-wearing of armor - is a factor too; also, some monsters are particularly
+monster's armor class \(em a general defense rating, not necessarily due to
+wearing of armor \(em is a factor too; also, some monsters are particularly
 vulnerable to certain types of weapons.
 .pg
 Many weapons can be wielded in one hand; some require both hands.
@@ -1715,7 +1805,7 @@ for `Q' runs out.
 .pg
 Some characters have the ability to fire a volley of multiple items in a
 single turn.  Knowing how to load several rounds of ammunition at
-once -- or hold several missiles in your hand -- and still hit a
+once \(em or hold several missiles in your hand \(em and still hit a
 target is not an easy task.  Rangers are among those who are adept
 at this task, as are those with a high level of proficiency in the
 relevant weapon skill (in bow skill if you're wielding one to
@@ -1782,7 +1872,7 @@ But first you need to have a weapon in each hand.
 (Note that your two weapons are not fully equal; the one in the
 hand you normally wield with is considered primary and the other
 one is considered secondary.  The most noticeable difference is
-after you stop--or before you begin, for that matter--wielding
+after you stop \(em or before you begin, for that matter \(em wielding
 two weapons at once.  The primary is your wielded weapon and the
 secondary is just an item in your inventory that's been designated
 as alternate weapon.)
@@ -1820,7 +1910,7 @@ the equivalent of no armor, and lower numbers meaning better armor.
 Each suit of armor which exists in AD&D gives the same protection in
 NetHack.  Here is an (incomplete) list of the armor classes provided by
 various suits of armor:
-
+.
 .TS S
 center;
 a n.
@@ -2089,7 +2179,7 @@ Gold adds to your score, and you can buy things in shops with it.
 There are a number
 of monsters in the dungeon that may be influenced by the amount of gold
 you are carrying (shopkeepers aside).
-
+.
 .hn 1
 Conduct
 .pg
@@ -2198,7 +2288,7 @@ wish for any items is a challenge, as is a game without wishing for
 an artifact (even if the artifact immediately disappears).  When the
 game offers you an opportunity to make a wish for an item, you may
 choose ``nothing'' if you want to decline.
-
+.
 .hn 1
 Options
 .pg
@@ -2218,9 +2308,15 @@ for system administrators.
 .hn 2
 Using a configuration file
 .pg
+.\" hw: don't hyphenate file names
+.hw .nethackrc defaults.nh nethack.exe nethackW.exe
 The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is ``defaults.nh''
-in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
+operating systems.
+On DOS and Windows, it is ``defaults.nh''
+in the same folder as nethack.exe or nethackW.exe.
+On
+.UX ,
+Linux,
 and Mac OS X it is ``.nethackrc'' in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
@@ -2251,7 +2347,10 @@ in a single OPTIONS statement.
 Example:
 .sd
 \fBOPTIONS=dogname:Fido\fP
-\fBOPTIONS=!legacy,autopickup,pickup_types:$"=/!?+\fP
+.\" '\(dq' == double quote; including a literal double quote here works
+.\"           for formatting but confuses Emacs' nroff-mode into thinking
+.\"           that the \fP is part of a string rather than a font toggle
+\fBOPTIONS=!legacy,autopickup,pickup_types:$\(dq=/!?+\fP
 .ed
 .lp HACKDIR
 Default location of files NetHack needs. On Windows HACKDIR
@@ -2344,14 +2443,14 @@ Here is a short example of config file contents:
 .sd
 \fB# Set your character's role, race, gender, and alignment.\fP
 \fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
-
+\fB#\fP
 \fB# Turn on autopickup, and set automatically picked up object types\fP
 \fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
 \fB# Show colored text if possible\fP
 \fBOPTIONS=color\fP
 \fB# Show lit corridors differently\fP
 \fBOPTIONS=lit_corridor\fP
-
+\fB#\fP
 \fB# No startup splash screen. Windows GUI only.\fP
 \fBOPTIONS=!splash_screen\fP
 .ed
@@ -2754,7 +2853,8 @@ When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
 with the letter `n' (``n12s'').
 .lp packorder
-Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
+.\" \(dq == double quote; literal '"' formats ok but confuses Emacs' nroff-mode
+Specify the order to list object types in (default ``\(dq)[%?+!=/(*`0_'').
 The value of this option should be a string containing the
 symbols for the various object types.  Any omitted types are filled in
 at the end from the previous order.
@@ -2763,23 +2863,23 @@ A space separated list of specific situations where alternate
 prompting is desired.  The default is paranoid_confirmation:pray.
 .PS Were-change
 .PL Confirm
-for any prompts which are set to require "yes" rather than 'y', also
-require "no" to reject instead of accepting any non-yes response as no
+for any prompts which are set to require ``yes'' rather than 'y', also
+require ``no'' to reject instead of accepting any non-yes response as no
 .PL quit
-require "yes" rather than 'y' to confirm quitting
+require ``yes'' rather than 'y' to confirm quitting
 the game or switching into non-scoring explore mode;
 .PL die
-require "yes" rather than 'y' to confirm dying (not
+require ``yes'' rather than 'y' to confirm dying (not
 useful in normal play; applies to explore mode);
 .PL bones
-require "yes" rather than 'y' to confirm saving
+require ``yes'' rather than 'y' to confirm saving
 bones data when dying in debug mode;
 .PL attack
-require "yes" rather than 'y' to confirm attacking a peaceful monster;
+require ``yes'' rather than 'y' to confirm attacking a peaceful monster;
 .PL wand-break
-require "yes" rather than 'y' to confirm breaking a wand;
+require ``yes'' rather than 'y' to confirm breaking a wand;
 .PL Were-change
-require "yes" rather than 'y' to confirm changing form due to lycanthropy
+require ``yes'' rather than 'y' to confirm changing form due to lycanthropy
 when hero has polymorph control;
 .PL pray
 require 'y' to confirm an attempt to pray rather
@@ -2829,11 +2929,13 @@ configuration file lines to further refine
 behavior.  Persistent.
 .lp pile_limit
 When walking across a pile of objects on the floor, threshold at which
-the message "there are few/several/many objects here" is given instead
-of showing a popup list of those objects.  A value of 0 means "no limit"
-(always list the objects); a value of 1 effectively means "never show
-the objects" since the pile size will always be at least that big;
-default value is 5.  Persistent.
+the message ``there are few/several/many objects here'' is given instead
+of showing a popup list of those objects.
+A value of 0 means ``no limit''
+(always list the objects); a value of 1 effectively means ``never show
+the objects'' since the pile size will always be at least that big;
+default value is 5.
+Persistent.
 .lp playmode
 Values are `normal', `explore', or `debug'.
 Allows selection of explore mode (also known as discovery mode) or debug
@@ -3001,11 +3103,12 @@ next and previous targets, allows filtering the possible targets.
 .ei
 .ed
 .lp ""
-The area-filter tries to be slightly predictive - if you're standing on a doorway,
+The area-filter tries to be slightly predictive \(em if you're standing
+on a doorway,
 it will consider the area on the side of the door you were last moving towards.
 .lp ""
-Filtering can also be changed when getting a location with the ``getpos.filter''
-key.
+Filtering can also be changed when getting a location with the
+``getpos.filter'' key.
 .lp whatis_menu
 When getting a location on the map, and using a key to cycle through
 next and previous targets, use a menu instead to pick a target.
@@ -3074,7 +3177,8 @@ If NetHack can, it should use this size font for the status window.
 .lp font_size_text
 If NetHack can, it should use this size font for text windows.
 .lp fullscreen
-If NetHack can, it should try and display on the entire screen rather than in a window.
+If NetHack can, it should try and display on the entire screen rather than
+in a window.
 .lp large_font
 If NetHack can, it should use a large font.
 .lp map_mode
@@ -3082,7 +3186,8 @@ If NetHack can, it should display the map in the manner specified.
 .lp mouse_support
 Allow use of the mouse for input and travel.
 .lp player_selection
-If NetHack can, it should pop up dialog boxes, or use prompts for character selection.
+If NetHack can, it should pop up dialog boxes, or use prompts for character
+selection.
 .lp popup_dialog
 If NetHack can, it should pop up dialog boxes for input.
 .lp preload_tiles
@@ -3098,12 +3203,15 @@ when the hero reaches the scroll_margin.
 If NetHack can, it should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 .lp selectsaved
-If NetHack can, it should display a menu of existing saved games for the player to
-choose from at game startup, if it can. Not all ports support this option.
+If NetHack can, it should display a menu of existing saved games for the
+player to choose from at game startup, if it can.
+Not all ports support this option.
 .lp softkeyboard
-Display an onscreen keyboard.  Handhelds are most likely to support this option.
+Display an onscreen keyboard.
+Handhelds are most likely to support this option.
 .lp splash_screen
-If NetHack can, it should display an opening splash screen when it starts up (default yes).
+If NetHack can, it should display an opening splash screen when it starts
+up (default yes).
 .lp tiled_map
 If NetHack can, it should display a tiled map if it can.
 .lp tile_file
@@ -3120,8 +3228,8 @@ If NetHack can, it should display inverse when the game specifies it.
 If NetHack can, it should display this number of messages at a time in
 the message window.
 .lp windowcolors
-If NetHack can, it should display windows with the specified foreground/background
-colors if it can.
+If NetHack can, it should display windows with the specified
+foreground/background colors if it can.
 .lp wraptext
 If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.
@@ -3132,8 +3240,8 @@ Here are explanations of options that are used by specific platforms or ports
 to customize and change the port behavior.
 .lp altkeyhandler
 Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
-The name of the handler is specified without the .dll extension and without any
-path information.
+The name of the handler is specified without the .dll extension and without
+any path information.
 Cannot be set with the `O' command.
 .lp altmeta
 On Amiga, this option controls whether typing `Alt' plus another key
@@ -3145,12 +3253,13 @@ ESC into a meta-shifted version of the second character (default off).
 .lp ""
 This conversion is only done for commands, not for other input prompts.
 Note that typing one or more digits as a count prefix prior to a
-command--preceded by \fBn\fP if the
+command \(em preceded by \fBn\fP if the
 .op number_pad
-option is set--is also subject to this conversion, so attempting to
+option is set \(em is also subject to this conversion, so attempting to
 abort the count by typing ESC will leave NetHack waiting for another
-character to complete the two character sequence.  Type a second ESC to
-finish cancelling such a count.  At other prompts a single ESC suffices.
+character to complete the two character sequence.
+Type a second ESC to finish cancelling such a count.
+At other prompts a single ESC suffices.
 .lp "BIOS    "
 Use BIOS calls to update the screen
 display quickly and to read the keyboard (allowing the use of arrow
@@ -3265,8 +3374,9 @@ Changing Key Bindings
 .pg
 It is possible to change the default key bindings of some special commands,
 menu accelerator keys, and extended commands, by using BIND stanzas in the
-configuration file. Format is key, followed by the command to bind to, separated
-by a colon. The key can be a single character (``x''), a control key (``^X'',
+configuration file.
+Format is key, followed by the command to bind to, separated by a colon.
+The key can be a single character (``x''), a control key (``^X'',
 ``C-x''), a meta key (``M-x''), or a three-digit decimal ASCII code.
 .pg
 For example:
@@ -3292,13 +3402,25 @@ to same keys, only one of those commands will be available. Special command
 can only be bound to a single key.
 .pg
 .lp count
-Prefix key to start a count, to repeat a command this many times. With number_pad only. Default is 'n'.
+Prefix key to start a count, to repeat a command this many times.
+With
+.op number_pad
+only.
+Default is 'n'.
 .lp doinv
-Show inventory. With number_pad only. Default is '0'.
+Show inventory.
+With
+.op number_pad
+only.
+Default is '0'.
 .lp fight
 Prefix key to force fight a direction. Default is 'F'.
 .lp fight.numpad
-Prefix key to force fight a direction. With number_pad only. Default is '-'.
+Prefix key to force fight a direction.
+With
+.op number_pad
+only.
+Default is '-'.
 .lp getdir.help
 When asked for a direction, the key to show the help. Default is '?'.
 .lp getdir.self
@@ -3308,57 +3430,91 @@ When asked for a direction, the key to target yourself. Default is 's'.
 .lp getpos.autodescribe
 When asked for a location, the key to toggle autodescribe. Default is '#'.
 .lp getpos.all.next
-When asked for a location, the key to go to next closest interesting thing. Default is 'a'.
+When asked for a location, the key to go to next closest interesting thing.
+Default is 'a'.
 .lp getpos.all.prev
-When asked for a location, the key to go to previous closest interesting thing. Default is 'A'.
+When asked for a location, the key to go to previous closest interesting
+thing.
+Default is 'A'.
 .lp getpos.door.next
-When asked for a location, the key to go to next closest door or doorway. Default is 'd'.
+When asked for a location, the key to go to next closest door or doorway.
+Default is 'd'.
 .lp getpos.door.prev
-When asked for a location, the key to go to previous closest door or doorway. Default is 'D'.
+When asked for a location, the key to go to previous closest door or doorway.
+Default is 'D'.
 .lp getpos.help
 When asked for a location, the key to show help. Default is '?'.
 .lp getpos.mon.next
-When asked for a location, the key to go to next closest monster. Default is 'm'.
+When asked for a location, the key to go to next closest monster.
+Default is 'm'.
 .lp getpos.mon.prev
-When asked for a location, the key to go to previous closest monster. Default is 'M'.
+When asked for a location, the key to go to previous closest monster.
+Default is 'M'.
 .lp getpos.obj.next
-When asked for a location, the key to go to next closest object. Default is 'o'.
+When asked for a location, the key to go to next closest object.
+Default is 'o'.
 .lp getpos.obj.prev
-When asked for a location, the key to go to previous closest object. Default is 'O'.
+When asked for a location, the key to go to previous closest object.
+Default is 'O'.
 .lp getpos.menu
-When asked for a location, and using one of the next or previous keys to cycle through targets, toggle showing a menu instead. Default is '!'.
+When asked for a location, and using one of the next or previous keys to
+cycle through targets, toggle showing a menu instead.
+Default is '!'.
 .lp getpos.moveskip
-When asked for a location, and using the shifted movement keys or meta-digit keys to fast-move around, move by skipping the same glyphs instead of by 8 units. Default is '*'.
+When asked for a location, and using the shifted movement keys or meta-digit
+keys to fast-move around, move by skipping the same glyphs instead of
+by 8 units.
+Default is '*'.
 .lp getpos.filter
-When asked for a location, change the filtering mode when using one of the next
-or previous keys to cycle through targets. Toggles between no filtering, in view
-only, and in the same area only. Default is '"'.
+When asked for a location, change the filtering mode when using one of
+the next or previous keys to cycle through targets. Toggles between no
+filtering, in view only, and in the same area only.
+Default is '\(dq'. \" double quote
 .lp getpos.pick
-When asked for a location, the key to choose the location, and possibly ask for more info. Default is '.'.
+When asked for a location, the key to choose the location, and possibly
+ask for more info.
+Default is '.'.
 .lp getpos.pick.once
-When asked for a location, the key to choose the location, and skip asking for more info. Default is ','.
+When asked for a location, the key to choose the location, and skip asking
+for more info.
+Default is ','.
 .lp getpos.pick.quick
-When asked for a location, the key to choose the location, skip asking for more info, and exit the location asking loop. Default is ';'.
+When asked for a location, the key to choose the location, skip asking for
+more info, and exit the location asking loop.
+Default is ';'.
 .lp getpos.pick.verbose
-When asked for a location, the key to choose the location, and show more info without asking. Default is ':'.
+When asked for a location, the key to choose the location, and show more
+info without asking.
+Default is ':'.
 .lp getpos.self
-When asked for a location, the key to go to your location. Default is '@'.
+When asked for a location, the key to go to your location.
+Default is '@'.
 .lp getpos.unexplored.next
-When asked for a location, the key to go to next closest unexplored location. Default is 'x'.
+When asked for a location, the key to go to next closest unexplored location.
+Default is 'x'.
 .lp getpos.unexplored.prev
-When asked for a location, the key to go to previous closest unexplored location. Default is 'X'.
+When asked for a location, the key to go to previous closest unexplored
+location.
+Default is 'X'.
 .lp getpos.valid
-When asked for a location, the key to go to show valid target locations. Default is '$'.
+When asked for a location, the key to go to show valid target locations.
+Default is '$'.
 .lp getpos.valid.next
-When asked for a location, the key to go to next closest valid location. Default is 'z'.
+When asked for a location, the key to go to next closest valid location.
+Default is 'z'.
 .lp getpos.valid.prev
-When asked for a location, the key to go to previous closest valid location. Default is 'Z'.
+When asked for a location, the key to go to previous closest valid location.
+Default is 'Z'.
 .lp nopickup
 Prefix key to move without picking up items. Default is 'm'.
 .lp redraw
 Key to redraw the screen. Default is '^R'.
 .lp redraw.numpad
-Key to redraw the screen. With number_pad only. Default is '^L'.
+Key to redraw the screen.
+With
+.op number_pad
+only.
+Default is '^L'.
 .lp repeat
 Key to repeat previous command. Default is '^A'.
 .lp reqmenu
@@ -3366,9 +3522,14 @@ Prefix key to request menu from some commands. Default is 'm'.
 .lp run
 Prefix key to run towards a direction. Default is 'G'.
 .lp run.nopickup
-Prefix key to run towards a direction without picking up items on the way. Default is 'M'.
+Prefix key to run towards a direction without picking up items on the way.
+Default is 'M'.
 .lp run.numpad
-Prefix key to run towards a direction. With number_pad only. Default is '5'.
+Prefix key to run towards a direction.
+With
+.op number_pad
+only.
+Default is '5'.
 .lp rush
 Prefix key to rush towards a direction. Default is 'g'.
 .hn 2
@@ -3382,7 +3543,7 @@ look like this:
 .si
 MSGTYPE=type "pattern"
 .ei
-.PS "message type"
+.PS "pattern"
 .PL type
 how the message should be shown;
 .PL pattern
@@ -3392,14 +3553,16 @@ the pattern to match.
 The pattern should be a regular expression.
 .lp ""
 Allowed types are:
-.sd
-.si
-show  - show message normally.
-hide  - never show the message.
-stop  - wait for user with more-prompt.
-norep - show the message once, but not again if no other message is shown in between.
-.ei
-.ed
+.PS "norep"
+.PL show
+show message normally;
+.PL hide
+never show the message;
+.PL stop
+wait for user with more-prompt;
+.PL norep
+show the message once, but not again if no other message is shown in between.
+.PE
 .lp ""
 Here's an example of message types using NetHack's internal
 pattern matching facility:
@@ -3409,9 +3572,11 @@ MSGTYPE=stop "You feel hungry."
 MSGTYPE=hide "You displaced *."
 .ei
 .ed
-specifies that whenever a message "You feel hungry" is shown,
+specifies that whenever a message ``You feel hungry'' is shown,
 the user is prompted with more-prompt, and a message matching
-"You displaced <something>." is not shown at all.
+``You displaced <something>.'' is not shown at all.
+.\" historical trivia:  "You displaced Fido." was the sort of message you
+.\" got when swapping places with your pet, but that was changed long ago...
 .lp ""
 The order of the defined MSGTYPE-lines is important; the last matching
 rule is used. Put the general case first, exceptions below them.
@@ -3456,16 +3621,16 @@ MENUCOLOR="* cursed *"=red
 MENUCOLOR="* cursed *(being worn)"=red&underline
 .ei
 .ed
-specifies that any menu line with " blessed " contained
-in it will be shown in green color, lines with " cursed " will be
-shown in red, and lines with " cursed " followed by "(being worn)"
+specifies that any menu line with `` blessed '' contained
+in it will be shown in green color, lines with `` cursed '' will be
+shown in red, and lines with `` cursed '' followed by ``(being worn)''
 on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
 a menu line will be used for the line.
 .pg
 Note that if you intend to have one or more color specifications match
-" uncursed ", you will probably want to turn the
+`` uncursed '', you will probably want to turn the
 .op implicit_uncursed
 option off so that all items known to be uncursed are actually
 displayed with the ``uncursed'' description.
@@ -3634,12 +3799,15 @@ center;
 c s s
 c1 l1 l.
 .\"TABLE_START
-NetHack Symbols
+.\" because description is wide, centered title seems off, so pad it a bit
+.\" note that each backslash precedes one space of padding (including the
+.\" last one; in other words, there's a trailing space here)
+NetHack Symbols\ \ \ \ \ \ \ 
 Default	Symbol Name	Description
 \_	\_	\_
-	S_air	(air)
+\ 	S_air	(air)
 \&_	S_altar	(altar)
-"	S_amulet	(amulet)
+\(dq	S_amulet	(amulet)
 A	S_angel	(angelic being)
 a	S_ant	(ant or other insect)
 ^	S_anti_magic_trap	(anti-magic field)
@@ -3655,7 +3823,7 @@ b	S_blob	(blob)
 +	S_book	(spellbook)
 )	S_boomleft	(boomerang open left)
 (	S_boomright	(boomerang open right)
-`	S_boulder	(boulder)
+\`	S_boulder	(boulder)
 -	S_brcorn	(bottom right corner)
 C	S_centaur	(centaur)
 \&_	S_chain	(iron chain)
@@ -3676,11 +3844,11 @@ D	S_dragon	(dragon)
 E	S_elemental	(elemental)
 /	S_explode1	(explosion top left)
 -	S_explode2	(explosion top center)
-`\e'	S_explode3	(explosion top right)
+\\	S_explode3	(explosion top right)
 |	S_explode4	(explosion middle left)
-	S_explode5	(explosion middle center)
+\ 	S_explode5	(explosion middle center)
 |	S_explode6	(explosion middle right)
-`\e'	S_explode7	(explosion bottom left)
+\\	S_explode7	(explosion bottom left)
 -	S_explode8	(explosion bottom center)
 /	S_explode9	(explosion bottom right)
 e	S_eye	(eye or sphere)
@@ -3692,22 +3860,22 @@ f	S_feline	(cat or other feline)
 {	S_fountain	(fountain)
 F	S_fungus	(fungus or mold)
 *	S_gem	(gem or rock)
-	S_ghost	(ghost)
+\ 	S_ghost	(ghost)
 H	S_giant	(giant humanoid)
 G	S_gnome	(gnome)
 '	S_golem	(golem)
 |	S_grave	(grave)
 g	S_gremlin	(gremlin)
--	S_hbeam	(wall)
+-	S_hbeam	(horizontal beam [zap animation])
 #	S_hcdbridge	(horizontal raised drawbridge)
-+	S_hcdoor	(closed door)
-.	S_hodbridge	(horizontal lowered drawbridge)
-|	S_hodoor	(open door)
++	S_hcdoor	(closed door in horizontal wall)
+\.	S_hodbridge	(horizontal lowered drawbridge)
+|	S_hodoor	(open door in horizontal wall)
 ^	S_hole	(hole)
 @	S_human	(human or elf)
 h	S_humanoid	(humanoid)
 -	S_hwall	(horizontal wall)
-.	S_ice	(ice)
+\.	S_ice	(ice)
 i	S_imp	(imp or minor demon)
 I	S_invisible	(invisible monster)
 J	S_jabberwock	(jabberwock)
@@ -3722,14 +3890,14 @@ L	S_lich	(lich)
 y	S_light	(light)
 #	S_litcorr	(lit corridor)
 :	S_lizard	(lizard)
-`\e'	S_lslant	(wall)
+\\	S_lslant	(diagonal beam [zap animation])
 ^	S_magic_portal	(magic portal)
 ^	S_magic_trap	(magic trap)
 m	S_mimic	(mimic)
 ]	S_mimic_def	(mimic)
 M	S_mummy	(mummy)
 N	S_naga	(naga)
-.	S_ndoor	(doorway)
+\.	S_ndoor	(doorway witout door)
 n	S_nymph	(nymph)
 O	S_ogre	(ogre)
 o	S_orc	(orc)
@@ -3743,11 +3911,11 @@ P	S_pudding	(pudding or ooze)
 q	S_quadruped	(quadruped)
 Q	S_quantmech	(quantum mechanic)
 \&=	S_ring	(ring)
-`	S_rock	(boulder or statue)
+\`	S_rock	(boulder or statue)
 r	S_rodent	(rodent)
 ^	S_rolling_boulder_trap	(rolling boulder trap)
-.	S_room	(floor of a room)
-/	S_rslant	(wall)
+\.	S_room	(floor of a room)
+/	S_rslant	(diagonal beam [zap animation])
 ^	S_rust_trap	(rust trap)
 R	S_rustmonst	(rust monster or disenchanter)
 ?	S_scroll	(scroll)
@@ -3762,19 +3930,19 @@ s	S_spider	(arachnid or centipede)
 @	S_ss3	(magic shield 3 of 4)
 *	S_ss4	(magic shield 4 of 4)
 ^	S_statue_trap	(statue trap)
-	S_stone	(dark part of a room)
+\ 	S_stone	(dark part of a room)
 ]	S_strange_obj	(strange object)
 -	S_sw_bc	(swallow bottom center)
-`\e'	S_sw_bl	(swallow bottom left)
+\\	S_sw_bl	(swallow bottom left)
 /	S_sw_br	(swallow bottom right)
 |	S_sw_ml	(swallow middle left)
 |	S_sw_mr	(swallow middle right)
 -	S_sw_tc	(swallow top center)
 /	S_sw_tl	(swallow top left)
-`\e'	S_sw_tr	(swallow top right)
+\\	S_sw_tr	(swallow top right)
 -	S_tdwall	(wall)
 ^	S_teleportation_trap	(teleportation trap)
-\	S_throne	(opulent throne)
+\\	S_throne	(opulent throne)
 -	S_tlcorn	(top left corner)
 |	S_tlwall	(wall)
 (	S_tool	(useful item (pick-axe\, key\, lamp...))
@@ -3790,19 +3958,19 @@ u	S_unicorn	(unicorn or horse)
 <	S_upladder	(ladder up)
 <	S_upstair	(staircase up)
 V	S_vampire	(vampire)
-|	S_vbeam	(wall)
+|	S_vbeam	(vertical beam [zap animation])
 #	S_vcdbridge	(vertical raised drawbridge)
-+	S_vcdoor	(closed door)
-.	S_venom	(splash of venom)
++	S_vcdoor	(closed door in vertical wall)
+\.	S_venom	(splash of venom)
 ^	S_vibrating_square	(vibrating square)
-.	S_vodbridge	(vertical lowered drawbridge)
--	S_vodoor	(open door)
+\.	S_vodbridge	(vertical lowered drawbridge)
+-	S_vodoor	(open door in vertical wall)
 v	S_vortex	(vortex)
 |	S_vwall	(vertical wall)
 /	S_wand	(wand)
 }	S_water	(water)
 )	S_weapon	(weapon)
-"	S_web	(web)
+\(dq	S_web	(web)
 w	S_worm	(worm)
 ~	S_worm_tail	(long worm tail)
 W	S_wraith	(wraith)
@@ -3835,7 +4003,7 @@ overall location of items on the screen.
 .pg
 NetHack can also be compiled with support for sending the game messages
 to an external program, such as a text-to-speech synthesizer. If the #version
-extended command shows "external program as a message handler", your NetHack
+extended command shows ``external program as a message handler'', your NetHack
 has been compiled with the capability. When compiling NetHack from source
 on Linux and other POSIX systems, define MSGHANDLER to enable it. To use
 the capability, set the environment variable NETHACK_MSGHANDLER to an
@@ -3863,7 +4031,9 @@ This will assist in the interface to speech synthesizers.
 Show menus on a cleared screen and aligned to the left edge.
 .lp number_pad
 A lot of speech access programs use the number-pad to review the screen.
-If this is the case, disable the number_pad option and use the traditional
+If this is the case, disable the
+.op number_pad
+option and use the traditional
 Rogue-like commands.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
@@ -3948,20 +4118,28 @@ random statue names (default is 10).
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
 Not defining this will prevent dumplog from being created. Only available
 if your game is compiled with DUMPLOG. Allows the following placeholders:
-.sd
-.si
-%% - literal '%'
-%v - version (eg. "3.6.1-0")
-%u - game UID
-%t - game start time, UNIX timestamp format
-%T - current time, UNIX timestamp format
-%d - game start time, YYYYMMDDhhmmss format
-%D - current time, YYYYMMDDhhmmss format
-%n - player name
-%N - first character of player name
-.ei
-.ed
-
+.\" note: %M is not an entry in the table, but 'M' is the widest letter
+.PS %M
+.PL %%
+literal '%'
+.PL %v
+version (eg. "3.6.1-0")
+.PL %u
+game UID
+.PL %t
+game start time, UNIX timestamp format
+.PL %T
+current time, UNIX timestamp format
+.PL %d
+game start time, YYYYMMDDhhmmss format
+.PL %D
+current time, YYYYMMDDhhmmss format
+.PL %n
+player name
+.PL %N
+first character of player name
+.PE
+.
 .hn 1
 Scoring
 .pg
@@ -3985,7 +4163,7 @@ all your gold, but if you swing and live, you might find more.
 .pg
 If you just want to see what the current top players/games list is, you
 can type \fBnethack -s all\fP on most versions.
-
+.
 .hn 1
 Explore mode
 .pg
@@ -4026,12 +4204,12 @@ there's no connection between ``wizard mode'' and the Wizard role).
 And on any system, the program might have been configured to omit debug
 mode entirely.  Attempting to start a game in debug mode when not allowed
 or not available will result in falling back to explore mode instead.
-
+.
 .hn
 Credits
 .pg
 The original \fIhack\fP game was modeled on the Berkeley
-.ux
+.UX
 \fIrogue\fP game.  Large portions of this paper were shamelessly
 cribbed from \fIA Guide to the Dungeons of Doom\fP, by Michael C. Toy
 and Kenneth C. R. C. Arnold.  Small portions were adapted from
@@ -4039,7 +4217,7 @@ and Kenneth C. R. C. Arnold.  Small portions were adapted from
 .pg
 NetHack is the product of literally dozens of people's work.
 Main events in the course of the game development are described below:
-
+.
 .pg
 \fBJay Fenlason\fP wrote the original Hack, with help from
 \fBKenny Woodland\fP, \fBMike Thome\fP and \fBJon Payne\fP.
@@ -4047,7 +4225,7 @@ Main events in the course of the game development are described below:
 \fBAndries Brouwer\fP did a major re-write, transforming Hack into a
 very different game, and published (at least) three versions (1.0.1,
 1.0.2, and 1.0.3) for
-.ux
+.UX
 machines to the Usenet.
 .pg
 \fBDon G. Kneller\fP ported Hack 1.0.3 to Microsoft C and MS-DOS, producing PC
@@ -4241,10 +4419,9 @@ In early 2015, ahead of the release of 3.6.0, new members
 \fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
 joined the NetHack development team.
 .pg
-The 3.6 versions of the game are special in a particular way. Near the end of
-the development of 3.6.0, one of the significant inspirations for many of
+Near the end of the development of 3.6.0, one of the significant inspirations for many of
 the humorous and fun features found in the game, author Terry Pratchett,
-passed away. The 3.6 versions of the game include a tribute to him.
+passed away. NetHack 3.6.0 introduced a tribute to him.
 .pg
 3.6.0 was released in December 2015, and merged work done by the development
 team since the release of 3.4.3 with some of the beloved community
@@ -4261,7 +4438,9 @@ the time of release of 3.6.1 consisted of
 .pg
 The development team, as well as \fBSteve VanDevender\fP and
 \fBKevin Smolkowski\fP, ensured that NetHack 3.6 continued to operate on
-various Unix flavors and maintained the X11 interface.
+various
+.UX
+flavors and maintained the X11 interface.
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
 maintained the port of NetHack 3.6 for Mac OSX.
@@ -4289,13 +4468,15 @@ again to \fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP
 for providing public NetHack servers at nethack.alt.org and devnull.net
 and/or for hosting annual NetHack tournaments.
 .pg
-			   - - - - - - - - - -
+.ce
+- - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too far
+.                          \" to the right, so pad them with a few spaces
 .pg
 From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The Gods of
 the Dungeon sometimes make note of the names of the worst of these miscreants
 in this, the list of Dungeoneers:
-
+.
 .TS S
 center;
 c c c.
@@ -4342,7 +4523,7 @@ Irina Rempt-Drijfhout	Mike Passaretti	Warwick Allison
 Izchak Miller	Mike Stephenson	Yitzhak Sapir
 .\"TABLE_END  Do not delete this line.
 .TE
-
+.pg
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.
 .\"Atari and 1040ST are trademarks of Atari, Inc.

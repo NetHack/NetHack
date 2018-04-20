@@ -1061,6 +1061,20 @@ int how;               /* type of query */
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     pack = flags.inv_order;
+
+    if (qflags & CHOOSE_ALL) {
+        invlet = 'A';
+        any = zeroany;
+        any.a_int = 'A';
+        add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+                 (qflags & WORN_TYPES) ? "Auto-select every item being worn"
+                                       : "Auto-select every item",
+                 MENU_UNSELECTED);
+
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    }
+
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
         invlet = 'a';
         any = zeroany;
@@ -1097,6 +1111,13 @@ int how;               /* type of query */
             return 0;
         }
     } while (*pack);
+
+    if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
+        || do_uncursed || do_buc_unknown) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    }
+
     /* unpaid items if there are any */
     if (do_unpaid) {
         invlet = 'u';
@@ -1113,15 +1134,7 @@ int how;               /* type of query */
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Unpaid items already used up", MENU_UNSELECTED);
     }
-    if (qflags & CHOOSE_ALL) {
-        invlet = 'A';
-        any = zeroany;
-        any.a_int = 'A';
-        add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 (qflags & WORN_TYPES) ? "Auto-select every item being worn"
-                                       : "Auto-select every item",
-                 MENU_UNSELECTED);
-    }
+
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
        reversing the usual sequence of 'U' and 'C' in BUCX */
