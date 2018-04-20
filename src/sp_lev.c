@@ -194,6 +194,7 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 /* positions touched by level elements explicitly defined in the des-file */
 static char SpLev_Map[COLNO][ROWNO];
 
+/* alignments to be shuffled and used for randomly aligned things */
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 static NEARDATA xchar xstart, ystart;
 static NEARDATA char xsize, ysize;
@@ -212,6 +213,9 @@ static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
 
+/* Make all usually diggable terrain outside the normal level map undiggable.
+ * Used on things like Sokoban and Vlad's Tower.
+ */
 void
 solidify_map()
 {
@@ -598,6 +602,10 @@ struct splev_var *varlist;
     }
 }
 
+/* Fill the given rectangle with the filling terrain, or STONE if the maze
+ * is a corrmaze. mazexy() positions will always be STONE, with the expectation
+ * that mazewalk will later be called on it.
+ */
 void
 lvlfill_maze_grid(x1, y1, x2, y2, filling)
 int x1, y1, x2, y2;
@@ -615,6 +623,9 @@ schar filling;
         }
 }
 
+/* Fill the entire maze area of the level with the filling terrain, and set its
+ * lit state to lit.
+ */
 void
 lvlfill_solid(filling, lit)
 schar filling;
@@ -627,8 +638,8 @@ schar lit;
         }
 }
 
-/*
- * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
+/* Bitwise or the wall_info of any walls or trees in the given rectangle
+ * with the given prop. (Either undiggable or non-passwall).
  */
 STATIC_OVL void
 set_wall_property(x1, y1, x2, y2, prop)
@@ -643,13 +654,13 @@ int prop;
                 levl[x][y].wall_info |= prop;
 }
 
+/* Shuffles the ralign[] array. */
 STATIC_OVL void
 shuffle_alignments()
 {
     int i;
     aligntyp atmp;
 
-    /* shuffle 3 alignments */
     i = rn2(3);
     atmp = ralign[2];
     ralign[2] = ralign[i];
@@ -662,7 +673,8 @@ shuffle_alignments()
 }
 
 /*
- * Count the different features (sinks, fountains) in the level.
+ * Count the sinks and fountains in the level, and store them in the
+ * appropriate level.flags fields.
  */
 STATIC_OVL void
 count_features()
@@ -680,6 +692,9 @@ count_features()
         }
 }
 
+/* Convert any boundary symbols to ROOM. (Boundary symbols would have been
+ * used to limit room borders and regions and such as if they were walls, while
+ * not actually being walls. */
 void
 remove_boundary_syms()
 {
@@ -705,7 +720,9 @@ remove_boundary_syms()
     }
 }
 
-/* used by sel_set_door() and link_doors_rooms() */
+/* Set the horizontal flag properly for a door at (x,y). Should it be a
+ * horizontal door or a vertical door?
+ * Used by sel_set_door() and link_doors_rooms(). */
 STATIC_OVL void
 set_door_orientation(x, y)
 int x, y;
@@ -2711,6 +2728,9 @@ int humidity;
  *
  * Makes the number of traps, monsters, etc. proportional
  * to the size of the maze.
+ *
+ * NOTE: A lot of the fill algorithm here is very similar to the code in
+ * makemaz() - they should probably be merged.
  */
 STATIC_OVL void
 fill_empty_maze()
