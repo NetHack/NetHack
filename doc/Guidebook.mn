@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ $NHDT-Date: 1523921339 2018/04/16 23:28:59 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1524190235 2018/04/20 02:10:35 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 16, 2018
+.ds f2 "April 19, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -92,13 +92,6 @@ A Guide to the Mazes of Menace
 .au
 Original version - Eric S. Raymond
 (Edited and expanded for 3.6 by Mike Stephenson and others)
-.hu
-Preface - Version 3.6
-.pg
-This version of the game is special in a particular way.  Near the end of
-the development of 3.6, one of the significant inspirations for many of the
-humorous and fun features found in the game, author \fITerry Pratchett\fP,
-passed away.  We have dedicated this version of the game in his memory.
 .hn 1
 Introduction
 .pg
@@ -4426,10 +4419,9 @@ In early 2015, ahead of the release of 3.6.0, new members
 \fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
 joined the NetHack development team.
 .pg
-The 3.6 versions of the game are special in a particular way. Near the end of
-the development of 3.6.0, one of the significant inspirations for many of
+Near the end of the development of 3.6.0, one of the significant inspirations for many of
 the humorous and fun features found in the game, author Terry Pratchett,
-passed away. The 3.6 versions of the game include a tribute to him.
+passed away. NetHack 3.6.0 introduced a tribute to him.
 .pg
 3.6.0 was released in December 2015, and merged work done by the development
 team since the release of 3.4.3 with some of the beloved community
