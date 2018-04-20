@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/20/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1064,6 +1064,13 @@ register struct attack *mattk;
         hitmsg(mtmp, mattk);
         if (!diseasemu(mdat))
             dmg = 0;
+        break;
+    case AD_WIND:
+        if (uncancelled) {
+            You("are blasted by wind!");
+            hurtle(u.ux - mtmp->mx, u.uy - mtmp->my, dmg, TRUE);
+        }
+        dmg = 0;
         break;
     case AD_FIRE:
         hitmsg(mtmp, mattk);
@@ -2156,6 +2163,12 @@ boolean ufound;
                     make_hallucinated(HHallucination + (long) tmp, FALSE, 0L);
                 You("%s.", chg ? "are freaked out" : "seem unaffected");
             }
+            break;
+
+        case AD_WIND:
+            You("are blasted by hurricane force winds!");
+            hurtle(u.ux - mtmp->mx, u.uy - mtmp->my, tmp, TRUE);
+            tmp = 0;
             break;
 
         default:

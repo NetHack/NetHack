@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/20/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -941,6 +941,15 @@ register struct attack *mattk;
             if (tmp >= mdef->mhp && mdef->mhp > 1)
                 tmp = mdef->mhp - 1;
         }
+        break;
+    case AD_WIND:
+        if (cancelled) {
+            tmp = 0;
+            break;
+        }
+        pline("%s is blasted by wind!", Monnam(mdef));
+        mhurtle(mdef, mdef->mx - magr->mx, mdef->my - magr->my, tmp);
+        tmp = 0;
         break;
     case AD_FIRE:
         if (cancelled) {

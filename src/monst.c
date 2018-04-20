@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/16/18 by NullCGT */
+/* Edited on 4/20/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -341,7 +341,7 @@ NEARDATA struct permonst mons[] = {
           NO_ATTK),
         SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
         M1_FLY | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD | M1_NOTAKE,
-        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_CYAN),
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_BROWN),
     MON("freezing sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_NOHELL | G_GENO | 2),
         A(ATTK(AT_EXPL, AD_COLD, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -364,6 +364,13 @@ NEARDATA struct permonst mons[] = {
         M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, HI_ZAP),
+    MON("whirling sphere", S_EYE, LVL(6, 13, 4, 0, 0),
+        (G_NOCORPSE | G_GENO | 2), A(ATTK(AT_EXPL, AD_WIND, 3, 2), NO_ATTK,
+                                     NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(10, 10, MS_SILENT, MZ_SMALL), 0, 0,
+        M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
+            | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER, 0, CLR_CYAN),
     MON("corrosive sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_GENO | 2), A(ATTK(AT_EXPL, AD_ACID, 4, 6), NO_ATTK,
                                      NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -675,6 +682,11 @@ NEARDATA struct permonst mons[] = {
           NO_ATTK),
         SIZ(400, 100, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GRAY),
+    MON("goblin windmage", S_ORC, LVL(1, 6, 10, 0, -3), (G_GENO | 1),
+        A(ATTK(AT_TUCH, AD_WIND, 1, 2), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(400, 100, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        M2_ORC | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, CLR_CYAN),
     MON("hobgoblin", S_ORC, LVL(1, 9, 10, 0, -4), (G_GENO | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
