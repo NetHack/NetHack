@@ -4,7 +4,7 @@
 ; This overlay schema is for use only when NetHack is built
 ; using packaged-functions for function-level linking.
 ;
-; Edited on 3/30/18 by NullCGT
+; Edited on 4/20/18 by NullCGT
 ;
 ; Overlay tuning level: 0
 ;
@@ -47,7 +47,7 @@ functions:20 _bhito _bhitpile _big_to_little _bill_box_content _bill_dummy_objec
 functions:21 _Blindf_off _Blindf_on _block_door _block_entry _block_point _blow_up_landmine _body_part
 functions:22 _boomhit _Boots_off _Boots_on _bot  _boulder_hits_pool _bound_digging
 functions:23 _boxlock _br_string _break_armor _break_statue _breakarm _breakmsg
-functions:24 _breakobj _breaks _breaksink _breaktest _breamu _bribe _bufoff _bufon
+functions:24 _breakobj _breaks _breakfurnace _breaksink _breaktest _breamu _bribe _bufoff _bufon
 functions:25 _build_room _burn_floor_paper _burn_object _burnarmor _bury_an_obj _bury_objs _buzz _buzzmu
 functions:26 _Can_dig_down
 functions:27 _Can_fall_thru _can_make_bones _can_ooze _can_pray _can_reach_floor _Can_rise_up _can_track
@@ -77,7 +77,7 @@ functions:50 _demonpet _destroy_arm _destroy_drawbridge _destroy_item _destroy_m
 functions:51 _dig_check _dig_corridor _dig_point _dig_typ _digactualhole _dighole _digit _dipfountain
 functions:52 _disable_ctrlP _disarm_landmine _disarm_shooting_trap _disarm_squeaky_board _discard_minvent _disclose _discover_object
 functions:53 _diseasemu _display_binventory _display_cinventory _display_gamewindows _display_inventory _display_minventory
-functions:54 _distant_name _distfleeck _disturb _djinni_from_bottle _dlb_cleanup _dlb_fclose
+functions:54 _distant_name _distfleeck _disturb _dipfurnace _djinni_from_bottle _dlb_cleanup _dlb_fclose
 functions:55 _dlb_fgets _dlb_fopen _dlb_fread _dlb_fseek _dlb_ftell _dlb_init _dlord _dmgtype
 functions:56 _dmgval _dmonsfree _dmore _dname_to_dnum _do_break_wand _do_clear_area _do_comp _do_dknown_of
 functions:57 _do_earthquake _do_entity _do_genocide _do_improvisation _do_light_sources _do_look _do_mapping _do_mname
@@ -98,9 +98,9 @@ functions:71 _dosinkfall _dosinkring _dosit _dosounds _dospinweb _dospit _dosumm
 functions:72 _dotalk _dotele _dothrow _dotogglepickup _dotrap _doturn _dotypeinv _dounpaid
 functions:73 _dountrap _doup _doversion _dovspell _dowaterdemon _dowaternymph _dowatersnakes _dowear
 functions:74 _dowhatdoes _dowhatis _dowield _dowipe _down_gate _dowrite _dozap _dprince
-functions:75 _drag_ball _drag_down _drain_en _DrawCursor _drinkfountain _drinksink _drop _drop_ball
+functions:75 _drag_ball _drag_down _drain_en _DrawCursor _drinkfountain _drinksink _drinkfurnace _drop _drop_ball
 functions:76 _drop_throw _drop_to _drop_upon_death _drop_weapon  _dropped_container _dropx _dropy
-functions:77 _drown _dryup _dtoxy _dungeon_branch _dunlev _dunlevs_in_dungeon _e_at _e_died
+functions:77 _drown _dryup _dtoxy _dungeon_branch _dungeon_crumble _dunlev _dunlevs_in_dungeon _e_at _e_died
 functions:78 _e_jumps _e_missed _e_nam _E_phrase _e_survives_at _eataccessory _eatcorpse _eaten_stat
 functions:79 _eatfood _eatmdone _eatspecial _egg_type_from_parent _emergency_disrobe _enable_ctrlP _encumber_msg _end_burn
 functions:80 _end_engulf
@@ -115,7 +115,7 @@ functions:88 _findnext_file _findone _findpriest _finish_map _finish_paybill _fi
 functions:89 _flash_hits_mon _float_down _float_up _floating_above _flood_fill_rm _flooreffects _floorfood _flush_screen _term_start_color
 functions:90 _flushout _fmt_ptr _food_detect _food_disappears _food_xname _foodword _fopen_config_file _fopen_datafile
 functions:91 _fopenp _forcelock _forget_levels _forget_map _forget_objects _forget_traps _foundfile_buffer _fpostfx
-functions:92 _fprefx _fracture_rock _free_dungeons _free_rooms _free_ttlist _free_window_info _freediskspace _freedynamicdata
+functions:92 _fprefx _fracture_rock _free_eama _free_dungeons _free_rooms _free_ttlist _free_window_info _freediskspace _freedynamicdata
 functions:93 _freefruitchn _freehand _freeinv _friday_13th _fruitadd _fry_by_god _fully_identify_obj _g_at
 functions:94 _gainstr _gameDiskPrompt _gazemm _gazemu _gd_move _gd_sound _gem_accept
 functions:95 _display_warning _dlb_fgetc _doattributes _dochug _dochugw
@@ -171,7 +171,7 @@ functions:142 _mk_bubble _mk_knox_portal _mk_mplayer _mk_named_object _mk_roamer
 functions:143 _mkcavearea _mkcavepos _mkclass _mkcorpstat _mkfount _mkgold _mkgoldobj _mkinvokearea
 functions:144 _mkinvpos _mklev _mkmap _mkobj _mkobj_at _mkportal _mkroll_launch _mkroom
 functions:145 _mkshobj_at _mkshop _mksink _mksobj _mksobj_at _mkstairs _mkswamp _mktemple
-functions:146 _mktrap _mkundead _mkzoo _mlevel_tele_trap _mlifesaver _mnearto _mnexto _mon_arrive
+functions:146 _mktrap _mkundead _mkzoo _mlevel_tele_trap _mlifesaver _mnearto _mnexto _moffer _mon_arrive
 functions:147 _mon_break_armor _mon_catchup_elapsed_time _mon_chain _mon_has_amulet _mon_has_arti _mon_has_special _mon_invent_chain _mon_is_local
 functions:148 _mon_nam _mon_nam_too _mon_owns _mon_reflects _mon_regen _mon_set_minvis _mon_to_stone _mon_wield_item
 functions:149 _mondead _mondied _mongets _mongone _monkilled _Monnam _monnear 
@@ -181,7 +181,7 @@ functions:153 _mpickobj
 functions:154 _mselftouch _msg_in _msleep _msmsg _mstatusline _msummon _mswings _mswingsm
 functions:155 _mtele_trap _mungspaces _munstone _mv_bubble _mvault_tele _mzapmsg _n_or_more _name_to_mon
 functions:156 _nameshk _nartifact_exist _nasty _ndemon _near_capacity _nemdead _nemesis_speaks _neminame
-functions:157 _nethack_exit _new_light_source _new_were _newcham _newexplevel _newgame _newhp _newmail
+functions:157 _nethack_exit _new_light_source _new_were _newcham _neweama _newexplevel _newgame _newhp _newmail
 functions:158 _newman _newuexp _newuhs _next_level _next_opt _next_shkp _next_to_u
 functions:159 _nexttodoor _nh_timeout _nhusage _night _nmcpy _no_bones_level _noattacks _nocmov
 functions:160 _nohandglow _noises _nomul _Norep _not_capable _not_fully_identified _number_leashed _o_in
