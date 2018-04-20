@@ -45,17 +45,9 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{April 16, 2018}
+\date{April 19, 2018}
 
 \maketitle
-
-%.hn 1
-\section{Preface - Version 3.6}
-%.pg
-This version of the game is special in a particular way.  Near the end of
-the development of 3.6, one of the significant inspirations for many of the
-humorous and fun features found in the game, author {\it Terry Pratchett},
-passed away.  We have dedicated this version of the game in his memory.
 
 %.pg
 %.hn 1
@@ -1036,7 +1028,7 @@ May be preceded by `{\tt m}' to force a selection menu.
 Toggle the {\it autopickup\/} option on and off.
 %.lp
 \item[\tb{\^{}}]
-Ask for the type of a trap you found earlier.
+Ask for the type of an adjacent trap you found earlier.
 %.lp
 \item[\tb{)}]
 Tell what weapon you are wielding.
@@ -1372,7 +1364,7 @@ List and reorder known spells. Default key is '{\tt +}'.
 Show the tools currently in use. Default key is '{\tt (}'.
 %.lp
 \item[\tb{\#seetrap}]
-Show the type of a trap near you. Default key is '{\tt \^{}}'.
+Show the type of an adjacent trap. Default key is '{\tt \^{}}'.
 %.lp
 \item[\tb{\#seeweapon}]
 Show the weapon currently wielded. Default key is '{\tt )}'.
@@ -4451,7 +4443,7 @@ file option. Symbols are specified as {\it name:value\/} pairs. Note that
 {\it NetHack\/} escape-processes the {\it value\/} string in conventional C
 fashion.  This means that `\verb+\+' is a prefix to take the following
 character literally.  Thus `\verb+\+' needs to be represented as `\verb+\\+'.
-The special escape form
+The special prefix
 `\verb+\m+' switches on the meta bit in the symbol value, and the
 `{\tt \^{}}' prefix causes the following character to be treated as a control
 character.
@@ -4640,7 +4632,18 @@ Default                      & Symbol Name                & Description\\
 \end{longtable}%
 }
 
-%.lp
+%.pg
+There is one additional class of object, described as ``strange object'',
+which will occasionally be the shape taken on by mimics and shown as
+`{\tt \verb+]+}'
+for maps displayed as text characters.
+Although the displayed character is the same as the default value for
+`S\verb+_+mimic\verb+_+def', it is a different symbol and there is no
+corresponding
+`S\verb+_\+strange\verb+_+object' symbol nor any way to assign an
+alternate value for it.
+
+%.pg
 %.hn 2
 \subsection*{Configuring {\it NetHack\/} for Play by the Blind}
 
@@ -5181,10 +5184,10 @@ joined the {\it NetHack\/} development team.
 
 %.pg
 \medskip
-The 3.6 versions of the game are special in a particular way.  Near the end of
-the development of 3.6.0, one of the significant inspirations for many of
-the humorous and fun features found in the game, author Terry Pratchett,
-passed away.  The 3.6 versions of the game include a tribute to him.
+Near the end of the development of 3.6.0, one of the significant inspirations 
+for many of the humorous and fun features found in the game, 
+author Terry Pratchett, passed away. {\it NetHack\/} 3.6.0 introduced 
+a tribute to him.
 
 %.pg
 \medskip
@@ -5196,8 +5199,9 @@ patches.  Many bugs were fixed and some code was restructured.
 \medskip
 In 2018, several hundred bug fixes for 3.6.0 and some new features
 were assembled and released as NetHack 3.6.1. The development team at
-the time of release of 3.6.1 consisted of {\it Michael Allison},
-{\it Ken Arromdee}, {\it David Cohrs}, {\it Jessie Collet},
+the time of release of 3.6.1 consisted of 
+{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee}, 
+{\it David Cohrs}, {\it Jessie Collet},
 {\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick},
 {\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
 {\it Alex Smith}, {\it Mike Stephenson}, {\it Janet Walz}, and
