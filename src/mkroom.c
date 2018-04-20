@@ -254,7 +254,10 @@ register boolean strict;
 }
 
 /* Try to find a suitable room for a zoo of the given type and, if one can be
- * found, set its room type and call fill_zoo to stock it. */
+ * found, set its room type and call fill_zoo to stock it.
+ * This function is generally used for special rooms with no weird terrain
+ * generation and when we want to put stuff on each square independently,
+ * either guaranteed or with a probability of occurring. */
 STATIC_OVL void
 mkzoo(type)
 int type;
