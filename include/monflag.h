@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 4/20/18 by NullCGT */
 
 #ifndef MONFLAG_H
 #define MONFLAG_H
@@ -48,6 +48,7 @@
 #define MS_SPELL 37     /* spellcaster not matching any of the above */
 #define MS_WERE 38      /* lycanthrope in human form */
 #define MS_BOAST 39     /* giants */
+#define MS_CHIMERA 40   /* chimera */
 
 #define MR_FIRE 0x01   /* resists fire */
 #define MR_COLD 0x02   /* resists cold */

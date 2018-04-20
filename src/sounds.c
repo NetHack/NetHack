@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/14/18 by NullCGT */
+/* Edited on 4/20/18 by NullCGT */
 
 #include "hack.h"
 
@@ -366,6 +366,8 @@ register struct monst *mtmp;
     case MS_SILENT:
         ret = "commotion";
         break;
+    case MS_CHIMERA:
+        ret = "hisses, roars, and screech";
     default:
         ret = "scream";
     }
@@ -417,6 +419,7 @@ register struct monst *mtmp;
         case MS_GROWL:
             yelp_verb = (!Deaf) ? "yelp" : "recoil";
             break;
+        case MS_CHIMERA:
         case MS_ROAR:
             yelp_verb = (!Deaf) ? "snarl" : "bluff";
             break;
@@ -726,6 +729,10 @@ register struct monst *mtmp;
         break;
     case MS_WAIL:
         pline_msg = "wails mournfully.";
+        break;
+    case MS_CHIMERA:
+        pline_msg = mtmp->mpeaceful ? "snarls, hisses, and grunts." :
+                                      "roars, hisses, and screeches!";
         break;
     case MS_GURGLE:
         pline_msg = "gurgles.";
