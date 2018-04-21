@@ -4929,12 +4929,7 @@ struct trap *adjtrap;
     
     for (idx = 0; idx < 8; idx++) {
         if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-            break;
-    }
-    /* idx is valid if < 8 */
-    if (idx < 8) {
-        int adjidx = (idx + 4) % 8;
-        return TRUE;
+            return TRUE;
     }
     return FALSE;
 }
