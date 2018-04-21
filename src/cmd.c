@@ -1278,6 +1278,7 @@ wiz_intrinsic(VOID_ARGS)
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
+        doredraw();
     } else
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_intrinsic)));
