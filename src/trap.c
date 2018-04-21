@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1514855666 2018/01/02 01:14:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.284 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1524312044 2018/04/21 12:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -854,7 +854,7 @@ unsigned trflags;
             plunged = (trflags & TOOKPLUNGE) != 0,
             viasitting = (trflags & VIASITTING) != 0,
             conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE),
-            adj_pit = (adj_nonconjoined_pit(trap) && t_at(u.ux0, u.uy0));
+            adj_pit = adj_nonconjoined_pit(trap);
     int oldumort;
     int steed_article = ARTICLE_THE;
 
@@ -1193,7 +1193,7 @@ unsigned trflags;
         if (!steedintrap(trap, (struct obj *) 0)) {
             if (ttype == SPIKED_PIT) {
                 oldumort = u.umortality;
-                losehp(Maybe_Half_Phys(rnd((conj_pit || adj_pit) ? 6 : 10)),
+                losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
                        plunged
                            ? "deliberately plunged into a pit of iron spikes"
                            : conj_pit ? "stepped into a pit of iron spikes"
@@ -4920,16 +4920,17 @@ struct trap *trap;
 boolean
 adj_nonconjoined_pit(adjtrap)
 struct trap *adjtrap;
-{    
-    int idx;
-    struct trap *trap_with_u = t_at(u.ux, u.uy);
+{
+    struct trap *trap_with_u = t_at(u.ux0, u.uy0);
 
-    if (!trap_with_u || !(adjtrap->ttyp == PIT || adjtrap->ttyp == SPIKED_PIT))
-        return FALSE;
-    
-    for (idx = 0; idx < 8; idx++) {
-        if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-            return TRUE;
+    if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT &&
+        (trap_with_u->ttyp == PIT || trap_with_u->ttyp == SPIKED_PIT) &&
+        (adjtrap->ttyp == PIT || adjtrap->ttyp == SPIKED_PIT)) {
+        int idx;
+        for (idx = 0; idx < 8; idx++) {
+            if (xdir[idx] == u.dx && ydir[idx] == u.dy)
+                return TRUE;
+        }
     }
     return FALSE;
 }
