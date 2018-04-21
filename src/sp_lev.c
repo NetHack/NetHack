@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1522701334 2018/04/02 20:35:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1524287226 2018/04/21 05:07:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,7 +69,7 @@ STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *,
 STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
                                           XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
-STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
+STATIC_DCL void FDECL(create_trap, (spltrap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
 STATIC_DCL int FDECL(pm_to_humidity, (struct permonst *));
@@ -1486,7 +1486,7 @@ xchar walls; /* any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
  */
 STATIC_OVL void
 create_trap(t, croom)
-trap *t;
+spltrap *t;
 struct mkroom *croom;
 {
     schar x = -1, y = -1;
@@ -3574,7 +3574,7 @@ struct sp_coder *coder;
     static const char nhFunc[] = "spo_trap";
     struct opvar *type;
     struct opvar *tcoord;
-    trap tmptrap;
+    spltrap tmptrap;
 
     if (!OV_pop_i(type) || !OV_pop_c(tcoord))
         return;
