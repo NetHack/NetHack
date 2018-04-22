@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1503309020 2017/08/21 09:50:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1524413723 2018/04/22 16:15:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3468,6 +3468,30 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 #else
     Strcpy(tmp, RECORD);
     fq_record = fqname(RECORD, SCOREPREFIX, 0);
+#endif
+#ifdef WIN32
+    /* If dir is NULL it indicates create but
+       only if it doesn't already exist */
+    if (!dir) {
+        char buf[BUFSZ];
+
+        buf[0] = '\0';
+        fd = open(fq_record, O_RDWR);
+        if (!(fd == -1 && errno == ENOENT)) {
+            if (fd >= 0) {
+                (void) nhclose(fd);
+            } else {
+                /* explanation for failure other than missing file */
+                Sprintf(buf, "error   \"%s\", (errno %d).",
+                        fq_record, errno);
+                paniclog("scorefile", buf);
+            }
+            return;
+        }
+        Sprintf(buf, "missing \"%s\", creating new scorefile.",
+                fq_record);
+        paniclog("scorefile", buf);
+    }
 #endif
 
     if ((fd = open(fq_record, O_RDWR)) < 0) {
