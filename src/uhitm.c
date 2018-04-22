@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/20/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1663,6 +1663,31 @@ register struct attack *mattk;
         }
         /* only potions damage resistant players in destroy_item */
         tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        break;
+    case AD_LOUD:
+        if (negated) {
+            tmp = 0;
+            break;
+        }
+        if (!Deaf)
+            pline("%s is caught in a sonicboom!", Monnam(mdef));
+        tmp += destroy_mitem(mdef, ARMOR_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, RING_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, TOOL_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, WAND_CLASS, AD_LOUD);
+        if (resists_sonic(mdef)) {
+            if (!Blind)
+                pline_The("sonicboom doesn't seem to harm %s!", mon_nam(mdef));
+            shieldeff(mdef->mx, mdef->my);
+            tmp = 0;
+        }
+        tmp += destroy_mitem(mdef, POTION_CLASS, AD_LOUD);
+        if (pd == &mons[PM_GLASS_GOLEM]) {
+            pline("%s shatters into a million pieces!", Monnam(mdef));
+            xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
+            tmp = 0;
+            break;
+        }
         break;
     case AD_COLD:
         if (negated) {

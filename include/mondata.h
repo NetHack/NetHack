@@ -1,7 +1,7 @@
 /* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/12/18 by NullCGT */
+/* Edited 4/22/18 by NullCGT */
 
 #ifndef MONDATA_H
 #define MONDATA_H
@@ -16,6 +16,7 @@
 #define resists_sleep(mon) (((mon)->mintrinsics & MR_SLEEP) != 0)
 #define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
 #define resists_elec(mon) (((mon)->mintrinsics & MR_ELEC) != 0)
+#define resists_sonic(mon) (((mon)->mintrinsics & MR_SONIC) != 0)
 #define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
 #define resists_acid(mon) (((mon)->mintrinsics & MR_ACID) != 0)
 #define resists_ston(mon) (((mon)->mintrinsics & MR_STONE) != 0)

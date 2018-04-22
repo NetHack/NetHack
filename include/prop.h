@@ -2,6 +2,8 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/22/18 by NullCGT */
+
 #ifndef PROP_H
 #define PROP_H
 
@@ -20,6 +22,7 @@ enum prop_types {
     POISON_RES,
     ACID_RES,
     STONE_RES,
+    SONIC_RES,
     /* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
     DRAIN_RES,
     SICK_RES,

@@ -6,14 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/12/18 by NullCGT */
-/* Uncommented code allowing monsters to use scrolls of fire */
-/* Monsters now attempt to use wands of cancellation */
-/* Monsters now throw potions of polymorph as well as drink them */
-/* Monsters now throw potions of hallucination */
-/* Monsters now activate figurines */
-/* Monsters now use wands of wishing in order to wish for various items. */
-/* Dragons can use miscelaneous and defensive items. */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1062,10 +1055,11 @@ try_again:
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
 #define MUSE_WAN_CANCELLATION 18
-#define MUSE_POT_POLYMORPH_THROW 19
+/* #define MUSE_POT_POLYMORPH_THROW 19 */
 #define MUSE_POT_HALLUCINATION 20
 #define MUSE_WAN_ACID 21
 #define MUSE_WAN_POISON_GAS 22
+#define MUSE_WAN_SONICS 23
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1141,6 +1135,11 @@ struct monst *mtmp;
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_POISON_GAS;
             }
+            nomore(MUSE_WAN_SONICS);
+            if (obj->otyp == MUSE_WAN_SONICS && obj->spe > 0) {
+                m.offensive = obj;
+                m.has_offense = MUSE_WAN_SONICS;
+            }
             nomore(MUSE_FROST_HORN);
             if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
                 m.offensive = obj;
@@ -1185,11 +1184,11 @@ struct monst *mtmp;
             m.offensive = obj;
             m.has_offense = MUSE_POT_HALLUCINATION;
         }
-        nomore(MUSE_POT_POLYMORPH_THROW);
+        /* nomore(MUSE_POT_POLYMORPH_THROW);
         if (obj->otyp == POT_POLYMORPH) {
             m.offensive = obj;
             m.has_offense = MUSE_POT_SLEEPING;
-        }
+        }*/
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && multi >= 0) {
             m.offensive = obj;
@@ -1310,6 +1309,8 @@ register struct obj *otmp;
 #endif
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
+        if (!Blind)
+            pline("You are covered in sparkling lights!");
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
         break;
     }
@@ -1438,6 +1439,7 @@ struct monst *mtmp;
     case MUSE_WAN_COLD:
     case MUSE_WAN_ACID:
     case MUSE_WAN_POISON_GAS:
+    case MUSE_WAN_SONICS:
     case MUSE_WAN_LIGHTNING:
     case MUSE_WAN_MAGIC_MISSILE:
         mzapmsg(mtmp, otmp, FALSE);
@@ -1570,7 +1572,7 @@ struct monst *mtmp;
     case MUSE_POT_CONFUSION:
     case MUSE_POT_SLEEPING:
     case MUSE_POT_ACID:
-    case MUSE_POT_POLYMORPH_THROW:
+    /* case MUSE_POT_POLYMORPH_THROW: */
     case MUSE_POT_HALLUCINATION:
         /* Note: this setting of dknown doesn't suffice.  A monster
          * which is out of sight might throw and it hits something _in_

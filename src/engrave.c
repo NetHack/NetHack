@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 2/23/18 by NullCGT */
+/* Modified 4/22/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -410,7 +410,7 @@ xchar e_type;
         adjalign(-3);
         make_confused(rnd(50), FALSE);
         make_stunned(rnd(50), FALSE);
-        forget_levels(3); 
+        forget_levels(3);
         forget_objects(3);
     }
     ep->engr_time = e_time;
@@ -691,6 +691,11 @@ doengrave()
                             surface(u.ux, u.uy));
                 }
                 break;
+            case WAN_SONICS:
+                if (!Deaf) {
+                    Strcpy(post_engr_text,
+                        "The wand issues a series of loud bangs!");
+                }
             case WAN_POLYMORPH:
                 if (oep) {
                     if (!Blind) {

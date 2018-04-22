@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/14/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2527,7 +2527,7 @@ dopickup()
         else if (IS_SINK(lev->typ))
             pline_The("plumbing connects it to the floor.");
         else if (IS_FURNACE(lev->typ))
-            pline_The("it seems as if it is part of the floor.");
+            pline_The("furnace seems as if it is part of the floor.");
         else if (IS_GRAVE(lev->typ))
             You("don't need a gravestone.  Yet.");
         else if (IS_FOUNTAIN(lev->typ))

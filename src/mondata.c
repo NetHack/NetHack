@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 /*
@@ -1141,6 +1141,8 @@ struct attack *mattk;
     case PM_CLAY_GOLEM:
     case PM_GOLD_GOLEM:
     case PM_AIR_ELEMENTAL:
+    case PM_FUSION_ELEMENTAL:
+    case PM_STORM_ELEMENTAL:
     case PM_EARTH_ELEMENTAL:
     case PM_DUST_VORTEX:
     case PM_ENERGY_VORTEX:

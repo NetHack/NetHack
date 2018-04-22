@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/20/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1502,6 +1502,14 @@ NEARDATA struct permonst mons[] = {
         M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
             | M1_UNSOLID | M1_FLY,
         M2_STRONG | M2_NEUTER, 0, CLR_CYAN),
+    MON("storm elemental", S_ELEMENTAL, LVL(8, 12, 2, 30, 0), (G_NOCORPSE | 1),
+        A(ATTK(AT_CLAW, AD_ELEC, 2, 4), ATTK(AT_CLAW, AD_LOUD, 2, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(0, 0, MS_SILENT, MZ_HUGE),
+        MR_POISON | MR_STONE | MR_ELEC | MR_SONIC, 0,
+        M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
+            | M1_UNSOLID | M1_FLY,
+        M2_STRONG | M2_NEUTER, 0, CLR_GRAY),
     MON("fire elemental", S_ELEMENTAL, LVL(8, 12, 2, 30, 0), (G_NOCORPSE | 1),
         A(ATTK(AT_CLAW, AD_FIRE, 3, 6), ATTK(AT_NONE, AD_FIRE, 0, 4), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -1532,7 +1540,7 @@ NEARDATA struct permonst mons[] = {
         SIZ(0, 0, MS_SILENT, MZ_GIGANTIC), MR_POISON | MR_STONE | MR_FIRE, 0,
         M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
             | M1_UNSOLID | M1_FLY | M1_SWIM | M1_WALLWALK,
-        M2_STRONG | M2_NEUTER, 0, CLR_RED),
+        M2_STRONG | M2_NEUTER, 0, CLR_MAGENTA),
     /*
      * Fungi
      */

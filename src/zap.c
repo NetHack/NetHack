@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/14/18 by NullCGT */
+/* Modified 4/22/18 by NullCGT */
 
 #include "hack.h"
 
@@ -43,6 +43,7 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 #define ZT_LIGHTNING (AD_ELEC - 1)
 #define ZT_POISON_GAS (AD_DRST - 1)
 #define ZT_ACID (AD_ACID - 1)
+#define ZT_SONIC (AD_LOUD - 1)
 /* 8 and 9 are currently unassigned */
 
 #define ZT_WAND(x) (x)
@@ -61,7 +62,8 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
     {
         "magic missile", /* Wands must be 0-9 */
         "bolt of fire", "bolt of cold", "sleep ray", "death ray",
-        "bolt of lightning", "blast of poison gas", "geyser of acid", "", "",
+        "bolt of lightning", "blast of poison gas", "geyser of acid",
+        "sonic beam", "",
 
         "magic missile", /* Spell equivalents must be 10-19 */
         "fireball", "cone of cold", "sleep ray", "finger of death",
@@ -71,7 +73,7 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "blast of missiles", /* Dragon breath equivalents 20-29*/
         "blast of fire", "blast of frost", "blast of sleep gas",
         "blast of disintegration", "blast of lightning",
-        "blast of poison gas", "blast of acid", "", ""
+        "blast of poison gas", "blast of acid", "sonic beam", ""
     };
 
 /*
@@ -2318,6 +2320,24 @@ boolean ordinary;
         (void) create_gas_cloud(u.ux, u.uy, 1, 8);
         break;
 
+    case WAN_SONICS:
+        learn_it = TRUE;
+        if (!Deaf) {
+            pline("KABOOM! You deafen yourself!");
+            incr_itimeout(&HDeaf, rn1(300, 100));
+            damage = d(6, 6);
+        }
+        if (Sonic_resistance) {
+            shieldeff(u.ux, u.uy);
+            pline("KABOOM! Well that was loud.");
+        }
+        destroy_item(ARMOR_CLASS, AD_LOUD);
+        destroy_item(RING_CLASS, AD_LOUD);
+        destroy_item(TOOL_CLASS, AD_LOUD);
+        destroy_item(WAND_CLASS, AD_LOUD);
+        destroy_item(POTION_CLASS, AD_LOUD);
+        break;
+
     case WAN_FIRE:
     case FIRE_HORN:
         learn_it = TRUE;
@@ -3046,7 +3066,7 @@ struct obj *obj;
         else if (otyp >= SPE_MAGIC_MISSILE && otyp <= SPE_FINGER_OF_DEATH)
             buzz(otyp - SPE_MAGIC_MISSILE + 10, u.ulevel / 2 + 1, u.ux, u.uy,
                  u.dx, u.dy);
-        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_ACID)
+        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_SONICS)
             buzz(otyp - WAN_MAGIC_MISSILE,
                  (otyp == WAN_MAGIC_MISSILE) ? 2 : 6, u.ux, u.uy, u.dx, u.dy);
         else
@@ -3604,6 +3624,22 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
             destroy_mitem(mon, FOOD_CLASS, AD_FIRE); /* carried slime */
         }
         break;
+    case ZT_SONIC:
+        if (resists_sonic(mon)) {
+            sho_shieldeff = TRUE;
+            break;
+        }
+        tmp = d(nd, 6);
+        if (spellcaster)
+            tmp = spell_damage_bonus(tmp);
+        if (!rn2(3)) {
+            destroy_mitem(mon, ARMOR_CLASS, AD_LOUD);
+            destroy_mitem(mon, RING_CLASS, AD_LOUD);
+            destroy_mitem(mon, TOOL_CLASS, AD_LOUD);
+            destroy_mitem(mon, WAND_CLASS, AD_LOUD);
+            destroy_mitem(mon, POTION_CLASS, AD_LOUD);
+        }
+        break;
     case ZT_COLD:
         if (resists_cold(mon)) {
             sho_shieldeff = TRUE;
@@ -3760,6 +3796,24 @@ xchar sx, sy;
                 destroy_item(SPBOOK_CLASS, AD_FIRE);
             destroy_item(FOOD_CLASS, AD_FIRE);
         }
+        break;
+    case ZT_SONIC:
+        if (Sonic_resistance) {
+            shieldeff(sx, sy);
+            pline("That was rather loud.");
+        } else {
+            dam = d(nd, 6);
+        }
+        if (!rn2(3))
+            destroy_item(POTION_CLASS, AD_LOUD);
+        if (!rn2(3))
+            destroy_item(TOOL_CLASS, AD_LOUD);
+        if (!rn2(3))
+            destroy_item(RING_CLASS, AD_LOUD);
+        if (!rn2(3))
+            destroy_item(ARMOR_CLASS, AD_LOUD);
+        if (!rn2(3))
+            destroy_item(WAND_CLASS, AD_LOUD);
         break;
     case ZT_COLD:
         if (Cold_resistance) {
@@ -4586,6 +4640,11 @@ short exploding_wand_typ;
             see_txt = "The door freezes and shatters!";
             sense_txt = "feel cold.";
             break;
+        case ZT_SONIC:
+            new_doormask = D_NODOOR;
+            see_txt = "The door is blown off its hinges!";
+            hear_txt =  "a loud bang.";
+            break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */
             if (abs(type) != ZT_BREATH(ZT_DEATH))
@@ -4741,6 +4800,9 @@ register struct obj *obj;
  *      [4] burning spellbook
  *      [5] shocked ring
  *      [6] shocked wand
+ *      [7] sonic (potion)
+ *      [8] sonic (item)
+ *      [9] sonic (wand)
  * (books, rings, and wands don't stack so don't need plural form;
  *  crumbling ring doesn't do damage so doesn't need killer reason)
  */
@@ -4753,6 +4815,9 @@ const char *const destroy_strings[][3] = {
     { "catches fire and burns", "", "burning book" },
     { "turns to dust and vanishes", "", "" },
     { "breaks apart and explodes", "", "exploding wand" },
+    { "resonates and explodes", "resonate and explode", "shattered potion"},
+    { "resonates and shatters", "", "shattered item"},
+    { "resonates and explodes", "", "exploding wand"},
 };
 
 void
@@ -4856,6 +4921,35 @@ register int osym, dmgtyp;
                 break;
             }
             break;
+        case AD_LOUD:
+            if (objects[obj->otyp].oc_material == GLASS ||
+                objects[obj->otyp].oc_material == GEMSTONE) {
+                quan = obj->quan;
+                switch (osym) {
+                case POTION_CLASS:
+                    dmg = rnd(4);
+                    dindx = 7;
+                    break;
+                case RING_CLASS:
+                case TOOL_CLASS:
+                    dmg = 1;
+                    dindx = 8;
+                    break;
+                case ARMOR_CLASS:
+                    dmg = rnd(10);
+                    dindx = 8;
+                    break;
+                case WAND_CLASS:
+                    dmg = rnd(6);
+                    dindx = 9;
+                    break;
+                default:
+                    skip++;
+                    break;
+                }
+            } else
+                skip++;
+            break;
         default:
             skip++;
             break;
@@ -4943,6 +5037,31 @@ int osym, dmgtyp;
                 quan = obj->quan;
                 dindx = 0;
                 tmp++;
+            } else
+                skip++;
+            break;
+        case AD_LOUD:
+            if (objects[obj->otyp].oc_material == GLASS ||
+                objects[obj->otyp].oc_material == GEMSTONE) {
+                quan = obj->quan;
+                switch (osym) {
+                case POTION_CLASS:
+                    dindx = 7;
+                    break;
+                case RING_CLASS:
+                case TOOL_CLASS:
+                    dindx = 8;
+                    break;
+                case ARMOR_CLASS:
+                    dindx = 8;
+                    break;
+                case WAND_CLASS:
+                    dindx = 9;
+                    break;
+                default:
+                    skip++;
+                    break;
+                }
             } else
                 skip++;
             break;

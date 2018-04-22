@@ -3,6 +3,8 @@
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/22/18 by NullCGT */
+
 /*
  *                      THE NEW DISPLAY CODE
  *

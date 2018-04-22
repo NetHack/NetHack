@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/20/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -950,6 +950,32 @@ register struct attack *mattk;
         pline("%s is blasted by wind!", Monnam(mdef));
         mhurtle(mdef, mdef->mx - magr->mx, mdef->my - magr->my, tmp);
         tmp = 0;
+        break;
+    case AD_LOUD:
+        if (cancelled) {
+            tmp = 0;
+            break;
+        }
+        if (vis && canseemon(mdef) && !Deaf)
+            pline("%s is caught in a sonicboom!", Monnam(mdef));
+        tmp += destroy_mitem(mdef, ARMOR_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, RING_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, TOOL_CLASS, AD_LOUD);
+        tmp += destroy_mitem(mdef, WAND_CLASS, AD_LOUD);
+        if (resists_sonic(mdef)) {
+            if (vis && canseemon(mdef))
+                pline_The("sonicboom doesn't seem to harm %s!", mon_nam(mdef));
+            shieldeff(mdef->mx, mdef->my);
+            tmp = 0;
+        }
+        tmp += destroy_mitem(mdef, POTION_CLASS, AD_LOUD);
+        if (pd == &mons[PM_GLASS_GOLEM]) {
+            pline("%s shatters into a million pieces!", Monnam(mdef));
+            mondied(mdef);
+            if (mdef->mhp > 0)
+                return 0;
+            return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+        }
         break;
     case AD_FIRE:
         if (cancelled) {

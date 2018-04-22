@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/20/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -321,7 +321,8 @@ struct attack *alt_attk_buf;
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
-            || attk->adtyp == AD_COLD || attk->adtyp == AD_FIRE) {
+            || attk->adtyp == AD_COLD || attk->adtyp == AD_FIRE
+            || attk->adtyp == AD_LOUD) {
             attk->aatyp = AT_TUCH;
         } else {
             attk->aatyp = AT_CLAW; /* attack message will be "<foo> hits" */
@@ -1107,6 +1108,39 @@ register struct attack *mattk;
                 destroy_item(POTION_CLASS, AD_COLD);
         } else
             dmg = 0;
+        break;
+    case AD_LOUD:
+        hitmsg(mtmp, mattk);
+        if (uncancelled) {
+            if (Deaf)
+                dmg = 1;
+            if (Sonic_resistance)
+                dmg = 0;
+            else {
+                pline("You are caught in a sonic blast!");
+                if (Sonic_resistance) {
+                    pline_The("noise isn't painful to you!");
+                    dmg = 0;
+                }
+            }
+            if ((int) mtmp->m_lev > rn2(20))
+                destroy_item(ARMOR_CLASS, AD_LOUD);
+            if ((int) mtmp->m_lev > rn2(20))
+                destroy_item(POTION_CLASS, AD_LOUD);
+            if ((int) mtmp->m_lev > rn2(25))
+                destroy_item(RING_CLASS, AD_LOUD);
+            if ((int) mtmp->m_lev > rn2(25))
+                destroy_item(TOOL_CLASS, AD_LOUD);
+            if ((int) mtmp->m_lev > rn2(25))
+                destroy_item(WAND_CLASS, AD_LOUD);
+
+        } else
+            dmg = 0;
+        if (dmg > 0 && u.umonnum == PM_GLASS_GOLEM) {
+            You("shatter into a million pieces!");
+            rehumanize();
+            break;
+        }
         break;
     case AD_ELEC:
         hitmsg(mtmp, mattk);
@@ -2109,6 +2143,10 @@ boolean ufound;
         case AD_FIRE:
             physical_damage = FALSE;
             not_affected |= Fire_resistance;
+            goto common;
+        case AD_LOUD:
+            physical_damage = FALSE;
+            not_affected = Deaf;
             goto common;
         case AD_ELEC:
             physical_damage = FALSE;

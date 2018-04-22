@@ -2,6 +2,8 @@
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/22/18 by NullCGT */
+
 #include "hack.h"
 
 /* Note: Arrays are column first, while the screen is row first */
@@ -154,6 +156,10 @@ int expltype;
             str = "splash of acid";
             adtyp = AD_ACID;
             break;
+        case 8:
+            str = "sonicboom";
+            adtyp = AD_LOUD;
+            break;
         default:
             impossible("explosion base type %d?", type);
             return;
@@ -198,6 +204,10 @@ int expltype;
                     explmask[i][j] = !!Acid_resistance;
                     physical_dmg = TRUE;
                     break;
+                case AD_LOUD:
+                    explmask[i][j] = !!Sonic_resistance;
+                    physical_dmg = TRUE;
+                    break;
                 default:
                     impossible("explosion type %d?", adtyp);
                     break;
@@ -237,6 +247,9 @@ int expltype;
                         explmask[i][j] |= resists_poison(mtmp);
                         break;
                     case AD_ACID:
+                        explmask[i][j] |= resists_acid(mtmp);
+                        break;
+                    case AD_LOUD:
                         explmask[i][j] |= resists_acid(mtmp);
                         break;
                     default:
@@ -366,8 +379,11 @@ int expltype;
                         case AD_ACID:
                             adj = "an upset stomach";
                             break;
+                        case AD_LOUD:
+                            adj = "an upset stomach";
+                            break;
                         default:
-                            adj = "fried";
+                            adj = "an uppended stomach";
                             break;
                         }
                         pline("%s gets %s!", Monnam(u.ustuck), adj);
@@ -393,6 +409,9 @@ int expltype;
                             break;
                         case AD_ACID:
                             adj = "burned";
+                            break;
+                        case AD_LOUD:
+                            adj = "blasted";
                             break;
                         default:
                             adj = "fried";

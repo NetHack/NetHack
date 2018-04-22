@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/9/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
@@ -56,6 +56,7 @@ const struct propname {
     { POISON_RES, "poison resistance" },
     { ACID_RES, "acid resistance" },
     { STONE_RES, "stoning resistance" },
+    { SONIC_RES, "sonic resistance" },
     { DRAIN_RES, "drain resistance" },
     { SICK_RES, "sickness resistance" },
     { ANTIMAGIC, "magic resistance" },
