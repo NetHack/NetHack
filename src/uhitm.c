@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1663,6 +1663,26 @@ register struct attack *mattk;
         }
         /* only potions damage resistant players in destroy_item */
         tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        break;
+    case AD_PSYC:
+        if (negated) {
+            tmp = 0;
+            break;
+        }
+        if (!Blind) {
+            You("trap %s in a mental assault!", mon_nam(mdef));
+            if (mindless(mdef->data)) {
+                shieldeff(mdef->mx, mdef->my);
+                tmp = 0;
+                pline("You realize that %s has no mind to break.",
+                mon_nam(mdef));
+            } else if (resists_psychic(mdef)) {
+                shieldeff(mdef->mx, mdef->my);
+                tmp = 0;
+                pline("%s fights it off!", Monnam(mdef));
+            } else
+                mdef->mconf = 1;
+        }
         break;
     case AD_LOUD:
         if (negated) {

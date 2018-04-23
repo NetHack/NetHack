@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -177,6 +177,7 @@ const int zapcolors[NUM_ZAP] = {
     CLR_YELLOW, /* 6 - poison gas */
     CLR_GREEN,  /* 7 - acid */
     CLR_GRAY,   /* 8 - sonic */
+    CLR_BLUE,   /* 9 - psychic */
 };
 #endif /* text color */
 

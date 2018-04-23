@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/1/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -881,7 +881,7 @@ register struct attack *mattk;
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
-    if (mattk->adtyp > AD_SPC2)
+    if (mattk->adtyp > AD_PSYC)
         return (0);
 
     if (mtmp->mcan) {

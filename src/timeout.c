@@ -57,6 +57,7 @@ const struct propname {
     { ACID_RES, "acid resistance" },
     { STONE_RES, "stoning resistance" },
     { SONIC_RES, "sonic resistance" },
+    { PSYCHIC_RES, "psionic resistance" },
     { DRAIN_RES, "drain resistance" },
     { SICK_RES, "sickness resistance" },
     { ANTIMAGIC, "magic resistance" },

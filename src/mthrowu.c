@@ -1,7 +1,7 @@
 /* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/22/18 by NullCGT */
+/* Edited 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -23,7 +23,7 @@ STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
 STATIC_OVL NEARDATA const char *breathwep[] = {
     "fragments", "fire", "frost", "sleep gas", "a disintegration blast",
     "lightning", "poison gas", "acid", "sonic",
-    "strange breath #9"
+    "psychic beam"
 };
 
 extern boolean notonhead; /* for long worms */
@@ -805,8 +805,8 @@ breamm(mtmp, mattk, mtarg)
 struct monst *mtmp, *mtarg;
 struct attack  *mattk;
 {
-    /* if new breath types are added, change AD_ACID to max type */
-    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_LOUD) : mattk->adtyp ;
+    /* if new breath types are added, change AD_PSYC to max type */
+    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_PSYC) : mattk->adtyp ;
 
     if (m_lined_up(mtarg, mtmp)) {
         if (mtmp->mcan) {
@@ -819,7 +819,7 @@ struct attack  *mattk;
             return 0;
         }
         if (!mtmp->mspec_used && rn2(3)) {
-            if ((typ >= AD_MAGM) && (typ <= AD_LOUD)) {
+            if ((typ >= AD_MAGM) && (typ <= AD_PSYC)) {
                 if (canseemon(mtmp))
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
                 dobuzz((int) (-20 - (typ - 1)), (int)mattk->damn,
@@ -1003,8 +1003,8 @@ breamu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
 {
-    /* if new breath types are added, change AD_ACID to max type */
-    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_LOUD) : mattk->adtyp;
+    /* if new breath types are added, change AD_PSYC to max type */
+    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_PSYC) : mattk->adtyp;
 
     if (lined_up(mtmp)) {
         if (mtmp->mcan) {
@@ -1017,7 +1017,7 @@ struct attack *mattk;
             return 0;
         }
         if (!mtmp->mspec_used && rn2(3)) {
-            if ((typ >= AD_MAGM) && (typ <= AD_LOUD)) {
+            if ((typ >= AD_MAGM) && (typ <= AD_PSYC)) {
                 if (canseemon(mtmp))
                     pline("%s breathes %s!", Monnam(mtmp),
                           breathwep[typ - 1]);

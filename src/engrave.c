@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/22/18 by NullCGT */
+/* Modified 4/23/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -712,6 +712,8 @@ doengrave()
             case WAN_PROBING:
                 break;
             /* RAY wands */
+            case WAN_PSIONICS:
+                break;
             case WAN_MAGIC_MISSILE:
                 ptext = TRUE;
                 if (!Blind) {

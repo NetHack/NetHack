@@ -3,7 +3,7 @@
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #ifndef DISPLAY_H
 #define DISPLAY_H
@@ -259,7 +259,7 @@
  *
  * The following are offsets used to convert to and from a glyph.
  */
-#define NUM_ZAP 9 /* number of zap beam types */
+#define NUM_ZAP 10 /* number of zap beam types */
 
 #define GLYPH_MON_OFF     0
 #define GLYPH_PET_OFF     (NUMMONS + GLYPH_MON_OFF)

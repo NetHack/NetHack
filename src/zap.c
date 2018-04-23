@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/22/18 by NullCGT */
+/* Modified 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -44,7 +44,8 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 #define ZT_POISON_GAS (AD_DRST - 1)
 #define ZT_ACID (AD_ACID - 1)
 #define ZT_SONIC (AD_LOUD - 1)
-/* 8 and 9 are currently unassigned */
+#define ZT_PSYCHIC (AD_PSYC - 1)
+/* 8 and 9 are now assigned to sonic and psychic */
 
 #define ZT_WAND(x) (x)
 #define ZT_SPELL(x) (10 + (x))
@@ -63,7 +64,7 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "magic missile", /* Wands must be 0-9 */
         "bolt of fire", "bolt of cold", "sleep ray", "death ray",
         "bolt of lightning", "blast of poison gas", "geyser of acid",
-        "sonic beam", "",
+        "sonic beam", "psibeam",
 
         "magic missile", /* Spell equivalents must be 10-19 */
         "fireball", "cone of cold", "sleep ray", "finger of death",
@@ -73,7 +74,8 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "blast of missiles", /* Dragon breath equivalents 20-29*/
         "blast of fire", "blast of frost", "blast of sleep gas",
         "blast of disintegration", "blast of lightning",
-        "blast of poison gas", "blast of acid", "sonic beam", ""
+        "blast of poison gas", "blast of acid", "sonic beam",
+        "beam of psychic energy"
     };
 
 /*
@@ -2338,6 +2340,18 @@ boolean ordinary;
         destroy_item(POTION_CLASS, AD_LOUD);
         break;
 
+    case WAN_PSIONICS:
+        learn_it = TRUE;
+        if (Psychic_resistance) {
+            shieldeff(u.ux, u.uy);
+            pline("You try to break into your own mind!");
+        } else {
+            pline("You fry your brain!");
+            make_stunned((HStun & TIMEOUT) + (long) rnd(10), FALSE);
+            damage = d(6,6);
+        }
+        break;
+
     case WAN_FIRE:
     case FIRE_HORN:
         learn_it = TRUE;
@@ -3066,7 +3080,7 @@ struct obj *obj;
         else if (otyp >= SPE_MAGIC_MISSILE && otyp <= SPE_FINGER_OF_DEATH)
             buzz(otyp - SPE_MAGIC_MISSILE + 10, u.ulevel / 2 + 1, u.ux, u.uy,
                  u.dx, u.dy);
-        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_SONICS)
+        else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_PSIONICS)
             buzz(otyp - WAN_MAGIC_MISSILE,
                  (otyp == WAN_MAGIC_MISSILE) ? 2 : 6, u.ux, u.uy, u.dx, u.dy);
         else
@@ -3640,6 +3654,18 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
             destroy_mitem(mon, POTION_CLASS, AD_LOUD);
         }
         break;
+    case ZT_PSYCHIC:
+        if (resists_psychic(mon)) {
+            sho_shieldeff = TRUE;
+            break;
+        }
+        tmp = d(nd, 6);
+        if (spellcaster)
+            tmp = spell_damage_bonus(tmp);
+        mon->mconf = 1;
+        mon->mstrategy &= ~STRAT_WAITFORU;
+        break;
+
     case ZT_COLD:
         if (resists_cold(mon)) {
             sho_shieldeff = TRUE;
@@ -3814,6 +3840,15 @@ xchar sx, sy;
             destroy_item(ARMOR_CLASS, AD_LOUD);
         if (!rn2(3))
             destroy_item(WAND_CLASS, AD_LOUD);
+        break;
+    case ZT_PSYCHIC:
+        if (Psychic_resistance) {
+            shieldeff(sx, sy);
+            pline("With a struggle, you resist the mental assault!");
+        } else {
+            dam = d(nd, 6);
+            make_confused(HConfusion + rnd(15), FALSE);
+        }
         break;
     case ZT_COLD:
         if (Cold_resistance) {
@@ -4644,6 +4679,9 @@ short exploding_wand_typ;
             new_doormask = D_NODOOR;
             see_txt = "The door is blown off its hinges!";
             hear_txt =  "a loud bang.";
+            break;
+        case ZT_PSYCHIC:
+            see_txt = "The door has no mind to attack.";
             break;
         case ZT_DEATH:
             /* death spells/wands don't disintegrate */

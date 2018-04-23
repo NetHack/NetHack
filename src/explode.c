@@ -2,7 +2,7 @@
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -160,6 +160,10 @@ int expltype;
             str = "sonicboom";
             adtyp = AD_LOUD;
             break;
+        case 9:
+            str = "psionic explosion";
+            adtyp = AD_PSYC;
+            break;
         default:
             impossible("explosion base type %d?", type);
             return;
@@ -208,6 +212,9 @@ int expltype;
                     explmask[i][j] = !!Sonic_resistance;
                     physical_dmg = TRUE;
                     break;
+                case AD_PSYC:
+                    explmask[i][j] = !!Psychic_resistance;
+                    break;
                 default:
                     impossible("explosion type %d?", adtyp);
                     break;
@@ -251,6 +258,9 @@ int expltype;
                         break;
                     case AD_LOUD:
                         explmask[i][j] |= resists_acid(mtmp);
+                        break;
+                    case AD_PSYC:
+                        explmask[i][j] |= resists_psychic(mtmp);
                         break;
                     default:
                         impossible("explosion type %d?", adtyp);
@@ -382,6 +392,9 @@ int expltype;
                         case AD_LOUD:
                             adj = "an upset stomach";
                             break;
+                        case AD_PSYC:
+                            adj = "mentally blasted";
+                            break;
                         default:
                             adj = "an uppended stomach";
                             break;
@@ -412,6 +425,10 @@ int expltype;
                             break;
                         case AD_LOUD:
                             adj = "blasted";
+                            break;
+                        case AD_PSYC:
+                            /* not a great adjective, or even a real one */
+                            adj = "mindblasted";
                             break;
                         default:
                             adj = "fried";

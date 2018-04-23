@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H
@@ -33,6 +33,10 @@
 #define HSonic_resistance u.uprops[SONIC_RES].intrinsic
 #define ESonic_resistance u.uprops[SONIC_RES].extrinsic
 #define Sonic_resistance (HSonic_resistance || ESonic_resistance)
+
+#define HPsychic_resistance u.uprops[PSYCHIC_RES].intrinsic
+#define EPsychic_resistance u.uprops[PSYCHIC_RES].extrinsic
+#define Psychic_resistance (HPsychic_resistance || EPsychic_resistance)
 
 #define HCold_resistance u.uprops[COLD_RES].intrinsic
 #define ECold_resistance u.uprops[COLD_RES].extrinsic

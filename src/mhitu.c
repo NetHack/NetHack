@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -322,7 +322,7 @@ struct attack *alt_attk_buf;
         attk = alt_attk_buf;
         if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
             || attk->adtyp == AD_COLD || attk->adtyp == AD_FIRE
-            || attk->adtyp == AD_LOUD) {
+            || attk->adtyp == AD_LOUD || attk->adtyp == AD_PSYC) {
             attk->aatyp = AT_TUCH;
         } else {
             attk->aatyp = AT_CLAW; /* attack message will be "<foo> hits" */
@@ -1106,6 +1106,19 @@ register struct attack *mattk;
             }
             if ((int) mtmp->m_lev > rn2(20))
                 destroy_item(POTION_CLASS, AD_COLD);
+        } else
+            dmg = 0;
+        break;
+    case AD_PSYC:
+        hitmsg(mtmp, mattk);
+        if (uncancelled) {
+            pline("Your mind is being attacked!");
+            if (Psychic_resistance) {
+                pline("You fend off the mental attack!");
+                dmg = 0;
+            } else {
+                make_confused(HConfusion + dmg, FALSE);
+            }
         } else
             dmg = 0;
         break;
@@ -2147,6 +2160,10 @@ boolean ufound;
         case AD_LOUD:
             physical_damage = FALSE;
             not_affected = Deaf;
+            goto common;
+        case AD_PSYC:
+            physical_damage = FALSE;
+            not_affected |= Psychic_resistance;
             goto common;
         case AD_ELEC:
             physical_damage = FALSE;

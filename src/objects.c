@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -1088,10 +1088,11 @@ WAND("fire",        "hexagonal", 20, 175, 1, RAY, IRON, HI_METAL),
 WAND("cold",            "short", 20, 175, 1, RAY, IRON, HI_METAL),
 WAND("sleep",           "runed", 50, 175, 1, RAY, IRON, HI_METAL),
 WAND("death",            "long",  5, 500, 1, RAY, IRON, HI_METAL),
-WAND("lightning",      "curved", 20, 175, 1, RAY, IRON, HI_METAL),
+WAND("lightning",      "curved", 10, 175, 1, RAY, IRON, HI_METAL),
 WAND("poison gas",  "octagonal", 20, 175, 1, RAY, IRON, HI_METAL),
 WAND("acid",          "twisted", 20, 175, 1, RAY, WOOD, HI_WOOD),
 WAND("sonics",       "titanium", 20, 175, 1, RAY, IRON, HI_METAL),
+WAND("psionics",      "mithril", 10, 175, 1, RAY, MITHRIL, HI_SILVER),
 /* extra descriptions, shuffled into use at start of new game */
 WAND(None,             "forked",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "holly",  0, 150, 1, 0, WOOD, HI_WOOD),
@@ -1100,7 +1101,6 @@ WAND(None,             "pliable",  0, 150, 1, 0, WOOD, HI_WOOD),
 WAND(None,             "bone",  0, 150, 1, 0, BONE, CLR_WHITE),
 WAND(None,             "dragon-bone",  0, 150, 1, 0, BONE, CLR_WHITE),
 WAND(None,             "golden",  0, 150, 1, 0, GOLD, HI_GOLD),
-WAND(None,             "mithril",  0, 150, 1, 0, MITHRIL, HI_SILVER),
 WAND(None,             "thin",  0, 150, 1, 0, IRON, HI_METAL),
 WAND(None,             "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 #undef WAND

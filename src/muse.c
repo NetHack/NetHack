@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1060,6 +1060,7 @@ try_again:
 #define MUSE_WAN_ACID 21
 #define MUSE_WAN_POISON_GAS 22
 #define MUSE_WAN_SONICS 23
+#define MUSE_WAN_PSIONICS 24
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1139,6 +1140,11 @@ struct monst *mtmp;
             if (obj->otyp == MUSE_WAN_SONICS && obj->spe > 0) {
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_SONICS;
+            }
+            nomore(MUSE_WAN_PSIONICS);
+            if (obj->otyp == MUSE_WAN_PSIONICS && obj->spe > 0) {
+                m.offensive = obj;
+                m.has_offense = MUSE_WAN_PSIONICS;
             }
             nomore(MUSE_FROST_HORN);
             if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
@@ -1440,6 +1446,7 @@ struct monst *mtmp;
     case MUSE_WAN_ACID:
     case MUSE_WAN_POISON_GAS:
     case MUSE_WAN_SONICS:
+    case MUSE_WAN_PSIONICS:
     case MUSE_WAN_LIGHTNING:
     case MUSE_WAN_MAGIC_MISSILE:
         mzapmsg(mtmp, otmp, FALSE);

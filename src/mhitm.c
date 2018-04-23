@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -950,6 +950,24 @@ register struct attack *mattk;
         pline("%s is blasted by wind!", Monnam(mdef));
         mhurtle(mdef, mdef->mx - magr->mx, mdef->my - magr->my, tmp);
         tmp = 0;
+        break;
+    case AD_PSYC:
+        if (cancelled || mindless(mdef->data)) {
+            tmp = 0;
+            break;
+        }
+        if (vis && canseemon(mdef)) {
+            pline("%s appears to be struggling with something!",
+                  Monnam(mdef));
+            if (resists_psychic(mdef)) {
+                shieldeff(mdef->mx, mdef->my);
+                tmp = 0;
+                pline("%s fights it off!", Monnam(mdef));
+            } else {
+                mdef->mconf = 1;
+                mdef->mstrategy &= ~STRAT_WAITFORU;
+            }
+        }
         break;
     case AD_LOUD:
         if (cancelled) {

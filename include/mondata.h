@@ -16,10 +16,12 @@
 #define resists_sleep(mon) (((mon)->mintrinsics & MR_SLEEP) != 0)
 #define resists_disint(mon) (((mon)->mintrinsics & MR_DISINT) != 0)
 #define resists_elec(mon) (((mon)->mintrinsics & MR_ELEC) != 0)
-#define resists_sonic(mon) (((mon)->mintrinsics & MR_SONIC) != 0)
 #define resists_poison(mon) (((mon)->mintrinsics & MR_POISON) != 0)
 #define resists_acid(mon) (((mon)->mintrinsics & MR_ACID) != 0)
 #define resists_ston(mon) (((mon)->mintrinsics & MR_STONE) != 0)
+#define resists_sonic(mon) (((mon)->mintrinsics & MR_SONIC) != 0)
+#define resists_psychic(mon) (((mon)->mintrinsics & MR_PSYCHIC) != 0 || \
+                              mindless((mon->data)))
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)

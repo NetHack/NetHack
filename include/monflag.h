@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #ifndef MONFLAG_H
 #define MONFLAG_H
@@ -59,6 +59,7 @@
 #define MR_ACID 0x40   /* resists acid */
 #define MR_STONE 0x80  /* resists petrification */
 #define MR_SONIC 0x81 /* resists sonic */
+#define MR_PSYCHIC 0x82 /* resists psychic */
 /* other resistances: magic, sickness */
 /* other conveyances: teleport, teleport control, telepathy */
 
