@@ -1309,6 +1309,12 @@ NEARDATA struct permonst mons[] = {
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_SLEEP, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_ORANGE),
+    MON("baby purple dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(1500, 500, MS_ROAR, MZ_HUGE), MR_SONIC, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_BRIGHT_MAGENTA),
     MON("baby black dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -1388,6 +1394,15 @@ NEARDATA struct permonst mons[] = {
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, CLR_ORANGE),
+    MON("purple dragon", S_DRAGON, LVL(15, 9, -1, 20, -5), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_LOUD, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_SONIC, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+            | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_BRIGHT_MAGENTA),
     /* disintegration breath is actually all or nothing, not 1d255 */
     MON("black dragon", S_DRAGON, LVL(15, 9, -1, 20, -6), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_DISN, 1, 255), ATTK(AT_BITE, AD_PHYS, 3, 8),
@@ -1438,7 +1453,7 @@ NEARDATA struct permonst mons[] = {
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS
             | M1_METALLIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, CLR_BRIGHT_CYAN),
+        0, CLR_CYAN),
     /* filth dragons are less mobile than the other elder dragons, but
        their illness attacks are highly dangerous. */
     MON("filth dragon", S_DRAGON, LVL(20, 9, -10, 20, -7), (G_GENO | 1),
@@ -1607,6 +1622,13 @@ NEARDATA struct permonst mons[] = {
         M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER | M2_LORD, 0, HI_LORD),
+    MON("screamer", S_FUNGUS, LVL(4, 4, 7, 0, 0), (G_GENO | 1),
+        A(ATTK(AT_TUCH, AD_LOUD, 3, 3),
+        NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(100, 100, MS_SHRIEK, MZ_SMALL), MR_POISON, MR_POISON,
+        M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
+            | M1_NOTAKE,
+        M2_HOSTILE | M2_NEUTER, 0, CLR_BRIGHT_MAGENTA),
     /*
      * Gnomes
      */
@@ -1701,7 +1723,7 @@ struct permonst _mons2[] = {
     MON("storm giant", S_GIANT, LVL(16, 12, 3, 10, -3),
         (G_GENO | G_SGROUP | 1), A(ATTK(AT_WEAP, AD_PHYS, 2, 12), NO_ATTK,
                                    NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(2250, 750, MS_BOAST, MZ_HUGE), MR_ELEC, MR_ELEC,
+        SIZ(2250, 750, MS_BOAST, MZ_HUGE), MR_ELEC | MR_SONIC, MR_ELEC,
         M1_HUMANOID | M1_CARNIVORE, M2_GIANT | M2_STRONG | M2_ROCKTHROW
                                         | M2_NASTY | M2_COLLECT | M2_JEWELS,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_BLUE),
@@ -2461,7 +2483,7 @@ struct permonst _mons2[] = {
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1800, 0, MS_SILENT, MZ_LARGE), MR_SLEEP | MR_POISON | MR_ACID, 0,
         M1_BREATHLESS | M1_MINDLESS | M1_HUMANOID | M1_THICK_HIDE,
-        M2_HOSTILE | M2_STRONG, 0, DRAGON_SILVER),
+        M2_HOSTILE | M2_STRONG, 0, CLR_BRIGHT_CYAN),
     MON("iron golem", S_GOLEM, LVL(18, 6, 3, 60, 0), (G_NOCORPSE | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_BREA, AD_DRST, 4, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),

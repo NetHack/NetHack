@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 #include "hack.h"
 
@@ -607,6 +607,7 @@ Shield_on(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case SHIELD_OF_RESONANCE:
     case HIDE_SHIELD:
     case TOWER_SHIELD:
         break;
@@ -632,6 +633,7 @@ Shield_off(VOID_ARGS)
     case DWARVISH_ROUNDSHIELD:
     case LARGE_SHIELD:
     case SHIELD_OF_REFLECTION:
+    case SHIELD_OF_RESONANCE:
     case HIDE_SHIELD:
     case TOWER_SHIELD:
         break;

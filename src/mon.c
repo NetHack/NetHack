@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -302,6 +302,7 @@ unsigned corpseflags;
     case PM_SHIMMERING_DRAGON:
     case PM_RED_DRAGON:
     case PM_ORANGE_DRAGON:
+    case PM_PURPLE_DRAGON:
     case PM_WHITE_DRAGON:
     case PM_BLACK_DRAGON:
     case PM_BLUE_DRAGON:

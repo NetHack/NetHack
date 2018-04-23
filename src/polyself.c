@@ -2,7 +2,7 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/22/18 by NullCGT */
 
 /*
  * Polymorph self routine.
@@ -1776,6 +1776,9 @@ int atyp;
     case RED_DRAGON_SCALE_MAIL:
     case RED_DRAGON_SCALES:
         return PM_RED_DRAGON;
+    case PURPLE_DRAGON_SCALE_MAIL:
+    case PURPLE_DRAGON_SCALES:
+        return PM_PURPLE_DRAGON;
     case ORANGE_DRAGON_SCALE_MAIL:
     case ORANGE_DRAGON_SCALES:
         return PM_ORANGE_DRAGON;
