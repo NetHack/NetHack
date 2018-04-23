@@ -13,6 +13,10 @@ work in progress, and as such bugs and balance issues may exist. A wiki can
 be found on the github page and there are encyclopedia entries for some new
 additions, but as of this moment neither is complete.
 
+Installation is the same as installation for vanilla 3.6.1. Please note that
+SpliceHack currently compiles to a binary with the same name as NetHack, so take
+care when compiling on a system where NetHack is installed.
+
 SpliceHack follows the conditions put forth in the license provided by the
 NetHack Dev Team (see dat/license). If you are aware of any licensing issues
 with SpliceHack, please contact us through github.
