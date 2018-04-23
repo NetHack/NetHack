@@ -1,11 +1,11 @@
-         Copyright (c) NetHack Development Team 1990-2017
+         Copyright (c) NetHack Development Team 1990-2018
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1450306349 2015/12/16 22:52:29 $
+          Last revision: $NHDT-Date: 1524317622 2018/04/21 13:33:42 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -56,9 +56,13 @@ The Visual Studio 2017 NetHack solution file can be found here:
 So the steps are:
     1. Launch the IDE.
     2. Open the appropriate solution file.
-    3. Select the build configuration you wish to use.
-    4. From build menu, select build solution.
-    5. Type F5 to start debugging.
+    3. If you have a newer version of Visual Studio than what was used to build 
+       the solution and project files distributed with the NetHack sources, you 
+       can easily retarget the solution before the next step. Refer to the
+       "Note about the Windows SDK version" a couple of paragraphs below.
+    4. Select the build configuration you wish to use (Release, Debug, etc.).
+    5. From the build menu, select build solution.
+    6. Type F5 to start debugging.
 
 You can also build all the projects for all platforms and configurations
 using a "build.bat" batch file found in the same directory as the solution.
@@ -66,10 +70,13 @@ using a "build.bat" batch file found in the same directory as the solution.
 Change to the appropriate directory (i.e. win\win32\vs2015 for VS2015 builds,
 win\win32\vs2017 for VS2017 builds) and run "build.bat".
 
-Note: The Visual Studio project files distributed for NetHack 3.6.1 are configured for the 
-      Windows SDK version 10.0.15063.0. At the time of writing, the Windows SDK version that
-      is distributed with VS2017 Community Edition is a newer 10.0.16299.0. If you have a build
-      error MSB8036, you will simply need to change the expected SDK version as follows:
+-----------------------------------
+Note about the WINDOWS SDK Version:
+-----------------------------------
+    The Visual Studio project files distributed for NetHack 3.6.1 are configured for the 
+    Windows SDK version 10.0.15063.0. At the time of writing, the Windows SDK version that
+    is distributed with VS2017 Community Edition is a newer 10.0.16299.0. If you have a build
+    error MSB8036, you will simply need to change the expected SDK version as follows:
 
           o Open the solution in the IDE and in the project property pages, right-click the 
             solution and select "Retarget solution".
@@ -203,9 +210,9 @@ Setting Up
                                           |    |          |
                                        share  winnt      win32 
  
-    Check the file "Files" in your top level directory for an exact
-    listing of what file is in which directory.  In order for the
-    Makefiles to work, all the source files must be in the proper
+    Check the file "Files" in your top level directory for a more 
+    complete listing of what file is in which directory.  In order for 
+    the Makefiles to work, all the source files must be in the proper
     locations.
 
     If you downloaded or ftp'd the sources from a UNIX system, the lines
