@@ -2,6 +2,8 @@
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/24/18 by NullCGT */
+
 #include "hack.h"
 #ifdef TTY_GRAPHICS
 #include "wintty.h"

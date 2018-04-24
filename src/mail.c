@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/13/18 by NullCGT */
+/* Edited on 4/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -465,7 +465,8 @@ struct obj *otmp UNUSED;
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
       "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
-        "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+        "Invitation: Visit the NetHack web site at http://www.nethack.org!",
+        "Contribute to SpliceHack at https://github.com/NullCGT/SpliceHack!"
     };
 
     /* XXX replace with more general substitution code and add local

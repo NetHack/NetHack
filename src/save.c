@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/3/18 by NullCGT */
+/* Edited on 4/24/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -93,7 +93,7 @@ dosave()
             u.uhp = -1; /* universal game's over indicator */
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
-            exit_nhwindows("Be seeing you...");
+            exit_nhwindows("Bye for now...");
             nh_terminate(EXIT_SUCCESS);
         } else
             (void) doredraw();
