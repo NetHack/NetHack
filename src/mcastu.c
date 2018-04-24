@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -325,6 +325,16 @@ boolean foundyou;
             shieldeff(u.ux, u.uy);
             pline("But you resist the effects.");
             dmg = 0;
+        }
+        break;
+    case AD_PSYC:
+        pline("Your mind is being attacked!");
+        if (Psychic_resistance) {
+            shieldeff(u.ux, u.uy);
+            pline("You fend off the mental attack!");
+            dmg = 0;
+        } else {
+            make_confused(HConfusion + dmg, FALSE);
         }
         break;
     case AD_MAGM:

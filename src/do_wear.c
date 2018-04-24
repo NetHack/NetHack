@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/23/18 by NullCGT */
 
 #include "hack.h"
 
@@ -396,6 +396,7 @@ Helmet_on(VOID_ARGS)
     case DWARVISH_IRON_HELM:
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
+    case HELM_OF_OPAQUE_THOUGHTS:
     case EARMUFF:
         break;
     case HELM_OF_BRILLIANCE:
@@ -462,6 +463,7 @@ Helmet_off(VOID_ARGS)
     case DWARVISH_IRON_HELM:
     case ORCISH_HELM:
     case EARMUFF:
+    case HELM_OF_OPAQUE_THOUGHTS:
         break;
     case DUNCE_CAP:
         context.botl = 1;

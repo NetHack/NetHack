@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/24/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -285,6 +285,11 @@ NEARDATA struct permonst mons[] = {
           NO_ATTK),
         SIZ(250, 200, MS_BARK, MZ_SMALL), MR_COLD, MR_COLD,
         M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISION, CLR_BLUE),
+    MON("thought hound", S_DOG, LVL(7, 12, 2, 0, -3), (G_GENO | 2),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 4), ATTK(AT_TUCH, AD_PSYC, 2, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(250, 200, MS_BARK, MZ_SMALL), MR_COLD, MR_COLD,
+        M1_NOHANDS | M1_CARNIVORE, M2_HOSTILE, M3_INFRAVISION, CLR_BRIGHT_BLUE),
     MON("winter wolf", S_DOG, LVL(7, 12, 4, 20, 0), (G_NOHELL | G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BREA, AD_COLD, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -510,7 +515,7 @@ NEARDATA struct permonst mons[] = {
         M2_DWARF | M2_STRONG | M2_PRINCE | M2_MALE | M2_GREEDY | M2_JEWELS
             | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
-    MON("Emperor Sankis", S_HUMANOID, LVL(8, 9, 10, 20, -7), (G_UNIQ | 2),
+    MON("Emperor Sankis", S_HUMANOID, LVL(8, 9, 10, 20, -7), (G_UNIQ | 3),
         A(ATTK(AT_WEAP, AD_FIRE, 2, 6), ATTK(AT_WEAP, AD_FIRE, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), MR_FIRE, 0,
@@ -522,6 +527,15 @@ NEARDATA struct permonst mons[] = {
     MON("mind flayer", S_HUMANOID, LVL(9, 12, 5, 90, -8), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_TENT, AD_DRIN, 2, 1),
           ATTK(AT_TENT, AD_DRIN, 2, 1), ATTK(AT_TENT, AD_DRIN, 2, 1), NO_ATTK,
+          NO_ATTK),
+        SIZ(1450, 400, MS_HISS, MZ_HUMAN), MR_PSYCHIC, 0,
+        M1_HUMANOID | M1_FLY | M1_SEE_INVIS | M1_OMNIVORE,
+        M2_HOSTILE | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_COLLECT,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_MAGENTA),
+    MON("mind flayer telepath", S_HUMANOID, LVL(11, 12, 4, 90, -8),
+        (G_GENO | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_TENT, AD_DRIN, 2, 1),
+          ATTK(AT_MAGC, AD_PSYC, 3, 4), ATTK(AT_MAGC, AD_PSYC, 3, 4), NO_ATTK,
           NO_ATTK),
         SIZ(1450, 400, MS_HISS, MZ_HUMAN), MR_PSYCHIC, 0,
         M1_HUMANOID | M1_FLY | M1_SEE_INVIS | M1_OMNIVORE,
@@ -1649,6 +1663,12 @@ NEARDATA struct permonst mons[] = {
           NO_ATTK),
         SIZ(700, 120, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_GNOME | M2_MAGIC, M3_INFRAVISIBLE | M3_INFRAVISION, HI_ZAP),
+    MON("gnomish psychic", S_GNOME, LVL(3, 10, 4, 10, 0), (G_GENO | 1),
+        A(ATTK(AT_MAGC, AD_PSYC, 2, 2), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(700, 120, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        M2_GNOME | M2_MAGIC, M3_INFRAVISIBLE | M3_INFRAVISION,
+        CLR_BRIGHT_MAGENTA),
     MON("gnome king", S_GNOME, LVL(5, 10, 10, 20, 0), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -3036,7 +3056,7 @@ struct permonst _mons2[] = {
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 1, MS_WAIL, MZ_HUMAN),
         MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON | MR_STONE |
-        MR_SYCHIC, 0,
+        MR_PSYCHIC, 0,
         M1_FLY | M1_HUMANOID | M1_REGEN | M1_SEE_INVIS | M1_TPORT_CNTRL,
         M2_NOPOLY | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY,
         M3_INFRAVISIBLE | M3_INFRAVISION | M3_DISPLACES, HI_LORD),

@@ -1,7 +1,7 @@
 /* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/9/18 by NullCGT */
+/* Edited 4/23/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -508,7 +508,8 @@ register struct monst *mtmp;
         if (canseemon(mtmp))
             pline("%s concentrates.", Monnam(mtmp));
         if (distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM) {
-            You("sense a faint wave of psychic energy.");
+            if (!(uarmh && uarmh->otyp == HELM_OF_OPAQUE_THOUGHTS))
+                You("sense a faint wave of psychic energy.");
             goto toofar;
         }
         pline("A wave of psychic energy pours over you!");
@@ -518,7 +519,8 @@ register struct monst *mtmp;
         } else if (!u.uinvulnerable) {
             register boolean m_sen = sensemon(mtmp);
 
-            if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
+            if ((m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) &&
+                !(uarmh && uarmh->otyp == HELM_OF_OPAQUE_THOUGHTS)) {
                 int dmg;
                 pline("It locks on to your %s!",
                       m_sen ? "telepathy" : Blind_telepat ? "latent telepathy"
