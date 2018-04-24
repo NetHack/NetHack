@@ -106,7 +106,7 @@ ifdef WANT_SHARE_INSTALL
 # NB: do NOT use $(wildcard ~$(GAMEUID)) since the user may not exist yet.
 PREFIX:=/Users/$(GAMEUID)
 SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/splicehackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 CHOWN=chown
@@ -123,7 +123,7 @@ CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 else
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/splicehackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 CHOWN=true

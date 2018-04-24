@@ -1,7 +1,7 @@
 #	NetHack Makefile.
 # NetHack 3.6  Makefile.top	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $
 
-# Edited 3/22/18 by NullCGT
+# Edited 4/24/18 by NullCGT
 
 # Root of source tree:
 NHSROOT=.
@@ -20,8 +20,8 @@ NHSROOT=.
 
 # make NetHack
 #PREFIX	 = /usr
-GAME     = nethack
-# GAME     = nethack.prg
+GAME     = splicehack
+# GAME     = splicehack.prg
 #GAMEUID  = games
 #GAMEGRP  = bin
 
@@ -208,7 +208,7 @@ dofiles:
 	cp util/recover $(INSTDIR)
 	-if test -n '$(SHELLDIR)'; then rm -f $(SHELLDIR)/$(GAME); fi
 	if test -n '$(SHELLDIR)'; then \
-		sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
+		sed -e 's;/usr/games/lib/splicehackdir;$(HACKDIR);' \
 		-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
 		< sys/unix/nethack.sh \
 		> $(SHELLDIR)/$(GAME) ; fi

@@ -3,6 +3,8 @@
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
+# Edited on 4/24/18 by NullCGT
+#
 #-PRE
 # Mac OS X (Darwin) hints file
 # This is for Mac OS X 10.5.3 (Darwin 9.3).  If this doesn't work for some
@@ -114,11 +116,11 @@ endif	# !WANT_WIN_QT
 
 ifdef WANT_SHARE_INSTALL
 # if $GAMEUID is root, we install into roughly proper Mac locations, otherwise
-# we install into ~/nethackdir
+# we install into ~/splicehackdir
 ifeq ($(GAMEUID),root)
 PREFIX:=/Library/NetHack
 SHELLDIR=/usr/local/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/splicehackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 CHOWN=chown
@@ -128,7 +130,7 @@ GAMEPERM = 02755
 else	# ! root
 PREFIX:=/Users/$(GAMEUID)
 SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/splicehackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 CHOWN=touch
@@ -160,7 +162,7 @@ MOREALL=$(MAKE) install
 else	# !WANT_SOURCE_INSTALL
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/splicehackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 CHOWN=true
@@ -202,7 +204,7 @@ SVS=$(shell $(NHSROOT)/util/makedefs --svs)
 SVSDOT=$(shell $(NHSROOT)/util/makedefs --svs .)
 
 PKGROOT_UG	= PKGROOT/usr/games
-PKGROOT_UGLN	= PKGROOT/usr/games/lib/nethackdir
+PKGROOT_UGLN	= PKGROOT/usr/games/lib/splicehackdir
 build_tty_pkg:
 ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
 	-echo build_tty_pkg only works for a tty-only build
@@ -217,9 +219,9 @@ else
 	sys/unix/hints/macosx.sh infoplist > Info.plist
 
 	mkdir PKGROOT/Applications
-	#osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+	#osacompile -o NetHackQt/NetHackQt.app/splicehackdir/NetHackRecover.app \
 	#	 win/macosx/NetHackRecover.applescript
-	#cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+	#cp win/macosx/recover.pl NetHackQt/NetHackQt.app/splicehackdir
 	osacompile -o PKGROOT/Applications/NetHackRecover.app \
 		 win/macosx/NetHackRecover.applescript
 	cp win/macosx/recover.pl $(PKGROOT_UGLN)
@@ -242,7 +244,7 @@ build_package_root:
 	cd src/..       # make sure we are at TOP
 	rm -rf PKGROOT
 	mkdir -p $(PKGROOT_UG)/lib $(PKGROOT_UG)/bin $(PKGROOT_UG)/man/man6 $(PKGROOT_UG)/doc $(PKGROOT_UGLN)
-	install -p src/nethack $(PKGROOT_UG)/bin
+	install -p src/splicehack $(PKGROOT_UG)/bin
 	# XXX should this be called nethackrecover?
 	install -p util/recover $(PKGROOT_UG)/bin
 	install -p doc/nethack.6 $(PKGROOT_UG)/man/man6
@@ -267,13 +269,13 @@ ifneq (,$(WANT_WIN_X11)$(WANT_WIN_TTY))
 else
 	$(MAKE) build_package_root
 	rm -rf NetHackQt
-	mkdir -p NetHackQt/NetHackQt.app/nethackdir/save
+	mkdir -p NetHackQt/NetHackQt.app/splicehackdir/save
 	mkdir NetHackQt/Documentation
 	cp doc/Guidebook.txt doc/nethack.txt doc/recover.txt NetHackQt/Documentation
 
-	osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+	osacompile -o NetHackQt/NetHackQt.app/splicehackdir/NetHackRecover.app \
 		 win/macosx/NetHackRecover.applescript
-	cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+	cp win/macosx/recover.pl NetHackQt/NetHackQt.app/splicehackdir
 
 	mkdir -p NetHackQt/NetHackQt.app/Contents/Frameworks
 	cp $(QTDIR)/libqt-mt.3.dylib NetHackQt/NetHackQt.app/Contents/Frameworks
@@ -281,7 +283,7 @@ else
 	mkdir NetHackQt/NetHackQt.app/Contents/MacOS
 	mv PKGROOT/nethack NetHackQt/NetHackQt.app/Contents/MacOS
 
-	mv PKGROOT/lib/nethackdir NetHackQt/NetHackQt.app/nethackdir
+	mv PKGROOT/lib/splicehackdir NetHackQt/NetHackQt.app/splicehackdir
 
 # XXX still missing:
 #NetHackQt/NetHackQt.app

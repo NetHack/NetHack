@@ -4,6 +4,6 @@ monstr.c
 hack.h-t
 tile.c
 Sysunix
-nethack
+splicehack
 *.o
 tiles.bmp
