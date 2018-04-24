@@ -1,6 +1,8 @@
 #	NetHack Makefile.
 # NetHack 3.6  Makefile.src	$NHDT-Date: 1520201829 2018/03/04 22:17:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.52 $
 
+# Edited on 4/24/18 by NullCGT
+
 # Root of source tree:
 NHSROOT=..
 
@@ -320,8 +322,8 @@ WINBELIB = -lbe
 LIBS =
 
 # make NetHack
-GAME     = nethack
-# GAME     = nethack.prg
+GAME     = splicehack
+# GAME     = splicehack.prg
 
 # if you defined RANDOM in unixconf.h/tosconf.h since your system did not come
 # with a reasonable random number generator
