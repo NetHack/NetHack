@@ -75,9 +75,7 @@ General Changes
 - Transforming into a lycanthrope now angers guards.
 - Runeswords and tsurugis can be randomly generated, but they are incredibly
   rare.
-- Vampire mages and Vorpal Jabberwocks un-deferred.
-- If preferred pet is set to '@', the player spawns with an adventuring party.
-  This is very experimental, and probably should not be used.
+- Vampire mages, Shimmering Dragons, and Vorpal Jabberwocks un-deferred.
 - Some of the less powerful or less unique quest nemeses have been changed to
   be more challenging or interesting (see below).
 - Bribing demon lords has been greatly expanded. They now can potentially ask
@@ -127,6 +125,7 @@ Quest Nemesis Changes
   sacrifice at altars could also cause some interesting effects.
 - Ixoth and the Chromatic Dragon are both affected by dragon changes, and as
   such are potentially nastier.
+- All bosses capable of using items are affected by the item use changes.
 
 New Races
 - Merfolk: Start with swimming, and eventually learn to breath water. This is
@@ -190,8 +189,9 @@ Dungeon Generation
 - Archery Shops: Sell arrows and bows.
 - Junk Shops: Function as a general store, but a large selection of what they
   sell is useless.
-- Mephisto's Lair
-- The Lord of the Foocubi's Lair
+- Mephisto's Lair: Gehennom level containing Mephisto
+- The Lord of the Foocubi's Lair: Gehennom level containing the Lord of the
+  Foocubi.
 
 New Monster Spells
 - Sonic Scream
@@ -229,6 +229,7 @@ New Items
 - Scroll of Pure Law
 - Scroll of True Neutrality
 - Scroll of Raw Chaos
+- Wand of Healing
 - Wand of Wonder
 - Wand of Acid
 - Wand of Poison Gas

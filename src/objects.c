@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/24/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -1074,7 +1074,7 @@ WAND("nothing",           "oak", 20, 100, 0, IMMEDIATE, WOOD, HI_WOOD),
 WAND("wonder",         "plastic", 5, 100, 0, IMMEDIATE, PLASTIC, CLR_RED),
 WAND("striking",        "ebony", 75, 150, 1, IMMEDIATE, WOOD, HI_WOOD),
 WAND("make invisible", "marble", 45, 150, 1, IMMEDIATE, MINERAL, HI_MINERAL),
-WAND("slow monster",      "tin", 50, 150, 1, IMMEDIATE, METAL, HI_METAL),
+WAND("slow monster",      "tin", 25, 150, 1, IMMEDIATE, METAL, HI_METAL),
 WAND("speed monster",   "brass", 50, 150, 1, IMMEDIATE, COPPER, HI_COPPER),
 WAND("undead turning", "copper", 50, 150, 1, IMMEDIATE, COPPER, HI_COPPER),
 WAND("polymorph",      "silver", 45, 200, 1, IMMEDIATE, SILVER, HI_SILVER),
@@ -1083,6 +1083,7 @@ WAND("teleportation", "iridium", 45, 200, 1, IMMEDIATE, METAL,
                                                              CLR_BRIGHT_CYAN),
 WAND("opening",          "zinc", 25, 150, 1, IMMEDIATE, METAL, HI_METAL),
 WAND("locking",      "aluminum", 25, 150, 1, IMMEDIATE, METAL, HI_METAL),
+WAND("healing",        "willow", 25, 175, 1, IMMEDIATE, WOOD, HI_WOOD),
 WAND("probing",       "uranium", 30, 150, 1, IMMEDIATE, METAL, HI_METAL),
 WAND("digging",          "iron", 55, 150, 1, RAY, IRON, HI_METAL),
 WAND("magic missile",   "steel", 50, 150, 1, RAY, IRON, HI_METAL),

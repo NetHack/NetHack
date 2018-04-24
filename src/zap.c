@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/23/18 by NullCGT */
+/* Modified 4/24/18 by NullCGT */
 
 #include "hack.h"
 
@@ -340,6 +340,7 @@ struct obj *otmp;
             mdrop_obj(mtmp, obj, FALSE);
         }
         break;
+    case WAN_HEALING:
     case SPE_HEALING:
     case SPE_EXTRA_HEALING:
         reveal_invis = TRUE;
@@ -1914,6 +1915,7 @@ struct obj *obj, *otmp;
             if (res)
                 learn_it = TRUE;
             break;
+        case WAN_SONICS:
         case WAN_STRIKING:
         case SPE_FORCE_BOLT:
             /* learn the type if you see or hear something break
@@ -2004,6 +2006,7 @@ struct obj *obj, *otmp;
         case SPE_SLOW_MONSTER:
         case WAN_SPEED_MONSTER:
         case WAN_NOTHING:
+        case WAN_HEALING:
         case SPE_HEALING:
         case SPE_EXTRA_HEALING:
             res = 0;
@@ -2511,6 +2514,7 @@ boolean ordinary;
         } else
             You("shudder in dread.");
         break;
+    case WAN_HEALING:
     case SPE_HEALING:
     case SPE_EXTRA_HEALING:
         learn_it = TRUE; /* (no effect for spells...) */
@@ -2731,6 +2735,7 @@ struct obj *obj; /* wand or spell */
     case WAN_SLOW_MONSTER:
     case SPE_SLOW_MONSTER:
     case WAN_SPEED_MONSTER:
+    case WAN_HEALING:
     case SPE_HEALING:
     case SPE_EXTRA_HEALING:
     case SPE_DRAIN_LIFE:
