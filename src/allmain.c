@@ -738,7 +738,7 @@ STATIC_DCL void
 interrupt_multi(msg)
 const char *msg;
 {
-    if (multi > 0 && !context.travel) {
+    if (multi > 0 && !context.travel && !context.run) {
         nomul(0);
         if (flags.verbose && msg)
             Norep("%s", msg);

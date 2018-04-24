@@ -1,4 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date: 1431737068 2015/05/16 00:44:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	winnt.c	$NHDT-Date: 1524321419 2018/04/21 14:36:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -329,14 +329,13 @@ char *buf;
      */
 
     char *tmp = buf;
-    HWND hwndConsole = GetConsoleHandle();
     HGLOBAL hglbCopy; 
     WCHAR *w, w2[2];
     int cc, rc, abytes;
     LPWSTR lpwstrCopy;
     HANDLE hresult;
 
-    if (!buf || (hwndConsole == NULL))
+    if (!buf)
         return; 
  
     cc = strlen(buf);
@@ -353,7 +352,7 @@ char *buf;
         free(w);
         return;
     }
-    if (!OpenClipboard(hwndConsole)) {
+    if (!OpenClipboard(NULL)) {
         free(w);
         return;
     }

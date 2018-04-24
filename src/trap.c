@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1514855666 2018/01/02 01:14:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.284 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1524312044 2018/04/21 12:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,6 +31,8 @@ STATIC_DCL char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif
 STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
+STATIC_DCL boolean FDECL(adj_nonconjoined_pit, (struct trap *));
+
 STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
 STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned,
                                                         struct obj *,
@@ -851,7 +853,8 @@ unsigned trflags;
             forcebungle = (trflags & FORCEBUNGLE) != 0,
             plunged = (trflags & TOOKPLUNGE) != 0,
             viasitting = (trflags & VIASITTING) != 0,
-            adj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
+            conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE),
+            adj_pit = adj_nonconjoined_pit(trap);
     int oldumort;
     int steed_article = ARTICLE_THE;
 
@@ -879,10 +882,11 @@ unsigned trflags;
             return;
         }
         if (!Fumbling && ttype != MAGIC_PORTAL && ttype != VIBRATING_SQUARE
-            && ttype != ANTI_MAGIC && !forcebungle && !plunged && !adj_pit
+            && ttype != ANTI_MAGIC && !forcebungle && !plunged
+            && !conj_pit && !adj_pit
             && (!rn2(5) || ((ttype == PIT || ttype == SPIKED_PIT)
                             && is_clinger(youmonst.data)))) {
-            You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
+                You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
                                      ? "an"
                                      : a_your[trap->madeby_u],
                 defsyms[trap_to_defsym(ttype)].explanation);
@@ -1154,8 +1158,11 @@ unsigned trflags;
                     Sprintf(verbbuf, "lead %s",
                             x_monnam(u.usteed, steed_article, "poor",
                                      SUPPRESS_SADDLE, FALSE));
-            } else if (adj_pit) {
+            } else if (conj_pit) {
                 You("move into an adjacent pit.");
+            } else if (adj_pit) {
+                You("stumble over debris%s.",
+                    !rn2(5) ? " between the pits" : "");
             } else {
                 Strcpy(verbbuf,
                        !plunged ? "fall" : (Flying ? "dive" : "plunge"));
@@ -1177,33 +1184,34 @@ unsigned trflags;
                 pline("%s %s %s!",
                       upstart(x_monnam(u.usteed, steed_article, "poor",
                                        SUPPRESS_SADDLE, FALSE)),
-                      adj_pit ? "steps" : "lands", predicament);
+                      conj_pit ? "steps" : "lands", predicament);
             } else
-                You("%s %s!", adj_pit ? "step" : "land", predicament);
+                You("%s %s!", conj_pit ? "step" : "land", predicament);
         }
         u.utrap = rn1(6, 2);
         u.utraptype = TT_PIT;
         if (!steedintrap(trap, (struct obj *) 0)) {
             if (ttype == SPIKED_PIT) {
                 oldumort = u.umortality;
-                losehp(Maybe_Half_Phys(rnd(adj_pit ? 6 : 10)),
+                losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
                        plunged
                            ? "deliberately plunged into a pit of iron spikes"
-                           : adj_pit ? "stepped into a pit of iron spikes"
+                           : conj_pit ? "stepped into a pit of iron spikes"
+                           : adj_pit ? "stumbled into a pit of iron spikes"
                                      : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                     poisoned("spikes", A_STR,
-                             adj_pit ? "stepping on poison spikes"
+                             (conj_pit || adj_pit) ? "stepping on poison spikes"
                                      : "fall onto poison spikes",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
             } else {
                 /* plunging flyers take spike damage but not pit damage */
-                if (!adj_pit
+                if (!conj_pit
                     && !(plunged && (Flying || is_clinger(youmonst.data))))
-                    losehp(Maybe_Half_Phys(rnd(6)),
+                    losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
                            plunged ? "deliberately plunged into a pit"
                                    : "fell into a pit",
                            NO_KILLER_PREFIX);
@@ -1213,7 +1221,7 @@ unsigned trflags;
                 ballfall();
                 placebc();
             }
-            if (!adj_pit)
+            if (!conj_pit)
                 selftouch("Falling, you");
             vision_full_recalc = 1; /* vision limits change */
             exercise(A_STR, FALSE);
@@ -4907,6 +4915,24 @@ struct trap *trap;
             }
         }
     }
+}
+
+boolean
+adj_nonconjoined_pit(adjtrap)
+struct trap *adjtrap;
+{
+    struct trap *trap_with_u = t_at(u.ux0, u.uy0);
+
+    if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT &&
+        (trap_with_u->ttyp == PIT || trap_with_u->ttyp == SPIKED_PIT) &&
+        (adjtrap->ttyp == PIT || adjtrap->ttyp == SPIKED_PIT)) {
+        int idx;
+        for (idx = 0; idx < 8; idx++) {
+            if (xdir[idx] == u.dx && ydir[idx] == u.dy)
+                return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 #if 0

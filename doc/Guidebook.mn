@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1524190235 2018/04/20 02:10:35 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1524524932 2018/04/23 23:08:52 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 19, 2018
+.ds f2 "April 23, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -83,6 +83,14 @@
 .	ef				\" short and sweet ...
 .\}
 ..
+.
+.\" A note on some special characters:
+.\"                                    \(dq = double quote character
+.\"  - = hyphen                        \-   = minus sign
+.\"                                    \(em = M-sized dash
+.\"  ^ = small circumflex punctuation  \(ha = larger circumflex character
+.\"  ~ = small tilde punctuation       \(ti = larger tilde character
+.
 .
 .\" finally, start the actual Guidebook...
 .
@@ -410,7 +418,7 @@ The message line (top)
 .pg
 The top line of the screen is reserved for messages that describe
 things that are impossible to represent visually.  If you see a
-``\fB--More--\fP'' on the top line, this means that NetHack has
+``\fB\-\-More\-\-\fP'' on the top line, this means that NetHack has
 another message to display on the screen, but it wants to make certain
 that you've read the one that is there first.  To read the next message,
 just press the space bar.
@@ -427,7 +435,7 @@ so far.  Each symbol on the screen represents something.  You can set
 various graphics options to change some of the symbols the game uses;
 otherwise, the game will use default symbols.  Here is a list of what the
 default symbols mean:
-.lp "- and | "
+.lp "\\- and | "
 The walls of a room, or an open door.  Or a grave (|).
 .lp .
 The floor of a room, ice, or a doorless doorway.
@@ -444,7 +452,7 @@ A closed door, or a spellbook containing a spell you may be able to learn.
 Your character or a human.
 .lp $
 A pile of gold.
-.lp ^
+.lp \(ha \" ^
 A trap (once you have detected it).
 .lp )
 A weapon.
@@ -507,8 +515,8 @@ you are presented with will depend chiefly on how you have set the
 option.
 .pg
 For example, a common question, in the form ``What do you want to
-use?\ [a-zA-Z\ ?*]'', asks you to choose an object you are carrying.
-Here, ``a-zA-Z'' are the inventory letters of your possible choices.
+use?\ [a\-zA\-Z\ ?*]'', asks you to choose an object you are carrying.
+Here, ``a\-zA\-Z'' are the inventory letters of your possible choices.
 Typing `?' gives you an inventory list of these items, so you can see
 what each letter refers to.  In this example, there is also a `*'
 indicating that you may choose an object not on the list, if you
@@ -927,8 +935,8 @@ May be preceded by `m' to force a selection menu.
 Toggle the
 .op autopickup
 option on and off.
-.lp ^
-Ask for the type of a trap you found earlier.
+.lp \(ha \" ^
+Ask for the type of an adjacent trap you found earlier.
 .lp )
 Tell what weapon you are wielding.
 .lp [
@@ -1203,7 +1211,8 @@ List and reorder known spells. Default key is '+'.
 .lp #seetools
 Show the tools currently in use. Default key is '('.
 .lp #seetrap
-Show the type of a trap near you. Default key is '^'.
+Show the type of an adjacent trap.
+Default key is '\(ha'.
 .lp #seeweapon
 Show the weapon currently wielded. Default key is ')'.
 .lp #shell
@@ -1438,7 +1447,7 @@ doors).
 Secret doors are hidden.  You can find them with the `s' (search)
 command.  Once found they are in all ways equivalent to normal doors.
 .hn 2
-Traps (`^')
+Traps (`\(ha')
 .pg
 There are traps throughout the dungeon to snare the unwary delver.
 For example, you may suddenly fall into a pit and be stuck for a few
@@ -1634,6 +1643,24 @@ damage.  You can plunder the deceased adventurer's possessions;
 however, they are likely to be cursed.  Beware of whatever killed the
 former player; it is probably still lurking around, gloating over its
 last victory.
+.
+.hn 2
+Persistence of Monsters
+.pg
+Monsters (a generic reference which also includes humans and pets) are only
+shown while they can be seen or otherwise sensed.
+Moving to a location where you can't see or sense a monster any more
+will result in it disappearing from your map, similarly if it is the
+one who moved rather than you.
+.pg
+However, if you encounter a monster which you can't see or sense \(em
+perhaps it is invisible and has just tapped you on the noggin \(em
+a special ``remembered, unseen monster'' marker will be displayed at
+the location where you think it is.
+That will persist until you have
+proven that there is no monster there, even if the unseen monster
+moves to another location or you move to a spot where the marker's
+location ordinarily wouldn't be seen any more.
 .
 .hn 1
 Objects
@@ -2180,6 +2207,30 @@ There are a number
 of monsters in the dungeon that may be influenced by the amount of gold
 you are carrying (shopkeepers aside).
 .
+.hn 2
+Persistence of Objects
+.pg
+Normally, if you have seen an object at a particular map location and
+move to another location which can't directly see that object any
+more, if will continue to be displayed on your map.
+That remains the case even if it is not actually there any more \(em
+perhaps a monster has picked it up or it has rotted away \(em
+until you can see or feel that location again.
+One notable exception is that if the object gets covered by the
+``remembered, unseen monster'' marker and that marker is later removed
+after you've verified that no monster is there, you will forget that
+there was any object there regardless of whether the unseen monster
+actually took the object.
+If the object is still there, then once you see or feel that location
+again you will re-discover the object and resume remembering it.
+.pg
+The situation is the same for a pile of objects, except that only the
+top item of the pile is displayed.
+The
+.op hilite_pile
+option can be enabled in order to show an item differently when is
+the top one of a pile.
+.
 .hn 1
 Conduct
 .pg
@@ -2431,7 +2482,7 @@ by the function that handles wishing.
 .pg
 Example:
 .sd
-\fBWIZKIT=~/wizkit.txt\fP
+\fBWIZKIT=\(ti/wizkit.txt\fP \" \(ti == '~'
 .ed
 .lp SOUNDDIR
 Define the directory that contains the sound files.
@@ -2741,11 +2792,11 @@ Default '-'.
 .lp menu_deselect_page
 Menu character accelerator to deselect all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
-Default '\e'.
+Default '\\'.
 .lp menu_first_page
 Menu character accelerator to jump to the first page in a menu.
 Implemented by the Amiga, Gem and tty ports.
-Default '^'.
+Default '\(ha'.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
 Values are 'none', 'bold', 'dim', 'underline', 'blink', or 'inverse'.
@@ -2757,7 +2808,7 @@ Default '@'.
 .lp menu_invert_page
 Menu character accelerator to invert all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
-Default '~'.
+Default '\(ti'. \" ~
 .lp menu_last_page
 Menu character accelerator to jump to the last page in a menu.
 Implemented by the Amiga, Gem and tty ports.
@@ -2810,9 +2861,9 @@ defaults to `full'), or it can be negated (which defaults to `single').
 Set your character's name (defaults to your user name).  You can also
 set your character's role by appending a dash and one or more letters of
 the role (that is, by suffixing one of
-.op "-A -B -C -H -K -M -P -Ra -Ro -S -T -V -W" ).
+.op "\-A \-B \-C \-H \-K \-M \-P \-Ra \-Ro \-S \-T \-V \-W" ).
 If
-.op "-@"
+.op "\-@"
 is used for the role, then a random one will be automatically chosen.
 Cannot be set with the `O' command.
 .lp "news    "
@@ -3033,7 +3084,7 @@ Persistent.
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).  Persistent.
 .lp standout
-Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
+Boldface monsters and ``\fB\-\-More\-\-\fP'' (default off).  Persistent.
 .lp statushilites
 Controls how many turns status hilite behaviors highlight
 the field. If negated or set to zero, disables status hiliting.
@@ -3785,14 +3836,14 @@ Set the name of the symbol set that you want to load for display
 on the rogue level.
 .pg
 You can also override one or more symbols using the SYMBOLS config
-file option. Symbols are specified as name:value pairs. Note that
+file option. Symbols are specified as name:value pairs.
+Note that
 NetHack escape-processes the value string in conventional C fashion.
-This means that \e is a prefix to take the following character literally. Thus
-\e needs to be represented as \e\e.
-The special escape form
-\em switches on the meta bit in the symbol value, and the \e^ prefix causes the
-following character to be treated as a control
-character.
+This means that \\ is a prefix to take the following character literally.
+Thus \\ needs to be represented as \\\\.
+The special prefix form \\m switches on the meta bit in the symbol value,
+and the \(ha prefix causes the following character to be treated as a
+control character.
 .pg
 .TS S
 center;
@@ -3810,30 +3861,30 @@ Default	Symbol Name	Description
 \(dq	S_amulet	(amulet)
 A	S_angel	(angelic being)
 a	S_ant	(ant or other insect)
-^	S_anti_magic_trap	(anti-magic field)
+\(ha	S_anti_magic_trap	(anti-magic field)
 [	S_armor	(suit or piece of armor)
 [	S_armour	(suit or piece of armor)
-^	S_arrow_trap	(arrow trap)
+\(ha	S_arrow_trap	(arrow trap)
 0	S_ball	(iron ball)
 #	S_bars	(iron bars)
 B	S_bat	(bat or bird)
-^	S_bear_trap	(bear trap)
--	S_blcorn	(bottom left corner)
+\(ha	S_bear_trap	(bear trap)
+\-	S_blcorn	(bottom left corner)
 b	S_blob	(blob)
 +	S_book	(spellbook)
 )	S_boomleft	(boomerang open left)
 (	S_boomright	(boomerang open right)
 \`	S_boulder	(boulder)
--	S_brcorn	(bottom right corner)
+\-	S_brcorn	(bottom right corner)
 C	S_centaur	(centaur)
 \&_	S_chain	(iron chain)
 #	S_cloud	(cloud)
 c	S_cockatrice	(cockatrice)
 $	S_coin	(pile of coins)
 #	S_corr	(corridor)
--	S_crwall	(wall)
+\-	S_crwall	(wall)
 #	S_darkroom	(dark room)
-^	S_dart_trap	(dart trap)
+\(ha	S_dart_trap	(dart trap)
 &	S_demon	(major demon)
 *	S_digbeam	(dig beam)
 >	S_dnladder	(ladder down)
@@ -3843,18 +3894,18 @@ D	S_dragon	(dragon)
 ;	S_eel	(sea monster)
 E	S_elemental	(elemental)
 /	S_explode1	(explosion top left)
--	S_explode2	(explosion top center)
+\-	S_explode2	(explosion top center)
 \\	S_explode3	(explosion top right)
 |	S_explode4	(explosion middle left)
 \ 	S_explode5	(explosion middle center)
 |	S_explode6	(explosion middle right)
 \\	S_explode7	(explosion bottom left)
--	S_explode8	(explosion bottom center)
+\-	S_explode8	(explosion bottom center)
 /	S_explode9	(explosion bottom right)
 e	S_eye	(eye or sphere)
-^	S_falling_rock_trap	(falling rock trap)
+\(ha	S_falling_rock_trap	(falling rock trap)
 f	S_feline	(cat or other feline)
-^	S_fire_trap	(fire trap)
+\(ha	S_fire_trap	(fire trap)
 !	S_flashbeam	(flash beam)
 %	S_food	(piece of food)
 {	S_fountain	(fountain)
@@ -3866,15 +3917,15 @@ G	S_gnome	(gnome)
 '	S_golem	(golem)
 |	S_grave	(grave)
 g	S_gremlin	(gremlin)
--	S_hbeam	(horizontal beam [zap animation])
+\-	S_hbeam	(horizontal beam [zap animation])
 #	S_hcdbridge	(horizontal raised drawbridge)
 +	S_hcdoor	(closed door in horizontal wall)
 \.	S_hodbridge	(horizontal lowered drawbridge)
 |	S_hodoor	(open door in horizontal wall)
-^	S_hole	(hole)
+\(ha	S_hole	(hole)
 @	S_human	(human or elf)
 h	S_humanoid	(humanoid)
--	S_hwall	(horizontal wall)
+\-	S_hwall	(horizontal wall)
 \.	S_ice	(ice)
 i	S_imp	(imp or minor demon)
 I	S_invisible	(invisible monster)
@@ -3882,17 +3933,17 @@ J	S_jabberwock	(jabberwock)
 j	S_jelly	(jelly)
 k	S_kobold	(kobold)
 K	S_kop	(Keystone Kop)
-^	S_land_mine	(land mine)
+\(ha	S_land_mine	(land mine)
 }	S_lava	(molten lava)
 l	S_leprechaun	(leprechaun)
-^	S_level_teleporter	(level teleporter)
+\(ha	S_level_teleporter	(level teleporter)
 L	S_lich	(lich)
 y	S_light	(light)
 #	S_litcorr	(lit corridor)
 :	S_lizard	(lizard)
 \\	S_lslant	(diagonal beam [zap animation])
-^	S_magic_portal	(magic portal)
-^	S_magic_trap	(magic trap)
+\(ha	S_magic_portal	(magic portal)
+\(ha	S_magic_trap	(magic trap)
 m	S_mimic	(mimic)
 ]	S_mimic_def	(mimic)
 M	S_mummy	(mummy)
@@ -3902,9 +3953,9 @@ n	S_nymph	(nymph)
 O	S_ogre	(ogre)
 o	S_orc	(orc)
 p	S_piercer	(piercer)
-^	S_pit	(pit)
+\(ha	S_pit	(pit)
 #	S_poisoncloud	(poison cloud)
-^	S_polymorph_trap	(polymorph trap)
+\(ha	S_polymorph_trap	(polymorph trap)
 }	S_pool	(water)
 !	S_potion	(potion)
 P	S_pudding	(pudding or ooze)
@@ -3913,46 +3964,46 @@ Q	S_quantmech	(quantum mechanic)
 \&=	S_ring	(ring)
 \`	S_rock	(boulder or statue)
 r	S_rodent	(rodent)
-^	S_rolling_boulder_trap	(rolling boulder trap)
+\(ha	S_rolling_boulder_trap	(rolling boulder trap)
 \.	S_room	(floor of a room)
 /	S_rslant	(diagonal beam [zap animation])
-^	S_rust_trap	(rust trap)
+\(ha	S_rust_trap	(rust trap)
 R	S_rustmonst	(rust monster or disenchanter)
 ?	S_scroll	(scroll)
 #	S_sink	(sink)
-^	S_sleeping_gas_trap	(sleeping gas trap)
+\(ha	S_sleeping_gas_trap	(sleeping gas trap)
 S	S_snake	(snake)
 s	S_spider	(arachnid or centipede)
-^	S_spiked_pit	(spiked pit)
-^	S_squeaky_board	(squeaky board)
+\(ha	S_spiked_pit	(spiked pit)
+\(ha	S_squeaky_board	(squeaky board)
 0	S_ss1	(magic shield 1 of 4)
 #	S_ss2	(magic shield 2 of 4)
 @	S_ss3	(magic shield 3 of 4)
 *	S_ss4	(magic shield 4 of 4)
-^	S_statue_trap	(statue trap)
+\(ha	S_statue_trap	(statue trap)
 \ 	S_stone	(dark part of a room)
 ]	S_strange_obj	(strange object)
--	S_sw_bc	(swallow bottom center)
+\-	S_sw_bc	(swallow bottom center)
 \\	S_sw_bl	(swallow bottom left)
 /	S_sw_br	(swallow bottom right)
 |	S_sw_ml	(swallow middle left)
 |	S_sw_mr	(swallow middle right)
--	S_sw_tc	(swallow top center)
+\-	S_sw_tc	(swallow top center)
 /	S_sw_tl	(swallow top left)
 \\	S_sw_tr	(swallow top right)
--	S_tdwall	(wall)
-^	S_teleportation_trap	(teleportation trap)
+\-	S_tdwall	(wall)
+\(ha	S_teleportation_trap	(teleportation trap)
 \\	S_throne	(opulent throne)
--	S_tlcorn	(top left corner)
+\-	S_tlcorn	(top left corner)
 |	S_tlwall	(wall)
 (	S_tool	(useful item (pick-axe\, key\, lamp...))
-^	S_trap_door	(trap door)
+\(ha	S_trap_door	(trap door)
 t	S_trapper	(trapper or lurker above)
--	S_trcorn	(top right corner)
+\-	S_trcorn	(top right corner)
 #	S_tree	(tree)
 T	S_troll	(troll)
 |	S_trwall	(wall)
--	S_tuwall	(wall)
+\-	S_tuwall	(wall)
 U	S_umber	(umber hulk)
 u	S_unicorn	(unicorn or horse)
 <	S_upladder	(ladder up)
@@ -3962,9 +4013,9 @@ V	S_vampire	(vampire)
 #	S_vcdbridge	(vertical raised drawbridge)
 +	S_vcdoor	(closed door in vertical wall)
 \.	S_venom	(splash of venom)
-^	S_vibrating_square	(vibrating square)
+\(ha	S_vibrating_square	(vibrating square)
 \.	S_vodbridge	(vertical lowered drawbridge)
--	S_vodoor	(open door in vertical wall)
+\-	S_vodoor	(open door in vertical wall)
 v	S_vortex	(vortex)
 |	S_vwall	(vertical wall)
 /	S_wand	(wand)
@@ -3972,7 +4023,7 @@ v	S_vortex	(vortex)
 )	S_weapon	(weapon)
 \(dq	S_web	(web)
 w	S_worm	(worm)
-~	S_worm_tail	(long worm tail)
+\(ti	S_worm_tail	(long worm tail)
 W	S_wraith	(wraith)
 x	S_xan	(xan or other mythical/fantastic insect)
 X	S_xorn	(xorn)
@@ -3981,6 +4032,13 @@ Z	S_zombie	(zombie)
 z	S_zruty	(zruty)
 .\"TABLE_END  Do not delete this line.
 .TE
+.pg
+There is one additional class of object, described as ``strange object'',
+which will occasionally be the shape taken on by mimics and shown as `]'
+for maps displayed as text characters.
+Although the displayed character is the same as the default value for
+`S_mimic_def', it is a different symbol and there is no corresponding
+`S_strange_object' symbol nor any way to assign an alternate value for it.
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind
@@ -4162,7 +4220,7 @@ live, or quit and stop with whatever you have.  If you quit, you keep
 all your gold, but if you swing and live, you might find more.
 .pg
 If you just want to see what the current top players/games list is, you
-can type \fBnethack -s all\fP on most versions.
+can type \fBnethack \-s all\fP on most versions.
 .
 .hn 1
 Explore mode
@@ -4175,7 +4233,7 @@ paltry cost of not getting on the high score list.
 .pg
 There are two ways of enabling explore mode.  One is to start the game
 with the
-.op -X
+.op \-X
 command-line switch or with the
 .op playmode:explore
 option.  The other is to issue the ``#exploremode'' extended command while
@@ -4192,7 +4250,7 @@ brief description.  It is intended for tracking down problems within the
 program rather than to provide god-like powers to your character, and
 players who attempt debugging are expected to figure out how to use it
 themselves.  It is initiated by starting the game with the
-.op -D
+.op \-D
 command-line switch or with the
 .op playmode:debug
 option.

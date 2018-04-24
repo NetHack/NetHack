@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501803105 2017/08/03 23:31:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1524287214 2018/04/21 05:06:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -351,7 +351,7 @@ typedef struct {
 typedef struct {
     packed_coord coord;
     xchar x, y, type;
-} trap;
+} spltrap;
 
 typedef struct {
     Str_or_Len name, appear_as;

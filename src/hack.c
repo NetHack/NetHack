@@ -857,8 +857,11 @@ int mode;
 
     if (sobj_at(BOULDER, x, y) && (Sokoban || !Passes_walls)) {
         if (!(Blind || Hallucination) && (context.run >= 2)
-            && mode != TEST_TRAV)
+            && mode != TEST_TRAV) {
+            if (mode == DO_MOVE && iflags.mention_walls)
+                pline("A boulder blocks your path.");
             return FALSE;
+        }
         if (mode == DO_MOVE) {
             /* tunneling monsters will chew before pushing */
             if (tunnels(youmonst.data) && !needspick(youmonst.data)
