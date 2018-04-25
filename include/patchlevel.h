@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1451600769 2015/12/31 22:26:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1524690061 2018/04/25 21:01:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,9 +36,9 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 1, [insert date here]
- *  A couple of dozen bug fixes.
- *  
+/*  Patch 1, April 27, 2018
+ *  Over five hundred bug fixes.
+ *  Some improvements.
  */
 
 /*

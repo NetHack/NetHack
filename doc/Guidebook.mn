@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1524524932 2018/04/23 23:08:52 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.264 $ $NHDT-Date: 1524690677 2018/04/25 21:11:17 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 23, 2018
+.ds f2 "April 27, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -4485,10 +4485,10 @@ passed away. NetHack 3.6.0 introduced a tribute to him.
 team since the release of 3.4.3 with some of the beloved community
 patches. Many bugs were fixed and some code was restructured.
 .pg
-In 2018, several hundred bug fixes for 3.6.0 and some new features
-were assembled and released as NetHack 3.6.1. The development team at
-the time of release of 3.6.1 consisted of
-\fBWarwick Allison\fP,\fBMichael Allison\fP, \fBKen Arromdee\fP,
+In late April 2018, several hundred bug fixes for 3.6.0 and 
+some new features were assembled and released as NetHack 3.6.1. 
+The development team at the time of release of 3.6.1 consisted of
+\fBWarwick Allison\fP, \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,
 \fBKen Lorber\fP, \fBDean Luick\fP, \fBPatric Mueller\fP,
 \fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
