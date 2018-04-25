@@ -1,5 +1,6 @@
 /* NetHack 3.6	ball.c	$NHDT-Date: 1450402033 2015/12/18 01:27:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Ball & Chain

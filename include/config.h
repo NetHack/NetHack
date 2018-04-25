@@ -1,5 +1,6 @@
 /* NetHack 3.6	config.h	$NHDT-Date: 1478740241 2016/11/10 01:10:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */

@@ -1,3 +1,6 @@
 *.def	NHSUBST
 *.des	NHSUBST
 *.txt	NHSUBST
+data.base NHSUBST
+symbols NHSUBST
+tribute NHSUBST

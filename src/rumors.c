@@ -1,5 +1,6 @@
 /* NetHack 3.6	rumors.c	$NHDT-Date: 1446713640 2015/11/05 08:54:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

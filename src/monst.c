@@ -1,5 +1,6 @@
 /* NetHack 3.6	monst.c	$NHDT-Date: 1510531569 2017/11/13 00:06:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"

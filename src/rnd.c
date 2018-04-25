@@ -1,4 +1,5 @@
-/* NetHack 3.6	rnd.c	$NHDT-Date: 1446883921 2015/11/07 08:12:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	rnd.c	$NHDT-Date: 1524689470 2018/04/25 20:51:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
+/*      Copyright (c) 2004 by Robert Patrick Rankin               */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

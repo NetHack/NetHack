@@ -1,5 +1,6 @@
 /* NetHack 3.6  decl.h  $NHDT-Date: 1496531104 2017/06/03 23:05:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef DECL_H

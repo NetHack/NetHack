@@ -1,5 +1,6 @@
 /* NetHack 3.6	dothrow.c	$NHDT-Date: 1522967321 2018/04/05 22:28:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Contains code for 't' (throw) */

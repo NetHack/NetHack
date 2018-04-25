@@ -1,5 +1,6 @@
 /* NetHack 3.6	tradstdc.h	$NHDT-Date: 1501803107 2017/08/03 23:31:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef TRADSTDC_H

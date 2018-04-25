@@ -1,2 +1,6 @@
 nh??icon  NHSUBST
 *.ad      NHSUBST
+Install.X11 NHSUBST
+nethack.rc NHSUBST
+*.bdf   NH_header=no
+*.xbm   NH_header=no

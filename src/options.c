@@ -1,5 +1,6 @@
 /* NetHack 3.6	options.c	$NHDT-Date: 1510963525 2017/11/18 00:05:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */

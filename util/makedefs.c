@@ -1,5 +1,6 @@
 /* NetHack 3.6  makedefs.c  $NHDT-Date: 1520022901 2018/03/02 20:35:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,5 +1,6 @@
 /* NetHack 3.6	pcconf.h	$NHDT-Date: 1457207019 2016/03/05 19:43:39 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef PCCONF_H

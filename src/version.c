@@ -1,5 +1,6 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1519155525 2018/02/20 19:38:45 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1524693365 2018/04/25 21:56:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -65,8 +66,10 @@ char *buf;
             Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_sha);
 #endif
 #if defined(NETHACK_GIT_BRANCH)
+#if defined(BETA)
         if (NetHack_git_branch)
-            Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_branch);
+            Sprintf(eos(buf), "%sbranch:%s", c++ ? "," : "", NetHack_git_branch);
+#endif
 #endif
         Sprintf(eos(buf), ")");
     }

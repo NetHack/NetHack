@@ -1,5 +1,6 @@
 /* NetHack 3.6	invent.c	$NHDT-Date: 1519672703 2018/02/26 19:18:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

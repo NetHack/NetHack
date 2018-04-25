@@ -1,7 +1,9 @@
 #
-# NHgithook.pm
+# NetHack 3.6  NHgithook.pm       $NHDT-Date: 1524689631 2018/04/25 20:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.6 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
 # NetHack Git Hook Module
-# $NHDT-Date: 1519164205 2018/02/20 22:03:25 $
 
 package NHgithook;
 use Cwd;

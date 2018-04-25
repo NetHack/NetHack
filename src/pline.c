@@ -1,5 +1,6 @@
 /* NetHack 3.6	pline.c	$NHDT-Date: 1520964541 2018/03/13 18:09:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \

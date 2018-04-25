@@ -1,5 +1,6 @@
 /* NetHack 3.6	mklev.c	$NHDT-Date: 1511681724 2017/11/26 07:35:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

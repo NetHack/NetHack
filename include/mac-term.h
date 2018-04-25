@@ -1,5 +1,6 @@
 /* NetHack 3.6	mac-term.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
+/*-Copyright (c) Kevin Hugo, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*	Compiler prefix file for the MacOS X Terminal.app port.
