@@ -1,4 +1,7 @@
 Install.nt NHSUBST
 Makefile.* NHSUBST
+defaults.nh NHSUBST
+sysconf NHSUBST
 *.rc NHSUBST
 *.bat NHSUBST
+*.def NH_header=no

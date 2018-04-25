@@ -1,0 +1,3 @@
+Install.Qt NHSUBST
+qpe-nethack.control NH_header=no
+knethack.lnk NH_header=no

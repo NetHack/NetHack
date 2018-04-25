@@ -1,1 +1,7 @@
 Makefile.* NHSUBST
+Install.unx NHSUBST
+NewInstall.unx NHSUBST
+README.linux NHSUBST
+depend.awk NHSUBST
+sysconf NHSUBST
+*shr NH_header=no

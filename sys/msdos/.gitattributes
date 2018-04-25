@@ -2,3 +2,5 @@
 *.bat NHSUBST
 Makefile.* NHSUBST
 Install.* NHSUBST
+moveinit.pat NH_header=no
+vesa.h NH_header=no

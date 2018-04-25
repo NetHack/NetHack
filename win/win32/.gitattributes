@@ -1,0 +1,10 @@
+*.mak NHSUBST
+*.sln -text
+*.vcxproj -text
+*.def NH_header=no
+*.sln NH_header=no
+*.vcxproj NH_header=no
+*.proj NH_header=no
+*.props NH_header=no
+resource.h NH_header=no
+nhresource.h NH_header=no
