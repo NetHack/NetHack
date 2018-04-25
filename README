@@ -181,3 +181,7 @@ be able to provide support or receive bug reports for it.
 In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
+
+# $NHDT-Date: 1524689604 2018/04/25 20:53:24 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $
+# Copyright (c) 2012 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.

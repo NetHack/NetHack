@@ -1,6 +1,6 @@
 NetHack 3.6.0 Linux Elf
 
-$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+$NHDT-Date: 1524684188 2018/04/25 19:23:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $
 
 This README provides the instructions for using the official Linux binary,
 system platform requirements, as well as steps used to create that binary.

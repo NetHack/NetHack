@@ -1,5 +1,6 @@
 /* NetHack 3.6	patchlevel.h	$NHDT-Date: 1451600769 2015/12/31 22:26:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* NetHack 3.6.1 */

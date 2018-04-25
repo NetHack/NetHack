@@ -4,7 +4,9 @@
  |___/\___|\_/\___|_\___/ .__/\___|_|
                         |_|
 
-$NHDT-Date: 1519228647 2018/02/21 15:57:27 $
+# NetHack 3.6  Developer.txt       $NHDT-Date: 1524689668 2018/04/25 20:54:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 Welcome to the NetHack Infrastructure Developer's Guide.
 

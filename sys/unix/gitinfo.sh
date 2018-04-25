@@ -1,5 +1,7 @@
 #!/bin/sh
-# NetHack 3.6  gitinfo.sh	$NHDT-Date: 1521185933 2018/03/16 07:38:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.1 $
+# NetHack 3.6  gitinfo.sh	$NHDT-Date: 1524689450 2018/04/25 20:50:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# Copyright (c) 2018 by Robert Patrick Rankin
+# NetHack may be freely redistributed.  See license for details.
 
 # bring dat/gitinfo.txt up to date; called from Makefile.src
 

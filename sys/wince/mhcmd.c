@@ -1,4 +1,5 @@
-/* NetHack 3.6	mhcmd.c	$NHDT-Date: 1432512800 2015/05/25 00:13:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	mhcmd.c	$NHDT-Date: 1524689383 2018/04/25 20:49:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/*      Copyright (c) 2009 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"

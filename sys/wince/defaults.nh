@@ -1,3 +1,7 @@
+# $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# Copyright (c) 2007 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+#
 # Sample config file for win32 NetHack
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #

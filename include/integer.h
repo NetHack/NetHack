@@ -1,4 +1,5 @@
-/* NetHack 3.6	integer.h	$NHDT-Date: 1457210314 2016/03/05 20:38:34 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6	integer.h	$NHDT-Date: 1524689514 2018/04/25 20:51:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $ */
+/*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* integer.h -- provide sized integer types */

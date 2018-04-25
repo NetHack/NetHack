@@ -1,5 +1,6 @@
 /* NetHack 3.6	version.c	$NHDT-Date: 1519155525 2018/02/20 19:38:45 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
