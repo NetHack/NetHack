@@ -1,6 +1,9 @@
 #!/usr/bin/perl
+# NetHack 3.6  NHadd       $NHDT-Date: 1524689631 2018/04/25 20:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.1 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
 # wrapper for nhadd and nhcommit aliases
-# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
 
 %ok = map { $_ => 1 } ('add', 'commit');
 

@@ -1,4 +1,5 @@
-/* NetHack 3.6	pcsys.c	$NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	pcsys.c	$NHDT-Date: 1524689500 2018/04/25 20:51:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/*      Copyright (c) 2012 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

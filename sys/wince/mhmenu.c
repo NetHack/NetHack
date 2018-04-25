@@ -1,3 +1,5 @@
+/* NetHack 3.6  mhmenu.c       $NHDT-Date: 1524689398 2018/04/25 20:49:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
+/*      Copyright (c) 2009 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"

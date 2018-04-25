@@ -1,6 +1,6 @@
 *.mn	NHSUBST
 *.6	NHSUBST
-fixes.*	NHSUBST
+fixes*	NHSUBST
 window.doc NHSUBST
 config.nh NHSUBST
 Guidebook.txt NH_header=no

@@ -1,4 +1,6 @@
-/* $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Date: 1524689304 2018/04/25 20:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/*      Copyright (c) 2017 by Pasi Kallinen                       */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Convert the given input files into an output file that is expected

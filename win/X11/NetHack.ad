@@ -1,4 +1,6 @@
-! $NHDT-Date: 1457079198 2016/03/04 08:13:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $
+! $NHDT-Date: 1524689294 2018/04/25 20:48:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
+! Copyright (c) 2017 by Pasi Kallinen
+! NetHack may be freely redistributed.  See license for details.
 
 #define NETHACK_FONT       -*-fixed-medium-*-*-*-15-*-*-*-*-*-*-*
 #define NETHACK_CLR_FG     grey

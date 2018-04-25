@@ -1,5 +1,6 @@
-$NHDT-Date: 1432473678 2015/05/24 13:21:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.2 $
-code_features.txt
+# NetHack 3.6  code_features.txt $NHDT-Date: 1524689669 2018/04/25 20:54:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $
+# Copyright (c) 2015 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
 
 Developer-useful info about code features, assumptions, purpose,
 rationale, etc.
