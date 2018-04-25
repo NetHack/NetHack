@@ -3073,7 +3073,7 @@ struct monst *mtmp;
     if (!has_mname(mtmp) && !is_animal(mtmp->data)) {
         if (!Deaf) {
             pline("%s introduces themselves to you as %s.", Monnam(mtmp),
-                  mon_nam(christen_monst(mtmp, rndhumname(mtmp->female))));
+                  noit_mon_nam(christen_monst(mtmp, rndhumname(mtmp->female))));
         } else {
             pline("%s seems to be introducing themselves..",
                   Monnam(mtmp));
