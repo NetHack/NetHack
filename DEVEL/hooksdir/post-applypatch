@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Date$
+# $NHDT-Date: 1524683720 2018/04/25 19:15:20 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $
 
 #STARTUP-START
 BEGIN {

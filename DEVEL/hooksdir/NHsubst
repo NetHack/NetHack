@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # NHsubst
-# $NHDT-Date$
+# $NHDT-Date: 1524683436 2018/04/25 19:10:36 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $
 # git merge driver for substitutions (like RCS/CVS)
 # driver line:   .... %O %A %B %L
 use strict;

@@ -1,6 +1,6 @@
 #!/bin/perl
 #
-#  $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+#  $NHDT-Date: 1524684628 2018/04/25 19:30:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $
 #
 
 sub bail($);

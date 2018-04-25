@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Date$
+# $NHDT-Date: 1524683609 2018/04/25 19:13:29 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.1 $
 
 # value of nethack.setupversion we will end up with when this is done
 # version 1 is reserved for repos checked out before versioning was added
