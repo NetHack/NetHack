@@ -1310,10 +1310,6 @@ int mmflags;
     case S_NYMPH:
         if (rn2(5) && !u.uhave.amulet)
             mtmp->msleeping = 1;
-        if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
-            && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)) {
-            mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
-        }
         break;
     case S_ORC:
         if (Race_if(PM_ELF))
@@ -1330,9 +1326,6 @@ int mmflags;
     case S_HUMAN:
         if (Race_if(PM_INFERNAL))
             mtmp->mpeaceful = FALSE;
-        break;
-    case S_KOP:
-        mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         break;
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION || mndx == PM_BAD_CLONE) {

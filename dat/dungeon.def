@@ -16,7 +16,7 @@
 #		number of choices for its branch level _first_.
 #
 
-DUNGEON:	"The Dungeons of Doom" "D" (25, 5)
+DUNGEON:	"The Dungeons of Doom" "D" (30, 5)
 ALIGNMENT:	unaligned
 BRANCH:		"The Gnomish Mines" @ (2, 3)
 LEVEL:		"rogue" "R" @ (15, 4)
@@ -24,7 +24,7 @@ LEVELDESC:	roguelike
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
-LEVEL:		"statuary" "S" @ (18, 2)
+LEVEL:		"statuary" "S" @ (18, 2) 40
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 10
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
@@ -56,7 +56,7 @@ LEVEL:		"void" "V" @ (1, 0)
 #		monsters can properly migrate here under certain
 #		circumstances.
 #
-DUNGEON:	"Gehennom" "G" (20, 5)
+DUNGEON:	"Gehennom" "G" (15, 5)
 DESCRIPTION:	mazelike
 DESCRIPTION:	hellish
 ALIGNMENT:	noalign
@@ -64,11 +64,11 @@ BRANCH:		"Vlad's Tower" @ (9, 5) up
 LEVEL:		"valley" "V" @ (1, 0)
 LEVEL:		"sanctum" "none" @ (-1, 0)
 LEVEL:		"juiblex" "J" @ (4, 4)
-LEVEL:		"baalz" "B" @ (6, 4)
+LEVEL:		"baalz" "B" @ (6, 4) 50
 LEVEL:		"asmodeus" "A" @ (2, 6)
-LEVEL:		"mephisto" "M" @ (2, 6)
-LEVEL:		"foogardens" "L" @ (2, 6)
-LEVEL:		"wizard1" "none" @ (11, 6)
+LEVEL:		"mephisto" "M" @ (2, 6) 50
+LEVEL:		"foogardens" "L" @ (2, 6) 50
+LEVEL:		"wizard1" "none" @ (11, 1)
 CHAINLEVEL:	"wizard2" "X" "wizard1" + (1, 0)
 CHAINLEVEL:	"wizard3" "Y" "wizard1" + (2, 0)
 LEVEL:		"orcus" "O" @ (10, 6)

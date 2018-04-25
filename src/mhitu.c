@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/25/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -21,6 +21,7 @@ STATIC_DCL void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
+STATIC_DCL void FDECL(mintroduce, (struct monst *));
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
 /* changed to a parameter to mhitu. */
@@ -1420,14 +1421,17 @@ register struct attack *mattk;
 
     case AD_SSEX:
         if (SYSOPT_SEDUCE) {
-            if (could_seduce(mtmp, &youmonst, mattk) == 1 && !mtmp->mcan)
+            if (could_seduce(mtmp, &youmonst, mattk) == 1 && !mtmp->mcan) {
+                mintroduce(mtmp);
                 if (doseduce(mtmp))
                     return 3;
+            }
             break;
         }
         /*FALLTHRU*/
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
+        mintroduce(mtmp);
         if (is_animal(mtmp->data)) {
             hitmsg(mtmp, mattk);
             if (mtmp->mcan)
@@ -3060,6 +3064,22 @@ assess_dmg:
         return 2;
     }
     return 1;
+}
+
+STATIC_OVL void
+mintroduce(mtmp)
+struct monst *mtmp;
+{
+    if (!has_mname(mtmp) && !is_animal(mtmp->data)) {
+        if (!Deaf) {
+            pline("%s introduces themselves to you as %s.", Monnam(mtmp),
+                  mon_nam(christen_monst(mtmp, rndhumname(mtmp->female))));
+        } else {
+            pline("%s seems to be introducing themselves..",
+                  Monnam(mtmp));
+        }
+    }
+    return;
 }
 
 struct monst *

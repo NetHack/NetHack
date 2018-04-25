@@ -63,7 +63,6 @@ General Changes
 - Monster wielding behavior was changed so monsters are more aggressive about
   wielding new items.
 - VENOM_CLASS and Q_CLASS are referred to differently in game.
-- Nymphs and Kops are generated with names.
 - Nephi's grudge patch has been implemented and expanded, so monsters will
   attack certain other monsters they are opposed to. This dovetails nicely with
   altar changes.
@@ -117,6 +116,8 @@ General Changes
 - Added an easter egg message during ascension.
 - Trees generate randomly in the dungeon. They use the same code as fountains
   and other features, so will not block the exit.
+- Monsters now are more polite, and introduce themselves before trying to
+  seduce you.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
