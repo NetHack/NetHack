@@ -4,7 +4,7 @@
 ; This overlay schema is for use only when NetHack is built
 ; using packaged-functions for function-level linking.
 ;
-; Edited on 4/20/18 by NullCGT
+; Edited on 4/24/18 by NullCGT
 ;
 ; Overlay tuning level: 0
 ;
@@ -171,7 +171,7 @@ functions:142 _mk_bubble _mk_knox_portal _mk_mplayer _mk_named_object _mk_roamer
 functions:143 _mkcavearea _mkcavepos _mkclass _mkcorpstat _mkfount _mkgold _mkgoldobj _mkinvokearea
 functions:144 _mkinvpos _mklev _mkmap _mkobj _mkobj_at _mkportal _mkroll_launch _mkroom
 functions:145 _mkshobj_at _mkshop _mksink _mksobj _mksobj_at _mkstairs _mkswamp _mktemple
-functions:146 _mktrap _mkundead _mkzoo _mlevel_tele_trap _mlifesaver _mnearto _mnexto _moffer _mon_arrive
+functions:146 _mktrap _mktree _mkundead _mkzoo _mlevel_tele_trap _mlifesaver _mnearto _mnexto _moffer _mon_arrive
 functions:147 _mon_break_armor _mon_catchup_elapsed_time _mon_chain _mon_has_amulet _mon_has_arti _mon_has_special _mon_invent_chain _mon_is_local
 functions:148 _mon_nam _mon_nam_too _mon_owns _mon_reflects _mon_regen _mon_set_minvis _mon_to_stone _mon_wield_item
 functions:149 _mondead _mondied _mongets _mongone _monkilled _Monnam _monnear 
