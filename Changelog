@@ -63,7 +63,7 @@ General Changes
 - Monster wielding behavior was changed so monsters are more aggressive about
   wielding new items.
 - VENOM_CLASS and Q_CLASS are referred to differently in game.
-- Guards, Nymphs, and Kops are generated with names.
+- Nymphs and Kops are generated with names.
 - Nephi's grudge patch has been implemented and expanded, so monsters will
   attack certain other monsters they are opposed to. This dovetails nicely with
   altar changes.
@@ -114,6 +114,9 @@ General Changes
   occasionally. As you begin to ascend the dungeon, monster spawn rate will
   speed up.
 - While you have the amulet, leprechauns are generated awake.
+- Added an easter egg message during ascension.
+- Trees generate randomly in the dungeon. They use the same code as fountains
+  and other features, so will not block the exit.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.

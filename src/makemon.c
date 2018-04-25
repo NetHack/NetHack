@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 4/25/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1328,14 +1328,11 @@ int mmflags;
             mon_adjust_speed(mtmp, 2, (struct obj *) 0);
         break;
     case S_HUMAN:
-    case S_KOP:
         if (Race_if(PM_INFERNAL))
             mtmp->mpeaceful = FALSE;
-        if (!type_is_pname(ptr) && !(ptr->msound == MS_CUSS)
-            && !(ptr->msound == MS_NEMESIS) && (ptr->msound == MS_LEADER)
-            && !is_elf(ptr) && !(is_dwarf(ptr))) {
-            mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
-        }
+        break;
+    case S_KOP:
+        mtmp = christen_monst(mtmp, rndhumname(mtmp->female));
         break;
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION || mndx == PM_BAD_CLONE) {
