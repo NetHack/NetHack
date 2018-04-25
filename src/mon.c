@@ -1,5 +1,6 @@
 /* NetHack 3.6	mon.c	$NHDT-Date: 1522540516 2018/03/31 23:55:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you're using precompiled headers, you don't want this either */

@@ -1,5 +1,6 @@
 /* NetHack 3.6	end.c	$NHDT-Date: 1512803167 2017/12/09 07:06:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS /* comment line for pre-compiled headers */

@@ -1,5 +1,6 @@
 /* NetHack 3.6	mextra.h	$NHDT-Date: 1451836000 2016/01/03 15:46:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MEXTRA_H

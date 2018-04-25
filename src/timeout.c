@@ -1,5 +1,6 @@
 /* NetHack 3.6	timeout.c	$NHDT-Date: 1505214876 2017/09/12 11:14:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

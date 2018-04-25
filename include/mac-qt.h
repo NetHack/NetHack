@@ -1,5 +1,6 @@
 /* NetHack 3.6	mac-qt.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
+/*-Copyright (c) Kevin Hugo, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*	Compiler prefix file for the Macintosh Qt port.

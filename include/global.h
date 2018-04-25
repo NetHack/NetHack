@@ -1,5 +1,6 @@
 /* NetHack 3.6	global.h	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef GLOBAL_H

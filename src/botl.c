@@ -1,5 +1,6 @@
 /* NetHack 3.6	botl.c	$NHDT-Date: 1506903619 2017/10/02 00:20:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
