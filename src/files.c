@@ -665,13 +665,17 @@ int lev, oflag;
 void
 really_close()
 {
-    int fd = lftrack.fd;
+    int fd;
+    
+    if (lftrack.init) {
+        fd = lftrack.fd;
 
-    lftrack.nethack_thinks_it_is_open = FALSE;
-    lftrack.fd = -1;
-    lftrack.oflag = 0;
-    if (fd != -1)
-        (void) close(fd);
+        lftrack.nethack_thinks_it_is_open = FALSE;
+        lftrack.fd = -1;
+        lftrack.oflag = 0;
+        if (fd != -1)
+            (void) close(fd);
+    }
     return;
 }
 
