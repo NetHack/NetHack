@@ -4,7 +4,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 4/14/18 by NullCGT */
+/* Edited on 4/26/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -24,6 +24,87 @@ extern int n_dgns; /* number of dungeons, from dungeon.c */
 
 static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
                                             ALL_CLASSES, 0 };
+
+#if 0
+/* #give: give another creature an item */
+/* based on / copied from dochat */
+void
+dogive()
+{
+
+    struct monst *mtmp;
+    int tx, ty, i;
+    struct obj *otmp;
+
+    if (u.uswallow) {
+        pline("The only thing you can give right now is your best effort.");
+        return;
+    }
+    if (!getdir("Give an item to whom? (in what direction)")) {
+        return;
+    }
+    if (u.usteed && u.dz > 0) {
+        if (!u.usteed->mcanmove || u.usteed->msleeping) {
+            pline("%s seems not to notice you.", Monnam(u.usteed));
+            return;
+        } else
+            return domonnoise(u.usteed);
+    }
+    if (u.dz) {
+        pline("Don't give up!");
+        return;
+    }
+    if (u.dx == 0 && u.dy == 0) {
+        pline("You give yourself a pat on the back.");
+        return;
+    }
+
+    tx = u.ux + u.dx;
+    ty = u.uy + u.dy;
+
+    if (!isok(tx, ty))
+        return;
+
+    mtmp = m_at(tx, ty);
+
+    if ((!mtmp || mtmp->mundetected)
+        && (otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
+        /* Talking to a statue */
+        if (!Blind) {
+            pline_The("%s seems not to notice you.",
+                      /* if hallucinating, you can't tell it's a statue */
+                      Hallucination ? rndmonnam((char *) 0) : "statue");
+        }
+        return;
+    }
+
+    if (!mtmp || mtmp->mundetected || mtmp->m_ap_type == M_AP_FURNITURE
+        || mtmp->m_ap_type == M_AP_OBJECT)
+        return;
+
+    /* sleeping monsters won't talk, except priests (who wake up) */
+    if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {
+        /* If it is unseen, the player can't tell the difference between
+           not noticing him and just not existing, so skip the message. */
+        if (canspotmon(mtmp))
+            pline("%s seems not to notice you.", Monnam(mtmp));
+        return;
+    }
+
+    /* if this monster is waiting for something, prod it into action */
+    mtmp->mstrategy &= ~STRAT_WAITMASK;
+
+    if (mtmp->mtame && mtmp->meating) {
+        if (!canspotmon(mtmp))
+            map_invisible(mtmp->mx, mtmp->my);
+        pline("%s is eating noisily.", Monnam(mtmp));
+        return;
+    }
+
+    /* giving code */
+
+}
+#endif
 
 /* 'd' command: drop one inventory item */
 int
