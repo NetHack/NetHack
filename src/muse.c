@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/26/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1193,7 +1193,7 @@ struct monst *mtmp;
         /* nomore(MUSE_POT_POLYMORPH_THROW);
         if (obj->otyp == POT_POLYMORPH) {
             m.offensive = obj;
-            m.has_offense = MUSE_POT_SLEEPING;
+            m.has_offense = MUSE_POT_POLYMORPH_THROW;
         }*/
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && multi >= 0) {
@@ -1663,6 +1663,7 @@ struct monst *mtmp;
 #define MUSE_POT_POLYMORPH 9
 #define MUSE_WAN_WISHING 10
 #define MUSE_FIGURINE 11
+#define MUSE_POT_REFLECT 12
 
 boolean
 find_misc(mtmp)
@@ -1785,6 +1786,11 @@ struct monst *mtmp;
         if (obj->otyp == POT_SPEED && mtmp->mspeed != MFAST && !mtmp->isgd) {
             m.misc = obj;
             m.has_misc = MUSE_POT_SPEED;
+        }
+        nomore(MUSE_POT_REFLECT);
+        if (obj->otyp == POT_REFLECTION && !mtmp->mreflect) {
+            m.misc = obj;
+            m.has_misc = MUSE_POT_REFLECT;
         }
         nomore(MUSE_WAN_POLYMORPH);
         if (obj->otyp == WAN_POLYMORPH && obj->spe > 0
@@ -1944,6 +1950,15 @@ struct monst *mtmp;
            player's character becomes "very fast" temporarily;
            monster becomes "one stage faster" permanently */
         mon_adjust_speed(mtmp, 1, otmp);
+        m_useup(mtmp, otmp);
+        return 2;
+    case MUSE_POT_REFLECT:
+        mquaffmsg(mtmp, otmp);
+        mtmp->mreflect = 1;
+        if (canspotmon(mtmp))
+            pline("%s is covered in a silvery sheen!", Monnam(mtmp));
+        if (oseen)
+            makeknown(POT_REFLECTION);
         m_useup(mtmp, otmp);
         return 2;
     case MUSE_WAN_POLYMORPH:
@@ -2111,7 +2126,7 @@ struct monst *mtmp;
     if (!rn2(40) && !nonliving(pm) && !is_vampshifter(mtmp))
         return AMULET_OF_LIFE_SAVING;
 
-    switch (rn2(3)) {
+    switch (rn2(4)) {
     case 0:
         if (mtmp->isgd)
             return 0;
@@ -2122,6 +2137,8 @@ struct monst *mtmp;
         return rn2(6) ? POT_INVISIBILITY : WAN_MAKE_INVISIBLE;
     case 2:
         return POT_GAIN_LEVEL;
+    case 3:
+        return POT_REFLECTION;
     }
     /*NOTREACHED*/
     return 0;
@@ -2143,6 +2160,8 @@ struct obj *obj;
                           && !attacktype(mon->data, AT_GAZE));
     if (typ == WAN_SPEED_MONSTER || typ == POT_SPEED)
         return (boolean) (mon->mspeed != MFAST);
+    if (typ == POT_REFLECTION)
+        return mon->mreflect != 1;
 
     switch (obj->oclass) {
     case WAND_CLASS:
@@ -2233,6 +2252,13 @@ const char *str;
             makeknown(AMULET_OF_REFLECTION);
         }
         return TRUE;
+    } else if ((orefl = which_armor(mon, W_ARMC))
+               && orefl->otyp == CLOAK_OF_REFLECTION) {
+        if (str) {
+            pline(str, s_suffix(mon_nam(mon)), "cloak");
+            makeknown(CLOAK_OF_REFLECTION);
+        }
+        return TRUE;
     } else if ((orefl = which_armor(mon, W_ARM))
                && (orefl->otyp == SILVER_DRAGON_SCALES
                    || orefl->otyp == SILVER_DRAGON_SCALE_MAIL)) {
@@ -2245,7 +2271,7 @@ const char *str;
         if (str)
             pline(str, s_suffix(mon_nam(mon)), "scales");
         return TRUE;
-    } else if (mon->data == &mons[PM_SILVER_GOLEM]) {
+    } else if (mon->data == &mons[PM_SILVER_GOLEM] || mon->mreflect) {
         if (str)
             pline(str, s_suffix(mon_nam(mon)), "body");
         return TRUE;

@@ -2,6 +2,8 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 4/26/18 by NUllCGT */
+
 #ifndef MONST_H
 #define MONST_H
 
@@ -101,6 +103,7 @@ struct monst {
     Bitfield(mcanmove, 1);  /* paralysis, similar to mblinded */
 
     Bitfield(mconf, 1);     /* confused */
+    Bitfield(mreflect, 1);  /* reflects things */
     Bitfield(mpeaceful, 1); /* does not attack unprovoked */
     Bitfield(mtrapped, 1);  /* trapped in a pit, web or bear trap */
     Bitfield(mleashed, 1);  /* monster is on a leash */
