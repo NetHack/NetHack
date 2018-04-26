@@ -5,7 +5,7 @@
 /* This file contains the command routines dowhatis() and dohelp() and */
 /* a few other help related facilities */
 
-/* Edited on 3/7/18 by NullCGT */
+/* Edited on 4/26/18 by NullCGT */
 
 #include "hack.h"
 #include "dlb.h"
@@ -270,6 +270,12 @@ int x, y;
     }
     if (mtmp->mleashed)
         Strcat(buf, ", leashed to you");
+
+    if (mtmp->misc_worn_check)
+        Strcat(buf, ", armored");
+
+    if (MON_WEP(mtmp))
+        Sprintf(eos(buf), ", wielding %s", ansimpleoname(MON_WEP(mtmp)));
 
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
