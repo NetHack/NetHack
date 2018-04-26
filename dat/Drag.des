@@ -49,13 +49,6 @@ MONSTER:('D',"drake"),random
 MONSTER:('D',"drake"),random
 MONSTER:('D',"drake"),random
 MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
-MONSTER:('D',"drake"),random
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Not very many traps
@@ -68,17 +61,18 @@ MONSTER:';',(37,04),hostile
 MONSTER:';',(37,10),hostile
 MONSTER:';',(37,12),hostile
 MONSTER:';',(37,16),hostile
-# Undead
+# Other monsters
 MONSTER:('W',"wraith"),random,hostile
 MONSTER:('W',"wraith"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
-MONSTER:('V',"vampire"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
+MONSTER:('q',"chimera"),random,hostile
 
 #
 #	The "locate" level for the quest.
@@ -135,10 +129,11 @@ MONSTER:('Z',"zombie dragon"),random,hostile
 MONSTER:('Z',"zombie dragon"),random,hostile
 MONSTER:('Z',"zombie dragon"),random,hostile
 MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
+MONSTER:('Z',"zombie dragon"),random,hostile
 MONSTER:'V' ,random,hostile
-MONSTER:'V' ,random,hostile
-MONSTER:'V' ,random,hostile
-MONSTER:'V' ,random,hostile
+MONSTER:('q',"chimera"),random,hostile
 
 #
 #	The "goal" level for the quest.
@@ -177,7 +172,7 @@ STAIR:random,up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:(')',"mace"),(25,08),blessed,0,name:"Sharur"
+OBJECT:(')',"ornate mace"),(25,08),blessed,0,name:"Sharur"
 OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
@@ -200,6 +195,9 @@ MONSTER:('Z', "zombie dragon"),random
 MONSTER:('Z', "zombie dragon"),random
 MONSTER:('Z', "zombie dragon"),random
 MONSTER:('Z', "zombie dragon"),random
+MONSTER:random,random
+MONSTER:random,random
+MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random

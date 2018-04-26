@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* File changed 4/16/18 by NullCGT */
+/* File changed 4/26/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -115,7 +115,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       Based on Sumerian legends. Extremely powerful.
     */
     A("Sharur", ORNATE_MACE,
-      (SPFX_RESTR | SPFX_NOGEN | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK | SPFX_WARN),
       0, 0, PHYS(5, 5), DFNS(AD_MAGM), NO_CARY, LION, A_LAWFUL, PM_DRAGONMASTER,
       NON_PM, 4000L, NO_COLOR),
 

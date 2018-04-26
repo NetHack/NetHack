@@ -2,7 +2,7 @@
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
-# File changed 3/28/18 by NullCGT
+# File changed 4/26/18 by NullCGT
 #
 #	The quest text file for NetHack 3.4
 #
@@ -1067,7 +1067,8 @@ spell cards to have ever lived."
 #	Dragonmaster
 #
 %Cc Dra 00001
-You suddenly find yourself at %H. The nests of dragons are all around you,
+You suddenly find yourself at %H.
+The nests of dragons are all around you,
 and you are surrounded by waterfalls and a myriad of beautiful flowers.
 Dragons of all shapes and colors wheel through the stormy skies
 above, swooping and diving through the clouds.
@@ -1119,25 +1120,25 @@ For what may be the final time, you arrive at %H.
 "ROAR!"
 %E
 %Cc Dra 00015
-"%p! You have returned to us in our time of peril!
+"%pC! You have returned to us in our time of peril!
 
 I must test your skills in order to determine if you have the strength
 to be our champion."
 %E ["You have returned at a time of great peril."]
 %Cp Dra 00016
-"%p, you have returned.  Are you strong enough now to be our champion?"
+"%pC, you have returned.  Are you strong enough now to be our champion?"
 %E
 %Cp Dra 00017
 "You have returned again, %p. Are you yet skilled enough?"
 %E
 %Cc Dra 00018
 "You still think you are worthy to be our champion? You disgust me,
-%p! Leave this place and never return!"
+%pC! Leave this place and never return!"
 
 "You shall not be the one to enact our vengance upon %n."
 %E ["You are unworthy to be the champion of your homeland."]
 %Cc Dra 00019
-"%p, I am afraid you are not yet strong enough to seek %n.
+"%pC, I am afraid you are not yet strong enough to seek %n.
 Only %Ra with the help of %d could ever hope to take revenge on our foe."
 %E ["You are too weak.  Come back when you are %Ra."]
 %Cc Dra 00020
@@ -1148,8 +1149,9 @@ Go forth, and return when you have thought hard on what you must do."
 %E ["You have wandered from the path of the %a.  Come back when you are ready."]
 %Cc Dra 00021
 "You have probably already guessed what has happened, %p.
-Our old nemesis %n attacked our nests and destroyed our eggs. %ni also had
-the gall to steal the greatest treasure of our horde, the mighty %o.
+Our old nemesis %n attacked our nests and destroyed our eggs.
+The fiend also had the gall to steal the greatest treasure of our horde,
+the mighty %o.
 
 "You must go to %i.  Once there, you can slay
 %n for his atrocities. Bring us back %o as proof that you have killed %ni."
@@ -1189,7 +1191,7 @@ death of %n."
 %E
 %Cc Dra 00035
 The air here is cool, and above you arch the enormous bones of dragons long
-since dead. You have reached %i.
+since dead. You have reached the grotto containing %i.
 %E [You have reached %i.]
 %Cp Dra 00036
 You have returned again to %i.
@@ -1202,9 +1204,10 @@ reached the deepest part of %i.  This is where %n must be hiding.
 You feel a chill again.
 %E
 %Cc Dra 00050
-"So, this is who %l sent to fight me. It seems that the dragons are not
-merely content with losing their eggs, but their %R as well. I am glad
-that unlike you, I saw the benefits to leaving them.
+"So, this is who %l sent to fight me. It seems that the dragons
+are not merely content with losing their eggs, but their %R
+as well.
+I am glad that unlike you, I saw the benefits to leaving them.
 
 "Let us duel, %p."
 %E [%nC challenges you."]
@@ -1252,10 +1255,10 @@ As you touch %o, you feel the power of it flow through your body.
 You feel that if you asked it to, it would fight at your side.
 %E [You feel the power of %o flowing through you.]
 %Cc Dra 00080
-%nC collapses, their body spent. Your vengance over the loss of your
-siblings is complete. You cannot help but feel slightly sad, however. In
-different circumstances, %n could have been your friend, and you
-could have grown up together under the watchful eye of %l.
+%nC collapses, their body spent. Your vengance over the loss
+of your siblings is complete. You cannot help but feel slightly sad, however.
+In different circumstances, %n could have been your friend,
+and you could have grown up together under the watchful eye of %l.
 %E [%nC has been slain.]
 %Cc Dra 00081
 When %l sees %o, she nods, and roars:
@@ -1270,7 +1273,7 @@ When %l sees %o, she nods, and roars:
 
 %E [%lC tells you to take %o, and to return when you have triumphed.]
 %Cc Dra 00082
-%l looks at %o, then back at you.
+%lC looks at %o, then back at you.
 
 "It is yours now. It is but a fragment of our hoard, and you have a greater
 need of it than we do."
