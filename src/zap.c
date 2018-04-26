@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/24/18 by NullCGT */
+/* Modified 4/26/18 by NullCGT */
 
 #include "hack.h"
 
@@ -465,6 +465,12 @@ probe_monster(mtmp)
 struct monst *mtmp;
 {
     struct obj *otmp;
+
+    if (!has_mname(mtmp) && !type_is_pname(mtmp->data) &&
+        is_human(mtmp->data) && !(mtmp->data->geno & G_UNIQ)) {
+        pline("%s is named %s.", Monnam(mtmp),
+              mon_nam(christen_monst(mtmp, rndhumname(mtmp->female))));
+    }
 
     mstatusline(mtmp);
     if (notonhead)

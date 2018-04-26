@@ -24,6 +24,7 @@ General Changes
 - Looking at monsters now tells you what weapon they are wielding, and whether
   they are armored. To avoid nerfing wands of probing, the type of armor is not
   indicated.
+- Probing certain non-unique monsters will tell you their name.
 - Deadly poison is no longer an instant kill, and instead does 1-13 extra
   damage. This change does not affect monsters.
 - Monsters are now capable of sacrificing corpses on altars, and all monsters

@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 2/01/18 by NullCGT */
+/* Edited on 4/26/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1575,7 +1575,8 @@ static const char *const malhumnames[] = {
     "Johnny",   "Spike",  "Josiah",     "Justin",   "Erin",      "Sarah",
     "Jimbo",    "Bob",    "Shadow",     "Dimitri",  "Harry",     "Donald",
     "Jerry",    "Dale",   "Arthur",     "Drew",     "Neo",       "Leo",
-    "Trevor",   "Pike",   "Barret",     "Red",      "Roy"
+    "Trevor",   "Pike",   "Barret",     "Red",      "Roy",       "Hugh",
+    "Juan",
 };
 
 static const char *const femhumnames[] = {
@@ -1586,7 +1587,7 @@ static const char *const femhumnames[] = {
     "Siri",     "Violet",   "Pell",    "Sam",    "Wanda",  "Lois",   "Bianca",
     "Trinity",  "Carmen",   "Megan",   "Sky",    "Rose",   "Roxy",   "Julie",
     "Fran",     "Frieda",   "Lana",    "Tanya",  "Sally",  "Rika",   "Sil",
-    "Valeska",  "Yellow",   "Lucy",    "Patty",  "Celia"
+    "Valeska",  "Yellow",   "Lucy",    "Patty",  "Celia",  "Erika",
 };
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
