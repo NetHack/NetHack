@@ -4,7 +4,7 @@
 
 /* various code that was replicated in *main.c */
 
-/* Edited on 4/18/18 by NullCGT */
+/* Edited on 4/27/18 by NullCGT */
 
 #include "hack.h"
 
@@ -296,7 +296,7 @@ boolean resuming;
                             u.uin_cnt--;
                         if (!u.uin_cnt) {
                             dungeon_crumble();
-                            u.uin_cnt = rn1(15, 15);
+                            u.uin_cnt = rn1(125, 50);
                         }
                     }
                     restore_attrib();
