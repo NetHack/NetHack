@@ -37,8 +37,7 @@
 /* Version 3.6.x */
 
 /*  Patch 1, April 27, 2018
- *  Over five hundred bug fixes.
- *  Some improvements.
+ *  Over four hundred and seventy bug fixes and improvements.
  */
 
 /*

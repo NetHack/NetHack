@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.446 $ $NHDT-Date: 1524689549 2018/04/25 20:52:29 $
+$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.448 $ $NHDT-Date: 1524780380 2018/04/26 22:06:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -542,6 +542,9 @@ at the prompt for entering a level annotation, responding with <return>
 reorder the #droptype menu and add some separator lines
 moving from a pit to an adjacent pit with uncleared debris shouldn't be a fall
 open drawbridge spanning ice would vanish if the ice melted
+if a warned-of mon moved onto a spot containing a 'remembered, unseen mon'
+	then moved off, the unseen marker was redisplayed even though the
+	hero should now know that the remembered monster isn't there anymore
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
