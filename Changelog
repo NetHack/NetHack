@@ -1,4 +1,4 @@
-                   SpliceHack -- Changelog
+                   SpliceHack v0.1 -- Changelog
 
 This changelog documents all the features that differ from vanilla Nethack.
 Beware of SPOILERS for both Nethack and SpliceHack all the way through this
@@ -21,6 +21,7 @@ New Options
   respectively. Birds can be set as the preferred pet with "b".
 
 General Changes
+- Slight restructuring of Gehennom.
 - Looking at monsters now tells you what weapon they are wielding, and whether
   they are armored. To avoid nerfing wands of probing, the type of armor is not
   indicated.
