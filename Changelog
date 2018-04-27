@@ -21,13 +21,10 @@ New Options
   respectively. Birds can be set as the preferred pet with "b".
 
 General Changes
-- Slight restructuring of Gehennom.
 - Looking at monsters now tells you what weapon they are wielding, and whether
   they are armored. To avoid nerfing wands of probing, the type of armor is not
   indicated.
 - Probing certain non-unique monsters will tell you their name.
-- Deadly poison is no longer an instant kill, and instead does 1-13 extra
-  damage. This change does not affect monsters.
 - Monsters are now capable of sacrificing corpses on altars, and all monsters
   that like objects will now pick up corpses (as opposed to just nymphs).
   In rare cases, this can result in monsters being gifted artifacts.
@@ -96,8 +93,8 @@ General Changes
   be generated with.
 - Summon nasties has been expanded to accommodate new monsters.
 - High level adventurers will arise as spectres in their bones files, a more
-  powerful type of ghost which is capable of using weapons. Inspired by an
-  archived YANI by AmyBSOD and aosdict.
+  powerful type of ghost which is capable of using weapons. Inspired by a YANI
+  by AmyBSOD and aosdict that was archived on the wiki's YANI list.
 - Additional achievements are tracked in the xlogfile that pertain to this
   variant.
 - Pets can now potentially become stunned or invisible by eating the right
@@ -122,7 +119,11 @@ General Changes
 - Trees generate randomly in the dungeon. They use the same code as fountains
   and other features, so will not block the exit.
 - Monsters now are more polite, and introduce themselves before trying to
-  seduce you.
+  seduce you. In the future, would like to expand this to monsters introducing
+  themselves in other ways.
+- Slight restructuring of Gehennom. In the future, would like to redo Gehennom
+  entirely, or possibly look into updating the Heck^2 patch for 3.6.1 (MAJOR
+  UNDERTAKING)
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
