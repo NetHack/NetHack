@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/5/18 by NullCGT */
+/* Edited on 4/27/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1411,12 +1411,13 @@ dosacrifice()
             value = monstr[otmp->corpsenm] + 1;
             if (otmp->oeaten)
                 value = eaten_stat(value, otmp);
-            if (uwep->otyp == BONE_KNIFE) {
+            if (uwep && uwep->otyp == BONE_KNIFE) {
                 value += 2;
             }
         }
 
-        if (your_race(ptr) || (uwep->otyp == BONE_KNIFE && uwep->cursed)) {
+        if (your_race(ptr) || (uwep &&
+            uwep->otyp == BONE_KNIFE && uwep->cursed)) {
             if (is_demon(youmonst.data)) {
                 You("find the idea very satisfying.");
                 exercise(A_WIS, TRUE);
