@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1520825872 2018/03/12 03:37:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1524931557 2018/04/28 16:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1550,7 +1550,7 @@ check_font_widths()
     LOGFONTW console_font_log_font = matching_log_font;
     console_font_log_font.lfWeight = console_font_info.FontWeight;
     console_font_log_font.lfHeight = console_font_info.dwFontSize.Y;
-    console_font_log_font.lfWidth = 0;
+    console_font_log_font.lfWidth = console_font_info.dwFontSize.X;
     HFONT console_font = CreateFontIndirectW(&console_font_log_font);
 
     if (console_font == NULL) {
