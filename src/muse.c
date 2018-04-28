@@ -123,7 +123,14 @@ struct obj *obj;
                     pline("In a cloud of smoke, %s emerges!", a_monnam(mtmp));
                 pline("%s speaks.", vis ? Monnam(mtmp) : Something);
                 /* I suspect few players will be upset that monsters */
-                /* can't wish for wands of death here.... */
+                /* CAN wish for wands of death here.... */
+                if (rn2(2)) {
+                    verbalize("Thank you for freeing me! I will grant you a wish in grattitude!");
+                    mmake_wish(mon);
+                    if (vis)
+                        pline("%s vanishes.", Monnam(mtmp));
+                    mongone(mtmp);
+                }
                 if (rn2(2)) {
                     verbalize("You freed me!");
                     mtmp->mpeaceful = 1;
