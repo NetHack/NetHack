@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1524413723 2018/04/22 16:15:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1524950534 2018/04/28 21:22:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3022,25 +3022,33 @@ boolean FDECL((*proc), (char *));
     char *ep;
     boolean skip = FALSE, morelines = FALSE;
     char *buf = (char *) 0;
+    size_t inbufsz = sizeof inbuf;
 
     free_config_sections();
 
-    while (fgets(inbuf, (int) (sizeof inbuf), fp)) {
+    while (fgets(inbuf, (int) inbufsz, fp)) {
         ep = index(inbuf, '\n');
         if (skip) { /* in case previous line was too long */
             if (ep)
                 skip = FALSE; /* found newline; next line is normal */
         } else {
-            if (!ep) {
-                config_error_add("Line too long, skipping");
-                skip = TRUE; /* newline missing; discard next fgets */
+            if (!ep) {  /* newline missing */
+                if (strlen(inbuf) < (inbufsz - 2)) {
+                    /* likely the last line of file is just
+                       missing a newline; process it anyway  */
+                    ep = eos(inbuf);
+                } else {
+                    config_error_add("Line too long, skipping");
+                    skip = TRUE; /* discard next fgets */
+                }
             } else {
+                *ep = '\0'; /* remove newline */
+            }
+            if (ep) {
                 char *tmpbuf = (char *) 0;
                 int len;
                 boolean ignoreline = FALSE;
                 boolean oldline = FALSE;
-
-                *ep = '\0'; /* remove newline */
 
                 /* line continuation (trailing '\') */
                 morelines = (--ep >= inbuf && *ep == '\\');
