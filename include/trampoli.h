@@ -2,7 +2,7 @@
 /* Copyright (c) 1989, by Norm Meluch and Stephen Spackman	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/06/18 by NullCGT */
+/* Edited on 4/27/18 by NullCGT */
 
 #ifndef TRAMPOLI_H
 #define TRAMPOLI_H
@@ -41,6 +41,7 @@
 #define doddrop() doddrop_()
 #define dodown() dodown_()
 #define dodrop() dodrop_()
+#define dogive() dogive_()
 #define donull() donull_()
 #define doup() doup_()
 #define dowipe() dowipe_()

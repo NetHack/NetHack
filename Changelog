@@ -20,6 +20,11 @@ New Options
 - Pet names for birds and dragons can be specified with birdname and dragonname
   respectively. Birds can be set as the preferred pet with "b".
 
+New Commands
+- #give can be used to give items to your pet or peaceful monsters, putting the
+  items directly in their inventory. This should streamline the process of
+  trying to get pets to take something.
+
 General Changes
 - Looking at monsters now tells you what weapon they are wielding, and whether
   they are armored. To avoid nerfing wands of probing, the type of armor is not

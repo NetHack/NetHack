@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/26/18 by NullCGT */
+/* Edited on 4/27/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2930,9 +2930,7 @@ struct ext_func_tab extcmdlist[] = {
             enter_explore_mode, IFBURIED },
     { 'f', "fire", "fire ammunition from quiver", dofire },
     { M('f'), "force", "force a lock", doforce, AUTOCOMPLETE },
-    #if 0
-    { 'g', "give", "give another creature an item", dogive },
-    #endif
+    { M('g'), "give", "give another creature an item", dogive, AUTOCOMPLETE },
     { ';', "glance", "show what type of thing a map symbol corresponds to",
             doquickwhatis, IFBURIED | GENERALCMD },
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },

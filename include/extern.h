@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 4/18/18 by NullCGT */
+/* Edited on 4/27/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -367,6 +367,7 @@ E int FDECL(drop, (struct obj *));
 E int NDECL(wipeoff);
 #endif
 E int NDECL(dodrop);
+E int NDECL(dogive);
 E boolean FDECL(boulder_hits_pool, (struct obj *, int, int, BOOLEAN_P));
 E boolean FDECL(flooreffects, (struct obj *, int, int, const char *));
 E void FDECL(doaltarobj, (struct obj *));

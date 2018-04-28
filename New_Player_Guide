@@ -55,5 +55,10 @@ see the changelog.
 - The Oracle's major consultations have been expanded, and she may drop hints
   about some of the other changes in the game.
 
+Additional Commands
+- #give can be used to give items to your pet or peaceful monsters, putting the
+  items directly in their inventory. This should streamline the process of
+  trying to get pets to take something.
+
 While many other differences from vanilla exist, this information should be
 enough to prepare you for SpliceHack. Enjoy and good luck.

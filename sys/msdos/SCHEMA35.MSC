@@ -4,7 +4,7 @@
 ; This overlay schema is for use only when NetHack is built
 ; using packaged-functions for function-level linking.
 ;
-; Edited on 4/24/18 by NullCGT
+; Edited on 4/27/18 by NullCGT
 ;
 ; Overlay tuning level: 0
 ;
@@ -275,7 +275,7 @@ functions:249 _uwepgone _vault_occupied _vault_tele _verbalize _vga_backsp _vga_
 functions:250 _vga_cliparound _vga_detect _vga_DisplayCell _vga_DisplayCell_O _vga_DrawCursor _vga_Finish _vga_FontPtrs _vga_get_scr_size
 functions:251 _vga_gotoloc _vga_HideCursor _vga_Init _vga_overview _vga_redrawmap _vga_refresh _vga_SetPalette _vga_SwitchMode
 functions:252 _vga_traditional _vga_tty_end_screen _vga_tty_startup _vga_update_positionbar _vga_userpan _vga_WriteChar _vga_WriteStr _vga_xputc
-functions:254 _vision_reset _dodiscovered _dodoor _dodown _dodrink _dodrop _doeat _doengrave
+functions:254 _vision_reset _dodiscovered _dodoor _dodown _dodrink _dodrop _doeat _doengrave _dogive
 functions:255 _wallification _wallify_map _wallify_vault _wantdoor  _watch_on_duty _water_damage _water_friction
 functions:256 _water_prayer _weapon_dam_bonus _weapon_hit_bonus _weapon_type _wearing_armor _weffects _weight
 functions:257 _weight_cap
