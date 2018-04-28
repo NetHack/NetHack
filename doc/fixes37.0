@@ -1,4 +1,4 @@
-$NHDT-Branch: master $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1524932114 2018/04/28 16:15:14 $
+$NHDT-Branch: master $:$NHDT-Revision: 1.2 $ $NHDT-Date: 1524945860 2018/04/28 20:04:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -10,11 +10,13 @@ Fixes to Post-3.7.0 Problems that Were Exposed Via git Repository
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+windows: bigroom.des requires makedefs preprocessing
 
 
 General New Features
 --------------------
 Conway's Life bigroom variant
+
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
