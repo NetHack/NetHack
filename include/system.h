@@ -1,5 +1,6 @@
 /* NetHack 3.6	system.h	$NHDT-Date: 1501723401 2017/08/03 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef SYSTEM_H

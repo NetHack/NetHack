@@ -41,6 +41,8 @@ typedef struct mswin_nethack_message_window {
     int yMax;   /* maximum vertical scrolling position */
     int xPage;  /* page size of horizontal scroll bar */
 } NHMessageWindow, *PNHMessageWindow;
+#define LINE_PADDING_LEFT(data)  (data->xChar * (2 - data->xPos))
+#define LINE_PADDING_RIGHT(data)  (0)
 
 static TCHAR szMessageWindowClass[] = TEXT("MSNHMessageWndClass");
 LRESULT CALLBACK NHMessageWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -599,7 +601,7 @@ onPaint(HWND hWnd)
     PNHMessageWindow data;
     RECT client_rt, draw_rt;
     int FirstLine, LastLine;
-    int i, x, y;
+    int i, y;
     HGDIOBJ oldFont;
     TCHAR wbuf[MAXWINDOWTEXT + 2];
     size_t wlen;
@@ -627,10 +629,9 @@ onPaint(HWND hWnd)
         y = min(ps.rcPaint.bottom, client_rt.bottom);
         for (i = LastLine; i >= FirstLine; i--) {
             char tmptext[MAXWINDOWTEXT + 1];
-            x = data->xChar * (2 - data->xPos);
 
-            draw_rt.left = x;
-            draw_rt.right = client_rt.right;
+            draw_rt.left = LINE_PADDING_LEFT(data);
+            draw_rt.right = client_rt.right - LINE_PADDING_RIGHT(data);
             draw_rt.top = y - data->yChar;
             draw_rt.bottom = y;
 
@@ -817,6 +818,8 @@ can_append_text(HWND hWnd, int attr, const char *text)
         mswin_get_font(NHW_MESSAGE, data->window_text[MSG_LINES - 1].attr,
                        hdc, FALSE));
     GetClientRect(hWnd, &draw_rt);
+    draw_rt.left += LINE_PADDING_LEFT(data);
+    draw_rt.right -= LINE_PADDING_RIGHT(data);
     draw_rt.bottom = draw_rt.top; /* we only need width for the DrawText */
     DrawText(hdc, tmptext, strlen(tmptext), &draw_rt,
              DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
@@ -861,8 +864,9 @@ more_prompt_check(HWND hWnd)
         SelectObject(hdc, mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, FALSE));
     for (i = 0; i < data->lines_not_seen; i++) {
         /* we only need width for the DrawText */
-        SetRect(&draw_rt, client_rt.left, client_rt.top, client_rt.right,
-                client_rt.top);
+        SetRect(&draw_rt,
+            client_rt.left + LINE_PADDING_LEFT(data), client_rt.top,
+            client_rt.right - LINE_PADDING_RIGHT(data), client_rt.top);
         SelectObject(hdc,
                      mswin_get_font(NHW_MESSAGE,
                                     data->window_text[MSG_LINES - i - 1].attr,

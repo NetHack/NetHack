@@ -171,3 +171,7 @@ creation.
 	An object of the NetHack development project is to get the game
 working on as many different types of hardware and under as many different
 operating systems as is practical.  Any assistance will be appreciated.
+
+# NetHack 3.6  Porting       $NHDT-Date: 1524689603 2018/04/25 20:53:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.5 $
+# Copyright (c) 2005 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.

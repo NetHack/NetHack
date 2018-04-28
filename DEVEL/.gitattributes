@@ -2,3 +2,5 @@
 nhgitset.pl NHSUBST
 hooksdir/* NHSUBST
 * text=auto
+DOTGIT/TARGET NH_header=no
+hooksdir/TARGET NH_header=no

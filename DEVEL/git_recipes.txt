@@ -1,7 +1,10 @@
+# NetHack 3.6  git_recipes.txt       $NHDT-Date: 1524689669 2018/04/25 20:54:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
+# Copyright (c) 2015 by Derek S. Ray
+# NetHack may be freely redistributed.  See license for details.
+
 Git has a messy learning curve. This file is an attempt to serve as a quick
 reference for basic tasks while you get up to speed.
 
-$NHDT-Date: 1429884051 2015/04/24 14:00:51 $
 ------------------------
 
 [*] git checkout [-f] (branch)

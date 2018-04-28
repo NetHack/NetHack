@@ -1,3 +1,7 @@
+# NetHack 3.6  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2006 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+
 # Sample config file for win32 NetHack
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
@@ -7,7 +11,7 @@
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
 #
-# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
 
 # *** OPTIONS ***
 #

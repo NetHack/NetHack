@@ -1,5 +1,6 @@
 /* NetHack 3.6	ioctl.c	$NHDT-Date: 1520099308 2018/03/03 17:48:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* This cannot be part of hack.tty.c (as it was earlier) since on some

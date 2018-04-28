@@ -56,30 +56,16 @@ The Visual Studio 2017 NetHack solution file can be found here:
 So the steps are:
     1. Launch the IDE.
     2. Open the appropriate solution file.
-    3. If you have a newer version of Visual Studio than what was used to build 
-       the solution and project files distributed with the NetHack sources, you 
-       can easily retarget the solution before the next step. Refer to the
-       "Note about the Windows SDK version" a couple of paragraphs below.
-    4. Select the build configuration you wish to use (Release, Debug, etc.).
-    5. From the build menu, select build solution.
-    6. Type F5 to start debugging.
+    3. Select the build configuration you wish to use (Release, Debug, etc.).
+    4. From the build menu, select build solution.
+    5. Type F5 to start debugging.
 
 You can also build all the projects for all platforms and configurations
 using a "build.bat" batch file found in the same directory as the solution.
 
-Change to the appropriate directory (i.e. win\win32\vs2015 for VS2015 builds,
-win\win32\vs2017 for VS2017 builds) and run "build.bat".
-
------------------------------------
-Note about the Windows SDK Version:
------------------------------------
-    The Visual Studio project files distributed for NetHack 3.6.1 are configured for the 
-    Windows SDK version 10.0.15063.0. At the time of writing, the Windows SDK version that
-    is distributed with VS2017 Community Edition is a newer 10.0.16299.0. If you have a build
-    error MSB8036, you will simply need to change the expected SDK version as follows:
-
-          o Open the solution in the IDE and in the project property pages, right-click the 
-            solution and select "Retarget solution".
+Open a developer command prompt for the version of Visual Studio you are
+using.  Change to the appropriate directory (i.e. win\win32\vs2015 for
+VS2015 builds, win\win32\vs2017 for VS2017 builds) and run "build.bat".
 
 /-----------------------------------\
 | Building Using Make               |

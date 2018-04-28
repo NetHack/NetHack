@@ -1,1 +1,6 @@
 Makefile.* NHSUBST
+NetHack.cnf NHSUBST
+termcap NH_header=no
+dgn_comp.h NH_header=no
+lev_comp.h NH_header=no
+Makefile.lib NH_header=no

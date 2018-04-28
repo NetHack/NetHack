@@ -1,5 +1,6 @@
 /* NetHack 3.6	os2conf.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 

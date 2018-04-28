@@ -1,5 +1,6 @@
 /* NetHack 3.6	weapon.c	$NHDT-Date: 1454660575 2016/02/05 08:22:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

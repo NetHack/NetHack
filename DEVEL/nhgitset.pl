@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-# $NHDT-Date$
+# $NHDT-Date: 1524689669 2018/04/25 20:54:29 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 # value of nethack.setupversion we will end up with when this is done
 # version 1 is reserved for repos checked out before versioning was added

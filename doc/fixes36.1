@@ -1,4 +1,4 @@
-$NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.448 $ $NHDT-Date: 1524780380 2018/04/26 22:06:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -39,7 +39,7 @@ make a previously-discovered scroll written with marker while blind have its
 #name or C for discoveries list that spanned multiple pages would exit on
 	space instead of advancing to next page (workaround: use '>' instead)
 don't show the old level when you die going down the stairs because of an
-        iron ball
+	iron ball
 new high score with ", while helpless" attribute appended would erroneously
 	result in ", while helpless" being appended to all following entries
 allow bright aliases for colors in menucolors
@@ -177,7 +177,7 @@ a few types of monster (barrow wight, Nazgul, erinys) have weapon attacks that
 	don't deal physical damage, so special damage like stoning via wielded
 	cockatrice corpse wouldn't be inflicted
 non-item-using monsters who happened to be carrying scroll or wand of fire or
-        a fire horn could use it to cure themselves of being turned into slime
+	a fire horn could use it to cure themselves of being turned into slime
 when looting multiple containers, add 'n' for "loot next container", change
 	'q' and ESC from "done with this container" to "done looting"
 change looting to choose ":iobrs nq" action from a menu for menustyle:Partial
@@ -542,6 +542,9 @@ at the prompt for entering a level annotation, responding with <return>
 reorder the #droptype menu and add some separator lines
 moving from a pit to an adjacent pit with uncleared debris shouldn't be a fall
 open drawbridge spanning ice would vanish if the ice melted
+if a warned-of mon moved onto a spot containing a 'remembered, unseen mon'
+	then moved off, the unseen marker was redisplayed even though the
+	hero should now know that the remembered monster isn't there anymore
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository

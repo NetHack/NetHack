@@ -1,5 +1,5 @@
 /**********************************************************************
-** $NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+** $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1524684508 2018/04/25 19:28:28 $
 ** $Id: qttableview.cpp,v 1.2 2002/03/09 03:13:15 jwalz Exp $
 **
 ** Implementation of QtTableView class

@@ -1,2 +1,4 @@
 Makefile.* NHSUBST
 *.com NHSUBST
+Install.vms NHSUBST
+sysconf NHSUBST
