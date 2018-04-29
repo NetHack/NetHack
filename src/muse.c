@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/26/18 by NullCGT */
+/* Edited on 4/29/18 by NullCGT */
 
 #include "hack.h"
 
@@ -272,6 +272,7 @@ struct obj *otmp;
 #define MUSE_UNICORN_HORN 17
 #define MUSE_POT_FULL_HEALING 18
 #define MUSE_LIZARD_CORPSE 19
+#define MUSE_WAN_HEALING 20
 /*
 #define MUSE_INNATE_TPT 9999
  * We cannot use this.  Since monsters get unlimited teleportation, if they
@@ -298,6 +299,11 @@ struct monst *mtmp;
     if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
         m.defensive = obj;
         m.has_defense = MUSE_POT_HEALING;
+        return TRUE;
+    }
+    if ((obj = m_carrying(mtmp, WAN_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_WAN_HEALING;
         return TRUE;
     }
     return FALSE;
@@ -579,6 +585,11 @@ struct monst *mtmp;
             if (obj->otyp == POT_HEALING) {
                 m.defensive = obj;
                 m.has_defense = MUSE_POT_HEALING;
+            }
+            nomore(MUSE_WAN_HEALING);
+            if (obj->otyp == WAN_HEALING) {
+                m.defensive = obj;
+                m.has_defense = MUSE_WAN_HEALING;
             }
         } else { /* Pestilence */
             nomore(MUSE_POT_FULL_HEALING);
@@ -954,6 +965,17 @@ struct monst *mtmp;
         if (oseen)
             makeknown(POT_HEALING);
         m_useup(mtmp, otmp);
+        return 2;
+    case MUSE_WAN_HEALING:
+        mzapmsg(mtmp, otmp, TRUE);
+        i = d(6, 4);
+        mtmp->mhp += i;
+        if (mtmp->mhp > mtmp->mhpmax)
+            mtmp->mhp = ++mtmp->mhpmax;
+        if (vismon)
+            pline("%s looks better.", Monnam(mtmp));
+        if (oseen)
+            makeknown(WAN_HEALING);
         return 2;
     case MUSE_POT_EXTRA_HEALING:
         mquaffmsg(mtmp, otmp);
@@ -2180,7 +2202,8 @@ struct obj *obj;
             return (boolean) (monstr[monsndx(mon->data)] < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER
-            || typ == WAN_CANCELLATION || typ == WAN_WISHING)
+            || typ == WAN_CANCELLATION || typ == WAN_WISHING
+            || typ == WAN_HEALING)
             return TRUE;
         break;
     case POTION_CLASS:
