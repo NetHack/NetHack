@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 4/29/18 by NullCGT */
 
 #include "hack.h"
 
@@ -330,6 +330,8 @@ struct obj *obj;
     getlin("How many cards will you draw?", buf);
     if (sscanf(buf, "%ld", &draws) != 1)
         draws = 0L;
+    if (draws > 5)
+        draws = 5;
     if (buf <= 0L || draws <= 0L) {
         pline("You decide not to try your luck.");
         pline("The pack of cards vanishes in a puff of smoke.");
@@ -366,6 +368,7 @@ struct obj *obj;
                 }
                 if ((pm = dlord(A_NONE)) != NON_PM)
                     makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
+                draws = 0;
                 break;
             case 4:
                 pline("You draw The Fool...");
@@ -385,20 +388,24 @@ struct obj *obj;
                 break;
             case 7:
                 pline("You draw The Emperor...");
+                pline("You feel worthless.");
                 attrcurse();
                 attrcurse();
                 break;
             case 8:
                 pline("You draw The Hermit...");
+                pline("What were you supposed to be doing here?");
                 forget_objects(100);
                 aggravate();
                 break;
             case 9:
                 pline("You draw The Hanged Man...");
+                pline("A hangman arrives!");
                 mtmp = makemon(&mons[PM_ROPE_GOLEM], u.ux, u.uy, NO_MM_FLAGS);
                 break;
             case 10:
                 pline("You draw Justice...");
+                pline("You are frozen by the power of Justice!");
                 nomul(-(rn1(30, 20)));
                 multi_reason = "frozen by fate";
                 nomovemsg = You_can_move_again;
@@ -410,7 +417,7 @@ struct obj *obj;
                 destroy_arm(some_armor(&youmonst));
                 break;
             case 12:
-                pline("You draw The Lovers!");
+                pline("You draw The Lovers! Some lovers appear!");
                 for (n = 0; n < 2; n++) {
                     if (!rn2(2))
                         mtmp = makemon(&mons[PM_SUCCUBUS],
@@ -427,7 +434,7 @@ struct obj *obj;
                 }
                     pline("You draw the Magician!");
                 u.uenmax += rn1(20,10);
-                u.uenmax = u.uenmax;
+                u.uen = u.uenmax;
                 break;
             case 14:
                 pline("You draw Strength!");
@@ -438,11 +445,11 @@ struct obj *obj;
                 adjalign(10);
                 break;
             case 16:
-                pline("You draw The Hierophant!");
+                pline("You draw The Hierophant! Your altar arrives.");
                 levl[u.ux][u.uy].typ = ALTAR;
                 break;
             case 17:
-                pline("You draw the Emperess!");
+                pline("You draw the Emperess! Your throne arrives.");
                 levl[u.ux][u.uy].typ = THRONE;
                 break;
             case 18:
