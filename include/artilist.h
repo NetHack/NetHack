@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* File changed 4/26/18 by NullCGT */
+/* File changed 4/29/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -225,7 +225,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *        Summons a superboss.
     */
     A("The King in Yellow", SPE_FINGER_OF_DEATH,
-      (SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
+      (SPFX_NOGEN | SPFX_HALRES), 0, 0, NO_ATTK, NO_DFNS, NO_CARY,
       KING, A_NONE, NON_PM, NON_PM, 30L, NO_COLOR),
 
     A("Cleaver", BATTLE_AXE, SPFX_RESTR, 0, 0, PHYS(3, 6), NO_DFNS, NO_CARY,

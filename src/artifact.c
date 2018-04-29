@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/16/18 by NullCGT */
+/* Edited 4/29/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1248,7 +1248,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     }
     if (attacks(AD_ACID, otmp)) {
         if (realizes_damage)
-            pline_The("sizzling mace %s %s%c",
+            pline_The("sizzling sword %s %s%c",
                       !spec_dbon_applies ? "hits" : "melts", hittee,
                       !spec_dbon_applies ? '.' : '!');
         return realizes_damage;

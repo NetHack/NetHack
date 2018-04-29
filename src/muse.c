@@ -2763,8 +2763,9 @@ mmake_wish(mon)
 struct monst *mon;
 {
     register int cnt;
+    register boolean wearable = FALSE;
     register struct obj *otmp;
-    switch(rn2(4)) {
+    switch(rn2(6)) {
         case 1:
             for (cnt = 0; cnt < 1 + rn2(3); cnt++) {
                 otmp = mksobj(POT_GAIN_LEVEL, FALSE, FALSE);
@@ -2777,15 +2778,42 @@ struct monst *mon;
             bless(otmp);
             (void) mpickobj(mon, otmp);
             break;
+        case 3:
+            otmp = mksobj(AMULET_OF_LIFE_SAVING, FALSE, FALSE);
+            bless(otmp);
+            (void) mpickobj(mon, otmp);
+            wearable = TRUE;
+            break;
+        case 4:
+            /* This is fine for dragons, because an artifact would be a good
+               addition to their horde. */
+            otmp = mk_artifact((struct obj *)0, mon->malign);
+            bless(otmp);
+            (void) mpickobj(mon, otmp);
+            wearable = TRUE;
+            break;
+        case 5:
+            if (mon->mreflect == 1 || monsndx(mon->data) == PM_SILVER_DRAGON) {
+                if (humanoid(mon->data))
+                    otmp = mksobj(SILVER_DRAGON_SCALE_MAIL, FALSE, FALSE);
+                else
+                    otmp = mksobj(AMULET_OF_REFLECTION, FALSE, FALSE);
+                bless(otmp);
+                (void) mpickobj(mon, otmp);
+                wearable = TRUE;
+                break;
+            }
+        /* FALLTHRU */
         default:
             if (is_dragon(mon->data)) {
-                /* Dragons are already tough enough, and they want more money,
-                   so they wish for the maximum amount of gold.*/
+                /* Dragons don't have a use for wands of death */
                 (void) mkmonmoney(mon, 5000);
             }
             else {
                 (void) mongets(mon, WAN_DEATH);
             }
     }
+    if (wearable)
+        m_dowear(mon, FALSE);
 }
 /*muse.c*/
