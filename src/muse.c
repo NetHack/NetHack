@@ -130,8 +130,7 @@ struct obj *obj;
                     if (vis)
                         pline("%s vanishes.", Monnam(mtmp));
                     mongone(mtmp);
-                }
-                if (rn2(2)) {
+                } else if (rn2(2)) {
                     verbalize("You freed me!");
                     mtmp->mpeaceful = 1;
                     set_malign(mtmp);
