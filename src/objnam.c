@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1521507553 2018/03/20 00:59:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1525012618 2018/04/29 14:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1146,7 +1146,8 @@ unsigned doname_flags;
 
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
-            Sprintf(eos(bp), " (weapon in %s)", hand_s);
+            Sprintf(eos(bp), " (%sweapon in %s)",
+                    (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
 
             if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
                 /* presumably can be felt when blind */

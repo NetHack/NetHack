@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1490908464 2017/03/30 21:14:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1525012595 2018/04/29 14:36:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -175,6 +175,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 enum bhit_call_types {
     ZAPPED_WAND = 0,
     THROWN_WEAPON,
+    THROWN_TETHERED_WEAPON,
     KICKED_WEAPON,
     FLASHED_LIGHT,
     INVIS_BEAM
