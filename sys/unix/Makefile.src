@@ -275,7 +275,7 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 WINQTLIB = -L$(QTDIR)/lib -lqt
 #
 # libraries for Qt 4
-WINQT4LIB = `pkg-config QtGui --libs`
+WINQT4LIB = `pkg-config $(QTGUI) --libs`
 #
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
@@ -558,25 +558,25 @@ qttableview.moc: ../include/qttableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt4kde0.moc : ../win/Qt4/qt4kde0.h
-	$(QTDIR)/bin/moc -o qt4kde0.moc ../win/Qt4/qt4kde0.h
+	$(MOC) -o qt4kde0.moc ../win/Qt4/qt4kde0.h
 qt4main.moc : ../win/Qt4/qt4main.h
-	$(QTDIR)/bin/moc -o qt4main.moc ../win/Qt4/qt4main.h
+	$(MOC) -o qt4main.moc ../win/Qt4/qt4main.h
 qt4map.moc : ../win/Qt4/qt4map.h
-	$(QTDIR)/bin/moc -o qt4map.moc ../win/Qt4/qt4map.h
+	$(MOC) -o qt4map.moc ../win/Qt4/qt4map.h
 qt4menu.moc : ../win/Qt4/qt4menu.h
-	$(QTDIR)/bin/moc -o qt4menu.moc ../win/Qt4/qt4menu.h
+	$(MOC) -o qt4menu.moc ../win/Qt4/qt4menu.h
 qt4msg.moc : ../win/Qt4/qt4msg.h
-	$(QTDIR)/bin/moc -o qt4msg.moc ../win/Qt4/qt4msg.h
+	$(MOC) -o qt4msg.moc ../win/Qt4/qt4msg.h
 qt4plsel.moc : ../win/Qt4/qt4plsel.h
-	$(QTDIR)/bin/moc -o qt4plsel.moc ../win/Qt4/qt4plsel.h
+	$(MOC) -o qt4plsel.moc ../win/Qt4/qt4plsel.h
 qt4set.moc : ../win/Qt4/qt4set.h
-	$(QTDIR)/bin/moc -o qt4set.moc ../win/Qt4/qt4set.h
+	$(MOC) -o qt4set.moc ../win/Qt4/qt4set.h
 qt4stat.moc : ../win/Qt4/qt4stat.h
-	$(QTDIR)/bin/moc -o qt4stat.moc ../win/Qt4/qt4stat.h
+	$(MOC) -o qt4stat.moc ../win/Qt4/qt4stat.h
 qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
-	$(QTDIR)/bin/moc -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+	$(MOC) -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
 qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
-	$(QTDIR)/bin/moc -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+	$(MOC) -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \

@@ -16,6 +16,12 @@ SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
 
+# For Qt 4:
+QTGUI=QtGui
+MOC=$(QTDIR)/bin/moc
+# For Qt 5:
+#QTGUI=Qt5Gui Qt5Widgets Qt5Multimedia
+#MOC=$(QTDIR)/bin/moc-qt5
 
 POSTINSTALL= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
@@ -28,7 +34,8 @@ CFLAGS+=-DTIMED_DELAY
 CFLAGS+=-DDUMPLOG
 CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
 CFLAGS+=-DQT_GRAPHICS -DDEFAULT_WINDOW_SYS=\"Qt\" -DNOTTYGRAPHICS
-CFLAGS+=`pkg-config QtGui --cflags`
+CFLAGS+=`pkg-config $(QTGUI) --cflags`
+CFLAGS+=-fPIC
 
 LINK=g++
 CXX=g++
