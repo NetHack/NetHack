@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1524470244 2018/04/23 07:57:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.275 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1525012627 2018/04/29 14:37:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.277 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3107,7 +3107,7 @@ int range, *skipstart, *skipend;
 struct monst *
 bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj)
 register int ddx, ddy, range;          /* direction and range */
-int weapon;                            /* see values in hack.h */
+enum bhit_call_types weapon;           /* defined in hack.h */
 int FDECL((*fhitm), (MONST_P, OBJ_P)), /* fns called when mon/obj hit */
     FDECL((*fhito), (OBJ_P, OBJ_P));
 struct obj **pobj; /* object tossed/used, set to NULL
@@ -3118,6 +3118,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
     uchar typ;
     boolean shopdoor = FALSE, point_blank = TRUE;
     boolean in_skip = FALSE, allow_skip = FALSE;
+    boolean tethered_weapon = FALSE;
     int skiprange_start = 0, skiprange_end = 0, skipcount = 0;
 
     if (weapon == KICKED_WEAPON) {
@@ -3137,6 +3138,10 @@ struct obj **pobj; /* object tossed/used, set to NULL
 
     if (weapon == FLASHED_LIGHT) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (weapon == THROWN_TETHERED_WEAPON && obj) {
+            tethered_weapon = TRUE;
+            weapon = THROWN_WEAPON;     /* simplify if's that follow below */
+            tmp_at(DISP_TETHER, obj_to_glyph(obj));
     } else if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM)
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
 
@@ -3262,8 +3267,11 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 if (!mtmp->minvis || perceives(mtmp->data))
                     return mtmp;
             } else if (weapon != ZAPPED_WAND) {
+
                 /* THROWN_WEAPON, KICKED_WEAPON */
-                tmp_at(DISP_END, 0);
+                if (!tethered_weapon)
+                    tmp_at(DISP_END, 0);
+
                 if (cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp))
                     map_invisible(bhitpos.x, bhitpos.y);
                 return mtmp;
@@ -3367,7 +3375,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         point_blank = FALSE; /* affects passing through iron bars */
     }
 
-    if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM)
+    if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM && !tethered_weapon)
         tmp_at(DISP_END, 0);
 
     if (shopdoor)
