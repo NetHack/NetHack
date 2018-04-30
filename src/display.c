@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1525012604 2018/04/29 14:36:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1525056598 2018/04/30 02:49:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -124,6 +124,7 @@ STATIC_DCL void FDECL(display_warning, (struct monst *));
 
 STATIC_DCL int FDECL(check_pos, (int, int, int));
 STATIC_DCL int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
+STATIC_DCL int FDECL(tether_glyph, (int, int));
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
@@ -894,6 +895,7 @@ xchar x, y;
 
 int
 tether_glyph(x, y)
+int x, y;
 {
     int tdx, tdy;
     tdx = u.ux - x;
