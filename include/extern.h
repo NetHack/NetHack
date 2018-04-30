@@ -92,7 +92,7 @@ E const char *glow_color(int);
 E void Sting_effects(int);
 E int retouch_object(struct obj **, boolean);
 E void retouch_equipment(int);
-E void mkot_trap_warn();
+E void mkot_trap_warn(void);
 E boolean is_magic_key(struct monst *, struct obj *);
 E struct obj *has_magic_key(struct monst *);
 
@@ -145,7 +145,7 @@ E int getbones(void);
 /* ### botl.c ### */
 
 E char *do_statusline1(void);
-E void check_gold_symbol();
+E void check_gold_symbol(void);
 E char *do_statusline2(void);
 E int xlev_to_rank(int);
 E int title_to_mon(const char *, int *, int *);
@@ -159,19 +159,19 @@ E void bot(void);
 E void status_initialize(boolean);
 E void status_finish(void);
 E void status_notify_windowport(boolean);
-E void status_eval_next_unhilite();
+E void status_eval_next_unhilite(void);
 #ifdef STATUS_HILITES
 E boolean parse_status_hl1(char *op, boolean);
-E void clear_status_hilites();
-E void reset_status_hilites();
-E int count_status_hilites();
-E boolean status_hilite_menu();
+E void clear_status_hilites(void);
+E void reset_status_hilites(void);
+E int count_status_hilites(void);
+E boolean status_hilite_menu(void);
 #endif
 
 /* ### cmd.c ### */
 
-E int doconduct();
-E int domonability();
+E int doconduct(void);
+E int domonability(void);
 E char cmd_from_func(int (*)(void));
 E boolean redraw_cmd(char);
 #ifdef USE_TRAMPOLI
@@ -1911,7 +1911,7 @@ E const char *bottlename(void);
 /* ### pray.c ### */
 
 E boolean critically_low_hp(boolean);
-E boolean stuck_in_wall();
+E boolean stuck_in_wall(void);
 #ifdef USE_TRAMPOLI
 E int prayer_done(void);
 #endif
@@ -2486,7 +2486,7 @@ E void port_help(void);
 E void sethanguphandler(void (*)(int));
 E boolean authorize_wizard_mode(void);
 E boolean check_user_string(char *);
-E char *get_login_name();
+E char *get_login_name(void);
 #endif /* UNIX */
 
 /* ### unixtty.c ### */

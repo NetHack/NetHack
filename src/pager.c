@@ -1774,7 +1774,7 @@ domenucontrols()
 
 /* data for dohelp() */
 static struct {
-    void (*f)();
+    void (*f)(void);
     const char *text;
 } help_menu_items[] = {
     { hmenu_doextversion, "About NetHack (version information)." },

@@ -313,9 +313,7 @@ strategy(register struct monst *mtmp)
 }
 
 void
-choose_stairs(sx, sy)
-xchar *sx;
-xchar *sy;
+choose_stairs(xchar *sx, xchar *sy)
 {
     xchar x = 0, y = 0;
 

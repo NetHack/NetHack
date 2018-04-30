@@ -3993,9 +3993,7 @@ accept_menu_prefix(int (*cmd_func)(void))
 }
 
 int
-ch2spkeys(c, start, end)
-char c;
-int start,end;
+ch2spkeys(char c, int start, int end)
 {
     int i;
 
@@ -4292,8 +4290,7 @@ redraw_cmd(char c)
 }
 
 boolean
-prefix_cmd(c)
-char c;
+prefix_cmd(char c)
 {
     return (c == Cmd.spkeys[NHKF_RUSH]
             || c == Cmd.spkeys[NHKF_RUN]

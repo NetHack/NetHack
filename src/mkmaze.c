@@ -599,16 +599,14 @@ fixup_special()
 }
 
 boolean
-maze_inbounds(x, y)
-int x, y;
+maze_inbounds(int x, int y)
 {
     return (x >= 2 && y >= 2
             && x < x_maze_max && y < y_maze_max && isok(x, y));
 }
 
 void
-maze_remove_deadends(typ)
-xchar typ;
+maze_remove_deadends(xchar typ)
 {
     char dirok[4];
     int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
@@ -654,9 +652,7 @@ xchar typ;
  * TODO: rewrite walkfrom so it works on temp space, not levl
  */
 void
-create_maze(corrwid, wallthick)
-int corrwid;
-int wallthick;
+create_maze(int corrwid, int wallthick)
 {
     int x,y;
     coord mm;

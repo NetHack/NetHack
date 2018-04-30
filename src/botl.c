@@ -2388,8 +2388,7 @@ status_hilite_linestr_gather()
 
 
 char *
-status_hilite2str(hl)
-struct hilite_s *hl;
+status_hilite2str(struct hilite_s *hl)
 {
     static char buf[BUFSZ];
     int clr = 0, attr = 0;
@@ -2501,8 +2500,7 @@ status_hilite_menu_choose_field()
 }
 
 int
-status_hilite_menu_choose_behavior(fld)
-int fld;
+status_hilite_menu_choose_behavior(int fld)
 {
     winid tmpwin;
     int res = 0, beh = BL_TH_NONE-1;
@@ -2591,9 +2589,7 @@ int fld;
 }
 
 int
-status_hilite_menu_choose_updownboth(fld, str)
-int fld;
-const char *str;
+status_hilite_menu_choose_updownboth(int fld, const char *str)
 {
     int res, ret = -2;
     winid tmpwin;
@@ -2645,8 +2641,7 @@ const char *str;
 }
 
 STATIC_OVL boolean
-status_hilite_menu_add(origfld)
-int origfld;
+status_hilite_menu_add(int origfld)
 {
     int fld;
     int behavior;
@@ -2951,8 +2946,7 @@ choose_color:
 }
 
 boolean
-status_hilite_remove(id)
-int id;
+status_hilite_remove(int id)
 {
     struct _status_hilite_line_str *hlstr = status_hilite_str;
 
@@ -3001,8 +2995,7 @@ int id;
 }
 
 boolean
-status_hilite_menu_fld(fld)
-int fld;
+status_hilite_menu_fld(int fld)
 {
     winid tmpwin;
     int i, res;

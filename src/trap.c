@@ -782,10 +782,7 @@ keep_saddle_with_steedcorpse(unsigned steed_mid, struct obj *objchn, struct obj 
 /* monster or you go through and possibly destroy a web.
    return TRUE if could go through. */
 boolean
-mu_maybe_destroy_web(mtmp, domsg, trap)
-struct monst *mtmp;
-boolean domsg;
-struct trap *trap;
+mu_maybe_destroy_web(struct monst *mtmp, boolean domsg, struct trap *trap)
 {
     boolean isyou = (mtmp == &youmonst);
     struct permonst *mptr = mtmp->data;
