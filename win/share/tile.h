@@ -1,4 +1,7 @@
-/* NetHack 3.6  tile.h       $NHDT-Date: 1466687973 2016/06/23 13:19:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6  tile.h       $NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
+/*      Copyright (c) 2016 by Michael Allison             */
+/* NetHack may be freely redistributed.  See license for details. */
+
 typedef unsigned char pixval;
 
 typedef struct pixel_s {

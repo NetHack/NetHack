@@ -1,6 +1,17 @@
-.TH MAKEDEFS 6 "29 Apr 2010"
-.\" NetHack 3.6  makedefs.6	$NHDT-Date: 1432512786 2015/05/25 00:13:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $
-.UC 4
+.TH MAKEDEFS 6 "25 May 2015" NETHACK
+.de ND
+.ds Nd \\$3
+..
+.de NB
+.ds Nb \\$2
+..
+.de NR
+.ds Nr \\$2
+..
+.ND $NHDT-Date: 1524689549 2018/04/25 20:52:29 $
+.NB $NHDT-Branch: NetHack-3.6.0 $
+.NR $NHDT-Revision: 1.10 $
+.ds Na Kenneth Lorber
 .SH NAME
 makedefs \- NetHack miscellaneous build-time functions
 .SH SYNOPSIS
@@ -85,6 +96,14 @@ Generate
 .I date.h
 and
 .I options
+file. It will read 
+.IR dat/gitinfo.txt ,
+only if it is present, to obtain 
+.B githash=
+and 
+.B gitbranch=
+ info and include related preprocessor #defines in
+.I date.h
 file.
 .br
 .TP
@@ -126,7 +145,7 @@ and
 .IR vis_tab.h .
 .SH LONG COMMANDS
 .TP
-.BI --debug
+.B --debug
 Show debugging output.
 .br
 .TP
@@ -250,3 +269,7 @@ The NetHack Development Team
 .SH "SEE ALSO"
 .PP
 .BR dgn_comp (6)
+.SH COPYRIGHT
+This file is Copyright (C) \*(Na and was last modified \*(Nd (version
+\*(Nb:\*(Nr).
+NetHack may be freely redistributed.  See license for details.

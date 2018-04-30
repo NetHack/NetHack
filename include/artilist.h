@@ -1,5 +1,6 @@
 /* NetHack 3.6  artilist.h      $NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifdef MAKEDEFS_C
@@ -208,6 +209,9 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
       PHYS(5, 0), NO_DFNS, NO_CARY, CREATE_AMMO, A_CHAOTIC, PM_RANGER, NON_PM,
       4000L, NO_COLOR),
 
+    /* MKoT has an additional carry property if the Key is not cursed (for
+       rogues) or blessed (for non-rogues):  #untrap of doors and chests
+       will always find any traps and disarming those will always succeed */
     A("The Master Key of Thievery", SKELETON_KEY,
       (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK),
       (SPFX_WARN | SPFX_TCTRL | SPFX_HPHDAM), 0, NO_ATTK, NO_DFNS, NO_CARY,

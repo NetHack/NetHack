@@ -12,6 +12,6 @@
 int mswin_getlin_window(const char *question, char *result,
                         size_t result_size);
 int mswin_ext_cmd_window(int *selection);
-int mswin_player_selection_window(int *selection);
+boolean mswin_player_selection_window();
 
 #endif /* MSWINDlgWindow_h */

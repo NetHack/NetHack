@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1501803105 2017/08/03 23:31:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1524287214 2018/04/21 05:06:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,43 +145,47 @@ enum opcode_defs {
  * mean.
  */
 /* MONSTER */
-#define SP_M_V_PEACEFUL 0
-#define SP_M_V_ALIGN 1
-#define SP_M_V_ASLEEP 2
-#define SP_M_V_APPEAR 3
-#define SP_M_V_NAME 4
+enum sp_mon_var_flags {
+    SP_M_V_PEACEFUL = 0,
+    SP_M_V_ALIGN,
+    SP_M_V_ASLEEP,
+    SP_M_V_APPEAR,
+    SP_M_V_NAME,
+    SP_M_V_FEMALE,
+    SP_M_V_INVIS,
+    SP_M_V_CANCELLED,
+    SP_M_V_REVIVED,
+    SP_M_V_AVENGE,
+    SP_M_V_FLEEING,
+    SP_M_V_BLINDED,
+    SP_M_V_PARALYZED,
+    SP_M_V_STUNNED,
+    SP_M_V_CONFUSED,
+    SP_M_V_SEENTRAPS,
 
-#define SP_M_V_FEMALE 5
-#define SP_M_V_INVIS 6
-#define SP_M_V_CANCELLED 7
-#define SP_M_V_REVIVED 8
-#define SP_M_V_AVENGE 9
-#define SP_M_V_FLEEING 10
-#define SP_M_V_BLINDED 11
-#define SP_M_V_PARALYZED 12
-#define SP_M_V_STUNNED 13
-#define SP_M_V_CONFUSED 14
-#define SP_M_V_SEENTRAPS 15
-
-#define SP_M_V_END 16 /* end of variable parameters */
+    SP_M_V_END
+};
 
 /* OBJECT */
-#define SP_O_V_SPE 0
-#define SP_O_V_CURSE 1
-#define SP_O_V_CORPSENM 2
-#define SP_O_V_NAME 3
-#define SP_O_V_QUAN 4
-#define SP_O_V_BURIED 5
-#define SP_O_V_LIT 6
-#define SP_O_V_ERODED 7
-#define SP_O_V_LOCKED 8
-#define SP_O_V_TRAPPED 9
-#define SP_O_V_RECHARGED 10
-#define SP_O_V_INVIS 11
-#define SP_O_V_GREASED 12
-#define SP_O_V_BROKEN 13
-#define SP_O_V_COORD 14
-#define SP_O_V_END 15 /* end of variable parameters */
+enum sp_obj_var_flags {
+    SP_O_V_SPE = 0,
+    SP_O_V_CURSE,
+    SP_O_V_CORPSENM,
+    SP_O_V_NAME,
+    SP_O_V_QUAN,
+    SP_O_V_BURIED,
+    SP_O_V_LIT,
+    SP_O_V_ERODED,
+    SP_O_V_LOCKED,
+    SP_O_V_TRAPPED,
+    SP_O_V_RECHARGED,
+    SP_O_V_INVIS,
+    SP_O_V_GREASED,
+    SP_O_V_BROKEN,
+    SP_O_V_COORD,
+
+    SP_O_V_END
+};
 
 /* When creating objects, we need to know whether
  * it's a container and/or contents.
@@ -346,7 +350,7 @@ typedef struct {
 typedef struct {
     packed_coord coord;
     xchar x, y, type;
-} trap;
+} spltrap;
 
 typedef struct {
     Str_or_Len name, appear_as;

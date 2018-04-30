@@ -1,5 +1,6 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1490908467 2017/03/30 21:14:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	getline.c	$NHDT-Date: 1523619111 2018/04/13 11:31:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -50,8 +51,19 @@ hooked_tty_getlin(const char *query, register char *bufp, getlin_hook_proc hook)
     cw->flags &= ~WIN_STOP;
     ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
+
+    /* issue the prompt */
     custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
-    *obufp = 0;
+#ifdef EDIT_GETLIN
+    /* bufp is input/output; treat current contents (presumed to be from
+       previous getlin()) as default input */
+    addtopl(obufp);
+    bufp = eos(obufp);
+#else
+    /* !EDIT_GETLIN: bufp is output only; init it to empty */
+    *bufp = '\0';
+#endif
+
     for (;;) {
         (void) fflush(stdout);
         Strcat(strcat(strcpy(toplines, query), " "), obufp);
@@ -123,11 +135,7 @@ hooked_tty_getlin(const char *query, register char *bufp, getlin_hook_proc hook)
 #endif                            /* NEWAUTOCOMP */
             } else
                 tty_nhbell();
-#if defined(apollo)
         } else if (c == '\n' || c == '\r') {
-#else
-        } else if (c == '\n') {
-#endif
 #ifndef NEWAUTOCOMP
             *bufp = 0;
 #endif /* not NEWAUTOCOMP */
@@ -206,7 +214,7 @@ xwaitforspace(register const char *s) /* chars allowed besides return */
         !program_state.done_hup &&
 #endif
         (c = tty_nhgetch()) != EOF) {
-        if (c == '\n')
+        if (c == '\n' || c == '\r')
             break;
 
         if (iflags.cbreak) {
@@ -216,7 +224,7 @@ xwaitforspace(register const char *s) /* chars allowed besides return */
                 morc = '\033';
                 break;
             }
-            if ((s && index(s, c)) || c == x) {
+            if ((s && index(s, c)) || c == x || (x == '\n' && c == '\r')) {
                 morc = (char) c;
                 break;
             }
@@ -281,6 +289,7 @@ tty_get_ext_cmd()
      *                      ? ext_cmd_getlin_hook
      *                      : (getlin_hook_proc) 0);
      */
+    buf[0] = '\0';
     hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc) 0
                                            : ext_cmd_getlin_hook);
     (void) mungspaces(buf);

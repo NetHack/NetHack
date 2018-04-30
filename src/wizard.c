@@ -1,5 +1,6 @@
 /* NetHack 3.6	wizard.c	$NHDT-Date: 1456618999 2016/02/28 00:23:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* wizard code - inspired by rogue code from Merlyn Leroy (digi-g!brian) */
@@ -378,7 +379,7 @@ tactics(register struct monst *mtmp)
                 mtmp->mhp += rnd(8);
                 return 1;
             }
-    /* fall through :-) */
+        /*FALLTHRU*/
 
     case STRAT_NONE: /* harass */
         if (!rn2(!mtmp->mflee ? 5 : 33))

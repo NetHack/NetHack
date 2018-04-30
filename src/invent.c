@@ -1,5 +1,6 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1498078873 2017/06/21 21:01:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1519672703 2018/02/26 19:18:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -23,7 +24,7 @@ STATIC_PTR int ckvalidcat(struct obj *);
 STATIC_PTR char *safeq_xprname(struct obj *);
 STATIC_PTR char *safeq_shortxprname(struct obj *);
 STATIC_DCL char display_pickinv(const char *, const char *,
-                                boolean, long *);
+                                        const char *, boolean, long *);
 STATIC_DCL char display_used_invlets(char);
 STATIC_DCL boolean this_type_only(struct obj *);
 STATIC_DCL void dounpaid(void);
@@ -386,7 +387,7 @@ merged(struct obj **potmp, struct obj **pobj)
         otmp->quan += obj->quan;
         /* temporary special case for gold objects!!!! */
         if (otmp->oclass == COIN_CLASS)
-            otmp->owt = weight(otmp);
+            otmp->owt = weight(otmp), otmp->bknown = 0;
         /* and puddings!!!1!!one! */
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
@@ -497,12 +498,21 @@ addinv_core1(struct obj *obj)
         }
         set_artifact_intrinsic(obj, 1, W_ART);
     }
-    if (is_mines_prize(obj) && obj->record_achieve_special) {
+
+    /* "special achievements" aren't discoverable during play, they
+       end up being recorded in XLOGFILE at end of game, nowhere else;
+       record_achieve_special overloads corpsenm which is ordinarily
+       initialized to NON_PM (-1) rather than to 0; any special prize
+       must never be a corpse, egg, tin, figurine, or statue because
+       their use of obj->corpsenm for monster type would conflict,
+       nor be a leash (corpsenm overloaded for m_id of leashed
+       monster) or a novel (corpsenm overloaded for novel index) */
+    if (is_mines_prize(obj)) {
         u.uachieve.mines_luckstone = 1;
-        obj->record_achieve_special = 0;
-    } else if (is_soko_prize(obj) && obj->record_achieve_special) {
+        obj->record_achieve_special = NON_PM;
+    } else if (is_soko_prize(obj)) {
         u.uachieve.finish_sokoban = 1;
-        obj->record_achieve_special = 0;
+        obj->record_achieve_special = NON_PM;
     }
 }
 
@@ -580,6 +590,11 @@ addinv(struct obj *obj)
 
     /* fill empty quiver if obj was thrown */
     if (flags.pickup_thrown && !uquiver && obj_was_thrown
+        /* if Mjollnir is thrown and fails to return, we want to
+           auto-pick it when we move to its spot, but not into quiver;
+           aklyses behave like Mjollnir when thrown while wielded, but
+           we lack sufficient information here make them exceptions */
+        && obj->oartifact != ART_MJOLLNIR
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
 added:
@@ -598,8 +613,7 @@ added:
 void
 carry_obj_effects(struct obj *obj)
 {
-    /* Cursed figurines can spontaneously transform
-       when carried. */
+    /* Cursed figurines can spontaneously transform when carried. */
     if (obj->otyp == FIGURINE) {
         if (obj->cursed && obj->corpsenm != NON_PM
             && !dead_species(obj->corpsenm, TRUE)) {
@@ -1044,6 +1058,8 @@ getobj(register const char *let, register const char *word)
     xchar foox = 0;
     long cnt;
     boolean cntgiven = FALSE;
+    boolean msggiven = FALSE;
+    boolean oneloop = FALSE;
     long dummymask;
 
     if (*let == ALLOW_COUNT)
@@ -1185,6 +1201,8 @@ getobj(register const char *let, register const char *word)
              || (!strcmp(word, "charge") && !is_chargeable(otmp))
              || (!strcmp(word, "open") && otyp != TIN)
              || (!strcmp(word, "call") && !objtyp_is_callable(otyp))
+             || (!strcmp(word, "adjust") && otmp->oclass == COIN_CLASS
+                 && !usegold)
              ) {
                 foo--;
             }
@@ -1252,15 +1270,24 @@ getobj(register const char *let, register const char *word)
     for (;;) {
         cnt = 0;
         cntgiven = FALSE;
-        if (!buf[0]) {
-            Sprintf(qbuf, "What do you want to %s? [*]", word);
-        } else {
-            Sprintf(qbuf, "What do you want to %s? [%s or ?*]", word, buf);
-        }
+        Sprintf(qbuf, "What do you want to %s?", word);
         if (in_doagain)
             ilet = readchar();
-        else
+        else if (iflags.force_invmenu) {
+            /* don't overwrite a possible quitchars */
+            if (!oneloop)
+                ilet = *let ? '?' : '*';
+            if (!msggiven)
+                putmsghistory(qbuf, FALSE);
+            msggiven = TRUE;
+            oneloop = TRUE;
+        } else {
+            if (!buf[0])
+                Strcat(qbuf, " [*]");
+            else
+                Sprintf(eos(qbuf), " [%s or ?*]", buf);
             ilet = yn_function(qbuf, (char *) 0, '\0');
+        }
         if (digit(ilet)) {
             long tmpcnt = 0;
 
@@ -1299,13 +1326,17 @@ getobj(register const char *let, register const char *word)
             }
             return (allownone ? &zeroobj : (struct obj *) 0);
         }
+redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
            select-from-invent before checking whether gold has been picked */
         if (ilet == '?' || ilet == '*') {
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
             long ctmp = 0;
+            char menuquery[QBUFSZ];
 
-            qbuf[0] = '\0';
+            menuquery[0] = qbuf[0] = '\0';
+            if (iflags.force_invmenu)
+                Sprintf(menuquery, "What do you want to %s?", word);
             if (!strcmp(word, "grease"))
                 Sprintf(qbuf, "your %s", makeplural(body_part(FINGER)));
             else if (!strcmp(word, "write with"))
@@ -1321,6 +1352,7 @@ getobj(register const char *let, register const char *word)
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;
             ilet = display_pickinv(allowed_choices, *qbuf ? qbuf : (char *) 0,
+                                   menuquery,
                                    TRUE, allowcnt ? &ctmp : (long *) 0);
             if (!ilet)
                 continue;
@@ -1331,6 +1363,8 @@ getobj(register const char *let, register const char *word)
                     pline1(Never_mind);
                 return (struct obj *) 0;
             }
+            if (ilet == '*')
+                goto redo_menu;
             if (allowcnt && ctmp >= 0) {
                 cnt = ctmp;
                 cntgiven = TRUE;
@@ -1518,7 +1552,7 @@ ggetobj(const char *word,
     int oletct, iletct, unpaid, oc_of_sym;
     char sym, *ip, olets[MAXOCLASSES + 5], ilets[MAXOCLASSES + 10];
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
-    char buf[BUFSZ], qbuf[QBUFSZ];
+    char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
     if (!invent) {
         You("have nothing to %s.", word);
@@ -1794,6 +1828,7 @@ nextclass:
         switch (sym) {
         case 'a':
             allflag = 1;
+            /*FALLTHRU*/
         case 'y':
             tmp = (*fn)(otmp);
             if (tmp < 0) {
@@ -1810,6 +1845,7 @@ nextclass:
             cnt += tmp;
             if (--mx == 0)
                 goto ret;
+            /*FALLTHRU*/
         case 'n':
             if (nodot)
                 dud++;
@@ -2096,9 +2132,11 @@ free_pickinv_cache()
 STATIC_OVL char
 display_pickinv(register const char *lets,
                 const char *xtra_choice, /* "fingers", pick hands rather than an object */
-                boolean want_reply,
+                const char *query,
+                boolean want_reply, 
                 long *out_cnt)
 {
+    static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp;
     char ilet, ret;
     char *invlet = flags.inv_order;
@@ -2145,7 +2183,7 @@ display_pickinv(register const char *lets,
         ++n;
 
     if (n == 0) {
-        pline("Not carrying anything.");
+        pline("%s.", not_carrying_anything);
         return 0;
     }
 
@@ -2153,7 +2191,7 @@ display_pickinv(register const char *lets,
     if (!flags.invlet_constant)
         reassign();
 
-    if (n == 1) {
+    if (n == 1 && !iflags.force_invmenu) {
         /* when only one item of interest, use pline instead of menus;
            we actually use a fake message-line menu in order to allow
            the user to perform selection at the --More-- prompt for tty */
@@ -2233,7 +2271,25 @@ nextclass:
             goto nextclass;
         }
     }
-    end_menu(win, (char *) 0);
+    if (iflags.force_invmenu && lets && want_reply) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                 "Special", MENU_UNSELECTED);
+        any.a_char = '*';
+        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
+                 "(list everything)", MENU_UNSELECTED);
+    }
+    /* for permanent inventory where we intend to show everything but
+       nothing has been listed (because there isn't anyhing to list;
+       recognized via any.a_char still being zero; the n==0 case above
+       gets skipped for perm_invent), put something into the menu */
+    if (flags.perm_invent && !lets && !any.a_char) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, 0,
+                 not_carrying_anything, MENU_UNSELECTED);
+        want_reply = FALSE;
+    }
+    end_menu(win, query && *query ? query : (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
     if (n > 0) {
@@ -2257,7 +2313,8 @@ nextclass:
 char
 display_inventory(const char *lets, boolean want_reply)
 {
-    return display_pickinv(lets, (char *) 0, want_reply, (long *) 0);
+    return display_pickinv(lets, (char *) 0, (char *) 0,
+                           want_reply, (long *) 0);
 }
 
 /*
@@ -2430,22 +2487,26 @@ STATIC_OVL void
 dounpaid()
 {
     winid win;
-    struct obj *otmp, *marker;
+    struct obj *otmp, *marker, *contnr;
     register char ilet;
     char *invlet = flags.inv_order;
     int classcount, count, num_so_far;
     long cost, totcost;
 
     count = count_unpaid(invent);
+    otmp = marker = contnr = (struct obj *) 0;
 
     if (count == 1) {
-        marker = (struct obj *) 0;
         otmp = find_unpaid(invent, &marker);
+        contnr = unknwn_contnr_contents(otmp);
+    }
+    if  (otmp && !contnr) {
+        /* 1 item; use pline instead of popup menu */
         cost = unpaid_cost(otmp, FALSE);
         iflags.suppress_price++; /* suppress "(unpaid)" suffix */
         pline1(xprname(otmp, distant_name(otmp, doname),
-                       carried(otmp) ? otmp->invlet : CONTAINED_SYM, TRUE,
-                       cost, 0L));
+                       carried(otmp) ? otmp->invlet : CONTAINED_SYM,
+                       TRUE, cost, 0L));
         iflags.suppress_price--;
         return;
     }
@@ -3409,10 +3470,18 @@ reassign()
  *      then a 'to' slot for its destination.  Open slots and those
  *      filled by compatible stacks are listed as likely candidates
  *      but user can pick any inventory letter (including 'from').
- *      All compatible items found are gathered into the 'from'
- *      stack as it is moved.  If the 'to' slot isn't empty and
- *      doesn't merge, then its stack is swapped to the 'from' slot.
  *
+ *  to == from, 'from' has a name
+ *      All compatible items (same name or no name) are gathered
+ *      into the 'from' stack.  No count is allowed.
+ *  to == from, 'from' does not have a name
+ *      All compatible items without a name are gathered into the
+ *      'from' stack.  No count is allowed.  Compatible stacks with
+ *      names are left as-is.
+ *  to != from, no count
+ *      Move 'from' to 'to'.  If 'to' is not empty, merge 'from'
+ *      into it if possible, otherwise swap it with the 'from' slot.
+ *  to != from, count given
  *      If the user specifies a count when choosing the 'from' slot,
  *      and that count is less than the full size of the stack,
  *      then the stack will be split.  The 'count' portion is moved
@@ -3422,21 +3491,35 @@ reassign()
  *      will be moved to an open slot; if there isn't any open slot
  *      available, the adjustment attempt fails.
  *
- *      Splitting has one special case:  if 'to' slot is non-empty
- *      and is compatible with 'from' in all respects except for
- *      user-assigned names, the 'count' portion being moved is
- *      effectively renamed so that it will merge with 'to' stack.
+ *      To minimize merging for 'from == to', unnamed stacks will
+ *      merge with named 'from' but named ones won't merge with
+ *      unnamed 'from'.  Otherwise attempting to collect all unnamed
+ *      stacks would lump the first compatible named stack with them
+ *      and give them its name.
+ *
+ *      To maximize merging for 'from != to', compatible stacks will
+ *      merge when either lacks a name (or they already have the same
+ *      name).  When no count is given and one stack has a name and
+ *      the other doesn't, the merged result will have that name.
+ *      However, when splitting results in a merger, the name of the
+ *      destination overrides that of the source, even if destination
+ *      is unnamed and source is named.
  */
 int
 doorganize() /* inventory organizer by Del Lamb */
 {
     struct obj *obj, *otmp, *splitting, *bumped;
-    int ix, cur, trycnt;
+    int ix, cur, trycnt, goldstacks;
     char let;
-    char alphabet[52 + 1], buf[52 + 1];
+#define GOLD_INDX   0
+#define GOLD_OFFSET 1
+#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
+    char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
-    char allowall[3]; /* { ALLOW_COUNT, ALL_CLASSES, 0 } */
+    char allowall[4]; /* { ALLOW_COUNT, ALL_CLASSES, 0, 0 } */
+    char *objname, *otmpname;
     const char *adj_type;
+    boolean ever_mind = FALSE, collect;
 
     if (!invent) {
         You("aren't carrying anything to adjust.");
@@ -3449,6 +3532,20 @@ doorganize() /* inventory organizer by Del Lamb */
     allowall[0] = ALLOW_COUNT;
     allowall[1] = ALL_CLASSES;
     allowall[2] = '\0';
+    for (goldstacks = 0, otmp = invent; otmp; otmp = otmp->nobj) {
+        /* gold should never end up in a letter slot, nor should two '$'
+           slots occur, but if they ever do, allow #adjust to handle them
+           (in the past, things like this have happened, usually due to
+           bknown being erroneously set on one stack, clear on another;
+           object merger isn't fooled by that anymore) */
+        if (otmp->oclass == COIN_CLASS
+            && (otmp->invlet != GOLD_SYM || ++goldstacks > 1)) {
+            allowall[1] = COIN_CLASS;
+            allowall[2] = ALL_CLASSES;
+            allowall[3] = '\0';
+            break;
+        }
+    }
     if (!(obj = getobj(allowall, "adjust")))
         return 0;
 
@@ -3462,39 +3559,43 @@ doorganize() /* inventory organizer by Del Lamb */
         }
 
     /* initialize the list with all lower and upper case letters */
-    for (ix = 0, let = 'a'; let <= 'z';)
-        alphabet[ix++] = let++;
+    lets[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
+    for (ix = GOLD_OFFSET, let = 'a'; let <= 'z';)
+        lets[ix++] = let++;
     for (let = 'A'; let <= 'Z';)
-        alphabet[ix++] = let++;
-    alphabet[ix] = '\0';
+        lets[ix++] = let++;
+    lets[OVRFLW_INDX] = ' ';
+    lets[sizeof lets - 1] = '\0';
     /* for floating inv letters, truncate list after the first open slot */
     if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < 52)
-        alphabet[ix + (splitting ? 0 : 1)] = '\0';
+        lets[ix + (splitting ? 0 : 1)] = '\0';
 
-    /* blank out all the letters currently in use in the inventory */
-    /* except those that will be merged with the selected object   */
+    /* blank out all the letters currently in use in the inventory
+       except those that will be merged with the selected object */
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if (otmp != obj && !mergable(otmp, obj)) {
             let = otmp->invlet;
             if (let >= 'a' && let <= 'z')
-                alphabet[let - 'a'] = ' ';
+                lets[GOLD_OFFSET + let - 'a'] = ' ';
             else if (let >= 'A' && let <= 'Z')
-                alphabet[let - 'A' + 26] = ' ';
+                lets[GOLD_OFFSET + let - 'A' + 26] = ' ';
+            /* overflow defaults to off, but it we find a stack using that
+               slot, switch to on -- the opposite of normal invlet handling */
+            else if (let == NOINVSYM)
+                lets[OVRFLW_INDX] = NOINVSYM;
         }
 
     /* compact the list by removing all the blanks */
-    for (ix = cur = 0; alphabet[ix]; ix++)
-        if (alphabet[ix] != ' ')
-            buf[cur++] = alphabet[ix];
-    if (!cur && obj->invlet == NOINVSYM)
-        buf[cur++] = NOINVSYM;
-    buf[cur] = '\0';
+    for (ix = cur = 0; lets[ix]; ix++)
+        if (lets[ix] != ' ' && cur++ < ix)
+            lets[cur - 1] = lets[ix];
+    lets[cur] = '\0';
     /* and by dashing runs of letters */
     if (cur > 5)
-        compactify(buf);
+        compactify(lets);
 
     /* get 'to' slot to use as destination */
-    Sprintf(qbuf, "Adjust letter to what [%s]%s?", buf,
+    Sprintf(qbuf, "Adjust letter to what [%s]%s?", lets,
             invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
         let = yn_function(qbuf, (char *) 0, '\0');
@@ -3513,18 +3614,28 @@ doorganize() /* inventory organizer by Del Lamb */
         noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);
-            pline1(Never_mind);
+            if (!ever_mind)
+                pline1(Never_mind);
             return 0;
+        } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
+            pline("Only gold coins may be moved into the '%c' slot.",
+                  GOLD_SYM);
+            ever_mind = TRUE;
+            goto noadjust;
         }
-        if ((letter(let) && let != '@') || index(buf, let))
+        /* letter() classifies '@' as one; compactify() can put '-' in lets;
+           the only thing of interest that index() might find is '$' or '#'
+           since letter() catches everything else that we put into lets[] */
+        if ((letter(let) && let != '@') || (index(lets, let) && let != '-'))
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
         pline("Select an inventory slot letter."); /* else try again */
     }
 
+    collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-    adj_type = !splitting ? "Moving:" : "Splitting:";
+    adj_type = collect ? "Collecting" : !splitting ? "Moving:" : "Splitting:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -3533,42 +3644,49 @@ doorganize() /* inventory organizer by Del Lamb */
     extract_nobj(obj, &invent);
 
     for (otmp = invent; otmp;) {
-        if (!splitting) {
-            if (merged(&otmp, &obj)) {
+        /* it's tempting to pull this outside the loop, but merged() could
+           free ONAME(obj) [via obfree()] and replace it with ONAME(otmp) */
+        objname = has_oname(obj) ? ONAME(obj) : (char *) 0;
+
+        if (collect) {
+            /* Collecting: #adjust an inventory stack into its same slot;
+               keep it there and merge other compatible stacks into it.
+               Traditional inventory behavior is to merge unnamed stacks
+               with compatible named ones; we only want that if it is
+               the 'from' stack (obj) with a name and candidate (otmp)
+               without one, not unnamed 'from' with named candidate. */
+            otmpname = has_oname(otmp) ? ONAME(otmp) : (char *) 0;
+            if ((!otmpname || (objname && !strcmp(objname, otmpname)))
+                && merged(&otmp, &obj)) {
                 adj_type = "Merging:";
                 obj = otmp;
                 otmp = otmp->nobj;
                 extract_nobj(obj, &invent);
                 continue; /* otmp has already been updated */
-            } else if (otmp->invlet == let) {
+            }
+        } else if (otmp->invlet == let) {
+            /* Moving or splitting: don't merge extra compatible stacks.
+               Found 'otmp' in destination slot; merge if compatible,
+               otherwise bump whatever is there to an open slot. */
+            if (!splitting) {
                 adj_type = "Swapping:";
                 otmp->invlet = obj->invlet;
-            }
-        } else {
-            /* splitting: don't merge extra compatible stacks;
-               if destination is compatible, do merge with it,
-               otherwise bump whatever is there to an open slot */
-            if (otmp->invlet == let) {
-                int olth = 0;
-
-                if (has_oname(obj))
-                    olth = strlen(ONAME(obj));
-                /* ugly hack:  if these objects aren't going to merge
-                   solely because they have conflicting user-assigned
-                   names, strip off the name of the one being moved */
-                if (olth && !obj->oartifact && !mergable(otmp, obj)) {
-                    char *holdname = ONAME(obj);
-
+            } else {
+                /* strip 'from' name if it has one */
+                if (objname && !obj->oartifact)
                     ONAME(obj) = (char *) 0;
-                    /* restore name iff merging is still not possible */
-                    if (!mergable(otmp, obj)) {
-                        ONAME(obj) = holdname;
-                        holdname = (char *) 0;
-                    } else
-                        free((genericptr_t) holdname);
+                if (!mergable(otmp, obj)) {
+                    /* won't merge; put 'from' name back */
+                    if (objname)
+                        ONAME(obj) = objname;
+                } else {
+                    /* will merge; discard 'from' name */
+                    if (objname)
+                        free((genericptr_t) objname), objname = 0;
                 }
 
                 if (merged(&otmp, &obj)) {
+                    adj_type = "Splitting and merging:";
                     obj = otmp;
                     extract_nobj(obj, &invent);
                 } else if (inv_cnt(FALSE) >= 52) {
@@ -3580,9 +3698,9 @@ doorganize() /* inventory organizer by Del Lamb */
                     bumped = otmp;
                     extract_nobj(bumped, &invent);
                 }
-                break;
-            } /* found 'to' slot */
-        }     /* splitting */
+            } /* moving vs splitting */
+            break; /* not collecting and found 'to' slot */
+        } /* collect */
         otmp = otmp->nobj;
     }
 

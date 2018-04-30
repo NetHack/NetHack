@@ -215,13 +215,8 @@ E short set_tty_font_name(winid, char *);
 #endif
 E char *tty_get_color_string(void);
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
 E void tty_status_init(void);
-E void tty_status_update(int, genericptr_t, int, int);
-#ifdef STATUS_HILITES
-E void tty_status_threshold(int, int, anything, int, int, int);
-#endif
-#endif
+E void tty_status_update(int, genericptr_t, int, int, int, unsigned long *);
 
 /* other defs that really should go away (they're tty specific) */
 E void tty_start_screen(void);

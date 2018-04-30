@@ -121,7 +121,7 @@ Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    moveinit.pat
 msdos.c         msdoshlp.txt    ovlinit.c       pckeys.c        pctiles.c
 pctiles.h       pcvideo.h       portio.h        schema1.BC      schema2.BC
 schema3.MSC     SCHEMA35.MSC    setup.bat       sound.c         tile2bin.c
-video.c         vidtxt.c        vidvesa.c       vidvga.c
+vesa.h          video.c         vidtxt.c        vidvesa.c       vidvga.c
 (files for running MSDOS binary under Windows)
 nhico.uu        nhpif.uu
 
@@ -169,9 +169,9 @@ wdnflute.uu     wdnharp.uu
 sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
-Makefile.utl    README.linux    depend.awk      mkmkfile.sh     nethack.sh
-NewInstall.unx  setup.sh        sysconf         unixmain.c      unixres.c
-unixunix.c
+Makefile.utl    README.linux    depend.awk      gitinfo.sh      mkmkfile.sh
+nethack.sh      NewInstall.unx  setup.sh        sysconf         unixmain.c
+unixres.c       unixunix.c
 (files for replacement cpp, only needed by some ancient UNIX systems)
 cpp1.shr        cpp2.shr        cpp3.shr
 (file for sound driver for 386 UNIX)
@@ -179,8 +179,9 @@ snd86unx.shr
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux           linux-chroot    linux-x11       macosx          macosx10.5
-macosx10.7      macosx10.8      macosx10.10     macosx.sh       unix
+linux           linux-chroot    linux-qt4       linux-x11       macosx
+macosx10.5      macosx10.7      macosx10.8      macosx10.10     macosx.sh
+unix
 
 sys/vms:
 (files for VMS version)
@@ -225,10 +226,23 @@ mdgrep.pl       panic.c         recover.c
 dgn_comp.l      dgn_comp.y      lev_comp.l      lev_comp.y
 
 win/Qt:
-(files for the Qt widget library - X11, Windows, Mac OS X, or Qtopia)
+(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
 Info.plist      Install.Qt      knethack.lnk    knh-mini.xpm    knh.xpm
 nhicns.uu       nhsplash.xpm    qt_clust.cpp    qt_win.cpp      qttableview.cpp
 tileedit.cpp    tileedit.h      qpe-nethack.control
+
+win/Qt4:
+(files for the Qt 4 widget library - X11, Windows, Mac OS X)
+qt4bind.cpp     qt4bind.h       qt4click.cpp    qt4click.h      qt4clust.cpp
+qt4clust.h      qt4delay.cpp    qt4delay.h      qt4glyph.cpp    qt4glyph.h
+qt4icon.cpp     qt4icon.h       qt4inv.cpp      qt4inv.h        qt4kde0.h
+qt4key.cpp      qt4key.h        qt4line.cpp     qt4line.h       qt4main.cpp
+qt4main.h       qt4map.cpp      qt4map.h        qt4menu.cpp     qt4menu.h
+qt4msg.cpp      qt4msg.h        qt4plsel.cpp    qt4plsel.h      qt4rip.cpp
+qt4rip.h        qt4set.cpp      qt4set.h        qt4stat.cpp     qt4stat.h
+qt4str.cpp      qt4streq.cpp    qt4streq.h      qt4str.h        qt4svsel.cpp
+qt4svsel.h      qt4win.cpp      qt4win.h        qt4xcmd.cpp     qt4xcmd.h
+qt4yndlg.cpp    qt4yndlg.h
 
 win/X11:
 (files for X versions)
@@ -284,19 +298,31 @@ mnsel.uu        mnselcnt.uu     mnunsel.uu      mswproc.c       petmark.uu
 pilemark.uu     record.uu       resource.h      rip.uu          splash.uu
 tiles.mak       winMS.h         winhack.c       winhack.rc
 
-win/win32/vs2010:
-(files for Visual Studio 2010 Express Edition builds)
-dgncomp.vcxproj     dgnstuff.vcxproj    dlb_main.vcxproj    levcomp.vcxproj
-levstuff.vcxproj    makedefs.vcxproj    NetHack.sln         NetHackW.vcxproj
-recover.vcxproj     tile2bmp.vcxproj    tilemap.vcxproj     tiles.vcxproj
+win/win32/vs2015:
+(files for Visual Studio 2015 Express Edition builds)
+afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj
+afternethack.proj  afterrecover.proj  aftertile2bmp.proj  aftertilemap.proj
+afteruudecode.proj build.bat          common.props        config.props
+console.props      default.props      default_dll.props   dgncomp.vcxproj
+dirs.props         dlb.vcxproj        dll.props           files.props
+levcomp.vcxproj    makedefs.vcxproj   NetHack.sln         NetHack.vcxproj
+NetHackW.vcxproj   nh340key.def       nh340key.vcxproj    nhdefkey.def
+nhdefkey.vcxproj   nhraykey.def       nhraykey.vcxproj    notes.txt
+recover.vcxproj    tile2bmp.vcxproj   tilemap.vcxproj     tiles.vcxproj
 uudecode.vcxproj
 
-win/win32/vs2013:
-(files for Visual Studio 2013 Express Edition builds)
-dgncomp.vcxproj     dgnstuff.vcxproj    dlb_main.vcxproj    levcomp.vcxproj
-levstuff.vcxproj    makedefs.vcxproj    NetHack.sln         NetHack.vcxproj
-NetHackW.vcxproj    nhdefkey.vcxproj    recover.vcxproj     tile2bmp.vcxproj
-tilemap.vcxproj     tiles.vcxproj       uudecode.vcxproj
+win/win32/vs2017:
+(files for Visual Studio 2017 Community Edition builds)
+afterdgncomp.proj  afterdlb.proj      afterlevcomp.proj   aftermakedefs.proj
+afternethack.proj  afterrecover.proj  aftertile2bmp.proj  aftertilemap.proj
+afteruudecode.proj build.bat          common.props        config.props
+console.props      default.props      default_dll.props   dgncomp.vcxproj
+dirs.props         dlb.vcxproj        dll.props           files.props
+levcomp.vcxproj    makedefs.vcxproj   NetHack.sln         NetHack.vcxproj
+NetHackW.vcxproj   nh340key.def       nh340key.vcxproj    nhdefkey.def
+nhdefkey.vcxproj   nhraykey.def       nhraykey.vcxproj    recover.vcxproj
+tile2bmp.vcxproj   tilemap.vcxproj    tiles.vcxproj       uudecode.vcxproj
+
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
@@ -376,7 +402,7 @@ uudecode.exe
 
 DEVEL:
 (files for people developing changes to NetHack)
-code_features.txt   code_style.txt  Developer.txt   git_recipes.txt 
+code_features.txt   code_style.txt  Developer.txt   git_recipes.txt
 nhgitset.pl
 
 DEVEL/DOTGIT:

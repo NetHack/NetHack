@@ -1,5 +1,6 @@
 /* NetHack 3.6  decl.h  $NHDT-Date: 1496531104 2017/06/03 23:05:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef DECL_H
@@ -325,9 +326,7 @@ E NEARDATA char **viz_array;           /* could see/in sight row pointers */
 
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;
-#ifndef STATUS_VIA_WINDOWPORT
 E NEARDATA winid WIN_STATUS;
-#endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
@@ -423,6 +422,15 @@ E struct plinemsg_type *plinemsg_types;
 #ifdef PANICTRACE
 E const char *ARGV0;
 #endif
+
+enum earlyarg {ARG_DEBUG, ARG_VERSION};
+
+struct early_opt {
+    enum earlyarg e;
+    const char *name;
+    int minlength;
+    boolean valallowed;
+};
 
 #undef E
 

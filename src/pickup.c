@@ -1,5 +1,6 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1498078877 2017/06/21 21:01:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1516581051 2018/01/22 00:30:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -21,7 +22,6 @@ STATIC_DCL boolean all_but_uchain(struct obj *);
 #if 0 /* not used */
 STATIC_DCL boolean allow_cat_no_uchain(struct obj *);
 #endif
-STATIC_DCL boolean autopick_testobj(struct obj *, boolean);
 STATIC_DCL int autopick(struct obj *, int, menu_item **);
 STATIC_DCL int count_categories(struct obj *, int);
 STATIC_DCL long carry_count(struct obj *, struct obj *, long,
@@ -29,6 +29,7 @@ STATIC_DCL long carry_count(struct obj *, struct obj *, long,
 STATIC_DCL int lift_object(struct obj *, struct obj *, long *,
                            boolean);
 STATIC_DCL boolean mbag_explodes(struct obj *, int);
+STATIC_DCL long boh_loss(struct obj *container, int);
 STATIC_PTR int in_container(struct obj *);
 STATIC_PTR int out_container(struct obj *);
 STATIC_DCL void removed_from_icebox(struct obj *);
@@ -138,7 +139,7 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
               const char *action, struct obj *objs, boolean here,
               int *menu_on_demand)
 {
-    char ilets[36], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
+    char ilets[36], inbuf[BUFSZ] = DUMMY; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
     boolean not_everything, filtered;
     char qbuf[QBUFSZ];
@@ -717,7 +718,7 @@ is_autopickup_exception(struct obj *obj,
     return FALSE;
 }
 
-STATIC_OVL boolean
+boolean
 autopick_testobj(struct obj *otmp, boolean calc_costly)
 {
     static boolean costly = FALSE;
@@ -1031,6 +1032,20 @@ query_category(const char *qstr,        /* query string */
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     pack = flags.inv_order;
+
+    if (qflags & CHOOSE_ALL) {
+        invlet = 'A';
+        any = zeroany;
+        any.a_int = 'A';
+        add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
+                 (qflags & WORN_TYPES) ? "Auto-select every item being worn"
+                                       : "Auto-select every item",
+                 MENU_UNSELECTED);
+
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    }
+
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
         invlet = 'a';
         any = zeroany;
@@ -1067,6 +1082,13 @@ query_category(const char *qstr,        /* query string */
             return 0;
         }
     } while (*pack);
+
+    if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
+        || do_uncursed || do_buc_unknown) {
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    }
+
     /* unpaid items if there are any */
     if (do_unpaid) {
         invlet = 'u';
@@ -1083,15 +1105,7 @@ query_category(const char *qstr,        /* query string */
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Unpaid items already used up", MENU_UNSELECTED);
     }
-    if (qflags & CHOOSE_ALL) {
-        invlet = 'A';
-        any = zeroany;
-        any.a_int = 'A';
-        add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
-                 (qflags & WORN_TYPES) ? "Auto-select every item being worn"
-                                       : "Auto-select every item",
-                 MENU_UNSELECTED);
-    }
+
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
        reversing the usual sequence of 'U' and 'C' in BUCX */
@@ -1462,26 +1476,43 @@ pickup_object(struct obj *obj,
 struct obj *
 pick_obj(struct obj *otmp)
 {
+    struct obj *result;
+    int ox = otmp->ox, oy = otmp->oy;
+    boolean robshop = (!u.uswallow && otmp != uball && costly_spot(ox, oy));
+
     obj_extract_self(otmp);
-    if (!u.uswallow && otmp != uball && costly_spot(otmp->ox, otmp->oy)) {
+    newsym(ox, oy);
+
+    /* for shop items, addinv() needs to be after addtobill() (so that
+       object merger can take otmp->unpaid into account) but before
+       remote_robbery() (which calls rob_shop() which calls setpaid()
+       after moving costs of unpaid items to shop debt; setpaid()
+       calls clear_unpaid() for lots of object chains, but 'otmp' isn't
+       on any of those between obj_extract_self() and addinv(); for
+       3.6.0, 'otmp' remained flagged as an unpaid item in inventory
+       and triggered impossible() every time inventory was examined) */
+    if (robshop) {
         char saveushops[5], fakeshop[2];
 
         /* addtobill cares about your location rather than the object's;
            usually they'll be the same, but not when using telekinesis
            (if ever implemented) or a grappling hook */
         Strcpy(saveushops, u.ushops);
-        fakeshop[0] = *in_rooms(otmp->ox, otmp->oy, SHOPBASE);
+        fakeshop[0] = *in_rooms(ox, oy, SHOPBASE);
         fakeshop[1] = '\0';
         Strcpy(u.ushops, fakeshop);
         /* sets obj->unpaid if necessary */
         addtobill(otmp, TRUE, FALSE, FALSE);
         Strcpy(u.ushops, saveushops);
-        /* if you're outside the shop, make shk notice */
-        if (!index(u.ushops, *fakeshop))
-            remote_burglary(otmp->ox, otmp->oy);
+        robshop = otmp->unpaid && !index(u.ushops, *fakeshop);
     }
-    newsym(otmp->ox, otmp->oy);
-    return addinv(otmp); /* might merge it with other objects */
+
+    result = addinv(otmp);
+    /* if you're taking a shop item from outside the shop, make shk notice */
+    if (robshop)
+        remote_burglary(ox, oy);
+
+    return result;
 }
 
 /*
@@ -1975,6 +2006,28 @@ mbag_explodes(struct obj *obj, int depthin)
     return FALSE;
 }
 
+STATIC_OVL long
+boh_loss(container, held)
+struct obj *container;
+int held;
+{
+    /* sometimes toss objects if a cursed magic bag */
+    if (Is_mbag(container) && container->cursed && Has_contents(container)) {
+        long loss = 0L;
+        struct obj *curr, *otmp;
+
+        for (curr = container->cobj; curr; curr = otmp) {
+            otmp = curr->nobj;
+            if (!rn2(13)) {
+                obj_extract_self(curr);
+                loss += mbag_item_gone(held, curr);
+            }
+        }
+        return loss;
+    }
+    return 0;
+}
+
 /* Returns: -1 to stop, 1 item was inserted, 0 item was not inserted. */
 STATIC_PTR int
 in_container(register struct obj *obj)
@@ -2274,13 +2327,18 @@ STATIC_OVL void
 explain_container_prompt(boolean more_containers)
 {
     static const char *const explaintext[] = {
-        "Container actions:", "", " : -- Look: examine contents",
-        " o -- Out: take things out", " i -- In: put things in",
+        "Container actions:",
+        "",
+        " : -- Look: examine contents",
+        " o -- Out: take things out",
+        " i -- In: put things in",
         " b -- Both: first take things out, then put things in",
         " r -- Reversed: put things in, then take things out",
         " s -- Stash: put one item in", "",
-        " n -- Next: loot next selected container", " q -- Quit: finished",
-        " ? -- Help: display this text.", "", 0
+        " n -- Next: loot next selected container",
+        " q -- Quit: finished",
+        " ? -- Help: display this text.",
+        "", 0
     };
     const char *const *txtpp;
     winid win;
@@ -2316,11 +2374,12 @@ int
 use_container(struct obj **objp, int held,
               boolean more_containers) /* True iff #loot multiple and this isn't last one */
 {
-    struct obj *curr, *otmp, *obj = *objp;
+    struct obj *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,
         stash_one, inokay, outokay, outmaybe;
     char c, emptymsg[BUFSZ], qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
     int used = 0;
+    long loss;
 
     abort_looting = FALSE;
     emptymsg[0] = '\0';
@@ -2361,22 +2420,14 @@ use_container(struct obj **objp, int held,
         observe_quantum_cat(current_container);
         used = 1;
     }
-    /* sometimes toss objects if a cursed magic bag */
-    cursed_mbag = (Is_mbag(current_container) && current_container->cursed
-                   && Has_contents(current_container));
-    if (cursed_mbag) {
-        long loss = 0L;
 
-        for (curr = current_container->cobj; curr; curr = otmp) {
-            otmp = curr->nobj;
-            if (!rn2(13)) {
-                obj_extract_self(curr);
-                loss += mbag_item_gone(held, curr);
-                used = 1;
-            }
-        }
-        if (loss)
-            You("owe %ld %s for lost merchandise.", loss, currency(loss));
+    cursed_mbag = Is_mbag(current_container)
+        && current_container->cursed
+        && Has_contents(current_container);
+    if (cursed_mbag
+        && (loss = boh_loss(current_container, held)) != 0) {
+        used = 1;
+        You("owe %ld %s for lost merchandise.", loss, currency(loss));
         current_container->owt = weight(current_container);
     }
     inokay = (invent != 0

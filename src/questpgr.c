@@ -460,6 +460,7 @@ convert_line(char *in_line, char *out_line)
                 /* pluralize */
                 case 'P':
                     cvt_buf[0] = highc(cvt_buf[0]);
+                    /*FALLTHRU*/
                 case 'p':
                     Strcpy(cvt_buf, makeplural(cvt_buf));
                     break;
@@ -467,6 +468,7 @@ convert_line(char *in_line, char *out_line)
                 /* append possessive suffix */
                 case 'S':
                     cvt_buf[0] = highc(cvt_buf[0]);
+                    /*FALLTHRU*/
                 case 's':
                     Strcpy(cvt_buf, s_suffix(cvt_buf));
                     break;

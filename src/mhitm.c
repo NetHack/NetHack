@@ -1,5 +1,6 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1504999944 2017/09/09 23:32:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1513297346 2017/12/15 00:22:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -402,8 +403,9 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             if (strike) {
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
-                     || mdef->data == &mons[PM_BROWN_PUDDING]) && otmp
-                    && objects[otmp->otyp].oc_material == IRON
+                     || mdef->data == &mons[PM_BROWN_PUDDING])
+                    && (otmp && (objects[otmp->otyp].oc_material == IRON
+                                 || objects[otmp->otyp].oc_material == METAL))
                     && mdef->mhp > 1
                     && !mdef->mcan) {
                     if (clone_mon(mdef, 0, 0)) {
@@ -562,6 +564,7 @@ hitmm(register struct monst *magr, register struct monst *mdef, struct attack *m
                     Sprintf(buf, "%s squeezes", magr_name);
                     break;
                 }
+                /*FALLTHRU*/
             default:
                 Sprintf(buf, "%s hits", magr_name);
             }
@@ -887,10 +890,17 @@ mdamagem(register struct monst *magr, register struct monst *mdef, register stru
             tmp = 0;
         } else if (mattk->aatyp == AT_WEAP) {
             if (otmp) {
+                struct obj *marmg;
+
                 if (otmp->otyp == CORPSE
                     && touch_petrifies(&mons[otmp->corpsenm]))
                     goto do_stone;
                 tmp += dmgval(otmp, mdef);
+                if ((marmg = which_armor(magr, W_ARMG)) != 0
+                    && marmg->otyp == GAUNTLETS_OF_POWER)
+                    tmp += rn1(4, 3); /* 3..6 */
+                if (tmp < 1) /* is this necessary?  mhitu.c has it... */
+                    tmp = 1;
                 if (otmp->oartifact) {
                     (void) artifact_hit(magr, mdef, otmp, &tmp, dieroll);
                     if (mdef->mhp <= 0)
@@ -916,10 +926,10 @@ mdamagem(register struct monst *magr, register struct monst *mdef, register stru
         }
         if (vis && canseemon(mdef))
             pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
-        if (pd == &mons[PM_STRAW_GOLEM] || pd == &mons[PM_PAPER_GOLEM]) {
+        if (completelyburns(pd)) { /* paper golem or straw golem */
             if (vis && canseemon(mdef))
                 pline("%s burns completely!", Monnam(mdef));
-            mondied(mdef);
+            mondead(mdef); /* was mondied() but that dropped paper scrolls */
             if (mdef->mhp > 0)
                 return 0;
             else if (mdef->mtame && !vis)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1450577672 2015/12/20 02:14:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1519662898 2018/02/26 16:34:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,6 +139,31 @@ critically_low_hp(boolean only_if_injured) /* determines whether maxhp <= 5 matt
     return (boolean) (curhp <= 5 || curhp * divisor <= maxhp);
 }
 
+/* return True if surrounded by impassible rock, regardless of the state
+   of your own location (for example, inside a doorless closet) */
+boolean
+stuck_in_wall()
+{
+    int i, j, x, y, count = 0;
+
+    if (Passes_walls)
+        return FALSE;
+    for (i = -1; i <= 1; i++) {
+        x = u.ux + i;
+        for (j = -1; j <= 1; j++) {
+            if (!i && !j)
+                continue;
+            y = u.uy + j;
+            if (!isok(x, y)
+                || (IS_ROCK(levl[x][y].typ)
+                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
+                ++count;
+        }
+    }
+    return (count == 8) ? TRUE : FALSE;
+}
+
 /*
  * Return 0 if nothing particular seems wrong, positive numbers for
  * serious trouble, and negative numbers for comparative annoyances.
@@ -157,7 +182,7 @@ STATIC_OVL int
 in_trouble()
 {
     struct obj *otmp;
-    int i, j, count = 0;
+    int i;
 
     /*
      * major troubles
@@ -182,19 +207,8 @@ in_trouble()
         return TROUBLE_LYCANTHROPE;
     if (near_capacity() >= EXT_ENCUMBER && AMAX(A_STR) - ABASE(A_STR) > 3)
         return TROUBLE_COLLAPSING;
-
-    for (i = -1; i <= 1; i++)
-        for (j = -1; j <= 1; j++) {
-            if (!i && !j)
-                continue;
-            if (!isok(u.ux + i, u.uy + j)
-                || IS_ROCK(levl[u.ux + i][u.uy + j].typ)
-                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
-                count++;
-        }
-    if (count == 8 && !Passes_walls)
+    if (stuck_in_wall())
         return TROUBLE_STUCK_IN_WALL;
-
     if (Cursed_obj(uarmf, LEVITATION_BOOTS)
         || stuck_ring(uleft, RIN_LEVITATION)
         || stuck_ring(uright, RIN_LEVITATION))
@@ -264,18 +278,21 @@ worst_cursed_item()
        with taking off a ring or putting on a shield */
     if (welded(uwep) && (uright || bimanual(uwep))) { /* weapon */
         otmp = uwep;
-        /* gloves come next, due to rings */
+    /* gloves come next, due to rings */
     } else if (uarmg && uarmg->cursed) { /* gloves */
         otmp = uarmg;
-        /* then shield due to two handed weapons and spells */
+    /* then shield due to two handed weapons and spells */
     } else if (uarms && uarms->cursed) { /* shield */
         otmp = uarms;
-        /* then cloak due to body armor */
+    /* then cloak due to body armor */
     } else if (uarmc && uarmc->cursed) { /* cloak */
         otmp = uarmc;
     } else if (uarm && uarm->cursed) { /* suit */
         otmp = uarm;
-    } else if (uarmh && uarmh->cursed) { /* helmet */
+    /* if worn helmet of opposite alignment is making you an adherent
+       of the current god, he/she/it won't uncurse that for you */
+    } else if (uarmh && uarmh->cursed /* helmet */
+               && uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT) {
         otmp = uarmh;
     } else if (uarmf && uarmf->cursed) { /* boots */
         otmp = uarmf;
@@ -289,13 +306,13 @@ worst_cursed_item()
         otmp = uright;
     } else if (ublindf && ublindf->cursed) { /* eyewear */
         otmp = ublindf; /* must be non-blinding lenses */
-        /* if weapon wasn't handled above, do it now */
+    /* if weapon wasn't handled above, do it now */
     } else if (welded(uwep)) { /* weapon */
         otmp = uwep;
-        /* active secondary weapon even though it isn't welded */
+    /* active secondary weapon even though it isn't welded */
     } else if (uswapwep && uswapwep->cursed && u.twoweap) {
         otmp = uswapwep;
-        /* all worn items ought to be handled by now */
+    /* all worn items ought to be handled by now */
     } else {
         for (otmp = invent; otmp; otmp = otmp->nobj) {
             if (!otmp->cursed)
@@ -334,14 +351,12 @@ fix_worst_trouble(int trouble)
         break;
     case TROUBLE_LAVA:
         You("are back on solid ground.");
-        /* teleport should always succeed, but if not,
-         * just untrap them.
-         */
+        /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(FALSE))
             u.utrap = 0;
         break;
     case TROUBLE_STARVING:
-        losestr(-1);
+        /* temporarily lost strength recovery now handled by init_uhunger() */
         /*FALLTHRU*/
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
@@ -384,8 +399,7 @@ fix_worst_trouble(int trouble)
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
                     what = leftglow;
-            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
-                       != 0) {
+            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uright)
                     what = rightglow;
             }
@@ -394,9 +408,22 @@ fix_worst_trouble(int trouble)
         }
         break;
     case TROUBLE_STUCK_IN_WALL:
-        Your("surroundings change.");
         /* no control, but works on no-teleport levels */
-        (void) safe_teleds(FALSE);
+        if (safe_teleds(FALSE)) {
+            Your("surroundings change.");
+        } else {
+            /* safe_teleds() couldn't find a safe place; perhaps the
+               level is completely full.  As a last resort, confer
+               intrinsic wall/rock-phazing.  Hero might get stuck
+               again fairly soon....
+               Without something like this, fix_all_troubles can get
+               stuck in an infinite loop trying to fix STUCK_IN_WALL
+               and repeatedly failing. */
+            set_itimeout(&HPasses_walls, (long) (d(4, 4) + 4)); /* 8..20 */
+            /* how else could you move between packed rocks or among
+               lattice forming "solid" rock? */
+            You_feel("much slimmer.");
+        }
         break;
     case TROUBLE_CURSED_LEVITATION:
         if (Cursed_obj(uarmf, LEVITATION_BOOTS)) {
@@ -922,6 +949,7 @@ pleased(aligntyp g_align)
         switch (min(action, 5)) {
         case 5:
             pat_on_head = 1;
+            /*FALLTHRU*/
         case 4:
             do
                 fix_worst_trouble(trouble);
@@ -1021,7 +1049,7 @@ pleased(aligntyp g_align)
                     break;
                 }
             }
-        /* Otherwise, falls into next case */
+            /*FALLTHRU*/
         case 2:
             if (!Blind)
                 You("are surrounded by %s glow.", an(hcolor(NH_GOLDEN)));
@@ -1062,7 +1090,9 @@ pleased(aligntyp g_align)
             else
                 You("are surrounded by %s aura.", an(hcolor(NH_LIGHT_BLUE)));
             for (otmp = invent; otmp; otmp = otmp->nobj) {
-                if (otmp->cursed) {
+                if (otmp->cursed
+                    && (otmp != uarmh /* [see worst_cursed_item()] */
+                        || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
                     if (!Blind) {
                         pline("%s %s.", Yobjnam2(otmp, "softly glow"),
                               hcolor(NH_AMBER));
@@ -1111,7 +1141,8 @@ pleased(aligntyp g_align)
             if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
                 gcrownu();
                 break;
-            } /* else FALLTHRU */
+            }
+            /*FALLTHRU*/
         case 6: {
             struct obj *otmp;
             int sp_no, trycnt = u.ulevel + 1;
@@ -1480,7 +1511,7 @@ dosacrifice()
                 u.uachieve.ascended = 1;
                 pline(
                "An invisible choir sings, and you are bathed in radiance...");
-                godvoice(altaralign, "Congratulations, mortal!");
+                godvoice(altaralign, "Mortal, thou hast done well!");
                 display_nhwindow(WIN_MESSAGE, FALSE);
                 verbalize(
           "In return for thy service, I grant thee the gift of Immortality!");

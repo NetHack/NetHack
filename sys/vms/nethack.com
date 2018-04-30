@@ -1,7 +1,9 @@
 $! NetHack.Com -- sample command procedure for invoking NetHack  9-JAN-1993
 $ v = 'f$verify(0)'
 $!
-$! $NHDT-Date: 1465133392 2016/06/05 13:29:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $
+$! $NHDT-Date: 1524689428 2018/04/25 20:50:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.5 $
+$! Copyright (c) 2016 by Robert Patrick Rankin
+$! NetHack may be freely redistributed.  See license for details.
 $!
 $!    Possible command line arguments include
 $!	"-uConan-B"	!play a barbarian named Conan

@@ -1,5 +1,6 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1501803108 2017/08/03 23:31:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1520964541 2018/03/13 18:09:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \
@@ -79,6 +80,7 @@ void pline
 static void
 vpline(const char *line, va_list the_args)
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
+    static int in_pline = 0;
     char pbuf[3 * BUFSZ];
     int ln;
     int msgtyp;
@@ -112,14 +114,7 @@ vpline(const char *line, va_list the_args)
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
     }
-    if (!iflags.window_inited) {
-        raw_print(line);
-        iflags.last_msg = PLNMSG_UNKNOWN;
-        return;
-    }
 
-    msgtyp = MSGTYP_NORMAL;
-    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
 #ifdef DUMPLOG
     /* We hook here early to have options-agnostic output.
      * Unfortunately, that means Norep() isn't honored (general issue) and
@@ -128,11 +123,30 @@ vpline(const char *line, va_list the_args)
     if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
+    /* use raw_print() if we're called too early (or perhaps too late
+       during shutdown) or if we're being called recursively (probably
+       via debugpline() in the interface code) */
+    if (in_pline++ || !iflags.window_inited) {
+        /* [we should probably be using raw_printf("\n%s", line) here] */
+        raw_print(line);
+        iflags.last_msg = PLNMSG_UNKNOWN;
+        goto pline_done;
+    }
+
+    msgtyp = MSGTYP_NORMAL;
+    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
     if ((pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
         if (msgtyp == MSGTYP_NOSHOW
             || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
-            return;
+            /* FIXME: we need a way to tell our caller that this message
+             * was suppressed so that caller doesn't set iflags.last_msg
+             * for something that hasn't been shown, otherwise a subsequent
+             * message which uses alternate wording based on that would be
+             * doing so out of context and probably end up seeming silly.
+             * (Not an issue for no-repeat but matters for no-show.)
+             */
+            goto pline_done;
     }
 
     if (vision_full_recalc)
@@ -152,6 +166,9 @@ vpline(const char *line, va_list the_args)
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
+ pline_done:
+    --in_pline;
+    return;
 }
 
 /* pline() variant which can override MSGTYPE handling or suppress
@@ -384,7 +401,7 @@ void impossible(const char *s, ...)
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     pline("%s", pbuf);
-    pline("%s", "Program in disorder - perhaps you'd better #quit.");
+    pline("%s", "Program in disorder!  (Saving and reloading may fix this problem.)");
     program_state.in_impossible = 0;
     va_end(the_args);
 }

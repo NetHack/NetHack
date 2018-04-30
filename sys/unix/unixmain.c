@@ -1,5 +1,6 @@
 /* NetHack 3.6	unixmain.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* main.c - Unix NetHack */
@@ -53,6 +54,7 @@ main(int argc, char *argv[])
 #endif
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
+    boolean plsel_once = FALSE;
 
     sys_early_init();
 
@@ -107,6 +109,9 @@ main(int argc, char *argv[])
         dir = nh_getenv("HACKDIR");
 
     if (argc > 1) {
+        if (argcheck(argc, argv, ARG_VERSION))
+            exit(EXIT_SUCCESS);
+
         if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
@@ -235,19 +240,6 @@ main(int argc, char *argv[])
         (void) signal(SIGQUIT, SIG_IGN);
         (void) signal(SIGINT, SIG_IGN);
     }
-    /*
-     * getlock() complains and quits if there is already a game
-     * in progress for current character name (when locknum == 0)
-     * or if there are too many active games (when locknum > 0).
-     * When proceeding, it creates an empty <lockname>.0 file to
-     * designate the current game.
-     * getlock() constructs <lockname> based on the character
-     * name (for !locknum) or on first available of alock, block,
-     * clock, &c not currently in use in the playground directory
-     * (for locknum > 0).
-     */
-    getlock();
-    program_state.preserve_locks = 0; /* after getlock() */
 
     dlb_init(); /* must be before newgame() */
 
@@ -264,7 +256,24 @@ main(int argc, char *argv[])
      * We'll return here if new game player_selection() renames the hero.
      */
 attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+
+    /*
+     * getlock() complains and quits if there is already a game
+     * in progress for current character name (when locknum == 0)
+     * or if there are too many active games (when locknum > 0).
+     * When proceeding, it creates an empty <lockname>.0 file to
+     * designate the current game.
+     * getlock() constructs <lockname> based on the character
+     * name (for !locknum) or on first available of alock, block,
+     * clock, &c not currently in use in the playground directory
+     * (for locknum > 0).
+     */
+    if (*plname) {
+        getlock();
+        program_state.preserve_locks = 0; /* after getlock() */
+    }
+
+    if (*plname && (fd = restore_saved_game()) >= 0) {
         const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -295,12 +304,17 @@ attempt_restore:
     }
 
     if (!resuming) {
+        boolean neednewlock = (!*plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
            and skip selection this time if that didn't succeed */
-        if (!iflags.renameinprogress) {
-            player_selection();
+        if (!iflags.renameinprogress || iflags.defer_plname || neednewlock) {
+            if (!plsel_once)
+                player_selection();
+            plsel_once = TRUE;
+            if (neednewlock && *plname)
+                goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
                    if locking alphabetically, the existing lock file
@@ -686,5 +700,55 @@ get_unix_pw()
     }
     return pw;
 }
+
+char *
+get_login_name()
+{
+    static char buf[BUFSZ];
+    struct passwd *pw = get_unix_pw();
+
+    buf[0] = '\0';
+
+    if (pw)
+        (void)strcpy(buf, pw->pw_name);
+
+    return buf;
+}
+
+#ifdef __APPLE__
+extern int errno;
+
+void
+port_insert_pastebuf(buf)
+char *buf;
+{
+    /* This should be replaced when there is a Cocoa port. */
+    const char *errfmt;
+    size_t len;
+    FILE *PB = popen("/usr/bin/pbcopy","w");
+    if(!PB){
+	errfmt = "Unable to start pbcopy (%d)\n";
+	goto error;
+    }
+
+    len = strlen(buf);
+    /* Remove the trailing \n, carefully. */
+    if(buf[len-1] == '\n') len--;
+
+    /* XXX Sorry, I'm too lazy to write a loop for output this short. */
+    if(len!=fwrite(buf,1,len,PB)){
+	errfmt = "Error sending data to pbcopy (%d)\n";
+	goto error;
+    }
+
+    if(pclose(PB)!=-1){
+	return;
+    }
+    errfmt = "Error finishing pbcopy (%d)\n";
+
+error:
+    raw_printf(errfmt,strerror(errno));
+}
+#endif
 
 /*unixmain.c*/

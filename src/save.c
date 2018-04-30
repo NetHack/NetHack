@@ -1,5 +1,6 @@
 /* NetHack 3.6	save.c	$NHDT-Date: 1489192905 2017/03/11 00:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -63,8 +64,6 @@ static struct save_procs {
     zerocomp_bflush, zerocomp_bwrite, zerocomp_bclose,
 #endif
 };
-
-static long nulls[sizeof(struct trap) + sizeof(struct fruit)];
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
 #define HUP if (!program_state.done_hup)
@@ -1126,21 +1125,23 @@ savemonchn(register int fd, register struct monst *mtmp, register int mode)
         bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 }
 
+/* save traps; ftrap is the only trap chain so the 2nd arg is superfluous */
 STATIC_OVL void
-savetrapchn(register int fd, register struct trap *trap, register int mode)
+savetrapchn(int fd, register struct trap *trap, int mode)
 {
+    static struct trap zerotrap;
     register struct trap *trap2;
 
     while (trap) {
         trap2 = trap->ntrap;
         if (perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) trap, sizeof(struct trap));
+            bwrite(fd, (genericptr_t) trap, sizeof (struct trap));
         if (release_data(mode))
             dealloc_trap(trap);
         trap = trap2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) nulls, sizeof(struct trap));
+        bwrite(fd, (genericptr_t) &zerotrap, sizeof zerotrap);
 }
 
 /* save all the fruit names and ID's; this is used only in saving whole games
@@ -1149,21 +1150,22 @@ savetrapchn(register int fd, register struct trap *trap, register int mode)
  * level routine marks nonexistent fruits by making the fid negative.
  */
 void
-savefruitchn(register int fd, register int mode)
+savefruitchn(int fd, int mode)
 {
+    static struct fruit zerofruit;
     register struct fruit *f2, *f1;
 
     f1 = ffruit;
     while (f1) {
         f2 = f1->nextf;
         if (f1->fid >= 0 && perform_bwrite(mode))
-            bwrite(fd, (genericptr_t) f1, sizeof(struct fruit));
+            bwrite(fd, (genericptr_t) f1, sizeof (struct fruit));
         if (release_data(mode))
             dealloc_fruit(f1);
         f1 = f2;
     }
     if (perform_bwrite(mode))
-        bwrite(fd, (genericptr_t) nulls, sizeof(struct fruit));
+        bwrite(fd, (genericptr_t) &zerofruit, sizeof zerofruit);
     if (release_data(mode))
         ffruit = 0;
 }
@@ -1172,6 +1174,7 @@ void
 store_plname_in_file(int fd)
 {
     int plsiztmp = PL_NSIZ;
+
     bufoff(fd);
     /* bwrite() before bufon() uses plain write() */
     bwrite(fd, (genericptr_t) &plsiztmp, sizeof(plsiztmp));
@@ -1354,7 +1357,7 @@ freedynamicdata()
     /* free_pickinv_cache();  --  now done from really_done()... */
     free_symsets();
 #endif /* FREE_ALL_MEMORY */
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_finish();
 #endif
 #ifdef DUMPLOG

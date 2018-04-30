@@ -1,4 +1,4 @@
-               Instructions for Building and Installing NetHack 3.6.0
+               Instructions for Building and Installing NetHack 3.6.1
                      on a VMS (aka OpenVMS) system
                =========================================
 
@@ -137,7 +137,8 @@ Notes:
 0.  Version 3.5.x was never publicly released.
 
 1.  Save files and bones files from 3.4.x and earlier versions
-    will not work with 3.6.0. The scoreboard file (RECORD) from
+    will not work with 3.6.1, but save files and bones file from 3.6.0
+    should work. The scoreboard file (RECORD) from 3.6.0 or 
     3.4.x or 3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the
@@ -479,3 +480,7 @@ Notes:
 
 20-OCT-2003
 minimally updated 9-NOV-2015...
+
+# NetHack 3.6  Install.vms       $NHDT-Date: 1524689427 2018/04/25 20:50:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $
+# Copyright (c) 2003 by Robert Patrick Rankin
+# NetHack may be freely redistributed.  See license for details.

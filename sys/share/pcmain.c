@@ -1,5 +1,6 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1457207045 2016/03/05 19:44:05 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1524413707 2018/04/22 16:15:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* main.c - MSDOS, OS/2, ST, Amiga, and Windows NetHack */
@@ -135,6 +136,15 @@ pcmain(int argc, char *argv[])
 /* use STDERR by default
 _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
 _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
+/* Heap Debugging
+    _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)
+        | _CRTDBG_ALLOC_MEM_DF
+        | _CRTDBG_CHECK_ALWAYS_DF
+        | _CRTDBG_CHECK_CRT_DF
+        | _CRTDBG_DELAY_FREE_MEM_DF
+        | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetBreakAlloc(1423);
+*/
 # endif
 #endif
 
@@ -294,6 +304,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     save_getreturn_status = getreturn_enabled;
     raw_clear_screen();
     getreturn_enabled = TRUE;
+    check_recordfile((char *) 0);
 #endif
     initoptions();
 
@@ -316,6 +327,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         Strcpy(hackdir, HACKDIR);
 #endif
     if (argc > 1) {
+        if (argcheck(argc, argv, ARG_VERSION))
+            nethack_exit(EXIT_SUCCESS);
+
         if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else

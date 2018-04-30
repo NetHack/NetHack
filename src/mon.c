@@ -1,5 +1,6 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1505266804 2017/09/13 01:40:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1522540516 2018/03/31 23:55:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you're using precompiled headers, you don't want this either */
@@ -22,7 +23,6 @@ STATIC_DCL void kill_eggs(struct obj *);
 STATIC_DCL int pickvampshape(struct monst *);
 STATIC_DCL boolean isspecmon(struct monst *);
 STATIC_DCL boolean validspecmon(struct monst *, int);
-STATIC_DCL boolean validvamp(struct monst *, int *, int);
 STATIC_DCL struct permonst *accept_newcham_form(int);
 STATIC_DCL struct obj *make_corpse(struct monst *, unsigned);
 STATIC_DCL void m_detach(struct monst *, struct permonst *);
@@ -83,14 +83,21 @@ mon_sanity_check()
         if (DEADMONSTER(mtmp))
             continue;
         x = mtmp->mx, y = mtmp->my;
-        if (!isok(x, y) && !(mtmp->isgd && x == 0 && y == 0))
+        if (!isok(x, y) && !(mtmp->isgd && x == 0 && y == 0)) {
             impossible("mon (%s) claims to be at <%d,%d>?",
                        fmt_ptr((genericptr_t) mtmp), x, y);
-        else if (level.monsters[x][y] != mtmp)
+        } else if (mtmp == u.usteed) {
+            /* steed is in fmon list but not on the map; its
+               <mx,my> coordinates should match hero's location */
+            if (x != u.ux || y != u.uy)
+                impossible("steed (%s) claims to be at <%d,%d>?",
+                           fmt_ptr((genericptr_t) mtmp), x, y);
+        } else if (level.monsters[x][y] != mtmp) {
             impossible("mon (%s) at <%d,%d> is not there!",
                        fmt_ptr((genericptr_t) mtmp), x, y);
-        else if (mtmp->wormno)
+        } else if (mtmp->wormno) {
             sanity_check_worm(mtmp);
+        }
     }
 
     for (x = 0; x < COLNO; x++)
@@ -101,6 +108,9 @@ mon_sanity_check()
                         break;
                 if (!m)
                     impossible("map mon (%s) at <%d,%d> not in fmon list!",
+                               fmt_ptr((genericptr_t) mtmp), x, y);
+                else if (mtmp == u.usteed)
+                    impossible("steed (%s) is on the map at <%d,%d>!",
                                fmt_ptr((genericptr_t) mtmp), x, y);
                 else if ((mtmp->mx != x || mtmp->my != y)
                          && mtmp->data != &mons[PM_LONG_WORM])
@@ -2700,7 +2710,6 @@ setmangry(struct monst *mtmp, boolean via_attack)
             }
         }
     }
-
 }
 
 /* wake up a monster, possibly making it angry in the process */
@@ -2708,9 +2717,6 @@ void
 wakeup(register struct monst *mtmp, boolean via_attack)
 {
     mtmp->msleeping = 0;
-    finish_meating(mtmp);
-    if (via_attack)
-        setmangry(mtmp, TRUE);
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
     } else if (context.forcefight && !context.mon_moving
@@ -2718,6 +2724,9 @@ wakeup(register struct monst *mtmp, boolean via_attack)
         mtmp->mundetected = 0;
         newsym(mtmp->mx, mtmp->my);
     }
+    finish_meating(mtmp);
+    if (via_attack)
+        setmangry(mtmp, TRUE);
 }
 
 /* Wake up nearby monsters without angering them. */
@@ -2733,8 +2742,13 @@ wake_nearby()
             mtmp->msleeping = 0;
             if (!unique_corpstat(mtmp->data))
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
-            if (mtmp->mtame && !mtmp->isminion)
-                EDOG(mtmp)->whistletime = moves;
+            if (mtmp->mtame) {
+                if (!mtmp->isminion)
+                    EDOG(mtmp)->whistletime = moves;
+                /* Clear mtrack. This is to fix up a pet who is
+                   stuck "fleeing" its master. */
+                memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+            }
         }
     }
 }
@@ -2974,7 +2988,8 @@ void
 decide_to_shapeshift(struct monst *mon, int shiftflags)
 {
     struct permonst *ptr = 0;
-    unsigned mndx, was_female = mon->female;
+    int mndx;
+    unsigned was_female = mon->female;
     boolean msg = FALSE, dochng = FALSE;
 
     if ((shiftflags & SHIFT_MSG)
@@ -3090,7 +3105,7 @@ validspecmon(struct monst *mon, int mndx)
 }
 
 /* prevent wizard mode user from specifying invalid vampshifter shape */
-STATIC_OVL boolean
+boolean
 validvamp(struct monst *mon, int *mndx_p, int monclass)
 {
     /* simplify caller's usage */
@@ -3193,7 +3208,7 @@ select_newcham_form(struct monst *mon)
 
     /* for debugging: allow control of polymorphed monster */
     if (wizard && iflags.mon_polycontrol) {
-        char pprompt[BUFSZ], buf[BUFSZ];
+        char pprompt[BUFSZ], buf[BUFSZ] = DUMMY;
         int monclass;
 
         Sprintf(pprompt, "Change %s @ %s into what kind of monster?",

@@ -463,9 +463,7 @@ static short hup_set_font_name(winid, char *);
 #endif
 static char *hup_get_color_string(void);
 #endif /* CHANGE_COLOR */
-#ifdef STATUS_VIA_WINDOWPORT
-static void hup_status_update(int, genericptr_t, int, int);
-#endif
+static void hup_status_update(int, genericptr_t, int, int, int, unsigned long *);
 
 static int hup_int_ndecl(void);
 static void hup_void_ndecl(void);
@@ -515,14 +513,9 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* end_screen */
     hup_outrip, genl_preference_update, genl_getmsghistory,
     genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     hup_void_ndecl,                                   /* status_init */
     hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif /* STATUS_VIA_WINDOWPORT */
     genl_can_suspend_no,
 };
 
@@ -710,14 +703,12 @@ hup_get_color_string(VOID_ARGS)
 }
 #endif /* CHANGE_COLOR */
 
-#ifdef STATUS_VIA_WINDOWPORT
 /*ARGSUSED*/
 static void
-hup_status_update(int idx UNUSED, genericptr_t ptr UNUSED, int chg UNUSED, int percent UNUSED)
+hup_status_update(int idx UNUSED, genericptr_t ptr UNUSED, int chg UNUSED, int pc UNUSED, int color UNUSED, unsigned long *colormasks UNUSED)
 {
     return;
 }
-#endif /* STATUS_VIA_WINDOWPORT */
 
 /*
  * Non-specific stubs.
@@ -758,7 +749,6 @@ hup_void_fdecl_constchar_p(const char *string UNUSED)
 
 #endif /* HANGUPHANDLING */
 
-#ifdef STATUS_VIA_WINDOWPORT
 
 /****************************************************************************/
 /* genl backward compat stuff                                               */
@@ -809,7 +799,7 @@ genl_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean e
 
 /* call once for each field, then call with BL_FLUSH to output the result */
 void
-genl_status_update(int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED)
+genl_status_update(int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED, int color UNUSED, unsigned long *colormasks UNUSED)
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
@@ -847,12 +837,17 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED
           BL_LEVELDESC, BL_GOLD, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH },
     };
 
+    /* in case interface is using genl_status_update() but has not
+       specified WC2_FLUSH_STATUS (status_update() for field values
+       is buffered so final BL_FLUSH is needed to produce output) */
+    windowprocs.wincap2 |= WC2_FLUSH_STATUS;
+
     if (idx != BL_FLUSH) {
         if (!status_activefields[idx])
             return;
         switch (idx) {
         case BL_CONDITION:
-            cond = *condptr;
+            cond = condptr ? *condptr : 0L;
             nb = status_vals[idx];
             *nb = '\0';
             if (cond & BL_MASK_STONE)
@@ -884,7 +879,8 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED
             break;
         default:
             Sprintf(status_vals[idx],
-                    status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s", text);
+                    status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
+                    text ? text : "");
             break;
         }
         return; /* processed one field other than BL_FLUSH */
@@ -969,15 +965,6 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED, int percent UNUSED
     curs(WIN_STATUS, 1, 1);
     putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
 }
-
-#ifdef STATUS_HILITES
-void
-genl_status_threshold(int fldidx UNUSED, int thresholdtype UNUSED, anything threshold UNUSED, int behavior UNUSED, int under UNUSED, int over UNUSED)
-{
-    return;
-}
-#endif /* STATUS_HILITES */
-#endif /* STATUS_VIA_WINDOWPORT */
 
 STATIC_VAR struct window_procs dumplog_windowprocs_backup;
 STATIC_VAR FILE *dumplog_file;

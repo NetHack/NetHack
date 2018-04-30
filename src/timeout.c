@@ -1,5 +1,6 @@
 /* NetHack 3.6	timeout.c	$NHDT-Date: 1505214876 2017/09/12 11:14:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -145,13 +146,13 @@ stoned_dialogue()
     exercise(A_DEX, FALSE);
 }
 
-/* He is getting sicker and sicker prior to vomiting */
+/* hero is getting sicker and sicker prior to vomiting */
 static NEARDATA const char *const vomiting_texts[] = {
     "are feeling mildly nauseated.", /* 14 */
     "feel slightly confused.",       /* 11 */
     "can't seem to think straight.", /* 8 */
     "feel incredibly sick.",         /* 5 */
-    "suddenly vomit!"                /* 2 */
+    "are about to vomit."            /* 2 */
 };
 
 STATIC_OVL void
@@ -188,12 +189,27 @@ vomiting_dialogue()
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
-            txt = "gag uncontrolably.";
+            txt = "gag uncontrollably.";
+        else if (Hallucination)
+            /* "hurl" is short for "hurl chunks" which is slang for
+               relatively violent vomiting... */
+            txt = "are about to hurl!";
         break;
     case 0:
         stop_occupation();
-        if (!cantvomit(youmonst.data))
+        if (!cantvomit(youmonst.data)) {
             morehungry(20);
+            /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
+               since you've just been through the earlier messages of the
+               countdown, and it was still possible to move around between
+               that message and "You can move again." (from vomit()'s
+               nomul(-2)) with no intervening message; give one here to
+               have more specific point at which hero became unable to move
+               [vomit() issues its own message for the cantvomit() case
+               and for the FAINTING-or-worse case where stomach is empty] */
+            if (u.uhs < FAINTING)
+                You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+        }
         vomit();
         break;
     default:
@@ -260,6 +276,7 @@ levitation_dialogue()
 
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
         const char *s = levi_texts[SIZE(levi_texts) - i];
+
         if (index(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
@@ -321,6 +338,30 @@ burn_away_slime()
     }
 }
 
+/* Intrinsic Passes_walls is temporary when your god is trying to fix
+   all troubles and then TROUBLE_STUCK_IN_WALL calls safe_teleds() but
+   it can't find anywhere to place you.  If that happens you get a small
+   value for (HPasses_walls & TIMEOUT) to move somewhere yourself.
+   Message given is "you feel much slimmer" as a joke hint that you can
+   move between things which are closely packed--like the substance of
+   solid rock! */
+static NEARDATA const char *const phaze_texts[] = {
+    "You start to feel bloated.",
+    "You are feeling rather flabby.",
+};
+
+STATIC_OVL void
+phaze_dialogue()
+{
+    long i = ((HPasses_walls & TIMEOUT) / 2L);
+
+    if (EPasses_walls || (HPasses_walls & ~TIMEOUT))
+        return;
+
+    if (((HPasses_walls & TIMEOUT) % 2L) && i > 0L && i <= SIZE(phaze_texts))
+        pline1(phaze_texts[SIZE(phaze_texts) - i]);
+}
+
 void
 nh_timeout()
 {
@@ -358,8 +399,10 @@ nh_timeout()
         vomiting_dialogue();
     if (Strangled)
         choke_dialogue();
-    if (Levitation)
+    if (HLevitation & TIMEOUT)
         levitation_dialogue();
+    if (HPasses_walls & TIMEOUT)
+        phaze_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
             u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
@@ -510,6 +553,15 @@ nh_timeout()
                 break;
             case LEVITATION:
                 (void) float_down(I_SPECIAL | TIMEOUT, 0L);
+                break;
+            case PASSES_WALLS:
+                if (!Passes_walls) {
+                    if (stuck_in_wall())
+                        You_feel("hemmed in again.");
+                    else
+                        pline("You're back to your %s self again.",
+                              !Upolyd ? "normal" : "unusual");
+                }
                 break;
             case STRANGLED:
                 killer.format = KILLED_BY;
@@ -939,7 +991,7 @@ void
 burn_object(anything *arg, long timeout)
 {
     struct obj *obj = arg->a_obj;
-    boolean canseeit, many, menorah, need_newsym;
+    boolean canseeit, many, menorah, need_newsym, need_invupdate;
     xchar x, y;
     char whose[BUFSZ];
 
@@ -956,6 +1008,7 @@ burn_object(anything *arg, long timeout)
 
             if (menorah) {
                 obj->spe = 0; /* no more candles */
+                obj->owt = weight(obj);
             } else if (Is_candle(obj) || obj->otyp == POT_OIL) {
                 /* get rid of candles and burning oil potions;
                    we know this object isn't carried by hero,
@@ -980,7 +1033,7 @@ burn_object(anything *arg, long timeout)
     } else {
         canseeit = FALSE;
     }
-    need_newsym = FALSE;
+    need_newsym = need_invupdate = FALSE;
 
     /* obj->age is the age remaining at this point.  */
     switch (obj->otyp) {
@@ -989,6 +1042,8 @@ burn_object(anything *arg, long timeout)
         if (canseeit) {
             switch (obj->where) {
             case OBJ_INVENT:
+                need_invupdate = TRUE;
+                /*FALLTHRU*/
             case OBJ_MINVENT:
                 pline("%spotion of oil has burnt away.", whose);
                 break;
@@ -1050,6 +1105,8 @@ burn_object(anything *arg, long timeout)
             if (canseeit || obj->where == OBJ_INVENT) {
                 switch (obj->where) {
                 case OBJ_INVENT:
+                    need_invupdate = TRUE;
+                    /*FALLTHRU*/
                 case OBJ_MINVENT:
                     if (obj->otyp == BRASS_LANTERN)
                         pline("%slantern has run out of power.", whose);
@@ -1127,6 +1184,8 @@ burn_object(anything *arg, long timeout)
                 if (menorah) {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        need_invupdate = TRUE;
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%scandelabrum's flame%s.", whose,
                               many ? "s die" : " dies");
@@ -1139,15 +1198,18 @@ burn_object(anything *arg, long timeout)
                 } else {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        /* no need_invupdate for update_inventory() necessary;
+                           useupall() -> freeinv() handles it */
+                        /*FALLTHRU*/
                     case OBJ_MINVENT:
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
                         break;
                     case OBJ_FLOOR:
                         /*
-                        You see some wax candles consumed!
-                        You see a wax candle consumed!
-                        */
+                          You see some wax candles consumed!
+                          You see a wax candle consumed!
+                         */
                         You_see("%s%s consumed!", many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
                         need_newsym = TRUE;
@@ -1165,6 +1227,7 @@ burn_object(anything *arg, long timeout)
 
             if (menorah) {
                 obj->spe = 0;
+                obj->owt = weight(obj);
             } else {
                 if (carried(obj)) {
                     useupall(obj);
@@ -1178,7 +1241,7 @@ burn_object(anything *arg, long timeout)
                 }
                 obj = (struct obj *) 0;
             }
-            break;
+            break; /* case [age ==] 0 */
 
         default:
             /*
@@ -1191,8 +1254,7 @@ burn_object(anything *arg, long timeout)
 
         if (obj && obj->age)
             begin_burn(obj, TRUE);
-
-        break;
+        break; /* case [otyp ==] candelabrum|tallow_candle|wax_candle */
 
     default:
         impossible("burn_object: unexpeced obj %s", xname(obj));
@@ -1200,6 +1262,8 @@ burn_object(anything *arg, long timeout)
     }
     if (need_newsym)
         newsym(x, y);
+    if (need_invupdate)
+        update_inventory();
 }
 
 /*

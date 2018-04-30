@@ -1,4 +1,5 @@
-/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1524689429 2018/04/25 20:50:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/*      Copyright (c) 2011 by Robert Patrick Rankin              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"

@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1496101037 2017/05/29 23:37:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1524780381 2018/04/26 22:06:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -267,6 +267,19 @@ map_invisible(register xchar x, register xchar y)
     }
 }
 
+boolean
+unmap_invisible(x, y)
+int x, y;
+{
+    if (isok(x,y) && glyph_is_invisible(levl[x][y].glyph)) {
+        unmap_object(x, y);
+        newsym(x, y);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
 /*
  * unmap_object()
  *
@@ -365,6 +378,7 @@ display_monster(register xchar x, register xchar y, /* display position */
         default:
             impossible("display_monster:  bad m_ap_type value [ = %d ]",
                        (int) mon->m_ap_type);
+            /*FALLTHRU*/
         case M_AP_NOTHING:
             show_glyph(x, y, mon_to_glyph(mon));
             break;
@@ -468,6 +482,13 @@ display_warning(register struct monst *mon)
         impossible("display_warning did not match warning type?");
         return;
     }
+    /* warning glyph is drawn on the monster layer; unseen
+       monster glyph is drawn on the object/trap/floor layer;
+       if we see a 'warning' move onto 'remembered, unseen' we
+       need to explicitly remove that in order for it to not
+       reappear when the warned-of monster moves off that spot */
+    if (glyph_is_invisible(levl[x][y].glyph))
+        unmap_object(x, y);
     show_glyph(x, y, glyph);
 }
 

@@ -26,6 +26,11 @@ x)      hints=/dev/null
         ;;
 esac
 
+if [ ! -f "$hints" ]; then
+    echo "Cannot find hints file $hfile"
+    exit 1
+fi
+
 /bin/sh ./mkmkfile.sh Makefile.top TOP ../../Makefile $hints $hfile
 /bin/sh ./mkmkfile.sh Makefile.dat DAT ../../dat/Makefile $hints $hfile
 /bin/sh ./mkmkfile.sh Makefile.doc DOC ../../doc/Makefile $hints $hfile

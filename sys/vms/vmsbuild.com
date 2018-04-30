@@ -1,6 +1,8 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.6.1"
-$ ! $NHDT-Date: 1465133393 2016/06/05 13:29:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
+$ ! $NHDT-Date: 1524689429 2018/04/25 20:50:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $
+# Copyright (c) 2018 by Robert Patrick Rankin
+# NetHack may be freely redistributed.  See license for details.
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]
@@ -175,7 +177,7 @@ $ ! final setup
 $	nethacklib = "[-.src]nethack.olb"
 $	create nethack.opt
 ! nethack.opt
-nethack.olb/Library/Include=(vmsmain)
+nethack.olb/Include=(vmsmain)/Library
 sys$library:starlet.olb/Include=(lib$initialize)
 psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
 iosegment=128

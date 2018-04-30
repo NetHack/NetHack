@@ -1,11 +1,45 @@
 /* NetHack 3.6	objclass.h	$NHDT-Date: 1462067744 2016/05/01 01:55:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OBJCLASS_H
 #define OBJCLASS_H
 
 /* [misnamed] definition of a type of object */
+enum obj_material_types {
+    LIQUID = 1, /* currently only for venom */
+    WAX,
+    VEGGY, /* foodstuffs */
+    FLESH, /*   ditto    */
+    PAPER,
+    CLOTH,
+    LEATHER,
+    WOOD,
+    BONE,
+    DRAGON_HIDE, /* not leather! */
+    IRON,        /* Fe - includes steel */
+    METAL,       /* Sn, &c. */
+    COPPER,      /* Cu - includes brass */
+    SILVER,      /* Ag */
+    GOLD,        /* Au */
+    PLATINUM,    /* Pt */
+    MITHRIL,
+    PLASTIC,
+    GLASS,
+    GEMSTONE,
+    MINERAL
+};
+
+enum obj_armor_types {
+    ARM_SUIT = 0,
+    ARM_SHIELD,        /* needed for special wear function */
+    ARM_HELM,
+    ARM_GLOVES,
+    ARM_BOOTS,
+    ARM_CLOAK,
+    ARM_SHIRT
+};
 
 struct objclass {
     short oc_name_idx;              /* index of actual name */
@@ -40,28 +74,7 @@ struct objclass {
 
     /*Bitfield(oc_subtyp,3);*/ /* Now too big for a bitfield... see below */
 
-    Bitfield(oc_material, 5);
-#define LIQUID 1 /* currently only for venom */
-#define WAX 2
-#define VEGGY 3 /* foodstuffs */
-#define FLESH 4 /*   ditto    */
-#define PAPER 5
-#define CLOTH 6
-#define LEATHER 7
-#define WOOD 8
-#define BONE 9
-#define DRAGON_HIDE 10 /* not leather! */
-#define IRON 11        /* Fe - includes steel */
-#define METAL 12       /* Sn, &c. */
-#define COPPER 13      /* Cu - includes brass */
-#define SILVER 14      /* Ag */
-#define GOLD 15        /* Au */
-#define PLATINUM 16    /* Pt */
-#define MITHRIL 17
-#define PLASTIC 18
-#define GLASS 19
-#define GEMSTONE 20
-#define MINERAL 21
+    Bitfield(oc_material, 5); /* one of obj_material_types */
 
 #define is_organic(otmp) (objects[otmp->otyp].oc_material <= WOOD)
 #define is_metallic(otmp)                    \
@@ -84,13 +97,6 @@ struct objclass {
     schar oc_subtyp;
 #define oc_skill oc_subtyp  /* Skills of weapons, spellbooks, tools, gems */
 #define oc_armcat oc_subtyp /* for armor */
-#define ARM_SHIELD 1        /* needed for special wear function */
-#define ARM_HELM 2
-#define ARM_GLOVES 3
-#define ARM_BOOTS 4
-#define ARM_CLOAK 5
-#define ARM_SHIRT 6
-#define ARM_SUIT 0
 
     uchar oc_oprop; /* property (invis, &c.) conveyed */
     char oc_class;  /* object class */

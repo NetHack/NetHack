@@ -1,3 +1,7 @@
+/* NetHack 3.6  stubs.c       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $ */
+/*      Copyright (c) 2015 by Michael Allison              */
+/* NetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 #ifdef GUISTUB

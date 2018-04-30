@@ -1,5 +1,7 @@
-#	NetHack Makefile.
-# NetHack 3.6  Makefile.doc	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $
+#      NetHack Documentation Makefile.
+# NetHack 3.6  Makefile.doc    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 # Root of source tree:
 NHSROOT=..
@@ -27,9 +29,11 @@ PSCMD = groff
 # Use the "cat" GUIDECMD if nroff and/or tbl and/or col are not installed
 # Not appropriate for creating Guidebook.txt.
 # GUIDECMD = cat Guidebook.txt
-# The following works better with groff-1.18, eg on Linux
-# GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
-GUIDECMD = $(GUIDE_PREFORMAT) | nroff | $(COLCMD)
+#
+# Single page. Might need adjustment to .pl value
+# GUIDECMD= $(GUIDE_PREFORMAT) | perl -pe 's/^(.mt)$$/.pl 4720v\n.in 0\n.po 8\n.ll 64m\n$$1/' | nroff -c -Tascii | $(COLCMD)
+#
+GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii | $(COLCMD)
 
 # Only generate output for the current configuration:
 NHGREP = $(MAKEDEFS) --grep --input - --output -

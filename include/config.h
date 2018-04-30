@@ -1,5 +1,6 @@
 /* NetHack 3.6	config.h	$NHDT-Date: 1447728911 2015/11/17 02:55:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */
@@ -11,7 +12,7 @@
  *              For "UNIX" select BSD, ULTRIX, SYSV, or HPUX in unixconf.h.
  *              A "VMS" option is not needed since the VMS C-compilers
  *              provide it (no need to change sec#1, vmsconf.h handles it).
- *              MacOSX uses the UNIX configruation, not the old MAC one.
+ *              MacOSX uses the UNIX configuration, not the old MAC one.
  */
 
 #define UNIX /* delete if no fork(), exec() available */
@@ -498,9 +499,7 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
-/* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line
-                                       updating process */
-/* #define STATUS_HILITES */        /* support hilites of status fields */
+#define STATUS_HILITES         /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */
 
@@ -515,6 +514,11 @@ typedef unsigned char uchar;
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
+
+/* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
+   so some prompts will remember the previously input text
+   (within the same session) */
+/* #define EDIT_GETLIN */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
 #ifdef DUMPLOG

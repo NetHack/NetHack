@@ -27,42 +27,18 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #define MAXCO (COLNO + 40)
 #endif
 
-#ifdef STATUS_VIA_WINDOWPORT
-#if 0
-/* clang-format off */
-#define BL_FLUSH        -1
-#define BL_TITLE        0
-#define BL_STR          1
-#define BL_DX           2
-#define BL_CO           3
-#define BL_IN           4
-#define BL_WI           5
-#define BL_CH           6
-#define BL_ALIGN        7
-#define BL_SCORE        8
-#define BL_CAP          9
-#define BL_GOLD         10
-#define BL_ENE          11
-#define BL_ENEMAX       12
-#define BL_XP           13
-#define BL_AC           14
-#define BL_HD           15
-#define BL_TIME         16
-#define BL_HUNGER       17
-#define BL_HP           18
-#define BL_HPMAX        19
-#define BL_LEVELDESC    20
-#define BL_EXP          21
-#define BL_CONDITION    22
-/* clang-format on */
+enum statusfields {
+    BL_CHARACTERISTICS = -2, /* alias for BL_STR..BL_CH */
+    BL_FLUSH = -1, BL_TITLE = 0,
+    BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,  /* 1..6 */
+    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
+    BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, BL_LEVELDESC, /* 13..20 */
+    BL_EXP, BL_CONDITION
+};
 
-#else
-enum statusfields { BL_FLUSH = -1, BL_TITLE = 0, BL_STR, BL_DX, BL_CO, BL_IN,
-BL_WI, BL_CH, BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
-BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, BL_LEVELDESC,
-BL_EXP, BL_CONDITION };
-#endif
-#define MAXBLSTATS      BL_CONDITION+1
+enum relationships { LT_VALUE = -1, EQ_VALUE, GT_VALUE, TXT_VALUE };
+
+#define MAXBLSTATS      (BL_CONDITION + 1)
 
 #define BEFORE  0
 #define NOW     1
@@ -87,7 +63,7 @@ BL_EXP, BL_CONDITION };
 
 #define REASSESS_ONLY TRUE
 
-#ifdef STATUS_HILITES
+/* #ifdef STATUS_HILITES */
 /* hilite status field behavior - coloridx values */
 #define BL_HILITE_NONE -1    /* no hilite of this field */
 #define BL_HILITE_INVERSE -2 /* inverse hilite */
@@ -98,9 +74,26 @@ BL_EXP, BL_CONDITION };
 #define BL_TH_VAL_ABSOLUTE 101   /* threshold is particular value */
 #define BL_TH_UPDOWN 102         /* threshold is up or down change */
 #define BL_TH_CONDITION 103      /* threshold is bitmask of conditions */
-#endif
+#define BL_TH_TEXTMATCH 104      /* threshold text value to match against */
+#define BL_TH_ALWAYS_HILITE 105  /* highlight regardless of value */
+
+
+#define HL_ATTCLR_DIM     CLR_MAX + 0
+#define HL_ATTCLR_BLINK   CLR_MAX + 1
+#define HL_ATTCLR_ULINE   CLR_MAX + 2
+#define HL_ATTCLR_INVERSE CLR_MAX + 3
+#define HL_ATTCLR_BOLD    CLR_MAX + 4
+#define BL_ATTCLR_MAX     CLR_MAX + 5
+
+enum hlattribs { HL_UNDEF   = 0x00,
+                 HL_NONE    = 0x01,
+                 HL_BOLD    = 0x02,
+                 HL_INVERSE = 0x04,
+                 HL_ULINE   = 0x08,
+                 HL_BLINK   = 0x10,
+                 HL_DIM     = 0x20 };
+/* #endif STATUS_HILITES */
 
 extern const char *status_fieldnames[]; /* in botl.c */
-#endif
 
 #endif /* BOTL_H */

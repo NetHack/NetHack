@@ -1,5 +1,6 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1451081581 2015/12/25 22:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -27,6 +28,7 @@ STATIC_DCL boolean Mb_hit(struct monst * magr, struct monst *mdef,
 STATIC_DCL unsigned long abil_to_spfx(long *);
 STATIC_DCL uchar abil_to_adtyp(long *);
 STATIC_DCL boolean untouchable(struct obj *, boolean);
+STATIC_DCL int count_surround_traps(int, int);
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -895,15 +897,21 @@ disp_artifact_discoveries(winid tmpwin)
  * stun attack.  As of 3.4.1, those effects can occur but
  * will be slightly less likely than they were in 3.3.x.]
  */
+
+enum mb_effect_indices {
+    MB_INDEX_PROBE = 0,
+    MB_INDEX_STUN,
+    MB_INDEX_SCARE,
+    MB_INDEX_CANCEL,
+
+    NUM_MB_INDICES
+};
+
 #define MB_MAX_DIEROLL 8 /* rolls above this aren't magical */
-static const char *const mb_verb[2][4] = {
+static const char *const mb_verb[2][NUM_MB_INDICES] = {
     { "probe", "stun", "scare", "cancel" },
     { "prod", "amaze", "tickle", "purge" },
 };
-#define MB_INDEX_PROBE 0
-#define MB_INDEX_STUN 1
-#define MB_INDEX_SCARE 2
-#define MB_INDEX_CANCEL 3
 
 /* called when someone is being hit by Magicbane */
 STATIC_OVL boolean
@@ -1450,8 +1458,8 @@ arti_invoke(struct obj *obj)
                 obj->age = 0;
                 return 0;
             }
-            b_effect = (obj->blessed
-                        && (Role_switch == oart->role || !oart->role));
+            b_effect = (obj->blessed && (oart->role == Role_switch
+                                         || oart->role == NON_PM));
             recharge(otmp, b_effect ? 1 : obj->cursed ? -1 : 0);
             update_inventory();
             break;
@@ -1989,6 +1997,107 @@ retouch_equipment(int dropflag)/* 0==don't drop, 1==drop all, 2==drop weapon */
 
     if (!--nesting)
         clear_bypasses(); /* reset upon final exit */
+}
+
+static int mkot_trap_warn_count = 0;
+
+STATIC_OVL int
+count_surround_traps(x, y)
+int x, y;
+{
+    struct rm *levp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int dx, dy, glyph, ret = 0;
+
+    for (dx = x - 1; dx < x + 2; ++dx)
+        for (dy = y - 1; dy < y + 2; ++dy) {
+            if (!isok(dx, dy))
+                continue;
+            /* If a trap is shown here, don't count it; the hero
+             * should be expecting it.  But if there is a trap here
+             * that's not shown, either undiscovered or covered by
+             * something, do count it.
+             */
+            glyph = glyph_at(dx, dy);
+            if (glyph_is_trap(glyph))
+                continue;
+            if ((ttmp = t_at(dx, dy)) != 0) {
+                ++ret;
+                continue;
+            }
+            levp = &levl[dx][dy];
+            if (IS_DOOR(levp->typ) && (levp->doormask & D_TRAPPED) != 0) {
+                ++ret;
+                continue;
+            }
+            for (otmp = level.objects[dx][dy]; otmp; otmp = otmp->nexthere)
+                if (Is_container(otmp) && otmp->otrapped) {
+                    ++ret; /* we're counting locations, so just */
+                    break; /* count the first one in a pile     */
+                }
+        }
+    /*
+     * [Shouldn't we also check inventory for a trapped container?
+     * Even if its trap has already been found, there's no 'tknown'
+     * flag to help hero remember that so we have nothing comparable
+     * to a shown glyph to justify skipping it.]
+     */
+    return ret;
+}
+
+/* sense adjacent traps if wielding MKoT without wearing gloves */
+void
+mkot_trap_warn()
+{
+    static const char *const heat[7] = {
+        "cool", "slightly warm", "warm", "very warm",
+        "hot", "very hot", "like fire"
+    };
+
+    if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+        int idx, ntraps = count_surround_traps(u.ux, u.uy);
+
+        if (ntraps != mkot_trap_warn_count) {
+            idx = min(ntraps, SIZE(heat) - 1);
+            pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+        }
+        mkot_trap_warn_count = ntraps;
+    } else
+        mkot_trap_warn_count = 0;
+}
+
+/* Master Key is magic key if its bless/curse state meets our criteria:
+   not cursed for rogues or blessed for non-rogues */
+boolean
+is_magic_key(mon, obj)
+struct monst *mon; /* if null, non-rogue is assumed */
+struct obj *obj;
+{
+    if (((obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY)
+         && ((mon == &youmonst) ? Role_if(PM_ROGUE)
+                                : (mon && mon->data == &mons[PM_ROGUE])))
+        ? !obj->cursed : obj->blessed)
+        return TRUE;
+    return FALSE;
+}
+
+/* figure out whether 'mon' (usually youmonst) is carrying the magic key */
+struct obj *
+has_magic_key(mon)
+struct monst *mon; /* if null, hero assumed */
+{
+    struct obj *o;
+    short key = artilist[ART_MASTER_KEY_OF_THIEVERY].otyp;
+
+    if (!mon)
+        mon = &youmonst;
+    for (o = ((mon == &youmonst) ? invent : mon->minvent); o;
+         o = nxtobj(o, key, FALSE)) {
+        if (is_magic_key(mon, o))
+            return o;
+    }
+    return (struct obj *) 0;
 }
 
 /*artifact.c*/

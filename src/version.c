@@ -1,5 +1,6 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1449328116 2015/12/05 15:08:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1524693365 2018/04/25 21:56:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -15,9 +16,14 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO ""
+#if defined(NETHACK_GIT_SHA)
+const char * NetHack_git_sha = NETHACK_GIT_SHA;
+#endif
+#if defined(NETHACK_GIT_BRANCH)
+const char * NetHack_git_branch = NETHACK_GIT_BRANCH;
+#endif
 
-STATIC_DCL void insert_rtoptions(winid,char *,const char *);
+STATIC_DCL void insert_rtoption(char *);
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
@@ -30,13 +36,41 @@ version_string(char *buf)
 char *
 getversionstring(char *buf)
 {
+    boolean details = FALSE;
+
     Strcpy(buf, VERSION_ID);
-#if defined(BETA) && defined(BETA_INFO)
-    Sprintf(eos(buf), " %s", BETA_INFO);
+#if defined(RUNTIME_PORT_ID) || \
+    defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
+    details = TRUE;
+#endif
+
+    if (details) {
+#if defined(RUNTIME_PORT_ID) || defined(NETHACK_GIT_SHA) || defined(NETHACK_GIT_BRANCH)
+        int c = 0;
 #endif
 #if defined(RUNTIME_PORT_ID)
-    append_port_id(buf);
+        char tmpbuf[BUFSZ];
+        char *tmp = (char *)0;
 #endif
+
+        Sprintf(eos(buf), " (");
+#if defined(RUNTIME_PORT_ID)
+        tmp = get_port_id(tmpbuf);        
+        if (tmp)
+            Sprintf(eos(buf), "%s%s", c++ ? "," : "", tmp);
+#endif
+#if defined(NETHACK_GIT_SHA)
+        if (NetHack_git_sha)
+            Sprintf(eos(buf), "%s%s", c++ ? "," : "", NetHack_git_sha);
+#endif
+#if defined(NETHACK_GIT_BRANCH)
+#if defined(BETA)
+        if (NetHack_git_branch)
+            Sprintf(eos(buf), "%sbranch:%s", c++ ? "," : "", NetHack_git_branch);
+#endif
+#endif
+        Sprintf(eos(buf), ")");
+    }
     return buf;
 }
 
@@ -55,9 +89,8 @@ int
 doextversion()
 {
     dlb *f;
-    char *pd, buf[BUFSZ];
+    char buf[BUFSZ];
     winid win = create_nhwindow(NHW_TEXT);
-    boolean rtadded = FALSE;
 
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
@@ -72,8 +105,7 @@ doextversion()
         /*
          * already inserted above:
          * + outdented program name and version plus build date and time
-         * dat/options; display the contents with lines prefixed by '-'
-         * deleted:
+         * dat/options; display contents with lines prefixed by '-' deleted:
          * - blank-line
          * -     indented program name and version
          *   blank-line
@@ -106,16 +138,9 @@ doextversion()
             if (prolog || !*buf)
                 continue;
 
-            if (!rtadded) {
-                const char *catchphrase = ", and basic NetHack features.";
+            if (index(buf, ':'))
+                insert_rtoption(buf);
 
-                pd = strstri(buf, catchphrase);
-                if (pd) {
-                    *pd = '\0';
-                    insert_rtoptions(win, buf, &catchphrase[2]);
-                    rtadded = TRUE; /* only do it once */
-               }
-            }
             if (*buf)
                 putstr(win, 0, buf);
         }
@@ -126,12 +151,51 @@ doextversion()
     return 0;
 }
 
+void early_version_info(boolean pastebuf)
+{
+    char buf[BUFSZ], buf2[BUFSZ];
+    char *tmp = getversionstring(buf);
+
+    /* this is early enough that we have to do
+       our own line-splitting */
+    if (tmp) {
+        tmp = strstri(buf," (");
+        if (tmp) *tmp++ = '\0';
+    }
+
+    Sprintf(buf2, "%s\n", buf);
+    if (tmp) Sprintf(eos(buf2), "%s\n", tmp);
+    raw_printf("%s", buf2);
+
+    if (pastebuf) {
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+        /*
+         * Call a platform/port-specific routine to insert the
+         * version information into a paste buffer. Useful for
+         * easy inclusion in bug reports.
+         */
+        port_insert_pastebuf(buf2);
+#else
+        raw_printf("%s", "Paste buffer copy is not available.\n");
+#endif
+    }
+}
+
 extern const char regex_id[];
 
-static const char *rt_opts[] = {
-    "pattern matching via", regex_id,
+/*
+ * makedefs should put the first token into dat/options; we'll substitute
+ * the second value for it.  The token must contain at least one colon
+ * so that we can spot it, and should not contain spaces so that makedefs
+ * won't split it across lines.  Ideally the length should be close to
+ * that of the substituted value since we don't do phrase-splitting/line-
+ * wrapping when displaying it.
+ */
+static struct rt_opt {
+    const char *token, *value;
+} rt_opts[] = {
+    { ":PATMATCH:", regex_id },
 };
-static const char indent[] = "    ";
 
 /*
  * 3.6.0
@@ -140,54 +204,16 @@ static const char indent[] = "    ";
  * game image, so we insert those options here.
  */
 STATIC_OVL void
-insert_rtoptions(winid win, char *buf, const char *finalphrase)
+insert_rtoption(char *buf)
 {
-    char rtbuf[BUFSZ];
-    int l, i;
-    const char *s1 = 0, *s2 = 0, *s3 = 0, *s4 = 0;
+    int i;
 
-    if ((int) strlen(buf) >= (BUFSZ - 1))
-        return;
-
-    strcpy(rtbuf, buf);
-    for (i = 0; i < (SIZE(rt_opts) + 1); i += 2) {
-        if (i < SIZE(rt_opts)) {
-            s1 = ", ";
-            s2 = rt_opts[i];
-            s3 = " ";
-            s4 = rt_opts[i+1];
-        } else {
-            s1 = " ";
-            s2 = finalphrase;
-            s3 = "";
-            s4 = "";
-        }
-        l = (int) strlen(rtbuf) + (int) strlen(s1) + (int) strlen(s2)
-            + (int) strlen(s3) + (int) strlen(s4) + 1;
-        if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
-            Strcat(rtbuf, s1);
-            Strcat(rtbuf, s2);
-            Strcat(rtbuf, s3);
-            Strcat(rtbuf, s4);
-        } else {
-            putstr(win, 0, rtbuf);
-            if (i >= SIZE(rt_opts))
-                s1 = "";
-            l = (int) strlen(indent) + (int) strlen(s1) + (int) strlen(s2)
-                + (int) strlen(s3) + (int) strlen(s4) + 1;
-            if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
-                Strcpy(rtbuf, indent);
-                Strcat(rtbuf, s1);
-                Strcat(rtbuf, s2);
-                Strcat(rtbuf, s3);
-                Strcat(rtbuf, s4);
-            }
-        }
+    for (i = 0; i < SIZE(rt_opts); ++i) {
+        if (strstri(buf, rt_opts[i].token))
+            (void) strsubst(buf, rt_opts[i].token, rt_opts[i].value);
+        /* we don't break out of the loop after a match; there might be
+           other matches on the same line */
     }
-
-    if (l)
-        putstr(win, 0, rtbuf);
-    *buf = '\0';
 }
 
 #ifdef MICRO

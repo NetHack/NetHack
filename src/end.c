@@ -1,5 +1,6 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1495232357 2017/05/19 22:19:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1512803167 2017/12/09 07:06:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS /* comment line for pre-compiled headers */
@@ -753,6 +754,7 @@ time_t when) /* date+time at end of game */
     dump_redirect(FALSE);
 #else
     nhUse(how);
+    nhUse(when);
 #endif
 }
 
@@ -1121,11 +1123,6 @@ really_done(int how)
     else if (how == TURNED_SLIME)
         u.ugrave_arise = PM_GREEN_SLIME;
 
-    /* if pets will contribute to score, populate mydogs list now
-       (bones creation isn't a factor, but pline() messaging is) */
-    if (how == ESCAPED || how == ASCENDED)
-        keepdogs(TRUE);
-
     if (how == QUIT) {
         killer.format = NO_KILLER_PREFIX;
         if (u.uhp < 1) {
@@ -1172,6 +1169,13 @@ really_done(int how)
 
         dump_everything(how, endtime);
     }
+
+    /* if pets will contribute to score, populate mydogs list now
+       (bones creation isn't a factor, but pline() messaging is; used to
+       be done ever sooner, but we need it to come after dump_everything()
+       so that any accompanying pets are still on the map during dump) */
+    if (how == ESCAPED || how == ASCENDED)
+        keepdogs(TRUE);
 
     /* finish_paybill should be called after disclosure but before bones */
     if (bones_ok && taken)
@@ -1253,11 +1257,14 @@ really_done(int how)
     if (have_windows) {
         wait_synch();
         free_pickinv_cache(); /* extra persistent window if perm_invent */
-        if (WIN_INVEN != WIN_ERR)
+        if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
+            /* precaution in case any late update_inventory() calls occur */
+            flags.perm_invent = 0;
+        }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
-#ifndef STATUS_VIA_WINDOWPORT
+#ifndef STATUS_HILITES
         destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
 #endif
         destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;
@@ -1275,7 +1282,8 @@ really_done(int how)
        for normal end of game, genocide doesn't either */
     if (how <= GENOCIDED) {
         dump_redirect(TRUE);
-        genl_outrip(0, how, endtime);
+        if (iflags.in_dumplog)
+            genl_outrip(0, how, endtime);
         dump_redirect(FALSE);
     }
 #endif
@@ -1294,7 +1302,7 @@ really_done(int how)
                 ? (const char *) ((flags.female && urole.name.f)
                     ? urole.name.f
                     : urole.name.m)
-            : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
+                : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);
 
@@ -1329,6 +1337,7 @@ really_done(int how)
             Schroedingers_cat = odds_and_ends(invent, CAT_CHECK);
         if (Schroedingers_cat) {
             int mhp, m_lev = adj_lev(&mons[PM_HOUSECAT]);
+
             mhp = d(m_lev, 8);
             nowrap_add(u.urexp, mhp);
             Strcat(eos(pbuf), " and Schroedinger's cat");
@@ -1355,7 +1364,8 @@ really_done(int how)
             artifact_score(invent, FALSE, endwin); /* list artifacts */
 #ifdef DUMPLOG
         dump_redirect(TRUE);
-        artifact_score(invent, FALSE, 0);
+        if (iflags.in_dumplog)
+            artifact_score(invent, FALSE, 0);
         dump_redirect(FALSE);
 #endif
 
@@ -1541,23 +1551,28 @@ nh_terminate(int status)
 
 extern const int monstr[];
 
-static const char *vanqorders[] = {
+enum vanq_order_modes {
+    VANQ_MLVL_MNDX = 0,
+    VANQ_MSTR_MNDX,
+    VANQ_ALPHA_SEP,
+    VANQ_ALPHA_MIX,
+    VANQ_MCLS_HTOL,
+    VANQ_MCLS_LTOH,
+    VANQ_COUNT_H_L,
+    VANQ_COUNT_L_H,
+
+    NUM_VANQ_ORDER_MODES
+};
+
+static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "traditional: by monster level, by internal monster index",
-#define VANQ_MLVL_MNDX 0
     "by monster toughness, by internal monster index",
-#define VANQ_MSTR_MNDX 1
     "alphabetically, first unique monsters, then others",
-#define VANQ_ALPHA_SEP 2
     "alphabetically, unique monsters and others intermixed",
-#define VANQ_ALPHA_MIX 3
     "by monster class, high to low level within class",
-#define VANQ_MCLS_HTOL 4
     "by monster class, low to high level within class",
-#define VANQ_MCLS_LTOH 5
     "by count, high to low, by internal index within tied count",
-#define VANQ_COUNT_H_L 6
     "by count, low to high, by internal index within tied count",
-#define VANQ_COUNT_L_H 7
 };
 static int vanq_sortmode = VANQ_MLVL_MNDX;
 

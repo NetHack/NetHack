@@ -1,6 +1,6 @@
 NetHack 3.6.0 Linux Elf
 
-$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+$NHDT-Date: 1524684188 2018/04/25 19:23:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $
 
 This README provides the instructions for using the official Linux binary,
 system platform requirements, as well as steps used to create that binary.
@@ -22,11 +22,12 @@ preserving permissions to put the NetHack files in /usr/games/nethack and
 home directory you might perform these steps.
     % su
     # cd /
-    # tar xpvzf ~yourlogin/nethack-360-linux-X11.tgz
+    # tar xpvzf ~yourlogin/nethack-361-linux-X11.tgz
 
 If you have old record and logfile entries from a previous NetHack version,
 you might want to save copies before they get overwritten by the new empty
-files; old saved games and bones files from 3.4.x will not work with 3.6.0.
+files; old saved games and bones files from 3.6.0 should work with 3.6.1
+but even older saved games and bones files from 3.4.3 will not.
 If you are installing from the RPM, there is no need to save the old record
 and logfile; they are automatically preserved.
 

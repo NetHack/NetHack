@@ -1,5 +1,6 @@
 /* NetHack 3.6	role.c	$NHDT-Date: 1463561393 2016/05/18 08:49:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -1683,7 +1684,7 @@ plnamesuffix()
 
     do {
         if (!*plname)
-            askname(); /* fill plname[] if necessary */
+            askname(); /* fill plname[] if necessary, or set defer_plname */
 
         /* Look for tokens delimited by '-' */
         if ((eptr = index(plname, '-')) != (char *) 0)
@@ -1704,7 +1705,7 @@ plnamesuffix()
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!*plname);
+    } while (!*plname && !iflags.defer_plname);
 
     /* commas in the plname confuse the record file, convert to spaces */
     for (sptr = plname; *sptr; sptr++) {

@@ -1,5 +1,6 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1503309020 2017/08/21 09:50:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1524413723 2018/04/22 16:15:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define NEED_VARARGS
@@ -193,11 +194,12 @@ STATIC_DCL char *make_lockname(const char *, char *);
 STATIC_DCL void set_configfile_name(const char *);
 STATIC_DCL FILE *fopen_config_file(const char *, int);
 STATIC_DCL int get_uchars(char *, uchar *, boolean,
-                          int, const char *);
+                                  int, const char *);
 boolean proc_wizkit_line(char *);
 boolean parse_config_line(char *);
 STATIC_DCL boolean parse_conf_file(FILE *, boolean (*proc)(char *));
 STATIC_DCL FILE *fopen_sym_file(void);
+boolean proc_symset_line(char *);
 STATIC_DCL void set_symhandling(char *, int);
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void adjust_prefix(char *, int);
@@ -641,13 +643,17 @@ open_levelfile_exclusively(const char *name, int lev, int oflag)
 void
 really_close()
 {
-    int fd = lftrack.fd;
+    int fd;
+    
+    if (lftrack.init) {
+        fd = lftrack.fd;
 
-    lftrack.nethack_thinks_it_is_open = FALSE;
-    lftrack.fd = -1;
-    lftrack.oflag = 0;
-    if (fd != -1)
-        (void) close(fd);
+        lftrack.nethack_thinks_it_is_open = FALSE;
+        lftrack.fd = -1;
+        lftrack.oflag = 0;
+        if (fd != -1)
+            (void) close(fd);
+    }
     return;
 }
 
@@ -1920,7 +1926,7 @@ fopen_config_file(const char *filename, int src)
     set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
         return fp;
-    } else if (strcmp(backwad_compat_configfile, configfile)) {
+    } else if (strcmp(backward_compat_configfile, configfile)) {
         set_configfile_name(backward_compat_configfile);
         if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
             return fp;
@@ -2476,6 +2482,11 @@ parse_config_line(char *origbuf)
     } else if (match_varname(buf, "MENUCOLOR", 9)) {
         if (!add_menu_coloring(bufp))
             retval = FALSE;
+    } else if (match_varname(buf, "HILITE_STATUS", 6)) {
+#ifdef STATUS_HILITES
+        if (!parse_status_hl1(bufp, TRUE))
+            retval = FALSE;
+#endif
     } else if (match_varname(buf, "WARNINGS", 5)) {
         (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
                           "WARNINGS");
@@ -2605,24 +2616,29 @@ parse_config_line(char *origbuf)
     } else if (match_varname(buf, "SOUND", 5)) {
         add_sound_mapping(bufp);
 #endif
-#ifdef QT_GRAPHICS
-        /* These should move to wc_ options */
     } else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
+#ifdef QT_GRAPHICS
         extern char *qt_tilewidth;
 
         if (qt_tilewidth == NULL)
             qt_tilewidth = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
+#ifdef QT_GRAPHICS
         extern char *qt_tileheight;
 
         if (qt_tileheight == NULL)
             qt_tileheight = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_FONTSIZE", 11)) {
+#ifdef QT_GRAPHICS
         extern char *qt_fontsize;
 
         if (qt_fontsize == NULL)
             qt_fontsize = dupstr(bufp);
+#endif
     } else if (match_varname(buf, "QT_COMPACT", 10)) {
+#ifdef QT_GRAPHICS
         extern int qt_compact_mode;
 
         qt_compact_mode = atoi(bufp);
@@ -2642,41 +2658,59 @@ can_read_file(const char *filename)
 }
 #endif /* USER_SOUNDS */
 
-static int config_err_line_num = 0;
-static int config_err_num_errors = 0;
-static boolean config_err_origline_shown = FALSE;
-static boolean config_err_fromfile = FALSE;
-static boolean config_err_secure = FALSE;
-static char config_err_origline[4 * BUFSZ];
-static char config_err_source[BUFSZ];
+struct _config_error_frame {
+    int line_num;
+    int num_errors;
+    boolean origline_shown;
+    boolean fromfile;
+    boolean secure;
+    char origline[4 * BUFSZ];
+    char source[BUFSZ];
+    struct _config_error_frame *next;
+};
+
+struct _config_error_frame *config_error_data = (struct _config_error_frame *)0;
 
 void
 config_error_init(boolean from_file, const char *sourcename, boolean secure)
 {
-    config_err_line_num = 0;
-    config_err_num_errors = 0;
-    config_err_origline_shown = FALSE;
-    config_err_fromfile = from_file;
-    config_err_secure = secure;
-    config_err_origline[0] = '\0';
-    if (sourcename && sourcename[0])
-        Strcpy(config_err_source, sourcename);
-    else
-        config_err_source[0] = '\0';
+    struct _config_error_frame *tmp = (struct _config_error_frame *)
+        alloc(sizeof(struct _config_error_frame));
+
+    tmp->line_num = 0;
+    tmp->num_errors = 0;
+    tmp->origline_shown = FALSE;
+    tmp->fromfile = from_file;
+    tmp->secure = secure;
+    tmp->origline[0] = '\0';
+    if (sourcename && sourcename[0]) {
+        (void) strncpy(tmp->source, sourcename, sizeof(tmp->source)-1);
+        tmp->source[sizeof(tmp->source)-1] = '\0';
+    } else
+        tmp->source[0] = '\0';
+
+    tmp->next = config_error_data;
+    config_error_data = tmp;
 }
 
 STATIC_OVL boolean
 config_error_nextline(const char *line)
 {
-    if (config_err_num_errors && config_err_secure)
+    struct _config_error_frame *ced = config_error_data;
+
+    if (!ced)
         return FALSE;
 
-    config_err_line_num++;
-    config_err_origline_shown = FALSE;
-    if (line && line[0])
-        Strcpy(config_err_origline, line);
-    else
-        config_err_origline[0] = '\0';
+    if (ced->num_errors && ced->secure)
+        return FALSE;
+
+    ced->line_num++;
+    ced->origline_shown = FALSE;
+    if (line && line[0]) {
+        (void) strncpy(ced->origline, line, sizeof(ced->origline)-1);
+        ced->origline[sizeof(ced->origline)-1] = '\0';
+    } else
+        ced->origline[0] = '\0';
 
     return TRUE;
 }
@@ -2693,17 +2727,25 @@ void config_error_add
     va_start(the_args, str);
     Vsprintf(buf, str, the_args);
 
-    config_err_num_errors++;
-    if (!config_err_origline_shown && !config_err_secure) {
-        pline("\n%s", config_err_origline);
-        config_err_origline_shown = TRUE;
+    if (!config_error_data) {
+        pline("%s.", *buf ? buf : "Unknown error");
+        wait_synch();
+        return;
     }
-    if (config_err_line_num > 0 && !config_err_secure) {
-        Sprintf(lineno, "Line %i: ", config_err_line_num);
+
+    config_error_data->num_errors++;
+    if (!config_error_data->origline_shown
+        && !config_error_data->secure) {
+        pline("\n%s", config_error_data->origline);
+        config_error_data->origline_shown = TRUE;
+    }
+    if (config_error_data->line_num > 0
+        && !config_error_data->secure) {
+        Sprintf(lineno, "Line %i: ", config_error_data->line_num);
     } else
         lineno[0] = '\0';
     pline("%s %s%s.",
-          config_err_secure ? "Error:" : " *",
+          config_error_data->secure ? "Error:" : " *",
           lineno,
           *buf ? buf : "Unknown error");
 
@@ -2713,14 +2755,24 @@ void config_error_add
 int
 config_error_done()
 {
-    int n = config_err_num_errors;
+    int n;
+    struct _config_error_frame *tmp = config_error_data;
+
+    if (!config_error_data)
+        return 0;
+    n = config_error_data->num_errors;
     if (n) {
         pline("\n%i error%s in %s.\n", n,
                    (n > 1) ? "s" : "",
-                   *config_err_source ? config_err_source : configfile);
+                   *config_error_data->source
+              ? config_error_data->source : configfile);
         wait_synch();
     }
-    config_error_init(FALSE, "", FALSE);
+
+    config_error_data = tmp->next;
+
+    free(tmp);
+
     return n;
 }
 
@@ -3015,6 +3067,7 @@ extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 static int symset_count = 0;             /* for pick-list building only */
 static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
+static int symset_which_set = 0;
 
 STATIC_OVL
 FILE *
@@ -3033,7 +3086,6 @@ fopen_sym_file()
 int
 read_sym_file(int which_set)
 {
-    char buf[4 * BUFSZ];
     FILE *fp;
 
     if (!(fp = fopen_sym_file()))
@@ -3041,13 +3093,13 @@ read_sym_file(int which_set)
 
     symset_count = 0;
     chosen_symset_start = chosen_symset_end = FALSE;
-    while (fgets(buf, 4 * BUFSZ, fp)) {
-        if (!parse_sym_line(buf, which_set)) {
-            raw_printf("Bad symbol line:  \"%.50s\"", buf);
-            wait_synch();
-        }
-    }
+    symset_which_set = which_set;
+
+    config_error_init(TRUE, "symbols", FALSE);
+
+    parse_conf_file(fp, proc_symset_line);
     (void) fclose(fp);
+
     if (!chosen_symset_start && !chosen_symset_end) {
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
@@ -3057,15 +3109,24 @@ read_sym_file(int which_set)
                            " -_", TRUE)
                 || !strcmpi(symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
+        config_error_done();
         return (symset[which_set].name == 0) ? 1 : 0;
     }
-    if (!chosen_symset_end) {
-        raw_printf("Missing finish for symset \"%s\"",
+    if (!chosen_symset_end)
+        config_error_add("Missing finish for symset \"%s\"",
                    symset[which_set].name ? symset[which_set].name
                                           : "unknown");
-        wait_synch();
-    }
+
+    config_error_done();
+
     return 1;
+}
+
+boolean
+proc_symset_line(buf)
+char *buf;
+{
+    return !((boolean) parse_sym_line(buf, symset_which_set));
 }
 
 /* returns 0 on error */
@@ -3079,8 +3140,7 @@ parse_sym_line(char *buf, int which_set)
     /* convert each instance of whitespace (tabs, consecutive spaces)
        into a single space; leading and trailing spaces are stripped */
     mungspaces(buf);
-    if (!*buf || *buf == '#' || !strcmp(buf, " "))
-        return 1;
+
     /* remove trailing comment, if any (this isn't strictly needed for
        individual symbols, and it won't matter if "X#comment" without
        separating space slips through; for handling or set description,
@@ -3102,6 +3162,7 @@ parse_sym_line(char *buf, int which_set)
             chosen_symset_start = FALSE;
             return 1;
         }
+        config_error_add("No \"finish\"");
         return 0;
     }
     /* skip '=' and space which follows, if any */
@@ -3110,8 +3171,10 @@ parse_sym_line(char *buf, int which_set)
         ++bufp;
 
     symp = match_sym(buf);
-    if (!symp)
+    if (!symp) {
+        config_error_add("Unknown sym keyword");
         return 0;
+    }
 
     if (!symset[which_set].name) {
         /* A null symset name indicates that we're just
@@ -3331,6 +3394,30 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
 #else
     Strcpy(tmp, RECORD);
     fq_record = fqname(RECORD, SCOREPREFIX, 0);
+#endif
+#ifdef WIN32
+    /* If dir is NULL it indicates create but
+       only if it doesn't already exist */
+    if (!dir) {
+        char buf[BUFSZ];
+
+        buf[0] = '\0';
+        fd = open(fq_record, O_RDWR);
+        if (!(fd == -1 && errno == ENOENT)) {
+            if (fd >= 0) {
+                (void) nhclose(fd);
+            } else {
+                /* explanation for failure other than missing file */
+                Sprintf(buf, "error   \"%s\", (errno %d).",
+                        fq_record, errno);
+                paniclog("scorefile", buf);
+            }
+            return;
+        }
+        Sprintf(buf, "missing \"%s\", creating new scorefile.",
+                fq_record);
+        paniclog("scorefile", buf);
+    }
 #endif
 
     if ((fd = open(fq_record, O_RDWR)) < 0) {

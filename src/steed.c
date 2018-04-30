@@ -479,6 +479,7 @@ dismount_steed(int reason) /* Player was thrown off etc. */
     switch (reason) {
     case DISMOUNT_THROWN:
         verb = "are thrown";
+        /*FALLTHRU*/
     case DISMOUNT_FELL:
         You("%s off of %s!", verb, mon_nam(mtmp));
         if (!have_spot)

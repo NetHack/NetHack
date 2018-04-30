@@ -1,5 +1,6 @@
 /* NetHack 3.6	minion.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -272,7 +273,8 @@ demon_talk(register struct monst *mtmp)
         if ((offer = bribe(mtmp)) >= demand) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
-        } else if (offer > 0L && (long) rnd(40) > (demand - offer)) {
+        } else if (offer > 0L
+                   && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
             pline("%s scowls at you menacingly, then vanishes.",
                   Amonnam(mtmp));
         } else {
@@ -289,7 +291,7 @@ demon_talk(register struct monst *mtmp)
 long
 bribe(struct monst *mtmp)
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     long offer;
     long umoney = money_cnt(invent);
 

@@ -1,4 +1,6 @@
-/* $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Date: 1524689304 2018/04/25 20:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/*      Copyright (c) 2017 by Pasi Kallinen                       */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Convert the given input files into an output file that is expected
@@ -89,7 +91,7 @@ merge_text_colormap()
 
         if (j == header.ncolors) { /* couldn't find it */
 #ifdef PRINT_COLORMAP
-            printf("color %2d: %3d %3d %3d\n", header.ncolors,
+            Fprintf(stdout, "color %2d: %3d %3d %3d\n", header.ncolors,
                    ColorMap[CM_RED][i], ColorMap[CM_GREEN][i],
                    ColorMap[CM_BLUE][i]);
 #endif
@@ -114,7 +116,7 @@ process_file(char *fname)
     }
     merge_text_colormap();
     count = convert_tiles(&curr_tb, header.ntiles);
-    Fprintf(stderr, "%s: %lu tiles\n", fname, count);
+    Fprintf(stdout, "%s: %lu tiles\n", fname, count);
     header.ntiles += count;
     fclose_text_file();
 }
@@ -193,7 +195,7 @@ main(int argc, char **argv)
         }
         process_file(argv[i]);
     }
-    Fprintf(stderr, "Total tiles: %ld\n", header.ntiles);
+    Fprintf(stdout, "Total tiles: %ld\n", header.ntiles);
 
     /* round size up to the end of the row */
     if ((header.ntiles % header.per_row) != 0) {

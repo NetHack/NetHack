@@ -1,5 +1,5 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1451610993 2016/01/01 01:16:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
-#       Copyright (c) NetHack PC Development Team 1993-2015
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
+#       Copyright (c) NetHack PC Development Team 1993-2018
 #
 #==============================================================================
 # Build Tools Environment
@@ -9,7 +9,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2010 Express, with the Platform SDK
 #            - Microsoft Visual Studio 2013 Express
-#            - Microsoft Visual Studio 2015 Express (pre-release)
+#            - Microsoft Visual Studio 2017 Community Edition
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
@@ -29,63 +29,37 @@
 #
 #   If you have any questions read the sys/winnt/Install.nt file included 
 #   with the distribution.
-#==============================================================================
-# Before we get started, this section is used to determine the version of 
-# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
-# is too old or untested.
-#
-
-!IF "$(_NMAKE_VER)" == "14.00.22310.1"
-VSVER=2015
-!ELSEIF "$(_NMAKE_VER)" == "12.00.21005.1"
-VSVER=2013
-!ELSEIF "$(_NMAKE_VER)" == "11.00.50727.1"
-VSVER=2012
-!ELSEIF "$(_NMAKE_VER)" == "10.00.40219.01"
-VSVER=2010
-!ELSE
-VSVER=0000		#untested version
-!ENDIF
-
-#==============================================================================
+#========================================================================================
 # BUILD DECISIONS SECTION
 #
-# There are currently only 3 decisions that you have to make.
-#	1. 32-bit or 64-bit?
-#	2. Where do you want your build to end up?
-#	3. Do you want debug information in the executable?
+# There are currently only 3 decisions that you can choose to make, and none are 
+# required:
+#	1. Where do you want your build to end up?
+#	2. Do you want debug information in the executable?
+#	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
 #
+#-----------------------------------------------------------------------------------------
+#=========================================================================================
+
 #---------------------------------------------------------------
-#==============================================================================
-# 1. 32-bit or 64-bit? (comment/uncomment appropriate TARGET_CPU line)
-#
+# 1. Where do you want the game to be built (which folder)?
 
-!IF ($(VSVER) >= 2012)
-#
-# 64 bit
-#TARGET_CPU=x64
-#
-# 32 bit
-TARGET_CPU=x86
-
-!ELSE
-# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
-# DO NOT DELETE THE FOLLOWING LINE
-!include <win32.mak>
-!ENDIF
-#
+GAMEDIR = ..\binary               # Default game build directory
+ 
 #---------------------------------------------------------------
-# 2. Where do you want the game to be built (which folder)?
-#
-
-GAMEDIR = ..\binary               # Game directory
-
-#
-#---------------------------------------------------------------
-# 3. Do you want debug information in the executable?
-#
+# 2. Do you want debug information available to the executable?
   
 DEBUGINFO = Y
+
+#---------------------------------------------------------------
+# 3. This Makefile will attempt to auto-detect your selected target architecture
+#    based on Visual Studio command prompt configuration settins etc.
+#    However, if you want to manually override generation of a 
+#    32-bit or 64-bit build target, you can uncomment the apppropriate
+#    TARGET_CPU line below.
+#
+#TARGET_CPU=x64
+#TARGET_CPU=x86
 
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -175,22 +149,92 @@ DLBFLG =
 #==========================================
 #==========================================
 
+# Before we get started, this section is used to determine the version of 
+# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
+# is too old or untested.
+#
+
+#!MESSAGE $(MAKEFLAGS)
+#!MESSAGE $(MAKEDIR)
+#!MESSAGE $(MAKE)
+
+MAKEVERSION=$(_NMAKE_VER:.= )
+MAKEVERSION=$(MAKEVERSION: =)
+#!MESSAGE $(_NMAKE_VER)
+#!MESSAGE $(MAKEVERSION)
+
+VSNEWEST=2017
+!IF ($(MAKEVERSION) < 1000000000)
+VSVER=0000		#untested ancient version
+!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
+VSVER=2010
+!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
+VSVER=2012
+!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
+VSVER=2013
+!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
+VSVER=2015
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1412258351)
+VSVER=$(VSNEWEST)
+!ELSEIF ($(MAKEVERSION) > 1412258350)
+VSVER=2999              #untested future version
+!ENDIF
+
+!IF ($(VSVER) >= 2012)
+!MESSAGE Autodetected Visual Studio $(VSVER)
+!ELSEIF ($(VSVER) == 2999
+!MESSAGE The version of Visual Studio is newer than the most recent at
+!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
+!MESSAGE Because it is newer we'll proceed expecting that the 
+!MESSAGE VS$(VSNEWEST) processing will still work.
+!ELSEIF ($(VSVER) == 0000)
+!MESSAGE The version of Visual Studio appears to be quite old, older
+!MESSAGE than VS2010 which is the oldest supported version by this
+!MESSAGE Makefile, so we'll stop now.
+!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
+# DO NOT DELETE THE FOLLOWING LINE
+!include <win32.mak>
+! ENDIF
+
+#----------------------------------------------------------------
+
+#These will be in the environment variables with one of the VS2017
+#developer command prompts.
+#VSCMD_ARG_HOST_ARCH=x64
+#VSCMD_ARG_TGT_ARCH=x86
+
+!IFDEF VSCMD_ARG_HOST_ARCH
+!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
+!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
+! IFNDEF TARGET_CPU
+!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
+TARGET_CPU=x64
+!  ELSE
+TARGET_CPU=x86
+!  ENDIF
+! ENDIF
+!ENDIF
+
 !IF "$(TARGET_CPU)" == ""
 TARGET_CPU=x86
 !ENDIF
 
-!IF "$(_NMAKE_VER)" == "10.00.40219.01"
-CL2013=
+!IF ($(VSVER) == 2010)
+CL_RECENT=
 !ELSE
 ! IF ($(VSVER) > 2010)
-CL2013=-sdl
+CL_RECENT=-sdl
 ! ENDIF
 !ENDIF
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
 	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" -EHsc -fp:precise -Gd -GF -GS -Gy \
-	$(CL2013) -WX- -Zc:forScope -Zc:wchar_t -Zi
+	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
 cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
 crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
 
@@ -247,8 +291,8 @@ guilflags = $(lflags) -subsystem:windows,$(EXEVER)
 dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
 
 # basic subsystem specific libraries, less the C Run-Time
-baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
-winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib
+winlibs     = $(baselibs) user32.lib comdlg32.lib winspool.lib
 
 # for Windows applications that use the C Run-Time libraries
 conlibs     = $(baselibs)
@@ -525,7 +569,7 @@ default : install
 
 all :	install
 
-install: envchk $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
+install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
 	 @echo Done.
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
@@ -869,14 +913,19 @@ $(MSWIN)\splash.bmp: $(U)uudecode.exe $(MSWIN)\splash.uu
 # defer to the steps in ..\win\win32\levstuff.mak
 #
 
-$(U)lev_yacc.c $(INCL)\lev_comp.h: $(U)lev_comp.y
-	nmake -nologo -f ..\win\win32\levstuff.mak default
+$(U)lev_yacc.c: $(U)lev_comp.y
+	nmake -nologo -f ..\win\win32\levstuff.mak $(U)lev_yacc.c
+
+$(U)lev_lex.c: $(U)lev_comp.l
+	nmake -nologo -f ..\win\win32\levstuff.mak $(U)lev_lex.c
+
+$(INCL)\lev_comp.h:
+	nmake -nologo -f ..\win\win32\levstuff.mak $(INCL)\lev_comp.h
 
 $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)lev_yacc.c
 
-$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) \
-               $(U)lev_lex.c
+$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) $(U)lev_lex.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)lev_lex.c
 
 $(O)lev_main.o:	$(U)lev_main.c $(HACK_H) $(SP_LEV_H)
@@ -895,8 +944,14 @@ $(U)levcomp.exe: $(LEVCOMPOBJS)
 #
 # defer to the steps in ..\win\win32\dgnstuff.mak
 #
-$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
-	nmake -nologo -f ..\win\win32\dgnstuff.mak default
+$(U)dgn_yacc.c: $(U)dgn_comp.y
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(U)dgn_yacc.c
+
+$(INCL)\dgn_comp.h:
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(INCL)\dgn_comp.h
+
+$(U)dgn_lex.c: $(U)dgn_comp.l
+	nmake -nologo -f ..\win\win32\dgnstuff.mak $(U)dgn_lex.c
 
 $(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)dgn_yacc.c
@@ -930,23 +985,17 @@ $(O)obj.tag:
 # options.
 #==========================================
 
-envchk:
-!	IF ($(VSVER) < 2010)
-	@echo Your Visual Studio version is too old or untested ($(_NMAKE_VER))
-!ERROR Your Visual Studio version is too old or untested ($(_NMAKE_VER))
-!	ENDIF
+$(O)envchk.tag: $(O)obj.tag
 !	IF "$(TARGET_CPU)"=="x64"
-	@echo Windows x64 64-bit build
+	@echo Windows x64 64-bit target build
 !	ELSE
-	@echo Windows x86 32-bit build
+	@echo Windows x86 32-bit target build
 !	ENDIF
 !	IF "$(CL)"!=""
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
 !	ENDIF
-	   @echo ----
-	   @echo NOTE: This build will include tile support.
-	   @echo ----
+        echo envchk >$@
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -1133,63 +1182,78 @@ spotless: clean
 	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
 	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
 ! ENDIF
-	if exist $(INCL)\date.h    del $(INCL)\date.h
-	if exist $(INCL)\onames.h  del $(INCL)\onames.h
-	if exist $(INCL)\pm.h      del $(INCL)\pm.h
-	if exist $(INCL)\vis_tab.h del $(INCL)\vis_tab.h
-	if exist $(SRC)\vis_tab.c  del $(SRC)\vis_tab.c
-	if exist $(SRC)\tile.c     del $(SRC)\tile.c
-	if exist $(U)*.lnk         del $(U)*.lnk
-	if exist $(U)*.map         del $(U)*.map
-	if exist $(DAT)\data       del $(DAT)\data
-	if exist $(DAT)\rumors     del $(DAT)\rumors
-	if exist $(DAT)\engrave    del $(DAT)\engrave
-	if exist $(DAT)\epitaph    del $(DAT)\epitaph
-	if exist $(DAT)\bogusmon   del $(DAT)\bogusmon
-	if exist $(DAT)\???-fil?.lev	del $(DAT)\???-fil?.lev
-	if exist $(DAT)\???-goal.lev	del $(DAT)\???-goal.lev
-	if exist $(DAT)\???-loca.lev	del $(DAT)\???-loca.lev
-	if exist $(DAT)\???-strt.lev	del $(DAT)\???-strt.lev
-	if exist $(DAT)\air.lev		del $(DAT)\air.lev
-	if exist $(DAT)\asmodeus.lev	del $(DAT)\asmodeus.lev
-	if exist $(DAT)\astral.lev	del $(DAT)\astral.lev
-	if exist $(DAT)\baalz.lev	del $(DAT)\baalz.lev
-	if exist $(DAT)\bigrm-*.lev	del $(DAT)\bigrm-*.lev
-	if exist $(DAT)\castle.lev	del $(DAT)\castle.lev
-	if exist $(DAT)\data		del $(DAT)\data
-	if exist $(DAT)\dungeon		del $(DAT)\dungeon
-	if exist $(DAT)\dungeon.pdf	del $(DAT)\dungeon.pdf
-	if exist $(DAT)\earth.lev	del $(DAT)\earth.lev
-	if exist $(DAT)\fakewiz?.lev	del $(DAT)\fakewiz?.lev
-	if exist $(DAT)\fire.lev	del $(DAT)\fire.lev
-	if exist $(DAT)\juiblex.lev	del $(DAT)\juiblex.lev
-	if exist $(DAT)\knox.lev	del $(DAT)\knox.lev
-	if exist $(DAT)\medusa-?.lev	del $(DAT)\medusa-?.lev
-	if exist $(DAT)\mine*.lev	del $(DAT)\mine*.lev
-	if exist $(DAT)\options		del $(DAT)\options
-	if exist $(DAT)\ttyoptions	del $(DAT)\ttyoptions
-	if exist $(DAT)\guioptions	del $(DAT)\guioptions
-	if exist $(DAT)\oracle.lev	del $(DAT)\oracle.lev
-	if exist $(DAT)\oracles		del $(DAT)\oracles
-	if exist $(DAT)\orcus.lev	del $(DAT)\orcus.lev
-	if exist $(DAT)\rumors		del $(DAT)\rumors
-	if exist $(DAT)\quest.dat	del $(DAT)\quest.dat
-	if exist $(DAT)\sanctum.lev	del $(DAT)\sanctum.lev
-	if exist $(DAT)\soko?-?.lev	del $(DAT)\soko?-?.lev
-	if exist $(DAT)\tower?.lev	del $(DAT)\tower?.lev
-	if exist $(DAT)\valley.lev	del $(DAT)\valley.lev
-	if exist $(DAT)\water.lev	del $(DAT)\water.lev
-	if exist $(DAT)\wizard?.lev	del $(DAT)\wizard?.lev
-	if exist $(DAT)\dlb.lst		del $(DAT)\dlb.lst
-	if exist $(O)sp_lev.tag	        del $(O)sp_lev.tag
-	if exist $(SRC)\monstr.c        del $(SRC)\monstr.c
-	if exist $(SRC)\vis_tab.c       del $(SRC)\vis_tab.c
-	if exist $(U)recover.exe        del $(U)recover.exe
-	if exist nhdat.			del nhdat.
-	if exist $(O)obj.tag            del $(O)obj.tag
-	if exist $(O)gamedir.tag        del $(O)gamedir.tag
-	if exist $(O)nh*key.lib         del $(O)nh*key.lib
-	if exist $(O)nh*key.exp         del $(O)nh*key.exp
+	if exist $(INCL)\date.h          del $(INCL)\date.h
+	if exist $(INCL)\onames.h        del $(INCL)\onames.h
+	if exist $(INCL)\pm.h            del $(INCL)\pm.h
+	if exist $(INCL)\vis_tab.h       del $(INCL)\vis_tab.h
+	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
+	if exist $(SRC)\tile.c           del $(SRC)\tile.c
+	if exist $(U)*.lnk               del $(U)*.lnk
+	if exist $(U)*.map               del $(U)*.map
+	if exist $(DAT)\data             del $(DAT)\data
+	if exist $(DAT)\rumors           del $(DAT)\rumors
+	if exist $(DAT)\engrave          del $(DAT)\engrave
+	if exist $(DAT)\epitaph          del $(DAT)\epitaph
+	if exist $(DAT)\bogusmon         del $(DAT)\bogusmon
+	if exist $(DAT)\???-fil?.lev	 del $(DAT)\???-fil?.lev
+	if exist $(DAT)\???-goal.lev	 del $(DAT)\???-goal.lev
+	if exist $(DAT)\???-loca.lev	 del $(DAT)\???-loca.lev
+	if exist $(DAT)\???-strt.lev	 del $(DAT)\???-strt.lev
+	if exist $(DAT)\air.lev		 del $(DAT)\air.lev
+	if exist $(DAT)\asmodeus.lev	 del $(DAT)\asmodeus.lev
+	if exist $(DAT)\astral.lev	 del $(DAT)\astral.lev
+	if exist $(DAT)\baalz.lev	 del $(DAT)\baalz.lev
+	if exist $(DAT)\bigrm-*.lev	 del $(DAT)\bigrm-*.lev
+	if exist $(DAT)\castle.lev	 del $(DAT)\castle.lev
+	if exist $(DAT)\data		 del $(DAT)\data
+	if exist $(DAT)\dungeon		 del $(DAT)\dungeon
+	if exist $(DAT)\dungeon.pdf	 del $(DAT)\dungeon.pdf
+	if exist $(DAT)\earth.lev	 del $(DAT)\earth.lev
+	if exist $(DAT)\fakewiz?.lev	 del $(DAT)\fakewiz?.lev
+	if exist $(DAT)\fire.lev	 del $(DAT)\fire.lev
+	if exist $(DAT)\juiblex.lev	 del $(DAT)\juiblex.lev
+	if exist $(DAT)\knox.lev	 del $(DAT)\knox.lev
+	if exist $(DAT)\medusa-?.lev	 del $(DAT)\medusa-?.lev
+	if exist $(DAT)\mine*.lev	 del $(DAT)\mine*.lev
+	if exist $(DAT)\options		 del $(DAT)\options
+	if exist $(DAT)\ttyoptions	 del $(DAT)\ttyoptions
+	if exist $(DAT)\guioptions	 del $(DAT)\guioptions
+	if exist $(DAT)\oracle.lev	 del $(DAT)\oracle.lev
+	if exist $(DAT)\oracles		 del $(DAT)\oracles
+	if exist $(DAT)\orcus.lev	 del $(DAT)\orcus.lev
+	if exist $(DAT)\rumors		 del $(DAT)\rumors
+	if exist $(DAT)\quest.dat	 del $(DAT)\quest.dat
+	if exist $(DAT)\sanctum.lev	 del $(DAT)\sanctum.lev
+	if exist $(DAT)\soko?-?.lev	 del $(DAT)\soko?-?.lev
+	if exist $(DAT)\tower?.lev	 del $(DAT)\tower?.lev
+	if exist $(DAT)\valley.lev	 del $(DAT)\valley.lev
+	if exist $(DAT)\water.lev	 del $(DAT)\water.lev
+	if exist $(DAT)\wizard?.lev	 del $(DAT)\wizard?.lev
+	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
+	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
+	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
+	if exist $(SRC)\monstr.c         del $(SRC)\monstr.c
+	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
+	if exist nhdat.			 del nhdat.
+	if exist $(O)obj.tag             del $(O)obj.tag
+	if exist $(O)gamedir.tag         del $(O)gamedir.tag
+	if exist $(O)nh*key.lib          del $(O)nh*key.lib
+	if exist $(O)nh*key.exp          del $(O)nh*key.exp
+	if exist $(INCL)\win32api.h      del $(INCL)\win32api.h
+        if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
+        if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
+        if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
+        if exist $(MSWIN)\petmark.bmp    del $(MSWIN)\petmark.bmp
+        if exist $(MSWIN)\pilemark.bmp   del $(MSWIN)\pilemark.bmp
+        if exist $(MSWIN)\rip.bmp        del $(MSWIN)\rip.bmp
+        if exist $(MSWIN)\splash.bmp     del $(MSWIN)\splash.bmp
+        if exist $(MSWIN)\nethack.ico    del $(MSWIN)\nethack.ico
+        if exist $(MSWSYS)\nethack.ico   del $(MSWSYS)\nethack.ico
+	if exist $(U)recover.exe         del $(U)recover.exe
+	if exist $(U)tile2bmp.exe        del $(U)tile2bmp.exe
+	if exist $(U)tilemap.exe         del $(U)tilemap.exe
+	if exist $(U)uudecode.exe        del $(U)uudecode.exe
+	if exist $(U)dlb_main.exe        del $(U)dlb_main.exe
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag
@@ -1225,6 +1289,7 @@ clean:
 	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
 	if exist $(O)nhraykey.map del $(O)nhraykey.map
 	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
+	if exist $(O)envchk.tag   del $(O)envchk.tag
 	if exist $(O)obj.tag      del $(O)obj.tag
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
@@ -1237,7 +1302,6 @@ clean:
 	rem defer to the steps in ..\win\win32\dgnstuff.mak
 	rem
 	nmake -nologo -f ..\win\win32\dgnstuff.mak clean
-
 	if exist $(TILEBMP16)        del $(TILEBMP16)
 	if exist $(TILEBMP32)        del $(TILEBMP32)
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1497485548 2017/06/15 00:12:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1520797126 2018/03/11 19:38:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,7 +107,7 @@ set_uasmon()
             youmonst.movement = new_speed * youmonst.movement / old_speed;
     }
 
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_initialize(REASSESS_ONLY);
 #endif
 }
@@ -187,12 +187,7 @@ polyman(const char *fmt, const char *arg)
 
     You(fmt, arg);
     /* check whether player foolishly genocided self while poly'd */
-    if ((mvitals[urole.malenum].mvflags & G_GENOD)
-        || (urole.femalenum != NON_PM
-            && (mvitals[urole.femalenum].mvflags & G_GENOD))
-        || (mvitals[urace.malenum].mvflags & G_GENOD)
-        || (urace.femalenum != NON_PM
-            && (mvitals[urace.femalenum].mvflags & G_GENOD))) {
+    if (ugenocided()) {
         /* intervening activity might have clobbered genocide info */
         struct kinfo *kptr = find_delayed_killer(POLYMORPH);
 
@@ -386,7 +381,7 @@ newman()
 void
 polyself(int psflags)
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     int old_light, new_light, mntmp, class, tryct;
     boolean forcecontrol = (psflags == 1), monsterpoly = (psflags == 2),
             draconian = (uarm && Is_dragon_armor(uarm)),
@@ -964,7 +959,7 @@ drop_weapon(int alone)
 {
     struct obj *otmp;
     const char *what, *which, *whichtoo;
-    boolean candropwep, candropswapwep;
+    boolean candropwep, candropswapwep, updateinv = TRUE;
 
     if (uwep) {
         /* !alone check below is currently superfluous but in the
@@ -989,17 +984,26 @@ drop_weapon(int alone)
                 You("find you must %s %s %s!", what,
                     the_your[!!strncmp(which, "corpse", 6)], which);
             }
+            /* if either uwep or wielded uswapwep is flagged as 'in_use'
+               then don't drop it or explicitly update inventory; leave
+               those actions to caller (or caller's caller, &c) */
             if (u.twoweap) {
                 otmp = uswapwep;
                 uswapwepgone();
-                if (candropswapwep)
+                if (otmp->in_use)
+                    updateinv = FALSE;
+                else if (candropswapwep)
                     dropx(otmp);
             }
             otmp = uwep;
             uwepgone();
-            if (candropwep)
+            if (otmp->in_use)
+                updateinv = FALSE;
+            else if (candropwep)
                 dropx(otmp);
-            update_inventory();
+
+            if (updateinv)
+                update_inventory();
         } else if (!could_twoweap(youmonst.data)) {
             untwoweapon();
         }
@@ -1010,10 +1014,16 @@ void
 rehumanize()
 {
     /* You can't revert back while unchanging */
-    if (Unchanging && (u.mh < 1)) {
-        killer.format = NO_KILLER_PREFIX;
-        Strcpy(killer.name, "killed while stuck in creature form");
-        done(DIED);
+    if (Unchanging) {
+        if (u.mh < 1) {
+            killer.format = NO_KILLER_PREFIX;
+            Strcpy(killer.name, "killed while stuck in creature form");
+            done(DIED);
+        } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
+            Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
+            uamul->dknown = 1;
+            makeknown(AMULET_OF_UNCHANGING);
+        }
     }
 
     if (emits_light(youmonst.data))
@@ -1800,6 +1810,33 @@ polysense()
         context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;
     }
+}
+
+/* True iff hero's role or race has been genocided */
+boolean
+ugenocided()
+{
+    return (boolean) ((mvitals[urole.malenum].mvflags & G_GENOD)
+                      || (urole.femalenum != NON_PM
+                          && (mvitals[urole.femalenum].mvflags & G_GENOD))
+                      || (mvitals[urace.malenum].mvflags & G_GENOD)
+                      || (urace.femalenum != NON_PM
+                          && (mvitals[urace.femalenum].mvflags & G_GENOD)));
+}
+
+/* how hero feels "inside" after self-genocide of role or race */
+const char *
+udeadinside()
+{
+    /* self-genocide used to always say "you feel dead inside" but that
+       seems silly when you're polymorphed into something undead;
+       monkilled() distinguishes between living (killed) and non (destroyed)
+       for monster death message; we refine the nonliving aspect a bit */
+    return !nonliving(youmonst.data)
+             ? "dead"          /* living, including demons */
+             : !weirdnonliving(youmonst.data)
+                 ? "condemned" /* undead plus manes */
+                 : "empty";    /* golems plus vortices */
 }
 
 /*polyself.c*/

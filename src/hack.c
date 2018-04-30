@@ -1,5 +1,6 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1518861490 2018/02/17 09:58:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -309,14 +310,30 @@ moverock()
                 feel_location(sx, sy);
         cannot_push:
             if (throws_rocks(youmonst.data)) {
+                boolean
+                    canpickup = (!Sokoban
+                                 /* similar exception as in can_lift():
+                                    when poly'd into a giant, you can
+                                    pick up a boulder if you have a free
+                                    slot or into the overflow ('#') slot
+                                    unless already carrying at least one */
+                              && (inv_cnt(FALSE) < 52 || !carrying(BOULDER))),
+                    willpickup = (canpickup && autopick_testobj(otmp, TRUE));
+
                 if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
                     You("aren't skilled enough to %s %s from %s.",
-                        (flags.pickup && !Sokoban) ? "pick up" : "push aside",
+                        willpickup ? "pick up" : "push aside",
                         the(xname(otmp)), y_monnam(u.usteed));
                 } else {
-                    pline("However, you can easily %s.",
-                          (flags.pickup && !Sokoban) ? "pick it up"
-                                                     : "push it aside");
+                    /*
+                     * willpickup:  you easily pick it up
+                     * canpickup:   you could easily pick it up
+                     * otherwise:   you easily push it aside
+                     */
+                    pline("However, you %seasily %s.",
+                          (willpickup || !canpickup) ? "" : "could ",
+                          (willpickup || canpickup) ? "pick it up"
+                                                    : "push it aside");
                     sokoban_guilt();
                     break;
                 }
@@ -435,7 +452,7 @@ still_chewing(xchar x, xchar y)
 
     } else if (IS_WALL(lev->typ)) {
         if (*in_rooms(x, y, SHOPBASE)) {
-            add_damage(x, y, 10L * ACURRSTR);
+            add_damage(x, y, SHOP_WALL_DMG);
             dmgtxt = "damage";
         }
         digtxt = "chew a hole in the wall.";
@@ -465,7 +482,7 @@ still_chewing(xchar x, xchar y)
 
     } else if (IS_DOOR(lev->typ)) {
         if (*in_rooms(x, y, SHOPBASE)) {
-            add_damage(x, y, 400L);
+            add_damage(x, y, SHOP_DOOR_COST);
             dmgtxt = "break";
         }
         if (lev->doormask & D_TRAPPED) {
@@ -704,9 +721,10 @@ test_move(int ux, int uy, int dx, int dy, int mode)
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
                 else if (iflags.mention_walls)
-                    pline("It's %s.", IS_WALL(tmpr->typ) ? "a wall"
-                                        : IS_TREE(tmpr->typ) ? "a tree"
-                                          : "solid stone");
+                    pline("It's %s.",
+                          (IS_WALL(tmpr->typ) || tmpr->typ == SDOOR) ? "a wall"
+                          : IS_TREE(tmpr->typ) ? "a tree"
+                          : "solid stone");
             }
             return FALSE;
         }
@@ -822,8 +840,11 @@ test_move(int ux, int uy, int dx, int dy, int mode)
 
     if (sobj_at(BOULDER, x, y) && (Sokoban || !Passes_walls)) {
         if (!(Blind || Hallucination) && (context.run >= 2)
-            && mode != TEST_TRAV)
+            && mode != TEST_TRAV) {
+            if (mode == DO_MOVE && iflags.mention_walls)
+                pline("A boulder blocks your path.");
             return FALSE;
+        }
         if (mode == DO_MOVE) {
             /* tunneling monsters will chew before pushing */
             if (tunnels(youmonst.data) && !needspick(youmonst.data)
@@ -1139,7 +1160,7 @@ STATIC_OVL boolean
 trapmove(int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
          struct trap *desttrap) /* nonnull if another trap at <x,y> */
 {
-    boolean anchored;
+    boolean anchored = FALSE;
     const char *predicament, *culprit;
     char *steedname = !u.usteed ? (char *) 0 : y_monnam(u.usteed);
 
@@ -1158,6 +1179,8 @@ trapmove(int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> 
         /* [why does diagonal movement give quickest escape?] */
         if ((u.dx && u.dy) || !rn2(5))
             u.utrap--;
+        if (!u.utrap)
+            goto wriggle_free;
         break;
     case TT_PIT:
         if (desttrap && desttrap->tseen
@@ -1249,6 +1272,7 @@ trapmove(int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> 
                     Norep("You are %s %s.", predicament, culprit);
             }
         } else {
+wriggle_free:
             if (u.usteed)
                 pline("%s finally %s free.", upstart(steedname),
                       !anchored ? "lurches" : "wrenches the ball");
@@ -1573,9 +1597,9 @@ domove()
         newsym(x, y);
         glyph = glyph_at(x, y); /* might have just changed */
 
-        if (boulder)
+        if (boulder) {
             Strcpy(buf, ansimpleoname(boulder));
-        else if (Underwater && !is_pool(x, y))
+        } else if (Underwater && !is_pool(x, y)) {
             /* Underwater, targetting non-water; the map just shows blank
                because you don't see remembered terrain while underwater;
                although the hero can attack an adjacent monster this way,
@@ -1583,21 +1607,20 @@ domove()
             Sprintf(buf, (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
                              ? "an air bubble"
                              : "nothing");
-        else if (solid)
+        } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is
                (except for solid rock, where the glyph would otherwise
                yield ludicrous "dark part of a room") */
-            Strcpy(buf,
-                   (levl[x][y].typ == STONE)
-                       ? "solid rock"
-                       : glyph_is_cmap(glyph)
+            Strcpy(buf, (levl[x][y].typ == STONE) ? "solid rock"
+                         : glyph_is_cmap(glyph)
                             ? the(defsyms[glyph_to_cmap(glyph)].explanation)
                             : (const char *) "an unknown obstacle");
-        /* note: 'solid' is misleadingly named and catches pools
-           of water and lava as well as rock and walls */
-        else
+            /* note: 'solid' is misleadingly named and catches pools
+               of water and lava as well as rock and walls */
+        } else {
             Strcpy(buf, "thin air");
+        }
         You("%s%s %s.",
             !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
             explo ? "explode at" : "attack", buf);
@@ -1610,10 +1633,7 @@ domove()
         }
         return;
     }
-    if (glyph_is_invisible(levl[x][y].glyph)) {
-        unmap_object(x, y);
-        newsym(x, y);
-    }
+    (void) unmap_invisible(x, y);
     /* not attacking an animal, so we try to move */
     if ((u.dx || u.dy) && u.usteed && stucksteed(FALSE)) {
         nomul(0);
@@ -1682,26 +1702,38 @@ domove()
                 yelp(mtmp);
             }
         }
+
+        /* seemimic/newsym should be done before moving hero, otherwise
+           the display code will draw the hero here before we possibly
+           cancel the swap below (we can ignore steed mx,my here) */
+        u.ux = u.ux0, u.uy = u.uy0;
         mtmp->mundetected = 0;
         if (mtmp->m_ap_type)
             seemimic(mtmp);
         else if (!mtmp->mtame)
             newsym(mtmp->mx, mtmp->my);
+        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
             u.ux = u.ux0, u.uy = u.uy0;
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
         } else {
             char pnambuf[BUFSZ];
@@ -1798,7 +1830,8 @@ domove()
     if (Punished) /* put back ball and chain */
         move_bc(0, bc_control, ballx, bally, chainx, chainy);
 
-    spoteffects(TRUE);
+    if (u.umoved)
+        spoteffects(TRUE);
 
     /* delay next move because of ball dragging */
     /* must come after we finished picking up, in spoteffects() */

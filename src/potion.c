@@ -1,5 +1,6 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1502753790 2017/08/14 23:36:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1520797133 2018/03/11 19:38:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -539,8 +540,8 @@ peffects(register struct obj *otmp)
             i = rn2(A_MAX); /* start at a random point */
             for (ii = 0; ii < A_MAX; ii++) {
                 lim = AMAX(i);
-                if (i == A_STR && u.uhs >= 3)
-                    --lim; /* WEAK */
+                /* this used to adjust 'lim' for A_STR when u.uhs was
+                   WEAK or worse, but that's handled via ATEMP(A_STR) now */
                 if (ABASE(i) < lim) {
                     ABASE(i) = lim;
                     context.botl = 1;
@@ -550,6 +551,18 @@ peffects(register struct obj *otmp)
                 }
                 if (++i >= A_MAX)
                     i = 0;
+            }
+
+            /* when using the potion (not the spell) also restore lost levels,
+               to make the potion more worth keeping around for players with
+               the spell or with a unihorn; this is better than full healing
+               in that it can restore all of them, not just half, and a
+               blessed potion restores them all at once */
+            if (otmp->otyp == POT_RESTORE_ABILITY &&
+                u.ulevel < u.ulevelmax) {
+                do {
+                    pluslvl(FALSE);
+                } while (u.ulevel < u.ulevelmax && otmp->blessed);
             }
         }
         break;
@@ -1213,21 +1226,25 @@ H2Opotion_dip(struct obj *potion,
     return res;
 }
 
+/* potion obj hits monster mon, which might be youmonst; obj always used up */
 void
-potionhit(register struct monst *mon, register struct obj *obj, boolean your_fault)
+potionhit(struct monst *mon, struct obj *obj, int how)
 {
     const char *botlnam = bottlename();
     boolean isyou = (mon == &youmonst);
     int distance, tx, ty;
     struct obj *saddle = (struct obj *) 0;
-    boolean hit_saddle = FALSE;
+    boolean hit_saddle = FALSE, your_fault = (how <= POTHIT_HERO_THROW);
 
     if (isyou) {
         tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
-        losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(rnd(2)),
+               (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
+                                           : "thrown potion",
+               KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
         /* sometimes it hits the saddle */
@@ -1281,6 +1298,7 @@ potionhit(register struct monst *mon, register struct obj *obj, boolean your_fau
         case POT_ACID:
             if (!Acid_resistance) {
                 int dmg;
+
                 pline("This burns%s!",
                       obj->blessed ? " a little"
                                    : obj->cursed ? " a lot" : "");
@@ -1512,6 +1530,11 @@ potionbreathe(register struct obj *obj)
     int i, ii, isdone, kn = 0;
     boolean cureblind = FALSE;
 
+    /* potion of unholy water might be wielded; prevent
+       you_were() -> drop_weapon() from dropping it so that it
+       remains in inventory where our caller expects it to be */
+    obj->in_use = 1;
+
     switch (obj->otyp) {
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
@@ -1663,7 +1686,7 @@ potionbreathe(register struct obj *obj)
         break;
      */
     }
-    /* note: no obfree() */
+    /* note: no obfree() -- that's our caller's responsibility */
     if (obj->dknown) {
         if (kn)
             makeknown(obj->otyp);

@@ -238,6 +238,7 @@ E boolean exit_x_event;     /* exit condition for event loop */
 #define EXIT_ON_EXIT 2
 #define EXIT_ON_SENT_EVENT 3
 E int click_x, click_y, click_button, updated_inventory;
+E boolean plsel_ask_name;
 
 typedef struct {
     Boolean slow;             /* issue prompts between map and message wins */
@@ -325,10 +326,17 @@ E void ps_key(Widget, XEvent *, String *,
 E void race_key(Widget, XEvent *, String *,
                         Cardinal *); /* race selection action */
 E void gend_key(Widget, XEvent *, String *, Cardinal *); /* gender */
-E void algn_key(Widget, XEvent *, String *, Cardinal *); /* alignment */
+E void algn_key
+             (Widget, XEvent *, String *, Cardinal *); /* alignment */
 E void ec_delete(Widget, XEvent *, String *, Cardinal *);
 E void ec_key(Widget, XEvent *, String *,
                       Cardinal *); /* extended command action */
+E void plsel_quit(Widget, XEvent *, String *,
+                      Cardinal *); /* player selection dialog */
+E void plsel_play(Widget, XEvent *, String *,
+                      Cardinal *); /* player selection dialog */
+E void plsel_randomize(Widget, XEvent *, String *,
+                      Cardinal *); /* player selection dialog */
 E void release_extended_cmds(void);
 
 /* ### winstatus.c ### */

@@ -1,5 +1,6 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1496619131 2017/06/04 23:32:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1519598527 2018/02/25 22:42:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -12,7 +13,7 @@ STATIC_DCL boolean its_dead(int, int, int *);
 STATIC_DCL int use_stethoscope(struct obj *);
 STATIC_DCL void use_whistle(struct obj *);
 STATIC_DCL void use_magic_whistle(struct obj *);
-STATIC_DCL void use_leash(struct obj *);
+STATIC_DCL int use_leash(struct obj *);
 STATIC_DCL int use_mirror(struct obj *);
 STATIC_DCL void use_bell(struct obj **);
 STATIC_DCL void use_candelabrum(struct obj *);
@@ -404,11 +405,8 @@ use_stethoscope(register struct obj *obj)
             map_invisible(rx, ry);
         return res;
     }
-    if (glyph_is_invisible(levl[rx][ry].glyph)) {
-        unmap_object(rx, ry);
-        newsym(rx, ry);
+    if (unmap_invisible(rx,ry))
         pline_The("invisible monster must have moved.");
-    }
 
     lev = &levl[rx][ry];
     switch (lev->typ) {
@@ -440,7 +438,11 @@ use_whistle(struct obj *obj)
     } else if (Underwater) {
         You("blow bubbles through %s.", yname(obj));
     } else {
-        You(whistle_str, obj->cursed ? "shrill" : "high");
+        if (Deaf)
+            You_feel("rushing air tickle your %s.",
+                        body_part(NOSE));
+        else
+            You(whistle_str, obj->cursed ? "shrill" : "high");
         wake_nearby();
         if (obj->cursed)
             vault_summon_gd();
@@ -563,6 +565,10 @@ unleash_all()
 
 #define MAXLEASHED 2
 
+/* TODO:
+ *  This ought to exclude various other things, such as lights and gas
+ *  spore, is_whirly() critters, ethereal creatures, possibly others.
+ */
 static boolean
 leashable(struct monst *mtmp)
 {
@@ -570,81 +576,98 @@ leashable(struct monst *mtmp)
 }
 
 /* ARGSUSED */
-STATIC_OVL void
+STATIC_OVL int
 use_leash(struct obj *obj)
 {
     coord cc;
-    register struct monst *mtmp;
+    struct monst *mtmp;
     int spotmon;
 
+    if (u.uswallow) {
+        /* if the leash isn't in use, assume we're trying to leash
+           the engulfer; if it is use, distinguish between removing
+           it from the engulfer versus from some other creature
+           (note: the two in-use cases can't actually occur; all
+           leashes are released when the hero gets engulfed) */
+        You_cant((!obj->leashmon
+                  ? "leash %s from inside."
+                  : (obj->leashmon == (int) u.ustuck->m_id)
+                    ? "unleash %s from inside."
+                    : "unleash anything from inside %s."),
+                 noit_mon_nam(u.ustuck));
+        return 0;
+    }
     if (!obj->leashmon && number_leashed() >= MAXLEASHED) {
         You("cannot leash any more pets.");
-        return;
+        return 0;
     }
 
     if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
-        return;
+        return 0;
 
-    if ((cc.x == u.ux) && (cc.y == u.uy)) {
+    if (cc.x == u.ux && cc.y == u.uy) {
         if (u.usteed && u.dz > 0) {
             mtmp = u.usteed;
             spotmon = 1;
             goto got_target;
         }
         pline("Leash yourself?  Very funny...");
-        return;
+        return 0;
     }
+
+    /*
+     * From here on out, return value is 1 == a move is used.
+     */
 
     if (!(mtmp = m_at(cc.x, cc.y))) {
         There("is no creature there.");
-        return;
+        (void) unmap_invisible(cc.x, cc.y);
+        return 1;
     }
 
     spotmon = canspotmon(mtmp);
-got_target:
+ got_target:
 
-    if (!mtmp->mtame) {
-        if (!spotmon)
-            There("is no creature there.");
-        else
-            pline("%s %s leashed!", Monnam(mtmp),
-                  (!obj->leashmon) ? "cannot be" : "is not");
-        return;
-    }
-    if (!obj->leashmon) {
+    if (!spotmon && !glyph_is_invisible(levl[cc.x][cc.y].glyph)) {
+        /* for the unleash case, we don't verify whether this unseen
+           monster is the creature attached to the current leash */
+        You("fail to %sleash something.", obj->leashmon ? "un" : "");
+        /* trying again will work provided the monster is tame
+           (and also that it doesn't change location by retry time) */
+        map_invisible(cc.x, cc.y);
+    } else if (!mtmp->mtame) {
+        pline("%s %s leashed!", Monnam(mtmp),
+              (!obj->leashmon) ? "cannot be" : "is not");
+    } else if (!obj->leashmon) {
+        /* applying a leash which isn't currently in use */
         if (mtmp->mleashed) {
             pline("This %s is already leashed.",
-                  spotmon ? l_monnam(mtmp) : "monster");
-            return;
-        }
-        if (!leashable(mtmp)) {
+                  spotmon ? l_monnam(mtmp) : "creature");
+        } else if (!leashable(mtmp)) {
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
                   l_monnam(mtmp));
-            return;
+        } else {
+            You("slip the leash around %s%s.", spotmon ? "your " : "",
+                l_monnam(mtmp));
+            mtmp->mleashed = 1;
+            obj->leashmon = (int) mtmp->m_id;
+            mtmp->msleeping = 0;
         }
-
-        You("slip the leash around %s%s.", spotmon ? "your " : "",
-            l_monnam(mtmp));
-        mtmp->mleashed = 1;
-        obj->leashmon = (int) mtmp->m_id;
-        mtmp->msleeping = 0;
-        return;
-    }
-    if (obj->leashmon != (int) mtmp->m_id) {
-        pline("This leash is not attached to that creature.");
-        return;
     } else {
-        if (obj->cursed) {
+        /* applying a leash which is currently in use */
+        if (obj->leashmon != (int) mtmp->m_id) {
+            pline("This leash is not attached to that creature.");
+        } else if (obj->cursed) {
             pline_The("leash would not come off!");
-            obj->bknown = TRUE;
-            return;
+            obj->bknown = 1;
+        } else {
+            mtmp->mleashed = 0;
+            obj->leashmon = 0;
+            You("remove the leash from %s%s.",
+                spotmon ? "your " : "", l_monnam(mtmp));
         }
-        mtmp->mleashed = 0;
-        obj->leashmon = 0;
-        You("remove the leash from %s%s.", spotmon ? "your " : "",
-            l_monnam(mtmp));
     }
-    return;
+    return 1;
 }
 
 /* assuming mtmp->mleashed has been checked */
@@ -1182,6 +1205,9 @@ use_candle(struct obj **optr)
             end_burn(obj, TRUE);
         /* candles are now gone */
         useupall(obj);
+        /* candelabrum's weight is changing */
+        otmp->owt = weight(otmp);
+        update_inventory();
     }
 }
 
@@ -1719,10 +1745,10 @@ jump(int magic)
             temp = -temp;
         if (range < temp)
             range = temp;
-        (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
-        /* hurtle_step results in (u.ux, u.uy) == (cc.x, cc.y) and usually
-         * moves the ball if punished, but does not handle all the effects
-         * of landing on the final position.
+        (void) walk_path(&uc, &cc, hurtle_jump, (genericptr_t) &range);
+        /* hurtle_jump -> hurtle_step results in <u.ux,u.uy> == <cc.x,cc.y>
+         * and usually moves the ball if punished, but does not handle all
+         * the effects of landing on the final position.
          */
         teleds(cc.x, cc.y, FALSE);
         sokoban_guilt();
@@ -1809,8 +1835,8 @@ use_tinning_kit(struct obj *obj)
                 verbalize(you_buy_it);
             useupf(corpse, 1L);
         }
-        can = hold_another_object(can, "You make, but cannot pick up, %s.",
-                                  doname(can), (const char *) 0);
+        (void) hold_another_object(can, "You make, but cannot pick up, %s.",
+                                   doname(can), (const char *) 0);
     } else
         impossible("Tinning failed.");
 }
@@ -1898,9 +1924,8 @@ use_unicorn_horn(struct obj *obj)
         if (ABASE(idx) >= AMAX(idx))
             continue;
         val_limit = AMAX(idx);
-        /* don't recover strength lost from hunger */
-        if (idx == A_STR && u.uhs >= WEAK)
-            val_limit--;
+        /* this used to adjust 'val_limit' for A_STR when u.uhs was
+           WEAK or worse, but that's handled via ATEMP(A_STR) now */
         if (Fixed_abil) {
             /* potion/spell of restore ability override sustain ability
                intrinsic but unicorn horn usage doesn't */
@@ -2720,9 +2745,8 @@ use_whip(struct obj *obj)
                         int hitu, hitvalu;
 
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu,
-                                     dmgval(otmp, &youmonst),
-                                     otmp, (char *)0);
+                        hitu = thitu(hitvalu, dmgval(otmp, &youmonst),
+                                     &otmp, (char *)0);
                         if (hitu) {
                             pline_The("%s hits you as you try to snatch it!",
                                       the(onambuf));
@@ -2746,8 +2770,8 @@ use_whip(struct obj *obj)
                         pline("Snatching %s is a fatal mistake.", kbuf);
                         instapetrify(kbuf);
                     }
-                    otmp = hold_another_object(
-                        otmp, "You drop %s!", doname(otmp), (const char *) 0);
+                    (void) hold_another_object(otmp, "You drop %s!",
+                                               doname(otmp), (const char *) 0);
                     break;
                 default:
                     /* to floor beneath mon */
@@ -2957,11 +2981,7 @@ use_pole(struct obj *obj)
         }
     } else {
         /* no monster here and no statue seen or remembered here */
-        if (glyph_is_invisible(glyph)) {
-            /* now you know that nothing is there... */
-            unmap_object(bhitpos.x, bhitpos.y);
-            newsym(bhitpos.x, bhitpos.y);
-        }
+        (void) unmap_invisible(bhitpos.x, bhitpos.y);
         You("miss; there is no one there to hit.");
     }
     u_wipe_engr(2); /* same as for melee or throwing */
@@ -3231,10 +3251,12 @@ do_break_wand(struct obj *obj)
         goto wanexpl;
     case WAN_FIRE:
         expltype = EXPL_FIERY;
+        /*FALLTHRU*/
     case WAN_COLD:
         if (expltype == EXPL_MAGICAL)
             expltype = EXPL_FROSTY;
         dmg *= 2;
+        /*FALLTHRU*/
     case WAN_MAGIC_MISSILE:
     wanexpl:
         explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
@@ -3502,7 +3524,7 @@ doapply()
         use_tinning_kit(obj);
         break;
     case LEASH:
-        use_leash(obj);
+        res = use_leash(obj);
         break;
     case SADDLE:
         res = use_saddle(obj);

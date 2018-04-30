@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1505170345 2017/09/11 22:52:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.604 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -26,6 +26,7 @@ E void display_gamewindows(void);
 E void newgame(void);
 E void welcome(boolean);
 E time_t get_realtime(void);
+E boolean argcheck(int, char **, enum earlyarg);
 
 /* ### apply.c ### */
 
@@ -91,6 +92,9 @@ E const char *glow_color(int);
 E void Sting_effects(int);
 E int retouch_object(struct obj **, boolean);
 E void retouch_equipment(int);
+E void mkot_trap_warn();
+E boolean is_magic_key(struct monst *, struct obj *);
+E struct obj *has_magic_key(struct monst *);
 
 /* ### attrib.c ### */
 
@@ -141,6 +145,7 @@ E int getbones(void);
 /* ### botl.c ### */
 
 E char *do_statusline1(void);
+E void check_gold_symbol();
 E char *do_statusline2(void);
 E int xlev_to_rank(int);
 E int title_to_mon(const char *, int *, int *);
@@ -151,20 +156,23 @@ E long botl_score(void);
 E int describe_level(char *);
 E const char *rank_of(int, short, boolean);
 E void bot(void);
-#ifdef STATUS_VIA_WINDOWPORT
 E void status_initialize(boolean);
 E void status_finish(void);
 E void status_notify_windowport(boolean);
+E void status_eval_next_unhilite();
 #ifdef STATUS_HILITES
-E boolean set_status_hilites(char *op, boolean);
-E void clear_status_hilites(boolean);
-E char *get_status_hilites(char *, int);
-E boolean status_hilite_menu(void);
-#endif
+E boolean parse_status_hl1(char *op, boolean);
+E void clear_status_hilites();
+E void reset_status_hilites();
+E int count_status_hilites();
+E boolean status_hilite_menu();
 #endif
 
 /* ### cmd.c ### */
 
+E int doconduct();
+E int domonability();
+E char cmd_from_func(int (*)(void));
 E boolean redraw_cmd(char);
 #ifdef USE_TRAMPOLI
 E int doextcmd(void);
@@ -317,6 +325,7 @@ E void map_background(xchar, xchar, int);
 E void map_trap(struct trap *, int);
 E void map_object(struct obj *, int);
 E void map_invisible(xchar, xchar);
+E boolean unmap_invisible(int, int);
 E void unmap_object(int, int);
 E void map_location(int, int, int);
 E void feel_newsym(xchar, xchar);
@@ -529,6 +538,7 @@ E void breakobj(struct obj *, xchar, xchar, boolean, boolean);
 E boolean breaktest(struct obj *);
 E boolean walk_path(coord *, coord *,
                             boolean (*)(genericptr, int, int), genericptr_t);
+E boolean hurtle_jump(genericptr_t, int, int);
 E boolean hurtle_step(genericptr_t, int, int);
 
 /* ### drawing.c ### */
@@ -603,6 +613,7 @@ E int donamelevel(void);
 E int dooverview(void);
 E void show_overview(int, int);
 E void forget_mapseen(int);
+E void rm_mapseen(int);
 E void init_mapseen(d_level *);
 E void recalc_mapseen(void);
 E void mapseen_temple(struct monst *);
@@ -863,6 +874,7 @@ E char *upstart(char *);
 E char *mungspaces(char *);
 E char *trimspaces(char *);
 E char *strip_newline(char *);
+E char *stripchars(char *, const char *, const char *);
 E char *eos(char *);
 E boolean str_end_is(const char *, const char *);
 E char *strkitten(char *, char);
@@ -910,6 +922,11 @@ E int phase_of_the_moon(void);
 E boolean friday_13th(void);
 E int night(void);
 E int midnight(void);
+E void strbuf_init(strbuf_t *);
+E void strbuf_append(strbuf_t *, const char *);
+E void strbuf_reserve(strbuf_t *, int);
+E void strbuf_empty(strbuf_t *);
+E void strbuf_nl_to_crlf(strbuf_t *);
 
 /* ### invent.c ### */
 
@@ -1264,6 +1281,7 @@ E struct obj *splitobj(struct obj *, long);
 E struct obj *unsplitobj(struct obj *);
 E void clear_splitobjs(void);
 E void replace_object(struct obj *, struct obj *);
+E struct obj *unknwn_contnr_contents(struct obj *);
 E void bill_dummy_object(struct obj *);
 E void costly_alteration(struct obj *, int);
 E struct obj *mksobj(int, boolean, boolean);
@@ -1377,6 +1395,7 @@ E void restore_cham(struct monst *);
 E boolean hideunder(struct monst *);
 E void hide_monst(struct monst *);
 E void mon_animal_list(boolean);
+E boolean validvamp(struct monst *, int *, int);
 E int select_newcham_form(struct monst *);
 E void mgender_from_permonst(struct monst *, struct permonst *);
 E int newcham
@@ -1408,6 +1427,7 @@ E boolean hates_silver(struct permonst *);
 E boolean mon_hates_silver(struct monst *);
 E boolean passes_bars(struct permonst *);
 E boolean can_blow(struct monst *);
+E boolean can_chant(struct monst *);
 E boolean can_be_strangled(struct monst *);
 E boolean can_track(struct permonst *);
 E boolean breakarm(struct permonst *);
@@ -1525,7 +1545,7 @@ E void Delay(int);
 
 /* ### mthrowu.c ### */
 
-E int thitu(int, int, struct obj *, const char *);
+E int thitu(int, int, struct obj **, const char *);
 E int ohitmon(struct monst *, struct obj *, int, boolean);
 E void thrwmu(struct monst *);
 E int spitmu(struct monst *, struct attack *);
@@ -1682,8 +1702,7 @@ E int dotogglepickup(void);
 E void option_help(void);
 E void next_opt(winid, const char *);
 E int fruitadd(char *, struct fruit *);
-E int choose_classes_menu(const char *, int, boolean,
-                          char *, char *);
+E int choose_classes_menu(const char *, int, boolean, char *, char *);
 E boolean parsebindings(char *);
 E void add_menu_cmd_alias(char, char);
 E char get_menu_cmd_key(char);
@@ -1703,10 +1722,13 @@ E boolean parsesymbols(char *);
 E struct symparse *match_sym(char *);
 E void set_playmode(void);
 E int sym_val(const char *);
+E int query_color(const char *);
+E int query_attr(const char *);
 E const char *clr2colorname(int);
 E int match_str2clr(char *);
+E int match_str2attr(const char *, boolean);
 E boolean add_menu_coloring(char *);
-E boolean get_menu_coloring(char *, int *, int *);
+E boolean get_menu_coloring(const char *, int *, int *);
 E void free_menu_coloring(void);
 E boolean msgtype_parse_add(char *);
 E int msgtype_type(const char *, boolean);
@@ -1810,6 +1832,7 @@ E int use_container(struct obj **, int, boolean);
 E int loot_mon(struct monst *, int *, boolean *);
 E int dotip(void);
 E boolean is_autopickup_exception(struct obj *, boolean);
+E boolean autopick_testobj(struct obj *, boolean);
 
 /* ### pline.c ### */
 
@@ -1855,6 +1878,8 @@ E const char *mbodypart(struct monst *, int);
 E const char *body_part(int);
 E int poly_gender(void);
 E void ugolemeffects(int, int);
+E boolean ugenocided(void);
+E const char *udeadinside(void);
 
 /* ### potion.c ### */
 
@@ -1875,7 +1900,7 @@ E int dopotion(struct obj *);
 E int peffects(struct obj *);
 E void healup(int, int, boolean, boolean);
 E void strange_feeling(struct obj *, const char *);
-E void potionhit(struct monst *, struct obj *, boolean);
+E void potionhit(struct monst *, struct obj *, int);
 E void potionbreathe(struct obj *);
 E int dodip(void);
 E void mongrantswish(struct monst **);
@@ -1886,6 +1911,7 @@ E const char *bottlename(void);
 /* ### pray.c ### */
 
 E boolean critically_low_hp(boolean);
+E boolean stuck_in_wall();
 #ifdef USE_TRAMPOLI
 E int prayer_done(void);
 #endif
@@ -2404,6 +2430,7 @@ E int float_down(long, long);
 E void climb_pit(void);
 E boolean fire_damage(struct obj *, boolean, xchar, xchar);
 E int fire_damage_chain(struct obj *, boolean, boolean, xchar, xchar);
+E boolean lava_damage(struct obj *, xchar, xchar);
 E void acid_damage(struct obj *);
 E int water_damage(struct obj *, const char *, boolean);
 E void water_damage_chain(struct obj *, boolean);
@@ -2441,10 +2468,10 @@ E boolean attack_checks(struct monst *, struct obj *);
 E void check_caitiff(struct monst *);
 E int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
 E boolean attack(struct monst *);
-E boolean hmon(struct monst *, struct obj *, int);
+E boolean hmon(struct monst *, struct obj *, int, int);
 E int damageum(struct monst *, struct attack *);
 E void missum(struct monst *, struct attack *, boolean);
-E int passive(struct monst *, boolean, int, uchar, boolean);
+E int passive(struct monst *, struct obj *, boolean, int, uchar, boolean);
 E void passive_obj(struct monst *, struct obj *, struct attack *);
 E void stumble_onto_mimic(struct monst *);
 E int flash_hits_mon(struct monst *, struct obj *);
@@ -2459,6 +2486,7 @@ E void port_help(void);
 E void sethanguphandler(void (*)(int));
 E boolean authorize_wizard_mode(void);
 E boolean check_user_string(char *);
+E char *get_login_name();
 #endif /* UNIX */
 
 /* ### unixtty.c ### */
@@ -2529,9 +2557,13 @@ E void store_version(int);
 E unsigned long get_feature_notice_ver(char *);
 E unsigned long get_current_feature_ver(void);
 E const char *copyright_banner_line(int);
+E void early_version_info(boolean);
 
 #ifdef RUNTIME_PORT_ID
-E void append_port_id(char *);
+E char *get_port_id(char *);
+#endif
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+E void port_insert_pastebuf(char *);
 #endif
 
 /* ### video.c ### */
@@ -2722,16 +2754,11 @@ E void genl_putmsghistory(const char *, boolean);
 #ifdef HANGUPHANDLING
 E void nhwindows_hangup(void);
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
 E void genl_status_init(void);
 E void genl_status_finish(void);
 E void genl_status_enablefield
              (int, const char *, const char *, boolean);
-E void genl_status_update(int, genericptr_t, int, int);
-#ifdef STATUS_HILITES
-E void genl_status_threshold(int, int, anything, int, int, int);
-#endif
-#endif
+E void genl_status_update(int, genericptr_t, int, int, int, unsigned long *);
 
 E void dump_open_log(time_t);
 E void dump_close_log(void);

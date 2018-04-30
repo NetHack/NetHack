@@ -1,5 +1,6 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1467718299 2016/07/05 11:31:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -96,10 +97,10 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Go team ant!",
         "Got newt?",
         "Hello, my darlings!", /* Charlie Drake */
-        "Hey! Nymphs! Steal This T-Shirt!",
+        "Hey!  Nymphs!  Steal This T-Shirt!",
         "I <3 Dungeon of Doom",
         "I <3 Maud",
-        "I am a Valkyrie. If you see me running, try to keep up.",
+        "I am a Valkyrie.  If you see me running, try to keep up.",
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
         "Plunder Island Brimstone Beach Club", /* Monkey Island */
@@ -135,6 +136,16 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Pudding farmer",
         "Vegetarian",
         "Hello, I'm War!",
+        "It is better to light a candle than to curse the darkness",
+        "It is easier to curse the darkness than to light a candle",
+        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
+           Theory" although they didn't create it (and an actual T-shirt
+           with pentagonal diagram showing which choices defeat which) */
+        "rock--paper--scissors--lizard--Spock!",
+        /* "All men must die -- all men must serve" challange and response
+           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
+           TV show "Game of Thrones" (probably an actual T-shirt too...) */
+        "/Valar morghulis/ -- /Valar dohaeris/",
     };
 
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
@@ -183,7 +194,9 @@ doread()
         useup(scroll);
         return 1;
     } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
-        char buf[BUFSZ];
+        char buf[BUFSZ], *mesg;
+        const char *endpunct;
+
         if (Blind) {
             You_cant("feel any Braille writing.");
             return 0;
@@ -196,15 +209,25 @@ doread()
             return 0;
         }
         u.uconduct.literate++;
-        if (flags.verbose)
+        /* populate 'buf[]' */
+        mesg = (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
+                                         : apron_text(scroll, buf);
+        endpunct = "";
+        if (flags.verbose) {
+            int ln = (int) strlen(mesg);
+
+            /* we will be displaying a sentence; need ending punctuation */
+            if (ln > 0 && !index(".!?", mesg[ln - 1]))
+                endpunct = ".";
             pline("It reads:");
-        pline("\"%s\"", (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                                  : apron_text(scroll, buf));
+        }
+        pline("\"%s\"%s", mesg, endpunct);
         return 1;
     } else if (scroll->otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
             "Leprechaun Gold Tru$t - Shamrock Card",
-            "Magic Memory Vault Charge Card", "Larn National Bank", /* Larn */
+            "Magic Memory Vault Charge Card",
+            "Larn National Bank",                /* Larn */
             "First Bank of Omega",               /* Omega */
             "Bank of Zork - Frobozz Magic Card", /* Zork */
             "Ankh-Morpork Merchant's Guild Barter Card",
@@ -229,10 +252,14 @@ doread()
                       : card_msgs[scroll->o_id % (SIZE(card_msgs) - 1)]);
         }
         /* Make a credit card number */
-        pline("\"%d0%d %d%d1 0%d%d0\"", ((scroll->o_id % 89) + 10),
-              (scroll->o_id % 4), (((scroll->o_id * 499) % 899999) + 100000),
-              (scroll->o_id % 10), (!(scroll->o_id % 3)),
-              ((scroll->o_id * 7) % 10));
+        pline("\"%d0%d %ld%d1 0%d%d0\"%s",
+              (((int) scroll->o_id % 89) + 10),
+              ((int) scroll->o_id % 4),
+              ((((long) scroll->o_id * 499L) % 899999L) + 100000L),
+              ((int) scroll->o_id % 10),
+              (!((int) scroll->o_id % 3)),
+              (((int) scroll->o_id * 7) % 10),
+              (flags.verbose || Blind) ? "." : "");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->otyp == CAN_OF_GREASE) {
@@ -245,7 +272,7 @@ doread()
         }
         if (flags.verbose)
             pline("It reads:");
-        pline("\"Magic Marker(TM) Red Ink Marker Pen. Water Soluble.\"");
+        pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oclass == COIN_CLASS) {
@@ -253,7 +280,7 @@ doread()
             You("feel the embossed words:");
         else if (flags.verbose)
             You("read:");
-        pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
+        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
@@ -279,7 +306,7 @@ doread()
             You_cant("feel any Braille writing.");
             return 0;
         }
-        pline("The wrapper reads: \"%s\"",
+        pline("The wrapper reads: \"%s\".",
               wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
         u.uconduct.literate++;
         return 1;
@@ -331,6 +358,8 @@ doread()
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
     if (scroll->otyp != SCR_BLANK_PAPER) {
+        boolean silently = !can_chant(&youmonst);
+
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
         nodisappear = (scroll->otyp == SCR_FIRE
@@ -340,7 +369,7 @@ doread()
             pline(nodisappear
                       ? "You %s the formula on the scroll."
                       : "As you %s the formula on it, the scroll disappears.",
-                  is_silent(youmonst.data) ? "cogitate" : "pronounce");
+                  silently ? "cogitate" : "pronounce");
         else
             pline(nodisappear ? "You read the scroll."
                               : "As you read the scroll, it disappears.");
@@ -349,8 +378,7 @@ doread()
                 pline("Being so trippy, you screw up...");
             else
                 pline("Being confused, you %s the magic words...",
-                      is_silent(youmonst.data) ? "misunderstand"
-                                               : "mispronounce");
+                      silently ? "misunderstand" : "mispronounce");
         }
     }
     if (!seffects(scroll)) {
@@ -1379,7 +1407,7 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
         if (sblessed)
             do_class_genocide();
         else
-            do_genocide(!scursed | (2 * !!Confusion));
+            do_genocide((!scursed) | (2 * !!Confusion));
         break;
     case SCR_LIGHT:
         if (!confused || rn2(5)) {
@@ -1495,6 +1523,7 @@ seffects(struct obj *sobj) /* scroll, or fake spellbook object for scroll-like s
             /* do_mapping() already reveals secret passages */
         }
         known = TRUE;
+        /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
             Your("%s spins as %s blocks the spell!", body_part(HEAD),
@@ -1684,6 +1713,7 @@ drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, b
         }
     } else
         dmg = 0;
+    wake_nearto(u.ux, u.uy, 4 * 4);
     /* Must be before the losehp(), for bones files */
     if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
         place_object(otmp2, u.ux, u.uy);
@@ -1747,7 +1777,10 @@ drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
                 pline("%s is killed.", Monnam(mtmp));
                 mondied(mtmp);
             }
+        } else {
+            wakeup(mtmp, byu);
         }
+        wake_nearto(x, y, 4 * 4);
     } else if (u.uswallow && mtmp == u.ustuck) {
         obfree(otmp2, (struct obj *) 0);
         /* fall through to player */
@@ -1949,7 +1982,7 @@ STATIC_OVL void
 do_class_genocide()
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     boolean gameover = FALSE; /* true iff killed self */
 
     for (j = 0;; j++) {
@@ -2042,7 +2075,7 @@ do_class_genocide()
                         u.uhp = -1;
                         if (Upolyd) {
                             if (!feel_dead++)
-                                You_feel("dead inside.");
+                                You_feel("%s inside.", udeadinside());
                         } else {
                             if (!feel_dead++)
                                 You("die.");
@@ -2100,7 +2133,7 @@ do_genocide(int how)
 /* 3 = forced genocide of player */
 /* 5 (4 | 1) = normal genocide from throne */
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     register int i, killplayer = 0;
     register int mndx;
     register struct permonst *ptr;
@@ -2222,7 +2255,7 @@ do_genocide(int how)
             /* KMH -- Unchanging prevents rehumanization */
             if (Upolyd && ptr != youmonst.data) {
                 delayed_killer(POLYMORPH, killer.format, killer.name);
-                You_feel("dead inside.");
+                You_feel("%s inside.", udeadinside());
             } else
                 done(GENOCIDED);
         } else if (ptr == youmonst.data) {
@@ -2352,7 +2385,7 @@ cant_revive(int *mtype, boolean revival, struct obj *from_obj)
 boolean
 create_particular()
 {
-    char buf[BUFSZ], *bufp, monclass;
+    char buf[BUFSZ] = DUMMY, *bufp, monclass;
     char *tmpp;
     int which, tryct, i, firstchoice = NON_PM;
     struct permonst *whichpm = NULL;

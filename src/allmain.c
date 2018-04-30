@@ -1,5 +1,6 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1463217182 2016/05/14 09:13:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1518193644 2018/02/09 16:27:24 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* various code that was replicated in *main.c */
@@ -58,15 +59,12 @@ moveloop(boolean resuming)
         context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
-    } else {                   /* restore old game */
-#ifndef WIN32
-        update_inventory(); /* for perm_invent */
-#endif
+    }
+    context.botlx = TRUE; /* for STATUS_HILITES */
+    update_inventory(); /* for perm_invent */
+    if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
     }
-#ifdef WIN32
-    update_inventory(); /* for perm_invent */
-#endif
 
     (void) encumber_msg(); /* in case they auto-picked up something */
     if (defer_see_monsters) {
@@ -269,6 +267,7 @@ moveloop(boolean resuming)
                         (void) dosearch0(1);
                     if (Warning)
                         warnreveal();
+                    mkot_trap_warn();
                     dosounds();
                     do_storms();
                     gethungry();
@@ -316,6 +315,7 @@ moveloop(boolean resuming)
             /* once-per-hero-took-time things go here */
             /******************************************/
 
+            status_eval_next_unhilite();
             if (context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
@@ -528,7 +528,7 @@ void
 display_gamewindows()
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
-#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
     status_initialize(0);
 #else
     WIN_STATUS = create_nhwindow(NHW_STATUS);
@@ -552,7 +552,7 @@ display_gamewindows()
      * The mac port is not DEPENDENT on the order of these
      * displays, but it looks a lot better this way...
      */
-#ifndef STATUS_VIA_WINDOWPORT
+#ifndef STATUS_HILITES
     display_nhwindow(WIN_STATUS, FALSE);
 #endif
     display_nhwindow(WIN_MESSAGE, FALSE);
@@ -640,6 +640,13 @@ welcome(boolean new_game)
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
 
+    /* skip "welcome back" if restoring a doomed character */
+    if (!new_game && Upolyd && ugenocided()) {
+        /* death via self-genocide is pending */
+        pline("You're back, but you still feel %s inside.", udeadinside());
+        return;
+    }
+
     /*
      * The "welcome back" message always describes your innate form
      * even when polymorphed or wearing a helm of opposite alignment.
@@ -723,12 +730,95 @@ STATIC_DCL void
 interrupt_multi(msg)
 const char *msg;
 {
-    if (multi > 0 && !context.travel) {
+    if (multi > 0 && !context.travel && !context.run) {
         nomul(0);
         if (flags.verbose && msg)
             Norep("%s", msg);
     }
 }
 
+/*
+ * Argument processing helpers - for xxmain() to share
+ * and call.
+ *
+ * These should return TRUE if the argument matched,
+ * whether the processing of the argument was
+ * successful or not.
+ *
+ * Most of these do their thing, then after returning
+ * to xxmain(), the code exits without starting a game.
+ *
+ */
+
+static struct early_opt earlyopts[] = {
+    {ARG_DEBUG, "debug", 5, FALSE},
+    {ARG_VERSION, "version", 4, TRUE},
+};
+
+boolean
+argcheck(argc, argv, e_arg)
+int argc;
+char *argv[];
+enum earlyarg e_arg;
+{
+    int i, idx;
+    boolean match = FALSE;
+    char *userea = (char *)0;
+    const char *dashdash = "";
+
+    for (idx = 0; idx < SIZE(earlyopts); idx++) {
+        if (earlyopts[idx].e == e_arg)
+            break;
+    }
+    if ((idx >= SIZE(earlyopts)) || (argc <= 1))
+            return FALSE;
+
+    for (i = 1; i < argc; ++i) {
+        if (argv[i][0] != '-')
+            continue;
+        if (argv[i][1] == '-') {
+            userea = &argv[i][2];
+            dashdash = "-";
+        } else {
+            userea = &argv[i][1];
+        }
+        match = match_optname(userea, earlyopts[idx].name,
+                    earlyopts[idx].minlength, earlyopts[idx].valallowed);
+        if (match) break;
+    }
+
+    if (match) {
+        switch(e_arg) {
+            case ARG_DEBUG:
+                        break;
+            case ARG_VERSION: {
+                        boolean insert_into_pastebuf = FALSE;
+                        const char *extended_opt = index(userea,':');
+
+                        if (!extended_opt)
+                            extended_opt = index(userea, '=');
+
+                        if (extended_opt) {
+                            extended_opt++;
+                            if (match_optname(extended_opt, "paste",
+                                                   5, FALSE)) {
+                                insert_into_pastebuf = TRUE;
+                            } else {
+                                raw_printf(
+                     "-%sversion can only be extended with -%sversion:paste.\n",
+                                            dashdash, dashdash);
+                                return TRUE;
+            		    }
+        		}
+                        early_version_info(insert_into_pastebuf);
+                        return TRUE;
+                        break;
+            }
+            default:
+                        break;
+        }
+    };
+    return FALSE;
+}
 
 /*allmain.c*/

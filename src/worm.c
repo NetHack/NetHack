@@ -1,5 +1,6 @@
 /* NetHack 3.6	worm.c	$NHDT-Date: 1456528599 2016/02/26 23:16:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

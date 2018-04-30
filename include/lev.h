@@ -1,5 +1,6 @@
 /* NetHack 3.6	lev.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*	Common include file for save and restore routines */
@@ -25,10 +26,12 @@ struct container {
     genericptr_t list;
 };
 
-#define CONS_OBJ 0
-#define CONS_MON 1
-#define CONS_HERO 2
-#define CONS_TRAP 3
+enum bubble_contains_types {
+    CONS_OBJ = 0,
+    CONS_MON,
+    CONS_HERO,
+    CONS_TRAP
+};
 
 struct bubble {
     xchar x, y;   /* coordinates of the upper left corner */

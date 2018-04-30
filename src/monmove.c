@@ -1,5 +1,6 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1505265968 2017/09/13 01:26:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -127,10 +128,18 @@ boolean
 onscary(int x, int y, struct monst *mtmp)
 {
     /* creatures who are directly resistant to magical scaring:
-     * Rodney, lawful minions, angels, the Riders */
+     * Rodney, lawful minions, Angels, the Riders, shopkeepers
+     * inside their own shop, priests inside their own temple */
     if (mtmp->iswiz || is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL]
-        || is_rider(mtmp->data))
+        || is_rider(mtmp->data)
+        || (mtmp->isshk && inhishop(mtmp))
+        || (mtmp->ispriest && inhistemple(mtmp)))
         return FALSE;
+
+    /* <0,0> is used by musical scaring to check for the above;
+     * it doesn't care about scrolls or engravings or dungeon branch */
+    if (x == 0 && y == 0)
+        return TRUE;
 
     /* should this still be true for defiled/molochian altars? */
     if (IS_ALTAR(levl[x][y].typ)
@@ -144,8 +153,9 @@ onscary(int x, int y, struct monst *mtmp)
 
     /*
      * Creatures who don't (or can't) fear a written Elbereth:
-     * all the above plus shopkeepers, guards, blind or
-     * peaceful monsters, humans, and minotaurs.
+     * all the above plus shopkeepers (even if poly'd into non-human),
+     * vault guards (also even if poly'd), blind or peaceful monsters,
+     * humans and elves, and minotaurs.
      *
      * If the player isn't actually on the square OR the player's image
      * isn't displaced to the square, no protection is being granted.
@@ -597,7 +607,8 @@ toofar:
      */
 
     if (!mtmp->mpeaceful || (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
-        if (inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
+        if (inrange && !noattacks(mdat)
+            && (Upolyd ? u.mh : u.uhp) > 0 && !scared && tmp != 3)
             if (mattacku(mtmp))
                 return 1; /* monster died (e.g. exploded) */
 
@@ -1221,6 +1232,16 @@ postmov:
                 boolean btrapped = (here->doormask & D_TRAPPED) != 0,
                         observeit = canseeit && canspotmon(mtmp);
 
+                /* if mon has MKoT, disarm door trap; no message given */
+                if (btrapped && has_magic_key(mtmp)) {
+                    /* BUG: this lets a vampire or blob or a doorbuster
+                       holding the Key disarm the trap even though it isn't
+                       using that Key when squeezing under or smashing the
+                       door.  Not significant enough to worry about; perhaps
+                       the Key's magic is more powerful for monsters? */
+                    here->doormask &= ~D_TRAPPED;
+                    btrapped = FALSE;
+                }
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && (amorphous(ptr)
                         || (can_fog(mtmp)
