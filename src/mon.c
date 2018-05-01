@@ -1881,6 +1881,9 @@ struct monst *mtmp;
         }
         if (lifesave) {
             m_useup(mtmp, lifesave);
+            /* monsters with multiple amulets / disintegrated items will now
+               re-equip themselves at the cost of a single m_dowear call. */
+            m_dowear(mtmp, FALSE);
         }
 
         surviver = !(mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);

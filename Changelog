@@ -129,6 +129,8 @@ General Changes
 - Slight restructuring of Gehennom. In the future, would like to redo Gehennom
   entirely, or possibly look into updating the Heck^2 patch for 3.6.1 (MAJOR
   UNDERTAKING)
+- Lifesaved monsters will reassess their equipment, so they will equip an
+  amulet if that slot is free now, or equip armor if that was disintegrated.
 
 Quest Nemesis Changes
 - Lord Surtur can create level-shaking earthquakes when he attacks.
