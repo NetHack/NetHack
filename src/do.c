@@ -720,6 +720,7 @@ register struct obj *obj;
         You("give %s to %s.", doname(obj), mon_nam(mon));
     freeinv(obj);
     (void) mpickobj(mon, obj);
+    m_dowear(mon, FALSE);
     return 1;
 }
 
