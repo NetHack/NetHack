@@ -5,7 +5,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 4/30/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -69,6 +69,8 @@ dogive()
         return 0;
 
     mtmp = m_at(tx, ty);
+    if (!mtmp)
+        return 0;
 
     if (!mtmp->mpeaceful && !mtmp->mtame) {
         pline("%s probably does not want any gifts from you.", Monnam(mtmp));
