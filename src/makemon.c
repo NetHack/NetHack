@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/25/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -793,7 +793,7 @@ register struct monst *mtmp;
             (void) mongets(mtmp, MUMMY_WRAPPING);
         break;
     case S_QUANTMECH:
-        if (!rn2(20)) {
+        if (ptr == &mons[PM_QUANTUM_MECHANIC] &&!rn2(20)) {
             otmp = mksobj(LARGE_BOX, FALSE, FALSE);
             otmp->spe = 1; /* flag for special box */
             otmp->owt = weight(otmp);
