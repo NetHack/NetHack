@@ -2,7 +2,7 @@
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/20/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -898,7 +898,7 @@ register struct monst *mtmp;
     case MS_CUSS:
         if (!mtmp->mpeaceful)
             cuss(mtmp);
-        else if (is_lminion(mtmp))
+        else if (is_lminion(mtmp) || ptr == &mons[PM_MINOR_ANGEL])
             verbl_msg = "It's not too late.";
         else
             verbl_msg = "We're all doomed.";

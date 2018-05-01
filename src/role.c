@@ -728,7 +728,7 @@ const struct Race races[] = {
         "celestialkind",
         "Ang",
         { 0, 0 },
-        PM_ANGEL,
+        PM_MINOR_ANGEL,
         NON_PM,
         PM_HUMAN_MUMMY,
         PM_HUMAN_ZOMBIE,

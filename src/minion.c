@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/16 by NullCGT */
+/* Edited on 5/1/16 by NullCGT */
 
 #include "hack.h"
 
@@ -229,7 +229,7 @@ register struct monst *mtmp;
     /* amulet check moved to here because of potential issues with
        disappearance. */
     if ((uwep && uwep->oartifact == ART_EXCALIBUR) || mon_has_amulet(mtmp)
-        || Race_if(PM_ANGEL)) {
+        || Race_if(PM_MINOR_ANGEL)) {
         pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);

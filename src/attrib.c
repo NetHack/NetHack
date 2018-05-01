@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -760,7 +760,7 @@ long frommask;
             break;
         case PM_INFERNAL:
             abil = inf_abil;
-        case PM_ANGEL:
+        case PM_MINOR_ANGEL:
             abil = ang_abil;
         default:
             break;
@@ -934,7 +934,7 @@ int oldlevel, newlevel;
     case PM_INFERNAL:
         rabil = inf_abil;
         break;
-    case PM_ANGEL:
+    case PM_MINOR_ANGEL:
         rabil = ang_abil;
         break;
     case PM_MERFOLK:

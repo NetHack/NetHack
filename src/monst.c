@@ -1143,6 +1143,14 @@ NEARDATA struct permonst mons[] = {
     /*
      * Angels and other lawful minions
      */
+     MON("minor angel", S_ANGEL, LVL(0, 12, 10, 0, 0), G_NOGEN,
+         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+           NO_ATTK),
+         SIZ(WT_HUMAN, 400, MS_CUSS, MZ_HUMAN), 0, 0,
+         M1_HUMANOID | M1_OMNIVORE | M1_FLY,
+         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE |
+         M3_INFRAVISION,
+         HI_DOMESTIC),
     MON("couatl", S_ANGEL, LVL(8, 10, 5, 30, 7),
         (G_NOHELL | G_SGROUP | G_NOCORPSE | 1),
         A(ATTK(AT_BITE, AD_DRST, 2, 4), ATTK(AT_BITE, AD_PHYS, 1, 3),
