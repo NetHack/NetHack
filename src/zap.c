@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/26/18 by NullCGT */
+/* Modified 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -3056,9 +3056,11 @@ struct obj *obj;
     if (otyp == WAN_WONDER) {
         wondertemp = WAN_LIGHT + rn2(WAN_LIGHTNING - WAN_LIGHT);
         if (wondertemp == WAN_WISHING)
-            wondertemp = WAN_UNDEAD_TURNING;
+            wondertemp = WAN_POISON_GAS;
         if (wondertemp == WAN_WONDER)
             wondertemp = WAN_POLYMORPH;
+        if (wondertemp == WAN_NOTHING)
+            wondertemp = WAN_DEATH;
         obj->otyp = wondertemp;
         otyp = wondertemp;
         wonder = TRUE;
