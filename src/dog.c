@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -165,34 +165,10 @@ makedog()
     register struct obj *otmp;
     const char *petname;
     int pettype;
-    int cnt;
     static int petname_used = 0;
 
     if (preferred_pet == 'n')
         return ((struct monst *) 0);
-
-    if (preferred_pet == '@') {
-        /* Based on the level drain code in artifact.c */
-        for (cnt = 0; cnt < 3; cnt++) {
-            pettype = PM_ARCHEOLOGIST + rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1);
-            mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
-            if (!mtmp) {
-                break;
-            }
-            while (mtmp->m_lev > 1) {
-                mtmp->m_lev--;
-                mtmp->mhpmax -= monhp_per_lvl(mtmp);
-            }
-            if (mtmp->mhpmax < 10) {
-                mtmp->mhpmax = 10;
-            }
-            mtmp->mhp = mtmp->mhpmax;
-            context.startingpet_mid = mtmp->m_id;
-            christen_monst(mtmp, rndhumname(mtmp->female));
-            initedog(mtmp);
-        }
-        return ((struct monst *) 0);
-    }
 
     pettype = pet_type();
     if (pettype == PM_LITTLE_DOG)
@@ -218,7 +194,10 @@ makedog()
         if (Role_if(PM_RANGER))
             petname = "Sirius"; /* Orion's dog */
         if (Role_if(PM_CARTOMANCER))
-            petname = "Joey";
+            petname = "Joey"; /* Obscure SpliceHack reference (tm) */
+    } else if (!*petname && pettype == PM_LITTLE_BIRD) {
+        if (Role_if(PM_RANGER))
+            petname = "Quothe";
     }
 
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
