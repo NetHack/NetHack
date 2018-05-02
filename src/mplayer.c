@@ -2,7 +2,7 @@
 /*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/5/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -382,10 +382,18 @@ register struct monst *mtmp;
             "The low-life wants to talk, eh?",
             "Fight, scum!",
             "Here is what I have to say!",
+        },
+        *peaceful_msg[3] = {
+            "Don\'t make the same mistakes I did.",
+            "I was so close."
+            "You must complete what I started."
         };
 
-    if (mtmp->mpeaceful)
-        return; /* will drop to humanoid talk */
+    if (mtmp->mpeaceful) {
+        mintroduce(mtmp);
+        pline("%s", peaceful_msg[rn2(3)]);
+        return;
+    }
 
     pline("Talk? -- %s", (mtmp->data == &mons[urole.malenum]
                           || mtmp->data == &mons[urole.femalenum])

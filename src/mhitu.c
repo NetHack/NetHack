@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/25/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -22,7 +22,6 @@ STATIC_DCL void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(mintroduce, (struct monst *));
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
 /* changed to a parameter to mhitu. */
@@ -3067,7 +3066,7 @@ assess_dmg:
     return 1;
 }
 
-STATIC_OVL void
+void
 mintroduce(mtmp)
 struct monst *mtmp;
 {
