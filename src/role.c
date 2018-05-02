@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/24/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -215,8 +215,8 @@ const struct Role roles[] = {
       PM_DRAKEMOTHER,
       PM_DRAKE,
       PM_SLIPSCALE_THE_BETRAYER,
-      PM_VAMPIRE,
-      PM_WRAITH,
+      PM_CHIMERA,
+      PM_ZOMBIE_DRAGON,
       S_ZOMBIE,
       S_VAMPIRE,
       ART_SHARUR,
