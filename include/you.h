@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/18/18 by NullCGT */
+/* Edited on 5/2/18 by NullCGT */
 
 #ifndef YOU_H
 #define YOU_H
@@ -70,6 +70,7 @@ struct u_achieve {
     Bitfield(killed_medusa, 1);
     Bitfield(killed_king, 1);   /* slew the King in Yellow */
     Bitfield(killed_demogorgon, 1);  /* slew Demogorgon */
+    Bitfield(killed_reaper, 1); /* slew the Grim Reaper */
 };
 
 struct u_realtime {

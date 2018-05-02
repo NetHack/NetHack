@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 5/2/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2044,6 +2044,8 @@ register struct monst *mtmp;
         u.uachieve.killed_king = 1;
     } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
         u.uachieve.killed_demogorgon = 1;
+    } else if (mtmp->data == &mons[PM_GRIM_REAPER]) {
+        u.uachieve.killed_reaper = 1;
     }
 
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
