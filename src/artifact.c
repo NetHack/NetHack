@@ -484,6 +484,8 @@ long wp_mask;
         mask = &EFire_resistance;
     else if (dtyp == AD_COLD)
         mask = &ECold_resistance;
+    else if (dtyp == AD_LOUD)
+        mask = &ESonic_resistance;
     else if (dtyp == AD_ACID)
         mask = &EAcid_resistance;
     else if (dtyp == AD_ELEC)
@@ -817,6 +819,8 @@ struct monst *mtmp;
             return !(yours ? Fire_resistance : resists_fire(mtmp));
         case AD_COLD:
             return !(yours ? Cold_resistance : resists_cold(mtmp));
+        case AD_LOUD:
+            return !(yours ? Cold_resistance : resists_sonic(mtmp));
         case AD_ACID:
             return !(yours ? Acid_resistance : resists_acid(mtmp));
         case AD_ELEC:
@@ -1251,6 +1255,23 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             pline_The("sizzling sword %s %s%c",
                       !spec_dbon_applies ? "hits" : "melts", hittee,
                       !spec_dbon_applies ? '.' : '!');
+        return realizes_damage;
+    }
+    if (attacks(AD_LOUD, otmp)) {
+        if (realizes_damage)
+            pline_The("thunderous morningstar %s %s%c",
+                      !spec_dbon_applies ? "hits" : "blasts", hittee,
+                      !spec_dbon_applies ? '.' : '!');
+        if (!rn2(4))
+            destroy_item(ARMOR_CLASS, AD_LOUD);
+        if (!rn2(4))
+            destroy_item(POTION_CLASS, AD_LOUD);
+        if (!rn2(7))
+            destroy_item(RING_CLASS, AD_LOUD);
+        if (!rn2(7))
+            destroy_item(TOOL_CLASS, AD_LOUD);
+        if (!rn2(7))
+            destroy_item(WAND_CLASS, AD_LOUD);
         return realizes_damage;
     }
     if (attacks(AD_ELEC, otmp)) {
@@ -1855,6 +1876,7 @@ long *abil;
     } abil2adtyp[] = {
         { &EFire_resistance, AD_FIRE },
         { &ECold_resistance, AD_COLD },
+        { &ECold_resistance, AD_LOUD },
         { &EAcid_resistance, AD_ACID },
         { &EShock_resistance, AD_ELEC },
         { &EAntimagic, AD_MAGM },

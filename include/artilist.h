@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* File changed 4/29/18 by NullCGT */
+/* File changed 5/1/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -28,6 +28,7 @@ static const char *artifact_names[] = {
 #define     PHYS(a,b)   {0,AD_PHYS,a,b}         /* physical */
 #define     DRLI(a,b)   {0,AD_DRLI,a,b}         /* life drain */
 #define     COLD(a,b)   {0,AD_COLD,a,b}
+#define     LOUD(a,b)   {0,AD_LOUD,a,b}
 #define     ACID(a,b)   {0,AD_ACID,a,b}
 #define     FIRE(a,b)   {0,AD_FIRE,a,b}
 #define     ELEC(a,b)   {0,AD_ELEC,a,b}         /* electrical shock */
@@ -180,6 +181,14 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     */
     A("Acidfall", LONG_SWORD, (SPFX_RESTR | SPFX_ATTK | SPFX_DEFN), 0, 0,
       ACID(5, 0), ACID(0, 0), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
+      NO_COLOR),
+
+    /*
+    *       Resisted by very few monsters, but is a morning star and also
+    *       happens to destroy tons of items.
+    */
+    A("Sonicboom", MORNING_STAR, (SPFX_RESTR | SPFX_ATTK | SPFX_DEFN), 0, 0,
+      LOUD(5, 0), LOUD(0, 0), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 3000L,
       NO_COLOR),
 
     /*
@@ -424,6 +433,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
 #undef PHYS
 #undef DRLI
 #undef COLD
+#undef LOUD
 #undef ACID
 #undef FIRE
 #undef ELEC
