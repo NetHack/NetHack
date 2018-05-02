@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/1/18 by NullCGT */
 
 #include "hack.h"
 
@@ -337,6 +337,11 @@ boolean foundyou;
         } else {
             make_confused(HConfusion + dmg, FALSE);
         }
+        break;
+    case AD_WIND:
+        You("are blasted by wind!");
+        hurtle(u.ux - mtmp->mx, u.uy - mtmp->my, dmg, TRUE);
+        dmg = 0;
         break;
     case AD_MAGM:
         You("are hit by a shower of missiles!");
