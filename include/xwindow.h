@@ -76,8 +76,8 @@
 #define XtNexposeCallback "exposeCallback"
 #define XtNresizeCallback "resizeCallback"
 
-extern XFontStruct *WindowFontStruct(/* Widget */);
-extern Font WindowFont(/* Widget */);
+extern XFontStruct *WindowFontStruct( Widget );
+extern Font WindowFont( Widget );
 
 #define XtCWindowResource "WindowResource"
 #define XtCRows "Rows"

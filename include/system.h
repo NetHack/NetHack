@@ -91,8 +91,8 @@ E int srandom(unsigned int);
 #endif
 #endif
 #else
-E long lrand48();
-E void srand48();
+E long lrand48(void);
+E void srand48(long);
 #endif /* BSD || ULTRIX || RANDOM */
 
 #if !defined(BSD) || defined(ultrix)
@@ -362,7 +362,7 @@ E int sleep(unsigned);
 #endif
 
 E char *getenv(const char *);
-E char *getlogin();
+E char *getlogin(void);
 #if defined(HPUX) && !defined(_POSIX_SOURCE)
 E long getuid(void);
 E long getgid(void);
@@ -516,7 +516,7 @@ E char *tgoto(const char *, int, int);
 #else
 #if !(defined(HPUX) && defined(_POSIX_SOURCE))
 E int tgetent(char *, const char *);
-E void tputs(const char *, int, int (*)());
+E void tputs(const char *, int, int (*)(int));
 #endif
 E int tgetnum(const char *);
 E int tgetflag(const char *);

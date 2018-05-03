@@ -1115,7 +1115,7 @@ percentage(struct istat_s *bl, struct istat_s *maxbl)
         return 0;
     }
 
-    ival = 0, lval = 0L, uval = 0U, ulval = 0UL;
+    ival = 0; lval = 0L; uval = 0U; ulval = 0UL;
     anytype = bl->anytype;
     if (maxbl->a.a_void) {
         switch (anytype) {
