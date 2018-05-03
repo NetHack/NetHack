@@ -113,8 +113,9 @@ collect_obj_classes(char ilets[], register struct obj *otmp, boolean here, boole
     ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
     while (otmp) {
         c = def_oc_syms[(int) otmp->oclass].sym;
-        if (!index(ilets, c) && (!filter || (*filter)(otmp)))
-            ilets[iletct++] = c, ilets[iletct] = '\0';
+        if (!index(ilets, c) && (!filter || (*filter)(otmp))) {
+            ilets[iletct++] = c; ilets[iletct] = '\0';
+        }
         *itemcount += 1;
         otmp = here ? otmp->nexthere : otmp->nobj;
     }
@@ -1904,7 +1905,7 @@ reverse_loot()
             coffers->owt = weight(coffers);
             coffers->cknown = 0;
             if (!coffers->olocked) {
-                boxdummy = zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
+                boxdummy = zeroobj; boxdummy.otyp = SPE_WIZARD_LOCK;
                 (void) boxlock(coffers, &boxdummy);
             }
         } else if (levl[x][y].looted != T_LOOTED
@@ -2280,8 +2281,9 @@ observe_quantum_cat(struct obj *box)
     xchar ox, oy;
 
     box->spe = 0; /* box->owt will be updated below */
-    if (get_obj_location(box, &ox, &oy, 0))
-        box->ox = ox, box->oy = oy; /* in case it's being carried */
+    if (get_obj_location(box, &ox, &oy, 0)) {
+        box->ox = ox; box->oy = oy; /* in case it's being carried */
+    }
 
     /* this isn't really right, since any form of observation
        (telepathic or monster/object/food detection) ought to
@@ -2819,7 +2821,7 @@ dotip()
      */
 
     /* at present, can only tip things at current spot, not adjacent ones */
-    cc.x = u.ux, cc.y = u.uy;
+    cc.x = u.ux; cc.y = u.uy;
 
     /* check floor container(s) first; at most one will be accessed */
     if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
@@ -2963,8 +2965,9 @@ tipcontainer(struct obj *box) /* or bag */
     /* box is either held or on floor at hero's spot; no need to check for
        nesting; when held, we need to update its location to match hero's;
        for floor, the coordinate updating is redundant */
-    if (get_obj_location(box, &ox, &oy, 0))
-        box->ox = ox, box->oy = oy;
+    if (get_obj_location(box, &ox, &oy, 0)) {
+        box->ox = ox; box->oy = oy;
+    }
 
     /* Shop handling:  can't rely on the container's own unpaid
        or no_charge status because contents might differ with it.
@@ -3062,7 +3065,7 @@ tipcontainer(struct obj *box) /* or bag */
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
-            otmp->ox = box->ox, otmp->oy = box->oy;
+            otmp->ox = box->ox; otmp->oy = box->oy;
 
             if (box->otyp == ICE_BOX) {
                 removed_from_icebox(otmp); /* resume rotting for corpse */

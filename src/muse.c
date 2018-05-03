@@ -403,17 +403,17 @@ find_defensive(struct monst *mtmp)
         for (i = 0; i < 10; ++i) /* 10: 9 spots plus sentinel */
             locs[i][0] = locs[i][1] = 0;
         /* collect viable spots; monster's <mx,my> comes first */
-        locs[0][0] = x, locs[0][1] = y;
+        locs[0][0] = x; locs[0][1] = y;
         i = 1;
         for (xx = x - 1; xx <= x + 1; xx++)
             for (yy = y - 1; yy <= y + 1; yy++)
                 if (isok(xx, yy) && (xx != x || yy != y)) {
-                    locs[i][0] = xx, locs[i][1] = yy;
+                    locs[i][0] = xx; locs[i][1] = yy;
                     ++i;
                 }
         /* look for a suitable trap among the viable spots */
         for (i = 0; i < 10; ++i) {
-            xx = locs[i][0], yy = locs[i][1];
+            xx = locs[i][0]; yy = locs[i][1];
             if (!xx)
                 break; /* we've run out of spots */
             /* skip if it's hero's location
@@ -2354,7 +2354,7 @@ munslime(struct monst *mon, boolean by_you)
                 for (y = mon->my - 1; y <= mon->my + 1; ++y)
                     if (isok(x, y) && accessible(x, y)
                         && !m_at(x, y) && (x != u.ux || y != u.uy)) {
-                        xy[0][nxy] = x, xy[1][nxy] = y;
+                        xy[0][nxy] = x; xy[1][nxy] = y;
                         ++nxy;
                     }
             for (idx = 0; idx < nxy; ++idx) {

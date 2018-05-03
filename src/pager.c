@@ -209,8 +209,9 @@ look_at_object(char *buf, /* output buffer */
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
                      ? distant_name(otmp, doname_vague_quan)
                      : obj_descr[STRANGE_OBJECT].oc_name);
-        if (fakeobj)
-            dealloc_obj(otmp), otmp = 0;
+        if (fakeobj) {
+            dealloc_obj(otmp); otmp = 0;
+        }
     } else
         Strcpy(buf, something); /* sanity precaution */
 
@@ -725,7 +726,7 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name, boolean witho
                         putstr(datawin, 0, buf + 1);
                     }
                     display_nhwindow(datawin, FALSE);
-                    destroy_nhwindow(datawin), datawin = WIN_ERR;
+                    destroy_nhwindow(datawin); datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file)
                 pline("I don't have any information on those things.");

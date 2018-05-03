@@ -529,7 +529,7 @@ struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
         /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
         i = (i + (clockwise ? 1 : 7)) % 8;
 
-        tx = x + xdir[i], ty = y + ydir[i]; /* current target location */
+        tx = x + xdir[i]; ty = y + ydir[i]; /* current target location */
         if (!isok(tx, ty))
             continue;
         mtmp = m_at(tx, ty);

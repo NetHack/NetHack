@@ -86,37 +86,48 @@ sys_early_init()
 void
 sysopt_release()
 {
-    if (sysopt.support)
-        free((genericptr_t) sysopt.support), sysopt.support = (char *) 0;
-    if (sysopt.recover)
-        free((genericptr_t) sysopt.recover), sysopt.recover = (char *) 0;
-    if (sysopt.wizards)
-        free((genericptr_t) sysopt.wizards), sysopt.wizards = (char *) 0;
-    if (sysopt.explorers)
-        free((genericptr_t) sysopt.explorers), sysopt.explorers = (char *) 0;
-    if (sysopt.shellers)
-        free((genericptr_t) sysopt.shellers), sysopt.shellers = (char *) 0;
-    if (sysopt.debugfiles)
-        free((genericptr_t) sysopt.debugfiles),
+    if (sysopt.support) {
+        free((genericptr_t) sysopt.support); sysopt.support = (char *) 0;
+    }
+    if (sysopt.recover) {
+        free((genericptr_t) sysopt.recover); sysopt.recover = (char *) 0;
+    }
+    if (sysopt.wizards) {
+        free((genericptr_t) sysopt.wizards); sysopt.wizards = (char *) 0;
+    }
+    if (sysopt.explorers) {
+        free((genericptr_t) sysopt.explorers); sysopt.explorers = (char *) 0;
+    }
+    if (sysopt.shellers) {
+        free((genericptr_t) sysopt.shellers); sysopt.shellers = (char *) 0;
+    }
+    if (sysopt.debugfiles) {
+        free((genericptr_t) sysopt.debugfiles);
         sysopt.debugfiles = (char *) 0;
+    }
 #ifdef DUMPLOG
-    if (sysopt.dumplogfile)
-        free((genericptr_t)sysopt.dumplogfile), sysopt.dumplogfile=(char *)0;
+    if (sysopt.dumplogfile) {
+        free((genericptr_t)sysopt.dumplogfile); sysopt.dumplogfile=(char *)0;
+    }
 #endif
-    if (sysopt.genericusers)
-        free((genericptr_t) sysopt.genericusers),
+    if (sysopt.genericusers) {
+        free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = (char *) 0;
+    }
 #ifdef PANICTRACE
-    if (sysopt.gdbpath)
-        free((genericptr_t) sysopt.gdbpath), sysopt.gdbpath = (char *) 0;
-    if (sysopt.greppath)
-        free((genericptr_t) sysopt.greppath), sysopt.greppath = (char *) 0;
+    if (sysopt.gdbpath) {
+        free((genericptr_t) sysopt.gdbpath); sysopt.gdbpath = (char *) 0;
+    }
+    if (sysopt.greppath) {
+        free((genericptr_t) sysopt.greppath); sysopt.greppath = (char *) 0;
+    }
 #endif
     /* this one's last because it might be used in panic feedback, although
        none of the preceding ones are likely to trigger a controlled panic */
-    if (sysopt.fmtd_wizard_list)
-        free((genericptr_t) sysopt.fmtd_wizard_list),
+    if (sysopt.fmtd_wizard_list) {
+        free((genericptr_t) sysopt.fmtd_wizard_list);
         sysopt.fmtd_wizard_list = (char *) 0;
+    }
     return;
 }
 

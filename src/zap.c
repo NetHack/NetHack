@@ -2536,7 +2536,7 @@ zap_steed(struct obj *obj) /* wand or spell */
 {
     int steedhit = FALSE;
 
-    bhitpos.x = u.usteed->mx, bhitpos.y = u.usteed->my;
+    bhitpos.x = u.usteed->mx; bhitpos.y = u.usteed->my;
     notonhead = FALSE;
     switch (obj->otyp) {
     /*

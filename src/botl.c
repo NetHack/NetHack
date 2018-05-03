@@ -866,10 +866,12 @@ status_finish()
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (blstats[0][i].val)
-            free((genericptr_t) blstats[0][i].val), blstats[0][i].val = 0;
-        if (blstats[1][i].val)
-            free((genericptr_t) blstats[1][i].val), blstats[1][i].val = 0;
+        if (blstats[0][i].val) {
+            free((genericptr_t) blstats[0][i].val); blstats[0][i].val = 0;
+        }
+        if (blstats[1][i].val) {
+            free((genericptr_t) blstats[1][i].val); blstats[1][i].val = 0;
+        }
 #ifdef STATUS_HILITES
         if (blstats[0][i].thresholds) {
             struct hilite_s *temp = blstats[0][i].thresholds,

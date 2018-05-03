@@ -784,8 +784,9 @@ genl_status_finish()
 
     /* free alloc'd memory here */
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (status_vals[i])
-            free((genericptr_t) status_vals[i]), status_vals[i] = (char *) 0;
+        if (status_vals[i]) {
+            free((genericptr_t) status_vals[i]); status_vals[i] = (char *) 0;
+        }
     }
 }
 

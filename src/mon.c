@@ -82,7 +82,7 @@ mon_sanity_check()
         sanity_check_single_mon(mtmp, TRUE, "fmon");
         if (DEADMONSTER(mtmp))
             continue;
-        x = mtmp->mx, y = mtmp->my;
+        x = mtmp->mx; y = mtmp->my;
         if (!isok(x, y) && !(mtmp->isgd && x == 0 && y == 0)) {
             impossible("mon (%s) claims to be at <%d,%d>?",
                        fmt_ptr((genericptr_t) mtmp), x, y);
@@ -2961,8 +2961,9 @@ mon_animal_list(boolean construct)
                       n * sizeof *animal_list);
         animal_list_count = n;
     } else { /* release */
-        if (animal_list)
-            free((genericptr_t) animal_list), animal_list = 0;
+        if (animal_list) {
+            free((genericptr_t) animal_list); animal_list = 0;
+        }
         animal_list_count = 0;
     }
 }
