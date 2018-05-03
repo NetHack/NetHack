@@ -520,9 +520,7 @@ ckmailstatus()
 
 #if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
 void
-read_simplemail(mbox, adminmsg)
-char *mbox;
-boolean adminmsg;
+read_simplemail(char *mbox, boolean adminmsg)
 {
     FILE* mb = fopen(mbox, "r");
     char curline[128], *msg;

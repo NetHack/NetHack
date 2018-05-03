@@ -1265,8 +1265,7 @@ do_mapping()
 
 /* clairvoyance */
 void
-do_vicinity_map(sobj)
-struct obj *sobj; /* scroll--actually fake spellbook--object */
+do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
 {
     register int zx, zy;
     struct monst *mtmp;

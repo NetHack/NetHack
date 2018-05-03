@@ -891,7 +891,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                 }
                                 continue;
                             foundc:
-                                cx = tx, cy = ty;
+                                cx = tx; cy = ty;
                                 if (msg_given) {
                                     clear_nhwindow(WIN_MESSAGE);
                                     msg_given = FALSE;
@@ -1369,8 +1369,7 @@ docallcmd()
 
 /* for use by safe_qbuf() */
 STATIC_PTR char *
-docall_xname(obj)
-struct obj *obj;
+docall_xname(struct obj *obj)
 {
     struct obj otemp;
 
@@ -1786,9 +1785,7 @@ noit_Monnam(struct monst *mtmp)
 
 /* return "a dog" rather than "Fido", honoring hallucination and visibility */
 char *
-noname_monnam(mtmp, article)
-struct monst *mtmp;
-int article;
+noname_monnam(struct monst *mtmp, int article)
 {
     return x_monnam(mtmp, article, (char *) 0, SUPPRESS_NAME, FALSE);
 }

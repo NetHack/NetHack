@@ -149,8 +149,7 @@ wall_cleanup(int x1, int y1, int x2, int y2)
 
 /* Correct wall types so they extend and connect to each other */
 void
-fix_wall_spines(x1, y1, x2, y2)
-int x1, y1, x2, y2;
+fix_wall_spines(int x1, int y1, int x2, int y2)
 {
     uchar type;
     int x, y;
@@ -211,8 +210,7 @@ int x1, y1, x2, y2;
 }
 
 void
-wallification(x1, y1, x2, y2)
-int x1, y1, x2, y2;
+wallification(int x1, int y1, int x2, int y2)
 {
     wall_cleanup(x1, y1, x2, y2);
     fix_wall_spines(x1, y1, x2, y2);
@@ -389,10 +387,11 @@ baalz_fixup()
         for (y = bughack.inarea.y1; y <= bughack.inarea.y2; ++y)
             if (levl[x][y].typ == POOL) {
                 levl[x][y].typ = HWALL;
-                if (bughack.delarea.x1 == COLNO)
-                    bughack.delarea.x1 = x, bughack.delarea.y1 = y;
-                else
-                    bughack.delarea.x2 = x, bughack.delarea.y2 = y;
+                if (bughack.delarea.x1 == COLNO) {
+                    bughack.delarea.x1 = x; bughack.delarea.y1 = y;
+                } else {
+                    bughack.delarea.x2 = x; bughack.delarea.y2 = y;
+                }
             } else if (levl[x][y].typ == IRONBARS) {
                 /* novelty effect; allowing digging in front of 'eyes' */
                 levl[x - 1][y].wall_info &= ~W_NONDIGGABLE;
@@ -408,7 +407,7 @@ baalz_fixup()
     /* bughack hack for rear-most legs on baalz level; first joint on
        both top and bottom gets a bogus extra connection to room area,
        producing unwanted rectangles; change back to separated legs */
-    x = bughack.delarea.x1, y = bughack.delarea.y1;
+    x = bughack.delarea.x1; y = bughack.delarea.y1;
     if (isok(x, y) && levl[x][y].typ == TLWALL
         && isok(x, y + 1) && levl[x][y + 1].typ == TUWALL) {
         levl[x][y].typ = BRCORNER;
@@ -416,7 +415,7 @@ baalz_fixup()
         if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
             (void) rloc(mtmp, FALSE);
     }
-    x = bughack.delarea.x2, y = bughack.delarea.y2;
+    x = bughack.delarea.x2; y = bughack.delarea.y2;
     if (isok(x, y) && levl[x][y].typ == TLWALL
         && isok(x, y - 1) && levl[x][y - 1].typ == TDWALL) {
         levl[x][y].typ = TRCORNER;

@@ -1516,8 +1516,7 @@ STATIC_VAR struct xprnctx {
 
 /* safe_qbuf() -> short_oname() callback */
 STATIC_PTR char *
-safeq_xprname(obj)
-struct obj *obj;
+safeq_xprname(struct obj *obj)
 {
     return xprname(obj, (char *) 0, safeq_xprn_ctx.let, safeq_xprn_ctx.dot,
                    0L, 0L);

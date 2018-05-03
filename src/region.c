@@ -736,10 +736,7 @@ rest_regions(int fd,
 
 /* to support '#stats' wizard-mode command */
 void
-region_stats(hdrfmt, hdrbuf, count, size)
-const char *hdrfmt;
-char *hdrbuf;
-long *count, *size;
+region_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
 {
     NhRegion *rg;
     int i;

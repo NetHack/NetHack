@@ -1187,10 +1187,7 @@ rest_engravings(int fd)
 
 /* to support '#stats' wizard-mode command */
 void
-engr_stats(hdrfmt, hdrbuf, count, size)
-const char *hdrfmt;
-char *hdrbuf;
-long *count, *size;
+engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
 {
     struct engr *ep;
 

@@ -298,10 +298,7 @@ restore_light_sources(int fd)
 
 /* to support '#stats' wizard-mode command */
 void
-light_stats(hdrfmt, hdrbuf, count, size)
-const char *hdrfmt;
-char *hdrbuf;
-long *count, *size;
+light_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
 {
     light_source *ls;
 

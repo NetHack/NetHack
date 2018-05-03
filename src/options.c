@@ -1370,8 +1370,7 @@ match_str2attr(const char *str, boolean complain)
 }
 
 int
-query_color(prompt)
-const char *prompt;
+query_color(const char *prompt)
 {
     winid tmpwin;
     anything any;
@@ -1614,9 +1613,7 @@ msgtype_parse_add(char *str)
 }
 
 STATIC_OVL boolean
-test_regex_pattern(str, errmsg)
-const char *str;
-const char *errmsg;
+test_regex_pattern(const char *str, const char *errmsg)
 {
     static const char re_error[] = "Regex error";
     struct nhregex *match;

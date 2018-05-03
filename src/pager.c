@@ -1425,14 +1425,11 @@ struct wd_stack_frame {
     Bitfield(else_seen, 1);
 };
 
-STATIC_DCL boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
-                                         int *, int));
+STATIC_DCL boolean whatdoes_cond(char *, struct wd_stack_frame *,
+                                         int *, int);
 
 STATIC_OVL boolean
-whatdoes_cond(buf, stack, depth, lnum)
-char *buf;
-struct wd_stack_frame *stack;
-int *depth, lnum;
+whatdoes_cond(char *buf, struct wd_stack_frame *stack, int *depth, int lnum)
 {
     const char badstackfmt[] = "cmdhlp: too many &%c directives at line %d.";
     boolean newcond, neg, gotopt;

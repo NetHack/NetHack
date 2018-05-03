@@ -1329,8 +1329,7 @@ static char gbuf_stop[ROWNO];
  * between object piles and single objects, it doesn't mark the location
  * for update. */
 void
-newsym_force(x, y)
-register int x, y;
+newsym_force(register int x, register int y)
 {
     newsym(x,y);
     gbuf[y][x].new = 1;

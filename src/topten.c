@@ -1187,8 +1187,7 @@ pickentry:
  * to an object (for statues or morgue corpses).
  */
 struct obj *
-tt_oname(otmp)
-struct obj *otmp;
+tt_oname(struct obj *otmp)
 {
     struct toptenentry *tt;
     if (!otmp)

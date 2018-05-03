@@ -3437,10 +3437,7 @@ mon_chain(winid win, const char *src, struct monst *chain, boolean force, long *
 }
 
 STATIC_OVL void
-misc_stats(win, total_count, total_size)
-winid win;
-long *total_count;
-long *total_size;
+misc_stats(winid win, long *total_count, long *total_size)
 {
     char buf[BUFSZ], hdrbuf[QBUFSZ];
     long count, size;

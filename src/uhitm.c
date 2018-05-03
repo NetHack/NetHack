@@ -486,9 +486,8 @@ known_hitum(register struct monst *mon,
 /* hit the monster next to you and the monsters to the left and right of it;
    return False if the primary target is killed, True otherwise */
 STATIC_OVL boolean
-hitum_cleave(target, uattk)
-struct monst *target; /* non-Null; forcefight at nothing doesn't cleave... */
-struct attack *uattk; /* ... but we don't enforce that here; Null works ok */
+hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't cleave... */
+             struct attack *uattk) /* ... but we don't enforce that here; Null works ok */
 {
     /* swings will be delivered in alternate directions; with consecutive
        attacks it will simulate normal swing and backswing; when swings

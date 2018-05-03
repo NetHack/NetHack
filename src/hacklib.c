@@ -1061,8 +1061,7 @@ midnight()
 
 /* strbuf_init() initializes strbuf state for use */
 void
-strbuf_init(strbuf)
-strbuf_t *strbuf;
+strbuf_init(strbuf_t *strbuf)
 {
     strbuf->str = NULL;
     strbuf->len = 0;
@@ -1070,9 +1069,7 @@ strbuf_t *strbuf;
 
 /* strbuf_append() appends given str to strbuf->str */
 void
-strbuf_append(strbuf, str)
-strbuf_t *strbuf;
-const char *str;
+strbuf_append(strbuf_t *strbuf, const char *str)
 {
     int len = (int) strlen(str) + 1;
 
@@ -1083,9 +1080,7 @@ const char *str;
 
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
 void
-strbuf_reserve(strbuf, len)
-strbuf_t *strbuf;
-int len;
+strbuf_reserve(strbuf_t *strbuf, int len)
 {
     if (strbuf->str == NULL) {
         strbuf->str = strbuf->buf;
@@ -1106,8 +1101,7 @@ int len;
 
 /* strbuf_empty() frees allocated memory and set strbuf to initial state */
 void
-strbuf_empty(strbuf)
-strbuf_t *strbuf;
+strbuf_empty(strbuf_t *strbuf)
 {
     if (strbuf->str != NULL && strbuf->str != strbuf->buf)
         free((genericptr_t) strbuf->str);
@@ -1116,8 +1110,7 @@ strbuf_t *strbuf;
 
 /* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
 void
-strbuf_nl_to_crlf(strbuf)
-strbuf_t *strbuf;
+strbuf_nl_to_crlf(strbuf_t *strbuf)
 {
     if (strbuf->str) {
         int len = (int) strlen(strbuf->str);

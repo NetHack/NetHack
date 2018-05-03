@@ -1852,8 +1852,7 @@ const char *backward_compat_configfile = "nethack.cnf";
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
 STATIC_OVL void
-set_configfile_name(fname)
-const char *fname;
+set_configfile_name(const char *fname)
 {
     (void) strncpy(configfile, fname, sizeof configfile - 1);
     configfile[sizeof configfile - 1] = '\0';
@@ -2980,8 +2979,9 @@ parse_conf_file(FILE *fp, boolean (*proc)(char *))
 
                 if (!config_error_nextline(inbuf)) {
                     rv = FALSE;
-                    if (buf)
-                        free(buf), buf = (char *) 0;
+                    if (buf) {
+                        free(buf); buf = (char *) 0;
+                    }
                     break;
                 }
 
