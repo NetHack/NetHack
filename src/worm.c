@@ -553,8 +553,7 @@ place_wsegs(struct monst *worm)
 }
 
 void
-sanity_check_worm(worm)
-struct monst *worm;
+sanity_check_worm(struct monst *worm)
 {
     struct wseg *curr;
 
@@ -800,9 +799,7 @@ worm_cross(int x1, int y1, int x2, int y2)
 
 /* construct an index number for a worm tail segment */
 int
-wseg_at(worm, x, y)
-struct monst *worm;
-int x, y;
+wseg_at(struct monst *worm, int x, int y)
 {
     int res = 0;
 
