@@ -100,6 +100,8 @@ General Changes
 - High level adventurers will arise as spectres in their bones files, a more
   powerful type of ghost which is capable of using weapons. Inspired by a YANI
   by AmyBSOD and aosdict that was archived on the wiki's YANI list.
+- Added RPresser's epitaph patch, allowing you to write your own epitaph if a
+  bones file is generated.
 - Additional achievements are tracked in the xlogfile that pertain to this
   variant.
 - Pets can now potentially become stunned or invisible by eating the right

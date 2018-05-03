@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/07/18 by NullCGT */
+/* Edited on 5/03/18 by NullCGT */
 
 #define NEED_VARARGS /* comment line for pre-compiled headers */
 
@@ -1087,6 +1087,7 @@ int how;
 {
     boolean taken;
     char pbuf[BUFSZ];
+    char ebuf[BUFSZ];
     winid endwin = WIN_ERR;
     boolean bones_ok, have_windows = iflags.window_inited;
     struct obj *corpse = (struct obj *) 0;
@@ -1228,6 +1229,11 @@ int how;
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, plname);
         Sprintf(pbuf, "%s, ", plname);
         formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);
+        /* ask player if he wants a custom epitaph */
+        if ('y' == yn("Do you want to write your own epitaph?")) {
+        	  getlin("What do you want your epitaph to be?",ebuf);
+         	  Sprintf(pbuf, "Here lies %s. %s", plname, ebuf);
+        }
         make_grave(u.ux, u.uy, pbuf);
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
