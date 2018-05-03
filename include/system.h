@@ -60,7 +60,7 @@ typedef long off_t;
 #endif
 #ifndef SIG_RET_TYPE
 #if defined(NHSTDC) || defined(POSIX_TYPES) || defined(OS2) || defined(__DECC)
-#define SIG_RET_TYPE void (*)()
+#define SIG_RET_TYPE void (*)(int)
 #endif
 #endif
 #ifndef SIG_RET_TYPE

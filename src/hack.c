@@ -102,7 +102,7 @@ moverock()
     register struct trap *ttmp;
     register struct monst *mtmp;
 
-    sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
+    sx = u.ux + u.dx; sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
         /* make sure that this boulder is visible as the top object */
         if (otmp != level.objects[sx][sy])
@@ -1238,7 +1238,7 @@ trapmove(int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> 
         if (anchored) {
             coord cc;
 
-            cc.x = u.ux, cc.y = u.uy;
+            cc.x = u.ux; cc.y = u.uy;
             /* can move normally within radius 1 of buried ball */
             if (buried_ball(&cc) && dist2(x, y, cc.x, cc.y) <= 2) {
                 /* ugly hack: we need to issue some message here
@@ -1724,7 +1724,7 @@ domove()
             }
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
+            u.ux = u.ux0; u.uy = u.uy0;
             if (u.usteed) {
                 u.usteed->mx = u.ux; u.usteed->my = u.uy;
             }
@@ -2044,7 +2044,7 @@ spoteffects(boolean pick)
 
     ++inspoteffects;
     spotterrain = levl[u.ux][u.uy].typ;
-    spotloc.x = u.ux, spotloc.y = u.uy;
+    spotloc.x = u.ux; spotloc.y = u.uy;
 
     /* moving onto different terrain might cause Levitation to toggle */
     if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))
