@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
@@ -465,7 +465,7 @@ nh_timeout()
                 done(TURNED_SLIME);
                 break;
             case VOMITING:
-                if (uamul->otyp == AMULET_OF_NAUSEA) {
+                if (uamul && uamul->otyp == AMULET_OF_NAUSEA) {
                     make_vomiting((long) rnd(100), FALSE);
                 } else  {
                     make_vomiting(0L, TRUE);
