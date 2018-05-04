@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 5/4/18 by NullCGT */
+/* Edited on 5/5/18 by NullCGT */
 
 #include "hack.h"
 
@@ -125,7 +125,7 @@ struct obj *obj;
                 /* I suspect few players will be upset that monsters */
                 /* CAN wish for wands of death here.... */
                 if (rn2(2)) {
-                    verbalize("Thank you for freeing me! I will grant you a wish in grattitude!");
+                    verbalize("Thank you for freeing me! I will grant you a wish in gratitude!");
                     mmake_wish(mon);
                     if (vis)
                         pline("%s vanishes.", Monnam(mtmp));
