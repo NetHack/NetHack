@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 
@@ -305,7 +305,7 @@ int *attk_count, *role_roll_penalty;
         tmp += weapon_hit_bonus((struct obj *) 0);
     }
 
-    /* handle the to-hits of Luckless Folly and Unliited moon */
+    /* handle the to-hits of Luckless Folly and Unlimited moon */
     if (weapon && weapon->oartifact &&
         weapon->oartifact == ART_LUCKLESS_FOLLY) {
         tmp -= 2 * Luck;
@@ -807,7 +807,7 @@ int dieroll;
                         return TRUE;
                     hittxt = TRUE;
                 }
-                /* handle the damages of Luckless Folly and Unliited moon */
+                /* handle the damages of Luckless Folly and Unlimited moon */
                 if (obj->oartifact && obj->oartifact == ART_LUCKLESS_FOLLY) {
                     tmp -= 2 * Luck;
                 } else if (obj && obj->oartifact &&

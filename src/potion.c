@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/15/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 
@@ -905,7 +905,7 @@ register struct obj *otmp;
         break;
     case POT_REFLECTION:
         if (otmp->cursed) {
-            pline("Its like drinking glue!");
+            pline("It\'s like drinking glue!");
             unkn++;
         } else {
             pline("You are covered in a mirror-like sheen!");
