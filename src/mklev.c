@@ -3,7 +3,7 @@
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1405,7 +1405,7 @@ coord *tm;
                     kind = NO_TRAP;
                 break;
             case BUZZSAW_TRAP:
-                if (lvl < 6)
+                if (lvl < 15)
                     kind = NO_TRAP;
                 break;
             case LANDMINE:
