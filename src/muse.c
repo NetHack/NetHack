@@ -6,7 +6,7 @@
  * Monster item usage routines.
  */
 
-/* Edited on 4/29/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1343,7 +1343,7 @@ register struct obj *otmp;
 #endif
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
-        if (!Blind)
+        if (!Blind && mtmp == &youmonst)
             pline("You are covered in sparkling lights!");
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
         break;
