@@ -1,7 +1,7 @@
 /* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/22/18 by NullCGT */
+/* Edited 5/3/18 by NullCGT */
 
 #ifndef MONDATA_H
 #define MONDATA_H
@@ -162,14 +162,12 @@
 #define emits_light(ptr)                                          \
     (((ptr)->mlet == S_LIGHT || (ptr) == &mons[PM_FLAMING_SPHERE] \
       || (ptr) == &mons[PM_SHOCKING_SPHERE]                       \
-      || (ptr) == &mons[PM_FIRE_VORTEX]                           \
-      || (ptr) == &mons[PM_EMPEROR_SANKIS])                       \
+      || (ptr) == &mons[PM_FIRE_VORTEX])                          \
          ? 1                                                      \
          : ((ptr) == &mons[PM_FIRE_ELEMENTAL]) ? 1 : 0)
 /*	[note: the light ranges above were reduced to 1 for performance...] */
 #define likes_lava(ptr) \
-    (ptr == &mons[PM_FIRE_ELEMENTAL] || ptr == &mons[PM_SALAMANDER] \
-      || ptr == &mons[PM_EMPEROR_SANKIS])
+    (ptr == &mons[PM_FIRE_ELEMENTAL] || ptr == &mons[PM_SALAMANDER])
 #define pm_invisible(ptr) \
     ((ptr) == &mons[PM_STALKER] || (ptr) == &mons[PM_BLACK_LIGHT])
 

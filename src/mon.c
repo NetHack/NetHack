@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/2/18 by NullCGT */
+/* Edited on 5/3/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -1535,11 +1535,6 @@ struct monst *magr, /* monster that is currently deciding where to move */
 
   	/* ravens like eyes */
   	if(ma == &mons[PM_RAVEN] && md == &mons[PM_FLOATING_EYE])
-  		  return ALLOW_M|ALLOW_TM;
-
-    /* Sankis turned on her own, and also beat up a cow. */
-    if(ma == &mons[PM_EMPEROR_SANKIS] &&
-       (is_dwarf(md) || md->mlet == S_QUADRUPED))
   		  return ALLOW_M|ALLOW_TM;
 
     /* Asmodeus and Mephisto dislike one another. */
