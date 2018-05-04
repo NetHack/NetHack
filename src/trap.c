@@ -2406,7 +2406,7 @@ register struct monst *mtmp;
                 pline("Spinning buzzsaws erupt from %s!",
                       surface(mtmp->mx, mtmp->my));
             }
-            if (is_flyer(mptr) || is_floater(mptr) && in_sight) {
+            if ((is_flyer(mptr) || is_floater(mptr)) && in_sight) {
                 pline("The blades do not reach %s.", mon_nam(mtmp));
             } else if (thitm(0, mtmp, (struct obj *) 0, d(4, 6), FALSE))
                 trapkilled = TRUE;
