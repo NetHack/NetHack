@@ -32,7 +32,7 @@
 
 #define HSonic_resistance u.uprops[SONIC_RES].intrinsic
 #define ESonic_resistance u.uprops[SONIC_RES].extrinsic
-#define Sonic_resistance (HSonic_resistance || ESonic_resistance)
+#define Sonic_resistance (HSonic_resistance || ESonic_resistance || Deaf)
 
 #define HPsychic_resistance u.uprops[PSYCHIC_RES].intrinsic
 #define EPsychic_resistance u.uprops[PSYCHIC_RES].extrinsic
