@@ -401,8 +401,10 @@ xchar e_type;
     ep->engr_txt = (char *) (ep + 1);
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
-    if (!in_mklev && !strcmp(s, "Elbereth"))
+    if (!in_mklev && !strcmp(s, "Elbereth")) {
         exercise(A_WIS, TRUE);
+        u.uconduct.elbereth++;
+    }
     if (!in_mklev && (!strcmp(s, "The Yellow Sign") ||
         !strcmp(s, "the Yellow Sign"))) {
         pline_The("weird, twisting sign burns itself into your mind!");

@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/4/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2815,6 +2815,14 @@ int final;
     } else if (wizard) {
         Sprintf(buf, "read items or engraved %ld time%s", u.uconduct.literate,
                 plur(u.uconduct.literate));
+        you_have_X(buf);
+    }
+
+    if (u.uconduct.elbereth == 0) {
+        you_have_never("engraved Elbereth");
+    } else if (wizard) {
+        Sprintf(buf, "engraved Elbereth %ld time%s", u.uconduct.elbereth,
+                plur(u.uconduct.elbereth));
         you_have_X(buf);
     }
 
