@@ -473,7 +473,7 @@ make_bones:
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
-    newbones->frpx = u.ux, newbones->frpy = u.uy;
+    newbones->frpx = u.ux; newbones->frpy = u.uy;
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
