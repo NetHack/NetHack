@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/1/18 by NullCGT */
+/* Edited on 5/3/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -3070,9 +3070,10 @@ void
 mintroduce(mtmp)
 struct monst *mtmp;
 {
+    char *Monst_name = Monnam(mtmp);
     if (!has_mname(mtmp) && !is_animal(mtmp->data)) {
         if (!Deaf) {
-            pline("%s introduces themselves to you as %s.", Monnam(mtmp),
+            pline("%s introduces themselves to you as %s.", Monst_name,
                   noit_mon_nam(christen_monst(mtmp, rndhumname(mtmp->female))));
         } else {
             pline("%s seems to be introducing themselves..",
