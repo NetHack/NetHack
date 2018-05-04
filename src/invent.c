@@ -1950,10 +1950,11 @@ identify_pack(int id_limit,
 
     unid_cnt = 0;
     the_obj = 0; /* if unid_cnt ends up 1, this will be it */
-    for (obj = invent; obj; obj = obj->nobj)
+    for (obj = invent; obj; obj = obj->nobj) {
         if (not_fully_identified(obj)) {
             ++unid_cnt; the_obj = obj;
         }
+    }
 
     if (!unid_cnt) {
         You("have already identified all %sof your possessions.",

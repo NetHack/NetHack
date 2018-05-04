@@ -1453,8 +1453,9 @@ sortspells()
            could just free it since that ordering becomes the default) */
         for (i = 0; i < MAXSPELL; i++)
             tmp_book[i] = spl_book[spl_orderindx[i]];
-        for (i = 0; i < MAXSPELL; i++)
-            spl_book[i] = tmp_book[i], spl_orderindx[i] = i;
+        for (i = 0; i < MAXSPELL; i++) {
+            spl_book[i] = tmp_book[i]; spl_orderindx[i] = i;
+        }
         spl_sortmode = SORTBY_LETTER; /* reset */
         return;
     }

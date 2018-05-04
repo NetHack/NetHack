@@ -580,7 +580,7 @@ animate_statue(struct obj *statue, xchar x, xchar y, int cause, int *fail_reason
 
     if (use_saved_traits) {
         /* restore a petrified monster */
-        cc.x = x, cc.y = y;
+        cc.x = x; cc.y = y;
         mon = montraits(statue, &cc);
         if (mon && mon->mtame && !mon->isminion)
             wary_dog(mon, TRUE);
@@ -1584,7 +1584,7 @@ blow_up_landmine(struct trap *trap)
         lev->doormask = D_BROKEN;
     /* destroy drawbridge if present */
     if (lev->typ == DRAWBRIDGE_DOWN || is_drawbridge_wall(x, y) >= 0) {
-        dbx = x, dby = y;
+        dbx = x; dby = y;
         /* if under the portcullis, the bridge is adjacent */
         if (find_drawbridge(&dbx, &dby))
             destroy_drawbridge(dbx, dby);
@@ -1844,7 +1844,7 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
                 case TRAPDOOR:
                     /* the boulder won't be used up if there is a
                        monster in the trap; stop rolling anyway */
-                    x2 = bhitpos.x, y2 = bhitpos.y; /* stops here */
+                    x2 = bhitpos.x; y2 = bhitpos.y; /* stops here */
                     if (flooreffects(singleobj, x2, y2, "fall")) {
                         used_up = TRUE;
                         launch_drop_spot((struct obj *) 0, 0, 0);
@@ -1891,7 +1891,7 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
         /* if about to hit iron bars, do so now */
         if (dist > 0 && isok(bhitpos.x + dx, bhitpos.y + dy)
             && levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
-            x2 = bhitpos.x, y2 = bhitpos.y; /* object stops here */
+            x2 = bhitpos.x; y2 = bhitpos.y; /* object stops here */
             if (hits_bars(&singleobj,
                           x2, y2, x2+dx, y2+dy,
                           !rn2(20), 0)) {
@@ -3004,12 +3004,14 @@ dofiretrap(struct obj *box) /* null for floor trap */
         }
         if (alt > num)
             num = alt;
-        if (u.mhmax > mons[u.umonnum].mlevel)
-            u.mhmax -= rn2(min(u.mhmax, num + 1)), context.botl = 1;
+        if (u.mhmax > mons[u.umonnum].mlevel) {
+            u.mhmax -= rn2(min(u.mhmax, num + 1)); context.botl = 1;
+        }
     } else {
         num = d(2, 4);
-        if (u.uhpmax > u.ulevel)
-            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), context.botl = 1;
+        if (u.uhpmax > u.ulevel) {
+            u.uhpmax -= rn2(min(u.uhpmax, num + 1)); context.botl = 1;
+        }
     }
     if (!num)
         You("are uninjured.");
@@ -3694,8 +3696,9 @@ crawl:
         pool_of_water = waterbody_name(u.ux, u.uy);
         killer.format = KILLED_BY_AN;
         /* avoid "drowned in [a] water" */
-        if (!strcmp(pool_of_water, "water"))
-            pool_of_water = "deep water", killer.format = KILLED_BY;
+        if (!strcmp(pool_of_water, "water")) {
+            pool_of_water = "deep water"; killer.format = KILLED_BY;
+        }
         Strcpy(killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
@@ -3827,8 +3830,8 @@ move_into_trap(struct trap *ttmp)
     /* we know there's no monster in the way, and we're not trapped */
     if (!Punished
         || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
-        u.ux0 = u.ux, u.uy0 = u.uy;
-        u.ux = x, u.uy = y;
+        u.ux0 = u.ux; u.uy0 = u.uy;
+        u.ux = x; u.uy = y;
         u.umoved = TRUE;
         newsym(u.ux0, u.uy0);
         vision_recalc(1);
