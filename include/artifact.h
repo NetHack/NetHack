@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Modified 4/16/18 by NullCGT */
+/* Modified 5/3/18 by NullCGT */
 
 #ifndef ARTIFACT_H
 #define ARTIFACT_H
@@ -45,7 +45,7 @@
 #define SPFX_CANC 0x20000000L /* Pure cancellation */
 #define SPFX_CONFLICT 0x40000000L /* Weapon causes slotless conflict */
 #define SPFX_BLIND 0x80000000L /* Weapon blinds on hit */
-#define SPFX_JUMP 0x1F000000L /* jumping */
+/* #define SPFX_JUMP 0x1F000000L */
 
 struct artifact {
     short otyp;

@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 5/3/18 by NullCGT */
 
 #ifndef MONFLAG_H
 #define MONFLAG_H
@@ -50,16 +50,16 @@
 #define MS_BOAST 39     /* giants */
 #define MS_CHIMERA 40   /* chimera */
 
-#define MR_FIRE 0x01   /* resists fire */
-#define MR_COLD 0x02   /* resists cold */
-#define MR_SLEEP 0x04  /* resists sleep */
-#define MR_DISINT 0x08 /* resists disintegration */
-#define MR_ELEC 0x10   /* resists electricity */
-#define MR_POISON 0x20 /* resists poison */
-#define MR_ACID 0x40   /* resists acid */
-#define MR_STONE 0x80  /* resists petrification */
-#define MR_SONIC 0x81 /* resists sonic */
-#define MR_PSYCHIC 0x82 /* resists psychic */
+#define MR_FIRE 0x01      /* resists fire */
+#define MR_COLD 0x02      /* resists cold */
+#define MR_SLEEP 0x04     /* resists sleep */
+#define MR_DISINT 0x08    /* resists disintegration */
+#define MR_ELEC 0x10      /* resists electricity */
+#define MR_POISON 0x20    /* resists poison */
+#define MR_ACID 0x40      /* resists acid */
+#define MR_STONE 0x80     /* resists petrification */
+#define MR_SONIC 0x0100   /* resists sonic */
+#define MR_PSYCHIC 0x0200 /* resists psychic */
 /* other resistances: magic, sickness */
 /* other conveyances: teleport, teleport control, telepathy */
 

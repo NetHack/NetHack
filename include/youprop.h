@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 5/3/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H

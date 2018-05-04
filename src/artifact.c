@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/29/18 by NullCGT */
+/* Edited 5/3/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -646,12 +646,12 @@ long wp_mask;
         else
             EMagical_breathing &= ~wp_mask;
     }
-    if (spfx & SPFX_JUMP) {
+    /* if (spfx & SPFX_JUMP) {
         if (on)
             EJumping |= wp_mask;
         else
             EJumping &= ~wp_mask;
-    }
+    } */
 
     if (wp_mask == W_ART && !on && oart->inv_prop) {
         /* might have to turn off invoked power too */
@@ -1914,7 +1914,7 @@ long *abil;
         { &EHalf_physical_damage, SPFX_HPHDAM },
         { &EReflecting, SPFX_REFLECT },
         { &EMagical_breathing, SPFX_BREATHE },
-        { &EJumping, SPFX_JUMP },
+        /* { &EJumping, SPFX_JUMP }, */
     };
     int k;
 

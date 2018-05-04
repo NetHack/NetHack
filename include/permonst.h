@@ -3,6 +3,8 @@
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/3/18 */
+
 #ifndef PERMONST_H
 #define PERMONST_H
 
@@ -53,7 +55,7 @@ struct permonst {
         cnutrit;                /* its nutritional value */
     uchar msound;               /* noise it makes (6 bits) */
     uchar msize;                /* physical size (3 bits) */
-    uchar mresists;             /* resistances */
+    unsigned short mresists;    /* resistances */
     uchar mconveys;             /* conveyed by eating */
     unsigned long mflags1,      /* boolean bitflags */
         mflags2;                /* more boolean bitflags */

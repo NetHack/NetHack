@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* File changed 5/1/18 by NullCGT */
+/* File changed 5/3/18 by NullCGT */
 
 #ifdef MAKEDEFS_C
 /* in makedefs.c, all we care about is the list of names */
@@ -217,10 +217,10 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     /*
     *      Self-explanatory.
     */
-    A("Seven-League Boots", SPEED_BOOTS,
+    /*A("Seven-League Boots", SPEED_BOOTS,
       (SPFX_RESTR | SPFX_JUMP), 0, 0,
       NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1000L,
-      CLR_MAGENTA),
+      CLR_MAGENTA), */
 
     /*
     *        Just for fun.
