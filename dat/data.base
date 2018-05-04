@@ -128,6 +128,9 @@ memory hound
 	May God make me more wretched
 	Than ever I have been yet!
 		[ Maud, And Other Poems by Alfred, Lord Tennyson ]
+amphisbaena
+	A snake with a head on either end, as opposed to a head and a
+	tail.
 ~amulet of yendor
 ~amulet of restful sleep
 *amulet
@@ -433,6 +436,7 @@ barbed devil
 # takes "bat or bird" when specifying 'B'
 ~*combat
 ~*wombat
+~quothe
 *bat
 bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
@@ -840,6 +844,12 @@ centipede
 	biped that ruins their peace.
 		[ Travels and Researches in South Africa,
 			by Dr. David Livingstone ]
+cerastes
+	A creature of Greek legend, a serpent that is incredibly 
+	flexible—so much so that it is said to have no spine. Cerastae 
+	can have either two large ram-like horns or four pairs of smaller 
+	horns.
+		[ Wikipedia, the free encyclopedia ]
 cerberus
 kerberos
 	Cerberus, (or Kerberos in Greek), was the three-headed dog
@@ -1289,6 +1299,7 @@ dispater
 	earth.
 		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
 djinn*
+*jinn
 	The djinn are genies from the elemental plane of Air.  There,
 	among their kind, they have their own societies.  They are
 	sometimes encountered on earth and may even be summoned here
@@ -1301,6 +1312,7 @@ djinn*
 ~hachi
 ~slasher
 ~sirius
+~joey
 *dog
 pup*
 *canine
@@ -1787,6 +1799,7 @@ fox
 	sour."
 		[ Aesop's Fables ]
 *fung*
+*mushroom
 	Fungi, division of simple plants that lack chlorophyll, true
 	stems, roots, and leaves.  Unlike algae, fungi cannot
 	photosynthesize, and live as parasites or saprophytes.  The
@@ -3289,6 +3302,15 @@ master key of thievery
 	carried, it grants its owner warning, teleport control, and
 	reduces all physical damage by half.  Finally, when invoked,
 	it has the ability to disarm any trapped lock.
+master of cats
+	When you notice a cat in profound meditation,
+	The reason, I tell you, is always the same:
+	His mind is engaged in a rapt contemplation
+	Of the thought, of the thought, of the thought of his name:
+	His ineffable effable
+	Effanineffable
+	Deep and inscrutable singular Name.
+		[ The Naming of Cats, by T S Elliot ]
 master of thieves
 	There was a flutter of wings at the window.  Ymor shifted his
 	bulk out of the chair and crossed the room, coming back with
@@ -3951,6 +3973,10 @@ pelias
 	Pelias cryptically.  "You see my fleshy guise, he saw my naked
 	soul."
 	    [ Conan the Usurper, by Robert E. Howard and L. Sprague de Camp ]
+phoenix
+	“Fawkes is a phoenix, Harry. Phoenixes burst into flame when it 
+	is time for them to die and are reborn from the ashes.”
+	    [ Harry Potter and the Chamber of Secrets, by J.K. Rowling ]
 pick*ax*
 broad pick
 	The mine is full of holes;
@@ -4607,6 +4633,8 @@ scroll *
 	I read these words, and read again, and tried
 	My eyes against the heavens, and read again.
 		[ Endymion, by John Keats ]
+serpopard
+	A leopard with a long, serpentine body and neck.
 set
 seth
 	The ancient Egyptian god of chaos (Set), the embodiment of
@@ -4627,6 +4655,11 @@ shad*
 	that a zombie is an undead animation of a corpse, while a
 	shade is an undead creature magically created by the use
 	of black magic.
+sharur
+	An enchanted mace of prodigious power, originating from
+	Mesopotamian mythology. It can fly, talk to and protect
+	its wielder, and take the form of a magnificent winged
+	lion.
 shaman karnov
 	Making his quarters in the Caves of the Ancestors, Shaman
 	Karnov unceasingly tries to shield his neanderthal people
@@ -5400,6 +5433,10 @@ vortices
 	able to envelop unwary travellers.  The hapless fool thus
 	swallowed by a vortex will soon perish from exposure to the
 	element the vortex is composed of.
+*void
+	Inside the mailbox was absolutely nothing.
+	Nothing after nothing came bursting out.
+		[ MOTHER 3 ] 
 vrock
 	The vrock is one of the weaker forms of demon.  It resembles
 	a cross between a human being and a vulture and does physical
