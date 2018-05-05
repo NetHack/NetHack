@@ -2,6 +2,8 @@
 /* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/5/18 by NullCGT */
+
 #ifndef ALIGN_H
 #define ALIGN_H
 
@@ -39,5 +41,8 @@ typedef struct align { /* alignment & record */
                                                      : ((int) x) - 2))
 #define Align2amask(x) \
     (((x) == A_NONE) ? AM_NONE : ((x) == A_LAWFUL) ? AM_LAWFUL : (x) + 2)
+
+/* for altars */
+#define a_align(x, y) ((aligntyp) Amask2align(levl[x][y].altarmask & AM_MASK))
 
 #endif /* ALIGN_H */

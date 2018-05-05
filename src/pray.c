@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/5/18 by NullCGT */
 
 #include "hack.h"
 
@@ -97,7 +97,6 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define ugod_is_angry() (u.ualign.record < 0)
 #define on_altar() IS_ALTAR(levl[u.ux][u.uy].typ)
 #define on_shrine() ((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
-#define a_align(x, y) ((aligntyp) Amask2align(levl[x][y].altarmask & AM_MASK))
 
 /* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
 boolean
