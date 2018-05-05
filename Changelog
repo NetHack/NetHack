@@ -25,10 +25,16 @@ New Commands
   items directly in their inventory. This should streamline the process of
   trying to get pets to take something.
 
-General Changes
+Visual/Interface Changes
 - Looking at monsters now tells you what weapon they are wielding, and whether
   they are armored. To avoid nerfing wands of probing, the type of armor is not
   indicated.
+- Tigers now are colored orange, in order to make room for lions, which are
+  colored yellow.
+- Branch staircases are colored yellow (ported from xnethack)
+- Altars are colored based on alignment (ported from xnethack)
+
+General Changes
 - Probing certain non-unique monsters will tell you their name.
 - Monsters are now capable of sacrificing corpses on altars, and all monsters
   that like objects will now pick up corpses (as opposed to just nymphs).
@@ -51,8 +57,6 @@ General Changes
 - There are different descriptions for venom which are randomized each game.
   This may break realism slightly, but does help with distinguishing what kind
   of venom an unfamiliar monster might be spitting.
-- Tigers now are colored orange, in order to make room for lions, which are
-  colored yellow.
 - Horned devils are now yellow to make room for dust devils, which are
   brown.
 - Barbed devils now have a passive physical damage attack involving their
