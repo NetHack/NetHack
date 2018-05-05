@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 5/3/18 by NullCGT */
+/* Edited 5/5/18 by NullCGT */
 
 #include "hack.h"
 #include "artifact.h"
@@ -1411,13 +1411,14 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             }
             return vis;
         } else {
-            if (Blind) {
-                You_feel(" oddly empty.");
-            } else if (otmp->oartifact == ART_GAE_DEARG) {
+            if (otmp->oartifact == ART_GAE_DEARG) {
                   if (rnd(3) == 1 &&
                       cancel_monst(&youmonst, otmp, TRUE, FALSE, FALSE)) {
-                          pline_The("%s spear destroys your magic!",
-                                    hcolor(NH_RED));
+                        if (Blind)
+                            You_feel(" oddly empty.");
+                        else
+                            pline_The("%s spear destroys your magic!",
+                                      hcolor(NH_RED));
                   }
                   return TRUE;
               }
@@ -1425,8 +1426,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     }
     if (spec_ability(otmp, SPFX_BLIND) && !rn2(3)) {
         if (!youdefend) {
-            if (!Blind) {
-                pline("The mace flashes with blinding light, blinding %s!",
+            if (mdef->mcansee) {
+                pline("%s blinds %s!", The(distant_name(otmp, xname)),
                       mon_nam(mdef));
                 mdef->mcansee = 0;
                 mdef->mblinded = 17;
