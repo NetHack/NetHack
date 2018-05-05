@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 4/24/18 by NullCGT */
+/* Modified 5/4/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -699,6 +699,7 @@ doengrave()
                     Strcpy(post_engr_text,
                         "The wand issues a series of loud bangs!");
                 }
+                break;
             case WAN_POLYMORPH:
                 if (oep) {
                     if (!Blind) {
