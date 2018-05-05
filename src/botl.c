@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1506903619 2017/10/02 00:20:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1525563781 2018/05/05 23:43:01 $  $NHDT-Branch: tty-status $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -858,7 +858,10 @@ boolean
             : TRUE;
 
         fieldname = initblstats[i].fldname;
-        fieldfmt = initblstats[i].fldfmt;
+        if (fld == BL_TITLE && iflags.wc2_hitpointbar)
+            fieldfmt = "%-30s";
+        else
+            fieldfmt = initblstats[i].fldfmt;
         status_enablefield(fld, fieldname, fieldfmt, fldenabled);
     }
     update_all = TRUE;
