@@ -2,6 +2,8 @@
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/5/18 by NullCGT */
+
 #include "hack.h"
 #if defined(TTY_GRAPHICS)
 #include "wintty.h" /* for prototype of has_color() only */
@@ -131,6 +133,10 @@ unsigned *ospecial;
         } else if (iflags.use_color && offset == S_litcorr
                    && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
+        } else if (iflags.use_color &&
+              (offset == S_upstair || offset == S_dnstair) &&
+              (x == sstairs.sx && y == sstairs.sy)) {
+          color = CLR_YELLOW;
 #endif
         /* try to provide a visible difference between water and lava
            if they use the same symbol and color is disabled */
