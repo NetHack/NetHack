@@ -188,8 +188,9 @@ static const WCHAR cp437[] = {
 };
 
 /*
- * cpConsole provides the mapping of characters in the console code page to UNICODE.
- * It maps a character to at most two WCHARs storing the number of WCHARs in count.
+ * cpConsole provides the mapping of characters in the console code page to
+ * UNICODE.  It maps a character to at most two WCHARs storing the number of
+ * WCHARs in count.
  *
  * NOTE: cpConsole is only valid if has_unicode is TRUE.
  */
@@ -208,7 +209,8 @@ static void initialize_cp_console()
 
         for (int i = 0; i < 256; i++) {
             char c = (char)i;
-            cpConsole[i].count = MultiByteToWideChar(codePage, 0, &c, 1, &cpConsole[i].characters[0], 2);
+            cpConsole[i].count = MultiByteToWideChar(codePage, 0, &c, 1,
+                                            &cpConsole[i].characters[0], 2);
         }
     }
 }
@@ -216,13 +218,17 @@ static void initialize_cp_console()
 /*
  * Console Buffer Flipping Support
  *
- * To minimize the number of calls into the WriteConsoleOutputXXX methods, we implement a notion
- * of a console back buffer which keeps the next frame of console output as it is being composed.
- * When ready to show the new frame, we compare this next frame to what is currently being output
- * and only call WriteConsoleOutputXXX for those console values that need to change.
+ * To minimize the number of calls into the WriteConsoleOutputXXX methods,
+ * we implement a notion of a console back buffer which keeps the next frame
+ * of console output as it is being composed.  When ready to show the new
+ * frame, we compare this next frame to what is currently being output and
+ * only call WriteConsoleOutputXXX for those console values that need to
+ * change.
+ *
  */
 
-#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN \
+                                                | FOREGROUND_BLUE)
 #define CONSOLE_CLEAR_CHARACTER (' ')
 
 typedef struct {
@@ -245,25 +251,28 @@ cell_t undefined_cell;
 
 static boolean buffer_flipping_initialized = FALSE;
 
-static void initialize_buffer_flipping();
+static void check_buffer_size(int width, int height);
 static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y);
 
 static void back_buffer_flip();
 
-static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * cell, int x, int y);
+static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * cell,
+                                int x, int y);
 static void back_buffer_clear_to_end_of_line(int x, int y);
 static void back_buffer_write(cell_t * cell, int x, int y);
 
-
-static void initialize_buffer_flipping()
+static void initialize_buffer_flipping(int width, int height)
 {
-    buffer_width = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
-    buffer_height = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top + 1;
+    if (buffer_flipping_initialized) {
+        check_buffer_size(width, height);
+        return;
+    }
 
-    if (buffer_width > 80) buffer_width = 80;
+    buffer_width = 0;
+    buffer_height = 0;
 
-    back_buffer.cells = (cell_t *)malloc(sizeof(cell_t) * buffer_width * buffer_height);
-    front_buffer.cells = (cell_t *)malloc(sizeof(cell_t) * buffer_width * buffer_height);
+    back_buffer.cells = NULL;
+    front_buffer.cells = NULL;
 
     clear_cell.attribute = CONSOLE_CLEAR_ATTRIBUTE;
     clear_cell.characters[0] = CONSOLE_CLEAR_CHARACTER;
@@ -273,10 +282,44 @@ static void initialize_buffer_flipping()
     undefined_cell = clear_cell;
     undefined_cell.count = 0;
 
-    buffer_fill_to_end(&front_buffer, &undefined_cell, 0, 0);
-    buffer_fill_to_end(&back_buffer, &clear_cell, 0, 0);
+    check_buffer_size(width, height);
 
     buffer_flipping_initialized = TRUE;
+}
+
+static void resize_buffer(console_buffer_t * buffer, cell_t * fill,
+                            int width, int height)
+    return buffer->cells + (buffer_width * y) + x;
+}
+
+{
+    cell_t * cells = (cell_t *)malloc(sizeof(cell_t) * width * height);
+    cell_t * dst = cells;
+    cell_t * sentinel = dst + (width * height);
+
+    while (dst != sentinel)
+        *dst++ = *fill;
+
+    int height_to_copy = (buffer_height > height ? height : buffer_height);
+    int bytes_to_copy = (buffer_width > width ? width : buffer_width)
+                        * sizeof(cell_t);
+
+    for (int y = 0; y < height_to_copy; y++)
+        memcpy(cells + (width * y), buffer->cells + (buffer_width * y),
+               bytes_to_copy);
+
+    free(buffer->cells);
+    buffer->cells = cells;
+}
+
+static void check_buffer_size(int width, int height)
+{
+    if (width != buffer_width || height != buffer_height) {
+        resize_buffer(&back_buffer, &clear_cell, width, height);
+        resize_buffer(&front_buffer, &undefined_cell, width, height);
+        buffer_width = width;
+        buffer_height = height;
+    }
 }
 
 static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y)
@@ -286,35 +329,41 @@ static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y)
 
 static void back_buffer_flip()
 {
-    cell_t * back_cell = back_buffer.cells;
-    cell_t * front_cell = front_buffer.cells;
-    COORD pos;
-
     if (!buffer_flipping_initialized)
         return;
 
+    cell_t * back = back_buffer.cells;
+    cell_t * front = front_buffer.cells;
+    COORD pos;
+
     for (pos.Y = 0; pos.Y < buffer_height; pos.Y++) {
-        for (pos.X = 0; pos.X < buffer_width; pos.X++, back_cell++, front_cell++) {
-            if (back_cell->attribute != front_cell->attribute) {
-                WriteConsoleOutputAttribute(hConOut, &back_cell->attribute, 1, pos, &acount);
-                front_cell->attribute = back_cell->attribute;
+        for (pos.X = 0; pos.X < buffer_width; pos.X++) {
+            if (back->attribute != front->attribute) {
+                WriteConsoleOutputAttribute(hConOut, &back->attribute,
+                                            1, pos, &acount);
+                front->attribute = back->attribute;
             }
-            if (back_cell->count != front_cell->count ||
-                back_cell->characters[0] != front_cell->characters[0] ||
-                back_cell->characters[1] != front_cell->characters[1]) {
+            if (back->count != front->count ||
+                back->characters[0] != front->characters[0] ||
+                back->characters[1] != front->characters[1]) {
                 if (has_unicode) {
-                    WriteConsoleOutputCharacterW(hConOut, back_cell->characters, back_cell->count, pos, &ccount);
+                    WriteConsoleOutputCharacterW(hConOut,  back->characters,
+                                                back->count, pos, &ccount);
                 } else {
-                    char ch = (char)back_cell->characters[0];
-                    WriteConsoleOutputCharacterA(hConOut, &ch, 1, pos, &ccount);
+                    char ch = (char)back->characters[0];
+                    WriteConsoleOutputCharacterA(hConOut, &ch, 1, pos,
+                                                    &ccount);
                 }
-                *front_cell = *back_cell;
+                *front = *back;
             }
+            back++;
+            front++;
         }
     }
 }
 
-static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src, int x, int y)
+static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
+                                int x, int y)
 {
     cell_t * dst = buffer_get_cell(buffer, x, y);
     cell_t * sentinel = buffer_get_cell(buffer, 0, buffer_height);
@@ -385,7 +434,6 @@ setftty()
         adjust_palette();
 #endif
     start_screen();
-    initialize_buffer_flipping();
 }
 
 void
@@ -462,7 +510,16 @@ DWORD ctrltype;
     }
 }
 
-/* called by init_tty in wintty.c for WIN32 port only */
+/*
+ * ntty_open() is called in several places.  It is called by win_tty_init
+ * passing in a mode of zero.  It is then later called again by pcmain passing
+ * in a mode of one.  Finally, it can also be called by process_options also
+ * with a mode of one.
+ *
+ * barthouse - The fact this is getting called multiple times needs to be
+ *   reviewed and perhaps cleaned up.
+ *
+ */
 void
 nttty_open(mode)
 int mode;
@@ -503,12 +560,33 @@ int mode;
         mode = 0;
         goto try;
     } else {
+        /* barthouse - Need to understand how this can happen and
+         *   whether we should bail instead of returning.
+         */
         return;
     }
 
     /* Obtain handles for the standard Console I/O devices */
     hConIn = GetStdHandle(STD_INPUT_HANDLE);
     hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    GetConsoleScreenBufferInfo(hConOut, &csbi);
+
+    int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    int width = min(csbi.srWindow.Right - csbi.srWindow.Left + 1, 80);
+
+    /* If the window is not big enough to meet our minimum requirements,
+     * grow the console's buffer to be large enough.  The user will have
+     * to manually extend the size of the window.
+     */
+
+    width = max(80, width);
+    height = max(25, height);
+
+    COORD size = { max(80, width), max(25, height) };
+    SetConsoleScreenBufferSize(hConOut, size);
+
+    initialize_buffer_flipping(width, height);
 
     load_keyboard_handler();
     /* Initialize the function pointer that points to
@@ -534,7 +612,10 @@ int mode;
         /* Unable to set control handler */
         cmode = 0; /* just to have a statement to break on for debugger */
     }
-    get_scr_size();
+
+    LI = height;
+    CO = width;
+
     console.cursor.X = console.cursor.Y = 0;
     really_move_cursor();
 }
@@ -557,32 +638,6 @@ int
 nttty_kbhit()
 {
     return pNHkbhit(hConIn, &ir);
-}
-
-void
-get_scr_size()
-{
-    int lines, cols;
-    
-    GetConsoleScreenBufferInfo(hConOut, &csbi);
-    
-    lines = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
-    cols = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
-
-    LI = lines;
-    CO = min(cols, 80);
-    
-    if ((LI < 25) || (CO < 80)) {
-        COORD newcoord;
-
-        LI = 25;
-        CO = 80;
-
-        newcoord.Y = LI;
-        newcoord.X = CO;
-
-        SetConsoleScreenBufferSize(hConOut, newcoord);
-    }
 }
 
 int
@@ -824,8 +879,10 @@ cl_eos()
     int cy = ttyDisplay->cury + 1;
     if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
 
-        buffer_fill_to_end(&front_buffer, &clear_cell, ttyDisplay->curx, ttyDisplay->cury);
-        buffer_fill_to_end(&back_buffer, &clear_cell, ttyDisplay->curx, ttyDisplay->cury);
+        buffer_fill_to_end(&front_buffer, &clear_cell, ttyDisplay->curx,
+                            ttyDisplay->cury);
+        buffer_fill_to_end(&back_buffer, &clear_cell, ttyDisplay->curx,
+                            ttyDisplay->cury);
 
         DWORD ccnt;
         COORD newcoord;
@@ -1240,10 +1297,10 @@ VA_DECL(const char *, fmt)
     else {
         if(!init_ttycolor_completed)
             init_ttycolor();
-
         xputs(buf);
         if (ttyDisplay)
             curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
+        really_move_cursor();
     }
     VA_END();
     return;
