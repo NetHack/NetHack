@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/25/18 by NullCGT */
+/* Edited on 5/6/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1212,7 +1212,7 @@ NEARDATA struct permonst mons[] = {
     MON("little bird", S_BAT, LVL(2, 22, 6, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(150, 150, MS_SQAWK, MZ_SMALL), 0, 0,
+        SIZ(40, 20, MS_SQAWK, MZ_SMALL), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_DOMESTIC, M3_INFRAVISIBLE,
         HI_DOMESTIC),
     MON("raven", S_BAT, LVL(4, 20, 6, 0, 0), (G_GENO | 2),
@@ -1224,7 +1224,7 @@ NEARDATA struct permonst mons[] = {
     MON("falcon", S_BAT, LVL(4, 22, 5, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(400, 200, MS_SQAWK, MZ_MEDIUM), 0, 0,
+        SIZ(80, 30, MS_SQAWK, MZ_MEDIUM), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_DOMESTIC, M3_INFRAVISIBLE,
         HI_DOMESTIC),
     MON("vampire bat", S_BAT, LVL(5, 20, 6, 0, 0), (G_GENO | 2),
@@ -1236,7 +1236,7 @@ NEARDATA struct permonst mons[] = {
     MON("giant falcon", S_BAT, LVL(6, 21, 4, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 2, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(800, 250, MS_SQAWK, MZ_MEDIUM), 0, 0,
+        SIZ(100, 50, MS_SQAWK, MZ_MEDIUM), 0, 0,
         M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE, M2_STRONG | M2_DOMESTIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
     MON("phoenix", S_BAT, LVL(15, 20, -7, 40, 7), (G_GENO | G_NOCORPSE | 2),
