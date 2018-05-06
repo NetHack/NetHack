@@ -285,7 +285,7 @@ MAP
 .................T...................}}}}}}}}}..T.....|......S.............|
 .....T......T........T.......T........}}}}}}}}}.....T.|......|.............|
 .........T.....T..................T.......}}}}}.......|......|.............|
-..T.........................T..............}}}}..T....|......|.............|
+..T.........................T..............}}}}..T....S......|.............|
 ............T.........T.................T..}}}}...T...|......|.............|
 ............................................}}}}......|......|.............|
 ......T.........T........T.....T.............}}}}.....|---S---------------S|
@@ -310,17 +310,20 @@ STAIR:(02,08),up
 STAIR:(56,08),down
 # random monsters in random spots
 MONSTER:('&',"succubus"),random
-MONSTER:('&',"succubus"),random
-MONSTER:('&',"succubus"),random
-MONSTER:('&',"succubus"),random
-MONSTER:('&',"succubus"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:random,random
+MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER:('&',"incubus"),random
-MONSTER:('&',"incubus"),random
-MONSTER:('&',"incubus"),random
-MONSTER:('&',"incubus"),random
-MONSTER:('&',"incubus"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:('n',"wood nymph"),random
+MONSTER:random,random
+MONSTER:random,random
 MONSTER:random,random
 MONSTER:random,random
 MONSTER: ';',(45,09)
@@ -329,10 +332,6 @@ MONSTER: ';',(40,00)
 # the demon lord and their gaurdians
 MONSTER:('&',"lord of the foocubi"),(56,08)
 MONSTER:('&',"succubus"),(57,08)
-MONSTER:('&',"incubus"),(57,09)
-MONSTER:('&',"succubus"),(62,13)
-MONSTER:('&',"incubus"),(62,14)
-MONSTER:('&',"incubus"),(62,04)
 MONSTER:('&',"succubus"),(62,03)
 # traps and objects
 OBJECT: random, random
