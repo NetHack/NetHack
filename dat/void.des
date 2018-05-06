@@ -8,6 +8,8 @@
 
 LEVEL:"void"
 FLAGS:noteleport
+MESSAGE: "You feel that you are not in the dungeon any more..."
+MESSAGE: "This place could be very dangerous."
 GEOMETRY:center,center
 MAP
 ...............................................................
