@@ -226,7 +226,7 @@ static void initialize_cp_console()
 #define CONSOLE_CLEAR_CHARACTER (' ')
 
 #define CONSOLE_BUFFER_WIDTH 80
-#define CONSOLE_BUFFER_HEIGHT 25
+#define CONSOLE_BUFFER_HEIGHT 26
 #define CONSOLE_BUFFER_SIZE (CONSOLE_BUFFER_WIDTH * CONSOLE_BUFFER_HEIGHT)
 
 typedef struct {
