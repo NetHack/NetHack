@@ -16,7 +16,7 @@ additions, but as of this moment neither is complete.
 Installation is the same as installation for vanilla 3.6.1. Please note that
 SpliceHack currently compiles to its own binary and uses splicehackdir instead
 of nethackdir on unix, but is untested on windows, and still compiles as nethack
-there.
+there. SpliceHack can be played online at https://www.hardfought.org.
 
 SpliceHack follows the conditions put forth in the license provided by the
 NetHack Dev Team (see dat/license). If you are aware of any licensing or
