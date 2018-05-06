@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/3/18 by NullCGT */
+/* Edited on 5/6/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -371,7 +371,7 @@ unsigned corpseflags;
         obj->age -= 100; /* this is an *OLD* corpse */
         break;
     case PM_SILVER_GOLEM:
-        num = d(2, 6);
+        num = d(1, 2);
         while (num--)
             obj = mksobj_at(SILVER_DAGGER, x, y, TRUE, FALSE);
         free_mname(mtmp); /* don't christen obj */
