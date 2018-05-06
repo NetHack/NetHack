@@ -225,10 +225,6 @@ static void initialize_cp_console()
 #define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
 #define CONSOLE_CLEAR_CHARACTER (' ')
 
-#define CONSOLE_BUFFER_WIDTH 80
-#define CONSOLE_BUFFER_HEIGHT 26
-#define CONSOLE_BUFFER_SIZE (CONSOLE_BUFFER_WIDTH * CONSOLE_BUFFER_HEIGHT)
-
 typedef struct {
     WCHAR   characters[2];
     int     count;
@@ -236,8 +232,11 @@ typedef struct {
 } cell_t;
 
 typedef struct {
-    cell_t  cells[CONSOLE_BUFFER_HEIGHT][CONSOLE_BUFFER_WIDTH];
+    cell_t  * cells;
 } console_buffer_t;
+
+static int buffer_width;
+static int buffer_height;
 
 console_buffer_t back_buffer;
 console_buffer_t front_buffer;
@@ -247,6 +246,7 @@ cell_t undefined_cell;
 static boolean buffer_flipping_initialized = FALSE;
 
 static void initialize_buffer_flipping();
+static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y);
 
 static void back_buffer_flip();
 
@@ -257,6 +257,14 @@ static void back_buffer_write(cell_t * cell, int x, int y);
 
 static void initialize_buffer_flipping()
 {
+    buffer_width = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
+    buffer_height = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top + 1;
+
+    if (buffer_width > 80) buffer_width = 80;
+
+    back_buffer.cells = (cell_t *)malloc(sizeof(cell_t) * buffer_width * buffer_height);
+    front_buffer.cells = (cell_t *)malloc(sizeof(cell_t) * buffer_width * buffer_height);
+
     clear_cell.attribute = CONSOLE_CLEAR_ATTRIBUTE;
     clear_cell.characters[0] = CONSOLE_CLEAR_CHARACTER;
     clear_cell.characters[1] = 0;
@@ -271,17 +279,22 @@ static void initialize_buffer_flipping()
     buffer_flipping_initialized = TRUE;
 }
 
+static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y)
+{
+    return buffer->cells + (buffer_width * y) + x;
+}
+
 static void back_buffer_flip()
 {
-    cell_t * back_cell = &back_buffer.cells[0][0];
-    cell_t * front_cell = &front_buffer.cells[0][0];
+    cell_t * back_cell = back_buffer.cells;
+    cell_t * front_cell = front_buffer.cells;
     COORD pos;
 
     if (!buffer_flipping_initialized)
         return;
 
-    for (pos.Y = 0; pos.Y < CONSOLE_BUFFER_HEIGHT; pos.Y++) {
-        for (pos.X = 0; pos.X < CONSOLE_BUFFER_WIDTH; pos.X++, back_cell++, front_cell++) {
+    for (pos.Y = 0; pos.Y < buffer_height; pos.Y++) {
+        for (pos.X = 0; pos.X < buffer_width; pos.X++, back_cell++, front_cell++) {
             if (back_cell->attribute != front_cell->attribute) {
                 WriteConsoleOutputAttribute(hConOut, &back_cell->attribute, 1, pos, &acount);
                 front_cell->attribute = back_cell->attribute;
@@ -303,15 +316,16 @@ static void back_buffer_flip()
 
 static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src, int x, int y)
 {
-    cell_t * dst = &buffer->cells[y][x];
-    cell_t * sentinel = &buffer->cells[0][0] + CONSOLE_BUFFER_SIZE;
+    cell_t * dst = buffer_get_cell(buffer, x, y);
+    cell_t * sentinel = buffer_get_cell(buffer, 0, buffer_height);
     while (dst != sentinel)
         *dst++ = clear_cell;
 }
 
 static void back_buffer_write(cell_t * cell, int x, int y)
 {
-    back_buffer.cells[y][x] = *cell;
+    cell_t * dst = buffer_get_cell(&back_buffer, x, y);
+    *dst = *cell;
 }
 
 static void back_buffer_clear_to_end_of_line(int x, int y)
@@ -319,8 +333,8 @@ static void back_buffer_clear_to_end_of_line(int x, int y)
     cell_t * cell;
     cell_t *sentinel;
 
-    cell = &back_buffer.cells[y][x];
-    sentinel = &back_buffer.cells[y+1][0];
+    cell = buffer_get_cell(&back_buffer, x, y);
+    sentinel = buffer_get_cell(&back_buffer, 0, y+1);
     while (cell != sentinel)
         *cell++ = clear_cell;
 }
