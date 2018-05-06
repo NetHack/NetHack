@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 5/1/18 by NullCGT */
+/* Modified 5/6/18 by NullCGT */
 
 #include "hack.h"
 
@@ -4188,7 +4188,9 @@ boolean say; /* Announce out of sight hit/miss events if true */
         buzzmonst:
             notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
-                if (mon_reflects(mon, (char *) 0)) {
+                /* psionic attacks cannot be reflected */
+                if (abstype != 9 &&
+                    mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
                         hit(fltxt, mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
@@ -4270,13 +4272,14 @@ boolean say; /* Announce out of sight hit/miss events if true */
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0);
-            if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *) 0)) {
+            if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *) 0)
+                && abstype != 9) {
                 mon = u.usteed;
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
                 pline("%s hits you!", The(fltxt));
-                if (Reflecting) {
+                if (abstype != 9 && Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",
                                          "it");
