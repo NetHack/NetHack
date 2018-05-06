@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1524931557 2018/04/28 16:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1525643540 2018/05/06 21:52:20 $  $NHDT-Branch: tty-status $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@
  * Switch to low level console output routines	M. Allison	2003/10/01
  * Restrict cursor movement until input pending	M. Lehotay	2003/10/02
  * Call Unicode version of output API on NT	R. Chason       2005/10/28
+ * Use of back buffer to improve performance    B. House        2018/05/06
  *
  */
 
@@ -289,9 +290,6 @@ static void initialize_buffer_flipping(int width, int height)
 
 static void resize_buffer(console_buffer_t * buffer, cell_t * fill,
                             int width, int height)
-    return buffer->cells + (buffer_width * y) + x;
-}
-
 {
     cell_t * cells = (cell_t *)malloc(sizeof(cell_t) * width * height);
     cell_t * dst = cells;
