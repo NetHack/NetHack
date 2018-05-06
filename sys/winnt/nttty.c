@@ -571,17 +571,23 @@ int mode;
     GetConsoleScreenBufferInfo(hConOut, &csbi);
 
     int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-    int width = min(csbi.srWindow.Right - csbi.srWindow.Left + 1, 80);
 
-    /* If the window is not big enough to meet our minimum requirements,
+    /* NOTE: We currently force to a width of 80 due to unresolved issues
+     *       within the TTY code.  These issues will need to resolved before
+     *       we could allow widths > 80.  We will always need a width of
+     *       atleast 80.
+     */
+
+    int width = 80; 
+
+    /* If the window is not big enough to meet our minimum height needs,
      * grow the console's buffer to be large enough.  The user will have
      * to manually extend the size of the window.
      */
 
-    width = max(80, width);
     height = max(25, height);
 
-    COORD size = { max(80, width), max(25, height) };
+    COORD size = { width, height };
     SetConsoleScreenBufferSize(hConOut, size);
 
     initialize_buffer_flipping(width, height);
