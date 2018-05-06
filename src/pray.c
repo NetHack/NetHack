@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/5/18 by NullCGT */
+/* Edited on 5/6/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1595,7 +1595,7 @@ dosacrifice()
                 done(ESCAPED);
             } else {
                 /* just for fun */
-                if (!Deaf) {
+                if (!Deaf && Hallucination) {
                     pline("A voice booms out...");
                     verbalize("So thou thought thou couldst defeat me, fool.");
                 }
