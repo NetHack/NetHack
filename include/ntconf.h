@@ -246,4 +246,15 @@ extern int FDECL(set_win32_option, (const char *, const char *));
 extern int FDECL(alternative_palette, (char *));
 #endif
 
+#ifdef NDEBUG
+#define nhassert(expression) ((void)0)
+#else
+extern void FDECL(assert_failed, (const char * exp, const char * file,
+                                    int line));
+
+#define nhassert(expression) (void)((!!(expression)) || \
+        (assert_failed(#expression, __FILE__, __LINE__), 0))
+#endif
+
+
 #endif /* NTCONF_H */
