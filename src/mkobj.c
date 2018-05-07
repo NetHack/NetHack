@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/8/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -2608,7 +2608,7 @@ struct obj *obj;
                 what = "ring";
         } else if (owornmask & W_TOOL) {
             if (obj->otyp != BLINDFOLD && obj->otyp != TOWEL
-                && obj->otyp != LENSES)
+                && obj->otyp != LENSES && obj->otyp != MASK)
                 what = "blindfold";
         } else if (owornmask & W_BALL) {
             if (obj->oclass != BALL_CLASS)

@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/29/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -24,7 +24,6 @@ STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj **));
 STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
-STATIC_DCL void FDECL(use_mask, (struct obj **));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
 STATIC_DCL void FDECL(use_trap, (struct obj *));
@@ -127,8 +126,10 @@ struct obj *obj;
 
                 what = (ublindf->otyp == LENSES)
                            ? "lenses"
-                           : (obj->otyp == ublindf->otyp) ? "other towel"
-                                                          : "blindfold";
+                           :(ublindf->otyp == MASK)
+                             ? "mask"
+                             : (obj->otyp == ublindf->otyp) ? "other towel"
+                                                            : "blindfold";
                 if (ublindf->cursed) {
                     You("push your %s %s.", what,
                         rn2(2) ? "cock-eyed" : "crooked");
@@ -2406,7 +2407,7 @@ boolean quietly;
     return TRUE;
 }
 
-STATIC_OVL void
+void
 use_mask(optr)
 struct obj **optr;
 {
@@ -2421,15 +2422,9 @@ struct obj **optr;
             You1(shudder_for_moment);
             losehp(rnd(30), "system shock", KILLED_BY_AN);
             pline("%s, then splits in two!", Tobjnam(obj, "shudder"));
-        } else {
-            pline("You place the mask on your %s, and a change comes over you!",
-                  body_part(FACE));
-            polymon(obj->corpsenm);
+            useup(obj);
         }
-        if (obj->blessed) {
-            HUnchanging |= FROMOUTSIDE;
-        }
-        useup(obj);
+        polymon(obj->corpsenm);
     } else {
         pline("Unfortunately, no mask will hide what you truly are.");
     }
@@ -3762,6 +3757,7 @@ doapply()
     switch (obj->otyp) {
     case BLINDFOLD:
     case LENSES:
+    case MASK:
         if (obj == ublindf) {
             if (!cursed(obj))
                 Blindf_off(obj);
@@ -3772,7 +3768,9 @@ doapply()
                                        ? "covered by a towel"
                                        : ublindf->otyp == BLINDFOLD
                                              ? "wearing a blindfold"
-                                             : "wearing lenses");
+                                             : ublindf->otyp == LENSES
+                                             ? "wearing lenses"
+                                             : "wearing a mask");
         }
         break;
     case CREAM_PIE:
@@ -3880,9 +3878,6 @@ doapply()
         break;
     case TIN_OPENER:
         res = use_tin_opener(obj);
-        break;
-    case MASK:
-        use_mask(&obj);
         break;
     case PLAYING_CARD_DECK:
     case DECK_OF_FATE:

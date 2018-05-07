@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/29/18 by NulLCGT */
+/* Edited on 5/7/18 by NulLCGT */
 
 #include "hack.h"
 
@@ -189,7 +189,8 @@ struct obj *obj;
             res |= W_QUIVER;
         break;
     case TOOL_CLASS:
-        if (otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES)
+        if (otyp == BLINDFOLD || otyp == TOWEL || otyp == LENSES
+            || otyp == MASK)
             res = W_TOOL; /* WORN_BLINDF */
         else if (is_weptool(obj) || otyp == TIN_OPENER)
             res = W_WEP | W_SWAPWEP;

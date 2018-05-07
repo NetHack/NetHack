@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/14/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1191,7 +1191,7 @@ register const char *let, *word;
                 (putting_on(word)
                  && ((otmp->oclass == FOOD_CLASS && otmp->otyp != MEAT_RING)
                      || (otmp->oclass == TOOL_CLASS && otyp != BLINDFOLD
-                         && otyp != TOWEL && otyp != LENSES)))
+                         && otyp != TOWEL && otyp != LENSES && otyp != MASK)))
              || (!strcmp(word, "wield")
                  && (otmp->oclass == TOOL_CLASS && !is_weptool(otmp)))
              || (!strcmp(word, "eat") && !is_edible(otmp))

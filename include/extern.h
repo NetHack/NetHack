@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 5/1/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -46,6 +46,7 @@ E void FDECL(check_leash, (XCHAR_P, XCHAR_P));
 E boolean FDECL(um_dist, (XCHAR_P, XCHAR_P, XCHAR_P));
 E boolean FDECL(snuff_candle, (struct obj *));
 E void FDECL(use_deck, (struct obj *));
+E void FDECL(use_mask, (struct obj **));
 E boolean FDECL(snuff_lit, (struct obj *));
 E boolean FDECL(catch_lit, (struct obj *));
 E void FDECL(use_unicorn_horn, (struct obj *));

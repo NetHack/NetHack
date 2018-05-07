@@ -2,7 +2,7 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/22/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 /*
  * Polymorph self routine.
@@ -395,6 +395,11 @@ int psflags;
 
     if (Unchanging) {
         pline("You fail to transform!");
+        return;
+    }
+    if (ublindf && ublindf->otyp == MASK &&
+        ublindf->corpsenm == monsndx(youmonst.data)) {
+        pline("Your mask prevents you from transforming.");
         return;
     }
     /* being Stunned|Unaware doesn't negate this aspect of Poly_control */
@@ -1054,6 +1059,9 @@ rehumanize()
     retouch_equipment(2);
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
+    if (ublindf && ublindf->otyp == MASK) {
+        remove_worn_item(ublindf, FALSE);
+    }
 }
 
 int

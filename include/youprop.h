@@ -2,7 +2,7 @@
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/3/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #ifndef YOUPROP_H
 #define YOUPROP_H
@@ -95,7 +95,8 @@
 #define Confusion HConfusion
 
 #define Blinded u.uprops[BLINDED].intrinsic
-#define Blindfolded (ublindf && ublindf->otyp != LENSES)
+#define Blindfolded (ublindf && ublindf->otyp != LENSES \
+                      && ublindf->otyp != MASK)
 /* ...means blind because of a cover */
 #define Blind                                     \
     ((u.uroleplay.blind || Blinded || Blindfolded \

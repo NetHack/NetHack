@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/23/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1133,6 +1133,7 @@ register struct obj *otmp;
     /* blindfold might be wielded; release it for wearing */
     if (otmp->owornmask & W_WEAPON)
         remove_worn_item(otmp, FALSE);
+
     setworn(otmp, W_TOOL);
     on_msg(otmp);
 
@@ -1164,6 +1165,8 @@ register struct obj *otmp;
             learn_unseen_invent();
         context.botl = 1;
     }
+    if (ublindf->otyp == MASK)
+        use_mask(&ublindf);
 }
 
 void
@@ -1184,7 +1187,7 @@ register struct obj *otmp;
         if (was_blind) {
             /* "still cannot see" makes no sense when removing lenses
                since they can't have been the cause of your blindness */
-            if (otmp->otyp != LENSES)
+            if (otmp->otyp != LENSES && otmp->otyp != MASK)
                 You("still cannot see.");
         } else {
             changed = TRUE; /* !was_blind */
@@ -1208,6 +1211,14 @@ register struct obj *otmp;
         if (!Blind)
             learn_unseen_invent();
         context.botl = 1;
+    }
+    if (otmp->otyp == MASK) {
+        if (otmp->blessed) {
+            otmp->blessed = 0;
+        } else if (!otmp->blessed && !otmp->cursed) {
+            otmp->cursed = 1;
+        }
+        rehumanize();
     }
 }
 
@@ -1568,7 +1579,8 @@ register struct obj *otmp;
     /* Curses, like chickens, come home to roost. */
     if ((otmp == uwep) ? welded(otmp) : (int) otmp->cursed) {
         boolean use_plural = (is_boots(otmp) || is_gloves(otmp)
-                              || otmp->otyp == LENSES || otmp->quan > 1L);
+                              || otmp->otyp == LENSES
+                              || otmp->otyp == MASK || otmp->quan > 1L);
 
         You("can't.  %s cursed.", use_plural ? "They are" : "It is");
         otmp->bknown = TRUE;
@@ -1849,7 +1861,7 @@ struct obj *obj;
     armor = (obj->oclass == ARMOR_CLASS);
     ring = (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING);
     eyewear = (obj->otyp == BLINDFOLD || obj->otyp == TOWEL
-               || obj->otyp == LENSES);
+               || obj->otyp == LENSES || obj->otyp == MASK);
     /* checks which are performed prior to actually touching the item */
     if (armor) {
         if (!canwearobj(obj, &mask, TRUE))
@@ -1932,7 +1944,10 @@ struct obj *obj;
             }
         } else if (eyewear) {
             if (ublindf) {
-                if (ublindf->otyp == TOWEL)
+                if (ublindf->otyp == MASK)
+                    Your("%s is already covered by a mask.",
+                         body_part(FACE));
+                else if (ublindf->otyp == TOWEL)
                     Your("%s is already covered by a towel.",
                          body_part(FACE));
                 else if (ublindf->otyp == BLINDFOLD) {
@@ -2050,7 +2065,7 @@ doputon()
         Your("%s%s are full, and you're already wearing an amulet and %s.",
              humanoid(youmonst.data) ? "ring-" : "",
              makeplural(body_part(FINGER)),
-             (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
+             "something on your face");
         return 0;
     }
     otmp = getobj(accessories, "put on");
