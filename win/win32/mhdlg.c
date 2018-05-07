@@ -10,8 +10,6 @@
 #include "resource.h"
 #include "mhdlg.h"
 
-#include <assert.h>
-
 /*---------------------------------------------------------------*/
 /* data for getlin dialog */
 struct getlin_data {
@@ -358,12 +356,12 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     if (lpnmkeydown->wVKey == ' ') {
                         if (control == data->control_role) {
                             int i = ListView_GetNextItem(data->control_role, -1, LVNI_FOCUSED);
-                            assert(i == -1 || ListView_GetNextItem(data->control_role, i, LVNI_FOCUSED) == -1);
+                            nhassert(i == -1 || ListView_GetNextItem(data->control_role, i, LVNI_FOCUSED) == -1);
                             flags.initrole = i;
                             plselAdjustSelections(hWnd);
                         } else if (control == data->control_race) {
                             int i = ListView_GetNextItem(data->control_race, -1, LVNI_FOCUSED);
-                            assert(i == -1 || ListView_GetNextItem(data->control_race, i, LVNI_FOCUSED) == -1);
+                            nhassert(i == -1 || ListView_GetNextItem(data->control_race, i, LVNI_FOCUSED) == -1);
                             if (ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM)) {
                                 flags.initrace = i;
                                 plselAdjustSelections(hWnd);
@@ -391,10 +389,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_KILLFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "KILLFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
-
                     if (data->focus == data->control_race) {
                         data->focus = NULL;
                         ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
@@ -406,9 +400,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_SETFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "SETFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
                     data->focus = control;
 
                     if (control == data->control_race) {
@@ -616,14 +607,14 @@ plselFinalSelection(HWND hWnd)
     int gender = flags.initgend;
     int alignment = flags.initalign;
 
-    assert(role != ROLE_RANDOM && role != ROLE_NONE);
-    assert(race != ROLE_RANDOM && race != ROLE_NONE);
-    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
-    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
-    assert(ok_role(role, race, gender, alignment));
-    assert(ok_race(role, race, gender, alignment));
-    assert(ok_gend(role, race, gender, alignment));
-    assert(ok_align(role, race, gender, alignment));
+    nhassert(role != ROLE_RANDOM && role != ROLE_NONE);
+    nhassert(race != ROLE_RANDOM && race != ROLE_NONE);
+    nhassert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    nhassert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+    nhassert(ok_role(role, race, gender, alignment));
+    nhassert(ok_race(role, race, gender, alignment));
+    nhassert(ok_gend(role, race, gender, alignment));
+    nhassert(ok_align(role, race, gender, alignment));
 
     return TRUE;
 }
@@ -660,10 +651,10 @@ static boolean plselRandomize(plsel_data_t * data)
     int gender = flags.initgend;
     int alignment = flags.initalign;
 
-    assert(role != ROLE_RANDOM && role != ROLE_NONE);
-    assert(race != ROLE_RANDOM && race != ROLE_NONE);
-    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
-    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+    nhassert(role != ROLE_RANDOM && role != ROLE_NONE);
+    nhassert(race != ROLE_RANDOM && race != ROLE_NONE);
+    nhassert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    nhassert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
 
     if (!ok_role(role, race, gender, alignment)) {
         fully_specified = FALSE;
@@ -693,14 +684,14 @@ static boolean plselRandomize(plsel_data_t * data)
     gender = flags.initgend;
     alignment = flags.initalign;
 
-    assert(role != ROLE_RANDOM && role != ROLE_NONE);
-    assert(race != ROLE_RANDOM && race != ROLE_NONE);
-    assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
-    assert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
-    assert(ok_role(role, race, gender, alignment));
-    assert(ok_race(role, race, gender, alignment));
-    assert(ok_gend(role, race, gender, alignment));
-    assert(ok_align(role, race, gender, alignment));
+    nhassert(role != ROLE_RANDOM && role != ROLE_NONE);
+    nhassert(race != ROLE_RANDOM && race != ROLE_NONE);
+    nhassert(gender != ROLE_RANDOM && gender != ROLE_NONE);
+    nhassert(alignment != ROLE_RANDOM && alignment != ROLE_NONE);
+    nhassert(ok_role(role, race, gender, alignment));
+    nhassert(ok_race(role, race, gender, alignment));
+    nhassert(ok_gend(role, race, gender, alignment));
+    nhassert(ok_align(role, race, gender, alignment));
 
     return fully_specified;
 }
@@ -716,14 +707,8 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (lpdis->itemID < 0)
         return FALSE;
 
-    HWND control = GetDlgItem(hWnd, wParam);
+    HWND control = GetDlgItem(hWnd, (int) wParam);
     int i = lpdis->itemID;
-
-    {
-        char buf[64];
-        sprintf(buf, "DRAW %lx %d\n", (unsigned long)control, i);
-        OutputDebugStringA(buf);
-    }
 
     const char * string;
 
@@ -737,7 +722,7 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             string = roles[i].name.m;
         selected = (flags.initrole == i);
     } else {
-        assert(wParam == IDC_PLSEL_RACE_LIST);
+        nhassert(wParam == IDC_PLSEL_RACE_LIST);
         ok = ok_race(flags.initrole, i, ROLE_RANDOM, ROLE_RANDOM);
         string = races[i].noun;
         selected = (flags.initrace == i);
@@ -774,12 +759,6 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     client_rt.left + ListView_GetColumnWidth(lpdis->hwndItem, 0),
                     lpdis->rcItem.bottom);
             DrawFocusRect(lpdis->hDC, &rect);
-
-            {
-                char buf[64];
-                sprintf(buf, "FOCUS %lx %d\n", (unsigned long)control, i);
-                OutputDebugStringA(buf);
-            }
         }
     }
 
