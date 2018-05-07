@@ -932,6 +932,8 @@ E char *FDECL(yyyymmddhhmmss, (time_t));
 E time_t FDECL(time_from_yyyymmddhhmmss, (char *));
 E int NDECL(phase_of_the_moon);
 E boolean NDECL(friday_13th);
+E boolean NDECL(pi_day);
+E boolean NDECL(mayfourth);
 E int NDECL(night);
 E int NDECL(midnight);
 E void FDECL(strbuf_init, (strbuf_t *));

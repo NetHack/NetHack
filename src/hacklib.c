@@ -1093,6 +1093,25 @@ friday_13th()
     return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
 }
 
+boolean
+pi_day()
+{
+    register struct tm *lt = getlt();
+
+    /* tm_mon (month, 0-11) */
+    return (boolean) (lt->tm_mday == 14 && lt->tm_mon == 2);
+}
+
+boolean
+mayfourth()
+{
+    register struct tm *lt = getlt();
+
+    /* tm_mon (month, 0-11) */
+    return (boolean) (lt->tm_mday == 4 && lt->tm_mon == 4);
+}
+
+
 int
 night()
 {

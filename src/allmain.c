@@ -57,6 +57,12 @@ boolean resuming;
         pline("Watch out!  Bad things can happen on Friday the 13th.");
         change_luck(-1);
     }
+    /* these are contained in elses in order to avoid spam */
+    else if (pi_day()) {
+        pline("Happy pi day!");
+    } else if (mayfourth()) {
+        pline("May the fourth be with you!");
+    }
 
     if (!resuming) { /* new game */
         context.rndencode = rnd(9000);
