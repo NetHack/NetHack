@@ -20,6 +20,8 @@
 #include <sys\stat.h>
 #include "win32api.h"
 
+//#define IMMEDIATE_FLIPS
+
 /*
  * The following WIN32 Console API routines are used in this file.
  *
@@ -366,12 +368,21 @@ static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
     cell_t * sentinel = buffer_get_cell(buffer, 0, buffer_height);
     while (dst != sentinel)
         *dst++ = clear_cell;
+
+#ifdef IMMEDIATE_FLIPS
+    if (buffer == &back_buffer)
+        back_buffer_flip();
+#endif
 }
 
 static void back_buffer_write(cell_t * cell, int x, int y)
 {
     cell_t * dst = buffer_get_cell(&back_buffer, x, y);
     *dst = *cell;
+
+#ifdef IMMEDIATE_FLIPS
+    back_buffer_flip();
+#endif
 }
 
 static void back_buffer_clear_to_end_of_line(int x, int y)
@@ -383,6 +394,10 @@ static void back_buffer_clear_to_end_of_line(int x, int y)
     sentinel = buffer_get_cell(&back_buffer, 0, y+1);
     while (cell != sentinel)
         *cell++ = clear_cell;
+
+#ifdef IMMEDIATE_FLIPS
+    back_buffer_flip();
+#endif
 }
 
 /*
@@ -921,6 +936,7 @@ tty_delay_output()
     int k;
 
     goal = 50 + clock();
+    back_buffer_flip();
     while (goal > clock()) {
         k = junk; /* Do nothing */
     }
