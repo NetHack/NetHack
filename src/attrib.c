@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/1/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -311,10 +311,13 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
 
     i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
     if (i == 0 && typ != A_CHA) {
-          /* instant kill */
-        u.uhp = -1;
-        context.botl = TRUE;
-        pline_The("poison was deadly...");
+          /* was previously an instant kill, now take damage AND lose attrib */
+        pline_The("poison courses through you...");
+        loss = d(2, 5);
+        losehp(loss, pkiller, kprefix); /* poison damage */
+        loss = d(2, 2);
+        if (adjattrib(typ, -loss, 1))
+            poisontell(typ, TRUE);
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */
         loss = thrown_weapon ? rnd(6) : rn1(10, 6);

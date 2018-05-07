@@ -35,6 +35,8 @@ Visual/Interface Changes
 - Altars are colored based on alignment (ported from xnethack)
 
 General Changes
+- Deadly poison no longer instantly kills you, but instead will cause both
+  HP and attribute damage.
 - Probing certain non-unique monsters will tell you their name.
 - Monsters are now capable of sacrificing corpses on altars, and all monsters
   that like objects will now pick up corpses (as opposed to just nymphs).
