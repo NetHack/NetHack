@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/6/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2772,7 +2772,7 @@ struct monst *mtmp;
         } else if (!Deaf) {
             You_hear("a loud roar!");
         }
-        aggravate();
+        wake_nearto(mtmp->mx, mtmp->my, 5);
     }
     if (mtmp->data == &mons[PM_MEDUSA]) {
         register int i;

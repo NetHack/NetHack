@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/23/18 by NullCGT */
+/* Edited 5/7/18 by NullCGT */
 
 #include "hack.h"
 #include "mfndpos.h"
@@ -436,7 +436,7 @@ register struct monst *mtmp;
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
         m_respond(mtmp);
     if (mdat->msound == MS_ROAR && !um_dist(mtmp->mx, mtmp->my, 10) &&
-        rnd(10) == 1)
+        !rn2(30))
         m_respond(mtmp);
     if (mdat == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
         m_respond(mtmp);
