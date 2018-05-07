@@ -5,7 +5,7 @@
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
 
-/* Edited on 4/30/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -1324,52 +1324,6 @@ boolean at_stairs, falling, portal;
     new_ledger = ledger_no(newlevel);
     if (new_ledger <= 0)
         done(ESCAPED); /* in fact < 0 is impossible */
-
-    /* If you have the amulet and are trying to get out of Gehennom,
-     * going up a set of stairs sometimes does some very strange things!
-     * Biased against law and towards chaos.  (The chance to be sent
-     * down multiple levels when attempting to go up are significantly
-     * less than the corresponding comment in older versions indicated
-     * due to overlooking the effect of the call to assign_rnd_lvl().)
-     *
-     * Odds for making it to the next level up, or of being sent down:
-     *  "up"    L      N      C
-     *   +1   75.0   75.0   75.0
-     *    0    6.25   8.33  12.5
-     *   -1   11.46  12.50  12.5
-     *   -2    5.21   4.17   0.0
-     *   -3    2.08   0.0    0.0
-     */
-     /*
-     *  Mysterious force now only affects you if you are hallucinating.
-     *  So there. Other effects will be given to the amulet to compensate?
-     */
-    if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
-        && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3) && HHallucination) {
-        if (!rn2(4)) {
-            int odds = 3 + (int) u.ualign.type,   /* 2..4 */
-                diff = odds <= 1 ? 0 : rn2(odds); /* paranoia */
-
-            if (diff != 0) {
-                assign_rnd_level(newlevel, &u.uz, diff);
-                /* if inside the tower, stay inside */
-                if (was_in_W_tower && !On_W_tower_level(newlevel))
-                    diff = 0;
-            }
-            if (diff == 0)
-                assign_level(newlevel, &u.uz);
-
-            new_ledger = ledger_no(newlevel);
-            pline("You suddenly remember that the mysterious force exists!");
-            pline("A mysterious force momentarily surrounds you...");
-            if (on_level(newlevel, &u.uz)) {
-                (void) safe_teleds(FALSE);
-                (void) next_to_u();
-                return;
-            } else
-                at_stairs = at_ladder = FALSE;
-        }
-    }
 
     /* Prevent the player from going past the first quest level unless
      * (s)he has been given the go-ahead by the leader.
