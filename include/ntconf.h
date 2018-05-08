@@ -256,5 +256,6 @@ extern void FDECL(assert_failed, (const char * exp, const char * file,
         (assert_failed(#expression, __FILE__, __LINE__), 0))
 #endif
 
+#define nethack_enter(argc, argv) nethack_enter_winnt()
 
 #endif /* NTCONF_H */
