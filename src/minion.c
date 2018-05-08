@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/1/16 by NullCGT */
+/* Edited on 5/8/16 by NullCGT */
 
 #include "hack.h"
 
@@ -311,17 +311,19 @@ register struct monst *mtmp;
             } else {
                 if (rnd(13) > Luck) {
                     pline("Unfortunately, %s beats you.", Amonnam(mtmp));
-                    pline("%s vanishes, saying that they will see you in the afterlife.",
+                    pline("%s laughs and crushes the deck of cards.",
                           Amonnam(mtmp));
-                    mongone(mtmp);
-                    return (1);
-                } else {
-                    pline("You hand beats %s!", Amonnam(mtmp));
-                    pline("%s gets angry...", Amonnam(mtmp));
                     mtmp->mpeaceful = 0;
                     set_malign(mtmp);
                     return 0;
+                } else {
+                    pline("You hand beats %s!", Amonnam(mtmp));
+                    pline("%s vanishes, congratulating you on a game well played.",
+                          Amonnam(mtmp));
+                    mongone(mtmp);
+                    return (1);
                 }
+                useup(otmp);
             }
         }
     } else if (otmp) {
