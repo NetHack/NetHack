@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1448540693 2015/11/26 12:24:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1505170340 2017/09/11 22:52:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -27,9 +27,11 @@
 #	QT_FIRSTLOCATE	35
 #	QT_NEXTLOCATE	36
 #
-#	QT_FIRSTACQUIRE	40
-#	QT_NEXTACQUIRE	41
-#
+#	QT_FIRSTGOAL	40	/* %n (nemesis) and %o (artifact) will always
+#				   be present on first visit in normal play */
+#	QT_NEXTGOAL	41	/* subsequent visits to goal level */
+#	QT_ALTGOAL	42	/* alternate to NEXTGOAL if quest artifact
+#				   is absent from the level (optional) */
 #	QT_FIRSTNEMESIS	50
 #	QT_NEXTNEMESIS	51
 #	QT_OTHERNEMESIS	52
@@ -194,6 +196,12 @@ You realize the feeling must be the presence of %o.
 %E [This strange feeling must be the presence of %o.]
 %Cp Arc 00041
 The familiar presence of %o is in the ether.
+%E
+# delivered instead of 00041 if %o is not on the level anymore;
+# hero might already be carrying it, so don't say anything like
+# "%o's presence can't be felt"
+%Cp Arc 00042
+The have returned to %ns lair.
 %E
 %Cc Arc 00050
 "So, %p, you think that you can succeed in recovering
@@ -2463,6 +2471,9 @@ proudly again.  Putting your kami in the hands of fate, you advance.
 As you arrive once again at the home of %n, your thoughts
 turn only to %o.
 %E
+%Cp Sam 00042
+As you arrive once again at the home of %n.
+%E
 %Cp Sam 00050
 "Ah, so it is to be you, %p-san.  I offer you seppuku.
 I will be your second if you wish."
@@ -2712,6 +2723,9 @@ You sense the presence of %o.
 %Cp Tou 00041
 You gain confidence, knowing that you may soon be united with
 %o.
+%E
+%Cp Tou 00042
+You have returned to %ns lair.
 %E
 %Cc Tou 00050
 "So, %p, %l thinks that you can wrest
@@ -3206,6 +3220,9 @@ You feel your mentor's presence; perhaps %o is nearby.
 %E
 %Cp Wiz 00041
 The aura of %o tingles at the edge of your perception.
+%E
+%Cp Wiz 00042
+You have returned to %ns lair.
 %E
 %Cc Wiz 00050
 "Ah, I recognize you, %p.  So, %l has sent you to steal

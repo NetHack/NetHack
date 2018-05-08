@@ -1,5 +1,6 @@
 /* NetHack 3.6	monst.h	$NHDT-Date: 1461028522 2016/04/19 01:15:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MONST_H
@@ -19,13 +20,15 @@
  * that there are enough situations which might make a monster change its
  * weapon that this is impractical.  --KAA
  */
-#define NO_WEAPON_WANTED   0
-#define NEED_WEAPON        1
-#define NEED_RANGED_WEAPON 2
-#define NEED_HTH_WEAPON    3
-#define NEED_PICK_AXE      4
-#define NEED_AXE           5
-#define NEED_PICK_OR_AXE   6
+enum wpn_chk_flags {
+    NO_WEAPON_WANTED = 0,
+    NEED_WEAPON,
+    NEED_RANGED_WEAPON,
+    NEED_HTH_WEAPON,
+    NEED_PICK_AXE,
+    NEED_AXE,
+    NEED_PICK_OR_AXE
+};
 
 /* The following flags are used for the second argument to display_minventory
  * in invent.c:
@@ -38,6 +41,13 @@
 #define MINV_PICKMASK 0x03 /* 1|2 */
 #define MINV_NOLET    0x04
 #define MINV_ALL      0x08
+
+enum m_ap_types {
+    M_AP_NOTHING = 0, /* mappearance unused--monster appears as itself */
+    M_AP_FURNITURE,   /* stairs, a door, an altar, etc. */
+    M_AP_OBJECT,      /* an object */
+    M_AP_MONSTER      /* a monster */
+};
 
 struct monst {
     struct monst *nmon;
@@ -56,11 +66,7 @@ struct monst {
     coord mtrack[MTSZ];   /* monster track */
     int mhp, mhpmax;
     unsigned mappearance; /* for undetected mimics and the wiz */
-    uchar m_ap_type;      /* what mappearance is describing: */
-#define M_AP_NOTHING   0  /* mappearance unused--monster appears as itself */
-#define M_AP_FURNITURE 1  /* stairs, a door, an altar, etc. */
-#define M_AP_OBJECT    2  /* an object */
-#define M_AP_MONSTER   3  /* a monster */
+    uchar m_ap_type;      /* what mappearance is describing, m_ap_types */
 
     schar mtame;                /* level of tameness, implies peaceful */
     unsigned short mintrinsics; /* low 8 correspond to mresists */

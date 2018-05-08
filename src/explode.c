@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1450915435 2015/12/24 00:03:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1522454717 2018/03/31 00:05:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,8 +42,9 @@ int expltype;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
-            do_hallu = FALSE, inside_engulfer;
-    char hallu_buf[BUFSZ];
+            do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
+    coord grabxy;
+    char hallu_buf[BUFSZ], killr_buf[BUFSZ];
     short exploding_wand_typ = 0;
 
     if (olet == WAND_CLASS) { /* retributive strike */
@@ -87,10 +88,38 @@ int expltype;
     /* if hero is engulfed and caused the explosion, only hero and
        engulfer will be affected */
     inside_engulfer = (u.uswallow && type >= 0);
+    /* held but not engulfed implies holder is reaching into second spot
+       so might get hit by double damage */
+    grabbed = grabbing = FALSE;
+    if (u.ustuck && !u.uswallow) {
+        if (Upolyd && sticks(youmonst.data))
+            grabbing = TRUE;
+        else
+            grabbed = TRUE;
+        grabxy.x = u.ustuck->mx;
+        grabxy.y = u.ustuck->my;
+    } else
+        grabxy.x = grabxy.y = 0; /* lint suppression */
+    /* FIXME:
+     *  It is possible for a grabber to be outside the explosion
+     *  radius and reaching inside to hold the hero.  If so, it ought
+     *  to take damage (the extra half of double damage).  It is also
+     *  possible for poly'd hero to be outside the radius and reaching
+     *  in to hold a monster.  Hero should take damage in that situation.
+     *
+     *  Probably the simplest way to handle this would be to expand
+     *  the radius used when collecting targets but exclude everything
+     *  beyond the regular radius which isn't reaching inside.  Then
+     *  skip harm to gear of any extended targets when inflicting damage.
+     */
 
     if (olet == MON_EXPLODE) {
-        str = killer.name;
-        do_hallu = Hallucination && strstri(str, "'s explosion");
+        /* when explode() is called recursively, killer.name might change so
+           we need to retain a copy of the current value for this explosion */
+        str = strcpy(killr_buf, killer.name);
+        do_hallu = (Hallucination
+                    && (strstri(str, "'s explosion")
+                        || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
         switch (abs(type) % 10) {
@@ -174,7 +203,7 @@ int expltype;
                     break;
                 }
             }
-            /* can be both you and mtmp if you're swallowed */
+            /* can be both you and mtmp if you're swallowed or riding */
             mtmp = m_at(i + x - 1, j + y - 1);
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
@@ -217,11 +246,8 @@ int expltype;
             }
             if (mtmp && cansee(i + x - 1, j + y - 1) && !canspotmon(mtmp))
                 map_invisible(i + x - 1, j + y - 1);
-            else if (!mtmp && glyph_is_invisible(
-                                  levl[i + x - 1][j + y - 1].glyph)) {
-                unmap_object(i + x - 1, j + y - 1);
-                newsym(i + x - 1, j + y - 1);
-            }
+            else if (!mtmp)
+                (void) unmap_invisible(i + x - 1, j + y - 1);
             if (cansee(i + x - 1, j + y - 1))
                 visible = TRUE;
             if (explmask[i][j] == 1)
@@ -392,8 +418,7 @@ int expltype;
                 } else {
                     /* call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
-                     * can
-                     * call mondied, not killed, if it's not your blast
+                     * can call mondied, not killed, if it's not your blast
                      */
                     int mdam = dam;
 
@@ -403,8 +428,15 @@ int expltype;
                             pline("%s resists the %s!", Monnam(mtmp), str);
                         mdam = (dam + 1) / 2;
                     }
-                    if (mtmp == u.ustuck)
+                    /* if grabber is reaching into hero's spot and
+                       hero's spot is within explosion radius, grabber
+                       gets hit by double damage */
+                    if (grabbed && mtmp == u.ustuck && distu(x, y) <= 2)
                         mdam *= 2;
+                    /* being resistant to opposite type of damage makes
+                       target more vulnerable to current type of damage
+                       (when target is also resistant to current type,
+                       we won't get here) */
                     if (resists_cold(mtmp) && adtyp == AD_FIRE)
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
@@ -413,8 +445,12 @@ int expltype;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
                 if (mtmp->mhp <= 0) {
+                    int xkflg = ((adtyp == AD_FIRE
+                                  && completelyburns(mtmp->data))
+                                 ? XKILL_NOCORPSE : 0);
+
                     if (!context.mon_moving) {
-                        killed(mtmp);
+                        xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
                          * into slime due to some action by the player.
@@ -426,11 +462,15 @@ int expltype;
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
                             pline("%s is %s!", Monnam(mtmp),
-                                  nonliving(mtmp->data) ? "destroyed"
-                                                        : "killed");
-                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT);
-                    } else
+                                  xkflg ? "burned completely"
+                                        : nonliving(mtmp->data) ? "destroyed"
+                                                                : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
+                    } else {
+                        if (xkflg)
+                            adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
+                    }
                 } else if (!context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
@@ -470,6 +510,13 @@ int expltype;
 
         ugolemeffects((int) adtyp, damu);
         if (uhurt == 2) {
+            /* if poly'd hero is grabbing another victim, hero takes
+               double damage (note: don't rely on u.ustuck here because
+               that victim might have been killed when hit by the blast) */
+            if (grabbing && dist2((int) grabxy.x, (int) grabxy.y, x, y) <= 2)
+                damu *= 2;
+            /* hero does not get same fire-resistant vs cold and
+               cold-resistant vs fire double damage as monsters [why not?] */
             if (Upolyd)
                 u.mh -= damu;
             else
@@ -512,12 +559,10 @@ int expltype;
     }
 
     if (shopdamage) {
-        pay_for_damage(adtyp == AD_FIRE
-                           ? "burn away"
-                           : adtyp == AD_COLD
-                                 ? "shatter"
-                                 : adtyp == AD_DISN ? "disintegrate"
-                                                    : "destroy",
+        pay_for_damage((adtyp == AD_FIRE) ? "burn away"
+                          : (adtyp == AD_COLD) ? "shatter"
+                             : (adtyp == AD_DISN) ? "disintegrate"
+                                : "destroy",
                        FALSE);
     }
 
@@ -571,7 +616,7 @@ struct obj *obj; /* only scatter this obj        */
     struct scatter_chain *schain = (struct scatter_chain *) 0;
     long total = 0L;
 
-    while ((otmp = individual_object ? obj : level.objects[sx][sy]) != 0) {
+    while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1L;
             if (qtmp > LARGEST_INT)
@@ -585,8 +630,8 @@ struct obj *obj; /* only scatter this obj        */
         used_up = FALSE;
 
         /* 9 in 10 chance of fracturing boulders or statues */
-        if ((scflags & MAY_FRACTURE)
-            && ((otmp->otyp == BOULDER) || (otmp->otyp == STATUE))
+        if ((scflags & MAY_FRACTURE) != 0
+            && (otmp->otyp == BOULDER || otmp->otyp == STATUE)
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy))
@@ -615,7 +660,7 @@ struct obj *obj; /* only scatter this obj        */
             used_up = TRUE;
 
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */
-        } else if ((scflags & MAY_DESTROY)
+        } else if ((scflags & MAY_DESTROY) != 0
                    && (!rn2(10) || (objects[otmp->otyp].oc_material == GLASS
                                     || otmp->otyp == EGG))) {
             if (breaks(otmp, (xchar) sx, (xchar) sy))
@@ -623,8 +668,7 @@ struct obj *obj; /* only scatter this obj        */
         }
 
         if (!used_up) {
-            stmp = (struct scatter_chain *)
-                                         alloc(sizeof (struct scatter_chain));
+            stmp = (struct scatter_chain *) alloc(sizeof *stmp);
             stmp->next = (struct scatter_chain *) 0;
             stmp->obj = otmp;
             stmp->ox = sx;
@@ -680,7 +724,9 @@ struct obj *obj; /* only scatter this obj        */
                         if (bigmonst(youmonst.data))
                             hitvalu++;
                         hitu = thitu(hitvalu, dmgval(stmp->obj, &youmonst),
-                                     stmp->obj, (char *) 0);
+                                     &stmp->obj, (char *) 0);
+                        if (!stmp->obj)
+                            stmp->stopped = TRUE;
                         if (hitu) {
                             stmp->range -= 3;
                             stop_occupation();

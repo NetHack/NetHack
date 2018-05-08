@@ -1,5 +1,6 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1496531104 2017/06/03 23:05:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef DECL_H
@@ -317,6 +318,7 @@ E const char *materialnm[];
 #define SUPPRESS_HALLUCINATION 0x04
 #define SUPPRESS_SADDLE 0x08
 #define EXACT_NAME 0x0F
+#define SUPPRESS_NAME 0x10
 
 /* Vision */
 E NEARDATA boolean vision_full_recalc; /* TRUE if need vision recalc */
@@ -324,9 +326,7 @@ E NEARDATA char **viz_array;           /* could see/in sight row pointers */
 
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;
-#ifndef STATUS_VIA_WINDOWPORT
 E NEARDATA winid WIN_STATUS;
-#endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
@@ -388,6 +388,14 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
+struct opvar {
+    xchar spovartyp; /* one of SPOVAR_foo */
+    union {
+        char *str;
+        long l;
+    } vardata;
+};
+
 struct autopickup_exception {
     struct nhregex *regex;
     char *pattern;
@@ -412,8 +420,17 @@ struct plinemsg_type {
 E struct plinemsg_type *plinemsg_types;
 
 #ifdef PANICTRACE
-E char *ARGV0;
+E const char *ARGV0;
 #endif
+
+enum earlyarg {ARG_DEBUG, ARG_VERSION};
+
+struct early_opt {
+    enum earlyarg e;
+    const char *name;
+    int minlength;
+    boolean valallowed;
+};
 
 #undef E
 

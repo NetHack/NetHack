@@ -1,5 +1,6 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1470819844 2016/08/10 09:04:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.263 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1524470244 2018/04/23 07:57:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.275 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -137,6 +138,7 @@ struct obj *otmp;
     boolean wake = TRUE; /* Most 'zaps' should wake monster */
     boolean reveal_invis = FALSE, learn_it = FALSE;
     boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
+    boolean helpful_gesture = FALSE;
     int dmg, otyp = otmp->otyp;
     const char *zap_type_text = "spell";
     struct obj *obj;
@@ -192,6 +194,8 @@ struct obj *otmp;
             mon_adjust_speed(mtmp, 1, otmp);
             m_dowear(mtmp, FALSE); /* might want speed boots */
         }
+        if (mtmp->mtame)
+            helpful_gesture = TRUE;
         break;
     case WAN_UNDEAD_TURNING:
     case SPE_TURN_UNDEAD:
@@ -426,7 +430,7 @@ struct obj *otmp;
     }
     if (wake) {
         if (mtmp->mhp > 0) {
-            wakeup(mtmp, TRUE);
+            wakeup(mtmp, helpful_gesture ? FALSE : TRUE);
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops)
                 hot_pursuit(mtmp);
@@ -2128,6 +2132,7 @@ backfire(otmp)
 struct obj *otmp;
 {
     int dmg;
+
     otmp->in_use = TRUE; /* in case losehp() is fatal */
     pline("%s suddenly explodes!", The(xname(otmp)));
     dmg = d(otmp->spe + 2, 6);
@@ -2405,6 +2410,7 @@ boolean ordinary;
     case WAN_LIGHT: /* (broken wand) */
         /* assert( !ordinary ); */
         damage = d(obj->spe, 25);
+        /*FALLTHRU*/
     case EXPENSIVE_CAMERA:
         if (!damage)
             damage = 5;
@@ -3071,6 +3077,7 @@ int range, *skipstart, *skipend;
 {
     int tr = (range / 4);
     int tmp = range - ((tr > 0) ? rnd(tr) : 0);
+
     *skipstart = tmp;
     *skipend = tmp - ((tmp / 4) * rnd(3));
     if (*skipend >= tmp)
@@ -3301,7 +3308,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                     if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN
                         && *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) {
                         shopdoor = TRUE;
-                        add_damage(bhitpos.x, bhitpos.y, 400L);
+                        add_damage(bhitpos.x, bhitpos.y, SHOP_DOOR_COST);
                     }
                 }
                 break;
@@ -3428,7 +3435,7 @@ int dx, dy;
         if (bhitpos.x == u.ux && bhitpos.y == u.uy) { /* ct == 9 */
             if (Fumbling || rn2(20) >= ACURR(A_DEX)) {
                 /* we hit ourselves */
-                (void) thitu(10 + obj->spe, dmgval(obj, &youmonst), obj,
+                (void) thitu(10 + obj->spe, dmgval(obj, &youmonst), &obj,
                              "boomerang");
                 endmultishot(TRUE);
                 break;
@@ -3881,10 +3888,10 @@ const char *fltxt;
 }
 
 void
-buzz(type,nd,sx,sy,dx,dy)
+buzz(type, nd, sx, sy, dx, dy)
 int type, nd;
-xchar sx,sy;
-int dx,dy;
+xchar sx, sy;
+int dx, dy;
 {
     dobuzz(type, nd, sx, sy, dx, dy, TRUE);
 }
@@ -3899,7 +3906,7 @@ int dx,dy;
  * called with dx = dy = 0 with vertical bolts
  */
 void
-dobuzz(type, nd, sx, sy, dx, dy,say)
+dobuzz(type, nd, sx, sy, dx, dy, say)
 register int type, nd;
 register xchar sx, sy;
 register int dx, dy;
@@ -3957,10 +3964,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
             /* reveal/unreveal invisible monsters before tmp_at() */
             if (mon && !canspotmon(mon))
                 map_invisible(sx, sy);
-            else if (!mon && glyph_is_invisible(levl[sx][sy].glyph)) {
-                unmap_object(sx, sy);
-                newsym(sx, sy);
-            }
+            else if (!mon)
+                (void) unmap_invisible(sx, sy);
             if (ZAP_POS(levl[sx][sy].typ)
                 || (isok(lsx, lsy) && cansee(lsx, lsy)))
                 tmp_at(sx, sy);
@@ -4023,10 +4028,22 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     if (tmp == MAGIC_COOKIE) { /* disintegration */
                         disintegrate_mon(mon, type, fltxt);
                     } else if (mon->mhp < 1) {
-                        if (type < 0)
+                        if (type < 0) {
+                            /* mon has just been killed by another monster */
                             monkilled(mon, fltxt, AD_RBRE);
-                        else
-                            killed(mon);
+                        } else {
+                            int xkflags = XKILL_GIVEMSG; /* killed(mon); */
+
+                            /* killed by hero; we know 'type' isn't negative;
+                               if it's fire, highly flammable monsters leave
+                               no corpse; don't bother reporting that they
+                               "burn completely" -- unnecessary verbosity */
+                            if ((type % 10 == ZT_FIRE)
+                                /* paper golem or straw golem */
+                                && completelyburns(mon->data))
+                                xkflags |= XKILL_NOCORPSE;
+                            xkilled(mon, xkflags);
+                        }
                     } else {
                         if (!otmp) {
                             /* normal non-fatal hit */
@@ -4124,7 +4141,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
 
                 switch (bounce) {
                 case 0:
-                    dx = -dx; /* fall into... */
+                    dx = -dx;
+                    /*FALLTHRU*/
                 case 1:
                     dy = -dy;
                     break;
@@ -4146,7 +4164,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                              ? "shatter"
                              /* "damage" indicates wall rather than door */
                              : abstype == ZT_ACID
-                             ? "damage"
+                                ? "damage"
                                 : abstype == ZT_DEATH
                                    ? "disintegrate"
                                    : "destroy",
@@ -4164,7 +4182,7 @@ const char *msg;
 
     if (!msg)
         msg = "The ice crackles and melts.";
-    if (lev->typ == DRAWBRIDGE_UP) {
+    if (lev->typ == DRAWBRIDGE_UP || lev->typ == DRAWBRIDGE_DOWN) {
         lev->drawbridgemask &= ~DB_ICE; /* revert to DB_MOAT */
     } else { /* lev->typ == ICE */
 #ifdef STUPID
@@ -4411,7 +4429,7 @@ short exploding_wand_typ;
                     lev->typ = ROOM;
                     if (see_it)
                         newsym(x, y);
-                    add_damage(x, y, (type >= 0) ? 300L : 0L);
+                    add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
                     if (type >= 0)
                         *shopdamage = TRUE;
                 } else {
@@ -4509,7 +4527,7 @@ short exploding_wand_typ;
         if (new_doormask >= 0) { /* door gets broken */
             if (*in_rooms(x, y, SHOPBASE)) {
                 if (type >= 0) {
-                    add_damage(x, y, 400L);
+                    add_damage(x, y, SHOP_DOOR_COST);
                     *shopdamage = TRUE;
                 } else /* caused by monster */
                     add_damage(x, y, 0L);
@@ -5036,7 +5054,8 @@ int triesleft;
 void
 makewish()
 {
-    char buf[BUFSZ], promptbuf[BUFSZ];
+    static char buf[BUFSZ] = DUMMY;
+    char promptbuf[BUFSZ];
     char bufcpy[BUFSZ];
     struct obj *otmp, nothing;
     int tries = 0;

@@ -73,13 +73,8 @@ struct window_procs mswin_procs = {
     /* other defs that really should go away (they're tty specific) */
     mswin_start_screen, mswin_end_screen, mswin_outrip,
     mswin_preference_update, genl_getmsghistory, genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_no,
 };
 
@@ -680,7 +675,7 @@ mswin_exit_nhwindows(const char *str)
     // Don't do any of this (?) - exit_nhwindows does not terminate
     // the application
     // DestroyWindow(GetNHApp()->hMainWnd);
-    // terminate(EXIT_SUCCESS);
+    // nh_terminate(EXIT_SUCCESS);
 }
 
 /* Prepare the window to be suspended. */
@@ -1726,7 +1721,7 @@ bail(const char *mesg)
 {
     clearlocks();
     mswin_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 

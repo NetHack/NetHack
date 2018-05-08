@@ -1,5 +1,6 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1459208813 2016/03/28 23:46:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1520022901 2018/03/02 20:35:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -52,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
+static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2018/03/02";
 #endif
 
 /* names of files to be generated */
@@ -72,6 +73,7 @@ static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
 #define QTXT_O_FILE "quest.dat"
 #define VIS_TAB_H "vis_tab.h"
 #define VIS_TAB_C "vis_tab.c"
+#define GITINFO_FILE "gitinfo.txt"
 /* locations for those files */
 #ifdef AMIGA
 #define FILE_PREFIX
@@ -177,6 +179,7 @@ static char *FDECL(bannerc_string, (char *, const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
                            (const char *, int *, long *, unsigned long));
+static boolean FDECL(get_gitinfo, (char *, char *));
 static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
@@ -209,6 +212,7 @@ static char *FDECL(fgetline, (FILE*));
 static char *FDECL(tmpdup, (const char *));
 static char *FDECL(limit, (char *, int));
 static char *FDECL(eos, (char *));
+static int FDECL(case_insensitive_comp, (const char *, const char *));
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
@@ -256,11 +260,12 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-    if ((argc != 2)
+    if ((argc == 1) ||
+        ((argc != 2)
 #ifdef FILE_PREFIX
         && (argc != 3)
 #endif
-        && !(argv[1][0] == '-' && argv[1][1] == '-')) {
+        && !(argv[1][0] == '-' && argv[1][1] == '-'))) {
         Fprintf(stderr, "Bad arg count (%d).\n", argc - 1);
         (void) fflush(stderr);
         return 1;
@@ -1238,6 +1243,7 @@ do_date()
 #else
     time_t clocktim = 0;
 #endif
+    char githash[BUFSZ], gitbranch[BUFSZ];
     char *c, cbuf[60], buf[BUFSZ];
     const char *ul_sfx;
 
@@ -1371,6 +1377,10 @@ do_date()
     Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
             bannerc_string(buf, cbuf));
     Fprintf(ofp, "\n");
+    if (get_gitinfo(githash, gitbranch)) {
+        Fprintf(ofp, "#define NETHACK_GIT_SHA \"%s\"\n", githash);
+        Fprintf(ofp, "#define NETHACK_GIT_BRANCH \"%s\"\n", gitbranch);
+    }
 #ifdef AMIGA
     {
         struct tm *tm = localtime((time_t *) &clocktim);
@@ -1383,6 +1393,84 @@ do_date()
 #endif
     Fclose(ofp);
     return;
+}
+
+boolean
+get_gitinfo(githash, gitbranch)
+char *githash, *gitbranch;
+{
+    FILE *gifp;
+    size_t len;
+    char infile[600];
+    char *line, *strval, *opt, *c, *end;
+    boolean havebranch = FALSE, havehash = FALSE;
+
+    if (!githash || !gitbranch) return FALSE;
+
+    Sprintf(infile, DATA_IN_TEMPLATE, GITINFO_FILE);
+    if (!(gifp = fopen(infile, RDTMODE))) {
+        /* perror(infile); */
+        return FALSE;
+    }
+
+    /* read the gitinfo file */
+    while ((line = fgetline(gifp)) != 0) {
+        strval = index(line, '=');
+        if (strval && strlen(strval) < (BUFSZ-1)) {
+            opt = line;
+            *strval++ = '\0';
+            /* strip off the '\n' */
+            if ((c = index(strval, '\n')) != 0)
+                *c = '\0'; 
+            if ((c = index(opt, '\n')) != 0)
+                *c = '\0';
+            /* strip leading and trailing white space */
+            while (*strval == ' ' || *strval == '\t')
+                strval++;
+            end = eos(strval);
+            while (--end >= strval && (*end == ' ' || *end == '\t'))
+            *end = '\0';
+            while (*opt == ' ' || *opt == '\t')
+                opt++;
+            end = eos(opt);
+            while (--end >= opt && (*end == ' ' || *end == '\t'))
+            *end = '\0';
+
+            len = strlen(opt);
+            if ((len >= strlen("gitbranch")) && !case_insensitive_comp(opt, "gitbranch")) {
+                Strcpy(gitbranch, strval);
+                havebranch = TRUE;
+            }
+            if ((len >= strlen("githash")) && !case_insensitive_comp(opt, "githash")) {
+                Strcpy(githash, strval);
+                havehash = TRUE;
+            }
+	}
+    }
+    Fclose(gifp);
+    if (havebranch && havehash)
+        return TRUE;
+    return FALSE;
+}
+
+static int
+case_insensitive_comp(s1, s2)
+const char *s1;
+const char *s2;
+{
+    uchar u1, u2;
+
+    for (;; s1++, s2++) {
+        u1 = (uchar) *s1;
+        if (isupper(u1))
+            u1 = tolower(u1);
+        u2 = (uchar) *s2;
+        if (isupper(u2))
+            u2 = tolower(u2);
+        if (u1 == '\0' || u1 != u2)
+            break;
+    }
+    return u1 - u2;
 }
 
 static char save_bones_compat_buf[BUFSZ];
@@ -1437,20 +1525,26 @@ static const char *build_opts[] = {
 #ifdef DUMPLOG
     "end-of-game dumplogs",
 #endif
-#ifdef MFLOPPY
-    "floppy drive support",
-#endif
-#ifdef INSURANCE
-    "insurance files for recovering from crashes",
-#endif
 #ifdef HOLD_LOCKFILE_OPEN
     "exclusive lock on level 0 file",
 #endif
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     "external program as a message handler",
 #endif
+#ifdef MFLOPPY
+    "floppy drive support",
+#endif
+#ifdef INSURANCE
+    "insurance files for recovering from crashes",
+#endif
 #ifdef LOGFILE
     "log file",
+#endif
+#ifdef XLOGFILE
+    "extended log file",
+#endif
+#ifdef PANICLOG
+    "errors and warnings log file",
 #endif
 #ifdef MAIL
     "mail daemon",
@@ -1472,6 +1566,8 @@ static const char *build_opts[] = {
 #endif
 #endif
 #endif
+    /* pattern matching method will be substituted by nethack at run time */
+    "pattern matching via :PATMATCH:",
 #ifdef SELECTSAVED
     "restore saved games via menu",
 #endif
@@ -1501,14 +1597,11 @@ static const char *build_opts[] = {
 #ifdef SHELL
     "shell command",
 #endif
-#ifdef STATUS_VIA_WINDOWPORT
-# ifdef STATUS_HILITES
-    "status via windowport with highlighting",
-# else
-    "status via windowport without highlighting",
-# endif
-#else
     "traditional status display",
+#ifdef STATUS_HILITES
+    "status via windowport with highlighting",
+#else
+    "status via windowport without highlighting",
 #endif
 #ifdef SUSPEND
     "suspend command",
@@ -1542,7 +1635,8 @@ static const char *build_opts[] = {
 #ifdef SYSCF
     "system configuration at run-time",
 #endif
-    save_bones_compat_buf, "and basic NetHack features"
+    save_bones_compat_buf,
+    "and basic NetHack features"
 };
 
 struct win_info {
@@ -1607,8 +1701,7 @@ windowing_sanity()
         for (i = 0; window_opts[i].id; ++i)
             if (!strcmp(window_opts[i].id, DEFAULT_WINDOW_SYS))
                 break;
-        if (!window_opts[i]
-                 .id) { /* went through whole list without a match */
+        if (!window_opts[i].id) { /* went through whole list without a match */
             Fprintf(stderr, "Configuration error: DEFAULT_WINDOW_SYS (%s)\n",
                     DEFAULT_WINDOW_SYS);
             Fprintf(stderr,
@@ -1652,7 +1745,8 @@ do_options()
     Fprintf(ofp, "\nOptions compiled into this edition:\n");
     length = COLNO + 1; /* force 1st item onto new line */
     for (i = 0; i < SIZE(build_opts); i++) {
-        str = strcpy(buf, build_opts[i]);
+        str = strcat(strcpy(buf, build_opts[i]),
+                     (i < SIZE(build_opts) - 1) ? "," : ".");
         while (*str) {
             word = index(str, ' ');
             if (word)
@@ -1664,7 +1758,6 @@ do_options()
             Fprintf(ofp, "%s", str), length += strlen(str);
             str += strlen(str) + (word ? 1 : 0);
         }
-        Fprintf(ofp, (i < SIZE(build_opts) - 1) ? "," : "."), length++;
     }
 
     winsyscnt = SIZE(window_opts) - 1;
@@ -2224,9 +2317,6 @@ do_permonst()
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#ifndef PM_H\n#define PM_H\n");
 
-    if (strcmp(mons[0].mname, "playermon") != 0)
-        Fprintf(ofp, "\n#define\tPM_PLAYERMON\t(-1)");
-
     for (i = 0; mons[i].mlet; i++) {
         SpinCursor(3);
 
@@ -2686,6 +2776,7 @@ do_objs()
                 prefix = -1;
                 break;
             }
+            /*FALLTHRU*/
         default:
             Fprintf(ofp, "#define\t");
         }
@@ -2814,7 +2905,7 @@ do_vision()
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
+    Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
         exit(EXIT_FAILURE);
@@ -2837,10 +2928,15 @@ do_vision()
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
-    Sprintf(filename, SOURCE_TEMPLATE, VIS_TAB_C);
+    Sprintf(eos(filename), SOURCE_TEMPLATE, VIS_TAB_C);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
+        /* creating vis_tab.c failed; remove the vis_tab.h we just made */
+        filename[0] = '\0';
+#ifdef FILE_PREFIX
+        Strcat(filename, file_prefix);
+#endif
+        Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }

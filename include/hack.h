@@ -1,5 +1,6 @@
 /* NetHack 3.6	hack.h	$NHDT-Date: 1490908464 2017/03/30 21:14:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef HACK_H
@@ -33,6 +34,15 @@ enum encumbrance_types {
 
 /* weight increment of heavy iron ball */
 #define IRON_BALL_W_INCR 160
+
+/* number of turns it takes for vault guard to show up */
+#define VAULT_GUARD_TIME 30
+
+#define SHOP_DOOR_COST 400L /* cost of a destroyed shop door */
+#define SHOP_BARS_COST 300L /* cost of iron bars */
+#define SHOP_HOLE_COST 200L /* cost of making hole/trapdoor */
+#define SHOP_WALL_COST 200L /* cost of destroying a wall */
+#define SHOP_WALL_DMG  (10L * ACURRSTR) /* damaging a wall */
 
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
@@ -141,6 +151,12 @@ enum game_end_types {
     ESCAPED,
     ASCENDED
 };
+
+typedef struct strbuf {
+    int    len;
+    char * str;
+    char   buf[256];
+} strbuf_t;
 
 #include "align.h"
 #include "dungeon.h"
@@ -280,6 +296,7 @@ enum hmon_atkmode_types {
 #define BUC_UNCURSED 0x200
 #define BUC_UNKNOWN 0x400
 #define BUC_ALLBKNOWN (BUC_BLESSED | BUC_CURSED | BUC_UNCURSED)
+#define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2
 
 /* Flags to control find_mid() */

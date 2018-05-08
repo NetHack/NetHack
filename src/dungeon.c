@@ -1,5 +1,6 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1491958681 2017/04/12 00:58:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1523308357 2018/04/09 21:12:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -57,6 +58,7 @@ STATIC_DCL boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
 STATIC_DCL void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
                                    BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
+STATIC_DCL char FDECL(chr_u_on_lvl, (d_level *));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
                                      struct lchoice *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
@@ -247,7 +249,7 @@ dlb *stream;
         panic(
   "Premature EOF on dungeon description file!\r\nExpected %d bytes - got %d.",
               (size * nitems), (size * cnt));
-        terminate(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
 }
 
@@ -965,7 +967,7 @@ init_dungeons()
            instead of 0, so adjust the start point to shift endgame up */
         if (dunlevs_in_dungeon(&x->dlevel) > 1 - dungeons[i].depth_start)
             dungeons[i].depth_start -= 1;
-        /* TO DO: strip "dummy" out all the way here,
+        /* TODO: strip "dummy" out all the way here,
            so that it's hidden from <ctrl/O> feedback. */
     }
 
@@ -1219,16 +1221,16 @@ int upflag;
            destination instead of its enclosing region.
            Note: up vs down doesn't matter in this case
            because both specify the same exclusion area. */
-        place_lregion(dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy, 0, 0, 0,
-                      0, LR_DOWNTELE, (d_level *) 0);
+        place_lregion(dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
+                      0, 0, 0, 0, LR_DOWNTELE, (d_level *) 0);
     else if (up)
-        place_lregion(updest.lx, updest.ly, updest.hx, updest.hy, updest.nlx,
-                      updest.nly, updest.nhx, updest.nhy, LR_UPTELE,
-                      (d_level *) 0);
+        place_lregion(updest.lx, updest.ly, updest.hx, updest.hy,
+                      updest.nlx, updest.nly, updest.nhx, updest.nhy,
+                      LR_UPTELE, (d_level *) 0);
     else
-        place_lregion(dndest.lx, dndest.ly, dndest.hx, dndest.hy, dndest.nlx,
-                      dndest.nly, dndest.nhx, dndest.nhy, LR_DOWNTELE,
-                      (d_level *) 0);
+        place_lregion(dndest.lx, dndest.ly, dndest.hx, dndest.hy,
+                      dndest.nlx, dndest.nly, dndest.nhx, dndest.nhy,
+                      LR_DOWNTELE, (d_level *) 0);
 }
 
 /* place you on the special staircase */
@@ -1794,6 +1796,13 @@ int type;
     return " (unknown)";
 }
 
+STATIC_OVL char
+chr_u_on_lvl(dlev)
+d_level *dlev;
+{
+    return u.uz.dnum == dlev->dnum && u.uz.dlevel == dlev->dlevel ? '*' : ' ';
+}
+
 /* Print all child branches between the lower and upper bounds. */
 STATIC_OVL void
 print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoices_p)
@@ -1811,7 +1820,9 @@ struct lchoice *lchoices_p;
     for (br = branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
-            Sprintf(buf, "   %s to %s: %d", br_string(br->type),
+            Sprintf(buf, "%c %s to %s: %d",
+                    bymenu ? chr_u_on_lvl(&br->end1) : ' ',
+                    br_string(br->type),
                     dungeons[br->end2.dnum].dname, depth(&br->end1));
             if (bymenu)
                 tport_menu(win, buf, lchoices_p, &br->end1,
@@ -1838,8 +1849,8 @@ xchar *rdgn;
     branch *br;
     anything any;
     struct lchoice lchoices;
-
     winid win = create_nhwindow(NHW_MENU);
+
     if (bymenu) {
         start_menu(win);
         lchoices.idx = 0;
@@ -1885,7 +1896,9 @@ xchar *rdgn;
             print_branch(win, i, last_level, slev->dlevel.dlevel, bymenu,
                          &lchoices);
 
-            Sprintf(buf, "   %s: %d", slev->proto, depth(&slev->dlevel));
+            Sprintf(buf, "%c %s: %d",
+                    chr_u_on_lvl(&slev->dlevel),
+                    slev->proto, depth(&slev->dlevel));
             if (Is_stronghold(&slev->dlevel))
                 Sprintf(eos(buf), " (tune %s)", tune);
             if (bymenu)
@@ -1940,26 +1953,35 @@ xchar *rdgn;
         Sprintf(buf, "Invocation position @ (%d,%d), hero @ (%d,%d)",
                 inv_pos.x, inv_pos.y, u.ux, u.uy);
         putstr(win, 0, buf);
-    }
-    /*
-     * The following is based on the assumption that the inter-level portals
-     * created by the level compiler (not the dungeon compiler) only exist
-     * one per level (currently true, of course).
-     */
-    else if (Is_earthlevel(&u.uz) || Is_waterlevel(&u.uz)
-             || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)) {
+    } else {
         struct trap *trap;
+
+        /* if current level has a magic portal, report its location;
+           this assumes that there is at most one magic portal on any
+           given level; quest and ft.ludios have pairs (one in main
+           dungeon matched with one in the corresponding branch), the
+           elemental planes have singletons (connection to next plane) */
+        *buf = '\0';
         for (trap = ftrap; trap; trap = trap->ntrap)
             if (trap->ttyp == MAGIC_PORTAL)
                 break;
 
-        putstr(win, 0, "");
         if (trap)
-            Sprintf(buf, "Portal @ (%d,%d), hero @ (%d,%d)", trap->tx,
-                    trap->ty, u.ux, u.uy);
-        else
-            Sprintf(buf, "No portal found.");
-        putstr(win, 0, buf);
+            Sprintf(buf, "Portal @ (%d,%d), hero @ (%d,%d)",
+                    trap->tx, trap->ty, u.ux, u.uy);
+
+        /* only report "no portal found" when actually expecting a portal */
+        else if (Is_earthlevel(&u.uz) || Is_waterlevel(&u.uz)
+                 || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)
+                 || Is_qstart(&u.uz) || at_dgn_entrance("The Quest")
+                 || Is_knox(&u.uz))
+            Strcpy(buf, "No portal found.");
+
+        /* only give output if we found a portal or expected one and didn't */
+        if (*buf) {
+            putstr(win, 0, "");
+            putstr(win, 0, buf);
+        }
     }
 
     display_nhwindow(win, TRUE);
@@ -2027,15 +2049,28 @@ donamelevel()
     if (!(mptr = find_mapseen(&u.uz)))
         return 0;
 
+    nbuf[0] = '\0';
+#ifdef EDIT_GETLIN
+    if (mptr->custom) {
+        (void) strncpy(nbuf, mptr->custom, BUFSZ);
+        nbuf[BUFSZ - 1] = '\0';
+    }
+#else
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
+
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
-                strlen(mptr->custom) > 30 ? "..." : "");
+                (strlen(mptr->custom) > 30) ? "..." : "");
         getlin(tmpbuf, nbuf);
     } else
+#endif
         getlin("What do you want to call this dungeon level?", nbuf);
-    if (index(nbuf, '\033'))
+
+    /* empty input or ESC means don't add or change annotation;
+       space-only means discard current annotation without adding new one */
+    if (!*nbuf || *nbuf == '\033')
         return 0;
+    /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
 
     /* discard old annotation, if any */
@@ -2044,7 +2079,8 @@ donamelevel()
         mptr->custom = (char *) 0;
         mptr->custom_lth = 0;
     }
-    /* add new annotation, unless it's empty or a single space */
+    /* add new annotation, unless it's all spaces (which will be an
+       empty string after mungspaces() above) */
     if (*nbuf && strcmp(nbuf, " ")) {
         mptr->custom = dupstr(nbuf);
         mptr->custom_lth = strlen(mptr->custom);
@@ -2106,6 +2142,39 @@ int ledger_num;
         (void) memset((genericptr_t) mptr->msrooms, 0, sizeof mptr->msrooms);
         for (bp = mptr->final_resting_place; bp; bp = bp->next)
             bp->bonesknown = FALSE;
+    }
+}
+
+void
+rm_mapseen(ledger_num)
+int ledger_num;
+{
+    mapseen *mptr, *mprev = (mapseen *)0;
+    struct cemetery *bp, *bpnext;
+
+    for (mptr = mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
+        if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel == ledger_num)
+            break;
+
+    if (!mptr)
+        return;
+
+    if (mptr->custom)
+        free((genericptr_t) mptr->custom);
+
+    bp = mptr->final_resting_place;
+    while (bp) {
+        bpnext = bp->next;
+        free(bp);
+        bp = bpnext;
+    }
+
+    if (mprev) {
+        mprev->next = mptr->next;
+        free(mptr);
+    } else {
+        mapseenchn = mptr->next;
+        free(mptr);
     }
 }
 
@@ -2545,7 +2614,7 @@ recalc_mapseen()
                 }
                 if (is_drawbridge_wall(x, y) < 0)
                     break;
-            /* else FALLTHRU */
+                /*FALLTHRU*/
             case DBWALL:
             case DRAWBRIDGE_DOWN:
                 if (Is_stronghold(&u.uz))

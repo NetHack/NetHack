@@ -1,34 +1,39 @@
 /* NetHack 3.6	mcastu.c	$NHDT-Date: 1436753517 2015/07/13 02:11:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 /* monster mage spells */
-#define MGC_PSI_BOLT 0
-#define MGC_CURE_SELF 1
-#define MGC_HASTE_SELF 2
-#define MGC_STUN_YOU 3
-#define MGC_DISAPPEAR 4
-#define MGC_WEAKEN_YOU 5
-#define MGC_DESTRY_ARMR 6
-#define MGC_CURSE_ITEMS 7
-#define MGC_AGGRAVATION 8
-#define MGC_SUMMON_MONS 9
-#define MGC_CLONE_WIZ 10
-#define MGC_DEATH_TOUCH 11
+enum mcast_mage_spells {
+    MGC_PSI_BOLT = 0,
+    MGC_CURE_SELF,
+    MGC_HASTE_SELF,
+    MGC_STUN_YOU,
+    MGC_DISAPPEAR,
+    MGC_WEAKEN_YOU,
+    MGC_DESTRY_ARMR,
+    MGC_CURSE_ITEMS,
+    MGC_AGGRAVATION,
+    MGC_SUMMON_MONS,
+    MGC_CLONE_WIZ,
+    MGC_DEATH_TOUCH
+};
 
 /* monster cleric spells */
-#define CLC_OPEN_WOUNDS 0
-#define CLC_CURE_SELF 1
-#define CLC_CONFUSE_YOU 2
-#define CLC_PARALYZE 3
-#define CLC_BLIND_YOU 4
-#define CLC_INSECTS 5
-#define CLC_CURSE_ITEMS 6
-#define CLC_LIGHTNING 7
-#define CLC_FIRE_PILLAR 8
-#define CLC_GEYSER 9
+enum mcast_cleric_spells {
+    CLC_OPEN_WOUNDS = 0,
+    CLC_CURE_SELF,
+    CLC_CONFUSE_YOU,
+    CLC_PARALYZE,
+    CLC_BLIND_YOU,
+    CLC_INSECTS,
+    CLC_CURSE_ITEMS,
+    CLC_LIGHTNING,
+    CLC_FIRE_PILLAR,
+    CLC_GEYSER
+};
 
 STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
@@ -86,7 +91,7 @@ int spellval;
     case 23:
         if (Antimagic || Hallucination)
             return MGC_PSI_BOLT;
-    /* else FALL THROUGH */
+        /*FALLTHRU*/
     case 22:
     case 21:
     case 20:
@@ -141,7 +146,7 @@ int spellnum;
     case 14:
         if (rn2(3))
             return CLC_OPEN_WOUNDS;
-    /* else FALL THROUGH */
+        /*FALLTHRU*/
     case 13:
         return CLC_GEYSER;
     case 12:

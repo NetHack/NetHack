@@ -1,5 +1,6 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1502753407 2017/08/14 23:30:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -209,7 +210,7 @@ int x, y; /* dog's starting location, might be different from current */
 boolean devour;
 {
     register struct edog *edog = EDOG(mtmp);
-    boolean poly, grow, heal, slimer, deadmimic;
+    boolean poly, grow, heal, eyes, slimer, deadmimic;
     int nutrit;
     long oprice;
     char objnambuf[BUFSZ];
@@ -226,6 +227,7 @@ boolean devour;
     poly = polyfodder(obj);
     grow = mlevelgain(obj);
     heal = mhealup(obj);
+    eyes = (obj->otyp == CARROT);
 
     if (devour) {
         if (mtmp->meating > 1)
@@ -343,6 +345,8 @@ boolean devour;
     }
     if (heal)
         mtmp->mhp = mtmp->mhpmax;
+    if ((eyes || heal) && !mtmp->mcansee)
+        mcureblindness(mtmp, canseemon(mtmp));
     if (deadmimic)
         quickmimic(mtmp);
     return 1;
@@ -1083,11 +1087,18 @@ int after; /* this is extra fast monster movement */
             continue;
 
         /* lessen the chance of backtracking to previous position(s) */
-        k = has_edog ? uncursedcnt : cnt;
-        for (j = 0; j < MTSZ && j < k - 1; j++)
-            if (nx == mtmp->mtrack[j].x && ny == mtmp->mtrack[j].y)
-                if (rn2(MTSZ * (k - j)))
-                    goto nxti;
+        /* This causes unintended issues for pets trying to follow
+           the hero. Thus, only run it if not leashed and >5 tiles
+           away. */
+        if (!mtmp->mleashed &&
+            distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 5) {
+            k = has_edog ? uncursedcnt : cnt;
+            for (j = 0; j < MTSZ && j < k - 1; j++)
+                if (nx == mtmp->mtrack[j].x &&
+                    ny == mtmp->mtrack[j].y)
+                    if (rn2(MTSZ * (k - j)))
+                        goto nxti;
+        }
 
         j = ((ndist = GDIST(nx, ny)) - nidist) * appr;
         if ((j == 0 && !rn2(++chcnt)) || j < 0

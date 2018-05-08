@@ -1,5 +1,6 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1448210011 2015/11/22 16:33:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1501803107 2017/08/03 23:31:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef TRADSTDC_H
@@ -100,6 +101,7 @@
 #define VA_END()      \
     va_end(the_args); \
     }
+#define VA_PASS1(a1) a1
 #if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
 #define _VA_LIST_ /* prevents multiple def in stdio.h */
 #endif
@@ -125,18 +127,27 @@
 #define VA_END()      \
     va_end(the_args); \
     }
+#define VA_PASS1(a1) a1
 #else
 
 /*USE_OLDARGS*/
+/*
+ * CAVEAT:  passing double (including float promoted to double) will
+ * almost certainly break this, as would any integer type bigger than
+ * sizeof (char *).
+ * NetHack avoids floating point, and any configuration able to use
+ * 'long long int' or I64P32 or the like should be using USE_STDARG.
+ */
+#ifndef VA_TYPE
+typedef const char *vA;
+#define VA_TYPE
+#endif
 #define VA_ARGS arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 #define VA_DECL(typ1, var1)                                             \
-    (var1, VA_ARGS) typ1 var1;                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9; \
+    (var1, VA_ARGS) typ1 var1; vA VA_ARGS;                              \
     {
 #define VA_DECL2(typ1, var1, typ2, var2)                                \
-    (var1, var2, VA_ARGS) typ1 var1;                                    \
-    typ2 var2;                                                          \
-    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9; \
+    (var1, var2, VA_ARGS) typ1 var1; typ2 var2; vA VA_ARGS;             \
     {
 #define VA_START(x)
 #define VA_INIT(var1, typ1)
@@ -151,9 +162,12 @@
  */
 #define VA_SHIFT()                                                    \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
-     arg6 = arg7, arg7 = arg8, arg8 = arg9)
+     arg6 = arg7, arg7 = arg8, arg8 = arg9, arg9 = 0)
 #define VA_NEXT(var1, typ1) ((var1 = (typ1) arg1), VA_SHIFT(), var1)
 #define VA_END() }
+/* needed in pline.c, where full number of arguments is known and expected */
+#define VA_PASS1(a1)                                                  \
+    (vA) a1, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0, (vA) 0
 #endif
 #endif
 
@@ -380,7 +394,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  * append this to a prototype declaration (see pline() in extern.h).
  */
 #ifdef __GNUC__
-#if __GNUC__ >= 2
+#if (__GNUC__ >= 2) && !defined(USE_OLDARGS)
 #define PRINTF_F(f, v) __attribute__((format(printf, f, v)))
 #endif
 #if __GNUC__ >= 3

@@ -1,5 +1,7 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
-#	NetHack 3.6	Makefile.dat	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $	$NHDT-Branch: master $:$NHDT-Revision: 1.8 $
+#	NetHack 3.6	Makefile.dat	$NHDT-Date: 1524689428 2018/04/25 20:50:28 $	$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
+# Copyright (c) 2015 by Mike Stephenson
+# NetHack may be freely redistributed.  See license for details.
 
 #  Copy this file to [.dat]Makefile.; no editing needed.
 

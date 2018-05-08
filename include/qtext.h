@@ -1,4 +1,4 @@
-/* NetHack 3.6	qtext.h	$NHDT-Date: 1432594167 2015/05/25 22:49:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	qtext.h	$NHDT-Date: 1505170347 2017/09/11 22:52:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,6 +83,7 @@ struct qtlists {
 
 #define QT_FIRSTGOAL 40
 #define QT_NEXTGOAL 41
+#define QT_ALTGOAL 42 /* alternate to QT_NEXTGOAL if artifact is absent */
 
 #define QT_FIRSTNEMESIS 50
 #define QT_NEXTNEMESIS 51

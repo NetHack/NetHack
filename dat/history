@@ -71,8 +71,8 @@ then added to other platforms.
 
 The 3.2 development team, comprised of Michael Allison, Ken Arromdee, David
 Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
-Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz, and
-Paul Winner, released version 3.2 in April of 1996.
+Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz,
+and Paul Winner, released version 3.2 in April of 1996.
 
 Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
@@ -110,8 +110,8 @@ Kevin Hugo, Steve Linhart, Ken Lorber, Dean Luick, Pat Rankin, Eric Smith,
 Mike Stephenson, Janet Walz, and Paul Winner, released 3.3.0 in
 December 1999 and 3.3.1 in August of 2000.
 
-Version 3.3 offered many firsts. It was the first version to separate race
-and profession. The Elf class was removed in preference to an elf race,
+Version 3.3 offered many firsts.  It was the first version to separate race
+and profession.  The Elf class was removed in preference to an elf race,
 and the races of dwarves, gnomes, and orcs made their first appearance in
 the game alongside the familiar human race.  Monk and Ranger roles joined
 Archeologists, Barbarians, Cavemen, Healers, Knights, Priests, Rogues,
@@ -172,102 +172,99 @@ would never be a 3.4.4, 3.5, or 3.5.0 official release version.
 In January 2015, preparation began for the release of NetHack 3.6.
 
 At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of Michael Allison,
-Warwick Allison, Ken Arromdee, David Cohrs, Jessie Collet, Ken Lorber,
+as 3.6.0, the development team consisted of Warwick Allison,
+Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet, Ken Lorber,
 Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and Paul Winner.
 Leading up to the release of 3.6.0 in early 2015, new members Sean Hunt,
 Pasi Kallinen, and Derek S. Ray joined the NetHack development team.
 
-In January 2015, preparation began for the release of NetHack 3.6.  The 3.6
-version merges work done by the development team since the previous release
-with some of the beloved community patches.  Many bugs were fixed and some
-code was restructured.
+Near the end of the development of 3.6.0, one of the significant inspirations
+for many of the humorous and fun features found in the game, author
+Terry Pratchett, passed away.  NetHack 3.6.0 introduced a tribute to him.
+
+3.6.0 was released in December 2015, and merged work done by the development
+team since the release of 3.4.3 with some of the beloved community patches.
+Many bugs were fixed and some code was restructured.
+
+In late April 2018, several hundred bug fixes for 3.6.0 and some new
+features were assembled and released as NetHack 3.6.1.
+The development team at the time of release of 3.6.1 consisted of
+Warwick Allison, Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet,
+Pasi Kallinen, Ken Lorber, Dean Luick, Patric Mueller, Pat Rankin,
+Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz and Paul Winner.
 
 The development team, as well as Steve VanDevender and Kevin Smolkowski
-ensured that NetHack 3.6 continued to operate on various Unix flavors
+ensured that NetHack 3.6.1 continued to operate on various Unix flavors
 as well as maintaining the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
-of NetHack 3.6 for Mac.
+of NetHack 3.6.1 for Mac OSX.
 
-Michael Allison, Derek S. Ray, Yitzhak Sapir, Alex Kompel, Dion Nicolaas,
-and David Cohrs maintained the port of NetHack 3.6 for Microsoft Windows.
+Michael Allison, David Cohrs, Barton House, Pasi Kallinen, Alex Kompel,
+Dion Nicolaas, Derek S. Ray and Yitzhak Sapir maintained the port of
+NetHack 3.6.1 for Microsoft Windows.
 
-Pat Rankin attempted to keep the VMS port running for NetHack 3.6,
+Pat Rankin attempted to keep the VMS port running for NetHack 3.6.1,
 hindered by limited access.  Kevin Smolkowski has updated and tested it
 for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
 and Integrity (aka Itanium aka IA64) but not VAX.
 
-The 3.6 version of the game is special in a particular way.  Near the end of
-the development of 3.6.0, one of the significant inspirations for many of
-the humorous and fun features found in the game, author Terry Pratchett,
-passed away.  The 3.6 version of the game includes a tribute to him.
+Ray Chason resurrected the msdos port for 3.6.1 and contributed the
+necessary updates to the community at large.
 
-The 3.6 development team consisting of Michael Allison, Warwick Allison, 
-Ken Arromdee, David Cohrs, Jessie Collet, Sean Hunt, Pasi Kallinen, 
-Ken Lorber, Dean Luick, Pat Rankin, Derek Ray, Mike Stephenson, 
-Janet Walz,  and Paul Winner released 3.6.1 as a bug fix release in 
-January 2016.
-
-An official NetHack web site continues to be maintained by Ken Lorber at
+The official NetHack web site is maintained by Ken Lorber at
 http://www.nethack.org/.
 
---
-SHOUT-OUTS
-
-The devteam would like to give a special "shout-out" to thank the generous
-people primarily responsible for the public NetHack servers available for
-playing the game at nethack.alt.org and devnull.net.  In addition to
-providing a way for the public to play a game of NetHack from almost
-anywhere, they have hosted annual NetHack tournaments for many, many years.
-
-On behalf of the NetHack community, thank you very much to
-M. Drew Streib, Pasi Kallinen and Robin Bandy.
+On behalf of the NetHack community, thank you very much once again to
+M. Drew Streib, Pasi Kallinen and Robin Bandy for providing public
+NetHack servers at nethack.alt.org and devnull.net and/or for hosting annual
+NetHack tournaments.
 
                            - - - - - - - - - -
 
 From time to time, some depraved individual out there in netland sends a
-particularly intriguing modification to help out with the game.  The Gods of
-the Dungeon sometimes make note of the names of the worst of these miscreants
-in this, the list of Dungeoneers:
+particularly intriguing modification to help out with the game.  The gods
+of the dungeon sometimes make note of the names of the worst of these
+miscreants in this, the list of Dungeoneers:
 
-    Adam Aronow               Janet Walz                Nathan Eady
-    Alex Kompel               Janne Salmijarvi          Norm Meluch
+    Adam Aronow               J. Ali Harlow             Mikko Juola
+    Alex Kompel               Janet Walz                Nathan Eady
+    Alex Smith                Janne Salmijarvi          Norm Meluch
     Andreas Dorn              Jean-Christophe Collet    Olaf Seibert
     Andy Church               Jeff Bailey               Pasi Kallinen
     Andy Swanson              Jochen Erwied             Pat Rankin
-    Ari Huttunen              John Kallen               Paul Winner
-    Barton House              John Rupley               Pierre Martineau
-    Benson I. Margulies       John S. Bien              Ralf Brown
-    Bill Dyer                 Johnny Lee                Ray Chason
-    Boudewijn Waijers         Jon W{tte                 Richard Addison
-    Bruce Cox                 Jonathan Handler          Richard Beigel
-    Bruce Holloway            Joshua Delahunty          Richard P. Hughey
-    Bruce Mewborne            Keizo Yamamoto            Rob Menke
-    Carl Schelin              Ken Arnold                Robin Bandy
-    Chris Russo               Ken Arromdee              Robin Johnson
-    David Cohrs               Ken Lorber                Roderick Schertler
-    David Damerell            Ken Washikita             Roland McGrath
-    David Gentzel             Kevin Darcy               Ron Van Iwaarden
-    David Hairston            Kevin Hugo                Ronnen Miller
-    Dean Luick                Kevin Sitze               Ross Brown
-    Del Lamb                  Kevin Smolkowski          Sascha Wostmann
-    Derek S. Ray              Kevin Sweet               Scott Bigham
-    Deron Meranda             Lars Huttar               Scott R. Turner
-    Dion Nicolaas             Leon Arnott               Sean Hunt
-    Dylan O'Donnell           M. Drew Streib            Stephen Spackman
-    Eric Backus               Malcolm Ryan              Stefan Thielscher
-    Eric Hendrickson          Mark Gooderum             Stephen White
-    Eric R. Smith             Mark Modrall              Steve Creps
-    Eric S. Raymond           Marvin Bressler           Steve Linhart
-    Erik Andersen             Matthew Day               Steve VanDevender
-    Frederick Roeber          Merlyn LeRoy              Teemu Suikki
-    Gil Neiger                Michael Allison           Tim Lennan
-    Greg Laskin               Michael Feir              Timo Hakulinen
-    Greg Olson                Michael Hamel             Tom Almy
-    Gregg Wonderly            Michael Sokolov           Tom West
-    Hao-yang Wang             Mike Engber               Warren Cheung
-    Helge Hafting             Mike Gallop               Warwick Allison
-    Irina Rempt-Drijfhout     Mike Passaretti           Yitzhak Sapir
-    Izchak Miller             Mike Stephenson
-    J. Ali Harlow             Mikko Juola
+    Ari Huttunen              John Kallen               Patric Mueller
+    Barton House              John Rupley               Paul Winner
+    Benson I. Margulies       John S. Bien              Pierre Martineau
+    Bill Dyer                 Johnny Lee                Ralf Brown
+    Boudewijn Waijers         Jon W{tte                 Ray Chason
+    Bruce Cox                 Jonathan Handler          Richard Addison
+    Bruce Holloway            Joshua Delahunty          Richard Beigel
+    Bruce Mewborne            Keizo Yamamoto            Richard P. Hughey
+    Carl Schelin              Ken Arnold                Rob Menke
+    Chris Russo               Ken Arromdee              Robin Bandy
+    David Cohrs               Ken Lorber                Robin Johnson
+    David Damerell            Ken Washikita             Roderick Schertler
+    David Gentzel             Kevin Darcy               Roland McGrath
+    David Hairston            Kevin Hugo                Ron Van Iwaarden
+    Dean Luick                Kevin Sitze               Ronnen Miller
+    Del Lamb                  Kevin Smolkowski          Ross Brown
+    Derek S. Ray              Kevin Sweet               Sascha Wostmann
+    Deron Meranda             Lars Huttar               Scott Bigham
+    Dion Nicolaas             Leon Arnott               Scott R. Turner
+    Dylan O'Donnell           M. Drew Streib            Sean Hunt
+    Eric Backus               Malcolm Ryan              Stephen Spackman
+    Eric Hendrickson          Mark Gooderum             Stefan Thielscher
+    Eric R. Smith             Mark Modrall              Stephen White
+    Eric S. Raymond           Marvin Bressler           Steve Creps
+    Erik Andersen             Matthew Day               Steve Linhart
+    Frederick Roeber          Merlyn LeRoy              Steve VanDevender
+    Gil Neiger                Michael Allison           Teemu Suikki
+    Greg Laskin               Michael Feir              Tim Lennan
+    Greg Olson                Michael Hamel             Timo Hakulinen
+    Gregg Wonderly            Michael Sokolov           Tom Almy
+    Hao-yang Wang             Mike Engber               Tom West
+    Helge Hafting             Mike Gallop               Warren Cheung
+    Irina Rempt-Drijfhout     Mike Passaretti           Warwick Allison
+    Izchak Miller             Mike Stephenson           Yitzhak Sapir
+

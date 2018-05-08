@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1448541043 2015/11/26 12:30:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1505172128 2017/09/11 23:22:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,6 +22,7 @@ static void NDECL(dump_qtlist);
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
 STATIC_DCL const char *NDECL(intermed);
+STATIC_DCL struct obj *FDECL(find_qarti, (struct obj *));
 STATIC_DCL const char *NDECL(neminame);
 STATIC_DCL const char *NDECL(guardname);
 STATIC_DCL const char *NDECL(homebase);
@@ -194,6 +195,58 @@ is_quest_artifact(otmp)
 struct obj *otmp;
 {
     return (boolean) (otmp->oartifact == urole.questarti);
+}
+
+STATIC_OVL struct obj *
+find_qarti(ochain)
+struct obj *ochain;
+{
+    struct obj *otmp, *qarti;
+
+    for (otmp = ochain; otmp; otmp = otmp->nobj) {
+        if (is_quest_artifact(otmp))
+            return otmp;
+        if (Has_contents(otmp) && (qarti = find_qarti(otmp->cobj)) != 0)
+            return qarti;
+    }
+    return (struct obj *) 0;
+}
+
+/* check several object chains for the quest artifact to determine
+   whether it is present on the current level */
+struct obj *
+find_quest_artifact(whichchains)
+unsigned whichchains;
+{
+    struct monst *mtmp;
+    struct obj *qarti = 0;
+
+    if ((whichchains & (1 << OBJ_INVENT)) != 0)
+        qarti = find_qarti(invent);
+    if (!qarti && (whichchains & (1 << OBJ_FLOOR)) != 0)
+        qarti = find_qarti(fobj);
+    if (!qarti && (whichchains & (1 << OBJ_MINVENT)) != 0)
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if ((qarti = find_qarti(mtmp->minvent)) != 0)
+                break;
+        }
+    if (!qarti && (whichchains & (1 << OBJ_MIGRATING)) != 0) {
+        /* check migrating objects and minvent of migrating monsters */
+        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if ((qarti = find_qarti(mtmp->minvent)) != 0)
+                break;
+        }
+        if (!qarti)
+            qarti = find_qarti(migrating_objs);
+    }
+    if (!qarti && (whichchains & (1 << OBJ_BURIED)) != 0)
+        qarti = find_qarti(level.buriedobjlist);
+
+    return qarti;
 }
 
 /* return your role nemesis' name */
@@ -418,6 +471,7 @@ char *in_line, *out_line;
                 /* pluralize */
                 case 'P':
                     cvt_buf[0] = highc(cvt_buf[0]);
+                    /*FALLTHRU*/
                 case 'p':
                     Strcpy(cvt_buf, makeplural(cvt_buf));
                     break;
@@ -425,6 +479,7 @@ char *in_line, *out_line;
                 /* append possessive suffix */
                 case 'S':
                     cvt_buf[0] = highc(cvt_buf[0]);
+                    /*FALLTHRU*/
                 case 's':
                     Strcpy(cvt_buf, s_suffix(cvt_buf));
                     break;
@@ -573,7 +628,18 @@ int msgnum;
     if (skip_pager(FALSE))
         return;
 
-    if (!(qt_msg = msg_in(qt_list.chrole, msgnum))) {
+    qt_msg = msg_in(qt_list.chrole, msgnum);
+    if (!qt_msg) {
+        /* some roles have an alternate message for return to the goal
+           level when the quest artifact is absent (handled by caller)
+           but some don't; for the latter, use the normal goal message;
+           note: for first visit, artifact is assumed to always be
+           present which might not be true for wizard mode but we don't
+           worry about quest message references in that situation */
+        if (msgnum == QT_ALTGOAL)
+            qt_msg = msg_in(qt_list.chrole, QT_NEXTGOAL);
+    }
+    if (!qt_msg) {
         impossible("qt_pager: message %d not found.", msgnum);
         return;
     }

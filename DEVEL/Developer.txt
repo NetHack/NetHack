@@ -1,10 +1,12 @@
- ___              _                   
- |   \ _____ _____| |___ _ __  ___ _ _ 
+  ___              _
+ |   \ _____ _____| |___ _ __  ___ _ _
  | |) / -_) V / -_) / _ \ '_ \/ -_) '_|
- |___/\___|\_/\___|_\___/ .__/\___|_|  
-                        |_|            
+ |___/\___|\_/\___|_\___/ .__/\___|_|
+                        |_|
 
-$NHDT-Date: 1447180052 2015/11/10 18:27:32 $
+# NetHack 3.6  Developer.txt       $NHDT-Date: 1524689668 2018/04/25 20:54:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 Welcome to the NetHack Infrastructure Developer's Guide.
 
@@ -25,6 +27,7 @@ CONTENTS
 5. variable expansion
 6. reserved names
 7. nhadd/nhcommit
+8. hooks
 ------------------------------------------------------------------------------
 1. email
 Email to devteam@nethack.org will usually get a response, but it may take a
@@ -32,10 +35,14 @@ while.  Please do not send save files, binary screen grabs, or other large
 things.
 ------------------------------------------------------------------------------
 2. git repositories
-The public NetHack git repository is available (read-only) on SourceForge at:
-  git://git.code.sf.net/p/nethack/NHsource
+A public repository of the latest NetHack code that we've made 
+available can be obtained via git from either of two locations:
+    https://github.com/NetHack/NetHack
+      or
+    https://sourceforge.net/p/nethack/NetHack/
 
-XXX need to discuss what branches are available
+Branches:
+NetHack-3.6.0	The 3.6.0 release code and subsequent fixes and additions.
 ------------------------------------------------------------------------------
 3. bug reporting
 Please use the form at http://www.nethack.org/common/contact.html (or send
@@ -43,11 +50,14 @@ us an email if that's more appropriate).
 ------------------------------------------------------------------------------
 4. git configuration
 
-NOTE: These instructions assume you are on the default branch ("master");
-      this _is_ where you want to be for setting things up.  This may or may
-      not be the branch you want to use for your changes; see the appropriate
+NOTE: These instructions assume you are on the default branch; this _is_
+      where you want to be for setting things up.  This may or may not be
+      the branch you want to use for your changes; see the appropriate
       project private documentation for more information (if you are working
       alone we suggest using branch names starting with "LOCAL-").
+
+NOTE: The following instructions require perl.  If you do not have perl on
+      your system, please install it before proceeding.
 
 A. If you have never set up git on this machine before:
    (This assumes you will only be using git for NetHack.  If you are going to
@@ -89,7 +99,8 @@ C. Configure the repository:
 		-v verbose
 		-n dry run
    You can re-run nhgitset.pl as often as needed; occasionally we will
-   update it and ask you to run it again.
+   update it (or something it installs) and you will need to run it again
+   so the changes take effect.
 D. aliases
    Two aliases are installed by nhgitset.pl:
 	nhadd
@@ -206,3 +217,19 @@ D. Using your own hooks
    "perldoc DEVEL/hooksdir/nhsub".
    
 ------------------------------------------------------------------------------
+8. hooks
+
+   nhgitset.pl also installs hooks into .git/hooks.  These hooks provide
+   a framework which allows local hook code to co-exist with hook code we
+   supply - see DEVEL/hooksdir/NHgithook.pm for details.
+
+   We currently use the following hooks:
+    post-checkout
+    post-commit
+    post-merge
+   These are used to generate dat/gitinfo.txt which provides the data that
+   ends up available through the game command #version and the command line
+   option --version.
+
+------------------------------------------------------------------------------
+

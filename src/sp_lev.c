@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1449269920 2015/12/04 22:58:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1524287226 2018/04/21 05:07:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -36,7 +36,6 @@ STATIC_DCL struct opvar *FDECL(opvar_new_coord, (int, int));
 #if 0
 STATIC_DCL struct opvar * FDECL(opvar_new_region, (int,int, int,int));
 #endif /*0*/
-STATIC_DCL void FDECL(opvar_free_x, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(opvar_clone, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(opvar_var_conversion, (struct sp_coder *,
                                                       struct opvar *));
@@ -53,6 +52,7 @@ STATIC_DCL void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
 STATIC_DCL void NDECL(shuffle_alignments);
 STATIC_DCL void NDECL(count_features);
 STATIC_DCL void NDECL(remove_boundary_syms);
+STATIC_DCL void FDECL(set_door_orientation, (int, int));
 STATIC_DCL void FDECL(maybe_add_door, (int, int, struct mkroom *));
 STATIC_DCL void NDECL(link_doors_rooms);
 STATIC_DCL void NDECL(fill_rooms);
@@ -69,7 +69,7 @@ STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *,
 STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
                                           XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
-STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
+STATIC_DCL void FDECL(create_trap, (spltrap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
 STATIC_DCL int FDECL(pm_to_humidity, (struct permonst *));
@@ -114,8 +114,6 @@ STATIC_DCL void FDECL(spo_altar, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_trap, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_gold, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_corridor, (struct sp_coder *));
-STATIC_DCL struct opvar *FDECL(selection_opvar, (char *));
-STATIC_DCL xchar FDECL(selection_getpoint, (int, int, struct opvar *));
 STATIC_DCL void FDECL(selection_setpoint, (int, int, struct opvar *, XCHAR_P));
 STATIC_DCL struct opvar *FDECL(selection_not, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(selection_logical_oper, (struct opvar *,
@@ -126,11 +124,8 @@ STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
 STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
                                           BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
-STATIC_DCL void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 STATIC_DCL int FDECL(floodfillchk_match_under, (int, int));
 STATIC_DCL int FDECL(floodfillchk_match_accessible, (int, int));
-STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int,
-                                            BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_ellipse, (struct opvar *, int, int,
                                              int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
@@ -204,13 +199,14 @@ static NEARDATA char xsize, ysize;
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
-boolean splev_init_present = FALSE;
-boolean icedpools = FALSE;
 
-struct obj *container_obj[MAX_CONTAINMENT];
-int container_idx = 0;
+static boolean splev_init_present = FALSE;
+static boolean icedpools = FALSE;
+static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
-struct monst *invent_carrying_monster = NULL;
+static struct obj *container_obj[MAX_CONTAINMENT];
+static int container_idx = 0;
+static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
 
@@ -707,7 +703,55 @@ remove_boundary_syms()
     }
 }
 
-void
+/* used by sel_set_door() and link_doors_rooms() */
+STATIC_OVL void
+set_door_orientation(x, y)
+int x, y;
+{
+    boolean wleft, wright, wup, wdown;
+
+    /* If there's a wall or door on either the left side or right
+     * side (or both) of this secret door, make it be horizontal.
+     *
+     * It is feasible to put SDOOR in a corner, tee, or crosswall
+     * position, although once the door is found and opened it won't
+     * make a lot sense (diagonal access required).  Still, we try to
+     * handle that as best as possible.  For top or bottom tee, using
+     * horizontal is the best we can do.  For corner or crosswall,
+     * either horizontal or vertical are just as good as each other;
+     * we produce horizontal for corners and vertical for crosswalls.
+     * For left or right tee, using vertical is best.
+     *
+     * A secret door with no adjacent walls is also feasible and makes
+     * even less sense.  It will be displayed as a vertical wall while
+     * hidden and become a vertical door when found.  Before resorting
+     * to that, we check for solid rock which hasn't been wallified
+     * yet (cf lower leftside of leader's room in Cav quest).
+     */
+    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ)
+                                 || IS_DOOR(levl[x - 1][y].typ)
+                                 || levl[x - 1][y].typ == SDOOR));
+    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ)
+                                 || IS_DOOR(levl[x + 1][y].typ)
+                                 || levl[x + 1][y].typ == SDOOR));
+    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ)
+                                 || IS_DOOR(levl[x][y - 1].typ)
+                                 || levl[x][y - 1].typ == SDOOR));
+    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ)
+                                 || IS_DOOR(levl[x][y + 1].typ)
+                                 || levl[x][y + 1].typ == SDOOR));
+    if (!wleft && !wright && !wup && !wdown) {
+        /* out of bounds is treated as implicit wall; should be academic
+           because we don't expect to have doors so near the level's edge */
+        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
+        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
+        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
+        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
+    }
+    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
+}
+
+STATIC_OVL void
 maybe_add_door(x, y, droom)
 int x, y;
 struct mkroom *droom;
@@ -716,7 +760,7 @@ struct mkroom *droom;
         add_door(x, y, droom);
 }
 
-void
+STATIC_OVL void
 link_doors_rooms()
 {
     int x, y;
@@ -725,6 +769,11 @@ link_doors_rooms()
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO; x++)
             if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
+                /* in case this door was a '+' or 'S' from the
+                   MAP...ENDMAP section without an explicit DOOR
+                   directive, set/clear levl[][].horizontal for it */
+                set_door_orientation(x, y);
+
                 for (tmpi = 0; tmpi < nroom; tmpi++) {
                     maybe_add_door(x, y, &rooms[tmpi]);
                     for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
@@ -1437,10 +1486,10 @@ xchar walls; /* any of W_NORTH | W_SOUTH | W_EAST | W_WEST (or W_ANY) */
  */
 STATIC_OVL void
 create_trap(t, croom)
-trap *t;
+spltrap *t;
 struct mkroom *croom;
 {
-    schar x, y;
+    schar x = -1, y = -1;
     coord tm;
 
     if (croom)
@@ -1594,11 +1643,14 @@ struct mkroom *croom;
             mtmp = christen_monst(mtmp, m->name.str);
 
         /*
-         * This is currently hardwired for mimics only.  It should
-         * eventually be expanded.
+         * This doesn't complain if an attempt is made to give a
+         * non-mimic/non-shapechanger an appearance or to give a
+         * shapechanger a non-monster shape, it just refuses to comply.
          */
         if (m->appear_as.str
-            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)
+            && ((mtmp->data->mlet == S_MIMIC)
+                /* shapechanger (chameleons, et al, and vampires) */
+                || (mtmp->cham >= LOW_PM && m->appear == M_AP_MONSTER))
             && !Protection_from_shape_changers) {
             int i;
 
@@ -1663,7 +1715,29 @@ struct mkroom *croom;
                     mndx = select_newcham_form(mtmp);
                 else
                     mndx = name_to_mon(m->appear_as.str);
-                if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
+
+                if (mndx == NON_PM || (is_vampshifter(mtmp)
+                                       && !validvamp(mtmp, &mndx, S_HUMAN))) {
+                    impossible("create_monster: invalid %s (\"%s\")",
+                               (mtmp->data->mlet == S_MIMIC)
+                                 ? "mimic appearance"
+                                 : (mtmp->data == &mons[PM_WIZARD_OF_YENDOR])
+                                     ? "Wizard appearance"
+                                     : is_vampshifter(mtmp)
+                                         ? "vampire shape"
+                                         : "chameleon shape",
+                               m->appear_as.str);
+                } else if (&mons[mndx] == mtmp->data) {
+                    /* explicitly forcing a mimic to appear as itself */
+                    mtmp->m_ap_type = M_AP_NOTHING;
+                    mtmp->mappearance = 0;
+                } else if (mtmp->data->mlet == S_MIMIC
+                           || mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) {
+                    /* this is ordinarily only used for Wizard clones
+                       and hasn't been exhaustively tested for mimics */
+                    mtmp->m_ap_type = M_AP_MONSTER;
+                    mtmp->mappearance = mndx;
+                } else { /* chameleon or vampire */
                     struct permonst *mdat = &mons[mndx];
                     struct permonst *olddata = mtmp->data;
 
@@ -1887,6 +1961,7 @@ struct mkroom *croom;
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];
+
             remove_object(otmp);
             if (cobj) {
                 (void) add_to_container(cobj, otmp);
@@ -1947,12 +2022,31 @@ struct mkroom *croom;
         }
     }
 
-    /* Nasty hack here: try to determine if this is the Mines or Sokoban
-     * "prize" and then set record_achieve_special (maps to corpsenm)
-     * for the object.  That field will later be checked to find out if
-     * the player obtained the prize. */
-    if (is_mines_prize(otmp) || is_soko_prize(otmp)) {
-        otmp->record_achieve_special = 1;
+    if (o->id != -1) {
+        static const char prize_warning[] = "multiple prizes on %s level";
+
+        /* if this is a specific item of the right type and it is being
+           created on the right level, flag it as the designated item
+           used to detect a special achievement (to whit, reaching and
+           exploring the target level, although the exploration part
+           might be short-circuited if a monster brings object to hero) */
+        if (Is_mineend_level(&u.uz)) {
+            if (otmp->otyp == iflags.mines_prize_type) {
+                otmp->record_achieve_special = MINES_PRIZE;
+                if (++mines_prize_count > 1)
+                    impossible(prize_warning, "mines end");
+            }
+        } else if (Is_sokoend_level(&u.uz)) {
+            if (otmp->otyp == iflags.soko_prize_type1) {
+                otmp->record_achieve_special = SOKO_PRIZE1;
+                if (++soko_prize_count > 1)
+                    impossible(prize_warning, "sokoban end");
+            } else if (otmp->otyp == iflags.soko_prize_type2) {
+                otmp->record_achieve_special = SOKO_PRIZE2;
+                if (++soko_prize_count > 1)
+                    impossible(prize_warning, "sokoban end");
+            }
+        }
     }
 
     stackobj(otmp);
@@ -1979,7 +2073,7 @@ create_altar(a, croom)
 altar *a;
 struct mkroom *croom;
 {
-    schar sproom, x, y;
+    schar sproom, x = -1, y = -1;
     aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
@@ -3050,6 +3144,7 @@ struct sp_coder *coder;
     while ((nparams++ < (SP_O_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
            && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_O_V_END)) {
         struct opvar *parm;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_O_V_NAME:
@@ -3061,11 +3156,12 @@ struct sp_coder *coder;
                 char monclass = SP_MONST_CLASS(OV_i(parm));
                 int monid = SP_MONST_PM(OV_i(parm));
 
-                if (monid >= 0 && monid < NUMMONS) {
+                if (monid >= LOW_PM && monid < NUMMONS) {
                     tmpobj.corpsenm = monid;
                     break; /* we're done! */
                 } else {
                     struct permonst *pm = (struct permonst *) 0;
+
                     if (def_char_to_monclass(monclass) != MAXMCLASSES) {
                         pm = mkclass(def_char_to_monclass(monclass), G_NOGEN);
                     } else {
@@ -3478,7 +3574,7 @@ struct sp_coder *coder;
     static const char nhFunc[] = "spo_trap";
     struct opvar *type;
     struct opvar *tcoord;
-    trap tmptrap;
+    spltrap tmptrap;
 
     if (!OV_pop_i(type) || !OV_pop_c(tcoord))
         return;
@@ -3774,7 +3870,7 @@ int dir;
 STATIC_VAR int FDECL((*selection_flood_check_func), (int, int));
 STATIC_VAR schar floodfillchk_match_under_typ;
 
-STATIC_OVL void
+void
 set_selection_floodfillchk(f)
 int FDECL((*f), (int, int));
 {
@@ -3797,7 +3893,7 @@ int x, y;
             || levl[x][y].typ == SCORR);
 }
 
-STATIC_OVL void
+void
 selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
 int x, y;
@@ -4164,8 +4260,7 @@ int dx, dy;
 genericptr_t arg;
 {
     xchar typ = *(xchar *) arg;
-    xchar x = dx;
-    xchar y = dy;
+    xchar x = dx, y = dy;
 
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
         levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
@@ -4174,6 +4269,7 @@ genericptr_t arg;
         if (typ < D_CLOSED)
             typ = D_CLOSED;
     }
+    set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }
@@ -5184,7 +5280,7 @@ sp_lev *lvl;
     long room_stack = 0;
     unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder =
-        (struct sp_coder *) alloc(sizeof(struct sp_coder));
+        (struct sp_coder *) alloc(sizeof (struct sp_coder));
 
     coder->frame = frame_new(0);
     coder->stack = NULL;
@@ -5198,9 +5294,14 @@ sp_lev *lvl;
 
     splev_init_present = FALSE;
     icedpools = FALSE;
+    /* achievement tracking; static init would suffice except we need to
+       reset if #wizmakemap is used to recreate mines' end or sokoban end;
+       once either level is created, these values can be forgotten */
+    mines_prize_count = soko_prize_count = 0;
 
     if (wizard) {
         char *met = nh_getenv("SPCODER_MAX_RUNTIME");
+
         if (met && met[0] == '1')
             max_execution = (1 << 30) - 1;
     }

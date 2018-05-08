@@ -1,4 +1,4 @@
-/* NetHack 3.6	recover.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	recover.c	$NHDT-Date: 1501461282 2017/07/31 00:34:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -245,7 +245,7 @@ char *basename;
                     errno);
 #endif
         Fprintf(stderr, "Cannot open level 0 for %s.\n", basename);
-        return (-1);
+        return -1;
     }
     if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         Fprintf(
@@ -253,7 +253,7 @@ char *basename;
             "Checkpoint data incompletely written or subsequently clobbered;",
             "recovery for \"", basename, "\" impossible.");
         Close(gfd);
-        return (-1);
+        return -1;
     }
     if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
         != sizeof(savelev)) {
@@ -261,7 +261,7 @@ char *basename;
                         "impossible.\n",
                 basename);
         Close(gfd);
-        return (-1);
+        return -1;
     }
     if ((read(gfd, (genericptr_t) savename, sizeof savename)
          != sizeof savename)
@@ -273,7 +273,7 @@ char *basename;
         || (read(gfd, (genericptr_t) &plbuf, pltmpsiz) != pltmpsiz)) {
         Fprintf(stderr, "Error reading %s -- can't recover.\n", lock);
         Close(gfd);
-        return (-1);
+        return -1;
     }
 
     /* save file should contain:
@@ -288,7 +288,7 @@ char *basename;
     if (sfd < 0) {
         Fprintf(stderr, "Cannot create savefile %s.\n", savename);
         Close(gfd);
-        return (-1);
+        return -1;
     }
 
     lfd = open_levelfile(savelev);
@@ -296,7 +296,7 @@ char *basename;
         Fprintf(stderr, "Cannot open level of save for %s.\n", basename);
         Close(gfd);
         Close(sfd);
-        return (-1);
+        return -1;
     }
 
     if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
@@ -304,7 +304,8 @@ char *basename;
         Fprintf(stderr, "Error writing %s; recovery failed.\n", savename);
         Close(gfd);
         Close(sfd);
-        return (-1);
+        Close(lfd);
+        return -1;
     }
 
     if (write(sfd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi) {
@@ -313,7 +314,8 @@ char *basename;
                 savename);
         Close(gfd);
         Close(sfd);
-        return (-1);
+        Close(lfd);
+        return -1;
     }
 
     if (write(sfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
@@ -323,7 +325,8 @@ char *basename;
                 savename);
         Close(gfd);
         Close(sfd);
-        return (-1);
+        Close(lfd);
+        return -1;
     }
 
     if (write(sfd, (genericptr_t) &plbuf, pltmpsiz) != pltmpsiz) {
@@ -331,7 +334,8 @@ char *basename;
                 savename);
         Close(gfd);
         Close(sfd);
-        return (-1);
+        Close(lfd);
+        return -1;
     }
 
     copy_bytes(lfd, sfd);
@@ -364,25 +368,27 @@ char *basename;
 
 #if 0 /* OBSOLETE, HackWB is no longer in use */
 #ifdef AMIGA
-			/* we need to create an icon for the saved game
-			 * or HackWB won't notice the file.
-			 */
-	{
+    {
+        /* we need to create an icon for the saved game
+         * or HackWB won't notice the file.
+         */
 	char iconfile[FILENAME];
 	int in, out;
 
 	(void) sprintf(iconfile, "%s.info", savename);
 	in = open("NetHack:default.icon", O_RDONLY);
 	out = open(iconfile, O_WRONLY | O_TRUNC | O_CREAT);
-	if(in > -1 && out > -1){
-		copy_bytes(in,out);
+	if (in > -1 && out > -1) {
+            copy_bytes(in, out);
 	}
-	if(in > -1)close(in);
-	if(out > -1)close(out);
-	}
+	if (in > -1)
+            close(in);
+	if (out > -1)
+            close(out);
+    }
+#endif /*AMIGA*/
 #endif
-#endif
-    return (0);
+    return 0;
 }
 
 #ifdef EXEPATH

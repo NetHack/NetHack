@@ -160,10 +160,11 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         ap = data->menu.gacc;
         for (i = 0; i < data->menu.size; i++) {
             if (data->menu.items[i].accelerator != 0) {
-                next_char = (char) (data->menu.items[i].accelerator + 1);
+                if (isalpha(data->menu.items[i].accelerator)) {
+                    next_char = (char)(data->menu.items[i].accelerator + 1);
+                }
             } else if (NHMENU_IS_SELECTABLE(data->menu.items[i])) {
-                if ((next_char >= 'a' && next_char <= 'z')
-                    || (next_char >= 'A' && next_char <= 'Z')) {
+                if (isalpha(next_char)) {
                     data->menu.items[i].accelerator = next_char;
                 } else {
                     if (next_char > 'z')
@@ -246,7 +247,20 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         data->is_active = FALSE;
         LayoutMenu(hWnd); // hide dialog buttons
         mswin_popup_destroy(hWnd);
+
+        /* If we just used the permanent inventory window to pick something,
+         * set the menu back to its display inventory state.
+         */
+        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
+            && how != PICK_NONE) {
+            data->menu.prompt[0] = '\0';
+            SetMenuListType(hWnd, PICK_NONE);
+            for (i = 0; i < data->menu.size; i++)
+                data->menu.items[i].count = 0;
+            LayoutMenu(hWnd);
+        }
     }
+
     return ret_val;
 }
 /*-----------------------------------------------------------------------------*/
@@ -586,8 +600,6 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         if (data->type != MENU_TYPE_MENU)
             break;
-        if (strlen(msg_data->str) == 0)
-            break;
 
         if (data->menu.size == data->menu.allocated) {
             data->menu.allocated += 10;
@@ -605,6 +617,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->menu.items[new_item].attr = msg_data->attr;
         strncpy(data->menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
+	/* prevent & being interpreted as a mnemonic start */
+        strNsubst(data->menu.items[new_item].str, "&", "&&", 0);
         data->menu.items[new_item].presel = msg_data->presel;
 
         /* calculate tabstop size */
@@ -883,6 +897,11 @@ GetMenuControl(HWND hWnd)
     PNHMenuWindow data;
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+	/* We may continue getting window messages after a window's WM_DESTROY is
+	   called.  We need to handle the case that USERDATA has been freed. */
+	if (data == NULL)
+		return NULL;
 
     if (data->type == MENU_TYPE_TEXT) {
         return GetDlgItem(hWnd, IDC_MENU_TEXT);

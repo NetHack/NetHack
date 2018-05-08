@@ -104,7 +104,7 @@ register_main_window_class()
     wcex.hInstance = GetNHApp()->hApp;
     wcex.hIcon = LoadIcon(GetNHApp()->hApp, (LPCTSTR) IDI_NETHACKW);
     wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
     wcex.lpszMenuName = (TCHAR *) IDC_NETHACKW;
     wcex.lpszClassName = szMainWindowClass;
 
@@ -370,7 +370,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ZeroMemory(kbd_state, sizeof(kbd_state));
             GetKeyboardState(kbd_state);
 
-            if (ToAscii(wParam, (lParam >> 16) & 0xFF, kbd_state, &c, 0)) {
+            if (ToAscii((UINT) wParam, (lParam >> 16) & 0xFF, kbd_state, &c, 0)) {
                 NHEVENT_KBD(c & 0xFF);
                 return 0;
             } else {

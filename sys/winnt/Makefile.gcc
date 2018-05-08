@@ -1,4 +1,6 @@
-# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1434804544 2015/06/20 12:49:04 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1524689356 2018/04/25 20:49:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $
+# Copyright (c) 2010 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
 #
 #==============================================================================
 #

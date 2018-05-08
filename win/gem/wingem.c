@@ -70,13 +70,8 @@ struct window_procs Gem_procs = {
     /* other defs that really should go away (they're tty specific) */
     Gem_start_screen, Gem_end_screen, Gem_outrip, Gem_preference_update,
     genl_getmsghistory, genl_putmsghistory
-#ifdef STATUS_VIA_WINDOWPORT
                             genl_status_init,
     genl_status_finish, genl_status_enablefield, genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_no,
 };
 
@@ -129,7 +124,7 @@ const char *mesg;
 {
     clearlocks();
     Gem_exit_nhwindows(mesg);
-    terminate(EXIT_SUCCESS);
+    nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
 }
 

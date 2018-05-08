@@ -1,5 +1,6 @@
 /* NetHack 3.6	unixmain.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* main.c - Unix NetHack */
@@ -55,6 +56,7 @@ char *argv[];
 #endif
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
+    boolean plsel_once = FALSE;
 
     sys_early_init();
 
@@ -97,19 +99,21 @@ char *argv[];
     choose_windows(DEFAULT_WINDOW_SYS);
 
 #ifdef CHDIR /* otherwise no chdir() */
-             /*
-              * See if we must change directory to the playground.
-              * (Perhaps hack runs suid and playground is inaccessible
-              *  for the player.)
-              * The environment variable HACKDIR is overridden by a
-              *  -d command line option (must be the first option given)
-              */
+    /*
+     * See if we must change directory to the playground.
+     * (Perhaps hack runs suid and playground is inaccessible
+     *  for the player.)
+     * The environment variable HACKDIR is overridden by a
+     *  -d command line option (must be the first option given).
+     */
     dir = nh_getenv("NETHACKDIR");
     if (!dir)
         dir = nh_getenv("HACKDIR");
-#endif
+
     if (argc > 1) {
-#ifdef CHDIR
+        if (argcheck(argc, argv, ARG_VERSION))
+            exit(EXIT_SUCCESS);
+
         if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
@@ -127,30 +131,33 @@ char *argv[];
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
         }
-        if (argc > 1)
+    }
 #endif /* CHDIR */
 
-            /*
-             * Now we know the directory containing 'record' and
-             * may do a prscore().  Exclude `-style' - it's a Qt option.
-             */
-            if (!strncmp(argv[1], "-s", 2) && strncmp(argv[1], "-style", 6)) {
+    if (argc > 1) {
+        /*
+         * Now we know the directory containing 'record' and
+         * may do a prscore().  Exclude `-style' - it's a Qt option.
+         */
+        if (!strncmp(argv[1], "-s", 2) && strncmp(argv[1], "-style", 6)) {
 #ifdef CHDIR
-                chdirx(dir, 0);
+            chdirx(dir, 0);
 #endif
 #ifdef SYSCF
-                initoptions();
+            initoptions();
 #endif
 #ifdef PANICTRACE
-                ARGV0 = argv[0]; /* save for possible stack trace */
+            ARGV0 = hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
-                panictrace_setsignals(TRUE);
+            panictrace_setsignals(TRUE);
 #endif
 #endif
-                prscore(argc, argv);
-                exit(EXIT_SUCCESS);
-            }
-    }
+            prscore(argc, argv);
+            /* FIXME: shouldn't this be using nh_terminate() to free
+               up any memory allocated by initoptions() */
+            exit(EXIT_SUCCESS);
+        }
+    } /* argc > 1 */
 
 /*
  * Change directories before we initialize the window system so
@@ -168,7 +175,7 @@ char *argv[];
 #endif
     initoptions();
 #ifdef PANICTRACE
-    ARGV0 = argv[0]; /* save for possible stack trace */
+    ARGV0 = hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
     panictrace_setsignals(TRUE);
 #endif
@@ -217,7 +224,7 @@ char *argv[];
          * dash matches role, race, gender, or alignment.
          */
         /* guard against user names with hyphens in them */
-        int len = strlen(plname);
+        int len = (int) strlen(plname);
         /* append the current role, if any, so that last dash is ours */
         if (++len < (int) sizeof plname)
             (void) strncat(strcat(plname, "-"), pl_character,
@@ -235,6 +242,23 @@ char *argv[];
         (void) signal(SIGQUIT, SIG_IGN);
         (void) signal(SIGINT, SIG_IGN);
     }
+
+    dlb_init(); /* must be before newgame() */
+
+    /*
+     * Initialize the vision system.  This must be before mklev() on a
+     * new game or before a level restore on a saved game.
+     */
+    vision_init();
+
+    display_gamewindows();
+
+    /*
+     * First, try to find and restore a save file for specified character.
+     * We'll return here if new game player_selection() renames the hero.
+     */
+attempt_restore:
+
     /*
      * getlock() complains and quits if there is already a game
      * in progress for current character name (when locknum == 0)
@@ -246,25 +270,12 @@ char *argv[];
      * clock, &c not currently in use in the playground directory
      * (for locknum > 0).
      */
-    getlock();
-    program_state.preserve_locks = 0; /* after getlock() */
+    if (*plname) {
+        getlock();
+        program_state.preserve_locks = 0; /* after getlock() */
+    }
 
-    dlb_init(); /* must be before newgame() */
-
-    /*
-     *  Initialize the vision system.  This must be before mklev() on a
-     *  new game or before a level restore on a saved game.
-     */
-    vision_init();
-
-    display_gamewindows();
-
-/*
- * First, try to find and restore a save file for specified character.
- * We'll return here if new game player_selection() renames the hero.
- */
-attempt_restore:
-    if ((fd = restore_saved_game()) >= 0) {
+    if (*plname && (fd = restore_saved_game()) >= 0) {
         const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -283,9 +294,10 @@ attempt_restore:
             resuming = TRUE; /* not starting new game */
             wd_message();
             if (discover || wizard) {
-                if (yn("Do you want to keep the save file?") == 'n')
+                /* this seems like a candidate for paranoid_confirmation... */
+                if (yn("Do you want to keep the save file?") == 'n') {
                     (void) delete_savefile();
-                else {
+                } else {
                     (void) chmod(fq_save, FCMASK); /* back to readable */
                     nh_compress(fq_save);
                 }
@@ -294,12 +306,17 @@ attempt_restore:
     }
 
     if (!resuming) {
+        boolean neednewlock = (!*plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
            and skip selection this time if that didn't succeed */
-        if (!iflags.renameinprogress) {
-            player_selection();
+        if (!iflags.renameinprogress || iflags.defer_plname || neednewlock) {
+            if (!plsel_once)
+                player_selection();
+            plsel_once = TRUE;
+            if (neednewlock && *plname)
+                goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
                    if locking alphabetically, the existing lock file
@@ -316,10 +333,12 @@ attempt_restore:
         wd_message();
     }
 
+    /* moveloop() never returns but isn't flagged NORETURN */
     moveloop(resuming);
+
     exit(EXIT_SUCCESS);
     /*NOTREACHED*/
-    return (0);
+    return 0;
 }
 
 static void
@@ -363,14 +382,15 @@ char *argv[];
             break;
 #endif
         case 'u':
-            if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
-            else if (argc > 1) {
+            if (argv[0][2]) {
+                (void) strncpy(plname, argv[0] + 2, sizeof plname - 1);
+            } else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
-            } else
+                (void) strncpy(plname, argv[0], sizeof plname - 1);
+            } else {
                 raw_print("Player name expected after -u");
+            }
             break;
         case 'I':
         case 'i':
@@ -405,7 +425,9 @@ char *argv[];
             }
             break;
         case 'w': /* windowtype */
+            config_error_init(FALSE, "command line", FALSE);
             choose_windows(&argv[0][2]);
+            config_error_done();
             break;
         case '@':
             flags.randomall = 1;
@@ -455,10 +477,10 @@ boolean wr;
         (void) setuid(getuid()); /* Ron Wessels */
 #endif
     } else {
-/* non-default data files is a sign that scores may not be
- * compatible, or perhaps that a binary not fitting this
- * system's layout is being used.
- */
+        /* non-default data files is a sign that scores may not be
+         * compatible, or perhaps that a binary not fitting this
+         * system's layout is being used.
+         */
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
@@ -481,9 +503,10 @@ boolean wr;
         error("Cannot chdir to %s.", dir);
     }
 
-    /* warn the player if we can't write the record file */
-    /* perhaps we should also test whether . is writable */
-    /* unfortunately the access system-call is worthless */
+    /* warn the player if we can't write the record file
+     * perhaps we should also test whether . is writable
+     * unfortunately the access system-call is worthless.
+     */
     if (wr) {
 #ifdef VAR_PLAYGROUND
         fqn_prefix[LEVELPREFIX] = fqn_prefix[SCOREPREFIX];
@@ -574,6 +597,7 @@ boolean
 authorize_wizard_mode()
 {
     struct passwd *pw = get_unix_pw();
+
     if (pw && sysopt.wizards && sysopt.wizards[0]) {
         if (check_user_string(sysopt.wizards))
             return TRUE;
@@ -626,6 +650,7 @@ char *optstr;
     int pwlen;
     char *eop, *w;
     char *pwname;
+
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
     if (!pw)
@@ -684,5 +709,55 @@ get_unix_pw()
     }
     return pw;
 }
+
+char *
+get_login_name()
+{
+    static char buf[BUFSZ];
+    struct passwd *pw = get_unix_pw();
+
+    buf[0] = '\0';
+
+    if (pw)
+        (void)strcpy(buf, pw->pw_name);
+
+    return buf;
+}
+
+#ifdef __APPLE__
+extern int errno;
+
+void
+port_insert_pastebuf(buf)
+char *buf;
+{
+    /* This should be replaced when there is a Cocoa port. */
+    const char *errfmt;
+    size_t len;
+    FILE *PB = popen("/usr/bin/pbcopy","w");
+    if(!PB){
+	errfmt = "Unable to start pbcopy (%d)\n";
+	goto error;
+    }
+
+    len = strlen(buf);
+    /* Remove the trailing \n, carefully. */
+    if(buf[len-1] == '\n') len--;
+
+    /* XXX Sorry, I'm too lazy to write a loop for output this short. */
+    if(len!=fwrite(buf,1,len,PB)){
+	errfmt = "Error sending data to pbcopy (%d)\n";
+	goto error;
+    }
+
+    if(pclose(PB)!=-1){
+	return;
+    }
+    errfmt = "Error finishing pbcopy (%d)\n";
+
+error:
+    raw_printf(errfmt,strerror(errno));
+}
+#endif
 
 /*unixmain.c*/

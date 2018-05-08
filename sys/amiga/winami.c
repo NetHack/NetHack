@@ -1,4 +1,4 @@
-/* NetHack 3.6	winami.c	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	winami.c	$NHDT-Date: 1501981093 2017/08/06 00:58:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -51,13 +51,8 @@ struct window_procs amii_procs = {
     /* other defs that really should go away (they're tty specific) */
     amii_delay_output, amii_delay_output, amii_outrip, genl_preference_update,
     genl_getmsghistory, genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_yes,
 };
 
@@ -88,13 +83,8 @@ struct window_procs amiv_procs = {
     /* other defs that really should go away (they're tty specific) */
     amii_delay_output, amii_delay_output, amii_outrip, genl_preference_update,
     genl_getmsghistory, genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif
     genl_can_suspend_yes,
 };
 
@@ -436,7 +426,7 @@ amii_askname()
     if (*plname == '\33') {
         clearlocks();
         exit_nhwindows(NULL);
-        terminate(0);
+        nh_terminate(0);
     }
 }
 
@@ -543,7 +533,7 @@ amii_player_selection()
 		CloseShWindow( cwin );
 		clearlocks();
 		exit_nhwindows(NULL);
-		terminate(0);
+		nh_terminate(0);
 		}
 		else
 		    DisplayBeep( NULL );
@@ -573,7 +563,7 @@ amii_player_selection()
 		CloseShWindow( cwin );
 		clearlocks();
 		exit_nhwindows(NULL);
-		terminate(0);
+		nh_terminate(0);
 		break;
 	    }
 	}
@@ -807,8 +797,8 @@ amii_get_ext_cmd(void)
         }
 
         return (-1);
-    } else {
-#else
+    }
+#endif
 
     amii_clear_nhwindow(WIN_MESSAGE); /* Was NHW_MESSAGE */
     if (scrollmsg) {
@@ -932,58 +922,61 @@ amii_get_ext_cmd(void)
             DisplayBeep(NULL);
     }
     return (-1);
-#endif
-    }
+}
 
-    static int put_ext_cmd(obufp, colx, cw, bottom) char * obufp;
-    int colx, bottom;
-    struct amii_WinDesc *cw;
-    {
-        struct Window *w = cw->win;
-        char *t;
+static int
+put_ext_cmd(obufp, colx, cw, bottom)
+char * obufp;
+int colx, bottom;
+struct amii_WinDesc *cw;
+{
+    struct Window *w = cw->win;
+    char *t;
 
-        t = (char *) alloc(strlen(obufp) + 7);
-        if (t != NULL) {
-            if (scrollmsg) {
-                sprintf(t, "xxx%s", obufp);
-                t[0] = 1;
-                t[1] = 1;
-                t[2] = '#';
-                amii_curs(WIN_MESSAGE, 0, bottom);
-                SetAPen(w->RPort, C_WHITE);
-                Text(w->RPort, "># ", 3);
-                /* SetAPen( w->RPort, C_BLACK ); */ /* Black text on black
-                                                       screen doesn't look too
-                                                       well ... -jhsa */
-                Text(w->RPort, t + 3, strlen(t) - 3);
-            } else {
-                sprintf(t, "# %s", obufp);
-                amii_curs(WIN_MESSAGE, 0, bottom);
-                SetAPen(w->RPort, C_WHITE);
-                Text(w->RPort, t, strlen(t));
-            }
-            if (scrollmsg)
-                SetAPen(w->RPort, C_WHITE);
-            if (cw->data[cw->maxrow - 1])
-                free(cw->data[cw->maxrow - 1]);
-            cw->data[cw->maxrow - 1] = t;
-        } else {
+    t = (char *) alloc(strlen(obufp) + 7);
+    if (t != NULL) {
+        if (scrollmsg) {
+            sprintf(t, "xxx%s", obufp);
+            t[0] = 1;
+            t[1] = 1;
+            t[2] = '#';
             amii_curs(WIN_MESSAGE, 0, bottom);
             SetAPen(w->RPort, C_WHITE);
-            Text(w->RPort, "# ", 2);
-            /* SetAPen( w->RPort, C_BLACK ); */ /* Black on black ... -jhsa */
-            Text(w->RPort, obufp, strlen(obufp));
+            Text(w->RPort, "># ", 3);
+            /* SetAPen( w->RPort, C_BLACK ); */ /* Black text on black
+                                                 * screen doesn't look
+                                                 * too well ... -jhsa */
+            Text(w->RPort, t + 3, strlen(t) - 3);
+        } else {
+            sprintf(t, "# %s", obufp);
+            amii_curs(WIN_MESSAGE, 0, bottom);
             SetAPen(w->RPort, C_WHITE);
+            Text(w->RPort, t, strlen(t));
         }
-        amii_curs(WIN_MESSAGE, colx = strlen(obufp) + 3 + (scrollmsg != 0),
-                  bottom);
-        return (colx);
+        if (scrollmsg)
+            SetAPen(w->RPort, C_WHITE);
+        if (cw->data[cw->maxrow - 1])
+            free(cw->data[cw->maxrow - 1]);
+        cw->data[cw->maxrow - 1] = t;
+    } else {
+        amii_curs(WIN_MESSAGE, 0, bottom);
+        SetAPen(w->RPort, C_WHITE);
+        Text(w->RPort, "# ", 2);
+        /* SetAPen( w->RPort, C_BLACK ); */ /* Black on black ... -jhsa */
+        Text(w->RPort, obufp, strlen(obufp));
+        SetAPen(w->RPort, C_WHITE);
     }
+    amii_curs(WIN_MESSAGE, colx = strlen(obufp) + 3 + (scrollmsg != 0),
+              bottom);
+    return colx;
+}
 
-    /* Ask a question and get a response */
-
-    char amii_yn_function(query, resp, def) const char * query, *resp;
-    char def;
+/* Ask a question and get a response */
+char
+amii_yn_function(query, resp, def)
+const char * query, *resp;
+char def;
+{
     /*
      *   Generic yes/no function. 'def' is the default (returned by space or
      *   return; 'esc' returns 'q', or 'n', or the default, depending on
@@ -995,155 +988,158 @@ amii_get_ext_cmd(void)
      *   are allowed); if it includes an <esc>, anything beyond that won't
      *   be shown in the prompt to the user but will be acceptable as input.
      */
-    {
-        register char q;
-        char rtmp[40];
-        boolean digit_ok, allow_num;
-        char prompt[BUFSZ];
-        register struct amii_WinDesc *cw;
+    register char q;
+    char rtmp[40];
+    boolean digit_ok, allow_num;
+    char prompt[BUFSZ];
+    register struct amii_WinDesc *cw;
 
-        if (cw = amii_wins[WIN_MESSAGE])
-            cw->disprows = 0;
-        if (resp) {
-            char *rb, respbuf[QBUFSZ];
+    if (cw = amii_wins[WIN_MESSAGE])
+        cw->disprows = 0;
+    if (resp) {
+        char *rb, respbuf[QBUFSZ];
 
-            allow_num = (index(resp, '#') != 0);
-            Strcpy(respbuf, resp);
-            /* any acceptable responses that follow <esc> aren't displayed */
-            if ((rb = index(respbuf, '\033')) != 0)
-                *rb = '\0';
-            (void) strncpy(prompt, query, QBUFSZ - 1);
-            prompt[QBUFSZ - 1] = '\0';
-            Sprintf(eos(prompt), " [%s]", respbuf);
-            if (def)
-                Sprintf(eos(prompt), " (%c)", def);
-            Strcat(prompt, " ");
-            pline("%s", prompt);
-        } else {
-            amii_putstr(WIN_MESSAGE, 0, query);
-            cursor_on(WIN_MESSAGE);
-            q = WindowGetchar();
-            cursor_off(WIN_MESSAGE);
-            *rtmp = q;
-            rtmp[1] = 0;
-            amii_addtopl(rtmp);
-            goto clean_up;
-        }
-
-        do { /* loop until we get valid input */
-            cursor_on(WIN_MESSAGE);
-            q = lowc(WindowGetchar());
-            cursor_off(WIN_MESSAGE);
-#if 0
-/* fix for PL2 */
-	    if (q == '\020') { /* ctrl-P */
-		if(!doprev) (void) tty_doprev_message(); /* need two initially */
-		(void) tty_doprev_message();
-		q = (char)0;
-		doprev = 1;
-		continue;
-	    } else if(doprev) {
-		tty_clear_nhwindow(WIN_MESSAGE);
-		cw->maxcol = cw->maxrow;
-		doprev = 0;
-		amii_addtopl(prompt);
-		continue;
-	    }
-#endif
-            digit_ok = allow_num && isdigit(q);
-            if (q == '\033') {
-                if (index(resp, 'q'))
-                    q = 'q';
-                else if (index(resp, 'n'))
-                    q = 'n';
-                else
-                    q = def;
-                break;
-            } else if (index(quitchars, q)) {
-                q = def;
-                break;
-            }
-            if (!index(resp, q) && !digit_ok) {
-                amii_bell();
-                q = (char) 0;
-            } else if (q == '#' || digit_ok) {
-                char z, digit_string[2];
-                int n_len = 0;
-                long value = 0;
-                amii_addtopl("#"), n_len++;
-                digit_string[1] = '\0';
-                if (q != '#') {
-                    digit_string[0] = q;
-                    amii_addtopl(digit_string), n_len++;
-                    value = q - '0';
-                    q = '#';
-                }
-                do { /* loop until we get a non-digit */
-                    cursor_on(WIN_MESSAGE);
-                    z = lowc(WindowGetchar());
-                    cursor_off(WIN_MESSAGE);
-                    if (isdigit(z)) {
-                        value = (10 * value) + (z - '0');
-                        if (value < 0)
-                            break; /* overflow: try again */
-                        digit_string[0] = z;
-                        amii_addtopl(digit_string), n_len++;
-                    } else if (z == 'y' || index(quitchars, z)) {
-                        if (z == '\033')
-                            value = -1; /* abort */
-                        z = '\n';       /* break */
-                    } else if (z == '\b') {
-                        if (n_len <= 1) {
-                            value = -1;
-                            break;
-                        } else {
-                            value /= 10;
-                            removetopl(1), n_len--;
-                        }
-                    } else {
-                        value = -1; /* abort */
-                        amii_bell();
-                        break;
-                    }
-                } while (z != '\n');
-                if (value > 0)
-                    yn_number = value;
-                else if (value == 0)
-                    q = 'n'; /* 0 => "no" */
-                else {       /* remove number from top line, then try again */
-                    removetopl(n_len), n_len = 0;
-                    q = '\0';
-                }
-            }
-        } while (!q);
-
-        if (q != '#' && q != '\033') {
-            Sprintf(rtmp, "%c", q);
-            amii_addtopl(rtmp);
-        }
-    clean_up:
+        allow_num = (index(resp, '#') != 0);
+        Strcpy(respbuf, resp);
+        /* any acceptable responses that follow <esc> aren't displayed */
+        if ((rb = index(respbuf, '\033')) != 0)
+            *rb = '\0';
+        (void) strncpy(prompt, query, QBUFSZ - 1);
+        prompt[QBUFSZ - 1] = '\0';
+        Sprintf(eos(prompt), " [%s]", respbuf);
+        if (def)
+            Sprintf(eos(prompt), " (%c)", def);
+        Strcat(prompt, " ");
+        pline("%s", prompt);
+    } else {
+        amii_putstr(WIN_MESSAGE, 0, query);
+        cursor_on(WIN_MESSAGE);
+        q = WindowGetchar();
         cursor_off(WIN_MESSAGE);
-        clear_nhwindow(WIN_MESSAGE);
-        return q;
+        *rtmp = q;
+        rtmp[1] = '\0';
+        amii_addtopl(rtmp);
+        goto clean_up;
     }
 
-    void amii_display_file(fn, complain) const char * fn;
-    boolean complain;
-    {
-        register struct amii_WinDesc *cw;
-        register int win;
-        register dlb *fp;
-        register char *t;
-        register char buf[200];
+    do { /* loop until we get valid input */
+        cursor_on(WIN_MESSAGE);
+        q = lowc(WindowGetchar());
+        cursor_off(WIN_MESSAGE);
+#if 0
+/* fix for PL2 */
+        if (q == '\020') { /* ctrl-P */
+            if(!doprev)
+                (void) tty_doprev_message(); /* need two initially */
+            (void) tty_doprev_message();
+            q = (char)0;
+            doprev = 1;
+            continue;
+        } else if (doprev) {
+            tty_clear_nhwindow(WIN_MESSAGE);
+            cw->maxcol = cw->maxrow;
+            doprev = 0;
+            amii_addtopl(prompt);
+            continue;
+        }
+#endif /*0*/
+        digit_ok = allow_num && isdigit(q);
+        if (q == '\033') {
+            if (index(resp, 'q'))
+                q = 'q';
+            else if (index(resp, 'n'))
+                q = 'n';
+            else
+                q = def;
+            break;
+        } else if (index(quitchars, q)) {
+            q = def;
+            break;
+        }
+        if (!index(resp, q) && !digit_ok) {
+            amii_bell();
+            q = (char) 0;
+        } else if (q == '#' || digit_ok) {
+            char z, digit_string[2];
+            int n_len = 0;
+            long value = 0;
 
-        if (fn == NULL)
-            panic("NULL file name in display_file()");
+            amii_addtopl("#"), n_len++;
+            digit_string[1] = '\0';
+            if (q != '#') {
+                digit_string[0] = q;
+                amii_addtopl(digit_string), n_len++;
+                value = q - '0';
+                q = '#';
+            }
+            do { /* loop until we get a non-digit */
+                cursor_on(WIN_MESSAGE);
+                z = lowc(WindowGetchar());
+                cursor_off(WIN_MESSAGE);
+                if (isdigit(z)) {
+                    value = (10 * value) + (z - '0');
+                    if (value < 0)
+                        break; /* overflow: try again */
+                    digit_string[0] = z;
+                    amii_addtopl(digit_string), n_len++;
+                } else if (z == 'y' || index(quitchars, z)) {
+                    if (z == '\033')
+                        value = -1; /* abort */
+                    z = '\n';       /* break */
+                } else if (z == '\b') {
+                    if (n_len <= 1) {
+                        value = -1;
+                        break;
+                    } else {
+                        value /= 10;
+                        removetopl(1), n_len--;
+                    }
+                } else {
+                    value = -1; /* abort */
+                    amii_bell();
+                    break;
+                }
+            } while (z != '\n');
+            if (value > 0)
+                yn_number = value;
+            else if (value == 0)
+                q = 'n'; /* 0 => "no" */
+            else {       /* remove number from top line, then try again */
+                removetopl(n_len), n_len = 0;
+                q = '\0';
+            }
+        }
+    } while (!q);
 
-        if ((fp = dlb_fopen(fn, RDTMODE)) == (dlb *) NULL) {
-            if (complain) {
-                sprintf(buf, "Can't display %s: %s", fn,
+    if (q != '#' && q != '\033') {
+        Sprintf(rtmp, "%c", q);
+        amii_addtopl(rtmp);
+    }
+ clean_up:
+    cursor_off(WIN_MESSAGE);
+    clear_nhwindow(WIN_MESSAGE);
+    return q;
+}
+
+void
+amii_display_file(fn, complain)
+const char * fn;
+boolean complain;
+{
+    register struct amii_WinDesc *cw;
+    register int win;
+    register dlb *fp;
+    register char *t;
+    register char buf[200];
+
+    if (fn == NULL)
+        panic("NULL file name in display_file()");
+
+    if ((fp = dlb_fopen(fn, RDTMODE)) == (dlb *) NULL) {
+        if (complain) {
+            sprintf(buf, "Can't display %s: %s", fn,
 #if defined(_DCC) || defined(__GNUC__)
-                        strerror(errno)
+                    strerror(errno)
 #else
 #ifdef __SASC_60
                     __sys_errlist[errno]
@@ -1151,520 +1147,510 @@ amii_get_ext_cmd(void)
                     sys_errlist[errno]
 #endif
 #endif
-                            );
-                amii_addtopl(buf);
-            }
-            return;
+                    );
+            amii_addtopl(buf);
         }
-        win = amii_create_nhwindow(NHW_TEXT);
+        return;
+    }
+    win = amii_create_nhwindow(NHW_TEXT);
 
-        /* Set window title to file name */
-        if (cw = amii_wins[win])
-            cw->morestr = (char *) fn;
+    /* Set window title to file name */
+    if (cw = amii_wins[win])
+        cw->morestr = (char *) fn;
 
-        while (dlb_fgets(buf, sizeof(buf), fp) != NULL) {
-            if (t = index(buf, '\n'))
-                *t = 0;
-            amii_putstr(win, 0, buf);
+    while (dlb_fgets(buf, sizeof(buf), fp) != NULL) {
+        if (t = index(buf, '\n'))
+            *t = 0;
+        amii_putstr(win, 0, buf);
+    }
+    dlb_fclose(fp);
+
+    /* If there were lines in the file, display those lines */
+    if (amii_wins[win]->cury > 0)
+        amii_display_nhwindow(win, TRUE);
+
+    amii_wins[win]->morestr = NULL; /* don't free title string */
+    amii_destroy_nhwindow(win);
+}
+
+/* Put a 3-D motif border around the gadget.  String gadgets or those
+ * which do not have highlighting are rendered down.  Boolean gadgets
+ * are rendered in the up position by default.
+ */
+void
+SetBorder(gd)
+register struct Gadget * gd;
+{
+    register struct Border *bp;
+    register short *sp;
+    register int i, inc = -1, dec = -1;
+    int borders = 6;
+    int hipen = sysflags.amii_dripens[SHINEPEN],
+        shadowpen = sysflags.amii_dripens[SHADOWPEN];
+#ifdef INTUI_NEW_LOOK
+    struct DrawInfo *dip;
+#endif
+
+#ifdef INTUI_NEW_LOOK
+    if (IntuitionBase->LibNode.lib_Version >= 37) {
+        if ((dip = GetScreenDrawInfo(HackScreen)) != 0) {
+            hipen = dip->dri_Pens[SHINEPEN];
+            shadowpen = dip->dri_Pens[SHADOWPEN];
+            FreeScreenDrawInfo(HackScreen, dip);
         }
-        dlb_fclose(fp);
-
-        /* If there were lines in the file, display those lines */
-
-        if (amii_wins[win]->cury > 0)
-            amii_display_nhwindow(win, TRUE);
-
-        amii_wins[win]->morestr = NULL; /* don't free title string */
-        amii_destroy_nhwindow(win);
+    }
+#endif
+    /* Allocate two border structures one for up image and one for down
+     * image, plus vector arrays for the border lines.
+     */
+    if (gd->GadgetType == STRGADGET)
+        borders = 12;
+    if ((bp = (struct Border *) alloc(((sizeof (struct Border) * 2)
+                                       + (sizeof (short) * borders)) * 2))
+        == NULL) {
+        return;
     }
 
-    /* Put a 3-D motif border around the gadget.  String gadgets or those
-     * which do not have highlighting are rendered down.  Boolean gadgets
-     * are rendered in the up position by default.
+    /* For a string gadget, we expand the border beyond the area where
+     * the text will be entered.
      */
 
-    void SetBorder(gd) register struct Gadget * gd;
-    {
-        register struct Border *bp;
-        register short *sp;
-        register int i, inc = -1, dec = -1;
-        int borders = 6;
-        int hipen = sysflags.amii_dripens[SHINEPEN],
-            shadowpen = sysflags.amii_dripens[SHADOWPEN];
-#ifdef INTUI_NEW_LOOK
-        struct DrawInfo *dip;
-#endif
+    /* Remove any special rendering flags to avoid confusing intuition */
+    gd->Flags &= ~(GADGHIGHBITS | GADGIMAGE);
 
-#ifdef INTUI_NEW_LOOK
-        if (IntuitionBase->LibNode.lib_Version >= 37) {
-            if (dip = GetScreenDrawInfo(HackScreen)) {
-                hipen = dip->dri_Pens[SHINEPEN];
-                shadowpen = dip->dri_Pens[SHADOWPEN];
-                FreeScreenDrawInfo(HackScreen, dip);
-            }
+    sp = (short *) (bp + 4);
+    if (gd->GadgetType == STRGADGET
+        || (gd->GadgetType == BOOLGADGET
+            && (gd->Flags & GADGHIGHBITS) == GADGHNONE)) {
+        sp[0] = -1;
+        sp[1] = gd->Height - 1;
+        sp[2] = -1;
+        sp[3] = -1;
+        sp[4] = gd->Width - 1;
+        sp[5] = -1;
+
+        sp[6] = gd->Width + 1;
+        sp[7] = -2;
+        sp[8] = gd->Width + 1;
+        sp[9] = gd->Height + 1;
+        sp[10] = -2;
+        sp[11] = gd->Height + 1;
+
+        sp[12] = -2;
+        sp[13] = gd->Height;
+        sp[14] = -2;
+        sp[15] = -2;
+        sp[16] = gd->Width;
+        sp[17] = -2;
+        sp[18] = gd->Width;
+        sp[19] = gd->Height;
+        sp[20] = -2;
+        sp[21] = gd->Height;
+
+        for (i = 0; i < 3; ++i) {
+            bp[i].LeftEdge = bp[i].TopEdge = -1;
+            bp[i].FrontPen = (i == 0 || i == 1) ? shadowpen : hipen;
+
+            /* Have to use JAM2 so that the old colors disappear. */
+            bp[i].BackPen = C_BLACK;
+            bp[i].DrawMode = JAM2;
+            bp[i].Count = (i == 0 || i == 1) ? 3 : 5;
+            bp[i].XY = &sp[i * 6];
+            bp[i].NextBorder = (i == 2) ? NULL : &bp[i + 1];
         }
-#endif
-        /* Allocate two border structures one for up image and one for down
-         * image, plus vector arrays for the border lines.
+
+        /* bp[0] and bp[1] two pieces for the up image */
+        gd->GadgetRender = (APTR) bp;
+
+        /* No image change for select */
+        gd->SelectRender = (APTR) bp;
+
+        gd->LeftEdge++;
+        gd->TopEdge++;
+        gd->Flags |= GADGHCOMP;
+    } else {
+        /* Create the border vector values for up and left side, and
+         * also the lower and right side.
          */
+        sp[0] = dec;
+        sp[1] = gd->Height + inc;
+        sp[2] = dec;
+        sp[3] = dec;
+        sp[4] = gd->Width + inc;
+        sp[5] = dec;
 
-        if (gd->GadgetType == STRGADGET)
-            borders = 12;
+        sp[6] = gd->Width + inc;
+        sp[7] = dec;
+        sp[8] = gd->Width + inc;
+        sp[9] = gd->Height + inc;
+        sp[10] = dec;
+        sp[11] = gd->Height + inc;
 
-        if ((bp = (struct Border *) alloc(((sizeof(struct Border) * 2)
-                                           + (sizeof(short) * borders)) * 2))
-            == NULL) {
+        /* We are creating 4 sets of borders, the two sides of the
+         * rectangle share the border vectors with the opposite image,
+         * but specify different colors.
+         */
+        for (i = 0; i < 4; ++i) {
+            bp[i].TopEdge = bp[i].LeftEdge = 0;
+
+            /* A GADGHNONE is always down */
+            if (gd->GadgetType == BOOLGADGET
+                && (gd->Flags & GADGHIGHBITS) != GADGHNONE) {
+                bp[i].FrontPen = (i == 1 || i == 2) ? shadowpen : hipen;
+            } else {
+                bp[i].FrontPen = (i == 1 || i == 3) ? hipen : shadowpen;
+            }
+
+            /* Have to use JAM2 so that the old colors disappear. */
+            bp[i].BackPen = C_BLACK;
+            bp[i].DrawMode = JAM2;
+            bp[i].Count = 3;
+            bp[i].XY = &sp[6 * ((i & 1) != 0)];
+            bp[i].NextBorder = (i == 1 || i == 3) ? NULL : &bp[i + 1];
+        }
+
+        /* bp[0] and bp[1] two pieces for the up image */
+        gd->GadgetRender = (APTR) bp;
+
+        /* bp[2] and bp[3] two pieces for the down image */
+        gd->SelectRender = (APTR)(bp + 2);
+        gd->Flags |= GADGHIMAGE;
+    }
+}
+
+/* Following function copied from wintty.c;
+   Modified slightly to fit amiga needs */
+void
+amii_player_selection()
+{
+    int i, k, n;
+    char pick4u = 'n', thisch, lastch = 0;
+    char pbuf[QBUFSZ], plbuf[QBUFSZ], rolenamebuf[QBUFSZ];
+    winid win;
+    anything any;
+    menu_item *selected = 0;
+
+    rigid_role_checks();
+
+    /* Should we randomly pick for the player? */
+    if (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE
+        || flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE) {
+        char *prompt;
+
+        prompt = build_plselection_prompt(pbuf, QBUFSZ,
+                                          flags.initrole, flags.initrace,
+                                          flags.initgend, flags.initalign);
+        pline("%s", prompt);
+        do { /* loop until we get valid input */
+            cursor_on(WIN_MESSAGE);
+            pick4u = lowc(WindowGetchar());
+            cursor_off(WIN_MESSAGE);
+            if (index(quitchars, pick4u))
+                pick4u = 'y';
+        } while (!index(ynqchars, pick4u));
+        pbuf[0] = pick4u;
+        pbuf[1] = 0;
+        amii_addtopl(pbuf);
+
+        if (pick4u != 'y' && pick4u != 'n') {
+        give_up: /* Quit */
+            if (selected)
+                free((genericptr_t) selected);
+            clearlocks();
+            exit_nhwindows(NULL);
+            nh_terminate(0);
+            /*NOTREACHED*/
             return;
-        }
-
-        /* For a string gadget, we expand the border beyond the area where
-         * the text will be entered.
-         */
-
-        /* Remove any special rendering flags to avoid confusing intuition
-         */
-
-        gd->Flags &= ~(GADGHIGHBITS | GADGIMAGE);
-
-        sp = (short *) (bp + 4);
-        if (gd->GadgetType == STRGADGET
-            || (gd->GadgetType == BOOLGADGET
-                && (gd->Flags & GADGHIGHBITS) == GADGHNONE)) {
-            sp[0] = -1;
-            sp[1] = gd->Height - 1;
-            sp[2] = -1;
-            sp[3] = -1;
-            sp[4] = gd->Width - 1;
-            sp[5] = -1;
-
-            sp[6] = gd->Width + 1;
-            sp[7] = -2;
-            sp[8] = gd->Width + 1;
-            sp[9] = gd->Height + 1;
-            sp[10] = -2;
-            sp[11] = gd->Height + 1;
-
-            sp[12] = -2;
-            sp[13] = gd->Height;
-            sp[14] = -2;
-            sp[15] = -2;
-            sp[16] = gd->Width;
-            sp[17] = -2;
-            sp[18] = gd->Width;
-            sp[19] = gd->Height;
-            sp[20] = -2;
-            sp[21] = gd->Height;
-
-            for (i = 0; i < 3; ++i) {
-                bp[i].LeftEdge = bp[i].TopEdge = -1;
-                bp[i].FrontPen = (i == 0 || i == 1) ? shadowpen : hipen;
-
-                /* Have to use JAM2 so that the old colors disappear. */
-                bp[i].BackPen = C_BLACK;
-                bp[i].DrawMode = JAM2;
-                bp[i].Count = (i == 0 || i == 1) ? 3 : 5;
-                bp[i].XY = &sp[i * 6];
-                bp[i].NextBorder = (i == 2) ? NULL : &bp[i + 1];
-            }
-
-            /* bp[0] and bp[1] two pieces for the up image */
-            gd->GadgetRender = (APTR) bp;
-
-            /* No image change for select */
-            gd->SelectRender = (APTR) bp;
-
-            gd->LeftEdge++;
-            gd->TopEdge++;
-            gd->Flags |= GADGHCOMP;
-        } else {
-            /* Create the border vector values for up and left side, and
-             * also the lower and right side.
-             */
-
-            sp[0] = dec;
-            sp[1] = gd->Height + inc;
-            sp[2] = dec;
-            sp[3] = dec;
-            sp[4] = gd->Width + inc;
-            sp[5] = dec;
-
-            sp[6] = gd->Width + inc;
-            sp[7] = dec;
-            sp[8] = gd->Width + inc;
-            sp[9] = gd->Height + inc;
-            sp[10] = dec;
-            sp[11] = gd->Height + inc;
-
-            /* We are creating 4 sets of borders, the two sides of the
-             * rectangle share the border vectors with the opposite image,
-             * but specify different colors.
-             */
-
-            for (i = 0; i < 4; ++i) {
-                bp[i].TopEdge = bp[i].LeftEdge = 0;
-
-                /* A GADGHNONE is always down */
-
-                if (gd->GadgetType == BOOLGADGET
-                    && (gd->Flags & GADGHIGHBITS) != GADGHNONE) {
-                    bp[i].FrontPen = (i == 1 || i == 2) ? shadowpen : hipen;
-                } else {
-                    bp[i].FrontPen = (i == 1 || i == 3) ? hipen : shadowpen;
-                }
-
-                /* Have to use JAM2 so that the old colors disappear. */
-                bp[i].BackPen = C_BLACK;
-                bp[i].DrawMode = JAM2;
-                bp[i].Count = 3;
-                bp[i].XY = &sp[6 * ((i & 1) != 0)];
-                bp[i].NextBorder = (i == 1 || i == 3) ? NULL : &bp[i + 1];
-            }
-
-            /* bp[0] and bp[1] two pieces for the up image */
-            gd->GadgetRender = (APTR) bp;
-
-            /* bp[2] and bp[3] two pieces for the down image */
-            gd->SelectRender = (APTR)(bp + 2);
-            gd->Flags |= GADGHIMAGE;
         }
     }
 
-    /* Following function copied from wintty.c */
-    /* Modified slightly to fit amiga needs */
+    (void) root_plselection_prompt(plbuf, QBUFSZ - 1,
+                                   flags.initrole, flags.initrace,
+                                   flags.initgend, flags.initalign);
 
-    void amii_player_selection()
-    {
-        int i, k, n;
-        char pick4u = 'n', thisch, lastch = 0;
-        char pbuf[QBUFSZ], plbuf[QBUFSZ], rolenamebuf[QBUFSZ];
-        winid win;
-        anything any;
-        menu_item *selected = 0;
-
-        rigid_role_checks();
-
-        /* Should we randomly pick for the player? */
-        if (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE
-            || flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE) {
-            char *prompt = build_plselection_prompt(
-                pbuf, QBUFSZ, flags.initrole, flags.initrace, flags.initgend,
-                flags.initalign);
-            pline("%s", prompt);
-            do { /* loop until we get valid input */
-                cursor_on(WIN_MESSAGE);
-                pick4u = lowc(WindowGetchar());
-                cursor_off(WIN_MESSAGE);
-                if (index(quitchars, pick4u))
-                    pick4u = 'y';
-            } while (!index(ynqchars, pick4u));
-            pbuf[0] = pick4u;
-            pbuf[1] = 0;
-            amii_addtopl(pbuf);
-
-            if (pick4u != 'y' && pick4u != 'n') {
-            give_up: /* Quit */
-                if (selected)
-                    free((genericptr_t) selected);
-                clearlocks();
-                exit_nhwindows(NULL);
-                terminate(0);
-                /*NOTREACHED*/
-                return;
+    /* Select a role, if necessary */
+    /* we'll try to be compatible with pre-selected race/gender/alignment,
+     * but may not succeed */
+    if (flags.initrole < 0) {
+        /* Process the choice */
+        if (pick4u == 'y' || flags.initrole == ROLE_RANDOM
+            || flags.randomall) {
+            /* Pick a random role */
+            flags.initrole = pick_role(flags.initrace, flags.initgend,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initrole < 0) {
+                amii_putstr(WIN_MESSAGE, 0, "Incompatible role!");
+                flags.initrole = randrole();
             }
-        }
-
-        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
-                                       flags.initrace, flags.initgend,
-                                       flags.initalign);
-
-        /* Select a role, if necessary */
-        /* we'll try to be compatible with pre-selected race/gender/alignment,
-         * but may not succeed */
-        if (flags.initrole < 0) {
-            /* Process the choice */
-            if (pick4u == 'y' || flags.initrole == ROLE_RANDOM
-                || flags.randomall) {
-                /* Pick a random role */
-                flags.initrole = pick_role(flags.initrace, flags.initgend,
-                                           flags.initalign, PICK_RANDOM);
-                if (flags.initrole < 0) {
-                    amii_putstr(WIN_MESSAGE, 0, "Incompatible role!");
-                    flags.initrole = randrole();
+        } else {
+            /* Prompt for a role */
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win);
+            any.a_void = 0; /* zero out all bits */
+            for (i = 0; roles[i].name.m; i++) {
+                if (ok_role(i, flags.initrace, flags.initgend,
+                            flags.initalign)) {
+                    any.a_int = i + 1; /* must be non-zero */
+                    thisch = lowc(roles[i].name.m[0]);
+                    if (thisch == lastch)
+                        thisch = highc(thisch);
+                    if (flags.initgend != ROLE_NONE
+                        && flags.initgend != ROLE_RANDOM) {
+                        if (flags.initgend == 1 && roles[i].name.f)
+                            Strcpy(rolenamebuf, roles[i].name.f);
+                        else
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                    } else {
+                        if (roles[i].name.f) {
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                            Strcat(rolenamebuf, "/");
+                            Strcat(rolenamebuf, roles[i].name.f);
+                        } else
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                    }
+                    add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
+                             an(rolenamebuf), MENU_UNSELECTED);
+                    lastch = thisch;
                 }
-            } else {
-                /* Prompt for a role */
+            }
+            any.a_int = pick_role(flags.initrace, flags.initgend,
+                                  flags.initalign, PICK_RANDOM) + 1;
+            if (any.a_int == 0) /* must be non-zero */
+                any.a_int = randrole() + 1;
+            add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                     MENU_UNSELECTED);
+            any.a_int = i + 1; /* must be non-zero */
+            add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                     MENU_UNSELECTED);
+            Sprintf(pbuf, "Pick a role for your %s", plbuf);
+            end_menu(win, pbuf);
+            n = select_menu(win, PICK_ONE, &selected);
+            destroy_nhwindow(win);
+
+            /* Process the choice */
+            if (n != 1 || selected[0].item.a_int == any.a_int)
+                goto give_up; /* Selected quit */
+
+            flags.initrole = selected[0].item.a_int - 1;
+            free((genericptr_t) selected), selected = 0;
+        }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1,
+                                       flags.initrole, flags.initrace,
+                                       flags.initgend, flags.initalign);
+    }
+
+    /* Select a race, if necessary */
+    /* force compatibility with role, try for compatibility with
+     * pre-selected gender/alignment */
+    if (flags.initrace < 0
+        || !validrace(flags.initrole, flags.initrace)) {
+        /* pre-selected race not valid */
+        if (pick4u == 'y' || flags.initrace == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initrace = pick_race(flags.initrole, flags.initgend,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initrace < 0) {
+                amii_putstr(WIN_MESSAGE, 0, "Incompatible race!");
+                flags.initrace = randrace(flags.initrole);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid races */
+            n = 0; /* number valid */
+            k = 0; /* valid race */
+            for (i = 0; races[i].noun; i++) {
+                if (ok_race(flags.initrole, i, flags.initgend,
+                            flags.initalign)) {
+                    n++;
+                    k = i;
+                }
+            }
+            if (n == 0) {
+                for (i = 0; races[i].noun; i++) {
+                    if (validrace(flags.initrole, i)) {
+                        n++;
+                        k = i;
+                    }
+                }
+            }
+
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
                 any.a_void = 0; /* zero out all bits */
-                for (i = 0; roles[i].name.m; i++) {
-                    if (ok_role(i, flags.initrace, flags.initgend,
+                for (i = 0; races[i].noun; i++)
+                    if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
                         any.a_int = i + 1; /* must be non-zero */
-                        thisch = lowc(roles[i].name.m[0]);
-                        if (thisch == lastch)
-                            thisch = highc(thisch);
-                        if (flags.initgend != ROLE_NONE
-                            && flags.initgend != ROLE_RANDOM) {
-                            if (flags.initgend == 1 && roles[i].name.f)
-                                Strcpy(rolenamebuf, roles[i].name.f);
-                            else
-                                Strcpy(rolenamebuf, roles[i].name.m);
-                        } else {
-                            if (roles[i].name.f) {
-                                Strcpy(rolenamebuf, roles[i].name.m);
-                                Strcat(rolenamebuf, "/");
-                                Strcat(rolenamebuf, roles[i].name.f);
-                            } else
-                                Strcpy(rolenamebuf, roles[i].name.m);
-                        }
-                        add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
-                                 an(rolenamebuf), MENU_UNSELECTED);
-                        lastch = thisch;
+                        add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
+                                 ATR_NONE, races[i].noun,
+                                 MENU_UNSELECTED);
                     }
-                }
-                any.a_int = pick_role(flags.initrace, flags.initgend,
+                any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
-                    any.a_int = randrole() + 1;
+                    any.a_int = randrace(flags.initrole) + 1;
                 add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
                          MENU_UNSELECTED);
                 any.a_int = i + 1; /* must be non-zero */
                 add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
                          MENU_UNSELECTED);
-                Sprintf(pbuf, "Pick a role for your %s", plbuf);
+                Sprintf(pbuf, "Pick the race of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
                 destroy_nhwindow(win);
-
-                /* Process the choice */
                 if (n != 1 || selected[0].item.a_int == any.a_int)
                     goto give_up; /* Selected quit */
 
-                flags.initrole = selected[0].item.a_int - 1;
+                k = selected[0].item.a_int - 1;
                 free((genericptr_t) selected), selected = 0;
             }
-            (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
-                                           flags.initrace, flags.initgend,
-                                           flags.initalign);
+            flags.initrace = k;
         }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1,
+                                       flags.initrole, flags.initrace,
+                                       flags.initgend, flags.initalign);
+    }
 
-        /* Select a race, if necessary */
-        /* force compatibility with role, try for compatibility with
-         * pre-selected gender/alignment */
-        if (flags.initrace < 0
-            || !validrace(flags.initrole, flags.initrace)) {
-            /* pre-selected race not valid */
-            if (pick4u == 'y' || flags.initrace == ROLE_RANDOM
-                || flags.randomall) {
-                flags.initrace = pick_race(flags.initrole, flags.initgend,
-                                           flags.initalign, PICK_RANDOM);
-                if (flags.initrace < 0) {
-                    amii_putstr(WIN_MESSAGE, 0, "Incompatible race!");
-                    flags.initrace = randrace(flags.initrole);
+    /* Select a gender, if necessary */
+    /* force compatibility with role/race, try for compatibility with
+     * pre-selected alignment */
+    if (flags.initgend < 0
+        || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
+        /* pre-selected gender not valid */
+        if (pick4u == 'y' || flags.initgend == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initgend = pick_gend(flags.initrole, flags.initrace,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initgend < 0) {
+                amii_putstr(WIN_MESSAGE, 0, "Incompatible gender!");
+                flags.initgend = randgend(flags.initrole, flags.initrace);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid genders */
+            n = 0; /* number valid */
+            k = 0; /* valid gender */
+            for (i = 0; i < ROLE_GENDERS; i++) {
+                if (ok_gend(flags.initrole, flags.initrace, i,
+                            flags.initalign)) {
+                    n++;
+                    k = i;
                 }
-            } else { /* pick4u == 'n' */
-                /* Count the number of valid races */
-                n = 0; /* number valid */
-                k = 0; /* valid race */
-                for (i = 0; races[i].noun; i++) {
-                    if (ok_race(flags.initrole, i, flags.initgend,
-                                flags.initalign)) {
+            }
+            if (n == 0) {
+                for (i = 0; i < ROLE_GENDERS; i++) {
+                    if (validgend(flags.initrole, flags.initrace, i)) {
                         n++;
                         k = i;
                     }
                 }
-                if (n == 0) {
-                    for (i = 0; races[i].noun; i++) {
-                        if (validrace(flags.initrole, i)) {
-                            n++;
-                            k = i;
-                        }
-                    }
-                }
-
-                /* Permit the user to pick, if there is more than one */
-                if (n > 1) {
-                    win = create_nhwindow(NHW_MENU);
-                    start_menu(win);
-                    any.a_void = 0; /* zero out all bits */
-                    for (i = 0; races[i].noun; i++)
-                        if (ok_race(flags.initrole, i, flags.initgend,
-                                    flags.initalign)) {
-                            any.a_int = i + 1; /* must be non-zero */
-                            add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                     ATR_NONE, races[i].noun,
-                                     MENU_UNSELECTED);
-                        }
-                    any.a_int = pick_race(flags.initrole, flags.initgend,
-                                          flags.initalign, PICK_RANDOM) + 1;
-                    if (any.a_int == 0) /* must be non-zero */
-                        any.a_int = randrace(flags.initrole) + 1;
-                    add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                             MENU_UNSELECTED);
-                    any.a_int = i + 1; /* must be non-zero */
-                    add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                             MENU_UNSELECTED);
-                    Sprintf(pbuf, "Pick the race of your %s", plbuf);
-                    end_menu(win, pbuf);
-                    n = select_menu(win, PICK_ONE, &selected);
-                    destroy_nhwindow(win);
-                    if (n != 1 || selected[0].item.a_int == any.a_int)
-                        goto give_up; /* Selected quit */
-
-                    k = selected[0].item.a_int - 1;
-                    free((genericptr_t) selected), selected = 0;
-                }
-                flags.initrace = k;
             }
-            (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
-                                           flags.initrace, flags.initgend,
-                                           flags.initalign);
-        }
 
-        /* Select a gender, if necessary */
-        /* force compatibility with role/race, try for compatibility with
-         * pre-selected alignment */
-        if (flags.initgend < 0
-            || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
-            /* pre-selected gender not valid */
-            if (pick4u == 'y' || flags.initgend == ROLE_RANDOM
-                || flags.randomall) {
-                flags.initgend = pick_gend(flags.initrole, flags.initrace,
-                                           flags.initalign, PICK_RANDOM);
-                if (flags.initgend < 0) {
-                    amii_putstr(WIN_MESSAGE, 0, "Incompatible gender!");
-                    flags.initgend = randgend(flags.initrole, flags.initrace);
-                }
-            } else { /* pick4u == 'n' */
-                /* Count the number of valid genders */
-                n = 0; /* number valid */
-                k = 0; /* valid gender */
-                for (i = 0; i < ROLE_GENDERS; i++) {
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+                any.a_void = 0; /* zero out all bits */
+                for (i = 0; i < ROLE_GENDERS; i++)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
+                        any.a_int = i + 1;
+                        add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
+                                 ATR_NONE, genders[i].adj, MENU_UNSELECTED);
+                    }
+                any.a_int = pick_gend(flags.initrole, flags.initrace,
+                                      flags.initalign, PICK_RANDOM) + 1;
+                if (any.a_int == 0) /* must be non-zero */
+                    any.a_int = randgend(flags.initrole, flags.initrace) + 1;
+                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                         MENU_UNSELECTED);
+                any.a_int = i + 1; /* must be non-zero */
+                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                         MENU_UNSELECTED);
+                Sprintf(pbuf, "Pick the gender of your %s", plbuf);
+                end_menu(win, pbuf);
+                n = select_menu(win, PICK_ONE, &selected);
+                destroy_nhwindow(win);
+                if (n != 1 || selected[0].item.a_int == any.a_int)
+                    goto give_up; /* Selected quit */
+
+                k = selected[0].item.a_int - 1;
+                free((genericptr_t) selected), selected = 0;
+            }
+            flags.initgend = k;
+        }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1,
+                                       flags.initrole, flags.initrace,
+                                       flags.initgend, flags.initalign);
+    }
+
+    /* Select an alignment, if necessary */
+    /* force compatibility with role/race/gender */
+    if (flags.initalign < 0
+        || !validalign(flags.initrole, flags.initrace, flags.initalign)) {
+        /* pre-selected alignment not valid */
+        if (pick4u == 'y' || flags.initalign == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initalign = pick_align(flags.initrole, flags.initrace,
+                                         flags.initgend, PICK_RANDOM);
+            if (flags.initalign < 0) {
+                amii_putstr(WIN_MESSAGE, 0, "Incompatible alignment!");
+                flags.initalign = randalign(flags.initrole, flags.initrace);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid alignments */
+            n = 0; /* number valid */
+            k = 0; /* valid alignment */
+            for (i = 0; i < ROLE_ALIGNS; i++) {
+                if (ok_align(flags.initrole, flags.initrace,
+                             flags.initgend, i)) {
+                    n++;
+                    k = i;
+                }
+            }
+            if (n == 0) {
+                for (i = 0; i < ROLE_ALIGNS; i++) {
+                    if (validalign(flags.initrole, flags.initrace, i)) {
                         n++;
                         k = i;
                     }
                 }
-                if (n == 0) {
-                    for (i = 0; i < ROLE_GENDERS; i++) {
-                        if (validgend(flags.initrole, flags.initrace, i)) {
-                            n++;
-                            k = i;
-                        }
-                    }
-                }
-
-                /* Permit the user to pick, if there is more than one */
-                if (n > 1) {
-                    win = create_nhwindow(NHW_MENU);
-                    start_menu(win);
-                    any.a_void = 0; /* zero out all bits */
-                    for (i = 0; i < ROLE_GENDERS; i++)
-                        if (ok_gend(flags.initrole, flags.initrace, i,
-                                    flags.initalign)) {
-                            any.a_int = i + 1;
-                            add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
-                                     0, ATR_NONE, genders[i].adj,
-                                     MENU_UNSELECTED);
-                        }
-                    any.a_int = pick_gend(flags.initrole, flags.initrace,
-                                          flags.initalign, PICK_RANDOM) + 1;
-                    if (any.a_int == 0) /* must be non-zero */
-                        any.a_int =
-                            randgend(flags.initrole, flags.initrace) + 1;
-                    add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                             MENU_UNSELECTED);
-                    any.a_int = i + 1; /* must be non-zero */
-                    add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                             MENU_UNSELECTED);
-                    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
-                    end_menu(win, pbuf);
-                    n = select_menu(win, PICK_ONE, &selected);
-                    destroy_nhwindow(win);
-                    if (n != 1 || selected[0].item.a_int == any.a_int)
-                        goto give_up; /* Selected quit */
-
-                    k = selected[0].item.a_int - 1;
-                    free((genericptr_t) selected), selected = 0;
-                }
-                flags.initgend = k;
             }
-            (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
-                                           flags.initrace, flags.initgend,
-                                           flags.initalign);
-        }
 
-        /* Select an alignment, if necessary */
-        /* force compatibility with role/race/gender */
-        if (flags.initalign < 0
-            || !validalign(flags.initrole, flags.initrace, flags.initalign)) {
-            /* pre-selected alignment not valid */
-            if (pick4u == 'y' || flags.initalign == ROLE_RANDOM
-                || flags.randomall) {
-                flags.initalign = pick_align(flags.initrole, flags.initrace,
-                                             flags.initgend, PICK_RANDOM);
-                if (flags.initalign < 0) {
-                    amii_putstr(WIN_MESSAGE, 0, "Incompatible alignment!");
-                    flags.initalign =
-                        randalign(flags.initrole, flags.initrace);
-                }
-            } else { /* pick4u == 'n' */
-                /* Count the number of valid alignments */
-                n = 0; /* number valid */
-                k = 0; /* valid alignment */
-                for (i = 0; i < ROLE_ALIGNS; i++) {
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+                any.a_void = 0; /* zero out all bits */
+                for (i = 0; i < ROLE_ALIGNS; i++)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
-                        n++;
-                        k = i;
+                        any.a_int = i + 1;
+                        add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
+                                 ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
                     }
-                }
-                if (n == 0) {
-                    for (i = 0; i < ROLE_ALIGNS; i++) {
-                        if (validalign(flags.initrole, flags.initrace, i)) {
-                            n++;
-                            k = i;
-                        }
-                    }
-                }
+                any.a_int = pick_align(flags.initrole, flags.initrace,
+                                       flags.initgend, PICK_RANDOM) + 1;
+                if (any.a_int == 0) /* must be non-zero */
+                    any.a_int = randalign(flags.initrole, flags.initrace) + 1;
+                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                         MENU_UNSELECTED);
+                any.a_int = i + 1; /* must be non-zero */
+                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                         MENU_UNSELECTED);
+                Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
+                end_menu(win, pbuf);
+                n = select_menu(win, PICK_ONE, &selected);
+                destroy_nhwindow(win);
+                if (n != 1 || selected[0].item.a_int == any.a_int)
+                    goto give_up; /* Selected quit */
 
-                /* Permit the user to pick, if there is more than one */
-                if (n > 1) {
-                    win = create_nhwindow(NHW_MENU);
-                    start_menu(win);
-                    any.a_void = 0; /* zero out all bits */
-                    for (i = 0; i < ROLE_ALIGNS; i++)
-                        if (ok_align(flags.initrole, flags.initrace,
-                                     flags.initgend, i)) {
-                            any.a_int = i + 1;
-                            add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                     ATR_NONE, aligns[i].adj,
-                                     MENU_UNSELECTED);
-                        }
-                    any.a_int = pick_align(flags.initrole, flags.initrace,
-                                           flags.initgend, PICK_RANDOM) + 1;
-                    if (any.a_int == 0) /* must be non-zero */
-                        any.a_int =
-                            randalign(flags.initrole, flags.initrace) + 1;
-                    add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                             MENU_UNSELECTED);
-                    any.a_int = i + 1; /* must be non-zero */
-                    add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                             MENU_UNSELECTED);
-                    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
-                    end_menu(win, pbuf);
-                    n = select_menu(win, PICK_ONE, &selected);
-                    destroy_nhwindow(win);
-                    if (n != 1 || selected[0].item.a_int == any.a_int)
-                        goto give_up; /* Selected quit */
-
-                    k = selected[0].item.a_int - 1;
-                    free((genericptr_t) selected), selected = 0;
-                }
-                flags.initalign = k;
+                k = selected[0].item.a_int - 1;
+                free((genericptr_t) selected), selected = 0;
             }
+            flags.initalign = k;
         }
-        /* Success! */
     }
+    /* Success! */
+}
 #endif /* AMIGA_INTUITION */

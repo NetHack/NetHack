@@ -1,3 +1,7 @@
+# NetHack 3.6  defaults.nh       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2006 by Michael Allison
+# NetHack may be freely redistributed.  See license for details.
+
 # Sample config file for win32 NetHack
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
@@ -7,7 +11,7 @@
 # To change the configuration, comment out the unwanted lines, and
 # uncomment the configuration you want.
 #
-# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $
 
 # *** OPTIONS ***
 #
@@ -36,23 +40,50 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=name:Janet,role:Valkyrie,race:Human,gender:female,align:lawful
 #OPTIONS=dogname:Fido,catname:Morris,fruit:guava
 #OPTIONS=horsename:Silver
-#OPTIONS=autopickup,pickup_types:$"=/!?+
+
+# Disable autopickup
+OPTIONS=!autopickup
+
+# When autopickup is on, automatically pick up these types of objects
+#OPTIONS=pickup_types:$"=/!?+
+
 #OPTIONS=packorder:")[%?+/=!(*0_`
 #OPTIONS=scores:10 top/2 around/own
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
-#OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
 #OPTIONS=perm_invent
 
-# Turn off all status hilites.
-#OPTIONS=!statushilites
-#
+
+# Highlight menu lines with different colors. You need to define the colors
+# with MENUCOLOR lines.
+#  Toggle menucolor use on or off
+OPTIONS=menucolors
+# Define color used for a certain menu line. Format is
+#    MENUCOLOR="regular expression"=color
+# or
+#    MENUCOLOR="regular expression"=color&attribute
+#  Show all blessed items in green
+MENUCOLOR=" blessed " = green
+#  Show all holy water in green
+MENUCOLOR=" holy " = green
+#  Show all cursed items in red
+MENUCOLOR=" cursed " = red
+#  Show all unholy water in red
+MENUCOLOR=" unholy " = red
+#  Show all cursed worn items in orange and underlined
+MENUCOLOR=" cursed .* (being worn)" = orange&underline
+
+
+
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
 #
 # number_pad option can have an optional value of 0 (off), 1 (on), 
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
 OPTIONS=time,noshowexp,number_pad:2,lit_corridor
+
+# Make commands that ask for an inventory item pop up a menu
+OPTIONS=force_invmenu
 
 #
 # If you want to get rid of "use #quit to quit..." use:
@@ -71,7 +102,7 @@ OPTIONS=suppress_alert:3.3.1
 # possible map_mode options include: tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|
 #                                    ascii7x12|ascii8x12|ascii16x12|ascii12x16|
 #                                    ascii10x18|fit_to_screen
-OPTIONS=map_mode:tiles,scroll_margin:5
+OPTIONS=map_mode:tiles,scroll_margin:10
 
 # Message window settings
 OPTIONS=font_message:Arial,font_size_message:9,align_message:top
@@ -159,4 +190,46 @@ OPTIONS=vary_msgcount:1
 #OPTIONS=palette:bright magenta-255-0-255
 #OPTIONS=palette:bright cyan-0-255-255
 #OPTIONS=palette:white-255-255-255
+
+
+
+# Status hilites
+OPTIONS=statushilites
+# HP
+OPTIONS=hitpointbar
+OPTIONS=hilite_status:hitpoints/100%/gray&normal
+OPTIONS=hilite_status:hitpoints/<100%/green&normal
+OPTIONS=hilite_status:hitpoints/<66%/yellow&normal
+OPTIONS=hilite_status:hitpoints/<50%/orange&normal
+OPTIONS=hilite_status:hitpoints/<33%/red&bold
+OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+
+## Pw
+OPTIONS=hilite_status:power/100%/gray&normal
+OPTIONS=hilite_status:power/<100%/green&normal
+OPTIONS=hilite_status:power/<66%/yellow&normal
+OPTIONS=hilite_status:power/<50%/orange&normal
+OPTIONS=hilite_status:power/<33%/red&bold
+
+## Carry
+OPTIONS=hilite_status:cap/burdened/yellow/stressed/orange/strained/red&bold/overtaxed/red&inverse/overloaded/red&inverse&blink
+
+## Hunger
+OPTIONS=hilite_status:hunger/satiated/yellow/hungry/orange/weak/red&bold/fainting/red&inverse/fainted/red&inverse&blink
+
+## Mental
+OPTIONS=hilite_status:condition/hallu/yellow
+OPTIONS=hilite_status:condition/conf/orange
+OPTIONS=hilite_status:condition/stun/red&bold
+
+## Health
+OPTIONS=hilite_status:condition/termill/red&inverse
+OPTIONS=hilite_status:condition/foodpois/red&inverse
+OPTIONS=hilite_status:condition/slime/red&inverse
+
+# gold
+OPTIONS=hilite_status:gold/up/yellow/down/brown
+
+# St, Dx, Co, In, Wi, Ch
+OPTIONS=hilite_status:characteristics/up/green/down/red
 

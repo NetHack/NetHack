@@ -1,5 +1,6 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1471112245 2016/08/13 18:17:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1521507553 2018/03/20 00:59:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -22,6 +23,7 @@ STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
 
 struct Jitem {
     int item;
@@ -90,8 +92,12 @@ releaseobuf(bufp)
 char *bufp;
 {
     /* caller may not know whether bufp is the most recently allocated
-       buffer; if it isn't, do nothing */
-    if (bufp == obufs[obufidx])
+       buffer; if it isn't, do nothing; note that because of the somewhat
+       obscure PREFIX handling for object name formatting by xname(),
+       the pointer our caller has and is passing to us might be into the
+       middle of an obuf rather than the address returned by nextobuf() */
+    if (bufp >= obufs[obufidx]
+        && bufp < obufs[obufidx] + sizeof obufs[obufidx]) /* obufs[][BUFSZ] */
         obufidx = (obufidx - 1 + NUMOBUF) % NUMOBUF;
 }
 
@@ -100,11 +106,11 @@ obj_typename(otyp)
 register int otyp;
 {
     char *buf = nextobuf();
-    register struct objclass *ocl = &objects[otyp];
-    register const char *actualn = OBJ_NAME(*ocl);
-    register const char *dn = OBJ_DESCR(*ocl);
-    register const char *un = ocl->oc_uname;
-    register int nn = ocl->oc_name_known;
+    struct objclass *ocl = &objects[otyp];
+    const char *actualn = OBJ_NAME(*ocl);
+    const char *dn = OBJ_DESCR(*ocl);
+    const char *un = ocl->oc_uname;
+    int nn = ocl->oc_name_known;
 
     if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
         actualn = Japanese_item_name(otyp);
@@ -251,6 +257,135 @@ boolean juice; /* whether or not to append " juice" to the name */
     return buf;
 }
 
+/* look up a named fruit by index (1..127) */
+struct fruit *
+fruit_from_indx(indx)
+int indx;
+{
+    struct fruit *f;
+
+    for (f = ffruit; f; f = f->nextf)
+        if (f->fid == indx)
+            break;
+    return f;
+}
+
+/* look up a named fruit by name */
+struct fruit *
+fruit_from_name(fname, exact, highest_fid)
+const char *fname;
+boolean exact; /* False => prefix or exact match, True = exact match only */
+int *highest_fid; /* optional output; only valid if 'fname' isn't found */
+{
+    struct fruit *f, *tentativef;
+    char *altfname;
+    unsigned k;
+    /*
+     * note: named fruits are case-senstive...
+     */
+
+    if (highest_fid)
+        *highest_fid = 0;
+    /* first try for an exact match */
+    for (f = ffruit; f; f = f->nextf)
+        if (!strcmp(f->fname, fname))
+            return f;
+        else if (highest_fid && f->fid > *highest_fid)
+            *highest_fid = f->fid;
+
+    /* didn't match as-is; if caller is willing to accept a prefix
+       match, try to find one; we want to find the longest prefix that
+       matches, not the first */
+    if (!exact) {
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            if (!strncmp(f->fname, fname, k)
+                && (!fname[k] || fname[k] == ' ')
+                && (!tentativef || k > strlen(tentativef->fname)))
+                tentativef = f;
+        }
+        f = tentativef;
+    }
+    /* if we still don't have a match, try singularizing the target;
+       for exact match, that's trivial, but for prefix, it's hard */
+    if (!f) {
+        altfname = makesingular(fname);
+        for (f = ffruit; f; f = f->nextf) {
+            if (!strcmp(f->fname, altfname))
+                break;
+        }
+        releaseobuf(altfname);
+    }
+    if (!f && !exact) {
+        char fnamebuf[BUFSZ], *p;
+        unsigned fname_k = strlen(fname); /* length of assumed plural fname */
+
+        tentativef = 0;
+        for (f = ffruit; f; f = f->nextf) {
+            k = strlen(f->fname);
+            /* reload fnamebuf[] each iteration in case it gets modified;
+               there's no need to recalculate fname_k */
+            Strcpy(fnamebuf, fname);
+            /* bug? if singular of fname is longer than plural,
+               failing the 'fname_k > k' test could skip a viable
+               candidate; unfortunately, we can't singularize until
+               after stripping off trailing stuff and we can't get
+               accurate fname_k until fname has been singularized;
+               compromise and use 'fname_k >= k' instead of '>',
+               accepting 1 char length discrepancy without risking
+               false match (I hope...) */
+            if (fname_k >= k && (p = index(&fnamebuf[k], ' ')) != 0) {
+                *p = '\0'; /* truncate at 1st space past length of f->fname */
+                altfname = makesingular(fnamebuf);
+                k = strlen(altfname); /* actually revised 'fname_k' */
+                if (!strcmp(f->fname, altfname)
+                    && (!tentativef || k > strlen(tentativef->fname)))
+                    tentativef = f;
+                releaseobuf(altfname); /* avoid churning through all obufs */
+            }
+        }
+        f = tentativef;
+    }
+    return f;
+}
+
+/* sort the named-fruit linked list by fruit index number */
+void
+reorder_fruit(forward)
+boolean forward;
+{
+    struct fruit *f, *allfr[1 + 127];
+    int i, j, k = SIZE(allfr);
+
+    for (i = 0; i < k; ++i)
+        allfr[i] = (struct fruit *) 0;
+    for (f = ffruit; f; f = f->nextf) {
+        /* without sanity checking, this would reduce to 'allfr[f->fid]=f' */
+        j = f->fid;
+        if (j < 1 || j >= k) {
+            impossible("reorder_fruit: fruit index (%d) out of range", j);
+            return; /* don't sort after all; should never happen... */
+        } else if (allfr[j]) {
+            impossible("reorder_fruit: duplicate fruit index (%d)", j);
+            return;
+        }
+        allfr[j] = f;
+    }
+    ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
+    /* slot [0] will always be empty; must start 'i' at 1 to avoid
+       [k - i] being out of bounds during first iteration */
+    for (i = 1; i < k; ++i) {
+        /* for forward ordering, go through indices from high to low;
+           for backward ordering, go from low to high */
+        j = forward ? (k - i) : i;
+        if (allfr[j]) {
+            allfr[j]->nextf = ffruit;
+            ffruit = allfr[j];
+        }
+    }
+}
+
 char *
 xname(obj)
 struct obj *obj;
@@ -319,6 +454,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case WEAPON_CLASS:
         if (is_poisonable(obj) && obj->opoisoned)
             Strcpy(buf, "poisoned ");
+        /*FALLTHRU*/
     case VENOM_CLASS:
     case TOOL_CLASS:
         if (typ == LENSES)
@@ -388,23 +524,20 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         break;
     case FOOD_CLASS:
         if (typ == SLIME_MOLD) {
-            register struct fruit *f;
+            struct fruit *f = fruit_from_indx(obj->spe);
 
-            for (f = ffruit; f; f = f->nextf) {
-                if (f->fid == obj->spe) {
-                    Strcpy(buf, f->fname);
-                    break;
-                }
-            }
             if (!f) {
                 impossible("Bad fruit #%d?", obj->spe);
                 Strcpy(buf, "fruit");
-            } else if (pluralize) {
-                /* ick; already pluralized fruit names
-                   are allowed--we want to try to avoid
-                   adding a redundant plural suffix */
-                Strcpy(buf, makeplural(makesingular(buf)));
-                pluralize = FALSE;
+            } else {
+                Strcpy(buf, f->fname);
+                if (pluralize) {
+                    /* ick; already pluralized fruit names
+                       are allowed--we want to try to avoid
+                       adding a redundant plural suffix */
+                    Strcpy(buf, makeplural(makesingular(buf)));
+                    pluralize = FALSE;
+                }
             }
             break;
         }
@@ -976,8 +1109,11 @@ unsigned doname_flags;
                "corpse" is already in the buffer returned by xname() */
             unsigned cxarg = (((obj->quan != 1L) ? 0 : CXN_ARTICLE)
                               | CXN_NOCORPSE);
+            char *cxstr = corpse_xname(obj, prefix, cxarg);
 
-            Sprintf(prefix, "%s ", corpse_xname(obj, prefix, cxarg));
+            Sprintf(prefix, "%s ", cxstr);
+            /* avoid having doname(corpse) consume an extra obuf */
+            releaseobuf(cxstr);
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))
@@ -1493,7 +1629,10 @@ const char *str;
         buf[0] = lowc(*str);
         Strcpy(&buf[1], str + 1);
         return buf;
-    } else if (*str < 'A' || *str > 'Z') {
+    } else if (*str < 'A' || *str > 'Z'
+               /* treat named fruit as not a proper name, even if player
+                  has assigned a capitalized proper name as his/her fruit */
+               || fruit_from_name(str, TRUE, (int *) 0)) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
     } else {
@@ -1897,15 +2036,20 @@ static struct sing_plur one_off[] = {
     { "erinys", "erinyes" },
     { "foot", "feet" },
     { "fungus", "fungi" },
+    { "goose", "geese" },
     { "knife", "knives" },
     { "labrum", "labra" }, /* candelabrum */
     { "louse", "lice" },
     { "mouse", "mice" },
     { "mumak", "mumakil" },
     { "nemesis", "nemeses" },
+    { "ovum", "ova" },
+    { "ox", "oxen" },
+    { "passerby", "passersby" },
     { "rtex", "rtices" }, /* vortex */
-    { "tooth", "teeth" },
+    { "serum", "sera" },
     { "staff", "staves" },
+    { "tooth", "teeth" },
     { 0, 0 }
 };
 
@@ -1914,18 +2058,18 @@ static const char *const as_is[] = {
     "boots",   "shoes",     "gloves",    "lenses",   "scales",
     "eyes",    "gauntlets", "iron bars",
     /* both singular and plural are spelled the same */
-    "deer",    "fish",      "tuna",      "yaki",     "-hai",
-    "krill",   "manes",     "ninja",     "sheep",    "ronin",
-    "roshi",   "shito",     "tengu",     "ki-rin",   "Nazgul",
-    "gunyoki", "piranha",   "samurai",   "shuriken", 0,
+    "bison",   "deer",      "elk",       "fish",      "fowl",
+    "tuna",    "yaki",      "-hai",      "krill",     "manes",
+    "moose",   "ninja",     "sheep",     "ronin",     "roshi",
+    "shito",   "tengu",     "ki-rin",    "Nazgul",    "gunyoki",
+    "piranha", "samurai",   "shuriken", 0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
        variant instead of attempting to support both. */
 };
 
-/* singularize/pluralize decisions common to both makesingular & makeplural
- */
+/* singularize/pluralize decisions common to both makesingular & makeplural */
 STATIC_OVL boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)
 char *basestr, *endstring;    /* base string, pointer to eos(string) */
@@ -1949,14 +2093,34 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
-    /* avoid false hit on one_off[].plur == "lice";
+    /* avoid false hit on one_off[].plur == "lice" or .sing == "goose";
        if more of these turn up, one_off[] entries will need to flagged
        as to which are whole words and which are matchable as suffices
        then matching in the loop below will end up becoming more complex */
-    if (!strcmpi(basestr, "slice")) {
+    if (!strcmpi(basestr, "slice")
+        || !strcmpi(basestr, "mongoose")) {
         if (to_plural)
-            (void) strkitten(basestr, 's');
+            Strcasecpy(endstring, "s");
         return TRUE;
+    }
+    /* skip "ox" -> "oxen" entry when pluralizing "<something>ox"
+       unless it is muskox */
+    if (to_plural && strlen(basestr) > 2 && !strcmpi(endstring - 2, "ox")
+        && strcmpi(endstring - 6, "muskox")) {
+        /* "fox" -> "foxes" */
+        Strcasecpy(endstring, "es");
+        return TRUE;
+    }
+    if (to_plural) {
+        if (!strcmpi(endstring - 3, "man")
+            && badman(basestr, to_plural)) {
+            Strcasecpy(endstring, "s");
+            return TRUE;
+        }
+    } else {
+        if (!strcmpi(endstring - 3, "men")
+            && badman(basestr, to_plural))
+            return TRUE;
     }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
@@ -2010,10 +2174,14 @@ char *str;
     return 0;
 }
 
-/* Plural routine; chiefly used for user-defined fruits.  We have to try to
- * account for everything reasonable the player has; something unreasonable
- * can still break the code.  However, it's still a lot more accurate than
- * "just add an s at the end", which Rogue uses...
+/* Plural routine; once upon a time it may have been chiefly used for
+ * user-defined fruits, but it is now used extensively throughout the
+ * program.
+ *
+ * For fruit, we have to try to account for everything reasonable the
+ * player has; something unreasonable can still break the code.
+ * However, it's still a lot more accurate than "just add an 's' at the
+ * end", which Rogue uses...
  *
  * Also used for plural monster names ("Wiped out all homunculi." or the
  * vanquished monsters list) and body parts.  A lot of unique monsters have
@@ -2063,7 +2231,7 @@ const char *oldstr;
     spot--;
     while (spot > str && *spot == ' ')
         spot--; /* Strip blanks from end */
-    *(spot + 1) = 0;
+    *(spot + 1) = '\0';
     /* Now spot is the last character of the string */
 
     len = strlen(str);
@@ -2078,7 +2246,6 @@ const char *oldstr;
     {
         static const char *const already_plural[] = {
             "ae",  /* algae, larvae, &c */
-            "men", /* also catches women, watchmen */
             "matzot", 0,
         };
 
@@ -2094,9 +2261,8 @@ const char *oldstr;
 
     /* man/men ("Wiped out all cavemen.") */
     if (len >= 3 && !strcmpi(spot - 2, "man")
-        /* exclude shamans and humans */
-        && (len < 6 || strcmpi(spot - 5, "shaman"))
-        && (len < 5 || strcmpi(spot - 4, "human"))) {
+        /* exclude shamans and humans etc */
+        && !badman(str, TRUE)) {
         Strcasecpy(spot - 1, "en");
         goto bottom;
     }
@@ -2271,7 +2437,8 @@ const char *oldstr;
 
     } else { /* input doesn't end in 's' */
 
-        if (!BSTRCMPI(bp, p - 3, "men")) {
+        if (!BSTRCMPI(bp, p - 3, "men")
+            && !badman(bp, FALSE)) {
             Strcasecpy(p - 2, "an");
             goto bottom;
         }
@@ -2296,6 +2463,54 @@ bottom:
         Strcat(bp, excess);
 
     return bp;
+}
+
+boolean
+badman(basestr, to_plural)
+const char *basestr;
+boolean to_plural;            /* true => makeplural, false => makesingular */
+{
+    int i, al;
+    char *endstr, *spot;
+    /* these are all the prefixes for *man that don't have a *men plural */
+    const char *no_men[] = {
+        "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
+        "ceru", "corner", "decu", "des", "dura", "fir", "hanu", "het",
+        "infrahu", "inhu", "nonhu", "otto", "out", "prehu", "protohu",
+        "subhu", "superhu", "talis", "unhu", "sha",
+        "hu", "un", "le", "re", "so", "to", "at", "a",
+    };
+    /* these are all the prefixes for *men that don't have a *man singular */
+    const char *no_man[] = {
+        "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
+        "hegu", "preno", "sonar", "speci", "dai", "exa", "fla", "sta", "teg",
+        "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
+        "o", "a",
+    };
+
+    if (!basestr || strlen(basestr) < 4)
+        return FALSE;
+
+    endstr = eos((char *)basestr);
+
+    if (to_plural) {
+        for (i = 0; i < SIZE(no_men); i++) {
+            al = (int) strlen(no_men[i]);
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_men[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
+                return TRUE;
+        }
+    } else {
+        for (i = 0; i < SIZE(no_man); i++) {
+            al = (int) strlen(no_man[i]);
+            spot = endstr - (al + 3);
+            if (!BSTRNCMPI(basestr, spot, no_man[i], al)
+                && (spot == basestr || *(spot - 1) == ' '))
+                return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /* compare user string against object name string using fuzzy matching */
@@ -2457,6 +2672,8 @@ struct alt_spellings {
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
     { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
+    /* if we ever add other sizes, move this to o_ranges[] with "bag" */
+    { "box", LARGE_BOX },
     /* normally we wouldn't have to worry about unnecessary <space>, but
        " stone" will get stripped off, preventing a wishymatch; that actually
        lets "flint stone" be a match, so we also accept bogus "flintstone" */
@@ -2550,7 +2767,7 @@ struct obj *no_wish;
     register struct obj *otmp;
     int cnt, spe, spesgn, typ, very, rechrg;
     int blessed, uncursed, iscursed, ispoisoned, isgreased;
-    int eroded, eroded2, erodeproof;
+    int eroded, eroded2, erodeproof, locked, unlocked, broken;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
@@ -2576,9 +2793,11 @@ struct obj *no_wish;
     char *un, *dn, *actualn, *origbp = bp;
     const char *name = 0;
 
-    cnt = spe = spesgn = typ = very = rechrg = blessed = uncursed = iscursed =
-        ispoisoned = isgreased = eroded = eroded2 = erodeproof = halfeaten =
-            islit = unlabeled = ishistoric = isdiluted = trapped = 0;
+    cnt = spe = spesgn = typ = 0;
+    very = rechrg = blessed = uncursed = iscursed = ispoisoned =
+        isgreased = eroded = eroded2 = erodeproof = halfeaten =
+        islit = unlabeled = ishistoric = isdiluted = trapped =
+        locked = unlocked = broken = 0;
     tvariety = RANDOM_TIN;
     mntmp = NON_PM;
 #define UNDEFINED 0
@@ -2666,6 +2885,13 @@ struct obj *no_wish;
                 trapped = 1;
         } else if (!strncmpi(bp, "untrapped ", l = 10)) {
             trapped = 2; /* not trapped */
+        /* locked, unlocked, broken: box/chest lock states */
+        } else if (!strncmpi(bp, "locked ", l = 7)) {
+            locked = 1, unlocked = broken = 0;
+        } else if (!strncmpi(bp, "unlocked ", l = 9)) {
+            unlocked = 1, locked = broken = 0;
+        } else if (!strncmpi(bp, "broken ", l = 7)) {
+            broken = 1, locked = unlocked = 0;
         } else if (!strncmpi(bp, "greased ", l = 8)) {
             isgreased = 1;
         } else if (!strncmpi(bp, "very ", l = 5)) {
@@ -2847,9 +3073,14 @@ struct obj *no_wish;
         if (!strstri(bp, "wand ") && !strstri(bp, "spellbook ")
             && !strstri(bp, "finger ")) {
             if ((p = strstri(bp, "tin of ")) != 0) {
-                tmp = tin_variety_txt(p + 7, &tinv);
-                tvariety = tinv;
-                mntmp = name_to_mon(p + 7 + tmp);
+                if (!strcmpi(p + 7, "spinach")) {
+                    contents = SPINACH;
+                    mntmp = NON_PM;
+                } else {
+                    tmp = tin_variety_txt(p + 7, &tinv);
+                    tvariety = tinv;
+                    mntmp = name_to_mon(p + 7 + tmp);
+                }
                 typ = TIN;
                 goto typfnd;
             } else if ((p = strstri(bp, " of ")) != 0
@@ -2858,35 +3089,32 @@ struct obj *no_wish;
         }
     }
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
-    if (strncmpi(bp, "samurai sword", 13))   /* not the "samurai" monster! */
-        if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
-            if (strncmpi(bp, "ninja-to", 8)) /* not the "ninja" rank */
-                if (strncmpi(bp, "master key",
-                             10)) /* not the "master" rank */
-                    if (strncmpi(bp, "magenta", 7)) /* not the "mage" rank */
-                        if (mntmp < LOW_PM && strlen(bp) > 2
-                            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
-                            int mntmptoo,
-                                mntmplen; /* double check for rank title */
-                            char *obp = bp;
-                            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
-                            bp += mntmp != mntmptoo
-                                      ? (int) strlen(mons[mntmp].mname)
+    if (strncmpi(bp, "samurai sword", 13)  /* not the "samurai" monster! */
+        && strncmpi(bp, "wizard lock", 11) /* not the "wizard" monster! */
+        && strncmpi(bp, "ninja-to", 8)     /* not the "ninja" rank */
+        && strncmpi(bp, "master key", 10)  /* not the "master" rank */
+        && strncmpi(bp, "magenta", 7)) {   /* not the "mage" rank */
+        if (mntmp < LOW_PM && strlen(bp) > 2
+            && (mntmp = name_to_mon(bp)) >= LOW_PM) {
+            int mntmptoo, mntmplen; /* double check for rank title */
+            char *obp = bp;
+
+            mntmptoo = title_to_mon(bp, (int *) 0, &mntmplen);
+            bp += (mntmp != mntmptoo) ? (int) strlen(mons[mntmp].mname)
                                       : mntmplen;
-                            if (*bp == ' ')
-                                bp++;
-                            else if (!strncmpi(bp, "s ", 2))
-                                bp += 2;
-                            else if (!strncmpi(bp, "es ", 3))
-                                bp += 3;
-                            else if (!*bp && !actualn && !dn && !un
-                                     && !oclass) {
-                                /* no referent; they don't really mean a
-                                 * monster type */
-                                bp = obp;
-                                mntmp = NON_PM;
-                            }
-                        }
+            if (*bp == ' ') {
+                bp++;
+            } else if (!strncmpi(bp, "s ", 2)) {
+                bp += 2;
+            } else if (!strncmpi(bp, "es ", 3)) {
+                bp += 3;
+            } else if (!*bp && !actualn && !dn && !un && !oclass) {
+                /* no referent; they don't really mean a monster type */
+                bp = obp;
+                mntmp = NON_PM;
+            }
+        }
+    }
 
     /* first change to singular if necessary */
     if (*bp) {
@@ -2952,7 +3180,8 @@ struct obj *no_wish;
      * gold/money concept.  Maybe we want to add other monetary units as
      * well in the future. (TH)
      */
-    if (!BSTRCMPI(bp, p - 10, "gold piece") || !BSTRCMPI(bp, p - 7, "zorkmid")
+    if (!BSTRCMPI(bp, p - 10, "gold piece")
+        || !BSTRCMPI(bp, p - 7, "zorkmid")
         || !strcmpi(bp, "gold") || !strcmpi(bp, "money")
         || !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
         if (cnt > 5000 && !wizard)
@@ -2975,15 +3204,19 @@ struct obj *no_wish;
 
     /* Search for class names: XXXXX potion, scroll of XXXXX.  Avoid */
     /* false hits on, e.g., rings for "ring mail". */
-    if (strncmpi(bp, "enchant ", 8) && strncmpi(bp, "destroy ", 8)
+    if (strncmpi(bp, "enchant ", 8)
+        && strncmpi(bp, "destroy ", 8)
         && strncmpi(bp, "detect food", 11)
-        && strncmpi(bp, "food detection", 14) && strncmpi(bp, "ring mail", 9)
+        && strncmpi(bp, "food detection", 14)
+        && strncmpi(bp, "ring mail", 9)
         && strncmpi(bp, "studded leather armor", 21)
         && strncmpi(bp, "leather armor", 13)
-        && strncmpi(bp, "tooled horn", 11) && strncmpi(bp, "food ration", 11)
+        && strncmpi(bp, "tooled horn", 11)
+        && strncmpi(bp, "food ration", 11)
         && strncmpi(bp, "meat ring", 9))
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
+
             if (!strncmpi(bp, wrp[i], j)) {
                 oclass = wrpsym[i];
                 if (oclass != AMULET_CLASS) {
@@ -3064,7 +3297,10 @@ retry:
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p - 6, " glass") || !strcmpi(bp, "glass")) {
         register char *g = bp;
-        if (strstri(g, "broken"))
+
+        /* treat "broken glass" as a non-existent item; since "broken" is
+           also a chest/box prefix it might have been stripped off above */
+        if (broken || strstri(g, "broken"))
             return (struct obj *) 0;
         if (!strncmpi(g, "worthless ", 10))
             g += 10;
@@ -3099,10 +3335,16 @@ srch:
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
 
-            if ((zn = OBJ_NAME(objects[i])) && !strcmpi(actualn, zn)) {
+            if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(actualn, zn)) {
                 typ = i;
                 goto typfnd;
             }
+        }
+        /* "tin of foo" would be caught above, but plain "tin" has
+           a random chance of yielding "tin wand" unless we do this */
+        if (!strcmpi(actualn, "tin")) {
+            typ = TIN;
+            goto typfnd;
         }
     }
 
@@ -3470,7 +3712,7 @@ typfnd:
             otmp->spe = (rn2(10) ? -1 : 0);
             break;
         }
-    /* fall through, if wizard */
+        /*FALLTHRU*/
     default:
         otmp->spe = spe;
     }
@@ -3577,6 +3819,28 @@ typfnd:
     if (trapped) {
         if (Is_box(otmp) || typ == TIN)
             otmp->otrapped = (trapped == 1);
+    }
+    /* empty for containers rather than for tins */
+    if (contents == EMPTY) {
+        if (otmp->otyp == BAG_OF_TRICKS || otmp->otyp == HORN_OF_PLENTY) {
+            if (otmp->spe > 0)
+                otmp->spe = 0;
+        } else if (Has_contents(otmp)) {
+            /* this assumes that artifacts can't be randomly generated
+               inside containers */
+            delete_contents(otmp);
+            otmp->owt = weight(otmp);
+        }
+    }
+    /* set locked/unlocked/broken */
+    if (Is_box(otmp)) {
+        if (locked) {
+            otmp->olocked = 1, otmp->obroken = 0;
+        } else if (unlocked) {
+            otmp->olocked = 0, otmp->obroken = 0;
+        } else if (broken) {
+            otmp->olocked = 0, otmp->obroken = 1;
+        }
     }
 
     if (isgreased)

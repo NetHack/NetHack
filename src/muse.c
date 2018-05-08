@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1469840918 2016/07/30 01:08:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1505181522 2017/09/12 01:58:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -603,7 +603,7 @@ struct monst *mtmp;
     int i, fleetim, how = 0;
     struct obj *otmp = m.defensive;
     boolean vis, vismon, oseen;
-    const char *Mnam, *mcsa = "%s can see again.";
+    const char *Mnam;
 
     if ((i = precheck(mtmp, otmp)) != 0)
         return i;
@@ -628,10 +628,7 @@ struct monst *mtmp;
                 pline_The("tip of %s's horn glows!", mon_nam(mtmp));
         }
         if (!mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
+            mcureblindness(mtmp, vismon);
         } else if (mtmp->mconf || mtmp->mstun) {
             mtmp->mconf = mtmp->mstun = 0;
             if (vismon)
@@ -939,12 +936,8 @@ struct monst *mtmp;
         mtmp->mhp += i;
         if (mtmp->mhp > mtmp->mhpmax)
             mtmp->mhp = ++mtmp->mhpmax;
-        if (!otmp->cursed && !mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!otmp->cursed && !mtmp->mcansee)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks better.", Monnam(mtmp));
         if (oseen)
@@ -957,12 +950,8 @@ struct monst *mtmp;
         mtmp->mhp += i;
         if (mtmp->mhp > mtmp->mhpmax)
             mtmp->mhp = (mtmp->mhpmax += (otmp->blessed ? 5 : 2));
-        if (!mtmp->mcansee) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!mtmp->mcansee)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks much better.", Monnam(mtmp));
         if (oseen)
@@ -974,12 +963,8 @@ struct monst *mtmp;
         if (otmp->otyp == POT_SICKNESS)
             unbless(otmp); /* Pestilence */
         mtmp->mhp = (mtmp->mhpmax += (otmp->blessed ? 8 : 4));
-        if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS) {
-            mtmp->mcansee = 1;
-            mtmp->mblinded = 0;
-            if (vismon)
-                pline(mcsa, Monnam(mtmp));
-        }
+        if (!mtmp->mcansee && otmp->otyp != POT_SICKNESS)
+            mcureblindness(mtmp, vismon);
         if (vismon)
             pline("%s looks completely healed.", Monnam(mtmp));
         if (oseen)
@@ -1020,7 +1005,7 @@ try_again:
             goto try_again;
         if (!rn2(3))
             return WAN_TELEPORTATION;
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case 0:
     case 1:
         return SCR_TELEPORTATION;
@@ -1028,7 +1013,7 @@ try_again:
     case 10:
         if (!rn2(3))
             return WAN_CREATE_MONSTER;
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case 2:
         return SCR_CREATE_MONSTER;
     case 3:
@@ -1144,6 +1129,24 @@ struct monst *mtmp;
             m.offensive = obj;
             m.has_offense = MUSE_WAN_STRIKING;
         }
+#if 0   /* use_offensive() has had some code to support wand of teleportation
+         * for a long time, but find_offensive() never selected one;
+         * so for the time being, this is still disabled */
+        nomore(MUSE_WAN_TELEPORTATION);
+        if (obj->otyp == WAN_TELEPORTATION && obj->spe > 0
+            /* don't give controlled hero a free teleport */
+            && !Teleport_control
+            /* do try to move hero to a more vulnerable spot */
+            && (onscary(u.ux, u.uy, mtmp)
+                || (u.ux == xupstair && u.uy == yupstair)
+                || (u.ux == xdnstair && u.uy == ydnstair)
+                || (u.ux == sstairs.sx && u.uy == sstairs.sy)
+                || (u.ux == xupladder && u.uy == yupladder)
+                || (u.ux == xdnladder && u.uy == ydnladder))) {
+            m.offensive = obj;
+            m.has_offense = MUSE_WAN_TELEPORTATION;
+        }
+#endif
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && multi >= 0) {
             m.offensive = obj;
@@ -1248,6 +1251,7 @@ register struct obj *otmp;
                 makeknown(WAN_STRIKING);
         }
         break;
+#if 0   /* disabled because find_offensive() never picks WAN_TELEPORTATION */
     case WAN_TELEPORTATION:
         if (mtmp == &youmonst) {
             if (zap_oseen)
@@ -1262,6 +1266,7 @@ register struct obj *otmp;
                 (void) rloc(mtmp, TRUE);
         }
         break;
+#endif
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
@@ -2173,6 +2178,20 @@ const char *fmt, *str;
         return TRUE;
     }
     return FALSE;
+}
+
+/* cure mon's blindness (use_defensive, dog_eat, meatobj) */
+void
+mcureblindness(mon, verbos)
+struct monst *mon;
+boolean verbos;
+{
+    if (!mon->mcansee) {
+        mon->mcansee = 1;
+        mon->mblinded = 0;
+        if (verbos && haseyes(mon->data))
+            pline("%s can see again.", Monnam(mon));
+    }
 }
 
 /* TRUE if the monster ate something */

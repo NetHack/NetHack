@@ -1,5 +1,6 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -134,13 +135,19 @@ onscary(x, y, mtmp)
 int x, y;
 struct monst *mtmp;
 {
-    boolean epresent = sengr_at("Elbereth", x, y, TRUE);
-
     /* creatures who are directly resistant to magical scaring:
-     * Rodney, lawful minions, angels, the Riders */
+     * Rodney, lawful minions, Angels, the Riders, shopkeepers
+     * inside their own shop, priests inside their own temple */
     if (mtmp->iswiz || is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL]
-        || is_rider(mtmp->data))
+        || is_rider(mtmp->data)
+        || (mtmp->isshk && inhishop(mtmp))
+        || (mtmp->ispriest && inhistemple(mtmp)))
         return FALSE;
+
+    /* <0,0> is used by musical scaring to check for the above;
+     * it doesn't care about scrolls or engravings or dungeon branch */
+    if (x == 0 && y == 0)
+        return TRUE;
 
     /* should this still be true for defiled/molochian altars? */
     if (IS_ALTAR(levl[x][y].typ)
@@ -152,16 +159,19 @@ struct monst *mtmp;
     if (sobj_at(SCR_SCARE_MONSTER, x, y))
         return TRUE;
 
-    /* creatures who don't (or can't) fear a written Elbereth:
-     * all the above plus shopkeepers, guards, blind or
-     * peaceful monsters, humans, and minotaurs.
+    /*
+     * Creatures who don't (or can't) fear a written Elbereth:
+     * all the above plus shopkeepers (even if poly'd into non-human),
+     * vault guards (also even if poly'd), blind or peaceful monsters,
+     * humans and elves, and minotaurs.
      *
-     * if the player isn't actually on the square OR the player's image
-     * isn't displaced to the square, no protection is being granted
+     * If the player isn't actually on the square OR the player's image
+     * isn't displaced to the square, no protection is being granted.
      *
      * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
-     * Astral Plane; the influence of the Valar only reaches so far.  */
-    return (epresent
+     * Astral Plane; the influence of the Valar only reaches so far.
+     */
+    return (sengr_at("Elbereth", x, y, TRUE)
             && ((u.ux == x && u.uy == y)
                 || (Displaced && mtmp->mux == x && mtmp->muy == y))
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
@@ -617,7 +627,8 @@ toofar:
      */
 
     if (!mtmp->mpeaceful || (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
-        if (inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
+        if (inrange && !noattacks(mdat)
+            && (Upolyd ? u.mh : u.uhp) > 0 && !scared && tmp != 3)
             if (mattacku(mtmp))
                 return 1; /* monster died (e.g. exploded) */
 
@@ -752,6 +763,7 @@ register int after;
     boolean uses_items = 0, setlikes = 0;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
+    boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
     struct monst *mtoo;
     schar mmoved = 0; /* not strictly nec.: chi >= 0 will do */
@@ -1245,15 +1257,27 @@ postmov:
                 boolean btrapped = (here->doormask & D_TRAPPED) != 0,
                         observeit = canseeit && canspotmon(mtmp);
 
+                /* if mon has MKoT, disarm door trap; no message given */
+                if (btrapped && has_magic_key(mtmp)) {
+                    /* BUG: this lets a vampire or blob or a doorbuster
+                       holding the Key disarm the trap even though it isn't
+                       using that Key when squeezing under or smashing the
+                       door.  Not significant enough to worry about; perhaps
+                       the Key's magic is more powerful for monsters? */
+                    here->doormask &= ~D_TRAPPED;
+                    btrapped = FALSE;
+                }
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && (amorphous(ptr)
                         || (can_fog(mtmp)
                             && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
-                                          canspotmon(mtmp))))) {
+                                          sawmon)))) {
+                    /* update cached value for vamp_shift() case */
+                    ptr = mtmp->data;
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
-                               || ptr == &mons[PM_YELLOW_LIGHT])
+                               || ptr->mlet == S_LIGHT)
                                   ? "flows"
                                   : "oozes");
                 } else if (here->doormask & D_LOCKED && can_unlock) {
@@ -1625,13 +1649,11 @@ struct permonst *ptr;
 boolean domsg;
 {
     int reslt = 0;
-    char fmtstr[BUFSZ];
+    char oldmtype[BUFSZ];
 
-    if (domsg) {
-        Sprintf(fmtstr, "You %s %%s where %s was.",
-                sensemon(mon) ? "now detect" : "observe",
-                an(m_monnam(mon)));
-    }
+    /* remember current monster type before shapechange */
+    Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
+
     if (mon->data == ptr) {
         /* already right shape */
         reslt = 1;
@@ -1639,9 +1661,13 @@ boolean domsg;
     } else if (is_vampshifter(mon)) {
         reslt = newcham(mon, ptr, FALSE, FALSE);
     }
+
     if (reslt && domsg) {
-        pline(fmtstr, an(m_monnam(mon)));
+        pline("You %s %s where %s was.",
+              !canseemon(mon) ? "now detect" : "observe",
+              noname_monnam(mon, ARTICLE_A), oldmtype);
     }
+
     return reslt;
 }
 

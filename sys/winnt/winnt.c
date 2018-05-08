@@ -1,4 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date: 1431737068 2015/05/16 00:44:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	winnt.c	$NHDT-Date: 1524321419 2018/04/21 14:36:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -35,6 +35,9 @@
 /* globals required within here */
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+typedef HWND(WINAPI *GETCONSOLEWINDOW)();
+static HWND GetConsoleHandle(void);
+static HWND GetConsoleHwnd(void);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -316,6 +319,118 @@ int interjection_type;
         msmsg(interjection_buf[interjection_type]);
 }
 
+#ifdef RUNTIME_PASTEBUF_SUPPORT
+
+void port_insert_pastebuf(buf)
+char *buf;
+{
+    /* This implementation will utilize the windows clipboard
+     * to accomplish this.
+     */
+
+    char *tmp = buf;
+    HGLOBAL hglbCopy; 
+    WCHAR *w, w2[2];
+    int cc, rc, abytes;
+    LPWSTR lpwstrCopy;
+    HANDLE hresult;
+
+    if (!buf)
+        return; 
+ 
+    cc = strlen(buf);
+    /* last arg=0 means "tell me the size of the buffer that I need" */
+    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w2, 0);
+    if (!rc) return;
+
+    abytes = rc * sizeof(WCHAR);
+    w = (WCHAR *)alloc(abytes);     
+    /* Housekeeping need: +free(w) */
+
+    rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w, rc);
+    if (!rc) {
+        free(w);
+        return;
+    }
+    if (!OpenClipboard(NULL)) {
+        free(w);
+        return;
+    }
+    /* Housekeeping need: +CloseClipboard(), free(w) */
+
+    EmptyClipboard(); 
+
+    /* allocate global mem obj to hold the text */
+ 
+    hglbCopy = GlobalAlloc(GMEM_MOVEABLE, abytes);
+    if (hglbCopy == NULL) { 
+        CloseClipboard(); 
+        free(w);
+        return;
+    } 
+    /* Housekeeping need: +GlobalFree(hglbCopy), CloseClipboard(), free(w) */
+ 
+    lpwstrCopy = (LPWSTR)GlobalLock(hglbCopy);
+    /* Housekeeping need: +GlobalUnlock(hglbCopy), GlobalFree(hglbCopy),
+                            CloseClipboard(), free(w) */
+
+    memcpy(lpwstrCopy, w, abytes);
+    GlobalUnlock(hglbCopy);
+    /* Housekeeping need: GlobalFree(hglbCopy), CloseClipboard(), free(w) */
+
+    /* put it on the clipboard */
+    hresult = SetClipboardData(CF_UNICODETEXT, hglbCopy);
+    if (!hresult) {
+        raw_printf("Error copying to clipboard.\n");
+        GlobalFree(hglbCopy); /* only needed if clipboard didn't accept data */
+    }
+    /* Housekeeping need: CloseClipboard(), free(w) */
+ 
+    CloseClipboard(); 
+    free(w);
+    return;
+}
+
+static HWND
+GetConsoleHandle(void)
+{
+    HMODULE hMod = GetModuleHandle("kernel32.dll");
+    GETCONSOLEWINDOW pfnGetConsoleWindow =
+        (GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
+    if (pfnGetConsoleWindow)
+        return pfnGetConsoleWindow();
+    else
+        return GetConsoleHwnd();
+}
+
+static HWND
+GetConsoleHwnd(void)
+{
+    int iterations = 0;
+    HWND hwndFound = 0;
+    char OldTitle[1024], NewTitle[1024], TestTitle[1024];
+
+    /* Get current window title */
+    GetConsoleTitle(OldTitle, sizeof OldTitle);
+
+    (void) sprintf(NewTitle, "NETHACK%d/%d", GetTickCount(),
+                   GetCurrentProcessId());
+    SetConsoleTitle(NewTitle);
+
+    GetConsoleTitle(TestTitle, sizeof TestTitle);
+    while (strcmp(TestTitle, NewTitle) != 0) {
+        iterations++;
+        /* sleep(0); */
+        GetConsoleTitle(TestTitle, sizeof TestTitle);
+    }
+    hwndFound = FindWindow(NULL, NewTitle);
+    SetConsoleTitle(OldTitle);
+    /*       printf("%d iterations\n", iterations); */
+    return hwndFound;
+}
+
+#endif
+
 #ifdef RUNTIME_PORT_ID
 /*
  * _M_IX86 is Defined for x86 processors. This is not defined for x64
@@ -326,23 +441,23 @@ int interjection_type;
  */
 #ifndef _M_IX86
 #ifdef _M_X64
-#define TARGET_PORT "(x64) "
+#define TARGET_PORT "x64"
 #endif
 #ifdef _M_IA64
-#define TARGET_PORT "(IA64) "
+#define TARGET_PORT "IA64"
 #endif
 #endif
 
 #ifndef TARGET_PORT
-#define TARGET_PORT "(x86) "
+#define TARGET_PORT "x86"
 #endif
 
-void
-append_port_id(buf)
+char *
+get_port_id(buf)
 char *buf;
 {
-    char *portstr = TARGET_PORT;
-    Sprintf(eos(buf), " %s", portstr);
+    Strcpy(buf, TARGET_PORT);
+    return buf;
 }
 #endif /* RUNTIME_PORT_ID */
 

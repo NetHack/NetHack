@@ -1,5 +1,6 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1491705573 2017/04/09 02:39:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1522891623 2018/04/05 01:27:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -1324,6 +1325,10 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
 
     if (!level.flags.hero_memory || unconstrained || mdetected) {
         flush_screen(1);                 /* flush temp screen */
+        /* the getpos() prompt from browse_map() is only shown when
+           flags.verbose is set, but make this unconditional so that
+           not-verbose users become aware of the prompting situation */
+        You("sense your surroundings.");
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
         if (extended)
@@ -1394,9 +1399,7 @@ genericptr_t num;
         }
         if (!canspotmon(mtmp) && !glyph_is_invisible(levl[zx][zy].glyph))
             map_invisible(zx, zy);
-    } else if (glyph_is_invisible(levl[zx][zy].glyph)) {
-        unmap_object(zx, zy);
-        newsym(zx, zy);
+    } else if (unmap_invisible(zx, zy)) {
         (*(int *) num)++;
     }
 }
@@ -1571,9 +1574,9 @@ boolean via_warning;
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
-            mtmp->mundetected = 0;
-            newsym(x, y);
-            goto find;
+        mtmp->mundetected = 0;
+        newsym(x, y);
+        goto find;
     }
     return 0;
 }
@@ -1646,11 +1649,8 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     /* see if an invisible monster has moved--if Blind,
                      * feel_location() already did it
                      */
-                    if (!aflag && !mtmp && !Blind
-                        && glyph_is_invisible(levl[x][y].glyph)) {
-                        unmap_object(x, y);
-                        newsym(x, y);
-                    }
+                    if (!aflag && !mtmp && !Blind)
+                        (void) unmap_invisible(x, y);
 
                     if ((trap = t_at(x, y)) && !trap->tseen && !rnl(8)) {
                         nomul(0);
@@ -1799,28 +1799,60 @@ int default_glyph, which_subset;
     return glyph;
 }
 
+#ifdef DUMPLOG
 void
 dump_map()
 {
-    int x, y, glyph;
+    int x, y, glyph, skippedrows, lastnonblank;
     int subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
     int default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
     char buf[BUFSZ];
+    boolean blankrow, toprow;
 
+    /*
+     * Squeeze out excess vertial space when dumping the map.
+     * If there are any blank map rows at the top, suppress them
+     * (our caller has already printed a separator).  If there is
+     * more than one blank map row at the bottom, keep just one.
+     * Any blank rows within the middle of the map are kept.
+     * Note: putstr() with winid==0 is for dumplog.
+     */
+    skippedrows = 0;
+    toprow = TRUE;
     for (y = 0; y < ROWNO; y++) {
+        blankrow = TRUE; /* assume blank until we discover otherwise */
+        lastnonblank = -1; /* buf[] index rather than map's x */
         for (x = 1; x < COLNO; x++) {
             int ch, color;
             unsigned special;
 
-            glyph = reveal_terrain_getglyph(x,y, FALSE, u.uswallow,
+            glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
             (void) mapglyph(glyph, &ch, &color, &special, x, y);
-            buf[x-1] = ch;
+            buf[x - 1] = ch;
+            if (ch != ' ') {
+                blankrow = FALSE;
+                lastnonblank = x - 1;
+            }
         }
-        buf[x-2] = '\0';
-        putstr(0,0, buf);
+        if (!blankrow) {
+            buf[lastnonblank + 1] = '\0';
+            if (toprow) {
+                skippedrows = 0;
+                toprow = FALSE;
+            }
+            for (x = 0; x < skippedrows; x++)
+                putstr(0, 0, "");
+            putstr(0, 0, buf); /* map row #y */
+            skippedrows = 0;
+        } else {
+            ++skippedrows;
+        }
     }
+    if (skippedrows)
+        putstr(0, 0, "");
 }
+#endif /* DUMPLOG */
 
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain */

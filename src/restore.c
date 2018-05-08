@@ -1,5 +1,6 @@
 /* NetHack 3.6	restore.c	$NHDT-Date: 1451082255 2015/12/25 22:24:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -744,7 +745,7 @@ xchar ltmp;
         }
 #endif /* ?AMIGA */
         pline("Be seeing you...");
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
     }
 #endif /* MFLOPPY */
     bufon(nfd);

@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1457207036 2016/03/05 19:43:56 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.29 $
+# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1519600525 2018/02/25 23:15:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
 #	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #
@@ -308,6 +308,9 @@ PPMWRITERS  = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 PPMWRIT2    = $(O)ppmwrit2.o $(O)alloc.o $(O)panic.o
 endif
 
+#REGEX = $(O)pmatchregex.o
+#REGEX = $(O)cppregex.o
+REGEX = $(O)posixreg.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -336,7 +339,7 @@ VOBJ19 = $(O)trap.o     $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
 VOBJ20 = $(O)vis_tab.o  $(O)weapon.o  $(O)were.o     $(O)wield.o    $(O)windows.o
 VOBJ21 = $(O)wintty.o   $(O)wizard.o  $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ22 = $(O)zap.o      $(O)light.o   $(O)dlb.o      $(O)dig.o      $(O)teleport.o
-VOBJ23 = $(O)region.o $(O)sys.o $(O)pmatchre.o $(O)string.o $(O)unicode.o
+VOBJ23 = $(O)region.o   $(O)sys.o     $(REGEX)
 
 SOBJ   = $(O)msdos.o    $(O)sound.o   $(O)pcsys.o    $(O)tty.o	    $(O)unix.o \
 	 $(O)video.o    $(O)vidtxt.o  $(O)pckeys.o
@@ -648,7 +651,7 @@ $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
 #==========================================
 
 $(U)lev_comp.exe:  $(SPLEVOBJS)
-	@rm -f temp.a
+	-rm -f temp.a
 	@ar ru temp.a $(SPLEVOBJS)
 	$(LINK) $(LFLAGS) -o$@ temp.a
 
@@ -813,17 +816,17 @@ $(DAT)/nhtiles.bmp: $(TILEFILES) $(U)tile2bmp.exe
 	@$(subst /,\,chdir $(SRC))
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXTIO)
-	@rm -f temp.a
+	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO)
 	$(LINK) $(LFLAGS) -o$@ $(O)tile2bmp.o temp.a
 
 $(U)tile2bin.exe: $(O)tile2bin.o $(TEXTIO)
-	@rm -f temp.a
+	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO)
 	$(LINK) $(LFLAGS) -o$@ $(O)tile2bin.o temp.a
 
 $(U)til2bin2.exe: $(O)til2bin2.o $(TEXTIO2)
-	@rm -f temp.a
+	-rm -f temp.a
 	@ar ru temp.a $(TEXTIO2)
 	$(LINK) $(LFLAGS) -o$@ $(O)til2bin2.o temp.a
 
@@ -1035,6 +1038,15 @@ $(O)unix.o:	 $(HACK_H) $(SSHR)/pcunix.c
 $(O)pcsys.o : $(HACK_H) $(SSHR)/pcsys.c
 	$(CC) $(cflags) -o$@ $(SSHR)/pcsys.c
 
+$(O)posixreg.o : $(HACK_H) $(SSHR)/posixreg.c
+	$(CC) $(cflags) -o$@ $(SSHR)/posixreg.c
+
+$(O)cppregex.o : $(HACK_H) $(SSHR)/cppregex.cpp
+	gpp $(cflags) -std=c++11 -o$@ $(SSHR)/cppregex.cpp
+
+$(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
+	$(CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
+
 # sys/msdos
 $(O)msdos.o : $(HACK_H)  $(MSYS)/msdos.c
 #	$(CC) $(cflags) -o$@ $(MSYS)/msdos.c
@@ -1084,8 +1096,6 @@ $(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
 		#$(INCL)/win32api.h
 	$(CC) $(cflags) -o$@ ../sys/share/pcmain.c
-$(O)pcsys.o: ../sys/share/pcsys.c $(HACK_H)
-	$(CC) $(cflags) -o$@ ../sys/share/pcsys.c
 $(O)pctty.o: ../sys/share/pctty.c $(HACK_H)
 	$(CC) $(cflags) -o$@ ../sys/share/pctty.c
 $(O)pcunix.o: ../sys/share/pcunix.c $(HACK_H)

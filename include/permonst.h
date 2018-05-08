@@ -1,5 +1,6 @@
 /* NetHack 3.6	permonst.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef PERMONST_H
@@ -70,7 +71,7 @@ extern NEARDATA struct permonst mons[]; /* the master list of monster types */
 #define FAST_SPEED 15
 #define VERY_FAST 24
 
-#define NON_PM PM_PLAYERMON          /* "not a monster" */
+#define NON_PM (-1)                  /* "not a monster" */
 #define LOW_PM (NON_PM + 1)          /* first monster in mons[] */
 #define SPECIAL_PM PM_LONG_WORM_TAIL /* [normal] < ~ < [special] */
 /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are

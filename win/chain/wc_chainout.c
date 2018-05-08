@@ -586,7 +586,6 @@ boolean is_restoring;
     (*tdp->nprocs->win_putmsghistory)(msg, is_restoring);
 }
 
-#ifdef STATUS_VIA_WINDOWPORT
 void
 chainout_status_init(vp)
 void *vp;
@@ -619,32 +618,16 @@ boolean enable;
 }
 
 void
-chainout_status_update(vp, idx, ptr, chg, percent)
+chainout_status_update(vp, idx, ptr, chg, percent, color, colormasks)
 void *vp;
-int idx, chg, percent;
+int idx, chg, percent, color;
 genericptr_t ptr;
+unsigned long *colormasks;
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_status_update)(idx, ptr, chg, percent);
+    (*tdp->nprocs->win_status_update)(idx, ptr, chg, percent, color, colormasks);
 }
-
-#ifdef STATUS_HILITES
-void
-chainout_status_threshold(vp, fldidx, thresholdtype, threshold, behavior,
-                          under, over)
-void *vp;
-int fldidx, thresholdtype;
-int behavior, under, over;
-anything threshold;
-{
-    struct chainout_data *tdp = vp;
-
-    (*tdp->nprocs->win_status_threshold)(fldidx, thresholdtype, threshold,
-                                         behavior, under, over);
-}
-#endif
-#endif
 
 boolean
 chainout_can_suspend(vp)
@@ -700,12 +683,7 @@ struct chain_procs chainout_procs = {
 
     chainout_outrip, chainout_preference_update, chainout_getmsghistory,
     chainout_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     chainout_status_init, chainout_status_finish, chainout_status_enablefield,
     chainout_status_update,
-#ifdef STATUS_HILITES
-    chainout_status_threshold,
-#endif
-#endif
     chainout_can_suspend,
 };

@@ -1,4 +1,6 @@
-# NetHack 3.6 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6 sysconf $NHDT-Date: 1524689450 2018/04/25 20:50:50 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 #
 # Sample sysconf file.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.
@@ -117,6 +119,14 @@ MAXPLAYERS=10
 #   %n player name
 #   %N first character of player name
 #DUMPLOGFILE=/tmp/nethack.%n.%d.log
+
+# Number of bones file pools.
+# The pool you belong to is determined at game start. You will
+# load and save bones only from that pool. Generally useful
+# for public servers only.
+# Changing this might make existing bones inaccessible.
+# Disabled by setting to 0, or commenting out.
+#BONES_POOLS=10
 
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.

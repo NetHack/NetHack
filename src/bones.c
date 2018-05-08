@@ -1,5 +1,6 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1450432756 2015/12/18 09:59:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1508827591 2017/10/24 06:46:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -45,14 +46,10 @@ STATIC_OVL void
 goodfruit(id)
 int id;
 {
-    register struct fruit *f;
+    struct fruit *f = fruit_from_indx(-id);
 
-    for (f = ffruit; f; f = f->nextf) {
-        if (f->fid == -id) {
-            f->fid = id;
-            return;
-        }
-    }
+    if (f)
+        f->fid = id;
 }
 
 STATIC_OVL void
@@ -128,7 +125,7 @@ boolean restore;
                     otmp->spe = 1;
 #endif
             } else if (otmp->otyp == EGG) {
-                otmp->spe = 0;
+                otmp->spe = 0; /* not "laid by you" in next game */
             } else if (otmp->otyp == TIN) {
                 /* make tins of unique monster's meat be empty */
                 if (otmp->corpsenm >= LOW_PM
@@ -137,24 +134,30 @@ boolean restore;
             } else if (otmp->otyp == CORPSE || otmp->otyp == STATUE) {
                 int mnum = otmp->corpsenm;
 
-                /* Discard incarnation details of unique
-                   monsters (by passing null instead of otmp
-                   for object), shopkeepers (by passing false
-                   for revival flag), temple priests, and
-                   vault guards in order to prevent corpse
-                   revival or statue reanimation. */
+                /* Discard incarnation details of unique monsters
+                   (by passing null instead of otmp for object),
+                   shopkeepers (by passing false for revival flag),
+                   temple priests, and vault guards in order to
+                   prevent corpse revival or statue reanimation. */
                 if (has_omonst(otmp)
                     && cant_revive(&mnum, FALSE, (struct obj *) 0)) {
                     free_omonst(otmp);
-                    /* mnum is now either human_zombie or
-                       doppelganger; for corpses of uniques,
-                       we need to force the transformation
-                       now rather than wait until a revival
-                       attempt, otherwise eating this corpse
+                    /* mnum is now either human_zombie or doppelganger;
+                       for corpses of uniques, we need to force the
+                       transformation now rather than wait until a
+                       revival attempt, otherwise eating this corpse
                        would behave as if it remains unique */
                     if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE)
                         set_corpsenm(otmp, mnum);
                 }
+            } else if ((otmp->otyp == iflags.mines_prize_type
+                        && !Is_mineend_level(&u.uz))
+                       || ((otmp->otyp == iflags.soko_prize_type1
+                            || otmp->otyp == iflags.soko_prize_type2)
+                           && !Is_sokoend_level(&u.uz))) {
+                /* "special prize" in this game becomes ordinary object
+                   if loaded into another game */
+                otmp->record_achieve_special = NON_PM;
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;
@@ -187,8 +190,8 @@ sanitize_name(namebuf)
 char *namebuf;
 {
     int c;
-    boolean strip_8th_bit =
-        !strcmp(windowprocs.name, "tty") && !iflags.wc_eight_bit_input;
+    boolean strip_8th_bit = (!strcmp(windowprocs.name, "tty")
+                             && !iflags.wc_eight_bit_input);
 
     /* it's tempting to skip this for single-user platforms, since
        only the current player could have left these bones--except
@@ -553,7 +556,7 @@ getbones()
 {
     register int fd;
     register int ok;
-    char c, *bonesid, oldbonesid[10];
+    char c, *bonesid, oldbonesid[40]; /* was [10]; more should be safer */
 
     if (discover) /* save bones files for real games */
         return 0;
@@ -585,7 +588,15 @@ getbones()
         }
         mread(fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
         mread(fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
-        if (strcmp(bonesid, oldbonesid) != 0) {
+        if (strcmp(bonesid, oldbonesid) != 0
+            /* from 3.3.0 through 3.6.0, bones in the quest branch stored
+               a bogus bonesid in the file; 3.6.1 fixed that, but for
+               3.6.0 bones to remain compatible, we need an extra test;
+               once compatibility with 3.6.x goes away, this can too
+               (we don't try to make this conditional upon the value of
+               VERSION_COMPATIBILITY because then we'd need patchlevel.h) */
+            && (strlen(bonesid) <= 2
+                || strcmp(bonesid + 2, oldbonesid) != 0)) {
             char errbuf[BUFSZ];
 
             Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,

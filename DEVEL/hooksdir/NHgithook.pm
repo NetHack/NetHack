@@ -1,7 +1,9 @@
 #
-# NHgithook.pm
+# NetHack 3.6  NHgithook.pm       $NHDT-Date: 1524689631 2018/04/25 20:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.6 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
 # NetHack Git Hook Module
-# $NHDT-Date$
 
 package NHgithook;
 use Cwd;
@@ -58,6 +60,51 @@ sub PRE {
 
 sub POST {
 	&do_hook("POST");
+}
+
+###
+### store githash and gitbranch in dat/gitinfo.txt
+###
+
+sub nhversioning {
+    use strict;
+    use warnings;
+
+    my $git_sha = `git rev-parse HEAD`;
+    $git_sha =~ s/\s+//g;
+    my $git_branch = `git rev-parse --abbrev-ref HEAD`;
+    $git_branch =~ s/\s+//g;
+    die "git rev-parse failed" unless(length $git_sha and length $git_branch);
+    my $exists = 0;
+
+    if (open my $fh, '<', 'dat/gitinfo.txt') {
+        $exists = 1;
+        my $hashok = 0;
+        my $branchok = 0;
+        while (my $line = <$fh>) {
+            if ((index $line, $git_sha) >= 0) {
+                $hashok++;
+            }
+            if ((index $line, $git_branch) >= 0) {
+                $branchok++;
+            }
+        }
+        close $fh;
+        if ($hashok && $branchok) {
+            print "dat/gitinfo.txt unchanged, githash=".$git_sha."\n";
+            return;
+        }
+    } else {
+	print "WARNING: Can't find dat directory\n" unless(-d "dat");
+    }
+    if (open my $fh, '>', 'dat/gitinfo.txt') {
+        my $how = ($exists ? "updated" : "created");
+        print $fh 'githash='.$git_sha."\n";
+        print $fh 'gitbranch='.$git_branch."\n";
+        print "dat/gitinfo.txt ".$how.", githash=".$git_sha."\n";
+    } else {
+	print "WARNING: Unable to open dat/gitinfo.txt: $!\n";
+    }
 }
 
 # PRIVATE

@@ -5,81 +5,87 @@
 #ifndef PROP_H
 #define PROP_H
 
-/*** What the properties are ***/
+/*** What the properties are ***
+ *
+ * note:  propertynames[] array in timeout.c has string values for these.
+ *        Property #0 is not used.
+ */
 /* Resistances to troubles */
-#define FIRE_RES 1
-#define COLD_RES 2
-#define SLEEP_RES 3
-#define DISINT_RES 4
-#define SHOCK_RES 5
-#define POISON_RES 6
-#define ACID_RES 7
-#define STONE_RES 8
-/* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
-#define DRAIN_RES 9
-#define SICK_RES 10
-#define INVULNERABLE 11
-#define ANTIMAGIC 12
-/* Troubles */
-#define STUNNED 13
-#define CONFUSION 14
-#define BLINDED 15
-#define DEAF 16
-#define SICK 17
-#define STONED 18
-#define STRANGLED 19
-#define VOMITING 20
-#define GLIB 21
-#define SLIMED 22
-#define HALLUC 23
-#define HALLUC_RES 24
-#define FUMBLING 25
-#define WOUNDED_LEGS 26
-#define SLEEPY 27
-#define HUNGER 28
-/* Vision and senses */
-#define SEE_INVIS 29
-#define TELEPAT 30
-#define WARNING 31
-#define WARN_OF_MON 32
-#define WARN_UNDEAD 33
-#define SEARCHING 34
-#define CLAIRVOYANT 35
-#define INFRAVISION 36
-#define DETECT_MONSTERS 37
-/* Appearance and behavior */
-#define ADORNED 38
-#define INVIS 39
-#define DISPLACED 40
-#define STEALTH 41
-#define AGGRAVATE_MONSTER 42
-#define CONFLICT 43
-/* Transportation */
-#define JUMPING 44
-#define TELEPORT 45
-#define TELEPORT_CONTROL 46
-#define LEVITATION 47
-#define FLYING 48
-#define WWALKING 49
-#define SWIMMING 50
-#define MAGICAL_BREATHING 51
-#define PASSES_WALLS 52
-/* Physical attributes */
-#define SLOW_DIGESTION 53
-#define HALF_SPDAM 54
-#define HALF_PHDAM 55
-#define REGENERATION 56
-#define ENERGY_REGENERATION 57
-#define PROTECTION 58
-#define PROT_FROM_SHAPE_CHANGERS 59
-#define POLYMORPH 60
-#define POLYMORPH_CONTROL 61
-#define UNCHANGING 62
-#define FAST 63
-#define REFLECTING 64
-#define FREE_ACTION 65
-#define FIXED_ABIL 66
-#define LIFESAVED 67
+enum prop_types {
+    FIRE_RES = 1,
+    COLD_RES,
+    SLEEP_RES,
+    DISINT_RES,
+    SHOCK_RES,
+    POISON_RES,
+    ACID_RES,
+    STONE_RES,
+    /* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
+    DRAIN_RES,
+    SICK_RES,
+    INVULNERABLE,
+    ANTIMAGIC,
+    /* Troubles */
+    STUNNED,
+    CONFUSION,
+    BLINDED,
+    DEAF,
+    SICK,
+    STONED,
+    STRANGLED,
+    VOMITING,
+    GLIB,
+    SLIMED,
+    HALLUC,
+    HALLUC_RES,
+    FUMBLING,
+    WOUNDED_LEGS,
+    SLEEPY,
+    HUNGER,
+    /* Vision and senses */
+    SEE_INVIS,
+    TELEPAT,
+    WARNING,
+    WARN_OF_MON,
+    WARN_UNDEAD,
+    SEARCHING,
+    CLAIRVOYANT,
+    INFRAVISION,
+    DETECT_MONSTERS,
+    /* Appearance and behavior */
+    ADORNED,
+    INVIS,
+    DISPLACED,
+    STEALTH,
+    AGGRAVATE_MONSTER,
+    CONFLICT,
+    /* Transportation */
+    JUMPING,
+    TELEPORT,
+    TELEPORT_CONTROL,
+    LEVITATION,
+    FLYING,
+    WWALKING,
+    SWIMMING,
+    MAGICAL_BREATHING,
+    PASSES_WALLS,
+    /* Physical attributes */
+    SLOW_DIGESTION,
+    HALF_SPDAM,
+    HALF_PHDAM,
+    REGENERATION,
+    ENERGY_REGENERATION,
+    PROTECTION,
+    PROT_FROM_SHAPE_CHANGERS,
+    POLYMORPH,
+    POLYMORPH_CONTROL,
+    UNCHANGING,
+    FAST,
+    REFLECTING,
+    FREE_ACTION,
+    FIXED_ABIL,
+    LIFESAVED
+};
 #define LAST_PROP (LIFESAVED)
 
 /*** Where the properties come from ***/

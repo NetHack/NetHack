@@ -72,6 +72,7 @@ typedef struct mswin_nhmsg_update_status {
     int n_fields;
     const char **vals;
     boolean *activefields;
+    int *percents;
     int *colors;
 } MSNHMsgUpdateStatus, *PMSNHMsgUpdateStatus;
 

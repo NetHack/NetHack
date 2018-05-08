@@ -1,5 +1,6 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1469930897 2016/07/31 02:08:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1518718417 2018/02/15 18:13:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -287,9 +288,9 @@ d_level *lev;
             return;
         }
 
-        lx = 1;
+        lx = 1; /* column 0 is not used */
         hx = COLNO - 1;
-        ly = 1;
+        ly = 0; /* 3.6.0 and earlier erroneously had 1 here */
         hy = ROWNO - 1;
     }
 
@@ -305,11 +306,9 @@ d_level *lev;
 
     /* then a deterministic one */
 
-    oneshot = TRUE;
     for (x = lx; x <= hx; x++)
         for (y = ly; y <= hy; y++)
-            if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot,
-                                 lev))
+            if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, TRUE, lev))
                 return;
 
     impossible("Couldn't place lregion type %d!", rtype);
@@ -493,7 +492,7 @@ fixup_special()
                 s_level *sp = find_level(r->rname.str);
                 lev = sp->dlevel;
             }
-        /* fall into... */
+            /*FALLTHRU*/
 
         case LR_UPSTAIR:
         case LR_DOWNSTAIR:
@@ -1185,11 +1184,6 @@ fumaroles()
  * Some of these functions would probably logically belong to some
  * other source files, but they are all so nicely encapsulated here.
  */
-
-#define CONS_OBJ 0
-#define CONS_MON 1
-#define CONS_HERO 2
-#define CONS_TRAP 3
 
 static struct bubble *bbubbles, *ebubbles;
 

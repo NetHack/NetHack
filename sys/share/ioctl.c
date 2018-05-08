@@ -1,5 +1,6 @@
-/* NetHack 3.6	ioctl.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	ioctl.c	$NHDT-Date: 1520099308 2018/03/03 17:48:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* This cannot be part of hack.tty.c (as it was earlier) since on some
@@ -63,9 +64,12 @@ struct termio termio;
 #include <signal.h>
 #endif
 
-#if defined(TIOCGWINSZ)                                    \
-    && (defined(BSD) || defined(ULTRIX) || defined(AIX_31) \
-        || defined(_BULL_SOURCE) || defined(SVR4))
+/* AVOID_WIN_IOCTL can be uncommented in unixconf.h
+ * to force USE_WIN_IOTCL to remain undefined,
+ * instead of the restricted explicit opt-in
+ * logic that used to be here.
+ */
+#if defined(TIOCGWINSZ) && !defined(AVOID_WIN_IOCTL)
 #define USE_WIN_IOCTL
 #include "tcap.h" /* for LI and CO */
 #endif

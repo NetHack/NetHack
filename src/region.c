@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1446892454 2015/11/07 10:34:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1496087244 2017/05/29 19:47:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -969,9 +969,15 @@ genericptr_t p2;
     } else { /* A monster is inside the cloud */
         mtmp = (struct monst *) p2;
 
-        /* Non living and non breathing monsters are not concerned */
+        /* Non living and non breathing monsters are not concerned;
+           adult green dragon is not affected by gas cloud, baby one is */
         if (!(nonliving(mtmp->data) || is_vampshifter(mtmp))
-            && !breathless(mtmp->data)) {
+            && !breathless(mtmp->data)
+            /* exclude monsters with poison gas breath attack:
+               adult green dragon and Chromatic Dragon (and iron golem,
+               but nonliving() and breathless() tests also catch that) */
+            && !(attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST)
+                 || attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE))) {
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s coughs!", Monnam(mtmp));
             if (heros_fault(reg))

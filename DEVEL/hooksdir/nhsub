@@ -1,6 +1,7 @@
 #!/usr/bin/perl
-# nhsub
-# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
+# $NHDT-Date: 1524689646 2018/04/25 20:54:06 $ Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
@@ -245,6 +246,7 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 # XXX had o modifier, why?
 	return unless($count>0);
 	return if($opt{n});
+	my $mode = 0777 & (stat($file))[2];
 
 	my $ofile = $file . ".nht";
 	open(TOUT, ">", $ofile) or die "Can't open $ofile";
@@ -263,6 +265,8 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 	}
 
 	close TOUT or die "Can't close $ofile";
+		# Do the right thing for *nix and hope for the best elsewhere:
+	chmod($mode, $ofile)==1 or warn "Can't set filemode on $ofile";
 	rename $ofile, $file or die "Can't rename $ofile to $file";
 }
 

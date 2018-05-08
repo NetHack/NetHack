@@ -1,5 +1,6 @@
 /* NetHack 3.6	artifact.h	$NHDT-Date: 1433050871 2015/05/31 05:41:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef ARTIFACT_H
@@ -56,14 +57,16 @@ struct artifact {
 };
 
 /* invoked properties with special powers */
-#define TAMING (LAST_PROP + 1)
-#define HEALING (LAST_PROP + 2)
-#define ENERGY_BOOST (LAST_PROP + 3)
-#define UNTRAP (LAST_PROP + 4)
-#define CHARGE_OBJ (LAST_PROP + 5)
-#define LEV_TELE (LAST_PROP + 6)
-#define CREATE_PORTAL (LAST_PROP + 7)
-#define ENLIGHTENING (LAST_PROP + 8)
-#define CREATE_AMMO (LAST_PROP + 9)
+enum invoke_prop_types {
+    TAMING = (LAST_PROP + 1),
+    HEALING,
+    ENERGY_BOOST,
+    UNTRAP,
+    CHARGE_OBJ,
+    LEV_TELE,
+    CREATE_PORTAL,
+    ENLIGHTENING,
+    CREATE_AMMO
+};
 
 #endif /* ARTIFACT_H */

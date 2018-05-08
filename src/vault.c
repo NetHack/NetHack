@@ -1,5 +1,6 @@
 /* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -191,6 +192,13 @@ findgd()
     return (struct monst *) 0;
 }
 
+void
+vault_summon_gd()
+{
+    if (vault_occupied(u.urooms) && !findgd())
+        u.uinvault = (VAULT_GUARD_TIME - 1);
+}
+
 char
 vault_occupied(array)
 char *array;
@@ -221,8 +229,9 @@ invault()
     vaultroom -= ROOMOFFSET;
 
     guard = findgd();
-    if (++u.uinvault % 30 == 0 && !guard) { /* if time ok and no guard now. */
-        char buf[BUFSZ];
+    if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
+        /* if time ok and no guard now. */
+        char buf[BUFSZ] = DUMMY;
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
         long umoney;

@@ -1,5 +1,6 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446887531 2015/11/07 09:12:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -26,24 +27,26 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
 };
 
 extern boolean notonhead; /* for long worms */
+STATIC_VAR int mesg_given; /* for m_throw()/thitu() 'miss' message */
 
 /* hero is hit by something other than a monster */
 int
-thitu(tlev, dam, obj, name)
+thitu(tlev, dam, objp, name)
 int tlev, dam;
-struct obj *obj;
-const char *name; /* if null, then format `obj' */
+struct obj **objp;
+const char *name; /* if null, then format `*objp' */
 {
+    struct obj *obj = objp ? *objp : 0;
     const char *onm, *knm;
     boolean is_acid;
-    int kprefix = KILLED_BY_AN;
+    int kprefix = KILLED_BY_AN, dieroll;
     char onmbuf[BUFSZ], knmbuf[BUFSZ];
 
     if (!name) {
         if (!obj)
             panic("thitu: name & obj both null?");
-        name =
-            strcpy(onmbuf, (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
+        name = strcpy(onmbuf,
+                      (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
         knm = strcpy(knmbuf, killer_xname(obj));
         kprefix = KILLED_BY; /* killer_name supplies "an" if warranted */
     } else {
@@ -58,10 +61,15 @@ const char *name; /* if null, then format `obj' */
             : an(name);
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
-    if (u.uac + tlev <= rnd(20)) {
-        if (Blind || !flags.verbose)
+    if (u.uac + tlev <= (dieroll = rnd(20))) {
+        ++mesg_given;
+        if (Blind || !flags.verbose) {
             pline("It misses.");
-        else
+        } else if (u.uac + tlev <= dieroll - 2) {
+            if (onm != onmbuf)
+                Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
+            pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
+        } else
             You("are almost hit by %s.", onm);
         return 0;
     } else {
@@ -70,14 +78,20 @@ const char *name; /* if null, then format `obj' */
         else
             You("are hit by %s%s", onm, exclam(dam));
 
-        if (obj && objects[obj->otyp].oc_material == SILVER && Hate_silver) {
-            /* extra damage already applied by dmgval() */
-            pline_The("silver sears your flesh!");
-            exercise(A_CON, FALSE);
-        }
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
+        } else if (obj && obj->oclass == POTION_CLASS) {
+            /* an explosion which scatters objects might hit hero with one
+               (potions deliberately thrown at hero are handled by m_throw) */
+            potionhit(&youmonst, obj, POTHIT_OTHER_THROW);
+            *objp = obj = 0; /* potionhit() uses up the potion */
         } else {
+            if (obj && objects[obj->otyp].oc_material == SILVER
+                && Hate_silver) {
+                /* extra damage already applied by dmgval() */
+                pline_The("silver sears your flesh!");
+                exercise(A_CON, FALSE);
+            }
             if (is_acid)
                 pline("It burns!");
             losehp(dam, knm, kprefix); /* acid damage */
@@ -110,9 +124,9 @@ int x, y;
     else
         create = 1;
 
-    if (create
-        && !((mtmp = m_at(x, y)) && (mtmp->mtrapped) && (t = t_at(x, y))
-             && ((t->ttyp == PIT) || (t->ttyp == SPIKED_PIT)))) {
+    if (create && !((mtmp = m_at(x, y)) != 0 && mtmp->mtrapped
+                    && (t = t_at(x, y)) != 0
+                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
         int objgone = 0;
 
         if (down_gate(x, y) != -1)
@@ -329,7 +343,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         mtmp->msleeping = 0;
         if (vis)
             otmp->dknown = 1;
-        potionhit(mtmp, otmp, FALSE);
+        /* probably thrown by a monster rather than 'other', but the
+           distinction only matters when hitting the hero */
+        potionhit(mtmp, otmp, POTHIT_OTHER_THROW);
         return 1;
     } else {
         damage = dmgval(otmp, mtmp);
@@ -509,6 +525,7 @@ struct obj *obj;         /* missile (or stack providing it) */
         (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
         return;
     }
+    mesg_given = 0; /* a 'missile misses' message has not yet been shown */
 
     /* Note: drop_throw may destroy singleobj.  Since obj must be destroyed
      * early to avoid the dagger bug, anyone who modifies this code should
@@ -549,7 +566,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             if (singleobj->oclass == POTION_CLASS) {
                 if (!Blind)
                     singleobj->dknown = 1;
-                potionhit(&youmonst, singleobj, FALSE);
+                potionhit(&youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }
             oldumort = u.umortality;
@@ -565,7 +582,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             /* fall through */
             case CREAM_PIE:
             case BLINDING_VENOM:
-                hitu = thitu(8, 0, singleobj, (char *) 0);
+                hitu = thitu(8, 0, &singleobj, (char *) 0);
                 break;
             default:
                 dam = dmgval(singleobj, &youmonst);
@@ -585,7 +602,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                 hitv += 8 + singleobj->spe;
                 if (dam < 1)
                     dam = 1;
-                hitu = thitu(hitv, dam, singleobj, (char *) 0);
+                hitu = thitu(hitv, dam, &singleobj, (char *) 0);
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {
                 char onmbuf[BUFSZ], knmbuf[BUFSZ];
@@ -637,8 +654,10 @@ struct obj *obj;         /* missile (or stack providing it) */
         if (!range /* reached end of path */
             || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
-                if (m_shot.n > 1 && (cansee(bhitpos.x, bhitpos.y)
-                                     || (archer && canseemon(archer))))
+                if (m_shot.n > 1
+                    && (!mesg_given || bhitpos.x != u.ux || bhitpos.y != u.uy)
+                    && (cansee(bhitpos.x, bhitpos.y)
+                        || (archer && canseemon(archer))))
                     pline("%s misses.", The(mshot_xname(singleobj)));
                 (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
             }
@@ -650,6 +669,7 @@ struct obj *obj;         /* missile (or stack providing it) */
     tmp_at(bhitpos.x, bhitpos.y);
     delay_output();
     tmp_at(DISP_END, 0);
+    mesg_given = 0; /* reset */
 
     if (blindinc) {
         u.ucreamed += blindinc;
@@ -888,7 +908,7 @@ struct monst *mtmp;
         if (dam < 1)
             dam = 1;
 
-        (void) thitu(hitv, dam, otmp, (char *) 0);
+        (void) thitu(hitv, dam, &otmp, (char *) 0);
         stop_occupation();
         return;
     }

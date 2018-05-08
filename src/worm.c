@@ -1,5 +1,6 @@
 /* NetHack 3.6	worm.c	$NHDT-Date: 1456528599 2016/02/26 23:16:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -565,6 +566,28 @@ struct monst *worm;
 
     while (curr != wheads[worm->wormno]) {
         place_worm_seg(worm, curr->wx, curr->wy);
+        curr = curr->nseg;
+    }
+}
+
+void
+sanity_check_worm(worm)
+struct monst *worm;
+{
+    struct wseg *curr;
+
+    if (!worm)
+        panic("no worm!");
+    if (!worm->wormno)
+        panic("not a worm?!");
+
+    curr = wtails[worm->wormno];
+
+    while (curr != wheads[worm->wormno]) {
+        if (!isok(curr->wx, curr->wy))
+            panic("worm seg not isok");
+        if (level.monsters[curr->wx][curr->wy] != worm)
+            panic("worm not at seg location");
         curr = curr->nseg;
     }
 }

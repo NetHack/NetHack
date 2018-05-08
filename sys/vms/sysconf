@@ -1,4 +1,6 @@
-# NetHack 3.6 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6 sysconf $NHDT-Date: 1524689429 2018/04/25 20:50:29 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# Copyright (c) 2015 by Robert Patrick Rankin
+# NetHack may be freely redistributed.  See license for details.
 #
 # Sample sysconf file for VMS.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.
@@ -72,6 +74,14 @@
 # Do not livelog breaking of conducts before this turncount
 # Cuts down on spam
 # LLC_TURNS=3000
+
+# Number of bones file pools.
+# The pool you belong to is determined at game start. You will
+# load and save bones only from that pool. Generally useful
+# for public servers only.
+# Changing this might make existing bones inaccessible.
+# Disabled by setting to 0, or commenting out.
+#BONES_POOLS=10
 
 # Show debugging information originating from these source files.
 # Use '*' for all, or list source files separated by spaces.

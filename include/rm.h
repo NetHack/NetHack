@@ -1,5 +1,6 @@
 /* NetHack 3.6	rm.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef RM_H
@@ -85,7 +86,8 @@ enum levl_typ_types {
 #define IS_STWALL(typ) ((typ) <= DBWALL) /* STONE <= (typ) <= DBWALL */
 #define IS_ROCK(typ) ((typ) < POOL)      /* absolutely nonaccessible */
 #define IS_DOOR(typ) ((typ) == DOOR)
-#define IS_TREE(typ) \
+#define IS_DOORJOIN(typ) (IS_ROCK(typ) || (typ) == IRONBARS)
+#define IS_TREE(typ)                                            \
     ((typ) == TREE || (level.flags.arboreal && (typ) == STONE))
 #define ACCESSIBLE(typ) ((typ) >= DOOR) /* good position */
 #define IS_ROOM(typ) ((typ) >= ROOM)    /* ROOM, STAIRS, furniture.. */
@@ -235,6 +237,12 @@ enum screen_symbols {
 #define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
 #define is_cmap_door(i) ((i) >= S_vodoor && (i) <= S_hcdoor)
 #define is_cmap_wall(i) ((i) >= S_stone && (i) <= S_trwall)
+#define is_cmap_room(i) ((i) >= S_room && (i) <= S_darkroom)
+#define is_cmap_corr(i) ((i) >= S_corr && (i) <= S_litcorr)
+#define is_cmap_furniture(i) ((i) >= S_upstair && (i) <= S_fountain)
+#define is_cmap_water(i) ((i) == S_pool || (i) == S_water)
+#define is_cmap_lava(i) ((i) == S_lava)
+
 
 struct symdef {
     uchar sym;
@@ -294,6 +302,8 @@ extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 extern int currentgraphics; /* from drawing.c */
 extern nhsym showsyms[];
+extern nhsym l_syms[];
+extern nhsym r_syms[];
 
 extern struct symsetentry symset[NUM_GRAPHICS]; /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))

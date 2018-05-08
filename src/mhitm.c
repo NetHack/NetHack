@@ -1,5 +1,6 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1470819842 2016/08/10 09:04:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1513297346 2017/12/15 00:22:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -324,11 +325,16 @@ register struct monst *magr, *mdef;
         mdef->mundetected = 0;
         newsym(mdef->mx, mdef->my);
         if (canseemon(mdef) && !sensemon(mdef)) {
-            if (Unaware)
-                You("dream of %s.", (mdef->data->geno & G_UNIQ)
-                                        ? a_monnam(mdef)
-                                        : makeplural(m_monnam(mdef)));
-            else
+            if (Unaware) {
+                boolean justone = (mdef->data->geno & G_UNIQ) != 0L;
+                const char *montype;
+
+                montype = noname_monnam(mdef, justone ? ARTICLE_THE
+                                                      : ARTICLE_NONE);
+                if (!justone)
+                    montype = makeplural(montype);
+                You("dream of %s.", montype);
+            } else
                 pline("Suddenly, you notice %s.", a_monnam(mdef));
         }
     }
@@ -407,8 +413,9 @@ register struct monst *magr, *mdef;
             if (strike) {
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
-                     || mdef->data == &mons[PM_BROWN_PUDDING]) && otmp
-                    && objects[otmp->otyp].oc_material == IRON
+                     || mdef->data == &mons[PM_BROWN_PUDDING])
+                    && (otmp && (objects[otmp->otyp].oc_material == IRON
+                                 || objects[otmp->otyp].oc_material == METAL))
                     && mdef->mhp > 1
                     && !mdef->mcan) {
                     if (clone_mon(mdef, 0, 0)) {
@@ -569,6 +576,7 @@ struct attack *mattk;
                     Sprintf(buf, "%s squeezes", magr_name);
                     break;
                 }
+                /*FALLTHRU*/
             default:
                 Sprintf(buf, "%s hits", magr_name);
             }
@@ -903,10 +911,17 @@ register struct attack *mattk;
             tmp = 0;
         } else if (mattk->aatyp == AT_WEAP) {
             if (otmp) {
+                struct obj *marmg;
+
                 if (otmp->otyp == CORPSE
                     && touch_petrifies(&mons[otmp->corpsenm]))
                     goto do_stone;
                 tmp += dmgval(otmp, mdef);
+                if ((marmg = which_armor(magr, W_ARMG)) != 0
+                    && marmg->otyp == GAUNTLETS_OF_POWER)
+                    tmp += rn1(4, 3); /* 3..6 */
+                if (tmp < 1) /* is this necessary?  mhitu.c has it... */
+                    tmp = 1;
                 if (otmp->oartifact) {
                     (void) artifact_hit(magr, mdef, otmp, &tmp, dieroll);
                     if (mdef->mhp <= 0)
@@ -932,10 +947,10 @@ register struct attack *mattk;
         }
         if (vis && canseemon(mdef))
             pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
-        if (pd == &mons[PM_STRAW_GOLEM] || pd == &mons[PM_PAPER_GOLEM]) {
+        if (completelyburns(pd)) { /* paper golem or straw golem */
             if (vis && canseemon(mdef))
                 pline("%s burns completely!", Monnam(mdef));
-            mondied(mdef);
+            mondead(mdef); /* was mondied() but that dropped paper scrolls */
             if (mdef->mhp > 0)
                 return 0;
             else if (mdef->mtame && !vis)
@@ -1270,6 +1285,7 @@ register struct attack *mattk;
                         | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
                 boolean couldspot = canspotmon(magr);
+
                 (void) rloc(magr, TRUE);
                 if (vis && couldspot && !canspotmon(magr))
                     pline("%s suddenly disappears!", buf);
@@ -1279,7 +1295,8 @@ register struct attack *mattk;
         break;
     case AD_DREN:
         if (!cancelled && !rn2(4))
-            xdrainenergym(mdef, vis && canspotmon(mdef) && mattk->aatyp != AT_ENGL);
+            xdrainenergym(mdef, (boolean) (vis && canspotmon(mdef)
+                                           && mattk->aatyp != AT_ENGL));
         tmp = 0;
         break;
     case AD_DRST:
@@ -1553,8 +1570,10 @@ int mdead;
                     tmp = 127;
                 if (magr->mcansee && haseyes(madat) && mdef->mcansee
                     && (perceives(madat) || !mdef->minvis)) {
-                    Sprintf(buf, "%s gaze is reflected by %%s %%s.",
-                            s_suffix(Monnam(mdef)));
+                    /* construct format string; guard against '%' in Monnam */
+                    Strcpy(buf, s_suffix(Monnam(mdef)));
+                    (void) strNsubst(buf, "%", "%%", 0);
+                    Strcat(buf, " gaze is reflected by %s %s.");
                     if (mon_reflects(magr,
                                      canseemon(magr) ? buf : (char *) 0))
                         return (mdead | mhit);

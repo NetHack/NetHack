@@ -36,13 +36,9 @@ mswin_display_splash_window(BOOL show_ver)
     RECT controlrt;
     HWND hWnd;
     int buttop;
-    int strsize = 0;
-    int bufsize = BUFSZ;
-    char *buf = malloc(bufsize);
+    strbuf_t strbuf;
 
-    if (buf == NULL)
-        panic("out of memory");
-    buf[0] = '\0';
+    strbuf_init(&strbuf);
 
     hWnd = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_SPLASH),
                         GetNHApp()->hMainWnd, NHSplashWndProc);
@@ -87,9 +83,9 @@ mswin_display_splash_window(BOOL show_ver)
                clientrt.right - 2 * SPLASH_OFFSET_X, controlrt.bottom, TRUE);
 
     /* Fill the text control */
-    Sprintf(buf, "%s\r\n%s\r\n%s\r\n%s\r\n\r\n", COPYRIGHT_BANNER_A,
+    strbuf_reserve(&strbuf, BUFSIZ);
+    Sprintf(strbuf.str, "%s\n%s\n%s\n%s\n\n", COPYRIGHT_BANNER_A,
             COPYRIGHT_BANNER_B, COPYRIGHT_BANNER_C, COPYRIGHT_BANNER_D);
-    strsize = strlen(buf);
 
     if (show_ver) {
         /* Show complete version information */
@@ -98,43 +94,16 @@ mswin_display_splash_window(BOOL show_ver)
         int verstrsize = 0;
  
         getversionstring(verbuf);
-        verstrsize = strlen(verbuf);
-        if (verstrsize + strlen("\r\n\r\n") + 1  <  BUFSZ - 1)
-            strcat(verbuf, "\r\n\r\n");
-        verstrsize = strlen(verbuf);
-
-        if (strsize + verstrsize + 1 > bufsize) {
-            bufsize += BUFSZ;
-            buf = realloc(buf, bufsize);
-            if (buf == NULL)
-                panic("out of memory");
-        }
-        strcat(buf, verbuf);
-        strsize = strlen(buf);
+        strbuf_append(&strbuf, verbuf);
+        strbuf_append(&strbuf, "\n\n");
             
         /* Add compile options */
         f = dlb_fopen(OPTIONS_USED, RDTMODE);
         if (f) {
             char line[LLEN + 1];
 
-            while (dlb_fgets(line, LLEN, f)) {
-                size_t len;
-                len = strlen(line);
-                if (len > 0 && line[len - 1] == '\n') {
-                    line[len - 1] = '\r';
-                    line[len] = '\n';
-                    line[len + 1] = '\0';
-                    len++;
-                }
-                if (strsize + (int) len + 1 > bufsize) {
-                    bufsize += BUFSZ;
-                    buf = realloc(buf, bufsize);
-                    if (buf == NULL)
-                        panic("out of memory");
-                }
-                strcat(buf, line);
-                strsize += len;
-            }
+            while (dlb_fgets(line, LLEN, f))
+                strbuf_append(&strbuf, line);
             (void) dlb_fclose(f);
         }
     } else {
@@ -147,32 +116,18 @@ mswin_display_splash_window(BOOL show_ver)
             if (nf != NULL) {
                 char line[LLEN + 1];
 
-                while (fgets(line, LLEN, nf)) {
-                    size_t len;
-                    len = strlen(line);
-                    if (len > 0 && line[len - 1] == '\n') {
-                        line[len - 1] = '\r';
-                        line[len] = '\n';
-                        line[len + 1] = '\0';
-                        len++;
-                    }
-                    if (strsize + (int) len + 1 > bufsize) {
-                        bufsize += BUFSZ;
-                        buf = realloc(buf, bufsize);
-                        if (buf == NULL)
-                            panic("out of memory");
-                    }
-                    strcat(buf, line);
-                    strsize += len;
-                }
+                while (fgets(line, LLEN, nf))
+                    strbuf_append(&strbuf, line);
                 (void) fclose(nf);
             } else {
-                strcat(buf, "No news.");
+                strbuf_append(&strbuf, "No news.");
             }
         }
     }
-    SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
-    free(buf);
+
+    strbuf_nl_to_crlf(&strbuf);
+    SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), strbuf.str);
+    strbuf_empty(&strbuf);
     ShowWindow(hWnd, SW_SHOW);
 
     while (IsWindow(hWnd) && GetMessage(&msg, NULL, 0, 0) != 0) {

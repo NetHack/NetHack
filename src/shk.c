@@ -1,5 +1,6 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1464138042 2016/05/25 01:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1515144230 2018/01/05 09:23:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -29,7 +30,6 @@ STATIC_VAR const char and_its_contents[] = " and its contents";
 STATIC_VAR const char the_contents_of[] = "the contents of ";
 
 STATIC_DCL void FDECL(append_honorific, (char *));
-STATIC_DCL void FDECL(setpaid, (struct monst *));
 STATIC_DCL long FDECL(addupbill, (struct monst *));
 STATIC_DCL void FDECL(pacify_shk, (struct monst *));
 STATIC_DCL struct bill_x *FDECL(onbill, (struct obj *, struct monst *,
@@ -286,7 +286,7 @@ struct obj *list;
 }
 
 /* either you paid or left the shop or the shopkeeper died */
-STATIC_OVL void
+void
 setpaid(shkp)
 register struct monst *shkp;
 {
@@ -2355,6 +2355,12 @@ struct monst *shkp;
         return;
     }
 
+    /* normally bill_p gets set up whenever you enter the shop, but obj
+       might be going onto the bill because hero just snagged it with
+       a grappling hook from outside without ever having been inside */
+    if (!eshkp->bill_p)
+        eshkp->bill_p = &(eshkp->bill[0]);
+
     bct = eshkp->billct;
     bp = &(eshkp->bill_p[bct]);
     bp->bo_id = obj->o_id;
@@ -3096,6 +3102,7 @@ xchar x, y;
         switch (sell_response ? sell_response : ynaq(qbuf)) {
         case 'q':
             sell_response = 'n';
+            /*FALLTHRU*/
         case 'n':
             if (container)
                 dropped_container(obj, shkp, FALSE);
@@ -3105,6 +3112,7 @@ xchar x, y;
             break;
         case 'a':
             sell_response = 'y';
+            /*FALLTHRU*/
         case 'y':
             if (container)
                 dropped_container(obj, shkp, TRUE);

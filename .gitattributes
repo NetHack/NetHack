@@ -1,6 +1,15 @@
 *.[ch] NHSUBST
+*.cpp NHSUBST
 *.sh NHSUBST
+*.pl NHSUBST
+Porting NHSUBST
+README NHSUBST
 * text=auto
 *.hqx -text
 *.sln -text
 *.vcxproj -text
+*.doc !diff
+*.DOC !diff
+*.uu NH_header=no
+*.xpm NH_header=no
+.git* NH_header=no

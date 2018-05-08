@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="dirs.props"/>
+  <Import Project="files.props"/>
+  <Target Name="Build"
+     Inputs="@(Desfiles->'$(DatDir)%(filename)%(extension)');$(BinDir)levcomp.exe"
+	 Outputs="@(Levfiles->'$(DatDir)%(filename)%(extension)')">
+	<Exec Command="$(ToolsDir)levcomp.exe @(Desfiles, ' ')" WorkingDirectory="$(DatDir)"/>
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="@(Levfiles->'$(DatDir)%(filename)%(extension)')"/>
+  </Target>
+</Project>

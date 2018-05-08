@@ -1,5 +1,6 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1461102045 2016/04/19 21:40:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1514071158 2017/12/23 23:19:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you change the flag structure make sure you increment EDITLEVEL in   */
@@ -48,7 +49,42 @@ struct flag {
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
+    /* The story so far:
+     * 'sortloot' originally took a True/False value but was changed
+     * to use a letter instead.  3.6.0 was released without changing its
+     * type from 'boolean' to 'char'.  A compiler was smart enough to
+     * complain that assigning any of the relevant letters was not 0 or 1
+     * so not appropriate for boolean (by a configuration which used
+     * SKIP_BOOLEAN to bypass nethack's 'boolean' and use a C++-compatible
+     * one).  So the type was changed to 'xchar', which is guaranteed to
+     * match the size of 'boolean' (this guarantee only applies for the
+     * !SKIP_BOOLEAN config, unfortunately).  Since xchar does not match
+     * actual use, the type was later changed to 'char'.  But that would
+     * break 3.6.0 savefile compatibility for configurations which typedef
+     * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
+     * systems that use unsigned characters without a way to force them
+     * to be signed.)  So, the type has been changed back to 'xchar' for
+     * 3.6.1.
+     *
+     * TODO:  change to 'char' (and move out of this block of booleans,
+     * and get rid of these comments...) once 3.6.0 savefile compatibility
+     * eventually ends.
+     */
+#ifndef SKIP_BOOLEAN
+    /* this is the normal configuration; assigning a character constant
+       for a normal letter to an 'xchar' variable should always work even
+       if 'char' is unsigned since character constants are actually 'int'
+       and letters are within the range where signedness shouldn't matter */
+    xchar   sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+#else
+    /* with SKIP_BOOLEAN, we have no idea what underlying type is being
+       used, other than it isn't 'xchar' (although its size might match
+       that) or a bitfield (because it must be directly addressable);
+       it's probably either 'char' for compactness or 'int' for access,
+       but we don't know which and it might be something else anyway;
+       flip a coin here and guess 'char' for compactness */
     char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
+#endif
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -60,15 +96,16 @@ struct flag {
     unsigned long suppress_alert;
 #define NEW_MOON 0
 #define FULL_MOON 4
-    int paranoia_bits; /* alternate confirmation prompting */
-#define PARANOID_CONFIRM 0x01
-#define PARANOID_QUIT 0x02
-#define PARANOID_DIE 0x04
-#define PARANOID_BONES 0x08
-#define PARANOID_HIT 0x10
-#define PARANOID_PRAY 0x20
-#define PARANOID_REMOVE 0x40
-#define PARANOID_BREAKWAND 0x80
+    unsigned paranoia_bits; /* alternate confirmation prompting */
+#define PARANOID_CONFIRM    0x0001
+#define PARANOID_QUIT       0x0002
+#define PARANOID_DIE        0x0004
+#define PARANOID_BONES      0x0008
+#define PARANOID_HIT        0x0010
+#define PARANOID_PRAY       0x0020
+#define PARANOID_REMOVE     0x0040
+#define PARANOID_BREAKWAND  0x0080
+#define PARANOID_WERECHANGE 0x0100
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char inv_order[MAXOCLASSES];
@@ -176,12 +213,24 @@ struct sysflag {
 #define GPCOORDS_COMFULL 'f'
 #define GPCOORDS_SCREEN  's'
 
+enum getloc_filters {
+    GFILTER_NONE = 0,
+    GFILTER_VIEW,
+    GFILTER_AREA,
+
+    NUM_GFILTER
+};
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
      * behaviour of various NetHack functions and probably warrant
      * a structure of their own elsewhere some day.
      */
+    boolean defer_plname;  /* X11 hack: askname() might not set plname */
+    boolean herecmd_menu;  /* use menu when mouseclick on yourself */
+    boolean invis_goldsym; /* gold symbol is ' '? */
+    int parse_config_file_src;  /* hack for parse_config_line() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
     int purge_monsters;    /* # of dead monsters still on fmon list */
@@ -194,14 +243,16 @@ struct instance_flags {
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     boolean getloc_travelmode;
-    boolean getloc_limitview;
+    int getloc_filter;     /* GFILTER_foo */
     boolean getloc_usemenu;
+    boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     boolean in_dumplog;    /* doing the dumplog right now? */
+    boolean in_parse;      /* is a command being parsed? */
 
     /* stuff that is related to options and/or user or platform preferences
      */
@@ -211,33 +262,43 @@ struct instance_flags {
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
-    boolean altmeta; /* Alt-c sends ESC c rather than M-c */
+    boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
+    boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
-    boolean num_pad;          /* use numbers for movement commands */
-    boolean news;             /* print news */
+    boolean echo;             /* 1 to echo characters */
+    boolean force_invmenu;    /* always menu when handling inventory */
+    /* FIXME: goldX belongs in flags, but putting it in iflags avoids
+       breaking 3.6.[01] save files */
+    boolean goldX;            /* for BUCX filtering, whether gold is X or U */
+    boolean hilite_pile;      /* mark piles of objects with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
-    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
     boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
                                * on some non-move commands */
+    boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
+    boolean news;             /* print news */
+    boolean num_pad;          /* use numbers for movement commands */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
+    boolean status_updates;   /* allow updates to bottom status lines;
+                               * disable to avoid excessive noise when using
+                               * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
-    boolean zerocomp;         /* write zero-compressed save files */
-    boolean rlecomp; /* run-length comp of levels when writing savefile */
-    uchar num_pad_mode;
-    boolean echo;             /* 1 to echo characters */
-    boolean use_menu_color;       /* use color in menus; only if wc_color */
-    boolean use_status_hilites;   /* use color in status line */
-    boolean status_updates;   /* allow updates to bottom status lines */
     boolean use_background_glyph; /* use background glyph when appropriate */
-    boolean hilite_pile;          /* mark piles of objects with a hilite */
-    boolean autodescribe;     /* autodescribe mode in getpos() */
-#if 0
+    boolean use_menu_color;   /* use color in menus; only if wc_color */
+#ifdef STATUS_HILITES
+    long hilite_delta;     /* number of moves to leave a temp hilite lit */
+    long unhilite_deadline; /* time when oldest temp hilite should be unlit */
+#endif
+    boolean zerocomp;         /* write zero-compressed save files */
+    boolean rlecomp;          /* alternative to zerocomp; run-length encoding
+                               * compression of levels when writing savefile */
+    uchar num_pad_mode;
+#if 0   /* XXXgraphics superseded by symbol sets */
     boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
     boolean  IBMgraphics;       /* use IBM extended character set */
 #ifdef MAC_GRAPHICS_ENV
@@ -326,24 +387,24 @@ struct instance_flags {
     int wc_fontsiz_menu;    /* font size for the menu window       */
     int wc_fontsiz_text;    /* font size for text windows          */
     int wc_scroll_amount;   /* scroll this amount at scroll_margin */
-    int wc_scroll_margin;   /* scroll map when this far from
-                                    the edge */
+    int wc_scroll_margin;   /* scroll map when this far from the edge */
     int wc_map_mode;        /* specify map viewing options, mostly
-                                    for backward compatibility */
+                             * for backward compatibility */
     int wc_player_selection;    /* method of choosing character */
     boolean wc_splash_screen;   /* display an opening splash screen or not */
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
-                                        in the message window */
+                                 * in the message window */
     boolean wc_eight_bit_input; /* allow eight bit input               */
     boolean wc_mouse_support;   /* allow mouse support */
     boolean wc2_fullscreen;     /* run fullscreen */
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
-    boolean wc2_darkgray; /* try to use dark-gray color for black glyphs */
-    boolean cmdassist;    /* provide detailed assistance for some commands */
-    boolean clicklook;    /* allow right-clicking for look */
-    boolean obsolete; /* obsolete options can point at this, it isn't used */
+    boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
+    boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
+    boolean cmdassist;     /* provide detailed assistance for some commands */
+    boolean clicklook;          /* allow right-clicking for look */
+    boolean obsolete;  /* obsolete options can point at this, it isn't used */
     struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
 #define AP_GRAB 1
@@ -357,6 +418,11 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
+    /* item types used to acomplish "special achievements"; find the target
+       object and you'll be flagged as having achieved something... */
+    short mines_prize_type;     /* luckstone */
+    short soko_prize_type1;     /* bag of holding or    */
+    short soko_prize_type2;     /* amulet of reflection */
 };
 
 /*
@@ -426,6 +492,9 @@ enum runmode_types {
 #define ParanoidRemove ((flags.paranoia_bits & PARANOID_REMOVE) != 0)
 /* breakwand: Applying a wand */
 #define ParanoidBreakwand ((flags.paranoia_bits & PARANOID_BREAKWAND) != 0)
+/* werechange: accepting randomly timed werecreature change to transform
+   from human to creature or vice versa while having polymorph control */
+#define ParanoidWerechange ((flags.paranoia_bits & PARANOID_WERECHANGE) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */
@@ -477,9 +546,12 @@ enum nh_keyfunc {
     NHKF_GETPOS_UNEX_PREV,
     NHKF_GETPOS_INTERESTING_NEXT,
     NHKF_GETPOS_INTERESTING_PREV,
+    NHKF_GETPOS_VALID_NEXT,
+    NHKF_GETPOS_VALID_PREV,
     NHKF_GETPOS_HELP,
     NHKF_GETPOS_MENU,
     NHKF_GETPOS_LIMITVIEW,
+    NHKF_GETPOS_MOVESKIP,
 
     NUM_NHKF
 };
@@ -490,6 +562,7 @@ enum gloctypes {
     GLOC_DOOR,
     GLOC_EXPLORE,
     GLOC_INTERESTING,
+    GLOC_VALID,
 
     NUM_GLOCS
 };

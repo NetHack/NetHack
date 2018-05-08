@@ -1,5 +1,6 @@
 /* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
@@ -158,7 +159,10 @@ const char *verb;
                           (mtmp) ? "" : " with you");
             if (mtmp) {
                 if (!passes_walls(mtmp->data) && !throws_rocks(mtmp->data)) {
-                    if (hmon(mtmp, obj, TRUE) && !is_whirly(mtmp->data))
+                    int dieroll = rnd(20);
+
+                    if (hmon(mtmp, obj, HMON_THROWN, dieroll)
+                        && !is_whirly(mtmp->data))
                         return FALSE; /* still alive */
                 }
                 mtmp->mtrapped = 0;
@@ -190,7 +194,7 @@ const char *verb;
         newsym(x, y);
         return TRUE;
     } else if (is_lava(x, y)) {
-        return fire_damage(obj, FALSE, x, y);
+        return lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make
@@ -501,6 +505,12 @@ register struct obj *obj;
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
+    } else if (!rn2(5)) {
+        freeinv(obj);
+        obj->in_use = FALSE;
+        obj->ox = u.ux;
+        obj->oy = u.uy;
+        add_to_buried(obj);
     } else
         useup(obj);
 }
@@ -1259,6 +1269,7 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
     substitute_tiles(newlevel);
 #endif
+    check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
      */

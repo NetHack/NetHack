@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -19,13 +19,11 @@ LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -34,14 +32,15 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_NETHACKW            ICON    DISCARDABLE     "NETHACK.ICO"
+IDI_NETHACKW            ICON                    "NETHACK.ICO"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_NETHACKW MENU DISCARDABLE 
+IDC_NETHACKW MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -98,7 +97,7 @@ END
 // Accelerator
 //
 
-IDC_NETHACKW ACCELERATORS MOVEABLE PURE 
+IDC_NETHACKW ACCELERATORS
 BEGIN
     "?",            IDM_ABOUT,              ASCII,  ALT
     "/",            IDM_ABOUT,              ASCII,  ALT
@@ -110,8 +109,8 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  22, 17, 230, 75
-STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOG 22, 17, 230, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
 FONT 8, "System"
 BEGIN
@@ -121,29 +120,27 @@ BEGIN
 END
 
 IDD_NHTEXT DIALOGEX 0, 0, 172, 178
-STYLE WS_CHILD | WS_CLIPSIBLINGS | WS_THICKFRAME
+STYLE DS_SETFONT | WS_CHILD | WS_CLIPSIBLINGS | WS_THICKFRAME
 EXSTYLE WS_EX_CLIENTEDGE | WS_EX_CONTROLPARENT
-FONT 8, "MS Sans Serif", 0, 0
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_TEXT_CONTROL,0,0,172,160,ES_MULTILINE | 
-                    ES_OEMCONVERT | ES_READONLY | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_TEXT_CONTROL,0,0,172,160,ES_MULTILINE | ES_OEMCONVERT | ES_READONLY | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,54,163,50,14,BS_FLAT | NOT WS_TABSTOP
 END
 
 IDD_MENU DIALOGEX 0, 0, 187, 153
-STYLE WS_CHILD | WS_CLIPSIBLINGS | WS_THICKFRAME
+STYLE DS_SETFONT | WS_CHILD | WS_CLIPSIBLINGS | WS_THICKFRAME
 EXSTYLE WS_EX_CLIENTEDGE | WS_EX_CONTROLPARENT
-FONT 8, "MS Sans Serif", 0, 0
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LISTBOX         IDC_MENU_LIST,10,10,170,55,LBS_SORT | NOT WS_BORDER
-    EDITTEXT        IDC_MENU_TEXT,10,70,170,60,ES_MULTILINE | ES_OEMCONVERT | 
-                    ES_READONLY | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP | NOT WS_BORDER
+    EDITTEXT        IDC_MENU_TEXT,10,70,170,60,ES_MULTILINE | ES_OEMCONVERT | ES_READONLY | NOT WS_BORDER | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,7,132,50,14,BS_FLAT | NOT WS_TABSTOP
     PUSHBUTTON      "Cancel",IDCANCEL,130,132,50,14,BS_FLAT | NOT WS_TABSTOP
 END
 
-IDD_GETLIN DIALOG DISCARDABLE  0, 0, 131, 29
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_GETLIN DIALOG 0, 0, 131, 29
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Question?"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -152,65 +149,54 @@ BEGIN
     EDITTEXT        IDC_GETLIN_EDIT,0,0,130,13,ES_AUTOHSCROLL
 END
 
-IDD_EXTCMD DIALOG DISCARDABLE  0, 0, 137, 117
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_EXTCMD DIALOG 0, 0, 137, 117
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Extended Commands"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,80,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,80,24,50,14
-    LISTBOX         IDC_EXTCMD_LIST,7,7,65,103,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_EXTCMD_LIST,7,7,65,103,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_PLAYER_SELECTOR DIALOG DISCARDABLE  0, 0, 152, 169
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_PLAYER_SELECTOR DIALOGEX 0, 0, 225, 212
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "What are you?"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Play",IDOK,7,148,66,14
-    PUSHBUTTON      "Quit",IDCANCEL,79,148,66,14
-    LTEXT           "Name:",IDC_STATIC,7,8,25,10
-    EDITTEXT        IDC_PLSEL_NAME,40,7,105,12,ES_AUTOHSCROLL | ES_READONLY | 
-                    NOT WS_TABSTOP
-    GROUPBOX        "Role",IDC_STATIC,7,21,138,30
-    CONTROL         "Random",IDC_PLSEL_ROLE_RANDOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,34,40,10
-    COMBOBOX        IDC_PLSEL_ROLE_LIST,63,33,75,50,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Race",IDC_STATIC,7,51,138,30
-    CONTROL         "Random",IDC_PLSEL_RACE_RANDOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,63,40,10
-    COMBOBOX        IDC_PLSEL_RACE_LIST,63,62,75,45,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Gender",IDC_STATIC,7,81,138,30
-    CONTROL         "Random",IDC_PLSEL_GENDER_RANDOM,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,14,93,40,10
-    COMBOBOX        IDC_PLSEL_GENDER_LIST,63,92,75,40,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Alignment",IDC_STATIC,7,111,138,30
-    CONTROL         "Random",IDC_PLSEL_ALIGN_RANDOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,123,40,10
-    COMBOBOX        IDC_PLSEL_ALIGN_LIST,63,122,75,45,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "Play",IDOK,12,192,54,14,WS_GROUP
+    PUSHBUTTON      "Quit",IDCANCEL,162,192,54,14,WS_GROUP
+    EDITTEXT        IDC_PLSEL_NAME,12,12,105,12,ES_AUTOHSCROLL | ES_READONLY | WS_GROUP | NOT WS_TABSTOP
+    CONTROL         "Neutral",IDC_PLSEL_ALIGN_NEUTRAL,"Button",BS_AUTORADIOBUTTON,168,60,37,10
+    CONTROL         "Lawful",IDC_PLSEL_ALIGN_LAWFUL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,48,35,10
+    CONTROL         "Chaotic",IDC_PLSEL_ALIGN_CHAOTIC,"Button",BS_AUTORADIOBUTTON,168,72,38,10
+    CONTROL         "Male",IDC_PLSEL_GENDER_MALE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,168,108,30,10
+    CONTROL         "Female",IDC_PLSEL_GENDER_FEMALE,"Button",BS_AUTORADIOBUTTON,168,120,38,10
+    GROUPBOX        "Alignment",IDC_STATIC,162,36,48,54
+    GROUPBOX        "Gender",IDC_STATIC,162,96,48,42
+    GROUPBOX        "Role",IDC_STATIC,6,36,72,150
+    GROUPBOX        "Race",IDC_STATIC,84,36,72,72
+    PUSHBUTTON      "Random",IDC_PLSEL_RANDOM,90,192,54,14,WS_GROUP
+    GROUPBOX        "Name",IDC_STATIC,6,0,120,30
+    CONTROL         "",IDC_PLSEL_ROLE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,12,48,60,130
+    CONTROL         "",IDC_PLSEL_RACE_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOSCROLL | LVS_NOCOLUMNHEADER | WS_BORDER | WS_GROUP | WS_TABSTOP,90,48,60,51
 END
 
 IDD_NHRIP DIALOGEX 0, 0, 281, 209
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Here lies..."
-FONT 8, "MS Sans Serif", 0, 0
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,82,188,50,14
 END
 
-IDD_SPLASH DIALOG DISCARDABLE  0, 0, 281, 257
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_SPLASH DIALOG 0, 0, 281, 257
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Welcome to NetHack"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,224,236,50,14
-    EDITTEXT        IDC_EXTRAINFO,7,176,267,52,ES_MULTILINE | ES_READONLY | 
-                    WS_VSCROLL
+    EDITTEXT        IDC_EXTRAINFO,7,176,267,52,ES_MULTILINE | ES_READONLY | WS_VSCROLL
 END
 
 
@@ -220,7 +206,7 @@ END
 // TEXTINCLUDE
 //
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#if defined(__BORLANDC__)\r\n"
     "LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US\r\n"
@@ -232,13 +218,13 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
 END
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
@@ -251,14 +237,22 @@ END
 // Bitmap
 //
 
-IDB_TILES               BITMAP  DISCARDABLE     "tiles.bmp"
-IDB_MENU_SEL            BITMAP  DISCARDABLE     "mnsel.bmp"
-IDB_MENU_UNSEL          BITMAP  DISCARDABLE     "mnunsel.bmp"
-IDB_PETMARK             BITMAP  DISCARDABLE     "petmark.bmp"
-IDB_PILEMARK            BITMAP  DISCARDABLE     "pilemark.bmp"
-IDB_MENU_SEL_COUNT      BITMAP  DISCARDABLE     "mnselcnt.bmp"
-IDB_RIP                 BITMAP  DISCARDABLE     "rip.bmp"
-IDB_SPLASH              BITMAP  DISCARDABLE     "splash.bmp"
+IDB_TILES               BITMAP                  "tiles.bmp"
+
+IDB_MENU_SEL            BITMAP                  "mnsel.bmp"
+
+IDB_MENU_UNSEL          BITMAP                  "mnunsel.bmp"
+
+IDB_PETMARK             BITMAP                  "petmark.bmp"
+
+IDB_PILEMARK            BITMAP                  "pilemark.bmp"
+
+IDB_MENU_SEL_COUNT      BITMAP                  "mnselcnt.bmp"
+
+IDB_RIP                 BITMAP                  "rip.bmp"
+
+IDB_SPLASH              BITMAP                  "splash.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -266,7 +260,7 @@ IDB_SPLASH              BITMAP  DISCARDABLE     "splash.bmp"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_NHTEXT, DIALOG
     BEGIN
@@ -297,9 +291,9 @@ BEGIN
     IDD_PLAYER_SELECTOR, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 145
+        RIGHTMARGIN, 218
         TOPMARGIN, 7
-        BOTTOMMARGIN, 162
+        BOTTOMMARGIN, 205
     END
 
     IDD_NHRIP, DIALOG
@@ -326,8 +320,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,5,0,0
- PRODUCTVERSION 3,5,0,0
+ FILEVERSION 3,6,1,0
+ PRODUCTVERSION 3,6,1,0
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -342,14 +336,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "NetHack for Windows - Graphical Interface\0"
-            VALUE "FileVersion", "3.5.0\0"
-            VALUE "InternalName", "NetHackW\0"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2006.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
-            VALUE "OriginalFilename", "NetHackW.exe\0"
-            VALUE "PrivateBuild", "140606\0"
-            VALUE "ProductName", "NetHack\0"
-            VALUE "ProductVersion", "3.5.0\0"
+            VALUE "FileDescription", "NetHack for Windows - Graphical Interface"
+            VALUE "FileVersion", "3.6.1"
+            VALUE "InternalName", "NetHackW"
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2018.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
+            VALUE "OriginalFilename", "NetHackW.exe"
+            VALUE "PrivateBuild", "140606"
+            VALUE "ProductName", "NetHack"
+            VALUE "ProductVersion", "3.6.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -358,19 +352,31 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PLAYER_SELECTOR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "NetHack for Windows - Graphical Interface"
     IDC_NETHACKW            "NETHACKW"
     IDS_APP_TITLE_SHORT     "NetHack for Windows"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
