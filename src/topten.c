@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/2/18 by NullCGT */
+/* Edited on 5/7/18 by NullCGT */
 
 #include "hack.h"
 #include "dlb.h"
@@ -425,6 +425,8 @@ encodeconduct()
         e |= 1L << 10;
     if (!num_genocides())
         e |= 1L << 11;
+    if (!u.uconduct.elbereth)
+        e |= 1L << 12;
 
     return e;
 }
