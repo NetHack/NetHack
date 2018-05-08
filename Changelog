@@ -54,8 +54,8 @@ General Changes
   attacks.
 - Upon stealing the amulet, if in the endgame a monster will try to flee.
 - Decreased floating eye spawn rate to make blind telepathy harder to obtain.
-- Mysterious force now only affects you when you are hallucinating (you
-  suddenly hallucinate that you are playing vanilla Nethack!)
+- Mysterious force is completely removed. Instead, the amulet blocks all forms
+  of teleportation.
 - There are different descriptions for venom which are randomized each game.
   This may break realism slightly, but does help with distinguishing what kind
   of venom an unfamiliar monster might be spitting.
