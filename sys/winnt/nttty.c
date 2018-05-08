@@ -1762,8 +1762,8 @@ void nethack_enter_nttty()
 
     GetConsoleScreenBufferInfo(console.hConOut, &console.origcsbi);
 
-    /* due to bugs we must set console width to 80 */
-    console.width = COLNO;
+    console.width = console.origcsbi.srWindow.Right -
+                     console.origcsbi.srWindow.Left + 1;
     console.height = console.origcsbi.srWindow.Bottom -
                      console.origcsbi.srWindow.Top + 1;
 
