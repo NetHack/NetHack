@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/24/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -354,13 +354,13 @@ static const struct def_skill Skill_D[] = {
     { P_PICK_AXE, P_BASIC },
     { P_SHORT_SWORD, P_BASIC },
     { P_BROAD_SWORD, P_EXPERT },
-    { P_LONG_SWORD, P_SKILLED },
-    { P_TWO_HANDED_SWORD, P_SKILLED },
+    { P_LONG_SWORD, P_BASIC },
+    { P_TWO_HANDED_SWORD, P_BASIC },
     { P_SCIMITAR, P_BASIC },
     { P_SABER, P_SKILLED },
     { P_CLUB, P_BASIC },
-    { P_MACE, P_SKILLED },
-    { P_MORNING_STAR, P_SKILLED },
+    { P_MACE, P_EXPERT },
+    { P_MORNING_STAR, P_EXPERT },
     { P_FLAIL, P_BASIC },
     { P_HAMMER, P_BASIC },
     { P_POLEARMS, P_EXPERT },
@@ -369,11 +369,9 @@ static const struct def_skill Skill_D[] = {
     { P_LANCE, P_EXPERT },
     { P_BOW, P_BASIC },
     { P_CROSSBOW, P_SKILLED },
-    { P_ATTACK_SPELL, P_SKILLED },
-    { P_HEALING_SPELL, P_SKILLED },
-    { P_CLERIC_SPELL, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },
+    { P_MATTER_SPELL, P_BASIC },
     { P_RIDING, P_EXPERT },
-    { P_TWO_WEAPON_COMBAT, P_SKILLED },
     { P_BARE_HANDED_COMBAT, P_BASIC },
     { P_NONE, 0 }
 };
@@ -775,6 +773,7 @@ u_init()
         ini_inv(Dragonmaster);
         knows_class(WEAPON_CLASS);
         knows_class(ARMOR_CLASS);
+        skill_init(Skill_D);
         break;
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
