@@ -2,7 +2,7 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 /*  attribute modification routines. */
 
@@ -107,8 +107,8 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   inf_abil[] = { { 1, &HInfravision, "", ""},
-                 { 7, &HRegeneration, "itchy",
-                                           "less itchy" },
+                 { 4, &HRegeneration, "resilient",
+                                           "less resilient" },
                  { 0, 0, 0, 0 } },
 
   mer_abil[] = { { 1, &HSwimming, "", ""},
