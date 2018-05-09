@@ -1,7 +1,9 @@
 #
 # NetHack 3.6  linux $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
-# NetHack may be freely redistributed.  See license for details. 
+# NetHack may be freely redistributed.  See license for details.
+#
+# Edited on 5/8/18
 #
 #-PRE
 # Linux hints file
@@ -25,7 +27,8 @@ CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 CFLAGS+=-DTIMED_DELAY
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
-CFLAGS+=-DDUMPLOG
+CFLAGS+=-DVAR_PLAYGROUND=\"$(HACKDIR)/var\"
+#CFLAGS+=-DDUMPLOG
 CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
 
 LINK=$(CC)

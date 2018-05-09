@@ -3,6 +3,8 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/8/18 by NullCGT */
+
 #define NEED_VARARGS
 
 #include "hack.h"
@@ -666,7 +668,7 @@ void
 really_close()
 {
     int fd;
-    
+
     if (lftrack.init) {
         fd = lftrack.fd;
 
@@ -2407,11 +2409,17 @@ char *origbuf;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
-    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 7)) {
+    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGFILE", 11)) {
 #ifdef DUMPLOG
         if (sysopt.dumplogfile)
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
+#endif
+    } else if (src == SET_IN_SYS && match_varname(buf, "DUMPLOGURL", 10)) {
+        #ifdef DUMPLOG
+        if (sysopt.dumplogurl)
+            free((genericptr_t) sysopt.dumplogurl);
+        sysopt.dumplogurl = dupstr(bufp);
 #endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
@@ -2495,6 +2503,24 @@ char *origbuf;
             return FALSE;
         }
         sysopt.tt_oname_maxrank = n;
+    } else if (src == SET_IN_SYS && match_varname(buf, "LIVELOG", 7)) {
+#ifdef LIVELOGFILE
+        n = strtol(bufp,NULL,0);
+        if (n < 0 || n > 0xFFFF) {
+            raw_printf("Illegal value in LIVELOG (must be between 0 and 0xFFFF).");
+            return 0;
+        }
+        sysopt.livelog = n;
+#else
+        raw_printf("WARNING: LIVELOG value configured but LIVELOGFILE not #defined. Ignored.");
+#endif
+    } else if (src == SET_IN_SYS && match_varname(buf, "LLC_TURNS", 9)) {
+        n = atoi(bufp);
+        if (n < 0) {
+            raw_printf("Illegal value in LLC_TURNS (must be a positive integer).");
+            return 0;
+        }
+        sysopt.ll_conduct_turns = n;
 
     /* SYSCF PANICTRACE options */
     } else if (src == SET_IN_SYS
@@ -3544,7 +3570,7 @@ const char *reason; /* explanation */
 {
 #ifdef PANICLOG
     FILE *lfile;
-    char buf[BUFSZ];
+    /* char buf[BUFSZ]; */
 
     if (!program_state.in_paniclog) {
         program_state.in_paniclog = 1;
@@ -3552,7 +3578,7 @@ const char *reason; /* explanation */
         if (lfile) {
 #ifdef PANICLOG_FMT2
             (void) fprintf(lfile, "%ld %s: %s %s\n",
-                           ubirthday, (plname ? plname : "(none)"),
+                           ubirthday, "(name removed)",
                            type, reason);
 #else
             time_t now = getnow();
@@ -4131,5 +4157,93 @@ int bufsz;
 }
 
 /* ----------  END TRIBUTE ----------- */
+
+/* Live logging - taken directly from 3.4.3-nao code base,
+ * but now uses \t separator instead of : as per xlogfile
+ */
+/* Locks the live log file and writes 'buffer'
+ * IF the ll_type matches sysopt.livelog mask
+ * lltype is included in LL entry for post-process filtering also
+ */
+#if defined LIVELOGFILE
+void
+livelog_write_string(ll_type, buffer)
+unsigned int ll_type;
+const char *buffer;
+{
+#define LLOG_SEP '\t' /* livelog field separator */
+    FILE* livelogfile;
+
+    if(!(ll_type & sysopt.livelog)) return;
+    if((ll_type == LL_CONDUCT) && (moves < sysopt.ll_conduct_turns)) return;
+    if(lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
+        if(!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
+            pline("Cannot open live log file!");
+        } else {
+            char tmpbuf[1024+1];
+            char msgbuf[512+1];
+            char *c1 = msgbuf;
+            strncpy(msgbuf, buffer, 512);
+            msgbuf[512] = '\0';
+            while (*c1 != '\0') {
+                if (*c1 == LLOG_SEP) *c1 = '_';
+                c1++;
+            }
+            snprintf(tmpbuf, 1024, "lltype=%d%cplayer=%s%crole=%s%crace=%s%cgender=%s%calign=%s%cturns=%ld%cstarttime=%ld%ccurtime=%ld%cmessage=%s\n",
+                     (ll_type & sysopt.livelog),
+                     LLOG_SEP,
+                     plname,
+                     LLOG_SEP,
+                     urole.filecode,
+                     LLOG_SEP,
+                     urace.filecode,
+                     LLOG_SEP,
+                     genders[flags.female].filecode,
+                     LLOG_SEP,
+                     aligns[1-u.ualign.type].filecode,
+                     LLOG_SEP,
+                     moves,
+                     LLOG_SEP,
+                     (long)ubirthday,
+                     LLOG_SEP,
+                     (long)time(NULL),
+                     LLOG_SEP,
+                     msgbuf);
+
+            fprintf(livelogfile, "%s", tmpbuf);
+            (void) fclose(livelogfile);
+        }
+        unlock_file(LIVELOGFILE);
+    }
+#undef LLOG_SEP
+}
+
+void
+livelog_printf
+VA_DECL2(unsigned int, ll_type, const char *, fmt)
+{
+    char ll_msgbuf[512];
+    VA_START(fmt);
+    VA_INIT(fmt, char *);
+    vsnprintf(ll_msgbuf, 512, fmt, VA_ARGS);
+    livelog_write_string(ll_type, ll_msgbuf);
+    VA_END();
+}
+
+#else /* LIVELOGFILE */
+
+void
+livelog_write_string(log_type, buffer)
+unsigned int log_type UNUSED;
+char *buffer UNUSED;
+{
+}
+
+void
+livelog_printf
+VA_DECL2(unsigned int, ll_type, const char *, fmt)
+} /* would be matched in VA_END() but we don't need this */
+
+#endif /* LIVELOGFILE */
 
 /*files.c*/

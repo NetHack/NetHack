@@ -1066,6 +1066,7 @@ int how;
         } else {
             killer.name[0] = 0;
             killer.format = 0;
+            livelog_write_string(LL_LIFESAVE, "averted death");
             return;
         }
     }
@@ -1482,6 +1483,7 @@ int how;
         raw_print("");
         raw_print("");
     }
+    livelog_dump_url(LL_DUMP_ALL|(how == ASCENDED ? LL_DUMP_ASC : 0));
     nh_terminate(EXIT_SUCCESS);
 }
 

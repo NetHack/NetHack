@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/14/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #ifndef DUNGEON_H
 #define DUNGEON_H
@@ -128,6 +128,7 @@ typedef struct branch {
 
 #define In_sokoban(x) ((x)->dnum == sokoban_dnum)
 #define Inhell In_hell(&u.uz) /* now gehennom */
+#define In_tower(x) ((x)->dnum == tower_dnum)
 #define In_endgame(x) ((x)->dnum == astral_level.dnum)
 
 #define within_bounded_area(X, Y, LX, LY, HX, HY) \

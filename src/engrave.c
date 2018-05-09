@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 5/4/18 by NullCGT */
+/* Modified 5/8/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -1092,7 +1092,9 @@ doengrave()
 
     /* A single `x' is the traditional signature of an illiterate person */
     if (len != 1 || (!index(ebuf, 'x') && !index(ebuf, 'X')))
-        u.uconduct.literate++;
+        if(!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,"became literate by engraving \"%s\"", ebuf);
+
 
     /* Mix up engraving if surface or state of mind is unsound.
        Note: this won't add or remove any spaces. */

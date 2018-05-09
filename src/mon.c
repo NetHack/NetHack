@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2033,8 +2033,16 @@ register struct monst *mtmp;
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
 
-    if (mtmp->data == &mons[PM_MEDUSA])
+    /* Medusa falls into two livelog categories,
+     * we log one message flagged for both categories.
+     */
+    if (mtmp->data == &mons[PM_MEDUSA]) {
         u.uachieve.killed_medusa = 1;
+        livelog_write_string(LL_ACHIEVE|LL_UMONST, "killed Medusa");
+    } else if (unique_corpstat(mtmp->data))
+        livelog_printf(LL_UMONST, "%s %s",
+              nonliving(mtmp->data) ? "destroyed" : "killed",
+              noit_mon_nam(mtmp));
     else if (mtmp->data == &mons[PM_KING_IN_YELLOW]) {
         u.uachieve.killed_king = 1;
     } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
@@ -2364,7 +2372,8 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
 
     mtmp->mhp = 0; /* caller will usually have already done this */
     if (!noconduct) /* KMH, conduct */
-        u.uconduct.killer++;
+        if(!u.uconduct.killer++)
+            livelog_write_string (LL_CONDUCT,"killed for the first time");
 
     if (!nomsg) {
         boolean namedpet = has_mname(mtmp) && !Hallucination;

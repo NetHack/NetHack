@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/11/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 /* Contains code for 't' (throw) */
 
@@ -1631,7 +1631,8 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
             /* attack hits mon */
             if (hmode == HMON_APPLIED)
-                u.uconduct.weaphit++;
+                if(!u.uconduct.weaphit++)
+                    livelog_write_string(LL_CONDUCT, "hit with a wielded weapon for the first time");
             if (hmon(mon, obj, hmode, dieroll)) { /* mon still alive */
                 cutworm(mon, bhitpos.x, bhitpos.y, obj);
             }

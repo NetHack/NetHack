@@ -3853,7 +3853,7 @@ c1 l1 l.
 .\" because description is wide, centered title seems off, so pad it a bit
 .\" note that each backslash precedes one space of padding (including the
 .\" last one; in other words, there's a trailing space here)
-NetHack Symbols\ \ \ \ \ \ \ 
+NetHack Symbols\ \ \ \ \ \ \
 Default	Symbol Name	Description
 \_	\_	\_
 \ 	S_air	(air)
@@ -4197,7 +4197,28 @@ player name
 .PL %N
 first character of player name
 .PE
-.
+.ei
+.ed
+.lp
+LIVELOG\ =\ A bitmask indicating which, if any, in-game events to record
+in the livelog file, which must be compiled into the game as LIVELOGFILE
+to enable this feature.  The following values may be combined:
+.sd
+.si
+0x01 - Wishes
+0x02 - Significant achievements (complete sokoban, perform invocation, etc)
+0x04 - Kill, destroy or bribe a unique monster.
+0x08 - Significant religious events (sacrifice gifts, crowning)
+0x10 - Life-saving
+0x20 - Break conduct - see also LLC_TURNS below.
+0x40 - Artifact obtained (#name Sting, dip for Excalibur)
+0x80 - Genocides
+0x8000 - Livelog debug msgs (currently only 'enter new level')
+.ei
+.ed
+%.lp
+LLC_TURNS\ = \ If live-logging conducts is enabled, do not log them before
+this turncount, because conducts broken in the early game are not interesting.
 .hn 1
 Scoring
 .pg
@@ -4485,8 +4506,8 @@ passed away. NetHack 3.6.0 introduced a tribute to him.
 team since the release of 3.4.3 with some of the beloved community
 patches. Many bugs were fixed and some code was restructured.
 .pg
-In late April 2018, several hundred bug fixes for 3.6.0 and 
-some new features were assembled and released as NetHack 3.6.1. 
+In late April 2018, several hundred bug fixes for 3.6.0 and
+some new features were assembled and released as NetHack 3.6.1.
 The development team at the time of release of 3.6.1 consisted of
 \fBWarwick Allison\fP, \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,

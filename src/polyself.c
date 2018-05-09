@@ -2,7 +2,7 @@
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 /*
  * Polymorph self routine.
@@ -608,7 +608,10 @@ int mntmp;
     }
 
     /* KMH, conduct */
-    u.uconduct.polyselfs++;
+    if(!u.uconduct.polyselfs++)
+        livelog_printf(LL_CONDUCT,
+            "changed form for the first time, becoming %s",
+            an(mons[mntmp].mname));
 
     /* exercise used to be at the very end but only Wis was affected
        there since the polymorph was always in effect by then */

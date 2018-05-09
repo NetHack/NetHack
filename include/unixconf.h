@@ -3,6 +3,8 @@
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/8/18 by NullCGT */
+
 #ifdef UNIX
 #ifndef UNIXCONF_H
 #define UNIXCONF_H
@@ -201,7 +203,7 @@
    read within game, from demon-delivered mail scrolls.
    The mail spool file will be deleted once the player
    has read the message. */
-/* #define SIMPLE_MAIL */
+#define SIMPLE_MAIL
 
 #ifndef MAILCKFREQ
 /* How often mail spool file is checked for new messages, in turns */
@@ -213,7 +215,7 @@
 /* If SERVER_ADMIN_MSG is defined and the file exists, players get
    a message from the user defined in the file.  The file format
    is "sender:message" all in one line. */
-/* #define SERVER_ADMIN_MSG "adminmsg" */
+#define SERVER_ADMIN_MSG "adminmsg"
 #ifndef SERVER_ADMIN_MSG_CKFREQ
 /* How often admin message file is checked for new messages, in turns */
 #define SERVER_ADMIN_MSG_CKFREQ 25
@@ -237,7 +239,7 @@
 #endif
 
 #ifndef FCMASK
-#define FCMASK 0660 /* file creation mask */
+#define FCMASK 0664 /* file creation mask */
 #endif
 
 /* fcntl(2) is a POSIX-portable call for manipulating file descriptors.

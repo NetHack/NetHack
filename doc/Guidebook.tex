@@ -2738,8 +2738,8 @@ for system administrators.
 %.pg
 The default name of the configuration file varies on different
 operating systems. On DOS and Windows, it is \mbox{``defaults.nh''}
-in the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}. 
-On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home 
+in the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
+On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 
@@ -4861,6 +4861,30 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 {\tt \%N}  --- first character of player name
 %.ei
 %.ed
+%.lp
+\item[\ib{LIVELOG}]
+A bitmask indicating which in-game events to record in the livelog file,
+which must be compiled into the game as LIVELOGFILE to enable this
+feature.  The following values may be combined:
+%.sd
+%.si
+
+{\tt 0x01}  --- Wishes\\
+{\tt 0x02}  --- Significant achievements (complete sokoban, perform invocation, etc)\\
+{\tt 0x04}  --- Kill, destroy or bribe a unique monster.\\
+{\tt 0x08}  --- Significant religious events (sacrifice gifts, crowning)\\
+{\tt 0x10}  --- Life-saving\\
+{\tt 0x20}  --- Break conduct - see also LLC\_TURNS below.\\
+{\tt 0x40}  --- Artifact obtained (#name Sting, dip for Excalibur)\\
+{\tt 0x80}  --- Genocides\\
+{\tt 0x8000}  --- Livelog debug msgs (currently only 'enter new level')
+%.ei
+%.ed
+
+%.lp
+\item[\ib{LLC\_TURNS}]
+If live-logging conducts is enabled, do not log them before this turncount,
+because conducts broken in the early game are not interesting.
 \elist
 
 %.hn 1
@@ -5230,9 +5254,9 @@ joined the {\it NetHack\/} development team.
 
 %.pg
 \medskip
-Near the end of the development of 3.6.0, one of the significant inspirations 
-for many of the humorous and fun features found in the game, 
-author Terry Pratchett, passed away. {\it NetHack\/} 3.6.0 introduced 
+Near the end of the development of 3.6.0, one of the significant inspirations
+for many of the humorous and fun features found in the game,
+author Terry Pratchett, passed away. {\it NetHack\/} 3.6.0 introduced
 a tribute to him.
 
 %.pg
@@ -5244,9 +5268,9 @@ patches.  Many bugs were fixed and some code was restructured.
 %.pg
 \medskip
 In late April 2018, several hundred bug fixes for 3.6.0 and some new features
-were assembled and released as NetHack 3.6.1. The development team at the 
-time of release of 3.6.1 consisted of 
-{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee}, 
+were assembled and released as NetHack 3.6.1. The development team at the
+time of release of 3.6.1 consisted of
+{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet},
 {\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick},
 {\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
@@ -5373,7 +5397,3 @@ Izchak Miller & Mike Stephenson & Yitzhak Sapir
 %\end{flushleft}
 
 \end{document}
-
-
-
-

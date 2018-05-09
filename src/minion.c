@@ -321,6 +321,8 @@ register struct monst *mtmp;
                     pline("%s vanishes, congratulating you on a game well played.",
                           Amonnam(mtmp));
                     mongone(mtmp);
+                    livelog_printf(LL_UMONST, "beat %s in a game of chance",
+                                Amonnam(mtmp));
                     return (1);
                 }
                 useup(otmp);
@@ -357,6 +359,8 @@ register struct monst *mtmp;
             pline("%s takes %s from you!", Monnam(mtmp), the(xname(otmp)));
             pline("%s laughs and vanishes. \"I look forward to seeing what becomes of your little quest.\"",
                   Amonnam(mtmp));
+            livelog_printf(LL_UMONST, "bribed %s with %s for safe passage",
+                        Amonnam(mtmp), xname(otmp));
             mongone(mtmp);
             return (1);
         }
@@ -380,13 +384,19 @@ register struct monst *mtmp;
         if ((offer = bribe(mtmp)) == demand + 1 || offer == demand) {
             pline("%s vanishes, commenting on the cheekiness of mortals.",
                   Amonnam(mtmp));
+            livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+                        Amonnam(mtmp), offer, currency(offer));
         } else if (offer >= demand) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
+            livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+                        Amonnam(mtmp), offer, currency(offer));
         } else if (offer > 0L
                    && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
             pline("%s scowls at you menacingly, then vanishes.",
                   Amonnam(mtmp));
+            livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+                        Amonnam(mtmp), offer, currency(offer));
         } else {
             pline("%s gets angry...", Amonnam(mtmp));
             mtmp->mpeaceful = 0;

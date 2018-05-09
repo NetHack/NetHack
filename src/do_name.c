@@ -3,7 +3,7 @@
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/26/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1296,7 +1296,10 @@ const char *name;
             alter_cost(obj, 0L);
         if (via_naming) {
             /* violate illiteracy conduct since successfully wrote arti-name */
-            u.uconduct.literate++;
+            if(!u.uconduct.literate++)
+                livelog_printf(LL_CONDUCT|LL_ARTIFACT, "became literate by naming %s", bare_artifactname(obj));
+            else
+                livelog_printf(LL_ARTIFACT, "chose %s to be named \"%s\"", ansimpleoname(obj), bare_artifactname(obj));
         }
     }
     if (carried(obj))

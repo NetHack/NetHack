@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/4/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1957,7 +1957,8 @@ dodip()
             short save_otyp = obj->otyp;
 
             /* KMH, conduct */
-            u.uconduct.polypiles++;
+            if(!u.uconduct.polypiles++)
+                livelog_printf(LL_CONDUCT, "polymorphed %s first item", uhis());
 
             was_wep = (obj == uwep);
             was_swapwep = (obj == uswapwep);

@@ -1,7 +1,7 @@
 /* NetHack 3.6	extern.h	$NHDT-Date: 1518053385 2018/02/08 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.625 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #ifndef EXTERN_H
 #define EXTERN_H
@@ -814,6 +814,8 @@ E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 E boolean FDECL(read_tribute, (const char *, const char *, int,
                                char *, int, unsigned));
 E boolean FDECL(Death_quote, (char *, int));
+E void FDECL(livelog_write_string, (unsigned int, const char *));
+E void VDECL(livelog_printf, (unsigned int, const char *, ...)) PRINTF_F(2, 3);
 
 /* ### fountain.c ### */
 
@@ -2796,6 +2798,7 @@ E void FDECL(dump_open_log, (time_t));
 E void NDECL(dump_close_log);
 E void FDECL(dump_redirect, (BOOLEAN_P));
 E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
+E void FDECL(livelog_dump_url, (unsigned int));
 
 /* ### wizard.c ### */
 

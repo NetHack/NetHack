@@ -3,7 +3,7 @@
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -612,7 +612,7 @@ bail:
     if (!adminmsg)
         pline("It appears to be all gibberish.");
 }
-#endif /* SIMPLE_MAIL */
+#endif /* SIMPLE_MAIL || ADMIN_MSG */
 
 void
 ck_server_admin_msg()

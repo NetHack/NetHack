@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/4/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -496,6 +496,9 @@ int dieroll;
             if (mon->wormno && *mhit)
                 cutworm(mon, x, y, weapon);
         }
+        if(u.uconduct.weaphit && !oldweaphit)
+            livelog_write_string(LL_CONDUCT,
+                    "hit with a wielded weapon for the first time");
     }
     return malive;
 }

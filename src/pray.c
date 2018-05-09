@@ -2,7 +2,7 @@
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/6/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -759,6 +759,8 @@ gcrownu()
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
         verbalize("I crown thee...  The Hand of Elbereth!");
+        livelog_printf(LL_DIVINEGIFT,
+                "was crowned \"The Hand of Elbereth\" by %s", u_gname());
         break;
     case A_NEUTRAL:
         u.uevent.uhand_of_elbereth = 2;
@@ -766,6 +768,8 @@ gcrownu()
         already_exists =
             exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
         verbalize("Thou shalt be my Envoy of Balance!");
+        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
+                s_suffix(u_gname()));
         break;
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
@@ -774,6 +778,9 @@ gcrownu()
             exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
         verbalize("Thou art chosen to %s for My Glory!",
                   already_exists && !in_hand ? "take lives" : "steal souls");
+        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
+                already_exists && !in_hand ? "take lives" : "steal souls",
+                u_gname());
         break;
     }
 
@@ -1397,7 +1404,11 @@ dosacrifice()
         extern const int monstr[];
 
         /* KMH, conduct */
-        u.uconduct.gnostic++;
+        if(!u.uconduct.gnostic++)
+            livelog_printf(LL_CONDUCT,
+                    "rejected atheism by offering %s on an altar of %s",
+                    corpse_xname(otmp, (const char *)0, CXN_ARTICLE),
+                    a_gname());
 
         /* you're handling this corpse, even if it was killed upon the altar
          */
@@ -1917,7 +1928,13 @@ dopray()
     if (ParanoidPray && yn("Are you sure you want to pray?") != 'y')
         return 0;
 
-    u.uconduct.gnostic++;
+    if(!u.uconduct.gnostic++)
+        /* breaking conduct should probably occur in can_pray() at
+         * "You begin praying to %s", as demons who find praying repugnant
+         * should not break conduct.  Also we can add more detail to the
+         * livelog message as p_aligntyp will be known.
+         */
+        livelog_write_string(LL_CONDUCT, "rejected atheism with a prayer");
 
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
@@ -2032,7 +2049,8 @@ doturn()
         You("don't know how to turn undead!");
         return 0;
     }
-    u.uconduct.gnostic++;
+    if(!u.uconduct.gnostic++)
+        livelog_write_string(LL_CONDUCT, "rejected atheism by turning undead");
 
     if ((u.ualign.type != A_CHAOTIC
          && (is_demon(youmonst.data) || is_undead(youmonst.data)))

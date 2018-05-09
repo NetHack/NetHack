@@ -3,7 +3,7 @@
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/4/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1842,6 +1842,7 @@ mkinvokearea()
     mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0); /* down */
     newsym(u.ux, u.uy);
     vision_full_recalc = 1; /* everything changed */
+    livelog_write_string(LL_ACHIEVE, "woke the rulers of Gehennom by performing the invocation");
 }
 
 /* Change level topology.  Boulders in the vicinity are eliminated.

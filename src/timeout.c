@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/8/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
@@ -462,7 +462,9 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
                 /* involuntarily break "never changed form" conduct */
-                u.uconduct.polyselfs++;
+                if(!u.uconduct.polyselfs++)
+                    livelog_write_string(LL_CONDUCT,
+                            "changed form for the first time by turning to slime");
                 done(TURNED_SLIME);
                 break;
             case VOMITING:
