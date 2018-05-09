@@ -2,7 +2,7 @@
 #	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #
-# Edited on 3/29/18 by NullCGT
+# Edited on 5/9/18 by NullCGT
 #
 #	Gnu gcc compiler for msdos (djgpp)
 #	Requires Gnu Make utility (V3.79.1 or greater) supplied with djgpp
@@ -587,6 +587,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
 	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
 	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/splicetips del $(DAT)/splicetips)
 	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
 	$(subst /,\,if exist $(DAT)/*.lev del $(DAT)/*.lev)
@@ -956,6 +957,9 @@ $(DAT)/engrave:	     $(O)utility.tag    $(DAT)/engrave.txt
 $(DAT)/epitaph:	     $(O)utility.tag    $(DAT)/epitaph.txt
 	@$(subst /,\,$(U)makedefs.exe -s)
 
+$(DAT)/splicetips:	     $(O)utility.tag    $(DAT)/splicetips.txt
+	@$(subst /,\,$(U)makedefs.exe -s)
+
 $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des \
 	$(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des \
@@ -1011,13 +1015,13 @@ $(DAT)/dungeon:	  $(O)utility.tag  $(DAT)/dungeon.def
 #
 $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors $(DAT)/dungeon \
 	    $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag \
-	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute
+	    $(DAT)/bogusmon $(DAT)/engrave $(DAT)/epitaph $(DAT)/tribute $(DAT)/splicetips
 	@$(subst /,\,echo dat done >$(O)dat.tag)
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
 	@$(LS) data dungeon oracles options quest.dat rumors help hh >dlb.lst
 	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
-	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
+	@$(LS) bogusmon engrave epitaph tribute splicetips >>dlb.lst
 	$(LS) $(subst /,\,*.lev) >>dlb.lst
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)
 	@$(subst /,\,cd $(SRC))

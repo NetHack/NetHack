@@ -7,7 +7,7 @@
 /* patchlevel.h if needed.  Changing the instance_flags structure does     */
 /* not require incrementing EDITLEVEL.                                     */
 
-/* Edited on 3/2/18 by NullCGT */
+/* Edited on 5/9/18 by NullCGT */
 
 #ifndef FLAG_H
 #define FLAG_H
@@ -92,6 +92,7 @@ struct flag {
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
     boolean time;            /* display elapsed 'time' */
+    boolean tips;            /* give the player spoilery tips */
     boolean tombstone;       /* print tombstone */
     boolean verbose;         /* max battle info */
     int end_top, end_around; /* describe desired score list */

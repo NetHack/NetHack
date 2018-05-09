@@ -5,7 +5,7 @@
 /* Copyright (c) Dean Luick, 1990.                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/9/18 by NullCGT */
 
 #define MAKEDEFS_C /* use to conditionally include file sections */
 
@@ -358,6 +358,7 @@ char *options;
             do_rnd_access_file(EPITAPHFILE);
             do_rnd_access_file(ENGRAVEFILE);
             do_rnd_access_file(BOGUSMONFILE);
+            do_rnd_access_file(SPLICETIPSFILE);
             break;
         case 'h':
         case 'H':

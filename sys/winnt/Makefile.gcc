@@ -2,7 +2,7 @@
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
-# Edited on 3/29/18 by NullCGT
+# Edited on 5/9/18 by NullCGT
 #
 #==============================================================================
 #
@@ -668,6 +668,9 @@ $(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
 $(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
+	$(subst /,\,$(U)makedefs -s)
+
+$(DAT)/splicetips: $(DAT)/splicetips.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
 $(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe

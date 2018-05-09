@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/9/18 by NullCGT */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -33,6 +33,7 @@
 #define OPTIONS_USED "options"  /* compile-time options, for #version */
 #define SYMBOLS "symbols"       /* replacement symbol sets */
 #define EPITAPHFILE "epitaph"   /* random epitaphs on graves */
+#define SPLICETIPSFILE "splicetips" /* tips for playing splicehack */
 #define ENGRAVEFILE "engrave"   /* random engravings on the floor */
 #define BOGUSMONFILE "bogusmon" /* hallucinatory monsters */
 #define TRIBUTEFILE "tribute"   /* 3.6 tribute to Terry Pratchett */
@@ -365,6 +366,6 @@ struct savefile_info {
 #define LL_GENOCIDE   0x0080 /* Logging of genocides */
 #define LL_DUMP_ASC   0x0100 /* Log URL for dumplog if ascended */
 #define LL_DUMP_ALL   0x0200 /* Log dumplog url for all games */
-#define LL_DEBUG      0x8000 /* For debugging messages and other spam */ 
+#define LL_DEBUG      0x8000 /* For debugging messages and other spam */
 
 #endif /* GLOBAL_H */

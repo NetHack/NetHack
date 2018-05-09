@@ -1,7 +1,7 @@
 # NetHack 3.6	Makefile.msc	$NHDT-Date: 1520858848 2018/03/12 12:47:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.112 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2018
 #
-# Edited 3/29/18 by NullCGT
+# Edited 5/9/18 by NullCGT
 #
 #==============================================================================
 # Build Tools Environment
@@ -1042,7 +1042,7 @@ $(DAT)\porthelp: $(MSWSYS)\porthelp
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
-	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
+	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(DAT)\splicetips $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -1064,6 +1064,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo wizhelp >>dlb.lst
 	echo dungeon >>dlb.lst
 	echo license >>dlb.lst
+	echo splicetips >>dlb.lst
 	for %%N in (*.lev) do echo %%N >>dlb.lst
 	$(U)dlb_main cIf dlb.lst $(SRC)\nhdat
 	cd $(SRC)
@@ -1202,6 +1203,7 @@ spotless: clean
 	if exist $(DAT)\rumors           del $(DAT)\rumors
 	if exist $(DAT)\engrave          del $(DAT)\engrave
 	if exist $(DAT)\epitaph          del $(DAT)\epitaph
+	if exist $(DAT)\splicetips       del $(DAT)\splicetips
 	if exist $(DAT)\bogusmon         del $(DAT)\bogusmon
 	if exist $(DAT)\???-fil?.lev	 del $(DAT)\???-fil?.lev
 	if exist $(DAT)\???-goal.lev	 del $(DAT)\???-goal.lev
@@ -1341,6 +1343,9 @@ $(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
 	$(U)makedefs -s
 
 $(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\splicetips: $(DAT)\splicetips.txt $(U)makedefs.exe
 	$(U)makedefs -s
 
 $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe

@@ -1,0 +1,58 @@
+# NetHack may be freely redistributed.  See license for details.
+# Random tips at the start of the game
+#
+Catnip can help you befriend felines, but might also make them confused.
+Drawing from a deck of fate is generally a bad idea.
+A deck of cards could save you from a demon lord.
+Demon lords may be interested in more than just money.
+Throwing Gae Bulg can potentially kill anything, but will result in the loss of the artifact.
+The mysterious force has left the dungeon.
+Performing the invocation ritual will draw notice from the remaining royalty of Gehennom.
+Luckless Folly becomes more powerful the more unlucky you are.
+The Amulet of Yendor now blocks teleportation.
+Sonic attacks will not harm you if you are deaf.
+Psionic attacks will not harm something without a mind.
+Psionic beams cannot be reflected.
+The Void is a dangerous branch that contains a void dragon.
+Void dragons can disintegrate you with a melee attack.
+Unlimited Moon's power is dependent on the moon phase.
+A polished silver shield might be a shield of reflection, or it could be a shield of resonance.
+Nymphs and other dungeon denizens might introduce themselves to you.
+Mystic scarabs have armor that is extremely difficult to penetrate.
+Phoenixes explode upon death.
+Birds are faster than dogs or cats, but slightly smaller and weaker.
+Want to give your pet an item to use? Try #give!
+Using farlook on a monster will tell you what they are wielding.
+Deadly poison isn't deadly anymore, but is still very dangerous.
+Venom appearances are randomized, and can be used to help you identify unfamiliar monsters.
+Bad clones get many more attacks per round than amalgamations.
+Looking for more hints about SpliceHack? Talk to the Oracle!
+Monsters can wake each other up by roaring.
+Guards don't like lycanthropes.
+If you see a banshee, plug your ears!
+Silver will now deal extra damage to sensitive players.
+Lord Surtur's attacks are ground-shaking.
+Thoth Amon has access to a wider array of magic than you might be used to.
+Nalzok is a big fan of summoning hell-p.
+The Dark One recently discovered the utility of casting two spells at once.
+Demon lords don't like angelic players.
+Angelic players intrinsically aggravate monsters.
+Infernal players hate silver.
+Cartomancers have a chance of keeping the scrolls they use.
+Fire resistance may only be partial protection against Mephisto.
+Boxing gloves. Because stunning monsters is cool.
+Combining a mask with an amulet of unchanging is a rather poor plan.
+Wand didn't identify when you thought it would? It might be a wand of wonder.
+Masks degrade in power when taken off, and cursed masks will break apart.
+Masks will allow you to permanently transform for as long as you wear them.
+The bones of high level players might spawn spectres.
+Vorpal jabberwocks are, thankfully, not actually vorpal.
+Opposed monsters may fight one another without your prompting.
+Attacking a barbed devil can be a painful experience.
+The Astral Plane is home to more player monsters than you might expect.
+Monsters can sacrifice corpses on altars.
+Monsters can ascend instead of you, should they manage to sacrifice the Amulet!
+Furnaces contain lava. As such, drinking from them is a rather poor idea.
+Dragons have learned how to manipulate certain items with their claws.
+Don't let a monster get ahold of a wand of wishing...
+See some colored stairs? They probably lead to a branch.

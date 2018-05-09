@@ -2,7 +2,7 @@ This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
-Edited 3/29/18 by NullCGT
+Edited 5/9/18 by NullCGT
 
 
 .:
@@ -20,7 +20,7 @@ history         keyhelp         knox.des        license         medusa.des
 mines.des       opthelp         oracle.des      oracles.txt     quest.txt
 rumors.fal      rumors.tru      sokoban.des     symbols         tower.des
 tribute         wizhelp         yendor.des      Cartomancer.des void.des
-statuary.des	Drag.des
+statuary.des	Drag.des          splicetips.txt
 
 doc:
 (files for all versions)

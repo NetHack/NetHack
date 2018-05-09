@@ -145,6 +145,7 @@ FILES
        data, oracles, rumors       Data files used by NetHack.
        quest.dat, bogusmon         More data files.
        engrave, epitaph, tribute   Still more data files.
+       splicetips                  Even more data files
        symbols                     Data file holding sets of specifications
                                    for how to display monsters, objects, and
                                    map features.

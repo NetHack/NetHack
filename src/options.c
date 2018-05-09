@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/9/18 by NullCGT */
+/* Edited on 5/9/18 by NullCGT */
 
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
@@ -224,6 +224,7 @@ static struct Bool_Opt {
 #else
     { "timed_delay", (boolean *) 0, FALSE, SET_IN_GAME },
 #endif
+    { "tips", &flags.tips, TRUE, SET_IN_GAME },
     { "tombstone", &flags.tombstone, TRUE, SET_IN_GAME },
     { "toptenwin", &iflags.toptenwin, FALSE, SET_IN_GAME },
     { "travel", &flags.travelcmd, TRUE, SET_IN_GAME },

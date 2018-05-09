@@ -3,7 +3,7 @@
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
-# Edited 4/24/18 by NullCGT
+# Edited 5/9/18 by NullCGT
 
 # Root of source tree:
 NHSROOT=.
@@ -59,7 +59,7 @@ DIRPERM  = 0755
 # for Gnome
 # VARDATND = x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
+VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors splicetips
 VARDAT = $(VARDATD) $(VARDATND)
 
 # Some versions of make use the SHELL environment variable as the shell
@@ -127,6 +127,9 @@ rumors: $(GAME)
 
 oracles: $(GAME)
 	( cd dat ; $(MAKE) oracles )
+
+splicetips: $(GAME)
+	( cd dat ; $(MAKE) splicetips )
 
 #	Note: options should have already been made with make, but...
 options: $(GAME)

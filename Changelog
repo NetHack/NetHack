@@ -17,6 +17,7 @@ New Options
   frustrating.
 - Ill-fated: A challenge mode where the dungeon difficulty is automatically
   upped by 50.
+- Tips: Gives you a spoiler tip every time you are welcomed. Defaults to true.
 - Pet names for birds and dragons can be specified with birdname and dragonname
   respectively. Birds can be set as the preferred pet with "b".
 
@@ -35,6 +36,7 @@ Visual/Interface Changes
 - Altars are colored based on alignment (ported from xnethack)
 
 General Changes
+- SpliceHack Tip of the Day will tell you about new features.
 - Deadly poison no longer instantly kills you, but instead will cause both
   HP and attribute damage.
 - Probing certain non-unique monsters will tell you their name.
@@ -110,6 +112,7 @@ General Changes
   bones file is generated.
 - Additional achievements are tracked in the xlogfile that pertain to this
   variant.
+- NHTangles' livelogging and hardfought configurations are enabled.
 - Pets can now potentially become stunned or invisible by eating the right
   kind of corpse.
 - Birds are now a potential kind of pet. You begin with a little bird, which can

@@ -5,7 +5,7 @@
 
 /* various code that was replicated in *main.c */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/9/18 by NullCGT */
 
 #include "hack.h"
 
@@ -658,6 +658,7 @@ welcome(new_game)
 boolean new_game; /* false => restoring an old game */
 {
     char buf[BUFSZ];
+    char tipbuf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
 
     /* skip "welcome back" if restoring a doomed character */
@@ -688,6 +689,10 @@ boolean new_game; /* false => restoring an old game */
                    : "%s %s, the%s %s %s, welcome back to SpliceHack!",
           Hello((struct monst *) 0), plname, buf, urace.adj,
           (currentgend && urole.name.f) ? urole.name.f : urole.name.m);
+    if (flags.tips) {
+        get_rnd_text(SPLICETIPSFILE, tipbuf);
+        pline("Splicehack Tip of the Day: %s", tipbuf);
+    }
 }
 
 #ifdef POSITIONBAR
