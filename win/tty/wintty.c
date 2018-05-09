@@ -3531,6 +3531,7 @@ const char *str;
         }
 #ifdef STATUS_HILITES
         else {
+            tty_curs(WIN_STATUS, i, cw->cury);
             ttyDisplay->curx++;
             cw->curx++;
         }
