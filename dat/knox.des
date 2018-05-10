@@ -127,3 +127,370 @@ OBJECT:('*',"ruby"),(48,06)
 OBJECT:('*',"amethyst"),(46,13)
 OBJECT:('*',"amethyst"),(47,13)
 OBJECT:('*',"amethyst"),(48,13)
+
+#
+# "Winterly Fort Ludios" by Patric Mueller <bhaak@gmx.net>
+#
+MAZE:"knox-2",' '
+FLAGS: noteleport,shortsighted
+GEOMETRY:center,center
+MAP
+--------------------}}I-----------------------------------------------------
+| |........|.........}II...................................................|
+| |........|.........}II.............}}}}}}}....................}}}}}}}....|
+| --S----S--..........}II............}-----}....................}-----}....|
+|   #   |..............}III..........}|...|}}}}}}}}}}}}}}}}}}}}}}|...|}....|
+|   #   |.............}}II...........}---S------------------------S---}....|
+|   # ---.............}}II...........}}}|...............|..........|}}}....|
+|   # |................II..............}|...............S..........|}......|
+|   # |................}II.............}|...............|......\...S}......|
+| --S----..............}III..........}}}|...............|..........|}}}....|
+| |.....|.............}}IIII.........}---S------------------------S---}....|
+| |.....+..............}}II..........}|...|}}}}}}}}}}}}}}}}}}}}}}|...|}....|
+| |.....|...............}}I..........}-----}....................}-----}....|
+| |.....|................}}I.........}}}}}}}....................}}}}}}}....|
+| |..-S----...............}II..............................................|
+| |..|....|..............}IIII.....|--+--|...........................|--+--|
+| |..|....|.............}}}.IIII...|.....|..........|--+--|..........|.....|
+| -----------..........}}}...III...+.....|----------|.....|----------|.....|
+|           |.........}}}...III....|.......................................|
+----------------------}}}----III--------------------------------------------
+ENDMAP
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# Portal arrival point
+BRANCH:(08,16,08,16),(0,0,0,0)
+TELEPORT_REGION:(06,15,09,16),(0,0,0,0),up
+TELEPORT_REGION:(06,15,09,16),(0,0,0,0),down
+#   Throne room, with Croesus on the throne
+REGION:(57,06,66,09),lit,"throne"
+#   50% chance each to move throne and/or fort's entry secret door up one row
+IF [50%] {
+   MONSTER:('@',"Croesus"),(63,08),hostile
+} ELSE {
+   MONSTER:('@',"Croesus"),(63,07),hostile
+   TERRAIN:(63,07), '\'
+   TERRAIN:(63,08), '.'
+}
+IF [50%] {
+   TERRAIN:(67,07), 'S'
+   TERRAIN:(67,08), '|'
+}
+#   The Vault
+#   Using unfilled morgue for
+#   identification in mkmaze.c
+REGION:(41,06,55,09),lit,"morgue",unfilled
+#   Vault entrance also varies
+IF [50%] {
+   TERRAIN:(56,07), '|'
+   TERRAIN:(56,08), 'S'
+}
+#   Corner towers
+REGION:(39,04,41,04),lit,"ordinary"
+REGION:(66,04,68,04),lit,"ordinary"
+REGION:(39,11,41,11),lit,"ordinary"
+REGION:(66,11,68,11),lit,"ordinary"
+#   A welcoming committee
+REGION:(03,10,07,13),lit,"zoo",filled,irregular
+#   arrival chamber; needs to be a real room to control migrating monsters,
+#   and `unfilled' is a kludge to force an ordinary room to remain a room
+REGION:(06,15,09,16),unlit,"ordinary",unfilled
+#   Barracks
+REGION:(36,16,36,18),lit,"barracks",filled,irregular
+# Doors
+DOOR:closed,(06,14)
+DOOR:closed,(09,03)
+DOOR:locked,(08,11)
+# barrack doors
+DOOR:closed,(35,17)
+DOOR:closed,(38,15)
+DOOR:closed,(55,16)
+DOOR:closed,(72,15)
+# Soldier in watchtower
+#MONSTER: '@', "lieutenant",(19,07),hostile
+#OBJECT:'/',"fire",(19,07)
+# Soldiers guarding the fort
+MONSTER:('@',"soldier"),(12,14)
+MONSTER:('@',"soldier"),(12,13)
+MONSTER:('@',"soldier"),(11,10)
+MONSTER:('@',"soldier"),(13,02)
+MONSTER:('@',"soldier"),(14,03)
+MONSTER:('@',"soldier"),(20,02)
+MONSTER:('@',"soldier"),(30,02)
+MONSTER:('@',"soldier"),(40,01)
+MONSTER:('@',"soldier"),(30,16)
+MONSTER:('@',"soldier"),(32,16)
+MONSTER:('@',"soldier"),(36,08)
+MONSTER:('@',"soldier"),(54,15)
+MONSTER:('@',"soldier"),(54,13)
+MONSTER:('@',"soldier"),(53,12)
+MONSTER:('@',"soldier"),(71,10)
+MONSTER:('@',"soldier"),(57,03)
+MONSTER:('@',"lieutenant"),(15,08)
+# Four dragons guarding each side
+MONSTER:'D',(32,09)
+MONSTER:'D',(49,02)
+MONSTER:'D',(50,12)
+# this one isn't where he's supposed to be
+MONSTER:'D',(25,03)
+# Eels in the moat
+MONSTER:(';',"giant eel"),(50,04)
+MONSTER:(';',"giant eel"),(60,04)
+MONSTER:(';',"giant eel"),(43,12)
+MONSTER:(';',"giant eel"),(68,09)
+# The corner rooms treasures
+OBJECT:('*',"diamond"),(39,04)
+OBJECT:('*',"diamond"),(40,04)
+OBJECT:('*',"diamond"),(41,04)
+OBJECT:('*',"emerald"),(39,11)
+OBJECT:('*',"emerald"),(40,11)
+OBJECT:('*',"emerald"),(41,11)
+OBJECT:('*',"ruby"),(66,04)
+OBJECT:('*',"ruby"),(67,04)
+OBJECT:('*',"ruby"),(68,04)
+OBJECT:('*',"amethyst"),(66,11)
+OBJECT:('*',"amethyst"),(67,11)
+OBJECT:('*',"amethyst"),(68,11)
+
+
+#
+# "Minas Tirith?" by Patric Mueller <bhaak@gmx.net>
+#
+MAZE:"knox-3",' '
+FLAGS: noteleport,shortsighted
+GEOMETRY:center,center
+MAP
+----------------------------------------------------------------------------
+|........|.......}|F|}.......}F|F|F}......+..................|.|   |.|   |.|
+|........|.......}|.|}.......}F.|.F}......F...........|--F--+|.|   |.|   |.|
+|-S----S--......}F|||F}......}F.|.F}......+.....|--F--|...}F.|.|   |.|   |.|
+| #   |.........}F.|.F}......}F|F|F}......|--F--|.........}|.|S-----S-----S-
+| #   |.........}F|||F}.......}|.|}.......................}F.|..............
+| # |--.........}|...|}......}F|F|F}......................}|.|............. 
+| # |...........}F|||F}......}F.|.F}......................}F.|...........   
+| # |...........}F.|.F}......}F.|.F}......................}|.|.........     
+|-S----.........}F|||F}......}F|F|F}..........{{{.........}F.|.......       
+|.....|..........}|.|}.......}|...|}..........{T{.........}|.|......        
+|.....+.........}F|||F}......}F|F|F}..........{{{.........}F.|---S-         
+|.....|.........}F.|.F}......}F.|.F}......................}|.|.......       
+|.....|.........}F|||F}......}F.|.F}......................}F.|........      
+|..-S----.......}|...|}......}F|F|F}......................}|.S....\......   
+|..|....|.......}F|||F}.......}|.|}.......................}F.|..............
+|..|....|.......}F.|.F}......}F|F|F}......|--F--|.........}|.|S-----S-----S-
+|----------.....}F|||F}......}F.|.F}......+.....|--F--|...}F.|.|   |.|   |.|
+|         |......}|.|}.......}F.|.F}......F...........|--F--+|.|   |.|   |.|
+|         |......}|F|}.......}F|F|F}......+..................|.|   |.|   |.|
+----------------------------------------------------------------------------
+ENDMAP
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,19)
+# everything's lit
+REGION:(00,00,75,19),lit,"ordinary"
+# Portal arrival point
+BRANCH:(06,16,06,16),(0,0,0,0)
+#   Throne room, with Croesus on the throne
+REGION:(62,12,75,15),lit,"throne"
+MONSTER:('@',"Croesus"),(66,14),hostile
+#   50% chance each to move fort's entry secret door up one row
+IF [50%] {
+   TERRAIN:(61,13), 'S'
+   TERRAIN:(61,14), '|'
+}
+#   The Vault
+#   Using unfilled morgue for
+#   identification in mkmaze.c
+REGION:(62,05,75,10),lit,"morgue",unfilled
+#   Vault entrance also varies
+IF [50%] {
+   TERRAIN:(65,11), '|'
+   TERRAIN:(64,11), 'S'
+}
+#   A welcoming committee
+REGION:(01,10,05,13),lit,"zoo",filled,irregular
+#   arrival chamber; needs to be a real room to control migrating monsters,
+#   and `unfilled' is a kludge to force an ordinary room to remain a room
+REGION:(04,15,07,16),unlit,"ordinary",unfilled
+#   Barracks
+REGION:(43,01,44,02),lit,"barracks",filled,irregular
+REGION:(43,17,44,17),lit,"barracks",filled,irregular
+# Drawbridges of first ringwall
+DRAWBRIDGE:(30,05),east,closed
+DRAWBRIDGE:(34,05),west,closed
+DRAWBRIDGE:(29,10),east,closed
+DRAWBRIDGE:(35,10),west,closed
+DRAWBRIDGE:(30,15),east,closed
+DRAWBRIDGE:(34,15),west,closed
+# Guards of first ringwall, with possible offensive wands
+MONSTER:'C',(31,02),hostile
+IF [50%] {
+  OBJECT:'/',(31,02)
+}
+MONSTER:'C',(31,03),hostile
+IF [50%] {
+  OBJECT:'/',(31,03)
+}
+MONSTER:'C',(31,07),hostile
+IF [50%] {
+  OBJECT:'/',(31,07)
+}
+MONSTER:'C',(31,08),hostile
+IF [50%] {
+  OBJECT:'/',(31,08)
+}
+MONSTER:'C',(31,12),hostile
+IF [50%] {
+  OBJECT:'/',(31,12)
+}
+MONSTER:'C',(31,13),hostile
+IF [50%] {
+  OBJECT:'/',(31,13)
+}
+MONSTER:'C',(31,17),hostile
+IF [50%] {
+  OBJECT:'/',(31,17)
+}
+MONSTER:'C',(31,18),hostile
+IF [50%] {
+  OBJECT:'/',(31,18)
+}
+MONSTER:'C',(33,02),hostile
+IF [50%] {
+  OBJECT:'/',(33,02)
+}
+MONSTER:'C',(33,03),hostile
+IF [50%] {
+  OBJECT:'/',(33,03)
+}
+MONSTER:'C',(33,07),hostile
+IF [50%] {
+  OBJECT:'/',(33,07)
+}
+MONSTER:'C',(33,08),hostile
+IF [50%] {
+  OBJECT:'/',(33,08)
+}
+MONSTER:'C',(33,12),hostile
+IF [50%] {
+  OBJECT:'/',(33,12)
+}
+MONSTER:'C',(33,13),hostile
+IF [50%] {
+  OBJECT:'/',(33,13)
+}
+MONSTER:'C',(33,17),hostile
+IF [50%] {
+  OBJECT:'/',(33,17)
+}
+MONSTER:'C',(33,18),hostile
+IF [50%] {
+  OBJECT:'/',(33,18)
+}
+# Drawbridges of second ringwall
+DRAWBRIDGE:(16,06),east,closed
+DRAWBRIDGE:(22,06),west,closed
+DRAWBRIDGE:(17,10),east,closed
+DRAWBRIDGE:(21,10),west,closed
+DRAWBRIDGE:(16,14),east,closed
+DRAWBRIDGE:(22,14),west,closed
+# Guards of first ringwall, with possible offensive wands
+MONSTER:'C',(18,04),hostile
+MONSTER:'C',(20,04),hostile
+IF [50%] {
+  OBJECT:'/',(18,04)
+}
+IF [50%] {
+  OBJECT:'/',(20,04)
+}
+MONSTER:'C',(18,08),hostile
+MONSTER:'C',(20,08),hostile
+IF [50%] {
+  OBJECT:'/',(18,08)
+}
+IF [50%] {
+  OBJECT:'/',(20,08)
+}
+MONSTER:'C',(18,12),hostile
+MONSTER:'C',(20,12),hostile
+IF [50%] {
+  OBJECT:'/',(18,12)
+}
+IF [50%] {
+  OBJECT:'/',(20,12)
+}
+MONSTER:'C',(18,16),hostile
+MONSTER:'C',(20,16),hostile
+IF [50%] {
+  OBJECT:'/',(18,16)
+}
+IF [50%] {
+  OBJECT:'/',(20,16)
+}
+# Doors
+DOOR:closed,(04,14)
+DOOR:closed,(07,03)
+DOOR:locked,(06,11)
+# barrack doors
+DOOR:closed,(60,02)
+DOOR:closed,(60,18)
+DOOR:closed,(42,01)
+DOOR:closed,(42,03)
+DOOR:closed,(42,17)
+DOOR:closed,(42,19)
+# elves
+MONSTER:('@',"Grey-elf"),    (60,03),hostile
+MONSTER:('@',"Woodland-elf"),(60,04),hostile
+MONSTER:('@',"Green-elf"),   (60,05),hostile
+MONSTER:('@',"Grey-elf"),    (60,06),hostile
+MONSTER:('@',"Woodland-elf"),(60,07),hostile
+MONSTER:('@',"Green-elf"),   (60,08),hostile
+MONSTER:('@',"Grey-elf"),    (60,09),hostile
+MONSTER:('@',"Woodland-elf"),(60,10),hostile
+MONSTER:('@',"Elvenking"),   (60,11),hostile
+MONSTER:('@',"Grey-elf"),    (60,12),hostile
+MONSTER:('@',"Woodland-elf"),(60,13),hostile
+MONSTER:('@',"Green-elf"),   (60,14),hostile
+MONSTER:('@',"elf-lord"),    (60,15),hostile
+MONSTER:('@',"Grey-elf"),    (60,16),hostile
+MONSTER:('@',"Woodland-elf"),(60,17),hostile
+# Soldiers guarding the fort in front of ringwalls
+MONSTER:('@',"soldier"),(12,14)
+MONSTER:('@',"soldier"),(12,13)
+MONSTER:('@',"soldier"),(11,10)
+MONSTER:('@',"soldier"),(13,15)
+MONSTER:('@',"soldier"),(14,04)
+MONSTER:('@',"soldier"),(12,18)
+MONSTER:('@',"soldier"),(13,12)
+MONSTER:('@',"soldier"),(14,8)
+MONSTER:('@',"lieutenant"),(12,08)
+MONSTER:('@',"soldier"),(28,16)
+MONSTER:('@',"soldier"),(24,17)
+MONSTER:('@',"soldier"),(25,09)
+MONSTER:('@',"soldier"),(25,15)
+MONSTER:('@',"soldier"),(26,13)
+MONSTER:('@',"soldier"),(27,04)
+MONSTER:('@',"soldier"),(28,10)
+MONSTER:('@',"soldier"),(23,03)
+MONSTER:('@',"lieutenant"),(26,08)
+# Four dragons guarding the fort
+MONSTER:'D',(42,09)
+MONSTER:'D',(50,09)
+MONSTER:'D',(49,08)
+MONSTER:'D',(46,12)
+# Eels in the moat
+MONSTER:(';',"giant eel"),(16,04)
+MONSTER:(';',"giant eel"),(22,15)
+MONSTER:(';',"giant eel"),(29,07)
+MONSTER:(';',"giant eel"),(35,14)
+# The corner rooms treasures
+OBJECT:('*',"diamond"),(62,17)
+OBJECT:('*',"diamond"),(62,18)
+OBJECT:('*',"diamond"),(62,19)
+OBJECT:('*',"emerald"),(74,17)
+OBJECT:('*',"emerald"),(74,18)
+OBJECT:('*',"emerald"),(74,19)
+OBJECT:('*',"ruby"),(62,01)
+OBJECT:('*',"ruby"),(62,02)
+OBJECT:('*',"ruby"),(62,03)
+OBJECT:('*',"amethyst"),(74,01)
+OBJECT:('*',"amethyst"),(74,02)
+OBJECT:('*',"amethyst"),(74,03)

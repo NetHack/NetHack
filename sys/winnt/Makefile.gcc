@@ -1026,7 +1026,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/fakewiz?.lev      del $(DAT)/fakewiz?.lev)
 	$(subst /,\,if exist $(DAT)/fire.lev     del $(DAT)/fire.lev)
 	$(subst /,\,if exist $(DAT)/juiblex.lev  del $(DAT)/juiblex.lev)
-	$(subst /,\,if exist $(DAT)/knox.lev     del $(DAT)/knox.lev)
+	$(subst /,\,if exist $(DAT)/knox-?.lev     del $(DAT)/knox-?.lev)
 	$(subst /,\,if exist $(DAT)/medusa-?.lev      del $(DAT)/medusa-?.lev)
 	$(subst /,\,if exist $(DAT)/mine*.lev    del $(DAT)/mine*.lev)
 	$(subst /,\,if exist $(DAT)/options      del $(DAT)/options)

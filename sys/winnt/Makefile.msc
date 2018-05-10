@@ -1226,7 +1226,7 @@ spotless: clean
 	if exist $(DAT)\fakewiz?.lev	 del $(DAT)\fakewiz?.lev
 	if exist $(DAT)\fire.lev	 del $(DAT)\fire.lev
 	if exist $(DAT)\juiblex.lev	 del $(DAT)\juiblex.lev
-	if exist $(DAT)\knox.lev	 del $(DAT)\knox.lev
+	if exist $(DAT)\knox-?.lev	 del $(DAT)\knox-?.lev
 	if exist $(DAT)\medusa-?.lev	 del $(DAT)\medusa-?.lev
 	if exist $(DAT)\mine*.lev	 del $(DAT)\mine*.lev
 	if exist $(DAT)\options		 del $(DAT)\options

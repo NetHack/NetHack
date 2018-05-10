@@ -116,7 +116,7 @@ RNDLEVEL:		"soko4" "none" @ (4, 0) 2
 DUNGEON:	"Fort Ludios" "K" (1, 0)
 DESCRIPTION:	mazelike
 ALIGNMENT:	unaligned
-LEVEL:		"knox" "K" @ (-1, 0)
+RNDLEVEL:		"knox" "K" @ (-1, 0) 3
 #
 #	Vlad's Tower
 #
