@@ -179,6 +179,9 @@ STATIC_DCL boolean NDECL(reset_role_filtering);
 STATIC_DCL void FDECL(status_putstr, (winid, struct WinDesc *, const char *));
 STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P));
 STATIC_DCL void NDECL(render_status);
+STATIC_DCL void FDECL(dump_tty_status, (const char *, int));
+STATIC_DCL void FDECL(dump_display_status, (const char *, int,
+                                            struct WinDesc *, const char *));
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -3403,6 +3406,31 @@ extern const char *status_fieldfmt[MAXBLSTATS];
 extern char *status_vals[MAXBLSTATS];
 extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
+const char *fieldnames[] = {
+    "title", 
+    "strength",
+    "dexterity",
+    "constitution",
+    "intelligence",
+    "wisdom", 
+    "charisma",
+    "alignment",
+    "score",
+    "carrying-capacity",
+    "gold",
+    "power", 
+    "power-max",
+    "experience-level",
+    "armor-class",
+    "HD", 
+    "time", 
+    "hunger", 
+    "hitpoints", 
+    "hitpoints-max", 
+    "dungeon-level", 
+    "experience", 
+    "condition", 
+};
 
 #ifdef STATUS_HILITES
 static int FDECL(condcolor, (long, unsigned long *));
@@ -3509,6 +3537,9 @@ const char *str;
             str = nb - 2;
     }
     nb = str;
+    if (iflags.debug.ttystatus)
+        dump_display_status("status_putstr (before)", st_fld, cw, str);
+
     for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
         if (!*nb) {
 #ifndef STATUS_HILITES
@@ -3539,6 +3570,8 @@ const char *str;
         if (*ob)
             ob++;
     }
+    if (iflags.debug.ttystatus)
+        dump_display_status("status_putsr (after)", st_fld, cw, str);
 
     (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
     cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
@@ -3654,7 +3687,11 @@ unsigned long *colormasks;
         tty_status[NOW][fldidx].lth += 2; /* [ and ] */
     if (fldidx == BL_GOLD)
          tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
-    
+
+    /* debugging log */
+    if (iflags.debug.ttystatus)
+        dump_tty_status("tty_status_update", fldidx);
+
     if (check_fields(force_update))
         render_status();
     return;
@@ -3703,10 +3740,22 @@ boolean forcefields;
              * Then, status_putstr() will see that flag setting
              * and ensure that the tty cell content is updated.
              */   
+            if (valid && iflags.debug.ttystatus) {
+                char buf[BUFSZ];
+                
+                Sprintf(buf, "check_fields: forcefields=%s, name=%s\n"
+                        "\t\t\"%s\"",
+                        forcefields ? "TRUE" : "FALSE",
+                        fieldnames[idx],
+                        status_vals[idx]);
+                testinglog("ttystatus", buf, "");
+	    }
+
             if (forcefields || update_right
                 || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
                 || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
                   tty_status[NOW][idx].redraw = TRUE;
+            if (iflags.debug.ttystatus) dump_tty_status("", idx);
             col += tty_status[NOW][idx].lth;
         }
     }
@@ -3774,6 +3823,8 @@ render_status(VOID_ARGS)
 
                 st_fld = fldidx;    /* for status_putstr() */
                 tty_curs(WIN_STATUS, x, y);
+                if (iflags.debug.ttystatus)
+                    dump_tty_status("render_status (before)", st_fld);
                 if (st_fld == BL_CONDITION) {
                     /*
                      * +-----------------+
@@ -3881,6 +3932,8 @@ render_status(VOID_ARGS)
                 }
                 /* reset .redraw */
                 tty_status[NOW][st_fld].redraw = FALSE;
+                if (iflags.debug.ttystatus)
+                    dump_tty_status("render_status (after)", st_fld);
                 /*
                  * Make a copy of the entire tty_status struct for comparison
                  * of current and previous.
@@ -3946,6 +3999,66 @@ unsigned long *bmarray;
     }
     return attr;
 }
+
+void
+dump_display_status(descr, idx, cw, str)
+const char *descr;
+int idx;
+struct WinDesc *cw;
+const char *str;
+{
+    boolean buf[BUFSZ];
+    const char *d2 = descr ? descr : "dump_Display_status";
+
+    Sprintf(buf,
+        "\t\t\"%s\"\n"
+        "\t\t%s = %d [%s], %s = %d, %s = %s\n"
+        "\t\t"
+        "%-17s = (%d,%d)\n"
+        "\t\t"
+        "%-17s = (%d,%d)\n"
+        "\t\t"
+        "%-17s = (%d,%d)\n",
+        str,
+        "idx", idx, fieldnames[idx], 
+            "lth", tty_status[NOW][idx].lth,
+            "redraw",tty_status[NOW][idx].redraw ? "TRUE" : "FALSE",
+        "x,y", tty_status[NOW][idx].x, tty_status[NOW][idx].y,
+        "ttyDisplay->x,->y", ttyDisplay->curx, ttyDisplay->cury,
+        "cw->curx,->cury", cw->curx, cw->cury);
+    testinglog("ttystatus", d2, buf);
+    return;
+}
+
+void
+dump_tty_status(descr, idx)
+const char *descr;
+int idx;
+{
+    boolean buf[BUFSZ];
+    const char *d2 = descr ? descr : "dump_status";
+
+    Sprintf(buf,
+        "\t\t%-6s = %s\n"
+        "\t\t%-6s = %d\n"
+        "\t\t%-6s = %d\n"
+        "\t\t%-6s = %X\n"
+        "\t\t%-6s = %d,%d\n"
+        "\t\t%-6s = %d\n"
+        "\t\t%-6s = %s\n"
+        "\t\t%-6s = %s\n",
+        "name",  fieldnames[idx],
+        "idx",   idx,
+        "color", tty_status[NOW][idx].color,
+        "attr",  tty_status[NOW][idx].attr,
+        "x,y",   tty_status[NOW][idx].x, tty_status[NOW][idx].y,
+        "lth",   tty_status[NOW][idx].lth,
+        "valid", tty_status[NOW][idx].valid ? "TRUE" : "FALSE",
+        "redraw",tty_status[NOW][idx].redraw ? "TRUE" : "FALSE");
+    testinglog("ttystatus", d2, buf);
+    return;
+}
+
 #endif /* STATUS_HILITES */
 
 #endif /* TTY_GRAPHICS */
