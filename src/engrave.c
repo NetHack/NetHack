@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 5/8/18 by NullCGT */
+/* Modified 5/10/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -401,7 +401,7 @@ xchar e_type;
     ep->engr_txt = (char *) (ep + 1);
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
-    if (!in_mklev && !strcmp(s, "Elbereth")) {
+    if (!in_mklev && !strcmpi(s, "Elbereth")) {
         exercise(A_WIS, TRUE);
         u.uconduct.elbereth++;
     }
