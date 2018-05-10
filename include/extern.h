@@ -26,7 +26,7 @@ E void NDECL(display_gamewindows);
 E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
 E time_t NDECL(get_realtime);
-E boolean FDECL(argcheck, (int, char **, enum earlyarg));
+E int FDECL(argcheck, (int, char **, enum earlyarg));
 
 /* ### apply.c ### */
 

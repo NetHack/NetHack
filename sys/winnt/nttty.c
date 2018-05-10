@@ -252,8 +252,6 @@ cell_t undefined_cell;
 
 static boolean buffer_flipping_initialized = FALSE;
 
-boolean do_immediate_flips = FALSE;
-
 static void check_buffer_size(int width, int height);
 static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y);
 
@@ -370,7 +368,7 @@ static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
     while (dst != sentinel)
         *dst++ = clear_cell;
 
-    if (do_immediate_flips && buffer == &back_buffer)
+    if (iflags.debug.immediateflips && buffer == &back_buffer)
         back_buffer_flip();
 }
 
@@ -379,7 +377,7 @@ static void back_buffer_write(cell_t * cell, int x, int y)
     cell_t * dst = buffer_get_cell(&back_buffer, x, y);
     *dst = *cell;
 
-    if (do_immediate_flips)
+    if (iflags.debug.immediateflips)
         back_buffer_flip();
 }
 
@@ -393,7 +391,7 @@ static void back_buffer_clear_to_end_of_line(int x, int y)
     while (cell != sentinel)
         *cell++ = clear_cell;
 
-    if (do_immediate_flips)
+    if (iflags.debug.immediateflips)
         back_buffer_flip();
 }
 
