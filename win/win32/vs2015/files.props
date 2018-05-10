@@ -65,7 +65,9 @@
     <Levfiles Include = "bigrm-8.lev"/>
     <Levfiles Include = "bigrm-9.lev"/>
     <Levfiles Include = "bigrm-10.lev"/>
-    <Levfiles Include = "castle.lev"/>
+    <Levfiles Include = "castle-1.lev"/>
+    <Levfiles Include = "castle-2.lev"/>
+    <Levfiles Include = "castle-3.lev"/>
     <Levfiles Include = "air.lev"/>
     <Levfiles Include = "astral.lev"/>
     <Levfiles Include = "earth.lev"/>

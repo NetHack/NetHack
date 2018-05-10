@@ -1016,7 +1016,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
 	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
 	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
-	$(subst /,\,if exist $(DAT)/castle.lev   del $(DAT)/castle.lev)
+	$(subst /,\,if exist $(DAT)/castle-?.lev   del $(DAT)/castle-?.lev)
 	$(subst /,\,if exist $(DAT)/statuary.lev   del $(DAT)/statuary.lev)
 	$(subst /,\,if exist $(DAT)/void.lev   del $(DAT)/void.lev)
 	$(subst /,\,if exist $(DAT)/data    del $(DAT)/data)

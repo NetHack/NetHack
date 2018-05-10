@@ -1216,7 +1216,7 @@ spotless: clean
 	if exist $(DAT)\astral.lev	 del $(DAT)\astral.lev
 	if exist $(DAT)\baalz.lev	 del $(DAT)\baalz.lev
 	if exist $(DAT)\bigrm-*.lev	 del $(DAT)\bigrm-*.lev
-	if exist $(DAT)\castle.lev	 del $(DAT)\castle.lev
+	if exist $(DAT)\castle-?.lev	 del $(DAT)\castle-?.lev
 	if exist $(DAT)\statuary.lev	del $(DAT)\statuary.lev
 	if exist $(DAT)\void.lev	del $(DAT)\void.lev
 	if exist $(DAT)\data		 del $(DAT)\data
