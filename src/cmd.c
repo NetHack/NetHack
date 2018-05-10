@@ -3106,7 +3106,13 @@ const char *command;
     return FALSE;
 }
 
-/* initialize all keyboard commands */
+/* initialize all keyboard commands 
+ *
+ * We initialize commands based on number_pad being set and thus freeing
+ * up 'y' 'k' 'u' 'h' 'l' 'b' 'j' 'n' for other commands.
+ *
+ * TODO: C('l'), C('n') are not documented.
+ */
 void
 commands_init()
 {
@@ -3942,7 +3948,7 @@ boolean initial;
 
     if (initial) {
         updated = 1;
-        Cmd.num_pad = FALSE;
+        Cmd.num_pad = TRUE;
         Cmd.pcHack_compat = Cmd.phone_layout = Cmd.swap_yz = FALSE;
         for (i = 0; i < SIZE(spkeys_binds); i++)
             Cmd.spkeys[spkeys_binds[i].nhkf] = spkeys_binds[i].key;
