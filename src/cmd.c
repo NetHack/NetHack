@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/4/18 by NullCGT */
+/* Edited on 5/10/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2820,7 +2820,7 @@ int final;
 
     if (u.uconduct.elbereth == 0) {
         you_have_never("engraved Elbereth");
-    } else if (wizard) {
+    } else {
         Sprintf(buf, "engraved Elbereth %ld time%s", u.uconduct.elbereth,
                 plur(u.uconduct.elbereth));
         you_have_X(buf);
