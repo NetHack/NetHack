@@ -102,14 +102,12 @@ void X11_player_selection_randomize(void);
 
 /* Bad Hack alert. Using integers instead of XtPointers */
 XtPointer
-i2xtp(i)
-int i;
+i2xtp(int i)
 {
     return (XtPointer)(long)i;
 }
 int
-xtp2i(x)
-XtPointer x;
+xtp2i(XtPointer x)
 {
     return (long)x;
 }
@@ -401,8 +399,7 @@ Cardinal *num_params;
 
 /* enable or disable the Play button */
 void
-plsel_set_play_button(state)
-boolean state;
+plsel_set_play_button(boolean state)
 {
     Arg args[2];
 
@@ -411,8 +408,7 @@ boolean state;
 }
 
 void
-plsel_set_sensitivities(setcurr)
-boolean setcurr;
+plsel_set_sensitivities(boolean setcurr)
 {
     Arg args[2];
     int j, valid;
@@ -759,8 +755,7 @@ XtPointer call;
 }
 
 Widget
-X11_create_player_selection_name(form)
-Widget form;
+X11_create_player_selection_name(Widget form)
 {
     Widget namelabel, name_vp, name_form;
     Arg args[10];
@@ -1311,7 +1306,7 @@ X11_player_selection_prompts()
 
         nh_XtPopdown(popup);
         XtDestroyWidget(popup);
-        free((genericptr_t) choices), choices = 0;
+        free((genericptr_t) choices); choices = 0;
 
         if (ps_selected == PS_QUIT || program_state.done_hup) {
             clearlocks();
@@ -1363,7 +1358,7 @@ X11_player_selection_prompts()
 
         if (availcount == 1) {
             flags.initrace = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Pick your %s race", s_suffix(plbuf));
             popup =
@@ -1380,7 +1375,7 @@ X11_player_selection_prompts()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
@@ -1431,7 +1426,7 @@ X11_player_selection_prompts()
 
         if (availcount == 1) {
             flags.initgend = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Your %s gender?", s_suffix(plbuf));
             popup =
@@ -1448,7 +1443,7 @@ X11_player_selection_prompts()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();
@@ -1497,7 +1492,7 @@ X11_player_selection_prompts()
 
         if (availcount == 1) {
             flags.initalign = availindex;
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
         } else {
             Sprintf(qbuf, "Your %s alignment?", s_suffix(plbuf));
             popup = make_menu("alignment_selection", qbuf,
@@ -1514,7 +1509,7 @@ X11_player_selection_prompts()
 
             nh_XtPopdown(popup);
             XtDestroyWidget(popup);
-            free((genericptr_t) choices), choices = 0;
+            free((genericptr_t) choices); choices = 0;
 
             if (ps_selected == PS_QUIT || program_state.done_hup) {
                 clearlocks();

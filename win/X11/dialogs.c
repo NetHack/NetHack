@@ -241,8 +241,7 @@ SetDialogPrompt(Widget w, String newprompt)
 
 /* get what the user typed; caller must free the response */
 String
-GetDialogResponse(w)
-Widget w;
+GetDialogResponse(Widget w)
 {
     Arg args[1];
     Widget response;

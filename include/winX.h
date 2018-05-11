@@ -264,7 +264,7 @@ typedef struct {
 } AppResources;
 
 E AppResources appResources;
-E void (*input_func)();
+E void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 
 extern struct window_procs X11_procs;
 

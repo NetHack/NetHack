@@ -335,7 +335,7 @@ destroy_text_window(struct xwindow *wp)
     if (text_info->blocked || text_info->destroy_on_ack) {
         XtDestroyWidget(wp->popup);
         free_text_buffer(&text_info->text);
-        free((genericptr_t) text_info), wp->text_information = 0;
+        free((genericptr_t) text_info); wp->text_information = 0;
         wp->type = NHW_NONE; /* allow reuse */
     } else {
         text_info->destroy_on_ack = TRUE; /* destroy on next ACK */

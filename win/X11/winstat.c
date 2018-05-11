@@ -138,8 +138,9 @@ destroy_status_window(struct xwindow *wp)
     if (wp->status_information) {
         if (wp->popup) {
             nh_XtPopdown(wp->popup);
-            if (!wp->keep_window)
-                XtDestroyWidget(wp->popup), wp->popup = (Widget) 0;
+            if (!wp->keep_window) {
+                XtDestroyWidget(wp->popup); wp->popup = (Widget) 0;
+            }
         }
         free((genericptr_t) wp->status_information);
         wp->status_information = 0;
