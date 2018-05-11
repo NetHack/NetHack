@@ -31,6 +31,7 @@ register struct obj *otmp;
     case SCR_AMNESIA:
     case SCR_FIRE:
     case SCR_EARTH:
+    case SCR_WEB:
         return 8;
     case SCR_DESTROY_ARMOR:
     case SCR_CREATE_MONSTER:

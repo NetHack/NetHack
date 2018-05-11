@@ -1513,12 +1513,53 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             nomovemsg = "Your natural flow of time reasserts itself.";
         } else {
             if (Hallucination)
-                pline("The world is moving through pudding!")
+                pline("The world is moving through pudding!");
             else
                 pline("Time slows down to a crawl around you!");
             youmonst.movement = 50 + bcsign(sobj) * 50;
         }
         break;
+    case SCR_WEB: {
+        coord cc;
+        known = TRUE;
+        register struct trap *trtmp;
+        if (confused) {
+            pline("You get the creepy crawlies.");
+            create_critters(rn1(2, 2), &mons[PM_CAVE_SPIDER], FALSE);
+        }
+        if (scursed) {
+            trtmp = maketrap(u.ux, u.uy, WEB);
+            if (trtmp)
+                dotrap(trtmp, FORCETRAP);
+            else
+                known = FALSE;
+        } else {
+            if (!already_known) {
+                if (Role_if(PM_CARTOMANCER))
+                    pline("This is a spell card of web!");
+                else
+                    pline("This is a scroll of web!");
+            }
+            cc.x = u.ux;
+            cc.y = u.uy;
+            pline("Where do you want to place a web?");
+            getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+            if (getpos(&cc, TRUE, "the desired position") < 0) {
+                pline1(Never_mind);
+                break;
+            }
+            if (!is_valid_stinking_cloud_pos(cc.x, cc.y, TRUE))
+                break;
+            trtmp = maketrap(cc.x, cc.y, WEB);
+            if (sblessed && trtmp) {
+                seetrap(trtmp);
+            }
+            if (MON_AT(cc.x, cc.y)) {
+                mintrap(m_at(cc.x, cc.y));
+            }
+          }
+          break;
+    }
     case SCR_TELEPORTATION:
         if (confused || scursed) {
             level_tele();
