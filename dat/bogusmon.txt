@@ -16,17 +16,32 @@
 # M.U.G.E.N.
 wayward hitbox
 null-tier character
-palette swap
+palette-swapped doppelganger
 
-# Eldritch Abominations
+# eldritch abominations
 =Cthulu
 =Yog-Sothoth
 =Nyarlathotep
+=IT
+
+# SLASH'EM
+shotgun-wielding shopkeeper
+gug
+bunny
+deep one
+bat from Hell
+
+# powergaming
+polypiler
+pudding farmer
+speedrunner
+lawful female dwarven valkyrie with Excalibur
 
 # self-deprecation / this variant
 questionable addition
 poorly balanced monster
 obscure reference
+clunky mechanic
 
 # cataclysm
 smoker zombie
@@ -116,6 +131,15 @@ overclocked microwave
 chronomancer
 lotus eater lad
 |king of all birds
+dishwasher
+antimatter fragment
+core warrior
+worm that remains stationary
+insulated eel
+really big rock
+scintillating serpent
+devourer
+mad cow
 
 # Quendor (Zork, &c.)
 grue
@@ -280,6 +304,12 @@ corpulent porpoise
 quokka
 potoo
 lemming
+hippo
+giant squid
+ant-lion
+gnat swarm
+barnacle
+ferret
 
 # european cryptids
 wolpertinger
@@ -298,6 +328,7 @@ hippocampus
 hippogriff
 kelpie
 catoblepas
+trow
 
 # Unusually animate body parts
 bouncing eye
@@ -344,6 +375,7 @@ miniature blimp
 dust speck
 silver dragon scale mail
 amulet of reflection
+|Amulet of Yendor
 wand of wishing
 
 # DnD monster
@@ -354,6 +386,7 @@ gray goo
 magnetic monopole
 first category perpetual motion device
 big dumb object
+second law of thermodynamics
 
 # Ultima
 +Lord British
@@ -379,6 +412,7 @@ apostrophe golem
 voluptuous ampersand
 turgid exclamation point
 fragile question mark
+alphanumeric character
 
 # Web comics and animation
 +Bob the angry flower
@@ -424,6 +458,9 @@ basement cat
 monorail cat
 knife cat
 bode
+
+# the internet has good dogs
+big doggo
 
 # POWDER
 tridude
@@ -504,6 +541,7 @@ mortar orc
 acid blog
 acute blob
 aria elemental
+arc lich
 aliasing priest
 aligned parasite
 aligned parquet
@@ -516,12 +554,14 @@ baby grainy dragon
 baby bong worm
 baby long word
 baby parable worm
+bad cone
 barfed devil
 blue dragoon
 beer wight
 boor wight
 brawny mold
 rave spider
+clockatrice
 clod giant
 clue golem
 cockathrice
@@ -566,9 +606,11 @@ pager golem
 pie fiend
 prophylactic worm
 razor flagon
+silt golem
 sock mole
 lockatrice
 rogue piercer
+score peopn
 seesawing sphere
 simile mimic
 moldier ant
@@ -581,4 +623,5 @@ waiter elemental
 water lemon
 water melon
 winged grizzly
+yellow gold
 yellow wight
