@@ -2,7 +2,7 @@
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1173,6 +1173,7 @@ boolean atme;
     case SPE_DETECT_FOOD:
     case SPE_CAUSE_FEAR:
     case SPE_IDENTIFY:
+    case SPE_WEB:
         /* high skill yields effect equivalent to blessed scroll */
         if (role_skill >= P_SKILLED)
             pseudo->blessed = 1;

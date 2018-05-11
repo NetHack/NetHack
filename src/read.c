@@ -1519,6 +1519,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             youmonst.movement = 50 + bcsign(sobj) * 50;
         }
         break;
+    case SPE_WEB:
     case SCR_WEB: {
         coord cc;
         known = TRUE;
