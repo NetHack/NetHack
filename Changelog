@@ -37,6 +37,9 @@ Visual/Interface Changes
 
 General Changes
 - SpliceHack Tip of the Day will tell you about new features.
+- Monks occasionally get martial arts messages when fighting bare-handed.
+- Engraving in the elemental plane of fire will mention that you are  engraving
+  in obsidian.
 - Deadly poison no longer instantly kills you, but instead will cause both
   HP and attribute damage.
 - Probing certain non-unique monsters will tell you their name.
