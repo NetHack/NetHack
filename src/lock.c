@@ -367,11 +367,11 @@ pick_lock(struct obj *pick)
                 it = 0;
                 if (otmp->obroken)
                     verb = "fix";
-                else if (!otmp->olocked)
-                    verb = "lock", it = 1;
-                else if (picktyp != LOCK_PICK)
-                    verb = "unlock", it = 1;
-                else
+                else if (!otmp->olocked) {
+                    verb = "lock"; it = 1;
+                } else if (picktyp != LOCK_PICK) {
+                    verb = "unlock"; it = 1;
+                } else
                     verb = "pick";
 
                 /* "There is <a box> here; <verb> <it|its lock>?" */

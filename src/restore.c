@@ -1070,7 +1070,7 @@ getlev(int fd, int pid, xchar lev, boolean ghostly)
     rest_regions(fd, ghostly);
     if (ghostly) {
         /* Now get rid of all the temp fruits... */
-        freefruitchn(oldfruit), oldfruit = 0;
+        freefruitchn(oldfruit); oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
             && lev < ledger_no(&stronghold_level) && xdnstair == 0) {

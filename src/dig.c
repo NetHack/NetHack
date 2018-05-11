@@ -1926,7 +1926,7 @@ rot_organic(anything *arg, long timeout UNUSED)
     while (Has_contents(obj)) {
         /* We don't need to place contained object on the floor
            first, but we do need to update its map coordinates. */
-        obj->cobj->ox = obj->ox, obj->cobj->oy = obj->oy;
+        obj->cobj->ox = obj->ox; obj->cobj->oy = obj->oy;
         /* Everything which can be held in a container can also be
            buried, so bury_an_obj's use of obj_extract_self insures
            that Has_contents(obj) will eventually become false. */

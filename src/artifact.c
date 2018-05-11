@@ -1850,8 +1850,9 @@ retouch_object(struct obj **objp,   /* might be destroyed or unintentionally dro
         if (!touch_blasted) {
             /* damage is somewhat arbitrary; half the usual 1d20 physical
                for silver, 1d10 magical for <foo>bane, potentially both */
-            if (ag)
-                tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
+            if (ag) {
+                tmp = rnd(10); dmg += Maybe_Half_Phys(tmp);
+            }
             if (bane)
                 dmg += rnd(10);
             Sprintf(buf, "handling %s", killer_xname(obj));

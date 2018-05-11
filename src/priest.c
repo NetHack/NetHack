@@ -670,7 +670,7 @@ in_your_sanctuary(struct monst *mon, /* if non-null, <mx,my> overrides <x,y> */
     if (mon) {
         if (is_minion(mon->data) || is_rider(mon->data))
             return FALSE;
-        x = mon->mx, y = mon->my;
+        x = mon->mx; y = mon->my;
     }
     if (u.ualign.record <= ALGN_SINNED) /* sinned or worse */
         return FALSE;

@@ -1396,11 +1396,12 @@ create_critters(int cnt,
             } else
                 ask = FALSE; /* ESC will shut off prompting */
         }
-        x = u.ux, y = u.uy;
+        x = u.ux; y = u.uy;
         /* if in water, try to encourage an aquatic monster
            by finding and then specifying another wet location */
-        if (!mptr && u.uinwater && enexto(&c, x, y, &mons[PM_GIANT_EEL]))
-            x = c.x, y = c.y;
+        if (!mptr && u.uinwater && enexto(&c, x, y, &mons[PM_GIANT_EEL])) {
+            x = c.x; y = c.y;
+        }
 
         mon = makemon(mptr, x, y, NO_MM_FLAGS);
         if (mon && canspotmon(mon))

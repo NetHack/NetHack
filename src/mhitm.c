@@ -195,9 +195,9 @@ mdisplacem(register struct monst *magr, register struct monst *mdef, boolean qui
     /* sanity checks; could matter if we unexpectedly get a long worm */
     if (!magr || !mdef || magr == mdef)
         return MM_MISS;
-    pa = magr->data, pd = mdef->data;
-    tx = mdef->mx, ty = mdef->my; /* destination */
-    fx = magr->mx, fy = magr->my; /* current location */
+    pa = magr->data; pd = mdef->data;
+    tx = mdef->mx; ty = mdef->my; /* destination */
+    fx = magr->mx; fy = magr->my; /* current location */
     if (m_at(fx, fy) != magr || m_at(tx, ty) != mdef)
         return MM_MISS;
 
@@ -647,9 +647,10 @@ engulf_target(struct monst *magr, struct monst *mdef)
     /* don't swallow something in a spot where attacker wouldn't
        otherwise be able to move onto; we don't want to engulf
        a wall-phaser and end up with a non-phaser inside a wall */
-    dx = mdef->mx, dy = mdef->my;
-    if (mdef == &youmonst)
+    dx = mdef->mx; dy = mdef->my;
+    if (mdef == &youmonst) {
         dx = u.ux, dy = u.uy;
+    }
     lev = &levl[dx][dy];
     if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
         /* not passes_bars(); engulfer isn't squeezing through */

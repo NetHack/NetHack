@@ -922,7 +922,7 @@ mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob, boolean skip
                        && levl[x - 1][y + 1].typ == STONE) {
                 if (rn2(1000) < goldprob) {
                     if ((otmp = mksobj(GOLD_PIECE, FALSE, FALSE)) != 0) {
-                        otmp->ox = x, otmp->oy = y;
+                        otmp->ox = x; otmp->oy = y;
                         otmp->quan = 1L + rnd(goldprob * 3);
                         otmp->owt = weight(otmp);
                         if (!rn2(3))
@@ -937,7 +937,7 @@ mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob, boolean skip
                             if (otmp->otyp == ROCK) {
                                 dealloc_obj(otmp); /* discard it */
                             } else {
-                                otmp->ox = x, otmp->oy = y;
+                                otmp->ox = x; otmp->oy = y;
                                 if (!rn2(3))
                                     add_to_buried(otmp);
                                 else

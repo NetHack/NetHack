@@ -391,7 +391,7 @@ save_oracles(int fd, int mode)
     if (release_data(mode)) {
         if (oracle_cnt) {
             free((genericptr_t) oracle_loc);
-            oracle_loc = 0, oracle_cnt = 0, oracle_flg = 0;
+            oracle_loc = 0; oracle_cnt = 0; oracle_flg = 0;
         }
     }
 }

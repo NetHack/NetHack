@@ -1021,11 +1021,11 @@ linedup(register xchar ax, register xchar ay, register xchar bx, register xchar 
            if that lack of sight is due solely to boulders */
         if (boulderhandling == 0)
             return FALSE;
-        dx = sgn(ax - bx), dy = sgn(ay - by);
+        dx = sgn(ax - bx); dy = sgn(ay - by);
         boulderspots = 0;
         do {
             /* <bx,by> is guaranteed to eventually converge with <ax,ay> */
-            bx += dx, by += dy;
+            bx += dx; by += dy;
             if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by))
                 return FALSE;
             if (sobj_at(BOULDER, bx, by))

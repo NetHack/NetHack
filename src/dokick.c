@@ -532,10 +532,12 @@ really_kick_object(xchar x, xchar y)
         /* you're in air, since is_pool did not match */
         range += rnd(3);
     } else {
-        if (is_ice(x, y))
-            range += rnd(3), slide = TRUE;
-        if (kickedobj->greased)
-            range += rnd(3), slide = TRUE;
+        if (is_ice(x, y)) {
+            range += rnd(3); slide = TRUE;
+        }
+        if (kickedobj->greased) {
+            range += rnd(3); slide = TRUE;
+        }
     }
 
     /* Mjollnir is magically too heavy to kick */
@@ -1603,16 +1605,16 @@ obj_delivery(boolean near_hero)
 
         switch (where) {
         case MIGR_STAIRS_UP:
-            nx = xupstair, ny = yupstair;
+            nx = xupstair; ny = yupstair;
             break;
         case MIGR_LADDER_UP:
-            nx = xupladder, ny = yupladder;
+            nx = xupladder; ny = yupladder;
             break;
         case MIGR_SSTAIRS:
-            nx = sstairs.sx, ny = sstairs.sy;
+            nx = sstairs.sx; ny = sstairs.sy;
             break;
         case MIGR_WITH_HERO:
-            nx = u.ux, ny = u.uy;
+            nx = u.ux; ny = u.uy;
             break;
         default:
         case MIGR_RANDOM:
