@@ -1512,7 +1512,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             multi_reason = "frozen in time";
             nomovemsg = "Your natural flow of time reasserts itself.";
         } else {
-            pline("Time slows down to a crawl around you!");
+            if (Hallucination)
+                pline("The world is moving through pudding!")
+            else
+                pline("Time slows down to a crawl around you!");
             youmonst.movement = 50 + bcsign(sobj) * 50;
         }
         break;
