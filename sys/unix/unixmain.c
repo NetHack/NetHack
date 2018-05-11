@@ -360,7 +360,7 @@ process_options(int argc, char *argv[])
         case 'd':
             if ((argv[0][1] == 'D' && !argv[0][2])
                 || !strcmpi(*argv, "-debug")) {
-                wizard = TRUE, discover = FALSE;
+                wizard = TRUE; discover = FALSE;
             } else if (!strncmpi(*argv, "-DECgraphics", l)) {
                 load_symset("DECGraphics", PRIMARY);
                 switch_symbols(TRUE);
@@ -370,7 +370,7 @@ process_options(int argc, char *argv[])
             break;
         case 'X':
 
-            discover = TRUE, wizard = FALSE;
+            discover = TRUE; wizard = FALSE;
             break;
 #ifdef NEWS
         case 'n':
@@ -610,7 +610,7 @@ wd_message()
             free(tmp);
         } else
             pline("Entering explore/discovery mode instead.");
-        wizard = 0, discover = 1; /* (paranoia) */
+        wizard = 0; discover = 1; /* (paranoia) */
     } else if (discover)
         You("are in non-scoring explore/discovery mode.");
 }

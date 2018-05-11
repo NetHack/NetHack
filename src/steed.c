@@ -686,7 +686,7 @@ place_monster(struct monst *mon, int x, int y)
                    (mon == u.usteed) ? "steed" : "defunct monster");
         return;
     }
-    mon->mx = x, mon->my = y;
+    mon->mx = x; mon->my = y;
     level.monsters[x][y] = mon;
 }
 

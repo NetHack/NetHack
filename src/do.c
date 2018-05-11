@@ -1616,7 +1616,7 @@ deferred_goto()
     u.utotype = 0; /* our caller keys off of this */
     if (dfr_pre_msg) {
         free((genericptr_t) dfr_pre_msg); dfr_pre_msg = 0;
-    } 
+    }
     if (dfr_post_msg) {
         free((genericptr_t) dfr_post_msg); dfr_post_msg = 0;
     }
