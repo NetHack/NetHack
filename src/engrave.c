@@ -205,6 +205,8 @@ register int x, y;
     else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
              || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
         return "floor";
+    else if (Is_firelevel(&u.uz))
+        return "obsidian"
     else
         return "ground";
 }
