@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -896,7 +896,8 @@ SCROLL("enchant weapon",         "DAIYEN FOOELS",  1,  80,  60),
 SCROLL("create monster",       "LEP GEX VEN ZEA",  1,  45, 200),
 SCROLL("taming",                   "PRIRUTSENIE",  1,  10, 200),
 SCROLL("genocide",                  "ELBIB YLOH",  1,  10, 300),
-SCROLL("light",                 "VERR YED HORRE",  1,  90,  50),
+SCROLL("light",                 "VERR YED HORRE",  1,  70,  50),
+SCROLL("time",                   "TEMPUS FUFGIT",  1,  20, 100),
 SCROLL("teleportation",        "VENZAR BORGAVVE",  1,  55, 100),
 SCROLL("gold detection",                 "THARR",  1,  33, 100),
 SCROLL("food detection",               "YUM YUM",  1,  25, 100),

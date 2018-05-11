@@ -1,7 +1,7 @@
 /* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/6/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -44,6 +44,7 @@ register struct obj *otmp;
     case SCR_REMOVE_CURSE:
     case SCR_ENCHANT_WEAPON:
     case SCR_CHARGING:
+    case SCR_TIME:
         return 16;
     case SCR_SCARE_MONSTER:
     case SCR_STINKING_CLOUD:

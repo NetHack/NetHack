@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1502,6 +1502,18 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
                                                : &mons[PM_BLACK_LIGHT],
                                    TRUE);
+        }
+        break;
+    case SCR_TIME:
+        known = TRUE;
+        if (confused || scursed) {
+            You("are frozen in time!");
+            nomul(-(rn1(5, 10 - 5 * bcsign(sobj))));
+            multi_reason = "frozen in time";
+            nomovemsg = "Your natural flow of time reasserts itself.";
+        } else {
+            pline("Time slows down to a crawl around you!");
+            youmonst.movement = 50 + bcsign(sobj) * 50;
         }
         break;
     case SCR_TELEPORTATION:
