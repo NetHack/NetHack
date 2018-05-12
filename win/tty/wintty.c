@@ -3631,8 +3631,8 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-       if (tty_status[NOW][fldidx].lth == 1 &&
-                status_vals[fldidx][0] == ' ') {
+       if (tty_status[NOW][fldidx].lth == 1
+                && status_vals[fldidx][0] == ' ') {
             status_vals[fldidx][0] = '\0';
             tty_status[NOW][fldidx].lth = 0;
        }
@@ -3805,7 +3805,7 @@ render_status(VOID_ARGS)
                  * Ignore zero length fields. check_fields() didn't count
                  * them in either.
                  */
-                if (!tty_status[NOW][fldidx].lth)
+                if (!tty_status[NOW][fldidx].lth && fldidx != BL_CONDITION)
                     continue;
 
                 if (fldidx == BL_CONDITION) {
