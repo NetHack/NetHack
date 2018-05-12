@@ -461,6 +461,21 @@ char *buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
+/* ntassert_failed is called when an ntassert's condition is false */
+void ntassert_failed(const char * exp, const char * file, int line)
+{
+    char message[128];
+    _snprintf(message, sizeof(message),
+                "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
+
+    if (IsDebuggerPresent()) {
+        OutputDebugStringA(message);
+        DebugBreak();
+    }
+
+    error(message);
+}
+
 #endif /* WIN32 */
 
 /*winnt.c*/

@@ -322,6 +322,10 @@ static void check_buffer_size(int width, int height)
 
 static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y)
 {
+    ntassert(x >= 0 && x < buffer_width);
+    ntassert(y >= 0 && ((y < buffer_height) ||
+                        (y == buffer_height && x == 0)));
+
     return buffer->cells + (buffer_width * y) + x;
 }
 
@@ -363,6 +367,9 @@ static void back_buffer_flip()
 static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
                                 int x, int y)
 {
+    ntassert(x >= 0 && x < buffer_width);
+    ntassert(y >= 0 && y < buffer_height);
+
     cell_t * dst = buffer_get_cell(buffer, x, y);
     cell_t * sentinel = buffer_get_cell(buffer, 0, buffer_height);
     while (dst != sentinel)
@@ -374,6 +381,9 @@ static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
 
 static void back_buffer_write(cell_t * cell, int x, int y)
 {
+    ntassert(x >= 0 && x < buffer_width);
+    ntassert(y >= 0 && y < buffer_height);
+
     cell_t * dst = buffer_get_cell(&back_buffer, x, y);
     *dst = *cell;
 
@@ -383,6 +393,9 @@ static void back_buffer_write(cell_t * cell, int x, int y)
 
 static void back_buffer_clear_to_end_of_line(int x, int y)
 {
+    ntassert(x >= 0 && x < buffer_width);
+    ntassert(y >= 0 && y < buffer_height);
+
     cell_t * cell;
     cell_t *sentinel;
 
@@ -834,6 +847,9 @@ int in_ch;
 void
 cl_end()
 {
+    ntassert(ttyDisplay->curx >= 0 && ttyDisplay->curx < buffer_width);
+    ntassert(ttyDisplay->cury >= 0 && ttyDisplay->cury < buffer_height);
+
     console.cursor.X = ttyDisplay->curx;
     console.cursor.Y = ttyDisplay->cury;
 
