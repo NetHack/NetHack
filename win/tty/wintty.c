@@ -179,6 +179,7 @@ STATIC_DCL boolean NDECL(reset_role_filtering);
 STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P));
 STATIC_DCL void NDECL(render_status);
 STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *, const char *, int, int));
+STATIC_DCL int FDECL(set_cond_shrinklvl, (int, int));
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -3676,7 +3677,7 @@ render_status(VOID_ARGS)
     long mask = 0L;
     int i, c, row, shrinklvl = 0, attrmask = 0;
     struct WinDesc *cw = 0;
-    boolean do_color = FALSE;
+    boolean do_color = FALSE, fit = FALSE;
     struct tty_status_fields *nullfield = (struct tty_status_fields *)0;
 
 #ifdef TEXTCOLOR
@@ -3709,6 +3710,7 @@ render_status(VOID_ARGS)
                      * | Condition Codes |
                      * +-----------------+
                      */
+                    shrinklvl = set_cond_shrinklvl(x, cw->cols);
                     for (c = 0; c < SIZE(conditions); ++c) {
                         mask = conditions[c].mask;
                         if ((tty_condition_bits & mask) == mask) {
@@ -3864,6 +3866,33 @@ int x,y;
             cw->curx++;
         }
     }
+}
+
+int
+set_cond_shrinklvl(col, ncols)
+int col, ncols;
+{
+    long mask = 0L;
+    int j, c, x, avail, shrinklvl = 0;
+    boolean fitting = FALSE;
+
+    avail = ncols - col;
+    /* determine appropriate shrinklvl required */
+    for (j = 0; j < 3 && !fitting; ++j) {
+        x = 0;
+        for (c = 0; c < SIZE(conditions); ++c) {
+            mask = conditions[c].mask;
+            if ((tty_condition_bits & mask) == mask) {
+                x++;    /* for spacer */
+                x += (int) strlen(conditions[c].text[shrinklvl]);
+            }
+        }
+        if (x < avail)
+            fitting = TRUE;
+        else if (shrinklvl < 2)
+            shrinklvl++;
+    }
+    return shrinklvl;
 }
 
 #ifdef TEXTCOLOR
