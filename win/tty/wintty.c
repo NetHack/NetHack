@@ -176,12 +176,9 @@ STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL boolean NDECL(reset_role_filtering);
-STATIC_DCL void FDECL(status_putstr, (winid, struct WinDesc *, const char *));
 STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P));
 STATIC_DCL void NDECL(render_status);
-STATIC_DCL void FDECL(dump_tty_status, (const char *, int));
-STATIC_DCL void FDECL(dump_display_status, (const char *, int,
-                                            struct WinDesc *, const char *));
+STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *, const char *, int, int));
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -2529,9 +2526,6 @@ const char *str;
         update_topl(str);
         break;
 
-    case NHW_STATUS:
-        status_putstr(window, cw, str);
-        break;
     case NHW_MAP:
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
@@ -3406,30 +3400,13 @@ extern const char *status_fieldfmt[MAXBLSTATS];
 extern char *status_vals[MAXBLSTATS];
 extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
+
 const char *fieldnames[] = {
-    "title", 
-    "strength",
-    "dexterity",
-    "constitution",
-    "intelligence",
-    "wisdom", 
-    "charisma",
-    "alignment",
-    "score",
-    "carrying-capacity",
-    "gold",
-    "power", 
-    "power-max",
-    "experience-level",
-    "armor-class",
-    "HD", 
-    "time", 
-    "hunger", 
-    "hitpoints", 
-    "hitpoints-max", 
-    "dungeon-level", 
-    "experience", 
-    "condition", 
+    "title",  "strength", "dexterity", "constitution", "intelligence",
+    "wisdom",  "charisma", "alignment", "score", "carrying-capacity",
+    "gold", "power",  "power-max", "experience-level", "armor-class",
+    "HD",  "time",  "hunger",  "hitpoints",  "hitpoints-max",
+    "dungeon-level",  "experience",  "condition",
 };
 
 #ifdef STATUS_HILITES
@@ -3438,6 +3415,7 @@ static int FDECL(condattr, (long, unsigned long *));
 static long tty_condition_bits;
 static unsigned long *tty_colormasks;
 static struct tty_status_fields {
+    int idx;
     int color;
     int attr;
     int x, y;
@@ -3488,6 +3466,7 @@ tty_status_init()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
+        tty_status[NOW][i].idx = -1;
         tty_status[NOW][i].color = NO_COLOR; /* no color */
         tty_status[NOW][i].attr = ATR_NONE;
         tty_status[NOW][i].x = 0;
@@ -3502,84 +3481,6 @@ tty_status_init()
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
-}
-
-/*
- * status_putstr() is not intended to be called directly
- * by anything other than tty_putstr(). tty_putstr()
- * does the prereq validations, and initializations of
- * window and cw.
- *
- * Moving the status handling code here from tty_putstr()
- * allows access to status data structures defined just
- * above, rather than up top, with the additional bonus
- * of having most status-related code bits fairly close
- * together.
- *
- */
-static void
-status_putstr(window, cw, str)
-winid window;
-struct WinDesc *cw;
-const char *str;
-{
-    char *ob;
-    long i, j, n0;
-    const char *nb;
-    
-    ob = &cw->data[cw->cury][j = cw->curx];
-    if (context.botlx)
-        *ob = 0;
-    if (!cw->cury && (int) strlen(str) >= CO) {
-        /* the characters before "St:" are unnecessary */
-        nb = index(str, ':');
-        if (nb && nb > str + 2)
-            str = nb - 2;
-    }
-    nb = str;
-    if (iflags.debug.ttystatus)
-        dump_display_status("status_putstr (before)", st_fld, cw, str);
-
-    for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
-        if (!*nb) {
-#ifndef STATUS_HILITES
-            if (*ob || context.botlx) {
-#else
-            if (context.botlx) {
-#endif
-                /* last char printed may be in middle of line */
-                tty_curs(WIN_STATUS, i, cw->cury);
-                cl_end();
-            }
-            break;
-        }
-#ifndef STATUS_HILITES
-        if (*ob != *nb) {
-#else
-        if (*ob != *nb || tty_status[NOW][st_fld].redraw) {
-#endif
-            tty_putsym(WIN_STATUS, i, cw->cury, *nb);
-        }
-#ifdef STATUS_HILITES
-        else {
-            tty_curs(WIN_STATUS, i, cw->cury);
-            ttyDisplay->curx++;
-            cw->curx++;
-        }
-#endif
-        if (*ob)
-            ob++;
-    }
-    if (iflags.debug.ttystatus)
-        dump_display_status("status_putsr (after)", st_fld, cw, str);
-
-    (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
-    cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
-#ifndef STATUS_HILITES
-    cw->cury = (cw->cury + 1) % 2;
-    cw->curx = 0;
-#endif
-    return;
 }
 
 #ifdef STATUS_HILITES
@@ -3662,6 +3563,7 @@ unsigned long *colormasks;
         case BL_CONDITION:
                 tty_condition_bits = *condptr;
                 tty_colormasks = colormasks;
+                tty_status[NOW][fldidx].idx = fldidx;
                 tty_status[NOW][fldidx].valid = TRUE;
                 break;
         default:
@@ -3672,6 +3574,7 @@ unsigned long *colormasks;
                                                          : NO_COLOR;
                 tty_status[NOW][fldidx].attr = (color & 0xFF00) >> 8;
                 tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
+                tty_status[NOW][fldidx].idx = fldidx;
                 tty_status[NOW][fldidx].valid = TRUE;
                 break;
     }
@@ -3797,6 +3700,7 @@ render_status(VOID_ARGS)
     int i, c, row, shrinklvl = 0, attrmask = 0;
     struct WinDesc *cw = 0;
     boolean do_color = FALSE;
+    struct tty_status_fields *nullfield = (struct tty_status_fields *)0;
 
 #ifdef TEXTCOLOR
     do_color = TRUE;
@@ -3821,10 +3725,7 @@ render_status(VOID_ARGS)
                 char *text = status_vals[fldidx];
                 boolean hitpointbar = (fldidx == BL_TITLE && iflags.wc2_hitpointbar);
 
-                st_fld = fldidx;    /* for status_putstr() */
-                tty_curs(WIN_STATUS, x, y);
-                if (iflags.debug.ttystatus)
-                    dump_tty_status("render_status (before)", st_fld);
+                st_fld = fldidx;
                 if (st_fld == BL_CONDITION) {
                     /*
                      * +-----------------+
@@ -3832,9 +3733,9 @@ render_status(VOID_ARGS)
                      * +-----------------+
                      */
                     for (c = 0; c < SIZE(conditions); ++c) {
-                        mask = conditions[c].mask; 
+                        mask = conditions[c].mask;
                         if ((tty_condition_bits & mask) == mask) {
-                            tty_putstr(WIN_STATUS, 0, " ");
+                            tty_putstatusfield(nullfield, " ", x++, y);
                             if (iflags.hilite_delta) {
                                 attrmask = condattr(mask, tty_colormasks);
                                 Begin_Attr(attrmask);
@@ -3844,8 +3745,9 @@ render_status(VOID_ARGS)
                                         term_start_color(coloridx);
                                 }
                             }
-                            tty_putstr(WIN_STATUS, 0,
-                                       conditions[c].text[shrinklvl]);
+                            tty_putstatusfield(nullfield,
+                                               conditions[c].text[shrinklvl], x, y);
+                            x += (int) strlen(conditions[c].text[shrinklvl]);
                             if (iflags.hilite_delta) {
                                 if (do_color && coloridx != NO_COLOR)
                                     term_end_color();
@@ -3853,14 +3755,18 @@ render_status(VOID_ARGS)
                             }
                         }
                     }
+                    tty_curs(WIN_STATUS, x, y);
+                    cl_end();
                 } else if (st_fld == BL_GOLD) {
+                    char buf[BUFSZ];
                     /*
                      * +-----------+
                      * |   Gold    |
                      * +-----------+
                      */
-                    /* putmixed() due to GOLD glyph */
-                    putmixed(WIN_STATUS, 0, text);
+                    /* decode_mixed() due to GOLD glyph */
+                    tty_putstatusfield(nullfield,
+                                       decode_mixed(buf, text), x, y);
                 } else if (hitpointbar) {
                     /*
                      * +-------------------------+
@@ -3888,22 +3794,26 @@ render_status(VOID_ARGS)
                             *bar2 = '\0';
                         }
                     }
-                    if (iflags.hilite_delta && iflags.wc2_hitpointbar) {
-                        tty_putstr(WIN_STATUS, 0, "[");
+                    if (iflags.hilite_delta) {
+                        tty_putstatusfield(nullfield, "[", x++, y);
                         if (do_color && hpbar_color != NO_COLOR)
                             term_start_color(hpbar_color);
                         term_start_attr(ATR_INVERSE);
-                        tty_putstr(WIN_STATUS, 0, bar);
+                        tty_putstatusfield(nullfield, bar, x, y);
+                        x += (int) strlen(bar);
                         term_end_attr(ATR_INVERSE);
                         if (do_color && hpbar_color != NO_COLOR)
                             term_end_color();
                         if (twoparts) {
                             *bar2 = savedch;
-                            tty_putstr(WIN_STATUS, 0, bar2);
+                            tty_putstatusfield(nullfield, bar2, x, y);
+                            x += (int) strlen(bar2);
+                            tty_curs(WIN_STATUS, x, y);
                         }
-                        tty_putstr(WIN_STATUS, 0, "]");
+                        tty_putstatusfield(nullfield, "]", x++, y);
                     } else {
-                        tty_putstr(WIN_STATUS, 0, text);
+                        tty_putstatusfield(&tty_status[NOW][fldidx],
+                                           (char *)0, x, y);
 		    }
                 } else {
                     /*
@@ -3914,7 +3824,7 @@ render_status(VOID_ARGS)
                      */
                     if (iflags.hilite_delta) {
                         if (*text == ' ') {
-                            tty_putstr(WIN_STATUS, 0, " ");
+                            tty_putstatusfield(nullfield, " ", x++, y);
                             text++;
                         }
                         /* multiple attributes can be in effect concurrently */
@@ -3923,7 +3833,8 @@ render_status(VOID_ARGS)
                             && coloridx != CLR_MAX)
 	                       term_start_color(coloridx);
 	            }
-                    tty_putstr(WIN_STATUS, 0, text);
+                    tty_putstatusfield(&tty_status[NOW][fldidx],
+                                       text, x, y);
                     if (iflags.hilite_delta) {
                         if (do_color && coloridx != NO_COLOR)
 	                    term_end_color();
@@ -3932,8 +3843,6 @@ render_status(VOID_ARGS)
                 }
                 /* reset .redraw */
                 tty_status[NOW][st_fld].redraw = FALSE;
-                if (iflags.debug.ttystatus)
-                    dump_tty_status("render_status (after)", st_fld);
                 /*
                  * Make a copy of the entire tty_status struct for comparison
                  * of current and previous.
@@ -3941,10 +3850,43 @@ render_status(VOID_ARGS)
                 tty_status[BEFORE][st_fld] = tty_status[NOW][st_fld]; /* copy struct */
 	    }
 	}
-        tty_curs(WIN_STATUS, cw->curx+1, cw->cury);
-	cl_end();
     }
     return;
+}
+
+void
+tty_putstatusfield(fld, val, x, y)
+struct tty_status_fields *fld;
+const char *val;
+int x,y;
+{
+    int i, ncols, lth;
+    struct WinDesc *cw = 0;
+    const char *text = (char *)0;
+
+    if ((cw = wins[NHW_STATUS]) == (struct WinDesc *) 0)
+        panic("Invalid WinDesc\n");
+
+    ncols = cw->cols;
+    if (val) {
+        text = val;
+        lth = strlen(text);
+    } else if (fld) {
+        text = status_vals[fld->idx];
+        lth = fld->lth;
+    }
+    if (!text) return;
+
+    print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
+
+    tty_curs(NHW_STATUS, x, y);
+    for (i = 0; i < lth; ++i) {
+        if ((i + x ) < ncols) {
+            (void) putchar(*text++);
+            ttyDisplay->curx++;
+            cw->curx++;
+        }
+    }
 }
 
 #ifdef TEXTCOLOR
@@ -4000,67 +3942,9 @@ unsigned long *bmarray;
     return attr;
 }
 
-void
-dump_display_status(descr, idx, cw, str)
-const char *descr;
-int idx;
-struct WinDesc *cw;
-const char *str;
-{
-    boolean buf[BUFSZ];
-    const char *d2 = descr ? descr : "dump_Display_status";
-
-    Sprintf(buf,
-        "\t\t\"%s\"\n"
-        "\t\t%s = %d [%s], %s = %d, %s = %s\n"
-        "\t\t"
-        "%-17s = (%d,%d)\n"
-        "\t\t"
-        "%-17s = (%d,%d)\n"
-        "\t\t"
-        "%-17s = (%d,%d)\n",
-        str,
-        "idx", idx, fieldnames[idx], 
-            "lth", tty_status[NOW][idx].lth,
-            "redraw",tty_status[NOW][idx].redraw ? "TRUE" : "FALSE",
-        "x,y", tty_status[NOW][idx].x, tty_status[NOW][idx].y,
-        "ttyDisplay->x,->y", ttyDisplay->curx, ttyDisplay->cury,
-        "cw->curx,->cury", cw->curx, cw->cury);
-    testinglog("ttystatus", d2, buf);
-    return;
-}
-
-void
-dump_tty_status(descr, idx)
-const char *descr;
-int idx;
-{
-    boolean buf[BUFSZ];
-    const char *d2 = descr ? descr : "dump_status";
-
-    Sprintf(buf,
-        "\t\t%-6s = %s\n"
-        "\t\t%-6s = %d\n"
-        "\t\t%-6s = %d\n"
-        "\t\t%-6s = %X\n"
-        "\t\t%-6s = %d,%d\n"
-        "\t\t%-6s = %d\n"
-        "\t\t%-6s = %s\n"
-        "\t\t%-6s = %s\n",
-        "name",  fieldnames[idx],
-        "idx",   idx,
-        "color", tty_status[NOW][idx].color,
-        "attr",  tty_status[NOW][idx].attr,
-        "x,y",   tty_status[NOW][idx].x, tty_status[NOW][idx].y,
-        "lth",   tty_status[NOW][idx].lth,
-        "valid", tty_status[NOW][idx].valid ? "TRUE" : "FALSE",
-        "redraw",tty_status[NOW][idx].redraw ? "TRUE" : "FALSE");
-    testinglog("ttystatus", d2, buf);
-    return;
-}
-
 #endif /* STATUS_HILITES */
 
 #endif /* TTY_GRAPHICS */
 
 /*wintty.c*/
+
