@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1510963525 2017/11/18 00:05:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.319 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1526112322 2018/05/12 08:05:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4821,7 +4821,7 @@ boolean setinitial, setfromfile;
                 if (strlen(tmp->pattern) > ln)
                     Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
                 else
-                    Strcat(mtbuf, "\"");
+                    Strcat(strcat(mtbuf, tmp->pattern), "\"");
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;
