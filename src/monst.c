@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/6/18 by NullCGT */
+/* Edited on 5/12/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1747,6 +1747,13 @@ struct permonst _mons2[] = {
         SIZ(2300, 900, MS_SPELL, MZ_HUGE), 0, 0,
         M1_FLY | M1_HUMANOID | M1_OMNIVORE,
         M2_STRONG | M2_ROCKTHROW | M2_NASTY | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_MAGENTA),
+    MON("hundred handed one", S_GIANT, LVL(20, 12, -5, 60, 5), (G_GENO | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6)),
+        SIZ(2300, 900, MS_BOAST, MZ_HUGE), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        M2_GIANT | M2_STRONG | M2_ROCKTHROW | M2_NASTY | M2_COLLECT | M2_JEWELS,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_MAGENTA),
     MON("minotaur", S_GIANT, LVL(15, 15, 6, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),

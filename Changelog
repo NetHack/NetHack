@@ -17,6 +17,8 @@ New Options
   frustrating.
 - Ill-fated: A challenge mode where the dungeon difficulty is automatically
   upped by 50.
+- Marathon: A challenge mode where you start with 999 HP, but cannot heal or
+  regenerate hit points.
 - Tips: Gives you a spoiler tip every time you are welcomed. Defaults to true.
 - Pet names for birds and dragons can be specified with birdname and dragonname
   respectively. Birds can be set as the preferred pet with "b".
@@ -205,7 +207,6 @@ New Artifacts
 - Sonicboom
 - Sunspot
 - Pridwen
-- Seven-League Boots
 - Balance
 - Sharur (Dragonmaster quest artifact)
 - The Holographic Void Lily (Cartomancer quest artifact)
@@ -353,6 +354,7 @@ New Monsters
 - Baby Purple Dragon
 - Mind Flayer Telepath
 - Gnomish Psychic
+- Hundred Handed One
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Infernal (Non-generated Race)
