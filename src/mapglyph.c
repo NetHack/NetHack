@@ -316,6 +316,7 @@ const char *str;
         *put++ = *str++;
     }
     *put = '\0';
+    return buf;
 }
 
 /*
