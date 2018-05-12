@@ -3591,10 +3591,6 @@ unsigned long *colormasks;
     if (fldidx == BL_GOLD)
          tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
 
-    /* debugging log */
-    if (iflags.debug.ttystatus)
-        dump_tty_status("tty_status_update", fldidx);
-
     if (check_fields(force_update))
         render_status();
     return;
@@ -3630,35 +3626,16 @@ boolean forcefields;
             if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
             /*
-             * status_putstr(), called from tty_putstr() checks
-             * whether individual tty cell text content matches what
-             * was already there and optimizes by leaving it be.
-             * Checking the text iself was sufficient back when the
-             * status lines were monochrome and of a single
-             * attribute style.
-             *
              * With STATUS_HILITES, it is possible that the color
              * needs to change even if the text is the same, so
              * we flag that here by setting .redraw.
              * Then, status_putstr() will see that flag setting
              * and ensure that the tty cell content is updated.
              */   
-            if (valid && iflags.debug.ttystatus) {
-                char buf[BUFSZ];
-                
-                Sprintf(buf, "check_fields: forcefields=%s, name=%s\n"
-                        "\t\t\"%s\"",
-                        forcefields ? "TRUE" : "FALSE",
-                        fieldnames[idx],
-                        status_vals[idx]);
-                testinglog("ttystatus", buf, "");
-	    }
-
             if (forcefields || update_right
                 || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
                 || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
                   tty_status[NOW][idx].redraw = TRUE;
-            if (iflags.debug.ttystatus) dump_tty_status("", idx);
             col += tty_status[NOW][idx].lth;
         }
     }
