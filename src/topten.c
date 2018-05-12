@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 #include "dlb.h"
@@ -477,7 +477,9 @@ encodeachieve()
     if (u.uroleplay.illfated)
         r |= 1L << 19;
     if (u.uachieve.killed_reaper)
-        r |= 1L << 16;
+        r |= 1L << 20;
+    if (u.uroleplay.marathon)
+        r |= 1L << 21;
 
     return r;
 }

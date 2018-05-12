@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/2/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #ifndef YOU_H
 #define YOU_H
@@ -108,6 +108,7 @@ struct u_roleplay {
     boolean clumsy; /* permanetnly fumbling */
     boolean nudist; /* has not worn any armor, ever */
     boolean illfated; /* massively increased dungeon danger */
+    boolean marathon;  /* cannot heal, fixed high max hp */
     long numbones;  /* # of bones files loaded  */
 };
 

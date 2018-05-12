@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/10/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2788,6 +2788,9 @@ int final;
         you_have_been("deaf from birth");
     if (u.uroleplay.illfated)
         you_have_been("fighting against your fate");
+    if (u.uroleplay.marathon) {
+        you_have_been("on a marathon run");
+    }
 
     if (!u.uconduct.food)
         enl_msg(You_, "have gone", "went", " without food", "");
