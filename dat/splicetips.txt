@@ -13,7 +13,7 @@ The Amulet of Yendor now blocks teleportation.
 Sonic attacks will not harm you if you are deaf.
 Psionic attacks will not harm something without a mind.
 Psionic beams cannot be reflected.
-The Void is a dangerous branch that contains a void dragon.
+The Void is a dangerous branch that contains a void dragon. Enter at your peril.
 Void dragons can disintegrate you with a melee attack.
 Unlimited Moon's power is dependent on the moon phase.
 A polished silver shield might be a shield of reflection, or it could be a shield of resonance.
@@ -56,3 +56,8 @@ Furnaces contain lava. As such, drinking from them is a rather poor idea.
 Dragons have learned how to manipulate certain items with their claws.
 Don't let a monster get ahold of a wand of wishing...
 See some colored stairs? They probably lead to a branch.
+Looking for a challenge? Marathon mode gives you 999 hp, but you cannot heal!
+Looking for a challenge? Try one of the new challenge modes!
+If you hate silver, you will take extra damage from it.
+Not sure what a monster is? Try using the encyclopedia.
+Drawing from a deck of fate is far more risky than using a fountain.
