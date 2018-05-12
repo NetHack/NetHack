@@ -207,7 +207,7 @@ VA_DECL(const char *, s)
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
-    if (!strncmpi(windowprocs.name, "tty", 3)) {
+    if (windowprocs.name != NULL && !strncmpi(windowprocs.name, "tty", 3)) {
         buf[0] = '\n';
         (void) vsprintf(&buf[1], s, VA_ARGS);
         Strcat(buf, "\n");
@@ -473,7 +473,17 @@ void ntassert_failed(const char * exp, const char * file, int line)
         DebugBreak();
     }
 
+    // strip off the newline
+    message[strlen(message) - 1] = '\0';
     error(message);
+}
+
+/* nethack_enter_winnt() is the first thing called from main */
+void nethack_enter_winnt()
+{
+#ifdef WIN32CON
+    nethack_enter_nttty();
+#endif
 }
 
 #endif /* WIN32 */

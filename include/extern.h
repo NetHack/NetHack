@@ -1620,6 +1620,7 @@ E int NDECL(tgetch);
 E int FDECL(ntposkey, (int *, int *, int *));
 E void FDECL(set_output_mode, (int));
 E void NDECL(synch_cursor);
+E void NDECL(nethack_enter_nttty);
 #endif
 
 /* ### o_init.c ### */
@@ -2778,6 +2779,11 @@ E void FDECL(dump_open_log, (time_t));
 E void NDECL(dump_close_log);
 E void FDECL(dump_redirect, (BOOLEAN_P));
 E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
+
+/* ### winnt.c ### */
+#ifdef WIN32
+E void NDECL(nethack_enter_winnt);
+#endif
 
 /* ### wizard.c ### */
 
