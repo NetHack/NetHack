@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/11/18 by NullCGT */
+/* Edited on 5/12/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -2789,7 +2789,7 @@ int final;
     if (u.uroleplay.illfated)
         you_have_been("fighting against your fate");
     if (u.uroleplay.marathon) {
-        you_have_been("on a marathon run");
+        you_have_been("playing in marathon mode");
     }
 
     if (!u.uconduct.food)
