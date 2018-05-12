@@ -77,6 +77,7 @@ struct tty_status_fields {
     int x, y;
     size_t lth;
     boolean valid;
+    boolean dirty;
     boolean redraw;
 };
 #endif

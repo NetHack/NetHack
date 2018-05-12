@@ -182,6 +182,7 @@ STATIC_DCL void NDECL(render_status);
 STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *,
                                            const char *, int, int));
 STATIC_DCL int FDECL(set_cond_shrinklvl, (int, int));
+STATIC_DCL boolean NDECL(check_windowdata);
 #endif
 
 /*
@@ -3448,7 +3449,6 @@ static unsigned long *tty_colormasks;
 static struct tty_status_fields
                 tty_status[2][MAXBLSTATS]; /* 2: first index is for current
                                                  and previous */
-static int st_fld;
 static int hpbar_percent, hpbar_color;
 static struct condition_t {
     long mask;
@@ -3478,7 +3478,21 @@ static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
       BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
       BL_CAP, BL_CONDITION, BL_FLUSH }
 };
+static boolean windowdata_init = FALSE;
+/* This controls whether to skip fields that aren't
+ * flagged as requiring updating during the current
+ * render_status().
+ *
+ * Hopefully that can be confirmed as working correctly
+ * for all platforms eventually and the conditional
+ * setting below can be removed.
+ */
+#if defined(UNIX)
+static int do_field_opt = 0;
+#else
+static int do_field_opt = 1;
 #endif
+#endif  /* STATUS_HILITES */
 
 /*
  *  tty_status_init()
@@ -3497,7 +3511,8 @@ tty_status_init()
         tty_status[NOW][i].attr = ATR_NONE;
         tty_status[NOW][i].x = 0;
         tty_status[NOW][i].y = 0;
-        tty_status[NOW][i].valid = FALSE;
+        tty_status[NOW][i].valid  = FALSE;
+        tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
@@ -3587,12 +3602,14 @@ unsigned long *colormasks;
                 force_update = TRUE;
                 break;
         case BL_CONDITION:
+                tty_status[NOW][fldidx].idx = fldidx;
                 tty_condition_bits = *condptr;
                 tty_colormasks = colormasks;
-                tty_status[NOW][fldidx].idx = fldidx;
                 tty_status[NOW][fldidx].valid = TRUE;
+                tty_status[NOW][fldidx].dirty = TRUE;
                 break;
         default:
+                tty_status[NOW][fldidx].idx = fldidx;
                 Sprintf(status_vals[fldidx],
                     status_fieldfmt[fldidx] ?
                     status_fieldfmt[fldidx] : "%s", text);
@@ -3600,8 +3617,9 @@ unsigned long *colormasks;
                                                          : NO_COLOR;
                 tty_status[NOW][fldidx].attr = (color & 0xFF00) >> 8;
                 tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
-                tty_status[NOW][fldidx].idx = fldidx;
                 tty_status[NOW][fldidx].valid = TRUE;
+                tty_status[NOW][fldidx].dirty = TRUE;
+
                 break;
     }
 
@@ -3611,11 +3629,32 @@ unsigned long *colormasks;
         hpbar_color = do_color ? (color & 0x00FF) : NO_COLOR;
     }
 
-    /* special case fixups */
+    /* The core botl engine sends a single blank to the window port
+       for carrying-capacity when its unused. Let's suppress that */
+       if (tty_status[NOW][fldidx].lth == 1 &&
+                status_vals[fldidx][0] == ' ') {
+            status_vals[fldidx][0] = '\0';
+            tty_status[NOW][fldidx].lth = 0;
+       }
+       
+    /* The core botl engine sends BL_LEVELDESC with trailing blanks
+       included. Let's suppress one of the trailing blanks */
+    if (fldidx == BL_LEVELDESC) {
+        char *lastchar = eos(status_vals[fldidx]);
+        lastchar--;
+        while (lastchar && *lastchar == ' '
+                && lastchar >= status_vals[fldidx]) {
+            *lastchar-- = '\0';
+            tty_status[NOW][fldidx].lth--;
+        }
+    }
+
+    /* Some other special case fixups */
     if (iflags.wc2_hitpointbar && fldidx == BL_TITLE)
         tty_status[NOW][fldidx].lth += 2; /* [ and ] */
     if (fldidx == BL_GOLD)
          tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
+
 
     if (check_fields(force_update))
         render_status();
@@ -3632,8 +3671,11 @@ boolean
 check_fields(forcefields)
 boolean forcefields;
 {
-    int i, row, col;
-    boolean valid = TRUE, update_right;
+    int c, i, row, col;
+    boolean valid = TRUE, matchprev = FALSE, update_right;
+
+    if (!windowdata_init && !check_windowdata())
+        return FALSE;
 
     for (row = 0; row < 2; ++row) {
         col = 1;
@@ -3649,16 +3691,44 @@ boolean forcefields;
 
             tty_status[NOW][idx].y = row;
             tty_status[NOW][idx].x = col;
+
+            /* evaluate */
             if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
+
+            /*
+             * Check values against those already on the dislay.
+             *  - Is the additional processing time for this worth it?
+             */
+            matchprev = FALSE;
+            if (do_field_opt && tty_status[NOW][idx].dirty) {
+                /* compare values */
+                    const char *ob, *nb;     /* old byte, new byte */
+                
+                c = col - 1;
+                ob = &wins[WIN_STATUS]->data[row][c];
+                nb = status_vals[idx];
+                while (*nb && c < wins[WIN_STATUS]->cols) {
+                    if (*nb != *ob)
+                        break;
+                    nb++;
+                    ob++;
+                    c++;
+                }
+                if (!*nb && c > col - 1)
+                    matchprev = TRUE;
+            }
+
             /*
              * With STATUS_HILITES, it is possible that the color
              * needs to change even if the text is the same, so
              * we flag that here by setting .redraw.
-             * Then, status_putstr() will see that flag setting
+             * Then, render_status() will see that flag setting
              * and ensure that the tty cell content is updated.
-             */   
-            if (forcefields || update_right
+             * After the field has been updated, render_status()
+             * will also clear .redraw.
+             */
+            if (forcefields || update_right || !matchprev
                 || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
                 || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
                   tty_status[NOW][idx].redraw = TRUE;
@@ -3711,7 +3781,7 @@ render_status(VOID_ARGS)
 
     if (WIN_STATUS == WIN_ERR
         || (cw = wins[WIN_STATUS]) == (struct WinDesc *) 0) {
-            paniclog("status", "WIN_ERR on status window.");
+            paniclog("render_status", "WIN_ERR on status window.");
             return;
     }
 
@@ -3728,8 +3798,17 @@ render_status(VOID_ARGS)
                 char *text = status_vals[fldidx];
                 boolean hitpointbar = (fldidx == BL_TITLE && iflags.wc2_hitpointbar);
 
-                st_fld = fldidx;
-                if (st_fld == BL_CONDITION) {
+                if (do_field_opt && !tty_status[NOW][fldidx].redraw)
+                    continue;
+
+                /*
+                 * Ignore zero length fields. check_fields() didn't count
+                 * them in either.
+                 */
+                if (!tty_status[NOW][fldidx].lth)
+                    continue;
+
+                if (fldidx == BL_CONDITION) {
                     /*
                      * +-----------------+
                      * | Condition Codes |
@@ -3761,7 +3840,7 @@ render_status(VOID_ARGS)
                     }
                     tty_curs(WIN_STATUS, x, y);
                     cl_end();
-                } else if (st_fld == BL_GOLD) {
+                } else if (fldidx == BL_GOLD) {
                     char buf[BUFSZ];
                     /*
                      * +-----------+
@@ -3845,26 +3924,32 @@ render_status(VOID_ARGS)
                         End_Attr(attridx);
 		    }
                 }
-                /* reset .redraw */
-                tty_status[NOW][st_fld].redraw = FALSE;
+                /* reset .redraw and .dirty now that they've been rendered */
+                tty_status[NOW][fldidx].dirty  = FALSE;
+                tty_status[NOW][fldidx].redraw = FALSE;
                 /*
                  * Make a copy of the entire tty_status struct for comparison
                  * of current and previous.
                  */
-                tty_status[BEFORE][st_fld] = tty_status[NOW][st_fld]; /* copy struct */
+                tty_status[BEFORE][fldidx] = tty_status[NOW][fldidx]; /* copy struct */
 	    }
 	}
     }
     return;
 }
 
+/*
+ * This is what places a field on the tty display.
+ * If val isn't null, it will be used rather than
+ * fld (it takes precedence).
+ */
 void
 tty_putstatusfield(fld, val, x, y)
 struct tty_status_fields *fld;
 const char *val;
 int x,y;
 {
-    int i, ncols, lth;
+    int i, n, ncols, lth;
     struct WinDesc *cw = 0;
     const char *text = (char *)0;
 
@@ -3885,10 +3970,13 @@ int x,y;
 
     tty_curs(NHW_STATUS, x, y);
     for (i = 0; i < lth; ++i) {
-        if ((i + x ) < ncols) {
-            (void) putchar(*text++);
+        n = i + x;
+        if (n < ncols && *text) {
+            (void) putchar(*text);
             ttyDisplay->curx++;
             cw->curx++;
+            cw->data[y][n-1] = *text;
+            text++;
         }
     }
 }
@@ -3920,6 +4008,30 @@ int col, ncols;
     return shrinklvl;
 }
 
+/*
+ * Ensure the underlying status window data start out
+ * blank and null-terminated.
+ */
+boolean
+check_windowdata(VOID_ARGS)
+{
+    if (WIN_STATUS == WIN_ERR || wins[WIN_STATUS] == (struct WinDesc *) 0) {
+            paniclog("check_windowdata", " null status window.");
+            return FALSE;
+    } else if (!windowdata_init) {
+        int i, n = wins[WIN_STATUS]->cols;
+
+        for (i = 0; i < wins[WIN_STATUS]->cols; ++i)
+            wins[WIN_STATUS]->data[0][i] = ' ';
+        wins[WIN_STATUS]->data[0][n - 1] = '\0';    /* null terminate */
+        for (i = 0; i < wins[WIN_STATUS]->cols; ++i)
+            wins[WIN_STATUS]->data[1][i] = ' ';
+        wins[WIN_STATUS]->data[0][n - 1] = '\0';    /* null terminate */
+        windowdata_init = TRUE;
+    }
+    return TRUE;
+}
+    
 #ifdef TEXTCOLOR
 /*
  * Return what color this condition should
