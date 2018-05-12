@@ -247,7 +247,7 @@ int glyph;
     return encbuf;
 }
 
-char *
+const char *
 decode_mixed(buf, str)
 char *buf;
 const char *str;

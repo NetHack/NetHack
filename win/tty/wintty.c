@@ -176,10 +176,13 @@ STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL boolean NDECL(reset_role_filtering);
+#ifdef STATUS_HILITES
 STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P));
 STATIC_DCL void NDECL(render_status);
-STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *, const char *, int, int));
+STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *,
+                                           const char *, int, int));
 STATIC_DCL int FDECL(set_cond_shrinklvl, (int, int));
+#endif
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -2494,7 +2497,6 @@ const char *str;
     register struct WinDesc *cw = 0;
     register char *ob;
     register long i, n0;
-    boolean attr_match = FALSE;
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -2507,11 +2509,7 @@ const char *str;
     if (str == (const char *) 0
         || ((cw->flags & WIN_CANCELLED) && (cw->type != NHW_MESSAGE)))
         return;
-#ifndef STATUS_HILITES
     if (cw->type != NHW_MESSAGE)
-#else
-    if (cw->type != NHW_MESSAGE && cw->type != NHW_STATUS)
-#endif
         str = compress_str(str);
 
     ttyDisplay->lastwin = window;
@@ -2526,7 +2524,39 @@ const char *str;
 #endif
         update_topl(str);
         break;
+#ifndef STATUS_HILITES
+    case NHW_STATUS:
+        ob = &cw->data[cw->cury][j = cw->curx];
+        if (context.botlx)
+            *ob = 0;
+        if (!cw->cury && (int) strlen(str) >= CO) {
+            /* the characters before "St:" are unnecessary */
+            nb = index(str, ':');
+            if (nb && nb > str + 2)
+                str = nb - 2;
+        }
+        nb = str;
+        for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
+            if (!*nb) {
+                if (*ob || context.botlx) {
+                    /* last char printed may be in middle of line */
+                    tty_curs(WIN_STATUS, i, cw->cury);
+                    cl_end();
+                }
+                break;
+            }
+            if (*ob != *nb)
+                tty_putsym(WIN_STATUS, i, cw->cury, *nb);
+            if (*ob)
+                ob++;
+        }
 
+        (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
+        cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
+        cw->cury = (cw->cury + 1) % 2;
+        cw->curx = 0;
+        break;
+#endif /* STATUS_HILITES */
     case NHW_MAP:
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
@@ -3415,20 +3445,15 @@ static int FDECL(condcolor, (long, unsigned long *));
 static int FDECL(condattr, (long, unsigned long *));
 static long tty_condition_bits;
 static unsigned long *tty_colormasks;
-static struct tty_status_fields {
-    int idx;
-    int color;
-    int attr;
-    int x, y;
-    size_t lth;
-    boolean valid;
-    boolean redraw;
-} tty_status[2][MAXBLSTATS];
+static struct tty_status_fields
+                tty_status[2][MAXBLSTATS]; /* 2: first index is for current
+                                                 and previous */
 static int st_fld;
-int hpbar_percent, hpbar_color;
-struct condition_t {
+static int hpbar_percent, hpbar_color;
+static struct condition_t {
     long mask;
-    char *text[3];  /* 3 potential display values, progressively smaller */
+    const char *text[3];  /* 3: potential display values, progressively
+                           * smaller */
 } conditions[] = {   
     /* The sequence order of these matters */
    { BL_MASK_STONE,    {"Stone", "Ston", "Sto"}},
@@ -3445,7 +3470,7 @@ struct condition_t {
    { BL_MASK_FLY,      {"Fly", "Fly", "Fl"}},
    { BL_MASK_RIDE,     {"Ride", "Rid", "Ri"}},
 };
-enum statusfields fieldorder[2][15] = {
+static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
       BL_FLUSH },

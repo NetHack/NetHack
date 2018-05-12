@@ -1158,7 +1158,7 @@ E boolean FDECL(usmellmon, (struct permonst *));
 
 E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int));
 E char *FDECL(encglyph, (int));
-E char *FDECL(decode_mixed, (char *,const char *));
+E const char *FDECL(decode_mixed, (char *,const char *));
 E void FDECL(genl_putmixed, (winid, int, const char *));
 
 /* ### mcastu.c ### */

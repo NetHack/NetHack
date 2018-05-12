@@ -854,7 +854,6 @@ const char *opts;
 {
     char *op;
     boolean negated = FALSE;
-    boolean retval = TRUE;
 
     while ((op = index(opts, ',')) != 0) {
         *op++ = 0;
