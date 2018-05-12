@@ -3542,7 +3542,7 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 
 /* ----------  END SCOREBOARD CREATION ----------- */
 
-/* ----------  BEGIN PANIC/IMPOSSIBLE LOG ----------- */
+/* ----------  BEGIN PANIC/IMPOSSIBLE/TESTING LOG ----------- */
 
 /*ARGSUSED*/
 void
@@ -3579,7 +3579,31 @@ const char *reason; /* explanation */
     return;
 }
 
-/* ----------  END PANIC/IMPOSSIBLE LOG ----------- */
+/*ARGSUSED*/
+void
+testinglog(filenm, type, reason)
+const char *filenm;   /* ad hoc file name */
+const char *type; 
+const char *reason;   /* explanation */
+{
+    FILE *lfile;
+    char fnbuf[BUFSZ];
+
+    if (!filenm) return;
+    Strcpy(fnbuf, filenm);
+    if (index(fnbuf, '.') == 0)
+        Strcat(fnbuf, ".log");
+    lfile = fopen_datafile(fnbuf, "a", TROUBLEPREFIX);
+    if (lfile) {
+        time_t now = getnow();
+        int uid = getuid();
+        (void) fprintf(lfile, "%s\n%s\n", type, reason);
+        (void) fclose(lfile);
+    }
+    return;
+}
+
+/* ----------  END PANIC/IMPOSSIBLE/TESTING LOG ----------- */
 
 #ifdef SELF_RECOVER
 

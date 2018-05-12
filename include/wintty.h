@@ -69,6 +69,19 @@ struct DisplayDesc {
 
 #endif /* WINDOW_STRUCTS */
 
+#ifdef STATUS_HILITES
+struct tty_status_fields {
+    int idx;
+    int color;
+    int attr;
+    int x, y;
+    size_t lth;
+    boolean valid;
+    boolean dirty;
+    boolean redraw;
+};
+#endif
+
 #define MAXWIN 20 /* maximum number of windows, cop-out */
 
 /* tty dependent window types */

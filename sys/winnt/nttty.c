@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1524931557 2018/04/28 16:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1525643540 2018/05/06 21:52:20 $  $NHDT-Branch: tty-status $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@
  * Switch to low level console output routines	M. Allison	2003/10/01
  * Restrict cursor movement until input pending	M. Lehotay	2003/10/02
  * Call Unicode version of output API on NT	R. Chason       2005/10/28
+ * Use of back buffer to improve performance    B. House        2018/05/06
  *
  */
 
@@ -151,6 +152,249 @@ SOURCEWHERE pSourceWhere;
 SOURCEAUTHOR pSourceAuthor;
 KEYHANDLERNAME pKeyHandlerName;
 
+/* CP437 to Unicode mapping according to the Unicode Consortium */
+static const WCHAR cp437[] = {
+    0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
+    0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
+    0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
+    0x2191, 0x2193, 0x2192, 0x2190, 0x221F, 0x2194, 0x25B2, 0x25BC,
+    0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+    0x0028, 0x0029, 0x002a, 0x002b, 0x002c, 0x002d, 0x002e, 0x002f,
+    0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+    0x0038, 0x0039, 0x003a, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f,
+    0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+    0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f,
+    0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+    0x0058, 0x0059, 0x005a, 0x005b, 0x005c, 0x005d, 0x005e, 0x005f,
+    0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067,
+    0x0068, 0x0069, 0x006a, 0x006b, 0x006c, 0x006d, 0x006e, 0x006f,
+    0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077,
+    0x0078, 0x0079, 0x007a, 0x007b, 0x007c, 0x007d, 0x007e, 0x2302,
+    0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
+    0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
+    0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
+    0x00ff, 0x00d6, 0x00dc, 0x00a2, 0x00a3, 0x00a5, 0x20a7, 0x0192,
+    0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
+    0x00bf, 0x2310, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
+    0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
+    0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
+    0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
+    0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
+    0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
+    0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
+    0x03b1, 0x00df, 0x0393, 0x03c0, 0x03a3, 0x03c3, 0x00b5, 0x03c4,
+    0x03a6, 0x0398, 0x03a9, 0x03b4, 0x221e, 0x03c6, 0x03b5, 0x2229,
+    0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
+    0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
+};
+
+/*
+ * cpConsole provides the mapping of characters in the console code page to
+ * UNICODE.  It maps a character to at most two WCHARs storing the number of
+ * WCHARs in count.
+ *
+ * NOTE: cpConsole is only valid if has_unicode is TRUE.
+ */
+
+typedef struct {
+    WCHAR characters[2];
+    int count;
+} CodePageMapping;
+
+static CodePageMapping cpConsole[256];
+
+static void initialize_cp_console()
+{
+    if (has_unicode) {
+        UINT codePage = GetConsoleOutputCP();
+
+        for (int i = 0; i < 256; i++) {
+            char c = (char)i;
+            cpConsole[i].count = MultiByteToWideChar(codePage, 0, &c, 1,
+                                            &cpConsole[i].characters[0], 2);
+        }
+    }
+}
+
+/*
+ * Console Buffer Flipping Support
+ *
+ * To minimize the number of calls into the WriteConsoleOutputXXX methods,
+ * we implement a notion of a console back buffer which keeps the next frame
+ * of console output as it is being composed.  When ready to show the new
+ * frame, we compare this next frame to what is currently being output and
+ * only call WriteConsoleOutputXXX for those console values that need to
+ * change.
+ *
+ */
+
+#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN \
+                                                | FOREGROUND_BLUE)
+#define CONSOLE_CLEAR_CHARACTER (' ')
+
+typedef struct {
+    WCHAR   characters[2];
+    int     count;
+    WORD    attribute;
+} cell_t;
+
+typedef struct {
+    cell_t  * cells;
+} console_buffer_t;
+
+static int buffer_width;
+static int buffer_height;
+
+console_buffer_t back_buffer;
+console_buffer_t front_buffer;
+cell_t clear_cell;
+cell_t undefined_cell;
+
+static boolean buffer_flipping_initialized = FALSE;
+
+static void check_buffer_size(int width, int height);
+static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y);
+
+static void back_buffer_flip();
+
+static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * cell,
+                                int x, int y);
+static void back_buffer_clear_to_end_of_line(int x, int y);
+static void back_buffer_write(cell_t * cell, int x, int y);
+
+static void initialize_buffer_flipping(int width, int height)
+{
+    if (buffer_flipping_initialized) {
+        check_buffer_size(width, height);
+        return;
+    }
+
+    buffer_width = 0;
+    buffer_height = 0;
+
+    back_buffer.cells = NULL;
+    front_buffer.cells = NULL;
+
+    clear_cell.attribute = CONSOLE_CLEAR_ATTRIBUTE;
+    clear_cell.characters[0] = CONSOLE_CLEAR_CHARACTER;
+    clear_cell.characters[1] = 0;
+    clear_cell.count = 1;
+
+    undefined_cell = clear_cell;
+    undefined_cell.count = 0;
+
+    check_buffer_size(width, height);
+
+    buffer_flipping_initialized = TRUE;
+}
+
+static void resize_buffer(console_buffer_t * buffer, cell_t * fill,
+                            int width, int height)
+{
+    cell_t * cells = (cell_t *)malloc(sizeof(cell_t) * width * height);
+    cell_t * dst = cells;
+    cell_t * sentinel = dst + (width * height);
+
+    while (dst != sentinel)
+        *dst++ = *fill;
+
+    int height_to_copy = (buffer_height > height ? height : buffer_height);
+    int bytes_to_copy = (buffer_width > width ? width : buffer_width)
+                        * sizeof(cell_t);
+
+    for (int y = 0; y < height_to_copy; y++)
+        memcpy(cells + (width * y), buffer->cells + (buffer_width * y),
+               bytes_to_copy);
+
+    free(buffer->cells);
+    buffer->cells = cells;
+}
+
+static void check_buffer_size(int width, int height)
+{
+    if (width != buffer_width || height != buffer_height) {
+        resize_buffer(&back_buffer, &clear_cell, width, height);
+        resize_buffer(&front_buffer, &undefined_cell, width, height);
+        buffer_width = width;
+        buffer_height = height;
+    }
+}
+
+static cell_t * buffer_get_cell(console_buffer_t * buffer, int x, int y)
+{
+    return buffer->cells + (buffer_width * y) + x;
+}
+
+static void back_buffer_flip()
+{
+    if (!buffer_flipping_initialized)
+        return;
+
+    cell_t * back = back_buffer.cells;
+    cell_t * front = front_buffer.cells;
+    COORD pos;
+
+    for (pos.Y = 0; pos.Y < buffer_height; pos.Y++) {
+        for (pos.X = 0; pos.X < buffer_width; pos.X++) {
+            if (back->attribute != front->attribute) {
+                WriteConsoleOutputAttribute(hConOut, &back->attribute,
+                                            1, pos, &acount);
+                front->attribute = back->attribute;
+            }
+            if (back->count != front->count ||
+                back->characters[0] != front->characters[0] ||
+                back->characters[1] != front->characters[1]) {
+                if (has_unicode) {
+                    WriteConsoleOutputCharacterW(hConOut,  back->characters,
+                                                back->count, pos, &ccount);
+                } else {
+                    char ch = (char)back->characters[0];
+                    WriteConsoleOutputCharacterA(hConOut, &ch, 1, pos,
+                                                    &ccount);
+                }
+                *front = *back;
+            }
+            back++;
+            front++;
+        }
+    }
+}
+
+static void buffer_fill_to_end(console_buffer_t * buffer, cell_t * src,
+                                int x, int y)
+{
+    cell_t * dst = buffer_get_cell(buffer, x, y);
+    cell_t * sentinel = buffer_get_cell(buffer, 0, buffer_height);
+    while (dst != sentinel)
+        *dst++ = clear_cell;
+
+    if (iflags.debug.immediateflips && buffer == &back_buffer)
+        back_buffer_flip();
+}
+
+static void back_buffer_write(cell_t * cell, int x, int y)
+{
+    cell_t * dst = buffer_get_cell(&back_buffer, x, y);
+    *dst = *cell;
+
+    if (iflags.debug.immediateflips)
+        back_buffer_flip();
+}
+
+static void back_buffer_clear_to_end_of_line(int x, int y)
+{
+    cell_t * cell;
+    cell_t *sentinel;
+
+    cell = buffer_get_cell(&back_buffer, x, y);
+    sentinel = buffer_get_cell(&back_buffer, 0, y+1);
+    while (cell != sentinel)
+        *cell++ = clear_cell;
+
+    if (iflags.debug.immediateflips)
+        back_buffer_flip();
+}
+
 /*
  * Called after returning from ! or ^Z
  */
@@ -197,7 +441,6 @@ setftty()
         adjust_palette();
 #endif
     start_screen();
-    has_unicode = ((GetVersion() & 0x80000000) == 0);
 }
 
 void
@@ -232,6 +475,10 @@ tty_end_screen()
     clear_screen();
     really_move_cursor();
     if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
+
+        buffer_fill_to_end(&back_buffer, &clear_cell, 0, 0);
+        buffer_fill_to_end(&front_buffer, &clear_cell, 0, 0);
+
         DWORD ccnt;
         COORD newcoord;
 
@@ -270,7 +517,16 @@ DWORD ctrltype;
     }
 }
 
-/* called by init_tty in wintty.c for WIN32 port only */
+/*
+ * ntty_open() is called in several places.  It is called by win_tty_init
+ * passing in a mode of zero.  It is then later called again by pcmain passing
+ * in a mode of one.  Finally, it can also be called by process_options also
+ * with a mode of one.
+ *
+ * barthouse - The fact this is getting called multiple times needs to be
+ *   reviewed and perhaps cleaned up.
+ *
+ */
 void
 nttty_open(mode)
 int mode;
@@ -278,6 +534,10 @@ int mode;
     HANDLE hStdOut;
     DWORD cmode;
     long mask;
+
+    has_unicode = ((GetVersion() & 0x80000000) == 0);
+
+    initialize_cp_console();
 
     GUILaunched = 0;
 
@@ -307,12 +567,39 @@ int mode;
         mode = 0;
         goto try;
     } else {
+        /* barthouse - Need to understand how this can happen and
+         *   whether we should bail instead of returning.
+         */
         return;
     }
 
     /* Obtain handles for the standard Console I/O devices */
     hConIn = GetStdHandle(STD_INPUT_HANDLE);
     hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    GetConsoleScreenBufferInfo(hConOut, &csbi);
+
+    int height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+    /* NOTE: We currently force to a width of 80 due to unresolved issues
+     *       within the TTY code.  These issues will need to resolved before
+     *       we could allow widths > 80.  We will always need a width of
+     *       atleast 80.
+     */
+
+    int width = 80; 
+
+    /* If the window is not big enough to meet our minimum height needs,
+     * grow the console's buffer to be large enough.  The user will have
+     * to manually extend the size of the window.
+     */
+
+    height = max(25, height);
+
+    COORD size = { width, height };
+    SetConsoleScreenBufferSize(hConOut, size);
+
+    initialize_buffer_flipping(width, height);
 
     load_keyboard_handler();
     /* Initialize the function pointer that points to
@@ -338,7 +625,10 @@ int mode;
         /* Unable to set control handler */
         cmode = 0; /* just to have a statement to break on for debugger */
     }
-    get_scr_size();
+
+    LI = height;
+    CO = width;
+
     console.cursor.X = console.cursor.Y = 0;
     really_move_cursor();
 }
@@ -361,32 +651,6 @@ int
 nttty_kbhit()
 {
     return pNHkbhit(hConIn, &ir);
-}
-
-void
-get_scr_size()
-{
-    int lines, cols;
-    
-    GetConsoleScreenBufferInfo(hConOut, &csbi);
-    
-    lines = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
-    cols = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
-
-    LI = lines;
-    CO = min(cols, 80);
-    
-    if ((LI < 25) || (CO < 80)) {
-        COORD newcoord;
-
-        LI = 25;
-        CO = 80;
-
-        newcoord.Y = LI;
-        newcoord.X = CO;
-
-        SetConsoleScreenBufferSize(hConOut, newcoord);
-    }
 }
 
 int
@@ -440,6 +704,8 @@ really_move_cursor()
         console.cursor.Y = ttyDisplay->cury;
     }
     SetConsoleCursorPosition(hConOut, console.cursor);
+
+    back_buffer_flip();
 }
 
 void
@@ -498,6 +764,7 @@ xputc_core(ch)
 char ch;
 {
     boolean inverse = FALSE;
+    cell_t cell;
     switch (ch) {
     case '\n':
         console.cursor.Y++;
@@ -515,17 +782,19 @@ char ch;
                         ttycolors[console.current_nhcolor];
         if (console.current_nhattr[ATR_BOLD])
                 console.attr |= (inverse) ?
-                                BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-        WriteConsoleOutputAttribute(hConOut, &console.attr, 1, console.cursor, &acount);
+            BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
+
+        cell.attribute = console.attr;
         if (has_unicode) {
-            /* Avoid bug in ANSI API on WinNT */
-            WCHAR c2[2];
-            int rc;
-            rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, &ch, 1, c2, 2);
-            WriteConsoleOutputCharacterW(hConOut, c2, rc, console.cursor, &ccount);
+            cell.characters[0] = cpConsole[ch].characters[0];
+            cell.characters[1] = cpConsole[ch].characters[1];
+            cell.count = cpConsole[ch].count;
         } else {
-            WriteConsoleOutputCharacterA(hConOut, &ch, 1, console.cursor, &ccount);
+            cell.characters[0] = ch;
+            cell.characters[1] = 0;
+            cell.count = 1;
         }
+        back_buffer_write(&cell, console.cursor.X, console.cursor.Y);
         console.cursor.X++;
     }
 }
@@ -535,46 +804,11 @@ char ch;
  * for win32. It is used for glyphs only, not text.
  */
 
-/* CP437 to Unicode mapping according to the Unicode Consortium */
-static const WCHAR cp437[] = {
-    0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
-    0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
-    0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
-    0x2191, 0x2193, 0x2192, 0x2190, 0x221F, 0x2194, 0x25B2, 0x25BC,
-    0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
-    0x0028, 0x0029, 0x002a, 0x002b, 0x002c, 0x002d, 0x002e, 0x002f,
-    0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
-    0x0038, 0x0039, 0x003a, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f,
-    0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
-    0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f,
-    0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
-    0x0058, 0x0059, 0x005a, 0x005b, 0x005c, 0x005d, 0x005e, 0x005f,
-    0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067,
-    0x0068, 0x0069, 0x006a, 0x006b, 0x006c, 0x006d, 0x006e, 0x006f,
-    0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077,
-    0x0078, 0x0079, 0x007a, 0x007b, 0x007c, 0x007d, 0x007e, 0x2302,
-    0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
-    0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
-    0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
-    0x00ff, 0x00d6, 0x00dc, 0x00a2, 0x00a3, 0x00a5, 0x20a7, 0x0192,
-    0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
-    0x00bf, 0x2310, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
-    0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
-    0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
-    0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
-    0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
-    0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
-    0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
-    0x03b1, 0x00df, 0x0393, 0x03c0, 0x03a3, 0x03c3, 0x00b5, 0x03c4,
-    0x03a6, 0x0398, 0x03a9, 0x03b4, 0x221e, 0x03c6, 0x03b5, 0x2229,
-    0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
-    0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
-};
-
 void
 g_putch(in_ch)
 int in_ch;
 {
+    cell_t cell;
     boolean inverse = FALSE;
     unsigned char ch = (unsigned char) in_ch;
 
@@ -587,23 +821,24 @@ int in_ch;
                     ttycolors[console.current_nhcolor];
     if (console.current_nhattr[ATR_BOLD])
         console.attr |= (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-    WriteConsoleOutputAttribute(hConOut, &console.attr, 1, console.cursor, &acount);
-
+    cell.attribute = console.attr;
+    cell.characters[1] = 0;
+    cell.count = 1;
     if (has_unicode)
-        WriteConsoleOutputCharacterW(hConOut, &cp437[ch], 1, console.cursor, &ccount);
+        cell.characters[0] = cp437[ch];
     else
-        WriteConsoleOutputCharacterA(hConOut, &ch, 1, console.cursor, &ccount);
+        cell.characters[0] = ch;
+    back_buffer_write(&cell, console.cursor.X, console.cursor.Y);
 }
 
 void
 cl_end()
 {
-    int cx;
     console.cursor.X = ttyDisplay->curx;
     console.cursor.Y = ttyDisplay->cury;
-    cx = CO - console.cursor.X;
-    FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR, cx, console.cursor, &acount);
-    FillConsoleOutputCharacter(hConOut, ' ', cx, console.cursor, &ccount);
+
+    back_buffer_clear_to_end_of_line(console.cursor.X, console.cursor.Y);
+
     tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
 }
 
@@ -611,6 +846,10 @@ void
 raw_clear_screen()
 {
     if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
+
+        buffer_fill_to_end(&front_buffer, &clear_cell, 0, 0);
+        buffer_fill_to_end(&back_buffer, &clear_cell, 0, 0);
+
         DWORD ccnt;
         COORD newcoord;
 
@@ -621,6 +860,7 @@ raw_clear_screen()
             csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
         FillConsoleOutputCharacter(
             hConOut, ' ', csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
+
     }
 }
 
@@ -651,11 +891,18 @@ cl_eos()
 {
     int cy = ttyDisplay->cury + 1;
     if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
+
+        buffer_fill_to_end(&front_buffer, &clear_cell, ttyDisplay->curx,
+                            ttyDisplay->cury);
+        buffer_fill_to_end(&back_buffer, &clear_cell, ttyDisplay->curx,
+                            ttyDisplay->cury);
+
         DWORD ccnt;
         COORD newcoord;
 
         newcoord.X = ttyDisplay->curx;
         newcoord.Y = ttyDisplay->cury;
+
         FillConsoleOutputAttribute(
             hConOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
             csbi.dwSize.X * csbi.dwSize.Y - cy, newcoord, &ccnt);
@@ -684,6 +931,7 @@ tty_delay_output()
     int k;
 
     goal = 50 + clock();
+    back_buffer_flip();
     while (goal > clock()) {
         k = junk; /* Do nothing */
     }
@@ -1063,10 +1311,10 @@ VA_DECL(const char *, fmt)
     else {
         if(!init_ttycolor_completed)
             init_ttycolor();
-
         xputs(buf);
         if (ttyDisplay)
             curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
+        really_move_cursor();
     }
     VA_END();
     return;
