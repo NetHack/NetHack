@@ -3410,10 +3410,7 @@ int dir;
 {
     if (dir != WININIT)
         return;
-#if defined(WIN32CON)
-    if (!strncmpi(windowprocs.name, "tty", 3))
-        nttty_open(0);
-#endif
+    // do nothing
     return;
 }
 

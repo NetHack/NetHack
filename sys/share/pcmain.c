@@ -57,11 +57,15 @@ extern void FDECL(nethack_exit, (int));
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 extern int redirect_stdout;       /* from sys/share/pcsys.c */
 extern int GUILaunched;
+#ifndef WIN32CON
 HANDLE hStdOut;
+#endif
 char *NDECL(exename);
 char default_window_sys[] = "mswin";
+#ifndef WIN32CON
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
+#endif
 #endif
 
 #if defined(MSWIN_GRAPHICS)
@@ -92,6 +96,8 @@ int argc;
 char *argv[];
 {
     boolean resuming;
+
+    nethack_enter(argc, argv);
 
     sys_early_init();
 #ifdef WIN32
@@ -353,7 +359,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             Strcpy(hackdir, dir);
         }
         if (argc > 1) {
-#if defined(WIN32)
+#if defined(WIN32) && !defined(WIN32CON)
             int sfd = 0;
             boolean tmpconsole = FALSE;
             hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -363,7 +369,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
              * may do a prscore().
              */
             if (!strncmp(argv[1], "-s", 2)) {
-#if defined(WIN32)
+#if defined(WIN32) && !defined(WIN32CON)
 
 #if 0
                 if (!hStdOut) {
@@ -390,7 +396,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 initoptions();
 #endif
                 prscore(argc, argv);
-#ifdef WIN32
+#if defined(WIN32) && !defined(WIN32CON)
                 if (tmpconsole) {
                     getreturn("to exit");
                     freefakeconsole();
@@ -416,7 +422,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
                 nhusage();
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(WIN32CON)
                 if (tmpconsole) {
                     getreturn("to exit");
                     freefakeconsole();
@@ -913,7 +919,7 @@ authorize_wizard_mode()
 #define PATH_SEPARATOR '\\'
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(WIN32CON)
 static char exenamebuf[PATHLEN];
 extern HANDLE hConIn;
 extern HANDLE hConOut;
