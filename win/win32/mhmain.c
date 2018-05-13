@@ -795,6 +795,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (!OpenClipboard(hWnd)) {
             NHMessageBox(hWnd, TEXT("Cannot open clipboard"),
                          MB_OK | MB_ICONERROR);
+            free(p);
             return 0;
         }
 
@@ -803,6 +804,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(char));
         if (hglbCopy == NULL) {
             CloseClipboard();
+            free(p);
             return FALSE;
         }
 
