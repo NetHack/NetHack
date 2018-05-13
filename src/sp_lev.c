@@ -1561,8 +1561,9 @@ create_monster(monster *m, struct mkroom *croom)
     }
 
     /* try to find a close place if someone else is already there */
-    if (MON_AT(x, y) && enexto(&cc, x, y, pm))
-        x = cc.x, y = cc.y;
+    if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
+        x = cc.x; y = cc.y;
+    }
 
     if (m->align != -(MAX_REGISTERS + 2))
         mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
