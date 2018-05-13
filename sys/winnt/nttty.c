@@ -1858,7 +1858,7 @@ void nethack_enter_nttty()
 
     /* load default keyboard handler */
     HKL keyboard_layout = GetKeyboardLayout(0);
-    DWORD primary_language = (DWORD) keyboard_layout & 0x3f;
+    DWORD primary_language = (UINT_PTR) keyboard_layout & 0x3f;
 
     if (primary_language == LANG_ENGLISH) {
         if (!load_keyboard_handler("nhdefkey"))

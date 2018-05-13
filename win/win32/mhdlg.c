@@ -391,10 +391,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_KILLFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "KILLFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
-
                     if (data->focus == data->control_race) {
                         data->focus = NULL;
                         ListView_RedrawItems(data->control_race, 0, data->race_count - 1);
@@ -406,9 +402,6 @@ PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case NM_SETFOCUS:
                 {
-                    char buf[64];
-                    sprintf(buf, "SETFOCUS %lx\n", (unsigned long) control);
-                    OutputDebugStringA(buf);
                     data->focus = control;
 
                     if (control == data->control_race) {
@@ -716,14 +709,8 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (lpdis->itemID < 0)
         return FALSE;
 
-    HWND control = GetDlgItem(hWnd, wParam);
+    HWND control = GetDlgItem(hWnd, (int) wParam);
     int i = lpdis->itemID;
-
-    {
-        char buf[64];
-        sprintf(buf, "DRAW %lx %d\n", (unsigned long)control, i);
-        OutputDebugStringA(buf);
-    }
 
     const char * string;
 
@@ -774,12 +761,6 @@ plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     client_rt.left + ListView_GetColumnWidth(lpdis->hwndItem, 0),
                     lpdis->rcItem.bottom);
             DrawFocusRect(lpdis->hDC, &rect);
-
-            {
-                char buf[64];
-                sprintf(buf, "FOCUS %lx %d\n", (unsigned long)control, i);
-                OutputDebugStringA(buf);
-            }
         }
     }
 
