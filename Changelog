@@ -1,4 +1,4 @@
-                   SpliceHack v0.1 -- Changelog
+                   SpliceHack v0.2 -- Changelog
 
 This changelog documents all the features that differ from vanilla Nethack.
 Beware of SPOILERS for both Nethack and SpliceHack all the way through this
@@ -34,6 +34,8 @@ Visual/Interface Changes
   colored yellow.
 - Branch staircases are colored yellow (ported from xnethack)
 - Altars are colored based on alignment (ported from xnethack)
+- The Curses patch by Tangles has been implemented, so you can now play in
+  curses mode.
 
 General Changes
 - SpliceHack Tip of the Day will tell you about new features.
@@ -112,7 +114,8 @@ General Changes
   bones file is generated.
 - Additional achievements are tracked in the xlogfile that pertain to this
   variant.
-- NHTangles' livelogging and hardfought configurations are enabled.
+- Tangles' and K2's livelogging, whereis, and hardfought configurations have
+  been added.
 - Pets can now potentially become stunned or invisible by eating the right
   kind of corpse.
 - Birds are now a potential kind of pet. You begin with a little bird, which can
