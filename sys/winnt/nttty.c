@@ -190,13 +190,19 @@ typedef int(__stdcall *SOURCEAUTHOR)(char **);
 
 typedef int(__stdcall *KEYHANDLERNAME)(char **, int);
 
-HANDLE hLibrary;
-PROCESS_KEYSTROKE pProcessKeystroke;
-NHKBHIT pNHkbhit;
-CHECKINPUT pCheckInput;
-SOURCEWHERE pSourceWhere;
-SOURCEAUTHOR pSourceAuthor;
-KEYHANDLERNAME pKeyHandlerName;
+typedef struct {
+    char *              name;       // name without DLL extension
+    HANDLE              hLibrary;
+    PROCESS_KEYSTROKE   pProcessKeystroke;
+    NHKBHIT             pNHkbhit;
+    CHECKINPUT          pCheckInput;
+    SOURCEWHERE         pSourceWhere;
+    SOURCEAUTHOR        pSourceAuthor;
+    KEYHANDLERNAME      pKeyHandlerName;
+} keyboard_handler_t;
+
+keyboard_handler_t keyboard_handler;
+
 
 /* Console buffer flipping support */
 
@@ -383,7 +389,6 @@ int mode; // unused
 {
     DWORD cmode;
 
-    load_keyboard_handler();
     /* Initialize the function pointer that points to
      * the kbhit() equivalent, in this TTY case nttty_kbhit()
      */
@@ -407,7 +412,8 @@ boolean *valid;
 boolean numberpad;
 int portdebug;
 {
-    int ch = pProcessKeystroke(console.hConIn, ir, valid, numberpad, portdebug);
+    int ch = keyboard_handler.pProcessKeystroke(
+                    console.hConIn, ir, valid, numberpad, portdebug);
     /* check for override */
     if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
         ch = key_overrides[ch];
@@ -417,7 +423,7 @@ int portdebug;
 int
 nttty_kbhit()
 {
-    return pNHkbhit(console.hConIn, &ir);
+    return keyboard_handler.pNHkbhit(console.hConIn, &ir);
 }
 
 int
@@ -429,8 +435,8 @@ tgetch()
     really_move_cursor();
     return (program_state.done_hup)
                ? '\033'
-               : pCheckInput(console.hConIn, &ir, &count, iflags.num_pad, 0, &mod,
-                             &cc);
+               : keyboard_handler.pCheckInput(
+                   console.hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
 }
 
 int
@@ -443,7 +449,8 @@ int *x, *y, *mod;
     really_move_cursor();
     ch = (program_state.done_hup)
              ? '\033'
-             : pCheckInput(console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+             : keyboard_handler.pCheckInput(
+                   console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
     if (!ch) {
         *x = cc.x;
         *y = cc.y;
@@ -909,20 +916,23 @@ win32con_handler_info()
 {
     char *buf;
     int ci;
-    if (!pSourceAuthor && !pSourceWhere)
+    if (!keyboard_handler.pSourceAuthor && !keyboard_handler.pSourceWhere)
         pline("Keyboard handler source info and author unavailable.");
     else {
-        if (pKeyHandlerName && pKeyHandlerName(&buf, 1)) {
+        if (keyboard_handler.pKeyHandlerName &&
+            keyboard_handler.pKeyHandlerName(&buf, 1)) {
             xputs("\n");
             xputs("Keystroke handler loaded: \n    ");
             xputs(buf);
         }
-        if (pSourceAuthor && pSourceAuthor(&buf)) {
+        if (keyboard_handler.pSourceAuthor &&
+            keyboard_handler.pSourceAuthor(&buf)) {
             xputs("\n");
             xputs("Keystroke handler Author: \n    ");
             xputs(buf);
         }
-        if (pSourceWhere && pSourceWhere(&buf)) {
+        if (keyboard_handler.pSourceWhere &&
+            keyboard_handler.pSourceWhere(&buf)) {
             xputs("\n");
             xputs("Keystroke handler source code available at:\n    ");
             xputs(buf);
@@ -974,86 +984,79 @@ register char *op;
     key_overrides[idx] = val;
 }
 
-void
-load_keyboard_handler()
+void unload_keyboard_handler()
 {
-    char suffx[] = ".dll";
-    char *truncspot;
-#define MAX_DLLNAME 25
-    char kh[MAX_ALTKEYHANDLER];
-    if (iflags.altkeyhandler[0]) {
-        if (hLibrary) { /* already one loaded apparently */
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            pNHkbhit = (NHKBHIT) 0;
-            pCheckInput = (CHECKINPUT) 0;
-            pSourceWhere = (SOURCEWHERE) 0;
-            pSourceAuthor = (SOURCEAUTHOR) 0;
-            pKeyHandlerName = (KEYHANDLERNAME) 0;
-            pProcessKeystroke = (PROCESS_KEYSTROKE) 0;
-        }
-        if ((truncspot = strstri(iflags.altkeyhandler, suffx)) != 0)
-            *truncspot = '\0';
-        (void) strncpy(kh, iflags.altkeyhandler,
-                       (MAX_ALTKEYHANDLER - sizeof suffx) - 1);
-        kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
-        Strcat(kh, suffx);
-        Strcpy(iflags.altkeyhandler, kh);
-        hLibrary = LoadLibrary(kh);
-        if (hLibrary) {
-            pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
-                hLibrary, TEXT("ProcessKeystroke"));
-            pNHkbhit = (NHKBHIT) GetProcAddress(hLibrary, TEXT("NHkbhit"));
-            pCheckInput =
-                (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
-            pSourceWhere =
-                (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
-            pSourceAuthor =
-                (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
-            pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
-                hLibrary, TEXT("KeyHandlerName"));
-        }
+    ntassert(keyboard_handler.hLibrary != NULL);
+
+    FreeLibrary(keyboard_handler.hLibrary);
+    memset(&keyboard_handler, 0, sizeof(keyboard_handler_t));
+}
+
+boolean
+load_keyboard_handler(const char * inName)
+{
+    char path[MAX_ALTKEYHANDLER + 4];
+    strcpy(path, inName);
+    strcat(path, ".dll");
+
+    HANDLE hLibrary = LoadLibrary(path);
+
+    if (hLibrary == NULL)
+        return FALSE;
+
+    PROCESS_KEYSTROKE pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
+        hLibrary, TEXT("ProcessKeystroke"));
+    NHKBHIT pNHkbhit = (NHKBHIT) GetProcAddress(
+        hLibrary, TEXT("NHkbhit"));
+    CHECKINPUT pCheckInput =
+        (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
+
+    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput)
+    {
+        return FALSE;
+    } else {
+        if (keyboard_handler.hLibrary != NULL)
+            unload_keyboard_handler();
+
+        keyboard_handler.hLibrary = hLibrary;
+
+        keyboard_handler.pProcessKeystroke = pProcessKeystroke;
+        keyboard_handler.pNHkbhit = pNHkbhit;
+        keyboard_handler.pCheckInput = pCheckInput;
+
+        keyboard_handler.pSourceWhere =
+            (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
+        keyboard_handler.pSourceAuthor =
+            (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
+        keyboard_handler.pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
+            hLibrary, TEXT("KeyHandlerName"));
     }
-    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
-        if (hLibrary) {
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            pNHkbhit = (NHKBHIT) 0;
-            pCheckInput = (CHECKINPUT) 0;
-            pSourceWhere = (SOURCEWHERE) 0;
-            pSourceAuthor = (SOURCEAUTHOR) 0;
-            pKeyHandlerName = (KEYHANDLERNAME) 0;
-            pProcessKeystroke = (PROCESS_KEYSTROKE) 0;
-        }
-        (void) strncpy(kh, "nhdefkey.dll",
-                       (MAX_ALTKEYHANDLER - sizeof suffx) - 1);
-        kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
-        Strcpy(iflags.altkeyhandler, kh);
-        hLibrary = LoadLibrary(kh);
-        if (hLibrary) {
-            pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
-                hLibrary, TEXT("ProcessKeystroke"));
-            pCheckInput =
-                (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
-            pNHkbhit = (NHKBHIT) GetProcAddress(hLibrary, TEXT("NHkbhit"));
-            pSourceWhere =
-                (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
-            pSourceAuthor =
-                (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
-            pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
-                hLibrary, TEXT("KeyHandlerName"));
-        }
+
+    return TRUE;
+}
+
+void set_altkeyhandler(const char * inName)
+{
+    if (strlen(inName) >= MAX_ALTKEYHANDLER) {
+        config_error_add("altkeyhandler name '%s' is too long", inName);
+        return;
     }
-    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
-        if (!hLibrary)
-            raw_printf("\nNetHack was unable to load keystroke handler.\n");
-        else {
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            raw_printf("\nNetHack keystroke handler is invalid.\n");
-        }
-        exit(EXIT_FAILURE);
+
+    char name[MAX_ALTKEYHANDLER];
+    strcpy(name, inName);
+
+    /* We support caller mistakenly giving name with '.dll' extension */
+    char * ext = strchr(name, '.');
+    if (ext != NULL) *ext = '\0';
+
+    if (load_keyboard_handler(name))
+        strcpy(iflags.altkeyhandler, name);
+    else {
+        config_error_add("unable to load altkeyhandler '%s'", name);
+        return;
     }
+
+    return;
 }
 
 /* this is used as a printf() replacement when the window
@@ -1853,6 +1856,17 @@ void nethack_enter_nttty()
 #endif
     SetConsoleMode(console.hConIn, cmode);
 
+    /* load default keyboard handler */
+    HKL keyboard_layout = GetKeyboardLayout(0);
+    DWORD primary_language = (DWORD) keyboard_layout & 0x3f;
+
+    if (primary_language == LANG_ENGLISH) {
+        if (!load_keyboard_handler("nhdefkey"))
+            error("Unable to load nhdefkey.dll");
+    } else {
+        if (!load_keyboard_handler("nhraykey"))
+            error("Unable to load nhdefkey.dll");
+    }
 }
 
 #endif /* WIN32 */
