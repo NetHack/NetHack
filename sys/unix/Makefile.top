@@ -254,7 +254,7 @@ update: $(GAME) recover $(VARDAT) dungeon spec_levs
 	( $(MAKE) dofiles )
 # touch time-sensitive files
 	-touch -c $(VARDIR)/bones* $(VARDIR)/?lock* $(VARDIR)/wizard*
-	-touch -c $(VARDIR)/save/*
+	-touch -c $(VARDIR)/save/* $(VARDIR)/whereis/*
 	touch $(VARDIR)/perm $(VARDIR)/record
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
@@ -269,13 +269,13 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 	-if test -n '$(SHELLDIR)'; then \
 		mkdir -p $(SHELLDIR); fi
 	rm -rf $(INSTDIR) $(VARDIR)
-	-mkdir -p $(INSTDIR) $(VARDIR) $(VARDIR)/save
+	-mkdir -p $(INSTDIR) $(VARDIR) $(VARDIR)/save $(VARDIR)/whereis
 	if test -d ./-p; then rmdir ./-p; fi
-	-$(CHOWN) $(GAMEUID) $(INSTDIR) $(VARDIR) $(VARDIR)/save
-	$(CHGRP) $(GAMEGRP) $(INSTDIR) $(VARDIR) $(VARDIR)/save
+	-$(CHOWN) $(GAMEUID) $(INSTDIR) $(VARDIR) $(VARDIR)/save $(VARDIR)/whereis
+	$(CHGRP) $(GAMEGRP) $(INSTDIR) $(VARDIR) $(VARDIR)/save $(VARDIR)/whereis
 # order counts here:
 	chmod $(DIRPERM) $(INSTDIR)
-	chmod $(VARDIRPERM) $(VARDIR) $(VARDIR)/save
+	chmod $(VARDIRPERM) $(VARDIR) $(VARDIR)/save $(VARDIR)/whereis
 # set up the game files
 	( $(MAKE) dofiles )
 # set up some additional files
@@ -286,7 +286,6 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 	true; $(POSTINSTALL)
 # and a reminder
 	@echo You may also want to reinstall the man pages via the doc Makefile.
-
 
 # 'make clean' removes all the .o files, but leaves around all the executables
 # and compiled data files

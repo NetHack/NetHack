@@ -383,7 +383,7 @@ doextlist(VOID_ARGS)
     return 0;
 }
 
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 #define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 
 /*
@@ -2812,7 +2812,7 @@ int final;
 
     if (!u.uconduct.literate) {
         you_have_been("illiterate");
-    } else if (wizard) {
+    } else {
         Sprintf(buf, "read items or engraved %ld time%s", u.uconduct.literate,
                 plur(u.uconduct.literate));
         you_have_X(buf);

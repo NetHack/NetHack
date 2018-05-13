@@ -1700,6 +1700,9 @@ boolean at_stairs, falling, portal;
     context.polearm.hitmon = (struct monst *) 0; /* polearm target */
     /* digging context is level-aware and can actually be resumed if
        hero returns to the previous level without any intervening dig */
+#ifdef WHEREIS_FILE
+    touch_whereis();
+#endif
 }
 
 STATIC_OVL void

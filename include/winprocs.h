@@ -211,10 +211,14 @@ extern
 #define WC2_HILITE_STATUS 0x0008L /* 04 hilite fields in status         */
 #define WC2_SELECTSAVED   0x0010L /* 05 saved game selection menu       */
 #define WC2_DARKGRAY      0x0020L /* 06 use bold black for black glyphs */
-#define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points */
+#define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points*/
 #define WC2_FLUSH_STATUS  0x0080L /* 08 call status_update(BL_FLUSH)
                                         after updating status window fields */
-                                  /* 24 free bits */
+#define WC2_TERM_SIZE     0x0100L /* 09 support setting terminal size   */
+#define WC2_WINDOWBORDERS 0x0200L /* 10 display borders on nh windows   */
+#define WC2_PETATTR       0x0400L /* 11 attributes for hilite_pet       */
+#define WC2_GUICOLOR      0x0800L /* 12 display colours outside map win */
+                                  /* 20 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

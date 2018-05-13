@@ -190,6 +190,14 @@ REGEXOBJ = posixregex.o
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
 	../win/tty/wintty.c
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o
+# Files for curses interface
+WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
+	../win/curses/cursmisc.c ../win/curses/cursdial.c \
+	../win/curses/cursstat.c ../win/curses/cursinit.c \
+	../win/curses/cursmesg.c ../win/curses/cursinvt.c
+WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
+	cursinit.o cursmesg.o cursinvt.o
+
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -735,6 +743,29 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
+                ../include/wincurs.h ../win/curses/curswins.h
+	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
+                ../win/curses/cursmisc.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/func_tab.h \
+                ../include/wincurs.h ../win/curses/cursdial.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
+                ../win/curses/cursstat.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
+                ../win/curses/cursinit.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
+                ../win/curses/cursmesg.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
+cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
+                ../win/curses/cursinvt.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c

@@ -39,7 +39,7 @@ endif
 #	- it will be owned by the user and group listed
 #	- you MUST create the user using System Preferences (this will also
 #	  create the group if it is the same as the user)
-#	- 'make install' must be run as "sudo make install"    
+#	- 'make install' must be run as "sudo make install"
 #WANT_SHARE_INSTALL=1
 GAMEUID  = games
 GAMEGRP  = $(GAMEUID)
@@ -58,8 +58,8 @@ CFLAGS+=-DNOCLIPPING -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
 
 ifdef WANT_WIN_TTY
-WINSRC = $(WINTTYSRC)
-WINOBJ = $(WINTTYOBJ)
+WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)
 WINLIB = $(WINTTYLIB)
 WINTTYLIB=-lncurses
 else

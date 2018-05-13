@@ -1269,6 +1269,13 @@ int color;
     if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Qt"))
         return 1;
 #endif
+#ifdef CURSES_GRAPHICS
+    /* XXX has_color() should be added to windowprocs */
+    /* iflags.wc_color is set to false and the option disabled if the
+     terminal cannot display color */
+    if (windowprocs.name != NULL &&
+     !strcmpi(windowprocs.name, "curses")) return iflags.wc_color;
+#endif
 #ifdef AMII_GRAPHICS
     /* hilites[] not used */
     return iflags.use_color ? 1 : 0;

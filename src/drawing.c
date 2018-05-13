@@ -267,6 +267,10 @@ void NDECL((*ibmgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
 void NDECL((*ascgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
 #endif
 
+#ifdef CURSES_GRAPHICS
+void NDECL((*cursesgraphics_mode_callback)) = 0;
+#endif
+
 /*
  * Convert the given character to an object class.  If the character is not
  * recognized, then MAXOCLASSES is returned.  Used in detect.c, invent.c,
@@ -497,6 +501,10 @@ int nondefault;
 #ifdef TERMLIB
         if (SYMHANDLING(H_DEC) && decgraphics_mode_callback)
             (*decgraphics_mode_callback)();
+#endif
+#ifdef CURSES_GRAPHICS
+        if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
+            (*cursesgraphics_mode_callback)();
 #endif
     } else
         init_symbols();

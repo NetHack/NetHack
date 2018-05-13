@@ -11,8 +11,8 @@
 # for Ubuntu dapper.
 
 
-#PREFIX=/usr
-PREFIX=$(wildcard ~)/nh/install
+PREFIX=/usr
+#PREFIX=$(wildcard ~)/nh/install
 HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
 SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
@@ -35,14 +35,17 @@ LINK=$(CC)
 # Only needed for GLIBC stack trace:
 LFLAGS=-rdynamic
 
-WINSRC = $(WINTTYSRC)
-WINOBJ = $(WINTTYOBJ)
+WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)
 WINLIB = $(WINTTYLIB)
 
 WINTTYLIB=-lcurses
 
-CHOWN=true
-CHGRP=true
+CHOWN=chown
+CHGRP=chgrp
+
+GAMEUID=games
+GAMEGRP=bin
 
 VARDIRPERM = 0755
 VARFILEPERM = 0600

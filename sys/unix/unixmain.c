@@ -577,6 +577,9 @@ void FDECL((*handler), (int));
 #ifdef SIGXCPU
     (void) signal(SIGXCPU, (SIG_RET_TYPE) handler);
 #endif
+#ifdef WHEREIS_FILE
+    (void) signal(SIGUSR1, (SIG_RET_TYPE) signal_whereis);
+#endif
 #endif /* ?SA_RESTART */
 }
 

@@ -46,6 +46,7 @@
  */
 #if !defined(NOTTYGRAPHICS)
 #define TTY_GRAPHICS /* good old tty based graphics */
+#define CURSES_GRAPHICS
 #endif
 /* #define X11_GRAPHICS */   /* X11 interface */
 /* #define QT_GRAPHICS */    /* Qt interface */
@@ -82,7 +83,7 @@
 #define BEOS_GRAPHICS             /* (optional) */
 #define DEFAULT_WINDOW_SYS "BeOS" /* "tty" */
 #ifndef HACKDIR                   /* override the default hackdir below */
-#define HACKDIR "/boot/apps/NetHack"
+#define HACKDIR "/spl-hdf"
 #endif
 #endif
 
@@ -527,10 +528,20 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
+/* Extra enhancements borrowed from nao343 and elsewhwere
+   for dgamelaunch-based server play */
+#define DGAMELAUNCH
+#ifdef DGAMELAUNCH
+#define EXTRAINFO_FN    "/dgldir/extrainfo-spl/%n.extrainfo"
+#define MAILCKFREQ 5  /* SIMPLE_MAIL is in unixconf.h */
+#endif
+
 /* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
    so some prompts will remember the previously input text
    (within the same session) */
 /* #define EDIT_GETLIN */
+
+#define WHEREIS_FILE "whereis/%n.whereis" /* Write out player's current location to player.whereis */
 
 #define DUMPLOG  /* End-of-game dump logs */
 #ifdef DUMPLOG

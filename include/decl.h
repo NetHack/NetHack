@@ -187,6 +187,10 @@ E NEARDATA struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
+#ifdef WHEREIS_FILE
+E char whereis_real_path[255];
+#endif
+
 E long done_money;
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char birdname[];
@@ -418,6 +422,7 @@ struct plinemsg_type {
 #define MSGTYP_NOREP    1
 #define MSGTYP_NOSHOW   2
 #define MSGTYP_STOP     3
+#define MSGTYP_ALERT    4
 /* bitmask for callers of hide_unhide_msgtypes() */
 #define MSGTYP_MASK_REP_SHOW ((1 << MSGTYP_NOREP) | (1 << MSGTYP_NOSHOW))
 

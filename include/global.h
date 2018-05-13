@@ -368,4 +368,16 @@ struct savefile_info {
 #define LL_DUMP_ALL   0x0200 /* Log dumplog url for all games */
 #define LL_DEBUG      0x8000 /* For debugging messages and other spam */
 
+/* LIVELOG message type flags */
+#define LL_WISH       0x0001 /* Report stuff people type at the wish prompt. */
+#define LL_ACHIEVE    0x0002 /* Achievements bitfield + invocation, planes */
+#define LL_UMONST     0x0004 /* Kill, Bribe or otherwise dispatch unique monsters */
+#define LL_DIVINEGIFT 0x0008 /* Sacrifice gifts, crowning */
+#define LL_LIFESAVE   0x0010 /* Use up amulet of lifesaving */
+#define LL_CONDUCT    0x0020 /* Break conduct - not reported early-game */
+#define LL_ARTIFACT   0x0040 /* Excalibur, Sting, Orcrist, plus sac gifts and artwishes */
+#define LL_GENOCIDE   0x0080 /* Logging of genocides */ 
+#define LL_DUMP_ASC   0x0100 /* Log URL for dumplog if ascended */
+#define LL_DUMP_ALL   0x0200 /* Log dumplog url for all games */
+#define LL_DEBUG      0x8000 /* For debugging messages and other spam */ 
 #endif /* GLOBAL_H */

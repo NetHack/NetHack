@@ -180,8 +180,15 @@ VA_DECL(const char *, line)
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
     (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
-    if (msgtyp == MSGTYP_STOP)
+    switch (msgtyp) {
+    case MSGTYP_ALERT:
+        iflags.msg_is_alert = TRUE; /* <TAB> */
+        /* FT */
+    case MSGTYP_STOP:
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+        break;
+    }
+    iflags.msg_is_alert = FALSE;
 
  pline_done:
     --in_pline;

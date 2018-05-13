@@ -302,6 +302,7 @@ struct symsetentry {
 #define H_UNK 0
 #define H_IBM 1
 #define H_DEC 2
+#define H_CURS 3
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];

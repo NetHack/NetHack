@@ -311,10 +311,14 @@ struct instance_flags {
 #endif
 #endif
     uchar bouldersym; /* symbol for boulder display */
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     char prevmsg_window; /* type of old message window to use */
     boolean extmenu;     /* extended commands use menu interface */
 #endif
+#ifdef CURSES_GRAPHICS
+    boolean classic_status;  /* use 3-line NH4 status bar if false */
+#endif
+
 #ifdef MFLOPPY
     boolean checkspace; /* check disk space before writing files */
                         /* (in iflags to allow restore after moving
@@ -404,10 +408,17 @@ struct instance_flags {
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
-    boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
-    boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
-    boolean cmdassist;     /* provide detailed assistance for some commands */
-    boolean clicklook;          /* allow right-clicking for look */
+    boolean wc2_darkgray;   /* try to use dark-gray color for black glyphs */
+    boolean wc2_hitpointbar;/* show graphical bar representing hit points */
+    int wc2_windowborders;  /* display borders around windows */
+    int wc2_term_cols;      /* terminal size x */
+    int wc2_term_rows;      /* terminal size y */
+    int wc2_petattr;        /* text attributes for pet */
+    boolean wc2_guicolor;   /* allow colours in gui (outside map) */
+    boolean cmdassist;      /* provide detailed assistance for some commands */
+    boolean clicklook;      /* allow right-clicking for look */
+    boolean msg_is_alert; /* suggest windowport should grab player's attention
+                           * and request <TAB> acknowlegement */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */
     struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0

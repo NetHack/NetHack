@@ -54,7 +54,7 @@ MAXPLAYERS=0
 
 # If not null, added to string "To get local support, " in the support
 # information help.
-#SUPPORT=call Izchak at extension 42.
+SUPPORT=yell at AntiGulp on freenode irc channel #hardfought.
 
 # If not null, displayed at the end of a panic-save sequence.
 #RECOVER=Run the recover program.

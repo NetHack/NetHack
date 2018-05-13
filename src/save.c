@@ -112,6 +112,10 @@ dosave0()
     d_level uz_save;
     char whynot[BUFSZ];
 
+#ifdef WHEREIS_FILE
+    delete_whereis();
+#endif
+
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
