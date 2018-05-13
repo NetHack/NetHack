@@ -1865,7 +1865,7 @@ void nethack_enter_nttty()
             error("Unable to load nhdefkey.dll");
     } else {
         if (!load_keyboard_handler("nhraykey"))
-            error("Unable to load nhdefkey.dll");
+            error("Unable to load nhraykey.dll");
     }
 }
 
