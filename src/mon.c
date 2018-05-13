@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1526132509 2018/05/12 13:41:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1522540516 2018/03/31 23:55:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1876,13 +1876,9 @@ register struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-                const char *whom = mtmp->data->mname;
-
                 /* was using a_monnam(mtmp) but that's weird if mtmp is named:
                    "Dracula suddenly transforms and rises as Dracula" */
-                if (!type_is_pname(mtmp->data))
-                    whom = an(whom);
-                pline(upstart(buf), whom);
+                pline(upstart(buf), an(mtmp->data->mname));
                 vamp_rise_msg = TRUE;
             }
             newsym(x, y);
