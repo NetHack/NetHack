@@ -542,7 +542,8 @@ char ch;
 
     switch (ch) {
     case '\n':
-        console.cursor.Y++;
+        if (console.cursor.Y < console.height - 1)
+            console.cursor.Y++;
     /* fall through */
     case '\r':
         console.cursor.X = 1;
@@ -565,6 +566,12 @@ char ch;
         buffer_write(console.back_buffer, &cell, console.cursor);
 
         console.cursor.X++;
+
+        if (console.cursor.X == console.width) {
+            console.cursor.X = 0;
+            if (console.cursor.Y < console.height - 1)
+                console.cursor.Y++;
+        }
     }
 }
 
