@@ -2445,7 +2445,9 @@ char ch;
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
     switch (cw->type) {
+#ifndef STATUS_HILITES
     case NHW_STATUS:
+#endif
     case NHW_MAP:
     case NHW_BASE:
         tty_curs(window, x, y);
@@ -2501,6 +2503,10 @@ const char *str;
     register struct WinDesc *cw = 0;
     register char *ob;
     register long i, n0;
+#ifndef STATUS_HILITES
+    register const char *nb;
+    register long j;
+#endif
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -3421,7 +3427,52 @@ char *posbar;
  * |  STATUS CODE     |
  * +------------------+
  */
- 
+
+/*
+ * ----------------------------------------------------------------
+ * tty_status_update
+ *
+ *      Called from the NetHack core and receives info hand-offs
+ *      from the core, processes them, storing some information
+ *      for rendering to the tty.
+ *          -> make_things_fit()
+ *          -> render_status()
+ *
+ * make_things_fit
+ * 
+ *      Called from tty_status_update(). It calls check_fields()
+ *      (described next) to get the required number of columns
+ *      and tries a few different ways to squish a representation
+ *      of the status window values onto the 80 column tty display.
+ *          ->check_fields()
+ *          ->condition_size()  - get the width of all conditions
+ *          ->shrink_enc()      - shrink encumbrance message word
+ *          ->shrink_dlvl()     - reduce the width of Dlvl:42
+ *
+ *  check_fields
+ *
+ *      Verifies that all the fields are ready for display, and
+ *      returns FALSE if called too early in the startup
+ *      processing sequence. It also figures out where everything
+ *      needs to go, taking the current shrinking attempts into
+ *      account. It returns number of columns needed back to
+ *      make_things_fit(), so make_things_fit() can make attempt
+ *      to make adjustments.
+ *     
+ *  render_status
+ *
+ *      Goes through each of the two status row's fields and
+ *      calls tty_putstatusfield() to place them on the display.
+ *          ->tty_putstatusfield()
+ *
+ *  tty_putstatusfield()
+ *
+ *      Move the cursor to the target spot, and output the field
+ *      asked for by render_status().
+ *
+ * ----------------------------------------------------------------
+ */
+
 /*
  * The following data structures come from the genl_ routines in
  * src/windows.c and as such are considered to be on the window-port
@@ -3841,7 +3892,7 @@ int x,y;
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
-    if (x <= ncols) {
+    if (x <= ncols && y < 2) {
         tty_curs(NHW_STATUS, x, y);
         for (i = 0; i < lth; ++i) {
             n = i + x;
