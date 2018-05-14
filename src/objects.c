@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/24/18 by NullCGT */
+/* Edited on 5/14/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -720,9 +720,9 @@ TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW),
 TOOL("expensive camera",    None, 1, 0, 0, 1, 15, 12,200, PLASTIC, CLR_BLACK),
 TOOL("mirror",   "looking glass", 0, 0, 0, 0, 45, 13, 10, GLASS, HI_SILVER),
 TOOL("playing card deck",
-                 "pack of cards", 0, 0, 0, 0, 20, 80, 10, LEATHER, HI_LEATHER),
+                 "pack of cards", 0, 0, 0, 0, 20, 10, 80, LEATHER, HI_LEATHER),
 TOOL("deck of fate",
-                 "pack of cards", 0, 0, 0, 0,  5,300, 10, LEATHER, HI_LEATHER),
+                 "pack of cards", 0, 0, 0, 0,  5, 10,300, LEATHER, HI_LEATHER),
 TOOL("crystal ball", "glass orb", 0, 0, 1, 1, 15,150, 60, GLASS, HI_GLASS),
 TOOL("lenses",              None, 1, 0, 0, 0,  5,  3, 80, GLASS, HI_GLASS),
 TOOL("blindfold",           None, 1, 0, 0, 0, 50,  2, 20, CLOTH, CLR_BLACK),
@@ -761,7 +761,7 @@ TOOL("leather drum",      "drum", 0, 0, 0, 0,  4, 25, 25, LEATHER, HI_LEATHER),
 TOOL("drum of earthquake","drum", 0, 0, 1, 1,  2, 25, 25, LEATHER, HI_LEATHER),
 /* tools useful as weapons */
 WEPTOOL("pick-axe", None,
-        1, 0, 0, 20, 100,  50,  6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
+        1, 0, 0, 20,  50,  50,  6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
 WEPTOOL("grappling hook", "iron hook",
         0, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL,    IRON, HI_METAL),
 WEPTOOL("unicorn horn", None,
