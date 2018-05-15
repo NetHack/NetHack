@@ -3902,7 +3902,7 @@ int x,y;
 
     print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
 
-    if (x <= ncols && y < 2) {
+    if (x < ncols && y < 2) {
         tty_curs(NHW_STATUS, x, y);
         for (i = 0; i < lth; ++i) {
             n = i + x;
