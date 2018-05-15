@@ -206,8 +206,6 @@ keyboard_handler_t keyboard_handler;
 
 /* Console buffer flipping support */
 
-boolean do_immediate_flips = FALSE;
-
 static void back_buffer_flip()
 {
     cell_t * back = console.back_buffer;
@@ -250,7 +248,7 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
     while (dst != sentinel)
         *dst++ = *fill;
 
-    if (do_immediate_flips && buffer == console.back_buffer)
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
         back_buffer_flip();
 }
 
@@ -265,7 +263,7 @@ static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
     while (dst != sentinel)
         *dst++ = clear_cell;
 
-    if (do_immediate_flips)
+    if (iflags.debug.immediateflips)
         back_buffer_flip();
 }
 
@@ -277,7 +275,7 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
     cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
     *dst = *cell;
 
-    if (do_immediate_flips && buffer == console.back_buffer)
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
         back_buffer_flip();
 }
 
@@ -458,6 +456,15 @@ int *x, *y, *mod;
     return ch;
 }
 
+static void set_console_cursor(int x, int y)
+{
+    ntassert(x >= 0 && x < console.width);
+    ntassert(y >= 0 && y < console.height);
+
+    console.cursor.X = max(0, min(console.width - 1, x));
+    console.cursor.Y = max(0, min(console.height - 1, y));
+}
+
 static void
 really_move_cursor()
 {
@@ -474,10 +481,9 @@ really_move_cursor()
         (void) SetConsoleTitle(newtitle);
     }
 #endif
-    if (ttyDisplay) {
-        console.cursor.X = ttyDisplay->curx;
-        console.cursor.Y = ttyDisplay->cury;
-    }
+    if (ttyDisplay)
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+
     back_buffer_flip();
     SetConsoleCursorPosition(console.hConOut, console.cursor);
 }
@@ -488,26 +494,25 @@ register int x, y;
 {
     ttyDisplay->cury = y;
     ttyDisplay->curx = x;
-    console.cursor.X = x;
-    console.cursor.Y = y;
+
+    set_console_cursor(x, y);
 }
 
 void
 nocmov(x, y)
 int x, y;
 {
-    console.cursor.X = x;
-    console.cursor.Y = y;
     ttyDisplay->curx = x;
     ttyDisplay->cury = y;
+
+    set_console_cursor(x, y);
 }
 
 void
 xputc(ch)
 char ch;
 {
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     xputc_core(ch);
 }
 
@@ -518,10 +523,8 @@ const char *s;
     int k;
     int slen = strlen(s);
 
-    if (ttyDisplay) {
-        console.cursor.X = ttyDisplay->curx;
-        console.cursor.Y = ttyDisplay->cury;
-    }
+    if (ttyDisplay)
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 
     if (s) {
         for (k = 0; k < slen && s[k]; ++k)
@@ -537,18 +540,27 @@ void
 xputc_core(ch)
 char ch;
 {
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
     boolean inverse = FALSE;
     cell_t cell;
 
     switch (ch) {
     case '\n':
-        console.cursor.Y++;
+        if (console.cursor.Y < console.height - 1)
+            console.cursor.Y++;
     /* fall through */
     case '\r':
         console.cursor.X = 1;
         break;
     case '\b':
-        console.cursor.X--;
+        if (console.cursor.X > 1) {
+            console.cursor.X--;
+        } else if(console.cursor.Y > 0) {
+            console.cursor.X = console.width - 1;
+            console.cursor.Y--;
+        }
         break;
     default:
         inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
@@ -564,8 +576,18 @@ char ch;
 
         buffer_write(console.back_buffer, &cell, console.cursor);
 
-        console.cursor.X++;
+        if (console.cursor.X == console.width - 1) {
+            if (console.cursor.Y < console.height - 1) {
+                console.cursor.X = 1;
+                console.cursor.Y++;
+            }
+        } else {
+            console.cursor.X++;
+        }
     }
+
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 }
 
 /*
@@ -616,8 +638,7 @@ int in_ch;
     boolean inverse = FALSE;
     unsigned char ch = (unsigned char) in_ch;
 
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 
     inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
     console.attr = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse) ?
@@ -637,8 +658,7 @@ int in_ch;
 void
 cl_end()
 {
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     buffer_clear_to_end_of_line(console.back_buffer, console.cursor.X,
                                 console.cursor.Y);
     tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
@@ -660,15 +680,14 @@ clear_screen()
 void
 home()
 {
-    console.cursor.X = console.cursor.Y = 0;
     ttyDisplay->curx = ttyDisplay->cury = 0;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 }
 
 void
 backsp()
 {
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     xputc_core('\b');
 }
 
@@ -1074,6 +1093,17 @@ VA_DECL(const char *, fmt)
     else {
         if(!init_ttycolor_completed)
             init_ttycolor();
+
+        /* if we have generated too many messages ... ask the user to
+         * confirm and then clear.
+         */
+        if (console.cursor.Y > console.height - 4) {
+            xputs("Hit <Enter> to continue.");
+            while (pgetchar() != '\n')
+                ;
+            raw_clear_screen();
+            set_console_cursor(1, 0);
+        }
 
         xputs(buf);
         if (ttyDisplay)
@@ -1707,34 +1737,48 @@ void early_raw_print(const char *s)
     if (console.hConOut == NULL)
         return;
 
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
     WORD attribute = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE;
     DWORD unused;
 
     while (*s != '\0') {
         switch (*s) {
         case '\n':
-            console.cursor.Y++;
+            if (console.cursor.Y < console.height - 1)
+                console.cursor.Y++;
         /* fall through */
         case '\r':
-            console.cursor.X = 0;
+            console.cursor.X = 1;
             break;
         case '\b':
-            console.cursor.X--;
+            if (console.cursor.X > 1) {
+                console.cursor.X--;
+            } else if(console.cursor.Y > 0) {
+                console.cursor.X = console.width - 1;
+                console.cursor.Y--;
+            }
             break;
         default:
             WriteConsoleOutputAttribute(console.hConOut, &attribute,
                                             1, console.cursor, &unused);
             WriteConsoleOutputCharacterA(console.hConOut, s,
                                             1, console.cursor, &unused);
-            console.cursor.X++;
-
-            if (console.cursor.X == console.width) {
-                console.cursor.Y++;
-                console.cursor.X = 0;
+            if (console.cursor.X == console.width - 1) {
+                if (console.cursor.Y < console.height - 1) {
+                    console.cursor.X = 1;
+                    console.cursor.Y++;
+                }
+            } else {
+                console.cursor.X++;
             }
         }
         s++;
     }
+
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
     SetConsoleCursorPosition(console.hConOut, console.cursor);
 
@@ -1769,9 +1813,6 @@ void nethack_enter_nttty()
     /* set up state needed by early_raw_print() */
     windowprocs.win_raw_print = early_raw_print;
 
-    console.cursor.X = 0;
-    console.cursor.Y = 0;
-
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
     ntassert(console.hConOut != NULL); // NOTE: this assert will not print
 
@@ -1795,9 +1836,11 @@ void nethack_enter_nttty()
 
     console.buffer_size = console.width * console.height;
 
+
     /* clear the entire console buffer */
     int size = console.origcsbi.dwSize.X * console.origcsbi.dwSize.Y;
     DWORD unused;
+    set_console_cursor(0, 0);
     FillConsoleOutputAttribute(
         console.hConOut, CONSOLE_CLEAR_ATTRIBUTE,
         size, console.cursor, &unused);
@@ -1806,9 +1849,10 @@ void nethack_enter_nttty()
         console.hConOut, CONSOLE_CLEAR_CHARACTER,
         size, console.cursor, &unused);
 
+    set_console_cursor(1, 0);
     SetConsoleCursorPosition(console.hConOut, console.cursor);
 
-    /* At this point early_raw_print will output */
+    /* At this point early_raw_print will work */
 
     console.hConIn = GetStdHandle(STD_INPUT_HANDLE);
     ntassert(console.hConIn  != NULL);

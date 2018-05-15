@@ -170,4 +170,15 @@ more()
     return;
 }
 
+void
+nethack_enter_nttty()
+{
+    return;
+}
+
+void
+set_altkeyhandler(const char *inName)
+{
+    return;
+}
 #endif /* TTYSTUBS */
