@@ -3918,7 +3918,7 @@ int x, y;
     } else {
         /* Now we're truncating */
         if (truncation_expected)
-            ; /* but we new in advance */
+            ; /* but we knew in advance */
     }
 }
 
@@ -4158,6 +4158,11 @@ render_status(VOID_ARGS)
                             }
                         }
                     }
+                    if (x >= cw->cols) {
+                        if (!truncation_expected)
+                            paniclog("render_status()", " unexpected truncation.");
+                        x = cw->cols - 1;
+                    }
                     tty_curs(WIN_STATUS, x, y);
                     cl_end();
                 } else if (fldidx == BL_GOLD) {
@@ -4167,9 +4172,21 @@ render_status(VOID_ARGS)
                      * |   Gold    |
                      * +-----------+
                      */
+                    if (iflags.hilite_delta) {
+                        /* multiple attributes can be in effect concurrently */
+                        Begin_Attr(attridx);
+                        if (do_color && coloridx != NO_COLOR
+                            && coloridx != CLR_MAX)
+                            term_start_color(coloridx);
+                    }
                     /* decode_mixed() due to GOLD glyph */
                     tty_putstatusfield(nullfield,
                                        decode_mixed(buf, text), x, y);
+                    if (iflags.hilite_delta) {
+                        if (do_color && coloridx != NO_COLOR)
+                            term_end_color();
+                        End_Attr(attridx);
+                    }
                 } else if (hitpointbar) {
                     /*
                      * +-------------------------+
