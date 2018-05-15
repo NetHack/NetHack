@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1525696908 2018/05/07 12:41:48 $  $NHDT-Branch: tty-status $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1526427319 2018/05/15 23:35:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1477,10 +1477,18 @@ boolean from_configfile;
         c = lowc(*op);
         if (c == ' ') {
             if (fldnum >= 1) {
-                rslt = parse_status_hl2(hsbuf, from_configfile);
-                if (!rslt) {
-                    badopt = TRUE;
-                    break;
+                if (fldnum == 1 && strcmpi(hsbuf[0], "title") == 0) {
+                    /* spaces are allowed in title */
+                    hsbuf[fldnum][ccount++] = c;
+                    hsbuf[fldnum][ccount] = '\0';
+                    op++;
+                    continue;
+                } else {
+                    rslt = parse_status_hl2(hsbuf, from_configfile);
+                    if (!rslt) {
+                        badopt = TRUE;
+                        break;
+                    }
                 }
             }
             for (i = 0; i < MAX_THRESH; ++i) {
