@@ -363,4 +363,10 @@ struct savefile_info {
     dropleveltempsfn = held; held=0; if(dropleveltempsfn)(*dropleveltempsfn)();
 #endif
 
+/* Supply nethack_enter macro if not supplied by port */
+#ifndef nethack_enter
+#define nethack_enter(argc, argv) ((void) 0)
+#endif
+
+
 #endif /* GLOBAL_H */

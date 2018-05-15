@@ -8,7 +8,8 @@
  * Initial Creation 				M. Allison	1993/01/31
  * Switch to low level console output routines	M. Allison	2003/10/01
  * Restrict cursor movement until input pending	M. Lehotay	2003/10/02
- * Call Unicode version of output API on NT	R. Chason       2005/10/28
+ * Call Unicode version of output API on NT     R. Chason   2005/10/28
+ * Use of back buffer to improve performance    B. House    2018/05/06
  *
  */
 
@@ -19,6 +20,34 @@
 #include <sys\types.h>
 #include <sys\stat.h>
 #include "win32api.h"
+
+/*
+ * Console Buffer Flipping Support
+ *
+ * To minimize the number of calls into the WriteConsoleOutputXXX methods,
+ * we implement a notion of a console back buffer which keeps the next frame
+ * of console output as it is being composed.  When ready to show the new
+ * frame, we compare this next frame to what is currently being output and
+ * only call WriteConsoleOutputXXX for those console values that need to
+ * change.
+ *
+ */
+
+#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN \
+                                                | FOREGROUND_BLUE)
+#define CONSOLE_CLEAR_CHARACTER (' ')
+
+#define CONSOLE_UNDEFINED_ATTRIBUTE (0)
+#define CONSOLE_UNDEFINED_CHARACTER ('\0')
+
+typedef struct {
+    WCHAR   character;
+    WORD    attribute;
+} cell_t;
+
+cell_t clear_cell = { CONSOLE_CLEAR_CHARACTER, CONSOLE_CLEAR_ATTRIBUTE };
+cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
+                          CONSOLE_UNDEFINED_ATTRIBUTE };
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -49,19 +78,11 @@ static boolean NDECL(check_font_widths);
 static void NDECL(set_known_good_console_font);
 static void NDECL(restore_original_console_font);
 
-/* Win32 Console handles for input and output */
-HANDLE hConIn;
-HANDLE hConOut;
-
 /* Win32 Screen buffer,coordinate,console I/O information */
-CONSOLE_SCREEN_BUFFER_INFO csbi, origcsbi;
 COORD ntcoord;
 INPUT_RECORD ir;
 
 /* Support for changing console font if existing glyph widths are too wide */
-boolean console_font_changed;
-CONSOLE_FONT_INFOEX original_console_font_info;
-UINT original_console_code_page;
 
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 extern int redirect_stdout;
@@ -73,9 +94,8 @@ extern int redirect_stdout;
  * immediately after it is displayed, yet not bother when started
  * from the command line.
  */
-int GUILaunched;
+int GUILaunched = FALSE;
 /* Flag for whether unicode is supported */
-static boolean has_unicode;
 static boolean init_ttycolor_completed;
 #ifdef PORT_DEBUG
 static boolean display_cursor_info = FALSE;
@@ -106,14 +126,41 @@ struct console_t {
     int current_nhcolor;
     int current_nhattr[ATR_INVERSE+1];
     COORD cursor;
+    HANDLE hConOut;
+    HANDLE hConIn;
+    CONSOLE_SCREEN_BUFFER_INFO origcsbi;
+    int width;
+    int height;
+    boolean has_unicode;
+    int buffer_size;
+    cell_t * front_buffer;
+    cell_t * back_buffer;
+    WCHAR cpMap[256];
+    boolean font_changed;
+    CONSOLE_FONT_INFOEX original_font_info;
+    UINT original_code_page;
 } console = {
     0,
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED),
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED),
     NO_COLOR,
     {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
-    {0, 0}
+    {0, 0},
+    NULL,
+    NULL,
+    { 0 },
+    0,
+    0,
+    FALSE,
+    0,
+    NULL,
+    NULL,
+    { 0 },
+    FALSE,
+    { 0 },
+    0
 };
+
 static DWORD ccount, acount;
 #ifndef CLR_MAX
 #define CLR_MAX 16
@@ -143,13 +190,94 @@ typedef int(__stdcall *SOURCEAUTHOR)(char **);
 
 typedef int(__stdcall *KEYHANDLERNAME)(char **, int);
 
-HANDLE hLibrary;
-PROCESS_KEYSTROKE pProcessKeystroke;
-NHKBHIT pNHkbhit;
-CHECKINPUT pCheckInput;
-SOURCEWHERE pSourceWhere;
-SOURCEAUTHOR pSourceAuthor;
-KEYHANDLERNAME pKeyHandlerName;
+typedef struct {
+    char *              name;       // name without DLL extension
+    HANDLE              hLibrary;
+    PROCESS_KEYSTROKE   pProcessKeystroke;
+    NHKBHIT             pNHkbhit;
+    CHECKINPUT          pCheckInput;
+    SOURCEWHERE         pSourceWhere;
+    SOURCEAUTHOR        pSourceAuthor;
+    KEYHANDLERNAME      pKeyHandlerName;
+} keyboard_handler_t;
+
+keyboard_handler_t keyboard_handler;
+
+
+/* Console buffer flipping support */
+
+static void back_buffer_flip()
+{
+    cell_t * back = console.back_buffer;
+    cell_t * front = console.front_buffer;
+    COORD pos;
+    DWORD unused;
+
+    for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
+        for (pos.X = 0; pos.X < console.width; pos.X++) {
+            if (back->attribute != front->attribute) {
+                WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
+                                            1, pos, &unused);
+                front->attribute = back->attribute;
+            }
+            if (back->character != front->character) {
+                if (console.has_unicode) {
+                    WriteConsoleOutputCharacterW(console.hConOut,
+                        &back->character, 1, pos, &unused);
+                } else {
+                    char ch = (char)back->character;
+                    WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
+                                                    &unused);
+                }
+                *front = *back;
+            }
+            back++;
+            front++;
+        }
+    }
+}
+
+void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
+{
+    ntassert(x >= 0 && x < console.width);
+    ntassert(y >= 0 && ((y < console.height) || (y == console.height && 
+                                                 x == 0)));
+
+    cell_t * dst = buffer + console.width * y + x;
+    cell_t * sentinel = buffer + console.buffer_size;
+    while (dst != sentinel)
+        *dst++ = *fill;
+
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
+        back_buffer_flip();
+}
+
+static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
+{
+    ntassert(x >= 0 && x < console.width);
+    ntassert(y >= 0 && ((y < console.height) || (y == console.height && 
+                                                 x == 0)));
+    cell_t * dst = buffer + console.width * y + x;
+    cell_t *sentinel = buffer + console.width * (y + 1);
+
+    while (dst != sentinel)
+        *dst++ = clear_cell;
+
+    if (iflags.debug.immediateflips)
+        back_buffer_flip();
+}
+
+void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
+{
+    ntassert(pos.X >= 0 && pos.X < console.width);
+    ntassert(pos.Y >= 0 && pos.Y < console.height);
+
+    cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
+    *dst = *cell;
+
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
+        back_buffer_flip();
+}
 
 /*
  * Called after returning from ! or ^Z
@@ -157,10 +285,6 @@ KEYHANDLERNAME pKeyHandlerName;
 void
 gettty()
 {
-    console_font_changed = FALSE;
-
-    check_and_set_font();
-
 #ifndef TEXTCOLOR
     int k;
 #endif
@@ -197,19 +321,14 @@ setftty()
         adjust_palette();
 #endif
     start_screen();
-    has_unicode = ((GetVersion() & 0x80000000) == 0);
 }
 
 void
 tty_startup(wid, hgt)
 int *wid, *hgt;
 {
-    int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
-
-    if (twid > 80)
-        twid = 80;
-    *wid = twid;
-    *hgt = origcsbi.srWindow.Bottom - origcsbi.srWindow.Top + 1;
+    *wid = console.width;
+    *hgt = console.height;
     set_option_mod_status("mouse_support", SET_IN_GAME);
 }
 
@@ -217,6 +336,7 @@ void
 tty_number_pad(state)
 int state;
 {
+    // do nothing
 }
 
 void
@@ -231,19 +351,9 @@ tty_end_screen()
 {
     clear_screen();
     really_move_cursor();
-    if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
-        DWORD ccnt;
-        COORD newcoord;
-
-        newcoord.X = 0;
-        newcoord.Y = 0;
-        FillConsoleOutputAttribute(
-            hConOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-            csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
-        FillConsoleOutputCharacter(
-            hConOut, ' ', csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
-    }
-    FlushConsoleInputBuffer(hConIn);
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
+    back_buffer_flip();
+    FlushConsoleInputBuffer(console.hConIn);
 }
 
 static BOOL
@@ -262,7 +372,7 @@ DWORD ctrltype;
         hangup(0);
 #endif
 #if defined(SAFERHANGUP)
-        CloseHandle(hConIn); /* trigger WAIT_FAILED */
+        CloseHandle(console.hConIn); /* trigger WAIT_FAILED */
         return TRUE;
 #endif
     default:
@@ -270,76 +380,26 @@ DWORD ctrltype;
     }
 }
 
-/* called by init_tty in wintty.c for WIN32 port only */
+/* called by pcmain() and process_options() */
 void
 nttty_open(mode)
-int mode;
+int mode; // unused
 {
-    HANDLE hStdOut;
     DWORD cmode;
-    long mask;
 
-    GUILaunched = 0;
-
-    try :
-        /* The following lines of code were suggested by
-         * Bob Landau of Microsoft WIN32 Developer support,
-         * as the only current means of determining whether
-         * we were launched from the command prompt, or from
-         * the NT program manager. M. Allison
-         */
-    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    if (hStdOut) {
-        GetConsoleScreenBufferInfo(hStdOut, &origcsbi);
-    } else if (mode) {
-        HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-
-        if (!hStdOut && !hStdIn) {
-            /* Bool rval; */
-            AllocConsole();
-            AttachConsole(GetCurrentProcessId());
-            /* 	rval = SetStdHandle(STD_OUTPUT_HANDLE, hWrite); */
-            freopen("CON", "w", stdout);
-            freopen("CON", "r", stdin);
-        }
-        mode = 0;
-        goto try;
-    } else {
-        return;
-    }
-
-    /* Obtain handles for the standard Console I/O devices */
-    hConIn = GetStdHandle(STD_INPUT_HANDLE);
-    hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    load_keyboard_handler();
     /* Initialize the function pointer that points to
-    * the kbhit() equivalent, in this TTY case nttty_kbhit()
-    */
+     * the kbhit() equivalent, in this TTY case nttty_kbhit()
+     */
     nt_kbhit = nttty_kbhit;
 
-    GetConsoleMode(hConIn, &cmode);
-#ifdef NO_MOUSE_ALLOWED
-    mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_MOUSE_INPUT
-           | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;
-#else
-    mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-           | ENABLE_WINDOW_INPUT;
-#endif
-    /* Turn OFF the settings specified in the mask */
-    cmode &= ~mask;
-#ifndef NO_MOUSE_ALLOWED
-    cmode |= ENABLE_MOUSE_INPUT;
-#endif
-    SetConsoleMode(hConIn, cmode);
     if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE)) {
         /* Unable to set control handler */
         cmode = 0; /* just to have a statement to break on for debugger */
     }
-    get_scr_size();
-    console.cursor.X = console.cursor.Y = 0;
+
+    LI = console.height;
+    CO = console.width;
+
     really_move_cursor();
 }
 
@@ -350,7 +410,8 @@ boolean *valid;
 boolean numberpad;
 int portdebug;
 {
-    int ch = pProcessKeystroke(hConIn, ir, valid, numberpad, portdebug);
+    int ch = keyboard_handler.pProcessKeystroke(
+                    console.hConIn, ir, valid, numberpad, portdebug);
     /* check for override */
     if (ch && ch < MAX_OVERRIDES && key_overrides[ch])
         ch = key_overrides[ch];
@@ -360,33 +421,7 @@ int portdebug;
 int
 nttty_kbhit()
 {
-    return pNHkbhit(hConIn, &ir);
-}
-
-void
-get_scr_size()
-{
-    int lines, cols;
-    
-    GetConsoleScreenBufferInfo(hConOut, &csbi);
-    
-    lines = csbi.srWindow.Bottom - (csbi.srWindow.Top + 1);
-    cols = csbi.srWindow.Right - (csbi.srWindow.Left + 1);
-
-    LI = lines;
-    CO = min(cols, 80);
-    
-    if ((LI < 25) || (CO < 80)) {
-        COORD newcoord;
-
-        LI = 25;
-        CO = 80;
-
-        newcoord.Y = LI;
-        newcoord.X = CO;
-
-        SetConsoleScreenBufferSize(hConOut, newcoord);
-    }
+    return keyboard_handler.pNHkbhit(console.hConIn, &ir);
 }
 
 int
@@ -398,8 +433,8 @@ tgetch()
     really_move_cursor();
     return (program_state.done_hup)
                ? '\033'
-               : pCheckInput(hConIn, &ir, &count, iflags.num_pad, 0, &mod,
-                             &cc);
+               : keyboard_handler.pCheckInput(
+                   console.hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
 }
 
 int
@@ -412,12 +447,22 @@ int *x, *y, *mod;
     really_move_cursor();
     ch = (program_state.done_hup)
              ? '\033'
-             : pCheckInput(hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
+             : keyboard_handler.pCheckInput(
+                   console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);
     if (!ch) {
         *x = cc.x;
         *y = cc.y;
     }
     return ch;
+}
+
+static void set_console_cursor(int x, int y)
+{
+    ntassert(x >= 0 && x < console.width);
+    ntassert(y >= 0 && y < console.height);
+
+    console.cursor.X = max(0, min(console.width - 1, x));
+    console.cursor.Y = max(0, min(console.height - 1, y));
 }
 
 static void
@@ -431,15 +476,16 @@ really_move_cursor()
             oldtitle[39] = '\0';
         }
         Sprintf(newtitle, "%-55s tty=(%02d,%02d) nttty=(%02d,%02d)", oldtitle,
-                ttyDisplay->curx, ttyDisplay->cury, console.cursor.X, console.cursor.Y);
+                ttyDisplay->curx, ttyDisplay->cury,
+                console.cursor.X, console.cursor.Y);
         (void) SetConsoleTitle(newtitle);
     }
 #endif
-    if (ttyDisplay) {
-        console.cursor.X = ttyDisplay->curx;
-        console.cursor.Y = ttyDisplay->cury;
-    }
-    SetConsoleCursorPosition(hConOut, console.cursor);
+    if (ttyDisplay)
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+
+    back_buffer_flip();
+    SetConsoleCursorPosition(console.hConOut, console.cursor);
 }
 
 void
@@ -448,26 +494,25 @@ register int x, y;
 {
     ttyDisplay->cury = y;
     ttyDisplay->curx = x;
-    console.cursor.X = x;
-    console.cursor.Y = y;
+
+    set_console_cursor(x, y);
 }
 
 void
 nocmov(x, y)
 int x, y;
 {
-    console.cursor.X = x;
-    console.cursor.Y = y;
     ttyDisplay->curx = x;
     ttyDisplay->cury = y;
+
+    set_console_cursor(x, y);
 }
 
 void
 xputc(ch)
 char ch;
 {
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     xputc_core(ch);
 }
 
@@ -478,10 +523,8 @@ const char *s;
     int k;
     int slen = strlen(s);
 
-    if (ttyDisplay) {
-        console.cursor.X = ttyDisplay->curx;
-        console.cursor.Y = ttyDisplay->cury;
-    }
+    if (ttyDisplay)
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 
     if (s) {
         for (k = 0; k < slen && s[k]; ++k)
@@ -497,16 +540,27 @@ void
 xputc_core(ch)
 char ch;
 {
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
     boolean inverse = FALSE;
+    cell_t cell;
+
     switch (ch) {
     case '\n':
-        console.cursor.Y++;
+        if (console.cursor.Y < console.height - 1)
+            console.cursor.Y++;
     /* fall through */
     case '\r':
         console.cursor.X = 1;
         break;
     case '\b':
-        console.cursor.X--;
+        if (console.cursor.X > 1) {
+            console.cursor.X--;
+        } else if(console.cursor.Y > 0) {
+            console.cursor.X = console.width - 1;
+            console.cursor.Y--;
+        }
         break;
     default:
         inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
@@ -516,18 +570,24 @@ char ch;
         if (console.current_nhattr[ATR_BOLD])
                 console.attr |= (inverse) ?
                                 BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-        WriteConsoleOutputAttribute(hConOut, &console.attr, 1, console.cursor, &acount);
-        if (has_unicode) {
-            /* Avoid bug in ANSI API on WinNT */
-            WCHAR c2[2];
-            int rc;
-            rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, &ch, 1, c2, 2);
-            WriteConsoleOutputCharacterW(hConOut, c2, rc, console.cursor, &ccount);
+
+        cell.attribute = console.attr;
+        cell.character = (console.has_unicode ? console.cpMap[ch] : ch);
+
+        buffer_write(console.back_buffer, &cell, console.cursor);
+
+        if (console.cursor.X == console.width - 1) {
+            if (console.cursor.Y < console.height - 1) {
+                console.cursor.X = 1;
+                console.cursor.Y++;
+            }
         } else {
-            WriteConsoleOutputCharacterA(hConOut, &ch, 1, console.cursor, &ccount);
+            console.cursor.X++;
         }
-        console.cursor.X++;
     }
+
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 }
 
 /*
@@ -578,8 +638,7 @@ int in_ch;
     boolean inverse = FALSE;
     unsigned char ch = (unsigned char) in_ch;
 
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 
     inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
     console.attr = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse) ?
@@ -587,41 +646,28 @@ int in_ch;
                     ttycolors[console.current_nhcolor];
     if (console.current_nhattr[ATR_BOLD])
         console.attr |= (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
-    WriteConsoleOutputAttribute(hConOut, &console.attr, 1, console.cursor, &acount);
 
-    if (has_unicode)
-        WriteConsoleOutputCharacterW(hConOut, &cp437[ch], 1, console.cursor, &ccount);
-    else
-        WriteConsoleOutputCharacterA(hConOut, &ch, 1, console.cursor, &ccount);
+    cell_t cell;
+
+    cell.attribute = console.attr;
+    cell.character = (console.has_unicode ? cp437[ch] : ch);
+
+    buffer_write(console.back_buffer, &cell, console.cursor);
 }
 
 void
 cl_end()
 {
-    int cx;
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
-    cx = CO - console.cursor.X;
-    FillConsoleOutputAttribute(hConOut, DEFTEXTCOLOR, cx, console.cursor, &acount);
-    FillConsoleOutputCharacter(hConOut, ' ', cx, console.cursor, &ccount);
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+    buffer_clear_to_end_of_line(console.back_buffer, console.cursor.X,
+                                console.cursor.Y);
     tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
 }
 
 void
 raw_clear_screen()
 {
-    if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
-        DWORD ccnt;
-        COORD newcoord;
-
-        newcoord.X = 0;
-        newcoord.Y = 0;
-        FillConsoleOutputAttribute(
-            hConOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-            csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
-        FillConsoleOutputCharacter(
-            hConOut, ' ', csbi.dwSize.X * csbi.dwSize.Y, newcoord, &ccnt);
-    }
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
 }
 
 void
@@ -634,35 +680,22 @@ clear_screen()
 void
 home()
 {
-    console.cursor.X = console.cursor.Y = 0;
     ttyDisplay->curx = ttyDisplay->cury = 0;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 }
 
 void
 backsp()
 {
-    console.cursor.X = ttyDisplay->curx;
-    console.cursor.Y = ttyDisplay->cury;
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     xputc_core('\b');
 }
 
 void
 cl_eos()
 {
-    int cy = ttyDisplay->cury + 1;
-    if (GetConsoleScreenBufferInfo(hConOut, &csbi)) {
-        DWORD ccnt;
-        COORD newcoord;
-
-        newcoord.X = ttyDisplay->curx;
-        newcoord.Y = ttyDisplay->cury;
-        FillConsoleOutputAttribute(
-            hConOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-            csbi.dwSize.X * csbi.dwSize.Y - cy, newcoord, &ccnt);
-        FillConsoleOutputCharacter(hConOut, ' ',
-                                   csbi.dwSize.X * csbi.dwSize.Y - cy,
-                                   newcoord, &ccnt);
-    }
+    buffer_fill_to_end(console.back_buffer, &clear_cell, ttyDisplay->curx,
+                        ttyDisplay->cury);
     tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
 }
 
@@ -684,6 +717,7 @@ tty_delay_output()
     int k;
 
     goal = 50 + clock();
+    back_buffer_flip();
     while (goal > clock()) {
         k = junk; /* Do nothing */
     }
@@ -856,12 +890,12 @@ void
 toggle_mouse_support()
 {
     DWORD cmode;
-    GetConsoleMode(hConIn, &cmode);
+    GetConsoleMode(console.hConIn, &cmode);
     if (iflags.wc_mouse_support)
         cmode |= ENABLE_MOUSE_INPUT;
     else
         cmode &= ~ENABLE_MOUSE_INPUT;
-    SetConsoleMode(hConIn, cmode);
+    SetConsoleMode(console.hConIn, cmode);
 }
 #endif
 
@@ -890,7 +924,7 @@ win32con_debug_keystrokes()
     xputs("\n");
     while (!valid || ch != 27) {
         nocmov(ttyDisplay->curx, ttyDisplay->cury);
-        ReadConsoleInput(hConIn, &ir, 1, &count);
+        ReadConsoleInput(console.hConIn, &ir, 1, &count);
         if ((ir.EventType == KEY_EVENT) && ir.Event.KeyEvent.bKeyDown)
             ch = process_keystroke(&ir, &valid, iflags.num_pad, 1);
     }
@@ -901,20 +935,23 @@ win32con_handler_info()
 {
     char *buf;
     int ci;
-    if (!pSourceAuthor && !pSourceWhere)
+    if (!keyboard_handler.pSourceAuthor && !keyboard_handler.pSourceWhere)
         pline("Keyboard handler source info and author unavailable.");
     else {
-        if (pKeyHandlerName && pKeyHandlerName(&buf, 1)) {
+        if (keyboard_handler.pKeyHandlerName &&
+            keyboard_handler.pKeyHandlerName(&buf, 1)) {
             xputs("\n");
             xputs("Keystroke handler loaded: \n    ");
             xputs(buf);
         }
-        if (pSourceAuthor && pSourceAuthor(&buf)) {
+        if (keyboard_handler.pSourceAuthor &&
+            keyboard_handler.pSourceAuthor(&buf)) {
             xputs("\n");
             xputs("Keystroke handler Author: \n    ");
             xputs(buf);
         }
-        if (pSourceWhere && pSourceWhere(&buf)) {
+        if (keyboard_handler.pSourceWhere &&
+            keyboard_handler.pSourceWhere(&buf)) {
             xputs("\n");
             xputs("Keystroke handler source code available at:\n    ");
             xputs(buf);
@@ -966,86 +1003,79 @@ register char *op;
     key_overrides[idx] = val;
 }
 
-void
-load_keyboard_handler()
+void unload_keyboard_handler()
 {
-    char suffx[] = ".dll";
-    char *truncspot;
-#define MAX_DLLNAME 25
-    char kh[MAX_ALTKEYHANDLER];
-    if (iflags.altkeyhandler[0]) {
-        if (hLibrary) { /* already one loaded apparently */
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            pNHkbhit = (NHKBHIT) 0;
-            pCheckInput = (CHECKINPUT) 0;
-            pSourceWhere = (SOURCEWHERE) 0;
-            pSourceAuthor = (SOURCEAUTHOR) 0;
-            pKeyHandlerName = (KEYHANDLERNAME) 0;
-            pProcessKeystroke = (PROCESS_KEYSTROKE) 0;
-        }
-        if ((truncspot = strstri(iflags.altkeyhandler, suffx)) != 0)
-            *truncspot = '\0';
-        (void) strncpy(kh, iflags.altkeyhandler,
-                       (MAX_ALTKEYHANDLER - sizeof suffx) - 1);
-        kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
-        Strcat(kh, suffx);
-        Strcpy(iflags.altkeyhandler, kh);
-        hLibrary = LoadLibrary(kh);
-        if (hLibrary) {
-            pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
-                hLibrary, TEXT("ProcessKeystroke"));
-            pNHkbhit = (NHKBHIT) GetProcAddress(hLibrary, TEXT("NHkbhit"));
-            pCheckInput =
-                (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
-            pSourceWhere =
-                (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
-            pSourceAuthor =
-                (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
-            pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
-                hLibrary, TEXT("KeyHandlerName"));
-        }
+    ntassert(keyboard_handler.hLibrary != NULL);
+
+    FreeLibrary(keyboard_handler.hLibrary);
+    memset(&keyboard_handler, 0, sizeof(keyboard_handler_t));
+}
+
+boolean
+load_keyboard_handler(const char * inName)
+{
+    char path[MAX_ALTKEYHANDLER + 4];
+    strcpy(path, inName);
+    strcat(path, ".dll");
+
+    HANDLE hLibrary = LoadLibrary(path);
+
+    if (hLibrary == NULL)
+        return FALSE;
+
+    PROCESS_KEYSTROKE pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
+        hLibrary, TEXT("ProcessKeystroke"));
+    NHKBHIT pNHkbhit = (NHKBHIT) GetProcAddress(
+        hLibrary, TEXT("NHkbhit"));
+    CHECKINPUT pCheckInput =
+        (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
+
+    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput)
+    {
+        return FALSE;
+    } else {
+        if (keyboard_handler.hLibrary != NULL)
+            unload_keyboard_handler();
+
+        keyboard_handler.hLibrary = hLibrary;
+
+        keyboard_handler.pProcessKeystroke = pProcessKeystroke;
+        keyboard_handler.pNHkbhit = pNHkbhit;
+        keyboard_handler.pCheckInput = pCheckInput;
+
+        keyboard_handler.pSourceWhere =
+            (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
+        keyboard_handler.pSourceAuthor =
+            (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
+        keyboard_handler.pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
+            hLibrary, TEXT("KeyHandlerName"));
     }
-    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
-        if (hLibrary) {
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            pNHkbhit = (NHKBHIT) 0;
-            pCheckInput = (CHECKINPUT) 0;
-            pSourceWhere = (SOURCEWHERE) 0;
-            pSourceAuthor = (SOURCEAUTHOR) 0;
-            pKeyHandlerName = (KEYHANDLERNAME) 0;
-            pProcessKeystroke = (PROCESS_KEYSTROKE) 0;
-        }
-        (void) strncpy(kh, "nhdefkey.dll",
-                       (MAX_ALTKEYHANDLER - sizeof suffx) - 1);
-        kh[(MAX_ALTKEYHANDLER - sizeof suffx) - 1] = '\0';
-        Strcpy(iflags.altkeyhandler, kh);
-        hLibrary = LoadLibrary(kh);
-        if (hLibrary) {
-            pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
-                hLibrary, TEXT("ProcessKeystroke"));
-            pCheckInput =
-                (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
-            pNHkbhit = (NHKBHIT) GetProcAddress(hLibrary, TEXT("NHkbhit"));
-            pSourceWhere =
-                (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
-            pSourceAuthor =
-                (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
-            pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
-                hLibrary, TEXT("KeyHandlerName"));
-        }
+
+    return TRUE;
+}
+
+void set_altkeyhandler(const char * inName)
+{
+    if (strlen(inName) >= MAX_ALTKEYHANDLER) {
+        config_error_add("altkeyhandler name '%s' is too long", inName);
+        return;
     }
-    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput) {
-        if (!hLibrary)
-            raw_printf("\nNetHack was unable to load keystroke handler.\n");
-        else {
-            FreeLibrary(hLibrary);
-            hLibrary = (HANDLE) 0;
-            raw_printf("\nNetHack keystroke handler is invalid.\n");
-        }
-        exit(EXIT_FAILURE);
+
+    char name[MAX_ALTKEYHANDLER];
+    strcpy(name, inName);
+
+    /* We support caller mistakenly giving name with '.dll' extension */
+    char * ext = strchr(name, '.');
+    if (ext != NULL) *ext = '\0';
+
+    if (load_keyboard_handler(name))
+        strcpy(iflags.altkeyhandler, name);
+    else {
+        config_error_add("unable to load altkeyhandler '%s'", name);
+        return;
     }
+
+    return;
 }
 
 /* this is used as a printf() replacement when the window
@@ -1063,6 +1093,17 @@ VA_DECL(const char *, fmt)
     else {
         if(!init_ttycolor_completed)
             init_ttycolor();
+
+        /* if we have generated too many messages ... ask the user to
+         * confirm and then clear.
+         */
+        if (console.cursor.Y > console.height - 4) {
+            xputs("Hit <Enter> to continue.");
+            while (pgetchar() != '\n')
+                ;
+            raw_clear_screen();
+            set_console_cursor(1, 0);
+        }
 
         xputs(buf);
         if (ttyDisplay)
@@ -1521,7 +1562,7 @@ check_font_widths()
 {
     CONSOLE_FONT_INFOEX console_font_info;
     console_font_info.cbSize = sizeof(console_font_info);
-    BOOL success = GetCurrentConsoleFontEx(hConOut, FALSE,
+    BOOL success = GetCurrentConsoleFontEx(console.hConOut, FALSE,
                                             &console_font_info);
 
     /* get console window and DC
@@ -1622,12 +1663,12 @@ set_known_good_console_font()
 {
     CONSOLE_FONT_INFOEX console_font_info;
     console_font_info.cbSize = sizeof(console_font_info);
-    BOOL success = GetCurrentConsoleFontEx(hConOut, FALSE,
+    BOOL success = GetCurrentConsoleFontEx(console.hConOut, FALSE,
                                             &console_font_info);
 
-    console_font_changed = TRUE;
-    original_console_font_info = console_font_info;
-    original_console_code_page = GetConsoleOutputCP();
+    console.font_changed = TRUE;
+    console.original_font_info = console_font_info;
+    console.original_code_page = GetConsoleOutputCP();
 
     wcscpy_s(console_font_info.FaceName,
         sizeof(console_font_info.FaceName)
@@ -1635,12 +1676,10 @@ set_known_good_console_font()
         L"Consolas");
 
     success = SetConsoleOutputCP(437);
-    if (!success)
-        raw_print("Unable to set console code page to 437\n");
+    ntassert(success);
 
-    success = SetCurrentConsoleFontEx(hConOut, FALSE, &console_font_info);
-    if (!success)
-        raw_print("Unable to set console font to Consolas\n");
+    success = SetCurrentConsoleFontEx(console.hConOut, FALSE, &console_font_info);
+    ntassert(success);
 }
 
 /* restore_original_console_font will restore the console font and code page
@@ -1649,19 +1688,228 @@ set_known_good_console_font()
 void
 restore_original_console_font()
 {
-    if (console_font_changed) {
+    if (console.font_changed) {
         BOOL success;
         raw_print("Restoring original font and code page\n");
-        success = SetConsoleOutputCP(original_console_code_page);
+        success = SetConsoleOutputCP(console.original_code_page);
         if (!success)
             raw_print("Unable to restore original code page\n");
 
-        success = SetCurrentConsoleFontEx(hConOut, FALSE,
-                                            &original_console_font_info);
+        success = SetCurrentConsoleFontEx(console.hConOut, FALSE,
+                                            &console.original_font_info);
         if (!success)
             raw_print("Unable to restore original font\n");
 
-        console_font_changed = FALSE;
+        console.font_changed = FALSE;
+    }
+}
+
+/* set_cp_map() creates a mapping of every possible character of a code
+ * page to its corresponding WCHAR.  This is necessary due to the high
+ * cost of making calls to MultiByteToWideChar() for every character we
+ * wish to print to the console.
+ */
+
+void set_cp_map()
+{
+    if (console.has_unicode) {
+        UINT codePage = GetConsoleOutputCP();
+
+        for (int i = 0; i < 256; i++) {
+            char c = (char)i;
+            int count = MultiByteToWideChar(codePage, 0, &c, 1,
+                                            &console.cpMap[i], 1);
+            ntassert(count == 1);
+        }
+    }
+}
+
+/* early_raw_print() is used during early game intialization prior to the
+ * setting up of the windowing system.  This allows early errors and panics
+ * to have there messages displayed.
+ *
+ * early_raw_print() eventually gets replaced by tty_raw_print().
+ *
+ */
+
+void early_raw_print(const char *s)
+{
+    if (console.hConOut == NULL)
+        return;
+
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
+    WORD attribute = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE;
+    DWORD unused;
+
+    while (*s != '\0') {
+        switch (*s) {
+        case '\n':
+            if (console.cursor.Y < console.height - 1)
+                console.cursor.Y++;
+        /* fall through */
+        case '\r':
+            console.cursor.X = 1;
+            break;
+        case '\b':
+            if (console.cursor.X > 1) {
+                console.cursor.X--;
+            } else if(console.cursor.Y > 0) {
+                console.cursor.X = console.width - 1;
+                console.cursor.Y--;
+            }
+            break;
+        default:
+            WriteConsoleOutputAttribute(console.hConOut, &attribute,
+                                            1, console.cursor, &unused);
+            WriteConsoleOutputCharacterA(console.hConOut, s,
+                                            1, console.cursor, &unused);
+            if (console.cursor.X == console.width - 1) {
+                if (console.cursor.Y < console.height - 1) {
+                    console.cursor.X = 1;
+                    console.cursor.Y++;
+                }
+            } else {
+                console.cursor.X++;
+            }
+        }
+        s++;
+    }
+
+    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
+    SetConsoleCursorPosition(console.hConOut, console.cursor);
+
+}
+
+/* nethack_enter_nttty() is the first thing that is called from main.
+ *
+ * We initialize all console state to support rendering to the console
+ * through out flipping support at this time.  This allows us to support
+ * raw_print prior to our returning.
+ *
+ * During this early initialization, we also determine the width and
+ * height of the console that will be used.  This width and height will
+ * not later change.
+ *
+ * We also check and set the console font to a font that we know will work
+ * well with nethack.
+ *
+ * The intent of this early initialization is to get all state that is
+ * not dependent upon game options initialized allowing us to simplify
+ * any additional initialization that might be needed when we are actually
+ * asked to open.
+ *
+ * Other then the call below which clears the entire console buffer, no
+ * other code outputs directly to the console other then the code that
+ * handles flipping the back buffer.
+ *
+ */
+
+void nethack_enter_nttty()
+{
+    /* set up state needed by early_raw_print() */
+    windowprocs.win_raw_print = early_raw_print;
+
+    console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    ntassert(console.hConOut != NULL); // NOTE: this assert will not print
+
+    GetConsoleScreenBufferInfo(console.hConOut, &console.origcsbi);
+
+    /* Testing of widths != COLNO has not turned up any problems.  Need
+     * to do a bit more testing and then we are likely to enable having
+     * console width match window width.
+     */
+#if 0
+    console.width = console.origcsbi.srWindow.Right -
+                     console.origcsbi.srWindow.Left + 1;
+    console.Width = max(console.Width, COLNO);
+#else
+    console.width = COLNO;
+#endif
+
+    console.height = console.origcsbi.srWindow.Bottom -
+                     console.origcsbi.srWindow.Top + 1;
+    console.height = max(console.height, ROWNO + 3);
+
+    console.buffer_size = console.width * console.height;
+
+
+    /* clear the entire console buffer */
+    int size = console.origcsbi.dwSize.X * console.origcsbi.dwSize.Y;
+    DWORD unused;
+    set_console_cursor(0, 0);
+    FillConsoleOutputAttribute(
+        console.hConOut, CONSOLE_CLEAR_ATTRIBUTE,
+        size, console.cursor, &unused);
+
+    FillConsoleOutputCharacter(
+        console.hConOut, CONSOLE_CLEAR_CHARACTER,
+        size, console.cursor, &unused);
+
+    set_console_cursor(1, 0);
+    SetConsoleCursorPosition(console.hConOut, console.cursor);
+
+    /* At this point early_raw_print will work */
+
+    console.hConIn = GetStdHandle(STD_INPUT_HANDLE);
+    ntassert(console.hConIn  != NULL);
+
+    /* grow the size of the console buffer if it is not wide enough */
+    if (console.origcsbi.dwSize.X < console.width) {
+        COORD size = {
+            size.Y = console.origcsbi.dwSize.Y,
+            size.X = console.width
+        };
+
+        SetConsoleScreenBufferSize(console.hConOut, size);
+    }
+
+    /* setup front and back buffers */
+    int buffer_size_bytes = sizeof(cell_t) * console.buffer_size;
+
+    console.front_buffer = (cell_t *)malloc(buffer_size_bytes);
+    buffer_fill_to_end(console.front_buffer, &undefined_cell, 0, 0);
+
+    console.back_buffer = (cell_t *)malloc(buffer_size_bytes);
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
+
+    /* determine whether OS version has unicode support */
+    console.has_unicode = ((GetVersion() & 0x80000000) == 0);
+
+    /* check the font before we capture the code page map */
+    check_and_set_font();
+    set_cp_map();
+
+    /* Set console mode */
+    DWORD cmode, mask;
+    GetConsoleMode(console.hConIn, &cmode);
+#ifdef NO_MOUSE_ALLOWED
+    mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_MOUSE_INPUT
+           | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;
+#else
+    mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
+           | ENABLE_WINDOW_INPUT;
+#endif
+    /* Turn OFF the settings specified in the mask */
+    cmode &= ~mask;
+#ifndef NO_MOUSE_ALLOWED
+    cmode |= ENABLE_MOUSE_INPUT;
+#endif
+    SetConsoleMode(console.hConIn, cmode);
+
+    /* load default keyboard handler */
+    HKL keyboard_layout = GetKeyboardLayout(0);
+    DWORD primary_language = (UINT_PTR) keyboard_layout & 0x3f;
+
+    if (primary_language == LANG_ENGLISH) {
+        if (!load_keyboard_handler("nhdefkey"))
+            error("Unable to load nhdefkey.dll");
+    } else {
+        if (!load_keyboard_handler("nhraykey"))
+            error("Unable to load nhraykey.dll");
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1510963525 2017/11/18 00:05:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.319 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1526112322 2018/05/12 08:05:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -263,7 +263,7 @@ static struct Comp_Opt {
       DISP_IN_GAME },
     { "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
     { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
-    { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
+    { "altkeyhandler", "alternate key handler", 20, SET_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
       SET_IN_GAME },
@@ -2651,9 +2651,8 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_opt(opts, negated)) != 0) {
-#ifdef WIN32
-            (void) strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
-            load_keyboard_handler();
+#if defined(WIN32CON)
+            set_altkeyhandler(op);
 #endif
         } else
             return FALSE;
@@ -4821,7 +4820,7 @@ boolean setinitial, setfromfile;
                 if (strlen(tmp->pattern) > ln)
                     Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
                 else
-                    Strcat(mtbuf, "\"");
+                    Strcat(strcat(mtbuf, tmp->pattern), "\"");
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;

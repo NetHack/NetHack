@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1506903619 2017/10/02 00:20:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1525696908 2018/05/07 12:41:48 $  $NHDT-Branch: tty-status $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -483,14 +483,14 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("charisma", " Ch:%s", ANY_INT, 10, BL_CH),
     INIT_BLSTAT("alignment", " %s", ANY_STR, 40, BL_ALIGN),
     INIT_BLSTAT("score", " S:%s", ANY_LONG, 20, BL_SCORE),
-    INIT_BLSTAT("carrying-capacity", " %s", ANY_LONG, 20, BL_CAP),
+    INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
     INIT_BLSTAT("gold", " %s", ANY_LONG, 30, BL_GOLD),
     INIT_BLSTATP("power", " Pw:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
-    INIT_BLSTAT("experience-level", " Xp:%s", ANY_LONG, 10, BL_XP),
+    INIT_BLSTAT("experience-level", " Xp:%s", ANY_INT, 10, BL_XP),
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
-    INIT_BLSTAT("time", " T:%s", ANY_INT, 20, BL_TIME),
+    INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
     INIT_BLSTAT("hunger", " %s", ANY_UINT, 40, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
@@ -630,7 +630,7 @@ bot_via_windowport()
 
     /* Experience */
     blstats[idx][BL_XP].a.a_int = u.ulevel;
-    blstats[idx][BL_EXP].a.a_int = u.uexp;
+    blstats[idx][BL_EXP].a.a_long = u.uexp;
 
     /* Time (moves) */
     blstats[idx][BL_TIME].a.a_long = moves;
@@ -858,7 +858,10 @@ boolean
             : TRUE;
 
         fieldname = initblstats[i].fldname;
-        fieldfmt = initblstats[i].fldfmt;
+        if (fld == BL_TITLE && iflags.wc2_hitpointbar)
+            fieldfmt = "%-30s";
+        else
+            fieldfmt = initblstats[i].fldfmt;
         status_enablefield(fld, fieldname, fieldfmt, fldenabled);
     }
     update_all = TRUE;

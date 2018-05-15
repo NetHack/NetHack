@@ -111,8 +111,13 @@ char *argv[];
         dir = nh_getenv("HACKDIR");
 
     if (argc > 1) {
-        if (argcheck(argc, argv, ARG_VERSION))
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
+
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+	}
 
         if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
