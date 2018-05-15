@@ -2,8 +2,6 @@ $NHDT-Branch: master $:$NHDT-Revision: 1.3 $ $NHDT-Date: 1525012578 2018/04/29 1
 
 General Fixes and Modified Features
 -----------------------------------
-since return capability is purported to be because of an implicit
-	tether on the aklys, integrate that into display features
 
 
 Fixes to Post-3.7.0 Problems that Were Exposed Via git Repository
