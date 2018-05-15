@@ -3538,7 +3538,7 @@ static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
 static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
 static int enclev = 0, enc_shrinklvl = 0;
-static dl_shrinklvl = 0;
+static int dl_shrinklvl = 0;
 static boolean truncation_expected = FALSE;
 
 /* This controls whether to skip fields that aren't
@@ -3709,7 +3709,6 @@ unsigned long *colormasks;
         case BL_HUNGER:
                 /* The core sends trailing blanks for some fields
                     Let's suppress the trailing blanks */
-                    char *lastchar = eos(status_vals[fldidx]);
                 lastchar = eos(status_vals[fldidx]);
                 lastchar--;
                 while (lastchar && *lastchar == ' '
