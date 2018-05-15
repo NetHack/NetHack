@@ -3650,6 +3650,8 @@ unsigned long *colormasks;
     int i;
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
+    char *lastchar = (char *) 0;
+    char *fval = (char *) 0;
     boolean do_color = FALSE;
     boolean force_update = FALSE;
 
@@ -3672,15 +3674,6 @@ unsigned long *colormasks;
                 tty_status[NOW][fldidx].dirty = TRUE;
                 truncation_expected = FALSE;
                 break;
-        case BL_CAP:
-                for (i = 0; i < SIZE(encvals); ++i) {
-                    if (!strcmp(encvals[enc_shrinklvl][i],
-                                        status_vals[BL_CAP])) {
-                       enclev = i;
-                       break;
-                    }
-                }
-                /*FALLTHRU*/
         default:
                 tty_status[NOW][fldidx].idx = fldidx;
                 Sprintf(status_vals[fldidx],
@@ -3692,14 +3685,7 @@ unsigned long *colormasks;
                 tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
                 tty_status[NOW][fldidx].valid = TRUE;
                 tty_status[NOW][fldidx].dirty = TRUE;
-
                 break;
-    }
-
-    /* Special additional processing for hitpointbar */
-    if (iflags.wc2_hitpointbar && fldidx == BL_HP) {
-        hpbar_percent = percent;
-        hpbar_color = do_color ? (color & 0x00FF) : NO_COLOR;
     }
 
     /* The core botl engine sends a single blank to the window port
@@ -3710,24 +3696,49 @@ unsigned long *colormasks;
             tty_status[NOW][fldidx].lth = 0;
        }
        
-    /* The core botl engine sends trailing blanks for some fields
-       Let's suppress the trailing blanks */
-    if (fldidx == BL_LEVELDESC || fldidx == BL_HUNGER) {
-        char *lastchar = eos(status_vals[fldidx]);
-        lastchar--;
-        while (lastchar && *lastchar == ' '
-                && lastchar >= status_vals[fldidx]) {
-            *lastchar-- = '\0';
-            tty_status[NOW][fldidx].lth--;
-        }
+    /* default processing above was required before these */
+    switch (fldidx) {
+        case BL_HP:
+                if (iflags.wc2_hitpointbar) {
+                    /* Special additional processing for hitpointbar */
+                    hpbar_percent = percent;
+                    hpbar_color = do_color ? (color & 0x00FF) : NO_COLOR;
+                }
+                break;
+        case BL_LEVELDESC:
+        case BL_HUNGER:
+                /* The core sends trailing blanks for some fields
+                    Let's suppress the trailing blanks */
+                    char *lastchar = eos(status_vals[fldidx]);
+                lastchar = eos(status_vals[fldidx]);
+                lastchar--;
+                while (lastchar && *lastchar == ' '
+                        && lastchar >= status_vals[fldidx]) {
+                    *lastchar-- = '\0';
+                    tty_status[NOW][fldidx].lth--;
+                }
+                break;
+        case BL_TITLE:
+                if (iflags.wc2_hitpointbar)
+                    tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
+                break;                
+        case BL_GOLD:
+                tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
+                break;
+        case BL_CAP:
+                fval = status_vals[fldidx];
+                if (fval) {
+                    if (*fval == ' ')
+                        fval++;
+                    for (i = 0; i < SIZE(encvals); ++i) {
+                        if (!strcmp(encvals[enc_shrinklvl][i], fval)) {
+                            enclev = i;
+                            break;              /* for */
+                        }
+                    }
+                }
+                break;
     }
-
-    /* Some other special case fixups */
-    if (iflags.wc2_hitpointbar && fldidx == BL_TITLE)
-        tty_status[NOW][fldidx].lth += 2; /* [ and ] */
-    if (fldidx == BL_GOLD)
-         tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
-
     if (make_things_fit(force_update) || truncation_expected)
         render_status();
     return;
