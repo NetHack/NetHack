@@ -136,12 +136,6 @@ register char *op;
     return;
 }
 
-void
-load_keyboard_handler()
-{
-    return;
-}
-
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
@@ -176,4 +170,15 @@ more()
     return;
 }
 
+void
+nethack_enter_nttty()
+{
+    return;
+}
+
+void
+set_altkeyhandler(const char *inName)
+{
+    return;
+}
 #endif /* TTYSTUBS */

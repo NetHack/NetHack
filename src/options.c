@@ -263,7 +263,7 @@ static struct Comp_Opt {
       DISP_IN_GAME },
     { "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
     { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
-    { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
+    { "altkeyhandler", "alternate key handler", 20, SET_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
       SET_IN_GAME },
@@ -2651,9 +2651,8 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_opt(opts, negated)) != 0) {
-#ifdef WIN32
-            (void) strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
-            load_keyboard_handler();
+#if defined(WIN32CON)
+            set_altkeyhandler(op);
 #endif
         } else
             return FALSE;
