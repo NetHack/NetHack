@@ -206,8 +206,6 @@ keyboard_handler_t keyboard_handler;
 
 /* Console buffer flipping support */
 
-boolean do_immediate_flips = FALSE;
-
 static void back_buffer_flip()
 {
     cell_t * back = console.back_buffer;
@@ -250,7 +248,7 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
     while (dst != sentinel)
         *dst++ = *fill;
 
-    if (do_immediate_flips && buffer == console.back_buffer)
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
         back_buffer_flip();
 }
 
@@ -265,7 +263,7 @@ static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
     while (dst != sentinel)
         *dst++ = clear_cell;
 
-    if (do_immediate_flips)
+    if (iflags.debug.immediateflips)
         back_buffer_flip();
 }
 
@@ -277,7 +275,7 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
     cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
     *dst = *cell;
 
-    if (do_immediate_flips && buffer == console.back_buffer)
+    if (iflags.debug.immediateflips && buffer == console.back_buffer)
         back_buffer_flip();
 }
 

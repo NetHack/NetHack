@@ -179,5 +179,6 @@ nethack_enter_nttty()
 void
 set_altkeyhandler(const char *inName)
 {
+    return;
 }
 #endif /* TTYSTUBS */
