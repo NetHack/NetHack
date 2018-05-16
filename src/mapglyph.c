@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1448175698 2015/11/22 07:01:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1526429201 2018/05/16 00:06:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,12 @@
 #include "color.h"
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
-static int explcolors[] = {
+#if !defined(TTY_GRAPHICS)
+#define has_color(n) TRUE
+#endif
+
+#ifdef TEXTCOLOR
+static const int explcolors[] = {
     CLR_BLACK,   /* dark    */
     CLR_GREEN,   /* noxious */
     CLR_BROWN,   /* muddy   */
@@ -19,11 +24,6 @@ static int explcolors[] = {
     CLR_WHITE,   /* frosty  */
 };
 
-#if !defined(TTY_GRAPHICS)
-#define has_color(n) TRUE
-#endif
-
-#ifdef TEXTCOLOR
 #define zap_color(n) color = iflags.use_color ? zapcolors[n] : NO_COLOR
 #define cmap_color(n) color = iflags.use_color ? defsyms[n].color : NO_COLOR
 #define obj_color(n) color = iflags.use_color ? objects[n].oc_color : NO_COLOR
@@ -233,6 +233,8 @@ unsigned *ospecial;
     *ospecial = special;
 #ifdef TEXTCOLOR
     *ocolor = color;
+#else
+    nhUse(ocolor);
 #endif
     return idx;
 }
@@ -241,7 +243,7 @@ char *
 encglyph(glyph)
 int glyph;
 {
-    static char encbuf[20];
+    static char encbuf[20]; /* 10+1 would suffice */
 
     Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
     return encbuf;
@@ -338,6 +340,7 @@ int attr;
 const char *str;
 {
     char buf[BUFSZ];
+
     /* now send it to the normal putstr */
     putstr(window, attr, decode_mixed(buf, str));
 }
