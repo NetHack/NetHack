@@ -9,9 +9,10 @@ General Fixes and Modified Features
 -----------------------------------
 last line of config file wasn't being heeded if it had no newline
 list MSGTYPE values shows empty strings as reported in H7140
-Killing Vlad while he was in bat/fog cloud/wolf form gave poorly
-	worded feedback when he reverted to vampire form
+Killing Vlad while he was in bat/fog cloud/wolf form gave poorly worded
+	feedback when he reverted to vampire form
 spaces in hilite_status option title text field not working
+numeric hilite_status values didn't allow negative numbers (needed for AC)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -25,11 +26,11 @@ windows-gui: In nethackw, there could be conflicts between menu accelerators
 	and an extra choice accelerator to fix H7132.  
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
-	port, implement a console back buffer to reduce the number of calls made to 
-	WriteConsoleOutputXXX
-windows-tty: Additional changes to xputc_core() and early_raw_print() to manage 
-	the cursor position correctly as that is needed to handle raw printing 
-	correctly
+	port, implement a console back buffer to reduce the number of calls
+	made to  WriteConsoleOutputXXX
+windows-tty: Additional changes to xputc_core() and early_raw_print() to
+	manage  the cursor position correctly as that is needed to handle
+	raw printing  correctly
 windows-tty: Added check for when we might be running off the bottom of the 
 	screen when handling msmsg()
 windows-tty: Added runtime checks to keep cursor always within bounds
@@ -38,7 +39,7 @@ windows-tty: Use nhraykey by default if the players keyboard layout is
 	non-english as reported in H4216
 windows-tty: We now support changing altkeyhandler in game
 windows: Added ntassert() mechanism for Windows based port use
-tty: some optimizations for performance and per field rendering
+tty: significant optimizations for performance and per field rendering
 
 
 General New Features
