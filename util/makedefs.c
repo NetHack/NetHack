@@ -1195,7 +1195,7 @@ const char *build_date;
     char betabuf[64];
 
 #ifdef BETA
-    Strcpy(betabuf, "Beta");
+    Strcpy(betabuf, " Beta");
 #else
     betabuf[0] = '\0';
 #endif
@@ -1206,7 +1206,7 @@ const char *build_date;
     Strcpy(&subbuf[1], PORT_SUB_ID);
 #endif
 
-    Sprintf(outbuf, "%s NetHack%s Version %s %s - last %s %s.", PORT_ID,
+    Sprintf(outbuf, "%s NetHack%s Version %s%s - last %s %s.", PORT_ID,
             subbuf, version_string(versbuf, "."), betabuf,
             date_via_env ? "revision" : "build", build_date);
     return outbuf;
