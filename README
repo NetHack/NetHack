@@ -1,39 +1,23 @@
-                NetHack 3.6.1 -- General information
+                NetHack 3.6.2 -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.1 contains over 470 bug fixes to NetHack 3.6.0. The 
-file doc/fixes36.1 in the source distribution has a full list of them. 
-The text in there was written for the development team's own use and is 
-provided "as is", so please do not ask us to further explain the entries 
-in that file. Some entries might be considered "spoilers", particularly
-in the "new features" section.
+NetHack 3.6.2 contains a collection of more than 15 bug fixes to NetHack 3.6.1.
+The file doc/fixes36.2 in the source distribution has a full list of them. The
+text in there was written for the development team's own use and is provided 
+"as is", so please do not ask us to further explain the entries in that file. 
+Some entries might be considered "spoilers", particularly in the "new features" 
+section.
 
 Below you will find some other general notes that were not considered
 spoilers:
-* additional Terry Pratchett tribute passages
-* enhanced map position picking
-* new status line conditions Stone Strngl Deaf Lev Fly Ride
-* updated status hilites and several interface enhancements
-* new paranoid_confirm settings
-* a new extended command #kick
-* the vanquished monsters list can be sorted during end of game disclosure
-* fountains are bright blue
-* travel accepts 'm' (request menu) prefix
-* pressing a or A when cursor positioning shows menu of "interesting" features
-* pressing z or Z when cursor positioning can cycle through valid locations
-* add option herecmd_menu to make a mouse click on your character pop up a menu
-* #adjust's behavior altered when collecting compatible stacks
-* Some community patches that were included:
-    - Malcolm Ryan's improved tin opener
-    - Ray Chason's MSDOS port support for some VESA modes
-    - Ray Chason's Qt4 windowport
-    - Darshan Shaligram's pet ranged attack
-    - Jason Dorje Short's key rebinding
-    - Maxime Bacoux's new DUMPLOG
-* updated database entries for several things
+* Performance optimizations with tty including the ability to do per field 
+  updating
+* sys/winnt/nttty performance improvements mainly through the introduction
+  of a back buffer approach
+* a couple of windows crash bug fixes
 
                         - - - - - - - - - - -
 

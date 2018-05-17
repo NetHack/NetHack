@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1526382995 2018/05/15 11:16:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1526429383 2018/05/16 00:09:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3493,7 +3493,9 @@ const char *fieldnames[] = {
 };
 
 #ifdef STATUS_HILITES
+#ifdef TEXTCOLOR
 STATIC_DCL int FDECL(condcolor, (long, unsigned long *));
+#endif
 STATIC_DCL int FDECL(condattr, (long, unsigned long *));
 static unsigned long *tty_colormasks;
 static long tty_condition_bits;
@@ -3624,13 +3626,13 @@ tty_status_init()
  *         the textual gold amount without the leading "$:" the port will
  *         have to skip past ':' in the passed "ptr" for the BL_GOLD case.
  *      -- color is an unsigned int.
- *               color_index = color & 0x00FF;       CLR_* value
- *               attribute   = color & 0xFF00 >> 8;  BL_* values
+ *               color_index = color & 0x00FF;         CLR_* value
+ *               attribute   = (color >> 8) & 0x00FF;  HL_ATTCLR_* mask
  *         This holds the color and attribute that the field should
  *         be displayed in.
  *         This is relevant for everything except BL_CONDITION fldindex.
  *         If fldindex is BL_CONDITION, this parameter should be ignored,
- *         as condition hilighting is done via the next colormasks
+ *         as condition highlighting is done via the next colormasks
  *         parameter instead.
  *
  *      -- colormasks - pointer to cond_hilites[] array of colormasks.
@@ -3653,15 +3655,14 @@ unsigned long *colormasks;
     char *text = (char *) ptr;
     char *lastchar = (char *) 0;
     char *fval = (char *) 0;
-    boolean do_color = FALSE;
     boolean force_update = FALSE;
-
-#ifdef TEXTCOLOR
-    do_color = TRUE;
-#endif
 
     if (fldidx != BL_FLUSH && !status_activefields[fldidx])
         return;
+
+#ifndef TEXTCOLOR
+    color = (color & ~0x00FF) | NO_COLOR;
+#endif
 
     switch (fldidx) {
     case BL_FLUSH:
@@ -3680,8 +3681,8 @@ unsigned long *colormasks;
         Sprintf(status_vals[fldidx],
                 status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
                 text);
-        tty_status[NOW][fldidx].color = do_color ? (color & 0x00FF) : NO_COLOR;
-        tty_status[NOW][fldidx].attr = (color & 0xFF00) >> 8;
+        tty_status[NOW][fldidx].color = (color & 0x00FF);
+        tty_status[NOW][fldidx].attr = ((color >> 8) & 0x00FF);
         tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
         tty_status[NOW][fldidx].valid = TRUE;
         tty_status[NOW][fldidx].dirty = TRUE;
@@ -3690,11 +3691,10 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-       if (tty_status[NOW][fldidx].lth == 1
-           && status_vals[fldidx][0] == ' ') {
-            status_vals[fldidx][0] = '\0';
-            tty_status[NOW][fldidx].lth = 0;
-       }
+    if (tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
+        status_vals[fldidx][0] = '\0';
+        tty_status[NOW][fldidx].lth = 0;
+    }
 
     /* default processing above was required before these */
     switch (fldidx) {
@@ -3702,7 +3702,7 @@ unsigned long *colormasks;
         if (iflags.wc2_hitpointbar) {
             /* Special additional processing for hitpointbar */
             hpbar_percent = percent;
-            hpbar_color = do_color ? (color & 0x00FF) : NO_COLOR;
+            hpbar_color = (color & 0x00FF);
         }
         break;
     case BL_LEVELDESC:
@@ -3721,7 +3721,7 @@ unsigned long *colormasks;
             tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
         break;
     case BL_GOLD:
-        tty_status[NOW][fldidx].lth -= 9; /* \GXXXXNNNN counts as 1 */
+        tty_status[NOW][fldidx].lth -= (10 - 1); /* \GXXXXNNNN counts as 1 */
         break;
     case BL_CAP:
         fval = status_vals[fldidx];
@@ -4007,11 +4007,17 @@ unsigned long *bmarray;
 
     if (bm && bmarray)
         for (i = 0; i < CLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i]))
+            if ((bm & bmarray[i]) != 0)
                 return i;
         }
     return NO_COLOR;
 }
+#else
+/* might need something more elaborate if some compiler complains that
+   the condition where this gets used always has the same value */
+#define condcolor(bm,bmarray) NO_COLOR
+#define term_start_color(color) /*empty*/
+#define term_end_color(color) /*empty*/
 #endif /* TEXTCOLOR */
 
 STATIC_OVL int
@@ -4024,8 +4030,8 @@ unsigned long *bmarray;
 
     if (bm && bmarray) {
         for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i])) {
-                switch(i) {
+            if ((bm & bmarray[i]) != 0) {
+                switch (i) {
                 case HL_ATTCLR_DIM:
                     attr |= HL_DIM;
                     break;
@@ -4086,13 +4092,6 @@ render_status(VOID_ARGS)
     long mask = 0L;
     int i, c, row, attrmask = 0;
     struct WinDesc *cw = 0;
-    boolean do_color =
-#ifdef TEXTCOLOR
-        TRUE
-#else
-        FALSE
-#endif
-        ;
     struct tty_status_fields *nullfield = (struct tty_status_fields *) 0;
 
     if (WIN_STATUS == WIN_ERR
@@ -4139,11 +4138,10 @@ render_status(VOID_ARGS)
                             if (iflags.hilite_delta) {
                                 attrmask = condattr(mask, tty_colormasks);
                                 Begin_Attr(attrmask);
-                                if (do_color) {
-                                    coloridx = condcolor(mask, tty_colormasks);
-                                    if (coloridx != NO_COLOR)
-                                        term_start_color(coloridx);
-                                }
+                                coloridx = condcolor(mask, tty_colormasks);
+                                if (coloridx != NO_COLOR
+                                    && coloridx != CLR_MAX)
+                                    term_start_color(coloridx);
                             }
                             if (x >= cw->cols && !truncation_expected)
                                 impossible(
@@ -4152,15 +4150,19 @@ render_status(VOID_ARGS)
                             tty_putstatusfield(nullfield, condtext, x, y);
                             x += (int) strlen(condtext);
                             if (iflags.hilite_delta) {
-                                if (do_color && coloridx != NO_COLOR)
+                                if (coloridx != NO_COLOR
+                                    && coloridx != CLR_MAX)
                                     term_end_color();
                                 End_Attr(attrmask);
                             }
                         }
                     }
                     if (x >= cw->cols) {
-                        if (!truncation_expected)
-                            paniclog("render_status()", " unexpected truncation.");
+                        static unsigned once_only = 0;
+
+                        if (!truncation_expected && !once_only++)
+                            paniclog(
+                                "render_status()", " unexpected truncation.");
                         x = cw->cols - 1;
                     }
                     tty_curs(WIN_STATUS, x, y);
@@ -4175,15 +4177,14 @@ render_status(VOID_ARGS)
                     if (iflags.hilite_delta) {
                         /* multiple attributes can be in effect concurrently */
                         Begin_Attr(attridx);
-                        if (do_color && coloridx != NO_COLOR
-                            && coloridx != CLR_MAX)
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(coloridx);
                     }
                     /* decode_mixed() due to GOLD glyph */
                     tty_putstatusfield(nullfield,
                                        decode_mixed(buf, text), x, y);
                     if (iflags.hilite_delta) {
-                        if (do_color && coloridx != NO_COLOR)
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         End_Attr(attridx);
                     }
@@ -4216,13 +4217,13 @@ render_status(VOID_ARGS)
                     }
                     if (iflags.hilite_delta) {
                         tty_putstatusfield(nullfield, "[", x++, y);
-                        if (do_color && hpbar_color != NO_COLOR)
+                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(hpbar_color);
                         term_start_attr(ATR_INVERSE);
                         tty_putstatusfield(nullfield, bar, x, y);
                         x += (int) strlen(bar);
                         term_end_attr(ATR_INVERSE);
-                        if (do_color && hpbar_color != NO_COLOR)
+                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         if (twoparts) {
                             *bar2 = savedch;
@@ -4249,14 +4250,13 @@ render_status(VOID_ARGS)
                         }
                         /* multiple attributes can be in effect concurrently */
                         Begin_Attr(attridx);
-                        if (do_color && coloridx != NO_COLOR
-                            && coloridx != CLR_MAX)
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(coloridx);
                     }
                     tty_putstatusfield(&tty_status[NOW][fldidx],
                                        text, x, y);
                     if (iflags.hilite_delta) {
-                        if (do_color && coloridx != NO_COLOR)
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         End_Attr(attridx);
                     }
