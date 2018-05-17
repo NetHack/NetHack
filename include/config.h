@@ -531,7 +531,7 @@ typedef unsigned char uchar;
 #define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
 /* DUMPLOG_FILE allows following placeholders:
    %% literal '%'
-   %v version (eg. "3.6.1-0")
+   %v version (eg. "3.6.2-0")
    %u game UID
    %t game start time, UNIX timestamp format
    %T current time, UNIX timestamp format

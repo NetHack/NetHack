@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 27, 2018
+.ds f2 "May 16, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -4181,7 +4181,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 .PL %%
 literal '%'
 .PL %v
-version (eg. "3.6.1-0")
+version (eg. "3.6.2-0")
 .PL %u
 game UID
 .PL %t

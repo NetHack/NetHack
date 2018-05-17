@@ -1091,7 +1091,7 @@ char *buf;
             case 'D': /* current time, YYYYMMDDhhmmss */
                 Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
                 break;
-            case 'v': /* version, eg. "3.6.1-0" */
+            case 'v': /* version, eg. "3.6.2-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */
