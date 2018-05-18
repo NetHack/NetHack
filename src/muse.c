@@ -1165,14 +1165,9 @@ struct monst *mtmp;
                 m.has_offense = MUSE_WAN_POISON_GAS;
             }
             nomore(MUSE_WAN_SONICS);
-            if (obj->otyp == MUSE_WAN_SONICS && obj->spe > 0) {
+            if (obj->otyp == WAN_SONICS && obj->spe > 0) {
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_SONICS;
-            }
-            nomore(MUSE_WAN_PSIONICS);
-            if (obj->otyp == MUSE_WAN_PSIONICS && obj->spe > 0) {
-                m.offensive = obj;
-                m.has_offense = MUSE_WAN_PSIONICS;
             }
             nomore(MUSE_FROST_HORN);
             if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
@@ -1189,6 +1184,11 @@ struct monst *mtmp;
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_MAGIC_MISSILE;
             }
+        }
+        nomore(MUSE_WAN_PSIONICS);
+        if (obj->otyp == WAN_PSIONICS && obj->spe > 0) {
+            m.offensive = obj;
+            m.has_offense = MUSE_WAN_PSIONICS;
         }
         nomore(MUSE_WAN_STRIKING);
         if (obj->otyp == WAN_STRIKING && obj->spe > 0) {
