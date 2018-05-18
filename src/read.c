@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/27/18 by NullCGT */
+/* Edited on 5/18/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1781,12 +1781,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         register struct monst *mtmp;
         known = TRUE;
         if (confused) {
-            if (uwep) {
-                dropy(mksobj(uwep->otyp, TRUE, FALSE));
-                pline("You clone your weapon!");
-            } else {
-                strange_feeling(sobj, "You feel duplicitous.");
-            }
+            mtmp = makemon(&mons[PM_DOPPELGANGER], u.ux, u.uy, MM_NOWAIT);
+            You("clone yourself, but your clone transforms!");
             break;
         } else if (!Hallucination) {
             You("clone yourself!");
