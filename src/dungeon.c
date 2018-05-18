@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 4/18/18 by NulLCGT */
+/* Edited on 5/18/18 by NulLCGT */
 
 #include "hack.h"
 #include "dgn_file.h"
@@ -2866,8 +2866,10 @@ int rtype;
         break;
     case ARCHERYSHOP:
         str = "archery emporium";
+        break;
     case JUNKSHOP:
         str = "junk shop";
+        break;
     case FODDERSHOP:
         str = "health food store";
         break;
