@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/11/18 by NullCGT */
+/* Edited on 5/18/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -897,22 +897,22 @@ SCROLL("create monster",       "LEP GEX VEN ZEA",  1,  45, 200),
 SCROLL("taming",                   "PRIRUTSENIE",  1,  10, 200),
 SCROLL("genocide",                  "ELBIB YLOH",  1,  10, 300),
 SCROLL("light",                 "VERR YED HORRE",  1,  70,  50),
-SCROLL("time",                   "TEMPUS FUFGIT",  1,  20, 100),
-SCROLL("web",                     "OCTAHEXAOCTA",  1,  20,  50),
+SCROLL("time",                   "TEMP USF UGIT",  1,  20, 100), /* tempus fugit */
+SCROLL("web",                     "OCTAHEXAOCTA",  1,  20,  50), /* 868 */
 SCROLL("teleportation",        "VENZAR BORGAVVE",  1,  55, 100),
 SCROLL("gold detection",                 "THARR",  1,  33, 100),
 SCROLL("food detection",               "YUM YUM",  1,  25, 100),
 SCROLL("identify",                  "KERNOD WEL",  1, 180,  20),
-SCROLL("pure law",                   "TRATS ARL",  1,   5, 200),
-SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200),
-SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200),
+SCROLL("pure law",                   "TRATS ARL",  1,   5, 200), /* LRA START */
+SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200), /* Jabberwocky */
+SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200), /* Tlon Uqbar */
 SCROLL("magic mapping",              "ELAM EBOW",  1,  45, 100),
 SCROLL("amnesia",                   "DUAM XNAHT",  1,  30, 200),
 SCROLL("fire",                  "ANDOVA BEGARIN",  1,  25, 100),
 SCROLL("earth",                          "KIRJE",  1,  18, 200),
 SCROLL("punishment",            "VE FORBRYDERNE",  1,  15, 300),
 SCROLL("charging",                "HACKEM MUCHE",  1,  15, 300),
-SCROLL("cloning",             "TOIL AND TROUBLE",  1,  10, 300),
+SCROLL("cloning",             "TOIL AND TROUBLE",  1,  10, 300), /* Macbeth */
 SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
     /* Extra descriptions, shuffled into use at start of new game.
      * Code in win/share/tilemap.c depends on SCR_STINKING_CLOUD preceding
@@ -921,6 +921,13 @@ SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
      * tilemap.c must be modified to match.
      */
 SCROLL(None,      "FOOBIE BLETCH",  1,   0, 100),
+SCROLL(None,            "NYEHEHE",  1,   0, 100), /* laughing noise */
+SCROLL(None,      "ELPHE MONATER",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,               "ABAJ",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,     "CONGLATURATION",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,       "DESUM TETRAL",  1,   0, 100),
+SCROLL(None,            "NHINRIL",  1,   0, 100), /* meta */
+SCROLL(None,          "ISAY INAY",  1,   0, 100), /* meta */
 SCROLL(None,              "TEMOV",  1,   0, 100),
 SCROLL(None,         "GARVEN DEH",  1,   0, 100),
 SCROLL(None,            "READ ME",  1,   0, 100),
