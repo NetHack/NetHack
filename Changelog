@@ -227,60 +227,78 @@ Dungeon Generation
   Foocubi.
 
 New Monster Spells
-- Sonic Scream
-- Gas Cloud
-- Slime Spray
+- Sonic Scream: High level spell that does a large amount of damage, but is
+  prevented if the player is deaf.
+- Gas Cloud: Generates a cloud of poison gas on the square of the player.
+- Slime Spray: Can potentially disarm the player.
 
 New Items
-- Ornate Mace
-- Silver Mace
-- Bone Knife
-- Throwing Axe
-- Razor Whip
-- Grain Scythe
-- Earmuff (pluralization to "Earmuffs" is currently WIP)
-- Flowing Dress
-- Snappy Tuxedo
-- Iron Mantle
-- Cloak of Flight
-- Cloak of Reflection
-- Tower Shield
-- Hide Shield
-- Shield of Resonance
-- Rogues Gloves
-- Boxing Gloves
-- Amulet of Drain Resistance
-- Amulet of Nausea
-- Amulet of Danger
-- Mask
-- Helm of Opaque Thoughts
-- Playing Card Deck
-- Deck of Fate
-- Pinch of Catnip
-- Potion of Reflection
+- Ornate Mace: Not randomly generated, used for Sharur.
+- Silver Mace: Mace with silver properties.
+- Bone Knife: If wielded, will increase the potency of offerings at altars,
+  unless cursed. If cursed, offering with it will bring about the wrath of your
+  god.
+- Throwing Axe: Similar to a regular axe, but treated as a throwing weapon and
+  deals slightly less damage.
+- Razor Whip: The metal counterpart of a bullwhip, which does a larger amount of
+  physical damage.
+- Grain Scythe: Not randomly generated, used for Reaper.
+- Earmuff (pluralization to "Earmuffs" is currently WIP): Wearing these deafens
+  the player.
+- Flowing Dress: Currently no special abilities.
+- Snappy Tuxedo: Currently no special abilities.
+- Iron Mantle: Heavy metal cloak which grants a larger AC bonus than its
+  counterparts.
+- Cloak of Flight: Cloak that grants flying.
+- Cloak of Reflection: Cloak that grants reflection.
+- Tower Shield: Shield that grants AC but is very heavy.
+- Hide Shield: Currently no special abilities.
+- Shield of Resonance: A shield which grants sonic resistance. When
+  unidentified, this has the same appearance as a shield of reflection.
+- Rogues Gloves: Grant searching.
+- Boxing Gloves: Increased chance of stunning with unarmed strikes.
+- Amulet of Drain Resistance: Grants drain resistance.
+- Amulet of Nausea: Causes nausea while worn.
+- Amulet of Danger: Grants infravision, but increases the difficulty of monsters
+  spawned.
+- Mask: Wearing a mask polymorphs you permanently until it is removed. Removing
+  it for any reason degrades the BCU status. Cursed masks will break and damage
+  you. Potentially part of an ascension kit.
+- Helm of Opaque Thoughts: Grants psionic resistance.
+- Playing Card Deck: The messages this deck yields can potentially correlate to
+  your luck.
+- Deck of Fate: An extremely risky items that can potentially grant wishes or
+  end your run. Appears the same as a playing card deck.
+- Pinch of Catnip: Confuses and tames felines.
+- Potion of Reflection: Grants temporary reflection.
 - Scroll of Cloning
-- Scroll of Pure Law
-- Scroll of True Neutrality
-- Scroll of Raw Chaos
-- Wand of Healing
-- Wand of Wonder
-- Wand of Acid
-- Wand of Poison Gas
-- Wand of Sonics
-- Wand of Psionics
-- Bony Quill
-- Ooze Dragon Scale Mail
-- Razor Dragon Scale Mail
-- Filth Dragon Scale Mail
-- Hex Dragon Scale Mail
-- Void Dragon Scale Mail
-- Purple Dragon Scale Mail
-- Ooze Dragon Scales
-- Razor Dragon Scales
-- Filth Dragon Scales
-- Hex Dragon Scales
-- Void Dragon Scales
-- Purple Dragon Scales
+- Scroll of Pure Law: All aligned scrolls allow an automatically successful
+  prayer when read if the player is coaligned, and otherwise yield the wrath
+  of the deity.
+- Scroll of True Neutrality: See scroll of pure law.
+- Scroll of Raw Chaos: See scroll of raw chaos.
+- Wand of Healing: Wand that acts as a heal spell.
+- Wand of Wonder: Wand that randomly mimics a different wand when zapped or
+  engraved with, making engrave-IDing slightly less reliable.
+- Wand of Acid: Shoots rays of acid, like yellow dragons.
+- Wand of Poison Gas: Shoots a blast of poison gas.
+- Wand of Sonics: Causes sonic damage, which is hard to resist, but also
+  destroys many types of items.
+- Wand of Psionics: Causes psionic damage, which only harms targets with a mind,
+  but cannot be reflected.
+- Bony Quill: Not randomly generated, used by manticores.
+- Ooze Dragon Scale Mail: Grants acid resistance.
+- Razor Dragon Scale Mail: Grants speed.
+- Filth Dragon Scale Mail: Grants sickness resistance.
+- Hex Dragon Scale Mail: Grants magic resistance.
+- Void Dragon Scale Mail: Grants disintegration resistance.
+- Purple Dragon Scale Mail: Grants sonic resistance.
+- Ooze Dragon Scales: Grants acid resistance.
+- Razor Dragon Scales: Grants speed.
+- Filth Dragon Scales: Grants sickness resistance.
+- Hex Dragon Scales: Grants magic resistance.
+- Void Dragon Scales: Grants disintegration resistance.
+- Purple Dragon Scales: Grants sonic resistance.
 
 New Monsters
 - Giant Fly
