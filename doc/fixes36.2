@@ -40,6 +40,12 @@ windows-tty: Use nhraykey by default if the players keyboard layout is
 windows-tty: We now support changing altkeyhandler in game
 windows: Added ntassert() mechanism for Windows based port use
 tty: significant optimizations for performance and per field rendering
+unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
+	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
+	replace with $(QUIETCC) which operates the same but defaults to
+	verbose so doesn't use '$<' for multi-prerequisite targets unless
+	specifically requested; use 'make QUIETCC=1 <target>' to get the
+	3.6.1 behavior back
 
 
 General New Features

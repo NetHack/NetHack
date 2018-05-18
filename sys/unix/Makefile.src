@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1526687360 2018/05/18 23:49:20 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.55 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -343,7 +343,13 @@ AWK	= nawk
 # will proceed without it
 GITINFO=1
 
-#VERBOSEMAKE = 1
+# if you change this to 1, feedback while building will omit -Dthis -Wthat
+# -Isomewhere so that each file being compiled is listed on one short line;
+# it requires support for '$<' in rules with more than one prerequisite
+# (rather than just in suffix default rule), such as is implemented by
+# gnu make and others which have picked up its extensions;
+# allowed values are 0, 1, and empty (which behaves like 0)
+QUIETCC=0
 
 # ----------------------------------------
 #
@@ -353,7 +359,7 @@ GITINFO=1
 # {unixconf.h, pcconf.h, tosconf.h}, and possibly system.h
 
 # Verbosity definitions, begin
-#   Set VERBOSEMAKE=1 to output more stuff.
+#   Set QUIETCC=1 above to output less feedback while building.
 #   CC and CXX obey verbosity, LD and LINK don't.
 #   AT is @ when not verbose, empty otherwise
 ACTUAL_CC := $(CC)
@@ -361,23 +367,25 @@ ACTUAL_CXX := $(CXX)
 ACTUAL_LD := $(LD)
 ACTUAL_LINK := $(LINK)
 
-CC_V0 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC_V0 = $(ACTUAL_CC)
 CC_V = $(CC_V0)
-CC_V1 = $(ACTUAL_CC)
-CC = $(CC_V$(VERBOSEMAKE))
+CC_V1 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC = $(CC_V$(QUIETCC))
 
-CXX_V0 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX_V0 = $(ACTUAL_CXX)
 CXX_V = $(CXX_V0)
-CXX_V1 = $(ACTUAL_CXX)
-CXX = $(CXX_V$(VERBOSEMAKE))
+CXX_V1 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX = $(CXX_V$(QUIETCC))
 
+# LD and LINK might be based on invoking CC and may not be able to substitute
+# for QUIETCC, so feedback from them is handled differently (via $AT)
 LD = $(ACTUAL_LD)
 LINK = $(ACTUAL_LINK)
 
-AT_V0 := @
+AT_V0 :=
 AT_V := $(AT_V0)
-AT_V1 :=
-AT = $(AT_V$(VERBOSEMAKE))
+AT_V1 := @
+AT = $(AT_V$(QUIETCC))
 # Verbosity, end
 
 MAKEDEFS = ../util/makedefs
