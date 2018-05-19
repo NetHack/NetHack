@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1519598527 2018/02/25 22:42:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1526769961 2018/05/19 22:46:01 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2865,21 +2865,41 @@ coord *pos;
 int min_range, max_range;
 {
     struct monst *mtmp;
-    struct monst *selmon = (struct monst *) 0;
+    coord mpos;
+    boolean impaired;
+    int x, y, lo_x, hi_x, lo_y, hi_y, rt, glyph;
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame
-            && cansee(mtmp->mx, mtmp->my)
-            && distu(mtmp->mx, mtmp->my) <= max_range
-            && distu(mtmp->mx, mtmp->my) >= min_range) {
-            if (selmon)
-                return FALSE;
-            selmon = mtmp;
+    if (Blind)
+        return FALSE; /* must be able to see target location */
+    impaired = (Confusion || Stunned || Hallucination);
+    mpos.x = mpos.y = 0; /* no candidate location yet */
+    rt = isqrt(max_range);
+    lo_x = max(u.ux - rt, 1), hi_x = min(u.ux + rt, COLNO - 1);
+    lo_y = max(u.uy - rt, 0), hi_y = min(u.uy + rt, ROWNO - 1);
+    for (x = lo_x; x <= hi_x; ++x) {
+        for (y = lo_y; y <= hi_y; ++y) {
+            if (distu(x, y) < min_range || distu(x, y) > max_range
+                || !isok(x, y) || !cansee(x, y))
+                continue;
+            glyph = glyph_at(x, y);
+            if (!impaired
+                && glyph_is_monster(glyph)
+                && (mtmp = m_at(x, y)) != 0
+                && (mtmp->mtame || (mtmp->mpeaceful && flags.confirm)))
+                continue;
+            if (glyph_is_monster(glyph)
+                || glyph_is_warning(glyph)
+                || glyph_is_invisible(glyph)
+                || (glyph_is_statue(glyph) && impaired)) {
+                if (mpos.x)
+                    return FALSE; /* more than one candidate location */
+                mpos.x = x, mpos.y = y;
+            }
         }
-    if (!selmon)
-        return FALSE;
-    pos->x = selmon->mx;
-    pos->y = selmon->my;
+    }
+    if (!mpos.x)
+        return FALSE; /* no candidate location */
+    *pos = mpos;
     return TRUE;
 }
 
@@ -2887,8 +2907,8 @@ static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
 STATIC_OVL boolean
-get_valid_polearm_position(x,y)
-int x,y;
+get_valid_polearm_position(x, y)
+int x, y;
 {
     return (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
             && distu(x, y) >= polearm_range_min
@@ -2998,7 +3018,7 @@ struct obj *obj;
         return res;
     }
 
-    context.polearm.hitmon = NULL;
+    context.polearm.hitmon = (struct monst *) 0;
     /* Attack the monster there */
     bhitpos = cc;
     if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *) 0) {
