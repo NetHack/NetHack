@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526597284 2018/05/17 22:48:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1526709371 2018/05/19 05:56:11 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1515,7 +1515,7 @@ boolean from_configfile;
     return TRUE;
 }
 
-/* is str in the format of "[<>]?-?[0-9]+%?" regex */
+/* is str in the format of "[<>]?[-+]?[0-9]+%?" regex */
 STATIC_OVL boolean
 is_ltgt_percentnumber(str)
 const char *str;
@@ -1524,10 +1524,10 @@ const char *str;
 
     if (*s == '<' || *s == '>')
         s++;
-    if (*s == '-')
+    if (*s == '-' || *s == '+')
         s++;
-    /* note:  this doesn't match the regexp shown above since it doesn't
-       require at least one digit; but it's adequate for how it gets used */
+    if (!digit(*s))
+        return FALSE;
     while (digit(*s))
         s++;
     if (*s == '%')
@@ -1699,10 +1699,10 @@ boolean from_configfile;
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
     char tmpbuf[BUFSZ];
-    const char *aligntxt[] = {"chaotic", "neutral", "lawful"};
+    static const char *aligntxt[] = { "chaotic", "neutral", "lawful" };
     /* hu_stat[] from eat.c has trailing spaces which foul up comparisons */
-    const char *hutxt[] = {"Satiated", "", "Hungry", "Weak",
-                           "Fainting", "Fainted", "Starved"};
+    static const char *hutxt[] = { "Satiated", "", "Hungry", "Weak",
+                                   "Fainting", "Fainted", "Starved" };
 
     /* Examples:
         3.6.1:
@@ -1737,7 +1737,7 @@ boolean from_configfile;
         return parse_condition(s, sidx);
 
     ++sidx;
-    while(s[sidx]) {
+    while (s[sidx]) {
         char buf[BUFSZ], **subfields;
         int sf = 0;     /* subfield count */
         int kidx;
@@ -1752,14 +1752,14 @@ boolean from_configfile;
         if (!s[sidx][0])
             return TRUE;
 
-        memset((genericptr_t) &hilite, 0, sizeof(struct hilite_s));
+        memset((genericptr_t) &hilite, 0, sizeof (struct hilite_s));
         hilite.set = FALSE; /* mark it "unset" */
         hilite.fld = fld;
 
-        if (*s[sidx+1] == '\0' || !strcmpi(s[sidx], "always")) {
+        if (*s[sidx + 1] == '\0' || !strcmpi(s[sidx], "always")) {
             /* "field/always/color" OR "field/color" */
             always = TRUE;
-            if (*s[sidx+1] == '\0')
+            if (*s[sidx + 1] == '\0')
                 sidx--;
             goto do_rel;
         } else if (!strcmpi(s[sidx], "up") || !strcmpi(s[sidx], "down")) {
@@ -1771,7 +1771,8 @@ boolean from_configfile;
             goto do_rel;
         } else if (fld == BL_CAP
                    && is_fld_arrayvalues(s[sidx], enc_stat,
-                                         SLT_ENCUMBER, OVERLOADED+1, &kidx)) {
+                                         SLT_ENCUMBER, OVERLOADED + 1,
+                                         &kidx)) {
             txt = enc_stat[kidx];
             txtval = TRUE;
             goto do_rel;
@@ -1782,7 +1783,7 @@ boolean from_configfile;
             goto do_rel;
         } else if (fld == BL_HUNGER
                    && is_fld_arrayvalues(s[sidx], hutxt,
-                                         SATIATED, STARVED+1, &kidx)) {
+                                         SATIATED, STARVED + 1, &kidx)) {
             txt = hu_stat[kidx];   /* store hu_stat[] val, not hutxt[] */
             txtval = TRUE;
             goto do_rel;
@@ -1793,11 +1794,11 @@ boolean from_configfile;
             tmp = s[sidx];
             if (strchr(tmp, '%'))
                percent = TRUE;
-            if (strchr(tmp, '<'))
+            if (*tmp == '<')
                 lt = TRUE;
-            if (strchr(tmp, '>'))
+            else if (*tmp == '>')
                 gt = TRUE;
-            (void) stripchars(tmpbuf, "%<>", tmp);
+            (void) stripchars(tmpbuf, "%<>+", tmp);
             tmp = tmpbuf;
             while (*tmp) {
                 if (!index("0123456789", *tmp)
