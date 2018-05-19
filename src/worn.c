@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1496959481 2017/06/08 22:04:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1526728754 2018/05/19 11:19:14 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,7 +105,8 @@ long mask;
                 }
             }
     }
-    update_inventory();
+    if (!restoring)
+        update_inventory();
 }
 
 /* called e.g. when obj is destroyed */
@@ -136,7 +137,9 @@ register struct obj *obj;
             if ((p = w_blocks(obj, wp->w_mask)) != 0)
                 u.uprops[p].blocked &= ~wp->w_mask;
         }
-    update_inventory();
+    /* setnotworn() isn't called during restore but parallel setworn() */
+    if (!restoring)
+        update_inventory();
 }
 
 /* return a bitmask of the equipment slot(s) a given item might be worn in */
