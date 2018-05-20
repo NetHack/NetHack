@@ -50,27 +50,27 @@
 #define MS_BOAST 39     /* giants */
 #define MS_CHIMERA 40   /* chimera */
 
-#define MR_FIRE 0x01      /* resists fire */
-#define MR_COLD 0x02      /* resists cold */
-#define MR_SLEEP 0x04     /* resists sleep */
-#define MR_DISINT 0x08    /* resists disintegration */
-#define MR_ELEC 0x10      /* resists electricity */
-#define MR_POISON 0x20    /* resists poison */
-#define MR_ACID 0x40      /* resists acid */
-#define MR_STONE 0x80     /* resists petrification */
-#define MR_SONIC 0x0100   /* resists sonic */
-#define MR_PSYCHIC 0x0200 /* resists psychic */
+#define MR_FIRE 0x00000001L      /* resists fire */
+#define MR_COLD 0x00000002L      /* resists cold */
+#define MR_SLEEP 0x00000004L     /* resists sleep */
+#define MR_DISINT 0x00000008L    /* resists disintegration */
+#define MR_ELEC 0x00000010L      /* resists electricity */
+#define MR_POISON 0x00000020L    /* resists poison */
+#define MR_ACID 0x00000040L      /* resists acid */
+#define MR_STONE 0x00000080L     /* resists petrification */
+#define MR_SONIC 0x00000100L   /* resists sonic */
+#define MR_PSYCHIC 0x00000200L /* resists psychic */
 /* other resistances: magic, sickness */
 /* other conveyances: teleport, teleport control, telepathy */
 
 /* individual resistances */
-#define MR2_SEE_INVIS 0x0100 /* see invisible */
-#define MR2_LEVITATE 0x0200  /* levitation */
-#define MR2_WATERWALK 0x0400 /* water walking */
-#define MR2_MAGBREATH 0x0800 /* magical breathing */
-#define MR2_DISPLACED 0x1000 /* displaced */
-#define MR2_STRENGTH 0x2000  /* gauntlets of power */
-#define MR2_FUMBLING 0x4000  /* clumsy */
+#define MR2_SEE_INVIS 0x00000400L /* see invisible */
+#define MR2_LEVITATE 0x00000800L  /* levitation */
+#define MR2_WATERWALK 0x00001000L /* water walking */
+#define MR2_MAGBREATH 0x00002000L /* magical breathing */
+#define MR2_DISPLACED 0x00004000L /* displaced */
+#define MR2_STRENGTH 0x00008000L  /* gauntlets of power */
+#define MR2_FUMBLING 0x00010000L  /* clumsy */
 
 #define M1_FLY 0x00000001L         /* can fly or float */
 #define M1_SWIM 0x00000002L        /* can traverse water */

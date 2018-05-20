@@ -355,10 +355,10 @@ boolean on, silently;
         case PROTECTION:
             break;
         default:
-            if (which <= 8) { /* 1 thru 8 correspond to MR_xxx mask values */
-                /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
+            if (which <= 10) { /* 1 thru 10 correspond to MR_xxx mask values */
+                /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE,SONIC,PSYCHIC */
                 mask = (uchar) (1 << (which - 1));
-                mon->mintrinsics |= (unsigned short) mask;
+                mon->mintrinsics |= (unsigned long) mask;
             }
             break;
         }
@@ -383,6 +383,8 @@ boolean on, silently;
         case POISON_RES:
         case ACID_RES:
         case STONE_RES:
+        case SONIC_RES:
+        case PSYCHIC_RES:
             mask = (uchar) (1 << (which - 1));
             /* If the monster doesn't have this resistance intrinsically,
                check whether any other worn item confers it.  Note that
@@ -394,7 +396,7 @@ boolean on, silently;
                         && (int) objects[otmp->otyp].oc_oprop == which)
                         break;
                 if (!otmp)
-                    mon->mintrinsics &= ~((unsigned short) mask);
+                    mon->mintrinsics &= ~((unsigned long) mask);
             }
             break;
         default:
