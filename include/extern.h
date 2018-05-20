@@ -1705,6 +1705,7 @@ E char *FDECL(thesimpleoname, (struct obj *));
 E char *FDECL(bare_artifactname, (struct obj *));
 E char *FDECL(makeplural, (const char *));
 E char *FDECL(makesingular, (const char *));
+E short FDECL(name_to_otyp, (const char *));
 E struct obj *FDECL(readobjnam, (char *, struct obj *));
 E int FDECL(rnd_class, (int, int));
 E const char *FDECL(suit_simple_name, (struct obj *));
@@ -2320,6 +2321,7 @@ E void FDECL(book_disappears, (struct obj *));
 E void FDECL(book_substitution, (struct obj *, struct obj *));
 E void NDECL(age_spells);
 E int NDECL(docast);
+E const char *FDECL(spelltypemnemonic, (int));
 E int FDECL(spell_skilltype, (int));
 E int FDECL(spelleffects, (int, BOOLEAN_P));
 E void NDECL(losespells);
@@ -2860,6 +2862,7 @@ E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */
 
+E int FDECL(ink_cost, (short));
 E int FDECL(dowrite, (struct obj *));
 
 /* ### zap.c ### */
