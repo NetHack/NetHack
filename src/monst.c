@@ -1488,7 +1488,7 @@ NEARDATA struct permonst mons[] = {
        capable of eating through even the best-prepared character in only a few
        turns. They may need to be reduced in power at some point. */
     MON("void dragon", S_DRAGON, LVL(25, 9, -10, 20, 0),
-        (G_NOGENO | G_NOCORPSE | G_NOGEN),
+        (G_NOCORPSE | G_NOGEN),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_VOID, 2, 4), ATTK(AT_CLAW, AD_VOID, 2, 4), NO_ATTK,
           NO_ATTK),
