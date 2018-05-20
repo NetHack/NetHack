@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526709371 2018/05/19 05:56:11 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1526804444 2018/05/20 08:20:44 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1349,7 +1349,7 @@ int *colorptr;
 {
     int bestcolor = NO_COLOR;
     struct hilite_s *hl;
-    anything *value = (anything *)vp;
+    anything *value = (anything *) vp;
     char *txtstr, *cmpstr;
 
     if (!colorptr || fldidx < 0 || fldidx >= MAXBLSTATS)
@@ -1358,11 +1358,12 @@ int *colorptr;
     if (blstats[idx][fldidx].thresholds) {
         /* there are hilites set here */
         int max_pc = 0, min_pc = 100;
-        int max_val = 0, min_val = LARGEST_INT;
+        int max_val = -LARGEST_INT, min_val = LARGEST_INT;
         boolean exactmatch = FALSE;
 
         hl = blstats[idx][fldidx].thresholds;
 
+        /* min_/max_ are used to track best fit */
         while (hl) {
             switch (hl->behavior) {
             case BL_TH_VAL_PERCENTAGE:
@@ -1371,12 +1372,12 @@ int *colorptr;
                     min_pc = max_pc = hl->value.a_int;
                     exactmatch = TRUE;
                 } else if (hl->rel == LT_VALUE && !exactmatch
-                           && (hl->value.a_int >= pc)
+                           && (pc < hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = hl->value.a_int;
                 } else if (hl->rel == GT_VALUE && !exactmatch
-                           && (hl->value.a_int <= pc)
+                           && (pc > hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_pc = hl->value.a_int;
@@ -1398,13 +1399,13 @@ int *colorptr;
                     min_val = max_val = hl->value.a_int;
                     exactmatch = TRUE;
                 } else if (hl->rel == LT_VALUE && !exactmatch
-                           && (hl->value.a_int >= value->a_int)
-                           && (hl->value.a_int < min_val)) {
+                           && (value->a_int < hl->value.a_int)
+                           && (hl->value.a_int <= min_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = hl->value.a_int;
                 } else if (hl->rel == GT_VALUE && !exactmatch
-                           && (hl->value.a_int <= value->a_int)
-                           && (hl->value.a_int > max_val)) {
+                           && (value->a_int > hl->value.a_int)
+                           && (hl->value.a_int >= max_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_val = hl->value.a_int;
                 }
@@ -1535,7 +1536,7 @@ const char *str;
     return (*s == '\0');
 }
 
-/* does str only contain "<>0-9%" chars */
+/* does str only contain "<>-+0-9%" chars */
 STATIC_OVL boolean
 has_ltgt_percentnumber(str)
 const char *str;
@@ -1543,7 +1544,7 @@ const char *str;
     const char *s = str;
 
     while (*s) {
-        if (!index("<>-0123456789%", *s))
+        if (!index("<>-+0123456789%", *s))
             return FALSE;
         s++;
     }
@@ -1761,73 +1762,80 @@ boolean from_configfile;
             always = TRUE;
             if (*s[sidx + 1] == '\0')
                 sidx--;
-            goto do_rel;
         } else if (!strcmpi(s[sidx], "up") || !strcmpi(s[sidx], "down")) {
             if (!strcmpi(s[sidx], "down"))
                 down = TRUE;
             else
                 up = TRUE;
             changed = TRUE;
-            goto do_rel;
         } else if (fld == BL_CAP
                    && is_fld_arrayvalues(s[sidx], enc_stat,
                                          SLT_ENCUMBER, OVERLOADED + 1,
                                          &kidx)) {
             txt = enc_stat[kidx];
             txtval = TRUE;
-            goto do_rel;
         } else if (fld == BL_ALIGN
                    && is_fld_arrayvalues(s[sidx], aligntxt, 0, 3, &kidx)) {
             txt = aligntxt[kidx];
             txtval = TRUE;
-            goto do_rel;
         } else if (fld == BL_HUNGER
                    && is_fld_arrayvalues(s[sidx], hutxt,
                                          SATIATED, STARVED + 1, &kidx)) {
             txt = hu_stat[kidx];   /* store hu_stat[] val, not hutxt[] */
             txtval = TRUE;
-            goto do_rel;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
-            goto do_rel;
         } else if (is_ltgt_percentnumber(s[sidx])) {
-            tmp = s[sidx];
+            tmp = s[sidx]; /* is_ltgt_() guarantees [<>]?[-+]?[0-9]+%? */
             if (strchr(tmp, '%'))
                percent = TRUE;
             if (*tmp == '<')
                 lt = TRUE;
             else if (*tmp == '>')
                 gt = TRUE;
-            (void) stripchars(tmpbuf, "%<>+", tmp);
-            tmp = tmpbuf;
-            while (*tmp) {
-                if (!index("0123456789", *tmp)
-                    && (*tmp != '-' || tmp > tmpbuf))
-                    return FALSE;
-                tmp++;
-            }
+            /* '%', '<', '>' have served their purpose, unary '+' is
+               just decorative, so get rid of them, leaving -?[0-9]+ */
+            tmp = stripchars(tmpbuf, "%<>+", tmp);
             numeric = TRUE;
-            tmp = tmpbuf;
-            if (strlen(tmp) > 0) {
-                dt = initblstats[fld].anytype;
-                if (percent)
-                    dt = ANY_INT;
-                (void) s_to_anything(&hilite.value, tmp, dt);
-            } else
-                return FALSE;
-            if (!hilite.value.a_void && (strcmp(tmp, "0") != 0))
-               return FALSE;
+            dt = percent ? ANY_INT : initblstats[fld].anytype;
+            (void) s_to_anything(&hilite.value, tmp, dt);
+            if (dt == ANY_INT
+                /* AC is the only field where negative values make sense but
+                   accept >-1 for other fields since we don't support >=0
+                   which someone might want to use in a catch-all rule */
+                && (hilite.value.a_int < (fld == BL_AC ? -128 : gt ? -1 : 0)
+                /* percentages have another more comprehensive check below */
+                    || hilite.value.a_int > (percent ? 100 : LARGEST_INT))) {
+                    config_error_add(
+                           "hilite_status threshold '%s%d%s' is out of range",
+                                     gt ? ">" : lt ? "<" : "",
+                                     hilite.value.a_int,
+                                     percent ? "%" : "");
+                    return FALSE;
+            }
+            /*
+             * Note:  the only check for ANY_LONG would be
+             *   if (hilite.value.a_long < (gt ? -1L : 0L)) { }
+             * so we might as well skip it instead of replicating
+             * the above config_error_add() for hilite.value.a_long.
+             * The only non-int/non-long numeric is BL_HUNGER
+             * (unsigned: ANY_UINT) and it should be changed to int
+             * instead of trying to support one oddball field,
+             * particularly since users are encouraged to use the
+             * "satiated"/"hungry"/"weak"/&c strings instead of
+             * their internal numeric values.
+             */
         } else if (initblstats[fld].anytype == ANY_STR) {
             txt = s[sidx];
             txtval = TRUE;
-            goto do_rel;
         } else {
             config_error_add(has_ltgt_percentnumber(s[sidx])
                  ? "Wrong format '%s', expected a threshold number or percent"
-                 : "Unknown behavior '%s'", s[sidx]);
+                 : "Unknown behavior '%s'",
+                             s[sidx]);
             return FALSE;
         }
-do_rel:
+
         /* relationships { LT_VALUE, GT_VALUE, EQ_VALUE} */
         if (gt)
             hilite.rel = GT_VALUE;
@@ -2666,7 +2674,7 @@ const char *str;
     start_menu(tmpwin);
 
     if (str)
-        Sprintf(buf, "%s or less", str);
+        Sprintf(buf, "%s than %s", (fld == BL_AC) ? "Better" : "Less", str);
     else
         Sprintf(buf, "Value goes down");
     any = zeroany;
@@ -2684,7 +2692,7 @@ const char *str;
              buf, MENU_UNSELECTED);
 
     if (str)
-        Sprintf(buf, "%s or more", str);
+        Sprintf(buf, "%s than %s", (fld == BL_AC) ? "Worse" : "More", str);
     else
         Sprintf(buf, "Value goes up");
     any = zeroany;
