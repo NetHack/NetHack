@@ -17,7 +17,9 @@
 #endif
 #include <ctype.h>
 #include "win32api.h"
+#ifdef TTY_GRAPHICS
 #include "wintty.h"
+#endif
 #ifdef WIN32
 
 /*
@@ -227,7 +229,14 @@ Delay(int ms)
     (void) Sleep(ms);
 }
 
+#ifdef TTY_GRAPHICS
 extern void NDECL(backsp);
+#else
+void
+backsp()
+{
+}
+#endif
 
 void
 win32_abort()
@@ -481,11 +490,10 @@ void ntassert_failed(const char * exp, const char * file, int line)
 /* nethack_enter_winnt() is the first thing called from main */
 void nethack_enter_winnt()
 {
-#ifdef WIN32CON
+#ifdef TTY_GRAPHICS
     nethack_enter_nttty();
 #endif
 }
-
 #endif /* WIN32 */
 
 /*winnt.c*/

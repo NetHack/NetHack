@@ -501,6 +501,15 @@ int code;
     exit(code);
 }
 
+#ifdef WIN32
+#ifndef TTY_GRAPHICS
+void
+synch_cursor()
+{
+}
+#endif
+#endif
+
 /* Chdir back to original directory
  */
 #ifdef TOS

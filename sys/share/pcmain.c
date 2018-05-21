@@ -310,7 +310,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
 #ifdef WIN32
     save_getreturn_status = getreturn_enabled;
+#ifdef TTY_GRAPHICS
     raw_clear_screen();
+#endif
     getreturn_enabled = TRUE;
     check_recordfile((char *) 0);
 #endif
@@ -484,12 +486,14 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             NHWinMainInit();
         else
     */
+#ifdef TTY_GRAPHICS
     if (!strncmpi(windowprocs.name, "tty", 3)) {
         iflags.use_background_glyph = FALSE;
         nttty_open(1);
     } else {
         iflags.use_background_glyph = TRUE;
     }
+#endif
 #endif
 #endif
 
@@ -510,7 +514,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     process_options(argc, argv);
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) && defined(TTY_GRAPHICS)
     toggle_mouse_support(); /* must come after process_options */
 #endif
 
@@ -791,14 +795,11 @@ char *argv[];
 #endif
 #ifdef WIN32
         case 'w': /* windowtype */
+#ifdef TTY_GRAPHICS
             if (strncmpi(&argv[0][2], "tty", 3)) {
                 nttty_open(1);
             }
-            /*
-                        else {
-                            NHWinMainInit();
-                        }
-            */
+#endif
             config_error_init(FALSE, "command line", FALSE);
             choose_windows(&argv[0][2]);
             config_error_done();

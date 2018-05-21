@@ -5354,8 +5354,10 @@ dotravel(VOID_ARGS)
 }
 
 #ifdef PORT_DEBUG
+#if defined(WIN32) && defined(TTY_GRAPHICS)
 extern void NDECL(win32con_debug_keystrokes);
 extern void NDECL(win32con_handler_info);
+#endif
 
 int
 wiz_port_debug()
@@ -5369,7 +5371,7 @@ wiz_port_debug()
         char *menutext;
         void NDECL((*fn));
     } menu_selections[] = {
-#ifdef WIN32
+#if defined(WIN32) && defined(TTY_GRAPHICS)
         { "test win32 keystrokes (tty only)", win32con_debug_keystrokes },
         { "show keystroke handler information (tty only)",
           win32con_handler_info },

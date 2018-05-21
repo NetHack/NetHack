@@ -96,11 +96,13 @@ clear_screen()
     return;
 }
 
+#ifdef TTY_GRAPHICS
 void
 backsp()
 {
     return;
 }
+#endif
 
 int
 has_color(int color)
@@ -158,11 +160,13 @@ VA_DECL(const char *, s)
     return;
 }
 
+#ifdef TTY_GRAPHICS
 void
 synch_cursor()
 {
     return;
 }
+#endif
 
 void
 more()
