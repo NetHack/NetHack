@@ -3018,7 +3018,7 @@ struct permonst _mons2[] = {
         HI_LORD),
     MON("Mephisto", S_DEMON, LVL(105, 12, -17, 90, 20),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
-        A(ATTK(AT_BUTT, AD_PHYS, 4, 4), ATTK(AT_MAGC, AD_FIRE, 6, 4),
+        A(ATTK(AT_BUTT, AD_PHYS, 4, 4), ATTK(AT_MAGC, AD_FIRE, 4, 4),
           ATTK(AT_CLAW, AD_PHYS, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1500, 500, MS_BRIBE, MZ_HUGE), MR_FIRE | MR_COLD | MR_POISON, 0,
