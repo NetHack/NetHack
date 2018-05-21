@@ -876,7 +876,8 @@ status_finish()
     int i;
 
     /* call the window port cleanup routine first */
-    (*windowprocs.win_status_finish)();
+    if (windowprocs.win_status_finish)
+        (*windowprocs.win_status_finish)();
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {

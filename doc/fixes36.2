@@ -21,6 +21,9 @@ targetting with a polearm could give away location of hidden monster
 static prototype could be left orphaned depending on #defines in rip.c
 config file error handling routines were calling xx_wait_synch early
 	even before the window system was initialized; add a default routine
+status_finish() in botl.c would unconditionally invoke the window port's 
+	win_status_finish() routine which was problematic if the windowport
+	wasn't initialized yet
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
