@@ -1001,6 +1001,7 @@ register int pm;
         (void) eatmdone();
 
     switch (pm) {
+    case PM_MYSTIC_SCARAB:
     case PM_NEWT:
         /* MRKR: "eye of newt" may give small magical energy boost */
         if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
