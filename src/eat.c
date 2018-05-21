@@ -1130,7 +1130,7 @@ register int pm;
             tmp = 0;
         /* if something was chosen, give it now (givit() might fail) */
         if (tmp == -1)
-            gainstr((struct obj *) 0, 0, TRUE);
+	    (void) gainstr((struct obj *) 0, 0, TRUE);
         else if (tmp > 0)
             givit(tmp, ptr);
         break;
@@ -1295,6 +1295,7 @@ const char *mesg;
     const char *what;
     int which, mnum, r;
     struct obj *tin = context.tin.tin;
+    boolean gained_str;
 
     r = tin_variety(tin, FALSE);
     if (tin->otrapped || (tin->cursed && r != HOMEMADE_TIN && !rn2(8))) {
@@ -1393,10 +1394,12 @@ const char *mesg;
          * conduct update, side-effects, shop handling, and nutrition.
          */
         u.uconduct.food++; /* don't need vegetarian checks for spinach */
+        gained_str = gainstr(tin, 0, FALSE);
         if (!tin->cursed)
             pline("This makes you feel like %s!",
-                  Hallucination ? "Swee'pea" : "Popeye");
-        gainstr(tin, 0, FALSE);
+                  Hallucination ? "Swee'pea" :
+		  (gained_str ? "Popeye" :
+		   (flags.female ? "Olive Oyl" : "Bluto")));
 
         tin = costly_tin(COST_OPEN);
 
@@ -2175,7 +2178,7 @@ struct obj *otmp;
         break;
     case LUMP_OF_ROYAL_JELLY:
         /* This stuff seems to be VERY healthy! */
-        gainstr(otmp, 1, TRUE);
+        (void) gainstr(otmp, 1, TRUE);
         if (Upolyd) {
             u.mh += otmp->cursed ? -rnd(20) : rnd(20);
             if (u.mh > u.mhmax) {
