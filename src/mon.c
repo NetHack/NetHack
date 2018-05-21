@@ -162,6 +162,7 @@ int mndx;
     case PM_VAMPIRE_MAGE:
     case PM_HUMAN_ZOMBIE:
     case PM_HUMAN_MUMMY:
+    case PM_DRAUGR:
         mndx = PM_HUMAN;
         break;
     case PM_GIANT_ZOMBIE:
