@@ -173,7 +173,7 @@ int msgflg; /* positive => no message, zero => message, and */
     return TRUE;
 }
 
-void
+boolean
 gainstr(otmp, incr, givemsg)
 struct obj *otmp;
 int incr;
@@ -189,7 +189,7 @@ boolean givemsg;
         else
             num = 1;
     }
-    (void) adjattrib(A_STR, (otmp && otmp->cursed) ? -num : num,
+    return adjattrib(A_STR, (otmp && otmp->cursed) ? -num : num,
                      givemsg ? -1 : 1);
 }
 
