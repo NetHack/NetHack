@@ -375,6 +375,7 @@ dochug(mtmp)
 register struct monst *mtmp;
 {
     register struct permonst *mdat;
+    register struct engr *ep = engr_at(mtmp->mx, mtmp->my);
     register int tmp = 0;
     int inrange, nearby, scared;
 
@@ -411,6 +412,16 @@ register struct monst *mtmp;
         if (Hallucination)
             newsym(mtmp->mx, mtmp->my);
         return 0;
+    }
+
+    /* check for warding words */
+    if (!mtmp->msleeping && !mtmp->mblinded) {
+        if (ep && !strcmp(ep->engr_txt, explengr)) {
+              if (cansee(mtmp->mux, mtmp->muy))
+                  pline("The engraving beneath %s explodes!", mon_nam(mtmp));
+              explode(mtmp->mx, mtmp->my, 10, d(3,4), TOOL_CLASS, EXPL_MAGICAL);
+              del_engr_at(mtmp->mx, mtmp->my);
+          }
     }
 
     /* not frozen or sleeping: wipe out texts written in the dust */

@@ -940,7 +940,7 @@ skip0:
         /* maybe make some graffiti */
         if (!rn2(27 + 3 * abs(depth(&u.uz)))) {
             char buf[BUFSZ];
-            const char *mesg = random_engraving(buf);
+            const char *mesg = random_engraving(buf, TRUE);
             if (mesg) {
                 do {
                     x = somex(croom);

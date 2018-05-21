@@ -55,6 +55,7 @@ NEARDATA char plname[PL_NSIZ] = DUMMY; /* player name */
 NEARDATA char pl_character[PL_CSIZ] = DUMMY;
 NEARDATA char pl_race = '\0';
 
+NEARDATA char explengr[BUFSZ] = DUMMY;
 NEARDATA char pl_fruit[PL_FSIZ] = DUMMY;
 NEARDATA struct fruit *ffruit = (struct fruit *) 0;
 

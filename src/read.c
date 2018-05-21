@@ -1504,6 +1504,33 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                                    TRUE);
         }
         break;
+    case SCR_WARDING_WORDS:
+        /* handle places where it is impossible to engrave */
+        if (is_lava(u.ux, u.uy) || is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)
+            || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+            || IS_FOUNTAIN(levl[u.ux][u.uy].typ) || u.uswallow
+            || !accessible(u.ux, u.uy)) {
+              strange_feeling(sobj,
+                  "You feel as if your vocabulary has been expanded.");
+              break;
+        }
+        /* create the engraving */
+        make_engr_at(u.ux, u.uy, explengr, moves, BURN);
+        /* notify the player */
+        if (!Blind) {
+            known = TRUE;
+            if (is_ice(u.ux, u.uy))
+                pline("The ice beneath you hisses as text appears.");
+            else
+                pline("The floor beneath you sizzles as text appears.");
+            if (sblessed) {
+                pline("You get the feeling that you should not read the engraving.");
+            } else if (scursed) {
+                pline("You cannot resist the temptation to read the engraving.");
+                read_engr_at(u.ux, u.uy);
+            }
+        }
+        break;
     case SCR_TIME:
         known = TRUE;
         if (confused || scursed) {

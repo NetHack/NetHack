@@ -2978,7 +2978,7 @@ struct obj *obj; /* wand or spell */
             case WAN_POLYMORPH:
             case SPE_POLYMORPH:
                 del_engr(e);
-                make_engr_at(x, y, random_engraving(buf), moves, (xchar) 0);
+                make_engr_at(x, y, random_engraving(buf, TRUE), moves, (xchar) 0);
                 break;
             case WAN_CANCELLATION:
             case SPE_CANCELLATION:

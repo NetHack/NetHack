@@ -697,7 +697,7 @@ E void FDECL(panictrace_setsignals, (BOOLEAN_P));
 
 /* ### engrave.c ### */
 
-E char *FDECL(random_engraving, (char *));
+E char *FDECL(random_engraving, (char *, BOOLEAN_P));
 E void FDECL(wipeout_text, (char *, int, unsigned));
 E boolean FDECL(can_reach_floor, (BOOLEAN_P));
 E void FDECL(cant_reach_floor, (int, int, BOOLEAN_P, BOOLEAN_P));

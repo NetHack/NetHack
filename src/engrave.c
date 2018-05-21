@@ -11,8 +11,9 @@
 STATIC_VAR NEARDATA struct engr *head_engr;
 
 char *
-random_engraving(outbuf)
+random_engraving(outbuf, wipe)
 char *outbuf;
+boolean wipe;
 {
     const char *rumor;
 
@@ -21,7 +22,8 @@ char *outbuf;
     if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor)
         (void) get_rnd_text(ENGRAVEFILE, outbuf);
 
-    wipeout_text(outbuf, (int) (strlen(outbuf) / 4), 0);
+    if (wipe)
+        wipeout_text(outbuf, (int) (strlen(outbuf) / 4), 0);
     return outbuf;
 }
 
@@ -378,6 +380,11 @@ int x, y;
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
             if (context.run > 1)
                 nomul(0);
+            if (!Blind && !strcmp(ep->engr_txt, explengr)) {
+                pline("As you read the words, the engraving explodes!");
+                explode(u.ux, u.uy, 10, d(3,4), TOOL_CLASS, EXPL_MAGICAL);
+                del_engr_at(u.ux, u.uy);
+            }
         }
     }
 }
@@ -699,7 +706,7 @@ doengrave()
                 if (oep) {
                     if (!Blind) {
                         type = (xchar) 0; /* random */
-                        (void) random_engraving(buf);
+                        (void) random_engraving(buf, TRUE);
                     }
                     dengr = TRUE;
                 }
