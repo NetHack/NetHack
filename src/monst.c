@@ -1079,7 +1079,7 @@ NEARDATA struct permonst mons[] = {
         SIZ(300, 300, MS_BUZZ, MZ_TINY), MR_POISON, MR_POISON,
         M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_POIS, M2_HOSTILE,
         M3_INFRAVISIBLE, CLR_RED),
-    MON("mystic scarab", S_XAN, LVL(7, 18, -20, 0, 0), (G_GENO | 3),
+    MON("mystic scarab", S_XAN, LVL(11, 18, -4, 0, 0), (G_GENO | 3),
         A(ATTK(AT_BITE, AD_PHYS, 5, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(400, 300, MS_BUZZ, MZ_LARGE), MR_POISON, MR_POISON,
