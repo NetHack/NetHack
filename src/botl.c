@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526982122 2018/05/22 09:42:02 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1527010852 2018/05/22 17:40:52 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -446,15 +446,16 @@ STATIC_DCL boolean FDECL(is_ltgt_percentnumber, (const char *));
 STATIC_DCL boolean FDECL(has_ltgt_percentnumber, (const char *));
 STATIC_DCL boolean FDECL(parse_status_hl2, (char (*)[QBUFSZ],BOOLEAN_P));
 STATIC_DCL boolean FDECL(parse_condition, (char (*)[QBUFSZ], int));
+STATIC_DCL boolean FDECL(noneoftheabove, (const char *));
 STATIC_DCL void FDECL(merge_bestcolor, (int *, int));
 STATIC_DCL void FDECL(get_hilite_color, (int, int, genericptr_t, int,
-                                                int, int *));
+                                         int, int *));
 STATIC_DCL unsigned long FDECL(match_str2conditionbitmask, (const char *));
 STATIC_DCL unsigned long FDECL(str2conditionbitmask, (char *));
 STATIC_DCL void FDECL(split_clridx, (int, int *, int *));
 STATIC_DCL char *FDECL(hlattr2attrname, (int, char *, int));
 STATIC_DCL void FDECL(status_hilite_linestr_add, (int, struct hilite_s *,
-                                            unsigned long, const char *));
+                                                unsigned long, const char *));
 STATIC_DCL void NDECL(status_hilite_linestr_done);
 STATIC_DCL int FDECL(status_hilite_linestr_countfield, (int));
 STATIC_DCL void NDECL(status_hilite_linestr_gather_conditions);
@@ -1308,6 +1309,20 @@ reset_status_hilites()
     context.botlx = TRUE;
 }
 
+/* test whether the text from a title rule matches the string for
+   title-while-polymorphed in the 'textmatch' menu */
+STATIC_OVL boolean
+noneoftheabove(hl_text)
+const char *hl_text;
+{
+    if (fuzzymatch(hl_text, "none of the above", "\" -_", TRUE)
+        || fuzzymatch(hl_text, "(polymorphed)", "()", TRUE)
+        || fuzzymatch(hl_text, "none of the above (polymorphed)",
+                      "\" -_()", TRUE))
+        return TRUE;
+    return FALSE;
+}
+
 STATIC_OVL void
 merge_bestcolor(bestcolor, newcolor)
 int *bestcolor;
@@ -1372,7 +1387,8 @@ int *colorptr;
         /* there are hilites set here */
         int max_pc = -1, min_pc = 101;
         int max_val = -LARGEST_INT, min_val = LARGEST_INT;
-        boolean exactmatch = FALSE, updown = FALSE, changed = FALSE;
+        boolean exactmatch = FALSE, updown = FALSE, changed = FALSE,
+                perc_or_abs = FALSE;
 
         /* min_/max_ are used to track best fit */
         for (hl = blstats[idx][fldidx].thresholds; hl; hl = hl->next) {
@@ -1381,33 +1397,43 @@ int *colorptr;
                updown rules to get the last one which qualifies */
             if ((updown || changed) && hl->behavior != BL_TH_UPDOWN)
                 continue;
+            /* among persistent highlights, if a 'percentage' or 'absolute'
+               rule has been matched, it takes precedence over 'always' */
+            if (perc_or_abs && hl->behavior == BL_TH_ALWAYS_HILITE)
+                continue;
 
             switch (hl->behavior) {
             case BL_TH_VAL_PERCENTAGE:
                 if (hl->rel == EQ_VALUE && pc == hl->value.a_int) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = max_pc = hl->value.a_int;
-                    exactmatch = TRUE;
-                } else if (hl->rel == LT_VALUE && !exactmatch
+                    exactmatch = perc_or_abs = TRUE;
+                } else if (exactmatch) {
+                    ; /* already found best fit, skip lt,ge,&c */
+                } else if (hl->rel == LT_VALUE
                            && (pc < hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = hl->value.a_int;
-                } else if (hl->rel == LE_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == LE_VALUE
                            && (pc <= hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = hl->value.a_int;
-                } else if (hl->rel == GT_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GT_VALUE
                            && (pc > hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_pc = hl->value.a_int;
-                } else if (hl->rel == GE_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GE_VALUE
                            && (pc >= hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_pc = hl->value.a_int;
+                    perc_or_abs = TRUE;
                 }
                 break;
             case BL_TH_UPDOWN:
@@ -1433,27 +1459,33 @@ int *colorptr;
                 if (hl->rel == EQ_VALUE && hl->value.a_int == value->a_int) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = max_val = hl->value.a_int;
-                    exactmatch = TRUE;
-                } else if (hl->rel == LT_VALUE && !exactmatch
+                    exactmatch = perc_or_abs = TRUE;
+                } else if (exactmatch) {
+                    ; /* already found best fit, skip lt,ge,&c */
+                } else if (hl->rel == LT_VALUE
                            && (value->a_int < hl->value.a_int)
                            && (hl->value.a_int <= min_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = hl->value.a_int;
-                } else if (hl->rel == LE_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == LE_VALUE
                            && (value->a_int <= hl->value.a_int)
                            && (hl->value.a_int <= min_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = hl->value.a_int;
-                } else if (hl->rel == GT_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GT_VALUE
                            && (value->a_int > hl->value.a_int)
                            && (hl->value.a_int >= max_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_val = hl->value.a_int;
-                } else if (hl->rel == GE_VALUE && !exactmatch
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GE_VALUE
                            && (value->a_int >= hl->value.a_int)
                            && (hl->value.a_int >= max_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_val = hl->value.a_int;
+                    perc_or_abs = TRUE;
                 }
                 break;
             case BL_TH_TEXTMATCH:
@@ -1461,7 +1493,8 @@ int *colorptr;
                 if (fldidx == BL_TITLE)
                     txtstr += (strlen(plname) + sizeof " the " - sizeof "");
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]
-                    && fuzzymatch(hl->textmatch, txtstr, " -_", TRUE)) {
+                    && (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)
+                        || (Upolyd && noneoftheabove(hl->textmatch)))) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                 }
                 break;
@@ -1524,12 +1557,11 @@ boolean from_configfile;
                     hsbuf[fldnum][ccount] = '\0';
                     op++;
                     continue;
-                } else {
-                    rslt = parse_status_hl2(hsbuf, from_configfile);
-                    if (!rslt) {
-                        badopt = TRUE;
-                        break;
-                    }
+                }
+                rslt = parse_status_hl2(hsbuf, from_configfile);
+                if (!rslt) {
+                    badopt = TRUE;
+                    break;
                 }
             }
             for (i = 0; i < MAX_THRESH; ++i) {
@@ -2350,7 +2382,10 @@ const char *str;
     tmp->fld = fld;
     tmp->hl = hl;
     tmp->mask = mask;
-    (void) stripchars(tmp->str, " ", str);
+    if (fld == BL_TITLE)
+        Strcpy(tmp->str, str);
+    else
+        (void) stripchars(tmp->str, " ", str);
     tmp->id = status_hilite_str_id;
 
     if ((nxt = status_hilite_str) != 0) {
@@ -2970,8 +3005,10 @@ choose_value:
         hilite.rel = lt_gt_eq;
         hilite.value = aval;
     } else if (behavior == BL_TH_UPDOWN) {
+        boolean ltok = (fld != BL_TIME), gtok = TRUE;
+
         lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
-                                                        TRUE, TRUE);
+                                                        ltok, gtok);
         if (lt_gt_eq == NO_LTEQGT)
             goto choose_behavior;
         Sprintf(colorqry, "Choose a color for when %s %s:",
@@ -3039,19 +3076,45 @@ choose_value:
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, hutxt[rv]);
         } else if (fld == BL_TITLE) {
-            const char *rolelist[9];
-            int i, rv;
+            const char *rolelist[3 * 9 + 1];
+            char mbuf[QBUFSZ], fbuf[QBUFSZ], obuf[QBUFSZ];
+            int i, j, rv;
 
-            for (i = 0; i < 9; i++)
-                rolelist[i] = (flags.female && urole.rank[i].f)
-                    ? urole.rank[i].f : urole.rank[i].m;
+            for (i = j = 0; i < 9; i++) {
+                Sprintf(mbuf, "\"%s\"", urole.rank[i].m);
+                if (urole.rank[i].f) {
+                    Sprintf(fbuf, "\"%s\"", urole.rank[i].f);
+                    Sprintf(obuf, "%s or %s",
+                            flags.female ? fbuf : mbuf,
+                            flags.female ? mbuf : fbuf);
+                } else {
+                    fbuf[0] = obuf[0] = '\0';
+                }
+                if (flags.female) {
+                    if (*fbuf)
+                        rolelist[j++] = dupstr(fbuf);
+                    rolelist[j++] = dupstr(mbuf);
+                    if (*obuf)
+                        rolelist[j++] = dupstr(obuf);
+                } else {
+                    rolelist[j++] = dupstr(mbuf);
+                    if (*fbuf)
+                        rolelist[j++] = dupstr(fbuf);
+                    if (*obuf)
+                        rolelist[j++] = dupstr(obuf);
+                }
+            }
+            rolelist[j++] = dupstr("\"none of the above (polymorphed)\"");
 
-            rv = query_arrayvalue(qry_buf, rolelist, 0, 9);
+            rv = query_arrayvalue(qry_buf, rolelist, 0, j);
+            if (rv >= 0) {
+                hilite.rel = TXT_VALUE;
+                Strcpy(hilite.textmatch, rolelist[rv]);
+            }
+            for (i = 0; i < j; i++)
+                free((genericptr_t) rolelist[i]), rolelist[i] = 0;
             if (rv < 0)
                 goto choose_behavior;
-
-            hilite.rel = TXT_VALUE;
-            Strcpy(hilite.textmatch, rolelist[rv]);
         } else {
             char inbuf[BUFSZ];
 
@@ -3137,9 +3200,25 @@ choose_color:
         pline("Added hilite condition/%s/%s",
               conditionbitmask2str(cond), clrbuf);
     } else {
+        char *p, *q;
+
         hilite.coloridx = clr | (atr << 8);
         hilite.anytype = initblstats[fld].anytype;
 
+        if (fld == BL_TITLE && (p = strstri(hilite.textmatch, " or ")) != 0) {
+            /* split menu choice "male-rank or female-rank" into two distinct
+               but otherwise identical rules, "male-rank" and "female-rank" */
+            *p = '\0'; /* chop off " or female-rank" */
+            /* new rule for male-rank */
+            status_hilite_add_threshold(fld, &hilite);
+            pline("Added hilite %s", status_hilite2str(&hilite));
+            /* transfer female-rank to start of hilite.textmatch buffer */
+            p += sizeof " or " - sizeof "";
+            q = hilite.textmatch;
+            while ((*q++ = *p++) != '\0')
+                continue;
+            /* proceed with normal addition of new rule */
+        }
         status_hilite_add_threshold(fld, &hilite);
         pline("Added hilite %s", status_hilite2str(&hilite));
     }
@@ -3314,7 +3393,7 @@ status_hilites_viewall()
 
     while (hlstr) {
         Sprintf(buf, "OPTIONS=hilite_status: %.*s",
-                (int)(BUFSZ - sizeof "OPTIONS=hilite_status: " - 1),
+                (int) (BUFSZ - sizeof "OPTIONS=hilite_status: " - 1),
                 hlstr->str);
         putstr(datawin, 0, buf);
         hlstr = hlstr->next;
