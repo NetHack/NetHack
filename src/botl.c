@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526955073 2018/05/22 02:11:13 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1526982122 2018/05/22 09:42:02 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1363,7 +1363,7 @@ int *colorptr;
     int bestcolor = NO_COLOR;
     struct hilite_s *hl;
     anything *value = (anything *) vp;
-    char *txtstr, *cmpstr;
+    char *txtstr;
 
     if (!colorptr || fldidx < 0 || fldidx >= MAXBLSTATS)
         return;
@@ -1457,19 +1457,13 @@ int *colorptr;
                 }
                 break;
             case BL_TH_TEXTMATCH:
-                txtstr = dupstr(blstats[idx][fldidx].val);
-                cmpstr = txtstr;
-                if (fldidx == BL_TITLE) {
-                    int len = (int) (strlen(plname) + sizeof (" the"));
-
-                    cmpstr += len;
-                }
-                (void) trimspaces(cmpstr);
-                if (hl->rel == TXT_VALUE && hl->textmatch[0] &&
-                    !strcmpi(hl->textmatch, cmpstr)) {
+                txtstr = blstats[idx][fldidx].val;
+                if (fldidx == BL_TITLE)
+                    txtstr += (strlen(plname) + sizeof " the " - sizeof "");
+                if (hl->rel == TXT_VALUE && hl->textmatch[0]
+                    && fuzzymatch(hl->textmatch, txtstr, " -_", TRUE)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                 }
-                free(txtstr);
                 break;
             case BL_TH_ALWAYS_HILITE:
                 merge_bestcolor(&bestcolor, hl->coloridx);
@@ -2337,8 +2331,7 @@ struct _status_hilite_line_str {
     struct _status_hilite_line_str *next;
 };
 
-struct _status_hilite_line_str *status_hilite_str =
-    (struct _status_hilite_line_str *) 0;
+static struct _status_hilite_line_str *status_hilite_str = 0;
 static int status_hilite_str_id = 0;
 
 STATIC_OVL void
@@ -2348,22 +2341,20 @@ struct hilite_s *hl;
 unsigned long mask;
 const char *str;
 {
-    struct _status_hilite_line_str *tmp = (struct _status_hilite_line_str *)
-        alloc(sizeof(struct _status_hilite_line_str));
-    struct _status_hilite_line_str *nxt = status_hilite_str;
+    struct _status_hilite_line_str *tmp, *nxt;
 
-    (void) memset(tmp, 0, sizeof(struct _status_hilite_line_str));
+    tmp = (struct _status_hilite_line_str *) alloc(sizeof *tmp);
+    (void) memset(tmp, 0, sizeof *tmp);
 
     ++status_hilite_str_id;
     tmp->fld = fld;
     tmp->hl = hl;
     tmp->mask = mask;
     (void) stripchars(tmp->str, " ", str);
-
     tmp->id = status_hilite_str_id;
 
-    if (nxt) {
-        while (nxt && nxt->next)
+    if ((nxt = status_hilite_str) != 0) {
+        while (nxt->next)
             nxt = nxt->next;
         nxt->next = tmp;
     } else {
@@ -2375,8 +2366,7 @@ const char *str;
 STATIC_OVL void
 status_hilite_linestr_done()
 {
-    struct _status_hilite_line_str *tmp = status_hilite_str;
-    struct _status_hilite_line_str *nxt;
+    struct _status_hilite_line_str *nxt, *tmp = status_hilite_str;
 
     while (tmp) {
         nxt = tmp->next;
@@ -2406,6 +2396,7 @@ int
 count_status_hilites(VOID_ARGS)
 {
     int count;
+
     status_hilite_linestr_gather();
     count = status_hilite_linestr_countfield(BL_FLUSH);
     status_hilite_linestr_done();
@@ -2421,13 +2412,14 @@ status_hilite_linestr_gather_conditions()
         unsigned long clratr;
     } cond_maps[SIZE(valid_conditions)];
 
-    (void)memset(cond_maps, 0,
-                 sizeof(struct _cond_map) * SIZE(valid_conditions));
+    (void) memset(cond_maps, 0,
+                  SIZE(valid_conditions) * sizeof (struct _cond_map));
 
     for (i = 0; i < SIZE(valid_conditions); i++) {
         int clr = NO_COLOR;
         int atr = HL_NONE;
         int j;
+
         for (j = 0; j < CLR_MAX; j++)
             if (cond_hilites[j] & valid_conditions[i].bitmask)
                 clr = j;
@@ -2445,6 +2437,7 @@ status_hilite_linestr_gather_conditions()
         if (clr != NO_COLOR || atr != HL_NONE) {
             unsigned long ca = clr | (atr << 8);
             boolean added_condmap = FALSE;
+
             for (j = 0; j < SIZE(valid_conditions); j++)
                 if (cond_maps[j].clratr == ca) {
                     cond_maps[j].bm |= valid_conditions[i].bitmask;
@@ -2465,12 +2458,14 @@ status_hilite_linestr_gather_conditions()
     for (i = 0; i < SIZE(valid_conditions); i++)
         if (cond_maps[i].bm) {
             int clr = NO_COLOR, atr = HL_NONE;
+
             split_clridx(cond_maps[i].clratr, &clr, &atr);
             if (clr != NO_COLOR || atr != HL_NONE) {
                 char clrbuf[BUFSZ];
                 char attrbuf[BUFSZ];
                 char condbuf[BUFSZ];
                 char *tmpattr;
+
                 (void) stripchars(clrbuf, " ", clr2colorname(clr));
                 tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
                 if (tmpattr)
@@ -3073,7 +3068,7 @@ choose_value:
         }
         Sprintf(colorqry, "Choose a color for when %s is '%s':",
                 initblstats[fld].fldname, hilite.textmatch);
-        Sprintf(colorqry, "Choose attribute for when %s is '%s':",
+        Sprintf(attrqry, "Choose attribute for when %s is '%s':",
                 initblstats[fld].fldname, hilite.textmatch);
     } else if (behavior == BL_TH_ALWAYS_HILITE) {
         Sprintf(colorqry, "Choose a color to always hilite %s:",
@@ -3346,9 +3341,7 @@ shlmenu_redo:
     start_menu(tmpwin);
 
     status_hilite_linestr_gather();
-
     countall = status_hilite_linestr_countfield(BL_FLUSH);
-
     if (countall) {
         any = zeroany;
         any.a_int = -1;
@@ -3364,12 +3357,10 @@ shlmenu_redo:
         char buf[BUFSZ];
 
         any = zeroany;
-        any.a_int = (i+1);
+        any.a_int = i + 1;
+        Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
-            Sprintf(buf, "%-18s (%i defined)",
-                    initblstats[i].fldname, count);
-        else
-            Sprintf(buf, "%-18s", initblstats[i].fldname);
+            Sprintf(eos(buf), " (%d defined)", count);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
@@ -3382,16 +3373,23 @@ shlmenu_redo:
             status_hilites_viewall();
         else
             (void) status_hilite_menu_fld(i);
-        free((genericptr_t) picks);
+        free((genericptr_t) picks), picks = (menu_item *) 0;
         redo = TRUE;
     }
 
-    picks = (menu_item *) 0;
     destroy_nhwindow(tmpwin);
+    countall = status_hilite_linestr_countfield(BL_FLUSH);
     status_hilite_linestr_done();
 
     if (redo)
         goto shlmenu_redo;
+
+    /* hilite_delta=='statushilites' does double duty:  it is the
+       number of turns for temporary highlights to remain visible
+       and also when non-zero it is the flag to enable highlighting */
+    if (countall > 0 && !iflags.hilite_delta)
+        pline(
+ "To have highlights become active, set 'statushilites' option to non-zero.");
 
     return TRUE;
 }

@@ -24,6 +24,12 @@ config file error handling routines were calling xx_wait_synch early
 status_finish() in botl.c would unconditionally invoke the window port's 
 	win_status_finish() routine which was problematic if the windowport
 	wasn't initialized yet
+using 'O' to set up a hilite_status rule for string comparison, the menu for
+	color was titled "choose attribute for when <foo> is 'bar'" and the
+	one prompting for attribute used the default "pick an attribute"
+when finishing using 'O' to examine or set hilite_status rules, if the
+	'statushilites' option is 0 and there is at least one rule, give a
+	reminder about setting it to non-zero to activate highlighting
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
