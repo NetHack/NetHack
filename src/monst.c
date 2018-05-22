@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/6/18 by NullCGT */
+/* Edited on 5/19/18 by NullCGT */
 
 #include "config.h"
 #include "permonst.h"
@@ -1443,7 +1443,7 @@ NEARDATA struct permonst mons[] = {
        challenge in the late game, and all of them are extremely nasty. */
     /* Ooze dragons are a good reason to have acid reistance. Probably the
        least dangerous of the elder dragons. */
-    MON("ooze dragon", S_DRAGON, LVL(20, 9, -10, 20, -7), (G_GENO | 1),
+    MON("ooze dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_ACID, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_ENGL, AD_ACID, 3, 6), ATTK(AT_CLAW, AD_PHYS, 1, 4),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK),
@@ -1454,7 +1454,7 @@ NEARDATA struct permonst mons[] = {
         0, CLR_BRIGHT_GREEN),
     /* Razor dragons have no breath weapon, but are incredibly fast and deal
        extremely large amounts of damage. */
-    MON("razor dragon", S_DRAGON, LVL(20, 18, -10, 20, 7), (G_GENO | 1),
+    MON("razor dragon", S_DRAGON, LVL(25, 18, -10, 20, 7), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 6), ATTK(AT_CLAW, AD_PHYS, 10, 4),
         ATTK(AT_CLAW, AD_PHYS, 10, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_COLD, 0,
@@ -1464,7 +1464,7 @@ NEARDATA struct permonst mons[] = {
         0, CLR_CYAN),
     /* filth dragons are less mobile than the other elder dragons, but
        their illness attacks are highly dangerous. */
-    MON("filth dragon", S_DRAGON, LVL(20, 9, -10, 20, -7), (G_GENO | 1),
+    MON("filth dragon", S_DRAGON, LVL(25, 9, -10, 20, -7), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_DRST, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_DISE, 1, 4), ATTK(AT_CLAW, AD_DISE, 1, 4),
           NO_ATTK, NO_ATTK),
@@ -1475,7 +1475,7 @@ NEARDATA struct permonst mons[] = {
         0, CLR_BROWN),
     /* Hex dragons are powerful spellcasters, and can move around the map
        with teleportation and wall walking.*/
-    MON("hex dragon", S_DRAGON, LVL(20, 9, -10, 80, -6), (G_GENO | 1),
+    MON("hex dragon", S_DRAGON, LVL(25, 9, -10, 80, -6), (G_GENO | 1),
         A(ATTK(AT_MAGC, AD_SPEL, 4, 6), ATTK(AT_BITE, AD_CURS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
           NO_ATTK),
@@ -1487,8 +1487,8 @@ NEARDATA struct permonst mons[] = {
     /* Void dragons are essentially death on legs. Their void attacks are
        capable of eating through even the best-prepared character in only a few
        turns. They may need to be reduced in power at some point. */
-    MON("void dragon", S_DRAGON, LVL(20, 9, -10, 20, 0),
-        (G_GENO | G_NOCORPSE | 1),
+    MON("void dragon", S_DRAGON, LVL(25, 9, -10, 20, 0),
+        (G_NOCORPSE | G_NOGEN),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_VOID, 2, 4), ATTK(AT_CLAW, AD_VOID, 2, 4), NO_ATTK,
           NO_ATTK),
@@ -1540,6 +1540,13 @@ NEARDATA struct permonst mons[] = {
         M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
             | M1_UNSOLID | M1_FLY | M1_NOTAKE,
         M2_STRONG | M2_NEUTER, M3_INFRAVISIBLE, CLR_YELLOW),
+    MON("magma elemental", S_ELEMENTAL, LVL(8, 6, 2, 30, 0), (G_NOCORPSE | 1),
+        A(ATTK(AT_CLAW, AD_FIRE, 4, 5), ATTK(AT_NONE, AD_FIRE, 0, 4), NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(0, 0, MS_SILENT, MZ_HUGE), MR_FIRE, 0,
+        M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS | M1_BREATHLESS
+            | M1_THICK_HIDE | M1_NOTAKE,
+        M2_STRONG | M2_NEUTER, M3_INFRAVISIBLE, CLR_ORANGE),
     MON("earth elemental", S_ELEMENTAL, LVL(8, 6, 2, 30, 0), (G_NOCORPSE | 1),
         A(ATTK(AT_CLAW, AD_PHYS, 4, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -1747,6 +1754,13 @@ struct permonst _mons2[] = {
         SIZ(2300, 900, MS_SPELL, MZ_HUGE), 0, 0,
         M1_FLY | M1_HUMANOID | M1_OMNIVORE,
         M2_STRONG | M2_ROCKTHROW | M2_NASTY | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_MAGENTA),
+    MON("hundred handed one", S_GIANT, LVL(20, 12, -5, 60, 5), (G_GENO | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6)),
+        SIZ(2300, 900, MS_BOAST, MZ_HUGE), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        M2_GIANT | M2_STRONG | M2_ROCKTHROW | M2_NASTY | M2_COLLECT | M2_JEWELS,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_MAGENTA),
     MON("minotaur", S_GIANT, LVL(15, 15, 6, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),

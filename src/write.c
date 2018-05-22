@@ -1,25 +1,23 @@
 /* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 3/6/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(cost, (struct obj *));
 STATIC_DCL boolean FDECL(label_known, (int, struct obj *));
 STATIC_DCL char *FDECL(new_book_description, (int, char *));
 
 /*
  * returns basecost of a scroll or a spellbook
  */
-STATIC_OVL int
-cost(otmp)
-register struct obj *otmp;
+int
+ink_cost(short otyp)
 {
-    if (otmp->oclass == SPBOOK_CLASS)
-        return (10 * objects[otmp->otyp].oc_level);
+    if (objects[otyp].oc_class == SPBOOK_CLASS)
+        return (10 * objects[otyp].oc_level);
 
-    switch (otmp->otyp) {
+    switch (otyp) {
 #ifdef MAIL
     case SCR_MAIL:
         return 2;
@@ -31,6 +29,7 @@ register struct obj *otmp;
     case SCR_AMNESIA:
     case SCR_FIRE:
     case SCR_EARTH:
+    case SCR_WEB:
         return 8;
     case SCR_DESTROY_ARMOR:
     case SCR_CREATE_MONSTER:
@@ -39,11 +38,13 @@ register struct obj *otmp;
     case SCR_CONFUSE_MONSTER:
         return 12;
     case SCR_IDENTIFY:
+    case SCR_WARDING_WORDS:
         return 14;
     case SCR_ENCHANT_ARMOR:
     case SCR_REMOVE_CURSE:
     case SCR_ENCHANT_WEAPON:
     case SCR_CHARGING:
+    case SCR_TIME:
         return 16;
     case SCR_SCARE_MONSTER:
     case SCR_STINKING_CLOUD:
@@ -240,7 +241,7 @@ found:
     check_unpaid(pen);
 
     /* see if there's enough ink */
-    basecost = cost(new_obj);
+    basecost = ink_cost(new_obj->otyp);
     if (pen->spe < basecost / 2) {
         Your("marker is too dry to write that!");
         obfree(new_obj, (struct obj *) 0);

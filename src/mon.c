@@ -3,7 +3,7 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/19/18 by NullCGT */
 
 /* If you're using precompiled headers, you don't want this either */
 #ifdef MICROPORT_BUG
@@ -2109,6 +2109,16 @@ boolean was_swallowed; /* digestion */
     if (mdat == &mons[PM_VLAD_THE_IMPALER] || mdat->mlet == S_LICH) {
         if (cansee(mon->mx, mon->my) && !was_swallowed)
             pline("%s body crumbles into dust.", s_suffix(Monnam(mon)));
+        return FALSE;
+    }
+
+    /* magma elementals dissolve into a pile of lava */
+    if (mdat == &mons[PM_MAGMA_ELEMENTAL]) {
+        if (cansee(mon->mx, mon->my) && !was_swallowed)
+            pline("%s body dissolves into a pool of lava.", s_suffix(Monnam(mon)));
+        if (levl[mon->mx][mon->my].typ != STAIRS &&
+                levl[mon->mx][mon->my].typ != LADDER)
+            levl[mon->mx][mon->my].typ = LAVAPOOL;
         return FALSE;
     }
 

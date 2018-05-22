@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -645,6 +645,17 @@ int dieroll;
     return result;
 }
 
+static const char *const monkattacks[] = {
+    "chop", "strike", "jab", "hit", "punch", "headbutt", "elbow"
+};
+
+/* any sort of nonsensical or non-lore-friendly physical attack */
+static const char *const hmonkattacks[] = {
+    "suplex",    "piledrive",    "slap",    "shove",    "flick",
+    "heel drop", "uppercut",     "flip",    "smack",    "downercut",
+    "arm-bar"
+};
+
 /* guts of hmon() */
 STATIC_OVL boolean
 hmon_hitmon(mon, obj, thrown, dieroll)
@@ -1269,7 +1280,13 @@ int dieroll;
             hit(mshot_xname(obj), mon, exclam(tmp));
         else if (!flags.verbose)
             You("hit it.");
-        else
+        else if (unarmed && Role_if(PM_MONK) && !Upolyd) {
+            You("%s %s%s", Hallucination ?
+                hmonkattacks[rn2(SIZE(hmonkattacks))] :
+                    rn2(25) ? "hit" :
+                    monkattacks[rn2(SIZE(monkattacks))], mon_nam(mon),
+                        canseemon(mon) ? exclam(tmp) : ".");
+        } else
             You("%s %s%s", Role_if(PM_BARBARIAN) ? "smite" : "hit",
                 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
     }

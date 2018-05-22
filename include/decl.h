@@ -134,6 +134,7 @@ E struct q_score quest_status;
 E NEARDATA char pl_character[PL_CSIZ];
 E NEARDATA char pl_race; /* character's race */
 
+E NEARDATA char explengr[BUFSZ];
 E NEARDATA char pl_fruit[PL_FSIZ];
 E NEARDATA struct fruit *ffruit;
 

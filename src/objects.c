@@ -2,7 +2,7 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/14/18 by NullCGT */
+/* Edited on 5/18/18 by NullCGT */
 
 /*
  * The data in this file is processed twice, to construct two arrays.
@@ -888,7 +888,7 @@ POTION("water",                 "clear",  0, 0, 92, 100, CLR_CYAN),
            BITS(0, 1, 0, 0, mgc, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),    \
            0, SCROLL_CLASS, prob, 0, 5, cost, 0, 0, 0, 0, 6, HI_PAPER)
 SCROLL("enchant armor",              "ZELGO MER",  1,  63,  80),
-SCROLL("destroy armor",         "JUYED AWK YACC",  1,  45, 100),
+SCROLL("destroy armor",         "JUYED AWK YACC",  1,  25, 100),
 SCROLL("confuse monster",                 "NR 9",  1,  53, 100),
 SCROLL("scare monster",   "XIXAXA XOXAXA XUXAXA",  1,  35, 100),
 SCROLL("remove curse",             "PRATYAVAYAH",  1,  60,  80),
@@ -896,21 +896,24 @@ SCROLL("enchant weapon",         "DAIYEN FOOELS",  1,  80,  60),
 SCROLL("create monster",       "LEP GEX VEN ZEA",  1,  45, 200),
 SCROLL("taming",                   "PRIRUTSENIE",  1,  10, 200),
 SCROLL("genocide",                  "ELBIB YLOH",  1,  10, 300),
-SCROLL("light",                 "VERR YED HORRE",  1,  90,  50),
+SCROLL("light",                 "VERR YED HORRE",  1,  30,  50),
+SCROLL("warding words",         "DO NOT READ ME",  1,  40,  50),
+SCROLL("time",                   "TEMP USF UGIT",  1,  20, 100), /* tempus fugit */
+SCROLL("web",                     "OCTAHEXAOCTA",  1,  20,  50), /* 868 */
 SCROLL("teleportation",        "VENZAR BORGAVVE",  1,  55, 100),
 SCROLL("gold detection",                 "THARR",  1,  33, 100),
 SCROLL("food detection",               "YUM YUM",  1,  25, 100),
 SCROLL("identify",                  "KERNOD WEL",  1, 180,  20),
-SCROLL("pure law",                   "TRATS ARL",  1,   5, 200),
-SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200),
-SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200),
+SCROLL("pure law",                   "TRATS ARL",  1,   5, 200), /* LRA START */
+SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200), /* Jabberwocky */
+SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200), /* Tlon Uqbar */
 SCROLL("magic mapping",              "ELAM EBOW",  1,  45, 100),
 SCROLL("amnesia",                   "DUAM XNAHT",  1,  30, 200),
 SCROLL("fire",                  "ANDOVA BEGARIN",  1,  25, 100),
 SCROLL("earth",                          "KIRJE",  1,  18, 200),
 SCROLL("punishment",            "VE FORBRYDERNE",  1,  15, 300),
 SCROLL("charging",                "HACKEM MUCHE",  1,  15, 300),
-SCROLL("cloning",             "TOIL AND TROUBLE",  1,  10, 300),
+SCROLL("cloning",             "TOIL AND TROUBLE",  1,  10, 300), /* Macbeth */
 SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
     /* Extra descriptions, shuffled into use at start of new game.
      * Code in win/share/tilemap.c depends on SCR_STINKING_CLOUD preceding
@@ -919,6 +922,13 @@ SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
      * tilemap.c must be modified to match.
      */
 SCROLL(None,      "FOOBIE BLETCH",  1,   0, 100),
+SCROLL(None,            "NYEHEHE",  1,   0, 100), /* laughing noise */
+SCROLL(None,      "ELPHE MONATER",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,               "ABAJ",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,     "CONGLATURATION",  1,   0, 100), /* famous mistranslation */
+SCROLL(None,       "DESUM TETRAL",  1,   0, 100),
+SCROLL(None,            "NHINRIL",  1,   0, 100), /* meta */
+SCROLL(None,          "ISAY INAY",  1,   0, 100), /* meta */
 SCROLL(None,              "TEMOV",  1,   0, 100),
 SCROLL(None,         "GARVEN DEH",  1,   0, 100),
 SCROLL(None,            "READ ME",  1,   0, 100),
@@ -971,7 +981,9 @@ SPELL("sleep",           "mottled",
 SPELL("finger of death", "stained",
       P_ATTACK_SPELL,       5, 10, 7, 1, RAY, HI_PAPER),
 SPELL("light",           "cloth",
-      P_DIVINATION_SPELL,  45,  1, 1, 1, NODIR, HI_CLOTH),
+      P_DIVINATION_SPELL,  25,  1, 1, 1, NODIR, HI_CLOTH),
+SPELL("web",             "moldy",
+      P_MATTER_SPELL,      20,  1, 1, 1, IMMEDIATE, HI_CLOTH),
 SPELL("detect monsters", "leathery",
       P_DIVINATION_SPELL,  43,  1, 1, 1, NODIR, HI_LEATHER),
 SPELL("healing",         "white",

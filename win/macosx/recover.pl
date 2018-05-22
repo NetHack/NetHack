@@ -13,7 +13,7 @@ if(! -d $playground){
 	print "Cannot find playground $playground.";
 	exit 0
 }
-if(! -f "$playground/castle.lev" && ! -f "$playground/nhdat"){
+if(! -f "$playground/castle-?.lev" && ! -f "$playground/nhdat"){
 	print "Failed to find playground $playground.";
 	exit 0
 }

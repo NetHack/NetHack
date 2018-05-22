@@ -2,7 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 4/23/18 by NullCGT */
+/* Edited 5/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -180,6 +180,8 @@ struct obj *otmp, *mwep;
         /* fake players treated as skilled (regardless of role limits) */
         else if (is_mplayer(mtmp->data))
             multishot++;
+        else if (monsndx(mtmp->data) == PM_HUNDRED_HANDED_ONE)
+            multishot += 5;
 
         /* this portion is different from hero multishot; from slash'em?
          */

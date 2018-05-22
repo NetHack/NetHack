@@ -16,7 +16,7 @@
 # To motivate the player : there are 4 storerooms (armors, weapons, food and
 # gems) and a wand of wishing in one of the 4 towers...
 
-MAZE:"castle",random
+MAZE:"castle-1",random
 FLAGS: noteleport
 GEOMETRY:center,center
 MAP
@@ -247,3 +247,490 @@ REGION:(39,08,55,08),unlit,"ordinary"
 #   Storeroom alcoves
 REGION:(47,05,47,06),unlit,"ordinary"
 REGION:(47,10,47,11),unlit,"ordinary"
+
+
+#
+# The thick walls on the corners of the armouries and the dragon pens
+# are a kludge to prevent the walls showing up through the iron bars from
+# outside the castle.
+#
+MAZE:"castle-2",' '
+FLAGS: noteleport
+GEOMETRY: center, center
+#000000000111111111122222222223333333333444444444455555555556666666666777777
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+T...}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}..}}...}}}}}}}}}}}}}....T.....}}}}...T..
+..}}}}}}}}}}}}}}}}}}}..}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}.......}}}}}}}.....
+.}}..}}}----------------------------------------------}}}}}}}..---------S---
+}}}}}}}}S...-|.........|........|......S......+......|}}}}}}}}}| - - - - - -
+}}}}}}}}|....|.........+........|......--------......|}.}}}}}}}|------------
+}}}}.}}}|....+.........|........+......|......|-.....|}..}}}}}.S - - - - - -
+}}}.T.}}|....|----------........|......|......--FFFF--}}}}}}}}.|------------
+}}}}..}}|----|.......|..........|......|......|}}}}}}}}}}}.....| - - - - - -
+}}}}}}}}|....|.LLLLL.|..........--FFFF-|......|}.....}}}....T..|------------
+.}}}}}..|....S.LLLLL.S.\........S......+..{...|}...............| - - - - - -
+T.}}}.}.|....|.LLLLL.|..........--FFFF-|......|}....}}}...}....|------------
+}.}}}}}}|----|.......|..........|......|......|}}}}}}}}}.}}}...| - - - - - -
+}}}}}}}}|....|----------........|......|......--FFFF--}}}}}....|------------
+}}}}}.}}|....+.........|........+......|......|-.....|}}}}}}}..| - - - - - -
+}}}}....|....|.........+........|......--------......|}}}}}}}}.|------------
+}}}.....S...-|.........|........|......S......+......|}}....}}}| - - - - - -
+}}..}...----------------------------------------------}..}...}}|------------
+}}}}}......}}}}...}}}}}}}..}}......}}}}}}}}}}}}}}}}}}}}.....}}}S - - - - - -
+}}}}}}...}}}}}}}}...}}.}..}}}}.T.}}}}}}}}}...}}}}}.}}}}}}}...}}|------------
+}}}}}}}}}}}}}.}}}}}}}}}}.}}}}}}}..}}.}}}.......}}.}}...}}}}}}}.| - - - - - -
+}}}}}}}}}.....}}}}}}}}}}}}}}}}}}}}}}}}.....T..}}}}}}}}.}}}}}}..-------------
+ENDMAP
+
+# Random registers initialization
+$object = object: { '[',')','*','%' }
+SHUFFLE: $object
+
+$place = { (09,08),(09,09),(09,10),(52,03),(52,15) }
+SHUFFLE: $place
+
+$monster = monster: { 'L','N','E','V','M','O','R','T','X','Z' }
+
+
+TELEPORT_REGION:(64,03,75,20),(07,01,54,17),down
+TELEPORT_REGION:(01,01,07,18),(07,01,75,20),up
+STAIR:(66,05,75,20),(07,01,66,20), up
+
+# the inner courtyard
+FOUNTAIN:(42,09)
+DRAWBRIDGE:(47,09),west,closed
+DOOR:locked,(39,09)
+
+# doors leading to the dragon pens
+DOOR:locked,(39,03)
+DOOR:locked,(46,03)
+DOOR:locked,(39,15)
+DOOR:locked,(46,15)
+
+# doors to the throne room
+DOOR:locked,(32,05)
+DOOR:locked,(32,09)
+DOOR:locked,(32,13)
+
+# doors to the barracks
+DOOR:closed,(23,04)
+DOOR:closed,(23,14)
+
+# doors to the armouries
+DOOR:locked,(13,05)
+DOOR:locked,(13,13)
+
+# Removed so that the castle can be breached with either levitation OR an
+# instrument.
+#TRAP:"trap door",(38,09)
+#TRAP:"trap door",(36,09)
+#TRAP:"trap door",(34,09)
+
+TRAP:"trap door",(41,03)
+TRAP:"trap door",(44,03)
+
+TRAP:"trap door",(41,15)
+TRAP:"trap door",(44,15)
+
+MAZEWALK:(63,09),east
+
+# only the inner walls of the maze are diggable
+NON_DIGGABLE:(00,00,63,20)
+NON_DIGGABLE:(63,00,75,02)
+
+# the maze is unlit
+REGION:(00,00,62,20),lit,"ordinary"
+REGION:(63,00,75,01),lit,"ordinary"
+
+# and the dragon pens are unlit
+REGION:(47,03,52,06),unlit,"ordinary"
+REGION:(47,12,52,15),unlit,"ordinary"
+
+REGION:(24,03,31,15),lit,"throne",unfilled,irregular
+
+REGION:(14,03,22,05),lit,"barracks"
+REGION:(14,13,22,15),lit,"barracks"
+
+# the armouries and the treasure room are unlit
+REGION:(09,03,12,15),unlit,"ordinary"
+
+# northern armoury
+OBJECT:$object[0],(09,03)
+OBJECT:$object[0],(10,03)
+OBJECT:$object[0],(11,03)
+OBJECT:$object[0],(09,04)
+OBJECT:$object[0],(10,04)
+OBJECT:$object[0],(11,04)
+OBJECT:$object[0],(12,04)
+OBJECT:$object[0],(09,05)
+OBJECT:$object[0],(10,05)
+OBJECT:$object[0],(11,05)
+OBJECT:$object[0],(12,05)
+OBJECT:$object[0],(09,06)
+OBJECT:$object[0],(10,06)
+OBJECT:$object[0],(11,06)
+OBJECT:$object[0],(12,06)
+# southern armoury
+OBJECT:$object[1],(09,12)
+OBJECT:$object[1],(10,12)
+OBJECT:$object[1],(11,12)
+OBJECT:$object[1],(12,12)
+OBJECT:$object[1],(09,13)
+OBJECT:$object[1],(10,13)
+OBJECT:$object[1],(11,13)
+OBJECT:$object[1],(12,13)
+OBJECT:$object[1],(09,14)
+OBJECT:$object[1],(10,14)
+OBJECT:$object[1],(11,14)
+OBJECT:$object[1],(12,14)
+OBJECT:$object[1],(09,15)
+OBJECT:$object[1],(10,15)
+OBJECT:$object[1],(11,15)
+
+# treasure room
+CONTAINER:('(',"chest"),not_trapped,$place[0] {
+OBJECT:('/',"wishing")
+}
+# Prevent monsters from eating it. (@'s never eat objects)
+ENGRAVING:$place[0],burn,"Elbereth"
+OBJECT:('?',"scare monster"),$place[0],cursed
+
+CONTAINER:('(',"chest"),$place[1] {
+OBJECT:'?'
+OBJECT:'?'
+OBJECT:'+'
+OBJECT:'*'
+OBJECT:'*'
+}
+
+CONTAINER:('(',"chest"),$place[2] {
+OBJECT:'/'
+OBJECT:'"'
+OBJECT:'*'
+OBJECT:'*'
+}
+
+CONTAINER:('(',"chest"),$place[3] {
+OBJECT:'?'
+OBJECT:'?'
+OBJECT:'+'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'!'
+}
+
+OBJECT:('(',"chest"),$place[4]
+
+# statues behind the throne
+OBJECT:('`',"statue"),(22,07)
+OBJECT:('`',"statue"),(22,11)
+
+# the king (and his adviser[s])
+
+IF [25%] {
+  MONSTER:('H',"titan"),(23,09),hostile,asleep
+}
+IF [50%] {
+  MONSTER:'V',(23,09),asleep
+}
+MONSTER:'V',(23,09),asleep
+
+# monsters in the water around the castle
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"jellyfish"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
+
+# monsters in attendance in the throne room
+MONSTER:$monster[0],(25,04)
+MONSTER:$monster[1],(27,04)
+MONSTER:$monster[2],(29,04)
+MONSTER:$monster[3],(26,05)
+MONSTER:$monster[4],(28,05)
+MONSTER:$monster[5],(30,05)
+MONSTER:$monster[6],(25,06)
+MONSTER:$monster[7],(27,06)
+MONSTER:$monster[8],(29,06)
+MONSTER:$monster[0],(25,14)
+MONSTER:$monster[1],(27,14)
+MONSTER:$monster[2],(29,14)
+MONSTER:$monster[3],(26,13)
+MONSTER:$monster[4],(28,13)
+MONSTER:$monster[5],(30,13)
+MONSTER:$monster[6],(25,12)
+MONSTER:$monster[7],(27,12)
+MONSTER:$monster[8],(29,12)
+
+# welcoming committee
+MONSTER:'D',(48,05)
+MONSTER:'D',(50,04)
+MONSTER:'D',(51,13)
+MONSTER:'D',(52,14)
+
+# guardians in the antechamber of the treasure room
+MONSTER:('E',"fire elemental"),(14,09)
+MONSTER:('E',"fire elemental"),(17,09)
+MONSTER:('v',"fire vortex"),(20,09)
+MONSTER:('v',"fire vortex"),(18,09)
+
+# sharpshooters in the chambers next to the hallway
+MONSTER:'C',(35,06)
+MONSTER:'C',(36,04)
+MONSTER:'C',(35,11)
+MONSTER:'C',(36,12)
+MONSTER:'C',(37,13)
+
+
+MAZE:"castle-3",' '
+FLAGS: noteleport
+GEOMETRY: center, center
+#000000000111111111122222222223333333333444444444455555555556666666666777777
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+---------------------------------------------.LLLLLLL.......................
+|...S..S..|..S..S.......|.|.......|....S..F.S.LLLLLL........................
+|.|---F-F---F-F--.......+.+.......|....|-----LLLLLLLL.............------....
+|.S.|...........+.......|.|.......|....|...LLLLLLL.LLLLL..L.......|....|....
+|.|.F...........---------+---------+----LLLLLLL.......LLLL........+.|..|....
+|.|-|.\.........+...................|.LLLLL....L.....LLLL.........|....|....
+|.|.F...........---------------------LLLLLL............LLLL.......------....
+|.S.|...........+...FLLLLLLLLLLLLL.LLLLL.LLLL...L.......LLLLL...............
+|.|---F--F-F--F-|...FLL.....LLLLLLLLLL.....LLLL..L....LLLLLLLLL.............
+|...|..|..|..|..S...FL.L...L...LLLLLLL........LLLL.LLLLLLL.LLLLLLL......LLLL
+|.{.-S--S---S--S|...FLL......LLLL-------S-------LLLLLLL-------LLL.LLLLLLLLLL
+|...............|----LLLL...LL..L| - - - - - - - - LL- - - - |LL-LLLLLLLLLLL
+|.-+--+--+-------LLLLLLLLLLL.....|-----------------LLL-------LL---LLLLLLLLLL
+|.|..|..|..F...LLL..........L....| - - - - - - - - -L- - - - - - |...LLLLLLL
+|+--F--F----LLLL...---------L-----------------------------------------LL.LL.
+|..FL....LLLLLL....| - - - - - - - - - - - - - - - - - - - - - - - - LL.....
+----LLLLLLL...LL...|-------------------------------------------------|......
+LLLLLLLLLLL........+ - - - - - - - - - - - - - - - - - - - - - - - - S......
+LLLLLLLL..LL.......|-------------------------------------------------|......
+LLLLLL.............| - - - - - - - - - - - - - - - - - - - - - - - - |......
+LLLL...............---------------------------------------------------......
+ENDMAP
+
+
+# Random registers initialization
+$place = { (15,01),(11,01),(09,01),(05,01), (03,03),(03,07), (05,09),(08,09),(12,09),(15,09) }
+SHUFFLE: $place
+
+$monster = monster: { 'L','L','E','E','R','R','T','T','O','O' }
+SHUFFLE: $monster
+
+
+# everything except the inner walls of the maze are non-diggable
+NON_DIGGABLE:(00,00,19,20)
+NON_DIGGABLE:(19,00,33,14)
+NON_DIGGABLE:(33,00,75,10)
+NON_DIGGABLE:(65,00,75,14)
+NON_DIGGABLE:(69,00,75,20)
+
+TELEPORT_REGION:(33,15,68,20),(10,00,18,14),down
+TELEPORT_REGION:(47,01,75,09),(17,00,44,09),up
+
+STAIR:(33,15,68,20),(00,00,00,00),up
+
+REGION:(00,00,75,20),lit,"ordinary"
+
+# the maze is dark
+REGION:(20,15,68,20),unlit,"ordinary"
+REGION:(34,11,60,14),unlit,"ordinary"
+REGION:(60,13,64,14),unlit,"ordinary"
+
+# the hallways in the castle are dark
+REGION:(17,05,35,05),unlit,"ordinary"
+REGION:(25,00,25,04),unlit,"ordinary"
+
+REGION:(01,01,03,01),unlit,"ordinary"
+REGION:(01,01,01,13),unlit,"ordinary"
+REGION:(01,09,03,11),unlit,"ordinary"
+REGION:(01,11,15,11),unlit,"ordinary"
+
+# the special rooms in the castle
+REGION:(05,03,15,07),lit,"throne",unfilled,irregular
+REGION:(17,01,23,03),lit,"barracks"
+REGION:(27,01,33,03),lit,"barracks"
+REGION:(17,07,19,10),lit,"barracks"
+
+MAZEWALK:(33,13),east
+
+FOUNTAIN:(02,10)
+
+DRAWBRIDGE:(25,07),north,closed
+
+# the castle doors
+DOOR:locked,(39,01)
+DOOR:locked,(35,04)
+DOOR:locked,(26,02)
+DOOR:locked,(24,02)
+DOOR:locked,(25,04)
+DOOR:locked,(16,01)
+DOOR:locked,(16,03)
+DOOR:locked,(16,05)
+DOOR:locked,(16,07)
+DOOR:locked,(16,09)
+DOOR:locked,(15,10)
+DOOR:locked,(13,01)
+DOOR:locked,(12,10)
+DOOR:locked,(09,12)
+DOOR:locked,(08,10)
+DOOR:locked,(07,01)
+DOOR:locked,(06,12)
+DOOR:locked,(05,10)
+DOOR:locked,(04,01)
+DOOR:locked,(03,12)
+DOOR:locked,(02,03)
+DOOR:locked,(02,07)
+DOOR:locked,(01,14)
+
+# door of the small building
+DOOR:random,(66,04)
+
+# doors for the maze
+DOOR:locked,(69,17)
+DOOR:locked,(40,10)
+DOOR:locked,(19,17)
+
+TRAP:"hole",(69,04)
+TRAP:"trap door",(33,05)
+TRAP:"trap door",(41,01)
+
+# lord of the keep
+MONSTER:'T',(06,05),asleep
+
+# monsters in attendance
+MONSTER:$monster[0],(15,04)
+MONSTER:$monster[0],(13,04)
+MONSTER:$monster[0],(11,04)
+MONSTER:$monster[1],(09,04)
+MONSTER:$monster[1],(07,04)
+MONSTER:$monster[2],(15,06)
+MONSTER:$monster[2],(13,06)
+MONSTER:$monster[3],(11,06)
+MONSTER:$monster[4],(09,06)
+MONSTER:$monster[5],(07,06)
+
+# monsters behind the bars
+MONSTER:('\'',"iron golem"),$place[1]
+MONSTER:('\'',"iron golem"),$place[2]
+MONSTER:('\'',"iron golem"),$place[3]
+MONSTER:'D',$place[4]
+MONSTER:'D',$place[5]
+MONSTER:'D',$place[6]
+MONSTER:'D',$place[7]
+MONSTER:'D',$place[8]
+MONSTER:'D',$place[9]
+
+# the prisoners
+MONSTER:('@',"prisoner"),(02,15),peaceful,asleep
+MONSTER:('@',"prisoner"),(03,13),peaceful
+MONSTER:('@',"prisoner"),(06,13)
+MONSTER:('@',"prisoner"),(10,13)
+
+MONSTER:('H',"fire giant"),(36,03),peaceful
+MONSTER:('j',"ochre jelly"),(43,01),asleep
+
+# treasure
+CONTAINER:('(',"chest"),$place[0] {
+OBJECT:('/',"wishing")
+}
+ENGRAVING:$place[0],burn,"Elbereth"
+OBJECT:('?',"scare monster"),$place[0],cursed
+
+OBJECT:('(',"chest"),$place[1]
+OBJECT:('(',"chest"),$place[2]
+OBJECT:('(',"chest"),$place[3]
+OBJECT:('(',"chest"),$place[4]
+OBJECT:('(',"chest"),$place[5]
+OBJECT:('(',"chest"),$place[6]
+# Guaranteed to be empty.
+CONTAINER:('(',"chest"),$place[7] {
+}
+CONTAINER:('(',"chest"),$place[8] {
+}
+CONTAINER:('(',"chest"),$place[9] {
+}
+
+# the soldiers' equipment; also doubles as a reward for player
+#
+# NW barracks
+OBJECT:'[',(17,01)
+OBJECT:')',(18,01)
+OBJECT:'[',(19,01)
+OBJECT:'[',(20,01)
+OBJECT:')',(21,01)
+OBJECT:'[',(22,01)
+OBJECT:')',(17,02)
+OBJECT:')',(18,02)
+OBJECT:'[',(19,02)
+OBJECT:')',(20,02)
+OBJECT:'[',(21,02)
+OBJECT:'[',(22,02)
+OBJECT:'[',(17,03)
+OBJECT:'[',(18,03)
+OBJECT:')',(19,03)
+OBJECT:'[',(20,03)
+OBJECT:'[',(21,03)
+OBJECT:')',(22,03)
+# NE barracks
+OBJECT:')',(28,01)
+OBJECT:'[',(29,01)
+OBJECT:'[',(30,01)
+OBJECT:')',(31,01)
+OBJECT:'[',(32,01)
+OBJECT:'[',(33,01)
+OBJECT:')',(28,02)
+OBJECT:')',(29,02)
+OBJECT:')',(30,02)
+OBJECT:'[',(31,02)
+OBJECT:'[',(32,02)
+OBJECT:'[',(33,02)
+OBJECT:'[',(28,03)
+OBJECT:')',(29,03)
+OBJECT:'[',(30,03)
+OBJECT:'[',(31,03)
+OBJECT:')',(32,03)
+OBJECT:'[',(33,03)
+
+# the items in the barracks with iron bars, facing the drawbridge
+OBJECT:(')',"arrow"),(18,07)
+OBJECT:(')',"arrow"),(18,08)
+OBJECT:(')',"arrow"),(18,09)
+OBJECT:(')',"arrow"),(18,10)
+IF [20%] {
+  OBJECT:(')',"silver arrow"),(18,07)
+}
+IF [20%] {
+  OBJECT:(')',"elven arrow"),(18,08),blessed,+2
+}
+IF [20%] {
+  OBJECT:(')',"elven arrow"),(18,09),blessed,+3
+}
+IF [20%] {
+  OBJECT:(')',"silver arrow"),(18,10)
+}
+OBJECT:(')',"bow"),(18,07),blessed,+1
+OBJECT:(')',"elven bow"),(18,08),blessed,+0
+OBJECT:(')',"elven bow"),(18,09)
+OBJECT:(')',"bow"),(18,10)
+
+# some boulders on the island
+OBJECT:('`',"boulder"),(45,06)
+OBJECT:('`',"boulder"),(51,08)
+OBJECT:('`',"boulder"),(51,06)
+
+# polearms for poking the captured monsters
+OBJECT:(')',"partisan"),(09,03)
+OBJECT:(')',"ranseur"),(11,03)
+OBJECT:(')',"spetum"),(08,07)
+OBJECT:(')',"bill-guisarme"),(12,07)

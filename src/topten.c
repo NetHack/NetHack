@@ -478,6 +478,8 @@ encodeachieve()
         r |= 1L << 19;
     if (u.uachieve.killed_reaper)
         r |= 1L << 20;
+    if (u.uroleplay.marathon)
+        r |= 1L << 21;
 
     return r;
 }

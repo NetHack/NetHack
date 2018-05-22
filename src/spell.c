@@ -2,7 +2,7 @@
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -44,7 +44,6 @@ STATIC_DCL char *FDECL(spellretention, (int, char *));
 STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
-STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
 STATIC_DCL boolean FDECL(spell_aim_step, (genericptr_t, int, int));
 
 /* The roles[] table lists the role-specific values for tuning
@@ -767,7 +766,7 @@ docast()
     return 0;
 }
 
-STATIC_OVL const char *
+const char *
 spelltypemnemonic(skill)
 int skill;
 {
@@ -1173,6 +1172,7 @@ boolean atme;
     case SPE_DETECT_FOOD:
     case SPE_CAUSE_FEAR:
     case SPE_IDENTIFY:
+    case SPE_WEB:
         /* high skill yields effect equivalent to blessed scroll */
         if (role_skill >= P_SKILLED)
             pseudo->blessed = 1;

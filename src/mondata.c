@@ -25,9 +25,9 @@ int flag;
         return; /* "don't care" */
 
     if (flag == 1)
-        mon->mintrinsics |= (ptr->mresists & 0x00FF);
+        mon->mintrinsics |= (ptr->mresists & 0x000000FFL);
     else
-        mon->mintrinsics = (ptr->mresists & 0x00FF);
+        mon->mintrinsics = (ptr->mresists & 0x000000FFL);
 
     if (mon->movement) { /* same adjustment as poly'd hero undergoes */
         new_speed = ptr->mmove;

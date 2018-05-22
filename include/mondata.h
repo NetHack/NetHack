@@ -1,7 +1,7 @@
 /* NetHack 3.6	mondata.h	$NHDT-Date: 1513297342 2017/12/15 00:22:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
-/* Edited 5/3/18 by NullCGT */
+/* Edited 5/12/18 by NullCGT */
 
 #ifndef MONDATA_H
 #define MONDATA_H
@@ -22,6 +22,15 @@
 #define resists_sonic(mon) (((mon)->mintrinsics & MR_SONIC) != 0)
 #define resists_psychic(mon) (((mon)->mintrinsics & MR_PSYCHIC) != 0 || \
                               mindless((mon->data)))
+
+#define resists_mgc(ptr) \
+    (dmgtype(ptr, AD_MAGM) || ptr == &mons[PM_BABY_GRAY_DRAGON] \
+     || dmgtype(ptr, AD_RBRE)) /* Chromatic Dragon */
+
+#define resists_drain(ptr) \
+    (is_undead(ptr) || is_demon(ptr) || is_were(ptr) \
+     || ptr == &mons[PM_DEATH])
+/* is_were() doesn't handle hero in human form */
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
@@ -167,7 +176,8 @@
          : ((ptr) == &mons[PM_FIRE_ELEMENTAL]) ? 1 : 0)
 /*	[note: the light ranges above were reduced to 1 for performance...] */
 #define likes_lava(ptr) \
-    (ptr == &mons[PM_FIRE_ELEMENTAL] || ptr == &mons[PM_SALAMANDER])
+    (ptr == &mons[PM_FIRE_ELEMENTAL] || ptr == &mons[PM_SALAMANDER] \
+          || ptr == &mons[PM_MAGMA_ELEMENTAL])
 #define pm_invisible(ptr) \
     ((ptr) == &mons[PM_STALKER] || (ptr) == &mons[PM_BLACK_LIGHT])
 

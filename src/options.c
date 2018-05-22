@@ -3,7 +3,7 @@
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/9/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
@@ -167,6 +167,7 @@ static struct Bool_Opt {
 #else
     { "mail", (boolean *) 0, TRUE, SET_IN_FILE },
 #endif
+    { "marathon", &u.uroleplay.marathon, FALSE, DISP_IN_GAME },
     { "mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
     { "menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME },
     /* for menu debugging only*/

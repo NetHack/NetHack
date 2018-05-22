@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Modified 5/10/18 by NullCGT */
+/* Modified 5/11/18 by NullCGT */
 
 #include "hack.h"
 #include "lev.h"
@@ -11,8 +11,9 @@
 STATIC_VAR NEARDATA struct engr *head_engr;
 
 char *
-random_engraving(outbuf)
+random_engraving(outbuf, wipe)
 char *outbuf;
+boolean wipe;
 {
     const char *rumor;
 
@@ -21,7 +22,8 @@ char *outbuf;
     if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor)
         (void) get_rnd_text(ENGRAVEFILE, outbuf);
 
-    wipeout_text(outbuf, (int) (strlen(outbuf) / 4), 0);
+    if (wipe)
+        wipeout_text(outbuf, (int) (strlen(outbuf) / 4), 0);
     return outbuf;
 }
 
@@ -205,6 +207,8 @@ register int x, y;
     else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
              || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
         return "floor";
+    else if (Is_firelevel(&u.uz))
+        return "obsidian";
     else
         return "ground";
 }
@@ -376,6 +380,11 @@ int x, y;
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
             if (context.run > 1)
                 nomul(0);
+            if (!Blind && !strcmp(ep->engr_txt, explengr)) {
+                pline("As you read the words, the engraving explodes!");
+                explode(u.ux, u.uy, 10, d(3,4), TOOL_CLASS, EXPL_MAGICAL);
+                del_engr_at(u.ux, u.uy);
+            }
         }
     }
 }
@@ -407,14 +416,7 @@ xchar e_type;
     }
     if (!in_mklev && (!strcmp(s, "The Yellow Sign") ||
         !strcmp(s, "the Yellow Sign"))) {
-        pline_The("weird, twisting sign burns itself into your mind!");
-        /* Could actually decrease confusion and stunning. */
         exercise(A_WIS, FALSE);
-        adjalign(-3);
-        make_confused(rnd(50), FALSE);
-        make_stunned(rnd(50), FALSE);
-        forget_levels(3);
-        forget_objects(3);
     }
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
@@ -704,7 +706,7 @@ doengrave()
                 if (oep) {
                     if (!Blind) {
                         type = (xchar) 0; /* random */
-                        (void) random_engraving(buf);
+                        (void) random_engraving(buf, TRUE);
                     }
                     dengr = TRUE;
                 }

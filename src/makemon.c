@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/1/18 by NullCGT */
+/* Edited on 5/12/18 by NullCGT */
 
 #include "hack.h"
 
@@ -198,7 +198,7 @@ register struct monst *mtmp;
     register struct permonst *ptr = mtmp->data;
     register int mm = monsndx(ptr);
     struct obj *otmp;
-    int bias, spe2, w1, w2;
+    int bias, spe2, w1, w2, hbold;
 
     if (Is_rogue_level(&u.uz))
         return;
@@ -215,6 +215,10 @@ register struct monst *mtmp;
     case S_GIANT:
         if (rn2(2))
             (void) mongets(mtmp, (mm != PM_ETTIN) ? BOULDER : CLUB);
+        if (mm == PM_HUNDRED_HANDED_ONE) {
+            for (hbold = 0; hbold < rn1(3, 4); hbold++)
+              (void) mongets(mtmp, BOULDER);
+        }
         break;
     case S_EEL:
         if (rn2(2) && mm == PM_MERFOLK)

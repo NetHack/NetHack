@@ -71,7 +71,7 @@ struct monst {
     uchar m_ap_type;      /* what mappearance is describing, m_ap_types */
 
     schar mtame;                /* level of tameness, implies peaceful */
-    unsigned short mintrinsics; /* low 8 correspond to mresists */
+    unsigned long mintrinsics; /* low 10 correspond to mresists */
     int mspec_used;             /* monster's special ability attack timeout */
 
     Bitfield(female, 1);      /* is female */

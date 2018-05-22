@@ -2,7 +2,7 @@
 #include "date.h"
 #include "patchlevel.h"
 
-/* Edited 3/29/18 by NullCGT */
+/* Edited 4/10/18 by NullCGT */
 
 /* Carbon 'carb' resource
  * has been made obsolete by the 'plst' resource below.
@@ -60,7 +60,7 @@ read 'File' (1014,"bigrm-2.lev") "bigrm-2.lev";
 read 'File' (1015,"bigrm-3.lev") "bigrm-3.lev";
 read 'File' (1016,"bigrm-4.lev") "bigrm-4.lev";
 read 'File' (1017,"bigrm-5.lev") "bigrm-5.lev";
-read 'File' (1018,"castle.lev") "castle.lev";
+read 'File' (1018,"castle-1.lev") "castle-1.lev";
 //read 'File' (1019,"data") "data";
 read 'File' (1020,"dungeon") "dungeon";
 read 'File' (1021,"earth.lev") "earth.lev";
@@ -184,6 +184,8 @@ read 'File' (1175,"void.lev") "void.lev";
 read 'File' (1176,"statuary.lev") "statuary.lev";
 read 'File' (1077,"foogardens.lev") "foogardens.lev";
 read 'File' (1078,"mephisto.lev") "mephisto.lev";
+read 'File' (1079,"castle-2.lev") ":lib:castle-2.lev";
+read 'File' (1080,"castle-3.lev") ":lib:castle-3.lev";
 #else
 read 'File' (1000,"cmdhelp") ":dat:cmdhelp";
 read 'File' (1001,"help") ":dat:help";
@@ -203,7 +205,7 @@ read 'File' (1014,"bigrm-2.lev") ":lib:bigrm-2.lev";
 read 'File' (1015,"bigrm-3.lev") ":lib:bigrm-3.lev";
 read 'File' (1016,"bigrm-4.lev") ":lib:bigrm-4.lev";
 read 'File' (1017,"bigrm-5.lev") ":lib:bigrm-5.lev";
-read 'File' (1018,"castle.lev") ":lib:castle.lev";
+read 'File' (1018,"castle-1.lev") ":lib:castle-1.lev";
 read 'File' (1019,"data") ":lib:data";
 read 'File' (1020,"dungeon") ":lib:dungeon";
 read 'File' (1021,"earth.lev") ":lib:earth.lev";
@@ -327,4 +329,6 @@ read 'File' (1175,"void.lev") "void.lev";
 read 'File' (1176,"statuary.lev") "statuary.lev";
 read 'File' (1077,"foogardens.lev") "foogardens.lev";
 read 'File' (1078,"mephisto.lev") "mephisto.lev";
+read 'File' (1079,"castle-2.lev") "castle-2.lev";
+read 'File' (1080,"castle-3.lev") "castle-3.lev";
 #endif

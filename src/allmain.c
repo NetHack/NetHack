@@ -5,7 +5,7 @@
 
 /* various code that was replicated in *main.c */
 
-/* Edited on 5/9/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -482,6 +482,8 @@ int wtcap;
     boolean reached_full = FALSE,
             encumbrance_ok = (wtcap < MOD_ENCUMBER || !u.umoved);
 
+    if (u.uroleplay.marathon)
+        return;
     if (Upolyd) {
         if (u.mh < 1) { /* shouldn't happen... */
             rehumanize();
@@ -673,6 +675,7 @@ boolean new_game; /* false => restoring an old game */
 {
     char buf[BUFSZ];
     char tipbuf[BUFSZ];
+    char ebuf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
 
     /* skip "welcome back" if restoring a doomed character */
@@ -680,6 +683,15 @@ boolean new_game; /* false => restoring an old game */
         /* death via self-genocide is pending */
         pline("You're back, but you still feel %s inside.", udeadinside());
         return;
+    }
+    if (new_game && u.uroleplay.marathon) {
+        u.uhp = 999;
+        u.uhpmax = 999;
+    }
+    if (new_game) {
+        (void) random_engraving(ebuf, FALSE);
+        memcpy(explengr, ebuf, BUFSZ);
+        /* Sprintf(flags.explengr, "%s", ebuf);*/
     }
 
     /*

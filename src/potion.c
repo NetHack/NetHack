@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/8/18 by NullCGT */
+/* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
 
@@ -1147,7 +1147,7 @@ healup(nhp, nxtra, curesick, cureblind)
 int nhp, nxtra;
 register boolean curesick, cureblind;
 {
-    if (nhp) {
+    if (nhp && !u.uroleplay.marathon) {
         if (Upolyd) {
             u.mh += nhp;
             if (u.mh > u.mhmax)

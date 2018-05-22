@@ -3,7 +3,7 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/7/18 by NullCGT */
+/* Edited on 5/19/18 by NullCGT */
 
 #include "hack.h"
 
@@ -447,11 +447,15 @@ struct obj *obj;
                 break;
             case 16:
                 pline("You draw The Hierophant! Your altar arrives.");
-                levl[u.ux][u.uy].typ = ALTAR;
+                if (levl[u.ux][u.uy].typ != STAIRS &&
+                      levl[u.ux][u.uy].typ != LADDER)
+                    levl[u.ux][u.uy].typ = ALTAR;
                 break;
             case 17:
                 pline("You draw the Emperess! Your throne arrives.");
-                levl[u.ux][u.uy].typ = THRONE;
+                if (levl[u.ux][u.uy].typ != STAIRS &&
+                      levl[u.ux][u.uy].typ != LADDER)
+                    levl[u.ux][u.uy].typ = THRONE;
                 break;
             case 18:
                 pline("You draw The Chariot! Your steed has arrived.");

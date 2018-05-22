@@ -17,6 +17,8 @@ New Options
   frustrating.
 - Ill-fated: A challenge mode where the dungeon difficulty is automatically
   upped by 50.
+- Marathon: A challenge mode where you start with 999 HP, but cannot heal or
+  regenerate hit points.
 - Tips: Gives you a spoiler tip every time you are welcomed. Defaults to true.
 - Pet names for birds and dragons can be specified with birdname and dragonname
   respectively. Birds can be set as the preferred pet with "b".
@@ -39,6 +41,9 @@ Visual/Interface Changes
 
 General Changes
 - SpliceHack Tip of the Day will tell you about new features.
+- Monks occasionally get martial arts messages when fighting bare-handed.
+- Engraving in the elemental plane of fire will mention that you are  engraving
+  in obsidian.
 - Deadly poison no longer instantly kills you, but instead will cause both
   HP and attribute damage.
 - Probing certain non-unique monsters will tell you their name.
@@ -205,7 +210,6 @@ New Artifacts
 - Sonicboom
 - Sunspot
 - Pridwen
-- Seven-League Boots
 - Balance
 - Sharur (Dragonmaster quest artifact)
 - The Holographic Void Lily (Cartomancer quest artifact)
@@ -225,6 +229,8 @@ Dungeon Generation
 - Mephisto's Lair: Gehennom level containing Mephisto
 - The Lord of the Foocubi's Lair: Gehennom level containing the Lord of the
   Foocubi.
+- Paxed's patches for additional Knox and Castle levels have been implemented,
+  resulting in several possible variants.
 
 New Monster Spells
 - Sonic Scream: High level spell that does a large amount of damage, but is
@@ -271,12 +277,15 @@ New Items
   end your run. Appears the same as a playing card deck.
 - Pinch of Catnip: Confuses and tames felines.
 - Potion of Reflection: Grants temporary reflection.
-- Scroll of Cloning
+- Scroll of Cloning: Clones the player.
 - Scroll of Pure Law: All aligned scrolls allow an automatically successful
   prayer when read if the player is coaligned, and otherwise yield the wrath
   of the deity.
 - Scroll of True Neutrality: See scroll of pure law.
 - Scroll of Raw Chaos: See scroll of raw chaos.
+- Scroll of Time: Grants the player a large number of movement points.
+- Scroll of Web: Allows the placement of webs
+- Spellbook of Web: Allows the placement of webs
 - Wand of Healing: Wand that acts as a heal spell.
 - Wand of Wonder: Wand that randomly mimics a different wand when zapped or
   engraved with, making engrave-IDing slightly less reliable.
@@ -366,6 +375,8 @@ New Monsters
 - Baby Purple Dragon
 - Mind Flayer Telepath
 - Gnomish Psychic
+- Hundred Handed One
+- Magma elemental
 - Cartomancer (Player Monster)
 - Dragonmaster (Player Monster)
 - Infernal (Non-generated Race)

@@ -585,9 +585,11 @@ fixup_special()
         /* stock the main vault */
         for (x = croom->lx; x <= croom->hx; x++)
             for (y = croom->ly; y <= croom->hy; y++) {
-                (void) mkgold((long) rn1(300, 600), x, y);
-                if (!rn2(3) && !is_pool(x, y))
-                    (void) maketrap(x, y, rn2(3) ? LANDMINE : SPIKED_PIT);
+                if (!is_solid(x,y)) {
+                    (void) mkgold((long) rn1(300, 600), x, y);
+                    if (!rn2(3) && !is_pool(x, y))
+                        (void) maketrap(x, y, rn2(3) ? LANDMINE : SPIKED_PIT);
+                }
             }
     } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
