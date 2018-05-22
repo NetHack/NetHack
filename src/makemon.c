@@ -75,7 +75,7 @@ struct permonst *ptr;
         case PM_WATER_ELEMENTAL:
             return Is_waterlevel(&u.uz);
         case PM_FUSION_ELEMENTAL:
-            return TRUE;
+            return Is_astralevel(&u.uz);
         }
     return FALSE;
 }
