@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526907473 2018/05/21 12:57:53 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1526955073 2018/05/22 02:11:13 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -462,8 +462,8 @@ STATIC_DCL void NDECL(status_hilite_linestr_gather);
 STATIC_DCL char *FDECL(status_hilite2str, (struct hilite_s *));
 STATIC_DCL int NDECL(status_hilite_menu_choose_field);
 STATIC_DCL int FDECL(status_hilite_menu_choose_behavior, (int));
-STATIC_DCL int FDECL(status_hilite_menu_choose_updownboth, (int,
-                                                            const char *));
+STATIC_DCL int FDECL(status_hilite_menu_choose_updownboth, (int, const char *,
+                                                       BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(status_hilite_menu_add, (int));
 #define has_hilite(i) (blstats[0][(i)].thresholds)
 #endif
@@ -494,7 +494,8 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
-    INIT_BLSTAT("hunger", " %s", ANY_UINT, 40, BL_HUNGER),
+    /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
+    INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, 80, BL_LEVELDESC),
@@ -639,7 +640,11 @@ bot_via_windowport()
     blstats[idx][BL_TIME].a.a_long = moves;
 
     /* Hunger */
-    blstats[idx][BL_HUNGER].a.a_uint = u.uhs;
+    /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
+       BL_HUNGER to be ANY_UINT, but that was the only non-int/non-long
+       numeric field so it's far simpler to treat it as plain int and
+       not need ANY_UINT handling at all */
+    blstats[idx][BL_HUNGER].a.a_int = (int) u.uhs;
     Strcpy(blstats[idx][BL_HUNGER].val,
            (u.uhs != NOT_HUNGRY) ? hu_stat[u.uhs] : "");
     valset[BL_HUNGER] = TRUE;
@@ -1220,6 +1225,10 @@ static struct fieldid_t {
     {0,          BL_FLUSH}
 };
 
+/* format arguments */
+static const char threshold_value[] = "hilite_status threshold ",
+                  is_out_of_range[] = " is out of range";
+
 /* field name to bottom line index */
 STATIC_OVL enum statusfields
 fldname_to_bl_indx(name)
@@ -1724,7 +1733,7 @@ boolean from_configfile;
     int coloridx = -1, successes = 0;
     int disp_attrib = 0;
     boolean percent, changed, numeric, down, up,
-        gt, lt, ge, le, eq, txtval, always;
+            gt, lt, ge, le, eq, txtval, always;
     const char *txt;
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
@@ -1814,6 +1823,8 @@ boolean from_configfile;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
         } else if (is_ltgt_percentnumber(s[sidx])) {
+            const char *op;
+
             tmp = s[sidx]; /* is_ltgt_() guarantees [<>]?=?[-+]?[0-9]+%? */
             if (strchr(tmp, '%'))
                percent = TRUE;
@@ -1835,33 +1846,26 @@ boolean from_configfile;
             numeric = TRUE;
             dt = percent ? ANY_INT : initblstats[fld].anytype;
             (void) s_to_anything(&hilite.value, tmp, dt);
+
+            op = gt ? ">" : ge ? ">=" : lt ? "<" : le ? "<=" : "=";
             if (dt == ANY_INT
                 /* AC is the only field where negative values make sense but
-                   accept >-1 for other fields */
-                && (hilite.value.a_int < (fld == BL_AC ? -128 : gt ? -1 : 0)
+                   accept >-1 for other fields; reject <0 for non-AC */
+                && (hilite.value.a_int
+                    < ((fld == BL_AC) ? -128 : gt ? -1 : lt ? 1 : 0)
                 /* percentages have another more comprehensive check below */
                     || hilite.value.a_int > (percent ? (lt ? 101 : 100)
                                                      : LARGEST_INT))) {
-                    config_error_add(
-                           "hilite_status threshold '%s%d%s' is out of range",
-                                     gt ? ">" : ge ? ">="
-                                        : lt ? "<" : le ? "<=" : "=",
-                                     hilite.value.a_int,
-                                     percent ? "%" : "");
-                    return FALSE;
+                config_error_add("%s'%s%d%s'%s", threshold_value,
+                                 op, hilite.value.a_int, percent ? "%" : "",
+                                 is_out_of_range);
+                return FALSE;
+            } else if (dt == ANY_LONG
+                       && (hilite.value.a_long < (gt ? -1L : lt ? 1L : 0L))) {
+                config_error_add("%s'%s%ld'%s", threshold_value,
+                                 op, hilite.value.a_long, is_out_of_range);
+                return FALSE;
             }
-            /*
-             * Note:  the only check for ANY_LONG would be
-             *   if (hilite.value.a_long < (gt ? -1L : 0L)) { }
-             * so we might as well skip it instead of replicating
-             * the above config_error_add() for hilite.value.a_long.
-             * The only non-int/non-long numeric is BL_HUNGER
-             * (unsigned: ANY_UINT) and it should be changed to int
-             * instead of trying to support one oddball field,
-             * particularly since users are encouraged to use the
-             * "satiated"/"hungry"/"weak"/&c strings instead of
-             * their internal numeric values.
-             */
         } else if (initblstats[fld].anytype == ANY_STR) {
             txt = s[sidx];
             txtval = TRUE;
@@ -2658,7 +2662,7 @@ int fld;
     }
 
     if (fld != BL_CAP && fld != BL_HUNGER
-        && (at == ANY_INT || at == ANY_LONG || at == ANY_UINT)) {
+        && (at == ANY_INT || at == ANY_LONG)) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
@@ -2704,9 +2708,10 @@ int fld;
 }
 
 STATIC_OVL int
-status_hilite_menu_choose_updownboth(fld, str)
+status_hilite_menu_choose_updownboth(fld, str, ltok, gtok)
 int fld;
 const char *str;
+boolean ltok, gtok;
 {
     int res, ret = NO_LTEQGT;
     winid tmpwin;
@@ -2717,23 +2722,25 @@ const char *str;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
 
-    if (str)
-        Sprintf(buf, "%s than %s",
-                (fld == BL_AC) ? "Better (lower)" : "Less", str);
-    else
-        Sprintf(buf, "Value goes down");
-    any = zeroany;
-    any.a_int = 10 + LT_VALUE;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
-
-    if (str) {
-        Sprintf(buf, "%s or %s",
-                str, (fld == BL_AC) ? "better (lower)" : "less");
+    if (ltok) {
+        if (str)
+            Sprintf(buf, "%s than %s",
+                    (fld == BL_AC) ? "Better (lower)" : "Less", str);
+        else
+            Sprintf(buf, "Value goes down");
         any = zeroany;
-        any.a_int = 10 + LE_VALUE;
+        any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
+
+        if (str) {
+            Sprintf(buf, "%s or %s",
+                    str, (fld == BL_AC) ? "better (lower)" : "less");
+            any = zeroany;
+            any.a_int = 10 + LE_VALUE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
     }
 
     if (str)
@@ -2745,25 +2752,26 @@ const char *str;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
 
-    if (str) {
-        Sprintf(buf, "%s or %s",
-                str, (fld == BL_AC) ? "worse (higher)" : "more");
+    if (gtok) {
+        if (str) {
+            Sprintf(buf, "%s or %s",
+                    str, (fld == BL_AC) ? "worse (higher)" : "more");
+            any = zeroany;
+            any.a_int = 10 + GE_VALUE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
+
+        if (str)
+            Sprintf(buf, "%s than %s",
+                    (fld == BL_AC) ? "Worse (higher)" : "More", str);
+        else
+            Sprintf(buf, "Value goes up");
         any = zeroany;
-        any.a_int = 10 + GE_VALUE;
+        any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 buf, MENU_UNSELECTED);
-    }
-
-    if (str)
-        Sprintf(buf, "%s than %s",
-                (fld == BL_AC) ? "Worse (higher)" : "More", str);
-    else
-        Sprintf(buf, "Value goes up");
-    any = zeroany;
-    any.a_int = 10 + GT_VALUE;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
-
+    }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
@@ -2783,7 +2791,7 @@ int origfld;
 {
     int fld;
     int behavior;
-    int lt_gt_eq = NO_LTEQGT; /* not set up yet */
+    int lt_gt_eq;
     int clr = NO_COLOR, atr = HL_UNDEF;
     struct hilite_s hilite;
     unsigned long cond = 0UL;
@@ -2827,10 +2835,11 @@ choose_value:
         char inbuf[BUFSZ], buf[BUFSZ];
         anything aval;
         int val, dt;
-        boolean skipltgt = FALSE, gotnum = FALSE,
-                percent = (behavior == BL_TH_VAL_PERCENTAGE);
+        boolean gotnum = FALSE, percent = (behavior == BL_TH_VAL_PERCENTAGE);
         char *inp, *numstart;
+        const char *op;
 
+        lt_gt_eq = NO_LTEQGT; /* not set up yet */
         inbuf[0] = '\0';
         Sprintf(buf, "Enter %svalue for %s threshold:",
                 percent ? "percentage " : "",
@@ -2849,7 +2858,6 @@ choose_value:
             lt_gt_eq = (*inp == '>') ? ((inp[1] == '=') ? GE_VALUE : GT_VALUE)
                      : (*inp == '<') ? ((inp[1] == '=') ? LE_VALUE : LT_VALUE)
                        : EQ_VALUE;
-            skipltgt = TRUE;
             *inp++ = ' ';
             numstart++;
             if (lt_gt_eq == GE_VALUE || lt_gt_eq == LE_VALUE) {
@@ -2882,6 +2890,12 @@ choose_value:
             pline("Is that an invisible number?");
             goto choose_value;
         }
+        op = (lt_gt_eq == LT_VALUE) ? "<"
+               : (lt_gt_eq == LE_VALUE) ? "<="
+                 : (lt_gt_eq == GT_VALUE) ? ">"
+                   : (lt_gt_eq == GE_VALUE) ? ">="
+                     : (lt_gt_eq == EQ_VALUE) ? "="
+                       : ""; /* didn't specify lt_gt_eq with number */
 
         aval = zeroany;
         dt = percent ? ANY_INT : initblstats[fld].anytype;
@@ -2898,31 +2912,43 @@ choose_value:
             /* if player only specified a number then lt_gt_eq isn't set
                up yet and the >-1 and <101 exceptions can't be honored;
                deliberate use of those should be uncommon enough for
-               that to be palatable; unfortunately, it also lets 0 with
-               later < and 100 with later > through too but those won't
-               break anything, just end up as no-ops */
+               that to be palatable; for 0 and 100, choose_updown_both()
+               will prevent useless operations */
             if ((val < 0 && (val != -1 || lt_gt_eq != GT_VALUE))
                 || (val == 0 && lt_gt_eq == LT_VALUE)
                 || (val == 100 && lt_gt_eq == GT_VALUE)
                 || (val > 100 && (val != 101 || lt_gt_eq != LT_VALUE))) {
-                pline("'%s%d%%' is not a valid percent value.",
-                      (lt_gt_eq == LT_VALUE) ? "<"
-                        : (lt_gt_eq == LE_VALUE) ? "<="
-                          : (lt_gt_eq == GT_VALUE) ? ">"
-                            : (lt_gt_eq == GE_VALUE) ? ">="
-                              : (lt_gt_eq == EQ_VALUE) ? "="
-                                /* didn't specify lt_gt_eq with number */
-                                : "",
-                      val);
+                pline("'%s%d%%' is not a valid percent value.", op, val);
                 goto choose_value;
             }
             /* restore suffix for use in color and attribute prompts */
             if (!index(numstart, '%'))
                 Strcat(numstart, "%");
+
+        /* reject negative values except for AC and >-1; reject 0 for < */
+        } else if (dt == ANY_INT
+                   && (aval.a_int < ((fld == BL_AC) ? -128
+                                     : (lt_gt_eq == GT_VALUE) ? -1
+                                       : (lt_gt_eq == LT_VALUE) ? 1 : 0))) {
+            pline("%s'%s%d'%s", threshold_value,
+                  op, aval.a_int, is_out_of_range);
+            goto choose_value;
+        } else if (dt == ANY_LONG
+                   && (aval.a_long < (lt_gt_eq == GT_VALUE) ? -1L
+                                     : (lt_gt_eq == LT_VALUE) ? 1L : 0L)) {
+            pline("%s'%s%ld'%s", threshold_value,
+                  op, aval.a_long, is_out_of_range);
+            goto choose_value;
         }
 
-        if (!skipltgt) {
-            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, inbuf);
+        if (lt_gt_eq == NO_LTEQGT) {
+            boolean ltok = ((dt == ANY_INT)
+                            ? (aval.a_int > 0 || fld == BL_AC)
+                            : (aval.a_long > 0L)),
+                    gtok = (!percent || aval.a_long < 100);
+
+            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, inbuf,
+                                                            ltok, gtok);
             if (lt_gt_eq == NO_LTEQGT)
                 goto choose_value;
         }
@@ -2949,7 +2975,8 @@ choose_value:
         hilite.rel = lt_gt_eq;
         hilite.value = aval;
     } else if (behavior == BL_TH_UPDOWN) {
-        lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0);
+        lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
+                                                        TRUE, TRUE);
         if (lt_gt_eq == NO_LTEQGT)
             goto choose_behavior;
         Sprintf(colorqry, "Choose a color for when %s %s:",
