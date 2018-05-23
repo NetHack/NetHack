@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1527010852 2018/05/22 17:40:52 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1527042178 2018/05/23 02:22:58 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1316,7 +1316,7 @@ noneoftheabove(hl_text)
 const char *hl_text;
 {
     if (fuzzymatch(hl_text, "none of the above", "\" -_", TRUE)
-        || fuzzymatch(hl_text, "(polymorphed)", "()", TRUE)
+        || fuzzymatch(hl_text, "(polymorphed)", "\"()", TRUE)
         || fuzzymatch(hl_text, "none of the above (polymorphed)",
                       "\" -_()", TRUE))
         return TRUE;
@@ -1492,10 +1492,16 @@ int *colorptr;
                 txtstr = blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     txtstr += (strlen(plname) + sizeof " the " - sizeof "");
-                if (hl->rel == TXT_VALUE && hl->textmatch[0]
-                    && (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)
-                        || (Upolyd && noneoftheabove(hl->textmatch)))) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
+                if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
+                    if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        exactmatch = TRUE;
+                    } else if (exactmatch) {
+                        ; /* already found best fit, skip "noneoftheabove" */
+                    } else if (fldidx == BL_TITLE
+                               && Upolyd && noneoftheabove(hl->textmatch)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                    }
                 }
                 break;
             case BL_TH_ALWAYS_HILITE:
