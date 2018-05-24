@@ -191,7 +191,7 @@ CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
 
-conlibs = -lwinmm
+conlibs = -lgdi32 -lwinmm
 guilibs = -lcomctl32 -lwinmm
 
 #==========================================
