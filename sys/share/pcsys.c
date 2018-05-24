@@ -546,8 +546,8 @@ msexit()
     if (GUILaunched)
         getreturn("to end");
     synch_cursor();
-#endif
     getreturn_enabled = TRUE;
+#endif
     wait_synch();
     return;
 }
