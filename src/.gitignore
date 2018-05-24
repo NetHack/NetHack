@@ -7,3 +7,4 @@ Sysunix
 nethack
 *.o
 tiles.bmp
+*.moc
