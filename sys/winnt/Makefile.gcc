@@ -1060,7 +1060,7 @@ spotless: clean
 	$(subst /,\,if exist $(MSWIN)/rip.bmp del $(MSWIN)/rip.bmp)
 	$(subst /,\,if exist $(MSWIN)/splash.bmp del $(MSWIN)/splash.bmp)
 ifneq "$(OBJ)" ""
-	$(subst /,\,rmdir $(OBJ)) /s /Q
+	$(subst /,\,if exist $(OBJ) rmdir $(OBJ)) /s /Q
 endif
 
 clean:
