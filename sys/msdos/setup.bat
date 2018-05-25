@@ -59,15 +59,15 @@ if exist ..\..\doc\guidebook.txt goto long3a
 if exist ..\..\doc\guideb~1.txt goto long3b
 goto warn3long
 :long3a
-echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guideboo.txt"
-ren ..\..\doc\guidebook.txt guideboo.txt
+echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guidebk.txt"
+ren ..\..\doc\guidebook.txt guidebk.txt
 goto long3ok
 :long3b
-echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guideboo.txt"
+echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guidebk.txt"
 ren ..\..\doc\guideb~1.txt guideboo.txt
 goto long3ok
 :warn3long
-echo "Warning - There is no NetHack Guidebook (..\..\doc\guideboo.txt)"
+echo "Warning - There is no NetHack Guidebook (..\..\doc\guidebk.txt)"
 echo "          included in your distribution.  Build will proceed anyway."
 :long3ok
 
