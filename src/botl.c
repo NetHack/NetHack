@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1526597284 2018/05/17 22:48:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1527042178 2018/05/23 02:22:58 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -446,21 +446,25 @@ STATIC_DCL boolean FDECL(is_ltgt_percentnumber, (const char *));
 STATIC_DCL boolean FDECL(has_ltgt_percentnumber, (const char *));
 STATIC_DCL boolean FDECL(parse_status_hl2, (char (*)[QBUFSZ],BOOLEAN_P));
 STATIC_DCL boolean FDECL(parse_condition, (char (*)[QBUFSZ], int));
+STATIC_DCL boolean FDECL(noneoftheabove, (const char *));
 STATIC_DCL void FDECL(merge_bestcolor, (int *, int));
 STATIC_DCL void FDECL(get_hilite_color, (int, int, genericptr_t, int,
-                                                int, int *));
+                                         int, int *));
 STATIC_DCL unsigned long FDECL(match_str2conditionbitmask, (const char *));
 STATIC_DCL unsigned long FDECL(str2conditionbitmask, (char *));
 STATIC_DCL void FDECL(split_clridx, (int, int *, int *));
 STATIC_DCL char *FDECL(hlattr2attrname, (int, char *, int));
 STATIC_DCL void FDECL(status_hilite_linestr_add, (int, struct hilite_s *,
-                                            unsigned long, const char *));
-
+                                                unsigned long, const char *));
 STATIC_DCL void NDECL(status_hilite_linestr_done);
 STATIC_DCL int FDECL(status_hilite_linestr_countfield, (int));
 STATIC_DCL void NDECL(status_hilite_linestr_gather_conditions);
 STATIC_DCL void NDECL(status_hilite_linestr_gather);
 STATIC_DCL char *FDECL(status_hilite2str, (struct hilite_s *));
+STATIC_DCL int NDECL(status_hilite_menu_choose_field);
+STATIC_DCL int FDECL(status_hilite_menu_choose_behavior, (int));
+STATIC_DCL int FDECL(status_hilite_menu_choose_updownboth, (int, const char *,
+                                                       BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(status_hilite_menu_add, (int));
 #define has_hilite(i) (blstats[0][(i)].thresholds)
 #endif
@@ -491,7 +495,8 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
-    INIT_BLSTAT("hunger", " %s", ANY_UINT, 40, BL_HUNGER),
+    /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
+    INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, 80, BL_LEVELDESC),
@@ -636,7 +641,11 @@ bot_via_windowport()
     blstats[idx][BL_TIME].a.a_long = moves;
 
     /* Hunger */
-    blstats[idx][BL_HUNGER].a.a_uint = u.uhs;
+    /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
+       BL_HUNGER to be ANY_UINT, but that was the only non-int/non-long
+       numeric field so it's far simpler to treat it as plain int and
+       not need ANY_UINT handling at all */
+    blstats[idx][BL_HUNGER].a.a_int = (int) u.uhs;
     Strcpy(blstats[idx][BL_HUNGER].val,
            (u.uhs != NOT_HUNGRY) ? hu_stat[u.uhs] : "");
     valset[BL_HUNGER] = TRUE;
@@ -873,7 +882,8 @@ status_finish()
     int i;
 
     /* call the window port cleanup routine first */
-    (*windowprocs.win_status_finish)();
+    if (windowprocs.win_status_finish)
+        (*windowprocs.win_status_finish)();
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {
@@ -1216,6 +1226,10 @@ static struct fieldid_t {
     {0,          BL_FLUSH}
 };
 
+/* format arguments */
+static const char threshold_value[] = "hilite_status threshold ",
+                  is_out_of_range[] = " is out of range";
+
 /* field name to bottom line index */
 STATIC_OVL enum statusfields
 fldname_to_bl_indx(name)
@@ -1295,6 +1309,20 @@ reset_status_hilites()
     context.botlx = TRUE;
 }
 
+/* test whether the text from a title rule matches the string for
+   title-while-polymorphed in the 'textmatch' menu */
+STATIC_OVL boolean
+noneoftheabove(hl_text)
+const char *hl_text;
+{
+    if (fuzzymatch(hl_text, "none of the above", "\" -_", TRUE)
+        || fuzzymatch(hl_text, "(polymorphed)", "\"()", TRUE)
+        || fuzzymatch(hl_text, "none of the above (polymorphed)",
+                      "\" -_()", TRUE))
+        return TRUE;
+    return FALSE;
+}
+
 STATIC_OVL void
 merge_bestcolor(bestcolor, newcolor)
 int *bestcolor;
@@ -1349,79 +1377,132 @@ int *colorptr;
 {
     int bestcolor = NO_COLOR;
     struct hilite_s *hl;
-    anything *value = (anything *)vp;
-    char *txtstr, *cmpstr;
+    anything *value = (anything *) vp;
+    char *txtstr;
 
     if (!colorptr || fldidx < 0 || fldidx >= MAXBLSTATS)
         return;
 
     if (blstats[idx][fldidx].thresholds) {
         /* there are hilites set here */
-        int max_pc = 0, min_pc = 100;
-        int max_val = 0, min_val = LARGEST_INT;
-        boolean exactmatch = FALSE;
+        int max_pc = -1, min_pc = 101;
+        int max_val = -LARGEST_INT, min_val = LARGEST_INT;
+        boolean exactmatch = FALSE, updown = FALSE, changed = FALSE,
+                perc_or_abs = FALSE;
 
-        hl = blstats[idx][fldidx].thresholds;
+        /* min_/max_ are used to track best fit */
+        for (hl = blstats[idx][fldidx].thresholds; hl; hl = hl->next) {
+            /* if we've already matched a temporary highlight, it takes
+               precedence over all persistent ones; we still process
+               updown rules to get the last one which qualifies */
+            if ((updown || changed) && hl->behavior != BL_TH_UPDOWN)
+                continue;
+            /* among persistent highlights, if a 'percentage' or 'absolute'
+               rule has been matched, it takes precedence over 'always' */
+            if (perc_or_abs && hl->behavior == BL_TH_ALWAYS_HILITE)
+                continue;
 
-        while (hl) {
             switch (hl->behavior) {
             case BL_TH_VAL_PERCENTAGE:
                 if (hl->rel == EQ_VALUE && pc == hl->value.a_int) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = max_pc = hl->value.a_int;
-                    exactmatch = TRUE;
-                } else if (hl->rel == LT_VALUE && !exactmatch
-                           && (hl->value.a_int >= pc)
+                    exactmatch = perc_or_abs = TRUE;
+                } else if (exactmatch) {
+                    ; /* already found best fit, skip lt,ge,&c */
+                } else if (hl->rel == LT_VALUE
+                           && (pc < hl->value.a_int)
                            && (hl->value.a_int <= min_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = hl->value.a_int;
-                } else if (hl->rel == GT_VALUE && !exactmatch
-                           && (hl->value.a_int <= pc)
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == LE_VALUE
+                           && (pc <= hl->value.a_int)
+                           && (hl->value.a_int <= min_pc)) {
+                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    min_pc = hl->value.a_int;
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GT_VALUE
+                           && (pc > hl->value.a_int)
                            && (hl->value.a_int >= max_pc)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_pc = hl->value.a_int;
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GE_VALUE
+                           && (pc >= hl->value.a_int)
+                           && (hl->value.a_int >= max_pc)) {
+                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    max_pc = hl->value.a_int;
+                    perc_or_abs = TRUE;
                 }
                 break;
             case BL_TH_UPDOWN:
+                /* specific 'up' or 'down' takes precedence over general
+                   'changed' regardless of their order in the rule set */
                 if (chg < 0 && hl->rel == LT_VALUE) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
+                    updown = TRUE;
                 } else if (chg > 0 && hl->rel == GT_VALUE) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
-                } else if (hl->rel == EQ_VALUE && chg) {
+                    updown = TRUE;
+                } else if (chg != 0 && hl->rel == EQ_VALUE && !updown) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
-                    min_val = max_val = hl->value.a_int;
+                    changed = TRUE;
                 }
                 break;
             case BL_TH_VAL_ABSOLUTE:
+            /*
+             * TODO:
+             *  This covers data type ANY_INT.  We need to handle ANY_LONG
+             *  separately using a_long and new min_lval, max_lval.
+             */
                 if (hl->rel == EQ_VALUE && hl->value.a_int == value->a_int) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = max_val = hl->value.a_int;
-                    exactmatch = TRUE;
-                } else if (hl->rel == LT_VALUE && !exactmatch
-                           && (hl->value.a_int >= value->a_int)
-                           && (hl->value.a_int < min_val)) {
+                    exactmatch = perc_or_abs = TRUE;
+                } else if (exactmatch) {
+                    ; /* already found best fit, skip lt,ge,&c */
+                } else if (hl->rel == LT_VALUE
+                           && (value->a_int < hl->value.a_int)
+                           && (hl->value.a_int <= min_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_val = hl->value.a_int;
-                } else if (hl->rel == GT_VALUE && !exactmatch
-                           && (hl->value.a_int <= value->a_int)
-                           && (hl->value.a_int > max_val)) {
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == LE_VALUE
+                           && (value->a_int <= hl->value.a_int)
+                           && (hl->value.a_int <= min_val)) {
+                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    min_val = hl->value.a_int;
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GT_VALUE
+                           && (value->a_int > hl->value.a_int)
+                           && (hl->value.a_int >= max_val)) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     max_val = hl->value.a_int;
+                    perc_or_abs = TRUE;
+                } else if (hl->rel == GE_VALUE
+                           && (value->a_int >= hl->value.a_int)
+                           && (hl->value.a_int >= max_val)) {
+                    merge_bestcolor(&bestcolor, hl->coloridx);
+                    max_val = hl->value.a_int;
+                    perc_or_abs = TRUE;
                 }
                 break;
             case BL_TH_TEXTMATCH:
-                txtstr = dupstr(blstats[idx][fldidx].val);
-                cmpstr = txtstr;
-                if (fldidx == BL_TITLE) {
-                    int len = (strlen(plname) + sizeof(" the"));
-                    cmpstr += len;
+                txtstr = blstats[idx][fldidx].val;
+                if (fldidx == BL_TITLE)
+                    txtstr += (strlen(plname) + sizeof " the " - sizeof "");
+                if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
+                    if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        exactmatch = TRUE;
+                    } else if (exactmatch) {
+                        ; /* already found best fit, skip "noneoftheabove" */
+                    } else if (fldidx == BL_TITLE
+                               && Upolyd && noneoftheabove(hl->textmatch)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                    }
                 }
-                (void) trimspaces(cmpstr);
-                if (hl->rel == TXT_VALUE && hl->textmatch[0] &&
-                    !strcmpi(hl->textmatch, cmpstr)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                }
-                free(txtstr);
                 break;
             case BL_TH_ALWAYS_HILITE:
                 merge_bestcolor(&bestcolor, hl->coloridx);
@@ -1431,7 +1512,6 @@ int *colorptr;
             default:
                 break;
             }
-            hl = hl->next;
         }
     }
     *colorptr = bestcolor;
@@ -1443,9 +1523,9 @@ split_clridx(idx, coloridx, attrib)
 int idx;
 int *coloridx, *attrib;
 {
-    if (idx && coloridx && attrib) {
-           *coloridx = idx & 0x00FF;
-           *attrib = (idx & 0xFF00) >> 8;
+    if (coloridx && attrib) {
+        *coloridx = idx & 0x00FF;
+        *attrib = (idx >> 8) & 0x00FF;
     }
 }
 
@@ -1483,12 +1563,11 @@ boolean from_configfile;
                     hsbuf[fldnum][ccount] = '\0';
                     op++;
                     continue;
-                } else {
-                    rslt = parse_status_hl2(hsbuf, from_configfile);
-                    if (!rslt) {
-                        badopt = TRUE;
-                        break;
-                    }
+                }
+                rslt = parse_status_hl2(hsbuf, from_configfile);
+                if (!rslt) {
+                    badopt = TRUE;
+                    break;
                 }
             }
             for (i = 0; i < MAX_THRESH; ++i) {
@@ -1515,7 +1594,7 @@ boolean from_configfile;
     return TRUE;
 }
 
-/* is str in the format of "[<>]?-?[0-9]+%?" regex */
+/* is str in the format of "[<>]?=?[-+]?[0-9]+%?" regex */
 STATIC_OVL boolean
 is_ltgt_percentnumber(str)
 const char *str;
@@ -1524,10 +1603,12 @@ const char *str;
 
     if (*s == '<' || *s == '>')
         s++;
-    if (*s == '-')
+    if (*s == '=')
         s++;
-    /* note:  this doesn't match the regexp shown above since it doesn't
-       require at least one digit; but it's adequate for how it gets used */
+    if (*s == '-' || *s == '+')
+        s++;
+    if (!digit(*s))
+        return FALSE;
     while (digit(*s))
         s++;
     if (*s == '%')
@@ -1535,7 +1616,7 @@ const char *str;
     return (*s == '\0');
 }
 
-/* does str only contain "<>0-9%" chars */
+/* does str only contain "<>=-+0-9%" chars */
 STATIC_OVL boolean
 has_ltgt_percentnumber(str)
 const char *str;
@@ -1543,7 +1624,7 @@ const char *str;
     const char *s = str;
 
     while (*s) {
-        if (!index("<>-0123456789%", *s))
+        if (!index("<>=-+0123456789%", *s))
             return FALSE;
         s++;
     }
@@ -1660,22 +1741,15 @@ struct hilite_s *hilite;
         return;
 
     /* alloc and initialize a new hilite_s struct */
-    new_hilite = (struct hilite_s *) alloc(sizeof(struct hilite_s));
+    new_hilite = (struct hilite_s *) alloc(sizeof (struct hilite_s));
     *new_hilite = *hilite;   /* copy struct */
 
     new_hilite->set = TRUE;
     new_hilite->fld = fld;
-    new_hilite->next = (struct hilite_s *)0;
+    new_hilite->next = blstats[0][fld].thresholds;
+    blstats[0][fld].thresholds = new_hilite;
+    /* sort_hilites(fld) */
 
-    /* Does that status field currently have any hilite thresholds? */
-    if (!blstats[0][fld].thresholds) {
-        blstats[0][fld].thresholds = new_hilite;
-    } else {
-        struct hilite_s *temp_hilite = blstats[0][fld].thresholds;
-        new_hilite->next = temp_hilite;
-        blstats[0][fld].thresholds = new_hilite;
-        /* sort_hilites(fld) */
-    }
     /* current and prev must both point at the same hilites */
     blstats[1][fld].thresholds = blstats[0][fld].thresholds;
 }
@@ -1690,19 +1764,16 @@ boolean from_configfile;
     int sidx = 0, i = -1, dt = -1;
     int coloridx = -1, successes = 0;
     int disp_attrib = 0;
-    boolean percent = FALSE, changed = FALSE, numeric = FALSE;
-    boolean down= FALSE, up = FALSE;
-    boolean gt = FALSE, lt = FALSE, eq = FALSE, neq = FALSE;
-    boolean txtval = FALSE;
-    boolean always = FALSE;
+    boolean percent, changed, numeric, down, up,
+            gt, lt, ge, le, eq, txtval, always;
     const char *txt;
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
     char tmpbuf[BUFSZ];
-    const char *aligntxt[] = {"chaotic", "neutral", "lawful"};
+    static const char *aligntxt[] = { "chaotic", "neutral", "lawful" };
     /* hu_stat[] from eat.c has trailing spaces which foul up comparisons */
-    const char *hutxt[] = {"Satiated", "", "Hungry", "Weak",
-                           "Fainting", "Fainted", "Starved"};
+    static const char *hutxt[] = { "Satiated", "", "Hungry", "Weak",
+                                   "Fainting", "Fainted", "Starved" };
 
     /* Examples:
         3.6.1:
@@ -1737,112 +1808,117 @@ boolean from_configfile;
         return parse_condition(s, sidx);
 
     ++sidx;
-    while(s[sidx]) {
+    while (s[sidx]) {
         char buf[BUFSZ], **subfields;
         int sf = 0;     /* subfield count */
         int kidx;
 
         txt = (const char *)0;
-        percent = changed = numeric = FALSE;
-        down = up = FALSE;
-        gt = eq = lt = neq = txtval = FALSE;
-        always = FALSE;
+        percent = numeric = always = FALSE;
+        down = up = changed = FALSE;
+        gt = ge = eq = le = lt = txtval = FALSE;
 
         /* threshold value */
         if (!s[sidx][0])
             return TRUE;
 
-        memset((genericptr_t) &hilite, 0, sizeof(struct hilite_s));
+        memset((genericptr_t) &hilite, 0, sizeof (struct hilite_s));
         hilite.set = FALSE; /* mark it "unset" */
         hilite.fld = fld;
 
-        if (*s[sidx+1] == '\0' || !strcmpi(s[sidx], "always")) {
+        if (*s[sidx + 1] == '\0' || !strcmpi(s[sidx], "always")) {
             /* "field/always/color" OR "field/color" */
             always = TRUE;
-            if (*s[sidx+1] == '\0')
+            if (*s[sidx + 1] == '\0')
                 sidx--;
-            goto do_rel;
         } else if (!strcmpi(s[sidx], "up") || !strcmpi(s[sidx], "down")) {
             if (!strcmpi(s[sidx], "down"))
                 down = TRUE;
             else
                 up = TRUE;
             changed = TRUE;
-            goto do_rel;
         } else if (fld == BL_CAP
                    && is_fld_arrayvalues(s[sidx], enc_stat,
-                                         SLT_ENCUMBER, OVERLOADED+1, &kidx)) {
+                                         SLT_ENCUMBER, OVERLOADED + 1,
+                                         &kidx)) {
             txt = enc_stat[kidx];
             txtval = TRUE;
-            goto do_rel;
         } else if (fld == BL_ALIGN
                    && is_fld_arrayvalues(s[sidx], aligntxt, 0, 3, &kidx)) {
             txt = aligntxt[kidx];
             txtval = TRUE;
-            goto do_rel;
         } else if (fld == BL_HUNGER
                    && is_fld_arrayvalues(s[sidx], hutxt,
-                                         SATIATED, STARVED+1, &kidx)) {
+                                         SATIATED, STARVED + 1, &kidx)) {
             txt = hu_stat[kidx];   /* store hu_stat[] val, not hutxt[] */
             txtval = TRUE;
-            goto do_rel;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
-            goto do_rel;
         } else if (is_ltgt_percentnumber(s[sidx])) {
-            tmp = s[sidx];
+            const char *op;
+
+            tmp = s[sidx]; /* is_ltgt_() guarantees [<>]?=?[-+]?[0-9]+%? */
             if (strchr(tmp, '%'))
                percent = TRUE;
-            if (strchr(tmp, '<'))
-                lt = TRUE;
-            if (strchr(tmp, '>'))
-                gt = TRUE;
-            (void) stripchars(tmpbuf, "%<>", tmp);
-            tmp = tmpbuf;
-            while (*tmp) {
-                if (!index("0123456789", *tmp)
-                    && (*tmp != '-' || tmp > tmpbuf))
-                    return FALSE;
-                tmp++;
+            if (*tmp == '<') {
+                if (tmp[1] == '=')
+                    le = TRUE;
+                else
+                    lt = TRUE;
+            } else if (*tmp == '>') {
+                if (tmp[1] == '=')
+                    ge = TRUE;
+                else
+                    gt = TRUE;
             }
+            /* '%', '<', '>' have served their purpose, '=' is either
+               part of '<' or '>' or optional for '=N', unary '+' is
+               just decorative, so get rid of them, leaving -?[0-9]+ */
+            tmp = stripchars(tmpbuf, "%<>=+", tmp);
             numeric = TRUE;
-            tmp = tmpbuf;
-            if (strlen(tmp) > 0) {
-                dt = initblstats[fld].anytype;
-                if (percent)
-                    dt = ANY_INT;
-                (void) s_to_anything(&hilite.value, tmp, dt);
-            } else
+            dt = percent ? ANY_INT : initblstats[fld].anytype;
+            (void) s_to_anything(&hilite.value, tmp, dt);
+
+            op = gt ? ">" : ge ? ">=" : lt ? "<" : le ? "<=" : "=";
+            if (dt == ANY_INT
+                /* AC is the only field where negative values make sense but
+                   accept >-1 for other fields; reject <0 for non-AC */
+                && (hilite.value.a_int
+                    < ((fld == BL_AC) ? -128 : gt ? -1 : lt ? 1 : 0)
+                /* percentages have another more comprehensive check below */
+                    || hilite.value.a_int > (percent ? (lt ? 101 : 100)
+                                                     : LARGEST_INT))) {
+                config_error_add("%s'%s%d%s'%s", threshold_value,
+                                 op, hilite.value.a_int, percent ? "%" : "",
+                                 is_out_of_range);
                 return FALSE;
-            if (!hilite.value.a_void && (strcmp(tmp, "0") != 0))
-               return FALSE;
+            } else if (dt == ANY_LONG
+                       && (hilite.value.a_long < (gt ? -1L : lt ? 1L : 0L))) {
+                config_error_add("%s'%s%ld'%s", threshold_value,
+                                 op, hilite.value.a_long, is_out_of_range);
+                return FALSE;
+            }
         } else if (initblstats[fld].anytype == ANY_STR) {
             txt = s[sidx];
             txtval = TRUE;
-            goto do_rel;
         } else {
             config_error_add(has_ltgt_percentnumber(s[sidx])
                  ? "Wrong format '%s', expected a threshold number or percent"
-                 : "Unknown behavior '%s'", s[sidx]);
+                 : "Unknown behavior '%s'",
+                             s[sidx]);
             return FALSE;
         }
-do_rel:
-        /* relationships { LT_VALUE, GT_VALUE, EQ_VALUE} */
-        if (gt)
+
+        /* relationships {LT_VALUE, LE_VALUE, EQ_VALUE, GE_VALUE, GT_VALUE} */
+        if (gt || up)
             hilite.rel = GT_VALUE;
-        else if (eq)
-            hilite.rel = EQ_VALUE;
-        else if (lt)
+        else if (lt || down)
             hilite.rel = LT_VALUE;
-        else if (percent)
-            hilite.rel = EQ_VALUE;
-        else if (numeric)
-            hilite.rel = EQ_VALUE;
-        else if (down)
-            hilite.rel = LT_VALUE;
-        else if (up)
-            hilite.rel = GT_VALUE;
-        else if (changed)
+        else if (ge)
+            hilite.rel = GE_VALUE;
+        else if (le)
+            hilite.rel = LE_VALUE;
+        else if (eq  || percent || numeric || changed)
             hilite.rel = EQ_VALUE;
         else if (txtval)
             hilite.rel = TXT_VALUE;
@@ -1860,13 +1936,24 @@ do_rel:
                 config_error_add("Cannot use percent with '%s'",
                                  initblstats[fld].fldname);
                 return FALSE;
-            } else if ((hilite.value.a_int < 0)
+            } else if ((hilite.value.a_int < -1)
+                       || (hilite.value.a_int == -1
+                           && hilite.value.a_int != GT_VALUE)
                        || (hilite.value.a_int == 0
                            && hilite.rel == LT_VALUE)
-                       || (hilite.value.a_int > 100)
                        || (hilite.value.a_int == 100
-                           && hilite.rel == GT_VALUE)) {
-                config_error_add("Illegal percentage value");
+                           && hilite.rel == GT_VALUE)
+                       || (hilite.value.a_int == 101
+                           && hilite.value.a_int != LT_VALUE)
+                       || (hilite.value.a_int > 101)) {
+                config_error_add(
+                           "hilite_status: invalid percentage value '%s%d%%'",
+                                 (hilite.rel == LT_VALUE) ? "<"
+                                   : (hilite.rel == LE_VALUE) ? "<="
+                                     : (hilite.rel == GT_VALUE) ? ">"
+                                       : (hilite.rel == GE_VALUE) ? ">="
+                                         : "=",
+                                 hilite.value.a_int);
                 return FALSE;
             }
         }
@@ -1889,6 +1976,7 @@ do_rel:
 
         for (i = 0; i < sf; ++i) {
             int a = match_str2attr(subfields[i], FALSE);
+
             if (a == ATR_DIM)
                 disp_attrib |= HL_DIM;
             else if (a == ATR_BLINK)
@@ -1933,7 +2021,7 @@ do_rel:
         hilite.anytype = dt;
 
         if (hilite.behavior == BL_TH_TEXTMATCH && txt
-            && strlen(txt) < QBUFSZ-1) {
+            && strlen(txt) < QBUFSZ - 1) {
             Strcpy(hilite.textmatch, txt);
             (void) trimspaces(hilite.textmatch);
         }
@@ -2281,8 +2369,7 @@ struct _status_hilite_line_str {
     struct _status_hilite_line_str *next;
 };
 
-struct _status_hilite_line_str *status_hilite_str =
-    (struct _status_hilite_line_str *) 0;
+static struct _status_hilite_line_str *status_hilite_str = 0;
 static int status_hilite_str_id = 0;
 
 STATIC_OVL void
@@ -2292,22 +2379,23 @@ struct hilite_s *hl;
 unsigned long mask;
 const char *str;
 {
-    struct _status_hilite_line_str *tmp = (struct _status_hilite_line_str *)
-        alloc(sizeof(struct _status_hilite_line_str));
-    struct _status_hilite_line_str *nxt = status_hilite_str;
+    struct _status_hilite_line_str *tmp, *nxt;
 
-    (void) memset(tmp, 0, sizeof(struct _status_hilite_line_str));
+    tmp = (struct _status_hilite_line_str *) alloc(sizeof *tmp);
+    (void) memset(tmp, 0, sizeof *tmp);
 
     ++status_hilite_str_id;
     tmp->fld = fld;
     tmp->hl = hl;
     tmp->mask = mask;
-    (void) stripchars(tmp->str, " ", str);
-
+    if (fld == BL_TITLE)
+        Strcpy(tmp->str, str);
+    else
+        (void) stripchars(tmp->str, " ", str);
     tmp->id = status_hilite_str_id;
 
-    if (nxt) {
-        while (nxt && nxt->next)
+    if ((nxt = status_hilite_str) != 0) {
+        while (nxt->next)
             nxt = nxt->next;
         nxt->next = tmp;
     } else {
@@ -2319,8 +2407,7 @@ const char *str;
 STATIC_OVL void
 status_hilite_linestr_done()
 {
-    struct _status_hilite_line_str *tmp = status_hilite_str;
-    struct _status_hilite_line_str *nxt;
+    struct _status_hilite_line_str *nxt, *tmp = status_hilite_str;
 
     while (tmp) {
         nxt = tmp->next;
@@ -2350,6 +2437,7 @@ int
 count_status_hilites(VOID_ARGS)
 {
     int count;
+
     status_hilite_linestr_gather();
     count = status_hilite_linestr_countfield(BL_FLUSH);
     status_hilite_linestr_done();
@@ -2365,13 +2453,14 @@ status_hilite_linestr_gather_conditions()
         unsigned long clratr;
     } cond_maps[SIZE(valid_conditions)];
 
-    (void)memset(cond_maps, 0,
-                 sizeof(struct _cond_map) * SIZE(valid_conditions));
+    (void) memset(cond_maps, 0,
+                  SIZE(valid_conditions) * sizeof (struct _cond_map));
 
     for (i = 0; i < SIZE(valid_conditions); i++) {
         int clr = NO_COLOR;
         int atr = HL_NONE;
         int j;
+
         for (j = 0; j < CLR_MAX; j++)
             if (cond_hilites[j] & valid_conditions[i].bitmask)
                 clr = j;
@@ -2389,6 +2478,7 @@ status_hilite_linestr_gather_conditions()
         if (clr != NO_COLOR || atr != HL_NONE) {
             unsigned long ca = clr | (atr << 8);
             boolean added_condmap = FALSE;
+
             for (j = 0; j < SIZE(valid_conditions); j++)
                 if (cond_maps[j].clratr == ca) {
                     cond_maps[j].bm |= valid_conditions[i].bitmask;
@@ -2409,12 +2499,14 @@ status_hilite_linestr_gather_conditions()
     for (i = 0; i < SIZE(valid_conditions); i++)
         if (cond_maps[i].bm) {
             int clr = NO_COLOR, atr = HL_NONE;
+
             split_clridx(cond_maps[i].clratr, &clr, &atr);
             if (clr != NO_COLOR || atr != HL_NONE) {
                 char clrbuf[BUFSZ];
                 char attrbuf[BUFSZ];
                 char condbuf[BUFSZ];
                 char *tmpattr;
+
                 (void) stripchars(clrbuf, " ", clr2colorname(clr));
                 tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
                 if (tmpattr)
@@ -2457,21 +2549,24 @@ struct hilite_s *hl;
     char clrbuf[BUFSZ];
     char attrbuf[BUFSZ];
     char *tmpattr;
+    const char *op;
 
     if (!hl)
         return (char *) 0;
 
     behavebuf[0] = '\0';
     clrbuf[0] = '\0';
+    op = (hl->rel == LT_VALUE) ? "<"
+           : (hl->rel == LE_VALUE) ? "<="
+             : (hl->rel == GT_VALUE) ? ">"
+               : (hl->rel == GE_VALUE) ? ">="
+                 : (hl->rel == EQ_VALUE) ? "="
+                   : 0;
 
     switch (hl->behavior) {
     case BL_TH_VAL_PERCENTAGE:
-        if (hl->rel == LT_VALUE)
-            Sprintf(behavebuf, "<%i%%", hl->value.a_int);
-        else if (hl->rel == GT_VALUE)
-            Sprintf(behavebuf, ">%i%%", hl->value.a_int);
-        else if (hl->rel == EQ_VALUE)
-            Sprintf(behavebuf, "%i%%", hl->value.a_int);
+        if (op)
+            Sprintf(behavebuf, "%s%d%%", op, hl->value.a_int);
         else
             impossible("hl->behavior=percentage, rel error");
         break;
@@ -2486,12 +2581,8 @@ struct hilite_s *hl;
             impossible("hl->behavior=updown, rel error");
         break;
     case BL_TH_VAL_ABSOLUTE:
-        if (hl->rel == LT_VALUE)
-            Sprintf(behavebuf, "<%i", hl->value.a_int);
-        else if (hl->rel == GT_VALUE)
-            Sprintf(behavebuf, ">%i", hl->value.a_int);
-        else if (hl->rel == EQ_VALUE)
-            Sprintf(behavebuf, "%i", hl->value.a_int);
+        if (op)
+            Sprintf(behavebuf, "%s%d", op, hl->value.a_int);
         else
             impossible("hl->behavior=absolute, rel error");
         break;
@@ -2531,7 +2622,7 @@ struct hilite_s *hl;
     return buf;
 }
 
-int
+STATIC_OVL int
 status_hilite_menu_choose_field()
 {
     winid tmpwin;
@@ -2560,7 +2651,7 @@ status_hilite_menu_choose_field()
     return fld;
 }
 
-int
+STATIC_OVL int
 status_hilite_menu_choose_behavior(fld)
 int fld;
 {
@@ -2606,7 +2697,8 @@ int fld;
         nopts++;
     }
 
-    if (fld != BL_CAP && fld != BL_HUNGER && (at == ANY_INT || at == ANY_LONG || at == ANY_UINT)) {
+    if (fld != BL_CAP && fld != BL_HUNGER
+        && (at == ANY_INT || at == ANY_LONG)) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
@@ -2622,7 +2714,8 @@ int fld;
         nopts++;
     }
 
-    if (initblstats[fld].anytype == ANY_STR || fld == BL_CAP || fld == BL_HUNGER) {
+    if (initblstats[fld].anytype == ANY_STR
+        || fld == BL_CAP || fld == BL_HUNGER) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
@@ -2650,12 +2743,13 @@ int fld;
     return beh;
 }
 
-int
-status_hilite_menu_choose_updownboth(fld, str)
+STATIC_OVL int
+status_hilite_menu_choose_updownboth(fld, str, ltok, gtok)
 int fld;
 const char *str;
+boolean ltok, gtok;
 {
-    int res, ret = -2;
+    int res, ret = NO_LTEQGT;
     winid tmpwin;
     char buf[BUFSZ];
     anything any;
@@ -2664,14 +2758,26 @@ const char *str;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
 
-    if (str)
-        Sprintf(buf, "%s or less", str);
-    else
-        Sprintf(buf, "Value goes down");
-    any = zeroany;
-    any.a_int = 10 + LT_VALUE;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+    if (ltok) {
+        if (str)
+            Sprintf(buf, "%s than %s",
+                    (fld == BL_AC) ? "Better (lower)" : "Less", str);
+        else
+            Sprintf(buf, "Value goes down");
+        any = zeroany;
+        any.a_int = 10 + LT_VALUE;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 buf, MENU_UNSELECTED);
+
+        if (str) {
+            Sprintf(buf, "%s or %s",
+                    str, (fld == BL_AC) ? "better (lower)" : "less");
+            any = zeroany;
+            any.a_int = 10 + LE_VALUE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
+    }
 
     if (str)
         Sprintf(buf, "Exactly %s", str);
@@ -2682,15 +2788,26 @@ const char *str;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
 
-    if (str)
-        Sprintf(buf, "%s or more", str);
-    else
-        Sprintf(buf, "Value goes up");
-    any = zeroany;
-    any.a_int = 10 + GT_VALUE;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-             buf, MENU_UNSELECTED);
+    if (gtok) {
+        if (str) {
+            Sprintf(buf, "%s or %s",
+                    str, (fld == BL_AC) ? "worse (higher)" : "more");
+            any = zeroany;
+            any.a_int = 10 + GE_VALUE;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
 
+        if (str)
+            Sprintf(buf, "%s than %s",
+                    (fld == BL_AC) ? "Worse (higher)" : "More", str);
+        else
+            Sprintf(buf, "Value goes up");
+        any = zeroany;
+        any.a_int = 10 + GT_VALUE;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             buf, MENU_UNSELECTED);
+    }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
@@ -2710,7 +2827,7 @@ int origfld;
 {
     int fld;
     int behavior;
-    int lt_gt_eq = 0;
+    int lt_gt_eq;
     int clr = NO_COLOR, atr = HL_UNDEF;
     struct hilite_s hilite;
     unsigned long cond = 0UL;
@@ -2731,55 +2848,63 @@ choose_field:
     colorqry[0] = '\0';
     attrqry[0] = '\0';
 
-    memset((genericptr_t) &hilite, 0, sizeof(struct hilite_s));
+    memset((genericptr_t) &hilite, 0, sizeof (struct hilite_s));
     hilite.set = FALSE; /* mark it "unset" */
     hilite.fld = fld;
 
 choose_behavior:
-
     behavior = status_hilite_menu_choose_behavior(fld);
 
-    if (behavior == (BL_TH_NONE-1)) {
+    if (behavior == (BL_TH_NONE - 1)) {
         return FALSE;
     } else if (behavior == BL_TH_NONE) {
         if (origfld == BL_FLUSH)
             goto choose_field;
-        else
-            return FALSE;
+        return FALSE;
     }
 
     hilite.behavior = behavior;
 
 choose_value:
-
     if (behavior == BL_TH_VAL_PERCENTAGE
         || behavior == BL_TH_VAL_ABSOLUTE) {
-        char inbuf[BUFSZ] = DUMMY, buf[BUFSZ];
-        int val;
-        boolean skipltgt = FALSE;
-        boolean gotnum = FALSE;
-        char *inp = inbuf;
-        char *numstart = inbuf;
+        char inbuf[BUFSZ], buf[BUFSZ];
+        anything aval;
+        int val, dt;
+        boolean gotnum = FALSE, percent = (behavior == BL_TH_VAL_PERCENTAGE);
+        char *inp, *numstart;
+        const char *op;
 
+        lt_gt_eq = NO_LTEQGT; /* not set up yet */
         inbuf[0] = '\0';
         Sprintf(buf, "Enter %svalue for %s threshold:",
-                (behavior == BL_TH_VAL_PERCENTAGE) ? "percentage " : "",
+                percent ? "percentage " : "",
                 initblstats[fld].fldname);
         getlin(buf, inbuf);
         if (inbuf[0] == '\0' || inbuf[0] == '\033')
             goto choose_behavior;
 
-        inp = trimspaces(inbuf);
+        inp = numstart = trimspaces(inbuf);
         if (!*inp)
             goto choose_behavior;
 
-        /* allow user to enter "<50%" or ">50" or just "50" */
+        /* allow user to enter "<50%" or ">50" or just "50"
+           or <=50% or >=50 or =50 */
         if (*inp == '>' || *inp == '<' || *inp == '=') {
-            lt_gt_eq = (*inp == '>') ? GT_VALUE
-                : (*inp == '<') ? LT_VALUE : EQ_VALUE;
-            skipltgt = TRUE;
-            *inp = ' ';
+            lt_gt_eq = (*inp == '>') ? ((inp[1] == '=') ? GE_VALUE : GT_VALUE)
+                     : (*inp == '<') ? ((inp[1] == '=') ? LE_VALUE : LT_VALUE)
+                       : EQ_VALUE;
+            *inp++ = ' ';
+            numstart++;
+            if (lt_gt_eq == GE_VALUE || lt_gt_eq == LE_VALUE) {
+                *inp++ = ' ';
+                numstart++;
+            }
+        }
+        if (*inp == '-') {
             inp++;
+        } else if (*inp == '+') {
+            *inp++ = ' ';
             numstart++;
         }
         while (digit(*inp)) {
@@ -2787,11 +2912,12 @@ choose_value:
             gotnum = TRUE;
         }
         if (*inp == '%') {
-            behavior = BL_TH_VAL_PERCENTAGE;
-            *inp = '\0';
-        } else if (!*inp) {
-            behavior = BL_TH_VAL_ABSOLUTE;
-        } else {
+            if (!percent) {
+                pline("Not expecting a percentage.");
+                goto choose_behavior;
+            }
+            *inp = '\0'; /* strip '%' [this accepts trailing junk!] */
+        } else if (*inp) {
             /* some random characters */
             pline("\"%s\" is not a recognized number.", inp);
             goto choose_value;
@@ -2800,65 +2926,114 @@ choose_value:
             pline("Is that an invisible number?");
             goto choose_value;
         }
+        op = (lt_gt_eq == LT_VALUE) ? "<"
+               : (lt_gt_eq == LE_VALUE) ? "<="
+                 : (lt_gt_eq == GT_VALUE) ? ">"
+                   : (lt_gt_eq == GE_VALUE) ? ">="
+                     : (lt_gt_eq == EQ_VALUE) ? "="
+                       : ""; /* didn't specify lt_gt_eq with number */
 
-        val = atoi(numstart);
-        if (behavior == BL_TH_VAL_PERCENTAGE) {
+        aval = zeroany;
+        dt = percent ? ANY_INT : initblstats[fld].anytype;
+        (void) s_to_anything(&aval, numstart, dt);
+
+        if (percent) {
+            val = aval.a_int;
             if (initblstats[fld].idxmax == -1) {
                 pline("Field '%s' does not support percentage values.",
                       initblstats[fld].fldname);
                 behavior = BL_TH_VAL_ABSOLUTE;
                 goto choose_value;
             }
-            if (val < 0 || val > 100) {
-                pline("Not a valid percent value.");
+            /* if player only specified a number then lt_gt_eq isn't set
+               up yet and the >-1 and <101 exceptions can't be honored;
+               deliberate use of those should be uncommon enough for
+               that to be palatable; for 0 and 100, choose_updown_both()
+               will prevent useless operations */
+            if ((val < 0 && (val != -1 || lt_gt_eq != GT_VALUE))
+                || (val == 0 && lt_gt_eq == LT_VALUE)
+                || (val == 100 && lt_gt_eq == GT_VALUE)
+                || (val > 100 && (val != 101 || lt_gt_eq != LT_VALUE))) {
+                pline("'%s%d%%' is not a valid percent value.", op, val);
                 goto choose_value;
             }
+            /* restore suffix for use in color and attribute prompts */
+            if (!index(numstart, '%'))
+                Strcat(numstart, "%");
+
+        /* reject negative values except for AC and >-1; reject 0 for < */
+        } else if (dt == ANY_INT
+                   && (aval.a_int < ((fld == BL_AC) ? -128
+                                     : (lt_gt_eq == GT_VALUE) ? -1
+                                       : (lt_gt_eq == LT_VALUE) ? 1 : 0))) {
+            pline("%s'%s%d'%s", threshold_value,
+                  op, aval.a_int, is_out_of_range);
+            goto choose_value;
+        } else if (dt == ANY_LONG
+                   && (aval.a_long < (lt_gt_eq == GT_VALUE) ? -1L
+                                     : (lt_gt_eq == LT_VALUE) ? 1L : 0L)) {
+            pline("%s'%s%ld'%s", threshold_value,
+                  op, aval.a_long, is_out_of_range);
+            goto choose_value;
         }
 
-        if (!skipltgt) {
-            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, inbuf);
-            if (lt_gt_eq == -2)
+        if (lt_gt_eq == NO_LTEQGT) {
+            boolean ltok = ((dt == ANY_INT)
+                            ? (aval.a_int > 0 || fld == BL_AC)
+                            : (aval.a_long > 0L)),
+                    gtok = (!percent || aval.a_long < 100);
+
+            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, inbuf,
+                                                            ltok, gtok);
+            if (lt_gt_eq == NO_LTEQGT)
                 goto choose_value;
         }
 
-        Sprintf(colorqry, "Choose a color for when %s is %s%s:",
+        Sprintf(colorqry, "Choose a color for when %s is %s%s%s:",
                 initblstats[fld].fldname,
+                (lt_gt_eq == LT_VALUE) ? "less than "
+                  : (lt_gt_eq == GT_VALUE) ? "more than "
+                    : "",
                 numstart,
-                (lt_gt_eq == EQ_VALUE) ? ""
-                : (lt_gt_eq == LT_VALUE) ? " or less"
-                : " or more");
-
-        Sprintf(attrqry, "Choose attribute for when %s is %s%s:",
+                (lt_gt_eq == LE_VALUE) ? " or less"
+                  : (lt_gt_eq == GE_VALUE) ? " or more"
+                    : "");
+        Sprintf(attrqry, "Choose attribute for when %s is %s%s%s:",
                 initblstats[fld].fldname,
-                inbuf,
-                (lt_gt_eq == EQ_VALUE) ? ""
-                : (lt_gt_eq == LT_VALUE) ? " or less"
-                : " or more");
+                (lt_gt_eq == LT_VALUE) ? "less than "
+                  : (lt_gt_eq == GT_VALUE) ? "more than "
+                    : "",
+                numstart,
+                (lt_gt_eq == LE_VALUE) ? " or less"
+                  : (lt_gt_eq == GE_VALUE) ? " or more"
+                    : "");
 
         hilite.rel = lt_gt_eq;
-        hilite.value.a_int = val;
+        hilite.value = aval;
     } else if (behavior == BL_TH_UPDOWN) {
-        lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0);
-        if (lt_gt_eq == -2)
+        boolean ltok = (fld != BL_TIME), gtok = TRUE;
+
+        lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
+                                                        ltok, gtok);
+        if (lt_gt_eq == NO_LTEQGT)
             goto choose_behavior;
         Sprintf(colorqry, "Choose a color for when %s %s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == EQ_VALUE) ? "changes"
-                : (lt_gt_eq == LT_VALUE) ? "decreases"
-                : "increases");
+                  : (lt_gt_eq == LT_VALUE) ? "decreases"
+                    : "increases");
         Sprintf(attrqry, "Choose attribute for when %s %s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == EQ_VALUE) ? "changes"
-                : (lt_gt_eq == LT_VALUE) ? "decreases"
-                : "increases");
+                  : (lt_gt_eq == LT_VALUE) ? "decreases"
+                    : "increases");
         hilite.rel = lt_gt_eq;
     } else if (behavior == BL_TH_CONDITION) {
         cond = query_conditions();
         if (!cond) {
             if (origfld == BL_FLUSH)
                 goto choose_field;
-            else
-                return FALSE;
+            return FALSE;
         }
         Sprintf(colorqry, "Choose a color for conditions %s:",
                 conditionbitmask2str(cond));
@@ -2866,6 +3041,7 @@ choose_value:
                 conditionbitmask2str(cond));
     } else if (behavior == BL_TH_TEXTMATCH) {
         char qry_buf[BUFSZ];
+
         Sprintf(qry_buf, "%s %s text value to match:",
                 (fld == BL_CAP
                  || fld == BL_ALIGN
@@ -2875,48 +3051,78 @@ choose_value:
         if (fld == BL_CAP) {
             int rv = query_arrayvalue(qry_buf,
                                       enc_stat,
-                                      SLT_ENCUMBER, OVERLOADED+1);
+                                      SLT_ENCUMBER, OVERLOADED + 1);
+
             if (rv < SLT_ENCUMBER)
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, enc_stat[rv]);
         } else if (fld == BL_ALIGN) {
-            const char *aligntxt[] = {"chaotic", "neutral", "lawful"};
+            static const char *aligntxt[] = { "chaotic", "neutral", "lawful" };
             int rv = query_arrayvalue(qry_buf,
-                                      aligntxt, 0, 3);
+                                      aligntxt, 0, 2 + 1);
+
             if (rv < 0)
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, aligntxt[rv]);
         } else if (fld == BL_HUNGER) {
-            const char *hutxt[] = {"Satiated", (char *)0, "Hungry", "Weak",
-                                   "Fainting", "Fainted", "Starved"};
+            static const char *hutxt[] = { "Satiated", (char *) 0, "Hungry",
+                                           "Weak", "Fainting", "Fainted",
+                                           "Starved" };
             int rv = query_arrayvalue(qry_buf,
                                       hutxt,
-                                      SATIATED, STARVED+1);
+                                      SATIATED, STARVED + 1);
+
             if (rv < SATIATED)
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, hutxt[rv]);
         } else if (fld == BL_TITLE) {
-            const char *rolelist[9];
-            int i, rv;
+            const char *rolelist[3 * 9 + 1];
+            char mbuf[QBUFSZ], fbuf[QBUFSZ], obuf[QBUFSZ];
+            int i, j, rv;
 
-            for (i = 0; i < 9; i++)
-                rolelist[i] = (flags.female && urole.rank[i].f)
-                    ? urole.rank[i].f : urole.rank[i].m;
+            for (i = j = 0; i < 9; i++) {
+                Sprintf(mbuf, "\"%s\"", urole.rank[i].m);
+                if (urole.rank[i].f) {
+                    Sprintf(fbuf, "\"%s\"", urole.rank[i].f);
+                    Sprintf(obuf, "%s or %s",
+                            flags.female ? fbuf : mbuf,
+                            flags.female ? mbuf : fbuf);
+                } else {
+                    fbuf[0] = obuf[0] = '\0';
+                }
+                if (flags.female) {
+                    if (*fbuf)
+                        rolelist[j++] = dupstr(fbuf);
+                    rolelist[j++] = dupstr(mbuf);
+                    if (*obuf)
+                        rolelist[j++] = dupstr(obuf);
+                } else {
+                    rolelist[j++] = dupstr(mbuf);
+                    if (*fbuf)
+                        rolelist[j++] = dupstr(fbuf);
+                    if (*obuf)
+                        rolelist[j++] = dupstr(obuf);
+                }
+            }
+            rolelist[j++] = dupstr("\"none of the above (polymorphed)\"");
 
-            rv = query_arrayvalue(qry_buf, rolelist, 0, 9);
+            rv = query_arrayvalue(qry_buf, rolelist, 0, j);
+            if (rv >= 0) {
+                hilite.rel = TXT_VALUE;
+                Strcpy(hilite.textmatch, rolelist[rv]);
+            }
+            for (i = 0; i < j; i++)
+                free((genericptr_t) rolelist[i]), rolelist[i] = 0;
             if (rv < 0)
                 goto choose_behavior;
-
-            hilite.rel = TXT_VALUE;
-            Strcpy(hilite.textmatch, rolelist[rv]);
         } else {
-            char inbuf[BUFSZ] = DUMMY;
+            char inbuf[BUFSZ];
 
             inbuf[0] = '\0';
             getlin(qry_buf, inbuf);
@@ -2924,14 +3130,14 @@ choose_value:
                 goto choose_behavior;
 
             hilite.rel = TXT_VALUE;
-            if (strlen(inbuf) < QBUFSZ-1)
+            if (strlen(inbuf) < QBUFSZ - 1)
                 Strcpy(hilite.textmatch, inbuf);
             else
                 return FALSE;
         }
         Sprintf(colorqry, "Choose a color for when %s is '%s':",
                 initblstats[fld].fldname, hilite.textmatch);
-        Sprintf(colorqry, "Choose attribute for when %s is '%s':",
+        Sprintf(attrqry, "Choose attribute for when %s is '%s':",
                 initblstats[fld].fldname, hilite.textmatch);
     } else if (behavior == BL_TH_ALWAYS_HILITE) {
         Sprintf(colorqry, "Choose a color to always hilite %s:",
@@ -2941,7 +3147,6 @@ choose_value:
     }
 
 choose_color:
-
     clr = query_color(colorqry);
     if (clr == -1) {
         if (behavior != BL_TH_ALWAYS_HILITE)
@@ -2975,6 +3180,7 @@ choose_color:
         char clrbuf[BUFSZ];
         char attrbuf[BUFSZ];
         char *tmpattr;
+
         if (atr == HL_DIM)
             cond_hilites[HL_ATTCLR_DIM] |= cond;
         else if (atr == HL_BLINK)
@@ -3000,9 +3206,25 @@ choose_color:
         pline("Added hilite condition/%s/%s",
               conditionbitmask2str(cond), clrbuf);
     } else {
+        char *p, *q;
+
         hilite.coloridx = clr | (atr << 8);
         hilite.anytype = initblstats[fld].anytype;
 
+        if (fld == BL_TITLE && (p = strstri(hilite.textmatch, " or ")) != 0) {
+            /* split menu choice "male-rank or female-rank" into two distinct
+               but otherwise identical rules, "male-rank" and "female-rank" */
+            *p = '\0'; /* chop off " or female-rank" */
+            /* new rule for male-rank */
+            status_hilite_add_threshold(fld, &hilite);
+            pline("Added hilite %s", status_hilite2str(&hilite));
+            /* transfer female-rank to start of hilite.textmatch buffer */
+            p += sizeof " or " - sizeof "";
+            q = hilite.textmatch;
+            while ((*q++ = *p++) != '\0')
+                continue;
+            /* proceed with normal addition of new rule */
+        }
         status_hilite_add_threshold(fld, &hilite);
         pline("Added hilite %s", status_hilite2str(&hilite));
     }
@@ -3177,7 +3399,7 @@ status_hilites_viewall()
 
     while (hlstr) {
         Sprintf(buf, "OPTIONS=hilite_status: %.*s",
-                (int)(BUFSZ - sizeof "OPTIONS=hilite_status: " - 1),
+                (int) (BUFSZ - sizeof "OPTIONS=hilite_status: " - 1),
                 hlstr->str);
         putstr(datawin, 0, buf);
         hlstr = hlstr->next;
@@ -3204,9 +3426,7 @@ shlmenu_redo:
     start_menu(tmpwin);
 
     status_hilite_linestr_gather();
-
     countall = status_hilite_linestr_countfield(BL_FLUSH);
-
     if (countall) {
         any = zeroany;
         any.a_int = -1;
@@ -3222,12 +3442,10 @@ shlmenu_redo:
         char buf[BUFSZ];
 
         any = zeroany;
-        any.a_int = (i+1);
+        any.a_int = i + 1;
+        Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
-            Sprintf(buf, "%-18s (%i defined)",
-                    initblstats[i].fldname, count);
-        else
-            Sprintf(buf, "%-18s", initblstats[i].fldname);
+            Sprintf(eos(buf), " (%d defined)", count);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
@@ -3240,16 +3458,23 @@ shlmenu_redo:
             status_hilites_viewall();
         else
             (void) status_hilite_menu_fld(i);
-        free((genericptr_t) picks);
+        free((genericptr_t) picks), picks = (menu_item *) 0;
         redo = TRUE;
     }
 
-    picks = (menu_item *) 0;
     destroy_nhwindow(tmpwin);
+    countall = status_hilite_linestr_countfield(BL_FLUSH);
     status_hilite_linestr_done();
 
     if (redo)
         goto shlmenu_redo;
+
+    /* hilite_delta=='statushilites' does double duty:  it is the
+       number of turns for temporary highlights to remain visible
+       and also when non-zero it is the flag to enable highlighting */
+    if (countall > 0 && !iflags.hilite_delta)
+        pline(
+ "To have highlights become active, set 'statushilites' option to non-zero.");
 
     return TRUE;
 }

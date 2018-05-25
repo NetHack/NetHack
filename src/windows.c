@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1495232365 2017/05/19 22:19:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1526933747 2018/05/21 20:15:47 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,7 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 #endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
+STATIC_DCL void NDECL(def_wait_synch);
 
 #ifdef DUMPLOG
 STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
@@ -191,6 +192,22 @@ const char *s;
     puts(s);
 }
 
+STATIC_OVL
+void
+def_wait_synch(VOID_ARGS)
+{
+    /* Config file error handling routines
+     * call wait_sync() without checking to
+     * see if it actually has a value,
+     * leading to spectacular violations
+     * when you try to execute address zero.
+     * The existence of this allows early
+     * processing to have something to execute
+     * even though it essentially does nothing
+     */
+     return;
+}
+
 #ifdef WINCHAIN
 static struct win_choices *
 win_choices_find(s)
@@ -232,6 +249,9 @@ const char *s;
 
     if (!windowprocs.win_raw_print)
         windowprocs.win_raw_print = def_raw_print;
+    if (!windowprocs.win_wait_synch)
+        /* early config file error processing routines call this */
+        windowprocs.win_wait_synch = def_wait_synch;
 
     if (!winchoices[0].procs) {
         raw_printf("No window types?");

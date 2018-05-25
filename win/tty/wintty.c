@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1526429383 2018/05/16 00:09:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1526909614 2018/05/21 13:33:34 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4175,6 +4175,10 @@ render_status(VOID_ARGS)
                      * +-----------+
                      */
                     if (iflags.hilite_delta) {
+                        if (*text == ' ') {
+                            tty_putstatusfield(nullfield, " ", x++, y);
+                            text++;
+                        }
                         /* multiple attributes can be in effect concurrently */
                         Begin_Attr(attridx);
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)

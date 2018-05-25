@@ -12,12 +12,31 @@ list MSGTYPE values shows empty strings as reported in H7140
 Killing Vlad while he was in bat/fog cloud/wolf form gave poorly worded
 	feedback when he reverted to vampire form
 spaces in hilite_status option title text field not working
-numeric hilite_status values didn't allow negative numbers (needed for AC)
+numeric hilite_status values didn't allow negative numbers (needed for AC);
+	change them to accept leading '-', also accept unary '+' as a no-op
+permanent inventory window was updated too soon when a scroll of charging
+	was used to [re]charge an item, not reflecting the item's change(s)
+for starting inventory, don't give an orc hero lembas wafers or cram rations
+targetting with a polearm could give away location of hidden monster
+static prototype could be left orphaned depending on #defines in rip.c
+config file error handling routines were calling xx_wait_synch early
+	even before the window system was initialized; add a default routine
+status_finish() in botl.c would unconditionally invoke the window port's 
+	win_status_finish() routine which was problematic if the windowport
+	wasn't initialized yet
+using 'O' to set up a hilite_status rule for string comparison, the menu for
+	color was titled "choose attribute for when <foo> is 'bar'" and the
+	one prompting for attribute used the default "pick an attribute"
+when finishing using 'O' to examine or set hilite_status rules, if the
+	'statushilites' option is 0 and there is at least one rule, give a
+	reminder about setting it to non-zero to activate highlighting
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 fix access violation when --debug:xxxx has no other args after it
+Setting the inverse attribute for gold had the space before "$:" 
+	getting highlighted along with the gold field
 
 
 Platform- and/or Interface-Specific Fixes
@@ -40,11 +59,21 @@ windows-tty: Use nhraykey by default if the players keyboard layout is
 windows-tty: We now support changing altkeyhandler in game
 windows: Added ntassert() mechanism for Windows based port use
 tty: significant optimizations for performance and per field rendering
+unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
+	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
+	replace with $(QUIETCC) which operates the same but defaults to
+	verbose so doesn't use '$<' for multi-prerequisite targets unless
+	specifically requested; use 'make QUIETCC=1 <target>' to get the
+	3.6.1 behavior back
 
 
 General New Features
 --------------------
 integrate aklys feature introduced in 3.6.1 into display
+status_hilite options which use comparisons may now use <= and >= in
+	addition to previous < and >; in 3.6.1 the latter operated as if
+	they were <= and >= but now behave as conventional less than and
+	greater than; old highlight rules using them should be updated
 
 
 Code Cleanup and Reorganization

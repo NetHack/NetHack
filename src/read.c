@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1526728750 2018/05/19 11:19:10 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,19 +19,23 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
-STATIC_DCL char * FDECL(erode_obj_text, (struct obj *, char *));
-STATIC_DCL void NDECL(do_class_genocide);
+STATIC_DCL char *FDECL(erode_obj_text, (struct obj *, char *));
+STATIC_DCL char *FDECL(apron_text, (struct obj *, char *buf));
 STATIC_DCL void FDECL(stripspe, (struct obj *));
 STATIC_DCL void FDECL(p_glow1, (struct obj *));
 STATIC_DCL void FDECL(p_glow2, (struct obj *, const char *));
-STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
+#if 0 /* not used */
+STATIC_DCL void FDECL(forget_objclass, (int));
+#endif
+STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_DCL boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_PTR void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
+STATIC_DCL void NDECL(do_class_genocide);
 
 STATIC_OVL boolean
 learnscrolltyp(scrolltyp)
@@ -56,7 +60,7 @@ struct obj *sobj;
         (void) learnscrolltyp(sobj->otyp);
 }
 
-char *
+STATIC_OVL char *
 erode_obj_text(otmp, buf)
 struct obj *otmp;
 char *buf;
@@ -158,7 +162,7 @@ char *buf;
     return erode_obj_text(tshirt, buf);
 }
 
-char *
+STATIC_OVL char *
 apron_text(apron, buf)
 struct obj *apron;
 char *buf;
@@ -324,6 +328,7 @@ doread()
         return 0;
     } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         const char *what = 0;
+
         if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
         else if (!scroll->dknown)
@@ -953,7 +958,7 @@ int x,y;
               || distu(x, y) >= 32));
 }
 
-boolean
+STATIC_OVL boolean
 is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
@@ -966,7 +971,7 @@ boolean showmsg;
     return TRUE;
 }
 
-void
+STATIC_PTR void
 display_stinking_cloud_positions(state)
 int state;
 {
@@ -1621,7 +1626,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                     pline("This is a scroll of fire!");
                 dam *= 5;
                 pline("Where do you want to center the explosion?");
-                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                getpos_sethilite(display_stinking_cloud_positions,
+                                 get_valid_stinking_cloud_pos);
                 (void) getpos(&cc, TRUE, "the desired position");
                 if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
                     /* try to reach too far, get burned */
@@ -1693,7 +1699,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
               already_known ? "stinking " : "");
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+        getpos_sethilite(display_stinking_cloud_positions,
+                         get_valid_stinking_cloud_pos);
         if (getpos(&cc, TRUE, "the desired position") < 0) {
             pline1(Never_mind);
             break;
@@ -1707,6 +1714,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     default:
         impossible("What weird effect is this? (%u)", otyp);
     }
+    /* if sobj is gone, we've already called useup() above and the
+       update_inventory() that it performs might have come too soon
+       (before charging an item, for instance) */
+    if (!sobj)
+        update_inventory();
     return sobj ? 0 : 1;
 }
 

@@ -13,6 +13,7 @@
  *
  */
 
+
 #ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "hack.h"
@@ -21,6 +22,10 @@
 #include <sys\stat.h>
 #include "win32api.h"
 
+extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
+extern int redirect_stdout;
+
+#ifdef TTY_GRAPHICS
 /*
  * Console Buffer Flipping Support
  *
@@ -83,9 +88,6 @@ COORD ntcoord;
 INPUT_RECORD ir;
 
 /* Support for changing console font if existing glyph widths are too wide */
-
-extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
-extern int redirect_stdout;
 
 /* Flag for whether NetHack was launched via the GUI, not the command line.
  * The reason we care at all, is so that we can get
@@ -1078,40 +1080,6 @@ void set_altkeyhandler(const char * inName)
     return;
 }
 
-/* this is used as a printf() replacement when the window
- * system isn't initialized yet
- */
-void msmsg
-VA_DECL(const char *, fmt)
-{
-    char buf[ROWNO * COLNO]; /* worst case scenario */
-    VA_START(fmt);
-    VA_INIT(fmt, const char *);
-    Vsprintf(buf, fmt, VA_ARGS);
-    if (redirect_stdout)
-        fprintf(stdout, "%s", buf);
-    else {
-        if(!init_ttycolor_completed)
-            init_ttycolor();
-
-        /* if we have generated too many messages ... ask the user to
-         * confirm and then clear.
-         */
-        if (console.cursor.Y > console.height - 4) {
-            xputs("Hit <Enter> to continue.");
-            while (pgetchar() != '\n')
-                ;
-            raw_clear_screen();
-            set_console_cursor(1, 0);
-        }
-
-        xputs(buf);
-        if (ttyDisplay)
-            curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
-    }
-    VA_END();
-    return;
-}
 
 /* fatal error */
 /*VARARGS1*/
@@ -1911,6 +1879,44 @@ void nethack_enter_nttty()
         if (!load_keyboard_handler("nhraykey"))
             error("Unable to load nhraykey.dll");
     }
+}
+#endif TTY_GRAPHICS
+
+/* this is used as a printf() replacement when the window
+ * system isn't initialized yet
+ */
+void msmsg
+VA_DECL(const char *, fmt)
+{
+    char buf[ROWNO * COLNO]; /* worst case scenario */
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    Vsprintf(buf, fmt, VA_ARGS);
+    if (redirect_stdout)
+        fprintf(stdout, "%s", buf);
+    else {
+#ifdef TTY_GRAPHICS
+        if(!init_ttycolor_completed)
+            init_ttycolor();
+        /* if we have generated too many messages ... ask the user to
+         * confirm and then clear.
+         */
+        if (console.cursor.Y > console.height - 4) {
+            xputs("Hit <Enter> to continue.");
+            while (pgetchar() != '\n')
+                ;
+            raw_clear_screen();
+            set_console_cursor(1, 0);
+        }
+        xputs(buf);
+        if (ttyDisplay)
+            curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
+#else
+        fprintf(stdout, "%s", buf);
+#endif
+    }
+    VA_END();
+    return;
 }
 
 #endif /* WIN32 */

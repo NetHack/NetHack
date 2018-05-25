@@ -2651,7 +2651,7 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_opt(opts, negated)) != 0) {
-#if defined(WIN32CON)
+#if defined(WIN32) && defined(TTY_GRAPHICS)
             set_altkeyhandler(op);
 #endif
         } else
@@ -3304,7 +3304,9 @@ boolean tinitial, tfrom_file;
             op = string_for_opt(opts, 0);
             if (!op)
                 return FALSE;
+#ifdef TTY_GRAPHICS
             map_subkeyvalue(op);
+#endif
 #endif
         }
         return retval;
