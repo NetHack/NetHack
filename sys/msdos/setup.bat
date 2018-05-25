@@ -64,7 +64,7 @@ ren ..\..\doc\guidebook.txt guidebk.txt
 goto long3ok
 :long3b
 echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guidebk.txt"
-ren ..\..\doc\guideb~1.txt guideboo.txt
+ren ..\..\doc\guideb~1.txt guidebk.txt
 goto long3ok
 :warn3long
 echo "Warning - There is no NetHack Guidebook (..\..\doc\guidebk.txt)"
