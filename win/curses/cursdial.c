@@ -419,6 +419,8 @@ curses_ext_cmd()
             ret = -1;
         }
         for (count = 0; extcmdlist[count].ef_txt; count++) {
+            if (!wizard && (extcmdlist[count].flags & WIZMODECMD))
+                continue;
             if (!(extcmdlist[count].flags & AUTOCOMPLETE))
                 continue;
             if (strlen(extcmdlist[count].ef_txt) > (size_t) prompt_width) {
