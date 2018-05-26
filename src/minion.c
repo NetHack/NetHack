@@ -284,9 +284,9 @@ register struct monst *mtmp;
     if (n > 1) {
         n = rnd(n);
         for (otmp = invent; otmp; otmp = otmp->nobj)
-            if ((otmp->oartifact || obj->otyp == WAN_WISHING ||
-                obj->otyp == BAG_OF_HOLDING || obj->otyp == PLAYING_CARD_DECK ||
-                obj->otyp == DECK_OF_FATE) && !--n)
+            if ((otmp->oartifact || otmp->otyp == WAN_WISHING ||
+                otmp->otyp == BAG_OF_HOLDING || otmp->otyp == PLAYING_CARD_DECK ||
+                otmp->otyp == DECK_OF_FATE) && !--n)
                 break;
     }
     if ((otmp && otmp->otyp == DECK_OF_FATE) ||
@@ -332,7 +332,7 @@ register struct monst *mtmp;
         pline("%s speaks to you. \"I see you have %s in your possession...\"",
               Amonnam(mtmp), xname(otmp));
         /* copied from steal.c */
-        if (yn("Give up your artifact?") == 'y') {
+        if (yn("Give up the item?") == 'y') {
             if ((otmp == uarm || otmp == uarmu) && uarmc)
                 remove_worn_item(uarmc, FALSE);
             if (otmp == uarmu && uarm)
