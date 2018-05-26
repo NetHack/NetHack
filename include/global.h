@@ -8,8 +8,10 @@
 
 #include <stdio.h>
 
+/* #define BETA */   /* development or beta testing [MRS] */
 #define BETA   /* development or beta testing [MRS] */
 
+/* #define DEBUG */
 #define DEBUG 
 
 /*

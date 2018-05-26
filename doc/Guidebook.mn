@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 16, 2018
+.ds f2 "May 26, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -3729,7 +3729,7 @@ For example, the following line in your config file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
 .si
-.lp "OPTION=hilite_status: hitpoints/<30%/red/normal"
+.lp "OPTION=hilite_status: hitpoints/<=30%/red/normal"
 .ei
 .pg
 For another example, the following line in your config file will cause
@@ -4516,13 +4516,26 @@ and Integrity (aka Itanium aka IA64) but not VAX.
 \fBRay Chason\fP resurrected the msdos port for 3.6.1 and contributed the
 necessary updates to the community at large.
 .pg
+Shortly after the release of 3.6.1, reports of some display performance 
+issues on some platforms began to emerge. With the help of some members
+of the NetHack community, those issues were tracked down and resolved. 
+The display performance fixes were combined with a couple of dozen 
+other bug fixes and released as NetHack 3.6.2 in late May 2018.
+.pg
+The development team at the time of release of 3.6.2 consisted of
+\fBWarwick Allison\fP, \fBMichael Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,
+\fBKen Lorber\fP, \fBDean Luick\fP, \fBPatric Mueller\fP,
+\fBPat Rankin\fP, \fBDerek S. Ray\fP, \fBAlex Smith\fP,
+\fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
+.pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg
 .hn 2
 SPECIAL THANKS
 .pg
 On behalf of the NetHack community, thank you very much once
-again to \fBM. Drew Streib\fP, \fBPasi Kallinen\fP for providing a
+again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
 public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP 
 and \fBAndy Thomson\fP for hardfought.org. Thanks to all those 
 unnamed dungeoneers who invest their time and effort into annual 

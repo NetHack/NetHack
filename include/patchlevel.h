@@ -34,15 +34,18 @@
 #define VERSION_COMPATIBILITY 0x03060002L
 
 /****************************************************************************/
-/* Version 3.7.x */
-
-/*
- *  NetHack 3.7.0, <insert date>
- *
- */
-
-/****************************************************************************/
 /* Version 3.6.x */
+
+/*  Patch 2, May 26, 2018 
+ *  Performance optimizations for tty including the ability to 
+ *      do per field updating
+ *  Significant performance improvements in sys/winnt/nttty mainly through
+ *      the introduction of a back buffer approach
+ *  A couple of windows crash bug fixes during early game startup
+ *  Ensuring that unix Makefiles do not rely on features unique to gnu make
+ *  Improvements to hilite_status parsing in an effort to ensure that expected
+ *      and sensible values ranges are more easily specified and accepted
+ */
 
 /*  Patch 1, April 27, 2018
  *  Over four hundred and seventy bug fixes and improvements.
