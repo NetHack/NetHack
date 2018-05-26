@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -192,7 +192,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -390,7 +390,7 @@
                friendly  creatures.   The  lower  this  number is, the more
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -720,7 +720,7 @@
                mouse support, the command is also  invoked  when  a  mouse-
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -786,7 +786,7 @@
                scrolls, and so on), shop status (`u' for unpaid,  in  other
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -984,7 +984,7 @@
                cept an item of armor and attempt to wear it.)
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1050,7 +1050,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1116,7 +1116,7 @@
                enter a count prior to its letter.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1314,7 +1314,7 @@
                and 'M-N'.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1512,7 +1512,7 @@
                Throw something. Default key is 't'.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1644,7 +1644,7 @@
                Show locations of special levels. Autocompletes. Wizard-mode
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2106,7 +2106,7 @@
           of  that  object  to  your  load.   The amount that you can carry
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2172,7 +2172,7 @@
           as  uncursed.   They  could just as easily have been described as
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2304,7 +2304,7 @@
           and still hit a target is not an easy task.   Rangers  are  among
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2370,7 +2370,7 @@
           you feel more confident in your skills.  At that  point  you  can
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2832,7 +2832,7 @@
           fungi  (`F') are also considered to be vegetable matter.  Certain
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2898,7 +2898,7 @@
           of item; or fight with your hands and feet.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -2964,7 +2964,7 @@
           ux, and Mac  OS  X  it  is  ``.nethackrc''  in  the  user's  home
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3030,7 +3030,7 @@
             Defaults to HACKDIR, must be writeable.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3228,7 +3228,7 @@
             (fire)  command  with  an  empty quiver (or quiver sack or have
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3360,7 +3360,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3426,7 +3426,7 @@
             aren't  interrupted with the ``More info?'' prompt, but it also
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3624,7 +3624,7 @@
             Set your character's name (defaults to your  user  name).   You
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3690,7 +3690,7 @@
                           instead of accepting any non-yes response as no
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3822,7 +3822,7 @@
             screen on the rogue level.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -3954,7 +3954,7 @@
             Put the ending display in a NetHack window instead of on stdout
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4020,7 +4020,7 @@
             target.  (default off)
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4086,7 +4086,7 @@
             map window.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4152,7 +4152,7 @@
             If NetHack can, it should pop up dialog boxes for input.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4218,7 +4218,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4350,7 +4350,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4482,7 +4482,7 @@
             When asked for a location, the key to go  to  previous  closest
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4614,7 +4614,7 @@
             Prefix  key to run towards a direction without picking up items
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4746,7 +4746,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4812,7 +4812,7 @@
             tion flags: stone, slime,  strngl,  foodpois,  termill,  blind,
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5208,7 +5208,7 @@
             Load a symbol set for the rogue level that is  appropriate  for
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5274,7 +5274,7 @@
             a game in wizard mode.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5340,7 +5340,7 @@
             %D - current time, YYYYMMDDhhmmss format
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5406,7 +5406,7 @@
           playmode:debug option.
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5472,7 +5472,7 @@
           code  for  PC  NetHack 3.0.  Johnny Lee ported NetHack 3.0 to the
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5670,7 +5670,7 @@
           Walz,  and  Paul  Winner.  In early 2015, ahead of the release of
 
 
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5721,22 +5721,22 @@
                Ray Chason resurrected the msdos port for 3.6.1 and contrib-
           uted the necessary updates to the community at large.
 
-               The official NetHack web site is maintained by Ken Lorber at
-          http://www.nethack.org/.
+               Shortly  after the release of 3.6.1, reports of some display
+          performance issues on some platforms began to  emerge.  With  the
+          help  of some members of the NetHack community, those issues were
+          tracked down and resolved.  The display  performance  fixes  were
+          combined  with  a couple of dozen other bug fixes and released as
+          NetHack 3.6.2 in late May 2018.
 
-          12.1.  SPECIAL THANKS
-
-               On behalf of the NetHack community, thank you very much once
-          again  to  M. Drew Streib, Pasi Kallinen and Robin Bandy for pro-
-          viding public NetHack servers at nethack.alt.org and  devnull.net
-          and/or for hosting annual NetHack tournaments.
-
-                                 - - - - - - - - - -
+               The development team at the time of release  of  3.6.2  con-
+          sisted  of  Warwick Allison, Michael Allison, Ken Arromdee, David
+          Cohrs, Jessie Collet, Pasi  Kallinen,  Ken  Lorber,  Dean  Luick,
+          Patric  Mueller,  Pat  Rankin,  Derek  S.  Ray,  Alex Smith, Mike
+          Stephenson, Janet Walz, and Paul Winner.
 
 
 
-
-          NetHack 3.6                                          May 16, 2018
+          NetHack 3.6                                          May 26, 2018
 
 
 
@@ -5745,6 +5745,21 @@
           NetHack Guidebook                                              88
 
 
+
+               The official NetHack web site is maintained by Ken Lorber at
+          http://www.nethack.org/.
+
+          12.1.  SPECIAL THANKS
+
+               On behalf of the NetHack community, thank you very much once
+          again to M. Drew Streib and Pasi Kallinen for providing a  public
+          NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and
+          Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
+          geoneers  who  invest  their  time and effort into annual NetHack
+          tournaments such as Junehack and in days past, devnull.net  (gone
+          for now, but not forgotten).
+
+                                 - - - - - - - - - -
 
                From  time  to  time,  some depraved individual out there in
           netland sends a particularly intriguing modification to help  out
@@ -5784,6 +5799,19 @@
               Erik Andersen            Matthew Day           Steve Linhart
             Frederick Roeber           Merlyn LeRoy        Steve VanDevender
                Gil Neiger            Michael Allison          Teemu Suikki
+
+
+
+          NetHack 3.6                                          May 26, 2018
+
+
+
+
+
+          NetHack Guidebook                                              89
+
+
+
                Greg Laskin             Michael Feir            Tim Lennan
                Greg Olson             Michael Hamel          Timo Hakulinen
              Gregg Wonderly          Michael Sokolov            Tom Almy
@@ -5802,7 +5830,45 @@
 
 
 
-          NetHack 3.6                                          May 16, 2018
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          NetHack 3.6                                          May 26, 2018
 
 
 
