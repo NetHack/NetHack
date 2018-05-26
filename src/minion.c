@@ -330,9 +330,9 @@ register struct monst *mtmp;
         }
     } else if (otmp) {
         pline("%s speaks to you. \"I see you have %s in your possession...\"",
-              Amonnam(mtmp), xname(otmp));
+              Amonnam(mtmp), the(xname(otmp)));
         /* copied from steal.c */
-        if (yn("Give up the item?") == 'y') {
+        if (yn("Give up your item?") == 'y') {
             if ((otmp == uarm || otmp == uarmu) && uarmc)
                 remove_worn_item(uarmc, FALSE);
             if (otmp == uarmu && uarm)
