@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1527375321 2018/05/26 22:55:21 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1524931630 2018/04/28 16:07:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,15 +36,8 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 2, May 26, 2018 
- *  Performance optimizations for tty including the ability to 
- *      do per field updating
- *  Significant performance improvements in sys/winnt/nttty mainly through
- *      the introduction of a back buffer approach
- *  A couple of windows crash bug fixes during early game startup
- *  Ensuring that unix Makefiles do not rely on features unique to gnu make
- *  Improvements to hilite_status parsing in an effort to ensure that expected
- *      and sensible values ranges are more easily specified and accepted
+/*  Patch 2, <insert date here>
+ *  
  */
 
 /*  Patch 1, April 27, 2018
