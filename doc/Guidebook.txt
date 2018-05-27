@@ -4784,7 +4784,7 @@
           cause the hitpoints field to display in the  color  red  if  your
           hitpoints drop to or below a threshold of 30%:
 
-               OPTION=hilite_status: hitpoints/<=30%/red/normal
+               OPTION=hilite_status: hitpoints/<30%/red/normal
 
                For  another example, the following line in your config file
           will cause wisdom to be displayed red if it drops and green if it
