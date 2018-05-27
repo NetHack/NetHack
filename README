@@ -30,7 +30,17 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     directory as the 'Top' directory.  It makes no difference what you
     call it.
 
-2.  The names of the directories listed should not be changed unless you
+2.  Having unpacked, you should have a file called 'Files' in your Top
+    directory.  
+
+    This file contains the list of all the files you now SHOULD
+    have in each directory.  Please check the files in each directory
+    against this list to make sure that you have a complete set.
+
+    This file also contains a list of what files are created during 
+    the build process.
+
+    The names of the directories listed should not be changed unless you
     are ready to go through the makefiles and the makedefs program and change
     all the directory references in them.
 
