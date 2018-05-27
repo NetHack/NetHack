@@ -30,9 +30,9 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     directory as the 'Top' directory.  It makes no difference what you
     call it.
 
-2.  The names of the directories in your distribtuion should not be changed 
-    unless you are ready to go through the makefiles and the makedefs program
-    and change all the directory references in them.
+2.  The names of the directories listed should not be changed unless you
+    are ready to go through the makefiles and the makedefs program and change
+    all the directory references in them.
 
 3.  Before you do anything else, please read carefully the file called
     "license" in the 'dat' subdirectory.  It is expected that you comply
