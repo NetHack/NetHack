@@ -4,23 +4,20 @@ NetHack 3.6 is an enhancement to the dungeon exploration game NetHack,
 which is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4 as there was no NetHack 3.5 release.
 
-NetHack 3.6.2 is being released as a collection of a couple of dozen bug fixes 
-committed since the release of 3.6.1. The file doc/fixes36.2 in the source 
-distribution has a full list of the bug fixes. The text in there was written
-for the development team's own use and is provided "as is", so please do not
-ask us to further explain the entries in that file.  Some entries might be 
-considered "spoilers", particularly in the "new features" section.
+NetHack 3.6.2 contains a collection of more than 15 bug fixes to NetHack 3.6.1.
+The file doc/fixes36.2 in the source distribution has a full list of them. The
+text in there was written for the development team's own use and is provided 
+"as is", so please do not ask us to further explain the entries in that file. 
+Some entries might be considered "spoilers", particularly in the "new features" 
+section.
 
 Below you will find some other general notes that were not considered
 spoilers:
-* Significant performance optimizations for tty including the ability to 
-  do per field updating
-* Significant performance improvements in sys/winnt/nttty mainly through
-  the introduction of a back buffer approach
-* a couple of windows crash bug fixes during early game startup
-* Ensuring that unix Makefiles do not rely on features unique to gnu make
-* Improvements to hilite_status parsing in an effort to ensure that all 
-  expected and sensible values ranges are more easily specified and accepted
+* Performance optimizations with tty including the ability to do per field 
+  updating
+* sys/winnt/nttty performance improvements mainly through the introduction
+  of a back buffer approach
+* a couple of windows crash bug fixes
 
                         - - - - - - - - - - -
 
