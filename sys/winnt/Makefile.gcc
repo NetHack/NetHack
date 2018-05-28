@@ -33,10 +33,16 @@
 #==============================================================================
 # BUILD DECISIONS SECTION
 #
-# There are currently only 3 decisions that you have to make.
+# There are currently only 4 decisions that you have to make.
 #	1. 32-bit or 64-bit?
 #	2. Where do you want your build to end up?
 #	3. Do you want debug information in the executable?
+#	4. Do you want additional GUI interfaces in the executable?
+#
+# Note that additional GUI interfaces may require external libraries.
+# Qt is placed where the official installer places it.
+# Other libraries are placed in a subdirectory of your home directory, either
+# x86libs or x64libs depending on whether you're building for 64 bits.
 #
 #==============================================================================
 # 1. 32-bit or 64-bit?
@@ -61,6 +67,26 @@ GAMEDIR = ../binary
 #
 
 DEBUGINFO = Y
+
+#
+#---------------------------------------------------------------
+# 4. Do you want additional GUI interfaces in the executable?
+#    Make these Y to enable the GUIs. Win32 is always enabled,
+#    and is the default.
+#
+
+WANT_WIN_QT4 = N
+
+# WANT_WIN_QT4 requires Qt 4 or Qt 5, see
+# https://www.qt.io/download-open-source/
+# Earlier versions of Qt are not compatible with Windows
+# For Qt 5, use:
+QT4_DIRECTORY = c:/Qt/Qt5.9.2/5.9.2/mingw53_32
+HAVE_QT5 = Y
+
+# For Qt 4, comment out the above two lines and use:
+#QT4_DIRECTORY = c:/Qt/4.8.6
+#HAVE_QT5 = N
 
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
@@ -97,6 +123,8 @@ MSWSYS = ../sys/winnt
 TTY   = ../win/tty
 # window port files (WIN32)
 MSWIN = ../win/win32
+# window port files (Qt4)
+QT4 = ../win/Qt4
 # Tile support files
 WSHR  = ../win/share
 
@@ -107,8 +135,12 @@ WSHR  = ../win/share
 OBJ = o
 
 cc     = gcc
+cxx    = g++
 rc     = windres
 link   = gcc
+ifeq "$(WANT_WIN_QT4)" "Y"
+    link = g++
+endif
 
 #
 #==========================================
@@ -159,6 +191,9 @@ RANDOM  = $(OBJ)/random.o
 #RANDOM =
 
 WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -DWIN32CON -D_WIN32_IE=0x0400 -D_WIN32_WINNT=0x0501
+ifeq "$(WANT_WIN_QT4)" "Y"
+    WINPFLAG += -DQT_GRAPHICS -DPIXMAPDIR='"."'
+endif
 # To store all the level files,
 # help files, etc. in a single library file.
 # USE_DLB = Y is left uncommented
@@ -191,8 +226,38 @@ CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
 
-conlibs = -lwinmm
+conlibs = -lgdi32 -lwinmm
 guilibs = -lcomctl32 -lwinmm
+ifeq "$(WANT_WIN_QT4)" "Y"
+    # Might be either Qt 4 or Qt 5
+    ifeq "$(HAVE_QT5)" "Y"
+        guilibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
+        guilibs += $(QT4_DIRECTORY)/lib/libQt5Gui.a
+        guilibs += $(QT4_DIRECTORY)/lib/libQt5Widgets.a
+        conlibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
+    else
+        guilibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
+        guilibs += $(QT4_DIRECTORY)/lib/libQtGui4.a
+        conlibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
+    endif
+endif
+
+#==========================================
+# Extra files needed for some ports
+#==========================================
+EXTRA_FILES =
+ifeq "$(WANT_WIN_QT4)" "Y"
+    ifeq "$(HAVE_QT5)" "Y"
+        EXTRA_FILES += $(GAMEDIR)/Qt5Core.dll
+        EXTRA_FILES += $(GAMEDIR)/Qt5Gui.dll
+        EXTRA_FILES += $(GAMEDIR)/Qt5Widgets.dll
+    else
+    # TODO: define QT 4 DLLs here
+        EXTRA_FILES += $(GAMEDIR)/QtCore4.dll
+        EXTRA_FILES += $(GAMEDIR)/QtGui4.dll
+    endif
+    EXTRA_FILES += $(GAMEDIR)/rip.xpm
+endif
 
 #==========================================
 # Util builds
@@ -207,6 +272,8 @@ LFLAGSU = $(LFLAGSBASEC)
 
 CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 lflags  = $(LFLAGSBASEC) $(linkdebuf)
+
+CXXFLAGS = $(CFLAGS)
 
 ifeq  "$(USE_DLB)" "Y"
 DLB = nhdat
@@ -320,12 +387,28 @@ GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+ifeq "$(WANT_WIN_QT4)" "Y"
+    GUIOBJ += $(O)qt4bind.o $(O)qt4click.o $(O)qt4clust.o $(O)qt4delay.o \
+	$(O)qt4glyph.o $(O)qt4icon.o $(O)qt4inv.o $(O)qt4key.o $(O)qt4line.o \
+	$(O)qt4main.o $(O)qt4map.o $(O)qt4menu.o $(O)qt4msg.o $(O)qt4plsel.o \
+	$(O)qt4rip.o $(O)qt4set.o $(O)qt4stat.o $(O)qt4str.o $(O)qt4streq.o \
+	$(O)qt4svsel.o $(O)qt4win.o $(O)qt4xcmd.o $(O)qt4yndlg.o
+endif
 
 GUIHDR = $(MSWIN)/mhaskyn.h $(MSWIN)/mhdlg.h $(MSWIN)/mhfont.h \
 	$(MSWIN)/mhinput.h $(MSWIN)/mhmain.h $(MSWIN)/mhmap.h \
 	$(MSWIN)/mhmenu.h $(MSWIN)/mhmsg.h $(MSWIN)/mhmsgwnd.h \
 	$(MSWIN)/mhrip.h $(MSWIN)/mhstatus.h \
 	$(MSWIN)/mhtext.h $(MSWIN)/resource.h $(MSWIN)/winMS.h
+ifeq "$(WANT_WIN_QT4)" "Y"
+    GUIHDR += $(QT4)/qt4bind.h $(QT4)/qt4click.h $(QT4)/qt4clust.h \
+	$(QT4)/qt4delay.h $(QT4)/qt4glyph.h $(QT4)/qt4icon.h $(QT4)/qt4inv.h \
+	$(QT4)/qt4kde0.h $(QT4)/qt4key.h $(QT4)/qt4line.h $(QT4)/qt4main.h \
+	$(QT4)/qt4map.h $(QT4)/qt4menu.h $(QT4)/qt4msg.h $(QT4)/qt4plsel.h \
+	$(QT4)/qt4rip.h $(QT4)/qt4set.h $(QT4)/qt4stat.h $(QT4)/qt4str.h \
+	$(QT4)/qt4streq.h $(QT4)/qt4svsel.h $(QT4)/qt4win.h $(QT4)/qt4xcmd.h \
+	$(QT4)/qt4yndlg.h
+endif
 
 KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
 
@@ -385,7 +468,7 @@ DATABASE = $(DAT)/data.base
 #================ RULES ==================
 #==========================================
 
-.SUFFIXES: .exe .o .til .uu .c .y .l
+.SUFFIXES: .exe .o .til .uu .c .y .l .moc
 
 #==========================================
 # Rules for files in src
@@ -405,7 +488,7 @@ $(OBJ)/%.o : $(SSYS)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
 $(OBJ)/%.o : $(SSYS)/%.cpp
-	g++ $(CFLAGS) -std=c++11  -o$@  $<
+	$(cxx) $(CXXFLAGS) -std=c++11  -o$@  $<
 
 #==========================================
 # Rules for files in sys/winnt
@@ -452,6 +535,21 @@ $(OBJ)/%.o : $(MSWIN)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
+# Rules for files in win/Qt4
+#==========================================
+
+ifeq "$(HAVE_QT5)" "Y"
+QT4_CXXFLAGS = -std=c++11
+else
+QT4_CXXFLAGS =
+endif
+$(OBJ)/%.o : $(QT4)/%.cpp
+	$(cxx) $(CXXFLAGS) $(QT4_CXXFLAGS) -I$(MSWIN) -I$(QT4_DIRECTORY)/include -o$@  $<
+
+$(QT4)/%.moc : $(QT4)/%.h
+	$(QT4_DIRECTORY)\bin\moc -o $@ $<
+
+#==========================================
 #=============== TARGETS ==================
 #==========================================
 
@@ -472,7 +570,7 @@ default : install
 
 all :   install
 
-install: graphicschk $(O)obj.tag $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe $(O)install.tag
+install: graphicschk $(O)obj.tag $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe $(O)install.tag $(EXTRA_FILES)
 	@echo NetHack is up to date.
 	@echo Done.
 
@@ -1035,8 +1133,33 @@ spotless: clean
 	$(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
 	$(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
 	$(subst /,\,if exist nhdat.         del nhdat.)
+	$(subst /,\,if exist $(QT4)/*.moc del $(QT4)/*.moc)
+	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
+	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
+	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
+	$(subst /,\,if exist $(DAT)/porthelp del $(DAT)/porthelp)
+	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
+	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
+	$(subst /,\,if exist $(INCL)/win32api.h del $(INCL)/win32api.h)
+	$(subst /,\,if exist $(MSWSYS)/NetHack.ico del $(MSWSYS)/NetHack.ico)
+	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
+	$(subst /,\,if exist $(U)dgn_yacc.c del $(U)dgn_yacc.c)
+	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
+	$(subst /,\,if exist $(U)lev_flex.c del $(U)lev_flex.c)
+	$(subst /,\,if exist $(U)lev_yacc.c del $(U)lev_yacc.c)
+	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
+	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
+	$(subst /,\,if exist $(U)uudecode.exe del $(U)uudecode.exe)
+	$(subst /,\,if exist $(MSWIN)/NetHack.ico del $(MSWIN)/NetHack.ico)
+	$(subst /,\,if exist $(MSWIN)/mnsel.bmp del $(MSWIN)/mnsel.bmp)
+	$(subst /,\,if exist $(MSWIN)/mnselcnt.bmp del $(MSWIN)/mnselcnt.bmp)
+	$(subst /,\,if exist $(MSWIN)/mnunsel.bmp del $(MSWIN)/mnunsel.bmp)
+	$(subst /,\,if exist $(MSWIN)/petmark.bmp del $(MSWIN)/petmark.bmp)
+	$(subst /,\,if exist $(MSWIN)/pilemark.bmp del $(MSWIN)/pilemark.bmp)
+	$(subst /,\,if exist $(MSWIN)/rip.bmp del $(MSWIN)/rip.bmp)
+	$(subst /,\,if exist $(MSWIN)/splash.bmp del $(MSWIN)/splash.bmp)
 ifneq "$(OBJ)" ""
-	$(subst /,\,rmdir $(OBJ)) /s /Q
+	$(subst /,\,if exist $(OBJ) rmdir $(OBJ)) /s /Q
 endif
 
 clean:
@@ -1056,6 +1179,40 @@ clean:
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
+
+# Other files needed by some ports
+$(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/Qt5Widgets.dll : $(QT4_DIRECTORY)/bin/Qt5Widgets.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/QtCore4.dll : $(QT4_DIRECTORY)/bin/QtCore4.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/QtGui4.dll : $(QT4_DIRECTORY)/bin/QtGui4.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/nhtiles.bmp : $(SRC)/tiles.bmp
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/rip.xpm : ../win/X11/rip.xpm
+	$(subst /,\,@copy $< $@ >nul)
+
+
+# Dependencies on .moc files (for Qt 4 or 5)
+$(OBJ)/qt4main.o : $(QT4)/qt4main.cpp $(QT4)/qt4main.moc $(QT4)/qt4kde0.moc
+$(OBJ)/qt4map.o : $(QT4)/qt4map.cpp $(QT4)/qt4map.moc
+$(OBJ)/qt4menu.o : $(QT4)/qt4menu.cpp $(QT4)/qt4menu.moc
+$(OBJ)/qt4msg.o : $(QT4)/qt4msg.cpp $(QT4)/qt4msg.moc
+$(OBJ)/qt4plsel.o : $(QT4)/qt4plsel.cpp $(QT4)/qt4plsel.moc
+$(OBJ)/qt4set.o : $(QT4)/qt4set.cpp $(QT4)/qt4set.moc
+$(OBJ)/qt4stat.o : $(QT4)/qt4stat.cpp $(QT4)/qt4stat.moc
+$(OBJ)/qt4xcmd.o : $(QT4)/qt4xcmd.cpp $(QT4)/qt4xcmd.moc
+$(OBJ)/qt4yndlg.o : $(QT4)/qt4yndlg.cpp $(QT4)/qt4yndlg.moc
 
 #
 # dat dependencies

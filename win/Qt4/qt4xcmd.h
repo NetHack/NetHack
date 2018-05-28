@@ -21,6 +21,8 @@ public:
 
 private:
     QLabel *prompt;
+    QVector<QPushButton *> buttons;
+    void enableButtons();
 
 private slots:
     void cancel();

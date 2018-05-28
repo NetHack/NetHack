@@ -1,6 +1,8 @@
 dgn_lex.c
+dgn_flex.c
 dgn_yacc.c
 lev_lex.c
+lev_flex.c
 lev_yacc.c
 tiletxt.c
 makedefs
