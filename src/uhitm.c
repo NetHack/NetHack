@@ -368,8 +368,8 @@ register struct monst *mtmp;
                 You("stop.  %s is in the way!", buf);
                 end_running(TRUE);
                 return TRUE;
-            } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
-                        || (mtmp->data->mmove == 0)) && rn2(6)) {
+            } else if (mtmp->mfrozen || mtmp->msleeping || (!mtmp->mcanmove)
+                       || (mtmp->data->mmove == 0 && rn2(6))) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
                 end_running(TRUE);
                 return TRUE;
