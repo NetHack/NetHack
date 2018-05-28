@@ -36,6 +36,8 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 2, <insert date here>
+ *  
 /*  Patch 2, May 26, 2018 
  *  Performance optimizations for tty including the ability to 
  *      do per field updating
