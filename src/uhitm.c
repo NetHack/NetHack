@@ -369,8 +369,8 @@ register struct monst *mtmp;
                 g.context.travel = g.context.travel1 = g.context.mv = g.context.run
                     = 0;
                 return TRUE;
-            } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
-                        || (mtmp->data->mmove == 0)) && rn2(6)) {
+            } else if (mtmp->mfrozen || mtmp->msleeping || (!mtmp->mcanmove)
+                       || (mtmp->data->mmove == 0 && rn2(6))) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
                 g.context.travel = g.context.travel1 = g.context.mv = g.context.run
                     = 0;
