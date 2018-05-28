@@ -932,9 +932,11 @@ add_obj_info(winid datawin, short otyp)
                 armorslots[oc.oc_armcat]);
 
         OBJPUTSTR(buf);
-        Sprintf(buf, "Base AC %d, takes %d turn%s to put on or remove.",
-                oc.a_ac, oc.oc_delay, (oc.oc_delay == 1 ? "" : "s"));
+        Sprintf(buf, "Base AC %d, magic cancellation %d.",
+            oc.a_ac, oc.a_can);
         OBJPUTSTR(buf);
+        Sprintf(buf, "Takes %d turn%s to put on or remove.",
+            oc.oc_delay, (oc.oc_delay == 1 ? "" : "s"));
     }
     if (olet == FOOD_CLASS) {
         if (otyp == TIN || otyp == CORPSE) {
@@ -1082,9 +1084,59 @@ add_obj_info(winid datawin, short otyp)
     if (oc.oc_oprop) {
         int i;
         for (i = 0; propertynames[i].prop_name; ++i) {
+            /* hack for alchemy smocks because everything about alchemy smocks
+             * is a hack */
+            if (propertynames[i].prop_num == ACID_RES
+                && otyp == ALCHEMY_SMOCK) {
+                OBJPUTSTR("Confers acid resistance.");
+                continue;
+            }
             if (oc.oc_oprop == propertynames[i].prop_num) {
-                Sprintf(buf, "Confers / makes you %s.", propertynames[i].prop_name);
                 OBJPUTSTR(buf);
+                /* proper grammar */
+                const char* confers = "Makes you";
+                const char* effect = propertynames[i].prop_name;
+                switch (propertynames[i].prop_num) {
+                    /* special overrides because prop_name is bad */
+                    case STRANGLED:
+                        effect = "choke";
+                        break;
+                    case LIFESAVED:
+                        effect = "life saving";
+                        /* FALLTHRU */
+                    /* for things that don't work with "Makes you" */
+                    case GLIB:
+                    case WOUNDED_LEGS:
+                    case DETECT_MONSTERS:
+                    case SEE_INVIS:
+                    case HUNGER:
+                    case WARNING:
+                    /* don't do special warn_of_mon */
+                    case SEARCHING:
+                    case INFRAVISION:
+                    case AGGRAVATE_MONSTER:
+                    case CONFLICT:
+                    case JUMPING:
+                    case TELEPORT_CONTROL:
+                    case SWIMMING:
+                    case SLOW_DIGESTION:
+                    case HALF_SPDAM:
+                    case HALF_PHDAM:
+                    case REGENERATION:
+                    case ENERGY_REGENERATION:
+                    case PROTECTION:
+                    case PROT_FROM_SHAPE_CHANGERS:
+                    case POLYMORPH_CONTROL:
+                    case FREE_ACTION:
+                    case FIXED_ABIL:
+                        confers = "Confers";
+                        break;
+                    default:
+                        break;
+                }
+                if (strstri(propertynames[i].prop_name, "resistance"))
+                    confers = "Confers";
+                Sprintf(buf, "%s %s.", confers, effect);
             }
         }
     }
