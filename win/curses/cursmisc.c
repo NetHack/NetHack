@@ -89,9 +89,9 @@ curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff)
     }
 
     /* GUI color disabled */
-//    if ((!iflags.wc2_guicolor) && (win != mapwin)) {
-//        return;
-//    }
+    if ((!iflags.wc2_guicolor) && (win != mapwin)) {
+        return;
+    }
 
     if (color == 0) {           /* make black fg visible */
 # ifdef USE_DARKGRAY
@@ -847,4 +847,3 @@ parse_escape_sequence(void)
     return '\033';
 #endif /* !PDCURSES */
 }
-

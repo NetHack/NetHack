@@ -13,7 +13,7 @@ struct window_procs curses_procs = {
     "curses",
     WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET |
         WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN,
-    WC2_DARKGRAY | WC2_HITPOINTBAR | 
+    WC2_DARKGRAY | WC2_HITPOINTBAR |
 #if defined(STATUS_HILITES)
      WC2_HILITE_STATUS |
 #endif
@@ -82,7 +82,7 @@ struct window_procs curses_procs = {
    the inventory window. */
 static int inv_update = 0;
 
-/*  
+/*
 init_nhwindows(int* argcp, char** argv)
                 -- Initialize the windows used by NetHack.  This can also
                    create the standard windows listed at the top, but does
@@ -249,7 +249,7 @@ curses_resume_nhwindows()
     curses_refresh_nethack_windows();
 }
 
-/*  Create a window of type "type" which can be 
+/*  Create a window of type "type" which can be
         NHW_MESSAGE     (top line)
         NHW_STATUS      (bottom lines)
         NHW_MAP         (main dungeon)
@@ -317,7 +317,7 @@ curses_display_nhwindow(winid wid, BOOLEAN_P block)
 }
 
 
-/* Destroy will dismiss the window if the window has not 
+/* Destroy will dismiss the window if the window has not
  * already been dismissed.
 */
 void
@@ -553,14 +553,16 @@ curses_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph)
+print_glyph(window, x, y, glyph, bkglyph)
                 -- Print the glyph at (x,y) on the given window.  Glyphs are
                    integers at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
+                   bkglyph is to render the background behind the glyph.
+                   It's not used here.
 */
 void
-curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
+curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
 {
     //glyph_t ch;
     int ch;
@@ -644,8 +646,8 @@ int nh_poskey(int *x, int *y, int *mod)
                    a position in the MAP window is returned in x, y and mod.
                    mod may be one of
 
-                        CLICK_1         -- mouse click type 1 
-                        CLICK_2         -- mouse click type 2 
+                        CLICK_1         -- mouse click type 1
+                        CLICK_2         -- mouse click type 2
 
                    The different click types can map to whatever the
                    hardware supports.  If no mouse is supported, this
@@ -803,7 +805,7 @@ preference_update(preference)
                    port of that change.  If your window-port is capable of
                    dynamically adjusting to the change then it should do so.
                    Your window-port will only be notified of a particular
-                   change if it indicated that it wants to be by setting the 
+                   change if it indicated that it wants to be by setting the
                    corresponding bit in the wincap mask.
 */
 void

@@ -93,7 +93,7 @@ extern void curses_display_file(const char *filename,BOOLEAN_P must_exist);
 extern void curses_start_menu(winid wid);
 
 extern void curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
-		CHAR_P accelerator, CHAR_P group_accel, int attr, 
+		CHAR_P accelerator, CHAR_P group_accel, int attr,
 		const char *str, BOOLEAN_P presel);
 
 extern void curses_end_menu(winid wid, const char *prompt);
@@ -108,7 +108,7 @@ extern void curses_wait_synch(void);
 
 extern void curses_cliparound(int x, int y);
 
-extern void curses_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph);
+extern void curses_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph, int bkglyph);
 
 extern void curses_raw_print(const char *str);
 
@@ -307,4 +307,3 @@ extern void curses_prev_mesg(void);
 extern void curses_count_window(const char *count_text);
 
 #endif  /* WINCURS_H */
-

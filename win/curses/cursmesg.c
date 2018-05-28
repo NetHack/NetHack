@@ -295,8 +295,8 @@ curses_prev_mesg()
 }
 
 
-/* Shows Count: in a separate window, or at the bottom of the message
-window, depending on the user's settings */
+/* Shows Count: in a separate window, or at the bottom of the message window,
+   popup_dialog is not currently implemented for this function */
 
 void
 curses_count_window(const char *count_text)
@@ -314,42 +314,28 @@ curses_count_window(const char *count_text)
 
     counting = TRUE;
 
-    if (iflags.wc_popup_dialog) {       /* Display count in popup window */
-        startx = 1;
-        starty = 1;
+    curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+    curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
+    if (curses_window_has_border(MESSAGE_WIN)) {
+        winx++;
+        winy++;
+    }
+    winy += messageh - 1;
 
-        if (countwin == NULL) {
-            countwin = curses_create_window(25, 1, UP);
-        }
-
-    } else {                    /* Display count at bottom of message window */
-
-        curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
-        curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
-
-        if (curses_window_has_border(MESSAGE_WIN)) {
-            winx++;
-            winy++;
-        }
-
-        winy += messageh - 1;
-
-        if (countwin == NULL) {
-            pline("#");
+    if (countwin == NULL) {
 #ifndef PDCURSES
-            countwin = newwin(1, 25, winy, winx);
+        countwin = newwin(1, 25, winy, winx);
 #endif /* !PDCURSES */
         }
 #ifdef PDCURSES
-        else {
-            curses_destroy_win(countwin);
-        }
-
-        countwin = newwin(1, 25, winy, winx);
-#endif /* PDCURSES */
-        startx = 0;
-        starty = 0;
+    else {
+        curses_destroy_win(countwin);
     }
+
+    countwin = newwin(1, 25, winy, winx);
+#endif /* PDCURSES */
+    startx = 0;
+    starty = 0;
 
     mvwprintw(countwin, starty, startx, "%s", count_text);
     wrefresh(countwin);
@@ -471,6 +457,11 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             free(linestarts);
             curs_set(orig_cursor);
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+            if (++my > maxy) {
+                scroll_window(MESSAGE_WIN);
+                my--;
+            }
+            mx = border_space;
             return;
         case '\r':
         case '\n':
