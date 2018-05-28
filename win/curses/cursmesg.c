@@ -298,8 +298,8 @@ curses_prev_mesg()
 }
 
 
-/* Shows Count: in a separate window, or at the bottom of the message
-window, depending on the user's settings */
+/* Shows Count: at the bottom of the message window,
+   popup_dialog is not currently implemented for this function */
 
 void
 curses_count_window(const char *count_text)
@@ -317,41 +317,30 @@ curses_count_window(const char *count_text)
 
     counting = TRUE;
 
-    if (iflags.wc_popup_dialog) {       /* Display count in popup window */
-        startx = 1;
-        starty = 1;
+    curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
+    curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
 
-        if (countwin == NULL) {
-            countwin = curses_create_window(25, 1, UP);
-        }
-
-    } else {                    /* Display count at bottom of message window */
-
-        curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
-        curses_get_window_size(MESSAGE_WIN, &messageh, &messagew);
-
-        if (curses_window_has_border(MESSAGE_WIN)) {
-            winx++;
-            winy++;
-        }
-
-        winy += messageh - 1;
-
-        if (countwin == NULL) {
-#ifndef PDCURSES
-            countwin = newwin(1, 25, winy, winx);
-#endif /* !PDCURSES */
-        }
-#ifdef PDCURSES
-        else {
-            curses_destroy_win(countwin);
-        }
-
-        countwin = newwin(1, 25, winy, winx);
-#endif /* PDCURSES */
-        startx = 0;
-        starty = 0;
+    if (curses_window_has_border(MESSAGE_WIN)) {
+        winx++;
+        winy++;
     }
+
+    winy += messageh - 1;
+
+    if (countwin == NULL) {
+#ifndef PDCURSES
+        countwin = newwin(1, 25, winy, winx);
+#endif /* !PDCURSES */
+    }
+#ifdef PDCURSES
+    else {
+        curses_destroy_win(countwin);
+    }
+
+    countwin = newwin(1, 25, winy, winx);
+#endif /* PDCURSES */
+    startx = 0;
+    starty = 0;
 
     mvwprintw(countwin, starty, startx, "%s", count_text);
     wrefresh(countwin);
