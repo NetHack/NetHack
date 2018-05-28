@@ -10,9 +10,12 @@ The mysterious force has left the dungeon.
 Performing the invocation ritual will draw notice from the remaining royalty of Gehennom.
 Luckless Folly becomes more powerful the more unlucky you are.
 The Amulet of Yendor now blocks teleportation.
+Wind attacks can push you into water, or even stun you by pushing you into walls.
 Sonic attacks will not harm you if you are deaf.
+Sonic attacks can shatter anything made of glass or gemstones.
 Psionic attacks will not harm something without a mind.
 Psionic beams cannot be reflected.
+Psionic attacks might confuse you.
 The Void is a dangerous branch that contains a void dragon. Enter at your peril.
 Void dragons can disintegrate you with a melee attack.
 Unlimited Moon's power is dependent on the moon phase.
@@ -21,6 +24,7 @@ Nymphs and other dungeon denizens might introduce themselves to you.
 Mystic scarabs have armor that is extremely difficult to penetrate.
 Phoenixes explode upon death.
 Birds are faster than dogs or cats, but slightly smaller and weaker.
+Birds are not as nutritious as dogs or cats. Not that one would ever eat any of them.
 Want to give your pet an item to use? Try #give!
 Using farlook on a monster will tell you what they are wielding.
 Deadly poison isn't deadly anymore, but is still very dangerous.
@@ -61,3 +65,25 @@ Looking for a challenge? Try one of the new challenge modes!
 If you hate silver, you will take extra damage from it.
 Not sure what a monster is? Try using the encyclopedia.
 Drawing from a deck of fate is far more risky than using a fountain.
+Have a question? Check the wiki, not the tip of the day!
+Getting tired of the tip of the day? Disable it in the config file.
+Do not let your pet near a porcupine.
+Naming a spellbook of finger of death might let you summon a bonus boss.
+Cartomancers have a chance of reusing scrolls.
+Wans of wonder cannot grant wishes.
+Have a good JuneNethack!
+Dragonmasters cannot wear dragon scale mail.
+Amalgamations and bad clones are combinations of two monsters.
+Altars are colored based on their alignment.
+Looking up a monster or object will give you statistics about it.
+Floating eyes are a bit less common in the dungeon these days.
+Fire resistance only halves the damage from Mephisto's hellfire.
+Beware Buer! He has some of the highest damage output in the game.
+The Lord of the Foocubi is notable for their thieving ability.
+Wands of poison gas create poison gas when engraving.
+Meet a monster zapping a corrupted knife of poison gas? Please report this bug.
+SpliceHack supports curses! Try editing your config file.
+The Master of Cats must be killed nine times before truly dying.
+Extra wishes? Try wishing for Vladsbane.
+Extra wishes and itching for YASD? Try wishing for the King in Yellow.
+Silver golems are especially deadly to infernal players.
