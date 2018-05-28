@@ -13,6 +13,10 @@
 # vertical bar	|  male, general name
 # equals	=  gender not specified, personal name
 
+# Junenethack 2018
+invader from the ivory tower
+improved tin opener
+
 # M.U.G.E.N.
 wayward hitbox
 null-tier character
