@@ -569,10 +569,12 @@ drinkfurnace()
     if (Levitation) {
         floating_above("furnace");
         return;
-    } if (!likes_lava(youmonst.data)) {
+    }
+    if (!likes_lava(youmonst.data)) {
         pline("Glug glug glug...");
         /* ugly hack, look away */
-        losehp(999, "trying to drink lava", KILLED_BY);
+        u.uhp = 0;
+        losehp(1, "trying to drink lava", KILLED_BY);
         return;
     }
     burn_away_slime();
