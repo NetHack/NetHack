@@ -212,28 +212,13 @@ and Integrity (aka Itanium aka IA64) but not VAX.
 Ray Chason resurrected the msdos port for 3.6.1 and contributed the
 necessary updates to the community at large.
 
-Shortly after the release of 3.6.1, reports of some display performance 
-issues on some platforms began to emerge. With the help of some members
-of the NetHack community, those issues were tracked down and resolved. 
-The display performance fixes were combined with a couple of dozen 
-other bug fixes and released as NetHack 3.6.2 in late May 2018.
-
-The development team at the time of release of 3.6.2 consisted of
-Warwick Allison, Michael Allison, Ken Arromdee, David Cohrs,
-Jessie Collet, Pasi Kallinen, Ken Lorber, Dean Luick, Patric Mueller,
-Pat Rankin, Derek S. Ray, Alex Smith, Mike Stephenson, Janet Walz, 
-and Paul Winner.
-
 The official NetHack web site is maintained by Ken Lorber at
 http://www.nethack.org/.
 
-SPECIAL THANKS:
-On behalf of the NetHack community, thank you very much once again to M.
-Drew Streib and Pasi Kallinen for providing a public NetHack server at
-nethack.alt.org. Thanks to Keith Simpson and Andy Thomson for
-hardfought.org. Thanks to all those unnamed dungeoneers who invest their
-time and effort into annual NetHack tournaments such as Junehack and in
-days past, devnull.net (gone for now, but not forgotten).
+On behalf of the NetHack community, thank you very much once again to
+M. Drew Streib, Pasi Kallinen and Robin Bandy for providing public
+NetHack servers at nethack.alt.org and devnull.net and/or for hosting annual
+NetHack tournaments.
 
                            - - - - - - - - - -
 
