@@ -7,3 +7,4 @@ Guidebook.txt NH_header=no
 tmac.n NH_header=no
 fixes* NH_header=no
 *.txt NH_header=no
+* NH_filestag=(files_for_all_versions)
