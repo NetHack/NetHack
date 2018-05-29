@@ -2088,8 +2088,7 @@ boolean pick;
         goto spotdone;
 
     check_special_room(FALSE);
-    if ((IS_SINK(levl[u.ux][u.uy].typ) || IS_FURNACE(levl[u.ux][u.uy].typ))
-         && Levitation)
+    if ((IS_SINK(levl[u.ux][u.uy].typ)) && Levitation)
         dosinkfall();
     if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
         boolean pit;
