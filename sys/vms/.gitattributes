@@ -2,4 +2,4 @@ Makefile.* NHSUBST
 *.com NHSUBST
 Install.vms NHSUBST
 sysconf NHSUBST
-* NH_filestag=(files_for_VMS_version)
+* NH_filestag=(file%s_for_VMS_version)
