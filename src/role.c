@@ -777,7 +777,7 @@ const struct Race races[] = {
         MH_ORC | ROLE_MALE | ROLE_FEMALE | ROLE_LAWFUL | ROLE_CHAOTIC,
         MH_ORC,
         0,
-        MH_GNOME | MH_ORC | MH_HUMAN | MH_DWARF | MH_ELF,
+        MH_GNOME | MH_ORC | MH_DWARF | MH_ELF,
         /*    Str     Int Wis Dex Con Cha */
         { 3, 3, 3, 3, 3, 3 },
         { STR18(100), 18, 18, 18, 18, 20 },

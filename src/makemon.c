@@ -1328,10 +1328,6 @@ int mmflags;
         if (Inhell && is_bat(ptr))
             mon_adjust_speed(mtmp, 2, (struct obj *) 0);
         break;
-    case S_HUMAN:
-        if (Race_if(PM_INFERNAL))
-            mtmp->mpeaceful = FALSE;
-        break;
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION || mndx == PM_BAD_CLONE) {
             neweama(mtmp);
