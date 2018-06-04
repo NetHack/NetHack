@@ -290,7 +290,7 @@ dowield()
     }
 
     /* Prompt for a new weapon */
-    if (!(wep = getobj("wield", wield_ok, TRUE, FALSE)))
+    if (!(wep = getobj("wield", wield_ok, FALSE, FALSE)))
         /* Cancelled */
         return 0;
     else if (wep == uwep) {
@@ -389,7 +389,7 @@ dowieldquiver()
     /* Prompt for a new quiver: "What do you want to ready?"
        (Include gems/stones as likely candidates if either primary
        or secondary weapon is a sling.) */
-    newquiver = getobj("ready", ready_ok, TRUE, FALSE);
+    newquiver = getobj("ready", ready_ok, FALSE, FALSE);
 
     if (!newquiver) {
         /* Cancelled */
