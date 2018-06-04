@@ -947,7 +947,6 @@ register struct obj *obj;
 
     switch (obj->otyp) {
     case RIN_TELEPORTATION:
-    case RIN_REGENERATION:
     case RIN_SEARCHING:
     case RIN_HUNGER:
     case RIN_AGGRAVATE_MONSTER:
@@ -963,6 +962,10 @@ register struct obj *obj;
     case RIN_SLOW_DIGESTION:
     case RIN_SUSTAIN_ABILITY:
     case MEAT_RING:
+        break;
+    case RIN_REGENERATION:
+        You_feel("invigorated!");
+        learnring(obj, TRUE);
         break;
     case RIN_STEALTH:
         toggle_stealth(obj, oldprop, TRUE);
@@ -1059,7 +1062,6 @@ boolean gone;
 
     switch (obj->otyp) {
     case RIN_TELEPORTATION:
-    case RIN_REGENERATION:
     case RIN_SEARCHING:
     case RIN_HUNGER:
     case RIN_AGGRAVATE_MONSTER:
@@ -1075,6 +1077,10 @@ boolean gone;
     case RIN_SLOW_DIGESTION:
     case RIN_SUSTAIN_ABILITY:
     case MEAT_RING:
+        break;
+    case RIN_REGENERATION:
+        You_feel("enervated.");
+        learnring(obj, TRUE);
         break;
     case RIN_STEALTH:
         toggle_stealth(obj, (EStealth & ~mask), FALSE);
