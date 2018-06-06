@@ -28,14 +28,16 @@ STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 static int dieroll;
 
 static const char *const monkattacks[] = {
-    "chop", "jab", "hit", "punch", "headbutt", "elbow"
+    "chop", "jab", "headbutt", "elbow", "knee", "hammer strike"
 };
 
 /* any sort of nonsensical or non-lore-friendly physical attack */
 static const char *const hmonkattacks[] = {
     "suplex",    "piledrive",    "slap",    "shove",    "flick",
     "heel drop", "uppercut",     "flip",    "smack",    "downercut",
-    "arm-bar"
+    "arm-bar",   "haymaker",     "leopard punch",       "sucker punch",
+    "backhand",  "combo"
+
 };
 
 const char *
@@ -76,16 +78,18 @@ struct monst *mtmp;
               return "lash";
       }
       if (mtmp->data == &mons[PM_MONK] || mtmp->data == &mons[PM_SAMURAI]
+              || mtmp->data == &mons[PM_MARTIAL_MASTER] 
+              || mtmp->data == &mons[PM_MARTIAL_ARTIST]
               || (martial_bonus() &&
                   (mtmp == &youmonst ||
                   /* Assumes monk or samurai quest monsters */
                   mtmp->data->msound == MS_LEADER ||
                   mtmp->data->msound == MS_GUARDIAN ||
                   mtmp->data->msound == MS_NEMESIS))) {
-              if (rn2(5))
-                  return "strike";
-              else if (Hallucination)
+              if (Hallucination)
                   return hmonkattacks[rn2(SIZE(hmonkattacks))];
+              else if (rn2(5))
+                  return "strike";
               else
                   return monkattacks[rn2(SIZE(monkattacks))];
 
