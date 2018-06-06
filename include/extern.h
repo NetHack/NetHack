@@ -1202,6 +1202,8 @@ E void FDECL(rustm, (struct monst *, struct obj *));
 
 /* ### mhitu.c ### */
 
+E const char *FDECL(weaphitmsg, (struct obj *,BOOLEAN_P));
+E const char *FDECL(barehitmsg, (struct monst *));
 E const char *FDECL(mpoisons_subj, (struct monst *, struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);

@@ -645,16 +645,6 @@ int dieroll;
     return result;
 }
 
-static const char *const monkattacks[] = {
-    "chop", "strike", "jab", "hit", "punch", "headbutt", "elbow"
-};
-
-/* any sort of nonsensical or non-lore-friendly physical attack */
-static const char *const hmonkattacks[] = {
-    "suplex",    "piledrive",    "slap",    "shove",    "flick",
-    "heel drop", "uppercut",     "flip",    "smack",    "downercut",
-    "arm-bar"
-};
 
 /* guts of hmon() */
 STATIC_OVL boolean
@@ -680,6 +670,7 @@ int dieroll;
     boolean silvermsg = FALSE, silverobj = FALSE;
     boolean valid_weapon_attack = FALSE;
     boolean unarmed = !uwep && !uarm && !uarms;
+    boolean not_melee_weapon = FALSE;
     boolean hand_to_hand = (thrown == HMON_MELEE
                             /* not grapnels; applied implies uwep */
                             || (thrown == HMON_APPLIED && is_pole(uwep)));
@@ -736,6 +727,7 @@ int dieroll;
                 || (is_ammo(obj) && (thrown != HMON_THROWN
                                      || !ammo_and_launcher(obj, uwep)))) {
                 /* then do only 1-2 points of damage */
+                not_melee_weapon = TRUE;
                 if (mdat == &mons[PM_SHADE] && !shade_glare(obj))
                     tmp = 0;
                 else
@@ -1280,14 +1272,9 @@ int dieroll;
             hit(mshot_xname(obj), mon, exclam(tmp));
         else if (!flags.verbose)
             You("hit it.");
-        else if (unarmed && Role_if(PM_MONK) && !Upolyd) {
-            You("%s %s%s", Hallucination ?
-                hmonkattacks[rn2(SIZE(hmonkattacks))] :
-                    rn2(25) ? "hit" :
-                    monkattacks[rn2(SIZE(monkattacks))], mon_nam(mon),
-                        canseemon(mon) ? exclam(tmp) : ".");
-        } else
-            You("%s %s%s", Role_if(PM_BARBARIAN) ? "smite" : "hit",
+        else
+            You("%s %s%s", !obj ? barehitmsg(&youmonst) :
+                not_melee_weapon ? "hit" : weaphitmsg(obj,TRUE),
                 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
     }
 
@@ -2513,7 +2500,8 @@ register struct monst *mon;
                 if (mattk->aatyp == AT_KICK)
                     You("kick %s.", mon_nam(mon));
                 else if (mattk->aatyp == AT_BITE)
-                    You("bite %s.", mon_nam(mon));
+                    You("%s %s.", has_beak(youmonst.data) ?
+                        "peck" : "bite", mon_nam(mon));
                 else if (mattk->aatyp == AT_STNG)
                     You("sting %s.", mon_nam(mon));
                 else if (mattk->aatyp == AT_BUTT)
@@ -2522,6 +2510,9 @@ register struct monst *mon;
                     You("touch %s.", mon_nam(mon));
                 else if (mattk->aatyp == AT_TENT)
                     Your("tentacles suck %s.", mon_nam(mon));
+                else if (mattk->aatyp == AT_CLAW) {
+                    You("%s %s.", barehitmsg(&youmonst),mon_nam(mon));
+                }
                 else
                     You("hit %s.", mon_nam(mon));
                 sum[i] = damageum(mon, mattk);
