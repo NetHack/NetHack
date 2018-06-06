@@ -72,7 +72,8 @@ int shotlimit;
 
     if (!canletgo(obj, "throw"))
         return 0;
-    if (obj->oartifact == ART_MJOLLNIR && obj != uwep) {
+    if ((obj->oartifact == ART_MJOLLNIR || obj->oartifact == ART_GUNGNIR)
+        && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
         return 0;
     }
