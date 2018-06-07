@@ -40,6 +40,7 @@ enum mcast_cleric_spells {
     CLC_GEYSER
 };
 
+STATIC_DCL char *FDECL(psitext, (struct monst*));
 STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
 STATIC_DCL int FDECL(choose_clerical_spell, (int));
@@ -50,6 +51,15 @@ STATIC_DCL boolean
 FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
 
 extern const char *const flash_types[]; /* from zap.c */
+
+/* different types of psionic bolts for monsters */
+STATIC_OVL
+char*
+psitext(mtmp)
+struct monst *mtmp;
+{
+
+}
 
 /* feedback when frustrated monster couldn't cast a spell */
 STATIC_OVL
@@ -532,12 +542,14 @@ int spellnum;
         } else if (!Blind) {
             pline("A blast of slime flies by you!");
         }
+        dmg = 0;
         break;
     case MGC_GAS_CLOUD:
         if (!Blinded) {
             pline("A noxious cloud swirls around you!");
         }
         create_gas_cloud(u.ux, u.uy, 1, min(dmg + 1, 6));
+        dmg = 0;
         break;
     case MGC_PSI_BOLT:
         /* prior to 3.4.0 Antimagic was setting the damage to 1--this
