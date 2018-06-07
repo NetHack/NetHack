@@ -386,7 +386,53 @@ register struct monst *mtmp;
             (void) mpickobj(mtmp, otmp);
         }
         break;
+    case S_GNOME:
+        switch (mm) {
+            case PM_GNOLL:
+                if(!rn2(3)) (void) mongets(mtmp, ORCISH_HELM);
+                if(!rn2(3)) (void) mongets(mtmp, STUDDED_LEATHER_ARMOR);
+                if(!rn2(3)) (void) mongets(mtmp, ORCISH_SHIELD);
+                if(!rn2(4)) (void) mongets(mtmp, SPEAR);
+                break;
+            case PM_GNOLL_WARRIOR:
+                if(!rn2(2)) (void) mongets(mtmp, ORCISH_HELM);
 
+                if (!rn2(20))
+                    (void) mongets(mtmp, ORANGE_DRAGON_SCALE_MAIL);
+                else if (rn2(3))
+                    (void) mongets(mtmp, SCALE_MAIL);
+                else
+                    (void) mongets(mtmp, SPLINT_MAIL);
+
+                if(!rn2(2)) (void) mongets(mtmp, ORCISH_SHIELD);
+                if(!rn2(3)) (void) mongets(mtmp, KATANA);
+                break;
+            case PM_GNOLL_CHIEFTAIN:
+                (void) mongets(mtmp, ORCISH_HELM);
+                if (!rn2(10))
+                    (void) mongets(mtmp, BLUE_DRAGON_SCALE_MAIL);
+                else
+                    (void) mongets(mtmp, CRYSTAL_PLATE_MAIL);
+                (void) mongets(mtmp, ORCISH_SHIELD);
+                (void) mongets(mtmp, KATANA);
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                break;
+            case PM_GNOLL_SHAMAN:
+                if (!rn2(10))
+                    (void) mongets(mtmp, SILVER_DRAGON_SCALE_MAIL);
+                else if (rn2(5))
+                    (void) mongets(mtmp, CRYSTAL_PLATE_MAIL);
+                else
+                    (void) mongets(mtmp, RED_DRAGON_SCALE_MAIL);
+
+                (void) mongets(mtmp, ATHAME);
+                m_initthrow(mtmp, SHURIKEN, 12);
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                break;
+            default:
+                break;
+        }
     case S_HUMANOID:
         if (mm == PM_HOBBIT) {
             switch (rn2(3)) {

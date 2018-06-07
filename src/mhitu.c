@@ -78,7 +78,7 @@ struct monst *mtmp;
               return "lash";
       }
       if (mtmp->data == &mons[PM_MONK] || mtmp->data == &mons[PM_SAMURAI]
-              || mtmp->data == &mons[PM_MARTIAL_MASTER] 
+              || mtmp->data == &mons[PM_MARTIAL_MASTER]
               || mtmp->data == &mons[PM_MARTIAL_ARTIST]
               || (martial_bonus() &&
                   (mtmp == &youmonst ||
