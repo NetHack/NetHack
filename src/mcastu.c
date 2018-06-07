@@ -23,7 +23,6 @@ enum mcast_mage_spells {
     MGC_DEATH_TOUCH,
     MGC_SONIC_SCREAM,
     MGC_GAS_CLOUD,
-    MGC_SLIME_SPRAY
 };
 
 /* monster cleric spells */
@@ -40,7 +39,7 @@ enum mcast_cleric_spells {
     CLC_GEYSER
 };
 
-STATIC_DCL char *FDECL(psitext, (struct monst*));
+STATIC_DCL boolean FDECL(uniquespell, (struct monst*));
 STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
 STATIC_DCL int FDECL(choose_clerical_spell, (int));
@@ -54,11 +53,54 @@ extern const char *const flash_types[]; /* from zap.c */
 
 /* different types of psionic bolts for monsters */
 STATIC_OVL
-char*
-psitext(mtmp)
+boolean
+uniquespell(mtmp)
 struct monst *mtmp;
 {
-
+    register struct permonst *ptr = mtmp->data;
+    register int mm = monsndx(ptr);
+    switch(ptr->mlet) {
+        case S_ANGEL:
+            You("are being crushed under the weight of your sins!");
+            break;
+        case S_DRAGON:
+            Your("thoughts are whited out by an overwhelming presence!");
+            break;
+        case S_VAMPIRE:
+            pline("Suddenly, %s streams from your %s and %s!", body_part(BLOOD),
+                body_part(FACE), makeplural(body_part(EYE)));
+            break;
+        case S_NAGA:
+            You("are being crushed by telekinetic coils!");
+            break;
+        case S_GIANT:
+            You("are walloped by an enormous phantasmal warhammer!");
+            break;
+        case S_GNOME:
+            You("are bombarded by spectral knives!");
+            break;
+        case S_DEMON:
+            switch(mm) {
+                case PM_DEMOGORGON:
+                    Your("body withers and decays!");
+                    break;
+                case PM_ORCUS:
+                    You("are torn apart by phantasmal skulls!");
+                    break;
+                case PM_MARID:
+                    Your("%s heaves as it is suddenly filled with water!",
+                          body_part(STOMACH));
+                    break;
+                default:
+                    You("are covered in ravenous insects!");
+                    break;
+            }
+            break;
+        default:
+            return FALSE;
+            break;
+    }
+    return TRUE;
 }
 
 /* feedback when frustrated monster couldn't cast a spell */
@@ -130,7 +172,6 @@ int spellval;
     case 8:
         return MGC_DESTRY_ARMR;
     case 7:
-        return MGC_SLIME_SPRAY;
     case 6:
         return MGC_WEAKEN_YOU;
     case 5:
@@ -535,15 +576,6 @@ int spellnum;
             You_feel("a brief hum.");
         }
         break;
-    case MGC_SLIME_SPRAY:
-        if (3 - rn2(20) < u.uac + dmg) {
-            You("are sprayed with slime!");
-            incr_itimeout(&Glib, rnd(10));
-        } else if (!Blind) {
-            pline("A blast of slime flies by you!");
-        }
-        dmg = 0;
-        break;
     case MGC_GAS_CLOUD:
         if (!Blinded) {
             pline("A noxious cloud swirls around you!");
@@ -558,7 +590,9 @@ int spellnum;
             shieldeff(u.ux, u.uy);
             dmg = (dmg + 1) / 2;
         }
-        if (dmg <= 5)
+        if (rn2(4) && uniquespell(mtmp))
+            break;
+        else if (dmg <= 5)
             You("get a slight %sache.", body_part(HEAD));
         else if (dmg <= 10)
             Your("brain is on fire!");
