@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1512803167 2017/12/09 07:06:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1528332335 2018/06/07 00:45:35 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -985,7 +985,7 @@ winid endwin;
             if (counting) {
                 nowrap_add(u.urexp, points);
             } else {
-                makeknown(otmp->otyp);
+                discover_object(otmp->otyp, TRUE, FALSE);
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
@@ -1178,7 +1178,7 @@ int how;
          * it in both of those places.
          */
         for (obj = invent; obj; obj = obj->nobj) {
-            makeknown(obj->otyp);
+            discover_object(obj->otyp, TRUE, FALSE);
             obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
             if (Is_container(obj) || obj->otyp == STATUE)
                 obj->cknown = obj->lknown = 1;
@@ -1400,7 +1400,7 @@ int how;
                     continue;
                 if (objects[typ].oc_class != GEM_CLASS || typ <= LAST_GEM) {
                     otmp = mksobj(typ, FALSE, FALSE);
-                    makeknown(otmp->otyp);
+                    discover_object(otmp->otyp, TRUE, FALSE);
                     otmp->known = 1;  /* for fake amulets */
                     otmp->dknown = 1; /* seen it (blindness fix) */
                     if (has_oname(otmp))
@@ -1509,7 +1509,7 @@ boolean identified, all_containers, reportempty;
                 putstr(tmpwin, 0, "");
                 for (obj = box->cobj; obj; obj = obj->nobj) {
                     if (identified) {
-                        makeknown(obj->otyp);
+                        discover_object(obj->otyp, TRUE, FALSE);
                         obj->known = obj->bknown = obj->dknown
                             = obj->rknown = 1;
                         if (Is_container(obj) || obj->otyp == STATUE)
