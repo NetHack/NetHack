@@ -16,7 +16,7 @@ int lev;
     if (lev < 10)
         return (10L * (1L << lev));
     if (lev < 20)
-        return (10000L * (1L << (lev - 10)));
+        return 0.75 * (10000L * (1L << (lev - 10)));
     return (10000000L * ((long) (lev - 19)));
 }
 
@@ -27,6 +27,7 @@ int en;
     switch (Role_switch) {
     case PM_PRIEST:
     case PM_WIZARD:
+    case PM_CARTOMANCER:
         return (2 * en);
     case PM_HEALER:
     case PM_KNIGHT:
