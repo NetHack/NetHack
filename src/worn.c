@@ -335,6 +335,9 @@ boolean on, silently;
             in_mklev = save_in_mklev;
             break;
         }
+        case JUMPING:
+            mon->mjump = 1;
+            break;
         /* properties handled elsewhere */
         case ANTIMAGIC:
         case REFLECTING:
@@ -351,7 +354,6 @@ boolean on, silently;
         /* properties which maybe should have an effect but don't */
         case DISPLACED:
         case FUMBLING:
-        case JUMPING:
         case PROTECTION:
             break;
         default:
@@ -375,6 +377,9 @@ boolean on, silently;
             in_mklev = save_in_mklev;
             break;
         }
+        case JUMPING:
+            mon->mjump = 0;
+            break;
         case FIRE_RES:
         case COLD_RES:
         case SLEEP_RES:
