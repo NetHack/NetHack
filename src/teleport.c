@@ -10,7 +10,6 @@
 STATIC_DCL boolean FDECL(tele_jump_ok, (int, int, int, int));
 STATIC_DCL boolean FDECL(teleok, (int, int, BOOLEAN_P));
 STATIC_DCL void NDECL(vault_tele);
-STATIC_DCL boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
 STATIC_DCL void FDECL(mvault_tele, (struct monst *));
 
 /* non-null when teleporting via having read this scroll */
@@ -921,7 +920,7 @@ unsigned trflags;
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
-STATIC_OVL boolean
+boolean
 rloc_pos_ok(x, y, mtmp)
 register int x, y; /* coordinates of candidate location */
 struct monst *mtmp;
