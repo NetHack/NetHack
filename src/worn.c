@@ -338,6 +338,9 @@ boolean on, silently;
         case JUMPING:
             mon->mjump = 1;
             break;
+        case WWALKING:
+            mon->wwalking = 1;
+            break;
         /* properties handled elsewhere */
         case ANTIMAGIC:
         case REFLECTING:
@@ -349,7 +352,6 @@ boolean on, silently;
             break;
         /* properties which should have an effect but aren't implemented */
         case LEVITATION:
-        case WWALKING:
             break;
         /* properties which maybe should have an effect but don't */
         case DISPLACED:
@@ -379,6 +381,9 @@ boolean on, silently;
         }
         case JUMPING:
             mon->mjump = 0;
+            break;
+        case WWALKING:
+            mon->wwalking = 0;
             break;
         case FIRE_RES:
         case COLD_RES:
