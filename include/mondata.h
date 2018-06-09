@@ -109,7 +109,8 @@
 #define is_bird(ptr) ((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr) (((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr) ((ptr)->mlet == S_GOLEM)
-#define is_domestic(ptr) (((ptr)->mflags2 & M2_DOMESTIC) != 0L)
+#define is_domestic(ptr) (((ptr)->mflags2 & M2_DOMESTIC) != 0L) \
+     || (Role_if(PM_DRAGONMASTER) && is_dragon(ptr))
 #define is_demon(ptr) (((ptr)->mflags2 & M2_DEMON) != 0L)
 #define is_mercenary(ptr) (((ptr)->mflags2 & M2_MERC) != 0L)
 #define is_male(ptr) (((ptr)->mflags2 & M2_MALE) != 0L)
