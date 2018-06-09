@@ -23,7 +23,6 @@ enum mcast_mage_spells {
     MGC_DEATH_TOUCH,
     MGC_SONIC_SCREAM,
     MGC_GAS_CLOUD,
-    MGC_SLIME_SPRAY
 };
 
 /* monster cleric spells */
@@ -120,7 +119,6 @@ int spellval;
     case 8:
         return MGC_DESTRY_ARMR;
     case 7:
-        return MGC_SLIME_SPRAY;
     case 6:
         return MGC_WEAKEN_YOU;
     case 5:
@@ -525,19 +523,12 @@ int spellnum;
             You_feel("a brief hum.");
         }
         break;
-    case MGC_SLIME_SPRAY:
-        if (3 - rn2(20) < u.uac + dmg) {
-            You("are sprayed with slime!");
-            incr_itimeout(&Glib, rnd(10));
-        } else if (!Blind) {
-            pline("A blast of slime flies by you!");
-        }
-        break;
     case MGC_GAS_CLOUD:
         if (!Blinded) {
             pline("A noxious cloud swirls around you!");
         }
         create_gas_cloud(u.ux, u.uy, 1, min(dmg + 1, 6));
+        dmg = 0;
         break;
     case MGC_PSI_BOLT:
         /* prior to 3.4.0 Antimagic was setting the damage to 1--this
