@@ -364,7 +364,8 @@ boolean devour;
         else
             mtmp->perminvis = 1;
     }
-    dogintr(mtmp, &mons[obj->corpsenm]);
+    if (obj->otyp == CORPSE)
+        dogintr(mtmp, &mons[obj->corpsenm]);
     return 1;
 }
 
