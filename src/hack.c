@@ -2403,6 +2403,9 @@ register boolean newlev;
         case BEEHIVE:
             You("enter a giant beehive!");
             break;
+        case LAB:
+            You("enter an abandoned laboratory!");
+            break;
         case DEN:
             You("enter a den of wild beasts!");
             break;

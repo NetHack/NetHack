@@ -154,6 +154,27 @@ dosounds()
             }
         }
     }
+    if (level.flags.has_lab && !rn2(200)) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if ((mtmp->data->mlet == S_QUANTMECH)
+                && mon_in_room(mtmp, LAB)) {
+                switch (rn2(2) + hallu) {
+                case 0:
+                    You_hear("a strange squelching noise.");
+                    break;
+                case 1:
+                    You_hear("the hissing of bunsen burners.");
+                    break;
+                case 2:
+                    You_hear("Dr. Frankenstein!");
+                    break;
+                }
+                return;
+            }
+        }
+    }
     if (level.flags.has_morgue && !rn2(200)) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
