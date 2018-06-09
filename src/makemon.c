@@ -45,8 +45,8 @@ struct monst *mtmp;
         (void) memset((genericptr_t) EAMA(mtmp), 0, sizeof(struct eama));
     }
     /* set up the monster components */
-    EAMA(mtmp)->m1 = rndmonst();
-    EAMA(mtmp)->m2 = rndmonst();
+    EAMA(mtmp)->m1 = &mons[rndmonnum()];
+    EAMA(mtmp)->m2 = &mons[rndmonnum()];
 }
 
 void
