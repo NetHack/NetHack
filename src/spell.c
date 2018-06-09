@@ -270,13 +270,16 @@ struct obj *book2;
                ascension run is no easy task :D */
             pline("You feel like you are being watched...");
             for (pm = PM_JUIBLEX; pm <= PM_DEMOGORGON; pm++) {
-                mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
-                mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
-                /* based on muse.c code */
-                d_level flev;
-                get_level(&flev, random_teleport_level());
-                migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
-                                 (coord *) 0);
+                if (!(mvitals[pm].mvflags & G_EXTINCT)) {
+                    mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
+                    pline("Created %s.", mon_nam(mtmp));
+                    mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
+                    /* based on muse.c code */
+                    d_level flev;
+                    get_level(&flev, random_teleport_level());
+                    migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
+                                     (coord *) 0);
+                }
             }
         } else { /* at least one artifact not prepared properly */
             You("have a feeling that %s is amiss...", something);
