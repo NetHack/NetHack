@@ -151,8 +151,9 @@ unsigned *ospecial;
       	} else if (iflags.use_color && offset == S_room) {
         		if (*in_rooms(x,y,BEEHIVE))
         		    color = CLR_YELLOW;
-        		else if (In_hell(&u.uz) && !In_W_tower(x, y, &u.uz))
-        		    color = (Is_juiblex_level(&u.uz)) ? CLR_GREEN : CLR_ORANGE;
+        		else if (In_hell(&u.uz) && !In_W_tower(x, y, &u.uz)
+                      && Is_juiblex_level(&u.uz))
+                color = CLR_GREEN;
         } else if (iflags.use_color && offset == S_altar) {
               if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
                   color = CLR_BRIGHT_MAGENTA;
