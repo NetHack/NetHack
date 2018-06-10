@@ -934,7 +934,9 @@ E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 
 /* ### invent.c ### */
 
-E void FDECL(sortloot, (struct obj **, unsigned, BOOLEAN_P));
+E Loot *FDECL(sortloot, (struct obj **, unsigned, BOOLEAN_P,
+                         boolean (*)(OBJ_P)));
+E void FDECL(unsortloot, (Loot **));
 E void FDECL(assigninvlet, (struct obj *));
 E struct obj *FDECL(merge_choice, (struct obj *, struct obj *));
 E int FDECL(merged, (struct obj **, struct obj **));
@@ -2841,6 +2843,7 @@ E void FDECL(bypass_obj, (struct obj *));
 E void NDECL(clear_bypasses);
 E void FDECL(bypass_objlist, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(nxt_unbypassed_obj, (struct obj *));
+E struct obj *FDECL(nxt_unbypassed_loot, (Loot *, struct obj *));
 E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */

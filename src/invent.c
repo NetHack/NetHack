@@ -46,10 +46,6 @@ static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
  */
 static char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
-struct sortloot_item {
-    struct obj *obj;
-    int indx;
-};
 unsigned sortlootmode = 0;
 
 /* qsort comparison routine for sortloot() */
@@ -211,6 +207,95 @@ tiebreak:
     return (sli1->indx - sli2->indx);
 }
 
+/*
+ * sortloot() - the story so far...
+ *
+ *      The original implementation constructed and returned an array
+ *      of pointers to objects in the requested order.  Callers had to
+ *      count the number of objects, allocate the array, pass one
+ *      object at a time to the routine which populates it, traverse
+ *      the objects via stepping through the array, then free the
+ *      array.  The ordering process used a basic insertion sort which
+ *      is fine for short lists but inefficient for long ones.
+ *
+ *      3.6.0 (and continuing with 3.6.1) changed all that so that
+ *      sortloot was self-contained as far as callers were concerned.
+ *      It reordered the linked list into the requested order and then
+ *      normal list traversal was used to process it.  It also switched
+ *      to qsort() on the assumption that the C library implementation
+ *      put some effort into sorting efficiently.  It also checked
+ *      whether the list was already sorted as it got ready to do the
+ *      sorting, so re-examining inventory or a pile of objects without
+ *      having changed anything would gobble up less CPU than a full
+ *      sort.  But it had as least two problems (aside from the ordinary
+ *      complement of bugs):
+ *      1) some players wanted to get the original order back when they
+ *      changed the 'sortloot' option back to 'none', but the list
+ *      reordering made that infeasible;
+ *      2) object identification giving the 'ID whole pack' result
+ *      would call makeknown() on each newly ID'd object, that would
+ *      call update_inventory() to update the persistent inventory
+ *      window if one existed, the interface would call the inventory
+ *      display routine which would call sortloot() which might change
+ *      the order of the list being traversed by the identify code,
+ *      possibly skipping the ID of some objects.  That could have been
+ *      avoided by suppressing 'perm_invent' during identification
+ *      (fragile) or by avoiding sortloot() during inventory display
+ *      (more robust).
+ *
+ *      3.6.2 reverts to the temporary array of ordered obj pointers
+ *      but has sortloot() do the counting and allocation.  Callers
+ *      need to use array traversal instead of linked list traversal
+ *      and need to free the temporary array when done.  And the
+ *      array contains 'struct sortloot_item' (aka 'Loot') entries
+ *      instead of simple 'struct obj *' entries.
+ */
+Loot *
+sortloot(olist, mode, by_nexthere, filterfunc)
+struct obj **olist; /* previous version might have changed *olist, we don't */
+unsigned mode; /* flags for sortloot_cmp() */
+boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
+boolean FDECL((*filterfunc), (OBJ_P));
+{
+    Loot *sliarray;
+    struct obj *o;
+    unsigned n, i;
+
+    for (n = 0, o = *olist; o; o = by_nexthere ? o->nexthere : o->nobj)
+        ++n;
+    /* note: if there is a filter function, this might overallocate */
+    sliarray = (Loot *) alloc((n + 1) * sizeof *sliarray);
+
+    /* populate aliarray[0..n-1] */
+    for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
+        if (filterfunc && !(*filterfunc)(o))
+            continue;
+        sliarray[i].obj = o, sliarray[i].indx = (int) i;
+    }
+    n = i;
+    /* add a terminator so that we don't have to pass 'n' back to caller */
+    sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
+
+    /* do the sort; if no sorting is requested, we'll just return
+       a sortloot_item array reflecting the current ordering */
+    if (mode) {
+        sortlootmode = mode; /* extra input for sortloot_cmp() */
+        qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
+        sortlootmode = 0; /* reset static mode flags */
+    }
+    return sliarray;
+}
+
+/* sortloot() callers should use this to free up memory it allocates */
+void
+unsortloot(loot_array_p)
+Loot **loot_array_p;
+{
+    if (*loot_array_p)
+        free((genericptr_t) *loot_array_p), *loot_array_p = (Loot *) 0;
+}
+
+#if 0 /* 3.6.0 'revamp' */
 void
 sortloot(olist, mode, by_nexthere)
 struct obj **olist;
@@ -248,6 +333,7 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
     }
     sortlootmode = 0;
 }
+#endif /*0*/
 
 void
 assigninvlet(otmp)
@@ -1097,6 +1183,7 @@ register const char *let, *word;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
     long dummymask;
+    Loot *sortedinvent, *srtinv;
 
     if (*let == ALLOW_COUNT)
         let++, allowcnt = 1;
@@ -1133,15 +1220,13 @@ register const char *let, *word;
 
     if (!flags.invlet_constant)
         reassign();
-    else
-        /* in case invent is in packorder, force it to be in invlet
-           order before collecing candidate inventory letters;
-           if player responds with '?' or '*' it will be changed
-           back by display_pickinv(), but by then we'll have 'lets'
-           and so won't have to re-sort in the for(;;) loop below */
-        sortloot(&invent, SORTLOOT_INVLET, FALSE);
 
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    /* force invent to be in invlet order before collecting candidate
+       inventory letters */
+    sortedinvent = sortloot(&invent, SORTLOOT_INVLET, FALSE,
+                            (boolean FDECL((*), (OBJ_P))) 0);
+
+    for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (&bp[foo] == &buf[sizeof buf - 1]
             || ap == &altlets[sizeof altlets - 1]) {
             /* we must have a huge number of NOINVSYM items somehow */
@@ -1285,6 +1370,7 @@ register const char *let, *word;
                 allowall = usegold = TRUE;
         }
     }
+    unsortloot(&sortedinvent);
 
     bp[foo] = 0;
     if (foo == 0 && bp > buf && bp[-1] == ' ')
@@ -1763,16 +1849,17 @@ unsigned *resultflags;
  */
 int
 askchain(objchn, olets, allflag, fn, ckfn, mx, word)
-struct obj **objchn;
+struct obj **objchn; /* *objchn might change */
 int allflag, mx;
 const char *olets, *word; /* olets is an Obj Class char array */
 int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
 {
     struct obj *otmp, *otmpo;
     register char sym, ilet;
-    register int cnt = 0, dud = 0, tmp;
+    int cnt = 0, dud = 0, tmp;
     boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
     char qbuf[QBUFSZ], qpfx[QBUFSZ];
+    Loot *sortedchn = 0;
 
     takeoff = taking_off(word);
     ident = !strcmp(word, "identify");
@@ -1787,7 +1874,8 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
 
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
-    sortloot(objchn, SORTLOOT_INVLET, FALSE);
+    sortedchn = sortloot(objchn, SORTLOOT_INVLET, FALSE,
+                         (boolean FDECL((*), (OBJ_P))) 0);
 
     first = TRUE;
     /*
@@ -1812,7 +1900,7 @@ nextclass:
      * track of which list elements have already been processed.
      */
     bypass_objlist(*objchn, FALSE); /* clear chain's bypass bits */
-    while ((otmp = nxt_unbypassed_obj(*objchn)) != 0) {
+    while ((otmp = nxt_unbypassed_loot(sortedchn, *objchn)) != 0) {
         if (ilet == 'z')
             ilet = 'A';
         else if (ilet == 'Z')
@@ -1900,11 +1988,13 @@ nextclass:
     }
     if (olets && *olets && *++olets)
         goto nextclass;
+
     if (!takeoff && (dud || cnt))
         pline("That was all.");
     else if (!dud && !cnt)
         pline("No applicable objects.");
 ret:
+    unsortloot(&sortedchn);
     bypass_objlist(*objchn, FALSE);
     return cnt;
 }
@@ -2195,6 +2285,8 @@ long *out_cnt;
     winid win;                        /* windows being used */
     anything any;
     menu_item *selected;
+    unsigned sortflags;
+    Loot *sortedinvent, *srtinv;
 
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
@@ -2268,10 +2360,11 @@ long *out_cnt;
         return ret;
     }
 
-    sortloot(&invent,
-             (((flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET)
-              | (flags.sortpack ? SORTLOOT_PACK : 0)),
-             FALSE);
+    sortflags = (flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET;
+    if (flags.sortpack)
+        sortflags |= SORTLOOT_PACK;
+    sortedinvent = sortloot(&invent, sortflags, FALSE,
+                            (boolean FDECL((*), (OBJ_P))) 0);
 
     start_menu(win);
     any = zeroany;
@@ -2296,7 +2389,7 @@ long *out_cnt;
     }
 nextclass:
     classcount = 0;
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (lets && !index(lets, otmp->invlet))
             continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
@@ -2330,6 +2423,7 @@ nextclass:
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
                  "(list everything)", MENU_UNSELECTED);
     }
+    unsortloot(&sortedinvent);
     /* for permanent inventory where we intend to show everything but
        nothing has been listed (because there isn't anyhing to list;
        recognized via any.a_char still being zero; the n==0 case above

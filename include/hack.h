@@ -190,6 +190,14 @@ enum hmon_atkmode_types {
     HMON_DRAGGED    /* attached iron ball, pulled into mon */
 };
 
+/* sortloot() return type; needed before extern.h */
+struct sortloot_item {
+    struct obj *obj;
+    int indx; /* signed int, because sortloot()'s qsort comparison routine
+                 assumes (a->indx - b->indx) might yield a negative result */
+};
+typedef struct sortloot_item Loot;
+
 #define MATCH_WARN_OF_MON(mon)                                               \
     (Warn_of_mon && ((context.warntype.obj                                   \
                       && (context.warntype.obj & (mon)->data->mflags2))      \
@@ -215,8 +223,7 @@ enum hmon_atkmode_types {
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
-#ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice \
-                       */
+#ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
 #undef NDECL
 #define NDECL(f) f()
 #endif
