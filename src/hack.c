@@ -1690,6 +1690,81 @@ domove()
         return;
     }
 
+    /* warn player before walking into known traps */
+    trap = t_at(x, y);
+    if (trap && trap->tseen && (!context.nopick || context.run)
+        && !Stunned && !Confusion
+        && (immune_to_trap(&youmonst, trap->ttyp) != 1 || Hallucination)) {
+        /* note on hallucination: all traps still show as ^, but the hero can't
+         * tell what they are, so warn of every trap. */
+        char qbuf[QBUFSZ];
+        xchar traptype = (Hallucination ? rnd(TRAPNUM - 1) : trap->ttyp);
+        boolean into = FALSE; /* "onto" the trap vs "into" */
+        switch (traptype) {
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TELEP_TRAP:
+        case LEVEL_TELEP:
+        case MAGIC_PORTAL:
+        case WEB:
+            into = TRUE;
+        }
+        snprintf(qbuf, QBUFSZ, "Really %s %sto that %s?",
+                 locomotion(youmonst.data, "step"),
+                 (into ? "in" : "on"),
+                 defsyms[trap_to_defsym(traptype)].explanation);
+        if (!paranoid_query(ParanoidTrap, qbuf)) {
+            nomul(0);
+            context.move = 0;
+            return;
+        }
+    }
+
+    /* Paranoid checks for dangerous moves into water or lava */
+    if (!Levitation && !Flying && grounded(youmonst.data) && !Stunned
+        && !Confusion && levl[x][y].seenv
+        && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
+            || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
+        boolean known_wwalking, known_lwalking;
+        known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
+                        && objects[WATER_WALKING_BOOTS].oc_name_known
+                        && !u.usteed);
+        known_lwalking = (known_wwalking && Fire_resistance &&
+                        uarmf->oerodeproof && uarmf->rknown);
+        /* FIXME: This can be exploited to identify the ring of fire resistance
+        * if the player is wearing it unidentified and has identified
+        * fireproof boots of water walking and is walking over lava. However,
+        * this is such a marginal case that it may not be worth fixing. */
+        if (context.nopick) {
+            /* moving with 'm' */
+            if (is_pool(x, y) && !known_wwalking) {
+                if (ParanoidSwim && yn("Really enter the water?") != 'y') {
+                    context.move = 0;
+                    nomul(0);
+                    return;
+                }
+            }
+            else if (is_lava(x, y) && !known_lwalking) {
+                if (ParanoidSwim && yn("Really enter the lava?") != 'y') {
+                    context.move = 0;
+                    nomul(0);
+                    return;
+                }
+            }
+        } else {
+            /* not moving with 'm'; if not known safe, simply prevent from
+             * moving at all */
+            if ((is_pool(x, y) && !known_wwalking)
+                || (is_lava(x, y) && !known_lwalking)) {
+                context.move = 0;
+                nomul(0);
+                return;
+            }
+        }
+    }
+
     /* Move ball and chain.  */
     if (Punished)
         if (!drag_ball(x, y, &bc_control, &ballx, &bally, &chainx, &chainy,

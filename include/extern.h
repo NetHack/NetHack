@@ -2464,6 +2464,7 @@ E struct trap *FDECL(maketrap, (int, int, int));
 E void FDECL(fall_through, (BOOLEAN_P));
 E struct monst *FDECL(animate_statue,
                       (struct obj *, XCHAR_P, XCHAR_P, int, int *));
+E boolean FDECL(immune_to_trap, (struct monst*, XCHAR_P));
 E struct monst *FDECL(activate_statue_trap,
                       (struct trap *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(dotrap, (struct trap *, unsigned));
