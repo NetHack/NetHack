@@ -1800,17 +1800,8 @@ domove()
      * be caught by the normal falling-monster code.
      */
     if (is_safepet(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if trapped, there's a chance the pet goes wild */
-        if (mtmp->mtrapped) {
-            if (!rn2(mtmp->mtame)) {
-                mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
-                if (mtmp->mleashed)
-                    m_unleash(mtmp, TRUE);
-                growl(mtmp);
-            } else {
-                yelp(mtmp);
-            }
-        }
+        /* if it turns out we can't actually move */
+        boolean didnt_move = FALSE;
 
         /* seemimic/newsym should be done before moving hero, otherwise
            the display code will draw the hero here before we possibly
@@ -1819,31 +1810,42 @@ domove()
         mtmp->mundetected = 0;
         if (mtmp->m_ap_type)
             seemimic(mtmp);
-        else if (!mtmp->mtame)
-            newsym(mtmp->mx, mtmp->my);
         u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
+            /* aos: since peaceful monsters simply being unable to move out of
+             * traps was inconsistent with pets having it possible but being
+             * untamed in the process, extend this to pets as well. */
+            You("stop.  %s can't move out of that trap.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if (mtmp->mpeaceful
+                   && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+                       || t_at(u.ux0, u.uy0) != NULL
+                       || mtmp->ispriest
+                       || mtmp->isshk
+                       || mtmp->data == &mons[PM_ORACLE]
+                       || mtmp->m_id == quest_status.leader_m_id)) {
+            /* displacing peaceful into unsafe or trapped space, or trying to
+             * displace quest leader, Oracle, shopkeeper, or priest */
+            You("stop.  %s doesn't want to swap places.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else {
             char pnambuf[BUFSZ];
 
@@ -1855,7 +1857,7 @@ domove()
             newsym(x, y);
             newsym(u.ux0, u.uy0);
 
-            You("%s %s.", mtmp->mtame ? "swap places with" : "frighten",
+            You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 pnambuf);
 
             /* check for displacing it into pools and traps */
@@ -1903,6 +1905,16 @@ domove()
                 break;
             }
         }
+
+        if (didnt_move) {
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+        }
+
+        mtmp->mundetected = 0;
+        if (mtmp->m_ap_type)
+            seemimic(mtmp);
     }
 
     reset_occupations();
