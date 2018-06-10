@@ -927,7 +927,7 @@ SCROLL(None,      "ELPHE MONATER",  1,   0, 100), /* famous mistranslation */
 SCROLL(None,               "ABAJ",  1,   0, 100), /* famous mistranslation */
 SCROLL(None,     "CONGLATURATION",  1,   0, 100), /* famous mistranslation */
 SCROLL(None,       "DESUM TETRAL",  1,   0, 100),
-SCROLL(None,            "NHINRIL",  1,   0, 100), /* meta */
+SCROLL(None,            "NHINRL",   1,   0, 100), /* meta */
 SCROLL(None,          "ISAY INAY",  1,   0, 100), /* meta */
 SCROLL(None,              "TEMOV",  1,   0, 100),
 SCROLL(None,         "GARVEN DEH",  1,   0, 100),
