@@ -2481,7 +2481,10 @@ int final;
         if (ltmp >= 0)
             enl_msg("Good luck ", "does", "did", " not time out for you", "");
     }
-
+    if (u.uconduct.gnostic) {
+        Sprintf(buf,"gone %d turns without praying", u.ublesstim);
+        you_have(buf, "");
+    }
     if (u.ugangr) {
         Sprintf(buf, " %sangry with you",
                 u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");

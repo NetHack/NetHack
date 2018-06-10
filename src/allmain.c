@@ -198,6 +198,7 @@ boolean resuming;
 
                     if (u.ublesscnt)
                         u.ublesscnt--;
+                    u.ublesstim++;
                     if (flags.time && !context.run)
                         context.botl = 1;
 #ifdef EXTRAINFO_FN

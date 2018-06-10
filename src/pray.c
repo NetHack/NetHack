@@ -1963,6 +1963,7 @@ dopray()
             You("are surrounded by a shimmering light.");
         u.uinvulnerable = TRUE;
     }
+    u.ublesstim = 0;
 
     return 1;
 }
