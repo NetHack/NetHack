@@ -260,21 +260,26 @@ boolean FDECL((*filterfunc), (OBJ_P));
     Loot *sliarray;
     struct obj *o;
     unsigned n, i;
+    boolean augment_filter;
 
     for (n = 0, o = *olist; o; o = by_nexthere ? o->nexthere : o->nobj)
         ++n;
     /* note: if there is a filter function, this might overallocate */
     sliarray = (Loot *) alloc((n + 1) * sizeof *sliarray);
 
+    augment_filter = (mode & SORTLOOT_PETRIFY) ? TRUE : FALSE;
     /* populate aliarray[0..n-1] */
     for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
-        if (filterfunc && !(*filterfunc)(o))
+        if (filterfunc && !(*filterfunc)(o)
+            && (!augment_filter || o->otyp != CORPSE
+                || !touch_petrifies(&mons[o->corpsenm])))
             continue;
         sliarray[i].obj = o, sliarray[i].indx = (int) i;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
     sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
+    mode &= ~SORTLOOT_PETRIFY;
 
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
