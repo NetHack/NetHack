@@ -275,7 +275,7 @@ struct obj *book2;
                     mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
                     /* based on muse.c code */
                     d_level flev;
-                    get_level(&flev, random_teleport_level());
+                    get_level(&flev, 1 + rn2(depth(&u.uz + 1)));
                     migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
                                      (coord *) 0);
                 }
