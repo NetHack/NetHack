@@ -272,7 +272,6 @@ struct obj *book2;
             for (pm = PM_JUIBLEX; pm <= PM_DEMOGORGON; pm++) {
                 if (!(mvitals[pm].mvflags & G_EXTINCT)) {
                     mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
-                    pline("Created %s.", mon_nam(mtmp));
                     mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
                     /* based on muse.c code */
                     d_level flev;
