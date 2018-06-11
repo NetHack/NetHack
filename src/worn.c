@@ -777,6 +777,30 @@ struct obj *objchain;
     return objchain;
 }
 
+/* like nxt_unbypassed_obj() but operates on sortloot_item array rather
+   than an object linked list; the array contains obj==Null terminator;
+   there's an added complication that the array may have stale pointers
+   for deleted objects (see Multiple-Drop case in askchain(invent.c)) */
+struct obj *
+nxt_unbypassed_loot(lootarray, listhead)
+Loot *lootarray;
+struct obj *listhead;
+{
+    struct obj *o, *obj;
+
+    while ((obj = lootarray->obj) != 0) {
+        for (o = listhead; o; o = o->nobj)
+            if (o == obj)
+                break;
+        if (o && !obj->bypass) {
+            bypass_obj(obj);
+            break;
+        }
+        ++lootarray;
+    }
+    return obj;
+}
+
 void
 mon_break_armor(mon, polyspot)
 struct monst *mon;

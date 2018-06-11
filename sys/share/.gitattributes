@@ -4,3 +4,41 @@ termcap NH_header=no
 dgn_comp.h NH_header=no
 lev_comp.h NH_header=no
 Makefile.lib NH_header=no
+
+Makefile.lib	NH_filestag=(file%s_for_MSDOS_and_OS/2_versions_-_untested_for_3.6.2)
+#termcap.uu NH_filestag=(file%s_for_MSDOS_and_OS/2_versions_-_untested_for_3.6.2)
+termcap.uu	NH_filestag=>Makefile.lib
+
+pcmain.c	NH_filestag=(file_for_MSDOS,_OS/2,_NT,_Amiga,_and_Atari_versions_-_untested_for_3.6.2)
+
+pcsys.c		NH_filestag=(file%s_for_MSDOS,_OS/2,_NT,_and_Atari_versions_-_untested_for_3.6.2)
+pcunix.c	NH_filestag=>pcsys.c
+
+NetHack.cnf	NH_filestag=(file_for_MSDOS,_OS/2,_and_Atari_versions_-_untested_for_3.6.2)
+pctty.c		NH_filestag=>NetHack.cnf
+
+ioctl.c		NH_filestag=(file%s_for_UNIX_and_Be_versions)
+unixtty.c	NH_filestag=>ioctl.c
+
+nhlan.c NH_filestag=(file_for_NT_version)
+
+random.c NH_filestag=(Berkeley_random_number_file,_which_may_be_included_in_any_version)
+
+uudecode.c NH_filestag=(Berkeley_uudecode_file,_which_may_be_used_in_build_process_of_any_version)
+
+tclib.c NH_filestag=(file_for_VMS_version)
+
+termcap NH_filestag=(file_for_MSDOS,_OS/2,_and_VMS_versions)
+
+dgn_comp.h	NH_filestag=(lex/yacc_output_for_special_level_and_dungeon_compilers)
+dgn_lex.c	NH_filestag=>dgn_comp.h
+dgn_yacc.c	NH_filestag=>dgn_comp.h
+lev_comp.h	NH_filestag=>dgn_comp.h
+lev_lex.c	NH_filestag=>dgn_comp.h
+lev_yacc.c	NH_filestag=>dgn_comp.h
+
+posixregex.c NH_filestag=60(posix_regex_for_versions_that_include_regex_in_their_C_library)
+
+cppregex.cpp NH_filestag=61(c++_regex_code_for_versions_that_can_build_a_C++_module_and_link_it_in)
+
+pmatchregex.c NH_filestag=62(pmatch_regex_for_other_versions)

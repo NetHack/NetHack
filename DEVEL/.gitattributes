@@ -4,3 +4,4 @@ hooksdir/* NHSUBST
 * text=auto
 DOTGIT/TARGET NH_header=no
 hooksdir/TARGET NH_header=no
+* NH_filestag=(file%s_for_people_developing_changes_to_NetHack)
