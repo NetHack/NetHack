@@ -376,6 +376,7 @@ enum explosion_types {
 #define SORTLOOT_PACK   0x01
 #define SORTLOOT_INVLET 0x02
 #define SORTLOOT_LOOT   0x04
+#define SORTLOOT_PETRIFY 0x20 /* override filter func for c-trice corpses */
 
 /* flags for xkilled() [note: meaning of first bit used to be reversed,
    1 to give message and 0 to suppress] */
