@@ -23,6 +23,9 @@ register struct monst *mon;
                 const char *howler;
 
                 switch (monsndx(mon->data)) {
+                case PM_ALPHA_WEREWOLF:
+                    howler = "pack of wolves";
+                    break;
                 case PM_WEREWOLF:
                     howler = "wolf";
                     break;
@@ -49,6 +52,10 @@ counter_were(pm)
 int pm;
 {
     switch (pm) {
+    case PM_ALPHA_WEREWOLF:
+        return PM_PACK_LORD;
+    case PM_PACK_LORD:
+        return PM_ALPHA_WEREWOLF;
     case PM_WEREWOLF:
         return PM_HUMAN_WEREWOLF;
     case PM_HUMAN_WEREWOLF:
@@ -156,6 +163,15 @@ char *genbuf;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
             typ = rn2(5) ? PM_WOLF : rn2(2) ? PM_WARG : PM_WINTER_WOLF;
+            if (genbuf)
+                Strcpy(genbuf, "wolf");
+            break;
+        case PM_ALPHA_WEREWOLF:
+        case PM_PACK_LORD:
+            if (!yours)
+                typ = rn2(4) ? PM_WOLF : rn2(3) ? PM_WINTER_WOLF : PM_WEREWOLF;
+            else
+                typ = rn2(4) ? PM_WOLF : PM_WINTER_WOLF;
             if (genbuf)
                 Strcpy(genbuf, "wolf");
             break;

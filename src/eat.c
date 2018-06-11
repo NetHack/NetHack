@@ -1027,6 +1027,7 @@ register int pm;
         catch_lycanthropy = PM_WEREJACKAL;
         break;
     case PM_HUMAN_WEREWOLF:
+    case PM_ALPHA_WEREWOLF:
         catch_lycanthropy = PM_WEREWOLF;
         break;
     case PM_NURSE:

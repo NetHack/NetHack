@@ -1389,8 +1389,9 @@ int mmflags;
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,
                          monst_to_any(mtmp));
-    /* lycanthropes are peaceful to natural lycanthropes */
-    if (is_were(mtmp->data) && Race_if(PM_HUMAN_WEREWOLF))
+    /* lycanthropes are peaceful to natural lycanthropes and pack lords */
+    if ((is_were(mtmp->data) && Race_if(PM_HUMAN_WEREWOLF))
+        || (u.ulycn == PM_ALPHA_WEREWOLF && mndx == PM_WEREWOLF))
         mtmp->mpeaceful = TRUE;
     mitem = 0; /* extra inventory item for this monster */
 
