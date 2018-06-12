@@ -29,7 +29,7 @@
 
 #define resists_drain(ptr) \
     (is_undead(ptr) || is_demon(ptr) || is_were(ptr) \
-     || ptr == &mons[PM_DEATH])
+     || ptr == &mons[PM_DEATH] || ptr == &mons[PM_GRIM_REAPER])
 /* is_were() doesn't handle hero in human form */
 
 #define is_lminion(mon) \
