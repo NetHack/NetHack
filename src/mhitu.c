@@ -2790,7 +2790,8 @@ struct monst *mon;
        as far as deciding what will happen; chance for bad outcome when
        Cha+Int is 32 or more is 2/35, a bit over 5.7% */
     attr_tot = ACURR(A_CHA) + ACURR(A_INT);
-    if (rn2(35) > min(attr_tot, 32)) {
+    if ((monsndx(mon->data) == PM_LORD_OF_THE_FOOCUBI && rn2(50) > attr_tot) ||
+        rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
         pline("%s seems to have enjoyed it more than you...",
               noit_Monnam(mon));

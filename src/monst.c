@@ -3055,9 +3055,9 @@ struct permonst _mons2[] = {
         M3_WANTSAMUL | M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
     MON("Lord of the Foocubi", S_DEMON, LVL(80, 18, -16, 80, 15),
         (G_HELL | G_NOCORPSE | G_NOGEN | G_UNIQ),
-        A(ATTK(AT_GAZE, AD_BLND, 4, 6), ATTK(AT_WEAP, AD_PHYS, 3, 6),
-          ATTK(AT_WEAP, AD_PHYS, 3, 6), ATTK(AT_CLAW, AD_SEDU, 0, 0),
-          ATTK(AT_CLAW, AD_SEDU, 0, 0), NO_ATTK),
+        A(ATTK(AT_GAZE, AD_BLND, 4, 6), ATTK(AT_WEAP, AD_PHYS, 2, 8),
+          ATTK(AT_WEAP, AD_PHYS, 2, 8), ATTK(AT_CLAW, AD_SEDU, 0, 0),
+          NO_ATTK, NO_ATTK),
         SIZ(900, 500, MS_BRIBE, MZ_HUMAN), MR_FIRE | MR_POISON, 0,
         M1_FLY | M1_SEE_INVIS | M1_POIS | M1_TPORT_CNTRL | M1_TPORT,
         M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY
