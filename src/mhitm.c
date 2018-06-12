@@ -412,6 +412,11 @@ register struct monst *magr, *mdef;
             /* KMH -- don't accumulate to-hit bonuses */
             if (otmp)
                 tmp -= hitval(otmp, mdef);
+            if (is_displaced(magr->data) && rn2(4)) {
+                pline("%s attacks the displaced image of %s.",
+                      Monnam(magr), mon_nam(mdef));
+                strike = FALSE;
+            }
             if (strike) {
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
@@ -436,6 +441,11 @@ register struct monst *magr, *mdef;
 
         case AT_HUGS: /* automatic if prev two attacks succeed */
             strike = (i >= 2 && res[i - 1] == MM_HIT && res[i - 2] == MM_HIT);
+            if (is_displaced(magr->data) && rn2(4)) {
+                pline("%s attacks the displaced image of %s.",
+                      Monnam(magr), mon_nam(mdef));
+                strike = FALSE;
+            }
             if (strike)
                 res[i] = hitmm(magr, mdef, mattk);
 

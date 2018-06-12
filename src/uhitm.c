@@ -423,6 +423,10 @@ register struct monst *mtmp;
             || mtmp->my != u.uy + u.dy)) /* it moved */
         return FALSE;
 
+    if (is_displaced(mtmp->data) && !u.uswallow && !rn2(4)) {
+        You("the image of %s shimmers and vanishes!", mon_nam(mtmp));
+        return FALSE;
+    }
     if (Upolyd)
         (void) hmonas(mtmp);
     else
