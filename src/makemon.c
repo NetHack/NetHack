@@ -1500,7 +1500,7 @@ int mmflags;
         m_initinv(mtmp); /* add on a few special items incl. more armor */
         m_dowear(mtmp, TRUE);
 
-        if (!rn2(100) && is_domestic(ptr)
+        if (!rn2(100) && is_domestic(ptr) && !is_dragon(ptr)
             && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
             struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
             put_saddle_on_mon(otmp, mtmp);
