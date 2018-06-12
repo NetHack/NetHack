@@ -2768,7 +2768,7 @@ m_respond(mtmp)
 struct monst *mtmp;
 {
     if (mtmp->data == &mons[PM_BANSHEE]) {
-        if (!Deaf) {
+        if (!Sonic_resistance) {
             pline("%s unleashes a bloodcurdling wail!", Monnam(mtmp));
             stop_occupation();
             losestr(rnd(3));
