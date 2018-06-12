@@ -3258,7 +3258,7 @@ xchar x, y;
         } else
             qbuf[0] = '\0'; /* just to pacify lint */
 
-        switch (g.sell_response ? g.sell_response : ynaq(qbuf)) {
+        switch (g.sell_response ? g.sell_response : nyaq(qbuf)) {
         case 'q':
             g.sell_response = 'n';
             /*FALLTHRU*/
@@ -4885,7 +4885,7 @@ struct obj *obj_absorber, *obj_absorbed;
 
         if (bp_absorber) {
             /* the absorber has a billing record */
-            bp_absorber->price += amount;           
+            bp_absorber->price += amount;
         } else {
             /* the absorber has no billing record */
             ;
@@ -4893,7 +4893,7 @@ struct obj *obj_absorber, *obj_absorbed;
         return;
     }
     /**************************************************************
-     * Scenario 2. Player-owned glob absorbing into shop-owned glob 
+     * Scenario 2. Player-owned glob absorbing into shop-owned glob
      **************************************************************/
     if (!bp_absorber && !bp && !obj_absorber->no_charge) {
         /* there are no billing records */
