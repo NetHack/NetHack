@@ -891,9 +891,7 @@ register struct obj *obj;
 {
     /* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
     if (mtmp->iswiz || mtmp->data == &mons[PM_MEDUSA]
-        || (mtmp->data->mflags3 & M3_WANTSARTI)
-        || mtmp->data == &mons[PM_DRAKE] || mtmp->data == &mons[PM_DRAKEMOTHER]
-        || mtmp->data == &mons[PM_DRAGON_OF_THE_BETRAYER])
+        || (mtmp->data->mflags3 & M3_WANTSARTI))
         return FALSE;
 
     /* worst case, at least it'll be peaceful. */
