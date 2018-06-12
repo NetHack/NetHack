@@ -1022,6 +1022,7 @@ level_tele()
        call it something, we can't defer until the end of the turn */
     if (u.utotype && !g.context.mon_moving)
         deferred_goto();
+    You("materialize on a different level!");
 }
 
 void
