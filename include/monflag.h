@@ -71,6 +71,7 @@
 #define MR2_DISPLACED 0x00004000L /* displaced */
 #define MR2_STRENGTH 0x00008000L  /* gauntlets of power */
 #define MR2_FUMBLING 0x00010000L  /* clumsy */
+#define MR2_JUMPING  0x00020000L  /* jumping */
 
 #define M1_FLY 0x00000001L         /* can fly or float */
 #define M1_SWIM 0x00000002L        /* can traverse water */

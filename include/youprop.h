@@ -213,7 +213,7 @@
 /*** Transportation ***/
 #define HJumping u.uprops[JUMPING].intrinsic
 #define EJumping u.uprops[JUMPING].extrinsic
-#define Jumping (HJumping || EJumping)
+#define Jumping (HJumping || EJumping || is_jumper(youmonst.data))
 
 #define HTeleportation u.uprops[TELEPORT].intrinsic
 #define ETeleportation u.uprops[TELEPORT].extrinsic

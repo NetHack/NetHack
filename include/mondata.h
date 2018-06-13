@@ -23,6 +23,9 @@
 #define resists_psychic(mon) (((mon)->mintrinsics & MR_PSYCHIC) != 0 || \
                               mindless((mon->data)))
 
+#define can_wwalk(mon) (((mon)->mintrinsics & MR2_WATERWALK) != 0)
+#define can_jump(mon)  (((mon)->mintrinsics & MR2_JUMPING) != 0)
+
 #define resists_mgc(ptr) \
     (dmgtype(ptr, AD_MAGM) || ptr == &mons[PM_BABY_GRAY_DRAGON] \
      || dmgtype(ptr, AD_RBRE)) /* Chromatic Dragon */
@@ -34,6 +37,8 @@
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)
+#define is_jumper(ptr) ((ptr) == &mons[PM_JUMPING_SPIDER] || \
+                        (ptr) == &mons[PM_EARTHSHARK])
 #define is_flyer(ptr) (((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr) ((ptr)->mlet == S_EYE || (ptr)->mlet == S_LIGHT)
 #define is_clinger(ptr) (((ptr)->mflags1 & M1_CLING) != 0L)
@@ -81,8 +86,6 @@
 #define lays_eggs(ptr) (((ptr)->mflags1 & M1_OVIPAROUS) != 0L)
 #define regenerates(ptr) (((ptr)->mflags1 & M1_REGEN) != 0L)
 #define perceives(ptr) (((ptr)->mflags1 & M1_SEE_INVIS) != 0L)
-#define can_jump(ptr) \
-    ((ptr) == &mons[PM_EARTHSHARK] || (ptr) == &mons[PM_JUMPING_SPIDER])
 #define can_teleport(ptr) (((ptr)->mflags1 & M1_TPORT) != 0L)
 #define control_teleport(ptr) (((ptr)->mflags1 & M1_TPORT_CNTRL) != 0L)
 #define telepathic(ptr)                                                \

@@ -335,11 +335,11 @@ boolean on, silently;
             in_mklev = save_in_mklev;
             break;
         }
-        case JUMPING:
-            mon->mjump = 1;
-            break;
         case WWALKING:
-            mon->wwalking = 1;
+            mon->mintrinsics |= MR2_WATERWALK;
+            break;
+        case JUMPING:
+            mon->mintrinsics |= MR2_JUMPING;
             break;
         /* properties handled elsewhere */
         case ANTIMAGIC:
@@ -380,11 +380,7 @@ boolean on, silently;
             break;
         }
         case JUMPING:
-            mon->mjump = 0;
-            break;
         case WWALKING:
-            mon->wwalking = 0;
-            break;
         case FIRE_RES:
         case COLD_RES:
         case SLEEP_RES:

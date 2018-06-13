@@ -810,7 +810,7 @@ NEARDATA struct permonst mons[] = {
         A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(500, 350, MS_SILENT, MZ_LARGE), 0, 0,
-        M1_WALLWALK | M1_ANIMAL | M1_SLITHY | M1_NOHANDS
+        M1_WALLWALK | M1_ANIMAL | M1_NOHANDS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_THICK_HIDE | M1_NOTAKE,
         M2_HOSTILE | M2_STRONG, 0, CLR_GRAY),
     MON("wumpus", S_QUADRUPED, LVL(8, 3, 2, 10, 0), (G_GENO | 1),

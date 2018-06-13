@@ -577,7 +577,7 @@ register struct monst *mtmp;
          * be handled here.  Swimmers are able to protect their stuff...
          */
         if (!is_clinger(mtmp->data) && !is_swimmer(mtmp->data)
-            && !amphibious(mtmp->data) && mtmp->wwalking != 1) {
+            && !amphibious(mtmp->data) && !can_wwalk(mtmp)) {
             if (cansee(mtmp->mx, mtmp->my)) {
                 pline("%s drowns.", Monnam(mtmp));
             }
@@ -1278,7 +1278,7 @@ long flag;
     nodiag = NODIAG(mdat - mons);
     wantpool = mdat->mlet == S_EEL;
     poolok = (is_flyer(mdat) || is_clinger(mdat)
-              || mon->wwalking == 1
+              || can_wwalk(mon)
               || (is_swimmer(mdat) && !wantpool));
     lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
