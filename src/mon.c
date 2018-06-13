@@ -2788,7 +2788,8 @@ struct monst *mtmp;
         }
         aggravate();
     }
-    if (mtmp->data->msound == MS_ROAR && !mtmp->mtame && mtmp->mpeaceful == 0) {
+    if (mtmp->data->msound == MS_ROAR && !mtmp->mtame && mtmp->mpeaceful == 0
+        && is_dragon(mtmp->data)) {
         if (!Deaf && canseemon(mtmp)) {
             pline("%s roars!", Monnam(mtmp));
             stop_occupation();
