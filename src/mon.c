@@ -2040,17 +2040,19 @@ register struct monst *mtmp;
     if (mtmp->data == &mons[PM_MEDUSA]) {
         u.uachieve.killed_medusa = 1;
         livelog_write_string(LL_ACHIEVE|LL_UMONST, "killed Medusa");
+    } else if (mtmp->data == &mons[PM_KING_IN_YELLOW]) {
+        u.uachieve.killed_king = 1;
+        livelog_write_string(LL_ACHIEVE|LL_UMONST, "killed the King in Yellow");
+    } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
+        u.uachieve.killed_demogorgon = 1;
+        livelog_write_string(LL_ACHIEVE|LL_UMONST, "slew Demogorgon");
+    } else if (mtmp->data == &mons[PM_GRIM_REAPER]) {
+        u.uachieve.killed_reaper = 1;
+        livelog_write_string(LL_ACHIEVE|LL_UMONST, "destroyed the Grim Reaper");
     } else if (unique_corpstat(mtmp->data))
         livelog_printf(LL_UMONST, "%s %s",
               nonliving(mtmp->data) ? "destroyed" : "killed",
               noit_mon_nam(mtmp));
-    else if (mtmp->data == &mons[PM_KING_IN_YELLOW]) {
-        u.uachieve.killed_king = 1;
-    } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
-        u.uachieve.killed_demogorgon = 1;
-    } else if (mtmp->data == &mons[PM_GRIM_REAPER]) {
-        u.uachieve.killed_reaper = 1;
-    }
 
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
