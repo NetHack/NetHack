@@ -202,43 +202,57 @@ MAZE: "mephisto", ' '
 FLAGS: noteleport
 GEOMETRY:center,center
 MAP
-LL..........................................................................
-LLL...........................................................LL............
-L......LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLL...........
-.......L-----------------------------------------------S-L...LLLL......L....
-.......LS...............................................|L....LLL.....LL....
-.......L|...............................................|L..................
-...L...L|...............................................|L..................
-.......L|...............................................|L..................
-.......L|...............................................|L..................
-.......L|...............................................|L..................
-.......L|...............................................|L..................
-.......L|...............................................|L..................
-..L....L|...............................................|L..................
-.......L|...............................................|L......L...........
-.......L|...............................................|L.....LLL..........
-...L...L|...............................................SL.....LLL..........
-.......L-S-----------------------------------------------L......L..........L
-L......LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL................LL
-...L......................................................................LL
-..........................................................................LL
+-------.................................................LLLLLLLLLLLLLLLLLLL
+|.....|......--------------|--------------------------...LLLLLLLLLLLLLLLLLL
+|.....|....................|---|...........|---......|...........LLLLLLLLLL
+|.....|------------........||.................|......|L..........LLLLLLLLLL
+|.....+....................|-...LL.......LL...--.....|LLLLLLLLL..LLLLLLLLLL
+---+-----------------------|...LLLL.....LLLL...|.....|LLLLLLLLL......LLLLLL
+..|.|......................|...LLLL.....LLLL...|.....|LLLLLLLLL......LLLLLL
+..|.|.|.|.|---------------.|-...LL.......LL...-|.....|LLLLLLLLLLLLL..LLLLLL
+..|.|.|.|.|..............|.||........L........|......|LLLLLLLLLLLLL..LLLLLL
+..|.|.|.|.|.|-----.......|.|---.....LLL.....---......|...............LLLLLL
+..|.|.|.|.|.|....|..|.|..|.|..|---.......---|........+...............LLLLLL
+..|.|.|.|.|.|..|.|..|.|..|.|.....|.|.|.|.|...........|---------------------
+..|.-----.|.|..--|..|.|..|.|.....|.|.|.|.|...........|..|..................
+..|.......|.|.......|.|..|.|.....|+-----+|...........|..|.|---------------.
+..---------.--------------.|.........|...............|..|.|................
+...........................-+------------------------|..|.|..|.|.|.|.|.|.|.
+...........................|............................-.---------------|.
+.-----------------------------------------------------...................|.
+.....................................................|--------------------.
+...........................................................................
 ENDMAP
 NON_DIGGABLE:(00,00,75,19)
 REGION:(00,00,75,19),unlit,"ordinary"
-STAIR: (31,09), down
-STAIR: (60,00), up
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
-OBJECT: random, random
+STAIR: (37,05), down
+STAIR: (04,04), up
+#
+DOOR: locked,(06,04)
+DOOR: locked,(03,05)
+DOOR: locked,(53,10)
+DOOR: locked,(34,13)
+DOOR: locked,(40,13)
+DOOR: locked,(28,15)
+#
+MONSTER:'&',(07,00)
+MONSTER:'&',(08,00)
+MONSTER:'&',(09,00)
+MONSTER:'&',(10,00)
+MONSTER:'&',(11,00)
+MONSTER:'&',(12,00)
+MONSTER:'&',(07,01)
+MONSTER:'&',(08,01)
+MONSTER:'&',(09,01)
+MONSTER:'&',(10,01)
+MONSTER:'&',(11,01)
+MONSTER:'&',(12,01)
+MONSTER:'&',(07,02)
+MONSTER:'&',(08,02)
+MONSTER:'&',(09,02)
+MONSTER:'&',(10,02)
+MONSTER:'&',(11,02)
+MONSTER:'&',(12,02)
 #
 MONSTER: random, random
 MONSTER: random, random
@@ -253,19 +267,31 @@ MONSTER: random, random
 MONSTER: random, random
 MONSTER: random, random
 MONSTER: random, random
-MONSTER: ('&', "mephisto"), (31,09)
+MONSTER: ('&', "mephisto"), (37,05)
 #
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
-TRAP: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+#
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
+TRAP: "land mine", random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
