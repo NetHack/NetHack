@@ -25,6 +25,7 @@
 
 #define can_wwalk(mon) (((mon)->mintrinsics & MR2_WATERWALK) != 0)
 #define can_jump(mon)  (((mon)->mintrinsics & MR2_JUMPING) != 0)
+#define has_displacement(mon) (((mon)->mintrinsics & MR2_DISPLACED) != 0)
 
 #define resists_mgc(ptr) \
     (dmgtype(ptr, AD_MAGM) || ptr == &mons[PM_BABY_GRAY_DRAGON] \
