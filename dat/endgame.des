@@ -426,9 +426,6 @@ MONSTER:(';',"giant eel"),random
 MONSTER:(';',"giant eel"),random
 MONSTER:(';',"giant eel"),random
 MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
-MONSTER:(';',"giant eel"),random
 MONSTER:(';',"electric eel"),random
 MONSTER:(';',"electric eel"),random
 MONSTER:(';',"electric eel"),random
@@ -480,7 +477,6 @@ MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
 MONSTER:('E',"water elemental"),random,hostile
-MONSTER:('&',"marid"),random,hostile
 MONSTER:('&',"marid"),random,hostile
 
 
