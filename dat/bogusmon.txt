@@ -235,6 +235,9 @@ youma
 
 # Pokemon (Meowth)
 nyaasu
++Digrat
+-Bird Jesus
++King Fonz
 
 # monster movies
 -Godzilla
