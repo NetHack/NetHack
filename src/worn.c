@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1496959481 2017/06/08 22:04:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1526728754 2018/05/19 11:19:14 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,7 +107,8 @@ long mask;
                 }
             }
     }
-    update_inventory();
+    if (!restoring)
+        update_inventory();
 }
 
 /* called e.g. when obj is destroyed */
@@ -138,7 +139,9 @@ register struct obj *obj;
             if ((p = w_blocks(obj, wp->w_mask)) != 0)
                 u.uprops[p].blocked &= ~wp->w_mask;
         }
-    update_inventory();
+    /* setnotworn() isn't called during restore but parallel setworn() */
+    if (!restoring)
+        update_inventory();
 }
 
 /* return a bitmask of the equipment slot(s) a given item might be worn in */
@@ -786,6 +789,30 @@ struct obj *objchain;
         objchain = objchain->nobj;
     }
     return objchain;
+}
+
+/* like nxt_unbypassed_obj() but operates on sortloot_item array rather
+   than an object linked list; the array contains obj==Null terminator;
+   there's an added complication that the array may have stale pointers
+   for deleted objects (see Multiple-Drop case in askchain(invent.c)) */
+struct obj *
+nxt_unbypassed_loot(lootarray, listhead)
+Loot *lootarray;
+struct obj *listhead;
+{
+    struct obj *o, *obj;
+
+    while ((obj = lootarray->obj) != 0) {
+        for (o = listhead; o; o = o->nobj)
+            if (o == obj)
+                break;
+        if (o && !obj->bypass) {
+            bypass_obj(obj);
+            break;
+        }
+        ++lootarray;
+    }
+    return obj;
 }
 
 void

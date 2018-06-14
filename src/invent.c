@@ -11,6 +11,8 @@
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'
 
+STATIC_DCL void FDECL(loot_classify, (Loot *, struct obj *));
+STATIC_DCL char *FDECL(loot_xname, (struct obj *));
 STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
                                                const genericptr));
 STATIC_DCL void NDECL(reorder_invent);
@@ -48,11 +50,210 @@ static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
  */
 static char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
-struct sortloot_item {
-    struct obj *obj;
-    int indx;
-};
-unsigned sortlootmode = 0;
+/* sortloot() classification; called at most once for each object sorted  */
+STATIC_OVL void
+loot_classify(sort_item, obj)
+Loot *sort_item;
+struct obj *obj;
+{
+    /* we may eventually make this a settable option to always use
+       with sortloot instead of only when the 'sortpack' option isn't
+       set; it is similar to sortpack's inv_order but items most
+       likely to be picked up are moved to the front */
+    static char def_srt_order[MAXOCLASSES] = {
+        COIN_CLASS, AMULET_CLASS, RING_CLASS, WAND_CLASS, POTION_CLASS,
+        SCROLL_CLASS, SPBOOK_CLASS, GEM_CLASS, FOOD_CLASS, TOOL_CLASS,
+        WEAPON_CLASS, ARMOR_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, 0,
+    };
+    static char armcat[8];
+    const char *classorder;
+    char *p;
+    int k, otyp = obj->otyp, oclass = obj->oclass;
+
+    /*
+     * For the value types assigned by this classification, sortloot()
+     * will put lower valued ones before higher valued ones.
+     */
+    if (!Blind)
+        obj->dknown = 1; /* xname(obj) does this; we want it sooner */
+    /* class order */
+    classorder = flags.sortpack ? flags.inv_order : def_srt_order;
+    p = index(classorder, oclass);
+    if (p)
+        k = 1 + (int) (p - classorder);
+    else
+        k = 1 + (int) strlen(classorder) + (oclass != VENOM_CLASS);
+    sort_item->class = (xchar) k;
+    /* subclass designation; only a few classes have subclasses
+       and the non-armor ones we use are fairly arbitrary */
+    switch (oclass) {
+    case ARMOR_CLASS:
+        if (!armcat[7]) {
+            /* one-time init; we use a different order than the subclass
+               values defined by objclass.h */
+            armcat[ARM_HELM]   = 1; /* [2] */
+            armcat[ARM_GLOVES] = 2; /* [3] */
+            armcat[ARM_BOOTS]  = 3; /* [4] */
+            armcat[ARM_SHIELD] = 4; /* [1] */
+            armcat[ARM_CLOAK]  = 5; /* [5] */
+            armcat[ARM_SHIRT]  = 6; /* [6] */
+            armcat[ARM_SUIT]   = 7; /* [0] */
+            armcat[7]          = 8; /* sanity protection */
+        }
+        k = objects[otyp].oc_armcat;
+        /* oc_armcat overloads oc_subtyp which is an 'schar' so guard
+           against somebody assigning something unexpected to it */
+        if (k < 0 || k >= 7)
+            k = 7;
+        k = armcat[k];
+        break;
+    case WEAPON_CLASS:
+        /* for weapons, group by ammo (arrows, bolts), launcher (bows),
+           missile (darts, boomerangs), stackable (daggers, knives, spears),
+           'other' (swords, axes, &c), polearms */
+        k = objects[otyp].oc_skill;
+        k = (k < 0) ? ((k >= -P_CROSSBOW && k <= -P_BOW) ? 1 : 3)
+                    : ((k >= P_BOW && k <= P_CROSSBOW) ? 2
+                       : (k == P_SPEAR || k == P_DAGGER || k == P_KNIFE) ? 4
+                          : !is_pole(obj) ? 5 : 6);
+        break;
+    case TOOL_CLASS:
+        if (obj->dknown && objects[otyp].oc_name_known
+            && (otyp == BAG_OF_TRICKS || otyp == HORN_OF_PLENTY))
+            k = 2; /* known pseudo-container */
+        else if (Is_container(obj))
+            k = 1; /* regular container or unknown bag of tricks */
+        else
+            switch (otyp) {
+            case WOODEN_FLUTE:
+            case MAGIC_FLUTE:
+            case TOOLED_HORN:
+            case FROST_HORN:
+            case FIRE_HORN:
+            case WOODEN_HARP:
+            case MAGIC_HARP:
+            case BUGLE:
+            case LEATHER_DRUM:
+            case DRUM_OF_EARTHQUAKE:
+            case HORN_OF_PLENTY: /* not a musical instrument */
+                k = 3; /* instrument or unknown horn of plenty */
+            default:
+                k = 4; /* 'other' tool */
+            }
+        break;
+    case FOOD_CLASS:
+        /* [what about separating "partly eaten" within each group?] */
+        switch (otyp) {
+        case SLIME_MOLD:
+            k = 1;
+            break;
+        default:
+            /* [maybe separate one-bite foods from rations and such?] */
+            k = obj->globby ? 6 : 2;
+            break;
+        case TIN:
+            k = 3;
+            break;
+        case EGG:
+            k = 4;
+            break;
+        case CORPSE:
+            k = 5;
+            break;
+        }
+        break;
+    default:
+        /* other classes don't have subclasses; we assign a nonzero
+           value because sortloot() uses 0 to mean 'not yet classified' */
+        k = 1; /* any non-zero would do */
+        break;
+    }
+    sort_item->subclass = (xchar) k;
+    /* discovery status */
+    k = !obj->dknown ? 1 /* unseen */
+        : (objects[otyp].oc_name_known || !OBJ_DESCR(objects[otyp])) ? 4
+          : (objects[otyp].oc_uname)? 3 /* named (partially discovered) */
+            : 2; /* undiscovered */
+    sort_item->disco = (xchar) k;
+}
+
+/* sortloot() formatting routine; for alphabetizing, not shown to user */
+STATIC_OVL char *
+loot_xname(obj)
+struct obj *obj;
+{
+    struct obj saveo;
+    boolean save_debug;
+    char *res, *save_oname;
+
+    /*
+     * Deal with things that xname() includes as a prefix.  We don't
+     * want such because they change alphabetical ordering.  First,
+     * remember 'obj's current settings.
+     */
+    saveo.odiluted = obj->odiluted;
+    saveo.blessed = obj->blessed, saveo.cursed = obj->cursed;
+    saveo.spe = obj->spe;
+    saveo.owt = obj->owt;
+    save_oname = has_oname(obj) ? ONAME(obj) : 0;
+    save_debug = flags.debug;
+    /* suppress "diluted" for potions and "holy/unholy" for water;
+       sortloot() will deal with them using other criteria than name */
+    if (obj->oclass == POTION_CLASS) {
+        obj->odiluted = 0;
+        if (obj->otyp == POT_WATER)
+            obj->blessed = 0, obj->cursed = 0;
+    }
+    /* make "wet towel" and "moist towel" format as "towel" so that all
+       three group together */
+    if (obj->otyp == TOWEL)
+        obj->spe = 0;
+    /* group "<size> glob of <foo>" by <foo> rather than by <size> */
+    if (obj->globby)
+        obj->owt = 200; /* 200: weight of combined glob from ten creatures
+                           (five or fewer is "small", more than fifteen is
+                           "large", in between has no prefix) */
+    /* suppress user-assigned name */
+    if (save_oname && !obj->oartifact)
+        ONAME(obj) = 0;
+    flags.debug = FALSE; /* avoid wizard mode formatting variations */
+
+    res = cxname_singular(obj);
+
+    flags.debug = save_debug;
+    /* restore the object */
+    if (obj->oclass == POTION_CLASS) {
+        obj->odiluted = saveo.odiluted;
+        if (obj->otyp == POT_WATER)
+            obj->blessed = saveo.blessed, obj->cursed = saveo.cursed;
+    }
+    if (obj->otyp == TOWEL) {
+        obj->spe = saveo.spe;
+        /* give "towel" a suffix that will force wet ones to come first,
+           moist ones next, and dry ones last regardless of whether
+           they've been flagged as having spe known */
+        Strcat(res, is_wet_towel(obj) ? ((obj->spe >= 3) ? "x" : "y") : "z");
+    }
+    if (obj->globby) {
+        obj->owt = saveo.owt;
+        /* we've suppressed the size prefix (above); there normally won't
+           be more than one of a given creature type because they coalesce,
+           but globs with different bless/curse state won't merge so it is
+           feasible to have multiple at the same location; add a suffix to
+           get such sorted by size (small first) */
+        Strcat(res, (obj->owt <= 100) ? "a"
+                    : (obj->owt <= 300) ? "b"
+                      : (obj->owt <= 500) ? "c"
+                        : "d");
+    }
+    if (save_oname && !obj->oartifact)
+        ONAME(obj) = save_oname;
+
+    return res;
+}
+
+/* set by sortloot() for use by sortloot_cmp(); reset by sortloot when done */
+static unsigned sortlootmode = 0;
 
 /* qsort comparison routine for sortloot() */
 STATIC_OVL int CFDECLSPEC
@@ -63,57 +264,46 @@ const genericptr vptr2;
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
                          *sli2 = (struct sortloot_item *) vptr2;
     struct obj *obj1 = sli1->obj,
-               *obj2 = sli2->obj,
-               sav1, sav2;
-    char *cls1, *cls2, nam1[BUFSZ], nam2[BUFSZ];
+               *obj2 = sli2->obj;
+    char *nam1, *nam2;
     int val1, val2, c, namcmp;
 
-    /* order by object class like inventory display */
-    if ((sortlootmode & SORTLOOT_PACK) != 0) {
-        cls1 = index(flags.inv_order, obj1->oclass);
-        cls2 = index(flags.inv_order, obj2->oclass);
-        if (cls1 != cls2)
-            return (int) (cls1 - cls2);
+    /* order by object class unless we're doing by-invlet without sortpack */
+    if ((sortlootmode & (SORTLOOT_PACK | SORTLOOT_INVLET))
+        != SORTLOOT_INVLET) {
+        /* Classify each object at most once no matter how many
+           comparisons it is involved in. */
+        if (!sli1->class)
+            loot_classify(sli1, obj1);
+        if (!sli2->class)
+            loot_classify(sli2, obj2);
 
-        if ((sortlootmode & SORTLOOT_INVLET) != 0) {
-            ; /* skip sub-classes when sorting by packorder+invlet */
+        /* Sort by class. */
+        val1 = sli1->class;
+        val2 = sli2->class;
+        if (val1 != val2)
+            return (int) (val1 - val2);
 
-        /* for armor, group by sub-category */
-        } else if (obj1->oclass == ARMOR_CLASS) {
-            static int armcat[7 + 1];
-
-            if (!armcat[7]) {
-                /* one-time init; we want to control the order */
-                armcat[ARM_HELM]   = 1; /* [2] */
-                armcat[ARM_GLOVES] = 2; /* [3] */
-                armcat[ARM_BOOTS]  = 3; /* [4] */
-                armcat[ARM_SHIELD] = 4; /* [1] */
-                armcat[ARM_CLOAK]  = 5; /* [5] */
-                armcat[ARM_SHIRT]  = 6; /* [6] */
-                armcat[ARM_SUIT]   = 7; /* [0] */
-                armcat[7]          = 8;
-            }
-            val1 = armcat[objects[obj1->otyp].oc_armcat];
-            val2 = armcat[objects[obj2->otyp].oc_armcat];
+        /* skip sub-classes when ordering by sortpack+invlet */
+        if ((sortlootmode & SORTLOOT_INVLET) == 0) {
+            /* Class matches; sort by subclass. */
+            val1 = sli1->subclass;
+            val2 = sli2->subclass;
             if (val1 != val2)
                 return val1 - val2;
 
-        /* for weapons, group by ammo (arrows, bolts), launcher (bows),
-           missile (dart, boomerang), stackable (daggers, knives, spears),
-           'other' (swords, axes, &c), polearm */
-        } else if (obj1->oclass == WEAPON_CLASS) {
-            val1 = objects[obj1->otyp].oc_skill;
-            val1 = (val1 < 0)
-                    ? (val1 >= -P_CROSSBOW && val1 <= -P_BOW) ? 1 : 3
-                    : (val1 >= P_BOW && val1 <= P_CROSSBOW) ? 2
-                       : (val1 == P_SPEAR || val1 == P_DAGGER
-                          || val1 == P_KNIFE) ? 4 : !is_pole(obj1) ? 5 : 6;
-            val2 = objects[obj2->otyp].oc_skill;
-            val2 = (val2 < 0)
-                    ? (val2 >= -P_CROSSBOW && val2 <= -P_BOW) ? 1 : 3
-                    : (val2 >= P_BOW && val2 <= P_CROSSBOW) ? 2
-                       : (val2 == P_SPEAR || val2 == P_DAGGER
-                          || val2 == P_KNIFE) ? 4 : !is_pole(obj2) ? 5 : 6;
+            /* Class and subclass match; sort by discovery status:
+             * first unseen, then seen but not named or discovered,
+             * then named, lastly discovered.
+             * 1) potion
+             * 2) pink potion
+             * 3) dark green potion called confusion
+             * 4) potion of healing
+             * Multiple entries within each group will be put into
+             * alphabetical order below.
+             */
+            val1 = sli1->disco;
+            val2 = sli2->disco;
             if (val1 != val2)
                 return val1 - val2;
         }
@@ -142,28 +332,16 @@ const genericptr vptr2;
 
     /*
      * Sort object names in lexicographical order, ignoring quantity.
+     *
+     * Each obj gets formatted at most once (per sort) no matter how many
+     * comparisons it gets subjected to.
      */
-    /* Force diluted potions to come out after undiluted of same type;
-       obj->odiluted overloads obj->oeroded. */
-    sav1.odiluted = obj1->odiluted;
-    sav2.odiluted = obj2->odiluted;
-    if (obj1->oclass == POTION_CLASS)
-        obj1->odiluted = 0;
-    if (obj1->oclass == POTION_CLASS)
-        obj2->odiluted = 0;
-    /* Force holy and unholy water to sort adjacent to water rather
-       than among 'h's and 'u's.  BUCX order will keep them distinct. */
-    Strcpy(nam1, cxname_singular(obj1));
-    if (obj1->otyp == POT_WATER && obj1->bknown
-        && (obj1->blessed || obj1->cursed))
-        (void) strsubst(nam1, obj1->blessed ? "holy " : "unholy ", "");
-    Strcpy(nam2, cxname_singular(obj2));
-    if (obj2->otyp == POT_WATER && obj2->bknown
-        && (obj2->blessed || obj2->cursed))
-        (void) strsubst(nam2, obj2->blessed ? "holy " : "unholy ", "");
-    obj1->odiluted = sav1.odiluted;
-    obj2->odiluted = sav2.odiluted;
-
+    nam1 = sli1->str;
+    if (!nam1)
+        nam1 = sli1->str = dupstr(loot_xname(obj1));
+    nam2 = sli2->str;
+    if (!nam2)
+        nam2 = sli2->str = dupstr(loot_xname(obj2));
     if ((namcmp = strcmpi(nam1, nam2)) != 0)
         return namcmp;
 
@@ -213,6 +391,108 @@ tiebreak:
     return (sli1->indx - sli2->indx);
 }
 
+/*
+ * sortloot() - the story so far...
+ *
+ *      The original implementation constructed and returned an array
+ *      of pointers to objects in the requested order.  Callers had to
+ *      count the number of objects, allocate the array, pass one
+ *      object at a time to the routine which populates it, traverse
+ *      the objects via stepping through the array, then free the
+ *      array.  The ordering process used a basic insertion sort which
+ *      is fine for short lists but inefficient for long ones.
+ *
+ *      3.6.0 (and continuing with 3.6.1) changed all that so that
+ *      sortloot was self-contained as far as callers were concerned.
+ *      It reordered the linked list into the requested order and then
+ *      normal list traversal was used to process it.  It also switched
+ *      to qsort() on the assumption that the C library implementation
+ *      put some effort into sorting efficiently.  It also checked
+ *      whether the list was already sorted as it got ready to do the
+ *      sorting, so re-examining inventory or a pile of objects without
+ *      having changed anything would gobble up less CPU than a full
+ *      sort.  But it had as least two problems (aside from the ordinary
+ *      complement of bugs):
+ *      1) some players wanted to get the original order back when they
+ *      changed the 'sortloot' option back to 'none', but the list
+ *      reordering made that infeasible;
+ *      2) object identification giving the 'ID whole pack' result
+ *      would call makeknown() on each newly ID'd object, that would
+ *      call update_inventory() to update the persistent inventory
+ *      window if one existed, the interface would call the inventory
+ *      display routine which would call sortloot() which might change
+ *      the order of the list being traversed by the identify code,
+ *      possibly skipping the ID of some objects.  That could have been
+ *      avoided by suppressing 'perm_invent' during identification
+ *      (fragile) or by avoiding sortloot() during inventory display
+ *      (more robust).
+ *
+ *      3.6.2 reverts to the temporary array of ordered obj pointers
+ *      but has sortloot() do the counting and allocation.  Callers
+ *      need to use array traversal instead of linked list traversal
+ *      and need to free the temporary array when done.  And the
+ *      array contains 'struct sortloot_item' (aka 'Loot') entries
+ *      instead of simple 'struct obj *' entries.
+ */
+Loot *
+sortloot(olist, mode, by_nexthere, filterfunc)
+struct obj **olist; /* previous version might have changed *olist, we don't */
+unsigned mode; /* flags for sortloot_cmp() */
+boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
+boolean FDECL((*filterfunc), (OBJ_P));
+{
+    Loot *sliarray;
+    struct obj *o;
+    unsigned n, i;
+    boolean augment_filter;
+
+    for (n = 0, o = *olist; o; o = by_nexthere ? o->nexthere : o->nobj)
+        ++n;
+    /* note: if there is a filter function, this might overallocate */
+    sliarray = (Loot *) alloc((n + 1) * sizeof *sliarray);
+
+    augment_filter = (mode & SORTLOOT_PETRIFY) ? TRUE : FALSE;
+    /* populate aliarray[0..n-1] */
+    for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
+        if (filterfunc && !(*filterfunc)(o)
+            && (!augment_filter || o->otyp != CORPSE
+                || !touch_petrifies(&mons[o->corpsenm])))
+            continue;
+        sliarray[i].obj = o, sliarray[i].indx = (int) i;
+        sliarray[i].str = (char *) 0;
+        sliarray[i].class = sliarray[i].subclass = sliarray[i].disco = 0;
+    }
+    n = i;
+    /* add a terminator so that we don't have to pass 'n' back to caller */
+    sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
+    sliarray[n].str = (char *) 0;
+    sliarray[n].class = sliarray[n].subclass = sliarray[n].disco = 0;
+    mode &= ~SORTLOOT_PETRIFY;
+
+    /* do the sort; if no sorting is requested, we'll just return
+       a sortloot_item array reflecting the current ordering */
+    if (mode) {
+        sortlootmode = mode; /* extra input for sortloot_cmp() */
+        qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
+        sortlootmode = 0; /* reset static mode flags */
+        /* if sortloot_cmp formatted any objects, discard their strings now */
+        for (i = 0; i < n; ++i)
+            if (sliarray[i].str)
+                free((genericptr_t) sliarray[i].str), sliarray[i].str = 0;
+    }
+    return sliarray;
+}
+
+/* sortloot() callers should use this to free up memory it allocates */
+void
+unsortloot(loot_array_p)
+Loot **loot_array_p;
+{
+    if (*loot_array_p)
+        free((genericptr_t) *loot_array_p), *loot_array_p = (Loot *) 0;
+}
+
+#if 0 /* 3.6.0 'revamp' */
 void
 sortloot(olist, mode, by_nexthere)
 struct obj **olist;
@@ -250,6 +530,7 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
     }
     sortlootmode = 0;
 }
+#endif /*0*/
 
 void
 assigninvlet(otmp)
@@ -1120,6 +1401,7 @@ register const char *let, *word;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
     long dummymask;
+    Loot *sortedinvent, *srtinv;
 
     if (*let == ALLOW_COUNT)
         let++, allowcnt = 1;
@@ -1156,15 +1438,13 @@ register const char *let, *word;
 
     if (!flags.invlet_constant)
         reassign();
-    else
-        /* in case invent is in packorder, force it to be in invlet
-           order before collecing candidate inventory letters;
-           if player responds with '?' or '*' it will be changed
-           back by display_pickinv(), but by then we'll have 'lets'
-           and so won't have to re-sort in the for(;;) loop below */
-        sortloot(&invent, SORTLOOT_INVLET, FALSE);
 
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    /* force invent to be in invlet order before collecting candidate
+       inventory letters */
+    sortedinvent = sortloot(&invent, SORTLOOT_INVLET, FALSE,
+                            (boolean FDECL((*), (OBJ_P))) 0);
+
+    for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (&bp[foo] == &buf[sizeof buf - 1]
             || ap == &altlets[sizeof altlets - 1]) {
             /* we must have a huge number of NOINVSYM items somehow */
@@ -1309,6 +1589,7 @@ register const char *let, *word;
                 allowall = usegold = TRUE;
         }
     }
+    unsortloot(&sortedinvent);
 
     bp[foo] = 0;
     if (foo == 0 && bp > buf && bp[-1] == ' ')
@@ -1787,16 +2068,17 @@ unsigned *resultflags;
  */
 int
 askchain(objchn, olets, allflag, fn, ckfn, mx, word)
-struct obj **objchn;
+struct obj **objchn; /* *objchn might change */
 int allflag, mx;
 const char *olets, *word; /* olets is an Obj Class char array */
 int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
 {
     struct obj *otmp, *otmpo;
     register char sym, ilet;
-    register int cnt = 0, dud = 0, tmp;
+    int cnt = 0, dud = 0, tmp;
     boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
     char qbuf[QBUFSZ], qpfx[QBUFSZ];
+    Loot *sortedchn = 0;
 
     takeoff = taking_off(word);
     ident = !strcmp(word, "identify");
@@ -1811,7 +2093,8 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
 
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
-    sortloot(objchn, SORTLOOT_INVLET, FALSE);
+    sortedchn = sortloot(objchn, SORTLOOT_INVLET, FALSE,
+                         (boolean FDECL((*), (OBJ_P))) 0);
 
     first = TRUE;
     /*
@@ -1836,7 +2119,7 @@ nextclass:
      * track of which list elements have already been processed.
      */
     bypass_objlist(*objchn, FALSE); /* clear chain's bypass bits */
-    while ((otmp = nxt_unbypassed_obj(*objchn)) != 0) {
+    while ((otmp = nxt_unbypassed_loot(sortedchn, *objchn)) != 0) {
         if (ilet == 'z')
             ilet = 'A';
         else if (ilet == 'Z')
@@ -1924,11 +2207,13 @@ nextclass:
     }
     if (olets && *olets && *++olets)
         goto nextclass;
+
     if (!takeoff && (dud || cnt))
         pline("That was all.");
     else if (!dud && !cnt)
         pline("No applicable objects.");
 ret:
+    unsortloot(&sortedchn);
     bypass_objlist(*objchn, FALSE);
     return cnt;
 }
@@ -2219,6 +2504,8 @@ long *out_cnt;
     winid win;                        /* windows being used */
     anything any;
     menu_item *selected;
+    unsigned sortflags;
+    Loot *sortedinvent, *srtinv;
 
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
@@ -2292,10 +2579,11 @@ long *out_cnt;
         return ret;
     }
 
-    sortloot(&invent,
-             (((flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET)
-              | (flags.sortpack ? SORTLOOT_PACK : 0)),
-             FALSE);
+    sortflags = (flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET;
+    if (flags.sortpack)
+        sortflags |= SORTLOOT_PACK;
+    sortedinvent = sortloot(&invent, sortflags, FALSE,
+                            (boolean FDECL((*), (OBJ_P))) 0);
 
     start_menu(win);
     any = zeroany;
@@ -2320,7 +2608,7 @@ long *out_cnt;
     }
 nextclass:
     classcount = 0;
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (lets && !index(lets, otmp->invlet))
             continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
@@ -2354,6 +2642,7 @@ nextclass:
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
                  "(list everything)", MENU_UNSELECTED);
     }
+    unsortloot(&sortedinvent);
     /* for permanent inventory where we intend to show everything but
        nothing has been listed (because there isn't anyhing to list;
        recognized via any.a_char still being zero; the n==0 case above

@@ -113,7 +113,7 @@ LLC_TURNS=3000
 # Only available if NetHack was compiled with DUMPLOG
 # Allows following placeholders:
 #   %% literal '%'
-#   %v version (eg. "3.6.1-0")
+#   %v version (eg. "3.6.2-0")
 #   %u game UID
 #   %t game start time, UNIX timestamp format
 #   %T current time, UNIX timestamp format

@@ -67,7 +67,7 @@ struct flag {
      * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
      * systems that use unsigned characters without a way to force them
      * to be signed.)  So, the type has been changed back to 'xchar' for
-     * 3.6.1.
+     * 3.6.x.
      *
      * TODO:  change to 'char' (and move out of this block of booleans,
      * and get rid of these comments...) once 3.6.0 savefile compatibility
@@ -225,6 +225,16 @@ enum getloc_filters {
     GFILTER_AREA,
 
     NUM_GFILTER
+};
+
+struct debug_flags {
+    boolean test;
+#ifdef TTY_GRAPHICS
+    boolean ttystatus;
+#endif
+#ifdef WIN32
+    boolean immediateflips;
+#endif
 };
 
 struct instance_flags {
@@ -440,6 +450,7 @@ struct instance_flags {
     short mines_prize_type;     /* luckstone */
     short soko_prize_type1;     /* bag of holding or    */
     short soko_prize_type2;     /* amulet of reflection */
+    struct debug_flags debug;
 };
 
 /*

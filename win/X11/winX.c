@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1507846693 2017/10/12 22:18:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1526429314 2018/05/16 00:08:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -138,8 +138,10 @@ struct window_procs X11_procs = {
  * Local functions.
  */
 static winid NDECL(find_free_window);
+#ifdef TEXTCOLOR
 static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
                                 XrmValuePtr, Cardinal *));
+#endif
 static boolean FDECL(new_resource_macro, (String, unsigned));
 static void NDECL(load_default_resources);
 static void NDECL(release_default_resources);
@@ -427,6 +429,7 @@ XtPointer *closure_ret;
     }
 }
 
+#ifdef TEXTCOLOR
 /* ARGSUSED */
 static void
 nhFreePixel(app, toVal, closure, args, num_args)
@@ -454,6 +457,7 @@ Cardinal *num_args;
                     (unsigned long *) toVal->addr, 1, (unsigned long) 0);
     }
 }
+#endif /*TEXTCOLOR*/
 
 /* [ALI] Utility function to ask Xaw for font height, since the previous
  * assumption of ascent + descent is not always valid.

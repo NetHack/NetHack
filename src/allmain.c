@@ -8,6 +8,7 @@
 /* Edited on 5/11/18 by NullCGT */
 
 #include "hack.h"
+#include <ctype.h>
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -18,6 +19,7 @@ STATIC_DCL void NDECL(do_positionbar);
 #endif
 STATIC_DCL void FDECL(regen_hp, (int));
 STATIC_DCL void FDECL(interrupt_multi, (const char *));
+STATIC_DCL void FDECL(debug_fields, (const char *));
 
 #ifdef EXTRAINFO_FN
 static long prev_dgl_extrainfo = 0;
@@ -803,11 +805,18 @@ const char *msg;
  */
 
 static struct early_opt earlyopts[] = {
-    {ARG_DEBUG, "debug", 5, FALSE},
+    {ARG_DEBUG, "debug", 5, TRUE},
     {ARG_VERSION, "version", 4, TRUE},
 };
 
-boolean
+/*
+ * Returns:
+ *    0 = no match
+ *    1 = found and skip past this argument
+ *    2 = found and trigger immediate exit
+ */
+
+int
 argcheck(argc, argv, e_arg)
 int argc;
 char *argv[];
@@ -825,7 +834,7 @@ enum earlyarg e_arg;
     if ((idx >= SIZE(earlyopts)) || (argc <= 1))
             return FALSE;
 
-    for (i = 1; i < argc; ++i) {
+    for (i = 0; i < argc; ++i) {
         if (argv[i][0] != '-')
             continue;
         if (argv[i][1] == '-') {
@@ -840,15 +849,20 @@ enum earlyarg e_arg;
     }
 
     if (match) {
+        const char *extended_opt = index(userea,':');
+
+        if (!extended_opt)
+            extended_opt = index(userea, '=');
         switch(e_arg) {
             case ARG_DEBUG:
+                        if (extended_opt) {
+                            extended_opt++;
+                            debug_fields(extended_opt);
+                        }
+                        return 1;
                         break;
             case ARG_VERSION: {
                         boolean insert_into_pastebuf = FALSE;
-                        const char *extended_opt = index(userea,':');
-
-                        if (!extended_opt)
-                            extended_opt = index(userea, '=');
 
                         if (extended_opt) {
                             extended_opt++;
@@ -863,7 +877,7 @@ enum earlyarg e_arg;
             		    }
         		}
                         early_version_info(insert_into_pastebuf);
-                        return TRUE;
+                        return 2;
                         break;
             }
             default:
@@ -873,4 +887,62 @@ enum earlyarg e_arg;
     return FALSE;
 }
 
+/*
+ * These are internal controls to aid developers with
+ * testing and debugging particular aspects of the code.
+ * They are not player options and the only place they
+ * are documented is right here. No gameplay is altered.
+ *
+ * test             - test whether this parser is working
+ * ttystatus        - TTY: 
+ * immediateflips   - WIN32: turn off display performance
+ *                    optimization so that display output
+ *                    can be debugged without buffering.
+ */
+void
+debug_fields(opts)
+const char *opts;
+{
+    char *op;
+    boolean negated = FALSE;
+
+    while ((op = index(opts, ',')) != 0) {
+        *op++ = 0;
+        /* recurse */
+        debug_fields(op);
+    }
+    if (strlen(opts) > BUFSZ / 2)
+        return;
+
+
+    /* strip leading and trailing white space */
+    while (isspace((uchar) *opts))
+        opts++;
+    op = eos((char *) opts);
+    while (--op >= opts && isspace((uchar) *op))
+        *op = '\0';
+
+    if (!*opts) {
+        /* empty */
+        return;
+    }
+    while ((*opts == '!') || !strncmpi(opts, "no", 2)) {
+        if (*opts == '!')
+            opts++;
+        else
+            opts += 2;
+        negated = !negated;
+    }
+    if (match_optname(opts, "test", 4, FALSE))
+        iflags.debug.test = negated ? FALSE : TRUE;
+#ifdef TTY_GRAPHICS
+    if (match_optname(opts, "ttystatus", 9, FALSE))
+        iflags.debug.ttystatus = negated ? FALSE : TRUE;
+#endif
+#ifdef WIN32
+    if (match_optname(opts, "immediateflips", 14, FALSE))
+        iflags.debug.immediateflips = negated ? FALSE : TRUE;
+#endif
+    return;
+}
 /*allmain.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1490908464 2017/03/30 21:14:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1525012595 2018/04/29 14:36:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -177,6 +177,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 enum bhit_call_types {
     ZAPPED_WAND = 0,
     THROWN_WEAPON,
+    THROWN_TETHERED_WEAPON,
     KICKED_WEAPON,
     FLASHED_LIGHT,
     INVIS_BEAM
@@ -190,6 +191,18 @@ enum hmon_atkmode_types {
     HMON_APPLIED,   /* polearm, treated as ranged */
     HMON_DRAGGED    /* attached iron ball, pulled into mon */
 };
+
+/* sortloot() return type; needed before extern.h */
+struct sortloot_item {
+    struct obj *obj;
+    char *str; /* result of loot_xname(obj) in some cases, otherwise null */
+    int indx; /* signed int, because sortloot()'s qsort comparison routine
+                 assumes (a->indx - b->indx) might yield a negative result */
+    xchar class; /* order rather than object class; 0 => not yet init'd */
+    xchar subclass; /* subclass for some classes */
+    xchar disco; /* discovery status */
+};
+typedef struct sortloot_item Loot;
 
 #define MATCH_WARN_OF_MON(mon)                                               \
     (Warn_of_mon && ((context.warntype.obj                                   \
@@ -216,8 +229,7 @@ enum hmon_atkmode_types {
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
-#ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice \
-                       */
+#ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
 #undef NDECL
 #define NDECL(f) f()
 #endif
@@ -371,6 +383,7 @@ enum explosion_types {
 #define SORTLOOT_PACK   0x01
 #define SORTLOOT_INVLET 0x02
 #define SORTLOOT_LOOT   0x04
+#define SORTLOOT_PETRIFY 0x20 /* override filter func for c-trice corpses */
 
 /* flags for xkilled() [note: meaning of first bit used to be reversed,
    1 to give message and 0 to suppress] */

@@ -1,6 +1,6 @@
                    SpliceHack -- General information
 
-SpliceHack is an in-progress fork of NetHack 3.6.1, made with the goal of adding
+SpliceHack is an in-progress fork of NetHack 3.6.x, made with the goal of adding
 additional monsters, items, special levels, and game features without changing
 too much of the core gameplay. The end goal is a "kitchen sink" variant similar
 to SLASH'EM that is still intuitive and easy to pick up and play for anyone
@@ -13,7 +13,7 @@ work in progress, and as such bugs and balance issues may exist. A wiki can
 be found on the github page and there are encyclopedia entries for some new
 additions, but as of this moment neither is complete.
 
-Installation is the same as installation for vanilla 3.6.1. Please note that
+Installation is the same as installation for vanilla 3.6.x. Please note that
 SpliceHack currently compiles to its own binary and uses splicehackdir instead
 of nethackdir on unix, but is untested on windows, and still compiles as nethack
 there. SpliceHack can be played online at https://www.hardfought.org.
