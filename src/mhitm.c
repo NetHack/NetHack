@@ -413,7 +413,7 @@ register struct monst *magr, *mdef;
             if (otmp)
                 tmp -= hitval(otmp, mdef);
             if ((is_displaced(magr->data) || has_displacement(magr))
-                  && rn2(4)) {
+                  && !rn2(4)) {
                 pline("%s attacks the displaced image of %s.",
                       Monnam(magr), mon_nam(mdef));
                 strike = FALSE;
@@ -443,7 +443,7 @@ register struct monst *magr, *mdef;
         case AT_HUGS: /* automatic if prev two attacks succeed */
             strike = (i >= 2 && res[i - 1] == MM_HIT && res[i - 2] == MM_HIT);
             if ((is_displaced(magr->data) || has_displacement(magr))
-                && rn2(4)) {
+                && !rn2(4)) {
                 pline("%s attacks the displaced image of %s.",
                       Monnam(magr), mon_nam(mdef));
                 strike = FALSE;
