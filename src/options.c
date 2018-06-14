@@ -149,6 +149,7 @@ static struct Bool_Opt {
     { "herecmd_menu", &iflags.herecmd_menu, FALSE, SET_IN_GAME },
     { "hilite_pet", &iflags.wc_hilite_pet, FALSE, SET_IN_GAME }, /*WC*/
     { "hilite_pile", &iflags.hilite_pile, FALSE, SET_IN_GAME },
+    { "hilite_hidden_stairs", &iflags.hilite_hidden_stairs, TRUE, SET_IN_GAME}, /*WC*/
     { "hitpointbar", &iflags.wc2_hitpointbar, FALSE, SET_IN_GAME }, /*WC2*/
     { "intrinsicswap", &flags.intrinsicswap, FALSE, DISP_IN_GAME },
     { "ill-fated", &u.uroleplay.illfated, FALSE, DISP_IN_GAME },

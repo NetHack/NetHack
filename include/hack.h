@@ -75,15 +75,16 @@ enum dismount_types {
 };
 
 /* Special returns from mapglyph() */
-#define MG_CORPSE  0x01
-#define MG_INVIS   0x02
-#define MG_DETECT  0x04
-#define MG_PET     0x08
-#define MG_RIDDEN  0x10
-#define MG_STATUE  0x20
-#define MG_OBJPILE 0x40  /* more than one stack of objects */
-#define MG_BW_LAVA 0x80  /* 'black & white lava': highlight lava if it
+#define MG_CORPSE  0x00001
+#define MG_INVIS   0x00002
+#define MG_DETECT  0x00004
+#define MG_PET     0x00008
+#define MG_RIDDEN  0x00010
+#define MG_STATUE  0x00020
+#define MG_OBJPILE 0x00040  /* more than one stack of objects */
+#define MG_BW_LAVA 0x00080  /* 'black & white lava': highlight lava if it
                             can't be distringuished from water by color */
+#define MG_STAIRS  0x00100  /* hidden stairs */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)

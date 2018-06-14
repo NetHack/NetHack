@@ -289,6 +289,7 @@ struct instance_flags {
        breaking 3.6.[01] save files */
     boolean goldX;            /* for BUCX filtering, whether gold is X or U */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
+    boolean hilite_hidden_stairs; /* mark hidden stairs with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */

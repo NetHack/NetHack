@@ -3253,7 +3253,8 @@ int bkglyph UNUSED;
     if (((special & MG_PET) && iflags.hilite_pet)
         || ((special & MG_OBJPILE) && iflags.hilite_pile)
         || ((special & MG_DETECT) && iflags.use_inverse)
-        || ((special & MG_BW_LAVA) && iflags.use_inverse)) {
+        || ((special & MG_BW_LAVA) && iflags.use_inverse)
+        || ((special & MG_STAIRS) && iflags.hilite_hidden_stairs)) {
         term_start_attr(ATR_INVERSE);
         reverse_on = TRUE;
     }
@@ -4290,4 +4291,3 @@ render_status(VOID_ARGS)
 #endif /* TTY_GRAPHICS */
 
 /*wintty.c*/
-
