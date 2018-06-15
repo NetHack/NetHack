@@ -514,6 +514,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Sprintf(buf, "set of %s", actualn);
             break;
         }
+        if (obj->otyp == EARMUFF) {
+            Strcpy(buf, "pair of earmuffs");
+            break;
+        }
         if (is_boots(obj) || is_gloves(obj))
             Strcpy(buf, "pair of ");
 
