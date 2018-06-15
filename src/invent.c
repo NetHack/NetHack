@@ -214,11 +214,20 @@ struct obj *obj;
     /* suppress user-assigned name */
     if (save_oname && !obj->oartifact)
         ONAME(obj) = 0;
-    flags.debug = FALSE; /* avoid wizard mode formatting variations */
+    /* avoid wizard mode formatting variations */
+    if (wizard) { /* flags.debug */
+        /* paranoia:  before toggling off wizard mode, guard against a
+           panic in xname() producing a normal mode panic save file */
+        program_state.something_worth_saving = 0;
+        flags.debug = FALSE;
+    }
 
     res = cxname_singular(obj);
 
-    flags.debug = save_debug;
+    if (save_debug) {
+        flags.debug = TRUE;
+        program_state.something_worth_saving = 1;
+    }
     /* restore the object */
     if (obj->oclass == POTION_CLASS) {
         obj->odiluted = saveo.odiluted;
@@ -409,7 +418,7 @@ tiebreak:
  *      whether the list was already sorted as it got ready to do the
  *      sorting, so re-examining inventory or a pile of objects without
  *      having changed anything would gobble up less CPU than a full
- *      sort.  But it had as least two problems (aside from the ordinary
+ *      sort.  But it had at least two problems (aside from the ordinary
  *      complement of bugs):
  *      1) some players wanted to get the original order back when they
  *      changed the 'sortloot' option back to 'none', but the list
@@ -449,10 +458,15 @@ boolean FDECL((*filterfunc), (OBJ_P));
     /* note: if there is a filter function, this might overallocate */
     sliarray = (Loot *) alloc((n + 1) * sizeof *sliarray);
 
+    /* the 'keep cockatrice corpses' flag is overloaded with sort mode */
     augment_filter = (mode & SORTLOOT_PETRIFY) ? TRUE : FALSE;
+    mode &= ~SORTLOOT_PETRIFY; /* remove flag, leaving mode */
     /* populate aliarray[0..n-1] */
     for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
         if (filterfunc && !(*filterfunc)(o)
+            /* caller may be asking us to override filterfunc (in order
+               to do a cockatrice corpse touch check during pickup even
+               if/when the filter rejects food class) */
             && (!augment_filter || o->otyp != CORPSE
                 || !touch_petrifies(&mons[o->corpsenm])))
             continue;
@@ -465,11 +479,10 @@ boolean FDECL((*filterfunc), (OBJ_P));
     sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
     sliarray[n].str = (char *) 0;
     sliarray[n].class = sliarray[n].subclass = sliarray[n].disco = 0;
-    mode &= ~SORTLOOT_PETRIFY;
 
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
-    if (mode) {
+    if (mode && n > 1) {
         sortlootmode = mode; /* extra input for sortloot_cmp() */
         qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
         sortlootmode = 0; /* reset static mode flags */
