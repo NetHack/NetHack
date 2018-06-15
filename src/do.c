@@ -524,6 +524,9 @@ register struct obj *obj;
         pline_The("water's force seems %ser now.",
                   (obj->spe < 0) ? "small" : "great");
         break;
+    case RIN_BLOOD_MAGIC:
+        pline_The("Thick red liquid pools in the sink.");
+        break;
     case RIN_HUNGER:
         ideed = FALSE;
         for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
