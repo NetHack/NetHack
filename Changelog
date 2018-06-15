@@ -7,6 +7,7 @@ the wiki. This file documents the changes in each version of SpliceHack.
 
 Patches
 - Implemented an altered version of the colored walls and floors patch by L.
+  Only walls are colored, and the valley of the dead is not in grayscale.
 - Implemented a heavily modified version of the descriptive hit messages patch
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
@@ -15,15 +16,24 @@ QOL Changes
 - Dropped the quest entry requirement to level 10.
 - Ported paranoid trap and swim confirmation from xnethack.
 - Ported peaceful monster displacement from xnethack.
+- Ported NAO 3.4.3's hilite_hidden_stairs option to 3.6.x and SpliceHack.
+  Defaults to true.
 - Nerfed Lord of the Foocubi and Will-o'-the-wisps after player feedback.
 - Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
 - Reduced the number of marids and giant eels on the plane of water.
+- Artifact wishing is based on the number of artifacts wished for, not
+  generated, preventing the increased  number of artifacts from nerfing artifact 
+  wishing.
 
 New Monsters
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
   transmit regular lycanthropy, and can (rarely) summon normal werewolves.
+
+New Objects
+- Ring of Blood Magic: If you do not have enough energy to cast a spell, you
+  cast it anyway, but lose hit points equal to the excess energy.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.
@@ -39,15 +49,25 @@ New Features
   appropriate items.
 
 Role and Race Changes
-- Improved Cartomancer energy reserves.
+- Improved Cartomancer energy levels, which were very low due to a missing case
+  in a switch statement.
+- Cartomancer basement is now a mines level.
+- Easter egg for Cartomancers that read credit cards.
 - Chromatic dragons are treated as domestic for Dragonmasters, meaning (among
   other things) that they can be tamed.
+- Dragonmasters slowly regenerate energy when standing next to pet dragons.
+  Additionally, pet dragons will attempt to help a dragonmaster who is slimed,
+  asleep, or stuck.
 
-Miscelaneous Changes
+Miscelaneous Changes and Bug Fixes
 - Landsharks are no longer slithy.
 - Martial artists and martial masters use monk hit messages.
 - Landsharks and Jumping Spiders are capable of jumping. Polymorphing into
   either of these monsters will grant the ability to jump.
 - Completely reworked Mephisto's lair.
 - The Grim Reaper is now drain resistant.
-- Cartomancer basement is now a mines level.
+- Earmuffs are now referred to as "a pair of earmuffs" instead of "earmuff,"
+  fixing one of the longest running bugs in SpliceHack.
+- Game pluralizes "worm that walks" as "worms that walk," as opposed to the
+  Gollum-esque "worms that walkses."
+- Vlad has a slowing attack now.
