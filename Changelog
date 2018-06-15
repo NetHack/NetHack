@@ -22,7 +22,7 @@ QOL Changes
 - Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
 - Reduced the number of marids and giant eels on the plane of water.
 - Artifact wishing is based on the number of artifacts wished for, not
-  generated, preventing the increased  number of artifacts from nerfing artifact 
+  generated, preventing the increased  number of artifacts from nerfing artifact
   wishing.
 
 New Monsters
@@ -33,7 +33,9 @@ New Monsters
 
 New Objects
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
-  cast it anyway, but lose hit points equal to the excess energy.
+  cast it anyway, but lose hit points equal to the excess energy. Casting
+  healing spells using blood magic will deal extra damage to you in order to
+  prevent excess skill farming.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.

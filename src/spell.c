@@ -1064,6 +1064,9 @@ boolean atme;
         u.uen = 0;
         pline("You draw upon your own life force to cast the spell.");
         losehp(energy, "reckless use of blood magic", KILLED_BY);
+        if (spellid(spell) == SPE_HEALING ||
+            spellid(spell) == SPE_EXTRA_HEALING)
+            losehp(3 * energy, "abuse of blood magic", KILLED_BY);
     } else {
         u.uen -= energy;
     }
