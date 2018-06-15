@@ -50,7 +50,7 @@ Wand didn't identify when you thought it would? It might be a wand of wonder.
 Masks degrade in power when taken off, and cursed masks will break apart.
 Masks will allow you to permanently transform for as long as you wear them.
 The bones of high level players might spawn spectres.
-Vorpal jabberwocks are, thankfully, not actually vorpal.
+Vorpal jabberwocks are, thankfully, not actually able to behead you.
 Opposed monsters may fight one another without your prompting.
 Attacking a barbed devil can be a painful experience.
 The Astral Plane is home to more player monsters than you might expect.
@@ -73,6 +73,7 @@ Cartomancers have a chance of reusing scrolls.
 Wans of wonder cannot grant wishes.
 Have a good JuneNethack!
 Dragonmasters cannot wear dragon scale mail.
+Dragonmasters can tame chromatic dragons.
 Amalgamations and bad clones are combinations of two monsters.
 Altars are colored based on their alignment.
 Looking up a monster or object will give you statistics about it.
@@ -87,3 +88,19 @@ The Master of Cats must be killed nine times before truly dying.
 Extra wishes? Try wishing for Vladsbane.
 Extra wishes and itching for YASD? Try wishing for the King in Yellow.
 Silver golems are especially deadly to infernal players.
+Tips of the day sometimes are not very helpful.
+Stairs hidden under some items? Try using #terrain.
+Join the #hardfought channel to talk about NetHack variants.
+Void dragons are not a valid polymorph, so don't even think about it.
+Masks make for excellent wishes.
+Dragonmasters' pet dragons can help get them out of sticky situations.
+Dragonmasters' pet dragons allow them to gain energy more quickly.
+Gnolls are particularly good hiders.
+Gnolls are stronger than you might think.
+Pets can gain intrinsics from corpses, just like the player can.
+Monsters can gain the ability to jump or walk on water.
+Attacking a shimmering dragon in melee will activate their displacement.
+Landsharks are quite good at jumping.
+Earmuffs are actually quite valuable, and will protect you from sonic attacks.
+You must be at least level 10 to enter the quest.
+Use magic to destroy death.
