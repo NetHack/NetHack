@@ -2332,6 +2332,11 @@ const char *oldstr;
         Strcasecpy(spot - 1, "i");
         goto bottom;
     }
+    /* worms that walk */
+    if (len >= 13 && !strcmpi(spot - 10, " that walks")) {
+        Strcasecpy(spot - 10, "s that walk");
+        goto bottom;
+    }
     /* sis/ses (nemesis) */
     if (len >= 3 && !strcmpi(spot - 2, "sis")) {
         Strcasecpy(spot - 1, "es");
