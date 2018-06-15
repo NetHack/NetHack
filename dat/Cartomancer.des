@@ -100,15 +100,9 @@ INIT_MAP: mines, '.' , ' ' , true , true , random , true
 NOMAP
 # Dungeon Description
 REGION:(00,00,75,19),lit,"ordinary"
-# Doors
-DOOR:locked,(24,09)
-DOOR:locked,(36,04)
-DOOR:locked,(37,04)
-DOOR:locked,(36,16)
-DOOR:locked,(37,16)
 # Stairs
-STAIR:(17,07),up
-STAIR:(51,10),down
+STAIR:random,up
+STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
