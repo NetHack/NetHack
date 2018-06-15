@@ -894,7 +894,7 @@ enum earlyarg e_arg;
  * are documented is right here. No gameplay is altered.
  *
  * test             - test whether this parser is working
- * ttystatus        - TTY: 
+ * ttystatus        - TTY:
  * immediateflips   - WIN32: turn off display performance
  *                    optimization so that display output
  *                    can be debugged without buffering.

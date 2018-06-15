@@ -970,6 +970,7 @@ int after; /* this is extra fast monster movement */
     int chi = -1, nidist, ndist;
     coord poss[9];
     long info[9], allowflags;
+    char buf[BUFSZ];
 #define GDIST(x, y) (dist2(x, y, gx, gy))
 
     /*
@@ -997,6 +998,35 @@ int after; /* this is extra fast monster movement */
     } else if (!udist)
         /* maybe we tamed him while being swallowed --jgm */
         return 0;
+
+    /* Dragonmaster's dragons help out the player. */
+    if (Role_if(PM_DRAGONMASTER) && is_dragon(mtmp->data) &&
+        distu(mtmp->mx, mtmp->my) <= 1) {
+        /* provide slow, passive energy regeneration */
+        if (u.uen < u.uenmax) {
+            u.uen += 1;
+            context.botl = 1;
+        }
+        /* allow red dragons to cure sliming */
+        if (Slimed && (mtmp->data == &mons[PM_RED_DRAGON] ||
+            mtmp->data == &mons[PM_BABY_RED_DRAGON])) {
+            pline("%s exhales on you!", Monnam(mtmp));
+            burn_away_slime();
+            return 1;
+        }
+        /* allow dragons to free the player */
+        if (u.ustuck) {
+            u.ustuck = 0;
+            pline("%s frees you!", mon_nam(mtmp));
+            return 1;
+        }
+        /* allow dragons to awaken the player */
+        if (u.usleep) {
+            Sprintf(buf, "%s gently nudges you awake.", Monnam(mtmp));
+            unmul(buf);
+            return 1;
+        }
+    }
 
     nix = omx; /* set before newdogpos */
     niy = omy;
