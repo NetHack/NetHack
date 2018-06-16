@@ -196,7 +196,7 @@ struct sortloot_item {
     char *str; /* result of loot_xname(obj) in some cases, otherwise null */
     int indx; /* signed int, because sortloot()'s qsort comparison routine
                  assumes (a->indx - b->indx) might yield a negative result */
-    xchar class; /* order rather than object class; 0 => not yet init'd */
+    xchar orderclass; /* order rather than object class; 0 => not yet init'd */
     xchar subclass; /* subclass for some classes */
     xchar disco; /* discovery status */
 };
