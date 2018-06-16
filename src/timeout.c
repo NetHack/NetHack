@@ -95,6 +95,8 @@ const struct propname {
     { REFLECTING, "reflecting" },
     { FREE_ACTION, "free action" },
     { FIXED_ABIL, "fixed abilites" },
+    { BLOODMAGIC, "blood magic" },
+    { GOODMEMORY, "resistance to amnesia" },
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };

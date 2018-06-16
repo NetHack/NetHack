@@ -2456,6 +2456,11 @@ int final;
         you_have("free action", from_what(FREE_ACTION));
     if (Fixed_abil)
         you_have("fixed abilities", from_what(FIXED_ABIL));
+    if (GoodMemory)
+        you_are("resistant to amnesia effects", from_what(GOODMEMORY));
+    if (BloodMagic)
+        you_can("draw on your own life force to cast spells",
+                  from_what(BLOODMAGIC));
     if (Lifesaved)
         enl_msg("Your life ", "will be", "would have been", " saved", "");
 

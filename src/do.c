@@ -610,6 +610,12 @@ register struct obj *obj;
             pline_The(
                   "sink momentarily looks like a regularly erupting geyser.");
             break;
+        case RIN_PSYCHIC_RESISTANCE:
+            pline_The("sink glows purple for a moment.");
+            break;
+        case RIN_MEMORY:
+            You("fondly remember the ring that you just lost.");
+            break;
         default:
             break;
         }

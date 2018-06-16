@@ -811,7 +811,7 @@ int percent;
     int i, count;
     int indices[NUM_OBJECTS];
 
-    if (percent == 0)
+    if (percent == 0 || GoodMemory)
         return;
     if (percent <= 0 || percent > 100) {
         impossible("forget_objects: bad percent %d", percent);
@@ -882,7 +882,7 @@ int percent;
     xchar maxl, this_lev;
     int indices[MAXLINFO];
 
-    if (percent == 0)
+    if (percent == 0 || GoodMemory)
         return;
 
     if (percent <= 0 || percent > 100) {
@@ -939,6 +939,9 @@ STATIC_OVL void
 forget(howmuch)
 int howmuch;
 {
+    if (GoodMemory)
+        return;
+
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
 

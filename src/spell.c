@@ -994,9 +994,7 @@ boolean atme;
         context.botl = 1;
         res = 1; /* time is going to elapse even if spell doesn't get cast */
     }
-    if (((uright && uright->otyp != RIN_BLOOD_MAGIC) ||
-         (uleft && uleft->otyp != RIN_BLOOD_MAGIC) || (!uright && !uleft))
-         && energy > u.uen) {
+    if (BloodMagic && energy > u.uen) {
         You("don't have enough energy to cast that spell.");
         return res;
     } else {
@@ -1320,6 +1318,9 @@ void
 losespells()
 {
     int n, nzap, i;
+
+    if (GoodMemory)
+        return;
 
     /* in case reading has been interrupted earlier, discard context */
     context.spbook.book = 0;

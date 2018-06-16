@@ -1127,6 +1127,8 @@ add_obj_info(winid datawin, short otyp)
                     case PROTECTION:
                     case PROT_FROM_SHAPE_CHANGERS:
                     case POLYMORPH_CONTROL:
+                    case BLOODMAGIC:
+                    case GOODMEMORY:
                     case FREE_ACTION:
                     case FIXED_ABIL:
                         confers = "Confers";

@@ -371,6 +371,10 @@
 
 #define Lifesaved u.uprops[LIFESAVED].extrinsic
 
+#define BloodMagic u.uprops[BLOODMAGIC].extrinsic
+
+#define GoodMemory u.uprops[GOODMEMORY].extrinsic
+
 /*
  * Some pseudo-properties.
  */

@@ -7,7 +7,7 @@ the wiki. This file documents the changes in each version of SpliceHack.
 
 Patches
 - Implemented an altered version of the colored walls and floors patch by L.
-  Only walls are colored, and the valley of the dead is not in grayscale.
+  Only walls are colored, and the Valley of the Dead is not in grayscale.
 - Implemented a heavily modified version of the descriptive hit messages patch
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
@@ -35,7 +35,11 @@ New Objects
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
   cast it anyway, but lose hit points equal to the excess energy. Casting
   healing spells using blood magic will deal extra damage to you in order to
-  prevent excess skill farming.
+  prevent skill farming.
+- Ring of Psychic Resistance: One of the few ways in the game to become
+  resistant to psionic attacks.
+- Ring of Memory: Blocks the forgetting of items, spells, and objects.
+  Essentially amnesia resistance.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.
@@ -47,7 +51,7 @@ New Features
   subject to change on player feedback.
 - Monsters can jump. This essentially allows them to do a short range teleport
   to the player if there is an available jumping path.
-- All monsters can now gain displacement, water walking, and jumping from the
+- All monsters can now gain displacement, water walking, and jumping from
   appropriate items.
 
 Role and Race Changes
@@ -72,4 +76,4 @@ Miscelaneous Changes and Bug Fixes
   fixing one of the longest running bugs in SpliceHack.
 - Game pluralizes "worm that walks" as "worms that walk," as opposed to the
   Gollum-esque "worms that walkses."
-- Vlad has a slowing attack now.
+- Vlad now  has a slowing attack.
