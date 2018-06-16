@@ -193,8 +193,12 @@ enum hmon_atkmode_types {
 /* sortloot() return type; needed before extern.h */
 struct sortloot_item {
     struct obj *obj;
+    char *str; /* result of loot_xname(obj) in some cases, otherwise null */
     int indx; /* signed int, because sortloot()'s qsort comparison routine
                  assumes (a->indx - b->indx) might yield a negative result */
+    xchar class; /* order rather than object class; 0 => not yet init'd */
+    xchar subclass; /* subclass for some classes */
+    xchar disco; /* discovery status */
 };
 typedef struct sortloot_item Loot;
 
