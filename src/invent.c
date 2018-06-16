@@ -81,7 +81,7 @@ struct obj *obj;
         k = 1 + (int) (p - classorder);
     else
         k = 1 + (int) strlen(classorder) + (oclass != VENOM_CLASS);
-    sort_item->class = (xchar) k;
+    sort_item->orderclass = (xchar) k;
     /* subclass designation; only a few classes have subclasses
        and the non-armor ones we use are fairly arbitrary */
     switch (oclass) {
@@ -280,14 +280,14 @@ const genericptr vptr2;
         != SORTLOOT_INVLET) {
         /* Classify each object at most once no matter how many
            comparisons it is involved in. */
-        if (!sli1->class)
+        if (!sli1->orderclass)
             loot_classify(sli1, obj1);
-        if (!sli2->class)
+        if (!sli2->orderclass)
             loot_classify(sli2, obj2);
 
         /* Sort by class. */
-        val1 = sli1->class;
-        val2 = sli2->class;
+        val1 = sli1->orderclass;
+        val2 = sli2->orderclass;
         if (val1 != val2)
             return (int) (val1 - val2);
 
@@ -472,13 +472,13 @@ boolean FDECL((*filterfunc), (OBJ_P));
             continue;
         sliarray[i].obj = o, sliarray[i].indx = (int) i;
         sliarray[i].str = (char *) 0;
-        sliarray[i].class = sliarray[i].subclass = sliarray[i].disco = 0;
+        sliarray[i].orderclass = sliarray[i].subclass = sliarray[i].disco = 0;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
     sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
     sliarray[n].str = (char *) 0;
-    sliarray[n].class = sliarray[n].subclass = sliarray[n].disco = 0;
+    sliarray[n].orderclass = sliarray[n].subclass = sliarray[n].disco = 0;
 
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
