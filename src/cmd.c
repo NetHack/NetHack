@@ -1966,7 +1966,7 @@ int final;
         you_are("confused", "");
     if (Hallucination)
         Sprintf(buf, "%s hallucinating",
-                u.uroleplay.blind ? "permanently" : "temporarily");
+                u.uroleplay.hallu ? "permanently" : "temporarily");
     if (Blind) {
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
@@ -2215,6 +2215,10 @@ int final;
         you_are("immune to sickness", from_what(SICK_RES));
     if (Stone_resistance)
         you_are("petrification resistant", from_what(STONE_RES));
+    if (Psychic_resistance)
+        you_are("psionic resistant", from_what(PSYCHIC_RES));
+    if (Sonic_resistance)
+        you_are("sonic resistant", from_what(SONIC_RES));
     if (Halluc_resistance)
         enl_msg(You_, "resist", "resisted", " hallucinations",
                 from_what(HALLUC_RES));
