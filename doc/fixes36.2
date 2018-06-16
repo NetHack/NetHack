@@ -36,6 +36,8 @@ internals for 'sortloot' option have been changed to not reorder the actual
 	list of objects, so changing it to 'n'one will get the original order
 	back and having a persistent inventory window open when performing
 	full-pack identify won't result in possibly skipping some items
+give vault guards a cursed tin whistle since there is a shrill whistling
+	sound if hero teleports out of vault while being confronted by guard
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -80,6 +82,9 @@ status_hilite options which use comparisons may now use <= and >= in
 	addition to previous < and >; in 3.6.1 the latter operated as if
 	they were <= and >= but now behave as conventional less than and
 	greater than; old highlight rules using them should be updated
+sortloot option has been enhanced to improve object ordering; primarily,
+	items of undiscovered type come out before items of discovered type
+	within each class or sub-class of objects
 
 
 Code Cleanup and Reorganization
