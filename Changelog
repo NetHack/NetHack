@@ -25,11 +25,13 @@ QOL Changes
   generated, preventing the increased  number of artifacts from nerfing artifact
   wishing.
 
-New Monsters
+New Monsters (8)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
   transmit regular lycanthropy, and can (rarely) summon normal werewolves.
+- Added ratmen and mutated ratmen. Both are low-level monsters that spawn
+  randomly.
 
 New Objects
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
@@ -77,3 +79,6 @@ Miscelaneous Changes and Bug Fixes
 - Game pluralizes "worm that walks" as "worms that walk," as opposed to the
   Gollum-esque "worms that walkses."
 - Vlad now  has a slowing attack.
+- Psychic and sonic resistance now appear in the enlightenment menu.
+- Permanent versus temporary hallucination is now displayed correctly based on
+  roleplay options.

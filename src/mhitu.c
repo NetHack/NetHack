@@ -1071,6 +1071,8 @@ register struct attack *mattk;
                     u.ustuck = mtmp;
                     if (Hallucination) {
                         pline("%s wrestles you!", Monnam(mtmp));
+                    } else if (mtmp->data->mlet == S_RODENT) {
+                        pline("%s wraps their tail around you!", Monnam(mtmp));
                     } else {
                         pline("%s grabs you!", Monnam(mtmp));
                     }

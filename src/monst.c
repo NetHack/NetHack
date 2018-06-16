@@ -897,6 +897,21 @@ NEARDATA struct permonst mons[] = {
             | M1_HERBIVORE,
         /* In reality, they tunnel instead of cutting lumber.  Oh, well. */
         M2_WANDER | M2_HOSTILE, M3_INFRAVISIBLE, CLR_BROWN),
+    /* pretty similar to hill orcs at the moment. */
+    MON("ratman", S_RODENT, LVL(2, 12, 8, 0, -3), (G_GENO | G_LGROUP | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 2), ATTK(AT_BITE, AD_PHYS, 1, 1),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(800, 100, MS_SQEEK, MZ_HUMAN), MR_POISON, 0,
+            M1_HUMANOID | M1_CARNIVORE | M1_SWIM,
+        M2_STALK | M2_GREEDY | M2_COLLECT,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GREEN),
+    MON("mutated ratman", S_RODENT, LVL(3, 12, 7, 0, -5), (G_GENO | 1),
+        A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_BITE, AD_PHYS, 1, 2),
+          ATTK(AT_HUGS, AD_PHYS, 1, 2), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(800, 100, MS_SQEEK, MZ_HUMAN), MR_POISON, 0,
+            M1_HUMANOID | M1_CARNIVORE | M1_SWIM,
+        M2_STALK | M2_GREEDY | M2_COLLECT,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_BRIGHT_GREEN),
     /*
      * spiders & scorpions (keep webmaker() in sync if new critters are added)
      */

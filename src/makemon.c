@@ -480,6 +480,20 @@ register struct monst *mtmp;
         if (!rn2(3))
             (void) mongets(mtmp, (rn2(2)) ? CLUB : RUBBER_HOSE);
         break;
+    case S_RODENT:
+        switch(mm) {
+        case PM_RATMAN:
+            if (!rn2(3))
+                (void) mongets(mtmp, KNIFE);
+            if (!rn2(3))
+                (void) mongets(mtmp, DENTED_POT);
+            else if (!rn2(10))
+                (void) mongets(mtmp, FEDORA);
+            break;
+        default:
+            break;
+        }
+        break;
     case S_ORC:
         if (rn2(2))
             (void) mongets(mtmp, ORCISH_HELM);
