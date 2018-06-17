@@ -12,7 +12,7 @@ Patches
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
 
-QOL Changes
+QOL and Major Balance Changes
 - Dropped the quest entry requirement to level 10.
 - Ported paranoid trap and swim confirmation from xnethack.
 - Ported peaceful monster displacement from xnethack.
@@ -24,6 +24,9 @@ QOL Changes
 - Artifact wishing is based on the number of artifacts wished for, not
   generated, preventing the increased  number of artifacts from nerfing artifact
   wishing.
+- Monsters can only get wishes from smoky potions now, not wands of
+  wishing. Wishes for wands of death and archon figurines were removed.
+- Vlad now  has a slowing attack.
 
 New Monsters (8)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
@@ -78,7 +81,7 @@ Miscelaneous Changes and Bug Fixes
   fixing one of the longest running bugs in SpliceHack.
 - Game pluralizes "worm that walks" as "worms that walk," as opposed to the
   Gollum-esque "worms that walkses."
-- Vlad now  has a slowing attack.
 - Psychic and sonic resistance now appear in the enlightenment menu.
 - Permanent versus temporary hallucination is now displayed correctly based on
   roleplay options.
+- Added a few random god names.
