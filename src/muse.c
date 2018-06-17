@@ -123,7 +123,7 @@ struct obj *obj;
                     pline("In a cloud of smoke, %s emerges!", a_monnam(mtmp));
                 pline("%s speaks.", vis ? Monnam(mtmp) : Something);
                 /* I suspect few players will be upset that monsters */
-                /* CAN wish for wands of death here.... */
+                /* can't wish for wands of death here.... */
                 if (rn2(2)) {
                     verbalize("Thank you for freeing me! I will grant you a wish in gratitude!");
                     mmake_wish(mon);
@@ -1689,9 +1689,8 @@ struct monst *mtmp;
 #define MUSE_WAN_SPEED_MONSTER 7
 #define MUSE_BULLWHIP 8
 #define MUSE_POT_POLYMORPH 9
-#define MUSE_WAN_WISHING 10
-#define MUSE_FIGURINE 11
-#define MUSE_POT_REFLECT 12
+#define MUSE_FIGURINE 10
+#define MUSE_POT_REFLECT 11
 
 boolean
 find_misc(mtmp)
@@ -1765,11 +1764,6 @@ struct monst *mtmp;
         if (obj->otyp == FIGURINE && !mtmp->mpeaceful) {
             m.misc = obj;
             m.has_misc = MUSE_FIGURINE;
-        }
-        nomore(MUSE_WAN_WISHING);
-        if (obj->otyp == WAN_WISHING && obj->spe > 0) {
-            m.misc = obj;
-            m.has_misc = MUSE_WAN_WISHING;
         }
         nomore(MUSE_BULLWHIP);
         if ((obj->otyp == BULLWHIP || obj->otyp == RAZOR_WHIP)
@@ -1996,15 +1990,6 @@ struct monst *mtmp;
         if (oseen)
             makeknown(WAN_POLYMORPH);
         return 2;
-    case MUSE_WAN_WISHING:
-        mzapmsg(mtmp, otmp, FALSE);
-        otmp->spe--;
-        if (vismon)
-            pline("%s makes a wish!", Monnam(mtmp));
-        if (oseen)
-            makeknown(WAN_WISHING);
-        mmake_wish(mtmp);
-        return 2;
     case MUSE_POT_POLYMORPH:
         mquaffmsg(mtmp, otmp);
         if (vismon)
@@ -2201,7 +2186,7 @@ struct obj *obj;
             return (boolean) (monstr[monsndx(mon->data)] < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER
-            || typ == WAN_CANCELLATION || typ == WAN_WISHING
+            || typ == WAN_CANCELLATION
             || typ == WAN_HEALING)
             return TRUE;
         break;
@@ -2765,7 +2750,7 @@ struct monst *mon;
     register int cnt;
     register boolean wearable = FALSE;
     register struct obj *otmp;
-    switch(rn2(6)) {
+    switch(rn2(5)) {
         case 1:
             for (cnt = 0; cnt < 1 + rn2(3); cnt++) {
                 otmp = mksobj(POT_GAIN_LEVEL, FALSE, FALSE);
@@ -2773,26 +2758,20 @@ struct monst *mon;
             }
             break;
         case 2:
-            otmp = mksobj(FIGURINE, FALSE, FALSE);
-            otmp->corpsenm = PM_ARCHON;
-            bless(otmp);
-            (void) mpickobj(mon, otmp);
-            break;
-        case 3:
             otmp = mksobj(AMULET_OF_LIFE_SAVING, FALSE, FALSE);
             bless(otmp);
             (void) mpickobj(mon, otmp);
             wearable = TRUE;
             break;
-        case 4:
+        case 3:
             /* This is fine for dragons, because an artifact would be a good
-               addition to their horde. */
+               addition to their hoard. */
             otmp = mk_artifact((struct obj *)0, mon->malign);
             bless(otmp);
             (void) mpickobj(mon, otmp);
             wearable = TRUE;
             break;
-        case 5:
+        case 4:
             if (mon->mreflect == 1 || monsndx(mon->data) == PM_SILVER_DRAGON) {
                 if (humanoid(mon->data))
                     otmp = mksobj(SILVER_DRAGON_SCALE_MAIL, FALSE, FALSE);
@@ -2810,7 +2789,7 @@ struct monst *mon;
                 (void) mkmonmoney(mon, 5000);
             }
             else {
-                (void) mongets(mon, WAN_DEATH);
+                (void) mongets(mon, WAN_SPEED_MONSTER);
             }
     }
     if (wearable)
