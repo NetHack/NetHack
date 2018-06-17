@@ -45,6 +45,9 @@ New Objects
   resistant to psionic attacks.
 - Ring of Memory: Blocks the forgetting of items, spells, and objects.
   Essentially amnesia resistance.
+- Scrolls of Knowledge: Essentially scrolls of reverse identify, like those
+  that appear in Nethack, the Next Generation. Reading one will allow you to
+  identify any item in the game by prompt.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.

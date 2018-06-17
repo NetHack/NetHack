@@ -30,6 +30,7 @@ STATIC_DCL void FDECL(forget_single_object, (int));
 #if 0 /* not used */
 STATIC_DCL void FDECL(forget_objclass, (int));
 #endif
+STATIC_DCL void FDECL(specified_id, (void));
 STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
@@ -1617,6 +1618,19 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (food_detect(sobj))
             sobj = 0; /* nothing detected: strange_feeling -> useup */
         break;
+    case SCR_KNOWLEDGE:
+        useup(sobj);
+        sobj = 0;
+        if (confused)
+            You("know this to be a knowledge scroll.");
+        else {
+            specified_id();
+            if (sblessed)
+                specified_id();
+        }
+        if (!already_known)
+            (void) learnscrolltyp(SCR_KNOWLEDGE);
+        break;
     case SCR_IDENTIFY:
         /* known = TRUE; -- handled inline here */
         /* use up the scroll first, before makeknown() performs a
@@ -1927,6 +1941,45 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     if (!sobj)
         update_inventory();
     return sobj ? 0 : 1;
+}
+
+STATIC_OVL void
+specified_id()
+{
+    static char buf[BUFSZ] = DUMMY;
+    char promptbuf[BUFSZ];
+    char bufcpy[BUFSZ];
+    struct obj *otmp, nothing;
+    int tries = 0;
+
+    promptbuf[0] = '\0';
+    nothing = zeroobj; /* lint suppression; only its address matters */
+    if (flags.verbose)
+        You("may learn about any object.");
+  retry:
+    Strcpy(promptbuf, "What object do you wish to know the identity of");
+    Strcat(promptbuf, "?");
+    getlin(promptbuf, buf);
+    (void) mungspaces(buf);
+    if (buf[0] == '\033') {
+        buf[0] = '\0';
+    }
+    strcpy(bufcpy, buf);
+    otmp = readobjnam(buf, &nothing);
+    if (!otmp) {
+        pline("Nothing fitting that description exists in the game.");
+        if (++tries < 5)
+            goto retry;
+        pline1(thats_enough_tries);
+        otmp = readobjnam((char *) 0, (struct obj *) 0);
+        if (!otmp)
+            return; /* for safety; should never happen */
+    } else if (otmp == &nothing) {
+        return;
+    }
+    (void) identify(otmp);
+    You("feel more knowledgeable about %s.", makeplural(xname(otmp)));
+    update_inventory();
 }
 
 void
