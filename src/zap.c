@@ -1392,7 +1392,8 @@ struct obj *obj;
 int id;
 {
     struct obj *otmp;
-    xchar ox, oy;
+    xchar ox = 0, oy = 0;
+    long old_wornmask, new_wornmask = 0L;
     boolean can_merge = (id == STRANGE_OBJECT);
     int obj_location = obj->where;
 
@@ -1573,10 +1574,10 @@ int id;
        of polymorph can produce side-effects but those won't yield out
        of sequence messages because current polymorph is finished */
     if (obj_location == OBJ_INVENT && obj->owornmask) {
-        long old_wornmask = obj->owornmask & ~(W_ART | W_ARTI),
-             new_wornmask = wearslot(otmp);
         boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
 
+        old_wornmask = obj->owornmask & ~(W_ART | W_ARTI);
+        new_wornmask = wearslot(otmp);
         remove_worn_item(obj, TRUE);
         /* if the new form can be worn in the same slot, make it so
            [possible extension:  if it could be worn in some other
@@ -1595,13 +1596,21 @@ int id;
                 u.twoweap = TRUE;
         } else if ((old_wornmask & new_wornmask) != 0L) {
             new_wornmask &= old_wornmask;
+            /*
+             * Defer this until later; set_wear() might result in otmp
+             * being destroyed (using up an amulet of change, for instance).
+             *
             setworn(otmp, new_wornmask);
-            set_wear(otmp); /* Armor_on() for side-effects */
+            set_wear(otmp);
+             */
         }
     }
 
-    /* ** we are now done adjusting the object ** */
+    /*
+     * ** we are now done adjusting the object **
+     */
 
+    (void) get_obj_location(obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO);
     /* swap otmp for obj */
     replace_object(obj, otmp);
     if (obj_location == OBJ_INVENT) {
@@ -1614,8 +1623,14 @@ int id;
         freeinv_core(obj);
         addinv_core1(otmp);
         addinv_core2(otmp);
+        if (new_wornmask) {
+            setworn(otmp, new_wornmask);
+            /* set_wear() might result in otmp being destroyed if
+               worn amulet has been turned into an amulet of change */
+            set_wear(otmp);
+            otmp = wearmask_to_obj(new_wornmask); /* might be Null */
+        }
     } else if (obj_location == OBJ_FLOOR) {
-        ox = otmp->ox, oy = otmp->oy; /* set by replace_object() */
         if (obj->otyp == BOULDER && otmp->otyp != BOULDER
             && !does_block(ox, oy, &levl[ox][oy]))
             unblock_point(ox, oy);
@@ -1624,11 +1639,9 @@ int id;
             block_point(ox, oy);
     }
 
-    if ((!carried(otmp) || obj->unpaid)
-        && get_obj_location(otmp, &ox, &oy, BURIED_TOO | CONTAINED_TOO)
-        && costly_spot(ox, oy)) {
-        register struct monst *shkp =
-            shop_keeper(*in_rooms(ox, oy, SHOPBASE));
+    /* note: if otmp is gone, billing for it was handled by useup() */
+    if (((otmp && !carried(otmp)) || obj->unpaid) && costly_spot(ox, oy)) {
+        struct monst *shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE));
 
         if ((!obj->no_charge
              || (Has_contents(obj)
@@ -1636,8 +1649,8 @@ int id;
             && inhishop(shkp)) {
             if (shkp->mpeaceful) {
                 if (*u.ushops
-                    && *in_rooms(u.ux, u.uy, 0)
-                           == *in_rooms(shkp->mx, shkp->my, 0)
+                    && (*in_rooms(u.ux, u.uy, 0)
+                        == *in_rooms(shkp->mx, shkp->my, 0))
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
