@@ -21,6 +21,28 @@ rider_cant_reach()
     You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
 }
 
+void
+newerid(mtmp)
+struct monst *mtmp;
+{
+    if (!mtmp->mextra)
+        mtmp->mextra = newmextra();
+    if (!ERID(mtmp)) {
+        ERID(mtmp) = (struct erid *) alloc(sizeof(struct erid));
+        (void) memset((genericptr_t) ERID(mtmp), 0, sizeof(struct erid));
+    }
+}
+
+void
+free_erid(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && ERID(mtmp)) {
+        free((genericptr_t) ERID(mtmp));
+        ERID(mtmp) = (struct erid *) 0;
+    }
+}
+
 /*** Putting the saddle on ***/
 
 /* Can this monster wear a saddle? */

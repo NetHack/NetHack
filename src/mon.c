@@ -1751,6 +1751,11 @@ struct monst *mtmp2, *mtmp1;
             neweama(mtmp2);
         *EAMA(mtmp2) = *EAMA(mtmp1);
     }
+    if (ERID(mtmp1)) {
+        if (!ERID(mtmp2))
+            newerid(mtmp2);
+        *ERID(mtmp2) = *ERID(mtmp1);
+    }
     if (has_mcorpsenm(mtmp1))
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
@@ -1776,6 +1781,8 @@ struct monst *m;
             free((genericptr_t) x->edog);
         if (x->eama)
             free((genericptr_t) x->eama);
+        if (x->erid)
+            free((genericptr_t) x->erid);
         /* [no action needed for x->mcorpsenm] */
 
         free((genericptr_t) x);

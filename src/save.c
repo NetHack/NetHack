@@ -1147,6 +1147,14 @@ struct monst *mtmp;
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EAMA(mtmp), buflen);
 
+        if (ERID(mtmp))
+            buflen = sizeof(struct erid);
+        else
+            buflen = 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) ERID(mtmp), buflen);
+
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         bwrite(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));

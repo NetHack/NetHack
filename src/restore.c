@@ -385,6 +385,12 @@ struct monst *mtmp;
             neweama(mtmp);
             mread(fd, (genericptr_t) EAMA(mtmp), sizeof(struct eama));
         }
+        /* erid - steed */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newerid(mtmp);
+            mread(fd, (genericptr_t) ERID(mtmp), sizeof(struct erid));
+        }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
         mread(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));

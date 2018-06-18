@@ -2364,6 +2364,8 @@ E struct obj *FDECL(findgold, (struct obj *));
 
 /* ### steed.c ### */
 
+E void FDECL(newerid, (struct monst *));
+E void FDECL(free_erid, (struct monst *));
 E void NDECL(rider_cant_reach);
 E boolean FDECL(can_saddle, (struct monst *));
 E int FDECL(use_saddle, (struct obj *));
