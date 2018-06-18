@@ -527,7 +527,7 @@ NEARDATA struct permonst mons[] = {
     MON("mind flayer telepath", S_HUMANOID, LVL(11, 12, 4, 90, -8),
         (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_TENT, AD_DRIN, 2, 1),
-          ATTK(AT_MAGC, AD_PSYC, 3, 4), ATTK(AT_MAGC, AD_PSYC, 3, 4), NO_ATTK,
+          ATTK(AT_MAGC, AD_PSYC, 1, 4), ATTK(AT_MAGC, AD_PSYC, 1, 4), NO_ATTK,
           NO_ATTK),
         SIZ(1450, 400, MS_HISS, MZ_HUMAN), MR_PSYCHIC, 0,
         M1_HUMANOID | M1_FLY | M1_SEE_INVIS | M1_OMNIVORE,
