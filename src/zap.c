@@ -1568,49 +1568,12 @@ int id;
     /* update the weight */
     otmp->owt = weight(otmp);
 
-    /* handle polymorph of worn item: stone-to-flesh cast on self can
-       affect multiple objects at once, but their new forms won't
-       produce any side-effects; a single worn item dipped into potion
-       of polymorph can produce side-effects but those won't yield out
-       of sequence messages because current polymorph is finished */
-    if (obj_location == OBJ_INVENT && obj->owornmask) {
-        boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
-
-        old_wornmask = obj->owornmask & ~(W_ART | W_ARTI);
-        new_wornmask = wearslot(otmp);
-        remove_worn_item(obj, TRUE);
-        /* if the new form can be worn in the same slot, make it so
-           [possible extension:  if it could be worn in some other
-           slot which is currently unfilled, wear it there instead] */
-        if ((old_wornmask & W_QUIVER) != 0L) {
-            setuqwep(otmp);
-        } else if ((old_wornmask & W_SWAPWEP) != 0L) {
-            if (was_twohanded || !bimanual(otmp))
-                setuswapwep(otmp);
-            if (was_twoweap && uswapwep)
-                u.twoweap = TRUE;
-        } else if ((old_wornmask & W_WEP) != 0L) {
-            if (was_twohanded || !bimanual(otmp) || !uarms)
-                setuwep(otmp);
-            if (was_twoweap && uwep && !bimanual(uwep))
-                u.twoweap = TRUE;
-        } else if ((old_wornmask & new_wornmask) != 0L) {
-            new_wornmask &= old_wornmask;
-            /*
-             * Defer this until later; set_wear() might result in otmp
-             * being destroyed (using up an amulet of change, for instance).
-             *
-            setworn(otmp, new_wornmask);
-            set_wear(otmp);
-             */
-        }
-    }
-
     /*
-     * ** we are now done adjusting the object **
+     * ** we are now done adjusting the object (except possibly wearing it) **
      */
 
     (void) get_obj_location(obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO);
+    old_wornmask = obj->owornmask & ~(W_ART | W_ARTI);
     /* swap otmp for obj */
     replace_object(obj, otmp);
     if (obj_location == OBJ_INVENT) {
@@ -1623,13 +1586,41 @@ int id;
         freeinv_core(obj);
         addinv_core1(otmp);
         addinv_core2(otmp);
-        if (new_wornmask) {
-            setworn(otmp, new_wornmask);
-            /* set_wear() might result in otmp being destroyed if
-               worn amulet has been turned into an amulet of change */
-            set_wear(otmp);
-            otmp = wearmask_to_obj(new_wornmask); /* might be Null */
-        }
+        /*
+         * Handle polymorph of worn item.  Stone-to-flesh cast on self can
+         * affect multiple objects at once, but their new forms won't
+         * produce any side-effects.  A single worn item dipped into potion
+         * of polymorph can produce side-effects but those won't yield out
+         * of sequence messages because current polymorph is finished.
+         */
+        if (old_wornmask) {
+            boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
+
+            /* wearslot() returns a mask which might have multiple bits set;
+               narrow that down to the bit(s) currently in use */
+            new_wornmask = wearslot(otmp) & old_wornmask;
+            remove_worn_item(obj, TRUE);
+            /* if the new form can be worn in the same slot, make it so */
+            if ((new_wornmask & W_WEP) != 0L) {
+                if (was_twohanded || !bimanual(otmp) || !uarms)
+                    setuwep(otmp);
+                if (was_twoweap && uwep && !bimanual(uwep))
+                    u.twoweap = TRUE;
+            } else if ((new_wornmask & W_SWAPWEP) != 0L) {
+                if (was_twohanded || !bimanual(otmp))
+                    setuswapwep(otmp);
+                if (was_twoweap && uswapwep)
+                    u.twoweap = TRUE;
+            } else if ((new_wornmask & W_QUIVER) != 0L) {
+                setuqwep(otmp);
+            } else if (new_wornmask) {
+                setworn(otmp, new_wornmask);
+                /* set_wear() might result in otmp being destroyed if
+                   worn amulet has been turned into an amulet of change */
+                set_wear(otmp);
+                otmp = wearmask_to_obj(new_wornmask); /* might be Null */
+            }
+        } /* old_wornmask */
     } else if (obj_location == OBJ_FLOOR) {
         if (obj->otyp == BOULDER && otmp->otyp != BOULDER
             && !does_block(ox, oy, &levl[ox][oy]))
