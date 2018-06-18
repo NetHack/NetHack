@@ -1955,9 +1955,9 @@ specified_id()
     promptbuf[0] = '\0';
     nothing = zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
-        You("may learn about any object.");
+        You("may identify any object.");
   retry:
-    Strcpy(promptbuf, "What object do you wish to know the identity of");
+    Strcpy(promptbuf, "What object do you wish to learn the history of");
     Strcat(promptbuf, "?");
     getlin(promptbuf, buf);
     (void) mungspaces(buf);
