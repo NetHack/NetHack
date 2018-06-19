@@ -29,7 +29,8 @@ const struct worn {
              { W_TOOL, &ublindf },
              { W_BALL, &uball },
              { W_CHAIN, &uchain },
-             { 0, 0 } };
+             { 0, 0 }
+};
 
 /* This only allows for one blocking item per property */
 #define w_blocks(o, m) \
@@ -140,6 +141,19 @@ register struct obj *obj;
     /* setnotworn() isn't called during restore but parallel setworn() */
     if (!restoring)
         update_inventory();
+}
+
+/* return item worn in slot indiciated by wornmask; needed by poly_obj() */
+struct obj *
+wearmask_to_obj(wornmask)
+long wornmask;
+{
+    const struct worn *wp;
+
+    for (wp = worn; wp->w_mask; wp++)
+        if (wp->w_mask & wornmask)
+            return *wp->w_obj;
+    return (struct obj *) 0;
 }
 
 /* return a bitmask of the equipment slot(s) a given item might be worn in */

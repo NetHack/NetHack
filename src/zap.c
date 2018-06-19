@@ -1392,7 +1392,8 @@ struct obj *obj;
 int id;
 {
     struct obj *otmp;
-    xchar ox, oy;
+    xchar ox = 0, oy = 0;
+    long old_wornmask, new_wornmask = 0L;
     boolean can_merge = (id == STRANGE_OBJECT);
     int obj_location = obj->where;
 
@@ -1567,41 +1568,12 @@ int id;
     /* update the weight */
     otmp->owt = weight(otmp);
 
-    /* handle polymorph of worn item: stone-to-flesh cast on self can
-       affect multiple objects at once, but their new forms won't
-       produce any side-effects; a single worn item dipped into potion
-       of polymorph can produce side-effects but those won't yield out
-       of sequence messages because current polymorph is finished */
-    if (obj_location == OBJ_INVENT && obj->owornmask) {
-        long old_wornmask = obj->owornmask & ~(W_ART | W_ARTI),
-             new_wornmask = wearslot(otmp);
-        boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
+    /*
+     * ** we are now done adjusting the object (except possibly wearing it) **
+     */
 
-        remove_worn_item(obj, TRUE);
-        /* if the new form can be worn in the same slot, make it so
-           [possible extension:  if it could be worn in some other
-           slot which is currently unfilled, wear it there instead] */
-        if ((old_wornmask & W_QUIVER) != 0L) {
-            setuqwep(otmp);
-        } else if ((old_wornmask & W_SWAPWEP) != 0L) {
-            if (was_twohanded || !bimanual(otmp))
-                setuswapwep(otmp);
-            if (was_twoweap && uswapwep)
-                u.twoweap = TRUE;
-        } else if ((old_wornmask & W_WEP) != 0L) {
-            if (was_twohanded || !bimanual(otmp) || !uarms)
-                setuwep(otmp);
-            if (was_twoweap && uwep && !bimanual(uwep))
-                u.twoweap = TRUE;
-        } else if ((old_wornmask & new_wornmask) != 0L) {
-            new_wornmask &= old_wornmask;
-            setworn(otmp, new_wornmask);
-            set_wear(otmp); /* Armor_on() for side-effects */
-        }
-    }
-
-    /* ** we are now done adjusting the object ** */
-
+    (void) get_obj_location(obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO);
+    old_wornmask = obj->owornmask & ~(W_ART | W_ARTI);
     /* swap otmp for obj */
     replace_object(obj, otmp);
     if (obj_location == OBJ_INVENT) {
@@ -1614,8 +1586,42 @@ int id;
         freeinv_core(obj);
         addinv_core1(otmp);
         addinv_core2(otmp);
+        /*
+         * Handle polymorph of worn item.  Stone-to-flesh cast on self can
+         * affect multiple objects at once, but their new forms won't
+         * produce any side-effects.  A single worn item dipped into potion
+         * of polymorph can produce side-effects but those won't yield out
+         * of sequence messages because current polymorph is finished.
+         */
+        if (old_wornmask) {
+            boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
+
+            /* wearslot() returns a mask which might have multiple bits set;
+               narrow that down to the bit(s) currently in use */
+            new_wornmask = wearslot(otmp) & old_wornmask;
+            remove_worn_item(obj, TRUE);
+            /* if the new form can be worn in the same slot, make it so */
+            if ((new_wornmask & W_WEP) != 0L) {
+                if (was_twohanded || !bimanual(otmp) || !uarms)
+                    setuwep(otmp);
+                if (was_twoweap && uwep && !bimanual(uwep))
+                    u.twoweap = TRUE;
+            } else if ((new_wornmask & W_SWAPWEP) != 0L) {
+                if (was_twohanded || !bimanual(otmp))
+                    setuswapwep(otmp);
+                if (was_twoweap && uswapwep)
+                    u.twoweap = TRUE;
+            } else if ((new_wornmask & W_QUIVER) != 0L) {
+                setuqwep(otmp);
+            } else if (new_wornmask) {
+                setworn(otmp, new_wornmask);
+                /* set_wear() might result in otmp being destroyed if
+                   worn amulet has been turned into an amulet of change */
+                set_wear(otmp);
+                otmp = wearmask_to_obj(new_wornmask); /* might be Null */
+            }
+        } /* old_wornmask */
     } else if (obj_location == OBJ_FLOOR) {
-        ox = otmp->ox, oy = otmp->oy; /* set by replace_object() */
         if (obj->otyp == BOULDER && otmp->otyp != BOULDER
             && !does_block(ox, oy, &levl[ox][oy]))
             unblock_point(ox, oy);
@@ -1624,11 +1630,9 @@ int id;
             block_point(ox, oy);
     }
 
-    if ((!carried(otmp) || obj->unpaid)
-        && get_obj_location(otmp, &ox, &oy, BURIED_TOO | CONTAINED_TOO)
-        && costly_spot(ox, oy)) {
-        register struct monst *shkp =
-            shop_keeper(*in_rooms(ox, oy, SHOPBASE));
+    /* note: if otmp is gone, billing for it was handled by useup() */
+    if (((otmp && !carried(otmp)) || obj->unpaid) && costly_spot(ox, oy)) {
+        struct monst *shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE));
 
         if ((!obj->no_charge
              || (Has_contents(obj)
@@ -1636,8 +1640,8 @@ int id;
             && inhishop(shkp)) {
             if (shkp->mpeaceful) {
                 if (*u.ushops
-                    && *in_rooms(u.ux, u.uy, 0)
-                           == *in_rooms(shkp->mx, shkp->my, 0)
+                    && (*in_rooms(u.ux, u.uy, 0)
+                        == *in_rooms(shkp->mx, shkp->my, 0))
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
