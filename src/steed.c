@@ -34,11 +34,14 @@ void mount_monster(mtmp, pm)
 struct monst *mtmp;
 int pm;
 {
+    register struct monst *mount;
+
     newerid(mtmp);
     /* small hack here: make it in a random spot to avoid failures due to there
        not being enough room. */
-    ERID(mtmp)->m1 =
-        makemon(&mons[pm], 0, 0, MM_ADJACENTOK);
+    mount = makemon(&mons[pm], 0, 0, MM_ADJACENTOK);
+    ERID(mtmp)->m1 = mount;
+    ERID(mtmp)->mid = mount->m_id;
     remove_monster(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my);
     if (cansee(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my))
         newsym(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my);

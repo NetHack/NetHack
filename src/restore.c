@@ -693,7 +693,20 @@ restlevelstate(stuckid, steedid)
 unsigned int stuckid, steedid;
 {
     register struct monst *mtmp;
+    register struct monst *mon;
 
+    for (mon = fmon; mon; mon = mon->nmon) {
+        if (mon->mextra && ERID(mon)) {
+            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+              if (mtmp->m_id == ERID(mon)->mid)
+                  break;
+            }
+            if (!mtmp)
+                panic("Cannot find monster steed.");
+            ERID(mon)->m1 = mtmp;
+            /* remove_monster(mtmp->mx, mtmp->my); */
+        }
+    }
     if (stuckid) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (mtmp->m_id == stuckid)
