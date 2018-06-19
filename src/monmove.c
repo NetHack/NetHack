@@ -621,8 +621,11 @@ toofar:
                 }
             }
         }
-
-        tmp = m_move(mtmp, 0);
+        if (mtmp->monmount != 1)
+            tmp = m_move(mtmp, 0);
+        else
+            tmp = 0;
+        update_monsteed(mtmp);
         if (tmp != 2)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 

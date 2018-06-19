@@ -1365,6 +1365,10 @@ int mmflags;
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
         }
+        if (mndx == PM_DEATH) {
+            mount_monster(mtmp, PM_HORSE);
+        }
+        break;
     case S_EEL:
         (void) hideunder(mtmp);
         break;

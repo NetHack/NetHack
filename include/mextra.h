@@ -177,7 +177,7 @@ struct eama {
 };
 
 struct erid {
-    struct permonst *m1; /* monster being ridden */
+    struct monst *m1; /* monster being ridden */
 };
 
 /***
