@@ -1302,6 +1302,7 @@ int mmflags;
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
         }
+        break;
     case S_EEL:
         (void) hideunder(mtmp);
         break;
