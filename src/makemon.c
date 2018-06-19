@@ -1364,9 +1364,12 @@ int mmflags;
         if (mndx == PM_KING_IN_YELLOW) {
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
-        }
-        if (mndx == PM_HORNED_DEVIL) {
-            mount_monster(mtmp, PM_HORSE);
+        } else if (mndx == PM_DEATH) {
+            mount_monster(mtmp, PM_PALE_HORSE);
+        } else if (mndx == PM_FAMINE) {
+            mount_monster(mtmp, PM_BLACK_HORSE);
+        } else if (mndx == PM_PESTILENCE) {
+            mount_monster(mtmp, PM_WHITE_HORSE);
         }
         break;
     case S_EEL:

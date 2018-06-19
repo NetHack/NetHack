@@ -1016,6 +1016,25 @@ NEARDATA struct permonst mons[] = {
         M1_ANIMAL | M1_NOHANDS | M1_FLY,
         M2_WANDER | M2_STRONG | M2_DEMON | M2_HOSTILE | M2_MINION,
         M3_INFRAVISIBLE, CLR_RED),
+    /* the horses of the Riders */
+    MON("pale horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_COLD, MR_COLD,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG, M3_INFRAVISIBLE, CLR_GRAY),
+    MON("white horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG | M2_UNDEAD, M3_INFRAVISIBLE, CLR_GRAY),
+    MON("black horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_POISON, MR_POISON,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG, M3_INFRAVISIBLE, CLR_GRAY),
     /*
      * vortices
      */

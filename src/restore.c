@@ -687,6 +687,7 @@ unsigned int *stuckid, *steedid;
     return TRUE;
 }
 
+/* TODO: Drop this down so it does not take O(n^2) time */
 STATIC_OVL void
 restmonsteeds()
 {
