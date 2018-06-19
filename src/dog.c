@@ -344,7 +344,7 @@ boolean with_you;
     ylocale = mtmp->mtrack[1].y;
     memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 
-    if (mtmp == u.usteed)
+    if (mtmp == u.usteed || mtmp->monmount == 1)
         return; /* don't place steed on the map */
     if (with_you) {
         /* When a monster accompanies you, sometimes it will arrive

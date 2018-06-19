@@ -39,6 +39,7 @@ STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean
 FDECL(restgamestate, (int, unsigned int *, unsigned int *));
+STATIC_DCL void NDECL(restmonsteeds);
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int, XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (int));
@@ -685,12 +686,8 @@ unsigned int *stuckid, *steedid;
     return TRUE;
 }
 
-/* update game state pointers to those valid for the current level (so we
- * don't dereference a wild u.ustuck when saving the game state, for instance)
- */
 STATIC_OVL void
-restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;
+restmonsteeds()
 {
     register struct monst *mtmp;
     register struct monst *mon;
@@ -707,6 +704,18 @@ unsigned int stuckid, steedid;
             /* remove_monster(mtmp->mx, mtmp->my); */
         }
     }
+}
+
+
+/* update game state pointers to those valid for the current level (so we
+ * don't dereference a wild u.ustuck when saving the game state, for instance)
+ */
+STATIC_OVL void
+restlevelstate(stuckid, steedid)
+unsigned int stuckid, steedid;
+{
+    register struct monst *mtmp;
+
     if (stuckid) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (mtmp->m_id == stuckid)
@@ -1071,6 +1080,7 @@ boolean ghostly;
     restore_timers(fd, RANGE_LEVEL, ghostly, elapsed);
     restore_light_sources(fd);
     fmon = restmonchn(fd, ghostly);
+    restmonsteeds();
 
     rest_worm(fd); /* restore worm information */
     ftrap = 0;
