@@ -264,7 +264,7 @@ int x, y;
                     ? "peaceful "
                     : "",
             name);
-    if (ERID(mtmp) && ERID(mtmp)->m1) {
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1) {
         Sprintf(eos(buf), ", riding %s", a_monnam(ERID(mtmp)->m1));
     }
     if (u.ustuck == mtmp) {

@@ -1365,7 +1365,7 @@ int mmflags;
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
         }
-        if (mndx == PM_DEATH) {
+        if (mndx == PM_HORNED_DEVIL) {
             mount_monster(mtmp, PM_HORSE);
         }
         break;

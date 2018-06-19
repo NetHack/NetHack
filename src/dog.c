@@ -706,6 +706,11 @@ coord *cc;   /* optional destination coordinates */
     xchar xyflags;
     int num_segs = 0; /* count of worm segments */
 
+    /* Recursive call to levelport monster steeds. */
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1) {
+        migrate_to_level(ERID(mtmp)->m1, tolev, xyloc, cc);
+    }
+
     if (mtmp->isshk)
         set_residency(mtmp, TRUE);
 
