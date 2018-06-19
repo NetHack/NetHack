@@ -357,6 +357,7 @@ boolean with_you;
             rloc_to(mtmp, u.ux, u.uy);
         else
             mnexto(mtmp);
+        update_monsteed(mtmp);
         return;
     }
     /*
@@ -482,6 +483,7 @@ fail_mon_placement:
             mongone(mtmp);
         }
     }
+    update_monsteed(mtmp);
 }
 
 /* heal monster for time spent elsewhere */

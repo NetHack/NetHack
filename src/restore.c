@@ -702,7 +702,6 @@ restmonsteeds()
             if (!mtmp)
                 panic("Cannot find monster steed.");
             ERID(mon)->m1 = mtmp;
-            /* remove_monster(mtmp->mx, mtmp->my); */
         }
     }
 }

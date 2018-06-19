@@ -27,6 +27,7 @@ struct monst *mtmp;
     if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1 != NULL) {
         ERID(mtmp)->m1->mx = mtmp->mx;
         ERID(mtmp)->m1->my = mtmp->my;
+        ERID(mtmp)->m1->mpeaceful = mtmp->mpeaceful;
     }
 }
 
