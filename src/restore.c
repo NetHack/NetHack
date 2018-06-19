@@ -704,6 +704,18 @@ restmonsteeds()
             ERID(mon)->m1 = mtmp;
         }
     }
+
+    for (mon = migrating_mons; mon; mon = mon->nmon) {
+        if (mon->mextra && ERID(mon)) {
+            for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+              if (mtmp->m_id == ERID(mon)->mid)
+                  break;
+            }
+            if (!mtmp)
+                panic("Cannot find monster steed.");
+            ERID(mon)->m1 = mtmp;
+        }
+    }
 }
 
 
