@@ -633,6 +633,7 @@ unsigned int *stuckid, *steedid;
 
     migrating_objs = restobjchn(fd, FALSE, FALSE);
     migrating_mons = restmonchn(fd, FALSE);
+    restmonsteeds();
     mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
 
     /*
