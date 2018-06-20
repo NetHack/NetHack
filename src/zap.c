@@ -138,7 +138,7 @@ struct obj *otmp;
     boolean wake = TRUE; /* Most 'zaps' should wake monster */
     boolean reveal_invis = FALSE, learn_it = FALSE;
     boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
-    boolean helpful_gesture = FALSE;
+    boolean skilled_spell, helpful_gesture = FALSE;
     int dmg, otyp = otmp->otyp;
     const char *zap_type_text = "spell";
     struct obj *obj;
@@ -149,10 +149,12 @@ struct obj *otmp;
         reveal_invis = FALSE;
 
     notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
+    skilled_spell = (otmp && otmp->oclass == SPBOOK_CLASS && otmp->blessed);
+
     switch (otyp) {
     case WAN_STRIKING:
         zap_type_text = "wand";
-    /* fall through */
+    /*FALLTHRU*/
     case SPE_FORCE_BOLT:
         reveal_invis = TRUE;
         if (disguised_mimic)
@@ -343,10 +345,12 @@ struct obj *otmp;
             mtmp->mhp += d(6, otyp == SPE_EXTRA_HEALING ? 8 : 4);
             if (mtmp->mhp > mtmp->mhpmax)
                 mtmp->mhp = mtmp->mhpmax;
-            if (mtmp->mblinded) {
-                mtmp->mblinded = 0;
-                mtmp->mcansee = 1;
-            }
+            /* plain healing must be blessed to cure blindness; extra
+               healing only needs to not be cursed, so spell always cures
+               [potions quaffed by monsters behave slightly differently;
+               we use the rules for the hero here...] */
+            if (skilled_spell || otyp == SPE_EXTRA_HEALING)
+                mcureblindness(mtmp, canseemon(mtmp));
             if (canseemon(mtmp)) {
                 if (disguised_mimic) {
                     if (is_obj_mappear(mtmp,STRANGE_OBJECT)) {
@@ -2407,7 +2411,7 @@ boolean ordinary;
     case SPE_EXTRA_HEALING:
         learn_it = TRUE; /* (no effect for spells...) */
         healup(d(6, obj->otyp == SPE_EXTRA_HEALING ? 8 : 4), 0, FALSE,
-               (obj->otyp == SPE_EXTRA_HEALING));
+               (obj->blessed || obj->otyp == SPE_EXTRA_HEALING));
         You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
         break;
     case WAN_LIGHT: /* (broken wand) */
