@@ -3439,7 +3439,7 @@ xchar x, y;
           */
         return FALSE;
     } else if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
-        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
+        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL || obj->oartifact)
             return FALSE;
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             if (in_sight)
@@ -3555,7 +3555,7 @@ struct obj *obj;
     if (obj->greased) {
         grease_protect(obj, (char *) 0, victim);
     } else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
-        if (obj->otyp != SCR_BLANK_PAPER
+        if (obj->otyp != SCR_BLANK_PAPER && !obj->oartifact
 #ifdef MAIL
             && obj->otyp != SCR_MAIL
 #endif
@@ -3638,7 +3638,7 @@ boolean force;
             *   awful luck (Luck<-4):  100%
             */
         return ER_NOTHING;
-    } else if (obj->oclass == SCROLL_CLASS) {
+    } else if (obj->oclass == SCROLL_CLASS && !obj->oartifact) {
         if (obj->otyp == SCR_BLANK_PAPER
 #ifdef MAIL
             || obj->otyp == SCR_MAIL

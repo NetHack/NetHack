@@ -1,0 +1,827 @@
+#	SCCS Id: @(#)Pirate.des	3.4	2002/04/08
+#	Copyright (c) 1989 by Jean-Christophe Collet
+#	Copyright (c) 1991-2 by M. Stephenson
+# NetHack may be freely redistributed.  See license for details.
+#
+#	Tortuga, The Turtle Island
+#
+#	The "start" level for the quest.
+#
+#	Here you meet your (besieged) class leader, Dread Pirate (ret.)
+#	and receive your quest assignment.
+#
+MAZE: "Pir-strt",' '
+FLAGS: noteleport,hardfloor
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0
+1
+2
+3               ---- ---- ---- ---- ---- ---- ---- ----    F-F-       -F-F
+4               -  | |  | |  | |  | |  | |  | |  | |  -    |..F-F-F-F-F..|
+5               -  | |  | |  | |  | |  | |  | |  | -  |    F.............F
+6               ---- ---- ---- ---- ---- ---- ---- ----    -|.FFFFFFFFF.F-
+7                                                           |.F.......F.|
+8        ----  -----                                        |.F.-F-F-.F.F
+9        -  -  -   -                                        |.F.F...|---|
+0        -  |  |   -                                        |.-.|...|...|
+1        -------   |                                        |.F.F...|---|
+2           -  -----                              -----     |.F.-F-F-.F.F
+3           -   |     -----  -----  -----  -----  |   |     |.F.......F.|
+4           |   |     |   |  |   |  |   |  |   |  |   |    --.FFFFFFFFF.F-
+5           -----     |   |  |   |  |   |  |   |  |   |    F.............F
+6                     |   |  |   |  |   |  |   |  |   |    |..F-F-F-F-F..|
+7                     -----  -----  -----  -----  -----    F-F-       -F-F
+8
+9
+0
+ENDMAP
+# Monsters on siege duty.
+MONSTER: ('@',"sergeant"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"spear"),random
+OBJECT:(')',"spear"),random
+
+
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0
+1
+2              ......................................
+3            ....---.----.----.----.----.----.--.-.--.-    F-F-       -F-F
+4           .......|.|  |.|  |.|  |.|  |.|  |.|..|.|....   |  F-F-F-F-F  |
+5         .........|.|  |.|  |.|  |.|  |.|  |.|..|....|... F             F .
+6        .......-..-.----.----.----.----.----.-.--.-..-... -| FFFFFFFFF F- .
+7       ....................................................| F       F |  .
+8       .-..-..-----....                              ......| F -F-F- F F  .
+9      ...............                                  ....| F F   |---|  .
+0     ......|..|.....                                    ...| + |   |   |....
+1      ..-.----....|..                                  ....| F F   |---|  .
+2       .........---....                          -----.....| F -F-F- F F  .
+3       ........|.....-----..-----..-----..-----..|   |.....| F       F |  .
+4        ...|...|.....|   |..|   |..|   |..|...|..|   |... -- FFFFFFFFF F- .
+5         ..-----.....|   |..|   |..|   |..|...|..|   |... F             F .
+6           ..........|   |..|   |..|   |..|...|..|   |..  |  F-F-F-F-F  |
+7            .........-----..-----..-----..-----..-----.   F-F-       -F-F
+8              .......................................
+9
+0
+ENDMAP
+# Monsters on siege duty.
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+1}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+2}}}}}}}}}}}}}}......................................}}}}}}}}}}}}}}}}}}}}}}}}
+3}}}}}}}}}}}}...+---.----.----.----.----.----.--+-.--+-}}}}F-F-}}}}}}}-F-F}}}
+4}}}}}}}}}}}....+..|.|##|.|##|.|##|.|##|.|##|.|..|.|..+.}}}|..F-F-F-F-F..|}}}
+5}}}}}}}}}......+..|.|##|.|##|.|##|.|##|.|##|.|..|.+..|...}F.............F}.}
+6}}}}}}}}.......-++-.--+-.--+-.--+-.--+-.--+-.-+--.-++-...}-|.FFFFFFFFF.F-}.}
+7}}}}}}}....................................................|.F#######F.|}}.}
+8}}}}}}}.-++-..-----....                              ......|.F#-F+F-#F.F}}.}
+9}}}}}}..+..+..+...+..    .......................  ..   ....|.F#F...|---|}}.}
+0}}}}}...+..|..|...+.    .........................H...   ...|.+#|...+...+....
+1}}}}}}..-+----+...|..  H .......................  ..   ....|.F#F...|---|}}.}
+2}}}}}}}....+..++---....                          -----.....|.F#-F+F-#F.F}}.}
+3}}}}}}}....+...|.....-----..-----..-----..-----..|.|.|.....|.F#######F.|}}.}
+4}}}}}}}}...|...|.....|...|..|...|..|...|..|...|..|.|.|...}--.FFFFFFFFF.F-}.}
+5}}}}}}}}}..-----.....|...|..|...|..|...|..|...|..|+-+|...}F.............F}.}
+6}}}}}}}}}}}..........|...|..|...|..|...|..|...|..S...|..}}|..F-F-F-F-F..|}}}
+7}}}}}}}}}}}}.........-+---..-+---..-+---..-+---..-----.}}}F-F-}}}}}}}-F-F}}}
+8}}}}}}}}}}}}}}.......................................}}}}}}}}}}}}}}}}}}}}}}}
+9}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+0}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+# Dungeon Description
+REGION:(00,00,75,20),lit,"ordinary"
+# Portal arrival point
+BRANCH:(05,00,58,20),(24,09,52,11)
+# Stairs
+STAIR:(65,10),down
+# Doors
+DOOR:closed,(22,06)
+DOOR:closed,(22,06)
+DOOR:closed,(27,06)
+DOOR:closed,(32,06)
+DOOR:closed,(37,06)
+DOOR:closed,(42,06)
+
+DOOR:locked,(67,10)
+DOOR:locked,(71,10)
+
+DOOR:closed,(22,17)
+DOOR:closed,(29,17)
+DOOR:closed,(36,17)
+DOOR:closed,(43,17)
+
+DOOR:locked,(49,16)
+DOOR:locked,(50,15)
+DOOR:locked,(52,15)
+
+# Shops
+REGION:(22,14,24,16),lit,"potion shop"
+OBJECT:('!',"booze"),(22,14)
+OBJECT:('!',"booze"),(23,14)
+OBJECT:('!',"booze"),(24,14)
+OBJECT:('!',"booze"),(24,15)
+OBJECT:('!',"booze"),(23,15)
+OBJECT:('!',"booze"),(22,15)
+OBJECT:('!',"booze"),(23,16)
+OBJECT:('!',"booze"),(24,16)
+REGION:(29,14,31,16),lit,"weapon shop"
+REGION:(36,14,38,16),lit,"weapon shop"
+REGION:(43,14,45,16),lit,"tool shop"
+MONSTER:('&',"succubus"),(50,13)
+OBJECT:('?',"scare monster"),(50,14), cursed, 0
+MONSTER:('&',"incubus"),(52,13)
+OBJECT:('?',"scare monster"),(52,14), cursed, 0
+
+# Dread Pirate (ret.)
+MONSTER:('@',"Mayor Cummerbund"),(51,10)
+# The treasure of the Dread Pirate
+OBJECT:('(',"chest"),(52,10)
+# Guards for the audience chamber
+MONSTER:('@',"pirate brother"),(22,05)
+MONSTER:('@',"pirate brother"),(27,05)
+MONSTER:('@',"pirate brother"),(32,05)
+MONSTER:('@',"pirate brother"),(37,05)
+MONSTER:('@',"pirate brother"),(42,05)
+MONSTER:('@',"pirate brother"),(27,09)
+MONSTER:('@',"pirate brother"),(37,11)
+MONSTER:('@',"pirate brother"),(47,10)
+
+#Used Cannon Balls
+OBJECT:('0',"heavy iron ball"),(13,15)
+OBJECT:('0',"heavy iron ball"),(16,12)
+OBJECT:('0',"heavy iron ball"),(21,09)
+OBJECT:('0',"heavy iron ball"),(21,16)
+OBJECT:('0',"heavy iron ball"),(45,08)
+OBJECT:('0',"heavy iron ball"),(51,08)
+OBJECT:('0',"heavy iron ball"),(52,08)
+
+# Non diggable walls
+NON_DIGGABLE:(00,00,75,20)
+
+#
+#	Welcome to Shipwreck Island
+#	The "locate" level for the quest.
+#
+#	Here you make landfall on shipwreck island and
+#	move inland towards the center of the island.
+#
+
+MAZE: "Pir-loca",' '
+FLAGS: noteleport,hardfloor
+# Dungeon Description
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0.........               ......PP..............  .. .........        ........
+1...  .          ..   ........PP....P........   .   ......        ....
+2....  ...      ............. ....P    ........  ..... .....  . ...
+3.... .  ..   ..   ......PPP.....P      ..   ........ ...   . ..
+4...   ..  . .....   .....PPPP....P  ....     .....   .. ..
+5.. . .      .  ......  PP.PPP.............   ...... ..  ........
+6... ..     ... . .     -----------------++-------....----.---|.
+7... . .   P   . .   --H|                          . ..     ..--|..
+8....  ...    .....--|                              .....       -|..
+9. . ..  .     ..--|                      ---           ...  .. .   HH
+0 . .  ..   ....-|                        | |      ......   .    HHH
+1. ... .  . .....--|                      ---     ........  .  . |
+2.. .       ..     --|                                 ....     -|
+3... .     ....     .---|                           ....   .. -++.
+4....  ..  P   ......PP.--------------------------++--..----.-|..
+5..... .           PPPPP........PPP....   ......................
+6......     P .  .   PP........P   P.. .  .......................
+7........   PP....   P.........    P...   .......................
+8...          P..  ...........     P..........................
+9.....  .  .    .............  ...P..........................
+0....... . ....................................................
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+
+MONSTER: (';',"shark"),random
+MONSTER: (';',"shark"),random
+
+MONSTER: (';',"shark"),random
+MONSTER: (';',"shark"),random
+
+MONSTER: (';',"shark"),random
+MONSTER: (';',"shark"),random
+
+# Objects (lost flotsam).
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+OBJECT:(')',"scimitar"),random
+
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0}}}}}}}}}               }}}}}}PP}}}}}}}}}}}}}}  }} }}}}}}}}}        }}}}}}}}
+1}}}  }          }}   }}}}}}}}PP}}}}P}}}}}}}}   }   }}}}}}        }}}}
+2}}}}  }}}      }}}}}}}}}}}}} }}}}P    }}}}}}}}  }}}}} }}}}}  } }}}
+3}}}} }  }}   }}   }}}}}}PPP}}}}}P      }}   }}}}}}}} }}}   } }}
+4}}}   }}  } }}}}}   }}}}}PPPP}}}}P  }}}}     }}}}}   }} }}
+5}} } }      }  }}}}}}  PP}PPP}}}}}}}}}}}}}   }}}}}} }}  }}}}}}}}
+6}}} }}     }}} } }     -----------------++-------}}}}----}---|}
+7}}} } }   P   } }   --H|..........................}.}}.....}}--|}}
+8}}}}  }}}    }}}}}--|..............................}}}}}.......-|}}
+9} } }}  }     }}--|......................---...........}}}..}}.}   HH
+0 } }  }}   }}}}-|........................| |......}}}}}}...}..  HHH
+1} }}} }  } }}}}}--|......................---.....}}}}}}}}..}..}.|
+2}} }       }}     --|.................................}}}}.....-|
+3}}} }     }}}}     }---|...........................}}}}...}}.-++}
+4}}}}  }}  P   }}}}}}PP}--------------------------++--}}----}-|}}
+5}}}}} }           PPPPP}}}}}}}}PPP}}}}   }}}}}}}}}}}}}}}}}}}}}}
+6}}}}}}     P }  }   PP}}}}}}}}P   P}} }  }}}}}}}}}}}}}}}}}}}}}}}
+7}}}}}}}}   PP}}}}   P}}}}}}}}}    P}}}   }}}}}}}}}}}}}}}}}}}}}}}
+8}}}          P}}  }}}}}}}}}}}     P}}}}}}}}}}}}}}}}}}}}}}}}}}
+9}}}}}  }  }    }}}}}}}}}}}}}  }}}P}}}}}}}}}}}}}}}}}}}}}}}}}}
+0}}}}}}} } }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+
+MONSTER: ('@',"lieutenant"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"crossbow"),random
+OBJECT:(')',"crossbow bolt"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"knife"),random
+OBJECT:(')',"spear"),random
+OBJECT:(')',"spear"),random
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0}}}}}}}}}......         }}}}}}PP}}}}}}}}}}}}}}  }} }}}}}}}}}        }}}}}}}}
+1}}}  }..........}}   }}}}}}}}PP}}}}P}}}}}}}}   }   }}}}}}        }}}}
+2}}}} .}}}......}}}}}}}}}}}}}.}}}}P.   }}}}}}}}  }}}}} }}}}}  } }}}
+3}}}}.}..}}...}}   }}}}}}PPP}}}}}P.     }}   }}}}}}}} }}}   } }}
+4}}}. .}}  }.}}}}}   }}}}}PPPP}}}}P. }}}}     }}}}}   }} }}
+5}}.}.}....  }..}}}}}} .PP}PPP}}}}}}}}}}}}}   }}}}}} }}  }}}}}}}}
+6}}}.}}.... }}}.}.}  ...-----------------++-------}}}}----}---|}
+7}}}.}.}...P...}.}...--H|                                     --|}}
+8}}}}..}}}.   }}}}}--|                                          -|}}
+9}.}.}}..}...  }}--|                                            }   HH
+0.}.}..}}...}}}}-|                                               HHH
+1}.}}}.}..} }}}}}--|                                             |
+2}}.}.....  }}.....--|                                          -|
+3}}}.}.... }}}}.....}---|                                     -++}
+4}}}}..}}..P ..}}}}}}PP}--------------------------++--}}----}-|}}
+5}}}}}.}.....  ....PPPPP}}}}}}}}PPP}}}}   }}}}}}}}}}}}}}}}}}}}}}
+6}}}}}}.....P }  }...PP}}}}}}}}P...P}} }  }}}}}}}}}}}}}}}}}}}}}}}
+7}}}}}}}}...PP}}}}...P}}}}}}}}}   .P}}}   }}}}}}}}}}}}}}}}}}}}}}}
+8}}}  ....   .P}}  }}}}}}}}}}}   ..P}}}}}}}}}}}}}}}}}}}}}}}}}}
+9}}}}}  }..}   .}}}}}}}}}}}}}  }}}P}}}}}}}}}}}}}}}}}}}}}}}}}}
+0}}}}}}}.} }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+
+MONSTER: (' ',"ghost"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+# Objects (lost flotsam).
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+
+OBJECT:random,random
+OBJECT:random,random
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0}}}}}}}}}               }}}}}}PP}}}}}}}}}}}}}}  }} }}}}}}}}}        }}}}}}}}
+1}}}  }          }}   }}}}}}}}PP}}}}P}}}}}}}}   }   }}}}}}        }}}}
+2}}}}  }}}      }}}}}}}}}}}}} }}}}P    }}}}}}}}  }}}}} }}}}}  } }}}   #######
+3}}}} }  }}   }}   }}}}}}PPP}}}}}P      }}   }}}}}}}} }}}   } }}       #####
+4}}}   }}  } }}}}}   }}}}}PPPP}}}}P  }}}}     }}}}}   }} }}      ###########
+5}} } }      }  }}}}}}  PP}PPP}}}}}}}}}}}}}   }}}}}} }}  }}}}}}}}   ###  ## #
+6}}} }}     }}} } }     -----------------++-------}}}}----}---|}     ## ####
+7}}} } }   P   } }   --H|                          } }}     }}--|}}   #####
+8}}}}  }}}    }}}}}--|                              }}}}}       -|}}  #######
+9} } }}  }     }}--|                      ---           }}}  }} }   HH#######
+0 } }  }}   }}}}-|                        | |      }}}}}}   }    HHH  ##  ###
+1} }}} }  } }}}}}--|                      ---     }}}}}}}}  }  } |   ########
+2}} }       }}     --|                                 }}}}     -| ##########
+3}}} }     }}}}     }---|                           }}}}   }} -++} ##  ###  #
+4}}}}  }}  P   }}}}}}PP}--------------------------++--}}----}-|}} #####  ####
+5}}}}} }           PPPPP}}}}}}}}PPP}}}}   }}}}}}}}}}}}}}}}}}}}}}  ######## ##
+6}}}}}}     P }  }   PP}}}}}}}}P   P}} }  }}}}}}}}}}}}}}}}}}}}}}} ###########
+7}}}}}}}}   PP}}}}   P}}}}}}}}}    P}}}   }}}}}}}}}}}}}}}}}}}}}}}  ####   ##
+8}}}          P}}  }}}}}}}}}}}     P}}}}}}}}}}}}}}}}}}}}}}}}}}       #### #
+9}}}}}  }  }    }}}}}}}}}}}}}  }}}P}}}}}}}}}}}}}}}}}}}}}}}}}}      #   ### #
+0}}}}}}} } }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}    #####
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+
+
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+MONSTER: ('&',"damned pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+0}}}}}}}}}......         }}}}}}PP}}}}}}}}}}}}}}  }} }}}}}}}}}        }}}}}}}}
+1}}}  }..........}}   }}}}}}}}PP}}}}P}}}}}}}}   }   }}}}}}        }}}}
+2}}}} .}}}......}}}}}}}}}}}}}.}}}}P.   }}}}}}}}  }}}}} }}}}}  } }}}   #######
+3}}}}.}..}}...}}   }}}}}}PPP}}}}}P.     }}   }}}}}}}} }}}   } }}       #####
+4}}}. .}}  }.}}}}}   }}}}}PPPP}}}}P. }}}}     }}}}}   }} }}      ###########
+5}}.}.}....  }..}}}}}} .PP}PPP}}}}}}}}}}}}}   }}}}}} }}  }}}}}}}}   ###  ## #
+6}}}.}}.... }}}.}.}  ...-----------------++-------}}}}----}---|}     ## ####
+7}}}.}.}...P...}.}...--H|..........................}.}}.....}}--|}}   #####
+8}}}}..}}}.   }}}}}--|..............................}}}}}.......-|}}  #######
+9}.}.}}..}...  }}--|......................---...........}}}..}}.}   HH#######
+0.}.}..}}...}}}}-|........................| |......}}}}}}...}..  HHH  ##  ###
+1}.}}}.}..} }}}}}--|......................---.....}}}}}}}}..}..}.|   ########
+2}}.}.....  }}.....--|.................................}}}}.....-| ##########
+3}}}.}.... }}}}.....}---|...........................}}}}...}}.-++} ##  ###  #
+4}}}}..}}..P ..}}}}}}PP}--------------------------++--}}----}-|}}  ####  ####
+5}}}}}.}.....  ....PPPPP}}}}}}}}PPP}}}}   }}}}}}}}}}}}}}}}}}}}}}  ######## ##
+6}}}}}}.....P }  }...PP}}}}}}}}P...P}} }  }}}}}}}}}}}}}}}}}}}}}}} ###########
+7}}}}}}}}...PP}}}}...P}}}}}}}}}   .P}}}   }}}}}}}}}}}}}}}}}}}}}}}  ####   ##
+8}}}  ....   .P}}  }}}}}}}}}}}   ..P}}}}}}}}}}}}}}}}}}}}}}}}}}       #### #
+9}}}}}  }..}   .}}}}}}}}}}}}}  }}}P}}}}}}}}}}}}}}}}}}}}}}}}}}      #   ### #
+0}}}}}}}.} }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}    #####
+ENDMAP
+#0123456789012345678901234567890123456789012345678901234567890123456789012345
+#0         1         2   	   3	     4		   5		 6	       7
+REGION:(00,00,15,20),lit,"ordinary"
+
+MONSTER: ('@',"captain"),(58,10), "Captain Ketch"
+OBJECT:(')',"crossbow"),(58,10)
+OBJECT:(')',"crossbow bolt"),(58,10), blessed,+3
+
+
+# Stairs
+STAIR:(00,10),up
+STAIR:(64,00, 75,20),(00,00, 00,00),down
+
+# Non diggable walls
+NON_DIGGABLE:(56,00,75,05)
+NON_DIGGABLE:(64,06,75,14)
+NON_DIGGABLE:(56,15,75,20)
+
+#
+#	Shipwreck Island center
+#	The "goal" level for the quest.
+#
+#	Here you meet Blackbeard's Ghost, your nemesis monster.
+#   You have to defeat Nalzok in combat to gain the artifact
+#	you have been assigned to retrieve.
+#
+
+MAZE: "Pir-goal", ' '
+FLAGS: noteleport
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#01234567890123456789012345678901234567890123456789012345678901234567890
+MAP
+0
+1
+2
+3
+4
+5                                    .
+6                                  .....
+7                                  .....
+8                                 .......
+9                                  .....
+0                                  .....
+1                                    .
+2
+3
+4
+5
+6
+ENDMAP
+#01234567890123456789012345678901234567890123456789012345678901234567890
+#0         1         2   	   3	     4		   5		 6	       7
+
+CONTAINER:('(',"chest"),(35,08) {
+OBJECT:'$'
+OBJECT:'$'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+}
+CONTAINER:('(',"chest"),(36,07) {
+OBJECT:'$'
+OBJECT:'$'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+}
+CONTAINER:('(',"chest"),(36,08) {
+OBJECT:'$'
+OBJECT:'$'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+}
+CONTAINER:('(',"chest"),(36,09) {
+OBJECT:'$'
+OBJECT:'$'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+}
+CONTAINER:('(',"chest"),(37,08) {
+OBJECT:'$'
+OBJECT:'$'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+OBJECT:'*'
+}
+OBJECT:'$',(35,08)
+OBJECT:'$',(36,07)
+OBJECT:'$',(36,08)
+OBJECT:'$',(36,09)
+OBJECT:'$',(37,08)
+OBJECT:'$',(35,08)
+OBJECT:'$',(36,07)
+OBJECT:'$',(36,08)
+OBJECT:'$',(36,09)
+OBJECT:'$',(37,08)
+
+OBJECT:(')',"scimitar"),(35,08)
+OBJECT:(')',"scimitar"),(36,07)
+OBJECT:(')',"scimitar"),(36,08)
+OBJECT:(')',"scimitar"),(36,09)
+OBJECT:(')',"scimitar"),(37,08)
+
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:'(',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+OBJECT:')',random
+
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+OBJECT:'*',random
+
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+OBJECT:'$',random
+
+CONTAINER:('(',"chest"),(35,08) {
+OBJECT:'$'
+}
+
+GEOMETRY:center,center
+#0         1         2   	   3	     4		   5		 6	       7
+#01234567890123456789012345678901234567890123456789012345678901234567890
+MAP
+0                        ###                                         #
+1#                      ###                  #                       ##
+2###                   ##            .        ##                      ##
+3 ###                 ##            ###       ###        #           ##
+4  ###                #           #H#H#HH       #         ##         #
+5    ##        #                 H#  #  ##       #         ###      #
+6     #       ##                 H ##H## H                  ###
+7            ##                 ## #H#H# ##                  ###
+8           ##                 .#H#H###H#H#.                 ##
+9          ###                  ## #H#H# ##                 ##
+0           ###                  H ##H## H                 ##     #
+1   #        ###         #       ##  #  #H                 #      ##
+2  #           ##         #       HH#H#H#           #              ###
+3 ##             #        ###       ###            ##               ###
+4##                        ##        .            ##                 ###
+5 ##                         #                  ###                    #
+6  #                                           ###
+ENDMAP
+#01234567890123456789012345678901234567890123456789012345678901234567890
+#0         1         2   	   3	     4		   5		 6	       7
+# Dungeon Description
+REGION:(34,06,38,10),  lit,"ordinary"
+# Stairs
+STAIR:(00,00, 70,16), (20,00, 50,16),up
+
+MAZEWALK:(36,02),north
+MAZEWALK:(30,08),west
+MAZEWALK:(42,08),east
+MAZEWALK:(36,14),south
+
+# Objects
+# OBJECT:('(',"chest"),(36,08),cursed,0,name:"The Treasury of Proteus"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# Random monsters.
+MONSTER:(' ',"Blackbeard's Ghost"),(36,08)
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:'Z',random
+MONSTER:'Z',random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:'W',random
+
+MONSTER: ('&',"damned pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+MONSTER: ('&',"damned pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+MONSTER: ('&',"damned pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+#
+#	The "fill" levels for the quest.
+#
+#	These levels are used to fill out any levels not occupied by specific
+#	levels as defined above. "filla" is the upper filler, between the
+#	start and locate levels, and "fillb" the lower between the locate
+#	and goal levels.
+#
+#
+
+MAZE: "Pir-fila",' '
+FLAGS: noteleport,shortsighted
+INIT_MAP: mines, '.' , '}' , false, false , lit , false
+NOMAP
+STAIR: (20,00,75,20), (0,0,20,20), down
+
+MONSTER: (' ',"ghost"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+MONSTER: ('@',"soldier"),random
+
+MONSTER: ('B',"parrot"),random
+MONSTER: ('B',"parrot"),random
+MONSTER: ('B',"parrot"),random
+MONSTER: ('B',"parrot"),random
+
+MONSTER: ('Y',"monkey"),random
+MONSTER: ('Y',"monkey"),random
+
+REGION:(00,00,75,20),  lit,"ordinary"
+GEOMETRY:left,bottom
+MAP
+}.}}
+....
+}.}.
+ENDMAP
+STAIR: (01,01), up
+REGION:(00,00,03,02),  lit,"ordinary"
+
+MAZE: "Pir-filb",' '
+FLAGS: noteleport
+INIT_MAP: mines, '#' , ' ' , true , true , unlit, true
+NOMAP
+#
+STAIR: random, up
+STAIR: random, down
+#
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+OBJECT:random,random
+TRAP: random, random
+
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+MONSTER: (' ',"ghost"),random
+
+MONSTER: ('@',"sergeant"),random
+
+MONSTER: ('&',"damned pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+MONSTER: ('Z',"skeletal pirate"),random
+

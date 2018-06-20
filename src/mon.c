@@ -1545,6 +1545,31 @@ struct monst *magr, /* monster that is currently deciding where to move */
     if(ma == &mons[PM_ASMODEUS] && md == &mons[PM_MEPHISTO])
         return ALLOW_M|ALLOW_TM;
 
+    /* Pirate patch. TODO: Clean this up */
+    if (magr->data == &mons[PM_SKELETAL_PIRATE] &&
+      is_mercenary(mdef->data))
+     	  return ALLOW_M|ALLOW_TM;
+   	else if (mdef->data == &mons[PM_SKELETAL_PIRATE] &&
+   		is_mercenary(magr->data))
+   	    return ALLOW_M|ALLOW_TM;
+
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		is_mercenary(mdef->data))
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (mdef->data == &mons[PM_DAMNED_PIRATE] &&
+   		is_mercenary(magr->data))
+   	    return ALLOW_M|ALLOW_TM;
+
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (magr->data == &mons[PM_PLANAR_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+
     /* Endgame amulet theft / fleeing */
     if(mon_has_amulet(magr) && In_endgame(&u.uz)) {
         return ALLOW_M|ALLOW_TM;

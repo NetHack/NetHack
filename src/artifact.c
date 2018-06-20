@@ -162,7 +162,8 @@ aligntyp alignment; /* target alignment, or A_NONE */
                 eligible[0] = m;
                 n = 1;
                 break; /* skip all other candidates */
-            }
+            } else if(by_align && Role_if(PM_PIRATE))
+                continue; /* pirates are not gifted artifacts */
             /* found something to consider for random selection */
             if (a->alignment != A_NONE || u.ugifts > 0) {
                 /* right alignment, or non-aligned with at least 1
@@ -1305,6 +1306,95 @@ int dieroll; /* needed for Magicbane and vorpal blades */
            no further attacks have side-effects on inventory */
         return FALSE;
     }
+   	if(otmp->oartifact == ART_REAVER){
+   	 if(youattack){
+   	  if(mdef->minvent && (Role_if(PM_PIRATE) || !rn2(10) ) ){
+   		struct obj *otmp2;
+   		long unwornmask;
+
+   		if((otmp2 = mdef->minvent) != 0) {
+   			/* take the object away from the monster */
+   			obj_extract_self(otmp2);
+   			if ((unwornmask = otmp2->owornmask) != 0L) {
+   				mdef->misc_worn_check &= ~unwornmask;
+   				if (otmp2->owornmask & W_WEP) {
+   					setmnotwielded(mdef,otmp2);
+   					MON_NOWEP(mdef);
+   				}
+   				otmp2->owornmask = 0L;
+   				update_mon_intrinsics(mdef, otmp2, FALSE, FALSE);
+   			}
+   			/* give the object to the character */
+   			otmp2 = Role_if(PM_PIRATE) ?
+   				hold_another_object(otmp2, "Ye snatched but dropped %s.",
+   						   doname(otmp2), "Ye steal: ") :
+   				hold_another_object(otmp2, "You snatched but dropped %s.",
+   						   doname(otmp2), "You steal: ");
+   			if (otmp2->otyp == CORPSE &&
+   				touch_petrifies(&mons[otmp2->corpsenm]) && !uarmg) {
+   				char kbuf[BUFSZ];
+
+   				Sprintf(kbuf, "stolen %s corpse", mons[otmp2->corpsenm].mname);
+   				instapetrify(kbuf);
+   			}
+   			/* more take-away handling, after theft message */
+   			if (unwornmask & W_WEP) {		/* stole wielded weapon */
+   				possibly_unwield(mdef, FALSE);
+   			} else if (unwornmask & W_ARMG) {	/* stole worn gloves */
+   				mselftouch(mdef, (const char *)0, TRUE);
+   				if (mdef->mhp <= 0)	/* it's now a statue */
+   					return 1; /* monster is dead */
+   			}
+   		}
+   	  }
+   	 }
+   	 else if(youdefend){
+   		char buf[BUFSZ];
+   		buf[0] = '\0';
+   		steal(magr, buf, TRUE);
+   	 }
+   	 else{
+   		struct obj *obj;
+   		/* find an object to steal, non-cursed if magr is tame */
+   		for (obj = mdef->minvent; obj; obj = obj->nobj)
+   		    if (!magr->mtame || !obj->cursed)
+   				break;
+
+   		if (obj) {
+   			char buf[BUFSZ], onambuf[BUFSZ], mdefnambuf[BUFSZ];
+
+   			/* make a special x_monnam() call that never omits
+   			   the saddle, and save it for later messages */
+   			Strcpy(mdefnambuf, x_monnam(mdef, ARTICLE_THE, (char *)0, 0, FALSE));
+   			if (u.usteed == mdef &&
+   					obj == which_armor(mdef, W_SADDLE))
+   				/* "You can no longer ride <steed>." */
+   				dismount_steed(DISMOUNT_POLY);
+   			obj_extract_self(obj);
+   			if (obj->owornmask) {
+   				mdef->misc_worn_check &= ~obj->owornmask;
+   				if (obj->owornmask & W_WEP)
+   				    setmnotwielded(mdef,obj);
+   				obj->owornmask = 0L;
+   				update_mon_intrinsics(mdef, obj, FALSE, FALSE);
+   			}
+   			/* add_to_minv() might free obj [if it merges] */
+   			if (vis)
+   				Strcpy(onambuf, doname(obj));
+   			(void) add_to_minv(magr, obj);
+   			if (vis) {
+   				Strcpy(buf, Monnam(magr));
+   				pline("%s steals %s from %s!", buf,
+   				    onambuf, mdefnambuf);
+   			}
+   			possibly_unwield(mdef, FALSE);
+   			mdef->mstrategy &= ~STRAT_WAITFORU;
+   			mselftouch(mdef, (const char *)0, FALSE);
+   			if (mdef->mhp <= 0)
+   				return 1;
+   		}
+   	 }
+   	}
 
     /* We really want "on a natural 20" but Nethack does it in */
     /* reverse from AD&D. */
@@ -1728,6 +1818,10 @@ struct obj *obj;
                                        aobjnam(otmp, "fall"), (char *) 0);
             break;
         }
+        case OBJECT_DET:
+         		object_detect(obj, 0);
+         		artifact_detect(obj);
+         		break;
         }
     } else {
         long eprop = (u.uprops[oart->inv_prop].extrinsic ^= W_ARTI),
@@ -2296,6 +2390,60 @@ struct monst *mon; /* if null, hero assumed */
             return o;
     }
     return (struct obj *) 0;
+}
+
+static const char *random_seasound[] = {
+   	"distant waves",
+   	"distant surf",
+   	"the distant sea",
+   	"the call of the ocean",
+   	"waves against the shore",
+   	"flowing water",
+   	"the sighing of waves",
+   	"quarrelling gulls",
+   	"the song of the deep",
+   	"rumbling in the deeps",
+   	"the singing of Eidothea",
+   	"the laughter of the protean nymphs",
+   	"rushing tides",
+   	"the elusive sea change",
+   	"the silence of the sea",
+   	"the passage of the albatross",
+   	"dancing raindrops",
+   	"coins rolling on the seabed",
+   	"treasure galleons crumbling in the depths",
+   	"waves lapping against a hull"
+};
+
+/* Polymorph obj contents */
+void
+arti_poly_contents(obj)
+struct obj *obj;
+{
+    struct obj *dobj = 0;  /*object to be deleted*/
+    struct obj *otmp;
+   	You_hear("%s.",random_seasound[rn2(SIZE(random_seasound))]);
+   	for (otmp = obj->cobj; otmp; otmp = otmp->nobj){
+     		if (dobj) {
+     			  delobj(dobj);
+     			    dobj = 0;
+     		}
+   		if(!obj_resists(otmp, 5, 95)) {
+     			/* KMH, conduct */
+     			u.uconduct.polypiles++;
+     			/* any saved lock context will be dangerously obsolete */
+     			if (Is_box(otmp)) (void) boxlock(otmp, obj);
+
+     			if (obj_shudders(otmp)) {
+     				  dobj = otmp;
+     			}
+     			else otmp = poly_obj(otmp, STRANGE_OBJECT);
+   		}
+   	}
+   	if (dobj) {
+     		delobj(dobj);
+     		dobj = 0;
+   	}
 }
 
 /*artifact.c*/

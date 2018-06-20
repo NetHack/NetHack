@@ -20,6 +20,70 @@ static void FDECL(execplinehandler, (const char *));
 unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
 char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
 
+/*Ben Collver's fixes*/
+const char *
+replace(st, orig, repl)
+const char *st, *orig, *repl;
+{
+  	static char retval[TBUFSZ];
+  	char buffer[TBUFSZ];
+  	const char *ch, *pos;
+  	size_t len;
+  	memset(buffer, 0, TBUFSZ);
+  	pos = st;
+  	while ((ch = strstr(pos, orig))){
+    		len = (ch - pos);
+    		strncat(buffer, pos, len);
+    		strncat(buffer, repl, strlen(repl));
+    		pos = (ch + strlen(orig));
+  	}
+  	if (pos == st) {
+  		  return st;
+  	}
+  	if (pos < (st + strlen(st))) {
+  		  strncat(buffer, pos, (st - pos));
+  	}
+  	strcpy(retval, buffer);
+  	return retval;
+}
+
+
+/*Ben Collver's fixes*/
+const char *
+piratesay(orig)
+const char *orig;
+{
+		orig = replace(orig,"You","Ye");
+		orig = replace(orig,"you","ye");
+		orig = replace(orig,"His","'is");
+		orig = replace(orig," his"," 'is");
+		orig = replace(orig,"Her","'er");
+		orig = replace(orig," her"," 'er");
+		orig = replace(orig,"Are","Be");
+		orig = replace(orig," are"," be");
+		orig = replace(orig,"Is","Be");
+		orig = replace(orig," is"," be");
+		orig = replace(orig,"Of","O'");
+		orig = replace(orig," ear"," lug");
+		orig = replace(orig," lugth"," earth");
+		orig = replace(orig,"Ear","Lug");
+		orig = replace(orig,"Lugth","Earth");
+		orig = replace(orig," eye"," deadlight");
+		orig = replace(orig,"Eye","Deadlight");
+		orig = replace(orig,"zorkmid","doubloon");
+		orig = replace(orig,"Zorkmid","Doubloon");
+		orig = replace(orig,"gold coins","pieces of eight");
+		orig = replace(orig,"Gold coins","Pieces of eight");
+		orig = replace(orig,"gold coin","piece of eight");
+		orig = replace(orig,"Gold coin","Piece of eight");
+		orig = replace(orig,"gold pieces","pieces of eight");
+		orig = replace(orig,"Gold pieces","Pieces of eight");
+		orig = replace(orig,"gold piece","piece of eight");
+		orig = replace(orig,"Gold piece","Piece of eight");
+    orig = replace(orig,"Ouch!","Arrr!");
+		return orig;
+}
+
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
 void
 dumplogmsg(line)
@@ -66,6 +130,7 @@ dumplogfreemessages()
 /* Note that these declarations rely on knowledge of the internals
  * of the variable argument handling stuff in "tradstdc.h"
  */
+
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(vpline, (const char *, va_list));
@@ -140,6 +205,11 @@ VA_DECL(const char *, line)
     if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
+
+   	if(Role_if(PM_PIRATE)){
+     		line = piratesay(line);
+   	}
+
     /* use raw_print() if we're called too early (or perhaps too late
        during shutdown) or if we're being called recursively (probably
        via debugpline() in the interface code) */

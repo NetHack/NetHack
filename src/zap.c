@@ -4922,6 +4922,8 @@ register int osym, dmgtyp;
             xresist = (Fire_resistance && obj->oclass != POTION_CLASS
                        && obj->otyp != GLOB_OF_GREEN_SLIME);
 
+            if (osym==SCROLL_CLASS && obj->oartifact)
+            		skip++;
             if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
                 skip++;
             if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
@@ -5130,6 +5132,8 @@ int osym, dmgtyp;
                 skip++;
             break;
         case AD_FIRE:
+            if (osym==SCROLL_CLASS && obj->oartifact)
+            		skip++;
             if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
                 skip++;
             if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {

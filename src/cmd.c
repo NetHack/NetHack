@@ -2176,7 +2176,8 @@ int final;
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
                                                     "the Envoy of Balance",
                                                     "the Glory of Arioch" };
-        you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
+        if(Role_if(PM_PIRATE)) you_are("the Pirate King", "");
+        else you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
     }
 
     Sprintf(buf, "%s", piousness(TRUE, "aligned"));

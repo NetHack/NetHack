@@ -11,6 +11,9 @@ Patches
 - Implemented a heavily modified version of the descriptive hit messages patch
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
+- Chris's Pirate patch was implemented, thus adding the pirate role to the game.
+  Updating this to be compatible with 3.6.1 took quite a bit of work, so for
+  those trying to add it to 3.6.1 I would recommend looking at what I did here.
 
 QOL and Major Balance Changes
 - Dropped the quest entry requirement to level 10.
@@ -28,13 +31,16 @@ QOL and Major Balance Changes
   wishing. Wishes for wands of death and archon figurines were removed.
 - Vlad now  has a slowing attack.
 
-New Monsters (8)
+New Monsters (16)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
   transmit regular lycanthropy, and can (rarely) summon normal werewolves.
 - Added ratmen and mutated ratmen. Both are low-level monsters that spawn
   randomly.
+- The pirate patch adds damned pirates, skeletal pirates, parrots, Mayor
+  Cumberbund, Blackbeard's Ghost, pirates, pirate brothers, and planar pirates.
+  These are not usually encountered unless one is a pirate.
 
 New Objects
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
@@ -48,6 +54,13 @@ New Objects
 - Scrolls of Knowledge: Essentially scrolls of reverse identify, like those
   that appear in Nethack, the Next Generation. Reading one will allow you to
   identify any item in the game by prompt.
+
+New Artifacts
+- Chest of Proteus: The pirate quest artifact. Catches curses and occasionally
+  polymorphs the items placed inside it.
+- Reaver: An artifact scimitar. Sacrifice gift for pirates.
+- Marauder's Map: An artifact scroll of magic mapping. Sacrifice gift for
+  pirates. Can also be used to detect artifacts.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.

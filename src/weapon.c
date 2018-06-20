@@ -261,6 +261,10 @@ struct monst *mon;
         case TWO_HANDED_SWORD:
             tmp += d(2, 6);
             break;
+        case SCIMITAR:
+        		if(otmp->oartifact == ART_REAVER)
+                tmp += d(1,8);
+            break;
         }
     } else {
         if (objects[otyp].oc_wsdam)
@@ -293,6 +297,8 @@ struct monst *mon;
         case ACID_VENOM:
             tmp += rnd(6);
             break;
+        case SCIMITAR:
+        		if(otmp->oartifact == ART_REAVER) tmp += d(1,8); break;
         }
     }
     if (Is_weapon) {

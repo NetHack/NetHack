@@ -190,7 +190,7 @@
 #define HInvis u.uprops[INVIS].intrinsic
 #define EInvis u.uprops[INVIS].extrinsic
 #define BInvis u.uprops[INVIS].blocked
-#define Invis ((HInvis || EInvis) && !BInvis)
+#define Invis ((HInvis || EInvis || Underwater) && !BInvis)
 #define Invisible (Invis && !See_invisible)
 /* Note: invisibility also hides inventory and steed */
 
@@ -200,7 +200,7 @@
 #define HStealth u.uprops[STEALTH].intrinsic
 #define EStealth u.uprops[STEALTH].extrinsic
 #define BStealth u.uprops[STEALTH].blocked
-#define Stealth ((HStealth || EStealth) && !BStealth)
+#define Stealth ((HStealth || EStealth || Underwater) && !BStealth)
 
 #define HAggravate_monster u.uprops[AGGRAVATE_MONSTER].intrinsic
 #define EAggravate_monster u.uprops[AGGRAVATE_MONSTER].extrinsic

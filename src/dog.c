@@ -66,7 +66,14 @@ pet_type()
         return  PM_LITTLE_DOG;
     else if (preferred_pet == 'b')
         return PM_LITTLE_BIRD;
-    else
+    else if (Role_if(PM_PIRATE)) {
+     		if (preferred_pet == 'B')
+     			  return (PM_PARROT);
+     		else if(preferred_pet == 'Y')
+     			  return PM_MONKEY;
+     		else
+     			  return (rn2(2) ? PM_PARROT : PM_MONKEY);
+    } else
         switch(rn2(3)) {
             case 0:
                 return PM_KITTEN;

@@ -32,11 +32,6 @@ struct Jitem {
     const char *name;
 };
 
-struct Caritem {
-    int item;
-    const char *name;
-};
-
 #define BSTRCMPI(base, ptr, str) ((ptr) < base || strcmpi((ptr), str))
 #define BSTRNCMPI(base, ptr, str, num) \
     ((ptr) < base || strncmpi((ptr), str, num))
@@ -49,7 +44,15 @@ struct Caritem {
          && (typ != DILITHIUM_CRYSTAL && typ != RUBY && typ != DIAMOND \
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
-
+STATIC_OVL struct Jitem Pirate_items[] = { { POT_BOOZE, "rum" },
+                                        	 { CRAM_RATION, "sea biscuit" },
+                                        	 { SCIMITAR, "cutlass" },
+                                        	 { SMALL_SHIELD, "buckler" },
+                                        	 { SACK, "ditty bag" },
+                                        	 { LARGE_BOX, "foot locker" },
+                                        	 { CLUB, "belaying pin" },
+                                           { QUARTERSTAFF, "oar"},
+                                        	 {0, "" } };
 STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
@@ -64,7 +67,7 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
 
-STATIC_OVL struct Caritem Cartomancer_items[] = {
+STATIC_OVL struct Jitem Cartomancer_items[] = {
   { LARGE_BOX, "deck box" },
   { LOCK_PICK, "worthless card" },
   { SHURIKEN, "razor card" },
@@ -74,8 +77,7 @@ STATIC_OVL struct Caritem Cartomancer_items[] = {
   { CREDIT_CARD, "banned card" },
   { 0, "" } };
 
-STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
-STATIC_DCL const char *FDECL(Cartomancer_item_name, (int i));
+STATIC_DCL const char *FDECL(Alternate_item_name,(int i, struct Jitem * ));
 
 STATIC_OVL char *
 strprepend(s, pref)
@@ -130,10 +132,12 @@ register int otyp;
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
-        actualn = Japanese_item_name(otyp);
-    if (Role_if(PM_CARTOMANCER) && Cartomancer_item_name(otyp))
-        actualn = Cartomancer_item_name(otyp);
+    if (Role_if(PM_SAMURAI) && Alternate_item_name(otyp,Japanese_items))
+     		actualn = Alternate_item_name(otyp,Japanese_items);
+    else if (Role_if(PM_CARTOMANCER) && Alternate_item_name(otyp,Cartomancer_items))
+     		actualn = Alternate_item_name(otyp,Cartomancer_items);
+    else if (Role_if(PM_PIRATE) && Alternate_item_name(otyp,Pirate_items))
+     		actualn = Alternate_item_name(otyp,Pirate_items);
     switch (ocl->oc_class) {
     case COIN_CLASS:
         Strcpy(buf, "coin");
@@ -432,10 +436,12 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     boolean known, dknown, bknown;
 
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
-        actualn = Japanese_item_name(typ);
-    if (Role_if(PM_CARTOMANCER) && Cartomancer_item_name(typ))
-        actualn = Cartomancer_item_name(typ);
+    if (Role_if(PM_SAMURAI) && Alternate_item_name(typ,Japanese_items))
+     		actualn = Alternate_item_name(typ,Japanese_items);
+    else if (Role_if(PM_CARTOMANCER) && Alternate_item_name(typ,Cartomancer_items))
+     		actualn = Alternate_item_name(typ,Cartomancer_items);
+    else if (Role_if(PM_PIRATE) && Alternate_item_name(typ,Pirate_items))
+     		actualn = Alternate_item_name(typ,Pirate_items);
 
     buf[0] = '\0';
     /*
@@ -1978,6 +1984,10 @@ register const char *verb;
      * Special case: allow null sobj to get the singular 3rd person
      * present tense form so we don't duplicate this code elsewhere.
      */
+    if(Role_if(PM_PIRATE) && !strcmp(verb,"are")) {
+    		Strcpy(buf,"be");
+    		return buf;
+    }
     if (subj) {
         if (!strncmpi(subj, "a ", 2) || !strncmpi(subj, "an ", 3))
             goto sing;
@@ -3480,24 +3490,18 @@ srch:
     typ = 0;
 
     if (actualn) {
-        struct Jitem *j = Japanese_items;
-        struct Caritem *c = Cartomancer_items;
-
-        while (j->item) {
-            if (actualn && !strcmpi(actualn, j->name)) {
-                typ = j->item;
-                goto typfnd;
-            }
-            j++;
-        }
-        while (c->item) {
-            if (actualn && !strcmpi(actualn, c->name)) {
-                typ = c->item;
-                goto typfnd;
-            }
-            c++;
-        }
-    }
+ 		    struct Jitem *j[] = {Japanese_items,Pirate_items,Cartomancer_items};
+    		for(i = 0; (unsigned long) i < sizeof(j) / sizeof(j[0]); i++)
+    		{
+         		while(j[i]->item) {
+           			if (actualn && !strcmpi(actualn, j[i]->name)) {
+           				  typ = j[i]->item;
+            				goto typfnd;
+            		}
+           			j[i]++;
+         		}
+  		  }
+  	}
     /* if we've stripped off "armor" and failed to match anything
        in objects[], append "mail" and try again to catch misnamed
        requests like "plate armor" and "yellow dragon scale armor" */
@@ -4022,6 +4026,7 @@ typfnd:
     /* more wishing abuse: don't allow wishing for certain artifacts */
     /* and make them pay; charge them for the wish anyway! */
     if ((is_quest_artifact(otmp)
+         || (Role_if(PM_PIRATE) && otmp->oartifact == ART_REAVER)
          || (otmp->oartifact && rn2(u.uconduct.wisharti) > 1)) && !wizard) {
         artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0);
@@ -4069,31 +4074,16 @@ int first, last;
 }
 
 STATIC_OVL const char *
-Japanese_item_name(i)
+Alternate_item_name(i,alternate_items)
 int i;
+struct Jitem *alternate_items;
 {
-    struct Jitem *j = Japanese_items;
-
-    while (j->item) {
-        if (i == j->item)
-            return j->name;
-        j++;
+   	while(alternate_items->item) {
+   		  if (i == alternate_items->item)
+   			    return alternate_items->name;
+   		  alternate_items++;
     }
-    return (const char *) 0;
-}
-
-STATIC_OVL const char *
-Cartomancer_item_name(i)
-int i;
-{
-    struct Caritem *c = Cartomancer_items;
-
-    while (c->item) {
-        if (i == c->item)
-            return c->name;
-        c++;
-    }
-    return (const char *) 0;
+    return (const char *)0;
 }
 
 const char *

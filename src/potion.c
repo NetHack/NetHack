@@ -414,11 +414,19 @@ boolean talk;
 void
 self_invis_message()
 {
-    pline("%s %s.",
-          Hallucination ? "Far out, man!  You"
-                        : "Gee!  All of a sudden, you",
-          See_invisible ? "can see right through yourself"
-                        : "can't see yourself");
+    if(Role_if(PM_PIRATE)){
+       	pline("%s %s.",
+       	    Hallucination ? "Arr, Matey!  Ye" : "Avast!  All of a sudden, ye",
+       	    See_invisible ? "can see right through yerself" :
+       		"can't see yerself");
+       	}
+    else{
+        pline("%s %s.",
+              Hallucination ? "Far out, man!  You"
+                            : "Gee!  All of a sudden, you",
+              See_invisible ? "can see right through yourself"
+                            : "can't see yourself");
+    }
 }
 
 STATIC_OVL void
@@ -1190,7 +1198,7 @@ const char *txt;
         && !objects[obj->otyp].oc_uname)
         docall(obj);
 
-    useup(obj);
+    if(!(obj->oartifact)) useup(obj);
 }
 
 const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",

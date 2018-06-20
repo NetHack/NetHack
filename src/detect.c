@@ -580,7 +580,8 @@ int class;            /* an object class, 0 for all */
     char stuff[BUFSZ];
     int is_cursed = (detector && detector->cursed);
     int do_dknown = (detector && (detector->oclass == POTION_CLASS
-                                  || detector->oclass == SPBOOK_CLASS)
+                                  || detector->oclass == SPBOOK_CLASS
+                                  || detector->oartifact)
                      && detector->blessed);
     int ct = 0, ctu = 0;
     register struct obj *obj, *otmp = (struct obj *) 0;
@@ -763,6 +764,117 @@ int class;            /* an object class, 0 for all */
         under_water(2);
     if (u.uburied)
         under_ground(2);
+    return 0;
+}
+
+/*
+ * Used for artifact effects.  Returns:
+ *
+ *	1 - nothing was detected
+ *	0 - something was detected
+ */
+int
+artifact_detect(detector)
+struct obj	*detector;	/* object doing the detecting */
+{
+    register int x, y;
+    char stuff[BUFSZ];
+    int is_cursed = (detector && detector->cursed);
+    int do_dknown = (detector && (detector->oclass == POTION_CLASS ||
+				    detector->oclass == SPBOOK_CLASS ||
+					detector->oartifact) &&
+			detector->blessed);
+    int ct = 0;
+    register struct obj *obj;
+    register struct monst *mtmp;
+    int uw = u.uinwater;
+
+	if (is_cursed){ /* Possible false negative */
+		strange_feeling(detector, "You feel a lack of something.");
+	    return 1;
+	}
+
+    if (Hallucination)
+		Strcpy(stuff, something);
+    else
+    	Strcpy(stuff, "artifacts");
+
+    if (do_dknown) for(obj = invent; obj; obj = obj->nobj) do_dknown_of(obj);
+
+    for (obj = fobj; obj; obj = obj->nobj) {
+	if (obj && obj->oartifact) {
+	    if (obj->ox != u.ux || obj->oy != u.uy) ct++;
+	}
+	if (do_dknown) do_dknown_of(obj);
+    }
+
+    for (obj = level.buriedobjlist; obj; obj = obj->nobj) {
+	if (obj && obj->oartifact) {
+	    if (obj->ox != u.ux || obj->oy != u.uy) ct++;
+	}
+	if (do_dknown) do_dknown_of(obj);
+    }
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+	if (DEADMONSTER(mtmp)) continue;
+		for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+			if (obj && obj->oartifact) ct++;
+			if (do_dknown) do_dknown_of(obj);
+		}
+	}
+
+    if (!clear_stale_map(ALL_CLASSES, 0) && !ct) {
+		strange_feeling(detector, "You feel a lack of something.");
+	    return 1;
+	}
+
+    cls();
+
+    u.uinwater = 0;
+/*
+ *	Map all buried objects first.
+ */
+    for (obj = level.buriedobjlist; obj; obj = obj->nobj)
+		if (obj && obj->oartifact) {
+			map_object(obj, 1);
+		}
+    /*
+     * If we are mapping all objects, map only the top object of a pile or
+     * the first object in a monster's inventory.  Otherwise, go looking
+     * for a matching object class and display the first one encountered
+     * at each location.
+     *
+     * Objects on the floor override buried objects.
+     */
+    for (x = 1; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
+		if (obj && obj->oartifact) {
+			map_object(obj, 1);
+	break;
+		}
+    /* Objects in the monster's inventory override floor objects. */
+    for (mtmp = fmon ; mtmp ; mtmp = mtmp->nmon) {
+	if (DEADMONSTER(mtmp)) continue;
+	for (obj = mtmp->minvent; obj; obj = obj->nobj)
+	    if (obj && obj->oartifact) {
+			map_object(obj, 1);
+	break;
+	    }
+    }
+
+    newsym(u.ux,u.uy);
+    You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
+    display_nhwindow(WIN_MAP, TRUE);
+    /*
+     * What are we going to do when the hero does an object detect while blind
+     * and the detected object covers a known pool?
+     */
+    docrt();	/* this will correctly reset vision */
+
+    u.uinwater = uw;
+    if (Underwater) under_water(2);
+    if (u.uburied) under_ground(2);
     return 0;
 }
 

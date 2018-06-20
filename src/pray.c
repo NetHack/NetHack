@@ -755,33 +755,40 @@ gcrownu()
 
     obj = ok_wep(uwep) ? uwep : 0;
     already_exists = in_hand = FALSE; /* lint suppression */
+   	if( Role_if(PM_PIRATE) ){
+     		u.uevent.uhand_of_elbereth = 2; /* Alignment of P King is treated as neutral */
+     		in_hand = (uwep && uwep->oartifact == ART_REAVER);
+     		already_exists = exist_artifact(SCIMITAR, artiname(ART_REAVER));
+     		verbalize("Hurrah for our Pirate King!");
+   	} else {
     switch (u.ualign.type) {
-    case A_LAWFUL:
-        u.uevent.uhand_of_elbereth = 1;
-        verbalize("I crown thee...  The Hand of Elbereth!");
-        livelog_printf(LL_DIVINEGIFT,
-                "was crowned \"The Hand of Elbereth\" by %s", u_gname());
-        break;
-    case A_NEUTRAL:
-        u.uevent.uhand_of_elbereth = 2;
-        in_hand = (uwep && uwep->oartifact == ART_VORPAL_BLADE);
-        already_exists =
-            exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
-        verbalize("Thou shalt be my Envoy of Balance!");
-        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
-                s_suffix(u_gname()));
-        break;
-    case A_CHAOTIC:
-        u.uevent.uhand_of_elbereth = 3;
-        in_hand = (uwep && uwep->oartifact == ART_STORMBRINGER);
-        already_exists =
-            exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
-        verbalize("Thou art chosen to %s for My Glory!",
-                  already_exists && !in_hand ? "take lives" : "steal souls");
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
-                already_exists && !in_hand ? "take lives" : "steal souls",
-                u_gname());
-        break;
+        case A_LAWFUL:
+            u.uevent.uhand_of_elbereth = 1;
+            verbalize("I crown thee...  The Hand of Elbereth!");
+            livelog_printf(LL_DIVINEGIFT,
+                    "was crowned \"The Hand of Elbereth\" by %s", u_gname());
+            break;
+        case A_NEUTRAL:
+            u.uevent.uhand_of_elbereth = 2;
+            in_hand = (uwep && uwep->oartifact == ART_VORPAL_BLADE);
+            already_exists =
+                exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
+            verbalize("Thou shalt be my Envoy of Balance!");
+            livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
+                    s_suffix(u_gname()));
+            break;
+        case A_CHAOTIC:
+            u.uevent.uhand_of_elbereth = 3;
+            in_hand = (uwep && uwep->oartifact == ART_STORMBRINGER);
+            already_exists =
+                exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
+            verbalize("Thou art chosen to %s for My Glory!",
+                      already_exists && !in_hand ? "take lives" : "steal souls");
+            livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
+                    already_exists && !in_hand ? "take lives" : "steal souls",
+                    u_gname());
+            break;
+        }
     }
 
     class_gift = STRANGE_OBJECT;
@@ -814,6 +821,27 @@ gcrownu()
         goto make_splbk;
     }
 
+	if( Role_if(PM_PIRATE) ){
+		if (class_gift != STRANGE_OBJECT) {
+			;		/* already got bonus above for some reason */
+		} else if (in_hand) {
+			Your("%s rings with the sound of waves!", xname(obj));
+			obj->dknown = TRUE;
+		} else if (!already_exists) {
+			obj = mksobj(SCIMITAR, FALSE, FALSE);
+			obj = oname(obj, artiname(ART_REAVER));
+			obj->spe = 1;
+			at_your_feet("A sword");
+			dropy(obj);
+			u.ugifts++;
+		}
+		/* acquire Reaver's skill regardless of weapon or gift,
+			although pirates are already good at using scimitars */
+		unrestrict_weapon_skill(P_SCIMITAR);
+		if (obj && obj->oartifact == ART_REAVER)
+			discover_artifact(ART_REAVER);
+	}
+	else {
     switch (u.ualign.type) {
     case A_LAWFUL:
         if (class_gift != STRANGE_OBJECT) {
@@ -876,6 +904,7 @@ gcrownu()
         obj = 0; /* lint */
         break;
     }
+	}
 
     /* enhance weapon regardless of alignment or artifact status */
     if (ok_wep(obj)) {
