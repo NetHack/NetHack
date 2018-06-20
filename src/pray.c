@@ -1264,6 +1264,19 @@ boolean bless_water;
     return (boolean) (changed > 0L);
 }
 
+int
+check_malign(mtmp)
+register struct monst *mtmp;
+{
+    if (mtmp->data->maligntyp < 0) {
+        return A_CHAOTIC;
+    } else if (mtmp->data->maligntyp > 0) {
+        return A_LAWFUL;
+    } else {
+        return A_NEUTRAL;
+    }
+}
+
 boolean
 moffer(mtmp)
 register struct monst *mtmp;
@@ -1274,7 +1287,7 @@ register struct monst *mtmp;
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         /* valid corpse and altar combination with which to sacrifice */
         if (otmp->otyp == CORPSE &&
-            a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp &&
+            a_align(mtmp->mx, mtmp->my) == check_malign(mtmp) &&
             (otmp->corpsenm == PM_ACID_BLOB
              || (monstermoves <= peek_at_iced_corpse_age(otmp) + 50))) {
                 pline("%s offers %s upon the altar.",
@@ -1297,17 +1310,20 @@ register struct monst *mtmp;
                     /* grew up into genocided monster */
                     return 2;
                 /* very small chance that monsters can sacrifice for artifact */
-                } else if (rn2(10 + (2 * u.ugifts * nartifact_exist()))) {
-                    godvoice(a_align(mtmp->mx, mtmp->my),
-                            "Use my gift wisely!");
+              }
+              else if (!rn2(10 + (2 * u.ugifts * nartifact_exist()))) {
                     gift = mk_artifact((struct obj *) 0,
                            a_align(mtmp->mx, mtmp->my));
-                    place_object(gift, mtmp->mx, mtmp->my);
+                    if (gift) {
+                        godvoice(a_align(mtmp->mx, mtmp->my),
+                                "Use my gift wisely!");
+                        place_object(gift, mtmp->mx, mtmp->my);
+                    }
                 }
             return 3;
         /* if nothing else to offer, try offering the amulet of yendor. */
       } else if (otmp->otyp == AMULET_OF_YENDOR && In_endgame(&u.uz) &&
-                 a_align(mtmp->mx, mtmp->my) == mtmp->data->maligntyp) {
+                 a_align(mtmp->mx, mtmp->my) == check_malign(mtmp)) {
             /* This will ALSO hopefully never happen. */
             pline("%s raises the Amulet of Yendor high above the altar!",
                   Monnam(mtmp));

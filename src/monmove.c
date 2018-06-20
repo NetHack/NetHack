@@ -1080,6 +1080,8 @@ not_special:
                              && (otmp->otyp != CORPSE
                                  || (otmp-> otyp == CORPSE
                                      && !is_demon(mtmp->data)
+                                     && !is_animal(mtmp->data)
+                                     && !mindless(mtmp->data)
                                      && !is_rider(&mons[otmp->corpsenm]))))
                          || (likemagic && index(magical, otmp->oclass))
                          || (uses_items && searches_for_item(mtmp, otmp))
