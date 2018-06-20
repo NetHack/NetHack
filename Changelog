@@ -57,10 +57,10 @@ New Objects
 
 New Artifacts
 - Chest of Proteus: The pirate quest artifact. Catches curses and occasionally
-  polymorphs the items placed inside it.
-- Reaver: An artifact scimitar. Sacrifice gift for pirates.
+  polymorphs the items placed inside it. The polypiler's dream.
+- Reaver: An artifact scimitar. The crowning gift for pirates.
 - Marauder's Map: An artifact scroll of magic mapping. Sacrifice gift for
-  pirates. Can also be used to detect artifacts.
+  pirates. Can also be invoked to detect artifacts.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.
@@ -85,8 +85,15 @@ Role and Race Changes
 - Dragonmasters slowly regenerate energy when standing next to pet dragons.
   Additionally, pet dragons will attempt to help a dragonmaster who is slimed,
   asleep, or stuck.
+- As noted above, the pirate role is now available.
 
 Miscelaneous Changes and Bug Fixes
+- Fixed the alignment of monsters being compared incorrectly when seeing whether
+  they would sacrifice something on an altar.
+- Fixed a segfault relating to monsters being gifted a nonexistent item from an
+  altar.
+- Fixed monsters not picking up corpses to sacrifice. All of these fixes make
+  monster sacrifice on altars much more likely to occur, especially in minetown.
 - Landsharks are no longer slithy.
 - Martial artists and martial masters use monk hit messages.
 - Landsharks and Jumping Spiders are capable of jumping. Polymorphing into
