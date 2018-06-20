@@ -1291,7 +1291,7 @@ register struct monst *mtmp;
                 }
                 pline("The sacrifice of %s is consumed in a burst of flame!",
                       mon_nam(mtmp));
-                useup(otmp);
+                m_useup(mtmp, otmp);
                 /* monsters get experiments from sacrificing instead of luck */
                 if (!grow_up(mtmp, (struct monst *) 0)) {
                     /* grew up into genocided monster */
@@ -1311,7 +1311,7 @@ register struct monst *mtmp;
             /* This will ALSO hopefully never happen. */
             pline("%s raises the Amulet of Yendor high above the altar!",
                   Monnam(mtmp));
-            useup(otmp);
+            m_useup(mtmp, otmp);
             if (is_demon(mtmp->data) || mtmp->iswiz) {
                 pline("%s gains ultimate power.",
                       Monnam(mtmp));
