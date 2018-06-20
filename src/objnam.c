@@ -2474,7 +2474,7 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
     int i, al;
     char *endstr, *spot;
     /* these are all the prefixes for *man that don't have a *men plural */
-    const char *no_men[] = {
+    static const char *no_men[] = {
         "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
         "ceru", "corner", "decu", "des", "dura", "fir", "hanu", "het",
         "infrahu", "inhu", "nonhu", "otto", "out", "prehu", "protohu",
@@ -2482,11 +2482,11 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
         "hu", "un", "le", "re", "so", "to", "at", "a",
     };
     /* these are all the prefixes for *men that don't have a *man singular */
-    const char *no_man[] = {
+    static const char *no_man[] = {
         "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
         "hegu", "preno", "sonar", "speci", "dai", "exa", "fla", "sta", "teg",
-        "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi", "ya",
-        "o", "a",
+        "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi",
+        "ya", "o", "a",
     };
 
     if (!basestr || strlen(basestr) < 4)
@@ -2775,7 +2775,7 @@ struct obj *no_wish;
     int wetness, gsize = 0;
     struct fruit *f;
     int ftype = context.current_fruit;
-    char fruitbuf[BUFSZ];
+    char fruitbuf[BUFSZ], globbuf[BUFSZ];
     /* Fruits may not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
      * another person's game), so they must be checked for last, after
@@ -2920,12 +2920,22 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "empty ", l = 6)) {
             contents = EMPTY;
         } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
+            /* "small" might be part of monster name (mimic, if wishing
+               for its corpse) rather than prefix for glob size */
+            if (strncmpi(bp + l, "glob", 4))
+                break;
             gsize = 1;
         } else if (!strncmpi(bp, "medium ", l = 7)) {
             /* xname() doesn't display "medium" but without this
-               there'd be no way to ask for the intermediate size */
+               there'd be no way to ask for the intermediate size
+               ("glob" without size prefix yields smallest one) */
             gsize = 2;
         } else if (!strncmpi(bp, "large ", l = 6)) {
+            /* "large" might be part of monster name (dog, cat, koboold,
+               mimic) or object name (box, round shield) rather than
+               prefix for glob size */
+            if (strncmpi(bp + l, "glob", 4))
+                break;
             /* "very large " had "very " peeled off on previous iteration */
             gsize = (very != 1) ? 3 : 4;
         } else
@@ -2933,7 +2943,7 @@ struct obj *no_wish;
         bp += l;
     }
     if (!cnt)
-        cnt = 1; /* %% what with "gems" etc. ? */
+        cnt = 1; /* will be changed to 2 if makesingular() changes string */
     if (strlen(bp) > 1 && (p = rindex(bp, '(')) != 0) {
         boolean keeptrailingchars = TRUE;
 
@@ -3056,12 +3066,28 @@ struct obj *no_wish;
      *
      * also don't let player wish for multiple globs.
      */
-    if ((p = strstri(bp, "glob of ")) != 0
+    i = (int) strlen(bp);
+    if (!strcmpi(bp, "glob") || !BSTRCMPI(bp, bp + i - 5, " glob")
+        || !strcmpi(bp, "globs") || !BSTRCMPI(bp, bp + i - 6, " globs")) {
+        /* string ends in "glob"; accept "black pudding glob" variation */
+        if ((mntmp = name_to_mon(bp)) == NON_PM)
+            /* "[size] glob" without "of <foo>"; pick random <foo> */
+            mntmp = rn1(PM_BLACK_PUDDING - PM_GRAY_OOZE, PM_GRAY_OOZE);
+    replaceglob:
+        Sprintf(globbuf, "glob of %s", mons[mntmp].mname);
+        bp = globbuf;
+        mntmp = NON_PM; /* not useful for "glob of <foo>" object lookup */
+        cnt = 0; /* globs don't stack */
+    } else if ((p = strstri(bp, "glob of ")) != 0
         || (p = strstri(bp, "globs of ")) != 0) {
         int globoffset = (*(p + 4) == 's') ? 9 : 8;
 
-        if ((mntmp = name_to_mon(p + globoffset)) >= PM_GRAY_OOZE
-            && mntmp <= PM_BLACK_PUDDING) {
+        if ((mntmp = name_to_mon(p + globoffset)) == PM_GRAY_OOZE) {
+            /* name_to_mon() recognizes "grey ooze" as variant spelling
+               but doesn't change input string to fix it; force canonical
+               spelling so that object name lookup always finds it */
+            goto replaceglob;
+        } else if (mntmp > PM_GRAY_OOZE && mntmp <= PM_BLACK_PUDDING) {
             mntmp = NON_PM; /* lie to ourselves */
             cnt = 0;        /* force only one */
         }
@@ -3120,6 +3146,7 @@ struct obj *no_wish;
     /* first change to singular if necessary */
     if (*bp) {
         char *sng = makesingular(bp);
+
         if (strcmp(bp, sng)) {
             if (cnt == 1)
                 cnt = 2;
