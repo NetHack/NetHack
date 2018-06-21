@@ -49,6 +49,9 @@
 #define MS_WERE 38      /* lycanthrope in human form */
 #define MS_BOAST 39     /* giants */
 #define MS_CHIMERA 40   /* chimera */
+#define MS_MOO 41       /* cow */
+#define MS_GROAN 42     /* zombies */
+#define MS_PIRATE 43
 
 #define MR_FIRE 0x00000001L      /* resists fire */
 #define MR_COLD 0x00000002L      /* resists cold */
