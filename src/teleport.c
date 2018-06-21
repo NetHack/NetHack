@@ -236,7 +236,7 @@ teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
 {
-    if (!trapok && t_at(x, y))
+    if (!trapok && t_at(x, y) && t_at(x, y)->ttyp != VIBRATING_SQUARE)
         return FALSE;
     if (!goodpos(x, y, &youmonst, 0))
         return FALSE;
