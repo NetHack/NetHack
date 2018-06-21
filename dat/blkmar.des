@@ -1,0 +1,52 @@
+#
+# This is the black market
+# Massimo Campostrini (campo@sunthpi3.difi.unipi.it)
+#
+LEVEL: "blkmar"
+FLAGS: noteleport, hardfloor, nommap
+GEOMETRY: center, center
+MAP
+---------------------------------------------------------------------------
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+|.+.......................................................................|
+|.|.......................................................................|
+|.|.......................................................................|
+---------------------------------------------------------------------------
+ENDMAP
+NON_DIGGABLE: (00,00,74,17)
+NON_PASSWALL: (00,00,74,17)
+REGION: (03,01,73,16), lit, "black market", filled
+BRANCH: (01,01,01,01), (0,0,0,0)
+DOOR: open, (02,14)
+ENGRAVING: (01,03), engrave, "Pets are not allowed in the shop"
+ENGRAVING: (01,05), engrave, "Thieves will be killed."
+ENGRAVING: (01,07), engrave, "Sorry about the mess. Remember, ask if you need help!"
+ENGRAVING: (01,09), engrave, "Don't even think about stealing anything."
+
+# black marketeer's assistants:
+# from The Hobbit (Tolkien)
+MONSTER:('T', "rock troll"),  (03,03), "William", asleep, peaceful
+MONSTER:('T', "rock troll"),  (03,12), "Thomas", asleep, peaceful
+# from the Bible
+MONSTER:('H', "frost giant"), (03,16), "Goliath", asleep, peaceful
+# from Greek mythology & high-energy physics
+MONSTER:('n', "wood nymph"),  (03,09), "Daphne",  asleep, peaceful
+# Add your favorite monsters here.  Make them peaceful and named,
+# otherwise they will not behave like assistants.
+MONSTER:('&', "balrog"),  (03,04), "Njalnohaar",  asleep, peaceful
+MONSTER:('&', "pit fiend"),  (03,02), "Hilvuuloth",  asleep, peaceful
+MONSTER:('u', "nightmare"),  (03,13), "Dream",  asleep, peaceful
+MONSTER:('q', "manticore"),  (03,08), "Spiky",  asleep, peaceful
+MONSTER:(':', "salamander"),  (03,11), "Izzy",  asleep, peaceful

@@ -2063,6 +2063,9 @@ register struct monst *mtmp;
             break;
         }
     }
+    if (Is_blackmarket(&u.uz) && tmp == PM_ARMS_DEALER) {
+        bars_around_portal(TRUE);
+    }
     if (mtmp->iswiz)
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS)
@@ -2865,9 +2868,13 @@ boolean via_attack;
             pline("The engraving beneath you fades.");
         del_engr_at(u.ux, u.uy);
     }
-
     /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
+    /* Even if the black marketeer is already angry he may not have called
+    * for his assistants if he or his staff have not been assaulted yet.
+    */
+    if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
+        blkmar_guards(mtmp);
     if (!mtmp->mpeaceful)
         return;
     if (mtmp->mtame)
@@ -2885,6 +2892,15 @@ boolean via_attack;
             pline("%s gets angry!", Monnam(mtmp));
         else if (flags.verbose && !Deaf)
             growl(mtmp);
+    }
+    /* Don't misbehave in the Black Market or else... */
+    if (Is_blackmarket(&u.uz)) {
+          if (is_blkmktstaff(mtmp->data) ||
+          /* non-tame named monsters are presumably
+           * black marketeer's assistants */
+            has_mname(mtmp)) {
+                blkmar_guards(mtmp);
+            }
     }
 
     /* attacking your own quest leader will anger his or her guardians */

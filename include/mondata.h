@@ -246,4 +246,7 @@
             || objects[(obj)->otyp].oc_material == VEGGY                 \
             || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
 
+#define is_blkmktstaff(ptr)	(Is_blackmarket(&u.uz) && \
+				  (ptr) == &mons[PM_ARMS_DEALER])
+
 #endif /* MONDATA_H */

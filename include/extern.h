@@ -2265,6 +2265,9 @@ E void FDECL(costly_gold, (XCHAR_P, XCHAR_P, long));
 E long FDECL(get_cost_of_shop_item, (struct obj *));
 E boolean FDECL(block_door, (XCHAR_P, XCHAR_P));
 E boolean FDECL(block_entry, (XCHAR_P, XCHAR_P));
+E void FDECL(blkmar_guards, (struct monst *));
+E void NDECL(set_black_marketeer_angry);
+E void FDECL(bars_around_portal, (BOOLEAN_P));
 E char *FDECL(shk_your, (char *, struct obj *));
 E char *FDECL(Shk_Your, (char *, struct obj *));
 

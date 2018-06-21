@@ -686,6 +686,9 @@ struct monst *mon;
     if (!oart)
         return 1;
 
+    if ((mon->isshk || mon->data == &mons[PM_ARMS_DEALER]) &&
+        obj->oartifact == ART_THIEFBANE) return 1;
+
     yours = (mon == &youmonst);
     /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
@@ -1301,10 +1304,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
     }
 
-    if (!spec_dbon_applies) {
-        /* since damage bonus didn't apply, nothing more to do;
-           no further attacks have side-effects on inventory */
-        return FALSE;
+    /* if (otmp->oartifact != ART_THIEFBANE || !youdefend) { */
+    if (otmp->oartifact != ART_THIEFBANE) {
+        if (!spec_dbon_applies) {
+            /* since damage bonus didn't apply, nothing more to do;
+               no further attacks have side-effects on inventory */
+            return FALSE;
+        }
     }
    	if(otmp->oartifact == ART_REAVER){
    	 if(youattack){
@@ -1443,9 +1449,10 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 otmp->dknown = TRUE;
                 return TRUE;
             }
-        } else if (otmp->oartifact == ART_VORPAL_BLADE
+        } else if ((otmp->oartifact == ART_VORPAL_BLADE
                    && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK]
-                                || mdef->data == &mons[PM_VORPAL_JABBERWOCK])) {
+                          || mdef->data == &mons[PM_VORPAL_JABBERWOCK])) ||
+                          (otmp->oartifact == ART_THIEFBANE && dieroll < 3)) {
             static const char *const behead_msg[2] = { "%s beheads %s!",
                                                        "%s decapitates %s!" };
 
@@ -1740,6 +1747,10 @@ struct obj *obj;
             winid tmpwin = create_nhwindow(NHW_MENU);
             anything any;
 
+            if (Is_blackmarket(&u.uz) && *u.ushops) {
+      		      You("feel very disoriented for a moment.");
+      		      break;
+      	    }
             any = zeroany; /* set all bits to zero */
             start_menu(tmpwin);
             /* use index+1 (cant use 0) as identifier */

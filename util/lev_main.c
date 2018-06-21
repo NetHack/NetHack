@@ -211,6 +211,7 @@ static struct {
     { "archery shop", ARCHERYSHOP },
     { "health food shop", FODDERSHOP },
     { "candle shop", CANDLESHOP },
+    { "black market", BLACKSHOP },
     { 0, 0 }
 };
 

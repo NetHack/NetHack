@@ -641,6 +641,11 @@ boolean pets_only; /* true for ascension or final escape */
                     pline("%s is still %s.", Monnam(mtmp),
                           mtmp->meating ? "eating" : "trapped");
                 stay_behind = TRUE;
+            } else if (mtmp->mtame &&
+        		    (Is_blackmarket(&u.uz))) {
+            			pline("%s can't follow you through the portal.",
+            			      Monnam(mtmp));
+            			stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
                     pline("%s seems very disoriented for a moment.",

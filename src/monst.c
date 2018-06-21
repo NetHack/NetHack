@@ -2718,6 +2718,16 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE, M2_NOPOLY | M2_HUMAN | M2_PEACEFUL
                                        | M2_STRONG | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE, HI_DOMESTIC),
+    /* Name change to prevent "one-eyed sam the one-eyed sam" */
+    MON("Arms Dealer", S_HUMAN, LVL(25, 24, -8, 50, -2), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK,
+          NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_ONEEYEDSAM, MZ_HUMAN),
+        MR_FIRE | MR_COLD | MR_POISON | MR_SLEEP | MR_ELEC | MR_STONE,
+      	MR_SLEEP, M1_HUMANOID | M1_OMNIVORE | M1_FLY,
+      	M2_NOPOLY | M2_HUMAN|M2_PEACEFUL | M2_STRONG | M2_COLLECT | M2_MAGIC |
+      	M2_PNAME | M2_FEMALE,
+      	M3_INFRAVISIBLE, HI_LORD),
     MON("guard", S_HUMAN, LVL(12, 12, 10, 40, 10), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

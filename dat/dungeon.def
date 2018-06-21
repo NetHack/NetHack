@@ -28,6 +28,7 @@ LEVEL:		"statuary" "S" @ (18, 2) 40
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 10
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
+BRANCH:		"One-eyed Sam's Market" @ (20, 5) portal
 RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
 BRANCH:		"The Void" @ (-2,0)
@@ -109,6 +110,12 @@ RNDLEVEL:		"soko1" "none" @ (1, 0) 2
 RNDLEVEL:		"soko2" "none" @ (2, 0) 2
 RNDLEVEL:		"soko3" "none" @ (3, 0) 2
 RNDLEVEL:		"soko4" "none" @ (4, 0) 2
+
+### The Black Market ###
+DUNGEON:        "One-eyed Sam's Market" "D" (1, 0)
+ALIGNMENT:      chaotic
+DESCRIPTION:    mazelike
+LEVEL:          "blkmar" "D" @ (1, 0)
 
 #
 #	The Central Vault of Croesus.

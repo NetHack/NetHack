@@ -513,7 +513,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
 	 $(DAT)/cartomancer.des $(DAT)/void.des $(DAT)/drag.des \
-	 $(DAT)/pirate.des
+	 $(DAT)/pirate.des	$(DAT)/blkmar.des
 	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
 	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)
@@ -543,6 +543,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/valkyrie.des)
 	$(subst /,\,$(U)levcomp $(DAT)/wizard.des)
 	$(subst /,\,$(U)levcomp $(DAT)/pirate.des)
+	$(subst /,\,$(U)levcomp $(DAT)/blkmar.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
@@ -1017,6 +1018,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/mephisto.lev      del $(DAT)/mephisto.lev)
 	$(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
 	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
+	$(subst /,\,if exist $(DAT)/blkmar.lev    del $(DAT)/blkmar.lev)
 	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
 	$(subst /,\,if exist $(DAT)/castle-?.lev   del $(DAT)/castle-?.lev)
 	$(subst /,\,if exist $(DAT)/statuary.lev   del $(DAT)/statuary.lev)

@@ -6,14 +6,19 @@ the wiki. This file documents the changes in each version of SpliceHack.
                             Version 4.0
 
 Patches
-- Implemented an altered version of the colored walls and floors patch by L.
-  Only walls are colored, and the Valley of the Dead is not in grayscale.
 - Implemented a heavily modified version of the descriptive hit messages patch
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
 - Chris's Pirate patch was implemented, thus adding the pirate role to the game.
   Updating this to be compatible with 3.6.1 took quite a bit of work, so for
   those trying to add it to 3.6.1 I would recommend looking at what I did here.
+- Added the Black Market from Unnethack/SLASHEM, using the code in Unnethack.
+  The market functions largely the same as the one in SLASHEM, although there
+  are a few small differences due to porting the code from 3.4.3 to 3.6.x
+  (see below).
+- Implemented an altered version of the colored walls and floors patch by L.
+  Only walls are colored, and the Valley of the Dead is not in grayscale. In
+  addition, some branches have new wall colors.
 
 QOL and Major Balance Changes
 - Dropped the quest entry requirement to level 10.
@@ -32,7 +37,7 @@ QOL and Major Balance Changes
 - The vibrating square can now be teleported onto directly (YANI by Mandevil)
 - Vlad now  has a slowing attack.
 
-New Monsters (16)
+New Monsters (17)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
@@ -42,6 +47,7 @@ New Monsters (16)
 - The pirate patch adds damned pirates, skeletal pirates, parrots, Mayor
   Cumberbund, Blackbeard's Ghost, pirates, pirate brothers, and planar pirates.
   These are not usually encountered unless one is a pirate.
+- One-Eyed Sam the Arms Dealer runs the Black Market.
 
 New Objects
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
@@ -109,4 +115,10 @@ Miscelaneous Changes and Bug Fixes
 - Permanent versus temporary hallucination is now displayed correctly based on
   roleplay options.
 - Added a few random god names.
-- Added new sounds for pirates, zombies, cows, and giant flies.
+- Added new sounds for pirates, all zombies, cows, and giant flies.
+- Due to the way that shopkeepers changed from 3.4.3 to 3.6.x, simply using
+  PM_ONE_EYED_SAM results in (at best), "One-Eyed Sam the One-Eyed Sam", and
+  segfaults due to shopkeeper struct initialization at worst. Thus, she now
+  uses the Arms Dealer monster entry.
+- Currently, it is possible to take your pet into the black market, but not
+  back out. I know why this bug exists but have not been able to solve it.

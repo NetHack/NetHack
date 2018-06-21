@@ -69,6 +69,7 @@ enum roomtype_types {
     LEPREHALL,  /* leprechaun hall (Tom Proudfoot) */
     COCKNEST,   /* cockatrice nest (Tom Proudfoot) */
     ANTHOLE,    /* ants (Tom Proudfoot) */
+    BLACKFOYER, /* black market */
     SHOPBASE,   /* everything above this is a shop */
     ARMORSHOP,  /* specific shop defines for level compiler */
     SCROLLSHOP,
@@ -82,11 +83,12 @@ enum roomtype_types {
     ARCHERYSHOP,
     JUNKSHOP,
     FODDERSHOP, /* health food store */
-    CANDLESHOP
+    CANDLESHOP,
+    BLACKSHOP
 };
 
-#define MAXRTYPE (CANDLESHOP) /* maximum valid room type */
-#define UNIQUESHOP (CANDLESHOP) /* shops here & above not randomly gen'd. */
+#define MAXRTYPE (BLACKSHOP) /* maximum valid room type */
+#define UNIQUESHOP (BLACKSHOP) /* shops here & above not randomly gen'd. */
 
 /* Special type for search_special() */
 #define ANY_TYPE (-1)
