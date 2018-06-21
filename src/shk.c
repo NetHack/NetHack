@@ -380,7 +380,7 @@ register boolean nearshop;
             makekops(&mm);
             return;
         }
-        if (flags.verbose && !Is_blackmarket(&u.uz)))
+        if (flags.verbose && !Is_blackmarket(&u.uz))
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
         if (Is_blackmarket(&u.uz)) {
