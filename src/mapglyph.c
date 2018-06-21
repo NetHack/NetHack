@@ -140,6 +140,8 @@ unsigned *ospecial;
         } else if (iflags.use_color && offset >= S_vwall && offset <= S_hcdoor) {
             if (*in_rooms(x,y,BEEHIVE))
         		    color = CLR_YELLOW;
+            else if (In_sokoban(&u.uz))
+                color = CLR_BLUE;
             else if (Is_blackmarket(&u.uz))
                 color = CLR_ORANGE;
         		else if (In_W_tower(x, y, &u.uz))
