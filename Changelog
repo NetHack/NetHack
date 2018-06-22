@@ -20,22 +20,24 @@ Patches
   Only walls are colored, and the Valley of the Dead is not in grayscale. In
   addition, some branches have new wall colors.
 
-QOL and Major Balance Changes
+QOL Changes
 - Dropped the quest entry requirement to level 10.
 - Ported paranoid trap and swim confirmation from xnethack.
 - Ported peaceful monster displacement from xnethack.
 - Ported NAO 3.4.3's hilite_hidden_stairs option to 3.6.x and SpliceHack.
   Defaults to true.
-- Nerfed Lord of the Foocubi and Will-o'-the-wisps after player feedback.
-- Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
-- Reduced the number of marids and giant eels on the plane of water.
 - Artifact wishing is based on the number of artifacts wished for, not
   generated, preventing the increased  number of artifacts from nerfing artifact
   wishing.
+- The vibrating square can now be teleported onto directly (YANI by Mandevil)
+
+Balance Changes
+- Vlad now  has a slowing attack.
+- Nerfed Lord of the Foocubi and Will-o'-the-wisps after player feedback.
+- Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
+- Reduced the number of marids and giant eels on the plane of water.
 - Monsters can only get wishes from smoky potions now, not wands of
   wishing. Wishes for wands of death and archon figurines were removed.
-- The vibrating square can now be teleported onto directly (YANI by Mandevil)
-- Vlad now  has a slowing attack.
 
 New Monsters (17)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
@@ -68,6 +70,7 @@ New Artifacts
 - Reaver: An artifact scimitar. The crowning gift for pirates.
 - Marauder's Map: An artifact scroll of magic mapping. Sacrifice gift for
   pirates. Can also be invoked to detect artifacts.
+- Thiefbane: Wielded by One-Eyed Sam. Identical to Thiefbane in Unnethack.
 
 New Features
 - Pets can gain intrinsics through corpses in the same way that the player can.

@@ -1206,7 +1206,7 @@ int how;
        be done ever sooner, but we need it to come after dump_everything()
        so that any accompanying pets are still on the map during dump) */
     if (how == ESCAPED || how == ASCENDED)
-        keepdogs(TRUE);
+        keepdogs(TRUE, FALSE);
 
     /* finish_paybill should be called after disclosure but before bones */
     if (bones_ok && taken)
