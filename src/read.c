@@ -1995,6 +1995,7 @@ specified_id()
     }
     (void) identify(otmp);
     You("feel more knowledgeable about %s.", makeplural(xname(otmp)));
+    delobj(otmp);
     update_inventory();
 }
 
