@@ -39,6 +39,13 @@ internals for 'sortloot' option have been changed to not reorder the actual
 give vault guards a cursed tin whistle since there is a shrill whistling
 	sound if hero teleports out of vault while being confronted by guard
 polymorphing worn amulet triggers panic if it turns into amulet of change
+wishing for small mimic corpse or large mimic corpse failed with 'nothing
+	matching that exists'; wishing for large {dog,cat,kobold} corpse
+	yielded normal size one (size prefix was being stripped off for globs)
+wishing for "glob of grey ooze" failed even though grey ooze is recognized
+	as a variant spelling for gray ooze
+spells of healing and extra healing cast at monsters handled monster blindness
+	inconsistently compared to other healing
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -46,6 +53,7 @@ Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
 fix access violation when --debug:xxxx has no other args after it
 Setting the inverse attribute for gold had the space before "$:" 
 	getting highlighted along with the gold field
+sortloot segfaulted when filtering a subset of items (seen with 'A' command)
 
 
 Platform- and/or Interface-Specific Fixes
