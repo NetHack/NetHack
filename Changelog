@@ -5,7 +5,7 @@ the wiki. This file documents the changes in each version of SpliceHack.
 
                             Version 4.0
 
-Patches
+Major Patches
 - Implemented a heavily modified version of the descriptive hit messages patch
   by L, and combined it with SpliceHack's existing monk hit messages.
 - Changes from NetHack 3.6.2B were pulled into the game.
@@ -30,6 +30,9 @@ QOL Changes
   generated, preventing the increased  number of artifacts from nerfing artifact
   wishing.
 - The vibrating square can now be teleported onto directly (YANI by Mandevil)
+- New messages when monsters pursue you up or down dungeon levels (YANI by
+  aosdict)
+- There are now messages for triggering teleport and level teleport traps.
 
 Balance Changes
 - Vlad now  has a slowing attack.
