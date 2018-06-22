@@ -1965,15 +1965,14 @@ specified_id()
     static char buf[BUFSZ] = DUMMY;
     char promptbuf[BUFSZ];
     char bufcpy[BUFSZ];
-    struct obj *otmp, nothing;
+    short otyp;
     int tries = 0;
 
     promptbuf[0] = '\0';
-    nothing = zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
         You("may identify any object.");
   retry:
-    Strcpy(promptbuf, "What object do you wish to learn the history of");
+    Strcpy(promptbuf, "What type of non-artifact object do you wish to learn the history of");
     Strcat(promptbuf, "?");
     getlin(promptbuf, buf);
     (void) mungspaces(buf);
@@ -1981,21 +1980,17 @@ specified_id()
         buf[0] = '\0';
     }
     strcpy(bufcpy, buf);
-    otmp = readobjnam(buf, &nothing);
-    if (!otmp) {
-        pline("Nothing fitting that description exists in the game.");
+    otyp = name_to_otyp(buf);
+    if (otyp == STRANGE_OBJECT) {
+            pline("No specific object of that name exists.");
         if (++tries < 5)
             goto retry;
         pline1(thats_enough_tries);
-        otmp = readobjnam((char *) 0, (struct obj *) 0);
-        if (!otmp)
+        if (!otyp)
             return; /* for safety; should never happen */
-    } else if (otmp == &nothing) {
-        return;
     }
-    (void) identify(otmp);
-    You("feel more knowledgeable about %s.", makeplural(xname(otmp)));
-    delobj(otmp);
+    (void) makeknown(otyp);
+    You("feel more knowledgeable.");
     update_inventory();
 }
 
