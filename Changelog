@@ -128,3 +128,4 @@ Miscelaneous Changes and Bug Fixes
   uses the Arms Dealer monster entry.
 - Currently, it is possible to take your pet into the black market, but not
   back out. I know why this bug exists but have not been able to solve it.
+- Domestic birds can now fly, as they were supposed to be able to.
