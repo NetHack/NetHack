@@ -462,7 +462,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
     augment_filter = (mode & SORTLOOT_PETRIFY) ? TRUE : FALSE;
     mode &= ~SORTLOOT_PETRIFY; /* remove flag, leaving mode */
     /* populate aliarray[0..n-1] */
-    for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
+    for (i = 0, o = *olist; o; o = by_nexthere ? o->nexthere : o->nobj) {
         if (filterfunc && !(*filterfunc)(o)
             /* caller may be asking us to override filterfunc (in order
                to do a cockatrice corpse touch check during pickup even
@@ -473,6 +473,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
         sliarray[i].obj = o, sliarray[i].indx = (int) i;
         sliarray[i].str = (char *) 0;
         sliarray[i].orderclass = sliarray[i].subclass = sliarray[i].disco = 0;
+        ++i;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
