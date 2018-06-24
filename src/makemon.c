@@ -656,6 +656,10 @@ register struct monst *mtmp;
      				otmp->oeroded = 1;
      				(void) mpickobj(mtmp, otmp);
      			  break;
+        case PM_HEADLESS_HORSEMAN:
+            (void) mongets(mtmp, LANCE);
+            (void) mongets(mtmp, SCALE_MAIL);
+            break;
         case PM_BALROG:
             (void) mongets(mtmp, BULLWHIP);
             (void) mongets(mtmp, BROADSWORD);
@@ -1211,6 +1215,7 @@ newmextra()
     mextra->emin = 0;
     mextra->edog = 0;
     mextra->eama = 0;
+    mextra->erid = 0;
     mextra->mcorpsenm = NON_PM;
     return mextra;
 }
@@ -1389,6 +1394,8 @@ int mmflags;
         newedog(mtmp);
     if (mmflags & MM_EAMA)
         neweama(mtmp);
+    if (mmflags & MM_ERID)
+        newerid(mtmp);
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -1449,7 +1456,16 @@ int mmflags;
         if (mndx == PM_KING_IN_YELLOW) {
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
+        } else if (mndx == PM_HEADLESS_HORSEMAN) {
+            mount_monster(mtmp, PM_NIGHTMARE);
+        } else if (mndx == PM_DEATH) {
+            mount_monster(mtmp, PM_PALE_HORSE);
+        } else if (mndx == PM_FAMINE) {
+            mount_monster(mtmp, PM_BLACK_HORSE);
+        } else if (mndx == PM_PESTILENCE) {
+            mount_monster(mtmp, PM_WHITE_HORSE);
         }
+        break;
     case S_EEL:
         (void) hideunder(mtmp);
         break;

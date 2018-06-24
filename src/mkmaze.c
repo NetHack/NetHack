@@ -1281,6 +1281,7 @@ movebubbles()
 
                             newsym(x, y); /* clean up old position */
                             mon->mx = mon->my = 0;
+                            update_monsteed(mon);
                         }
                         if (!u.uswallow && x == u.ux && y == u.uy) {
                             struct container *cons =

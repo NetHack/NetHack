@@ -39,6 +39,7 @@ STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean
 FDECL(restgamestate, (int, unsigned int *, unsigned int *));
+STATIC_DCL void NDECL(restmonsteeds);
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int, XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (int));
@@ -385,6 +386,12 @@ struct monst *mtmp;
             neweama(mtmp);
             mread(fd, (genericptr_t) EAMA(mtmp), sizeof(struct eama));
         }
+        /* erid - steed */
+        mread(fd, (genericptr_t) &buflen, sizeof(buflen));
+        if (buflen > 0) {
+            newerid(mtmp);
+            mread(fd, (genericptr_t) ERID(mtmp), sizeof(struct erid));
+        }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
         mread(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
@@ -626,6 +633,7 @@ unsigned int *stuckid, *steedid;
 
     migrating_objs = restobjchn(fd, FALSE, FALSE);
     migrating_mons = restmonchn(fd, FALSE);
+    restmonsteeds();
     mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
 
     /*
@@ -678,6 +686,39 @@ unsigned int *stuckid, *steedid;
 #endif
     return TRUE;
 }
+
+/* TODO: Drop this down so it does not take O(n^2) time */
+STATIC_OVL void
+restmonsteeds()
+{
+    register struct monst *mtmp;
+    register struct monst *mon;
+
+    for (mon = fmon; mon; mon = mon->nmon) {
+        if (mon->mextra && ERID(mon)) {
+            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+              if (mtmp->m_id == ERID(mon)->mid)
+                  break;
+            }
+            if (!mtmp)
+                panic("Cannot find monster steed.");
+            ERID(mon)->m1 = mtmp;
+        }
+    }
+
+    for (mon = migrating_mons; mon; mon = mon->nmon) {
+        if (mon->mextra && ERID(mon)) {
+            for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+              if (mtmp->m_id == ERID(mon)->mid)
+                  break;
+            }
+            if (!mtmp)
+                panic("Cannot find monster steed.");
+            ERID(mon)->m1 = mtmp;
+        }
+    }
+}
+
 
 /* update game state pointers to those valid for the current level (so we
  * don't dereference a wild u.ustuck when saving the game state, for instance)
@@ -1052,6 +1093,7 @@ boolean ghostly;
     restore_timers(fd, RANGE_LEVEL, ghostly, elapsed);
     restore_light_sources(fd);
     fmon = restmonchn(fd, ghostly);
+    restmonsteeds();
 
     rest_worm(fd); /* restore worm information */
     ftrap = 0;

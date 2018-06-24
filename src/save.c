@@ -1147,6 +1147,14 @@ struct monst *mtmp;
         if (buflen > 0)
             bwrite(fd, (genericptr_t) EAMA(mtmp), buflen);
 
+        if (ERID(mtmp))
+            buflen = sizeof(struct erid);
+        else
+            buflen = 0;
+        bwrite(fd, (genericptr_t) &buflen, sizeof(int));
+        if (buflen > 0)
+            bwrite(fd, (genericptr_t) ERID(mtmp), buflen);
+
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         bwrite(fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
@@ -1163,6 +1171,12 @@ register struct monst *mtmp;
 
     while (mtmp) {
         mtmp2 = mtmp->nmon;
+        #if 0
+        /* this simply eliminates the mount entirely */
+        if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1) {
+            ERID(mtmp)->m1 = (struct monst *) 0;
+        }
+        #endif
         if (perform_bwrite(mode)) {
             mtmp->mnum = monsndx(mtmp->data);
             if (mtmp->ispriest)

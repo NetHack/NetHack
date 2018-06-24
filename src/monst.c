@@ -1023,6 +1023,25 @@ NEARDATA struct permonst mons[] = {
         M1_ANIMAL | M1_NOHANDS | M1_FLY,
         M2_WANDER | M2_STRONG | M2_DEMON | M2_HOSTILE | M2_MINION,
         M3_INFRAVISIBLE, CLR_RED),
+    /* the horses of the Riders */
+    MON("pale horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_COLD, MR_COLD,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG, M3_INFRAVISIBLE, CLR_GRAY),
+    MON("white horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG | M2_UNDEAD, M3_INFRAVISIBLE, CLR_GRAY),
+    MON("black horse", S_UNICORN, LVL(15, 24, 4, 70, 0), (G_NOGEN),
+        A(ATTK(AT_KICK, AD_PHYS, 1, 10), ATTK(AT_BITE, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1800, 350, MS_NEIGH, MZ_LARGE), MR_POISON, MR_POISON,
+        M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE | M1_FLY,
+        M2_STRONG, M3_INFRAVISIBLE, CLR_GRAY),
     /*
      * vortices
      */
@@ -3043,6 +3062,14 @@ struct permonst _mons2[] = {
         SIZ(1500, 400, MS_CUSS, MZ_HUMAN), MR_STONE, 0, M1_HUMANOID,
         M2_NOPOLY | M2_STALK | M2_STRONG | M2_COLLECT | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GRAY),
+    /* headless horsemen spawn riding nightmares */
+    MON("headless horseman", S_DEMON, LVL(14, 15, 10, 40, 0),
+        (G_HELL | G_NOCORPSE | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_CLAW, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_SILENT, MZ_HUMAN), MR_FIRE, MR_FIRE,
+        M1_HUMANOID | M1_NOHEAD | M1_BREATHLESS, M2_STRONG | M2_MALE |
+        M2_NASTY | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GREEN),
     MON("balrog", S_DEMON, LVL(16, 5, -2, 75, -14), (G_HELL | G_NOCORPSE | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 8, 4), ATTK(AT_WEAP, AD_PHYS, 4, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),

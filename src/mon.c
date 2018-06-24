@@ -98,6 +98,9 @@ mon_sanity_check()
             if (x != u.ux || y != u.uy)
                 impossible("steed (%s) claims to be at <%d,%d>?",
                            fmt_ptr((genericptr_t) mtmp), x, y);
+        } else if (mtmp->monmount) {
+            /* TODO: clean up this case and make it into a more airtight check */
+            continue;
         } else if (level.monsters[x][y] != mtmp) {
             impossible("mon (%s) at <%d,%d> is not there!",
                        fmt_ptr((genericptr_t) mtmp), x, y);
@@ -1659,7 +1662,7 @@ struct monst *mtmp, *mtmp2;
     relmon(mtmp, (struct monst **) 0);
 
     /* finish adding its replacement */
-    if (mtmp != u.usteed) /* don't place steed onto the map */
+    if (mtmp != u.usteed && mtmp->monmount != 1) /* don't place steed onto the map */
         place_monster(mtmp2, mtmp2->mx, mtmp2->my);
     if (mtmp2->wormno)      /* update level.monsters[wseg->wx][wseg->wy] */
         place_wsegs(mtmp2); /* locations to mtmp2 not mtmp. */
@@ -1778,6 +1781,11 @@ struct monst *mtmp2, *mtmp1;
             neweama(mtmp2);
         *EAMA(mtmp2) = *EAMA(mtmp1);
     }
+    if (ERID(mtmp1)) {
+        if (!ERID(mtmp2))
+            newerid(mtmp2);
+        *ERID(mtmp2) = *ERID(mtmp1);
+    }
     if (has_mcorpsenm(mtmp1))
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
@@ -1803,6 +1811,8 @@ struct monst *m;
             free((genericptr_t) x->edog);
         if (x->eama)
             free((genericptr_t) x->eama);
+        if (x->erid)
+            free((genericptr_t) x->erid);
         /* [no action needed for x->mcorpsenm] */
 
         free((genericptr_t) x);
@@ -2104,6 +2114,12 @@ boolean was_swallowed; /* digestion */
     struct permonst *mdat = mon->data;
     struct obj *obj = (struct obj *) 0;
     int i, tmp;
+    /* TODO: Move this somewhere more logical. If mounted, the mount appears
+       after death. */
+    if (mon->mextra && ERID(mon) && ERID(mon)->m1 != NULL) {
+        place_monster(ERID(mon)->m1, mon->mx, mon->my);
+        ERID(mon)->m1->monmount = 0;
+    }
     /* A worm that walks naturally dissolves into worms */
     if (mdat == &mons[PM_WORM_THAT_WALKS] || mdat == &mons[PM_LORD_OF_WORMS]) {
         if (cansee(mon->mx, mon->my) && !was_swallowed) {
