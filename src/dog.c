@@ -561,8 +561,9 @@ long nmv; /* number of moves */
 
 /* called when you move to another level */
 void
-keepdogs(pets_only)
+keepdogs(pets_only, stairs)
 boolean pets_only; /* true for ascension or final escape */
+boolean stairs;
 {
     register struct monst *mtmp, *mtmp2;
     register struct obj *obj;
@@ -644,6 +645,13 @@ boolean pets_only; /* true for ascension or final escape */
                 place_monster(mtmp, mtmp->mx, mtmp->my);
             } else
                 num_segs = 0;
+
+            if (!stay_behind && !mtmp->mpeaceful){
+                  if (stairs)
+                      pline("%s pursues you!", Monnam(mtmp));
+                  else
+                      pline("%s manages to get a grip on you!", Monnam(mtmp));
+            }
 
             /* set minvent's obj->no_charge to 0 */
             for (obj = mtmp->minvent; obj; obj = obj->nobj) {

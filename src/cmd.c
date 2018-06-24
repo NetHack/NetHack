@@ -832,7 +832,7 @@ boolean pre, wiztower;
         dmonsfree(); /* purge dead monsters from 'fmon' */
         /* keep steed and other adjacent pets after releasing them
            from traps, stopping eating, &c as if hero were ascending */
-        keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE' here) */
+        keepdogs(TRUE, FALSE); /* (pets-only; normally we'd be using 'FALSE' here) */
 
         /* discard current level; "saving" is used to release dynamic data */
         zero_nhfile(&tmpnhfp);  /* also sets fd to -1 as desired */
