@@ -1844,10 +1844,23 @@ struct obj *corpse;
             break;
 
         case OBJ_FLOOR:
-            if (cansee(mtmp->mx, mtmp->my))
-                pline("%s rises from the dead!",
-                      chewed ? Adjmonnam(mtmp, "bite-covered")
-                             : Monnam(mtmp));
+            if (cansee(mtmp->mx, mtmp->my)) {
+                int pm = monsndx(mtmp->data);
+                if (pm == PM_DEATH) {
+                    pline("%s rises from the dead in a whirl of specral skulls!",
+                        Monnam(mtmp));
+                } else if (pm == PM_PESTILENCE) {
+                    pline("%s rises from the dead in a churning pillar of flies!",
+                        Monnam(mtmp));
+                } else if (pm == PM_FAMINE) {
+                    pline("%s rises from the dead amid a chorus of wails!",
+                        Monnam(mtmp));
+                } else {
+                    pline("%s rises from the dead!",
+                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                                 : Monnam(mtmp));
+                }
+            }
             break;
 
         case OBJ_MINVENT: /* probably a nymph's */

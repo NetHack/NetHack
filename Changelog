@@ -42,13 +42,16 @@ Balance Changes
 - Monsters can only get wishes from smoky potions now, not wands of
   wishing. Wishes for wands of death and archon figurines were removed.
 
-New Monsters (17)
+New Monsters (21)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
   transmit regular lycanthropy, and can (rarely) summon normal werewolves.
 - Added ratmen and mutated ratmen. Both are low-level monsters that spawn
   randomly.
+- Headless horseman, a demon that spawns riding a nightmare.
+- A pale horse, white horse, and black horse, which only appear on the Astral
+  Plane and are ridden by their respective Riders.
 - The pirate patch adds damned pirates, skeletal pirates, parrots, Mayor
   Cumberbund, Blackbeard's Ghost, pirates, pirate brothers, and planar pirates.
   These are not usually encountered unless one is a pirate.
@@ -87,6 +90,9 @@ New Features
   to the player if there is an available jumping path.
 - All monsters can now gain displacement, water walking, and jumping from
   appropriate items.
+- Monsters are now capable of riding steeds. Currently only headless horsemen
+  and the Riders ride steeds. Each of the riders is mounted on an appropriate
+  high-level horse.
 
 Role and Race Changes
 - Improved Cartomancer energy levels, which were very low due to a missing case
@@ -129,3 +135,5 @@ Miscelaneous Changes and Bug Fixes
 - Currently, it is possible to take your pet into the black market, but not
   back out. I know why this bug exists but have not been able to solve it.
 - Domestic birds can now fly, as they were supposed to be able to.
+- Riders now carry their appropriate implements, and resurrect with special
+  messages.

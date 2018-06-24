@@ -1545,8 +1545,11 @@ int mmflags;
         mitem = BELL_OF_OPENING;
     } else if (mndx == PM_PESTILENCE) {
         mitem = POT_SICKNESS;
+        (void) mongets(mtmp, BOW);
     } else if (mndx == PM_DEATH) {
         mitem = GRAIN_SCYTHE;
+    } else if (mndx == PM_FAMINE) {
+        mitem = YELLOW_DRAGON_SCALES;
     }
     if (mitem && allow_minvent)
         (void) mongets(mtmp, mitem);
