@@ -46,6 +46,12 @@ wishing for "glob of grey ooze" failed even though grey ooze is recognized
 	as a variant spelling for gray ooze
 spells of healing and extra healing cast at monsters handled monster blindness
 	inconsistently compared to other healing
+when using the 'O' command to create a status highlight that specifies
+	multiple attributes (blink+inverse, &c), pick all of them in one menu
+	selection and create a single hilite_status rule instead of having
+	separate rules for each attribute to be merged when highlighting
+highlighting status conditions would fail to use attributes if a rule with
+	them was followed by another one without (color only or color&normal)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
