@@ -2156,6 +2156,7 @@ const char *str;
         if (!nmatches) {
             /* check partial matches to aliases */
             int len = (int) strlen(str);
+
             for (i = 0; i < SIZE(condition_aliases); i++)
                 if (!strncmpi(str, condition_aliases[i].id, len)) {
                     mask |= condition_aliases[i].bitmask;
@@ -2335,7 +2336,7 @@ char *buf;
         int k, first = 0;
 
         attbuf[0] = '\0';
-        if (attrib & HL_NONE) {
+        if (attrib == HL_NONE) {
             Strcpy(buf, "normal");
             return buf;
         }
@@ -2383,8 +2384,9 @@ const char *str;
 
     tmp = (struct _status_hilite_line_str *) alloc(sizeof *tmp);
     (void) memset(tmp, 0, sizeof *tmp);
+    tmp->next = (struct _status_hilite_line_str *) 0;
 
-    ++status_hilite_str_id;
+    tmp->id = ++status_hilite_str_id;
     tmp->fld = fld;
     tmp->hl = hl;
     tmp->mask = mask;
@@ -2392,14 +2394,12 @@ const char *str;
         Strcpy(tmp->str, str);
     else
         (void) stripchars(tmp->str, " ", str);
-    tmp->id = status_hilite_str_id;
 
     if ((nxt = status_hilite_str) != 0) {
         while (nxt->next)
             nxt = nxt->next;
         nxt->next = tmp;
     } else {
-        tmp->next = (struct _status_hilite_line_str *) 0;
         status_hilite_str = tmp;
     }
 }
@@ -2462,8 +2462,10 @@ status_hilite_linestr_gather_conditions()
         int j;
 
         for (j = 0; j < CLR_MAX; j++)
-            if (cond_hilites[j] & valid_conditions[i].bitmask)
+            if (cond_hilites[j] & valid_conditions[i].bitmask) {
                 clr = j;
+                break;
+            }
         if (cond_hilites[HL_ATTCLR_DIM] & valid_conditions[i].bitmask)
             atr |= HL_DIM;
         if (cond_hilites[HL_ATTCLR_BOLD] & valid_conditions[i].bitmask)
@@ -2474,6 +2476,8 @@ status_hilite_linestr_gather_conditions()
             atr |= HL_ULINE;
         if (cond_hilites[HL_ATTCLR_INVERSE] & valid_conditions[i].bitmask)
             atr |= HL_INVERSE;
+        if (atr != HL_NONE)
+            atr &= ~HL_NONE;
 
         if (clr != NO_COLOR || atr != HL_NONE) {
             unsigned long ca = clr | (atr << 8);
@@ -2846,6 +2850,7 @@ choose_field:
     attrqry[0] = '\0';
 
     memset((genericptr_t) &hilite, 0, sizeof (struct hilite_s));
+    hilite.next = (struct hilite_s *) 0;
     hilite.set = FALSE; /* mark it "unset" */
     hilite.fld = fld;
 
@@ -3243,14 +3248,14 @@ int id;
         if (hl) {
             while (hl) {
                 if (hlstr->hl == hl) {
-                    if (hlprev)
+                    if (hlprev) {
                         hlprev->next = hl->next;
-                    else {
+                    } else {
                         blstats[0][fld].thresholds = hl->next;
                         blstats[1][fld].thresholds =
                             blstats[0][fld].thresholds;
                     }
-                    free(hl);
+                    free((genericptr_t) hl);
                     return TRUE;
                 }
                 hlprev = hl;
@@ -3319,14 +3324,15 @@ int fld;
     add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
              "Add a new hilite", MENU_UNSELECTED);
 
-
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     if ((res = select_menu(tmpwin, PICK_ANY, &picks)) > 0) {
         int mode = 0;
+
         for (i = 0; i < res; i++) {
             int idx = picks[i].item.a_int;
+
             if (idx == -1) {
                 /* delete selected hilites */
                 if (mode)
@@ -3346,6 +3352,7 @@ int fld;
             /* delete selected hilites */
             for (i = 0; i < res; i++) {
                 int idx = picks[i].item.a_int;
+
                 if (idx > 0)
                     (void) status_hilite_remove(idx);
             }
