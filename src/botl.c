@@ -2282,11 +2282,11 @@ int sidx;
             else if (a == ATR_BOLD)
                 cond_hilites[HL_ATTCLR_BOLD] |= conditions_bitmask;
             else if (a == ATR_NONE) {
-                cond_hilites[HL_ATTCLR_DIM]     = 0UL;
-                cond_hilites[HL_ATTCLR_BLINK]   = 0UL;
-                cond_hilites[HL_ATTCLR_ULINE]   = 0UL;
-                cond_hilites[HL_ATTCLR_INVERSE] = 0UL;
-                cond_hilites[HL_ATTCLR_BOLD]    = 0UL;
+                cond_hilites[HL_ATTCLR_DIM] &= ~conditions_bitmask;
+                cond_hilites[HL_ATTCLR_BLINK] &= ~conditions_bitmask;
+                cond_hilites[HL_ATTCLR_ULINE] &= ~conditions_bitmask;
+                cond_hilites[HL_ATTCLR_INVERSE] &= ~conditions_bitmask;
+                cond_hilites[HL_ATTCLR_BOLD] &= ~conditions_bitmask;
             } else {
                 int k = match_str2clr(subfields[i]);
 
@@ -2507,7 +2507,8 @@ status_hilite_linestr_gather_conditions()
                 char condbuf[BUFSZ];
                 char *tmpattr;
 
-                (void) stripchars(clrbuf, " ", clr2colorname(clr));
+                (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)),
+                                 " ", "-", 0);
                 tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
                 if (tmpattr)
                     Sprintf(eos(clrbuf), "&%s", tmpattr);
@@ -2608,14 +2609,10 @@ struct hilite_s *hl;
     }
 
     split_clridx(hl->coloridx, &clr, &attr);
-    if (clr != NO_COLOR)
-        (void) stripchars(clrbuf, " ", clr2colorname(clr));
+    (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)), " ", "-", 0);
     if (attr != HL_UNDEF) {
-        tmpattr = hlattr2attrname(attr, attrbuf, BUFSZ);
-        if (tmpattr)
-            Sprintf(eos(clrbuf), "%s%s",
-                    (clr != NO_COLOR) ? "&" : "",
-                    tmpattr);
+        if ((tmpattr = hlattr2attrname(attr, attrbuf, BUFSZ)) != 0)
+            Sprintf(eos(clrbuf), "&%s", tmpattr);
     }
     Sprintf(buf, "%s/%s/%s", initblstats[hl->fld].fldname, behavebuf, clrbuf);
 
@@ -3154,52 +3151,34 @@ choose_color:
         else
             goto choose_behavior;
     }
-
-    atr = query_attr(attrqry); /* FIXME: pick multiple attrs */
+    atr = query_attr(attrqry);
     if (atr == -1)
         goto choose_color;
-    if (atr == ATR_DIM)
-        atr = HL_DIM;
-    else if (atr == ATR_BLINK)
-        atr = HL_BLINK;
-    else if (atr == ATR_ULINE)
-        atr = HL_ULINE;
-    else if (atr == ATR_INVERSE)
-        atr = HL_INVERSE;
-    else if (atr == ATR_BOLD)
-        atr = HL_BOLD;
-    else if (atr == ATR_NONE)
-        atr = HL_NONE;
-    else
-        atr = HL_UNDEF;
-
-    if (clr == -1)
-        clr = NO_COLOR;
 
     if (behavior == BL_TH_CONDITION) {
         char clrbuf[BUFSZ];
         char attrbuf[BUFSZ];
         char *tmpattr;
 
-        if (atr == HL_DIM)
+        if (atr & HL_DIM)
             cond_hilites[HL_ATTCLR_DIM] |= cond;
-        else if (atr == HL_BLINK)
+        else if (atr & HL_BLINK)
             cond_hilites[HL_ATTCLR_BLINK] |= cond;
-        else if (atr == HL_ULINE)
+        else if (atr & HL_ULINE)
             cond_hilites[HL_ATTCLR_ULINE] |= cond;
-        else if (atr == HL_INVERSE)
+        else if (atr & HL_INVERSE)
             cond_hilites[HL_ATTCLR_INVERSE] |= cond;
-        else if (atr == HL_BOLD)
+        else if (atr & HL_BOLD)
             cond_hilites[HL_ATTCLR_BOLD] |= cond;
         else if (atr == HL_NONE) {
-            cond_hilites[HL_ATTCLR_DIM]     = 0UL;
-            cond_hilites[HL_ATTCLR_BLINK]   = 0UL;
-            cond_hilites[HL_ATTCLR_ULINE]   = 0UL;
-            cond_hilites[HL_ATTCLR_INVERSE] = 0UL;
-            cond_hilites[HL_ATTCLR_BOLD]    = 0UL;
+            cond_hilites[HL_ATTCLR_DIM] &= ~cond;
+            cond_hilites[HL_ATTCLR_BLINK] &= ~cond;
+            cond_hilites[HL_ATTCLR_ULINE] &= ~cond;
+            cond_hilites[HL_ATTCLR_INVERSE] &= ~cond;
+            cond_hilites[HL_ATTCLR_BOLD] &= ~cond;
         }
         cond_hilites[clr] |= cond;
-        (void) stripchars(clrbuf, " ", clr2colorname(clr));
+        (void) strNsubst(strcpy(clrbuf, clr2colorname(clr)), " ", "-", 0);
         tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
         if (tmpattr)
             Sprintf(eos(clrbuf), "&%s", tmpattr);
