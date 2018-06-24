@@ -3022,6 +3022,14 @@ struct permonst _mons2[] = {
         SIZ(1500, 400, MS_CUSS, MZ_HUMAN), MR_STONE, 0, M1_HUMANOID,
         M2_NOPOLY | M2_STALK | M2_STRONG | M2_COLLECT | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GRAY),
+    /* headless horsemen spawn riding nightmares */
+    MON("headless horseman", S_DEMON, LVL(14, 15, 10, 40, 0),
+        (G_HELL | G_NOCORPSE | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_CLAW, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_SILENT, MZ_HUMAN), MR_FIRE, MR_FIRE,
+        M1_HUMANOID | M1_NOHEAD | M1_BREATHLESS, M2_STRONG | M2_MALE |
+        M2_NASTY | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, CLR_GREEN),
     MON("balrog", S_DEMON, LVL(16, 5, -2, 75, -14), (G_HELL | G_NOCORPSE | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 8, 4), ATTK(AT_WEAP, AD_PHYS, 4, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),

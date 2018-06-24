@@ -586,6 +586,10 @@ register struct monst *mtmp;
         break;
     case S_DEMON:
         switch (mm) {
+        case PM_HEADLESS_HORSEMAN:
+            (void) mongets(mtmp, LANCE);
+            (void) mongets(mtmp, SCALE_MAIL);
+            break;
         case PM_BALROG:
             (void) mongets(mtmp, BULLWHIP);
             (void) mongets(mtmp, BROADSWORD);
@@ -1364,6 +1368,8 @@ int mmflags;
         if (mndx == PM_KING_IN_YELLOW) {
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
+        } else if (mndx == PM_HEADLESS_HORSEMAN) {
+            mount_monster(mtmp, PM_NIGHTMARE);
         } else if (mndx == PM_DEATH) {
             mount_monster(mtmp, PM_PALE_HORSE);
         } else if (mndx == PM_FAMINE) {
