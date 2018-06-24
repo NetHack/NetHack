@@ -1417,19 +1417,31 @@ const char *prompt;
             break;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name,
-                 MENU_UNSELECTED);
+                 (colornames[i].color == NO_COLOR) ? MENU_SELECTED
+                                                   : MENU_UNSELECTED);
     }
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
-        i = colornames[picks->item.a_int - 1].color;
+        i = colornames[picks[0].item.a_int - 1].color;
+        /* pick_cnt==2: explicitly picked something other than the
+           preselected entry */
+        if (pick_cnt == 2 && i == NO_COLOR)
+            i = colornames[picks[1].item.a_int - 1].color;
         free((genericptr_t) picks);
         return i;
+    } else if (pick_cnt == 0) {
+        /* pick_cnt==0: explicitly picking preselected entry toggled it off */
+        return NO_COLOR;
     }
     return -1;
 }
 
+/* ask about highlighting attribute; for menu headers and menu
+   coloring patterns, only one attribute at a time is allowed;
+   for status highlighting, multiple attributes are allowed [overkill;
+   life would be much simpler if that were restricted to one also...] */
 int
 query_attr(prompt)
 const char *prompt;
@@ -1438,7 +1450,11 @@ const char *prompt;
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
+    boolean allow_many = (prompt && !strncmpi(prompt, "Choose", 6));
+    int default_attr = ATR_NONE;
 
+    if (prompt && strstri(prompt, "menu headings"))
+        default_attr = iflags.menu_headings;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
     any = zeroany;
@@ -1447,16 +1463,61 @@ const char *prompt;
             break;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, attrnames[i].attr,
-                 attrnames[i].name, MENU_UNSELECTED);
+                 attrnames[i].name,
+                 (attrnames[i].attr == default_attr) ? MENU_SELECTED
+                                                     : MENU_UNSELECTED);
     }
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
-    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY: PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
-        i = attrnames[picks->item.a_int - 1].attr;
+        int j, k = 0;
+
+        if (allow_many) {
+            /* PICK_ANY, with one preselected entry which should be
+               excluded if any other choices were picked */
+            for (i = 0; i < pick_cnt; ++i) {
+                j = picks[i].item.a_int - 1;
+                if (attrnames[j].attr != ATR_NONE || pick_cnt == 1) {
+                    switch (attrnames[j].attr) {
+                    case ATR_DIM:
+                        k |= HL_DIM;
+                        break;
+                    case ATR_BLINK:
+                        k |= HL_BLINK;
+                        break;
+                    case ATR_ULINE:
+                        k |= HL_ULINE;
+                        break;
+                    case ATR_INVERSE:
+                        k |= HL_INVERSE;
+                        break;
+                    case ATR_BOLD:
+                        k |= HL_BOLD;
+                        break;
+                    case ATR_NONE:
+                        k = HL_NONE;
+                        break;
+                    }
+                }
+            }
+        } else {
+            /* PICK_ONE, but might get 0 or 2 due to preselected entry */
+            j = picks[0].item.a_int - 1;
+            /* pick_cnt==2: explicitly picked something other than the
+               preselected entry */
+            if (pick_cnt == 2 && attrnames[j].attr == default_attr)
+                j = picks[1].item.a_int - 1;
+            k = attrnames[j].attr;
+        }
         free((genericptr_t) picks);
-        return i;
+        return k;
+    } else if (pick_cnt == 0 && !allow_many) {
+        /* PICK_ONE, preselected entry explicitly chosen */
+        return default_attr;
     }
+    /* either ESC to explicitly cancel (pick_cnt==-1) or
+       PICK_ANY with preselected entry toggled off and nothing chosen */
     return -1;
 }
 
@@ -4872,6 +4933,7 @@ boolean setinitial, setfromfile;
             const char *sattr, *sclr;
             menu_item *pick_list = (menu_item *) 0;
             struct menucoloring *tmp = menu_colorings;
+            char clrbuf[QBUFSZ];
 
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
@@ -4879,11 +4941,12 @@ boolean setinitial, setfromfile;
             mc_idx = 0;
             while (tmp) {
                 sattr = attr2attrname(tmp->attr);
-                sclr = clr2colorname(tmp->color);
+                sclr = strcpy(clrbuf, clr2colorname(tmp->color));
+                (void) strNsubst(clrbuf, " ", "-", 0);
                 any.a_int = ++mc_idx;
                 /* construct suffix */
                 Sprintf(buf, "\"\"=%s%s%s", sclr,
-                        (tmp->attr != ATR_NONE) ? " & " : "",
+                        (tmp->attr != ATR_NONE) ? "&" : "",
                         (tmp->attr != ATR_NONE) ? sattr : "");
                 /* now main string */
                 ln = sizeof buf - strlen(buf) - 1; /* length available */
