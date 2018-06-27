@@ -151,8 +151,8 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *       since getting luck of -13 will give this weapon an automatic +13
     *       to damage and hit, but playing with -13 luck would be really hard.
     */
-    A("Luckless Folly", SHORT_SWORD, (SPFX_RESTR | SPFX_LUCK), 0, 0,
-      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM, 3000L,
+    A("Luckless Folly", SHORT_SWORD, (SPFX_RESTR | SPFX_NOGEN | SPFX_LUCK), 0,
+      0, PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM, 3000L,
       NO_COLOR),
 
     /*

@@ -45,6 +45,8 @@ Balance Changes
 - Several artifacts were buffed. The most noticeable buff is to dismounter,
   which now does extra damage and throws a rider from their horse, making them
   automatically stunned. This is particularly useful against the new riders.
+- Luckless Folly now must be wished for, and will probably be added as a prize
+  for a branch at some point.
 
 New Monsters (21, but only 8 spawn randomly)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
@@ -61,7 +63,7 @@ New Monsters (21, but only 8 spawn randomly)
   These are not usually encountered unless one is a pirate.
 - One-Eyed Sam the Arms Dealer runs the Black Market.
 
-New Objects
+New Objects (4)
 - Ring of Blood Magic: If you do not have enough energy to cast a spell, you
   cast it anyway, but lose hit points equal to the excess energy. Casting
   healing spells using blood magic will deal extra damage to you in order to
@@ -74,7 +76,7 @@ New Objects
   that appear in Nethack, the Next Generation. Reading one will allow you to
   identify any item in the game by prompt.
 
-New Artifacts
+New Artifacts (4)
 - Chest of Proteus: The pirate quest artifact. Catches curses and occasionally
   polymorphs the items placed inside it. The polypiler's dream.
 - Reaver: An artifact scimitar. The crowning gift for pirates.
