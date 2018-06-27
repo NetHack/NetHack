@@ -2167,11 +2167,13 @@ boolean was_swallowed; /* digestion */
 
     /* magma elementals dissolve into a pile of lava */
     if (mdat == &mons[PM_MAGMA_ELEMENTAL]) {
-        if (cansee(mon->mx, mon->my) && !was_swallowed)
-            pline("%s body dissolves into a pool of lava.", s_suffix(Monnam(mon)));
         if (levl[mon->mx][mon->my].typ != STAIRS &&
-                levl[mon->mx][mon->my].typ != LADDER)
+                levl[mon->mx][mon->my].typ != LADDER) {
             levl[mon->mx][mon->my].typ = LAVAPOOL;
+        if (cansee(mon->mx, mon->my) && !was_swallowed)
+            pline("%s body dissolves into a pool of lava.",
+                s_suffix(Monnam(mon)));
+        }
         return FALSE;
     }
 
