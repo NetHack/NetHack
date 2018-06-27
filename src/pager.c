@@ -705,6 +705,7 @@ struct permonst * pm;
     /* Flag descriptions */
     buf[0] = '\0';
     APPENDC(is_male(pm), "male");
+    APPENDC(is_female(pm), "female");
     APPENDC(pm->msize == MZ_TINY, "tiny");
     APPENDC(pm->msize == MZ_SMALL, "small");
     APPENDC(pm->msize == MZ_LARGE, "large");
@@ -753,6 +754,7 @@ struct permonst * pm;
     APPENDC(can_teleport(pm), "teleport");
     APPENDC(is_clinger(pm), "cling to the ceiling");
     APPENDC(needspick(pm), "mine");
+    APPENDC(is_jumper(pm), "jump long distances");
     if (!needspick(pm))
         APPENDC(tunnels(pm), "dig");
     if (*buf) {
@@ -762,6 +764,10 @@ struct permonst * pm;
     }
 
     /* Full-line remarks. */
+    if (is_displaced(pm))
+        MONPUTSTR("Has displacement.");
+    if (is_domestic(pm))
+        MONPUTSTR("Is treated as domestic.");
     if (touch_petrifies(pm))
         MONPUTSTR("Petrifies by touch.");
     if (perceives(pm))
