@@ -33,10 +33,11 @@ QOL Changes
 - New messages when monsters pursue you up or down dungeon levels (YANI by
   aosdict)
 - There are now messages for triggering teleport and level teleport traps.
-- Void level disabled.
+- Void level disabled (for now).
+- Looking at monsters provides additional information, such as whether they can
+  jump or be domesticated.
 
 Balance Changes
-- Vlad now  has a slowing attack.
 - Nerfed Lord of the Foocubi and Will-o'-the-wisps after player feedback.
 - Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
 - Reduced the number of marids and giant eels on the plane of water.
@@ -138,10 +139,15 @@ Miscelaneous Changes and Bug Fixes
   PM_ONE_EYED_SAM results in (at best), "One-Eyed Sam the One-Eyed Sam", and
   segfaults due to shopkeeper struct initialization at worst. Thus, she now
   uses the Arms Dealer monster entry.
-- Currently, it is possible to take your pet into the black market, but not
-  back out. I know why this bug exists but have not been able to solve it.
 - Domestic birds can now fly, as they were supposed to be able to.
 - Riders now carry their appropriate implements, and resurrect with special
   messages.
 - Merfolk are generated hostile now, so killing them no longer counts as
   murder.
+- Mind flayer telepaths are now treated as mind flayers.
+- Magma elementals no longer say that they dissolved into magma without
+  actually dissolving into magma.
+
+Known Bugs
+- Currently, it is possible to take your pet into the black market, but not
+  back out. I know why this bug exists but have not been able to solve it.
