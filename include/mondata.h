@@ -205,7 +205,8 @@
     ((ptr) == &mons[PM_COCKATRICE] || (ptr) == &mons[PM_CHICKATRICE])
 
 #define is_mind_flayer(ptr) \
-    ((ptr) == &mons[PM_MIND_FLAYER] || (ptr) == &mons[PM_MASTER_MIND_FLAYER])
+    ((ptr) == &mons[PM_MIND_FLAYER] || (ptr) == &mons[PM_MASTER_MIND_FLAYER] \
+      || (ptr) == &mons[PM_MIND_FLAYER_TELEPATH])
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
