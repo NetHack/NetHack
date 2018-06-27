@@ -191,7 +191,7 @@ static const char *const shkhealthfoods[] = {
 };
 
 static const char *const shkblackmarket[] = {
-    "One-Eyed Sam"
+    "One-Eyed Sam", 0
 };
 
 /*
@@ -727,7 +727,10 @@ struct mkroom *sroom;
             (1000L + 30L * (long) rnd(100))); /* initial capital */
     if (shp->shknms == shkrings)
         (void) mongets(shk, TOUCHSTONE);
-    nameshk(shk, shp->shknms);
+    if (!Is_blackmarket(&u.uz))
+        nameshk(shk, shp->shknms);
+    else
+        (void) strncpy(ESHK(shk)->shknam, "One-Eyed Sam", PL_NSIZ);
 
     return sh;
 }
