@@ -2431,12 +2431,6 @@ int fld;
     int count = 0;
 
     for (tmp = status_hilite_str; tmp; tmp = tmp->next) {
-#ifndef SCORE_ON_BOTL
-        /* when SCORE_ON_BOTL is disabled, only count 'score' rules
-           if explicitly asked to do so; exclude them from 'all' count */
-        if (countall && tmp->fld == BL_SCORE)
-            continue;
-#endif
         if (countall || tmp->fld == fld)
             count++;
     }
@@ -2647,7 +2641,8 @@ status_hilite_menu_choose_field()
 
     for (i = 0; i < MAXBLSTATS; i++) {
 #ifndef SCORE_ON_BOTL
-        if (initblstats[i].fld == BL_SCORE)
+        if (initblstats[i].fld == BL_SCORE
+            && !blstats[0][BL_SCORE].thresholds)
             continue;
 #endif
         any = zeroany;
@@ -3334,10 +3329,21 @@ int fld;
                  "Remove selected hilites", MENU_UNSELECTED);
     }
 
-    any = zeroany;
-    any.a_int = -2;
-    add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
-             "Add a new hilite", MENU_UNSELECTED);
+#ifndef SCORE_ON_BOTL
+    if (fld == BL_SCORE) {
+        /* suppress 'Z - Add a new hilite' for 'score' when SCORE_ON_BOTL
+           is disabled; we wouldn't be called for 'score' unless it has
+           hilite rules from the config file, so count must be positive
+           (hence there's no risk that we're putting up an empty menu) */
+        ;
+    } else
+#endif
+    {
+        any = zeroany;
+        any.a_int = -2;
+        add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
+                 "Add a new hilite", MENU_UNSELECTED);
+    }
 
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
@@ -3445,9 +3451,9 @@ shlmenu_redo:
 #ifndef SCORE_ON_BOTL
         /* config file might contain rules for highlighting 'score'
            even when SCORE_ON_BOTL is disabled; if so, 'O' command
-           menus won't manipulate them, but will display them for
-           the "View all hilites in config format" operation */
-        if (initblstats[i].fld == BL_SCORE)
+           menus will show them and allow deletions but not additions,
+           otherwise, it won't show 'score' at all */
+        if (initblstats[i].fld == BL_SCORE && !count)
             continue;
 #endif
         any = zeroany;
