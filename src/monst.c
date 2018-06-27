@@ -3292,7 +3292,7 @@ struct permonst _mons2[] = {
                                    NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE | M1_SWIM | M1_AMPHIBIOUS ,
-        M2_COLLECT | M2_HUMAN, M3_INFRAVISIBLE, CLR_GREEN),
+        M2_COLLECT | M2_HUMAN | M2_HOSTILE, M3_INFRAVISIBLE, CLR_GREEN),
     MON("piranha", S_EEL, LVL(5, 12, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

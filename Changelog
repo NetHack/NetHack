@@ -143,3 +143,5 @@ Miscelaneous Changes and Bug Fixes
 - Domestic birds can now fly, as they were supposed to be able to.
 - Riders now carry their appropriate implements, and resurrect with special
   messages.
+- Merfolk are generated hostile now, so killing them no longer counts as
+  murder.
