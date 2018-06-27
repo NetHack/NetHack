@@ -1321,6 +1321,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             if (mdef->mextra && ERID(mdef) && ERID(mdef)->m1 != NULL) {
                 place_monster(ERID(mdef)->m1, mdef->mx, mdef->my);
                 ERID(mdef)->m1->monmount = 0;
+                mdef->mstun = 1;
                 free_erid(mdef);
                 if (vis)
                     pline_The("powerful lance unseats %s!", mon_nam(mdef));

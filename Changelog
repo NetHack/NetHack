@@ -42,6 +42,9 @@ Balance Changes
 - Reduced the number of marids and giant eels on the plane of water.
 - Monsters can only get wishes from smoky potions now, not wands of
   wishing. Wishes for wands of death and archon figurines were removed.
+- Several artifacts were buffed. The most noticeable buff is to dismounter,
+  which now does extra damage and throws a rider from their horse, making them
+  automatically stunned. This is particularly useful against the new riders.
 
 New Monsters (21, but only 8 spawn randomly)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
