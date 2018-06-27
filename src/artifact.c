@@ -1304,12 +1304,28 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
     }
 
-    /* if (otmp->oartifact != ART_THIEFBANE || !youdefend) { */
-    if (otmp->oartifact != ART_THIEFBANE) {
+    if (otmp->oartifact != ART_THIEFBANE || !youdefend) {
         if (!spec_dbon_applies) {
             /* since damage bonus didn't apply, nothing more to do;
                no further attacks have side-effects on inventory */
             return FALSE;
+        }
+    }
+    if (otmp->oartifact == ART_DISMOUNTER) {
+        if (youdefend) {
+            if (u.usteed) {
+                dismount_steed(DISMOUNT_THROWN);
+                return TRUE;
+            }
+        } else {
+            if (mdef->mextra && ERID(mdef) && ERID(mdef)->m1 != NULL) {
+                place_monster(ERID(mdef)->m1, mdef->mx, mdef->my);
+                ERID(mdef)->m1->monmount = 0;
+                free_erid(mdef);
+                if (vis)
+                    pline_The("powerful lance unseats %s!", mon_nam(mdef));
+                return TRUE;
+            }
         }
     }
    	if(otmp->oartifact == ART_REAVER){

@@ -80,7 +80,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      Gugnir also returns to the hand of the wielder when thrown if
     *      the wielder is a Valkyrie, but there is no strength requirement.
     */
-    A("Gungnir", DWARVISH_SPEAR, (SPFX_RESTR | SPFX_ATTK), 0, 0, ELEC(7, 12),
+    A("Gungnir", DWARVISH_SPEAR, (SPFX_RESTR | SPFX_ATTK), 0, 0, ELEC(7, 20),
       NO_DFNS, NO_CARY, 0, A_NEUTRAL, PM_VALKYRIE, NON_PM, 4000L, NO_COLOR),
 
     /*
@@ -90,7 +90,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     *      monsters attacking them with Gae Bulg.
     */
     A("Gae Bulg", JAVELIN, (SPFX_RESTR | SPFX_ATTK | SPFX_DRLI), 0, 0,
-      DRLI(2, 2), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
+      DRLI(2, 4), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, NON_PM,
       9000L, NO_COLOR),
 
     /*
@@ -158,8 +158,8 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     /*
     *       A fairly standard bane.
     */
-    A("Dismounter", LANCE, (SPFX_RESTR | SPFX_DCLAS), 0, S_QUADRUPED,
-      PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 200L,
+    A("Dismounter", LANCE, (SPFX_RESTR), 0, 0,
+      PHYS(5, 5), NO_DFNS, NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 200L,
       NO_COLOR),
 
     /*

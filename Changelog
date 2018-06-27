@@ -33,6 +33,7 @@ QOL Changes
 - New messages when monsters pursue you up or down dungeon levels (YANI by
   aosdict)
 - There are now messages for triggering teleport and level teleport traps.
+- Void level disabled.
 
 Balance Changes
 - Vlad now  has a slowing attack.
@@ -42,7 +43,7 @@ Balance Changes
 - Monsters can only get wishes from smoky potions now, not wands of
   wishing. Wishes for wands of death and archon figurines were removed.
 
-New Monsters (21)
+New Monsters (21, but only 8 spawn randomly)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
 - Added Lampades, high-level nymphs appearing in Gehennom.
 - Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
