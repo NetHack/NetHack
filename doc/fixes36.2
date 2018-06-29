@@ -52,12 +52,15 @@ when using the 'O' command to create a status highlight that specifies
 	separate rules for each attribute to be merged when highlighting
 highlighting status conditions would fail to use attributes if a rule with
 	them was followed by another one without (color only or color&normal)
+when using 'O' to set hilite_status rules, hide the 'score' status field if
+	game has been built without SCORE_ON_BOTL; latent rules for 'score'
+	can still be set in config file but can't be added or removed via 'O'
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 fix access violation when --debug:xxxx has no other args after it
-Setting the inverse attribute for gold had the space before "$:" 
+setting the inverse attribute for gold had the space before "$:"
 	getting highlighted along with the gold field
 sortloot segfaulted when filtering a subset of items (seen with 'A' command)
 

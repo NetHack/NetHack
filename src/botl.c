@@ -924,6 +924,7 @@ init_blstats()
 #ifdef STATUS_HILITES
             struct hilite_s *keep_hilite_chain = blstats[i][j].thresholds;
 #endif
+
             blstats[i][j] = initblstats[j];
             blstats[i][j].a = zeroany;
             if (blstats[i][j].valwidth) {
@@ -932,8 +933,7 @@ init_blstats()
             } else
                 blstats[i][j].val = (char *) 0;
 #ifdef STATUS_HILITES
-            if (keep_hilite_chain)
-                blstats[i][j].thresholds = keep_hilite_chain;
+            blstats[i][j].thresholds = keep_hilite_chain;
 #endif
         }
     }
@@ -1204,26 +1204,28 @@ static struct fieldid_t {
     const char *fieldname;
     enum statusfields fldid;
 } fieldids_alias[] = {
-    {"characteristics", BL_CHARACTERISTICS},
-    {"dx",       BL_DX},
-    {"co",       BL_CO},
-    {"con",      BL_CO},
-    {"points",   BL_SCORE},
-    {"cap",      BL_CAP},
-    {"pw",       BL_ENE},
-    {"pw-max",   BL_ENEMAX},
-    {"xl",       BL_XP},
-    {"xplvl",    BL_XP},
-    {"ac",       BL_AC},
-    {"hit-dice", BL_HD},
-    {"turns",    BL_TIME},
-    {"hp",       BL_HP},
-    {"hp-max",   BL_HPMAX},
-    {"dgn",      BL_LEVELDESC},
-    {"xp",       BL_EXP},
-    {"exp",      BL_EXP},
-    {"flags",    BL_CONDITION},
-    {0,          BL_FLUSH}
+    { "characteristics",   BL_CHARACTERISTICS },
+    { "encumbrance",       BL_CAP },
+    { "experience-points", BL_EXP },
+    { "dx",       BL_DX },
+    { "co",       BL_CO },
+    { "con",      BL_CO },
+    { "points",   BL_SCORE },
+    { "cap",      BL_CAP },
+    { "pw",       BL_ENE },
+    { "pw-max",   BL_ENEMAX },
+    { "xl",       BL_XP },
+    { "xplvl",    BL_XP },
+    { "ac",       BL_AC },
+    { "hit-dice", BL_HD },
+    { "turns",    BL_TIME },
+    { "hp",       BL_HP },
+    { "hp-max",   BL_HPMAX },
+    { "dgn",      BL_LEVELDESC },
+    { "xp",       BL_EXP },
+    { "exp",      BL_EXP },
+    { "flags",    BL_CONDITION },
+    {0,           BL_FLUSH }
 };
 
 /* format arguments */
@@ -1258,6 +1260,7 @@ const char *name;
         if (!nmatches) {
             /* check partial matches to canonical names */
             int len = (int) strlen(name);
+
             for (i = 0; i < SIZE(initblstats); i++)
                 if (!strncmpi(name, initblstats[i].fldname, len)) {
                     fld = initblstats[i].fld;
@@ -1286,7 +1289,8 @@ long augmented_time;
         return FALSE;
 
     while (tl) {
-        /* only this style times out */
+        /* only this style times out (includes general 'changed'
+           as well as specific 'up' and 'down') */
         if (tl->behavior == BL_TH_UPDOWN)
             return TRUE;
         tl = tl->next;
@@ -1491,6 +1495,7 @@ int *colorptr;
             case BL_TH_TEXTMATCH:
                 txtstr = blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
+                    /* "<name> the <rank-title>", skip past "<name> the " */
                     txtstr += (strlen(plname) + sizeof " the " - sizeof "");
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
                     if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
@@ -1523,15 +1528,14 @@ split_clridx(idx, coloridx, attrib)
 int idx;
 int *coloridx, *attrib;
 {
-    if (coloridx && attrib) {
+    if (coloridx)
         *coloridx = idx & 0x00FF;
+    if (attrib)
         *attrib = (idx >> 8) & 0x00FF;
-    }
 }
 
-
 /*
- * This is the parser for the hilite options
+ * This is the parser for the hilite options.
  *
  * parse_status_hl1() separates each hilite entry into
  * a set of field threshold/action component strings,
@@ -2422,17 +2426,18 @@ STATIC_OVL int
 status_hilite_linestr_countfield(fld)
 int fld;
 {
-    struct _status_hilite_line_str *tmp = status_hilite_str;
+    struct _status_hilite_line_str *tmp;
+    boolean countall = (fld == BL_FLUSH);
     int count = 0;
 
-    while (tmp) {
-        if (tmp->fld == fld || fld == BL_FLUSH)
+    for (tmp = status_hilite_str; tmp; tmp = tmp->next) {
+        if (countall || tmp->fld == fld)
             count++;
-        tmp = tmp->next;
     }
     return count;
 }
 
+/* used by options handling, doset(options.c) */
 int
 count_status_hilites(VOID_ARGS)
 {
@@ -2635,8 +2640,13 @@ status_hilite_menu_choose_field()
     start_menu(tmpwin);
 
     for (i = 0; i < MAXBLSTATS; i++) {
+#ifndef SCORE_ON_BOTL
+        if (initblstats[i].fld == BL_SCORE
+            && !blstats[0][BL_SCORE].thresholds)
+            continue;
+#endif
         any = zeroany;
-        any.a_int = (i+1);
+        any.a_int = (i + 1);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  initblstats[i].fldname, MENU_UNSELECTED);
     }
@@ -3319,10 +3329,21 @@ int fld;
                  "Remove selected hilites", MENU_UNSELECTED);
     }
 
-    any = zeroany;
-    any.a_int = -2;
-    add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
-             "Add a new hilite", MENU_UNSELECTED);
+#ifndef SCORE_ON_BOTL
+    if (fld == BL_SCORE) {
+        /* suppress 'Z - Add a new hilite' for 'score' when SCORE_ON_BOTL
+           is disabled; we wouldn't be called for 'score' unless it has
+           hilite rules from the config file, so count must be positive
+           (hence there's no risk that we're putting up an empty menu) */
+        ;
+    } else
+#endif
+    {
+        any = zeroany;
+        any.a_int = -2;
+        add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
+                 "Add a new hilite", MENU_UNSELECTED);
+    }
 
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
@@ -3427,6 +3448,14 @@ shlmenu_redo:
         int count = status_hilite_linestr_countfield(i);
         char buf[BUFSZ];
 
+#ifndef SCORE_ON_BOTL
+        /* config file might contain rules for highlighting 'score'
+           even when SCORE_ON_BOTL is disabled; if so, 'O' command
+           menus will show them and allow deletions but not additions,
+           otherwise, it won't show 'score' at all */
+        if (initblstats[i].fld == BL_SCORE && !count)
+            continue;
+#endif
         any = zeroany;
         any.a_int = i + 1;
         Sprintf(buf, "%-18s", initblstats[i].fldname);
@@ -3435,7 +3464,6 @@ shlmenu_redo:
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
-
 
     end_menu(tmpwin, "Status hilites:");
     if ((res = select_menu(tmpwin, PICK_ONE, &picks)) > 0) {
