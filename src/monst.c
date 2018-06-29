@@ -3257,7 +3257,7 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_STALK | M2_PEACEFUL, M3_INFRAVISIBLE | M3_INFRAVISION,
         CLR_BRIGHT_BLUE),
 #endif
-    MON("desert jinn", S_DEMON, LVL(4, 12, 6, 10, 0), (G_GENO | 2),
+    MON("desert jinn", S_DEMON, LVL(4, 12, 6, 10, 0), (G_GENO | G_NOCORPSE | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), ATTK(AT_WEAP, AD_PHYS, 1, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
           SIZ(WT_HUMAN, 400, MS_DJINNI, MZ_HUMAN), MR_POISON | MR_FIRE, MR_FIRE,
