@@ -1811,7 +1811,9 @@ struct monst *mtmp;
             m.has_misc = MUSE_POT_SPEED;
         }
         nomore(MUSE_POT_REFLECT);
-        if (obj->otyp == POT_REFLECTION && !mtmp->mreflect) {
+        if (obj->otyp == POT_REFLECTION && !mtmp->mreflect &&
+              mtmp->data != &mons[PM_SILVER_DRAGON] && 
+              mtmp->data != &mons[PM_BABY_SILVER_DRAGON]) {
             m.misc = obj;
             m.has_misc = MUSE_POT_REFLECT;
         }
