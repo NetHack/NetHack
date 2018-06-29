@@ -16,6 +16,7 @@
 # Junenethack 2018
 invader from the ivory tower
 improved tin opener
+baseball-cap toting elemental
 
 # M.U.G.E.N.
 wayward hitbox
@@ -34,18 +35,22 @@ gug
 bunny
 deep one
 bat from Hell
+shoggoth
 
-# powergaming
+# powergaming and speedrunning
 polypiler
 pudding farmer
 speedrunner
 lawful female dwarven valkyrie with Excalibur
+Elbereth-spammer
+enexto abuser
 
 # self-deprecation / this variant
 questionable addition
 poorly balanced monster
 obscure reference
 clunky mechanic
+absurdly powerful mystic scarab
 
 # cataclysm
 smoker zombie
@@ -144,6 +149,7 @@ really big rock
 scintillating serpent
 devourer
 mad cow
+ascii art
 
 # Quendor (Zork, &c.)
 grue
@@ -448,6 +454,7 @@ weighted Companion Cube
 MissingNo
 -M
 =Test0
+corrupted cream pie
 
 # South Park
 manbearpig

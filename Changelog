@@ -147,6 +147,8 @@ Miscelaneous Changes and Bug Fixes
 - Mind flayer telepaths are now treated as mind flayers.
 - Magma elementals no longer say that they dissolved into magma without
   actually dissolving into magma.
+- Silver dragons and baby silver dragons no longer quaff potions of reflection.
+- Desert jinn no longer leave corpses.
 
 Known Bugs
 - Currently, it is possible to take your pet into the black market, but not
