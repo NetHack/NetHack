@@ -149,6 +149,7 @@ Miscelaneous Changes and Bug Fixes
   actually dissolving into magma.
 - Silver dragons and baby silver dragons no longer quaff potions of reflection.
 - Desert jinn no longer leave corpses.
+- Fixed a bug where enlightenment could not be duplicated by a wand of wonder.
 
 Known Bugs
 - Currently, it is possible to take your pet into the black market, but not

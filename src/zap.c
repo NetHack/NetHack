@@ -2104,7 +2104,7 @@ register struct obj *obj;
        from being identified erroneously. */
     boolean wonder = FALSE;
     if (obj->otyp == WAN_WONDER) {
-        switch (rn2(3)) {
+        switch (rn2(4)) {
         case 0:
             obj->otyp = WAN_LIGHT;
             break;
