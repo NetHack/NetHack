@@ -3,7 +3,7 @@
 A full list of differences in SpliceHack from vanilla NetHack can be found on
 the wiki. This file documents the changes in each version of SpliceHack.
 
-                            Version 4.0
+                    Version 4.0 - QOL and Life Improvement
 
 Major Patches
 - Implemented a heavily modified version of the descriptive hit messages patch
