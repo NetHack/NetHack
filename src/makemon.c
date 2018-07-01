@@ -307,6 +307,33 @@ register struct monst *mtmp;
         } else if (mm == PM_NINJA) { /* extra quest villains */
             (void) mongets(mtmp, rn2(4) ? SHURIKEN : DART);
             (void) mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
+     		} else if (mm == PM_PIRATE_BROTHER){
+     			  (void)mongets(mtmp, SCIMITAR);
+     			  (void)mongets(mtmp, LEATHER_ARMOR);
+     			  (void)mongets(mtmp, HIGH_BOOTS);
+     		} else if (mm == PM_MAYOR_CUMMERBUND){
+     		    otmp = mksobj(SCIMITAR, FALSE, FALSE);
+     		    curse(otmp);
+     		    otmp->oerodeproof = TRUE;
+     		    spe2 = d(1,3);
+     		    otmp->spe = max(otmp->spe, spe2);
+     		    (void) mpickobj(mtmp, otmp);
+
+     		    otmp = mksobj(LEATHER_JACKET, FALSE, FALSE);
+     		    otmp->oerodeproof = TRUE;
+     		    spe2 = d(2,3);
+     		    otmp->spe = max(otmp->spe, spe2);
+     		    (void) mpickobj(mtmp, otmp);
+
+     		    otmp = mksobj(SMALL_SHIELD, FALSE, FALSE);
+     		    otmp->oerodeproof = TRUE;
+     		    spe2 = d(1,3);
+     		    otmp->spe = max(otmp->spe, spe2);
+     		    (void) mpickobj(mtmp, otmp);
+
+     			  (void)mongets(mtmp, LEATHER_CLOAK);
+     			  (void)mongets(mtmp, HIGH_BOOTS);
+     			  (void)mongets(mtmp, LEATHER_GLOVES);
         } else if (ptr->msound == MS_GUARDIAN) {
             /* quest "guardians" */
             switch (mm) {
@@ -361,6 +388,23 @@ register struct monst *mtmp;
             }
         }
         break;
+ 		case S_GHOST:
+     		if(mm == PM_BLACKBEARD_S_GHOST){
+     		    otmp = mksobj(SCIMITAR, FALSE, FALSE);
+     		    curse(otmp);
+     		    otmp->oerodeproof = TRUE;
+     			  otmp->oeroded = 1;
+     		    spe2 = d(2,3);
+     		    otmp->spe = max(otmp->spe, spe2);
+     		    (void) mpickobj(mtmp, otmp);
+
+            otmp = mksobj(CHEST, FALSE, FALSE);
+            otmp = oname(otmp, artiname(ART_TREASURY_OF_PROTEUS));
+            curse(otmp);
+            otmp->oerodeproof = TRUE;
+            mpickobj(mtmp, otmp);
+        }
+        break;
 
     case S_ANGEL:
         if (humanoid(ptr)) {
@@ -386,7 +430,53 @@ register struct monst *mtmp;
             (void) mpickobj(mtmp, otmp);
         }
         break;
+    case S_GNOME:
+        switch (mm) {
+            case PM_GNOLL:
+                if(!rn2(3)) (void) mongets(mtmp, ORCISH_HELM);
+                if(!rn2(3)) (void) mongets(mtmp, STUDDED_LEATHER_ARMOR);
+                if(!rn2(3)) (void) mongets(mtmp, ORCISH_SHIELD);
+                if(!rn2(4)) (void) mongets(mtmp, SPEAR);
+                break;
+            case PM_GNOLL_WARRIOR:
+                if(!rn2(2)) (void) mongets(mtmp, ORCISH_HELM);
 
+                if (!rn2(20))
+                    (void) mongets(mtmp, ORANGE_DRAGON_SCALE_MAIL);
+                else if (rn2(3))
+                    (void) mongets(mtmp, SCALE_MAIL);
+                else
+                    (void) mongets(mtmp, SPLINT_MAIL);
+
+                if(!rn2(2)) (void) mongets(mtmp, ORCISH_SHIELD);
+                if(!rn2(3)) (void) mongets(mtmp, KATANA);
+                break;
+            case PM_GNOLL_CHIEFTAIN:
+                (void) mongets(mtmp, ORCISH_HELM);
+                if (!rn2(10))
+                    (void) mongets(mtmp, BLUE_DRAGON_SCALE_MAIL);
+                else
+                    (void) mongets(mtmp, CRYSTAL_PLATE_MAIL);
+                (void) mongets(mtmp, ORCISH_SHIELD);
+                (void) mongets(mtmp, KATANA);
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                break;
+            case PM_GNOLL_SHAMAN:
+                if (!rn2(10))
+                    (void) mongets(mtmp, SILVER_DRAGON_SCALE_MAIL);
+                else if (rn2(5))
+                    (void) mongets(mtmp, CRYSTAL_PLATE_MAIL);
+                else
+                    (void) mongets(mtmp, RED_DRAGON_SCALE_MAIL);
+
+                (void) mongets(mtmp, ATHAME);
+                m_initthrow(mtmp, SHURIKEN, 12);
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                (void) mongets(mtmp, rnd_offensive_item(mtmp));
+                break;
+            default:
+                break;
+        }
     case S_HUMANOID:
         if (mm == PM_HOBBIT) {
             switch (rn2(3)) {
@@ -424,6 +514,11 @@ register struct monst *mtmp;
             } else {
                 (void) mongets(mtmp, !rn2(3) ? PICK_AXE : DAGGER);
             }
+     		} else if(mm == PM_PLANAR_PIRATE){
+       			(void)mongets(mtmp, TWO_HANDED_SWORD);
+       			(void)mongets(mtmp, BRONZE_PLATE_MAIL);
+       			(void)mongets(mtmp, LEATHER_GLOVES);
+       			(void)mongets(mtmp, HIGH_BOOTS);
         }
         break;
     case S_KOP:
@@ -433,6 +528,20 @@ register struct monst *mtmp;
             m_initthrow(mtmp, CREAM_PIE, 2);
         if (!rn2(3))
             (void) mongets(mtmp, (rn2(2)) ? CLUB : RUBBER_HOSE);
+        break;
+    case S_RODENT:
+        switch(mm) {
+        case PM_RATMAN:
+            if (!rn2(3))
+                (void) mongets(mtmp, KNIFE);
+            if (!rn2(3))
+                (void) mongets(mtmp, DENTED_POT);
+            else if (!rn2(10))
+                (void) mongets(mtmp, FEDORA);
+            break;
+        default:
+            break;
+        }
         break;
     case S_ORC:
         if (rn2(2))
@@ -518,6 +627,18 @@ register struct monst *mtmp;
             (void) mongets(mtmp, LEATHER_ARMOR);
         if (!rn2(4))
             (void) mongets(mtmp, (rn2(3) ? KNIFE : SHORT_SWORD));
+        if (mm == PM_SKELETAL_PIRATE) {
+        	  otmp = rn2(2) ? mksobj(SCIMITAR, FALSE, FALSE) :
+                mksobj(KNIFE, FALSE, FALSE);
+        	  curse(otmp);
+         		otmp->oeroded = 1;
+         		(void) mpickobj(mtmp, otmp);
+         		otmp = rn2(2) ? mksobj(HIGH_BOOTS, FALSE, FALSE) :
+                mksobj(LEATHER_JACKET, FALSE, FALSE);
+         		curse(otmp);
+         		otmp->oeroded2 = 1;
+         		(void) mpickobj(mtmp, otmp);
+         }
         break;
     case S_LIZARD:
         if (mm == PM_SALAMANDER)
@@ -526,6 +647,19 @@ register struct monst *mtmp;
         break;
     case S_DEMON:
         switch (mm) {
+        case PM_DAMNED_PIRATE:
+     				otmp = mksobj(SCIMITAR, FALSE, FALSE);
+     				curse(otmp);
+     				(void) mpickobj(mtmp, otmp);
+     				otmp = mksobj(LEATHER_ARMOR, FALSE, FALSE);
+     				curse(otmp);
+     				otmp->oeroded = 1;
+     				(void) mpickobj(mtmp, otmp);
+     			  break;
+        case PM_HEADLESS_HORSEMAN:
+            (void) mongets(mtmp, LANCE);
+            (void) mongets(mtmp, SCALE_MAIL);
+            break;
         case PM_BALROG:
             (void) mongets(mtmp, BULLWHIP);
             (void) mongets(mtmp, BROADSWORD);
@@ -557,7 +691,8 @@ register struct monst *mtmp;
         /* prevent djinn and mail daemons from leaving objects when
          * they vanish
          */
-        if (!is_demon(ptr) && mm != PM_MARID && mm != PM_DESERT_JINN)
+        if (!is_demon(ptr) && mm != PM_MARID && mm != PM_DESERT_JINN &&
+            mm != PM_DAMNED_PIRATE)
             break;
         /*FALLTHRU*/
     default:
@@ -727,6 +862,23 @@ register struct monst *mtmp;
             case 3:
                 (void) mongets(mtmp, WAN_STRIKING);
             }
+        } else if (ptr == &mons[PM_ARMS_DEALER]) {
+              otmp = mksobj(TWO_HANDED_SWORD, FALSE, FALSE);
+              otmp = oname(otmp, artiname(ART_THIEFBANE));
+              mpickobj(mtmp, otmp);
+              if (otmp->spe < 5) otmp->spe += rnd(5);
+              otmp = mksobj(SHIELD_OF_REFLECTION, FALSE, FALSE);
+              mpickobj(mtmp, otmp);
+              if (otmp->spe < 5) otmp->spe += rnd(5);
+              otmp = mksobj(HEX_DRAGON_SCALE_MAIL, FALSE, FALSE);
+              mpickobj(mtmp, otmp);
+              if (otmp->spe < 5) otmp->spe += rnd(5);
+              otmp = mksobj(SPEED_BOOTS, FALSE, FALSE);
+              mpickobj(mtmp, otmp);
+              if (otmp->spe < 5) otmp->spe += rnd(5);
+              otmp = mksobj(AMULET_OF_LIFE_SAVING, FALSE, FALSE);
+              mpickobj(mtmp, otmp);
+              (void) mongets(mtmp,SKELETON_KEY);
         } else if (ptr->msound == MS_PRIEST
                    || quest_mon_represents_role(ptr, PM_PRIEST)) {
             (void) mongets(mtmp, rn2(7) ? ROBE
@@ -1063,6 +1215,7 @@ newmextra()
     mextra->emin = 0;
     mextra->edog = 0;
     mextra->eama = 0;
+    mextra->erid = 0;
     mextra->mcorpsenm = NON_PM;
     return mextra;
 }
@@ -1241,6 +1394,8 @@ int mmflags;
         newedog(mtmp);
     if (mmflags & MM_EAMA)
         neweama(mtmp);
+    if (mmflags & MM_ERID)
+        newerid(mtmp);
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -1301,6 +1456,14 @@ int mmflags;
         if (mndx == PM_KING_IN_YELLOW) {
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
+        } else if (mndx == PM_HEADLESS_HORSEMAN) {
+            mount_monster(mtmp, PM_NIGHTMARE);
+        } else if (mndx == PM_DEATH) {
+            mount_monster(mtmp, PM_PALE_HORSE);
+        } else if (mndx == PM_FAMINE) {
+            mount_monster(mtmp, PM_BLACK_HORSE);
+        } else if (mndx == PM_PESTILENCE) {
+            mount_monster(mtmp, PM_WHITE_HORSE);
         }
         break;
     case S_EEL:
@@ -1344,8 +1507,9 @@ int mmflags;
     if ((ct = emits_light(mtmp->data)) > 0)
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,
                          monst_to_any(mtmp));
-    /* lycanthropes are peaceful to natural lycanthropes */
-    if (is_were(mtmp->data) && Race_if(PM_HUMAN_WEREWOLF))
+    /* lycanthropes are peaceful to natural lycanthropes and pack lords */
+    if ((is_were(mtmp->data) && Race_if(PM_HUMAN_WEREWOLF))
+        || (u.ulycn == PM_ALPHA_WEREWOLF && mndx == PM_WEREWOLF))
         mtmp->mpeaceful = TRUE;
     mitem = 0; /* extra inventory item for this monster */
 
@@ -1381,8 +1545,11 @@ int mmflags;
         mitem = BELL_OF_OPENING;
     } else if (mndx == PM_PESTILENCE) {
         mitem = POT_SICKNESS;
+        (void) mongets(mtmp, BOW);
     } else if (mndx == PM_DEATH) {
         mitem = GRAIN_SCYTHE;
+    } else if (mndx == PM_FAMINE) {
+        mitem = YELLOW_DRAGON_SCALES;
     }
     if (mitem && allow_minvent)
         (void) mongets(mtmp, mitem);
@@ -1454,7 +1621,7 @@ int mmflags;
         m_initinv(mtmp); /* add on a few special items incl. more armor */
         m_dowear(mtmp, TRUE);
 
-        if (!rn2(100) && is_domestic(ptr)
+        if (!rn2(100) && is_domestic(ptr) && !is_dragon(ptr)
             && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
             struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
             put_saddle_on_mon(otmp, mtmp);
@@ -1590,6 +1757,14 @@ rndmonst()
     register struct permonst *ptr;
     register int mndx, ct;
 
+   	if(u.ukinghill){ /* You have pirate quest artifact in open inventory */
+   		  if(rnd(100)>80){
+   			    if(In_endgame(&u.uz)) return &mons[PM_PLANAR_PIRATE];
+   			    else if(Inhell) return &mons[PM_DAMNED_PIRATE];
+   			    else return &mons[PM_SKELETAL_PIRATE];
+   		  }
+   	}
+
     if (u.uz.dnum == quest_dnum && rn2(7) && (ptr = qt_montype()) != 0)
         return ptr;
 
@@ -1629,6 +1804,8 @@ rndmonst()
             if (upper && !isupper((uchar) def_monsyms[(int) ptr->mlet].sym))
                 continue;
             if (elemlevel && wrong_elem_type(ptr))
+                continue;
+            if (is_domestic(ptr) && Is_blackmarket(&u.uz))
                 continue;
             if (uncommon(mndx))
                 continue;

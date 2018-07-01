@@ -176,6 +176,11 @@ struct eama {
     struct permonst *m2; /* first monster */
 };
 
+struct erid {
+    struct monst *m1; /* monster being ridden */
+    unsigned int mid;   /* pointer to attached monster id */
+};
+
 /***
  **     mextra.h -- collection of all monster extensions
  */
@@ -187,6 +192,7 @@ struct mextra {
     struct emin *emin;
     struct edog *edog;
     struct eama *eama;
+    struct erid *erid;
     int mcorpsenm; /* obj->corpsenm for mimic posing as statue or corpse */
 };
 
@@ -197,6 +203,7 @@ struct mextra {
 #define EMIN(mon) ((mon)->mextra->emin)
 #define EDOG(mon) ((mon)->mextra->edog)
 #define EAMA(mon) ((mon)->mextra->eama)
+#define ERID(mon) ((mon)->mextra->erid)
 #define MCORPSENM(mon) ((mon)->mextra->mcorpsenm)
 
 #define has_mname(mon) ((mon)->mextra && MNAME(mon))
@@ -206,6 +213,7 @@ struct mextra {
 #define has_emin(mon)  ((mon)->mextra && EMIN(mon))
 #define has_edog(mon)  ((mon)->mextra && EDOG(mon))
 #define has_eama(mon)  ((mon)->mextra && EAMA(mon))
+#define has_erid(mon)  ((mon)->mextra && ERID(mon))
 #define has_mcorpsenm(mon) ((mon)->mextra && MCORPSENM(mon) != NON_PM)
 
 #endif /* MEXTRA_H */

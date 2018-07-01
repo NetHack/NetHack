@@ -61,6 +61,9 @@ int roomtype;
         case BEEHIVE:
             mkzoo(BEEHIVE);
             break;
+        case LAB:
+            mkzoo(LAB);
+            break;
         case DEN:
             mkzoo(DEN);
             break;
@@ -112,6 +115,10 @@ mkshop()
             }
             if (*ep == 'b' || *ep == 'B') {
                 mkzoo(BEEHIVE);
+                return;
+            }
+            if (*ep == 'l' || *ep == 'L') {
+                mkzoo(LAB);
                 return;
             }
             if (*ep == 'd' || *ep == 'D') {
@@ -297,6 +304,7 @@ struct mkroom *sroom;
     throne_placed:
         mk_zoo_thronemon(tx, ty);
         break;
+    case LAB:
     case BEEHIVE:
         tx = sroom->lx + (sroom->hx - sroom->lx + 1) / 2;
         ty = sroom->ly + (sroom->hy - sroom->ly + 1) / 2;
@@ -343,16 +351,20 @@ struct mkroom *sroom;
                                      ? (sx == tx && sy == ty
                                          ? &mons[PM_QUEEN_BEE]
                                          : &mons[PM_KILLER_BEE])
-                                     : (type == LEPREHALL)
-                                         ? &mons[PM_LEPRECHAUN]
-                                         : (type == COCKNEST)
-                                             ? &mons[PM_COCKATRICE]
-                                             : (type == DEN)
-                                                 ? denmon()
-                                                 : (type == ANTHOLE)
-                                                     ? antholemon()
-                                                     : (struct permonst *) 0,
-                              sx, sy, NO_MM_FLAGS);
+                                     : (type == LAB)
+                                         ? (sx == tx && sy == ty
+                                             ? &mons[PM_BAD_CLONE]
+                                             : &mons[PM_AMALGAMATION])
+                                       : (type == LEPREHALL)
+                                           ? &mons[PM_LEPRECHAUN]
+                                           : (type == COCKNEST)
+                                               ? &mons[PM_COCKATRICE]
+                                               : (type == DEN)
+                                                   ? denmon()
+                                                   : (type == ANTHOLE)
+                                                       ? antholemon()
+                                                       : (struct permonst *) 0,
+                                sx, sy, NO_MM_FLAGS);
             if (mon) {
                 mon->msleeping = 1;
                 if (type == COURT && mon->mpeaceful) {
@@ -424,6 +436,11 @@ struct mkroom *sroom;
         chest->owt = weight(chest);
         chest->spe = 2; /* so it can be found later */
         level.flags.has_court = 1;
+        break;
+    }
+    case LAB: {
+        levl[tx][ty].typ = SINK;
+        level.flags.has_lab = 1;
         break;
     }
     case BARRACKS:

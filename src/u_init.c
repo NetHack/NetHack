@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1503960969 2017/08/28 22:56:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1526755625 2018/05/19 18:47:05 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -113,6 +113,22 @@ static struct trobj Monk[] = {
      */
     { FORTUNE_COOKIE, 0, FOOD_CLASS, 3, UNDEF_BLESS },
     { 0, 0, 0, 0, 0 }
+};
+static struct trobj Pirate[] = {
+#define PIR_KNIVES	1
+#define PIR_SNACK 5
+#define PIR_JEWELRY 7
+#define PIR_TOOL 8
+	{ SCIMITAR, 0, WEAPON_CLASS, 1, UNDEF_BLESS },
+	{ KNIFE, 1, WEAPON_CLASS, 2, 0 },
+	{ LEATHER_JACKET, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
+	{ HIGH_BOOTS, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
+	{ CRAM_RATION, 0, FOOD_CLASS, 2, UNDEF_BLESS },
+	{ BANANA, 0, FOOD_CLASS, 3, 0 },
+	{ POT_BOOZE, 0, POTION_CLASS, 3, UNDEF_BLESS },
+	{ UNDEF_TYP, UNDEF_SPE, RING_CLASS, 1, UNDEF_BLESS },
+	{ OILSKIN_SACK, 0, TOOL_CLASS, 1, 0 },
+	{ 0, 0, 0, 0, 0 }
 };
 static struct trobj Priest[] = {
     { MACE, 1, WEAPON_CLASS, 1, 1 },
@@ -240,11 +256,14 @@ static struct inv_sub {
     { PM_ORC, SMALL_SHIELD, ORCISH_SHIELD },
     { PM_ORC, RING_MAIL, ORCISH_RING_MAIL },
     { PM_ORC, CHAIN_MAIL, ORCISH_CHAIN_MAIL },
+    { PM_ORC, CRAM_RATION, TRIPE_RATION },
+    { PM_ORC, LEMBAS_WAFER, TRIPE_RATION },
     { PM_DWARF, SPEAR, DWARVISH_SPEAR },
     { PM_DWARF, SHORT_SWORD, DWARVISH_SHORT_SWORD },
     { PM_DWARF, HELMET, DWARVISH_IRON_HELM },
     /* { PM_DWARF, SMALL_SHIELD, DWARVISH_ROUNDSHIELD }, */
     /* { PM_DWARF, PICK_AXE, DWARVISH_MATTOCK }, */
+    { PM_DWARF, LEMBAS_WAFER, CRAM_RATION },
     { PM_GNOME, BOW, CROSSBOW },
     { PM_GNOME, ARROW, CROSSBOW_BOLT },
     { NON_PM, STRANGE_OBJECT, STRANGE_OBJECT }
@@ -462,6 +481,32 @@ static const struct def_skill Skill_P[] = {
     { P_DIVINATION_SPELL, P_EXPERT },
     { P_CLERIC_SPELL, P_EXPERT },
     { P_BARE_HANDED_COMBAT, P_BASIC },
+    { P_NONE, 0 }
+};
+static const struct def_skill Skill_Pir[] = {
+    { P_DAGGER, P_SKILLED },
+    { P_KNIFE,  P_EXPERT },
+    { P_AXE, P_SKILLED },
+    { P_SHORT_SWORD, P_BASIC },
+   	{ P_BROAD_SWORD, P_EXPERT },
+    { P_LONG_SWORD, P_BASIC },
+   	{ P_SCIMITAR, P_EXPERT },
+    { P_SABER, P_EXPERT },
+   	{ P_CLUB, P_BASIC },
+    { P_MORNING_STAR, P_SKILLED },
+    { P_FLAIL, P_EXPERT },
+    { P_SPEAR, P_SKILLED },
+    { P_TRIDENT, P_EXPERT },
+    { P_CROSSBOW, P_EXPERT },
+    { P_DART, P_SKILLED },
+    { P_WHIP, P_SKILLED },
+    { P_UNICORN_HORN, P_BASIC },
+   	{ P_ATTACK_SPELL, P_BASIC },
+    { P_DIVINATION_SPELL, P_BASIC },
+   	{ P_ENCHANTMENT_SPELL, P_BASIC },
+    { P_ESCAPE_SPELL, P_SKILLED },
+    { P_TWO_WEAPON_COMBAT, P_SKILLED },
+    { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_NONE, 0 }
 };
 static const struct def_skill Skill_R[] = {
@@ -694,7 +739,10 @@ u_init()
 
     u.umoved = FALSE;
     u.umortality = 0;
-    u.ugrave_arise = NON_PM;
+    u.ugrave_arise = Role_if(PM_PIRATE) ? PM_SKELETAL_PIRATE : NON_PM;
+
+    u.ukinghill = 0;
+    u.protean = 0;
 
     u.umonnum = u.umonster = (flags.female && urole.femalenum != NON_PM)
                                  ? urole.femalenum
@@ -713,6 +761,7 @@ u_init()
     for (i = 0; i <= MAXSPELL; i++)
         spl_book[i].sp_id = NO_SPELL;
     u.ublesscnt = 300; /* no prayers just yet */
+    u.ublesstim = 0;
     u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
         aligns[flags.initalign].value;
 
@@ -806,6 +855,19 @@ u_init()
         skill_init(Skill_Mon);
         break;
     }
+    case PM_PIRATE:
+        u.umoney0 = rnd(300);
+     		Pirate[PIR_KNIVES].trquan = rn1(2, 2);
+     		if(!rn2(4)) Pirate[PIR_SNACK].trotyp = KELP_FROND;
+     		Pirate[PIR_SNACK].trquan += rn2(4);
+     		if(rn2(100)<50)	Pirate[PIR_JEWELRY].trotyp = RIN_ADORNMENT;
+     		if(rn2(100)<50)	Pirate[PIR_TOOL].trotyp = GRAPPLING_HOOK;
+     		ini_inv(Pirate);
+     		knows_object(OILSKIN_SACK);
+     		knows_object(OILSKIN_CLOAK);
+     		knows_object(GRAPPLING_HOOK);
+     		skill_init(Skill_Pir);
+     		break;
     case PM_PRIEST:
         ini_inv(Priest);
         if (!rn2(10))
@@ -1027,6 +1089,9 @@ int otyp;
     case PM_MONK:
         skills = Skill_Mon;
         break;
+    case PM_PIRATE:
+        skills = Skill_Pir;
+        break;
     case PM_PRIEST:
         skills = Skill_P;
         break;
@@ -1069,17 +1134,8 @@ register struct trobj *trop;
     int otyp, i;
 
     while (trop->trclass) {
-        if (trop->trotyp != UNDEF_TYP) {
-            otyp = (int) trop->trotyp;
-            if (urace.malenum != PM_HUMAN) {
-                /* substitute specific items for generic ones */
-                for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                    if (inv_subs[i].race_pm == urace.malenum
-                        && otyp == inv_subs[i].item_otyp) {
-                        otyp = inv_subs[i].subs_otyp;
-                        break;
-                    }
-            }
+        otyp = (int) trop->trotyp;
+        if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;
@@ -1153,6 +1209,23 @@ register struct trobj *trop;
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
                 nocreate4 = otyp;
+        }
+
+        if (urace.malenum != PM_HUMAN) {
+            /* substitute race-specific items; this used to be in
+               the 'if (otyp != UNDEF_TYP) { }' block above, but then
+               substitutions didn't occur for randomly generated items
+               (particularly food) which have racial substitutes */
+            for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
+                if (inv_subs[i].race_pm == urace.malenum
+                    && otyp == inv_subs[i].item_otyp) {
+                    debugpline3("ini_inv: substituting %s for %s%s",
+                                OBJ_NAME(objects[inv_subs[i].subs_otyp]),
+                                (trop->trotyp == UNDEF_TYP) ? "random " : "",
+                                OBJ_NAME(objects[otyp]));
+                    otyp = obj->otyp = inv_subs[i].subs_otyp;
+                    break;
+                }
         }
 
         /* nudist gets no armor */

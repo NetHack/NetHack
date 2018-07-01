@@ -11,6 +11,7 @@
 
 extern boolean notonhead;
 
+STATIC_DCL void FDECL(dogintr, (struct monst*, struct permonst*));
 STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
 STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
 STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
@@ -363,8 +364,99 @@ boolean devour;
         else
             mtmp->perminvis = 1;
     }
+    if (obj->otyp == CORPSE)
+        dogintr(mtmp, &mons[obj->corpsenm]);
     return 1;
 }
+
+STATIC_OVL void
+dogintr(mtmp, ptr)
+struct monst *mtmp;
+register struct permonst *ptr;
+{
+    register int type = 0;
+    register int chance;
+    /* this loop of code is copied from cpostfx, since symmetry is good.
+       In the future this should be put into its own function. */
+    int count = 0, i = 0;
+    for (i = 1; i <= LAST_PROP; i++) {
+        if (!intrinsic_possible(i, ptr))
+            continue;
+        ++count;
+        /* a 1 in count chance of replacing the old choice
+           with this one, and a count-1 in count chance
+           of keeping the old choice (note that 1 in 1 and
+           0 in 1 are what we want for the first candidate) */
+        if (!rn2(count)) {
+            type = i;
+        }
+    }
+    /* this section of code is just a modified version of givit() */
+    switch (type) {
+    case POISON_RES:
+        if ((ptr == &mons[PM_KILLER_BEE] || ptr == &mons[PM_SCORPION])
+            && !rn2(4))
+            chance = 1;
+        else
+            chance = 15;
+        break;
+    case TELEPORT:
+        chance = 10;
+        break;
+    case TELEPORT_CONTROL:
+        chance = 12;
+        break;
+    case TELEPAT:
+        chance = 1;
+        break;
+    default:
+        chance = 15;
+        break;
+    }
+
+    if (ptr->mlevel <= rn2(chance))
+        return; /* failed die roll */
+    switch (type) {
+    case FIRE_RES:
+        if (canseemon(mtmp))
+            pline("%s shivers slightly.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_FIRE;
+        break;
+    case SLEEP_RES:
+        if (canseemon(mtmp))
+            pline("%s looks wide awake.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_SLEEP;
+        break;
+    case COLD_RES:
+        if (canseemon(mtmp))
+            pline("%s looks quite warm.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_COLD;
+        break;
+    case DISINT_RES:
+        if (canseemon(mtmp))
+            pline("%s seems more firm.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_DISINT;
+        break;
+    case SHOCK_RES:
+        if (canseemon(mtmp))
+            pline("%s crackles with static electricity.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_ELEC;
+        break;
+    case POISON_RES:
+        if (canseemon(mtmp))
+            pline("%s looks very healthy.", Monnam(mtmp));
+        mtmp->mintrinsics |= MR_POISON;
+        break;
+    case TELEPORT:
+    case TELEPORT_CONTROL:
+    case TELEPAT:
+        break;
+    default:
+        debugpline0("Tried to give an impossible intrinsic");
+        break;
+    }
+}
+
 
 /* hunger effects -- returns TRUE on starvation */
 STATIC_OVL boolean
@@ -878,6 +970,7 @@ int after; /* this is extra fast monster movement */
     int chi = -1, nidist, ndist;
     coord poss[9];
     long info[9], allowflags;
+    char buf[BUFSZ];
 #define GDIST(x, y) (dist2(x, y, gx, gy))
 
     /*
@@ -905,6 +998,35 @@ int after; /* this is extra fast monster movement */
     } else if (!udist)
         /* maybe we tamed him while being swallowed --jgm */
         return 0;
+
+    /* Dragonmaster's dragons help out the player. */
+    if (Role_if(PM_DRAGONMASTER) && is_dragon(mtmp->data) &&
+        distu(mtmp->mx, mtmp->my) <= 1) {
+        /* provide slow, passive energy regeneration */
+        if (u.uen < u.uenmax) {
+            u.uen += 1;
+            context.botl = 1;
+        }
+        /* allow red dragons to cure sliming */
+        if (Slimed && (mtmp->data == &mons[PM_RED_DRAGON] ||
+            mtmp->data == &mons[PM_BABY_RED_DRAGON])) {
+            pline("%s exhales on you!", Monnam(mtmp));
+            burn_away_slime();
+            return 1;
+        }
+        /* allow dragons to free the player */
+        if (u.ustuck) {
+            u.ustuck = 0;
+            pline("%s frees you!", mon_nam(mtmp));
+            return 1;
+        }
+        /* allow dragons to awaken the player */
+        if (u.usleep) {
+            Sprintf(buf, "%s gently nudges you awake.", Monnam(mtmp));
+            unmul(buf);
+            return 1;
+        }
+    }
 
     nix = omx; /* set before newdogpos */
     niy = omy;

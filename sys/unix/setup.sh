@@ -23,13 +23,13 @@ x)      hints=/dev/null
         ;;
 *)      hints=$prefix/$1
 	hfile=$1
+	    # sanity check
+	if [ ! -f "$hints" ]; then
+	    echo "Cannot find hints file $hfile"
+	    exit 1
+	fi
         ;;
 esac
-
-if [ ! -f "$hints" ]; then
-    echo "Cannot find hints file $hfile"
-    exit 1
-fi
 
 /bin/sh ./mkmkfile.sh Makefile.top TOP ../../Makefile $hints $hfile
 /bin/sh ./mkmkfile.sh Makefile.dat DAT ../../dat/Makefile $hints $hfile

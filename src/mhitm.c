@@ -412,6 +412,12 @@ register struct monst *magr, *mdef;
             /* KMH -- don't accumulate to-hit bonuses */
             if (otmp)
                 tmp -= hitval(otmp, mdef);
+            if ((is_displaced(magr->data) || has_displacement(magr))
+                  && !rn2(4)) {
+                pline("%s attacks the displaced image of %s.",
+                      Monnam(magr), mon_nam(mdef));
+                strike = FALSE;
+            }
             if (strike) {
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
@@ -436,6 +442,12 @@ register struct monst *magr, *mdef;
 
         case AT_HUGS: /* automatic if prev two attacks succeed */
             strike = (i >= 2 && res[i - 1] == MM_HIT && res[i - 2] == MM_HIT);
+            if ((is_displaced(magr->data) || has_displacement(magr))
+                && !rn2(4)) {
+                pline("%s attacks the displaced image of %s.",
+                      Monnam(magr), mon_nam(mdef));
+                strike = FALSE;
+            }
             if (strike)
                 res[i] = hitmm(magr, mdef, mattk);
 
@@ -559,11 +571,18 @@ struct attack *mattk;
             Strcpy(magr_name, Monnam(magr));
             switch (mattk->aatyp) {
             case AT_BITE:
-                Sprintf(buf, "%s bites", magr_name);
+                Sprintf(buf,"%s %ss", magr_name, has_beak(magr->data) ?
+                                   "peck" : "bite");
+                break;
+            case AT_KICK:
+                Sprintf(buf,"%s kicks", magr_name);
                 break;
             case AT_STNG:
                 Sprintf(buf, "%s stings", magr_name);
                 break;
+             case AT_CLAW:
+                     Sprintf(buf,"%s %s", magr_name, makeplural(barehitmsg(magr)));
+                     break;
             case AT_BUTT:
                 Sprintf(buf, "%s butts", magr_name);
                 break;
@@ -573,6 +592,17 @@ struct attack *mattk;
             case AT_TENT:
                 Sprintf(buf, "%s tentacles suck", s_suffix(magr_name));
                 break;
+            case AT_WEAP:
+                if (MON_WEP(magr)) {
+                    if (is_launcher(MON_WEP(magr)) ||
+                        is_missile(MON_WEP(magr)) ||
+                        is_ammo(MON_WEP(magr)) ||
+                        is_pole(MON_WEP(magr)))
+                            Sprintf(buf,"%s hits", magr_name);
+                    else Sprintf(buf,"%s %s", magr_name,
+                        makeplural(weaphitmsg(MON_WEP(magr),FALSE)));
+                    break;
+                } /*FALLTHRU*/
             case AT_HUGS:
                 if (magr != u.ustuck) {
                     Sprintf(buf, "%s squeezes", magr_name);

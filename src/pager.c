@@ -264,6 +264,9 @@ int x, y;
                     ? "peaceful "
                     : "",
             name);
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1) {
+        Sprintf(eos(buf), ", riding %s", a_monnam(ERID(mtmp)->m1));
+    }
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
             Strcat(buf, is_animal(mtmp->data)
@@ -702,6 +705,7 @@ struct permonst * pm;
     /* Flag descriptions */
     buf[0] = '\0';
     APPENDC(is_male(pm), "male");
+    APPENDC(is_female(pm), "female");
     APPENDC(pm->msize == MZ_TINY, "tiny");
     APPENDC(pm->msize == MZ_SMALL, "small");
     APPENDC(pm->msize == MZ_LARGE, "large");
@@ -750,6 +754,7 @@ struct permonst * pm;
     APPENDC(can_teleport(pm), "teleport");
     APPENDC(is_clinger(pm), "cling to the ceiling");
     APPENDC(needspick(pm), "mine");
+    APPENDC(is_jumper(pm), "jump long distances");
     if (!needspick(pm))
         APPENDC(tunnels(pm), "dig");
     if (*buf) {
@@ -759,6 +764,10 @@ struct permonst * pm;
     }
 
     /* Full-line remarks. */
+    if (is_displaced(pm))
+        MONPUTSTR("Has displacement.");
+    if (is_domestic(pm))
+        MONPUTSTR("Is treated as domestic.");
     if (touch_petrifies(pm))
         MONPUTSTR("Petrifies by touch.");
     if (perceives(pm))
@@ -1127,6 +1136,8 @@ add_obj_info(winid datawin, short otyp)
                     case PROTECTION:
                     case PROT_FROM_SHAPE_CHANGERS:
                     case POLYMORPH_CONTROL:
+                    case BLOODMAGIC:
+                    case GOODMEMORY:
                     case FREE_ACTION:
                     case FIXED_ABIL:
                         confers = "Confers";

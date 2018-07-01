@@ -582,12 +582,9 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
         ch = curses_convert_glyph(ch, glyph);
     }
     if (wid == NHW_MAP) {
-/* hilite stairs not in 3.6, yet
         if ((special & MG_STAIRS) && iflags.hilite_hidden_stairs) {
             color = 16 + (color * 2);
-        } else
-*/
-        if ((special & MG_OBJPILE) && iflags.hilite_pile) {
+        } else if ((special & MG_OBJPILE) && iflags.hilite_pile) {
             color = 16 + (color * 2) + 1;
         }
     }

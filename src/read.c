@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1526728750 2018/05/19 11:19:10 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,19 +21,24 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
-STATIC_DCL char * FDECL(erode_obj_text, (struct obj *, char *));
-STATIC_DCL void NDECL(do_class_genocide);
+STATIC_DCL char *FDECL(erode_obj_text, (struct obj *, char *));
+STATIC_DCL char *FDECL(apron_text, (struct obj *, char *buf));
 STATIC_DCL void FDECL(stripspe, (struct obj *));
 STATIC_DCL void FDECL(p_glow1, (struct obj *));
 STATIC_DCL void FDECL(p_glow2, (struct obj *, const char *));
-STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
+#if 0 /* not used */
+STATIC_DCL void FDECL(forget_objclass, (int));
+#endif
+STATIC_DCL void FDECL(specified_id, (void));
+STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_DCL boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_PTR void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
+STATIC_DCL void NDECL(do_class_genocide);
 
 STATIC_OVL boolean
 learnscrolltyp(scrolltyp)
@@ -58,7 +63,7 @@ struct obj *sobj;
         (void) learnscrolltyp(sobj->otyp);
 }
 
-char *
+STATIC_OVL char *
 erode_obj_text(otmp, buf)
 struct obj *otmp;
 char *buf;
@@ -160,7 +165,7 @@ char *buf;
     return erode_obj_text(tshirt, buf);
 }
 
-char *
+STATIC_OVL char *
 apron_text(apron, buf)
 struct obj *apron;
 char *buf;
@@ -260,10 +265,15 @@ doread()
         } else {
             if (flags.verbose)
                 pline("It reads:");
-            pline("\"%s\"",
-                  scroll->oartifact
-                      ? card_msgs[SIZE(card_msgs) - 1]
-                      : card_msgs[scroll->o_id % (SIZE(card_msgs) - 1)]);
+            if (Role_if(PM_CARTOMANCER) && scroll->oartifact)
+                pline("\"You gain 3 energy.\"");
+            else if (Role_if(PM_CARTOMANCER))
+                pline("\"Draw three cards. If one of those cards is the Amulet of Yendor, you win the game.\"");
+            else
+                pline("\"%s\"",
+                      scroll->oartifact
+                          ? card_msgs[SIZE(card_msgs) - 1]
+                          : card_msgs[scroll->o_id % (SIZE(card_msgs) - 1)]);
         }
         /* Make a credit card number */
         pline("\"%d0%d %ld%d1 0%d%d0\"%s",
@@ -340,6 +350,7 @@ doread()
         return 0;
     } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         const char *what = 0;
+
         if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
         else if (!scroll->dknown) {
@@ -388,7 +399,13 @@ doread()
     }
 
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
-    if (scroll->otyp != SCR_BLANK_PAPER) {
+    if(scroll->oartifact) {
+     		if(Blind) {
+     			  pline("Being blind, you cannot see the %s.", the(xname(scroll)));
+     			  return 0;
+     		}
+     		pline("You examine %s.", the(xname(scroll)));
+    } else if(scroll->otyp != SCR_BLANK_PAPER) {
         boolean silently = !can_chant(&youmonst);
 
         /* a few scroll feedback messages describe something happening
@@ -435,7 +452,7 @@ doread()
                 docall(scroll);
         }
         scroll->in_use = FALSE;
-        if (scroll->otyp != SCR_BLANK_PAPER)
+        if (scroll->otyp != SCR_BLANK_PAPER  && !scroll->oartifact)
             useup(scroll);
     }
     return 1;
@@ -801,7 +818,7 @@ int percent;
     int i, count;
     int indices[NUM_OBJECTS];
 
-    if (percent == 0)
+    if (percent == 0 || GoodMemory)
         return;
     if (percent <= 0 || percent > 100) {
         impossible("forget_objects: bad percent %d", percent);
@@ -872,7 +889,7 @@ int percent;
     xchar maxl, this_lev;
     int indices[MAXLINFO];
 
-    if (percent == 0)
+    if (percent == 0 || GoodMemory)
         return;
 
     if (percent <= 0 || percent > 100) {
@@ -929,6 +946,9 @@ STATIC_OVL void
 forget(howmuch)
 int howmuch;
 {
+    if (GoodMemory)
+        return;
+
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
 
@@ -967,7 +987,7 @@ struct obj *sobj;
     int was_tame = mtmp->mtame;
     unsigned was_peaceful = mtmp->mpeaceful;
 
-    if (sobj->cursed) {
+    if (sobj->cursed || Is_blackmarket(&u.uz)) {
         setmangry(mtmp, FALSE);
         if (was_peaceful && !mtmp->mpeaceful)
             return -1;
@@ -991,7 +1011,7 @@ int x,y;
               || distu(x, y) >= 32));
 }
 
-boolean
+STATIC_OVL boolean
 is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
@@ -1004,7 +1024,7 @@ boolean showmsg;
     return TRUE;
 }
 
-void
+STATIC_PTR void
 display_stinking_cloud_positions(state)
 int state;
 {
@@ -1604,6 +1624,19 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (food_detect(sobj))
             sobj = 0; /* nothing detected: strange_feeling -> useup */
         break;
+    case SCR_KNOWLEDGE:
+        useup(sobj);
+        sobj = 0;
+        if (confused)
+            You("know this to be a knowledge scroll.");
+        else {
+            specified_id();
+            if (sblessed)
+                specified_id();
+        }
+        if (!already_known)
+            (void) learnscrolltyp(SCR_KNOWLEDGE);
+        break;
     case SCR_IDENTIFY:
         /* known = TRUE; -- handled inline here */
         /* use up the scroll first, before makeknown() performs a
@@ -1709,7 +1742,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             make_confused(HConfusion + rnd(30), FALSE);
             break;
         }
-        if (sblessed) {
+        if (sobj->blessed && !(sobj->oartifact)) {
             register int x, y;
 
             for (x = 1; x < COLNO; x++)
@@ -1727,14 +1760,24 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             make_confused(HConfusion + rnd(30), FALSE);
             break;
         }
-        pline("A map coalesces in your mind!");
-        cval = (scursed && !confused);
-        if (cval)
-            HConfusion = 1; /* to screw up map */
-        do_mapping();
-        if (cval) {
-            HConfusion = 0; /* restore */
-            pline("Unfortunately, you can't grasp the details.");
+        if(!(sobj->oartifact)){
+            pline("A map coalesces in your mind!");
+            cval = (scursed && !confused);
+            if (cval)
+                HConfusion = 1; /* to screw up map */
+            do_mapping();
+            if (cval) {
+                HConfusion = 0; /* restore */
+                pline("Unfortunately, you can't grasp the details.");
+            }
+        }
+        else{
+       			if(sobj->age > monstermoves){
+       				  pline("The map is hard to see.");
+       				  nomul(rnd(3));
+       				  sobj->age += (long) d(3,10);
+       			} else sobj->age = monstermoves + (long) d(3,10);
+       			    do_vicinity_map(sobj);
         }
         break;
     case SCR_AMNESIA:
@@ -1796,7 +1839,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 }
                 dam *= 5;
                 pline("Where do you want to center the explosion?");
-                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                getpos_sethilite(display_stinking_cloud_positions,
+                                 get_valid_stinking_cloud_pos);
                 (void) getpos(&cc, TRUE, "the desired position");
                 if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
                     /* try to reach too far, get burned */
@@ -1892,7 +1936,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
               already_known ? "stinking " : "");
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+        getpos_sethilite(display_stinking_cloud_positions,
+                         get_valid_stinking_cloud_pos);
         if (getpos(&cc, TRUE, "the desired position") < 0) {
             pline1(Never_mind);
             break;
@@ -1906,7 +1951,47 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     default:
         impossible("What weird effect is this? (%u)", otyp);
     }
+    /* if sobj is gone, we've already called useup() above and the
+       update_inventory() that it performs might have come too soon
+       (before charging an item, for instance) */
+    if (!sobj)
+        update_inventory();
     return sobj ? 0 : 1;
+}
+
+STATIC_OVL void
+specified_id()
+{
+    static char buf[BUFSZ] = DUMMY;
+    char promptbuf[BUFSZ];
+    char bufcpy[BUFSZ];
+    short otyp;
+    int tries = 0;
+
+    promptbuf[0] = '\0';
+    if (flags.verbose)
+        You("may identify any object.");
+  retry:
+    Strcpy(promptbuf, "What type of non-artifact object do you wish to learn the history of");
+    Strcat(promptbuf, "?");
+    getlin(promptbuf, buf);
+    (void) mungspaces(buf);
+    if (buf[0] == '\033') {
+        buf[0] = '\0';
+    }
+    strcpy(bufcpy, buf);
+    otyp = name_to_otyp(buf);
+    if (otyp == STRANGE_OBJECT) {
+            pline("No specific object of that name exists.");
+        if (++tries < 5)
+            goto retry;
+        pline1(thats_enough_tries);
+        if (!otyp)
+            return; /* for safety; should never happen */
+    }
+    (void) makeknown(otyp);
+    You("feel more knowledgeable.");
+    update_inventory();
 }
 
 void

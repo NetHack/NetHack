@@ -67,7 +67,7 @@ struct flag {
      * 'schar' to 'short int' instead of to 'char'.  (Needed by pre-ANSI
      * systems that use unsigned characters without a way to force them
      * to be signed.)  So, the type has been changed back to 'xchar' for
-     * 3.6.1.
+     * 3.6.x.
      *
      * TODO:  change to 'char' (and move out of this block of booleans,
      * and get rid of these comments...) once 3.6.0 savefile compatibility
@@ -110,6 +110,8 @@ struct flag {
 #define PARANOID_REMOVE     0x0040
 #define PARANOID_BREAKWAND  0x0080
 #define PARANOID_WERECHANGE 0x0100
+#define PARANOID_SWIM       0x0200
+#define PARANOID_TRAP       0x0400
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char inv_order[MAXOCLASSES];
@@ -225,6 +227,16 @@ enum getloc_filters {
     NUM_GFILTER
 };
 
+struct debug_flags {
+    boolean test;
+#ifdef TTY_GRAPHICS
+    boolean ttystatus;
+#endif
+#ifdef WIN32
+    boolean immediateflips;
+#endif
+};
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -277,6 +289,7 @@ struct instance_flags {
        breaking 3.6.[01] save files */
     boolean goldX;            /* for BUCX filtering, whether gold is X or U */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
+    boolean hilite_hidden_stairs; /* mark hidden stairs with a hilite */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
@@ -438,6 +451,7 @@ struct instance_flags {
     short mines_prize_type;     /* luckstone */
     short soko_prize_type1;     /* bag of holding or    */
     short soko_prize_type2;     /* amulet of reflection */
+    struct debug_flags debug;
 };
 
 /*
@@ -510,6 +524,11 @@ enum runmode_types {
 /* werechange: accepting randomly timed werecreature change to transform
    from human to creature or vice versa while having polymorph control */
 #define ParanoidWerechange ((flags.paranoia_bits & PARANOID_WERECHANGE) != 0)
+/* swim: walk (not fly or jump or levitate) into water or lava from a
+ * non-similar square */
+#define ParanoidSwim ((flags.paranoia_bits & PARANOID_SWIM) != 0)
+/* trap: move onto a trap that you know is there */
+#define ParanoidTrap ((flags.paranoia_bits & PARANOID_TRAP) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */

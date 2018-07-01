@@ -922,6 +922,9 @@ register struct obj *obj;
     case RIN_SLOW_DIGESTION:
     case RIN_SUSTAIN_ABILITY:
     case MEAT_RING:
+    case RIN_BLOOD_MAGIC:
+    case RIN_PSYCHIC_RESISTANCE:
+    case RIN_MEMORY:
         break;
     case RIN_STEALTH:
         toggle_stealth(obj, oldprop, TRUE);
@@ -1033,6 +1036,9 @@ boolean gone;
     case RIN_SLOW_DIGESTION:
     case RIN_SUSTAIN_ABILITY:
     case MEAT_RING:
+    case RIN_BLOOD_MAGIC:
+    case RIN_PSYCHIC_RESISTANCE:
+    case RIN_MEMORY:
         break;
     case RIN_STEALTH:
         toggle_stealth(obj, (EStealth & ~mask), FALSE);

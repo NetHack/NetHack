@@ -88,6 +88,8 @@ enum prop_types {
     REFLECTING,
     FREE_ACTION,
     FIXED_ABIL,
+    BLOODMAGIC,
+    GOODMEMORY,
     LIFESAVED
 };
 #define LAST_PROP (LIFESAVED)

@@ -27,6 +27,80 @@ STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 /* changed to a parameter to mhitu. */
 static int dieroll;
 
+static const char *const monkattacks[] = {
+    "chop", "jab", "headbutt", "elbow", "knee", "hammer strike"
+};
+
+/* any sort of nonsensical or non-lore-friendly physical attack */
+static const char *const hmonkattacks[] = {
+    "suplex",    "piledrive",    "slap",    "shove",    "flick",
+    "heel drop", "uppercut",     "flip",    "smack",    "downercut",
+    "arm-bar",   "haymaker",     "leopard punch",       "sucker punch",
+    "backhand",  "combo"
+
+};
+
+const char *
+weaphitmsg(obj,uhitm)
+struct obj *obj;
+boolean uhitm;
+{
+       /* lucern hammers and bec-de-corbins both whack and pierce */
+       return ((objects[obj->otyp].oc_dir & WHACK &&
+               (!(objects[obj->otyp].oc_dir & PIERCE) || rn2(2))) ?
+                       ((objects[obj->otyp].oc_skill == P_CLUB ||
+                       objects[obj->otyp].oc_skill == P_MACE ||
+                       objects[obj->otyp].oc_skill == P_MORNING_STAR) ?
+                           "club" : "whack") :
+               (objects[obj->otyp].oc_dir & PIERCE &&
+               (!(objects[obj->otyp].oc_dir & SLASH) || rn2(2))) ?
+                       (is_blade(obj) ? "stab" : "jab") :
+               (objects[obj->otyp].oc_dir & SLASH) ?
+                       (uhitm && Role_if(PM_BARBARIAN) ? "smite" :
+                        rn2(2) ? "hack" : is_axe(obj) ? "hew" : "slash") :
+               (objects[obj->otyp].oc_skill == P_WHIP) ?
+                       "whip" :
+               "hit");
+}
+
+const char *
+barehitmsg(mtmp)
+struct monst *mtmp;
+{
+      if (!strcmp(mbodypart(mtmp, HAND),"claw") ||
+	  !strcmp(mbodypart(mtmp, HAND),"paw") ||
+              !strcmp(mbodypart(mtmp, HAND),"foreclaw") || is_bird(mtmp->data))
+                return "claw";
+      if (!strcmp(mbodypart(mtmp, HAND),"swirl") || /* elementals */
+          !strcmp(mbodypart(mtmp, HAND),"tentacle")) { /* krakens */
+              if (mtmp->data == &mons[PM_EARTH_ELEMENTAL])
+                  return "pummel";
+              return "lash";
+      }
+      if (mtmp->data == &mons[PM_MONK] || mtmp->data == &mons[PM_SAMURAI]
+              || mtmp->data == &mons[PM_MARTIAL_MASTER]
+              || mtmp->data == &mons[PM_MARTIAL_ARTIST]
+              || (martial_bonus() &&
+                  (mtmp == &youmonst ||
+                  /* Assumes monk or samurai quest monsters */
+                  mtmp->data->msound == MS_LEADER ||
+                  mtmp->data->msound == MS_GUARDIAN ||
+                  mtmp->data->msound == MS_NEMESIS))) {
+              if (Hallucination)
+                  return hmonkattacks[rn2(SIZE(hmonkattacks))];
+              else if (rn2(5))
+                  return "strike";
+              else
+                  return monkattacks[rn2(SIZE(monkattacks))];
+
+      }
+      if (mtmp->data == &mons[PM_NURSE])
+          return "jab";
+      if (!strcmp(mbodypart(mtmp, HAND), "hand"))
+          return "punch";
+      return "hit";
+}
+
 STATIC_OVL void
 hitmsg(mtmp, mattk)
 struct monst *mtmp;
@@ -46,7 +120,7 @@ struct attack *mattk;
     } else {
         switch (mattk->aatyp) {
         case AT_BITE:
-            pfmt = "%s bites!";
+            pfmt = has_beak(mtmp->data) ? "%s pecks!" : "%s bites!";
             break;
         case AT_KICK:
             pline("%s kicks%c", Monst_name,
@@ -56,7 +130,7 @@ struct attack *mattk;
             pfmt = "%s stings!";
             break;
         case AT_BUTT:
-            pfmt = "%s butts!";
+            pfmt = has_horns(mtmp->data) ? "%s gores you!" : "%s butts!";
             break;
         case AT_TUCH:
             pfmt = "%s touches you!";
@@ -68,6 +142,20 @@ struct attack *mattk;
         case AT_EXPL:
         case AT_BOOM:
             pfmt = "%s explodes!";
+            break;
+        case AT_WEAP:
+            if (MON_WEP(mtmp)) {
+                if (is_launcher(MON_WEP(mtmp)) ||
+                    is_missile(MON_WEP(mtmp)) ||
+                    is_ammo(MON_WEP(mtmp)) ||
+                    is_pole(MON_WEP(mtmp)))
+                        pfmt = "%s hits!";
+                else pline("%s %s you!", Monst_name,
+                    makeplural(weaphitmsg(MON_WEP(mtmp),FALSE)));
+                break;
+            } /*fallthrough*/
+        case AT_CLAW:
+            pline("%s %s you!", Monst_name, makeplural(barehitmsg(mtmp)));
             break;
         default:
             pfmt = "%s hits!";
@@ -983,6 +1071,8 @@ register struct attack *mattk;
                     u.ustuck = mtmp;
                     if (Hallucination) {
                         pline("%s wrestles you!", Monnam(mtmp));
+                    } else if (mtmp->data->mlet == S_RODENT) {
+                        pline("%s wraps their tail around you!", Monnam(mtmp));
                     } else {
                         pline("%s grabs you!", Monnam(mtmp));
                     }
@@ -1460,7 +1550,7 @@ register struct attack *mattk;
             break;
         }
         buf[0] = '\0';
-        switch (steal(mtmp, buf)) {
+        switch (steal(mtmp, buf, FALSE)) {
         case -1:
             return 2;
         case 0:
@@ -1540,7 +1630,7 @@ register struct attack *mattk;
             && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
 
-            pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
+            pline("%s %s you!  (I hope you don't mind.)", Monnam(mtmp), makeplural(barehitmsg(mtmp)));
             if (Upolyd) {
                 u.mh += rnd(7);
                 if (!rn2(7)) {
@@ -2702,7 +2792,8 @@ struct monst *mon;
        as far as deciding what will happen; chance for bad outcome when
        Cha+Int is 32 or more is 2/35, a bit over 5.7% */
     attr_tot = ACURR(A_CHA) + ACURR(A_INT);
-    if (rn2(35) > min(attr_tot, 32)) {
+    if ((monsndx(mon->data) == PM_LORD_OF_THE_FOOCUBI && rn2(50) > attr_tot) ||
+        rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
         pline("%s seems to have enjoyed it more than you...",
               noit_Monnam(mon));

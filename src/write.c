@@ -39,6 +39,7 @@ ink_cost(short otyp)
         return 12;
     case SCR_IDENTIFY:
     case SCR_WARDING_WORDS:
+    case SCR_KNOWLEDGE:
         return 14;
     case SCR_ENCHANT_ARMOR:
     case SCR_REMOVE_CURSE:

@@ -524,6 +524,9 @@ register struct obj *obj;
         pline_The("water's force seems %ser now.",
                   (obj->spe < 0) ? "small" : "great");
         break;
+    case RIN_BLOOD_MAGIC:
+        pline_The("Thick red liquid pools in the sink.");
+        break;
     case RIN_HUNGER:
         ideed = FALSE;
         for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
@@ -606,6 +609,12 @@ register struct obj *obj;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
                   "sink momentarily looks like a regularly erupting geyser.");
+            break;
+        case RIN_PSYCHIC_RESISTANCE:
+            pline_The("sink glows purple for a moment.");
+            break;
+        case RIN_MEMORY:
+            You("fondly remember the ring that you just lost.");
             break;
         default:
             break;
@@ -1012,9 +1021,12 @@ int retry;
         bypass_objlist(invent, FALSE);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-        n = query_objlist("What would you like to drop?", &invent,
-                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
-                          all_categories ? allow_all : allow_category);
+        n = Role_if(PM_PIRATE) ? query_objlist("What would ye like to drop?",
+            &invent, USE_INVLET|INVORDER_SORT, &pick_list,
+            PICK_ANY, all_categories ? allow_all : allow_category)
+            : query_objlist("What would you like to drop?", &invent,
+          	USE_INVLET|INVORDER_SORT, &pick_list,
+          	PICK_ANY, all_categories ? allow_all : allow_category);
         if (n > 0) {
             /*
              * picklist[] contains a set of pointers into inventory, but
@@ -1360,7 +1372,7 @@ boolean at_stairs, falling, portal;
     u.ustuck = 0; /* idem */
     u.uinwater = 0;
     u.uundetected = 0; /* not hidden, even if means are available */
-    keepdogs(FALSE);
+    keepdogs(FALSE, at_stairs);
     if (u.uswallow) /* idem */
         u.uswldtim = u.uswallow = 0;
     recalc_mapseen(); /* recalculate map overview before we leave the level */
@@ -1460,10 +1472,13 @@ boolean at_stairs, falling, portal;
             if (ttrap->ttyp == MAGIC_PORTAL)
                 break;
 
-        if (!ttrap)
-            panic("goto_level: no corresponding portal!");
-        seetrap(ttrap);
-        u_on_newpos(ttrap->tx, ttrap->ty);
+        if (!ttrap) {
+            /* panic("goto_level: no corresponding portal!"); */
+            u_on_rndspot((up ? 1 : 0) | (was_in_W_tower ? 2 : 0));
+        } else {
+            seetrap(ttrap);
+            u_on_newpos(ttrap->tx, ttrap->ty);
+        }
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
             if (at_ladder)
@@ -1832,10 +1847,23 @@ struct obj *corpse;
             break;
 
         case OBJ_FLOOR:
-            if (cansee(mtmp->mx, mtmp->my))
-                pline("%s rises from the dead!",
-                      chewed ? Adjmonnam(mtmp, "bite-covered")
-                             : Monnam(mtmp));
+            if (cansee(mtmp->mx, mtmp->my)) {
+                int pm = monsndx(mtmp->data);
+                if (pm == PM_DEATH) {
+                    pline("%s rises from the dead in a whirl of specral skulls!",
+                        Monnam(mtmp));
+                } else if (pm == PM_PESTILENCE) {
+                    pline("%s rises from the dead in a churning pillar of flies!",
+                        Monnam(mtmp));
+                } else if (pm == PM_FAMINE) {
+                    pline("%s rises from the dead amid a chorus of wails!",
+                        Monnam(mtmp));
+                } else {
+                    pline("%s rises from the dead!",
+                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                                 : Monnam(mtmp));
+                }
+            }
             break;
 
         case OBJ_MINVENT: /* probably a nymph's */

@@ -34,10 +34,10 @@ X11TILES= x11tiles.;
 # note: the level lists need to be space separated
 QUESTLEVS = Arch.des Barb.des Caveman.des Cartomancer.des Healer.des \
 	Knight.des Monk.des Priest.des Ranger.des Rogue.des Samurai.des Tourist.des \
-	Valkyrie.des Wizard.des	Drag.des
+	Valkyrie.des Wizard.des	Drag.des Pirate.des
 SPECLEVS  = bigroom.des castle.des endgame.des gehennom.des knox.des \
 	medusa.des mines.des oracle.des sokoban.des statuary.des tower.des \
-	void.des yendor.des
+	void.des yendor.des blkmar.des
 
 all :	$(VARDAT) $(DUNGEON) $(MARKERS) $(DLB)
       @ $(ECHO) "data files are up to date."

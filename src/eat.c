@@ -21,7 +21,6 @@ STATIC_DCL struct obj *FDECL(touchfood, (struct obj *));
 STATIC_DCL void NDECL(do_reset_eat);
 STATIC_DCL void FDECL(done_eating, (BOOLEAN_P));
 STATIC_DCL void FDECL(cprefx, (int));
-STATIC_DCL int FDECL(intrinsic_possible, (int, struct permonst *));
 STATIC_DCL void FDECL(givit, (int, struct permonst *));
 STATIC_DCL void FDECL(cpostfx, (int));
 STATIC_DCL void FDECL(consume_tin, (const char *));
@@ -776,7 +775,7 @@ fix_petrification()
  */
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
-STATIC_OVL int
+int
 intrinsic_possible(type, ptr)
 int type;
 register struct permonst *ptr;
@@ -1028,6 +1027,7 @@ register int pm;
         catch_lycanthropy = PM_WEREJACKAL;
         break;
     case PM_HUMAN_WEREWOLF:
+    case PM_ALPHA_WEREWOLF:
         catch_lycanthropy = PM_WEREWOLF;
         break;
     case PM_NURSE:

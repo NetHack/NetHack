@@ -10,7 +10,6 @@
 STATIC_DCL boolean FDECL(tele_jump_ok, (int, int, int, int));
 STATIC_DCL boolean FDECL(teleok, (int, int, BOOLEAN_P));
 STATIC_DCL void NDECL(vault_tele);
-STATIC_DCL boolean FDECL(rloc_pos_ok, (int, int, struct monst *));
 STATIC_DCL void FDECL(mvault_tele, (struct monst *));
 
 /* non-null when teleporting via having read this scroll */
@@ -237,7 +236,7 @@ teleok(x, y, trapok)
 register int x, y;
 boolean trapok;
 {
-    if (!trapok && t_at(x, y))
+    if (!trapok && t_at(x, y) && t_at(x, y)->ttyp != VIBRATING_SQUARE)
         return FALSE;
     if (!goodpos(x, y, &youmonst, 0))
         return FALSE;
@@ -698,7 +697,8 @@ level_tele()
         /* if in Knox and the requested level > 0, stay put.
          * we let negative values requests fall into the "heaven" loop.
          */
-        if (Is_knox(&u.uz) && newlev > 0 && !force_dest) {
+        if ((Is_knox(&u.uz) || Is_blackmarket(&u.uz))
+            && newlev > 0 && !force_dest) {
             You1(shudder_for_moment);
             return;
         }
@@ -887,6 +887,13 @@ struct trap *trap;
         vault_tele();
     } else
         tele();
+    /* Give the player a message when they trigger a teleport trap.  */
+    if (!In_endgame(&u.uz) && !Antimagic) {
+        if (!Blind)
+            pline("The air around you shimmers!");
+        else
+            You("are briefly feel dizzy.");
+    }
 }
 
 void
@@ -921,7 +928,7 @@ unsigned trflags;
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
-STATIC_OVL boolean
+boolean
 rloc_pos_ok(x, y, mtmp)
 register int x, y; /* coordinates of candidate location */
 struct monst *mtmp;
@@ -1180,6 +1187,17 @@ int in_sight;
                     seetrap(trap);
                 }
                 return 0;
+              } else if (mtmp->mtame &&
+          			  (Is_blackmarket(&trap->dst) || Is_blackmarket(&u.uz))) {
+          		    if (in_sight) {
+          			        pline("%s seems to shimmer for a moment.",
+          				      Monnam(mtmp));
+          			        seetrap(trap);
+          		    }
+          		    return 0;
+          	} else if (Is_blackmarket(&u.uz) &&
+          			mtmp->data == &mons[PM_ARMS_DEALER]) {
+          		    return 0;
             } else {
                 assign_level(&tolevel, &trap->dst);
                 migrate_typ = MIGR_PORTAL;
@@ -1296,7 +1314,7 @@ random_teleport_level()
     int nlev, max_depth, min_depth, cur_depth = (int) depth(&u.uz);
 
     /* [the endgame case can only occur in wizard mode] */
-    if (!rn2(5) || Is_knox(&u.uz) || In_endgame(&u.uz))
+    if (!rn2(5) || Is_knox(&u.uz) || Is_blackmarket(&u.uz) || In_endgame(&u.uz))
         return cur_depth;
 
     /* What I really want to do is as follows:

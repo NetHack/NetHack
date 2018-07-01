@@ -2456,6 +2456,7 @@ boolean prefilled;
         case COURT:
         case ZOO:
         case BEEHIVE:
+        case LAB:
         case DEN:
         case MORGUE:
         case BARRACKS:
@@ -2478,6 +2479,9 @@ boolean prefilled;
         break;
     case BEEHIVE:
         level.flags.has_beehive = TRUE;
+        break;
+    case LAB:
+        level.flags.has_lab = TRUE;
         break;
     case DEN:
         level.flags.has_den = TRUE;

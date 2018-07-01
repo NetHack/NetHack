@@ -9,6 +9,9 @@
 Vlad was here
 ad aerarium
 
+# The NetHack Song, by Rob Balder
+ASCII stupid question and you'll get a stupid ANSI.
+
 # Junenethack 2018
 Improved Tin Openers rule!
 
@@ -17,16 +20,19 @@ Owlbreath
 Galadriel
 Kilroy was here
 
-# House of Leaves (added by NullCGT 2/05/18)
+# Creepypasta
+Watch the Sky.
+
+# House of Leaves
 This is not for you.
 
-# Robert W. Chambers (added by NullCGT 2/05/18)
+# Robert W. Chambers
 The Yellow Sign
 
-# White Plume Mountain (added by NullCGT 5/20/18)
+# White Plume Mountain
 Fabulous riches and hideous death await!
 
-# Frustrating messages (added by NullCGT 5/20/18)
+# Frustrating messages
 Sorry, adventurer, your amulet is in another dungeon.
 
 # Journey to the Center of the Earth

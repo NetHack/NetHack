@@ -66,7 +66,14 @@ pet_type()
         return  PM_LITTLE_DOG;
     else if (preferred_pet == 'b')
         return PM_LITTLE_BIRD;
-    else
+    else if (Role_if(PM_PIRATE)) {
+     		if (preferred_pet == 'B')
+     			  return (PM_PARROT);
+     		else if(preferred_pet == 'Y')
+     			  return PM_MONKEY;
+     		else
+     			  return (rn2(2) ? PM_PARROT : PM_MONKEY);
+    } else
         switch(rn2(3)) {
             case 0:
                 return PM_KITTEN;
@@ -344,7 +351,7 @@ boolean with_you;
     ylocale = mtmp->mtrack[1].y;
     memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 
-    if (mtmp == u.usteed)
+    if (mtmp == u.usteed || mtmp->monmount == 1)
         return; /* don't place steed on the map */
     if (with_you) {
         /* When a monster accompanies you, sometimes it will arrive
@@ -357,6 +364,7 @@ boolean with_you;
             rloc_to(mtmp, u.ux, u.uy);
         else
             mnexto(mtmp);
+        update_monsteed(mtmp);
         return;
     }
     /*
@@ -482,6 +490,7 @@ fail_mon_placement:
             mongone(mtmp);
         }
     }
+    update_monsteed(mtmp);
 }
 
 /* heal monster for time spent elsewhere */
@@ -585,8 +594,9 @@ long nmv; /* number of moves */
 
 /* called when you move to another level */
 void
-keepdogs(pets_only)
+keepdogs(pets_only, stairs)
 boolean pets_only; /* true for ascension or final escape */
+boolean stairs;
 {
     register struct monst *mtmp, *mtmp2;
     register struct obj *obj;
@@ -634,6 +644,11 @@ boolean pets_only; /* true for ascension or final escape */
                     pline("%s is still %s.", Monnam(mtmp),
                           mtmp->meating ? "eating" : "trapped");
                 stay_behind = TRUE;
+            } else if (mtmp->mtame &&
+        		    (Is_blackmarket(&u.uz))) {
+            			pline("%s can't follow you through the portal.",
+            			      Monnam(mtmp));
+            			stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp))
                     pline("%s seems very disoriented for a moment.",
@@ -667,6 +682,13 @@ boolean pets_only; /* true for ascension or final escape */
                 wormgone(mtmp);
             } else
                 num_segs = 0;
+
+            if (!stay_behind && !mtmp->mpeaceful){
+                  if (stairs)
+                      pline("%s pursues you!", Monnam(mtmp));
+                  else
+                      pline("%s manages to get a grip on you!", Monnam(mtmp));
+            }
 
             /* set minvent's obj->no_charge to 0 */
             for (obj = mtmp->minvent; obj; obj = obj->nobj) {
@@ -705,6 +727,11 @@ coord *cc;   /* optional destination coordinates */
     d_level new_lev;
     xchar xyflags;
     int num_segs = 0; /* count of worm segments */
+
+    /* Recursive call to levelport monster steeds. */
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1) {
+        migrate_to_level(ERID(mtmp)->m1, tolev, xyloc, cc);
+    }
 
     if (mtmp->isshk)
         set_residency(mtmp, TRUE);

@@ -2044,6 +2044,244 @@ the Astral Plane.  I suspect that I shall never see you again in this
 life, but I hope to at %ds feet."
 %E [Take the Amulet to the Astral Plane and deliver it to %d.]
 #
+#	Pirate
+#
+%Cc Pir 00001
+Ye breathe deeply of the sweet bouquet that is %H.
+
+...It'll linger.
+
+Rather than the chaotic din ye recall, a eerie silence greets yer
+lugs. In the distance, ye hear soldiers on patrol. Seems yer pirate
+brethren be in need of yer assistance!
+%E
+%Cp Pir 00002
+Once again, you breathe the bouquet that is %H.
+%E
+%Cp Pir 00003
+Ye are back on %H.
+Ye fear that soon the brethren of the coast will have to abandon
+%H.
+%E
+%Cp Pir 00005
+"The soldiers o' Yendor attacked %H and destroyed %l's home!"
+%E
+%Cp Pir 00006
+"These Yendorans 'ave disturbed the dead that lay in Davy Jones's
+Locker!"
+%E
+%Cp Pir 00007
+"Ol' %l once sailed with the Dread Pirate Roberts, or so they say."
+%E
+%Cp Pir 00008
+"%n has risen and scattered the soldiers sent to %i.
+Now the dead attack %H as well!"
+%E
+%Cp Pir 00009
+"Captain Ketch led the attack and sank many o' our ships. Now Ketch be
+trapped on %i."
+%E
+%Cp Pir 00010
+"Have ye found much booty in the Dungeons o' Doom?"
+%E
+%Cp Pir 00011
+"Did ye send Ketch to feed the fishes?"
+%E
+%Cp Pir 00012
+"Arrrr!"
+%E
+%Cp Pir 00013
+"Ol' %l once sailed with the Dread Pirate Roberts, or so they say."
+%E
+%Cp Pir 00014
+"Be there comely lasses in the Dungeons o' Doom?"
+%E
+%Cc Pir 00015
+"So, %p. Ye have returned to yer brethren. We 'ave need of a canny
+%S of the coast to show these Yendorans to the plank.
+
+"Let me be see'n if you BE that %S."
+%E
+%Cp Pir 00016
+"Ye try me patience, %p.
+I hope that this time ye be ready."
+%E
+%Cp Pir 00017
+"I hope for yer sake ye are prepared at last."
+%E
+%Cc Pir 00018
+"Me mercy is at an end, %p. Leave %H and never return."
+%E
+%Cc Pir 00019
+"Ye be still too weak.  Return a proven %R. Perhaps then
+ye will be ready.
+
+"Go now, and follow %d to glory and riches."
+%E
+%Cc Pir 00020
+"Ye must follow %d through %a waters to reach %i.
+
+"As ye be now ye would never make it. Do not return to %H
+until ye be wise in the ways o' %d."
+%E
+%Cc Pir 00021
+"I always knew ye had greatness in ye, %S. As a %g, perhaps ye may
+succeed where I once failed.
+
+"In my youth, I sailed with the immortal Dread Pirate, Roberts. In our
+adventures, we came to oppose Blackbeard, then mightiest of the servants
+of the Devil, in his quest for %o.
+
+"Our final duel took place at the center of %i. Roberts,
+himself a mighty follower of %d, bested Blackbeard
+at swordplay, sending him tumbling into the caldera. But Blackbeard
+was able to place a mighty curse on %o, and I was
+unable to stop it plunging into the caldera to join him.
+
+"Now these Yendorans have come to claim what I lost, and in my age
+I be unable to stop them. So it falls to ye, my %S. Drive these
+soldiers from %H, then sail to %i, destroy %n
+once and fer all, and claim %o, in yer own name!"
+%E
+%Cp Pir 00025
+"Do not be shaken by the fearsome form of %n."
+%E
+%Cp Pir 00026
+"To enter %i you must find a hidden fissure in the rocks."
+%E
+%Cp Pir 00027
+"Oh, an' Captain Ketch owes me for a new house!"
+%E
+%Cp Pir 00028
+"Captain Ketch sailed to %i, but the ship was lost on the
+rocks an' Ketch doesn't know the way into the caves."
+%E
+%Cp Pir 00029
+"If ye do not destroy %n, he will follow you back here!"
+%E
+%Cp Pir 00030
+"Sharks swim in the waters around %i."
+%E
+%Cp Pir 00031
+"It be pitch black in %i!"
+%E
+%Cp Pir 00032
+"There be much treasure lost in the waves around %i."
+%E
+%Cp Pir 00033
+"Only the %a can reach %i."
+%E
+%Cp Pir 00034
+"Trust %d in yer hour of need."
+%E
+%Cc Pir 00035
+Ye have reached the treacherous waters around %i at last
+The ghostly minions of %n are everywhere around you.
+%E
+%Cp Pir 00036
+Ye know that this time you must find and destroy %n.
+%E
+%Cc Pir 00040
+Ye sense the presence of %o at the heart of %i.
+%E
+%Cp Pir 00041
+Ye know that soon ye shall claim %o for yer own.
+%E
+%Cc Pir 00050
+"So, %p, %l thinks that ye can claim %o,
+when even he could not?!
+
+"He must be senile to send %ra to destroy me, when even in his prime
+he failed at the same task! No, it is your soul that shall go to %d."
+%E
+%Cp Pir 00051
+"I have been toying with ye, %p. This time I will kill ye."
+%E
+%Cc Pir 00052
+"Flee now, %p. A %c cannot destroy %n.
+
+"If ye do not flee, I will inflict so much suffering on ye that
+%l will feel guilty for ever having sent his %S to me!"
+%E
+%Cc Pir 00053
+"Return %o to me, or I shall visit torments on ye even
+Judas knows naught of.
+%E
+%Cp Pir 00060
+"I defeated death, even %l couldn't destroy me at his best.
+What hope have ye, %p."
+%E
+%Cp Pir 00061
+"I am the mightiest follower of the Devil the world
+has ever known! Your weak devotion to %d
+will not save ye."
+%E
+%Cp Pir 00062
+"Beg for mercy now, and I will only kill ye."
+%E
+%Cp Pir 00063
+"Abandon your %a ways! Slink off and never face me again!"
+%E
+%Cp Pir 00064
+"Vengeance will be mine, %p. I will make %l pay,
+for what he did to me!"
+%E
+%Cp Pir 00065
+"The Brethren of the Coast are finished. Now I rule the seas!"
+%E
+%Cp Pir 00066
+"With %o I control all the treasures of the sea!"
+%E
+%Cp Pir 00067
+"I will never die!"
+%E
+%Cp Pir 00068
+"Are ye truly the greatest pirate %H has left?
+It will share your fate!"
+%E
+%Cp Pir 00069
+"Die in vain, %p! I will send %l to join ye!"
+%E
+%Cc Pir 00070
+As ye pick up %o, ye feel a great
+weight has been lifted from your shoulders.  Your only thoughts are
+to quickly return to %H and find %l.
+%E
+%Cc Pir 00080
+A great crack opens below %n, and a huge, flaming hand
+reaches out to seize his wispy form. He curses ye:
+    NO! I won't die here, %p! It is ye who's soul will feed
+	the Devil! I am king of all the oceans, I cannot be killed!
+	I will haunt ye until %d betrays ye!
+%E
+%Cc Pir 00081
+As %l senses %o, the lines on his face harden
+into what may be his version of a smile.
+    Ye have claimed %o.  Ye hold in
+	yer hands all the treasures of the sea.  Ye may well be
+	the next Dread Pirate, greater even than Roberts. My
+	%S, ye should seek a treasure greater than any pirate
+	has ever sought before: the Amulet of Yendor.
+
+	The great Wizard, who lives in Yendor, knows that ye
+	can claim this prize. It was he who sent the soldiers here.
+	Return to %Z, and claim yer destiny!
+%E
+%Cc Pir 00082
+"%oC is yers.  Yer destiny awaits through the portal that
+brought ye here."
+%E
+%Cp Pir 00090
+"Tell me of yer adventures in yer quest for the Amulet of Yendor."
+%E
+%Cc Pir 00091
+"Ye have claimed the Amulet of Yendor! Truly ye were destined to be
+the greatest %S of the Breathren of the Coast!
+
+"Now ye must travel to the astral sea, and offer the Amulet on the
+High Altar of %d!"
+%E
+#
 #	Priest
 #
 %Cc Pri 00001

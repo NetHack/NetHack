@@ -302,6 +302,9 @@ struct you {
 
     int uhunger;  /* refd only in eat.c and shk.c */
     unsigned uhs; /* hunger state - see eat.c */
+    boolean ukinghill; /* records if you are carying the pirate treasure
+    (and are therefor king of the hill) */
+    int protean; /* counter for the auto-polypiling power of the chest*/
 
     struct prop uprops[LAST_PROP + 1];
 
@@ -383,6 +386,7 @@ struct you {
     int ugangr;              /* if the gods are angry at you */
     int ugifts;              /* number of artifacts bestowed */
     int ublessed, ublesscnt; /* blessing/duration from #pray */
+    int ublesstim;           /* turns since prayer */
     long umoney0;
     long uspare1;
     long uexp, urexp;

@@ -154,6 +154,27 @@ dosounds()
             }
         }
     }
+    if (level.flags.has_lab && !rn2(200)) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if ((mtmp->data->mlet == S_QUANTMECH)
+                && mon_in_room(mtmp, LAB)) {
+                switch (rn2(2) + hallu) {
+                case 0:
+                    You_hear("a strange squelching noise.");
+                    break;
+                case 1:
+                    You_hear("the hissing of bunsen burners.");
+                    break;
+                case 2:
+                    You_hear("Dr. Frankenstein!");
+                    break;
+                }
+                return;
+            }
+        }
+    }
     if (level.flags.has_morgue && !rn2(200)) {
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
@@ -318,6 +339,16 @@ dosounds()
         }
         return;
     }
+    if (!Is_blackmarket(&u.uz) && at_dgn_entrance("One-eyed Sam's Market") &&
+      !rn2(200)) {
+        static const char *blkmar_msg[3] = {
+            "You hear someone complaining about the prices.",
+            "Somebody whispers: \"Food rations? Only 900 zorkmids.\"",
+            "You feel like searching for more gold.",
+        };
+      pline("%s", blkmar_msg[rn2(2)+hallu]);
+}
+
 }
 
 static const char *const h_sounds[] = {
@@ -336,6 +367,12 @@ register struct monst *mtmp;
     const char *ret;
 
     switch (mtmp->data->msound) {
+    case MS_GROAN:
+        ret = "moan";
+        break;
+    case MS_MOO:
+        ret = "moo";
+        break;
     case MS_MEW:
     case MS_HISS:
         ret = "hiss";
@@ -368,6 +405,10 @@ register struct monst *mtmp;
         break;
     case MS_CHIMERA:
         ret = "hisses, roars, and screech";
+        break;
+    case MS_PIRATE:
+        ret = "curse";
+        break;
     default:
         ret = "scream";
     }
@@ -716,6 +757,22 @@ register struct monst *mtmp;
     case MS_BUZZ:
         pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
         break;
+    case MS_MOO:
+        pline_msg = "moos.";
+        break;
+    case MS_GROAN:
+        pline_msg = mtmp->mpeaceful ? "mutters \"brains!\"." : "groans.";
+        break;
+    case MS_PIRATE:
+        if (!mtmp->mpeaceful) {
+              pline("says, \"Ye be off the edge of the map, matey.\"");
+              break;
+        } else if (is_undead(mtmp->data)) {
+            pline_msg = "tells you to be careful of cursed gold.";
+        } else {
+            pline_msg = "talks to you about the pirate code.";
+        }
+        break;
     case MS_GRUNT:
         pline_msg = "grunts.";
         break;
@@ -941,6 +998,17 @@ register struct monst *mtmp;
                                     : soldier_foe_msg[rn2(3)];
         break;
     }
+    case MS_ONEEYEDSAM:
+        if (!mtmp->mpeaceful)
+            verbl_msg = "You worthless piece of scum!";
+        else {
+            static const char * const one_eyed_sam_msg[3] = {
+                "Psst! If you smuggle me the Amulet of Yendor we can split the profit!",
+                "Today's special: Buy two items and get the third for full price!",
+                "Go ahead and steal something. I could use a bit of fun."};
+            verbl_msg = one_eyed_sam_msg[rn2(3)];
+        }
+        break;
     case MS_RIDER: {
         const char *tribtitle;
         struct obj *book = 0;

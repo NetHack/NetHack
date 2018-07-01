@@ -615,6 +615,10 @@ RING("sustain ability", "bronze",
      FIXED_ABIL,               100, 1, 0,  4, COPPER, HI_COPPER),
 RING("levitation", "agate",
      LEVITATION,               200, 1, 0,  7, GEMSTONE, CLR_RED),
+RING("blood magic", "bloodstone",
+     BLOODMAGIC,               200, 1, 0,  8, GEMSTONE, CLR_RED),
+RING("memory", "petrified wood",
+     GOODMEMORY,               200, 1, 0,  4, MINERAL, HI_WOOD),
 RING("hunger", "topaz",
      HUNGER,                   100, 1, 0,  8, GEMSTONE, CLR_CYAN),
 RING("aggravate monster", "sapphire",
@@ -629,6 +633,8 @@ RING("fire resistance", "iron",
      FIRE_RES,                 200, 1, 0,  5, IRON, HI_METAL),
 RING("cold resistance", "brass",
      COLD_RES,                 150, 1, 0,  4, COPPER, HI_COPPER),
+RING("psychic resistance", "crystal",
+     PSYCHIC_RES,              150, 1, 0,  3, GLASS, HI_GLASS),
 RING("shock resistance", "copper",
      SHOCK_RES,                150, 1, 0,  3, COPPER, HI_COPPER),
 RING("free action", "twisted",
@@ -903,7 +909,8 @@ SCROLL("web",                     "OCTAHEXAOCTA",  1,  20,  50), /* 868 */
 SCROLL("teleportation",        "VENZAR BORGAVVE",  1,  55, 100),
 SCROLL("gold detection",                 "THARR",  1,  33, 100),
 SCROLL("food detection",               "YUM YUM",  1,  25, 100),
-SCROLL("identify",                  "KERNOD WEL",  1, 180,  20),
+SCROLL("knowledge",                   "POTESTAS",  1,  20,  20), /* power */
+SCROLL("identify",                  "KERNOD WEL",  1, 160,  20),
 SCROLL("pure law",                   "TRATS ARL",  1,   5, 200), /* LRA START */
 SCROLL("true neutrality",         "TWAS BRILLIG",  1,   5, 200), /* Jabberwocky */
 SCROLL("raw chaos",                 "TLON UQBAR",  1,   5, 200), /* Tlon Uqbar */
@@ -926,8 +933,8 @@ SCROLL(None,            "NYEHEHE",  1,   0, 100), /* laughing noise */
 SCROLL(None,      "ELPHE MONATER",  1,   0, 100), /* famous mistranslation */
 SCROLL(None,               "ABAJ",  1,   0, 100), /* famous mistranslation */
 SCROLL(None,     "CONGLATURATION",  1,   0, 100), /* famous mistranslation */
-SCROLL(None,       "DESUM TETRAL",  1,   0, 100),
-SCROLL(None,            "NHINRIL",  1,   0, 100), /* meta */
+SCROLL(None,       "DESUM TETRAL",  1,   0, 100), /* dal aos */
+SCROLL(None,            "NHINRL",   1,   0, 100), /* meta */
 SCROLL(None,          "ISAY INAY",  1,   0, 100), /* meta */
 SCROLL(None,              "TEMOV",  1,   0, 100),
 SCROLL(None,         "GARVEN DEH",  1,   0, 100),

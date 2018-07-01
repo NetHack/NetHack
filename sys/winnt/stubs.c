@@ -96,11 +96,13 @@ clear_screen()
     return;
 }
 
+#ifdef TTY_GRAPHICS
 void
 backsp()
 {
     return;
 }
+#endif
 
 int
 has_color(int color)
@@ -136,12 +138,6 @@ register char *op;
     return;
 }
 
-void
-load_keyboard_handler()
-{
-    return;
-}
-
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
@@ -164,11 +160,13 @@ VA_DECL(const char *, s)
     return;
 }
 
+#ifdef TTY_GRAPHICS
 void
 synch_cursor()
 {
     return;
 }
+#endif
 
 void
 more()
@@ -176,4 +174,15 @@ more()
     return;
 }
 
+void
+nethack_enter_nttty()
+{
+    return;
+}
+
+void
+set_altkeyhandler(const char *inName)
+{
+    return;
+}
 #endif /* TTYSTUBS */

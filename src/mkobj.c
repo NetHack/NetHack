@@ -1382,6 +1382,9 @@ register struct obj *obj;
 {
     int wt = (int) objects[obj->otyp].oc_weight;
 
+    if(obj->oartifact == ART_TREASURY_OF_PROTEUS){
+     		wt =  150; /* Same as a crystal ball (ie, the Orb of Weight) */
+    }
     /* glob absorpsion means that merging globs accumulates weight while
        quantity stays 1, so update 'wt' to reflect that, unless owt is 0,
        when we assume this is a brand new glob so use objects[].oc_weight */

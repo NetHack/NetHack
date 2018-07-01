@@ -15,9 +15,10 @@
 
 #if defined(WIN32) || defined(MSDOS)
 extern char orgdir[];
-#ifdef WIN32
-extern void NDECL(backsp);
 #endif
+
+#if defined(WIN32) && defined(TTY_GRAPHICS)
+extern void NDECL(backsp);
 extern void NDECL(clear_screen);
 #endif
 
@@ -196,7 +197,7 @@ getlock()
     if (c == 'y' || c == 'Y')
 #ifndef SELF_RECOVER
         if (eraseoldlocks()) {
-#if defined(WIN32)
+#if defined(WIN32) && defined(TTY_GRAPHICS)
             if (!strncmpi(windowprocs.name, "tty", 3))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif
@@ -210,7 +211,7 @@ getlock()
         }
 #else /*SELF_RECOVER*/
         if (recover_savefile()) {
-#if defined(WIN32)
+#if defined(WIN32) && defined(TTY_GRAPHICS)
             if (!strncmpi(windowprocs.name, "tty", 3))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif

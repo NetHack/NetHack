@@ -996,8 +996,7 @@ boolean atme;
         context.botl = 1;
         res = 1; /* time is going to elapse even if spell doesn't get cast */
     }
-
-    if (energy > u.uen) {
+    if (BloodMagic && energy > u.uen) {
         You("don't have enough energy to cast that spell.");
         return res;
     } else {
@@ -1059,7 +1058,18 @@ boolean atme;
         return 1;
     }
 
-    u.uen -= energy;
+    /* only can hit this case if using blood magic */
+    if (energy > u.uen) {
+        energy -= u.uen;
+        u.uen = 0;
+        pline("You draw upon your own life force to cast the spell.");
+        losehp(energy, "reckless use of blood magic", KILLED_BY);
+        if (spellid(spell) == SPE_HEALING ||
+            spellid(spell) == SPE_EXTRA_HEALING)
+            losehp(3 * energy, "abuse of blood magic", KILLED_BY);
+    } else {
+        u.uen -= energy;
+    }
     context.botl = 1;
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
@@ -1310,6 +1320,9 @@ void
 losespells()
 {
     int n, nzap, i;
+
+    if (GoodMemory)
+        return;
 
     /* in case reading has been interrupted earlier, discard context */
     context.spbook.book = 0;

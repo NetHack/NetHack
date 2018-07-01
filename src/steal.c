@@ -244,9 +244,10 @@ boolean unchain_ball; /* whether to unpunish or just unwield */
  * Nymphs and monkeys won't steal coins
  */
 int
-steal(mtmp, objnambuf)
+steal(mtmp, objnambuf, artifact)
 struct monst *mtmp;
 char *objnambuf;
+boolean artifact;
 {
     struct obj *otmp;
     int tmp, could_petrify, armordelay, olddelay, named = 0, retrycnt = 0;
@@ -268,16 +269,17 @@ char *objnambuf;
     if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
     nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
-        if (Blind)
-            pline("Somebody tries to rob you, but finds nothing to steal.");
-        else
-            pline("%s tries to rob you, but there is nothing to steal!",
-                  Monnam(mtmp));
+   	    if(Blind){
+     	      if(!artifact) pline("Somebody tries to rob you, but finds nothing to steal.");
+   		  } else{
+     	      if(!artifact) pline("%s tries to rob you, but there is nothing to steal!",
+                Monnam(mtmp));
+   		  }
         return 1; /* let her flee */
     }
 
     monkey_business = is_animal(mtmp->data);
-    if (monkey_business || uarmg) {
+    if (monkey_business || uarmg || artifact) {
         ; /* skip ring special cases */
     } else if (Adornment & LEFT_RING) {
         otmp = uleft;
@@ -405,24 +407,26 @@ gotobj:
                 if (Unaware)
                     unmul((char *) 0);
                 slowly = (armordelay >= 1 || multi < 0);
-                if (flags.female)
-                    pline("%s charms you.  You gladly %s your %s.",
-                          !seen ? "She" : Monnam(mtmp),
-                          curssv ? "let her take"
-                                 : !slowly ? "hand over"
-                                           : was_doffing ? "continue removing"
-                                                         : "start removing",
-                          equipname(otmp));
-                else
-                    pline("%s seduces you and %s off your %s.",
-                          !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
-                          curssv
-                              ? "helps you to take"
-                              : !slowly ? "you take"
-                                        : was_doffing ? "you continue taking"
-                                                      : "you start taking",
-                          equipname(otmp));
-                named++;
+                if (!artifact) {
+                    if (flags.female)
+                        pline("%s charms you.  You gladly %s your %s.",
+                              !seen ? "She" : Monnam(mtmp),
+                              curssv ? "let her take"
+                                     : !slowly ? "hand over"
+                                               : was_doffing ? "continue removing"
+                                                             : "start removing",
+                              equipname(otmp));
+                    else
+                        pline("%s seduces you and %s off your %s.",
+                              !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
+                              curssv
+                                  ? "helps you to take"
+                                  : !slowly ? "you take"
+                                            : was_doffing ? "you continue taking"
+                                                          : "you start taking",
+                              equipname(otmp));
+                    named++;
+                }
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
                 multi_reason = "taking off clothes";

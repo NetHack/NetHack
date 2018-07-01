@@ -190,17 +190,17 @@
 #define HInvis u.uprops[INVIS].intrinsic
 #define EInvis u.uprops[INVIS].extrinsic
 #define BInvis u.uprops[INVIS].blocked
-#define Invis ((HInvis || EInvis) && !BInvis)
+#define Invis ((HInvis || EInvis || Underwater) && !BInvis)
 #define Invisible (Invis && !See_invisible)
 /* Note: invisibility also hides inventory and steed */
 
 #define EDisplaced u.uprops[DISPLACED].extrinsic
-#define Displaced EDisplaced
+#define Displaced (EDisplaced || is_displaced(youmonst.data))
 
 #define HStealth u.uprops[STEALTH].intrinsic
 #define EStealth u.uprops[STEALTH].extrinsic
 #define BStealth u.uprops[STEALTH].blocked
-#define Stealth ((HStealth || EStealth) && !BStealth)
+#define Stealth ((HStealth || EStealth || Underwater) && !BStealth)
 
 #define HAggravate_monster u.uprops[AGGRAVATE_MONSTER].intrinsic
 #define EAggravate_monster u.uprops[AGGRAVATE_MONSTER].extrinsic
@@ -213,7 +213,7 @@
 /*** Transportation ***/
 #define HJumping u.uprops[JUMPING].intrinsic
 #define EJumping u.uprops[JUMPING].extrinsic
-#define Jumping (HJumping || EJumping)
+#define Jumping (HJumping || EJumping || is_jumper(youmonst.data))
 
 #define HTeleportation u.uprops[TELEPORT].intrinsic
 #define ETeleportation u.uprops[TELEPORT].extrinsic
@@ -370,6 +370,10 @@
 #define Fixed_abil u.uprops[FIXED_ABIL].extrinsic /* KMH */
 
 #define Lifesaved u.uprops[LIFESAVED].extrinsic
+
+#define BloodMagic u.uprops[BLOODMAGIC].extrinsic
+
+#define GoodMemory u.uprops[GOODMEMORY].extrinsic
 
 /*
  * Some pseudo-properties.

@@ -351,6 +351,14 @@ register boolean nearshop;
               && (mvitals[PM_KOP_LIEUTENANT].mvflags & G_GONE)
               && (mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
 
+    if (Is_blackmarket(&u.uz)) {
+      	nokops = ((mvitals[PM_SOLDIER].mvflags & G_GONE) &&
+            (mvitals[PM_SERGEANT].mvflags & G_GONE) &&
+            (mvitals[PM_LIEUTENANT].mvflags & G_GONE) &&
+            (mvitals[PM_CAPTAIN].mvflags & G_GONE));
+    }
+
+
     if (!angry_guards(!!Deaf) && nokops) {
         if (flags.verbose && !Deaf)
             pline("But no one seems to respond to it.");
@@ -363,7 +371,7 @@ register boolean nearshop;
     {
         coord mm;
 
-        if (nearshop) {
+        if (nearshop && !Is_blackmarket(&u.uz)) {
             /* Create swarm around you, if you merely "stepped out" */
             if (flags.verbose)
                 pline_The("Keystone Kops appear!");
@@ -372,17 +380,107 @@ register boolean nearshop;
             makekops(&mm);
             return;
         }
-        if (flags.verbose)
+        if (flags.verbose && !Is_blackmarket(&u.uz))
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
-        mm.x = xdnstair;
-        mm.y = ydnstair;
+        if (Is_blackmarket(&u.uz)) {
+            struct trap *trap = ftrap;
+            while (trap) {
+                if (trap->ttyp == MAGIC_PORTAL) {
+                    mm.x = trap->tx;
+                    mm.y = trap->ty;
+                }
+                trap = trap->ntrap;
+            }
+        } else {
+            mm.x = xdnstair;
+            mm.y = ydnstair;
+        }
         makekops(&mm);
         /* Create swarm near shopkeeper (hinders return to shop) */
         mm.x = shkp->mx;
         mm.y = shkp->my;
         makekops(&mm);
     }
+}
+
+void
+blkmar_guards(mtmp)
+register struct monst *mtmp;
+{
+    register struct monst *mt;
+    boolean mesg_given = FALSE;	/* Only give message if assistants peaceful */
+    static boolean rlock = FALSE; /* Prevent recursive calls (via wakeup) */
+
+    if (rlock)  return;
+    rlock = TRUE;
+
+    /* allow black marketeer to leave his shop */
+    hot_pursuit(mtmp);
+
+    /* wake up assistants */
+    for (mt = fmon; mt; mt = mt->nmon) {
+        if (DEADMONSTER(mt)) continue;
+      	/* non-tame named monsters are presumably
+      	 * black marketeer's assistants */
+      	else if (mt->mpeaceful &&
+      		  ((!mt->mtame && has_mname(mt) &&
+      		    mt->mpeaceful && mt != mtmp) ||
+              mt->data == &mons[PM_ARMS_DEALER])) {
+                  if (!mesg_given) {
+                  		pline("%s calls for help!", noit_Monnam(mtmp));
+                  		mesg_given = TRUE;
+                  		bars_around_portal(FALSE);
+                  		call_kops(mtmp, FALSE);
+                  }
+      	    wakeup(mt, FALSE);
+      	}
+    }
+    rlock = FALSE;
+}
+
+/* look for a portal on the level and add or
+ * remove iron bars on every adjacent square */
+void
+bars_around_portal(removebars)
+boolean removebars;
+{
+    int x, y, dx, dy;
+    boolean sawit = FALSE;
+    struct trap *trap = ftrap;
+    while (trap) {
+        if (trap->ttyp == MAGIC_PORTAL) break;
+        trap = trap->ntrap;
+    }
+    if (!trap) return;
+    if (trap->tx == u.ux && trap->ty == u.uy) return;
+    for (dx = -1; dx <= 1; dx++)
+      	for (dy = -1; dy <= 1; dy++) {
+      	    if (!dx && !dy) continue;
+      	    x = trap->tx + dx;
+      	    y = trap->ty + dy;
+      	    if (removebars) {
+            		if (levl[x][y].typ == IRONBARS) {
+            		    dissolve_bars(x,y);
+            		    if (cansee(x,y))
+            			sawit = TRUE;
+            		}
+      	    } else {
+            		if (!IS_ROCK(levl[x][y].typ) && levl[x][y].typ != IRONBARS) {
+            		    levl[x][y].typ = IRONBARS;
+            		    newsym(x, y);
+            		    if (cansee(x,y))
+            			sawit = TRUE;
+            		}
+      	    }
+      	}
+    if (sawit) {
+      	if (removebars)
+      	    pline("The iron bars rise back into the ceiling.");
+  	else
+  	    pline("Iron bars drop from the ceiling around the magic portal!");
+    }
+
 }
 
 /* x,y is strictly inside shop */
@@ -442,7 +540,10 @@ boolean newlev;
     }
 
     if (rob_shop(shkp)) {
-        call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+        if (Is_blackmarket(&u.uz))
+            blkmar_guards(shkp);
+        else
+            call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
     }
 }
 
@@ -463,8 +564,11 @@ xchar x, y;
         return;
 
     if (rob_shop(shkp)) {
-        /*[might want to set 2nd arg based on distance from shop doorway]*/
-        call_kops(shkp, FALSE);
+        if (Is_blackmarket(&u.uz))
+            blkmar_guards(shkp);
+        else
+            /*[might want to set 2nd arg based on distance from shop doorway]*/
+            call_kops(shkp, FALSE);
     }
 }
 
@@ -581,7 +685,7 @@ char *enterstring;
 
     if (Invis) {
         pline("%s senses your presence.", shkname(shkp));
-        if (!Deaf && !muteshk(shkp))
+        if (!Deaf && !muteshk(shkp) && !Is_blackmarket(&u.uz))
             verbalize("Invisible customers are not welcome!");
         else
             pline("%s stands firm as if %s knows you are there.",
@@ -621,7 +725,7 @@ char *enterstring;
                 eshkp->visitct++ ? " again" : "");
     }
     /* can't do anything about blocking if teleported in */
-    if (!inside_shop(u.ux, u.uy)) {
+    if (!inside_shop(u.ux, u.uy) && !Is_blackmarket(&u.uz)) {
         boolean should_block;
         int cnt;
         const char *tool;
@@ -1689,6 +1793,8 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
         petrified since shk shouldn't be able to grab inventory
         which has been shut inside a statue] */
 
+    if (Is_blackmarket(&u.uz)) return FALSE;
+
     /* this is where inventory will end up if any shk takes it */
     repo.location.x = repo.location.y = 0;
     repo.shopkeeper = 0;
@@ -2090,6 +2196,19 @@ register struct monst *shkp; /* if angry, impose a surcharge */
        from the multiplier/divisor calculation */
     if (shkp && ESHK(shkp)->surcharge)
         tmp += (tmp + 2L) / 3L;
+
+    if (Is_blackmarket(&u.uz)) {
+    	  if (obj->oclass==RING_CLASS    || obj->oclass==AMULET_CLASS   ||
+    	      obj->oclass==POTION_CLASS  || obj->oclass==SCROLL_CLASS   ||
+    	      obj->oclass==SPBOOK_CLASS  || obj->oclass==WAND_CLASS     ||
+    	      obj->otyp==LUCKSTONE       || obj->otyp==LOADSTONE ||
+            objects[obj->otyp].oc_magic) {
+            tmp *= 25;
+    	  } else {
+            tmp *= 15;
+        }
+    }
+
     return tmp;
 }
 
@@ -3672,15 +3791,19 @@ register struct monst *shkp;
         avoid = FALSE;
     } else {
 #define GDIST(x, y) (dist2(x, y, gx, gy))
-        if (Invis || u.usteed) {
+        if ((Is_blackmarket(&u.uz) && u.umonnum > 0 &&
+            mons[u.umonnum].mlet != S_HUMAN) ||
+            /* WAC Let you out if you're stuck inside */
+            (!Is_blackmarket(&u.uz) && (Invis || u.usteed))) {
             avoid = FALSE;
         } else {
             uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
             if (uondoor) {
                 badinv =
-                    (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
+                    (!Is_blackmarket(&u.uz) && (carrying(PICK_AXE)
+                     || carrying(DWARVISH_MATTOCK)))
                      || (Fast && (sobj_at(PICK_AXE, u.ux, u.uy)
-                                  || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy))));
+                                  || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)));
                 if (satdoor && badinv)
                     return 0;
                 avoid = !badinv;
@@ -3831,9 +3954,14 @@ coord *mm;
 {
     static const short k_mndx[4] = { PM_KEYSTONE_KOP, PM_KOP_SERGEANT,
                                      PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN };
+    static const short s_mndx[4] = { PM_SOLDIER, PM_SERGEANT,
+                                     PM_LIEUTENANT, PM_CAPTAIN };
     int k_cnt[4], cnt, mndx, k;
 
-    k_cnt[0] = cnt = abs(depth(&u.uz)) + rnd(5);
+    if (!Is_blackmarket(&u.uz))
+        k_cnt[0] = cnt = abs(depth(&u.uz)) + rnd(5);
+    else
+        k_cnt[0] = cnt = 7 + rnd(10);
     k_cnt[1] = (cnt / 3) + 1; /* at least one sarge */
     k_cnt[2] = (cnt / 6);     /* maybe a lieutenant */
     k_cnt[3] = (cnt / 9);     /* and maybe a kaptain */
@@ -3841,7 +3969,10 @@ coord *mm;
     for (k = 0; k < 4; k++) {
         if ((cnt = k_cnt[k]) == 0)
             break;
-        mndx = k_mndx[k];
+        if (!Is_blackmarket(&u.uz))
+            mndx = k_mndx[k];
+        else
+            mndx = s_mndx[k];
         if (mvitals[mndx].mvflags & G_GONE)
             continue;
 

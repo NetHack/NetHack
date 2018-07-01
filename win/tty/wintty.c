@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1520825319 2018/03/12 03:28:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1526909614 2018/05/21 13:33:34 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,7 +66,7 @@ struct window_procs tty_procs = {
      | WC2_SELECTSAVED
 #endif
 #if defined(STATUS_HILITES)
-     | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
+     | WC2_HILITE_STATUS | WC2_HITPOINTBAR
 #endif
      | WC2_DARKGRAY),
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
@@ -176,6 +176,17 @@ STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL boolean NDECL(reset_role_filtering);
+#ifdef STATUS_HILITES
+STATIC_DCL boolean FDECL(check_fields, (BOOLEAN_P, int *, int *));
+STATIC_DCL void NDECL(render_status);
+STATIC_DCL void FDECL(tty_putstatusfield, (struct tty_status_fields *,
+                                           const char *, int, int));
+STATIC_DCL boolean NDECL(check_windowdata);
+STATIC_DCL int NDECL(condition_size);
+STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
+STATIC_DCL void FDECL(shrink_enc, (int));
+STATIC_DCL void FDECL(shrink_dlvl, (int));
+#endif
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -198,7 +209,8 @@ int i, c, d;
     if (iflags.vt_tiledata) {
         if (c >= 0) {
             if (i == AVTC_SELECT_WINDOW) {
-                if (c == vt_tile_current_window) return;
+                if (c == vt_tile_current_window)
+                    return;
                 vt_tile_current_window = c;
             }
             if (d >= 0)
@@ -343,7 +355,7 @@ char **argv UNUSED;
     setftty(); /* calls start_screen */
 
     /* set up tty descriptor */
-    ttyDisplay = (struct DisplayDesc *) alloc(sizeof(struct DisplayDesc));
+    ttyDisplay = (struct DisplayDesc *) alloc(sizeof (struct DisplayDesc));
     ttyDisplay->toplin = 0;
     ttyDisplay->rows = hgt;
     ttyDisplay->cols = wid;
@@ -2365,13 +2377,13 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
             s = "[base window]";
             break;
         }
-        debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x,
-                    y);
-        /* This return statement caused a functional difference between DEBUG and
-           non-DEBUG operation, so it is being commented out. It caused tty_curs()
-           to fail to move the cursor to the location it needed to be if the x,y
-           range checks failed, leaving the next piece of output to be displayed
-           at whatever random location the cursor happened to be at prior. */
+        debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
+        /* This return statement caused a functional difference between
+           DEBUG and non-DEBUG operation, so it is being commented
+           out. It caused tty_curs() to fail to move the cursor to the
+           location it needed to be if the x,y range checks failed,
+           leaving the next piece of output to be displayed at whatever
+           random location the cursor happened to be at prior. */
 
         /* return; */
     }
@@ -2434,7 +2446,9 @@ char ch;
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
     switch (cw->type) {
+#ifndef STATUS_HILITES
     case NHW_STATUS:
+#endif
     case NHW_MAP:
     case NHW_BASE:
         tty_curs(window, x, y);
@@ -2489,8 +2503,11 @@ const char *str;
 {
     register struct WinDesc *cw = 0;
     register char *ob;
+    register long i, n0;
+#ifndef STATUS_HILITES
     register const char *nb;
-    register long i, j, n0;
+    register long j;
+#endif
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -2518,7 +2535,7 @@ const char *str;
 #endif
         update_topl(str);
         break;
-
+#ifndef STATUS_HILITES
     case NHW_STATUS:
         ob = &cw->data[cw->cury][j = cw->curx];
         if (context.botlx)
@@ -2532,32 +2549,14 @@ const char *str;
         nb = str;
         for (i = cw->curx + 1, n0 = cw->cols; i < n0; i++, nb++) {
             if (!*nb) {
-#ifndef STATUS_HILITES
                 if (*ob || context.botlx) {
-#else
-                /* STATUS_HILITES will call cl_end() when finished
-                 * its sequence of putstr's.  We don't want to call
-                 * cl_end() with each putstr() which may cause flashing
-                 * in the Windows port
-                 */
-                if (context.botlx) {
-#endif
                     /* last char printed may be in middle of line */
                     tty_curs(WIN_STATUS, i, cw->cury);
                     cl_end();
                 }
                 break;
             }
-#ifdef STATUS_HILITES
-            /* Don't optimize the putsym away, in case it happens
-               to be the same character but different color/attr.
-               We don't optimize on iflags.use_status_hilites either,
-               in case old chars were written with highlighting and
-               that option has just now been toggled off.  [We could
-               do better by tracking color/attr more closely.] */
-#else
             if (*ob != *nb)
-#endif
                 tty_putsym(WIN_STATUS, i, cw->cury, *nb);
             if (*ob)
                 ob++;
@@ -2565,11 +2564,10 @@ const char *str;
 
         (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
         cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
-#ifndef STATUS_HILITES
         cw->cury = (cw->cury + 1) % 2;
         cw->curx = 0;
-#endif
         break;
+#endif /* STATUS_HILITES */
     case NHW_MAP:
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
@@ -3255,7 +3253,8 @@ int bkglyph UNUSED;
     if (((special & MG_PET) && iflags.hilite_pet)
         || ((special & MG_OBJPILE) && iflags.hilite_pile)
         || ((special & MG_DETECT) && iflags.use_inverse)
-        || ((special & MG_BW_LAVA) && iflags.use_inverse)) {
+        || ((special & MG_BW_LAVA) && iflags.use_inverse)
+        || ((special & MG_STAIRS) && iflags.hilite_hidden_stairs)) {
         term_start_attr(ATR_INVERSE);
         reverse_on = TRUE;
     }
@@ -3410,10 +3409,6 @@ int dir;
 {
     if (dir != WININIT)
         return;
-#if defined(WIN32CON)
-    if (!strncmpi(windowprocs.name, "tty", 3))
-        nttty_open(0);
-#endif
     return;
 }
 
@@ -3426,36 +3421,167 @@ char *posbar;
     video_update_positionbar(posbar);
 #endif
 }
-#endif
+#endif /* POSITIONBAR */
+
+
+/*
+ * +------------------+
+ * |  STATUS CODE     |
+ * +------------------+
+ */
+
+/*
+ * ----------------------------------------------------------------
+ * tty_status_update
+ *
+ *      Called from the NetHack core and receives info hand-offs
+ *      from the core, processes them, storing some information
+ *      for rendering to the tty.
+ *          -> make_things_fit()
+ *          -> render_status()
+ *
+ * make_things_fit
+ *
+ *      Called from tty_status_update(). It calls check_fields()
+ *      (described next) to get the required number of columns
+ *      and tries a few different ways to squish a representation
+ *      of the status window values onto the 80 column tty display.
+ *          ->check_fields()
+ *          ->condition_size()  - get the width of all conditions
+ *          ->shrink_enc()      - shrink encumbrance message word
+ *          ->shrink_dlvl()     - reduce the width of Dlvl:42
+ *
+ *  check_fields
+ *
+ *      Verifies that all the fields are ready for display, and
+ *      returns FALSE if called too early in the startup
+ *      processing sequence. It also figures out where everything
+ *      needs to go, taking the current shrinking attempts into
+ *      account. It returns number of columns needed back to
+ *      make_things_fit(), so make_things_fit() can make attempt
+ *      to make adjustments.
+ *
+ *  render_status
+ *
+ *      Goes through each of the two status row's fields and
+ *      calls tty_putstatusfield() to place them on the display.
+ *          ->tty_putstatusfield()
+ *
+ *  tty_putstatusfield()
+ *
+ *      Move the cursor to the target spot, and output the field
+ *      asked for by render_status().
+ *
+ * ----------------------------------------------------------------
+ */
 
 /*
  * The following data structures come from the genl_ routines in
  * src/windows.c and as such are considered to be on the window-port
  * "side" of things, rather than the NetHack-core "side" of things.
  */
-
 extern const char *status_fieldfmt[MAXBLSTATS];
 extern char *status_vals[MAXBLSTATS];
 extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
+const char *fieldnames[] = {
+    "title",  "strength", "dexterity", "constitution", "intelligence",
+    "wisdom",  "charisma", "alignment", "score", "carrying-capacity",
+    "gold", "power",  "power-max", "experience-level", "armor-class",
+    "HD",  "time",  "hunger",  "hitpoints",  "hitpoints-max",
+    "dungeon-level",  "experience",  "condition",
+};
+
 #ifdef STATUS_HILITES
+#ifdef TEXTCOLOR
+STATIC_DCL int FDECL(condcolor, (long, unsigned long *));
+#endif
+STATIC_DCL int FDECL(condattr, (long, unsigned long *));
+static unsigned long *tty_colormasks;
 static long tty_condition_bits;
-static int tty_status_colors[MAXBLSTATS];
-int hpbar_percent, hpbar_color;
+int cond_disp_width[2];                    /* 2: current and previous */
+static struct tty_status_fields
+                tty_status[2][MAXBLSTATS]; /* 2: first index is for current
+                                                 and previous */
+static int hpbar_percent, hpbar_color;
+static struct condition_t {
+    long mask;
+    const char *text[3];  /* 3: potential display values, progressively
+                           * smaller */
+} conditions[] = {
+    /* The sequence order of these matters */
+   { BL_MASK_STONE,    {"Stone", "Ston", "Sto"}},
+   { BL_MASK_SLIME,    {"Slime", "Slim", "Slm"}},
+   { BL_MASK_STRNGL,   {"Strngl", "Stngl", "Str"}},
+   { BL_MASK_FOODPOIS, {"FoodPois", "Fpois", "Poi"}},
+   { BL_MASK_TERMILL,  {"TermIll" , "Ill", "Ill"}},
+   { BL_MASK_BLIND,    {"Blind", "Blnd", "Bl"}},
+   { BL_MASK_DEAF,     {"Deaf", "Def", "Df"}},
+   { BL_MASK_STUN,     {"Stun", "Stun", "St"}},
+   { BL_MASK_CONF,     {"Conf", "Cnf", "Cn"}},
+   { BL_MASK_HALLU,    {"Hallu", "Hal", "Ha"}},
+   { BL_MASK_LEV,      {"Lev", "Lev", "Lv"}},
+   { BL_MASK_FLY,      {"Fly", "Fly", "Fl"}},
+   { BL_MASK_RIDE,     {"Ride", "Rid", "Ri"}},
+};
+static const char *encvals[3][6] = {
+    { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded"},
+    { "", "Burden", "Stress", "Strain", "Overtax", "Overload" },
+    { "", "Brd", "Strs", "Strn", "Ovtx", "Ovld" }
+};
+static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+      BL_FLUSH },
+    { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+      BL_CAP, BL_CONDITION, BL_FLUSH }
+};
 
-static int FDECL(condcolor, (long, unsigned long *));
-static int FDECL(condattr, (long, unsigned long *));
-#endif /* STATUS_HILITES */
+static boolean windowdata_init = FALSE;
+static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
+static int enclev = 0, enc_shrinklvl = 0;
+/* static int dl_shrinklvl = 0; */
+static boolean truncation_expected = FALSE;
 
+/* This controls whether to skip fields that aren't
+ * flagged as requiring updating during the current
+ * render_status().
+ *
+ * Hopefully that can be confirmed as working correctly
+ * for all platforms eventually and the conditional
+ * setting below can be removed.
+ */
+#if defined(UNIX)
+static int do_field_opt = 0;
+#else
+static int do_field_opt = 1;
+#endif
+#endif  /* STATUS_HILITES */
+
+/*
+ *  tty_status_init()
+ *      -- initialize the tty-specific data structures.
+ *      -- call genl_status_init() to initialize the general data.
+ */
 void
 tty_status_init()
 {
 #ifdef STATUS_HILITES
     int i;
 
-    for (i = 0; i < MAXBLSTATS; ++i)
-        tty_status_colors[i] = NO_COLOR; /* no color */
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        tty_status[NOW][i].idx = -1;
+        tty_status[NOW][i].color = NO_COLOR; /* no color */
+        tty_status[NOW][i].attr = ATR_NONE;
+        tty_status[NOW][i].x = 0;
+        tty_status[NOW][i].y = 0;
+        tty_status[NOW][i].valid  = FALSE;
+        tty_status[NOW][i].dirty  = FALSE;
+        tty_status[NOW][i].redraw = FALSE;
+        tty_status[BEFORE][i] = tty_status[NOW][i];
+    }
     tty_condition_bits = 0L;
     hpbar_percent = 0, hpbar_color = NO_COLOR;
 #endif /* STATUS_HILITES */
@@ -3463,6 +3589,8 @@ tty_status_init()
     /* let genl_status_init do most of the initialization */
     genl_status_init();
 }
+
+#ifdef STATUS_HILITES
 
 /*
  *  *_status_update()
@@ -3499,13 +3627,13 @@ tty_status_init()
  *         the textual gold amount without the leading "$:" the port will
  *         have to skip past ':' in the passed "ptr" for the BL_GOLD case.
  *      -- color is an unsigned int.
- *               color_index = color & 0x00FF;       CLR_* value
- *               attribute   = color & 0xFF00 >> 8;  BL_* values
+ *               color_index = color & 0x00FF;         CLR_* value
+ *               attribute   = (color >> 8) & 0x00FF;  HL_ATTCLR_* mask
  *         This holds the color and attribute that the field should
  *         be displayed in.
  *         This is relevant for everything except BL_CONDITION fldindex.
  *         If fldindex is BL_CONDITION, this parameter should be ignored,
- *         as condition hilighting is done via the next colormasks
+ *         as condition highlighting is done via the next colormasks
  *         parameter instead.
  *
  *      -- colormasks - pointer to cond_hilites[] array of colormasks.
@@ -3517,263 +3645,353 @@ tty_status_init()
  *         See doc/window.doc for more details.
  */
 
-
-/* new approach through status_update() only */
-#define Begin_Attr(m) \
-            if (m) {                                                          \
-                if ((m) & HL_BOLD)                                            \
-                    term_start_attr(ATR_BOLD);                                \
-                if ((m) & HL_INVERSE)                                         \
-                    term_start_attr(ATR_INVERSE);                             \
-                if ((m) & HL_ULINE)                                           \
-                    term_start_attr(ATR_ULINE);                               \
-                if ((m) & HL_BLINK)                                           \
-                    term_start_attr(ATR_BLINK);                               \
-                if ((m) & HL_DIM)                                             \
-                    term_start_attr(ATR_DIM);                                 \
-	    }
-
-#define End_Attr(m) \
-            if (m) {                                                          \
-                if ((m) & HL_DIM)                                             \
-                    term_end_attr(ATR_DIM);                                   \
-                if ((m) & HL_BLINK)                                           \
-                    term_end_attr(ATR_BLINK);                                 \
-                if ((m) & HL_ULINE)                                           \
-                    term_end_attr(ATR_ULINE);                                 \
-                if ((m) & HL_INVERSE)                                         \
-                    term_end_attr(ATR_INVERSE);                               \
-                if ((m) & HL_BOLD)                                            \
-                    term_end_attr(ATR_BOLD);                                  \
-	    }
-
-#ifdef STATUS_HILITES
-
-#ifdef TEXTCOLOR
-#define MaybeDisplayCond(bm,txt) \
-            if (tty_condition_bits & (bm)) {                                  \
-                putstr(WIN_STATUS, 0, " ");                                   \
-                if (iflags.hilite_delta) {                                    \
-                    attrmask = condattr(bm, colormasks);                      \
-                    Begin_Attr(attrmask);                                     \
-                    if ((coloridx = condcolor(bm, colormasks)) != NO_COLOR)   \
-                        term_start_color(coloridx);                           \
-		}                                                             \
-                putstr(WIN_STATUS, 0, txt);                                   \
-                if (iflags.hilite_delta) {                                    \
-                    if (coloridx != NO_COLOR)                                 \
-                        term_end_color();                                     \
-                    End_Attr(attrmask);                                       \
-		}                                                             \
-            }
-#else
-#define MaybeDisplayCond(bm,txt) \
-            if (tty_condition_bits & (bm)) {                                  \
-                putstr(WIN_STATUS, 0, " ");                                   \
-                if (iflags.hilite_delta) {                                    \
-                    attrmask = condattr(bm, colormasks);                      \
-                    Begin_Attr(attrmask);                                     \
-		}                                                             \
-                putstr(WIN_STATUS, 0, txt);                                   \
-                if (iflags.hilite_delta) {                                    \
-                    End_Attr(attrmask);                                       \
-		}                                                             \
-            }
-#endif
-
 void
 tty_status_update(fldidx, ptr, chg, percent, color, colormasks)
-int fldidx, chg UNUSED, percent UNUSED, color;
+int fldidx, chg UNUSED, percent, color;
 genericptr_t ptr;
 unsigned long *colormasks;
 {
+    int i;
     long *condptr = (long *) ptr;
-    int i, attrmask = 0;
-#ifdef TEXTCOLOR
-    int coloridx = NO_COLOR;
-#endif
     char *text = (char *) ptr;
-    static boolean oncearound = FALSE; /* prevent premature partial display */
-    enum statusfields fieldorder[2][15] = {
-        { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-          BL_FLUSH },
-        { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
-          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_FLUSH }
-    };
-    int attridx = 0;
+    char *lastchar = (char *) 0;
+    char *fval = (char *) 0;
+    boolean force_update = FALSE;
 
-    if (fldidx != BL_FLUSH) {
-        if (!status_activefields[fldidx])
-            return;
-        switch (fldidx) {
-        case BL_CONDITION:
-            tty_condition_bits = *condptr;
-            oncearound = TRUE;
-            break;
-        default:
-            Sprintf(status_vals[fldidx],
-                    (fldidx == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30s" :
-                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
-                    text);
-#ifdef TEXTCOLOR
-            tty_status_colors[fldidx] = color;
-#else
-            tty_status_colors[fldidx] = NO_COLOR;
+    if (fldidx != BL_FLUSH && !status_activefields[fldidx])
+        return;
+
+#ifndef TEXTCOLOR
+    color = (color & ~0x00FF) | NO_COLOR;
 #endif
-            if (iflags.wc2_hitpointbar && fldidx == BL_HP) {
-                hpbar_percent = percent;
-#ifdef TEXTCOLOR
-                hpbar_color = color;
-#else
-                hpbar_color = NO_COLOR;
-#endif
-            }
-            break;
-        }
+
+    switch (fldidx) {
+    case BL_FLUSH:
+        force_update = TRUE;
+        break;
+    case BL_CONDITION:
+        tty_status[NOW][fldidx].idx = fldidx;
+        tty_condition_bits = *condptr;
+        tty_colormasks = colormasks;
+        tty_status[NOW][fldidx].valid = TRUE;
+        tty_status[NOW][fldidx].dirty = TRUE;
+        truncation_expected = FALSE;
+        break;
+    default:
+        tty_status[NOW][fldidx].idx = fldidx;
+        Sprintf(status_vals[fldidx],
+                status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
+                text);
+        tty_status[NOW][fldidx].color = (color & 0x00FF);
+        tty_status[NOW][fldidx].attr = ((color >> 8) & 0x00FF);
+        tty_status[NOW][fldidx].lth = strlen(status_vals[fldidx]);
+        tty_status[NOW][fldidx].valid = TRUE;
+        tty_status[NOW][fldidx].dirty = TRUE;
+        break;
     }
 
-    if (!oncearound) return;
+    /* The core botl engine sends a single blank to the window port
+       for carrying-capacity when its unused. Let's suppress that */
+    if (tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
+        status_vals[fldidx][0] = '\0';
+        tty_status[NOW][fldidx].lth = 0;
+    }
 
-    curs(WIN_STATUS, 1, 0);
-    for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
-        int fldidx1 = fieldorder[0][i];
-        if (status_activefields[fldidx1]) {
-            if (fldidx1 != BL_TITLE || !iflags.wc2_hitpointbar) {
-#ifdef TEXTCOLOR
-                coloridx = tty_status_colors[fldidx1] & 0x00FF;
-#endif
-                attridx = (tty_status_colors[fldidx1] & 0xFF00) >> 8;
-                text = status_vals[fldidx1];
-                if (iflags.hilite_delta) {
-                    if (*text == ' ') {
-                        putstr(WIN_STATUS, 0, " ");
-                        text++;
-                    }
-                    /* multiple attributes can be in effect concurrently */
-                    Begin_Attr(attridx);
-#ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-	                term_start_color(coloridx);
-#endif
-	        }
-
-                putstr(WIN_STATUS, 0, text);
-
-                if (iflags.hilite_delta) {
-#ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR)
-	                term_end_color();
-#endif
-                    End_Attr(attridx);
+    /* default processing above was required before these */
+    switch (fldidx) {
+    case BL_HP:
+        if (iflags.wc2_hitpointbar) {
+            /* Special additional processing for hitpointbar */
+            hpbar_percent = percent;
+            hpbar_color = (color & 0x00FF);
+        }
+        break;
+    case BL_LEVELDESC:
+    case BL_HUNGER:
+        /* The core sends trailing blanks for some fields.
+           Let's suppress the trailing blanks */
+        lastchar = eos(status_vals[fldidx]);
+        lastchar--;
+        while (*lastchar == ' ' && lastchar >= status_vals[fldidx]) {
+            *lastchar-- = '\0';
+            tty_status[NOW][fldidx].lth--;
+        }
+        break;
+    case BL_TITLE:
+        if (iflags.wc2_hitpointbar)
+            tty_status[NOW][fldidx].lth += 2; /* '[' and ']' */
+        break;
+    case BL_GOLD:
+        tty_status[NOW][fldidx].lth -= (10 - 1); /* \GXXXXNNNN counts as 1 */
+        break;
+    case BL_CAP:
+        fval = status_vals[fldidx];
+        if (fval) {
+            if (*fval == ' ')
+                fval++;
+            for (i = 0; i < SIZE(encvals); ++i) {
+                if (!strcmp(encvals[enc_shrinklvl][i], fval)) {
+                    enclev = i;
+                    break;              /* for */
                 }
-            } else {
-                /* hitpointbar using hp percent calculation */
-                int bar_pos, bar_len;
-                char *bar2 = (char *)0;
-                char bar[MAXCO], savedch;
-                boolean twoparts = FALSE;
-
-                text = status_vals[fldidx1];
-                bar_len = strlen(text);
-                if (bar_len < MAXCO-1) {
-                    Strcpy(bar, text);
-                    bar_pos = (bar_len * hpbar_percent) / 100;
-                    if (bar_pos < 1 && hpbar_percent > 0)
-                        bar_pos = 1;
-                    if (bar_pos >= bar_len && hpbar_percent < 100)
-                        bar_pos = bar_len - 1;
-                    if (bar_pos > 0 && bar_pos < bar_len) {
-                        twoparts = TRUE;
-                        bar2 = &bar[bar_pos];
-                        savedch = *bar2;
-                        *bar2 = '\0';
-                    }
-		}
-                if (iflags.hilite_delta && iflags.wc2_hitpointbar) {
-                    putstr(WIN_STATUS, 0, "[");
-#ifdef TEXTCOLOR
-                    coloridx = hpbar_color & 0x00FF;
-                    /* attridx = (hpbar_color & 0xFF00) >> 8; */
-                    if (coloridx != NO_COLOR)
-                        term_start_color(coloridx);
-#endif
-                    term_start_attr(ATR_INVERSE);
-                    putstr(WIN_STATUS, 0, bar);
-                    term_end_attr(ATR_INVERSE);
-#ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR)
-                        term_end_color();
-#endif
-                    if (twoparts) {
-                        *bar2 = savedch;
-                        putstr(WIN_STATUS, 0, bar2);
-                    }
-                    putstr(WIN_STATUS, 0, "]");
-                } else
-                    putstr(WIN_STATUS, 0, text);
             }
         }
+        break;
     }
-    cl_end();
-    curs(WIN_STATUS, 1, 1);
-    for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
-        int fldidx2 = fieldorder[1][i];
-
-        if (status_activefields[fldidx2]) {
-            if (fldidx2 != BL_CONDITION) {
-#ifdef TEXTCOLOR
-                coloridx = tty_status_colors[fldidx2] & 0x00FF;
-#endif
-                attridx = (tty_status_colors[fldidx2] & 0xFF00) >> 8;
-                text = status_vals[fldidx2];
-                if (iflags.hilite_delta) {
-                    if (*text == ' ') {
-                        putstr(WIN_STATUS, 0, " ");
-                        text++;
-                    }
-                    /* multiple attributes can be in effect concurrently */
-                    Begin_Attr(attridx);
-#ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                        term_start_color(coloridx);
-#endif
-		}
-
-                if (fldidx2 == BL_GOLD) {
-                    /* putmixed() due to GOLD glyph */
-                    putmixed(WIN_STATUS, 0, text);
-                } else {
-                    putstr(WIN_STATUS, 0, text);
-                }
-
-                if (iflags.hilite_delta) {
-#ifdef TEXTCOLOR
-       	            if (coloridx != NO_COLOR)
-                        term_end_color();
-#endif
-                    End_Attr(attridx);
-                }
-            } else {
-                MaybeDisplayCond(BL_MASK_STONE, "Stone");
-                MaybeDisplayCond(BL_MASK_SLIME, "Slime");
-                MaybeDisplayCond(BL_MASK_STRNGL, "Strngl");
-                MaybeDisplayCond(BL_MASK_FOODPOIS, "FoodPois");
-                MaybeDisplayCond(BL_MASK_TERMILL, "TermIll");
-                MaybeDisplayCond(BL_MASK_BLIND, "Blind");
-                MaybeDisplayCond(BL_MASK_DEAF, "Deaf");
-                MaybeDisplayCond(BL_MASK_STUN, "Stun");
-                MaybeDisplayCond(BL_MASK_CONF, "Conf");
-                MaybeDisplayCond(BL_MASK_HALLU, "Hallu");
-                MaybeDisplayCond(BL_MASK_LEV, "Lev");
-                MaybeDisplayCond(BL_MASK_FLY, "Fly");
-                MaybeDisplayCond(BL_MASK_RIDE, "Ride");
-	    }
-        }
-    }
-    cl_end();
+    if (make_things_fit(force_update) || truncation_expected)
+        render_status();
     return;
+}
+
+STATIC_OVL int
+make_things_fit(force_update)
+boolean force_update;
+{
+    int trycnt, fitting = 0, condsz = 0, requirement = 0;
+    int rowsz[2], otheroptions = 0;
+    boolean check = FALSE;
+
+    condsz = condition_size();
+    for (trycnt = 0; trycnt < 6 && !fitting; ++trycnt) {
+        check = check_fields(force_update, &rowsz[0], &rowsz[1]);
+        if (!check)
+            return 0;
+
+        requirement = rowsz[1];
+        if (requirement < wins[WIN_STATUS]->cols - 1) {
+            fitting = requirement;
+            break;  /* we're good */
+        }
+        if (trycnt < 2) {
+            if (cond_shrinklvl < trycnt + 1) {
+                cond_shrinklvl = trycnt + 1;
+                condsz = condition_size();
+                cond_width_at_shrink = cond_disp_width[NOW];
+            }
+            continue;
+        }
+        if (cond_shrinklvl >= 2) {
+            /* We've exhausted the condition identifiers shrinkage,
+             * so let's try something other things...
+             */
+            if (otheroptions == 0 || otheroptions == 1) {
+                /* try shrinking the encumbrance word */
+                shrink_enc(otheroptions + 1);
+                otheroptions++;
+            } else if (otheroptions == 2) {
+                shrink_dlvl(1);
+                otheroptions++;
+            } else {
+                /* Last resort - turn on trunction */
+                truncation_expected = TRUE;
+                otheroptions++;
+            }
+        }
+    }
+    return fitting;
+}
+
+/*
+ * This is the routine where we figure out where each field
+ * should be placed, and flag whether the on-screen details
+ * must be updated because they need to change.
+ * This is now done at an individual field case-by-case level.
+ */
+boolean
+check_fields(forcefields, topsz, bottomsz)
+boolean forcefields;
+int *topsz, *bottomsz;
+{
+    int c, i, row, col, trackx, idx;
+    boolean valid = TRUE, matchprev = FALSE, update_right;
+
+    if (!windowdata_init && !check_windowdata())
+        return FALSE;
+
+    for (row = 0; row < 2; ++row) {
+        col = 1;
+        trackx = 1;
+        update_right = FALSE;
+        for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
+            idx = fieldorder[row][i];
+            if (!status_activefields[idx])
+                continue;
+            if (!tty_status[NOW][idx].valid)
+                valid = FALSE;
+
+            tty_status[NOW][idx].y = row;
+            tty_status[NOW][idx].x = col;
+
+            /* evaluate */
+            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
+                update_right = TRUE;
+
+            if (!update_right && !forcefields) {
+                /*
+                 * Check values against those already on the dislay.
+                 *  - Is the additional processing time for this worth it?
+                 */
+                matchprev = FALSE;
+                if (do_field_opt && tty_status[NOW][idx].dirty) {
+                    /* compare values */
+                    const char *ob, *nb;     /* old byte, new byte */
+
+                    c = col - 1;
+                    ob = &wins[WIN_STATUS]->data[row][c];
+                    nb = status_vals[idx];
+                    while (*nb && c < wins[WIN_STATUS]->cols) {
+                        if (*nb != *ob)
+                            break;
+                        nb++;
+                        ob++;
+                        c++;
+                    }
+                    if (!*nb && c > col - 1)
+                        matchprev = TRUE;
+                }
+            }
+            /*
+             * With STATUS_HILITES, it is possible that the color
+             * needs to change even if the text is the same, so
+             * we flag that here by setting .redraw.
+             * Then, render_status() will see that flag setting
+             * and ensure that the tty cell content is updated.
+             * After the field has been updated, render_status()
+             * will also clear .redraw and .dirty.
+             */
+            if (forcefields || update_right || !matchprev
+                || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
+                || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
+                tty_status[NOW][idx].redraw = TRUE;
+            col += tty_status[NOW][idx].lth;
+        }
+        if (row && bottomsz)
+            *bottomsz = col + tty_status[NOW][idx].lth;
+        else if (topsz)
+            *topsz = col + tty_status[NOW][idx].lth;
+    }
+    return valid;
+}
+
+/*
+ * This is what places a field on the tty display.
+ * If val isn't null, it will be used rather than
+ * fld (it takes precedence).
+ */
+STATIC_OVL void
+tty_putstatusfield(fld, val, x, y)
+struct tty_status_fields *fld;
+const char *val;
+int x, y;
+{
+    int i, n, ncols, lth;
+    struct WinDesc *cw = 0;
+    const char *text = (char *)0;
+
+    if ((cw = wins[NHW_STATUS]) == (struct WinDesc *) 0)
+        panic("Invalid WinDesc\n");
+
+    ncols = cw->cols;
+    if (val) {
+        text = val;
+        lth = strlen(text);
+    } else if (fld) {
+        text = status_vals[fld->idx];
+        lth = fld->lth;
+    }
+    if (!text)
+        return;
+
+    print_vt_code2(AVTC_SELECT_WINDOW, NHW_STATUS);
+
+    if (x < ncols && y < 2) {
+        tty_curs(NHW_STATUS, x, y);
+        for (i = 0; i < lth; ++i) {
+            n = i + x;
+            if (n < ncols && *text) {
+                (void) putchar(*text);
+                ttyDisplay->curx++;
+                cw->curx++;
+              cw->data[y][n-1] = *text;
+                text++;
+            }
+        }
+    } else {
+        /* Now we're truncating */
+        if (truncation_expected)
+            ; /* but we knew in advance */
+    }
+}
+
+STATIC_OVL int
+condition_size()
+{
+    long mask = 0L;
+    int c, x;
+
+    x = 0;
+    for (c = 0; c < SIZE(conditions); ++c) {
+        mask = conditions[c].mask;
+        if ((tty_condition_bits & mask) == mask) {
+            x++;    /* for spacer */
+            x += (int) strlen(conditions[c].text[cond_shrinklvl]);
+        }
+    }
+    tty_status[NOW][BL_CONDITION].lth = x;
+    cond_disp_width[NOW] = x;
+    return x;
+}
+
+STATIC_OVL void
+shrink_enc(lvl)
+int lvl;
+{
+    /* shrink or restore the encumbrance word */
+    if (lvl == 0 || lvl <= 2) {
+        enc_shrinklvl = lvl;
+        Strcpy(status_vals[BL_CAP], encvals[lvl][enclev]);
+    }
+    tty_status[NOW][BL_CAP].lth = strlen(status_vals[BL_CAP]);
+}
+
+STATIC_OVL void
+shrink_dlvl(lvl)
+int lvl;
+{
+    /* try changing Dlvl: to Dl: */
+    char buf[BUFSZ];
+    char *levval = index(status_vals[BL_LEVELDESC], ':');
+
+    if (levval) {
+        Strcpy(buf, (lvl == 0) ? "Dlvl" : "Dl");
+        Strcat(buf, levval);
+        Strcpy(status_vals[BL_LEVELDESC], buf);
+        tty_status[NOW][BL_LEVELDESC].lth = strlen(status_vals[BL_LEVELDESC]);
+    }
+}
+
+/*
+ * Ensure the underlying status window data start out
+ * blank and null-terminated.
+ */
+STATIC_OVL boolean
+check_windowdata(VOID_ARGS)
+{
+    if (WIN_STATUS == WIN_ERR || wins[WIN_STATUS] == (struct WinDesc *) 0) {
+        paniclog("check_windowdata", " null status window.");
+        return FALSE;
+    } else if (!windowdata_init) {
+        int i, n = wins[WIN_STATUS]->cols;
+
+        for (i = 0; i < wins[WIN_STATUS]->cols; ++i) {
+            wins[WIN_STATUS]->data[0][i] = ' ';
+            wins[WIN_STATUS]->data[1][i] = ' ';
+        }
+        wins[WIN_STATUS]->data[0][n - 1] = '\0';    /* null terminate */
+        wins[WIN_STATUS]->data[1][n - 1] = '\0';    /* null terminate */
+        windowdata_init = TRUE;
+    }
+    return TRUE;
 }
 
 #ifdef TEXTCOLOR
@@ -3781,7 +3999,8 @@ unsigned long *colormasks;
  * Return what color this condition should
  * be displayed in based on user settings.
  */
-int condcolor(bm, bmarray)
+STATIC_OVL int
+condcolor(bm, bmarray)
 long bm;
 unsigned long *bmarray;
 {
@@ -3789,14 +4008,21 @@ unsigned long *bmarray;
 
     if (bm && bmarray)
         for (i = 0; i < CLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i]))
+            if ((bm & bmarray[i]) != 0)
                 return i;
         }
     return NO_COLOR;
 }
+#else
+/* might need something more elaborate if some compiler complains that
+   the condition where this gets used always has the same value */
+#define condcolor(bm,bmarray) NO_COLOR
+#define term_start_color(color) /*empty*/
+#define term_end_color(color) /*empty*/
 #endif /* TEXTCOLOR */
 
-int condattr(bm, bmarray)
+STATIC_OVL int
+condattr(bm, bmarray)
 long bm;
 unsigned long *bmarray;
 {
@@ -3805,29 +4031,261 @@ unsigned long *bmarray;
 
     if (bm && bmarray) {
         for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
-            if (bmarray[i] && (bm & bmarray[i])) {
-                switch(i) {
-                    case HL_ATTCLR_DIM:
-                        attr |= HL_DIM;
-                        break;
-                    case HL_ATTCLR_BLINK:
-                        attr |= HL_BLINK;
-                        break;
-                    case HL_ATTCLR_ULINE:
-                        attr |= HL_ULINE;
-                        break;
-                    case HL_ATTCLR_INVERSE:
-                        attr |= HL_INVERSE;
-                        break;
-                    case HL_ATTCLR_BOLD:
-                        attr |= HL_BOLD;
-                        break;
+            if ((bm & bmarray[i]) != 0) {
+                switch (i) {
+                case HL_ATTCLR_DIM:
+                    attr |= HL_DIM;
+                    break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
+                case HL_ATTCLR_ULINE:
+                    attr |= HL_ULINE;
+                    break;
+                case HL_ATTCLR_INVERSE:
+                    attr |= HL_INVERSE;
+                    break;
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
                 }
             }
         }
     }
     return attr;
 }
+
+#define Begin_Attr(m) \
+    do {                                                                \
+        if (m) {                                                        \
+            if ((m) & HL_BOLD)                                          \
+                term_start_attr(ATR_BOLD);                              \
+            if ((m) & HL_INVERSE)                                       \
+                term_start_attr(ATR_INVERSE);                           \
+            if ((m) & HL_ULINE)                                         \
+                term_start_attr(ATR_ULINE);                             \
+            if ((m) & HL_BLINK)                                         \
+                term_start_attr(ATR_BLINK);                             \
+            if ((m) & HL_DIM)                                           \
+                term_start_attr(ATR_DIM);                               \
+        }                                                               \
+    } while (0)
+
+#define End_Attr(m) \
+    do {                                                                \
+        if (m) {                                                        \
+            if ((m) & HL_DIM)                                           \
+                term_end_attr(ATR_DIM);                                 \
+            if ((m) & HL_BLINK)                                         \
+                term_end_attr(ATR_BLINK);                               \
+            if ((m) & HL_ULINE)                                         \
+                term_end_attr(ATR_ULINE);                               \
+            if ((m) & HL_INVERSE)                                       \
+                term_end_attr(ATR_INVERSE);                             \
+            if ((m) & HL_BOLD)                                          \
+                term_end_attr(ATR_BOLD);                                \
+        }                                                               \
+    } while (0)
+
+STATIC_OVL void
+render_status(VOID_ARGS)
+{
+    long mask = 0L;
+    int i, c, row, attrmask = 0;
+    struct WinDesc *cw = 0;
+    struct tty_status_fields *nullfield = (struct tty_status_fields *) 0;
+
+    if (WIN_STATUS == WIN_ERR
+        || (cw = wins[WIN_STATUS]) == (struct WinDesc *) 0) {
+        paniclog("render_status", "WIN_ERR on status window.");
+        return;
+    }
+
+    for (row = 0; row < 2; ++row) {
+        curs(WIN_STATUS, 1, row);
+        for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
+            int fldidx = fieldorder[row][i];
+
+            if (do_field_opt && !tty_status[NOW][fldidx].redraw)
+                continue;
+            /*
+             * Ignore zero length fields. check_fields() didn't count
+             * them in either.
+             */
+            if (!tty_status[NOW][fldidx].lth && fldidx != BL_CONDITION)
+                continue;
+
+            if (status_activefields[fldidx]) {
+                int coloridx = tty_status[NOW][fldidx].color;
+                int attridx = tty_status[NOW][fldidx].attr;
+                int x = tty_status[NOW][fldidx].x;
+                int y = row;
+                char *text = status_vals[fldidx];
+                boolean hitpointbar = (fldidx == BL_TITLE
+                                       && iflags.wc2_hitpointbar);
+
+                if (fldidx == BL_CONDITION) {
+                    /*
+                     * +-----------------+
+                     * | Condition Codes |
+                     * +-----------------+
+                     */
+                    for (c = 0; c < SIZE(conditions); ++c) {
+                        mask = conditions[c].mask;
+                        if ((tty_condition_bits & mask) == mask) {
+                            const char *condtext;
+
+                            tty_putstatusfield(nullfield, " ", x++, y);
+                            if (iflags.hilite_delta) {
+                                attrmask = condattr(mask, tty_colormasks);
+                                Begin_Attr(attrmask);
+                                coloridx = condcolor(mask, tty_colormasks);
+                                if (coloridx != NO_COLOR
+                                    && coloridx != CLR_MAX)
+                                    term_start_color(coloridx);
+                            }
+                            if (x >= cw->cols && !truncation_expected)
+                                impossible(
+                                   "Unexpected condition placement overflow");
+                            condtext = conditions[c].text[cond_shrinklvl];
+                            tty_putstatusfield(nullfield, condtext, x, y);
+                            x += (int) strlen(condtext);
+                            if (iflags.hilite_delta) {
+                                if (coloridx != NO_COLOR
+                                    && coloridx != CLR_MAX)
+                                    term_end_color();
+                                End_Attr(attrmask);
+                            }
+                        }
+                    }
+                    if (x >= cw->cols) {
+                        static unsigned once_only = 0;
+
+                        if (!truncation_expected && !once_only++)
+                            paniclog(
+                                "render_status()", " unexpected truncation.");
+                        x = cw->cols - 1;
+                    }
+                    tty_curs(WIN_STATUS, x, y);
+                    cl_end();
+                } else if (fldidx == BL_GOLD) {
+                    char buf[BUFSZ];
+                    /*
+                     * +-----------+
+                     * |   Gold    |
+                     * +-----------+
+                     */
+                    if (iflags.hilite_delta) {
+                        if (*text == ' ') {
+                            tty_putstatusfield(nullfield, " ", x++, y);
+                            text++;
+                        }
+                        /* multiple attributes can be in effect concurrently */
+                        Begin_Attr(attridx);
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                            term_start_color(coloridx);
+                    }
+                    /* decode_mixed() due to GOLD glyph */
+                    tty_putstatusfield(nullfield,
+                                       decode_mixed(buf, text), x, y);
+                    if (iflags.hilite_delta) {
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                            term_end_color();
+                        End_Attr(attridx);
+                    }
+                } else if (hitpointbar) {
+                    /*
+                     * +-------------------------+
+                     * | Title with Hitpoint Bar |
+                     * +-------------------------+
+                     */
+                    /* hitpointbar using hp percent calculation */
+                    int bar_pos, bar_len;
+                    char *bar2 = (char *)0;
+                    char bar[MAXCO], savedch;
+                    boolean twoparts = FALSE;
+
+                    bar_len = strlen(text);
+                    if (bar_len < MAXCO-1) {
+                        Strcpy(bar, text);
+                        bar_pos = (bar_len * hpbar_percent) / 100;
+                        if (bar_pos < 1 && hpbar_percent > 0)
+                            bar_pos = 1;
+                        if (bar_pos >= bar_len && hpbar_percent < 100)
+                            bar_pos = bar_len - 1;
+                        if (bar_pos > 0 && bar_pos < bar_len) {
+                            twoparts = TRUE;
+                            bar2 = &bar[bar_pos];
+                            savedch = *bar2;
+                            *bar2 = '\0';
+                        }
+                    }
+                    if (iflags.hilite_delta) {
+                        tty_putstatusfield(nullfield, "[", x++, y);
+                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                            term_start_color(hpbar_color);
+                        term_start_attr(ATR_INVERSE);
+                        tty_putstatusfield(nullfield, bar, x, y);
+                        x += (int) strlen(bar);
+                        term_end_attr(ATR_INVERSE);
+                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                            term_end_color();
+                        if (twoparts) {
+                            *bar2 = savedch;
+                            tty_putstatusfield(nullfield, bar2, x, y);
+                            x += (int) strlen(bar2);
+                            tty_curs(WIN_STATUS, x, y);
+                        }
+                        tty_putstatusfield(nullfield, "]", x++, y);
+                    } else {
+                        tty_putstatusfield(&tty_status[NOW][fldidx],
+                                           (char *) 0, x, y);
+                    }
+                } else {
+                    /*
+                     * +-----------------------------+
+                     * | Everything else that is not |
+                     * |   in a special case above   |
+                     * +-----------------------------+
+                     */
+                    if (iflags.hilite_delta) {
+                        if (*text == ' ') {
+                            tty_putstatusfield(nullfield, " ", x++, y);
+                            text++;
+                        }
+                        /* multiple attributes can be in effect concurrently */
+                        Begin_Attr(attridx);
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                            term_start_color(coloridx);
+                    }
+                    tty_putstatusfield(&tty_status[NOW][fldidx],
+                                       text, x, y);
+                    if (iflags.hilite_delta) {
+                        if (coloridx != NO_COLOR && coloridx != CLR_MAX)
+                            term_end_color();
+                        End_Attr(attridx);
+                    }
+                }
+                /* reset .redraw and .dirty now that they've been rendered */
+                tty_status[NOW][fldidx].dirty  = FALSE;
+                tty_status[NOW][fldidx].redraw = FALSE;
+                /*
+                 * Make a copy of the entire tty_status struct for comparison
+                 * of current and previous.
+                 */
+                tty_status[BEFORE][fldidx] = tty_status[NOW][fldidx];
+            }
+        }
+    }
+    if (cond_disp_width[NOW] < cond_width_at_shrink) {
+        cond_shrinklvl = 0;      /* reset */
+        cond_width_at_shrink = condition_size();
+        shrink_enc(0);
+        shrink_dlvl(0);
+    }
+    return;
+}
+
 #endif /* STATUS_HILITES */
 
 #endif /* TTY_GRAPHICS */

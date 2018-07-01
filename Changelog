@@ -1,397 +1,155 @@
-                   SpliceHack v0.2 -- Changelog
+                        SpliceHack -- Changelog
 
-This changelog documents all the features that differ from vanilla Nethack.
-Beware of SPOILERS for both Nethack and SpliceHack all the way through this
-document.
+A full list of differences in SpliceHack from vanilla NetHack can be found on
+the wiki. This file documents the changes in each version of SpliceHack.
 
-New Options
-- Intrinsicswap: Gaining a resistance other than poison resistance through food
-  will cause you to lose your other resistances. Experimental balancing option,
-  must be manually enabled.
-- Deaf: A roleplay option and conduct that allows you to play a deaf character.
-- Hallucinating: A roleplay option and conduct that allows you to play a
-  permanently hallucinating character. Using an artifact to gain hallucination
-  resistance will break this, as will drinking a potion of sickness.
-- Clumsy: A roleplay option and conduct that allows you to play a permanently
-  fumbling character. Probably not terribly hard to ascend with, just very
-  frustrating.
-- Ill-fated: A challenge mode where the dungeon difficulty is automatically
-  upped by 50.
-- Marathon: A challenge mode where you start with 999 HP, but cannot heal or
-  regenerate hit points.
-- Tips: Gives you a spoiler tip every time you are welcomed. Defaults to true.
-- Pet names for birds and dragons can be specified with birdname and dragonname
-  respectively. Birds can be set as the preferred pet with "b".
+                            Version 4.0
 
-New Commands
-- #give can be used to give items to your pet or peaceful monsters, putting the
-  items directly in their inventory. This should streamline the process of
-  trying to get pets to take something.
+Major Patches
+- Implemented a heavily modified version of the descriptive hit messages patch
+  by L, and combined it with SpliceHack's existing monk hit messages.
+- Changes from NetHack 3.6.2B were pulled into the game.
+- Chris's Pirate patch was implemented, thus adding the pirate role to the game.
+  Updating this to be compatible with 3.6.1 took quite a bit of work, so for
+  those trying to add it to 3.6.1 I would recommend looking at what I did here.
+- Added the Black Market from Unnethack/SLASHEM, using the code in Unnethack.
+  The market functions largely the same as the one in SLASHEM, although there
+  are a few small differences due to porting the code from 3.4.3 to 3.6.x
+  (see below).
+- Implemented an altered version of the colored walls and floors patch by L.
+  Only walls are colored, and the Valley of the Dead is not in grayscale. In
+  addition, some branches have new wall colors.
 
-Visual/Interface Changes
-- Looking at monsters now tells you what weapon they are wielding, and whether
-  they are armored. To avoid nerfing wands of probing, the type of armor is not
-  indicated.
-- Tigers now are colored orange, in order to make room for lions, which are
-  colored yellow.
-- Branch staircases are colored yellow (ported from xnethack)
-- Altars are colored based on alignment (ported from xnethack)
-- The Curses patch by Tangles has been implemented, so you can now play in
-  curses mode.
+QOL Changes
+- Dropped the quest entry requirement to level 10.
+- Ported paranoid trap and swim confirmation from xnethack.
+- Ported peaceful monster displacement from xnethack.
+- Ported NAO 3.4.3's hilite_hidden_stairs option to 3.6.x and SpliceHack.
+  Defaults to true.
+- Artifact wishing is based on the number of artifacts wished for, not
+  generated, preventing the increased  number of artifacts from nerfing artifact
+  wishing.
+- The vibrating square can now be teleported onto directly (YANI by Mandevil)
+- New messages when monsters pursue you up or down dungeon levels (YANI by
+  aosdict)
+- There are now messages for triggering teleport and level teleport traps.
+- Void level disabled (for now).
+- Looking at monsters provides additional information, such as whether they can
+  jump or be domesticated.
 
-General Changes
-- SpliceHack Tip of the Day will tell you about new features.
-- Monks occasionally get martial arts messages when fighting bare-handed.
-- Engraving in the elemental plane of fire will mention that you are  engraving
-  in obsidian.
-- Deadly poison no longer instantly kills you, but instead will cause both
-  HP and attribute damage.
-- Probing certain non-unique monsters will tell you their name.
-- Monsters are now capable of sacrificing corpses on altars, and all monsters
-  that like objects will now pick up corpses (as opposed to just nymphs).
-  In rare cases, this can result in monsters being gifted artifacts.
-- If a monster on the Astral Plane somehow obtains the Amulet of Yendor and
-  makes it to an altar, they will attempt to sacrifice it and gain immortality,
-  causing an instant loss.
-- Many new artifacts have been added, spanning many different item classes. As
-  such, randomly generated artifacts may be slightly more common.
-- Increased number of player monsters in the endgame.
-- Player monsters no longer spawn with offensive items, making them much more
-  likely to employ their artifacts. Player monsters also have a larger variety
-  of artifacts that they can spawn with. Their abilities have been diversified
-  somewhat, but all of them are now capable of stealing the amulet with their
-  attacks.
-- Upon stealing the amulet, if in the endgame a monster will try to flee.
-- Decreased floating eye spawn rate to make blind telepathy harder to obtain.
-- Mysterious force is completely removed. Instead, the amulet blocks all forms
-  of teleportation.
-- There are different descriptions for venom which are randomized each game.
-  This may break realism slightly, but does help with distinguishing what kind
-  of venom an unfamiliar monster might be spitting.
-- Horned devils are now yellow to make room for dust devils, which are
-  brown.
-- Barbed devils now have a passive physical damage attack involving their
-  barbs.
-- Disarmed bear traps and land mines can rarely be generated.
-- The Oracle now drops hints in major consultations about the new features
-  in SpliceHack. Attempts have been made to make this fit as seamlessly as
-  possible into the existing tone.
-- Additional graves, hallucinations, rumors, scroll and wand names,  and
-  the like.
-- Spellcasting monsters have access to a larger variety of dangerous
-  spells.
-- Engraving "The Yellow Sign" will cause bad things to happen to you and those
-  around you.
-- Monster wielding behavior was changed so monsters are more aggressive about
-  wielding new items.
-- VENOM_CLASS and Q_CLASS are referred to differently in game.
-- Nephi's grudge patch has been implemented and expanded, so monsters will
-  attack certain other monsters they are opposed to. This dovetails nicely with
-  altar changes.
-- Dragons have been made subtly more difficult. Hostile monsters with the "roar"
-  sound will occasionally roar when the player is nearby, aggravating monsters
-  on the level. Additionally, dragons are counted as having hands for the
-  purposes of using defensive and utility items.
-- Monsters now use a much wider array of items. This includes wands of wishing.
-- Transforming into a lycanthrope now angers guards.
-- Runeswords and tsurugis can be randomly generated, but they are incredibly
-  rare.
-- Vampire mages, Shimmering Dragons, and Vorpal Jabberwocks un-deferred.
-- Some of the less powerful or less unique quest nemeses have been changed to
-  be more challenging or interesting (see below).
-- Bribing demon lords has been greatly expanded. They now can potentially ask
-  for powerful items in your inventory instead of gold, and you can also use
-  decks of cards to gamble on your immortal soul with them. Challenging them
-  with a deck of fate is a Bad Idea.
-- All demon lords have had their AC significantly lowered.
-- The wailing of the banshee message was changed slightly to account for the
-  addition of wailing banshees.
-- The addition of so many artifacts changes things. On one hand, the player is
-  more likely to find artifacts throughout the dungeon, due to many new artifact
-  types. On the other hand, adding artifacts made the Astral Plane slightly more
-  difficult, since player monsters now have a greater number of artifacts to
-  be generated with.
-- Summon nasties has been expanded to accommodate new monsters.
-- High level adventurers will arise as spectres in their bones files, a more
-  powerful type of ghost which is capable of using weapons. Inspired by a YANI
-  by AmyBSOD and aosdict that was archived on the wiki's YANI list.
-- Added RPresser's epitaph patch, allowing you to write your own epitaph if a
-  bones file is generated.
-- Additional achievements are tracked in the xlogfile that pertain to this
-  variant.
-- Tangles' and K2's livelogging, whereis, and hardfought configurations have
-  been added.
-- Pets can now potentially become stunned or invisible by eating the right
-  kind of corpse.
-- Birds are now a potential kind of pet. You begin with a little bird, which can
-  grow up into a falcon and then into a giant falcon. They are balanced around
-  the existing pet options.
-- Death is generated with a scythe.
-- Monsters with heads now "swallow" you instead of "engulfing" you.
-- If you are playing an infernal or polymorphed into a silver-hating creature,
-  silver will deal an extra 1-20 damage to you.
-- Furnaces will spawn in the dungeon. Useful for getting rid of items you don't
-  want lying around, and for dipping lavaproof items in for possible effects.
-  Please do not try drinking out of a furnace.
-- Upon performing the invocation ritual, all unique demons that have not yet
-  been generated will appear and immediately teleport to random levels in the
-  game. The dungeon will begin to crumble, causing earthquakes centered on you
-  occasionally. As you begin to ascend the dungeon, monster spawn rate will
-  speed up.
-- While you have the amulet, leprechauns are generated awake.
-- Added an easter egg message during ascension.
-- Trees generate randomly in the dungeon. They use the same code as fountains
-  and other features, so will not block the exit.
-- Monsters now are more polite, and introduce themselves before trying to
-  seduce you. In the future, would like to expand this to monsters introducing
-  themselves in other ways.
-- Slight restructuring of Gehennom. In the future, would like to redo Gehennom
-  entirely, or possibly look into updating the Heck^2 patch for 3.6.1 (MAJOR
-  UNDERTAKING)
-- Lifesaved monsters will reassess their equipment, so they will equip an
-  amulet if that slot is free now, or equip armor if that was disintegrated.
-- Some peaceful dialogue for mplayers.
+Balance Changes
+- Nerfed Lord of the Foocubi and Will-o'-the-wisps after player feedback.
+- Only dragons can randomly roar now, as opposed to any monster with MS_ROAR.
+- Reduced the number of marids and giant eels on the plane of water.
+- Monsters can only get wishes from smoky potions now, not wands of
+  wishing. Wishes for wands of death and archon figurines were removed.
+- Several artifacts were buffed. The most noticeable buff is to dismounter,
+  which now does extra damage and throws a rider from their horse, making them
+  automatically stunned. This is particularly useful against the new riders.
+- Luckless Folly now must be wished for, and will probably be added as a prize
+  for a branch at some point.
 
-Quest Nemesis Changes
-- Lord Surtur can create level-shaking earthquakes when he attacks.
-- Nalzok now has a much higher chance of summoning other demons on hit than
-  demons found in gehennom.
-- Ixoth's claw attack can stun the opponent.
-- The Dark One now casts spells twice per turn.
-- Thoth Amon now casts a mix of clerical and mage spells. The changes to monster
-  sacrifice at altars could also cause some interesting effects.
-- Ixoth and the Chromatic Dragon are both affected by dragon changes, and as
-  such are potentially nastier.
-- All bosses capable of using items are affected by the item use changes.
+New Monsters (21, but only 8 spawn randomly)
+- Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
+- Added Lampades, high-level nymphs appearing in Gehennom.
+- Added Pack Lords, which transform into Alpha Werewolves. Alpha Werewolves
+  transmit regular lycanthropy, and can (rarely) summon normal werewolves.
+- Added ratmen and mutated ratmen. Both are low-level monsters that spawn
+  randomly.
+- Headless horseman, a demon that spawns riding a nightmare.
+- A pale horse, white horse, and black horse, which only appear on the Astral
+  Plane and are ridden by their respective Riders.
+- The pirate patch adds damned pirates, skeletal pirates, parrots, Mayor
+  Cumberbund, Blackbeard's Ghost, pirates, pirate brothers, and planar pirates.
+  These are not usually encountered unless one is a pirate.
+- One-Eyed Sam the Arms Dealer runs the Black Market.
 
-New Races
-- Merfolk: Start with swimming, and eventually learn to breath water. This is
-  made up for by low maxed stats.
-- Werewolf: Similar to humans, but with permanent, incurable lycanthropy.
-  Can be considered a "challenge race."
-- Infernal: Gain regeneration and have a strong set of abilities, but many
-  monsters are hostile to them and they are vulnerable to silver.
-- Angel: Gain flying and have no opposed races, but aggravate monsters and
-  have subpar physical abilities. All demon lords will attack them instead
-  of chatting.
+New Objects (4)
+- Ring of Blood Magic: If you do not have enough energy to cast a spell, you
+  cast it anyway, but lose hit points equal to the excess energy. Casting
+  healing spells using blood magic will deal extra damage to you in order to
+  prevent skill farming.
+- Ring of Psychic Resistance: One of the few ways in the game to become
+  resistant to psionic attacks.
+- Ring of Memory: Blocks the forgetting of items, spells, and objects.
+  Essentially amnesia resistance.
+- Scrolls of Knowledge: Essentially scrolls of reverse identify, like those
+  that appear in Nethack, the Next Generation. Reading one will allow you to
+  identify any item in the game by prompt.
 
-New Roles
-- Cartomancer: A spellcaster with a focus on spell cards (scrolls). They start
-  with a number of scrolls, and whenever they use one it has a chance of not
-  being consumed. Unfortunately, their skill selection is awful, and they
-  receive a harsh alignment penalty for using magic markers (you feel guilty
-  for forging a card). The entire role affectionately parodies various trading
-  card games and the shows that center on them.
-- Dragonmaster: This role is similar to that of a knight, but they begin with
-  a pet baby dragon instead of a pony, which they can eventually raise into a
-  powerful steed. Due to being raised by dragons, they are averse to wearing
-  dragon scales and dragon scale mail, which makes their midgame very difficult.
-  Their quest artifact is Sharur, a talking ornate mace.
+New Artifacts (4)
+- Chest of Proteus: The pirate quest artifact. Catches curses and occasionally
+  polymorphs the items placed inside it. The polypiler's dream.
+- Reaver: An artifact scimitar. The crowning gift for pirates.
+- Marauder's Map: An artifact scroll of magic mapping. Sacrifice gift for
+  pirates. Can also be invoked to detect artifacts.
+- Thiefbane: Wielded by One-Eyed Sam. Identical to Thiefbane in Unnethack.
 
-New Dungeon Features
-- Buzzsaw Trap
-- Furnaces
+New Features
+- Pets can gain intrinsics through corpses in the same way that the player can.
+- Water walking has been implemented for monsters, and functions exactly how one
+  would expect.
+- Displacement has been implemented for monsters. A displaced monster has a 1/4
+  chance of being someplace else when it is melee-d, and then surprising you.
+  Displacement can be bypassed using see invisible or telepathy. This feature is
+  subject to change on player feedback.
+- Monsters can jump. This essentially allows them to do a short range teleport
+  to the player if there is an available jumping path.
+- All monsters can now gain displacement, water walking, and jumping from
+  appropriate items.
+- Monsters are now capable of riding steeds. Currently only headless horsemen
+  and the Riders ride steeds. Each of the riders is mounted on an appropriate
+  high-level horse.
 
-New Artifacts
-- Gungnir
-- Gleipnir
-- Gae Bulg
-- Gae Dearg
-- Gae Buidhe
-- Carnwennan
-- Seafoam
-- Luckless Folly
-- Dismounter
-- Final Death
-- Unlimited Moon
-- Reaper
-- War's Sword
-- Acidfall
-- Sonicboom
-- Sunspot
-- Pridwen
-- Balance
-- Sharur (Dragonmaster quest artifact)
-- The Holographic Void Lily (Cartomancer quest artifact)
-- Vladsbane (joke artifact, must be wished for)
-- The King in Yellow (summons an optional boss)
+Role and Race Changes
+- Improved Cartomancer energy levels, which were very low due to a missing case
+  in a switch statement.
+- Cartomancer basement is now a mines level.
+- Easter egg for Cartomancers that read credit cards.
+- Chromatic dragons are treated as domestic for Dragonmasters, meaning (among
+  other things) that they can be tamed.
+- Dragonmasters slowly regenerate energy when standing next to pet dragons.
+  Additionally, pet dragons will attempt to help a dragonmaster who is slimed,
+  asleep, or stuck.
+- As noted above, the pirate role is now available.
 
-Dungeon Generation
-- Statuary level: A level with many statues and statue traps. One statue
-  contains a wand of wonder.
-- The Void: A dangerous one level branch with a very large amount of loot, but
-  filled with a number of extremely annoying void-themed monsters and a single
-  void dragon.
-- Beast den: A special room which contains a number of wild animals.
-- Archery Shops: Sell arrows and bows.
-- Junk Shops: Function as a general store, but a large selection of what they
-  sell is useless.
-- Mephisto's Lair: Gehennom level containing Mephisto
-- The Lord of the Foocubi's Lair: Gehennom level containing the Lord of the
-  Foocubi.
-- Paxed's patches for additional Knox and Castle levels have been implemented,
-  resulting in several possible variants.
+Miscelaneous Changes and Bug Fixes
+- Fixed the alignment of monsters being compared incorrectly when seeing whether
+  they would sacrifice something on an altar.
+- Fixed a segfault relating to monsters being gifted a nonexistent item from an
+  altar.
+- Fixed monsters not picking up corpses to sacrifice. All of these fixes make
+  monster sacrifice on altars much more likely to occur, especially in minetown.
+- Landsharks are no longer slithy.
+- Martial artists and martial masters use monk hit messages.
+- Landsharks and Jumping Spiders are capable of jumping. Polymorphing into
+  either of these monsters will grant the ability to jump.
+- Completely reworked Mephisto's lair.
+- The Grim Reaper is now drain resistant.
+- Earmuffs are now referred to as "a pair of earmuffs" instead of "earmuff,"
+  fixing one of the longest running bugs in SpliceHack.
+- Game pluralizes "worm that walks" as "worms that walk," as opposed to the
+  Gollum-esque "worms that walkses."
+- Psychic and sonic resistance now appear in the enlightenment menu.
+- Permanent versus temporary hallucination is now displayed correctly based on
+  roleplay options.
+- Added a few random god names.
+- Added new sounds for pirates, all zombies, cows, and giant flies.
+- Due to the way that shopkeepers changed from 3.4.3 to 3.6.x, simply using
+  PM_ONE_EYED_SAM results in (at best), "One-Eyed Sam the One-Eyed Sam", and
+  segfaults due to shopkeeper struct initialization at worst. Thus, she now
+  uses the Arms Dealer monster entry.
+- Domestic birds can now fly, as they were supposed to be able to.
+- Riders now carry their appropriate implements, and resurrect with special
+  messages.
+- Merfolk are generated hostile now, so killing them no longer counts as
+  murder.
+- Mind flayer telepaths are now treated as mind flayers.
+- Magma elementals no longer say that they dissolved into magma without
+  actually dissolving into magma.
+- Silver dragons and baby silver dragons no longer quaff potions of reflection.
+- Desert jinn no longer leave corpses.
 
-New Monster Spells
-- Sonic Scream: High level spell that does a large amount of damage, but is
-  prevented if the player is deaf.
-- Gas Cloud: Generates a cloud of poison gas on the square of the player.
-- Slime Spray: Can potentially disarm the player.
-
-New Items
-- Ornate Mace: Not randomly generated, used for Sharur.
-- Silver Mace: Mace with silver properties.
-- Bone Knife: If wielded, will increase the potency of offerings at altars,
-  unless cursed. If cursed, offering with it will bring about the wrath of your
-  god.
-- Throwing Axe: Similar to a regular axe, but treated as a throwing weapon and
-  deals slightly less damage.
-- Razor Whip: The metal counterpart of a bullwhip, which does a larger amount of
-  physical damage.
-- Grain Scythe: Not randomly generated, used for Reaper.
-- Earmuff (pluralization to "Earmuffs" is currently WIP): Wearing these deafens
-  the player.
-- Flowing Dress: Currently no special abilities.
-- Snappy Tuxedo: Currently no special abilities.
-- Iron Mantle: Heavy metal cloak which grants a larger AC bonus than its
-  counterparts.
-- Cloak of Flight: Cloak that grants flying.
-- Cloak of Reflection: Cloak that grants reflection.
-- Tower Shield: Shield that grants AC but is very heavy.
-- Hide Shield: Currently no special abilities.
-- Shield of Resonance: A shield which grants sonic resistance. When
-  unidentified, this has the same appearance as a shield of reflection.
-- Rogues Gloves: Grant searching.
-- Boxing Gloves: Increased chance of stunning with unarmed strikes.
-- Amulet of Drain Resistance: Grants drain resistance.
-- Amulet of Nausea: Causes nausea while worn.
-- Amulet of Danger: Grants infravision, but increases the difficulty of monsters
-  spawned.
-- Mask: Wearing a mask polymorphs you permanently until it is removed. Removing
-  it for any reason degrades the BCU status. Cursed masks will break and damage
-  you. Potentially part of an ascension kit.
-- Helm of Opaque Thoughts: Grants psionic resistance.
-- Playing Card Deck: The messages this deck yields can potentially correlate to
-  your luck.
-- Deck of Fate: An extremely risky items that can potentially grant wishes or
-  end your run. Appears the same as a playing card deck.
-- Pinch of Catnip: Confuses and tames felines.
-- Potion of Reflection: Grants temporary reflection.
-- Scroll of Cloning: Clones the player.
-- Scroll of Pure Law: All aligned scrolls allow an automatically successful
-  prayer when read if the player is coaligned, and otherwise yield the wrath
-  of the deity.
-- Scroll of True Neutrality: See scroll of pure law.
-- Scroll of Raw Chaos: See scroll of raw chaos.
-- Scroll of Time: Grants the player a large number of movement points.
-- Scroll of Web: Allows the placement of webs
-- Spellbook of Web: Allows the placement of webs
-- Wand of Healing: Wand that acts as a heal spell.
-- Wand of Wonder: Wand that randomly mimics a different wand when zapped or
-  engraved with, making engrave-IDing slightly less reliable.
-- Wand of Acid: Shoots rays of acid, like yellow dragons.
-- Wand of Poison Gas: Shoots a blast of poison gas.
-- Wand of Sonics: Causes sonic damage, which is hard to resist, but also
-  destroys many types of items.
-- Wand of Psionics: Causes psionic damage, which only harms targets with a mind,
-  but cannot be reflected.
-- Bony Quill: Not randomly generated, used by manticores.
-- Ooze Dragon Scale Mail: Grants acid resistance.
-- Razor Dragon Scale Mail: Grants speed.
-- Filth Dragon Scale Mail: Grants sickness resistance.
-- Hex Dragon Scale Mail: Grants magic resistance.
-- Void Dragon Scale Mail: Grants disintegration resistance.
-- Purple Dragon Scale Mail: Grants sonic resistance.
-- Ooze Dragon Scales: Grants acid resistance.
-- Razor Dragon Scales: Grants speed.
-- Filth Dragon Scales: Grants sickness resistance.
-- Hex Dragon Scales: Grants magic resistance.
-- Void Dragon Scales: Grants disintegration resistance.
-- Purple Dragon Scales: Grants sonic resistance.
-
-New Monsters
-- Giant Fly
-- Earthshark
-- Will-O'-The-Wisp
-- Monstrous spider
-- Memory Hound
-- Thought Hound
-- Weeping Eye
-- Lion
-- Porcupine
-- Manticore
-- Nightmare
-- Death maggot
-- Lamassu
-- Ooze Dragon
-- Razor Dragon
-- Filth Dragon
-- Hex Dragon
-- Void Dragon
-- Fusion Elemental
-- Legendary Lichen
-- Worm that Walks
-- Lord of Worms
-- Lemur
-- Zombie Dragon
-- Animated Statue
-- Desert Jinn
-- Marid
-- Merfolk
-- Sea Horse
-- Velociraptor
-- T-Rex
-- Banshee
-- Corrosive Sphere
-- Barghest
-- Giant Praying Mantis
-- Elder Kraken
-- Amalgamation
-- Bad Clone
-- Draugr
-- Amphisbaena
-- Silver Golem
-- Sludge Golem
-- Cow
-- Phoenix
-- Spectre
-- Little Bird
-- Falcon
-- Giant Falcon
-- Dust Devil
-- Swordfish
-- Martial Artist
-- Martial Master
-- Mystic Scarab
-- Goblin Windmage
-- Whirling Sphere
-- Chimera
-- Cerastes
-- Serpopard
-- Lindorm
-- Storm Elemental
-- Screamer
-- Purple Dragon
-- Baby Purple Dragon
-- Mind Flayer Telepath
-- Gnomish Psychic
-- Hundred Handed One
-- Magma elemental
-- Cartomancer (Player Monster)
-- Dragonmaster (Player Monster)
-- Infernal (Non-generated Race)
-- Minor Angel (Non-generated Race)
-- Drake (Dragonmaster Quest)
-
-New Unique Monsters
-- Master of Cats
-- Lord of the Foocubi
-- Mephisto
-- Buer
-- King in Yellow
-- Lord of the Cards
-- Grim Reaper
-- Dal Zethire
-- Drakemother
-- Slipscale the Betrayer
-- Dragon of the Betrayer
+Known Bugs
+- Currently, it is possible to take your pet into the black market, but not
+  back out. I know why this bug exists but have not been able to solve it.

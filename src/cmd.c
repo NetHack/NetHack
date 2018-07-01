@@ -1009,6 +1009,8 @@ wiz_map_levltyp(VOID_ARGS)
             Strcat(dsc, " barracks");
         if (level.flags.has_beehive)
             Strcat(dsc, " hive");
+        if (level.flags.has_lab)
+            Strcat(dsc, " lab");
         if (level.flags.has_den)
             Strcat(dsc, " den");
         if (level.flags.has_swamp)
@@ -1964,7 +1966,7 @@ int final;
         you_are("confused", "");
     if (Hallucination)
         Sprintf(buf, "%s hallucinating",
-                u.uroleplay.blind ? "permanently" : "temporarily");
+                u.uroleplay.hallu ? "permanently" : "temporarily");
     if (Blind) {
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
@@ -2174,7 +2176,8 @@ int final;
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
                                                     "the Envoy of Balance",
                                                     "the Glory of Arioch" };
-        you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
+        if(Role_if(PM_PIRATE)) you_are("the Pirate King", "");
+        else you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
     }
 
     Sprintf(buf, "%s", piousness(TRUE, "aligned"));
@@ -2213,6 +2216,10 @@ int final;
         you_are("immune to sickness", from_what(SICK_RES));
     if (Stone_resistance)
         you_are("petrification resistant", from_what(STONE_RES));
+    if (Psychic_resistance)
+        you_are("psionic resistant", from_what(PSYCHIC_RES));
+    if (Sonic_resistance)
+        you_are("sonic resistant", from_what(SONIC_RES));
     if (Halluc_resistance)
         enl_msg(You_, "resist", "resisted", " hallucinations",
                 from_what(HALLUC_RES));
@@ -2454,6 +2461,11 @@ int final;
         you_have("free action", from_what(FREE_ACTION));
     if (Fixed_abil)
         you_have("fixed abilities", from_what(FIXED_ABIL));
+    if (GoodMemory)
+        you_are("resistant to amnesia effects", from_what(GOODMEMORY));
+    if (BloodMagic)
+        you_can("draw on your own life force to cast spells",
+                  from_what(BLOODMAGIC));
     if (Lifesaved)
         enl_msg("Your life ", "will be", "would have been", " saved", "");
 
@@ -2479,7 +2491,10 @@ int final;
         if (ltmp >= 0)
             enl_msg("Good luck ", "does", "did", " not time out for you", "");
     }
-
+    if (u.uconduct.gnostic) {
+        Sprintf(buf,"gone %d turns without praying", u.ublesstim);
+        you_have(buf, "");
+    }
     if (u.ugangr) {
         Sprintf(buf, " %sangry with you",
                 u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");
@@ -3498,6 +3513,8 @@ boolean incl_wsegs;
             sz += (int) sizeof (struct edog);
         if (EAMA(mtmp))
             sz += (int) sizeof (struct eama);
+        if (ERID(mtmp))
+            sz += (int) sizeof (struct erid);
         /* mextra->mcorpsenm doesn't point to more memory */
     }
     return sz;
@@ -5395,8 +5412,10 @@ dotravel(VOID_ARGS)
 }
 
 #ifdef PORT_DEBUG
+#if defined(WIN32) && defined(TTY_GRAPHICS)
 extern void NDECL(win32con_debug_keystrokes);
 extern void NDECL(win32con_handler_info);
+#endif
 
 int
 wiz_port_debug()
@@ -5410,7 +5429,7 @@ wiz_port_debug()
         char *menutext;
         void NDECL((*fn));
     } menu_selections[] = {
-#ifdef WIN32
+#if defined(WIN32) && defined(TTY_GRAPHICS)
         { "test win32 keystrokes (tty only)", win32con_debug_keystrokes },
         { "show keystroke handler information (tty only)",
           win32con_handler_info },

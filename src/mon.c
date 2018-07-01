@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1522540516 2018/03/31 23:55:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1526132509 2018/05/12 13:41:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.252 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -98,6 +98,9 @@ mon_sanity_check()
             if (x != u.ux || y != u.uy)
                 impossible("steed (%s) claims to be at <%d,%d>?",
                            fmt_ptr((genericptr_t) mtmp), x, y);
+        } else if (mtmp->monmount) {
+            /* TODO: clean up this case and make it into a more airtight check */
+            continue;
         } else if (level.monsters[x][y] != mtmp) {
             impossible("mon (%s) at <%d,%d> is not there!",
                        fmt_ptr((genericptr_t) mtmp), x, y);
@@ -577,7 +580,7 @@ register struct monst *mtmp;
          * be handled here.  Swimmers are able to protect their stuff...
          */
         if (!is_clinger(mtmp->data) && !is_swimmer(mtmp->data)
-            && !amphibious(mtmp->data)) {
+            && !amphibious(mtmp->data) && !can_wwalk(mtmp)) {
             if (cansee(mtmp->mx, mtmp->my)) {
                 pline("%s drowns.", Monnam(mtmp));
             }
@@ -1084,7 +1087,9 @@ register const char *str;
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
         if (!str ? searches_for_item(mtmp, otmp)
                  : !!(index(str, otmp->oclass))) {
-            if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
+            /* changed to account for monsters sacrificing on altars. */
+            if (otmp->otyp == CORPSE && (is_animal(mtmp->data)
+                || is_demon(mtmp->data) || mindless(mtmp->data))
                 /* let a handful of corpse types thru to can_carry() */
                 && !touch_petrifies(&mons[otmp->corpsenm])
                 && otmp->corpsenm != PM_LIZARD
@@ -1278,6 +1283,7 @@ long flag;
     nodiag = NODIAG(mdat - mons);
     wantpool = mdat->mlet == S_EEL;
     poolok = (is_flyer(mdat) || is_clinger(mdat)
+              || can_wwalk(mon)
               || (is_swimmer(mdat) && !wantpool));
     lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
@@ -1544,6 +1550,31 @@ struct monst *magr, /* monster that is currently deciding where to move */
     if(ma == &mons[PM_ASMODEUS] && md == &mons[PM_MEPHISTO])
         return ALLOW_M|ALLOW_TM;
 
+    /* Pirate patch. TODO: Clean this up */
+    if (magr->data == &mons[PM_SKELETAL_PIRATE] &&
+      is_mercenary(mdef->data))
+     	  return ALLOW_M|ALLOW_TM;
+   	else if (mdef->data == &mons[PM_SKELETAL_PIRATE] &&
+   		is_mercenary(magr->data))
+   	    return ALLOW_M|ALLOW_TM;
+
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		is_mercenary(mdef->data))
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (mdef->data == &mons[PM_DAMNED_PIRATE] &&
+   		is_mercenary(magr->data))
+   	    return ALLOW_M|ALLOW_TM;
+
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (magr->data == &mons[PM_DAMNED_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+   	else if (magr->data == &mons[PM_PLANAR_PIRATE] &&
+   		u.ukinghill)
+   	    return ALLOW_M|ALLOW_TM;
+
     /* Endgame amulet theft / fleeing */
     if(mon_has_amulet(magr) && In_endgame(&u.uz)) {
         return ALLOW_M|ALLOW_TM;
@@ -1631,7 +1662,7 @@ struct monst *mtmp, *mtmp2;
     relmon(mtmp, (struct monst **) 0);
 
     /* finish adding its replacement */
-    if (mtmp != u.usteed) /* don't place steed onto the map */
+    if (mtmp != u.usteed && mtmp->monmount != 1) /* don't place steed onto the map */
         place_monster(mtmp2, mtmp2->mx, mtmp2->my);
     if (mtmp2->wormno)      /* update level.monsters[wseg->wx][wseg->wy] */
         place_wsegs(mtmp2); /* locations to mtmp2 not mtmp. */
@@ -1750,6 +1781,11 @@ struct monst *mtmp2, *mtmp1;
             neweama(mtmp2);
         *EAMA(mtmp2) = *EAMA(mtmp1);
     }
+    if (ERID(mtmp1)) {
+        if (!ERID(mtmp2))
+            newerid(mtmp2);
+        *ERID(mtmp2) = *ERID(mtmp1);
+    }
     if (has_mcorpsenm(mtmp1))
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
@@ -1775,6 +1811,8 @@ struct monst *m;
             free((genericptr_t) x->edog);
         if (x->eama)
             free((genericptr_t) x->eama);
+        if (x->erid)
+            free((genericptr_t) x->erid);
         /* [no action needed for x->mcorpsenm] */
 
         free((genericptr_t) x);
@@ -1961,9 +1999,13 @@ register struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
+                const char *whom = mtmp->data->mname;
+
                 /* was using a_monnam(mtmp) but that's weird if mtmp is named:
                    "Dracula suddenly transforms and rises as Dracula" */
-                pline(upstart(buf), an(mtmp->data->mname));
+                if (!type_is_pname(mtmp->data))
+                    whom = an(whom);
+                pline(upstart(buf), whom);
                 vamp_rise_msg = TRUE;
             }
             newsym(x, y);
@@ -1990,6 +2032,8 @@ register struct monst *mtmp;
         set_mon_data(mtmp, &mons[PM_HUMAN_WEREJACKAL], -1);
     else if (mtmp->data == &mons[PM_WEREWOLF])
         set_mon_data(mtmp, &mons[PM_HUMAN_WEREWOLF], -1);
+    else if (mtmp->data == &mons[PM_ALPHA_WEREWOLF])
+        set_mon_data(mtmp, &mons[PM_PACK_LORD], -1);
     else if (mtmp->data == &mons[PM_WERERAT])
         set_mon_data(mtmp, &mons[PM_HUMAN_WERERAT], -1);
 
@@ -2028,6 +2072,9 @@ register struct monst *mtmp;
         default:
             break;
         }
+    }
+    if (Is_blackmarket(&u.uz) && tmp == PM_ARMS_DEALER) {
+        bars_around_portal(TRUE);
     }
     if (mtmp->iswiz)
         wizdead();
@@ -2069,6 +2116,12 @@ boolean was_swallowed; /* digestion */
     struct permonst *mdat = mon->data;
     struct obj *obj = (struct obj *) 0;
     int i, tmp;
+    /* TODO: Move this somewhere more logical. If mounted, the mount appears
+       after death. */
+    if (mon->mextra && ERID(mon) && ERID(mon)->m1 != NULL) {
+        place_monster(ERID(mon)->m1, mon->mx, mon->my);
+        ERID(mon)->m1->monmount = 0;
+    }
     /* A worm that walks naturally dissolves into worms */
     if (mdat == &mons[PM_WORM_THAT_WALKS] || mdat == &mons[PM_LORD_OF_WORMS]) {
         if (cansee(mon->mx, mon->my) && !was_swallowed) {
@@ -2116,11 +2169,13 @@ boolean was_swallowed; /* digestion */
 
     /* magma elementals dissolve into a pile of lava */
     if (mdat == &mons[PM_MAGMA_ELEMENTAL]) {
-        if (cansee(mon->mx, mon->my) && !was_swallowed)
-            pline("%s body dissolves into a pool of lava.", s_suffix(Monnam(mon)));
         if (levl[mon->mx][mon->my].typ != STAIRS &&
-                levl[mon->mx][mon->my].typ != LADDER)
+                levl[mon->mx][mon->my].typ != LADDER) {
             levl[mon->mx][mon->my].typ = LAVAPOOL;
+        if (cansee(mon->mx, mon->my) && !was_swallowed)
+            pline("%s body dissolves into a pool of lava.",
+                s_suffix(Monnam(mon)));
+        }
         return FALSE;
     }
 
@@ -2767,7 +2822,7 @@ m_respond(mtmp)
 struct monst *mtmp;
 {
     if (mtmp->data == &mons[PM_BANSHEE]) {
-        if (!Deaf) {
+        if (!Sonic_resistance) {
             pline("%s unleashes a bloodcurdling wail!", Monnam(mtmp));
             stop_occupation();
             losestr(rnd(3));
@@ -2787,7 +2842,8 @@ struct monst *mtmp;
         }
         aggravate();
     }
-    if (mtmp->data->msound == MS_ROAR && !mtmp->mtame && mtmp->mpeaceful == 0) {
+    if (mtmp->data->msound == MS_ROAR && !mtmp->mtame && mtmp->mpeaceful == 0
+        && is_dragon(mtmp->data)) {
         if (!Deaf && canseemon(mtmp)) {
             pline("%s roars!", Monnam(mtmp));
             stop_occupation();
@@ -2832,9 +2888,13 @@ boolean via_attack;
             pline("The engraving beneath you fades.");
         del_engr_at(u.ux, u.uy);
     }
-
     /* AIS: Should this be in both places, or just in wakeup()? */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
+    /* Even if the black marketeer is already angry he may not have called
+    * for his assistants if he or his staff have not been assaulted yet.
+    */
+    if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
+        blkmar_guards(mtmp);
     if (!mtmp->mpeaceful)
         return;
     if (mtmp->mtame)
@@ -2852,6 +2912,15 @@ boolean via_attack;
             pline("%s gets angry!", Monnam(mtmp));
         else if (flags.verbose && !Deaf)
             growl(mtmp);
+    }
+    /* Don't misbehave in the Black Market or else... */
+    if (Is_blackmarket(&u.uz)) {
+          if (is_blkmktstaff(mtmp->data) ||
+          /* non-tame named monsters are presumably
+           * black marketeer's assistants */
+            has_mname(mtmp)) {
+                blkmar_guards(mtmp);
+            }
     }
 
     /* attacking your own quest leader will anger his or her guardians */
@@ -4077,6 +4146,8 @@ struct permonst *mdat;
         case PM_HUMAN_WEREJACKAL:
         case PM_HUMAN_WERERAT:
         case PM_HUMAN_WEREWOLF:
+        case PM_PACK_LORD:
+        case PM_ALPHA_WEREWOLF:
         case PM_WEREJACKAL:
         case PM_WERERAT:
         case PM_WEREWOLF:

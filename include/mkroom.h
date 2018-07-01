@@ -59,6 +59,7 @@ enum roomtype_types {
     SWAMP,      /* contains pools */
     VAULT,      /* contains piles of gold */
     BEEHIVE,    /* contains killer bees and royal jelly */
+    LAB,        /* contains amalgamations and bad clones, along with a sink */
     DEN,        /* contains wild animals */
     MORGUE,     /* contains corpses, undead and ghosts */
     BARRACKS,   /* contains soldiers and their gear */
@@ -68,6 +69,7 @@ enum roomtype_types {
     LEPREHALL,  /* leprechaun hall (Tom Proudfoot) */
     COCKNEST,   /* cockatrice nest (Tom Proudfoot) */
     ANTHOLE,    /* ants (Tom Proudfoot) */
+    BLACKFOYER, /* black market */
     SHOPBASE,   /* everything above this is a shop */
     ARMORSHOP,  /* specific shop defines for level compiler */
     SCROLLSHOP,
@@ -81,11 +83,12 @@ enum roomtype_types {
     ARCHERYSHOP,
     JUNKSHOP,
     FODDERSHOP, /* health food store */
-    CANDLESHOP
+    CANDLESHOP,
+    BLACKSHOP
 };
 
-#define MAXRTYPE (CANDLESHOP) /* maximum valid room type */
-#define UNIQUESHOP (CANDLESHOP) /* shops here & above not randomly gen'd. */
+#define MAXRTYPE (BLACKSHOP) /* maximum valid room type */
+#define UNIQUESHOP (BLACKSHOP) /* shops here & above not randomly gen'd. */
 
 /* Special type for search_special() */
 #define ANY_TYPE (-1)

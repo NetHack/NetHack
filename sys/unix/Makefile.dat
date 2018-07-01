@@ -134,7 +134,8 @@ options:	../util/makedefs
 
 spec_levs: ../util/lev_comp \
 	bigroom.des castle.des endgame.des gehennom.des knox.des medusa.des \
-	mines.des oracle.des sokoban.des statuary.des tower.des void.des yendor.des
+	mines.des oracle.des sokoban.des statuary.des tower.des void.des yendor.des \
+	blkmar.des
 	../util/lev_comp bigroom.des
 	../util/lev_comp castle.des
 	../util/lev_comp endgame.des
@@ -148,12 +149,13 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp tower.des
 	../util/lev_comp void.des
 	../util/lev_comp yendor.des
+	../util/lev_comp blkmar.des
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \
 	Arch.des Barb.des Caveman.des Cartomancer.des Healer.des Knight.des Monk.des \
 	Priest.des Ranger.des Rogue.des Samurai.des Tourist.des Valkyrie.des \
-	Wizard.des Drag.des
+	Wizard.des Drag.des Pirate.des
 	../util/lev_comp Arch.des
 	../util/lev_comp Barb.des
 	../util/lev_comp Cartomancer.des
@@ -162,6 +164,7 @@ quest_levs: ../util/lev_comp \
 	../util/lev_comp Healer.des
 	../util/lev_comp Knight.des
 	../util/lev_comp Monk.des
+	../util/lev_comp Pirate.des
 	../util/lev_comp Priest.des
 	../util/lev_comp Ranger.des
 	../util/lev_comp Rogue.des

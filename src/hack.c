@@ -1690,6 +1690,81 @@ domove()
         return;
     }
 
+    /* warn player before walking into known traps */
+    trap = t_at(x, y);
+    if (trap && trap->tseen && (!context.nopick || context.run)
+        && !Stunned && !Confusion
+        && (immune_to_trap(&youmonst, trap->ttyp) != 1 || Hallucination)) {
+        /* note on hallucination: all traps still show as ^, but the hero can't
+         * tell what they are, so warn of every trap. */
+        char qbuf[QBUFSZ];
+        xchar traptype = (Hallucination ? rnd(TRAPNUM - 1) : trap->ttyp);
+        boolean into = FALSE; /* "onto" the trap vs "into" */
+        switch (traptype) {
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TELEP_TRAP:
+        case LEVEL_TELEP:
+        case MAGIC_PORTAL:
+        case WEB:
+            into = TRUE;
+        }
+        snprintf(qbuf, QBUFSZ, "Really %s %sto that %s?",
+                 locomotion(youmonst.data, "step"),
+                 (into ? "in" : "on"),
+                 defsyms[trap_to_defsym(traptype)].explanation);
+        if (!paranoid_query(ParanoidTrap, qbuf)) {
+            nomul(0);
+            context.move = 0;
+            return;
+        }
+    }
+
+    /* Paranoid checks for dangerous moves into water or lava */
+    if (!Levitation && !Flying && grounded(youmonst.data) && !Stunned
+        && !Confusion && levl[x][y].seenv
+        && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
+            || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
+        boolean known_wwalking, known_lwalking;
+        known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
+                        && objects[WATER_WALKING_BOOTS].oc_name_known
+                        && !u.usteed);
+        known_lwalking = (known_wwalking && Fire_resistance &&
+                        uarmf->oerodeproof && uarmf->rknown);
+        /* FIXME: This can be exploited to identify the ring of fire resistance
+        * if the player is wearing it unidentified and has identified
+        * fireproof boots of water walking and is walking over lava. However,
+        * this is such a marginal case that it may not be worth fixing. */
+        if (context.nopick) {
+            /* moving with 'm' */
+            if (is_pool(x, y) && !known_wwalking) {
+                if (ParanoidSwim && yn("Really enter the water?") != 'y') {
+                    context.move = 0;
+                    nomul(0);
+                    return;
+                }
+            }
+            else if (is_lava(x, y) && !known_lwalking) {
+                if (ParanoidSwim && yn("Really enter the lava?") != 'y') {
+                    context.move = 0;
+                    nomul(0);
+                    return;
+                }
+            }
+        } else {
+            /* not moving with 'm'; if not known safe, simply prevent from
+             * moving at all */
+            if ((is_pool(x, y) && !known_wwalking)
+                || (is_lava(x, y) && !known_lwalking)) {
+                context.move = 0;
+                nomul(0);
+                return;
+            }
+        }
+    }
+
     /* Move ball and chain.  */
     if (Punished)
         if (!drag_ball(x, y, &bc_control, &ballx, &bally, &chainx, &chainy,
@@ -1725,17 +1800,8 @@ domove()
      * be caught by the normal falling-monster code.
      */
     if (is_safepet(mtmp) && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if trapped, there's a chance the pet goes wild */
-        if (mtmp->mtrapped) {
-            if (!rn2(mtmp->mtame)) {
-                mtmp->mtame = mtmp->mpeaceful = mtmp->msleeping = 0;
-                if (mtmp->mleashed)
-                    m_unleash(mtmp, TRUE);
-                growl(mtmp);
-            } else {
-                yelp(mtmp);
-            }
-        }
+        /* if it turns out we can't actually move */
+        boolean didnt_move = FALSE;
 
         /* seemimic/newsym should be done before moving hero, otherwise
            the display code will draw the hero here before we possibly
@@ -1744,31 +1810,42 @@ domove()
         mtmp->mundetected = 0;
         if (mtmp->m_ap_type)
             seemimic(mtmp);
-        else if (!mtmp->mtame)
-            newsym(mtmp->mx, mtmp->my);
         u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
             && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
-            u.ux = u.ux0, u.uy = u.uy0;
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
             /* can't swap places when pet won't fit thru the opening */
-            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
-            if (u.usteed)
-                u.usteed->mx = u.ux, u.usteed->my = u.uy;
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
+            /* aos: since peaceful monsters simply being unable to move out of
+             * traps was inconsistent with pets having it possible but being
+             * untamed in the process, extend this to pets as well. */
+            You("stop.  %s can't move out of that trap.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
+        } else if (mtmp->mpeaceful
+                   && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+                       || t_at(u.ux0, u.uy0) != NULL
+                       || mtmp->ispriest
+                       || mtmp->isshk
+                       || mtmp->data == &mons[PM_ORACLE]
+                       || mtmp->m_id == quest_status.leader_m_id)) {
+            /* displacing peaceful into unsafe or trapped space, or trying to
+             * displace quest leader, Oracle, shopkeeper, or priest */
+            You("stop.  %s doesn't want to swap places.",
+                upstart(y_monnam(mtmp)));
+            didnt_move = TRUE;
         } else {
             char pnambuf[BUFSZ];
 
@@ -1780,7 +1857,7 @@ domove()
             newsym(x, y);
             newsym(u.ux0, u.uy0);
 
-            You("%s %s.", mtmp->mtame ? "swap places with" : "frighten",
+            You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 pnambuf);
 
             /* check for displacing it into pools and traps */
@@ -1828,6 +1905,16 @@ domove()
                 break;
             }
         }
+
+        if (didnt_move) {
+            u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
+            if (u.usteed)
+                u.usteed->mx = u.ux, u.usteed->my = u.uy;
+        }
+
+        mtmp->mundetected = 0;
+        if (mtmp->m_ap_type)
+            seemimic(mtmp);
     }
 
     reset_occupations();
@@ -2403,6 +2490,9 @@ register boolean newlev;
         case BEEHIVE:
             You("enter a giant beehive!");
             break;
+        case LAB:
+            You("enter an abandoned laboratory!");
+            break;
         case DEN:
             You("enter a den of wild beasts!");
             break;
@@ -2433,6 +2523,13 @@ register boolean newlev;
                 msg_given = FALSE;
             break;
         }
+        case BLACKFOYER:
+            if(monstinroom(&mons[PM_ARMS_DEALER], roomno)) {
+                verbalize("%s, %s!  Welcome to One-eyed Sam's black market!",
+                    Hello((struct monst *)0), plname);
+                    verbalize("Please have a look around, but don't even think about stealing anything.");
+            }
+            break;
         case TEMPLE:
             intemple(roomno + ROOMOFFSET);
         /*FALLTHRU*/

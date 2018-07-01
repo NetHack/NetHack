@@ -21,6 +21,69 @@ rider_cant_reach()
     You("aren't skilled enough to reach from %s.", y_monnam(u.usteed));
 }
 
+void update_monsteed(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1 != NULL) {
+        ERID(mtmp)->m1->mx = mtmp->mx;
+        ERID(mtmp)->m1->my = mtmp->my;
+        ERID(mtmp)->m1->mpeaceful = mtmp->mpeaceful;
+    }
+}
+
+void mount_monster(mtmp, pm)
+struct monst *mtmp;
+int pm;
+{
+    register struct monst *mount;
+
+    newerid(mtmp);
+    /* small hack here: make it in a random spot to avoid failures due to there
+       not being enough room. */
+    mount = makemon(&mons[pm], 0, 0, MM_ADJACENTOK);
+    ERID(mtmp)->m1 = mount;
+    ERID(mtmp)->mid = mount->m_id;
+    remove_monster(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my);
+    if (cansee(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my))
+        newsym(ERID(mtmp)->m1->mx, ERID(mtmp)->m1->my);
+    ERID(mtmp)->m1->monmount = 1;
+    ERID(mtmp)->m1->mx = mtmp->mx;
+    ERID(mtmp)->m1->my = mtmp->my;
+    context.botl = TRUE;
+}
+
+void
+newerid(mtmp)
+struct monst *mtmp;
+{
+    if (!mtmp->mextra)
+        mtmp->mextra = newmextra();
+    if (!ERID(mtmp)) {
+        ERID(mtmp) = (struct erid *) alloc(sizeof(struct erid));
+        (void) memset((genericptr_t) ERID(mtmp), 0, sizeof(struct erid));
+    }
+}
+
+void
+free_erid(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && ERID(mtmp)) {
+        free((genericptr_t) ERID(mtmp));
+        ERID(mtmp) = (struct erid *) 0;
+    }
+}
+
+struct monst*
+get_mount(mtmp)
+struct monst *mtmp;
+{
+    if (mtmp->mextra && ERID(mtmp) && ERID(mtmp)->m1 != NULL) {
+        return ERID(mtmp)->m1;
+    }
+    return (struct monst *) 0;
+}
+
 /*** Putting the saddle on ***/
 
 /* Can this monster wear a saddle? */

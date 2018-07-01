@@ -1677,15 +1677,17 @@ int part;
         return "skin"; /* sharks don't have scales */
     if ((mptr == &mons[PM_JELLYFISH] || mptr == &mons[PM_KRAKEN])
         && (part == ARM || part == FINGER || part == HAND || part == FOOT
-            || part == TOE))
+            || part == TOE || part == FINGERTIP))
         return "tentacle";
     if (mptr == &mons[PM_FLOATING_EYE] && part == EYE)
         return "cornea";
     if (humanoid(mptr) && (part == ARM || part == FINGER || part == FINGERTIP
                            || part == HAND || part == HANDED))
         return humanoid_parts[part];
-    if (mptr == &mons[PM_RAVEN])
+    if (is_bird(mptr))
         return bird_parts[part];
+    if (has_beak(mptr) && part == NOSE)
+        return "beak";
     if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN
         || (mptr == &mons[PM_ROTHE] && part != HAIR))
         return horse_parts[part];

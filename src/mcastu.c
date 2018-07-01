@@ -39,6 +39,7 @@ enum mcast_cleric_spells {
     CLC_GEYSER
 };
 
+STATIC_DCL boolean FDECL(uniquespell, (struct monst*));
 STATIC_DCL void FDECL(cursetxt, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(choose_magic_spell, (int));
 STATIC_DCL int FDECL(choose_clerical_spell, (int));
@@ -49,6 +50,58 @@ STATIC_DCL boolean
 FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
 
 extern const char *const flash_types[]; /* from zap.c */
+
+/* different types of psionic bolts for monsters */
+STATIC_OVL
+boolean
+uniquespell(mtmp)
+struct monst *mtmp;
+{
+    register struct permonst *ptr = mtmp->data;
+    register int mm = monsndx(ptr);
+    switch(ptr->mlet) {
+        case S_ANGEL:
+            You("are being crushed under the weight of your sins!");
+            break;
+        case S_DRAGON:
+            Your("thoughts are whited out by an overwhelming presence!");
+            break;
+        case S_VAMPIRE:
+            pline("Suddenly, %s streams from your %s and %s!", body_part(BLOOD),
+                body_part(FACE), makeplural(body_part(EYE)));
+            break;
+        case S_NAGA:
+            You("are being crushed by telekinetic coils!");
+            break;
+        case S_GIANT:
+            You("are walloped by an enormous phantasmal warhammer!");
+            break;
+        case S_GNOME:
+            You("are bombarded by spectral knives!");
+            break;
+        case S_DEMON:
+            switch(mm) {
+                case PM_DEMOGORGON:
+                    Your("body withers and decays!");
+                    break;
+                case PM_ORCUS:
+                    You("are torn apart by phantasmal skulls!");
+                    break;
+                case PM_MARID:
+                    Your("%s heaves as it is suddenly filled with water!",
+                          body_part(STOMACH));
+                    break;
+                default:
+                    You("are covered in ravenous insects!");
+                    break;
+            }
+            break;
+        default:
+            return FALSE;
+            break;
+    }
+    return TRUE;
+}
 
 /* feedback when frustrated monster couldn't cast a spell */
 STATIC_OVL
@@ -537,7 +590,9 @@ int spellnum;
             shieldeff(u.ux, u.uy);
             dmg = (dmg + 1) / 2;
         }
-        if (dmg <= 5)
+        if (rn2(4) && uniquespell(mtmp))
+            break;
+        else if (dmg <= 5)
             You("get a slight %sache.", body_part(HEAD));
         else if (dmg <= 10)
             Your("brain is on fire!");

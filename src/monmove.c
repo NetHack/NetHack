@@ -621,8 +621,11 @@ toofar:
                 }
             }
         }
-
-        tmp = m_move(mtmp, 0);
+        if (mtmp->monmount != 1)
+            tmp = m_move(mtmp, 0);
+        else
+            tmp = 0;
+        update_monsteed(mtmp);
         if (tmp != 2)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
@@ -919,6 +922,31 @@ register int after;
     }
 #endif
 
+    /* jump toward the player if that lies in our nature */
+    if (can_jump(mtmp) || is_jumper(ptr)) {
+        int dist = dist2(mtmp->mx, mtmp->my, u.ux, u.uy);
+        if (!mtmp->mpeaceful && !rn2(3) && dist <= 20 && dist > 8) {
+            int x = u.ux - mtmp->mx;
+            int y = u.uy - mtmp->my;
+            if (x < 0)
+                x = 1;
+            else if (x > 0)
+                x = -1;
+            if (y < 0)
+                y = 1;
+            else if (y > 0)
+                y = -1;
+            if (rloc_pos_ok(u.ux + x, u.uy + y, mtmp)
+                && check_mon_jump(mtmp, u.ux + x, u.uy + y)) {
+                rloc_to(mtmp, u.ux + x, u.uy + y);
+                if (canseemon(mtmp))
+                    pline("%s leaps at you!", Monnam(mtmp));
+                mmoved = 1;
+                goto postmov;
+            }
+        }
+    }
+
     /* teleport if that lies in our nature */
     if (ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan
         && !tele_restrict(mtmp)) {
@@ -1008,12 +1036,13 @@ not_special:
             && !mtmp->mpeaceful)
             minr--;
         /* guards shouldn't get too distracted */
-        if (!mtmp->mpeaceful && is_mercenary(ptr))
+        if ((!mtmp->mpeaceful && is_mercenary(ptr)) || is_blkmktstaff(ptr))
             minr = 1;
 
-        if ((likegold || likegems || likeobjs || likemagic || likerock
+        if (((likegold || likegems || likeobjs || likemagic || likerock
              || conceals) && (!*in_rooms(omx, omy, SHOPBASE)
-                              || (!rn2(25) && !mtmp->isshk))) {
+                              || (!rn2(25) && !mtmp->isshk))) &&
+                              !Is_blackmarket(&u.uz)) {
         look_for_obj:
             oomx = min(COLNO - 1, omx + minr);
             oomy = min(ROWNO - 1, omy + minr);
@@ -1055,6 +1084,8 @@ not_special:
                              && (otmp->otyp != CORPSE
                                  || (otmp-> otyp == CORPSE
                                      && !is_demon(mtmp->data)
+                                     && !is_animal(mtmp->data)
+                                     && !mindless(mtmp->data)
                                      && !is_rider(&mons[otmp->corpsenm]))))
                          || (likemagic && index(magical, otmp->oclass))
                          || (uses_items && searches_for_item(mtmp, otmp))

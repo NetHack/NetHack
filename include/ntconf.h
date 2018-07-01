@@ -203,7 +203,9 @@ extern void NDECL(win32_abort);
 extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
-extern void NDECL(load_keyboard_handler);
+#if defined(WIN32CON)
+extern void FDECL(set_altkeyhandler, (const char *));
+#endif
 extern void NDECL(raw_clear_screen);
 
 #include <fcntl.h>
@@ -245,5 +247,17 @@ extern int FDECL(set_win32_option, (const char *, const char *));
 #ifdef CHANGE_COLOR
 extern int FDECL(alternative_palette, (char *));
 #endif
+
+#ifdef NDEBUG
+#define ntassert(expression) ((void)0)
+#else
+extern void FDECL(ntassert_failed, (const char * exp, const char * file,
+                                    int line));
+
+#define ntassert(expression) (void)((!!(expression)) || \
+        (ntassert_failed(#expression, __FILE__, __LINE__), 0))
+#endif
+
+#define nethack_enter(argc, argv) nethack_enter_winnt()
 
 #endif /* NTCONF_H */

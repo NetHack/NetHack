@@ -696,6 +696,7 @@ clear_level_structures()
     level.flags.has_court = 0;
     level.flags.has_morgue = level.flags.graveyard = 0;
     level.flags.has_beehive = 0;
+    level.flags.has_lab = 0;
     level.flags.has_den = 0;
     level.flags.has_barracks = 0;
     level.flags.has_temple = 0;
@@ -846,7 +847,7 @@ makelevel()
             mkroom(SHOPBASE);
         else if (u_depth > 4 && !rn2(6))
             mkroom(COURT);
-        else if (u_depth > 5 && !rn2(8)
+        else if (u_depth > 5 && !rn2(9)
                  && !(mvitals[PM_LEPRECHAUN].mvflags & G_GONE))
             mkroom(LEPREHALL);
         else if (u_depth > 6 && !rn2(7))
@@ -856,6 +857,9 @@ makelevel()
         else if (u_depth > 9 && !rn2(5)
                  && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE))
             mkroom(BEEHIVE);
+        else if (u_depth > 10 && !rn2(10)
+                 && !(mvitals[PM_AMALGAMATION].mvflags & G_GONE))
+            mkroom(LAB);
         else if (u_depth > 11 && !rn2(6))
             mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
