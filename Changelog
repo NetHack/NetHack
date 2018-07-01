@@ -48,6 +48,9 @@ Balance Changes
   automatically stunned. This is particularly useful against the new riders.
 - Luckless Folly now must be wished for, and will probably be added as a prize
   for a branch at some point.
+- Amalgamtions now grab totally random monsters to make a part of themselves.
+  For balance purposes, their speed has been massively nerfed. Regardless,
+  tangle with them at your own peril.
 
 New Monsters (21, but only 8 spawn randomly)
 - Ported Gnolls, Gnoll Shamans, and Gnoll Chieftains from SLASH'EM.
@@ -150,6 +153,7 @@ Miscelaneous Changes and Bug Fixes
 - Silver dragons and baby silver dragons no longer quaff potions of reflection.
 - Desert jinn no longer leave corpses.
 - Fixed a bug where enlightenment could not be duplicated by a wand of wonder.
+- Fixed amalgamations rarely randomly segfaulting on initialization.
 
 Known Bugs
 - Currently, it is possible to take your pet into the black market, but not

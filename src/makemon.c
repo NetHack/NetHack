@@ -34,6 +34,19 @@ extern const int monstr[];
 #define toostrong(monindx, lev) (monstr[monindx] > lev)
 #define tooweak(monindx, lev) (monstr[monindx] < lev)
 
+struct permonst*
+rnd_point() {
+    register struct permonst *ptr;
+    register int i;
+    unsigned short excludeflags;
+    excludeflags = G_UNIQ | G_NOGEN | (Inhell ? G_NOHELL : G_HELL);
+    do {
+        i = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
+        ptr = &mons[i];
+    } while ((ptr->geno & excludeflags) != 0);
+    return ptr;
+}
+
 void
 neweama(mtmp)
 struct monst *mtmp;
@@ -44,9 +57,9 @@ struct monst *mtmp;
         EAMA(mtmp) = (struct eama *) alloc(sizeof(struct eama));
         (void) memset((genericptr_t) EAMA(mtmp), 0, sizeof(struct eama));
     }
-    /* set up the monster components */
-    EAMA(mtmp)->m1 = &mons[rndmonnum()];
-    EAMA(mtmp)->m2 = &mons[rndmonnum()];
+
+    EAMA(mtmp)->m1 = rnd_point();
+    EAMA(mtmp)->m2 = rnd_point();
 }
 
 void
