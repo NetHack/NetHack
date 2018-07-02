@@ -137,7 +137,7 @@ unsigned *ospecial;
               (offset == S_upstair || offset == S_dnstair) &&
               (x == sstairs.sx && y == sstairs.sy)) {
           color = CLR_YELLOW;
-        } else if (iflags.use_color && offset >= S_vwall && offset <= S_hcdoor) {
+        } else if (iflags.use_color && offset >= S_vwall && offset <= S_trwall) {
             if (*in_rooms(x,y,BEEHIVE))
         		    color = CLR_YELLOW;
             else if (In_sokoban(&u.uz))
