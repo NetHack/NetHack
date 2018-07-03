@@ -555,9 +555,10 @@ int locflags; /* non-zero means get location even if monster is buried */
 
 /* used by revive() and animate_statue() */
 struct monst *
-montraits(obj, cc)
+montraits(obj, cc, adjacentok)
 struct obj *obj;
 coord *cc;
+boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
 {
     struct monst *mtmp = (struct monst *) 0;
     struct monst *mtmp2 = (struct monst *) 0;
@@ -570,7 +571,8 @@ coord *cc;
         if (mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))
             return (struct monst *) 0;
         mtmp = makemon(mtmp2->data, cc->x, cc->y,
-                       NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH);
+                       (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
+                        | (adjacentok ? MM_ADJACENTOK : 0)));
         if (!mtmp)
             return mtmp;
 
@@ -786,7 +788,7 @@ boolean by_hero;
     } else if (has_omonst(corpse)) {
         /* use saved traits */
         xy.x = x, xy.y = y;
-        mtmp = montraits(corpse, &xy);
+        mtmp = montraits(corpse, &xy, FALSE);
         if (mtmp && mtmp->mtame && !mtmp->isminion)
             wary_dog(mtmp, TRUE);
     } else {
