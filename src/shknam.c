@@ -613,7 +613,7 @@ struct mkroom *sroom;
             sy--;
         else if (isok(sx, sy + 1) && !levl[sx][sy + 1].edge
                  && (int) levl[sx][sy + 1].roomno == rmno)
-            sx++;
+            sy++;
         else
             goto shk_failed;
     } else if (sx == sroom->lx - 1)
