@@ -2454,6 +2454,7 @@ boolean prefilled;
         case BEEHIVE:
         case MORGUE:
         case BARRACKS:
+        case ANTHOLE:
             fill_zoo(croom);
             break;
         }
