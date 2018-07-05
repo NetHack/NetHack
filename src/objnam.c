@@ -1194,7 +1194,9 @@ unsigned doname_flags;
             Strcat(bp, " (at the ready)");
         }
     }
-    if (!iflags.suppress_price && is_unpaid(obj)) {
+    /* treat 'restoring' like suppress_price because shopkeeper and
+       bill might not be available yet while restore is in progress */
+    if (!iflags.suppress_price && !restoring && is_unpaid(obj)) {
         long quotedprice = unpaid_cost(obj, TRUE);
 
         Sprintf(eos(bp), " (%s, %ld %s)",
