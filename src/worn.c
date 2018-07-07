@@ -106,8 +106,7 @@ long mask;
                 }
             }
     }
-    if (!restoring)
-        update_inventory();
+    update_inventory();
 }
 
 /* called e.g. when obj is destroyed */
@@ -138,9 +137,7 @@ register struct obj *obj;
             if ((p = w_blocks(obj, wp->w_mask)) != 0)
                 u.uprops[p].blocked &= ~wp->w_mask;
         }
-    /* setnotworn() isn't called during restore but parallel setworn() */
-    if (!restoring)
-        update_inventory();
+    update_inventory();
 }
 
 /* return item worn in slot indiciated by wornmask; needed by poly_obj() */
