@@ -54,7 +54,20 @@ highlighting status conditions would fail to use attributes if a rule with
 	them was followed by another one without (color only or color&normal)
 when using 'O' to set hilite_status rules, hide the 'score' status field if
 	game has been built without SCORE_ON_BOTL; latent rules for 'score'
-	can still be set in config file but can't be added or removed via 'O'
+	can still be set in config file and removed via 'O' but can't be added
+make stone-to-flesh behave the same on statues of petrified monsters as it
+	does on random 'dungeon art' ones (revive at a nearby spot instead of
+	becoming a corpse when there's already a monster at statue's location)
+special level loader didn't support populating several types of special rooms
+	(ant hole, cockatrice nest, leprechaun hall)
+eating rings while polymorphed didn't handle bonus/penalty for increase damage,
+	increase accuracy, or protection correctly
+shopkeeper's position in front of shop door didn't correctly handle bottom
+	edge of irregularly shaped shop due to typo or copy+paste error
+	(latent bug; no such shops are present in 3.6.x)
+attempting to update permanent inventory window during restore had problems
+	with unpaid items (needed shop bill before shop and its shopkeeper
+	were restored) and named fruit
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository

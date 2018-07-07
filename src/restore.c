@@ -35,8 +35,7 @@ STATIC_DCL struct monst *FDECL(restmonchn, (int, BOOLEAN_P));
 STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
 STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
-STATIC_DCL boolean
-FDECL(restgamestate, (int, unsigned int *, unsigned int *));
+STATIC_DCL boolean FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int, XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (int));
@@ -521,6 +520,7 @@ unsigned int *stuckid, *steedid;
     struct obj *otmp, *tmp_bc;
     char timebuf[15];
     unsigned long uid;
+    boolean defer_perm_invent;
 
     mread(fd, (genericptr_t) &uid, sizeof uid);
     if (SYSOPT_CHECK_SAVE_UID
@@ -531,7 +531,7 @@ unsigned int *stuckid, *steedid;
         if (!wizard)
             return FALSE;
     }
-    mread(fd, (genericptr_t) &context, sizeof(struct context_info));
+    mread(fd, (genericptr_t) &context, sizeof (struct context_info));
     if (context.warntype.speciesidx >= LOW_PM)
         context.warntype.species = &mons[context.warntype.speciesidx];
 
@@ -539,7 +539,13 @@ unsigned int *stuckid, *steedid;
        file option values instead of keeping old save file option values
        if partial restore fails and we resort to starting a new game */
     newgameflags = flags;
-    mread(fd, (genericptr_t) &flags, sizeof(struct flag));
+    mread(fd, (genericptr_t) &flags, sizeof (struct flag));
+    /* avoid keeping permanent inventory window up to date during restore
+       (setworn() calls update_inventory); attempting to include the cost
+       of unpaid items before shopkeeper's bill is available is a no-no;
+       named fruit names aren't accessible yet either */
+    defer_perm_invent = flags.perm_invent;
+    flags.perm_invent = FALSE;
     /* wizard and discover are actually flags.debug and flags.explore;
        player might be overriding the save file values for them;
        in the discover case, we don't want to set that for a normal
@@ -645,14 +651,14 @@ unsigned int *stuckid, *steedid;
     restlevchn(fd);
     mread(fd, (genericptr_t) &moves, sizeof moves);
     mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
-    mread(fd, (genericptr_t) &quest_status, sizeof(struct q_score));
-    mread(fd, (genericptr_t) spl_book, sizeof(struct spell) * (MAXSPELL + 1));
+    mread(fd, (genericptr_t) &quest_status, sizeof (struct q_score));
+    mread(fd, (genericptr_t) spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     restore_artifacts(fd);
     restore_oracles(fd);
     if (u.ustuck)
-        mread(fd, (genericptr_t) stuckid, sizeof(*stuckid));
+        mread(fd, (genericptr_t) stuckid, sizeof *stuckid);
     if (u.usteed)
-        mread(fd, (genericptr_t) steedid, sizeof(*steedid));
+        mread(fd, (genericptr_t) steedid, sizeof *steedid);
     mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
     mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
@@ -665,6 +671,8 @@ unsigned int *stuckid, *steedid;
     /* must come after all mons & objs are restored */
     relink_timers(FALSE);
     relink_light_sources(FALSE);
+    /* inventory display is now viable */
+    flags.perm_invent = defer_perm_invent;
     return TRUE;
 }
 
