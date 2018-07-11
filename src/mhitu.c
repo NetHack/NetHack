@@ -2015,6 +2015,9 @@ struct attack *mattk;
             dismount_steed(DISMOUNT_ENGULFED);
         } else if (has_head(mtmp->data)) {
             pline("%s swallows you!", Monnam(mtmp));
+        } else if (mtmp->data == &mons[PM_FIRE_VORTEX] &&
+            Role_if(PM_CARTOMANCER)) {
+            pline("That tornado\'s carrying a car!");
         } else
             pline("%s engulfs you!", Monnam(mtmp));
         stop_occupation();
