@@ -11,7 +11,6 @@
 
 extern boolean notonhead;
 
-STATIC_DCL void FDECL(dogintr, (struct monst*, struct permonst*));
 STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
 STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
 STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
@@ -369,7 +368,7 @@ boolean devour;
     return 1;
 }
 
-STATIC_OVL void
+void
 dogintr(mtmp, ptr)
 struct monst *mtmp;
 register struct permonst *ptr;

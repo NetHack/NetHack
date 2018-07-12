@@ -1093,7 +1093,8 @@ not_special:
                          || (likegems && otmp->oclass == GEM_CLASS
                              && objects[otmp->otyp].oc_material != MINERAL)
                          || (conceals && !cansee(otmp->ox, otmp->oy))
-                         || (ptr == &mons[PM_GELATINOUS_CUBE]
+                         || ((ptr == &mons[PM_GELATINOUS_CUBE] ||
+                              ptr == &mons[PM_TASMANIAN_DEVIL])
                              && !index(indigestion, otmp->oclass)
                              && !(otmp->otyp == CORPSE
                                   && touch_petrifies(&mons[otmp->corpsenm]))))
@@ -1488,7 +1489,8 @@ postmov:
                 mpickgold(mtmp);
 
             /* Maybe a cube ate just about anything */
-            if (ptr == &mons[PM_GELATINOUS_CUBE]) {
+            if (ptr == &mons[PM_GELATINOUS_CUBE] ||
+                ptr == &mons[PM_TASMANIAN_DEVIL]) {
                 if (meatobj(mtmp) == 2)
                     return 2; /* it died */
             }
