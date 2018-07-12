@@ -85,7 +85,7 @@ System:  gcc-3.2, XFree86-libs-4.2.1, ncurses-5.2, glibc-2.3.2 (GLIBC_2.3)
 		  LFLAGS = -L/usr/X11R6/lib
 		  WINSRC = $(WINTTYSRC) $(WINX11SRC)
 		  WINOBJ = $(WINTTYOBJ) $(WINX11OBJ)
-		  WINTTYLIB = /usr/lib/libncurses.a
+		  WINTTYLIB = -lncurses
 		  WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11
 		  WINLIB = $(WINTTYLIB) $(WINX11LIB)
 
