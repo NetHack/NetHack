@@ -1413,9 +1413,10 @@ postmov:
                             return 2;
                     } else {
                         if (flags.verbose) {
-                            if (observeit)
+                            if (observeit) {
                                 pline("%s smashes down a door.",
                                       Monnam(mtmp));
+                            }
                             else if (canseeit)
                                 You_see("a door crash open.");
                             else if (!Deaf)

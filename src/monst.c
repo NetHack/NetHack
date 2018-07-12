@@ -1206,8 +1206,27 @@ NEARDATA struct permonst mons[] = {
     	A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
     	  ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
     	SIZ(500, 250, MS_GROWL, MZ_SMALL), 0, 0,
-    	M1_ANIMAL | M1_NOHANDS | M1_OMNIVORE,
-    	M2_HOSTILE, 0, CLR_BLACK),
+    	M1_ANIMAL | M1_NOHANDS | M1_OMNIVORE, M2_HOSTILE, 0, CLR_BLACK),
+    /* wallabies, wallaroos, and kangaroos can all jump */
+    MON("wallaby", S_ZOUTHERN, LVL(5, 16, 7, 0, 0), (G_NOHELL | G_GENO | 1),
+      A(ATTK(AT_KICK, AD_PHYS, 2, 4), ATTK(AT_BITE, AD_PHYS, 1, 4),
+        NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+      SIZ(400, 150, MS_SILENT, MZ_SMALL), 0, 0,
+      M1_ANIMAL | M1_HERBIVORE, 0, 0, CLR_BROWN),
+    /* nerfed damage output */
+    MON("wallaroo", S_ZOUTHERN, LVL(6, 20, 8, 0, 0),
+      (G_NOHELL | G_GENO | G_SGROUP | 1),
+      A(ATTK(AT_KICK, AD_PHYS, 2, 4), ATTK(AT_BITE, AD_PHYS, 1, 4),
+        NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+      SIZ(600, 300, MS_SILENT, MZ_SMALL), 0, 0,
+      M1_ANIMAL | M1_HERBIVORE, 0, 0, CLR_RED),
+    /* nerfed damage output */
+    MON("kangaroo", S_ZOUTHERN, LVL(10, 24, 6, 0, 0),
+      (G_NOHELL | G_GENO | G_SGROUP | 2),
+      A(ATTK(AT_KICK, AD_PHYS, 1, 8), ATTK(AT_KICK, AD_PHYS, 1, 8),
+        ATTK(AT_BITE, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+      SIZ(1000, 500, MS_SILENT, MZ_MEDIUM), 0, 0,
+      M1_ANIMAL | M1_HERBIVORE, M2_NASTY, 0, CLR_GRAY),
     /*
      * Angels and other lawful minions
      */
