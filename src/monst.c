@@ -1181,15 +1181,33 @@ NEARDATA struct permonst mons[] = {
         M1_FLY | M1_BREATHLESS | M1_AMORPHOUS | M1_NOEYES | M1_NOLIMBS
             | M1_NOHEAD | M1_MINDLESS | M1_UNSOLID | M1_SEE_INVIS | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, 0, CLR_BLACK),
-    /*
-     * zruty
-     */
-    MON("zruty", S_ZRUTY, LVL(9, 8, 3, 0, 0), (G_GENO | 2),
-        A(ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_CLAW, AD_PHYS, 3, 4),
-          ATTK(AT_BITE, AD_PHYS, 3, 6), NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(1200, 600, MS_SILENT, MZ_LARGE), 0, 0,
-        M1_ANIMAL | M1_HUMANOID | M1_CARNIVORE, M2_HOSTILE | M2_STRONG,
-        M3_INFRAVISIBLE, CLR_BROWN),
+    /* "Zouthern" animals, originally from SLASH'EM. A few of these have been
+        nerfed in order to fit the balance of vanilla. */
+    MON("echidna", S_ZOUTHERN, LVL(2, 6, 9, 0, 0), (G_NOHELL | G_GENO | 1),
+        A(ATTK(AT_CLAW, AD_PHYS, 1, 2), ATTK(AT_CLAW, AD_PHYS, 1, 2),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(15, 10, MS_SILENT, MZ_TINY), 0, 0,
+        M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE | M1_OVIPAROUS | M1_THICK_HIDE,
+        M2_WANDER, 0, CLR_BROWN),
+    MON("platypus", S_ZOUTHERN, LVL(4, 8, 8, 0, 0), (G_NOHELL | G_GENO | 1),
+      A(ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_KICK, AD_DRST, 1, 4),
+        NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK), SIZ(20, 12, MS_SILENT, MZ_TINY),
+        0, 0, M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE | M1_OVIPAROUS |
+        M1_SWIM | M1_THICK_HIDE, M2_WANDER, 0, CLR_GREEN),
+    MON("wombat", S_ZOUTHERN, LVL(5, 12, 5, 0, 0), (G_NOHELL | G_GENO | 1),
+    	A(ATTK(AT_KICK, AD_PHYS, 1, 6), ATTK(AT_BITE, AD_PHYS, 1, 2),
+    	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+    	SIZ(100, 40, MS_GROWL, MZ_SMALL), 0, 0,
+    	M1_ANIMAL | M1_NOHANDS | M1_HERBIVORE,
+    	M2_DOMESTIC, 0, CLR_BROWN),
+    /* nerfed damage output to compensate for Splice's lower power level */
+    MON("Tasmanian devil", S_ZOUTHERN, LVL(9, 12, 8, 0, 0),
+      (G_NOHELL | G_GENO | 1),
+    	A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
+    	  ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+    	SIZ(500, 250, MS_GROWL, MZ_SMALL), 0, 0,
+    	M1_ANIMAL | M1_NOHANDS | M1_OMNIVORE,
+    	M2_HOSTILE, 0, CLR_BLACK),
     /*
      * Angels and other lawful minions
      */
@@ -2438,6 +2456,13 @@ struct permonst _mons2[] = {
         SIZ(1550, 750, MS_GROWL, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE, M2_STRONG,
         M3_INFRAVISIBLE, CLR_GRAY),
+    /* moved from S_ZRUTY */
+    MON("zruty", S_YETI, LVL(9, 8, 3, 0, 0), (G_GENO | 2),
+        A(ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_CLAW, AD_PHYS, 3, 4),
+          ATTK(AT_BITE, AD_PHYS, 3, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1200, 600, MS_SILENT, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_HUMANOID | M1_CARNIVORE, M2_HOSTILE | M2_STRONG,
+        M3_INFRAVISIBLE, CLR_GREEN),
     /*
      * Zombies
      */

@@ -37,7 +37,7 @@ enum mon_class_types {
     S_WORM,
     S_XAN,
     S_LIGHT,
-    S_ZRUTY,
+    S_ZOUTHERN,
     S_ANGEL,
     S_BAT,
     S_CENTAUR,
@@ -107,7 +107,7 @@ enum mon_class_types {
 #define DEF_WORM        'w'
 #define DEF_XAN         'x'
 #define DEF_LIGHT       'y'
-#define DEF_ZRUTY       'z'
+#define DEF_ZOUTHERN    'z'
 #define DEF_ANGEL       'A'
 #define DEF_BAT         'B'
 #define DEF_CENTAUR     'C'

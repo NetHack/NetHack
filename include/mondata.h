@@ -70,7 +70,8 @@
                                (ptr) == &mons[PM_TENGU] || \
                                (ptr) == &mons[PM_VROCK])
 #define is_whirly(ptr) \
-    ((ptr)->mlet == S_VORTEX || (ptr) == &mons[PM_AIR_ELEMENTAL])
+    ((ptr)->mlet == S_VORTEX || (ptr) == &mons[PM_AIR_ELEMENTAL] || \
+      (ptr) == &mons[PM_TASMANIAN_DEVIL])
 #define flaming(ptr)                                                     \
     ((ptr) == &mons[PM_FIRE_VORTEX] || (ptr) == &mons[PM_FLAMING_SPHERE] \
      || (ptr) == &mons[PM_FIRE_ELEMENTAL] || (ptr) == &mons[PM_SALAMANDER])
