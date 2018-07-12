@@ -851,10 +851,10 @@ register int after;
      */
     if (!Is_rogue_level(&u.uz))
         can_tunnel = tunnels(ptr);
-    can_open = !(nohands(ptr) || verysmall(ptr));
+    can_open = !(nohands(ptr) || verysmall(ptr) || is_marsupial(ptr));
     can_unlock =
         ((can_open && monhaskey(mtmp, TRUE)) || mtmp->iswiz || is_rider(ptr));
-    doorbuster = is_giant(ptr);
+    doorbuster = is_giant(ptr) || is_marsupial(ptr);
     if (mtmp->wormno)
         goto not_special;
     /* my dog gets special treatment */
@@ -1414,8 +1414,12 @@ postmov:
                     } else {
                         if (flags.verbose) {
                             if (observeit) {
-                                pline("%s smashes down a door.",
-                                      Monnam(mtmp));
+                                if (is_marsupial(ptr))
+                                    pline("%s kicks down a door.",
+                                          Monnam(mtmp));
+                                else
+                                    pline("%s smashes down a door.",
+                                          Monnam(mtmp));
                             }
                             else if (canseeit)
                                 You_see("a door crash open.");
