@@ -83,7 +83,7 @@ struct obj *obj;
         k = 1 + (int) (p - classorder);
     else
         k = 1 + (int) strlen(classorder) + (oclass != VENOM_CLASS);
-    sort_item->class = (xchar) k;
+    sort_item->orderclass = (xchar) k;
     /* subclass designation; only a few classes have subclasses
        and the non-armor ones we use are fairly arbitrary */
     switch (oclass) {
@@ -216,11 +216,20 @@ struct obj *obj;
     /* suppress user-assigned name */
     if (save_oname && !obj->oartifact)
         ONAME(obj) = 0;
-    flags.debug = FALSE; /* avoid wizard mode formatting variations */
+    /* avoid wizard mode formatting variations */
+    if (wizard) { /* flags.debug */
+        /* paranoia:  before toggling off wizard mode, guard against a
+           panic in xname() producing a normal mode panic save file */
+        program_state.something_worth_saving = 0;
+        flags.debug = FALSE;
+    }
 
     res = cxname_singular(obj);
 
-    flags.debug = save_debug;
+    if (save_debug) {
+        flags.debug = TRUE;
+        program_state.something_worth_saving = 1;
+    }
     /* restore the object */
     if (obj->oclass == POTION_CLASS) {
         obj->odiluted = saveo.odiluted;
@@ -273,14 +282,14 @@ const genericptr vptr2;
         != SORTLOOT_INVLET) {
         /* Classify each object at most once no matter how many
            comparisons it is involved in. */
-        if (!sli1->class)
+        if (!sli1->orderclass)
             loot_classify(sli1, obj1);
-        if (!sli2->class)
+        if (!sli2->orderclass)
             loot_classify(sli2, obj2);
 
         /* Sort by class. */
-        val1 = sli1->class;
-        val2 = sli2->class;
+        val1 = sli1->orderclass;
+        val2 = sli2->orderclass;
         if (val1 != val2)
             return (int) (val1 - val2);
 
@@ -411,7 +420,7 @@ tiebreak:
  *      whether the list was already sorted as it got ready to do the
  *      sorting, so re-examining inventory or a pile of objects without
  *      having changed anything would gobble up less CPU than a full
- *      sort.  But it had as least two problems (aside from the ordinary
+ *      sort.  But it had at least two problems (aside from the ordinary
  *      complement of bugs):
  *      1) some players wanted to get the original order back when they
  *      changed the 'sortloot' option back to 'none', but the list
@@ -451,27 +460,32 @@ boolean FDECL((*filterfunc), (OBJ_P));
     /* note: if there is a filter function, this might overallocate */
     sliarray = (Loot *) alloc((n + 1) * sizeof *sliarray);
 
+    /* the 'keep cockatrice corpses' flag is overloaded with sort mode */
     augment_filter = (mode & SORTLOOT_PETRIFY) ? TRUE : FALSE;
+    mode &= ~SORTLOOT_PETRIFY; /* remove flag, leaving mode */
     /* populate aliarray[0..n-1] */
-    for (i = 0, o = *olist; o; ++i, o = by_nexthere ? o->nexthere : o->nobj) {
+    for (i = 0, o = *olist; o; o = by_nexthere ? o->nexthere : o->nobj) {
         if (filterfunc && !(*filterfunc)(o)
+            /* caller may be asking us to override filterfunc (in order
+               to do a cockatrice corpse touch check during pickup even
+               if/when the filter rejects food class) */
             && (!augment_filter || o->otyp != CORPSE
                 || !touch_petrifies(&mons[o->corpsenm])))
             continue;
         sliarray[i].obj = o, sliarray[i].indx = (int) i;
         sliarray[i].str = (char *) 0;
-        sliarray[i].class = sliarray[i].subclass = sliarray[i].disco = 0;
+        sliarray[i].orderclass = sliarray[i].subclass = sliarray[i].disco = 0;
+        ++i;
     }
     n = i;
     /* add a terminator so that we don't have to pass 'n' back to caller */
     sliarray[n].obj = (struct obj *) 0, sliarray[n].indx = -1;
     sliarray[n].str = (char *) 0;
-    sliarray[n].class = sliarray[n].subclass = sliarray[n].disco = 0;
-    mode &= ~SORTLOOT_PETRIFY;
+    sliarray[n].orderclass = sliarray[n].subclass = sliarray[n].disco = 0;
 
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
-    if (mode) {
+    if (mode && n > 1) {
         sortlootmode = mode; /* extra input for sortloot_cmp() */
         qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
         sortlootmode = 0; /* reset static mode flags */

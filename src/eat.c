@@ -1449,7 +1449,16 @@ const char *mesg;
         u.uconduct.food++; /* don't need vegetarian checks for spinach */
         if (!tin->cursed)
             pline("This makes you feel like %s!",
-                  Hallucination ? "Swee'pea" : "Popeye");
+                  /* "Swee'pea" is a character from the Popeye cartoons */
+                  Hallucination ? "Swee'pea"
+                  /* "feel like Popeye" unless sustain ability suppresses
+                     any attribute change; this slightly oversimplifies
+                     things:  we want "Popeye" if no strength increase
+                     occurs due to already being at maximum, but we won't
+                     get it if at-maximum and fixed-abil both apply */
+                  : !Fixed_abil ? "Popeye"
+                  /* no gain, feel like another character from Popeye */
+                  : (flags.female ? "Olive Oyl" : "Bluto"));
         gainstr(tin, 0, FALSE);
 
         tin = costly_tin(COST_OPEN);
@@ -1947,10 +1956,11 @@ int old, inc, typ;
 {
     int absold, absinc, sgnold, sgninc;
 
-    /* don't include any amount coming from worn rings */
-    if (uright && uright->otyp == typ)
+    /* don't include any amount coming from worn rings (caller handles
+       'protection' differently) */
+    if (uright && uright->otyp == typ && typ != RIN_PROTECTION)
         old -= uright->spe;
-    if (uleft && uleft->otyp == typ)
+    if (uleft && uleft->otyp == typ && typ != RIN_PROTECTION)
         old -= uleft->spe;
     absold = abs(old), absinc = abs(inc);
     sgnold = sgn(old), sgninc = sgn(inc);
@@ -1970,6 +1980,11 @@ int old, inc, typ;
     } else {
         inc = 0; /* no further increase allowed via this method */
     }
+    /* put amount from worn rings back */
+    if (uright && uright->otyp == typ && typ != RIN_PROTECTION)
+        old += uright->spe;
+    if (uleft && uleft->otyp == typ && typ != RIN_PROTECTION)
+        old += uleft->spe;
     return old + inc;
 }
 
@@ -1978,7 +1993,7 @@ accessory_has_effect(otmp)
 struct obj *otmp;
 {
     pline("Magic spreads through your body as you digest the %s.",
-          otmp->oclass == RING_CLASS ? "ring" : "amulet");
+          (otmp->oclass == RING_CLASS) ? "ring" : "amulet");
 }
 
 STATIC_OVL void

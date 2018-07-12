@@ -36,13 +36,50 @@ internals for 'sortloot' option have been changed to not reorder the actual
 	list of objects, so changing it to 'n'one will get the original order
 	back and having a persistent inventory window open when performing
 	full-pack identify won't result in possibly skipping some items
+give vault guards a cursed tin whistle since there is a shrill whistling
+	sound if hero teleports out of vault while being confronted by guard
+polymorphing worn amulet triggers panic if it turns into amulet of change
+wishing for small mimic corpse or large mimic corpse failed with 'nothing
+	matching that exists'; wishing for large {dog,cat,kobold} corpse
+	yielded normal size one (size prefix was being stripped off for globs)
+wishing for "glob of grey ooze" failed even though grey ooze is recognized
+	as a variant spelling for gray ooze
+spells of healing and extra healing cast at monsters handled monster blindness
+	inconsistently compared to other healing
+when using the 'O' command to create a status highlight that specifies
+	multiple attributes (blink+inverse, &c), pick all of them in one menu
+	selection and create a single hilite_status rule instead of having
+	separate rules for each attribute to be merged when highlighting
+highlighting status conditions would fail to use attributes if a rule with
+	them was followed by another one without (color only or color&normal)
+when using 'O' to set hilite_status rules, hide the 'score' status field if
+	game has been built without SCORE_ON_BOTL; latent rules for 'score'
+	can still be set in config file and removed via 'O' but can't be added
+make stone-to-flesh behave the same on statues of petrified monsters as it
+	does on random 'dungeon art' ones (revive at a nearby spot instead of
+	becoming a corpse when there's already a monster at statue's location)
+special level loader didn't support populating several types of special rooms
+	(ant hole, cockatrice nest, leprechaun hall)
+eating rings while polymorphed didn't handle bonus/penalty for increase damage,
+	increase accuracy, or protection correctly
+shopkeeper's position in front of shop door didn't correctly handle bottom
+	edge of irregularly shaped shop due to typo or copy+paste error
+	(latent bug; no such shops are present in 3.6.x)
+attempting to update permanent inventory window during restore had problems
+	with unpaid items (needed shop bill before shop and its shopkeeper
+	were restored) and named fruit
+remembered corpse which isn't there anymore would be described by farlook as
+	the corpse of a random monster type
+when eating a tin of spinach, don't "feel like Popeye" is sustain-abilities
+	prevents any strength gain
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 fix access violation when --debug:xxxx has no other args after it
-Setting the inverse attribute for gold had the space before "$:" 
+setting the inverse attribute for gold had the space before "$:"
 	getting highlighted along with the gold field
+sortloot segfaulted when filtering a subset of items (seen with 'A' command)
 
 
 Platform- and/or Interface-Specific Fixes

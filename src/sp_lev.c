@@ -790,10 +790,9 @@ link_doors_rooms()
 void
 fill_rooms()
 {
-    int tmpi;
+    int tmpi, m;
 
     for (tmpi = 0; tmpi < nroom; tmpi++) {
-        int m;
         if (rooms[tmpi].needfill)
             fill_room(&rooms[tmpi], (rooms[tmpi].needfill == 2));
         for (m = 0; m < rooms[tmpi].nsubrooms; m++)
@@ -2458,6 +2457,9 @@ boolean prefilled;
         case BEEHIVE:
         case LAB:
         case DEN:
+        case ANTHOLE:
+        case COCKNEST:
+        case LEPREHALL:
         case MORGUE:
         case BARRACKS:
             fill_zoo(croom);
