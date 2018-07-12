@@ -86,13 +86,14 @@
 #define AD_CNCL 47  /* cancel the player (beholder) */
 #define AD_DSRM 48  /* disarm the player */
 #define AD_WIND 49  /* cause the defender to hurtle */
+#define AD_CALM 50  /* calms down the defender (koala) */
 
-#define AD_CLRC 50 /* random clerical spell */
-#define AD_SPEL 51 /* random magic spell */
-#define AD_RBRE 52 /* random breath weapon */
+#define AD_CLRC 51 /* random clerical spell */
+#define AD_SPEL 52 /* random magic spell */
+#define AD_RBRE 53 /* random breath weapon */
 
-#define AD_SAMU 53 /* hits, may steal Amulet (Wizard) */
-#define AD_CURS 54 /* random curse (ex. gremlin) */
+#define AD_SAMU 54 /* hits, may steal Amulet (Wizard) */
+#define AD_CURS 55 /* random curse (ex. gremlin) */
 #define LAST_AD AD_CURS
 
 /*

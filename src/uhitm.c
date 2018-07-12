@@ -1917,6 +1917,18 @@ register struct attack *mattk;
         (void) eat_brains(&youmonst, mdef, TRUE, &tmp);
         break;
     }
+    case AD_CALM:	/* KMH -- koala attack */
+    /* Certain monsters aren't even made peaceful. */
+        if (!mdef->iswiz && mdef->data != &mons[PM_MEDUSA] &&
+            !(mdef->data->mflags3 & M3_COVETOUS) &&
+            !(mdef->data->geno & G_UNIQ) &&
+              mdef->mtame) {
+              if (canseemon(mdef)) pline("%s looks calmer.", Monnam(mdef));
+              mdef->mpeaceful = 1;
+              mdef->mtame = 0;
+              tmp = 0;
+        }
+        break;
     case AD_STCK:
         if (!negated && !sticks(pd))
             u.ustuck = mdef; /* it's now stuck to you */

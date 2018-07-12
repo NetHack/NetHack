@@ -249,10 +249,12 @@
 #define befriend_with_obj(ptr, obj) \
     (((ptr) == &mons[PM_MONKEY] || (ptr) == &mons[PM_APE])               \
      ? (obj)->otyp == BANANA                                             \
-     : (is_domestic(ptr) && (obj)->oclass == FOOD_CLASS                  \
-        && ((ptr)->mlet != S_UNICORN                                     \
-            || objects[(obj)->otyp].oc_material == VEGGY                 \
-            || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
+     : ((ptr) == &mons[PM_KOALA])                                          \
+      ? (obj)->otyp == EUCALYPTUS_LEAF                                   \
+       : (is_domestic(ptr) && (obj)->oclass == FOOD_CLASS                \
+          && ((ptr)->mlet != S_UNICORN                                   \
+              || objects[(obj)->otyp].oc_material == VEGGY               \
+              || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
 
 #define is_blkmktstaff(ptr)	(Is_blackmarket(&u.uz) && \
 				  (ptr) == &mons[PM_ARMS_DEALER])

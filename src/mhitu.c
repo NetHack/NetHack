@@ -1342,6 +1342,11 @@ register struct attack *mattk;
         forget_levels(25);  /* lose memory of 25% of levels */
         forget_objects(25); /* lose memory of 25% of objects */
         break;
+    case AD_CALM:	/* KMH -- koala attack */
+        hitmsg(mtmp, mattk);
+        if (uncancelled)
+            You_feel("much calmer.");
+        break;
     case AD_MEMR:
         hitmsg(mtmp, mattk);
         if (uncancelled) {
