@@ -844,6 +844,12 @@ NEARDATA struct permonst mons[] = {
         SIZ(2650, 650, MS_SILENT, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_HERBIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, CLR_GRAY),
+    MON("walrus", S_QUADRUPED, LVL(14, 3, -1, 0, 0), (G_GENO | G_SGROUP | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 5, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(2500, 500, MS_BARK, MZ_LARGE), MR_COLD, 0,
+        M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE | M1_SWIM,
+        M2_STRONG, M3_INFRAVISIBLE, CLR_BLUE),
     MON("baluchitherium", S_QUADRUPED, LVL(14, 12, 5, 0, 0), (G_GENO | 2),
         A(ATTK(AT_CLAW, AD_PHYS, 5, 4), ATTK(AT_CLAW, AD_PHYS, 5, 4), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2218,6 +2224,15 @@ struct permonst _mons2[] = {
          SIZ(2000, 350, MS_HUMANOID, MZ_HUGE), MR_POISON, 0,
          M1_AMORPHOUS | M1_OMNIVORE | M1_POIS, M2_HOSTILE | M2_NOPOLY,
          0, HI_LORD),
+    MON("Failure Eidolon", S_QUANTMECH, LVL(20, 5, -3, 40, 0),
+        (G_UNIQ | G_NOGEN | G_NOCORPSE),
+        A(ATTK(AT_NONE, AD_COLD, 3, 4), ATTK(AT_CLAW, AD_TLPT, 3, 4),
+          ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_TUCH, AD_COLD, 2, 4),
+          NO_ATTK, NO_ATTK),
+        SIZ(3000, 2500, MS_SILENT, MZ_GIGANTIC), MR_POISON | MR_COLD, MR_COLD,
+        M1_HIDE | M1_MINDLESS | M1_THICK_HIDE,
+        M2_HOSTILE | M2_NOPOLY | M2_STRONG | M2_NEUTER | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISION, HI_LORD),
     /*
      * Rust monster or disenchanter
      */
