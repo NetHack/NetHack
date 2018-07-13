@@ -941,8 +941,12 @@ boolean hitsroof;
           action, ceiling(u.ux, u.uy), body_part(HEAD));
 
     /* object now hits you */
-
-    if (obj->oclass == POTION_CLASS) {
+    if (obj->otyp == ORB_OF_PERMAFROST) {
+        pline("%s explodes in a blast of ice!", Doname2(obj));
+        explode(u.ux, u.uy, 2, d(12, 6), TOOL_CLASS, EXPL_FROSTY);
+        You_feel("full of sorrow.");
+    }
+    else if (obj->oclass == POTION_CLASS) {
         potionhit(&youmonst, obj, POTHIT_HERO_THROW);
     } else if (breaktest(obj)) {
         int otyp = obj->otyp;
@@ -1935,6 +1939,11 @@ boolean from_invent;
         if (hero_caused)
             change_luck(-2);
         break;
+    case ORB_OF_PERMAFROST:
+        pline("%s explodes in a blast of ice!", Doname2(obj));
+        explode(x, y, 2, d(12, 6), TOOL_CLASS, EXPL_FROSTY);
+        You_feel("full of sorrow.");
+        break;
     case POT_WATER:      /* really, all potions */
         obj->in_use = 1; /* in case it's fatal */
         if (obj->otyp == POT_OIL && obj->lamplit) {
@@ -2052,6 +2061,7 @@ boolean in_view;
     case MIRROR:
     case CRYSTAL_BALL:
     case EXPENSIVE_CAMERA:
+    case ORB_OF_PERMAFROST:
         to_pieces = " into a thousand pieces";
     /*FALLTHRU*/
     case POT_WATER: /* really, all potions */

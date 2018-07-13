@@ -119,7 +119,12 @@ int x, y;
     struct monst *mtmp;
     struct trap *t;
 
-    if (obj->otyp == CREAM_PIE || obj->oclass == VENOM_CLASS
+    if (obj->otyp == ORB_OF_PERMAFROST) {
+        pline("%s explodes in a blast of ice!", Doname2(obj));
+        explode(x, y, 2, d(12, 6), TOOL_CLASS, EXPL_FROSTY);
+        You_feel("full of sorrow.");
+        create = 0;
+    } else if (obj->otyp == CREAM_PIE || obj->oclass == VENOM_CLASS
         || (ohit && obj->otyp == EGG))
         create = 0;
     else if (ohit && (is_multigen(obj) || obj->otyp == ROCK))
