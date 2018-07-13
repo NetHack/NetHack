@@ -1,0 +1,70 @@
+MAZE: "icewaste",' '
+FLAGS: noteleport,hardfloor,icedpools
+MESSAGE:"The air here is cold and dead. Snow falls silently from the sky above."
+MESSAGE:"This world died a long time ago, yet you still feel as if you are not alone..."
+INIT_MAP:solidfill,'I'
+GEOMETRY:center,center
+MAP
+xxxxxxxxxxxx-------xxxxxxxxxxxxxxxxxxxxxxxxxxx----------xxxxxxxxxxxxxxxxxxxx
+xxx-----xxxx|.....|xxxxxxxxxxxxxxxxxxxxxxxxxxx|........|xxxxxxxxxxxxxxxxxxxx
+xxx....|xxxx|.....|xxxxxxxxxxxxxxxxxxxxxxxxxxx|........xxxxxxxxxxxxxxxxxxxxx
+x|xx----xxxx|.....|xxxxx--..---------xx-------------xxxxxxx----xxxxx------xx
+x|.x|xxxxxxx---.---xxxxx|...........|xx|............xxxxxxx|xxxxxxxxxxxxx|xx
+x----xxxxxxxxxxxxxxxxxxx|...........|xx|...........|xxxxxxx|xxxxxxxxxxxxxxxx
+xxxxxxxxx-------xxxxxxxx|...........|xx|...........|x-----x|xxxxxxxxxxxxxxxx
+xxxxxxxxx|.....|xxxxxxxx|...........|xx|...........|x....|x|xxxxxxxxxxxxx|xx
+xxxxxxxxx|......xxxxxxxx-------..----xx----.-.--.---x....|x|xxxxxxxxxxxxxxxx
+-----xxxx|.....|xxx---xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|...|x|xxxxxxxxxxxxxxxx
+|...|xxxx|.....|xxx..|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx----|x|xxxxxxxxxxxxxxxx
+|...|xxxx|.....|xxx..|xx-------------xx-----.-------xxxxxxx|xxxxxxxxxxxxx|xx
+|...---xx|.....|xxx---xx............|xx|...........|xxxxxxx|xxxxxxxxxxxxx|xx
+|.....|xx|.....|xxxxxxxx............|xx|...........|xxxxxxx|xxxxxxxxxxxxx|xx
+|.....|xx-------xxxxxxxx|............xx|...........|xxxxxxx---------xxxx-|xx
+|......xxxxxxxxxxxxxxxxx-------------xx----...------xxxxxxxxxxxxxxxxxxxxxxxx
+x------xxxxx----------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-----xxxxxx
+xxxxxxxxxxxx.........|xxxxxxxx-------------------------xxxxxxxxxx|...|xxxxxx
+xxxxxxxxxxxx.........|xxxxxxxx|.......................|xxxxxxxxxx....|xxxxxx
+xxxxxxxxxxxx|.........xxxxxxxx|........................xxxxxxxxxx----|xxxxxx
+ENDMAP
+# Dungeon Description
+REGION:(00,00,75,19),unlit,"ordinary"
+# Portal arrival point
+BRANCH:(12,08,12,08),(0,0,0,0)
+# Fountains
+FOUNTAIN:(37,9)
+FOUNTAIN:(38,9)
+FOUNTAIN:(37,10)
+FOUNTAIN:(38,10)
+# Monsters
+MONSTER: ('v',"ice vortex"),random
+MONSTER: ('v',"ice vortex"),random
+MONSTER: ('Y',"yeti"),random
+MONSTER: ('j',"blue jelly"),random
+MONSTER: ('q',"walrus"),random
+MONSTER: ('q',"walrus"),random
+MONSTER: ('q',"walrus"),random,hostile
+MONSTER: ('H',"frost giant"),random,hostile
+MONSTER: ('H',"frost giant"),random,hostile
+MONSTER: ('H',"frost giant"),random,hostile
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+MONSTER: ('Z',"draugr"),random
+# Boss
+MONSTER: ('Q',"Failure Eidolon"),(66,8)
+OBJECT: ('(',"Orb of Permafrost"),(66,8)
+# Loot
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random

@@ -37,7 +37,7 @@ QUESTLEVS = Arch.des Barb.des Caveman.des Cartomancer.des Healer.des \
 	Valkyrie.des Wizard.des	Drag.des Pirate.des
 SPECLEVS  = bigroom.des castle.des endgame.des gehennom.des knox.des \
 	medusa.des mines.des oracle.des sokoban.des statuary.des tower.des \
-	void.des yendor.des blkmar.des
+	void.des yendor.des blkmar.des icewaste.des
 
 all :	$(VARDAT) $(DUNGEON) $(MARKERS) $(DLB)
       @ $(ECHO) "data files are up to date."

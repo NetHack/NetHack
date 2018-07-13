@@ -20,7 +20,7 @@ history         keyhelp         knox.des        license         medusa.des
 mines.des       opthelp         oracle.des      oracles.txt     quest.txt
 rumors.fal      rumors.tru      sokoban.des     symbols         tower.des
 tribute         wizhelp         yendor.des      Cartomancer.des void.des
-statuary.des	Drag.des        splicetips.txt  blkmar.des
+statuary.des	Drag.des        splicetips.txt  blkmar.des	icewaste.des
 
 doc:
 (files for all versions)
@@ -361,7 +361,7 @@ orcus.lev       sanctum.lev     soko1-1.lev     soko1-2.lev     soko2-1.lev
 soko2-2.lev     soko3-1.lev     soko3-2.lev     soko4-1.lev     soko4-2.lev
 tower1.lev      tower2.lev      tower3.lev      valley.lev      water.lev
 wizard1.lev     wizard2.lev     wizard3.lev     void.lev        statuary.lev
-foogardens.lev  mephisto.lev	blkmar.lev
+foogardens.lev  mephisto.lev	blkmar.lev	icewaste.lev
 (tile files optionally generated for X ports at playground creation time)
 pet_mark.xbm    rip.xpm         x11tiles
 (files generated for Qt interface on Mac OS X)

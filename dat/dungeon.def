@@ -31,6 +31,7 @@ BRANCH:		"Fort Ludios" @ (18, 4) portal
 BRANCH:		"One-eyed Sam's Market" @ (20, 5) portal
 RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
+BRANCH:		"The Icy Wastes" @ (15, 8) portal
 #BRANCH:		"The Void" @ (-2,0)
 RNDLEVEL:	"castle" "none" @ (-1, 0) 3
 CHAINBRANCH:	"Gehennom" "castle" + (0, 0) no_down
@@ -39,6 +40,10 @@ BRANCH:		"The Elemental Planes" @ (1, 0) no_down up
 #DUNGEON: "The Void" "v" (1,0)
 #ALIGNMENT:	unaligned
 #LEVEL:		"void" "V" @ (1, 0)
+
+DUNGEON: "The Icy Wastes" "I" (1,0)
+ALIGNMENT: noalign
+LEVEL: "icewaste" "I" @ (1, 0)
 
 #
 #	Gehennom

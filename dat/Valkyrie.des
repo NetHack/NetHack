@@ -50,7 +50,7 @@ ENDMAP
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(27,08,42,12),lit,"ordinary"
 # Portal arrival point
-BRANCH:(66,17,66,17),(0,0,0,0)
+BRANCH:(06,02,06,02),(0,0,0,0)
 # Stairs
 STAIR:(18,01),down
 FOUNTAIN:(53,02)
