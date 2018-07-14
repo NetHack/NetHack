@@ -827,6 +827,9 @@ register int after;
     }
     ptr = mtmp->data; /* mintrap() can change mtmp->data -dlc */
 
+    if (ptr == &mons[PM_ANCIENT_BRAIN])
+        return 0;
+
     if (mtmp->meating) {
         mtmp->meating--;
         if (mtmp->meating <= 0)

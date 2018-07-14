@@ -32,6 +32,7 @@ BRANCH:		"One-eyed Sam's Market" @ (20, 5) portal
 RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
 BRANCH:		"The Icy Wastes" @ (15, 8) portal
+BRANCH:		"Mysterious Laboratory" @ (17, 5)
 #BRANCH:		"The Void" @ (-2,0)
 RNDLEVEL:	"castle" "none" @ (-1, 0) 3
 CHAINBRANCH:	"Gehennom" "castle" + (0, 0) no_down
@@ -44,6 +45,10 @@ BRANCH:		"The Elemental Planes" @ (1, 0) no_down up
 DUNGEON: "The Icy Wastes" "I" (1,0)
 ALIGNMENT: noalign
 LEVEL: "icewaste" "I" @ (1, 0)
+
+DUNGEON: "Mysterious Laboratory" "L" (1,0)
+ALIGNMENT: lawful
+LEVEL: "laboratory" "L" @ (1, 0)
 
 #
 #	Gehennom

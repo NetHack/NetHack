@@ -88,7 +88,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle-?.lev fakewiz?.lev \
 	tower?.lev valley.lev wizard?.lev \
 	astral.lev air.lev earth.lev fire.lev water.lev \
 	statuary.lev void.lev foogardens.lev mephisto.lev blkmar.lev \
-	icewaste.lev
+	icewaste.lev laboratory.lev
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
 DATNODLB = $(VARDATND) license symbols

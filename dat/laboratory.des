@@ -1,0 +1,47 @@
+MAZE:"laboratory",' '
+FLAGS:hardfloor
+GEOMETRY:center,center
+MAP
+...........................
+.}}}}}}}}}}}}.}}}}}}}}}}}}.
+.}---}...............}---}.
+.}|..}}.............}}..|}.
+.}|...}}...........}}...|}.
+.}|.....................|}.
+.}|.........|.|.........|}.
+.}|----------.----------|}.
+.}..|.|.|.|.|.|.|.|.|.|..}.
+.}}}}}}}}}}}}}}}}}}}}}}}}}.
+...........................
+          .......          
+           .....           
+            ...            
+            ...            
+            ...            
+            ...            
+            ...            
+            ...            
+ENDMAP
+TRAP:"anti magic",random
+TRAP:"anti magic",random
+TRAP:"anti magic",random
+BRANCH:(13,18,13,18),(0,0,0,0)
+MONSTER:('P',"Ancient Brain"),(13,05)
+MONSTER:('h',"mind flayer"), random
+MONSTER:('h',"mind flayer"), random
+MONSTER: 'h', random
+MONSTER: 'h', random
+MONSTER: 'Q', random
+MONSTER: 'Q', random
+MONSTER: 'Q', random
+MONSTER: random, random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'!',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'+',random
+OBJECT:'+',random

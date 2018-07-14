@@ -513,7 +513,8 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/rogue.des   $(DAT)/samurai.des  $(DAT)/sokoban.des \
 	 $(DAT)/tourist.des $(DAT)/valkyrie.des $(DAT)/wizard.des \
 	 $(DAT)/cartomancer.des $(DAT)/void.des $(DAT)/drag.des \
-	 $(DAT)/pirate.des  $(DAT)/blkmar.des 	$(DAT)/icewaste.des
+	 $(DAT)/pirate.des  $(DAT)/blkmar.des 	$(DAT)/icewaste.des \
+	 $(DAT)/laboratory.des
 	$(subst /,\,$(U)levcomp $(DAT)/bigroom.des)
 	$(subst /,\,$(U)levcomp $(DAT)/castle.des)
 	$(subst /,\,$(U)levcomp $(DAT)/endgame.des)

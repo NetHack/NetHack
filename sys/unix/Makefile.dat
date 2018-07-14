@@ -135,7 +135,7 @@ options:	../util/makedefs
 spec_levs: ../util/lev_comp \
 	bigroom.des castle.des endgame.des gehennom.des knox.des medusa.des \
 	mines.des oracle.des sokoban.des statuary.des tower.des void.des yendor.des \
-	blkmar.des icewaste.des
+	blkmar.des icewaste.des laboratory.des
 	../util/lev_comp bigroom.des
 	../util/lev_comp castle.des
 	../util/lev_comp endgame.des
@@ -151,6 +151,7 @@ spec_levs: ../util/lev_comp \
 	../util/lev_comp yendor.des
 	../util/lev_comp blkmar.des
 	../util/lev_comp icewaste.des
+	../util/lev_comp laboratory.des
 	touch spec_levs
 
 quest_levs: ../util/lev_comp \

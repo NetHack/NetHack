@@ -2208,6 +2208,14 @@ struct permonst _mons2[] = {
         M1_BREATHLESS | M1_AMORPHOUS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_MINDLESS | M1_OMNIVORE | M1_ACID,
         M2_HOSTILE | M2_NEUTER, 0, CLR_BLACK),
+    MON("Ancient Brain", S_PUDDING, LVL(15, 12, 10, 50, 13), (G_UNIQ | G_NOGEN),
+      A(ATTK(AT_MAGC, AD_PSYC, 2, 4), ATTK(AT_MAGC, AD_PSYC, 2, 4),
+        ATTK(AT_MAGC, AD_PSYC, 2, 4), ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK,
+        NO_ATTK), SIZ(4000, 2000, MS_SILENT, MZ_GIGANTIC),
+        MR_COLD | MR_ELEC | MR_POISON | MR_ACID | MR_STONE,
+        MR_COLD | MR_ELEC | MR_POISON,
+        M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_ACID | M1_SWIM,
+        M2_HOSTILE | M2_NEUTER, 0, HI_LORD),
     /*
      * Strange beings
      */

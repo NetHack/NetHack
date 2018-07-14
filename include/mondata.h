@@ -95,7 +95,8 @@
 #define control_teleport(ptr) (((ptr)->mflags1 & M1_TPORT_CNTRL) != 0L)
 #define telepathic(ptr)                                                \
     ((ptr) == &mons[PM_FLOATING_EYE] || (ptr) == &mons[PM_MIND_FLAYER] \
-     || (ptr) == &mons[PM_MASTER_MIND_FLAYER])
+     || (ptr) == &mons[PM_MASTER_MIND_FLAYER] \
+     || (ptr) == &mons[PM_ANCIENT_BRAIN])
 #define is_armed(ptr) attacktype(ptr, AT_WEAP)
 #define acidic(ptr) (((ptr)->mflags1 & M1_ACID) != 0L)
 #define poisonous(ptr) (((ptr)->mflags1 & M1_POIS) != 0L)
@@ -214,7 +215,8 @@
 
 #define is_mind_flayer(ptr) \
     ((ptr) == &mons[PM_MIND_FLAYER] || (ptr) == &mons[PM_MASTER_MIND_FLAYER] \
-      || (ptr) == &mons[PM_MIND_FLAYER_TELEPATH])
+      || (ptr) == &mons[PM_MIND_FLAYER_TELEPATH] \
+      || (ptr) == &mons[PM_ANCIENT_BRAIN])
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
