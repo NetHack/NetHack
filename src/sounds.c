@@ -946,6 +946,12 @@ register struct monst *mtmp;
             verbl_msg = arrest_msg[rn2(3)];
         }
         break;
+    case MS_MAD:
+        if (mtmp->mpeaceful)
+            verbalize("Oh, we're all mad here!");
+        else
+            cuss(mtmp);
+        break;
     case MS_BRIBE:
         if (mtmp->mpeaceful && !mtmp->mtame) {
             (void) demon_talk(mtmp);

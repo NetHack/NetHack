@@ -295,6 +295,8 @@ struct obj *otmp;
             reveal_invis = TRUE;
             learn_it = TRUE;
         }
+        if (mtmp->data == &mons[PM_CHESHIRE_CAT])
+            pline("The grin of %s remains visible.", nambuf);
         break;
     }
     case WAN_LOCKING:

@@ -53,6 +53,7 @@
 #define MS_GROAN 42     /* zombies */
 #define MS_PIRATE 43
 #define MS_ONEEYEDSAM 44
+#define MS_MAD 45
 
 #define MR_FIRE 0x00000001L      /* resists fire */
 #define MR_COLD 0x00000002L      /* resists cold */
