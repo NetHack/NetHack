@@ -1266,7 +1266,7 @@ NEARDATA struct permonst mons[] = {
         M2_MINION | M2_STALK | M2_NASTY | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, CLR_YELLOW),
     MON("lamassu", S_ANGEL, LVL(12, 12, -3, 50, 0), (G_NOHELL | G_NOCORPSE | 1),
-        A(ATTK(AT_CLAW, AD_PHYS, 3, 4), ATTK(AT_CLAW, AD_PHYS, 3, 4),
+        A(ATTK(AT_CLAW, AD_PHYS, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4),
           ATTK(AT_BITE, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_CLRC, 2, 6),
           NO_ATTK, NO_ATTK),
         SIZ(600, 300, MS_CUSS, MZ_LARGE), MR_FIRE, 0,
