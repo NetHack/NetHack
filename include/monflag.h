@@ -21,39 +21,40 @@
 #define MS_WAIL 11      /* wails, as a tortured soul */
 #define MS_GURGLE 12    /* gurgles, as liquid or through saliva */
 #define MS_BURBLE 13    /* burbles (jabberwock) */
-#define MS_ANIMAL 13    /* up to here are animal noises */
-#define MS_SHRIEK 15    /* wakes up others */
-#define MS_BONES 16     /* rattles bones (skeleton) */
-#define MS_LAUGH 17     /* grins, smiles, giggles, and laughs */
-#define MS_MUMBLE 18    /* says something or other */
-#define MS_IMITATE 19   /* imitates others (leocrotta) */
+#define MS_MOO 14       /* cow */
+#define MS_CHIMERA 15   /* chimera */
+#define MS_ANT 16       /* ants */
+#define MS_ANIMAL 16    /* up to here are animal noises */
+#define MS_SHRIEK 18    /* wakes up others */
+#define MS_BONES 19     /* rattles bones (skeleton) */
+#define MS_LAUGH 20     /* grins, smiles, giggles, and laughs */
+#define MS_MUMBLE 21    /* says something or other */
+#define MS_IMITATE 22   /* imitates others (leocrotta) */
 #define MS_ORC MS_GRUNT /* intelligent brutes */
-#define MS_HUMANOID 20  /* generic traveling companion */
-#define MS_ARREST 21    /* "Stop in the name of the law!" (Kops) */
-#define MS_SOLDIER 22   /* army and watchmen expressions */
-#define MS_GUARD 23     /* "Please drop that gold and follow me." */
-#define MS_DJINNI 24    /* "Thank you for freeing me!" */
-#define MS_NURSE 25     /* "Take off your shirt, please." */
-#define MS_SEDUCE 26    /* "Hello, sailor." (Nymphs) */
-#define MS_VAMPIRE 27   /* vampiric seduction, Vlad's exclamations */
-#define MS_BRIBE 28     /* asks for money, or berates you */
-#define MS_CUSS 29      /* berates (demons) or intimidates (Wiz) */
-#define MS_RIDER 30     /* astral level special monsters */
-#define MS_LEADER 31    /* your class leader */
-#define MS_NEMESIS 32   /* your nemesis */
-#define MS_GUARDIAN 33  /* your leader's guards */
-#define MS_SELL 34      /* demand payment, complain about shoplifters */
-#define MS_ORACLE 35    /* do a consultation */
-#define MS_PRIEST 36    /* ask for contribution; do cleansing */
-#define MS_SPELL 37     /* spellcaster not matching any of the above */
-#define MS_WERE 38      /* lycanthrope in human form */
-#define MS_BOAST 39     /* giants */
-#define MS_CHIMERA 40   /* chimera */
-#define MS_MOO 41       /* cow */
-#define MS_GROAN 42     /* zombies */
-#define MS_PIRATE 43
-#define MS_ONEEYEDSAM 44
-#define MS_MAD 45
+#define MS_HUMANOID 23  /* generic traveling companion */
+#define MS_ARREST 24    /* "Stop in the name of the law!" (Kops) */
+#define MS_SOLDIER 25   /* army and watchmen expressions */
+#define MS_GUARD 26     /* "Please drop that gold and follow me." */
+#define MS_DJINNI 27    /* "Thank you for freeing me!" */
+#define MS_NURSE 28     /* "Take off your shirt, please." */
+#define MS_SEDUCE 29    /* "Hello, sailor." (Nymphs) */
+#define MS_VAMPIRE 30   /* vampiric seduction, Vlad's exclamations */
+#define MS_BRIBE 31     /* asks for money, or berates you */
+#define MS_CUSS 32      /* berates (demons) or intimidates (Wiz) */
+#define MS_RIDER 33     /* astral level special monsters */
+#define MS_LEADER 34    /* your class leader */
+#define MS_NEMESIS 35   /* your nemesis */
+#define MS_GUARDIAN 36  /* your leader's guards */
+#define MS_SELL 37      /* demand payment, complain about shoplifters */
+#define MS_ORACLE 38    /* do a consultation */
+#define MS_PRIEST 39    /* ask for contribution; do cleansing */
+#define MS_SPELL 40     /* spellcaster not matching any of the above */
+#define MS_WERE 41      /* lycanthrope in human form */
+#define MS_BOAST 42     /* giants */
+#define MS_GROAN 43     /* zombies */
+#define MS_PIRATE 44    /* pirates */
+#define MS_ONEEYEDSAM 45 /* One-Eyed Sam */
+#define MS_MAD 46       /* cheshire cats */
 
 #define MR_FIRE 0x00000001L      /* resists fire */
 #define MR_COLD 0x00000002L      /* resists cold */
