@@ -2403,6 +2403,10 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     mdat = mtmp->data; /* note: mondead can change mtmp->data */
     mndx = monsndx(mdat);
 
+    if (mndx == PM_JABBERWOCK && Hallucination) {
+        pline("Oh frabjous day!  Callooh!  Callay!");
+    }
+
     if (g.stoned) {
         g.stoned = FALSE;
         goto cleanup;
