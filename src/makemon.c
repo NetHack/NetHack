@@ -2214,8 +2214,6 @@ int type;
         return 20;
     case PM_PAPER_GOLEM:
         return 20;
-    case PM_ANIMATED_STATUE:
-        return 20;
     case PM_ROPE_GOLEM:
         return 30;
     case PM_LEATHER_GOLEM:
@@ -2235,6 +2233,8 @@ int type;
     case PM_SILVER_GOLEM:
         return 100;
     case PM_SLUDGE_GOLEM:
+        return 120;
+    case PM_ROOK:
         return 120;
     case PM_IRON_GOLEM:
         return 80;

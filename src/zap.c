@@ -398,7 +398,7 @@ struct obj *otmp;
         break;
     case SPE_STONE_TO_FLESH:
         if (monsndx(mtmp->data) == PM_STONE_GOLEM ||
-            monsndx(mtmp->data) == PM_ANIMATED_STATUE) {
+            monsndx(mtmp->data) == PM_ROOK) {
             char *name = Monnam(mtmp);
 
             /* turn into flesh golem */

@@ -399,7 +399,7 @@ unsigned corpseflags;
         obj->owt = weight(obj);
         free_mname(mtmp);
         break;
-    case PM_ANIMATED_STATUE:
+    case PM_ROOK:
     case PM_STONE_GOLEM:
         corpstatflags &= ~CORPSTAT_INIT;
         obj =
