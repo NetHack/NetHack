@@ -1725,7 +1725,12 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                && (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
         (void) hmon(mon, obj, hmode, dieroll);
         return 1; /* hmon used it up */
-
+    } else if (otyp == ORB_OF_PERMAFROST) {
+        pline("%s explodes in a blast of ice!", Doname2(obj));
+        delobj(obj);
+        explode(mon->mx, mon->my, 2, d(12, 6), TOOL_CLASS, EXPL_FROSTY);
+        You_feel("full of sorrow.");
+        return 1;
     } else if (obj->oclass == POTION_CLASS
                && (guaranteed_hit || ACURR(A_DEX) > rnd(25))) {
         potionhit(mon, obj, POTHIT_HERO_THROW);
