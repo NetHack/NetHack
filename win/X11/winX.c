@@ -2404,7 +2404,7 @@ void
 nh_XtPopup(w, g, childwid)
 Widget w;        /* widget */
 int g;           /* type of grab */
-Widget childwid; /* child to recieve focus (can be None) */
+Widget childwid; /* child to receive focus (can be None) */
 {
     XtPopup(w, (XtGrabKind) g);
     XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete_window, 1);
