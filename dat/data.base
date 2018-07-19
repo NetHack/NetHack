@@ -93,6 +93,10 @@ sacrific*
 	For the ashes of his fathers
 	And the temples of his gods?
 		[ Lays of Ancient Rome, by Thomas B. Macaulay ]
+amalgamation
+bad clone
+	These unstable hybrids are a combination of two different
+	monsters forcibly merged into a single body.
 amaterasu omikami
 	The Shinto sun goddess, Amaterasu Omikami is the central
 	figure of Shintoism and the ancestral deity of the imperial
@@ -158,6 +162,7 @@ amulet of yendor
 	depths of Moloch's Sanctum and offer it on the appropriate high
 	altar on the Astral Plane.
 angel*
+*angel
 	He answered and said unto them, he that soweth the good seed
 	is the Son of man; the field is the world, and the good seed
 	are the children of the kingdom; but the weeds are the
@@ -432,12 +437,19 @@ barbarian
 		[ Conan - The Warrior, by Robert E. Howard ]
 barbed devil
 	Barbed devils lack any real special abilities, though they
-	are quite difficult to kill.
+	are quite difficult to kill and their hide is quite prickly.
+barghest
+	Few have seen these mysterious black dogs and lived to tell
+	the tale. Some believe that they are an omen of bad luck,
+	while others believe the barghest to be a shapeshifter or
+	some type of gremlin.
 # takes "bat or bird" when specifying 'B'
 ~*combat
 ~*wombat
 ~quothe
 *bat
+*bird
+*falcon
 bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
 	as it made its nightly rounds and came in through the window
@@ -471,6 +483,7 @@ bear*trap
 	occasions, one may stumble upon a bee-hive, in which the
 	queen bee is being well provided for, and guarded against
 	intruders.
+*scarab
 *beetle
 	[ The Creator ] has an inordinate fondness for beetles.
 		[ attributed to biologist J.B.S. Haldane ]
@@ -667,6 +680,9 @@ brigit
 	Bring me my cross of gold,
 	As a talisman.
 		[ "Broadsword" (refrain) by Ian Anderson ]
+buer
+	This demon often manifests in the form of a lion's head surrounded
+	by five clawed limbs.
 bugbear
 	Bugbears are relatives of goblins, although they tend to be
 	larger and more hairy.  They are aggressive carnivores and
@@ -910,6 +926,11 @@ chih*sung*tzu
 	lived with other celestial beings in their paradise on Mount
 	Kunlun.
 	  [ The Illustrated Who's Who In Mythology, by Michael Senior ]
+chimera
+	Most creatures have only a single head, but a chimera has
+	three: The head of a dragon, the head of a lion, and the head
+	of a goat. Even more dangerous than one's heads, however, 
+	is their venomous stinger.
 chromatic dragon
 tiamat
 	Tiamat is said to be the mother of evil dragonkind.  She is
@@ -1040,6 +1061,8 @@ cornuthaum
 			[ The Elfin Ship, James P. Blaylock ]
 couatl
 	A mythical feathered serpent.  The couatl are very rare.
+cow
+	The duck goes quack! The cow says moo!
 coyote
 	This carnivore is known for its voracious appetite and
 	inflated view of its own intelligence.
@@ -1197,6 +1220,11 @@ dal z*
 	There are those who play for the love of the game, and those
 	who play for the love of their friends. Rare are those that
 	play only to win.
+lord of the foocubi
+	 For love is no part of the dreamworld. Love belongs to Desire, 
+	and Desire is always cruel.
+		[ The Sandman, by Neil Gaiman ]
+
 dark one
 	... But he ruled rather by force and fear, if they might
 	avail; and those who perceived his shadow spreading over the
@@ -1221,6 +1249,9 @@ dart*
 	I saw the thing that should have pierced his heart
 	Turn to a golden staff.
 		[ Gifts, by Mary Coleridge ]
+death maggot
+	Maggots are alive, but feast on the dead.
+	Death maggots are dead, but feast on the living.
 demogorgon
 	A terrible deity, whose very name was capable of producing the
 	most horrible effects.  He is first mentioned by the 4th-century
@@ -1412,6 +1443,11 @@ doppelganger
 	make of steel.
 		[ The Last Book of Swords: Shieldbreaker's Story,
 			by Fred Saberhagen ]
+draugr
+	Draugar live in their graves, often guarding treasure buried with
+	them in their burial mound. They are animated corpses—unlike ghosts 
+	they have a corporeal body with similar physical abilities as in life.
+		[ Wikipedia, the free encyclopedia ]
 dread pirate roberts
  	Finally, Roberts decided something. He said, "All right,
  	Westley, I've never had a valet. You can try it for tonight.
@@ -1465,6 +1501,8 @@ dungeon*
 	As far remov'd from God and light of Heav'n
 	As from the Center thrice to th' utmost Pole.
 		[ Paradise Lost, by John Milton ]
+dust devil
+	Sometimes the sands hide things we do not wish to see.
 ~dwarf ??m*
 #~dwar* cave*man
 dwarf*
@@ -1506,6 +1544,9 @@ elwing
 	offspring of elf and mortal, Earendil, and Elwing, and Elrond
 	their child.
 		[ The Silmarillion, by J.R.R. Tolkien ]
+earthshark
+	Some sharks swim not through water, but through land. These beasts
+	are also notable for their uncommonly good jumping ability.
 eel
 giant eel
 	The behaviour of eels in fresh water extends the air of
@@ -1783,6 +1824,9 @@ floating eye
 	A man's despair with joy allay,
 	Turn bachelors old to lovers gay.
 		[ The Magic Flute, by Wolfgang Amadeus Mozart ]
+* fly
+	Flies are the dead man's revenge.
+		[ A Storm of Swords, by George R.R. Martin ]
 # also takes fog/vapor cloud
 fog* cloud
 	The fog comes
@@ -1959,6 +2003,7 @@ geryon
 			Alighieri, translated by H.F. Cary ]
 *ghost
 valley of *dea*
+spectre
 	And now the souls of the dead who had gone below came swarming
 	up from Erebus -- fresh brides, unmarried youths, old men
 	with life's long suffering behind them, tender young girls
@@ -1994,11 +2039,15 @@ giant humanoid
 	boulders as weapons, hurling them over large distances.  All
 	types of giants share a love for men - roasted, boiled, or
 	fried.  Their table manners are legendary.
+gnoll*
+	These bipedal hyenas serve Yeenoghu, and are almost unmatched
+	in combat.
 # note: "gnomish wizard" is a monster
 ~gnome ??m*
 #~gnom* cave*man
 gnome*
 gnomish wizard
+gnomish psychic
 	...  And then a gnome came by, carrying a bundle, an old
 	fellow three times as large as an imp and wearing clothes of
 	a sort, especially a hat.  And he was clearly just as frightened
@@ -2028,6 +2077,7 @@ gnomish wizard
 	and turned it upside down.
 	  [ Harry Potter and the Chamber of Secrets, by J. K. Rowling ]
 goblin
+goblin windmage
 	Now goblins are cruel, wicked, and bad-hearted.  They make
 	no beautiful things, but they make many clever ones.  They
 	can tunnel and mine as well as any but the most skilled
@@ -2193,6 +2243,14 @@ hawaiian*shirt
 	a shirt in such a violent and vivid conflict of colours that
 	the Weasel's fastidious eye was offended even in the half-light.
 		[ The Colour of Magic, by Terry Pratchett ]
+headless horseman
+	On mounting a rising ground, which brought the figure of his 
+	fellow-traveller in relief against the sky, gigantic in height, 
+	and muffled in a cloak, Ichabod was horror-struck on perceiving 
+	that he was headless!--but his horror was still more increased on 
+	observing that the head, which should have rested on his shoulders, 
+	was carried before him on the pommel of his saddle!
+		[ The Legend of Sleepy Hollow, by Washington Irving ]
 healer
 * healer
 attendant
@@ -2400,6 +2458,7 @@ horned devil
 ~horsem*
 warhorse
 sea horse
+nightmare
 	King Richard III: A horse! a horse! my kingdom for a horse!
 	Catesby: Withdraw, my lord; I'll help you to a horse.
 	King Richard III: Slave, I have set my life upon a cast,
@@ -2415,6 +2474,7 @@ red horse
 *horsem*
 rider*
 death
+grim reaper
 famine
 pestilence
 war
@@ -2483,6 +2543,9 @@ human or elf*
 	resent the intrusion of such beasts.  They are capable of
 	using weapons and magic, and it is even rumored that the
 	Wizard of Yendor is a member of this species.
+hundred handed one
+hecatoncheires
+	Enormous giants with one hundred arms and fifty heads.
 hunter
 	What of the hunting, hunter bold?
 	Brother, the watch was long and cold.
@@ -2872,7 +2935,7 @@ kos
 	   [ Swords and Deviltry, by Fritz Leiber ]
 koto
 	A Japanese harp.
-kraken
+*kraken
 	Out from the water a long sinuous tentacle had crawled; it
 	was pale-green and luminous and wet.  Its fingered end had
 	hold of Frodo's foot, and was dragging him into the water.
@@ -2913,6 +2976,8 @@ offler
 
 	"Come _on_," he said wearily, "Play fair."
 		[ The Colour of Magic, by Terry Pratchett ]
+lamassu
+	Honorable winged lions possessed of mystical powers.
 *lamp
 	When he came to himself he told his mother what had passed,
 	and showed her the lamp and the fruits he had gathered in the
@@ -3085,6 +3150,9 @@ light
 	Strange creatures formed from energy rather than matter,
 	lights are given to self-destructive behavior when battling
 	foes.
+lindorm
+knucker
+	A serpentine, dragon-like monster with a pair of front claws.
 lion
 	A lion doesn't concern itself with the opinion of sheep.
 		[ A Game of Thrones, by George R.R. Martin ]
@@ -3193,6 +3261,7 @@ lurker*
 lycanthrope
 were*
 human were*
+pack lord
 *were
 	In 1573, the Parliament of Dole published a decree, permitting
 	the inhabitants of the Franche-Comte to pursue and kill a
@@ -3276,6 +3345,14 @@ manes
 
 	The gnats of the dungeon, these swarming monsters are rarely
 	seen alone.
+manticore
+	This creature is capable of firing volleys of spines from
+	its spiky tail. They are always watchful and never sleep,
+	making them excellent guardian beasts.
+mantis
+* mantis
+	Forelimbs folded as if in prayer, even the power of Elbereth
+	will not deter these monsters.
 marduk
 	First insisting on recognition as supreme commander, Marduk
 	defeated the Dragon, cut her body in two, and from it created
@@ -3443,6 +3520,11 @@ mercury
 	Roman god of commerce, trade and travellers.  He is commonly
 	depicted carrying a caduceus (a staff with two snakes
 	intertwining around it) and a purse.
+merfolk
+merman
+mermaid
+	A tail is far from the only thing preventing a human from
+	living beneath the sea.
 *mimic
 	The ancestors of the modern day chameleon, these creatures can
 	assume the form of anything in their surroundings.  They may
@@ -3555,6 +3637,8 @@ mol?ch
 monk
 * monk
 grand master
+martial artist
+martial master
 master kaen
 	One day, an army general invited the Buddhist monk I-Hsiu
 	(literally, "One Rest") to his military head office for a
@@ -3595,6 +3679,7 @@ master kaen
 		[ Dining with a General - a Zen Buddhism Koan,
 		  translation by Yiu-man Chan ]
 monkey
+lemur
 	"Listen, man-cub," said the Bear, and his voice rumbled like
 	thunder on a hot night.  "I have taught thee all the Law of
 	the Jungle for all the peoples of the jungle--except the
@@ -3761,6 +3846,7 @@ nunchaku
 		[ Wikipedia, the free encyclopedia ]
 *nymph
 naiad
+lampad
 	A female creature from Roman and Greek mythology, the nymph
 	occupied rivers, forests, ponds, etc.  A nymph's beauty is
 	beyond words:  an ever-young woman with sleek figure and
@@ -4014,6 +4100,8 @@ panther
 	Such players may use Paper to assert their superiority and dignity.
 		[ The Official Rock Paper Scissors Strategy Guide,
 			by Douglas and Graham Walker ]
+parrot
+	Polly desires a compressed edible concoction of wheat!
 pelias
 	Conan cried out sharply and recoiled, thrusting his companion
 	back.  Before them rose the great shimmering white form of Satha,
@@ -4232,6 +4320,9 @@ pony
 	For they sniff danger ahead which you walk right into; and if they
 	run to save themselves, then they run the right way."
 		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
+porcupine
+	Never enter an arsekicking contest with a porcupine.
+		[ Sourcery, by Terry Pratchett ]
 *portal
 	Portals can be Mirrors, Pictures, Standing Stones, Stone
 	Circles, Windows, and special gates set up for the purpose.
@@ -4460,6 +4551,7 @@ ranger
 	Dunedain were asleep, or were all gone into the grave?"
 		[ The Fellowship of the Ring, by J.R.R. Tolkien ]
 rat
+packrat
 * rat
 	Rats are long-tailed rodents.  They are aggressive,
 	omnivorous, and adaptable, often carrying diseases.
@@ -4475,6 +4567,11 @@ rat
 	dying people.  They show astonishing intelligence in knowing
 	when a human being is helpless."
 		[ 1984, by George Orwell ]
+ratman
+* ratman
+nezumi
+	A rat might walk among humans, but it would never be mistaken
+	for one.
 raven
 	But the raven, sitting lonely on the placid bust, spoke only
 	That one word, as if his soul in that one word he did outpour.
@@ -4575,6 +4672,10 @@ rogue
 	conceal it; and therein am I constant to my profession.
 		[ Autolycus the Rogue, from The Winter's Tale by
 			William Shakespeare ]
+rook
+	A chess piece that is capable of moving horizontally and
+	vertically, but not orthogonally. They are considered
+	slightly more valuable than knights or bishops.
 roshi
 	Roshi is a Japanese word, common in Zen Buddhism, meaning "old"
 	(ro) and "teacher" (shi).  Roshi can be used as a term of
@@ -4827,6 +4928,8 @@ shark
 shito
 	A Japanese stabbing knife.
 *shopkeeper
+arms dealer
+one-eyed sam
 	There have been three general theories put forward to explain
 	the phenomenon of the wandering shops or, as they are
 	generically known, _tabernae vagantes._
@@ -4852,6 +4955,7 @@ shito
 	completely and utterly wrong.
 		[ The Light Fantastic, by Terry Pratchett ]
 shrieker
+screamer
 	With a single, savage thrust of her spear, the warrior-woman
 	impaled the fungus, silencing it.  However, it was too late:
 	the alarm had been raised[...]
@@ -5172,6 +5276,9 @@ susano*o
 	material world.  He has been expelled from heaven and taken
 	up residence on earth.
 		[ Encyclopedia of Gods, by Michael Jordan ]
+swordfish
+	Fence with a swordfish and you will always lose, for the 
+	swordfish can never be disarmed.
 tanko
 	Samurai plate armor of the Yamato period (AD 300 - 710).
 tengu
@@ -5208,6 +5315,8 @@ thoth*amon
 	Thutothmes seeks hidden power [The Heart of Ahriman] to
 	overthrow the Great One.
 		[ Conan the Conqueror, by Robert E. Howard ]
+thought hound
+	Some dogs hunt for meals more enticing than flesh.
 *throne
 	Methought I saw the footsteps of a throne
 	Which mists and vapours from mine eyes did shroud--
@@ -5680,6 +5789,11 @@ web
 	Oh what a tangled web we weave,
 	When first we practise to deceive!
 		[ Marmion, by Sir Walter Scott ]
+weeping eye
+	While floating eyes pose a constant danger for adventurers of
+	all levels of experience, weeping eyes are not so threatening.
+	They are generally content to float around the dungeon crying,
+	and attacking one will unleash a deluge of tears.
 whistle
 	There were legends both on the front and on the back of the
 	whistle. The one read thus:
@@ -5899,6 +6013,9 @@ yumi
 	mechanical semblance of life, -- it is a dead body which is
 	made to walk and act and move as if it were alive.
 		[ W. B. Seabrook ]
+zouthern animal
+	A collective term taken from SLASH'EM to describe a number of
+	animals native to Australia.
 zruty
 	The zruty are wild and gigantic beings, living in the
 	wildernesses of the Tatra mountains.
