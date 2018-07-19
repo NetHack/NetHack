@@ -621,8 +621,8 @@ boolean stairs;
             mtmp->mcanmove = 1;
         }
         if (((monnear(mtmp, u.ux, u.uy) &&
-            (levl_follower(mtmp) ||
-              (ERID(mtmp) && levl_follower(ERID(mtmp)->m1))))
+            (levl_follower(mtmp) &&
+              !ERID(mtmp) && mtmp->monmount != 1))
              /* the wiz will level t-port from anywhere to chase
                 the amulet; if you don't have it, will chase you
                 only if in range. -3. */
