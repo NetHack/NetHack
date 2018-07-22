@@ -3,6 +3,8 @@
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* Edited on 5/11/18 by NullCGT */
+
 #ifndef YOU_H
 #define YOU_H
 
@@ -66,6 +68,9 @@ struct u_achieve {
     Bitfield(finish_sokoban, 1);  /* obtained the sokoban prize */
 
     Bitfield(killed_medusa, 1);
+    Bitfield(killed_king, 1);   /* slew the King in Yellow */
+    Bitfield(killed_demogorgon, 1);  /* slew Demogorgon */
+    Bitfield(killed_reaper, 1); /* slew the Grim Reaper */
 };
 
 struct u_realtime {
@@ -92,12 +97,18 @@ struct u_conduct {     /* number of times... */
     long polyselfs;    /* transformed yourself */
     long wishes;       /* used a wish */
     long wisharti;     /* wished for an artifact */
+    long elbereth;     /* engraved Elbereth */
     /* genocides already listed at end of game */
 };
 
 struct u_roleplay {
     boolean blind;  /* permanently blind */
+    boolean hallu;  /* permanently hallucinating */
+    boolean deaf;   /* permanently deaf */
+    boolean clumsy; /* permanetnly fumbling */
     boolean nudist; /* has not worn any armor, ever */
+    boolean illfated; /* massively increased dungeon danger */
+    boolean marathon;  /* cannot heal, fixed high max hp */
     long numbones;  /* # of bones files loaded  */
 };
 
@@ -291,6 +302,9 @@ struct you {
 
     int uhunger;  /* refd only in eat.c and shk.c */
     unsigned uhs; /* hunger state - see eat.c */
+    boolean ukinghill; /* records if you are carying the pirate treasure
+    (and are therefor king of the hill) */
+    int protean; /* counter for the auto-polypiling power of the chest*/
 
     struct prop uprops[LAST_PROP + 1];
 
@@ -336,6 +350,7 @@ struct you {
     /* 1 free bit! */
 
     unsigned udg_cnt;           /* how long you have been demigod */
+    unsigned uin_cnt;           /* how long since the invocation */
     struct u_achieve uachieve;  /* achievements */
     struct u_event uevent;      /* certain events have happened */
     struct u_have uhave;        /* you're carrying special objects */
@@ -371,6 +386,7 @@ struct you {
     int ugangr;              /* if the gods are angry at you */
     int ugifts;              /* number of artifacts bestowed */
     int ublessed, ublesscnt; /* blessing/duration from #pray */
+    int ublesstim;           /* turns since prayer */
     long umoney0;
     long uspare1;
     long uexp, urexp;

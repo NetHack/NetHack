@@ -169,11 +169,11 @@
 
 /* Monster races -- must stay within ROLE_RACEMASK */
 /* Eventually this may become its own field */
-#define MH_HUMAN M2_HUMAN
-#define MH_ELF M2_ELF
-#define MH_DWARF M2_DWARF
-#define MH_GNOME M2_GNOME
-#define MH_ORC M2_ORC
+#define MH_HUMAN 0x00000008L
+#define MH_ELF 0x00000010L
+#define MH_DWARF 0x00000020L
+#define MH_GNOME 0x00000040L
+#define MH_ORC 0x00000080L
 
 /* for mons[].geno (constant during game) */
 #define G_UNIQ 0x1000     /* generated only once */
