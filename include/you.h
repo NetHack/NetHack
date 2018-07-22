@@ -3,8 +3,6 @@
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Edited on 5/11/18 by NullCGT */
-
 #ifndef YOU_H
 #define YOU_H
 
