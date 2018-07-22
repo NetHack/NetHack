@@ -341,7 +341,7 @@ struct obj *obj;
         return TRUE;
     /* non-silver artifacts with bonus against undead also are effective */
     arti = get_artifact(obj);
-    if (arti && (arti->spfx & SPFX_DFLAG2) && arti->mtype == M2_UNDEAD)
+    if (arti && (arti->spfx & SPFX_DFLAGR) && arti->mtype == MH_UNDEAD)
         return TRUE;
     /* [if there was anything with special bonus against noncorporeals,
        it would be effective too] */
@@ -568,13 +568,13 @@ long wp_mask;
             ETeleport_control &= ~wp_mask;
     }
     if (spfx & SPFX_WARN) {
-        if (spec_m2(otmp)) {
+        if (spec_mh(otmp)) {
             if (on) {
                 EWarn_of_mon |= wp_mask;
-                context.warntype.obj |= spec_m2(otmp);
+                context.warntype.obj |= spec_mh(otmp);
             } else {
                 EWarn_of_mon &= ~wp_mask;
-                context.warntype.obj &= ~spec_m2(otmp);
+                context.warntype.obj &= ~spec_mh(otmp);
             }
             see_monsters();
         } else {
@@ -769,11 +769,11 @@ struct monst *mtmp;
         return (weap->mtype == (unsigned long) ptr->mlet);
     } else if (weap->spfx & SPFX_DFLAG1) {
         return ((ptr->mflags1 & weap->mtype) != 0L);
-    } else if (weap->spfx & SPFX_DFLAG2) {
-        return ((ptr->mflags2 & weap->mtype)
+    } else if (weap->spfx & SPFX_DFLAGR) {
+        return ((ptr->mrace & weap->mtype)
                 || (yours
                     && ((!Upolyd && (urace.selfmask & weap->mtype))
-                        || ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
+                        || ((weap->mtype & MH_WERE) && u.ulycn >= LOW_PM))));
     } else if (weap->spfx & SPFX_DALIGN) {
         return yours ? (u.ualign.type != weap->alignment)
                      : (ptr->maligntyp == A_NONE
@@ -810,7 +810,7 @@ struct monst *mtmp;
 /* return the M2 flags of monster that an artifact's special attacks apply
  * against */
 long
-spec_m2(otmp)
+spec_mh(otmp)
 struct obj *otmp;
 {
     const struct artifact *artifact = get_artifact(otmp);

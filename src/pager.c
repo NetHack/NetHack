@@ -338,11 +338,11 @@ int x, y;
                 } else {
                     unsigned long mW = (context.warntype.obj
                                         | context.warntype.polyd),
-                                  m2 = mtmp->data->mflags2;
-                    const char *whom = ((mW & M2_HUMAN & m2) ? "human"
-                                        : (mW & M2_ELF & m2) ? "elf"
-                                          : (mW & M2_ORC & m2) ? "orc"
-                                            : (mW & M2_DEMON & m2) ? "demon"
+                                  mh = mtmp->data->mrace;
+                    const char *whom = ((mW & MH_HUMAN & mh) ? "human"
+                                        : (mW & MH_ELF & mh) ? "elf"
+                                          : (mW & MH_ORC & mh) ? "orc"
+                                            : (mW & MH_DEMON & mh) ? "demon"
                                               : mtmp->data->mname);
 
                     Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
@@ -1396,7 +1396,7 @@ doidtrap()
     commands:  basic letters vs digits, 'g' vs 'G' for '5', phone
     keypad vs normal layout of digits, and QWERTZ keyboard swap between
     y/Y/^Y/M-y/M-Y/M-^Y and z/Z/^Z/M-z/M-Z/M-^Z.)
-    
+
     The interpretor understands
      '&#' for comment,
      '&? option' for 'if' (also '&? !option'
@@ -1407,7 +1407,7 @@ doidtrap()
      '&:' for 'else' (also '&: #comment';
                       0 or 1 instance for a given 'if'), and
      '&.' for 'endif' (also '&. #comment'; required for each 'if').
-    
+
     The option handling is a bit of a mess, with no generality for
     which options to deal with and only a comma separated list of
     integer values for the '=value' part.  number_pad is the only
