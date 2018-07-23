@@ -1090,6 +1090,7 @@ try_again:
 #define MUSE_WAN_SONICS 23
 #define MUSE_WAN_PSIONICS 24
 #define MUSE_MGC_FLUTE 25
+#define MUSE_MGC_DRUM 26
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1279,6 +1280,12 @@ struct monst *mtmp;
             && mtmp->mcansee && haseyes(mtmp->data)) {
             m.offensive = obj;
             m.has_offense = MUSE_SCR_FIRE;
+        }
+        nomore(MUSE_MGC_DRUM);
+        if (obj->otyp == DRUM_OF_EARTHQUAKE && !rn2(10)
+            && obj->spe > 0 && multi >= 0) {
+            m.offensive = obj;
+            m.has_offense = MUSE_MGC_DRUM;
         }
     }
     return (boolean) !!m.has_offense;
@@ -1529,6 +1536,22 @@ struct monst *mtmp;
         }
         m_using = FALSE;
         return 2;
+    case MUSE_MGC_DRUM:
+        if (oseen) {
+            pline("%s begins to beat on a drum!", Monnam(mtmp));
+            You("%s produces a heavy, thunderous rolling!", Monnam(mtmp));
+            makeknown(otmp->otyp);
+        }
+        otmp->spe--;
+        m_using = TRUE;
+        pline_The("entire world is shaking!");
+        /* this ends up being a bit silly, since monsters might scare
+           themselves or fall in a pit. */
+        do_earthquake((mtmp->m_lev - 1) / 3 + 1, mtmp->mx, mtmp->my);
+        /* shake up monsters in a much larger radius... */
+        awaken_monsters(ROWNO * COLNO);
+        m_using = FALSE;
+        return (mtmp->mhp <= 0) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
     case MUSE_WAN_CANCELLATION:
@@ -2249,7 +2272,7 @@ struct obj *obj;
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN || typ == MAGIC_FLUTE)
             return (obj->spe > 0 && can_blow(mon));
-        if (typ == FIGURINE || DRUM_OF_EARTHQUAKE)
+        if (typ == FIGURINE || typ == DRUM_OF_EARTHQUAKE)
             return TRUE;
         break;
     case FOOD_CLASS:
