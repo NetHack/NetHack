@@ -273,9 +273,7 @@ Cloak_on(VOID_ARGS)
     case CLOAK_OF_MAGIC_RESISTANCE:
     case ROBE:
     case PLAIN_CLOAK:
-    case IRON_MANTLE:
-    case FLOWING_DRESS:
-    case SNAPPY_TUXEDO:
+    case MANTLE:
     case CLOAK_OF_REFLECTION:
         break;
     case CLOAK_OF_FLIGHT:
@@ -345,10 +343,8 @@ Cloak_off(VOID_ARGS)
     case OILSKIN_CLOAK:
     case ROBE:
     case PLAIN_CLOAK:
-    case IRON_MANTLE:
+    case MANTLE:
     case CLOAK_OF_FLIGHT:
-    case FLOWING_DRESS:
-    case SNAPPY_TUXEDO:
     case SECOND_SKIN:
     case CLOAK_OF_REFLECTION:
         break;
@@ -656,6 +652,8 @@ Shirt_on(VOID_ARGS)
     switch (uarmu->otyp) {
     case HAWAIIAN_SHIRT:
     case T_SHIRT:
+    case DRESS:
+    case TUXEDO:
         break;
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
@@ -674,6 +672,8 @@ Shirt_off(VOID_ARGS)
     switch (uarmu->otyp) {
     case HAWAIIAN_SHIRT:
     case T_SHIRT:
+    case DRESS:
+    case TUXEDO:
         break;
     default:
         impossible(unknown_type, c_shirt, uarmu->otyp);
