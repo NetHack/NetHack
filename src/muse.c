@@ -1089,6 +1089,7 @@ try_again:
 #define MUSE_WAN_POISON_GAS 22
 #define MUSE_WAN_SONICS 23
 #define MUSE_WAN_PSIONICS 24
+#define MUSE_MGC_FLUTE 25
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
@@ -1242,6 +1243,12 @@ struct monst *mtmp;
         if (obj->otyp == POT_SLEEPING) {
             m.offensive = obj;
             m.has_offense = MUSE_POT_SLEEPING;
+        }
+        nomore(MUSE_MGC_FLUTE);
+        if (obj->otyp == MAGIC_FLUTE && !u.usleep && !rn2(3)
+            && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2) {
+            m.offensive = obj;
+            m.has_offense = MUSE_MGC_FLUTE;
         }
         nomore(MUSE_POT_ACID);
         if (obj->otyp == POT_ACID) {
@@ -1501,6 +1508,25 @@ struct monst *mtmp;
              sgn(mtmp->muy - mtmp->my));
         m_using = FALSE;
         return (mtmp->mhp <= 0) ? 1 : 2;
+    case MUSE_MGC_FLUTE:
+        if (oseen) {
+            makeknown(otmp->otyp);
+            pline("%s plays a %s!", Monnam(mtmp), xname(otmp));
+        }
+        if (!Deaf) {
+            pline("%s produces soft music.", The(xname(otmp)));
+        }
+        m_using = TRUE;
+        if (!Deaf && distu(mtmp->mx, mtmp->my) < 5) {
+            if (Sleep_resistance || Free_action)
+                pline("You yawn.");
+            else {
+                pline("You fall asleep!");
+                fall_asleep(-rn1(10, 10), TRUE);
+            }
+        }
+        m_using = FALSE;
+        return 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
     case MUSE_WAN_CANCELLATION:
@@ -1812,7 +1838,7 @@ struct monst *mtmp;
         }
         nomore(MUSE_POT_REFLECT);
         if (obj->otyp == POT_REFLECTION && !mtmp->mreflect &&
-              mtmp->data != &mons[PM_SILVER_DRAGON] && 
+              mtmp->data != &mons[PM_SILVER_DRAGON] &&
               mtmp->data != &mons[PM_BABY_SILVER_DRAGON]) {
             m.misc = obj;
             m.has_misc = MUSE_POT_REFLECT;
@@ -2219,7 +2245,7 @@ struct obj *obj;
             return (boolean) needspick(mon->data);
         if (typ == UNICORN_HORN)
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
-        if (typ == FROST_HORN || typ == FIRE_HORN)
+        if (typ == FROST_HORN || typ == FIRE_HORN || typ == MAGIC_FLUTE)
             return (obj->spe > 0 && can_blow(mon));
         if (typ == FIGURINE)
             return TRUE;
