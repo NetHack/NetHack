@@ -12,6 +12,7 @@ Balance Changes
 Role and Race Changes
 - Infernals use their own race tag, which changes their class selection
   slightly (infernal pirates are now playable).
+- Infernals are now fire resistant instead of having infravision.
 - Pirates no longer always get a message about rising as skeletal pirates.
 
 Dungeon Changes
@@ -59,6 +60,10 @@ Bug Fixes
 - Spellcasters with no arms no longer point at you before cursing.
 - Fixed some monster sound bugs.
 - Monsters now actually attempt to throw their throwing axes.
+
+Known Bugs
+- Pets can be taken into the Black Market, but not out of it.
+- Some races are improperly tagged.
 
                     Version 0.4.0 - QOL and Life Improvement
 

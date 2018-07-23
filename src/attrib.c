@@ -111,7 +111,7 @@ static const struct innate {
   gno_abil[] = { { 1, &HInfravision, "", "" },
                  { 0, 0, 0, 0 } },
 
-  inf_abil[] = { { 1, &HInfravision, "", ""},
+  inf_abil[] = { { 1, &HFire_resistance, "", ""},
                  { 4, &HRegeneration, "resilient",
                                            "less resilient" },
                  { 0, 0, 0, 0 } },
