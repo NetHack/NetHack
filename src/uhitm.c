@@ -2052,7 +2052,7 @@ register struct attack *mattk;
         break;
     case AD_PITS:
         pline("Your strike shakes the entire world around you!");
-        do_earthquake((u.ulevel - 1) / 3 + 1);
+        do_earthquake((u.ulevel - 1) / 3 + 1, u.ux, u.uy);
         /* shake up monsters in a much larger radius... */
         awaken_monsters(ROWNO * COLNO);
         break;

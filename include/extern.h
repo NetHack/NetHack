@@ -1630,7 +1630,7 @@ E boolean FDECL(munslime, (struct monst *, BOOLEAN_P));
 
 E void FDECL(awaken_monsters, (int));
 E void FDECL(awaken_soldiers, (struct monst *));
-E void FDECL(do_earthquake, (int));
+E void FDECL(do_earthquake, (int, int, int));
 E int FDECL(do_play_instrument, (struct obj *));
 
 /* ### nhlan.c ### */

@@ -219,7 +219,7 @@ boolean quietly;
         return MM_MISS;
 
     /* Grid bugs and rooks cannot displace at an angle. */
-    if ((pa == &mons[PM_GRID_BUG] || pa == &mons[PM_ROOK]) 
+    if ((pa == &mons[PM_GRID_BUG] || pa == &mons[PM_ROOK])
         && magr->mx != mdef->mx
         && magr->my != mdef->my)
         return MM_MISS;
@@ -1513,7 +1513,7 @@ register struct attack *mattk;
     case AD_PITS:
         pline("The strike of %s shakes the world!",
             mon_nam(magr));
-        do_earthquake(7);
+        do_earthquake(7, magr->mx, magr->my);
         /* shake up monsters in a much larger radius... */
         awaken_monsters(ROWNO * COLNO);
         break;

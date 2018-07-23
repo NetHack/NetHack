@@ -2401,7 +2401,7 @@ mapseen *mptr;
 
 void dungeon_crumble() {
     pline("The dungeon is crumbling around you!");
-    do_earthquake(3);
+    do_earthquake(3, u.ux, u.uy);
 }
 
 /* recalculate mapseen for the current level */

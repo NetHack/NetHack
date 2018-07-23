@@ -237,8 +237,8 @@ int distance;
  * That is:  create random chasms (pits).
  */
 void
-do_earthquake(force)
-int force;
+do_earthquake(force, ox, oy)
+int force, ox, oy;
 {
     register int x, y;
     struct monst *mtmp;
@@ -247,13 +247,14 @@ int force;
     int start_x, start_y, end_x, end_y;
     schar filltype;
     unsigned tu_pit = 0;
+    boolean by_u = (ox == u.ux && oy == u.uy);
 
     if (trap_at_u)
         tu_pit = (trap_at_u->ttyp == PIT || trap_at_u->ttyp == SPIKED_PIT);
-    start_x = u.ux - (force * 2);
-    start_y = u.uy - (force * 2);
-    end_x = u.ux + (force * 2);
-    end_y = u.uy + (force * 2);
+    start_x = ox - (force * 2);
+    start_y = oy - (force * 2);
+    end_x = ox + (force * 2);
+    end_y = oy + (force * 2);
     if (start_x < 1)
         start_x = 1;
     if (start_y < 1)
@@ -265,7 +266,8 @@ int force;
     for (x = start_x; x <= end_x; x++)
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
-                wakeup(mtmp, TRUE); /* peaceful monster will become hostile */
+                if (by_u)
+                    wakeup(mtmp, TRUE); /* peaceful monster will become hostile */
                 if (mtmp->mundetected && is_hider(mtmp->data)) {
                     mtmp->mundetected = 0;
                     if (cansee(x, y))
@@ -587,7 +589,7 @@ struct obj *instr;
 
         You("produce a heavy, thunderous rolling!");
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
-        do_earthquake((u.ulevel - 1) / 3 + 1);
+        do_earthquake((u.ulevel - 1) / 3 + 1, u.ux, u.uy);
         /* shake up monsters in a much larger radius... */
         awaken_monsters(ROWNO * COLNO);
         makeknown(DRUM_OF_EARTHQUAKE);

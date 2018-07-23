@@ -1881,7 +1881,7 @@ register struct attack *mattk;
     case AD_PITS:
         pline("The strike of %s shakes the entire world around you!",
             mon_nam(mtmp));
-        do_earthquake(7);
+        do_earthquake(7, mtmp->mx, mtmp->my);
         /* shake up monsters in a much larger radius... */
         awaken_monsters(ROWNO * COLNO);
         break;
