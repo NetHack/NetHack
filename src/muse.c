@@ -1516,6 +1516,7 @@ struct monst *mtmp;
         if (!Deaf) {
             pline("%s produces soft music.", The(xname(otmp)));
         }
+        otmp->spe--;
         m_using = TRUE;
         if (!Deaf && distu(mtmp->mx, mtmp->my) < 5) {
             if (Sleep_resistance || Free_action)
