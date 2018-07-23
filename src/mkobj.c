@@ -3026,6 +3026,11 @@ struct obj* obj;
         int i = rnd(100);
         for(; (i -= materials->iprob) > 0; materials++);
         obj->material = materials->iclass;
+        /* Infernals tend to encounter silver much more often */
+        if (Race_switch == PM_INFERNAL && valid_obj_material(obj, SILVER)
+            && !rn2(35)) {
+              obj->material = SILVER;
+        }
     }
     else {
         /* default case for other items: always use base material... */
