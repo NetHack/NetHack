@@ -2984,7 +2984,7 @@ struct obj* obj;
 
     /* Otherwise, select an appropriate list, or return NULL if no appropriate
      * list exists. */
-    if (otyp == SHIELD_OF_REFLECTION) {
+    if (otyp == SHIELD_OF_REFLECTION || otyp == SHILED_OF_RESONANCE) {
         return shiny_materials;
     }
     if (is_elven_obj(obj) && default_material != CLOTH) {
