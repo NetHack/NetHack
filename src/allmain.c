@@ -329,6 +329,7 @@ boolean resuming;
                             u.udg_cnt = rn1(200, 50);
                         }
                     }
+                    /*
                     if (u.uevent.udemigod && !u.uinvulnerable &&
                         !In_endgame(&u.uz)) {
                         if (u.uin_cnt)
@@ -338,6 +339,7 @@ boolean resuming;
                             u.uin_cnt = rn1(125, 50);
                         }
                     }
+                    */
                     restore_attrib();
                     /* underwater and waterlevel vision are done here */
                     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
