@@ -70,7 +70,7 @@ Getting tired of the tip of the day? Disable it in the config file.
 Do not let your pet near a porcupine.
 Naming a spellbook of finger of death might let you summon a bonus boss.
 Cartomancers have a chance of reusing scrolls.
-Wans of wonder cannot grant wishes.
+Wands of wonder cannot grant wishes.
 Have a good JuneNethack!
 Dragonmasters cannot wear dragon scale mail.
 Dragonmasters can tame chromatic dragons.
