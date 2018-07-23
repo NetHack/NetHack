@@ -964,7 +964,7 @@ register struct monst *mtmp;
         } else if (ptr == &mons[PM_WORM_THAT_WALKS] && !rn2(3)) {
             (void) mongets(mtmp, MACE);
         } else if (ptr == &mons[PM_LORD_OF_WORMS] && !rn2(13)) {
-            (void) mongets(mtmp, BONE_KNIFE);
+            (void) mongets(mtmp, SACRIFICIAL_KNIFE);
         }
         break;
     case S_MUMMY:

@@ -156,7 +156,7 @@ WEAPON("dagger", None,
        1, 1, 0, 33,  10,   4,  4,  3, 2, P,   P_DAGGER, IRON, HI_METAL),
 WEAPON("elven dagger", "runed dagger",
        0, 1, 0, 10,  10,   4,  5,  3, 2, P,   P_DAGGER, WOOD, HI_WOOD),
-WEAPON("bone knife", None,
+WEAPON("sacrificial knife", None,
        1, 1, 0, 3,   5,   4,  3,  2, 0, P|S, P_KNIFE, BONE, CLR_WHITE),
 WEAPON("orcish dagger", "crude dagger",
        0, 1, 0, 12,  10,   4,  3,  3, 2, P,   P_DAGGER, IRON, CLR_BLACK),
@@ -268,10 +268,7 @@ WEAPON("bec de corbin", "beaked polearm",
 
 /* bludgeons */
 WEAPON("mace", None,
-       1, 0, 0, 36,  30,   5,  6,  6, 0, B,   P_MACE, IRON, HI_METAL),
-        /* +1 small */
-WEAPON("silver mace", None,
-       1, 0, 0, 4,  30,   5,  6,  6, 0, B,   P_MACE, SILVER, HI_SILVER),
+       1, 0, 0, 40,  30,   5,  6,  6, 0, B,   P_MACE, IRON, HI_METAL),
         /* +1 small */
 WEAPON("ornate mace", None,
        1, 0, 0, 0,  30,   5,  6,  6, 0, B,   P_MACE, GOLD, HI_METAL),
