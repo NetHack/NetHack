@@ -1246,6 +1246,7 @@ struct monst *mtmp;
         }
         nomore(MUSE_MGC_FLUTE);
         if (obj->otyp == MAGIC_FLUTE && !u.usleep && !rn2(3)
+            && obj->spe > 0 && multi >= 0
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2) {
             m.offensive = obj;
             m.has_offense = MUSE_MGC_FLUTE;
@@ -2248,7 +2249,7 @@ struct obj *obj;
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN || typ == MAGIC_FLUTE)
             return (obj->spe > 0 && can_blow(mon));
-        if (typ == FIGURINE)
+        if (typ == FIGURINE || DRUM_OF_EARTHQUAKE)
             return TRUE;
         break;
     case FOOD_CLASS:
