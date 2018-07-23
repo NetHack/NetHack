@@ -89,7 +89,7 @@ const char *name; /* if null, then format `*objp' */
             potionhit(&youmonst, obj, POTHIT_OTHER_THROW);
             *objp = obj = 0; /* potionhit() uses up the potion */
         } else {
-            if (obj && objects[obj->otyp].oc_material == SILVER
+            if (obj && obj->material == SILVER
                 && Hate_silver) {
                 /* extra damage already applied by dmgval() */
                 pline_The("silver sears your flesh!");
@@ -389,8 +389,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 }
             }
         }
-        if (objects[otmp->otyp].oc_material == SILVER
-            && mon_hates_silver(mtmp)) {
+        if (otmp->material == SILVER && mon_hates_silver(mtmp)) {
             if (vis)
                 pline_The("silver sears %s flesh!", s_suffix(mon_nam(mtmp)));
             else if (verbose && !target)
@@ -1156,8 +1155,7 @@ boolean your_fault, from_invent;
     else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
         pline("Whang!");
     else if (otmp->oclass == COIN_CLASS
-             || objects[obj_type].oc_material == GOLD
-             || objects[obj_type].oc_material == SILVER)
+             || otmp->material == GOLD || otmp->material == SILVER)
         pline("Clink!");
     else
         pline("Clonk!");

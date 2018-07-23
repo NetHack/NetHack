@@ -1812,7 +1812,7 @@ struct monst *mtmp;
         }
         nomore(MUSE_POT_REFLECT);
         if (obj->otyp == POT_REFLECTION && !mtmp->mreflect &&
-              mtmp->data != &mons[PM_SILVER_DRAGON] && 
+              mtmp->data != &mons[PM_SILVER_DRAGON] &&
               mtmp->data != &mons[PM_BABY_SILVER_DRAGON]) {
             m.misc = obj;
             m.has_misc = MUSE_POT_REFLECT;
@@ -2062,7 +2062,7 @@ struct monst *mtmp;
                 pline_The("whip slips free."); /* not `The_whip' */
                 return 1;
             } else if (where_to == 3 && mon_hates_silver(mtmp)
-                       && objects[obj->otyp].oc_material == SILVER) {
+                       && obj->material == SILVER) {
                 /* this monster won't want to catch a silver
                    weapon; drop it at hero's feet instead */
                 where_to = 2;

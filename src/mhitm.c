@@ -219,7 +219,7 @@ boolean quietly;
         return MM_MISS;
 
     /* Grid bugs and rooks cannot displace at an angle. */
-    if ((pa == &mons[PM_GRID_BUG] || pa == &mons[PM_ROOK]) 
+    if ((pa == &mons[PM_GRID_BUG] || pa == &mons[PM_ROOK])
         && magr->mx != mdef->mx
         && magr->my != mdef->my)
         return MM_MISS;
@@ -424,8 +424,8 @@ register struct monst *magr, *mdef;
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
                      || mdef->data == &mons[PM_BROWN_PUDDING])
-                    && (otmp && (objects[otmp->otyp].oc_material == IRON
-                                 || objects[otmp->otyp].oc_material == METAL))
+                    && (otmp && (otmp->material == IRON
+                                 || otmp->material == METAL))
                     && mdef->mhp > 1
                     && !mdef->mcan) {
                     if (clone_mon(mdef, 0, 0)) {

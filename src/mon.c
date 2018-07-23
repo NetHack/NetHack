@@ -377,7 +377,8 @@ unsigned corpseflags;
     case PM_SILVER_GOLEM:
         num = d(1, 2);
         while (num--)
-            obj = mksobj_at(SILVER_DAGGER, x, y, TRUE, FALSE);
+            obj = mksobj_at(DAGGER, x, y, TRUE, FALSE);
+            obj->material = SILVER;
         free_mname(mtmp); /* don't christen obj */
         break;
     case PM_IRON_GOLEM:
@@ -415,7 +416,7 @@ unsigned corpseflags;
     case PM_LEATHER_GOLEM:
         num = d(2, 4);
         while (num--)
-            obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
+            obj = mksobj_at(LIGHT_ARMOR, x, y, TRUE, FALSE);
         free_mname(mtmp);
         break;
     case PM_GOLD_GOLEM:
@@ -1060,7 +1061,7 @@ register struct monst *mtmp;
     int mat_idx;
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
-        mat_idx = objects[gold->otyp].oc_material;
+        mat_idx = gold->material;
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {

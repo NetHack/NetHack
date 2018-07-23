@@ -159,7 +159,7 @@ Boots_on(VOID_ARGS)
 
     switch (uarmf->otyp) {
     case LOW_BOOTS:
-    case IRON_SHOES:
+    case DWARVISH_BOOTS:
     case HIGH_BOOTS:
     case JUMPING_BOOTS:
     case KICKING_BOOTS:
@@ -249,7 +249,7 @@ Boots_off(VOID_ARGS)
         }
         break;
     case LOW_BOOTS:
-    case IRON_SHOES:
+    case DWARVISH_BOOTS:
     case HIGH_BOOTS:
     case JUMPING_BOOTS:
     case KICKING_BOOTS:
@@ -272,7 +272,7 @@ Cloak_on(VOID_ARGS)
     case DWARVISH_CLOAK:
     case CLOAK_OF_MAGIC_RESISTANCE:
     case ROBE:
-    case LEATHER_CLOAK:
+    case PLAIN_CLOAK:
     case IRON_MANTLE:
     case FLOWING_DRESS:
     case SNAPPY_TUXEDO:
@@ -344,7 +344,7 @@ Cloak_off(VOID_ARGS)
     case CLOAK_OF_MAGIC_RESISTANCE:
     case OILSKIN_CLOAK:
     case ROBE:
-    case LEATHER_CLOAK:
+    case PLAIN_CLOAK:
     case IRON_MANTLE:
     case CLOAK_OF_FLIGHT:
     case FLOWING_DRESS:
@@ -393,8 +393,8 @@ Helmet_on(VOID_ARGS)
     case FEDORA:
     case HELMET:
     case DENTED_POT:
-    case ELVEN_LEATHER_HELM:
-    case DWARVISH_IRON_HELM:
+    case ELVEN_HELM:
+    case DWARVISH_HELM:
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
     case HELM_OF_OPAQUE_THOUGHTS:
@@ -460,8 +460,8 @@ Helmet_off(VOID_ARGS)
     case FEDORA:
     case HELMET:
     case DENTED_POT:
-    case ELVEN_LEATHER_HELM:
-    case DWARVISH_IRON_HELM:
+    case ELVEN_HELM:
+    case DWARVISH_HELM:
     case ORCISH_HELM:
     case EARMUFF:
     case HELM_OF_OPAQUE_THOUGHTS:
@@ -506,7 +506,7 @@ Gloves_on(VOID_ARGS)
         u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
 
     switch (uarmg->otyp) {
-    case LEATHER_GLOVES:
+    case GLOVES:
     case BOXING_GLOVES:
     case ROGUES_GLOVES:
         break;
@@ -561,7 +561,7 @@ Gloves_off(VOID_ARGS)
     context.takeoff.mask &= ~W_ARMG;
 
     switch (uarmg->otyp) {
-    case LEATHER_GLOVES:
+    case GLOVES:
     case BOXING_GLOVES:
     case ROGUES_GLOVES:
         break;

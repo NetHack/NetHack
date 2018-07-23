@@ -2091,6 +2091,36 @@ register struct obj *obj;
     return cost;
 }
 
+/* Relative prices for the different materials.
+ * Units for this are much more poorly defined than for weights; the best
+ * approximation would be something like "zorkmids per aum".
+ * We only care about the ratio of two of these together. */
+STATIC_DCL
+const int matprices[] = {
+     0,
+     1, /* LIQUID */
+     1, /* WAX */
+     1, /* VEGGY */
+     3, /* FLESH */
+     2, /* PAPER */
+     3, /* CLOTH */
+     5, /* LEATHER */
+     8, /* WOOD */
+    20, /* BONE */
+   200, /* DRAGON_HIDE - DSM to scale mail */
+    10, /* IRON */
+    10, /* METAL */
+    10, /* COPPER */
+    30, /* SILVER */
+    30, /* GOLD */
+    30, /* PLATINUM */
+    32, /* MITHRIL - mithril-coat to regular chain mail */
+    10, /* PLASTIC */
+    20, /* GLASS */
+   500, /* GEMSTONE */
+    10  /* MINERAL */
+};
+
 /* calculate the value that the shk will charge for [one of] an object */
 STATIC_OVL long
 get_cost(obj, shkp)
@@ -2107,8 +2137,7 @@ register struct monst *shkp; /* if angry, impose a surcharge */
     /* shopkeeper may notice if the player isn't very knowledgeable -
        especially when gem prices are concerned */
     if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
-        if (obj->oclass == GEM_CLASS
-            && objects[obj->otyp].oc_material == GLASS) {
+        if (is_worthless_glass(obj)) {
             int i;
             /* get a value that's 'random' from game to game, but the
                same within the same game */
@@ -2156,6 +2185,9 @@ register struct monst *shkp; /* if angry, impose a surcharge */
             divisor *= 3L;
         }
     }
+    /* adjust for different material */
+    multiplier *= matprices[obj->material];
+    divisor *= matprices[objects[obj->otyp].oc_material];
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         multiplier *= 4L, divisor *= 3L;
     else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV / 2))
@@ -2355,6 +2387,10 @@ register struct monst *shkp;
 {
     long tmp = getprice(obj, TRUE) * obj->quan, multiplier = 1L, divisor = 1L;
 
+    /* adjust for different material */
+    multiplier *= matprices[obj->material];
+    divisor *= matprices[objects[obj->otyp].oc_material];
+
     if (uarmh && uarmh->otyp == DUNCE_CAP)
         divisor *= 3L;
     else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV / 2))
@@ -2368,8 +2404,8 @@ register struct monst *shkp;
     if (!obj->dknown || !objects[obj->otyp].oc_name_known) {
         if (obj->oclass == GEM_CLASS) {
             /* different shop keepers give different prices */
-            if (objects[obj->otyp].oc_material == GEMSTONE
-                || objects[obj->otyp].oc_material == GLASS) {
+            if (obj->material == GEMSTONE
+                || is_worthless_glass(obj)) {
                 tmp = (obj->otyp % (6 - shkp->m_id % 3));
                 tmp = (tmp + 3) * obj->quan;
             }

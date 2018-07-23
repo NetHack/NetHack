@@ -888,7 +888,7 @@ register struct obj *obj;
         if (obj->otyp == AMULET_OF_STRANGULATION
             || obj->otyp == RIN_SLOW_DIGESTION)
             return TABU;
-        if (mon_hates_silver(mon) && objects[obj->otyp].oc_material == SILVER)
+        if (mon_hates_silver(mon) && obj->material == SILVER)
             return TABU;
         if ((mptr == &mons[PM_GELATINOUS_CUBE] ||
              mptr == &mons[PM_TASMANIAN_DEVIL]) && is_organic(obj))

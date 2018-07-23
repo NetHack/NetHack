@@ -187,6 +187,7 @@ unsigned *ospecial;
             cmap_color(offset);
         }
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) { /* object */
+        struct obj* otmp = vobj_at(x, y);
         idx = objects[offset].oc_class + SYM_OFF_O;
         if (On_stairs(x,y) && levl[x][y].seenv) special |= MG_STAIRS;
         if (offset == BOULDER)
@@ -204,6 +205,19 @@ unsigned *ospecial;
                 break;
             }
         } else
+#ifdef TEXTCOLOR
+        if (iflags.use_color && otmp && otmp->otyp == offset
+            && otmp->material != objects[offset].oc_material) {
+            /* Externify this array if it's ever needed anywhere else. */
+            const int materialclr[] = {
+                CLR_BLACK, HI_ORGANIC, CLR_WHITE, HI_ORGANIC, CLR_BROWN,
+                CLR_WHITE, HI_CLOTH, HI_LEATHER, HI_WOOD, CLR_WHITE, CLR_BLACK,
+                HI_METAL, HI_METAL, HI_COPPER, HI_SILVER, HI_GOLD, CLR_WHITE,
+                HI_METAL, CLR_WHITE, HI_SILVER, CLR_RED, CLR_GRAY
+            };
+            color = materialclr[otmp->material];
+        } else
+#endif
             obj_color(offset);
         if (offset != BOULDER && is_objpile(x,y))
             special |= MG_OBJPILE;

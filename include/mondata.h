@@ -256,7 +256,7 @@
       ? (obj)->otyp == EUCALYPTUS_LEAF                                   \
        : (is_domestic(ptr) && (obj)->oclass == FOOD_CLASS                \
           && ((ptr)->mlet != S_UNICORN                                   \
-              || objects[(obj)->otyp].oc_material == VEGGY               \
+              || obj->material == VEGGY               \
               || ((obj)->otyp == CORPSE && (obj)->corpsenm == PM_LICHEN))))
 
 #define is_blkmktstaff(ptr)	(Is_blackmarket(&u.uz) && \

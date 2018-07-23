@@ -1094,7 +1094,7 @@ not_special:
                          || (uses_items && searches_for_item(mtmp, otmp))
                          || (likerock && otmp->otyp == BOULDER)
                          || (likegems && otmp->oclass == GEM_CLASS
-                             && objects[otmp->otyp].oc_material != MINERAL)
+                             && otmp->material != MINERAL)
                          || (conceals && !cansee(otmp->ox, otmp->oy))
                          || ((ptr == &mons[PM_GELATINOUS_CUBE] ||
                               ptr == &mons[PM_TASMANIAN_DEVIL])
@@ -1105,7 +1105,7 @@ not_special:
                         if (can_carry(mtmp, otmp) > 0
                             && (throws_rocks(ptr) || !sobj_at(BOULDER, xx, yy))
                             && (!is_unicorn(ptr)
-                                || objects[otmp->otyp].oc_material == GEMSTONE)
+                                || otmp->material == GEMSTONE)
                             /* Don't get stuck circling an Elbereth */
                             && !onscary(xx, yy, mtmp)) {
                             minr = distmin(omx, omy, xx, yy);
@@ -1694,7 +1694,7 @@ struct monst *mtmp;
         if (obj->oclass != GEM_CLASS && !(typ >= ARROW && typ <= BOOMERANG)
             && !(typ >= DAGGER && typ <= CRYSKNIFE) && typ != SLING
             && !is_cloak(obj) && typ != FEDORA && !is_gloves(obj)
-            && typ != LEATHER_JACKET && typ != CREDIT_CARD && !is_shirt(obj)
+            && typ != JACKET && typ != CREDIT_CARD && !is_shirt(obj)
             && !(typ == CORPSE && verysmall(&mons[obj->corpsenm]))
             && typ != FORTUNE_COOKIE && typ != CANDY_BAR && typ != PANCAKE
             && typ != LEMBAS_WAFER && typ != LUMP_OF_ROYAL_JELLY

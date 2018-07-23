@@ -256,7 +256,7 @@ register struct monst *mtmp;
                 break;
             case PM_CAPTAIN:
             case PM_WATCH_CAPTAIN:
-                w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
+                w1 = rn2(2) ? LONG_SWORD : SABER;
                 break;
             default:
                 if (!rn2(4))
@@ -274,9 +274,9 @@ register struct monst *mtmp;
         } else if (is_elf(ptr)) {
             if (rn2(2))
                 (void) mongets(mtmp,
-                               rn2(2) ? ELVEN_MITHRIL_COAT : ELVEN_CLOAK);
+                               rn2(2) ? ELVEN_CHAIN_MAIL : ELVEN_CLOAK);
             if (rn2(2))
-                (void) mongets(mtmp, ELVEN_LEATHER_HELM);
+                (void) mongets(mtmp, ELVEN_HELM);
             else if (!rn2(4))
                 (void) mongets(mtmp, ELVEN_BOOTS);
             if (rn2(2))
@@ -322,7 +322,7 @@ register struct monst *mtmp;
             (void) mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
      		} else if (mm == PM_PIRATE_BROTHER){
      			  (void)mongets(mtmp, SCIMITAR);
-     			  (void)mongets(mtmp, LEATHER_ARMOR);
+     			  (void)mongets(mtmp, LIGHT_ARMOR);
      			  (void)mongets(mtmp, HIGH_BOOTS);
      		} else if (mm == PM_MAYOR_CUMMERBUND){
      		    otmp = mksobj(SCIMITAR, FALSE, FALSE);
@@ -332,7 +332,7 @@ register struct monst *mtmp;
      		    otmp->spe = max(otmp->spe, spe2);
      		    (void) mpickobj(mtmp, otmp);
 
-     		    otmp = mksobj(LEATHER_JACKET, FALSE, FALSE);
+     		    otmp = mksobj(JACKET, FALSE, FALSE);
      		    otmp->oerodeproof = TRUE;
      		    spe2 = d(2,3);
      		    otmp->spe = max(otmp->spe, spe2);
@@ -344,9 +344,9 @@ register struct monst *mtmp;
      		    otmp->spe = max(otmp->spe, spe2);
      		    (void) mpickobj(mtmp, otmp);
 
-     			  (void)mongets(mtmp, LEATHER_CLOAK);
+     			  (void)mongets(mtmp, PLAIN_CLOAK);
      			  (void)mongets(mtmp, HIGH_BOOTS);
-     			  (void)mongets(mtmp, LEATHER_GLOVES);
+     			  (void)mongets(mtmp, GLOVES);
         } else if (ptr->msound == MS_GUARDIAN) {
             /* quest "guardians" */
             switch (mm) {
@@ -359,7 +359,7 @@ register struct monst *mtmp;
                 if (rn2(2))
                     (void) mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
                 if (rn2(5))
-                    (void) mongets(mtmp, rn2(3) ? LEATHER_JACKET : LEATHER_CLOAK);
+                    (void) mongets(mtmp, rn2(3) ? JACKET : PLAIN_CLOAK);
                 if (rn2(3))
                     (void) mongets(mtmp, rn2(3) ? LOW_BOOTS : HIGH_BOOTS);
                 if (rn2(3))
@@ -370,11 +370,11 @@ register struct monst *mtmp;
             case PM_ROSHI:
             case PM_WARRIOR:
                 (void) mongets(mtmp, rn2(3) ? LONG_SWORD : SHORT_SWORD);
-                (void) mongets(mtmp, rn2(3) ? CHAIN_MAIL : LEATHER_ARMOR);
+                (void) mongets(mtmp, rn2(3) ? CHAIN_MAIL : LIGHT_ARMOR);
                 if (rn2(2))
                     (void) mongets(mtmp, rn2(2) ? LOW_BOOTS : HIGH_BOOTS);
                 if (!rn2(3))
-                    (void) mongets(mtmp, LEATHER_CLOAK);
+                    (void) mongets(mtmp, PLAIN_CLOAK);
                 if (!rn2(3)) {
                     (void) mongets(mtmp, BOW);
                     m_initthrow(mtmp, ARROW, 12);
@@ -383,7 +383,7 @@ register struct monst *mtmp;
             case PM_HUNTER:
                 (void) mongets(mtmp, rn2(3) ? SHORT_SWORD : DAGGER);
                 if (rn2(2))
-                    (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
+                    (void) mongets(mtmp, rn2(2) ? JACKET : LIGHT_ARMOR);
                 (void) mongets(mtmp, BOW);
                 m_initthrow(mtmp, ARROW, 12);
                 break;
@@ -391,12 +391,12 @@ register struct monst *mtmp;
                 (void) mongets(mtmp, CLUB);
                 (void) mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
                 if (rn2(2))
-                    (void) mongets(mtmp, LEATHER_GLOVES);
-                (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
+                    (void) mongets(mtmp, GLOVES);
+                (void) mongets(mtmp, rn2(2) ? JACKET : LIGHT_ARMOR);
                 break;
             case PM_NEANDERTHAL:
                 (void) mongets(mtmp, CLUB);
-                (void) mongets(mtmp, LEATHER_ARMOR);
+                (void) mongets(mtmp, LIGHT_ARMOR);
                 break;
             }
         }
@@ -447,7 +447,7 @@ register struct monst *mtmp;
         switch (mm) {
             case PM_GNOLL:
                 if(!rn2(3)) (void) mongets(mtmp, ORCISH_HELM);
-                if(!rn2(3)) (void) mongets(mtmp, STUDDED_LEATHER_ARMOR);
+                if(!rn2(3)) (void) mongets(mtmp, STUDDED_ARMOR);
                 if(!rn2(3)) (void) mongets(mtmp, ORCISH_SHIELD);
                 if(!rn2(4)) (void) mongets(mtmp, SPEAR);
                 break;
@@ -504,14 +504,14 @@ register struct monst *mtmp;
                 break;
             }
             if (!rn2(10))
-                (void) mongets(mtmp, ELVEN_MITHRIL_COAT);
+                (void) mongets(mtmp, ELVEN_CHAIN_MAIL);
             if (!rn2(10))
                 (void) mongets(mtmp, DWARVISH_CLOAK);
         } else if (is_dwarf(ptr)) {
             if (rn2(7))
                 (void) mongets(mtmp, DWARVISH_CLOAK);
             if (rn2(7))
-                (void) mongets(mtmp, IRON_SHOES);
+                (void) mongets(mtmp, DWARVISH_BOOTS);
             if (!rn2(4)) {
                 (void) mongets(mtmp, DWARVISH_SHORT_SWORD);
                 /* note: you can't use a mattock with a shield */
@@ -521,16 +521,16 @@ register struct monst *mtmp;
                     (void) mongets(mtmp, rn2(2) ? AXE : DWARVISH_SPEAR);
                     (void) mongets(mtmp, DWARVISH_ROUNDSHIELD);
                 }
-                (void) mongets(mtmp, DWARVISH_IRON_HELM);
+                (void) mongets(mtmp, DWARVISH_HELM);
                 if (!rn2(3))
-                    (void) mongets(mtmp, DWARVISH_MITHRIL_COAT);
+                    (void) mongets(mtmp, DWARVISH_CHAIN_MAIL);
             } else {
                 (void) mongets(mtmp, !rn2(3) ? PICK_AXE : DAGGER);
             }
      		} else if(mm == PM_PLANAR_PIRATE){
        			(void)mongets(mtmp, TWO_HANDED_SWORD);
-       			(void)mongets(mtmp, BRONZE_PLATE_MAIL);
-       			(void)mongets(mtmp, LEATHER_GLOVES);
+       			(void)mongets(mtmp, CRYSTAL_PLATE_MAIL);
+       			(void)mongets(mtmp, GLOVES);
        			(void)mongets(mtmp, HIGH_BOOTS);
         }
         break;
@@ -577,7 +577,7 @@ register struct monst *mtmp;
             if (!rn2(3))
                 (void) mongets(mtmp, ORCISH_SHORT_SWORD);
             if (!rn2(3))
-                (void) mongets(mtmp, IRON_SHOES);
+                (void) mongets(mtmp, DWARVISH_BOOTS);
             if (!rn2(3)) {
                 (void) mongets(mtmp, ORCISH_BOW);
                 m_initthrow(mtmp, ORCISH_ARROW, 12);
@@ -637,7 +637,7 @@ register struct monst *mtmp;
         break;
     case S_ZOMBIE:
         if (!rn2(4))
-            (void) mongets(mtmp, LEATHER_ARMOR);
+            (void) mongets(mtmp, LIGHT_ARMOR);
         if (!rn2(4))
             (void) mongets(mtmp, (rn2(3) ? KNIFE : SHORT_SWORD));
         if (mm == PM_SKELETAL_PIRATE) {
@@ -647,7 +647,7 @@ register struct monst *mtmp;
          		otmp->oeroded = 1;
          		(void) mpickobj(mtmp, otmp);
          		otmp = rn2(2) ? mksobj(HIGH_BOOTS, FALSE, FALSE) :
-                mksobj(LEATHER_JACKET, FALSE, FALSE);
+                mksobj(JACKET, FALSE, FALSE);
          		curse(otmp);
          		otmp->oeroded2 = 1;
          		(void) mpickobj(mtmp, otmp);
@@ -664,7 +664,7 @@ register struct monst *mtmp;
      				otmp = mksobj(SCIMITAR, FALSE, FALSE);
      				curse(otmp);
      				(void) mpickobj(mtmp, otmp);
-     				otmp = mksobj(LEATHER_ARMOR, FALSE, FALSE);
+     				otmp = mksobj(LIGHT_ARMOR, FALSE, FALSE);
      				curse(otmp);
      				otmp->oeroded = 1;
      				(void) mpickobj(mtmp, otmp);
@@ -826,9 +826,9 @@ register struct monst *mtmp;
                     6 + mongets(mtmp, (rn2(3)) ? SPLINT_MAIL : BANDED_MAIL);
             else if (rn2(5))
                 mac += 3 + mongets(mtmp, (rn2(3)) ? RING_MAIL
-                                                  : STUDDED_LEATHER_ARMOR);
+                                                  : STUDDED_ARMOR);
             else
-                mac += 2 + mongets(mtmp, LEATHER_ARMOR);
+                mac += 2 + mongets(mtmp, LIGHT_ARMOR);
 
             if (mac < 10 && rn2(3))
                 mac += 1 + mongets(mtmp, HELMET);
@@ -843,9 +843,9 @@ register struct monst *mtmp;
             else if (mac < 10 && rn2(2))
                 mac += 2 + mongets(mtmp, HIGH_BOOTS);
             if (mac < 10 && rn2(3))
-                mac += 1 + mongets(mtmp, LEATHER_GLOVES);
+                mac += 1 + mongets(mtmp, GLOVES);
             else if (mac < 10 && rn2(2))
-                mac += 1 + mongets(mtmp, LEATHER_CLOAK);
+                mac += 1 + mongets(mtmp, PLAIN_CLOAK);
 
             nhUse(mac); /* suppress 'dead increment' from static analyzer */
 
