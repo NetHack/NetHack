@@ -3106,6 +3106,7 @@ struct obj *no_wish;
                  * if chain */
                 break;
         }
+        bp += l;
     }
     if (!cnt)
         cnt = 1; /* will be changed to 2 if makesingular() changes string */
