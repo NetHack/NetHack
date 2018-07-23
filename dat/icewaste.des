@@ -56,6 +56,8 @@ MONSTER: ('Z',"draugr"),random
 # Boss
 MONSTER: ('Q',"Failure Eidolon"),(66,8)
 OBJECT: ('(',"Orb of Permafrost"),(66,8)
+# Guaranteed pair of earmuffs
+OBJECT: ('[',"Earmuff"),(66,10)
 # Loot
 OBJECT:random,random
 OBJECT:random,random

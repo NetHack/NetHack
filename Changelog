@@ -3,7 +3,64 @@
 A full list of differences in SpliceHack from vanilla NetHack can be found on
 the wiki. This file documents the changes in each version of SpliceHack.
 
-                    Version 4.0 - QOL and Life Improvement
+                    Version 0.4.1 - Fun and Features
+
+Balance Changes
+- Nerfed lamassu damage output.
+- Disabled dungeon crumbling feature. This may be reinstated upon feedback.
+
+Role and Race Changes
+- Infernals use their own race tag, which changes their class selection
+  slightly (infernal pirates are now playable).
+- Pirates no longer always get a message about rising as skeletal pirates.
+
+Dungeon Changes
+- New branch: Ice wastes. A creepy level covered in ice and snow, with an orb
+  of permafrost at the end. This level is important in that it also has a
+  guaranteed pair of earmuffs, so it is much easier to find something for
+  sonic resistance during a run.
+- New branch: Mysterious laboratory. This laboratory is run by mind flayers, and
+  they are not thrilled to be interrupted.
+
+New Monsters (12)
+- Failure Eidolon, a unique monster appearing in the ice wastes. It can
+  teleport the player.
+- Ancient Brain, a unique monster appearing in the laboratory. It cannot move,
+  but can fire psychic rays and cast spells.
+- Nuckelavee, a new type of demon with poison breath.
+- Cheshire cats. They are very rare and only spawn in Gehennom. They have
+  displacement, and making them invisible gives YAFM.
+- Ported SLASH'EM's Zouthern animals, of which there are eight. Some of these
+  animals have had their damage output nerfed from SLASH'EM in order to match
+  the balance of SpliceHack.
+- Animated statues have been completely removed and replaced with chess rooks,
+  which like grid bugs can only move in straight lines.
+
+New Objects (1)
+- Orb of permafrost, an orb that causes an icy explosion when thrown.
+
+Miscelaneous Changes
+- All monsters can potentially gain intrinsics by eating, not just pets. This
+  makes gelationous cubes and tasmanian devils slightly more dangerous since
+  they consume everything in their path.
+- Monsters can now use magic flutes and rarely drums of earthquake.
+- Updated the database with many new monsters.
+- YAFM when a tornado engulfs a Cartomancer (Luxidream).
+- Pets now produce a message when they level up.
+- Ants now have a special sound when #chatted with.
+- Added a few more monsters to summon nasties.
+
+Bug Fixes
+- Fixed doors being rendered in the wrong color.
+- Updated to current version of vanilla NetHack.
+- Fixed health food stores causing segfaults (msearle5).
+- Monsters with steeds and ridden monsters no longer follow you to other levels,
+  thus preventing a number of segfaults and bugs.
+- Spellcasters with no arms no longer point at you before cursing.
+- Fixed some monster sound bugs.
+- Monsters now actually attempt to throw their throwing axes.
+
+                    Version 0.4.0 - QOL and Life Improvement
 
 Major Patches
 - Implemented a heavily modified version of the descriptive hit messages patch
