@@ -1137,6 +1137,8 @@ register struct trobj *trop;
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
+            /* Don't allow materials to be start scummed for */
+            obj->material = objects[obj->otyp].oc_material;
         } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;
             static NEARDATA short nocreate2 = STRANGE_OBJECT;
@@ -1184,7 +1186,8 @@ register struct trobj *trop;
                 obj = mkobj(trop->trclass, FALSE);
                 otyp = obj->otyp;
             }
-
+            /* Don't allow materials to be start scummed for */
+            obj->material = objects[obj->otyp].oc_material;
             /* Don't start with +0 or negative rings */
             if (objects[otyp].oc_charged && obj->spe <= 0)
                 obj->spe = rne(3);
