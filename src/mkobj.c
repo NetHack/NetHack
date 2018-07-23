@@ -2894,19 +2894,6 @@ struct obj *otmp2;
     }
 }
 
-/* Object material probabilities. */
-static const struct icp iron_materials[] = {
-    {80, IRON},
-    {5, WOOD},
-    {5, SILVER},
-    {3, COPPER},
-    {3, MITHRIL},
-    {1, GOLD},
-    {1, BONE},
-    {1, GLASS},
-    {1, PLASTIC}
-};
-
 /* for objects which are normally iron or metal */
 static const struct icp metal_materials[] = {
     {80, IRON},
@@ -2918,6 +2905,19 @@ static const struct icp metal_materials[] = {
     { 1, BONE},
     { 1, GLASS},
     { 1, PLASTIC}
+};
+
+/* Reflectable items - currently just the shield of reflection, but anything
+ * that can hold a polish */
+static const struct icp shiny_materials[] = {
+    {30, SILVER},
+    {20, COPPER},
+    {10, GOLD},
+    {10, IRON}, /* stainless steel */
+    {10, GLASS},
+    { 7, MITHRIL},
+    { 5, METAL}, /* aluminum, or similar */
+    { 2, PLATINUM}
 };
 
 /* for objects which are normally wooden */
@@ -2974,6 +2974,19 @@ struct obj* obj;
 {
     unsigned short otyp = obj->otyp;
     int default_material = objects[otyp].oc_material;
+    /* Special exceptions - where we ALWAYS want an object to use its base
+     * material regardless of other cases in this function - go here.
+     * Return NULL so that init_obj_material and valid_obj_material both work
+     * properly. */
+    if (otyp == BULLWHIP) {
+        return NULL;
+    }
+
+    /* Otherwise, select an appropriate list, or return NULL if no appropriate
+     * list exists. */
+    if (otyp == SHIELD_OF_REFLECTION) {
+        return shiny_materials;
+    }
     if (is_elven_obj(obj) && default_material != CLOTH) {
         if (otyp == ELVEN_HELM) {
             return elvenhelm_materials;
@@ -2989,14 +3002,12 @@ struct obj* obj;
              || obj->oclass == ARMOR_CLASS
              || obj->otyp == CHEST || obj->otyp == LARGE_BOX) {
         if (default_material == IRON || default_material == METAL) {
-            return iron_materials;
+            return metal_materials;
         }
         else if (default_material == WOOD) {
             return wood_materials;
-        }
-    }
-    else if (default_material == CLOTH || default_material == LEATHER) {
-            return unrigid_materials;
+        } else if (default_material == CLOTH || default_material == LEATHER) {
+                return unrigid_materials;
         }
     }
     return NULL;
