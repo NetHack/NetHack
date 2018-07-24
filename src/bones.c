@@ -85,6 +85,10 @@ boolean restore;
             } else if (has_oname(otmp)) {
                 sanitize_name(ONAME(otmp));
             }
+            /* prevent materials from differing on things like rings */
+            if (!valid_obj_material(otmp, otmp->material)) {
+                otmp->material = objects[otmp->otyp].oc_material;
+            }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
 
