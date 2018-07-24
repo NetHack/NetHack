@@ -503,8 +503,12 @@ register struct monst *mtmp;
                 (void) mongets(mtmp, SLING);
                 break;
             }
-            if (!rn2(10))
-                (void) mongets(mtmp, ELVEN_CHAIN_MAIL);
+            if (!rn2(10)) {
+                 (void) mongets(mtmp, ELVEN_CHAIN_MAIL);
+                struct obj* mail = m_carrying(mtmp, ELVEN_CHAIN_MAIL);
+                if (mail)
+                    mail->material = MITHRIL;
+            }
             if (!rn2(10))
                 (void) mongets(mtmp, DWARVISH_CLOAK);
         } else if (is_dwarf(ptr)) {
