@@ -3,7 +3,10 @@
 A full list of differences in SpliceHack from vanilla NetHack can be found on
 the wiki. This file documents the changes in each version of SpliceHack.
 
-                    Version 0.4.1 - Fun and Features
+                    Version 0.5.0 - Balance and the Bizarre
+
+Patches Introduced
+- SpliceHack now uses xnethack's object materials patch.
 
 Balance Changes
 - Nerfed lamassu damage output.
@@ -17,7 +20,9 @@ Balance Changes
 
 Role and Race Changes
 - Infernals use their own race tag, which changes their class selection
-  slightly (infernal pirates are now playable).
+  slightly.
+- Silver items generate more often for infernal characters, making the role
+  much more harrowing to play.
 - Infernals are now fire resistant instead of having infravision.
 - Pirates no longer always get a message about rising as skeletal pirates.
 
