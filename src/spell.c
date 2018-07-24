@@ -273,6 +273,14 @@ struct obj *book2;
                 if (!(mvitals[pm].mvflags & G_EXTINCT)) {
                     mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
                     mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
+                    if (mtmp->data->mflags3 & M3_WANTSAMUL) {
+                        pline("BANG");
+                        mtmp->data->mflags3 &= ~M3_WANTSAMUL;
+                    }
+                    if (mtmp->data->mflags3 & ~M3_WANTSBOOK)
+                        mtmp->data->mflags3 &= ~M3_WANTSBOOK;
+                    if (mtmp->data->mflags3 & M3_WAITFORU)
+                        mtmp->data->mflags3 &= ~M3_WAITFORU;
                     /* based on muse.c code */
                     d_level flev;
                     get_level(&flev, 1 + rn2(depth(&u.uz)));
