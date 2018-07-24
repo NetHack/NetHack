@@ -597,8 +597,8 @@ toofar:
 
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
-        || (mdat->mlet == S_LEPRECHAUN && !findgold(invent)
-            && (findgold(mtmp->minvent) || rn2(2)))
+        || (mdat->mlet == S_LEPRECHAUN && !findgold(invent, FALSE)
+            && (findgold(mtmp->minvent, FALSE) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
         || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
         /* Possibly cast an undirected spell if not attacking you */
@@ -986,9 +986,9 @@ not_special:
             appr = 0;
 
         if (monsndx(ptr) == PM_LEPRECHAUN && (appr == 1)
-            && ((lepgold = findgold(mtmp->minvent))
+            && ((lepgold = findgold(mtmp->minvent, TRUE))
                 && (lepgold->quan
-                    > ((ygold = findgold(invent)) ? ygold->quan : 0L))))
+                    > ((ygold = findgold(invent, TRUE)) ? ygold->quan : 0L))))
             appr = -1;
 
         if (!should_see && can_track(ptr)) {

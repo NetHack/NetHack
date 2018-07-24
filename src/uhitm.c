@@ -1789,14 +1789,20 @@ register struct attack *mattk;
         /* This you as a leprechaun, so steal
            real gold only, no lesser coins */
         {
-            struct obj *mongold = findgold(mdef->minvent);
+            struct obj *mongold = findgold(mdef->minvent, FALSE);
             if (mongold) {
                 obj_extract_self(mongold);
                 if (merge_choice(invent, mongold) || inv_cnt(FALSE) < 52) {
                     addinv(mongold);
-                    Your("purse feels heavier.");
+                    if (mongold->otyp == GOLD_PIECE) {
+                        Your("purse feels heavier.");
+                    }
+                    else {
+                        You("steal %s's %s.", mon_nam(mdef), xname(mongold));
+                    }
                 } else {
-                    You("grab %s's gold, but find no room in your knapsack.",
+                    You("grab %s's %s, but find no room in your knapsack.",
+                        (mongold->otyp == GOLD_PIECE ? "gold" : xname(mongold)),
                         mon_nam(mdef));
                     dropy(mongold);
                 }

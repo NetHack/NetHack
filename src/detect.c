@@ -308,7 +308,8 @@ register struct obj *sobj;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue; /* probably not needed in this case but... */
-        if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
+            if (findgold(mtmp->minvent, TRUE)
+                || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
             if (mtmp == u.usteed) {
                 steedgold = TRUE;
             } else {
@@ -399,7 +400,8 @@ outgoldmap:
         if (DEADMONSTER(mtmp))
             continue; /* probably overkill here */
         temp = 0;
-        if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
+        if (findgold(mtmp->minvent, TRUE)
+            || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
             gold = zeroobj; /* ensure oextra is cleared too */
             gold.otyp = GOLD_PIECE;
             gold.quan = (long) rnd(10); /* usually more than 1 */
@@ -651,7 +653,8 @@ int class;            /* an object class, 0 for all */
         }
         if ((is_cursed && mtmp->m_ap_type == M_AP_OBJECT
              && (!class || class == objects[mtmp->mappearance].oc_class))
-            || (findgold(mtmp->minvent) && (!class || class == COIN_CLASS))) {
+             || (findgold(mtmp->minvent, TRUE)
+                && (!class || class == COIN_CLASS))) {
             ct++;
             break;
         }
@@ -735,7 +738,7 @@ int class;            /* an object class, 0 for all */
             temp.oy = mtmp->my;
             temp.corpsenm = PM_TENGU; /* if mimicing a corpse */
             map_object(&temp, 1);
-        } else if (findgold(mtmp->minvent)
+        } else if (findgold(mtmp->minvent, TRUE)
                    && (!class || class == COIN_CLASS)) {
             struct obj gold;
 
