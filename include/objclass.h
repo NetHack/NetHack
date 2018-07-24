@@ -28,7 +28,8 @@ enum obj_material_types {
     PLASTIC,
     GLASS,
     GEMSTONE,
-    MINERAL
+    MINERAL,
+    NUM_MATERIAL_TYPES
 };
 
 enum obj_armor_types {
@@ -76,19 +77,17 @@ struct objclass {
 
     Bitfield(oc_material, 5); /* one of obj_material_types */
 
-#define is_organic(otmp) (objects[otmp->otyp].oc_material <= WOOD)
+#define is_organic(otmp) (otmp->material <= WOOD)
 #define is_metallic(otmp)                    \
-    (objects[otmp->otyp].oc_material >= IRON \
-     && objects[otmp->otyp].oc_material <= MITHRIL)
+    (otmp->material >= IRON && otmp->material <= MITHRIL)
 
 /* primary damage: fire/rust/--- */
 /* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
-#define is_rustprone(otmp) (objects[otmp->otyp].oc_material == IRON)
+#define is_rustprone(otmp) (otmp->material == IRON)
 
 /* secondary damage: rot/acid/acid */
 #define is_corrodeable(otmp)                   \
-    (objects[otmp->otyp].oc_material == COPPER \
-     || objects[otmp->otyp].oc_material == IRON)
+    (otmp->material == COPPER || otmp->material == IRON)
 
 #define is_damageable(otmp)                                        \
     (is_rustprone(otmp) || is_flammable(otmp) || is_rottable(otmp) \

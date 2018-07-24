@@ -103,11 +103,12 @@ struct obj {
     Bitfield(nomerge, 1);    /* set temporarily to prevent merging */
     Bitfield(was_thrown, 1); /* thrown by hero since last picked up */
 
+    Bitfield(material, 5); /* material this obj is made of */
     Bitfield(in_use, 1); /* for magic items before useup items */
     Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
     Bitfield(cknown, 1); /* contents of container assumed to be known */
     Bitfield(lknown, 1); /* locked/unlocked status is known */
-    /* 4 free bits */
+    /* 7 free bits */
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */
 #define leashmon corpsenm /* gets m_id of attached pet */
@@ -227,18 +228,19 @@ struct obj {
 #define is_suit(otmp) \
     (otmp->oclass == ARMOR_CLASS && objects[otmp->otyp].oc_armcat == ARM_SUIT)
 #define is_elven_armor(otmp)                                              \
-    ((otmp)->otyp == ELVEN_LEATHER_HELM                                   \
-     || (otmp)->otyp == ELVEN_MITHRIL_COAT || (otmp)->otyp == ELVEN_CLOAK \
-     || (otmp)->otyp == ELVEN_SHIELD || (otmp)->otyp == ELVEN_BOOTS)
+    ((otmp)->otyp == ELVEN_HELM || (otmp)->otyp == ELVEN_CLOAK           \
+     || (otmp)->otyp == ELVEN_SHIELD || (otmp)->otyp == ELVEN_BOOTS \
+     || (otmp)->otyp == ELVEN_RING_MAIL)
 #define is_orcish_armor(otmp)                                            \
     ((otmp)->otyp == ORCISH_HELM || (otmp)->otyp == ORCISH_CHAIN_MAIL    \
      || (otmp)->otyp == ORCISH_RING_MAIL || (otmp)->otyp == ORCISH_CLOAK \
-     || (otmp)->otyp == URUK_HAI_SHIELD || (otmp)->otyp == ORCISH_SHIELD)
+     || (otmp)->otyp == URUK_HAI_SHIELD || (otmp)->otyp == ORCISH_SHIELD \
+     || (otmp)->otyp == ORCISH_RING_MAIL)
 #define is_dwarvish_armor(otmp)               \
-    ((otmp)->otyp == DWARVISH_IRON_HELM       \
-     || (otmp)->otyp == DWARVISH_MITHRIL_COAT \
+    ((otmp)->otyp == DWARVISH_HELM           \
      || (otmp)->otyp == DWARVISH_CLOAK        \
-     || (otmp)->otyp == DWARVISH_ROUNDSHIELD)
+     || (otmp)->otyp == DWARVISH_ROUNDSHIELD \
+     || (otmp)->otyp == DWARVISH_RING_MAIL)
 #define is_gnomish_armor(otmp) (FALSE)
 
 /* Eggs and other food */
@@ -332,10 +334,13 @@ struct obj {
     ((obj)->otyp == LUCKSTONE || (obj)->otyp == LOADSTONE \
      || (obj)->otyp == FLINT || (obj)->otyp == TOUCHSTONE)
 
+/* worthless glass -- assumes all GLASS * are worthless glass */
+#define is_worthless_glass(obj) \
+    ((obj)->oclass == GEM_CLASS && obj->material == GLASS)
+
 /* misc helpers, simple enough to be macros */
 #define is_flimsy(otmp)                           \
-    (objects[(otmp)->otyp].oc_material <= LEATHER \
-     || (otmp)->otyp == RUBBER_HOSE)
+    (otmp->material <= LEATHER || (otmp)->otyp == RUBBER_HOSE)
 #define is_plural(o) \
     ((o)->quan != 1L                                                    \
      /* "the Eyes of the Overworld" are plural, but                     \

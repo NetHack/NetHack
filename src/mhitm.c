@@ -424,8 +424,8 @@ register struct monst *magr, *mdef;
                 res[i] = hitmm(magr, mdef, mattk);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
                      || mdef->data == &mons[PM_BROWN_PUDDING])
-                    && (otmp && (objects[otmp->otyp].oc_material == IRON
-                                 || objects[otmp->otyp].oc_material == METAL))
+                    && (otmp && (otmp->material == IRON
+                                 || otmp->material == METAL))
                     && mdef->mhp > 1
                     && !mdef->mcan) {
                     if (clone_mon(mdef, 0, 0)) {
@@ -1295,23 +1295,24 @@ register struct attack *mattk;
          * between mdef's feet...
          */
         {
-            struct obj *gold = findgold(mdef->minvent);
+            struct obj *gold = findgold(mdef->minvent, FALSE);
 
             if (!gold)
                 break;
+            /* print first so yname prints proper monster */
+            if (vis && canseemon(mdef)) {
+                Strcpy(buf, Monnam(magr));
+                pline("%s steals %s.", buf, distant_name(gold, yname));
+            }
             obj_extract_self(gold);
             add_to_minv(magr, gold);
-        }
-        mdef->mstrategy &= ~STRAT_WAITFORU;
-        if (vis && canseemon(mdef)) {
-            Strcpy(buf, Monnam(magr));
-            pline("%s steals some gold from %s.", buf, mon_nam(mdef));
-        }
-        if (!tele_restrict(magr)) {
-            boolean couldspot = canspotmon(magr);
-            (void) rloc(magr, TRUE);
-            if (vis && couldspot && !canspotmon(magr))
-                pline("%s suddenly disappears!", buf);
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            if (!tele_restrict(magr)) {
+                boolean couldspot = canspotmon(magr);
+                (void) rloc(magr, TRUE);
+                if (vis && couldspot && !canspotmon(magr))
+                    pline("%s suddenly disappears!", buf);
+            }
         }
         break;
     case AD_DRLI:

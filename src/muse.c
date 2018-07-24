@@ -2113,7 +2113,7 @@ struct monst *mtmp;
                 pline_The("whip slips free."); /* not `The_whip' */
                 return 1;
             } else if (where_to == 3 && mon_hates_silver(mtmp)
-                       && objects[obj->otyp].oc_material == SILVER) {
+                       && obj->material == SILVER) {
                 /* this monster won't want to catch a silver
                    weapon; drop it at hero's feet instead */
                 where_to = 2;

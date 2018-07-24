@@ -708,7 +708,7 @@ OBJECT:(')',"arrow"),(18,08)
 OBJECT:(')',"arrow"),(18,09)
 OBJECT:(')',"arrow"),(18,10)
 IF [20%] {
-  OBJECT:(')',"silver arrow"),(18,07)
+  OBJECT:(')',"arrow"),(18,07)
 }
 IF [20%] {
   OBJECT:(')',"elven arrow"),(18,08),blessed,+2
@@ -717,7 +717,7 @@ IF [20%] {
   OBJECT:(')',"elven arrow"),(18,09),blessed,+3
 }
 IF [20%] {
-  OBJECT:(')',"silver arrow"),(18,10)
+  OBJECT:(')',"arrow"),(18,10)
 }
 OBJECT:(')',"bow"),(18,07),blessed,+1
 OBJECT:(')',"elven bow"),(18,08),blessed,+0

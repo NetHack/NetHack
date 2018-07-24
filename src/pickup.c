@@ -1691,6 +1691,11 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
     }
     cobj->lknown = 1;
 
+    if (cobj->material == SILVER && Hate_silver) {
+            pline("The silver lid burns your flesh!");
+            losehp(rnd(20), "opening a silver container", KILLED_BY);
+    }
+
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
 

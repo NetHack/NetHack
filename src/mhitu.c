@@ -973,6 +973,12 @@ struct monst *mon;
         /* a_can field is only applicable for armor (which must be worn) */
         if ((o->owornmask & W_ARMOR) != 0L) {
             armpro = objects[o->otyp].a_can;
+            /* mithril armor grants MC 2 even if it has a different base
+             * material */
+            if (((o->owornmask & W_ARM) || (o->owornmask & W_ARMC))
+                && o->material == MITHRIL && armpro < 2) {
+                armpro = 2;
+            }
             if (armpro > mc)
                 mc = armpro;
         }
@@ -1107,9 +1113,14 @@ register struct attack *mattk;
                 if (!(otmp->oartifact
                       && artifact_hit(mtmp, &youmonst, otmp, &dmg, dieroll)))
                     hitmsg(mtmp, mattk);
+
+                /* glass breakage from the attack */
+                break_glass_obj(MON_WEP(mtmp));
+                break_glass_obj(some_armor(&youmonst));
+
                 if (!dmg)
                     break;
-                if (objects[otmp->otyp].oc_material == SILVER
+                if (otmp->material == SILVER
                     && Hate_silver) {
                     pline_The("silver sears your flesh!");
                     exercise(A_CON, FALSE);
@@ -1124,9 +1135,9 @@ register struct attack *mattk;
                 if (tmp < 1)
                     tmp = 1;
                 if (u.mh - tmp > 1
-                    && (objects[otmp->otyp].oc_material == IRON
+                    && (otmp->material == IRON
                         /* relevant 'metal' objects are scalpel and tsurugi */
-                        || objects[otmp->otyp].oc_material == METAL)
+                        || otmp->material == METAL)
                     && (u.umonnum == PM_BLACK_PUDDING
                         || u.umonnum == PM_BROWN_PUDDING)) {
                     if (tmp > 1)
@@ -1401,7 +1412,7 @@ register struct attack *mattk;
         } else {
             if (uarmf) {
                 if (rn2(2) && (uarmf->otyp == LOW_BOOTS
-                               || uarmf->otyp == IRON_SHOES)) {
+                               || uarmf->otyp == DWARVISH_BOOTS)) {
                     pline("%s pricks the exposed part of your %s %s!",
                           Monst_name, sidestr, leg);
                 } else if (!rn2(5)) {
@@ -1888,6 +1899,35 @@ register struct attack *mattk;
     default:
         dmg = 0;
         break;
+    }
+    /* handle silver gloves for touch attacks */
+    switch(mattk->aatyp) {
+    case AT_WEAP:
+        if (mon_currwep)
+            break;
+        /* FALLTHRU */
+    case AT_CLAW:
+    case AT_TUCH:
+    case AT_HUGS:
+        {
+            struct obj *marmg = which_armor(mtmp, W_ARMG);
+            if (marmg && marmg->material == SILVER && Hate_silver) {
+                /* assume that marmg is plural */
+                pline("%s sear your flesh!", upstart(yname(marmg)));
+                exercise(A_CON, FALSE);
+                dmg += rnd(20);
+            }
+        }
+        break;
+    case AT_KICK:
+        {
+            struct obj * marmf = which_armor(mtmp, W_ARMF);
+            if (marmf && marmf->material == SILVER && Hate_silver) {
+                pline("%s sear your flesh!", upstart(yname(marmf)));
+                exercise(A_CON, FALSE);
+                dmg += rnd(20);
+            }
+        }
     }
     if ((Upolyd ? u.mh : u.uhp) < 1) {
         /* already dead? call rehumanize() or done_in_by() as appropriate */

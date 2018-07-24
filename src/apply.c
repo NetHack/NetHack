@@ -2618,7 +2618,7 @@ struct obj *tstone;
             return;
         } else {
             /* either a ring or the touchstone was not effective */
-            if (objects[obj->otyp].oc_material == GLASS) {
+            if (obj->material == GLASS) {
                 do_scratch = TRUE;
                 break;
             }
@@ -2627,7 +2627,7 @@ struct obj *tstone;
         break; /* gem or ring */
 
     default:
-        switch (objects[obj->otyp].oc_material) {
+        switch (obj->material) {
         case CLOTH:
             pline("%s a little more polished now.", Tobjnam(tstone, "look"));
             return;

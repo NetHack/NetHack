@@ -1466,13 +1466,13 @@ dosacrifice()
             value = monstr[otmp->corpsenm] + 1;
             if (otmp->oeaten)
                 value = eaten_stat(value, otmp);
-            if (uwep && uwep->otyp == BONE_KNIFE) {
+            if (uwep && uwep->otyp == SACRIFICIAL_KNIFE) {
                 value += 2;
             }
         }
 
         if (your_race(ptr) || (uwep &&
-            uwep->otyp == BONE_KNIFE && uwep->cursed)) {
+            uwep->otyp == SACRIFICIAL_KNIFE && uwep->cursed)) {
             if (is_demon(youmonst.data)) {
                 You("find the idea very satisfying.");
                 exercise(A_WIS, TRUE);

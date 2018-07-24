@@ -547,6 +547,7 @@ E int FDECL(hero_breaks, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E int FDECL(breaks, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(release_camera_demon, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(breakobj, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P, BOOLEAN_P));
+E void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
 E boolean FDECL(breaktest, (struct obj *));
 E boolean FDECL(walk_path, (coord *, coord *,
                             boolean (*)(genericptr, int, int), genericptr_t));
@@ -1335,6 +1336,7 @@ E struct monst *FDECL(get_mtraits, (struct obj *, BOOLEAN_P));
 E struct obj *FDECL(mk_tt_object, (int, int, int));
 E struct obj *FDECL(mk_named_object,
                     (int, struct permonst *, int, int, const char *));
+E int FDECL(material_bonus, (struct obj*));
 E struct obj *FDECL(rnd_treefruit_at, (int, int));
 E void FDECL(set_corpsenm, (struct obj *, int));
 E void FDECL(start_corpse_timeout, (struct obj *));
@@ -1365,6 +1367,7 @@ E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
 E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
 E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
 E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
+E boolean FDECL(valid_obj_material, (struct obj *, int));
 
 /* ### mkroom.c ### */
 
@@ -2366,7 +2369,7 @@ E void FDECL(maybe_absorb_item, (struct monst *, struct obj *, int, int));
 E void FDECL(mdrop_obj, (struct monst *, struct obj *, BOOLEAN_P));
 E void FDECL(mdrop_special_objs, (struct monst *));
 E void FDECL(relobj, (struct monst *, int, BOOLEAN_P));
-E struct obj *FDECL(findgold, (struct obj *));
+E struct obj *FDECL(findgold, (struct obj *, BOOLEAN_P));
 
 /* ### steed.c ### */
 
@@ -2542,6 +2545,7 @@ E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
                       UCHAR_P, BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *, struct obj *, struct attack *));
+E boolean FDECL(break_glass_obj, (struct obj *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *, struct obj *));
 E void FDECL(light_hits_gremlin, (struct monst *, int));

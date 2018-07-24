@@ -376,24 +376,44 @@ unsigned corpseflags;
         break;
     case PM_SILVER_GOLEM:
         num = d(1, 2);
-        while (num--)
-            obj = mksobj_at(SILVER_DAGGER, x, y, TRUE, FALSE);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, SILVER)) {
+                delobj(obj);
+                obj = mksobj_at(DAGGER, x, y, TRUE, FALSE);
+            }
+            obj->material = SILVER;
+        }
         free_mname(mtmp); /* don't christen obj */
         break;
     case PM_IRON_GOLEM:
         num = d(2, 6);
-        while (num--)
-            obj = mksobj_at(IRON_CHAIN, x, y, TRUE, FALSE);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, IRON)) {
+                delobj(obj);
+                obj = mksobj_at(IRON_CHAIN, x, y, TRUE, FALSE);
+            }
+            obj->material = IRON;
+        }
         free_mname(mtmp); /* don't christen obj */
         break;
     case PM_GLASS_GOLEM:
         num = d(2, 4); /* very low chance of creating all glass gems */
-        while (num--)
-            obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, GLASS)
+                || obj->oclass == POTION_CLASS) {
+                delobj(obj);
+                obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
+            }
+            obj->material = GLASS;
+        }
         free_mname(mtmp);
         break;
     case PM_CLAY_GOLEM:
     case PM_SLUDGE_GOLEM:
+        /* TODO: Other material? */
         obj = mksobj_at(ROCK, x, y, FALSE, FALSE);
         obj->quan = (long) (rn2(20) + 50);
         obj->owt = weight(obj);
@@ -408,25 +428,51 @@ unsigned corpseflags;
     case PM_WOOD_GOLEM:
         num = d(2, 4);
         while (num--) {
-            obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, WOOD)) {
+                delobj(obj);
+                obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
+            }
+            obj->material = WOOD;
         }
         free_mname(mtmp);
         break;
     case PM_LEATHER_GOLEM:
         num = d(2, 4);
-        while (num--)
-            obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, LEATHER)) {
+                delobj(obj);
+                obj = mksobj_at(LIGHT_ARMOR, x, y, TRUE, FALSE);
+            }
+            obj->material = LEATHER;
+        }
         free_mname(mtmp);
         break;
     case PM_GOLD_GOLEM:
         /* Good luck gives more coins */
-        obj = mkgold((long) (200 - rnl(101)), x, y);
+        num = d(2, 4);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, GOLD)) {
+                delobj(obj);
+                obj = mkgold(50 + rnd(100), x, y);
+            }
+            obj->material = GOLD;
+        }
         free_mname(mtmp);
         break;
     case PM_PAPER_GOLEM:
         num = rnd(4);
-        while (num--)
-            obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
+        while (num--) {
+            obj = mkobj_at(RANDOM_CLASS, x, y, FALSE);
+            if (!valid_obj_material(obj, PAPER) || obj->oclass == SCROLL_CLASS
+                || obj->oclass == SPBOOK_CLASS) {
+                delobj(obj);
+                obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
+            }
+            obj->material = PAPER;
+        }
         free_mname(mtmp);
         break;
     /* expired puddings will congeal into a large blob;
@@ -1060,7 +1106,7 @@ register struct monst *mtmp;
     int mat_idx;
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
-        mat_idx = objects[gold->otyp].oc_material;
+        mat_idx = gold->material;
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
