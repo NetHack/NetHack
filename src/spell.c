@@ -273,10 +273,8 @@ struct obj *book2;
                 if (!(mvitals[pm].mvflags & G_EXTINCT)) {
                     mtmp = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS);
                     mtmp->mpeaceful = mtmp->minvis = mtmp->perminvis = 0;
-                    if (mtmp->data->mflags3 & M3_WANTSAMUL) {
-                        pline("BANG");
+                    if (mtmp->data->mflags3 & M3_WANTSAMUL)
                         mtmp->data->mflags3 &= ~M3_WANTSAMUL;
-                    }
                     if (mtmp->data->mflags3 & ~M3_WANTSBOOK)
                         mtmp->data->mflags3 &= ~M3_WANTSBOOK;
                     if (mtmp->data->mflags3 & M3_WAITFORU)
