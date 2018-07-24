@@ -3001,10 +3001,12 @@ struct obj* obj;
          * Return NULL so that init_obj_material and valid_obj_material both
          * work properly. */
         case BULLWHIP:
+        case QUILL:
             return NULL;
         /* Any other cases for specific object types go here. */
         case SHIELD_OF_RESONANCE:
         case SHIELD_OF_REFLECTION:
+        case ORNATE_MACE:
             return shiny_materials;
         case BOW:
         case ELVEN_BOW:
@@ -3013,13 +3015,14 @@ struct obj* obj;
             return bow_materials;
         case ELVEN_HELM:
             return elvenhelm_materials;
-            case CHEST:
-            case LARGE_BOX:
-                return wood_materials;
-            case SKELETON_KEY:
-            case LOCK_PICK:
-            case TIN_OPENER:
-                return metal_materials;
+        case CHEST:
+        case LARGE_BOX:
+        case MASK:
+            return wood_materials;
+        case SKELETON_KEY:
+        case LOCK_PICK:
+        case TIN_OPENER:
+            return metal_materials;
         default:
             break;
     }
