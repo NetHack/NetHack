@@ -876,7 +876,7 @@ char *prefix;
 
     rknown = (iflags.override_ID == 0) ? obj->rknown : TRUE;
 
-    if (!is_damageable(obj) && !iscrys)
+    if (!is_damageable(obj) && !(obj->material == GLASS) && !iscrys)
         return;
 
     /* The only cases where any of these bits do double duty are for
@@ -904,16 +904,18 @@ char *prefix;
         }
         Strcat(prefix, is_corrodeable(obj) ? "corroded " : "rotted ");
     }
-    if (rknown && obj->oerodeproof)
-        Strcat(prefix, iscrys
-                          ? "fixed "
-                          : is_rustprone(obj)
-                             ? "rustproof "
-                             : is_corrodeable(obj)
-                                ? "corrodeproof " /* "stainless"? */
-                                : is_flammable(obj)
-                                   ? "fireproof "
-                                   : "");
+    if (rknown && obj->oerodeproof) {
+        if (iscrys)
+            Strcat(prefix, "fixed ");
+        else if (obj->material == GLASS)
+            Strcat(prefix, "shatterproof ");
+        else if (is_rustprone(obj))
+            Strcat(prefix, "rustproof ");
+        else if (is_corrodeable(obj))
+            Strcat(prefix, "corrodeproof ");
+        else if (is_flammable(obj))
+            Strcat(prefix, "fireproof ");
+    }
 }
 
 /* used to prevent rust on items where rust makes no difference */
@@ -3013,7 +3015,8 @@ struct obj *no_wish;
                    || !strncmpi(bp, "corrodeproof ", l = 13)
                    || !strncmpi(bp, "fixed ", l = 6)
                    || !strncmpi(bp, "fireproof ", l = 10)
-                   || !strncmpi(bp, "rotproof ", l = 9)) {
+                   || !strncmpi(bp, "rotproof ", l = 9)
+                   || !strncmpi(bp, "shatterproof ", l = 13)) {
             erodeproof = 1;
         } else if (!strncmpi(bp, "lit ", l = 4)
                    || !strncmpi(bp, "burning ", l = 8)) {

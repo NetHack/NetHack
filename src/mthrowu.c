@@ -137,7 +137,12 @@ int x, y;
                     && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
         int objgone = 0;
 
-        if (down_gate(x, y) != -1)
+        if (!IS_SOFT(levl[x][y].typ) && breaktest(obj)) {
+            breakmsg(obj, cansee(x, y));
+            breakobj(obj, x, y, FALSE, FALSE);
+            objgone = 1;
+        }
+        if (!objgone && down_gate(x, y) != -1)
             objgone = ship_object(obj, x, y, FALSE);
         if (!objgone) {
             if (!flooreffects(obj, x, y, "fall")) {

@@ -547,6 +547,7 @@ E int FDECL(hero_breaks, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E int FDECL(breaks, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(release_camera_demon, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(breakobj, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P, BOOLEAN_P));
+E void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
 E boolean FDECL(breaktest, (struct obj *));
 E boolean FDECL(walk_path, (coord *, coord *,
                             boolean (*)(genericptr, int, int), genericptr_t));
@@ -2544,6 +2545,7 @@ E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
                       UCHAR_P, BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *, struct obj *, struct attack *));
+E boolean FDECL(break_glass_obj, (struct obj *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
 E int FDECL(flash_hits_mon, (struct monst *, struct obj *));
 E void FDECL(light_hits_gremlin, (struct monst *, int));

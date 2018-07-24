@@ -1107,6 +1107,11 @@ register struct attack *mattk;
                 if (!(otmp->oartifact
                       && artifact_hit(mtmp, &youmonst, otmp, &dmg, dieroll)))
                     hitmsg(mtmp, mattk);
+
+                /* glass breakage from the attack */
+                break_glass_obj(MON_WEP(mtmp));
+                break_glass_obj(some_armor(&youmonst));
+
                 if (!dmg)
                     break;
                 if (otmp->material == SILVER
