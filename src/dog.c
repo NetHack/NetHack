@@ -607,6 +607,8 @@ boolean stairs;
         mtmp2 = mtmp->nmon;
         if (DEADMONSTER(mtmp))
             continue;
+        if ((mtmp->mextra && ERID(mtmp)) || mtmp->monmount)
+            continue;
         if (pets_only) {
             if (!mtmp->mtame)
                 continue; /* reject non-pets */
@@ -620,9 +622,7 @@ boolean stairs;
             mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
         }
-        if (((monnear(mtmp, u.ux, u.uy) &&
-            (levl_follower(mtmp) &&
-              !ERID(mtmp) && mtmp->monmount != 1))
+        if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp))
              /* the wiz will level t-port from anywhere to chase
                 the amulet; if you don't have it, will chase you
                 only if in range. -3. */
