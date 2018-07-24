@@ -513,7 +513,7 @@ boolean mkspecl;
         atype = get_shop_item((int) (shp - shtypes));
         if (atype == VEGETARIAN_CLASS)
             mkveggy_at(sx, sy);
-        if (Is_blackmarket(&u.uz)) {
+        else if (Is_blackmarket(&u.uz)) {
   	         if (!rn2(20)) return; /* leave an empty square */
              if (!rn2(10)) {
                 (void) mkobj_at(rn2(5) ? GEM_CLASS : TOOL_CLASS, sx, sy, TRUE);

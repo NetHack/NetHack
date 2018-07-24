@@ -187,6 +187,7 @@
 #define MH_GNOME M2_GNOME
 #define MH_ORC M2_ORC
 #define MH_WERE M2_WERE
+#define MH_DEMON M2_DEMON
 
 /* for mons[].geno (constant during game) */
 #define G_UNIQ 0x1000     /* generated only once */
