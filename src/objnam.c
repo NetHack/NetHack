@@ -3100,7 +3100,10 @@ struct obj *no_wish;
             gsize = (very != 1) ? 3 : 4;
         } else {
             /* check for materials */
-            if (!strncmpi(bp, "silver dragon", l = 13)) {
+            if (!strncmpi(bp, "silver dragon", l = 13)
+                || !strcmp(bp, "silver ring")
+                || !strcmp(bp, "gold ring")
+                || !strcmp(bp, "gold")) {
                 /* hack so that silver dragon scales/mail doesn't get
                  * interpreted as silver */
                 break;
