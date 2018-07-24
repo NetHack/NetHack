@@ -975,7 +975,7 @@ struct monst *mon;
             armpro = objects[o->otyp].a_can;
             /* mithril armor grants MC 2 even if it has a different base
              * material */
-            if ((o->owornmask & (W_ARM | W_ARMC) != 0)
+            if (((o->owornmask & W_ARM) || (o->owornmask & W_ARMC))
                 && o->material == MITHRIL && armpro < 2) {
                 armpro = 2;
             }
