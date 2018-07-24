@@ -3091,6 +3091,12 @@ struct obj *no_wish;
             /* "very large " had "very " peeled off on previous iteration */
             gsize = (very != 1) ? 3 : 4;
         } else {
+            /* check for materials */
+            if (!strncmpi(bp, "silver dragon", l = 13)) {
+                /* hack so that silver dragon scales/mail doesn't get
+                 * interpreted as silver */
+                break;
+            }
             /* doesn't currently catch "wood" for wooden */
             for (i = 1; i < NUM_MATERIAL_TYPES; i++) {
                 l = strlen(materialnm[i]);
@@ -4178,8 +4184,6 @@ struct obj *suit;
     esuitp = eos((char *) suitnm);
     if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
         return "mail"; /* most suits fall into this category */
-    else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
-        return "jacket"; /* leather jacket */
     /* suit is lame but armor is ambiguous and body armor is absurd */
     return "suit";
 }
@@ -4216,8 +4220,8 @@ struct obj *helmet;
      *  given for various bonks on the head:  headgear that provides
      *  such protection is a "helm", that which doesn't is a "hat".
      *
-     *      elven leather helm / leather hat    -> hat
-     *      dwarvish iron helm / hard hat       -> helm
+     *      elven helm                          -> hat
+     *      dwarvish helm / hard hat            -> helm
      *  The rest are completely straightforward:
      *      fedora, cornuthaum, dunce cap       -> hat
      *      all other types of helmets          -> helm
