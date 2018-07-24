@@ -229,15 +229,18 @@ struct obj {
     (otmp->oclass == ARMOR_CLASS && objects[otmp->otyp].oc_armcat == ARM_SUIT)
 #define is_elven_armor(otmp)                                              \
     ((otmp)->otyp == ELVEN_HELM || (otmp)->otyp == ELVEN_CLOAK           \
-     || (otmp)->otyp == ELVEN_SHIELD || (otmp)->otyp == ELVEN_BOOTS)
+     || (otmp)->otyp == ELVEN_SHIELD || (otmp)->otyp == ELVEN_BOOTS \
+     || (otmp)->otyp == ELVEN_RING_MAIL)
 #define is_orcish_armor(otmp)                                            \
     ((otmp)->otyp == ORCISH_HELM || (otmp)->otyp == ORCISH_CHAIN_MAIL    \
      || (otmp)->otyp == ORCISH_RING_MAIL || (otmp)->otyp == ORCISH_CLOAK \
-     || (otmp)->otyp == URUK_HAI_SHIELD || (otmp)->otyp == ORCISH_SHIELD)
+     || (otmp)->otyp == URUK_HAI_SHIELD || (otmp)->otyp == ORCISH_SHIELD \
+     || (otmp)->otyp == ORCISH_RING_MAIL)
 #define is_dwarvish_armor(otmp)               \
     ((otmp)->otyp == DWARVISH_HELM           \
      || (otmp)->otyp == DWARVISH_CLOAK        \
-     || (otmp)->otyp == DWARVISH_ROUNDSHIELD)
+     || (otmp)->otyp == DWARVISH_ROUNDSHIELD \
+     || (otmp)->otyp == DWARVISH_RING_MAIL)
 #define is_gnomish_armor(otmp) (FALSE)
 
 /* Eggs and other food */
