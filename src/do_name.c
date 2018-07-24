@@ -1774,6 +1774,10 @@ boolean called;
             Strcat(buf, name);
             name_at_start = TRUE;
         }
+    } else if (EAMA(mtmp) && !do_hallu) {
+        Sprintf(eos(buf), "%s%s",
+          EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
+          name_at_start = FALSE;
     } else if (is_mplayer(mdat) && !In_endgame(&u.uz)) {
         char pbuf[BUFSZ];
 

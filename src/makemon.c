@@ -60,6 +60,13 @@ struct monst *mtmp;
 
     EAMA(mtmp)->m1 = rnd_point();
     EAMA(mtmp)->m2 = rnd_point();
+    /* this needs to happen in order to avoid an xname chain crash. */
+    if (monsndx(EAMA(mtmp)->m1) == PM_AMALGAMATION
+        || (monsndx(EAMA(mtmp)->m1) == PM_BAD_CLONE))
+        EAMA(mtmp)->m1 = &mons[PM_FIRE_ELEMENTAL];
+    if (monsndx(EAMA(mtmp)->m2) == PM_AMALGAMATION
+        || (monsndx(EAMA(mtmp)->m2) == PM_BAD_CLONE))
+        EAMA(mtmp)->m2 = &mons[PM_WATER_ELEMENTAL];
 }
 
 void
@@ -1518,12 +1525,6 @@ int mmflags;
     case S_QUANTMECH:
         if (mndx == PM_AMALGAMATION || mndx == PM_BAD_CLONE) {
             neweama(mtmp);
-            /* set up name */
-            char buf[BUFSZ];
-            sprintf(buf, "Experiment %d: %s / %s", rnd(100),
-                    EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
-            mtmp = christen_monst(mtmp, buf);
-
         }
         break;
     }

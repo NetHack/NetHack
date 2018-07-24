@@ -7,7 +7,13 @@ the wiki. This file documents the changes in each version of SpliceHack.
 
 Balance Changes
 - Nerfed lamassu damage output.
+- Nerfed amalgamations slightly. Additionally, amalgamations now use a
+  completely different and much better naming system that fits in the game
+  more naturally.
 - Disabled dungeon crumbling feature. This may be reinstated upon feedback.
+- The demon lords that appear due to performing the ritual are no longer
+  covetous, preventing the player from being mobbed and randomly killed during
+  the ascension.
 
 Role and Race Changes
 - Infernals use their own race tag, which changes their class selection
