@@ -2907,7 +2907,7 @@ static const struct icp metal_materials[] = {
     { 1, PLASTIC}
 };
 
-/* Reflectable items - currently just the shield of reflection, but anything
+/* Reflectable items - the shield of reflection; anything
  * that can hold a polish */
 static const struct icp shiny_materials[] = {
     {30, SILVER},
@@ -2930,12 +2930,20 @@ static const struct icp wood_materials[] = {
     { 1, SILVER}
 };
 
-/* for objects which are normally cloth or leather */
-static const struct icp unrigid_materials[] = {
-    {60, CLOTH},
-    {31, LEATHER},
-    { 7, PAPER},
-    { 2, PLASTIC}
+/* for objects which are normally cloth */
+static const struct icp cloth_materials[] = {
+    {80, CLOTH},
+    {10, LEATHER},
+    { 7, PLASTIC},
+    { 3, PAPER}
+};
+
+/* for objects which are normally leather */
+static const struct icp leather_materials[] = {
+    {75, LEATHER},
+    {17, CLOTH},
+    { 7, PLASTIC},
+    { 1, PAPER}
 };
 
 /* for objects of dwarvish make */
@@ -2957,11 +2965,22 @@ static const struct icp elven_materials[] = {
     { 3, SILVER},
     { 2, GOLD}
 };
-/* hack specifically for elven helms */
+/* hacks for specific objects... not great because it's a lot of data, but it's
+ * a relatively clean solution */
 static const struct icp elvenhelm_materials[] = {
     {70, LEATHER},
     {20, COPPER},
     {10, WOOD}
+};
+static const struct icp bow_materials[] = {
+    {80, WOOD},
+    { 7, IRON},
+    { 4, PLASTIC},
+    { 3, BONE},
+    { 2, MITHRIL},
+    { 2, COPPER},
+    { 1, SILVER},
+    { 1, GOLD}
 };
 
 /* TODO: Orcish? */
@@ -2974,40 +2993,61 @@ struct obj* obj;
 {
     unsigned short otyp = obj->otyp;
     int default_material = objects[otyp].oc_material;
-    /* Special exceptions - where we ALWAYS want an object to use its base
-     * material regardless of other cases in this function - go here.
-     * Return NULL so that init_obj_material and valid_obj_material both work
-     * properly. */
-    if (otyp == BULLWHIP) {
-        return NULL;
+    /* Cases for specific object types. */
+    switch (otyp) {
+        /* Special exceptions to the whole randomized materials system - where
+         * we ALWAYS want an object to use its base material regardless of
+         * other cases in this function - go here.
+         * Return NULL so that init_obj_material and valid_obj_material both
+         * work properly. */
+        case BULLWHIP:
+            return NULL;
+        /* Any other cases for specific object types go here. */
+        case SHIELD_OF_RESONANCE:
+        case SHIELD_OF_REFLECTION:
+            return shiny_materials;
+        case BOW:
+        case ELVEN_BOW:
+        case ORCISH_BOW:
+        case YUMI:
+            return bow_materials;
+        case ELVEN_HELM:
+            return elvenhelm_materials;
+            case CHEST:
+            case LARGE_BOX:
+                return wood_materials;
+            case SKELETON_KEY:
+            case LOCK_PICK:
+            case TIN_OPENER:
+                return metal_materials;
+        default:
+            break;
     }
 
     /* Otherwise, select an appropriate list, or return NULL if no appropriate
      * list exists. */
-    if (otyp == SHIELD_OF_REFLECTION || otyp == SHIELD_OF_RESONANCE) {
-        return shiny_materials;
-    }
     if (is_elven_obj(obj) && default_material != CLOTH) {
-        if (otyp == ELVEN_HELM) {
-            return elvenhelm_materials;
-        }
-        else {
-            return elven_materials;
-        }
+        return elven_materials;
     }
     else if (is_dwarvish_obj(obj) && default_material != CLOTH) {
         return dwarvish_materials;
     }
+    else if (obj->oclass == AMULET_CLASS && otyp != AMULET_OF_YENDOR
+             && otyp != FAKE_AMULET_OF_YENDOR) {
+        /* could use metal_materials too */
+        return shiny_materials;
+    }
     else if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
-             || obj->oclass == ARMOR_CLASS
-             || obj->otyp == CHEST || obj->otyp == LARGE_BOX) {
+             || obj->oclass == ARMOR_CLASS) {
         if (default_material == IRON || default_material == METAL) {
             return metal_materials;
         }
         else if (default_material == WOOD) {
             return wood_materials;
-        } else if (default_material == CLOTH || default_material == LEATHER) {
-                return unrigid_materials;
+        } else if (default_material == CLOTH) {
+            return cloth_materials;
+        } else if (default_material == LEATHER) {
+            return leather_materials;
         }
     }
     return NULL;
@@ -3024,7 +3064,12 @@ struct obj* obj;
 
     if (materials) {
         int i = rnd(100);
-        for(; (i -= materials->iprob) > 0; materials++);
+        while (i > 0) {
+            if (i <= materials->iprob)
+                break;
+            i -= materials->iprob;
+            materials++;
+        }
         obj->material = materials->iclass;
         /* Infernals tend to encounter silver much more often */
         if (Race_switch == PM_INFERNAL && valid_obj_material(obj, SILVER)
@@ -3039,7 +3084,7 @@ struct obj* obj;
 
     /* Do any post-fixups here for bad or illogical material combinations */
     if (otyp == PICK_AXE &&
-        (obj->material == PLASTIC || obj->material == BONE)) {
+        (obj->material == PLASTIC || obj->material == GLASS)) {
         obj->material = IRON;
     }
 }
@@ -3059,10 +3104,13 @@ int mat;
 
     if (materials) {
         int i = 100; /* guarantee going through everything */
-        for(; (i -= materials->iprob) > 0; materials++) {
+        while (i > 0) {
             if (materials->iclass == mat)
                 return TRUE;
+            i -= materials->iprob;
+            materials++;
         }
+
         /* no valid ones found */
         return FALSE;
     }
