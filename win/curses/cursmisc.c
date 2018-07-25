@@ -188,8 +188,8 @@ curses_get_wid(int type)
         ret = text_wid;
         break;
     default:
-        panic("curses_get_wid: unsupported window type");
-        ret = -1;               /* Not reached */
+        impossible("curses_get_wid: unsupported window type");
+        ret = -1;
     }
 
     while (curses_window_exists(ret)) {
