@@ -32,7 +32,8 @@ Dungeon Changes
   guaranteed pair of earmuffs, so it is much easier to find something for
   sonic resistance during a run.
 - New branch: Mysterious laboratory. This laboratory is run by mind flayers, and
-  they are not thrilled to be interrupted.
+  they are not thrilled to be interrupted. The level contains numerous
+  spellbooks as loot.
 
 New Monsters (12)
 - Failure Eidolon, a unique monster appearing in the ice wastes. It can
@@ -61,6 +62,7 @@ Miscelaneous Changes
 - Pets now produce a message when they level up.
 - Ants now have a special sound when #chatted with.
 - Added a few more monsters to summon nasties.
+- Monsters that can jump now notify you when you polymorph into them.
 
 Bug Fixes
 - Fixed doors being rendered in the wrong color.
