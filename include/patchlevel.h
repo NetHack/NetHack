@@ -5,9 +5,9 @@
 
 /* Edited on 5/3/18 by NullCGT */
 
-/* NetHack 3.6.1 */
+/* NetHack 0.5.0 */
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 4
+#define VERSION_MINOR 5
 /*
  * PATCHLEVEL is updated for each release.
  */
@@ -16,7 +16,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 5
+#define EDITLEVEL 6
 
 #define COPYRIGHT_BANNER_A "SpliceHack, Copyright 1985-2018"
 #define COPYRIGHT_BANNER_B \
@@ -33,7 +33,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x00040005L
+#define VERSION_COMPATIBILITY 0x00050006L
 
 /****************************************************************************/
 /* Version 3.6.x */
