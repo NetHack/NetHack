@@ -3901,7 +3901,6 @@ xchar sx, sy;
             pline("With a struggle, you resist the mental assault!");
         } else {
             dam = d(nd, 6);
-            make_confused(HConfusion + rnd(15), FALSE);
         }
         break;
     case ZT_COLD:

@@ -385,8 +385,6 @@ boolean foundyou;
             shieldeff(u.ux, u.uy);
             pline("You fend off the mental attack!");
             dmg = 0;
-        } else {
-            make_confused(HConfusion + dmg, FALSE);
         }
         break;
     case AD_WIND:

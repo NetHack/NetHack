@@ -1218,8 +1218,6 @@ register struct attack *mattk;
             if (Psychic_resistance) {
                 pline("You fend off the mental attack!");
                 dmg = 0;
-            } else {
-                make_confused(HConfusion + dmg, FALSE);
             }
         } else
             dmg = 0;
