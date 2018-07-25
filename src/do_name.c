@@ -1300,7 +1300,7 @@ struct obj * wpn;
         "%s of Protection",   "%s of the Infinite", "%s of Swift Defeat",
         "%s of the Planes",
         "Righteous %s",   "Mighty %s",     "Unstoppable %s", "Unlimited %s",
-        "Lucky %s",       "Unlucky %s",    "Righteous %s",   "Desecrated %s",
+        "Lucky %s",       "Unlucky %s",    "Hungry %s",      "Desecrated %s",
         "Death %s",       "Dudley's %s",   "Gilgamesh's %s", "Punished %s",
         "Chaos %s",       "Void %s",       "Hungry %s",
         "Due Process",   "Puddingbane",    "Vladsbane",
