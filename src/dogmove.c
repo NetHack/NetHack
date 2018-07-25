@@ -841,6 +841,9 @@ struct monst *mtmp, *mtarg;
         else
             faith2 = FALSE;
 
+        if (mtmp->data->mattk[0].aatyp == AT_EXPL && !(mtarg->mtame)
+            && !(mtarg == &youmonst))
+            return 5000L;
         /* Never target quest friendlies */
         if (mtarg->data->msound == MS_LEADER
             || mtarg->data->msound == MS_GUARDIAN)

@@ -1238,24 +1238,20 @@ boolean atme;
     case SPE_CREATE_FAMILIAR:
         (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
         break;
-    case SPE_FLAME_SPHERE:
-        pline("You conjure a sphere of fire from thin air!");
-        mtmp = makemon(&mons[PM_FLAMING_SPHERE], u.ux, u.uy,
-            MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
-        if (!mtmp) {
-            pline("The fire winks out!");
-        } else {
-            initedog(mtmp);
-        }
-        break;
     case SPE_FREEZE_SPHERE:
-        pline("You conjure a sphere of cold from thin air!");
-        mtmp = makemon(&mons[PM_FREEZING_SPHERE], u.ux, u.uy,
-            MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
-        if (!mtmp) {
-            pline("The sphere of cold winks out!");
-        } else {
-            initedog(mtmp);
+    case SPE_FLAME_SPHERE:
+        pline("You conjure some energy from thin air!");
+        for (n = 0; n < role_skill; n++) {
+            mtmp = makemon(otyp == SPE_FREEZE_SPHERE ?
+                &mons[PM_FREEZING_SPHERE] :
+                &mons[PM_FLAMING_SPHERE],
+                  u.ux, u.uy, MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
+            if (!mtmp) {
+                pline("But it winks out!");
+                break;
+            } else {
+                initedog(mtmp);
+            }
         }
         break;
     case SPE_CLAIRVOYANCE:
