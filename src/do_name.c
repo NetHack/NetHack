@@ -1257,6 +1257,61 @@ register struct obj *obj;
     --via_naming; /* ...but oname() is used in a lot of places, so defer. */
 }
 
+/* Confer a grand-sounding name on a weapon. The weapon is assumed to be a
+ * non-artifact and have a good enchantment or other good property. */
+struct obj *
+weapon_oname(wpn)
+struct obj * wpn;
+{
+    /* Don't randomly name stacks. */
+    if (wpn->quan > 1)
+        return wpn;
+
+    char basename[BUFSZ];
+    int skill = weapon_type(wpn);
+    if (skill == P_SABER)
+        Strcpy(basename, "Sabre");
+    else if (wpn->otyp == TWO_HANDED_SWORD)
+        Strcpy(basename, "Claymore");
+    else if (is_sword(wpn))
+        Strcpy(basename, "Sword");
+    else if (wpn->otyp == LUCERN_HAMMER)
+        Strcpy(basename, "Lucern Hammer");
+    else if (wpn->otyp == MORNING_STAR)
+        Strcpy(basename, "Morning Star");
+    else if (wpn->otyp == RUBBER_HOSE)
+        Strcpy(basename, "Hose");
+    else if ((skill == P_POLEARMS) || (skill == P_KNIFE)
+             || (wpn->otyp == ATHAME))
+        Strcpy(basename, OBJ_NAME(objects[wpn->otyp]));
+    else
+        Strcpy(basename, weapon_descr(wpn));
+
+    /* Possible names. Any names with a %s in them must be sprintf'd with
+     * basename. */
+    const char* wpn_names[] = {
+        "%s of Justice",  "%s of Honor",   "%s of Glory",    "%s of Revenge",
+        "%s of Sorrow",   "%s of Yendor",  "%s of Victory",  "%s of Carnage",
+        "%s of Serenity", "%s of Fable",   "%s of Legend",   "%s of Integrity",
+        "%s of Redress",  "%s of Fate",    "%s of Punition", "%s of Reckoning",
+        "%s of Omen",     "%s of Truth",   "%s of Virtue",   "%s of Bloodlust",
+        "%s of Disaster", "%s of Torment", "Righteous %s",   "Mighty %s",
+        "Death %s",       "Due Process",   "Puddingbane",    "Vladsbane",
+        "Newtsbane",      "Aggressive Negotiation",
+        "Orphan Maker",   "Monster Slayer"
+    };
+
+    const char* name = wpn_names[rn2(SIZE(wpn_names))];
+    if (strstri(name, "%s")) {
+        char buf[BUFSZ];
+        Sprintf(buf, name, upstart(basename));
+        return oname(wpn, buf);
+    }
+    else {
+        return oname(wpn, name);
+    }
+}
+
 struct obj *
 oname(obj, name)
 struct obj *obj;

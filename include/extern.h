@@ -409,6 +409,7 @@ E void FDECL(new_oname, (struct obj *, int));
 E void FDECL(free_oname, (struct obj *));
 E const char *FDECL(safe_oname, (struct obj *));
 E struct monst *FDECL(christen_monst, (struct monst *, const char *));
+E struct obj * FDECL(weapon_oname, (struct obj*));
 E struct obj *FDECL(oname, (struct obj *, const char *));
 E boolean FDECL(objtyp_is_callable, (int));
 E int NDECL(docallcmd);

@@ -7,6 +7,8 @@ the wiki. This file documents the changes in each version of SpliceHack.
 
 Patches Introduced
 - SpliceHack now uses xnethack's object materials patch.
+- SpliceHack uses xnethack's randomly named weapons, originally ported from
+  NetHack Fourk.
 
 Balance Changes
 - Nerfed lamassu damage output.
@@ -49,8 +51,11 @@ New Monsters (12)
 - Animated statues have been completely removed and replaced with chess rooks,
   which like grid bugs can only move in straight lines.
 
-New Objects (1)
+New Objects (3)
 - Orb of permafrost, an orb that causes an icy explosion when thrown.
+- Spellbooks of flame sphere and freeze sphere, which function nearly
+  identically to SLASH'EM. These necessitated changing the AI for explosive pets
+  slightly.
 
 Miscelaneous Changes
 - All monsters can potentially gain intrinsics by eating, not just pets. This

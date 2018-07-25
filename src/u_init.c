@@ -1137,6 +1137,9 @@ register struct trobj *trop;
             obj = mksobj(otyp, TRUE, FALSE);
             /* Don't allow materials to be start scummed for */
             obj->material = objects[obj->otyp].oc_material;
+            /* Don't allow weapons to roll high enchantment and get an oname
+             * when they'll then have their enchantment set after this */
+            free_oname(obj);
         } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;
             static NEARDATA short nocreate2 = STRANGE_OBJECT;

@@ -785,6 +785,11 @@ boolean artif;
 
             if (artif && !rn2(20))
                 otmp = mk_artifact(otmp, (aligntyp) A_NONE);
+
+            if (!otmp->oartifact && !otmp->cursed
+                && (otmp->spe + otmp->oerodeproof > rnd(5)))
+                otmp = weapon_oname(otmp);
+
             break;
         case FOOD_CLASS:
             otmp->oeaten = 0;
