@@ -1003,7 +1003,7 @@ boolean atme;
         context.botl = 1;
         res = 1; /* time is going to elapse even if spell doesn't get cast */
     }
-    if (BloodMagic && energy > u.uen) {
+    if (!BloodMagic && energy > u.uen) {
         You("don't have enough energy to cast that spell.");
         return res;
     } else {
@@ -1066,7 +1066,7 @@ boolean atme;
     }
 
     /* only can hit this case if using blood magic */
-    if (energy > u.uen) {
+    if (energy > u.uen && BloodMagic) {
         energy -= u.uen;
         u.uen = 0;
         pline("You draw upon your own life force to cast the spell.");
