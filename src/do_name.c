@@ -1294,13 +1294,33 @@ struct obj * wpn;
         "%s of Sorrow",   "%s of Yendor",  "%s of Victory",  "%s of Carnage",
         "%s of Serenity", "%s of Fable",   "%s of Legend",   "%s of Integrity",
         "%s of Redress",  "%s of Fate",    "%s of Punition", "%s of Reckoning",
-        "%s of Omen",     "%s of Truth",   "%s of Virtue",   "%s of Bloodlust",
-        "%s of Disaster", "%s of Torment", "Righteous %s",   "Mighty %s",
-        "Death %s",       "Due Process",   "Puddingbane",    "Vladsbane",
+        "%s of Omens",    "%s of Truth",   "%s of Virtue",   "%s of Bloodlust",
+        "%s of Disaster", "%s of Torment", "%s of the Horde","%s of the Gods",
+        "%s of the Peerless", "%s of the End", "%s of the Beginning",
+        "%s of Protection",   "%s of the Infinite", "%s of Swift Defeat",
+        "%s of the Planes",
+        "Righteous %s",   "Mighty %s",     "Unstoppable %s", "Unlimited %s",
+        "Lucky %s",       "Unlucky %s",    "Righteous %s",   "Desecrated %s",
+        "Death %s",       "Dudley's %s",   "Gilgamesh's %s", "Punished %s",
+        "Chaos %s",       "Void %s",       "Hungry %s",
+        "Due Process",   "Puddingbane",    "Vladsbane",
         "Newtsbane",      "Aggressive Negotiation",
         "Orphan Maker",   "Monster Slayer"
+        "Astral Caller"
     };
-
+    const char* bane_wpn_names[] = {
+        "%s slayer", "%s eater", "%s destroyer", "%sbane"
+    };
+    /* Only happen rarely or during hallucination due to being very silly. */
+    if (Hallucination || !rn2(10)) {
+        char rnamecode;
+        const char* name = bane_wpn_names[rn2(SIZE(bane_wpn_names))];
+        char rname[BUFSZ];
+        Strcpy(rname, rndmonnam(&rnamecode));
+        char buf[BUFSZ];
+        Sprintf(buf, name, upstart(rname));
+        return oname(wpn, buf);
+    }
     const char* name = wpn_names[rn2(SIZE(wpn_names))];
     if (strstri(name, "%s")) {
         char buf[BUFSZ];

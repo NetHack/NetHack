@@ -8,7 +8,8 @@ the wiki. This file documents the changes in each version of SpliceHack.
 Patches Introduced
 - SpliceHack now uses xnethack's object materials patch.
 - SpliceHack uses xnethack's randomly named weapons, originally ported from
-  NetHack Fourk.
+  NetHack Fourk. SpliceHack's version functions differently, however, and
+  generates a different set of names.
 
 Balance Changes
 - Nerfed lamassu damage output.
