@@ -937,6 +937,7 @@ boolean atme;
     boolean confused = (Confusion != 0);
     boolean physical_damage = FALSE;
     struct obj *pseudo;
+    struct monst *mtmp;
     coord cc;
 
     /*
@@ -1236,6 +1237,26 @@ boolean atme;
         break;
     case SPE_CREATE_FAMILIAR:
         (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
+        break;
+    case SPE_FLAME_SPHERE:
+        pline("You conjure a sphere of fire from thin air!");
+        mtmp = makemon(&mons[PM_FLAMING_SPHERE], u.ux, u.uy,
+            MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
+        if (!mtmp) {
+            pline("The fire winks out!");
+        } else {
+            initedog(mtmp);
+        }
+        break;
+    case SPE_FREEZE_SPHERE:
+        pline("You conjure a sphere of cold from thin air!");
+        mtmp = makemon(&mons[PM_FREEZING_SPHERE], u.ux, u.uy,
+            MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
+        if (!mtmp) {
+            pline("The sphere of cold winks out!");
+        } else {
+            initedog(mtmp);
+        }
         break;
     case SPE_CLAIRVOYANCE:
         if (!BClairvoyant) {

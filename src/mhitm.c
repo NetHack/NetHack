@@ -811,14 +811,23 @@ struct attack *mattk;
     else
         noises(magr, mattk);
 
-    result = mdamagem(magr, mdef, mattk);
-
-    /* Kill off aggressor if it didn't die. */
-    if (!(result & MM_AGR_DIED)) {
-        mondead(magr);
-        if (magr->mhp > 0)
-            return result; /* life saved */
-        result |= MM_AGR_DIED;
+    if (magr->mtame && magr->data == &mons[PM_FLAMING_SPHERE]) {
+            mondead(magr);
+            explode(magr->mx, magr->my, 1, d(4,6), TOOL_CLASS, EXPL_FIERY);
+            result = MM_AGR_DIED;
+    } else if (magr->mtame && magr->data == &mons[PM_FREEZING_SPHERE]) {
+            mondead(magr);
+            explode(magr->mx, magr->my, 2, d(4,6), TOOL_CLASS, EXPL_FROSTY);
+            result = MM_AGR_DIED;
+    } else {
+        result = mdamagem(magr, mdef, mattk);
+        /* Kill off aggressor if it didn't die. */
+        if (!(result & MM_AGR_DIED)) {
+            mondead(magr);
+            if (magr->mhp > 0)
+                return result; /* life saved */
+            result |= MM_AGR_DIED;
+        }
     }
     if (magr->mtame) /* give this one even if it was visible */
         You(brief_feeling, "melancholy");
