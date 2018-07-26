@@ -97,6 +97,7 @@ register struct monst *mtmp;
     /* look for gold on the floor */
     fgold = level.objects[u.ux][u.uy];
     while (fgold && fgold->material != GOLD)
+        fgold = fgold->nexthere;
 
     /* Do you have real gold? */
     ygold = findgold(invent, FALSE);
