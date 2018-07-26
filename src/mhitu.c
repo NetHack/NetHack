@@ -2675,7 +2675,8 @@ struct attack *mattk;
         return 0;
 
     if (pagr->mlet != S_NYMPH
-        && ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
+        && ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS]
+            && pagr != &mons[PM_MALCANTHET])
             || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)))
         return 0;
 
@@ -2691,7 +2692,8 @@ doseduce(mon)
 struct monst *mon;
 {
     struct obj *ring, *nring;
-    boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
+    boolean fem = (mon->data == &mons[PM_SUCCUBUS] ||
+                   mon->data == &mons[PM_MALCANTHET]); /* otherwise incubus */
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ];
 
@@ -2838,7 +2840,7 @@ struct monst *mon;
        as far as deciding what will happen; chance for bad outcome when
        Cha+Int is 32 or more is 2/35, a bit over 5.7% */
     attr_tot = ACURR(A_CHA) + ACURR(A_INT);
-    if ((monsndx(mon->data) == PM_LORD_OF_THE_FOOCUBI && rn2(50) > attr_tot) ||
+    if ((monsndx(mon->data) == PM_MALCANTHET && rn2(50) > attr_tot) ||
         rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
         pline("%s seems to have enjoyed it more than you...",

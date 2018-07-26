@@ -356,7 +356,7 @@ MONSTER: ';',(45,09)
 MONSTER: ';',(44,06)
 MONSTER: ';',(40,00)
 # the demon lord and their gaurdians
-MONSTER:('&',"lord of the foocubi"),(56,08)
+MONSTER:('&',"Malcanthet"),(56,08)
 MONSTER:('&',"succubus"),(57,08)
 MONSTER:('&',"succubus"),(62,03)
 # traps and objects

@@ -4189,7 +4189,7 @@ struct permonst *mdat;
         case PM_DISPATER:
         case PM_YEENOGHU:
         case PM_ORCUS:
-        case PM_LORD_OF_THE_FOOCUBI:
+        case PM_MALCANTHET:
             break;
         case PM_HUMAN_WEREJACKAL:
         case PM_HUMAN_WERERAT:
