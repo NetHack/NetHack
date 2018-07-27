@@ -3101,8 +3101,9 @@ struct obj *no_wish;
         } else {
             /* check for materials */
             if (!strncmpi(bp, "silver dragon", l = 13)
-                || !strcmp(bp, "silver ring")
-                || !strcmp(bp, "gold ring")
+                || !strcmpi(bp, "silver ring", l = 11)
+                || !strcmpi(bp, "gold ring", l = 9)
+                || !strncmpi(bp, "platinum yendorian express card", l = 31)
                 || !strcmp(bp, "gold")) {
                 /* hack so that silver dragon scales/mail doesn't get
                  * interpreted as silver */
