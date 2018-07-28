@@ -187,6 +187,10 @@ struct obj **obj_p;
             otmp->spe = context.current_fruit; /* give it a type */
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
+        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+            otmp->corpsenm = glyph - GLYPH_BODY_OFF;
+        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+            otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
     }
     /* if located at adjacent spot, mark it as having been seen up close
        (corpse type will be known even if dknown is 0, so we don't need a
