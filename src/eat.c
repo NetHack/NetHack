@@ -1395,7 +1395,16 @@ const char *mesg;
         u.uconduct.food++; /* don't need vegetarian checks for spinach */
         if (!tin->cursed)
             pline("This makes you feel like %s!",
-                  Hallucination ? "Swee'pea" : "Popeye");
+                  /* "Swee'pea" is a character from the Popeye cartoons */
+                  Hallucination ? "Swee'pea"
+                  /* "feel like Popeye" unless sustain ability suppresses
+                     any attribute change; this slightly oversimplifies
+                     things:  we want "Popeye" if no strength increase
+                     occurs due to already being at maximum, but we won't
+                     get it if at-maximum and fixed-abil both apply */
+                  : !Fixed_abil ? "Popeye"
+                  /* no gain, feel like another character from Popeye */
+                  : (flags.female ? "Olive Oyl" : "Bluto"));
         gainstr(tin, 0, FALSE);
 
         tin = costly_tin(COST_OPEN);
