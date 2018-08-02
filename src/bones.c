@@ -185,7 +185,11 @@ boolean restore;
             } else if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
                 otmp->otyp = SPE_BLANK_PAPER;
                 curse(otmp);
-            }
+            } else if (otmp->oartifact == ART_THIEFBANE) {
+      			    /* Guaranteed artifacts become ordinary objects */
+      			    otmp->oartifact = 0;
+      			    free_oname(otmp);
+      			}
         }
     }
 }
