@@ -3300,6 +3300,7 @@ struct obj *no_wish;
     if (strncmpi(bp, "samurai sword", 13)  /* not the "samurai" monster! */
         && strncmpi(bp, "wizard lock", 11) /* not the "wizard" monster! */
         && strncmpi(bp, "ninja-to", 8)     /* not the "ninja" rank */
+        && strncmpi(bp, "Thiefbane", 9)    /* not the "thief" rank */
         && strncmpi(bp, "master key", 10)  /* not the "master" rank */
         && strncmpi(bp, "magenta", 7)) {   /* not the "mage" rank */
         if (mntmp < LOW_PM && strlen(bp) > 2
