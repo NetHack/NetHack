@@ -1800,7 +1800,7 @@ a minion of %d.  %d commands that you retain
 of Yendor.
 
 "Go forth, and let %d guide your steps."
-%E [Congraulations, %p.  Keep %o; go and recover the Amulet.]
+%E [Congratulations, %p.  Keep %o; go and recover the Amulet.]
 %Cc Pri 00082
 %lC reiterates that %o is yours now.
 
