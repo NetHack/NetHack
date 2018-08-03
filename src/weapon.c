@@ -268,6 +268,7 @@ struct monst *mon;
         switch (otyp) {
         case IRON_CHAIN:
         case CROSSBOW_BOLT:
+        case ORNATE_MACE:
         case MACE:
         case WAR_HAMMER:
         case FLAIL:
