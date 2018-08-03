@@ -2097,11 +2097,6 @@ struct monst *mtmp, *victim;
     else if (lev_limit > 49)
         lev_limit = (ptr->mlevel > 49 ? 50 : 49);
 
-    if (mtmp->mtame) {
-        if (canspotmon(mtmp))
-            pline("%s grows to level %d!", Monnam(mtmp), mtmp->m_lev);
-    }
-
     if ((int) ++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
         ptr = &mons[newtype];
         /* new form might force gender change */
@@ -2143,6 +2138,10 @@ struct monst *mtmp, *victim;
     }
 
     /* sanity checks */
+    if (mtmp->mtame && (int) mtmp->m_lev <= lev_limit) {
+        if (canspotmon(mtmp))
+            pline("%s grows to level %d!", Monnam(mtmp), mtmp->m_lev);
+    }
     if ((int) mtmp->m_lev > lev_limit) {
         mtmp->m_lev--; /* undo increment */
         /* HP might have been allowed to grow when it shouldn't */
