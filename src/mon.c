@@ -2941,8 +2941,9 @@ boolean via_attack;
     /* Even if the black marketeer is already angry he may not have called
     * for his assistants if he or his staff have not been assaulted yet.
     */
-    if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful)
+    /* if (is_blkmktstaff(mtmp->data) && !mtmp->mpeaceful) {
         blkmar_guards(mtmp);
+    } */
     if (!mtmp->mpeaceful)
         return;
     if (mtmp->mtame)

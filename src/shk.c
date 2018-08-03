@@ -434,6 +434,7 @@ register struct monst *mtmp;
                   		call_kops(mtmp, FALSE);
                   }
       	    wakeup(mt, FALSE);
+            setmangry(mt, FALSE);
       	}
     }
     rlock = FALSE;
