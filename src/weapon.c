@@ -288,6 +288,7 @@ struct monst *mon;
         case ELVEN_BROADSWORD:
         case RUNESWORD:
         case VOULGE:
+        case GRAIN_SCYTHE:
             tmp += rnd(4);
             break;
 
