@@ -901,7 +901,7 @@ register struct monst *mtmp;
               otmp = oname(otmp, artiname(ART_THIEFBANE));
               mpickobj(mtmp, otmp);
               if (otmp->spe < 5) otmp->spe += rnd(5);
-              otmp = mksobj(SHIELD_OF_REFLECTION, FALSE, FALSE);
+              otmp = mksobj(CLOAK_OF_REFLECTION, FALSE, FALSE);
               mpickobj(mtmp, otmp);
               if (otmp->spe < 5) otmp->spe += rnd(5);
               otmp = mksobj(HEX_DRAGON_SCALE_MAIL, FALSE, FALSE);
