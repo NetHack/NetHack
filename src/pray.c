@@ -1939,12 +1939,12 @@ doturn()
         pline("For some reason, %s seems to ignore you.", u_gname());
         aggravate();
         exercise(A_WIS, FALSE);
-        return 0;
+        return 1;
     }
     if (Inhell) {
         pline("Since you are in Gehennom, %s won't help you.", u_gname());
         aggravate();
-        return 0;
+        return 1;
     }
     pline("Calling upon %s, you chant an arcane formula.", u_gname());
     exercise(A_WIS, TRUE);
