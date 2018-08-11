@@ -21,6 +21,8 @@ Balance Changes
   covetous, preventing the player from being mobbed and randomly killed during
   the ascension.
 - Nerfed psionic attacks so that they no longer confuse the player.
+- The lord of the foocubi is now renamed to Malcanthet, and has been heavily
+  nerfed.
 
 Role and Race Changes
 - Infernals use their own race tag, which changes their class selection
@@ -70,6 +72,9 @@ Miscelaneous Changes
 - Ants now have a special sound when #chatted with.
 - Added a few more monsters to summon nasties.
 - Monsters that can jump now notify you when you polymorph into them.
+- Changed the piece of cloth into a dusty cloak (xnethack).
+- Looking at a monster no longer displays whether they are armored, but does
+  tell you the material of their weapon.
 
 Bug Fixes
 - Fixed doors being rendered in the wrong color.
@@ -80,6 +85,12 @@ Bug Fixes
 - Spellcasters with no arms no longer point at you before cursing.
 - Fixed some monster sound bugs.
 - Monsters now actually attempt to throw their throwing axes.
+- Fixed legendary lichen corpses being treated differently than lichens.
+- Fixed silver haters being gifted silver artifacts.
+- Fixed overly powerful reaver, and a few erroneous damage values for weapons.
+- Fixed a lot of black market related bugs, including continual guards and
+  thiefbane not being wielded. This means that One-Eyed Sam now wears a cloak
+  of reflection and hex dragon scale mail.
 
 Known Bugs
 - Pets can be taken into the Black Market, but not out of it.
