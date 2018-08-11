@@ -2089,7 +2089,8 @@ dodip()
     }
 
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
-        && obj->corpsenm == PM_LICHEN && !Blind) {
+        && (obj->corpsenm == PM_LICHEN || obj->corpsenm == PM_LEGENDARY_LICHEN)
+        && !Blind) {
         pline("%s %s %s around the edges.", The(cxname(obj)),
               otense(obj, "turn"),
               potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));

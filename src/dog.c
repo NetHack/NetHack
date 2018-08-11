@@ -819,7 +819,8 @@ register struct obj *obj;
             if (obj->otyp == CORPSE)
                 return (peek_at_iced_corpse_age(obj) + 50L <= monstermoves
                         && fptr != &mons[PM_LIZARD]
-                        && fptr != &mons[PM_LICHEN])
+                        && fptr != &mons[PM_LICHEN]
+                        && fptr != &mons[PM_LEGENDARY_LICHEN])
                            ? DOGFOOD
                            : (starving && !vegan(fptr))
                               ? ACCFOOD

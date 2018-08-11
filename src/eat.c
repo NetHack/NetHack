@@ -51,7 +51,8 @@ char msgbuf[BUFSZ];
 /* Rider corpses are treated as non-rotting so that attempting to eat one
    will be sure to reach the stage of eating where that meal is fatal */
 #define nonrotting_corpse(mnum) \
-    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || is_rider(&mons[mnum]))
+    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || \
+     (mnum) == PM_LEGENDARY_LICHEN || is_rider(&mons[mnum]))
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
    as if rotten if they are cursed (fortune cookies handled elsewhere) */
