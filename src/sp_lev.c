@@ -2560,6 +2560,9 @@ int x1, y1, x2, y2;
         lo_yy = (y > 0) ? y - 1 : 0;
         hi_yy = (y < y2) ? y + 1 : y2;
         for (x = x1; x <= x2; x++) {
+            if (!isok(x, y))
+                /* not on the map anyway, can't be wallified */
+                continue;
             if (levl[x][y].typ != STONE)
                 continue;
             lo_xx = (x > 0) ? x - 1 : 0;
