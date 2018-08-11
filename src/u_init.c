@@ -1139,6 +1139,8 @@ register struct trobj *trop;
             obj->material = objects[obj->otyp].oc_material;
             /* Don't allow weapons to roll high enchantment and get an oname
              * when they'll then have their enchantment set after this */
+            if (Hate_silver && obj->material == SILVER)
+                obj->material = IRON;
             free_oname(obj);
         } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;

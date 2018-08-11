@@ -87,6 +87,9 @@ Bug Fixes
 - Monsters now actually attempt to throw their throwing axes.
 - Fixed legendary lichen corpses being treated differently than lichens.
 - Fixed silver haters being gifted silver artifacts.
+- Fixed silver haters starting the game with silver items. The items in their
+  inventory are set to iron instead of silver, regardless of the type. This is
+  a kludge.
 - Fixed overly powerful reaver, and a few erroneous damage values for weapons.
 - Fixed a lot of black market related bugs, including continual guards and
   thiefbane not being wielded. This means that One-Eyed Sam now wears a cloak
