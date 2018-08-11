@@ -1170,7 +1170,7 @@ dospinweb()
             for (i = 0; i < NATTK; i++)
                 if (u.ustuck->data->mattk[i].aatyp == AT_ENGL)
                     break;
-            if (i == NATTK)
+            if (i == NATTK && !has_eama(u.ustuck))
                 impossible("Swallower has no engulfing attack?");
             else {
                 char sweep[30];
@@ -1186,6 +1186,8 @@ dospinweb()
                 case AD_COLD:
                     Strcpy(sweep, "freezes, shatters and ");
                     break;
+                default:
+                    Strcpy(sweep, "virbrates and ");
                 }
                 pline_The("web %sis swept away!", sweep);
             }

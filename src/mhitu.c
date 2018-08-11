@@ -319,7 +319,7 @@ boolean message;
             struct attack *attk = attacktype_fordmg(mdat, AT_ENGL, AD_ANY);
 
             blast[0] = '\0';
-            if (!attk) {
+            if (!attk && !has_eama(mtmp)) {
                 impossible("Swallower has no engulfing attack?");
             } else {
                 if (is_whirly(mdat)) {
