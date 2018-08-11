@@ -31,6 +31,7 @@ Role and Race Changes
   much more harrowing to play.
 - Infernals are now fire resistant instead of having infravision.
 - Pirates no longer always get a message about rising as skeletal pirates.
+- Cartomancers use a refactored language system.
 
 Dungeon Changes
 - New branch: Ice wastes. A creepy level covered in ice and snow, with an orb
@@ -94,6 +95,7 @@ Bug Fixes
 - Fixed a lot of black market related bugs, including continual guards and
   thiefbane not being wielded. This means that One-Eyed Sam now wears a cloak
   of reflection and hex dragon scale mail.
+- Fixed amalgamations bugging out when engulfing.
 
 Known Bugs
 - Pets can be taken into the Black Market, but not out of it.

@@ -425,12 +425,8 @@ doread()
                           : "As you %s the formula on it, the scroll disappears.",
                       silently ? "cogitate" : "pronounce");
         } else {
-            if (Role_if(PM_CARTOMANCER))
-                pline(nodisappear ? "You play the spell card."
-                                  : "As you play the card, it disappears.");
-            else
-                pline(nodisappear ? "You read the scroll."
-                                  : "As you read the scroll, it disappears.");
+            pline(nodisappear ? "You read the scroll."
+                              : "As you read the scroll, it disappears.");
         } if (confused) {
             if (Hallucination)
                 pline("Being so trippy, you screw up...");
@@ -1335,10 +1331,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                                   : "the power of the Force against you!"));
 
         if (scursed) {
-            if (Role_if(PM_CARTOMANCER))
-                pline_The("spell card disintegrates.");
-            else
-                pline_The("scroll disintegrates.");
+            pline_The("scroll disintegrates.");
         } else {
             for (obj = invent; obj; obj = obj->nobj) {
                 long wornmask;
@@ -1583,10 +1576,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 known = FALSE;
         } else {
             if (!already_known) {
-                if (Role_if(PM_CARTOMANCER))
-                    pline("This is a spell card of web!");
-                else
-                    pline("This is a scroll of web!");
+                pline("This is a scroll of web!");
             }
             cc.x = u.ux;
             cc.y = u.uy;
@@ -1832,10 +1822,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         } else {
             if (sblessed) {
                 if (!already_known) {
-                    if (Role_if(PM_CARTOMANCER))
-                        pline("This is a spell card of fire!");
-                    else
-                        pline("This is a scroll of fire!");
+                    pline("This is a scroll of fire!");
                 }
                 dam *= 5;
                 pline("Where do you want to center the explosion?");
@@ -1849,10 +1836,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 }
             }
             if (cc.x == u.ux && cc.y == u.uy) {
-                if (Role_if(PM_CARTOMANCER))
-                    pline_The("spell card erupts in a tower of flame!");
-                else
-                    pline_The("scroll erupts in a tower of flame!");
+                pline_The("scroll erupts in a tower of flame!");
                 iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
                 burn_away_slime();
             }
@@ -1926,10 +1910,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         coord cc;
 
         if (!already_known) {
-            if (Role_if(PM_CARTOMANCER))
-                You("have found a spell card of stinking cloud!");
-            else
-                You("have found a scroll of stinking cloud!");
+            You("have found a scroll of stinking cloud!");
         }
         known = TRUE;
         pline("Where do you want to center the %scloud?",

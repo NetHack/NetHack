@@ -84,6 +84,25 @@ const char *orig;
 		return orig;
 }
 
+const char *
+cartsay(orig)
+const char *orig;
+{
+		orig = replace(orig,"read the scroll","play the spell card");
+    orig = replace(orig,"scroll","spell card");
+    orig = replace(orig,"zorkmid","victory chips");
+		orig = replace(orig,"Zorkmid","Victory chip");
+    orig = replace(orig,"gold coins","victory tokens");
+		orig = replace(orig,"Gold coins","Victory tokens");
+		orig = replace(orig,"gold coin","victory token");
+		orig = replace(orig,"Gold coin","Victory token");
+		orig = replace(orig,"gold pieces","victory tokens");
+		orig = replace(orig,"Gold pieces","Victory tokens");
+		orig = replace(orig,"gold piece","victory token");
+		orig = replace(orig,"Gold piece","Victory token");
+		return orig;
+}
+
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
 void
 dumplogmsg(line)
@@ -208,7 +227,9 @@ VA_DECL(const char *, line)
 
    	if(Role_if(PM_PIRATE)){
      		line = piratesay(line);
-   	}
+   	} else if(Role_if(PM_CARTOMANCER)) {
+        line = cartsay(line);
+    }
 
     /* use raw_print() if we're called too early (or perhaps too late
        during shutdown) or if we're being called recursively (probably

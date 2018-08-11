@@ -75,6 +75,7 @@ STATIC_OVL struct Jitem Cartomancer_items[] = {
   { HAWAIIAN_SHIRT, "graphic tee" },
   { EXPENSIVE_CAMERA, "holographic card" },
   { CREDIT_CARD, "banned card" },
+  { SACK, "card bag" },
   { 0, "" } };
 
 STATIC_DCL const char *FDECL(Alternate_item_name,(int i, struct Jitem * ));
