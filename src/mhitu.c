@@ -11,7 +11,8 @@ STATIC_VAR NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *, struct monst *,
                                  struct attack *));
-STATIC_DCL void FDECL(mayberem, (const char *, struct obj *, const char *));
+STATIC_DCL void FDECL(mayberem, (struct monst *, const char *,
+                                 struct obj *, const char *));
 STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
 STATIC_DCL int FDECL(hitmu, (struct monst *, struct attack *));
 STATIC_DCL int FDECL(gulpmu, (struct monst *, struct attack *));
@@ -2349,7 +2350,7 @@ struct attack *mattk;
         return (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
-/* Returns 1 if monster teleported */
+/* returns 1 if monster teleported (or hero leaves monster's vicinity) */
 int
 doseduce(mon)
 struct monst *mon;
@@ -2392,7 +2393,7 @@ struct monst *mon;
             if (ring->owornmask && uarmg) {
                 /* don't take off worn ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, "gloves");
                 if (uarmg)
                     continue; /* next ring might not be worn */
             }
@@ -2422,7 +2423,7 @@ struct monst *mon;
             if (uarmg) {
                 /* don't put on ring if gloves are in the way */
                 if (!tried_gloves++)
-                    mayberem(Who, uarmg, "gloves");
+                    mayberem(mon, Who, uarmg, "gloves");
                 if (uarmg)
                     break; /* no point trying further rings */
             }
@@ -2449,14 +2450,25 @@ struct monst *mon;
                       Who, the(xname(ring)), body_part(HAND));
                 setworn(ring, LEFT_RING);
             } else if (uright && uright->otyp != RIN_ADORNMENT) {
+                /* note: the "replaces" message might be inaccurate if
+                   hero's location changes and the process gets interrupted,
+                   but trying to figure that out in advance in order to use
+                   alternate wording is not worth the effort */
                 pline("%s replaces %s with %s.",
                       Who, yname(uright), yname(ring));
                 Ring_gone(uright);
+                /* ring removal might cause loss of levitation which could
+                   drop hero onto trap that transports hero somewhere else */
+                if (u.utotype || distu(mon->mx, mon->my) > 2)
+                    return 1;
                 setworn(ring, RIGHT_RING);
             } else if (uleft && uleft->otyp != RIN_ADORNMENT) {
+                /* see "replaces" note above */
                 pline("%s replaces %s with %s.",
                       Who, yname(uleft), yname(ring));
                 Ring_gone(uleft);
+                if (u.utotype || distu(mon->mx, mon->my) > 2)
+                    return 1;
                 setworn(ring, LEFT_RING);
             } else
                 impossible("ring replacement");
@@ -2471,16 +2483,25 @@ struct monst *mon;
                : naked ? "murmurs sweet nothings into your ear"
                        : "murmurs in your ear",
           naked ? "" : ", while helping you undress");
-    mayberem(Who, uarmc, cloak_simple_name(uarmc));
+    mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc)
-        mayberem(Who, uarm, "suit");
-    mayberem(Who, uarmf, "boots");
+        mayberem(mon, Who, uarm, suit_simple_name(uarm));
+    mayberem(mon, Who, uarmf, "boots");
     if (!tried_gloves)
-        mayberem(Who, uarmg, "gloves");
-    mayberem(Who, uarms, "shield");
-    mayberem(Who, uarmh, helm_simple_name(uarmh));
+        mayberem(mon, Who, uarmg, "gloves");
+    mayberem(mon, Who, uarms, "shield");
+    mayberem(mon, Who, uarmh, helm_simple_name(uarmh));
     if (!uarmc && !uarm)
-        mayberem(Who, uarmu, "shirt");
+        mayberem(mon, Who, uarmu, "shirt");
+
+    /* removing armor (levitation boots, or levitation ring to make
+       room for adornment ring with incubus case) might result in the
+       hero falling through a trap door or landing on a teleport trap
+       and changing location, so hero might not be adjacent to seducer
+       any more (mayberem() has its own adjacency test so we don't need
+       to check after each potential removal) */
+    if (u.utotype || distu(mon->mx, mon->my) > 2)
+        return 1;
 
     if (uarm || uarmc) {
         if (!Deaf)
@@ -2627,7 +2648,8 @@ struct monst *mon;
 }
 
 STATIC_OVL void
-mayberem(seducer, obj, str)
+mayberem(mon, seducer, obj, str)
+struct monst *mon;
 const char *seducer; /* only used for alternate message */
 struct obj *obj;
 const char *str;
@@ -2635,6 +2657,10 @@ const char *str;
     char qbuf[QBUFSZ];
 
     if (!obj || !obj->owornmask)
+        return;
+    /* removal of a previous item might have sent the hero elsewhere
+       (loss of levitation that leads to landing on a transport trap) */
+    if (u.utotype || distu(mon->mx, mon->my) > 2)
         return;
 
     /* being deaf overrides confirmation prompt for high charisma */

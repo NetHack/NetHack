@@ -62,7 +62,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Intel Pentium or better (or clone) running Linux, BSDI, or 
                 Windows (7 through 10)
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
-	Mac OS X 10.9
+	Mac OS X 10.11 (follow the instructions in sys/unix, not sys/mac)
 	OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Instructions have been provided by way of community contribution on:
@@ -166,6 +166,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1524689604 2018/04/25 20:53:24 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $
+# $NHDT-Date: 1533602460 2018/08/07 00:41:00 $ $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.46 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
