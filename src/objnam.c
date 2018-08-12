@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1525012618 2018/04/29 14:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1533352036 2018/08/04 03:07:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3978,17 +3978,19 @@ struct obj *suit;
 {
     const char *suitnm, *esuitp;
 
-    if (Is_dragon_mail(suit))
-        return "dragon mail"; /* <color> dragon scale mail */
-    else if (Is_dragon_scales(suit))
-        return "dragon scales";
-    suitnm = OBJ_NAME(objects[suit->otyp]);
-    esuitp = eos((char *) suitnm);
-    if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
-        return "mail"; /* most suits fall into this category */
-    else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
-        return "jacket"; /* leather jacket */
-    /* suit is lame but armor is ambiguous and body armor is absurd */
+    if (suit) {
+        if (Is_dragon_mail(suit))
+            return "dragon mail"; /* <color> dragon scale mail */
+        else if (Is_dragon_scales(suit))
+            return "dragon scales";
+        suitnm = OBJ_NAME(objects[suit->otyp]);
+        esuitp = eos((char *) suitnm);
+        if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
+            return "mail"; /* most suits fall into this category */
+        else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
+            return "jacket"; /* leather jacket */
+    }
+    /* "suit" is lame but "armor" is ambiguous and "body armor" is absurd */
     return "suit";
 }
 
