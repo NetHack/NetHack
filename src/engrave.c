@@ -659,6 +659,7 @@ doengrave()
 
             if (otmp->otyp == WAN_WONDER) {
                 otmp->otyp = WAN_LIGHT + rn2(WAN_LIGHTNING - WAN_LIGHT);
+                pline("You get a funny feeling about this wand.");
                 wonder = TRUE;
             }
 
