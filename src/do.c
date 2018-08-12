@@ -1006,6 +1006,8 @@ dodown()
                     You("were unable to fit %s.", down_or_thru);
                     return 0;
                 }
+            } else {
+                return 0;
             }
         }
         You("%s %s the %s.", actn, down_or_thru,
