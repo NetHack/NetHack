@@ -795,11 +795,7 @@ struct permonst * pm;
         char dicebuf[20]; /* should be a safe limit */
         struct attack * attk;
 
-        if (pm == &mons[PM_AMALGAMATION]) {
-            Sprintf(buf2, "Uses a combination of attacks from fused monsters.");
-            APPENDC(TRUE, buf2);
-            break;
-        } else if (pm == &mons[PM_BAD_CLONE]) {
+        if (pm == &mons[PM_AMALGAMATION] || pm == &mons[PM_BAD_CLONE]) {
             Sprintf(buf2, "Uses a combination of attacks from fused monsters.");
             APPENDC(TRUE, buf2);
             break;
