@@ -268,16 +268,18 @@ boolean incr; /* true iff via incremental experience growth */
     if (!incr)
         You_feel("more experienced.");
 
-    /* increase hit points (when polymorphed, do monster form first
-       in order to retain normal human/whatever increase for later) */
-    if (Upolyd) {
-        hpinc = monhp_per_lvl(&youmonst);
-        u.mhmax += hpinc;
-        u.mh += hpinc;
+    if (!u.uroleplay.marathon) {
+        /* increase hit points (when polymorphed, do monster form first
+           in order to retain normal human/whatever increase for later) */
+        if (Upolyd) {
+            hpinc = monhp_per_lvl(&youmonst);
+            u.mhmax += hpinc;
+            u.mh += hpinc;
+        }
+        hpinc = newhp();
+        u.uhpmax += hpinc;
+        u.uhp += hpinc;
     }
-    hpinc = newhp();
-    u.uhpmax += hpinc;
-    u.uhp += hpinc;
 
     /* increase spell power/energy points */
     eninc = newpw();
