@@ -126,6 +126,8 @@ STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
 STATIC_DCL int FDECL(floodfillchk_match_under, (int, int));
 STATIC_DCL int FDECL(floodfillchk_match_accessible, (int, int));
+STATIC_DCL boolean FDECL(sel_flood_havepoint, (int, int,
+                                               xchar *, xchar *, int));
 STATIC_DCL void FDECL(selection_do_ellipse, (struct opvar *, int, int,
                                              int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
@@ -3895,6 +3897,23 @@ int x, y;
             || levl[x][y].typ == SCORR);
 }
 
+/* check whethere <x,y> is already in xs[],ys[] */
+STATIC_OVL boolean
+sel_flood_havepoint(x, y, xs, ys, n)
+int x, y;
+xchar xs[], ys[];
+int n;
+{
+    xchar xx = (xchar) x, yy = (xchar) y;
+
+    while (n > 0) {
+        if (xs[n] == xx && ys[n] == yy)
+            return TRUE;
+        --n;
+    }
+    return FALSE;
+}
+
 void
 selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
@@ -3904,7 +3923,7 @@ boolean diagonals;
     static const char nhFunc[] = "selection_floodfill";
     struct opvar *tmp = selection_opvar((char *) 0);
 #define SEL_FLOOD_STACK (COLNO * ROWNO)
-#define SEL_FLOOD(nx, ny)                     \
+#define SEL_FLOOD(nx, ny) \
     do {                                      \
         if (idx < SEL_FLOOD_STACK) {          \
             dx[idx] = (nx);                   \
@@ -3913,17 +3932,20 @@ boolean diagonals;
         } else                                \
             panic(floodfill_stack_overrun);   \
     } while (0)
-#define SEL_FLOOD_CHKDIR(mx,my,sel)                  \
-    if (isok((mx), (my))                             \
-        && (*selection_flood_check_func)((mx), (my)) \
-        && !selection_getpoint((mx), (my), (sel)))   \
-        SEL_FLOOD((mx), (my))
+#define SEL_FLOOD_CHKDIR(mx, my, sel) \
+    do {                                                        \
+        if (isok((mx), (my))                                    \
+            && (*selection_flood_check_func)((mx), (my))        \
+            && !selection_getpoint((mx), (my), (sel))           \
+            && !sel_flood_havepoint((mx), (my), dx, dy, idx))   \
+            SEL_FLOOD((mx), (my));                              \
+    } while (0)
     static const char floodfill_stack_overrun[] = "floodfill stack overrun";
     int idx = 0;
     xchar dx[SEL_FLOOD_STACK];
     xchar dy[SEL_FLOOD_STACK];
 
-    if (selection_flood_check_func == NULL) {
+    if (selection_flood_check_func == (int FDECL((*), (int, int))) 0) {
         opvar_free(tmp);
         return;
     }
