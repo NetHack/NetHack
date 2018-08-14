@@ -1867,9 +1867,13 @@ boolean called;
             name_at_start = TRUE;
         }
     } else if (mtmp->mextra && EAMA(mtmp) && !do_hallu) {
-        Sprintf(eos(buf), "%s%s",
-          EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
-          name_at_start = FALSE;
+        if (mdat == &mons[PM_AMALGAMATION])
+            Sprintf(eos(buf), "fused %s%s",
+              EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
+        else
+            Sprintf(eos(buf), "merged %s%s",
+              EAMA(mtmp)->m1->mname, EAMA(mtmp)->m2->mname);
+        name_at_start = FALSE;
     } else if (is_mplayer(mdat) && !In_endgame(&u.uz)) {
         char pbuf[BUFSZ];
 

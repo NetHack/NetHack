@@ -696,6 +696,12 @@ const char *in_str;
     else if (!strncmp(str, "the ", 4))
         str += 4;
 
+    /* Amalgamations and bad clones are a special case. */
+    if (!strncmp(str, "fused ", 6))
+        return PM_AMALGAMATION;
+    else if (!strncmp(str, "merged ", 7))
+        return PM_BAD_CLONE;
+
     slen = strlen(str);
     term = str + slen;
 
