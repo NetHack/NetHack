@@ -5,7 +5,7 @@ Catnip can help you befriend felines, but might also make them confused.
 Drawing from a deck of fate is generally a bad idea.
 A deck of cards could save you from a demon lord.
 Demon lords may be interested in more than just money.
-Throwing Gae Bulg can potentially kill anything, but will result in the loss of the artifact.
+Throwing Gae Bulg can potentially kill anything, but can also result in the loss of the artifact.
 The mysterious force has left the dungeon.
 Performing the invocation ritual will draw notice from the remaining royalty of Gehennom.
 Luckless Folly becomes more powerful the more unlucky you are.
@@ -19,7 +19,6 @@ Psionic attacks might confuse you.
 The Void is a dangerous branch that contains a void dragon. Enter at your peril.
 Void dragons can disintegrate you with a melee attack.
 Unlimited Moon's power is dependent on the moon phase.
-A polished silver shield might be a shield of reflection, or it could be a shield of resonance.
 Nymphs and other dungeon denizens might introduce themselves to you.
 Mystic scarabs have armor that is extremely difficult to penetrate.
 Phoenixes explode upon death.
@@ -71,7 +70,6 @@ Do not let your pet near a porcupine.
 Naming a spellbook of finger of death might let you summon a bonus boss.
 Cartomancers have a chance of reusing scrolls.
 Wands of wonder cannot grant wishes.
-Have a good JuneNethack!
 Dragonmasters cannot wear dragon scale mail.
 Dragonmasters can tame chromatic dragons.
 Amalgamations and bad clones are combinations of two monsters.
@@ -80,7 +78,7 @@ Looking up a monster or object will give you statistics about it.
 Floating eyes are a bit less common in the dungeon these days.
 Fire resistance only halves the damage from Mephisto's hellfire.
 Beware Buer! He has some of the highest damage output in the game.
-The Lord of the Foocubi is notable for their thieving ability.
+A tryst with Malcanthet ends poorly as often as not.
 Wands of poison gas create poison gas when engraving.
 Meet a monster zapping a corrupted knife of poison gas? Please report this bug.
 SpliceHack supports curses! Try editing your config file.
@@ -99,6 +97,7 @@ Gnolls are particularly good hiders.
 Gnolls are stronger than you might think.
 Pets can gain intrinsics from corpses, just like the player can.
 Monsters can gain the ability to jump or walk on water.
+Monsters can wear cloaks of displacement.
 Attacking a shimmering dragon in melee will activate their displacement.
 Landsharks are quite good at jumping.
 Earmuffs are actually quite valuable, and will protect you from sonic attacks.
@@ -108,3 +107,10 @@ Monsters are capable of riding other monsters.
 Death rides a pale horse.
 Headless horsemen are known to ride nightmares.
 Did you know? Noty was the first known player to ascend SpliceHack.
+Reading a scroll of cloning while polymorphed can be a frightful combination.
+Cheshire cats are difficult to pinpoint.
+Not sure what a monster does? Use ":" while hovering over them to look up all of their stats.
+Leprechauns love all types of gold, not just gold pieces.
+SpliceHack inherits many monsters from SLASH'EM.
+A demon lord summoned from Gehennom by the ascension ritual will no longer be covetous.
+Zouthern monsters are slightly less tough in SpliceHack than in other variants.
