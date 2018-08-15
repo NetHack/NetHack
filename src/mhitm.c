@@ -606,7 +606,7 @@ struct attack *mattk;
                     break;
                 } /*FALLTHRU*/
             case AT_HUGS:
-                if (magr != u.ustuck) {
+                if (magr != u.ustuck &&  mattk->aatyp == AT_HUGS) {
                     Sprintf(buf, "%s squeezes", magr_name);
                     break;
                 }
