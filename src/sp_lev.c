@@ -2552,19 +2552,23 @@ region *tmpregion;
     }
 }
 
-void
+STATIC_OVL void
 wallify_map(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     int x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
 
+    y1 = max(y1, 0);
+    x1 = max(x1, 1);
+    y2 = min(y2, ROWNO - 1);
+    x2 = min(x2, COLNO - 1);
     for (y = y1; y <= y2; y++) {
         lo_yy = (y > 0) ? y - 1 : 0;
         hi_yy = (y < y2) ? y + 1 : y2;
         for (x = x1; x <= x2; x++) {
             if (levl[x][y].typ != STONE)
                 continue;
-            lo_xx = (x > 0) ? x - 1 : 0;
+            lo_xx = (x > 1) ? x - 1 : 1;
             hi_xx = (x < x2) ? x + 1 : x2;
             for (yy = lo_yy; yy <= hi_yy; yy++)
                 for (xx = lo_xx; xx <= hi_xx; xx++)
