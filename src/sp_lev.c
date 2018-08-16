@@ -2552,13 +2552,9 @@ region *tmpregion;
     }
 }
 
-<<<<<<< HEAD
 /* initialization common to all special levels */
 /* XXX dup name in mkmap.c */
-void
-=======
 STATIC_OVL void
->>>>>>> NetHack-3.6.2
 wallify_map(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
