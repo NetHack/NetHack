@@ -2919,7 +2919,7 @@ But it is now likely that you can defeat %n, and recover
 "A short time ago, %n and his minions attacked this place.  They
 opened the huge volcanic vents you %x about the hill, and attacked.  I knew
 that this was to come to pass, and had asked %d for a group of %gP
-to help defend this place.  The few you %x here are the  mightiest of
+to help defend this place.  The few you %x here are the mightiest of
 Valhalla's own, and are all that are left of one hundred %d sent.
 
 "Despite the great and glorious battle we fought, %n managed at
