@@ -2127,9 +2127,12 @@ long timeout;
             suppress_see = TRUE;
 
         if (mtmp->mundetected) {
-            if (hides_under(mtmp->data) && mshelter) {
-                Sprintf(and_vanish, " and %s under %s",
-                        locomotion(mtmp->data, "crawl"), doname(mshelter));
+            if (hides_under(mtmp->data) && concealed_spot(mtmp->mx, mtmp->my)) {
+                Sprintf(and_vanish, " and %s under %s%s",
+                        locomotion(mtmp->data, "crawl"),
+                        (mshelter ? "" : "the "),
+                        (mshelter ? doname(mshelter) :
+                         explain_terrain(mtmp->mx, mtmp->my)));
             } else if (mtmp->data->mlet == S_MIMIC
                        || mtmp->data->mlet == S_EEL) {
                 suppress_see = TRUE;
