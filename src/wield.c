@@ -202,15 +202,17 @@ struct obj *wep;
                 pline("%s to shine %s!", Tobjnam(wep, "begin"),
                       arti_light_description(wep));
         }
-#if 0
-        /* we'll get back to this someday, but it's not balanced yet */
-        if (Race_if(PM_ELF) && !wep->oartifact
-            && objects[wep->otyp].oc_material == IRON) {
-            /* Elves are averse to wielding cold iron */
-            You("have an uneasy feeling about wielding cold iron.");
-            change_luck(-1);
+
+        /* Elves are averse to wielding cold iron - see uhitm.c */
+        if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))
+            && !wep->oartifact && objects[wep->otyp].oc_material == IRON) {
+            if (Race_if(PM_ELF)) {
+                You("feel uneasy about wielding cold iron.");
+            }
+            unweapon = TRUE;
+            /* change_luck(-1); This was the original idea, deemed unbalanced */
         }
-#endif
+
         if (wep->unpaid) {
             struct monst *this_shkp;
 

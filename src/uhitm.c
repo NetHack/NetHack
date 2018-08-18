@@ -280,9 +280,19 @@ int *attk_count, *role_roll_penalty;
         else if (!uwep && !uarms)
             tmp += (u.ulevel / 3) + 2;
     }
-    if (is_orc(mtmp->data)
-        && maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+    if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
+        /* Elves are graceful */
         tmp++;
+        /* and they get an extra hit bonus against orcs */
+        if (is_orc(mtmp->data)) {
+            tmp++;
+        }
+        /* but they are averse to cold iron */
+        if (weapon && !weapon->oartifact
+            && objects[weapon->otyp].oc_material == IRON)) {
+                tmp -= 4;
+        }
+    }
 
     /* encumbrance: with a lot of luggage, your agility diminishes */
     if ((tmp2 = near_capacity()) != 0)
@@ -391,8 +401,16 @@ register struct monst *mtmp;
     if (unweapon) {
         unweapon = FALSE;
         if (flags.verbose) {
-            if (uwep)
-                You("begin bashing monsters with %s.", yname(uwep));
+            if (uwep) {
+                /* Hint to players that elves should not wield iron */
+                if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))
+                    && !uwep->oartifact
+                    && objects[uwep->otyp].oc_material == IRON) {
+                    You("feel dizzy swinging %s.", yname(uwep));
+                } else {
+                    You("begin bashing monsters with %s.", yname(uwep));
+                }
+            }
             else if (!cantwield(youmonst.data))
                 You("begin %s monsters with your %s %s.",
                     ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
