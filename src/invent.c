@@ -1342,6 +1342,7 @@ boolean allow_floor;
                     ilet = '?';
                 else
                     ilet = '*';
+                first = FALSE;
             }
         } else {
             Sprintf(eos(qbuf), " [%s]", buf);
