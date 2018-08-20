@@ -1,8 +1,6 @@
 # NetHack 3.6  epitaph.txt       $NHDT-Date: 1524689580 2018/04/25 20:53:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $
 # Copyright (c) 2015 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
-# Epitaphs for random headstones (Edited by NullCGT 4/27/18)
-#
 #
 Rest in peace
 R.I.P.
@@ -397,4 +395,63 @@ Ya really had me going baby, but now I'm gone.
 Yes Dear, just a few more minutes...
 You said it wasn't poisonous!
 You set my heart aflame.  You gave me heartburn.
+#######
+# Splice epitaphs (mostly puns, rhymes, and references).
+#######
 DYWYPI?
+That is not dead which may eternal lie.
+In strange aeons even death may die.
+Here lies the barbarian Blanche, she tried real hard to fight an avalanche.
+Bob, killed by a zombie. Sure could use a turn, undead!
+This would never have happened in vanilla!
+This was all part of my evil plan!
+4.5 / 5 stars, would live again
+Sure is dark in here.
+Hindsight is 20/20
+Who dug this grave?
+What a world, what a world!
+Peter Fyde, tripped over a cockatrice corpse.
+HE COMES
+Lifetime guarantee
+Onward to the next adventure!
+Raise a glass
+Hey, who turned out the lights?
+Here lies a hero named Theseus, he was struck in the trapezius.
+Here lies the body of Ernest, he chugged some lava straight out of a furnace.
+Does anyone read these?
+Antigulp was here
+Here lies a mysterious force, dummied out as a matter of course
+Mystic scarab mass grave
+Hopes and Dreams
+RIP the Lord of the Foocubi, few were sad to see them die
+LOL, GWWOD. YASD.
+A miserable pile of secrets
+Doh!
+Don't let my death be in vain.
+For sale by owner
+"Zombie life insurance" isn't all it was cracked up to be
+That's it?
+Failed the death warp
+He was #1.
+Dig here for a wand of wishing
+20XX
+I now face Elbereth and walk backwards into Gehennom.
+Here we go again!
+Ouch.
+I shall walk this Earth again.
+I didn't want to go.
+No fair.
+Give Rodney a kick for me!
+Yet another victim of Master Kaen's training program.
+No regrets... except for eating that kobold corpse.
+Jimbo the item farmer, got some brown pudding stuck in his armor.
+Sarah the valkyrie, thought she'd sit on a throne to feel less dreary.
+They told me that what is dead may never die, but I feel pretty dead!
+In this grave sits Astolfo the knight, his fault was he never ran from a fight.
+######
+# The following are up there for most obscure references in Splice.
+######
+# This one will probably become a scroll in some form later.
+IOWA WE CASK NIACIN WE IX APOGEE IOWA
+I would have liked to have seen the Astral Plane
+Use your light but awful chains
