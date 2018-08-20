@@ -1865,6 +1865,11 @@ dosacrifice()
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
+                    livelog_printf (LL_DIVINEGIFT|LL_ARTIFACT,
+                            "had %s bestowed upon %s by %s",
+                            artiname(otmp->oartifact),
+                            uhim(),
+                            align_gname(u.ualign.type));
                     /* make sure we can use this weapon */
                     unrestrict_weapon_skill(weapon_type(otmp));
                     if (!Hallucination && !Blind) {
