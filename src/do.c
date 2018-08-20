@@ -1275,14 +1275,8 @@ struct monst *mtmp;
 
     /* There's a monster at your target destination; it might be one
        which accompanied you--see mon_arrive(dogmove.c)--or perhaps
-       it was already here.  Randomly move you to an adjacent spot
-       or else the monster to any nearby location.  Prior to 3.3.0
-       the latter was done unconditionally. */
-    if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
-        && distu(cc.x, cc.y) <= 2)
-        u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
-    else
-        mnexto(mtmp);
+       it was already here. Displace the monster to any nearby location. */
+    mnexto(mtmp);
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
         /* there was an unconditional impossible("mnexto failed")
