@@ -3303,8 +3303,8 @@ long cost;
 
         /* Don't schedule for repair unless it's a real shop entrance */
         for (shops = in_rooms(x, y, SHOPBASE); *shops; shops++)
-            if ((mtmp = shop_keeper(*shops)) != 0 && x == ESHK(mtmp)->shd.x
-                && y == ESHK(mtmp)->shd.y)
+            if ((mtmp = shop_keeper(*shops)) != 0
+                && x == ESHK(mtmp)->shd.x && y == ESHK(mtmp)->shd.y)
                 break;
         if (!*shops)
             return;
@@ -3312,10 +3312,11 @@ long cost;
     for (tmp_dam = level.damagelist; tmp_dam; tmp_dam = tmp_dam->next)
         if (tmp_dam->place.x == x && tmp_dam->place.y == y) {
             tmp_dam->cost += cost;
+            tmp_dam->when = monstermoves; /* needed by pay_for_damage() */
             return;
         }
-    tmp_dam = (struct damage *) alloc((unsigned) sizeof(struct damage));
-    (void) memset((genericptr_t)tmp_dam, 0, sizeof(struct damage));
+    tmp_dam = (struct damage *) alloc((unsigned) sizeof *tmp_dam);
+    (void) memset((genericptr_t) tmp_dam, 0, sizeof *tmp_dam);
     tmp_dam->when = monstermoves;
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
@@ -3362,11 +3363,11 @@ boolean croaked;
             if (IS_DOOR(levl[x][y].typ))
                 old_doormask = levl[x][y].doormask;
 
-            if (croaked)
+            if (croaked) {
                 disposition = (shops[1]) ? 0 : 1;
-            else if (stop_picking)
+            } else if (stop_picking) {
                 disposition = repair_damage(shkp, tmp_dam, FALSE);
-            else {
+            } else {
                 /* Defer the stop_occupation() until after repair msgs */
                 if (closed_door(x, y))
                     stop_picking = picking_at(x, y);
@@ -3461,15 +3462,16 @@ boolean croaked;
  */
 int
 repair_damage(shkp, tmp_dam, catchup)
-register struct monst *shkp;
-register struct damage *tmp_dam;
+struct monst *shkp;
+struct damage *tmp_dam;
 boolean catchup; /* restoring a level */
 {
-    register xchar x, y, i;
+    xchar x, y;
     xchar litter[9];
-    register struct monst *mtmp;
-    register struct obj *otmp;
-    register struct trap *ttmp;
+    struct monst *mtmp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int i, k, ix, iy, disposition = 1;
 
     if ((monstermoves - tmp_dam->when) < REPAIR_DELAY)
         return 0;
@@ -3478,18 +3480,14 @@ boolean catchup; /* restoring a level */
     x = tmp_dam->place.x;
     y = tmp_dam->place.y;
     if (!IS_ROOM(tmp_dam->typ)) {
-        if (x == u.ux && y == u.uy)
-            if (!Passes_walls)
-                return 0;
-        if (x == shkp->mx && y == shkp->my)
-            return 0;
-        if ((mtmp = m_at(x, y)) && (!passes_walls(mtmp->data)))
+        if ((x == u.ux && y == u.uy && !Passes_walls)
+            || (x == shkp->mx && y == shkp->my)
+            || ((mtmp = m_at(x, y)) && !passes_walls(mtmp->data)))
             return 0;
     }
     if ((ttmp = t_at(x, y)) != 0) {
-        if (x == u.ux && y == u.uy)
-            if (!Passes_walls)
-                return 0;
+        if (x == u.ux && y == u.uy && !Passes_walls)
+            return 0;
         if (ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP) {
             /* convert to an object */
             otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP,
@@ -3499,48 +3497,60 @@ boolean catchup; /* restoring a level */
             (void) mpickobj(shkp, otmp);
         }
         deltrap(ttmp);
-        if (IS_DOOR(tmp_dam->typ) && !(levl[x][y].doormask & D_ISOPEN)) {
-            levl[x][y].doormask = D_CLOSED;
-            block_point(x, y);
-        } else if (IS_WALL(tmp_dam->typ)) {
-            levl[x][y].typ = tmp_dam->typ;
-            block_point(x, y);
-        }
-        newsym(x, y);
-        return 3;
+        if (cansee(x, y))
+            newsym(x, y);
+        if (!catchup)
+            disposition = 3;
     }
-    if (IS_ROOM(tmp_dam->typ)) {
-        /* No messages, because player already filled trap door */
-        return 1;
-    }
-    if ((tmp_dam->typ == levl[x][y].typ)
-        && (!IS_DOOR(tmp_dam->typ) || (levl[x][y].doormask > D_BROKEN)))
-        /* No messages if player already replaced shop door */
-        return 1;
+    if (IS_ROOM(tmp_dam->typ)
+        || (tmp_dam->typ == levl[x][y].typ
+            && (!IS_DOOR(tmp_dam->typ) || levl[x][y].doormask > D_BROKEN)))
+        /* no terrain fix necessary (trap removal or manually repaired) */
+        return disposition;
+
+    /* door or wall repair; trap, if any, is now gone;
+       restore original terrain type and move any items away */
     levl[x][y].typ = tmp_dam->typ;
-    (void) memset((genericptr_t) litter, 0, sizeof(litter));
-    if ((otmp = level.objects[x][y]) != 0) {
-/* Scatter objects haphazardly into the shop */
+    if (IS_DOOR(tmp_dam->typ))
+        levl[x][y].doormask = D_CLOSED; /* arbitrary */
+
+    (void) memset((genericptr_t) litter, 0, sizeof litter);
 #define NEED_UPDATE 1
 #define OPEN 2
 #define INSHOP 4
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
+    k = 0; /* number of adjacent shop spots */
+    if (level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
         for (i = 0; i < 9; i++) {
-            if ((i == 4) || (!ZAP_POS(levl[x + horiz(i)][y + vert(i)].typ)))
+            ix = x + horiz(i);
+            iy = y + vert(i);
+            if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
                 continue;
             litter[i] = OPEN;
-            if (inside_shop(x + horiz(i), y + vert(i))
-                == ESHK(shkp)->shoproom)
+            if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
                 litter[i] |= INSHOP;
+                ++k;
+            }
         }
+    }
+    /* placement below assumes there is always at least one adjacent
+       spot; the 'k' check guards against getting stuck in an infinite
+       loop if some irregularly shaped room breaks that assumption */
+    if (k > 0) {
+        /* Scatter objects haphazardly into the shop */
         if (Punished && !u.uswallow
             && ((uchain->ox == x && uchain->oy == y)
                 || (uball->ox == x && uball->oy == y))) {
             /*
              * Either the ball or chain is in the repair location.
-             *
              * Take the easy way out and put ball&chain under hero.
+             *
+             * FIXME: message should be reworded; this might be the
+             * shop's doorway rather than a wall, there might be some
+             * other stuff here which isn't junk, and "your junk" has
+             * a slang connotation which could be applicable if hero
+             * has Passes_walls ability.
              */
             if (!Deaf && !muteshk(shkp))
                 verbalize("Get your junk out of my wall!");
@@ -3549,40 +3559,48 @@ boolean catchup; /* restoring a level */
         }
         while ((otmp = level.objects[x][y]) != 0)
             /* Don't mess w/ boulders -- just merge into wall */
-            if ((otmp->otyp == BOULDER) || (otmp->otyp == ROCK)) {
+            if (otmp->otyp == BOULDER || otmp->otyp == ROCK) {
                 obj_extract_self(otmp);
                 obfree(otmp, (struct obj *) 0);
             } else {
-                while (!(litter[i = rn2(9)] & INSHOP))
-                    ;
+                int trylimit = 50;
+
+                /* otmp must be moved otherwise level.objects[x][y] will
+                   never become Null and while-loop won't terminate */
+                do {
+                    i = rn2(9);
+                } while (--trylimit && !(litter[i] & INSHOP));
+                if ((litter[i] & (OPEN | INSHOP)) != 0) {
+                    ix = x + horiz(i);
+                    iy = y + vert(i);
+                } else {
+                    /* we know shk isn't at <x,y> because repair
+                       is deferred in that situation */
+                    ix = shkp->mx;
+                    iy = shkp->my;
+                }
                 remove_object(otmp);
-                place_object(otmp, x + horiz(i), y + vert(i));
+                place_object(otmp, ix, iy);
                 litter[i] |= NEED_UPDATE;
             }
     }
     if (catchup)
-        return 1; /* repair occurred while off level */
+        return 1; /* repair occurred while off level so no messages */
 
     block_point(x, y);
-    if (IS_DOOR(tmp_dam->typ)) {
-        levl[x][y].doormask = D_CLOSED; /* arbitrary */
-        newsym(x, y);
-    } else {
-        /* don't set doormask  - it is (hopefully) the same as it was
-           if not, perhaps save it with the damage array... */
-
-        if (IS_WALL(tmp_dam->typ) && cansee(x, y)) {
-            /* Player sees actual repair process, so they KNOW it's a wall */
+    if (cansee(x, y)) {
+        if (IS_WALL(tmp_dam->typ))
+            /* player sees actual repair process, so KNOWS it's a wall */
             levl[x][y].seenv = SVALL;
-            newsym(x, y);
-        }
-        /* Mark this wall as "repaired".  There currently is no code
-           to do anything about repaired walls, so don't do it. */
+        newsym(x, y);
     }
     for (i = 0; i < 9; i++)
         if (litter[i] & NEED_UPDATE)
             newsym(x + horiz(i), y + vert(i));
-    return 2;
+
+    if (disposition < 3)
+        disposition = 2;
+    return disposition;
 #undef NEED_UPDATE
 #undef OPEN
 #undef INSHOP
@@ -3595,12 +3613,12 @@ boolean catchup; /* restoring a level */
  */
 int
 shk_move(shkp)
-register struct monst *shkp;
+struct monst *shkp;
 {
-    register xchar gx, gy, omx, omy;
-    register int udist;
-    register schar appr;
-    register struct eshk *eshkp = ESHK(shkp);
+    xchar gx, gy, omx, omy;
+    int udist;
+    schar appr;
+    struct eshk *eshkp = ESHK(shkp);
     int z;
     boolean uondoor = FALSE, satdoor, avoid = FALSE, badinv;
 
@@ -3858,24 +3876,22 @@ boolean cant_mollify;
 {
     register struct monst *shkp = (struct monst *) 0;
     char shops_affected[5];
-    register boolean uinshp = (*u.ushops != '\0');
+    boolean uinshp = (*u.ushops != '\0');
     char qbuf[80];
-    register xchar x, y;
+    xchar x, y;
     boolean dugwall = (!strcmp(dmgstr, "dig into")    /* wand */
                        || !strcmp(dmgstr, "damage")); /* pick-axe */
     boolean animal, pursue;
     struct damage *tmp_dam, *appear_here = 0;
-    /* any number >= (80*80)+(24*24) would do, actually */
     long cost_of_damage = 0L;
-    unsigned int nearest_shk = 7000, nearest_damage = 7000;
+    unsigned int nearest_shk = (ROWNO * ROWNO) + (COLNO * COLNO),
+                 nearest_damage = nearest_shk;
     int picks = 0;
 
-    for (tmp_dam = level.damagelist;
-         (tmp_dam && (tmp_dam->when == monstermoves));
-         tmp_dam = tmp_dam->next) {
+    for (tmp_dam = level.damagelist; tmp_dam; tmp_dam = tmp_dam->next) {
         char *shp;
 
-        if (!tmp_dam->cost)
+        if (tmp_dam->when != monstermoves || !tmp_dam->cost)
             continue;
         cost_of_damage += tmp_dam->cost;
         Strcpy(shops_affected,

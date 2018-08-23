@@ -87,6 +87,12 @@ wallifying a special level might go out of map bounds (not with 3.6.x levels)
 	and corrupt other level data
 if a random grave produced during level creation included some gold, that gold
 	was left on the ground instead of being buried with other treasure
+multiple instances of shop damage at same spot (before repairs, so a broken
+	door or dug wall plus trap creation) only charged hero for first one
+shop door repair which took place when hero was on another level only worked
+	correctly if a trap at the same spot was removed
+object scattering during shop wall repair was skipped if a trap at the same
+	spot was also being removed
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
