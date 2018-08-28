@@ -1970,61 +1970,56 @@ reveal_terrain(full, which_subset)
 int full; /* wizard|explore modes allow player to request full map */
 int which_subset; /* when not full, whether to suppress objs and/or traps */
 {
-    if ((Hallucination || Stunned || Confusion) && !full) {
-        You("are too disoriented for this.");
-    } else {
-        int x, y, glyph, default_glyph;
-        char buf[BUFSZ];
-        /* there is a TER_MAP bit too; we always show map regardless of it */
-        boolean keep_traps = (which_subset & TER_TRP) !=0,
-                keep_objs = (which_subset & TER_OBJ) != 0,
-                keep_mons = (which_subset & TER_MON) != 0; /* not used */
-        unsigned swallowed = u.uswallow; /* before unconstrain_map() */
+    int x, y, glyph, default_glyph;
+    char buf[BUFSZ];
+    /* there is a TER_MAP bit too; we always show map regardless of it */
+    boolean keep_traps = (which_subset & TER_TRP) !=0,
+            keep_objs = (which_subset & TER_OBJ) != 0,
+            keep_mons = (which_subset & TER_MON) != 0; /* not used */
+    unsigned swallowed = u.uswallow; /* before unconstrain_map() */
 
-        if (unconstrain_map())
-            docrt();
-        default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree : S_stone);
+    if (unconstrain_map())
+        docrt();
+    default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree : S_stone);
 
-        for (x = 1; x < COLNO; x++)
-            for (y = 0; y < ROWNO; y++) {
-                glyph = reveal_terrain_getglyph(x,y, full, swallowed,
-                                                default_glyph, which_subset);
-                show_glyph(x, y, glyph);
-            }
-
-        /* hero's location is not highlighted, but getpos() starts with
-           cursor there, and after moving it anywhere '@' moves it back */
-        flush_screen(1);
-        if (full) {
-            Strcpy(buf, "underlying terrain");
-        } else {
-            Strcpy(buf, "known terrain");
-            if (keep_traps)
-                Sprintf(eos(buf), "%s traps",
-                        (keep_objs || keep_mons) ? "," : " and");
-            if (keep_objs)
-                Sprintf(eos(buf), "%s%s objects",
-                        (keep_traps || keep_mons) ? "," : "",
-                        keep_mons ? "" : " and");
-            if (keep_mons)
-                Sprintf(eos(buf), "%s and monsters",
-                        (keep_traps || keep_objs) ? "," : "");
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            glyph = reveal_terrain_getglyph(x,y, full, swallowed,
+                                            default_glyph, which_subset);
+            show_glyph(x, y, glyph);
         }
-        pline("Showing %s only...", buf);
 
-        /* allow player to move cursor around and get autodescribe feedback
-           based on what is visible now rather than what is on 'real' map */
-        which_subset |= TER_MAP; /* guarantee non-zero */
-        browse_map(which_subset, "anything of interest");
-
-        reconstrain_map();
-        docrt(); /* redraw the screen, restoring regular map */
-        if (Underwater)
-            under_water(2);
-        if (u.uburied)
-            under_ground(2);
+    /* hero's location is not highlighted, but getpos() starts with
+        cursor there, and after moving it anywhere '@' moves it back */
+    flush_screen(1);
+    if (full) {
+        Strcpy(buf, "underlying terrain");
+    } else {
+        Strcpy(buf, "known terrain");
+        if (keep_traps)
+            Sprintf(eos(buf), "%s traps",
+                    (keep_objs || keep_mons) ? "," : " and");
+        if (keep_objs)
+            Sprintf(eos(buf), "%s%s objects",
+                    (keep_traps || keep_mons) ? "," : "",
+                    keep_mons ? "" : " and");
+        if (keep_mons)
+            Sprintf(eos(buf), "%s and monsters",
+                    (keep_traps || keep_objs) ? "," : "");
     }
-    return;
+    pline("Showing %s only...", buf);
+
+    /* allow player to move cursor around and get autodescribe feedback
+        based on what is visible now rather than what is on 'real' map */
+    which_subset |= TER_MAP; /* guarantee non-zero */
+    browse_map(which_subset, "anything of interest");
+
+    reconstrain_map();
+    docrt(); /* redraw the screen, restoring regular map */
+    if (Underwater)
+        under_water(2);
+    if (u.uburied)
+        under_ground(2);
 }
 
 /*detect.c*/
