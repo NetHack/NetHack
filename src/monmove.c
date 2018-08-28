@@ -716,25 +716,25 @@ struct monst *mtmp;
 xchar nix,niy;
 {
     boolean can_tunnel = 0;
-    struct obj *mw_tmp;
+    struct obj *mw_tmp = MON_WEP(mtmp);
 
     if (!Is_rogue_level(&u.uz))
         can_tunnel = tunnels(mtmp->data);
 
-    if (can_tunnel && needspick(mtmp->data)
-        && mtmp->weapon_check != NO_WEAPON_WANTED
-        && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
-            || closed_door(nix, niy))) {
+    if (can_tunnel && needspick(mtmp->data) && !mwelded(mw_tmp)
+        && (may_dig(nix, niy) || closed_door(nix, niy))) {
+        /* may_dig() is either IS_STWALL or IS_TREE */
         if (closed_door(nix, niy)) {
-            if (!(mw_tmp = MON_WEP(mtmp))
+            if (!mw_tmp
                 || !is_pick(mw_tmp)
                 || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_OR_AXE;
         } else if (IS_TREE(levl[nix][niy].typ)) {
             if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_AXE;
-        } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
-            mtmp->weapon_check = NEED_PICK_AXE;
+        } else if (IS_STWALL(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp))
+                mtmp->weapon_check = NEED_PICK_AXE;
         }
         if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
             return TRUE;
