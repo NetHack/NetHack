@@ -2680,7 +2680,7 @@ struct attack *mattk;
             || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)))
         return 0;
 
-    if (genagr == 1 - gendef)
+    if (genagr == 1 - gendef || pagr == &mons[PM_MALCANTHET])
         return 1;
     else
         return (pagr->mlet == S_NYMPH) ? 2 : 0;
