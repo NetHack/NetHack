@@ -3280,7 +3280,22 @@ If NetHack can, it should display this number of messages at a time in
 the message window.
 .lp windowcolors
 If NetHack can, it should display windows with the specified
-foreground/background colors if it can.
+foreground/background colors. Windows GUI only. The format is
+.si
+.lp "OPTION=windowcolors:wintype foreground/background"
+.ei
+.pg
+where wintype is one of "menu", "message", "status", or "text", and
+foreground and background are colors, either a hexadecimal \'#rrggbb',
+one of the named colors (black, red, green, brown,
+blue, magenta, cyan, orange, brightgreen, yellow, brightblue,
+brightmagenta, brightcyan, white, trueblack, gray, purple,
+silver, maroon, fuchsia, lime, olive, navy, teal, aqua),
+or one of Windows UI colors (activeborder, activecaption,
+appworkspace, background, btnface, btnshadow, btntext,
+captiontext, graytext, greytext, highlight, highlighttext,
+inactiveborder, inactivecaption, menu, menutext, scrollbar,
+window, windowframe, windowtext).
 .lp wraptext
 If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.

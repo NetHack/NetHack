@@ -3850,7 +3850,25 @@ in the message window.
 %.lp
 \item[\ib{windowcolors}]
 If {\it NetHack\/} can, it should display windows with the specified
-foreground/background colors if it can.
+foreground/background colors. Windows GUI only. The format is
+\begin{verbatim}
+    OPTION=windowcolors:wintype foreground/background
+\end{verbatim}
+
+%.pg
+where wintype is one of {\it menu}, {\it message}, {\it status}, or {\it text}, and
+foreground and background are colors, either a hexadecimal {\it \#rrggbb},
+one of the named colors ({\it black}, {\it red}, {\it green}, {\it brown},
+{\it blue}, {\it magenta}, {\it cyan}, {\it orange},
+{\it brightgreen}, {\it yellow}, {\it brightblue}, {\it brightmagenta},
+{\it brightcyan}, {\it white}, {\it trueblack}, {\it gray}, {\it purple},
+{\it silver}, {\it maroon}, {\it fuchsia}, {\it lime}, {\it olive},
+{\it navy}, {\it teal}, {\it aqua}), or one of Windows UI colors ({\it activeborder},
+{\it activecaption}, {\it appworkspace}, {\it background}, {\it btnface}, {\it btnshadow},
+{\it btntext}, {\it captiontext}, {\it graytext}, {\it greytext}, {\it highlight},
+{\it highlighttext}, {\it inactiveborder}, {\it inactivecaption}, {\it menu},
+{\it menutext}, {\it scrollbar}, {\it window}, {\it windowframe}, {\it windowtext}).
+
 %.lp
 \item[\ib{wraptext}]
 If {\it NetHack\/} can, it should wrap long lines of text if they don't fit
