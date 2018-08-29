@@ -508,7 +508,7 @@ int how;
     else if (mptr == &mons[PM_WORM_THAT_WALKS] ||
               mptr == &mons[PM_LORD_OF_WORMS])
         u.ugrave_arise = PM_WORM_THAT_WALKS;
-    else if (mptr == &mons[PM_SPECTRE] || u.ulevel > 10)
+    else if (mptr == &mons[PM_SPECTRE] || u.ulevel > 15)
         u.ugrave_arise = PM_SPECTRE;
     /* this could happen if a high-end vampire kills the hero
        when ordinary vampires are genocided; ditto for wraiths */
