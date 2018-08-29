@@ -1018,8 +1018,8 @@ int after; /* this is extra fast monster movement */
         }
         /* allow dragons to free the player */
         if (u.ustuck) {
-            u.ustuck = 0;
-            pline("%s frees you!", mon_nam(mtmp));
+            expels(u.ustuck, u.ustuck->data, FALSE);
+            pline("%s frees you!", Monnam(mtmp));
             return 1;
         }
         /* allow dragons to awaken the player */
