@@ -1129,6 +1129,18 @@ register int pm;
         debugpline0("using attrcurse to strip an intrinsic");
         attrcurse();
         break;
+    case PM_ANCIENT_BRAIN:
+        if (ABASE(A_WIS) < ATTRMAX(A_WIS)) {
+            (void) adjattrib(A_WIS, 1, FALSE);
+        }
+        if (ABASE(A_INT) < ATTRMAX(A_INT)) {
+                pline("Yum! You're a smart eater!");
+                (void) adjattrib(A_INT, 1, FALSE);
+                break; /* don't give them telepathy, too */
+        } else {
+            pline("Maybe this is more satisfying for zombies.");
+        }
+        break;
     case PM_MIND_FLAYER:
     case PM_MASTER_MIND_FLAYER:
         if (ABASE(A_INT) < ATTRMAX(A_INT)) {
