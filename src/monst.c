@@ -1168,7 +1168,7 @@ NEARDATA struct permonst mons[] = {
      */
     MON("will-o'-the-wisp", S_LIGHT, LVL(2, 9, 2, 0, 0),
         (G_NOCORPSE | G_SGROUP | G_GENO | 4),
-        A(ATTK(AT_TUCH, AD_BLND, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK,
+        A(ATTK(AT_TUCH, AD_BLND, 1, 2), NO_ATTK, NO_ATTK, NO_ATTK,
                NO_ATTK, NO_ATTK), SIZ(0, 0, MS_SILENT, MZ_SMALL),
         MR_FIRE | MR_COLD | MR_ELEC | MR_DISINT | MR_SLEEP | MR_POISON
             | MR_ACID | MR_STONE,
