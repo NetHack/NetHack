@@ -2580,7 +2580,7 @@ long *out_cnt;
     if (wizard && iflags.override_ID) {
         char prompt[QBUFSZ];
 
-        any.a_char = -1;
+        any.a_char = WIZ_IDENT_VAL;
         /* wiz_identify stuffed the wiz_identify command character (^I)
            into iflags.override_ID for our use as an accelerator */
         Sprintf(prompt, "Debug Identify (%s to permanently identify)",

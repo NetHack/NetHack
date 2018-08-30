@@ -625,7 +625,7 @@ wiz_identify(VOID_ARGS)
 {
     if (wizard) {
         iflags.override_ID = (int) cmd_from_func(wiz_identify);
-        if ((signed char) display_inventory((char *) 0, TRUE) == -1)
+        if (display_inventory((char *) 0, TRUE) == WIZ_IDENT_VAL)
             identify_pack(0, FALSE);
         iflags.override_ID = 0;
     } else
