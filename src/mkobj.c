@@ -1861,7 +1861,7 @@ discard_minvent(mtmp)
 struct monst *mtmp;
 {
     struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = (mtmp->mhp > 0);
+    boolean keeping_mon = (!DEADMONSTER(mtmp));
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */

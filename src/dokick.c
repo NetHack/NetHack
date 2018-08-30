@@ -97,7 +97,7 @@ register boolean clumsy;
     dmg += u.udaminc; /* add ring(s) of increase damage */
     if (dmg > 0)
         mon->mhp -= dmg;
-    if (mon->mhp > 0 && martial() && !bigmonst(mon->data) && !rn2(3)
+    if (!DEADMONSTER(mon) && martial() && !bigmonst(mon->data) && !rn2(3)
         && mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
         /* see if the monster has a place to move into */
         mdx = mon->mx + u.dx;
@@ -116,8 +116,8 @@ register boolean clumsy;
         }
     }
 
-    (void) passive(mon, uarmf, TRUE, mon->mhp > 0, AT_KICK, FALSE);
-    if (mon->mhp <= 0 && !trapkilled)
+    (void) passive(mon, uarmf, TRUE, !DEADMONSTER(mon), AT_KICK, FALSE);
+    if (DEADMONSTER(mon) && !trapkilled)
         killed(mon);
 
     /* may bring up a dialog, so put this after all messages */
@@ -914,7 +914,7 @@ dokick()
         kick_monster(mtmp, x, y);
         glyph = glyph_at(x, y);
         /* see comment in attack_checks() */
-        if (mtmp->mhp <= 0) { /* DEADMONSTER() */
+        if (DEADMONSTER(mtmp)) { /* DEADMONSTER() */
             /* if we mapped an invisible monster and immediately
                killed it, we don't want to forget what we thought
                was there before the kick */

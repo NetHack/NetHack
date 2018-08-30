@@ -429,7 +429,7 @@ atk_done:
      * and it returned 0 (it's okay to attack), and the monster didn't
      * evade.
      */
-    if (context.forcefight && mtmp->mhp > 0 && !canspotmon(mtmp)
+    if (context.forcefight && !DEADMONSTER(mtmp) && !canspotmon(mtmp)
         && !glyph_is_invisible(levl[u.ux + u.dx][u.uy + u.dy].glyph)
         && !(u.uswallow && mtmp == u.ustuck))
         map_invisible(u.ux + u.dx, u.uy + u.dy);
@@ -792,7 +792,7 @@ int dieroll;
 
                 if (obj->oartifact
                     && artifact_hit(&youmonst, mon, obj, &tmp, dieroll)) {
-                    if (mon->mhp <= 0) /* artifact killed monster */
+                    if (DEADMONSTER(mon)) /* artifact killed monster */
                         return FALSE;
                     if (tmp == 0)
                         return TRUE;
@@ -835,7 +835,7 @@ int dieroll;
             freeinv(obj);
             potionhit(mon, obj,
                       hand_to_hand ? POTHIT_HERO_BASH : POTHIT_HERO_THROW);
-            if (mon->mhp <= 0)
+            if (DEADMONSTER(mon))
                 return FALSE; /* killed */
             hittxt = TRUE;
             /* in case potion effect causes transformation */
@@ -884,7 +884,7 @@ int dieroll;
                         if (resists_ston(mon))
                             break;
                         /* note: hp may be <= 0 even if munstoned==TRUE */
-                        return (boolean) (mon->mhp > 0);
+                        return (boolean) (!DEADMONSTER(mon));
 #if 0
                     } else if (touch_petrifies(mdat)) {
                         ; /* maybe turn the corpse into a statue? */
@@ -933,7 +933,7 @@ int dieroll;
                             minstapetrify(mon, TRUE);
                         if (resists_ston(mon))
                             break;
-                        return (boolean) (mon->mhp > 0);
+                        return (boolean) (!DEADMONSTER(mon));
                     } else { /* ordinary egg(s) */
                         const char *eggp =
                             (obj->corpsenm != NON_PM && obj->known)
@@ -1176,7 +1176,7 @@ int dieroll;
        a level draining artifact has already done to max HP */
     if (mon->mhp > mon->mhpmax)
         mon->mhp = mon->mhpmax;
-    if (mon->mhp < 1)
+    if (DEADMONSTER(mon))
         destroyed = TRUE;
     if (mon->mtame && tmp > 0) {
         /* do this even if the pet is being killed (affects revival) */
@@ -1501,7 +1501,7 @@ struct attack *mattk;
             possibly_unwield(mdef, FALSE);
         } else if (unwornmask & W_ARMG) { /* stole worn gloves */
             mselftouch(mdef, (const char *) 0, TRUE);
-            if (mdef->mhp <= 0) /* it's now a statue */
+            if (DEADMONSTER(mdef)) /* it's now a statue */
                 return;         /* can't continue stealing */
         }
 
@@ -1724,7 +1724,7 @@ register struct attack *mattk;
             mdef->mhp -= xtmp;
             /* !m_lev: level 0 monster is killed regardless of hit points
                rather than drop to level -1 */
-            if (mdef->mhp <= 0 || !mdef->m_lev) {
+            if (DEADMONSTER(mdef) || !mdef->m_lev) {
                 pline("%s dies!", Monnam(mdef));
                 xkilled(mdef, XKILL_NOMSG);
             } else
@@ -1848,7 +1848,7 @@ register struct attack *mattk;
         if (negated)
             break; /* physical damage only */
         if (!rn2(4) && !slimeproof(pd)) {
-            if (!munslime(mdef, TRUE) && mdef->mhp > 0) {
+            if (!munslime(mdef, TRUE) && !DEADMONSTER(mdef)) {
                 /* this assumes newcham() won't fail; since hero has
                    a slime attack, green slimes haven't been geno'd */
                 You("turn %s into slime.", mon_nam(mdef));
@@ -1856,7 +1856,7 @@ register struct attack *mattk;
                     pd = mdef->data;
             }
             /* munslime attempt could have been fatal */
-            if (mdef->mhp < 1)
+            if (DEADMONSTER(mdef))
                 return 2; /* skip death message */
             tmp = 0;
         }
@@ -1888,7 +1888,7 @@ register struct attack *mattk;
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
     mdef->mhp -= tmp;
-    if (mdef->mhp < 1) {
+    if (DEADMONSTER(mdef)) {
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
             if (tmp)
@@ -1940,7 +1940,7 @@ register struct attack *mattk;
         if (!resistance) {
             pline("%s gets blasted!", Monnam(mdef));
             mdef->mhp -= tmp;
-            if (mdef->mhp <= 0) {
+            if (DEADMONSTER(mdef)) {
                 killed(mdef);
                 return 2;
             }
@@ -2074,7 +2074,7 @@ register struct attack *mattk;
                    several turns) but the level-gain message seems out of
                    order if the kill message is left implicit */
                 xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
-                if (mdef->mhp > 0) { /* monster lifesaved */
+                if (!DEADMONSTER(mdef)) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));
                 } else {
@@ -2183,9 +2183,9 @@ register struct attack *mattk;
             }
             end_engulf();
             mdef->mhp -= dam;
-            if (mdef->mhp <= 0) {
+            if (DEADMONSTER(mdef)) {
                 killed(mdef);
-                if (mdef->mhp <= 0) /* not lifesaved */
+                if (DEADMONSTER(mdef)) /* not lifesaved */
                     return 2;
             }
             You("%s %s!", is_animal(youmonst.data) ? "regurgitate" : "expel",
@@ -2832,7 +2832,7 @@ struct obj *otmp; /* source of flash */
                                               : rn2(min(mtmp->mhp, 4));
                 light_hits_gremlin(mtmp, amt);
             }
-            if (mtmp->mhp > 0) {
+            if (!DEADMONSTER(mtmp)) {
                 if (!context.mon_moving)
                     setmangry(mtmp, TRUE);
                 if (tmp < 9 && !mtmp->isshk && rn2(4))
@@ -2854,7 +2854,7 @@ int dmg;
           (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);
-    if (mon->mhp <= 0) {
+    if (DEADMONSTER(mon)) {
         if (context.mon_moving)
             monkilled(mon, (char *) 0, AD_BLND);
         else

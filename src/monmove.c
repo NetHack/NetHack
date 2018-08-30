@@ -31,9 +31,9 @@ struct monst *mtmp;
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
     mtmp->mhp -= rnd(15);
-    if (mtmp->mhp <= 0) {
+    if (DEADMONSTER(mtmp)) {
         mondied(mtmp);
-        if (mtmp->mhp > 0) /* lifesaved */
+        if (!DEADMONSTER(mtmp)) /* lifesaved */
             return FALSE;
         else
             return TRUE;
@@ -413,7 +413,7 @@ register struct monst *mtmp;
         m_respond(mtmp);
     if (mdat == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
         m_respond(mtmp);
-    if (mtmp->mhp <= 0)
+    if (DEADMONSTER(mtmp))
         return 1; /* m_respond gaze can kill medusa */
 
     /* fleeing monsters might regain courage */
@@ -518,7 +518,7 @@ register struct monst *mtmp;
                 if (cansee(m2->mx, m2->my))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
-                if (m2->mhp <= 0)
+                if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
                 else
                     m2->msleeping = 0;
@@ -590,7 +590,7 @@ toofar:
         case 0: /* no movement, but it can still attack you */
         case 3: /* absolutely no movement */
             /* vault guard might have vanished */
-            if (mtmp->isgd && (mtmp->mhp < 1 || mtmp->mx == 0))
+            if (mtmp->isgd && (DEADMONSTER(mtmp) || mtmp->mx == 0))
                 return 1; /* behave as if it died */
             /* During hallucination, monster appearance should
              * still change - even if it doesn't move.

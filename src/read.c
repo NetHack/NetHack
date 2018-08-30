@@ -1814,7 +1814,7 @@ boolean confused, byu;
             }
         }
         mtmp->mhp -= mdmg;
-        if (mtmp->mhp <= 0) {
+        if (DEADMONSTER(mtmp)) {
             if (byu) {
                 killed(mtmp);
             } else {
