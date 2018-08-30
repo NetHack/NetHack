@@ -748,7 +748,7 @@ time_t when; /* date+time at end of game */
     dump_plines();
     putstr(0, 0, "");
     putstr(0, 0, "Inventory:");
-    display_inventory((char *) 0, TRUE);
+    (void) display_inventory((char *) 0, TRUE);
     container_contents(invent, TRUE, TRUE, FALSE);
     enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
                   (how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
