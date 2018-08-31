@@ -354,9 +354,9 @@ int force;
                             /* Falling is okay for falling down
                                 within a pit from jostling too */
                             mselftouch(mtmp, "Falling, ", TRUE);
-                            if (mtmp->mhp > 0) {
+                            if (!DEADMONSTER(mtmp)) {
                                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
-                                if (mtmp->mhp <= 0) {
+                                if (DEADMONSTER(mtmp)) {
                                     if (!cansee(x, y)) {
                                         pline("It is destroyed!");
                                     } else {

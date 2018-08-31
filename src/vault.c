@@ -55,9 +55,9 @@ boolean forceshow;
     while ((fcbeg = egrd->fcbeg) < egrd->fcend) {
         fcx = egrd->fakecorr[fcbeg].fx;
         fcy = egrd->fakecorr[fcbeg].fy;
-        if ((grd->mhp <= 0 || !in_fcorridor(grd, u.ux, u.uy)) && egrd->gddone)
+        if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy)) && egrd->gddone)
             forceshow = TRUE;
-        if ((u.ux == fcx && u.uy == fcy && grd->mhp > 0)
+        if ((u.ux == fcx && u.uy == fcy && !DEADMONSTER(grd))
             || (!forceshow && couldsee(fcx, fcy))
             || (Punished && !carried(uball) && uball->ox == fcx
                 && uball->oy == fcy))
@@ -592,7 +592,7 @@ register struct monst *grd;
     boolean goldincorridor = FALSE,
             u_in_vault = vault_occupied(u.urooms) ? TRUE : FALSE,
             grd_in_vault = *in_rooms(grd->mx, grd->my, VAULT) ? TRUE : FALSE;
-    boolean disappear_msg_seen = FALSE, semi_dead = (grd->mhp <= 0);
+    boolean disappear_msg_seen = FALSE, semi_dead = (DEADMONSTER(grd));
     long umoney = money_cnt(invent);
     register boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
     boolean see_guard, newspot = FALSE;

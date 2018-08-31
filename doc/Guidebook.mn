@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.264 $ $NHDT-Date: 1524690677 2018/04/25 21:11:17 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.271 $ $NHDT-Date: 1535668900 2018/08/30 22:41:40 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 28, 2018
+.ds f2 "August 30, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -782,13 +782,13 @@ The available options
 are listed later in this Guidebook.  Options are usually set before the
 game rather than with the `O' command; see the section on options below.
 .lp ^O
-Show overview or show dungeon layout
+Show overview.
 .lp ""
-In normal play and in explore mode, a shortcut for the ``#overview''
-extended command to list interesting dungeon levels visited.
+Shortcut for ``#overview'':  list interesting dungeon levels visited.
 .lp ""
-In debug mode, an extra command which lists the placement of all special
-levels.
+(Prior to 3.6.0, `^O' was a debug mode command which listed
+the placement of all special levels.
+Use ``#wizwhere'' to run that command.)
 .lp p
 Pay your shopping bill.
 .lp P
@@ -1098,13 +1098,19 @@ Default key is '^D', and 'k' if
 .op number_pad
 is on.
 .lp #known
-Show what object types have been discovered. Default key is '\\'.
+Show what object types have been discovered.
+Default key is '\\'.
 .lp #knownclass
-Show discovered types for one class of objects. Default key is '`'.
+Show discovered types for one class of objects.
+Default key is '`'.
 .lp #levelchange
-Change your experience level. Autocompletes. Wizard-mode only.
+Change your experience level.
+Autocompletes.
+Debug mode only.
 .lp #lightsources
-Show mobile light sources. Autocompletes. Wizard-mode only.
+Show mobile light sources.
+Autocompletes.
+Debug mode only.
 .lp #look
 Look at what is here, under you. Default key is ':'.
 .lp #loot
@@ -1116,7 +1122,9 @@ Default key is 'M-l', and 'l' if
 .op number_pad
 is on.
 .lp #monpolycontrol
-Control monster polymorphs. Autocompletes. Wizard-mode only.
+Control monster polymorphs.
+Autocompletes.
+Debug mode only.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
 Autocompletes. Default key is 'M-m'.
@@ -1142,14 +1150,19 @@ If dungeon overview is chosen during end-of-game disclosure, every visited
 level will be included regardless of annotations. Autocompletes.
 Default keys are '^O', and 'M-O'.
 .lp #panic
-Test the panic routine. Autocompletes. Wizard-mode only.
+Test the panic routine.
+Terminates the current game.
+Autocompletes.
+Debug mode only.
 .lp "#pay "
 Pay your shopping bill. Default key is 'p'.
 .lp #pickup
 Pick up things at the current location. Default key is ','.
 The `m' prefix forces use of a menu.
 .lp #polyself
-Polymorph self. Autocompletes. Wizard-mode only.
+Polymorph self.
+Autocompletes.
+Debug mode only.
 .lp #pray
 Pray to the gods for help. Autocompletes. Default key is 'M-p'.
 .lp ""
@@ -1203,7 +1216,9 @@ Show the armor currently worn. Default key is '['.
 .lp #seegold
 Count your gold. Default key is '$'.
 .lp #seenv
-Show seen vectors. Autocompletes. Wizard-mode only.
+Show seen vectors.
+Autocompletes.
+Debug mode only.
 .lp #seerings
 Show the ring(s) currently worn. Default key is '='.
 .lp #seespells
@@ -1220,7 +1235,9 @@ Do a shell escape. Default key is '!'.
 .lp "#sit "
 Sit down. Autocompletes. Default key is 'M-s'.
 .lp #stats
-Show memory statistics. Autocompletes. Wizard-mode only.
+Show memory statistics.
+Autocompletes.
+Debug mode only.
 .lp #suspend
 Suspend the game. Default key is '^Z'.
 .lp #swap
@@ -1239,7 +1256,9 @@ Show a menu of possible actions in a location next to you.
 .lp #throw
 Throw something. Default key is 't'.
 .lp #timeout
-Look at the timeout queue. Autocompletes. Wizard-mode only.
+Look at the timeout queue.
+Autocompletes.
+Debug mode only.
 .lp "#tip "
 Tip over a container (bag or box) to pour out its contents.
 Autocompletes. Default key is 'M-T'.
@@ -1271,16 +1290,21 @@ In some circumstances it can also be used to rescue trapped monsters.
 .lp "#up  "
 Go up a staircase. Default key is '<'.
 .lp #vanquished
-List vanquished monsters. Autocompletes. Wizard-mode only.
+List vanquished monsters.
+Autocompletes.
+Debug mode only.
 .lp #version
 Print compile time options for this version of NetHack.
 Autocompletes. Default key is 'M-v'.
 .lp #versionshort
 Show version string. Default key is 'v'.
 .lp #vision
-Show vision array. Autocompletes. Wizard-mode only.
+Show vision array.
+Autocompletes.
+Debug mode only.
 .lp #wait
-Rest one move while doing nothing. Default key is '.', and ' ' if
+Rest one move while doing nothing.
+Default key is '.', and also ' ' if
 rest_on_space is on.
 .lp #wear
 Wear a piece of armor. Default key is 'W'.
@@ -1293,35 +1317,65 @@ Wield a weapon. Default key is 'w'.
 .lp #wipe
 Wipe off your face. Autocompletes. Default key is 'M-w'.
 .lp #wizdebug_bury
-Bury objects under and around you. Autocompletes. Wizard-mode only.
+Bury objects under and around you.
+Autocompletes.
+Debug mode only.
 .lp #wizdebug_traveldisplay
-Toggle travel display. Autocompletes. Wizard-mode only.
+Toggle travel display.
+Autocompletes.
+Debug mode only.
 .lp #wizdetect
-Search a room. Autocompletes. Wizard-mode only. Default key is '^E'.
+Search for hidden things (secret doors or traps or unseen monsters)
+within a modest radius.
+Autocompletes.
+Debug mode only.
+Default key is '^E'.
 .lp #wizgenesis
-Create a monster. Autocompletes. Wizard-mode only. Default key is '^G'.
+Create a monster.
+May be prefixed by a count to create more than one.
+Autocompletes.
+Debug mode only.
+Default key is '^G'.
 .lp #wizidentify
-Identify all items in inventory. Autocompletes. Wizard-mode only.
+Identify all items in inventory.
+Autocompletes.
+Debug mode only.
 Default key is '^I'.
 .lp #wizintrinsic
-Set intrinsic. Autocompletes. Wizard-mode only.
+Set one or more intrinsic attributes.
+Autocompletes.
+Debug mode only.
 .lp #wizlevelport
 Teleport to another level.
 Autocompletes.
-Wizard-mode only.
+Debug mode only.
 Default key is '^V'.
 .lp #wizmap
-Map the level. Autocompletes. Wizard-mode only. Default key is '^F'.
+Map the level.
+Autocompletes.
+Debug mode only.
+Default key is '^F'.
 .lp #wizrumorcheck
-Verify rumor boundaries. Autocompletes. Wizard-mode only.
+Verify rumor boundaries.
+Autocompletes.
+Debug mode only.
 .lp #wizsmell
-Smell monster. Autocompletes. Wizard-mode only.
+Smell monster.
+Autocompletes.
+Debug mode only.
 .lp #wizwhere
-Show locations of special levels. Autocompletes. Wizard-mode only.
+Show locations of special levels.
+Autocompletes.
+Debug mode only.
 .lp #wizwish
-Wish for something. Autocompletes. Wizard-mode only. Default key is '^W'.
+Wish for something.
+Autocompletes.
+Debug mode only.
+Default key is '^W'.
 .lp #wmode
-Show wall modes. Autocompletes. Wizard-mode only.
+Show wall modes.
+Autocompletes.
+Debug mode only.
 .lp "#zap "
 Zap a wand. Default key is 'z'.
 .lp "#?   "
@@ -2476,9 +2530,10 @@ Example:
 \fBSYMBOLS=S_boulder:0\fP
 .ed
 .lp WIZKIT
-Wizard-mode extra items, in a text file containing item names,
-one per line, up to a maximum of 128 lines. Each line is processed
-by the function that handles wishing.
+Debug mode only:  extra items to add to initial inventory.
+Value is the name of a text file containing a list of item names,
+one per line, up to a maximum of 128 lines.
+Each line is processed by the function that handles wishing.
 .pg
 Example:
 .sd
@@ -3280,7 +3335,22 @@ If NetHack can, it should display this number of messages at a time in
 the message window.
 .lp windowcolors
 If NetHack can, it should display windows with the specified
-foreground/background colors if it can.
+foreground/background colors. Windows GUI only. The format is
+.si
+.lp "OPTION=windowcolors:wintype foreground/background"
+.ei
+.pg
+where wintype is one of "menu", "message", "status", or "text", and
+foreground and background are colors, either a hexadecimal \'#rrggbb',
+one of the named colors (black, red, green, brown,
+blue, magenta, cyan, orange, brightgreen, yellow, brightblue,
+brightmagenta, brightcyan, white, trueblack, gray, purple,
+silver, maroon, fuchsia, lime, olive, navy, teal, aqua),
+or one of Windows UI colors (activeborder, activecaption,
+appworkspace, background, btnface, btnshadow, btntext,
+captiontext, graytext, greytext, highlight, highlighttext,
+inactiveborder, inactivecaption, menu, menutext, scrollbar,
+window, windowframe, windowtext).
 .lp wraptext
 If NetHack can, it should wrap long lines of text if they don't fit in
 the visible area of the window.
@@ -4130,15 +4200,15 @@ system).
 .\"               as filling and justifying are concerned
 .lp
 WIZARDS\ =\ A space-separated list of user names who are allowed to
-play in wizard
-mode (the debugging mode, not the magic-using role).  A value of a single
-asterisk (*) allows anyone to start a game in wizard mode.
+play in debug mode (commonly referred to as wizard mode).
+A value of a single
+asterisk (*) allows anyone to start a game in debug mode.
 .lp
 SHELLERS\ =\ A list of users who are allowed to use the shell
 escape command (!).  The syntax is the same as WIZARDS.
 .lp
-EXPLORERS\ =\ A list of users who are allowed to use the explore mode.  The
-syntax is the same as WIZARDS.
+EXPLORERS\ =\ A list of users who are allowed to use the explore mode.
+The syntax is the same as WIZARDS.
 .lp
 MAXPLAYERS\ =\ Limit the maximum number of games that can be running
 at the same time.
@@ -4246,10 +4316,13 @@ the trepid reader to discover.
 Debug mode
 .pg
 Debug mode, also known as wizard mode, is undocumented aside from this
-brief description.  It is intended for tracking down problems within the
+brief description and the various ``debug mode only'' commands listed
+among the command descriptions.
+It is intended for tracking down problems within the
 program rather than to provide god-like powers to your character, and
 players who attempt debugging are expected to figure out how to use it
-themselves.  It is initiated by starting the game with the
+themselves.
+It is initiated by starting the game with the
 .op \-D
 command-line switch or with the
 .op playmode:debug
@@ -4259,8 +4332,7 @@ For some systems, the player must be logged in
 under a particular user name to be allowed to use debug mode; for others,
 the hero must be given a particular character name (but may be any role;
 there's no connection between ``wizard mode'' and the Wizard role).
-And on any system, the program might have been configured to omit debug
-mode entirely.  Attempting to start a game in debug mode when not allowed
+Attempting to start a game in debug mode when not allowed
 or not available will result in falling back to explore mode instead.
 .
 .hn

@@ -208,7 +208,7 @@ int expltype;
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
             if (mtmp) {
-                if (mtmp->mhp < 1)
+                if (DEADMONSTER(mtmp))
                     explmask[i][j] = 2;
                 else
                     switch (adtyp) {
@@ -444,7 +444,7 @@ int expltype;
                     mtmp->mhp -= mdam;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
-                if (mtmp->mhp <= 0) {
+                if (DEADMONSTER(mtmp)) {
                     int xkflg = ((adtyp == AD_FIRE
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);

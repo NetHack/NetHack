@@ -87,6 +87,23 @@ wallifying a special level might go out of map bounds (not with 3.6.x levels)
 	and corrupt other level data
 if a random grave produced during level creation included some gold, that gold
 	was left on the ground instead of being buried with other treasure
+multiple instances of shop damage at same spot (before repairs, so a broken
+	door or dug wall plus trap creation) only charged hero for first one
+shop door repair which took place when hero was on another level only worked
+	correctly if a trap at the same spot was removed
+object scattering during shop wall repair was skipped if a trap at the same
+	spot was also being removed
+augmented death reason for "while helpless" was broken for record and logfile
+	(but still correct for xlogfile)
+prevent wish prompt input from remembering the previous wish
+parchment and vellum are made from animal skin so change material composition
+	and color for spellbooks with those descriptions from paper to leather;
+	eating those books now breaks vegetarian conduct
+fix monsters not wielding digging implements
+wizard mode ^I^I didn't make temporary identifications become persistent if
+	the build configuration makes plain 'char' unsigned
+wizard mode #wizidentify didn't disclose extra information for unID'd items if
+	key bindings took away ^I and didn't bind #wizidentify to another key
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -135,6 +152,8 @@ status_hilite options which use comparisons may now use <= and >= in
 sortloot option has been enhanced to improve object ordering; primarily,
 	items of undiscovered type come out before items of discovered type
 	within each class or sub-class of objects
+YAFM when stumbling on an undetected monster while hallucinating
+Make it clear when a leprechaun dodges your attack
 
 
 Code Cleanup and Reorganization

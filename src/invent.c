@@ -5,6 +5,10 @@
 
 #include "hack.h"
 
+#ifndef C /* same as cmd.c */
+#define C(c) (0x1f & (c))
+#endif
+
 #define NOINVSYM '#'
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'
@@ -2580,9 +2584,15 @@ long *out_cnt;
     if (wizard && iflags.override_ID) {
         char prompt[QBUFSZ];
 
-        any.a_char = -1;
+        /* C('I') == ^I == default keystroke for wiz_identify;
+           it is guaranteed not to be in use as an inventory letter
+           (wiz_identify might be remapped to an ordinary letter,
+           making iflags.override_ID ambiguous as a return value) */
+        any.a_char = C('I');
         /* wiz_identify stuffed the wiz_identify command character (^I)
-           into iflags.override_ID for our use as an accelerator */
+           into iflags.override_ID for our use as an accelerator;
+           it could be ambiguous as a selector but the only time it
+           is wanted is in case where no item is being selected */
         Sprintf(prompt, "Debug Identify (%s to permanently identify)",
                 visctrl(iflags.override_ID));
         add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,

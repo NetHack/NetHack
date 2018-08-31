@@ -1752,7 +1752,7 @@ struct monst *mtmp, *victim;
     /* monster died after killing enemy but before calling this function */
     /* currently possible if killing a gas spore */
     /* Also used to abort processing for CONWAYS's mildew temp monsters. */
-    if (mtmp->mhp <= 0)
+    if (DEADMONSTER(mtmp))
         return (struct permonst *) 0;
 
     /* note:  none of the monsters with special hit point calculations

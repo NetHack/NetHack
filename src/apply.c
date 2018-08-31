@@ -767,7 +767,7 @@ register xchar x, y;
                        corpse less likely to remain tame after revival */
                     xkilled(mtmp, XKILL_NOMSG);
                     /* life-saving doesn't ordinarily reset this */
-                    if (mtmp->mhp > 0)
+                    if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
                     pline("%s is choked by the leash!", Monnam(mtmp));

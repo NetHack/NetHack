@@ -285,7 +285,7 @@ struct obj *otmp, *mwep;
            if mtmp gets killed (shot kills adjacent gas spore and
            triggers explosion, perhaps), inventory will be dropped
            and otmp might go away via merging into another stack */
-        if (mtmp->mhp <= 0 && m_shot.i < m_shot.n)
+        if (DEADMONSTER(mtmp) && m_shot.i < m_shot.n)
             /* cancel pending shots (perhaps ought to give a message here
                since we gave one above about throwing/shooting N missiles) */
             break; /* endmultishot(FALSE); */
@@ -404,9 +404,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 damage = 0;
         }
 
-        if (mtmp->mhp > 0) { /* might already be dead (if petrified) */
+        if (!DEADMONSTER(mtmp)) { /* might already be dead (if petrified) */
             mtmp->mhp -= damage;
-            if (mtmp->mhp < 1) {
+            if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !target))
                     pline("%s is %s!", Monnam(mtmp),
                           (nonliving(mtmp->data) || is_vampshifter(mtmp)
@@ -422,7 +422,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
 
         /* blinding venom and cream pie do 0 damage, but verify
            that the target is still alive anyway */
-        if (mtmp->mhp > 0
+        if (!DEADMONSTER(mtmp)
             && can_blnd((struct monst *) 0, mtmp,
                         (uchar) ((otmp->otyp == BLINDING_VENOM) ? AT_SPIT
                                                                 : AT_WEAP),
