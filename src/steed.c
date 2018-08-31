@@ -551,7 +551,7 @@ int reason; /* Player was thrown off etc. */
             (void) rloc(mtmp, FALSE);
         return;
     }
-    if (mtmp->mhp > 0) {
+    if (!DEADMONSTER(mtmp)) {
         place_monster(mtmp, u.ux, u.uy);
         if (!u.uswallow && !u.ustuck && have_spot) {
             struct permonst *mdat = mtmp->data;
@@ -594,7 +594,7 @@ int reason; /* Player was thrown off etc. */
              * falling into the hole).
              */
             /* [ALI] No need to move the player if the steed died. */
-            if (mtmp->mhp > 0) {
+            if (!DEADMONSTER(mtmp)) {
                 /* Keep steed here, move the player to cc;
                  * teleds() clears u.utrap
                  */

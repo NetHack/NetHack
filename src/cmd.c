@@ -7,6 +7,22 @@
 #include "lev.h"
 #include "func_tab.h"
 
+/* Macros for meta and ctrl modifiers:
+ *   M and C return the meta/ctrl code for the given character;
+ *     e.g., (C('c') is ctrl-c
+ */
+#ifndef M
+#ifndef NHSTDC
+#define M(c) (0x80 | (c))
+#else
+#define M(c) ((c) - 128)
+#endif /* NHSTDC */
+#endif
+
+#ifndef C
+#define C(c) (0x1f & (c))
+#endif
+
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
 #endif
@@ -625,8 +641,18 @@ wiz_identify(VOID_ARGS)
 {
     if (wizard) {
         iflags.override_ID = (int) cmd_from_func(wiz_identify);
-        if (display_inventory((char *) 0, TRUE) == -1)
+        /* command remapping might leave #wizidentify as the only way
+           to invoke us, in which case cmd_from_func() will yield NUL;
+           it won't matter to display_inventory()/display_pickinv()
+           if ^I invokes some other command--what matters is that it
+           is never an inventory letter */
+        if (!iflags.override_ID)
+            iflags.override_ID = C('I');
+        /* C('I') == ^I == default keystroke for wiz_identify;
+           it doesn't matter whether the command has been remapped */
+        if (display_inventory((char *) 0, TRUE) == C('I'))
             identify_pack(0, FALSE);
+        /* [TODO?  if player picks a specific inventory item, ID it] */
         iflags.override_ID = 0;
     } else
         pline("Unavailable command '%s'.",
@@ -2858,22 +2884,6 @@ int final;
     destroy_nhwindow(en_win);
     en_win = WIN_ERR;
 }
-
-/* Macros for meta and ctrl modifiers:
- *   M and C return the meta/ctrl code for the given character;
- *     e.g., (C('c') is ctrl-c
- */
-#ifndef M
-#ifndef NHSTDC
-#define M(c) (0x80 | (c))
-#else
-#define M(c) ((c) - 128)
-#endif /* NHSTDC */
-#endif
-
-#ifndef C
-#define C(c) (0x1f & (c))
-#endif
 
 /* ordered by command name */
 struct ext_func_tab extcmdlist[] = {

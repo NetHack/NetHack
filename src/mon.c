@@ -509,9 +509,9 @@ register struct monst *mtmp;
         mtmp->mhp -= dam;
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
-        if (mtmp->mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             mondead(mtmp);
-            if (mtmp->mhp < 1)
+            if (DEADMONSTER(mtmp))
                 return 1;
         }
         water_damage_chain(mtmp->minvent, FALSE);
@@ -538,14 +538,14 @@ register struct monst *mtmp;
                 mondead(mtmp);
             } else {
                 mtmp->mhp -= 1;
-                if (mtmp->mhp < 1) {
+                if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
                         pline("%s surrenders to the fire.", Monnam(mtmp));
                     mondead(mtmp);
                 } else if (cansee(mtmp->mx, mtmp->my))
                     pline("%s burns slightly.", Monnam(mtmp));
             }
-            if (mtmp->mhp > 0) {
+            if (!DEADMONSTER(mtmp)) {
                 (void) fire_damage_chain(mtmp->minvent, FALSE, FALSE,
                                          mtmp->mx, mtmp->my);
                 (void) rloc(mtmp, FALSE);
@@ -570,7 +570,7 @@ register struct monst *mtmp;
                       Monnam(mtmp), hliquid("water"));
             }
             mondead(mtmp);
-            if (mtmp->mhp > 0) {
+            if (!DEADMONSTER(mtmp)) {
                 water_damage_chain(mtmp->minvent, FALSE);
                 (void) rloc(mtmp, FALSE);
                 return 0;
@@ -708,7 +708,7 @@ movemon()
         nmtmp = mtmp->nmon;
         /* one dead monster needs to perform a move after death:
            vault guard whose temporary corridor is still on the map */
-        if (mtmp->isgd && !mtmp->mx && mtmp->mhp <= 0)
+        if (mtmp->isgd && !mtmp->mx && DEADMONSTER(mtmp))
             (void) gd_move(mtmp);
         if (DEADMONSTER(mtmp))
             continue;
@@ -1536,7 +1536,7 @@ dmonsfree()
 
     for (mtmp = &fmon; *mtmp;) {
         freetmp = *mtmp;
-        if (freetmp->mhp <= 0 && !freetmp->isgd) {
+        if (DEADMONSTER(freetmp) && !freetmp->isgd) {
             *mtmp = freetmp->nmon;
             freetmp->nmon = NULL;
             dealloc_monst(freetmp);
@@ -1825,7 +1825,7 @@ register struct monst *mtmp;
 
     mtmp->mhp = 0; /* in case caller hasn't done this */
     lifesaved_monster(mtmp);
-    if (mtmp->mhp > 0)
+    if (!DEADMONSTER(mtmp))
         return;
 
     if (is_vampshifter(mtmp)) {
@@ -1993,9 +1993,9 @@ boolean was_swallowed; /* digestion */
                 } else {
                     You_hear("an explosion.");
                     magr->mhp -= tmp;
-                    if (magr->mhp < 1)
+                    if (DEADMONSTER(magr))
                         mondied(magr);
-                    if (magr->mhp < 1) { /* maybe lifesaved */
+                    if (DEADMONSTER(magr)) { /* maybe lifesaved */
                         if (canspotmon(magr))
                             pline("%s rips open!", Monnam(magr));
                     } else if (canseemon(magr))
@@ -2033,7 +2033,7 @@ mondied(mdef)
 register struct monst *mdef;
 {
     mondead(mdef);
-    if (mdef->mhp > 0)
+    if (!DEADMONSTER(mdef))
         return; /* lifesaved */
 
     if (corpse_chance(mdef, (struct monst *) 0, FALSE)
@@ -2083,7 +2083,7 @@ struct monst *mdef;
      */
     mdef->mhp = 0; /* in case caller hasn't done this */
     lifesaved_monster(mdef);
-    if (mdef->mhp > 0)
+    if (!DEADMONSTER(mdef))
         return;
 
     mdef->mtrapped = 0; /* (see m_detach) */
@@ -2176,7 +2176,7 @@ int how;
     else
         mondied(mdef);
 
-    if (be_sad && mdef->mhp <= 0)
+    if (be_sad && DEADMONSTER(mdef))
         You("have a sad feeling for a moment, then it passes.");
 }
 
@@ -2276,7 +2276,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         mondead(mtmp);
     disintegested = FALSE; /* reset */
 
-    if (mtmp->mhp > 0) { /* monster lifesaved */
+    if (!DEADMONSTER(mtmp)) { /* monster lifesaved */
         /* Cannot put the non-visible lifesaving message in
          * lifesaved_monster() since the message appears only when _you_
          * kill it (as opposed to visible lifesaving which always appears).
