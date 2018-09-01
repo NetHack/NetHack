@@ -2545,7 +2545,7 @@ pickup_checks()
 
 /* the ',' command */
 int
-dopickup()
+dopickup(VOID_ARGS)
 {
     int count, tmpcount, ret;
 
