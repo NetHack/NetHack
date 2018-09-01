@@ -2468,16 +2468,14 @@ register boolean newlev;
     return;
 }
 
-/* the ',' command */
+/* returns
+   1 = cannot pickup, time taken
+   0 = cannot pickup, no time taken
+  -1 = do normal pickup
+  -2 = loot the monster */
 int
-dopickup()
+pickup_checks()
 {
-    int count, tmpcount;
-    struct trap *traphere = t_at(u.ux, u.uy);
-
-    /* awful kludge to work around parse()'s pre-decrement */
-    count = (multi || (save_cm && *save_cm == ',')) ? multi + 1 : 0;
-    multi = 0; /* always reset */
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck->minvent) {
@@ -2489,8 +2487,7 @@ dopickup()
                     Blind ? "feel" : "see");
             return 1;
         } else {
-            tmpcount = -count;
-            return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
+            return -2; /* loot the monster inventory */
         }
     }
     if (is_pool(u.ux, u.uy)) {
@@ -2532,6 +2529,7 @@ dopickup()
         return 0;
     }
     if (!can_reach_floor(TRUE)) {
+        struct trap *traphere = t_at(u.ux, u.uy);
         if (traphere && uteetering_at_seen_pit(traphere))
             You("cannot reach the bottom of the pit.");
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
@@ -2542,6 +2540,25 @@ dopickup()
             You("cannot reach the %s.", surface(u.ux, u.uy));
         return 0;
     }
+    return -1; /* can do normal pickup */
+}
+
+/* the ',' command */
+int
+dopickup()
+{
+    int count, tmpcount, ret;
+
+    /* awful kludge to work around parse()'s pre-decrement */
+    count = (multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? multi + 1 : 0;
+    multi = 0; /* always reset */
+
+    if ((ret = pickup_checks() >= 0))
+        return ret;
+    else if (ret == -2) {
+        tmpcount = -count;
+        return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
+    } /* else ret == -1 */
 
     return pickup(-count);
 }
