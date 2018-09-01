@@ -2593,6 +2593,9 @@ long *out_cnt;
         char prompt[QBUFSZ];
 
         unid_cnt = count_unidentified(invent); 
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     "Debug Identify",
+                     MENU_UNSELECTED);
         if (!unid_cnt) {
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "(all items are permanently identified already)",
@@ -2604,10 +2607,10 @@ long *out_cnt;
                it could be ambiguous as a selector but the only time it
                is wanted is in case where no item is being selected */
             Sprintf(prompt,
-            "Select any to identify permanently (%s for %s %d bolded item%s)",
-                    visctrl(iflags.override_ID), 
-                    (unid_cnt == 1) ? "the" : "all", unid_cnt,
-                    (unid_cnt > 1)  ? "s" : "");
+          "Select %sthe %d bolded item%s to permanently identify (%s for all)",
+                    (unid_cnt == 1) ? "": "any of ", unid_cnt,
+                    (unid_cnt > 1) ? "s" : "",
+                    visctrl(iflags.override_ID));
             add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,
                      prompt, MENU_UNSELECTED);
             wizid = TRUE;
