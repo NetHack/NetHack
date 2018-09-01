@@ -3552,11 +3552,13 @@ static boolean truncation_expected = FALSE;
  * for all platforms eventually and the conditional
  * setting below can be removed.
  */
-#if defined(UNIX)
-static int do_field_opt = 0;
+static int do_field_opt = 
+#if defined(ENABLE_TTY_FIELD_OPT)
+    1;
 #else
-static int do_field_opt = 1;
+    0;
 #endif
+
 #endif  /* STATUS_HILITES */
 
 /*
@@ -3691,7 +3693,8 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-    if (tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
+    if (fldidx != BL_FLUSH &&
+            tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
         status_vals[fldidx][0] = '\0';
         tty_status[NOW][fldidx].lth = 0;
     }
