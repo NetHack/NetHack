@@ -1268,15 +1268,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SPE_REMOVE_CURSE: {
         register struct obj *obj;
 
-        You_feel(!Hallucination
-                     ? (!confused ? "like someone is helping you."
-                                  : "like you need some help.")
-                     : (!confused ? "in touch with the Universal Oneness."
-                                  : "the power of the Force against you!"));
-
         if (scursed) {
             pline_The("scroll disintegrates.");
         } else {
+            You_feel(!Hallucination
+                        ? (!confused ? "like someone is helping you."
+                                    : "like you need some help.")
+                        : (!confused ? "in touch with the Universal Oneness."
+                                    : "the power of the Force against you!"));
             for (obj = g.invent; obj; obj = obj->nobj) {
                 long wornmask;
 
