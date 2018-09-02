@@ -770,8 +770,7 @@ evaluate_and_notify_windowport(valsetlist, idx, idx_p)
 int idx, idx_p;
 boolean *valsetlist;
 {
-    int i;
-    boolean updated = FALSE;
+    int i, updated = 0, notpresent = 0;
 
     /*
      *  Now pass the changed values to window port.
@@ -781,24 +780,32 @@ boolean *valsetlist;
             || ((i == BL_EXP) && !flags.showexp)
             || ((i == BL_TIME) && !flags.time)
             || ((i == BL_HD) && !Upolyd)
-            || ((i == BL_XP || i == BL_EXP) && Upolyd))
+            || ((i == BL_XP || i == BL_EXP) && Upolyd)) {
+            notpresent++;
             continue;
+        }
         if (evaluate_and_notify_windowport_field(i, valsetlist, idx, idx_p))
-            updated = TRUE;
+            updated++;
     }
     /*
-     * It is possible to get here, with nothing having been pushed
-     * to the window port, when none of the info has changed. In that
-     * case, we need to force a call to status_update() when
-     * context.botlx is set. The tty port in particular has a problem
-     * if that isn't done, since it sets context.botlx when a menu or
-     * text display obliterates the status line.
+     * Notes:
+     *  1. It is possible to get here, with nothing having been pushed
+     *     to the window port, when none of the info has changed.
      *
-     * To work around it, we call status_update() with fictitious
+     *  2. Some window ports are also known to optimize by only drawing
+     *     fields that have changed since the previous update.
+     *
+     * In both of those situations, we need to force updates to
+     * all of the fields when context.botlx is set.
+     *
+     * The tty port in particular has a problem
+     * if that isn't done, since it sets context.botlx when a menu or
+     * text display obliterates the status line. 
+     *
+     * To trigger the full update we call status_update() with fictitious
      * index of BL_FLUSH (-1).
      */
-    if ((context.botlx && !updated)
-        || (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+    if (context.botlx || (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
 

@@ -107,6 +107,9 @@ wizard mode #wizidentify didn't disclose extra information for unID'd items if
 make transformation message of a deliberate apply of a figurine seem a bit 
 	less definite when blind and place unseen monster marker at the spot
 	you think it should be
+ensure BL_FLUSH always gets sent down to the window port whenever bot() is
+	called with context.botlx set so that status updates work as
+	expected after full screen clear after a level change
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
