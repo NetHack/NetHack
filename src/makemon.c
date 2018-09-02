@@ -1468,6 +1468,24 @@ int mmflags;
     mtmp->mcansee = mtmp->mcanmove = TRUE;
     mtmp->mpeaceful = (mmflags & MM_ANGRY) ? FALSE : peace_minded(ptr);
 
+    /* mounting */
+    if (!(mmflags & MM_REVIVE)) {
+        switch (mndx) {
+            case PM_HEADLESS_HORSEMAN:
+                mount_monster(mtmp, PM_NIGHTMARE);
+                break;
+            case PM_DEATH:
+                mount_monster(mtmp, PM_PALE_HORSE);
+                break;
+            case PM_FAMINE:
+                mount_monster(mtmp, PM_BLACK_HORSE);
+                break;
+            case PM_PESTILENCE:
+                mount_monster(mtmp, PM_WHITE_HORSE);
+                break;
+        }
+    }
+
     switch (ptr->mlet) {
     case S_MIMIC:
         set_mimic_sym(mtmp);
@@ -1490,14 +1508,6 @@ int mmflags;
         if (mndx == PM_KING_IN_YELLOW) {
             mtmp->perminvis = TRUE;
             mtmp->minvis = TRUE;
-        } else if (mndx == PM_HEADLESS_HORSEMAN) {
-            mount_monster(mtmp, PM_NIGHTMARE);
-        } else if (mndx == PM_DEATH) {
-            mount_monster(mtmp, PM_PALE_HORSE);
-        } else if (mndx == PM_FAMINE) {
-            mount_monster(mtmp, PM_BLACK_HORSE);
-        } else if (mndx == PM_PESTILENCE) {
-            mount_monster(mtmp, PM_WHITE_HORSE);
         }
         break;
     case S_EEL:

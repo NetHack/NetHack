@@ -2170,6 +2170,7 @@ boolean was_swallowed; /* digestion */
         place_monster(ERID(mon)->m1, mon->mx, mon->my);
         ERID(mon)->m1->monmount = 0;
     }
+    free_erid(mon);
     /* A worm that walks naturally dissolves into worms */
     if (mdat == &mons[PM_WORM_THAT_WALKS] || mdat == &mons[PM_LORD_OF_WORMS]) {
         if (cansee(mon->mx, mon->my) && !was_swallowed) {
