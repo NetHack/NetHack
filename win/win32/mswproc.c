@@ -2857,10 +2857,14 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
                    BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
                    BL_LEVELDESC, BL_EXP, BL_CONDITION
-                -- fldindex could also be BL_FLUSH (-1), which is not really
-                   a field index, but is a special trigger to tell the
-                   windowport that it should redisplay all its status fields,
-                   even if no changes have been presented to it.
+		-- fldindex could also be BL_FLUSH, which is not really
+		   a field index, but is a special trigger to tell the 
+		   windowport that it should output all changes received
+                   to this point. It marks the end of a bot() cycle.
+		-- fldindex could also be BL_RESET, which is not really
+		   a field index, but is a special advisory to to tell the 
+		   windowport that it should redisplay all its status fields,
+		   even if no changes have been presented to it.
                 -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
                    If fldindex is BL_CONDITION, then ptr is a long value with
                    any or none of the following bits set (from botl.h):
@@ -2898,7 +2902,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, colormasks);
 
-    if (idx != BL_FLUSH) {
+    if (idx != BL_FLUSH && idx != BL_RESET) {
         if (!_status_activefields[idx])
             return;
         _status_percents[idx] = percent;
