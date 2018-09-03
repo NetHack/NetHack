@@ -2857,11 +2857,11 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
                    BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
                    BL_LEVELDESC, BL_EXP, BL_CONDITION
-		-- fldindex could also be BL_FLUSH (-1), which is not really
+		-- fldindex could also be BL_FLUSH, which is not really
 		   a field index, but is a special trigger to tell the 
 		   windowport that it should output all changes received
                    to this point. It marks the end of a bot() cycle.
-		-- fldindex could also be BL_RESET (-3), which is not really
+		-- fldindex could also be BL_RESET, which is not really
 		   a field index, but is a special advisory to to tell the 
 		   windowport that it should redisplay all its status fields,
 		   even if no changes have been presented to it.
