@@ -652,7 +652,6 @@ wiz_identify(VOID_ARGS)
            it doesn't matter whether the command has been remapped */
         if (display_inventory((char *) 0, TRUE) == C('I'))
             identify_pack(0, FALSE);
-        /* [TODO?  if player picks a specific inventory item, ID it] */
         iflags.override_ID = 0;
     } else
         pline("Unavailable command '%s'.",

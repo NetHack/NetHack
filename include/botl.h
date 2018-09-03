@@ -28,8 +28,10 @@ Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
 #endif
 
 enum statusfields {
-    BL_CHARACTERISTICS = -2, /* alias for BL_STR..BL_CH */
-    BL_FLUSH = -1, BL_TITLE = 0,
+    BL_CHARACTERISTICS = -3, /* alias for BL_STR..BL_CH */
+    BL_RESET = -2,           /* Force everything to redisplay */
+    BL_FLUSH = -1,           /* Finished cycling through bot fields */
+    BL_TITLE = 0,
     BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,  /* 1..6 */
     BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
     BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
