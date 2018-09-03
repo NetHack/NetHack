@@ -736,7 +736,7 @@ boolean *valsetlist;
 
     if (update_all || chg || reset) {
         idxmax = curr->idxmax;
-        pc = (idxmax > BL_FLUSH) ? percentage(curr, &blstats[idx][idxmax]) : 0;
+        pc = (idxmax >= 0) ? percentage(curr, &blstats[idx][idxmax]) : 0;
 
         if (!valsetlist[fld])
             (void) anything_to_s(curr->val, &curr->a, anytype);
@@ -796,19 +796,27 @@ boolean *valsetlist;
      *     fields that have changed since the previous update.
      *
      * In both of those situations, we need to force updates to
-     * all of the fields when context.botlx is set.
+     * all of the fields when context.botlx is set. The tty port in
+     * particular has a problem if that isn't done, since the core sets
+     * context.botlx when a menu or text display obliterates the status
+     * line. 
      *
-     * The tty port in particular has a problem
-     * if that isn't done, since it sets context.botlx when a menu or
-     * text display obliterates the status line. 
+     * For those situations, to trigger the full update of every field
+     * whether changed or not, call status_update() with BL_RESET.
      *
-     * To trigger the full update we call status_update() with fictitious
-     * index of BL_FLUSH (-1).
+     * For regular processing and to notify the window port that a
+     * bot() round has finished and it's time to trigger a flush of
+     * all buffered changes received thus far but not reflected in
+     * the display, call status_update() with BL_FLUSH.
+     *
      */
-    if (context.botlx || (windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
+    if (context.botlx)
+        status_update(BL_RESET, (genericptr_t) 0, 0, 0,
+                      NO_COLOR, &cond_hilites[0]);
+    else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
-
+    
     context.botl = context.botlx = 0;
     update_all = FALSE;
 }
@@ -1943,7 +1951,7 @@ boolean from_configfile;
         }
 
         if (percent) {
-            if (initblstats[fld].idxmax <= BL_FLUSH) {
+            if (initblstats[fld].idxmax < 0) {
                 config_error_add("Cannot use percent with '%s'",
                                  initblstats[fld].fldname);
                 return FALSE;
@@ -2681,7 +2689,7 @@ int fld;
     int at;
     int onlybeh = BL_TH_NONE, nopts = 0;
 
-    if (fld <= BL_FLUSH || fld >= MAXBLSTATS)
+    if (fld < 0 || fld >= MAXBLSTATS)
         return BL_TH_NONE;
 
     at = initblstats[fld].anytype;
@@ -2724,7 +2732,7 @@ int fld;
         nopts++;
     }
 
-    if (initblstats[fld].idxmax > BL_FLUSH) {
+    if (initblstats[fld].idxmax >= 0) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
@@ -2856,6 +2864,7 @@ choose_field:
     fld = origfld;
     if (fld == BL_FLUSH) {
         fld = status_hilite_menu_choose_field();
+        /* isn't this redundant given what follows? */
         if (fld == BL_FLUSH)
             return FALSE;
     }

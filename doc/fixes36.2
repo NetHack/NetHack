@@ -107,9 +107,10 @@ wizard mode #wizidentify didn't disclose extra information for unID'd items if
 make transformation message of a deliberate apply of a figurine seem a bit 
 	less definite when blind and place unseen monster marker at the spot
 	you think it should be
-ensure BL_FLUSH always gets sent down to the window port whenever bot() is
-	called with context.botlx set so that status updates work as
-	expected after full screen clear after a level change
+add window port status_update() value BL_RESET to use as a flag to 
+	redraw all status fields, distinguished from BL_FLUSH which now only
+	specifies that the bot() call has completed so any buffered changes
+	should now be rendered
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -125,7 +126,8 @@ tty: turn off an optimization that is the suspected cause of Windows reported
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 windows-gui: In nethackw, there could be conflicts between menu accelerators 
-	and an extra choice accelerator to fix H7132.  
+	and an extra choice accelerator to fix H7132.
+windows-gui: recognize new BL_RESET in status_update; behavior currently the same
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
 	port, implement a console back buffer to reduce the number of calls
@@ -142,6 +144,8 @@ windows-tty: Use nhraykey by default if the players keyboard layout is
 windows-tty: We now support changing altkeyhandler in game
 windows: Added ntassert() mechanism for Windows based port use
 tty: significant optimizations for performance and per field rendering
+tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
+tty: support BL_RESET in status_update to force an update to all status fields
 unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
 	replace with $(QUIETCC) which operates the same but defaults to

@@ -66,7 +66,7 @@ struct window_procs tty_procs = {
      | WC2_SELECTSAVED
 #endif
 #if defined(STATUS_HILITES)
-     | WC2_HILITE_STATUS | WC2_HITPOINTBAR
+     | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
 #endif
      | WC2_DARKGRAY),
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
@@ -3543,6 +3543,8 @@ static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
 static int enclev = 0, enc_shrinklvl = 0;
 /* static int dl_shrinklvl = 0; */
 static boolean truncation_expected = FALSE;
+#define FORCE_RESET TRUE
+#define NO_RESET FALSE
 
 /* This controls whether to skip fields that aren't
  * flagged as requiring updating during the current
@@ -3553,10 +3555,10 @@ static boolean truncation_expected = FALSE;
  * setting below can be removed.
  */
 static int do_field_opt = 
-#if defined(ENABLE_TTY_FIELD_OPT)
-    1;
-#else
+#if defined(DISABLE_TTY_FIELD_OPT)
     0;
+#else
+    1;
 #endif
 
 #endif  /* STATUS_HILITES */
@@ -3573,7 +3575,7 @@ tty_status_init()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-        tty_status[NOW][i].idx = -1;
+        tty_status[NOW][i].idx = BL_FLUSH;
         tty_status[NOW][i].color = NO_COLOR; /* no color */
         tty_status[NOW][i].attr = ATR_NONE;
         tty_status[NOW][i].x = 0;
@@ -3604,7 +3606,11 @@ tty_status_init()
  *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
  *         BL_LEVELDESC, BL_EXP, BL_CONDITION
  *      -- fldindex could also be BL_FLUSH (-1), which is not really
- *         a field index, but is a special trigger to tell the
+ *         a field index, but is a special trigger to tell the 
+ *         windowport that it should output all changes received
+ *         to this point. It marks the end of a bot() cycle.
+ *      -- fldindex could also be BL_RESET (-3), which is not really
+ *         a field index, but is a special advisory to to tell the 
  *         windowport that it should redisplay all its status fields,
  *         even if no changes have been presented to it.
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -3657,9 +3663,9 @@ unsigned long *colormasks;
     char *text = (char *) ptr;
     char *lastchar = (char *) 0;
     char *fval = (char *) 0;
-    boolean force_update = FALSE;
+    boolean reset_state = NO_RESET;
 
-    if (fldidx != BL_FLUSH && !status_activefields[fldidx])
+    if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
         return;
 
 #ifndef TEXTCOLOR
@@ -3667,9 +3673,13 @@ unsigned long *colormasks;
 #endif
 
     switch (fldidx) {
+    case BL_RESET:
+        reset_state = FORCE_RESET;
+        /* FALLTHRU */
     case BL_FLUSH:
-        force_update = TRUE;
-        break;
+        if (make_things_fit(reset_state) || truncation_expected)
+            render_status();
+        return;
     case BL_CONDITION:
         tty_status[NOW][fldidx].idx = fldidx;
         tty_condition_bits = *condptr;
@@ -3693,7 +3703,7 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-    if (fldidx != BL_FLUSH &&
+    if (fldidx >= 0 && fldidx < MAXBLSTATS &&
             tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
         status_vals[fldidx][0] = '\0';
         tty_status[NOW][fldidx].lth = 0;
@@ -3706,6 +3716,10 @@ unsigned long *colormasks;
             /* Special additional processing for hitpointbar */
             hpbar_percent = percent;
             hpbar_color = (color & 0x00FF);
+        }
+        if (iflags.wc2_hitpointbar && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
+            tty_status[NOW][BL_TITLE].color = hpbar_color;
+            tty_status[NOW][BL_TITLE].dirty = TRUE;
         }
         break;
     case BL_LEVELDESC:
@@ -3740,8 +3754,7 @@ unsigned long *colormasks;
         }
         break;
     }
-    if (make_things_fit(force_update) || truncation_expected)
-        render_status();
+    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 
@@ -3805,7 +3818,7 @@ boolean forcefields;
 int *topsz, *bottomsz;
 {
     int c, i, row, col, trackx, idx;
-    boolean valid = TRUE, matchprev = FALSE, update_right;
+    boolean valid = TRUE, matchprev = FALSE, update_right, disregard;
 
     if (!windowdata_init && !check_windowdata())
         return FALSE;
@@ -3833,25 +3846,32 @@ int *topsz, *bottomsz;
                  * Check values against those already on the dislay.
                  *  - Is the additional processing time for this worth it?
                  */
-                matchprev = FALSE;
-                if (do_field_opt && tty_status[NOW][idx].dirty) {
-                    /* compare values */
-                    const char *ob, *nb;     /* old byte, new byte */
+                if (do_field_opt) {
+                    matchprev = FALSE;
+                    disregard = (tty_status[NOW][idx].lth == 0);
+                    if (do_field_opt && !disregard
+                            && tty_status[NOW][idx].dirty) {
+                        /* compare values */
+                        const char *ob, *nb;     /* old byte, new byte */
 
-                    c = col - 1;
-                    ob = &wins[WIN_STATUS]->data[row][c];
-                    nb = status_vals[idx];
-                    while (*nb && c < wins[WIN_STATUS]->cols) {
-                        if (*nb != *ob)
-                            break;
-                        nb++;
-                        ob++;
-                        c++;
+                        c = col - 1;
+                        ob = &wins[WIN_STATUS]->data[row][c];
+                        nb = status_vals[idx];
+                        while (*nb && c < wins[WIN_STATUS]->cols) {
+                            if (*nb != *ob)
+                                break;
+                            nb++;
+                            ob++;
+                            c++;
+                        }
+                        if (!*nb && c > col - 1)
+                            matchprev = TRUE;
                     }
-                    if (!*nb && c > col - 1)
-                        matchprev = TRUE;
+                } else {
+                    matchprev = FALSE;
                 }
             }
+
             /*
              * With STATUS_HILITES, it is possible that the color
              * needs to change even if the text is the same, so
@@ -3861,7 +3881,8 @@ int *topsz, *bottomsz;
              * After the field has been updated, render_status()
              * will also clear .redraw and .dirty.
              */
-            if (forcefields || update_right || !matchprev
+            if (forcefields || update_right
+                || (!matchprev && tty_status[NOW][idx].dirty && !disregard)
                 || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
                 || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
                 tty_status[NOW][idx].redraw = TRUE;
