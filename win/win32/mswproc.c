@@ -2902,7 +2902,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, colormasks);
 
-    if (idx != BL_FLUSH || idx == BL_RESET) {
+    if (idx != BL_FLUSH && idx != BL_RESET) {
         if (!_status_activefields[idx])
             return;
         _status_percents[idx] = percent;
