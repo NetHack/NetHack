@@ -111,6 +111,9 @@ add window port status_update() value BL_RESET to use as a flag to
 	redraw all status fields, distinguished from BL_FLUSH which now only
 	specifies that the bot() call has completed so any buffered changes
 	should now be rendered
+for hilite_status of string status fields (title, dungeon-level, alignment),
+	the types value-goes-up and -down aren't meaningful; treat them as
+	value-changed if from config file and don't offer as choices with 'O'
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -166,7 +169,7 @@ sortloot option has been enhanced to improve object ordering; primarily,
 	items of undiscovered type come out before items of discovered type
 	within each class or sub-class of objects
 YAFM when stumbling on an undetected monster while hallucinating
-Make it clear when a leprechaun dodges your attack
+make it clear when a leprechaun dodges your attack
 wizard mode #wizidentify can now select individual items for permanent 
 	identification and don't display the selection to permanently
 	identify everything if everything is already fully identified
