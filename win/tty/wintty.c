@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1526909614 2018/05/21 13:33:34 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1536193253 2018/09/06 00:20:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4245,15 +4245,20 @@ render_status(VOID_ARGS)
                     }
                     if (iflags.hilite_delta) {
                         tty_putstatusfield(nullfield, "[", x++, y);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_start_color(hpbar_color);
-                        term_start_attr(ATR_INVERSE);
-                        tty_putstatusfield(nullfield, bar, x, y);
+                        if (hpbar_percent > 0) {
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_start_color(hpbar_color);
+                            term_start_attr(ATR_INVERSE);
+                        }
+                        tty_putstatusfield(nullfield,
+                                           (hpbar_percent > 0) ? bar : text, x, y);
                         x += (int) strlen(bar);
-                        term_end_attr(ATR_INVERSE);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_end_color();
-                        if (twoparts) {
+                        if (hpbar_percent > 0) {
+                            term_end_attr(ATR_INVERSE);
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_end_color();
+                        }
+                        if (twoparts && hpbar_percent > 0) {
                             *bar2 = savedch;
                             tty_putstatusfield(nullfield, bar2, x, y);
                             x += (int) strlen(bar2);
