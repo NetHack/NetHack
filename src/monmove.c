@@ -742,6 +742,18 @@ xchar nix,niy;
     return FALSE;
 }
 
+/* returns the number of walls in the four cardinal directions that could hold up a web */
+int
+count_webbing_walls(x,y)
+xchar x,y;
+{
+#define holds_up_web(x,y) ((!isok((x),(y)) \
+                            || IS_ROCK(levl[(x)][(y)].typ) \
+                            || levl[(x)][(y)].typ == IRONBARS) ? 1 : 0)
+    return holds_up_web(x, y-1) + holds_up_web(x+1, y) + holds_up_web(x, y+1) + holds_up_web(x-1, y);
+#undef holds_up_web
+}
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1433,6 +1445,19 @@ postmov:
                 newsym(mtmp->mx, mtmp->my);
                 if (mtmp->wormno)
                     see_wsegs(mtmp);
+            }
+        }
+
+        /* maybe a spider spun a web */
+        if (webmaker(ptr) && !t_at(mtmp->mx, mtmp->my)) {
+            int prob = ((ptr == &mons[PM_GIANT_SPIDER]) ? 15 : 5) *
+                (count_webbing_walls(mtmp->mx, mtmp->my) + 1);
+            if (rn2(1000) < prob) {
+                struct trap* trap = maketrap(mtmp->mx, mtmp->my, WEB);
+                if (trap && canspotmon(mtmp)) {
+                    pline("%s spins a web.", upstart(y_monnam(mtmp)));
+                    trap->tseen = 1;
+                }
             }
         }
 
