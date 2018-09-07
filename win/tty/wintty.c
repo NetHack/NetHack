@@ -4244,16 +4244,23 @@ render_status(VOID_ARGS)
                         }
                     }
                     if (iflags.hilite_delta) {
+                        char *s = bar;
                         tty_putstatusfield(nullfield, "[", x++, y);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_start_color(hpbar_color);
-                        term_start_attr(ATR_INVERSE);
-                        tty_putstatusfield(nullfield, bar, x, y);
-                        x += (int) strlen(bar);
-                        term_end_attr(ATR_INVERSE);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_end_color();
-                        if (twoparts) {
+                        if (hpbar_percent > 0) {
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_start_color(hpbar_color);
+                            term_start_attr(ATR_INVERSE);
+                        }
+                        if (hpbar_percent == 0)
+                            s = text;
+                        tty_putstatusfield(nullfield, s, x, y);
+                        x += (int) strlen(s);
+                        if (hpbar_percent > 0) {
+                            term_end_attr(ATR_INVERSE);
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_end_color();
+                        }
+                        if (twoparts && hpbar_percent > 0) {
                             *bar2 = savedch;
                             tty_putstatusfield(nullfield, bar2, x, y);
                             x += (int) strlen(bar2);

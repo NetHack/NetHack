@@ -1851,7 +1851,13 @@ boolean from_configfile;
             if (*s[sidx + 1] == '\0')
                 sidx--;
         } else if (!strcmpi(s[sidx], "up") || !strcmpi(s[sidx], "down")) {
-            if (!strcmpi(s[sidx], "down"))
+            if (initblstats[fld].anytype == ANY_STR)
+                /* ordered string comparison is supported but LT/GT for
+                   the string fields (title, dungeon-level, alignment)
+                   is pointless; treat 'up' or 'down' for string fields
+                   as 'changed' rather than rejecting them outright */
+                ;
+            else if (!strcmpi(s[sidx], "down"))
                 down = TRUE;
             else
                 up = TRUE;
@@ -2053,8 +2059,6 @@ boolean from_configfile;
 
     return TRUE;
 }
-
-
 
 const struct condmap valid_conditions[] = {
     {"stone",    BL_MASK_STONE},
@@ -3039,12 +3043,22 @@ choose_value:
         hilite.rel = lt_gt_eq;
         hilite.value = aval;
     } else if (behavior == BL_TH_UPDOWN) {
-        boolean ltok = (fld != BL_TIME), gtok = TRUE;
+        if (initblstats[fld].anytype != ANY_STR) {
+            boolean ltok = (fld != BL_TIME), gtok = TRUE;
 
-        lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
-                                                        ltok, gtok);
-        if (lt_gt_eq == NO_LTEQGT)
-            goto choose_behavior;
+            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
+                                                            ltok, gtok);
+            if (lt_gt_eq == NO_LTEQGT)
+                goto choose_behavior;
+        } else { /* ANY_STR */
+            /* player picked '<field> value changes' in outer menu;
+               ordered string comparison is supported but LT/GT for the
+               string status fields (title, dungeon level, alignment)
+               is pointless; rather than calling ..._choose_updownboth()
+               with ltok==False plus gtok=False and having a menu with a
+               single choice, skip it altogether and just use 'changed' */
+            lt_gt_eq = EQ_VALUE;
+        }
         Sprintf(colorqry, "Choose a color for when %s %s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == EQ_VALUE) ? "changes"
