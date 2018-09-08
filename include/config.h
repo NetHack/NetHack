@@ -19,8 +19,6 @@
 
 /* #define MSDOS */ /* in case it's not auto-detected */
 
-/* #define MSDOS_CROSS */ /* define this if cross-compiling to DOS */
-
 /* #define OS2 */ /* define for OS/2 */
 
 /* #define TOS */ /* define for Atari ST/TT */

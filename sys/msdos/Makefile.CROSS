@@ -107,36 +107,32 @@ ZLIB= -lz
 
 GAMEFILE = $(GAMEDIR)/$(GAME).exe
 
+cflags = -DMSDOS_CROSS -c -O -I../include
+LFLAGS =
+
 # Changing this conditional block is not recommended
 ifeq ($(USE_DLB),Y)
-DLBFLG = -DDLB
-else
-DLBFLG =
+    cflags += -DDLB
 endif
 
 #
 #  Flags.
 #
 ifeq ($(SUPPRESS_GRAPHICS),Y)
-TERMLIB =
-# Build NetHack suitable for blind players
+    # Build NetHack suitable for blind players
+    TERMLIB =
+    cflags += -DSUPPRESS_GRAPHICS
 
-# Debugging
-#cflags = -pg -c -I../include $(DLBFLG) -DSUPPRESS_GRAPHICS
-#LFLAGS = -pg
-
-cflags = -c -O -I../include $(DLBFLG) -DSUPPRESS_GRAPHICS
-LFLAGS =
-
+    # Debugging
+    #cflags += -pg
+    #LFLAGS += -pg
 else
+    # Normal
+    cflags += -DUSE_TILES
 
-# Debugging
-#cflags = -g -c -I../include $(DLBFLG) -DUSE_TILES
-#LFLAGS = -g
-
-#    Normal
-cflags = -c -O -I../include $(DLBFLG) -DUSE_TILES
-LFLAGS =
+    # Debugging
+    #cflags += -g
+    #LFLAGS += -g
 endif
 
 #==========================================
