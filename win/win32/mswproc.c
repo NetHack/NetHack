@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1451611595 2016/01/01 01:26:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1536411259 2018/09/08 12:54:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2899,10 +2899,21 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
     int ocolor, ochar;
     unsigned ospecial;
     long value = -1;
+    boolean reset_state = FALSE;
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, colormasks);
 
-    if (idx != BL_FLUSH && idx != BL_RESET) {
+    switch (idx) {
+        case BL_RESET:
+            reset_state = TRUE;
+            /* FALLTHRU */
+        case BL_FLUSH:
+            /* FALLTHRU */
+        default:
+            break;
+    }
+
+    if (idx >= 0) {
         if (!_status_activefields[idx])
             return;
         _status_percents[idx] = percent;
@@ -2965,18 +2976,18 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
                     text);
         } break;
         }
-    }
 
-    _status_colors[idx] = color;
+        _status_colors[idx] = color;
 
-    /* send command to status window */
-    ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
-    update_cmd_data.n_fields = MAXBLSTATS;
-    update_cmd_data.vals = _status_vals;
-    update_cmd_data.activefields = _status_activefields;
-    update_cmd_data.percents = _status_percents;
-    update_cmd_data.colors = _status_colors;
-    SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
+        /* send command to status window */
+        ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
+        update_cmd_data.n_fields = MAXBLSTATS;
+        update_cmd_data.vals = _status_vals;
+        update_cmd_data.activefields = _status_activefields;
+        update_cmd_data.percents = _status_percents;
+        update_cmd_data.colors = _status_colors;
+        SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
                 (WPARAM) MSNH_MSG_UPDATE_STATUS, (LPARAM) &update_cmd_data);
+    }
 }
 
