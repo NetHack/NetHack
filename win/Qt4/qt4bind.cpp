@@ -565,6 +565,8 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
         else if (def)
             message += QString(" %1").arg(def);
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
+
+        return ret;
     }
 }
 
