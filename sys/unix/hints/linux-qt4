@@ -36,8 +36,7 @@ CXX=g++ -std=gnu++11
 WINSRC = $(WINQT4SRC)
 WINOBJ = $(WINQT4OBJ)
 WINLIB = $(WINQT4LIB)
-MOC = moc
-#MOC = moc-qt4
+MOC = moc-qt4
 
 VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 
