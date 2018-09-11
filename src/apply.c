@@ -1798,7 +1798,6 @@ int magic; /* 0=Physical, otherwise skill level */
          * the effects of landing on the final position.
          */
         teleds(cc.x, cc.y, FALSE);
-        sokoban_guilt();
         nomul(-1);
         g.multi_reason = "jumping around";
         g.nomovemsg = "";
@@ -2513,7 +2512,7 @@ struct obj *otmp;
         return;
     }
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
-    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx 
+    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx
                                 && u.uy == g.trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
             defsyms[trap_to_defsym(what_trap(ttyp, rn2))].explanation);
