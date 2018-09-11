@@ -106,6 +106,7 @@ default shk sell prompt to N (github #265)
 teach non-mindless monsters about the Castle trapdoors (github #265)
 always print a message when the hero teleports (github #265)
 always print a message when the hero level teleports (github #265)
+remove Sokoban luck penalties for actions you can't cheat with (github #260)
 
 
 Code Cleanup and Reorganization

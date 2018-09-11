@@ -842,7 +842,6 @@ boolean verbose;
         You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
     endmultishot(TRUE);
-    sokoban_guilt();
     uc.x = u.ux;
     uc.y = u.uy;
     /* this setting of cc is only correct if dx and dy are [-1,0,1] only */
