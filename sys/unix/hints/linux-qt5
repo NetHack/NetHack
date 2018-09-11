@@ -1,12 +1,12 @@
 #
-# NetHack 3.6  linux-qt4 $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# NetHack 3.6  linux-qt5 $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
 #-PRE
 # Linux hints file
-# This hints file provides a single-user Qt4 build for Linux, specifically
-# for Ubuntu dapper.
+# This hints file provides a single-user Qt5 build for Linux, specifically
+# for Fedora 26.
 
 
 #PREFIX=/usr
@@ -28,15 +28,16 @@ CFLAGS+=-DTIMED_DELAY
 CFLAGS+=-DDUMPLOG
 CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
 CFLAGS+=-DQT_GRAPHICS -DDEFAULT_WINDOW_SYS=\"Qt\" -DNOTTYGRAPHICS
-CFLAGS+=`pkg-config QtGui --cflags`
+CFLAGS+=`pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags` -fPIC
 
 LINK=g++
 CXX=g++ -std=gnu++11
 
 WINSRC = $(WINQT4SRC)
 WINOBJ = $(WINQT4OBJ)
-WINLIB = $(WINQT4LIB)
-MOC = moc-qt4
+WINLIB = $(WINQT5LIB)
+#MOC = moc
+MOC = moc-qt5
 
 VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 

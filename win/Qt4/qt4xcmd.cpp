@@ -66,6 +66,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
 	pb->setMinimumSize(butw,pb->sizeHint().height());
 	group->addButton(pb, i+1);
 	gl->addWidget(pb,i/ncols,i%ncols);
+        buttons.append(pb);
     }
     group->addButton(can, 0);
     connect(group,SIGNAL(buttonPressed(int)),this,SLOT(done(int)));
@@ -92,6 +93,7 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 	QString promptstr = prompt->text();
 	if (promptstr != "#")
 	    prompt->setText(promptstr.left(promptstr.size()-1));
+        enableButtons();
     }
     else
     {
@@ -111,6 +113,7 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 	    done(match+1);
 	else if (matches >= 2)
 	    prompt->setText(promptstr);
+        enableButtons();
     }
 }
 
@@ -129,6 +132,17 @@ int NetHackQtExtCmdRequestor::get()
     if (result() == none)
 	exec();
     return result()-1;
+}
+
+// Enable only buttons that match the current prompt string
+void NetHackQtExtCmdRequestor::enableButtons()
+{
+    QString typedstr = prompt->text().mid(1); // skip the '#'
+    std::size_t len = typedstr.size();
+
+    for (auto b = buttons.begin(); b != buttons.end(); ++b) {
+        (*b)->setVisible((*b)->text().left(len) == typedstr);
+    }
 }
 
 } // namespace nethack_qt4

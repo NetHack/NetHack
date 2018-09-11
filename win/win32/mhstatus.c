@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhstatus.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	mhstatus.c	$NHDT-Date: 1536411224 2018/09/08 12:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -324,7 +324,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
         LONG left = rt.left;
         LONG cy = 0;
         int vlen;
-        for (f = *fop; *f != -1; f++) {
+        for (f = *fop; *f != BL_FLUSH; f++) {
             int clr, atr;
             int fntatr = ATR_NONE;
             HGDIOBJ fnt;
@@ -362,7 +362,8 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 SelectObject(hdc, fnt);
                 SetBkMode(hdc, OPAQUE);
                 SetBkColor(hdc, status_bg_color);
-                SetTextColor(hdc, nhcolor_to_RGB(hpbar_color));
+                /* SetTextColor(hdc, nhcolor_to_RGB(hpbar_color)); */
+				SetTextColor(hdc, status_fg_color);
 
                 /* get bounding rectangle */
                 GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
@@ -370,21 +371,22 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 /* first draw title normally */
                 DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
 
-                /* calc bar length */
-                barrect.left = rt.left;
-                barrect.top = rt.top;
-                barrect.bottom = sz.cy;
-                if (hpbar_percent > 0)
-                    barrect.right = (int)((hpbar_percent * sz.cx) / 100);
-                else
-                    barrect.right = sz.cx;
+                if (hpbar_percent > 0) {
+                    /* calc bar length */
+                    barrect.left = rt.left;
+                    barrect.top = rt.top;
+                    barrect.bottom = sz.cy;
+                    if (hpbar_percent > 0)
+                        barrect.right = (int)((hpbar_percent * sz.cx) / 100);
+                    /* else
+                        barrect.right = sz.cx; */
 
-                /* then draw hpbar on top of title */
-                FillRect(hdc, &barrect, back_brush);
-                SetBkMode(hdc, TRANSPARENT);
-                SetTextColor(hdc, nBg);
-                DrawText(hdc, wbuf, vlen, &barrect, DT_LEFT);
-
+                    /* then draw hpbar on top of title */
+                    FillRect(hdc, &barrect, back_brush);
+                    SetBkMode(hdc, TRANSPARENT);
+                    SetTextColor(hdc, nBg);
+                    DrawText(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                }
                 DeleteObject(back_brush);
             } else {
                 if (atr & HL_INVERSE) {
