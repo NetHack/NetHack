@@ -756,8 +756,8 @@ level_tele()
             killer.format = NO_KILLER_PREFIX;
             Strcpy(killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
-            You_feel("deliriously happy. ");
-            pline("(In fact, you're on Cloud 9!) ");
+            You_feel("deliriously happy.");
+            pline("(In fact, you're on Cloud 9!)");
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else
             You("are now high above the clouds...");
