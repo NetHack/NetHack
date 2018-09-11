@@ -778,6 +778,15 @@ initoptions_init()
 #endif
 #endif /* UNIX || VMS */
 
+#if defined(MSDOS) || defined(WIN32)
+    /* Use IBM defaults. Can be overridden via config file */
+    if (!symset[PRIMARY].name) {
+        load_symset("IBMGraphics_2", PRIMARY);
+    }
+    if (!symset[ROGUESET].name) {
+        load_symset("RogueEpyx", ROGUESET);
+    }
+#endif
 #ifdef MAC_GRAPHICS_ENV
     if (!symset[PRIMARY].name)
         load_symset("MACGraphics", PRIMARY);
