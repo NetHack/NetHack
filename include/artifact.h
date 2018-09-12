@@ -33,7 +33,7 @@
                                   */
 #define SPFX_DFLAG1 0x00400000L  /* attack bonus on monsters w/ mflags1 flag \
                                     */
-#define SPFX_DFLAG2 0x00800000L  /* attack bonus on monsters w/ mflags2 flag \
+#define SPFX_DFLAGR 0x00800000L  /* attack bonus on monsters w/ mrace flag \
                                     */
 #define SPFX_DALIGN 0x01000000L  /* attack bonus on non-aligned monsters  */
 #define SPFX_DBONUS 0x01F00000L  /* attack bonus mask */

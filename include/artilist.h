@@ -72,21 +72,21 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
      *      damage bonus applies to all targets rather than just elves
      *      (handled as special case in spec_dbon()).
      */
-    A("Grimtooth", ORCISH_DAGGER, (SPFX_RESTR | SPFX_WARN | SPFX_DFLAG2),
-      0, M2_ELF, PHYS(2, 6), NO_DFNS,
+    A("Grimtooth", ORCISH_DAGGER, (SPFX_RESTR | SPFX_WARN | SPFX_DFLAGR),
+      0, MH_ELF, PHYS(2, 6), NO_DFNS,
       NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ORC, 300L, CLR_RED),
     /*
      *      Orcrist and Sting have same alignment as elves.
      *
-     *      The combination of SPFX_WARN+SPFX_DFLAG2+M2_value will trigger
-     *      EWarn_of_mon for all monsters that have the M2_value flag.
-     *      Sting and Orcrist will warn of M2_ORC monsters.
+     *      The combination of SPFX_WARN+SPFX_DFLAGR+MH_value will trigger
+     *      EWarn_of_mon for all monsters that have the MH_value flag.
+     *      Sting and Orcrist will warn of MH_ORC monsters.
      */
-    A("Orcrist", ELVEN_BROADSWORD, (SPFX_WARN | SPFX_DFLAG2), 0, M2_ORC,
+    A("Orcrist", ELVEN_BROADSWORD, (SPFX_WARN | SPFX_DFLAGR), 0, MH_ORC,
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ELF, 2000L,
       CLR_BRIGHT_BLUE), /* bright blue is actually light blue */
 
-    A("Sting", ELVEN_DAGGER, (SPFX_WARN | SPFX_DFLAG2), 0, M2_ORC, PHYS(5, 0),
+    A("Sting", ELVEN_DAGGER, (SPFX_WARN | SPFX_DFLAGR), 0, MH_ORC, PHYS(5, 0),
       NO_DFNS, NO_CARY, 0, A_CHAOTIC, NON_PM, PM_ELF, 800L, CLR_BRIGHT_BLUE),
     /*
      *      Magicbane is a bit different!  Its magic fanfare
@@ -109,11 +109,11 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 500L,
       NO_COLOR),
 
-    A("Demonbane", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_DEMON,
+    A("Demonbane", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAGR), 0, MH_DEMON,
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 2500L,
       NO_COLOR),
 
-    A("Werebane", SILVER_SABER, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_WERE,
+    A("Werebane", SILVER_SABER, (SPFX_RESTR | SPFX_DFLAGR), 0, MH_WERE,
       PHYS(5, 0), DFNS(AD_WERE), NO_CARY, 0, A_NONE, NON_PM, NON_PM, 1500L,
       NO_COLOR),
 
@@ -121,7 +121,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 8000L,
       NO_COLOR),
 
-    A("Giantslayer", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_GIANT,
+    A("Giantslayer", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAGR), 0, MH_GIANT,
       PHYS(5, 0), NO_DFNS, NO_CARY, 0, A_NEUTRAL, NON_PM, NON_PM, 200L,
       NO_COLOR),
 
@@ -151,7 +151,7 @@ STATIC_OVL NEARDATA struct artifact artilist[] = {
     A("Snickersnee", KATANA, SPFX_RESTR, 0, 0, PHYS(0, 8), NO_DFNS, NO_CARY,
       0, A_LAWFUL, PM_SAMURAI, NON_PM, 1200L, NO_COLOR),
 
-    A("Sunsword", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAG2), 0, M2_UNDEAD,
+    A("Sunsword", LONG_SWORD, (SPFX_RESTR | SPFX_DFLAGR), 0, MH_UNDEAD,
       PHYS(5, 0), DFNS(AD_BLND), NO_CARY, 0, A_LAWFUL, NON_PM, NON_PM, 1500L,
       NO_COLOR),
 
@@ -200,8 +200,8 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
       2500L, NO_COLOR),
 
     A("The Mitre of Holiness", HELM_OF_BRILLIANCE,
-      (SPFX_NOGEN | SPFX_RESTR | SPFX_DFLAG2 | SPFX_INTEL | SPFX_PROTECT), 0,
-      M2_UNDEAD, NO_ATTK, NO_DFNS, CARY(AD_FIRE), ENERGY_BOOST, A_LAWFUL,
+      (SPFX_NOGEN | SPFX_RESTR | SPFX_DFLAGR | SPFX_INTEL | SPFX_PROTECT), 0,
+      MH_UNDEAD, NO_ATTK, NO_DFNS, CARY(AD_FIRE), ENERGY_BOOST, A_LAWFUL,
       PM_PRIEST, NON_PM, 2000L, NO_COLOR),
 
     A("The Longbow of Diana", BOW,

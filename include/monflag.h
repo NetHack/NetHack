@@ -106,35 +106,26 @@
 #endif
 
 #define M2_NOPOLY 0x00000001L       /* players mayn't poly into one */
-#define M2_UNDEAD 0x00000002L       /* is walking dead */
-#define M2_WERE 0x00000004L         /* is a lycanthrope */
-#define M2_HUMAN 0x00000008L        /* is a human */
-#define M2_ELF 0x00000010L          /* is an elf */
-#define M2_DWARF 0x00000020L        /* is a dwarf */
-#define M2_GNOME 0x00000040L        /* is a gnome */
-#define M2_ORC 0x00000080L          /* is an orc */
-#define M2_DEMON 0x00000100L        /* is a demon */
-#define M2_MERC 0x00000200L         /* is a guard or soldier */
-#define M2_LORD 0x00000400L         /* is a lord to its kind */
-#define M2_PRINCE 0x00000800L       /* is an overlord to its kind */
-#define M2_MINION 0x00001000L       /* is a minion of a deity */
-#define M2_GIANT 0x00002000L        /* is a giant */
-#define M2_SHAPESHIFTER 0x00004000L /* is a shapeshifting species */
-#define M2_MALE 0x00010000L         /* always male */
-#define M2_FEMALE 0x00020000L       /* always female */
-#define M2_NEUTER 0x00040000L       /* neither male nor female */
-#define M2_PNAME 0x00080000L        /* monster name is a proper name */
-#define M2_HOSTILE 0x00100000L      /* always starts hostile */
-#define M2_PEACEFUL 0x00200000L     /* always starts peaceful */
-#define M2_DOMESTIC 0x00400000L     /* can be tamed by feeding */
-#define M2_WANDER 0x00800000L       /* wanders randomly */
-#define M2_STALK 0x01000000L        /* follows you to other levels */
-#define M2_NASTY 0x02000000L        /* extra-nasty monster (more xp) */
-#define M2_STRONG 0x04000000L       /* strong (or big) monster */
-#define M2_ROCKTHROW 0x08000000L    /* throws boulders */
-#define M2_GREEDY 0x10000000L       /* likes gold */
-#define M2_JEWELS 0x20000000L       /* likes gems */
-#define M2_COLLECT 0x40000000L      /* picks up weapons and food */
+#define M2_MERC 0x00000002L         /* is a guard or soldier */
+#define M2_LORD 0x00000004L         /* is a lord to its kind */
+#define M2_PRINCE 0x00000008L       /* is an overlord to its kind */
+#define M2_MINION 0x00000010L       /* is a minion of a deity */
+#define M2_SHAPESHIFTER 0x00000020L /* is a shapeshifting species */
+#define M2_MALE 0x00000040L         /* always male */
+#define M2_FEMALE 0x00000080L       /* always female */
+#define M2_NEUTER 0x00000100L       /* neither male nor female */
+#define M2_PNAME 0x00000200L        /* monster name is a proper name */
+#define M2_HOSTILE 0x00000400L      /* always starts hostile */
+#define M2_PEACEFUL 0x00000800L     /* always starts peaceful */
+#define M2_DOMESTIC 0x00001000L     /* can be tamed by feeding */
+#define M2_WANDER 0x00002000L       /* wanders randomly */
+#define M2_STALK 0x00004000L        /* follows you to other levels */
+#define M2_NASTY 0x00008000L        /* extra-nasty monster (more xp) */
+#define M2_STRONG 0x00010000L       /* strong (or big) monster */
+#define M2_ROCKTHROW 0x00020000L    /* throws boulders */
+#define M2_GREEDY 0x00040000L       /* likes gold */
+#define M2_JEWELS 0x00080000L       /* likes gems */
+#define M2_COLLECT 0x00100000L      /* picks up weapons and food */
 #ifdef NHSTDC
 #define M2_MAGIC 0x80000000UL /* picks up magic items */
 #else
@@ -168,12 +159,15 @@
 #define MZ_GIGANTIC 7      /* off the scale */
 
 /* Monster races -- must stay within ROLE_RACEMASK */
-/* Eventually this may become its own field */
-#define MH_HUMAN M2_HUMAN
-#define MH_ELF M2_ELF
-#define MH_DWARF M2_DWARF
-#define MH_GNOME M2_GNOME
-#define MH_ORC M2_ORC
+#define MH_GIANT 0x00000001L
+#define MH_UNDEAD 0x00000002L
+#define MH_WERE 0x00000004L
+#define MH_HUMAN 0x00000008L
+#define MH_ELF 0x00000010L
+#define MH_DWARF 0x00000020L
+#define MH_GNOME 0x00000040L
+#define MH_ORC 0x00000080L
+#define MH_DEMON 0x00000100L
 
 /* for mons[].geno (constant during game) */
 #define G_UNIQ 0x1000     /* generated only once */

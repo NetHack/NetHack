@@ -204,9 +204,9 @@ typedef struct sortloot_item Loot;
 
 #define MATCH_WARN_OF_MON(mon)                                               \
     (Warn_of_mon && ((context.warntype.obj                                   \
-                      && (context.warntype.obj & (mon)->data->mflags2))      \
+                      && (context.warntype.obj & (mon)->data->mrace))        \
                      || (context.warntype.polyd                              \
-                         && (context.warntype.polyd & (mon)->data->mflags2)) \
+                         && (context.warntype.polyd & (mon)->data->mrace))   \
                      || (context.warntype.species                            \
                          && (context.warntype.species == (mon)->data))))
 

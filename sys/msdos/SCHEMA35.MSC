@@ -408,7 +408,7 @@ functions:372 _place_monster _pm_to_cham _prisoner_speaks _process_options _rand
 functions:373 _randrace _randrole _relobj _remove_mon_from_reg _remove_region
 functions:374 _remove_worn_item _replace_object _reset_oattached_mids _rest_regions _restore_cham _rnd_treefruit_at
 functions:375 _save_regions _select_newcham_form _self_invis_message _setuqwep _setuswapwep _show_conduct
-functions:376 _show_region _simple_typename _slime_dialogue _sokoban_detect _spec_m2 _special_handling
+functions:376 _show_region _simple_typename _slime_dialogue _sokoban_detect _spec_mh _special_handling
 functions:377 _str2align _str2gend _str2race _str2role _There _throw_obj
 functions:378 _tmiss _tty_update_positionbar _tty_wait_synch  _undiscovered_artifact _untwoweapon _update_mlstmv
 functions:379 _update_monster_region _update_player_regions _uqwepgone _ureflects _use_grapple _use_pole

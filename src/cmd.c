@@ -2248,23 +2248,23 @@ int final;
         you_are("warned", from_what(WARNING));
     if (Warn_of_mon && context.warntype.obj) {
         Sprintf(buf, "aware of the presence of %s",
-                (context.warntype.obj & M2_ORC) ? "orcs"
-                : (context.warntype.obj & M2_ELF) ? "elves"
-                : (context.warntype.obj & M2_DEMON) ? "demons" : something);
+                (context.warntype.obj & MH_ORC) ? "orcs"
+                : (context.warntype.obj & MH_ELF) ? "elves"
+                : (context.warntype.obj & MH_DEMON) ? "demons" : something);
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Warn_of_mon && context.warntype.polyd) {
         Sprintf(buf, "aware of the presence of %s",
-                ((context.warntype.polyd & (M2_HUMAN | M2_ELF))
-                 == (M2_HUMAN | M2_ELF))
+                ((context.warntype.polyd & (MH_HUMAN | MH_ELF))
+                 == (MH_HUMAN | MH_ELF))
                     ? "humans and elves"
-                    : (context.warntype.polyd & M2_HUMAN)
+                    : (context.warntype.polyd & MH_HUMAN)
                           ? "humans"
-                          : (context.warntype.polyd & M2_ELF)
+                          : (context.warntype.polyd & MH_ELF)
                                 ? "elves"
-                                : (context.warntype.polyd & M2_ORC)
+                                : (context.warntype.polyd & MH_ORC)
                                       ? "orcs"
-                                      : (context.warntype.polyd & M2_DEMON)
+                                      : (context.warntype.polyd & MH_DEMON)
                                             ? "demons"
                                             : "certain monsters");
         you_are(buf, "");
