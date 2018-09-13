@@ -29,6 +29,8 @@ const char *line;
     unsigned indx = g.saved_pline_index; /* next slot to use */
     char *oldest = g.saved_plines[indx]; /* current content of that slot */
 
+    if (!strncmp(line, "Unknown command", 15))
+        return;
     if (oldest && strlen(oldest) >= strlen(line)) {
         /* this buffer will gradually shrink until the 'else' is needed;
            there's no pressing need to track allocation size instead */
