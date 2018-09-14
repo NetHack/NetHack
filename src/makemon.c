@@ -2127,16 +2127,12 @@ register struct monst *mtmp;
             appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
         else
             appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-        if (!mtmp->minvis || See_invisible)
-            block_point(mx, my); /* vision */
     } else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {
         ap_type = M_AP_OBJECT;
         appear = STATUE;
     } else if (roomno < 0 && !t_at(mx, my)) {
         ap_type = M_AP_OBJECT;
         appear = BOULDER;
-        if (!mtmp->minvis || See_invisible)
-            block_point(mx, my); /* vision */
     } else if (rt == ZOO || rt == VAULT) {
         ap_type = M_AP_OBJECT;
         appear = GOLD_PIECE;
@@ -2194,6 +2190,9 @@ register struct monst *mtmp;
         if (appear == EGG && !can_be_hatched(MCORPSENM(mtmp)))
             MCORPSENM(mtmp) = NON_PM; /* revert to generic egg */
     }
+
+    if (does_block(mx, my, &levl[mx][my]))
+        block_point(mx, my);
 }
 
 /* release monster from bag of tricks; return number of monsters created */
