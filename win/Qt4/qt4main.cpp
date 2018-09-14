@@ -490,6 +490,10 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     addToolBar(toolbar);
     menubar = menuBar();
 
+    QCoreApplication::setOrganizationName("The NetHack DevTeam");
+    QCoreApplication::setOrganizationDomain("nethack.org");
+    QCoreApplication::setApplicationName("NetHack");
+
     setWindowTitle("Qt NetHack");
     if ( qt_compact_mode )
 	setWindowIcon(QIcon(QPixmap(nh_icon_small)));

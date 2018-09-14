@@ -36,10 +36,11 @@ int qt_compact_mode = 0;
 
 namespace nethack_qt4 {
 
-#define TILEWMIN 1
-#define TILEHMIN 1
+#define TILEWMIN 6
+#define TILEHMIN 6
 
 NetHackQtSettings::NetHackQtSettings(int w, int h) :
+    settings(),
     tilewidth(this),
     tileheight(this),
     widthlbl("&Width:",this),
@@ -63,9 +64,9 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
     heightlbl.setBuddy(&tileheight);
     tileheight.setRange(TILEHMIN, 128);
 
-    default_fontsize=2;
-    tilewidth.setValue(16);
-    tileheight.setValue(16);
+    tilewidth.setValue(settings.value("tilewidth", 16).toInt());
+    tileheight.setValue(settings.value("tileheight", 16).toInt());
+    default_fontsize = settings.value("fontsize", 2).toInt();
 
     // Tile/font sizes read from .nethackrc
     if (qt_tilewidth != NULL) {
@@ -100,7 +101,7 @@ NetHackQtSettings::NetHackQtSettings(int w, int h) :
     fontsize.addItem("Small");
     fontsize.addItem("Tiny");
     fontsize.setCurrentIndex(default_fontsize);
-    connect(&fontsize,SIGNAL(activated(int)),this,SIGNAL(fontChanged()));
+    connect(&fontsize,SIGNAL(activated(int)),this,SLOT(changedFont()));
 
     QGridLayout* grid = new QGridLayout(this);
     grid->addWidget(&whichsize, 0, 0, 1, 2);
@@ -126,11 +127,19 @@ NetHackQtGlyphs& NetHackQtSettings::glyphs()
     return *theglyphs;
 }
 
+void NetHackQtSettings::changedFont()
+{
+    settings.setValue("fontsize", fontsize.currentIndex());
+    emit fontChanged();
+}
+
 void NetHackQtSettings::resizeTiles()
 {
     int w = tilewidth.value();
     int h = tileheight.value();
 
+    settings.setValue("tilewidth", tilewidth.value());
+    settings.setValue("tileheight", tileheight.value());
     theglyphs->setSize(w,h);
     emit tilesChanged();
 }

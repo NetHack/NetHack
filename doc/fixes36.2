@@ -114,7 +114,9 @@ add window port status_update() value BL_RESET to use as a flag to
 for hilite_status of string status fields (title, dungeon-level, alignment),
 	the types value-goes-up and -down aren't meaningful; treat them as
 	value-changed if from config file and don't offer as choices with 'O'
-spiders will occasionally spin webs when moving around
+jumping into or over a Sokoban pit, or over a fire trap, triggers trap twice
+mimics created by #wizgenesis could block or not block vision incorrectly
+handle monsters inside the invocation area
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -125,6 +127,8 @@ setting the inverse attribute for gold had the space before "$:"
 sortloot segfaulted when filtering a subset of items (seen with 'A' command)
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
+tty: ensure that current status fields are always copied to prior status
+	values so that comparisons are correct
 
 
 Platform- and/or Interface-Specific Fixes
@@ -162,6 +166,7 @@ unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
 Qt: enable compiling Qt5 on Windows (Ray Chason)
 Qt: entering extended commands, hide non-matching ones
+Qt: remember tile and font size
 
 
 General New Features
@@ -179,6 +184,7 @@ make it clear when a leprechaun dodges your attack
 wizard mode #wizidentify can now select individual items for permanent 
 	identification and don't display the selection to permanently
 	identify everything if everything is already fully identified
+spiders will occasionally spin webs when moving around
 
 
 Code Cleanup and Reorganization

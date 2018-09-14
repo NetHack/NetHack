@@ -1733,6 +1733,7 @@ int dist;
     struct obj *otmp;
     boolean make_rocks;
     register struct rm *lev = &levl[x][y];
+    struct monst *mon;
 
     /* clip at existing map borders if necessary */
     if (!within_bounded_area(x, y, x_maze_min + 1, y_maze_min + 1,
@@ -1759,7 +1760,6 @@ int dist;
             obfree(otmp, (struct obj *) 0);
         }
     }
-    unblock_point(x, y); /* make sure vision knows this location is open */
 
     /* fake out saved state */
     lev->seenv = 0;
@@ -1795,6 +1795,20 @@ int dist;
         impossible("mkinvpos called with dist %d", dist);
         break;
     }
+
+    if ((mon = m_at(x, y)) != 0) {
+        /* wake up mimics, don't want to deal with them blocking vision */
+        if (mon->m_ap_type)
+            seemimic(mon);
+
+        if ((ttmp = t_at(x, y)) != 0)
+            (void) mintrap(mon);
+        else
+            (void) minliquid(mon);
+    }
+
+    if (!does_block(x, y, lev))
+        unblock_point(x, y); /* make sure vision knows this location is open */
 
     /* display new value of position; could have a monster/object on it */
     newsym(x, y);
