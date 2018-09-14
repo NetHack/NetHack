@@ -3353,6 +3353,21 @@ struct obj **pobj; /* object tossed/used, set to NULL
 
         typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
 
+        if (typ == IRONBARS && weapon == ZAPPED_WAND
+            && ((levl[g.bhitpos.x][g.bhitpos.y].wall_info & W_NONDIGGABLE) == 0)
+            && (obj->otyp == SPE_FORCE_BOLT || obj->otyp == WAN_STRIKING)) {
+            levl[g.bhitpos.x][g.bhitpos.y].typ = ROOM;
+            if (cansee(g.bhitpos.x, g.bhitpos.y))
+                pline_The("iron bars are blown apart!");
+            else
+                You_hear("a lot of loud clanging sounds!");
+            wake_nearto(g.bhitpos.x, g.bhitpos.y, 20 * 20);
+            newsym(g.bhitpos.x, g.bhitpos.y);
+            /* stop the bolt here; it takes a lot of energy to destroy bars */
+            range = 0;
+            break;
+        }
+
         /* iron bars will block anything big enough and break some things */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
             if (obj->lamplit && !Blind)
