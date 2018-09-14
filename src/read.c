@@ -2550,8 +2550,14 @@ struct _create_particular_data *d;
 
             put_saddle_on_mon(otmp, mtmp);
         }
-        if (d->invisible)
+        if (d->invisible) {
+            int mx = mtmp->mx, my = mtmp->my;
             mon_set_minvis(mtmp);
+            if (does_block(mx, my, &levl[mx][my]))
+                block_point(mx, my);
+            else
+                unblock_point(mx, my);
+        }
         if (d->sleeping)
             mtmp->msleeping = 1;
         madeany = TRUE;
