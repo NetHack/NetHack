@@ -731,6 +731,17 @@ movemon()
         if (minliquid(mtmp))
             continue;
 
+        /* after losing equipment, try to put on replacement */
+        if (mtmp->misc_worn_check & I_SPECIAL) {
+            long oldworn;
+
+            mtmp->misc_worn_check &= ~I_SPECIAL;
+            oldworn = mtmp->misc_worn_check;
+            m_dowear(mtmp, FALSE);
+            if (mtmp->misc_worn_check != oldworn || !mtmp->mcanmove)
+                continue;
+        }
+
         if (is_hider(mtmp->data)) {
             /* unwatched mimics and piercers may hide again  [MRS] */
             if (restrap(mtmp))
@@ -1796,6 +1807,8 @@ struct monst *mtmp;
             pline_The("medallion crumbles to dust!");
         }
         m_useup(mtmp, lifesave);
+        /* equip replacement amulet, if any, on next move */
+        mtmp->misc_worn_check |= I_SPECIAL;
 
         surviver = !(mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);
         mtmp->mcanmove = 1;
@@ -1806,13 +1819,14 @@ struct monst *mtmp;
         if (mtmp->mhpmax <= 0)
             mtmp->mhpmax = 10;
         mtmp->mhp = mtmp->mhpmax;
-        if (surviver)
-            return;
 
-        /* genocided monster can't be life-saved */
-        if (cansee(mtmp->mx, mtmp->my))
-            pline("Unfortunately, %s is still genocided...", mon_nam(mtmp));
-        mtmp->mhp = 0;
+        if (!surviver) {
+            /* genocided monster can't be life-saved */
+            if (cansee(mtmp->mx, mtmp->my))
+                pline("Unfortunately, %s is still genocided...",
+                      mon_nam(mtmp));
+            mtmp->mhp = 0;
+        }
     }
 }
 
