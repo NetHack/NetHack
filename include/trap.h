@@ -83,4 +83,6 @@ enum trap_types {
     TRAPNUM
 };
 
+#define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
+
 #endif /* TRAP_H */

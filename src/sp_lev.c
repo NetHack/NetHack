@@ -2660,7 +2660,7 @@ fill_empty_maze()
             maze1xy(&mm, DRY);
             trytrap = rndtrap();
             if (sobj_at(BOULDER, mm.x, mm.y))
-                while (trytrap == PIT || trytrap == SPIKED_PIT
+                while (is_pit(trytrap)
                        || trytrap == TRAPDOOR || trytrap == HOLE)
                     trytrap = rndtrap();
             (void) maketrap(mm.x, mm.y, trytrap);

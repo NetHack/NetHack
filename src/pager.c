@@ -279,7 +279,7 @@ int x, y;
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
-        if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT || tt == WEB)
+        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
             Sprintf(eos(buf), ", trapped in %s",
                     an(defsyms[trap_to_defsym(tt)].explanation));
     }

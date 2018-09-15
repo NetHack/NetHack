@@ -495,7 +495,7 @@ xchar x, y;
         return 0;
 
     if ((trap = t_at(x, y)) != 0) {
-        if (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
+        if ((is_pit(trap->ttyp) && !Passes_walls)
             || trap->ttyp == WEB) {
             if (!trap->tseen)
                 find_trap(trap);

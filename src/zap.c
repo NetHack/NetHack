@@ -3373,7 +3373,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                               The(distant_name(obj, xname))); /* lame */
                     range = 0;
                 } else if (Sokoban && (t = t_at(x, y)) != 0
-                           && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
+                           && (is_pit(t->ttyp)
                                || t->ttyp == HOLE || t->ttyp == TRAPDOOR)) {
                     /* hero falls into the trap, so ball stops */
                     range = 0;

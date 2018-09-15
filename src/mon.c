@@ -1446,7 +1446,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                     if ((ttmp->ttyp != RUST_TRAP
                          || mdat == &mons[PM_IRON_GOLEM])
                         && ttmp->ttyp != STATUE_TRAP
-                        && ((ttmp->ttyp != PIT && ttmp->ttyp != SPIKED_PIT
+                        && ((!is_pit(ttmp->ttyp)
                              && ttmp->ttyp != TRAPDOOR && ttmp->ttyp != HOLE)
                             || (!is_flyer(mdat) && !is_floater(mdat)
                                 && !is_clinger(mdat)) || Sokoban)
@@ -2256,7 +2256,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     }
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0
-        && (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
+        && is_pit(t->ttyp)) {
         if (sobj_at(BOULDER, x, y))
             nocorpse = TRUE; /* Prevent corpses/treasure being created
                                 "on top" of boulder that is about to fall in.
@@ -2943,7 +2943,7 @@ register struct monst *mtmp;
         || rn2(3) || mtmp == u.ustuck
         /* can't hide while trapped except in pits */
         || (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0
-            && !(t->ttyp == PIT || t->ttyp == SPIKED_PIT))
+            && !is_pit(t->ttyp))
         || (sensemon(mtmp) && distu(mtmp->mx, mtmp->my) <= 2))
         return FALSE;
 
@@ -2971,7 +2971,7 @@ struct monst *mtmp;
         ; /* can't hide if holding you or held by you */
     } else if (is_u ? (u.utrap && u.utraptype != TT_PIT)
                     : (mtmp->mtrapped && (t = t_at(x, y)) != 0
-                       && !(t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
+                       && !is_pit(t->ttyp))) {
         ; /* can't hide while stuck in a non-pit trap */
     } else if (mtmp->data->mlet == S_EEL) {
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));

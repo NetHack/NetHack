@@ -249,7 +249,7 @@ int force;
     unsigned tu_pit = 0;
 
     if (trap_at_u)
-        tu_pit = (trap_at_u->ttyp == PIT || trap_at_u->ttyp == SPIKED_PIT);
+        tu_pit = is_pit(trap_at_u->ttyp);
     start_x = u.ux - (force * 2);
     start_y = u.uy - (force * 2);
     end_x = u.ux + (force * 2);

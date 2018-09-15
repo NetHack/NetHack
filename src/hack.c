@@ -151,8 +151,7 @@ moverock()
 
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
-                    || !(ttmp && ((ttmp->ttyp == PIT)
-                                  || (ttmp->ttyp == SPIKED_PIT))))) {
+                    || !(ttmp && is_pit(ttmp->ttyp)))) {
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
@@ -1205,7 +1204,7 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         break;
     case TT_PIT:
         if (desttrap && desttrap->tseen
-            && (desttrap->ttyp == PIT || desttrap->ttyp == SPIKED_PIT))
+            && is_pit(desttrap->ttyp))
             return TRUE; /* move into adjacent pit */
         /* try to escape; position stays same regardless of success */
         climb_pit();
@@ -1736,7 +1735,7 @@ domove()
         u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
-            && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
+            && is_pit(trap->ttyp)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
@@ -2100,7 +2099,7 @@ boolean pick;
          * If not a pit, pickup before triggering trap.
          * If pit, trigger trap before pickup.
          */
-        pit = (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT));
+        pit = (trap && is_pit(trap->ttyp));
         if (pick && !pit)
             (void) pickup(1);
 
