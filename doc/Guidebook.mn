@@ -3004,7 +3004,6 @@ such as ``paranoid_confirmation:attack pray Remove''.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
-Persistent.
 .lp pettype
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
