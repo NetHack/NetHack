@@ -1515,7 +1515,7 @@ boolean shop_floor_obj;
     /* boulders never fall through trap doors, but they might knock
        other things down before plugging the hole */
     if (otmp->otyp == BOULDER && ((t = t_at(x, y)) != 0)
-        && (t->ttyp == TRAPDOOR || t->ttyp == HOLE)) {
+        && is_hole(t->ttyp)) {
         if (impact)
             impact_drop(otmp, x, y, 0);
         return FALSE; /* let caller finish the drop */
@@ -1717,7 +1717,7 @@ xchar x, y;
     }
 
     if (((ttmp = t_at(x, y)) != 0 && ttmp->tseen)
-        && (ttmp->ttyp == TRAPDOOR || ttmp->ttyp == HOLE)) {
+        && is_hole(ttmp->ttyp)) {
         gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
                                             : "through the hole";
         return MIGR_RANDOM;

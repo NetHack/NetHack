@@ -439,7 +439,7 @@ struct monst *mtmp;
                 || onscary(xx, yy, mtmp))
                 continue;
             /* use trap if it's the correct type */
-            if ((t->ttyp == TRAPDOOR || t->ttyp == HOLE)
+            if (is_hole(t->ttyp)
                 && !is_floater(mtmp->data)
                 && !mtmp->isshk && !mtmp->isgd && !mtmp->ispriest
                 && Can_fall_thru(&u.uz)) {

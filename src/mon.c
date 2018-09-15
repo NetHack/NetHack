@@ -1446,8 +1446,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                     if ((ttmp->ttyp != RUST_TRAP
                          || mdat == &mons[PM_IRON_GOLEM])
                         && ttmp->ttyp != STATUE_TRAP
-                        && ((!is_pit(ttmp->ttyp)
-                             && ttmp->ttyp != TRAPDOOR && ttmp->ttyp != HOLE)
+                        && ((!is_pit(ttmp->ttyp) && !is_hole(ttmp->ttyp))
                             || (!is_flyer(mdat) && !is_floater(mdat)
                                 && !is_clinger(mdat)) || Sokoban)
                         && (ttmp->ttyp != SLP_GAS_TRAP || !resists_sleep(mon))

@@ -3508,7 +3508,7 @@ wiztrap:
             if (strncmpi(tname, bp, strlen(tname)))
                 continue;
             /* found it; avoid stupid mistakes */
-            if ((trap == TRAPDOOR || trap == HOLE) && !Can_fall_thru(&u.uz))
+            if (is_hole(trap) && !Can_fall_thru(&u.uz))
                 trap = ROCKTRAP;
             if ((t = maketrap(x, y, trap)) != 0) {
                 trap = t->ttyp;

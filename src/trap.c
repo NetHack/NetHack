@@ -406,8 +406,7 @@ int x, y, typ;
     case HOLE:
     case TRAPDOOR:
         if (*in_rooms(x, y, SHOPBASE)
-            && (typ == HOLE || typ == TRAPDOOR
-                || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
+            && (is_hole(typ) || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
             add_damage(x, y, /* schedule repair */
                        ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
                         && !context.mon_moving)
@@ -861,8 +860,7 @@ unsigned trflags;
     nomul(0);
 
     /* KMH -- You can't escape the Sokoban level traps */
-    if (Sokoban && (is_pit(ttype)
-                    || ttype == HOLE || ttype == TRAPDOOR)) {
+    if (Sokoban && (is_pit(ttype) || is_hole(ttype))) {
         /* The "air currents" message is still appropriate -- even when
          * the hero isn't flying or levitating -- because it conveys the
          * reason why the player cannot escape the trap with a dexterity
@@ -2864,8 +2862,7 @@ long hmask, emask; /* might cancel timeout */
     if (Punished && !carried(uball)
         && (is_pool(uball->ox, uball->oy)
             || ((trap = t_at(uball->ox, uball->oy))
-                && (is_pit(trap->ttyp)
-                    || (trap->ttyp == TRAPDOOR) || (trap->ttyp == HOLE))))) {
+                && (is_pit(trap->ttyp) || is_hole(trap->ttyp))))) {
         u.ux0 = u.ux;
         u.uy0 = u.uy;
         u.ux = uball->ox;
@@ -4986,7 +4983,7 @@ register struct trap *ttmp;
     if (ttmp && ((ttmp->ttyp == SQKY_BOARD) || (ttmp->ttyp == BEAR_TRAP)
                  || (ttmp->ttyp == LANDMINE) || (ttmp->ttyp == FIRE_TRAP)
                  || is_pit(ttmp->ttyp)
-                 || (ttmp->ttyp == HOLE) || (ttmp->ttyp == TRAPDOOR)
+                 || is_hole(ttmp->ttyp)
                  || (ttmp->ttyp == TELEP_TRAP) || (ttmp->ttyp == LEVEL_TELEP)
                  || (ttmp->ttyp == WEB) || (ttmp->ttyp == MAGIC_TRAP)
                  || (ttmp->ttyp == ANTI_MAGIC))) {

@@ -503,8 +503,7 @@ int trap_type;
             if (trap_type || !rn2(4)) {
                 rm->typ = SCORR;
                 if (trap_type) {
-                    if ((trap_type == HOLE || trap_type == TRAPDOOR)
-                        && !Can_fall_thru(&u.uz))
+                    if (is_hole(trap_type) && !Can_fall_thru(&u.uz))
                         trap_type = ROCKTRAP;
                     ttmp = maketrap(xx, yy + dy, trap_type);
                     if (ttmp) {
@@ -1342,15 +1341,14 @@ coord *tm;
         } while (kind == NO_TRAP);
     }
 
-    if ((kind == TRAPDOOR || kind == HOLE) && !Can_fall_thru(&u.uz))
+    if (is_hole(kind) && !Can_fall_thru(&u.uz))
         kind = ROCKTRAP;
 
     if (tm) {
         m = *tm;
     } else {
         register int tryct = 0;
-        boolean avoid_boulder = (is_pit(kind)
-                                 || kind == TRAPDOOR || kind == HOLE);
+        boolean avoid_boulder = (is_pit(kind) || is_hole(kind));
 
         do {
             if (++tryct > 200)

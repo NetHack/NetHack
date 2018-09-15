@@ -1362,8 +1362,7 @@ doidtrap()
                 break;
             tt = trap->ttyp;
             if (u.dz) {
-                if (u.dz < 0 ? (tt == TRAPDOOR || tt == HOLE)
-                             : tt == ROCKTRAP)
+                if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
             tt = what_trap(tt);

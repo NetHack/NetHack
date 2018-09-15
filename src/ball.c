@@ -599,8 +599,7 @@ drag:
              || !is_pool(uball->ox, uball->oy)
              || levl[uball->ox][uball->oy].typ == POOL))
         || ((t = t_at(uchain->ox, uchain->oy))
-            && (is_pit(t->ttyp) || t->ttyp == HOLE
-                || t->ttyp == TRAPDOOR))) {
+            && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
             You_feel("a tug from the iron ball.");
             if (t)
@@ -746,7 +745,7 @@ xchar x, y;
             && (is_pool(x, y)
                 || ((t = t_at(x, y))
                     && (is_pit(t->ttyp)
-                        || t->ttyp == TRAPDOOR || t->ttyp == HOLE)))) {
+                        || is_hole(t->ttyp))))) {
             u.ux = x;
             u.uy = y;
         } else {

@@ -2660,8 +2660,7 @@ fill_empty_maze()
             maze1xy(&mm, DRY);
             trytrap = rndtrap();
             if (sobj_at(BOULDER, mm.x, mm.y))
-                while (is_pit(trytrap)
-                       || trytrap == TRAPDOOR || trytrap == HOLE)
+                while (is_pit(trytrap) || is_hole(trytrap))
                     trytrap = rndtrap();
             (void) maketrap(mm.x, mm.y, trytrap);
         }
@@ -4495,7 +4494,7 @@ ensure_way_out()
 
     while (ttmp) {
         if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE
-             || ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR)
+             || is_hole(ttmp->ttyp))
             && !selection_getpoint(ttmp->tx, ttmp->ty, ov))
             selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
         ttmp = ttmp->ntrap;
