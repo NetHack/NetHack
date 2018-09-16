@@ -2306,7 +2306,7 @@ boolean ordinary;
 
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
-        (void) cancel_monst(&youmonst, obj, TRUE, FALSE, TRUE);
+        (void) cancel_monst(&youmonst, obj, TRUE, TRUE, TRUE);
         break;
 
     case SPE_DRAIN_LIFE:
@@ -2675,25 +2675,45 @@ boolean youattack, allow_cancel_kill, self_cancel;
 
     /* now handle special cases */
     if (youdefend) {
-        if (Upolyd) {
-            if ((u.umonnum == PM_CLAY_GOLEM) && !Blind)
-                pline(writing_vanishes, your);
-
-            if (Unchanging)
+        if (Upolyd) { /* includes lycanthrope in creature form */
+            /*
+             * Return to normal form unless Unchanging.
+             * Hero in clay golem form dies if Unchanging.
+             * Does not cure lycanthropy or stop timed random polymorph.
+             */
+            if (u.umonnum == PM_CLAY_GOLEM) {
+                if (!Blind)
+                    pline(writing_vanishes, your);
+                else /* note: "dark" rather than "heavy" is intentional... */
+                    You_feel("%s headed.", Hallucination ? "dark" : "light");
+                u.mh = 0; /* fatal; death handled by rehumanize() */
+            }
+            if (Unchanging && u.mh > 0)
                 Your("amulet grows hot for a moment, then cools.");
             else
                 rehumanize();
         }
     } else {
-        mdef->mcan = TRUE;
-
-        if (is_were(mdef->data) && mdef->data->mlet != S_HUMAN)
+        mdef->mcan = 1;
+        /* force shapeshifter into its base form */
+        if (mdef->m_ap_type != M_AP_NOTHING)
+            seemimic(mdef);
+        /* [not 'else if'; chameleon might have been hiding as a mimic] */
+        if (mdef->cham >= LOW_PM) {
+            /* note: newcham() uncancels shapechangers (resets m->mcan
+               to 0), but only for shapechangers whose m->cham is already
+               NON_PM and we just verified that it's LOW_PM or higher */
+            newcham(mdef, &mons[mdef->cham], FALSE, FALSE);
+            mdef->cham = NON_PM; /* cancelled shapeshifter can't shift */
+        }
+        if (is_were(mdef->data) && !is_human(mdef->data))
             were_change(mdef);
 
         if (mdef->data == &mons[PM_CLAY_GOLEM]) {
             if (canseemon(mdef))
                 pline(writing_vanishes, s_suffix(mon_nam(mdef)));
-
+            /* !allow_cancel_kill is for Magicbane, where clay golem
+               will be killed somewhere back up the call/return chain... */
             if (allow_cancel_kill) {
                 if (youattack)
                     killed(mdef);

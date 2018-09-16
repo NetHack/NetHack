@@ -2900,7 +2900,8 @@ restartcham()
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
-        mtmp->cham = pm_to_cham(monsndx(mtmp->data));
+        if (!mtmp->mcan)
+            mtmp->cham = pm_to_cham(monsndx(mtmp->data));
         if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping
             && cansee(mtmp->mx, mtmp->my)) {
             set_mimic_sym(mtmp);
@@ -3417,6 +3418,13 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
            anomalous extinction feedback during final disclsoure */
         if (mbirth_limit(monsndx(olddata)) < MAXMONNO)
             return 0;
+        /* cancelled shapechangers become uncancelled prior
+           to being given a new shape */
+        if (mtmp->mcan && !Protection_from_shape_changers) {
+            mtmp->cham = pm_to_cham(monsndx(mtmp->data));
+            if (mtmp->cham != NON_PM)
+                mtmp->mcan = 0;
+        }
     }
 
     if (msg) {
