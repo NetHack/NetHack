@@ -2118,6 +2118,7 @@ initMapTiles(void)
     HBITMAP hBmp;
     BITMAP bm;
     TCHAR wbuf[MAX_PATH];
+    DWORD errcode;
     int tl_num;
     SIZE map_size;
     extern int total_tiles_used;
@@ -2131,8 +2132,13 @@ initMapTiles(void)
                      NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
                      IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
     if (hBmp == NULL) {
-        raw_print(
-            "Cannot load tiles from the file. Reverting back to default.");
+        char errmsg[BUFSZ];
+
+        errcode = GetLastError();
+        Sprintf(errmsg, "%s (0x%x).",
+            "Cannot load tiles from the file. Reverting back to default",
+            errcode);
+        raw_print(errmsg);
         return FALSE;
     }
 
