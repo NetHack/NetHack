@@ -3312,6 +3312,15 @@ struct obj *obj;
     freeinv(obj);       /* hide it from destroy_item instead... */
     setnotworn(obj);    /* so we need to do this ourselves */
 
+    /* If you know the wand you're breaking is a wand of nothing,
+     * it should say something different.
+     * OK to skip other wand breaking code since even wresting won't have
+     * any effect. */
+    if(obj->otyp == WAN_NOTHING && objects[WAN_NOTHING].oc_name_known) {
+      pline("Predictably, nothing happens.");
+      goto discard_broken_wand;
+    }
+
     if (!zappable(obj)) {
         pline(nothing_else_happens);
         goto discard_broken_wand;
