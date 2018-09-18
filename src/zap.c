@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1525012627 2018/04/29 14:37:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1537234123 2018/09/18 01:28:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.287 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -222,7 +222,11 @@ struct obj *otmp;
     case WAN_POLYMORPH:
     case SPE_POLYMORPH:
     case POT_POLYMORPH:
-        if (resists_magm(mtmp)) {
+        if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp)) {
+            /* if a long worm has mcorpsenm set, it was polymophed by
+               the current zap and shouldn't be affected if hit again */
+            ;
+        } else if (resists_magm(mtmp)) {
             /* magic resistance protects from polymorph traps, so make
                it guard against involuntary polymorph attacks too... */
             shieldeff(mtmp->mx, mtmp->my);
@@ -238,6 +242,7 @@ struct obj *otmp;
             if (polyspot)
                 for (obj = mtmp->minvent; obj; obj = obj->nobj)
                     bypass_obj(obj);
+
             /* natural shapechangers aren't affected by system shock
                (unless protection from shapechangers is interfering
                with their metabolism...) */
@@ -260,6 +265,22 @@ struct obj *otmp;
                 if (give_msg && (canspotmon(mtmp)
                                  || (u.uswallow && mtmp == u.ustuck)))
                     learn_it = TRUE;
+            }
+
+            /* do this even if polymorphed failed (otherwise using
+               flags.mon_polycontrol prompting to force mtmp to remain
+               'long worm' would prompt again if zap hit another segment) */
+            if (!DEADMONSTER(mtmp) && mtmp->data == &mons[PM_LONG_WORM]) {
+                if (!has_mcorpsenm(mtmp))
+                    newmcorpsenm(mtmp);
+                /* flag to indicate that mtmp became a long worm
+                   on current zap, so further hits (on mtmp's new
+                   tail) don't do further transforms */
+                MCORPSENM(mtmp) = PM_LONG_WORM;
+                /* flag to indicate that cleanup is needed; object
+                   bypass cleanup also clears mon->mextra->mcorpsenm
+                   for all long worms on the level */
+                context.bypasses = TRUE;
             }
         }
         break;
