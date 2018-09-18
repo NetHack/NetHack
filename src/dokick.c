@@ -1612,6 +1612,9 @@ boolean near_hero;
             continue;
 
         where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
+        if ((where & MIGR_TO_SPECIES) != 0)
+            continue;
+
         nobreak = (where & MIGR_NOBREAK) != 0;
         noscatter = (where & MIGR_WITH_HERO) != 0;
         where &= ~(MIGR_NOBREAK | MIGR_NOSCATTER);
@@ -1663,6 +1666,48 @@ boolean near_hero;
                 /* assume it broke before player arrived, no messages */
                 delobj(otmp);
             }
+        }
+    }
+}
+
+void
+deliver_obj_to_mon(mtmp, deliverflags)
+struct monst *mtmp;
+unsigned long deliverflags;
+{
+    struct obj *otmp, *otmp2;
+    int where, cnt = 0, maxobj = 0;
+
+    if (deliverflags & DF_RANDOM3)
+        maxobj = rn2(3) + 1;
+    else if (deliverflags & DF_RANDOM2)
+        maxobj = rn2(2) + 1;
+    else if (deliverflags == DF_NONE)
+        maxobj = 1;
+
+    for (otmp = migrating_objs; otmp; otmp = otmp2) {
+        otmp2 = otmp->nobj;
+        where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
+        if ((where & MIGR_TO_SPECIES) == 0)
+            continue;
+        
+        if ((mtmp->data->mflags2 & otmp->corpsenm) != 0) {
+            obj_extract_self(otmp);
+            otmp->owornmask = 0L;
+            otmp->ox = otmp->oy = 0;
+
+            /* special treatment for orcs and their kind */
+            if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
+                if (!has_mname(mtmp))
+                    mtmp = christen_orc(mtmp, ONAME(otmp));
+                free_oname(otmp);
+            }
+            otmp->corpsenm = 0;
+            (void) add_to_minv(mtmp, otmp);
+            cnt++;
+            if (maxobj && cnt >= maxobj)
+                break;
+            /* getting here implies DF_ALL */
         }
     }
 }

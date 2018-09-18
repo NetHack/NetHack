@@ -1390,6 +1390,9 @@ int mmflags;
             mtmp->mstrategy |= STRAT_APPEARMSG;
     }
 
+    if (allow_minvent && migrating_objs)
+        deliver_obj_to_mon(mtmp, DF_RANDOM3); /* in case there's waiting items */
+    
     if (!in_mklev)
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 

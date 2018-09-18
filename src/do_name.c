@@ -543,7 +543,7 @@ int cx, cy;
 
     cc.x = cx;
     cc.y = cy;
-    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
@@ -593,7 +593,8 @@ int gloc;
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
-        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch)) {
+        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf,
+                              &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch,
@@ -2065,6 +2066,47 @@ char *buf;
                            : coynames[mtmp->m_id % (SIZE(coynames) - 1)]);
     }
     return buf;
+}
+
+char *
+rndorcname(s)
+char *s;
+{
+    int i;
+    const char *v[] = {"a", "ai", "og", "u"};
+    const char *snd[] = {"gor", "gris", "un", "bane", "ruk",
+                         "oth","ul", "z", "thos","akh","hai"};
+    int vstart = rn2(2);
+    
+    if (s) {
+        *s = '\0';
+        for (i = 0; i  < rn2(2) + 3; ++i) { 
+            vstart = 1 - vstart;                /* 0 -> 1, 1 -> 0 */
+            if (!rn2(30) && i > 0)
+                (void) strcat(s, "-");
+            (void) sprintf(eos(s), "%s", vstart ? v[rn2(SIZE(v))] :
+                            snd[rn2(SIZE(snd))]);
+        }
+    }
+    return s;
+}
+
+struct monst *
+christen_orc(mtmp, gang)
+struct monst *mtmp;
+char *gang;
+{
+    size_t sz = 0;
+    char buf[BUFSZ], buf2[BUFSZ], *orcname;
+
+    orcname = rndorcname(buf2);
+    sz = strlen(gang) + strlen(orcname) + strlen(" of ");
+    if (buf && gang && orcname && (sz < (BUFSZ - 1))) {
+        Sprintf(buf, "%s of %s",
+                upstart(orcname), upstart(gang));
+        mtmp = christen_monst(mtmp, buf);
+    }
+    return mtmp;
 }
 
 /* make sure "The Colour of Magic" remains the first entry in here */

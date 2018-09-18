@@ -270,6 +270,12 @@ typedef struct sortloot_item Loot;
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
 
+/* flags for deliver_obj_to_mon */
+#define DF_NONE     0x00
+#define DF_RANDOM2  0x01
+#define DF_RANDOM3  0x02
+#define DF_ALL      0x04
+
 /* special mhpmax value when loading bones monster to flag as extinct or
  * genocided */
 #define DEFUNCT_MONSTER (-100)
