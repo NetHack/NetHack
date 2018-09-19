@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1533352036 2018/08/04 03:07:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1537313446 2018/09/18 23:30:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3202,6 +3202,11 @@ struct obj *no_wish;
     }
     if (unlabeled && !BSTRCMPI(bp, p - 9, "spellbook")) {
         typ = SPE_BLANK_PAPER;
+        goto typfnd;
+    }
+    /* specific food rather than color of gem/potion/spellbook[/scales] */
+    if (!BSTRCMPI(bp, p - 6, "orange") && mntmp == NON_PM) {
+        typ = ORANGE;
         goto typfnd;
     }
     /*
