@@ -96,7 +96,7 @@ M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
 M-a     adjust  adjust inventory letters
 M-A     annotate add a one-line note to the current dungeon level (see M-O)
 M-c     chat    talk to someone
-M-C     conduct view optional challanges
+M-C     conduct view optional challenges
 M-d     dip     dip an object into something
 M-e     enhance advance or check weapon and spell skills
 M-f     force   force a lock
