@@ -678,6 +678,8 @@ const char *gang;
     if (otmp && gang) {
         new_oname(otmp, strlen(gang) + 1); /* removes old name if one is present */
         Strcpy(ONAME(otmp), gang);
+        if (otyp >= TRIPE_RATION && otyp <= TIN)
+            otmp->quan += (long) rn2(3);
     }
 }
 
@@ -710,13 +712,13 @@ stolen_booty(VOID_ARGS)
         migrate_orc(mtmp, ORC_LEADER);
     }
     /* create the stuff that the rest of the gang took */
+    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
     cnt = rn2(3) + 1;
     for (i = 0; i < cnt; ++i)
         migr_booty_item(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, gang);
     cnt = rn2(2) + 1;
     for (i = 0; i < cnt; ++i)
         migr_booty_item(SKELETON_KEY, gang);
-    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
     otyp = rn2((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1) + LEATHER_GLOVES;
     migr_booty_item(otyp, gang);
     cnt = rn2(9) + 1;
@@ -735,22 +737,33 @@ stolen_booty(VOID_ARGS)
         if (DEADMONSTER(mtmp))
             continue;
 
-        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10))
-            mtmp = christen_orc(mtmp, upstart(gang));
+        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
+            /*
+             * We'll consider the orc captain from the level
+             * .des file to be the captain of a rival orc horde
+             * who is there to see what has transpired, and to
+             * contemplate future action.
+             *
+             * Don't christen the orc captain as a subordinate
+             * member of the main orc horde.
+             */
+            if (mtmp->data != &mons[PM_ORC_CAPTAIN])
+                mtmp = christen_orc(mtmp, upstart(gang));
+        }
     }
-    /* Lastly, ensure there's a few more orcs from the gang along the way
+    /* Lastly, ensure there's several more orcs from the gang along the way.
      * The mechanics are such that they aren't actually identified as
      * members of the invading gang until they get their spoils assigned
      * to the inventory; handled during that assignment.
      */
-    cnt = rn2(6) + 1;
+    cnt = rn2(7) + 5;
     for (i = 0; i < cnt; ++i) {
         int mtyp;
 
         mtyp = rn2((PM_ORC_SHAMAN - PM_ORC) + 1) + PM_ORC;
         mtmp = makemon(&mons[mtyp], 0, 0, MM_NONAME);
         if (mtmp)
-            migrate_orc(mtmp, 0L);
+            migrate_orc(mtmp, 0UL);
     }
        
     ransacked = 0;
