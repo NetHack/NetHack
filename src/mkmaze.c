@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1518718417 2018/02/15 18:13:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1537477570 2018/09/20 21:06:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -628,20 +628,15 @@ check_ransacked(s)
 char *s;
 {
     /* this kludge only works as long as orctown is minetn-1 */
-    if (dungeons[u.uz.dnum].dname
-        && !strcmp(dungeons[u.uz.dnum].dname, "The Gnomish Mines")
-        && !strcmp(s, "minetn-1"))
-        ransacked = 1;
-    else
-        ransacked = 0;
+    ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
 }
 
 #define ORC_LEADER 1
 
 void
-migrate_orc(mtmp, flags)
+migrate_orc(mtmp, mflags)
 struct monst *mtmp;
-unsigned long flags;
+unsigned long mflags;
 {
     int nlev, max_depth, cur_depth;
     d_level dest;
@@ -649,7 +644,7 @@ unsigned long flags;
     cur_depth = (int) depth(&u.uz);
     max_depth = dunlevs_in_dungeon(&u.uz) +
                 (dungeons[u.uz.dnum].depth_start - 1);
-    if (flags == ORC_LEADER) {
+    if (mflags == ORC_LEADER) {
         /* Note that the orc leader will take possession of any
          * remaining stuff not already delivered to other
          * orcs between here and the bottom of the mines.

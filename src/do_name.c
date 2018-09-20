@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1519420054 2018/02/23 21:07:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1537477563 2018/09/20 21:06:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1700,10 +1700,7 @@ boolean called;
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
         Strcat(buf, "saddled ");
-    if (buf[0] != 0)
-        has_adjectives = TRUE;
-    else
-        has_adjectives = FALSE;
+    has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now */
     /* Be sure to remember whether the buffer starts with a name */
@@ -2096,14 +2093,13 @@ christen_orc(mtmp, gang)
 struct monst *mtmp;
 char *gang;
 {
-    size_t sz = 0;
+    int sz = 0;
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
 
     orcname = rndorcname(buf2);
-    sz = strlen(gang) + strlen(orcname) + strlen(" of ");
-    if (buf && gang && orcname && (sz < (BUFSZ - 1))) {
-        Sprintf(buf, "%s of %s",
-                upstart(orcname), upstart(gang));
+    sz = (int) (strlen(gang) + strlen(orcname) + sizeof " of " - sizeof "");
+    if (gang && orcname && sz < BUFSZ) {
+        Sprintf(buf, "%s of %s", upstart(orcname), upstart(gang));
         mtmp = christen_monst(mtmp, buf);
     }
     return mtmp;
