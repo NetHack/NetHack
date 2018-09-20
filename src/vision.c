@@ -1916,7 +1916,7 @@ char *limits;       /* points at range limit for current row, or NULL */
          * shadow limit imposed by the far block (right) then use the far
          * wall as our new far block when we recurse.
          *
-         * If the limits are the the same, and the far block really exists
+         * If the limits are the same, and the far block really exists
          * (fb_row >= 0) then do the same as above.
          *
          * Normally, the check would be for the far wall being closer OR EQUAL
