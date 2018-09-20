@@ -1161,7 +1161,7 @@ CalculateCellSize(HWND hWnd, LPSIZE pSize, LPSIZE pWindowSize)
     hdc = GetDC(hWnd);
 
     /* if windows size is specified - attempt ro stretch cells across
-       the the window size. If not - make default cell size based on
+       the window size. If not - make default cell size based on
        10 points font. Make sure that cell cesize does not exceeds 20 points
        */
     if (pWindowSize->cx > 0)
