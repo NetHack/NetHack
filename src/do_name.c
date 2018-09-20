@@ -50,7 +50,7 @@ boolean FDECL((*gp_getvalidf), (int, int));
     getpos_getvalid = gp_getvalidf;
 }
 
-const char *const gloc_descr[NUM_GLOCS][4] = {
+static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next monster", "monsters" },
     { "any items", "item", "next object", "objects" },
     { "any doors", "door", "next door or doorway", "doors or doorways" },
@@ -60,7 +60,7 @@ const char *const gloc_descr[NUM_GLOCS][4] = {
       "anything interesting" }
 };
 
-const char *const gloc_filtertxt[NUM_GFILTER] = {
+static const char *const gloc_filtertxt[NUM_GFILTER] = {
     "",
     " in view",
     " in this area"
@@ -90,11 +90,11 @@ getpos_help(force, goal)
 boolean force;
 const char *goal;
 {
+    static const char *const fastmovemode[2] = { "8 units at a time",
+                                                 "skipping same glyphs" };
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
-    const char *const fastmovemode[2] = { "8 units at a time",
-                                          "skipping same glyphs" };
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
@@ -275,8 +275,8 @@ int glyph;
 }
 
 STATIC_OVL int
-gloc_filter_floodfill_matcharea(x,y)
-int x,y;
+gloc_filter_floodfill_matcharea(x, y)
+int x, y;
 {
     int glyph = back_to_glyph(x, y);
 
@@ -308,7 +308,7 @@ gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!gloc_filter_map) {
-            gloc_filter_map = selection_opvar(NULL);
+            gloc_filter_map = selection_opvar((char *) 0);
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -321,8 +321,6 @@ gloc_filter_init()
         } else {
             gloc_filter_floodfill(u.ux, u.uy);
         }
-
-
     }
 }
 
@@ -331,7 +329,7 @@ gloc_filter_done()
 {
     if (gloc_filter_map) {
         opvar_free_x(gloc_filter_map);
-        gloc_filter_map = NULL;
+        gloc_filter_map = (struct opvar *) 0;
     }
 }
 
@@ -466,7 +464,7 @@ boolean fulldir;
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
-        const char *dirnames[4][2] = {
+        static const char *dirnames[4][2] = {
             { "n", "north" },
             { "s", "south" },
             { "w", "west" },
@@ -543,7 +541,8 @@ int cx, cy;
 
     cc.x = cx;
     cc.y = cy;
-    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
+                              (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
@@ -590,6 +589,7 @@ int gloc;
         coord tmpcc;
         const char *firstmatch = "unknown";
         int sym = 0;
+
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
@@ -804,11 +804,12 @@ const char *goal;
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
-            const char *const view_filters[NUM_GFILTER] = {
+            static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
                 "Limiting targets to in sight",
                 "Limiting targets to in same area"
             };
+
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
             for (i = 0; i < NUM_GLOCS; i++) {
                 if (garr[i]) {
@@ -845,6 +846,7 @@ const char *goal;
 
             if (iflags.getloc_usemenu) {
                 coord tmpcrd;
+
                 if (getpos_menu(&tmpcrd, gloc)) {
                     cx = tmpcrd.x;
                     cy = tmpcrd.y;
@@ -1513,7 +1515,7 @@ namefloorobj()
               (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
         return;
     }
-    /* note well: 'obj' might be as instance of STRANGE_OBJECT if target
+    /* note well: 'obj' might be an instance of STRANGE_OBJECT if target
        is a mimic; passing that to xname (directly or via simpleonames)
        would yield "glorkum" so we need to handle it explicitly; it will
        always fail the Hallucination test and pass the !callable test,
@@ -2025,9 +2027,9 @@ static NEARDATA const char *const hliquids[] = {
     "instant coffee", "tea", "herbal infusion", "liquid rainbow",
     "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",
     "ketchup", "slow light", "oil", "vinaigrette", "liquid crystal", "honey",
-    "caramel sauce", "ink", "aqueous humour", "milk substitute", "fruit juice",
-    "glowing lava", "gastric acid", "mineral water", "cough syrup", "quicksilver",
-    "sweet vitriol", "grey goo", "pink slime",
+    "caramel sauce", "ink", "aqueous humour", "milk substitute",
+    "fruit juice", "glowing lava", "gastric acid", "mineral water",
+    "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
 };
 
 const char *
@@ -2035,7 +2037,7 @@ hliquid(liquidpref)
 const char *liquidpref;
 {
     return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
-                                         : liquidpref;
+                                          : liquidpref;
 }
 
 /* Aliases for road-runner nemesis
