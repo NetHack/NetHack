@@ -54,7 +54,7 @@
 .in -\\n(PYu				\" undo indent past label (etc)
 .sn \\n(pdu				\" tmac.n: inter-paragraph space
 ..
-.\" end of labeled paragrah
+.\" end of labeled paragraph
 .\"
 .\" aligned single character key with SHORT definition (if it overflows one
 .\" line, all bets are off)
@@ -1583,7 +1583,7 @@ debt or credit, if any.  The `Iu' command lists unpaid items
 The `Ix' command shows an inventory-like display of any unpaid
 items which have been used up, along with other shop fees, if any.
 .hn 3
-Shop idiosyncracies
+Shop idiosyncrasies
 .pg
 Several aspects of shop behavior might be unexpected.
 .\" note: using * instead of \(bu is better for plain text output
@@ -2463,19 +2463,19 @@ defaults to the location of the NetHack.exe or NetHackw.exe file
 so setting HACKDIR to override that is not usually necessary or recommended.
 .lp LEVELDIR
 The location that in-progress level files are stored. Defaults to HACKDIR,
-must be writeable.
+must be writable.
 .lp SAVEDIR
 The location where saved games are kept. Defaults to HACKDIR, must be
-writeable.
+writable.
 .lp BONESDIR
 The location that bones files are kept. Defaults to HACKDIR, must be
-writeable.
+writable.
 .lp LOCKDIR
 The location that file synchronization locks are stored. Defaults to
-HACKDIR, must be writeable.
+HACKDIR, must be writable.
 .lp TROUBLEDIR
 The location that a record of game aborts and self-diagnosed game problems
-is kept. Defaults to HACKDIR, must be writeable.
+is kept. Defaults to HACKDIR, must be writable.
 .lp AUTOCOMPLETE
 Enable or disable an extended command autocompletion.
 Autocompletion has no effect for the X11 windowport.
@@ -4017,7 +4017,7 @@ m	S_mimic	(mimic)
 ]	S_mimic_def	(mimic)
 M	S_mummy	(mummy)
 N	S_naga	(naga)
-\.	S_ndoor	(doorway witout door)
+\.	S_ndoor	(doorway without door)
 n	S_nymph	(nymph)
 O	S_ogre	(ogre)
 o	S_orc	(orc)

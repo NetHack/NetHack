@@ -334,7 +334,7 @@ add_menu(windid window, int glyph, const anything identifier,
 		   outside of the standard accelerator (see above) or a
 		   number.  If 0, the item is unaffected by any group
 		   accelerator.  If this accelerator conflicts with
-		   the menu command (or their user defined alises), it loses.
+		   the menu command (or their user defined aliases), it loses.
 		   The menu commands and aliases take care not to interfere
 		   with the default object class symbols.
 		-- If you want this choice to be preselected when the
@@ -461,7 +461,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
 
                    For the user's chosen set of BL_MASK_ condition bits,
                    They are stored internally in the cond_hilites[] array,
-                   at the array offset aligned to the color those condtion
+                   at the array offset aligned to the color those condition
                    bits should display in.
 
                    For example, if the user has chosen to display strngl

@@ -398,21 +398,21 @@
 #HACKDIR=c:\games\nethack
 
 # The location that level files in progress are stored
-# (default=HACKDIR, writeable)
+# (default=HACKDIR, writable)
 #LEVELDIR=c:\nethack\levels
 
-# The location where saved games are kept (default=HACKDIR, writeable)
+# The location where saved games are kept (default=HACKDIR, writable)
 #SAVEDIR=c:\nethack\save
 
-# The location that bones files are kept (default=HACKDIR, writeable)
+# The location that bones files are kept (default=HACKDIR, writable)
 #BONESDIR=c:\nethack\save
 
 # The location that file synchronization locks are stored
-# (default=HACKDIR, writeable)
+# (default=HACKDIR, writable)
 #LOCKDIR=c:\nethack\levels
 
 # The location that a record of game aborts and self-diagnosed game problems
-# is kept (default=HACKDIR, writeable)
+# is kept (default=HACKDIR, writable)
 #TROUBLEDIR=c:\nethack\trouble
 
 # Finnish keyboards might need these modifications uncommented. Windows GUI.
