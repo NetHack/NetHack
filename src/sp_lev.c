@@ -3839,31 +3839,39 @@ int dir;
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
+            if (!isok(x, y))
+                continue;
             c = 0;
-            if ((dir & W_WEST) && (x > 0)
-                && (selection_getpoint(x - 1, y, ov)))
+            if ((dir & W_WEST) && selection_getpoint(x + 1, y, ov)) {
                 c++;
-            if ((dir & (W_WEST | W_NORTH)) && (x > 0) && (y > 0)
-                && (selection_getpoint(x - 1, y - 1, ov)))
+            }
+            /* Note: extra parens around these operands are critical, due to ==
+             * having precedence over & and |. */
+            else if (((dir & (W_WEST | W_NORTH)) == (W_WEST | W_NORTH))
+                && selection_getpoint(x + 1, y + 1, ov)) {
                 c++;
-            if ((dir & W_NORTH) && (y > 0)
-                && (selection_getpoint(x, y - 1, ov)))
+            }
+            else if ((dir & W_NORTH) && selection_getpoint(x, y + 1, ov)) {
                 c++;
-            if ((dir & (W_NORTH | W_EAST)) && (y > 0) && (x < COLNO - 1)
-                && (selection_getpoint(x + 1, y - 1, ov)))
+            }
+            else if (((dir & (W_NORTH | W_EAST)) == (W_NORTH | W_EAST))
+                && selection_getpoint(x - 1, y + 1, ov)) {
                 c++;
-            if ((dir & W_EAST) && (x < COLNO - 1)
-                && (selection_getpoint(x + 1, y, ov)))
+            }
+            else if ((dir & W_EAST) && selection_getpoint(x - 1, y, ov)) {
                 c++;
-            if ((dir & (W_EAST | W_SOUTH)) && (x < COLNO - 1)
-                && (y < ROWNO - 1) && (selection_getpoint(x + 1, y + 1, ov)))
+            }
+            else if (((dir & (W_EAST | W_SOUTH)) == (W_EAST | W_SOUTH))
+                && selection_getpoint(x - 1, y - 1, ov)) {
                 c++;
-            if ((dir & W_SOUTH) && (y < ROWNO - 1)
-                && (selection_getpoint(x, y + 1, ov)))
+            }
+            else if ((dir & W_SOUTH) && selection_getpoint(x, y - 1, ov)) {
                 c++;
-            if ((dir & (W_SOUTH | W_WEST)) && (y < ROWNO - 1) && (x > 0)
-                && (selection_getpoint(x - 1, y + 1, ov)))
+            }
+            else if (((dir & (W_SOUTH | W_WEST)) == (W_SOUTH | W_WEST))
+                && selection_getpoint(x + 1, y - 1, ov)) {
                 c++;
+            }
             if (c)
                 tmp[x][y] = 1;
         }
