@@ -75,7 +75,7 @@ There is a fqn_prefix[] entry for holding the path to each of the following:
 To recap, they are about enabling "different paths for different things", and
 separation of:
 - read-only stuff from read-write stuff.
-- sysadmin stuff from user-writeable stuff.
+- sysadmin stuff from user-writable stuff.
 etc.
 
 ==============================================
