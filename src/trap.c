@@ -7,6 +7,15 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
+STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
+                                                        struct obj *));
+STATIC_DCL struct obj *FDECL(t_missile, (int, struct trap *));
+STATIC_DCL char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
+STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
+STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
+STATIC_DCL int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
+                                     SHORT_P, long));
+STATIC_DCL boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe, (boolean *));
@@ -18,26 +27,16 @@ STATIC_DCL int FDECL(disarm_holdingtrap, (struct trap *));
 STATIC_DCL int FDECL(disarm_landmine, (struct trap *));
 STATIC_DCL int FDECL(disarm_squeaky_board, (struct trap *));
 STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
+STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
+STATIC_DCL boolean FDECL(adj_nonconjoined_pit, (struct trap *));
 STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int,
                                 BOOLEAN_P));
 STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
-STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
-                                 BOOLEAN_P));
-STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
-                                     SHORT_P, long));
-STATIC_DCL boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
-STATIC_DCL char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 #if 0
 STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif
-STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
-STATIC_DCL boolean FDECL(adj_nonconjoined_pit, (struct trap *));
-
-STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
-STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned,
-                                                        struct obj *,
-                                                        struct obj *));
+STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
+                                 BOOLEAN_P));
 STATIC_DCL void NDECL(maybe_finish_sokoban);
 
 /* mintrap() should take a flags argument, but for time being we use this */
@@ -839,6 +838,21 @@ struct trap *trap;
     return FALSE;
 }
 
+/* make a single arrow/dart/rock for a trap to shoot or drop */
+STATIC_OVL struct obj *
+t_missile(otyp, trap)
+int otyp;
+struct trap *trap;
+{
+    struct obj *otmp = mksobj(otyp, TRUE, FALSE);
+
+    otmp->quan = 1L;
+    otmp->owt = weight(otmp);
+    otmp->opoisoned = 0;
+    otmp->ox = trap->tx, otmp->oy = trap->ty;
+    return otmp;
+}
+
 void
 dotrap(trap, trflags)
 register struct trap *trap;
@@ -911,12 +925,9 @@ unsigned trflags;
         trap->once = 1;
         seetrap(trap);
         pline("An arrow shoots out at you!");
-        otmp = mksobj(ARROW, TRUE, FALSE);
-        otmp->quan = 1L;
-        otmp->owt = weight(otmp);
-        otmp->opoisoned = 0;
-        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
-            ;
+        otmp = t_missile(ARROW, trap);
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
+            ; /* nothing */
         } else if (thitu(8, dmgval(otmp, &youmonst), &otmp, "arrow")) {
             if (otmp)
                 obfree(otmp, (struct obj *) 0);
@@ -939,14 +950,12 @@ unsigned trflags;
         trap->once = 1;
         seetrap(trap);
         pline("A little dart shoots out at you!");
-        otmp = mksobj(DART, TRUE, FALSE);
-        otmp->quan = 1L;
-        otmp->owt = weight(otmp);
+        otmp = t_missile(DART, trap);
         if (!rn2(6))
             otmp->opoisoned = 1;
         oldumort = u.umortality;
-        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
-            ;
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
+            ; /* nothing */
         } else if (thitu(7, dmgval(otmp, &youmonst), &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
@@ -976,13 +985,11 @@ unsigned trflags;
 
             trap->once = 1;
             feeltrap(trap);
-            otmp = mksobj_at(ROCK, u.ux, u.uy, TRUE, FALSE);
-            otmp->quan = 1L;
-            otmp->owt = weight(otmp);
+            otmp = t_missile(ROCK, trap);
+            place_object(otmp, u.ux, u.uy);
 
             pline("A trap door in %s opens and %s falls on your %s!",
                   the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
-
             if (uarmh) {
                 if (is_metallic(uarmh)) {
                     pline("Fortunately, you are wearing a hard helmet.");
@@ -991,7 +998,6 @@ unsigned trflags;
                     pline("%s does not protect you.", Yname2(uarmh));
                 }
             }
-
             if (!Blind)
                 otmp->dknown = 1;
             stackobj(otmp);
@@ -1639,7 +1645,7 @@ static struct {
     xchar x, y;
 } launchplace;
 
-static void
+STATIC_OVL void
 launch_drop_spot(obj, x, y)
 struct obj *obj;
 xchar x, y;
@@ -2147,10 +2153,7 @@ register struct monst *mtmp;
                 break;
             }
             trap->once = 1;
-            otmp = mksobj(ARROW, TRUE, FALSE);
-            otmp->quan = 1L;
-            otmp->owt = weight(otmp);
-            otmp->opoisoned = 0;
+            otmp = t_missile(ARROW, trap);
             if (in_sight)
                 seetrap(trap);
             if (thitm(8, mtmp, otmp, 0, FALSE))
@@ -2166,9 +2169,7 @@ register struct monst *mtmp;
                 break;
             }
             trap->once = 1;
-            otmp = mksobj(DART, TRUE, FALSE);
-            otmp->quan = 1L;
-            otmp->owt = weight(otmp);
+            otmp = t_missile(DART, trap);
             if (!rn2(6))
                 otmp->opoisoned = 1;
             if (in_sight)
@@ -2187,9 +2188,7 @@ register struct monst *mtmp;
                 break;
             }
             trap->once = 1;
-            otmp = mksobj(ROCK, TRUE, FALSE);
-            otmp->quan = 1L;
-            otmp->owt = weight(otmp);
+            otmp = t_missile(ROCK, trap);
             if (in_sight)
                 seetrap(trap);
             if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
@@ -4889,7 +4888,7 @@ boolean u_entering_trap2;
     return FALSE;
 }
 
-void
+STATIC_OVL void
 clear_conjoined_pits(trap)
 struct trap *trap;
 {
@@ -4913,7 +4912,7 @@ struct trap *trap;
     }
 }
 
-boolean
+STATIC_OVL boolean
 adj_nonconjoined_pit(adjtrap)
 struct trap *adjtrap;
 {
