@@ -127,7 +127,7 @@ filing a bug report from our "Contact Us" web page at:
     https://www.nethack.org/common/contact.html or
     http://www.nethack.org/common/contact.html
 Please include the version information from #version or the command line
-option --version in the apropriate field.
+option --version in the appropriate field.
 
 A public repository of the latest NetHack code that we've made
 available can be obtained via git here:
