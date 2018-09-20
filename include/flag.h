@@ -40,7 +40,7 @@ struct flag {
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
-    boolean perm_invent;     /* keep full inventories up until dismissed */
+    boolean p__obsolete;     /* [3.6.2: perm_invent moved to iflags] */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
@@ -292,6 +292,7 @@ struct instance_flags {
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean news;             /* print news */
     boolean num_pad;          /* use numbers for movement commands */
+    boolean perm_invent;      /* keep full inventories up until dismissed */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
     boolean status_updates;   /* allow updates to bottom status lines;

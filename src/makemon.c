@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1495237801 2017/05/19 23:50:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1537477761 2018/09/20 21:09:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1390,6 +1390,9 @@ int mmflags;
             mtmp->mstrategy |= STRAT_APPEARMSG;
     }
 
+    if (allow_minvent && migrating_objs)
+        deliver_obj_to_mon(mtmp, DF_RANDOM2); /* in case there's waiting items */
+    
     if (!in_mklev)
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 
@@ -1835,7 +1838,7 @@ struct monst *mtmp, *victim;
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
                     ptr->mname);
-            pline("%s %s %s.", Monnam(mtmp),
+            pline("%s %s %s.", upstart(y_monnam(mtmp)),
                   (fem != mtmp->female) ? "changes into"
                                         : humanoid(ptr) ? "becomes"
                                                         : "grows up into",

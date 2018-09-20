@@ -407,6 +407,12 @@ boolean with_you;
         break;
     }
 
+    if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
+        /* Pick up the rest of the MIGR_TO_SPECIES objects */
+        if (migrating_objs)
+            deliver_obj_to_mon(mtmp, DF_ALL);
+    }
+    
     if (xlocale && wander) {
         /* monster moved a bit; pick a nearby location */
         /* mnearto() deals w/stone, et al */

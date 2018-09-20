@@ -312,8 +312,7 @@ dig(VOID_ARGS)
         }
 
         if (context.digging.effort <= 50
-            || (ttmp && (ttmp->ttyp == TRAPDOOR || ttmp->ttyp == PIT
-                         || ttmp->ttyp == SPIKED_PIT))) {
+            || (ttmp && (ttmp->ttyp == TRAPDOOR || is_pit(ttmp->ttyp)))) {
             return 1;
         } else if (ttmp && (ttmp->ttyp == LANDMINE
                             || (ttmp->ttyp == BEAR_TRAP && !u.utrap))) {
@@ -803,7 +802,7 @@ coord *cc;
         }
 
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) != 0) {
-        if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)
+        if (ttmp && is_pit(ttmp->ttyp)
             && rn2(2)) {
             pline_The("boulder settles into the %spit.",
                       (dig_x != u.ux || dig_y != u.uy) ? "adjacent " : "");
@@ -1087,7 +1086,7 @@ struct obj *obj;
                            KILLED_BY);
             } else if (u.utrap && u.utraptype == TT_PIT && trap
                        && (trap_with_u = t_at(u.ux, u.uy))
-                       && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
+                       && is_pit(trap->ttyp)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
                 int idx;
 
@@ -1462,8 +1461,7 @@ zap_dig()
             struct trap *adjpit = t_at(zx, zy);
             if ((diridx < 8) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0; /* limited to the adjacent location only */
-                if (!(adjpit && (adjpit->ttyp == PIT
-                                 || adjpit->ttyp == SPIKED_PIT))) {
+                if (!(adjpit && is_pit(adjpit->ttyp))) {
                     char buf[BUFSZ];
                     cc.x = zx;
                     cc.y = zy;
@@ -1477,7 +1475,7 @@ zap_dig()
                     }
                 }
                 if (adjpit
-                    && (adjpit->ttyp == PIT || adjpit->ttyp == SPIKED_PIT)) {
+                    && is_pit(adjpit->ttyp)) {
                     int adjidx = (diridx + 4) % 8;
                     trap_with_u->conjoined |= (1 << diridx);
                     adjpit->conjoined |= (1 << adjidx);
@@ -1566,7 +1564,7 @@ zap_dig()
 
     if (pitflow && isok(flow_x, flow_y)) {
         struct trap *ttmp = t_at(flow_x, flow_y);
-        if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)) {
+        if (ttmp && is_pit(ttmp->ttyp)) {
             schar filltyp = fillholetyp(ttmp->tx, ttmp->ty, TRUE);
             if (filltyp != ROOM)
                 pit_flow(ttmp, filltyp);
@@ -1681,7 +1679,7 @@ struct trap *trap;
 schar filltyp;
 {
     if (trap && (filltyp != ROOM)
-        && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)) {
+        && is_pit(trap->ttyp)) {
         struct trap t;
         int idx;
 

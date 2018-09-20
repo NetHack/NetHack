@@ -543,9 +543,12 @@ unsigned int *stuckid, *steedid;
     /* avoid keeping permanent inventory window up to date during restore
        (setworn() calls update_inventory); attempting to include the cost
        of unpaid items before shopkeeper's bill is available is a no-no;
-       named fruit names aren't accessible yet either */
-    defer_perm_invent = flags.perm_invent;
-    flags.perm_invent = FALSE;
+       named fruit names aren't accessible yet either
+       [3.6.2: moved perm_invent from flags to iflags to keep it out of
+       save files; retaining the override here is simpler than trying to
+       to figure out where it really belongs now] */
+    defer_perm_invent = iflags.perm_invent;
+    iflags.perm_invent = FALSE;
     /* wizard and discover are actually flags.debug and flags.explore;
        player might be overriding the save file values for them;
        in the discover case, we don't want to set that for a normal
@@ -595,6 +598,7 @@ unsigned int *stuckid, *steedid;
         u.uz.dlevel = 1;
         /* revert to pre-restore option settings */
         iflags.deferred_X = FALSE;
+        iflags.perm_invent = defer_perm_invent;
         flags = newgameflags;
 #ifdef SYSFLAGS
         sysflags = newgamesysflags;
@@ -672,7 +676,7 @@ unsigned int *stuckid, *steedid;
     relink_timers(FALSE);
     relink_light_sources(FALSE);
     /* inventory display is now viable */
-    flags.perm_invent = defer_perm_invent;
+    iflags.perm_invent = defer_perm_invent;
     return TRUE;
 }
 

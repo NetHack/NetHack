@@ -700,7 +700,7 @@ mswin_layout_main_window(HWND changed_child)
         GetNHApp()->rtInvenWindow.bottom = GetNHApp()->rtMenuWindow.bottom;
 
         /* adjust map window size only if perm_invent is set */
-        if (flags.perm_invent)
+        if (iflags.perm_invent)
             GetNHApp()->rtMapWindow.right = GetNHApp()->rtMenuWindow.left;
     }
 
@@ -712,7 +712,7 @@ mswin_layout_main_window(HWND changed_child)
             /* kludge - inventory window should have its own type (same as
                menu-text
                as a matter of fact) */
-            if (flags.perm_invent && i == WIN_INVEN) {
+            if (iflags.perm_invent && i == WIN_INVEN) {
                 mswin_get_window_placement(NHW_INVEN, &rt);
             } else {
                 mswin_get_window_placement(GetNHApp()->windowlist[i].type,

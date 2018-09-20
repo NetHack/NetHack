@@ -2511,7 +2511,7 @@ long *out_cnt;
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
 
-    if (flags.perm_invent && (lets || xtra_choice)) {
+    if (iflags.perm_invent && (lets || xtra_choice)) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
            the first time needed and keep it for re-use as needed later */
@@ -2536,7 +2536,7 @@ long *out_cnt;
      * more than 1; for the last one, we don't need a precise number.
      * For perm_invent update we force 'more than 1'.
      */
-    n = (flags.perm_invent && !lets && !want_reply) ? 2
+    n = (iflags.perm_invent && !lets && !want_reply) ? 2
         : lets ? (int) strlen(lets)
                : !invent ? 0 : !invent->nobj ? 1 : 2;
     /* for xtra_choice, there's another 'item' not included in initial 'n';
@@ -2670,7 +2670,7 @@ nextclass:
        nothing has been listed (because there isn't anyhing to list;
        recognized via any.a_char still being zero; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
-    if (flags.perm_invent && !lets && !any.a_char) {
+    if (iflags.perm_invent && !lets && !any.a_char) {
         any = zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, 0,
                  not_carrying_anything, MENU_UNSELECTED);

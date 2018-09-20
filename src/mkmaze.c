@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1518718417 2018/02/15 18:13:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1537477570 2018/09/20 21:06:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -30,6 +30,10 @@ STATIC_DCL boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
 STATIC_DCL void NDECL(baalz_fixup);
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
+STATIC_DCL void FDECL(check_ransacked, (char *));
+STATIC_DCL void FDECL(migr_booty_item, (int, const char *));
+STATIC_DCL void FDECL(migrate_orc, (struct monst *, unsigned long));
+STATIC_DCL void NDECL(stolen_booty);
 
 #ifdef CONWAY
 STATIC_DCL void NDECL(conway_setup);
@@ -619,6 +623,8 @@ fixup_special()
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
+    } else if (u.uz.dnum == mines_dnum && ransacked) {
+       stolen_booty();
     }
 #ifdef CONWAY
     if (level.flags.conway) {
@@ -630,6 +636,149 @@ fixup_special()
         free((genericptr_t) lregions), lregions = 0;
     num_lregions = 0;
 }
+
+void
+check_ransacked(s)
+char *s;
+{
+    /* this kludge only works as long as orctown is minetn-1 */
+    ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
+}
+
+#define ORC_LEADER 1
+
+void
+migrate_orc(mtmp, mflags)
+struct monst *mtmp;
+unsigned long mflags;
+{
+    int nlev, max_depth, cur_depth;
+    d_level dest;
+
+    cur_depth = (int) depth(&u.uz);
+    max_depth = dunlevs_in_dungeon(&u.uz) +
+                (dungeons[u.uz.dnum].depth_start - 1);
+    if (mflags == ORC_LEADER) {
+        /* Note that the orc leader will take possession of any
+         * remaining stuff not already delivered to other
+         * orcs between here and the bottom of the mines.
+         */
+        nlev = max_depth;
+        mtmp->mspare1 = MIGR_LEFTOVERS;
+    } else {
+        nlev = rn2(max_depth - cur_depth) + cur_depth + 1;
+        if (nlev == cur_depth)
+            nlev++;
+        if (nlev > max_depth)
+            nlev = max_depth;
+        mtmp->mspare1 = 0L;
+    }
+    get_level(&dest, nlev);
+    migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
+}
+
+void
+migr_booty_item(otyp, gang)
+int otyp;
+const char *gang;
+{
+    struct obj *otmp;
+    otmp = mksobj_migr_to_species(otyp, (unsigned long) M2_ORC, FALSE, FALSE);
+    if (otmp && gang) {
+        new_oname(otmp, strlen(gang) + 1); /* removes old name if one is present */
+        Strcpy(ONAME(otmp), gang);
+        if (otyp >= TRIPE_RATION && otyp <= TIN)
+            otmp->quan += (long) rn2(3);
+    }
+}
+
+void
+stolen_booty(VOID_ARGS)
+{
+    char *gang, gang_name[BUFSZ];
+    struct monst *mtmp;
+    int cnt, i, otyp;
+
+    /*
+     * --------------------------------------------------------
+     * Mythos:
+     *
+     *      A tragic accident has occurred in Frontier Town...
+     *      It has been overrun by orcs.
+     *
+     *      The booty that the orcs took from the town is now
+     *      in the possession of the orcs that did this and
+     *      have long since fled the level.
+     * --------------------------------------------------------
+     */
+
+    gang = rndorcname(gang_name);
+    /* create the leader of the orc gang */
+    mtmp = makemon(&mons[PM_ORC_CAPTAIN], 0, 0, MM_NONAME);
+    if (mtmp) {
+        mtmp = christen_monst(mtmp, upstart(gang));
+        mtmp->mpeaceful = 0;
+        migrate_orc(mtmp, ORC_LEADER);
+    }
+    /* create the stuff that the rest of the gang took */
+    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
+    cnt = rn2(3) + 1;
+    for (i = 0; i < cnt; ++i)
+        migr_booty_item(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, gang);
+    cnt = rn2(2) + 1;
+    for (i = 0; i < cnt; ++i)
+        migr_booty_item(SKELETON_KEY, gang);
+    otyp = rn2((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1) + LEATHER_GLOVES;
+    migr_booty_item(otyp, gang);
+    cnt = rn2(9) + 1;
+    for (i = 0; i < cnt; ++i) {
+        /* Food items - but no lembas! (or some other weird things) */
+        otyp = rn2((TIN - TRIPE_RATION) + 1) + TRIPE_RATION;
+        if (otyp != LEMBAS_WAFER && otyp != GLOB_OF_GRAY_OOZE &&
+              otyp != GLOB_OF_BROWN_PUDDING && otyp != GLOB_OF_GREEN_SLIME &&
+              otyp != GLOB_OF_BLACK_PUDDING && otyp != MEAT_STICK &&
+              otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING &&
+              otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
+            migr_booty_item(otyp, gang);
+    }
+    /* Make most of the orcs on the level be part of the invading gang */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+
+        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
+            /*
+             * We'll consider the orc captain from the level
+             * .des file to be the captain of a rival orc horde
+             * who is there to see what has transpired, and to
+             * contemplate future action.
+             *
+             * Don't christen the orc captain as a subordinate
+             * member of the main orc horde.
+             */
+            if (mtmp->data != &mons[PM_ORC_CAPTAIN])
+                mtmp = christen_orc(mtmp, upstart(gang));
+        }
+    }
+    /* Lastly, ensure there's several more orcs from the gang along the way.
+     * The mechanics are such that they aren't actually identified as
+     * members of the invading gang until they get their spoils assigned
+     * to the inventory; handled during that assignment.
+     */
+    cnt = rn2(7) + 5;
+    for (i = 0; i < cnt; ++i) {
+        int mtyp;
+
+        mtyp = rn2((PM_ORC_SHAMAN - PM_ORC) + 1) + PM_ORC;
+        mtmp = makemon(&mons[mtyp], 0, 0, MM_NONAME);
+        if (mtmp)
+            migrate_orc(mtmp, 0UL);
+    }
+       
+    ransacked = 0;
+}
+
+#undef ORC_LEADER
 
 boolean
 maze_inbounds(x, y)
@@ -833,6 +982,7 @@ const char *s;
     }
 
     if (*protofile) {
+        check_ransacked(protofile);
         Strcat(protofile, LEV_EXT);
         if (load_special(protofile)) {
             /* some levels can end up with monsters

@@ -1280,7 +1280,7 @@ int how;
         if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
             /* precaution in case any late update_inventory() calls occur */
-            flags.perm_invent = 0;
+            iflags.perm_invent = 0;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;

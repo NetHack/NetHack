@@ -2662,8 +2662,7 @@ fill_empty_maze()
             maze1xy(&mm, DRY);
             trytrap = rndtrap();
             if (sobj_at(BOULDER, mm.x, mm.y))
-                while (trytrap == PIT || trytrap == SPIKED_PIT
-                       || trytrap == TRAPDOOR || trytrap == HOLE)
+                while (is_pit(trytrap) || is_hole(trytrap))
                     trytrap = rndtrap();
             (void) maketrap(mm.x, mm.y, trytrap);
         }
@@ -3834,7 +3833,7 @@ selection_do_grow(ov, dir)
 struct opvar *ov;
 int dir;
 {
-    int x, y, c;
+    int x, y;
     char tmp[COLNO][ROWNO];
 
     if (ov->spovartyp != SPOVAR_SEL)
@@ -3842,40 +3841,31 @@ int dir;
     if (!ov)
         return;
 
-    (void) memset(tmp, 0, sizeof(tmp));
+    (void) memset(tmp, 0, sizeof tmp);
 
-    for (x = 0; x < COLNO; x++)
+    for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            c = 0;
-            if ((dir & W_WEST) && (x > 0)
-                && (selection_getpoint(x - 1, y, ov)))
-                c++;
-            if ((dir & (W_WEST | W_NORTH)) && (x > 0) && (y > 0)
-                && (selection_getpoint(x - 1, y - 1, ov)))
-                c++;
-            if ((dir & W_NORTH) && (y > 0)
-                && (selection_getpoint(x, y - 1, ov)))
-                c++;
-            if ((dir & (W_NORTH | W_EAST)) && (y > 0) && (x < COLNO - 1)
-                && (selection_getpoint(x + 1, y - 1, ov)))
-                c++;
-            if ((dir & W_EAST) && (x < COLNO - 1)
-                && (selection_getpoint(x + 1, y, ov)))
-                c++;
-            if ((dir & (W_EAST | W_SOUTH)) && (x < COLNO - 1)
-                && (y < ROWNO - 1) && (selection_getpoint(x + 1, y + 1, ov)))
-                c++;
-            if ((dir & W_SOUTH) && (y < ROWNO - 1)
-                && (selection_getpoint(x, y + 1, ov)))
-                c++;
-            if ((dir & (W_SOUTH | W_WEST)) && (y < ROWNO - 1) && (x > 0)
-                && (selection_getpoint(x - 1, y + 1, ov)))
-                c++;
-            if (c)
+            /* note:  dir is a mask of multiple directions, but the only
+               way to specify diagonals is by including the two adjacent
+               orthogonal directions, which effectively specifies three-
+               way growth [WEST|NORTH => WEST plus WEST|NORTH plus NORTH] */
+            if (((dir & W_WEST) && selection_getpoint(x + 1, y, ov))
+                || (((dir & (W_WEST | W_NORTH)) == (W_WEST | W_NORTH))
+                    && selection_getpoint(x + 1, y + 1, ov))
+                || ((dir & W_NORTH) && selection_getpoint(x, y + 1, ov))
+                || (((dir & (W_NORTH | W_EAST)) == (W_NORTH | W_EAST))
+                    && selection_getpoint(x - 1, y + 1, ov))
+                || ((dir & W_EAST) && selection_getpoint(x - 1, y, ov))
+                || (((dir & (W_EAST | W_SOUTH)) == (W_EAST | W_SOUTH))
+                    && selection_getpoint(x - 1, y - 1, ov))
+                || ((dir & W_SOUTH) && selection_getpoint(x, y - 1, ov))
+                ||  (((dir & (W_SOUTH | W_WEST)) == (W_SOUTH | W_WEST))
+                     && selection_getpoint(x + 1, y - 1, ov))) {
                 tmp[x][y] = 1;
+            }
         }
 
-    for (x = 0; x < COLNO; x++)
+    for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             if (tmp[x][y])
                 selection_setpoint(x, y, ov, 1);
@@ -4501,7 +4491,7 @@ ensure_way_out()
 
     while (ttmp) {
         if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE
-             || ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR)
+             || is_hole(ttmp->ttyp))
             && !selection_getpoint(ttmp->tx, ttmp->ty, ov))
             selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
         ttmp = ttmp->ntrap;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1523142395 2018/04/07 23:06:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1537477571 2018/09/20 21:06:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,8 +16,9 @@ STATIC_DCL void FDECL(look_at_monster, (char *, char *,
                                         struct monst *, int, int));
 STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
 STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
-                                  BOOLEAN_P, BOOLEAN_P));
+                                  BOOLEAN_P, BOOLEAN_P, char *));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,BOOLEAN_P));
 STATIC_DCL void NDECL(whatdoes_help);
 STATIC_DCL void NDECL(docontact);
 STATIC_DCL void NDECL(dispfile_help);
@@ -279,7 +280,7 @@ int x, y;
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
-        if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT || tt == WEB)
+        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
             Sprintf(eos(buf), ", trapped in %s",
                     an(defsyms[trap_to_defsym(tt)].explanation));
     }
@@ -509,10 +510,11 @@ char *buf, *monbuf;
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 STATIC_OVL void
-checkfile(inp, pm, user_typed_name, without_asking)
+checkfile(inp, pm, user_typed_name, without_asking, supplemental_name)
 char *inp;
 struct permonst *pm;
 boolean user_typed_name, without_asking;
+char *supplemental_name;
 {
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
@@ -619,7 +621,7 @@ boolean user_typed_name, without_asking;
         int chk_skip, pass = 1;
         boolean yes_to_moreinfo, found_in_file, pass1found_in_file,
                 skipping_entry;
-        char *ap, *alt = 0; /* alternate description */
+        char *sp, *ap, *alt = 0; /* alternate description */
 
         /* adjust the input to remove "named " and "called " */
         if ((ep = strstri(dbase_str, " named ")) != 0) {
@@ -629,6 +631,8 @@ boolean user_typed_name, without_asking;
         } else if ((ep = strstri(dbase_str, " called ")) != 0) {
             copynchars(givenname, ep + 8, BUFSZ - 1);
             alt = givenname;
+            if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
+                copynchars(supplemental_name, sp + 8, BUFSZ - 1);
         } else
             ep = strstri(dbase_str, ", ");
         if (ep && ep > dbase_str)
@@ -760,12 +764,13 @@ boolean user_typed_name, without_asking;
 }
 
 int
-do_screen_description(cc, looked, sym, out_str, firstmatch)
+do_screen_description(cc, looked, sym, out_str, firstmatch, for_supplement)
 coord cc;
 boolean looked;
 int sym;
 char *out_str;
 const char **firstmatch;
+struct permonst **for_supplement;
 {
     static const char mon_interior[] = "the interior of a monster",
                       unreconnoitered[] = "unreconnoitered";
@@ -1008,11 +1013,15 @@ const char **firstmatch;
 
  didlook:
     if (looked) {
+        struct permonst *pm = (struct permonst *)0;
+
         if (found > 1 || need_to_look) {
             char monbuf[BUFSZ];
             char temp_buf[BUFSZ];
 
-            (void) lookat(cc.x, cc.y, look_buf, monbuf);
+            pm = lookat(cc.x, cc.y, look_buf, monbuf);
+            if (pm && for_supplement)
+                *for_supplement = pm;
             *firstmatch = look_buf;
             if (*(*firstmatch)) {
                 Sprintf(temp_buf, " (%s)", *firstmatch);
@@ -1043,7 +1052,7 @@ coord *click_cc;
     boolean clicklook = (mode == 2); /* right mouse-click method */
     char out_str[BUFSZ] = DUMMY;
     const char *firstmatch = 0;
-    struct permonst *pm = 0;
+    struct permonst *pm = 0, *supplemental_pm = 0;
     int i = '\0', ans = 0;
     int sym;              /* typed symbol or converted glyph */
     int found;            /* count of matching syms found */
@@ -1137,7 +1146,7 @@ coord *click_cc;
                     break;
                 }
             if (*out_str)
-                checkfile(out_str, pm, TRUE, TRUE);
+                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
             return 0;
           }
         case '?':
@@ -1151,7 +1160,7 @@ coord *click_cc;
                 return 0;
 
             if (out_str[1]) { /* user typed in a complete string */
-                checkfile(out_str, pm, TRUE, TRUE);
+                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
                 return 0;
             }
             sym = out_str[0];
@@ -1204,7 +1213,7 @@ coord *click_cc;
         }
 
         found = do_screen_description(cc, (from_screen || clicklook), sym,
-                                      out_str, &firstmatch);
+                                  out_str, &firstmatch, &supplemental_pm);
 
         /* Finally, print out our explanation. */
         if (found) {
@@ -1215,16 +1224,19 @@ coord *click_cc;
             if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE
                 && (ans == LOOK_VERBOSE || (flags.help && !quick))
                 && !clicklook) {
-                char temp_buf[BUFSZ];
+                char temp_buf[BUFSZ], supplemental_name[BUFSZ];
 
+                supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
                 checkfile(temp_buf, pm, FALSE,
-                          (boolean) (ans == LOOK_VERBOSE));
+                          (boolean) (ans == LOOK_VERBOSE), supplemental_name);
+                if (supplemental_pm)
+                    do_supplemental_info(supplemental_name, supplemental_pm,
+                                         (boolean) (ans == LOOK_VERBOSE));
             }
         } else {
             pline("I've never heard of such things.");
         }
-
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
 
     flags.verbose = save_verbose;
@@ -1319,6 +1331,69 @@ boolean do_mons; /* True => monsters, False => objects */
     destroy_nhwindow(win);
 }
 
+void
+do_supplemental_info(name, pm, without_asking)
+char *name;
+struct permonst *pm;
+boolean without_asking;
+{
+    winid datawin = WIN_ERR;
+    char *entrytext = name, *bp;
+    char question[QBUFSZ];
+    boolean yes_to_moreinfo = FALSE;
+
+    /*
+     * Provide some info on some specific things
+     * meant to support in-game mythology, and not
+     * available from data.base or other sources.
+     */
+    if (name && pm && is_orc(pm) &&
+                (strlen(name) < (BUFSZ - 1)) &&
+                (bp = strstri(name, " of ")) != 0) {
+        char fullname[BUFSZ];
+
+        Strcpy(fullname, name);
+        if (!without_asking) {
+            Strcpy(question, "More info about \"");
+            /* +2 => length of "\"?" */
+            copynchars(eos(question), entrytext,
+                (int) (sizeof question - 1 - (strlen(question) + 2)));
+            Strcat(question, "\"?");
+            if (yn(question) == 'y')
+            yes_to_moreinfo = TRUE;
+        }
+        if (yes_to_moreinfo) {
+            int i, subs = 0;
+            char *gang = bp + 4;
+            static const char *text[] = {
+             "%s is a member of a marauding horde of orcs",
+             "rumored to have brutally attacked and plundered the ordinarily",
+             "sheltered town that is located deep within The Gnomish Mines.",
+             "",
+             "The members of that vicious horde proudly and defiantly acclaim",
+             "their allegiance to their leader %s in their names.",
+            };
+
+            *bp = '\0';
+            datawin = create_nhwindow(NHW_MENU);
+            for (i = 0; i < SIZE(text); i++) {
+                char buf[BUFSZ];
+                const char *txt;
+
+                if (strstri(text[i], "%s") != 0) {
+                    Sprintf(buf, text[i],
+                            subs++ ? gang : fullname);
+                    txt = buf;
+                } else
+                    txt = text[i];
+                putstr(datawin, 0, txt);
+            }
+            display_nhwindow(datawin, FALSE);
+            destroy_nhwindow(datawin), datawin = WIN_ERR;
+	}
+    }
+}
+
 /* the '/' command */
 int
 dowhatis()
@@ -1362,8 +1437,7 @@ doidtrap()
                 break;
             tt = trap->ttyp;
             if (u.dz) {
-                if (u.dz < 0 ? (tt == TRAPDOOR || tt == HOLE)
-                             : tt == ROCKTRAP)
+                if (u.dz < 0 ? is_hole(tt) : tt == ROCKTRAP)
                     break;
             }
             tt = what_trap(tt);

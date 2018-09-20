@@ -1102,7 +1102,7 @@ identifier
                    outside of the standard accelerator (see above) or a
                    number.  If 0, the item is unaffected by any group
                    accelerator.  If this accelerator conflicts with
-                   the menu command (or their user defined alises), it loses.
+                   the menu command (or their user defined aliases), it loses.
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
@@ -1194,7 +1194,7 @@ mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
         ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
         nReturned = mswin_menu_window_select_menu(
             GetNHApp()->windowlist[wid].win, how, selected,
-            !(flags.perm_invent && wid == WIN_INVEN
+            !(iflags.perm_invent && wid == WIN_INVEN
               && how == PICK_NONE) /* don't activate inventory window if
                                       perm_invent is on */
             );
@@ -1211,7 +1211,7 @@ void
 mswin_update_inventory()
 {
     logDebug("mswin_update_inventory()\n");
-    if (flags.perm_invent && program_state.something_worth_saving
+    if (iflags.perm_invent && program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -2118,6 +2118,7 @@ initMapTiles(void)
     HBITMAP hBmp;
     BITMAP bm;
     TCHAR wbuf[MAX_PATH];
+    DWORD errcode;
     int tl_num;
     SIZE map_size;
     extern int total_tiles_used;
@@ -2131,8 +2132,13 @@ initMapTiles(void)
                      NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
                      IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
     if (hBmp == NULL) {
-        raw_print(
-            "Cannot load tiles from the file. Reverting back to default.");
+        char errmsg[BUFSZ];
+
+        errcode = GetLastError();
+        Sprintf(errmsg, "%s (0x%x).",
+            "Cannot load tiles from the file. Reverting back to default",
+            errcode);
+        raw_print(errmsg);
         return FALSE;
     }
 
@@ -2243,7 +2249,7 @@ mswin_popup_destroy(HWND hWnd)
     DrawMenuBar(GetNHApp()->hMainWnd);
 
     /* Don't hide the permanent inventory window ... leave it showing */
-    if (!flags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
+    if (!iflags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
         ShowWindow(hWnd, SW_HIDE);
 
     GetNHApp()->hPopupWnd = NULL;

@@ -826,7 +826,7 @@ menu_item **menu_list;
      * each time.
      */
     if (menu_info->valid_widgets
-        && (window != WIN_INVEN || !flags.perm_invent)) {
+        && (window != WIN_INVEN || !iflags.perm_invent)) {
         XtDestroyWidget(wp->popup);
         menu_info->valid_widgets = FALSE;
         menu_info->is_up = FALSE;
