@@ -1,5 +1,5 @@
 /* NetHack 3.6	mactty.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* Copyright (c) Jon W{tte 1993.					*/
+/* Copyright (c) Jon Watte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 
 /*

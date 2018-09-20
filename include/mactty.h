@@ -1,5 +1,5 @@
 /* NetHack 3.6	mactty.h	$NHDT-Date: 1447755970 2015/11/17 10:26:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* Copyright (c) Jon W{tte 1993.                                        */
+/* Copyright (c) Jon Watte 1993.                                        */
 /* NetHack may be freely redistributed.  See license for details.       */
 
 /*
@@ -13,7 +13,7 @@
  * alignment doesn't matter, and for 8-bit color, alignment to every
  * fourth pixel is most efficient.
  *
- * (c) Copyright 1993 Jon W{tte
+ * (c) Copyright 1993 Jon Watte
  */
 
 /*

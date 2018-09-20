@@ -14,8 +14,8 @@
 /****************************************\
  * Edit History:
  *
- * 930512	- More bug fixes and getting tty to work again, Jon W{tte
- * 930508	- Bug fixes in-flight, Jon W{tte
+ * 930512	- More bug fixes and getting tty to work again, Jon Watte
+ * 930508	- Bug fixes in-flight, Jon Watte
  * 04/29/93 - 1st Release Draft, David Hairston
  * 04/11/93 - 1st Draft, David Hairston
 \****************************************/
