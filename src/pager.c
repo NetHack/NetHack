@@ -1226,6 +1226,7 @@ coord *click_cc;
                 && !clicklook) {
                 char temp_buf[BUFSZ], supplemental_name[BUFSZ];
 
+                supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
                 checkfile(temp_buf, pm, FALSE,
                           (boolean) (ans == LOOK_VERBOSE), supplemental_name);
