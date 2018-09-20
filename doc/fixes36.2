@@ -117,6 +117,17 @@ for hilite_status of string status fields (title, dungeon-level, alignment),
 jumping into or over a Sokoban pit, or over a fire trap, triggers trap twice
 mimics created by #wizgenesis could block or not block vision incorrectly
 handle monsters inside the invocation area
+give monsters who have had a worn item stolen or who have been life-saved
+	(used up amulet) a chance to wear replacement gear on next move
+	instead of having to wait until they pick something up
+Unchanging hero in clay golem form will be killed when cancelled
+poly'd shapechanger and hiding mimic will revert to normal when cancelled,
+	like werecreature in beast form and non-Unchanging hero
+cancelled shapeshifter is no longer able to change shape
+cancelled shapeshifter hit by polymorph magic will become uncancelled
+polymorph zap which creates a new long worm (or retains an old one via wizard
+	mode monpolycontrol) can hit that worm multiple times (tail segments)
+wishing for "orange" could yield orange or orange colored gem/potion/spellbook
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -133,6 +144,8 @@ tty: ensure that current status fields are always copied to prior status
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+move 'perm_invent' value from flags to iflags to keep it out of save files;
+	affects X11, win32, and curses
 windows-gui: In nethackw, there could be conflicts between menu accelerators 
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
@@ -185,6 +198,7 @@ wizard mode #wizidentify can now select individual items for permanent
 	identification and don't display the selection to permanently
 	identify everything if everything is already fully identified
 spiders will occasionally spin webs when moving around
+make mine town "orctown" variation a multiple level feature of the mines
 
 
 Code Cleanup and Reorganization

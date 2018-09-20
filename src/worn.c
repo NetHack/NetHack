@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1526728754 2018/05/19 11:19:14 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1537234121 2018/09/18 01:28:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -710,6 +710,13 @@ clear_bypasses()
     struct obj *otmp, *nobj;
     struct monst *mtmp;
 
+    /*
+     * 'Object' bypass is also used for one monster function:
+     * polymorph control of long worms.  Activated via setting
+     * context.bypasses even if no specific object has been
+     * bypassed.
+     */
+
     for (otmp = fobj; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (otmp->bypass) {
@@ -741,10 +748,19 @@ clear_bypasses()
             continue;
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
             otmp->bypass = 0;
+        /* long worm created by polymorph has mon->mextra->mcorpsenm set
+           to PM_LONG_WORM to flag it as not being subject to further
+           polymorph (so polymorph zap won't hit monster to transform it
+           into a long worm, then hit that worm's tail and transform it
+           again on same zap); clearing mcorpsenm reverts worm to normal */
+        if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp))
+            MCORPSENM(mtmp) = NON_PM;
     }
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
             otmp->bypass = 0;
+        /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
+           be just created by polymorph and migrating at the same time */
     }
     /* billobjs and mydogs chains don't matter here */
     context.bypasses = FALSE;

@@ -126,7 +126,7 @@ int x, y;
 
     if (create && !((mtmp = m_at(x, y)) != 0 && mtmp->mtrapped
                     && (t = t_at(x, y)) != 0
-                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
+                    && is_pit(t->ttyp))) {
         int objgone = 0;
 
         if (down_gate(x, y) != -1)

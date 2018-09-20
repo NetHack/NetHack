@@ -368,7 +368,7 @@ HELM("helm of telepathy", "visored helmet",
  * There is code in obj.h, objnam.c, mon.c, read.c that assumes (2).
  *      (1) The dragon scale mails and the dragon scales are together.
  *      (2) That the order of the dragon scale mail and dragon scales
- *          is the the same as order of dragons defined in monst.c.
+ *          is the same as order of dragons defined in monst.c.
  */
 #define DRGN_ARMR(name,mgc,power,cost,ac,color)  \
     ARMOR(name, None, 1, mgc, 1, power, 0, 5, 40,  \

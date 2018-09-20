@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1519420054 2018/02/23 21:07:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1537477563 2018/09/20 21:06:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -543,7 +543,7 @@ int cx, cy;
 
     cc.x = cx;
     cc.y = cy;
-    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch, (struct permonst **)0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
@@ -593,7 +593,8 @@ int gloc;
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
         tmpcc.y = garr[i].y;
-        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf, &firstmatch)) {
+        if (do_screen_description(tmpcc, TRUE, sym, tmpbuf,
+                              &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch,
@@ -1699,10 +1700,7 @@ boolean called;
     if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
         && !Hallucination)
         Strcat(buf, "saddled ");
-    if (buf[0] != 0)
-        has_adjectives = TRUE;
-    else
-        has_adjectives = FALSE;
+    has_adjectives = (buf[0] != '\0');
 
     /* Put the actual monster name or type into the buffer now */
     /* Be sure to remember whether the buffer starts with a name */
@@ -2065,6 +2063,46 @@ char *buf;
                            : coynames[mtmp->m_id % (SIZE(coynames) - 1)]);
     }
     return buf;
+}
+
+char *
+rndorcname(s)
+char *s;
+{
+    int i;
+    const char *v[] = {"a", "ai", "og", "u"};
+    const char *snd[] = {"gor", "gris", "un", "bane", "ruk",
+                         "oth","ul", "z", "thos","akh","hai"};
+    int vstart = rn2(2);
+    
+    if (s) {
+        *s = '\0';
+        for (i = 0; i  < rn2(2) + 3; ++i) { 
+            vstart = 1 - vstart;                /* 0 -> 1, 1 -> 0 */
+            if (!rn2(30) && i > 0)
+                (void) strcat(s, "-");
+            (void) sprintf(eos(s), "%s", vstart ? v[rn2(SIZE(v))] :
+                            snd[rn2(SIZE(snd))]);
+        }
+    }
+    return s;
+}
+
+struct monst *
+christen_orc(mtmp, gang)
+struct monst *mtmp;
+char *gang;
+{
+    int sz = 0;
+    char buf[BUFSZ], buf2[BUFSZ], *orcname;
+
+    orcname = rndorcname(buf2);
+    sz = (int) (strlen(gang) + strlen(orcname) + sizeof " of " - sizeof "");
+    if (gang && orcname && sz < BUFSZ) {
+        Sprintf(buf, "%s of %s", upstart(orcname), upstart(gang));
+        mtmp = christen_monst(mtmp, buf);
+    }
+    return mtmp;
 }
 
 /* make sure "The Colour of Magic" remains the first entry in here */
