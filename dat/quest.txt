@@ -2707,7 +2707,7 @@ and you may be able to defeat him."
 "If you are %a at all times you may succeed, %p."
 %E
 %Cp Tou 00034
-"Let all who meet you on your journey know that you are on an quest for
+"Let all who meet you on your journey know that you are on a quest for
 %l and grant safe passage."
 %E
 %Cc Tou 00035
