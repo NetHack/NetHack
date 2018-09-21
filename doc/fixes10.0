@@ -32,7 +32,7 @@ There are lots more of these little gems, with sufficient hints in
 Build from source changes
 =========================
 The program "makedefs" has been modified in order to allow limited use of
-	muse of "#ifdef/#else/#endif" sets in objects.h
+	"#ifdef/#else/#endif" sets in objects.h
 Makedefs will only generate one #define for any number of ocurrences of
 	a given object name string.  In addition, "makedefs" also generates
 	alternate defines for "DEAD_xxxxx" in those cases where a monster
@@ -47,7 +47,7 @@ Makedefs has been modified in order that it may be used to
 The Unix "Makefile" has been enhanced to make installation cleaner
 	and also to allow "initialization" of the play directories (WARNING:
 	this will destroy old score files!!!).  The PC Makefile hasn't been
-	upgraded in this respect.
+	upgraded in this respect
 
 
 Known Problems:
