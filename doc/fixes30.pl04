@@ -1,0 +1,38 @@
+-------------
+UPDATE4
+-------------
+NOTICE:  The changes which were made in the code make all save and bones 
+files absolete.  Once Patch 4 is applied, all the old save and bones files
+must be thrown out.
+
+
+Here is a list of the main changes:
+
+Object and monster types got a new field specifying their color, so things 
+can now appear in "living color" instead having one color for all monsters,
+one for all weapons, and so on.
+
+References to monsters and objects on the floor were moved to new structures,
+which support the better color handling as well as provide yet faster access.
+
+David Gentzel provided a port for VMS.  Although extensively tested by
+David and others, and found to be sound, it probably needs further
+refinements.  We are appealing to those of you who know VMS (none of us
+does..) to join David in his efforts to refine the VMS code.
+
+Much of the *main.c code was moved to a new file, to avoid having to update
+that common code in three different *main.c files.
+
+VARARG handling was ifdef'd to satisfy ANSI compilers.
+
+Almost all grey creatures now join the other gray creatures.
+
+Monsters will no longer be created in the same room as the player, and should
+no longer want to end up in the SE corner of the dungeon.
+
+Lycanthropy is now considered a "major problem" (allowing for appeal to the
+gods through prayer), some artifacts are associated with particular character
+classes, various oddities involving statues, digging, iron balls, and 
+throwing have been removed, and many other bugs, both major and minor, were
+fixed.
+

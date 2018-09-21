@@ -521,7 +521,7 @@ E void FDECL(container_impact_dmg, (struct obj *, XCHAR_P, XCHAR_P));
 E int NDECL(dokick);
 E boolean FDECL(ship_object, (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
 E void FDECL(obj_delivery, (BOOLEAN_P));
-E void FDECL(deliver_obj_to_mon, (struct monst *mtmp, unsigned long));
+E void FDECL(deliver_obj_to_mon, (struct monst *mtmp, int, unsigned long));
 E schar FDECL(down_gate, (XCHAR_P, XCHAR_P));
 E void FDECL(impact_drop, (struct obj *, XCHAR_P, XCHAR_P, XCHAR_P));
 
@@ -1706,6 +1706,7 @@ E const char *FDECL(helm_simple_name, (struct obj *));
 E const char *FDECL(mimic_obj_name, (struct monst *));
 E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
                           char *(*)(OBJ_P), char *(*)(OBJ_P), const char *));
+E int FDECL(shiny_obj, (CHAR_P));
 
 /* ### options.c ### */
 

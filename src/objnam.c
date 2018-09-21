@@ -2753,6 +2753,13 @@ char oclass;
     return STRANGE_OBJECT;
 }
 
+int
+shiny_obj(oclass)
+char oclass;
+{
+    return (int) rnd_otyp_by_namedesc("shiny", oclass);
+}
+
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,

@@ -1,0 +1,80 @@
+--------------
+UPDATE2
+--------------
+This patch kit upgrades NetHack to version 3.0f.  The kit should
+be applied to the original release, patched with patchlevel 1.
+
+Many of the diffs included here are bugfixes to bugs reported to 
+us by players.  We are very grateful for these reports.
+  
+There were questions about our netnews usage.  We use the good
+offices of comp.sources.games because, unlike rec.games.hack, it 
+is archived.  It is the only way to secure the availability of 
+the source code and the official patches for future users.  For 
+this reason, comp.sources.games will remain the only place where 
+the official NetHack patches are posted.
+
+Occasionally we may see a need to post a semi-official stopgap patch 
+such as the one for the 'killer' bug posted just after Patch 1 in
+rec.games.hack and in comp.sources.games.bugs.  These stopgap patches
+will always be included in the next official patch kit.  The 'killer'
+bugfix is, indeed, included here.
+
+The above two newsgroups often contain many bug reports and unofficial
+fixes.  We read these groups, and thus we get the reports.  But it
+will be helpful if you mailed nethack-bugs a copy of your posting.
+If your site gets these newsgroups, you may want to check them for 
+mentions of bugs before reporting the same bug to nethack-bugs (or
+to the same newsgroups, for that matter -- unless you have additional 
+information).
+
+
+
+Now, on to the main changes.
+
+Objects were rearranged slightly, so the cautious may want to throw 
+out saved games and bones files.
+
+Timo Hakulinen provided an OS/2 port.
+
+Various people convinced various OS versions to be better about 
+sensing the available screen size at start-up.
+
+The game tries now to be smarter about guessing defaults for players 
+who don't set environment variables of interest to NetHack.
+
+Eric Raymond extended the PC color code slightly to allow its use by 
+SVR3.2 machines with color information from terminfo, and also allowed 
+many extended commands to be available via a meta key under SYSV.
+
+Paul Gyugyi provided a better makefile for MicroSoft C.
+
+The MSDOS terminal problems, including always needing TERMLIB, are
+(hopefully) fixed.
+
+The '/' command now allows multiple identifications, and more things 
+may be usefully identified.
+
+More code was shuffled and rewritten to satisfy compiler and preprocessor
+constraints.
+
+Starving dogs again eat people food.
+
+Credit cards can no longer lock things.
+
+Doors have been toned down slightly, but are in no danger of being removed.
+
+The gods' ranking of player troubles was revised.
+
+Wizards can no longer start with certain useless items.
+
+Various code, including game ending, seduction, and monster attack, is
+considerably cleaner.
+
+Above all: scores of bugs were fixed.
+
+
+Please continue testing the game and reporting to nethack-bugs.  Your
+response has been wonderful, and it has made this effort worth while.
+
+

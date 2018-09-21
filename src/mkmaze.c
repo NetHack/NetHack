@@ -646,6 +646,7 @@ char *s;
 }
 
 #define ORC_LEADER 1
+static const char *orcfruit[] = {"paddle cactus", "dwarven root"};
 
 void
 migrate_orc(mtmp, mflags)
@@ -664,9 +665,12 @@ unsigned long mflags;
          * orcs between here and the bottom of the mines.
          */
         nlev = max_depth;
+        /* once in a blue moon, he won't be at the very bottom */
+        if (!rn2(40))
+            nlev--;
         mtmp->mspare1 = MIGR_LEFTOVERS;
     } else {
-        nlev = rn2(max_depth - cur_depth) + cur_depth + 1;
+        nlev = rn2((max_depth - cur_depth) + 1) + cur_depth;
         if (nlev == cur_depth)
             nlev++;
         if (nlev > max_depth)
@@ -678,6 +682,39 @@ unsigned long mflags;
 }
 
 void
+shiny_orc_stuff(mtmp)
+struct monst *mtmp;
+{
+    int gemprob, goldprob, otyp;
+    struct obj *otmp;
+    boolean is_captain = (mtmp->data == &mons[PM_ORC_CAPTAIN]);
+
+    /* probabilities */
+    goldprob = is_captain ? 600 : 300;
+    gemprob = goldprob / 4;
+    if (rn2(1000) < goldprob) {
+        if ((otmp = mksobj(GOLD_PIECE, FALSE, FALSE)) != 0) {
+            otmp->quan = 1L + rnd(goldprob);
+            otmp->owt = weight(otmp);
+            add_to_minv(mtmp, otmp);
+        }
+    }
+    if (rn2(1000) < gemprob) {
+        if ((otmp = mkobj(GEM_CLASS, FALSE)) != 0) {
+            if (otmp->otyp == ROCK)
+                dealloc_obj(otmp);
+            else
+                add_to_minv(mtmp, otmp);
+        }
+    }
+    if (is_captain || !rn2(8)) {
+        otyp = shiny_obj(RING_CLASS);
+        if ((otyp != STRANGE_OBJECT) &&
+            (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+            add_to_minv(mtmp, otmp);
+    }
+}
+void
 migr_booty_item(otyp, gang)
 int otyp;
 const char *gang;
@@ -687,8 +724,13 @@ const char *gang;
     if (otmp && gang) {
         new_oname(otmp, strlen(gang) + 1); /* removes old name if one is present */
         Strcpy(ONAME(otmp), gang);
-        if (otyp >= TRIPE_RATION && otyp <= TIN)
+        if (otyp >= TRIPE_RATION && otyp <= TIN) {
+            if (otyp == SLIME_MOLD)
+                otmp->spe = fruitadd((char *) orcfruit[rn2(SIZE(orcfruit))],
+                                     (struct fruit *) 0);
             otmp->quan += (long) rn2(3);
+            otmp->owt = weight(otmp);
+        }
     }
 }
 
@@ -713,24 +755,16 @@ stolen_booty(VOID_ARGS)
      */
 
     gang = rndorcname(gang_name);
-    /* create the leader of the orc gang */
-    mtmp = makemon(&mons[PM_ORC_CAPTAIN], 0, 0, MM_NONAME);
-    if (mtmp) {
-        mtmp = christen_monst(mtmp, upstart(gang));
-        mtmp->mpeaceful = 0;
-        migrate_orc(mtmp, ORC_LEADER);
-    }
-    /* create the stuff that the rest of the gang took */
-    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
-    cnt = rn2(3) + 1;
+    /* create the stuff that the gang took */
+    cnt = rnd(4);
     for (i = 0; i < cnt; ++i)
         migr_booty_item(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, gang);
-    cnt = rn2(2) + 1;
+    cnt = rnd(3);
     for (i = 0; i < cnt; ++i)
         migr_booty_item(SKELETON_KEY, gang);
     otyp = rn2((GAUNTLETS_OF_DEXTERITY - LEATHER_GLOVES) + 1) + LEATHER_GLOVES;
     migr_booty_item(otyp, gang);
-    cnt = rn2(9) + 1;
+    cnt = rnd(10);
     for (i = 0; i < cnt; ++i) {
         /* Food items - but no lembas! (or some other weird things) */
         otyp = rn2((TIN - TRIPE_RATION) + 1) + TRIPE_RATION;
@@ -740,6 +774,15 @@ stolen_booty(VOID_ARGS)
               otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING &&
               otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
             migr_booty_item(otyp, gang);
+    }
+    migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
+    /* create the leader of the orc gang */
+    mtmp = makemon(&mons[PM_ORC_CAPTAIN], 0, 0, MM_NONAME);
+    if (mtmp) {
+        mtmp = christen_monst(mtmp, upstart(gang));
+        mtmp->mpeaceful = 0;
+        shiny_orc_stuff(mtmp);
+        migrate_orc(mtmp, ORC_LEADER);
     }
     /* Make most of the orcs on the level be part of the invading gang */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -765,14 +808,16 @@ stolen_booty(VOID_ARGS)
      * members of the invading gang until they get their spoils assigned
      * to the inventory; handled during that assignment.
      */
-    cnt = rn2(7) + 5;
+    cnt = rn2(10) + 5;
     for (i = 0; i < cnt; ++i) {
         int mtyp;
 
         mtyp = rn2((PM_ORC_SHAMAN - PM_ORC) + 1) + PM_ORC;
         mtmp = makemon(&mons[mtyp], 0, 0, MM_NONAME);
-        if (mtmp)
+        if (mtmp) {
+            shiny_orc_stuff(mtmp);        
             migrate_orc(mtmp, 0UL);
+        }
     }
        
     ransacked = 0;
