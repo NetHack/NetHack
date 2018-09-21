@@ -651,6 +651,9 @@ unsigned long mflags;
          * orcs between here and the bottom of the mines.
          */
         nlev = max_depth;
+        /* once in a blue moon, he won't be at the very bottom */
+        if (!rn2(40))
+            nlev--;
         mtmp->mspare1 = MIGR_LEFTOVERS;
     } else {
         nlev = rn2((max_depth - cur_depth) + 1) + cur_depth;
@@ -692,7 +695,8 @@ struct monst *mtmp;
     }
     if (is_captain || !rn2(8)) {
         otyp = shiny_obj(RING_CLASS);
-        if ((otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+        if ((otyp != STRANGE_OBJECT) &&
+            (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
             add_to_minv(mtmp, otmp);
     }
 }
