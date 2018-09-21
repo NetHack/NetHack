@@ -410,7 +410,7 @@ boolean with_you;
     if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
         /* Pick up the rest of the MIGR_TO_SPECIES objects */
         if (migrating_objs)
-            deliver_obj_to_mon(mtmp, DF_ALL);
+            deliver_obj_to_mon(mtmp, 0, DF_ALL);
     }
     
     if (xlocale && wander) {

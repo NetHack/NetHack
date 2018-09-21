@@ -1671,20 +1671,22 @@ boolean near_hero;
 }
 
 void
-deliver_obj_to_mon(mtmp, deliverflags)
+deliver_obj_to_mon(mtmp, cnt, deliverflags)
+int cnt;
 struct monst *mtmp;
 unsigned long deliverflags;
 {
     struct obj *otmp, *otmp2;
-    int where, cnt = 0, maxobj = 0;
+    int where, maxobj = 1;
 
-    if (deliverflags & DF_RANDOM3)
-        maxobj = rn2(3) + 1;
-    else if (deliverflags & DF_RANDOM2)
-        maxobj = rn2(2) + 1;
-    else if (deliverflags == DF_NONE)
+    if ((deliverflags & DF_RANDOM) && cnt > 1)
+        maxobj = rnd(cnt);
+    else if (deliverflags & DF_ALL)
+        maxobj = 0;
+    else
         maxobj = 1;
 
+    cnt = 0;
     for (otmp = migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         where = (int) (otmp->owornmask & 0x7fffL); /* destination code */

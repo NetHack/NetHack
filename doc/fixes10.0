@@ -1,0 +1,70 @@
+New Features:
+====================
+New character classes (Ken Arromdee)
+New weapons code (Ken Arromdee)
+Armor weights implemented (Ken Arromdee)
+New tools code (Ken Arromdee)
+Polymorph self code (Ken Arromdee)
+additional bug fixes (Ken Arromdee)
+added new character classes and traps (M. Stephenson)
+added the Throne Room (M. Stephenson)
+Rockmole & Keystone Kops code (Scott R. Turner)
+Squeeky Board & Magic traps (Scott R. Turner)
+Fountain code (Scott R. Turner)
+Magic Marker code (Gil Neiger)
+Fountain code enhancements (Gil Neiger)
+Enhancements to dozens of routines (Gil Neiger)
+more bug fixes in hack.zap.c
+#dip mods to fountain code (Eric Backus)
+added spellbooks and spellcasting (M. Stephenson)
+implemented code for praying (M. Stephenson)
+made some enhancements to the endgame (M. Stephenson)
+Some of the old code (eg. KOPS) has been enhanced to allow for more
+	functionality
+Kops now throw cream pies (thank/blame KAA for the suggestion)
+The wizard may not stay dead!!!
+There are a couple of new types of demons.
+Demons may not be aggressive.
+There are lots more of these little gems, with sufficient hints in
+	various fortune cookies to give away enough clues.
+
+
+Build from source changes
+=========================
+The program "makedefs" has been modified in order to allow limited use of
+	"#ifdef/#else/#endif" sets in objects.h
+Makedefs will only generate one #define for any number of ocurrences of
+	a given object name string.  In addition, "makedefs" also generates
+	alternate defines for "DEAD_xxxxx" in those cases where a monster
+	has been given an alternate identity.
+Makedefs has been modified in order that it may be used to
+	initialize the following variable def files:
+	  objects.h -o option,  see above.
+	  trap.h    -t option,  trap type defines.
+	  date.h    -d option,  date string.
+	  data	    -D option,  optional monster names.
+	  rumors    -r option,  optional rumor addition.
+The Unix "Makefile" has been enhanced to make installation cleaner
+	and also to allow "initialization" of the play directories (WARNING:
+	this will destroy old score files!!!).  The PC Makefile hasn't been
+	upgraded in this respect
+
+
+Known Problems:
+=================
+The WALKIES code is really crude.  Fido get's mnexto()'d you when
+	he gets out of the effective leash range.  I haven't yet been able
+	to integrate leashed movement into dogmove().  You might just want
+	to comment out the #define in config.h
+ROCKMOLES have some problems with screen updating.  I didn't make
+	any changes to the code I received, and have noticed some distinct
+	problems with walls not being set to "door" until the rockmole
+	moves off the cell
+There are some problems in the item selection code, the usual effect
+	of which is to leave the cursor sitting at some arbitrary point on
+	the screen instead of returning it to the upper left hand corner or
+	onto the "@".  This doesn't affect the screen updating, so I have
+	ignored it up to now
+REDO may not be completely implemented.  I am still working on it
+	here but would appreciate any help anyone out there might want to give
+

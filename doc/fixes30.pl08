@@ -1,0 +1,59 @@
+From @RELAY.CS.NET,@central.cis.upenn.edu:izchak@linc.cis.upenn.edu Sun Jun  3 19:07:16 1990
+Received: from tekred.CNA.TEK.COM by saab.CNA.TEK.COM (3.2/6.24)
+	id AA19831; Sun, 3 Jun 90 19:07:15 PDT
+Received: by tekred.CNA.TEK.COM (5.51/6.24)
+	id AA07744; Sun, 3 Jun 90 19:04:46 PDT
+Received: by tektronix.TEK.COM (5.51/7.1)
+	id AA19147; Sun, 3 Jun 90 19:09:13 PDT
+Received: from  by zephyr.ENS.TEK.COM (4.1/7.1)
+	id AB19260; Sun, 3 Jun 90 19:03:29 PDT
+Received: from relay.cs.net by RELAY.CS.NET id aa02627; 3 Jun 90 21:57 EDT
+Received: from central.cis.upenn.edu by RELAY.CS.NET id aa02050;
+          3 Jun 90 21:58 EDT
+Received: from LINC.CIS.UPENN.EDU by central.cis.upenn.edu
+	id AA24573; Sun, 3 Jun 90 21:58:54 -0400
+Return-Path: <izchak@linc.cis.upenn.edu>
+Received: by linc.cis.upenn.edu
+	id AA04476; Sun, 3 Jun 90 21:58:14 EDT
+Date: Sun, 3 Jun 90 21:58:14 EDT
+From: Izchak Miller <izchak@linc.cis.upenn.edu>
+Posted-Date: Sun, 3 Jun 90 21:58:14 EDT
+Message-Id: <9006040158.AA04476@linc.cis.upenn.edu>
+To: billr@saab.CNA.TEK.COM
+Subject: UPDATE8
+Status: O
+
+This patch is devoted to bugfixes and accommodations for more versions of
+the newer ports.
+
+The VMS port should now compile with both VAXC and GNUC and install more
+easily under a variety of OS versions, thanks to Joshua Delahunty and Pat
+Rankin.
+
+A number of strange interactions in the Macintosh-specific code have been
+cleaned up.
+
+The MSDOS overlay manager was debugged, and the overlay assignments and macro
+names straightened out, so the result should be both faster and more stable
+than previous versions.  See the new file Install.ovl and various files in
+the others directory for more information.
+
+The Amiga port now specifies addressing modes for many external variables,
+which should make its executable smaller and faster as well.
+
+
+The biggest externally visible change separates DECgraphics and IBMgraphics
+from the general graphics-setting code, and makes them selectable on the
+command line.
+
+Once again, existing saved games and bones files should be discarded (or the
+update postponed until they are gone).
+
+A number of reasonably simple bugs are no more, although some screen update
+oddities are postponed to 3.1.  Among the dead are problems with shops on
+bones levels, renaming artifacts, kicking non-objects, winning gem treatment,
+level bounds checking and monster filling, mimic appearances, taking items
+out of containers, monster interiors and inventories, and guard behavior.
+Various other things were changed to be consistent with similar situations.
+
+
