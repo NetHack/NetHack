@@ -1,0 +1,23 @@
+UPDATE10
+
+Patch 10 to NetHack 3.0 adds no new features, and few optimizations.
+It fixes many mostly rare bugs and extends support to a couple more
+system variants.
+
+The major change with this patch is that the MSDOS overlay manager is
+now bright enough to split up one logical executable among several disk
+files, thus simplifying distribution via floppies since each file can
+be <360K.  Entering debugging mode for the Macintosh is simplified.
+There are provisions for later versions of several compilers, although
+not yet Turbo C++, as we have not gotten an executable with adequate
+performance (see Install.ovl for gory details).
+
+NetHack should now get along better with Irises, IBM RS/6000s, NeXTs,
+and possibly even SCO UNIX.
+
+Among the dead bugs are those involving artifact damage, VMS file
+manipulation, crushed iron balls, elven equipment, orcs with 2^32-1
+daggers, trolls with ridiculously high hitpoints, exploding bags of
+holding on the ground, inappropriate messages, saved luck, unbounded
+digging on special levels, and several distinct trap problems.
+
