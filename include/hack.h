@@ -272,8 +272,7 @@ typedef struct sortloot_item Loot;
 
 /* flags for deliver_obj_to_mon */
 #define DF_NONE     0x00
-#define DF_RANDOM2  0x01
-#define DF_RANDOM3  0x02
+#define DF_RANDOM   0x01
 #define DF_ALL      0x04
 
 /* special mhpmax value when loading bones monster to flag as extinct or
