@@ -47,7 +47,7 @@ cmd.c:		added #[command] auto-substitution.
 termcap.c:	fixed termlib / curses dependencies.
 		fixed null padding bug on output of SO/SE/HI/HE.
 
-pcmain.c:	many fixes by Ralf Brown (ralf@b.gp.cs.cmu.edu) to allow the
+pcmain.c:	many fixes by Ralf Brown to allow the
 pcunix.c:	program to be compiled using the Turbo C compiler in a Dos
 Makefile.tcc:	enviornment.
 
