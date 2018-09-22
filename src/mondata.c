@@ -312,6 +312,14 @@ register struct permonst *ptr;
                       || (ptr->mlet == S_IMP && ptr != &mons[PM_TENGU]));
 }
 
+/* True if specific monster is especially affected by light-emitting weapons */
+boolean
+mon_hates_light(mon)
+struct monst *mon;
+{
+    return (boolean) (hates_light(mon->data));
+}
+
 /* True iff the type of monster pass through iron bars */
 boolean
 passes_bars(mptr)
