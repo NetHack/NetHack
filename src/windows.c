@@ -974,6 +974,10 @@ unsigned long *colormasks UNUSED;
         return; /* processed one field other than BL_FLUSH */
     } /* (idx >= 0, thus not BL_FLUSH, BL_RESET, BL_CHARACTERISTICS) */
 
+    if (idx != BL_FLUSH && idx != BL_RESET)
+        return;
+    /* does BL_RESET require any additional code to ensure all fields ? */
+
     /* We've received BL_FLUSH; time to output the gathered data */
     nb = newbot1;
     *nb = '\0';
