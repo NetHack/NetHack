@@ -16,7 +16,7 @@ Makefile.att	Added a makefile for the AT&T Unix PC using shared libraries.
 		(Contributed by ahby@umn-cs)
 
 Makefile.pc	Streamlined compilation of main.o, tty.o, and unix.o
-Makefile.tcc	(Contributed by polder@cs.vu.nl).
+Makefile.tcc	(Contributed by polder@cs.vu).
 
 data.base	deletion of duplicate lines and spelling fixes. (sweet@scubed)
 
@@ -30,16 +30,15 @@ engrave.c	Correction to "feel" code. (mike@genat)
 
 pri.c		Added colour highliting functions (sweet@scubed)
 
-prisym.c	changed "symbol.room" to "ROOM_SYM" (one I missed)
-		(Ralf.Brown@b.gp.cs.cmu.edu)
-		Changed "dirlet()" to return an int. (maartenj@cs.vu.nl)
+prisym.c	changed "symbol.room" to "ROOM_SYM" (one I missed; Ralf.Brown)
+		Changed "dirlet()" to return an int. (maartenj@cs.vu)
 
-msdos.c		Changed "symbol" to "showsyms" (Ralf.Brown@b.gp.cs.cmu.edu)
+msdos.c		Changed "symbol" to "showsyms" (Ralf.Brown)
 		Fixed up REDO & IBMBIOS stuff. (Kevin Sweet - sweet@scubed)
 
 do.c		Dropping gold asked for only when gold posessed. (walz@mimsy)
 		Potential unsigned value problem fixed (u.ucreamed)
-		Added leash dropping code. (maartenj@cs.vu.nl)
+		Added leash dropping code. (maartenj@cs.vu)
 		Blind modifications for blindfolding.  (eric@snark)
 		Value wrap fixed for u.ucreamed
 
@@ -54,7 +53,7 @@ spell.c		Potential unsigned value problem fixed (u.ulevel).
 
 shk.c		"inshop" crash bug corrected (many sources).
 		extern declaration of carrying() moved to avoid a Turbo-C
-		type mismatch msg. (Ralf.Brown@b.gp.cs.cmu.edu)
+		type mismatch msg. (Ralf.Brown)
 		Added new "online()" which executes faster. (tom@uw-warp)
 		Blind modifications for blindfolding.  (eric@snark)
 		Added item pricing shopkeeper talk.
@@ -62,7 +61,7 @@ shk.c		"inshop" crash bug corrected (many sources).
 		Cleaned up Kops code. (sweet@scubed)
 
 mhitu.c		Argument mismatches fixed. (walz@mimsy)
-		Scorpion/spider mixup fix. (William LeFebvre - phil@rice.edu)
+		Scorpion/spider mixup fix. (William LeFebvre - phil@rice)
 		Blind modifications for blindfolding.  (eric@snark)
 
 potion.c	Argument mismatch fixed. (walz@mimsy)
@@ -82,7 +81,7 @@ hack.c		"Elbereth" effectiveness increased under "HARD" option to
 		Declaration of "register struct monst *m_at()" fixed. (many)
 		Typo fixed. (tom@uw-warp)
 		Fixed scroll of scare monster pickup problems (and giveaway)
-		(polder@cs.vu.nl)
+		(polder@cs.vu)
 		Documentation modifications for blindfolding.  (eric@snark)
 
 ioctl.c		ioctl call for SET changed to function properly under
@@ -94,9 +93,9 @@ decl.c		in_doagain initialized. (many sources)
 wield.c		Ability to remove cursed weapons w. w- removed. (many sources)
 
 options.c	Major rewrite of options help.  Now uses pager.  (mike@genat)
-		Rewrote GRAPHICS setup. (maartenj@cs.vu.nl)
+		Rewrote GRAPHICS setup. (maartenj@cs.vu)
 		Allowed reassignment of inventory order #ifdef DGK
-		(polder@cs.vu.nl)
+		(polder@cs.vu)
 
 pray.c		Fixed mk_obj of spellbook under all conditions to make book
 		if "SPELLS" defined, and scroll otherwise. (unruh@infbs)
@@ -106,7 +105,7 @@ pray.c		Fixed mk_obj of spellbook under all conditions to make book
 
 zap.c		Potion of invis. breakage message improved. (unruh@infbs)
 		Added WAN_PROBING to "zapyourself".
-		Changed "dirlet()" to return an int. (maartenj@cs.vu.nl)
+		Changed "dirlet()" to return an int. (maartenj@cs.vu)
 		Fixed cancellation code to work properly on wands (spe
 		set to -1 instead of 0) this means no infinite wands of
 		wishing. (Ron Wessels - ron@utcsri)
@@ -115,23 +114,23 @@ zap.c		Potion of invis. breakage message improved. (unruh@infbs)
 		Added fcn to destroy wands with zero charges. (sweet@scubed)
 
 pcmain.c	Added a routine to zero out the fileinfo array in order to
-		prevent crashes on level change. (ralf@b.gp.cs.cmu.edu)
+		prevent crashes on level change. (Ralf.Brown)
 		Added chdir to HACKDIR before looking for .CNF file.
-		Added call "uptodate(savefile)". (polder@cs.vu.nl)
+		Added call "uptodate(savefile)". (polder@cs.vu)
 
 pager.c		changed "cornline()" to use xputs for HI/HE. (tom@uw-warp)
 		added choice for dowhatis() to allow letter or cursor object
-		selection. (polder@cs.vu.nl)
+		selection. (polder@cs.vu)
 
 cmd.c		Added ^W (wish) and ^I (ident-all) commands for WIZARD-mode.
-		(Paul Polderman - polder@cs.vu.nl)
+		(Paul Polderman - polder@cs.vu)
 		Added "Z" as alternate to "# cast" (Eric Raymond - eric@snark)
 
 u_init.c	Expanded a tab which didn't show in raw mode.
 		Changed trobj.trotyp to "unsigned short" to avoid >255
-		problems. (Maarten Jan Huisjes - maartenj@cs.vu.nl)
+		problems. (Maarten Jan Huisjes - maartenj@cs.vu)
 		Removed wand of wishing from WIZARD's inventory (due to
-		the above cmd additions). (polder@cs.vu.nl)
+		the above cmd additions). (polder@cs.vu)
 		Fixed declaration of leash. (simon@its63b)
 		Beefed up Wizard class.
 		Added Wakizashi for Samurai.
@@ -139,36 +138,36 @@ u_init.c	Expanded a tab which didn't show in raw mode.
 		Modifications to provide blindfolds.  (eric@snark)
 
 end.c		changed inventory identification on death to list form.
-		(polder@cs.vu.nl)
+		(polder@cs.vu)
 		added hallucination effects to done_in_by()
 		added posession of amulet flag for scoreboard (sweet@scubed)
 
-wizard.c	corrected "nasties" decl. (maartenj@cs.vu.nl)
+wizard.c	corrected "nasties" decl. (maartenj@cs.vu)
 		Blind modifications for blindfolding.  (eric@snark)
 
-do_wear.c	Prot. from shape changers logic fixed. (maartenj@cs.vu.nl)
+do_wear.c	Prot. from shape changers logic fixed. (maartenj@cs.vu)
 
-lev.c		Prot. from shape changers logic fixed. (maartenj@cs.vu.nl)
+lev.c		Prot. from shape changers logic fixed. (maartenj@cs.vu)
 
-mon.c		Inserted cast to fix compiler warning. (maartenj@cs.vu.nl)
+mon.c		Inserted cast to fix compiler warning. (maartenj@cs.vu)
 		Nymphs now leave potions of object detection when killed.
 		Kops now don't leave treasure behind. (sweet@scubed)
 
 topl.c		Changed size of "toplines" to avoid overflow in "parseoptions"
-		when help is asked for. (probably n/a) (maartenj@cs.vu.nl)
+		when help is asked for. (probably n/a) (maartenj@cs.vu)
 
 topten.c	Added longer death descriptions, including name of
 		shopkeeper who killed character.  (many sources)
 
 termcap.c	Changed allocation of HI/HO for copying SI/SO to allow room
-		for null.  (maartenj@cs.vu.nl)
+		for null.  (maartenj@cs.vu)
 		Added PCHack 3.61 termcap stuff.
 		Added colour highliting code. (sweet@scubed)
 
-version.c	Expanded a tab for rawmode io. (maartenj@cs.vu.nl)
+version.c	Expanded a tab for rawmode io. (maartenj@cs.vu)
 
 objnam.c	Allow the WIZARD to wish for really excessive objects.
-		(polder@cs.vu.nl)
+		(polder@cs.vu)
 
 makedefs.c	Added "freopen" which works (MSC 4.0 drops first couple
 		of lines).  Solves missing #define AMULET... problem.
