@@ -1658,6 +1658,8 @@ boolean near_hero;
             stackobj(otmp);
             if (!noscatter)
                 (void) scatter(nx, ny, rnd(2), 0, otmp);
+            else
+                newsym(nx, ny);
         } else { /* random location */
             /* set dummy coordinates because there's no
                current position for rloco() to update */
