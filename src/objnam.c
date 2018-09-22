@@ -1052,7 +1052,7 @@ unsigned doname_flags;
                 obj->leashmon = 0;
             } else {
                 Sprintf(eos(bp), " (attached to %s)",
-                        a_monnam(mlsh));
+                        noit_mon_nam(mlsh));
             }
             break;
         }
