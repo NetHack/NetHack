@@ -774,7 +774,6 @@ to support:
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
-  |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
   +--------------------+--------------------+--------------------+--------+
 
   more wincap2 for STATUS_HILITES support and control
