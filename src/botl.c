@@ -810,7 +810,8 @@ boolean *valsetlist;
      * the display, call status_update() with BL_FLUSH.
      *
      */
-    if (context.botlx)
+    if (context.botlx &&
+        (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
     else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)

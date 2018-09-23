@@ -67,6 +67,7 @@ struct window_procs tty_procs = {
 #endif
 #if defined(STATUS_HILITES)
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
+     | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY),
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
