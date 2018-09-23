@@ -3991,6 +3991,16 @@ boolean force_failure;
                 }
             } else if (under_u) {
                 dotrap(ttmp, 0);
+            } else if (ttype == BEAR_TRAP && (Levitation || Flying)) {
+                /* There was a report of oddities of the trap
+                   vanishing from view due to tseen being cleared
+                   (which was deliberate to work around a check_here()
+                   issue). Since you won't actually end up in the trap
+                   during the #untrap operation anyway due to
+                   Levitation and Flying checks further along,
+                   just avoid the whole "vanishing trap" scenario
+                   by failing the #untrap operation right here. */
+                You("couldn't reach it from your vantage point.");
             } else {
                 move_into_trap(ttmp);
             }
