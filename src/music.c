@@ -445,6 +445,11 @@ generic_lvl_desc()
         return "dungeon";
 }
 
+const char *beats[] = {
+    "stepper", "one drop", "slow two", "triple stroke roll",
+    "double shuffle", "half-time shuffle", "second line", "train"
+};
+
 /*
  * The player is trying to extract something from his/her instrument.
  */
@@ -454,6 +459,7 @@ struct obj *instr;
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
+    boolean mundane = FALSE;
 
     itmp = *instr;
     itmp.oextra = (struct oextra *) 0; /* ok on this copy as instr maintains
@@ -462,8 +468,10 @@ struct obj *instr;
 
     /* if won't yield special effect, make sound of mundane counterpart */
     if (!do_spec || instr->spe <= 0)
-        while (objects[itmp.otyp].oc_magic)
+        while (objects[itmp.otyp].oc_magic) {
             itmp.otyp -= 1;
+            mundane = TRUE;
+        }
 #ifdef MAC
     mac_speaker(&itmp, "C");
 #endif
@@ -579,6 +587,10 @@ struct obj *instr;
         exercise(A_DEX, TRUE);
         break;
     case DRUM_OF_EARTHQUAKE: /* create several pits */
+        /* a drum of earthquake does cause not cause deafness
+           while still magically functional, nor afterwards
+           when it invokes the LEATHER_DRUM case instead and
+           mundane is flagged */
         consume_obj_charge(instr, TRUE);
 
         You("produce a heavy, thunderous rolling!");
@@ -589,10 +601,15 @@ struct obj *instr;
         makeknown(DRUM_OF_EARTHQUAKE);
         break;
     case LEATHER_DRUM: /* Awaken monsters */
-        You("beat a deafening row!");
-        awaken_monsters(u.ulevel * 40);
-        incr_itimeout(&HDeaf, rn1(20, 30));
-        exercise(A_WIS, FALSE);
+        if (!mundane) {
+            You("beat a deafening row!");
+            incr_itimeout(&HDeaf, rn1(20, 30));
+            exercise(A_WIS, FALSE);
+	} else
+	    You("%s %s.",
+                rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
+                an(beats[rn2(SIZE(beats))]));
+        awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         context.botl = TRUE;
         break;
     default:
