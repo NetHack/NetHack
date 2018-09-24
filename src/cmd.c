@@ -361,39 +361,142 @@ doextcmd(VOID_ARGS)
     return retval;
 }
 
-/* here after #? - now list all full-word commands */
+/* here after #? - now list all full-word commands and provid
+   some navigation capability through the long list */
 int
 doextlist(VOID_ARGS)
 {
     register const struct ext_func_tab *efp;
-    char buf[BUFSZ];
-    winid datawin;
-    char ch = cmd_from_func(doextcmd);
+    char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
+    winid menuwin;
+    anything any;
+    menu_item *selected;
+    int n, pass, maxpass = wizard ? 2 : 1;
+    int menumode = 0, menushown[2] = {0,0}, onelist = 0;
+    boolean redisplay = TRUE, search = FALSE;
+    const char *headings[] = {"Extended commands",
+                              "Debugging Extended Commands"};
 
-    datawin = create_nhwindow(NHW_TEXT);
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "            Extended Commands List");
-    putstr(datawin, 0, "");
-    if (ch) {
-        Sprintf(buf, "    Press '%s', then type:",
-                visctrl(ch));
-        putstr(datawin, 0, buf);
-        putstr(datawin, 0, "");
-    }
+    searchbuf[0] = '\0';
+    menuwin = create_nhwindow(NHW_MENU);
 
-    for (efp = extcmdlist; efp->ef_txt; efp++) {
-        if (!wizard && (efp->flags & WIZMODECMD))
-            continue;
-        Sprintf(buf, "   %-15s %c %s.",
-                efp->ef_txt,
-                (efp->flags & AUTOCOMPLETE) ? '*' : ' ',
-                efp->ef_desc);
-        putstr(datawin, 0, buf);
+    while (redisplay) {
+        redisplay = FALSE;
+        any = zeroany;
+        start_menu(menuwin);
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "Extended Commands List", MENU_UNSELECTED);
+
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "", MENU_UNSELECTED);
+
+        Strcpy(buf, menumode ? "Show" : "Hide");
+        Strcat(buf, " commands that don't autocomplete");
+        if (!menumode)
+            Strcat(buf, " (those not marked with [A] below)");
+        any.a_int = 1;
+        add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf, MENU_UNSELECTED);
+
+        if (strlen(searchbuf) == 0) {
+            any.a_int = 2;
+            add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+                     "Search extended commands", MENU_UNSELECTED);
+        } else {
+            Strcpy(buf, "Show all, clear search");
+            if ((strlen(buf) + strlen(searchbuf) + strlen(" (\"\")")) < QBUFSZ)
+                Sprintf(eos(buf), " (\"%s\")", searchbuf);
+            any.a_int = 3;
+            add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
+        if (wizard) {
+            any.a_int = 4;
+            add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
+                     onelist ? "Show debugging commands in separate section" :
+                     "Show all alphabetically, including debugging commands",
+                     MENU_UNSELECTED);
+	}
+        any = zeroany;
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "", MENU_UNSELECTED);
+        menushown[0] = menushown[1] = 0;
+        for (pass = 0; pass < maxpass; ++pass) {
+            for (efp = extcmdlist; efp->ef_txt; efp++) {
+                boolean showit = (onelist ||
+                                 (!menumode ||
+                                  (menumode && (efp->flags & AUTOCOMPLETE))) &&
+                                 ((!pass && !(efp->flags & WIZMODECMD)) ||
+                                   (pass &&  (efp->flags & WIZMODECMD))));
+
+                if (strlen(searchbuf) > 0) {
+                    if (!((strstri(efp->ef_txt, searchbuf) != 0) ||
+                          (strstri(efp->ef_desc, searchbuf) != 0)))
+                        showit = FALSE;
+                }
+                if (showit) {
+                    /* We're about to show an item, have we shown the menu yet?
+                       Doing menu in inner loop like this on demand avoids a
+                       heading with no subordinate entries on the search
+                       results menu */
+                    if (!menushown[pass]) {
+                        Strcpy(buf, headings[pass]);
+                        add_menu(menuwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                                 buf, MENU_UNSELECTED);
+                        menushown[pass] = 1;
+                    }
+                    Sprintf(buf, " %-14s %-3s %s",
+                            efp->ef_txt,
+                            (efp->flags & AUTOCOMPLETE) ? "[A]" : " ",
+                            efp->ef_desc);
+                    add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         buf, MENU_UNSELECTED);
+                }
+            }
+            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "", MENU_UNSELECTED);
+        }
+        end_menu(menuwin, (char *) 0);
+        n = select_menu(menuwin, PICK_ONE, &selected);
+        if (n > 0) {
+            switch(selected[0].item.a_int) {
+                case 1:
+                         menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
+                         redisplay = TRUE;
+                         break;
+                case 2:
+                         search = TRUE;
+                         break;
+                case 3:
+                         search = FALSE;
+                         searchbuf[0] = '\0';
+                         redisplay = TRUE;
+                         break;
+                case 4:
+                         search = FALSE;
+                         searchbuf[0] = '\0';
+                         onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
+                         maxpass = onelist ? 1 : wizard ? 2 : 1;
+                         redisplay = TRUE;
+                         break;
+	    }                
+            free((genericptr_t) selected);
+        } else {
+            search = FALSE;
+            searchbuf[0] = '\0';
+        }
+        if (search) {
+            Strcpy(promptbuf, "Extended command list search phrase");
+            Strcat(promptbuf, "?");
+            getlin(promptbuf, searchbuf);
+            (void) mungspaces(searchbuf);
+            if (searchbuf[0] == '\033')
+                searchbuf[0] = '\0';
+            if (strlen(searchbuf) > 0)
+                redisplay = TRUE;
+            search = FALSE;
+        }
     }
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "    Commands marked with a * will be autocompleted.");
-    display_nhwindow(datawin, FALSE);
-    destroy_nhwindow(datawin);
+    destroy_nhwindow(menuwin);
     return 0;
 }
 
