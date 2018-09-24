@@ -47,9 +47,10 @@ mon_nam_too(outbuf, mon, other_mon)
 char *outbuf;
 struct monst *mon, *other_mon;
 {
-    Strcpy(outbuf, mon_nam(mon));
-    if (mon == other_mon)
-        switch (pronoun_gender(mon)) {
+    if (mon != other_mon)
+        Strcpy(outbuf, mon_nam(mon));
+    else
+        switch (pronoun_gender(mon, FALSE)) {
         case 0:
             Strcpy(outbuf, "himself");
             break;
