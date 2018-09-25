@@ -371,11 +371,11 @@ doextlist(VOID_ARGS)
     winid menuwin;
     anything any;
     menu_item *selected;
-    int n, pass, maxpass = wizard ? 2 : 1;
-    int menumode = 0, menushown[2] = {0,0}, onelist = 0;
+    int n, pass;
+    int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
-    const char *headings[] = {"Extended commands",
-                              "Debugging Extended Commands"};
+    static const char *headings[] = { "Extended commands",
+                                      "Debugging Extended Commands" };
 
     searchbuf[0] = '\0';
     menuwin = create_nhwindow(NHW_MENU);
@@ -386,24 +386,24 @@ doextlist(VOID_ARGS)
         start_menu(menuwin);
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "Extended Commands List", MENU_UNSELECTED);
-
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
 
         Strcpy(buf, menumode ? "Show" : "Hide");
         Strcat(buf, " commands that don't autocomplete");
         if (!menumode)
-            Strcat(buf, " (those not marked with [A] below)");
+            Strcat(buf, " (those not marked with [A])");
         any.a_int = 1;
-        add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf, MENU_UNSELECTED);
+        add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf,
+                 MENU_UNSELECTED);
 
-        if (strlen(searchbuf) == 0) {
+        if (!*searchbuf) {
             any.a_int = 2;
             add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
                      "Search extended commands", MENU_UNSELECTED);
         } else {
             Strcpy(buf, "Show all, clear search");
-            if ((strlen(buf) + strlen(searchbuf) + strlen(" (\"\")")) < QBUFSZ)
+            if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
             add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
@@ -412,72 +412,88 @@ doextlist(VOID_ARGS)
         if (wizard) {
             any.a_int = 4;
             add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
-                     onelist ? "Show debugging commands in separate section" :
-                     "Show all alphabetically, including debugging commands",
+                     onelist ? "Show debugging commands in separate section"
+                     : "Show all alphabetically, including debugging commands",
                      MENU_UNSELECTED);
 	}
         any = zeroany;
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
         menushown[0] = menushown[1] = 0;
-        for (pass = 0; pass < maxpass; ++pass) {
+        n = 0;
+        for (pass = 0; pass <= 1; ++pass) {
+            /* skip second pass if not in wizard mode or wizard mode
+               commands are being integrated into a single list */
+            if (pass == 1 && (onelist || !wizard))
+                break;
             for (efp = extcmdlist; efp->ef_txt; efp++) {
-                boolean showit = (onelist ||
-                                 (!menumode ||
-                                  (menumode && (efp->flags & AUTOCOMPLETE))) &&
-                                 ((!pass && !(efp->flags & WIZMODECMD)) ||
-                                   (pass &&  (efp->flags & WIZMODECMD))));
+                int wizc;
 
-                if (strlen(searchbuf) > 0) {
-                    if (!((strstri(efp->ef_txt, searchbuf) != 0) ||
-                          (strstri(efp->ef_desc, searchbuf) != 0)))
-                        showit = FALSE;
+                /* if hiding non-autocomplete commands, skip such */
+                if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
+                    continue;
+                /* if searching, skip this command if it doesn't match */
+                if (*searchbuf
+                    && !strstri(efp->ef_txt, searchbuf)
+                    && !strstri(efp->ef_desc, searchbuf))
+                    continue;
+                /* skip wizard mode commands if not in wizard mode;
+                   when showing two sections, skip wizard mode commands
+                   in pass==0 and skip other commands in pass==1 */
+                wizc = (efp->flags & WIZMODECMD) != 0;
+                if (wizc && !wizard)
+                    continue;
+                if (!onelist && pass != wizc)
+                    continue;
+
+                /* We're about to show an item, have we shown the menu yet?
+                   Doing menu in inner loop like this on demand avoids a
+                   heading with no subordinate entries on the search
+                   results menu. */
+                if (!menushown[pass]) {
+                    Strcpy(buf, headings[pass]);
+                    add_menu(menuwin, NO_GLYPH, &any, 0, 0,
+                             iflags.menu_headings, buf, MENU_UNSELECTED);
+                    menushown[pass] = 1;
                 }
-                if (showit) {
-                    /* We're about to show an item, have we shown the menu yet?
-                       Doing menu in inner loop like this on demand avoids a
-                       heading with no subordinate entries on the search
-                       results menu */
-                    if (!menushown[pass]) {
-                        Strcpy(buf, headings[pass]);
-                        add_menu(menuwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-                                 buf, MENU_UNSELECTED);
-                        menushown[pass] = 1;
-                    }
-                    Sprintf(buf, " %-14s %-3s %s",
-                            efp->ef_txt,
-                            (efp->flags & AUTOCOMPLETE) ? "[A]" : " ",
-                            efp->ef_desc);
-                    add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                Sprintf(buf, " %-14s %-3s %s",
+                        efp->ef_txt,
+                        (efp->flags & AUTOCOMPLETE) ? "[A]" : " ",
+                        efp->ef_desc);
+                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                          buf, MENU_UNSELECTED);
-                }
+                ++n;
             }
-            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 "", MENU_UNSELECTED);
+            if (n)
+                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         "", MENU_UNSELECTED);
         }
+        if (*searchbuf && !n)
+            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     "no matches", MENU_UNSELECTED);
+
         end_menu(menuwin, (char *) 0);
         n = select_menu(menuwin, PICK_ONE, &selected);
         if (n > 0) {
-            switch(selected[0].item.a_int) {
-                case 1:
-                         menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
-                         redisplay = TRUE;
-                         break;
-                case 2:
-                         search = TRUE;
-                         break;
-                case 3:
-                         search = FALSE;
-                         searchbuf[0] = '\0';
-                         redisplay = TRUE;
-                         break;
-                case 4:
-                         search = FALSE;
-                         searchbuf[0] = '\0';
-                         onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
-                         maxpass = onelist ? 1 : wizard ? 2 : 1;
-                         redisplay = TRUE;
-                         break;
+            switch (selected[0].item.a_int) {
+            case 1: /* 'a': toggle show/hide non-autocomplete */
+                menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+                break;
+            case 2: /* 's' when not searching yet: enable search */
+                search = TRUE;
+                break;
+            case 3: /* 's' when already searching: disable search */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                redisplay = TRUE;
+                break;
+            case 4: /* 'z': toggle showing wizard mode commands separately */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+                break;
 	    }                
             free((genericptr_t) selected);
         } else {
@@ -491,7 +507,7 @@ doextlist(VOID_ARGS)
             (void) mungspaces(searchbuf);
             if (searchbuf[0] == '\033')
                 searchbuf[0] = '\0';
-            if (strlen(searchbuf) > 0)
+            if (*searchbuf)
                 redisplay = TRUE;
             search = FALSE;
         }
