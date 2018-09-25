@@ -364,8 +364,8 @@ moverock()
 /*
  *  still_chewing()
  *
- *  Chew on a wall, door, or boulder.  Returns TRUE if still eating, FALSE
- *  when done.
+ *  Chew on a wall, door, or boulder.  [What about statues?]
+ *  Returns TRUE if still eating, FALSE when done.
  */
 STATIC_OVL int
 still_chewing(x, y)
@@ -379,7 +379,10 @@ xchar x, y;
         (void) memset((genericptr_t) &context.digging, 0,
                       sizeof (struct dig_info));
 
-    if (!boulder && IS_ROCK(lev->typ) && !may_dig(x, y)) {
+    if (!boulder
+        && ((IS_ROCK(lev->typ) && !may_dig(x, y))
+            /* may_dig() checks W_NONDIGGABLE but doesn't handle iron bars */
+            || (lev->typ == IRONBARS && (lev->wall_info & W_NONDIGGABLE)))) {
         You("hurt your teeth on the %s.",
             (lev->typ == IRONBARS)
                 ? "bars"
