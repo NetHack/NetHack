@@ -747,14 +747,11 @@ wiz_identify(VOID_ARGS)
         /* command remapping might leave #wizidentify as the only way
            to invoke us, in which case cmd_from_func() will yield NUL;
            it won't matter to display_inventory()/display_pickinv()
-           if ^I invokes some other command--what matters is that it
-           is never an inventory letter */
+           if ^I invokes some other command--what matters is that
+           display_pickinv() and xname() see override_ID as nonzero */
         if (!iflags.override_ID)
             iflags.override_ID = C('I');
-        /* C('I') == ^I == default keystroke for wiz_identify;
-           it doesn't matter whether the command has been remapped */
-        if (display_inventory((char *) 0, TRUE) == C('I'))
-            identify_pack(0, FALSE);
+        (void) display_inventory((char *) 0, FALSE);
         iflags.override_ID = 0;
     } else
         pline("Unavailable command '%s'.",
