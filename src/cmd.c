@@ -494,7 +494,7 @@ doextlist(VOID_ARGS)
                 onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
                 redisplay = TRUE;
                 break;
-	    }                
+	    }
             free((genericptr_t) selected);
         } else {
             search = FALSE;
@@ -2468,7 +2468,7 @@ int final;
         if (Flying)
             enl_msg(You_, "would fly", "would have flown",
                     Levitation
-                       ? "if you weren't levitating"
+                       ? " if you weren't levitating"
                        : (save_BFly == FROMOUTSIDE)
                           ? if_surroundings_permitted
                           /* both surroundings and [latent] levitation */
