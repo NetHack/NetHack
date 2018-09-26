@@ -329,6 +329,8 @@ struct monst *mon;
             bonus += rnd(4);
         if (objects[otyp].oc_material == SILVER && mon_hates_silver(mon))
             bonus += rnd(20);
+        if (artifact_light(otmp) && otmp->lamplit && hates_light(ptr))
+            bonus += rnd(8);
 
         /* if the weapon is going to get a double damage bonus, adjust
            this bonus so that effectively it's added after the doubling */

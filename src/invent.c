@@ -2593,24 +2593,27 @@ long *out_cnt;
         char prompt[QBUFSZ];
 
         unid_cnt = count_unidentified(invent); 
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     "Debug Identify",
-                     MENU_UNSELECTED);
+        Sprintf(prompt, "Debug Identify"); /* 'title' rather than 'prompt' */
+        if (unid_cnt)
+            Sprintf(eos(prompt),
+                    " -- unidentified or partially identified item%s",
+                    plur(unid_cnt));
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
         if (!unid_cnt) {
             add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "(all items are permanently identified already)",
                      MENU_UNSELECTED);
         } else {
             any.a_obj = &wizid_fakeobj;
+            Sprintf(prompt, "select %s to permanently identify",
+                    (unid_cnt == 1) ? "it": "any or all of them");
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
-               it could be ambiguous as a selector but the only time it
-               is wanted is in case where no item is being selected */
-            Sprintf(prompt,
-          "Select %sthe %d bolded item%s to permanently identify (%s for all)",
-                    (unid_cnt == 1) ? "": "any of ", unid_cnt,
-                    (unid_cnt > 1) ? "s" : "",
-                    visctrl(iflags.override_ID));
+               it could be ambiguous if player has assigned a letter to
+               the #wizidentify command */
+            if (unid_cnt > 1)
+                Sprintf(eos(prompt), " (%s for all)",
+                        visctrl(iflags.override_ID));
             add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,
                      prompt, MENU_UNSELECTED);
             wizid = TRUE;
@@ -2630,6 +2633,8 @@ nextclass:
         if (lets && !index(lets, otmp->invlet))
             continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
+            if (wizid && !not_fully_identified(otmp))
+                continue;
             any = zeroany; /* all bits zero */
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
@@ -2643,9 +2648,7 @@ nextclass:
                 any.a_obj = otmp;
             else
                 any.a_char = ilet;
-            add_menu(win, obj_to_glyph(otmp), &any, ilet, 0,
-                     (wizid && not_fully_identified(otmp)) ?
-                        ATR_BOLD : ATR_NONE,
+            add_menu(win, obj_to_glyph(otmp), &any, ilet, 0, ATR_NONE,
                      doname(otmp), MENU_UNSELECTED);
         }
     }
@@ -2678,21 +2681,18 @@ nextclass:
     }
     end_menu(win, query && *query ? query : (char *) 0);
 
-    n = select_menu(win, wizid ? PICK_ANY :
-                    want_reply ? PICK_ONE : PICK_NONE, &selected);
+    n = select_menu(win,
+                    wizid ? PICK_ANY : want_reply ? PICK_ONE : PICK_NONE,
+                    &selected);
     if (n > 0) {
         if (wizid) {
-            int i = n;
+            int i;
 
             ret = '\0';
-            while (--i >= 0) {
+            for (i = 0; i < n; ++i) {
                 otmp = selected[i].item.a_obj;
                 if (otmp == &wizid_fakeobj) {
-                    /* C('I') == ^I == default keystroke for wiz_identify;
-                       it is guaranteed not to be in use as an inventory letter
-                       (wiz_identify might be remapped to an ordinary letter,
-                       making iflags.override_ID ambiguous as a return value) */
-                       ret = C('I');
+                    identify_pack(0, FALSE);
                 } else {
                     if (not_fully_identified(otmp))
                         (void) identify(otmp);

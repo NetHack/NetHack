@@ -657,6 +657,7 @@ struct obj *obj; /* only scatter this obj        */
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
+            newsym(sx, sy); /* in case it's beyond radius of 'farthest' */
             used_up = TRUE;
 
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */

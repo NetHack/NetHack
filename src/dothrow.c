@@ -664,12 +664,8 @@ int x, y;
 
         mon->mundetected = 0; /* wakeup() will handle mimic */
         mnam = a_monnam(mon); /* after unhiding */
-        pronoun = mhim(mon);
+        pronoun = noit_mhim(mon);
         if (!strcmp(mnam, "it")) {
-            /* mhim() uses pronoun_gender() which forces neuter if monster
-               can't be seen; we want him/her for humanoid sensed by touch */
-            if (!strcmp(pronoun, "it") && humanoid(mon->data))
-                pronoun = genders[mon->female].him;
             mnam = !strcmp(pronoun, "it") ? "something" : "someone";
         }
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))

@@ -3693,7 +3693,7 @@ drown()
         && (Teleport_control || rn2(3) < Luck + 2)) {
         You("attempt a teleport spell."); /* utcsri!carroll */
         if (!level.flags.noteleport) {
-            (void) dotele();
+            (void) dotele(FALSE);
             if (!is_pool(u.ux, u.uy))
                 return TRUE;
         } else
@@ -3991,6 +3991,16 @@ boolean force_failure;
                 }
             } else if (under_u) {
                 dotrap(ttmp, 0);
+            } else if (ttype == BEAR_TRAP && (Levitation || Flying)) {
+                /* There was a report of oddities of the trap
+                   vanishing from view due to tseen being cleared
+                   (which was deliberate to work around a check_here()
+                   issue). Since you won't actually end up in the trap
+                   during the #untrap operation anyway due to
+                   Levitation and Flying checks further along,
+                   just avoid the whole "vanishing trap" scenario
+                   by failing the #untrap operation right here. */
+                You("couldn't reach it from your vantage point.");
             } else {
                 move_into_trap(ttmp);
             }

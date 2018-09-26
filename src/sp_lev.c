@@ -621,6 +621,7 @@ schar filling;
 schar lit;
 {
     int x, y;
+
     for (x = 2; x <= x_maze_max; x++)
         for (y = 0; y <= y_maze_max; y++) {
             SET_TYPLIT(x, y, filling, lit);
@@ -636,11 +637,21 @@ xchar x1, y1, x2, y2;
 int prop;
 {
     register xchar x, y;
+    struct rm *lev;
 
-    for (y = max(y1, 0); y <= min(y2, ROWNO - 1); y++)
-        for (x = max(x1, 0); x <= min(x2, COLNO - 1); x++)
-            if (IS_STWALL(levl[x][y].typ) || IS_TREE(levl[x][y].typ))
-                levl[x][y].wall_info |= prop;
+    x1 = max(x1, 1);
+    x2 = min(x2, COLNO - 1);
+    y1 = max(y1, 0);
+    y2 = min(y2, ROWNO - 1);
+    for (y = y1; y <= y2; y++)
+        for (x = x1; x <= x2; x++) {
+            lev = &levl[x][y];
+            if (IS_STWALL(lev->typ) || IS_TREE(lev->typ)
+                /* 3.6.2: made iron bars eligible to be flagged nondiggable
+                   (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
+                || lev->typ == IRONBARS)
+                lev->wall_info |= prop;
+        }
 }
 
 STATIC_OVL void
