@@ -3666,6 +3666,9 @@ unsigned long *colormasks;
     char *fval = (char *) 0;
     boolean reset_state = NO_RESET;
 
+    if ((fldidx < BL_RESET) || (fldidx >= MAXBLSTATS))
+        return;
+
     if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
         return;
 
@@ -3727,11 +3730,13 @@ unsigned long *colormasks;
     case BL_HUNGER:
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
-        lastchar = eos(status_vals[fldidx]);
-        lastchar--;
-        while (*lastchar == ' ' && lastchar >= status_vals[fldidx]) {
-            *lastchar-- = '\0';
-            tty_status[NOW][fldidx].lth--;
+        if (tty_status[NOW][fldidx].lth > 0) {
+            lastchar = eos(status_vals[fldidx]);
+            lastchar--;
+            while (lastchar >= status_vals[fldidx] && *lastchar == ' ') {
+                *lastchar-- = '\0';
+                tty_status[NOW][fldidx].lth--;
+            }
         }
         break;
     case BL_TITLE:
