@@ -930,7 +930,7 @@ unsigned long *colormasks UNUSED;
        is buffered so final BL_FLUSH is needed to produce output) */
     windowprocs.wincap2 |= WC2_FLUSH_STATUS;
 
-    if (idx != BL_FLUSH) {
+    if (idx >= 0) {
         if (!status_activefields[idx])
             return;
         switch (idx) {
@@ -972,11 +972,20 @@ unsigned long *colormasks UNUSED;
             break;
         }
         return; /* processed one field other than BL_FLUSH */
-    } /* (idx != BL_FLUSH) */
+    } /* (idx >= 0, thus not BL_FLUSH, BL_RESET, BL_CHARACTERISTICS) */
+
+    /* does BL_RESET require any specific code to ensure all fields ? */
+
+    if (!(idx == BL_FLUSH || idx == BL_RESET))
+        return;
 
     /* We've received BL_FLUSH; time to output the gathered data */
     nb = newbot1;
     *nb = '\0';
+    /* BL_FLUSH is the only pseudo-index value we need to check for
+       in the loop below because it is the only entry used to pad the
+       end of the fieldorder array. We could stop on any
+       negative (illegal) index, but this should be fine */
     for (i = 0; (idx1 = fieldorder[0][i]) != BL_FLUSH; ++i) {
         if (status_activefields[idx1])
             Strcpy(nb = eos(nb), status_vals[idx1]);

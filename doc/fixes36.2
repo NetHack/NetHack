@@ -128,6 +128,30 @@ cancelled shapeshifter hit by polymorph magic will become uncancelled
 polymorph zap which creates a new long worm (or retains an old one via wizard
 	mode monpolycontrol) can hit that worm multiple times (tail segments)
 wishing for "orange" could yield orange or orange colored gem/potion/spellbook
+a sleeping or paralyzed mon would be frightened by its reflection when 
+	applying a mirror
+prevent leash showing unseen monster as "attached to it"
+gremlins seemed impervious to Sunsword's light yet a flash from a camera
+	caused them to cry out in pain
+when objects migrate (fall down stairs) and invisible hero (w/o see invisible,
+	no-autopickup) descends, stairs get shown instead of object(s) on them
+drum of earthquake was causing deafness but oddly enough only when used up
+known bear trap was being forgotten about by a player polymorphed into a
+	flying monster if the player unsuccessfully tried to #untrap it and
+	moved onto the trap square as a result
+no leash-related message is given when a leashed pet yellow light explodes
+shop messages refer to shk by name even when shk is not visible but some
+	used pronoun "it" or "its" in same sentence; ditto for vault guards
+poly'd hero and monsters could eat through iron bars in areas where walls
+	were flagged as non-diggable
+Samurai seeing items at a distance could have them be described by their
+	ordinary names rather than by their Japanese names
+wizard mode ^T shouldn't have been diminishing player power but it was
+	and hilite_status:power settings really drew attention to that
+fix missing space in "would flyif you weren't levitating"
+a wand of polymorph lost its magical ability for the turn just because the
+	player using it to engrave happened to be blind, which didn't make
+	a much sense
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -136,11 +160,16 @@ fix access violation when --debug:xxxx has no other args after it
 setting the inverse attribute for gold had the space before "$:"
 	getting highlighted along with the gold field
 sortloot segfaulted when filtering a subset of items (seen with 'A' command)
+orctown: prevent Bad fruit #0 and some minor tuning
+make long extended commands list be more navigable
+simplify #wizidentify; don't rely on having bold menu entries
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
 	values so that comparisons are correct
-orctown: prevent Bad fruit #0 and some minor tuning
+tty: fix an out of bounds error in tty_status_update() for BL_HUNGER case
+X11: its use of genl_status_update exposed a negative index use that could
+	lead to a segfault
 
 
 Platform- and/or Interface-Specific Fixes

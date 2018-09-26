@@ -214,7 +214,9 @@ extern
 #define WC2_HITPOINTBAR   0x0040L /* 07 show bar representing hit points */
 #define WC2_FLUSH_STATUS  0x0080L /* 08 call status_update(BL_FLUSH)
                                         after updating status window fields */
-                                  /* 24 free bits */
+#define WC2_RESET_STATUS  0x0100L /* 09 call status_update(BL_RESET) to indicate
+                                        draw everything */
+                                  /* 23 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

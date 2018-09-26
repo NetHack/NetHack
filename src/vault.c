@@ -452,7 +452,8 @@ invault()
                 if (!Blind)
                     pline(
                        "%s holds out %s palm and beckons with %s other hand.",
-                          noit_Monnam(guard), mhis(guard), mhis(guard));
+                          noit_Monnam(guard), noit_mhis(guard),
+                          noit_mhis(guard));
             } else {
                 verbalize(
                     "Most likely all your gold was stolen from this vault.");
@@ -707,7 +708,7 @@ register struct monst *grd;
                 if (Deaf) {
                     if (!Blind)
                         pline("%s holds out %s palm demandingly!",
-                              noit_Monnam(grd), mhis(grd));
+                              noit_Monnam(grd), noit_mhis(grd));
                 } else {
                     verbalize("Drop all your gold, scoundrel!");
                 }
@@ -716,7 +717,7 @@ register struct monst *grd;
                 if (Deaf) {
                     if (!Blind)
                         pline("%s rubs %s hands with enraged delight!",
-                              noit_Monnam(grd), mhis(grd));
+                              noit_Monnam(grd), noit_mhis(grd));
                 } else {
                     verbalize("So be it, rogue!");
                 }

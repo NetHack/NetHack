@@ -45,9 +45,10 @@ mon_nam_too(outbuf, mon, other_mon)
 char *outbuf;
 struct monst *mon, *other_mon;
 {
-    Strcpy(outbuf, mon_nam(mon));
-    if (mon == other_mon)
-        switch (pronoun_gender(mon)) {
+    if (mon != other_mon)
+        Strcpy(outbuf, mon_nam(mon));
+    else
+        switch (pronoun_gender(mon, FALSE)) {
         case 0:
             Strcpy(outbuf, "himself");
             break;
@@ -779,10 +780,17 @@ struct attack *mattk;
 
     /* Kill off aggressor if it didn't die. */
     if (!(result & MM_AGR_DIED)) {
+        boolean was_leashed = (magr->mleashed);
+
         mondead(magr);
         if (!DEADMONSTER(magr))
             return result; /* life saved */
         result |= MM_AGR_DIED;
+        
+        /* mondead() -> m_detach() -> m_unleash() always suppresses
+           the m_unleash() slack message, so deliver it here instead */
+        if (was_leashed)
+            Your("leash falls slack.");
     }
     if (magr->mtame) /* give this one even if it was visible */
         You(brief_feeling, "melancholy");

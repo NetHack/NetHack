@@ -776,6 +776,20 @@ to support:
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
   +--------------------+--------------------+--------------------+--------+
 
+  more wincap2 for STATUS_HILITES support and control
+  +--------------------------------- +---------------------------+
+  | To inform the game engine        |                           |
+  | that the window port is equipped | bit to set in wincap mask |
+  | to receive the following in its  |                           |
+  | x_status_update() routine        |                           |
+  |----------------------------------+---------------------------+
+  | BL_FLUSH to render buffered      | WC2_FLUSH_STATUS          |
+  |          field changes now       |                           |
+  |----------------------------------+---------------------------+
+  | BL_RESET to indicate that all    | WC2_RESET_STATUS          |
+  |          fields should be redone |                           |
+  +----------------------------------+---------------------------+
+
 align_message	-- where to place message window (top, bottom, left, right)
 align_status	-- where to place status display (top, bottom, left, right).
 ascii_map	-- port should display an ascii map if it can.

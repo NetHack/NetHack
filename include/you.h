@@ -236,12 +236,18 @@ struct Gender {
                              increment to 3 if you allow neuter roles */
 
 extern const struct Gender genders[]; /* table of available genders */
+/* pronouns for the hero */
 #define uhe()      (genders[flags.female ? 1 : 0].he)
 #define uhim()     (genders[flags.female ? 1 : 0].him)
 #define uhis()     (genders[flags.female ? 1 : 0].his)
-#define mhe(mtmp)  (genders[pronoun_gender(mtmp)].he)
-#define mhim(mtmp) (genders[pronoun_gender(mtmp)].him)
-#define mhis(mtmp) (genders[pronoun_gender(mtmp)].his)
+/* corresponding pronouns for monsters; yields "it" when mtmp can't be seen */
+#define mhe(mtmp)  (genders[pronoun_gender(mtmp, FALSE)].he)
+#define mhim(mtmp) (genders[pronoun_gender(mtmp, FALSE)].him)
+#define mhis(mtmp) (genders[pronoun_gender(mtmp, FALSE)].his)
+/* override "it" if reason is lack of visibility rather than neuter species */
+#define noit_mhe(mtmp)  (genders[pronoun_gender(mtmp, TRUE)].he)
+#define noit_mhim(mtmp) (genders[pronoun_gender(mtmp, TRUE)].him)
+#define noit_mhis(mtmp) (genders[pronoun_gender(mtmp, TRUE)].his)
 
 /*** Unified structure specifying alignment information ***/
 struct Align {

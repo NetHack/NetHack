@@ -312,6 +312,14 @@ register struct permonst *ptr;
                       || (ptr->mlet == S_IMP && ptr != &mons[PM_TENGU]));
 }
 
+/* True if specific monster is especially affected by light-emitting weapons */
+boolean
+mon_hates_light(mon)
+struct monst *mon;
+{
+    return (boolean) (hates_light(mon->data));
+}
+
 /* True iff the type of monster pass through iron bars */
 boolean
 passes_bars(mptr)
@@ -892,10 +900,13 @@ register struct monst *mtmp;
 /* Like gender(), but lower animals and such are still "it".
    This is the one we want to use when printing messages. */
 int
-pronoun_gender(mtmp)
+pronoun_gender(mtmp, override_vis)
 register struct monst *mtmp;
+boolean override_vis; /* if True then 'no it' unless neuter */
 {
-    if (is_neuter(mtmp->data) || !canspotmon(mtmp))
+    if (!override_vis && !canspotmon(mtmp))
+        return 2;
+    if (is_neuter(mtmp->data))
         return 2;
     return (humanoid(mtmp->data) || (mtmp->data->geno & G_UNIQ)
             || type_is_pname(mtmp->data)) ? (int) mtmp->female : 2;

@@ -255,6 +255,14 @@ struct monst *mon;
     }
 }
 
+#define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN] &&                          \
+                        (uwep && artifact_light(uwep) && uwep->lamplit))
+
+/* we could include this in the above macro, but probably overkill/overhead */
+/*      (!((which_armor((mon), W_ARMC) != 0) && ((which_armor((mon), W_ARMH) != 0))) && */
+
+
+                        
 /* monster begins fleeing for the specified time, 0 means untimed flee
  * if first, only adds fleetime if monster isn't already fleeing
  * if fleemsg, prints a message about new flight, otherwise, caller should */
@@ -289,9 +297,15 @@ boolean fleemsg;
             /* unfortunately we can't distinguish between temporary
                sleep and temporary paralysis, so both conditions
                receive the same alternate message */
-            if (!mtmp->mcanmove || !mtmp->data->mmove)
+            if (!mtmp->mcanmove || !mtmp->data->mmove) {
                 pline("%s seems to flinch.", Adjmonnam(mtmp, "immobile"));
-            else
+            } else if (flees_light(mtmp)) {
+                if (rn2(10) || Deaf)
+                    pline("%s flees from the painful light of %s.",
+                          Monnam(mtmp), bare_artifactname(uwep));
+                else
+                    verbalize("Bright light!");
+            } else
                 pline("%s turns to flee.", Monnam(mtmp));
         }
         mtmp->mflee = 1;
@@ -306,7 +320,7 @@ register struct monst *mtmp;
 int *inrange, *nearby, *scared;
 {
     int seescaryx, seescaryy;
-    boolean sawscary = FALSE;
+    boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
 
     *inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
                 <= (BOLT_LIM * BOLT_LIM));
@@ -329,12 +343,15 @@ int *inrange, *nearby, *scared;
 
     sawscary = onscary(seescaryx, seescaryy, mtmp);
     if (*nearby && (sawscary
+                    || (flees_light(mtmp) && !bravegremlin)
                     || (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
         *scared = 1;
         monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
     } else
         *scared = 0;
 }
+
+#undef flees_light
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
@@ -1371,7 +1388,8 @@ postmov:
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                if (may_dig(mtmp->mx, mtmp->my)
+                /* 3.6.2: was using may_dig() but it doesn't handle bars */
+                if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
                     && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
                     if (canseemon(mtmp))
                         pline("%s eats through the iron bars.", Monnam(mtmp));
