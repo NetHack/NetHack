@@ -3729,7 +3729,7 @@ unsigned long *colormasks;
            Let's suppress the trailing blanks */
         lastchar = eos(status_vals[fldidx]);
         lastchar--;
-        while (*lastchar == ' ' && lastchar >= status_vals[fldidx]) {
+        while (lastchar >= status_vals[fldidx] && *lastchar == ' ') {
             *lastchar-- = '\0';
             tty_status[NOW][fldidx].lth--;
         }
