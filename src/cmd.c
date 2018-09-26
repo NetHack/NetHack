@@ -116,7 +116,7 @@ extern int NDECL(dosit);              /**/
 extern int NDECL(dotalk);             /**/
 extern int NDECL(docast);             /**/
 extern int NDECL(dovspell);           /**/
-extern int NDECL(dotele);             /**/
+extern int NDECL(dotelecmd);          /**/
 extern int NDECL(dountrap);           /**/
 extern int NDECL(doversion);          /**/
 extern int NDECL(doextversion);       /**/
@@ -3133,7 +3133,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'x', "swap", "swap wielded and secondary weapons", doswapweapon },
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
     { 'A', "takeoffall", "remove all armor", doddoremarm },
-    { C('t'), "teleport", "teleport around the level", dotele, IFBURIED },
+    { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
     { '\0', "terrain", "show map without obstructions",
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
