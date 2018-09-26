@@ -403,7 +403,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     register struct objclass *ocl = &objects[typ];
     int nn = ocl->oc_name_known, omndx = obj->corpsenm;
     const char *actualn = OBJ_NAME(*ocl);
-    const char *dn = OBJ_DESCR(*ocl) ? OBJ_DESCR(*ocl) : actualn;
+    const char *dn = OBJ_DESCR(*ocl);
     const char *un = ocl->oc_uname;
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
@@ -411,6 +411,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);
+    /* 3.6.2: this used to be part of 'dn's initialization, but it
+       needs to come after possibly overriding 'actualn' */
+    if (!dn)
+        dn = actualn;
 
     buf[0] = '\0';
     /*
