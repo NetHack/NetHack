@@ -397,14 +397,24 @@ doextlist(VOID_ARGS)
 
         if (!*searchbuf) {
             any.a_int = 2;
-            add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+            /* was 's', but then using ':' handling within the interface
+               would only examine the two or three meta entries, not the
+               actual list of extended commands shown via separator lines;
+               having ':' as an explicit selector overrides the default
+               menu behavior for it; we retain 's' as a group accelerator */
+            add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
                      "Search extended commands", MENU_UNSELECTED);
         } else {
             Strcpy(buf, "Show all, clear search");
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
-            add_menu(menuwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
+            /* specifying ':' as a group accelerator here is mostly a
+               statement of intent (we'd like to accept it as a synonym but
+               also want to hide it from general menu use) because it won't
+               work for interfaces which support ':' to search; use as a
+               general menu command takes precedence over group accelerator */
+            add_menu(menuwin, NO_GLYPH, &any, 's', ':', ATR_NONE,
                      buf, MENU_UNSELECTED);
         }
         if (wizard) {
@@ -413,7 +423,7 @@ doextlist(VOID_ARGS)
                      onelist ? "Show debugging commands in separate section"
                      : "Show all alphabetically, including debugging commands",
                      MENU_UNSELECTED);
-	}
+        }
         any = zeroany;
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
@@ -432,8 +442,13 @@ doextlist(VOID_ARGS)
                     continue;
                 /* if searching, skip this command if it doesn't match */
                 if (*searchbuf
+                    /* first try case-insensitive substring match */
                     && !strstri(efp->ef_txt, searchbuf)
-                    && !strstri(efp->ef_desc, searchbuf))
+                    && !strstri(efp->ef_desc, searchbuf)
+                    /* wildcard support; most interfaces use case-insensitve
+                       pmatch rather than regexp for menu searching */
+                    && !pmatchi(searchbuf, efp->ef_txt)
+                    && !pmatchi(searchbuf, efp->ef_desc))
                     continue;
                 /* skip wizard mode commands if not in wizard mode;
                    when showing two sections, skip wizard mode commands
@@ -478,7 +493,7 @@ doextlist(VOID_ARGS)
                 menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
                 redisplay = TRUE;
                 break;
-            case 2: /* 's' when not searching yet: enable search */
+            case 2: /* ':' when not searching yet: enable search */
                 search = TRUE;
                 break;
             case 3: /* 's' when already searching: disable search */
@@ -492,7 +507,7 @@ doextlist(VOID_ARGS)
                 onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
                 redisplay = TRUE;
                 break;
-	    }
+            }
             free((genericptr_t) selected);
         } else {
             search = FALSE;
