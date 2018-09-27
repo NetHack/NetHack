@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "August 30, 2018
+.ds f2 "September 26, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -1121,10 +1121,6 @@ and go directly to removing a saddle.
 Default key is 'M-l', and 'l' if
 .op number_pad
 is on.
-.lp #monpolycontrol
-Control monster polymorphs.
-Autocompletes.
-Debug mode only.
 .lp #monster
 Use a monster's special ability (when polymorphed into monster form).
 Autocompletes. Default key is 'M-m'.
@@ -1316,12 +1312,8 @@ Show what type of thing a symbol corresponds to. Default key is '/'.
 Wield a weapon. Default key is 'w'.
 .lp #wipe
 Wipe off your face. Autocompletes. Default key is 'M-w'.
-.lp #wizdebug_bury
+.lp #wizbury
 Bury objects under and around you.
-Autocompletes.
-Debug mode only.
-.lp #wizdebug_traveldisplay
-Toggle travel display.
 Autocompletes.
 Debug mode only.
 .lp #wizdetect
@@ -2895,6 +2887,13 @@ Default '.'.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default ','.
+." .lp menu_tab_sep
+." Format menu entries using TAB to separate columns (default off).
+." Only applicable to some menus, and only useful to some interfaces.
+." Debug mode only.
+.lp monpolycontrol
+Prompt for new form whenever any monster changes shape (default off).
+Debug mode only.
 .lp msghistory
 The number of top line messages to save (and recall with ^P) (default 20).
 Cannot be set with the `O' command.
@@ -3100,6 +3099,9 @@ used `teleport' only.  Whether or not the effect is noticeable will
 depend upon the window port used or on the type of terminal.  Persistent.
 .lp safe_pet
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+.lp sanity_check
+Evaluate monsters, objects, and map prior to each turn (default off).
+Debug mode only.
 .lp scores
 Control what parts of the score list you are shown at the end (ex.
 ``scores:5 top scores/4 around my score/own scores'').  Only the first
@@ -3172,6 +3174,9 @@ the score list around after game end on a terminal or emulating window.
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
 mouse clicks on the map window.  Persistent.
+." .lp travel_debug
+." Display intended path during each step of travel (default off).
+." Debug mode only.
 .lp verbose
 Provide more commentary during the game (default on).  Persistent.
 .lp whatis_coord
@@ -3227,6 +3232,9 @@ move by skipping the same glyphs.
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
 Cannot be set with the `O' command.
+.lp wizweight
+Augment object descriptions with their objects' weight (default off).
+Debug mode only.
 .lp zerocomp
 When writing out a save file, perform zero-comp compression of the
 contents. Not all ports support zero-comp compression. It has no effect

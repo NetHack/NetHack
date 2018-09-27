@@ -257,6 +257,7 @@ struct instance_flags {
     boolean getloc_usemenu;
     boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
+    boolean trav_debug;    /* display travel path (#if DEBUG only) */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */

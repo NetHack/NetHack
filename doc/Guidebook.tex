@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{August 30, 2018}
+\date{September 26, 2018}
 
 \maketitle
 
@@ -1244,11 +1244,6 @@ Default key is '{\tt M-l}', and '{\tt l}' if {\it number\verb+_+pad\/} is on.
 Precede with the `{\tt m}' prefix to skip containers at your location
 and go directly to removing a saddle.
 %.lp
-\item[\tb{\#monpolycontrol}]
-Control monster polymorphs.
-Autocompletes.
-Debug mode only.
-%.lp
 \item[\tb{\#monster}]
 Use a monster's special ability (when polymorphed into monster form).
 Autocompletes. Default key is '{\tt M-m}'.
@@ -1494,13 +1489,8 @@ Wield a weapon. Default key is '{\tt w}'.
 \item[\tb{\#wipe}]
 Wipe off your face. Autocompletes. Default key is '{\tt M-w}'.
 %.lp
-\item[\tb{\#wizdebug\verb+_+bury}]
+\item[\tb{\#wizbury}]
 Bury objects under and around you.
-Autocompletes.
-Debug mode only.
-%.lp
-\item[\tb{\#wizdebug\verb+_+traveldisplay}]
-Toggle travel display.
 Autocompletes.
 Debug mode only.
 %.lp
@@ -3370,6 +3360,15 @@ Default `.'.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
+% %.lp
+% \item[\ib{menu\verb+_+tab\verb+_+sep}]
+% Format menu entries using TAB to separate columns (default off).
+% Only applicable to some menus, and only useful to some interfaces.
+% Debug mode only.
+%.lp
+\item[\ib{monpolycontrol}]
+Prompt for new form whenever any monster changes shape (default off).
+Debug mode only.
 %.lp
 \item[\ib{msghistory}]
 The number of top line messages to save (and recall with `{\tt \^{}P}')
@@ -3608,6 +3607,10 @@ depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+%+.lp
+\item[\ib{sanity\verb+_+check}]
++Evaluate monsters, objects, and map prior to each turn (default off).
++Debug mode only.
 %.lp
 \item[\ib{scores}]
 Control what parts of the score list you are shown at the end (ex.\
@@ -3698,6 +3701,10 @@ the score list around after game end on a terminal or emulating window.
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
 mouse clicks on the map window.  Persistent.
+% %.lp
+% \item[ib{travel\verb+_+debug}]
+% Display intended path during each step of travel (default off).
+% Debug mode only.
 %.lp
 \item[\ib{verbose}]
 Provide more commentary during the game (default on).  Persistent.
@@ -3765,6 +3772,10 @@ move by skipping the same glyphs.
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on version).
 Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{wizweight}]
+Augment object descriptions with their objects' weight (default off).
+Debug mode only.
 %.lp
 \item[\ib{zerocomp}]
 When writing out a save file, perform zero-comp compression of the

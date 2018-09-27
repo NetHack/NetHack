@@ -897,17 +897,6 @@ int mode;
     return TRUE;
 }
 
-#ifdef DEBUG
-static boolean trav_debug = FALSE;
-
-/* in this case, toggle display of travel debug info */
-int wiz_debug_cmd_traveldisplay()
-{
-    trav_debug = !trav_debug;
-    return 0;
-}
-#endif /* DEBUG */
-
 /*
  * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
  * A shortest path is returned.  If guess is TRUE, consider various
@@ -1065,7 +1054,7 @@ int mode;
             }
 
 #ifdef DEBUG
-            if (trav_debug) {
+            if (iflags.trav_debug) {
                 /* Use of warning glyph is arbitrary. It stands out. */
                 tmp_at(DISP_ALL, warning_to_glyph(1));
                 for (i = 0; i < nn; ++i) {
@@ -1121,7 +1110,7 @@ int mode;
                 goto found;
             }
 #ifdef DEBUG
-            if (trav_debug) {
+            if (iflags.trav_debug) {
                 /* Use of warning glyph is arbitrary. It stands out. */
                 tmp_at(DISP_ALL, warning_to_glyph(2));
                 tmp_at(px, py);
