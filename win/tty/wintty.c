@@ -187,6 +187,7 @@ STATIC_DCL int NDECL(condition_size);
 STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
 STATIC_DCL void FDECL(shrink_enc, (int));
 STATIC_DCL void FDECL(shrink_dlvl, (int));
+STATIC_DCL void NDECL(do_setlast);
 #endif
 
 /*
@@ -3530,7 +3531,8 @@ static const char *encvals[3][6] = {
     { "", "Burden", "Stress", "Strain", "Overtax", "Overload" },
     { "", "Brd", "Strs", "Strn", "Ovtx", "Ovld" }
 };
-static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
+#define MAX_PER_ROW 15
+static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: two status lines */
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
       BL_FLUSH },
@@ -3539,6 +3541,8 @@ static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
       BL_CAP, BL_CONDITION, BL_FLUSH }
 };
 
+static int last_on_row[2];
+static boolean setlast = FALSE;
 static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
 static int enclev = 0, enc_shrinklvl = 0;
@@ -3584,6 +3588,7 @@ tty_status_init()
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
+        tty_status[NOW][i].padright = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3592,6 +3597,24 @@ tty_status_init()
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
+}
+
+void
+do_setlast()
+{
+    int i, row, fld;
+
+    setlast = TRUE;
+    for (row = 0; row < 2; ++row)
+        for (i = MAX_PER_ROW - 1; i ; --i) {
+           fld = fieldorder[row][i];
+
+           if (fld == BL_FLUSH || !status_activefields[fld])
+                continue;
+
+           last_on_row[row] = fld;
+           break;
+	}
 }
 
 #ifdef STATUS_HILITES
@@ -3671,6 +3694,9 @@ unsigned long *colormasks;
 
     if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
         return;
+
+    if (!setlast)
+        do_setlast();
 
 #ifndef TEXTCOLOR
     color = (color & ~0x00FF) | NO_COLOR;
@@ -3845,8 +3871,12 @@ int *topsz, *bottomsz;
 
             /* On a change to the field length, everything 
                further to the right must be updated as well */
-            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
+            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth) {
                 update_right = TRUE;
+                if ((tty_status[NOW][idx].lth < tty_status[BEFORE][idx].lth) &&
+                        idx == last_on_row[row])
+                    tty_status[NOW][idx].padright = TRUE;
+            }
 
             if (!update_right && !forcefields) {
                 /*
@@ -4291,17 +4321,28 @@ render_status(VOID_ARGS)
                             term_start_color(coloridx);
                     }
                     tty_putstatusfield(&tty_status[NOW][fldidx],
-                                       text, x, y);
+                                       text, x, y);                    
                     if (iflags.hilite_delta) {
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         End_Attr(attridx);
                     }
+                    if (tty_status[NOW][fldidx].padright) {
+                        int cnt = tty_status[BEFORE][fldidx].lth
+                                     - tty_status[NOW][fldidx].lth;
+
+                        while (cnt > 0) {
+                            x += (tty_status[NOW][fldidx].lth - 1);
+                            tty_putstatusfield(nullfield, " ", x++, y);
+                            --cnt;
+                        }
+                    }
                 }
             }
-            /* reset .redraw and .dirty now that they've been rendered */
+            /* reset .redraw, .dirty, .padright now that they've been rendered */
             tty_status[NOW][fldidx].dirty  = FALSE;
             tty_status[NOW][fldidx].redraw = FALSE;
+            tty_status[NOW][fldidx].padright = FALSE;
 
             /*
              * Make a copy of the entire tty_status struct for comparison
