@@ -4331,11 +4331,9 @@ render_status(VOID_ARGS)
                         int cnt = tty_status[BEFORE][fldidx].lth
                                      - tty_status[NOW][fldidx].lth;
 
-                        while (cnt > 0) {
-                            x += (tty_status[NOW][fldidx].lth - 1);
+                        x += (tty_status[NOW][fldidx].lth - 1);
+                        while (cnt-- > 0)
                             tty_putstatusfield(nullfield, " ", x++, y);
-                            --cnt;
-                        }
                     }
                 }
             }
