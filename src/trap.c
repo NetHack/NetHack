@@ -886,8 +886,7 @@ unsigned trflags;
         /* then proceed to normal trap effect */
     } else if (already_seen && !forcetrap) {
         if ((Levitation || (Flying && !plunged))
-            && (is_pit(ttype) || ttype == HOLE
-                || ttype == BEAR_TRAP)) {
+            && (is_pit(ttype) || ttype == HOLE || ttype == BEAR_TRAP)) {
             You("%s over %s %s.", Levitation ? "float" : "fly",
                 a_your[trap->madeby_u],
                 defsyms[trap_to_defsym(ttype)].explanation);
@@ -1198,16 +1197,23 @@ unsigned trflags;
             if (ttype == SPIKED_PIT) {
                 oldumort = u.umortality;
                 losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
+                       /* note: these don't need locomotion() handling;
+                          if fatal while poly'd and Unchanging, the
+                          death reason will be overridden with
+                          "killed while stuck in creature form" */
                        plunged
-                           ? "deliberately plunged into a pit of iron spikes"
-                           : conj_pit ? "stepped into a pit of iron spikes"
-                           : adj_pit ? "stumbled into a pit of iron spikes"
-                                     : "fell into a pit of iron spikes",
+                          ? "deliberately plunged into a pit of iron spikes"
+                          : conj_pit
+                             ? "stepped into a pit of iron spikes"
+                             : adj_pit
+                                ? "stumbled into a pit of iron spikes"
+                                : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                     poisoned("spikes", A_STR,
-                             (conj_pit || adj_pit) ? "stepping on poison spikes"
-                                     : "fall onto poison spikes",
+                             (conj_pit || adj_pit)
+                                ? "stepping on poison spikes"
+                                : "fall onto poison spikes",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
@@ -3912,7 +3918,14 @@ struct trap *ttmp;
            there are objects covering this trap */
         ttmp->tseen = 0; /* hack for check_here() */
         /* trigger the trap */
+        iflags.failing_untrap++; /* spoteffects() -> dotrap(,FORCETRAP) */
         spoteffects(TRUE); /* pickup() + dotrap() */
+        iflags.failing_untrap--;
+        /* this should no longer be necessary; before the failing_untrap
+           hack, Flying hero would not trigger an unseen bear trap and
+           setting it not-yet-seen above resulted in leaving it hidden */
+        if ((ttmp = t_at(u.ux, u.uy)) != 0)
+            ttmp->tseen = 1;
         exercise(A_WIS, FALSE);
     }
 }
@@ -3991,16 +4004,6 @@ boolean force_failure;
                 }
             } else if (under_u) {
                 dotrap(ttmp, 0);
-            } else if (ttype == BEAR_TRAP && (Levitation || Flying)) {
-                /* There was a report of oddities of the trap
-                   vanishing from view due to tseen being cleared
-                   (which was deliberate to work around a check_here()
-                   issue). Since you won't actually end up in the trap
-                   during the #untrap operation anyway due to
-                   Levitation and Flying checks further along,
-                   just avoid the whole "vanishing trap" scenario
-                   by failing the #untrap operation right here. */
-                You("couldn't reach it from your vantage point.");
             } else {
                 move_into_trap(ttmp);
             }
