@@ -103,7 +103,7 @@ struct window_procs tty_procs = {
 #endif
     tty_getmsghistory, tty_putmsghistory,
     tty_status_init,
-    genl_status_finish, genl_status_enablefield,
+    genl_status_finish, tty_status_enablefield,
 #ifdef STATUS_HILITES
     tty_status_update,
 #else
@@ -3600,13 +3600,25 @@ tty_status_init()
 }
 
 void
+tty_status_enablefield(fieldidx, nm, fmt, enable)
+int fieldidx;
+const char *nm;
+const char *fmt;
+boolean enable;
+{
+    genl_status_enablefield(fieldidx, nm, fmt, enable);
+    /* force re-evaluation of last field on the row */
+    setlast = FALSE;
+}
+
+void
 do_setlast()
 {
     int i, row, fld;
 
     setlast = TRUE;
     for (row = 0; row < 2; ++row)
-        for (i = MAX_PER_ROW - 1; i ; --i) {
+        for (i = MAX_PER_ROW - 1; i > 0; --i) {
            fld = fieldorder[row][i];
 
            if (fld == BL_FLUSH || !status_activefields[fld])
