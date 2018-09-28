@@ -2042,6 +2042,7 @@ boolean pick;
 
     struct monst *mtmp;
     struct trap *trap = t_at(u.ux, u.uy);
+    int trapflag = iflags.failing_untrap ? FORCETRAP : 0;
 
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
@@ -2107,7 +2108,7 @@ boolean pick;
             if (!spottrap || spottraptyp != trap->ttyp) {
                 spottrap = trap;
                 spottraptyp = trap->ttyp;
-                dotrap(trap, 0); /* fall into arrow trap, etc. */
+                dotrap(trap, trapflag); /* fall into arrow trap, etc. */
                 spottrap = (struct trap *) 0;
                 spottraptyp = NO_TRAP;
             }
