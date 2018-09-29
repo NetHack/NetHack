@@ -168,6 +168,8 @@ tty: turn off an optimization that is the suspected cause of Windows reported
 tty: ensure that current status fields are always copied to prior status
 	values so that comparisons are correct
 tty: fix an out of bounds error in tty_status_update() for BL_HUNGER case
+tty: fix leftover display artifact when last field on the row got smaller
+	and optimize so only the right-most field requires the cleanup code
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 
@@ -229,6 +231,9 @@ wizard mode #wizidentify can now select individual items for permanent
 	identify everything if everything is already fully identified
 spiders will occasionally spin webs when moving around
 make mine town "orctown" variation a multiple level feature of the mines
+replace #monpolycontrol command with monpolycontrol boolean option
+replace #wizdebug_traveldisplay command with travel_debug boolean option
+rename #wizdebug_bury command to #wizbury
 
 
 Code Cleanup and Reorganization

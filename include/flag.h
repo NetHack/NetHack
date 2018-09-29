@@ -240,11 +240,12 @@ struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
-    int parse_config_file_src;  /* hack for parse_config_line() */
+    int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
-    int purge_monsters;    /* # of dead monsters still on fmon list */
     int override_ID;       /* true to force full identification of objects */
+    int parse_config_file_src;  /* hack for parse_config_line() */
+    int purge_monsters;    /* # of dead monsters still on fmon list */
     int suppress_price;    /* controls doname() for unpaid objects */
     int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
 #define TER_MAP    0x01
@@ -257,6 +258,7 @@ struct instance_flags {
     boolean getloc_usemenu;
     boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
+    boolean trav_debug;    /* display travel path (#if DEBUG only) */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
