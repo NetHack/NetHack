@@ -168,8 +168,9 @@ tty: turn off an optimization that is the suspected cause of Windows reported
 tty: ensure that current status fields are always copied to prior status
 	values so that comparisons are correct
 tty: fix an out of bounds error in tty_status_update() for BL_HUNGER case
-tty: fix leftover display artifact when last field on the row got smaller
-	and optimize so only the right-most field requires the cleanup code
+tty: fix leftover display artifact when the last field on the row got placed
+	to the left of where it was previously due to it, or one of the fields
+	to its left, getting shorter
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
 

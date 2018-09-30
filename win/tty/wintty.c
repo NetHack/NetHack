@@ -3588,7 +3588,7 @@ tty_status_init()
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
-        tty_status[NOW][i].padright = FALSE;
+        tty_status[NOW][i].padright = 0;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3883,11 +3883,17 @@ int *topsz, *bottomsz;
 
             /* On a change to the field length, everything 
                further to the right must be updated as well */
-            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth) {
+            if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
-                if ((tty_status[NOW][idx].lth < tty_status[BEFORE][idx].lth) &&
-                        idx == last_on_row[row])
-                    tty_status[NOW][idx].padright = TRUE;
+
+            if (idx == last_on_row[row]) {
+                int prevright = tty_status[BEFORE][idx].x
+                                + tty_status[BEFORE][idx].lth,
+                    currright = tty_status[NOW][idx].x
+                                + tty_status[NOW][idx].lth;
+
+                    if (currright < prevright)
+                        tty_status[NOW][idx].padright = prevright - currright;
             }
 
             if (!update_right && !forcefields) {
@@ -4339,10 +4345,11 @@ render_status(VOID_ARGS)
                             term_end_color();
                         End_Attr(attridx);
                     }
-                    if (tty_status[NOW][fldidx].padright) {
-                        int cnt = tty_status[BEFORE][fldidx].lth
-                                     - tty_status[NOW][fldidx].lth;
+                    if (tty_status[NOW][fldidx].padright > 0) {
+                        int cnt = tty_status[NOW][fldidx].padright;
 
+                        /* .lth - 1 below because we already did the leading
+                           blank above */
                         x += (tty_status[NOW][fldidx].lth - 1);
                         while (cnt-- > 0)
                             tty_putstatusfield(nullfield, " ", x++, y);
@@ -4352,7 +4359,7 @@ render_status(VOID_ARGS)
             /* reset .redraw, .dirty, .padright now that they've been rendered */
             tty_status[NOW][fldidx].dirty  = FALSE;
             tty_status[NOW][fldidx].redraw = FALSE;
-            tty_status[NOW][fldidx].padright = FALSE;
+            tty_status[NOW][fldidx].padright = 0;
 
             /*
              * Make a copy of the entire tty_status struct for comparison
