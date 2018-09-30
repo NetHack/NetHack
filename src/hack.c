@@ -2058,7 +2058,7 @@ boolean pick;
 
     struct monst *mtmp;
     struct trap *trap = t_at(u.ux, u.uy);
-    int trapflag = iflags.failing_untrap ? FORCETRAP : 0;
+    int trapflag = iflags.failing_untrap ? FAILEDUNTRAP : 0;
 
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts

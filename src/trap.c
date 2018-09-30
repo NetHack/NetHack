@@ -894,7 +894,8 @@ unsigned trflags;
     register int ttype = trap->ttyp;
     struct obj *otmp;
     boolean already_seen = trap->tseen,
-            forcetrap = (trflags & FORCETRAP) != 0,
+            forcetrap = ((trflags & FORCETRAP) != 0
+                         || (trflags & FAILEDUNTRAP) != 0),
             webmsgok = (trflags & NOWEBMSG) == 0,
             forcebungle = (trflags & FORCEBUNGLE) != 0,
             plunged = (trflags & TOOKPLUNGE) != 0,
@@ -3989,7 +3990,7 @@ struct trap *ttmp;
            there are objects covering this trap */
         ttmp->tseen = 0; /* hack for check_here() */
         /* trigger the trap */
-        iflags.failing_untrap++; /* spoteffects() -> dotrap(,FORCETRAP) */
+        iflags.failing_untrap++; /* spoteffects() -> dotrap(,FAILEDUNTRAP) */
         spoteffects(TRUE); /* pickup() + dotrap() */
         iflags.failing_untrap--;
         /* this should no longer be necessary; before the failing_untrap
@@ -4074,7 +4075,8 @@ boolean force_failure;
                         pline("%s remains entangled.", Monnam(mtmp));
                 }
             } else if (under_u) {
-                dotrap(ttmp, 0);
+                /* [don't need the iflags.failing_untrap hack here] */
+                dotrap(ttmp, FAILEDUNTRAP);
             } else {
                 move_into_trap(ttmp);
             }
