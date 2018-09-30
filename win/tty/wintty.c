@@ -3541,7 +3541,8 @@ static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: two status lines *
       BL_CAP, BL_CONDITION, BL_FLUSH }
 };
 
-static int last_on_row[2];
+static int last_on_row[2];  /* [rows] */
+static int finalx[2][2];    /* [rows][NOW or BEFORE] */
 static boolean setlast = FALSE;
 static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
@@ -3588,7 +3589,7 @@ tty_status_init()
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
-        tty_status[NOW][i].padright = 0;
+        tty_status[NOW][i].last_on_row = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3886,15 +3887,8 @@ int *topsz, *bottomsz;
             if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
 
-            if (idx == last_on_row[row]) {
-                int prevright = tty_status[BEFORE][idx].x
-                                + tty_status[BEFORE][idx].lth,
-                    currright = tty_status[NOW][idx].x
-                                + tty_status[NOW][idx].lth;
-
-                    if (currright < prevright)
-                        tty_status[NOW][idx].padright = prevright - currright;
-            }
+            if (idx == last_on_row[row])
+                tty_status[NOW][idx].last_on_row = TRUE;
 
             if (!update_right && !forcefields) {
                 /*
@@ -4182,22 +4176,22 @@ render_status(VOID_ARGS)
     for (row = 0; row < 2; ++row) {
         curs(WIN_STATUS, 1, row);
         for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
-            int fldidx = fieldorder[row][i];
+            int idx = fieldorder[row][i];
 
-            if (!status_activefields[fldidx])
+            if (!status_activefields[idx])
                 continue;
 
-            if ((tty_status[NOW][fldidx].lth || fldidx == BL_CONDITION)
-                 && (tty_status[NOW][fldidx].redraw || !do_field_opt)) {
-                int coloridx = tty_status[NOW][fldidx].color;
-                int attridx = tty_status[NOW][fldidx].attr;
-                int x = tty_status[NOW][fldidx].x;
+            if ((tty_status[NOW][idx].lth || idx == BL_CONDITION)
+                 && (tty_status[NOW][idx].redraw || !do_field_opt)) {
+                int coloridx = tty_status[NOW][idx].color;
+                int attridx = tty_status[NOW][idx].attr;
+                int x = tty_status[NOW][idx].x;
                 int y = row;
-                char *text = status_vals[fldidx];
-                boolean hitpointbar = (fldidx == BL_TITLE
+                char *text = status_vals[idx];
+                boolean hitpointbar = (idx == BL_TITLE
                                        && iflags.wc2_hitpointbar);
 
-                if (fldidx == BL_CONDITION) {
+                if (idx == BL_CONDITION) {
                     /*
                      * +-----------------+
                      * | Condition Codes |
@@ -4241,7 +4235,7 @@ render_status(VOID_ARGS)
                     }
                     tty_curs(WIN_STATUS, x, y);
                     cl_end();
-                } else if (fldidx == BL_GOLD) {
+                } else if (idx == BL_GOLD) {
                     char buf[BUFSZ];
                     /*
                      * +-----------+
@@ -4318,7 +4312,7 @@ render_status(VOID_ARGS)
                         }
                         tty_putstatusfield(nullfield, "]", x++, y);
                     } else {
-                        tty_putstatusfield(&tty_status[NOW][fldidx],
+                        tty_putstatusfield(&tty_status[NOW][idx],
                                            (char *) 0, x, y);
                     }
                 } else {
@@ -4338,34 +4332,37 @@ render_status(VOID_ARGS)
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(coloridx);
                     }
-                    tty_putstatusfield(&tty_status[NOW][fldidx],
+                    tty_putstatusfield(&tty_status[NOW][idx],
                                        text, x, y);                    
                     if (iflags.hilite_delta) {
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         End_Attr(attridx);
                     }
-                    if (tty_status[NOW][fldidx].padright > 0) {
-                        int cnt = tty_status[NOW][fldidx].padright;
-
-                        /* .lth - 1 below because we already did the leading
-                           blank above */
-                        x += (tty_status[NOW][fldidx].lth - 1);
-                        while (cnt-- > 0)
-                            tty_putstatusfield(nullfield, " ", x++, y);
-                    }
                 }
+                if (tty_status[NOW][idx].last_on_row) {
+                    int padright = 0;
+
+                    x = tty_status[NOW][idx].x + tty_status[NOW][idx].lth;
+                    finalx[row][NOW] = x - 1;
+                    if (finalx[row][NOW] < finalx[row][BEFORE])
+                        padright = finalx[row][BEFORE] - finalx[row][NOW];
+                    while (padright-- > 0)
+                        tty_putstatusfield(nullfield, " ", x++, y);
+                }    
             }
             /* reset .redraw, .dirty, .padright now that they've been rendered */
-            tty_status[NOW][fldidx].dirty  = FALSE;
-            tty_status[NOW][fldidx].redraw = FALSE;
-            tty_status[NOW][fldidx].padright = 0;
+            tty_status[NOW][idx].dirty  = FALSE;
+            tty_status[NOW][idx].redraw = FALSE;
+            tty_status[NOW][idx].last_on_row = FALSE;
 
             /*
-             * Make a copy of the entire tty_status struct for comparison
-             * of current and previous.
+             * For comparison of current and previous,
+             * - Copy the entire tty_status struct.
+             * - Copy the last written column number on the line.
              */
-             tty_status[BEFORE][fldidx] = tty_status[NOW][fldidx];
+             tty_status[BEFORE][idx] = tty_status[NOW][idx];
+             finalx[row][BEFORE] = finalx[row][NOW];
         }
     }
     if (cond_disp_width[NOW] < cond_width_at_shrink) {

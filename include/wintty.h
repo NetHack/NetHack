@@ -75,11 +75,11 @@ struct tty_status_fields {
     int color;
     int attr;
     int x, y;
-    int padright;
     size_t lth;
     boolean valid;
     boolean dirty;
     boolean redraw;
+    boolean last_on_row;
 };
 #endif
 
