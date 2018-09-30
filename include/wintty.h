@@ -79,7 +79,7 @@ struct tty_status_fields {
     boolean valid;
     boolean dirty;
     boolean redraw;
-    boolean padright;
+    boolean last_on_row;
 };
 #endif
 
