@@ -703,11 +703,12 @@ xchar x, y;
     }
 
     if (x != u.ux || y != u.uy) {
+        static const char *pullmsg = "The ball pulls you out of the %s!";
         struct trap *t;
-        const char *pullmsg = "The ball pulls you out of the %s!";
+        long side;
 
-        if (u.utrap && u.utraptype != TT_INFLOOR
-            && u.utraptype != TT_BURIEDBALL) {
+        if (u.utrap
+            && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
                 pline(pullmsg, "pit");
@@ -720,8 +721,8 @@ xchar x, y;
             case TT_LAVA:
                 pline(pullmsg, hliquid("lava"));
                 break;
-            case TT_BEARTRAP: {
-                register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+            case TT_BEARTRAP:
+                side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 pline(pullmsg, "bear trap");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
@@ -734,8 +735,7 @@ xchar x, y;
                 }
                 break;
             }
-            }
-            u.utrap = 0;
+            reset_utrap(TRUE);
             fill_pit(u.ux, u.uy);
         }
 

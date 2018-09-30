@@ -289,7 +289,7 @@ boolean allow_drag;
             }
         }
     }
-    u.utrap = 0;
+    reset_utrap(FALSE);
     u.ustuck = 0;
     u.ux0 = u.ux;
     u.uy0 = u.uy;

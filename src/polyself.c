@@ -86,7 +86,10 @@ set_uasmon()
     PROPSET(TELEPORT, can_teleport(mdat));
     PROPSET(TELEPORT_CONTROL, control_teleport(mdat));
     PROPSET(LEVITATION, is_floater(mdat));
-    PROPSET(FLYING, is_flyer(mdat));
+    /* floating eye is the only 'floater'; it is also flagged as a 'flyer';
+       suppress flying for it so that enlightenment doesn't confusingly
+       show latent flight capability always blocked by levitation */
+    PROPSET(FLYING, (is_flyer(mdat) && !is_floater(mdat)));
     PROPSET(SWIMMING, is_swimmer(mdat));
     /* [don't touch MAGICAL_BREATHING here; both Amphibious and Breathless
        key off of it but include different monster forms...] */
@@ -116,12 +119,21 @@ set_uasmon()
 void
 float_vs_flight()
 {
-    /* floating overrides flight; normally float_up() and float_down()
-       handle this, but sometimes they're skipped */
-    if (HLevitation || ELevitation)
+    boolean stuck_in_floor = (u.utrap && u.utraptype != TT_PIT);
+
+    /* floating overrides flight; so does being trapped in the floor */
+    if ((HLevitation || ELevitation)
+        || ((HFlying || EFlying) && stuck_in_floor))
         BFlying |= I_SPECIAL;
     else
         BFlying &= ~I_SPECIAL;
+    /* being trapped on the ground (bear trap, web, molten lava survived
+       with fire resistance, former lava solidified via cold, tethered
+       to a buried iron ball) overrides floating--the floor is reachable */
+    if ((HLevitation || ELevitation) && stuck_in_floor)
+        BLevitation |= I_SPECIAL;
+    else
+        BLevitation &= ~I_SPECIAL;
     context.botl = TRUE;
 }
 
@@ -207,8 +219,8 @@ const char *fmt, *arg;
     if (u.twoweap && !could_twoweap(youmonst.data))
         untwoweapon();
 
-    if (u.utraptype == TT_PIT && u.utrap) {
-        u.utrap = rn1(6, 2); /* time to escape resets */
+    if (u.utrap && u.utraptype == TT_PIT) {
+        set_utrap(rn1(6, 2), TT_PIT); /* time to escape resets */
     }
     if (was_blind && !Blind) { /* reverting from eyeless */
         Blinded = 1L;
@@ -725,8 +737,8 @@ int mntmp;
     drop_weapon(1);
     (void) hideunder(&youmonst);
 
-    if (u.utraptype == TT_PIT && u.utrap) {
-        u.utrap = rn1(6, 2); /* time to escape resets */
+    if (u.utrap && u.utraptype == TT_PIT) {
+        set_utrap(rn1(6, 2), TT_PIT); /* time to escape resets */
     }
     if (was_blind && !Blind) { /* previous form was eyeless */
         Blinded = 1L;
@@ -794,17 +806,17 @@ int mntmp;
         spoteffects(TRUE);
     if (Passes_walls && u.utrap
         && (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
-        u.utrap = 0;
-        if (u.utraptype == TT_INFLOOR)
+        if (u.utraptype == TT_INFLOOR) {
             pline_The("rock seems to no longer trap you.");
-        else {
+        } else {
             pline_The("buried ball is no longer bound to you.");
             buried_ball_to_freedom();
         }
+        reset_utrap(TRUE);
     } else if (likes_lava(youmonst.data) && u.utrap
                && u.utraptype == TT_LAVA) {
-        u.utrap = 0;
         pline_The("%s now feels soothing.", hliquid("lava"));
+        reset_utrap(TRUE);
     }
     if (amorphous(youmonst.data) || is_whirly(youmonst.data)
         || unsolid(youmonst.data)) {
@@ -823,11 +835,11 @@ int mntmp;
         You("are no longer stuck in the %s.",
             u.utraptype == TT_WEB ? "web" : "bear trap");
         /* probably should burn webs too if PM_FIRE_ELEMENTAL */
-        u.utrap = 0;
+        reset_utrap(TRUE);
     }
     if (webmaker(youmonst.data) && u.utrap && u.utraptype == TT_WEB) {
         You("orient yourself on the web.");
-        u.utrap = 0;
+        reset_utrap(TRUE);
     }
     check_strangling(TRUE); /* maybe start strangling */
 

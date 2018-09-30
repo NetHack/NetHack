@@ -1683,9 +1683,9 @@ mkinvokearea()
 
     /* any trap hero is stuck in will be going away now */
     if (u.utrap) {
-        u.utrap = 0;
         if (u.utraptype == TT_BURIEDBALL)
             buried_ball_to_punishment();
+        reset_utrap(FALSE);
     }
     mkinvpos(xmin, ymin, 0); /* middle, before placing stairs */
 

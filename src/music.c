@@ -254,14 +254,10 @@ int force;
     start_y = u.uy - (force * 2);
     end_x = u.ux + (force * 2);
     end_y = u.uy + (force * 2);
-    if (start_x < 1)
-        start_x = 1;
-    if (start_y < 1)
-        start_y = 1;
-    if (end_x >= COLNO)
-        end_x = COLNO - 1;
-    if (end_y >= ROWNO)
-        end_y = ROWNO - 1;
+    start_x = max(start_x, 1);
+    start_y = max(start_y, 0);
+    end_x = min(end_x, COLNO - 1);
+    end_y = min(end_y, ROWNO - 1);
     for (x = start_x; x <= end_x; x++)
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
@@ -311,6 +307,11 @@ int force;
                         break; /* no pit if portal at that location */
                     chasm->tseen = 1;
 
+                    /* TODO:
+                     * This ought to be split into a separate routine to
+                     * reduce indentation and the consequent line-wraps.
+                     */
+
                     levl[x][y].doormask = 0;
                     /*
                      * Let liquid flow into the newly created chasm.
@@ -328,8 +329,8 @@ int force;
                     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                         if (cansee(x, y))
                             pline("KADOOM! The boulder falls into a chasm%s!",
-                                  ((x == u.ux) && (y == u.uy)) ? " below you"
-                                                               : "");
+                                  (x == u.ux && y == u.uy) ? " below you"
+                                                           : "");
                         if (mtmp)
                             mtmp->mtrapped = 0;
                         obj_extract_self(otmp);
@@ -343,6 +344,7 @@ int force;
                         if (!is_flyer(mtmp->data)
                             && !is_clinger(mtmp->data)) {
                             boolean m_already_trapped = mtmp->mtrapped;
+
                             mtmp->mtrapped = 1;
                             if (!m_already_trapped) { /* suppress messages */
                                 if (cansee(x, y))
@@ -375,6 +377,16 @@ int force;
                             }
                         }
                     } else if (x == u.ux && y == u.uy) {
+                        if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+                            /* Note:  the chain should break if a pit gets
+                               created at the buried ball's location, which
+                               is not necessarily here.  But if we don't do
+                               things this way, entering the new pit below
+                               will override current trap anyway, but too
+                               late to get Lev and Fly handling. */
+                            Your("chain breaks!");
+                            reset_utrap(TRUE);
+                        }
                         if (Levitation || Flying
                             || is_clinger(youmonst.data)) {
                             if (!tu_pit) { /* no pit here previously */
@@ -384,10 +396,9 @@ int force;
                         } else if (!tu_pit || !u.utrap
                                    || (u.utrap && u.utraptype != TT_PIT)) {
                             /* no pit here previously, or you were
-                               not in it even it there was */
+                               not in it even if there was */
                             You("fall into a chasm!");
-                            u.utrap = rn1(6, 2);
-                            u.utraptype = TT_PIT;
+                            set_utrap(rn1(6, 2), TT_PIT);
                             losehp(Maybe_Half_Phys(rnd(6)),
                                    "fell into a chasm", NO_KILLER_PREFIX);
                             selftouch("Falling, you");
@@ -396,9 +407,9 @@ int force;
                                 ((Fumbling && !rn2(5))
                                  || (!rnl(Role_if(PM_ARCHEOLOGIST) ? 3 : 9))
                                  || ((ACURR(A_DEX) > 7) && rn2(5)));
+
                             You("are jostled around violently!");
-                            u.utrap = rn1(6, 2);
-                            u.utraptype = TT_PIT; /* superfluous */
+                            set_utrap(rn1(6, 2), TT_PIT);
                             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
                                    "hurt in a chasm", NO_KILLER_PREFIX);
                             if (keepfooting)
@@ -605,8 +616,8 @@ struct obj *instr;
             You("beat a deafening row!");
             incr_itimeout(&HDeaf, rn1(20, 30));
             exercise(A_WIS, FALSE);
-	} else
-	    You("%s %s.",
+        } else
+            You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));

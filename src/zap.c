@@ -4431,11 +4431,10 @@ short exploding_wand_typ;
                         vision_full_recalc = 1;
                     } else if (u.utrap && u.utraptype == TT_LAVA) {
                         if (Passes_walls) {
-                            u.utrap = 0;
                             You("pass through the now-solid rock.");
+                            reset_utrap(TRUE);
                         } else {
-                            u.utrap = rn1(50, 20);
-                            u.utraptype = TT_INFLOOR;
+                            set_utrap(rn1(50, 20), TT_INFLOOR);
                             You("are firmly stuck in the cooling rock.");
                         }
                     }
