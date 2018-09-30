@@ -1030,6 +1030,8 @@ int alone;
 void
 rehumanize()
 {
+    boolean was_flying = (Flying != 0);
+
     /* You can't revert back while unchanging */
     if (Unchanging) {
         if (u.mh < 1) {
@@ -1060,7 +1062,9 @@ rehumanize()
     context.botl = 1;
     vision_full_recalc = 1;
     (void) encumber_msg();
-
+    if (was_flying && !Flying && u.usteed)
+        You("and %s return gently to the %s.",
+            mon_nam(u.usteed), surface(u.ux, u.uy));
     retouch_equipment(2);
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);

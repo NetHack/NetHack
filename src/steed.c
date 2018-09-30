@@ -335,6 +335,8 @@ boolean force;      /* Quietly force this animal */
             /* Must have Lev_at_will at this point */
             pline("%s magically floats up!", Monnam(mtmp));
         You("mount %s.", mon_nam(mtmp));
+        if (Flying)
+            You("and %s take flight together.", mon_nam(mtmp));
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
