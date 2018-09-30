@@ -598,7 +598,7 @@ struct obj *instr;
         exercise(A_DEX, TRUE);
         break;
     case DRUM_OF_EARTHQUAKE: /* create several pits */
-        /* a drum of earthquake does cause not cause deafness
+        /* a drum of earthquake does not cause deafness
            while still magically functional, nor afterwards
            when it invokes the LEATHER_DRUM case instead and
            mundane is flagged */
