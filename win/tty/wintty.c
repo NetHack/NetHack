@@ -4349,7 +4349,7 @@ render_status(VOID_ARGS)
                         padright = finalx[row][BEFORE] - finalx[row][NOW];
                     while (padright-- > 0)
                         tty_putstatusfield(nullfield, " ", x++, y);
-                }    
+                }
             }
             /* reset .redraw, .dirty, .padright now that they've been rendered */
             tty_status[NOW][idx].dirty  = FALSE;
@@ -4357,13 +4357,16 @@ render_status(VOID_ARGS)
             tty_status[NOW][idx].last_on_row = FALSE;
 
             /*
-             * For comparison of current and previous,
+             * For comparison of current and previous:
              * - Copy the entire tty_status struct.
-             * - Copy the last written column number on the line.
              */
              tty_status[BEFORE][idx] = tty_status[NOW][idx];
-             finalx[row][BEFORE] = finalx[row][NOW];
         }
+        /*
+         * For comparison of current and previous:
+         * - Copy the last written column number on the row.
+         */
+        finalx[row][BEFORE] = finalx[row][NOW];
     }
     if (cond_disp_width[NOW] < cond_width_at_shrink) {
         cond_shrinklvl = 0;      /* reset */
