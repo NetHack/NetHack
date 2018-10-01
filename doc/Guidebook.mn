@@ -2601,7 +2601,8 @@ exclude that alignment from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp autodescribe
 Automatically describe the terrain under cursor when asked to get a location
-on the map.  The
+on the map (default true).
+The
 .op whatis_coord
 option controls whether the description includes map coordinates.
 .lp autodig
