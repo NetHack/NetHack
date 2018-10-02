@@ -162,8 +162,7 @@ mungspaces(char *bp)
 
 /* remove leading and trailing whitespace, in place */
 char*
-trimspaces(txt)
-char* txt;
+trimspaces(char* txt)
 {
     char* end;
 
@@ -178,8 +177,7 @@ char* txt;
 
 /* remove \n from end of line; remove \r too if one is there */
 char *
-strip_newline(str)
-char *str;
+strip_newline(char *str)
 {
     char *p = rindex(str, '\n');
 
@@ -202,8 +200,7 @@ eos(register char *s)
 
 /* determine whether 'str' ends in 'chkstr' */
 boolean
-str_end_is(str, chkstr)
-const char *str, *chkstr;
+str_end_is(const char *str, const char *chkstr)
 {
     int clen = (int) strlen(chkstr);
 
@@ -420,9 +417,7 @@ visctrl(char c)
 /* caller is responsible for ensuring that bp is a
    valid pointer to a BUFSZ buffer */
 char *
-stripchars(bp, stuff_to_strip, orig)
-char *bp;
-const char *stuff_to_strip, *orig;
+stripchars(char *bp, const char *stuff_to_strip, const char *orig)
 {
     int i = 0;
     char *s = bp;
@@ -464,11 +459,10 @@ strsubst(char *bp, const char *orig, const char *replacement)
    if N is 0, substitute all occurrences; returns the number of subsitutions;
    maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
 int
-strNsubst(inoutbuf, orig, replacement, n)
-char *inoutbuf; /* current string, and result buffer */
-const char *orig, /* old substring; if "" then insert in front of Nth char */
-           *replacement; /* new substring; if "" then delete old substring */
-int n; /* which occurrence to replace; 0 => all */
+strNsubst(char *inoutbuf, /* current string, and result buffer */
+          const char *orig, /* old substring; if "" then insert in front of Nth char */
+          const char *replacement, /* new substring; if "" then delete old substring */
+          int n /* which occurrence to replace; 0 => all */)
 {
     char *bp, *op, workbuf[BUFSZ];
     const char *rp;
