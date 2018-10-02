@@ -175,7 +175,7 @@ const char *goal;
         }
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
-	doing_what_is = (goal == what_is_an_unknown_object);
+        doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
@@ -2071,20 +2071,17 @@ char *
 rndorcname(s)
 char *s;
 {
-    int i;
-    const char *v[] = {"a", "ai", "og", "u"};
-    const char *snd[] = {"gor", "gris", "un", "bane", "ruk",
-                         "oth","ul", "z", "thos","akh","hai"};
-    int vstart = rn2(2);
-    
+    static const char *v[] = { "a", "ai", "og", "u" };
+    static const char *snd[] = { "gor", "gris", "un", "bane", "ruk",
+                                 "oth","ul", "z", "thos","akh","hai" };
+    int i, iend = rn1(2, 3), vstart = rn2(2);
+
     if (s) {
         *s = '\0';
-        for (i = 0; i  < rn2(2) + 3; ++i) { 
+        for (i = 0; i < iend; ++i) {
             vstart = 1 - vstart;                /* 0 -> 1, 1 -> 0 */
-            if (!rn2(30) && i > 0)
-                (void) strcat(s, "-");
-            (void) sprintf(eos(s), "%s", vstart ? v[rn2(SIZE(v))] :
-                            snd[rn2(SIZE(snd))]);
+            Sprintf(eos(s), "%s%s", (i > 0 && !rn2(30)) ? "-" : "",
+                    vstart ? v[rn2(SIZE(v))] : snd[rn2(SIZE(snd))]);
         }
     }
     return s;

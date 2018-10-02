@@ -412,7 +412,7 @@ boolean with_you;
         if (migrating_objs)
             deliver_obj_to_mon(mtmp, 0, DF_ALL);
     }
-    
+
     if (xlocale && wander) {
         /* monster moved a bit; pick a nearby location */
         /* mnearto() deals w/stone, et al */

@@ -782,13 +782,13 @@ struct attack *mattk;
 
     /* Kill off aggressor if it didn't die. */
     if (!(result & MM_AGR_DIED)) {
-        boolean was_leashed = (magr->mleashed);
+        boolean was_leashed = (magr->mleashed != 0);
 
         mondead(magr);
         if (!DEADMONSTER(magr))
             return result; /* life saved */
         result |= MM_AGR_DIED;
-        
+
         /* mondead() -> m_detach() -> m_unleash() always suppresses
            the m_unleash() slack message, so deliver it here instead */
         if (was_leashed)

@@ -801,11 +801,10 @@ stolen_booty(VOID_ARGS)
         mtyp = rn2((PM_ORC_SHAMAN - PM_ORC) + 1) + PM_ORC;
         mtmp = makemon(&mons[mtyp], 0, 0, MM_NONAME);
         if (mtmp) {
-            shiny_orc_stuff(mtmp);        
+            shiny_orc_stuff(mtmp);
             migrate_orc(mtmp, 0UL);
         }
     }
-       
     ransacked = 0;
 }
 

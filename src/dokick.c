@@ -1694,7 +1694,7 @@ unsigned long deliverflags;
         where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
         if ((where & MIGR_TO_SPECIES) == 0)
             continue;
-        
+
         if ((mtmp->data->mflags2 & otmp->corpsenm) != 0) {
             obj_extract_self(otmp);
             otmp->owornmask = 0L;

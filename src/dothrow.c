@@ -1292,7 +1292,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
             || tethered_weapon) {
             if (rn2(100)) {
-                if (tethered_weapon)        
+                if (tethered_weapon)
                     tmp_at(DISP_END, BACKTRACK);
                 else
                     sho_obj_return_to_u(obj); /* display its flight */

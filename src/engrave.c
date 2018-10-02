@@ -690,7 +690,7 @@ doengrave()
                         xcrypt(blengr(), buf);
                     }
                     dengr = TRUE;
-                } 
+                }
                 break;
             case WAN_NOTHING:
             case WAN_UNDEAD_TURNING:
