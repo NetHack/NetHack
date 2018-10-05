@@ -571,7 +571,7 @@ int x, y;
     int ox, oy, *range = (int *) arg;
     struct obj *obj;
     struct monst *mon;
-    boolean may_pass = TRUE;
+    boolean may_pass = TRUE, via_jumping, stopping_short;
     struct trap *ttmp;
     int dmg = 0;
 
@@ -583,6 +583,8 @@ int x, y;
     } else if (*range == 0) {
         return FALSE; /* previous step wants to stop now */
     }
+    via_jumping = (EWwalking & I_SPECIAL) != 0L;
+    stopping_short = (via_jumping && *range < 2);
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
         boolean odoor_diag = (IS_DOOR(levl[x][y].typ)
@@ -662,12 +664,8 @@ int x, y;
 
         mon->mundetected = 0; /* wakeup() will handle mimic */
         mnam = a_monnam(mon); /* after unhiding */
-        pronoun = mhim(mon);
+        pronoun = noit_mhim(mon);
         if (!strcmp(mnam, "it")) {
-            /* mhim() uses pronoun_gender() which forces neuter if monster
-               can't be seen; we want him/her for humanoid sensed by touch */
-            if (!strcmp(pronoun, "it") && humanoid(mon->data))
-                pronoun = genders[mon->female].him;
             mnam = !strcmp(pronoun, "it") ? "something" : "someone";
         }
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
@@ -710,12 +708,17 @@ int x, y;
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
 
-    if (is_pool(x, y) && !u.uinwater
-        && ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
-            || !(Levitation || Flying || Wwalking))) {
-        multi = 0; /* can move, so drown() allows crawling out of water */
-        (void) drown();
-        return FALSE;
+    if (is_pool(x, y) && !u.uinwater) {
+        if ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
+            || !(Levitation || Flying || Wwalking)) {
+            multi = 0; /* can move, so drown() allows crawling out of water */
+            (void) drown();
+            return FALSE;
+        } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
+            Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
+       }
+    } else if (is_lava(x, y) && !stopping_short) {
+        Norep("You move over some lava.");
     }
 
     /* FIXME:
@@ -727,7 +730,9 @@ int x, y;
      * ones that we have not yet tested.
      */
     if ((ttmp = t_at(x, y)) != 0) {
-        if (ttmp->ttyp == MAGIC_PORTAL) {
+        if (stopping_short) {
+            ; /* see the comment above hurtle_jump() */
+        } else if (ttmp->ttyp == MAGIC_PORTAL) {
             dotrap(ttmp, 0);
             return FALSE;
         } else if (ttmp->ttyp == VIBRATING_SQUARE) {
@@ -735,11 +740,12 @@ int x, y;
             dotrap(ttmp, 0); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
             dotrap(ttmp, 0);
-        } else if ((ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT
-                    || ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR)
+        } else if ((is_pit(ttmp->ttyp) || is_hole(ttmp->ttyp))
                    && Sokoban) {
-            /* Air currents overcome the recoil */
-            dotrap(ttmp, 0);
+            /* air currents overcome the recoil in Sokoban;
+               when jumping, caller performs last step and enters trap */
+            if (!via_jumping)
+                dotrap(ttmp, 0);
             *range = 0;
             return TRUE;
         } else {
@@ -1286,7 +1292,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
             || tethered_weapon) {
             if (rn2(100)) {
-                if (tethered_weapon)        
+                if (tethered_weapon)
                     tmp_at(DISP_END, BACKTRACK);
                 else
                     sho_obj_return_to_u(obj); /* display its flight */
