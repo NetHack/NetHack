@@ -339,8 +339,8 @@ dig(VOID_ARGS)
             } else {
                 You("destroy the bear trap with %s.",
                     yobjnam(uwep, (const char *) 0));
-                u.utrap = 0; /* release from trap */
                 deltrap(ttmp);
+                reset_utrap(TRUE); /* release from trap, maybe Lev or Fly */
             }
             /* we haven't made any progress toward a pit yet */
             context.digging.effort = 0;
@@ -557,7 +557,7 @@ int ttyp;
         if (u.utraptype == TT_BURIEDBALL)
             buried_ball_to_punishment();
         else if (u.utraptype == TT_INFLOOR)
-            u.utrap = 0;
+            reset_utrap(FALSE);
     }
 
     /* these furniture checks were in dighole(), but wand
@@ -619,11 +619,10 @@ int ttyp;
 
         if (at_u) {
             if (!wont_fall) {
-                u.utrap = rn1(4, 2);
-                u.utraptype = TT_PIT;
+                set_utrap(rn1(4, 2), TT_PIT);
                 vision_full_recalc = 1; /* vision limits change */
             } else
-                u.utrap = 0;
+                reset_utrap(TRUE);
             if (oldobjs != newobjs) /* something unearthed */
                 (void) pickup(1);   /* detects pit */
         } else if (mtmp) {
@@ -1103,7 +1102,7 @@ struct obj *obj;
                     pline("You clear some debris from between the pits.");
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
-                       && (trap_with_u = t_at(u.ux, u.uy))) {
+                       && (trap_with_u = t_at(u.ux, u.uy)) != 0) {
                 You("swing %s, but the rubble has no place to go.",
                     yobjnam(obj, (char *) 0));
             } else {
@@ -1775,8 +1774,7 @@ buried_ball_to_punishment()
             (void) stop_timer(RUST_METAL, obj_to_any(ball));
 #endif
         punish(ball); /* use ball as flag for unearthed buried ball */
-        u.utrap = 0;
-        u.utraptype = 0;
+        reset_utrap(FALSE);
         del_engr_at(cc.x, cc.y);
         newsym(cc.x, cc.y);
     }
@@ -1800,8 +1798,7 @@ buried_ball_to_freedom()
 #endif
         place_object(ball, cc.x, cc.y);
         stackobj(ball);
-        u.utrap = 0;
-        u.utraptype = 0;
+        reset_utrap(TRUE);
         del_engr_at(cc.x, cc.y);
         newsym(cc.x, cc.y);
     }

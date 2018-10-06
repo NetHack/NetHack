@@ -799,7 +799,7 @@ boolean *valsetlist;
      * all of the fields when context.botlx is set. The tty port in
      * particular has a problem if that isn't done, since the core sets
      * context.botlx when a menu or text display obliterates the status
-     * line. 
+     * line.
      *
      * For those situations, to trigger the full update of every field
      * whether changed or not, call status_update() with BL_RESET.
@@ -817,7 +817,7 @@ boolean *valsetlist;
     else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
-    
+
     context.botl = context.botlx = 0;
     update_all = FALSE;
 }

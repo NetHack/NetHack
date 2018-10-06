@@ -78,7 +78,7 @@ static struct Bool_Opt {
 #else
     { "asksavedisk", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
-    { "autodescribe", &iflags.autodescribe, FALSE, SET_IN_GAME },
+    { "autodescribe", &iflags.autodescribe, TRUE, SET_IN_GAME },
     { "autodig", &flags.autodig, FALSE, SET_IN_GAME },
     { "autoopen", &flags.autoopen, TRUE, SET_IN_GAME },
     { "autopickup", &flags.pickup, TRUE, SET_IN_GAME },

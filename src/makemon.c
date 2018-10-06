@@ -1391,8 +1391,8 @@ int mmflags;
     }
 
     if (allow_minvent && migrating_objs)
-        deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case there's waiting items */
-    
+        deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case of waiting items */
+
     if (!in_mklev)
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 
