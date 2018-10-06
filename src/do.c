@@ -171,7 +171,7 @@ const char *verb;
                            "squished under a boulder", NO_KILLER_PREFIX);
                     return FALSE; /* player remains trapped */
                 } else
-                    u.utrap = 0;
+                    reset_utrap(TRUE);
             }
         }
         if (*verb) {
@@ -1239,7 +1239,7 @@ boolean at_stairs, falling, portal;
     check_special_room(TRUE); /* probably was a trap door */
     if (Punished)
         unplacebc();
-    u.utrap = 0; /* needed in level_tele */
+    reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
     u.ustuck = 0; /* idem */
     u.uinwater = 0;

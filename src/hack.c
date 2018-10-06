@@ -539,11 +539,17 @@ dosinkfall()
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),
             innate_lev = ((HLevitation & (FROMOUTSIDE | FROMFORM)) != 0L),
-            ufall = (!innate_lev && !(HFlying || EFlying)); /* BFlying */
+            /* to handle being chained to buried iron ball, trying to
+               levitate but being blocked, then moving onto adjacent sink;
+               no need to worry about being blocked by terrain because we
+               couldn't be over a sink at the same time */
+            blockd_lev = (BLevitation == I_SPECIAL),
+            ufall = (!innate_lev && !blockd_lev
+                     && !(HFlying || EFlying)); /* BFlying */
 
     if (!ufall) {
-        You(innate_lev ? "wobble unsteadily for a moment."
-                       : "gain control of your flight.");
+        You((innate_lev || blockd_lev) ? "wobble unsteadily for a moment."
+                                       : "gain control of your flight.");
     } else {
         long save_ELev = ELevitation, save_HLev = HLevitation;
 
@@ -1179,6 +1185,10 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
     if (!u.utrap)
         return TRUE; /* sanity check */
 
+    /*
+     * Note: caller should call reset_utrap() when we set u.utrap to 0.
+     */
+
     switch (u.utraptype) {
     case TT_BEARTRAP:
         if (flags.verbose) {
@@ -1203,7 +1213,6 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         break;
     case TT_WEB:
         if (uwep && uwep->oartifact == ART_STING) {
-            u.utrap = 0;
             pline("Sting cuts through the web!");
             break; /* escape trap but don't move */
         }
@@ -1656,7 +1665,12 @@ domove()
         return;
 
     if (u.utrap) {
-        if (!trapmove(x, y, trap))
+        boolean moved = trapmove(x, y, trap);
+
+        if (!u.utrap)
+            reset_utrap(TRUE); /* might resume levitation or flight */
+        /* might not have escaped, or did escape but remain in same spot */
+        if (!moved)
             return;
     }
 
@@ -1927,13 +1941,15 @@ switch_terrain()
                         || (Is_waterlevel(&u.uz) && lev->typ == WATER));
 
     if (blocklev) {
-        /* called from spoteffects(), skip float_down() */
+        /* called from spoteffects(), stop levitating but skip float_down() */
         if (Levitation)
             You_cant("levitate in here.");
         BLevitation |= FROMOUTSIDE;
     } else if (BLevitation) {
         BLevitation &= ~FROMOUTSIDE;
-        if (Levitation)
+        /* we're probably levitating now; if not, we must be chained
+           to a buried iron ball so get float_up() feedback for that */
+        if (Levitation || BLevitation)
             float_up();
     }
     /* the same terrain that blocks levitation also blocks flight */
@@ -2042,7 +2058,7 @@ boolean pick;
 
     struct monst *mtmp;
     struct trap *trap = t_at(u.ux, u.uy);
-    int trapflag = iflags.failing_untrap ? FORCETRAP : 0;
+    int trapflag = iflags.failing_untrap ? FAILEDUNTRAP : 0;
 
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
@@ -2058,7 +2074,7 @@ boolean pick;
     spotterrain = levl[u.ux][u.uy].typ;
     spotloc.x = u.ux, spotloc.y = u.uy;
 
-    /* moving onto different terrain might cause Levitation to toggle */
+    /* moving onto different terrain might cause Lev or Fly to toggle */
     if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))
         switch_terrain();
 
@@ -2890,7 +2906,7 @@ boolean k_format;
 int
 weight_cap()
 {
-    long carrcap, save_ELev = ELevitation;
+    long carrcap, save_ELev = ELevitation, save_BLev = BLevitation;
 
     /* boots take multiple turns to wear but any properties they
        confer are enabled at the start rather than the end; that
@@ -2900,6 +2916,9 @@ weight_cap()
         ELevitation &= ~W_ARMF;
         float_vs_flight(); /* in case Levitation is blocking Flying */
     }
+    /* levitation is blocked by being trapped in the floor, but it still
+       functions enough in that situation to enhance carrying capacity */
+    BLevitation &= ~I_SPECIAL;
 
     carrcap = 25 * (ACURRSTR + ACURR(A_CON)) + 50;
     if (Upolyd) {
@@ -2930,8 +2949,9 @@ weight_cap()
             carrcap = 0;
     }
 
-    if (ELevitation != save_ELev) {
+    if (ELevitation != save_ELev || BLevitation != save_BLev) {
         ELevitation = save_ELev;
+        BLevitation = save_BLev;
         float_vs_flight();
     }
 

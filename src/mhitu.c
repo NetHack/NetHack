@@ -1774,7 +1774,7 @@ struct attack *mattk;
         if (u.utrap) {
             You("are released from the %s!",
                 u.utraptype == TT_WEB ? "web" : "trap");
-            u.utrap = 0;
+            reset_utrap(FALSE);
         }
 
         i = number_leashed();

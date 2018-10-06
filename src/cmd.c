@@ -803,6 +803,7 @@ wiz_makemap(VOID_ARGS)
             ballrelease(FALSE);
             unplacebc();
         }
+        reset_utrap(FALSE); /* also done by safe_teleds() for new level */
         check_special_room(TRUE);
         dmonsfree();
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
@@ -2458,9 +2459,19 @@ int final;
         long save_BLev = BLevitation;
 
         BLevitation = 0L;
-        if (Levitation)
-            enl_msg(You_, "would levitate", "would have levitated",
-                    if_surroundings_permitted, "");
+        if (Levitation) {
+            /* either trapped in the floor or inside solid rock
+               (or both if chained to buried iron ball and have
+               moved one step into solid rock somehow) */
+            boolean trapped = (save_BLev & I_SPECIAL) != 0L,
+                    terrain = (save_BLev & FROMOUTSIDE) != 0L;
+
+            Sprintf(buf, "%s%s%s",
+                    trapped ? " if not trapped" : "",
+                    (trapped && terrain) ? " and" : "",
+                    terrain ? if_surroundings_permitted : "");
+            enl_msg(You_, "would levitate", "would have levitated", buf, "");
+        }
         BLevitation = save_BLev;
     }
     /* actively flying handled earlier as a status condition */
@@ -2468,15 +2479,27 @@ int final;
         long save_BFly = BFlying;
 
         BFlying = 0L;
-        if (Flying)
+        if (Flying) {
             enl_msg(You_, "would fly", "would have flown",
+                    /* wording quibble: for past tense, "hadn't been"
+                       would sound better than "weren't" (and
+                       "had permitted" better than "permitted"), but
+                       "weren't" and "permitted" are adequate so the
+                       extra complexity to handle that isn't worth it */
                     Levitation
                        ? " if you weren't levitating"
-                       : (save_BFly == FROMOUTSIDE)
-                          ? if_surroundings_permitted
-                          /* both surroundings and [latent] levitation */
-                          : " if circumstances permitted",
+                       : (save_BFly == I_SPECIAL)
+                          /* this is an oversimpliction; being trapped
+                             might also be blocking levitation so flight
+                             would still be blocked after escaping trap */
+                          ? " if you weren't trapped"
+                          : (save_BFly == FROMOUTSIDE)
+                             ? if_surroundings_permitted
+                             /* two or more of levitation, surroundings,
+                                and being trapped in the floor */
+                             : " if circumstances permitted",
                     "");
+        }
         BFlying = save_BFly;
     }
     /* actively walking on water handled earlier as a status condition */
