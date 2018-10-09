@@ -1114,8 +1114,6 @@ register struct trobj *trop;
         if (obj->oclass == ARMOR_CLASS) {
             if (is_shield(obj) && !uarms) {
                 setworn(obj, W_ARMS);
-                if (uswapwep)
-                    setuswapwep((struct obj *) 0);
             } else if (is_helmet(obj) && !uarmh)
                 setworn(obj, W_ARMH);
             else if (is_gloves(obj) && !uarmg)
