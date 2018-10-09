@@ -163,7 +163,8 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
 CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
-CXX=g++
+CXX ?= g++
+MOC ?= moc
 #LINK=g++
 #	For cross-compiling, eg. with gcc on Linux (see also CC further up):
 #CXX=arm-linux-g++
@@ -276,6 +277,9 @@ WINQTLIB = -L$(QTDIR)/lib -lqt
 #
 # libraries for Qt 4
 WINQT4LIB = `pkg-config QtGui --libs`
+#
+# libraries for Qt 5 (use with WINQT4SRC and WINQT4OBJ)
+WINQT5LIB = `pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs`
 #
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
@@ -566,25 +570,25 @@ qttableview.moc: ../include/qttableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt4kde0.moc : ../win/Qt4/qt4kde0.h
-	$(QTDIR)/bin/moc -o qt4kde0.moc ../win/Qt4/qt4kde0.h
+	$(QTDIR)/bin/$(MOC) -o qt4kde0.moc ../win/Qt4/qt4kde0.h
 qt4main.moc : ../win/Qt4/qt4main.h
-	$(QTDIR)/bin/moc -o qt4main.moc ../win/Qt4/qt4main.h
+	$(QTDIR)/bin/$(MOC) -o qt4main.moc ../win/Qt4/qt4main.h
 qt4map.moc : ../win/Qt4/qt4map.h
-	$(QTDIR)/bin/moc -o qt4map.moc ../win/Qt4/qt4map.h
+	$(QTDIR)/bin/$(MOC) -o qt4map.moc ../win/Qt4/qt4map.h
 qt4menu.moc : ../win/Qt4/qt4menu.h
-	$(QTDIR)/bin/moc -o qt4menu.moc ../win/Qt4/qt4menu.h
+	$(QTDIR)/bin/$(MOC) -o qt4menu.moc ../win/Qt4/qt4menu.h
 qt4msg.moc : ../win/Qt4/qt4msg.h
-	$(QTDIR)/bin/moc -o qt4msg.moc ../win/Qt4/qt4msg.h
+	$(QTDIR)/bin/$(MOC) -o qt4msg.moc ../win/Qt4/qt4msg.h
 qt4plsel.moc : ../win/Qt4/qt4plsel.h
-	$(QTDIR)/bin/moc -o qt4plsel.moc ../win/Qt4/qt4plsel.h
+	$(QTDIR)/bin/$(MOC) -o qt4plsel.moc ../win/Qt4/qt4plsel.h
 qt4set.moc : ../win/Qt4/qt4set.h
-	$(QTDIR)/bin/moc -o qt4set.moc ../win/Qt4/qt4set.h
+	$(QTDIR)/bin/$(MOC) -o qt4set.moc ../win/Qt4/qt4set.h
 qt4stat.moc : ../win/Qt4/qt4stat.h
-	$(QTDIR)/bin/moc -o qt4stat.moc ../win/Qt4/qt4stat.h
+	$(QTDIR)/bin/$(MOC) -o qt4stat.moc ../win/Qt4/qt4stat.h
 qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
-	$(QTDIR)/bin/moc -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+	$(QTDIR)/bin/$(MOC) -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
 qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
-	$(QTDIR)/bin/moc -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+	$(QTDIR)/bin/$(MOC) -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \

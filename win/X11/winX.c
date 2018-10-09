@@ -100,7 +100,10 @@ struct window_procs X11_procs = {
     "X11",
     (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
      | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
-    0L, /* WC2 flag mask */
+#if defined(STATUS_HILITES)
+    WC2_FLUSH_STATUS | WC2_RESET_STATUS |
+#endif
+    0L,
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
     X11_suspend_nhwindows, X11_resume_nhwindows, X11_create_nhwindow,
@@ -2404,7 +2407,7 @@ void
 nh_XtPopup(w, g, childwid)
 Widget w;        /* widget */
 int g;           /* type of grab */
-Widget childwid; /* child to recieve focus (can be None) */
+Widget childwid; /* child to receive focus (can be None) */
 {
     XtPopup(w, (XtGrabKind) g);
     XSetWMProtocols(XtDisplay(w), XtWindow(w), &wm_delete_window, 1);

@@ -31,11 +31,12 @@ CFLAGS+=-DQT_GRAPHICS -DDEFAULT_WINDOW_SYS=\"Qt\" -DNOTTYGRAPHICS
 CFLAGS+=`pkg-config QtGui --cflags`
 
 LINK=g++
-CXX=g++
+CXX=g++ -std=gnu++11
 
 WINSRC = $(WINQT4SRC)
 WINOBJ = $(WINQT4OBJ)
 WINLIB = $(WINQT4LIB)
+MOC = moc-qt4
 
 VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 

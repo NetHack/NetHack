@@ -1,0 +1,52 @@
+#
+# NetHack 3.6  linux-qt5 $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
+# NetHack may be freely redistributed.  See license for details.
+#
+#-PRE
+# Linux hints file
+# This hints file provides a single-user Qt5 build for Linux, specifically
+# for Fedora 26.
+
+
+#PREFIX=/usr
+PREFIX=$(wildcard ~)/nh/install
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/games
+INSTDIR=$(HACKDIR)
+VARDIR = $(HACKDIR)
+
+
+POSTINSTALL= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
+
+CFLAGS=-g -O -I../include -DNOTPARMDECL
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\"
+CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS+=-DTIMED_DELAY
+CFLAGS+=-DDUMPLOG
+CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+CFLAGS+=-DQT_GRAPHICS -DDEFAULT_WINDOW_SYS=\"Qt\" -DNOTTYGRAPHICS
+CFLAGS+=`pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags` -fPIC
+
+LINK=g++
+CXX=g++ -std=gnu++11
+
+WINSRC = $(WINQT4SRC)
+WINOBJ = $(WINQT4OBJ)
+WINLIB = $(WINQT5LIB)
+#MOC = moc
+MOC = moc-qt5
+
+VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
+
+QTDIR=/usr
+
+CHOWN=true
+CHGRP=true
+VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
+
+# note: needs libxt-dev libxaw7-dev libx11-dev bdftopcf

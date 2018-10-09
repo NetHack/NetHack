@@ -326,7 +326,7 @@ boolean devour;
     /* turning into slime might be cureable */
     if (slimer && munslime(mtmp, FALSE)) {
         /* but the cure (fire directed at self) might be fatal */
-        if (mtmp->mhp < 1)
+        if (DEADMONSTER(mtmp))
             return 2;
         slimer = FALSE; /* sliming is avoided, skip polymorph */
     }
@@ -370,7 +370,7 @@ struct edog *edog;
             mtmp->mhpmax = newmhpmax;
             if (mtmp->mhp > mtmp->mhpmax)
                 mtmp->mhp = mtmp->mhpmax;
-            if (mtmp->mhp < 1)
+            if (DEADMONSTER(mtmp))
                 goto dog_died;
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s is confused from hunger.", Monnam(mtmp));
@@ -379,7 +379,7 @@ struct edog *edog;
             else
                 You_feel("worried about %s.", y_monnam(mtmp));
             stop_occupation();
-        } else if (monstermoves > edog->hungrytime + 750 || mtmp->mhp < 1) {
+        } else if (monstermoves > edog->hungrytime + 750 || DEADMONSTER(mtmp)) {
         dog_died:
             if (mtmp->mleashed && mtmp != u.usteed)
                 Your("leash goes slack.");

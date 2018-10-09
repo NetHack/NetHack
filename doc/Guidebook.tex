@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{May 28, 2018}
+\date{September 26, 2018}
 
 \maketitle
 
@@ -852,13 +852,14 @@ are listed later in this Guidebook.  Options are usually set before the
 game rather than with the `{\tt O}' command; see the section on options below.
 %.lp
 \item[\tb{\^{}O}]
-Show overview or show dungeon layout\\
+Show overview.\\
 %.lp ""
-In normal play and in explore mode, a shortcut for the ``{\tt \#overview}''
-extended command to list interesting dungeon levels visited.\\
+Shortcut for the ``{\tt \#overview}'':
+list interesting dungeon levels visited.\\
 %.lp ""
-In debug mode, an extra command which lists the placement of all special
-levels.
+(Prior to 3.6.0, `{\tt \^{}O}' was a debug mode command which listed
+the placement of all special levels.
+Use ``{\tt \#wizwhere}'' to run that command.)
 %.lp
 \item[\tb{p}]
 Pay your shopping bill.
@@ -1216,16 +1217,22 @@ Jump to another location. Autocompletes. Default key is '{\tt M-j}', and '{\tt j
 Kick something. Default key is '{\tt \^{}D}', and '{\tt k}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#known}]
-Show what object types have been discovered. Default key is '{\tt $\backslash$}'.
+Show what object types have been discovered.
+Default key is '{\tt $\backslash$}'.
 %.lp
 \item[\tb{\#knownclass}]
-Show discovered types for one class of objects. Default key is '{\tt `}'.
+Show discovered types for one class of objects.
+Default key is '{\tt `}'.
 %.lp
 \item[\tb{\#levelchange}]
-Change your experience level. Autocompletes. Wizard-mode only.
+Change your experience level.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#lightsources}]
-Show mobile light sources. Autocompletes. Wizard-mode only.
+Show mobile light sources.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#look}]
 Look at what is here, under you. Default key is '{\tt :}'.
@@ -1236,9 +1243,6 @@ from a steed standing next to you. Autocompletes.
 Default key is '{\tt M-l}', and '{\tt l}' if {\it number\verb+_+pad\/} is on.
 Precede with the `{\tt m}' prefix to skip containers at your location
 and go directly to removing a saddle.
-%.lp
-\item[\tb{\#monpolycontrol}]
-Control monster polymorphs. Autocompletes. Wizard-mode only.
 %.lp
 \item[\tb{\#monster}]
 Use a monster's special ability (when polymorphed into monster form).
@@ -1271,7 +1275,10 @@ level will be included regardless of annotations. Autocompletes.
 Default keys are '{\tt \^{}O}', and '{\tt M-O}'.
 %.lp
 \item[\tb{\#panic}]
-Test the panic routine. Autocompletes. Wizard-mode only.
+Test the panic routine.
+Terminates the current game.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#pay}]
 Pay your shopping bill. Default key is '{\tt p}'.
@@ -1281,7 +1288,9 @@ Pick up things at the current location. Default key is '{\tt ,}'.
 The `{\tt m}' prefix forces use of a menu.
 %.lp
 \item[\tb{\#polyself}]
-Polymorph self. Autocompletes. Wizard-mode only.
+Polymorph self.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#pray}]
 Pray to the gods for help. Autocompletes. Default key is '{\tt M-p}'.\\
@@ -1352,7 +1361,9 @@ Show the armor currently worn. Default key is '{\tt [}'.
 Count your gold. Default key is '{\tt \$}'.
 %.lp
 \item[\tb{\#seenv}]
-Show seen vectors. Autocompletes. Wizard-mode only.
+Show seen vectors.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#seerings}]
 Show the ring(s) currently worn. Default key is '{\tt =}'.
@@ -1376,7 +1387,9 @@ Do a shell escape. Default key is '{\tt !}'.
 Sit down. Autocompletes. Default key is '{\tt M-s}'.
 %.lp
 \item[\tb{\#stats}]
-Show memory statistics. Autocompletes. Wizard-mode only.
+Show memory statistics.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#suspend}]
 Suspend the game. Default key is '{\tt \^{}Z}'.
@@ -1404,7 +1417,9 @@ Show a menu of possible actions in a location next to you.
 Throw something. Default key is '{\tt t}'.
 %.lp
 \item[\tb{\#timeout}]
-Look at the timeout queue. Autocompletes. Wizard-mode only.
+Look at the timeout queue.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#tip}]
 Tip over a container (bag or box) to pour out its contents.
@@ -1432,13 +1447,15 @@ be automatically turned off.
 \item[\tb{\#untrap}]
 Untrap something (trap, door, or chest). Default key is '{\tt M-u}', and '{\tt u}' if {\it number\verb+_+pad\/} is on.
 %.lp ""
-In some circumstancs it can also be used to rescue trapped monsters.
+In some circumstances it can also be used to rescue trapped monsters.
 %.lp
 \item[\tb{\#up}]
 Go up a staircase. Default key is '{\tt <}'.
 %.lp
 \item[\tb{\#vanquished}]
-List vanquished monsters. Autocompletes. Wizard-mode only.
+List vanquished monsters.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack\/}.
@@ -1448,10 +1465,14 @@ Autocompletes. Default key is '{\tt M-v}'.
 Show version string. Default key is '{\tt v}'.
 %.lp
 \item[\tb{\#vision}]
-Show vision array. Autocompletes. Wizard-mode only.
+Show vision array.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wait}]
-Rest one move while doing nothing. Default key is '{\tt .}', and '{\tt{ }}' if {\it rest\verb+_+on\verb+_+space\/} is on.
+Rest one move while doing nothing.
+Default key is '{\tt .}', and also '{\tt{ }}' if
+{\it rest\verb+_+on\verb+_+space\/} is on.
 %.lp
 \item[\tb{\#wear}]
 Wear a piece of armor. Default key is '{\tt W}'.
@@ -1468,45 +1489,73 @@ Wield a weapon. Default key is '{\tt w}'.
 \item[\tb{\#wipe}]
 Wipe off your face. Autocompletes. Default key is '{\tt M-w}'.
 %.lp
-\item[\tb{\#wizdebug\verb+_+bury}]
-Bury objects under and around you. Autocompletes. Wizard-mode only.
-%.lp
-\item[\tb{\#wizdebug\verb+_+traveldisplay}]
-Toggle travel display. Autocompletes. Wizard-mode only.
+\item[\tb{\#wizbury}]
+Bury objects under and around you.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wizdetect}]
-Search a room. Autocompletes. Wizard-mode only. Default key is '{\tt \^{}E}'.
+Search for hidden things (secret doors or traps or unseen monsters)
+within a modest radius.
+Autocompletes.
+Debug mode only.
+Default key is '{\tt \^{}E}'.
 %.lp
 \item[\tb{\#wizgenesis}]
-Create a monster. Autocompletes. Wizard-mode only. Default key is '{\tt \^{}G}'.
+Create a monster.
+May be prefixed by a count to create more than one.
+Autocompletes.
+Debug mode only.
+Default key is '{\tt \^{}G}'.
 %.lp
 \item[\tb{\#wizidentify}]
-Identify all items in inventory. Autocompletes. Wizard-mode only.
+Identify all items in inventory.
+Autocompletes.
+Debug mode only.
 Default key is '{\tt \^{}I}'.
 %.lp
 \item[\tb{\#wizintrinsic}]
-Set intrinsic. Autocompletes. Wizard-mode only.
+Set one or more intrinsic attributes.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wizlevelport}]
-Teleport to another level. Autocompletes. Wizard-mode only. Default key is '{\tt \^{}V}'.
+Teleport to another level.
+Autocompletes.
+Debug mode only.
+Default key is '{\tt \^{}V}'.
 %.lp
 \item[\tb{\#wizmap}]
-Map the level. Autocompletes. Wizard-mode only. Default key is '{\tt \^{}F}'.
+Map the level.
+Autocompletes.
+Debug mode only.
+Default key is '{\tt \^{}F}'.
 %.lp
 \item[\tb{\#wizrumorcheck}]
-Verify rumor boundaries. Autocompletes. Wizard-mode only.
+Verify rumor boundaries.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wizsmell}]
-Smell monster. Autocompletes. Wizard-mode only.
+Smell monster.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wizwhere}]
-Show locations of special levels. Autocompletes. Wizard-mode only.
+Show locations of special levels.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#wizwish}]
-Wish for something. Autocompletes. Wizard-mode only. Default key is '{\tt \^{}W}'.
+Wish for something.
+Autocompletes.
+Debug mode only.
+Default key is '{\tt \^{}W}'.
 %.lp
 \item[\tb{\#wmode}]
-Show wall modes. Autocompletes. Wizard-mode only.
+Show wall modes.
+Autocompletes.
+Debug mode only.
 %.lp
 \item[\tb{\#zap}]
 Zap a wand. Default key is '{\tt z}'.
@@ -1771,7 +1820,7 @@ The {\tt Ix} command shows an inventory-like display of any unpaid
 items which have been used up, along with other shop fees, if any.
 
 %.hn 3
-\subsubsection*{Shop idiosyncracies}
+\subsubsection*{Shop idiosyncrasies}
 
 %.pg
 Several aspects of shop behavior might be unexpected.
@@ -2789,23 +2838,23 @@ so setting HACKDIR to override that is not usually necessary or recommended.
 %.lp
 \item[\bb{LEVELDIR}]
 The location that in-progress level files are stored. Defaults to HACKDIR,
-must be writeable.
+must be writable.
 %.lp
 \item[\bb{SAVEDIR}]
 The location where saved games are kept. Defaults to HACKDIR, must be
-writeable.
+writable.
 %.lp
 \item[\bb{BONESDIR}]
 The location that bones files are kept. Defaults to HACKDIR, must be
-writeable.
+writable.
 %.lp
 \item[\bb{LOCKDIR}]
 The location that file synchronization locks are stored. Defaults to
-HACKDIR, must be writeable.
+HACKDIR, must be writable.
 %.lp
 \item[\bb{TROUBLEDIR}]
 The location that a record of game aborts and self-diagnosed game problems
-is kept. Defaults to HACKDIR, must be writeable.
+is kept. Defaults to HACKDIR, must be writable.
 %.lp
 \item[\bb{AUTOCOMPLETE}]
 Enable or disable an extended command autocompletion.
@@ -2882,9 +2931,10 @@ Example:
 
 %.lp
 \item[\bb{WIZKIT}]
-Wizard-mode extra items, in a text file containing item names,
-one per line, up to a maximum of 128 lines. Each line is processed
-by the function that handles wishing.
+Debug mode only:  extra items to add to initial inventory.
+Value is the name of a text file containing a list of item names,
+one per line, up to a maximum of 128 lines.
+Each line is processed by the function that handles wishing.
 %.pg
 Example:
 %.sd
@@ -2988,8 +3038,8 @@ Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{autodescribe}]
 Automatically describe the terrain under cursor when asked to get a location
-on the map.  The
-{\it whatis\verb+_+coord\/}
+on the map (default true).
+The {\it whatis\verb+_+coord\/}
 option controls whether the description includes map coordinates.
 %.lp
 \item[\ib{autodig}]
@@ -3310,6 +3360,15 @@ Default `.'.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
+% %.lp
+% \item[\ib{menu\verb+_+tab\verb+_+sep}]
+% Format menu entries using TAB to separate columns (default off).
+% Only applicable to some menus, and only useful to some interfaces.
+% Debug mode only.
+%.lp
+\item[\ib{monpolycontrol}]
+Prompt for new form whenever any monster changes shape (default off).
+Debug mode only.
 %.lp
 \item[\ib{msghistory}]
 The number of top line messages to save (and recall with `{\tt \^{}P}')
@@ -3441,7 +3500,6 @@ such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 \item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
-Persistent.
 %.lp
 \item[\ib{pettype}]
 Specify the type of your initial pet, if you are playing a character class
@@ -3549,6 +3607,10 @@ depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+%+.lp
+\item[\ib{sanity\verb+_+check}]
++Evaluate monsters, objects, and map prior to each turn (default off).
++Debug mode only.
 %.lp
 \item[\ib{scores}]
 Control what parts of the score list you are shown at the end (ex.\
@@ -3639,6 +3701,10 @@ the score list around after game end on a terminal or emulating window.
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
 mouse clicks on the map window.  Persistent.
+% %.lp
+% \item[ib{travel\verb+_+debug}]
+% Display intended path during each step of travel (default off).
+% Debug mode only.
 %.lp
 \item[\ib{verbose}]
 Provide more commentary during the game (default on).  Persistent.
@@ -3706,6 +3772,10 @@ move by skipping the same glyphs.
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
 (default depends on version).
 Cannot be set with the `{\tt O}' command.
+%.lp
+\item[\ib{wizweight}]
+Augment object descriptions with their objects' weight (default off).
+Debug mode only.
 %.lp
 \item[\ib{zerocomp}]
 When writing out a save file, perform zero-comp compression of the
@@ -3850,7 +3920,25 @@ in the message window.
 %.lp
 \item[\ib{windowcolors}]
 If {\it NetHack\/} can, it should display windows with the specified
-foreground/background colors if it can.
+foreground/background colors. Windows GUI only. The format is
+\begin{verbatim}
+    OPTION=windowcolors:wintype foreground/background
+\end{verbatim}
+
+%.pg
+where wintype is one of {\it menu}, {\it message}, {\it status}, or {\it text}, and
+foreground and background are colors, either a hexadecimal {\it \#rrggbb},
+one of the named colors ({\it black}, {\it red}, {\it green}, {\it brown},
+{\it blue}, {\it magenta}, {\it cyan}, {\it orange},
+{\it brightgreen}, {\it yellow}, {\it brightblue}, {\it brightmagenta},
+{\it brightcyan}, {\it white}, {\it trueblack}, {\it gray}, {\it purple},
+{\it silver}, {\it maroon}, {\it fuchsia}, {\it lime}, {\it olive},
+{\it navy}, {\it teal}, {\it aqua}), or one of Windows UI colors ({\it activeborder},
+{\it activecaption}, {\it appworkspace}, {\it background}, {\it btnface}, {\it btnshadow},
+{\it btntext}, {\it captiontext}, {\it graytext}, {\it greytext}, {\it highlight},
+{\it highlighttext}, {\it inactiveborder}, {\it inactivecaption}, {\it menu},
+{\it menutext}, {\it scrollbar}, {\it window}, {\it windowframe}, {\it windowtext}).
+
 %.lp
 \item[\ib{wraptext}]
 If {\it NetHack\/} can, it should wrap long lines of text if they don't fit
@@ -4793,9 +4881,10 @@ system).
 \blist{}
 %.lp
 \item[\ib{WIZARDS}]
-A space-separated list of user name who are allowed to play in wizard
-mode (the debugging mode, not the magic-useing role). A value of a single
-asterisk (*) allows anyone to start a game in wizard mode.
+A space-separated list of user name who are allowed to
+play in debug mode (commonly referred to as wizard mode).
+A value of a single
+asterisk (*) allows anyone to start a game in debug mode.
 %.lp
 \item[\ib{SHELLERS}]
 A list of users who are allowed to use the shell escape command (`{\tt !}').
@@ -4921,10 +5010,13 @@ the trepid reader to discover.
 
 %.pg
 Debug mode, also known as wizard mode, is undocumented aside from this
-brief description.  It is intended for tracking down problems within the
+brief description and the various ``debug mode only'' commands listed
+among the command descriptions.
+It is intended for tracking down problems within the
 program rather than to provide god-like powers to your character, and
 players who attempt debugging are expected to figure out how to use it
-themselves.  It is initiated by starting the game with the
+themselves.
+It is initiated by starting the game with the
 {\tt -D}
 command-line switch or with the
 {\it playmode:debug\/}
@@ -4935,8 +5027,7 @@ For some systems, the player must be logged in
 under a particular user name to be allowed to use debug mode; for others,
 the hero must be given a particular character name (but may be any role;
 there's no connection between ``wizard mode'' and the {\it Wizard\/} role).
-And on any system, the program might have been configured to omit debug
-mode entirely.  Attempting to start a game in debug mode when not allowed
+Attempting to start a game in debug mode when not allowed
 or not available will result in falling back to explore mode instead.
 
 %.hn
@@ -5297,7 +5388,7 @@ http:{\tt /}{\tt /}www.nethack.org{\tt /}.
 
 \subsection*{Special Thanks}
 \nd On behalf of the {\it NetHack\/} community, thank you very much once
-again to {\it M. Drew Streib}, {\it Pasi Kallinen} for providing a
+again to {\it M. Drew Streib} and {\it Pasi Kallinen} for providing a
 public NetHack server at nethack.alt.org. Thanks to {\it Keith Simpson} 
 and {\it Andy Thomson} for hardfought.org. Thanks to all those 
 unnamed dungeoneers who invest their time and effort into annual 

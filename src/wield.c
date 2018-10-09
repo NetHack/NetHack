@@ -112,7 +112,6 @@ register struct obj *obj;
                        : !is_weptool(obj) && !is_wet_towel(obj);
     } else
         unweapon = TRUE; /* for "bare hands" message */
-    update_inventory();
 }
 
 STATIC_OVL boolean
@@ -230,7 +229,9 @@ setuqwep(obj)
 register struct obj *obj;
 {
     setworn(obj, W_QUIVER);
-    update_inventory();
+    /* no extra handling needed; this used to include a call to
+       update_inventory() but that's already performed by setworn() */
+    return;
 }
 
 void
@@ -238,7 +239,7 @@ setuswapwep(obj)
 register struct obj *obj;
 {
     setworn(obj, W_SWAPWEP);
-    update_inventory();
+    return;
 }
 
 /*** Commands to change particular slot(s) ***/

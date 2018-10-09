@@ -149,8 +149,7 @@ const char *verb;
     if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE)) {
         return TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
-             && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
-                 || t->ttyp == TRAPDOOR || t->ttyp == HOLE)) {
+               && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
             || (u.utrap && u.ux == x && u.uy == y)) {
             if (*verb)
@@ -172,7 +171,7 @@ const char *verb;
                            "squished under a boulder", NO_KILLER_PREFIX);
                     return FALSE; /* player remains trapped */
                 } else
-                    u.utrap = 0;
+                    reset_utrap(TRUE);
             }
         }
         if (*verb) {
@@ -956,7 +955,7 @@ dodown()
         if (trap && uteetering_at_seen_pit(trap)) {
             dotrap(trap, TOOKPLUNGE);
             return 1;
-        } else if (!trap || (trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
+        } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
@@ -988,10 +987,31 @@ dodown()
         return 0;
     }
 
-    if (trap)
-        You("%s %s.", Flying ? "fly" : locomotion(youmonst.data, "jump"),
-            trap->ttyp == HOLE ? "down the hole" : "through the trap door");
+    if (trap) {
+        const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
+        const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
 
+        if (youmonst.data->msize >= MZ_HUGE) {
+            char qbuf[QBUFSZ];
+
+            You("don't fit %s easily.", down_or_thru);
+            Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
+            if (yn(qbuf) == 'y') {
+                if (!rn2(3)) {
+                    actn = "manage to squeeze";
+                    losehp(Maybe_Half_Phys(rnd(4)),
+                           "contusion from a small passage", KILLED_BY);
+                } else {
+                    You("were unable to fit %s.", down_or_thru);
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }
+        You("%s %s the %s.", actn, down_or_thru,
+            trap->ttyp == HOLE ? "hole" : "trap door");
+    }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
     } else {
@@ -1219,7 +1239,7 @@ boolean at_stairs, falling, portal;
     check_special_room(TRUE); /* probably was a trap door */
     if (Punished)
         unplacebc();
-    u.utrap = 0; /* needed in level_tele */
+    reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
     u.ustuck = 0; /* idem */
     u.uinwater = 0;

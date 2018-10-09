@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1451611595 2016/01/01 01:26:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1536411259 2018/09/08 12:54:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -88,7 +88,7 @@ struct window_procs mswin_procs = {
         | WC_VARY_MSGCOUNT | WC_WINDOWCOLORS | WC_PLAYER_SELECTION
         | WC_SPLASH_SCREEN | WC_POPUP_DIALOG | WC_MOUSE_SUPPORT,
 #ifdef STATUS_HILITES
-    WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_HILITE_STATUS |
+    WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
 #endif
     0L, mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
@@ -1102,7 +1102,7 @@ identifier
                    outside of the standard accelerator (see above) or a
                    number.  If 0, the item is unaffected by any group
                    accelerator.  If this accelerator conflicts with
-                   the menu command (or their user defined alises), it loses.
+                   the menu command (or their user defined aliases), it loses.
                    The menu commands and aliases take care not to interfere
                    with the default object class symbols.
                 -- If you want this choice to be preselected when the
@@ -1194,7 +1194,7 @@ mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
         ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
         nReturned = mswin_menu_window_select_menu(
             GetNHApp()->windowlist[wid].win, how, selected,
-            !(flags.perm_invent && wid == WIN_INVEN
+            !(iflags.perm_invent && wid == WIN_INVEN
               && how == PICK_NONE) /* don't activate inventory window if
                                       perm_invent is on */
             );
@@ -1211,7 +1211,7 @@ void
 mswin_update_inventory()
 {
     logDebug("mswin_update_inventory()\n");
-    if (flags.perm_invent && program_state.something_worth_saving
+    if (iflags.perm_invent && program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -2118,6 +2118,7 @@ initMapTiles(void)
     HBITMAP hBmp;
     BITMAP bm;
     TCHAR wbuf[MAX_PATH];
+    DWORD errcode;
     int tl_num;
     SIZE map_size;
     extern int total_tiles_used;
@@ -2131,8 +2132,13 @@ initMapTiles(void)
                      NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
                      IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
     if (hBmp == NULL) {
-        raw_print(
-            "Cannot load tiles from the file. Reverting back to default.");
+        char errmsg[BUFSZ];
+
+        errcode = GetLastError();
+        Sprintf(errmsg, "%s (0x%x).",
+            "Cannot load tiles from the file. Reverting back to default",
+            errcode);
+        raw_print(errmsg);
         return FALSE;
     }
 
@@ -2243,7 +2249,7 @@ mswin_popup_destroy(HWND hWnd)
     DrawMenuBar(GetNHApp()->hMainWnd);
 
     /* Don't hide the permanent inventory window ... leave it showing */
-    if (!flags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
+    if (!iflags.perm_invent || mswin_winid_from_handle(hWnd) != WIN_INVEN)
         ShowWindow(hWnd, SW_HIDE);
 
     GetNHApp()->hPopupWnd = NULL;
@@ -2857,10 +2863,14 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
                    BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
                    BL_LEVELDESC, BL_EXP, BL_CONDITION
-                -- fldindex could also be BL_FLUSH (-1), which is not really
-                   a field index, but is a special trigger to tell the
-                   windowport that it should redisplay all its status fields,
-                   even if no changes have been presented to it.
+		-- fldindex could also be BL_FLUSH, which is not really
+		   a field index, but is a special trigger to tell the 
+		   windowport that it should output all changes received
+                   to this point. It marks the end of a bot() cycle.
+		-- fldindex could also be BL_RESET, which is not really
+		   a field index, but is a special advisory to to tell the 
+		   windowport that it should redisplay all its status fields,
+		   even if no changes have been presented to it.
                 -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
                    If fldindex is BL_CONDITION, then ptr is a long value with
                    any or none of the following bits set (from botl.h):
@@ -2895,10 +2905,21 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
     int ocolor, ochar;
     unsigned ospecial;
     long value = -1;
+    boolean reset_state = FALSE;
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, colormasks);
 
-    if (idx != BL_FLUSH) {
+    switch (idx) {
+        case BL_RESET:
+            reset_state = TRUE;
+            /* FALLTHRU */
+        case BL_FLUSH:
+            /* FALLTHRU */
+        default:
+            break;
+    }
+
+    if (idx >= 0) {
         if (!_status_activefields[idx])
             return;
         _status_percents[idx] = percent;
@@ -2961,18 +2982,18 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
                     text);
         } break;
         }
-    }
 
-    _status_colors[idx] = color;
+        _status_colors[idx] = color;
 
-    /* send command to status window */
-    ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
-    update_cmd_data.n_fields = MAXBLSTATS;
-    update_cmd_data.vals = _status_vals;
-    update_cmd_data.activefields = _status_activefields;
-    update_cmd_data.percents = _status_percents;
-    update_cmd_data.colors = _status_colors;
-    SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
+        /* send command to status window */
+        ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
+        update_cmd_data.n_fields = MAXBLSTATS;
+        update_cmd_data.vals = _status_vals;
+        update_cmd_data.activefields = _status_activefields;
+        update_cmd_data.percents = _status_percents;
+        update_cmd_data.colors = _status_colors;
+        SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
                 (WPARAM) MSNH_MSG_UPDATE_STATUS, (LPARAM) &update_cmd_data);
+    }
 }
 

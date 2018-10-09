@@ -355,7 +355,7 @@ int trouble;
         You("are back on solid ground.");
         /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(FALSE))
-            u.utrap = 0;
+            reset_utrap(TRUE);
         break;
     case TROUBLE_STARVING:
         /* temporarily lost strength recovery now handled by init_uhunger() */
@@ -921,7 +921,7 @@ aligntyp g_align;
      *  - fix all of your problems;
      *  - do you a gratuitous favor.
      *
-     * If you make it to the the last category, you roll randomly again
+     * If you make it to the last category, you roll randomly again
      * to see what they do for you.
      *
      * If your luck is at least 0, then you are guaranteed rescued from
@@ -1939,12 +1939,12 @@ doturn()
         pline("For some reason, %s seems to ignore you.", u_gname());
         aggravate();
         exercise(A_WIS, FALSE);
-        return 0;
+        return 1;
     }
     if (Inhell) {
         pline("Since you are in Gehennom, %s won't help you.", u_gname());
         aggravate();
-        return 0;
+        return 1;
     }
     pline("Calling upon %s, you chant an arcane formula.", u_gname());
     exercise(A_WIS, TRUE);

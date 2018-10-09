@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1525012627 2018/04/29 14:37:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1537234123 2018/09/18 01:28:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.287 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -214,7 +214,7 @@ struct obj *otmp;
                 dmg = spell_damage_bonus(dmg);
             context.bypasses = TRUE; /* for make_corpse() */
             if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
-                if (mtmp->mhp > 0)
+                if (!DEADMONSTER(mtmp))
                     monflee(mtmp, 0, FALSE, TRUE);
             }
         }
@@ -222,7 +222,11 @@ struct obj *otmp;
     case WAN_POLYMORPH:
     case SPE_POLYMORPH:
     case POT_POLYMORPH:
-        if (resists_magm(mtmp)) {
+        if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp)) {
+            /* if a long worm has mcorpsenm set, it was polymophed by
+               the current zap and shouldn't be affected if hit again */
+            ;
+        } else if (resists_magm(mtmp)) {
             /* magic resistance protects from polymorph traps, so make
                it guard against involuntary polymorph attacks too... */
             shieldeff(mtmp->mx, mtmp->my);
@@ -238,6 +242,7 @@ struct obj *otmp;
             if (polyspot)
                 for (obj = mtmp->minvent; obj; obj = obj->nobj)
                     bypass_obj(obj);
+
             /* natural shapechangers aren't affected by system shock
                (unless protection from shapechangers is interfering
                with their metabolism...) */
@@ -260,6 +265,22 @@ struct obj *otmp;
                 if (give_msg && (canspotmon(mtmp)
                                  || (u.uswallow && mtmp == u.ustuck)))
                     learn_it = TRUE;
+            }
+
+            /* do this even if polymorphed failed (otherwise using
+               flags.mon_polycontrol prompting to force mtmp to remain
+               'long worm' would prompt again if zap hit another segment) */
+            if (!DEADMONSTER(mtmp) && mtmp->data == &mons[PM_LONG_WORM]) {
+                if (!has_mcorpsenm(mtmp))
+                    newmcorpsenm(mtmp);
+                /* flag to indicate that mtmp became a long worm
+                   on current zap, so further hits (on mtmp's new
+                   tail) don't do further transforms */
+                MCORPSENM(mtmp) = PM_LONG_WORM;
+                /* flag to indicate that cleanup is needed; object
+                   bypass cleanup also clears mon->mextra->mcorpsenm
+                   for all long worms on the level */
+                context.bypasses = TRUE;
             }
         }
         break;
@@ -412,11 +433,11 @@ struct obj *otmp;
             dmg = spell_damage_bonus(dmg);
         if (resists_drli(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
-        } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) && mtmp->mhp > 0) {
+        } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) && !DEADMONSTER(mtmp)) {
             mtmp->mhp -= dmg;
             mtmp->mhpmax -= dmg;
             /* die if already level 0, regardless of hit points */
-            if (mtmp->mhp <= 0 || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
+            if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
                 killed(mtmp);
             } else {
                 mtmp->m_lev--;
@@ -433,7 +454,7 @@ struct obj *otmp;
         break;
     }
     if (wake) {
-        if (mtmp->mhp > 0) {
+        if (!DEADMONSTER(mtmp)) {
             wakeup(mtmp, helpful_gesture ? FALSE : TRUE);
             m_respond(mtmp);
             if (mtmp->isshk && !*u.ushops)
@@ -446,7 +467,7 @@ struct obj *otmp;
      * might be an invisible worm hit on the tail.
      */
     if (reveal_invis) {
-        if (mtmp->mhp > 0 && cansee(bhitpos.x, bhitpos.y)
+        if (!DEADMONSTER(mtmp) && cansee(bhitpos.x, bhitpos.y)
             && !canspotmon(mtmp))
             map_invisible(bhitpos.x, bhitpos.y);
     }
@@ -555,9 +576,10 @@ int locflags; /* non-zero means get location even if monster is buried */
 
 /* used by revive() and animate_statue() */
 struct monst *
-montraits(obj, cc)
+montraits(obj, cc, adjacentok)
 struct obj *obj;
 coord *cc;
+boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
 {
     struct monst *mtmp = (struct monst *) 0;
     struct monst *mtmp2 = (struct monst *) 0;
@@ -570,7 +592,8 @@ coord *cc;
         if (mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))
             return (struct monst *) 0;
         mtmp = makemon(mtmp2->data, cc->x, cc->y,
-                       NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH);
+                       (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
+                        | (adjacentok ? MM_ADJACENTOK : 0)));
         if (!mtmp)
             return mtmp;
 
@@ -786,7 +809,7 @@ boolean by_hero;
     } else if (has_omonst(corpse)) {
         /* use saved traits */
         xy.x = x, xy.y = y;
-        mtmp = montraits(corpse, &xy);
+        mtmp = montraits(corpse, &xy, FALSE);
         if (mtmp && mtmp->mtame && !mtmp->isminion)
             wary_dog(mtmp, TRUE);
     } else {
@@ -2304,7 +2327,7 @@ boolean ordinary;
 
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
-        (void) cancel_monst(&youmonst, obj, TRUE, FALSE, TRUE);
+        (void) cancel_monst(&youmonst, obj, TRUE, TRUE, TRUE);
         break;
 
     case SPE_DRAIN_LIFE:
@@ -2673,25 +2696,45 @@ boolean youattack, allow_cancel_kill, self_cancel;
 
     /* now handle special cases */
     if (youdefend) {
-        if (Upolyd) {
-            if ((u.umonnum == PM_CLAY_GOLEM) && !Blind)
-                pline(writing_vanishes, your);
-
-            if (Unchanging)
+        if (Upolyd) { /* includes lycanthrope in creature form */
+            /*
+             * Return to normal form unless Unchanging.
+             * Hero in clay golem form dies if Unchanging.
+             * Does not cure lycanthropy or stop timed random polymorph.
+             */
+            if (u.umonnum == PM_CLAY_GOLEM) {
+                if (!Blind)
+                    pline(writing_vanishes, your);
+                else /* note: "dark" rather than "heavy" is intentional... */
+                    You_feel("%s headed.", Hallucination ? "dark" : "light");
+                u.mh = 0; /* fatal; death handled by rehumanize() */
+            }
+            if (Unchanging && u.mh > 0)
                 Your("amulet grows hot for a moment, then cools.");
             else
                 rehumanize();
         }
     } else {
-        mdef->mcan = TRUE;
-
-        if (is_were(mdef->data) && mdef->data->mlet != S_HUMAN)
+        mdef->mcan = 1;
+        /* force shapeshifter into its base form */
+        if (mdef->m_ap_type != M_AP_NOTHING)
+            seemimic(mdef);
+        /* [not 'else if'; chameleon might have been hiding as a mimic] */
+        if (mdef->cham >= LOW_PM) {
+            /* note: newcham() uncancels shapechangers (resets m->mcan
+               to 0), but only for shapechangers whose m->cham is already
+               NON_PM and we just verified that it's LOW_PM or higher */
+            newcham(mdef, &mons[mdef->cham], FALSE, FALSE);
+            mdef->cham = NON_PM; /* cancelled shapeshifter can't shift */
+        }
+        if (is_were(mdef->data) && !is_human(mdef->data))
             were_change(mdef);
 
         if (mdef->data == &mons[PM_CLAY_GOLEM]) {
             if (canseemon(mdef))
                 pline(writing_vanishes, s_suffix(mon_nam(mdef)));
-
+            /* !allow_cancel_kill is for Magicbane, where clay golem
+               will be killed somewhere back up the call/return chain... */
             if (allow_cancel_kill) {
                 if (youattack)
                     killed(mdef);
@@ -3371,8 +3414,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                               The(distant_name(obj, xname))); /* lame */
                     range = 0;
                 } else if (Sokoban && (t = t_at(x, y)) != 0
-                           && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
-                               || t->ttyp == HOLE || t->ttyp == TRAPDOOR)) {
+                           && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
                     /* hero falls into the trap, so ball stops */
                     range = 0;
                 }
@@ -3954,7 +3996,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
         /* Using disintegration from the inside only makes a hole... */
         if (tmp == MAGIC_COOKIE)
             u.ustuck->mhp = 0;
-        if (u.ustuck->mhp < 1)
+        if (DEADMONSTER(u.ustuck))
             killed(u.ustuck);
         return;
     }
@@ -4042,7 +4084,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
 
                     if (tmp == MAGIC_COOKIE) { /* disintegration */
                         disintegrate_mon(mon, type, fltxt);
-                    } else if (mon->mhp < 1) {
+                    } else if (DEADMONSTER(mon)) {
                         if (type < 0) {
                             /* mon has just been killed by another monster */
                             monkilled(mon, fltxt, AD_RBRE);
@@ -4389,11 +4431,10 @@ short exploding_wand_typ;
                         vision_full_recalc = 1;
                     } else if (u.utrap && u.utraptype == TT_LAVA) {
                         if (Passes_walls) {
-                            u.utrap = 0;
                             You("pass through the now-solid rock.");
+                            reset_utrap(TRUE);
                         } else {
-                            u.utrap = rn1(50, 20);
-                            u.utraptype = TT_INFLOOR;
+                            set_utrap(rn1(50, 20), TT_INFLOOR);
                             You("are firmly stuck in the cooling rock.");
                         }
                     }
@@ -4996,7 +5037,7 @@ int damage, tell;
 
     if (damage) {
         mtmp->mhp -= damage;
-        if (mtmp->mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             if (m_using)
                 monkilled(mtmp, "", AD_RBRE);
             else
@@ -5069,7 +5110,7 @@ int triesleft;
 void
 makewish()
 {
-    static char buf[BUFSZ] = DUMMY;
+    char buf[BUFSZ] = DUMMY;
     char promptbuf[BUFSZ];
     struct obj *otmp, nothing;
     int tries = 0;

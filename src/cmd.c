@@ -7,6 +7,22 @@
 #include "lev.h"
 #include "func_tab.h"
 
+/* Macros for meta and ctrl modifiers:
+ *   M and C return the meta/ctrl code for the given character;
+ *     e.g., (C('c') is ctrl-c
+ */
+#ifndef M
+#ifndef NHSTDC
+#define M(c) (0x80 | (c))
+#else
+#define M(c) ((c) - 128)
+#endif /* NHSTDC */
+#endif
+
+#ifndef C
+#define C(c) (0x1f & (c))
+#endif
+
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
 #endif
@@ -31,7 +47,6 @@ extern const char *enc_stat[]; /* encumbrance status from botl.c */
 
 #ifdef DEBUG
 extern int NDECL(wiz_debug_cmd_bury);
-extern int NDECL(wiz_debug_cmd_traveldisplay);
 #endif
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
@@ -100,7 +115,7 @@ extern int NDECL(dosit);              /**/
 extern int NDECL(dotalk);             /**/
 extern int NDECL(docast);             /**/
 extern int NDECL(dovspell);           /**/
-extern int NDECL(dotele);             /**/
+extern int NDECL(dotelecmd);          /**/
 extern int NDECL(dountrap);           /**/
 extern int NDECL(doversion);          /**/
 extern int NDECL(doextversion);       /**/
@@ -138,7 +153,6 @@ STATIC_PTR int NDECL(wiz_show_seenv);
 STATIC_PTR int NDECL(wiz_show_vision);
 STATIC_PTR int NDECL(wiz_smell);
 STATIC_PTR int NDECL(wiz_intrinsic);
-STATIC_PTR int NDECL(wiz_mon_polycontrol);
 STATIC_PTR int NDECL(wiz_show_wmodes);
 STATIC_DCL void NDECL(wiz_map_levltyp);
 STATIC_DCL void NDECL(wiz_levltyp_legend);
@@ -345,39 +359,173 @@ doextcmd(VOID_ARGS)
     return retval;
 }
 
-/* here after #? - now list all full-word commands */
+/* here after #? - now list all full-word commands and provid
+   some navigation capability through the long list */
 int
 doextlist(VOID_ARGS)
 {
     register const struct ext_func_tab *efp;
-    char buf[BUFSZ];
-    winid datawin;
-    char ch = cmd_from_func(doextcmd);
+    char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
+    winid menuwin;
+    anything any;
+    menu_item *selected;
+    int n, pass;
+    int menumode = 0, menushown[2], onelist = 0;
+    boolean redisplay = TRUE, search = FALSE;
+    static const char *headings[] = { "Extended commands",
+                                      "Debugging Extended Commands" };
 
-    datawin = create_nhwindow(NHW_TEXT);
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "            Extended Commands List");
-    putstr(datawin, 0, "");
-    if (ch) {
-        Sprintf(buf, "    Press '%s', then type:",
-                visctrl(ch));
-        putstr(datawin, 0, buf);
-        putstr(datawin, 0, "");
-    }
+    searchbuf[0] = '\0';
+    menuwin = create_nhwindow(NHW_MENU);
 
-    for (efp = extcmdlist; efp->ef_txt; efp++) {
-        if (!wizard && (efp->flags & WIZMODECMD))
-            continue;
-        Sprintf(buf, "   %-15s %c %s.",
-                efp->ef_txt,
-                (efp->flags & AUTOCOMPLETE) ? '*' : ' ',
-                efp->ef_desc);
-        putstr(datawin, 0, buf);
+    while (redisplay) {
+        redisplay = FALSE;
+        any = zeroany;
+        start_menu(menuwin);
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "Extended Commands List", MENU_UNSELECTED);
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "", MENU_UNSELECTED);
+
+        Strcpy(buf, menumode ? "Show" : "Hide");
+        Strcat(buf, " commands that don't autocomplete");
+        if (!menumode)
+            Strcat(buf, " (those not marked with [A])");
+        any.a_int = 1;
+        add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf,
+                 MENU_UNSELECTED);
+
+        if (!*searchbuf) {
+            any.a_int = 2;
+            /* was 's', but then using ':' handling within the interface
+               would only examine the two or three meta entries, not the
+               actual list of extended commands shown via separator lines;
+               having ':' as an explicit selector overrides the default
+               menu behavior for it; we retain 's' as a group accelerator */
+            add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
+                     "Search extended commands", MENU_UNSELECTED);
+        } else {
+            Strcpy(buf, "Show all, clear search");
+            if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
+                Sprintf(eos(buf), " (\"%s\")", searchbuf);
+            any.a_int = 3;
+            /* specifying ':' as a group accelerator here is mostly a
+               statement of intent (we'd like to accept it as a synonym but
+               also want to hide it from general menu use) because it won't
+               work for interfaces which support ':' to search; use as a
+               general menu command takes precedence over group accelerator */
+            add_menu(menuwin, NO_GLYPH, &any, 's', ':', ATR_NONE,
+                     buf, MENU_UNSELECTED);
+        }
+        if (wizard) {
+            any.a_int = 4;
+            add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
+                     onelist ? "Show debugging commands in separate section"
+                     : "Show all alphabetically, including debugging commands",
+                     MENU_UNSELECTED);
+        }
+        any = zeroany;
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 "", MENU_UNSELECTED);
+        menushown[0] = menushown[1] = 0;
+        n = 0;
+        for (pass = 0; pass <= 1; ++pass) {
+            /* skip second pass if not in wizard mode or wizard mode
+               commands are being integrated into a single list */
+            if (pass == 1 && (onelist || !wizard))
+                break;
+            for (efp = extcmdlist; efp->ef_txt; efp++) {
+                int wizc;
+
+                /* if hiding non-autocomplete commands, skip such */
+                if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
+                    continue;
+                /* if searching, skip this command if it doesn't match */
+                if (*searchbuf
+                    /* first try case-insensitive substring match */
+                    && !strstri(efp->ef_txt, searchbuf)
+                    && !strstri(efp->ef_desc, searchbuf)
+                    /* wildcard support; most interfaces use case-insensitve
+                       pmatch rather than regexp for menu searching */
+                    && !pmatchi(searchbuf, efp->ef_txt)
+                    && !pmatchi(searchbuf, efp->ef_desc))
+                    continue;
+                /* skip wizard mode commands if not in wizard mode;
+                   when showing two sections, skip wizard mode commands
+                   in pass==0 and skip other commands in pass==1 */
+                wizc = (efp->flags & WIZMODECMD) != 0;
+                if (wizc && !wizard)
+                    continue;
+                if (!onelist && pass != wizc)
+                    continue;
+
+                /* We're about to show an item, have we shown the menu yet?
+                   Doing menu in inner loop like this on demand avoids a
+                   heading with no subordinate entries on the search
+                   results menu. */
+                if (!menushown[pass]) {
+                    Strcpy(buf, headings[pass]);
+                    add_menu(menuwin, NO_GLYPH, &any, 0, 0,
+                             iflags.menu_headings, buf, MENU_UNSELECTED);
+                    menushown[pass] = 1;
+                }
+                Sprintf(buf, " %-14s %-3s %s",
+                        efp->ef_txt,
+                        (efp->flags & AUTOCOMPLETE) ? "[A]" : " ",
+                        efp->ef_desc);
+                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         buf, MENU_UNSELECTED);
+                ++n;
+            }
+            if (n)
+                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         "", MENU_UNSELECTED);
+        }
+        if (*searchbuf && !n)
+            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     "no matches", MENU_UNSELECTED);
+
+        end_menu(menuwin, (char *) 0);
+        n = select_menu(menuwin, PICK_ONE, &selected);
+        if (n > 0) {
+            switch (selected[0].item.a_int) {
+            case 1: /* 'a': toggle show/hide non-autocomplete */
+                menumode = 1 - menumode;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+                break;
+            case 2: /* ':' when not searching yet: enable search */
+                search = TRUE;
+                break;
+            case 3: /* 's' when already searching: disable search */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                redisplay = TRUE;
+                break;
+            case 4: /* 'z': toggle showing wizard mode commands separately */
+                search = FALSE;
+                searchbuf[0] = '\0';
+                onelist = 1 - onelist;  /* toggle 0 -> 1, 1 -> 0 */
+                redisplay = TRUE;
+                break;
+            }
+            free((genericptr_t) selected);
+        } else {
+            search = FALSE;
+            searchbuf[0] = '\0';
+        }
+        if (search) {
+            Strcpy(promptbuf, "Extended command list search phrase");
+            Strcat(promptbuf, "?");
+            getlin(promptbuf, searchbuf);
+            (void) mungspaces(searchbuf);
+            if (searchbuf[0] == '\033')
+                searchbuf[0] = '\0';
+            if (*searchbuf)
+                redisplay = TRUE;
+            search = FALSE;
+        }
     }
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "    Commands marked with a * will be autocompleted.");
-    display_nhwindow(datawin, FALSE);
-    destroy_nhwindow(datawin);
+    destroy_nhwindow(menuwin);
     return 0;
 }
 
@@ -625,8 +773,14 @@ wiz_identify(VOID_ARGS)
 {
     if (wizard) {
         iflags.override_ID = (int) cmd_from_func(wiz_identify);
-        if (display_inventory((char *) 0, TRUE) == -1)
-            identify_pack(0, FALSE);
+        /* command remapping might leave #wizidentify as the only way
+           to invoke us, in which case cmd_from_func() will yield NUL;
+           it won't matter to display_inventory()/display_pickinv()
+           if ^I invokes some other command--what matters is that
+           display_pickinv() and xname() see override_ID as nonzero */
+        if (!iflags.override_ID)
+            iflags.override_ID = C('I');
+        (void) display_inventory((char *) 0, FALSE);
         iflags.override_ID = 0;
     } else
         pline("Unavailable command '%s'.",
@@ -649,6 +803,7 @@ wiz_makemap(VOID_ARGS)
             ballrelease(FALSE);
             unplacebc();
         }
+        reset_utrap(FALSE); /* also done by safe_teleds() for new level */
         check_special_room(TRUE);
         dmonsfree();
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
@@ -734,16 +889,6 @@ wiz_level_tele(VOID_ARGS)
     else
         pline("Unavailable command '%s'.",
               visctrl((int) cmd_from_func(wiz_level_tele)));
-    return 0;
-}
-
-/* #monpolycontrol command - choose new form for shapechangers, polymorphees */
-STATIC_PTR int
-wiz_mon_polycontrol(VOID_ARGS)
-{
-    iflags.mon_polycontrol = !iflags.mon_polycontrol;
-    pline("Monster polymorph control is %s.",
-          iflags.mon_polycontrol ? "on" : "off");
     return 0;
 }
 
@@ -2314,9 +2459,19 @@ int final;
         long save_BLev = BLevitation;
 
         BLevitation = 0L;
-        if (Levitation)
-            enl_msg(You_, "would levitate", "would have levitated",
-                    if_surroundings_permitted, "");
+        if (Levitation) {
+            /* either trapped in the floor or inside solid rock
+               (or both if chained to buried iron ball and have
+               moved one step into solid rock somehow) */
+            boolean trapped = (save_BLev & I_SPECIAL) != 0L,
+                    terrain = (save_BLev & FROMOUTSIDE) != 0L;
+
+            Sprintf(buf, "%s%s%s",
+                    trapped ? " if not trapped" : "",
+                    (trapped && terrain) ? " and" : "",
+                    terrain ? if_surroundings_permitted : "");
+            enl_msg(You_, "would levitate", "would have levitated", buf, "");
+        }
         BLevitation = save_BLev;
     }
     /* actively flying handled earlier as a status condition */
@@ -2324,15 +2479,27 @@ int final;
         long save_BFly = BFlying;
 
         BFlying = 0L;
-        if (Flying)
+        if (Flying) {
             enl_msg(You_, "would fly", "would have flown",
+                    /* wording quibble: for past tense, "hadn't been"
+                       would sound better than "weren't" (and
+                       "had permitted" better than "permitted"), but
+                       "weren't" and "permitted" are adequate so the
+                       extra complexity to handle that isn't worth it */
                     Levitation
-                       ? "if you weren't levitating"
-                       : (save_BFly == FROMOUTSIDE)
-                          ? if_surroundings_permitted
-                          /* both surroundings and [latent] levitation */
-                          : " if circumstances permitted",
+                       ? " if you weren't levitating"
+                       : (save_BFly == I_SPECIAL)
+                          /* this is an oversimpliction; being trapped
+                             might also be blocking levitation so flight
+                             would still be blocked after escaping trap */
+                          ? " if you weren't trapped"
+                          : (save_BFly == FROMOUTSIDE)
+                             ? if_surroundings_permitted
+                             /* two or more of levitation, surroundings,
+                                and being trapped in the floor */
+                             : " if circumstances permitted",
                     "");
+        }
         BFlying = save_BFly;
     }
     /* actively walking on water handled earlier as a status condition */
@@ -2461,7 +2628,7 @@ int final;
     else if (u.moreluck < 0)
         you_have("reduced luck", "");
     if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
-        ltmp = stone_luck(0);
+        ltmp = stone_luck(FALSE);
         if (ltmp <= 0)
             enl_msg("Bad luck ", "does", "did", " not time out for you", "");
         if (ltmp >= 0)
@@ -2859,22 +3026,6 @@ int final;
     en_win = WIN_ERR;
 }
 
-/* Macros for meta and ctrl modifiers:
- *   M and C return the meta/ctrl code for the given character;
- *     e.g., (C('c') is ctrl-c
- */
-#ifndef M
-#ifndef NHSTDC
-#define M(c) (0x80 | (c))
-#else
-#define M(c) ((c) - 128)
-#endif /* NHSTDC */
-#endif
-
-#ifndef C
-#define C(c) (0x1f & (c))
-#endif
-
 /* ordered by command name */
 struct ext_func_tab extcmdlist[] = {
     { '#', "#", "perform an extended command",
@@ -2937,8 +3088,6 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "migratemons", "migrate N random monsters",
             wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
 #endif
-    { '\0', "monpolycontrol", "control monster polymorphs",
-            wiz_mon_polycontrol, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { M('m'), "monster", "use monster's special ability",
             domonability, IFBURIED | AUTOCOMPLETE },
     { 'N', "name", "name a monster or an object",
@@ -3008,7 +3157,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'x', "swap", "swap wielded and secondary weapons", doswapweapon },
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
     { 'A', "takeoffall", "remove all armor", doddoremarm },
-    { C('t'), "teleport", "teleport around the level", dotele, IFBURIED },
+    { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
     { '\0', "terrain", "show map without obstructions",
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
@@ -3041,10 +3190,8 @@ struct ext_func_tab extcmdlist[] = {
     { 'w', "wield", "wield (put in use) a weapon", dowield },
     { M('w'), "wipe", "wipe off your face", dowipe, AUTOCOMPLETE },
 #ifdef DEBUG
-    { '\0', "wizdebug_bury", "wizard debug: bury objs under and around you",
+    { '\0', "wizbury", "bury objs under and around you",
             wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-    { '\0', "wizdebug_traveldisplay", "wizard debug: toggle travel display",
-          wiz_debug_cmd_traveldisplay, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
 #endif
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
             wiz_detect, IFBURIED | AUTOCOMPLETE | WIZMODECMD },

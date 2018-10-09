@@ -408,7 +408,7 @@ run_regions()
                 struct monst *mtmp =
                     find_mid(regions[i]->monsters[j], FM_FMON);
 
-                if (!mtmp || mtmp->mhp <= 0
+                if (!mtmp || DEADMONSTER(mtmp)
                     || (*callbacks[f_indx])(regions[i], mtmp)) {
                     /* The monster died, remove it from list */
                     k = (regions[i]->n_monst -= 1);
@@ -989,12 +989,12 @@ genericptr_t p2;
             if (resists_poison(mtmp))
                 return FALSE;
             mtmp->mhp -= rnd(dam) + 5;
-            if (mtmp->mhp <= 0) {
+            if (DEADMONSTER(mtmp)) {
                 if (heros_fault(reg))
                     killed(mtmp);
                 else
                     monkilled(mtmp, "gas cloud", AD_DRST);
-                if (mtmp->mhp <= 0) { /* not lifesaved */
+                if (DEADMONSTER(mtmp)) { /* not lifesaved */
                     return TRUE;
                 }
             }

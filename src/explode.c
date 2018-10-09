@@ -208,7 +208,7 @@ int expltype;
             if (!mtmp && i + x - 1 == u.ux && j + y - 1 == u.uy)
                 mtmp = u.usteed;
             if (mtmp) {
-                if (mtmp->mhp < 1)
+                if (DEADMONSTER(mtmp))
                     explmask[i][j] = 2;
                 else
                     switch (adtyp) {
@@ -444,7 +444,7 @@ int expltype;
                     mtmp->mhp -= mdam;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
-                if (mtmp->mhp <= 0) {
+                if (DEADMONSTER(mtmp)) {
                     int xkflg = ((adtyp == AD_FIRE
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
@@ -657,6 +657,7 @@ struct obj *obj; /* only scatter this obj        */
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
+            newsym(sx, sy); /* in case it's beyond radius of 'farthest' */
             used_up = TRUE;
 
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */

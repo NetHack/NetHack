@@ -335,6 +335,8 @@ boolean force;      /* Quietly force this animal */
             /* Must have Lev_at_will at this point */
             pline("%s magically floats up!", Monnam(mtmp));
         You("mount %s.", mon_nam(mtmp));
+        if (Flying)
+            You("and %s take flight together.", mon_nam(mtmp));
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
@@ -551,7 +553,7 @@ int reason; /* Player was thrown off etc. */
             (void) rloc(mtmp, FALSE);
         return;
     }
-    if (mtmp->mhp > 0) {
+    if (!DEADMONSTER(mtmp)) {
         place_monster(mtmp, u.ux, u.uy);
         if (!u.uswallow && !u.ustuck && have_spot) {
             struct permonst *mdat = mtmp->data;
@@ -594,7 +596,7 @@ int reason; /* Player was thrown off etc. */
              * falling into the hole).
              */
             /* [ALI] No need to move the player if the steed died. */
-            if (mtmp->mhp > 0) {
+            if (!DEADMONSTER(mtmp)) {
                 /* Keep steed here, move the player to cc;
                  * teleds() clears u.utrap
                  */

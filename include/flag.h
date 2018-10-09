@@ -40,7 +40,7 @@ struct flag {
     boolean lit_corridor;    /* show a dark corr as lit if it is in sight */
     boolean nap;             /* `timed_delay' option for display effects */
     boolean null;            /* OK to send nulls to the terminal */
-    boolean perm_invent;     /* keep full inventories up until dismissed */
+    boolean p__obsolete;     /* [3.6.2: perm_invent moved to iflags] */
     boolean pickup;          /* whether you pickup or move and look */
     boolean pickup_thrown;   /* auto-pickup items you threw */
     boolean pushweapon; /* When wielding, push old weapon into second slot */
@@ -240,11 +240,12 @@ struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
-    int parse_config_file_src;  /* hack for parse_config_line() */
+    int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
-    int purge_monsters;    /* # of dead monsters still on fmon list */
     int override_ID;       /* true to force full identification of objects */
+    int parse_config_file_src;  /* hack for parse_config_line() */
+    int purge_monsters;    /* # of dead monsters still on fmon list */
     int suppress_price;    /* controls doname() for unpaid objects */
     int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
 #define TER_MAP    0x01
@@ -257,6 +258,7 @@ struct instance_flags {
     boolean getloc_usemenu;
     boolean getloc_moveskip;
     coord travelcc;        /* coordinates for travel_cache */
+    boolean trav_debug;    /* display travel path (#if DEBUG only) */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
@@ -292,6 +294,7 @@ struct instance_flags {
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean news;             /* print news */
     boolean num_pad;          /* use numbers for movement commands */
+    boolean perm_invent;      /* keep full inventories up until dismissed */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
     boolean status_updates;   /* allow updates to bottom status lines;

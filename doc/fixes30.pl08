@@ -1,0 +1,36 @@
+[ Release notes for nethack 3.0 patchlevel 8. ]
+
+This patch is devoted to bugfixes and accommodations for more versions of
+the newer ports.
+
+The VMS port should now compile with both VAXC and GNUC and install more
+easily under a variety of OS versions, thanks to Joshua Delahunty and Pat
+Rankin.
+
+A number of strange interactions in the Macintosh-specific code have been
+cleaned up.
+
+The MSDOS overlay manager was debugged, and the overlay assignments and macro
+names straightened out, so the result should be both faster and more stable
+than previous versions.  See the new file Install.ovl and various files in
+the others directory for more information.
+
+The Amiga port now specifies addressing modes for many external variables,
+which should make its executable smaller and faster as well.
+
+
+The biggest externally visible change separates DECgraphics and IBMgraphics
+from the general graphics-setting code, and makes them selectable on the
+command line.
+
+Once again, existing saved games and bones files should be discarded (or the
+update postponed until they are gone).
+
+A number of reasonably simple bugs are no more, although some screen update
+oddities are postponed to 3.1.  Among the dead are problems with shops on
+bones levels, renaming artifacts, kicking non-objects, winning gem treatment,
+level bounds checking and monster filling, mimic appearances, taking items
+out of containers, monster interiors and inventories, and guard behavior.
+Various other things were changed to be consistent with similar situations.
+
+

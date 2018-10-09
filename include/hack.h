@@ -270,6 +270,11 @@ typedef struct sortloot_item Loot;
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
 
+/* flags for deliver_obj_to_mon */
+#define DF_NONE     0x00
+#define DF_RANDOM   0x01
+#define DF_ALL      0x04
+
 /* special mhpmax value when loading bones monster to flag as extinct or
  * genocided */
 #define DEFUNCT_MONSTER (-100)
@@ -328,6 +333,7 @@ typedef struct sortloot_item Loot;
 #define RECURSIVETRAP 0x08 /* trap changed into another type this same turn */
 #define TOOKPLUNGE 0x10    /* used '>' to enter pit below you */
 #define VIASITTING 0x20    /* #sit while at trap location (affects message) */
+#define FAILEDUNTRAP 0x40  /* trap activated by failed untrap attempt */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE 0   /* really doing the move */

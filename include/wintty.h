@@ -79,6 +79,7 @@ struct tty_status_fields {
     boolean valid;
     boolean dirty;
     boolean redraw;
+    boolean last_on_row;
 };
 #endif
 
@@ -228,6 +229,8 @@ E short FDECL(set_tty_font_name, (winid, char *));
 #endif
 E char *NDECL(tty_get_color_string);
 #endif
+E void FDECL(tty_status_enablefield,
+             (int, const char *, const char *, BOOLEAN_P));
 E void NDECL(tty_status_init);
 E void FDECL(tty_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 

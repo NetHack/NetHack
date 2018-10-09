@@ -1926,7 +1926,7 @@
           any  unpaid  items which have been used up, along with other shop
           fees, if any.
 
-          5.4.1.  Shop idiosyncracies
+          5.4.1.  Shop idiosyncrasies
 
                Several aspects of shop behavior might be unexpected.
 
@@ -3015,19 +3015,19 @@
 
           LEVELDIR
             The  location that in-progress level files are stored. Defaults
-            to HACKDIR, must be writeable.
+            to HACKDIR, must be writable.
 
           SAVEDIR
             The location where saved games are kept. Defaults  to  HACKDIR,
-            must be writeable.
+            must be writable.
 
           BONESDIR
             The  location  that  bones files are kept. Defaults to HACKDIR,
-            must be writeable.
+            must be writable.
 
           LOCKDIR
             The  location  that  file  synchronization  locks  are  stored.
-            Defaults to HACKDIR, must be writeable.
+            Defaults to HACKDIR, must be writable.
 
 
           NetHack 3.6                                          May 27, 2018
@@ -3042,7 +3042,7 @@
 
           TROUBLEDIR
             The  location  that  a record of game aborts and self-diagnosed
-            game problems is kept. Defaults to HACKDIR, must be writeable.
+            game problems is kept. Defaults to HACKDIR, must be writable.
 
           AUTOCOMPLETE
             Enable or disable an extended command autocompletion.  Autocom-
@@ -5043,7 +5043,7 @@
              ]    S_mimic_def            (mimic)
              M    S_mummy                (mummy)
              N    S_naga                 (naga)
-             .    S_ndoor                (doorway witout door)
+             .    S_ndoor                (doorway without door)
              n    S_nymph                (nymph)
              O    S_ogre                 (ogre)
              o    S_orc                  (orc)
@@ -5731,7 +5731,7 @@
           NetHack server at nethack.alt.org. Thanks to  Keith  Simpson  and
           Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
           geoneers who invest their time and  effort  into  annual  NetHack
-          tournaments  such as Junehack and in days past, devnull.net (gone
+          tournaments such as Junethack and in days past, devnull.net (gone
           for now, but not forgotten).
 
 

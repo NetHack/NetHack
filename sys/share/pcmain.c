@@ -498,16 +498,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
 
 #if defined(MSDOS) || defined(WIN32)
-    /* Player didn't specify any symbol set so use IBM defaults */
-    if (!symset[PRIMARY].name) {
-        load_symset("IBMGraphics_2", PRIMARY);
-    }
-    if (!symset[ROGUESET].name) {
-        load_symset("RogueEpyx", ROGUESET);
-    }
-#endif
-
-#if defined(MSDOS) || defined(WIN32)
     init_nhwindows(&argc, argv);
 #else
     init_nhwindows(&argc, argv);

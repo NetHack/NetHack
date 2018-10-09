@@ -66,7 +66,8 @@ struct window_procs tty_procs = {
      | WC2_SELECTSAVED
 #endif
 #if defined(STATUS_HILITES)
-     | WC2_HILITE_STATUS | WC2_HITPOINTBAR
+     | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
+     | WC2_RESET_STATUS
 #endif
      | WC2_DARKGRAY),
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
@@ -102,7 +103,7 @@ struct window_procs tty_procs = {
 #endif
     tty_getmsghistory, tty_putmsghistory,
     tty_status_init,
-    genl_status_finish, genl_status_enablefield,
+    genl_status_finish, tty_status_enablefield,
 #ifdef STATUS_HILITES
     tty_status_update,
 #else
@@ -186,6 +187,7 @@ STATIC_DCL int NDECL(condition_size);
 STATIC_DCL int FDECL(make_things_fit, (BOOLEAN_P));
 STATIC_DCL void FDECL(shrink_enc, (int));
 STATIC_DCL void FDECL(shrink_dlvl, (int));
+STATIC_DCL void NDECL(do_setlast);
 #endif
 
 /*
@@ -3529,7 +3531,8 @@ static const char *encvals[3][6] = {
     { "", "Burden", "Stress", "Strain", "Overtax", "Overload" },
     { "", "Brd", "Strs", "Strn", "Ovtx", "Ovld" }
 };
-static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
+#define MAX_PER_ROW 15
+static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: two status lines */
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
       BL_FLUSH },
@@ -3538,11 +3541,16 @@ static enum statusfields fieldorder[2][15] = { /* 2: two status lines */
       BL_CAP, BL_CONDITION, BL_FLUSH }
 };
 
+static int last_on_row[2];  /* [rows] */
+static int finalx[2][2];    /* [rows][NOW or BEFORE] */
+static boolean setlast = FALSE;
 static boolean windowdata_init = FALSE;
 static int cond_shrinklvl = 0, cond_width_at_shrink = 0;
 static int enclev = 0, enc_shrinklvl = 0;
 /* static int dl_shrinklvl = 0; */
 static boolean truncation_expected = FALSE;
+#define FORCE_RESET TRUE
+#define NO_RESET FALSE
 
 /* This controls whether to skip fields that aren't
  * flagged as requiring updating during the current
@@ -3552,11 +3560,13 @@ static boolean truncation_expected = FALSE;
  * for all platforms eventually and the conditional
  * setting below can be removed.
  */
-#if defined(UNIX)
-static int do_field_opt = 0;
+static int do_field_opt = 
+#if defined(DISABLE_TTY_FIELD_OPT)
+    0;
 #else
-static int do_field_opt = 1;
+    1;
 #endif
+
 #endif  /* STATUS_HILITES */
 
 /*
@@ -3571,7 +3581,7 @@ tty_status_init()
     int i;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
-        tty_status[NOW][i].idx = -1;
+        tty_status[NOW][i].idx = BL_FLUSH;
         tty_status[NOW][i].color = NO_COLOR; /* no color */
         tty_status[NOW][i].attr = ATR_NONE;
         tty_status[NOW][i].x = 0;
@@ -3579,6 +3589,7 @@ tty_status_init()
         tty_status[NOW][i].valid  = FALSE;
         tty_status[NOW][i].dirty  = FALSE;
         tty_status[NOW][i].redraw = FALSE;
+        tty_status[NOW][i].last_on_row = FALSE;
         tty_status[BEFORE][i] = tty_status[NOW][i];
     }
     tty_condition_bits = 0L;
@@ -3587,6 +3598,36 @@ tty_status_init()
 
     /* let genl_status_init do most of the initialization */
     genl_status_init();
+}
+
+void
+tty_status_enablefield(fieldidx, nm, fmt, enable)
+int fieldidx;
+const char *nm;
+const char *fmt;
+boolean enable;
+{
+    genl_status_enablefield(fieldidx, nm, fmt, enable);
+    /* force re-evaluation of last field on the row */
+    setlast = FALSE;
+}
+
+void
+do_setlast()
+{
+    int i, row, fld;
+
+    setlast = TRUE;
+    for (row = 0; row < 2; ++row)
+        for (i = MAX_PER_ROW - 1; i > 0; --i) {
+           fld = fieldorder[row][i];
+
+           if (fld == BL_FLUSH || !status_activefields[fld])
+                continue;
+
+           last_on_row[row] = fld;
+           break;
+	}
 }
 
 #ifdef STATUS_HILITES
@@ -3602,7 +3643,11 @@ tty_status_init()
  *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
  *         BL_LEVELDESC, BL_EXP, BL_CONDITION
  *      -- fldindex could also be BL_FLUSH (-1), which is not really
- *         a field index, but is a special trigger to tell the
+ *         a field index, but is a special trigger to tell the 
+ *         windowport that it should output all changes received
+ *         to this point. It marks the end of a bot() cycle.
+ *      -- fldindex could also be BL_RESET (-3), which is not really
+ *         a field index, but is a special advisory to to tell the 
  *         windowport that it should redisplay all its status fields,
  *         even if no changes have been presented to it.
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -3655,19 +3700,29 @@ unsigned long *colormasks;
     char *text = (char *) ptr;
     char *lastchar = (char *) 0;
     char *fval = (char *) 0;
-    boolean force_update = FALSE;
+    boolean reset_state = NO_RESET;
 
-    if (fldidx != BL_FLUSH && !status_activefields[fldidx])
+    if ((fldidx < BL_RESET) || (fldidx >= MAXBLSTATS))
         return;
+
+    if ((fldidx >= 0 && fldidx < MAXBLSTATS) && !status_activefields[fldidx])
+        return;
+
+    if (!setlast)
+        do_setlast();
 
 #ifndef TEXTCOLOR
     color = (color & ~0x00FF) | NO_COLOR;
 #endif
 
     switch (fldidx) {
+    case BL_RESET:
+        reset_state = FORCE_RESET;
+        /* FALLTHRU */
     case BL_FLUSH:
-        force_update = TRUE;
-        break;
+        if (make_things_fit(reset_state) || truncation_expected)
+            render_status();
+        return;
     case BL_CONDITION:
         tty_status[NOW][fldidx].idx = fldidx;
         tty_condition_bits = *condptr;
@@ -3691,7 +3746,8 @@ unsigned long *colormasks;
 
     /* The core botl engine sends a single blank to the window port
        for carrying-capacity when its unused. Let's suppress that */
-    if (tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
+    if (fldidx >= 0 && fldidx < MAXBLSTATS &&
+            tty_status[NOW][fldidx].lth == 1 && status_vals[fldidx][0] == ' ') {
         status_vals[fldidx][0] = '\0';
         tty_status[NOW][fldidx].lth = 0;
     }
@@ -3704,16 +3760,22 @@ unsigned long *colormasks;
             hpbar_percent = percent;
             hpbar_color = (color & 0x00FF);
         }
+        if (iflags.wc2_hitpointbar && (tty_procs.wincap2 & WC2_FLUSH_STATUS) != 0L) {
+            tty_status[NOW][BL_TITLE].color = hpbar_color;
+            tty_status[NOW][BL_TITLE].dirty = TRUE;
+        }
         break;
     case BL_LEVELDESC:
     case BL_HUNGER:
         /* The core sends trailing blanks for some fields.
            Let's suppress the trailing blanks */
-        lastchar = eos(status_vals[fldidx]);
-        lastchar--;
-        while (*lastchar == ' ' && lastchar >= status_vals[fldidx]) {
-            *lastchar-- = '\0';
-            tty_status[NOW][fldidx].lth--;
+        if (tty_status[NOW][fldidx].lth > 0) {
+            lastchar = eos(status_vals[fldidx]);
+            lastchar--;
+            while (lastchar >= status_vals[fldidx] && *lastchar == ' ') {
+                *lastchar-- = '\0';
+                tty_status[NOW][fldidx].lth--;
+            }
         }
         break;
     case BL_TITLE:
@@ -3737,8 +3799,7 @@ unsigned long *colormasks;
         }
         break;
     }
-    if (make_things_fit(force_update) || truncation_expected)
-        render_status();
+    /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
 }
 
@@ -3802,7 +3863,7 @@ boolean forcefields;
 int *topsz, *bottomsz;
 {
     int c, i, row, col, trackx, idx;
-    boolean valid = TRUE, matchprev = FALSE, update_right;
+    boolean valid = TRUE, matchprev = FALSE, update_right, disregard;
 
     if (!windowdata_init && !check_windowdata())
         return FALSE;
@@ -3821,34 +3882,45 @@ int *topsz, *bottomsz;
             tty_status[NOW][idx].y = row;
             tty_status[NOW][idx].x = col;
 
-            /* evaluate */
+            /* On a change to the field length, everything 
+               further to the right must be updated as well */
             if (tty_status[NOW][idx].lth != tty_status[BEFORE][idx].lth)
                 update_right = TRUE;
+
+            if (idx == last_on_row[row])
+                tty_status[NOW][idx].last_on_row = TRUE;
 
             if (!update_right && !forcefields) {
                 /*
                  * Check values against those already on the dislay.
                  *  - Is the additional processing time for this worth it?
                  */
-                matchprev = FALSE;
-                if (do_field_opt && tty_status[NOW][idx].dirty) {
-                    /* compare values */
-                    const char *ob, *nb;     /* old byte, new byte */
+                if (do_field_opt) {
+                    matchprev = FALSE;
+                    disregard = (tty_status[NOW][idx].lth == 0);
+                    if (do_field_opt && !disregard
+                            && tty_status[NOW][idx].dirty) {
+                        /* compare values */
+                        const char *ob, *nb;     /* old byte, new byte */
 
-                    c = col - 1;
-                    ob = &wins[WIN_STATUS]->data[row][c];
-                    nb = status_vals[idx];
-                    while (*nb && c < wins[WIN_STATUS]->cols) {
-                        if (*nb != *ob)
-                            break;
-                        nb++;
-                        ob++;
-                        c++;
+                        c = col - 1;
+                        ob = &wins[WIN_STATUS]->data[row][c];
+                        nb = status_vals[idx];
+                        while (*nb && c < wins[WIN_STATUS]->cols) {
+                            if (*nb != *ob)
+                                break;
+                            nb++;
+                            ob++;
+                            c++;
+                        }
+                        if (!*nb && c > col - 1)
+                            matchprev = TRUE;
                     }
-                    if (!*nb && c > col - 1)
-                        matchprev = TRUE;
+                } else {
+                    matchprev = FALSE;
                 }
             }
+
             /*
              * With STATUS_HILITES, it is possible that the color
              * needs to change even if the text is the same, so
@@ -3858,7 +3930,8 @@ int *topsz, *bottomsz;
              * After the field has been updated, render_status()
              * will also clear .redraw and .dirty.
              */
-            if (forcefields || update_right || !matchprev
+            if (forcefields || update_right
+                || (!matchprev && tty_status[NOW][idx].dirty && !disregard)
                 || tty_status[NOW][idx].color != tty_status[BEFORE][idx].color
                 || tty_status[NOW][idx].attr  != tty_status[BEFORE][idx].attr)
                 tty_status[NOW][idx].redraw = TRUE;
@@ -4103,27 +4176,22 @@ render_status(VOID_ARGS)
     for (row = 0; row < 2; ++row) {
         curs(WIN_STATUS, 1, row);
         for (i = 0; fieldorder[row][i] != BL_FLUSH; ++i) {
-            int fldidx = fieldorder[row][i];
+            int idx = fieldorder[row][i];
 
-            if (do_field_opt && !tty_status[NOW][fldidx].redraw)
-                continue;
-            /*
-             * Ignore zero length fields. check_fields() didn't count
-             * them in either.
-             */
-            if (!tty_status[NOW][fldidx].lth && fldidx != BL_CONDITION)
+            if (!status_activefields[idx])
                 continue;
 
-            if (status_activefields[fldidx]) {
-                int coloridx = tty_status[NOW][fldidx].color;
-                int attridx = tty_status[NOW][fldidx].attr;
-                int x = tty_status[NOW][fldidx].x;
+            if ((tty_status[NOW][idx].lth || idx == BL_CONDITION)
+                 && (tty_status[NOW][idx].redraw || !do_field_opt)) {
+                int coloridx = tty_status[NOW][idx].color;
+                int attridx = tty_status[NOW][idx].attr;
+                int x = tty_status[NOW][idx].x;
                 int y = row;
-                char *text = status_vals[fldidx];
-                boolean hitpointbar = (fldidx == BL_TITLE
+                char *text = status_vals[idx];
+                boolean hitpointbar = (idx == BL_TITLE
                                        && iflags.wc2_hitpointbar);
 
-                if (fldidx == BL_CONDITION) {
+                if (idx == BL_CONDITION) {
                     /*
                      * +-----------------+
                      * | Condition Codes |
@@ -4167,7 +4235,7 @@ render_status(VOID_ARGS)
                     }
                     tty_curs(WIN_STATUS, x, y);
                     cl_end();
-                } else if (fldidx == BL_GOLD) {
+                } else if (idx == BL_GOLD) {
                     char buf[BUFSZ];
                     /*
                      * +-----------+
@@ -4220,16 +4288,23 @@ render_status(VOID_ARGS)
                         }
                     }
                     if (iflags.hilite_delta) {
+                        char *s = bar;
                         tty_putstatusfield(nullfield, "[", x++, y);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_start_color(hpbar_color);
-                        term_start_attr(ATR_INVERSE);
-                        tty_putstatusfield(nullfield, bar, x, y);
-                        x += (int) strlen(bar);
-                        term_end_attr(ATR_INVERSE);
-                        if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
-                            term_end_color();
-                        if (twoparts) {
+                        if (hpbar_percent > 0) {
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_start_color(hpbar_color);
+                            term_start_attr(ATR_INVERSE);
+                        }
+                        if (hpbar_percent == 0)
+                            s = text;
+                        tty_putstatusfield(nullfield, s, x, y);
+                        x += (int) strlen(s);
+                        if (hpbar_percent > 0) {
+                            term_end_attr(ATR_INVERSE);
+                            if (hpbar_color != NO_COLOR && coloridx != CLR_MAX)
+                                term_end_color();
+                        }
+                        if (twoparts && hpbar_percent > 0) {
                             *bar2 = savedch;
                             tty_putstatusfield(nullfield, bar2, x, y);
                             x += (int) strlen(bar2);
@@ -4237,7 +4312,7 @@ render_status(VOID_ARGS)
                         }
                         tty_putstatusfield(nullfield, "]", x++, y);
                     } else {
-                        tty_putstatusfield(&tty_status[NOW][fldidx],
+                        tty_putstatusfield(&tty_status[NOW][idx],
                                            (char *) 0, x, y);
                     }
                 } else {
@@ -4257,24 +4332,41 @@ render_status(VOID_ARGS)
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_start_color(coloridx);
                     }
-                    tty_putstatusfield(&tty_status[NOW][fldidx],
-                                       text, x, y);
+                    tty_putstatusfield(&tty_status[NOW][idx],
+                                       text, x, y);                    
                     if (iflags.hilite_delta) {
                         if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                             term_end_color();
                         End_Attr(attridx);
                     }
                 }
-                /* reset .redraw and .dirty now that they've been rendered */
-                tty_status[NOW][fldidx].dirty  = FALSE;
-                tty_status[NOW][fldidx].redraw = FALSE;
-                /*
-                 * Make a copy of the entire tty_status struct for comparison
-                 * of current and previous.
-                 */
-                tty_status[BEFORE][fldidx] = tty_status[NOW][fldidx];
+                if (tty_status[NOW][idx].last_on_row) {
+                    int padright = 0;
+
+                    x = tty_status[NOW][idx].x + tty_status[NOW][idx].lth;
+                    finalx[row][NOW] = x - 1;
+                    if (finalx[row][NOW] < finalx[row][BEFORE])
+                        padright = finalx[row][BEFORE] - finalx[row][NOW];
+                    while (padright-- > 0)
+                        tty_putstatusfield(nullfield, " ", x++, y);
+                }
             }
+            /* reset .redraw, .dirty, .padright now that they've been rendered */
+            tty_status[NOW][idx].dirty  = FALSE;
+            tty_status[NOW][idx].redraw = FALSE;
+            tty_status[NOW][idx].last_on_row = FALSE;
+
+            /*
+             * For comparison of current and previous:
+             * - Copy the entire tty_status struct.
+             */
+             tty_status[BEFORE][idx] = tty_status[NOW][idx];
         }
+        /*
+         * For comparison of current and previous:
+         * - Copy the last written column number on the row.
+         */
+        finalx[row][BEFORE] = finalx[row][NOW];
     }
     if (cond_disp_width[NOW] < cond_width_at_shrink) {
         cond_shrinklvl = 0;      /* reset */

@@ -224,6 +224,23 @@ boolean init, artif;
     return otmp;
 }
 
+struct obj *
+mksobj_migr_to_species(otyp, mflags2, init, artif)
+int otyp;
+unsigned mflags2;
+boolean init, artif;
+{
+    struct obj *otmp;
+
+    otmp = mksobj(otyp, init, artif);
+    if (otmp) {
+        add_to_migration(otmp);
+        otmp->owornmask = (long) MIGR_TO_SPECIES;
+        otmp->corpsenm = mflags2;
+    }
+    return otmp;
+}
+
 /* mkobj(): select a type of item from a class, use mksobj() to create it */
 struct obj *
 mkobj(oclass, artif)
@@ -1861,7 +1878,7 @@ discard_minvent(mtmp)
 struct monst *mtmp;
 {
     struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = (mtmp->mhp > 0);
+    boolean keeping_mon = (!DEADMONSTER(mtmp));
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */

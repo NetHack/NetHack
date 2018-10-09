@@ -34,7 +34,7 @@ typedef struct mswin_nethack_message_window {
     int yMax;            /* maximum vertical scrolling position */
     int xPage;           /* page size of horizontal scroll bar */
     int lines_last_turn; /* lines added during the last turn */
-    int dont_care; /* flag the the user does not care if messages are lost */
+    int dont_care; /* flag the user does not care if messages are lost */
 } NHMessageWindow, *PNHMessageWindow;
 
 static TCHAR szMessageWindowClass[] = TEXT("MSNHMessageWndClass");

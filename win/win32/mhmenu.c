@@ -251,7 +251,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         /* If we just used the permanent inventory window to pick something,
          * set the menu back to its display inventory state.
          */
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
             && how != PICK_NONE) {
             data->menu.prompt[0] = '\0';
             SetMenuListType(hWnd, PICK_NONE);
@@ -322,7 +322,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetWindowRect(hWnd, &rt);
         ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
         ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
             mswin_update_window_placement(NHW_INVEN, &rt);
         else
             mswin_update_window_placement(NHW_MENU, &rt);
@@ -334,7 +334,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetWindowRect(hWnd, &rt);
         ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
         ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
             mswin_update_window_placement(NHW_INVEN, &rt);
         else
             mswin_update_window_placement(NHW_MENU, &rt);

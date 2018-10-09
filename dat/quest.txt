@@ -1668,7 +1668,7 @@ to %ns lair.  If you can manage to defeat %n and return
 undead that befoul the land.
 
 "Go with %d as your guide, %p."
-%E [%nC invaded %H and captured %o.  Defeat %ni and retrive %oh.]
+%E [%nC invaded %H and captured %o.  Defeat %ni and retrieve %oh.]
 %Cp Pri 00025
 "You can prevail, if you rely on %d."
 %E
@@ -1800,7 +1800,7 @@ a minion of %d.  %d commands that you retain
 of Yendor.
 
 "Go forth, and let %d guide your steps."
-%E [Congraulations, %p.  Keep %o; go and recover the Amulet.]
+%E [Congratulations, %p.  Keep %o; go and recover the Amulet.]
 %Cc Pri 00082
 %lC reiterates that %o is yours now.
 
@@ -2056,7 +2056,7 @@ the Amulet."
 %E [You have succeeded.  Take %o with you as you go to find the Amulet.]
 # assumes The Longbow of Diana
 %Cc Ran 00082
-%l flexs %o reverently.
+%l flexes %o reverently.
 
 "With this wondrous bow, one need never run out of arrows.
 You are its keeper now, and the time has come to resume your
@@ -2707,7 +2707,7 @@ and you may be able to defeat him."
 "If you are %a at all times you may succeed, %p."
 %E
 %Cp Tou 00034
-"Let all who meet you on your journey know that you are on an quest for
+"Let all who meet you on your journey know that you are on a quest for
 %l and grant safe passage."
 %E
 %Cc Tou 00035
@@ -2919,7 +2919,7 @@ But it is now likely that you can defeat %n, and recover
 "A short time ago, %n and his minions attacked this place.  They
 opened the huge volcanic vents you %x about the hill, and attacked.  I knew
 that this was to come to pass, and had asked %d for a group of %gP
-to help defend this place.  The few you %x here are the  mightiest of
+to help defend this place.  The few you %x here are the mightiest of
 Valhalla's own, and are all that are left of one hundred %d sent.
 
 "Despite the great and glorious battle we fought, %n managed at
@@ -2967,7 +2967,7 @@ The ice and snow gives way to a valley floor.  You %x ahead of you
 a huge round hill surrounded by pools of lava.  This then is the entrance
 to %i.  It looks like you're not going to get in without
 a fight though.
-%E [This is the entrace to %i.]
+%E [This is the entrance to %i.]
 %Cp Val 00036
 Once again, you stand before the entrance to %i.
 %E

@@ -97,7 +97,7 @@ register boolean clumsy;
     dmg += u.udaminc; /* add ring(s) of increase damage */
     if (dmg > 0)
         mon->mhp -= dmg;
-    if (mon->mhp > 0 && martial() && !bigmonst(mon->data) && !rn2(3)
+    if (!DEADMONSTER(mon) && martial() && !bigmonst(mon->data) && !rn2(3)
         && mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
         /* see if the monster has a place to move into */
         mdx = mon->mx + u.dx;
@@ -116,8 +116,8 @@ register boolean clumsy;
         }
     }
 
-    (void) passive(mon, uarmf, TRUE, mon->mhp > 0, AT_KICK, FALSE);
-    if (mon->mhp <= 0 && !trapkilled)
+    (void) passive(mon, uarmf, TRUE, !DEADMONSTER(mon), AT_KICK, FALSE);
+    if (DEADMONSTER(mon) && !trapkilled)
         killed(mon);
 
     /* may bring up a dialog, so put this after all messages */
@@ -495,7 +495,7 @@ xchar x, y;
         return 0;
 
     if ((trap = t_at(x, y)) != 0) {
-        if (((trap->ttyp == PIT || trap->ttyp == SPIKED_PIT) && !Passes_walls)
+        if ((is_pit(trap->ttyp) && !Passes_walls)
             || trap->ttyp == WEB) {
             if (!trap->tseen)
                 find_trap(trap);
@@ -914,7 +914,7 @@ dokick()
         kick_monster(mtmp, x, y);
         glyph = glyph_at(x, y);
         /* see comment in attack_checks() */
-        if (mtmp->mhp <= 0) { /* DEADMONSTER() */
+        if (DEADMONSTER(mtmp)) { /* DEADMONSTER() */
             /* if we mapped an invisible monster and immediately
                killed it, we don't want to forget what we thought
                was there before the kick */
@@ -1515,7 +1515,7 @@ boolean shop_floor_obj;
     /* boulders never fall through trap doors, but they might knock
        other things down before plugging the hole */
     if (otmp->otyp == BOULDER && ((t = t_at(x, y)) != 0)
-        && (t->ttyp == TRAPDOOR || t->ttyp == HOLE)) {
+        && is_hole(t->ttyp)) {
         if (impact)
             impact_drop(otmp, x, y, 0);
         return FALSE; /* let caller finish the drop */
@@ -1612,6 +1612,9 @@ boolean near_hero;
             continue;
 
         where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
+        if ((where & MIGR_TO_SPECIES) != 0)
+            continue;
+
         nobreak = (where & MIGR_NOBREAK) != 0;
         noscatter = (where & MIGR_WITH_HERO) != 0;
         where &= ~(MIGR_NOBREAK | MIGR_NOSCATTER);
@@ -1655,6 +1658,8 @@ boolean near_hero;
             stackobj(otmp);
             if (!noscatter)
                 (void) scatter(nx, ny, rnd(2), 0, otmp);
+            else
+                newsym(nx, ny);
         } else { /* random location */
             /* set dummy coordinates because there's no
                current position for rloco() to update */
@@ -1663,6 +1668,50 @@ boolean near_hero;
                 /* assume it broke before player arrived, no messages */
                 delobj(otmp);
             }
+        }
+    }
+}
+
+void
+deliver_obj_to_mon(mtmp, cnt, deliverflags)
+int cnt;
+struct monst *mtmp;
+unsigned long deliverflags;
+{
+    struct obj *otmp, *otmp2;
+    int where, maxobj = 1;
+
+    if ((deliverflags & DF_RANDOM) && cnt > 1)
+        maxobj = rnd(cnt);
+    else if (deliverflags & DF_ALL)
+        maxobj = 0;
+    else
+        maxobj = 1;
+
+    cnt = 0;
+    for (otmp = migrating_objs; otmp; otmp = otmp2) {
+        otmp2 = otmp->nobj;
+        where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
+        if ((where & MIGR_TO_SPECIES) == 0)
+            continue;
+
+        if ((mtmp->data->mflags2 & otmp->corpsenm) != 0) {
+            obj_extract_self(otmp);
+            otmp->owornmask = 0L;
+            otmp->ox = otmp->oy = 0;
+
+            /* special treatment for orcs and their kind */
+            if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
+                if (!has_mname(mtmp))
+                    mtmp = christen_orc(mtmp, ONAME(otmp));
+                free_oname(otmp);
+            }
+            otmp->corpsenm = 0;
+            (void) add_to_minv(mtmp, otmp);
+            cnt++;
+            if (maxobj && cnt >= maxobj)
+                break;
+            /* getting here implies DF_ALL */
         }
     }
 }
@@ -1717,7 +1766,7 @@ xchar x, y;
     }
 
     if (((ttmp = t_at(x, y)) != 0 && ttmp->tseen)
-        && (ttmp->ttyp == TRAPDOOR || ttmp->ttyp == HOLE)) {
+        && is_hole(ttmp->ttyp)) {
         gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
                                             : "through the hole";
         return MIGR_RANDOM;
