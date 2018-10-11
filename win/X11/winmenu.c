@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmenu.c	$NHDT-Date: 1453448854 2016/01/22 07:47:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	winmenu.c	$NHDT-Date: 1539216247 2018/10/11 00:04:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -82,6 +82,9 @@ XtPointer client_data, call_data;
     long how_many;
     x11_menu_item *curr = (x11_menu_item *) client_data;
     struct xwindow *wp;
+    Arg args[2];
+
+    nhUse(call_data);
 
     if (!curr)
         return;
@@ -110,7 +113,6 @@ XtPointer client_data, call_data;
         curr->pick_count = -1L;
     }
 
-    Arg args[2];
     XtSetArg(args[0], nhStr(XtNlabel), curr->str);
     XtSetValues(w, args, ONE);
 
@@ -790,19 +792,23 @@ struct menu *curr_menu;
         XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
         XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
 
-        if (!iflags.use_menu_color || !get_menu_coloring(curr->str, &color, &attr))
+        if (!iflags.use_menu_color
+            || !get_menu_coloring(curr->str, &color, &attr))
             attr = curr->attr;
 
         if (color != NO_COLOR) {
             if (attr != ATR_INVERSE)
-                XtSetArg(args[num_args], nhStr(XtNforeground), get_nhcolor(wp, color).pixel); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNforeground),
+                         get_nhcolor(wp, color).pixel); num_args++;
         }
 
         /* TODO: ATR_BOLD, ATR_DIM, ATR_ULINE, ATR_BLINK */
 
         if (attr == ATR_INVERSE) {
-            XtSetArg(args[num_args], nhStr(XtNforeground), get_nhcolor(wp, CLR_BLACK).pixel); num_args++;
-            XtSetArg(args[num_args], nhStr(XtNbackground), get_nhcolor(wp, (color == NO_COLOR) ? NO_COLOR : color).pixel); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNforeground),
+                     get_nhcolor(wp, CLR_BLACK).pixel); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNbackground),
+                     get_nhcolor(wp, color).pixel); num_args++;
         }
 
         if (menulineidx) {
@@ -815,11 +821,13 @@ struct menu *curr_menu;
         Sprintf(tmpbuf, "menuline_%s", (canpick) ? "command" : "label");
         curr->w = linewidget
             = XtCreateManagedWidget(tmpbuf,
-                                    canpick ? commandWidgetClass : labelWidgetClass,
+                                    canpick ? commandWidgetClass
+                                            : labelWidgetClass,
                                     wp->w, args, num_args);
 
         if (canpick)
-            XtAddCallback(linewidget, XtNcallback, menu_select, (XtPointer) curr);
+            XtAddCallback(linewidget, XtNcallback, menu_select,
+                          (XtPointer) curr);
         prevlinewidget = linewidget;
     }
 }
@@ -835,12 +843,10 @@ menu_item **menu_list;
     struct menu_info_t *menu_info;
     Arg args[10];
     Cardinal num_args;
-    String *ptr;
     int retval;
-    Dimension v_pixel_width, v_pixel_height, lblwidth[6], maxlblwidth;
+    Dimension v_pixel_width, v_pixel_height;
     boolean labeled;
     Widget viewport_widget, form, label, all;
-    Boolean sens;
     char gacc[QBUFSZ], *ap;
     boolean permi;
 
@@ -863,7 +869,7 @@ menu_item **menu_list;
     gacc[0] = '\0';
     if (menu_info->how != PICK_NONE) {
         int i, n, gcnt[128];
-#define GSELIDX(c) ((c) &127) /* guard against `signed char' */
+#define GSELIDX(c) ((c) & 127) /* guard against `signed char' */
 
         for (i = 0; i < SIZE(gcnt); i++)
             gcnt[i] = 0;
@@ -963,11 +969,8 @@ menu_item **menu_list;
         XtSetArg(args[num_args], XtNheight, 500);
         num_args++;
 
-        wp->w = XtCreateManagedWidget("menu_list",
-                                                formWidgetClass,
-                                                viewport_widget,
-                                                args,
-                                                num_args);
+        wp->w = XtCreateManagedWidget("menu_list", formWidgetClass,
+                                      viewport_widget, args, num_args);
 
     }
 
@@ -1151,10 +1154,7 @@ static void
 init_menu_nhcolors(wp)
 struct xwindow *wp;
 {
-    if (wp->menu_information->nh_colors_inited)
-        return;
-
-    const char *mapCLR_to_res[CLR_MAX] = {
+    static const char *mapCLR_to_res[CLR_MAX] = {
         XtNblack,
         XtNred,
         XtNgreen,
@@ -1172,15 +1172,22 @@ struct xwindow *wp;
         XtNbright_cyan,
         XtNwhite,
     };
-    Display *dpy = XtDisplay(wp->w);
-    Colormap screen_colormap = DefaultColormap(dpy, DefaultScreen(dpy));
+    Display *dpy;
+    Colormap screen_colormap;
+    XrmDatabase rDB;
+    XrmValue value;
     Status rc;
     int color;
-    XrmDatabase rDB = XrmGetDatabase(dpy);
     char *ret_type[32];
-    XrmValue value;
     char clr_name[BUFSZ];
     char clrclass[BUFSZ];
+
+    if (wp->menu_information->nh_colors_inited)
+        return;
+
+    dpy = XtDisplay(wp->w);
+    screen_colormap = DefaultColormap(dpy, DefaultScreen(dpy));
+    rDB = XrmGetDatabase(dpy);
 
     for (color = 0; color < CLR_MAX; color++) {
         Sprintf(clr_name, "nethack.menu.%s", mapCLR_to_res[color]);
@@ -1195,13 +1202,19 @@ struct xwindow *wp;
             impossible("XrmGetResource error (%s)", clr_name);
         } else if (!strcmp(ret_type[0], "String")) {
             char tmpbuf[256];
-            strncpy(tmpbuf, value.addr, (int) value.size);
+
+            if (value.size >= sizeof tmpbuf)
+                value.size = sizeof tmpbuf - 1;
+            (void) strncpy(tmpbuf, (char *) value.addr, (int) value.size);
             tmpbuf[value.size] = '\0';
             /* tmpbuf now contains the color name from the named resource */
 
-            rc = XAllocNamedColor(dpy, screen_colormap, tmpbuf, &wp->menu_information->nh_colors[color], &wp->menu_information->nh_colors[color]);
+            rc = XAllocNamedColor(dpy, screen_colormap, tmpbuf,
+                                  &wp->menu_information->nh_colors[color],
+                                  &wp->menu_information->nh_colors[color]);
             if (rc == 0) {
-                impossible("XAllocNamedColor failed for color %i (%s)", color, clr_name);
+                impossible("XAllocNamedColor failed for color %i (%s)",
+                           color, clr_name);
             }
         }
     }
