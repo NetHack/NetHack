@@ -257,19 +257,19 @@ Cardinal *num_params;
                 X11_nhbell();
                 return;
             }
-        } else if (ch == MENU_SELECT_ALL) { /* select all */
+        } else if (ch == MENU_SELECT_ALL || ch == MENU_SELECT_PAGE) {
             if (menu_info->how == PICK_ANY)
                 select_all(wp);
             else
                 X11_nhbell();
             return;
-        } else if (ch == MENU_UNSELECT_ALL) { /* unselect all */
+        } else if (ch == MENU_UNSELECT_ALL || ch == MENU_UNSELECT_PAGE) {
             if (menu_info->how == PICK_ANY)
                 select_none(wp);
             else
                 X11_nhbell();
             return;
-        } else if (ch == MENU_INVERT_ALL) { /* invert all */
+        } else if (ch == MENU_INVERT_ALL || ch == MENU_INVERT_PAGE) {
             if (menu_info->how == PICK_ANY)
                 invert_all(wp);
             else
