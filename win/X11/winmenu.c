@@ -521,6 +521,15 @@ static void
 menu_popdown(wp)
 struct xwindow *wp;
 {
+    if (iflags.perm_invent && wp == &window_list[WIN_INVEN]
+        && wp->menu_information->how == PICK_NONE) {
+        get_widget_window_geometry(wp->popup,
+                                   &wp->menu_information->permi_x,
+                                   &wp->menu_information->permi_y,
+                                   &wp->menu_information->permi_w,
+                                   &wp->menu_information->permi_h);
+    }
+
     nh_XtPopdown(wp->popup); /* remove the event grab */
     XtDestroyWidget(wp->popup);
     wp->w = wp->popup = (Widget) 0;
@@ -922,6 +931,12 @@ menu_item **menu_list;
         num_args = 0;
         XtSetArg(args[num_args], XtNallowShellResize, True);
         num_args++;
+        if (permi && menu_info->permi_x != -1) {
+            XtSetArg(args[num_args], nhStr(XtNwidth), menu_info->permi_w);
+            num_args++;
+            XtSetArg(args[num_args], nhStr(XtNheight), menu_info->permi_h);
+            num_args++;
+        }
         wp->popup = XtCreatePopupShell((window == WIN_INVEN)
                                            ? "inventory" : "menu",
                                        (how == PICK_NONE)
@@ -1022,8 +1037,22 @@ menu_item **menu_list;
 
     menu_info->is_up = TRUE;
     if (permi) {
+        if (permi && menu_info->permi_x != -1) {
+            /* Cannot set window x,y at creation time,
+               we must move the window now instead */
+            XMoveWindow(XtDisplay(wp->popup), XtWindow(wp->popup),
+                        menu_info->permi_x, menu_info->permi_y);
+        }
         /* cant use nh_XtPopup() because it may try to grab the focus */
         XtPopup(wp->popup, (int) XtGrabNone);
+        if (permi && menu_info->permi_x == -1) {
+            /* remember perm_invent window geometry the first time */
+            get_widget_window_geometry(wp->popup,
+                                       &menu_info->permi_x,
+                                       &menu_info->permi_y,
+                                       &menu_info->permi_w,
+                                       &menu_info->permi_h);
+        }
         if (!updated_inventory) {
             XMapRaised(XtDisplay(wp->popup), XtWindow(wp->popup));
         }
@@ -1245,6 +1274,10 @@ struct xwindow *wp;
     reset_menu_count(wp->menu_information);
     wp->w = wp->popup = (Widget) 0;
     wp->menu_information->nh_colors_inited = FALSE;
+    wp->menu_information->permi_x = -1;
+    wp->menu_information->permi_y = -1;
+    wp->menu_information->permi_w = -1;
+    wp->menu_information->permi_h = -1;
 }
 
 void
