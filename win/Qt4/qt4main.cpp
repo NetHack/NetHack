@@ -587,7 +587,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { magic, "Offer",            3, dosacrifice},
         { magic, "Pray",             3, dopray},
         { magic, 0, 3},
-        { magic, "Teleport",         3, dotele},
+        { magic, "Teleport",         3, dotelecmd},
         { magic, "Monster action",   3, domonability},
         { magic, "Turn undead",      3, doturn},
 

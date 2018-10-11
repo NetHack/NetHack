@@ -135,6 +135,8 @@ typedef struct x11_mi {
     boolean preselected; /*   in advance?  */
     char selector;       /* Char used to select this entry. */
     char gselector;      /* Group selector. */
+    Widget w;
+    int window;
 } x11_menu_item;
 
 struct menu {
@@ -143,8 +145,6 @@ struct menu {
     const char *query;    /* Query string. */
     const char *gacc;     /* Group accelerators. */
     int count;            /* Number of strings. */
-    String *list_pointer; /* String list. */
-    Boolean *sensitive;   /* Active list. */
     char curr_selector;   /* Next keyboard accelerator to assign, */
                           /*   if 0, then we're out.              */
 };
@@ -153,18 +153,21 @@ struct menu_info_t {
     struct menu curr_menu; /* Menu being displayed. */
     struct menu new_menu;  /* New menu being built. */
 
+    boolean nh_colors_inited;
+    XColor nh_colors[CLR_MAX];
+
     XFontStruct *fs;           /* Font for the window. */
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
     Dimension internal_width;  /* Internal width between widget & border */
     short how;                 /* Menu mode PICK_NONE, PICK_ONE, PICK_ANY */
-    boolean valid_widgets;     /* TRUE if widgets have been created. */
     boolean is_menu;   /* Has been confirmed to being a menu window. */
     boolean is_active; /* TRUE when waiting for user input. */
     boolean is_up;     /* TRUE when window is popped-up. */
     boolean cancelled; /* Menu has been explicitly cancelled. */
     boolean counting;  /* true when menu_count has a valid value */
+    boolean permi;
 };
 
 /*
