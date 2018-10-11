@@ -2472,19 +2472,12 @@ Cardinal *num_params;
 
     direction = atoi(params[0]);
 
-    horiz_sb = XtNameToWidget(viewport, "*horizontal");
-    vert_sb = XtNameToWidget(viewport, "*vertical");
-
-    if (!horiz_sb && !vert_sb) {
-        /* Perhaps the widget enclosing this has scrollbars (could use while)
-         */
-        Widget parent = XtParent(viewport);
-
-        if (parent) {
-            horiz_sb = XtNameToWidget(parent, "horizontal");
-            vert_sb = XtNameToWidget(parent, "vertical");
-        }
-    }
+    Widget scrollw = viewport;
+    do {
+        horiz_sb = XtNameToWidget(scrollw, "*horizontal");
+        vert_sb = XtNameToWidget(scrollw, "*vertical");
+        scrollw = XtParent(scrollw);
+    } while (!horiz_sb && !vert_sb && scrollw);
 
 #define H_DELTA 0.25 /* distance of horiz shift */
     /* vert shift is half of curr distance */

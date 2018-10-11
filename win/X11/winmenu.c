@@ -67,7 +67,13 @@ static const char menu_translations[] = "#override\n\
      <Key>Right: scroll(6)\n\
      <Key>Up: scroll(8)\n\
      <Key>Down: scroll(2)\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)\n\
      <Key>: menu_key()";
+
+static const char menu_entry_translations[] = "#override\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)";
 
 /*
  * Menu callback.
@@ -816,6 +822,9 @@ struct menu *curr_menu;
         } else {
             XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
         }
+
+        XtSetArg(args[num_args], XtNtranslations,
+                 XtParseTranslationTable(menu_entry_translations)); num_args++;
 
         menulineidx++;
         Sprintf(tmpbuf, "menuline_%s", (canpick) ? "command" : "label");
