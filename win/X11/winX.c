@@ -432,6 +432,58 @@ XtPointer *closure_ret;
     }
 }
 
+/* Ask the WM for window frame size */
+void
+get_window_frame_extents(w, top, bottom, left, right)
+Widget w;
+long *top, *bottom, *left, *right;
+{
+    XEvent event;
+    Display *dpy = XtDisplay(w);
+    Window win = XtWindow(w);
+    Atom prop, retprop;
+    int retfmt;
+    unsigned long nitems;
+    unsigned long nbytes;
+    unsigned char *data = 0;
+    long *extents;
+
+    prop = XInternAtom(dpy, "_NET_FRAME_EXTENTS", True);
+
+    while (XGetWindowProperty(dpy, win, prop,
+                              0, 4, False, AnyPropertyType,
+                              &retprop, &retfmt,
+                              &nitems, &nbytes, &data) != Success
+           || nitems != 4 || nbytes != 0)
+        {
+            XNextEvent(dpy, &event);
+        }
+
+    extents = (long *) data;
+
+    *left = extents[0];
+    *right = extents[1];
+    *top = extents[2];
+    *bottom = extents[3];
+}
+
+void
+get_widget_window_geometry(w, x,y, width, height)
+Widget w;
+int *x, *y, *width, *height;
+{
+    long top, bottom, left, right;
+    Arg args[5];
+    XtSetArg(args[0], nhStr(XtNx), x);
+    XtSetArg(args[1], nhStr(XtNy), y);
+    XtSetArg(args[2], nhStr(XtNwidth), width);
+    XtSetArg(args[3], nhStr(XtNheight), height);
+    XtGetValues(w, args, 4);
+    get_window_frame_extents(w, &top, &bottom, &left, &right);
+    *x -= left;
+    *y -= top;
+}
+
 #ifdef TEXTCOLOR
 /* ARGSUSED */
 static void
@@ -2472,19 +2524,12 @@ Cardinal *num_params;
 
     direction = atoi(params[0]);
 
-    horiz_sb = XtNameToWidget(viewport, "*horizontal");
-    vert_sb = XtNameToWidget(viewport, "*vertical");
-
-    if (!horiz_sb && !vert_sb) {
-        /* Perhaps the widget enclosing this has scrollbars (could use while)
-         */
-        Widget parent = XtParent(viewport);
-
-        if (parent) {
-            horiz_sb = XtNameToWidget(parent, "horizontal");
-            vert_sb = XtNameToWidget(parent, "vertical");
-        }
-    }
+    Widget scrollw = viewport;
+    do {
+        horiz_sb = XtNameToWidget(scrollw, "*horizontal");
+        vert_sb = XtNameToWidget(scrollw, "*vertical");
+        scrollw = XtParent(scrollw);
+    } while (!horiz_sb && !vert_sb && scrollw);
 
 #define H_DELTA 0.25 /* distance of horiz shift */
     /* vert shift is half of curr distance */
