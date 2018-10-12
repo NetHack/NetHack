@@ -1033,6 +1033,13 @@ menu_item **menu_list;
     if (menu_info->is_up && permi && menu_info->curr_menu.base) {
         /* perm_invent window - explicitly destroy old menu entry widgets,
            without recreating whole window */
+        WidgetList wlist;
+        Cardinal numchild;
+        num_args = 0;
+        XtSetArg(args[num_args], XtNchildren, &wlist); num_args++;
+        XtSetArg(args[num_args], XtNnumChildren, &numchild); num_args++;
+        XtGetValues(wp->w, args, num_args);
+        XtUnmanageChildren(wlist, numchild);
         for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
             if (curr->w)
                 XtDestroyWidget(curr->w);
