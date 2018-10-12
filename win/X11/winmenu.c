@@ -779,6 +779,31 @@ Widget form,under;
 }
 
 void
+load_boldfont(wp, w)
+struct xwindow *wp;
+Widget w;
+{
+    Arg args[1];
+    XFontStruct *fs;
+    unsigned long ret;
+    char *fontname;
+    Display *dpy;
+
+    if (wp->menu_information->boldfs)
+        return;
+
+    XtSetArg(args[0], nhStr(XtNfont), &fs);
+    XtGetValues(w, args, 1);
+
+    if (!XGetFontProperty(fs, XA_FONT, &ret))
+        return;
+
+    wp->menu_information->boldfs_dpy = dpy = XtDisplay(w);
+    fontname = fontname_boldify(XGetAtomName(dpy, (Atom)ret));
+    wp->menu_information->boldfs = XLoadQueryFont(dpy, fontname);
+}
+
+void
 menu_create_entries(wp, curr_menu)
 struct xwindow *wp;
 struct menu *curr_menu;
@@ -842,6 +867,13 @@ struct menu *curr_menu;
                                     canpick ? commandWidgetClass
                                             : labelWidgetClass,
                                     wp->w, args, num_args);
+
+        if (attr == ATR_BOLD) {
+            load_boldfont(wp, curr->w);
+            num_args = 0;
+            XtSetArg(args[num_args], nhStr(XtNfont), wp->menu_information->boldfs); num_args++;
+            XtSetValues(curr->w, args, num_args);
+        }
 
         if (canpick)
             XtAddCallback(linewidget, XtNcallback, menu_select,
@@ -1285,6 +1317,8 @@ destroy_menu_window(wp)
 struct xwindow *wp;
 {
     clear_old_menu(wp); /* this will also destroy the widgets */
+    if (wp->menu_information->boldfs)
+        XFreeFont(wp->menu_information->boldfs_dpy, wp->menu_information->boldfs);
     free((genericptr_t) wp->menu_information);
     wp->menu_information = (struct menu_info_t *) 0;
     wp->type = NHW_NONE; /* allow re-use */
