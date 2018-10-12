@@ -168,6 +168,9 @@ struct menu_info_t {
     boolean cancelled; /* Menu has been explicitly cancelled. */
     boolean counting;  /* true when menu_count has a valid value */
     boolean permi;
+
+    int permi_x, permi_y; /* perm_invent window x,y */
+    int permi_w, permi_h; /* perm_invent window wid, hei */
 };
 
 /*
@@ -293,6 +296,7 @@ E void FDECL(positionpopup, (Widget, BOOLEAN_P));
 /* ### winX.c ### */
 E struct xwindow *FDECL(find_widget, (Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
+E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
 E Dimension FDECL(nhFontHeight, (Widget));
 E char FDECL(key_event_to_char, (XKeyEvent *));
 E void FDECL(msgkey, (Widget, XtPointer, XEvent *));
