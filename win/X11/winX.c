@@ -85,6 +85,8 @@ int click_x, click_y, click_button; /* Click position on a map window   */
                                     /* (filled by set_button_values()). */
 int updated_inventory;
 
+static int (*old_error_handler) (Display *, XErrorEvent *);
+
 #if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
 #if XtSpecificationRelease >= 6
 #define X11_HANGUP_SIGNAL
@@ -148,6 +150,7 @@ static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
 static boolean FDECL(new_resource_macro, (String, unsigned));
 static void NDECL(load_default_resources);
 static void NDECL(release_default_resources);
+static int FDECL(panic_on_error, (Display *, XErrorEvent *));
 #ifdef X11_HANGUP_SIGNAL
 static void FDECL(X11_sig, (int));
 static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
@@ -1273,6 +1276,21 @@ static XtResource resources[] = {
 #endif
 };
 
+static int
+panic_on_error(display, error)
+Display *display;
+XErrorEvent *error;
+{
+    char buf[BUFSZ];
+    XGetErrorText(display, error->error_code, buf, BUFSZ);
+    fprintf(stderr, "X Error: code %i (%s), request %i, minor %i, serial %lu\n",
+            error->error_code, buf,
+            error->request_code, error->minor_code,
+            error->serial);
+    panic("X Error");
+    return 0;
+}
+
 void
 X11_init_nhwindows(argcp, argv)
 int *argcp;
@@ -1317,6 +1335,8 @@ char **argv;
               XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
 
     /* We don't need to realize the top level widget. */
+
+    old_error_handler = XSetErrorHandler(panic_on_error);
 
 #ifdef TEXTCOLOR
     /* add new color converter to deal with overused colormaps */
