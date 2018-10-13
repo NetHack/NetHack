@@ -484,6 +484,34 @@ int *x, *y, *width, *height;
     *y -= top;
 }
 
+/* Change the full font name string so the weight is "bold" */
+char *
+fontname_boldify(fontname)
+const char *fontname;
+{
+    static char buf[BUFSZ];
+    char *bufp = buf;
+    int idx = 0;
+
+    while (*fontname) {
+        if (*fontname == '-')
+            idx++;
+        *bufp = *fontname;
+        if (idx == 3) {
+            strcat(buf, "bold");
+            bufp += 5;
+            do {
+                fontname++;
+            } while (*fontname && *fontname != '-');
+        } else {
+            bufp++;
+            fontname++;
+        }
+    }
+    *bufp = '\0';
+    return buf;
+}
+
 #ifdef TEXTCOLOR
 /* ARGSUSED */
 static void
