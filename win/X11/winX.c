@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1526429314 2018/05/16 00:08:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1539392992 2018/10/13 01:09:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2539,7 +2539,7 @@ String *params;
 Cardinal *num_params;
 {
     Arg arg[2];
-    Widget horiz_sb, vert_sb;
+    Widget horiz_sb, vert_sb, scrollw;
     float top, shown;
     Boolean do_call;
     int direction;
@@ -2552,7 +2552,7 @@ Cardinal *num_params;
 
     direction = atoi(params[0]);
 
-    Widget scrollw = viewport;
+    scrollw = viewport;
     do {
         horiz_sb = XtNameToWidget(scrollw, "*horizontal");
         vert_sb = XtNameToWidget(scrollw, "*vertical");
