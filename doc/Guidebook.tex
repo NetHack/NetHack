@@ -2123,7 +2123,7 @@ weapon ready to use by setting things up with the `{\tt x}' command, which
 exchanges your primary (the one being wielded) and alternate weapons.
 And if you have proficiency in the ``two weapon combat'' skill, you
 may wield both weapons simultaneously as primary and secondary; use the
-`{\tt \#twoweapon}' extended command to engage or disengage that.  Only
+``{\tt \#twoweapon}'' extended command to engage or disengage that.  Only
 some types of characters (barbarians, for instance) have the necessary
 skill available.  Even with that skill, using two weapons at once incurs
 a penalty in the chance to hit your target compared to using just one
@@ -2145,7 +2145,8 @@ in an appendix to {\it Unearthed Arcana}, an AD\&D supplement.
 %.pg
 The commands to use weapons are `{\tt w}' (wield), `{\tt t}' (throw),
 `{\tt f}' (fire, an alternative way of throwing), `{\tt Q}' (quiver),
-`{\tt x}' (exchange), `{\tt \#twoweapon}', and `{\tt \#enhance}' (see below).
+`{\tt x}' (exchange), ``{\tt \#twoweapon}'', and ``{\tt \#enhance}''
+(see below).
 
 %.hn 3
 \subsection*{Throwing and shooting}
@@ -2212,13 +2213,15 @@ can achieve for each group.  For instance, wizards can become highly
 skilled in daggers or staves but not in swords or bows.
 
 %.pg
-The `{\tt \#enhance}' extended command is used to review current weapons proficiency
+The ``{\tt \#enhance}'' extended command is used to review current weapons
+proficiency
 (also spell proficiency) and to choose which skill(s) to improve when
 you've used one or more skills enough to become eligible to do so.  The
 skill rankings are ``none'' (sometimes also referred to as ``restricted'',
 because you won't be able to advance), ``unskilled'', ``basic'', ``skilled'',
 and ``expert''.  Restricted skills simply will not appear in the list
-shown by `{\tt \#enhance}'.  (Divine intervention might unrestrict a particular
+shown by ``{\tt \#enhance}''.
+(Divine intervention might unrestrict a particular
 skill, in which case it will start at unskilled and be limited to basic.)
 Some characters can enhance their barehanded combat or martial arts skill
 beyond expert to ``master'' or ``grand master''.
@@ -2233,7 +2236,8 @@ higher.  A successful hit has a chance to boost your training towards
 the next skill level (unless you've already reached the limit for this
 skill).  Once such training reaches the threshold for that next level,
 you'll be told that you feel more confident in your skills.  At that
-point you can use `{\tt \#enhance}' to increase one or more skills.  Such skills
+point you can use ``{\tt \#enhance}'' to increase one or more skills.
+Such skills
 are not increased automatically because there is a limit to your total
 overall skills, so you need to actively choose which skills to enhance
 and which to ignore.
@@ -2510,7 +2514,7 @@ Other spells don't require any direction or target.
 Just as weapons are divided into groups in which a character can become
 proficient (to varying degrees), spells are similarly grouped.
 Successfully casting a spell exercises its skill group; using the
-`{\tt \#enhance}' command to advance a sufficiently exercised skill
+``{\tt \#enhance}'' command to advance a sufficiently exercised skill
 will affect all spells within the group.  Advanced skill may increase the
 potency of spells, reduce their risk of failure during casting attempts,
 and improve the accuracy of the estimate for how much longer they will
@@ -2737,7 +2741,7 @@ by other means.
 %.pg
 An illiterate character cannot read or write.  This includes reading
 a scroll, spellbook, fortune cookie message, or t-shirt; writing a
-scroll; or making an engraving of anything other than a single ``x'' (the
+scroll; or making an engraving of anything other than a single ``X'' (the
 traditional signature of an illiterate person).  Reading an engraving,
 or any item that is absolutely necessary to win the game, is not counted
 against this conduct.  The identity of scrolls and spellbooks (and
@@ -2787,7 +2791,7 @@ for system administrators.
 
 %.pg
 The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is \mbox{``defaults.nh''}
+operating systems. On MS-DOS and Windows, it is \mbox{``defaults.nh''}
 in the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}. 
 On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home 
 directory. The file may not exist, but it is a normal ASCII text file and
@@ -3231,7 +3235,7 @@ might miss some interesting and/or important information.  Persistent.
 \item[\ib{herecmd\verb+_+menu}]
 When using a windowport that supports mouse and clicking on yourself or
 next to you, show a menu of possible actions for the location.
-Same as herecmdmenu and therecmdmenu commands.
+Same as ``{\tt \#herecmdmenu}'' and ``{\tt \#therecmdmenu}'' commands.
 %.lp
 \item[\ib{hilite\verb+_+pet}]
 Visually distinguish pets from similar animals (default off).
@@ -3425,7 +3429,7 @@ Valid settings are:
 \numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
 \numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
 \numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
-\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility\\
+\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MS-DOS compatibility\\
 \numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
 %.ei
 %.ed
@@ -3434,7 +3438,7 @@ For backward compatibility, omitting a value is the same as specifying {\tt 1}
 and negating
 {\it number\verb+_+pad\/}
 is the same as specifying {\tt 0}.
-(Settings {\tt 2} and {\tt 4} are for compatibility with MSDOS or old PC Hack;
+(Settings {\tt 2} and {\tt 4} are for compatibility with MS-DOS or old PC Hack;
 in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
 and `{\tt Alt-0}' acts as `{\tt I}'.
 Setting {\tt -1} is to accommodate some QWERTZ keyboards which have the
@@ -3770,8 +3774,9 @@ move by skipping the same glyphs.
 (default off)
 %.lp
 \item[\ib{windowtype}]
-Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
-(default depends on version).
+When the program has been built to support multiple interfaces,
+select whichone to use, such as ``{\tt tty}'' or ``{\tt X11}''
+(default depends on build-time settings; use ``{\tt \#version}'' to check).
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{wizweight}]
@@ -3874,7 +3879,7 @@ If {\it NetHack\/} can, it should pop up dialog boxes for input.
 %.lp
 \item[\ib{preload\verb+_+tiles}]
 If {\it NetHack\/} can, it should preload tiles into memory.
-For example, in the protected mode MSDOS version, control whether tiles
+For example, in the protected mode MS-DOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `{\tt O}' command.
@@ -4139,7 +4144,7 @@ in the config file. You cannot bind object symbols into menu accelerators.
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
 Below are the special commands you can rebind. Some of them can be bound to
-same keys with no problems, others are in the same "context", and if bound
+same keys with no problems, others are in the same ``context'', and if bound
 to same keys, only one of those commands will be available. Special command
 can only be bound to a single key.
 
@@ -4371,9 +4376,9 @@ pattern matching facility:
     MENUCOLOR="* cursed *(being worn)"=red&underline
 \end{verbatim}
 
-specifies that any menu line with " blessed " contained
-in it will be shown in green color, lines with " cursed " will be
-shown in red, and lines with " cursed " followed by "(being worn)"
+specifies that any menu line with ``~blessed~'' contained
+in it will be shown in green color, lines with ``~cursed~'' will be
+shown in red, and lines with ``~cursed~'' followed by ``(being worn)''
 on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
@@ -4381,7 +4386,7 @@ a menu line will be used for the line.
 
 %.pg
 Note that if you intend to have one or more color specifications match
-" uncursed ", you will probably want to turn the
+``~uncursed~'', you will probably want to turn the
 {\it implicit\verb+_+uncursed\/}
 option off so that all items known to be uncursed are actually
 displayed with the ``uncursed'' description.
@@ -4801,10 +4806,13 @@ These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 %.pg
 {\it NetHack\/} can also be compiled with support for sending the game messages
-to an external program, such as a text-to-speech synthesizer. If the \#version
-extended command shows "external program as a message handler", your {\it NetHack\/}
-has been compiled with the capability. When compiling {\it NetHack\/} from source
-on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it. To use
+to an external program, such as a text-to-speech synthesizer. If the
+``{\tt \#version}'' extended command shows ``external program as a
+message handler'', your {\it NetHack\/}
+has been compiled with the capability. When compiling {\it NetHack\/}
+from source
+on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it.
+To use
 the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
 executable, which will be executed with the game message as the program's
 only parameter.
