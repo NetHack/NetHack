@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.279 $ $NHDT-Date: 1539547136 2018/10/14 19:58:56 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.280 $ $NHDT-Date: 1539552590 2018/10/14 21:29:50 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -1326,7 +1326,7 @@ Autocompletes.
 Debug mode only.
 .lp #wait
 Rest one move while doing nothing.
-Default key is '.', and also ' ' if
+Default key is '.', and also '\ ' if
 rest_on_space is on.
 .lp #wear
 Wear a piece of armor. Default key is 'W'.
@@ -3849,17 +3849,18 @@ MENUCOLOR="* cursed *"=red
 MENUCOLOR="* cursed *(being worn)"=red&underline
 .ei
 .ed
-.\" these quotes with leading or trailing space should be flagged "don't split"
-specifies that any menu line with \(lq blessed \(rq contained
-in it will be shown in green color, lines with \(lq cursed \(rq will be
-shown in red, and lines with \(lq cursed \(rq followed by \(lq(being worn)\(rq
+.\" note backslash-quoted spaces to prevent line breaks within " word "
+specifies that any menu line with \(lq\ blessed\ \(rq contained
+in it will be shown in green color, lines with \(lq\ cursed\ \(rq will be
+shown in red, and lines with \(lq\ cursed\ \(rq followed
+by \(lq(being worn)\(rq
 on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
 a menu line will be used for the line.
 .pg
 Note that if you intend to have one or more color specifications match
-\(lq uncursed \(rq, you will probably want to turn the
+\(lq\ uncursed\ \(rq, you will probably want to turn the
 .op implicit_uncursed
 option off so that all items known to be uncursed are actually
 displayed with the \(lquncursed\(rq description.
