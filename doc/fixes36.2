@@ -158,6 +158,11 @@ being trapped (bear trap, web, molten or solidified lava, chained to buried
 	iron ball) blocks both levitation and flight (note: being stuck in a
 	pit ends when either of those starts so doesn't apply)
 change default value for the 'autodescribe' option to 'on'
+Elbereth hypocrisy penalty doesn't apply if attacking a monster which isn't
+	frightened by Elbereth; normal scuffing of engravings still applies
+Elbereth hypocrisy penalty reduced when alignment is already low
+during character creation, don't unset alternate weapon when a shield gets
+	worn (was preventing knight from having lance set up as uswapwep)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -225,6 +230,7 @@ X11: make key translations work with menus on Linux
 X11: allow mouse wheel scrolling to work in menus by default
 X11: handle paged menu control keys
 X11: remember perm_invent window geometry
+X11: handle X errors via panic
 
 
 General New Features

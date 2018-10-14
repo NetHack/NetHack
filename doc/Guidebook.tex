@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{September 26, 2018}
+\date{October 14, 2018}
 
 \maketitle
 
@@ -2619,13 +2619,14 @@ you are carrying (shopkeepers aside).
 
 %.pg
 Normally, if you have seen an object at a particular map location and
-move to another location which can't directly see that object any
+move to another location where you can't directly see that object any
 more, if will continue to be displayed on your map.
 That remains the case even if it is not actually there any more--
 perhaps a monster has picked it up or it has rotted away--
 until you can see or feel that location again.
 One notable exception is that if the object gets covered by the
-``remembered, unseen monster'' marker and that marker is later removed
+``remembered, unseen monster'' marker.
+When that marker is later removed
 after you've verified that no monster is there, you will forget that
 there was any object there regardless of whether the unseen monster
 actually took the object.
@@ -2637,7 +2638,7 @@ The situation is the same for a pile of objects, except that only the
 top item of the pile is displayed.
 The
 {\it hilite\verb+_+pile\/}
-option can be enabled in order to show an item differently when is
+option can be enabled in order to show an item differently when it is
 the top one of a pile.
 
 %.hn 1
@@ -3109,7 +3110,7 @@ peaceable creatures (default on).  Persistent.
 %.lp
 %.lp
 \item[\ib{dark\verb+_+room}]
-Show out-of-sight areas of lit rooms (default off).  Persistent.
+Show out-of-sight areas of lit rooms (default on).  Persistent.
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
