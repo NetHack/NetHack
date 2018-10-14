@@ -218,6 +218,7 @@
     <DlbList Include = "$(DatDir)porthelp"/>
     <DlbList Include = "$(DatDir)hh"/>
     <DlbList Include = "$(DatDir)cmdhelp"/>
+    <DlbList Include = "$(DatDir)keyhelp"/>
     <DlbList Include = "$(DatDir)history"/>
     <DlbList Include = "$(DatDir)opthelp"/>
     <DlbList Include = "$(DatDir)wizhelp"/>

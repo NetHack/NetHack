@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1526755625 2018/05/19 18:47:05 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1539510426 2018/10/14 09:47:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1112,10 +1112,13 @@ register struct trobj *trop;
             discover_object(POT_OIL, TRUE, FALSE);
 
         if (obj->oclass == ARMOR_CLASS) {
-            if (is_shield(obj) && !uarms) {
+            if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
                 setworn(obj, W_ARMS);
-                if (uswapwep)
-                    setuswapwep((struct obj *) 0);
+                /* 3.6.2: this used to unset uswapwep if it was set, but
+                   wearing a shield doesn't prevent having an alternate
+                   weapon ready to swap with the primary; just make sure we
+                   aren't two-weaponing (academic; no one starts that way) */
+                u.twoweap = FALSE;
             } else if (is_helmet(obj) && !uarmh)
                 setworn(obj, W_ARMH);
             else if (is_gloves(obj) && !uarmg)
@@ -1135,10 +1138,11 @@ register struct trobj *trop;
             if (is_ammo(obj) || is_missile(obj)) {
                 if (!uquiver)
                     setuqwep(obj);
-            } else if (!uwep)
+            } else if (!uwep && (!uarms || !bimanual(obj))) {
                 setuwep(obj);
-            else if (!uswapwep)
+            } else if (!uswapwep) {
                 setuswapwep(obj);
+            }
         }
         if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
             initialspell(obj);

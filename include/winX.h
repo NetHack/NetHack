@@ -157,6 +157,8 @@ struct menu_info_t {
     XColor nh_colors[CLR_MAX];
 
     XFontStruct *fs;           /* Font for the window. */
+    XFontStruct *boldfs;       /* Bold font */
+    Display *boldfs_dpy;
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
@@ -297,6 +299,7 @@ E void FDECL(positionpopup, (Widget, BOOLEAN_P));
 E struct xwindow *FDECL(find_widget, (Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
 E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
+E char *FDECL(fontname_boldify, (const char *));
 E Dimension FDECL(nhFontHeight, (Widget));
 E char FDECL(key_event_to_char, (XKeyEvent *));
 E void FDECL(msgkey, (Widget, XtPointer, XEvent *));

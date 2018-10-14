@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1526429314 2018/05/16 00:08:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1539392992 2018/10/13 01:09:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -85,6 +85,8 @@ int click_x, click_y, click_button; /* Click position on a map window   */
                                     /* (filled by set_button_values()). */
 int updated_inventory;
 
+static int (*old_error_handler) (Display *, XErrorEvent *);
+
 #if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
 #if XtSpecificationRelease >= 6
 #define X11_HANGUP_SIGNAL
@@ -148,6 +150,7 @@ static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
 static boolean FDECL(new_resource_macro, (String, unsigned));
 static void NDECL(load_default_resources);
 static void NDECL(release_default_resources);
+static int FDECL(panic_on_error, (Display *, XErrorEvent *));
 #ifdef X11_HANGUP_SIGNAL
 static void FDECL(X11_sig, (int));
 static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
@@ -482,6 +485,34 @@ int *x, *y, *width, *height;
     get_window_frame_extents(w, &top, &bottom, &left, &right);
     *x -= left;
     *y -= top;
+}
+
+/* Change the full font name string so the weight is "bold" */
+char *
+fontname_boldify(fontname)
+const char *fontname;
+{
+    static char buf[BUFSZ];
+    char *bufp = buf;
+    int idx = 0;
+
+    while (*fontname) {
+        if (*fontname == '-')
+            idx++;
+        *bufp = *fontname;
+        if (idx == 3) {
+            strcat(buf, "bold");
+            bufp += 5;
+            do {
+                fontname++;
+            } while (*fontname && *fontname != '-');
+        } else {
+            bufp++;
+            fontname++;
+        }
+    }
+    *bufp = '\0';
+    return buf;
 }
 
 #ifdef TEXTCOLOR
@@ -1245,6 +1276,21 @@ static XtResource resources[] = {
 #endif
 };
 
+static int
+panic_on_error(display, error)
+Display *display;
+XErrorEvent *error;
+{
+    char buf[BUFSZ];
+    XGetErrorText(display, error->error_code, buf, BUFSZ);
+    fprintf(stderr, "X Error: code %i (%s), request %i, minor %i, serial %lu\n",
+            error->error_code, buf,
+            error->request_code, error->minor_code,
+            error->serial);
+    panic("X Error");
+    return 0;
+}
+
 void
 X11_init_nhwindows(argcp, argv)
 int *argcp;
@@ -1289,6 +1335,8 @@ char **argv;
               XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
 
     /* We don't need to realize the top level widget. */
+
+    old_error_handler = XSetErrorHandler(panic_on_error);
 
 #ifdef TEXTCOLOR
     /* add new color converter to deal with overused colormaps */
@@ -2511,7 +2559,7 @@ String *params;
 Cardinal *num_params;
 {
     Arg arg[2];
-    Widget horiz_sb, vert_sb;
+    Widget horiz_sb, vert_sb, scrollw;
     float top, shown;
     Boolean do_call;
     int direction;
@@ -2524,7 +2572,7 @@ Cardinal *num_params;
 
     direction = atoi(params[0]);
 
-    Widget scrollw = viewport;
+    scrollw = viewport;
     do {
         horiz_sb = XtNameToWidget(scrollw, "*horizontal");
         vert_sb = XtNameToWidget(scrollw, "*vertical");
