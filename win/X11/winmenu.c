@@ -52,6 +52,11 @@ static void FDECL(select_match, (struct xwindow *, char *));
 static void FDECL(invert_all, (struct xwindow *));
 static void FDECL(invert_match, (struct xwindow *, char *));
 static void FDECL(menu_popdown, (struct xwindow *));
+Widget FDECL(menu_create_buttons, (struct xwindow *, Widget, Widget));
+void FDECL(load_boldfont, (struct xwindow *, Widget));
+void FDECL(menu_create_entries, (struct xwindow *, struct menu *));
+void FDECL(destroy_menu_entry_widgets, (struct xwindow *));
+static void NDECL(create_menu_translation_tables);
 
 static void FDECL(move_menu, (struct menu *, struct menu *));
 static void FDECL(free_menu_line_entries, (struct menu *));
@@ -74,6 +79,20 @@ static const char menu_translations[] = "#override\n\
 static const char menu_entry_translations[] = "#override\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)";
+
+XtTranslations menu_entry_translation_table = (XtTranslations) 0;
+XtTranslations menu_translation_table = (XtTranslations) 0;
+XtTranslations menu_del_translation_table = (XtTranslations) 0;
+
+static void
+create_menu_translation_tables()
+{
+    if (!menu_translation_table) {
+        menu_translation_table = XtParseTranslationTable(menu_translations);
+        menu_entry_translation_table = XtParseTranslationTable(menu_entry_translations);
+        menu_del_translation_table = XtParseTranslationTable("<Message>WM_PROTOCOLS: menu_delete()");
+    }
+}
 
 /*
  * Menu callback.
@@ -858,7 +877,7 @@ struct menu *curr_menu;
         }
 
         XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(menu_entry_translations)); num_args++;
+                 menu_entry_translation_table); num_args++;
 
         menulineidx++;
         Sprintf(tmpbuf, "menuline_%s", (canpick) ? "command" : "label");
@@ -880,6 +899,31 @@ struct menu *curr_menu;
                           (XtPointer) curr);
         prevlinewidget = linewidget;
     }
+}
+
+void
+destroy_menu_entry_widgets(wp)
+struct xwindow *wp;
+{
+    WidgetList wlist;
+    Cardinal numchild;
+    Arg args[5];
+    Cardinal num_args;
+    x11_menu_item *curr;
+    struct menu_info_t *menu_info;
+
+    if (!wp || !wp->w)
+        return;
+
+    menu_info = wp->menu_information;
+    num_args = 0;
+    XtSetArg(args[num_args], XtNchildren, &wlist); num_args++;
+    XtSetArg(args[num_args], XtNnumChildren, &numchild); num_args++;
+    XtGetValues(wp->w, args, num_args);
+    XtUnmanageChildren(wlist, numchild);
+    for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
+        if (curr->w)
+            XtDestroyWidget(curr->w);
 }
 
 int
@@ -910,6 +954,8 @@ menu_item **menu_list;
     }
 
     debugpline2("X11_select_menu(%i, %i)", window, how);
+
+    create_menu_translation_tables();
 
     menu_info->how = (short) how;
 
@@ -950,6 +996,7 @@ menu_item **menu_list;
 
     if (menu_info->is_up) {
         if (!menu_info->permi) {
+            destroy_menu_entry_widgets(wp);
             nh_XtPopdown(wp->popup);
             XtDestroyWidget(wp->popup);
             wp->w = wp->popup = (Widget) 0;
@@ -975,13 +1022,11 @@ menu_item **menu_list;
                                            ? topLevelShellWidgetClass
                                            : transientShellWidgetClass,
                                        toplevel, args, num_args);
-        XtOverrideTranslations(wp->popup,
-                               XtParseTranslationTable(
-                                     "<Message>WM_PROTOCOLS: menu_delete()"));
+        XtOverrideTranslations(wp->popup, menu_del_translation_table);
 
         num_args = 0;
         XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(menu_translations)); num_args++;
+                 menu_translation_table); num_args++;
         form = XtCreateManagedWidget("mform", formWidgetClass, wp->popup,
                                      args, num_args);
 
@@ -1013,7 +1058,7 @@ menu_item **menu_list;
         XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
         XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
         XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(menu_translations)); num_args++;
+                 menu_translation_table); num_args++;
         viewport_widget = XtCreateManagedWidget(
             "menu_viewport",           /* name */
             viewportWidgetClass, form, /* parent widget */
@@ -1033,16 +1078,7 @@ menu_item **menu_list;
     if (menu_info->is_up && permi && menu_info->curr_menu.base) {
         /* perm_invent window - explicitly destroy old menu entry widgets,
            without recreating whole window */
-        WidgetList wlist;
-        Cardinal numchild;
-        num_args = 0;
-        XtSetArg(args[num_args], XtNchildren, &wlist); num_args++;
-        XtSetArg(args[num_args], XtNnumChildren, &numchild); num_args++;
-        XtGetValues(wp->w, args, num_args);
-        XtUnmanageChildren(wlist, numchild);
-        for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
-            if (curr->w)
-                XtDestroyWidget(curr->w);
+        destroy_menu_entry_widgets(wp);
         free_menu_line_entries(&menu_info->curr_menu);
     }
 
