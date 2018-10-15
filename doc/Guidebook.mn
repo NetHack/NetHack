@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.280 $ $NHDT-Date: 1539552590 2018/10/14 21:29:50 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.281 $ $NHDT-Date: 1539564402 2018/10/15 00:46:42 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -282,11 +282,12 @@ replaces the \(lqYou see ...\(rq descriptions of text adventure games.
 Figure 1 is a sample of what a NetHack screen might look like.
 The way the screen looks for you depends on your platform.
 .
+.br \" break - advance to next line
+\ \" space to force non-empty line before table
 .ft CR \" set font to constant-width Roman
 .TS S
-center tab(~);
-a.
-_
+center box tab(~);
+L.
 The bat bites!
 
     ------
@@ -298,10 +299,8 @@ The bat bites!
 
 
 
-Player the Rambler     St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
-Dlvl:1 $:0  HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
-
-_
+Player the Rambler    St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral
+Dlvl:1 $:0 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
 .TE
 .ft \" revert to previous font
 .ce 1
