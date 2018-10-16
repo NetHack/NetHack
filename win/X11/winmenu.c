@@ -1056,7 +1056,9 @@ menu_item **menu_list;
                                        toplevel, args, num_args);
         XtOverrideTranslations(wp->popup, menu_del_translation_table);
 
-        XtAddEventHandler(wp->popup, StructureNotifyMask, False, menu_size_change_handler, (XtPointer) wp);
+        if (permi)
+            XtAddEventHandler(wp->popup, StructureNotifyMask, False,
+                              menu_size_change_handler, (XtPointer) wp);
 
         num_args = 0;
         XtSetArg(args[num_args], XtNtranslations,
