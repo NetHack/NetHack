@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1508827591 2017/10/24 06:46:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1539653203 2018/10/16 01:26:43 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -460,6 +460,7 @@ make_bones:
     resetobjs(level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
+    u.ux0 = u.ux, u.uy0 = u.uy;
     u.ux = u.uy = 0;
 
     /* Clear all memory from the level. */
@@ -485,7 +486,7 @@ make_bones:
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
-    newbones->frpx = u.ux, newbones->frpy = u.uy;
+    newbones->frpx = u.ux0, newbones->frpy = u.uy0;
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
