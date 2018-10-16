@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.281 $ $NHDT-Date: 1539564402 2018/10/15 00:46:42 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.282 $ $NHDT-Date: 1539728282 2018/10/16 22:18:02 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -21,7 +21,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 14, 2018
+.ds f2 "October 16, 2018
 .
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
@@ -212,7 +212,8 @@ in them stealth and cunning.
 items, and a particular affinity for dweomercraft.  Although seemingly weak
 and easy to overcome at first sight, an experienced Wizard is a deadly foe.
 .pg
-You may also choose the race of your character:
+You may also choose the race of your character (within limits; most
+roles have restrictions on which races are eligible for them):
 .pg
 \fIDwarves\fP are smaller than humans or elves, but are stocky and solid
 individuals.  Dwarves' most notable trait is their great expertise in mining
@@ -745,7 +746,7 @@ anything off the floor.
 Engrave a message on the floor.
 .sd
 .si
-E- - write in the dust with your fingers.
+E\- - write in the dust with your fingers.
 .ei
 .ed
 .lp ""
@@ -753,12 +754,14 @@ Engraving the word \(lqElbereth\(rq will cause most monsters to not attack
 you hand-to-hand (but if you attack, you will rub it out); this is
 often useful to give yourself a breather.
 .lp f
-Fire one of the objects placed in your quiver (or quiver sack, or that you
-have at the ready).  You may select
-ammunition with a previous `Q' command, or let the computer pick
-something appropriate if
+Fire (shoot or throw) one of the objects placed in your quiver (or
+quiver sack, or that you have at the ready).
+You may select ammunition with a previous \(oqQ\(cq command, or let the
+computer pick something appropriate if
 .op autoquiver
 is true.
+.lp ""
+See also \(oqt\(cq (throw) for more general throwing and shooting.
 .lp i
 List your inventory (everything you're carrying).
 .lp I
@@ -778,7 +781,7 @@ list all items known to be uncursed;
 .PL IC
 list all items known to be cursed;
 .PL IX
-list all items whose bless/curse status is known;
+list all items whose bless/curse status is unknown;
 .PL I$
 count your money.
 .PE
@@ -849,13 +852,36 @@ choices but will accept an accessory and attempt to remove it.)
 .lp \(haR
 Redraw the screen.
 .lp s
-Search for secret doors and traps around you.  It usually takes several
-tries to find something.
+Search for secret doors and traps around you.
+It usually takes several tries to find something.
+.lp ""
+Can also be used to figure out whether there is still a monster at
+an adjacent \(lqremembered, unseen monster\(rq marker.
 .lp S
-Save (and suspend) the game.  The game will be restored automatically the
-next time you play.
+Save the game (which suspends play and exits the program).
+The saved game will be restored automatically the next time you play
+using the same character name.
+.lp ""
+In normal play, once a saved game is restored the file used to hold
+the saved data is deleted.
+In explore mode, once restoration is accomplished you are asked whether
+to keep or delete the file.
+Keeping the file makes it feasible to play for a while then quit
+without saving and later restore again.
+.lp ""
+There is no ``save current game state and keep playing'' command, not
+even in explore mode where saved game files can be kept and re-used.
 .lp t
 Throw an object or shoot a projectile.
+.lp ""
+There's no separate \(lqshoot\(rq command.
+If you throw an arrow while wielding a bow, you are shooting
+that arrow and any weapon skill bonus or penalty for bow applies.
+If you throw an arrow while not wielding a bow, you are throwing
+it by hand and it will generally be less effective than when shot.
+.lp ""
+See also \(oqf\(cq (fire) for throwing or shooting an item pre-selected
+via the \(oqQ\(cq (quiver) command.
 .lp T
 Take off armor.
 .lp ""
@@ -883,7 +909,7 @@ Display the game history.
 Wield weapon.
 .sd
 .si
-w- - wield nothing, use your bare hands.
+w\- - wield nothing, use your bare (or gloved) hands.
 .ei
 .ed
 Some characters can wield two weapons at once; use the `X' command
@@ -918,6 +944,10 @@ along with your patron deity and his or her opposition.  It also
 shows most of the various items of information from the status line(s)
 in a less terse form, including several additional things which don't
 appear in the normal status display due to space considerations.
+.lp ""
+In normal play, that's all that \(oq\(haX\(cq displays.
+In explore mode, the role and status feedback is augmented by the
+information provided by \fIenlightenment\fP magic.
 .lp z
 Zap a wand.
 .sd

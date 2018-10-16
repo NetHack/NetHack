@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 14, 2018}
+\date{October 16, 2018}
 
 \maketitle
 
@@ -196,7 +196,8 @@ and easy to overcome at first sight, an experienced Wizard is a deadly foe.
 \elist
 
 %.pg
-You may also choose the race of your character:
+You may also choose the race of your character (within limits; most
+roles have restrictions on which races are eligible for them):
 
 %.pg
 %
@@ -811,10 +812,12 @@ you hand-to-hand (but if you attack, you will rub it out); this is
 often useful to give yourself a breather.
 %.lp
 \item[\tb{f}]
-Fire one of the objects placed in your quiver (or quiver sack, or that you
-have at the ready).  You may select
-ammunition with a previous `{\tt Q}' command, or let the computer pick
-something appropriate if {\it autoquiver\/} is true.
+Fire (shoot or throw) one of the objects placed in your quiver (or
+quiver sack, or that you have at the ready).
+You may select ammunition with a previous `{\tt Q}' command, or let the
+computer pick something appropriate if {\it autoquiver\/} is true.\\
+%.lp ""
+See also `{\tt t}' (throw) for more general throwing and shooting.
 %.lp
 \item[\tb{i}]
 List your inventory (everything you're carrying).
@@ -913,15 +916,38 @@ choices but will accept an accessory and attempt to remove it.)
 Redraw the screen.
 %.lp
 \item[\tb{s}]
-Search for secret doors and traps around you.  It usually takes several
-tries to find something.
+Search for secret doors and traps around you.
+It usually takes several tries to find something.\\
+%.lp ""
+Can also be used to figure out whether there is still a monster at
+an adjacent ``remembered, unseen monster'' marker.
 %.lp
 \item[\tb{S}]
-Save (and suspend) the game.  The game will be restored automatically the
-next time you play.
+Save the game (which suspends play and exits the program).
+The saved game will be restored automatically the next time you play
+using the same character name.\\
+%.lp ""
+In normal play, once a saved game is restored the file used to hold
+the saved data is deleted.
+In explore mode, once restoration is accomplished you are asked whether
+to keep or delete the file.
+Keeping the file makes it feasible to play for a while then quit
+without saving and later restore again.\\
+%.lp ""
+There is no ``save current game state and keep playing'' command, not
+even in explore mode where saved game files can be kept and re-used.
 %.lp
 \item[\tb{t}]
-Throw an object or shoot a projectile.
+Throw an object or shoot a projectile.\\
+%.lp ""
+There's no separate ``shoot'' command.
+If you ``throw'' an arrow while wielding a bow, you are shooting
+that arrow and any weapon skill bonus or penalty for bow applies.
+If you ``throw'' an arrow while not wielding a bow, you are throwing
+it by hand and it will generally be less effective than when shot.\\
+%.lp ""
+See also `{\tt f}' (fire) for throwing or shooting an item pre-selected
+via the `{\tt Q}' (quiver) command.
 %.lp
 \item[\tb{T}]
 Take off armor.\\
@@ -954,7 +980,7 @@ Display the game history.
 Wield weapon.\\
 %.sd
 %.si
-{\tt w-} --- wield nothing, use your bare hands.\\
+{\tt w-} --- wield nothing, use your bare (or gloved) hands.\\
 %.ei
 %.ed
 Some characters can wield two weapons at once; use the `{\tt X}' command
@@ -993,7 +1019,11 @@ redundant, such as {\tt Caveman} or {\tt Priestess}), and alignment,
 along with your patron deity and his or her opposition.  It also
 shows most of the various items of information from the status line(s)
 in a less terse form, including several additional things which don't
-appear in the normal status display due to space considerations.
+appear in the normal status display due to space considerations.\\
+%.lp ""
+In normal play, that's all that `{\tt \^{}X}' displays.
+In explore mode, the role and status feedback is augmented by the
+information provided by {\it enlightenment\/} magic.
 %.lp
 \item[\tb{z}]
 Zap a wand.\\
