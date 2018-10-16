@@ -37,6 +37,7 @@
 
 XColor FDECL(get_nhcolor, (struct xwindow *, int));
 static void FDECL(init_menu_nhcolors, (struct xwindow *));
+static void FDECL(menu_size_change_handler, (Widget, XtPointer, XEvent *, Boolean *));
 
 static void FDECL(menu_select, (Widget, XtPointer, XtPointer));
 static void FDECL(invert_line, (struct xwindow *, x11_menu_item *, int, long));
@@ -93,6 +94,29 @@ create_menu_translation_tables()
         menu_del_translation_table = XtParseTranslationTable("<Message>WM_PROTOCOLS: menu_delete()");
     }
 }
+
+static void
+menu_size_change_handler(w, ptr, event, flag)
+Widget w;
+XtPointer ptr;
+XEvent *event;
+Boolean *flag;
+{
+    struct xwindow *wp = (struct xwindow *) ptr;
+
+    if (!wp || !event)
+        return;
+
+    if (iflags.perm_invent && wp == &window_list[WIN_INVEN]
+        && wp->menu_information->how == PICK_NONE) {
+        get_widget_window_geometry(wp->popup,
+                                   &wp->menu_information->permi_x,
+                                   &wp->menu_information->permi_y,
+                                   &wp->menu_information->permi_w,
+                                   &wp->menu_information->permi_h);
+    }
+}
+
 
 /*
  * Menu callback.
@@ -540,15 +564,6 @@ static void
 menu_popdown(wp)
 struct xwindow *wp;
 {
-    if (iflags.perm_invent && wp == &window_list[WIN_INVEN]
-        && wp->menu_information->how == PICK_NONE) {
-        get_widget_window_geometry(wp->popup,
-                                   &wp->menu_information->permi_x,
-                                   &wp->menu_information->permi_y,
-                                   &wp->menu_information->permi_w,
-                                   &wp->menu_information->permi_h);
-    }
-
     nh_XtPopdown(wp->popup); /* remove the event grab */
     XtDestroyWidget(wp->popup);
     wp->w = wp->popup = (Widget) 0;
@@ -1040,6 +1055,8 @@ menu_item **menu_list;
                                            : transientShellWidgetClass,
                                        toplevel, args, num_args);
         XtOverrideTranslations(wp->popup, menu_del_translation_table);
+
+        XtAddEventHandler(wp->popup, StructureNotifyMask, False, menu_size_change_handler, (XtPointer) wp);
 
         num_args = 0;
         XtSetArg(args[num_args], XtNtranslations,
