@@ -957,6 +957,23 @@ menu_item **menu_list;
 
     create_menu_translation_tables();
 
+    if (menu_info->permi && how != PICK_NONE) {
+        /* Core is reusing perm_invent window for picking an item.
+           But it could be even on a different screen!
+           Create a new temp window for it instead. */
+        winid newwin = X11_create_nhwindow(NHW_MENU);
+        struct xwindow *nwp = &window_list[newwin];
+        X11_start_menu(newwin);
+        move_menu(&menu_info->new_menu, &nwp->menu_information->new_menu);
+        for (curr = nwp->menu_information->new_menu.base; curr; curr = curr->next)
+            curr->window = newwin;
+        nwp->menu_information->permi = FALSE;
+        int ret = X11_select_menu(newwin, how, menu_list);
+        destroy_menu_entry_widgets(nwp);
+        X11_destroy_nhwindow(newwin);
+        return ret;
+    }
+
     menu_info->how = (short) how;
 
     /* collect group accelerators; for PICK_NONE, they're ignored;
