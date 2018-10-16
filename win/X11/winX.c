@@ -1307,6 +1307,7 @@ char **argv;
 
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
+    set_option_mod_status("mouse_support", SET_IN_GAME);
 
     load_default_resources(); /* create default_resource_data[] */
 
