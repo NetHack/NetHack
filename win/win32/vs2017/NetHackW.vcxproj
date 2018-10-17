@@ -85,7 +85,6 @@
     <ClCompile Include="$(SrcDir)mondata.c" />
     <ClCompile Include="$(SrcDir)monmove.c" />
     <ClCompile Include="$(SrcDir)monst.c" />
-    <ClCompile Include="$(SrcDir)monstr.c" />
     <ClCompile Include="$(SrcDir)mplayer.c" />
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />

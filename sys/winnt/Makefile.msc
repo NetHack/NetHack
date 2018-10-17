@@ -384,7 +384,7 @@ VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.
 VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
 VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
 VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
 VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
@@ -638,7 +638,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	echo sp_levs done > $(O)sp_lev.tag
 
 $(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\monstr.c		$(SRC)\vis_tab.c  \
+		$(SRC)\vis_tab.c  \
 		$(U)levcomp.exe	$(INCL)\vis_tab.h \
 		$(U)dgncomp.exe $(TILEUTIL16)
              @echo utilities made >$@
@@ -838,12 +838,6 @@ $(INCL)\onames.h : $(U)makedefs.exe
 
 $(INCL)\pm.h : $(U)makedefs.exe
 	$(U)makedefs -p
-
-#$(INCL)\trap.h : $(U)makedefs.exe
-#	$(U)makedefs -t
-
-$(SRC)\monstr.c: $(U)makedefs.exe
-	$(U)makedefs -m
 
 $(INCL)\vis_tab.h: $(U)makedefs.exe
 	$(U)makedefs -z
@@ -1234,7 +1228,6 @@ spotless: clean
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
-	if exist $(SRC)\monstr.c         del $(SRC)\monstr.c
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist nhdat.			 del nhdat.
 	if exist $(O)obj.tag             del $(O)obj.tag
@@ -1520,7 +1513,6 @@ $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
 	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_chainout.c
 $(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
 	@$(cc) $(cflagsBuild) -Fo$@ ..\win\chain\wc_trace.c
-$(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
