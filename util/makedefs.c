@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1520022901 2018/03/02 20:35:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1539804926 2018/10/17 19:35:26 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -183,8 +183,6 @@ static boolean FDECL(get_gitinfo, (char *, char *));
 static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
-static boolean FDECL(ranged_attk, (struct permonst *));
-static int FDECL(mstrength, (struct permonst *));
 static void NDECL(build_savebones_compat_string);
 static void NDECL(windowing_sanity);
 
@@ -2183,89 +2181,18 @@ do_dungeon()
     return;
 }
 
-static boolean
-ranged_attk(ptr) /* returns TRUE if monster can attack at range */
-register struct permonst *ptr;
-{
-    register int i, j;
-    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
-
-    for (i = 0; i < NATTK; i++) {
-        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP || (atk_mask & (1 << j)))
-            return TRUE;
-    }
-
-    return FALSE;
-}
-
-/* This routine is designed to return an integer value which represents
- * an approximation of monster strength.  It uses a similar method of
- * determination as "experience()" to arrive at the strength.
- */
-static int
-mstrength(ptr)
-struct permonst *ptr;
-{
-    int i, tmp2, n, tmp = ptr->mlevel;
-
-    if (tmp > 49) /* special fixed hp monster */
-        tmp = 2 * (tmp - 6) / 4;
-
-    /*  For creation in groups */
-    n = (!!(ptr->geno & G_SGROUP));
-    n += (!!(ptr->geno & G_LGROUP)) << 1;
-
-    /*  For ranged attacks */
-    if (ranged_attk(ptr))
-        n++;
-
-    /*  For higher ac values */
-    n += (ptr->ac < 4);
-    n += (ptr->ac < 0);
-
-    /*  For very fast monsters */
-    n += (ptr->mmove >= 18);
-
-    /*  For each attack and "special" attack */
-    for (i = 0; i < NATTK; i++) {
-        tmp2 = ptr->mattk[i].aatyp;
-        n += (tmp2 > 0);
-        n += (tmp2 == AT_MAGC);
-        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
-    }
-
-    /*  For each "special" damage type */
-    for (i = 0; i < NATTK; i++) {
-        tmp2 = ptr->mattk[i].adtyp;
-        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
-            || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
-            n += 2;
-        else if (strcmp(ptr->mname, "grid bug"))
-            n += (tmp2 != AD_PHYS);
-        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
-    }
-
-    /*  Leprechauns are special cases.  They have many hit dice so they can
-        hit and are hard to kill, but they don't really do much damage. */
-    if (!strcmp(ptr->mname, "leprechaun"))
-        n -= 2;
-
-    /*  Finally, adjust the monster level  0 <= n <= 24 (approx.) */
-    if (n == 0)
-        tmp--;
-    else if (n >= 6)
-        tmp += (n / 2);
-    else
-        tmp += (n / 3 + 1);
-
-    return (tmp >= 0) ? tmp : 0;
-}
-
 void
 do_monstr()
 {
-    register struct permonst *ptr;
-    register int i, j;
+    /* Don't break anything for ports that haven't been updated. */
+    printf("DEPRECATION WARNINGS:\n");
+    printf("'makedefs -m' is deprecated.  Remove all references\n");
+    printf("  to it from the build process.\n");
+    printf("'monstr.c' is deprecated.  Remove all references to\n");
+    printf("  it from the build process.\n");
+    printf("monstr[] is deprecated.  Replace monstr[x] with\n");
+    printf("  mons[x].difficulty\n");
+    printf("monstr_init() is deprecated.  Remove all references to it.\n");
 
     /*
      * create the source file, "monstr.c"
@@ -2281,15 +2208,18 @@ do_monstr()
     }
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#include \"config.h\"\n");
-    Fprintf(ofp, "\nconst int monstr[] = {\n");
-    for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
-        SpinCursor(3);
-
-        i = mstrength(ptr);
-        Fprintf(ofp, "%2d,%c", i, (++j & 15) ? ' ' : '\n');
-    }
-    /* might want to insert a final 0 entry here instead of just newline */
-    Fprintf(ofp, "%s};\n", (j & 15) ? "\n" : "");
+    Fprintf(ofp, "\nconst int monstrXXX[] = {\n");
+    Fprintf(ofp, "0};\n");
+    Fprintf(ofp, "/*\n");
+    Fprintf(ofp, "DEPRECATION WARNINGS:\n");
+    Fprintf(ofp, "'makedefs -m' is deprecated.  Remove all references\n");
+    Fprintf(ofp, "  to it from the build process.\n");
+    Fprintf(ofp, "'monstr.c' is deprecated.  Remove all references to\n");
+    Fprintf(ofp, "  it from the build process.\n");
+    Fprintf(ofp, "monstr[] is deprecated.  Replace monstr[x] with\n");
+    Fprintf(ofp, "  mons[x].difficulty\n");
+    Fprintf(ofp, "monstr_init() is deprecated.  Remove all references to it.\n");
+    Fprintf(ofp, "*/\n");
 
     Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
     Fprintf(ofp, "\nvoid\n");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1518193644 2018/02/09 16:27:24 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1539804859 2018/10/17 19:34:19 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,7 +35,6 @@ boolean resuming;
     */
     decl_init();
     monst_init();
-    monstr_init(); /* monster strengths */
     objects_init();
 
     /* if a save file created in normal mode is now being restored in
