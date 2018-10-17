@@ -8,8 +8,6 @@
     <Defs Include = "$(IncDir)onames.h"/>
 	<!-- -p -->
     <Defs Include = "$(IncDir)pm.h"/>
-	<!-- -m -->
-    <Defs Include = "$(SrcDir)monstr.c"/>
 	<!-- -z -->
     <Defs Include = "$(IncDir)vis_tab.h"/>
     <Defs Include = "$(SrcDir)vis_tab.c"/>
