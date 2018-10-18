@@ -71,6 +71,8 @@ static const char extended_command_translations[] = "#override\n\
      <Key>Right: scroll(6)\n\
      <Key>Up: scroll(8)\n\
      <Key>Down: scroll(2)\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)\n\
      <Key>: ec_key()";
 
 static const char player_select_translations[] = "#override\n\
@@ -81,6 +83,10 @@ static const char gend_select_translations[] = "#override\n\
      <Key>: gend_key()";
 static const char algn_select_translations[] = "#override\n\
      <Key>: algn_key()";
+
+static const char popup_entry_translations[] = "#override\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)";
 
 static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
@@ -2003,22 +2009,41 @@ Widget *formp; /* return */
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     popup = XtCreatePopupShell(popup_name, transientShellWidgetClass,
                                toplevel, args, num_args);
     XtOverrideTranslations(
         popup, XtParseTranslationTable("<Message>WM_PROTOCOLS: ec_delete()"));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNforceBars, False); num_args++;
-    XtSetArg(args[num_args], XtNallowVert, True); num_args++;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(popup_translations)); num_args++;
-    view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popup,
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
+    Widget popform = XtCreateManagedWidget("topmenuform", formWidgetClass, popup,
+                                           args, num_args);
+
+
+    num_args = 0;
+    XtSetArg(args[num_args], XtNforceBars, False); num_args++;
+    XtSetArg(args[num_args], XtNallowVert, True); num_args++;
+    /*XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;*/
+    XtSetArg(args[num_args], nhStr(XtNuseBottom), True); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNuseRight), True); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(popup_translations)); num_args++;
+    view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popform,
                                  args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(popup_translations)); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
     *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
@@ -2092,6 +2117,8 @@ Widget *formp; /* return */
         if (!widget_names[i])
             continue;
         num_args = 0;
+        XtSetArg(args[num_args], XtNtranslations,
+                 XtParseTranslationTable(popup_entry_translations)); num_args++;
         XtSetArg(args[num_args], nhStr(XtNfromVert), above); num_args++;
         if (above == left) {
             /* if first, we are farther apart */
