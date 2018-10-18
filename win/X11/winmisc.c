@@ -1237,12 +1237,15 @@ X11_player_selection_dialog()
     XtRealizeWidget(popup);
     X11_player_selection_randomize();
 
-    ps_selected = -1;
-
-    nh_XtPopup(popup, (int) XtGrabExclusive, form);
+    if (flags.randomall) {
+        plsel_dialog_acceptvalues();
+    } else {
+        ps_selected = -1;
+        nh_XtPopup(popup, (int) XtGrabExclusive, form);
+    }
 
     /* The callback will enable the event loop exit. */
-    (void) x_event(EXIT_ON_EXIT);
+    (void) x_event(flags.randomall ? EXIT_ON_SENT_EVENT : EXIT_ON_EXIT);
 
     nh_XtPopdown(popup);
     XtDestroyWidget(popup);
