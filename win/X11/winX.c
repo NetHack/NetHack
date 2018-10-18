@@ -2585,8 +2585,6 @@ Cardinal *num_params;
     /* The V_DELTA is 1/2 the value of shown. */
 
     if (horiz_sb) {
-        if (XtWindow(viewport) != XtWindow(horiz_sb))
-          return;
         XtSetArg(arg[0], nhStr(XtNshown), &shown);
         XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
         XtGetValues(horiz_sb, arg, TWO);
@@ -2618,8 +2616,6 @@ Cardinal *num_params;
     }
 
     if (vert_sb) {
-        if (XtWindow(viewport) != XtWindow(vert_sb))
-          return;
         XtSetArg(arg[0], nhStr(XtNshown), &shown);
         XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
         XtGetValues(vert_sb, arg, TWO);
