@@ -21,6 +21,7 @@
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
+#include <X11/Xaw/Scrollbar.h>
 #include <X11/Xaw/Box.h>
 #include <X11/Xos.h>
 
@@ -323,6 +324,27 @@ Cardinal *num_params;
                 invert_all(wp);
             else
                 X11_nhbell();
+            return;
+        } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
+            Widget hbar = (Widget) 0, vbar = (Widget) 0;
+            float top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
+            find_scrollbars(wp->w, &hbar, &vbar);
+            if (vbar)
+                XtCallCallbacks(vbar, XtNjumpProc, &top);
+            return;
+        } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
+            Widget hbar = (Widget) 0, vbar = (Widget) 0;
+            find_scrollbars(wp->w, &hbar, &vbar);
+            if (vbar) {
+                float shown, top;
+                Arg arg[2];
+                XtSetArg(arg[0], nhStr(XtNshown), &shown);
+                XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
+                XtGetValues(vbar, arg, TWO);
+                top += ((ch == MENU_NEXT_PAGE) ? shown : -shown);
+                if (vbar)
+                    XtCallCallbacks(vbar, XtNjumpProc, &top);
+            }
             return;
         } else if (index(menu_info->curr_menu.gacc, ch)) {
         group_accel:
