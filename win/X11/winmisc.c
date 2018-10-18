@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1457079197 2016/03/04 08:13:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1539892610 2018/10/18 19:56:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -120,8 +120,7 @@ XtPointer x;
     return (long)x;
 }
 
-/* Player Selection --------------------------------------------------------
- */
+/* Player Selection ------------------------------------------------------- */
 /* ARGSUSED */
 static void
 ps_quit(w, client_data, call_data)
@@ -1275,8 +1274,7 @@ X11_player_selection_dialog()
     }
 }
 
-/* Global functions =========================================================
- */
+/* Global functions ======================================================== */
 void
 X11_player_selection_prompts()
 {
@@ -1612,11 +1610,9 @@ release_extended_cmds()
     }
 }
 
-/* End global functions =====================================================
- */
+/* End global functions =================================================== */
 
-/* Extended Command --------------------------------------------------------
- */
+/* Extended Command ------------------------------------------------------- */
 /* ARGSUSED */
 static void
 extend_select(w, client_data, call_data)
@@ -1957,8 +1953,7 @@ init_extended_commands_popup()
     free((char *) command_list);
 }
 
-/* -------------------------------------------------------------------------
- */
+/* ------------------------------------------------------------------------ */
 
 /*
  * Create a popup widget of the following form:
@@ -1996,7 +1991,7 @@ Widget **command_widgets;
 XtCallbackProc name_callback;
 Widget *formp; /* return */
 {
-    Widget popup, form, label, above, left, right, view;
+    Widget popup, popform, form, label, above, left, right, view;
     Widget *commands, *curr;
     int i;
     Arg args[8];
@@ -2020,8 +2015,8 @@ Widget *formp; /* return */
              XtParseTranslationTable(popup_translations)); num_args++;
     XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
-    Widget popform = XtCreateManagedWidget("topmenuform", formWidgetClass, popup,
-                                           args, num_args);
+    popform = XtCreateManagedWidget("topmenuform", formWidgetClass, popup,
+                                    args, num_args);
 
 
     num_args = 0;
