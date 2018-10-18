@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.283 $ $NHDT-Date: 1539778950 2018/10/17 12:22:30 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1539898655 2018/10/18 21:37:35 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -1229,15 +1229,19 @@ Name a monster, an individual object, or a type of object.
 Same as \(lq#call\(rq.
 Autocompletes.
 Default keys are \(oqN\(cq, \(oqM-n\(cq, and \(oqM-N\(cq.
-.lp #offer
+.\".lp #offer \" `ff' ligature is narrow enough that text fits on same line
+.\"           \" as #offer but that looks bad because it is too close to 'r'
+.lp "#offer "
 Offer a sacrifice to the gods.
 Autocompletes.
 Default key is \(oqM-o\(cq.
-The \(oqm\(cq prefix skips offering items on the altar.
 .lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
-.lp #open
+.lp ""
+The \(oqm\(cq prefix skips offering any items which are on the altar.
+.\".lp #open \" there's no ligature here, but text ends up too close to #open
+.lp "#open "
 Open a door.
 Default key is \(oqo\(cq.
 .lp #options
@@ -4160,7 +4164,7 @@ for stone through termill, \(lqminor_troubles\(rq for blind through hallu,
 .lp ""
 Allowed behaviors are \(lqalways\(rq, \(lqup\(rq, \(lqdown\(rq,
 \(lqchanged\(rq, a percentage or absolute number threshold, or
-a text to match against.
+text to match against.
 .si
 .lp "*"
 \(lqalways\(rq will set the default attributes for that field.
@@ -4913,8 +4917,8 @@ passed away. NetHack 3.6.0 introduced a tribute to him.
 team since the release of 3.4.3 with some of the beloved community
 patches. Many bugs were fixed and some code was restructured.
 .pg
-In late April 2018, several hundred bug fixes for 3.6.0 and 
-some new features were assembled and released as NetHack 3.6.1. 
+In late April 2018, several hundred bug fixes for 3.6.0 and
+some new features were assembled and released as NetHack 3.6.1.
 The development team at the time of release of 3.6.1 consisted of
 \fBWarwick Allison\fP, \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBPasi Kallinen\fP,
@@ -4952,10 +4956,10 @@ SPECIAL THANKS
 .pg
 On behalf of the NetHack community, thank you very much once
 again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
-public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP 
-and \fBAndy Thomson\fP for hardfought.org. Thanks to all those 
-unnamed dungeoneers who invest their time and effort into annual 
-NetHack tournaments such as Junethack and in days past, 
+public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP
+and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
+unnamed dungeoneers who invest their time and effort into annual
+NetHack tournaments such as Junethack and in days past,
 devnull.net (gone for now, but not forgotten).
 .pg
 .ce
