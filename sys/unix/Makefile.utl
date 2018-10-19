@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1526687364 2018/05/18 23:49:24 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.36 $
+# NetHack 3.6  Makefile.utl    $NHDT-Date: 1539968067 2018/10/19 16:54:27 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.38 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -242,8 +242,6 @@ mdgreph: mdgrep.pl
 	./makedefs -o
 ../include/pm.h: makedefs
 	./makedefs -p
-../src/monstr.c: makedefs
-	./makedefs -m
 ../include/vis_tab.h: makedefs
 	./makedefs -z
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
@@ -447,7 +445,7 @@ tileedit: tileedit.cpp $(TEXT_IO)
 #	../src/foo::
 #		@( cd ../src ; $(MAKE) foo )
 # would always force foo to be up-to-date according to the src Makefile
-# when it's needed here.  unfortunately, some makes believe this syntax
+# when it's needed here.  Unfortunately, some makes believe this syntax
 # means foo always changes, instead of foo should always be checked.
 # therefore, approximate via config.h dependencies, and hope that anybody
 # changing anything other than basic configuration also knows when not
