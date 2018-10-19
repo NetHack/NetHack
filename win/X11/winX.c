@@ -1307,6 +1307,7 @@ char **argv;
 
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
+    set_option_mod_status("mouse_support", SET_IN_GAME);
 
     load_default_resources(); /* create default_resource_data[] */
 
@@ -2547,6 +2548,20 @@ int dir;
     return;
 }
 
+void
+find_scrollbars(w, horiz, vert)
+Widget w;
+Widget *horiz, *vert;
+{
+    if (w) {
+        do {
+            *horiz = XtNameToWidget(w, "*horizontal");
+            *vert = XtNameToWidget(w, "*vertical");
+            w = XtParent(w);
+        } while (!*horiz && !*vert && w);
+    }
+}
+
 /* Callback
  * Scroll a viewport, using standard NH 1,2,3,4,6,7,8,9 directions.
  */
@@ -2559,7 +2574,7 @@ String *params;
 Cardinal *num_params;
 {
     Arg arg[2];
-    Widget horiz_sb, vert_sb, scrollw;
+    Widget horiz_sb = (Widget) 0, vert_sb = (Widget) 0;
     float top, shown;
     Boolean do_call;
     int direction;
@@ -2572,12 +2587,7 @@ Cardinal *num_params;
 
     direction = atoi(params[0]);
 
-    scrollw = viewport;
-    do {
-        horiz_sb = XtNameToWidget(scrollw, "*horizontal");
-        vert_sb = XtNameToWidget(scrollw, "*vertical");
-        scrollw = XtParent(scrollw);
-    } while (!horiz_sb && !vert_sb && scrollw);
+    find_scrollbars(viewport, &horiz_sb, &vert_sb);
 
 #define H_DELTA 0.25 /* distance of horiz shift */
     /* vert shift is half of curr distance */

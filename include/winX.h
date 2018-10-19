@@ -307,6 +307,7 @@ E void FDECL(highlight_yn, (BOOLEAN_P));
 E void FDECL(nh_XtPopup, (Widget, int, Widget));
 E void FDECL(nh_XtPopdown, (Widget));
 E void FDECL(win_X11_init, (int));
+E void FDECL(find_scrollbars, (Widget, Widget *, Widget *));
 E void FDECL(nh_keyscroll, (Widget, XEvent *, String *, Cardinal *));
 
 /* ### winmesg.c ### */

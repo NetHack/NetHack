@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1522891623 2018/04/05 01:27:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1539908137 2018/10/19 00:15:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1539,44 +1539,41 @@ mfind0(mtmp, via_warning)
 struct monst *mtmp;
 boolean via_warning;
 {
-    xchar x = mtmp->mx,
-          y = mtmp->my;
+    int x = mtmp->mx, y = mtmp->my;
+    boolean found_something = FALSE;
 
     if (via_warning && !warning_of(mtmp))
         return -1;
 
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
-    find:
-        exercise(A_WIS, TRUE);
-        if (!canspotmon(mtmp)) {
-            if (glyph_is_invisible(levl[x][y].glyph)) {
-                /* Found invisible monster in a square which already has
-                 * an 'I' in it.  Logically, this should still take time
-                 * and lead to a return 1, but if we did that the player
-                 * would keep finding the same monster every turn.
-                 */
-                return -1;
-            } else {
-                You_feel("an unseen monster!");
-                map_invisible(x, y);
-            }
-        } else if (!sensemon(mtmp))
-                You("find %s.",
-                    mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
-        return 1;
-    }
-    if (!canspotmon(mtmp)) {
-        if (mtmp->mundetected
-            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL))
-            if (via_warning) {
-                Your("warning senses cause you to take a second %s.",
-                     Blind ? "to check nearby" : "look close by");
-                display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-            }
+        found_something = TRUE;
+    } else if (mtmp->mundetected
+               && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+        if (via_warning) {
+            Your("warning senses cause you to take a second %s.",
+                 Blind ? "to check nearby" : "look close by");
+            display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
+        }
         mtmp->mundetected = 0;
         newsym(x, y);
-        goto find;
+        found_something = TRUE;
+    }
+
+    if (found_something) {
+        if (!canspotmon(mtmp) && glyph_is_invisible(levl[x][y].glyph))
+            return -1; /* Found invisible monster in square which already has
+                        * 'I' in it.  Logically, this should still take time
+                        * and lead to `return 1', but if we did that the hero
+                        * would keep finding the same monster every turn. */
+        exercise(A_WIS, TRUE);
+        if (!canspotmon(mtmp)) {
+            map_invisible(x, y);
+            You_feel("an unseen monster!");
+        } else if (!sensemon(mtmp)) {
+            You("find %s.", mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));
+        }
+        return 1;
     }
     return 0;
 }
