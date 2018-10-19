@@ -807,6 +807,17 @@ register struct obj *obj;
             /* turning into slime is preferable to starvation */
             else if (fptr == &mons[PM_GREEN_SLIME] && !slimeproof(mon->data))
                 return starving ? ACCFOOD : POISON;
+            /* polymorphing is preferable to starvation, and the pet might also
+             * want to take their chances on it if they've been mistreated */
+            else if (is_shapeshifter(fptr)) {
+                if (mon->mtame == 1) {
+                    /* A herbivore still won't eat a nonvegan corpse, but in any
+                     * other circumstance a pet with tameness 1 will happily eat
+                     * a shapeshifter. */
+                    return (herbi && !vegan(fptr)) ? MANFOOD : CADAVER;
+                }
+                return starving ? ACCFOOD : MANFOOD;
+            }
             else if (vegan(fptr))
                 return herbi ? CADAVER : MANFOOD;
             /* most humanoids will avoid cannibalism unless starving;
