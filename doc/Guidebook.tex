@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 14, 2018}
+\date{October 16, 2018}
 
 \maketitle
 
@@ -196,7 +196,8 @@ and easy to overcome at first sight, an experienced Wizard is a deadly foe.
 \elist
 
 %.pg
-You may also choose the race of your character:
+You may also choose the race of your character (within limits; most
+roles have restrictions on which races are eligible for them):
 
 %.pg
 %
@@ -811,10 +812,12 @@ you hand-to-hand (but if you attack, you will rub it out); this is
 often useful to give yourself a breather.
 %.lp
 \item[\tb{f}]
-Fire one of the objects placed in your quiver (or quiver sack, or that you
-have at the ready).  You may select
-ammunition with a previous `{\tt Q}' command, or let the computer pick
-something appropriate if {\it autoquiver\/} is true.
+Fire (shoot or throw) one of the objects placed in your quiver (or
+quiver sack, or that you have at the ready).
+You may select ammunition with a previous `{\tt Q}' command, or let the
+computer pick something appropriate if {\it autoquiver\/} is true.\\
+%.lp ""
+See also `{\tt t}' (throw) for more general throwing and shooting.
 %.lp
 \item[\tb{i}]
 List your inventory (everything you're carrying).
@@ -913,15 +916,38 @@ choices but will accept an accessory and attempt to remove it.)
 Redraw the screen.
 %.lp
 \item[\tb{s}]
-Search for secret doors and traps around you.  It usually takes several
-tries to find something.
+Search for secret doors and traps around you.
+It usually takes several tries to find something.\\
+%.lp ""
+Can also be used to figure out whether there is still a monster at
+an adjacent ``remembered, unseen monster'' marker.
 %.lp
 \item[\tb{S}]
-Save (and suspend) the game.  The game will be restored automatically the
-next time you play.
+Save the game (which suspends play and exits the program).
+The saved game will be restored automatically the next time you play
+using the same character name.\\
+%.lp ""
+In normal play, once a saved game is restored the file used to hold
+the saved data is deleted.
+In explore mode, once restoration is accomplished you are asked whether
+to keep or delete the file.
+Keeping the file makes it feasible to play for a while then quit
+without saving and later restore again.\\
+%.lp ""
+There is no ``save current game state and keep playing'' command, not
+even in explore mode where saved game files can be kept and re-used.
 %.lp
 \item[\tb{t}]
-Throw an object or shoot a projectile.
+Throw an object or shoot a projectile.\\
+%.lp ""
+There's no separate ``shoot'' command.
+If you ``throw'' an arrow while wielding a bow, you are shooting
+that arrow and any weapon skill bonus or penalty for bow applies.
+If you ``throw'' an arrow while not wielding a bow, you are throwing
+it by hand and it will generally be less effective than when shot.\\
+%.lp ""
+See also `{\tt f}' (fire) for throwing or shooting an item pre-selected
+via the `{\tt Q}' (quiver) command.
 %.lp
 \item[\tb{T}]
 Take off armor.\\
@@ -954,7 +980,7 @@ Display the game history.
 Wield weapon.\\
 %.sd
 %.si
-{\tt w-} --- wield nothing, use your bare hands.\\
+{\tt w-} --- wield nothing, use your bare (or gloved) hands.\\
 %.ei
 %.ed
 Some characters can wield two weapons at once; use the `{\tt X}' command
@@ -980,7 +1006,6 @@ the exchange still takes place.
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``{\tt \#twoweapon}'' extended command.\\
 %.lp ""
-
 (In versions prior to 3.6 this was the command to switch from normal
 play to ``explore mode'', also known as ``discovery mode'', which has now
 been moved to ``{\tt \#exploremode}''.)
@@ -993,7 +1018,11 @@ redundant, such as {\tt Caveman} or {\tt Priestess}), and alignment,
 along with your patron deity and his or her opposition.  It also
 shows most of the various items of information from the status line(s)
 in a less terse form, including several additional things which don't
-appear in the normal status display due to space considerations.
+appear in the normal status display due to space considerations.\\
+%.lp ""
+In normal play, that's all that `{\tt \^{}X}' displays.
+In explore mode, the role and status feedback is augmented by the
+information provided by {\it enlightenment\/} magic.
 %.lp
 \item[\tb{z}]
 Zap a wand.\\
@@ -1090,7 +1119,7 @@ the game was compiled with.
 \item[\tb{\#adjust}]
 Adjust inventory letters (most useful when the
 {\it fixinv\/}
-option is ``on''). Autocompletes. Default key is '{\tt M-a}'.\\
+option is ``on''). Autocompletes. Default key is `{\tt M-a}'.\\
 %.lp ""
 This command allows you to move an item from one particular inventory
 slot to another so that it has a letter which is more meaningful for you
@@ -1119,12 +1148,14 @@ deciding whether to merge with the destination stack.
 \item[\tb{\#annotate}]
 Allows you to specify one line of text to associate with the current
 dungeon level.  All levels with annotations are displayed by the
-``{\tt \#overview}'' command. Autocompletes. Default key is '{\tt M-A}',
-and '{\tt \^{}N}' if {\it number\verb+_+pad\/} is on.
+``{\tt \#overview}'' command. Autocompletes.
+Default key is `{\tt M-A}',
+and also `{\tt \^{}N}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#apply}]
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
-Default key is '{\tt a}'.\\
+Default key is `{\tt a}'.\\
+%.lp ""
 If the tool used acts on items on the floor, using the `{\tt m}' prefix
 skips those items.\\
 %.lp ""
@@ -1132,97 +1163,103 @@ If used on a wand, that wand will be broken, releasing its magic in the
 process.  Confirmation is required.
 %.lp
 \item[\tb{\#attributes}]
-Show your attributes. Default key is '{\tt \^{}X}'.\\
+Show your attributes. Default key is `{\tt \^{}X}'.
 %.lp
 \item[\tb{\#autopickup}]
-Toggle the {\it autopickup\/} -option. Default key is '{\tt @}'.\\
+Toggle the {\it autopickup\/} option. Default key is `{\tt @}'.
 %.lp
 \item[\tb{\#call}]
 Call (name) a monster, or an object in inventory, on the floor,
 or in the discoveries list, or add an annotation for the
-current level (same as ``{\tt \#annotate}''). Default key is '{\tt C}'.
+current level (same as ``{\tt \#annotate}''). Default key is `{\tt C}'.
 %.lp
 \item[\tb{\#cast}]
-Cast a spell. Default key is '{\tt Z}'.\\
+Cast a spell. Default key is `{\tt Z}'.
 %.lp
 \item[\tb{\#chat}]
-Talk to someone. Default key is '{\tt M-c}'.\\
+Talk to someone. Default key is `{\tt M-c}'.
 %.lp
 \item[\tb{\#close}]
-Close a door. Default key is '{\tt c}'.\\
+Close a door. Default key is `{\tt c}'.
 %.lp
 \item[\tb{\#conduct}]
 List voluntary challenges you have maintained. Autocompletes.
-Default key is '{\tt M-C}'.\\
+Default key is `{\tt M-C}'.\\
 %.lp ""
 See the section below entitled ``Conduct'' for details.
 %.lp
 \item[\tb{\#dip}]
-Dip an object into something. Autocompletes. Default key is '{\tt M-d}'.
+Dip an object into something. Autocompletes. Default key is `{\tt M-d}'.
 %.lp
 \item[\tb{\#down}]
-Go down a staircase. Default key is '{\tt >}'.
+Go down a staircase. Default key is `{\tt >}'.
 %.lp
 \item[\tb{\#drop}]
-Drop an item. Default key is '{\tt d}'.
+Drop an item. Default key is `{\tt d}'.
 %.lp
 \item[\tb{\#droptype}]
-Drop specific item types. Default key is '{\tt D}'.
+Drop specific item types. Default key is `{\tt D}'.
 %.lp
 \item[\tb{\#eat}]
-Eat something. Default key is '{\tt e}'.
+Eat something. Default key is `{\tt e}'.
 The `{\tt m}' prefix skips eating items on the floor.
 %.lp
 \item[\tb{\#engrave}]
-Engrave writing on the floor. Default key is '{\tt E}'.
+Engrave writing on the floor. Default key is `{\tt E}'.
 %.lp
 \item[\tb{\#enhance}]
 Advance or check weapon and spell skills. Autocompletes.
-Default key is '{\tt M-e}'.
+Default key is `{\tt M-e}'.
 %.lp
 \item[\tb{\#exploremode}]
 Enter the explore mode.
 %.lp
 \item[\tb{\#fire}]
-Fire ammunition from quiver. Default key is '{\tt f}'.
+Fire ammunition from quiver. Default key is `{\tt f}'.
 %.lp
 \item[\tb{\#force}]
-Force a lock. Autocompletes. Default key is '{\tt M-f}'.
+Force a lock. Autocompletes. Default key is `{\tt M-f}'.
 %.lp
 \item[\tb{\#glance}]
-Show what type of thing a map symbol corresponds to. Default key is '{\tt ;}'.
+Show what type of thing a map symbol corresponds to. Default key is `{\tt ;}'.
 %.lp
 \item[\tb{\#help}]
-Show the help menu. Default key is '{\tt ?}', and '{\tt h}' if {\it number\verb+_+pad\/} is on.
+Show the help menu.
+Default key is `{\tt ?}',
+and also `{\tt h}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#herecmdmenu}]
 Show a menu of possible actions in your current location.
 %.lp
 \item[\tb{\#history}]
-Show long version and game history. Default key is '{\tt V}'.
+Show long version and game history. Default key is `{\tt V}'.
 %.lp
 \item[\tb{\#inventory}]
-Show your inventory. Default key is '{\tt i}'.
+Show your inventory. Default key is `{\tt i}'.
 %.lp
 \item[\tb{\#inventtype}]
-Inventory specific item types. Default key is '{\tt I}'.
+Inventory specific item types. Default key is `{\tt I}'.
 %.lp
 \item[\tb{\#invoke}]
-Invoke an object's special powers. Autocompletes. Default key is '{\tt M-i}'.
+Invoke an object's special powers. Autocompletes. Default key is `{\tt M-i}'.
 %.lp
 \item[\tb{\#jump}]
-Jump to another location. Autocompletes. Default key is '{\tt M-j}', and '{\tt j}' if {\it number\verb+_+pad\/} is on.
+Jump to another location. Autocompletes.
+Default key is `{\tt M-j}',
+and also `{\tt j}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#kick}]
-Kick something. Default key is '{\tt \^{}D}', and '{\tt k}' if {\it number\verb+_+pad\/} is on.
+Kick something.
+Default key is `{\tt \^{}D}',
+and also `{\tt k}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#known}]
 Show what object types have been discovered.
-Default key is '{\tt $\backslash$}'.
+Default key is `{\tt $\backslash$}'.
 %.lp
 \item[\tb{\#knownclass}]
 Show discovered types for one class of objects.
-Default key is '{\tt `}'.
+Default key is `{\tt `}'.
 %.lp
 \item[\tb{\#levelchange}]
 Change your experience level.
@@ -1235,35 +1272,39 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#look}]
-Look at what is here, under you. Default key is '{\tt :}'.
+Look at what is here, under you. Default key is `{\tt :}'.
 %.lp
 \item[\tb{\#loot}]
 Loot a box or bag on the floor beneath you, or the saddle
 from a steed standing next to you. Autocompletes.
-Default key is '{\tt M-l}', and '{\tt l}' if {\it number\verb+_+pad\/} is on.
+Default key is `{\tt M-l}',
+and also `{\tt l}' if {\it number\verb+_+pad\/} is on.
 Precede with the `{\tt m}' prefix to skip containers at your location
 and go directly to removing a saddle.
 %.lp
 \item[\tb{\#monster}]
 Use a monster's special ability (when polymorphed into monster form).
-Autocompletes. Default key is '{\tt M-m}'.
+Autocompletes. Default key is `{\tt M-m}'.
 %.lp
 \item[\tb{\#name}]
-Name a monster, an individual object, or a type of object.  Same as `{\tt \#call}'.
-Autocompletes. Default keys are '{\tt N}', '{\tt M-n}', and '{\tt M-N}'.
+Name a monster, an individual object, or a type of object.
+Same as ``{\tt \#call}''.
+Autocompletes.
+Default keys are `{\tt N}', `{\tt M-n}', and `{\tt M-N}'.
 %.lp
 \item[\tb{\#offer}]
-Offer a sacrifice to the gods. Autocompletes. Default key is '{\tt M-o}'.\\
-The `{\tt m}' prefix skips offering items on the altar.
+Offer a sacrifice to the gods. Autocompletes. Default key is `{\tt M-o}'.\\
 %.lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
+%.lp ""
+The `{\tt m}' prefix skips offering any items which are on the altar.\\
 %.lp
 \item[\tb{\#open}]
-Open a door. Default key is '{\tt o}'.
+Open a door. Default key is `{\tt o}'.
 %.lp
 \item[\tb{\#options}]
-Show and change option settings. Default key is '{\tt O}'.
+Show and change option settings. Default key is `{\tt O}'.
 %.lp
 \item[\tb{\#overview}]
 Display information you've discovered about the dungeon.  Any visited
@@ -1272,8 +1313,9 @@ and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
 level will be included regardless of annotations. Autocompletes.
-Default keys are '{\tt \^{}O}', and '{\tt M-O}'.
+Default keys are `{\tt \^{}O}', and `{\tt M-O}'.
 %.lp
+% DON'T PANIC!
 \item[\tb{\#panic}]
 Test the panic routine.
 Terminates the current game.
@@ -1281,10 +1323,10 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#pay}]
-Pay your shopping bill. Default key is '{\tt p}'.
+Pay your shopping bill. Default key is `{\tt p}'.
 %.lp
 \item[\tb{\#pickup}]
-Pick up things at the current location. Default key is '{\tt ,}'.
+Pick up things at the current location. Default key is `{\tt ,}'.
 The `{\tt m}' prefix forces use of a menu.
 %.lp
 \item[\tb{\#polyself}]
@@ -1293,7 +1335,7 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#pray}]
-Pray to the gods for help. Autocompletes. Default key is '{\tt M-p}'.\\
+Pray to the gods for help. Autocompletes. Default key is `{\tt M-p}'.\\
 %.lp ""
 Praying too soon after receiving prior help is a bad idea.
 (Hint: entering the dungeon alive is treated as having received help.
@@ -1305,17 +1347,17 @@ by default, and you can reset the
 option to disable it.
 %.lp
 \item[\tb{\#prevmsg}]
-Show previously displayed game messages. Default key is '{\tt \^{}P}'.
+Show previously displayed game messages. Default key is `{\tt \^{}P}'.
 %.lp
 \item[\tb{\#puton}]
-Put on an accessory (ring, amulet, etc). Default key is '{\tt P}'.
+Put on an accessory (ring, amulet, etc). Default key is `{\tt P}'.
 %.lp
 \item[\tb{\#quaff}]
-Quaff (drink) something. Default key is '{\tt q}'.
+Quaff (drink) something. Default key is `{\tt q}'.
 %.lp
 \item[\tb{\#quit}]
 Quit the program without saving your game. Autocompletes.
-Default key is '{\tt M-q}'.
+Default key is `{\tt M-q}'.
 %.lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
@@ -1324,41 +1366,44 @@ response of `{\tt y}' acknowledges that intent.  You can set the
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#quiver}]
-Select ammunition for quiver. Default key is '{\tt Q}'.
+Select ammunition for quiver. Default key is `{\tt Q}'.
 %.lp
 \item[\tb{\#read}]
-Read a scroll, a spellbook, or something else. Default key is '{\tt r}'.
+Read a scroll, a spellbook, or something else. Default key is `{\tt r}'.
 %.lp
 \item[\tb{\#redraw}]
-Redraw the screen. Default key is '{\tt \^{}R}', and '{\tt \^{}L}' if {\it number\verb+_+pad\/} is on.
+Redraw the screen.
+Default key is `{\tt \^{}R}',
+and also `{\tt \^{}L}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#remove}]
-Remove an accessory (ring, amulet, etc). Default key is '{\tt R}'.
+Remove an accessory (ring, amulet, etc). Default key is `{\tt R}'.
 %.lp
 \item[\tb{\#ride}]
 Ride (or stop riding) a saddled creature. Autocompletes.
-Default key is '{\tt M-R}'.
+Default key is `{\tt M-R}'.
 %.lp
 \item[\tb{\#rub}]
-Rub a lamp or a stone. Autocompletes. Default key is '{\tt M-r}'.
+Rub a lamp or a stone. Autocompletes. Default key is `{\tt M-r}'.
 %.lp
 \item[\tb{\#save}]
-Save the game. Default key is '{\tt S}'.
+Save the game and exit the program.
+Default key is `{\tt S}'.
 %.lp
 \item[\tb{\#search}]
-Search for traps and secret doors around you. Default key is '{\tt s}'.
+Search for traps and secret doors around you. Default key is `{\tt s}'.
 %.lp
 \item[\tb{\#seeall}]
-Show all equipment in use. Default key is '{\tt *}'.
+Show all equipment in use. Default key is `{\tt *}'.
 %.lp
 \item[\tb{\#seeamulet}]
-Show the amulet currently worn. Default key is '{\tt "}'.
+Show the amulet currently worn. Default key is `{\tt "}'.
 %.lp
 \item[\tb{\#seearmor}]
-Show the armor currently worn. Default key is '{\tt [}'.
+Show the armor currently worn. Default key is `{\tt [}'.
 %.lp
 \item[\tb{\#seegold}]
-Count your gold. Default key is '{\tt \$}'.
+Count your gold. Default key is `{\tt \$}'.
 %.lp
 \item[\tb{\#seenv}]
 Show seen vectors.
@@ -1366,45 +1411,45 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#seerings}]
-Show the ring(s) currently worn. Default key is '{\tt =}'.
+Show the ring(s) currently worn. Default key is `{\tt =}'.
 %.lp
 \item[\tb{\#seespells}]
-List and reorder known spells. Default key is '{\tt +}'.
+List and reorder known spells. Default key is `{\tt +}'.
 %.lp
 \item[\tb{\#seetools}]
-Show the tools currently in use. Default key is '{\tt (}'.
+Show the tools currently in use. Default key is `{\tt (}'.
 %.lp
 \item[\tb{\#seetrap}]
-Show the type of an adjacent trap. Default key is '{\tt \^{}}'.
+Show the type of an adjacent trap. Default key is `{\tt \^{}}'.
 %.lp
 \item[\tb{\#seeweapon}]
-Show the weapon currently wielded. Default key is '{\tt )}'.
+Show the weapon currently wielded. Default key is `{\tt )}'.
 %.lp
 \item[\tb{\#shell}]
-Do a shell escape. Default key is '{\tt !}'.
+Do a shell escape. Default key is `{\tt !}'.
 %.lp
 \item[\tb{\#sit}]
-Sit down. Autocompletes. Default key is '{\tt M-s}'.
+Sit down. Autocompletes. Default key is `{\tt M-s}'.
 %.lp
 \item[\tb{\#stats}]
-Show memory statistics.
+Show memory usage statistics.
 Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#suspend}]
-Suspend the game. Default key is '{\tt \^{}Z}'.
+Suspend the game. Default key is `{\tt \^{}Z}'.
 %.lp
 \item[\tb{\#swap}]
-Swap wielded and secondary weapons. Default key is '{\tt x}'.
+Swap wielded and secondary weapons. Default key is `{\tt x}'.
 %.lp
 \item[\tb{\#takeoff}]
-Take off one piece of armor. Default key is '{\tt T}'.
+Take off one piece of armor. Default key is `{\tt T}'.
 %.lp
 \item[\tb{\#takeoffall}]
-Remove all armor. Default key is '{\tt A}'.
+Remove all armor. Default key is `{\tt A}'.
 %.lp
 \item[\tb{\#teleport}]
-Teleport around the level. Default key is '{\tt \^{}T}'.
+Teleport around the level. Default key is `{\tt \^{}T}'.
 %.lp
 \item[\tb{\#terrain}]
 Show bare map without displaying monsters, objects, or traps.
@@ -1414,7 +1459,7 @@ Autocompletes.
 Show a menu of possible actions in a location next to you.
 %.lp
 \item[\tb{\#throw}]
-Throw something. Default key is '{\tt t}'.
+Throw something. Default key is `{\tt t}'.
 %.lp
 \item[\tb{\#timeout}]
 Look at the timeout queue.
@@ -1423,34 +1468,38 @@ Debug mode only.
 %.lp
 \item[\tb{\#tip}]
 Tip over a container (bag or box) to pour out its contents.
-Autocompletes. Default key is '{\tt M-T}'.
+Autocompletes. Default key is `{\tt M-T}'.
 The `{\tt m}' prefix makes the command use a menu.
 %.lp
 \item[\tb{\#travel}]
-Travel to a specific location on the map. Default key is '{\tt _}'.
+Travel to a specific location on the map.
+Default key is `{\tt \verb+_+}'.
 Using the ``request menu'' prefix shows a menu of interesting targets in sight
-without asking to move the cursor. When picking a target with cursor and
-the {\it autodescribe\/}-option is on, the top line will show "(no travel path)" if
+without asking to move the cursor.
+When picking a target with cursor and the {\it autodescribe\/}
+option is on, the top line will show ``(no travel path)'' if
 your character does not know of a path to that location.
 %.lp
 \item[\tb{\#turn}]
-Turn undead away. Autocompletes. Default key is '{\tt M-t}'.
+Turn undead away. Autocompletes. Default key is `{\tt M-t}'.
 %.lp
 \item[\tb{\#twoweapon}]
-Toggle two-weapon combat on or off. Autocompletes. Default keys are '{\tt X}',
-and '{\tt M-2}'.
+Toggle two-weapon combat on or off. Autocompletes.
+Default key is `{\tt X}',
+and also `{\tt M-2}' if {\it number\verb+_+pad\/} is off.\\
 %.lp ""
 Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
 %.lp
 \item[\tb{\#untrap}]
-Untrap something (trap, door, or chest). Default key is '{\tt M-u}', and '{\tt u}' if {\it number\verb+_+pad\/} is on.
+Untrap something (trap, door, or chest).
+Default key is `{\tt M-u}', and `{\tt u}' if {\it number\verb+_+pad\/} is on.\\
 %.lp ""
 In some circumstances it can also be used to rescue trapped monsters.
 %.lp
 \item[\tb{\#up}]
-Go up a staircase. Default key is '{\tt <}'.
+Go up a staircase. Default key is `{\tt <}'.
 %.lp
 \item[\tb{\#vanquished}]
 List vanquished monsters.
@@ -1459,10 +1508,10 @@ Debug mode only.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack\/}.
-Autocompletes. Default key is '{\tt M-v}'.
+Autocompletes. Default key is `{\tt M-v}'.
 %.lp
 \item[\tb{\#versionshort}]
-Show version string. Default key is '{\tt v}'.
+Show version string. Default key is `{\tt v}'.
 %.lp
 \item[\tb{\#vision}]
 Show vision array.
@@ -1471,23 +1520,23 @@ Debug mode only.
 %.lp
 \item[\tb{\#wait}]
 Rest one move while doing nothing.
-Default key is '{\tt .}', and also '{\tt{ }}' if
+Default key is `{\tt .}', and also `{\tt{ }}' if
 {\it rest\verb+_+on\verb+_+space\/} is on.
 %.lp
 \item[\tb{\#wear}]
-Wear a piece of armor. Default key is '{\tt W}'.
+Wear a piece of armor. Default key is `{\tt W}'.
 %.lp
 \item[\tb{\#whatdoes}]
-Tell what a key does. Default key is '{\tt \&}'.
+Tell what a key does. Default key is `{\tt \&}'.
 %.lp
 \item[\tb{\#whatis}]
-Show what type of thing a symbol corresponds to. Default key is '{\tt /}'.
+Show what type of thing a symbol corresponds to. Default key is `{\tt /}'.
 %.lp
 \item[\tb{\#wield}]
-Wield a weapon. Default key is '{\tt w}'.
+Wield a weapon. Default key is `{\tt w}'.
 %.lp
 \item[\tb{\#wipe}]
-Wipe off your face. Autocompletes. Default key is '{\tt M-w}'.
+Wipe off your face. Autocompletes. Default key is `{\tt M-w}'.
 %.lp
 \item[\tb{\#wizbury}]
 Bury objects under and around you.
@@ -1499,20 +1548,20 @@ Search for hidden things (secret doors or traps or unseen monsters)
 within a modest radius.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}E}'.
+Default key is `{\tt \^{}E}'.
 %.lp
 \item[\tb{\#wizgenesis}]
 Create a monster.
 May be prefixed by a count to create more than one.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}G}'.
+Default key is `{\tt \^{}G}'.
 %.lp
 \item[\tb{\#wizidentify}]
 Identify all items in inventory.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}I}'.
+Default key is `{\tt \^{}I}'.
 %.lp
 \item[\tb{\#wizintrinsic}]
 Set one or more intrinsic attributes.
@@ -1523,13 +1572,13 @@ Debug mode only.
 Teleport to another level.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}V}'.
+Default key is `{\tt \^{}V}'.
 %.lp
 \item[\tb{\#wizmap}]
 Map the level.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}F}'.
+Default key is `{\tt \^{}F}'.
 %.lp
 \item[\tb{\#wizrumorcheck}]
 Verify rumor boundaries.
@@ -1550,7 +1599,7 @@ Debug mode only.
 Wish for something.
 Autocompletes.
 Debug mode only.
-Default key is '{\tt \^{}W}'.
+Default key is `{\tt \^{}W}'.
 %.lp
 \item[\tb{\#wmode}]
 Show wall modes.
@@ -1558,7 +1607,7 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#zap}]
-Zap a wand. Default key is '{\tt z}'.
+Zap a wand. Default key is `{\tt z}'.
 %.lp
 \item[\tb{\#?}]
 Help menu:  get the list of available extended commands.
@@ -1901,13 +1950,15 @@ but want to try fighting anyway, you can use the `F' command.
 \subsection*{Your pet}
 
 %.pg
-You start the game with a little dog (`{\tt d}'), cat (`{\tt f}'),
+You start the game with a little dog (`{\tt d}'), kitten (`{\tt f}'),
 or pony (`{\tt u}'), which follows
-you about the dungeon and fights monsters with you.  Like you, your
-pet needs food to survive.  It usually feeds itself on fresh carrion
-and other meats.  If you're worried about it or want to train it, you
-can feed it, too, by throwing it food.  A properly trained pet can be
-very useful under certain circumstances.
+you about the dungeon and fights monsters with you.
+Like you, your pet needs food to survive.
+Dogs and cats usually feed themselves on fresh carrion and other meats;
+horses need vegetarian food which is harder to come by.
+If you're worried about your pet or want to train it, you
+can feed it, too, by throwing it food.
+A properly trained pet can be very useful under certain circumstances.
 
 %.pg
 Your pet also gains experience from killing monsters, and can grow
@@ -2009,9 +2060,11 @@ will get slower and you'll burn calories faster, requiring food more frequently
 to cope with it.  Eventually, you'll be so overloaded that you'll either have
 to discard some of what you're carrying or collapse under its weight.
 %.pg
-{\it NetHack\/} will tell you how badly you have loaded yourself.  The symbols
-`Burdened', `Stressed', `Strained', `Overtaxed' and `Overloaded' are
-displayed on the bottom line display to indicate your condition.
+{\it NetHack\/} will tell you how badly you have loaded yourself.
+If you are encumbered, one of the conditions
+``{\it Burdened\/}'', ``{\it Stressed\/}'', ``{\it Strained\/}'',
+``{\it Overtaxed\/}'' or ``{\it Overloaded\/}'' will be
+shown on the bottom line status display.
 
 %.pg
 When you pick up an object, it is assigned an inventory letter.  Many
@@ -2085,10 +2138,12 @@ be displayed even when that can be deduced from other attributes.
 
 %.pg
 Given a chance, most monsters in the Mazes of Menace will gratuitously try to
-kill you.  You need weapons for self-defense (killing them first).  Without a
+kill you.
+You need weapons for self-defense (killing them first).
+Without a
 weapon, you do only 1--2 hit points of damage (plus bonuses, if any).
-Monk characters are an exception; they normally do much more damage with
-bare hands than they do with weapons.
+Monk characters are an exception; they normally do more damage with
+bare (or gloved) hands than they do with weapons.
 
 %.pg
 There are wielded weapons, like maces and swords, and thrown weapons,
@@ -2123,8 +2178,8 @@ weapon ready to use by setting things up with the `{\tt x}' command, which
 exchanges your primary (the one being wielded) and alternate weapons.
 And if you have proficiency in the ``two weapon combat'' skill, you
 may wield both weapons simultaneously as primary and secondary; use the
-`{\tt \#twoweapon}' extended command to engage or disengage that.  Only
-some types of characters (barbarians, for instance) have the necessary
+`{\tt X}' command to engage or disengage that.
+Only some types of characters (barbarians, for instance) have the necessary
 skill available.  Even with that skill, using two weapons at once incurs
 a penalty in the chance to hit your target compared to using just one
 weapon at a time.
@@ -2144,8 +2199,9 @@ in an appendix to {\it Unearthed Arcana}, an AD\&D supplement.
 
 %.pg
 The commands to use weapons are `{\tt w}' (wield), `{\tt t}' (throw),
-`{\tt f}' (fire, an alternative way of throwing), `{\tt Q}' (quiver),
-`{\tt x}' (exchange), `{\tt \#twoweapon}', and `{\tt \#enhance}' (see below).
+`{\tt f}' (fire, an alternate way of throwing), `{\tt Q}' (quiver),
+`{\tt x}' (exchange), `{\tt X}' (twoweapon), and ``{\tt \#enhance}''
+(see below).
 
 %.hn 3
 \subsection*{Throwing and shooting}
@@ -2212,13 +2268,15 @@ can achieve for each group.  For instance, wizards can become highly
 skilled in daggers or staves but not in swords or bows.
 
 %.pg
-The `{\tt \#enhance}' extended command is used to review current weapons proficiency
+The ``{\tt \#enhance}'' extended command is used to review current weapons
+proficiency
 (also spell proficiency) and to choose which skill(s) to improve when
 you've used one or more skills enough to become eligible to do so.  The
 skill rankings are ``none'' (sometimes also referred to as ``restricted'',
 because you won't be able to advance), ``unskilled'', ``basic'', ``skilled'',
 and ``expert''.  Restricted skills simply will not appear in the list
-shown by `{\tt \#enhance}'.  (Divine intervention might unrestrict a particular
+shown by ``{\tt \#enhance}''.
+(Divine intervention might unrestrict a particular
 skill, in which case it will start at unskilled and be limited to basic.)
 Some characters can enhance their barehanded combat or martial arts skill
 beyond expert to ``master'' or ``grand master''.
@@ -2233,7 +2291,8 @@ higher.  A successful hit has a chance to boost your training towards
 the next skill level (unless you've already reached the limit for this
 skill).  Once such training reaches the threshold for that next level,
 you'll be told that you feel more confident in your skills.  At that
-point you can use `{\tt \#enhance}' to increase one or more skills.  Such skills
+point you can use ``{\tt \#enhance}'' to increase one or more skills.
+Such skills
 are not increased automatically because there is a limit to your total
 overall skills, so you need to actively choose which skills to enhance
 and which to ignore.
@@ -2256,12 +2315,14 @@ as alternate weapon.)
 
 %.pg
 If your primary weapon is wielded but your off hand is empty or has
-the wrong weapon, use the sequence `{\tt x}', `{\tt w}', `{\tt x}' to first swap your
+the wrong weapon, use the sequence `{\tt x}', `{\tt w}', `{\tt x}' to
+first swap your
 primary into your off hand, wield whatever you want as secondary
 weapon, then swap them both back into the intended hands.
 If your secondary or alternate weapon is correct but your primary
 one is not, simply use `{\tt w}' to wield the primary.
-Lastly, if neither hand holds the correct weapon, use `{\tt w}', `{\tt x}', `{\tt w}'
+Lastly, if neither hand holds the correct weapon,
+use `{\tt w}', `{\tt x}', `{\tt w}'
 to first wield the intended secondary, swap it to off hand, and then
 wield the primary.
 
@@ -2275,8 +2336,9 @@ intend to be secondary, and then wield the one you want as primary
 which will push the first into secondary position.
 
 %.pg
-When in two-weapon combat mode, using the ``{\tt \#twoweapon}'' command
-toggles back to single-weapon mode.  Throwing or dropping either of the
+When in two-weapon combat mode, using the `{\tt X}' command
+toggles back to single-weapon mode.
+Throwing or dropping either of the
 weapons or having one of them be stolen or destroyed will also make you
 revert to single-weapon combat.
 
@@ -2510,7 +2572,7 @@ Other spells don't require any direction or target.
 Just as weapons are divided into groups in which a character can become
 proficient (to varying degrees), spells are similarly grouped.
 Successfully casting a spell exercises its skill group; using the
-`{\tt \#enhance}' command to advance a sufficiently exercised skill
+``{\tt \#enhance}'' command to advance a sufficiently exercised skill
 will affect all spells within the group.  Advanced skill may increase the
 potency of spells, reduce their risk of failure during casting attempts,
 and improve the accuracy of the estimate for how much longer they will
@@ -2737,7 +2799,7 @@ by other means.
 %.pg
 An illiterate character cannot read or write.  This includes reading
 a scroll, spellbook, fortune cookie message, or t-shirt; writing a
-scroll; or making an engraving of anything other than a single ``x'' (the
+scroll; or making an engraving of anything other than a single ``X'' (the
 traditional signature of an illiterate person).  Reading an engraving,
 or any item that is absolutely necessary to win the game, is not counted
 against this conduct.  The identity of scrolls and spellbooks (and
@@ -2787,9 +2849,9 @@ for system administrators.
 
 %.pg
 The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is \mbox{``defaults.nh''}
-in the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}. 
-On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home 
+operating systems. On MS-DOS and Windows, it is \mbox{``defaults.nh''} in
+the same folder as \mbox{{\it nethack.exe\/}} or \mbox{{\it nethackW.exe\/}}.
+On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 
@@ -2959,7 +3021,7 @@ Here is a short example of config file contents:
     # Set your character's role, race, gender, and alignment.
     OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful
 
-    # Turn on autopickup, and set automatically picked up object types
+    # Turn on autopickup, set automatically picked up object types
     OPTIONS=autopickup,pickup_types:$"=/!?+
     # Show colored text if possible
     OPTIONS=color
@@ -2985,29 +3047,33 @@ the option name, a colon or equals sign, and then the value of the string.
 The value is terminated by the next comma or the end of string.
 
 %.pg
-For example, to set up an environment variable so that {\it autoquiver\/}
+For example, to set up an environment variable so that {\it color\/}
 is on, {\it autopickup\/} is off, the {\it name\/} is set to ``Blue Meanie'',
 and the {\it fruit\/} is set to ``papaya'', you would enter the command
 %.sd
 \begin{verbatim}
-    setenv NETHACKOPTIONS "autoquiver,\!autopickup,name:Blue Meanie,fruit:papaya"
+    setenv NETHACKOPTIONS "color,\!autopickup,name:Blue Meanie,fruit:papaya"
 \end{verbatim}
 %.ed
 
 \nd in {\it csh}
-(note the need to escape the ! since it's special to the shell), or
+(note the need to escape the `!' since it's special to the shell), or
 %.sd
 \begin{verbatim}
-    NETHACKOPTIONS="autoquiver,!autopickup,name:Blue Meanie,fruit:papaya"
+    NETHACKOPTIONS="color,!autopickup,name:Blue Meanie,fruit:papaya"
     export NETHACKOPTIONS
 \end{verbatim}
 %.ed
 
-\nd in {\it sh\/} or {\it ksh}.
+\nd in {\it sh\/}, {\it ksh}, or {\it bash}.
 
 %.pg
-NETHACKOPTIONS can also be set to the full name of a configuration file you
-want to use (possibly preceded by an `{\tt @}').
+Instead of a comma-separated list of options,
+NETHACKOPTIONS can be set to the full name of a configuration file you
+want to use.
+If that full name doesn't start with a slash, precede it with `{\tt @}'
+(at-sign) to let NetHack know that the rest is intended as a file name.
+If it does start with `{\tt /}', the at-sign is optional.
 
 %.hn 2
 \subsection*{Customization options}
@@ -3056,21 +3122,22 @@ See ``{\it pickup\verb+_+types\/}'' to refine the behavior.
 %.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `f' (fire)
-command with an empty quiver (or quiver sack or have nothing at the ready).
+command when nothing is quivered or readied (default false).
 When true, the computer will fill
-your quiver or quiver sack or make ready some suitable weapon.  Note that it
-will not take
+your quiver or quiver sack or make ready some suitable weapon.
+Note that it will not take
 into account the blessed/cursed status, enchantment, damage, or
-quality of the weapon; you are free to manually fill your quiver or quiver sack
-or make ready
-with the `Q' command instead.  If no weapon is found or the option is
-false, the `t' (throw) command is executed instead.  Persistent.  (default false)
+quality of the weapon; you are free to manually fill your quiver
+or quiver sack or make ready
+with the `Q' command instead.
+If no weapon is found or the option is
+false, the `t' (throw) command is executed instead.  Persistent.
 %.lp
 \item[\ib{blind}]
-Start the character permanently blind.  Persistent. (default false)
+Start the character permanently blind (default false).  Persistent.
 %.lp
 \item[\ib{bones}]
-Allow saving and loading bones files.  Persistent.  (default true)
+Allow saving and loading bones files (default true).  Persistent.
 %.lp
 \item[\ib{boulder}]
 Set the character used to display boulders (default is the ``large rock''
@@ -3155,7 +3222,7 @@ Asking refers to picking one of the orderings from a menu.
 The `{\tt +}' disclose without prompting choice,
 or being prompted and answering `{\tt y}' rather than `{\tt a}',
 will default to showing monsters in the traditional order,
-from high level to low level.
+from high level to low level.\\
 .lp ""
 
 %.lp ""
@@ -3231,7 +3298,7 @@ might miss some interesting and/or important information.  Persistent.
 \item[\ib{herecmd\verb+_+menu}]
 When using a windowport that supports mouse and clicking on yourself or
 next to you, show a menu of possible actions for the location.
-Same as herecmdmenu and therecmdmenu commands.
+Same as ``{\tt \#herecmdmenu}'' and ``{\tt \#therecmdmenu}'' commands.
 %.lp
 \item[\ib{hilite\verb+_+pet}]
 Visually distinguish pets from similar animals (default off).
@@ -3269,8 +3336,9 @@ Show corridor squares seen by night vision or a light source held by your
 character as lit (default off).  Persistent.
 %.lp
 \item[\ib{lootabc}]
-Use the old `{\tt a}', `{\tt b}', and `{\tt c}' keyboard shortcuts when
-looting, rather than the mnemonics `{\tt o}', `{\tt i}', and `{\tt b}' (default off).
+When using a menu to interact with a container,
+use the old `{\tt a}', `{\tt b}', and `{\tt c}' keyboard shortcuts
+rather than the mnemonics `{\tt o}', `{\tt i}', and `{\tt b}' (default off).
 Persistent.
 %.lp
 \item[\ib{mail}]
@@ -3372,8 +3440,9 @@ Prompt for new form whenever any monster changes shape (default off).
 Debug mode only.
 %.lp
 \item[\ib{msghistory}]
-The number of top line messages to save (and recall with `{\tt \^{}P}')
-(default 20). Cannot be set with the `{\tt O}' command.
+The number of top line messages to save (and be able to recall
+with `{\tt \^{}P}') (default 20).
+Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{msg\verb+_+window}]
 Allows you to change the way recalled messages are displayed.
@@ -3425,7 +3494,7 @@ Valid settings are:
 \numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
 \numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
 \numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
-\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MSDOS compatibility\\
+\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MS-DOS compatibility\\
 \numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
 %.ei
 %.ed
@@ -3434,7 +3503,7 @@ For backward compatibility, omitting a value is the same as specifying {\tt 1}
 and negating
 {\it number\verb+_+pad\/}
 is the same as specifying {\tt 0}.
-(Settings {\tt 2} and {\tt 4} are for compatibility with MSDOS or old PC Hack;
+(Settings {\tt 2} and {\tt 4} are for compatibility with MS-DOS or old PC Hack;
 in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
 and `{\tt Alt-0}' acts as `{\tt I}'.
 Setting {\tt -1} is to accommodate some QWERTZ keyboards which have the
@@ -3714,7 +3783,7 @@ Provide more commentary during the game (default on).  Persistent.
 When using the `{\tt /}' or `{\tt ;}' commands to look around on the map with
 ``{\tt autodescribe}''
 on, display coordinates after the description.
-Also works in other situations where you are asked to pick a location.
+Also works in other situations where you are asked to pick a location.\\
 
 %.lp ""
 The possible settings are:
@@ -3740,7 +3809,7 @@ where the `{\it none\/}' setting is overridden with `{\it map}'.
 \item[\ib{whatis\verb+_+filter}]
 When getting a location on the map, and using the keys to cycle through
 next and previous targets, allows filtering the possible targets.
-(default none)
+(default none)\\
 %.lp ""
 The possible settings are:
 
@@ -3752,11 +3821,12 @@ The possible settings are:
 %.ei
 %.ed
 %.lp ""
-The area-filter tries to be slightly predictive - if you're standing on a doorway,
-it will consider the area on the side of the door you were last moving towards.
+The area-filter tries to be slightly predictive -- if you're standing
+on a doorway, it will consider the area on the side of the door you
+were last moving towards.\\
 %.lp ""
-Filtering can also be changed when getting a location with the ``getpos.filter''
-key.
+Filtering can also be changed when getting a location with
+the ``getpos.filter'' key.
 %.lp
 \item[\ib{whatis\verb+_+menu}]
 When getting a location on the map, and using a key to cycle through
@@ -3770,8 +3840,9 @@ move by skipping the same glyphs.
 (default off)
 %.lp
 \item[\ib{windowtype}]
-Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
-(default depends on version).
+When the program has been built to support multiple interfaces,
+select whichone to use, such as ``{\tt tty}'' or ``{\tt X11}''
+(default depends on build-time settings; use ``{\tt \#version}'' to check).
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{wizweight}]
@@ -3874,7 +3945,7 @@ If {\it NetHack\/} can, it should pop up dialog boxes for input.
 %.lp
 \item[\ib{preload\verb+_+tiles}]
 If {\it NetHack\/} can, it should preload tiles into memory.
-For example, in the protected mode MSDOS version, control whether tiles
+For example, in the protected mode MS-DOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `{\tt O}' command.
@@ -4044,7 +4115,8 @@ Cannot be set with the `{\tt O}' command.
 
 %.pg
 Regular expressions are normally POSIX extended regular expressions. It is
-possible to compile {\it NetHack\/} without regular expression support on a platform where
+possible to compile {\it NetHack\/} without regular expression support on
+a platform where
 there is no regular expression library. While this is not true of any modern
 platform, if your {\it NetHack\/} was built this way, patterns are instead glob
 patterns. This applies to Autopickup exceptions, Message types, Menu colors,
@@ -4065,7 +4137,7 @@ autopickup something.
 \blist{}
 %.lp
 \item[\ib{autopickup\verb+_+exception}]
-Sets an exception to the `{\it pickup\verb+_+types}' option.
+Sets an exception to the ``{\it pickup\verb+_+types}'' option.
 The {\it autopickup\verb+_+exception\/} option should be followed by a regular
 expression to be used as a pattern to match against the singular form of the
 description of an object at your location.
@@ -4080,7 +4152,7 @@ character in the pattern, specifically:
 %.ei
 %.ed
 
-A `never pickup' rule takes precedence over an `always pickup' rule if
+A ``never pickup'' rule takes precedence over an ``always pickup'' rule if
 both match.
 
 %.lp ""
@@ -4110,8 +4182,8 @@ autopickup.
 %.pg
 It is possible to change the default key bindings of some special commands,
 menu accelerator keys, and extended commands, by using BIND stanzas in the
-configuration file. Format is key, followed by the command to bind to, separated
-by a colon. The key can be a single character (``{\tt x}''),
+configuration file. Format is key, followed by the command to bind to,
+separated by a colon. The key can be a single character (``{\tt x}''),
 a control key (``{\tt \^{}X}'', ``{\tt C-x}''), a meta key (``{\tt M-x}''),
 or a three-digit decimal ASCII code.
 
@@ -4139,7 +4211,7 @@ in the config file. You cannot bind object symbols into menu accelerators.
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
 Below are the special commands you can rebind. Some of them can be bound to
-same keys with no problems, others are in the same "context", and if bound
+same keys with no problems, others are in the same ``context'', and if bound
 to same keys, only one of those commands will be available. Special command
 can only be bound to a single key.
 
@@ -4147,121 +4219,151 @@ can only be bound to a single key.
 \blist{}
 %.lp
 \item{\bb{count}}
-Prefix key to start a count, to repeat a command this many times. With {\it number\verb+_+pad\/} only. Default is ``{\tt n}''.
+Prefix key to start a count, to repeat a command this many times.
+With {\it number\verb+_+pad\/} only. Default is `{\tt n}'.
 %.lp
 \item{\bb{doinv}}
-Show inventory. With {\it number\verb+_+pad\/} only. Default is ``{\tt 0}''.
+Show inventory. With {\it number\verb+_+pad\/} only. Default is `{\tt 0}'.
 %.lp
 \item{\bb{fight}}
-Prefix key to force fight a direction. Default is ``{\tt F}''.
+Prefix key to force fight a direction. Default is `{\tt F}'.
 %.lp
 \item{\bb{fight.numpad}}
-Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only. Default is ``{\tt -}''.
+Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only.
+Default is `{\tt -}'.
 %.lp
 \item{\bb{getdir.help}}
-When asked for a direction, the key to show the help. Default is ``{\tt ?}''.
+When asked for a direction, the key to show the help. Default is `{\tt ?}'.
 %.lp
 \item{\bb{getdir.self}}
-When asked for a direction, the key to target yourself. Default is ``{\tt .}''.
+When asked for a direction, the key to target yourself. Default is `{\tt .}'.
 %.lp
 \item{\bb{getdir.self2}}
-When asked for a direction, the key to target yourself. Default is ``{\tt s}''.
+When asked for a direction, the key to target yourself. Default is `{\tt s}'.
 %.lp
 \item{\bb{getpos.autodescribe}}
-When asked for a location, the key to toggle {\it autodescribe\/}. Default is ``{\tt \#}''.
+When asked for a location, the key to toggle {\it autodescribe\/}.
+Default is `{\tt \#}'.
 %.lp
 \item{\bb{getpos.all.next}}
-When asked for a location, the key to go to next closest interesting thing. Default is ``{\tt a}''.
+When asked for a location, the key to go to next closest interesting thing.
+Default is `{\tt a}'.
 %.lp
 \item{\bb{getpos.all.prev}}
-When asked for a location, the key to go to previous closest interesting thing. Default is ``{\tt A}''.
+When asked for a location, the key to go to previous closest interesting thing.
+Default is `{\tt A}'.
 %.lp
 \item{\bb{getpos.door.next}}
-When asked for a location, the key to go to next closest door or doorway. Default is ``{\tt d}''.
+When asked for a location, the key to go to next closest door or doorway.
+Default is `{\tt d}'.
 %.lp
 \item{\bb{getpos.door.prev}}
-When asked for a location, the key to go to previous closest door or doorway. Default is ``{\tt D}''.
+When asked for a location, the key to go to previous closest door or doorway.
+Default is `{\tt D}'.
 %.lp
 \item{\bb{getpos.help}}
-When asked for a location, the key to show help. Default is ``{\tt ?}''.
+When asked for a location, the key to show help. Default is `{\tt ?}'.
 %.lp
 \item{\bb{getpos.mon.next}}
-When asked for a location, the key to go to next closest monster. Default is ``{\tt m}''.
+When asked for a location, the key to go to next closest monster.
+Default is `{\tt m}'.
 %.lp
 \item{\bb{getpos.mon.prev}}
-When asked for a location, the key to go to previous closest monster. Default is ``{\tt M}''.
+When asked for a location, the key to go to previous closest monster.
+Default is `{\tt M}'.
 %.lp
 \item{\bb{getpos.obj.next}}
-When asked for a location, the key to go to next closest object. Default is ``{\tt o}''.
+When asked for a location, the key to go to next closest object.
+Default is `{\tt o}'.
 %.lp
 \item{\bb{getpos.obj.prev}}
-When asked for a location, the key to go to previous closest object. Default is ``{\tt O}''.
+When asked for a location, the key to go to previous closest object.
+Default is `{\tt O}'.
 %.lp
 \item{\bb{getpos.menu}}
-When asked for a location, and using one of the next or previous keys to cycle through targets, toggle showing a menu instead. Default is '{\tt !}'.
+When asked for a location, and using one of the next or previous keys to
+cycle through targets, toggle showing a menu instead. Default is `{\tt !}'.
 %.lp
 \item{\bb{getpos.moveskip}}
-When asked for a location, and using the shifted movement keys or meta-digit keys to fast-move around, move by skipping the same glyphs instead of by 8 units. Default is ``{\tt *}''.
+When asked for a location, and using the shifted movement keys or
+meta-digit keys to fast-move around, move by skipping the same glyphs
+instead of by 8 units.
+Default is `{\tt *}'.
 %.lp
 \item{\bb{getpos.filter}}
-When asked for a location, change the filtering mode when using one of the next or previous keys to cycle through targets. Toggles between no filtering, in view only, and in the same area only. Default is '{\tt "}'.
+When asked for a location, change the filtering mode when using one of
+the next or previous keys to cycle through targets. Toggles between no
+filtering, in view only, and in the same area only. Default is `{\tt "}'.
 %.lp
 \item{\bb{getpos.pick}}
-When asked for a location, the key to choose the location, and possibly ask for more info. Default is ``{\tt .}''.
+When asked for a location, the key to choose the location, and possibly
+ask for more info. Default is `{\tt .}'.
 %.lp
 \item{\bb{getpos.pick.once}}
-When asked for a location, the key to choose the location, and skip asking for more info. Default is ``{\tt ,}''.
+When asked for a location, the key to choose the location, and skip
+asking for more info. Default is `{\tt ,}'.
 %.lp
 \item{\bb{getpos.pick.quick}}
-When asked for a location, the key to choose the location, skip asking for more info, and exit the location asking loop. Default is ``{\tt ;}''.
+When asked for a location, the key to choose the location, skip asking
+for more info, and exit the location asking loop. Default is `{\tt ;}'.
 %.lp
 \item{\bb{getpos.pick.verbose}}
-When asked for a location, the key to choose the location, and show more info without asking. Default is ``{\tt :}''.
+When asked for a location, the key to choose the location, and show more
+info without asking. Default is `{\tt :}'.
 %.lp
 \item{\bb{getpos.self}}
-When asked for a location, the key to go to your location. Default is ``{\tt @}''.
+When asked for a location, the key to go to your location.
+Default is `{\tt @}'.
 %.lp
 \item{\bb{getpos.unexplored.next}}
-When asked for a location, the key to go to next closest unexplored location. Default is ``{\tt x}''.
+When asked for a location, the key to go to next closest unexplored location.
+Default is `{\tt x}'.
 %.lp
 \item{\bb{getpos.unexplored.prev}}
-When asked for a location, the key to go to previous closest unexplored location. Default is ``{\tt X}''.
+When asked for a location, the key to go to previous closest unexplored
+location. Default is `{\tt X}'.
 %.lp
 \item{\bb{getpos.valid}}
-When asked for a location, the key to go to show valid target locations. Default is ``{\tt \$}''.
+When asked for a location, the key to go to show valid target locations.
+Default is `{\tt \$}'.
 %.lp
 \item{\bb{getpos.valid.next}}
-When asked for a location, the key to go to next closest valid location. Default is ``{\tt z}''.
+When asked for a location, the key to go to next closest valid location.
+Default is `{\tt z}'.
 %.lp
 \item{\bb{getpos.valid.prev}}
-When asked for a location, the key to go to previous closest valid location. Default is ``{\tt Z}''.
+When asked for a location, the key to go to previous closest valid location.
+Default is `{\tt Z}'.
 %.lp
 \item{\bb{nopickup}}
-Prefix key to move without picking up items. Default is ``{\tt m}''.
+Prefix key to move without picking up items. Default is `{\tt m}'.
 %.lp
 \item{\bb{redraw}}
-Key to redraw the screen. Default is ``{\tt \^{}R}''.
+Key to redraw the screen. Default is `{\tt \^{}R}'.
 %.lp
 \item{\bb{redraw.numpad}}
-Key to redraw the screen. With {\it number\verb+_+pad\/} only. Default is ``{\tt \^{}L}''.
+Key to redraw the screen. With {\it number\verb+_+pad\/} only.
+Default is `{\tt \^{}L}'.
 %.lp
 \item{\bb{repeat}}
-Key to repeat previous command. Default is ``{\tt \^{}A}''.
+Key to repeat previous command. Default is `{\tt \^{}A}'.
 %.lp
 \item{\bb{reqmenu}}
-Prefix key to request menu from some commands. Default is ``{\tt m}''.
+Prefix key to request menu from some commands. Default is `{\tt m}'.
 %.lp
 \item{\bb{run}}
-Prefix key to run towards a direction. Default is ``{\tt G}''.
+Prefix key to run towards a direction. Default is `{\tt G}'.
 %.lp
 \item{\bb{run.nopickup}}
-Prefix key to run towards a direction without picking up items on the way. Default is ``{\tt M}''.
+Prefix key to run towards a direction without picking up items on the way.
+Default is `{\tt M}'.
 %.lp
 \item{\bb{run.numpad}}
-Prefix key to run towards a direction. With {\it number\verb+_+pad\/} only. Default is ``{\tt 5}''.
+Prefix key to run towards a direction. With {\it number\verb+_+pad\/} only.
+Default is `{\tt 5}'.
 %.lp
 \item{\bb{rush}}
-Prefix key to rush towards a direction. Default is ``{\tt g}''.
+Prefix key to rush towards a direction. Default is `{\tt g}'.
 \elist
 \elist
 
@@ -4289,7 +4391,8 @@ how the message should be shown:
 {\tt show}  --- show message normally.\\
 {\tt hide}  --- never show the message.\\
 {\tt stop}  --- wait for user with more-prompt.\\
-{\tt norep} --- show the message once, but not again if no other message is shown in between.
+{\tt norep} --- show the message once, but not again if no other message is
+shown in between.
 %.ei
 %.ed
 %.lp
@@ -4371,9 +4474,9 @@ pattern matching facility:
     MENUCOLOR="* cursed *(being worn)"=red&underline
 \end{verbatim}
 
-specifies that any menu line with " blessed " contained
-in it will be shown in green color, lines with " cursed " will be
-shown in red, and lines with " cursed " followed by "(being worn)"
+specifies that any menu line with ``~blessed~'' contained
+in it will be shown in green color, lines with ``~cursed~'' will be
+shown in red, and lines with ``~cursed~'' followed by ``(being worn)''
 on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
@@ -4381,7 +4484,7 @@ a menu line will be used for the line.
 
 %.pg
 Note that if you intend to have one or more color specifications match
-" uncursed ", you will probably want to turn the
+``~uncursed~'', you will probably want to turn the
 {\it implicit\verb+_+uncursed\/}
 option off so that all items known to be uncursed are actually
 displayed with the ``uncursed'' description.
@@ -4481,38 +4584,55 @@ for stone through termill, `minor\_troubles' for blind through hallu,
 `movement' for lev, fly, and ride, and `all' for every condition.
 
 %.lp ""
-Allowed behaviors are "always", "up", "down", "changed", a
-percentage or absolute number threshold, or a text to match against.
+Allowed behaviors are ``always'', ``up'', ``down'', ``changed'', a
+percentage or absolute number threshold, or text to match against.
 
 \blist{}
 %.lp "*"
 \item{\bb{}}
-"always" will set the default attributes for that field.
+``{\tt always}'' will set the default attributes for that field.
 %.lp "*"
 \item{\bb{}}
-"up" and "down" set the field attributes for when the field
+``{\tt up}'' and ``(\tt down}'' set the field attributes for when the field
 value changes upwards or downwards. This attribute times out after
-statushilites turns.
+{\tt statushilites} turns.
 %.lp "*"
 \item{\bb{}}
-"changed" sets the field attribute for when the field value
-changes. This attribute times out after statushilites turns.
+``{\tt changed}'' sets the field attribute for when the field value
+changes. This attribute times out after {\tt statushilites} turns.
+(If a field has both a ``changed'' rule and an ``up'' or ``down''
+rule which matches a change in the field's value,
+the ``up'' or ``down'' one takes precedence.)
 %.lp "*"
 \item{\bb{}}
 percentage sets the field attribute when the field value
-matches the percentage. If the percentage is prefixed with `{\tt <}'
-or `{\tt >}', it also matches when value is below or above the percentage.
-Only valid for `power' and `hitpoints' fields.
+matches the percentage.
+It is specified as a number between 0 and 100, followed by `{\tt \%}'
+(percent sign).
+If the percentage is prefixed with `{\tt <=}' or `{\tt >=}',
+it also matches when value is below or above the percentage.
+Use prefix `{\tt <}' or `{\tt >}' to match when strictly below or above.
+(The numeric limit is relaxed slightly for those: {\tt >-1\%}
+and {\tt <101\%} are allowed.)
+Only valid for ``{\it power\/}'' and ``{\it hitpoints\/}'' fields.
 %.lp "*"
 \item{\bb{}}
 absolute value sets the attribute when the field value
-matches that number. If the number is prefixed with `{\tt <}'
-or `{\tt >}', it also matches when value is below or above.
+matches that number.
+The number must be 0 or higher, except for ``{\it armor-class\/} which
+allows negative values.
+If the number is prefixed with `{\tt <=}' or `{\tt >=}',
+it also matches when value is below or above.
+If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
+above or below.
 %.lp "*"
 \item{\bb{}}
-text match sets the attribute when the field value
-matches the text. Text matches can only be used for `alignment',
-`carrying-capacity', and `dungeon-level'.
+text match sets the attribute when the field value matches the text.
+Text matches can only be used for ``{\it alignment\/}'',
+``{\it carrying-capacity\/}'', ``{\it hunger\/}'', ``{\it dungeon-level\/}'',
+and ``{\it title\/}''.
+For title, only the role's rank title
+is tested; the character's name is ignored.
 %.ei
 \elist
 
@@ -4801,10 +4921,13 @@ These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 %.pg
 {\it NetHack\/} can also be compiled with support for sending the game messages
-to an external program, such as a text-to-speech synthesizer. If the \#version
-extended command shows "external program as a message handler", your {\it NetHack\/}
-has been compiled with the capability. When compiling {\it NetHack\/} from source
-on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it. To use
+to an external program, such as a text-to-speech synthesizer. If the
+``{\tt \#version}'' extended command shows ``external program as a
+message handler'', your {\it NetHack\/}
+has been compiled with the capability. When compiling {\it NetHack\/}
+from source
+on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it.
+To use
 the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
 executable, which will be executed with the game message as the program's
 only parameter.
@@ -4941,7 +5064,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 %.sd
 %.si
 {\tt \%\%}  --- literal `{\tt \%}'\\
-{\tt \%v}  --- version (eg. "3.6.2-0")\\
+{\tt \%v}  --- version (eg. ``{\tt 3.6.2-0}'')\\
 {\tt \%u}  --- game UID\\
 {\tt \%t}  --- game start time, UNIX timestamp format\\
 {\tt \%T}  --- current time, UNIX timestamp format\\
@@ -5190,7 +5313,7 @@ casting system with the Wizard Patch.
 %.pg
 \medskip
 {\it Warren Cheung} combined {\it SLASH} with the Wizard Patch
-to produce {\it Slash'em\/}, and
+to produce {\it Slash'EM\/}, and
 with the help of {\it Kevin Hugo}, added more features.
 Kevin later joined the
 DevTeam and incorporated the best of these ideas into {\it NetHack\/} 3.3.
@@ -5322,9 +5445,9 @@ joined the {\it NetHack\/} development team.
 
 %.pg
 \medskip
-Near the end of the development of 3.6.0, one of the significant inspirations 
-for many of the humorous and fun features found in the game, 
-author Terry Pratchett, passed away. {\it NetHack\/} 3.6.0 introduced 
+Near the end of the development of 3.6.0, one of the significant inspirations
+for many of the humorous and fun features found in the game,
+author Terry Pratchett, passed away. {\it NetHack\/} 3.6.0 introduced
 a tribute to him.
 
 %.pg
@@ -5336,9 +5459,9 @@ patches.  Many bugs were fixed and some code was restructured.
 %.pg
 \medskip
 In late April 2018, several hundred bug fixes for 3.6.0 and some new features
-were assembled and released as NetHack 3.6.1. The development team at the 
-time of release of 3.6.1 consisted of 
-{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee}, 
+were assembled and released as NetHack 3.6.1. The development team at the
+time of release of 3.6.1 consisted of
+{\it Warwick Allison}, {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet},
 {\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick},
 {\it Patric Mueller}, {\it Pat Rankin}, {\it Derek S. Ray},
@@ -5390,10 +5513,10 @@ http:{\tt /}{\tt /}www.nethack.org{\tt /}.
 \subsection*{Special Thanks}
 \nd On behalf of the {\it NetHack\/} community, thank you very much once
 again to {\it M. Drew Streib} and {\it Pasi Kallinen} for providing a
-public NetHack server at nethack.alt.org. Thanks to {\it Keith Simpson} 
-and {\it Andy Thomson} for hardfought.org. Thanks to all those 
-unnamed dungeoneers who invest their time and effort into annual 
-{\it NetHack\/} tournaments such as {\it Junethack} and in days past, 
+public NetHack server at nethack.alt.org. Thanks to {\it Keith Simpson}
+and {\it Andy Thomson} for hardfought.org. Thanks to all those
+unnamed dungeoneers who invest their time and effort into annual
+{\it NetHack\/} tournaments such as {\it Junethack} and in days past,
 {\it devnull.net\/} (gone for now, but not forgotten).
 \clearpage
 
