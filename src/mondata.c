@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1508479720 2017/10/20 06:08:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1539938825 2018/10/19 08:47:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -740,7 +740,9 @@ const char *in_str;
             { "invisible stalker", PM_STALKER },
             { "high-elf", PM_ELVENKING }, /* PM_HIGH_ELF is obsolete */
             { "halfling", PM_HOBBIT },    /* potential guess for polyself */
-            /* Hyphenated names */
+            { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
+            /* Hyphenated names -- it would be nice to handle these via
+               fuzzymatch() but it isn't able to ignore trailing stuff */
             { "ki rin", PM_KI_RIN },
             { "uruk hai", PM_URUK_HAI },
             { "orc captain", PM_ORC_CAPTAIN },
