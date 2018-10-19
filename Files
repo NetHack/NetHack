@@ -182,8 +182,8 @@ snd86unx.shr
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
 linux           linux-chroot    linux-qt4       linux-qt5       
-linux-x11       macosx          macosx.sh       macosx10.10     
-macosx10.10-qt  macosx10.5      macosx10.7      macosx10.8      
+linux-x11       macosx          macosx.sh       macosx10.5      
+macosx10.7      macosx10.8      macosx10.10     macosx10.10-qt  
 unix
 
 sys/vms:
@@ -352,8 +352,8 @@ Tou-fila.lev  Tou-filb.lev  Tou-goal.lev  Tou-loca.lev  Tou-strt.lev
 Val-fila.lev  Val-filb.lev  Val-goal.lev  Val-loca.lev  Val-strt.lev  
 Wiz-fila.lev  Wiz-filb.lev  Wiz-goal.lev  Wiz-loca.lev  Wiz-strt.lev  
 air.lev       asmodeus.lev  astral.lev    baalz.lev     bigrm-1.lev   
-bigrm-10.lev  bigrm-2.lev   bigrm-3.lev   bigrm-4.lev   bigrm-5.lev   
-bigrm-6.lev   bigrm-7.lev   bigrm-8.lev   bigrm-9.lev   castle.lev    
+bigrm-2.lev   bigrm-3.lev   bigrm-4.lev   bigrm-5.lev   bigrm-6.lev   
+bigrm-7.lev   bigrm-8.lev   bigrm-9.lev   bigrm-10.lev  castle.lev    
 earth.lev     fakewiz1.lev  fakewiz2.lev  fire.lev      juiblex.lev   
 knox.lev      medusa-1.lev  medusa-2.lev  medusa-3.lev  medusa-4.lev  
 minefill.lev  minend-1.lev  minend-2.lev  minend-3.lev  minetn-1.lev  
