@@ -1047,7 +1047,15 @@ used up all the letters, so this is a way to introduce the less frequently
 used commands.
 What extended commands are available depends on what features the game was
 compiled with.
-.lp #adjust
+.\"
+.\" Pad short entries out to 1+8 characters.  This will make sure that
+.\" the text description starts on its own line like long named entries
+.\" instead of sometimes being on the same line for short name ones.
+.\" The document will be longer, but mixing the two is harder to read.
+.\" (For plain text output, the old 1+4 was sufficient.  For Postscript,
+.\" several need at least 1+7 due to narrow letters or ligatures.)
+.\"
+.lp "#adjust  "
 Adjust inventory letters (most useful when the
 .op fixinv
 option is \(lqon\(rq).
@@ -1089,7 +1097,7 @@ Autocompletes.
 Default key is \(oqM-A\(cq, and also \(oq\(haN\(cq if
 .op number_pad
 is on.
-.lp #apply
+.lp "#apply   "
 Apply (use) a tool such as a pick-axe, a key, or a lamp.
 Default key is \(oqa\(cq.
 .lp ""
@@ -1107,70 +1115,70 @@ Toggle the
 .op autopickup
 option on/off.
 Default key is \(oq@\(cq.
-.lp #call
+.lp "#call    "
 Call (name) a monster, or an object in inventory, on the floor,
 or in the discoveries list, or add an annotation for the
 current level (same as \(lq#annotate\(rq).
 Default key is \(oqC\(cq.
-.lp #cast
+.lp "#cast    "
 Cast a spell.
 Default key is \(oqZ\(cq.
-.lp #chat
+.lp "#chat    "
 Talk to someone.
 Default key is \(oqM-c\)cq.
-.lp #close
+.lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
-.lp #conduct
+.lp "#conduct "
 List voluntary challenges you have maintained.
 Autocompletes.
 Default key is \(oqM-C\(cq.
 .lp ""
 See the section below entitled \(lqConduct\(rq for details.
-.lp "#dip "
+.lp "#dip     "
 Dip an object into something.
 Autocompletes.
 Default key is \(oqM-d\(cq.
-.lp #down
+.lp "#down    "
 Go down a staircase.
 Default key is \(oq>\(cq.
-.lp #drop
+.lp "#drop    "
 Drop an item.
 Default key is \(oqd\(cq.
 .lp #droptype
 Drop specific item types.
 Default key is \(oqD\(cq.
-.lp "#eat "
+.lp "#eat     "
 Eat something.
 Default key is \(oqe\(cq.
 The \(oqm\(cq prefix skips eating items on the floor.
-.lp #engrave
+.lp "#engrave "
 Engrave writing on the floor.
 Default key is \(oqE\(cq.
-.lp #enhance
+.lp "#enhance "
 Advance or check weapon and spell skills.
 Autocompletes.
 Default key is \(oqM-e\(cq.
 .lp #exploremode
 Enter the explore mode.
-.lp #fire
+.lp "#fire    "
 Fire ammunition from quiver.
 Default key is \(oqf\(cq.
-.lp #force
+.lp "#force   "
 Force a lock.
 Autocompletes.
 Default key is \(oqM-f\(cq.
-.lp #glance
+.lp "#glance  "
 Show what type of thing a map symbol corresponds to.
 Default key is \(oq;\(cq.
-.lp #help
+.lp "#help    "
 Show the help menu.
 Default key is \(oq?\(cq, and also \(oqh\(cq if
 .op number_pad
 is on.
 .lp #herecmdmenu
 Show a menu of possible actions in your current location.
-.lp #history
+.lp "#history "
 Show long version and game history.
 Default key is \(oqV\(cq.
 .lp #inventory
@@ -1179,22 +1187,22 @@ Default key is \(oqi\(cq.
 .lp #inventtype
 Inventory specific item types.
 Default key is \(oqI\(cq.
-.lp #invoke
+.lp "#invoke  "
 Invoke an object's special powers.
 Autocompletes.
 Default key is \(oqM-i\(cq.
-.lp #jump
+.lp "#jump    "
 Jump to another location.
 Autocompletes.
 Default key is \(oqM-j\(cq, and also \(oqj\(cq if
 .op number_pad
 is on.
-.lp #kick
+.lp "#kick    "
 Kick something.
 Default key is \(oq\(haD\(cq, and \(oqk\(cq if
 .op number_pad
 is on.
-.lp #known
+.lp "#known   "
 Show what object types have been discovered.
 Default key is \(oq\\\(cq.
 .lp #knownclass
@@ -1208,10 +1216,10 @@ Debug mode only.
 Show mobile light sources.
 Autocompletes.
 Debug mode only.
-.lp #look
+.lp "#look    "
 Look at what is here, under you.
 Default key is \(oq:\(cq.
-.lp #loot
+.lp "#loot    "
 Loot a box or bag on the floor beneath you, or the saddle
 from a steed standing next to you.
 Autocompletes.
@@ -1220,18 +1228,16 @@ and go directly to removing a saddle.
 Default key is \(oqM-l\(cq, and also \(oql\(cq if
 .op number_pad
 is on.
-.lp #monster
+.lp "#monster "
 Use a monster's special ability (when polymorphed into monster form).
 Autocompletes.
 Default key is \(oqM-m\(cq.
-.lp #name
+.lp "#name    "
 Name a monster, an individual object, or a type of object.
 Same as \(lq#call\(rq.
 Autocompletes.
 Default keys are \(oqN\(cq, \(oqM-n\(cq, and \(oqM-N\(cq.
-.\".lp #offer \" `ff' ligature is narrow enough that text fits on same line
-.\"           \" as #offer but that looks bad because it is too close to 'r'
-.lp "#offer "
+.lp "#offer   " \" `ff' ligature is narrow
 Offer a sacrifice to the gods.
 Autocompletes.
 Default key is \(oqM-o\(cq.
@@ -1240,11 +1246,10 @@ You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
 .lp ""
 The \(oqm\(cq prefix skips offering any items which are on the altar.
-.\".lp #open \" there's no ligature here, but text ends up too close to #open
-.lp "#open "
+.lp "#open    "
 Open a door.
 Default key is \(oqo\(cq.
-.lp #options
+.lp "#options "
 Show and change option settings.
 Default key is \(oqO\(cq.
 .lp #overview
@@ -1258,15 +1263,15 @@ level will be included regardless of annotations.
 Autocompletes.
 Default keys are \(oq\(haO\(cq, and \(oqM-O\(cq.
 .\" DON'T PANIC!
-.lp #panic
+.lp "#panic   "
 Test the panic routine.
 Terminates the current game.
 Autocompletes.
 Debug mode only.
-.lp "#pay "
+.lp "#pay     "
 Pay your shopping bill.
 Default key is \(oqp\(cq.
-.lp #pickup
+.lp "#pickup  "
 Pick up things at the current location.
 Default key is \(oq,\(cq.
 The \(oqm\(cq prefix forces use of a menu.
@@ -1274,7 +1279,7 @@ The \(oqm\(cq prefix forces use of a menu.
 Polymorph self.
 Autocompletes.
 Debug mode only.
-.lp #pray
+.lp "#pray    "
 Pray to the gods for help.
 Autocompletes.
 Default key is \(oqM-p\(cq.
@@ -1287,16 +1292,16 @@ option to make you confirm your intent before praying.
 It is enabled by default, and you can reset the
 .op paranoid_confirmation
 option to disable it.
-.lp #prevmsg
+.lp "#prevmsg "
 Show previously displayed game messages.
 Default key is \(oq\(haP\(cq.
-.lp #puton
+.lp "#puton   "
 Put on an accessory (ring, amulet, etc).
 Default key is \(oqP\(cq.
-.lp #quaff
+.lp "#quaff   "
 Quaff (drink) something.
 Default key is \(oqq\(cq.
-.lp #quit
+.lp "#quit    "
 Quit the program without saving your game.
 Autocompletes.
 Default key is \(oqM-q\(cq.
@@ -1307,35 +1312,35 @@ By default a response of \(oqy\(cq acknowledges that intent.
 You can set the
 .op paranoid_confirmation
 option to require a response of \(lqyes\(rq instead.
-.lp #quiver
+.lp "#quiver  "
 Select ammunition for quiver.
 Default key is \(oqQ\(cq.
-.lp #read
+.lp "#read    "
 Read a scroll, a spellbook, or something else.
 Default key is \(oqr\(cq.
-.lp #redraw
+.lp "#redraw  "
 Redraw the screen.
 Default key is \(oq\(haR\(cq, and also \(oq\(haL\(cq if
 .op number_pad
 is on.
-.lp #remove
+.lp "#remove  "
 Remove an accessory (ring, amulet, etc).
 Default key is \(oqR\(cq.
-.lp #ride
+.lp "#ride    "
 Ride (or stop riding) a saddled creature.
 Autocompletes.
 Default key is \(oqM-R\(cq.
-.lp "#rub "
+.lp "#rub     "
 Rub a lamp or a stone.
 Autocompletes.
 Default key is \(oqM-r\(cq.
-.lp #save
+.lp "#save    "
 Save the game and exit the program.
 Default key is \(oqS\(cq.
-.lp #search
+.lp "#search  "
 Search for traps and secret doors around you.
 Default key is \(oqs\(cq.
-.lp #seeall
+.lp "#seeall  "
 Show all equipment in use.
 Default key is \(oq*\(cq.
 .lp #seeamulet
@@ -1344,10 +1349,10 @@ Default key is \(oq\(dq\(cq. \" double quote
 .lp #seearmor
 Show the armor currently worn.
 Default key is \(oq[\(cq.
-.lp #seegold
+.lp "#seegold "
 Count your gold.
 Default key is \(oq$\(cq.
-.lp #seenv
+.lp "#seenv   "
 Show seen vectors.
 Autocompletes.
 Debug mode only.
@@ -1360,30 +1365,30 @@ Default key is \(oq+\(cq.
 .lp #seetools
 Show the tools currently in use.
 Default key is \(oq(\(cq.
-.lp #seetrap
+.lp "#seetrap "
 Show the type of an adjacent trap.
 Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp #seeweapon
 Show the weapon currently wielded.
 Default key is \(oq)\(cq.
-.lp #shell
+.lp "#shell   "
 Do a shell escape.
 Default key is \(oq!\(cq.
-.lp "#sit "
+.lp "#sit     "
 Sit down.
 Autocompletes.
 Default key is \(oqM-s\(cq.
-.lp #stats
+.lp "#stats   "
 Show memory usage statistics.
 Autocompletes.
 Debug mode only.
-.lp #suspend
+.lp "#suspend "
 Suspend the game.
 Default key is \(oq\(haZ\(cq.
-.lp #swap
+.lp "#swap    "
 Swap wielded and secondary weapons.
 Default key is \(oqx\(cq.
-.lp #takeoff
+.lp "#takeoff "
 Take off one piece of armor.
 Default key is \(oqT\(cq.
 .lp #takeoffall
@@ -1392,24 +1397,24 @@ Default key is \(oqA\(cq.
 .lp #teleport
 Teleport around the level.
 Default key is \(oq\(haT\(cq.
-.lp #terrain
+.lp "#terrain "
 Show bare map without displaying monsters, objects, or traps.
 Autocompletes.
 .lp #therecmdmenu
 Show a menu of possible actions in a location next to you.
-.lp #throw
+.lp "#throw   "
 Throw something.
 Default key is \(oqt\(cq.
-.lp #timeout
+.lp "#timeout "
 Look at the timeout queue.
 Autocompletes.
 Debug mode only.
-.lp "#tip "
+.lp "#tip     "
 Tip over a container (bag or box) to pour out its contents.
 Autocompletes.
 Default key is \(oqM-T\(cq.
 The \(oqm\(cq prefix makes the command use a menu.
-.lp #travel
+.lp "#travel  "
 Travel to a specific location on the map.
 Default key is \(oq_\(cq. \" underscore
 Using the \(lqrequest menu\(rq prefix shows a menu of interesting targets
@@ -1418,7 +1423,7 @@ When picking a target with cursor and the
 .op autodescribe
 option is on, the top line will show \(lq(no travel path)\(rq if
 your character does not know of a path to that location.
-.lp #turn
+.lp "#turn    "
 Turn undead away.
 Autocompletes.
 Default key is \(oqM-t\(cq.
@@ -1432,53 +1437,53 @@ is off.
 Note that you must
 use suitable weapons for this type of combat, or it will
 be automatically turned off.
-.lp #untrap
+.lp "#untrap  "
 Untrap something (trap, door, or chest).
 Default key is \(oqM-u\(cq, and \(oqu\(cq if
 .op number_pad
 is on.
 .lp ""
 In some circumstances it can also be used to rescue trapped monsters.
-.lp "#up  "
+.lp "#up      "
 Go up a staircase.
 Default key is \(oq<\(cq.
 .lp #vanquished
 List vanquished monsters.
 Autocompletes.
 Debug mode only.
-.lp #version
+.lp "#version "
 Print compile time options for this version of NetHack.
 Autocompletes.
 Default key is \(oqM-v\(cq.
 .lp #versionshort
 Show version string.
 Default key is \(oqv\(cq.
-.lp #vision
+.lp "#vision  "
 Show vision array.
 Autocompletes.
 Debug mode only.
-.lp #wait
+.lp "#wait    "
 Rest one move while doing nothing.
 Default key is \(oq.\(cq, and also \(oq\ \(cq if
 .op rest_on_space
 is on.
-.lp #wear
+.lp "#wear    "
 Wear a piece of armor.
 Default key is \(oqW\(cq.
 .lp #whatdoes
 Tell what a key does.
 Default key is \(oq&\(cq.
-.lp #whatis
+.lp "#whatis  "
 Show what type of thing a symbol corresponds to.
 Default key is \(oq/\(cq.
-.lp #wield
+.lp "#wield   "
 Wield a weapon.
 Default key is \(oqw\(cq.
-.lp #wipe
+.lp "#wipe    "
 Wipe off your face.
 Autocompletes.
 Default key is \(oqM-w\(cq.
-.lp #wizbury
+.lp "#wizbury "
 Bury objects under and around you.
 Autocompletes.
 Debug mode only.
@@ -1508,7 +1513,7 @@ Teleport to another level.
 Autocompletes.
 Debug mode only.
 Default key is \(oq\(haV\(cq.
-.lp #wizmap
+.lp "#wizmap  "
 Map the level.
 Autocompletes.
 Debug mode only.
@@ -1525,19 +1530,19 @@ Debug mode only.
 Show locations of special levels.
 Autocompletes.
 Debug mode only.
-.lp #wizwish
+.lp "#wizwish "
 Wish for something.
 Autocompletes.
 Debug mode only.
 Default key is \(oq\(haW\(cq.
-.lp #wmode
+.lp "#wmode   "
 Show wall modes.
 Autocompletes.
 Debug mode only.
-.lp "#zap "
+.lp "#zap     "
 Zap a wand.
 Default key is \(oqz\(cq.
-.lp "#?   "
+.lp "#?       "
 Help menu:  get the list of available extended commands.
 .lp ""
 .pg

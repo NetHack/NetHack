@@ -1335,11 +1335,14 @@
 
           #offer
                Offer  a sacrifice to the gods.  Autocompletes.  Default key
-               is `M-o'.  The `m' prefix skips offering items on the altar.
+               is `M-o'.
 
-               You'll  need to find an altar to have any chance at success.
-               Corpses of  recently  killed  monsters  are  the  fodder  of
+               You'll need to find an altar to have any chance at  success.
+               Corpses  of  recently  killed  monsters  are  the  fodder of
                choice.
+
+               The `m' prefix skips offering any items which are on the al-
+               tar.
 
           #open
                Open a door.  Default key is `o'.
@@ -1375,9 +1378,6 @@
                Pray to the gods for help.  Autocompletes.  Default  key  is
                `M-p'.
 
-               Praying  too  soon after receiving prior help is a bad idea.
-               (Hint: entering the dungeon alive is treated as  having  re-
-               ceived help.  You probably shouldn't start off a new game by
 
 
           NetHack 3.6                                      October 16, 2018
@@ -1390,6 +1390,9 @@
 
 
 
+               Praying  too  soon after receiving prior help is a bad idea.
+               (Hint: entering the dungeon alive is treated as  having  re-
+               ceived help.  You probably shouldn't start off a new game by
                praying right away.)  Since using this command  by  accident
                can  cause  trouble,  there is an option to make you confirm
                your intent before praying.  It is enabled by  default,  and
@@ -1440,9 +1443,6 @@
                Rub  a  lamp or a stone.  Autocompletes.  Default key is `M-
                r'.
 
-          #save
-               Save the game and exit the program.  Default key is `S'.
-
 
 
 
@@ -1455,6 +1455,9 @@
           NetHack Guidebook                                              23
 
 
+
+          #save
+               Save the game and exit the program.  Default key is `S'.
 
           #search
                Search for traps and secret doors around you.   Default  key
@@ -1506,9 +1509,6 @@
           #swap
                Swap wielded and secondary weapons.  Default key is `x'.
 
-          #takeoff
-               Take off one piece of armor.  Default key is `T'.
-
 
 
 
@@ -1521,6 +1521,9 @@
           NetHack Guidebook                                              24
 
 
+
+          #takeoff
+               Take off one piece of armor.  Default key is `T'.
 
           #takeoffall
                Remove all armor.  Default key is `A'.
@@ -1574,9 +1577,6 @@
           #up
                Go up a staircase.  Default key is `<'.
 
-          #vanquished
-               List  vanquished monsters.  Autocompletes.  Debug mode only.
-
 
           NetHack 3.6                                      October 16, 2018
 
@@ -1587,6 +1587,9 @@
           NetHack Guidebook                                              25
 
 
+
+          #vanquished
+               List  vanquished monsters.  Autocompletes.  Debug mode only.
 
           #version
                Print compile time options for this version of NetHack.  Au-
@@ -1640,9 +1643,6 @@
                Set one or more intrinsic attributes.  Autocompletes.  Debug
                mode only.
 
-          #wizlevelport
-               Teleport to another level.  Autocompletes.  Debug mode only.
-
 
           NetHack 3.6                                      October 16, 2018
 
@@ -1654,6 +1654,8 @@
 
 
 
+          #wizlevelport
+               Teleport to another level.  Autocompletes.  Debug mode only.
                Default key is `^V'.
 
           #wizmap
@@ -1705,8 +1707,6 @@
 
           M-A  #annotate
 
-          M-c  #chat
-
 
 
 
@@ -1719,6 +1719,8 @@
           NetHack Guidebook                                              27
 
 
+
+          M-c  #chat
 
           M-C  #conduct
 
@@ -1771,8 +1773,6 @@
 
           j    #jump
 
-          k    #kick
-
 
 
 
@@ -1785,6 +1785,8 @@
           NetHack Guidebook                                              28
 
 
+
+          k    #kick
 
           l    #loot
 
@@ -1838,8 +1840,6 @@
 
                There is a special pre-mapped branch of the dungeon based on
           the classic computer game "Sokoban."  The goal  is  to  push  the
-          boulders  into  the pits or holes.  With careful foresight, it is
-          possible  to  complete  all  of  the  levels  according  to   the
 
 
           NetHack 3.6                                      October 16, 2018
@@ -1852,8 +1852,10 @@
 
 
 
-          traditional  rules  of Sokoban.  Some allowances are permitted in
-          case the player gets stuck; however, they will lower your luck.
+          boulders  into  the pits or holes.  With careful foresight, it is
+          possible to complete all of the levels according  to  the  tradi-
+          tional  rules  of Sokoban.  Some allowances are permitted in case
+          the player gets stuck; however, they will lower your luck.
 
           5.3.  Stairs and ladders (`<', `>')
 
@@ -1904,8 +1906,6 @@
           floor  while inside a shop.  You will either be offered an amount
           of gold and asked whether you're willing to sell,  or  you'll  be
           told  that  the shopkeeper isn't interested (generally, your item
-          needs to be compatible with the type of  merchandise  carried  by
-          the shop).
 
 
           NetHack 3.6                                      October 16, 2018
@@ -1917,6 +1917,9 @@
           NetHack Guidebook                                              30
 
 
+
+          needs to be compatible with the type of  merchandise  carried  by
+          the shop).
 
                If  you drop something in a shop by accident, the shopkeeper
           will usually claim ownership without offering  any  compensation.
@@ -1970,9 +1973,6 @@
           from  another  when  multiple  monsters are present.  Assigning a
           name which is just a space will remove any prior name.
 
-               The extended command "#chat" can be used to interact with an
-          adjacent monster.  There is no actual dialog (in other words, you
-
 
           NetHack 3.6                                      October 16, 2018
 
@@ -1984,6 +1984,8 @@
 
 
 
+               The extended command "#chat" can be used to interact with an
+          adjacent monster.  There is no actual dialog (in other words, you
           don't get to choose what you'll say), but chatting with some mon-
           sters  such  as  a shopkeeper or the Oracle of Delphi can produce
           useful results.
@@ -2036,8 +2038,6 @@
           accompany you and any non-adjacent pet will be left behind.  Your
           pet  may trigger such traps itself; you will not be carried along
           with it even if adjacent at the time.
-
-
 
 
           NetHack 3.6                                      October 16, 2018
@@ -4852,8 +4852,7 @@
             and ride, and "all" for every condition.
 
             Allowed behaviors are "always", "up", "down", "changed", a per-
-            centage  or  absolute  number  threshold,  or  a  text to match
-            against.
+            centage or absolute number threshold, or text to match against.
 
                * "always" will set the default attributes for that field.
 
@@ -4876,6 +4875,7 @@
                  numeric limit is relaxed  slightly  for  those:  >-1%  and
                  <101%  are  allowed.)   Only  valid  for "power" and "hit-
                  points" fields.
+
 
 
           NetHack 3.6                                      October 16, 2018
