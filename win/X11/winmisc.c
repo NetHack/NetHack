@@ -1247,10 +1247,9 @@ X11_player_selection_dialog()
     } else {
         ps_selected = -1;
         nh_XtPopup(popup, (int) XtGrabExclusive, form);
+        /* The callback will enable the event loop exit. */
+        (void) x_event(EXIT_ON_EXIT);
     }
-
-    /* The callback will enable the event loop exit. */
-    (void) x_event(flags.randomall ? EXIT_ON_SENT_EVENT : EXIT_ON_EXIT);
 
     nh_XtPopdown(popup);
     XtDestroyWidget(popup);
@@ -1994,7 +1993,7 @@ Widget *formp; /* return */
     Widget popup, popform, form, label, above, left, right, view;
     Widget *commands, *curr;
     int i;
-    Arg args[8];
+    Arg args[12];
     Cardinal num_args;
     Dimension width, other_width, max_width, border_width,
               height, cumulative_height, screen_height;
