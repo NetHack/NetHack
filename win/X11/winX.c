@@ -133,7 +133,7 @@ struct window_procs X11_procs = {
 #else
     genl_outrip,
 #endif
-    X11_preference_update, genl_getmsghistory, genl_putmsghistory,
+    X11_preference_update, X11_getmsghistory, X11_putmsghistory,
     genl_status_init, genl_status_finish, genl_status_enablefield,
     genl_status_update,
     genl_can_suspend_no, /* XXX may not always be correct */
@@ -180,6 +180,43 @@ static winid message_win = WIN_ERR, /* These are the winids of the message, */
              map_win = WIN_ERR,     /*   map, and status windows, when they */
              status_win = WIN_ERR;  /*   are created in init_windows().     */
 static Pixmap icon_pixmap = None;   /* Pixmap for icon.                     */
+
+void
+X11_putmsghistory(msg, is_restoring)
+const char *msg;
+boolean is_restoring;
+{
+    if (WIN_MESSAGE != WIN_ERR) {
+        struct xwindow *wp = &window_list[WIN_MESSAGE];
+        debugpline2("X11_putmsghistory('%s',%i)", msg, is_restoring);
+        if (msg)
+            append_message(wp, msg);
+    }
+}
+
+char *
+X11_getmsghistory(init)
+boolean init;
+{
+    if (WIN_MESSAGE != WIN_ERR) {
+        static struct line_element *curr = (struct line_element *) 0;
+        static int numlines = 0;
+        struct xwindow *wp = &window_list[WIN_MESSAGE];
+
+        if (!curr) {
+            curr = wp->mesg_information->head;
+            numlines = 0;
+        }
+
+        if (numlines < wp->mesg_information->num_lines) {
+            curr = curr->next;
+            numlines++;
+            debugpline2("X11_getmsghistory(%i)='%s'", init, curr->line);
+            return curr->line;
+        }
+    }
+    return (char *) 0;
+}
 
 /*
  * Find the window structure that corresponds to the given widget.  Note

@@ -394,6 +394,8 @@ E void FDECL(hilight_value, (Widget));
 E void FDECL(swap_fg_bg, (Widget));
 
 /* external declarations */
+E char *FDECL(X11_getmsghistory, (BOOLEAN_P));
+E void FDECL(X11_putmsghistory, (const char *, BOOLEAN_P));
 E void FDECL(X11_init_nhwindows, (int *, char **));
 E void NDECL(X11_player_selection);
 E void NDECL(X11_askname);
