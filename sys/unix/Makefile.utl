@@ -111,10 +111,10 @@ OBJDIR = ../src
 
 # yacc/lex programs to use to generate *_comp.h, *_lex.c, and *_yacc.c.
 # if, instead of yacc/lex you have bison/flex, comment/uncomment the following.
-YACC     = yacc
+# YACC     = yacc
 LEX      = lex
 # YACC     = bison -y
-# YACC     = byacc
+YACC     = byacc
 # LEX      = flex
 
 # these are the names of the output files from YACC/LEX. Under MS-DOS
