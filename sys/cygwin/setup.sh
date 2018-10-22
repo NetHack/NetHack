@@ -7,7 +7,7 @@
 #
 # This requires no argument
 # e.g.:
-#  sh setup.sh
+#  ./setup.sh
 
 # Cygwin is very much liks Unix.  We make use of as many of the sys/unix files
 # as we can so that it requires less maintenance on update to the unix versions.
