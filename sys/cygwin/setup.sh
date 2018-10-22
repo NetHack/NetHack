@@ -16,8 +16,8 @@
 prefix=.
 if [ -f sys/cygwin/Makefile.top ]; then cd sys/cygwin; prefix=../..; fi
 
-hints=$prefix/cygwin_hints
-hfile=$1
+hfile=cygwin_hints
+hints=$prefix/$hfile
 
 if [ ! -f "$hints" ]; then
     echo "Cannot find hints file $hfile"
