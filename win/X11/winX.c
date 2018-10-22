@@ -103,7 +103,7 @@ struct window_procs X11_procs = {
     (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
      | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
 #if defined(STATUS_HILITES)
-    WC2_FLUSH_STATUS | WC2_RESET_STATUS |
+    WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
 #endif
     0L,
     X11_init_nhwindows,
@@ -134,8 +134,8 @@ struct window_procs X11_procs = {
     genl_outrip,
 #endif
     X11_preference_update, X11_getmsghistory, X11_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    X11_status_init, X11_status_finish, X11_status_enablefield,
+    X11_status_update,
     genl_can_suspend_no, /* XXX may not always be correct */
 };
 
@@ -827,9 +827,11 @@ const char *str;
         toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
+#ifndef STATUS_HILITES
     case NHW_STATUS:
         adjust_status(wp, str);
         break;
+#endif
     case NHW_MAP:
         impossible("putstr: called on map window \"%s\"", str);
         break;
@@ -1267,6 +1269,8 @@ static XtActionsRec actions[] = {
 static XtResource resources[] = {
     { nhStr("slow"), nhStr("Slow"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, slow), XtRString, nhStr("True") },
+    { nhStr("fancy_status"), nhStr("Fancy_status"), XtRBoolean, sizeof(Boolean),
+      XtOffset(AppResources *, fancy_status), XtRString, nhStr("True") },
     { nhStr("autofocus"), nhStr("AutoFocus"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, autofocus), XtRString, nhStr("False") },
     { nhStr("message_line"), nhStr("Message_line"), XtRBoolean,
@@ -2251,7 +2255,7 @@ static int
 input_event(exit_condition)
 int exit_condition;
 {
-    if (WIN_STATUS != WIN_ERR) /* hilighting on the fancy status window */
+    if (appResources.fancy_status && WIN_STATUS != WIN_ERR) /* hilighting on the fancy status window */
         check_turn_events();
     if (WIN_MAP != WIN_ERR) /* make sure cursor is not clipped */
         check_cursor_visibility(&window_list[WIN_MAP]);
@@ -2521,7 +2525,8 @@ init_standard_windows()
      * after the fancy status widget is realized (above, with the game popup),
      * but before it is popped up.
      */
-    null_out_status();
+    if (appResources.fancy_status)
+        null_out_status();
     /*
      * Set the map size to its standard size.  As with the message window
      * above, the map window needs to be set to its constrained size until

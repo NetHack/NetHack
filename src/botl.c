@@ -1248,6 +1248,16 @@ static struct fieldid_t {
 static const char threshold_value[] = "hilite_status threshold ",
                   is_out_of_range[] = " is out of range";
 
+
+const char *
+bl_idx_to_fldname(idx)
+int idx;
+{
+    if (idx >= 0 && idx < MAXBLSTATS)
+        return initblstats[idx].fldname;
+    return (const char *) 0;
+}
+
 /* field name to bottom line index */
 STATIC_OVL enum statusfields
 fldname_to_bl_indx(name)

@@ -100,6 +100,10 @@ NetHack*highlight_prompt: False
 ! has a lot of popups and is almost unplayable without some kind of autofocus.
 !NetHack*autofocus: True
 !
+
+! True, use a "fancy" style status area vs. TTY-style status lines
+!NetHack*fancy_status: False
+
 ! Specify the number of rows and columns of the map window.  The default
 ! is the standard 80x21 window.  Note: this _does_not_ change nethack's
 ! level size, only what you see of it.
