@@ -17,7 +17,7 @@ SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
 
-POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; echo "OPTIONS=symset:DECgraphics, color, !sparkle, !autopickup" >> $(INSTDIR)/sysconf ; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+POSTINSTALL=cp -n sys/cygwin/sysconf $(INSTDIR)/sysconf; echo "OPTIONS=symset:DECgraphics, color, autodig, !sparkle, !autopickup" >> $(INSTDIR)/sysconf ; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL -DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
@@ -46,8 +46,4 @@ CHGRP=true
 VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
-
-#-POST
-
-YACC=byacc
 
