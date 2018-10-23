@@ -306,13 +306,13 @@ NetHack*map*green:          green3
 NetHack*map*brown:          DarkOrange3
 NetHack*map*blue:           blue3
 NetHack*map*magenta:        magenta3
-NetHack*map*cyan:           cyan3
+NetHack*map*cyan:           Dark cyan
 NetHack*map*gray:           gray50
-NetHack*map*orange:         yellow
+NetHack*map*orange:         orange
 NetHack*map*bright_green:   green
 NetHack*map*yellow:         yellow
-NetHack*map*bright_blue:    blue
-NetHack*map*bright_magenta: magenta
+NetHack*map*bright_blue:    Royal blue
+NetHack*map*bright_magenta: Fuchsia
 NetHack*map*bright_cyan:    cyan
 NetHack*map*white:          white
 !
