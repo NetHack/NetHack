@@ -153,12 +153,7 @@ struct menu_info_t {
     struct menu curr_menu; /* Menu being displayed. */
     struct menu new_menu;  /* New menu being built. */
 
-    boolean nh_colors_inited;
-    XColor nh_colors[CLR_MAX];
-
     XFontStruct *fs;           /* Font for the window. */
-    XFontStruct *boldfs;       /* Bold font */
-    Display *boldfs_dpy;
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
@@ -202,6 +197,11 @@ struct xwindow {
     Dimension pixel_height;
     int prevx, cursx; /* Cursor position, only used by    */
     int prevy, cursy; /*   map and "plain" status windows.*/
+
+    boolean nh_colors_inited;
+    XColor nh_colors[CLR_MAX];
+    XFontStruct *boldfs;       /* Bold font */
+    Display *boldfs_dpy;       /* Bold font display */
 
     union {
         struct map_info_t *Map_info;       /* map window info */
@@ -298,6 +298,9 @@ E void FDECL(positionpopup, (Widget, BOOLEAN_P));
 
 /* ### winX.c ### */
 E struct xwindow *FDECL(find_widget, (Widget));
+E XColor FDECL(get_nhcolor, (struct xwindow *, int));
+E void FDECL(init_menu_nhcolors, (struct xwindow *));
+E void FDECL(load_boldfont, (struct xwindow *, Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
 E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
 E char *FDECL(fontname_boldify, (const char *));

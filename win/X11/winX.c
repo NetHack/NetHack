@@ -49,6 +49,7 @@
 #include "hack.h"
 #include "winX.h"
 #include "dlb.h"
+#include "xwindow.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -261,6 +262,102 @@ find_free_window()
     if (windex == MAX_WINDOWS)
         panic("find_free_window: no free windows!");
     return (winid) windex;
+}
+
+
+XColor
+get_nhcolor(wp, clr)
+struct xwindow *wp;
+int clr;
+{
+    init_menu_nhcolors(wp);
+    /* FIXME: init_menu_nhcolors may fail */
+
+    if (clr >= 0 && clr < CLR_MAX)
+        return wp->nh_colors[clr];
+
+    return wp->nh_colors[0];
+}
+
+void
+init_menu_nhcolors(wp)
+struct xwindow *wp;
+{
+    static const char *mapCLR_to_res[CLR_MAX] = {
+        XtNblack,
+        XtNred,
+        XtNgreen,
+        XtNbrown,
+        XtNblue,
+        XtNmagenta,
+        XtNcyan,
+        XtNgray,
+        XtNforeground,
+        XtNorange,
+        XtNbright_green,
+        XtNyellow,
+        XtNbright_blue,
+        XtNbright_magenta,
+        XtNbright_cyan,
+        XtNwhite,
+    };
+    Display *dpy;
+    Colormap screen_colormap;
+    XrmDatabase rDB;
+    XrmValue value;
+    Status rc;
+    int color;
+    char *ret_type[32];
+    char clr_name[BUFSZ];
+    char clrclass[BUFSZ];
+    const char *wintypenames[NHW_TEXT] = {
+        "message", "status", "map", "menu", "text"
+    };
+    const char *wtn;
+    char wtn_up[BUFSZ];
+
+    if (wp->nh_colors_inited || !wp->type)
+        return;
+
+    wtn = wintypenames[wp->type - 1];
+    Strcpy(wtn_up, wtn);
+    (void) upstart(wtn_up);
+
+    dpy = XtDisplay(wp->w);
+    screen_colormap = DefaultColormap(dpy, DefaultScreen(dpy));
+    rDB = XrmGetDatabase(dpy);
+
+    for (color = 0; color < CLR_MAX; color++) {
+        Sprintf(clr_name, "nethack.%s.%s", wtn, mapCLR_to_res[color]);
+        Sprintf(clrclass, "NetHack.%s.%s", wtn_up, mapCLR_to_res[color]);
+
+        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
+            Sprintf(clr_name, "nethack.map.%s", mapCLR_to_res[color]);
+            Sprintf(clrclass, "NetHack.Map.%s", mapCLR_to_res[color]);
+        }
+
+        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
+            impossible("XrmGetResource error (%s)", clr_name);
+        } else if (!strcmp(ret_type[0], "String")) {
+            char tmpbuf[256];
+
+            if (value.size >= sizeof tmpbuf)
+                value.size = sizeof tmpbuf - 1;
+            (void) strncpy(tmpbuf, (char *) value.addr, (int) value.size);
+            tmpbuf[value.size] = '\0';
+            /* tmpbuf now contains the color name from the named resource */
+
+            rc = XAllocNamedColor(dpy, screen_colormap, tmpbuf,
+                                  &wp->nh_colors[color],
+                                  &wp->nh_colors[color]);
+            if (rc == 0) {
+                impossible("XAllocNamedColor failed for color %i (%s)",
+                           color, clr_name);
+            }
+        }
+    }
+
+    wp->nh_colors_inited = TRUE;
 }
 
 /*
@@ -550,6 +647,31 @@ const char *fontname;
     }
     *bufp = '\0';
     return buf;
+}
+
+void
+load_boldfont(wp, w)
+struct xwindow *wp;
+Widget w;
+{
+    Arg args[1];
+    XFontStruct *fs;
+    unsigned long ret;
+    char *fontname;
+    Display *dpy;
+
+    if (wp->boldfs)
+        return;
+
+    XtSetArg(args[0], nhStr(XtNfont), &fs);
+    XtGetValues(w, args, 1);
+
+    if (!XGetFontProperty(fs, XA_FONT, &ret))
+        return;
+
+    wp->boldfs_dpy = dpy = XtDisplay(w);
+    fontname = fontname_boldify(XGetAtomName(dpy, (Atom)ret));
+    wp->boldfs = XLoadQueryFont(dpy, fontname);
 }
 
 #ifdef TEXTCOLOR
@@ -952,6 +1074,9 @@ int type;
     wp->prevx = wp->prevy = wp->cursx = wp->cursy = wp->pixel_width =
         wp->pixel_height = 0;
     wp->keep_window = FALSE;
+    wp->nh_colors_inited = FALSE;
+    wp->boldfs = (XFontStruct *) 0;
+    wp->boldfs_dpy = (Display *) 0;
 
     switch (type) {
     case NHW_MAP:
@@ -1094,6 +1219,12 @@ winid window;
     } else if (window == WIN_INVEN) {
         /* don't need to keep this one */
         WIN_INVEN = WIN_ERR;
+    }
+
+    if (wp->boldfs) {
+        XFreeFont(wp->boldfs_dpy, wp->boldfs);
+        wp->boldfs = (XFontStruct *) 0;
+        wp->boldfs_dpy = (Display *) 0;
     }
 
     switch (wp->type) {
