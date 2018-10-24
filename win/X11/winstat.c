@@ -114,12 +114,11 @@ static enum statusfields X11_fieldorder[X11_NUM_STATUS_LINES][X11_NUM_STATUS_FIE
       BL_CAP, BL_CONDITION, BL_FLUSH }
 };
 
-/* static boolean X11_labels_created = FALSE; */
 static Widget X11_status_widget;
 static Widget X11_status_labels[MAXBLSTATS];
 static Widget X11_cond_labels[32]; /* Ugh */
 
-static Pixel X11_colors[16];
+struct xwindow *xw_status_win;
 static Pixel X11_status_widget_fg, X11_status_widget_bg;
 
 
@@ -266,15 +265,22 @@ const char *text;
         XtSetArg(args[num_args], nhStr(XtNlabel), (text && *text) ? text : ""); num_args++;
         XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
 
-        fg = (coloridx != NO_COLOR) ? X11_colors[coloridx]
+        fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
                                     : X11_status_widget_fg;
         if (attrmask & HL_INVERSE) {
             Pixel tmppx = fg;
             fg = bg;
             bg = tmppx;
         }
+
+        if (attrmask & HL_BOLD) {
+            load_boldfont(xw_status_win, label);
+            XtSetArg(args[num_args], nhStr(XtNfont),
+                     xw_status_win->boldfs); num_args++;
+        }
+
         if (fg == bg)
-            fg = X11_colors[CLR_GRAY];
+            fg = get_nhcolor(xw_status_win, CLR_GRAY).pixel;
 
         XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
         XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
@@ -404,7 +410,7 @@ unsigned long *colormasks;
                      (text && *text) ? text : ""); num_args++;
             XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
 
-            fg = (coloridx != NO_COLOR) ? X11_colors[coloridx]
+            fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
                                         : X11_status_widget_fg;
             if (attridx & HL_INVERSE) {
                 Pixel tmppx = fg;
@@ -413,8 +419,14 @@ unsigned long *colormasks;
                 bg = tmppx;
             }
 
+            if (attridx & HL_BOLD) {
+                load_boldfont(xw_status_win, label);
+                XtSetArg(args[num_args], nhStr(XtNfont),
+                         xw_status_win->boldfs); num_args++;
+            }
+
             if (fg == bg)
-                fg = X11_colors[CLR_GRAY];
+                fg = get_nhcolor(xw_status_win, CLR_GRAY).pixel;
 
             XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
             XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
@@ -581,44 +593,6 @@ unsigned long *colormasks;
         X11_status_update_tty(fld, ptr, chg, percent, color, colormasks);
 }
 
-
-void
-init_nhcolors(w)
-Widget w;
-{
-    int i;
-    Display *dpy = XtDisplay(w);
-    int defscreen = DefaultScreen(dpy);
-    Colormap cmap = DefaultColormap(dpy, defscreen);
-    const char * resource2clr[16] = {
-        XtNblack,
-        XtNred,
-        XtNgreen,
-        XtNbrown,
-        XtNblue,
-        XtNmagenta,
-        XtNcyan,
-        XtNgray,
-        XtNforeground,
-        XtNorange,
-        XtNbright_green,
-        XtNyellow,
-        XtNbright_blue,
-        XtNbright_magenta,
-        XtNbright_cyan,
-        XtNwhite
-    };
-
-    for (i = 0; i < SIZE(resource2clr); i++) {
-        XColor color, ignore;
-
-        if (XAllocNamedColor(dpy, cmap, resource2clr[i], &color, &ignore))
-            X11_colors[i] = color.pixel;
-        else
-            X11_colors[i] = WhitePixel(dpy, defscreen);
-    }
-}
-
 Widget
 create_tty_status(parent, top)
 Widget parent, top;
@@ -718,8 +692,6 @@ Widget parent, top;
                                                    args, num_args);
     }
 
-    init_nhcolors(w);
-
     return w;
 }
 
@@ -776,6 +748,7 @@ struct xwindow *wp; /* window pointer */
 boolean create_popup;
 Widget parent;
 {
+    xw_status_win = wp;
     if (appResources.fancy_status)
         create_status_window_fancy(wp, create_popup, parent);
     else
