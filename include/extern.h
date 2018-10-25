@@ -145,6 +145,7 @@ E int NDECL(getbones);
 
 /* ### botl.c ### */
 
+E const char *FDECL(bl_idx_to_fldname, (int));
 E char *NDECL(do_statusline1);
 E void NDECL(check_gold_symbol);
 E char *NDECL(do_statusline2);
