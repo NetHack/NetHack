@@ -49,6 +49,7 @@
 #include "hack.h"
 #include "winX.h"
 #include "dlb.h"
+#include "xwindow.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -103,7 +104,7 @@ struct window_procs X11_procs = {
     (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
      | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
 #if defined(STATUS_HILITES)
-    WC2_FLUSH_STATUS | WC2_RESET_STATUS |
+    WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
 #endif
     0L,
     X11_init_nhwindows,
@@ -133,9 +134,9 @@ struct window_procs X11_procs = {
 #else
     genl_outrip,
 #endif
-    X11_preference_update, genl_getmsghistory, genl_putmsghistory,
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    X11_preference_update, X11_getmsghistory, X11_putmsghistory,
+    X11_status_init, X11_status_finish, X11_status_enablefield,
+    X11_status_update,
     genl_can_suspend_no, /* XXX may not always be correct */
 };
 
@@ -181,6 +182,43 @@ static winid message_win = WIN_ERR, /* These are the winids of the message, */
              status_win = WIN_ERR;  /*   are created in init_windows().     */
 static Pixmap icon_pixmap = None;   /* Pixmap for icon.                     */
 
+void
+X11_putmsghistory(msg, is_restoring)
+const char *msg;
+boolean is_restoring;
+{
+    if (WIN_MESSAGE != WIN_ERR) {
+        struct xwindow *wp = &window_list[WIN_MESSAGE];
+        debugpline2("X11_putmsghistory('%s',%i)", msg, is_restoring);
+        if (msg)
+            append_message(wp, msg);
+    }
+}
+
+char *
+X11_getmsghistory(init)
+boolean init;
+{
+    if (WIN_MESSAGE != WIN_ERR) {
+        static struct line_element *curr = (struct line_element *) 0;
+        static int numlines = 0;
+        struct xwindow *wp = &window_list[WIN_MESSAGE];
+
+        if (!curr) {
+            curr = wp->mesg_information->head;
+            numlines = 0;
+        }
+
+        if (numlines < wp->mesg_information->num_lines) {
+            curr = curr->next;
+            numlines++;
+            debugpline2("X11_getmsghistory(%i)='%s'", init, curr->line);
+            return curr->line;
+        }
+    }
+    return (char *) 0;
+}
+
 /*
  * Find the window structure that corresponds to the given widget.  Note
  * that this is not the popup widget, nor the viewport, but the child.
@@ -224,6 +262,102 @@ find_free_window()
     if (windex == MAX_WINDOWS)
         panic("find_free_window: no free windows!");
     return (winid) windex;
+}
+
+
+XColor
+get_nhcolor(wp, clr)
+struct xwindow *wp;
+int clr;
+{
+    init_menu_nhcolors(wp);
+    /* FIXME: init_menu_nhcolors may fail */
+
+    if (clr >= 0 && clr < CLR_MAX)
+        return wp->nh_colors[clr];
+
+    return wp->nh_colors[0];
+}
+
+void
+init_menu_nhcolors(wp)
+struct xwindow *wp;
+{
+    static const char *mapCLR_to_res[CLR_MAX] = {
+        XtNblack,
+        XtNred,
+        XtNgreen,
+        XtNbrown,
+        XtNblue,
+        XtNmagenta,
+        XtNcyan,
+        XtNgray,
+        XtNforeground,
+        XtNorange,
+        XtNbright_green,
+        XtNyellow,
+        XtNbright_blue,
+        XtNbright_magenta,
+        XtNbright_cyan,
+        XtNwhite,
+    };
+    Display *dpy;
+    Colormap screen_colormap;
+    XrmDatabase rDB;
+    XrmValue value;
+    Status rc;
+    int color;
+    char *ret_type[32];
+    char clr_name[BUFSZ];
+    char clrclass[BUFSZ];
+    const char *wintypenames[NHW_TEXT] = {
+        "message", "status", "map", "menu", "text"
+    };
+    const char *wtn;
+    char wtn_up[BUFSZ];
+
+    if (wp->nh_colors_inited || !wp->type)
+        return;
+
+    wtn = wintypenames[wp->type - 1];
+    Strcpy(wtn_up, wtn);
+    (void) upstart(wtn_up);
+
+    dpy = XtDisplay(wp->w);
+    screen_colormap = DefaultColormap(dpy, DefaultScreen(dpy));
+    rDB = XrmGetDatabase(dpy);
+
+    for (color = 0; color < CLR_MAX; color++) {
+        Sprintf(clr_name, "nethack.%s.%s", wtn, mapCLR_to_res[color]);
+        Sprintf(clrclass, "NetHack.%s.%s", wtn_up, mapCLR_to_res[color]);
+
+        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
+            Sprintf(clr_name, "nethack.map.%s", mapCLR_to_res[color]);
+            Sprintf(clrclass, "NetHack.Map.%s", mapCLR_to_res[color]);
+        }
+
+        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
+            impossible("XrmGetResource error (%s)", clr_name);
+        } else if (!strcmp(ret_type[0], "String")) {
+            char tmpbuf[256];
+
+            if (value.size >= sizeof tmpbuf)
+                value.size = sizeof tmpbuf - 1;
+            (void) strncpy(tmpbuf, (char *) value.addr, (int) value.size);
+            tmpbuf[value.size] = '\0';
+            /* tmpbuf now contains the color name from the named resource */
+
+            rc = XAllocNamedColor(dpy, screen_colormap, tmpbuf,
+                                  &wp->nh_colors[color],
+                                  &wp->nh_colors[color]);
+            if (rc == 0) {
+                impossible("XAllocNamedColor failed for color %i (%s)",
+                           color, clr_name);
+            }
+        }
+    }
+
+    wp->nh_colors_inited = TRUE;
 }
 
 /*
@@ -515,6 +649,31 @@ const char *fontname;
     return buf;
 }
 
+void
+load_boldfont(wp, w)
+struct xwindow *wp;
+Widget w;
+{
+    Arg args[1];
+    XFontStruct *fs;
+    unsigned long ret;
+    char *fontname;
+    Display *dpy;
+
+    if (wp->boldfs)
+        return;
+
+    XtSetArg(args[0], nhStr(XtNfont), &fs);
+    XtGetValues(w, args, 1);
+
+    if (!XGetFontProperty(fs, XA_FONT, &ret))
+        return;
+
+    wp->boldfs_dpy = dpy = XtDisplay(w);
+    fontname = fontname_boldify(XGetAtomName(dpy, (Atom)ret));
+    wp->boldfs = XLoadQueryFont(dpy, fontname);
+}
+
 #ifdef TEXTCOLOR
 /* ARGSUSED */
 static void
@@ -790,9 +949,11 @@ const char *str;
         toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
+#ifndef STATUS_HILITES
     case NHW_STATUS:
         adjust_status(wp, str);
         break;
+#endif
     case NHW_MAP:
         impossible("putstr: called on map window \"%s\"", str);
         break;
@@ -913,6 +1074,9 @@ int type;
     wp->prevx = wp->prevy = wp->cursx = wp->cursy = wp->pixel_width =
         wp->pixel_height = 0;
     wp->keep_window = FALSE;
+    wp->nh_colors_inited = FALSE;
+    wp->boldfs = (XFontStruct *) 0;
+    wp->boldfs_dpy = (Display *) 0;
 
     switch (type) {
     case NHW_MAP:
@@ -1055,6 +1219,12 @@ winid window;
     } else if (window == WIN_INVEN) {
         /* don't need to keep this one */
         WIN_INVEN = WIN_ERR;
+    }
+
+    if (wp->boldfs) {
+        XFreeFont(wp->boldfs_dpy, wp->boldfs);
+        wp->boldfs = (XFontStruct *) 0;
+        wp->boldfs_dpy = (Display *) 0;
     }
 
     switch (wp->type) {
@@ -1230,6 +1400,8 @@ static XtActionsRec actions[] = {
 static XtResource resources[] = {
     { nhStr("slow"), nhStr("Slow"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, slow), XtRString, nhStr("True") },
+    { nhStr("fancy_status"), nhStr("Fancy_status"), XtRBoolean, sizeof(Boolean),
+      XtOffset(AppResources *, fancy_status), XtRString, nhStr("True") },
     { nhStr("autofocus"), nhStr("AutoFocus"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, autofocus), XtRString, nhStr("False") },
     { nhStr("message_line"), nhStr("Message_line"), XtRBoolean,
@@ -2214,7 +2386,7 @@ static int
 input_event(exit_condition)
 int exit_condition;
 {
-    if (WIN_STATUS != WIN_ERR) /* hilighting on the fancy status window */
+    if (appResources.fancy_status && WIN_STATUS != WIN_ERR) /* hilighting on the fancy status window */
         check_turn_events();
     if (WIN_MAP != WIN_ERR) /* make sure cursor is not clipped */
         check_cursor_visibility(&window_list[WIN_MAP]);
@@ -2484,7 +2656,8 @@ init_standard_windows()
      * after the fancy status widget is realized (above, with the game popup),
      * but before it is popped up.
      */
-    null_out_status();
+    if (appResources.fancy_status)
+        null_out_status();
     /*
      * Set the map size to its standard size.  As with the message window
      * above, the map window needs to be set to its constrained size until

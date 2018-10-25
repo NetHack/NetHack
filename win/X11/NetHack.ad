@@ -100,6 +100,10 @@ NetHack*highlight_prompt: False
 ! has a lot of popups and is almost unplayable without some kind of autofocus.
 !NetHack*autofocus: True
 !
+
+! True, use a "fancy" style status area vs. TTY-style status lines
+!NetHack*fancy_status: False
+
 ! Specify the number of rows and columns of the map window.  The default
 ! is the standard 80x21 window.  Note: this _does_not_ change nethack's
 ! level size, only what you see of it.
@@ -170,80 +174,80 @@ NetHack*player_selection_dialog*play.cornerRoundPercent: NETHACK_BTN_ROUND
 
 
 ! role selection window  (OPTIONS=player_selection:prompts)
-NetHack*player_selection*random.foreground:   NETHACK_CLR_RANDOM
-NetHack*player_selection*random.background:   black
-NetHack*player_selection*random.borderColor:  NETHACK_CLR_RANDOM
-NetHack*player_selection*random.borderWidth:  1
-NetHack*player_selection*random.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*player_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
-NetHack*player_selection*quit.foreground:     NETHACK_CLR_QUIT
-NetHack*player_selection*quit.borderColor:    NETHACK_CLR_QUIT
-NetHack*player_selection*quit.borderWidth:    1
-NetHack*player_selection*quit.shapeStyle: NETHACK_BTN_SHAPE
-NetHack*player_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*player_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+NetHack*player_selection*btn_random.background:   black
+NetHack*player_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*player_selection*btn_random.borderWidth:  1
+NetHack*player_selection*btn_random.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*player_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*player_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+NetHack*player_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*player_selection*btn_quit.borderWidth:    1
+NetHack*player_selection*btn_quit.shapeStyle: NETHACK_BTN_SHAPE
+NetHack*player_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*player_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*player_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*player_selection*Command.borderWidth: NETHACK_CMD_BORDER
 
 ! race selection window
-NetHack*race_selection*random.foreground:   NETHACK_CLR_RANDOM
-NetHack*race_selection*random.background:   black
-NetHack*race_selection*random.borderColor:  NETHACK_CLR_RANDOM
-NetHack*race_selection*random.borderWidth:  1
-NetHack*race_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*race_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
-NetHack*race_selection*quit.foreground:     NETHACK_CLR_QUIT
-NetHack*race_selection*quit.borderColor:    NETHACK_CLR_QUIT
-NetHack*race_selection*quit.borderWidth:    1
-NetHack*race_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*race_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*race_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+NetHack*race_selection*btn_random.background:   black
+NetHack*race_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*race_selection*btn_random.borderWidth:  1
+NetHack*race_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*race_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*race_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+NetHack*race_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*race_selection*btn_quit.borderWidth:    1
+NetHack*race_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*race_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*race_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*race_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*race_selection*Command.borderWidth: NETHACK_CMD_BORDER
 
 ! gender selection window
-NetHack*gender_selection*random.foreground:   NETHACK_CLR_RANDOM
-NetHack*gender_selection*random.background:   black
-NetHack*gender_selection*random.borderColor:  NETHACK_CLR_RANDOM
-NetHack*gender_selection*random.borderWidth:  1
-NetHack*gender_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*gender_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
-NetHack*gender_selection*quit.foreground:     NETHACK_CLR_QUIT
-NetHack*gender_selection*quit.borderColor:    NETHACK_CLR_QUIT
-NetHack*gender_selection*quit.borderWidth:    1
-NetHack*gender_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*gender_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*gender_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+NetHack*gender_selection*btn_random.background:   black
+NetHack*gender_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*gender_selection*btn_random.borderWidth:  1
+NetHack*gender_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*gender_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*gender_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+NetHack*gender_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*gender_selection*btn_quit.borderWidth:    1
+NetHack*gender_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*gender_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*gender_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*gender_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*gender_selection*Command.borderWidth: NETHACK_CMD_BORDER
 
 ! alignment selection window
-NetHack*alignment_selection*random.foreground:   NETHACK_CLR_RANDOM
-NetHack*alignment_selection*random.background:   black
-NetHack*alignment_selection*random.borderColor:  NETHACK_CLR_RANDOM
-NetHack*alignment_selection*random.borderWidth:  1
-NetHack*alignment_selection*random.shapeStyle:   NETHACK_BTN_SHAPE
-NetHack*alignment_selection*random.cornerRoundPercent: NETHACK_BTN_ROUND
-NetHack*alignment_selection*quit.foreground:     NETHACK_CLR_QUIT
-NetHack*alignment_selection*quit.borderColor:    NETHACK_CLR_QUIT
-NetHack*alignment_selection*quit.borderWidth:    1
-NetHack*alignment_selection*quit.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*alignment_selection*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*alignment_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+NetHack*alignment_selection*btn_random.background:   black
+NetHack*alignment_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+NetHack*alignment_selection*btn_random.borderWidth:  1
+NetHack*alignment_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+NetHack*alignment_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*alignment_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+NetHack*alignment_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+NetHack*alignment_selection*btn_quit.borderWidth:    1
+NetHack*alignment_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*alignment_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*alignment_selection*Command.foreground:  NETHACK_CLR_FG
 NetHack*alignment_selection*Command.borderColor: NETHACK_CLR_FG
 NetHack*alignment_selection*Command.borderWidth: NETHACK_CMD_BORDER
 
 ! extended commands window
-NetHack*extended_commands*dismiss.foreground:  NETHACK_CLR_QUIT
-NetHack*extended_commands*dismiss.borderColor: NETHACK_CLR_QUIT
-NetHack*extended_commands*dismiss.borderWidth: 1
-NetHack*extended_commands*dismiss.shapeStyle:  NETHACK_BTN_SHAPE
-NetHack*extended_commands*dismiss.cornerRoundPercent: NETHACK_BTN_ROUND
-NetHack*extended_commands*help.foreground:     NETHACK_CLR_HELP
-NetHack*extended_commands*help.borderColor:    NETHACK_CLR_HELP
-NetHack*extended_commands*help.borderWidth:    1
-NetHack*extended_commands*help.shapeStyle:     NETHACK_BTN_SHAPE
-NetHack*extended_commands*help.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*extended_commands*btn_dismiss.foreground:  NETHACK_CLR_QUIT
+NetHack*extended_commands*btn_dismiss.borderColor: NETHACK_CLR_QUIT
+NetHack*extended_commands*btn_dismiss.borderWidth: 1
+NetHack*extended_commands*btn_dismiss.shapeStyle:  NETHACK_BTN_SHAPE
+NetHack*extended_commands*btn_dismiss.cornerRoundPercent: NETHACK_BTN_ROUND
+NetHack*extended_commands*btn_help.foreground:     NETHACK_CLR_HELP
+NetHack*extended_commands*btn_help.borderColor:    NETHACK_CLR_HELP
+NetHack*extended_commands*btn_help.borderWidth:    1
+NetHack*extended_commands*btn_help.shapeStyle:     NETHACK_BTN_SHAPE
+NetHack*extended_commands*btn_help.cornerRoundPercent: NETHACK_BTN_ROUND
 NetHack*extended_commands*Command.foreground:  NETHACK_CLR_FG
 NetHack*extended_commands*Command.borderColor: NETHACK_CLR_FG
 NetHack*extended_commands*Command.borderWidth: NETHACK_CMD_BORDER
@@ -302,13 +306,13 @@ NetHack*map*green:          green3
 NetHack*map*brown:          DarkOrange3
 NetHack*map*blue:           blue3
 NetHack*map*magenta:        magenta3
-NetHack*map*cyan:           cyan3
+NetHack*map*cyan:           Dark cyan
 NetHack*map*gray:           gray50
-NetHack*map*orange:         yellow
+NetHack*map*orange:         orange
 NetHack*map*bright_green:   green
 NetHack*map*yellow:         yellow
-NetHack*map*bright_blue:    blue
-NetHack*map*bright_magenta: magenta
+NetHack*map*bright_blue:    Royal blue
+NetHack*map*bright_magenta: Fuchsia
 NetHack*map*bright_cyan:    cyan
 NetHack*map*white:          white
 !

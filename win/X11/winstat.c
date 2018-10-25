@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1452920162 2016/01/16 04:56:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1540247293 2018/10/22 22:28:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,6 +15,7 @@
 #endif
 
 #include <X11/Intrinsic.h>
+#include <X11/IntrinsicP.h>
 #include <X11/StringDefs.h>
 #include <X11/Shell.h>
 #include <X11/Xaw/AsciiText.h>
@@ -22,6 +23,7 @@
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Paned.h>
 #include <X11/Xaw/Label.h>
+#include <X11/Xaw/Viewport.h>
 #include <X11/Xatom.h>
 
 #ifdef PRESERVE_NO_SYSV
@@ -31,18 +33,754 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#include "xwindow.h"
+
 #include "hack.h"
 #include "winX.h"
+
+/*
+ * Fancy status form entry storage indices.
+ */
+#define F_DUMMY     0
+#define F_STR       1
+#define F_DEX       2
+#define F_CON       3
+#define F_INT       4
+#define F_WIS       5
+#define F_CHA       6
+
+#define F_NAME      7
+#define F_DLEVEL    8
+#define F_GOLD      9
+#define F_HP       10
+#define F_MAXHP    11
+#define F_POWER    12
+#define F_MAXPOWER 13
+#define F_AC       14
+#define F_LEVEL    15
+#define F_EXP      16
+#define F_ALIGN    17
+#define F_TIME     18
+#define F_SCORE    19
+
+/* status conditions grouped by columns; tty orders these differently */
+#define F_STONE    20
+#define F_SLIME    21
+#define F_STRNGL   22
+#define F_FOODPOIS 23
+#define F_TERMILL  24
+
+#define F_HUNGER   25
+#define F_ENCUMBER 26
+#define F_LEV      27
+#define F_FLY      28
+#define F_RIDE     29
+
+#define F_BLIND    30
+#define F_DEAF     31
+#define F_STUN     32
+#define F_CONF     33
+#define F_HALLU    34
+
+#define NUM_STATS 35
+
+static void FDECL(update_fancy_status, (struct xwindow *));
+static void FDECL(update_fancy_status_field, (int));
+static Widget FDECL(create_fancy_status, (Widget, Widget));
+static void FDECL(destroy_fancy_status, (struct xwindow *));
+static void FDECL(create_status_window_fancy, (struct xwindow *, BOOLEAN_P, Widget));
+static void FDECL(create_status_window_tty, (struct xwindow *, BOOLEAN_P, Widget));
+static void FDECL(destroy_status_window_fancy, (struct xwindow *));
+static void FDECL(destroy_status_window_tty, (struct xwindow *));
+static void FDECL(adjust_status_fancy, (struct xwindow *, const char *));
+static void FDECL(adjust_status_tty, (struct xwindow *, const char *));
+
+extern const char *status_fieldfmt[MAXBLSTATS];
+extern char *status_vals[MAXBLSTATS];
+extern boolean status_activefields[MAXBLSTATS];
+static long X11_condition_bits;
+static int X11_status_colors[MAXBLSTATS];
+static int hpbar_percent, hpbar_color;
+
+#define X11_NUM_STATUS_LINES 2
+#define X11_NUM_STATUS_FIELD 15
+
+static enum statusfields X11_fieldorder[X11_NUM_STATUS_LINES][X11_NUM_STATUS_FIELD] = {
+    { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+      BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+      BL_FLUSH },
+    { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+      BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+      BL_CAP, BL_CONDITION, BL_FLUSH }
+};
+
+static Widget X11_status_widget;
+static Widget X11_status_labels[MAXBLSTATS];
+static Widget X11_cond_labels[32]; /* Ugh */
+
+struct xwindow *xw_status_win;
+static Pixel X11_status_widget_fg, X11_status_widget_bg;
+
+
+int
+condcolor(bm, bmarray)
+long bm;
+unsigned long *bmarray;
+{
+    int i;
+
+    if (bm && bmarray)
+        for (i = 0; i < CLR_MAX; ++i) {
+            if (bmarray[i] && (bm & bmarray[i]))
+                return i;
+        }
+    return NO_COLOR;
+}
+
+int
+condattr(bm, bmarray)
+long bm;
+unsigned long *bmarray;
+{
+    int attr = 0;
+    int i;
+
+    if (bm && bmarray) {
+        for (i = HL_ATTCLR_DIM; i < BL_ATTCLR_MAX; ++i) {
+            if (bmarray[i] && (bm & bmarray[i])) {
+                switch(i) {
+                case HL_ATTCLR_DIM:
+                    attr |= HL_DIM;
+                    break;
+                case HL_ATTCLR_BLINK:
+                    attr |= HL_BLINK;
+                    break;
+                case HL_ATTCLR_ULINE:
+                    attr |= HL_ULINE;
+                    break;
+                case HL_ATTCLR_INVERSE:
+                    attr |= HL_INVERSE;
+                    break;
+                case HL_ATTCLR_BOLD:
+                    attr |= HL_BOLD;
+                    break;
+                }
+            }
+        }
+    }
+    return attr;
+}
+
+void
+X11_status_init()
+{
+#ifdef STATUS_HILITES
+    int i;
+
+    for (i = 0; i < MAXBLSTATS; ++i)
+        X11_status_colors[i] = NO_COLOR; /* no color */
+    X11_condition_bits = 0L;
+    hpbar_percent = 0, hpbar_color = NO_COLOR;
+#endif /* STATUS_HILITES */
+    /* let genl_status_init do most of the initialization */
+    genl_status_init();
+}
+
+void
+X11_status_finish()
+{
+    /* nothing */
+}
+
+void
+X11_status_enablefield(fieldidx, nm, fmt, enable)
+int fieldidx;
+const char *nm;
+const char *fmt;
+boolean enable;
+{
+    genl_status_enablefield(fieldidx, nm, fmt, enable);
+}
+
+
+int
+cond_bm2idx(bm)
+unsigned long bm;
+{
+    int i;
+    for (i = 0; i < 32; i++)
+        if ((1 << i) == bm)
+            return i;
+    return -1;
+}
+
+void
+MaybeDisplayCond(bm, colormasks, text)
+unsigned long bm;
+unsigned long *colormasks;
+const char *text;
+{
+    int idx = cond_bm2idx(bm);
+    Widget label;
+    Arg args[10];
+    Cardinal num_args;
+    Pixel fg = X11_status_widget_fg, bg = X11_status_widget_bg;
+    Dimension lbl_wid;
+    Dimension lbl_hei;
+    Dimension lbl_border_wid;
+    Dimension lbl_iwidth;
+
+    if (idx < 0)
+        return;
+
+    label = X11_cond_labels[idx];
+    if ((X11_condition_bits & bm) != 0) {
+        int attrmask, coloridx;
+        XFontStruct *font;
+        Position lbl_x;
+        Position lbl_y;
+
+#ifdef TEXTCOLOR
+        coloridx = condcolor(bm, colormasks);
+#else
+        coloridx = NO_COLOR;
+#endif
+        attrmask = condattr(bm, colormasks);
+        num_args = 0;
+        XtSetArg(args[num_args], nhStr(XtNfont), &font); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+        XtGetValues(label, args, num_args);
+
+        if (text && *text)
+            lbl_wid = lbl_iwidth + font->max_bounds.width * strlen(text);
+        else
+            lbl_wid = 1;
+
+        num_args = 0;
+        XtSetArg(args[num_args], nhStr(XtNlabel), (text && *text) ? text : ""); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
+
+        fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
+                                    : X11_status_widget_fg;
+        if (attrmask & HL_INVERSE) {
+            Pixel tmppx = fg;
+            fg = bg;
+            bg = tmppx;
+        }
+
+        if (attrmask & HL_BOLD) {
+            load_boldfont(xw_status_win, label);
+            XtSetArg(args[num_args], nhStr(XtNfont),
+                     xw_status_win->boldfs); num_args++;
+        }
+
+        if (fg == bg)
+            fg = get_nhcolor(xw_status_win, CLR_GRAY).pixel;
+
+        XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
+        XtSetValues(label, args, num_args);
+        XtResizeWidget(label, lbl_wid, lbl_hei, lbl_border_wid);
+    } else {
+        num_args = 0;
+        XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+        XtGetValues(label, args, num_args);
+
+        num_args = 0;
+        XtSetArg(args[num_args], nhStr(XtNlabel), ""); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNwidth), 1); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
+        XtSetValues(label, args, num_args);
+
+        XtResizeWidget(label, lbl_wid, lbl_hei, lbl_border_wid);
+    }
+}
+
+
+void
+X11_status_update_tty(fld, ptr, chg, percent, color, colormasks)
+int fld, chg UNUSED, percent, color;
+genericptr_t ptr;
+unsigned long *colormasks;
+{
+    static boolean oncearound = FALSE; /* prevent premature partial display */
+    long *condptr = (long *) ptr;
+    int coloridx = NO_COLOR;
+    const char *text = (char *) ptr;
+    char tmpbuf[BUFSZ];
+    int attridx = 0;
+
+    XFontStruct *font;
+    Arg args[10];
+    Cardinal num_args;
+    Position lbl_x;
+    Position lbl_y;
+    Dimension lbl_wid;
+    Dimension lbl_hei;
+    Dimension lbl_border_wid;
+    Dimension lbl_iwidth;
+    Widget label;
+    Pixel fg = X11_status_widget_fg, bg = X11_status_widget_bg;
+
+#ifndef TEXTCOLOR
+    color = NO_COLOR;
+#endif
+
+    if (fld < BL_RESET || fld >= MAXBLSTATS)
+        return;
+
+    if ((fld >= 0 && fld < MAXBLSTATS) && !status_activefields[fld])
+        return;
+
+    if (fld != BL_FLUSH && fld != BL_RESET) {
+        if (!status_activefields[fld])
+            return;
+        switch (fld) {
+        case BL_CONDITION:
+            X11_condition_bits = *condptr;
+            oncearound = TRUE;
+            break;
+        default:
+            Sprintf(status_vals[fld],
+                    (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30s" :
+                    status_fieldfmt[fld] ? status_fieldfmt[fld] : "%s",
+                    text);
+            X11_status_colors[fld] = color;
+            if (iflags.wc2_hitpointbar && fld == BL_HP) {
+                hpbar_percent = percent;
+                hpbar_color = color;
+             }
+             break;
+        }
+        if (fld == BL_CONDITION) {
+            MaybeDisplayCond(BL_MASK_STONE, colormasks, "Stone");
+            MaybeDisplayCond(BL_MASK_SLIME, colormasks, "Slime");
+            MaybeDisplayCond(BL_MASK_STRNGL, colormasks, "Strngl");
+            MaybeDisplayCond(BL_MASK_FOODPOIS, colormasks, "FoodPois");
+            MaybeDisplayCond(BL_MASK_TERMILL, colormasks, "TermIll");
+            MaybeDisplayCond(BL_MASK_BLIND, colormasks, "Blind");
+            MaybeDisplayCond(BL_MASK_DEAF, colormasks, "Deaf");
+            MaybeDisplayCond(BL_MASK_STUN, colormasks, "Stun");
+            MaybeDisplayCond(BL_MASK_CONF, colormasks, "Conf");
+            MaybeDisplayCond(BL_MASK_HALLU, colormasks, "Hallu");
+            MaybeDisplayCond(BL_MASK_LEV, colormasks, "Lev");
+            MaybeDisplayCond(BL_MASK_FLY, colormasks, "Fly");
+            MaybeDisplayCond(BL_MASK_RIDE, colormasks, "Ride");
+        } else {
+            label = X11_status_labels[fld];
+            text = status_vals[fld];
+            if (fld == BL_GOLD)
+                text = decode_mixed(tmpbuf, text);
+#ifdef TEXTCOLOR
+            coloridx = X11_status_colors[fld] & 0x00FF;
+#endif
+            attridx = (X11_status_colors[fld] & 0xFF00) >> 8;
+
+            num_args = 0;
+            XtSetArg(args[num_args], nhStr(XtNfont), &font); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNinternalWidth), &lbl_iwidth); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNborderWidth), &lbl_border_wid); num_args++;
+            XtGetValues(label, args, num_args);
+
+            /*raw_printf("font: %i-%i",
+                         font->min_bounds.width, font->max_bounds.width);*/
+
+            if (text && *text)
+                lbl_wid = lbl_iwidth + font->max_bounds.width * strlen(text);
+            else
+                lbl_wid = 1;
+
+            /*raw_printf("1:lbl_wid=%i('%s')", lbl_wid, text);*/
+
+            num_args = 0;
+            XtSetArg(args[num_args], nhStr(XtNlabel),
+                     (text && *text) ? text : ""); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNwidth), lbl_wid); num_args++;
+
+            fg = (coloridx != NO_COLOR) ? get_nhcolor(xw_status_win, coloridx).pixel
+                                        : X11_status_widget_fg;
+            if (attridx & HL_INVERSE) {
+                Pixel tmppx = fg;
+
+                fg = bg;
+                bg = tmppx;
+            }
+
+            if (attridx & HL_BOLD) {
+                load_boldfont(xw_status_win, label);
+                XtSetArg(args[num_args], nhStr(XtNfont),
+                         xw_status_win->boldfs); num_args++;
+            }
+
+            if (fg == bg)
+                fg = get_nhcolor(xw_status_win, CLR_GRAY).pixel;
+
+            XtSetArg(args[num_args], nhStr(XtNforeground), fg); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNbackground), bg); num_args++;
+            XtSetValues(label, args, num_args);
+            XtResizeWidget(label, lbl_wid, lbl_hei, lbl_border_wid);
+        }
+    } else {
+        int x, y;
+
+        for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
+            Cardinal dx = 0;
+
+            for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
+                int f = X11_fieldorder[y][x];
+
+                if (f <= BL_FLUSH)
+                    continue;
+                if (!status_activefields[f])
+                    continue;
+
+                if (f == BL_CONDITION) {
+                    int i;
+
+                    for (i = 0; i < 32; i++) {
+                        label = X11_cond_labels[i];
+
+                        num_args = 0;
+                        XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+                        XtSetArg(args[num_args], nhStr(XtNborderWidth),
+                                 &lbl_border_wid); num_args++;
+                        XtGetValues(label, args, num_args);
+
+                        lbl_x = dx;
+
+                        num_args = 0;
+                        XtSetArg(args[num_args], nhStr(XtNx), lbl_x); num_args++;
+                        XtSetValues(label, args, num_args);
+                        XtConfigureWidget(label, lbl_x, lbl_y,
+                                          lbl_wid, lbl_hei, lbl_border_wid);
+
+                        if (lbl_wid > 1)
+                            dx += lbl_wid;
+                    }
+                    continue;
+                }
+                label = X11_status_labels[f];
+
+                text = status_vals[f];
+                if (f == BL_GOLD)
+                    text = decode_mixed(tmpbuf, text);
+
+                num_args = 0;
+                XtSetArg(args[num_args], nhStr(XtNx), &lbl_x); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNy), &lbl_y); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNwidth), &lbl_wid); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNheight), &lbl_hei); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNborderWidth),
+                         &lbl_border_wid); num_args++;
+                XtGetValues(label, args, num_args);
+
+                lbl_x = dx;
+                /*raw_printf("2:lbl_wid=%i('%s')", lbl_wid, text);*/
+
+                num_args = 0;
+                XtSetArg(args[num_args], nhStr(XtNx), lbl_x); num_args++;
+                XtSetArg(args[num_args], nhStr(XtNlabel), text); num_args++;
+                XtSetValues(label, args, num_args);
+                XtConfigureWidget(label, lbl_x, lbl_y,
+                                  lbl_wid, lbl_hei, lbl_border_wid);
+
+                dx += lbl_wid;
+            }
+        }
+    }
+}
+
+/*ARGSUSED*/
+void
+X11_status_update_fancy(fld, ptr, chg, percent, color, colormasks)
+int fld, chg UNUSED, percent UNUSED, color UNUSED;
+genericptr_t ptr;
+unsigned long *colormasks UNUSED;
+{
+    static const struct {
+        int bl, ff;
+    } bl_to_fancyfield[] = {
+        { BL_TITLE, F_NAME },
+        { BL_STR, F_STR },
+        { BL_DX, F_DEX },
+        { BL_CO, F_CON },
+        { BL_IN, F_INT },
+        { BL_WI, F_WIS },
+        { BL_CH, F_CHA },
+        { BL_ALIGN, F_ALIGN },
+        { BL_SCORE, F_SCORE },
+        { BL_CAP, F_ENCUMBER },
+        { BL_GOLD, F_GOLD },
+        { BL_ENE, F_POWER },
+        { BL_ENEMAX, F_MAXPOWER },
+        { BL_XP, F_LEVEL },
+        { BL_AC, F_AC },
+        /*{ BL_HD, F_ },*/
+        { BL_TIME, F_TIME },
+        { BL_HUNGER, F_HUNGER },
+        { BL_HP, F_HP },
+        { BL_HPMAX, F_MAXHP },
+        { BL_LEVELDESC, F_DLEVEL },
+        { BL_EXP, F_EXP }
+    };
+    static const struct {
+        unsigned long mask;
+        int ff;
+    } mask_to_fancyfield[] = {
+        { BL_MASK_STONE, F_STONE },
+        { BL_MASK_SLIME, F_SLIME },
+        { BL_MASK_STRNGL, F_STRNGL },
+        { BL_MASK_FOODPOIS, F_FOODPOIS },
+        { BL_MASK_TERMILL, F_TERMILL },
+        { BL_MASK_BLIND, F_BLIND },
+        { BL_MASK_DEAF, F_DEAF },
+        { BL_MASK_STUN, F_STUN },
+        { BL_MASK_CONF, F_CONF },
+        { BL_MASK_HALLU, F_HALLU },
+        { BL_MASK_LEV, F_LEV },
+        { BL_MASK_FLY, F_FLY },
+        { BL_MASK_RIDE, F_RIDE }
+    };
+    int i;
+
+    if (fld == BL_RESET || fld == BL_FLUSH) {
+        if (WIN_STATUS != WIN_ERR) {
+            struct xwindow *wp = &window_list[WIN_STATUS];
+
+            update_fancy_status(wp);
+        }
+        return;
+    }
+
+    if (fld == BL_CONDITION) {
+        unsigned long mask = (unsigned long) ptr;
+
+        for (i = 0; i < SIZE(mask_to_fancyfield); i++)
+            if (mask_to_fancyfield[i].mask == mask)
+                update_fancy_status_field(mask_to_fancyfield[i].ff);
+    } else {
+        for (i = 0; i < SIZE(bl_to_fancyfield); i++)
+            if (bl_to_fancyfield[i].bl == fld)
+                update_fancy_status_field(bl_to_fancyfield[i].ff);
+    }
+}
+
+void
+X11_status_update(fld, ptr, chg, percent, color, colormasks)
+int fld, chg UNUSED, percent UNUSED, color;
+genericptr_t ptr;
+unsigned long *colormasks;
+{
+    if (appResources.fancy_status)
+        X11_status_update_fancy(fld, ptr, chg, percent, color, colormasks);
+    else
+        X11_status_update_tty(fld, ptr, chg, percent, color, colormasks);
+}
+
+Widget
+create_tty_status(parent, top)
+Widget parent, top;
+{
+    Widget form; /* The form that surrounds everything. */
+    Widget w;
+    Arg args[16];
+    Cardinal num_args;
+    int i, x, y;
+
+    num_args = 0;
+    if (top != (Widget) 0) {
+        XtSetArg(args[num_args], nhStr(XtNfromVert), top);
+        num_args++;
+    }
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
+    num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0);
+    num_args++;
+    XtSetArg(args[num_args], XtNwidth, 400); num_args++;
+    XtSetArg(args[num_args], XtNheight, 100); num_args++;
+    form = XtCreateManagedWidget("status_viewport", viewportWidgetClass,
+                                 parent, args, num_args);
+
+    num_args = 0;
+    XtSetArg(args[num_args], XtNwidth, 400); num_args++;
+    XtSetArg(args[num_args], XtNheight, 100); num_args++;
+    w = XtCreateManagedWidget("status_form", formWidgetClass,
+                             form, args, num_args);
+    for (y = 0; y < X11_NUM_STATUS_LINES; y++) {
+        for (x = 0; x < X11_NUM_STATUS_FIELD; x++) {
+            int fld = X11_fieldorder[y][x];
+            char labelname[BUFSZ];
+            int prevfld;
+
+            if (fld <= BL_FLUSH)
+                continue;
+            Sprintf(labelname, "label_%s", bl_idx_to_fldname(fld));
+            num_args = 0;
+            if (y > 0) {
+                prevfld = X11_fieldorder[y-1][0];
+                XtSetArg(args[num_args], nhStr(XtNfromVert),
+                         X11_status_labels[prevfld]); num_args++;
+            }
+            if (x > 0) {
+                prevfld = X11_fieldorder[y][x-1];
+                XtSetArg(args[num_args], nhStr(XtNfromHoriz),
+                         X11_status_labels[prevfld]); num_args++;
+            }
+
+            XtSetArg(args[num_args], nhStr(XtNhorizDistance), 0); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
+
+            XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNbottomMargin), 0); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNleftMargin), 0); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNrightMargin), 0); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
+            /*
+            XtSetArg(args[num_args], nhStr(XtNlabel),
+                     bl_idx_to_fldname(fld)); num_args++;
+            */
+            XtSetArg(args[num_args], nhStr(XtNlabel), ""); num_args++;
+            X11_status_labels[fld] = XtCreateManagedWidget(labelname,
+                                                           labelWidgetClass, w,
+                                                           args, num_args);
+        }
+     }
+
+    for (i = 0; i < 32; i++) {
+        char condname[BUFSZ];
+        int prevfld;
+
+        Sprintf(condname, "cond_%i", i);
+        num_args = 0;
+
+        prevfld = X11_fieldorder[0][0];
+        XtSetArg(args[num_args], nhStr(XtNfromVert),
+                 X11_status_labels[prevfld]); num_args++;
+
+        XtSetArg(args[num_args], nhStr(XtNfromHoriz),
+                 (i == 0) ? X11_status_labels[BL_CONDITION]
+                 : X11_cond_labels[i-1]); num_args++;
+
+        XtSetArg(args[num_args], nhStr(XtNhorizDistance), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNtopMargin), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbottomMargin), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNleftMargin), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNrightMargin), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNlabel), ""); num_args++;
+        X11_cond_labels[i] = XtCreateManagedWidget(condname,
+                                                   labelWidgetClass, w,
+                                                   args, num_args);
+    }
+
+    return w;
+}
+
+/*ARGSUSED*/
+void
+create_status_window_tty(wp, create_popup, parent)
+struct xwindow *wp; /* window pointer */
+boolean create_popup UNUSED;
+Widget parent;
+{
+    Arg args[10];
+    Cardinal num_args;
+
+    wp->type = NHW_STATUS;
+    X11_status_widget = wp->w = create_tty_status(parent, (Widget) 0);
+
+    num_args = 0;
+    XtSetArg(args[num_args], nhStr(XtNforeground), &X11_status_widget_fg); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbackground), &X11_status_widget_bg); num_args++;
+    XtGetValues(X11_status_widget, args, num_args);
+}
+
+void
+destroy_status_window_tty(wp)
+struct xwindow *wp;
+{
+    /* If status_information is defined, then it a "text" status window. */
+    if (wp->status_information) {
+        if (wp->popup) {
+            nh_XtPopdown(wp->popup);
+            if (!wp->keep_window)
+                XtDestroyWidget(wp->popup), wp->popup = (Widget) 0;
+        }
+        free((genericptr_t) wp->status_information);
+        wp->status_information = 0;
+    } else {
+    }
+    if (!wp->keep_window)
+        wp->type = NHW_NONE;
+}
+
+/*ARGSUSED*/
+void
+adjust_status_tty(wp, str)
+struct xwindow *wp UNUSED;
+const char *str UNUSED;
+{
+    /* nothing */
+}
+
+void
+create_status_window(wp, create_popup, parent)
+struct xwindow *wp; /* window pointer */
+boolean create_popup;
+Widget parent;
+{
+    xw_status_win = wp;
+    if (appResources.fancy_status)
+        create_status_window_fancy(wp, create_popup, parent);
+    else
+        create_status_window_tty(wp, create_popup, parent);
+}
+
+void
+destroy_status_window(wp)
+struct xwindow *wp;
+{
+    if (appResources.fancy_status)
+        destroy_status_window_fancy(wp);
+    else
+        destroy_status_window_tty(wp);
+}
+
+void
+adjust_status(wp, str)
+struct xwindow *wp;
+const char *str;
+{
+    if (appResources.fancy_status)
+        adjust_status_fancy(wp, str);
+    else
+        adjust_status_tty(wp, str);
+}
 
 extern const char *hu_stat[];  /* from eat.c */
 extern const char *enc_stat[]; /* from botl.c */
 
-static void FDECL(update_fancy_status, (struct xwindow *));
-static Widget FDECL(create_fancy_status, (Widget, Widget));
-static void FDECL(destroy_fancy_status, (struct xwindow *));
-
 void
-create_status_window(wp, create_popup, parent)
+create_status_window_fancy(wp, create_popup, parent)
 struct xwindow *wp; /* window pointer */
 boolean create_popup;
 Widget parent;
@@ -60,7 +798,7 @@ Widget parent;
          * window.
          */
         if (!parent)
-            panic("create_status_window: no parent for fancy status");
+            panic("create_status_window_fancy: no parent for fancy status");
         wp->status_information = 0;
         wp->w = create_fancy_status(parent, (Widget) 0);
         return;
@@ -133,7 +871,7 @@ Widget parent;
 }
 
 void
-destroy_status_window(wp)
+destroy_status_window_fancy(wp)
 struct xwindow *wp;
 {
     /* If status_information is defined, then it a "text" status window. */
@@ -159,7 +897,7 @@ struct xwindow *wp;
  *	+ We didn't set stringInPlace on the widget.
  */
 void
-adjust_status(wp, str)
+adjust_status_fancy(wp, str)
 struct xwindow *wp;
 const char *str;
 {
@@ -215,52 +953,6 @@ static Widget FDECL(init_column, (const char *, Widget, Widget, Widget,
                                   int *));
 static void NDECL(fixup_cond_widths);
 static Widget FDECL(init_info_form, (Widget, Widget, Widget));
-
-/*
- * Form entry storage indices.
- */
-#define F_DUMMY     0
-#define F_STR       1
-#define F_DEX       2
-#define F_CON       3
-#define F_INT       4
-#define F_WIS       5
-#define F_CHA       6
-
-#define F_NAME      7
-#define F_DLEVEL    8
-#define F_GOLD      9
-#define F_HP       10
-#define F_MAXHP    11
-#define F_POWER    12
-#define F_MAXPOWER 13
-#define F_AC       14
-#define F_LEVEL    15
-#define F_EXP      16
-#define F_ALIGN    17
-#define F_TIME     18
-#define F_SCORE    19
-
-/* status conditions grouped by columns; tty orders these differently */
-#define F_STONE    20
-#define F_SLIME    21
-#define F_STRNGL   22
-#define F_FOODPOIS 23
-#define F_TERMILL  24
-
-#define F_HUNGER   25
-#define F_ENCUMBER 26
-#define F_LEV      27
-#define F_FLY      28
-#define F_RIDE     29
-
-#define F_BLIND    30
-#define F_DEAF     31
-#define F_STUN     32
-#define F_CONF     33
-#define F_HALLU    34
-
-#define NUM_STATS 35
 
 /*
  * Notes:
@@ -583,18 +1275,13 @@ long new_value;
  * [**] HD is shown instead of level and exp if Upolyd.
  */
 static void
-update_fancy_status(wp)
-struct xwindow *wp;
+update_fancy_status_field(i)
+int i;
 {
-    struct X_status_value *sv;
+    struct X_status_value *sv = &shown_stats[i];
     long val;
-    int i;
 
-    if (wp->cursy != 0)
-        return; /* do a complete update when line 0 is done */
-
-    for (i = 0, sv = shown_stats; i < NUM_STATS; i++, sv++) {
-        switch (i) {
+    switch (i) {
         case F_DUMMY:
             val = 0L;
             break;
@@ -734,10 +1421,24 @@ struct xwindow *wp;
             val = 0L;
             break;
         } /* default */
-        } /* switch */
-        update_val(sv, val);
-    }
+    } /* switch */
+    update_val(sv, val);
 }
+
+/*ARGUSED*/
+static void
+update_fancy_status(wp)
+struct xwindow *wp UNUSED;
+{
+    int i;
+
+    /*if (wp->cursy != 0)
+      return;*/ /* do a complete update when line 0 is done */
+
+    for (i = 0; i < NUM_STATS; i++)
+        update_fancy_status_field(i);
+}
+
 
 /*
  * Turn off hilighted status values after a certain amount of turns.

@@ -153,12 +153,7 @@ struct menu_info_t {
     struct menu curr_menu; /* Menu being displayed. */
     struct menu new_menu;  /* New menu being built. */
 
-    boolean nh_colors_inited;
-    XColor nh_colors[CLR_MAX];
-
     XFontStruct *fs;           /* Font for the window. */
-    XFontStruct *boldfs;       /* Bold font */
-    Display *boldfs_dpy;
     long menu_count;           /* number entered by user */
     Dimension line_height;     /* Total height of a line of text. */
     Dimension internal_height; /* Internal height between widget & border */
@@ -202,6 +197,11 @@ struct xwindow {
     Dimension pixel_height;
     int prevx, cursx; /* Cursor position, only used by    */
     int prevy, cursy; /*   map and "plain" status windows.*/
+
+    boolean nh_colors_inited;
+    XColor nh_colors[CLR_MAX];
+    XFontStruct *boldfs;       /* Bold font */
+    Display *boldfs_dpy;       /* Bold font display */
 
     union {
         struct map_info_t *Map_info;       /* map window info */
@@ -254,6 +254,7 @@ E boolean plsel_ask_name;
 
 typedef struct {
     Boolean slow;             /* issue prompts between map and message wins */
+    Boolean fancy_status;     /* use "fancy" status vs. TTY-style status */
     Boolean autofocus;        /* grab pointer focus for popup windows */
     Boolean message_line;     /* separate current turn mesgs from prev ones */
     Boolean highlight_prompt; /* if 'slow', highlight yn prompts */
@@ -297,6 +298,9 @@ E void FDECL(positionpopup, (Widget, BOOLEAN_P));
 
 /* ### winX.c ### */
 E struct xwindow *FDECL(find_widget, (Widget));
+E XColor FDECL(get_nhcolor, (struct xwindow *, int));
+E void FDECL(init_menu_nhcolors, (struct xwindow *));
+E void FDECL(load_boldfont, (struct xwindow *, Widget));
 E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
 E void FDECL(get_widget_window_geometry, (Widget, int *, int *, int *, int *));
 E char *FDECL(fontname_boldify, (const char *));
@@ -394,6 +398,8 @@ E void FDECL(hilight_value, (Widget));
 E void FDECL(swap_fg_bg, (Widget));
 
 /* external declarations */
+E char *FDECL(X11_getmsghistory, (BOOLEAN_P));
+E void FDECL(X11_putmsghistory, (const char *, BOOLEAN_P));
 E void FDECL(X11_init_nhwindows, (int *, char **));
 E void NDECL(X11_player_selection);
 E void NDECL(X11_askname);
@@ -431,6 +437,10 @@ E void FDECL(X11_getlin, (const char *, char *));
 E int NDECL(X11_get_ext_cmd);
 E void FDECL(X11_number_pad, (int));
 E void NDECL(X11_delay_output);
+E void NDECL(X11_status_init);
+E void NDECL(X11_status_finish);
+E void FDECL(X11_status_enablefield, (int, const char *, const char *, BOOLEAN_P));
+E void FDECL(X11_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 
 /* other defs that really should go away (they're tty specific) */
 E void NDECL(X11_start_screen);

@@ -32,12 +32,9 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
-#include "xwindow.h"
 #include "hack.h"
 #include "winX.h"
 
-XColor FDECL(get_nhcolor, (struct xwindow *, int));
-static void FDECL(init_menu_nhcolors, (struct xwindow *));
 static void FDECL(menu_size_change_handler, (Widget, XtPointer,
                                              XEvent *, Boolean *));
 static void FDECL(menu_select, (Widget, XtPointer, XtPointer));
@@ -55,7 +52,6 @@ static void FDECL(invert_all, (struct xwindow *));
 static void FDECL(invert_match, (struct xwindow *, char *));
 static void FDECL(menu_popdown, (struct xwindow *));
 static Widget FDECL(menu_create_buttons, (struct xwindow *, Widget, Widget));
-static void FDECL(load_boldfont, (struct xwindow *, Widget));
 static void FDECL(menu_create_entries, (struct xwindow *, struct menu *));
 static void FDECL(destroy_menu_entry_widgets, (struct xwindow *));
 static void NDECL(create_menu_translation_tables);
@@ -1122,31 +1118,6 @@ Widget form,under;
 }
 
 static void
-load_boldfont(wp, w)
-struct xwindow *wp;
-Widget w;
-{
-    Arg args[1];
-    XFontStruct *fs;
-    unsigned long ret;
-    char *fontname;
-    Display *dpy;
-
-    if (wp->menu_information->boldfs)
-        return;
-
-    XtSetArg(args[0], nhStr(XtNfont), &fs);
-    XtGetValues(w, args, 1);
-
-    if (!XGetFontProperty(fs, XA_FONT, &ret))
-        return;
-
-    wp->menu_information->boldfs_dpy = dpy = XtDisplay(w);
-    fontname = fontname_boldify(XGetAtomName(dpy, (Atom)ret));
-    wp->menu_information->boldfs = XLoadQueryFont(dpy, fontname);
-}
-
-static void
 menu_create_entries(wp, curr_menu)
 struct xwindow *wp;
 struct menu *curr_menu;
@@ -1185,7 +1156,7 @@ struct menu *curr_menu;
                          get_nhcolor(wp, color).pixel); num_args++;
         }
 
-        /* TODO: ATR_BOLD, ATR_DIM, ATR_ULINE, ATR_BLINK */
+        /* TODO: ATR_DIM, ATR_ULINE, ATR_BLINK */
 
         if (attr == ATR_INVERSE) {
             XtSetArg(args[num_args], nhStr(XtNforeground),
@@ -1215,7 +1186,7 @@ struct menu *curr_menu;
             load_boldfont(wp, curr->w);
             num_args = 0;
             XtSetArg(args[num_args], nhStr(XtNfont),
-                     wp->menu_information->boldfs); num_args++;
+                     wp->boldfs); num_args++;
             XtSetValues(curr->w, args, num_args);
         }
 
@@ -1315,91 +1286,6 @@ struct xwindow *wp;
     }
 }
 
-XColor
-get_nhcolor(wp, clr)
-struct xwindow *wp;
-int clr;
-{
-    init_menu_nhcolors(wp);
-
-    if (clr >= 0 && clr < CLR_MAX)
-        return wp->menu_information->nh_colors[clr];
-
-    return wp->menu_information->nh_colors[0];
-}
-
-static void
-init_menu_nhcolors(wp)
-struct xwindow *wp;
-{
-    static const char *mapCLR_to_res[CLR_MAX] = {
-        XtNblack,
-        XtNred,
-        XtNgreen,
-        XtNbrown,
-        XtNblue,
-        XtNmagenta,
-        XtNcyan,
-        XtNgray,
-        XtNforeground,
-        XtNorange,
-        XtNbright_green,
-        XtNyellow,
-        XtNbright_blue,
-        XtNbright_magenta,
-        XtNbright_cyan,
-        XtNwhite,
-    };
-    Display *dpy;
-    Colormap screen_colormap;
-    XrmDatabase rDB;
-    XrmValue value;
-    Status rc;
-    int color;
-    char *ret_type[32];
-    char clr_name[BUFSZ];
-    char clrclass[BUFSZ];
-
-    if (wp->menu_information->nh_colors_inited)
-        return;
-
-    dpy = XtDisplay(wp->w);
-    screen_colormap = DefaultColormap(dpy, DefaultScreen(dpy));
-    rDB = XrmGetDatabase(dpy);
-
-    for (color = 0; color < CLR_MAX; color++) {
-        Sprintf(clr_name, "nethack.menu.%s", mapCLR_to_res[color]);
-        Sprintf(clrclass, "NetHack.Menu.%s", mapCLR_to_res[color]);
-
-        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
-            Sprintf(clr_name, "nethack.map.%s", mapCLR_to_res[color]);
-            Sprintf(clrclass, "NetHack.Map.%s", mapCLR_to_res[color]);
-        }
-
-        if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
-            impossible("XrmGetResource error (%s)", clr_name);
-        } else if (!strcmp(ret_type[0], "String")) {
-            char tmpbuf[256];
-
-            if (value.size >= sizeof tmpbuf)
-                value.size = sizeof tmpbuf - 1;
-            (void) strncpy(tmpbuf, (char *) value.addr, (int) value.size);
-            tmpbuf[value.size] = '\0';
-            /* tmpbuf now contains the color name from the named resource */
-
-            rc = XAllocNamedColor(dpy, screen_colormap, tmpbuf,
-                                  &wp->menu_information->nh_colors[color],
-                                  &wp->menu_information->nh_colors[color]);
-            if (rc == 0) {
-                impossible("XAllocNamedColor failed for color %i (%s)",
-                           color, clr_name);
-            }
-        }
-    }
-
-    wp->menu_information->nh_colors_inited = TRUE;
-}
-
 void
 create_menu_window(wp)
 struct xwindow *wp;
@@ -1413,7 +1299,6 @@ struct xwindow *wp;
     reset_menu_to_default(&wp->menu_information->new_menu);
     reset_menu_count(wp->menu_information);
     wp->w = wp->popup = (Widget) 0;
-    wp->menu_information->nh_colors_inited = FALSE;
     wp->menu_information->permi_x = -1;
     wp->menu_information->permi_y = -1;
     wp->menu_information->permi_w = -1;
@@ -1425,9 +1310,6 @@ destroy_menu_window(wp)
 struct xwindow *wp;
 {
     clear_old_menu(wp); /* this will also destroy the widgets */
-    if (wp->menu_information->boldfs)
-        XFreeFont(wp->menu_information->boldfs_dpy,
-                  wp->menu_information->boldfs);
     free((genericptr_t) wp->menu_information);
     wp->menu_information = (struct menu_info_t *) 0;
     wp->type = NHW_NONE; /* allow re-use */
