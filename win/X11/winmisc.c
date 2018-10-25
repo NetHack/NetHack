@@ -1998,6 +1998,7 @@ Widget *formp; /* return */
     Dimension width, other_width, max_width, border_width,
               height, cumulative_height, screen_height;
     int distance, skip;
+    char btnname[BUFSZ];
 
     commands = (Widget *) alloc((unsigned) num_names * sizeof (Widget));
 
@@ -2072,11 +2073,13 @@ Widget *formp; /* return */
      */
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel), left_name); num_args++;
 #if 0
     XtSetArg(args[num_args], nhStr(XtNshapeStyle),
                               XmuShapeRoundedRectangle); num_args++;
 #endif
-    left = XtCreateManagedWidget(left_name, commandWidgetClass, form, args,
+    Sprintf(btnname, "btn_%s", left_name);
+    left = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                  num_args);
     XtAddCallback(left, XtNcallback, left_callback, (XtPointer) 0);
     skip = (distance < 4) ? 8 : 2 * distance;
@@ -2093,11 +2096,13 @@ Widget *formp; /* return */
     XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
     XtSetArg(args[num_args], nhStr(XtNhorizDistance), skip); num_args++;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel), right_name); num_args++;
 #if 0
     XtSetArg(args[num_args], nhStr(XtNshapeStyle),
                               XmuShapeRoundedRectangle); num_args++;
 #endif
-    right = XtCreateManagedWidget(right_name, commandWidgetClass, form, args,
+    Sprintf(btnname, "btn_%s", right_name);
+    right = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                   num_args);
     XtAddCallback(right, XtNcallback, right_callback, (XtPointer) 0);
 
