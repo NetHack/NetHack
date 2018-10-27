@@ -62,7 +62,6 @@ struct toptenentry {
 
 STATIC_DCL void FDECL(topten_print, (const char *));
 STATIC_DCL void FDECL(topten_print_bold, (const char *));
-STATIC_DCL xchar FDECL(observable_depth, (d_level *));
 STATIC_DCL void NDECL(outheader);
 STATIC_DCL void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
 STATIC_DCL void FDECL(discardexcess, (FILE *));
@@ -178,7 +177,7 @@ const char *x;
         putstr(toptenwin, ATR_BOLD, x);
 }
 
-STATIC_OVL xchar
+int
 observable_depth(lev)
 d_level *lev;
 {

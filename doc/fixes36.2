@@ -172,6 +172,10 @@ in Guidebook.mn and Guidebook.txt, the 'I' command mis-described `IX' as
 	displaying inventory items whose bless/curse state is "known"
 	(Guidebook.tex correctly had "unknown")
 poison gas (stinking cloud) wasn't shown at drawbridge-up spot
+prayer result which enhanced strength (fix weakness from hunger) didn't give
+	a message if a change in encumbrance occurred; it came on next move
+add current location within the dungeon to the Background section of ^X and
+	final disclosure (it's not background but doesn't fit anywhere else)
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -184,6 +188,7 @@ orctown: prevent Bad fruit #0 and some minor tuning
 make long extended commands list be more navigable
 simplify #wizidentify; don't rely on having bold menu entries
 ensure tmp_at() structures are initialized for all code paths when swallowed
+trapped-vs-levitation/flying change broke Sting releasing hero from web
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status

@@ -283,6 +283,7 @@ understand what {\it NetHack\/} is doing with the screen.  The {\it NetHack\/}
 screen replaces the ``You see \ldots'' descriptions of text adventure games.
 Figure 1 is a sample of what a {\it NetHack\/} screen might look like.
 The way the screen looks for you depends on your platform.
+%.BR 2
 
 \vbox{
 \begin{verbatim}
@@ -297,8 +298,8 @@ The way the screen looks for you depends on your platform.
 
 
 
-        Player the Rambler     St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15  Neutral
-        Dlvl:1  $:0  HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
+        Player the Rambler    St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral
+        Dlvl:1 $:0 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:257 Weak
 \end{verbatim}
 \begin{center}
 Figure 1
@@ -1620,7 +1621,7 @@ bit), you can invoke many extended commands by meta-ing the first
 letter of the command.
 In {\it NT, OS/2, PC\/ {\rm and} ST NetHack},
 the `Alt' key can be used in this fashion;
-on the {\it Amiga\/}, set the {\it altmeta\/} option to get this behavior.
+on the {\it Amiga}, set the {\it altmeta\/} option to get this behavior.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
@@ -2040,7 +2041,7 @@ location ordinarily wouldn't be seen any more.
 
 %.pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In {\it NetHack\/}, this is accomplished automatically by walking over
+it up.  In {\it NetHack}, this is accomplished automatically by walking over
 the object (unless you turn off the {\it autopickup\/}
 option (see below), or move with the `{\tt m}' prefix (see above)), or
 manually by using the `{\tt ,}' command.
@@ -2791,7 +2792,7 @@ fire, and kick weapons; use a wand, spell, or other type of item;
 or fight with your hands and feet.
 
 %.pg
-In {\it NetHack\/}, a pacifist refuses to cause the death of any other monster
+In {\it NetHack}, a pacifist refuses to cause the death of any other monster
 (i.e. if you would get experience for the death).  This is a particularly
 difficult challenge, although it is still possible to gain experience
 by other means.
@@ -3032,6 +3033,7 @@ Here is a short example of config file contents:
     OPTIONS=!splash_screen
 \end{verbatim}
 %.ed
+%.BR 2
 
 %.hn 2
 \subsection*{Using the NETHACKOPTIONS environment variable}
@@ -3047,25 +3049,29 @@ the option name, a colon or equals sign, and then the value of the string.
 The value is terminated by the next comma or the end of string.
 
 %.pg
-For example, to set up an environment variable so that {\it color\/}
-is on, {\it autopickup\/} is off, the {\it name\/} is set to ``Blue Meanie'',
-and the {\it fruit\/} is set to ``papaya'', you would enter the command
-%.sd
+For example, to set up an environment variable so that
+{\it color\/} is {\tt on},
+{\it legacy\/} is {\tt off},
+character {\it name\/} is set to ``{\tt Blue Meanie}'',
+and named {\it fruit\/} is set to ``{\tt lime}'',
+you would enter the command
+%.SD i
 \begin{verbatim}
-    setenv NETHACKOPTIONS "color,\!autopickup,name:Blue Meanie,fruit:papaya"
+    setenv NETHACKOPTIONS "color,\!leg,name:Blue Meanie,fruit:lime"
 \end{verbatim}
-%.ed
+%.ED
 
 \nd in {\it csh}
-(note the need to escape the `!' since it's special to the shell), or
-%.sd
+(note the need to escape the `!' since it's special
+to that shell), or the pair of commands
+%.SD i
 \begin{verbatim}
-    NETHACKOPTIONS="color,!autopickup,name:Blue Meanie,fruit:papaya"
+    NETHACKOPTIONS="color,!leg,name:Blue Meanie,fruit:lime"
     export NETHACKOPTIONS
 \end{verbatim}
-%.ed
+%.ED
 
-\nd in {\it sh\/}, {\it ksh}, or {\it bash}.
+\nd in {\it sh}, {\it ksh}, or {\it bash}.
 
 %.pg
 Instead of a comma-separated list of options,
@@ -4593,7 +4599,7 @@ percentage or absolute number threshold, or text to match against.
 ``{\tt always}'' will set the default attributes for that field.
 %.lp "*"
 \item{\bb{}}
-``{\tt up}'' and ``(\tt down}'' set the field attributes for when the field
+``{\tt up}'' and ``{\tt down}'' set the field attributes for when the field
 value changes upwards or downwards. This attribute times out after
 {\tt statushilites} turns.
 %.lp "*"

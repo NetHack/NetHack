@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1502754159 2017/08/14 23:42:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1540596900 2018/10/26 23:35:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -110,14 +110,18 @@ register struct obj *obj;
     return (boolean) (obj->oclass == FOOD_CLASS);
 }
 
+/* used for hero init, life saving (if choking), and prayer results of fix
+   starving, fix weak from hunger, or golden glow boon (if u.uhunger < 900) */
 void
 init_uhunger()
 {
     context.botl = (u.uhs != NOT_HUNGRY || ATEMP(A_STR) < 0);
     u.uhunger = 900;
     u.uhs = NOT_HUNGRY;
-    if (ATEMP(A_STR) < 0)
+    if (ATEMP(A_STR) < 0) {
         ATEMP(A_STR) = 0;
+        (void) encumber_msg();
+    }
 }
 
 /* tin types [SPINACH_TIN = -1, overrides corpsenm, nut==600] */

@@ -1833,6 +1833,41 @@ int final;
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
         putstr(en_win, 0, buf);
     }
+
+    /* 3.6.2: dungeon level, so that ^X really has all status info as
+       claimed by the comment below; this reveals more information than
+       the basic status display, but that's one of the purposes of ^X;
+       similar information is revealed by #overview; the "You died in
+       <location>" given by really_done() is more rudimentary than this */
+    *buf = *tmpbuf = '\0';
+    if (In_endgame(&u.uz)) {
+        int egdepth = observable_depth(&u.uz);
+
+        (void) endgamelevelname(tmpbuf, egdepth);
+        Sprintf(buf, "in the endgame, on the %s%s",
+                !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
+    } else if (Is_knox(&u.uz)) {
+        /* this gives away the fact that the knox branch is only 1 level */
+        Sprintf(buf, "on the %s level", dungeons[u.uz.dnum].dname);
+        /* TODO? maybe phrase it differently when actually inside the fort,
+           if we're able to determine that (not trivial) */
+    } else {
+        char dgnbuf[QBUFSZ];
+
+        Strcpy(dgnbuf, dungeons[u.uz.dnum].dname);
+        if (!strncmpi(dgnbuf, "The ", 4))
+            *dgnbuf = lowc(*dgnbuf);
+        Sprintf(tmpbuf, "level %d",
+                In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
+        /* TODO? maybe extend this bit to include various other automatic
+           annotations from the dungeon overview code */
+        if (Is_rogue_level(&u.uz))
+            Strcat(tmpbuf, ", a primitive area");
+        else if (Is_bigroom(&u.uz) && !Blind)
+            Strcat(tmpbuf, ", a very big room");
+        Sprintf(buf, "in %s, on %s", dgnbuf, tmpbuf);
+    }
+    you_are(buf, "");
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c;

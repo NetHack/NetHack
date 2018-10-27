@@ -1,5 +1,5 @@
 #      NetHack Documentation Makefile.
-# NetHack 3.6  Makefile.doc    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $
+# NetHack 3.6  Makefile.doc    $NHDT-Date: 1540625947 2018/10/27 07:39:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.17 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -45,11 +45,11 @@ NHGREP = $(MAKEDEFS) --grep --input - --output -
 GUIDE_PREFORMAT = cat Guidebook.mn | $(NHGREP) | tbl tmac.n -
 
 # the basic guidebook
-Guidebook:	Guidebook.mn
+Guidebook:	Guidebook.mn tmac.n tmac.nh
 	$(GUIDECMD) > Guidebook
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
-Guidebook.ps:	Guidebook.mn
+Guidebook.ps:	Guidebook.mn tmac.n tmac.nh
 	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
 
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
@@ -95,7 +95,7 @@ DISTRIB = Guidebook.txt nethack.txt lev_comp.txt dgn_comp.txt recover.txt \
 distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
 
-Guidebook.txt	: Guidebook.mn tmac.n
+Guidebook.txt	: Guidebook.mn tmac.n tmac.nh
 	$(GUIDECMD) > Guidebook.txt
 MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
 nethack.txt	: nethack.6
