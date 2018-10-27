@@ -819,6 +819,9 @@ menu_item **menu_list;
             XtSetArg(args[num_args], nhStr(XtNheight), menu_info->permi_h);
             num_args++;
         }
+        if (wp->title) {
+            XtSetArg(args[num_args], nhStr(XtNtitle), wp->title); num_args++;
+        }
         wp->popup = XtCreatePopupShell((window == WIN_INVEN)
                                            ? "inventory" : "menu",
                                        (how == PICK_NONE)

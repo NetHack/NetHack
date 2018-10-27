@@ -202,6 +202,7 @@ struct xwindow {
     XColor nh_colors[CLR_MAX];
     XFontStruct *boldfs;       /* Bold font */
     Display *boldfs_dpy;       /* Bold font display */
+    char *title;
 
     union {
         struct map_info_t *Map_info;       /* map window info */

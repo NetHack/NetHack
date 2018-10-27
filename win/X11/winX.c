@@ -1077,6 +1077,7 @@ int type;
     wp->nh_colors_inited = FALSE;
     wp->boldfs = (XFontStruct *) 0;
     wp->boldfs_dpy = (Display *) 0;
+    wp->title = (char *) 0;
 
     switch (type) {
     case NHW_MAP:
@@ -1225,6 +1226,11 @@ winid window;
         XFreeFont(wp->boldfs_dpy, wp->boldfs);
         wp->boldfs = (XFontStruct *) 0;
         wp->boldfs_dpy = (Display *) 0;
+    }
+
+    if (wp->title) {
+        free(wp->title);
+        wp->title = (char *) 0;
     }
 
     switch (wp->type) {
@@ -1964,17 +1970,8 @@ const char *str;
 boolean complain;
 {
     dlb *fp;
-    Arg args[12];
-    Cardinal num_args;
-    Widget popup, dispfile;
-    Position top_margin, bottom_margin, left_margin, right_margin;
-    XFontStruct *fs;
-    int new_width, new_height;
 #define LLEN 128
     char line[LLEN];
-    int num_lines;
-    char *textlines, *bp;
-    int charcount;
 
     /* Use the port-independent file opener to see if the file exists. */
     fp = dlb_fopen(str, RDTMODE);
@@ -1985,92 +1982,26 @@ boolean complain;
         return; /* it doesn't exist, ignore */
     }
 
-    /*
-     * Count the number of lines and characters in the file.
-     */
-    num_lines = 0;
-    charcount = 1;
+    winid newwin = X11_create_nhwindow(NHW_MENU);
+    struct xwindow *wp = &window_list[newwin];
+    anything any = zeroany;
+    menu_item *menu_list;
+
+    X11_start_menu(newwin);
+
     while (dlb_fgets(line, LLEN, fp)) {
-        num_lines++;
-        charcount += strlen(line);
+        X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE, line, MENU_UNSELECTED);
     }
 
     (void) dlb_fclose(fp);
 
-    /* Ignore empty files */
-    if (num_lines == 0)
-        return;
+    /* show file name as the window title */
+    if (str)
+        wp->title = dupstr(str);
 
-    /* If over the max window size, truncate the window size to the max */
-    if (num_lines >= DISPLAY_FILE_SIZE)
-        num_lines = DISPLAY_FILE_SIZE;
-
-    /*
-     * Re-open the file and read the data into a buffer.  Cannot use
-     * the XawAsciiFile type of widget, because that is not DLB-aware.
-     */
-    textlines = (char *) alloc((unsigned int) charcount);
-    textlines[0] = '\0';
-
-    fp = dlb_fopen(str, RDTMODE);
-
-    bp = textlines;
-    while (dlb_fgets(line, LLEN, fp)) {
-        Strcpy((bp = eos(bp)), line);
-    }
-
-    (void) dlb_fclose(fp);
-
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNtitle), str); num_args++;
-
-    popup = XtCreatePopupShell("display_file", topLevelShellWidgetClass,
-                               toplevel, args, num_args);
-    XtOverrideTranslations(popup,
-        XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_file()"));
-
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
-             XawtextScrollWhenNeeded); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNscrollVertical), XawtextScrollAlways);
-                                                                   num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtype), XawAsciiString); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), textlines); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtranslations),
-             XtParseTranslationTable(display_translations)); num_args++;
-
-    dispfile = XtCreateManagedWidget("text",                      /* name */
-                                     asciiTextWidgetClass, popup, /* parent */
-                                     args, num_args);
-
-    /* Get font and border information. */
-    num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfont), &fs); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottomMargin), &bottom_margin);
-                                                                   num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin);
-                                                                   num_args++;
-    XtGetValues(dispfile, args, num_args);
-
-    /*
-     * The data files are currently set up assuming an 80 char wide window
-     * and a fixed width font.  Soo..
-     */
-    new_height =
-        num_lines * nhFontHeight(dispfile) + top_margin + bottom_margin;
-    new_width = 80 * fs->max_bounds.width + left_margin + right_margin;
-
-    /* Set the new width and height. */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNwidth, new_width); num_args++;
-    XtSetArg(args[num_args], XtNheight, new_height); num_args++;
-    XtSetValues(dispfile, args, num_args);
-
-    nh_XtPopup(popup, (int) XtGrabNone, (Widget) 0);
-    free(textlines);
+    wp->menu_information->permi = FALSE;
+    (void) X11_select_menu(newwin, PICK_NONE, &menu_list);
+    X11_destroy_nhwindow(newwin);
 }
 
 /* yn_function ------------------------------------------------------------ */
