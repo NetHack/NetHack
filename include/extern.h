@@ -628,6 +628,7 @@ E void FDECL(room_discovered, (int));
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
 E void FDECL(overview_stats, (winid, const char *, long *, long *));
 E void FDECL(remdun_mapseen, (int));
+E const char *FDECL(endgamelevelname, (char *, int));
 
 /* ### eat.c ### */
 
@@ -2417,6 +2418,7 @@ E void NDECL(timer_sanity_check);
 /* ### topten.c ### */
 
 E void FDECL(formatkiller, (char *, unsigned, int, BOOLEAN_P));
+E int FDECL(observable_depth, (d_level *));
 E void FDECL(topten, (int, time_t));
 E void FDECL(prscore, (int, char **));
 E struct toptenentry *NDECL(get_rnd_toptenentry);
