@@ -164,8 +164,6 @@ static void FDECL(done_button, (Widget, XtPointer, XtPointer));
 static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
 static void FDECL(abort_button, (Widget, XtPointer, XtPointer));
 static void NDECL(release_getline_widgets);
-static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
 static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
 static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
 static void NDECL(release_yn_widgets);
@@ -1375,8 +1373,6 @@ Widget toplevel = (Widget) 0; /* toplevel widget */
 Atom wm_delete_window;        /* pop down windows */
 
 static XtActionsRec actions[] = {
-    { nhStr("dismiss_file"), dismiss_file }, /* file viewing widget */
-    { nhStr("delete_file"), delete_file },   /* file delete-window */
     { nhStr("dismiss_text"), dismiss_text }, /* text widget button action */
     { nhStr("delete_text"), delete_text },   /* text widget delete action */
     { nhStr("key_dismiss_text"), key_dismiss_text }, /* text key action   */
@@ -1923,46 +1919,6 @@ char *input;
 }
 
 /* Display file ----------------------------------------------------------- */
-static const char display_translations[] = "#override\n\
-     <Key>q: dismiss_file()\n\
-     <Key>Escape: dismiss_file()\n\
-     <BtnDown>: dismiss_file()";
-
-/* WM_DELETE_WINDOW callback for file dismissal. */
-/*ARGSUSED*/
-static void
-delete_file(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
-{
-    nhUse(event);
-    nhUse(params);
-    nhUse(num_params);
-
-    nh_XtPopdown(w);
-    XtDestroyWidget(w);
-}
-
-/* Callback for file dismissal. */
-/*ARGSUSED*/
-static void
-dismiss_file(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
-{
-    Widget popup = XtParent(w);
-
-    nhUse(event);
-    nhUse(params);
-    nhUse(num_params);
-
-    nh_XtPopdown(popup);
-    XtDestroyWidget(popup);
-}
 
 void
 X11_display_file(str, complain)
