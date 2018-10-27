@@ -5,5 +5,6 @@ window.doc NHSUBST
 config.nh NHSUBST
 Guidebook.txt NH_header=no
 tmac.n NH_header=no
+tmac.nh NUSUBST
 fixes* NH_header=no
 *.txt NH_header=no

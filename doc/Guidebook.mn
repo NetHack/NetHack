@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1539898655 2018/10/18 21:37:35 $
+.\" $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.286 $ $NHDT-Date: 1540625949 2018/10/27 07:39:09 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" NetHack's Guidebook.mn currently does *not* adhere to these guidelines.
@@ -15,6 +15,9 @@
 .\"|   ter each sentence.
 .\"|||
 .\"
+.
+.so tmac.nh	\" extra macros which aren't in tmac.n
+.
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -22,67 +25,6 @@
 .ds f0 "\*(vr
 .ds f1
 .ds f2 "October 16, 2018
-.
-.\" labeled paragraph start (should be part of tmac.n, but I don't want to
-.\" make changes to that file)
-.\" .PS word
-.\"	set the width for the label column
-.\" .PL word
-.\"	label for the entry
-.\" .PE
-.\"	clean up
-.de PS
-.nr PY \\w'\\$1\ -\ 'u			\" width of label plus " - "
-.nr PX \\w'\ -\ 'u			\" width of " - "
-.sn \\n(pdu				\" tmac.n: inter-paragraph space
-.in +\\n(PYu				\" additional indent past label (etc)
-.si					\" tmac.n: start indented section
-..
-.\" labeled paragraph label (and first line)
-.de PL
-.br
-\\h'|-\\n(PYu'\\$1\\h'|-\\n(PXu'\ -\ \\c \" back up, output the label, then
-.					\" skip to width-of(" - ") before the
-.					\" normal indentation, output the " - "
-.					\" then attach the next line (the
-.					\" text) without stopping (\c: nroff
-.					\" section 4.2)
-..
-.\"labeled paragraph end
-.de PE
-.ei					\" tmac.n: end indented section
-.in -\\n(PYu				\" undo indent past label (etc)
-.sn \\n(pdu				\" tmac.n: inter-paragraph space
-..
-.\" end of labeled paragraph
-.\"
-.\" aligned single character key with SHORT definition (if it overflows one
-.\" line, all bets are off)
-.\" Usage:
-.\"  .CC k "definition here"
-.nr CZ \w'\fBW'		\" width of the key character column
-.nr CW \n(CZ/2		\" half the width of the key character column
-.de CC
-.nr CX \\w'\\fB\\$1'u/2	\" half the width of the key character
-.nr CY \\n(CWu-\\n(CXu	\" difference between the two half widths
-.\" output: move right CR units, print the key letter, move right to
-.\"  the full width of the column, print " - " and the definition
-\\h'|\\n(CYu'\\fB\\$1\\fP\\h'|\\n(CZu'\ -\ \\$2
-..
-.\" '.UX' is verbatim copy of tmac.n's '.ux' with the exception that
-.\" the trademark owner for "UNIX" has been updated.  (tmac.n contains
-.\" a comment asking that modified versions not be distributed, so we
-.\" are using this substitute instead of modifying that file.)
-.de UX					\" print "UNIX"
-.ie \\n(ux \\&\\$2\\s-1UNIX\\s0\\$1
-.el \{\
-.	nr ux +1			\" mark footnote as dropped
-\\&\\$2\\s-1UNIX\\s0\\*(rg\\$1
-.	fn				\" put out the footnote
-\\&\\*(rgUNIX is a registered trademark of The Open Group.
-.	ef				\" short and sweet ...
-.\}
-..
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -285,8 +227,7 @@ replaces the \(lqYou see ...\(rq descriptions of text adventure games.
 Figure 1 is a sample of what a NetHack screen might look like.
 The way the screen looks for you depends on your platform.
 .
-.br \" break - advance to next line
-\ \" space to force non-empty line before table
+.BR 2
 .ft CR \" set font to constant-width Roman
 .TS S
 center box tab(~);
@@ -2479,7 +2420,8 @@ Very large humanoids (giants and their ilk) have been known to use boulders
 as weapons.
 .pg
 For some configurations of the program, statues are no longer shown as
-\(oq\`\(cq but by the letter representing the monster they depict instead.
+\(oq\f(CR\`\fP\(cq but by the letter representing the monster they depict
+instead.
 .hn 2
 Gold (\(oq$\(cq)
 .pg
@@ -2816,6 +2758,7 @@ OPTIONS=lit_corridor
 OPTIONS=!splash_screen
 .ft \" revert to previous font
 .ed
+.BR 2
 .hn 2
 Using the NETHACKOPTIONS environment variable
 .pg
@@ -2823,32 +2766,46 @@ The NETHACKOPTIONS variable is a comma-separated list of initial
 values for the various options.
 Some can only be turned on or off.
 You turn one of these on by adding the name of the option to the list,
-and turn it off by typing a \(oq!\(cq or \(lqno\(rq before the name.
+and turn it off by typing a \(oq\f(CR!\fP\(cq or \(lq\f(CRno\fP\(rq
+before the name.
 Others take a character string as a value.
 You can set string options by typing
 the option name, a colon or equals sign, and then the value of the string.
 The value is terminated by the next comma or the end of string.
 .pg
-For example, to set up an environment variable so that \(lqcolor\(rq
-is on, \(lqautopickup\(rq is off, the name is set to \(lqBlue Meanie\(rq,
-and the fruit is set to \(lqpapaya\(rq, you would enter the command
-.sd
-% \f(CRsetenv NETHACKOPTIONS "color,\e!autopickup,name:Blue Meanie,fruit:papaya"\fP
-.ed
+For example, to set up an environment variable so that
+\fIcolor\fP is \f(CRon\fP,
+\fIlegacy\fP is \f(CRoff\fP,
+character \fIname\fP is set to \(lq\f(CRBlue Meanie\fP\(rq,
+and named \fIfruit\fP is set to \(lq\f(CRlime\fP\(rq,
+you would enter the command
+.\" Guidebook.ps looks better with the normal indentation for .sd (.SD i)
+.\" but the 'setenv' example is too wide for Guidebook.txt unless the
+.\" indentation is suppressed (.SD n).  Even though the second example
+.\" can be indented, it should match the first or they'll both look odd.
+.\" groff has a built-in register allowing recognition of '-T', but we
+.\" can't rely on that.  Assume Guidebook.ps uses a proportional font
+.\" and Guidebook.txt a fixed-width one and test which sort we're using.
+.ds sD i \" assume proportional, indentation acceptable and preferred
+.\" Check for fixed-width font; 'f' will be same width as 'F'.
+.if (\w'f'p)=(\w'F'p) .ds sD n \" if same width, suppress indentation
+.SD \*(sD
+\f(CR% setenv NETHACKOPTIONS "color,\\!leg,name:Blue Meanie,fruit:lime"\fP
+.ED
 in \fIcsh\fP (note the need to escape the \(oq!\(cq since it's special
-to the shell), or
-.sd
-$ \f(CRNETHACKOPTIONS="color,!autopickup,name:Blue Meanie,fruit:papaya"\fP
-$ \f(CRexport NETHACKOPTIONS\fP
-.ed
+to that shell), or the pair of commands
+.SD \*(sD
+\f(CR$ NETHACKOPTIONS="color,!leg,name:Blue Meanie,fruit:lime"\fP
+\f(CR$ export NETHACKOPTIONS\fP
+.ED
 in \fIsh\fP, \fIksh\fP, or \fIbash\fP.
 .pg
 Instead of a comma-separated list of options,
 NETHACKOPTIONS can be set to the full name of a configuration file you
 want to use.
-If that full name doesn't start with a slash, precede it with \(oq@\(cq
+If that full name doesn't start with a slash, precede it with \(oq\f(CR@\fP\(cq
 (at-sign) to let NetHack know that the rest is intended as a file name.
-If it does start with \(oq/\(cq, the at-sign is optional.
+If it does start with \(oq\f(CR/\fP\(cq, the at-sign is optional.
 .hn 2
 Customization options
 .pg

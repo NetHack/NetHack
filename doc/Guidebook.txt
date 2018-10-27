@@ -3154,11 +3154,11 @@
           equals sign, and then the value of the string.  The value is ter-
           minated by the next comma or the end of string.
 
-               For example, to set up an environment variable so that "col-
-          or" is on, "autopickup" is off, the name is set to "Blue Meanie",
-          and the fruit is set to "papaya", you would enter the command
+               For example, to set up an environment variable so that color
+          is on, legacy is off, character name is set to "Blue Meanie", and
+          named fruit is set to "lime", you would enter the command
 
-               % setenv NETHACKOPTIONS "color,\!autopickup,name:Blue Meanie,fruit:papaya"
+          % setenv NETHACKOPTIONS "color,\!leg,name:Blue Meanie,fruit:lime"
 
 
 
@@ -3172,11 +3172,11 @@
 
 
 
-          in csh (note the need to escape the `!' since it's special to the
-          shell), or
+          in csh (note the need to escape the `!'  since  it's  special  to
+          that shell), or the pair of commands
 
-               $ NETHACKOPTIONS="color,!autopickup,name:Blue Meanie,fruit:papaya"
-               $ export NETHACKOPTIONS
+          $ NETHACKOPTIONS="color,!leg,name:Blue Meanie,fruit:lime"
+          $ export NETHACKOPTIONS
 
           in sh, ksh, or bash.
 
