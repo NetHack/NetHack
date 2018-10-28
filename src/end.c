@@ -1037,8 +1037,17 @@ int how;
     if (!killer.name[0] || how >= PANICKED)
         Strcpy(killer.name, deaths[how]);
 
-    if (how < PANICKED)
+    if (how < PANICKED) {
         u.umortality++;
+        /* in case caller hasn't already done this */
+        if (u.uhp > 0 || (Upolyd && u.mh > 0)) {
+            /* for deaths not triggered by loss of hit points, force
+               current HP to zero (0 HP when turning into green slime
+               is iffy but we don't have much choice--that is fatal) */
+            u.uhp = u.mh = 0;
+            context.botl = 1;
+        }
+    }
     if (Lifesaved && (how <= GENOCIDED)) {
         pline("But wait...");
         makeknown(AMULET_OF_LIFE_SAVING);
