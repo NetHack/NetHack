@@ -199,6 +199,7 @@ tty: fix leftover display artifact when the last field on the row got placed
 	to its left, getting shorter
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
+X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -248,6 +249,7 @@ X11: handle X errors via panic
 X11: don't reuse perm_invent window for picking an object
 X11: obey mouse_support and allow toggling it in game
 X11: obey menu movement keys
+X11: enable menu [cancel] button for PICK_NONE menus
 
 
 General New Features

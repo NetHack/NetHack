@@ -254,7 +254,8 @@ Cardinal *num_params;
         return;
     }
 
-    if (menu_info->is_active && menu_info->how != PICK_NONE) { /* waiting for input */
+    /* don't exclude PICK_NONE menus; doing so disables scrolling via keys */
+    if (menu_info->is_active) { /* waiting for input */
         /* first check for an explicit selector match, so that it won't be
            overridden if it happens to duplicate a mapped menu command (':'
            to look inside a container vs ':' to select via search string) */
@@ -324,12 +325,14 @@ Cardinal *num_params;
         } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
             Widget hbar = (Widget) 0, vbar = (Widget) 0;
             float top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
+
             find_scrollbars(wp->w, &hbar, &vbar);
             if (vbar)
                 XtCallCallbacks(vbar, XtNjumpProc, &top);
             return;
         } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
             Widget hbar = (Widget) 0, vbar = (Widget) 0;
+
             find_scrollbars(wp->w, &hbar, &vbar);
             if (vbar) {
                 float shown, top;
@@ -1029,7 +1032,9 @@ Widget form,under;
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
     XtSetArg(args[num_args], nhStr(XtNfromHoriz), ok); num_args++;
+#if 0   /* [cancel] is a viable choice even for PICK_NONE */
     XtSetArg(args[num_args], nhStr(XtNsensitive), how != PICK_NONE); num_args++;
+#endif
     XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;

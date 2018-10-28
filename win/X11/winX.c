@@ -1920,35 +1920,38 @@ char *input;
 
 /* Display file ----------------------------------------------------------- */
 
+/* uses a menu (with no selectors specified) rather than a text window
+   to allow previous_page and first_menu actions to move backwards */
 void
 X11_display_file(str, complain)
 const char *str;
 boolean complain;
 {
     dlb *fp;
+    winid newwin;
+    struct xwindow *wp;
+    anything any;
+    menu_item *menu_list;
 #define LLEN 128
     char line[LLEN];
 
     /* Use the port-independent file opener to see if the file exists. */
     fp = dlb_fopen(str, RDTMODE);
-
     if (!fp) {
         if (complain)
             pline("Cannot open %s.  Sorry.", str);
         return; /* it doesn't exist, ignore */
     }
 
-    winid newwin = X11_create_nhwindow(NHW_MENU);
-    struct xwindow *wp = &window_list[newwin];
-    anything any = zeroany;
-    menu_item *menu_list;
-
+    newwin = X11_create_nhwindow(NHW_MENU);
+    wp = &window_list[newwin];
     X11_start_menu(newwin);
 
+    any = zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
-        X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE, line, MENU_UNSELECTED);
+        X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     line, MENU_UNSELECTED);
     }
-
     (void) dlb_fclose(fp);
 
     /* show file name as the window title */
