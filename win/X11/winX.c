@@ -202,6 +202,9 @@ boolean init;
         static int numlines = 0;
         struct xwindow *wp = &window_list[WIN_MESSAGE];
 
+        if (init)
+            curr = (struct line_element *) 0;
+
         if (!curr) {
             curr = wp->mesg_information->head;
             numlines = 0;
