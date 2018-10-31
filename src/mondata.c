@@ -762,6 +762,7 @@ const char *in_str;
             { "lurkers above", PM_LURKER_ABOVE },
             { "cavemen", PM_CAVEMAN },
             { "cavewomen", PM_CAVEWOMAN },
+            { "watchmen", PM_WATCHMAN },
             { "djinn", PM_DJINNI },
             { "mumakil", PM_MUMAK },
             { "erinyes", PM_ERINYS },
