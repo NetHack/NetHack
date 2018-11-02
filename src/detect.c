@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1539908137 2018/10/19 00:15:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1541119051 2018/11/02 00:37:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1548,14 +1548,16 @@ boolean via_warning;
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
         found_something = TRUE;
-    } else if (mtmp->mundetected
-               && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
-        if (via_warning) {
-            Your("warning senses cause you to take a second %s.",
-                 Blind ? "to check nearby" : "look close by");
-            display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
+    } else {
+        if (mtmp->mundetected
+            && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
+            if (via_warning) {
+                Your("warning senses cause you to take a second %s.",
+                     Blind ? "to check nearby" : "look close by");
+                display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
+            }
+            mtmp->mundetected = 0;
         }
-        mtmp->mundetected = 0;
         newsym(x, y);
         found_something = TRUE;
     }
