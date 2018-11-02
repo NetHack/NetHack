@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1541119051 2018/11/02 00:37:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1541144458 2018/11/02 07:40:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1548,7 +1548,7 @@ boolean via_warning;
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
         found_something = TRUE;
-    } else {
+    } else if (!canspotmon(mtmp)) {
         if (mtmp->mundetected
             && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
             if (via_warning) {
