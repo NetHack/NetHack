@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1523306904 2018/04/09 20:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1541145515 2018/11/02 07:58:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.297 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -190,6 +190,7 @@ STATIC_DCL boolean NDECL(walking_on_water);
 STATIC_DCL boolean FDECL(cause_known, (int));
 STATIC_DCL char *FDECL(attrval, (int, int, char *));
 STATIC_DCL void FDECL(background_enlightenment, (int, int));
+STATIC_DCL void FDECL(basics_enlightenment, (int, int));
 STATIC_DCL void FDECL(characteristics_enlightenment, (int, int));
 STATIC_DCL void FDECL(one_characteristic, (int, int, int));
 STATIC_DCL void FDECL(status_enlightenment, (int, int));
@@ -1693,8 +1694,10 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     putstr(en_win, 0, buf); /* "Conan the Archeologist's attributes:" */
     /* background and characteristics; ^X or end-of-game disclosure */
     if (mode & BASICENLIGHTENMENT) {
-        /* role, race, alignment, deities */
+        /* role, race, alignment, deities, dungeon level, time, experience */
         background_enlightenment(mode, final);
+        /* hit points, energy points, armor class, gold */
+        basics_enlightenment(mode, final);
         /* strength, dexterity, &c */
         characteristics_enlightenment(mode, final);
     }
@@ -1868,35 +1871,77 @@ int final;
         Sprintf(buf, "in %s, on %s", dgnbuf, tmpbuf);
     }
     you_are(buf, "");
+
+    /* this is shown even if the 'time' option is off */
+    if (moves == 1L) {
+        you_have("just started your adventure", "");
+    } else {
+        /* 'turns' grates on the nerves in this context... */
+        Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
+        /* same phrasing for current and final: "entered" is unconditional */
+        enlght_line(You_, "entered ", buf, "");
+    }
+    if (!Upolyd) {
+        /* flags.showexp does not matter */
+        /* experience level is already shown above */
+        Sprintf(buf, "%-1ld experience point%s", u.uexp, plur(u.uexp));
+        if (wizard) {
+            if (u.ulevel < 30) {
+                int ulvl = (int) u.ulevel;
+                long nxtlvl = newuexp(ulvl);
+                /* long oldlvl = (ulvl > 1) ? newuexp(ulvl - 1) : 0; */
+
+                Sprintf(eos(buf), ", %ld %s%sneeded to attain level %d",
+                        (nxtlvl - u.uexp), (u.uexp > 0) ? "more " : "",
+                        !final ? "" : "were ", (ulvl + 1));
+            }
+        }
+        you_have(buf, "");
+    }
+#ifdef SCORE_ON_BOTL
+    if (flags.showscore) {
+        /* describes what's shown on status line, which is an approximation;
+           only show it here if player has the 'showscore' option enabled */
+        Sprintf(buf, "%ld%s", botl_score(),
+                !final ? "" : " before end-of-game adjustments");
+        enl_msg("Your score ", "is ", "was ", buf, "");
+    }
+#endif
 }
 
-/* characteristics: expanded version of bottom line strength, dexterity, &c;
-   [3.6.1: now includes all status info (except things already shown in the
-   'background' section), primarily so that blind players can suppress the
-   status line(s) altogether and use ^X feedback on demand to view HP, &c] */
+/* hit points, energy points, armor class -- essential information which
+   doesn't fit very well in other categories */
+/*ARGSUSED*/
 STATIC_OVL void
-characteristics_enlightenment(mode, final)
-int mode;
+basics_enlightenment(mode, final)
+int mode UNUSED;
 int final;
 {
+    static char Power[] = "energy points (spell power)";
     char buf[BUFSZ];
-    int hp = Upolyd ? u.mh : u.uhp;
-    int hpmax = Upolyd ? u.mhmax : u.uhpmax;
+    int wtype, pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
+        pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
 
     putstr(en_win, 0, ""); /* separator after background */
-    putstr(en_win, 0,
-           final ? "Final Characteristics:" : "Current Characteristics:");
+    putstr(en_win, 0, "Basics:");
 
     if (hp < 0)
         hp = 0;
-    Sprintf(buf, "%d hit points (max:%d)", hp, hpmax);
+    /* "1 out of 1" rather than "all" if max is only 1; should never happen */
+    if (hp == hpmax && hpmax > 1)
+        Sprintf(buf, "all %d hit points", hpmax);
+    else
+        Sprintf(buf, "%d out of %d hit point%s", hp, hpmax, plur(hpmax));
     you_have(buf, "");
 
-    Sprintf(buf, "%d magic power (max:%d)", u.uen, u.uenmax);
+    /* low max energy is feasible, so handle couple of extra special cases */
+    if (pwmax == 0 || (pw == pwmax && pwmax == 2)) /* both: "all 2" is silly */
+        Sprintf(buf, "%s %s", !pwmax ? "no" : "both", Power);
+    else if (pw == pwmax && pwmax > 2)
+        Sprintf(buf, "all %d %s", pwmax, Power);
+    else
+        Sprintf(buf, "%d out of %d %s", pw, pwmax, Power);
     you_have(buf, "");
-
-    Sprintf(buf, "%d", u.uac);
-    enl_msg("Your armor class ", "is ", "was ", buf, "");
 
     if (Upolyd) {
         switch (mons[u.umonnum].mlevel) {
@@ -1911,28 +1956,66 @@ int final;
             Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
             break;
         }
-    } else {
-        /* flags.showexp does not matter */
-        /* experience level is already shown in the Background section */
-        Sprintf(buf, "%-1ld experience point%s",
-                u.uexp, plur(u.uexp));
+        you_have(buf, "");
     }
-    you_have(buf, "");
 
-    /* this is shown even if the 'time' option is off */
-    Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
-    /* same phrasing at end of game:  "entered" is unconditional */
-    enlght_line(You_, "entered ", buf, "");
+    Sprintf(buf, "%d", u.uac);
+    enl_msg("Your armor class ", "is ", "was ", buf, "");
 
-#ifdef SCORE_ON_BOTL
-    if (flags.showscore) {
-        /* describes what's shown on status line, which is an approximation;
-           only show it here if player has the 'showscore' option enabled */
-        Sprintf(buf, "%ld%s", botl_score(),
-                !final ? "" : " before end-of-game adjustments");
-        enl_msg("Your score ", "is ", "was ", buf, "");
+    /*
+     * Skill with current weapon.  Might help players who've never
+     * noticed #enhance or decided that it was pointless.
+     *
+     * TODO?  This should probably be merged with the "you are wielding ..."
+     * at the end of the status conditions.
+     */
+    wtype = uwep_skill_type();
+    if (wtype != P_NONE) {
+        boolean hav; /* "you have" vs "you are" */
+        char skil[20];
+
+        if (P_SKILL(wtype) == P_ISRESTRICTED)
+            Strcpy(skil, "no");
+        else
+            (void) lcase(skill_level_name(wtype, skil));
+        /* "no/basic/expert/master skill with" or "unskilled/skilled in" */
+        hav = (P_SKILL(wtype) != P_UNSKILLED && P_SKILL(wtype) != P_SKILLED);
+        Sprintf(buf, "%s %s %s",
+                skil, hav ? "skill with" : "in", skill_name(wtype));
+        if (can_advance(wtype, FALSE))
+            Sprintf(eos(buf), " and %s that",
+                    !final ? "can enhance" : "could have enhanced");
+        if (hav)
+            you_have(buf, "");
+        else
+            you_are(buf, "");
     }
-#endif
+    /* gold; similar to doprgold(#seegold) but without shop billing info;
+       same amount as shown on status line which ignores container contents */
+    {
+        static const char Your_wallet[] = "Your wallet ";
+        long umoney = money_cnt(invent);
+
+        if (!umoney) {
+            enl_msg(Your_wallet, "is ", "was ", "empty", "");
+        } else {
+            Sprintf(buf, "%ld %s", umoney, currency(umoney));
+            enl_msg(Your_wallet, "contains ", "contained ", buf, "");
+        }
+    }
+}
+
+/* characteristics: expanded version of bottom line strength, dexterity, &c */
+STATIC_OVL void
+characteristics_enlightenment(mode, final)
+int mode;
+int final;
+{
+    char buf[BUFSZ];
+
+    putstr(en_win, 0, "");
+    Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
+    putstr(en_win, 0, buf);
 
     /* bottom line order */
     one_characteristic(mode, final, A_STR); /* strength */
