@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1541145515 2018/11/02 07:58:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.297 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1541235664 2018/11/03 09:01:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -182,6 +182,7 @@ STATIC_DCL int NDECL(wiz_port_debug);
 STATIC_PTR int NDECL(wiz_rumor_check);
 STATIC_PTR int NDECL(doattributes);
 
+STATIC_DCL void FDECL(enlght_out, (const char *));
 STATIC_DCL void FDECL(enlght_line, (const char *, const char *, const char *,
                                     const char *));
 STATIC_DCL char *FDECL(enlght_combatinc, (const char *, int, int, char *));
@@ -1534,6 +1535,7 @@ doterrain(VOID_ARGS)
 
 /* -enlightenment and conduct- */
 static winid en_win = WIN_ERR;
+static boolean en_via_menu = FALSE;
 static const char You_[] = "You ", are[] = "are ", were[] = "were ",
                   have[] = "have ", had[] = "had ", can[] = "can ",
                   could[] = "could ";
@@ -1552,13 +1554,26 @@ static const char have_been[] = "have been ", have_never[] = "have never ",
     enl_msg(You_, have, (const char *) "", something, "")
 
 static void
+enlght_out(buf)
+const char *buf;
+{
+    if (en_via_menu) {
+        anything any;
+
+        any = zeroany;
+        add_menu(en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    } else
+        putstr(en_win, 0, buf);
+}
+
+static void
 enlght_line(start, middle, end, ps)
 const char *start, *middle, *end, *ps;
 {
     char buf[BUFSZ];
 
     Sprintf(buf, " %s%s%s%s.", start, middle, end, ps);
-    putstr(en_win, 0, buf);
+    enlght_out(buf);
 }
 
 /* format increased chance to hit or damage or defense (Protection) */
@@ -1680,6 +1695,11 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
+    en_win = create_nhwindow(NHW_MENU);
+    en_via_menu = !final;
+    if (en_via_menu)
+        start_menu(en_win);
+
     Strcpy(tmpbuf, plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
@@ -1689,9 +1709,8 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
                 ? urole.name.f
                 : urole.name.m);
 
-    en_win = create_nhwindow(NHW_MENU);
     /* title */
-    putstr(en_win, 0, buf); /* "Conan the Archeologist's attributes:" */
+    enlght_out(buf); /* "Conan the Archeologist's attributes:" */
     /* background and characteristics; ^X or end-of-game disclosure */
     if (mode & BASICENLIGHTENMENT) {
         /* role, race, alignment, deities, dungeon level, time, experience */
@@ -1713,7 +1732,17 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         /* intrinsics and other traditional enlightenment feedback */
         attributes_enlightenment(mode, final);
     }
-    display_nhwindow(en_win, TRUE);
+
+    if (!en_via_menu) {
+        display_nhwindow(en_win, TRUE);
+    } else {
+        menu_item *selected = 0;
+
+        end_menu(en_win, (char *) 0);
+        if (select_menu(en_win, PICK_NONE, &selected) > 0)
+            free((genericptr_t) selected);
+        en_via_menu = FALSE;
+    }
     destroy_nhwindow(en_win);
     en_win = WIN_ERR;
 }
@@ -1735,8 +1764,8 @@ int final;
     role_titl = (innategend && urole.name.f) ? urole.name.f : urole.name.m;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
-    putstr(en_win, 0, ""); /* separator after title */
-    putstr(en_win, 0, "Background:");
+    enlght_out(""); /* separator after title */
+    enlght_out("Background:");
 
     /* if polymorphed, report current shape before underlying role;
        will be repeated as first status: "you are transformed" and also
@@ -1798,7 +1827,7 @@ int final;
                      /* lastly, normal case */
                      : "",
             u_gname());
-    putstr(en_win, 0, buf);
+    enlght_out(buf);
     /* show the rest of this game's pantheon (finishes previous sentence)
        [appending "also Moloch" at the end would allow for straightforward
        trailing "and" on all three aligned entries but looks too verbose] */
@@ -1814,7 +1843,7 @@ int final;
         Sprintf(eos(buf), " %s (%s)", align_gname(A_CHAOTIC),
                 align_str(A_CHAOTIC));
     Strcat(buf, "."); /* terminate sentence */
-    putstr(en_win, 0, buf);
+    enlght_out(buf);
 
     /* show original alignment,gender,race,role if any have been changed;
        giving separate message for temporary alignment change bypasses need
@@ -1834,7 +1863,7 @@ int final;
                 difgend ? genders[flags.initgend].adj : "",
                 (difgend && difalgn) ? " and " : "",
                 difalgn ? align_str(u.ualignbase[A_ORIGINAL]) : "");
-        putstr(en_win, 0, buf);
+        enlght_out(buf);
     }
 
     /* 3.6.2: dungeon level, so that ^X really has all status info as
@@ -1919,11 +1948,11 @@ int final;
 {
     static char Power[] = "energy points (spell power)";
     char buf[BUFSZ];
-    int wtype, pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
+    int pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);
 
-    putstr(en_win, 0, ""); /* separator after background */
-    putstr(en_win, 0, "Basics:");
+    enlght_out(""); /* separator after background */
+    enlght_out("Basics:");
 
     if (hp < 0)
         hp = 0;
@@ -1962,34 +1991,6 @@ int final;
     Sprintf(buf, "%d", u.uac);
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
-    /*
-     * Skill with current weapon.  Might help players who've never
-     * noticed #enhance or decided that it was pointless.
-     *
-     * TODO?  This should probably be merged with the "you are wielding ..."
-     * at the end of the status conditions.
-     */
-    wtype = uwep_skill_type();
-    if (wtype != P_NONE) {
-        boolean hav; /* "you have" vs "you are" */
-        char skil[20];
-
-        if (P_SKILL(wtype) == P_ISRESTRICTED)
-            Strcpy(skil, "no");
-        else
-            (void) lcase(skill_level_name(wtype, skil));
-        /* "no/basic/expert/master skill with" or "unskilled/skilled in" */
-        hav = (P_SKILL(wtype) != P_UNSKILLED && P_SKILL(wtype) != P_SKILLED);
-        Sprintf(buf, "%s %s %s",
-                skil, hav ? "skill with" : "in", skill_name(wtype));
-        if (can_advance(wtype, FALSE))
-            Sprintf(eos(buf), " and %s that",
-                    !final ? "can enhance" : "could have enhanced");
-        if (hav)
-            you_have(buf, "");
-        else
-            you_are(buf, "");
-    }
     /* gold; similar to doprgold(#seegold) but without shop billing info;
        same amount as shown on status line which ignores container contents */
     {
@@ -2013,9 +2014,9 @@ int final;
 {
     char buf[BUFSZ];
 
-    putstr(en_win, 0, "");
+    enlght_out("");
     Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
-    putstr(en_win, 0, buf);
+    enlght_out(buf);
 
     /* bottom line order */
     one_characteristic(mode, final, A_STR); /* strength */
@@ -2128,7 +2129,7 @@ int mode;
 int final;
 {
     boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
-    int cap;
+    int cap, wtype;
     char buf[BUFSZ], youtoo[BUFSZ];
     boolean Riding = (u.usteed
                       /* if hero dies while dismounting, u.usteed will still
@@ -2146,8 +2147,8 @@ int final;
      * Status (many are abbreviated on bottom line; others are or
      *     should be discernible to the hero hence to the player)
     \*/
-    putstr(en_win, 0, ""); /* separator after title or characteristics */
-    putstr(en_win, 0, final ? "Final Status:" : "Current Status:");
+    enlght_out(""); /* separator after title or characteristics */
+    enlght_out(final ? "Final Status:" : "Current Status:");
 
     Strcpy(youtoo, You_);
     /* not a traditional status but inherently obvious to player; more
@@ -2369,6 +2370,7 @@ int final;
            still useful though) */
         you_are("unencumbered", "");
     }
+
     /* report being weaponless; distinguish whether gloves are worn */
     if (!uwep) {
         you_are(uarmg ? "empty handed" /* gloves imply hands */
@@ -2378,7 +2380,8 @@ int final;
                          /* alternate phrasing for paws or lack of hands */
                          : "not wielding anything",
                 "");
-    /* two-weaponing implies a weapon (not other odd stuff) in each hand */
+    /* two-weaponing implies hands (can't be polymorphed) and
+       a weapon or wep-tool (not other odd stuff) in each hand */
     } else if (u.twoweap) {
         you_are("wielding two weapons at once", "");
     /* report most weapons by their skill class (so a katana will be
@@ -2394,6 +2397,33 @@ int final;
             Sprintf(buf, "wielding %s",
                     (uwep->quan == 1L) ? an(what) : makeplural(what));
         you_are(buf, "");
+    }
+    /*
+     * Skill with current weapon.  Might help players who've never
+     * noticed #enhance or decided that it was pointless.
+     *
+     * TODO?  Maybe merge wielding line and skill line into one sentence.
+     */
+    if ((wtype = uwep_skill_type()) != P_NONE) {
+        char sklvlbuf[20];
+        int sklvl = P_SKILL(wtype);
+        boolean hav = (sklvl != P_UNSKILLED && sklvl != P_SKILLED);
+
+        if (sklvl == P_ISRESTRICTED)
+            Strcpy(sklvlbuf, "no");
+        else
+            (void) lcase(skill_level_name(wtype, sklvlbuf));
+        /* "you have no/basic/expert/master/grand-master skill with <skill>"
+           or "you are unskilled/skilled in <skill>" */
+        Sprintf(buf, "%s %s %s", sklvlbuf,
+                hav ? "skill with" : "in", skill_name(wtype));
+        if (can_advance(wtype, FALSE))
+            Sprintf(eos(buf), " and %s that",
+                    !final ? "can enhance" : "could have enhanced");
+        if (hav)
+            you_have(buf, "");
+        else
+            you_are(buf, "");
     }
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarmg && !uarmf && !uarmh) {
@@ -2418,8 +2448,8 @@ int final;
     /*\
      *  Attributes
     \*/
-    putstr(en_win, 0, "");
-    putstr(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
+    enlght_out("");
+    enlght_out(final ? "Final Attributes:" : "Current Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",

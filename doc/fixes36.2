@@ -280,6 +280,11 @@ replace #monpolycontrol command with monpolycontrol boolean option
 replace #wizdebug_traveldisplay command with travel_debug boolean option
 rename #wizdebug_bury command to #wizbury
 life-saving now makes swallower or grabber release hero
+for ^X and enlightenment, display the information in a menu rather than a
+	plain text popup, so that player can go back within the text via
+	'<' (menu_previous_page) and '^' (menu_first_page) menu keys;
+	needed for interfaces (tty) without text popup scrollbar support;
+	end of game disclosure of attributes remains single-forward-pass
 
 
 Code Cleanup and Reorganization
