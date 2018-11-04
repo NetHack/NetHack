@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1490908468 2017/03/30 21:14:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1540934784 2018/10/30 21:26:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -637,7 +637,7 @@ boolean init;
  *
  * It's also called by the quest pager code when a block message
  * has a one-line summary specified.  We put that line directly
- * message history for ^P recall without having displayed it.
+ * into message history for ^P recall without having displayed it.
  */
 void
 tty_putmsghistory(msg, restoring_msghist)

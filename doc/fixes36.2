@@ -151,7 +151,7 @@ wizard mode ^T shouldn't have been diminishing player power but it was
 fix missing space in "would flyif you weren't levitating"
 a wand of polymorph lost its magical ability for the turn just because the
 	player using it to engrave happened to be blind, which didn't make
-	a much sense
+	much sense
 floating eye is classified as a flyer but flying is blocked while levitating,
 	so don't set intrinsic flying if hero is polymorphed into one
 being trapped (bear trap, web, molten or solidified lava, chained to buried
@@ -176,6 +176,15 @@ prayer result which enhanced strength (fix weakness from hunger) didn't give
 	a message if a change in encumbrance occurred; it came on next move
 add current location within the dungeon to the Background section of ^X and
 	final disclosure (it's not background but doesn't fit anywhere else)
+death from something other than loss of hit points could leave hero with
+	non-zero HP at end of game (during "really die?" prompt, disclosure)
+added several special cases for genocide and/or wishing prompt: (cookie,
+	pie, genie, watchmen)
+lightning strike from Mjollnir did not make any noise
+with menustyle:Full, picking 'A - autoselect all' when putting items into a
+	container actually took everything out of that container
+add missing 'A - autoselect all' choice for menustyle:Full when taking items
+	out while looting a container
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -189,6 +198,8 @@ make long extended commands list be more navigable
 simplify #wizidentify; don't rely on having bold menu entries
 ensure tmp_at() structures are initialized for all code paths when swallowed
 trapped-vs-levitation/flying change broke Sting releasing hero from web
+life-saving while poly'd and Unchanging wasn't restoring u.mh (HP as monster)
+change in searching stopped finding unseen monsters except hiders and eels
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -199,6 +210,7 @@ tty: fix leftover display artifact when the last field on the row got placed
 	to its left, getting shorter
 X11: its use of genl_status_update exposed a negative index use that could
 	lead to a segfault
+X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 
 
 Platform- and/or Interface-Specific Fixes
@@ -248,6 +260,7 @@ X11: handle X errors via panic
 X11: don't reuse perm_invent window for picking an object
 X11: obey mouse_support and allow toggling it in game
 X11: obey menu movement keys
+X11: enable menu [cancel] button for PICK_NONE menus
 
 
 General New Features
@@ -270,6 +283,12 @@ make mine town "orctown" variation a multiple level feature of the mines
 replace #monpolycontrol command with monpolycontrol boolean option
 replace #wizdebug_traveldisplay command with travel_debug boolean option
 rename #wizdebug_bury command to #wizbury
+life-saving now makes swallower or grabber release hero
+for ^X and enlightenment, display the information in a menu rather than a
+	plain text popup, so that player can go back within the text via
+	'<' (menu_previous_page) and '^' (menu_first_page) menu keys;
+	needed for interfaces (tty) without text popup scrollbar support;
+	end of game disclosure of attributes remains single-forward-pass
 
 
 Code Cleanup and Reorganization
