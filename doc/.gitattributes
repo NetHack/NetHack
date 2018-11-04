@@ -1,5 +1,6 @@
 *.mn	NHSUBST
 *.6	NHSUBST
+*.7	NHSUBST
 fixes*	NHSUBST
 window.doc NHSUBST
 config.nh NHSUBST
