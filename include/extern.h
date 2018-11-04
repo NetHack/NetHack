@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1535812936 2018/09/01 14:42:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.636 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1541145514 2018/11/02 07:58:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.645 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -721,6 +721,7 @@ E void FDECL(make_grave, (int, int, const char *));
 
 /* ### exper.c ### */
 
+E long FDECL(newuexp, (int));
 E int NDECL(newpw);
 E int FDECL(experience, (struct monst *, int));
 E void FDECL(more_experienced, (int, int));
@@ -2727,6 +2728,9 @@ E int NDECL(abon);
 E int NDECL(dbon);
 E void FDECL(wet_a_towel, (struct obj *, int, BOOLEAN_P));
 E void FDECL(dry_a_towel, (struct obj *, int, BOOLEAN_P));
+E char *FDECL(skill_level_name, (int, char *));
+E const char *FDECL(skill_name, (int));
+E boolean FDECL(can_advance, (int, BOOLEAN_P));
 E int NDECL(enhance_weapon_skill);
 E void FDECL(unrestrict_weapon_skill, (int));
 E void FDECL(use_skill, (int, int));

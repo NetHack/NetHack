@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1516581051 2018/01/22 00:30:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1541312259 2018/11/04 06:17:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2720,9 +2720,7 @@ boolean put_in;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES);
-        if (put_in)
-            mflags |= CHOOSE_ALL;
+        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL);
         n = query_category(buf, put_in ? invent : current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
@@ -2739,12 +2737,23 @@ boolean put_in;
     }
 
     if (loot_everything) {
-        current_container->cknown = 1;
-        for (otmp = current_container->cobj; otmp; otmp = otmp2) {
-            otmp2 = otmp->nobj;
-            res = out_container(otmp);
-            if (res < 0)
-                break;
+        if (!put_in) {
+            current_container->cknown = 1;
+            for (otmp = current_container->cobj; otmp; otmp = otmp2) {
+                otmp2 = otmp->nobj;
+                res = out_container(otmp);
+                if (res < 0)
+                    break;
+                n_looted += res;
+            }
+        } else {
+            for (otmp = invent; otmp && current_container; otmp = otmp2) {
+                otmp2 = otmp->nobj;
+                res = in_container(otmp);
+                if (res < 0)
+                    break;
+                n_looted += res;
+            }
         }
     } else {
         mflags = INVORDER_SORT;

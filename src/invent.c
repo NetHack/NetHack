@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1519672703 2018/02/26 19:18:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.225 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1541145517 2018/11/02 07:58:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.241 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3605,6 +3605,7 @@ doprgold()
     /* the messages used to refer to "carrying gold", but that didn't
        take containers into account */
     long umoney = money_cnt(invent);
+
     if (!umoney)
         Your("wallet is empty.");
     else
