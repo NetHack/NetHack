@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1503960969 2017/08/28 22:56:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1539510426 2018/10/14 09:47:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -219,11 +219,14 @@ static struct inv_sub {
     { PM_ORC, SMALL_SHIELD, ORCISH_SHIELD },
     { PM_ORC, RING_MAIL, ORCISH_RING_MAIL },
     { PM_ORC, CHAIN_MAIL, ORCISH_CHAIN_MAIL },
+    { PM_ORC, CRAM_RATION, TRIPE_RATION },
+    { PM_ORC, LEMBAS_WAFER, TRIPE_RATION },
     { PM_DWARF, SPEAR, DWARVISH_SPEAR },
     { PM_DWARF, SHORT_SWORD, DWARVISH_SHORT_SWORD },
     { PM_DWARF, HELMET, DWARVISH_IRON_HELM },
     /* { PM_DWARF, SMALL_SHIELD, DWARVISH_ROUNDSHIELD }, */
     /* { PM_DWARF, PICK_AXE, DWARVISH_MATTOCK }, */
+    { PM_DWARF, LEMBAS_WAFER, CRAM_RATION },
     { PM_GNOME, BOW, CROSSBOW },
     { PM_GNOME, ARROW, CROSSBOW_BOLT },
     { NON_PM, STRANGE_OBJECT, STRANGE_OBJECT }
@@ -972,17 +975,8 @@ register struct trobj *trop;
     int otyp, i;
 
     while (trop->trclass) {
-        if (trop->trotyp != UNDEF_TYP) {
-            otyp = (int) trop->trotyp;
-            if (urace.malenum != PM_HUMAN) {
-                /* substitute specific items for generic ones */
-                for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                    if (inv_subs[i].race_pm == urace.malenum
-                        && otyp == inv_subs[i].item_otyp) {
-                        otyp = inv_subs[i].subs_otyp;
-                        break;
-                    }
-            }
+        otyp = (int) trop->trotyp;
+        if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
             static NEARDATA short nocreate = STRANGE_OBJECT;
@@ -1057,6 +1051,23 @@ register struct trobj *trop;
                 nocreate4 = otyp;
         }
 
+        if (urace.malenum != PM_HUMAN) {
+            /* substitute race-specific items; this used to be in
+               the 'if (otyp != UNDEF_TYP) { }' block above, but then
+               substitutions didn't occur for randomly generated items
+               (particularly food) which have racial substitutes */
+            for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
+                if (inv_subs[i].race_pm == urace.malenum
+                    && otyp == inv_subs[i].item_otyp) {
+                    debugpline3("ini_inv: substituting %s for %s%s",
+                                OBJ_NAME(objects[inv_subs[i].subs_otyp]),
+                                (trop->trotyp == UNDEF_TYP) ? "random " : "",
+                                OBJ_NAME(objects[otyp]));
+                    otyp = obj->otyp = inv_subs[i].subs_otyp;
+                    break;
+                }
+        }
+
         /* nudist gets no armor */
         if (u.uroleplay.nudist && obj->oclass == ARMOR_CLASS) {
             dealloc_obj(obj);
@@ -1101,10 +1112,13 @@ register struct trobj *trop;
             discover_object(POT_OIL, TRUE, FALSE);
 
         if (obj->oclass == ARMOR_CLASS) {
-            if (is_shield(obj) && !uarms) {
+            if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
                 setworn(obj, W_ARMS);
-                if (uswapwep)
-                    setuswapwep((struct obj *) 0);
+                /* 3.6.2: this used to unset uswapwep if it was set, but
+                   wearing a shield doesn't prevent having an alternate
+                   weapon ready to swap with the primary; just make sure we
+                   aren't two-weaponing (academic; no one starts that way) */
+                u.twoweap = FALSE;
             } else if (is_helmet(obj) && !uarmh)
                 setworn(obj, W_ARMH);
             else if (is_gloves(obj) && !uarmg)
@@ -1124,10 +1138,11 @@ register struct trobj *trop;
             if (is_ammo(obj) || is_missile(obj)) {
                 if (!uquiver)
                     setuqwep(obj);
-            } else if (!uwep)
+            } else if (!uwep && (!uarms || !bimanual(obj))) {
                 setuwep(obj);
-            else if (!uswapwep)
+            } else if (!uswapwep) {
                 setuswapwep(obj);
+            }
         }
         if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
             initialspell(obj);

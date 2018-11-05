@@ -14,8 +14,10 @@ STATIC_DCL int FDECL(disturb, (struct monst *));
 STATIC_DCL void FDECL(release_hero, (struct monst *));
 STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
+STATIC_DCL int FDECL(count_webbing_walls, (XCHAR_P, XCHAR_P));
 STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
-STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *, BOOLEAN_P));
+STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *,
+                                  BOOLEAN_P));
 
 /* True if mtmp died */
 boolean
@@ -31,9 +33,9 @@ struct monst *mtmp;
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
     mtmp->mhp -= rnd(15);
-    if (mtmp->mhp <= 0) {
+    if (DEADMONSTER(mtmp)) {
         mondied(mtmp);
-        if (mtmp->mhp > 0) /* lifesaved */
+        if (!DEADMONSTER(mtmp)) /* lifesaved */
             return FALSE;
         else
             return TRUE;
@@ -253,6 +255,12 @@ struct monst *mon;
     }
 }
 
+#define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN]     \
+                          && (uwep && artifact_light(uwep) && uwep->lamplit))
+/* we could include this in the above macro, but probably overkill/overhead */
+/*      && (!(which_armor((mon), W_ARMC) != 0                               */
+/*            && which_armor((mon), W_ARMH) != 0))                          */
+
 /* monster begins fleeing for the specified time, 0 means untimed flee
  * if first, only adds fleetime if monster isn't already fleeing
  * if fleemsg, prints a message about new flight, otherwise, caller should */
@@ -287,9 +295,15 @@ boolean fleemsg;
             /* unfortunately we can't distinguish between temporary
                sleep and temporary paralysis, so both conditions
                receive the same alternate message */
-            if (!mtmp->mcanmove || !mtmp->data->mmove)
+            if (!mtmp->mcanmove || !mtmp->data->mmove) {
                 pline("%s seems to flinch.", Adjmonnam(mtmp, "immobile"));
-            else
+            } else if (flees_light(mtmp)) {
+                if (rn2(10) || Deaf)
+                    pline("%s flees from the painful light of %s.",
+                          Monnam(mtmp), bare_artifactname(uwep));
+                else
+                    verbalize("Bright light!");
+            } else
                 pline("%s turns to flee.", Monnam(mtmp));
         }
         mtmp->mflee = 1;
@@ -304,7 +318,7 @@ register struct monst *mtmp;
 int *inrange, *nearby, *scared;
 {
     int seescaryx, seescaryy;
-    boolean sawscary = FALSE;
+    boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
 
     *inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
                 <= (BOLT_LIM * BOLT_LIM));
@@ -327,12 +341,15 @@ int *inrange, *nearby, *scared;
 
     sawscary = onscary(seescaryx, seescaryy, mtmp);
     if (*nearby && (sawscary
+                    || (flees_light(mtmp) && !bravegremlin)
                     || (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
         *scared = 1;
         monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
     } else
         *scared = 0;
 }
+
+#undef flees_light
 
 /* perform a special one-time action for a monster; returns -1 if nothing
    special happened, 0 if monster uses up its turn, 1 if monster is killed */
@@ -413,7 +430,7 @@ register struct monst *mtmp;
         m_respond(mtmp);
     if (mdat == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
         m_respond(mtmp);
-    if (mtmp->mhp <= 0)
+    if (DEADMONSTER(mtmp))
         return 1; /* m_respond gaze can kill medusa */
 
     /* fleeing monsters might regain courage */
@@ -518,7 +535,7 @@ register struct monst *mtmp;
                 if (cansee(m2->mx, m2->my))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
-                if (m2->mhp <= 0)
+                if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
                 else
                     m2->msleeping = 0;
@@ -590,7 +607,7 @@ toofar:
         case 0: /* no movement, but it can still attack you */
         case 3: /* absolutely no movement */
             /* vault guard might have vanished */
-            if (mtmp->isgd && (mtmp->mhp < 1 || mtmp->mx == 0))
+            if (mtmp->isgd && (DEADMONSTER(mtmp) || mtmp->mx == 0))
                 return 1; /* behave as if it died */
             /* During hallucination, monster appearance should
              * still change - even if it doesn't move.
@@ -716,30 +733,48 @@ struct monst *mtmp;
 xchar nix,niy;
 {
     boolean can_tunnel = 0;
-    struct obj *mw_tmp;
+    struct obj *mw_tmp = MON_WEP(mtmp);
 
     if (!Is_rogue_level(&u.uz))
         can_tunnel = tunnels(mtmp->data);
 
-    if (can_tunnel && needspick(mtmp->data)
-        && mtmp->weapon_check != NO_WEAPON_WANTED
-        && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
-            || closed_door(nix, niy))) {
+    if (can_tunnel && needspick(mtmp->data) && !mwelded(mw_tmp)
+        && (may_dig(nix, niy) || closed_door(nix, niy))) {
+        /* may_dig() is either IS_STWALL or IS_TREE */
         if (closed_door(nix, niy)) {
-            if (!(mw_tmp = MON_WEP(mtmp))
+            if (!mw_tmp
                 || !is_pick(mw_tmp)
                 || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_OR_AXE;
         } else if (IS_TREE(levl[nix][niy].typ)) {
             if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_AXE;
-        } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
-            mtmp->weapon_check = NEED_PICK_AXE;
+        } else if (IS_STWALL(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp))
+                mtmp->weapon_check = NEED_PICK_AXE;
         }
         if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
             return TRUE;
     }
     return FALSE;
+}
+
+/* returns the number of walls in the four cardinal directions that could
+   hold up a web */
+STATIC_OVL int
+count_webbing_walls(x, y)
+xchar x, y;
+{
+#define holds_up_web(X, Y) ((!isok((X), (Y))                              \
+                             || IS_ROCK(levl[X][Y].typ)                   \
+                             || (levl[X][Y].typ == STAIRS                 \
+                                 && (X) == xupstair && (Y) == yupstair)   \
+                             || (levl[X][Y].typ == LADDER                 \
+                                 && (X) == xupladder && (Y) == yupladder) \
+                             || levl[X][Y].typ == IRONBARS) ? 1 : 0)
+    return (holds_up_web(x, y - 1) + holds_up_web(x + 1, y)
+            + holds_up_web(x, y + 1) + holds_up_web(x - 1, y));
+#undef holds_up_web
 }
 
 /* Return values:
@@ -1351,7 +1386,8 @@ postmov:
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                if (may_dig(mtmp->mx, mtmp->my)
+                /* 3.6.2: was using may_dig() but it doesn't handle bars */
+                if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
                     && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
                     if (canseemon(mtmp))
                         pline("%s eats through the iron bars.", Monnam(mtmp));
@@ -1433,6 +1469,27 @@ postmov:
                 newsym(mtmp->mx, mtmp->my);
                 if (mtmp->wormno)
                     see_wsegs(mtmp);
+            }
+        }
+
+        /* maybe spin a web -- this needs work; if the spider is far away,
+           it might spin a lot of webs before hero encounters it */
+        if (webmaker(ptr) && !mtmp->mspec_used && !t_at(mtmp->mx, mtmp->my)) {
+            struct trap *trap;
+            int prob = ((ptr == &mons[PM_GIANT_SPIDER]) ? 15 : 5)
+                      * (count_webbing_walls(mtmp->mx, mtmp->my) + 1);
+
+            if (rn2(1000) < prob
+                && (trap = maketrap(mtmp->mx, mtmp->my, WEB)) != 0) {
+                mtmp->mspec_used = d(4, 4); /* 4..16 */
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    char mbuf[BUFSZ];
+
+                    Strcpy(mbuf,
+                           canspotmon(mtmp) ? y_monnam(mtmp) : something);
+                    pline("%s spins a web.", upstart(mbuf));
+                    trap->tseen = 1;
+                }
             }
         }
 

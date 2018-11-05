@@ -104,7 +104,7 @@ preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
                of the tile graphics, but uses more memory.
 
 Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
-vt_tiledata    insert extra data escae code markers into output   [FALSE]
+vt_tiledata    insert extra data escape code markers into output  [FALSE]
 
 Any Boolean option can be negated by prefixing it with a '!' or 'no'.
 
@@ -159,7 +159,7 @@ paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
               pray    -- y to confirm an attempt to pray; on by default
               Remove  -- always pick from inventory for 'R' and 'T' even when
               wearing just one applicable item to remove or take off
-pickup_burden when you pick up an item that exceeds this encumberance   [S]
+pickup_burden when you pick up an item that exceeds this encumbrance    [S]
               level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
               or overLoaded), you will be asked if you want to continue.
 pickup_types  a list of default symbols for kinds of objects to          []

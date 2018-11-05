@@ -69,6 +69,20 @@ struct DisplayDesc {
 
 #endif /* WINDOW_STRUCTS */
 
+#ifdef STATUS_HILITES
+struct tty_status_fields {
+    int idx;
+    int color;
+    int attr;
+    int x, y;
+    size_t lth;
+    boolean valid;
+    boolean dirty;
+    boolean redraw;
+    boolean last_on_row;
+};
+#endif
+
 #define MAXWIN 20 /* maximum number of windows, cop-out */
 
 /* tty dependent window types */
@@ -215,6 +229,8 @@ E short FDECL(set_tty_font_name, (winid, char *));
 #endif
 E char *NDECL(tty_get_color_string);
 #endif
+E void FDECL(tty_status_enablefield,
+             (int, const char *, const char *, BOOLEAN_P));
 E void NDECL(tty_status_init);
 E void FDECL(tty_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1519598527 2018/02/25 22:42:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1526769961 2018/05/19 22:46:01 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -215,12 +215,9 @@ int rx, ry, *resp;
             /* (most corpses don't retain the monster's sex, so
                we're usually forced to use generic pronoun here) */
             if (mtmp) {
-                mptr = &mons[mtmp->mnum];
-                /* can't use mhe() here; it calls pronoun_gender() which
-                   expects monster to be on the map (visibility check) */
-                if ((humanoid(mptr) || (mptr->geno & G_UNIQ)
-                     || type_is_pname(mptr)) && !is_neuter(mptr))
-                    gndr = (int) mtmp->female;
+                mptr = mtmp->data = &mons[mtmp->mnum];
+                /* TRUE: override visibility check--it's not on the map */
+                gndr = pronoun_gender(mtmp, TRUE);
             } else {
                 mptr = &mons[corpse->corpsenm];
                 if (is_female(mptr))
@@ -767,7 +764,7 @@ register xchar x, y;
                        corpse less likely to remain tame after revival */
                     xkilled(mtmp, XKILL_NOMSG);
                     /* life-saving doesn't ordinarily reset this */
-                    if (mtmp->mhp > 0)
+                    if (!DEADMONSTER(mtmp))
                         u.uconduct.killer = save_pacifism;
                 } else {
                     pline("%s is choked by the leash!", Monnam(mtmp));
@@ -956,9 +953,20 @@ struct obj *obj;
             (void) rloc(mtmp, TRUE);
     } else if (!is_unicorn(mtmp->data) && !humanoid(mtmp->data)
                && (!mtmp->minvis || perceives(mtmp->data)) && rn2(5)) {
-        if (vis)
-            pline("%s is frightened by its reflection.", Monnam(mtmp));
-        monflee(mtmp, d(2, 4), FALSE, FALSE);
+        boolean do_react = TRUE;
+
+        if (mtmp->mfrozen) {
+            if (vis)
+                You("discern no obvious reaction from %s.", mon_nam(mtmp));
+            else
+                You_feel("a bit silly gesturing the mirror in that direction.");
+            do_react = FALSE;
+        }
+        if (do_react) {
+            if (vis)
+                pline("%s is frightened by its reflection.", Monnam(mtmp));
+            monflee(mtmp, d(2, 4), FALSE, FALSE);
+        }
     } else if (!Blind) {
         if (mtmp->minvis && !See_invisible)
             ;
@@ -1744,7 +1752,7 @@ int magic; /* 0=Physical, otherwise skill level */
                 break;
             case TT_LAVA:
                 You("pull yourself above the %s!", hliquid("lava"));
-                u.utrap = 0;
+                reset_utrap(TRUE);
                 return 1;
             case TT_BURIEDBALL:
             case TT_INFLOOR:
@@ -2236,16 +2244,19 @@ struct obj **optr;
     /* Passing FALSE arg here will result in messages displayed */
     if (!figurine_location_checks(obj, &cc, FALSE))
         return;
-    You("%s and it transforms.",
+    You("%s and it %stransforms.",
         (u.dx || u.dy) ? "set the figurine beside you"
                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
                           || is_pool(cc.x, cc.y))
                              ? "release the figurine"
                              : (u.dz < 0 ? "toss the figurine into the air"
-                                         : "set the figurine on the ground"));
+                                         : "set the figurine on the ground"),
+        Blind ? "supposedly " : "");
     (void) make_familiar(obj, cc.x, cc.y, FALSE);
     (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     useup(obj);
+    if (Blind)
+        map_invisible(cc.x, cc.y);
     *optr = 0;
 }
 
@@ -2727,7 +2738,7 @@ struct obj *obj;
                 if (!mtmp || enexto(&cc, rx, ry, youmonst.data)) {
                     You("yank yourself out of the pit!");
                     teleds(cc.x, cc.y, TRUE);
-                    u.utrap = 0;
+                    reset_utrap(TRUE);
                     vision_full_recalc = 1;
                 }
             } else {
@@ -2865,21 +2876,41 @@ coord *pos;
 int min_range, max_range;
 {
     struct monst *mtmp;
-    struct monst *selmon = (struct monst *) 0;
+    coord mpos;
+    boolean impaired;
+    int x, y, lo_x, hi_x, lo_y, hi_y, rt, glyph;
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame
-            && cansee(mtmp->mx, mtmp->my)
-            && distu(mtmp->mx, mtmp->my) <= max_range
-            && distu(mtmp->mx, mtmp->my) >= min_range) {
-            if (selmon)
-                return FALSE;
-            selmon = mtmp;
+    if (Blind)
+        return FALSE; /* must be able to see target location */
+    impaired = (Confusion || Stunned || Hallucination);
+    mpos.x = mpos.y = 0; /* no candidate location yet */
+    rt = isqrt(max_range);
+    lo_x = max(u.ux - rt, 1), hi_x = min(u.ux + rt, COLNO - 1);
+    lo_y = max(u.uy - rt, 0), hi_y = min(u.uy + rt, ROWNO - 1);
+    for (x = lo_x; x <= hi_x; ++x) {
+        for (y = lo_y; y <= hi_y; ++y) {
+            if (distu(x, y) < min_range || distu(x, y) > max_range
+                || !isok(x, y) || !cansee(x, y))
+                continue;
+            glyph = glyph_at(x, y);
+            if (!impaired
+                && glyph_is_monster(glyph)
+                && (mtmp = m_at(x, y)) != 0
+                && (mtmp->mtame || (mtmp->mpeaceful && flags.confirm)))
+                continue;
+            if (glyph_is_monster(glyph)
+                || glyph_is_warning(glyph)
+                || glyph_is_invisible(glyph)
+                || (glyph_is_statue(glyph) && impaired)) {
+                if (mpos.x)
+                    return FALSE; /* more than one candidate location */
+                mpos.x = x, mpos.y = y;
+            }
         }
-    if (!selmon)
-        return FALSE;
-    pos->x = selmon->mx;
-    pos->y = selmon->my;
+    }
+    if (!mpos.x)
+        return FALSE; /* no candidate location */
+    *pos = mpos;
     return TRUE;
 }
 
@@ -2887,8 +2918,8 @@ static int polearm_range_min = -1;
 static int polearm_range_max = -1;
 
 STATIC_OVL boolean
-get_valid_polearm_position(x,y)
-int x,y;
+get_valid_polearm_position(x, y)
+int x, y;
 {
     return (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
             && distu(x, y) >= polearm_range_min
@@ -2998,7 +3029,7 @@ struct obj *obj;
         return res;
     }
 
-    context.polearm.hitmon = NULL;
+    context.polearm.hitmon = (struct monst *) 0;
     /* Attack the monster there */
     bhitpos = cc;
     if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *) 0) {

@@ -18,7 +18,7 @@ extern "C" {
 #undef max
 
 #include <QtGui/QtGui>
-#include <QStringList>
+#include <QtCore/QStringList>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #include <QtMultimedia/QSound>
@@ -350,9 +350,9 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
 	    complain = must_exist;
 	} else {
 	    while (dlb_fgets(buf, BUFSZ, f)) {
-		if ((cr = index(buf, '\n')) != 0) *cr = 0;
+		if ((cr = strchr(buf, '\n')) != 0) *cr = 0;
 #ifdef MSDOS
-		if ((cr = index(buf, '\r')) != 0) *cr = 0;
+		if ((cr = strchr(buf, '\r')) != 0) *cr = 0;
 #endif
 		window->PutStr(ATR_NONE, tabexpand(buf));
 	    }
@@ -401,7 +401,7 @@ void NetHackQtBind::qt_update_inventory()
     if (main)
 	main->updateInventory();
     /* doesn't work yet
-    if (program_state.something_worth_saving && flags.perm_invent)
+    if (program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, false);
     */
 }
@@ -508,8 +508,8 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
         message = QString("%1 [%2] ").arg(question, choicebuf);
         if (def) message += QString("(%1) ").arg(QChar(def));
         // escape maps to 'q' or 'n' or default, in that order
-        yn_esc_map = (index(choices, 'q') ? 'q' :
-                      (index(choices, 'n') ? 'n' : def));
+        yn_esc_map = (strchr(choices, 'q') ? 'q' :
+                      (strchr(choices, 'n') ? 'n' : def));
     } else {
         message = question;
     }
@@ -542,7 +542,7 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
-	    } else if (choices && !index(choices,ch)) {
+	    } else if (choices && !strchr(choices,ch)) {
 		if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
 		    result=def;
 		} else {
@@ -565,6 +565,8 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
         else if (def)
             message += QString(" %1").arg(def);
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
+
+        return ret;
     }
 }
 
@@ -798,6 +800,7 @@ struct window_procs Qt_procs = {
     genl_can_suspend_yes,
 };
 
+#ifndef WIN32
 extern "C" void play_usersound(const char* filename, int volume)
 {
 #ifdef USER_SOUNDS
@@ -806,3 +809,4 @@ extern "C" void play_usersound(const char* filename, int volume)
 #endif
 #endif
 }
+#endif

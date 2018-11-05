@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1450318588 2015/12/17 02:16:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1528332336 2018/06/07 00:45:36 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -361,7 +361,8 @@ boolean credit_hero;
             if (credit_hero)
                 exercise(A_WIS, TRUE);
         }
-        if (moves > 1L)
+        /* moves==1L => initial inventory, gameover => final disclosure */
+        if (moves > 1L && !program_state.gameover)
             update_inventory();
     }
 }

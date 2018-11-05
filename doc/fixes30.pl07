@@ -1,0 +1,35 @@
+Sorry this one took so long.  We think just about every computer and network
+we depend on has broken sometime in last few weeks.
+
+Work on the PC overlay mechanism continues, with Kevin Smolkowski joining
+Pierre Martineau, Stephen Spackman, and Norm Meluch.  Breaking each .c file
+into separately-swapped pieces should help performance considerably.  More
+changes to the overlay manager are brewing, and will be distributed in the
+unfortunately required Patch 8.
+
+The Amiga port was brought up to date and extended by Richard Addison,
+Jochen Erwied, Mark Gooderum, Ken Lorber, Greg Olson, Mike Passaretti, and
+Gregg Wonderly.
+
+The Macintosh port was futher extended by Kevin Sitze, Andy Swanson, Jon
+Watte, and Tom West, working with Johnny Lee.
+
+Support for recent versions of HP-UX was added by Steve Creps.
+
+We believe all major various platforms and compilers are working properly now.
+
+
+In other news, '/' now distinguishes among monsters of a given class, named
+objects (including artifacts) are handled better, an extended version command
+gives compilation options, monster colors should show up better, more
+occupations are being stopped appropriately, unconscious and non-animal
+monsters are handled better, and the eating behavior and ending messages have
+been overhauled again.
+
+Various display nuisances have been fixed and the "worm segment", "nymph
+freeinv", and combined nymph/succubus/polymorphing bugs are gone, along with
+a large number of less notorious problems.  A few more fun loopholes no longer
+exist.
+
+In all, we think this is the stablest and most balanced version yet.
+

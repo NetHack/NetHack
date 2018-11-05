@@ -1,0 +1,49 @@
+As things have mostly settled down to rediscoveries of fixed bugs, 
+it is time to distribute the first batch of patches and ports.
+
+
+NOTICE:  The diffs comprising this update batch were cut on NetHack 3.0
+         release version.  If you modified any of your files, store them
+         and replace with release version files before applying this kit.
+
+
+Changes made:
+
+Eric Smith provided a port to the Atari using gcc; the older Lattice C 
+vestiges moved to different preprocessor options and remain untested.
+
+Ralf Brown adapted NetHack to the Andrew File System.
+
+The fruit naming code was enclosed in a new option, TUTTI_FRUTTI, which 
+allows another 3K of object code to be defined out.
+
+Various tweaks, rewritings, and reshufflings to get the code to get along
+with various compilers and preprocessors, including Microport SysV/AT 2.4,
+Gould UTX/32, HP-UX, and of course Turbo C.
+
+Various suggested changes in behavior, none major.
+
+Distribution of termcap.uu, the uuencoded termcap.arc for PCs that was
+previously distributed with NetHack 2.2 and 2.3.
+
+Explicit instructions to short-circuit common installation mistakes.
+
+
+Bug fixes:
+
+Various segmentation faults no longer exist, including the popular dropping
+items in shops.
+
+Vortices can no longer disappear through solid walls when they disgorge you
+over a moat.
+
+You now get credit for food when engulfing monsters.
+
+A few more spelling errors that fell through the cracks.
+
+
+Suggestion for overflowing compiler tables:  follow the SysV-AT trail in the
+src Makefile with -DDUMB and DUMB.Setup.  It appears that many SVR2 3Bs will
+need to do this.
+
+

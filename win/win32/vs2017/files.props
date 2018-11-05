@@ -8,8 +8,6 @@
     <Defs Include = "$(IncDir)onames.h"/>
 	<!-- -p -->
     <Defs Include = "$(IncDir)pm.h"/>
-	<!-- -m -->
-    <Defs Include = "$(SrcDir)monstr.c"/>
 	<!-- -z -->
     <Defs Include = "$(IncDir)vis_tab.h"/>
     <Defs Include = "$(SrcDir)vis_tab.c"/>
@@ -218,6 +216,7 @@
     <DlbList Include = "$(DatDir)porthelp"/>
     <DlbList Include = "$(DatDir)hh"/>
     <DlbList Include = "$(DatDir)cmdhelp"/>
+    <DlbList Include = "$(DatDir)keyhelp"/>
     <DlbList Include = "$(DatDir)history"/>
     <DlbList Include = "$(DatDir)opthelp"/>
     <DlbList Include = "$(DatDir)wizhelp"/>

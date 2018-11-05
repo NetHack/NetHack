@@ -251,7 +251,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         /* If we just used the permanent inventory window to pick something,
          * set the menu back to its display inventory state.
          */
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
             && how != PICK_NONE) {
             data->menu.prompt[0] = '\0';
             SetMenuListType(hWnd, PICK_NONE);
@@ -322,7 +322,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetWindowRect(hWnd, &rt);
         ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
         ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
             mswin_update_window_placement(NHW_INVEN, &rt);
         else
             mswin_update_window_placement(NHW_MENU, &rt);
@@ -334,7 +334,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetWindowRect(hWnd, &rt);
         ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
         ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
-        if (flags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
+        if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN)
             mswin_update_window_placement(NHW_INVEN, &rt);
         else
             mswin_update_window_placement(NHW_MENU, &rt);
@@ -1208,6 +1208,21 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
+    is_accelerator = FALSE;
+    for (i = 0; i < data->menu.size; i++) {
+        if (data->menu.items[i].accelerator == ch) {
+            is_accelerator = TRUE;
+            break;
+        }
+    }
+
+    /* Don't use switch if input matched an accelerator.  Sometimes
+     * accelerators can conflict with menu actions.  For example, when
+     * engraving the extra choice of using fingers matches MENU_UNSELECT_ALL.
+     */
+    if (is_accelerator)
+        goto accelerator;
+
     switch (ch) {
     case MENU_FIRST_PAGE:
         i = 0;
@@ -1402,6 +1417,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         }
     } break;
 
+    accelerator:
     default:
         if (strchr(data->menu.gacc, ch)
             && !(ch == '0' && data->menu.counting)) {
@@ -1448,14 +1464,6 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                 }
             }
             return -2;
-        }
-
-        is_accelerator = FALSE;
-        for (i = 0; i < data->menu.size; i++) {
-            if (data->menu.items[i].accelerator == ch) {
-                is_accelerator = TRUE;
-                break;
-            }
         }
 
         if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')

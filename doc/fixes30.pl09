@@ -1,0 +1,11 @@
+Patchlevel 9 is in fact an amendment patch to Patchlevel 8.  It
+contains fixes to some deadly bugs discovered thus far in the Pl8
+code.  
+
+Among the bugs fixed are a 0 dereference bug in the Amiga code, a
+bug in the tins code, a bug in the inventory weight code, a level
+files bug in the Mac code, an ST display bug, a bug in the maze's
+bones level, a bug with chest traps, a bug in the restoring code, a
+vault guard bug, a PC collapsing dungeon bug, and other more minor
+bugs. 
+

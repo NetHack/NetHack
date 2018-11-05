@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1495232365 2017/05/19 22:19:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1526933747 2018/05/21 20:15:47 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,7 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 #endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
+STATIC_DCL void NDECL(def_wait_synch);
 
 #ifdef DUMPLOG
 STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
@@ -63,7 +64,8 @@ STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
 STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
 STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
 STATIC_DCL void FDECL(dump_start_menu, (winid));
-STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
+                                      CHAR_P, int, const char *, BOOLEAN_P));
 STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
 STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
 STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
@@ -144,14 +146,22 @@ static struct winlink *chain = 0;
 static struct winlink *
 wl_new()
 {
-    return calloc(1, sizeof(struct winlink));
+    struct winlink *wl = (struct winlink *) alloc(sizeof *wl);
+
+    wl->nextlink = 0;
+    wl->wincp = 0;
+    wl->linkdata = 0;
+
+    return wl;
 }
+
 static void
 wl_addhead(struct winlink *wl)
 {
     wl->nextlink = chain;
     chain = wl;
 }
+
 static void
 wl_addtail(struct winlink *wl)
 {
@@ -189,6 +199,22 @@ def_raw_print(s)
 const char *s;
 {
     puts(s);
+}
+
+STATIC_OVL
+void
+def_wait_synch(VOID_ARGS)
+{
+    /* Config file error handling routines
+     * call wait_sync() without checking to
+     * see if it actually has a value,
+     * leading to spectacular violations
+     * when you try to execute address zero.
+     * The existence of this allows early
+     * processing to have something to execute
+     * even though it essentially does nothing
+     */
+     return;
 }
 
 #ifdef WINCHAIN
@@ -232,27 +258,34 @@ const char *s;
 
     if (!windowprocs.win_raw_print)
         windowprocs.win_raw_print = def_raw_print;
+    if (!windowprocs.win_wait_synch)
+        /* early config file error processing routines call this */
+        windowprocs.win_wait_synch = def_wait_synch;
 
     if (!winchoices[0].procs) {
         raw_printf("No window types?");
-        exit(EXIT_FAILURE);
+        nh_terminate(EXIT_FAILURE);
     }
     if (!winchoices[1].procs) {
-        config_error_add("Window type %s not recognized.  The only choice is: %s",
-                   s, winchoices[0].procs->name);
+        config_error_add(
+                     "Window type %s not recognized.  The only choice is: %s",
+                         s, winchoices[0].procs->name);
     } else {
         char buf[BUFSZ];
         boolean first = TRUE;
+
         buf[0] = '\0';
         for (i = 0; winchoices[i].procs; i++) {
             if ('+' == winchoices[i].procs->name[0])
                 continue;
             if ('-' == winchoices[i].procs->name[0])
                 continue;
-            Sprintf(eos(buf), "%s%s", first ? "" : ",", winchoices[i].procs->name);
+            Sprintf(eos(buf), "%s%s",
+                    first ? "" : ", ", winchoices[i].procs->name);
             first = FALSE;
         }
-        config_error_add("Window type %s not recognized.  Choices are: %s", s, buf);
+        config_error_add("Window type %s not recognized.  Choices are:  %s",
+                         s, buf);
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
@@ -271,6 +304,7 @@ const char *s;
             continue;
         if (!strcmpi(s, winchoices[i].procs->name)) {
             struct winlink *p = wl_new();
+
             p->wincp = &winchoices[i];
             wl_addtail(p);
             /* NB: The ini_routine() will be called during commit. */
@@ -287,7 +321,7 @@ const char *s;
         raw_printf("        %s", winchoices[i].procs->name);
     }
 
-    exit(EXIT_FAILURE);
+    nh_terminate(EXIT_FAILURE);
 }
 
 void
@@ -474,7 +508,8 @@ static short FDECL(hup_set_font_name, (winid, char *));
 #endif
 static char *NDECL(hup_get_color_string);
 #endif /* CHANGE_COLOR */
-static void FDECL(hup_status_update, (int, genericptr_t, int, int, int, unsigned long *));
+static void FDECL(hup_status_update, (int, genericptr_t, int, int, int,
+                                      unsigned long *));
 
 static int NDECL(hup_int_ndecl);
 static void NDECL(hup_void_ndecl);
@@ -910,7 +945,7 @@ unsigned long *colormasks UNUSED;
        is buffered so final BL_FLUSH is needed to produce output) */
     windowprocs.wincap2 |= WC2_FLUSH_STATUS;
 
-    if (idx != BL_FLUSH) {
+    if (idx >= 0) {
         if (!status_activefields[idx])
             return;
         switch (idx) {
@@ -952,11 +987,20 @@ unsigned long *colormasks UNUSED;
             break;
         }
         return; /* processed one field other than BL_FLUSH */
-    } /* (idx != BL_FLUSH) */
+    } /* (idx >= 0, thus not BL_FLUSH, BL_RESET, BL_CHARACTERISTICS) */
+
+    /* does BL_RESET require any specific code to ensure all fields ? */
+
+    if (!(idx == BL_FLUSH || idx == BL_RESET))
+        return;
 
     /* We've received BL_FLUSH; time to output the gathered data */
     nb = newbot1;
     *nb = '\0';
+    /* BL_FLUSH is the only pseudo-index value we need to check for
+       in the loop below because it is the only entry used to pad the
+       end of the fieldorder array. We could stop on any
+       negative (illegal) index, but this should be fine */
     for (i = 0; (idx1 = fieldorder[0][i]) != BL_FLUSH; ++i) {
         if (status_activefields[idx1])
             Strcpy(nb = eos(nb), status_vals[idx1]);
@@ -1091,7 +1135,7 @@ char *buf;
             case 'D': /* current time, YYYYMMDDhhmmss */
                 Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
                 break;
-            case 'v': /* version, eg. "3.6.1-0" */
+            case 'v': /* version, eg. "3.6.2-0" */
                 Sprintf(tmpbuf, "%s", version_string(verbuf));
                 break;
             case 'u': /* UID */

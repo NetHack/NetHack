@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1457079197 2016/03/04 08:13:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1539892610 2018/10/18 19:56:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,6 +71,8 @@ static const char extended_command_translations[] = "#override\n\
      <Key>Right: scroll(6)\n\
      <Key>Up: scroll(8)\n\
      <Key>Down: scroll(2)\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)\n\
      <Key>: ec_key()";
 
 static const char player_select_translations[] = "#override\n\
@@ -81,6 +83,10 @@ static const char gend_select_translations[] = "#override\n\
      <Key>: gend_key()";
 static const char algn_select_translations[] = "#override\n\
      <Key>: algn_key()";
+
+static const char popup_entry_translations[] = "#override\n\
+     <Btn4Down>: scroll(8)\n\
+     <Btn5Down>: scroll(2)";
 
 static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
@@ -114,8 +120,7 @@ XtPointer x;
     return (long)x;
 }
 
-/* Player Selection --------------------------------------------------------
- */
+/* Player Selection ------------------------------------------------------- */
 /* ARGSUSED */
 static void
 ps_quit(w, client_data, call_data)
@@ -1237,12 +1242,14 @@ X11_player_selection_dialog()
     XtRealizeWidget(popup);
     X11_player_selection_randomize();
 
-    ps_selected = -1;
-
-    nh_XtPopup(popup, (int) XtGrabExclusive, form);
-
-    /* The callback will enable the event loop exit. */
-    (void) x_event(EXIT_ON_EXIT);
+    if (flags.randomall) {
+        plsel_dialog_acceptvalues();
+    } else {
+        ps_selected = -1;
+        nh_XtPopup(popup, (int) XtGrabExclusive, form);
+        /* The callback will enable the event loop exit. */
+        (void) x_event(EXIT_ON_EXIT);
+    }
 
     nh_XtPopdown(popup);
     XtDestroyWidget(popup);
@@ -1266,8 +1273,7 @@ X11_player_selection_dialog()
     }
 }
 
-/* Global functions =========================================================
- */
+/* Global functions ======================================================== */
 void
 X11_player_selection_prompts()
 {
@@ -1603,11 +1609,9 @@ release_extended_cmds()
     }
 }
 
-/* End global functions =====================================================
- */
+/* End global functions =================================================== */
 
-/* Extended Command --------------------------------------------------------
- */
+/* Extended Command ------------------------------------------------------- */
 /* ARGSUSED */
 static void
 extend_select(w, client_data, call_data)
@@ -1948,8 +1952,7 @@ init_extended_commands_popup()
     free((char *) command_list);
 }
 
-/* -------------------------------------------------------------------------
- */
+/* ------------------------------------------------------------------------ */
 
 /*
  * Create a popup widget of the following form:
@@ -1987,35 +1990,55 @@ Widget **command_widgets;
 XtCallbackProc name_callback;
 Widget *formp; /* return */
 {
-    Widget popup, form, label, above, left, right, view;
+    Widget popup, popform, form, label, above, left, right, view;
     Widget *commands, *curr;
     int i;
-    Arg args[8];
+    Arg args[12];
     Cardinal num_args;
     Dimension width, other_width, max_width, border_width,
               height, cumulative_height, screen_height;
     int distance, skip;
+    char btnname[BUFSZ];
 
     commands = (Widget *) alloc((unsigned) num_names * sizeof (Widget));
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     popup = XtCreatePopupShell(popup_name, transientShellWidgetClass,
                                toplevel, args, num_args);
     XtOverrideTranslations(
         popup, XtParseTranslationTable("<Message>WM_PROTOCOLS: ec_delete()"));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNforceBars, False); num_args++;
-    XtSetArg(args[num_args], XtNallowVert, True); num_args++;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(popup_translations)); num_args++;
-    view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popup,
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
+    popform = XtCreateManagedWidget("topmenuform", formWidgetClass, popup,
+                                    args, num_args);
+
+
+    num_args = 0;
+    XtSetArg(args[num_args], XtNforceBars, False); num_args++;
+    XtSetArg(args[num_args], XtNallowVert, True); num_args++;
+    /*XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;*/
+    XtSetArg(args[num_args], nhStr(XtNuseBottom), True); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNuseRight), True); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(popup_translations)); num_args++;
+    view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popform,
                                  args, num_args);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(popup_translations)); num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
     *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
@@ -2050,11 +2073,13 @@ Widget *formp; /* return */
      */
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel), left_name); num_args++;
 #if 0
     XtSetArg(args[num_args], nhStr(XtNshapeStyle),
                               XmuShapeRoundedRectangle); num_args++;
 #endif
-    left = XtCreateManagedWidget(left_name, commandWidgetClass, form, args,
+    Sprintf(btnname, "btn_%s", left_name);
+    left = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                  num_args);
     XtAddCallback(left, XtNcallback, left_callback, (XtPointer) 0);
     skip = (distance < 4) ? 8 : 2 * distance;
@@ -2071,11 +2096,13 @@ Widget *formp; /* return */
     XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
     XtSetArg(args[num_args], nhStr(XtNhorizDistance), skip); num_args++;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNlabel), right_name); num_args++;
 #if 0
     XtSetArg(args[num_args], nhStr(XtNshapeStyle),
                               XmuShapeRoundedRectangle); num_args++;
 #endif
-    right = XtCreateManagedWidget(right_name, commandWidgetClass, form, args,
+    Sprintf(btnname, "btn_%s", right_name);
+    right = XtCreateManagedWidget(btnname, commandWidgetClass, form, args,
                                   num_args);
     XtAddCallback(right, XtNcallback, right_callback, (XtPointer) 0);
 
@@ -2089,6 +2116,8 @@ Widget *formp; /* return */
         if (!widget_names[i])
             continue;
         num_args = 0;
+        XtSetArg(args[num_args], XtNtranslations,
+                 XtParseTranslationTable(popup_entry_translations)); num_args++;
         XtSetArg(args[num_args], nhStr(XtNfromVert), above); num_args++;
         if (above == left) {
             /* if first, we are farther apart */

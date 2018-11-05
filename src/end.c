@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1512803167 2017/12/09 07:06:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1540767809 2018/10/28 23:03:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -748,7 +748,7 @@ time_t when; /* date+time at end of game */
     dump_plines();
     putstr(0, 0, "");
     putstr(0, 0, "Inventory:");
-    display_inventory((char *) 0, TRUE);
+    (void) display_inventory((char *) 0, TRUE);
     container_contents(invent, TRUE, TRUE, FALSE);
     enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
                   (how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
@@ -851,7 +851,8 @@ int how;
     if (u.uhpmax < uhpmin)
         u.uhpmax = uhpmin;
     u.uhp = u.uhpmax;
-    u.uswldtim = 0;
+    if (Upolyd) /* Unchanging, or death which bypasses losing hit points */
+        u.mh = u.mhmax;
     if (u.uhunger < 500) {
         u.uhunger = 500;
         newuhs(FALSE);
@@ -870,13 +871,23 @@ int how;
     else
         multi = -1;
     if (u.utrap && u.utraptype == TT_LAVA)
-        u.utrap = 0;
+        reset_utrap(FALSE);
     context.botl = 1;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();
     if (!context.mon_moving)
         endmultishot(FALSE);
+    if (u.uswallow) {
+        /* might drop hero onto a trap that kills her all over again */
+        expels(u.ustuck, u.ustuck->data, TRUE);
+    } else if (u.ustuck) {
+        if (Upolyd && sticks(youmonst.data))
+            You("release %s.", mon_nam(u.ustuck));
+        else
+            pline("%s releases you.", Monnam(u.ustuck));
+        unstuck(u.ustuck);
+    }
 }
 
 /*
@@ -985,7 +996,7 @@ winid endwin;
             if (counting) {
                 nowrap_add(u.urexp, points);
             } else {
-                makeknown(otmp->otyp);
+                discover_object(otmp->otyp, TRUE, FALSE);
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
@@ -1006,13 +1017,16 @@ void
 done(how)
 int how;
 {
+    boolean survive = FALSE;
+
     if (how == TRICKED) {
         if (killer.name[0]) {
             paniclog("trickery", killer.name);
-            killer.name[0] = 0;
+            killer.name[0] = '\0';
         }
         if (wizard) {
             You("are a very tricky wizard, it seems.");
+            killer.format = KILLED_BY_AN; /* reset to 0 */
             return;
         }
     }
@@ -1037,8 +1051,17 @@ int how;
     if (!killer.name[0] || how >= PANICKED)
         Strcpy(killer.name, deaths[how]);
 
-    if (how < PANICKED)
+    if (how < PANICKED) {
         u.umortality++;
+        /* in case caller hasn't already done this */
+        if (u.uhp > 0 || (Upolyd && u.mh > 0)) {
+            /* for deaths not triggered by loss of hit points, force
+               current HP to zero (0 HP when turning into green slime
+               is iffy but we don't have much choice--that is fatal) */
+            u.uhp = u.mh = 0;
+            context.botl = 1;
+        }
+    }
     if (Lifesaved && (how <= GENOCIDED)) {
         pline("But wait...");
         makeknown(AMULET_OF_LIFE_SAVING);
@@ -1055,21 +1078,25 @@ int how;
         if (how == GENOCIDED) {
             pline("Unfortunately you are still genocided...");
         } else {
-            killer.name[0] = 0;
-            killer.format = 0;
             livelog_write_string(LL_LIFESAVE, "averted death");
-            return;
+            survive = TRUE;
         }
     }
-    if ((wizard || discover) && (how <= GENOCIDED)
+    /* explore and wizard modes offer player the option to keep playing */
+    if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
         savelife(how);
-        killer.name[0] = 0;
-        killer.format = 0;
+        survive = TRUE;
+    }
+
+    if (survive) {
+        killer.name[0] = '\0';
+        killer.format = KILLED_BY_AN; /* reset to 0 */
         return;
     }
     really_done(how);
+    /*NOTREACHED*/
 }
 
 /* separated from done() in order to specify the __noreturn__ attribute */
@@ -1179,7 +1206,7 @@ int how;
          * it in both of those places.
          */
         for (obj = invent; obj; obj = obj->nobj) {
-            makeknown(obj->otyp);
+            discover_object(obj->otyp, TRUE, FALSE);
             obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
             if (Is_container(obj) || obj->otyp == STATUE)
                 obj->cknown = obj->lknown = 1;
@@ -1281,7 +1308,7 @@ int how;
         if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
             /* precaution in case any late update_inventory() calls occur */
-            flags.perm_invent = 0;
+            iflags.perm_invent = 0;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
@@ -1401,7 +1428,7 @@ int how;
                     continue;
                 if (objects[typ].oc_class != GEM_CLASS || typ <= LAST_GEM) {
                     otmp = mksobj(typ, FALSE, FALSE);
-                    makeknown(otmp->otyp);
+                    discover_object(otmp->otyp, TRUE, FALSE);
                     otmp->known = 1;  /* for fake amulets */
                     otmp->dknown = 1; /* seen it (blindness fix) */
                     if (has_oname(otmp))
@@ -1499,18 +1526,20 @@ boolean identified, all_containers, reportempty;
                 continue; /* wrong type of container */
             } else if (box->cobj) {
                 winid tmpwin = create_nhwindow(NHW_MENU);
+                Loot *sortedcobj, *srtc;
+                unsigned sortflags;
 
-                sortloot(&box->cobj,
-                         (((flags.sortloot == 'l' || flags.sortloot == 'f')
-                           ? SORTLOOT_LOOT : 0)
-                          | (flags.sortpack ? SORTLOOT_PACK : 0)),
-                         FALSE);
                 Sprintf(buf, "Contents of %s:", the(xname(box)));
                 putstr(tmpwin, 0, buf);
                 putstr(tmpwin, 0, "");
-                for (obj = box->cobj; obj; obj = obj->nobj) {
+                sortflags = (((flags.sortloot == 'l' || flags.sortloot == 'f')
+                              ? SORTLOOT_LOOT : 0)
+                             | (flags.sortpack ? SORTLOOT_PACK : 0));
+                sortedcobj = sortloot(&box->cobj, sortflags, FALSE,
+                                      (boolean FDECL((*), (OBJ_P))) 0);
+                for (srtc = sortedcobj; ((obj = srtc->obj) != 0); ++srtc) {
                     if (identified) {
-                        makeknown(obj->otyp);
+                        discover_object(obj->otyp, TRUE, FALSE);
                         obj->known = obj->bknown = obj->dknown
                             = obj->rknown = 1;
                         if (Is_container(obj) || obj->otyp == STATUE)
@@ -1518,6 +1547,7 @@ boolean identified, all_containers, reportempty;
                     }
                     putstr(tmpwin, 0, doname(obj));
                 }
+                unsortloot(&sortedcobj);
                 if (cat)
                     putstr(tmpwin, 0, "Schroedinger's cat");
                 else if (deadcat)
@@ -1572,8 +1602,6 @@ int status;
     nethack_exit(status);
 }
 
-extern const int monstr[];
-
 enum vanq_order_modes {
     VANQ_MLVL_MNDX = 0,
     VANQ_MSTR_MNDX,
@@ -1618,7 +1646,7 @@ const genericptr vptr2;
         break;
     case VANQ_MSTR_MNDX:
         /* sort by monster toughness */
-        mstr1 = monstr[indx1], mstr2 = monstr[indx2];
+        mstr1 = mons[indx1].difficulty, mstr2 = mons[indx2].difficulty;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:

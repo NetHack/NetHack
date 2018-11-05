@@ -534,6 +534,7 @@ ooze
 	kind had swept so evilly free of all litter.
 		[ At the Mountains of Madness, by H.P. Lovecraft ]
 blue jelly
+spotted jelly
 	I'd planned how to prevent the lock from sealing behind me; it
 	required a temporary sacrifice, not cleverness.  I used the door
 	itself to help me cut off a portion of my body, after shunting all
@@ -892,6 +893,20 @@ tiamat
 	extremely vain.
 citrine*
 	A pale yellow variety of crystalline quartz resembling topaz.
+clay golem
+        It was a warm spring night when a fist knocked at the door so
+        hard that the hinges bent.
+        A man opened it and peered out into the street. There was
+        mist coming off the river and it was a cloudy night. He might
+        as well have tried to see through white velvet.
+        But he thought afterwards that there had been shapes out
+        there, just beyond the light spilling out into the road. A
+        lot of shapes, watching him carefully. He thought maybe
+        there'd been very faint points of light...
+        There was no mistaking the shape right in front of him,
+        though. It was big and dark red and looked like a child's
+        clay model of a man. Its eyes were two embers.
+                [ Feet of Clay, by Terry Pratchett ]
 cleaver
 	Hither came Conan, the Cimmerian, black-haired, sullen-eyed,
 	sword in hand, a thief, a reaver, a slayer, with gigantic
@@ -1994,6 +2009,7 @@ gold golem
 ~gold golem
 ~straw golem
 ~wood golem
+~clay golem
 *golem
 	"The original story harks back, so they say, to the sixteenth
 	century.  Using long-lost formulas from the Kabbala, a rabbi is
@@ -2305,7 +2321,8 @@ cornucopia
 	And scatters corn and wine, and fruits and flowers.
 		[ Os Lusiadas, by Luis Vaz de Camoes ]
 horned devil
-	Horned devils lack any real special abilities, though they
+barbed devil
+	These devils lack any real special abilities, though they
 	are quite difficult to kill.
 ~horsem*
 *horse
@@ -4001,6 +4018,7 @@ pony
 	continent and to and from our own world.  The precise manner
 	of their working is a Management secret.
 	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+trident
 poseido*n
 	Poseido(o)n, lord of the seas and father of rivers and
 	fountains, was the son of Chronos and Rhea, brother of Zeus,
@@ -4071,6 +4089,13 @@ acolyte
 	there may well be wonderful universes above us where reason is
 	utterly unreasonable?"
 		[ The Innocence of Father Brown, by G.K. Chesterton ]
+paddle cactus
+	Opuntia, commonly called prickly pear, is a genus in the cactus
+	family, Cactaceae. Prickly pears are also known as tuna (fruit),
+	sabra, nopal (paddle, plural nopales) from the Nahuatl word
+	nopalli for the pads, or nostle, from the Nahuatl word nochtli
+	for the fruit; or paddle cactus.
+		[ Wikipedia, the free encyclopedia ]
 prisoner
 	Where am I?
 		In the Village.
@@ -4337,6 +4362,29 @@ rogue
 	conceal it; and therein am I constant to my profession.
 		[ Autolycus the Rogue, from The Winter's Tale by
 			William Shakespeare ]
+root
+dwarven root
+	But when they were cooked these roots proved good to eat,
+	somewhat like bread; and the outlaws were glad of them, for
+	they had long lacked bread save when they could steal it.
+	"Wild Elves know them not; Grey-elves have not found them;
+	the proud ones from over the Sea are too proud to delve,"
+	said Mim.
+	
+	"What is their name?" said Turin. Mim looked at him sidelong.
+	"They have no name, save in the Dwarf-tongue, which we do not
+	teach," he said. "And we not teach Men to find them, for Men
+	are greedy and thriftless, and would not spare till all the
+	plants had perished; whereas now they pass them by as they go
+	blundering in the wild. No more will you learn of me; but you
+	may have enough of my bounty, as long as you speak fair and 
+	do not spy or steal." Then again he laughed in his throat.
+	
+	"They are of great worth." he said. "More than gold in the
+	hungry winter, for they may be hoarded like the nuts of a
+	squirrel, and already we were building our store from the
+	first that are ripe."
+		[ Unfinished Tales, Part 1, by J.R.R. Tolkien ]
 roshi
 	Roshi is a Japanese word, common in Zen Buddhism, meaning "old"
 	(ro) and "teacher" (shi).  Roshi can be used as a term of
@@ -5152,6 +5200,7 @@ tripe ration
 	often, alas, because the heat has not been kept low enough,
 	it has the consistency of wet shoe leather.
 		[ Joy of Cooking, by I Rombauer and M Becker ]
+~water troll
 *troll
 	The troll shambled closer.  He was perhaps eight feet tall,
 	perhaps more.  His forward stoop, with arms dangling past
@@ -5420,6 +5469,21 @@ water demon
 	and drink, I will enjoy eating you, the biggest monkey, most
 	of all!"  He grinned, and saliva dripped down his hairy chin.
 		[ Buddhist Tales for Young and Old, Vol. 1 ]
+water troll
+	It wasn't that the troll was _horrifying_. Instead of the
+	rotting, betentacled monstrosity he had been expecting
+	Rincewind found himself looking at a rather squat but not
+	particularly ugly old man who would quite easily have passed
+	for normal on any city street, always provided that other
+	people on the street were used to seeing old men who were
+	apparently composed of water and very little else. It was as
+	if the ocean had decided to create life without going through
+	all that tedious business of evolution, and had simply formed
+	a part of itself into a biped and sent it walking squishily up
+	the beach. The troll was a pleasant translucent blue color.
+	As Rincewind stared a small shoal of silver fish flashed
+	across its chest.
+	    [ The Colour of Magic, by Terry Pratchett ]
 weapon
 	A weapon is a device for making your enemy change his mind.
 		[ The Vor Game, by Lois McMaster Bujold ]
@@ -5428,17 +5492,17 @@ web
 	When first we practise to deceive!
 		[ Marmion, by Sir Walter Scott ]
 whistle
-	There were legends both on the front and on the back of the 
+	There were legends both on the front and on the back of the
 	whistle. The one read thus:
 
-	FLA FUR BIS FLE The other: QUIS EST ISTE QUI VENIT 
-	'I ought to be able to make it out,' he thought; 
-	'but I suppose I am a little rusty in my Latin. 
-	When I come to think of it, I don't believe I even 
-	know the word for a whistle. The long one does seem 
-	simple enough. It ought to mean, "Who is this who is coming?" 
+	FLA FUR BIS FLE The other: QUIS EST ISTE QUI VENIT
+	'I ought to be able to make it out,' he thought;
+	'but I suppose I am a little rusty in my Latin.
+	When I come to think of it, I don't believe I even
+	know the word for a whistle. The long one does seem
+	simple enough. It ought to mean, "Who is this who is coming?"
 
-	Well, the best way to find out is evidently to whistle 
+	Well, the best way to find out is evidently to whistle
 	for him.'
 
 		[Ghost Stories of an Antiquary, by Montague Rhodes James

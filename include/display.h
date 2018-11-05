@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1447729027 2015/11/17 02:57:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	display.h	$NHDT-Date: 1525012585 2018/04/29 14:36:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -179,14 +179,16 @@
  */
 #define DISP_BEAM    (-1) /* Keep all glyphs showing & clean up at end. */
 #define DISP_ALL     (-2) /* Like beam, but still displayed if not visible. */
-#define DISP_FLASH   (-3) /* Clean up each glyph before displaying new one. */
-#define DISP_ALWAYS  (-4) /* Like flash, but still displayed if not visible. */
-#define DISP_CHANGE  (-5) /* Change glyph. */
-#define DISP_END     (-6) /* Clean up. */
-#define DISP_FREEMEM (-7) /* Free all memory during exit only. */
+#define DISP_TETHER  (-3) /* Like beam, but tether glyph differs from final */
+#define DISP_FLASH   (-4) /* Clean up each glyph before displaying new one. */
+#define DISP_ALWAYS  (-5) /* Like flash, but still displayed if not visible. */
+#define DISP_CHANGE  (-6) /* Change glyph. */
+#define DISP_END     (-7) /* Clean up. */
+#define DISP_FREEMEM (-8) /* Free all memory during exit only. */
 
 /* Total number of cmap indices in the shield_static[] array. */
 #define SHIELD_COUNT 21
+#define BACKTRACK (-1)    /* flag for DISP_END to display each prior location */
 
 /*
  * display_self()

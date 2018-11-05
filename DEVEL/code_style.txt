@@ -16,7 +16,7 @@ declarations. Due to some incompatibilities, the patch is not publicly
 available and clang-format is not expected to be regularly used.
 
 Developers should do their best to adhere to the coding style to promote
-legibile, easy-to-edit code. Legibility is paramount, so in some cases, it may
+legible, easy-to-edit code. Legibility is paramount, so in some cases, it may
 be better not to fully adhere to the style guidelines.
 
 Recipes for common text editors can be found at the end of this file.
@@ -30,7 +30,7 @@ characters, not tabs.
 Lines should be at most 78 characters wide. If a line would be longer than the
 limit, the line should be wrapped and the wrapped portion should be aligned
 with the parentheses or brackets containing the wrap. If there is no set of
-parenthese or brackets, the line should be indented four spaces. Wrapping
+parentheses or brackets, the line should be indented four spaces. Wrapping
 should normally occur after a comma or before a binary operator, when
 possible:
 
@@ -43,7 +43,7 @@ possible:
 
 Single blank lines should be used wherever convenient to improve readability.
 
-Functions and Control Satements
+Functions and Control Statements
 -------------------------------
 
 For a function definition, the return type, declarator, and opening brace
@@ -183,10 +183,10 @@ many entries that reproducing them here is impractical. Fortunately, the
 options are in plain English, so walking through them with a copy of 
 this Guide handy and making changes as required will suffice.
 
-emacs Configuration
+Emacs Configuration
 ===================
 
-There are no doubt umpteen different ways to handle this in emacs.
+There are no doubt umpteen different ways to handle this in Emacs.
 Putting the following in ~/.emacs.el is one
 
 (defun hook-c ()

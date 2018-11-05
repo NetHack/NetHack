@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1522967321 2018/04/05 22:28:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1525012611 2018/04/29 14:36:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -571,7 +571,7 @@ int x, y;
     int ox, oy, *range = (int *) arg;
     struct obj *obj;
     struct monst *mon;
-    boolean may_pass = TRUE;
+    boolean may_pass = TRUE, via_jumping, stopping_short;
     struct trap *ttmp;
     int dmg = 0;
 
@@ -583,6 +583,8 @@ int x, y;
     } else if (*range == 0) {
         return FALSE; /* previous step wants to stop now */
     }
+    via_jumping = (EWwalking & I_SPECIAL) != 0L;
+    stopping_short = (via_jumping && *range < 2);
 
     if (!Passes_walls || !(may_pass = may_passwall(x, y))) {
         boolean odoor_diag = (IS_DOOR(levl[x][y].typ)
@@ -662,12 +664,8 @@ int x, y;
 
         mon->mundetected = 0; /* wakeup() will handle mimic */
         mnam = a_monnam(mon); /* after unhiding */
-        pronoun = mhim(mon);
+        pronoun = noit_mhim(mon);
         if (!strcmp(mnam, "it")) {
-            /* mhim() uses pronoun_gender() which forces neuter if monster
-               can't be seen; we want him/her for humanoid sensed by touch */
-            if (!strcmp(pronoun, "it") && humanoid(mon->data))
-                pronoun = genders[mon->female].him;
             mnam = !strcmp(pronoun, "it") ? "something" : "someone";
         }
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
@@ -710,12 +708,17 @@ int x, y;
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
 
-    if (is_pool(x, y) && !u.uinwater
-        && ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
-            || !(Levitation || Flying || Wwalking))) {
-        multi = 0; /* can move, so drown() allows crawling out of water */
-        (void) drown();
-        return FALSE;
+    if (is_pool(x, y) && !u.uinwater) {
+        if ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
+            || !(Levitation || Flying || Wwalking)) {
+            multi = 0; /* can move, so drown() allows crawling out of water */
+            (void) drown();
+            return FALSE;
+        } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
+            Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
+       }
+    } else if (is_lava(x, y) && !stopping_short) {
+        Norep("You move over some lava.");
     }
 
     /* FIXME:
@@ -727,7 +730,9 @@ int x, y;
      * ones that we have not yet tested.
      */
     if ((ttmp = t_at(x, y)) != 0) {
-        if (ttmp->ttyp == MAGIC_PORTAL) {
+        if (stopping_short) {
+            ; /* see the comment above hurtle_jump() */
+        } else if (ttmp->ttyp == MAGIC_PORTAL) {
             dotrap(ttmp, 0);
             return FALSE;
         } else if (ttmp->ttyp == VIBRATING_SQUARE) {
@@ -735,11 +740,12 @@ int x, y;
             dotrap(ttmp, 0); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
             dotrap(ttmp, 0);
-        } else if ((ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT
-                    || ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR)
+        } else if ((is_pit(ttmp->ttyp) || is_hole(ttmp->ttyp))
                    && Sokoban) {
-            /* Air currents overcome the recoil */
-            dotrap(ttmp, 0);
+            /* air currents overcome the recoil in Sokoban;
+               when jumping, caller performs last step and enters trap */
+            if (!via_jumping)
+                dotrap(ttmp, 0);
             *range = 0;
             return TRUE;
         } else {
@@ -1082,6 +1088,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
     register int range, urange;
     boolean crossbowing, impaired = (Confusion || Stunned || Blind
                                      || Hallucination || Fumbling);
+    boolean tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);
 
     notonhead = FALSE; /* reset potentially stale value */
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
@@ -1127,12 +1134,13 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         mon = u.ustuck;
         bhitpos.x = mon->mx;
         bhitpos.y = mon->my;
+        if (tethered_weapon)
+            tmp_at(DISP_TETHER, obj_to_glyph(obj));
     } else if (u.dz) {
         if (u.dz < 0
             /* Mjollnir must we wielded to be thrown--caller verifies this;
                aklys must we wielded as primary to return when thrown */
-            && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR)
-                || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0))
+            && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR) || tethered_weapon)
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
@@ -1217,7 +1225,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             range = 20; /* you must be giant */
         else if (obj->oartifact == ART_MJOLLNIR)
             range = (range + 1) / 2; /* it's heavy */
-        else if (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0)
+        else if (tethered_weapon) /* primary weapon is aklys */
             /* if an aklys is going to return, range is limited by the
                length of the attached cord [implicit aspect of item] */
             range = min(range, BOLT_LIM / 2);
@@ -1227,7 +1235,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (Underwater)
             range = 1;
 
-        mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
+        mon = bhit(u.dx, u.dy, range,
+                   tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON,
                    (int FDECL((*), (MONST_P, OBJ_P))) 0,
                    (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
         thrownobj = obj; /* obj may be null now */
@@ -1236,8 +1245,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (Is_airlevel(&u.uz) || Levitation)
             hurtle(-u.dx, -u.dy, urange, TRUE);
 
-        if (!obj)
+        if (!obj) {
+            /* bhit display cleanup was left with this caller
+               for tethered_weapon, but clean it up now since
+               we're about to return */
+            if (tethered_weapon)
+                tmp_at(DISP_END, 0);
             return;
+        }
     }
 
     if (mon) {
@@ -1264,19 +1279,33 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
     }
 
     if (!thrownobj) {
-        ; /* missile has already been handled */
+        /* missile has already been handled */
+        if (tethered_weapon) tmp_at(DISP_END, 0);
     } else if (u.uswallow) {
-        /* ball is not picked up by monster */
-        if (obj != uball)
-            (void) mpickobj(u.ustuck, obj);
-        thrownobj = (struct obj *) 0;
+        if (tethered_weapon) {
+            tmp_at(DISP_END, 0);
+            pline("%s returns to your hand!", The(xname(thrownobj)));
+            thrownobj = addinv(thrownobj);
+            (void) encumber_msg();
+            if (thrownobj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
+                setuqwep((struct obj *) 0);
+            setuwep(thrownobj);            
+        } else {
+            /* ball is not picked up by monster */
+            if (obj != uball)
+                (void) mpickobj(u.ustuck, obj);
+            thrownobj = (struct obj *) 0;
+        }
     } else {
         /* Mjollnir must we wielded to be thrown--caller verifies this;
            aklys must we wielded as primary to return when thrown */
         if ((obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE))
-            || (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0)) {
+            || tethered_weapon) {
             if (rn2(100)) {
-                sho_obj_return_to_u(obj); /* display its flight */
+                if (tethered_weapon)
+                    tmp_at(DISP_END, BACKTRACK);
+                else
+                    sho_obj_return_to_u(obj); /* display its flight */
 
                 if (!impaired && rn2(100)) {
                     pline("%s to your hand!", Tobjnam(obj, "return"));
@@ -1320,6 +1349,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                 thrownobj = (struct obj *) 0;
                 return;
             } else {
+                if (tethered_weapon) tmp_at(DISP_END, 0);
                 /* when this location is stepped on, the weapon will be
                    auto-picked up due to 'obj->was_thrown' of 1;
                    addinv() prevents thrown Mjollnir from being placed

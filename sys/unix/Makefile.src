@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1539968067 2018/10/19 16:54:27 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.58 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -163,7 +163,8 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
 CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
-CXX=g++
+CXX ?= g++
+MOC ?= moc
 #LINK=g++
 #	For cross-compiling, eg. with gcc on Linux (see also CC further up):
 #CXX=arm-linux-g++
@@ -277,6 +278,9 @@ WINQTLIB = -L$(QTDIR)/lib -lqt
 # libraries for Qt 4
 WINQT4LIB = `pkg-config QtGui --libs`
 #
+# libraries for Qt 5 (use with WINQT4SRC and WINQT4OBJ)
+WINQT5LIB = `pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs`
+#
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
 #
@@ -343,7 +347,13 @@ AWK	= nawk
 # will proceed without it
 GITINFO=1
 
-#VERBOSEMAKE = 1
+# if you change this to 1, feedback while building will omit -Dthis -Wthat
+# -Isomewhere so that each file being compiled is listed on one short line;
+# it requires support for '$<' in rules with more than one prerequisite
+# (rather than just in suffix default rule), such as is implemented by
+# gnu make and others which have picked up its extensions;
+# allowed values are 0, 1, and empty (which behaves like 0)
+QUIETCC=0
 
 # ----------------------------------------
 #
@@ -353,7 +363,7 @@ GITINFO=1
 # {unixconf.h, pcconf.h, tosconf.h}, and possibly system.h
 
 # Verbosity definitions, begin
-#   Set VERBOSEMAKE=1 to output more stuff.
+#   Set QUIETCC=1 above to output less feedback while building.
 #   CC and CXX obey verbosity, LD and LINK don't.
 #   AT is @ when not verbose, empty otherwise
 ACTUAL_CC := $(CC)
@@ -361,23 +371,25 @@ ACTUAL_CXX := $(CXX)
 ACTUAL_LD := $(LD)
 ACTUAL_LINK := $(LINK)
 
-CC_V0 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC_V0 = $(ACTUAL_CC)
 CC_V = $(CC_V0)
-CC_V1 = $(ACTUAL_CC)
-CC = $(CC_V$(VERBOSEMAKE))
+CC_V1 = @echo "[CC] $<"; $(ACTUAL_CC)
+CC = $(CC_V$(QUIETCC))
 
-CXX_V0 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX_V0 = $(ACTUAL_CXX)
 CXX_V = $(CXX_V0)
-CXX_V1 = $(ACTUAL_CXX)
-CXX = $(CXX_V$(VERBOSEMAKE))
+CXX_V1 = @echo "[CXX] $<"; $(ACTUAL_CXX)
+CXX = $(CXX_V$(QUIETCC))
 
+# LD and LINK might be based on invoking CC and may not be able to substitute
+# for QUIETCC, so feedback from them is handled differently (via $AT)
 LD = $(ACTUAL_LD)
 LINK = $(ACTUAL_LINK)
 
-AT_V0 := @
+AT_V0 :=
 AT_V := $(AT_V0)
-AT_V1 :=
-AT = $(AT_V$(VERBOSEMAKE))
+AT_V1 := @
+AT = $(AT_V$(QUIETCC))
 # Verbosity, end
 
 MAKEDEFS = ../util/makedefs
@@ -415,7 +427,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = monstr.c vis_tab.c	#tile.c
+GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
@@ -462,7 +474,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
-	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
+	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
@@ -558,25 +570,25 @@ qttableview.moc: ../include/qttableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt4kde0.moc : ../win/Qt4/qt4kde0.h
-	$(QTDIR)/bin/moc -o qt4kde0.moc ../win/Qt4/qt4kde0.h
+	$(QTDIR)/bin/$(MOC) -o qt4kde0.moc ../win/Qt4/qt4kde0.h
 qt4main.moc : ../win/Qt4/qt4main.h
-	$(QTDIR)/bin/moc -o qt4main.moc ../win/Qt4/qt4main.h
+	$(QTDIR)/bin/$(MOC) -o qt4main.moc ../win/Qt4/qt4main.h
 qt4map.moc : ../win/Qt4/qt4map.h
-	$(QTDIR)/bin/moc -o qt4map.moc ../win/Qt4/qt4map.h
+	$(QTDIR)/bin/$(MOC) -o qt4map.moc ../win/Qt4/qt4map.h
 qt4menu.moc : ../win/Qt4/qt4menu.h
-	$(QTDIR)/bin/moc -o qt4menu.moc ../win/Qt4/qt4menu.h
+	$(QTDIR)/bin/$(MOC) -o qt4menu.moc ../win/Qt4/qt4menu.h
 qt4msg.moc : ../win/Qt4/qt4msg.h
-	$(QTDIR)/bin/moc -o qt4msg.moc ../win/Qt4/qt4msg.h
+	$(QTDIR)/bin/$(MOC) -o qt4msg.moc ../win/Qt4/qt4msg.h
 qt4plsel.moc : ../win/Qt4/qt4plsel.h
-	$(QTDIR)/bin/moc -o qt4plsel.moc ../win/Qt4/qt4plsel.h
+	$(QTDIR)/bin/$(MOC) -o qt4plsel.moc ../win/Qt4/qt4plsel.h
 qt4set.moc : ../win/Qt4/qt4set.h
-	$(QTDIR)/bin/moc -o qt4set.moc ../win/Qt4/qt4set.h
+	$(QTDIR)/bin/$(MOC) -o qt4set.moc ../win/Qt4/qt4set.h
 qt4stat.moc : ../win/Qt4/qt4stat.h
-	$(QTDIR)/bin/moc -o qt4stat.moc ../win/Qt4/qt4stat.h
+	$(QTDIR)/bin/$(MOC) -o qt4stat.moc ../win/Qt4/qt4stat.h
 qt4xcmd.moc : ../win/Qt4/qt4xcmd.h
-	$(QTDIR)/bin/moc -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+	$(QTDIR)/bin/$(MOC) -o qt4xcmd.moc ../win/Qt4/qt4xcmd.h
 qt4yndlg.moc : ../win/Qt4/qt4yndlg.h
-	$(QTDIR)/bin/moc -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+	$(QTDIR)/bin/$(MOC) -o qt4yndlg.moc ../win/Qt4/qt4yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
@@ -597,9 +609,7 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/onames.h )
 ../include/pm.h: $(MAKEDEFS) ../include/onames.h
 	@( cd ../util ; $(MAKE) ../include/pm.h )
-monstr.c: $(MAKEDEFS) ../include/pm.h
-	@( cd ../util ; $(MAKE) ../src/monstr.c )
-../include/vis_tab.h: $(MAKEDEFS) monstr.c
+../include/vis_tab.h: $(MAKEDEFS) ../include/pm.h
 	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
 vis_tab.c: ../include/vis_tab.h
@@ -647,7 +657,7 @@ clean:
 spotless: clean
 	-rm -f a.out core $(GAME) Sys*
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
-	-rm -f monstr.c ../include/vis_tab.h vis_tab.c tile.c *.moc
+	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
 
@@ -874,7 +884,6 @@ wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainout.c
 wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
-monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)
 alloc.o: alloc.c $(CONFIG_H)

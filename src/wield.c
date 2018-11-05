@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1496959480 2017/06/08 22:04:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1525012623 2018/04/29 14:37:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -112,7 +112,6 @@ register struct obj *obj;
                        : !is_weptool(obj) && !is_wet_towel(obj);
     } else
         unweapon = TRUE; /* for "bare hands" message */
-    update_inventory();
 }
 
 STATIC_OVL boolean
@@ -187,6 +186,8 @@ struct obj *wep;
             long dummy = wep->owornmask;
 
             wep->owornmask |= W_WEP;
+            if (wep->otyp == AKLYS && (wep->owornmask & W_WEP) != 0)
+                You("secure the tether.");
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
         }
@@ -228,7 +229,9 @@ setuqwep(obj)
 register struct obj *obj;
 {
     setworn(obj, W_QUIVER);
-    update_inventory();
+    /* no extra handling needed; this used to include a call to
+       update_inventory() but that's already performed by setworn() */
+    return;
 }
 
 void
@@ -236,7 +239,7 @@ setuswapwep(obj)
 register struct obj *obj;
 {
     setworn(obj, W_SWAPWEP);
-    update_inventory();
+    return;
 }
 
 /*** Commands to change particular slot(s) ***/

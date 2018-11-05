@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1524780381 2018/04/26 22:06:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1540502147 2018/10/25 21:15:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -124,6 +124,7 @@ STATIC_DCL void FDECL(display_warning, (struct monst *));
 
 STATIC_DCL int FDECL(check_pos, (int, int, int));
 STATIC_DCL int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
+STATIC_DCL int FDECL(tether_glyph, (int, int));
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
@@ -511,6 +512,7 @@ warning_of(mon)
 struct monst *mon;
 {
     int wl = 0, tmp = 0;
+
     if (mon_warning(mon)) {
         tmp = (int) (mon->m_lev / 4);    /* match display.h */
         wl = (tmp > WARNCOUNT - 1) ? WARNCOUNT - 1 : tmp;
@@ -754,38 +756,36 @@ register int x, y;
         /* normal region shown only on accessible positions, but poison clouds
          * also shown above lava, pools and moats.
          */
-        if (reg != NULL && (ACCESSIBLE(lev->typ)
-                            || (reg->glyph == cmap_to_glyph(S_poisoncloud)
-                                && (lev->typ == LAVAPOOL || lev->typ == POOL
-                                    || lev->typ == MOAT)))) {
+        if (reg && (ACCESSIBLE(lev->typ)
+                    || (reg->glyph == cmap_to_glyph(S_poisoncloud)
+                        && is_pool_or_lava(x, y)))) {
             show_region(reg, x, y);
             return;
         }
+
         if (x == u.ux && y == u.uy) {
-            if (canspotself()) {
-                _map_location(x, y, 0); /* map *under* self */
+            int see_self = canspotself();
+
+            /* update map information for <u.ux,u.uy> (remembered topology
+               and object/known trap/terrain glyph) but only display it if
+               hero can't see him/herself, then show self if appropriate */
+            _map_location(x, y, !see_self);
+            if (see_self)
                 display_self();
-            } else
-                /* we can see what is there */
-                _map_location(x, y, 1);
         } else {
             mon = m_at(x, y);
             worm_tail = is_worm_tail(mon);
-            see_it =
-                mon && (worm_tail ? (!mon->minvis || See_invisible)
-                                  : (mon_visible(mon)) || tp_sensemon(mon)
-                                        || MATCH_WARN_OF_MON(mon));
+            see_it = mon && (mon_visible(mon)
+                             || (!worm_tail && (tp_sensemon(mon)
+                                                || MATCH_WARN_OF_MON(mon))));
             if (mon && (see_it || (!worm_tail && Detect_monsters))) {
                 if (mon->mtrapped) {
                     struct trap *trap = t_at(x, y);
                     int tt = trap ? trap->ttyp : NO_TRAP;
 
-                    /* if monster is in a physical trap, you see the trap too
-                     */
-                    if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT
-                        || tt == WEB) {
-                        trap->tseen = TRUE;
-                    }
+                    /* if monster is in a physical trap, you see trap too */
+                    if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
+                        trap->tseen = 1;
                 }
                 _map_location(x, y, 0); /* map under the monster */
                 /* also gets rid of any invisibility glyph */
@@ -794,7 +794,7 @@ register int x, y;
                                 worm_tail);
             } else if (mon && mon_warning(mon) && !is_worm_tail(mon)) {
                 display_warning(mon);
-            } else if (glyph_is_invisible(levl[x][y].glyph)) {
+            } else if (glyph_is_invisible(lev->glyph)) {
                 map_invisible(x, y);
             } else
                 _map_location(x, y, 1); /* map the location */\
@@ -807,19 +807,17 @@ register int x, y;
 
             if (canspotself())
                 display_self();
-        } else if ((mon = m_at(x, y))
+        } else if ((mon = m_at(x, y)) != 0
                    && ((see_it = (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
                                   || (see_with_infrared(mon)
-                                      && mon_visible(mon))))
+                                      && mon_visible(mon)))) != 0
                        || Detect_monsters)) {
-            /* Monsters are printed every time. */
-            /* This also gets rid of any invisibility glyph */
+            /* Seen or sensed monsters are printed every time.
+               This also gets rid of any invisibility glyph. */
             display_monster(x, y, mon, see_it ? 0 : DETECTED,
                             is_worm_tail(mon) ? TRUE : FALSE);
-        } else if ((mon = m_at(x, y)) && mon_warning(mon)
-                   && !is_worm_tail(mon)) {
+        } else if (mon && mon_warning(mon) && !is_worm_tail(mon)) {
             display_warning(mon);
-        }
 
         /*
          * If the location is remembered as being both dark (waslit is false)
@@ -827,7 +825,6 @@ register int x, y;
          *
          *      (1) A dark location that the hero could see through night
          *          vision.
-         *
          *      (2) Darkened while out of the hero's sight.  This can happen
          *          when cursed scroll of light is read.
          *
@@ -843,7 +840,7 @@ register int x, y;
          * These checks and changes must be here and not in back_to_glyph().
          * They are dependent on the position being out of sight.
          */
-        else if (Is_rogue_level(&u.uz)) {
+        } else if (Is_rogue_level(&u.uz)) {
             if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
             else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM
@@ -851,8 +848,7 @@ register int x, y;
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
             else
                 goto show_mem;
-        }
-        else if (!lev->waslit || (flags.dark_room && iflags.use_color)) {
+        } else if (!lev->waslit || (flags.dark_room && iflags.use_color)) {
             if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
             else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM)
@@ -892,6 +888,16 @@ xchar x, y;
     }
 }
 
+int
+tether_glyph(x, y)
+int x, y;
+{
+    int tdx, tdy;
+    tdx = u.ux - x;
+    tdy = u.uy - y;
+    return zapdir_to_glyph(sgn(tdx),sgn(tdy), 2);
+}
+
 /*
  * tmp_at()
  *
@@ -912,6 +918,9 @@ xchar x, y;
  *
  * DISP_BEAM  - Display the given glyph at each location, but do not erase
  *              any until the close call.
+ * DISP_TETHER- Display a tether glyph at each location, and the tethered
+ *              object at the farthest location, but do not erase any
+ *              until the return trip or close.
  * DISP_FLASH - Display the given glyph at each location, but erase the
  *              previous location's glyph.
  * DISP_ALWAYS- Like DISP_FLASH, but vision is not taken into account.
@@ -937,6 +946,7 @@ int x, y;
     switch (x) {
     case DISP_BEAM:
     case DISP_ALL:
+    case DISP_TETHER:
     case DISP_FLASH:
     case DISP_ALWAYS:
         if (!tglyph)
@@ -979,6 +989,22 @@ int x, y;
             /* Erase (reset) from source to end */
             for (i = 0; i < tglyph->sidx; i++)
                 newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+	} else if (tglyph->style == DISP_TETHER) {
+            int i;
+
+            if (y == BACKTRACK && tglyph->sidx > 1) {
+                /* backtrack */
+                for (i = tglyph->sidx - 1; i > 0; i--) {
+                    newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                    show_glyph(tglyph->saved[i - 1].x,
+                               tglyph->saved[i - 1].y, tglyph->glyph);
+                    flush_screen(0);   /* make sure it shows up */
+                    delay_output();
+                }
+                tglyph->sidx = 1;
+            }
+            for (i = 0; i < tglyph->sidx; i++)
+                newsym(tglyph->saved[i].x, tglyph->saved[i].y);
         } else {              /* DISP_FLASH or DISP_ALWAYS */
             if (tglyph->sidx) /* been called at least once */
                 newsym(tglyph->saved[0].x, tglyph->saved[0].y);
@@ -999,6 +1025,20 @@ int x, y;
             if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
                 break; /* too many locations */
             /* save pos for later erasing */
+            tglyph->saved[tglyph->sidx].x = x;
+            tglyph->saved[tglyph->sidx].y = y;
+            tglyph->sidx += 1;
+	} else if (tglyph->style == DISP_TETHER) {
+            if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
+                break; /* too many locations */
+            if (tglyph->sidx) {
+                int px, py;
+
+                px = tglyph->saved[tglyph->sidx-1].x;
+                py = tglyph->saved[tglyph->sidx-1].y;
+                show_glyph(px, py, tether_glyph(px, py));
+            }
+            /* save pos for later use or erasure */
             tglyph->saved[tglyph->sidx].x = x;
             tglyph->saved[tglyph->sidx].y = y;
             tglyph->sidx += 1;

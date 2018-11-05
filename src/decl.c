@@ -57,6 +57,7 @@ NEARDATA char pl_fruit[PL_FSIZ] = DUMMY;
 NEARDATA struct fruit *ffruit = (struct fruit *) 0;
 
 NEARDATA char tune[6] = DUMMY;
+NEARDATA boolean ransacked = 0;
 
 const char *occtxt = DUMMY;
 const char quitchars[] = " \r\n\033";

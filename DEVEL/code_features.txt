@@ -20,7 +20,7 @@ Here's how to do it:
      - The example above will alert the users for a new feature
        added in 3.6.0 via a one-liner via pline(), but you
        could get more elaborate (just make sure it is all done
-       in the 'if' code block..
+       in the 'if' code block.
 
 Once the user finds the alert no longer useful, or becoming 
 annoying, they can set the "suppress_alert" option.
@@ -75,7 +75,7 @@ There is a fqn_prefix[] entry for holding the path to each of the following:
 To recap, they are about enabling "different paths for different things", and
 separation of:
 - read-only stuff from read-write stuff.
-- sysadmin stuff from user-writeable stuff.
+- sysadmin stuff from user-writable stuff.
 etc.
 
 ==============================================

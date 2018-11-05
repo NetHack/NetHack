@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-/* #define BETA  */ /* development or beta testing [MRS] */
+#define BETA   /* development or beta testing [MRS] */
 
 #define DEBUG 
 
@@ -58,8 +58,13 @@
  * since otherwise comparisons with signed quantities are done incorrectly
  */
 typedef schar xchar;
+#if defined(__GNUC__) && defined(WIN32) && defined(__cplusplus)
+/* Resolve conflict with Qt 5 and MinGW-w32 */
+typedef uchar boolean; /* 0 or 1 */
+#else
 #ifndef SKIP_BOOLEAN
 typedef xchar boolean; /* 0 or 1 */
+#endif
 #endif
 
 #ifndef TRUE /* defined in some systems' native include files */
@@ -352,6 +357,11 @@ struct savefile_info {
 #define PANICTRACE_GDB
 #endif
 
+/* Supply nethack_enter macro if not supplied by port */
+#ifndef nethack_enter
+#define nethack_enter(argc, argv) ((void) 0)
+#endif
+
 /* LIVELOG message type flags */
 #define LL_WISH       0x0001 /* Report stuff people type at the wish prompt. */
 #define LL_ACHIEVE    0x0002 /* Achievements bitfield + invocation, planes */
@@ -362,4 +372,5 @@ struct savefile_info {
 #define LL_ARTIFACT   0x0040 /* Excalibur, Sting, Orcrist, plus sac gifts and artwishes */
 #define LL_GENOCIDE   0x0080 /* Logging of genocides */ 
 #define LL_DEBUG      0x8000 /* For debugging messages and other spam */ 
+
 #endif /* GLOBAL_H */

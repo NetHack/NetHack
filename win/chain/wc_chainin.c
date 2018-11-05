@@ -27,23 +27,26 @@ void *me;
 void *nextprocs;
 void *nextdata;
 {
+    struct chainin_data *tdp = 0;
+
     switch (cmd) {
-    case WINCHAIN_ALLOC: {
-        struct chainin_data *tdp = calloc(1, sizeof(struct chainin_data));
+    case WINCHAIN_ALLOC:
+        tdp = (struct chainin_data *) alloc(sizeof *tdp);
+        tdp->nprocs = 0;
+        tdp->ndata = 0;
         tdp->linknum = n;
-        cibase = tdp;
-        return tdp;
-    }
-    case WINCHAIN_INIT: {
-        struct chainin_data *tdp = me;
+        cibase = 0;
+        break;
+    case WINCHAIN_INIT:
+        tdp = me;
         tdp->nprocs = nextprocs;
         tdp->ndata = nextdata;
-        return tdp;
-    }
+        break;
     default:
-        raw_printf("chainin_procs_chain: bad cmd\n");
-        exit(EXIT_FAILURE);
+        panic("chainin_procs_chain: bad cmd\n");
+        /*NOTREACHED*/
     }
+    return tdp;
 }
 
 /* XXX if we don't need this, take it out of the table */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1518861490 2018/02/17 09:58:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1540591769 2018/10/26 22:09:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -151,8 +151,7 @@ moverock()
 
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
-                    || !(ttmp && ((ttmp->ttyp == PIT)
-                                  || (ttmp->ttyp == SPIKED_PIT))))) {
+                    || !(ttmp && is_pit(ttmp->ttyp)))) {
                 if (Blind)
                     feel_location(sx, sy);
                 if (canspotmon(mtmp)) {
@@ -365,8 +364,8 @@ moverock()
 /*
  *  still_chewing()
  *
- *  Chew on a wall, door, or boulder.  Returns TRUE if still eating, FALSE
- *  when done.
+ *  Chew on a wall, door, or boulder.  [What about statues?]
+ *  Returns TRUE if still eating, FALSE when done.
  */
 STATIC_OVL int
 still_chewing(x, y)
@@ -380,7 +379,10 @@ xchar x, y;
         (void) memset((genericptr_t) &context.digging, 0,
                       sizeof (struct dig_info));
 
-    if (!boulder && IS_ROCK(lev->typ) && !may_dig(x, y)) {
+    if (!boulder
+        && ((IS_ROCK(lev->typ) && !may_dig(x, y))
+            /* may_dig() checks W_NONDIGGABLE but doesn't handle iron bars */
+            || (lev->typ == IRONBARS && (lev->wall_info & W_NONDIGGABLE)))) {
         You("hurt your teeth on the %s.",
             (lev->typ == IRONBARS)
                 ? "bars"
@@ -548,11 +550,17 @@ dosinkfall()
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),
             innate_lev = ((HLevitation & (FROMOUTSIDE | FROMFORM)) != 0L),
-            ufall = (!innate_lev && !(HFlying || EFlying)); /* BFlying */
+            /* to handle being chained to buried iron ball, trying to
+               levitate but being blocked, then moving onto adjacent sink;
+               no need to worry about being blocked by terrain because we
+               couldn't be over a sink at the same time */
+            blockd_lev = (BLevitation == I_SPECIAL),
+            ufall = (!innate_lev && !blockd_lev
+                     && !(HFlying || EFlying)); /* BFlying */
 
     if (!ufall) {
-        You(innate_lev ? "wobble unsteadily for a moment."
-                       : "gain control of your flight.");
+        You((innate_lev || blockd_lev) ? "wobble unsteadily for a moment."
+                                       : "gain control of your flight.");
     } else {
         long save_ELev = ELevitation, save_HLev = HLevitation;
 
@@ -906,17 +914,6 @@ int mode;
     return TRUE;
 }
 
-#ifdef DEBUG
-static boolean trav_debug = FALSE;
-
-/* in this case, toggle display of travel debug info */
-int wiz_debug_cmd_traveldisplay()
-{
-    trav_debug = !trav_debug;
-    return 0;
-}
-#endif /* DEBUG */
-
 /*
  * Find a path from the destination (u.tx,u.ty) back to (u.ux,u.uy).
  * A shortest path is returned.  If guess is TRUE, consider various
@@ -1074,7 +1071,7 @@ int mode;
             }
 
 #ifdef DEBUG
-            if (trav_debug) {
+            if (iflags.trav_debug) {
                 /* Use of warning glyph is arbitrary. It stands out. */
                 tmp_at(DISP_ALL, warning_to_glyph(1));
                 for (i = 0; i < nn; ++i) {
@@ -1130,7 +1127,7 @@ int mode;
                 goto found;
             }
 #ifdef DEBUG
-            if (trav_debug) {
+            if (iflags.trav_debug) {
                 /* Use of warning glyph is arbitrary. It stands out. */
                 tmp_at(DISP_ALL, warning_to_glyph(2));
                 tmp_at(px, py);
@@ -1199,6 +1196,10 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
     if (!u.utrap)
         return TRUE; /* sanity check */
 
+    /*
+     * Note: caller should call reset_utrap() when we set u.utrap to 0.
+     */
+
     switch (u.utraptype) {
     case TT_BEARTRAP:
         if (flags.verbose) {
@@ -1216,16 +1217,17 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
         break;
     case TT_PIT:
         if (desttrap && desttrap->tseen
-            && (desttrap->ttyp == PIT || desttrap->ttyp == SPIKED_PIT))
+            && is_pit(desttrap->ttyp))
             return TRUE; /* move into adjacent pit */
         /* try to escape; position stays same regardless of success */
         climb_pit();
         break;
     case TT_WEB:
         if (uwep && uwep->oartifact == ART_STING) {
-            u.utrap = 0;
+            /* escape trap but don't move and don't destroy it */
+            u.utrap = 0; /* caller will call reset_utrap() */
             pline("Sting cuts through the web!");
-            break; /* escape trap but don't move */
+            break;
         }
         if (--u.utrap) {
             if (flags.verbose) {
@@ -1676,7 +1678,12 @@ domove()
         return;
 
     if (u.utrap) {
-        if (!trapmove(x, y, trap))
+        boolean moved = trapmove(x, y, trap);
+
+        if (!u.utrap)
+            reset_utrap(TRUE); /* might resume levitation or flight */
+        /* might not have escaped, or did escape but remain in same spot */
+        if (!moved)
             return;
     }
 
@@ -1747,7 +1754,7 @@ domove()
         u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
 
         if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
-            && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
+            && is_pit(trap->ttyp)
             && sobj_at(BOULDER, trap->tx, trap->ty)) {
             /* can't swap places with pet pinned in a pit by a boulder */
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
@@ -1948,13 +1955,15 @@ switch_terrain()
                         || (Is_waterlevel(&u.uz) && lev->typ == WATER));
 
     if (blocklev) {
-        /* called from spoteffects(), skip float_down() */
+        /* called from spoteffects(), stop levitating but skip float_down() */
         if (Levitation)
             You_cant("levitate in here.");
         BLevitation |= FROMOUTSIDE;
     } else if (BLevitation) {
         BLevitation &= ~FROMOUTSIDE;
-        if (Levitation)
+        /* we're probably levitating now; if not, we must be chained
+           to a buried iron ball so get float_up() feedback for that */
+        if (Levitation || BLevitation)
             float_up();
     }
     /* the same terrain that blocks levitation also blocks flight */
@@ -2063,6 +2072,7 @@ boolean pick;
 
     struct monst *mtmp;
     struct trap *trap = t_at(u.ux, u.uy);
+    int trapflag = iflags.failing_untrap ? FAILEDUNTRAP : 0;
 
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
@@ -2078,7 +2088,7 @@ boolean pick;
     spotterrain = levl[u.ux][u.uy].typ;
     spotloc.x = u.ux, spotloc.y = u.uy;
 
-    /* moving onto different terrain might cause Levitation to toggle */
+    /* moving onto different terrain might cause Lev or Fly to toggle */
     if (spotterrain != levl[u.ux0][u.uy0].typ || !on_level(&u.uz, &u.uz0))
         switch_terrain();
 
@@ -2112,7 +2122,7 @@ boolean pick;
          * If not a pit, pickup before triggering trap.
          * If pit, trigger trap before pickup.
          */
-        pit = (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT));
+        pit = (trap && is_pit(trap->ttyp));
         if (pick && !pit)
             (void) pickup(1);
 
@@ -2128,7 +2138,7 @@ boolean pick;
             if (!spottrap || spottraptyp != trap->ttyp) {
                 spottrap = trap;
                 spottraptyp = trap->ttyp;
-                dotrap(trap, 0); /* fall into arrow trap, etc. */
+                dotrap(trap, trapflag); /* fall into arrow trap, etc. */
                 spottrap = (struct trap *) 0;
                 spottraptyp = NO_TRAP;
             }
@@ -2480,16 +2490,14 @@ register boolean newlev;
     return;
 }
 
-/* the ',' command */
+/* returns
+   1 = cannot pickup, time taken
+   0 = cannot pickup, no time taken
+  -1 = do normal pickup
+  -2 = loot the monster */
 int
-dopickup()
+pickup_checks()
 {
-    int count, tmpcount;
-    struct trap *traphere = t_at(u.ux, u.uy);
-
-    /* awful kludge to work around parse()'s pre-decrement */
-    count = (multi || (save_cm && *save_cm == ',')) ? multi + 1 : 0;
-    multi = 0; /* always reset */
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck->minvent) {
@@ -2501,8 +2509,7 @@ dopickup()
                     Blind ? "feel" : "see");
             return 1;
         } else {
-            tmpcount = -count;
-            return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
+            return -2; /* loot the monster inventory */
         }
     }
     if (is_pool(u.ux, u.uy)) {
@@ -2544,6 +2551,7 @@ dopickup()
         return 0;
     }
     if (!can_reach_floor(TRUE)) {
+        struct trap *traphere = t_at(u.ux, u.uy);
         if (traphere && uteetering_at_seen_pit(traphere))
             You("cannot reach the bottom of the pit.");
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
@@ -2554,6 +2562,25 @@ dopickup()
             You("cannot reach the %s.", surface(u.ux, u.uy));
         return 0;
     }
+    return -1; /* can do normal pickup */
+}
+
+/* the ',' command */
+int
+dopickup(VOID_ARGS)
+{
+    int count, tmpcount, ret;
+
+    /* awful kludge to work around parse()'s pre-decrement */
+    count = (multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? multi + 1 : 0;
+    multi = 0; /* always reset */
+
+    if ((ret = pickup_checks() >= 0))
+        return ret;
+    else if (ret == -2) {
+        tmpcount = -count;
+        return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
+    } /* else ret == -1 */
 
     return pickup(-count);
 }
@@ -2893,7 +2920,7 @@ boolean k_format;
 int
 weight_cap()
 {
-    long carrcap, save_ELev = ELevitation;
+    long carrcap, save_ELev = ELevitation, save_BLev = BLevitation;
 
     /* boots take multiple turns to wear but any properties they
        confer are enabled at the start rather than the end; that
@@ -2903,6 +2930,9 @@ weight_cap()
         ELevitation &= ~W_ARMF;
         float_vs_flight(); /* in case Levitation is blocking Flying */
     }
+    /* levitation is blocked by being trapped in the floor, but it still
+       functions enough in that situation to enhance carrying capacity */
+    BLevitation &= ~I_SPECIAL;
 
     carrcap = 25 * (ACURRSTR + ACURR(A_CON)) + 50;
     if (Upolyd) {
@@ -2933,8 +2963,9 @@ weight_cap()
             carrcap = 0;
     }
 
-    if (ELevitation != save_ELev) {
+    if (ELevitation != save_ELev || BLevitation != save_BLev) {
         ELevitation = save_ELev;
+        BLevitation = save_BLev;
         float_vs_flight();
     }
 

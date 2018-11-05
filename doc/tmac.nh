@@ -1,0 +1,127 @@
+.\" NetHack 3.6	tmac.nh	$NHDT-Date: $ $NHDT-Branch: $:$NHDT-Revision: $
+.
+.\"   Miscellaneous tmac.n-style macros specifically for nethack's Guidebook.
+.\"
+.\"   Most are modelled after, or variations of, macros in tmac.n whose author
+.\"   has specified that that file remain unmodified if it gets distributed.
+.\"   These used to be inline within Guidebook.mn but it was becoming too
+.\"   cluttered as their number increased.  It now uses the '.so' directive
+.\"   to include this file.  (tmac.n is passed to 'roff on the command line.)
+.
+.\" labeled paragraph start
+.\" .PS word
+.\"	set the width for the label column
+.\" .PL word
+.\"	label for the entry
+.\" .PE
+.\"	clean up
+.de PS
+.nr PY \\w'\\$1\ -\ 'u			\" width of label plus " - "
+.nr PX \\w'\ -\ 'u			\" width of " - "
+.sn \\n(pdu				\" tmac.n: inter-paragraph space
+.in +\\n(PYu				\" additional indent past label (etc)
+.si					\" tmac.n: start indented section
+..
+.\" labeled paragraph label (and first line)
+.de PL
+.br
+\\h'|-\\n(PYu'\\$1\\h'|-\\n(PXu'\ -\ \\c \" back up, output the label, then
+.					\" skip to width-of(" - ") before the
+.					\" normal indentation, output the " - "
+.					\" then attach the next line (the
+.					\" text) without stopping (\c: nroff
+.					\" section 4.2)
+..
+.\" labeled paragraph end
+.de PE
+.ei					\" tmac.n: end indented section
+.in -\\n(PYu				\" undo indent past label (etc)
+.sn \\n(pdu				\" tmac.n: inter-paragraph space
+..
+.\" end of labeled paragraph
+.
+.\"
+.\" aligned single character key with SHORT definition (if it overflows one
+.\" line, all bets are off)
+.\" Usage:
+.\"  .CC k "definition here"
+.nr CZ \w'\fBW'		\" width of the key character column
+.nr CW \n(CZ/2		\" half the width of the key character column
+.de CC
+.nr CX \\w'\\fB\\$1'u/2	\" half the width of the key character
+.nr CY \\n(CWu-\\n(CXu	\" difference between the two half widths
+.\" output: move right CR units, print the key letter, move right to
+.\"  the full width of the column, print " - " and the definition
+\\h'|\\n(CYu'\\fB\\$1\\fP\\h'|\\n(CZu'\ -\ \\$2
+..
+.
+.\" .SD = .sd with extra choices for argument; pair with .ED
+.\"    c - centered (original choice; as of this writing, not used by nethack)
+.\"    i - indented (default if choice is omitted)
+.\"    n - not indented
+.\" SF - set (1=>indent, 0=>no-indent) by .SD, used by .ED unless centering
+.de SD					\" start display
+.					\" look for nested displays -- ILLEGAL
+.ie \\n(id>0 .er "display within display"
+.el \{\
+.	nr sf 0				\" don't center by default
+.	nr SF 1				\" assume indent
+.	ie '\\$1'c' .nr sf 1		\" center the sucker
+.	el .if '\\$1'n' .nr SF 0	\" don't indent if 'n'
+.\}
+.sn \\n(pdu				\" a little bit of space
+.ev 2					\" switch to display environment
+.nf					\" what you type is what you get
+.if \\n(id=0 .di dd			\" start saving text
+.rs					\" don't eat leading space
+.nr id +1				\" increment level of display
+..
+.\" .ED = .ed with support for \n(SF (indent vs no-indent); pair with .SD
+.de ED					\" end display
+.br					\" flush line
+.ie \\n(id<=0 .er "end display has no corresponding begin display"
+.el \{\
+.	nr id -1			\" decrement level of display
+.	if \\n(id=0 \{\
+.		di			\" end diversion
+.		fi			\" resume filling
+.		in -\\n(piu		\" dedent
+.		ev			\" pop environment
+.		ne \\n(dnu		\" be sure you have room
+.		nf			\" don't reprocess display
+.		rs			\" don't eat leading space
+.		zi			\" save indents
+.		ie \\n(sf .in (\\n(llu-\\n(dlu)/2u	\" center
+.		el .if \\n(SF .in +\\n(piu		\" indent
+.		dd			\" drop display
+.		yi			\" restore indents
+.	\}
+.\}
+.fi					\" resume filling
+.sn \\n(pdu				\" a little bit of space
+..
+.
+.\" '.UX' is verbatim copy of tmac.n's '.ux' with the exception that
+.\" the trademark owner for "UNIX" has been updated.
+.de UX					\" print "UNIX"
+.ie \\n(ux \\&\\$2\\s-1UNIX\\s0\\$1
+.el \{\
+.	nr ux +1			\" mark footnote as dropped
+\\&\\$2\\s-1UNIX\\s0\\*(rg\\$1
+.	fn				\" put out the footnote
+\\&\\*(rgUNIX is a registered trademark of The Open Group.
+.	ef				\" short and sweet ...
+.\}
+..
+.
+.\" .BR - hard line break with vertical padding inserted
+.\"    $1 - repeat count for amount of padding (optional; default is 1)
+.de BR
+.nr bR (\\$1-0)
+.if \\n(bR<1 .nr bR 1
+.nr bR \\n(bR*\\n(pd
+.sn \\n(bRu
+.br
+..
+.
+.\"tmac.nh/"
