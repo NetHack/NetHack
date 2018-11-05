@@ -2534,6 +2534,10 @@ pickup_checks()
             You("could drink the %s...", hliquid("water"));
         else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
             pline("It won't come off the hinges.");
+        else if (IS_ALTAR(lev->typ))
+            pline("Moving the altar would be a very bad idea.")
+        else if (lev->typ == STAIRS)
+            pline_The("stairs are solidly fixed to the ground.");
         else
             There("is nothing here to pick up.");
         return 0;
