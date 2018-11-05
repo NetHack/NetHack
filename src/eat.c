@@ -1032,7 +1032,7 @@ register int pm;
             char buf[BUFSZ];
 
             if(!u.uconduct.polyselfs++) /* you're changing form */
-                livelog_printf(LL_CONDUCT, "changed form for the first time by mimicing %s",
+                livelog_printf(LL_CONDUCT, "changed form for the first time by mimicking %s",
                      Hallucination ? "an orange" : "a pile of gold");
             You_cant("resist the temptation to mimic %s.",
                      Hallucination ? "an orange" : "a pile of gold");
