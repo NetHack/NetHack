@@ -1720,7 +1720,7 @@ timer_sanity_check()
             struct obj *obj = curr->arg.a_obj;
 
             if (obj->timed == 0) {
-                pline("timer sanity: untimed obj %s, timer %ld",
+                impossible("timer sanity: untimed obj %s, timer %ld",
                       fmt_ptr((genericptr_t) obj), curr->tid);
             }
         }

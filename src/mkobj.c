@@ -2251,7 +2251,7 @@ obj_sanity_check()
     /* monsters temporarily in transit;
        they should have arrived with hero by the time we get called */
     if (mydogs) {
-        pline("mydogs sanity [not empty]");
+        impossible("mydogs sanity [not empty]");
         mon_obj_sanity(mydogs, "mydogs minvent sanity");
     }
 
@@ -2390,10 +2390,10 @@ struct monst *mon;
         Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
         if (mon)
             monnm = x_monnam(mon, ARTICLE_A, (char *) 0, EXACT_NAME, TRUE);
-        pline(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
+        impossible(altfmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj),
               objnm, fmt_ptr((genericptr_t) mon), monnm);
     } else {
-        pline(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj), objnm);
+        impossible(fmt, mesg, fmt_ptr((genericptr_t) obj), where_name(obj), objnm);
     }
 }
 
@@ -2421,7 +2421,7 @@ const char *mesg;
         if (obj->where != OBJ_CONTAINED)
             insane_object(obj, "%s obj %s %s: %s", mesg, (struct monst *) 0);
         else if (obj->ocontainer != container)
-            pline("%s obj %s in container %s, not %s", mesg,
+            impossible("%s obj %s in container %s, not %s", mesg,
                   fmt_ptr((genericptr_t) obj),
                   fmt_ptr((genericptr_t) obj->ocontainer),
                   fmt_ptr((genericptr_t) container));
