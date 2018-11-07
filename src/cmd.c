@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1541235664 2018/11/03 09:01:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1541631031 2018/11/07 22:50:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2426,7 +2426,7 @@ int final;
             you_are(buf, "");
     }
     /* report 'nudity' */
-    if (!uarm && !uarmu && !uarmc && !uarmg && !uarmf && !uarmh) {
+    if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
             enl_msg(You_, "do", "did", " not wear any armor", "");
         else
