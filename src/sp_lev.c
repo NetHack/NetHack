@@ -3912,9 +3912,9 @@ int n;
     xchar xx = (xchar) x, yy = (xchar) y;
 
     while (n > 0) {
+        --n;
         if (xs[n] == xx && ys[n] == yy)
             return TRUE;
-        --n;
     }
     return FALSE;
 }
