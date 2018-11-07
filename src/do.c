@@ -178,7 +178,9 @@ const char *verb;
             if (Blind && (x == u.ux) && (y == u.uy)) {
                 You_hear("a CRASH! beneath you.");
             } else if (!Blind && cansee(x, y)) {
-                pline_The("boulder %s%s.", t->tseen ? "" : "triggers and ",
+                pline_The("boulder %s%s.",
+                    (t->ttyp == TRAPDOOR && !t->tseen)
+                        ? "triggers and " : "",
                           t->ttyp == TRAPDOOR
                               ? "plugs a trap door"
                               : t->ttyp == HOLE ? "plugs a hole"
