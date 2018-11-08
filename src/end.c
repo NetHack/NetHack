@@ -330,6 +330,8 @@ int sig_unused UNUSED;
 int
 done2()
 {
+    if (iflags.debug_fuzzer)
+        return 0;
     if (!paranoid_query(ParanoidQuit, "Really quit?")) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -602,7 +604,7 @@ VA_DECL(const char *, str)
     /* XXX can we move this above the prints?  Then we'd be able to
      * suppress "it may be possible to rebuild" based on dosave0()
      * or say it's NOT possible to rebuild. */
-    if (program_state.something_worth_saving) {
+    if (program_state.something_worth_saving && !iflags.debug_fuzzer) {
         set_error_savefile();
         if (dosave0()) {
             /* os/win port specific recover instructions */
@@ -1043,6 +1045,14 @@ int how;
         bot();
     }
 
+    if (iflags.debug_fuzzer) {
+        if (!(program_state.panicking || how == PANICKED)) {
+            savelife(how);
+            killer.name[0] = 0;
+            killer.format = 0;
+            return;
+        }
+    } else
     if (how == ASCENDED || (!killer.name[0] && how == GENOCIDED))
         killer.format = NO_KILLER_PREFIX;
     /* Avoid killed by "a" burning or "a" starvation */

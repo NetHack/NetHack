@@ -389,7 +389,7 @@ boolean resuming;
             continue;
         }
 
-        if (iflags.sanity_check)
+        if (iflags.sanity_check || iflags.debug_fuzzer)
             sanity_check();
 
 #ifdef CLIPPING

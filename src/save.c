@@ -77,6 +77,8 @@ static unsigned ustuck_id = 0, usteed_id = 0;
 int
 dosave()
 {
+    if (iflags.debug_fuzzer)
+        return 0;
     clear_nhwindow(WIN_MESSAGE);
     if (yn("Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);

@@ -453,6 +453,8 @@ VA_DECL(const char *, s)
     Vsprintf(pbuf, s, VA_ARGS);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
+    if (iflags.debug_fuzzer)
+        panic(pbuf);
     pline("%s", VA_PASS1(pbuf));
     pline(VA_PASS1(
        "Program in disorder!  (Saving and reloading may fix this problem.)"));

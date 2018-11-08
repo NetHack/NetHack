@@ -1061,6 +1061,8 @@ doup()
         return 1;
     }
     if (ledger_no(&u.uz) == 1) {
+        if (iflags.debug_fuzzer)
+            return 0;
         if (yn("Beware, there will be no return! Still climb?") != 'y')
             return 0;
     }

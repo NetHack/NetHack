@@ -608,6 +608,8 @@ level_tele()
     char buf[BUFSZ];
     boolean force_dest = FALSE;
 
+    if (iflags.debug_fuzzer)
+        goto random_levtport;
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
         You_feel("very disoriented for a moment.");
@@ -750,6 +752,8 @@ level_tele()
 
     killer.name[0] = 0; /* still alive, so far... */
 
+    if (iflags.debug_fuzzer && newlev < 0)
+        goto random_levtport;
     if (newlev < 0 && !force_dest) {
         if (*u.ushops0) {
             /* take unpaid inventory items off of shop bills */

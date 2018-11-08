@@ -172,6 +172,7 @@ E boolean NDECL(status_hilite_menu);
 
 /* ### cmd.c ### */
 
+E char NDECL(randomkey);
 E int NDECL(doconduct);
 E int NDECL(domonability);
 E char FDECL(cmd_from_func, (int NDECL((*))));
