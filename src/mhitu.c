@@ -2117,7 +2117,8 @@ struct attack *mattk;
         if (flags.verbose
             && (is_animal(mtmp->data)
                 || (dmgtype(mtmp->data, AD_DGST) && Slow_digestion)))
-            pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
+            pline("Obviously %s thinks you would give it indigestion.",
+                  mon_nam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
     }
     return 1;
