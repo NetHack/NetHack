@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1541235664 2018/11/03 09:01:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.298 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1541631031 2018/11/07 22:50:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -298,6 +298,8 @@ pgetchar() /* courtesy of aeb@cwi.nl */
 {
     register int ch;
 
+    if (iflags.debug_fuzzer)
+        return randomkey();
     if (!(ch = popch()))
         ch = nhgetch();
     return (char) ch;
@@ -942,6 +944,11 @@ wiz_level_change(VOID_ARGS)
 STATIC_PTR int
 wiz_panic(VOID_ARGS)
 {
+    if (iflags.debug_fuzzer) {
+        u.uhp = u.uhpmax = 1000;
+        u.uen = u.uenmax = 1000;
+        return 0;
+    }
     if (yn("Do you want to call panic() and end your game?") == 'y')
         panic("Crash test.");
     return 0;
@@ -2426,7 +2433,7 @@ int final;
             you_are(buf, "");
     }
     /* report 'nudity' */
-    if (!uarm && !uarmu && !uarmc && !uarmg && !uarmf && !uarmh) {
+    if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
             enl_msg(You_, "do", "did", " not wear any armor", "");
         else
@@ -4354,6 +4361,29 @@ int NDECL((*cmd_func));
     return FALSE;
 }
 
+char
+randomkey()
+{
+    static int i = 0;
+    char c;
+
+    switch (rn2(12)) {
+    default: c = '\033'; break;
+    case 0: c = '\n'; break;
+    case 1:
+    case 2:
+    case 3:
+    case 4: c = (char)(' ' + rn2((int)('~' - ' '))); break;
+    case 5: c = '\t'; break;
+    case 6: c = (char)('a' + rn2((int)('z' - 'a'))); break;
+    case 7: c = (char)('A' + rn2((int)('Z' - 'A'))); break;
+    case 8: c = extcmdlist[(i++) % SIZE(extcmdlist)].key; break;
+    case 9: c = '#'; break;
+    }
+
+    return c;
+}
+
 int
 ch2spkeys(c, start, end)
 char c;
@@ -5563,6 +5593,8 @@ readchar()
     register int sym;
     int x = u.ux, y = u.uy, mod = 0;
 
+    if (iflags.debug_fuzzer)
+        return randomkey();
     if (*readchar_queue)
         sym = *readchar_queue++;
     else
