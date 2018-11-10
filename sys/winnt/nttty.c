@@ -433,6 +433,8 @@ tgetch()
     coord cc;
     DWORD count;
     really_move_cursor();
+    if (iflags.debug_fuzzer)
+        return randomkey();
     return (program_state.done_hup)
                ? '\033'
                : keyboard_handler.pCheckInput(
@@ -447,6 +449,8 @@ int *x, *y, *mod;
     coord cc;
     DWORD count;
     really_move_cursor();
+    if (iflags.debug_fuzzer)
+        return randomkey();
     ch = (program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
@@ -704,7 +708,7 @@ cl_eos()
 void
 tty_nhbell()
 {
-    if (flags.silent)
+    if (flags.silent || iflags.debug_fuzzer)
         return;
     Beep(8000, 500);
 }
@@ -717,6 +721,9 @@ tty_delay_output()
     /* delay 50 ms - uses ANSI C clock() function now */
     clock_t goal;
     int k;
+
+    if (iflags.debug_fuzzer)
+        return;
 
     goal = 50 + clock();
     back_buffer_flip();

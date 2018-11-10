@@ -642,6 +642,8 @@ struct obj *otmp UNUSED;
     return;
 #endif /* SIMPLE_MAIL */
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
+    if (iflags.debug_fuzzer)
+        return;
     display_nhwindow(WIN_MESSAGE, FALSE);
     if (!(mr = nh_getenv("MAILREADER")))
         mr = DEF_MAILREADER;
@@ -674,6 +676,8 @@ ckmailstatus()
 {
     struct mail_info *brdcst;
 
+    if (iflags.debug_fuzzer)
+        return;
     if (u.uswallow || !flags.biff)
         return;
 

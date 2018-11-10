@@ -748,6 +748,8 @@ tty_delay_output()
 #if defined(MICRO)
     register int i;
 #endif
+    if (iflags.debug_fuzzer)
+        return;
 #ifdef TIMED_DELAY
     if (flags.nap) {
         (void) fflush(stdout);

@@ -1448,6 +1448,7 @@ char *githash, *gitbranch;
                 havehash = TRUE;
             }
 	}
+        free(line);
     }
     Fclose(gifp);
     if (havebranch && havehash)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1517128663 2018/01/28 08:37:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1541842623 2018/11/10 09:37:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1722,22 +1722,27 @@ register struct obj *otmp;
 register boolean nodrop;
 long num;
 {
-    char obuf[BUFSZ];
+    char *optr = 0, obuf[BUFSZ], xbuf[BUFSZ];
 
-    Sprintf(obuf, "%s%s",
-            (otmp->otyp == CORPSE && type_is_pname(&mons[otmp->corpsenm]))
-                ? ""
-                : "The ",
-            cxname(otmp));
+    if (otmp->otyp == CORPSE) {
+        /* Tobjnam() calls xname() and would yield "The corpse";
+           we want more specific "The newt corpse" or "Medusa's corpse" */
+        optr = upstart(corpse_xname(otmp, (char *) 0, CXN_PFX_THE));
+    } else {
+        optr = Tobjnam(otmp, (char *) 0);
+    }
+    Strcpy(obuf, optr);
 
     if (num) { /* means: other objects are impacted */
-        Sprintf(eos(obuf), " %s %s object%s", otense(otmp, "hit"),
-                num == 1L ? "another" : "other", num > 1L ? "s" : "");
+        /* 3.6.2: use a separate buffer for the suffix to avoid risk of
+           overrunning obuf[] (let pline() handle truncation if necessary) */
+        Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),
+                (num == 1L) ? "another" : "other", (num > 1L) ? "s" : "");
         if (nodrop)
-            Sprintf(eos(obuf), ".");
+            Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(obuf), " and %s %s.", otense(otmp, "fall"), gate_str);
-        pline1(obuf);
+            Sprintf(eos(xbuf), " and %s %s.", otense(otmp, "fall"), gate_str);
+        pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
         pline("%s %s %s.", obuf, otense(otmp, "fall"), gate_str);
 }
