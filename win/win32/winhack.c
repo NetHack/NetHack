@@ -88,11 +88,19 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
 
-    sys_early_init();
+    //
+    // We need to support DPI awareness.
+    //
+    // BOOL result = SetProcessDpiAwarenessContext(
+    //                            DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    //
 
-    /* ensure that we don't access violate on a panic() */
+    /* We must initialize state sufficiently to support calls to panic */
     windowprocs.win_raw_print = mswin_raw_print;
     windowprocs.win_raw_print_bold = mswin_raw_print_bold;
+    windowprocs.win_wait_synch = mswin_wait_synch;
+
+    sys_early_init();
 
     /* init applicatio structure */
     _nethack_app.hApp = hInstance;
