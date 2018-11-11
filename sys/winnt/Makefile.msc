@@ -397,7 +397,8 @@ VOBJ23 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
 VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
-VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
+VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ28 = $(O)win10.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -1341,6 +1342,8 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 
 $(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nttty.c
 	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
+$(O)win10.o: $(HACK_H) $(MSWSYS)\win10.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
 $(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(MSWSYS)\winnt.c
 	@$(cc) $(cflagsBuild) -Fo$@  $(MSWSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
@@ -1351,6 +1354,13 @@ $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
 
 $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
+
+#
+# WIN32 dependencies
+#
+
+$(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
