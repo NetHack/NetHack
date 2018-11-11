@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1540767809 2018/10/28 23:03:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1541902951 2018/11/11 02:22:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2009,10 +2009,10 @@ const char *killername;
 {
     struct kinfo *k = find_delayed_killer(id);
 
-    if (k == (struct kinfo *) 0) {
+    if (!k) {
         /* no match, add a new delayed killer to the list */
-        k = (struct kinfo *) alloc(sizeof(struct kinfo));
-        (void) memset((genericptr_t)k, 0, sizeof(struct kinfo));
+        k = (struct kinfo *) alloc(sizeof (struct kinfo));
+        (void) memset((genericptr_t) k, 0, sizeof (struct kinfo));
         k->id = id;
         k->next = killer.next;
         killer.next = k;
