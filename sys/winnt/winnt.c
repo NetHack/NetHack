@@ -4,6 +4,8 @@
 
 /*
  *  WIN32 system functions.
+ * 
+ *  Included in both console and window based clients on the windows platform.
  *
  *  Initial Creation: Michael Allison - January 31/93
  *
@@ -229,15 +231,6 @@ Delay(int ms)
     (void) Sleep(ms);
 }
 
-#ifdef TTY_GRAPHICS
-extern void NDECL(backsp);
-#else
-void
-backsp()
-{
-}
-#endif
-
 void
 win32_abort()
 {
@@ -250,9 +243,13 @@ win32_abort()
         msmsg("Execute debug breakpoint wizard?");
         while ((ci = nhgetch()) != '\n') {
             if (ct > 0) {
+#ifdef TTY_GRAPHICS
                 backsp(); /* \b is visible on NT */
+#endif
                 (void) putchar(' ');
+#ifdef TTY_GRAPHICS
                 backsp();
+#endif
                 ct = 0;
                 c = 'n';
             }
