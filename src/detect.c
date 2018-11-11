@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1541144458 2018/11/02 07:40:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1522891623 2018/04/05 01:27:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1300,25 +1300,82 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
 {
     register int zx, zy;
     struct monst *mtmp;
+    struct obj *otmp;
+    long save_EDetect_mons;
+    char save_viz_uyux;
     boolean unconstrained, refresh = FALSE, mdetected = FALSE,
-            extended = (sobj && sobj->blessed);
-    int lo_y = ((u.uy - 5 < 0) ? 0 : u.uy - 5),
+            /* fake spellbook 'sobj' implies hero has cast the spell;
+               when book is blessed, casting is skilled or expert level;
+               if already clairvoyant, non-skilled spell acts like skilled */
+            extended = (sobj && (sobj->blessed || Clairvoyant));
+    int newglyph, oldglyph,
+        lo_y = ((u.uy - 5 < 0) ? 0 : u.uy - 5),
         hi_y = ((u.uy + 6 >= ROWNO) ? ROWNO - 1 : u.uy + 6),
         lo_x = ((u.ux - 9 < 1) ? 1 : u.ux - 9), /* avoid column 0 */
         hi_x = ((u.ux + 10 >= COLNO) ? COLNO - 1 : u.ux + 10),
         ter_typ = TER_DETECT | TER_MAP | TER_TRP | TER_OBJ;
 
+    /*
+     * 3.6.0 attempted to emphasize terrain over transient map
+     * properties (monsters and objects) but that led to problems.
+     * Notably, known trap would be displayed instead of a monster
+     * on or in it and then the display remained that way after the
+     * clairvoyant snapshot finished.  That could have been fixed by
+     * issuing --More-- and then regular vision update, but we want
+     * to avoid that when having a clairvoyant episode every N turns
+     * (from donating to a temple priest or by carrying the Amulet).
+     * Unlike when casting the spell, it is much too intrustive when
+     * in the midst of walking around or combatting monsters.
+     *
+     * For 3.6.2, show terrain, then object, then monster like regular
+     * map updating, except in this case the map locations get marked
+     * as seen from every direction rather than just from direction of
+     * hero.  Skilled spell marks revealed objects as 'seen up close'
+     * (but for piles, only the top item) and shows monsters as if
+     * detected.  Non-skilled and timed clairvoyance reveals non-visible
+     * monsters as 'remembered, unseen'.
+     */
+
+    /* if hero is engulfed, show engulfer at <u.ux,u.uy> */
+    save_viz_uyux = viz_array[u.uy][u.ux];
+    if (u.uswallow)
+        viz_array[u.uy][u.ux] |= IN_SIGHT; /* <x,y> are reversed to [y][x] */
+    save_EDetect_mons = EDetect_monsters;
+    /* for skilled spell, getpos() scanning of the map will display all
+       monsters within range; otherwise, "unseen creature" will be shown */
+    EDetect_monsters |= I_SPECIAL;
     unconstrained = unconstrain_map();
     for (zx = lo_x; zx <= hi_x; zx++)
         for (zy = lo_y; zy <= hi_y; zy++) {
+            oldglyph = glyph_at(zx, zy);
+            /* this will remove 'remembered, unseen mon' (and objects) */
             show_map_spot(zx, zy);
-
-            if (extended && (mtmp = m_at(zx, zy)) != 0
+            /* if there are any objects here, see the top one */
+            if (OBJ_AT(zx, zy)) {
+                /* not vobj_at(); this is not vision-based access;
+                   unlike object detection, we don't notice buried items */
+                otmp = level.objects[zx][zy];
+                if (extended)
+                    otmp->dknown = 1;
+                map_object(otmp, TRUE);
+            }
+            /* if there is a monster here, see or detect it,
+               possibly as "remembered, unseen monster" */
+            if ((mtmp = m_at(zx, zy)) != 0
                 && mtmp->mx == zx && mtmp->my == zy) { /* skip worm tails */
-                int oldglyph = glyph_at(zx, zy);
-
-                map_monst(mtmp, FALSE);
-                if (glyph_at(zx, zy) != oldglyph)
+                /* if we're going to offer browse_map()/getpos() scanning of
+                   the map and we're not doing extended/blessed clairvoyance
+                   (hence must be swallowed or underwater), show "unseen
+                   creature" unless map already displayed a monster here */
+                if ((unconstrained || !level.flags.hero_memory)
+                    && !extended && (zx != u.ux || zy != u.uy)
+                    && !glyph_is_monster(oldglyph))
+                    map_invisible(zx, zy);
+                else
+                    map_monst(mtmp, FALSE);
+                newglyph = glyph_at(zx, zy);
+                if (extended && newglyph != oldglyph
+                    && !glyph_is_invisible(newglyph))
                     mdetected = TRUE;
             }
         }
@@ -1331,13 +1388,26 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
         You("sense your surroundings.");
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
-        if (extended)
-            EDetect_monsters |= I_SPECIAL;
         browse_map(ter_typ, "anything of interest");
-        EDetect_monsters &= ~I_SPECIAL;
         refresh = TRUE;
     }
     reconstrain_map();
+    EDetect_monsters = save_EDetect_mons;
+    viz_array[u.uy][u.ux] = save_viz_uyux;
+
+    /* replace monsters with remembered,unseen monster, then run
+       see_monsters() to update visible ones and warned-of ones */
+    for (zx = lo_x; zx <= hi_x; zx++)
+        for (zy = lo_y; zy <= hi_y; zy++) {
+            if (zx == u.ux && zy == u.uy)
+                continue;
+            newglyph = glyph_at(zx, zy);
+            if (glyph_is_monster(newglyph)
+                && glyph_to_mon(newglyph) != PM_LONG_WORM_TAIL)
+                map_invisible(zx, zy);
+        }
+    see_monsters();
+
     if (refresh)
         docrt();
 }

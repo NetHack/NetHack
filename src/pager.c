@@ -895,12 +895,17 @@ struct permonst **for_supplement;
     }
 
     if (sym == DEF_INVISIBLE) {
+        extern const char altinvisexplain[]; /* drawing.c */
+        /* for active clairvoyance, use alternate "unseen creature" */
+        boolean usealt = (EDetect_monsters & I_SPECIAL) != 0L;
+        const char *unseen_explain = !usealt ? invisexplain : altinvisexplain;
+
         if (!found) {
-            Sprintf(out_str, "%s%s", prefix, an(invisexplain));
-            *firstmatch = invisexplain;
+            Sprintf(out_str, "%s%s", prefix, an(unseen_explain));
+            *firstmatch = unseen_explain;
             found++;
         } else {
-            found += append_str(out_str, an(invisexplain));
+            found += append_str(out_str, an(unseen_explain));
         }
     }
 
