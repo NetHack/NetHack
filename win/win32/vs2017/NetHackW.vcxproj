@@ -30,6 +30,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>comctl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <AdditionalManifestFiles>NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(SrcDir)allmain.c" />
@@ -152,6 +155,7 @@
       <PreprocessorDefinitions>TTYSTUB;</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="$(SysWinntDir)winnt.c" />
+    <ClCompile Include="$(SysWinntDir)win10.c" />
     <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />
     <ClCompile Include="$(WinWin32Dir)mhdlg.c" />
     <ClCompile Include="$(WinWin32Dir)mhfont.c" />

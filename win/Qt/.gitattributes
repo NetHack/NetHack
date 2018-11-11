@@ -1,3 +1,4 @@
 Install.Qt NHSUBST
 qpe-nethack.control NH_header=no
 knethack.lnk NH_header=no
+* NH_filestag=(file%s_for_the_Qt_3_widget_library_-_X11,_Windows,_Mac_OS_X,_or_Qtopia)

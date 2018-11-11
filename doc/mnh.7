@@ -1,0 +1,95 @@
+.\" $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1541298620 2018/11/04 02:30:20 $
+.TH MNH 7 NETHACK
+.SH NAME
+mnh \- additional text formatting macros for the NetHack Guidebook
+.SH SYNOPSIS
+.B "make Guidebook"
+.\"[ options ]  file  ...
+.\".br
+.\".B "troff  \-mn"
+.\"[ options ]  file  ...
+.SH DESCRIPTION
+.PP
+This package of
+.IR nroff (1)
+and
+.IR troff (1)
+macro definitions extends
+.IR tmac.n (7)
+for the NetHack Guidebook.  This document should be
+read as an addendum to the documentation for
+.IR tmac.n .
+.PP
+All \-mnh macros,
+diversions,
+string registers,
+and number registers are defined below.
+.SH FILES
+doc/tmac.nh
+.SH "SEE ALSO"
+mn(7)
+.SH AUTHOR
+Pat Rankin
+.SH REQUESTS
+.PP
+In the
+.I Note
+column,
+.I b
+means the request causes a break,
+and
+.I i
+means the macro,
+number register,
+string register,
+or diversion is internal and should not be used for anything.
+In the
+.I "What It Is"
+column,
+.IR div " means " diversion ,
+.IR mac " means " macro ,
+.IR num " means " "number register" ,
+and
+.IR str " means " "string register" .
+In the
+.I "Initial Value"
+column,
+a hyphen means no initial value is used,
+anything else is the initial value,
+and if two values are given,
+the first is for
+.I nroff
+and the second for
+.IR troff .
+.PP
+.if n .in 0
+.ds x \f2x\fP\|
+.ds y \f2y\fP\|
+.ds z \f2z\fP\|
+.ds X "\*x
+.ds Y "\*x \*y
+.ds Z "\*x \*y \*z
+.tr _.
+.ta \w'MacroNames'u +\w'WhatItIs'u +\w'InitialVal'u +\w'Note 'u
+.sp .3
+.nf
+Macro	What	Initial	Note	\0 Explanation
+Name	It Is	Value
+.sp .3
+_BR	mac	\-	\-	hard line break with vertical padding inserted
+bR	num	\-	i
+_CC \*Y	mac	\-	\-	aligned one char key \*x with \fIshort\fP definition \*y
+CW	num	\-	i
+CX	num	\-	i
+CY	num	\-	i
+CZ	num	\-	i
+CZ	num	\-	i
+_ED	mac	\-	\-	ends .SD
+_PE	mac	\-	b	labelled paragraph end
+_PL \*X	mac	\-	b	labelled paragraph label is \*x
+_PS \*X	mac	\-	b	labelled paragraph start for label the width of \*x
+PX	num	\-	i
+PY	num	\-	i
+_SD \*X	mac	\-	\-	.sd with options c-center i-indent n-no indent
+SF	num	\-	i
+_UX	mac	\-	\-	.ux with updated trademark owner

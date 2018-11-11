@@ -4086,7 +4086,7 @@ For example, the following line in your config file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
 .si
-.lp "OPTION=hilite_status: hitpoints/<30%/red/normal"
+.lp "OPTION=hilite_status: hitpoints/<=30%/red/normal"
 .ei
 .pg
 For another example, the following line in your config file will cause
