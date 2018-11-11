@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1541631031 2018/11/07 22:50:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1541902950 2018/11/11 02:22:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1423,7 +1423,19 @@ wiz_intrinsic(VOID_ARGS)
                 make_vomiting(newtimeout, FALSE);
                 pline1(buf);
                 break;
+            case WARN_OF_MON:
+                if (!Warn_of_mon) {
+                    context.warntype.speciesidx = PM_GRID_BUG;
+                    context.warntype.species
+                                         = &mons[context.warntype.speciesidx];
+                }
+                goto def_feedback;
+            case LEVITATION:
+            case FLYING:
+                float_vs_flight();
+                /*FALLTHRU*/
             default:
+            def_feedback:
                 pline("Timeout for %s %s %d.", propertynames[i].prop_name,
                       oldtimeout ? "increased by" : "set to", amt);
                 incr_itimeout(&u.uprops[p].intrinsic, amt);
