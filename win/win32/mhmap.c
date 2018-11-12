@@ -13,6 +13,7 @@
 #include "color.h"
 #include "patchlevel.h"
 
+//#define NHMAP_FONT_NAME TEXT("Terminal")
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define MAXWINDOWTEXT 255
 
