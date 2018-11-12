@@ -5,6 +5,10 @@
 
 /* main.c - MSDOS, OS/2, ST, Amiga, and Windows NetHack */
 
+#ifdef WIN32
+#include "win32api.h" /* for GetModuleFileName */
+#endif
+
 #include "hack.h"
 #include "dlb.h"
 
@@ -20,10 +24,6 @@
 #ifdef GNUDOS
 #include <sys/stat.h>
 #endif
-#endif
-
-#ifdef WIN32
-#include "win32api.h" /* for GetModuleFileName */
 #endif
 
 #ifdef __DJGPP__

@@ -2,12 +2,13 @@
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include "winMS.h"
-#include "resource.h"
+#include "winos.h"
 #include "mhmap.h"
-#include "mhmsg.h"
-#include "mhinput.h"
 #include "mhfont.h"
+#include "mhinput.h"
+#include "mhmsg.h"
+#include "resource.h"
+#include "winMS.h"
 
 #include "color.h"
 #include "patchlevel.h"
@@ -17,12 +18,14 @@
 
 extern short glyph2tile[];
 
-#define TILEBMP_X(ntile) ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
-#define TILEBMP_Y(ntile) ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
+#define TILEBMP_X(ntile) \
+    ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
+#define TILEBMP_Y(ntile) \
+    ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
 
 /* map window data */
 typedef struct mswin_nethack_map_window {
-    int map[COLNO][ROWNO]; /* glyph map */
+    int map[COLNO][ROWNO];   /* glyph map */
     int bkmap[COLNO][ROWNO]; /* backround glyph map */
 
     int mapMode;              /* current map mode */
@@ -35,6 +38,7 @@ typedef struct mswin_nethack_map_window {
     POINT map_orig;           /* map origin point */
 
     HFONT hMapFont;           /* font for ASCII mode */
+    boolean bUnicodeFont;     /* font supports unicode page 437 */
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -199,6 +203,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
         NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
     }
     data->hMapFont = CreateFontIndirect(&lgfnt);
+    data->bUnicodeFont = winos_font_support_cp437(data->hMapFont);
 
     mswin_cliparound(data->xCur, data->yCur);
 
@@ -460,13 +465,13 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             data->map[msg_data->x][msg_data->y] = msg_data->glyph;
             data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
 
-            /* invalidate the update area. Erase backround if there 
+            /* invalidate the update area. Erase backround if there
                is nothing to paint or we are in text mode */
             nhcoord2display(data, msg_data->x, msg_data->y, &rt);
-            InvalidateRect(hWnd, &rt, 
-                           (((msg_data->glyph == NO_GLYPH) && (msg_data->bkglyph == NO_GLYPH))
-                            || data->bAsciiMode 
-                            || Is_rogue_level(&u.uz)));
+            InvalidateRect(hWnd, &rt,
+                           (((msg_data->glyph == NO_GLYPH)
+                             && (msg_data->bkglyph == NO_GLYPH))
+                            || data->bAsciiMode || Is_rogue_level(&u.uz)));
         }
     } break;
 
@@ -664,7 +669,7 @@ onPaint(HWND hWnd)
                 for (j = paint_rt.top; j < paint_rt.bottom; j++)
                     if (data->map[i][j] >= 0) {
                         char ch;
-                        TCHAR wch;
+                        WCHAR wch;
                         RECT glyph_rect;
                         int color;
                         unsigned special;
@@ -703,9 +708,15 @@ onPaint(HWND hWnd)
                             OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
                         }
 #endif
-
-                        DrawText(hDC, NH_A2W(&ch, &wch, 1), 1, &glyph_rect,
+                        if (data->bUnicodeFont) {
+                            wch = winos_ascii_to_wide(ch);
+                            DrawTextW(hDC, &wch, 1, &glyph_rect,
+                                     DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+                        } else {
+                            DrawTextA(hDC, &ch, 1, &glyph_rect,
                                  DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+                        }
+
                         SetTextColor(hDC, OldFg);
                     }
             SelectObject(hDC, oldFont);
@@ -741,7 +752,7 @@ onPaint(HWND hWnd)
                                    data->xScrTile, data->yScrTile, tileDC,
                                    t_x, t_y, GetNHApp()->mapTile_X,
                                    GetNHApp()->mapTile_Y, SRCCOPY);
-                        layer ++;
+                        layer++;
                     }
 
                     if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
@@ -753,8 +764,8 @@ onPaint(HWND hWnd)
                         if (layer > 0) {
                             (*GetNHApp()->lpfnTransparentBlt)(
                                 hDC, glyph_rect.left, glyph_rect.top,
-                                data->xScrTile, data->yScrTile, tileDC,
-                                t_x, t_y, GetNHApp()->mapTile_X,
+                                data->xScrTile, data->yScrTile, tileDC, t_x,
+                                t_y, GetNHApp()->mapTile_X,
                                 GetNHApp()->mapTile_Y, TILE_BK_COLOR);
                         } else {
                             StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
@@ -763,18 +774,18 @@ onPaint(HWND hWnd)
                                        GetNHApp()->mapTile_Y, SRCCOPY);
                         }
 
-                        layer ++;
-                     }
+                        layer++;
+                    }
 
 #ifdef USE_PILEMARK
-                     /* rely on NetHack core helper routine */
-                     (void) mapglyph(data->map[i][j], &mgch, &color,
-                                        &special, i, j);
-                     if ((glyph != NO_GLYPH) && (special & MG_PET) 
+                    /* rely on NetHack core helper routine */
+                    (void) mapglyph(data->map[i][j], &mgch, &color, &special,
+                                    i, j);
+                    if ((glyph != NO_GLYPH) && (special & MG_PET)
 #else
-                     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
+                    if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
 #endif
-                           && iflags.wc_hilite_pet) {
+                        && iflags.wc_hilite_pet) {
                         /* apply pet mark transparently over
                            pet image */
                         HDC hdcPetMark;
@@ -782,35 +793,35 @@ onPaint(HWND hWnd)
 
                         /* this is DC for petmark bitmap */
                         hdcPetMark = CreateCompatibleDC(hDC);
-                        bmPetMarkOld = SelectObject(
-                            hdcPetMark, GetNHApp()->bmpPetMark);
+                        bmPetMarkOld =
+                            SelectObject(hdcPetMark, GetNHApp()->bmpPetMark);
 
                         (*GetNHApp()->lpfnTransparentBlt)(
                             hDC, glyph_rect.left, glyph_rect.top,
-                            data->xScrTile, data->yScrTile, hdcPetMark, 0,
-                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
+                            data->xScrTile, data->yScrTile, hdcPetMark, 0, 0,
+                            TILE_X, TILE_Y, TILE_BK_COLOR);
                         SelectObject(hdcPetMark, bmPetMarkOld);
                         DeleteDC(hdcPetMark);
                     }
 #ifdef USE_PILEMARK
-                    if ((glyph != NO_GLYPH)
-                        && (special & MG_OBJPILE) && iflags.hilite_pile) {
+                    if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)
+                        && iflags.hilite_pile) {
                         /* apply pilemark transparently over other image */
                         HDC hdcPileMark;
                         HBITMAP bmPileMarkOld;
 
                         /* this is DC for pilemark bitmap */
                         hdcPileMark = CreateCompatibleDC(hDC);
-                        bmPileMarkOld = SelectObject(
-                            hdcPileMark, GetNHApp()->bmpPileMark);
+                        bmPileMarkOld = SelectObject(hdcPileMark,
+                                                     GetNHApp()->bmpPileMark);
 
                         (*GetNHApp()->lpfnTransparentBlt)(
                             hDC, glyph_rect.left, glyph_rect.top,
-                            data->xScrTile, data->yScrTile, hdcPileMark, 0,
-                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
+                            data->xScrTile, data->yScrTile, hdcPileMark, 0, 0,
+                            TILE_X, TILE_Y, TILE_BK_COLOR);
                         SelectObject(hdcPileMark, bmPileMarkOld);
-                        DeleteDC(hdcPileMark);                        
-		    }
+                        DeleteDC(hdcPileMark);
+                    }
 #endif
                 }
 
@@ -1030,4 +1041,3 @@ nhcolor_to_RGB(int c)
         return GetNHApp()->regMapColors[c];
     return RGB(0x00, 0x00, 0x00);
 }
-
