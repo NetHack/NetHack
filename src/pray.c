@@ -2181,6 +2181,7 @@ blocked_boulder(dx, dy)
 int dx, dy;
 {
     register struct obj *otmp;
+    int nx, ny;
     long count = 0L;
 
     for (otmp = level.objects[u.ux + dx][u.uy + dy]; otmp;
@@ -2189,6 +2190,7 @@ int dx, dy;
             count += otmp->quan;
     }
 
+    nx = u.ux + 2 * dx, ny = u.uy + 2 * dy; /* next spot beyond boulder(s) */
     switch (count) {
     case 0:
         /* no boulders--not blocked */
@@ -2196,17 +2198,24 @@ int dx, dy;
     case 1:
         /* possibly blocked depending on if it's pushable */
         break;
+    case 2:
+        /* this is only approximate since multiple boulders might sink */
+        if (is_pool_or_lava(nx, ny)) /* does its own isok() check */
+            break; /* still need Sokoban check below */
+        /*FALLTHRU*/
     default:
         /* more than one boulder--blocked after they push the top one;
            don't force them to push it first to find out */
         return TRUE;
     }
 
-    if (!isok(u.ux + 2 * dx, u.uy + 2 * dy))
+    if (dx && dy && Sokoban) /* can't push boulder diagonally in Sokoban */
         return TRUE;
-    if (IS_ROCK(levl[u.ux + 2 * dx][u.uy + 2 * dy].typ))
+    if (!isok(nx, ny))
         return TRUE;
-    if (sobj_at(BOULDER, u.ux + 2 * dx, u.uy + 2 * dy))
+    if (IS_ROCK(levl[nx][ny].typ))
+        return TRUE;
+    if (sobj_at(BOULDER, nx, ny))
         return TRUE;
 
     return FALSE;
