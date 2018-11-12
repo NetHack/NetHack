@@ -905,7 +905,7 @@ register struct obj *otmp;
         }
         break;
     case POT_SPEED:
-        /* skip when mounted; heal_legs() would heal steeds legs */
+        /* skip when mounted; heal_legs() would heal steed's legs */
         if (Wounded_legs && !otmp->cursed && !u.usteed) {
             heal_legs(0);
             unkn++;
