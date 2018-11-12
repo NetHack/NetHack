@@ -137,17 +137,17 @@ stoned_dialogue()
         multi_reason = "getting stoned";
         nomovemsg = You_can_move_again; /* not unconscious */
         /* "your limbs have turned to stone" so terminate wounded legs */
-        if ((HWounded_legs & TIMEOUT) != 0L && !u.usteed)
-            set_itimeout(&HWounded_legs, 0L);
+        if (Wounded_legs && !u.usteed)
+            heal_legs(2);
         break;
     case 2: /* turned to stone */
         if ((HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
             set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
-        /* if also vomiting or turning into slime, stop those */
-        if ((Vomiting & TIMEOUT) != 0L)
-            set_itimeout(&Vomiting, 0L), context.botl = 1;
-        if ((Slimed & TIMEOUT) != 0L)
-            set_itimeout(&Slimed, 0L), context.botl = 1;
+        /* if also vomiting or turning into slime, stop those (no messages) */
+        if (Vomiting)
+            make_vomiting(0L, FALSE);
+        if (Slimed)
+            make_slimed(0L, (char *) 0);
         break;
     default:
         break;
@@ -342,8 +342,8 @@ slime_dialogue()
         break;
     case 1L: /* turning into slime */
         /* if also turning to stone, stop doing that (no message) */
-        if ((Stoned & TIMEOUT) != 0L)
-            set_itimeout(&Stoned, 0L), context.botl = 1;
+        if (Stoned)
+            make_stoned(0L, (char *) 0, KILLED_BY_AN, (char *) 0);
         break;
     }
     exercise(A_DEX, FALSE);
@@ -553,7 +553,7 @@ nh_timeout()
                 stop_occupation();
                 break;
             case WOUNDED_LEGS:
-                heal_legs();
+                heal_legs(0);
                 stop_occupation();
                 break;
             case HALLUC:
