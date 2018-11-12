@@ -3181,7 +3181,8 @@ vomit() /* A good idea from David Neves */
            dealing with some esoteric body_part() */
         Your("jaw gapes convulsively.");
     } else {
-        make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
+        if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
+            make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
         /* if not enough in stomach to actually vomit then dry heave;
            vomiting_dialog() gives a vomit message when its countdown
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */

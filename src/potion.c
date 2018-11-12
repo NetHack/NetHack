@@ -113,6 +113,7 @@ const char *cause; /* sickness cause */
 boolean talk;
 int type;
 {
+    struct kinfo *kptr;
     long old = Sick;
 
 #if 0
@@ -148,11 +149,17 @@ int type;
         context.botl = TRUE;
     }
 
+    kptr = find_delayed_killer(SICK);
     if (Sick) {
         exercise(A_CON, FALSE);
-        delayed_killer(SICK, KILLED_BY_AN, cause);
+        if (!old || !kptr) {
+            int kpfx = ((cause && !strcmp(cause, "#wizintrinsic"))
+                        ? KILLED_BY : KILLED_BY_AN);
+
+            delayed_killer(SICK, kpfx, cause);
+        }
     } else
-        dealloc_killer(find_delayed_killer(SICK));
+        dealloc_killer(kptr);
 }
 
 void
