@@ -242,8 +242,8 @@ static void back_buffer_flip()
 
 void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 {
-    ntassert(x >= 0 && x < console.width);
-    ntassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(x >= 0 && x < console.width);
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
                                                  x == 0)));
 
     cell_t * dst = buffer + console.width * y + x;
@@ -257,8 +257,8 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 
 static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
 {
-    ntassert(x >= 0 && x < console.width);
-    ntassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(x >= 0 && x < console.width);
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
                                                  x == 0)));
     cell_t * dst = buffer + console.width * y + x;
     cell_t *sentinel = buffer + console.width * (y + 1);
@@ -272,8 +272,8 @@ static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
 
 void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
 {
-    ntassert(pos.X >= 0 && pos.X < console.width);
-    ntassert(pos.Y >= 0 && pos.Y < console.height);
+    nhassert(pos.X >= 0 && pos.X < console.width);
+    nhassert(pos.Y >= 0 && pos.Y < console.height);
 
     cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
     *dst = *cell;
@@ -465,8 +465,8 @@ int *x, *y, *mod;
 
 static void set_console_cursor(int x, int y)
 {
-    ntassert(x >= 0 && x < console.width);
-    ntassert(y >= 0 && y < console.height);
+    nhassert(x >= 0 && x < console.width);
+    nhassert(y >= 0 && y < console.height);
 
     console.cursor.X = max(0, min(console.width - 1, x));
     console.cursor.Y = max(0, min(console.height - 1, y));
@@ -547,8 +547,8 @@ void
 xputc_core(ch)
 char ch;
 {
-    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
     boolean inverse = FALSE;
     cell_t cell;
@@ -596,8 +596,8 @@ char ch;
         }
     }
 
-    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 }
 
 /*
@@ -982,7 +982,7 @@ register char *op;
 
 void unload_keyboard_handler()
 {
-    ntassert(keyboard_handler.hLibrary != NULL);
+    nhassert(keyboard_handler.hLibrary != NULL);
 
     FreeLibrary(keyboard_handler.hLibrary);
     memset(&keyboard_handler, 0, sizeof(keyboard_handler_t));
@@ -1619,10 +1619,10 @@ set_known_good_console_font()
         L"Consolas");
 
     success = SetConsoleOutputCP(437);
-    ntassert(success);
+    nhassert(success);
 
     success = SetCurrentConsoleFontEx(console.hConOut, FALSE, &console_font_info);
-    ntassert(success);
+    nhassert(success);
 }
 
 /* restore_original_console_font will restore the console font and code page
@@ -1665,7 +1665,7 @@ void set_cp_map()
                 char c = (char)i;
                 int count = MultiByteToWideChar(codePage, 0, &c, 1,
                                                 &console.cpMap[i], 1);
-                ntassert(count == 1);
+                nhassert(count == 1);
             }        
         }
 
@@ -1685,8 +1685,8 @@ void early_raw_print(const char *s)
     if (console.hConOut == NULL)
         return;
 
-    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
     WORD attribute = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE;
     DWORD unused;
@@ -1725,8 +1725,8 @@ void early_raw_print(const char *s)
         s++;
     }
 
-    ntassert(console.cursor.X >= 0 && console.cursor.X < console.width);
-    ntassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
     SetConsoleCursorPosition(console.hConOut, console.cursor);
 
@@ -1762,7 +1762,7 @@ void nethack_enter_nttty()
     windowprocs.win_raw_print = early_raw_print;
 
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    ntassert(console.hConOut != NULL); // NOTE: this assert will not print
+    nhassert(console.hConOut != NULL); // NOTE: this assert will not print
 
     GetConsoleScreenBufferInfo(console.hConOut, &console.origcsbi);
 
@@ -1803,7 +1803,7 @@ void nethack_enter_nttty()
     /* At this point early_raw_print will work */
 
     console.hConIn = GetStdHandle(STD_INPUT_HANDLE);
-    ntassert(console.hConIn  != NULL);
+    nhassert(console.hConIn  != NULL);
 
     /* grow the size of the console buffer if it is not wide enough */
     if (console.origcsbi.dwSize.X < console.width) {

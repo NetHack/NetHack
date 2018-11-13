@@ -3,12 +3,14 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winos.h"
+#include "winMS.h"
+#include "win10.h"
+
 #include "mhmap.h"
 #include "mhfont.h"
 #include "mhinput.h"
 #include "mhmsg.h"
 #include "resource.h"
-#include "winMS.h"
 
 #include "color.h"
 #include "patchlevel.h"
@@ -34,12 +36,18 @@ typedef struct mswin_nethack_map_window {
     boolean bFitToScreenMode; /* switch Fit map to screen mode on/off */
     int xPos, yPos;           /* scroll position */
     int xPageSize, yPageSize; /* scroll page size */
+    int xMin, xMax, yMin, yMax; /* scroll range */
     int xCur, yCur;           /* position of the cursor */
-    int xScrTile, yScrTile;   /* size of display tile */
+    int xScrTile, yScrTile;   /* size of tile on screen in pixels */
     POINT map_orig;           /* map origin point */
 
-    HFONT hMapFont;           /* font for ASCII mode */
-    boolean bUnicodeFont;     /* font supports unicode page 437 */
+    HFONT hMapFont;       /* font for ASCII mode */
+    boolean bUnicodeFont; /* font supports unicode page 437 */
+
+    int tileWidth;          /* width of tile in pixels at 96 dpi */
+    int tileHeight;         /* height of tile in pixels at 96 dpi */
+    double scale; /* scale factor */
+
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -101,29 +109,57 @@ mswin_init_map_window()
 }
 
 void
-mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
+mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 {
-    PNHMapWindow data;
-    RECT client_rt;
-    SCROLLINFO si;
-    SIZE wnd_size;
-    LOGFONT lgfnt;
-
     /* check arguments */
-    if (!IsWindow(hWnd) || !lpsz || lpsz->cx <= 0 || lpsz->cy <= 0)
+    if (!IsWindow(hWnd) || !map_size || map_size->cx <= 0
+        || map_size->cy <= 0)
         return;
 
+    PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
     /* calculate window size */
+    RECT client_rt;
     GetClientRect(hWnd, &client_rt);
+
+    SIZE wnd_size;
     wnd_size.cx = client_rt.right - client_rt.left;
     wnd_size.cy = client_rt.bottom - client_rt.top;
 
+    if (wnd_size.cx > 0 && wnd_size.cy > 0 && data->bFitToScreenMode) {
+        double windowAspectRatio =
+            (double) wnd_size.cx / (double) wnd_size.cy;
+        UINT mapWidth = COLNO * data->tileWidth;
+        UINT mapHeight = ROWNO * data->tileHeight;
+
+        double mapAspectRatio = (double) mapWidth / (double) mapHeight;
+
+        if (windowAspectRatio > mapAspectRatio)
+            data->scale = (double) wnd_size.cy / (double) mapHeight;
+        else
+            data->scale = (double) wnd_size.cx / (double) mapWidth;
+
+    } else {
+        // Auto size window
+
+        UINT windowDpi = 96;
+
+        if (gWin10.Valid) {
+            windowDpi = gWin10.GetDpiForWindow(hWnd);
+            if (windowDpi == 0)
+                windowDpi = 96;
+        }
+
+        windowDpi = max(96, windowDpi);
+        data->scale = (double) windowDpi / 96.0;
+    }
+
     /* set new screen tile size */
-    data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    data->xScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cx : lpsz->cx) / COLNO);
-    data->yScrTile =
-        max(1, (data->bFitToScreenMode ? wnd_size.cy : lpsz->cy) / ROWNO);
+    data->xScrTile = (int) (data->tileWidth * data->scale);
+    data->yScrTile = (int) (data->tileHeight * data->scale);
+
+    data->xScrTile = max(1, data->xScrTile);
+    data->yScrTile = max(1, data->yScrTile);
 
     /* set map origin point */
     data->map_orig.x =
@@ -134,55 +170,48 @@ mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
     data->map_orig.x -= data->map_orig.x % data->xScrTile;
     data->map_orig.y -= data->map_orig.y % data->yScrTile;
 
-    /* adjust horizontal scroll bar */
-    if (data->bFitToScreenMode)
-        data->xPageSize = COLNO + 1; /* disable scroll bar */
-    else
-        data->xPageSize = wnd_size.cx / data->xScrTile;
+    // Set horizontal scroll
 
-    if (data->xPageSize >= COLNO) {
-        data->xPos = 0;
-        GetNHApp()->bNoHScroll = TRUE;
-    } else {
-        GetNHApp()->bNoHScroll = FALSE;
-        data->xPos = max(
-            0, min(COLNO - data->xPageSize + 1, u.ux - data->xPageSize / 2));
-    }
+    data->xPageSize = min(COLNO, wnd_size.cx / data->xScrTile);
+
+    GetNHApp()->bNoHScroll = (data->xPageSize == COLNO);
+
+    data->xMin = 0;
+    data->xMax = COLNO - data->xPageSize;
+    data->xPos = max(0, min(data->xMax, u.ux - (data->xPageSize / 2)));
+
+    SCROLLINFO si;
 
     si.cbSize = sizeof(si);
     si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
-    si.nMin = 0;
-    si.nMax = COLNO;
-    si.nPage = data->xPageSize;
+    si.nMin = data->xMin;
+    si.nMax = data->xMax;
+    si.nPage = 1;
     si.nPos = data->xPos;
     SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 
-    /* adjust vertical scroll bar */
-    if (data->bFitToScreenMode)
-        data->yPageSize = ROWNO + 1; /* disable scroll bar */
-    else
-        data->yPageSize = wnd_size.cy / data->yScrTile;
+    data->yPageSize = min(ROWNO, wnd_size.cy / data->yScrTile);
 
-    if (data->yPageSize >= ROWNO) {
-        data->yPos = 0;
-        GetNHApp()->bNoVScroll = TRUE;
-    } else {
-        GetNHApp()->bNoVScroll = FALSE;
-        data->yPos = max(
-            0, min(ROWNO - data->yPageSize + 1, u.uy - data->yPageSize / 2));
-    }
+    GetNHApp()->bNoVScroll = (data->yPageSize == ROWNO);
+
+    data->yMin = 0;
+    data->yMax = ROWNO - data->yPageSize;
+    data->yPos = max(0, min(data->yMax, u.uy - (data->yPageSize / 2)));
 
     si.cbSize = sizeof(si);
     si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
-    si.nMin = 0;
-    si.nMax = ROWNO;
-    si.nPage = data->yPageSize;
+    si.nMin = data->yMin;
+    si.nMax = data->yMax;
+    si.nPage = 1;
     si.nPos = data->yPos;
     SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
     /* create font */
     if (data->hMapFont)
         DeleteObject(data->hMapFont);
+
+    LOGFONT lgfnt;
+
     ZeroMemory(&lgfnt, sizeof(lgfnt));
     lgfnt.lfHeight = -data->yScrTile;          // height of font
     lgfnt.lfWidth = -data->xScrTile;           // average character width
@@ -231,94 +260,91 @@ mswin_map_mode(HWND hWnd, int mode)
     case MAP_MODE_ASCII4x6:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 4 * COLNO;
-        mapSize.cy = 6 * ROWNO;
+        data->tileWidth = 4;
+        data->tileHeight = 6;
         break;
 
     case MAP_MODE_ASCII6x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 6 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 6;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII8x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 8;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII16x8:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 8 * ROWNO;
+        data->tileWidth = 16;
+        data->tileHeight = 8;
         break;
 
     case MAP_MODE_ASCII7x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 7 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 7;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII8x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 8 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 8;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII16x12:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 16 * COLNO;
-        mapSize.cy = 12 * ROWNO;
+        data->tileWidth = 16;
+        data->tileHeight = 12;
         break;
 
     case MAP_MODE_ASCII12x16:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 12 * COLNO;
-        mapSize.cy = 16 * ROWNO;
+        data->tileWidth = 12;
+        data->tileHeight = 16;
         break;
 
     case MAP_MODE_ASCII10x18:
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = 10 * COLNO;
-        mapSize.cy = 18 * ROWNO;
+        data->tileWidth = 10;
+        data->tileHeight = 18;
         break;
 
-    case MAP_MODE_ASCII_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_ASCII_FIT_TO_SCREEN: 
         data->bAsciiMode = TRUE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        data->tileWidth = 12;
+        data->tileHeight = 16;
+        break;
 
-    case MAP_MODE_TILES_FIT_TO_SCREEN: {
-        RECT client_rt;
-        GetClientRect(hWnd, &client_rt);
-        mapSize.cx = client_rt.right - client_rt.left;
-        mapSize.cy = client_rt.bottom - client_rt.top;
-
+    case MAP_MODE_TILES_FIT_TO_SCREEN:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = TRUE;
-    } break;
+        data->tileWidth = GetNHApp()->mapTile_X;
+        data->tileHeight = GetNHApp()->mapTile_Y;
+        break;
 
     case MAP_MODE_TILES:
     default:
         data->bAsciiMode = FALSE;
         data->bFitToScreenMode = FALSE;
-        mapSize.cx = GetNHApp()->mapTile_X * COLNO;
-        mapSize.cy = GetNHApp()->mapTile_Y * ROWNO;
+        data->tileWidth = GetNHApp()->mapTile_X;
+        data->tileHeight = GetNHApp()->mapTile_Y;
         break;
     }
+
+    mapSize.cx = data->tileWidth * COLNO;
+    mapSize.cy = data->tileHeight * ROWNO;
 
     mswin_map_stretch(hWnd, &mapSize, TRUE);
 
@@ -618,6 +644,8 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     data->xScrTile = GetNHApp()->mapTile_X;
     data->yScrTile = GetNHApp()->mapTile_Y;
+    data->tileWidth = GetNHApp()->mapTile_X;
+    data->tileHeight = GetNHApp()->mapTile_Y;
 
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 }
@@ -712,10 +740,10 @@ onPaint(HWND hWnd)
                         if (data->bUnicodeFont) {
                             wch = winos_ascii_to_wide(ch);
                             DrawTextW(hDC, &wch, 1, &glyph_rect,
-                                     DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+                                      DT_CENTER | DT_VCENTER | DT_NOPREFIX);
                         } else {
                             DrawTextA(hDC, &ch, 1, &glyph_rect,
-                                 DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+                                      DT_CENTER | DT_VCENTER | DT_NOPREFIX);
                         }
 
                         SetTextColor(hDC, OldFg);
@@ -887,7 +915,7 @@ onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
         yNewPos = data->yPos;
     }
 
-    yNewPos = max(0, min(ROWNO - data->yPageSize + 1, yNewPos));
+    yNewPos = max(0, min(data->yMax, yNewPos));
     if (yNewPos == data->yPos)
         return;
 
@@ -948,7 +976,7 @@ onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
         xNewPos = data->xPos;
     }
 
-    xNewPos = max(0, min(COLNO - data->xPageSize + 1, xNewPos));
+    xNewPos = max(0, min(data->xMax, xNewPos));
     if (xNewPos == data->xPos)
         return;
 

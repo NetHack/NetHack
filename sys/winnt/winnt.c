@@ -468,8 +468,8 @@ char *buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
-/* ntassert_failed is called when an ntassert's condition is false */
-void ntassert_failed(const char * exp, const char * file, int line)
+/* nhassert_failed is called when an nhassert's condition is false */
+void nhassert_failed(const char * exp, const char * file, int line)
 {
     char message[128];
     _snprintf(message, sizeof(message),
