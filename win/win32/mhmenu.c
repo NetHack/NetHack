@@ -2,6 +2,7 @@
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win10.h"
 #include "winMS.h"
 #include <assert.h>
 #include "resource.h"
@@ -975,6 +976,9 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     int color = NO_COLOR, attr;
     boolean menucolr = FALSE;
+    double monitorScale = win10_monitor_scale(hWnd);
+    int tileXScaled = (int) (TILE_X * monitorScale);
+    int tileYScaled = (int) (TILE_Y * monitorScale);
 
     UNREFERENCED_PARAMETER(wParam);
 
@@ -1024,15 +1028,15 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 break;
             }
 
-            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2;
+            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
             SetBrushOrgEx(lpdis->hDC, x, y, NULL);
             saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
-            PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
+            PatBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, PATCOPY);
             SelectObject(lpdis->hDC, saveBrush);
             DeleteObject(hbrCheckMark);
         }
 
-        x += TILE_X + spacing;
+        x += tileXScaled + spacing;
 
         if (item->accelerator != 0) {
             buf[0] = item->accelerator;
@@ -1053,13 +1057,14 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
         x += tm.tmAveCharWidth + tm.tmOverhang + spacing;
     } else {
-        x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
+        x += tileXScaled + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
     }
 
     /* print glyph if present */
     if (NHMENU_HAS_GLYPH(*item)) {
         if (!IS_MAP_ASCII(iflags.wc_map_mode)) {
             HGDIOBJ saveBmp;
+            double monitorScale = win10_monitor_scale(hWnd);
 
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
             ntile = glyph2tile[item->glyph];
@@ -1068,21 +1073,21 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             t_y =
                 (ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y;
 
-            y = (lpdis->rcItem.bottom + lpdis->rcItem.top
-                 - GetNHApp()->mapTile_Y) / 2;
+            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
 
             if (GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles) {
                 /* using original nethack tiles - apply image transparently */
-                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, TILE_X, TILE_Y,
+                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, 
+                                          tileXScaled, tileYScaled,
                                           tileDC, t_x, t_y, TILE_X, TILE_Y,
                                           TILE_BK_COLOR);
             } else {
                 /* using custom tiles - simple blt */
-                BitBlt(lpdis->hDC, x, y, GetNHApp()->mapTile_X,
-                       GetNHApp()->mapTile_Y, tileDC, t_x, t_y, SRCCOPY);
+                StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+                    tileDC, t_x, t_y, GetNHApp()->mapTile_X, GetNHApp()->mapTile_Y, SRCCOPY);
             }
             SelectObject(tileDC, saveBmp);
-            x += GetNHApp()->mapTile_X;
+            x += tileXScaled;
         } else {
             const char *sel_ind;
             switch (item->count) {
@@ -1106,7 +1111,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } else {
         /* no glyph - need to adjust so help window won't look to cramped */
-        x += TILE_X;
+        x += tileXScaled;
     }
 
     x += spacing;

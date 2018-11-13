@@ -129,17 +129,8 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     wnd_size.cx = client_rt.right - client_rt.left;
     wnd_size.cy = client_rt.bottom - client_rt.top;
 
-    /* calculate monitor dpi and monitor scale */
-    UINT monitorDpi = 96;
-
-    if (gWin10.Valid) {
-        monitorDpi = gWin10.GetDpiForWindow(hWnd);
-        if (monitorDpi == 0)
-            monitorDpi = 96;
-    }
-
-    monitorDpi = max(96, monitorDpi);
-    data->monitorScale = (double) monitorDpi / 96.0;
+    // calculate back buffer scale
+    data->monitorScale = win10_monitor_scale(hWnd);
 
     if (data->bAsciiMode) {
         data->backScale = data->monitorScale;

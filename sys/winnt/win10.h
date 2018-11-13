@@ -22,5 +22,8 @@ typedef struct {
 extern Win10 gWin10;
 
 void win10_init();
+int win10_monitor_dpi(HWND hWnd);
+double win10_monitor_scale(HWND hWnd);
+
 
 #endif // WIN10_H

@@ -44,3 +44,23 @@ void win10_init()
     }
 
 }
+
+int win10_monitor_dpi(HWND hWnd)
+{
+    UINT monitorDpi = 96;
+
+    if (gWin10.Valid) {
+        monitorDpi = gWin10.GetDpiForWindow(hWnd);
+        if (monitorDpi == 0)
+            monitorDpi = 96;
+    }
+
+    monitorDpi = max(96, monitorDpi);
+
+    return monitorDpi;
+}
+
+double win10_monitor_scale(HWND hWnd)
+{
+    return (double) win10_monitor_dpi(hWnd) / 96.0;
+}
