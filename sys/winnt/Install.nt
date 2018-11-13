@@ -22,7 +22,6 @@ You can build a TTY version of NetHack and a Windows Graphical
 version.  You can use one of the following build environments:
 
   o A copy of Microsoft Visual Studio 2017 Community Edition
-    OR        Microsoft Visual Studio 2015 Express
 
     OR
 
@@ -35,20 +34,15 @@ version.  You can use one of the following build environments:
     Graphical version.
 
 /--------------------------------------------------------\
-| Building And Running Using Visual Studio 2015 or       |
-|                            Visual Studio 2017          |
+| Building And Running Using Visual Studio 2017          |
 \--------------------------------------------------------/
 
-If you are NOT using Visual Studio 2015 or Visual Studio 2017 IDE, or
-you prefer to build using a Make utility and a Makefile proceed
-to "Building Using Make".
+If you are NOT using Visual Studio 2017 IDE, or you prefer to build
+using a Make utility and a Makefile proceed to "Building Using Make".
 
-When using either Visual Studio 2015 or Visual Studio 2017, you simply 
-need to load the solution file within the IDE, build the solution and 
-run the version of NetHack you wish to run.
-
-The Visual Studio 2015 NetHack solution file can be found here:
-    win\win32\vs2015\NetHack.sln
+When using either Visual Studio 2017, you simply need to load the
+solution file within the IDE, build the solution and  run the version
+of NetHack you wish to run.
 
 The Visual Studio 2017 NetHack solution file can be found here:
     win\win32\vs2017\NetHack.sln
@@ -64,8 +58,7 @@ You can also build all the projects for all platforms and configurations
 using a "build.bat" batch file found in the same directory as the solution.
 
 Open a developer command prompt for the version of Visual Studio you are
-using.  Change to the appropriate directory (i.e. win\win32\vs2015 for
-VS2015 builds, win\win32\vs2017 for VS2017 builds) and run "build.bat".
+using.  Change to the directory win\win32\vs2017 and run "build.bat".
 
 /-----------------------------------\
 | Building Using Make               |

@@ -2,6 +2,7 @@
 /*      Copyright (c) 2015 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win32api.h"
 #include "hack.h"
 
 #ifdef GUISTUB
@@ -51,9 +52,6 @@ char *argv[];
 /* =============================================== */
 
 #ifdef TTYSTUB
-
-#include "hack.h"
-#include "win32api.h"
 
 HANDLE hConIn;
 HANDLE hConOut;

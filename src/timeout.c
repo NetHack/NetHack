@@ -136,10 +136,19 @@ stoned_dialogue()
         nomul(-3); /* can't move anymore */
         multi_reason = "getting stoned";
         nomovemsg = You_can_move_again; /* not unconscious */
+        /* "your limbs have turned to stone" so terminate wounded legs */
+        if (Wounded_legs && !u.usteed)
+            heal_legs(2);
         break;
-    case 2:
+    case 2: /* turned to stone */
         if ((HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
             set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
+        /* if also vomiting or turning into slime, stop those (no messages) */
+        if (Vomiting)
+            make_vomiting(0L, FALSE);
+        if (Slimed)
+            make_slimed(0L, (char *) 0);
+        break;
     default:
         break;
     }
@@ -318,15 +327,25 @@ slime_dialogue()
         } else
             pline1(buf);
     }
-    if (i == 3L) {  /* limbs becoming oozy */
+
+    switch (i) {
+    case 3L:  /* limbs becoming oozy */
         HFast = 0L; /* lose intrinsic speed */
         if (!Popeye(SLIMED))
             stop_occupation();
         if (multi > 0)
             nomul(0);
+        break;
+    case 2L: /* skin begins to peel */
+        if ((HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
+            set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
+        break;
+    case 1L: /* turning into slime */
+        /* if also turning to stone, stop doing that (no message) */
+        if (Stoned)
+            make_stoned(0L, (char *) 0, KILLED_BY_AN, (char *) 0);
+        break;
     }
-    if (i == 2L && (HDeaf & TIMEOUT) > 0L && (HDeaf & TIMEOUT) < 5L)
-        set_itimeout(&HDeaf, 5L); /* avoid Hear_again at tail end */
     exercise(A_DEX, FALSE);
 }
 
@@ -534,7 +553,7 @@ nh_timeout()
                 stop_occupation();
                 break;
             case WOUNDED_LEGS:
-                heal_legs();
+                heal_legs(0);
                 stop_occupation();
                 break;
             case HALLUC:

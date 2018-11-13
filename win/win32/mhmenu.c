@@ -561,7 +561,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         saveFont =
             SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
         SetRect(&text_rt, 0, 0, 0, 0);
-        DrawText(hdc, msg_data->text, strlen(msg_data->text), &text_rt,
+        DrawTextA(hdc, msg_data->text, strlen(msg_data->text), &text_rt,
                  DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX
                      | DT_SINGLELINE);
         data->text.text_box_size.cx =
