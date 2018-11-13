@@ -13,9 +13,9 @@
 static char where_to_get_source[] = "http://www.nethack.org/";
 static char author[] = "The NetHack Development Team";
 
+#include "win32api.h"
 #include "hack.h"
 #include "wintty.h"
-#include "win32api.h"
 
 extern HANDLE hConIn;
 extern INPUT_RECORD ir;

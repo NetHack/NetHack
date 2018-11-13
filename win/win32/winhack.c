@@ -5,14 +5,15 @@
 // winhack.cpp : Defines the entry point for the application.
 //
 
+#include "win10.h"
 #include <process.h>
+
 #include "winMS.h"
 #include "hack.h"
 #include "dlb.h"
 #include "resource.h"
 #include "mhmain.h"
 #include "mhmap.h"
-#include "win10.h"
 
 /* Borland and MinGW redefine "boolean" in shlwapi.h,
    so just use the little bit we need */

@@ -300,7 +300,7 @@ conlibs     = $(baselibs)
 guilibs     = $(winlibs)
 #
 
-INCLDIR= /I..\include
+INCLDIR= /I..\include /I..\sys\winnt
 
 #==========================================
 # Util builds
@@ -997,14 +997,6 @@ $(O)envchk.tag: $(O)obj.tag
 #=========== SECONDARY TARGETS ============
 #==========================================
 
-#===========================================
-# Header files NOT distributed in $(INCL)
-#===========================================
-
-$(INCL)\win32api.h: $(MSWSYS)\win32api.h
-	copy $(MSWSYS)\win32api.h $@
-
-
 #==========================================
 # DLB utility and nhdat file creation
 #==========================================
@@ -1065,7 +1057,7 @@ $(U)recover.exe: $(RECOVOBJS)
 	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
-$(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
+$(O)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)recover.c
 
 #==========================================
@@ -1159,10 +1151,10 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 		)
 <<
 
-$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
+$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
-$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
+$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #==========================================
@@ -1235,7 +1227,6 @@ spotless: clean
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
-	if exist $(INCL)\win32api.h      del $(INCL)\win32api.h
         if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
         if exist $(MSWIN)\mnselcnt.bmp   del $(MSWIN)\mnselcnt.bmp
         if exist $(MSWIN)\mnunsel.bmp    del $(MSWIN)\mnunsel.bmp
@@ -1340,11 +1331,10 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 # NT dependencies
 #
 
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nttty.c
+$(O)nttty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h $(MSWSYS)\nttty.c
 	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
-$(O)win10.o: $(HACK_H) $(MSWSYS)\win10.c
+$(O)winnt.o: $(HACK_H) $(MSWSYS)\win32api.h $(MSWSYS)\winnt.c
 	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
-$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(MSWSYS)\winnt.c
 	@$(cc) $(cflagsBuild) -Fo$@  $(MSWSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
 	@$(cc) $(cflagsBuild)  -Fo$@ $(MSWSYS)\ntsound.c
@@ -1400,7 +1390,7 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\win32api.h
+		$(MSWSYS)\win32api.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcsys.c
