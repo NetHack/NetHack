@@ -106,6 +106,9 @@ boolean talk;
     set_itimeout(&HStun, xtime);
 }
 
+/* Sick is overloaded with both fatal illness and food poisoning (via
+   u.usick_type bit mask), but delayed killer can only support one or
+   the other at a time.  They should become separate intrinsics.... */
 void
 make_sick(xtime, cause, talk, type)
 long xtime;
@@ -113,9 +116,10 @@ const char *cause; /* sickness cause */
 boolean talk;
 int type;
 {
+    struct kinfo *kptr;
     long old = Sick;
 
-#if 0
+#if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         talk = FALSE;
 #endif
@@ -148,11 +152,20 @@ int type;
         context.botl = TRUE;
     }
 
+    kptr = find_delayed_killer(SICK);
     if (Sick) {
         exercise(A_CON, FALSE);
-        delayed_killer(SICK, KILLED_BY_AN, cause);
+        /* setting delayed_killer used to be unconditional, but that's
+           not right when make_sick(0) is called to cure food poisoning
+           if hero was also fatally ill; this is only approximate */
+        if (xtime || !old || !kptr) {
+            int kpfx = ((cause && !strcmp(cause, "#wizintrinsic"))
+                        ? KILLED_BY : KILLED_BY_AN);
+
+            delayed_killer(SICK, kpfx, cause);
+        }
     } else
-        dealloc_killer(find_delayed_killer(SICK));
+        dealloc_killer(kptr);
 }
 
 void
@@ -162,7 +175,7 @@ const char *msg;
 {
     long old = Slimed;
 
-#if 0
+#if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         msg = 0;
 #endif
@@ -170,7 +183,7 @@ const char *msg;
     if ((xtime != 0L) ^ (old != 0L)) {
         context.botl = TRUE;
         if (msg)
-            pline1(msg);
+            pline("%s", msg);
     }
     if (!Slimed)
         dealloc_killer(find_delayed_killer(SLIMED));
@@ -186,7 +199,7 @@ const char *killername;
 {
     long old = Stoned;
 
-#if 0
+#if 0   /* tell player even if hero is unconscious */
     if (Unaware)
         msg = 0;
 #endif
@@ -194,7 +207,7 @@ const char *killername;
     if ((xtime != 0L) ^ (old != 0L)) {
         context.botl = TRUE;
         if (msg)
-            pline1(msg);
+            pline("%s", msg);
     }
     if (!Stoned)
         dealloc_killer(find_delayed_killer(STONED));
@@ -892,9 +905,9 @@ register struct obj *otmp;
         }
         break;
     case POT_SPEED:
+        /* skip when mounted; heal_legs() would heal steed's legs */
         if (Wounded_legs && !otmp->cursed && !u.usteed) {
-            /* heal_legs() would heal steeds legs */
-            heal_legs();
+            heal_legs(0);
             unkn++;
             break;
         }

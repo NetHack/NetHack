@@ -1334,6 +1334,7 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 $(O)nttty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h $(MSWSYS)\nttty.c
 	@$(cc) $(cflagsBuild) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
 $(O)winnt.o: $(HACK_H) $(MSWSYS)\win32api.h $(MSWSYS)\winnt.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWSYS)\win10.c
 	@$(cc) $(cflagsBuild) -Fo$@  $(MSWSYS)\winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
 	@$(cc) $(cflagsBuild)  -Fo$@ $(MSWSYS)\ntsound.c
@@ -1343,6 +1344,13 @@ $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
 
 $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DGUISTUB -Fo$@ $(MSWSYS)\stubs.c
+
+#
+# WIN32 dependencies
+#
+
+$(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.

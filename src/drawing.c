@@ -26,7 +26,8 @@ nhsym l_syms[SYM_MAX] = DUMMY;   /* loaded symbols          */
 nhsym r_syms[SYM_MAX] = DUMMY;   /* rogue symbols           */
 
 nhsym warnsyms[WARNCOUNT] = DUMMY; /* the current warning display symbols */
-const char invisexplain[] = "remembered, unseen, creature";
+const char invisexplain[] = "remembered, unseen, creature",
+           altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}

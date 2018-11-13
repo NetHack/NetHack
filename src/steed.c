@@ -221,7 +221,7 @@ boolean force;      /* Quietly force this animal */
     if (Wounded_legs) {
         Your("%s are in no shape for riding.", makeplural(body_part(LEG)));
         if (force && wizard && yn("Heal your legs?") == 'y')
-            HWounded_legs = EWounded_legs = 0;
+            HWounded_legs = EWounded_legs = 0L;
         else
             return (FALSE);
     }
@@ -542,12 +542,8 @@ int reason; /* Player was thrown off etc. */
     }
     /* While riding, Wounded_legs refers to the steed's legs;
        after dismounting, it reverts to the hero's legs. */
-    if (repair_leg_damage) {
-        /* [TODO: make heal_legs() take a parameter to handle this] */
-        in_steed_dismounting = TRUE;
-        heal_legs();
-        in_steed_dismounting = FALSE;
-    }
+    if (repair_leg_damage)
+        heal_legs(1);
 
     /* Release the steed and saddle */
     u.usteed = 0;
