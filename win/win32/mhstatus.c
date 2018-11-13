@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <assert.h>
+#include "winos.h"
 #include "winMS.h"
 #include "mhstatus.h"
 #include "mhmsg.h"
@@ -278,7 +279,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
     int **fop;
     SIZE sz;
     HGDIOBJ normalFont, boldFont;
-    TCHAR wbuf[BUFSZ];
+    WCHAR wbuf[BUFSZ];
     RECT rt;
     PAINTSTRUCT ps;
     HDC hdc;
@@ -335,7 +336,8 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
             clr = data->colors[*f] & 0x00ff;
             atr = (data->colors[*f] & 0xff00) >> 8;
             vlen = strlen(data->vals[*f]);
-            NH_A2W(data->vals[*f], wbuf, SIZE(wbuf));
+
+            const char *str = data->vals[*f];
 
             if (atr & HL_BOLD)
                 fntatr = ATR_BOLD;
@@ -347,7 +349,13 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 fntatr = ATR_BLINK;
             else if (atr & HL_DIM)
                 fntatr = ATR_DIM;
+
             fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
+
+            BOOL useUnicode = mswin_font_supports_unicode(fnt);
+
+            winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+
             nFg = (clr == NO_COLOR ? status_fg_color
                    : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
                       : status_fg_color));
@@ -365,11 +373,19 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 /* SetTextColor(hdc, nhcolor_to_RGB(hpbar_color)); */
 				SetTextColor(hdc, status_fg_color);
 
-                /* get bounding rectangle */
-                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                if (useUnicode) {
+                    /* get bounding rectangle */
+                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
 
-                /* first draw title normally */
-                DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    /* first draw title normally */
+                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                } else {
+                    /* get bounding rectangle */
+                    GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                    /* first draw title normally */
+                    DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                }
 
                 if (hpbar_percent > 0) {
                     /* calc bar length */
@@ -385,7 +401,11 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     FillRect(hdc, &barrect, back_brush);
                     SetBkMode(hdc, TRANSPARENT);
                     SetTextColor(hdc, nBg);
-                    DrawText(hdc, wbuf, vlen, &barrect, DT_LEFT);
+
+                    if (useUnicode)
+                        DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                    else
+                        DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
                 }
                 DeleteObject(back_brush);
             } else {
@@ -401,11 +421,19 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 SetBkColor(hdc, nBg);
                 SetTextColor(hdc, nFg);
 
-                /* get bounding rectangle */
-                GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                if (useUnicode) {
+                    /* get bounding rectangle */
+                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
 
-                /* draw */
-                DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    /* draw */
+                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                } else {
+                    /* get bounding rectangle */
+                    GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                    /* draw */
+                    DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                }
             }
             assert(sz.cy >= 0);
 

@@ -10,8 +10,8 @@
  *
  */
 
-#include "hack.h"
 #include "win32api.h"
+#include "hack.h"
 #include <mmsystem.h>
 
 #ifdef USER_SOUNDS

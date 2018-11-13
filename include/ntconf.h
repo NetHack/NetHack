@@ -249,13 +249,13 @@ extern int FDECL(alternative_palette, (char *));
 #endif
 
 #ifdef NDEBUG
-#define ntassert(expression) ((void)0)
+#define nhassert(expression) ((void)0)
 #else
-extern void FDECL(ntassert_failed, (const char * exp, const char * file,
+extern void FDECL(nhassert_failed, (const char * exp, const char * file,
                                     int line));
 
-#define ntassert(expression) (void)((!!(expression)) || \
-        (ntassert_failed(#expression, __FILE__, __LINE__), 0))
+#define nhassert(expression) (void)((!!(expression)) || \
+        (nhassert_failed(#expression, __FILE__, __LINE__), 0))
 #endif
 
 #define nethack_enter(argc, argv) nethack_enter_winnt()

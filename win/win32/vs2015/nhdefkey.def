@@ -1,8 +1,0 @@
-LIBRARY nhdefkey
-EXPORTS
-ProcessKeystroke
-NHkbhit
-CheckInput
-SourceWhere
-SourceAuthor
-KeyHandlerName

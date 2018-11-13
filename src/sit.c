@@ -188,7 +188,7 @@ dosit()
                 u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-                heal_legs();
+                heal_legs(0);
                 context.botl = 1;
                 break;
             case 5:

@@ -5,14 +5,15 @@
 // winhack.cpp : Defines the entry point for the application.
 //
 
+#include "win10.h"
 #include <process.h>
+
 #include "winMS.h"
 #include "hack.h"
 #include "dlb.h"
 #include "resource.h"
 #include "mhmain.h"
 #include "mhmap.h"
-#include "win10.h"
 
 /* Borland and MinGW redefine "boolean" in shlwapi.h,
    so just use the little bit we need */
@@ -90,11 +91,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UNREFERENCED_PARAMETER(nCmdShow);
 
     /* We must initialize state sufficiently to support calls to panic */
-    // We need to support DPI awareness.
-    //
-    // BOOL result = SetProcessDpiAwarenessContext(
-    //                            DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    //
     windowprocs.win_raw_print = mswin_raw_print;
     windowprocs.win_raw_print_bold = mswin_raw_print_bold;
     windowprocs.win_wait_synch = mswin_wait_synch;

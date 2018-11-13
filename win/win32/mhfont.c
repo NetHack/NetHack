@@ -4,6 +4,7 @@
 
 /* font management and such */
 
+#include "winos.h"
 #include "mhfont.h"
 
 #define MAXFONTS 64
@@ -12,6 +13,7 @@
 static struct font_table_entry {
     int code;
     HFONT hFont;
+    BOOL supportsUnicode;
 } font_table[MAXFONTS];
 static int font_table_size = 0;
 HFONT version_splash_font;
@@ -48,6 +50,16 @@ void
 mswin_destroy_splashfonts()
 {
     DeleteObject(version_splash_font);
+}
+
+BOOL 
+mswin_font_supports_unicode(HFONT hFont)
+{
+    for (int i = 0; i < font_table_size; i++)
+        if (font_table[i].hFont == hFont)
+            return font_table[i].supportsUnicode;
+
+    return FALSE;
 }
 
 /* create font based on window type, charater attributes and
@@ -198,6 +210,8 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 
     font_table[font_index].code = NHFONT_CODE(win_type, attr);
     font_table[font_index].hFont = fnt;
+    font_table[font_index].supportsUnicode = winos_font_support_cp437(fnt);
+
     return fnt;
 }
 
