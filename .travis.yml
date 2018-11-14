@@ -1,0 +1,27 @@
+language: c
+
+script: "cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../ && QT_SELECT=5 make MOC=moc install"
+
+matrix:
+  include:
+    - env: HINTS=linux
+      compiler: gcc
+    - env: HINTS=linux
+      compiler: clang
+    - env: HINTS=linux-x11
+      compiler: gcc
+    - env: HINTS=linux-qt5
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
+
+sudo: false
+
+notifications:
+  email:
+    recipients:
+      - bhaak@gmx.net
