@@ -45,6 +45,17 @@ void win10_init()
 
 }
 
+void win10_monitor_size(HWND hWnd, int * width, int * height)
+{
+    HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO info;
+    info.cbSize = sizeof(MONITORINFO);
+    BOOL success = GetMonitorInfo(monitor, &info);
+    nhassert(success);
+    *width = info.rcMonitor.right - info.rcMonitor.left;
+    *height = info.rcMonitor.bottom - info.rcMonitor.top;
+}
+
 int win10_monitor_dpi(HWND hWnd)
 {
     UINT monitorDpi = 96;
@@ -63,4 +74,10 @@ int win10_monitor_dpi(HWND hWnd)
 double win10_monitor_scale(HWND hWnd)
 {
     return (double) win10_monitor_dpi(hWnd) / 96.0;
+}
+
+void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo)
+{
+    monitorInfo->scale = win10_monitor_scale(hWnd);
+    win10_monitor_size(hWnd, &monitorInfo->width, &monitorInfo->height);
 }
