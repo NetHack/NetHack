@@ -19,11 +19,19 @@ typedef struct {
     GetDpiForWindowProc GetDpiForWindow;
 } Win10;
 
+typedef struct {
+    double  scale;  // dpi of monitor / 96
+    int     width;  // in pixels
+    int     height; // in pixels
+} MonitorInfo;
+
 extern Win10 gWin10;
 
 void win10_init();
 int win10_monitor_dpi(HWND hWnd);
 double win10_monitor_scale(HWND hWnd);
+void win10_monitor_size(HWND hWnd, int * width, int * height);
+void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo);
 
 
 #endif // WIN10_H
