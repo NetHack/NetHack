@@ -1,4 +1,4 @@
-! $NHDT-Date: 1542244678 2018/11/15 01:17:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.19 $
+! $NHDT-Date: 1542244983 2018/11/15 01:23:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
 ! Copyright (c) 2017 by Pasi Kallinen
 ! NetHack may be freely redistributed.  See license for details.
 
@@ -91,10 +91,10 @@ NetHack*highlight_prompt: False
 !NetHack*message_line: True
 
 ! If True, the default, use a "fancy" style status area below the map.
-! Fancy status has some highlighting but does not honor STATUS_HILITES.
+! Fancy status has some highlighting but does not honor HILITE_STATUS.
 ! If False, use TTY-style status lines (two text lines below the map).
-! TTY status honors STATUS_HILITE thresholds and colors but for
-! attributes, only supports inverse (not bold, dim, blink, or underline).
+! TTY status honors HILITE_STATUS thresholds and colors, but for
+! attributes only supports inverse (not bold, dim, blink, or underline).
 ! (As of this writing, fancy status looks better with a tiles map and
 ! tty-style status looks good with a text map but not with a tiles one.)
 !NetHack*fancy_status: False
