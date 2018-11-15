@@ -698,6 +698,7 @@ int fld, idx, idx_p;
 boolean *valsetlist;
 {
     static int oldrndencode = 0;
+    static nhsym oldgoldsym = 0;
     int pc, chg, color = NO_COLOR;
     unsigned anytype;
     boolean updated = FALSE, reset;
@@ -719,10 +720,28 @@ boolean *valsetlist;
      * so $:0 has already been encoded and cached by the window
      * port.  Without this hack, gold's \G sequence won't be
      * recognized and ends up being displayed as-is for 'update_all'.
+     *
+     * Also, even if context.rndencode hasn't changed and the
+     * gold amount itself hasn't changed, the glyph portion of the
+     * encoding may have changed if a new symset was put into
+     * effect.
+     *
+     *  \GXXXXNNNN:25
+     *  XXXX = the context.rndencode portion
+     *  NNNN = the glyph portion
+     *  25   = the gold amount
+     *
      */
-    if (context.rndencode != oldrndencode && fld == BL_GOLD) {
-        chg = 2;
-        oldrndencode = context.rndencode;
+
+    if (fld == BL_GOLD) {
+        if (context.rndencode != oldrndencode && fld == BL_GOLD) {
+            chg = 2;
+            oldrndencode = context.rndencode;
+        }
+        if (oldgoldsym != showsyms[COIN_CLASS + SYM_OFF_O]) {
+            chg = 2;
+            oldgoldsym = showsyms[COIN_CLASS + SYM_OFF_O];
+        }
     }
 
     reset = FALSE;
