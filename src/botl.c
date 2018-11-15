@@ -734,7 +734,7 @@ boolean *valsetlist;
      */
 
     if (fld == BL_GOLD) {
-        if (context.rndencode != oldrndencode && fld == BL_GOLD) {
+        if (context.rndencode != oldrndencode) {
             chg = 2;
             oldrndencode = context.rndencode;
         }
