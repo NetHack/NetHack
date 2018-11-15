@@ -863,9 +863,11 @@ SetMenuListType(HWND hWnd, int how)
     SendMessage(control, WM_SETFONT, (WPARAM) fnt, (LPARAM) 0);
 
     /* add column to the list view */
+    MonitorInfo monitorInfo;
+    win10_monitor_info(hWnd, &monitorInfo);
     ZeroMemory(&lvcol, sizeof(lvcol));
     lvcol.mask = LVCF_WIDTH | LVCF_TEXT;
-    lvcol.cx = GetSystemMetrics(SM_CXFULLSCREEN);
+    lvcol.cx = monitorInfo.width;
     lvcol.pszText = NH_A2W(data->menu.prompt, wbuf, BUFSZ);
     ListView_InsertColumn(control, 0, &lvcol);
 

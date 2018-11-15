@@ -2,6 +2,7 @@
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win10.h"
 #include "winMS.h"
 #include "resource.h"
 #include "mhrip.h"
@@ -25,6 +26,14 @@ typedef struct mswin_nethack_text_window {
     HANDLE rip_bmp;
     TCHAR *window_text;
     TCHAR *rip_text;
+    int x;
+    int y;
+    int width;
+    int height;
+    int graveX;
+    int graveY;
+    int graveHeight;
+    int graveWidth;
 } NHRIPWindow, *PNHRIPWindow;
 
 INT_PTR CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -62,8 +71,20 @@ mswin_display_RIP_window(HWND hWnd)
     RECT textrect;
     HDC hdc;
     HFONT OldFont;
+    MonitorInfo monitorInfo;
+
+    win10_monitor_info(hWnd, &monitorInfo);
 
     data = (PNHRIPWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    data->x = (int)(RIP_OFFSET_X * monitorInfo.scale);
+    data->y = (int)(RIP_OFFSET_Y * monitorInfo.scale);
+    data->width = (int)(RIP_WIDTH * monitorInfo.scale);
+    data->height = (int)(RIP_HEIGHT * monitorInfo.scale);
+    data->graveX = (int)(RIP_GRAVE_X * monitorInfo.scale);
+    data->graveY = (int)(RIP_GRAVE_Y * monitorInfo.scale);
+    data->graveWidth = (int)(RIP_GRAVE_WIDTH * monitorInfo.scale);
+    data->graveHeight = (int)(RIP_GRAVE_HEIGHT * monitorInfo.scale);
 
     GetNHApp()->hPopupWnd = hWnd;
     mapWnd = mswin_hwnd_from_winid(WIN_MAP);
@@ -73,9 +94,9 @@ mswin_display_RIP_window(HWND hWnd)
     GetWindowRect(hWnd, &riprt);
     GetClientRect(hWnd, &clientrect);
     textrect = clientrect;
-    textrect.top += RIP_OFFSET_Y;
-    textrect.left += RIP_OFFSET_X;
-    textrect.right -= RIP_OFFSET_X;
+    textrect.top += data->y;
+    textrect.left += data->x;
+    textrect.right -= data->x;
     if (data->window_text) {
         hdc = GetDC(hWnd);
         OldFont = SelectObject(hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE));
@@ -84,17 +105,17 @@ mswin_display_RIP_window(HWND hWnd)
         SelectObject(hdc, OldFont);
         ReleaseDC(hWnd, hdc);
     }
-    if (textrect.right - textrect.left > RIP_WIDTH)
-        clientrect.right = textrect.right + RIP_OFFSET_X - clientrect.right;
+    if (textrect.right - textrect.left > data->width)
+        clientrect.right = textrect.right + data->y - clientrect.right;
     else
         clientrect.right =
-            textrect.left + 2 * RIP_OFFSET_X + RIP_WIDTH - clientrect.right;
+            textrect.left + 2 * data->x + data->width - clientrect.right;
     clientrect.bottom =
-        textrect.bottom + RIP_HEIGHT + RIP_OFFSET_Y - clientrect.bottom;
+        textrect.bottom + data->height + data->y - clientrect.bottom;
     GetWindowRect(GetDlgItem(hWnd, IDOK), &textrect);
     textrect.right -= textrect.left;
     textrect.bottom -= textrect.top;
-    clientrect.bottom += textrect.bottom + RIP_OFFSET_Y;
+    clientrect.bottom += textrect.bottom + data->y;
     riprt.right -= riprt.left;
     riprt.bottom -= riprt.top;
     riprt.right += clientrect.right;
@@ -106,7 +127,7 @@ mswin_display_RIP_window(HWND hWnd)
     GetClientRect(hWnd, &clientrect);
     MoveWindow(GetDlgItem(hWnd, IDOK),
                (clientrect.right - clientrect.left - textrect.right) / 2,
-               clientrect.bottom - textrect.bottom - RIP_OFFSET_Y,
+               clientrect.bottom - textrect.bottom - data->y,
                textrect.right, textrect.bottom, TRUE);
     ShowWindow(hWnd, SW_SHOW);
 
@@ -158,9 +179,9 @@ NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetBkMode(hdc, TRANSPARENT);
         GetClientRect(hWnd, &clientrect);
         textrect = clientrect;
-        textrect.top += RIP_OFFSET_Y;
-        textrect.left += RIP_OFFSET_X;
-        textrect.right -= RIP_OFFSET_X;
+        textrect.top += data->y;
+        textrect.left += data->x;
+        textrect.right -= data->x;
         if (data->window_text) {
             DrawText(hdc, data->window_text, strlen(data->window_text),
                      &textrect, DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
@@ -169,15 +190,16 @@ NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpRip);
         SetBkMode(hdc, OPAQUE);
-        bitmap_offset = (textrect.right - textrect.left - RIP_WIDTH) / 2;
-        BitBlt(hdc, textrect.left + bitmap_offset, textrect.bottom, RIP_WIDTH,
-               RIP_HEIGHT, hdcBitmap, 0, 0, SRCCOPY);
+        bitmap_offset = (textrect.right - textrect.left - data->width) / 2;
+        StretchBlt(hdc, textrect.left + bitmap_offset, textrect.bottom,
+            data->width, data->height, 
+            hdcBitmap, 0, 0, RIP_WIDTH, RIP_HEIGHT, SRCCOPY);
         SetBkMode(hdc, TRANSPARENT);
         if (data->rip_text) {
-            textrect.left += RIP_GRAVE_X + bitmap_offset;
-            textrect.top = textrect.bottom + RIP_GRAVE_Y;
-            textrect.right = textrect.left + RIP_GRAVE_WIDTH;
-            textrect.bottom = textrect.top + RIP_GRAVE_HEIGHT;
+            textrect.left += data->graveX + bitmap_offset;
+            textrect.top = textrect.bottom + data->graveY;
+            textrect.right = textrect.left + data->graveWidth;
+            textrect.bottom = textrect.top + data->graveHeight;
             DrawText(hdc, data->rip_text, strlen(data->rip_text), &textrect,
                      DT_CENTER | DT_VCENTER | DT_NOPREFIX | DT_WORDBREAK);
         }
