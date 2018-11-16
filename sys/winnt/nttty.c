@@ -571,8 +571,6 @@ char ch;
         break;
     default:
 
-        // Temporary fix.  Tty putstatusfield()
-
         inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
         console.attr = (inverse) ?
                         ttycolors_inv[console.current_nhcolor] :
