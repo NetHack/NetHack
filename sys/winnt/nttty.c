@@ -1664,6 +1664,12 @@ void set_cp_map()
                 int count = MultiByteToWideChar(codePage, 0, &c, 1,
                                                 &console.cpMap[i], 1);
                 nhassert(count == 1);
+
+                // If a character was mapped to unicode control codes,
+                // remap to the appropriate unicode character per our
+                // code page 437 mappings.
+                if (console.cpMap[i] < 32)
+                    console.cpMap[i] = cp437[console.cpMap[i]];
             }        
         }
 
