@@ -21,6 +21,8 @@
 #define CURSOR_BLINK_INTERVAL 1000 // milliseconds
 #define CURSOR_HEIGHT 2 // pixels
 
+#define CUSOR_BLINK FALSE // Set to true for a cursor that blinks
+
 extern short glyph2tile[];
 
 #define TILEBMP_X(ntile) \
@@ -57,7 +59,7 @@ typedef struct mswin_nethack_map_window {
     double monitorScale;        /* from 96dpi to monitor dpi*/
     
     boolean cursorOn;
-    int yFrontCursor;           /* height of cursor inback buffer in pixels */
+    int yCursor;           /* height of cursor inback buffer in pixels */
 
     int backWidth;              /* back buffer width */
     int backHeight;             /* back buffer height */
@@ -129,8 +131,10 @@ mswin_init_map_window()
 
     mswin_apply_window_style(hWnd);
 
+#if CURSOR_BLINK
     /* set cursor blink timer */
     SetTimer(hWnd, 0, CURSOR_BLINK_INTERVAL, NULL);
+#endif
 
     return hWnd;
 }
@@ -278,7 +282,11 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
 
     /* calcuate ASCII cursor height */
-    data->yFrontCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
+#if CURSOR_BLINK
+    data->yCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
+#else
+    data->yCursor = data->yBackTile;
+#endif
 
     /* set map origin point */
     data->map_orig.x =
@@ -701,6 +709,7 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     data->hWnd = hWnd;
 
     data->bAsciiMode = FALSE;
+    data->cursorOn = TRUE;
 
     data->xFrontTile = GetNHApp()->mapTile_X;
     data->yFrontTile = GetNHApp()->mapTile_Y;
@@ -885,9 +894,9 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
 
     if (i == data->xCur && j == data->yCur && data->cursorOn)
         PatBlt(data->backBufferDC, 
-                rect->left, rect->bottom - data->yFrontCursor,
+                rect->left, rect->bottom - data->yCursor,
                 rect->right - rect->left,
-                data->yFrontCursor,
+                data->yCursor,
                 DSTINVERT);
 }
 
