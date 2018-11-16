@@ -1,6 +1,6 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.6.2"
-$ ! $NHDT-Date: 1524689429 2018/04/25 20:50:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $
+$ ! $NHDT-Date: 1542411224 2018/11/16 23:33:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.19 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 $ !
@@ -251,7 +251,6 @@ $ makedefs -p	!pm.h
 $ makedefs -o	!onames.h
 $ makedefs -v	!date.h
 $ milestone " (*.h)"
-$ makedefs -m	!../src/monstr.c
 $ makedefs -z	!../src/vis_tab.c, ../include/vis_tab.h
 $ milestone " (*.c)"
 $ set default [-.src]
@@ -269,7 +268,7 @@ $ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,cmd,dbridge,detect" -
 $ gosub compile_list
 $ c_list = "hack,hacklib,invent,light,lock,mail,makemon,mapglyph,mcastu" -
 	+ ",mhitm,mhitu,minion,mklev,mkmap,mkmaze,mkobj,mkroom,mon,mondata" -
-	+ ",monmove,monstr,mplayer,mthrowu,muse,music,o_init,objnam,options" -
+	+ ",monmove,mplayer,mthrowu,muse,music,o_init,objnam,options" -
 	+ ",pager,pickup"
 $ gosub compile_list
 $ c_list = "pline,polyself,potion,pray,priest,quest,questpgr,read" -
