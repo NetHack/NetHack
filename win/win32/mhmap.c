@@ -566,6 +566,10 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         if (data->hMapFont)
             DeleteObject(data->hMapFont);
+        if (data->hBackBuffer)
+            DeleteBitmap(data->hBackBuffer);
+        if (data->backBufferDC)
+            DeleteDC(data->backBufferDC);
         free(data);
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
         break;
