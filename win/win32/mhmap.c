@@ -88,6 +88,7 @@ static void clearAll(PNHMapWindow data);
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 static void nhglyph2charcolor(short glyph, uchar *ch, int *color);
 #endif
+extern boolean win32_cursorblink;       /* from sys\winnt\winnt.c */
 
 HWND
 mswin_init_map_window()
