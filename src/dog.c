@@ -464,6 +464,7 @@ fail_mon_placement:
             }
             (void) mkcorpstat(CORPSE, (struct monst *) 0, mtmp->data, xlocale,
                               ylocale, CORPSTAT_NONE);
+            mtmp->mx = mtmp->my = -1; /* for mongone, mon is not anywhere */
             mongone(mtmp);
         }
     }
