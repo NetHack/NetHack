@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	NetHack 3.6	Makefile.utl	$NHDT-Date: 1524689428 2018/04/25 20:50:28 $	$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
+#	NetHack 3.6	Makefile.utl	$NHDT-Date: 1542388602 2018/11/16 17:16:42 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.16 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -173,8 +173,6 @@ $(INC)onames.h	: $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -o
 $(INC)pm.h	: $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -p
-$(SRC)monstr.c	: $(MAKEDEFS)
-	$(RUN) $(MAKEDEFS) -m
 # both vis_tab.h and vis_tab.c are made at the same time by makedefs -z
 $(INC)vis_tab.h : $(SRC)vis_tab.c
 	$(TOUCH) $(INC)vis_tab.h

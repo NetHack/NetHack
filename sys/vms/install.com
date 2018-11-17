@@ -1,9 +1,9 @@
 $ ! vms/install.com -- set up nethack 'playground'
-$! $NHDT-Date: 1524689428 2018/04/25 20:50:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $
+$! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
 $! Copyright (c) 2016 by Robert Patrick Rankin
 $! NetHack may be freely redistributed.  See license for details.
 $ !
-$ ! $NHDT-Date: 1524689428 2018/04/25 20:50:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $
+$ ! $NHDT-Date: 1542388600 2018/11/16 17:16:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.11 $
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
@@ -26,10 +26,11 @@ $	if p2.nes."" then  gameuic := 'p2'
 $
 $	! note: all filespecs contain some punctuation,
 $	!	to avoid inadvertent logical name interaction
-$	play_files = "PERM.,RECORD.,LOGFILE.,PANICLOG."
+$	play_files = "PERM.,RECORD.,LOGFILE.,XLOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,KEYHELP.,WIZHELP.,OPTHELP.," -
 		   + "HISTORY.,LICENSE."
-$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE."
+$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE.," -
+		   + "ENGRAVE.,EPITAPH.,BOGUSMON."
 $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
@@ -88,6 +89,8 @@ $ makedefs -r	!rumors.tru + rumors.fal -> rumors
 $	milestone "(oracles)"
 $ makedefs -h	!oracles.txt -> oracles
 $	milestone "(dungeon preprocess)"
+$ makedefs -s
+$	milestone "(engrave, epitaph, bogusmon)"
 $ makedefs -e	!dungeon.def -> dungeon.pdf
 $	milestone "(quest text)"
 $ makedefs -q	!quest.txt -> quest.dat
