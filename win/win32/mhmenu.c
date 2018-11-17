@@ -23,6 +23,9 @@
 #define DEFAULT_COLOR_BG_MENU COLOR_WINDOW
 #define DEFAULT_COLOR_FG_MENU COLOR_WINDOWTEXT
 
+#define CHECK_WIDTH 16
+#define CHECK_HEIGHT 16
+
 typedef struct mswin_menu_item {
     int glyph;
     ANY_P identifier;
@@ -62,6 +65,7 @@ typedef struct mswin_nethack_menu_window {
     HBITMAP bmpChecked;
     HBITMAP bmpCheckedCount;
     HBITMAP bmpNotChecked;
+    HDC bmpDC;
 
     BOOL is_active;
 } NHMenuWindow, *PNHMenuWindow;
@@ -268,14 +272,14 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
 INT_PTR CALLBACK
 MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PNHMenuWindow data;
-    HWND control;
-    HDC hdc;
+    PNHMenuWindow data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    HWND control = GetDlgItem(hWnd, IDC_MENU_TEXT);
     TCHAR title[MAX_LOADSTRING];
 
-    data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+
+        HDC hdc = GetDC(control);
         data = (PNHMenuWindow) malloc(sizeof(NHMenuWindow));
         ZeroMemory(data, sizeof(NHMenuWindow));
         data->type = MENU_TYPE_TEXT;
@@ -288,12 +292,11 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
         data->bmpNotChecked =
             LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
+        data->bmpDC = CreateCompatibleDC(hdc);
         data->is_active = FALSE;
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
         /* set font for the text cotrol */
-        control = GetDlgItem(hWnd, IDC_MENU_TEXT);
-        hdc = GetDC(control);
         SendMessage(control, WM_SETFONT,
                     (WPARAM) mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE),
                     (LPARAM) 0);
@@ -311,6 +314,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         /* set focus to text control for now */
         SetFocus(control);
+    }
         return FALSE;
 
     case WM_MSNH_COMMAND:
@@ -501,6 +505,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         if (data) {
+            DeleteDC(data->bmpDC);
             DeleteObject(data->bmpChecked);
             DeleteObject(data->bmpCheckedCount);
             DeleteObject(data->bmpNotChecked);
@@ -1015,27 +1020,26 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (NHMENU_IS_SELECTABLE(*item)) {
         char buf[2];
         if (data->how != PICK_NONE) {
-            HGDIOBJ saveBrush;
-            HBRUSH hbrCheckMark;
+            HBITMAP bmpCheck;
+            HBITMAP bmpSaved;
 
             switch (item->count) {
             case -1:
-                hbrCheckMark = CreatePatternBrush(data->bmpChecked);
+                bmpCheck = data->bmpChecked;
                 break;
             case 0:
-                hbrCheckMark = CreatePatternBrush(data->bmpNotChecked);
+                bmpCheck = data->bmpNotChecked;
                 break;
             default:
-                hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount);
+                bmpCheck = data->bmpCheckedCount;
                 break;
             }
 
             y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
-            SetBrushOrgEx(lpdis->hDC, x, y, NULL);
-            saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
-            PatBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, PATCOPY);
-            SelectObject(lpdis->hDC, saveBrush);
-            DeleteObject(hbrCheckMark);
+            bmpSaved = SelectBitmap(data->bmpDC, bmpCheck);
+            StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+                data->bmpDC, 0, 0,  CHECK_WIDTH, CHECK_HEIGHT, SRCCOPY);
+            SelectObject(data->bmpDC, bmpSaved);
         }
 
         x += tileXScaled + spacing;
