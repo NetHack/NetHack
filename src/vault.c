@@ -13,6 +13,7 @@ STATIC_DCL void FDECL(restfakecorr, (struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
+STATIC_DCL void FDECL(gd_mv_monaway, (struct monst *, int, int));
 
 void
 newegd(mtmp)
@@ -577,6 +578,19 @@ struct monst *grd;
     }
 }
 
+STATIC_OVL void
+gd_mv_monaway(grd, nx,ny)
+register struct monst *grd;
+int nx,ny;
+{
+    if (MON_AT(nx, ny) && nx != grd->mx && ny != grd->my) {
+        if (!Deaf)
+            verbalize("Out of my way, scum!");
+        if (!rloc(m_at(nx, ny), FALSE))
+            m_into_limbo(m_at(nx, ny));
+    }
+}
+
 /*
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
  */
@@ -745,11 +759,7 @@ register struct monst *grd;
             mpickgold(grd); /* does a newsym */
         } else {
             /* just for insurance... */
-            if (MON_AT(m, n) && m != grd->mx && n != grd->my) {
-                if (!Deaf)
-                    verbalize("Out of my way, scum!");
-                (void) rloc(m_at(m, n), FALSE);
-            }
+            gd_mv_monaway(grd, m,n);
             remove_monster(grd->mx, grd->my);
             newsym(grd->mx, grd->my);
             place_monster(grd, m, n);
@@ -869,6 +879,7 @@ proceed:
     fcp->fy = ny;
     fcp->ftyp = typ;
 newpos:
+    gd_mv_monaway(grd, nx,ny);
     if (egrd->gddone) {
         /* The following is a kludge.  We need to keep    */
         /* the guard around in order to be able to make   */
