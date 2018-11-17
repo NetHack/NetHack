@@ -1,0 +1,146 @@
+Below are some things I would like to see
+
+NETHACK INTERFACE
+=================
+
+(These are the functions in cursmain.c called by the core NetHack code)
+
+ * Implement curses_rip for optional fancier color tombstone, as well
+ as one that will display correctly on smaller terminals.
+ 
+ * I am confused as to how mark_synch, wait_synch, and delay_output
+ should work.  Help, please?
+ 
+ * Both PDCurses and Ncurses have mouse support, so the poskey function
+ could probably be implemented easily enough.
+ 
+ * raw_print is supposed to be able to work before the windowing system
+ has been initialized, as well as after, so I am unsure if curses
+ functions should be used here.  Maybe check to see if initscr() has
+ been called, and use curses functions if so, and call initscr() from
+ there is not?  Right now it is just a call to puts() with no support
+ for bold text.
+
+
+DISPLAY
+=======
+
+ * Consolidate refreshes of the display for smoother output.
+
+ * Horizontal scrollbar to show position for displays < 80 columns.
+ 
+ * Calls to getch() should probably be turned into wgetch() for the
+ appropriate window.  This causes quirty cursor behavior under
+ PDCurses, however.
+
+ * Animation effects do not display properly - this could probably be
+ fixed with a correct implementation of the delay_output function.
+
+ * Support option to set forground and background colors for individual
+ windows
+
+
+MENUS
+=====
+
+(cursdial.c)
+
+ * Menus need to be able to accept a count as input, e.g. to specifiy
+ how many items to drop.
+ 
+ * Currently the "preselected" flag for an individual menu item is
+ ignored.  This should eventually be implemented.
+ 
+ * Menus probably should never overlap with the message window, since
+ the user sometmes needs to be able to see the messages while the menu
+ is active, e.g. when identifying multiple items one at a time.
+ 
+ * Perhaps allow for keyboard navigation of individual items, e.g.
+ using the up and down arrows to move among the selectable items, and
+ selecting individual items with the spacebar.  Perhaps the tab key
+ could jump to the first selectable item after the next heading, and
+ shift-tab could jump to the first item of the previous heading.
+
+
+MESSAGE WINDOW
+==============
+
+(cursmesg.c)
+
+ * Hitting Esc at the more prompt (which is '>>' for the curses
+ interface) should suppress the display of any further messages for
+ that turn like the tty interface does.
+
+
+MAP WINDOW
+==========
+
+(curswins.c)
+
+ * The map window would probably benefit from a total redesign.  Right
+ now, it uses a pad instead of a regular curses window, which causes a
+ number of special cases in the code to account for it, and a seperate
+ window behind it just to draw the border.  It feels kludgy and
+ annoying!
+
+
+STATUS WINDOW
+=============
+
+(cursstat.c)
+
+ * If the status window is on the right or left, then we have much more
+ room to work with for each item horizontally.  Expand out some of the
+ labels for clarity.  We can also list the current dungeon (e.g.
+ Gnomish Mines) and perhaps show thermometer bars for hit points and
+ magical power.
+ 
+ * Conversely, if we have a narrower dislay, compress some of the
+ labels to save space, and do not display some items that never or
+ rarely change (e.g. name, level and title, and alignment).  Perhaps
+ display changes to these fields in the message window if they do
+ happen to change (e.g. converting to a new alignment).
+ 
+ * Maybe add some configuration options for what colors are used and
+ the like.
+
+OTHER DIALOGS
+=============
+
+(cursdial.c)
+
+ * curses_yn_function needs to accept a count if a '#' is present in
+ choices string.
+ 
+ * Extended commands should be enterable letter-by-letter via a '#'
+ prompt if user does not have the extmenu command set to TRUE.
+ 
+ * Character selection should allow for a random selection of any or
+ all choices.
+
+
+OTHER PLATFORMS
+===============
+
+ * PDCurses also work on DOS and OS/2.  PDCurses for SDL and ncurses
+ exist for Mac OS X.  Porting the curses interface to these platforms
+ should not be too difficult.
+
+
+MISC
+====
+
+ * Update documentation and in-game help to describe the newly-added
+ options: cursesgraphics, term_rows, term_cols, and windowborders.
+
+ * Recognize "Alt" key in a platform-independant way to allow its use
+ to select extended commands.  Currently this works for PDCurses.  For
+ Ncurses, the Alt key works in an xterm or rxvt if the -meta8 flag is
+ passed, but I'd like to see a general way of detecting it.
+ 
+ * PDCurses has a function named "addrawch" to output the visual
+ representation of a control character to the screen without having the
+ control character affect the display otherwise.  I would like to find
+ a way to accomplish the same thing via Ncurses to e.g. be able to use
+ a font like nh10 with the correct symbol mappings in an xterm or the
+ like.
