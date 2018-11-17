@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1524689428 2018/04/25 20:50:28 $	$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1542388601 2018/11/16 17:16:41 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.31 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -113,19 +113,22 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
-	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c mail.c \
-	   makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c mklev.c mkmap.c \
+	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c \
+	   mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c \
+	   mklev.c mkmap.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c rnd.c \
-	   role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c spell.c \
-	   steal.c steed.c sys.c teleport.c timeout.c topten.c track.c trap.c \
-	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
+	   rip.c rnd.c role.c \
+	   rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c spell.c \
+	   steal.c steed.c sys.c teleport.c timeout.c topten.c track.c \
+	   trap.c u_init.c \
+	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = monstr.c vis_tab.c	#tile.c
+GENCSRC = vis_tab.c	#tile.c
 
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
@@ -159,7 +162,7 @@ HOBJ2 = dog.obj,dogmove.obj,dokick.obj,dothrow.obj,drawing.obj, \
 	extralev.obj,files.obj,fountain.obj,hack.obj,hacklib.obj,invent.obj
 HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mapglyph.obj,mcastu.obj, \
 	mhitm.obj,mhitu.obj,minion.obj,mklev.obj,mkmap.obj,mkmaze.obj, \
-	mkobj.obj,mkroom.obj,mon.obj,mondata.obj,monmove.obj,monstr.obj
+	mkobj.obj,mkroom.obj,mon.obj,mondata.obj,monmove.obj
 HOBJ4 = mplayer.obj,mthrowu.obj,muse.obj,music.obj,o_init.obj,objnam.obj, \
 	options.obj,pager.obj,pickup.obj,pline.obj,polyself.obj, \
 	potion.obj,pray.obj,priest.obj,quest.obj,questpgr.obj,read.obj
@@ -260,10 +263,6 @@ $(INC)pm.h :	$(MAKEDEFS)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(INC)pm.h
       @ $(CD) $(SRC)
-monstr.c : $(MAKEDEFS)
-	$(CD) $(UTL)
-	$(MAKE)$(MAKEFLAGS) $(SRC)monstr.c
-      @ $(CD) $(SRC)
 # both vis_tab.h and vis_tab.c are made at the same time by makedefs
 $(INC)vis_tab.h : vis_tab.c
 	$(TOUCH) $(INC)vis_tab.h
@@ -290,19 +289,20 @@ $(INC)date.h :	$(VERSOURCES) $(HACK_H)
 	$(MAKE)$(MAKEFLAGS) $(INC)date.h
       @ $(CD) $(SRC)
 
-#	special targets
+#	special targets (monstr.c is an obsolete generated source file)
 clean :
       - if f$search("*.*;-2").nes."" then  purge/Keep=2
       - if f$search("$(INC)*.*;-2").nes."" then  purge/Keep=2 $(INC) /Exclude=*conf*.h
       - if f$search("*.obj").nes."" then  delete *.obj;*
       - if f$search("*.h-t").nes."" then  delete *.h-t;* !$(HACK_H),$(CONFIG_H)
+      - if f$search("monstr.c").nes."" then  delete monstr.c;*
 
 spotless :	clean
       - if f$search("*.*;-1).nes."" then  purge
       - if f$search("$(INC)*.*;-1").nes."" then  purge $(INC)
       - if f$search("$(SYSTEM)").nes."" then  delete $(SYSTEM)
       - if f$search("$(GAME)").nes."" then  delete $(GAME)
-      - delete monstr.c;,vis_tab.c;,$(INC)vis_tab.h;,\
+      - delete vis_tab.c;,$(INC)vis_tab.h;,\
  $(INC)pm.h;,$(INC)onames.h;,$(INC)date.h;
       - if f$search("tile.c").nes."" then  delete tile.c;
       - if f$search("tclib.c").nes."" then  delete tclib.c;
@@ -368,7 +368,6 @@ winstat.obj :	$(X11)winstat.c $(HACK_H) $(INC)winX.h
 wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
-monstr.obj :	monstr.c $(CONFIG_H)
 vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
 #	general code
 allmain.obj :	allmain.c $(HACK_H)

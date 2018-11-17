@@ -428,7 +428,11 @@ E const char *ARGV0;
 E void NDECL((*dropleveltempsfn));
 #endif
 
-enum earlyarg {ARG_DEBUG, ARG_VERSION};
+enum earlyarg {ARG_DEBUG, ARG_VERSION
+#ifdef WIN32
+    ,ARG_WINDOWS
+#endif
+};
 
 struct early_opt {
     enum earlyarg e;

@@ -15,6 +15,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw);
 int mswin_map_mode(HWND hWnd, int mode);
 
 #define ROGUE_LEVEL_MAP_MODE MAP_MODE_ASCII12x16
+#define ROGUE_LEVEL_MAP_MODE_FIT_TO_SCREEN MAP_MODE_ASCII_FIT_TO_SCREEN
 
 #define DEF_CLIPAROUND_MARGIN 5
 #define DEF_CLIPAROUND_AMOUNT 1

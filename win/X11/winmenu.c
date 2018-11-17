@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmenu.c	$NHDT-Date: 1539812601 2018/10/17 21:43:21 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	winmenu.c	$NHDT-Date: 1542245161 2018/11/15 01:26:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,6 +45,7 @@ static void FDECL(menu_all, (Widget, XtPointer, XtPointer));
 static void FDECL(menu_none, (Widget, XtPointer, XtPointer));
 static void FDECL(menu_invert, (Widget, XtPointer, XtPointer));
 static void FDECL(menu_search, (Widget, XtPointer, XtPointer));
+static void FDECL(search_menu, (struct xwindow *));
 static void FDECL(select_all, (struct xwindow *));
 static void FDECL(select_none, (struct xwindow *));
 static void FDECL(select_match, (struct xwindow *, char *));
@@ -285,25 +286,9 @@ Cardinal *num_params;
                 menu_info->counting = TRUE;
             return;
         } else if (ch == MENU_SEARCH) { /* search */
-            if (menu_info->how == PICK_ANY || menu_info->how == PICK_ONE) {
-                char buf[BUFSZ + 2], tmpbuf[BUFSZ];
-
-                X11_getlin("Search for:", tmpbuf);
-                if (!*tmpbuf || *tmpbuf == '\033')
-                    return;
-                /* convert "string" into "*string*" for use with pmatch() */
-                Sprintf(buf, "*%s*", tmpbuf);
-
-                if (menu_info->how == PICK_ANY) {
-                    invert_match(wp, buf);
-                    return;
-                } else {
-                    select_match(wp, buf);
-                }
-            } else {
-                X11_nhbell();
+            search_menu(wp);
+            if (menu_info->how == PICK_ANY)
                 return;
-            }
         } else if (ch == MENU_SELECT_ALL || ch == MENU_SELECT_PAGE) {
             if (menu_info->how == PICK_ANY)
                 select_all(wp);
@@ -471,24 +456,47 @@ XtPointer client_data, call_data;
 {
     struct xwindow *wp = (struct xwindow *) client_data;
     struct menu_info_t *menu_info = wp->menu_information;
-    char buf[BUFSZ + 2], tmpbuf[BUFSZ];
 
     nhUse(w);
     nhUse(call_data);
 
-    X11_getlin("Search for:", tmpbuf);
-    if (!*tmpbuf || *tmpbuf == '\033')
-        return;
-    /* convert "string" into "*string*" for use with pmatch() */
-    Sprintf(buf, "*%s*", tmpbuf);
-
-    if (menu_info->how == PICK_ANY)
-        invert_match(wp, buf);
-    else
-        select_match(wp, buf);
-
+    search_menu(wp);
     if (menu_info->how == PICK_ONE)
         menu_popdown(wp);
+}
+
+/* common to menu_search and menu_key */
+static void
+search_menu(wp)
+struct xwindow *wp;
+{
+    char *pat, buf[BUFSZ + 2]; /* room for '*' + BUFSZ-1 + '*' + '\0' */
+    struct menu_info_t *menu_info = wp->menu_information;
+
+    buf[0] = buf[1] = '\0';
+    pat = &buf[1]; /* leave room to maybe insert '*' at front */
+    if (menu_info->how != PICK_NONE) {
+        X11_getlin("Search for:", pat);
+        if (!*pat || *pat == '\033')
+            return;
+        /* convert "string" into "*string*" for use with pmatch() */
+        if (*pat != '*')
+            *--pat = '*'; /* now points to &buf[0] */
+        if (*(eos(pat) - 1) != '*')
+            Strcat(pat, "*");
+    }
+
+    switch (menu_info->how) {
+    case PICK_ANY:
+        invert_match(wp, pat);
+        break;
+    case PICK_ONE:
+        select_match(wp, pat);
+        break;
+    default: /* PICK_NONE */
+        X11_nhbell();
+        break;
+    }
 }
 
 static void

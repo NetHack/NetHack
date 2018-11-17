@@ -2,6 +2,7 @@
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include "win10.h"
 #include "winMS.h"
 #include <assert.h>
 #include "resource.h"
@@ -21,6 +22,9 @@
 #define DEFAULT_COLOR_FG_TEXT COLOR_WINDOWTEXT
 #define DEFAULT_COLOR_BG_MENU COLOR_WINDOW
 #define DEFAULT_COLOR_FG_MENU COLOR_WINDOWTEXT
+
+#define CHECK_WIDTH 16
+#define CHECK_HEIGHT 16
 
 typedef struct mswin_menu_item {
     int glyph;
@@ -61,6 +65,7 @@ typedef struct mswin_nethack_menu_window {
     HBITMAP bmpChecked;
     HBITMAP bmpCheckedCount;
     HBITMAP bmpNotChecked;
+    HDC bmpDC;
 
     BOOL is_active;
 } NHMenuWindow, *PNHMenuWindow;
@@ -267,14 +272,14 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
 INT_PTR CALLBACK
 MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PNHMenuWindow data;
-    HWND control;
-    HDC hdc;
+    PNHMenuWindow data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    HWND control = GetDlgItem(hWnd, IDC_MENU_TEXT);
     TCHAR title[MAX_LOADSTRING];
 
-    data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+
+        HDC hdc = GetDC(control);
         data = (PNHMenuWindow) malloc(sizeof(NHMenuWindow));
         ZeroMemory(data, sizeof(NHMenuWindow));
         data->type = MENU_TYPE_TEXT;
@@ -287,12 +292,11 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
         data->bmpNotChecked =
             LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
+        data->bmpDC = CreateCompatibleDC(hdc);
         data->is_active = FALSE;
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
         /* set font for the text cotrol */
-        control = GetDlgItem(hWnd, IDC_MENU_TEXT);
-        hdc = GetDC(control);
         SendMessage(control, WM_SETFONT,
                     (WPARAM) mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE),
                     (LPARAM) 0);
@@ -310,6 +314,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         /* set focus to text control for now */
         SetFocus(control);
+    }
         return FALSE;
 
     case WM_MSNH_COMMAND:
@@ -500,6 +505,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         if (data) {
+            DeleteDC(data->bmpDC);
             DeleteObject(data->bmpChecked);
             DeleteObject(data->bmpCheckedCount);
             DeleteObject(data->bmpNotChecked);
@@ -862,9 +868,11 @@ SetMenuListType(HWND hWnd, int how)
     SendMessage(control, WM_SETFONT, (WPARAM) fnt, (LPARAM) 0);
 
     /* add column to the list view */
+    MonitorInfo monitorInfo;
+    win10_monitor_info(hWnd, &monitorInfo);
     ZeroMemory(&lvcol, sizeof(lvcol));
     lvcol.mask = LVCF_WIDTH | LVCF_TEXT;
-    lvcol.cx = GetSystemMetrics(SM_CXFULLSCREEN);
+    lvcol.cx = monitorInfo.width;
     lvcol.pszText = NH_A2W(data->menu.prompt, wbuf, BUFSZ);
     ListView_InsertColumn(control, 0, &lvcol);
 
@@ -975,6 +983,9 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     int color = NO_COLOR, attr;
     boolean menucolr = FALSE;
+    double monitorScale = win10_monitor_scale(hWnd);
+    int tileXScaled = (int) (TILE_X * monitorScale);
+    int tileYScaled = (int) (TILE_Y * monitorScale);
 
     UNREFERENCED_PARAMETER(wParam);
 
@@ -1009,30 +1020,29 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (NHMENU_IS_SELECTABLE(*item)) {
         char buf[2];
         if (data->how != PICK_NONE) {
-            HGDIOBJ saveBrush;
-            HBRUSH hbrCheckMark;
+            HBITMAP bmpCheck;
+            HBITMAP bmpSaved;
 
             switch (item->count) {
             case -1:
-                hbrCheckMark = CreatePatternBrush(data->bmpChecked);
+                bmpCheck = data->bmpChecked;
                 break;
             case 0:
-                hbrCheckMark = CreatePatternBrush(data->bmpNotChecked);
+                bmpCheck = data->bmpNotChecked;
                 break;
             default:
-                hbrCheckMark = CreatePatternBrush(data->bmpCheckedCount);
+                bmpCheck = data->bmpCheckedCount;
                 break;
             }
 
-            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - TILE_Y) / 2;
-            SetBrushOrgEx(lpdis->hDC, x, y, NULL);
-            saveBrush = SelectObject(lpdis->hDC, hbrCheckMark);
-            PatBlt(lpdis->hDC, x, y, TILE_X, TILE_Y, PATCOPY);
-            SelectObject(lpdis->hDC, saveBrush);
-            DeleteObject(hbrCheckMark);
+            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
+            bmpSaved = SelectBitmap(data->bmpDC, bmpCheck);
+            StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+                data->bmpDC, 0, 0,  CHECK_WIDTH, CHECK_HEIGHT, SRCCOPY);
+            SelectObject(data->bmpDC, bmpSaved);
         }
 
-        x += TILE_X + spacing;
+        x += tileXScaled + spacing;
 
         if (item->accelerator != 0) {
             buf[0] = item->accelerator;
@@ -1053,13 +1063,14 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
         x += tm.tmAveCharWidth + tm.tmOverhang + spacing;
     } else {
-        x += TILE_X + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
+        x += tileXScaled + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
     }
 
     /* print glyph if present */
     if (NHMENU_HAS_GLYPH(*item)) {
         if (!IS_MAP_ASCII(iflags.wc_map_mode)) {
             HGDIOBJ saveBmp;
+            double monitorScale = win10_monitor_scale(hWnd);
 
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
             ntile = glyph2tile[item->glyph];
@@ -1068,21 +1079,21 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             t_y =
                 (ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y;
 
-            y = (lpdis->rcItem.bottom + lpdis->rcItem.top
-                 - GetNHApp()->mapTile_Y) / 2;
+            y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
 
             if (GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles) {
                 /* using original nethack tiles - apply image transparently */
-                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, TILE_X, TILE_Y,
+                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, 
+                                          tileXScaled, tileYScaled,
                                           tileDC, t_x, t_y, TILE_X, TILE_Y,
                                           TILE_BK_COLOR);
             } else {
                 /* using custom tiles - simple blt */
-                BitBlt(lpdis->hDC, x, y, GetNHApp()->mapTile_X,
-                       GetNHApp()->mapTile_Y, tileDC, t_x, t_y, SRCCOPY);
+                StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+                    tileDC, t_x, t_y, GetNHApp()->mapTile_X, GetNHApp()->mapTile_Y, SRCCOPY);
             }
             SelectObject(tileDC, saveBmp);
-            x += GetNHApp()->mapTile_X;
+            x += tileXScaled;
         } else {
             const char *sel_ind;
             switch (item->count) {
@@ -1106,7 +1117,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } else {
         /* no glyph - need to adjust so help window won't look to cramped */
-        x += TILE_X;
+        x += tileXScaled;
     }
 
     x += spacing;
