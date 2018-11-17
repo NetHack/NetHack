@@ -2586,7 +2586,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     xchar newx, newy;
     coord mm;
 
-    if (mtmp->mx == x && mtmp->my == y)
+    if (mtmp->mx == x && mtmp->my == y && m_at(x,y) == mtmp)
         return TRUE;
 
     if (move_other && (othermon = m_at(x, y)) != 0) {
