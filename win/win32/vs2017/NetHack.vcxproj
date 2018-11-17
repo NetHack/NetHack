@@ -16,6 +16,18 @@
   <PropertyGroup>
     <OutDir>$(BinDir)</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
@@ -24,10 +36,14 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;CURSES_GRAPHICS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;PDCurses.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(PDCURSES)\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(PDCURSES)\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(PDCURSES)\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(PDCURSES)\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,6 +170,14 @@
     <ClCompile Include="$(WinTtyDir)getline.c" />
     <ClCompile Include="$(WinTtyDir)topl.c" />
     <ClCompile Include="$(WinTtyDir)wintty.c" />
+    <ClCompile Include="$(WinCursDir)cursdial.c" />
+    <ClCompile Include="$(WinCursDir)cursinit.c" />
+    <ClCompile Include="$(WinCursDir)cursinvt.c" />
+    <ClCompile Include="$(WinCursDir)cursmain.c" />
+    <ClCompile Include="$(WinCursDir)cursmesg.c" />
+    <ClCompile Include="$(WinCursDir)cursmisc.c" />
+    <ClCompile Include="$(WinCursDir)cursstat.c" />
+    <ClCompile Include="$(WinCursDir)curswins.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(IncDir)align.h" />
@@ -212,6 +236,13 @@
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
     <ClInclude Include="$(WinWin32Dir)nhresource.h" />
+    <ClInclude Include="$(WinCursDir)cursdial.h" />
+    <ClInclude Include="$(WinCursDir)cursinit.h" />
+    <ClInclude Include="$(WinCursDir)cursinvt.h" />
+    <ClInclude Include="$(WinCursDir)cursmesg.h" />
+    <ClInclude Include="$(WinCursDir)cursmisc.h" />
+    <ClInclude Include="$(WinCursDir)cursstat.h" />
+    <ClInclude Include="$(WinCursDir)curswins.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(WinWin32Dir)NetHack.rc" />
