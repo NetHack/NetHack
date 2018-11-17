@@ -721,6 +721,7 @@ struct monst *mtmp, *mtarg;
     /* Give 1 in 3 chance of safe breathing even if pet is confused or
      * if you're on the quest start level */
     if (!mtmp->mconf || !rn2(3) || Is_qstart(&u.uz)) {
+        int mtmp_lev;
         aligntyp align1 = A_NONE, align2 = A_NONE; /* For priests, minions */
         boolean faith1 = TRUE,  faith2 = TRUE;
 
@@ -774,10 +775,26 @@ struct monst *mtmp, *mtarg;
             || (mtmp->m_lev > 12 && mtarg->m_lev < mtmp->m_lev - 9
                 && u.ulevel > 8 && mtarg->m_lev < u.ulevel - 7))
             score -= 25;
+        /* for strength purposes, a vampshifter in weak form (vampire bat,
+           fog cloud, maybe wolf) will attack as if in vampire form;
+           otherwise if won't do much and usually wouldn't suffer enough
+           damage (from counterattacks) to switch back to vampire form;
+           make it be more aggressive by behaving as if stronger */
+        mtmp_lev = mtmp->m_lev;
+        if (is_vampshifter(mtmp) && mtmp->data->mlet != S_VAMPIRE) {
+            /* is_vampshifter() implies (mtmp->cham >= LOW_PM) */
+            mtmp_lev = mons[mtmp->cham].mlevel;
+            /* actual vampire level would range from 1.0*mlvl to 1.5*mlvl */
+            mtmp_lev += rn2(mtmp_lev / 2 + 1);
+            /* we don't expect actual level in weak form to exceed
+               base level of strong form, but handle that if it happens */
+            if (mtmp->m_lev > mtmp_lev)
+                mtmp_lev = mtmp->m_lev;
+        }
         /* And pets will hesitate to attack vastly stronger foes.
            This penalty will be discarded if master's in trouble. */
-        if (mtarg->m_lev > mtmp->m_lev + 4L)
-            score -= (mtarg->m_lev - mtmp->m_lev) * 20L;
+        if (mtarg->m_lev > mtmp_lev + 4L)
+            score -= (mtarg->m_lev - mtmp_lev) * 20L;
         /* All things being the same, go for the beefiest monster. This
            bonus should not be large enough to override the pet's aversion
            to attacking much stronger monsters. */

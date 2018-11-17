@@ -196,6 +196,10 @@ avoid potential buffer overflow if object with very long name knocks other
 #wizintrinsic for 'warn_of_mon' didn't set any type of monster (now grid bugs)
 clairvoyance would show trap instead of a monster on/in that trap, which was
 	intentional, but when clairvoyance finished the monster wasn't shown
+nurse corpse/tin chance to convey poison resistance when eaten was not honored
+make tame vampires be more aggressive when shifted to bat/fog/wolf form
+a stale gold symbol could be displayed on the status line following a switch
+	to a new symset, as observed and reported for Windows RogueEpyx symset
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -246,6 +250,10 @@ windows-tty: Fix memory leaks as reported in H5779
 windows-tty: Use nhraykey by default if the players keyboard layout is 
 	non-english as reported in H4216
 windows-tty: We now support changing altkeyhandler in game
+windows-tty: augment codepage850-to-Unicode mappings that are not displayable
+	with codepage437-to-Unicode mappings that are, to help ensure
+	that rogue-level characters in the status line match their appearance
+	on the map
 windows: Added ntassert() mechanism for Windows based port use
 windows: heed OPTIONS=symset:default in config file if it is present 
 tty: significant optimizations for performance and per field rendering
@@ -258,6 +266,8 @@ unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	verbose so doesn't use '$<' for multi-prerequisite targets unless
 	specifically requested; use 'make QUIETCC=1 <target>' to get the
 	3.6.1 behavior back
+vms: data file processing and playground setup were missing post-3.4.3 files
+	engrave, epitaph, and bogusmon made from corresponding *.txt
 Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
 Qt: enable compiling Qt5 on Windows (Ray Chason)
 Qt: entering extended commands, hide non-matching ones
@@ -304,3 +314,5 @@ for ^X and enlightenment, display the information in a menu rather than a
 
 Code Cleanup and Reorganization
 -------------------------------
+generated source file monstr.c is no longer used
+

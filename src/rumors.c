@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1446713640 2015/11/05 08:54:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1542422933 2018/11/17 02:48:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,6 +43,7 @@
 
 STATIC_DCL void FDECL(init_rumors, (dlb *));
 STATIC_DCL void FDECL(init_oracles, (dlb *));
+STATIC_DCL void FDECL(couldnt_open_file, (const char *));
 
 /* rumor size variables are signed so that value -1 can be used as a flag */
 static long true_rumor_size = 0L, false_rumor_size;
@@ -155,7 +156,7 @@ boolean exclude_cookie;
         else if (!in_mklev) /* avoid exercizing wisdom for graffiti */
             exercise(A_WIS, (adjtruth > 0));
     } else {
-        pline("Can't open rumors file!");
+        couldnt_open_file(RUMORFILE);
         true_rumor_size = -1; /* don't try to open it again */
     }
 /* this is safe either way, so do it always since we can't get the definition
@@ -272,7 +273,7 @@ rumor_check()
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
     } else {
-        impossible("Can't open rumors file!");
+        couldnt_open_file(RUMORFILE);
         true_rumor_size = -1; /* don't try to open it again */
     }
 }
@@ -314,8 +315,10 @@ char *buf;
             *endp = 0;
         Strcat(buf, xcrypt(line, xbuf));
         (void) dlb_fclose(fh);
-    } else
-        impossible("Can't open file %s!", fname);
+    } else {
+        couldnt_open_file(fname);
+    }
+
     return buf;
 }
 
@@ -469,7 +472,7 @@ boolean delphi;
         destroy_nhwindow(tmpwin);
         (void) dlb_fclose(oracles);
     } else {
-        pline("Can't open oracles file!");
+        couldnt_open_file(ORACLEFILE);
         oracle_flg = -1; /* don't try to open it again */
     }
 }
@@ -545,6 +548,22 @@ struct monst *oracl;
         newexplevel();
     }
     return 1;
+}
+
+STATIC_OVL void
+couldnt_open_file(filename)
+const char *filename;
+{
+    int save_something = program_state.something_worth_saving;
+
+    /* most likely the file is missing, so suppress impossible()'s
+       "saving and restoring might fix this" (unless the fuzzer,
+       which escalates impossible to panic, is running) */
+    if (!iflags.debug_fuzzer)
+        program_state.something_worth_saving = 0;
+
+    impossible("Can't open '%s' file.", filename);
+    program_state.something_worth_saving = save_something;
 }
 
 /*rumors.c*/

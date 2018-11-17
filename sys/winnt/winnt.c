@@ -37,9 +37,13 @@
  *
  */
 
+/* runtime cursor display control switch */
+boolean win32_cursorblink;
+
 /* globals required within here */
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
@@ -581,6 +585,25 @@ BOOL winos_font_support_cp437(HFONT hFont)
     return allFound;
 }
 
+int
+windows_early_options(window_opt)
+const char *window_opt;
+{
+    /*
+     * If you return 2, the game will exit before it begins.
+     * Return 1, to say the option parsed okay.
+     * Return 0, to say the option was bad.
+     */
+
+    if (match_optname(window_opt, "cursorblink", 5, FALSE)) {
+        win32_cursorblink = TRUE;
+        return 1;
+    } else {
+        raw_printf(
+            "-%swindows:cursorblink is the only supported option.\n");
+    }
+    return 0;
+}
 #endif /* WIN32 */
 
 /*winnt.c*/

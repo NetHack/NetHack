@@ -4,6 +4,7 @@
 
 /* font management and such */
 
+#include "win10.h"
 #include "winos.h"
 #include "mhfont.h"
 
@@ -26,9 +27,10 @@ void
 mswin_init_splashfonts(HWND hWnd)
 {
     HDC hdc = GetDC(hWnd);
+    double scale = win10_monitor_scale(hWnd);
     LOGFONT lgfnt;
     ZeroMemory(&lgfnt, sizeof(lgfnt));
-    lgfnt.lfHeight = -80;                      // height of font
+    lgfnt.lfHeight = -(int)(80 * scale);       // height of font
     lgfnt.lfWidth = 0;                         // average character width
     lgfnt.lfEscapement = 0;                    // angle of escapement
     lgfnt.lfOrientation = 0;                   // base-line orientation angle

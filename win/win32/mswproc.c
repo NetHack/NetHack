@@ -813,8 +813,14 @@ mswin_clear_nhwindow(winid wid)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
         if (GetNHApp()->windowlist[wid].type == NHW_MAP) {
             if (Is_rogue_level(&u.uz))
-                mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
-                               ROGUE_LEVEL_MAP_MODE);
+                if (iflags.wc_map_mode == MAP_MODE_ASCII_FIT_TO_SCREEN ||
+                    iflags.wc_map_mode == MAP_MODE_TILES_FIT_TO_SCREEN)
+
+                    mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
+                                   ROGUE_LEVEL_MAP_MODE_FIT_TO_SCREEN);
+                else
+                    mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
+                                   ROGUE_LEVEL_MAP_MODE);
             else
                 mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
                                iflags.wc_map_mode);

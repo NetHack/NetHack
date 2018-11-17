@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - data files: special levels and other data.
-#	NetHack 3.6	Makefile.dat	$NHDT-Date: 1524689428 2018/04/25 20:50:28 $	$NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
+#	NetHack 3.6	Makefile.dat	$NHDT-Date: 1542388601 2018/11/16 17:16:41 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.10 $
 # Copyright (c) 2015 by Mike Stephenson
 # NetHack may be freely redistributed.  See license for details.
 
@@ -26,10 +26,11 @@ UTILMARKER = $(UTL)util.timestamp;
 
 # note: filespecs have enough punctuation to satisfy DELETE
 MARKERS = spec_levs.timestamp;,quest_levs.timestamp; 
-VARDAT	= data.;,rumors.;,quest.dat;,oracles.;,options.;
+VARDAT	= data.;,rumors.;,quest.dat;,oracles.;,options.;,\
+	engrave.;,epitaph.;,bogusmon.;
 DUNGEON = dungeon.;
 X11TILES= x11tiles.;
-# note: the level lists need to be space separated
+# note: the level lists need to be space separated for use as-is by $(LEVCOMP)
 QUESTLEVS = Arch.des Barb.des Caveman.des Healer.des Knight.des \
 	Monk.des Priest.des Ranger.des Rogue.des Samurai.des Tourist.des \
 	Valkyrie.des Wizard.des
@@ -53,6 +54,12 @@ rumors :	rumors.;
 quest.dat :	quest.dat;
       @ $(NOOP)
 oracles :	oracles.;
+      @ $(NOOP)
+engrave :	engrave.;
+      @ $(NOOP)
+epitaph :	epitaph.;
+      @ $(NOOP)
+bogusmon :	bogusmon.;
       @ $(NOOP)
 options :	options.;
       @ $(NOOP)
@@ -101,6 +108,9 @@ data.; :	data.base $(MAKEDEFS)
 
 rumors.; :	rumors.tru rumors.fal $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -r
+
+engrave.; epitaph.; bogusmon.; : engrave.txt epitaph.txt bogusmon.txt
+	$(RUN) $(MAKEDEFS) -s
 
 quest.dat; :	quest.txt $(MAKEDEFS)
 	$(RUN) $(MAKEDEFS) -q

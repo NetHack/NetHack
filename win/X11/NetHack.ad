@@ -1,4 +1,4 @@
-! $NHDT-Date: 1524689294 2018/04/25 20:48:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
+! $NHDT-Date: 1542244983 2018/11/15 01:23:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
 ! Copyright (c) 2017 by Pasi Kallinen
 ! NetHack may be freely redistributed.  See license for details.
 
@@ -37,7 +37,7 @@ NetHack*text*borderWidth:  0
 !
 NetHack.tile_file: x11tiles
 !NetHack.double_tile_size: True
-!
+
 ! The annotation of pets.
 !NetHack.pet_mark_bitmap: pet_mark.xbm
 !NetHack.pet_mark_color: Red
@@ -57,30 +57,25 @@ NetHack.tile_file: x11tiles
 ! The color to use for the text on the hero's tombstone
 NetHack*rip*foreground: black
 
-! Translation tables.  There are currently several actions in nethack, but
-! the only one you should be using is "input()", which, with no parameters,
-! uses XLookupString to translate your keypress into a command.  You
-! can optionally give it parameters to change the behavior, see the example
-! below.  Note that you have to specify the translations in every appropriate
-! window.
-NetHack*message*translations:	<KeyPress>: input()
-!
-! Example extra translations for the map window.
-!
-!NetHack*map*translations:	#override \
-!				!<Key>Left: input(h) \n\
-!				!<Key>Right: input(l) \n\
-!				!<Key>Up: input(k) \n\
-!				!<Key>Down: input(j)
-!
 ! The icon to use; supported values are nh72, nh56, and nh32; nh72 is the
 ! default.  Some window managers may not support the larger icon sizes.
 ! It is not guaranteed that the window manager will honor the icon selection.
 !NetHack*icon: nh56
-!
+
 ! If True, the default, a popup for single character prompts such as y/n
-! questions is _not_ used.
-NetHack*slow: True
+! questions is _not_ used.  Single-character prompts appear in a fixed
+! position between the top of the map and the bottom of the messages.
+! If False, popups appear near where the pointer is positioned so tend to
+! meander around the screen depending upon where the last click ocurred.
+! (The name 'slow' is misleading; this feature was originally necessitated
+! by window managers which were slow putting up popup windows, but the
+! fixed-position prompting can be just as useful for quick popups.)
+!NetHack*slow: False
+
+! If True, force keyboard to attach to popup windows.  Some window managers
+! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  NetHack
+! has a lot of popups and is almost unplayable without some kind of autofocus.
+!NetHack*autofocus: True
 
 ! If 'slow' is True, setting 'highlight_prompt' to True will cause the line
 ! between map and message display that's used for prompting to be "hidden"
@@ -91,18 +86,32 @@ NetHack*highlight_prompt: False
 
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12
-!
+
 ! If True, the message window has a line that seperates old and new messages.
 !NetHack*message_line: True
-!
-! If True, force keyboard to attach to popup windows.  Some window managers
-! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  NetHack
-! has a lot of popups and is almost unplayable without some kind of autofocus.
-!NetHack*autofocus: True
-!
 
-! True, use a "fancy" style status area vs. TTY-style status lines
+! If True, the default, use a "fancy" style status area below the map.
+! Fancy status has some highlighting but does not honor HILITE_STATUS.
+! If False, use TTY-style status lines (two text lines below the map).
+! TTY status honors HILITE_STATUS thresholds and colors, but for
+! attributes only supports inverse (not bold, dim, blink, or underline).
+! (As of this writing, fancy status looks better with a tiles map and
+! tty-style status looks good with a text map but not with a tiles one.)
 !NetHack*fancy_status: False
+
+! Translation tables.  There are currently several actions in nethack, but
+! the only one you should be using is "input()", which, with no parameters,
+! uses XLookupString to translate your keypress into a command.  You can
+! optionally give it parameters to change the behavior, see the example below.
+! Note that you have to specify the translations in every appropriate window.
+NetHack*message*translations:	<KeyPress>: input()
+!
+! Example extra translations for the map window.
+!NetHack*map*translations:	#override \
+!				!<Key>Left: input(h) \n\
+!				!<Key>Right: input(l) \n\
+!				!<Key>Up: input(k) \n\
+!				!<Key>Down: input(j)
 
 ! Specify the number of rows and columns of the map window.  The default
 ! is the standard 80x21 window.  Note: this _does_not_ change nethack's
