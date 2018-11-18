@@ -18,7 +18,8 @@ STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
 STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P, char *));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
-STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,BOOLEAN_P));
+STATIC_DCL void FDECL(do_supplemental_info, (char *, struct permonst *,
+                                             BOOLEAN_P));
 STATIC_DCL void NDECL(whatdoes_help);
 STATIC_DCL void NDECL(docontact);
 STATIC_DCL void NDECL(dispfile_help);
@@ -1352,9 +1353,8 @@ boolean without_asking;
      * meant to support in-game mythology, and not
      * available from data.base or other sources.
      */
-    if (name && pm && is_orc(pm) &&
-                (strlen(name) < (BUFSZ - 1)) &&
-                (bp = strstri(name, " of ")) != 0) {
+    if (name && pm && is_orc(pm) && (strlen(name) < (BUFSZ - 1))
+        && (bp = strstri(name, " of ")) != 0) {
         char fullname[BUFSZ];
 
         Strcpy(fullname, name);
@@ -1880,7 +1880,7 @@ domenucontrols()
 
 /* data for dohelp() */
 static struct {
-    void (*f)();
+    void NDECL((*f));
     const char *text;
 } help_menu_items[] = {
     { hmenu_doextversion, "About NetHack (version information)." },
@@ -1900,7 +1900,7 @@ static struct {
     { port_help, "%s-specific help and commands." },
 #endif
     { dispfile_debughelp, "List of wizard-mode commands." },
-    { NULL, (char *) 0 }
+    { (void NDECL((*))) 0, (char *) 0 }
 };
 
 /* the '?' command */
@@ -1913,7 +1913,6 @@ dohelp()
     menu_item *selected;
     anything any;
     int sel;
-    char *bufptr;
 
     any = zeroany; /* zero all bits */
     start_menu(tmpwin);
@@ -1923,13 +1922,12 @@ dohelp()
             continue;
         if (help_menu_items[i].text[0] == '%') {
             Sprintf(helpbuf, help_menu_items[i].text, PORT_ID);
-            bufptr = helpbuf;
         } else {
-            bufptr = (char *)help_menu_items[i].text;
+            Strcpy(helpbuf, help_menu_items[i].text);
         }
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 bufptr, MENU_UNSELECTED);
+                 helpbuf, MENU_UNSELECTED);
     }
     end_menu(tmpwin, "Select one item:");
     n = select_menu(tmpwin, PICK_ONE, &selected);
@@ -1937,7 +1935,7 @@ dohelp()
     if (n > 0) {
         sel = selected[0].item.a_int - 1;
         free((genericptr_t) selected);
-        (void)(*help_menu_items[sel].f)();
+        (void) (*help_menu_items[sel].f)();
     }
     return 0;
 }

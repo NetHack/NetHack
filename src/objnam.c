@@ -2484,8 +2484,6 @@ badman(basestr, to_plural)
 const char *basestr;
 boolean to_plural;            /* true => makeplural, false => makesingular */
 {
-    int i, al;
-    char *endstr, *spot;
     /* these are all the prefixes for *man that don't have a *men plural */
     static const char *no_men[] = {
         "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
@@ -2501,11 +2499,13 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
         "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi",
         "ya", "o", "a",
     };
+    int i, al;
+    const char *endstr, *spot;
 
     if (!basestr || strlen(basestr) < 4)
         return FALSE;
 
-    endstr = eos((char *)basestr);
+    endstr = eos((char *) basestr);
 
     if (to_plural) {
         for (i = 0; i < SIZE(no_men); i++) {

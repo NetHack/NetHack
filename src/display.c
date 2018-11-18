@@ -989,7 +989,7 @@ int x, y;
             /* Erase (reset) from source to end */
             for (i = 0; i < tglyph->sidx; i++)
                 newsym(tglyph->saved[i].x, tglyph->saved[i].y);
-	} else if (tglyph->style == DISP_TETHER) {
+        } else if (tglyph->style == DISP_TETHER) {
             int i;
 
             if (y == BACKTRACK && tglyph->sidx > 1) {
@@ -1028,7 +1028,7 @@ int x, y;
             tglyph->saved[tglyph->sidx].x = x;
             tglyph->saved[tglyph->sidx].y = y;
             tglyph->sidx += 1;
-	} else if (tglyph->style == DISP_TETHER) {
+        } else if (tglyph->style == DISP_TETHER) {
             if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
                 break; /* too many locations */
             if (tglyph->sidx) {

@@ -91,8 +91,9 @@ check_gold_symbol()
     int goldch, goldoc;
     unsigned int goldos;
     int goldglyph = objnum_to_glyph(GOLD_PIECE);
+
     (void) mapglyph(goldglyph, &goldch, &goldoc, &goldos, 0, 0);
-    iflags.invis_goldsym = ((char)goldch <= ' ');
+    iflags.invis_goldsym = ((char) goldch <= ' ');
 }
 
 char *
@@ -829,8 +830,7 @@ boolean *valsetlist;
      * the display, call status_update() with BL_FLUSH.
      *
      */
-    if (context.botlx &&
-        (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
+    if (context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &cond_hilites[0]);
     else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
@@ -2091,33 +2091,33 @@ boolean from_configfile;
 }
 
 const struct condmap valid_conditions[] = {
-    {"stone",    BL_MASK_STONE},
-    {"slime",    BL_MASK_SLIME},
-    {"strngl",   BL_MASK_STRNGL},
-    {"foodPois", BL_MASK_FOODPOIS},
-    {"termIll",  BL_MASK_TERMILL},
-    {"blind",    BL_MASK_BLIND},
-    {"deaf",     BL_MASK_DEAF},
-    {"stun",     BL_MASK_STUN},
-    {"conf",     BL_MASK_CONF},
-    {"hallu",    BL_MASK_HALLU},
-    {"lev",      BL_MASK_LEV},
-    {"fly",      BL_MASK_FLY},
-    {"ride",     BL_MASK_RIDE},
+    { "stone",    BL_MASK_STONE },
+    { "slime",    BL_MASK_SLIME },
+    { "strngl",   BL_MASK_STRNGL },
+    { "foodPois", BL_MASK_FOODPOIS },
+    { "termIll",  BL_MASK_TERMILL },
+    { "blind",    BL_MASK_BLIND },
+    { "deaf",     BL_MASK_DEAF },
+    { "stun",     BL_MASK_STUN },
+    { "conf",     BL_MASK_CONF },
+    { "hallu",    BL_MASK_HALLU },
+    { "lev",      BL_MASK_LEV },
+    { "fly",      BL_MASK_FLY },
+    { "ride",     BL_MASK_RIDE },
 };
 
 const struct condmap condition_aliases[] = {
-    {"strangled",      BL_MASK_STRNGL},
-    {"all",            BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL |
-                       BL_MASK_FOODPOIS | BL_MASK_TERMILL |
-                       BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN |
-                       BL_MASK_CONF | BL_MASK_HALLU |
-                       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
-    {"major_troubles", BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL |
-                       BL_MASK_FOODPOIS | BL_MASK_TERMILL},
-    {"minor_troubles", BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN |
-                       BL_MASK_CONF | BL_MASK_HALLU},
-    {"movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE}
+    { "strangled",      BL_MASK_STRNGL },
+    { "all",            BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
+                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL
+                        | BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
+                        | BL_MASK_CONF | BL_MASK_HALLU
+                        | BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
+    { "major_troubles", BL_MASK_STONE | BL_MASK_SLIME | BL_MASK_STRNGL
+                        | BL_MASK_FOODPOIS | BL_MASK_TERMILL },
+    { "minor_troubles", BL_MASK_BLIND | BL_MASK_DEAF | BL_MASK_STUN
+                        | BL_MASK_CONF | BL_MASK_HALLU },
+    { "movement",       BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE }
 };
 
 unsigned long

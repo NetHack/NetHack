@@ -21,8 +21,6 @@
 #define CURSOR_BLINK_INTERVAL 1000 // milliseconds
 #define CURSOR_HEIGHT 2 // pixels
 
-#define CUSOR_BLINK FALSE // Set to true for a cursor that blinks
-
 extern short glyph2tile[];
 
 #define TILEBMP_X(ntile) \
@@ -59,7 +57,10 @@ typedef struct mswin_nethack_map_window {
     double monitorScale;        /* from 96dpi to monitor dpi*/
     
     boolean cursorOn;
-    int yCursor;           /* height of cursor inback buffer in pixels */
+    int yNoBlinkCursor;         /* non-blinking cursor height inback buffer
+                                   in pixels */
+    int yBlinkCursor;           /* blinking cursor height inback buffer
+                                   in pixels */
 
     int backWidth;              /* back buffer width */
     int backHeight;             /* back buffer height */
@@ -132,10 +133,8 @@ mswin_init_map_window()
 
     mswin_apply_window_style(hWnd);
 
-#if CURSOR_BLINK
     /* set cursor blink timer */
     SetTimer(hWnd, 0, CURSOR_BLINK_INTERVAL, NULL);
-#endif
 
     return hWnd;
 }
@@ -283,11 +282,8 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     data->yFrontTile = (int) ((double) data->yBackTile * data->frontScale);
 
     /* calcuate ASCII cursor height */
-#if CURSOR_BLINK
-    data->yCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
-#else
-    data->yCursor = data->yBackTile;
-#endif
+    data->yBlinkCursor = (int) ((double) CURSOR_HEIGHT * data->backScale);
+    data->yNoBlinkCursor = data->yBackTile;
 
     /* set map origin point */
     data->map_orig.x =
@@ -830,7 +826,8 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 #endif
 
-    if (i == data->xCur && j == data->yCur && data->cursorOn)
+    if (i == data->xCur && j == data->yCur && 
+        (data->cursorOn || !win32_cursorblink))
         DrawFocusRect(data->backBufferDC, rect);
 }
 
@@ -897,12 +894,16 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         SetTextColor(data->backBufferDC, OldFg);
     }
 
-    if (i == data->xCur && j == data->yCur && data->cursorOn)
+    if (i == data->xCur && j == data->yCur &&
+        (data->cursorOn || !win32_cursorblink)) {
+        int yCursor = (win32_cursorblink ? data->yBlinkCursor :
+                                           data->yNoBlinkCursor);
         PatBlt(data->backBufferDC, 
-                rect->left, rect->bottom - data->yCursor,
+                rect->left, rect->bottom - yCursor,
                 rect->right - rect->left,
-                data->yCursor,
+                yCursor,
                 DSTINVERT);
+    }
 }
 
 static void setGlyph(PNHMapWindow data, int i, int j, int fg, int bg)
