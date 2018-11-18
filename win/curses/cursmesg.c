@@ -133,9 +133,11 @@ curses_message_win_puts(const char *message, boolean recursed)
 }
 
 #ifdef WIN32
-#define XTRA_RESP "\r"
+#define RESP   " \n\033\r"       /* space, enter, esc, cr */
+#define TRANS  " \n\033\n"       /* translated return value */
 #else
-#define XTRA_RESP ""
+#define RESP   " \n\033"         /* space, enter, esc */
+#define TRANS  " \n\033"
 #endif
 
 int
@@ -145,8 +147,9 @@ curses_block(boolean noscroll)
 {
     int height, width, ret;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    char *resp = " \n\033" XTRA_RESP; /* space, enter, esc */
-
+    char *resp = RESP;
+    char *trans = TRANS;
+    char *rp = (char *) 0;
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
     mvwprintw(win, my, mx, iflags.msg_is_alert ? "<TAB!>" : ">>");
@@ -158,7 +161,9 @@ curses_block(boolean noscroll)
     /* msgtype=stop should require space/enter rather than
      * just any key, as we want to prevent YASD from
      * riding direction keys. */
-    while (!iflags.msg_is_alert && (ret = wgetch(win)) && !index(resp,(char)ret));
+    while (!iflags.msg_is_alert &&
+              (ret = wgetch(win)) && ((rp = index(resp,(char)ret)) == 0))
+        ;
     if (iflags.msg_is_alert)
         curses_alert_main_borders(FALSE);
     if (height == 1) {
@@ -171,6 +176,8 @@ curses_block(boolean noscroll)
         }
         wrefresh(win);
     }
+    if (rp)
+        ret = trans[(rp - resp)];
 
     return ret;
 }
