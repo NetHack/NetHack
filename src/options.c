@@ -3313,8 +3313,8 @@ boolean tinitial, tfrom_file;
 
     /* WINCAP
      *
-     *  map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|
-     *            ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen]
+     *  map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12
+     *            |ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen]
      */
     fullname = "map_mode";
     if (match_optname(opts, fullname, sizeof("map_mode") - 1, TRUE)) {

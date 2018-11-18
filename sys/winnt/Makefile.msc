@@ -32,11 +32,12 @@
 #========================================================================================
 # BUILD DECISIONS SECTION
 #
-# There are currently only 3 decisions that you can choose to make, and none are 
-# required:
+# There are currently only 4 decisions that you can choose to make, and none are 
+# absolutely required because defaults are in place:
 #	1. Where do you want your build to end up?
 #	2. Do you want debug information in the executable?
 #	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
+#       4. Do you want to include the optional curses port?
 #
 #-----------------------------------------------------------------------------------------
 #=========================================================================================
@@ -64,15 +65,16 @@ DEBUGINFO = Y
 #---------------------------------------------------------------
 # OPTIONAL - Curses window port support 
 #
-# 4. Uncomment these and set them appropriate if you want to
+# 4. Uncomment these and set them appropriately if you want to
 #    include curses port support alongside TTY support in your
-#    console binary. You'll have to set CURSESINCL to the location
-#    of your curses header (.h) files and CURSESDLL to the location
-#    of your pdcurses.dll.
+#    NetHack.exe binary. 
 #
-ADD_CURSES=Y
-CURSESINCL=..\..\pdcurses
-CURSESLIB=..\..\pdcurses\wincon\pdcurses.lib
+#    You'll have to set PDCURSES_H to the correct location of the 
+#    PDCurses header (.h) files and PDCURSES_C to the location
+#    of your PDCurses C files.
+#
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -98,17 +100,17 @@ CURSESLIB=..\..\pdcurses\wincon\pdcurses.lib
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
 
-INCL   = ..\include    # NetHack include files
-DAT    = ..\dat        # NetHack data files
-DOC    = ..\doc        # NetHack documentation files
-UTIL   = ..\util       # Utility source
-SRC    = ..\src        # Main source
-SSYS   = ..\sys\share  # Shared system files
-MSWSYS = ..\sys\winnt  # mswin specific files
-TTY    = ..\win\tty    # window port files (tty)
-MSWIN  = ..\win\win32  # window port files (win32)
-CURSES = ..\win\curses # window port files (curses) 
-WSHR   = ..\win\share  # Tile support files 
+INCL    = ..\include     # NetHack include files
+DAT     = ..\dat         # NetHack data files
+DOC     = ..\doc         # NetHack documentation files
+UTIL    = ..\util        # Utility source
+SRC     = ..\src         # Main source
+SSYS    = ..\sys\share   # Shared system files
+MSWSYS  = ..\sys\winnt   # mswin specific files
+TTY     = ..\win\tty     # window port files (tty)
+MSWIN   = ..\win\win32   # window port files (win32)
+WCURSES = ..\win\curses  # window port files (curses) 
+WSHR    = ..\win\share   # Tile support files 
 
 #
 #  Object directory.
@@ -215,17 +217,6 @@ VSVER=2999              #untested future version
 !include <win32.mak>
 ! ENDIF
 
-#----------------------------------------------------------------
-
-!IF "$(ADD_CURSES)" == "Y"
-#CURSESDEF=-D"PDC_DLL_BUILD" -D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
-!ELSE
-CURSDEF=
-CURSESLIB=
-CURSESINCL=
-!ENDIF
-
 #These will be in the environment variables with one of the VS2017
 #developer command prompts.
 #VSCMD_ARG_HOST_ARCH=x64
@@ -255,100 +246,6 @@ CL_RECENT=-sdl
 ! ENDIF
 !ENDIF
 
-ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
-	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
-	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" $(CURSESDEF) \
-	-EHsc -fp:precise -Gd -GF -GS -Gy \
-	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
-cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
-crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
-
-lcommon= /NOLOGO /INCREMENTAL:NO
-
-!IF "$(DEBUGINFO)" == "Y"
-ldebug = /DEBUG
-cflags1=$(ccommon) $(cdebug)
-lflags1=$(lcommon) $(ldebug)
-!ELSE
-ldebug= /DEBUG
-cflags1=$(ccommon) $(crelease)
-lflags1=$(lcommon) $(ldebug)
-!ENDIF
-
-lflags= $(lflags1)
-
-!IF "$(TARGET_CPU)" == "x86"
-cflags = $(cflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
-scall  = -Gz
-
-!ELSEIF "$(TARGET_CPU)" == "x64"
-cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
-scall  =
-!ENDIF
-
-!IF ($(VSVER) >= 2012)
-cflags = $(cflags:-W4=-W3)
-!ENDIF
-
-#More verbose warning output options below
-#cflags = $(cflags:-W4=-wd4131
-#cflags = $(cflags:-W4=-Wall)
-#cflags = $(cflags:-W3=-wd4131
-#cflags = $(cflags:-W3=-Wall)
-
-# declarations for use on Intel x86 systems
-!IF "$(TARGET_CPU)" == "x86"
-DLLENTRY = @12
-EXEVER=5.01
-MACHINE=/MACHINE:X86
-!ENDIF
-
-# declarations for use on AMD64 systems
-!IF "$(TARGET_CPU)" == "x64"
-DLLENTRY =
-EXEVER=5.02
-MACHINE=/MACHINE:X64
-!ENDIF
-
-# for Windows applications
-conlflags = $(lflags) -subsystem:console,$(EXEVER)
-guilflags = $(lflags) -subsystem:windows,$(EXEVER)
-dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
-
-# basic subsystem specific libraries, less the C Run-Time
-baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib
-winlibs     = $(baselibs) user32.lib comdlg32.lib winspool.lib
-
-# for Windows applications that use the C Run-Time libraries
-conlibs     = $(baselibs)
-guilibs     = $(winlibs)
-#
-
-!IFNDEF ADD_CURSES
-INCLDIR= /I..\include /I..\sys\winnt
-!ELSE
-INCLDIR= /I..\include /I..\sys\winnt /I$(CURSESINCL)
-!ENDIF
-  
-
-#==========================================
-# Util builds
-#==========================================
-
-cflagsBuild = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
-lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
-
-#==========================================
-# - Game build
-#==========================================
-
-LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
-
-! IF ("$(USE_DLB)"=="Y")
-DLB = nhdat
-! ELSE
-DLB =
-! ENDIF
 
 #==========================================
 #================ MACROS ==================
@@ -481,6 +378,35 @@ ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ)
 
 OPTIONS_FILE = $(DAT)\options
 
+!IF "$(ADD_CURSES)" == "Y"	
+#==========================================
+# PDCurses build macros
+#==========================================
+PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
+PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
+PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
+PDCSRC                  = $(PDCURSES_TOP)\pdcurses
+PDCWINCON               = $(PDCURSES_TOP)\wincon
+PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
+	$(O)deprec.o $(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
+	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
+	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
+	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o $(O)terminfo.o $(O)touch.o $(O)util.o $(O)window.o    \
+	$(O)debug.o
+
+PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
+	  $(O)pdcsetsc.o $(O)pdcutil.o
+
+PDCLIB = $(O)\pdcurses.lib
+
+PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
+
+!ELSE
+PDCLIB = 
+!ENDIF
+
 #==========================================
 # Header file macros
 #==========================================
@@ -517,6 +443,114 @@ TILE_H      = ..\win\share\tile.h
 #==========================================
 
 DATABASE = $(DAT)\data.base
+
+#==========================================
+# More compiler setup post-macros
+#==========================================
+#----------------------------------------------------------------
+
+!IF "$(ADD_CURSES)" == "Y"
+#CURSESDEF=-D"PDC_DLL_BUILD" -D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+!ELSE
+CURSDEF=
+CURSESLIB=
+CURSESINCL=
+!ENDIF
+
+ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
+	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" $(CURSESDEF) \
+	-EHsc -fp:precise -Gd -GF -GS -Gy \
+	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
+cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
+
+lcommon= /NOLOGO /INCREMENTAL:NO
+
+!IF "$(DEBUGINFO)" == "Y"
+ldebug = /DEBUG
+cflags1=$(ccommon) $(cdebug)
+lflags1=$(lcommon) $(ldebug)
+!ELSE
+ldebug= /DEBUG
+cflags1=$(ccommon) $(crelease)
+lflags1=$(lcommon) $(ldebug)
+!ENDIF
+
+lflags= $(lflags1)
+
+!IF "$(TARGET_CPU)" == "x86"
+cflags = $(cflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+scall  = -Gz
+
+!ELSEIF "$(TARGET_CPU)" == "x64"
+cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
+scall  =
+!ENDIF
+
+!IF ($(VSVER) >= 2012)
+cflags = $(cflags:-W4=-W3)
+!ENDIF
+
+#More verbose warning output options below
+#cflags = $(cflags:-W4=-wd4131
+#cflags = $(cflags:-W4=-Wall)
+#cflags = $(cflags:-W3=-wd4131
+#cflags = $(cflags:-W3=-Wall)
+
+# declarations for use on Intel x86 systems
+!IF "$(TARGET_CPU)" == "x86"
+DLLENTRY = @12
+EXEVER=5.01
+MACHINE=/MACHINE:X86
+!ENDIF
+
+# declarations for use on AMD64 systems
+!IF "$(TARGET_CPU)" == "x64"
+DLLENTRY =
+EXEVER=5.02
+MACHINE=/MACHINE:X64
+!ENDIF
+
+# for Windows applications
+conlflags = $(lflags) -subsystem:console,$(EXEVER)
+guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+# basic subsystem specific libraries, less the C Run-Time
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib gdi32.lib
+winlibs     = $(baselibs) user32.lib comdlg32.lib winspool.lib
+
+# for Windows applications that use the C Run-Time libraries
+conlibs     = $(baselibs)
+guilibs     = $(winlibs)
+#
+
+!IFNDEF ADD_CURSES
+INCLDIR= /I..\include /I..\sys\winnt
+!ELSE
+INCLDIR= /I..\include /I..\sys\winnt /I$(CURSESINCL)
+!ENDIF
+
+#==========================================
+# Util builds
+#==========================================
+
+cflagsBuild = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
+
+#==========================================
+# - Game build
+#==========================================
+
+LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
+
+! IF ("$(USE_DLB)"=="Y")
+DLB = nhdat
+! ELSE
+DLB =
+! ENDIF
 
 #==========================================
 #================ RULES ==================
@@ -562,19 +596,6 @@ DATABASE = $(DAT)\data.base
 	@$(cc) $(cflagsBuild) -Fo$@ $<
 
 #==========================================
-# Rules for files in win\curses
-#==========================================
-
-{$(CURSES)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild)  -Fo$@ $<
-
-{$(CURSES)}.h{$(INCL)}.h:
-	@copy $< $@
-
-#{$(CURSES)}.txt{$(DAT)}.txt:
-#	@copy $< $@
-
-#==========================================
 # Rules for files in win\share
 #==========================================
 
@@ -601,6 +622,29 @@ DATABASE = $(DAT)\data.base
 
 {$(MSWIN)}.c{$(OBJ)}.o:
 	@$(cc) $(cflagsBuild)  -Fo$@  $<
+
+#==========================================
+# Rules for files in win\curses
+#==========================================
+
+{$(WCURSES)}.c{$(OBJ)}.o:
+	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+
+#{$(WCURSES)}.txt{$(DAT)}.txt:
+#	@copy $< $@
+
+#==========================================
+# Rules for files in PDCurses
+#==========================================
+
+{$(PDCURSES_TOP)}.c{$(OBJ)}.o:
+	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+
+{$(PDCSRC)}.c{$(OBJ)}.o:
+	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
+
+{$(PDCWINCON)}.c{$(OBJ)}.o:
+	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -752,12 +796,12 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)tile.o $(O)guistub.o
 
 
-$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
+$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(conlibs) -out:$@ @<<$(@B).lnk
+		$(LIBS) $(PDCLIB) $(conlibs) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -780,7 +824,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)
 		$(O)tile.o
@@ -1214,6 +1258,13 @@ $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #==========================================
+# PDCurses
+#==========================================
+
+$(O)\pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
+	lib -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
+
+#==========================================
 # Housekeeping
 #==========================================
 
@@ -1297,6 +1348,9 @@ spotless: clean
 	if exist $(U)tilemap.exe         del $(U)tilemap.exe
 	if exist $(U)uudecode.exe        del $(U)uudecode.exe
 	if exist $(U)dlb_main.exe        del $(U)dlb_main.exe
+!IF "$(ADD_CURSES)" == "Y"	
+	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
+!ENDIF
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag
@@ -1428,6 +1482,17 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 (O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\cppregex.cpp
 
+# 
+# curses window port dependencies
+#
+$(O)\cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)\cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)\cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)\cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
+$(O)\cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)\cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)\cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
@@ -1476,9 +1541,9 @@ $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\tty\wintty.c
-$(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
-		$(CONFIG_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\Window.c
+#$(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
+#		$(CONFIG_H)
+#	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\Window.c
 $(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\dialogs.c
 $(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
@@ -1676,7 +1741,7 @@ $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
-$(O)windows.o: windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
+#$(O)windows.o: windows.c $(HACK_H) $(INCL)\wingem.h $(INCL)\winGnome.h
 $(O)wizard.o: wizard.c $(HACK_H) $(INCL)\qtext.h
 $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h
 $(O)worn.o: worn.c $(HACK_H)

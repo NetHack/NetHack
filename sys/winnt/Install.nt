@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1524317622 2018/04/21 13:33:42 $
+          Last revision: $NHDT-Date: 1542545993 2018/11/18 12:59:53 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -47,6 +47,10 @@ of NetHack you wish to run.
 The Visual Studio 2017 NetHack solution file can be found here:
     win\win32\vs2017\NetHack.sln
 
+Before executing the steps to build listed in the next paragraph,
+decide if you want to include optional curses window-port. See
+the note just below entitled "Optional curses window-port support."
+
 So the steps are:
     1. Launch the IDE.
     2. Open the appropriate solution file.
@@ -59,6 +63,26 @@ using a "build.bat" batch file found in the same directory as the solution.
 
 Open a developer command prompt for the version of Visual Studio you are
 using.  Change to the directory win\win32\vs2017 and run "build.bat".
+
+<Optional curses window-port support>
+
+Starting with 3.6.2, the community patch for a window-port that uses
+curses was incorporated into the NetHack source code tree. That window-port,
+which evolved from work originally done by Karl Garrison, has been used in
+several NetHack variants and on nethack.alt.org and on 
+www.hardfought.org/nethack/.
+
+If you want to include the curses window-port support in your Visual Studio
+build, you will have to first obtain the PDCurses sources from
+https://github.com/wmcbrine/PDCurses
+and have them available prior to building NetHack. There are two ways to 
+enable curses window-port support during the VS build: Either set the 
+environment variable PDCURSES to a folder containing a PDCurses 
+repository/source-tree
+    OR 
+Place the PDCurses folder alongside the NetHack source repository prior
+to proceeding with steps 1 through 5 above.
+
 
 /-----------------------------------\
 | Building Using Make               |
@@ -151,7 +175,26 @@ Setting Up
     source tree.
         cd src
 
-2.  Make sure all the NetHack files are in the appropriate directory
+2.  Starting with 3.6.2, the community patch for a window-port that uses
+    curses was incorporated into the NetHack source code tree. That 
+    window-port, which evolved from work originally done by Karl Garrison,
+    has been used in several NetHack variants and on nethack.alt.org and 
+    on www.hardfought.org/nethack/.
+
+    If you want to include the optional curses window-port support in your
+    command line Makefile build, you will have to first obtain the 
+    PDCurses sources from https://github.com/wmcbrine/PDCurses
+    and have that source code tree available prior to building NetHack.
+    Edit your Makefile and in Question 4 of the four decisions you can 
+    make in there, uncomment these two lines:
+        ADD_CURSES=Y
+        PDCURSES_TOP=..\..\pdcurses
+
+    Adjust the PDCURSES_TOP macro so that it points to the correct 
+    location for the top of the PDCurses source tree if it differs from
+    the path shown.
+
+3.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
     dat, doc, include, src, sys\share, sys\winnt, util, and binary (The
     "binary" directory was created by nhsetup.bat earlier if you
@@ -164,26 +207,26 @@ Setting Up
     they are not necessary for building the TTY version for the Win32 
     console subsystem.  You can delete them to save space.
 
-    Required Directories for a Win32 Console NetHack:
+    Required Directories for a Win32 Console NetHack build:
 
-                            top
-                             |
-        ----------------------------------------------------/ /----- 
-        |       |     |        |       |     |          |        |
-       util    dat   doc    include   src   sys        win     binary
-                                             |          |
-                                          ------      ----- 
-                                          |    |      |    
-                                       share  winnt  tty  
+                          top -------------(optional) ----------------
+                           |                                         |
+      -------------------------------------------------        pdcurses-top
+      |       |     |        |       |     |          |        |          |
+     util    dat   doc    include   src   sys        win    pdcurses   wincon
+                                           |          |
+                                        ------      ----- 
+                                        |    |      |    
+                                     share  winnt  tty  
  
 
     Required Directories for a Win32 Graphical NetHack:
 
                             top
                              |
-        ----------------------------------------------------/ /----- 
-        |       |     |        |       |     |          |        |
-       util    dat   doc    include   src   sys        win     binary
+        -------------------------------------------------
+        |       |     |        |       |     |          |  
+       util    dat   doc    include   src   sys        win 
                                              |          |
                                           ------      ----- 
                                           |    |          |
@@ -200,7 +243,7 @@ Setting Up
     trouble with them, so you may need to convert them. The compiler
     should not have any problems with them however.
 
-3.  Now go to the include subdirectory to check a couple of the header
+4.  Now go to the include subdirectory to check a couple of the header
     files there.  Things *should* work as they are, but since you have
     probably set up your system in some sort of custom configuration it
     doesn't hurt to check out the following:
