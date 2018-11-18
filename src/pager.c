@@ -1780,7 +1780,7 @@ dowhatdoes()
 }
 
 STATIC_OVL void
-docontact()
+docontact(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
     char buf[BUFSZ];
@@ -1810,67 +1810,67 @@ docontact()
 }
 
 void
-dispfile_help()
+dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
 void
-dispfile_shelp()
+dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
 void
-dispfile_optionfile()
+dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
 void
-dispfile_license()
+dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
 void
-dispfile_debughelp()
+dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
 void
-hmenu_doextversion()
+hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
 void
-hmenu_dohistory()
+hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
 void
-hmenu_dowhatis()
+hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
 void
-hmenu_dowhatdoes()
+hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
 void
-hmenu_doextlist()
+hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();
 }
 
 void
-domenucontrols()
+domenucontrols(VOID_ARGS)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
     show_menu_controls(cwin, FALSE);
