@@ -587,7 +587,7 @@ struct monst *summoner;
                 } while (summoner
                          && ((attacktype(&mons[makeindex], AT_MAGC)
                               && mons[makeindex].difficulty
-				 >= mons[summoner->mnum].difficulty)
+                                 >= mons[summoner->mnum].difficulty)
                              || (s_cls == S_DEMON && m_cls == S_ANGEL)
                              || (s_cls == S_ANGEL && m_cls == S_DEMON)));
                 /* do this after picking the monster to place */
