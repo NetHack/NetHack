@@ -1,0 +1,13 @@
+Here is a list of known issues with the curses interface at the time of
+this writing.  Send any others you discover to me (Karl Garrison) at
+kgarrison@obox.com, along with how to reproduce the problem, if
+possible.  Missing features are listed in the file Todo.txt.
+
+ * Resizing a window to 80 columns or less causes a crash (PDCurses for
+ SDL and X11 only).  Windows starting at this size and below do not
+ cause a crash, however.
+ 
+ * Cursor position is wrong on map for smaller terminal windows in all
+ versions of PDCurses (smaller than 80 width or 24 height).  This is
+ due to an incomplete workaround for an issue with the wmove() function
+ in PDCurses.

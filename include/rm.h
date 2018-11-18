@@ -108,7 +108,7 @@ enum levl_typ_types {
 /*
  * The screen symbols may be the default or defined at game startup time.
  * See drawing.c for defaults.
- * Note: {ibm|dec}_graphics[] arrays (also in drawing.c) must be kept in
+ * Note: {ibm|dec|curses}_graphics[] arrays (also in drawing.c) must be kept in
  * synch.
  */
 
@@ -294,9 +294,10 @@ struct symsetentry {
  * Must match the order of the known_handlers strings
  * in drawing.c
  */
-#define H_UNK 0
-#define H_IBM 1
-#define H_DEC 2
+#define H_UNK     0
+#define H_IBM     1
+#define H_DEC     2
+#define H_CURS    3
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];

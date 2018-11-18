@@ -1650,6 +1650,9 @@ static struct win_info window_opts[] = {
 #ifdef TTY_GRAPHICS
     { "tty", "traditional tty-based graphics" },
 #endif
+#ifdef CURSES_GRAPHICS
+    { "curses", "terminal-based graphics using curses libraries" },
+#endif
 #ifdef X11_GRAPHICS
     { "X11", "X11" },
 #endif
