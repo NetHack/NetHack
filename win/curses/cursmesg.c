@@ -132,6 +132,11 @@ curses_message_win_puts(const char *message, boolean recursed)
     wrefresh(win);
 }
 
+#ifdef WIN32
+#define XTRA_RESP "\r"
+#else
+#define XTRA_RESP ""
+#endif
 
 int
 curses_block(boolean noscroll)
@@ -140,8 +145,7 @@ curses_block(boolean noscroll)
 {
     int height, width, ret;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    char *resp = " \n\033"; /* space, enter, esc */
-
+    char *resp = " \n\033" XTRA_RESP; /* space, enter, esc */
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     curses_toggle_color_attr(win, MORECOLOR, NONE, ON);
