@@ -401,7 +401,7 @@ PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o 
 
 PDCLIB = $(O)\pdcurses.lib
 
-PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCURSES_TOP)\pdcurses
+PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
 
 !ELSE
 PDCLIB = 
@@ -1348,6 +1348,9 @@ spotless: clean
 	if exist $(U)tilemap.exe         del $(U)tilemap.exe
 	if exist $(U)uudecode.exe        del $(U)uudecode.exe
 	if exist $(U)dlb_main.exe        del $(U)dlb_main.exe
+!IF "$(ADD_CURSES)" == "Y"	
+	if exist $(U)pdcurses.lib        del $(O)pdcurses.lib
+!ENDIF
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag
