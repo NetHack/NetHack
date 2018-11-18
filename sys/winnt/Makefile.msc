@@ -73,8 +73,8 @@ DEBUGINFO = Y
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=..\..\pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -1261,7 +1261,7 @@ $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 # PDCurses
 #==========================================
 
-$(PDCLIB) : $(PDCLIBOBJS) $(PDCOBJS)
+$(O)\pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 	lib -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
 #==========================================
