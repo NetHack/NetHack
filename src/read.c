@@ -2370,8 +2370,8 @@ struct obj *sobj;
     uball->spe = 1; /* special ball (see save) */
 
     /*
-     *  Place ball & chain if not swallowed.  If swallowed, the ball &
-     *  chain variables will be set at the next call to placebc().
+     *  Place ball & chain if not swallowed.  If swallowed, the ball & chain
+     *  variables will be set at the next call to placebc().
      */
     if (!u.uswallow) {
         placebc();

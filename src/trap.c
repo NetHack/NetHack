@@ -5033,10 +5033,10 @@ struct trap *adjtrap;
 {
     struct trap *trap_with_u = t_at(u.ux0, u.uy0);
 
-    if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT &&
-        is_pit(trap_with_u->ttyp) &&
-        is_pit(adjtrap->ttyp)) {
+    if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT
+        && is_pit(trap_with_u->ttyp) && is_pit(adjtrap->ttyp)) {
         int idx;
+
         for (idx = 0; idx < 8; idx++) {
             if (xdir[idx] == u.dx && ydir[idx] == u.dy)
                 return TRUE;
@@ -5063,8 +5063,7 @@ struct trap *trap;
         x = trap->tx + xdir[diridx];
         y = trap->ty + ydir[diridx];
         if (isok(x, y)) {
-            if ((t = t_at(x, y)) != 0
-                && is_pit(t->ttyp)) {
+            if ((t = t_at(x, y)) != 0 && is_pit(t->ttyp)) {
                 trap->conjoined |= (1 << diridx);
                 join_adjacent_pits(t);
             } else
