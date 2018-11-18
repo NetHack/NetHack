@@ -1349,7 +1349,7 @@ spotless: clean
 	if exist $(U)uudecode.exe        del $(U)uudecode.exe
 	if exist $(U)dlb_main.exe        del $(U)dlb_main.exe
 !IF "$(ADD_CURSES)" == "Y"	
-	if exist $(U)pdcurses.lib        del $(O)pdcurses.lib
+	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
 !ENDIF
 clean:
 	if exist $(O)*.o del $(O)*.o
