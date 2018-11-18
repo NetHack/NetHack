@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1542501042 2018/11/18 00:30:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.35 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -497,9 +497,11 @@ main()
     Fprintf(ofp, "\nshort glyph2tile[MAX_GLYPH] = {\n");
 
     for (i = 0; i < MAX_GLYPH; i++) {
-        Fprintf(ofp, "%2d,%c", tilemap[i], (i % 12) ? ' ' : '\n');
+        Fprintf(ofp, " %4d,", tilemap[i]);
+        if ((i % 12) == 11 || i == MAX_GLYPH - 1)
+            Fprintf(ofp, "\n");
     }
-    Fprintf(ofp, "\n};\n");
+    Fprintf(ofp, "};\n");
 
     process_substitutions(ofp);
 

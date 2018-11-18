@@ -495,13 +495,13 @@ xchar x, y;
         return 0;
 
     if ((trap = t_at(x, y)) != 0) {
-        if ((is_pit(trap->ttyp) && !Passes_walls)
-            || trap->ttyp == WEB) {
+        if ((is_pit(trap->ttyp) && !Passes_walls) || trap->ttyp == WEB) {
             if (!trap->tseen)
                 find_trap(trap);
             You_cant("kick %s that's in a %s!", something,
-                     Hallucination ? "tizzy" :
-                     (trap->ttyp == WEB) ? "web" : "pit");
+                     Hallucination ? "tizzy"
+                         : (trap->ttyp == WEB) ? "web"
+                             : "pit");
             return 1;
         }
         if (trap->ttyp == STATUE_TRAP) {

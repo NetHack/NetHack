@@ -231,7 +231,7 @@ struct splevstack *st;
         st->depth = 0;
         st->depth_alloc = SPLEV_STACK_RESERVE;
         st->stackdata =
-            (struct opvar **) alloc(st->depth_alloc * sizeof(struct opvar *));
+           (struct opvar **) alloc(st->depth_alloc * sizeof (struct opvar *));
     }
 }
 
@@ -284,7 +284,7 @@ struct opvar *v;
 
     if (st->depth >= st->depth_alloc) {
         struct opvar **tmp = (struct opvar **) alloc(
-            (st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof(struct opvar *));
+           (st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof (struct opvar *));
 
         (void) memcpy(tmp, st->stackdata,
                       st->depth_alloc * sizeof(struct opvar *));
@@ -352,7 +352,7 @@ struct opvar *
 opvar_new_str(s)
 char *s;
 {
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
+    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
 
     tmpov->spovartyp = SPOVAR_STRING;
     if (s) {
@@ -370,7 +370,7 @@ struct opvar *
 opvar_new_int(i)
 long i;
 {
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
+    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
 
     tmpov->spovartyp = SPOVAR_INT;
     tmpov->vardata.l = i;
@@ -381,7 +381,7 @@ struct opvar *
 opvar_new_coord(x, y)
 int x, y;
 {
-    struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
+    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
 
     tmpov->spovartyp = SPOVAR_COORD;
     tmpov->vardata.l = SP_COORD_PACK(x, y);
@@ -393,7 +393,7 @@ struct opvar *
 opvar_new_region(x1,y1,x2,y2)
      int x1,y1,x2,y2;
 {
-    struct opvar *tmpov = (struct opvar *)alloc(sizeof (struct opvar));
+    struct opvar *tmpov = (struct opvar *) alloc(sizeof (struct opvar));
 
     tmpov->spovartyp = SPOVAR_REGION;
     tmpov->vardata.l = SP_REGION_PACK(x1,y1,x2,y2);

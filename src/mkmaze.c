@@ -632,7 +632,7 @@ char *s;
 }
 
 #define ORC_LEADER 1
-static const char *orcfruit[] = {"paddle cactus", "dwarven root"};
+static const char *orcfruit[] = { "paddle cactus", "dwarven root" };
 
 void
 migrate_orc(mtmp, mflags)
@@ -643,8 +643,8 @@ unsigned long mflags;
     d_level dest;
 
     cur_depth = (int) depth(&u.uz);
-    max_depth = dunlevs_in_dungeon(&u.uz) +
-                (dungeons[u.uz.dnum].depth_start - 1);
+    max_depth = dunlevs_in_dungeon(&u.uz)
+                + (dungeons[u.uz.dnum].depth_start - 1);
     if (mflags == ORC_LEADER) {
         /* Note that the orc leader will take possession of any
          * remaining stuff not already delivered to other
@@ -695,8 +695,7 @@ struct monst *mtmp;
     }
     if (is_captain || !rn2(8)) {
         otyp = shiny_obj(RING_CLASS);
-        if ((otyp != STRANGE_OBJECT) &&
-            (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
+        if (otyp != STRANGE_OBJECT && (otmp = mksobj(otyp, FALSE, FALSE)) != 0)
             add_to_minv(mtmp, otmp);
     }
 }
@@ -754,11 +753,11 @@ stolen_booty(VOID_ARGS)
     for (i = 0; i < cnt; ++i) {
         /* Food items - but no lembas! (or some other weird things) */
         otyp = rn2((TIN - TRIPE_RATION) + 1) + TRIPE_RATION;
-        if (otyp != LEMBAS_WAFER && otyp != GLOB_OF_GRAY_OOZE &&
-              otyp != GLOB_OF_BROWN_PUDDING && otyp != GLOB_OF_GREEN_SLIME &&
-              otyp != GLOB_OF_BLACK_PUDDING && otyp != MEAT_STICK &&
-              otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING &&
-              otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
+        if (otyp != LEMBAS_WAFER && otyp != GLOB_OF_GRAY_OOZE
+            && otyp != GLOB_OF_BROWN_PUDDING && otyp != GLOB_OF_GREEN_SLIME
+            && otyp != GLOB_OF_BLACK_PUDDING && otyp != MEAT_STICK
+            && otyp != MEATBALL && otyp != MEAT_STICK && otyp != MEAT_RING
+            && otyp != HUGE_CHUNK_OF_MEAT && otyp != CORPSE)
             migr_booty_item(otyp, gang);
     }
     migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
