@@ -32,11 +32,12 @@
 #========================================================================================
 # BUILD DECISIONS SECTION
 #
-# There are currently only 3 decisions that you can choose to make, and none are 
-# required:
+# There are currently only 4 decisions that you can choose to make, and none are 
+# absolutely required because defaults are in place:
 #	1. Where do you want your build to end up?
 #	2. Do you want debug information in the executable?
 #	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
+#       4. Do you want to include the optional curses port?
 #
 #-----------------------------------------------------------------------------------------
 #=========================================================================================
@@ -64,15 +65,16 @@ DEBUGINFO = Y
 #---------------------------------------------------------------
 # OPTIONAL - Curses window port support 
 #
-# 4. Uncomment these and set them appropriate if you want to
+# 4. Uncomment these and set them appropriately if you want to
 #    include curses port support alongside TTY support in your
-#    console binary. You'll have to set CURSESINCL to the location
-#    of your curses header (.h) files and CURSESDLL to the location
-#    of your pdcurses.dll.
+#    NetHack.exe binary. 
+#
+#    You'll have to set PDCURSES_H to the correct location of the 
+#    PDCurses header (.h) files and PDCURSES_C to the location
+#    of your PDCurses C files.
 #
 ADD_CURSES=Y
-CURSESINCL=..\..\pdcurses
-CURSESLIB=..\..\pdcurses\wincon\pdcurses.lib
+PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -98,18 +100,20 @@ CURSESLIB=..\..\pdcurses\wincon\pdcurses.lib
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
 
-INCL   = ..\include    # NetHack include files
-DAT    = ..\dat        # NetHack data files
-DOC    = ..\doc        # NetHack documentation files
-UTIL   = ..\util       # Utility source
-SRC    = ..\src        # Main source
-SSYS   = ..\sys\share  # Shared system files
-MSWSYS = ..\sys\winnt  # mswin specific files
-TTY    = ..\win\tty    # window port files (tty)
-MSWIN  = ..\win\win32  # window port files (win32)
-CURSES = ..\win\curses # window port files (curses) 
-WSHR   = ..\win\share  # Tile support files 
+INCL    = ..\include     # NetHack include files
+DAT     = ..\dat         # NetHack data files
+DOC     = ..\doc         # NetHack documentation files
+UTIL    = ..\util        # Utility source
+SRC     = ..\src         # Main source
+SSYS    = ..\sys\share   # Shared system files
+MSWSYS  = ..\sys\winnt   # mswin specific files
+TTY     = ..\win\tty     # window port files (tty)
+MSWIN   = ..\win\win32   # window port files (win32)
+WCURSES = ..\win\curses  # window port files (curses) 
+WSHR    = ..\win\share   # Tile support files 
 
+! IF ("$(ADD_CURSES)"=="Y")
+PDCURSES = 
 #
 #  Object directory.
 #
@@ -481,6 +485,38 @@ ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ)
 
 OPTIONS_FILE = $(DAT)\options
 
+!IF "$(ADD_CURSES)" == "Y"	
+#==========================================
+# PDCurses build macros
+#==========================================
+PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
+PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
+PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
+PANEL_HEADER		= $(PDCURSES_TOP)\panel.h
+TERM_HEADER		= $(PDCURSES_TOP)\term.h
+PDCSRC                  = $(PDCURSES_TOP)\wincon
+
+PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
+	$(O)deprec.o $(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
+	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
+	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
+	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o $(O)terminfo.o $(O)touch.o $(O)util.o $(O)window.o    \
+	$(O)debug.o
+
+PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
+	  $(O)pdcsetsc.o $(O)pdcutil.o
+PDCOSDIR = $(PDCURSES_SRCDIR)/wincon
+
+PDCURSES_WIN_H = $(PDCOSDIR)/pdcwin.h
+
+PDCLIB = $(O)\pdcurses.lib
+
+!ELSE
+PDCLIB = 
+!ENDIF
+
 #==========================================
 # Header file macros
 #==========================================
@@ -601,6 +637,16 @@ DATABASE = $(DAT)\data.base
 
 {$(MSWIN)}.c{$(OBJ)}.o:
 	@$(cc) $(cflagsBuild)  -Fo$@  $<
+
+#==========================================
+# Rules for files in PDCurses
+#==========================================
+
+{$(PDCURSES_TOP)}.c{$(OBJ)}.o:
+	@$(cc) $(cflagsBuild)  -Fo$@ $<
+
+{$(PDCSRC)}.c{$(OBJ)}.o:
+	@$(cc) $(cflagsBuild)  -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -757,7 +803,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(conlibs) -out:$@ @<<$(@B).lnk
+		$(PDCLIB) $(LIBS) $(conlibs) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
 		$(O)nttty.o
@@ -1214,6 +1260,12 @@ $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 #==========================================
+# PDCurses
+#==========================================
+
+$(PDCLIB) : $(PDCLIBOBJS)
+
+#==========================================
 # Housekeeping
 #==========================================
 
@@ -1428,6 +1480,17 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 (O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\cppregex.cpp
 
+# 
+# curses window port dependencies
+#
+$(O)\cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)\cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)\cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)\cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
+$(O)\cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)\cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)\cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
