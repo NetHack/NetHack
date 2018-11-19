@@ -704,6 +704,8 @@ int x, y;
                    (mon == u.usteed) ? "steed" : "defunct monster");
         return;
     }
+    if (level.monsters[x][y])
+        impossible("placing monster over another?");
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
 }

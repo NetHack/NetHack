@@ -629,8 +629,19 @@ extern dlevel_t level; /* structure describing the current level */
 #define MON_BURIED_AT(x, y)                     \
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
+#if EXTRA_SANITY_CHECKS
+#define place_worm_seg(m, x, y) do { \
+    if (level.monsters[x][y] && level.monsters[x][y] != m) impossible("place_worm_seg over mon"); \
+    level.monsters[x][y] = m; \
+    } while(0)
+#define remove_monster(x, y) do { \
+    if (!level.monsters[x][y]) impossible("no monster to remove"); \
+    level.monsters[x][y] = (struct monst *) 0; \
+    } while(0)
+#else
 #define place_worm_seg(m, x, y) level.monsters[x][y] = m
 #define remove_monster(x, y) level.monsters[x][y] = (struct monst *) 0
+#endif
 #define m_at(x, y) (MON_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)
 #define m_buried_at(x, y) \
     (MON_BURIED_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)

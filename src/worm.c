@@ -383,6 +383,7 @@ struct obj *weap;
 
     /* Sometimes the tail end dies. */
     if (!new_worm) {
+        place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (context.mon_moving) {
             if (canspotmon(worm))
                 pline("Part of %s tail has been cut off.",

@@ -336,19 +336,21 @@ register int tx, ty; /* destination of mail daemon */
         else if (fx == u.ux && fy == u.uy)
             verbalize("Excuse me.");
 
+        if (mon)
+            remove_monster(fx, fy);
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);            /* see it */
         flush_screen(0);           /* make sure md shows up */
         delay_output();            /* wait a little bit */
 
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
+        remove_monster(fx, fy);
         if (mon) {
             if ((mon->mx != fx) || (mon->my != fy))
                 place_worm_seg(mon, fx, fy);
             else
                 place_monster(mon, fx, fy);
-        } else
-            remove_monster(fx, fy);
+        }
         newsym(fx, fy);
     }
 
@@ -357,9 +359,11 @@ register int tx, ty; /* destination of mail daemon */
      * very unlikely).  If one exists, then have the md leave in disgust.
      */
     if ((mon = m_at(fx, fy)) != 0) {
+        remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
         verbalize("This place's too crowded.  I'm outta here.");
+        remove_monster(fx, fy);
 
         if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
             place_worm_seg(mon, fx, fy);
