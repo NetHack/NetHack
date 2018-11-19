@@ -714,8 +714,12 @@
 				3189577B21A1FDA400FB2ABE /* Sources */,
 				3189577C21A1FDA400FB2ABE /* Frameworks */,
 				3189577D21A1FDA400FB2ABE /* CopyFiles */,
-				319B338E21A32B0800B78702 /* ShellScript */,
-				319CBA3821A3458100150830 /* ShellScript */,
+				319B338E21A32B0800B78702 /* Build options */,
+				319CBA3821A3458100150830 /* Build data */,
+				317E7C4521A3548F00F6E4E5 /* Build rumors */,
+				317E7C4621A355E700F6E4E5 /* Build quest.dat */,
+				317E7C4721A357F700F6E4E5 /* Build oracles */,
+				317E7C4821A358AE00F6E4E5 /* Build engrave, epitaph and bogusmon */,
 			);
 			buildRules = (
 			);
@@ -848,7 +852,7 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		319B338E21A32B0800B78702 /* ShellScript */ = {
+		317E7C4521A3548F00F6E4E5 /* Build rumors */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -856,7 +860,98 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(NH_DAT_DIR)/rumors.tru",
+				"$(NH_DAT_DIR)/rumors.fal",
+				"$(NH_UTIL_DIR)/makedefs",
 			);
+			name = "Build rumors";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/rumors",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -r\n";
+		};
+		317E7C4621A355E700F6E4E5 /* Build quest.dat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_DAT_DIR)/quest.txt",
+				"$(NH_UTIL_DIR)/makedefs",
+			);
+			name = "Build quest.dat";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/quest.dat",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -q\n\n";
+		};
+		317E7C4721A357F700F6E4E5 /* Build oracles */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_DAT_DIR)/oracles.txt",
+				"$(NH_UTIL_DIR)/makedefs",
+			);
+			name = "Build oracles";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/oracles",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
+		};
+		317E7C4821A358AE00F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_UTIL_DIR)/makedefs",
+				"$(NH_DAT_DIR)/engrave.txt",
+				"$(NH_DAT_DIR)/epitaph.txt",
+				"$(NH_DAT_DIR)/bogusmon.txt",
+			);
+			name = "Build engrave, epitaph and bogusmon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/engrave",
+				"$(NH_DAT_DIR)/epitaph",
+				"$(NH_DAT_DIR)/bogusmon",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
+		};
+		319B338E21A32B0800B78702 /* Build options */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/makedefs",
+			);
+			name = "Build options";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -868,7 +963,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${NH_UTIL_DIR}\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
 		};
-		319CBA3821A3458100150830 /* ShellScript */ = {
+		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -879,6 +974,7 @@
 				"$(NH_DAT_DIR)/data.base",
 				"$(NH_UTIL_DIR)/makedefs",
 			);
+			name = "Build data";
 			outputFileListPaths = (
 			);
 			outputPaths = (
