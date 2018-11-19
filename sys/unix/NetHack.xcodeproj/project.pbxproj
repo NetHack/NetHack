@@ -860,13 +860,13 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"${SOURCE_ROOT}/../../util/makedefs",
-				"$(SOURCE_ROOT}/../../inlcude/date.h",
-				"$(SOURCE_ROOT}/../../dat/options",
+				"$(NH_UTIL_DIR)/makedefs",
+				"$(NH_INC_DIR)/date.h",
+				"$(NH_DAT_DIR)/options",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${SOURCE_ROOT}/../../util\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${NH_UTIL_DIR}\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
 		};
 		319CBA3821A3458100150830 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1149,6 +1149,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
 				NH_ROOT = "$(SOURCE_ROOT)/../..";
 				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				ONLY_ACTIVE_ARCH = YES;
@@ -1219,6 +1220,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
 				NH_ROOT = "$(SOURCE_ROOT)/../..";
 				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				OTHER_CFLAGS = (
