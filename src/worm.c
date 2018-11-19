@@ -301,7 +301,8 @@ register struct monst *worm;
      */
     for (seg = wtails[wnum]; seg; seg = seg->nseg)
         if (distu(seg->wx, seg->wy) < 3)
-            (void) mattacku(worm);
+            if (mattacku(worm))
+                return; /* your passive ability killed the worm */
 }
 
 /*  cutworm()
