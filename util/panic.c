@@ -20,10 +20,10 @@ extern void NDECL(vms_abort);
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (char *, ...));
+void VDECL(panic, (const char *, ...));
 
 void panic
-VA_DECL(char *, str)
+VA_DECL(const char *, str)
 {
     VA_START(str);
     VA_INIT(str, char *);
