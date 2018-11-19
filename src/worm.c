@@ -596,10 +596,12 @@ struct monst *worm;
     curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        if (!isok(curr->wx, curr->wy))
-            panic("worm seg not isok");
-        if (level.monsters[curr->wx][curr->wy] != worm)
-            panic("worm not at seg location");
+        if (curr->wx) {
+            if (!isok(curr->wx, curr->wy))
+                panic("worm seg not isok");
+            if (level.monsters[curr->wx][curr->wy] != worm)
+                panic("worm not at seg location");
+        }
         curr = curr->nseg;
     }
 }
@@ -621,8 +623,11 @@ register struct monst *worm;
     /*  if (!mtmp->wormno) return;  bullet proofing */
 
     while (curr) {
-        remove_monster(curr->wx, curr->wy);
-        newsym(curr->wx, curr->wy);
+        if (curr->wx) {
+            remove_monster(curr->wx, curr->wy);
+            newsym(curr->wx, curr->wy);
+            curr->wx = 0;
+        }
         curr = curr->nseg;
     }
 }
