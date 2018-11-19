@@ -757,6 +757,8 @@
 				31B8A43221A268DF0055BD01 /* Sources */,
 				31B8A43321A268DF0055BD01 /* Frameworks */,
 				31B8A43421A268DF0055BD01 /* CopyFiles */,
+				317E7C5021A3735300F6E4E5 /* Copy dgn_comp */,
+				317E7C5121A373E100F6E4E5 /* Build dungeon */,
 			);
 			buildRules = (
 				31B8A46721A286E70055BD01 /* PBXBuildRule */,
@@ -1045,6 +1047,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -s\n";
+		};
+		317E7C5021A3735300F6E4E5 /* Copy dgn_comp */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/dgn_comp",
+			);
+			name = "Copy dgn_comp";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${NH_UTIL_DIR}/dgn_comp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/dgn_comp ${NH_UTIL_DIR}/dgn_comp\n";
+		};
+		317E7C5121A373E100F6E4E5 /* Build dungeon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_UTIL_DIR)/makedefs",
+				"$(NH_UTIL_DIR)/dgn_comp",
+				"$(NH_DAT_DIR)/dungeon.pdf",
+			);
+			name = "Build dungeon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/dungeon",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -e\n${NH_UTIL_DIR}/dgn_comp dungeon.pdf\n";
 		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
