@@ -13,7 +13,7 @@
 #ifndef DEBUG  /* allow tool chains to define without causing warnings */
 #define DEBUG
 #endif
-:
+
 /*
  * Files expected to exist in the playground directory.
  */
