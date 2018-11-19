@@ -53,4 +53,4 @@ Makefile.gcc-orig
 # VS 2017 caches data into the hidden directory .vs
 .vs
 # Win32-specific ignores end
-
+.DS_Store
