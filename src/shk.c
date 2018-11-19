@@ -1827,9 +1827,10 @@ int croaked;
             eshkp->robbed -= umoney;
             if (eshkp->robbed < 0L)
                 eshkp->robbed = 0L;
-            if (umoney > 0)
+            if (umoney > 0L) {
                 money2mon(shkp, umoney);
-            context.botl = 1;
+                context.botl = 1;
+            }
             pline("%s %s all your possessions.", Shknam(shkp), takes);
             taken = TRUE;
             /* where to put player's invent (after disclosure) */
@@ -2795,6 +2796,7 @@ boolean peaceful, silent;
 
     if (peaceful) {
         boolean credit_use = !!ESHK(shkp)->credit;
+
         value = check_credit(value, shkp);
         /* 'peaceful' affects general treatment, but doesn't affect
          * the fact that other code expects that all charges after the
@@ -4027,8 +4029,10 @@ boolean cant_mollify;
             currency(cost_of_damage), !animal ? "\"" : "");
     if (yn(qbuf) != 'n') {
         cost_of_damage = check_credit(cost_of_damage, shkp);
-        money2mon(shkp, cost_of_damage);
-        context.botl = 1;
+        if (cost_of_damage > 0L) {
+            money2mon(shkp, cost_of_damage);
+            context.botl = 1;
+        }
         pline("Mollified, %s accepts your restitution.", shkname(shkp));
         /* move shk back to his home loc */
         home_shk(shkp, FALSE);
