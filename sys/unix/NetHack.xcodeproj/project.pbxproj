@@ -876,17 +876,17 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRC_ROOT)/../../dat/data.base",
-				"$(SRCROOT)/../../util/makedefs",
+				"$(NH_DAT_DIR)/data.base",
+				"$(NH_UTIL_DIR)/makedefs",
 			);
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRC_ROOT)/../../data",
+				"$(NH_DAT_DIR)/data",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# make data from data.base\ncd ${SOURCE_ROOT}/../../dat\n\n../util/makedefs -d\n";
+			shellScript = "# make data from data.base\ncd ${NH_DAT_DIR}\n\n${NH_UTIL_DIR}/makedefs -d\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1148,6 +1148,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_ROOT = "$(SOURCE_ROOT)/../..";
+				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
@@ -1215,6 +1218,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_ROOT = "$(SOURCE_ROOT)/../..";
+				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",
