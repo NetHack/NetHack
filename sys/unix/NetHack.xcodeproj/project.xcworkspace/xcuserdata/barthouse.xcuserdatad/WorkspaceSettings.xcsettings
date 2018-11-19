@@ -4,8 +4,14 @@
 <dict>
 	<key>BuildLocationStyle</key>
 	<string>UseAppPreferences</string>
+	<key>CustomBuildIntermediatesPath</key>
+	<string>../../obj</string>
 	<key>CustomBuildLocationType</key>
-	<string>RelativeToDerivedData</string>
+	<string>RelativeToWorkspace</string>
+	<key>CustomBuildProductsPath</key>
+	<string>../../bin</string>
+	<key>CustomIndexStorePath</key>
+	<string>../../datastore</string>
 	<key>DerivedDataLocationStyle</key>
 	<string>Default</string>
 	<key>EnabledFullIndexStoreVisibility</key>

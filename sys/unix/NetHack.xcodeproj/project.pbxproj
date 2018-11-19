@@ -197,7 +197,7 @@
 		3189576F21A1FCC100FB2ABE /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = /usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -714,6 +714,7 @@
 				3189577B21A1FDA400FB2ABE /* Sources */,
 				3189577C21A1FDA400FB2ABE /* Frameworks */,
 				3189577D21A1FDA400FB2ABE /* CopyFiles */,
+				319B338E21A32B0800B78702 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -844,6 +845,29 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		319B338E21A32B0800B78702 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${SOURCE_ROOT}/../../util/makedefs",
+				"$(SOURCE_ROOT}/../../inlcude/date.h",
+				"$(SOURCE_ROOT}/../../dat/options",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${SOURCE_ROOT}/../../util\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3189576D21A1FCC100FB2ABE /* Sources */ = {
@@ -1114,6 +1138,7 @@
 					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
 					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
 					"-DSECURE",
+					"-DCURSES_GRAPHICS",
 				);
 				SDKROOT = macosx;
 			};
@@ -1179,6 +1204,7 @@
 					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
 					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
 					"-DSECURE",
+					"-DCURSES_GRAPHICS",
 				);
 				SDKROOT = macosx;
 			};
