@@ -206,7 +206,7 @@
 		3189577D21A1FDA400FB2ABE /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = /usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -714,12 +714,12 @@
 				3189577B21A1FDA400FB2ABE /* Sources */,
 				3189577C21A1FDA400FB2ABE /* Frameworks */,
 				3189577D21A1FDA400FB2ABE /* CopyFiles */,
-				319B338E21A32B0800B78702 /* Build options */,
+				317E7C4B21A35F0500F6E4E5 /* Copy makedefs */,
 				319CBA3821A3458100150830 /* Build data */,
 				317E7C4521A3548F00F6E4E5 /* Build rumors */,
 				317E7C4621A355E700F6E4E5 /* Build quest.dat */,
-				317E7C4721A357F700F6E4E5 /* Build oracles */,
-				317E7C4821A358AE00F6E4E5 /* Build engrave, epitaph and bogusmon */,
+				317E7C4E21A3697300F6E4E5 /* Build options */,
+				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
 			);
 			buildRules = (
 			);
@@ -737,6 +737,9 @@
 				31B8A41A21A2669A0055BD01 /* Sources */,
 				31B8A41B21A2669A0055BD01 /* Frameworks */,
 				31B8A41C21A2669A0055BD01 /* CopyFiles */,
+				317E7C4C21A3625000F6E4E5 /* Copy lev_comp */,
+				317E7C4A21A35E9400F6E4E5 /* Build special levels */,
+				317E7C4D21A3649B00F6E4E5 /* Build quest levels */,
 			);
 			buildRules = (
 			);
@@ -895,7 +898,7 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -q\n\n";
 		};
-		317E7C4721A357F700F6E4E5 /* Build oracles */ = {
+		317E7C4A21A35E9400F6E4E5 /* Build special levels */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -903,20 +906,102 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(NH_DAT_DIR)/oracles.txt",
-				"$(NH_UTIL_DIR)/makedefs",
+				"$(NH_UTIL_DIR)/lev_comp",
+				"$(NH_DAT_DIR)/bigroom.des",
+				"$(NH_DAT_DIR)/castle.des",
+				"$(NH_DAT_DIR)/endgame.des",
+				"$(NH_DAT_DIR)/knox.des",
+				"$(NH_DAT_DIR)/medusa.des",
+				"$(NH_DAT_DIR)/mines.des",
+				"$(NH_DAT_DIR)/oracle.des",
+				"$(NH_DAT_DIR)/sokoban.des",
+				"$(NH_DAT_DIR)/tower.des",
+				"$(NH_DAT_DIR)/yendor.des",
 			);
-			name = "Build oracles";
+			name = "Build special levels";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(NH_DAT_DIR)/oracles",
+				"$(NH_DAT_DIR)/spec_levs",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/lev_comp bigroom.des\n${NH_UTIL_DIR}/lev_comp castle.des\n${NH_UTIL_DIR}/lev_comp endgame.des\n${NH_UTIL_DIR}/lev_comp gehennom.des\n${NH_UTIL_DIR}/lev_comp knox.des\n${NH_UTIL_DIR}/lev_comp medusa.des\n${NH_UTIL_DIR}/lev_comp mines.des\n${NH_UTIL_DIR}/lev_comp oracle.des\n${NH_UTIL_DIR}/lev_comp sokoban.des\n${NH_UTIL_DIR}/lev_comp tower.des\n${NH_UTIL_DIR}/lev_comp yendor.des\ntouch spec_levs\n";
 		};
-		317E7C4821A358AE00F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
+		317E7C4B21A35F0500F6E4E5 /* Copy makedefs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/makedefs",
+			);
+			name = "Copy makedefs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_UTIL_DIR)/makedefs",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/makedefs ${NH_UTIL_DIR}/makedefs\n";
+		};
+		317E7C4C21A3625000F6E4E5 /* Copy lev_comp */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/lev_comp",
+			);
+			name = "Copy lev_comp";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_UTIL_DIR)/lev_comp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/lev_comp ${NH_UTIL_DIR}/lev_comp\n";
+		};
+		317E7C4D21A3649B00F6E4E5 /* Build quest levels */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_UTIL_DIR)/lev_comp",
+				"$(NH_DAT_DIR)/Arch.des",
+				"$(NH_DAT_DIR)/Barb.des",
+				"$(NH_DAT_DIR)/Caveman.des",
+				"$(NH_DAT_DIR)/Healer.des",
+				"$(NH_DAT_DIR)/Knight.des",
+				"$(NH_DAT_DIR)/Monk.des",
+				"$(NH_DAT_DIR)/Priest.des",
+				"$(NH_DAT_DIR)/Ranger.des",
+				"$(NH_DAT_DIR)/Rogue.des",
+				"$(NH_DAT_DIR)/Samurai.des",
+				"$(NH_DAT_DIR)/Tourist.des",
+				"$(NH_DAT_DIR)/Valkyrie.des",
+				"$(NH_DAT_DIR)/Wizard.des",
+			);
+			name = "Build quest levels";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/quest_levs",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/lev_comp Arch.des\n${NH_UTIL_DIR}/lev_comp Barb.des\n${NH_UTIL_DIR}/lev_comp Caveman.des\n${NH_UTIL_DIR}/lev_comp Healer.des\n${NH_UTIL_DIR}/lev_comp Knight.des\n${NH_UTIL_DIR}/lev_comp Monk.des\n${NH_UTIL_DIR}/lev_comp Priest.des\n${NH_UTIL_DIR}/lev_comp Ranger.des\n${NH_UTIL_DIR}/lev_comp Rogue.des\n${NH_UTIL_DIR}/lev_comp Samurai.des\n${NH_UTIL_DIR}/lev_comp Tourist.des\n${NH_UTIL_DIR}/lev_comp Valkyrie.des\n${NH_UTIL_DIR}/lev_comp Wizard.des\ntouch quest_levs\n";
+		};
+		317E7C4E21A3697300F6E4E5 /* Build options */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -925,6 +1010,26 @@
 			);
 			inputPaths = (
 				"$(NH_UTIL_DIR)/makedefs",
+			);
+			name = "Build options";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_UTIL_DIR)/options",
+				"$(NH_INC_DIR)/date.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\n";
+		};
+		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
 				"$(NH_DAT_DIR)/engrave.txt",
 				"$(NH_DAT_DIR)/epitaph.txt",
 				"$(NH_DAT_DIR)/bogusmon.txt",
@@ -939,29 +1044,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
-		};
-		319B338E21A32B0800B78702 /* Build options */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/makedefs",
-			);
-			name = "Build options";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(NH_UTIL_DIR)/makedefs",
-				"$(NH_INC_DIR)/date.h",
-				"$(NH_DAT_DIR)/options",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${NH_UTIL_DIR}\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -s\n";
 		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -982,7 +1065,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# make data from data.base\ncd ${NH_DAT_DIR}\n\n${NH_UTIL_DIR}/makedefs -d\n";
+			shellScript = "# make data from data.base\ncd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -d\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
