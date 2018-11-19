@@ -651,6 +651,7 @@ boolean pets_only; /* true for ascension or final escape */
                 cnt = count_wsegs(mtmp);
                 num_segs = min(cnt, MAX_NUM_WORMS - 1);
                 wormgone(mtmp);
+                place_monster(mtmp, mtmp->mx, mtmp->my);
             } else
                 num_segs = 0;
 
@@ -701,6 +702,7 @@ coord *cc;   /* optional destination coordinates */
         cnt = count_wsegs(mtmp);
         num_segs = min(cnt, MAX_NUM_WORMS - 1);
         wormgone(mtmp);
+        place_monster(mtmp, mtmp->mx, mtmp->my);
     }
 
     /* set minvent's obj->no_charge to 0 */
