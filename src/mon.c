@@ -3577,8 +3577,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 #endif
         /* we can now create worms with tails - 11/91 */
         initworm(mtmp, rn2(5));
-        if (count_wsegs(mtmp))
-            place_worm_tail_randomly(mtmp, mtmp->mx, mtmp->my);
+        place_worm_tail_randomly(mtmp, mtmp->mx, mtmp->my);
     }
 
     newsym(mtmp->mx, mtmp->my);
