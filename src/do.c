@@ -1446,7 +1446,7 @@ boolean at_stairs, falling, portal;
                with the situation, so only say something when debugging */
             if (wizard)
                 pline("(monster in hero's way)");
-            if (!rloc(mtmp, TRUE))
+            if (!rloc(mtmp, TRUE) || m_at(u.ux, u.uy))
                 /* no room to move it; send it away, to return later */
                 migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_RANDOM,
                                  (coord *) 0);

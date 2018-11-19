@@ -586,7 +586,7 @@ int nx,ny;
     if (MON_AT(nx, ny) && nx != grd->mx && ny != grd->my) {
         if (!Deaf)
             verbalize("Out of my way, scum!");
-        if (!rloc(m_at(nx, ny), FALSE))
+        if (!rloc(m_at(nx, ny), FALSE) || m_at(nx, ny))
             m_into_limbo(m_at(nx, ny));
     }
 }
