@@ -715,6 +715,7 @@
 				3189577C21A1FDA400FB2ABE /* Frameworks */,
 				3189577D21A1FDA400FB2ABE /* CopyFiles */,
 				319B338E21A32B0800B78702 /* ShellScript */,
+				319CBA3821A3458100150830 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -866,6 +867,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path\ncd ${SOURCE_ROOT}/../../util\n\ncp ${BUILT_PRODUCTS_DIR}/makedefs .\n\n# Make dat/options\n# This also will generate include/date.h\n\n./makedefs -v\n";
+		};
+		319CBA3821A3458100150830 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRC_ROOT)/../../dat/data.base",
+				"$(SRCROOT)/../../util/makedefs",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRC_ROOT)/../../data",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# make data from data.base\ncd ${SOURCE_ROOT}/../../dat\n\n../util/makedefs -d\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
