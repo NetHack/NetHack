@@ -297,6 +297,9 @@ link_sanity_check()
     */
     monst_init();
     objects_init();
+
+    /* Quite unused warning */
+    (void) SCCS_Id;
 }
 
 void
