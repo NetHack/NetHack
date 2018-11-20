@@ -138,7 +138,7 @@ curses_block(boolean noscroll)
 /* noscroll - blocking because of msgtype = stop/alert */
 /* else blocking because window is full, so need to scroll after */
 {
-    int height, width, ret;
+    int height, width, ret = 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     char *resp = " \n\033"; /* space, enter, esc */
 
@@ -225,6 +225,8 @@ void
 curses_last_messages()
 {
     boolean border = curses_window_has_border(MESSAGE_WIN);
+    nhprev_mesg *mesg;
+    int i;
 
     if (border) {
         mx = 1;
@@ -234,8 +236,6 @@ curses_last_messages()
         my = 0;
     }
 
-    nhprev_mesg *mesg;
-    int i;
     for (i = (num_messages - 1); i > 0; i--) {
         mesg = get_msg_line(TRUE, i);
         if (mesg && mesg->str && strcmp(mesg->str, ""))
