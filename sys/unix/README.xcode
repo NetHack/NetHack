@@ -1,0 +1,39 @@
+This README provides the instructions for building the unofficial Mac
+binaries using the Apple provided developer IDE named XCode.
+
+Establish a developer team in XCode
+===================================
+
+Your first step should be to establish a developer team within XCode.
+Launch XCode and open the preferences diaglog (XCode Menu->Preferences).
+Select the "Accounts" tab.  Add an account (usually this should just be
+your apple ID accoung you used to setup the Mac).  After adding the account,
+select the account and then add a team (usually this will be just a
+personal team for Mac Development).
+
+Obtain your developer team identifier
+=====================================
+
+Your DEVELOPMENT_TEAM can be found by opening Keychain Access
+(found by Finder->Applications->Utilities).  Click on "My Certificates".
+Look for your "Mac Developer" certificate.  Right click on
+the certificate to open a dialog that shows certificate details.
+Look for "Organizational Unit" among the details.  This ten digit value
+is your development team identifier.
+
+Create XCodeLocal.xcconfig file
+===============================
+
+Now you need to create the XCodeLocal.xcconfig file that will be used by
+XCode to get your development team identifier.  Create the file in
+sys/unix and add a single line such as:
+DEVELOPMENT_TEAM = XXXXXXXXXX
+
+Where XXXXXXXXXX is replaced with your development team identifier.
+
+Open the project and build
+==========================
+
+In XCode open the project file sys\unix\NetHack.xcodeproj, select
+the product NetHack and build.  The build results are placed in
+~nethackdir.
