@@ -331,6 +331,113 @@
 
 /* Begin PBXFileReference section */
 		2A953FB221A3F404007906E5 /* XCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCode.xcconfig; sourceTree = "<group>"; };
+		3186A36D21A4B0F90052BF02 /* xwindowp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xwindowp.h; path = ../../include/xwindowp.h; sourceTree = "<group>"; };
+		3186A36E21A4B0FA0052BF02 /* botl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = botl.h; path = ../../include/botl.h; sourceTree = "<group>"; };
+		3186A36F21A4B0FA0052BF02 /* winprocs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winprocs.h; path = ../../include/winprocs.h; sourceTree = "<group>"; };
+		3186A37021A4B0FA0052BF02 /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = ../../include/extern.h; sourceTree = "<group>"; };
+		3186A37121A4B0FA0052BF02 /* context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = context.h; path = ../../include/context.h; sourceTree = "<group>"; };
+		3186A37221A4B0FA0052BF02 /* mac-term.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mac-term.h"; path = "../../include/mac-term.h"; sourceTree = "<group>"; };
+		3186A37321A4B0FA0052BF02 /* func_tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = func_tab.h; path = ../../include/func_tab.h; sourceTree = "<group>"; };
+		3186A37421A4B0FA0052BF02 /* attrib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attrib.h; path = ../../include/attrib.h; sourceTree = "<group>"; };
+		3186A37521A4B0FA0052BF02 /* patchlevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchlevel.h; path = ../../include/patchlevel.h; sourceTree = "<group>"; };
+		3186A37621A4B0FA0052BF02 /* wincurs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wincurs.h; path = ../../include/wincurs.h; sourceTree = "<group>"; };
+		3186A37721A4B0FA0052BF02 /* pm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pm.h; path = ../../include/pm.h; sourceTree = "<group>"; };
+		3186A37821A4B0FA0052BF02 /* qt_kde0.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qt_kde0.h; path = ../../include/qt_kde0.h; sourceTree = "<group>"; };
+		3186A37921A4B0FA0052BF02 /* monattk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monattk.h; path = ../../include/monattk.h; sourceTree = "<group>"; };
+		3186A37A21A4B0FA0052BF02 /* integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = integer.h; path = ../../include/integer.h; sourceTree = "<group>"; };
+		3186A37B21A4B0FA0052BF02 /* region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = region.h; path = ../../include/region.h; sourceTree = "<group>"; };
+		3186A37C21A4B0FA0052BF02 /* rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rect.h; path = ../../include/rect.h; sourceTree = "<group>"; };
+		3186A37D21A4B0FA0052BF02 /* wingem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wingem.h; path = ../../include/wingem.h; sourceTree = "<group>"; };
+		3186A37E21A4B0FA0052BF02 /* vision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vision.h; path = ../../include/vision.h; sourceTree = "<group>"; };
+		3186A37F21A4B0FA0052BF02 /* prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prop.h; path = ../../include/prop.h; sourceTree = "<group>"; };
+		3186A38021A4B0FB0052BF02 /* amiconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = amiconf.h; path = ../../include/amiconf.h; sourceTree = "<group>"; };
+		3186A38121A4B0FB0052BF02 /* pcconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pcconf.h; path = ../../include/pcconf.h; sourceTree = "<group>"; };
+		3186A38221A4B0FB0052BF02 /* skills.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = skills.h; path = ../../include/skills.h; sourceTree = "<group>"; };
+		3186A38321A4B0FB0052BF02 /* permonst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = permonst.h; path = ../../include/permonst.h; sourceTree = "<group>"; };
+		3186A38421A4B0FB0052BF02 /* monsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monsym.h; path = ../../include/monsym.h; sourceTree = "<group>"; };
+		3186A38521A4B0FB0052BF02 /* mextra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mextra.h; path = ../../include/mextra.h; sourceTree = "<group>"; };
+		3186A38621A4B0FB0052BF02 /* dgn_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgn_comp.h; path = ../../include/dgn_comp.h; sourceTree = "<group>"; };
+		3186A38721A4B0FB0052BF02 /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../include/color.h; sourceTree = "<group>"; };
+		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
+		3186A38921A4B0FB0052BF02 /* mttypriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mttypriv.h; path = ../../include/mttypriv.h; sourceTree = "<group>"; };
+		3186A38A21A4B0FB0052BF02 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = ../../include/system.h; sourceTree = "<group>"; };
+		3186A38B21A4B0FC0052BF02 /* onames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onames.h; path = ../../include/onames.h; sourceTree = "<group>"; };
+		3186A38C21A4B0FC0052BF02 /* trampoli.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trampoli.h; path = ../../include/trampoli.h; sourceTree = "<group>"; };
+		3186A38D21A4B0FC0052BF02 /* vis_tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vis_tab.h; path = ../../include/vis_tab.h; sourceTree = "<group>"; };
+		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
+		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
+		3186A39021A4B0FC0052BF02 /* lev_comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev_comp.h; path = ../../include/lev_comp.h; sourceTree = "<group>"; };
+		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
+		3186A39221A4B0FC0052BF02 /* qtext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qtext.h; path = ../../include/qtext.h; sourceTree = "<group>"; };
+		3186A39321A4B0FC0052BF02 /* xwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xwindow.h; path = ../../include/xwindow.h; sourceTree = "<group>"; };
+		3186A39421A4B0FC0052BF02 /* tileset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tileset.h; path = ../../include/tileset.h; sourceTree = "<group>"; };
+		3186A39521A4B0FC0052BF02 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = obj.h; path = ../../include/obj.h; sourceTree = "<group>"; };
+		3186A39621A4B0FC0052BF02 /* os2conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = os2conf.h; path = ../../include/os2conf.h; sourceTree = "<group>"; };
+		3186A39721A4B0FC0052BF02 /* rm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rm.h; path = ../../include/rm.h; sourceTree = "<group>"; };
+		3186A39821A4B0FC0052BF02 /* qt_clust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qt_clust.h; path = ../../include/qt_clust.h; sourceTree = "<group>"; };
+		3186A39921A4B0FD0052BF02 /* load_img.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = load_img.h; path = ../../include/load_img.h; sourceTree = "<group>"; };
+		3186A39A21A4B0FD0052BF02 /* wintty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintty.h; path = ../../include/wintty.h; sourceTree = "<group>"; };
+		3186A39B21A4B0FD0052BF02 /* ntconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ntconf.h; path = ../../include/ntconf.h; sourceTree = "<group>"; };
+		3186A39C21A4B0FD0052BF02 /* mkroom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mkroom.h; path = ../../include/mkroom.h; sourceTree = "<group>"; };
+		3186A39D21A4B0FD0052BF02 /* macpopup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = macpopup.h; path = ../../include/macpopup.h; sourceTree = "<group>"; };
+		3186A39E21A4B0FD0052BF02 /* quest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quest.h; path = ../../include/quest.h; sourceTree = "<group>"; };
+		3186A39F21A4B0FD0052BF02 /* mac-qt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mac-qt.h"; path = "../../include/mac-qt.h"; sourceTree = "<group>"; };
+		3186A3A021A4B0FD0052BF02 /* dgn_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgn_file.h; path = ../../include/dgn_file.h; sourceTree = "<group>"; };
+		3186A3A121A4B0FD0052BF02 /* tile2x11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tile2x11.h; path = ../../include/tile2x11.h; sourceTree = "<group>"; };
+		3186A3A221A4B0FD0052BF02 /* engrave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = engrave.h; path = ../../include/engrave.h; sourceTree = "<group>"; };
+		3186A3A321A4B0FD0052BF02 /* spell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spell.h; path = ../../include/spell.h; sourceTree = "<group>"; };
+		3186A3A421A4B0FD0052BF02 /* mac-carbon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mac-carbon.h"; path = "../../include/mac-carbon.h"; sourceTree = "<group>"; };
+		3186A3A521A4B0FD0052BF02 /* hack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hack.h; path = ../../include/hack.h; sourceTree = "<group>"; };
+		3186A3A621A4B0FD0052BF02 /* macconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = macconf.h; path = ../../include/macconf.h; sourceTree = "<group>"; };
+		3186A3A721A4B0FD0052BF02 /* youprop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = youprop.h; path = ../../include/youprop.h; sourceTree = "<group>"; };
+		3186A3A821A4B0FD0052BF02 /* objclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = objclass.h; path = ../../include/objclass.h; sourceTree = "<group>"; };
+		3186A3A921A4B0FD0052BF02 /* display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = display.h; path = ../../include/display.h; sourceTree = "<group>"; };
+		3186A3AA21A4B0FD0052BF02 /* winami.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winami.h; path = ../../include/winami.h; sourceTree = "<group>"; };
+		3186A3AB21A4B0FD0052BF02 /* artilist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artilist.h; path = ../../include/artilist.h; sourceTree = "<group>"; };
+		3186A3AC21A4B0FD0052BF02 /* dungeon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dungeon.h; path = ../../include/dungeon.h; sourceTree = "<group>"; };
+		3186A3AD21A4B0FD0052BF02 /* unixconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unixconf.h; path = ../../include/unixconf.h; sourceTree = "<group>"; };
+		3186A3AE21A4B0FD0052BF02 /* mactty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mactty.h; path = ../../include/mactty.h; sourceTree = "<group>"; };
+		3186A3AF21A4B0FD0052BF02 /* def_os2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = def_os2.h; path = ../../include/def_os2.h; sourceTree = "<group>"; };
+		3186A3B021A4B0FD0052BF02 /* date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = date.h; path = ../../include/date.h; sourceTree = "<group>"; };
+		3186A3B121A4B0FD0052BF02 /* bitmfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitmfile.h; path = ../../include/bitmfile.h; sourceTree = "<group>"; };
+		3186A3B221A4B0FD0052BF02 /* wceconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wceconf.h; path = ../../include/wceconf.h; sourceTree = "<group>"; };
+		3186A3B321A4B0FD0052BF02 /* mfndpos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mfndpos.h; path = ../../include/mfndpos.h; sourceTree = "<group>"; };
+		3186A3B421A4B0FD0052BF02 /* qt_win.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qt_win.h; path = ../../include/qt_win.h; sourceTree = "<group>"; };
+		3186A3B521A4B0FD0052BF02 /* flag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flag.h; path = ../../include/flag.h; sourceTree = "<group>"; };
+		3186A3B621A4B0FD0052BF02 /* sp_lev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sp_lev.h; path = ../../include/sp_lev.h; sourceTree = "<group>"; };
+		3186A3B721A4B0FD0052BF02 /* align.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = align.h; path = ../../include/align.h; sourceTree = "<group>"; };
+		3186A3B821A4B0FD0052BF02 /* mail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mail.h; path = ../../include/mail.h; sourceTree = "<group>"; };
+		3186A3B921A4B0FD0052BF02 /* tosconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tosconf.h; path = ../../include/tosconf.h; sourceTree = "<group>"; };
+		3186A3BA21A4B0FD0052BF02 /* beconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beconf.h; path = ../../include/beconf.h; sourceTree = "<group>"; };
+		3186A3BB21A4B0FD0052BF02 /* monst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monst.h; path = ../../include/monst.h; sourceTree = "<group>"; };
+		3186A3BC21A4B0FD0052BF02 /* lint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lint.h; path = ../../include/lint.h; sourceTree = "<group>"; };
+		3186A3BD21A4B0FD0052BF02 /* qt_xpms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qt_xpms.h; path = ../../include/qt_xpms.h; sourceTree = "<group>"; };
+		3186A3BE21A4B0FD0052BF02 /* vmsconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vmsconf.h; path = ../../include/vmsconf.h; sourceTree = "<group>"; };
+		3186A3BF21A4B0FD0052BF02 /* you.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = you.h; path = ../../include/you.h; sourceTree = "<group>"; };
+		3186A3C021A4B0FD0052BF02 /* wintype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintype.h; path = ../../include/wintype.h; sourceTree = "<group>"; };
+		3186A3C121A4B0FD0052BF02 /* global.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = global.h; path = ../../include/global.h; sourceTree = "<group>"; };
+		3186A3C221A4B0FE0052BF02 /* winX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winX.h; path = ../../include/winX.h; sourceTree = "<group>"; };
+		3186A3C321A4B0FE0052BF02 /* tcap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tcap.h; path = ../../include/tcap.h; sourceTree = "<group>"; };
+		3186A3C421A4B0FE0052BF02 /* qttableview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qttableview.h; path = ../../include/qttableview.h; sourceTree = "<group>"; };
+		3186A3C521A4B0FE0052BF02 /* coord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coord.h; path = ../../include/coord.h; sourceTree = "<group>"; };
+		3186A3C621A4B0FE0052BF02 /* config1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config1.h; path = ../../include/config1.h; sourceTree = "<group>"; };
+		3186A3C721A4B0FE0052BF02 /* tradstdc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tradstdc.h; path = ../../include/tradstdc.h; sourceTree = "<group>"; };
+		3186A3C821A4B0FE0052BF02 /* mondata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mondata.h; path = ../../include/mondata.h; sourceTree = "<group>"; };
+		3186A3C921A4B0FE0052BF02 /* macwin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = macwin.h; path = ../../include/macwin.h; sourceTree = "<group>"; };
+		3186A3CA21A4B0FE0052BF02 /* timeout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timeout.h; path = ../../include/timeout.h; sourceTree = "<group>"; };
+		3186A3CB21A4B0FE0052BF02 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys.h; path = ../../include/sys.h; sourceTree = "<group>"; };
+		3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gem_rsc.h; path = ../../include/gem_rsc.h; sourceTree = "<group>"; };
+		3186A3CD21A4B0FE0052BF02 /* trap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trap.h; path = ../../include/trap.h; sourceTree = "<group>"; };
+		3186A3CE21A4B0FE0052BF02 /* winGnome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winGnome.h; path = ../../include/winGnome.h; sourceTree = "<group>"; };
+		3186A3CF21A4B0FE0052BF02 /* lev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lev.h; path = ../../include/lev.h; sourceTree = "<group>"; };
+		3186A3D021A4B0FE0052BF02 /* decl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decl.h; path = ../../include/decl.h; sourceTree = "<group>"; };
+		3186A3D321A4B14B0052BF02 /* cursstat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursstat.h; path = ../../win/curses/cursstat.h; sourceTree = "<group>"; };
+		3186A3D421A4B14B0052BF02 /* cursdial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursdial.h; path = ../../win/curses/cursdial.h; sourceTree = "<group>"; };
+		3186A3D521A4B14B0052BF02 /* cursmesg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursmesg.h; path = ../../win/curses/cursmesg.h; sourceTree = "<group>"; };
+		3186A3D621A4B14B0052BF02 /* cursinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursinit.h; path = ../../win/curses/cursinit.h; sourceTree = "<group>"; };
+		3186A3D721A4B14B0052BF02 /* cursinvt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursinvt.h; path = ../../win/curses/cursinvt.h; sourceTree = "<group>"; };
+		3186A3D821A4B14B0052BF02 /* cursmisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursmisc.h; path = ../../win/curses/cursmisc.h; sourceTree = "<group>"; };
+		3186A3D921A4B14B0052BF02 /* curswins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = curswins.h; path = ../../win/curses/curswins.h; sourceTree = "<group>"; };
 		3189577121A1FCC100FB2ABE /* NetHack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetHack; sourceTree = BUILT_PRODUCTS_DIR; };
 		3189577F21A1FDA400FB2ABE /* makedefs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = makedefs; sourceTree = BUILT_PRODUCTS_DIR; };
 		3192867B21A3ACAB00325BEB /* lev_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = lev_comp.y; path = ../../util/lev_comp.y; sourceTree = "<group>"; };
@@ -694,6 +801,106 @@
 		3189579621A2046700FB2ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
+				3186A3B721A4B0FD0052BF02 /* align.h */,
+				3186A38021A4B0FB0052BF02 /* amiconf.h */,
+				3186A38821A4B0FB0052BF02 /* artifact.h */,
+				3186A3AB21A4B0FD0052BF02 /* artilist.h */,
+				3186A37421A4B0FA0052BF02 /* attrib.h */,
+				3186A3BA21A4B0FD0052BF02 /* beconf.h */,
+				3186A3B121A4B0FD0052BF02 /* bitmfile.h */,
+				3186A36E21A4B0FA0052BF02 /* botl.h */,
+				3186A38721A4B0FB0052BF02 /* color.h */,
+				3186A3C621A4B0FE0052BF02 /* config1.h */,
+				3186A37121A4B0FA0052BF02 /* context.h */,
+				3186A3C521A4B0FE0052BF02 /* coord.h */,
+				3186A3B021A4B0FD0052BF02 /* date.h */,
+				3186A3D021A4B0FE0052BF02 /* decl.h */,
+				3186A3AF21A4B0FD0052BF02 /* def_os2.h */,
+				3186A38621A4B0FB0052BF02 /* dgn_comp.h */,
+				3186A3A021A4B0FD0052BF02 /* dgn_file.h */,
+				3186A3A921A4B0FD0052BF02 /* display.h */,
+				3186A38E21A4B0FC0052BF02 /* dlb.h */,
+				3186A3AC21A4B0FD0052BF02 /* dungeon.h */,
+				3186A3A221A4B0FD0052BF02 /* engrave.h */,
+				3186A37021A4B0FA0052BF02 /* extern.h */,
+				3186A3B521A4B0FD0052BF02 /* flag.h */,
+				3186A37321A4B0FA0052BF02 /* func_tab.h */,
+				3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */,
+				3186A3C121A4B0FD0052BF02 /* global.h */,
+				3186A3A521A4B0FD0052BF02 /* hack.h */,
+				3186A37A21A4B0FA0052BF02 /* integer.h */,
+				3186A39021A4B0FC0052BF02 /* lev_comp.h */,
+				3186A3CF21A4B0FE0052BF02 /* lev.h */,
+				3186A3BC21A4B0FD0052BF02 /* lint.h */,
+				3186A39921A4B0FD0052BF02 /* load_img.h */,
+				3186A3A421A4B0FD0052BF02 /* mac-carbon.h */,
+				3186A39F21A4B0FD0052BF02 /* mac-qt.h */,
+				3186A37221A4B0FA0052BF02 /* mac-term.h */,
+				3186A3A621A4B0FD0052BF02 /* macconf.h */,
+				3186A39D21A4B0FD0052BF02 /* macpopup.h */,
+				3186A3AE21A4B0FD0052BF02 /* mactty.h */,
+				3186A3C921A4B0FE0052BF02 /* macwin.h */,
+				3186A3B821A4B0FD0052BF02 /* mail.h */,
+				3186A38521A4B0FB0052BF02 /* mextra.h */,
+				3186A3B321A4B0FD0052BF02 /* mfndpos.h */,
+				3186A39121A4B0FC0052BF02 /* micro.h */,
+				3186A39C21A4B0FD0052BF02 /* mkroom.h */,
+				3186A37921A4B0FA0052BF02 /* monattk.h */,
+				3186A3C821A4B0FE0052BF02 /* mondata.h */,
+				3186A38F21A4B0FC0052BF02 /* monflag.h */,
+				3186A3BB21A4B0FD0052BF02 /* monst.h */,
+				3186A38421A4B0FB0052BF02 /* monsym.h */,
+				3186A38921A4B0FB0052BF02 /* mttypriv.h */,
+				3186A39B21A4B0FD0052BF02 /* ntconf.h */,
+				3186A39521A4B0FC0052BF02 /* obj.h */,
+				3186A3A821A4B0FD0052BF02 /* objclass.h */,
+				3186A38B21A4B0FC0052BF02 /* onames.h */,
+				3186A39621A4B0FC0052BF02 /* os2conf.h */,
+				3186A37521A4B0FA0052BF02 /* patchlevel.h */,
+				3186A38121A4B0FB0052BF02 /* pcconf.h */,
+				3186A38321A4B0FB0052BF02 /* permonst.h */,
+				3186A37721A4B0FA0052BF02 /* pm.h */,
+				3186A37F21A4B0FA0052BF02 /* prop.h */,
+				3186A39821A4B0FC0052BF02 /* qt_clust.h */,
+				3186A37821A4B0FA0052BF02 /* qt_kde0.h */,
+				3186A3B421A4B0FD0052BF02 /* qt_win.h */,
+				3186A3BD21A4B0FD0052BF02 /* qt_xpms.h */,
+				3186A39221A4B0FC0052BF02 /* qtext.h */,
+				3186A3C421A4B0FE0052BF02 /* qttableview.h */,
+				3186A39E21A4B0FD0052BF02 /* quest.h */,
+				3186A37C21A4B0FA0052BF02 /* rect.h */,
+				3186A37B21A4B0FA0052BF02 /* region.h */,
+				3186A39721A4B0FC0052BF02 /* rm.h */,
+				3186A38221A4B0FB0052BF02 /* skills.h */,
+				3186A3B621A4B0FD0052BF02 /* sp_lev.h */,
+				3186A3A321A4B0FD0052BF02 /* spell.h */,
+				3186A3CB21A4B0FE0052BF02 /* sys.h */,
+				3186A38A21A4B0FB0052BF02 /* system.h */,
+				3186A3C321A4B0FE0052BF02 /* tcap.h */,
+				3186A3A121A4B0FD0052BF02 /* tile2x11.h */,
+				3186A39421A4B0FC0052BF02 /* tileset.h */,
+				3186A3CA21A4B0FE0052BF02 /* timeout.h */,
+				3186A3B921A4B0FD0052BF02 /* tosconf.h */,
+				3186A3C721A4B0FE0052BF02 /* tradstdc.h */,
+				3186A38C21A4B0FC0052BF02 /* trampoli.h */,
+				3186A3CD21A4B0FE0052BF02 /* trap.h */,
+				3186A3AD21A4B0FD0052BF02 /* unixconf.h */,
+				3186A38D21A4B0FC0052BF02 /* vis_tab.h */,
+				3186A37E21A4B0FA0052BF02 /* vision.h */,
+				3186A3BE21A4B0FD0052BF02 /* vmsconf.h */,
+				3186A3B221A4B0FD0052BF02 /* wceconf.h */,
+				3186A3AA21A4B0FD0052BF02 /* winami.h */,
+				3186A37621A4B0FA0052BF02 /* wincurs.h */,
+				3186A37D21A4B0FA0052BF02 /* wingem.h */,
+				3186A3CE21A4B0FE0052BF02 /* winGnome.h */,
+				3186A36F21A4B0FA0052BF02 /* winprocs.h */,
+				3186A39A21A4B0FD0052BF02 /* wintty.h */,
+				3186A3C021A4B0FD0052BF02 /* wintype.h */,
+				3186A3C221A4B0FE0052BF02 /* winX.h */,
+				3186A39321A4B0FC0052BF02 /* xwindow.h */,
+				3186A36D21A4B0F90052BF02 /* xwindowp.h */,
+				3186A3BF21A4B0FD0052BF02 /* you.h */,
+				3186A3A721A4B0FD0052BF02 /* youprop.h */,
 				31B8A30A21A20D730055BD01 /* config.h */,
 			);
 			name = include;
@@ -751,6 +958,13 @@
 		31B8A40221A23EAA0055BD01 /* curses */ = {
 			isa = PBXGroup;
 			children = (
+				3186A3D421A4B14B0052BF02 /* cursdial.h */,
+				3186A3D621A4B14B0052BF02 /* cursinit.h */,
+				3186A3D721A4B14B0052BF02 /* cursinvt.h */,
+				3186A3D521A4B14B0052BF02 /* cursmesg.h */,
+				3186A3D821A4B14B0052BF02 /* cursmisc.h */,
+				3186A3D321A4B14B0052BF02 /* cursstat.h */,
+				3186A3D921A4B14B0052BF02 /* curswins.h */,
 				31B8A40421A23EEB0055BD01 /* cursdial.c */,
 				31B8A40621A23EEB0055BD01 /* cursinit.c */,
 				31B8A40521A23EEB0055BD01 /* cursinvt.c */,
