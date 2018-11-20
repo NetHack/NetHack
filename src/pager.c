@@ -1066,6 +1066,9 @@ coord *click_cc;
     boolean save_verbose; /* saved value of flags.verbose */
     boolean from_screen;  /* question from the screen */
 
+    cc.x = 0;
+    cc.y = 0;
+
     if (!clicklook) {
         if (quick) {
             from_screen = TRUE; /* yes, we want to use the cursor */
