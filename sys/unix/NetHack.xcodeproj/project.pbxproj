@@ -718,6 +718,7 @@
 				3189576E21A1FCC100FB2ABE /* Frameworks */,
 				3189576F21A1FCC100FB2ABE /* CopyFiles */,
 				317E7C5421A3804400F6E4E5 /* Build Guidebook */,
+				317E7C5521A3912D00F6E4E5 /* Build nhdat */,
 			);
 			buildRules = (
 			);
@@ -1140,6 +1141,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DOC_DIR}\ncat Guidebook.mn | ${NH_UTIL_DIR}/makedefs --grep --input - --output - | tbl tmac.n - | nroff -c -Tascii | col -bx > Guidebook\n";
+		};
+		317E7C5521A3912D00F6E4E5 /* Build nhdat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_DAT_DIR)/help",
+			);
+			name = "Build nhdat";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/nhdat",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon tribute asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev juiblex.lev knox.lev medusa-?.lev minend-?.lev minefill.lev minetn-?.lev oracle.lev orcus.lev sanctum.lev soko?-?.lev tower?.lev valley.lev wizard?.lev astral.lev air.lev earth.lev fire.lev water.lev ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev bogusmon data engrave epitaph oracles options quest.dat rumors\n\n";
 		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
