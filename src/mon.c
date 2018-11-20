@@ -29,6 +29,7 @@ STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
 STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
 STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
 
+/* note: duplicated in dog.c */
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
      || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
@@ -446,7 +447,8 @@ unsigned corpseflags;
     }
     /* All special cases should precede the G_NOCORPSE check */
 
-    if (!obj) return NULL;
+    if (!obj)
+        return (struct obj *) 0;
 
     /* if polymorph or undead turning has killed this monster,
        prevent the same attack beam from hitting its corpse */
