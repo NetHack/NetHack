@@ -89,9 +89,9 @@ curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff)
     }
 
     /* GUI color disabled */
-//    if ((!iflags.wc2_guicolor) && (win != mapwin)) {
-//        return;
-//    }
+    /*  if ((!iflags.wc2_guicolor) && (win != mapwin)) {
+          return;
+    } */
 
     if (color == 0) {           /* make black fg visible */
 # ifdef USE_DARKGRAY
@@ -562,7 +562,7 @@ void
 curses_posthousekeeping()
 {
     curs_set(0);
-    //curses_decrement_highlights(FALSE);
+    /* curses_decrement_highlights(FALSE); */
     curses_clear_unhighlight_message_window();
 }
 
