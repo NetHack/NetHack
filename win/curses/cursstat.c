@@ -31,9 +31,9 @@ static int FDECL(condcolor, (long, unsigned long *));
 static int FDECL(condattr, (long, unsigned long *));
 #endif /* STATUS_HILITES */
 static void FDECL(draw_status, (unsigned long *));
-static void FDECL(draw_classic, (boolean, unsigned long *));
-static void FDECL(draw_vertical, (boolean, unsigned long *));
-static void FDECL(draw_horizontal, (boolean, unsigned long *));
+static void FDECL(draw_classic, (BOOLEAN_P, unsigned long *));
+static void FDECL(draw_vertical, (BOOLEAN_P, unsigned long *));
+static void FDECL(draw_horizontal, (BOOLEAN_P, unsigned long *));
 
 void
 curses_status_init()
@@ -246,14 +246,15 @@ unsigned long *colormasks;
 
     /* Figure out if we have proper window dimensions for horizontal statusbar. */
     if (horiz) {
+        int ax = 0;
+        int ay = 0;
+
         /* correct y */
         int cy = 3;
         if (iflags.statuslines < 3)
             cy = 2;
 
         /* actual y (and x) */
-        int ax = 0;
-        int ay = 0;
         getmaxyx(win, ay, ax);
         if (border)
             ay -= 2;
@@ -339,7 +340,7 @@ unsigned long *colormasks;
                 /* hitpointbar using hp percent calculation */
                 int bar_pos, bar_len;
                 char *bar2 = (char *)0;
-                char bar[MAXCO], savedch;
+                char bar[MAXCO], savedch = 0;
                 boolean twoparts = FALSE;
 
                 text = status_vals[fldidx1];
@@ -536,7 +537,7 @@ unsigned long *colormasks;
                 /* hitpointbar using hp percent calculation */
                 int bar_pos, bar_len;
                 char *bar2 = (char *)0;
-                char bar[MAXCO], savedch;
+                char bar[MAXCO], savedch = 0;
                 boolean twoparts = FALSE;
                 int height,width;
 
@@ -642,7 +643,7 @@ unsigned long *bmarray;
 }
 #endif /* STATUS_HILITES */
 
-#if 0 //old stuff to be re-incorporated
+#if 0 /* old stuff to be re-incorporated */
 /* Private declarations */
 
 /* Used to track previous value of things, to highlight changes. */
