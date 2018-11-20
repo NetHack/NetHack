@@ -159,6 +159,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
+		317E7C5221A3774F00F6E4E5 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.yacc;
+			isEditable = 1;
+			outputFiles = (
+				"$(NH_INC_DIR)/lev_comp.h",
+				"$(NH_UTIL_DIR)/lev_yacc.c",
+			);
+			script = "cd {NH_UTIL_DIR}\nyacc -d lev_comp.y\nsed -e 's#y.tab.c#lev_yacc.c#' -e 's#y.tab.c:#lev_yacc.c:#' y.tab.c > lev_yacc.c && rm y.tab.c\nsed -e 's#y.tab.h#lev_comp.h#' y.tab.h > ${NH_INC_DIR}/lev_comp.h && rm y.tab.h\n";
+		};
+		317E7C5321A3796200F6E4E5 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.lex;
+			isEditable = 1;
+			outputFiles = (
+				"$(NH_UTIL_DIR)/lev_lex.c",
+			);
+			script = "cd ${NH_UTIL_DIR}\nlex lev_comp.l\nsed -e 's#lex.yy.c#lev_lex.c#' -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' lex.yy.c > lev_lex.c && rm lex.yy.c\n";
+		};
 		31B8A46321A270680055BD01 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
@@ -167,9 +188,9 @@
 			isEditable = 1;
 			outputFiles = (
 				"$(INPUT_FILE_DIR)/dgn_yacc.c",
-				"$(INPUT_FILE_DIR)/dgn_comp.h",
+				"$(NH_INC_DIR)/dgn_comp.h",
 			);
-			script = "cd ${INPUT_FILE_DIR}\nyacc -d dgn_comp.y\nsed -e 's#\"y.tab.c\"#\"dgn_yacc.c\"#' -e 's#y.tab.c:#dgn_yacc.c:#' y.tab.c > dgn_yacc.c && rm y.tab.c\nsed -e 's#\"y.tab.h\"#\"dgn_comp.h\"#' y.tab.h > dgn_comp.h && rm y.tab.h\necho $(FOO)\n";
+			script = "cd ${INPUT_FILE_DIR}\nyacc -d dgn_comp.y\nsed -e 's#\"y.tab.c\"#\"dgn_yacc.c\"#' -e 's#y.tab.c:#dgn_yacc.c:#' y.tab.c > dgn_yacc.c && rm y.tab.c\nsed -e 's#\"y.tab.h\"#\"dgn_comp.h\"#' y.tab.h > ${NH_INC_DIR}/dgn_comp.h && rm y.tab.h\necho $(FOO)\n";
 		};
 		31B8A46721A286E70055BD01 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -696,6 +717,7 @@
 				3189576D21A1FCC100FB2ABE /* Sources */,
 				3189576E21A1FCC100FB2ABE /* Frameworks */,
 				3189576F21A1FCC100FB2ABE /* CopyFiles */,
+				317E7C5421A3804400F6E4E5 /* Build Guidebook */,
 			);
 			buildRules = (
 			);
@@ -718,7 +740,7 @@
 				319CBA3821A3458100150830 /* Build data */,
 				317E7C4521A3548F00F6E4E5 /* Build rumors */,
 				317E7C4621A355E700F6E4E5 /* Build quest.dat */,
-				317E7C4E21A3697300F6E4E5 /* Build options */,
+				317E7C4E21A3697300F6E4E5 /* Build options and headers */,
 				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
 			);
 			buildRules = (
@@ -742,6 +764,8 @@
 				317E7C4D21A3649B00F6E4E5 /* Build quest levels */,
 			);
 			buildRules = (
+				317E7C5321A3796200F6E4E5 /* PBXBuildRule */,
+				317E7C5221A3774F00F6E4E5 /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -1003,7 +1027,7 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/lev_comp Arch.des\n${NH_UTIL_DIR}/lev_comp Barb.des\n${NH_UTIL_DIR}/lev_comp Caveman.des\n${NH_UTIL_DIR}/lev_comp Healer.des\n${NH_UTIL_DIR}/lev_comp Knight.des\n${NH_UTIL_DIR}/lev_comp Monk.des\n${NH_UTIL_DIR}/lev_comp Priest.des\n${NH_UTIL_DIR}/lev_comp Ranger.des\n${NH_UTIL_DIR}/lev_comp Rogue.des\n${NH_UTIL_DIR}/lev_comp Samurai.des\n${NH_UTIL_DIR}/lev_comp Tourist.des\n${NH_UTIL_DIR}/lev_comp Valkyrie.des\n${NH_UTIL_DIR}/lev_comp Wizard.des\ntouch quest_levs\n";
 		};
-		317E7C4E21A3697300F6E4E5 /* Build options */ = {
+		317E7C4E21A3697300F6E4E5 /* Build options and headers */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1013,16 +1037,20 @@
 			inputPaths = (
 				"$(NH_UTIL_DIR)/makedefs",
 			);
-			name = "Build options";
+			name = "Build options and headers";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 				"$(NH_UTIL_DIR)/options",
 				"$(NH_INC_DIR)/date.h",
+				"$(NH_INC_DIR)/onames.h",
+				"$(NH_INC_DIR)/pm.h",
+				"$(NH_INC_DIR)/vis_tab.h",
+				"$(NH_SRC_DIR)/vis_tab.c",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\n";
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\ncd ${NH_UTIL_DIR}\n./makedefs -o\n./makedefs -p\n./makedefs -z\n";
 		};
 		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1089,6 +1117,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -e\n${NH_UTIL_DIR}/dgn_comp dungeon.pdf\n";
+		};
+		317E7C5421A3804400F6E4E5 /* Build Guidebook */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_UTIL_DIR)/makedefs",
+				"$(NH_DOC_DIR)/Guidebook.mn",
+				"$(NH_DOC_DIR)/tmac.n",
+				"$(NH_DOC_DIR)/tmac.nh",
+			);
+			name = "Build Guidebook";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DOC_DIR)/Guidebook",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DOC_DIR}\ncat Guidebook.mn | ${NH_UTIL_DIR}/makedefs --grep --input - --output - | tbl tmac.n - | nroff -c -Tascii | col -bx > Guidebook\n";
 		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1372,8 +1423,10 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_DOC_DIR = "$(SOURCE_ROOT)/../../doc";
 				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
 				NH_ROOT = "$(SOURCE_ROOT)/../..";
+				NH_SRC_DIR = "$(SOURCE_ROOT)/../../src";
 				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -1443,8 +1496,10 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
+				NH_DOC_DIR = "$(SOURCE_ROOT)/../../doc";
 				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
 				NH_ROOT = "$(SOURCE_ROOT)/../..";
+				NH_SRC_DIR = "$(SOURCE_ROOT)/../../src";
 				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
