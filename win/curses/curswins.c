@@ -46,7 +46,7 @@ static void clear_map(void);
 WINDOW *
 curses_create_window(int width, int height, orient orientation)
 {
-    int mapx, mapy, maph, mapw = 0;
+    int mapx = 0, mapy = 0, maph = 0, mapw = 0;
     int startx = 0;
     int starty = 0;
     WINDOW *win;
