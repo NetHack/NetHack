@@ -178,110 +178,112 @@ curses_create_main_windows()
        based on configuration. The priority alignment-wise is: status > msgarea > game.
        Define everything as taking as much space as possible and shrink/move based on
        alignment positions. */
-    int message_x = 0;
-    int message_y = 0;
-    int status_x = 0;
-    int status_y = 0;
-    int inv_x = 0;
-    int inv_y = 0;
-    int map_x = 0;
-    int map_y = 0;
+    {
+        int message_x = 0;
+        int message_y = 0;
+        int status_x = 0;
+        int status_y = 0;
+        int inv_x = 0;
+        int inv_y = 0;
+        int map_x = 0;
+        int map_y = 0;
 
-    int message_height = 0;
-    int message_width = 0;
-    int status_height = 0;
-    int status_width = 0;
-    int inv_height = 0;
-    int inv_width = 0;
-    int map_height = (term_rows - border_space);
-    int map_width = (term_cols - border_space);
+        int message_height = 0;
+        int message_width = 0;
+        int status_height = 0;
+        int status_width = 0;
+        int inv_height = 0;
+        int inv_width = 0;
+        int map_height = (term_rows - border_space);
+        int map_width = (term_cols - border_space);
+        int statusheight = 3;
 
-    boolean status_vertical = FALSE;
-    boolean msg_vertical = FALSE;
-    if (status_orientation == ALIGN_LEFT ||
-        status_orientation == ALIGN_RIGHT)
-        status_vertical = TRUE;
-    if (message_orientation == ALIGN_LEFT ||
-        message_orientation == ALIGN_RIGHT)
-        msg_vertical = TRUE;
+        boolean status_vertical = FALSE;
+        boolean msg_vertical = FALSE;
+        if (status_orientation == ALIGN_LEFT ||
+            status_orientation == ALIGN_RIGHT)
+            status_vertical = TRUE;
+        if (message_orientation == ALIGN_LEFT ||
+            message_orientation == ALIGN_RIGHT)
+            msg_vertical = TRUE;
 
-    int statusheight = 3;
-    if (iflags.statuslines < 3)
-        statusheight = 2;
+        if (iflags.statuslines < 3)
+            statusheight = 2;
 
-    /* Vertical windows have priority. Otherwise, priotity is:
-       status > inv > msg */
-    if (status_vertical)
-        set_window_position(&status_x, &status_y, &status_width, &status_height,
-                            status_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, statusheight, 26);
+        /* Vertical windows have priority. Otherwise, priotity is:
+           status > inv > msg */
+        if (status_vertical)
+            set_window_position(&status_x, &status_y, &status_width, &status_height,
+                                status_orientation, &map_x, &map_y, &map_width, &map_height,
+                                border_space, statusheight, 26);
 
-    if (iflags.perm_invent) {
-        /* Take up all width unless msgbar is also vertical. */
-        int width = -25;
+        if (iflags.perm_invent) {
+            /* Take up all width unless msgbar is also vertical. */
+            int width = -25;
+            if (msg_vertical)
+                width = 25;
+
+            set_window_position(&inv_x, &inv_y, &inv_width, &inv_height,
+                                ALIGN_RIGHT, &map_x, &map_y, &map_width, &map_height,
+                                border_space, -1, width);
+        }
+
         if (msg_vertical)
-            width = 25;
+            set_window_position(&message_x, &message_y, &message_width, &message_height,
+                                message_orientation, &map_x, &map_y, &map_width, &map_height,
+                                border_space, -1, -25);
 
-        set_window_position(&inv_x, &inv_y, &inv_width, &inv_height,
-                            ALIGN_RIGHT, &map_x, &map_y, &map_width, &map_height,
-                            border_space, -1, width);
-    }
+        /* Now draw horizontal windows */
+        if (!status_vertical)
+            set_window_position(&status_x, &status_y, &status_width, &status_height,
+                                status_orientation, &map_x, &map_y, &map_width, &map_height,
+                                border_space, statusheight, 26);
 
-    if (msg_vertical)
-        set_window_position(&message_x, &message_y, &message_width, &message_height,
-                            message_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, -1, -25);
+        if (!msg_vertical)
+            set_window_position(&message_x, &message_y, &message_width, &message_height,
+                                message_orientation, &map_x, &map_y, &map_width, &map_height,
+                                border_space, -1, -25);
 
-    /* Now draw horizontal windows */
-    if (!status_vertical)
-        set_window_position(&status_x, &status_y, &status_width, &status_height,
-                            status_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, statusheight, 26);
+        if (map_width > COLNO)
+            map_width = COLNO;
 
-    if (!msg_vertical)
-        set_window_position(&message_x, &message_y, &message_width, &message_height,
-                            message_orientation, &map_x, &map_y, &map_width, &map_height,
-                            border_space, -1, -25);
+        if (map_height > ROWNO)
+            map_height = ROWNO;
 
-    if (map_width > COLNO)
-        map_width = COLNO;
+        if (curses_get_nhwin(STATUS_WIN)) {
+            curses_del_nhwin(STATUS_WIN);
+            curses_del_nhwin(MESSAGE_WIN);
+            curses_del_nhwin(MAP_WIN);
+            curses_del_nhwin(INV_WIN);
 
-    if (map_height > ROWNO)
-        map_height = ROWNO;
+            clear();
+        }
 
-    if (curses_get_nhwin(STATUS_WIN)) {
-        curses_del_nhwin(STATUS_WIN);
-        curses_del_nhwin(MESSAGE_WIN);
-        curses_del_nhwin(MAP_WIN);
-        curses_del_nhwin(INV_WIN);
+        curses_add_nhwin(STATUS_WIN, status_height, status_width, status_y,
+                         status_x, status_orientation, borders);
 
-        clear();
-    }
+        curses_add_nhwin(MESSAGE_WIN, message_height, message_width, message_y,
+                         message_x, message_orientation, borders);
 
-    curses_add_nhwin(STATUS_WIN, status_height, status_width, status_y,
-                     status_x, status_orientation, borders);
-
-    curses_add_nhwin(MESSAGE_WIN, message_height, message_width, message_y,
-                     message_x, message_orientation, borders);
-
-    if (iflags.perm_invent)
-        curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
-                         ALIGN_RIGHT, borders);
-
-    curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0, borders);
-
-    refresh();
-
-    curses_refresh_nethack_windows();
-/*
-    if (iflags.window_inited) {
-        curses_update_stats();
         if (iflags.perm_invent)
-            curses_update_inventory();
-    } else {
-        iflags.window_inited = TRUE;
+            curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
+                             ALIGN_RIGHT, borders);
+
+        curses_add_nhwin(MAP_WIN, map_height, map_width, map_y, map_x, 0, borders);
+
+        refresh();
+
+        curses_refresh_nethack_windows();
+    /*
+        if (iflags.window_inited) {
+            curses_update_stats();
+            if (iflags.perm_invent)
+                curses_update_inventory();
+        } else {
+            iflags.window_inited = TRUE;
+        }
+    */
     }
-*/
 }
 
 
@@ -304,6 +306,7 @@ curses_init_nhcolors()
 
         {
             int i;
+            boolean hicolor = FALSE;
 
             int clr_remap[16] = {
                 COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
@@ -319,7 +322,6 @@ curses_init_nhcolors()
                 init_pair(17 + (i * 2) + 1, clr_remap[i], COLOR_BLUE);
             }
 
-            boolean hicolor = FALSE;
             if (COLORS >= 16)
                 hicolor = TRUE;
 
