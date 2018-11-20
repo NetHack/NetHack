@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1541902950 2018/11/11 02:22:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1542673290 2018/11/20 00:21:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3820,6 +3820,7 @@ long *total_size;
     int idx;
     struct trap *tt;
     struct damage *sd; /* shop damage */
+    struct kinfo *k; /* delayed killer */
     struct cemetery *bi; /* bones info */
 
     /* traps and engravings are output unconditionally;
@@ -3880,6 +3881,20 @@ long *total_size;
     if (count || size) {
         *total_count += count;
         *total_size += size;
+        Sprintf(buf, template, hdrbuf, count, size);
+        putstr(win, 0, buf);
+    }
+
+    count = size = 0L;
+    for (k = killer.next; k; k = k->next) {
+        ++count;
+        size += (long) sizeof *k;
+    }
+    if (count || size) {
+        *total_count += count;
+        *total_size += size;
+        Sprintf(hdrbuf, "delayed killer%s, size %ld",
+                plur(count), (long) sizeof (struct kinfo));
         Sprintf(buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
