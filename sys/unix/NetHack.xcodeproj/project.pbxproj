@@ -207,6 +207,34 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		316B91C621A3BD5000EC3E81 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
+			remoteInfo = makedefs;
+		};
+		316B91C821A3BD5C00EC3E81 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
+			remoteInfo = makedefs;
+		};
+		316B91CA21A3BD7C00EC3E81 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
+			remoteInfo = makedefs;
+		};
+		316B91CC21A3BD8F00EC3E81 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3189577E21A1FDA400FB2ABE;
+			remoteInfo = makedefs;
+		};
 		3192867321A3AAFA00325BEB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
@@ -810,6 +838,7 @@
 				317E7C5221A3774F00F6E4E5 /* PBXBuildRule */,
 			);
 			dependencies = (
+				316B91C921A3BD5C00EC3E81 /* PBXTargetDependency */,
 			);
 			name = lev_comp;
 			productName = lev_comp;
@@ -831,6 +860,7 @@
 				31B8A46321A270680055BD01 /* PBXBuildRule */,
 			);
 			dependencies = (
+				316B91C721A3BD5000EC3E81 /* PBXTargetDependency */,
 			);
 			name = dgn_comp;
 			productName = dgn_comp;
@@ -848,6 +878,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				316B91CD21A3BD8F00EC3E81 /* PBXTargetDependency */,
 			);
 			name = recover;
 			productName = recover;
@@ -866,6 +897,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				316B91CB21A3BD7C00EC3E81 /* PBXTargetDependency */,
 			);
 			name = dlb;
 			productName = dlb;
@@ -1650,6 +1682,26 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		316B91C721A3BD5000EC3E81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
+			targetProxy = 316B91C621A3BD5000EC3E81 /* PBXContainerItemProxy */;
+		};
+		316B91C921A3BD5C00EC3E81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
+			targetProxy = 316B91C821A3BD5C00EC3E81 /* PBXContainerItemProxy */;
+		};
+		316B91CB21A3BD7C00EC3E81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
+			targetProxy = 316B91CA21A3BD7C00EC3E81 /* PBXContainerItemProxy */;
+		};
+		316B91CD21A3BD8F00EC3E81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
+			targetProxy = 316B91CC21A3BD8F00EC3E81 /* PBXContainerItemProxy */;
+		};
 		3192867421A3AAFA00325BEB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 31B8A44921A26A4B0055BD01 /* recover */;
