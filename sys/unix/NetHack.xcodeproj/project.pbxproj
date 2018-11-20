@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3192867C21A3ACAC00325BEB /* lev_comp.y in Sources */ = {isa = PBXBuildFile; fileRef = 3192867B21A3ACAB00325BEB /* lev_comp.y */; };
+		3192867E21A3ACB800325BEB /* lev_comp.l in Sources */ = {isa = PBXBuildFile; fileRef = 3192867D21A3ACB800325BEB /* lev_comp.l */; };
 		31B8A30C21A20D8B0055BD01 /* makedefs.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30B21A20D8B0055BD01 /* makedefs.c */; };
 		31B8A30F21A20DC10055BD01 /* objects.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30D21A20DC10055BD01 /* objects.c */; };
 		31B8A31021A20DC10055BD01 /* monst.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A30E21A20DC10055BD01 /* monst.c */; };
@@ -168,7 +170,7 @@
 				"$(NH_INC_DIR)/lev_comp.h",
 				"$(NH_UTIL_DIR)/lev_yacc.c",
 			);
-			script = "cd {NH_UTIL_DIR}\nyacc -d lev_comp.y\nsed -e 's#y.tab.c#lev_yacc.c#' -e 's#y.tab.c:#lev_yacc.c:#' y.tab.c > lev_yacc.c && rm y.tab.c\nsed -e 's#y.tab.h#lev_comp.h#' y.tab.h > ${NH_INC_DIR}/lev_comp.h && rm y.tab.h\n";
+			script = "cd ${NH_UTIL_DIR}\nbison -o lev_yacc.c -d lev_comp.y\nmv lev_yacc.h ${NH_INC_DIR}/lev_comp.h \n";
 		};
 		317E7C5321A3796200F6E4E5 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -178,7 +180,7 @@
 			outputFiles = (
 				"$(NH_UTIL_DIR)/lev_lex.c",
 			);
-			script = "cd ${NH_UTIL_DIR}\nlex lev_comp.l\nsed -e 's#lex.yy.c#lev_lex.c#' -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' lex.yy.c > lev_lex.c && rm lex.yy.c\n";
+			script = "cd ${NH_UTIL_DIR}\nlex -o lev_lex.c lev_comp.l\nsed -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' lev_lex.c > lev_lex.x\nmv lev_lex.x lev_lex.c\n";
 		};
 		31B8A46321A270680055BD01 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -187,10 +189,10 @@
 			fileType = sourcecode.yacc;
 			isEditable = 1;
 			outputFiles = (
-				"$(INPUT_FILE_DIR)/dgn_yacc.c",
+				"$(NH_UTIL_DIR)/dgn_yacc.c",
 				"$(NH_INC_DIR)/dgn_comp.h",
 			);
-			script = "cd ${INPUT_FILE_DIR}\nyacc -d dgn_comp.y\nsed -e 's#\"y.tab.c\"#\"dgn_yacc.c\"#' -e 's#y.tab.c:#dgn_yacc.c:#' y.tab.c > dgn_yacc.c && rm y.tab.c\nsed -e 's#\"y.tab.h\"#\"dgn_comp.h\"#' y.tab.h > ${NH_INC_DIR}/dgn_comp.h && rm y.tab.h\necho $(FOO)\n";
+			script = "cd ${NH_UTIL_DIR}\nbison -o dgn_yacc.c -d dgn_comp.y\nmv dgn_yacc.h ${NH_INC_DIR}/dgn_comp.h \n";
 		};
 		31B8A46721A286E70055BD01 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -198,13 +200,41 @@
 			fileType = sourcecode.lex;
 			isEditable = 1;
 			outputFiles = (
-				"$(INPUT_FILE_DIR)/dgn_lex.c",
+				"$(NH_UTIL_DIR)/dgn_lex.c",
 			);
-			script = "cd ${INPUT_FILE_DIR}\nlex dgn_comp.l\nsed -e 's#lex.yy.c#dgn_lex.c#' -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' lex.yy.c > dgn_lex.c && rm lex.yy.c\n";
+			script = "cd ${NH_UTIL_DIR}\nlex -o dgn_lex.c dgn_comp.l\nsed -e 's#  *$$##' -e 's#static void yyunput#void yyunput#' dgn_lex.c > dgn_lex.x\nmv dgn_lex.x dgn_lex.c\n";
 		};
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		3192867321A3AAFA00325BEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31B8A44921A26A4B0055BD01;
+			remoteInfo = recover;
+		};
+		3192867521A3AAFE00325BEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31B8A45621A26A970055BD01;
+			remoteInfo = dlb;
+		};
+		3192867721A3AB0400325BEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31B8A43521A268DF0055BD01;
+			remoteInfo = dgn_comp;
+		};
+		3192867921A3AB0800325BEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31B8A41D21A2669A0055BD01;
+			remoteInfo = lev_comp;
+		};
 		31B8A31321A2355C0055BD01 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3189576921A1FCC100FB2ABE /* Project object */;
@@ -274,6 +304,8 @@
 /* Begin PBXFileReference section */
 		3189577121A1FCC100FB2ABE /* NetHack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetHack; sourceTree = BUILT_PRODUCTS_DIR; };
 		3189577F21A1FDA400FB2ABE /* makedefs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = makedefs; sourceTree = BUILT_PRODUCTS_DIR; };
+		3192867B21A3ACAB00325BEB /* lev_comp.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = lev_comp.y; path = ../../util/lev_comp.y; sourceTree = "<group>"; };
+		3192867D21A3ACB800325BEB /* lev_comp.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = lev_comp.l; path = ../../util/lev_comp.l; sourceTree = "<group>"; };
 		31B8A30A21A20D730055BD01 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../include/config.h; sourceTree = "<group>"; };
 		31B8A30B21A20D8B0055BD01 /* makedefs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = makedefs.c; path = ../../util/makedefs.c; sourceTree = "<group>"; };
 		31B8A30D21A20DC10055BD01 /* objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = objects.c; path = ../../src/objects.c; sourceTree = "<group>"; };
@@ -611,6 +643,8 @@
 		3189579321A200EC00FB2ABE /* util */ = {
 			isa = PBXGroup;
 			children = (
+				3192867D21A3ACB800325BEB /* lev_comp.l */,
+				3192867B21A3ACAB00325BEB /* lev_comp.y */,
 				31B8A46421A278AC0055BD01 /* dgn_comp.y */,
 				31B8A45F21A26AE70055BD01 /* dlb_main.c */,
 				31B8A45121A26A750055BD01 /* recover.c */,
@@ -717,13 +751,19 @@
 				3189576D21A1FCC100FB2ABE /* Sources */,
 				3189576E21A1FCC100FB2ABE /* Frameworks */,
 				3189576F21A1FCC100FB2ABE /* CopyFiles */,
+				3192867121A3A2D500325BEB /* Copy nethack */,
 				317E7C5421A3804400F6E4E5 /* Build Guidebook */,
 				317E7C5521A3912D00F6E4E5 /* Build nhdat */,
+				3192867021A39F6A00325BEB /* Install */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				31B8A31421A2355C0055BD01 /* PBXTargetDependency */,
+				3192867A21A3AB0800325BEB /* PBXTargetDependency */,
+				3192867821A3AB0400325BEB /* PBXTargetDependency */,
+				3192867621A3AAFE00325BEB /* PBXTargetDependency */,
+				3192867421A3AAFA00325BEB /* PBXTargetDependency */,
 			);
 			name = NetHack;
 			productName = NetHack;
@@ -743,6 +783,7 @@
 				317E7C4621A355E700F6E4E5 /* Build quest.dat */,
 				317E7C4E21A3697300F6E4E5 /* Build options and headers */,
 				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
+				3192867F21A3AF8000325BEB /* Build oracles */,
 			);
 			buildRules = (
 			);
@@ -820,6 +861,7 @@
 				31B8A45321A26A970055BD01 /* Sources */,
 				31B8A45421A26A970055BD01 /* Frameworks */,
 				31B8A45521A26A970055BD01 /* CopyFiles */,
+				3192867221A3AA5700325BEB /* copy dlb */,
 			);
 			buildRules = (
 			);
@@ -1298,6 +1340,97 @@
 			shellPath = /bin/sh;
 			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon tribute asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev juiblex.lev knox.lev medusa-?.lev minend-?.lev minefill.lev minetn-?.lev oracle.lev orcus.lev sanctum.lev soko?-?.lev tower?.lev valley.lev wizard?.lev astral.lev air.lev earth.lev fire.lev water.lev ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev bogusmon data engrave epitaph oracles options quest.dat rumors\n\n";
 		};
+		3192867021A39F6A00325BEB /* Install */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_DAT_DIR)/nhdat",
+				"$(NH_DAT_DIR)/license",
+				"$(NH_DAT_DIR)/symbols",
+				"$(NH_SRC_DIR)/nethack",
+				"$(NH_UTIL_DIR)/recover",
+				"$(NH_UNIX_DIR)/sysconf",
+				"$(NH_UNIX_DIR)/hints/macosx.sh",
+			);
+			name = Install;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_INSTALL_DIR)/nhdat",
+				"$(NH_INSTALL_DIR)/licenses",
+				"$(NH_INSTALL_DIR)/symbols",
+				"$(NH_INSTALL_DIR)/nethack",
+				"$(NH_INSTALL_DIR)/recover",
+				"$(NH_INSTALL_DIR)/sysconf",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p ${NH_INSTALL_DIR}/save\ncd ${NH_DAT_DIR}\ncp nhdat license symbols ${NH_INSTALL_DIR}\ncp ${NH_SRC_DIR}/nethack ${NH_INSTALL_DIR}\ncp ${NH_UTIL_DIR}/recover ${NH_INSTALL_DIR}\ntouch ${NH_INSTALL_DIR}/perm\ntouch ${NH_INSTALL_DIR}/record\ntouch ${NH_INSTALL_DIR}/logfile\ntouch ${NH_INSTALL_DIR}/xlogfile\ncd ${NH_ROOT_DIR}\nsys/unix/hints/macosx.sh editsysconf sys/unix/sysconf ${NH_INSTALL_DIR}/sysconf\n";
+		};
+		3192867121A3A2D500325BEB /* Copy nethack */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/nethack",
+			);
+			name = "Copy nethack";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_SRC_DIR)/nethack",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/nethack ${NH_SRC_DIR}/nethack\n";
+		};
+		3192867221A3AA5700325BEB /* copy dlb */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${BUILT_PRODUCTS_DIR}/dlb",
+			);
+			name = "copy dlb";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_UTIL_DIR)/dlb",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp ${BUILT_PRODUCTS_DIR}/dlb ${NH_UTIL_DIR}/dlb\n";
+		};
+		3192867F21A3AF8000325BEB /* Build oracles */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(NH_DAT_DIR)/oracles.txt",
+			);
+			name = "Build oracles";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(NH_DAT_DIR)/oracles",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
+		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1469,12 +1602,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3192867C21A3ACAC00325BEB /* lev_comp.y in Sources */,
 				31B8A42B21A267E60055BD01 /* panic.c in Sources */,
 				31B8A43021A268370055BD01 /* monst.c in Sources */,
 				31B8A42921A267E60055BD01 /* lev_yacc.c in Sources */,
 				31B8A42C21A267E60055BD01 /* lev_main.c in Sources */,
 				31B8A42D21A267F50055BD01 /* alloc.c in Sources */,
 				31B8A42E21A2680B0055BD01 /* drawing.c in Sources */,
+				3192867E21A3ACB800325BEB /* lev_comp.l in Sources */,
 				31B8A42A21A267E60055BD01 /* lev_lex.c in Sources */,
 				31B8A43121A268420055BD01 /* objects.c in Sources */,
 				31B8A42F21A2681E0055BD01 /* decl.c in Sources */,
@@ -1515,6 +1650,26 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3192867421A3AAFA00325BEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31B8A44921A26A4B0055BD01 /* recover */;
+			targetProxy = 3192867321A3AAFA00325BEB /* PBXContainerItemProxy */;
+		};
+		3192867621A3AAFE00325BEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31B8A45621A26A970055BD01 /* dlb */;
+			targetProxy = 3192867521A3AAFE00325BEB /* PBXContainerItemProxy */;
+		};
+		3192867821A3AB0400325BEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31B8A43521A268DF0055BD01 /* dgn_comp */;
+			targetProxy = 3192867721A3AB0400325BEB /* PBXContainerItemProxy */;
+		};
+		3192867A21A3AB0800325BEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31B8A41D21A2669A0055BD01 /* lev_comp */;
+			targetProxy = 3192867921A3AB0800325BEB /* PBXContainerItemProxy */;
+		};
 		31B8A31421A2355C0055BD01 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3189577E21A1FDA400FB2ABE /* makedefs */;
@@ -1579,12 +1734,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
-				NH_DOC_DIR = "$(SOURCE_ROOT)/../../doc";
-				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
-				NH_ROOT = "$(SOURCE_ROOT)/../..";
-				NH_SRC_DIR = "$(SOURCE_ROOT)/../../src";
-				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
+				NH_DAT_DIR = "$(NH_ROOT_DIR)/dat";
+				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
+				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
+				NH_INSTALL_DIR = "$(HOME)/nethackdir";
+				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
+				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
+				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
+				NH_UTIL_DIR = "$(NH_ROOT_DIR)/util";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
@@ -1652,12 +1809,14 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				NH_DAT_DIR = "$(SOURCE_ROOT)/../../dat";
-				NH_DOC_DIR = "$(SOURCE_ROOT)/../../doc";
-				NH_INC_DIR = "$(SOURCE_ROOT)/../../include";
-				NH_ROOT = "$(SOURCE_ROOT)/../..";
-				NH_SRC_DIR = "$(SOURCE_ROOT)/../../src";
-				NH_UTIL_DIR = "$(SOURCE_ROOT)/../../util";
+				NH_DAT_DIR = "$(NH_ROOT_DIR)/dat";
+				NH_DOC_DIR = "$(NH_ROOT_DIR)/doc";
+				NH_INC_DIR = "$(NH_ROOT_DIR)/include";
+				NH_INSTALL_DIR = "$(HOME)/nethackdir";
+				NH_ROOT_DIR = "$(SOURCE_ROOT)/../..";
+				NH_SRC_DIR = "$(NH_ROOT_DIR)/src";
+				NH_UNIX_DIR = "$(NH_ROOT_DIR)/sys/unix";
+				NH_UTIL_DIR = "$(NH_ROOT_DIR)/util";
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",
