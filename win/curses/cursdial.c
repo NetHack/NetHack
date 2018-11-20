@@ -80,6 +80,10 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 {
     int map_height, map_width, maxwidth, remaining_buf, winx, winy, count;
     WINDOW *askwin, *bwin;
+    char *tmpstr;
+    int prompt_width = strlen(prompt) + buffer + 1;
+    int prompt_height = 1;
+    int height = prompt_height;
 #if __STDC_VERSION__ >= 199901L
     char input[buffer];
 #else
@@ -90,10 +94,6 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 
     buffer = BUFSZ - 1;
 #endif
-    char *tmpstr;
-    int prompt_width = strlen(prompt) + buffer + 1;
-    int prompt_height = 1;
-    int height = prompt_height;
 
     maxwidth = term_cols - 2;
 
@@ -869,7 +869,7 @@ menu_win_size(nhmenu *menu)
         } else {
             /* Add space for accelerator */
             curentrywidth = strlen(menu_item_ptr->str) + 4;
-#if 0 // FIXME: menu glyphs
+#if 0 /* FIXME: menu glyphs */
             if (menu_item_ptr->glyph != NO_GLYPH
                         && iflags.use_menu_glyphs)
                 curentrywidth += 2;
