@@ -1130,7 +1130,7 @@ xchar w, h;
 xchar xal, yal;
 xchar rtype, rlit;
 {
-    xchar xabs, yabs;
+    xchar xabs = 0, yabs = 0;
     int wtmp, htmp, xaltmp, yaltmp, xtmp, ytmp;
     NhRect *r1 = 0, r2;
     int trycnt = 0;
@@ -2000,7 +2000,7 @@ struct mkroom *croom;
      * other contents, but that can be specified as an empty container.
      */
     if (o->id == STATUE && Is_medusa_level(&u.uz) && o->corpsenm == NON_PM) {
-        struct monst *was;
+        struct monst *was = NULL;
         struct obj *obj;
         int wastyp;
         int i = 0; /* prevent endless loop in case makemon always fails */
