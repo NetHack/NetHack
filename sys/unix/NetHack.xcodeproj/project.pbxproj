@@ -1805,8 +1805,8 @@
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
-					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
-					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
+					"-DSYSCF_FILE=\\\"$(NH_INSTALL_DIR)/sysconf\\\"",
+					"-DHACKDIR=\\\"$(NH_INSTALL_DIR)\\\"",
 					"-DSECURE",
 					"-DCURSES_GRAPHICS",
 				);
@@ -1880,8 +1880,8 @@
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
-					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
-					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
+					"-DSYSCF_FILE=\\\"$(NH_INSTALL_DIR)/sysconf\\\"",
+					"-DHACKDIR=\\\"$(NH_INSTALL_DIR)\\\"",
 					"-DSECURE",
 					"-DCURSES_GRAPHICS",
 				);
@@ -1900,8 +1900,8 @@
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
-					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
-					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
+					"-DSYSCF_FILE=\\\"$(NH_INSTALL_DIR)/sysconf\\\"",
+					"-DHACKDIR=\\\"$(NH_INSTALL_DIR)\\\"",
 					"-DSECURE",
 					"-DCURSES_GRAPHICS",
 				);
@@ -1920,8 +1920,8 @@
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
-					"-DSYSCF_FILE=\\\"/Users/barthouse/nethackdir/sysconf\\\"",
-					"-DHACKDIR=\\\"/Users/barthouse/nethackdir\\\"",
+					"-DSYSCF_FILE=\\\"$(NH_INSTALL_DIR)/sysconf\\\"",
+					"-DHACKDIR=\\\"$(NH_INSTALL_DIR)\\\"",
 					"-DSECURE",
 					"-DCURSES_GRAPHICS",
 				);
