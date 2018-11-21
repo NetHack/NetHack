@@ -185,6 +185,8 @@ static const char scanmap[] = {
     'b', 'n', 'm', ',', '.', '?' /* ... */
 };
 
+#define IDT_FUZZ_TIMER 100 
+
 /*
 //  FUNCTION: WndProc(HWND, unsigned, WORD, LONG)
 //
@@ -727,6 +729,62 @@ mswin_layout_main_window(HWND changed_child)
         SetForegroundWindow(changed_child);
 }
 
+VOID CALLBACK FuzzTimerProc(
+	_In_ HWND     hwnd,
+	_In_ UINT     uMsg,
+	_In_ UINT_PTR idEvent,
+	_In_ DWORD    dwTime
+	)
+{
+	INPUT input[16];
+	int i_pos = 0;
+	int c = randomkey();
+	SHORT k = VkKeyScanA(c);
+	BOOL gen_alt = (rn2(50) == 0) && isalpha(c);
+
+	if (!iflags.debug_fuzzer) {
+		KillTimer(hwnd, IDT_FUZZ_TIMER);
+		return;
+	}
+
+	if (!GetFocus())
+            return;
+
+	ZeroMemory(input, sizeof(input));
+	if (gen_alt) {
+		input[i_pos].type = INPUT_KEYBOARD;
+		input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+		input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+		i_pos++;
+	}
+
+	if (HIBYTE(k) & 1) {
+		input[i_pos].type = INPUT_KEYBOARD;
+		input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+		input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+		i_pos++;
+	}
+
+	input[i_pos].type = INPUT_KEYBOARD;
+	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+	input[i_pos].ki.wScan = MapVirtualKey(LOBYTE(k), 0);
+	i_pos++;
+
+	if (HIBYTE(k) & 1) {
+		input[i_pos].type = INPUT_KEYBOARD;
+		input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+		input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+		i_pos++;
+	}
+	if (gen_alt) {
+		input[i_pos].type = INPUT_KEYBOARD;
+		input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+		input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+		i_pos++;
+	}
+	SendInput(i_pos, input, sizeof(input[0]));
+}
+
 LRESULT
 onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -745,11 +803,22 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         mswin_display_splash_window(TRUE);
         break;
 
+    case IDM_FUZZ:
+        if (iflags.debug_fuzzer)
+            KillTimer(hWnd, IDT_FUZZ_TIMER);
+        else
+            SetTimer(hWnd, IDT_FUZZ_TIMER, 10, FuzzTimerProc);
+        iflags.debug_fuzzer = !iflags.debug_fuzzer;
+        break;
     case IDM_EXIT:
+        if (iflags.debug_fuzzer)
+            break;
         done2();
         break;
 
     case IDM_SAVE:
+        if (iflags.debug_fuzzer)
+            break;
         if (!program_state.gameover && !program_state.done_hup)
             dosave();
         else
@@ -828,6 +897,9 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         char *text;
         wchar_t *wtext;
         int tlen = 0;
+
+        if (iflags.debug_fuzzer)
+            break;
 
         ZeroMemory(filename, sizeof(filename));
         ZeroMemory(&ofn, sizeof(ofn));

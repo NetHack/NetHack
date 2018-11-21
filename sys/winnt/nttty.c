@@ -688,11 +688,11 @@ tty_delay_output()
     clock_t goal;
     int k;
 
+    goal = 50 + clock();
+    back_buffer_flip();
     if (iflags.debug_fuzzer)
         return;
 
-    goal = 50 + clock();
-    back_buffer_flip();
     while (goal > clock()) {
         k = junk; /* Do nothing */
     }
