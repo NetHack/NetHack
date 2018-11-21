@@ -389,6 +389,11 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #undef signed
 #endif
 
+#ifdef __clang__
+#define UNUSED __attribute__((unused))
+#define NORETURN __attribute__((noreturn))
+#endif
+
 /*
  * Allow gcc2 to check parameters of printf-like calls with -Wformat;
  * append this to a prototype declaration (see pline() in extern.h).

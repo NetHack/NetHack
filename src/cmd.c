@@ -533,7 +533,7 @@ doextlist(VOID_ARGS)
     return 0;
 }
 
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 #define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 
 /*
@@ -901,7 +901,7 @@ STATIC_PTR int
 wiz_level_change(VOID_ARGS)
 {
     char buf[BUFSZ] = DUMMY;
-    int newlevel;
+    int newlevel = 0;
     int ret;
 
     getlin("To what experience level do you want to be set?", buf);

@@ -233,8 +233,8 @@ X11: its use of genl_status_update exposed a negative index use that could
 X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 
 
-Platform- and/or Interface-Specific Fixes
------------------------------------------
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
 move 'perm_invent' value from flags to iflags to keep it out of save files;
 	affects X11, win32, and curses
 windows-gui: In nethackw, there could be conflicts between menu accelerators 
@@ -261,16 +261,22 @@ windows-tty: augment codepage850-to-Unicode mappings that are not displayable
 	on the map
 windows: Added ntassert() mechanism for Windows based port use
 windows: heed OPTIONS=symset:default in config file if it is present 
+windows: add curses window port
 tty: significant optimizations for performance and per field rendering
 tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
 tty: support BL_RESET in status_update to force an update to all status fields
 tty: stop hitpointbar from jumping to 100% health at zero hit points
+MacOSX: add curses window port
+MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
+MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
+	containing important build info
 unix: Makefile.src and Makefile.utl inadvertently relied on a 'gnu make'
 	extension when using $(VERBOSEMAKE) to reduce build-time feedback;
 	replace with $(QUIETCC) which operates the same but defaults to
 	verbose so doesn't use '$<' for multi-prerequisite targets unless
 	specifically requested; use 'make QUIETCC=1 <target>' to get the
 	3.6.1 behavior back
+unix: add curses window port
 vms: data file processing and playground setup were missing post-3.4.3 files
 	engrave, epitaph, and bogusmon made from corresponding *.txt
 Qt: add Qt5 specific hints file for linux and Mac OS X (Ray Chason)
@@ -315,6 +321,19 @@ for ^X and enlightenment, display the information in a menu rather than a
 	'<' (menu_previous_page) and '^' (menu_first_page) menu keys;
 	needed for interfaces (tty) without text popup scrollbar support;
 	end of game disclosure of attributes remains single-forward-pass
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+curses: the community patch for an optional curses window-port was
+	incorporated into the NetHack source code tree. The curses
+	window-port evolved from work originally done by Karl Garrison,
+	and has been in use in several NetHack variants and on 
+	nethack.alt.org and on www.hardfought.org/nethack/ for a while.
+	It is available and tested for 3.6.2 for Windows with PDCurses 
+	layered underneath, and for Mac OSX and Unix (using ncurses as
+	the layer underneath). It may also work for DOS with PDCurses
+	layered underneath, but that has not been tested.
 
 
 Code Cleanup and Reorganization
