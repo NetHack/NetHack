@@ -53,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2018/03/02";
+static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2018/03/02";
 #endif
 
 /* names of files to be generated */
@@ -298,8 +298,6 @@ link_sanity_check()
     monst_init();
     objects_init();
 
-    /* Quiet unused warning */
-    (void) SCCS_Id;
 }
 
 void
