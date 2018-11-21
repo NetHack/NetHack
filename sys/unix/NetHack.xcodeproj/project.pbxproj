@@ -2015,7 +2015,7 @@
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",
-					"-DDEFAULT_WINDOW_SYS=\\\"curses\\\"",
+					"-DDEFAULT_WINDOW_SYS=\\\"tty\\\"",
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
@@ -2090,7 +2090,7 @@
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",
-					"-DDEFAULT_WINDOW_SYS=\\\"curses\\\"",
+					"-DDEFAULT_WINDOW_SYS=\\\"tty\\\"",
 					"-DDLB",
 					"-DGREPPATH=\\\"/usr/bin/grep\\\"",
 					"-DSYSCF",
