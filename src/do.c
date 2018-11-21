@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1542765356 2018/11/21 01:55:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1063,7 +1063,7 @@ doup()
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
             return 0;
-        if (yn("Beware, there will be no return! Still climb?") != 'y')
+        if (yn("Beware, there will be no return!  Still climb?") != 'y')
             return 0;
     }
     if (!next_to_u()) {

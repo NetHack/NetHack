@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1519070343 2018/02/19 19:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1542765359 2018/11/21 01:55:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -468,7 +468,7 @@ struct obj *otmp UNUSED;
         "Please find enclosed a small token to represent your Owlbear",
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
-      "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
+     "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 

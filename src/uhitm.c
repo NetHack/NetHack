@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1521684760 2018/03/22 02:12:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.176 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1542765366 2018/11/21 01:56:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -930,7 +930,7 @@ int dieroll;
 
                     if (touch_petrifies(&mons[obj->corpsenm])) {
                         /*learn_egg_type(obj->corpsenm);*/
-                        pline("Splat! You hit %s with %s %s egg%s!",
+                        pline("Splat!  You hit %s with %s %s egg%s!",
                               mon_nam(mon),
                               obj->known ? "the" : cnt > 1L ? "some" : "a",
                               obj->known ? mons[obj->corpsenm].mname

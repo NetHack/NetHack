@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1542765368 2018/11/21 01:56:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -352,7 +352,8 @@ invault()
         newsym(guard->mx, guard->my);
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
-            if (!Deaf) verbalize("What's going on here?");
+            if (!Deaf)
+                verbalize("What's going on here?");
             if (gsensed)
                 pline_The("other presence vanishes.");
             mongone(guard);
@@ -361,8 +362,9 @@ invault()
         if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
             if (youmonst.m_ap_type == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
-                if (!Deaf) verbalize("Hey! Who left that %s in here?",
-                                    mimic_obj_name(&youmonst));
+                if (!Deaf)
+                    verbalize("Hey!  Who left that %s in here?",
+                              mimic_obj_name(&youmonst));
             /* You're mimicking some object or you're hidden. */
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
             mongone(guard);
