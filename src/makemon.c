@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1539804904 2018/10/17 19:35:04 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1542798623 2018/11/21 11:10:23 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -280,7 +280,8 @@ register struct monst *mtmp;
                 if (rn2(2))
                     (void) mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
                 if (rn2(5))
-                    (void) mongets(mtmp, rn2(3) ? LEATHER_JACKET : LEATHER_CLOAK);
+                    (void) mongets(mtmp, rn2(3) ? LEATHER_JACKET
+                                                : LEATHER_CLOAK);
                 if (rn2(3))
                     (void) mongets(mtmp, rn2(3) ? LOW_BOOTS : HIGH_BOOTS);
                 if (rn2(3))
@@ -304,7 +305,8 @@ register struct monst *mtmp;
             case PM_HUNTER:
                 (void) mongets(mtmp, rn2(3) ? SHORT_SWORD : DAGGER);
                 if (rn2(2))
-                    (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
+                    (void) mongets(mtmp, rn2(2) ? LEATHER_JACKET
+                                                : LEATHER_ARMOR);
                 (void) mongets(mtmp, BOW);
                 m_initthrow(mtmp, ARROW, 12);
                 break;
@@ -744,9 +746,21 @@ register struct monst *mtmp;
         break;
     case S_QUANTMECH:
         if (!rn2(20)) {
+            struct obj *catcorpse;
+
             otmp = mksobj(LARGE_BOX, FALSE, FALSE);
-            otmp->spe = 1; /* flag for special box */
-            otmp->owt = weight(otmp);
+            /* we used to just set the flag, which resulted in weight()
+               treating the box as being heavier by the weight of a cat;
+               now we include a cat corpse that won't rot; when opening or
+               disclosing the box's contents, the corpse might be revived,
+               otherwise it's given a rot timer; weight is now ordinary */
+            if ((catcorpse = mksobj(CORPSE, TRUE, FALSE)) != 0) {
+                otmp->spe = 1; /* flag for special SchroedingersBox */
+                set_corpsenm(catcorpse, PM_HOUSECAT);
+                (void) stop_timer(ROT_CORPSE, obj_to_any(catcorpse));
+                add_to_container(otmp, catcorpse);
+                otmp->owt = weight(otmp);
+            }
             (void) mpickobj(mtmp, otmp);
         }
         break;

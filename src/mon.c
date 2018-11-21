@@ -105,7 +105,7 @@ mon_sanity_check()
         }
     }
 
-    for (x = 0; x < COLNO; x++)
+    for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             if ((mtmp = level.monsters[x][y]) != 0) {
                 for (m = fmon; m; m = m->nmon)
@@ -1747,7 +1747,7 @@ m_detach(mtmp, mptr)
 struct monst *mtmp;
 struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
 {
-    boolean onmap = (mtmp->mx > -1);
+    boolean onmap = (mtmp->mx > 0);
 
     if (mtmp == context.polearm.hitmon)
         context.polearm.hitmon = 0;
