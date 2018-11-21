@@ -91,8 +91,13 @@ E int FDECL(srandom, (unsigned int));
 #endif
 #endif
 #else
+#if defined(MACOSX)
+E long NDECL(lrand48);
+E void FDECL(srand48, (long));
+#else
 E long lrand48();
 E void srand48();
+#endif /* MACOSX */
 #endif /* BSD || ULTRIX || RANDOM */
 
 #if !defined(BSD) || defined(ultrix)

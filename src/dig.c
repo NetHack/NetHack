@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1517913682 2018/02/06 10:41:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1542765354 2018/11/21 01:55:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -811,7 +811,7 @@ coord *cc;
              * digging makes a hole, but the boulder immediately
              * fills it.  Final outcome:  no hole, no boulder.
              */
-            pline("KADOOM! The boulder falls in!");
+            pline("KADOOM!  The boulder falls in!");
             (void) delfloortrap(ttmp);
         }
         delobj(boulder_here);

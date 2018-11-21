@@ -53,7 +53,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2018/03/02";
+static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.6\t2018/03/02";
 #endif
 
 /* names of files to be generated */
@@ -297,6 +297,7 @@ link_sanity_check()
     */
     monst_init();
     objects_init();
+
 }
 
 void
@@ -1663,6 +1664,9 @@ struct win_info {
 static struct win_info window_opts[] = {
 #ifdef TTY_GRAPHICS
     { "tty", "traditional tty-based graphics" },
+#endif
+#ifdef CURSES_GRAPHICS
+    { "curses", "terminal-based graphics using curses libraries" },
 #endif
 #ifdef X11_GRAPHICS
     { "X11", "X11" },

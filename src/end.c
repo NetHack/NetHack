@@ -861,8 +861,7 @@ int how;
     }
     /* cure impending doom of sickness hero won't have time to fix */
     if ((Sick & TIMEOUT) == 1L) {
-        u.usick_type = 0;
-        set_itimeout(&Sick, 0L);
+        make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
     if (how == CHOKING)
         init_uhunger();
@@ -2051,10 +2050,11 @@ struct kinfo *kptr;
     }
 
     if (k == (struct kinfo *) 0) {
-        impossible("dealloc_killer not on list");
+        impossible("dealloc_killer (#%d) not on list", kptr->id);
     } else {
         prev->next = k->next;
         free((genericptr_t) k);
+        debugpline1("freed delayed killer #%d", kptr->id);
     }
 }
 
@@ -2067,7 +2067,7 @@ int mode;
 
     if (perform_bwrite(mode)) {
         for (kptr = &killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
-            bwrite(fd, (genericptr_t) kptr, sizeof(struct kinfo));
+            bwrite(fd, (genericptr_t) kptr, sizeof (struct kinfo));
         }
     }
     if (release_data(mode)) {
@@ -2086,9 +2086,9 @@ int fd;
     struct kinfo *kptr;
 
     for (kptr = &killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
-        mread(fd, (genericptr_t) kptr, sizeof(struct kinfo));
+        mread(fd, (genericptr_t) kptr, sizeof (struct kinfo));
         if (kptr->next) {
-            kptr->next = (struct kinfo *) alloc(sizeof(struct kinfo));
+            kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }
     }
 }

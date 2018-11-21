@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1542765368 2018/11/21 01:56:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,7 @@ STATIC_DCL void FDECL(restfakecorr, (struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
+STATIC_DCL void FDECL(gd_mv_monaway, (struct monst *, int, int));
 
 void
 newegd(mtmp)
@@ -351,7 +352,8 @@ invault()
         newsym(guard->mx, guard->my);
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
-            if (!Deaf) verbalize("What's going on here?");
+            if (!Deaf)
+                verbalize("What's going on here?");
             if (gsensed)
                 pline_The("other presence vanishes.");
             mongone(guard);
@@ -360,8 +362,9 @@ invault()
         if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
             if (youmonst.m_ap_type == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
-                if (!Deaf) verbalize("Hey! Who left that %s in here?",
-                                    mimic_obj_name(&youmonst));
+                if (!Deaf)
+                    verbalize("Hey!  Who left that %s in here?",
+                              mimic_obj_name(&youmonst));
             /* You're mimicking some object or you're hidden. */
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
             mongone(guard);
@@ -577,6 +580,19 @@ struct monst *grd;
     }
 }
 
+STATIC_OVL void
+gd_mv_monaway(grd, nx,ny)
+register struct monst *grd;
+int nx,ny;
+{
+    if (MON_AT(nx, ny) && nx != grd->mx && ny != grd->my) {
+        if (!Deaf)
+            verbalize("Out of my way, scum!");
+        if (!rloc(m_at(nx, ny), FALSE) || m_at(nx, ny))
+            m_into_limbo(m_at(nx, ny));
+    }
+}
+
 /*
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
  */
@@ -745,11 +761,7 @@ register struct monst *grd;
             mpickgold(grd); /* does a newsym */
         } else {
             /* just for insurance... */
-            if (MON_AT(m, n) && m != grd->mx && n != grd->my) {
-                if (!Deaf)
-                    verbalize("Out of my way, scum!");
-                (void) rloc(m_at(m, n), FALSE);
-            }
+            gd_mv_monaway(grd, m,n);
             remove_monster(grd->mx, grd->my);
             newsym(grd->mx, grd->my);
             place_monster(grd, m, n);
@@ -869,6 +881,7 @@ proceed:
     fcp->fy = ny;
     fcp->ftyp = typ;
 newpos:
+    gd_mv_monaway(grd, nx,ny);
     if (egrd->gddone) {
         /* The following is a kludge.  We need to keep    */
         /* the guard around in order to be able to make   */

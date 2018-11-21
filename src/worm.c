@@ -301,7 +301,8 @@ register struct monst *worm;
      */
     for (seg = wtails[wnum]; seg; seg = seg->nseg)
         if (distu(seg->wx, seg->wy) < 3)
-            (void) mattacku(worm);
+            if (mattacku(worm))
+                return; /* your passive ability killed the worm */
 }
 
 /*  cutworm()
@@ -382,6 +383,7 @@ struct obj *weap;
 
     /* Sometimes the tail end dies. */
     if (!new_worm) {
+        place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (context.mon_moving) {
             if (canspotmon(worm))
                 pline("Part of %s tail has been cut off.",
@@ -414,7 +416,7 @@ struct obj *weap;
     wgrowtime[new_wnum] = 0L;    /* trying to call initworm().       */
 
     /* Place the new monster at all the segment locations. */
-    place_wsegs(new_worm);
+    place_wsegs(new_worm, worm);
 
     if (context.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
@@ -555,17 +557,28 @@ int fd;
  *  place_wsegs()
  *
  *  Place the segments of the given worm.  Called from restore.c
+ *  If oldworm is not NULL, assumes the oldworm segments are on map
+ *  in the same location as worm segments
  */
 void
-place_wsegs(worm)
-struct monst *worm;
+place_wsegs(worm, oldworm)
+struct monst *worm, *oldworm;
 {
     struct wseg *curr = wtails[worm->wormno];
 
     /*  if (!mtmp->wormno) return;  bullet proofing */
 
     while (curr != wheads[worm->wormno]) {
-        place_worm_seg(worm, curr->wx, curr->wy);
+        xchar x = curr->wx;
+        xchar y = curr->wy;
+
+        if (oldworm) {
+            if (m_at(x,y) == oldworm)
+                remove_monster(x, y);
+            else
+                impossible("placing worm seg <%i,%i> over another mon", x, y);
+        }
+        place_worm_seg(worm, x, y);
         curr = curr->nseg;
     }
 }
@@ -584,10 +597,12 @@ struct monst *worm;
     curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        if (!isok(curr->wx, curr->wy))
-            panic("worm seg not isok");
-        if (level.monsters[curr->wx][curr->wy] != worm)
-            panic("worm not at seg location");
+        if (curr->wx) {
+            if (!isok(curr->wx, curr->wy))
+                panic("worm seg not isok");
+            if (level.monsters[curr->wx][curr->wy] != worm)
+                panic("worm not at seg location");
+        }
         curr = curr->nseg;
     }
 }
@@ -609,8 +624,11 @@ register struct monst *worm;
     /*  if (!mtmp->wormno) return;  bullet proofing */
 
     while (curr) {
-        remove_monster(curr->wx, curr->wy);
-        newsym(curr->wx, curr->wy);
+        if (curr->wx) {
+            remove_monster(curr->wx, curr->wy);
+            newsym(curr->wx, curr->wy);
+            curr->wx = 0;
+        }
         curr = curr->nseg;
     }
 }

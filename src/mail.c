@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1519070343 2018/02/19 19:59:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1542765359 2018/11/21 01:55:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -336,19 +336,21 @@ register int tx, ty; /* destination of mail daemon */
         else if (fx == u.ux && fy == u.uy)
             verbalize("Excuse me.");
 
+        if (mon)
+            remove_monster(fx, fy);
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);            /* see it */
         flush_screen(0);           /* make sure md shows up */
         delay_output();            /* wait a little bit */
 
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
+        remove_monster(fx, fy);
         if (mon) {
             if ((mon->mx != fx) || (mon->my != fy))
                 place_worm_seg(mon, fx, fy);
             else
                 place_monster(mon, fx, fy);
-        } else
-            remove_monster(fx, fy);
+        }
         newsym(fx, fy);
     }
 
@@ -357,9 +359,11 @@ register int tx, ty; /* destination of mail daemon */
      * very unlikely).  If one exists, then have the md leave in disgust.
      */
     if ((mon = m_at(fx, fy)) != 0) {
+        remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
         verbalize("This place's too crowded.  I'm outta here.");
+        remove_monster(fx, fy);
 
         if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
             place_worm_seg(mon, fx, fy);
@@ -418,7 +422,8 @@ struct mail_info *info;
 
 /* zip back to starting location */
 go_back:
-    (void) md_rush(md, start.x, start.y);
+    if (!md_rush(md, start.x, start.y))
+        md->mx = md->my = -1; /* for mongone, md is not on map */
     mongone(md);
 /* deliver some classes of messages even if no daemon ever shows up */
 give_up:
@@ -463,7 +468,7 @@ struct obj *otmp UNUSED;
         "Please find enclosed a small token to represent your Owlbear",
         "**FR33 P0T10N 0F FULL H34L1NG**",
         "Please return to sender (Asmodeus)",
-      "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
+     "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 

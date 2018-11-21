@@ -21,11 +21,13 @@
 WANT_WIN_TTY=1
 #WANT_WIN_X11=1
 #WANT_WIN_QT=1
+#WANT_WIN_CURSES=1
 
 # 1a. What is the default window system?
 WANT_DEFAULT=tty
 #WANT_DEFAULT=x11
 #WANT_DEFAULT=qt
+#WANT_DEFAULT=curses
 
 # 1b. If you set WANT_WIN_QT, you need to
 #  A) set QTDIR either here or in the environment to point to the Qt2 or Qt3
@@ -95,6 +97,13 @@ WINTTYLIB=-lncurses
 else	# !WANT_WIN_TTY
 CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
+
+ifdef WANT_WIN_CURSES
+CFLAGS += -DCURSES_GRAPHICS
+WINSRC += $(WINCURSESSRC)
+WINOBJ += $(WINCURSESOBJ)
+WINLIB += -lncurses
+endif
 
 ifdef WANT_WIN_X11
 WINSRC += $(WINX11SRC)
