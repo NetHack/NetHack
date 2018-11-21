@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1541312259 2018/11/04 06:17:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1542798625 2018/11/21 11:10:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -34,7 +34,6 @@ STATIC_PTR int FDECL(in_container, (struct obj *));
 STATIC_PTR int FDECL(out_container, (struct obj *));
 STATIC_DCL void FDECL(removed_from_icebox, (struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int, struct obj *));
-STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
 STATIC_DCL void FDECL(explain_container_prompt, (BOOLEAN_P));
 STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
 STATIC_DCL int FDECL(menu_loot, (int, BOOLEAN_P));
@@ -2321,45 +2320,66 @@ struct obj *item;
     return loss;
 }
 
-STATIC_OVL void
-observe_quantum_cat(box)
+/* used for #loot/apply, #tip, and final disclosure */
+void
+observe_quantum_cat(box, makecat, givemsg)
 struct obj *box;
+boolean makecat, givemsg;
 {
     static NEARDATA const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
-    struct monst *livecat;
+    struct monst *livecat = 0;
     xchar ox, oy;
+    boolean itsalive = !rn2(2);
 
-    box->spe = 0; /* box->owt will be updated below */
     if (get_obj_location(box, &ox, &oy, 0))
         box->ox = ox, box->oy = oy; /* in case it's being carried */
 
     /* this isn't really right, since any form of observation
        (telepathic or monster/object/food detection) ought to
-       force the determination of alive vs dead state; but basing
-       it just on opening the box is much simpler to cope with */
-    livecat = rn2(2)
-                  ? makemon(&mons[PM_HOUSECAT], box->ox, box->oy, NO_MINVENT)
-                  : 0;
-    if (livecat) {
-        livecat->mpeaceful = 1;
-        set_malign(livecat);
-        if (!canspotmon(livecat))
-            You("think %s brushed your %s.", something, body_part(FOOT));
-        else
-            pline("%s inside the box is still alive!", Monnam(livecat));
-        (void) christen_monst(livecat, sc);
-    } else {
-        deadcat = mk_named_object(CORPSE, &mons[PM_HOUSECAT],
-                                  box->ox, box->oy, sc);
-        if (deadcat) {
-            obj_extract_self(deadcat);
-            (void) add_to_container(box, deadcat);
+       force the determination of alive vs dead state; but basing it
+       just on opening or disclosing the box is much simpler to cope with */
+
+    /* SchroedingersBox already has a cat corpse in it */
+    deadcat = box->cobj;
+    if (itsalive) {
+        if (makecat)
+            livecat = makemon(&mons[PM_HOUSECAT], box->ox, box->oy,
+                              NO_MINVENT | MM_ADJACENTOK);
+        if (livecat) {
+            livecat->mpeaceful = 1;
+            set_malign(livecat);
+            if (givemsg) {
+                if (!canspotmon(livecat))
+                    You("think %s brushed your %s.", something,
+                        body_part(FOOT));
+                else
+                    pline("%s inside the box is still alive!",
+                          Monnam(livecat));
+            }
+            (void) christen_monst(livecat, sc);
+            if (deadcat) {
+                obj_extract_self(deadcat);
+                obfree(deadcat, (struct obj *) 0), deadcat = 0;
+            }
+            box->owt = weight(box);
+            box->spe = 0;
         }
-        pline_The("%s inside the box is dead!",
-                  Hallucination ? rndmonnam((char *) 0) : "housecat");
+    } else {
+        box->spe = 0; /* now an ordinary box (with a cat corpse inside) */
+        if (deadcat) {
+            /* set_corpsenm() will start the rot timer that was removed
+               when makemon() created SchroedingersBox; start it from
+               now rather than from when this special corpse got created */
+            deadcat->age = monstermoves;
+            set_corpsenm(deadcat, PM_HOUSECAT);
+            deadcat = oname(deadcat, sc);
+        }
+        if (givemsg)
+            pline_The("%s inside the box is dead!",
+                      Hallucination ? rndmonnam((char *) 0) : "housecat");
     }
-    box->owt = weight(box);
+    nhUse(deadcat);
     return;
 }
 
@@ -2472,7 +2492,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     /* check for Schroedinger's Cat */
     quantum_cat = SchroedingersBox(current_container);
     if (quantum_cat) {
-        observe_quantum_cat(current_container);
+        observe_quantum_cat(current_container, TRUE, TRUE);
         used = 1;
     }
 
@@ -3096,7 +3116,7 @@ struct obj *box; /* or bag */
     } else if (SchroedingersBox(box)) {
         char yourbuf[BUFSZ];
 
-        observe_quantum_cat(box);
+        observe_quantum_cat(box, TRUE, TRUE);
         if (!Has_contents(box)) /* evidently a live cat came out */
             /* container type of "large box" is inferred */
             pline("%sbox is now empty.", Shk_Your(yourbuf, box));

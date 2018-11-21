@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1518053380 2018/02/08 01:29:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1542798624 2018/11/21 11:10:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1388,8 +1388,6 @@ register struct obj *obj;
        when we assume this is a brand new glob so use objects[].oc_weight */
     if (obj->globby && obj->owt > 0)
         wt = obj->owt;
-    if (SchroedingersBox(obj))
-        wt += mons[PM_HOUSECAT].cwt;
     if (Is_container(obj) || obj->otyp == STATUE) {
         struct obj *contents;
         register int cwt = 0;
