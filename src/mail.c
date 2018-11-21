@@ -423,7 +423,7 @@ struct mail_info *info;
 /* zip back to starting location */
 go_back:
     if (!md_rush(md, start.x, start.y))
-        md->mx = md->my = -1; /* for mongone, md is not on map */
+        md->mx = md->my = 0; /* for mongone, md is not on map */
     mongone(md);
 /* deliver some classes of messages even if no daemon ever shows up */
 give_up:

@@ -484,7 +484,7 @@ fail_mon_placement:
                 && !LEVEL_SPECIFIC_NOCORPSE(mtmp->data))
                 (void) mkcorpstat(CORPSE, mtmp, mtmp->data,
                                   xlocale, ylocale, CORPSTAT_NONE);
-            mtmp->mx = mtmp->my = -1; /* for mongone, mon is not anywhere */
+            mtmp->mx = mtmp->my = 0; /* for mongone, mon is not anywhere */
             mongone(mtmp);
         }
     }
