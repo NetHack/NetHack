@@ -1380,7 +1380,7 @@ getobj(let, word)
 register const char *let, *word;
 {
     register struct obj *otmp;
-    register char ilet;
+    register char ilet = 0;
     char buf[BUFSZ], qbuf[QBUFSZ];
     char lets[BUFSZ], altlets[BUFSZ], *ap;
     register int foo = 0;

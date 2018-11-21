@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1496087244 2017/05/29 19:47:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1542765361 2018/11/21 01:56:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -857,7 +857,7 @@ genericptr_t p2;
 
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
-            You("bump into %s. Ouch!",
+            You("bump into %s.  Ouch!",
                 Hallucination ? "an invisible tree"
                               : "some kind of invisible wall");
         else

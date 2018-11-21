@@ -108,7 +108,7 @@ enum levl_typ_types {
 /*
  * The screen symbols may be the default or defined at game startup time.
  * See drawing.c for defaults.
- * Note: {ibm|dec}_graphics[] arrays (also in drawing.c) must be kept in
+ * Note: {ibm|dec|curses}_graphics[] arrays (also in drawing.c) must be kept in
  * synch.
  */
 
@@ -294,9 +294,10 @@ struct symsetentry {
  * Must match the order of the known_handlers strings
  * in drawing.c
  */
-#define H_UNK 0
-#define H_IBM 1
-#define H_DEC 2
+#define H_UNK     0
+#define H_IBM     1
+#define H_DEC     2
+#define H_CURS    3
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
@@ -629,8 +630,19 @@ extern dlevel_t level; /* structure describing the current level */
 #define MON_BURIED_AT(x, y)                     \
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
+#if EXTRA_SANITY_CHECKS
+#define place_worm_seg(m, x, y) do { \
+    if (level.monsters[x][y] && level.monsters[x][y] != m) impossible("place_worm_seg over mon"); \
+    level.monsters[x][y] = m; \
+    } while(0)
+#define remove_monster(x, y) do { \
+    if (!level.monsters[x][y]) impossible("no monster to remove"); \
+    level.monsters[x][y] = (struct monst *) 0; \
+    } while(0)
+#else
 #define place_worm_seg(m, x, y) level.monsters[x][y] = m
 #define remove_monster(x, y) level.monsters[x][y] = (struct monst *) 0
+#endif
 #define m_at(x, y) (MON_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)
 #define m_buried_at(x, y) \
     (MON_BURIED_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)

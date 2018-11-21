@@ -536,6 +536,11 @@ skip_lots:
     saveobjchn(fd, level.buriedobjlist, mode);
     saveobjchn(fd, billobjs, mode);
     if (release_data(mode)) {
+        int x,y;
+
+        for (y = 0; y < ROWNO; y++)
+            for (x = 0; x < COLNO; x++)
+                level.monsters[x][y] = 0;
         fmon = 0;
         ftrap = 0;
         fobj = 0;

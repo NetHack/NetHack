@@ -1,0 +1,34 @@
+# OS X temporary files that should never be committed
+#
+.DS_Store
+.Trashes
+*.swp
+#*.lock
+# 
+# NB: NIB/XIB files still exist even on Storyboard projects, so we want this...
+*~.nib
+#
+# NB: slash on the end, so we only remove the FOLDER, not any files that were badly named "DerivedData"
+DerivedData/
+# NB: slash on the end, so we only remove the FOLDER, not any files that were badly named "build"
+build/
+# Xcode private settings (window sizes, bookmarks, breakpoints, custom executables, smart groups)
+#
+#*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+#    NB: also, whitelist the default ones, some projects need to use these
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+####
+# Xcode 4 - semi-personal settings
+*.xccheckout
+#     throw away ALL personal settings (including custom schemes!
+#     - unless they are "shared")
+# As per build/ and DerivedData/, this ought to have a trailing slash
+xcuserdata/
+#
+*.moved-aside

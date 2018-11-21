@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1541806894 2018/11/09 23:41:34 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1542765364 2018/11/21 01:56:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -529,7 +529,7 @@ int reason; /* Player was thrown off etc. */
             return;
         }
         if (!have_spot) {
-            You("can't. There isn't anywhere for you to stand.");
+            You("can't.  There isn't anywhere for you to stand.");
             return;
         }
         if (!has_mname(mtmp)) {
@@ -704,6 +704,8 @@ int x, y;
                    (mon == u.usteed) ? "steed" : "defunct monster");
         return;
     }
+    if (level.monsters[x][y])
+        impossible("placing monster over another?");
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
 }

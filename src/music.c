@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1517877381 2018/02/06 00:36:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1542765361 2018/11/21 01:56:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -328,7 +328,7 @@ int force;
 
                     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                         if (cansee(x, y))
-                            pline("KADOOM! The boulder falls into a chasm%s!",
+                            pline("KADOOM!  The boulder falls into a chasm%s!",
                                   (x == u.ux && y == u.uy) ? " below you"
                                                            : "");
                         if (mtmp)

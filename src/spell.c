@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1508479722 2017/10/20 06:08:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1542765363 2018/11/21 01:56:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1230,7 +1230,7 @@ throwspell()
     struct monst *mtmp;
 
     if (u.uinwater) {
-        pline("You're joking! In this weather?");
+        pline("You're joking!  In this weather?");
         return 0;
     } else if (Is_waterlevel(&u.uz)) {
         You("had better wait for the sun to come out.");

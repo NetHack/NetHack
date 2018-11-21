@@ -146,6 +146,15 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #LINK = gcc
 #LFLAGS = -Xlinker -soname=_APP_
 
+# Compile with PDCurses installed in a separate directory that doesn't
+# conflict with the system curses/ncurses library
+#CFLAGS = -O -I../include -I/usr/local/include/pdcurses
+# Same as above, but for XCurses
+#CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
+# Compile against system curses library, such as ncurses
+#CFLAGS = -O -I../include
+
+
 # Only used for the Gnome interface.
 # When including the Gnome interface, you need to include gnome specific
 # directories.  The ones given below is the usual spot for linux systems.
@@ -189,6 +198,14 @@ REGEXOBJ = posixregex.o
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
 	../win/tty/wintty.c
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o
+#
+# Files for curses interface
+WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
+	../win/curses/cursmisc.c ../win/curses/cursdial.c \
+	../win/curses/cursstat.c ../win/curses/cursinit.c \
+	../win/curses/cursmesg.c ../win/curses/cursinvt.c
+WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
+	cursinit.o cursmesg.o cursinvt.o
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -243,12 +260,15 @@ WINBEOBJ =
 #WINBESRC = ../win/BeOS/winbe.cpp ../win/BeOS/NHWindow.cpp \
 #	../win/BeOS/NHMenuWindow.cpp ../win/BeOS/NHMapWindow.cpp tile.c
 #WINBEOBJ = winbe.o NHWindow.o NHMenuWindow.o NHMapWindow.o tile.o
-
 #
 #
 #WINSRC = $(WINTTYSRC)
 #WINOBJ = $(WINTTYOBJ)
-
+#
+# Curses - Karl Garrison, Tangles
+#WINSRC = $(WINCURSESSRC)
+#WINOBJ = $(WINCURSESOBJ)
+#
 # on some systems the termcap library is in -ltermcap or -lcurses
 # on 386 Xenix, the -ltermlib tputs() seems not to work; use -lcurses instead
 # Sysatt uses shared library in lieu of this option
@@ -272,6 +292,7 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 # WINX11LIB = -lXaw -lXmu -lXext -lXt -lXpm -lX11 -lm
 # WINX11LIB = -lXaw -lXmu -lXpm -lXext -lXt -lX11 -lSM -lICE -lm # BSD/OS 2.0
 #
+#
 # libraries for Qt 3
 WINQTLIB = -L$(QTDIR)/lib -lqt
 #
@@ -292,9 +313,20 @@ WINGEMLIB = -le_gem -lgem
 #
 # libraries for BeOS 
 WINBELIB = -lbe
-
+#
+# libraries for curses port
+# link with ncurses
+WINCURSESLIB = -lncurses
+# link with pdcurses for SDL, installed in a separate directory
+#WINCURSESLIB = -L/usr/local/lib/pdcurses -lpdcurses -lSDL
+# same as above, for XCurses
+#WINCURSESLIB = -L/usr/local/lib/pdcurses -lXCurses -lXawM -lXmu -lXext -lXt -lX11
+#
 #WINLIB = $(WINTTYLIB)
-
+#
+# For Curses
+#WINLIB = $(WINCURSESLIB)
+#
 # any other strange libraries your system needs (for Sysunix only -- the more
 # specialized targets should already be right)
 #
@@ -743,6 +775,29 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/curswins.h
+	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
+cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmisc.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/func_tab.h \
+		../include/wincurs.h ../win/curses/cursdial.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
+cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursstat.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
+cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinit.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
+cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinvt.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
+cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursmesg.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c

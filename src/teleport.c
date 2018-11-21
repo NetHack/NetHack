@@ -1005,8 +1005,8 @@ register int x, y;
     register int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
 
-    if (x == mtmp->mx && y == mtmp->my) /* that was easy */
-        return;
+    if (x == mtmp->mx && y == mtmp->my && m_at(x,y) == mtmp)
+        return; /* that was easy */
 
     if (oldx) { /* "pick up" monster */
         if (mtmp->wormno) {

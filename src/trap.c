@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1524312044 2018/04/21 12:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.290 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1542765365 2018/11/21 01:56:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1523,7 +1523,7 @@ unsigned trflags;
         int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
         feeltrap(trap);
-        pline("Click! You trigger a rolling boulder trap!");
+        pline("Click!  You trigger a rolling boulder trap!");
         if (!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                         trap->launch2.x, trap->launch2.y, style)) {
             deltrap(trap);
@@ -2673,7 +2673,7 @@ register struct monst *mtmp;
 
                 newsym(mtmp->mx, mtmp->my);
                 if (in_sight)
-                    pline("Click! %s triggers %s.", Monnam(mtmp),
+                    pline("Click!  %s triggers %s.", Monnam(mtmp),
                           trap->tseen ? "a rolling boulder trap" : something);
                 if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                                trap->launch2.x, trap->launch2.y, style)) {
@@ -4064,7 +4064,7 @@ boolean force_failure;
 
                         if (ttmp2) {
                             pline_The(
-                                "webbing sticks to you. You're caught too!");
+                                "webbing sticks to you.  You're caught too!");
                             dotrap(ttmp2, NOWEBMSG);
                             if (u.usteed && u.utrap) {
                                 /* you, not steed, are trapped */
@@ -4402,7 +4402,7 @@ boolean force;
                     deal_with_floor_trap = FALSE;
                 } else {
                     Sprintf(
-                        qbuf, "There %s and %s here. %s %s?",
+                        qbuf, "There %s and %s here.  %s %s?",
                         (boxcnt == 1) ? "is a container" : "are containers",
                         an(trapdescr),
                         (ttmp->ttyp == WEB) ? "Remove" : "Disarm", the_trap);

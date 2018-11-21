@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1526769961 2018/05/19 22:46:01 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.246 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1542765339 2018/11/21 01:55:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -116,7 +116,7 @@ struct obj *obj;
             if (!ublindf) {
                 old = u.ucreamed;
                 u.ucreamed += rn1(10, 3);
-                pline("Yecch! Your %s %s gunk on it!", body_part(FACE),
+                pline("Yecch!  Your %s %s gunk on it!", body_part(FACE),
                       (old ? "has more" : "now has"));
                 make_blinded(Blinded + (long) u.ucreamed - old, TRUE);
             } else {

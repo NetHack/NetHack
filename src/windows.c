@@ -6,6 +6,9 @@
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
+#ifdef CURSES_GRAPHICS
+extern struct window_procs curses_procs;
+#endif
 #ifdef X11_GRAPHICS
 /* Cannot just blindly include winX.h without including all of X11 stuff
    and must get the order of include files right.  Don't bother. */
@@ -91,6 +94,9 @@ static struct win_choices {
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
     { &tty_procs, win_tty_init CHAINR(0) },
+#endif
+#ifdef CURSES_GRAPHICS
+    { &curses_procs, 0 },
 #endif
 #ifdef X11_GRAPHICS
     { &X11_procs, win_X11_init CHAINR(0) },

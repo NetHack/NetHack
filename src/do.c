@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1542765356 2018/11/21 01:55:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1063,7 +1063,7 @@ doup()
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
             return 0;
-        if (yn("Beware, there will be no return! Still climb?") != 'y')
+        if (yn("Beware, there will be no return!  Still climb?") != 'y')
             return 0;
     }
     if (!next_to_u()) {
@@ -1446,7 +1446,7 @@ boolean at_stairs, falling, portal;
                with the situation, so only say something when debugging */
             if (wizard)
                 pline("(monster in hero's way)");
-            if (!rloc(mtmp, TRUE))
+            if (!rloc(mtmp, TRUE) || m_at(u.ux, u.uy))
                 /* no room to move it; send it away, to return later */
                 migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_RANDOM,
                                  (coord *) 0);
