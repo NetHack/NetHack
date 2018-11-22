@@ -247,7 +247,7 @@ PKGROOT_UG	= PKGROOT/$(PREFIX)
 PKGROOT_UGLN	= PKGROOT/$(HACKDIR)
 PKGROOT_BIN	= PKGROOT/$(SHELLDIR)
 
-#DEVELOPER_CERT = Developer ID Installer: John Doe (XXXXXXXXXX)
+#DEVELOPER_CERT = Developer ID Installer: Bart House
 DEVELOPER_CERT = NONE
 
 spotless::
@@ -255,9 +255,9 @@ spotless::
 	rm -rf PKG
 	rm -rf PKGSCRIPTS
 	rm -rf PKGROOT
-	rm Info.plist
-	rm Distribution.xml
-	rm NetHack-*-mac-Term*
+	rm -f Info.plist
+	rm -f Distribution.xml
+	rm -f NetHack-*-mac-Term*
 
 build_tty_pkg:
 ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
@@ -307,7 +307,7 @@ endif
 
 sign_tty_pkg:
 	productsign --timestamp=none --sign "$(DEVELOPER_CERT)" NetHack-$(SVS)-mac-Term-unsigned.pkg NetHack-$(SVS)-mac-Term.pkg || (echo "Package signing failed"; exit 1)
-	spctl -a -v --type install NetHack-362-0-mac-Term.pkg || (echo "Package not signed properly"; exit 1)
+	spctl -a -v --type install NetHack-$(SVS)-mac-Term.pkg || (echo "Package not signed properly"; exit 1)
 	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
 
 build_package_root:
