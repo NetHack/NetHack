@@ -1600,15 +1600,13 @@ boolean showmsg;
     return TRUE;
 }
 
-static int jumping_is_magic;
-
 STATIC_OVL boolean
 get_valid_jump_position(x,y)
 int x,y;
 {
     return (isok(x, y)
             && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
-            && is_valid_jump_pos(x, y, jumping_is_magic, FALSE));
+            && is_valid_jump_pos(x, y, icontext.jumping_is_magic, FALSE));
 }
 
 void
@@ -1722,7 +1720,7 @@ int magic; /* 0=Physical, otherwise skill level */
     pline("Where do you want to jump?");
     cc.x = u.ux;
     cc.y = u.uy;
-    jumping_is_magic = magic;
+    icontext.jumping_is_magic = magic;
     getpos_sethilite(display_jump_positions, get_valid_jump_position);
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
@@ -2914,16 +2912,13 @@ int min_range, max_range;
     return TRUE;
 }
 
-static int polearm_range_min = -1;
-static int polearm_range_max = -1;
-
 STATIC_OVL boolean
 get_valid_polearm_position(x, y)
 int x, y;
 {
     return (isok(x, y) && ACCESSIBLE(levl[x][y].typ)
-            && distu(x, y) >= polearm_range_min
-            && distu(x, y) <= polearm_range_max);
+            && distu(x, y) >= icontext.polearm_range_min
+            && distu(x, y) <= icontext.polearm_range_max);
 }
 
 void
@@ -2995,8 +2990,8 @@ struct obj *obj;
     else
         max_range = 8; /* (P_SKILL(typ) >= P_EXPERT) */
 
-    polearm_range_min = min_range;
-    polearm_range_max = max_range;
+    icontext.polearm_range_min = min_range;
+    icontext.polearm_range_max = max_range;
 
     /* Prompt for a location */
     pline(where_to_hit);

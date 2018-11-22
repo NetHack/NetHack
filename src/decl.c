@@ -284,7 +284,7 @@ char *fqn_prefix_names[PREFIX_COUNT] = {
 };
 #endif
 
-NEARDATA struct savefile_info sfcap = {
+const struct savefile_info default_sfinfo = {
 #ifdef NHSTDC
     0x00000000UL
 #else
@@ -307,28 +307,7 @@ NEARDATA struct savefile_info sfcap = {
 #endif
 };
 
-NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
-#ifdef NHSTDC
-    0x00000000UL
-#else
-    0x00000000L
-#endif
-#if defined(COMPRESS) || defined(ZLIB_COMP)
-        | SFI1_EXTERNALCOMP
-#endif
-#if defined(ZEROCOMP)
-        | SFI1_ZEROCOMP
-#endif
-#if defined(RLECOMP)
-        | SFI1_RLECOMP
-#endif
-    ,
-#ifdef NHSTDC
-    0x00000000UL, 0x00000000UL
-#else
-    0x00000000L, 0x00000000L
-#endif
-};
+NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 
@@ -345,5 +324,31 @@ decl_init()
 {
     return;
 }
+
+const struct instance_context icontext_initial_state = {
+    0,  /* oldcap - last encumberance in pickup.c */
+    0,  /* petname_used - dog.c */
+    0,  /* jumping_is_magic - apply.c */
+    -1, /* polearm_range_min - apply.c */
+    -1, /* polearm_range_max - apply.c */
+    0,  /* spec_dbon_applies - artifact.c */
+    0,  /* mrank_sz - botl.c */
+    STRANGE_OBJECT, /* nocreate - ini_inv() in u_init.c */
+    STRANGE_OBJECT, /* nocreate2 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate3 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate4 - ini_inv() in u_init.c  */
+};
+
+struct instance_context icontext;
+
+void 
+icontext_init() 
+{
+    icontext = icontext_initial_state;
+
+    sfcap = default_sfinfo;
+    sfrestinfo = default_sfinfo;
+    sfsaveinfo = default_sfinfo;
+};
 
 /*decl.c*/

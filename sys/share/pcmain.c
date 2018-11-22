@@ -97,7 +97,9 @@ char *argv[];
 
     nethack_enter(argc, argv);
 
+    icontext_init();
     sys_early_init();
+
 #if defined(WIN32) && defined(TTY_GRAPHICS)
     Strcpy(default_window_sys, "tty");
 #else

@@ -192,6 +192,7 @@ E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;
+
 E const char *occtxt; /* defined when occupation != NULL */
 E const char *nomovemsg;
 E char lock[];
@@ -436,6 +437,31 @@ struct early_opt {
     int minlength;
     boolean valallowed;
 };
+
+/* instance_context holds per game instance data that does not need to be
+ * persisted upon game exit.  This game instance data is one of the first
+ * things initialized during the initialization of the game engine.
+ * It is initialized with icontext_initial_state found in decl.c */
+
+struct instance_context {
+    int oldcap; /* encumberance - pickup.c */
+    int petname_used; /* user preferred pet name has been used - dog.c */
+    int jumping_is_magic; /* current jump result of magic - apply.c */
+    int polearm_range_min; /* apply.c */
+    int polearm_range_max; /* apply.c */
+    int spec_dbon_applies; /* coordinate effects from spec_dbon() with 
+                            * messages in artifact_hit() - artifact.c */
+    int mrank_sz; /* loaded by max_rank_sz - botl.c */
+    short nocreate; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate2; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate3; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate4; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+};
+
+E struct instance_context icontext;
+
+E void icontext_init();
+
 
 #undef E
 
