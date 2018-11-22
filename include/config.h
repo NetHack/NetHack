@@ -552,6 +552,11 @@ typedef unsigned char uchar;
 
 #endif
 
+/* PLAYAGAIN is support for allowing the game shell to stay open after the player
+   saves or dies.  This requires that the game engine can be re-entered to start
+   another game.  This support is primarily about ensuring that game engine
+   state is cleaned up properly to allow the game engine to be re-initialized. */
+/* #define PLAYAGAIN */
 
 /* End of Section 4 */
 
