@@ -251,6 +251,9 @@ E void FDECL(destroy_drawbridge, (int, int));
 /* ### decl.c ### */
 
 E void NDECL(decl_init);
+#ifdef PLAYAGAIN
+E void NDECL(decl_early_init);
+#endif
 
 /* ### detect.c ### */
 

@@ -97,7 +97,11 @@ char *argv[];
 
     nethack_enter(argc, argv);
 
+#ifdef PLAYAGAIN
+    decl_early_init();
+#endif
     sys_early_init();
+
 #if defined(WIN32) && defined(TTY_GRAPHICS)
     Strcpy(default_window_sys, "tty");
 #else
