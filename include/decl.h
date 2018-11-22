@@ -192,6 +192,8 @@ E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;
+E int petname_used;
+
 E const char *occtxt; /* defined when occupation != NULL */
 E const char *nomovemsg;
 E char lock[];
@@ -436,6 +438,22 @@ struct early_opt {
     int minlength;
     boolean valallowed;
 };
+
+/* instance_context holds per game instance data that does not need to be
+ * persisted upon game exit.  This game instance data is one of the first
+ * things initialized during the initialization of the game engine.
+ * It is initialized with icontext_initial_state found in decl.c */
+
+#define PLAYAGAIN
+
+struct instance_context {
+    int oldcap; /* encumberance - pickup.c */
+};
+
+E struct instance_context icontext;
+
+E void icontext_init();
+
 
 #undef E
 

@@ -37,6 +37,7 @@ char *argv[];
 {
     boolean resuming;
 
+    icontext_init();
     sys_early_init();
     Strcpy(default_window_sys, "tty");
     resuming = pcmain(argc, argv);
