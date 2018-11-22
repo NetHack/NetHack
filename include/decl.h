@@ -437,6 +437,9 @@ struct early_opt {
     boolean valallowed;
 };
 
+/* encumbrance */
+E int oldcap;
+
 #undef E
 
 #endif /* DECL_H */
