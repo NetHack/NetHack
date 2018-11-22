@@ -1,8 +1,8 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.6.2"
-$ ! $NHDT-Date: 1542411224 2018/11/16 23:33:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.19 $
-# Copyright (c) 2018 by Robert Patrick Rankin
-# NetHack may be freely redistributed.  See license for details.
+$ ! $NHDT-Date: 1542847646 2018/11/22 00:47:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
+$ ! Copyright (c) 2018 by Robert Patrick Rankin
+$ ! NetHack may be freely redistributed.  See license for details.
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]
@@ -178,8 +178,13 @@ $	nethacklib = "[-.src]nethack.olb"
 $	create nethack.opt
 ! nethack.opt
 nethack.olb/Include=(vmsmain)/Library
+! lib$initialize is used to call a routine (before main()) in vmsunix.c that
+! tries to check whether debugger support has been linked in, for PANICTRACE
 sys$library:starlet.olb/Include=(lib$initialize)
-psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
+! psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
+! IA64 linker doesn't support Usr or Pic and complains that Long is too small
+psect_attr=lib$initialize, Con,Rel,Gbl,noShr,noExe,Rd,noWrt
+! increase memory available to RMS (the default iosegment is probably adequate)
 iosegment=128
 $	if f$search("nethack.opt;-2").nes."" then  purge/Keep=2/noLog nethack.opt
 $	milestone = "write sys$output f$fao("" !5%T "",0),"
