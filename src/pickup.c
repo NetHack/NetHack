@@ -1556,7 +1556,6 @@ struct obj *otmp;
 int
 encumber_msg()
 {
-    static int oldcap = UNENCUMBERED;
     int newcap = near_capacity();
 
     if (oldcap < newcap) {
