@@ -974,16 +974,15 @@ register struct trobj *trop;
     struct obj *obj;
     int otyp, i;
 
-	NEARDATA short nocreate = STRANGE_OBJECT;
-	NEARDATA short nocreate2 = STRANGE_OBJECT;
-	NEARDATA short nocreate3 = STRANGE_OBJECT;
-	NEARDATA short nocreate4 = STRANGE_OBJECT;
-
-	while (trop->trclass) {
+    while (trop->trclass) {
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
+            static NEARDATA short nocreate = STRANGE_OBJECT;
+            static NEARDATA short nocreate2 = STRANGE_OBJECT;
+            static NEARDATA short nocreate3 = STRANGE_OBJECT;
+            static NEARDATA short nocreate4 = STRANGE_OBJECT;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
