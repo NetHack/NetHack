@@ -294,14 +294,41 @@ struct savefile_info {
     unsigned long sfi3; /* thirdparty */
 };
 #ifdef NHSTDC
+#define SFI_ZERO (0UL)
 #define SFI1_EXTERNALCOMP (1UL)
 #define SFI1_RLECOMP (1UL << 1)
 #define SFI1_ZEROCOMP (1UL << 2)
 #else
+#define SFI_ZERO (0L)
 #define SFI1_EXTERNALCOMP (1L)
 #define SFI1_RLECOMP (1L << 1)
 #define SFI1_ZEROCOMP (1L << 2)
 #endif
+
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+#define SFI1_DEFAULT_EXTERNALCOMP SFI1_EXTERNALCOMP
+#else
+#define SFI1_DEFAULT_EXTERNALCOMP SFI_ZERO
+#endif
+
+#if defined(ZEROCOMP)
+#define SFI1_DEFAULT_ZEROCOMP SFI1_EXTERNALCOMP
+#else
+#define SFI1_DEFAULT_ZEROCOMP SFI_ZERO
+#endif
+
+#if defined(RLECOMP)
+#define SFI1_DEFAULT_RLECOMP SFI1_RLECOMP
+#else
+#define SFI1_DEFAULT_RLECOMP SFI_ZERO
+#endif
+
+#define SFI1_DEFAULT (SFI1_DEFAULT_EXTERNALCOMP | \
+                      SFI1_DEFAULT_ZEROCOMP |     \
+                      SFI1_DEFAULT_RLECOMP)
+#define SFI2_DEFAULT SFI_ZERO
+#define SFI3_DEFAULT SFI_ZERO
+
 
 /*
  * Configurable internal parameters.
