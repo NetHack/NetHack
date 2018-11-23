@@ -414,6 +414,6 @@ instance_globals_init()
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;
     sfsaveinfo = default_sfinfo;
-};
+}
 
 /*decl.c*/
