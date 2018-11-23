@@ -348,6 +348,9 @@ const struct instance_globals g_init = {
     /* pickup.c */
     0,  /* oldcap */
 
+    /* polyself.c */
+    0, /* sex_change_ok */
+
     /* potion.c */
     FALSE, /* notonhead */
     UNDEFINED_VALUE, /* potion_nothing */

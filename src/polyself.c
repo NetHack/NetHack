@@ -33,10 +33,6 @@ STATIC_DCL void NDECL(polysense);
 STATIC_VAR const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
 
-/* controls whether taking on new form or becoming new man can also
-   change sex (ought to be an arg to polymon() and newman() instead) */
-STATIC_VAR int sex_change_ok = 0;
-
 /* update the youmonst.data structure pointer and intrinsics */
 void
 set_uasmon()
@@ -296,7 +292,7 @@ newman()
         u.ulevelmax = newlvl;
     u.ulevel = newlvl;
 
-    if (sex_change_ok && !rn2(10))
+    if (g.sex_change_ok && !rn2(10))
         change_sex();
 
     adjabil(oldlvl, (int) u.ulevel);
@@ -573,14 +569,14 @@ int psflags;
     /* The below polyok() fails either if everything is genocided, or if
      * we deliberately chose something illegal to force newman().
      */
-    sex_change_ok++;
+    g.sex_change_ok++;
     if (!polyok(&mons[mntmp]) || (!forcecontrol && !rn2(5))
         || your_race(&mons[mntmp])) {
         newman();
     } else {
         (void) polymon(mntmp);
     }
-    sex_change_ok--; /* reset */
+    g.sex_change_ok--; /* reset */
 
 made_change:
     new_light = emits_light(youmonst.data);
@@ -650,7 +646,7 @@ int mntmp;
         if (!flags.female)
             dochange = TRUE;
     } else if (!is_neuter(&mons[mntmp]) && mntmp != u.ulycn) {
-        if (sex_change_ok && !rn2(10))
+        if (g.sex_change_ok && !rn2(10))
             dochange = TRUE;
     }
 
