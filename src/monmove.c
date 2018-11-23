@@ -7,8 +7,6 @@
 #include "mfndpos.h"
 #include "artifact.h"
 
-extern boolean notonhead;
-
 STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
 STATIC_DCL int FDECL(disturb, (struct monst *));
 STATIC_DCL void FDECL(release_hero, (struct monst *));
@@ -877,7 +875,7 @@ register int after;
          */
         if ((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) && intruder
             && (intruder != mtmp)) {
-            notonhead = (intruder->mx != tx || intruder->my != ty);
+            g.notonhead = (intruder->mx != tx || intruder->my != ty);
             if (mattackm(mtmp, intruder) == 2)
                 return 2;
             mmoved = 1;
@@ -1222,7 +1220,7 @@ not_special:
             int mstatus;
             mtmp2 = m_at(nix, niy);
 
-            notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
+            g.notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
             /* note: mstatus returns 0 if mtmp2 is nonexistent */
             mstatus = mattackm(mtmp, mtmp2);
 
@@ -1232,7 +1230,7 @@ not_special:
             if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
                 && mtmp2->movement >= NORMAL_SPEED) {
                 mtmp2->movement -= NORMAL_SPEED;
-                notonhead = 0;
+                g.notonhead = 0;
                 mstatus = mattackm(mtmp2, mtmp); /* return attack */
                 if (mstatus & MM_DEF_DIED)
                     return 2;

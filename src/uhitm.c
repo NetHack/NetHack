@@ -24,8 +24,6 @@ STATIC_DCL boolean FDECL(hmonas, (struct monst *));
 STATIC_DCL void FDECL(nohandglow, (struct monst *));
 STATIC_DCL boolean FDECL(shade_aware, (struct obj *));
 
-extern boolean notonhead; /* for long worms */
-
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
 
 void
@@ -467,7 +465,7 @@ int dieroll;
 
         /* we hit the monster; be careful: it might die or
            be knocked into a different location */
-        notonhead = (mon->mx != x || mon->my != y);
+        g.notonhead = (mon->mx != x || mon->my != y);
         malive = hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             /* monster still alive */
@@ -1808,7 +1806,7 @@ register struct attack *mattk;
     case AD_DRIN: {
         struct obj *helmet;
 
-        if (notonhead || !has_head(pd)) {
+        if (g.notonhead || !has_head(pd)) {
             pline("%s doesn't seem harmed.", Monnam(mdef));
             tmp = 0;
             if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {

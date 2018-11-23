@@ -348,6 +348,11 @@ const struct instance_globals g_init = {
     /* pickup.c */
     0,  /* oldcap */
 
+    /* potion.c */
+    FALSE, /* notonhead */
+    UNDEFINED_VALUE, /* potion_nothing */
+    UNDEFINED_VALUE, /* potion_unkn */
+
     /* read.c */
     UNDEFINED_VALUE, /* known */
 

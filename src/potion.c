@@ -5,9 +5,6 @@
 
 #include "hack.h"
 
-boolean notonhead = FALSE;
-
-static NEARDATA int nothing, unkn;
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
 STATIC_DCL long FDECL(itimeout, (long));
@@ -537,17 +534,17 @@ register struct obj *otmp;
     int retval;
 
     otmp->in_use = TRUE;
-    nothing = unkn = 0;
+    g.potion_nothing = g.potion_unkn = 0;
     if ((retval = peffects(otmp)) >= 0)
         return retval;
 
-    if (nothing) {
-        unkn++;
+    if (g.potion_nothing) {
+        g.potion_unkn++;
         You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "peculiar");
     }
     if (otmp->dknown && !objects[otmp->otyp].oc_name_known) {
-        if (!unkn) {
+        if (!g.potion_unkn) {
             makeknown(otmp->otyp);
             more_experienced(0, 10);
         } else if (!objects[otmp->otyp].oc_uname)
@@ -566,7 +563,7 @@ register struct obj *otmp;
     switch (otmp->otyp) {
     case POT_RESTORE_ABILITY:
     case SPE_RESTORE_ABILITY:
-        unkn++;
+        g.potion_unkn++;
         if (otmp->cursed) {
             pline("Ulch!  This makes you feel mediocre!");
             break;
@@ -606,7 +603,7 @@ register struct obj *otmp;
         break;
     case POT_HALLUCINATION:
         if (Hallucination || Halluc_resistance)
-            nothing++;
+            g.potion_nothing++;
         (void) make_hallucinated(itimeout_incr(HHallucination,
                                           rn1(200, 600 - 300 * bcsign(otmp))),
                                  TRUE, 0L);
@@ -618,7 +615,7 @@ register struct obj *otmp;
             newuhs(FALSE);
             break;
         }
-        unkn++;
+        g.potion_unkn++;
         if (is_undead(youmonst.data) || is_demon(youmonst.data)
             || u.ualign.type == A_CHAOTIC) {
             if (otmp->blessed) {
@@ -663,7 +660,7 @@ register struct obj *otmp;
         }
         break;
     case POT_BOOZE:
-        unkn++;
+        g.potion_unkn++;
         pline("Ooph!  This tastes like %s%s!",
               otmp->odiluted ? "watered down " : "",
               Hallucination ? "dandelion wine" : "liquid fire");
@@ -683,7 +680,7 @@ register struct obj *otmp;
         break;
     case POT_ENLIGHTENMENT:
         if (otmp->cursed) {
-            unkn++;
+            g.potion_unkn++;
             You("have an uneasy feeling...");
             exercise(A_WIS, FALSE);
         } else {
@@ -707,7 +704,7 @@ register struct obj *otmp;
         /* FALLTHRU */
     case POT_INVISIBILITY:
         if (Invis || Blind || BInvis) {
-            nothing++;
+            g.potion_nothing++;
         } else {
             self_invis_message();
         }
@@ -725,7 +722,7 @@ register struct obj *otmp;
     case POT_FRUIT_JUICE: {
         int msg = Invisible && !Blind;
 
-        unkn++;
+        g.potion_unkn++;
         if (otmp->cursed)
             pline("Yecch!  This tastes %s.",
                   Hallucination ? "overripe" : "rotten");
@@ -755,7 +752,7 @@ register struct obj *otmp;
         newsym(u.ux, u.uy);   /* see yourself! */
         if (msg && !Blind) {  /* Blind possible if polymorphed */
             You("can see through yourself, but you are visible!");
-            unkn--;
+            g.potion_unkn--;
         }
         break;
     }
@@ -790,8 +787,8 @@ register struct obj *otmp;
             int x, y;
 
             if (Detect_monsters)
-                nothing++;
-            unkn++;
+                g.potion_nothing++;
+            g.potion_unkn++;
             /* after a while, repeated uses become less effective */
             if ((HDetect_monsters & TIMEOUT) >= 300L)
                 i = 1;
@@ -805,11 +802,11 @@ register struct obj *otmp;
                         newsym(x, y);
                     }
                     if (MON_AT(x, y))
-                        unkn = 0;
+                        g.potion_unkn = 0;
                 }
             }
             see_monsters();
-            if (unkn)
+            if (g.potion_unkn)
                 You_feel("lonely.");
             break;
         }
@@ -874,11 +871,11 @@ register struct obj *otmp;
         if (!Confusion) {
             if (Hallucination) {
                 pline("What a trippy feeling!");
-                unkn++;
+                g.potion_unkn++;
             } else
                 pline("Huh, What?  Where am I?");
         } else
-            nothing++;
+            g.potion_nothing++;
         make_confused(itimeout_incr(HConfusion,
                                     rn1(7, 16 - 8 * bcsign(otmp))),
                       FALSE);
@@ -886,9 +883,9 @@ register struct obj *otmp;
     case POT_GAIN_ABILITY:
         if (otmp->cursed) {
             pline("Ulch!  That potion tasted foul!");
-            unkn++;
+            g.potion_unkn++;
         } else if (Fixed_abil) {
-            nothing++;
+            g.potion_nothing++;
         } else {      /* If blessed, increase all; if not, try up to */
             int itmp; /* 6 times to find one which can be increased. */
 
@@ -907,7 +904,7 @@ register struct obj *otmp;
         /* skip when mounted; heal_legs() would heal steed's legs */
         if (Wounded_legs && !otmp->cursed && !u.usteed) {
             heal_legs(0);
-            unkn++;
+            g.potion_unkn++;
             break;
         }
         /* FALLTHRU */
@@ -916,21 +913,21 @@ register struct obj *otmp;
             You("are suddenly moving %sfaster.", Fast ? "" : "much ");
         } else {
             Your("%s get new energy.", makeplural(body_part(LEG)));
-            unkn++;
+            g.potion_unkn++;
         }
         exercise(A_DEX, TRUE);
         incr_itimeout(&HFast, rn1(10, 100 + 60 * bcsign(otmp)));
         break;
     case POT_BLINDNESS:
         if (Blind)
-            nothing++;
+            g.potion_nothing++;
         make_blinded(itimeout_incr(Blinded,
                                    rn1(200, 250 - 125 * bcsign(otmp))),
                      (boolean) !Blind);
         break;
     case POT_GAIN_LEVEL:
         if (otmp->cursed) {
-            unkn++;
+            g.potion_unkn++;
             /* they went up a level */
             if ((ledger_no(&u.uz) == 1 && u.uhave.amulet)
                 || Can_rise_up(u.ux, u.uy, &u.uz)) {
@@ -1008,7 +1005,7 @@ register struct obj *otmp;
                that cursed effect yields "you float down" on next turn.
                Blessed and uncursed get one extra turn duration. */
         } else /* already levitating, or can't levitate */
-            nothing++;
+            g.potion_nothing++;
 
         if (otmp->cursed) {
             /* 'already levitating' used to block the cursed effect(s)
@@ -1023,7 +1020,7 @@ register struct obj *otmp;
                 (void) doup();
                 /* in case we're already Levitating, which would have
                    resulted in incrementing 'nothing' */
-                nothing = 0; /* not nothing after all */
+                g.potion_nothing = 0; /* not nothing after all */
             } else if (has_ceiling(&u.uz)) {
                 int dmg = rnd(!uarmh ? 10 : !is_metallic(uarmh) ? 6 : 3);
 
@@ -1031,7 +1028,7 @@ register struct obj *otmp;
                     ceiling(u.ux, u.uy));
                 losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
                        KILLED_BY);
-                nothing = 0; /* not nothing after all */
+                g.potion_nothing = 0; /* not nothing after all */
             }
         } else if (otmp->blessed) {
             /* at this point, timeout is already at least 1 */
@@ -1115,7 +1112,7 @@ register struct obj *otmp;
         }
         if (Stoned)
             fix_petrification();
-        unkn++; /* holy/unholy water can burn like acid too */
+        g.potion_unkn++; /* holy/unholy water can burn like acid too */
         break;
     case POT_POLYMORPH:
         You_feel("a little %s.", Hallucination ? "normal" : "strange");
@@ -1314,7 +1311,7 @@ int how;
                                           FALSE)));
             } else if (has_head(mon->data)) {
                 Sprintf(buf, "%s %s", s_suffix(mnam),
-                        (notonhead ? "body" : "head"));
+                        (g.notonhead ? "body" : "head"));
             } else {
                 Strcpy(buf, mnam);
             }

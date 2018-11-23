@@ -28,8 +28,6 @@ static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
 
 /* thrownobj (decl.c) tracks an object until it lands */
 
-extern boolean notonhead; /* for long worms */
-
 /* Throw the selected object, asking for direction */
 STATIC_OVL int
 throw_obj(obj, shotlimit)
@@ -1090,7 +1088,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                                      || Hallucination || Fumbling);
     boolean tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);
 
-    notonhead = FALSE; /* reset potentially stale value */
+    g.notonhead = FALSE; /* reset potentially stale value */
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
         boolean slipok = TRUE;
 
@@ -1263,7 +1261,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             return; /* alert shk caught it */
         }
         (void) snuff_candle(obj);
-        notonhead = (bhitpos.x != mon->mx || bhitpos.y != mon->my);
+        g.notonhead = (bhitpos.x != mon->mx || bhitpos.y != mon->my);
         obj_gone = thitmonst(mon, obj);
         /* Monster may have been tamed; this frees old mon */
         mon = m_at(bhitpos.x, bhitpos.y);
