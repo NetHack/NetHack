@@ -347,6 +347,8 @@ const struct instance_globals g_init = {
 
     /* pickup.c */
     0,  /* oldcap */
+    UNDEFINED_PTR, /* current_container */
+    UNDEFINED_VALUE, /* abort_looting */
 
     /* pline.c */
     0, /* pline_flags */

@@ -463,6 +463,11 @@ struct instance_globals {
 
     /* pickup.c */
     int oldcap; /* last encumberance */
+    /* current_container is set in use_container(), to be used by the
+       callback routines in_container() and out_container() from askchain()
+       and use_container(). Also used by menu_loot() and container_gone(). */
+    struct obj *current_container;
+    boolean abort_looting;
 
     /* pline.c */
     unsigned pline_flags;

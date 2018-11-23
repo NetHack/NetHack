@@ -62,12 +62,7 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w, n) (((w) * -100L) - ((n) + 50L) - 1L)
 
-/* A variable set in use_container(), to be used by the callback routines
-   in_container() and out_container() from askchain() and use_container().
-   Also used by menu_loot() and container_gone(). */
-static NEARDATA struct obj *current_container;
-static NEARDATA boolean abort_looting;
-#define Icebox (current_container->otyp == ICE_BOX)
+#define Icebox (g.current_container->otyp == ICE_BOX)
 
 static const char
         moderateloadmsg[] = "You have a little trouble lifting",
@@ -1695,7 +1690,7 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
         tmp = rnd(10);
         losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
-        abort_looting = TRUE;
+        g.abort_looting = TRUE;
         return 1;
     }
 
@@ -1720,7 +1715,7 @@ doloot()
     boolean prev_loot = FALSE;
     int num_conts = 0;
 
-    abort_looting = FALSE;
+    g.abort_looting = FALSE;
 
     if (check_capacity((char *) 0)) {
         /* "Can't do that while carrying so much stuff." */
@@ -1791,7 +1786,7 @@ doloot()
                 for (i = 1; i <= n; i++) {
                     cobj = pick_list[i - 1].item.a_obj;
                     timepassed |= do_loot_cont(&cobj, i, n);
-                    if (abort_looting) {
+                    if (g.abort_looting) {
                         /* chest trap or magic bag explosion or <esc> */
                         free((genericptr_t) pick_list);
                         return timepassed;
@@ -1816,7 +1811,7 @@ doloot()
                     anyfound = TRUE;
 
                     timepassed |= do_loot_cont(&cobj, 1, 1);
-                    if (abort_looting)
+                    if (g.abort_looting)
                         /* chest trap or magic bag explosion or <esc> */
                         return timepassed;
                 }
@@ -2076,17 +2071,17 @@ STATIC_PTR int
 in_container(obj)
 register struct obj *obj;
 {
-    boolean floor_container = !carried(current_container);
+    boolean floor_container = !carried(g.current_container);
     boolean was_unpaid = FALSE;
     char buf[BUFSZ];
 
-    if (!current_container) {
+    if (!g.current_container) {
         impossible("<in> no current_container?");
         return 0;
     } else if (obj == uball || obj == uchain) {
         You("must be kidding.");
         return 0;
-    } else if (obj == current_container) {
+    } else if (obj == g.current_container) {
         pline("That would be an interesting topological exercise.");
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
@@ -2141,7 +2136,7 @@ register struct obj *obj;
          *  of evaluation of the parameters is undefined.
          */
         Strcpy(buf, the(xname(obj)));
-        You("cannot fit %s into %s.", buf, the(xname(current_container)));
+        You("cannot fit %s into %s.", buf, the(xname(g.current_container)));
         return 0;
     }
 
@@ -2157,7 +2152,7 @@ register struct obj *obj;
             was_unpaid = obj->unpaid ? TRUE : FALSE;
             /* don't sell when putting the item into your own container,
              * but handle billing correctly */
-            sellobj_state(current_container->no_charge
+            sellobj_state(g.current_container->no_charge
                           ? SELL_DONTSELL : SELL_DELIBERATE);
             sellobj(obj, u.ux, u.uy);
             sellobj_state(SELL_NORMAL);
@@ -2174,7 +2169,7 @@ register struct obj *obj;
             if (rot_alarm)
                 obj->norevive = 1;
         }
-    } else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+    } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
         /* explicitly mention what item is triggering the explosion */
         pline("As you put %s inside, you are blasted by a magical explosion!",
               doname(obj));
@@ -2182,34 +2177,34 @@ register struct obj *obj;
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
         obfree(obj, (struct obj *) 0);
-        delete_contents(current_container);
+        delete_contents(g.current_container);
         if (!floor_container)
-            useup(current_container);
-        else if (obj_here(current_container, u.ux, u.uy))
-            useupf(current_container, current_container->quan);
+            useup(g.current_container);
+        else if (obj_here(g.current_container, u.ux, u.uy))
+            useupf(g.current_container, g.current_container->quan);
         else
             panic("in_container:  bag not found.");
 
         losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
-        current_container = 0; /* baggone = TRUE; */
+        g.current_container = 0; /* baggone = TRUE; */
     }
 
-    if (current_container) {
-        Strcpy(buf, the(xname(current_container)));
+    if (g.current_container) {
+        Strcpy(buf, the(xname(g.current_container)));
         You("put %s into %s.", doname(obj), buf);
 
         /* gold in container always needs to be added to credit */
         if (floor_container && obj->oclass == COIN_CLASS)
-            sellobj(obj, current_container->ox, current_container->oy);
-        (void) add_to_container(current_container, obj);
-        current_container->owt = weight(current_container);
+            sellobj(obj, g.current_container->ox, g.current_container->oy);
+        (void) add_to_container(g.current_container, obj);
+        g.current_container->owt = weight(g.current_container);
     }
     /* gold needs this, and freeinv() many lines above may cause
      * the encumbrance to disappear from the status, so just always
      * update status immediately.
      */
     bot();
-    return (current_container ? 1 : -1);
+    return (g.current_container ? 1 : -1);
 }
 
 /* askchain() filter used by in_container();
@@ -2221,7 +2216,7 @@ int
 ck_bag(obj)
 struct obj *obj;
 {
-    return (current_container && obj != current_container);
+    return (g.current_container && obj != g.current_container);
 }
 
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
@@ -2234,7 +2229,7 @@ register struct obj *obj;
     int res, loadlev;
     long count;
 
-    if (!current_container) {
+    if (!g.current_container) {
         impossible("<out> no current_container?");
         return -1;
     } else if (is_gold) {
@@ -2248,7 +2243,7 @@ register struct obj *obj;
         return -1;
 
     count = obj->quan;
-    if ((res = lift_object(obj, current_container, &count, FALSE)) <= 0)
+    if ((res = lift_object(obj, g.current_container, &count, FALSE)) <= 0)
         return res;
 
     if (obj->quan != count && obj->otyp != LOADSTONE)
@@ -2256,15 +2251,15 @@ register struct obj *obj;
 
     /* Remove the object from the list. */
     obj_extract_self(obj);
-    current_container->owt = weight(current_container);
+    g.current_container->owt = weight(g.current_container);
 
     if (Icebox)
         removed_from_icebox(obj);
 
-    if (!obj->unpaid && !carried(current_container)
-        && costly_spot(current_container->ox, current_container->oy)) {
-        obj->ox = current_container->ox;
-        obj->oy = current_container->oy;
+    if (!obj->unpaid && !carried(g.current_container)
+        && costly_spot(g.current_container->ox, g.current_container->oy)) {
+        obj->ox = g.current_container->ox;
+        obj->oy = g.current_container->oy;
         addtobill(obj, FALSE, FALSE, FALSE);
     }
     if (is_pick(obj))
@@ -2391,7 +2386,7 @@ int FDECL((*fn), (OBJ_P));
 {
     /* result is only meaningful while use_container() is executing */
     return ((fn == in_container || fn == out_container)
-            && !current_container);
+            && !g.current_container);
 }
 
 STATIC_OVL void
@@ -2455,7 +2450,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     int used = 0;
     long loss;
 
-    abort_looting = FALSE;
+    g.abort_looting = FALSE;
     emptymsg[0] = '\0';
 
     if (!u_handsy())
@@ -2478,37 +2473,37 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
             multi_reason = "opening a container";
             nomovemsg = "";
         }
-        abort_looting = TRUE;
+        g.abort_looting = TRUE;
         return 1;
     }
     obj->lknown = 1;
 
-    current_container = obj; /* for use by in/out_container */
+    g.current_container = obj; /* for use by in/out_container */
     /*
      * From here on out, all early returns go through 'containerdone:'.
      */
 
     /* check for Schroedinger's Cat */
-    quantum_cat = SchroedingersBox(current_container);
+    quantum_cat = SchroedingersBox(g.current_container);
     if (quantum_cat) {
-        observe_quantum_cat(current_container, TRUE, TRUE);
+        observe_quantum_cat(g.current_container, TRUE, TRUE);
         used = 1;
     }
 
-    cursed_mbag = Is_mbag(current_container)
-        && current_container->cursed
-        && Has_contents(current_container);
+    cursed_mbag = Is_mbag(g.current_container)
+        && g.current_container->cursed
+        && Has_contents(g.current_container);
     if (cursed_mbag
-        && (loss = boh_loss(current_container, held)) != 0) {
+        && (loss = boh_loss(g.current_container, held)) != 0) {
         used = 1;
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
-        current_container->owt = weight(current_container);
+        g.current_container->owt = weight(g.current_container);
     }
     inokay = (invent != 0
-              && !(invent == current_container && !current_container->nobj));
-    outokay = Has_contents(current_container);
+              && !(invent == g.current_container && !g.current_container->nobj));
+    outokay = Has_contents(g.current_container);
     if (!outokay) /* preformat the empty-container message */
-        Sprintf(emptymsg, "%s is %sempty.", Ysimple_name2(current_container),
+        Sprintf(emptymsg, "%s is %sempty.", Ysimple_name2(g.current_container),
                 (quantum_cat || cursed_mbag) ? "now " : "");
 
     /*
@@ -2538,13 +2533,13 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
      * <The/Your/Shk's container> is empty.  Do what with it? [:irs nq or ?]
      */
     for (;;) { /* repeats iff '?' or ":' gets chosen */
-        outmaybe = (outokay || !current_container->cknown);
+        outmaybe = (outokay || !g.current_container->cknown);
         if (!outmaybe)
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
-                             current_container, Yname2, Ysimple_name2,
+                             g.current_container, Yname2, Ysimple_name2,
                              "This");
         else
-            (void) safe_qbuf(qbuf, "Do what with ", "?", current_container,
+            (void) safe_qbuf(qbuf, "Do what with ", "?", g.current_container,
                              yname, ysimple_name, "it");
         /* ask player about what to do with this container */
         if (flags.menu_style == MENU_PARTIAL
@@ -2554,7 +2549,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                    trying to do both will yield proper feedback */
                 c = 'b';
             } else {
-                c = in_or_out_menu(qbuf, current_container, outmaybe, inokay,
+                c = in_or_out_menu(qbuf, g.current_container, outmaybe, inokay,
                                    (boolean) (used != 0), more_containers);
             }
         } else { /* TRADITIONAL or COMBINATION */
@@ -2581,15 +2576,15 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         if (c == '?') {
             explain_container_prompt(more_containers);
         } else if (c == ':') { /* note: will set obj->cknown */
-            if (!current_container->cknown)
+            if (!g.current_container->cknown)
                 used = 1; /* gaining info */
-            container_contents(current_container, FALSE, FALSE, TRUE);
+            container_contents(g.current_container, FALSE, FALSE, TRUE);
         } else
             break;
     } /* loop until something other than '?' or ':' is picked */
 
     if (c == 'q')
-        abort_looting = TRUE;
+        g.abort_looting = TRUE;
     if (c == 'n' || c == 'q') /* [not strictly needed; falling thru works] */
         goto containerdone;
     loot_out = (c == 'o' || c == 'b' || c == 'r');
@@ -2599,11 +2594,11 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
 
     /* out-only or out before in */
     if (loot_out && !loot_in_first) {
-        if (!Has_contents(current_container)) {
+        if (!Has_contents(g.current_container)) {
             pline1(emptymsg); /* <whatever> is empty. */
-            if (!current_container->cknown)
+            if (!g.current_container->cknown)
                 used = 1;
-            current_container->cknown = 1;
+            g.current_container->cknown = 1;
         } else {
             add_valid_menu_class(0); /* reset */
             if (flags.menu_style == MENU_TRADITIONAL)
@@ -2615,7 +2610,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     }
 
     if ((loot_in || stash_one)
-        && (!invent || (invent == current_container && !invent->nobj))) {
+        && (!invent || (invent == g.current_container && !invent->nobj))) {
         You("don't have anything%s to %s.", invent ? " else" : "",
             stash_one ? "stash" : "put in");
         loot_in = stash_one = FALSE;
@@ -2645,16 +2640,16 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         }
     }
     /* putting something in might have triggered magic bag explosion */
-    if (!current_container)
+    if (!g.current_container)
         loot_out = FALSE;
 
     /* out after in */
     if (loot_out && loot_in_first) {
-        if (!Has_contents(current_container)) {
+        if (!Has_contents(g.current_container)) {
             pline1(emptymsg); /* <whatever> is empty. */
-            if (!current_container->cknown)
+            if (!g.current_container->cknown)
                 used = 1;
-            current_container->cknown = 1;
+            g.current_container->cknown = 1;
         } else {
             add_valid_menu_class(0); /* reset */
             if (flags.menu_style == MENU_TRADITIONAL)
@@ -2671,16 +2666,16 @@ containerdone:
            whatever was already inside, now we suddenly do.  That can't
            be helped unless we want to track things item by item and then
            deal with containers whose contents are "partly known". */
-        if (current_container)
-            current_container->cknown = 1;
+        if (g.current_container)
+            g.current_container->cknown = 1;
         update_inventory();
     }
 
-    *objp = current_container; /* might have become null */
-    if (current_container)
-        current_container = 0; /* avoid hanging on to stale pointer */
+    *objp = g.current_container; /* might have become null */
+    if (g.current_container)
+        g.current_container = 0; /* avoid hanging on to stale pointer */
     else
-        abort_looting = TRUE;
+        g.abort_looting = TRUE;
     return used;
 }
 
@@ -2703,7 +2698,7 @@ boolean put_in;
         checkfunc = ck_bag;
     } else {
         action = "take out";
-        objlist = &(current_container->cobj);
+        objlist = &(g.current_container->cobj);
         actionfunc = out_container;
         checkfunc = (int FDECL((*), (OBJ_P))) 0;
     }
@@ -2740,7 +2735,7 @@ boolean put_in;
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL);
-        n = query_category(buf, put_in ? invent : current_container->cobj,
+        n = query_category(buf, put_in ? invent : g.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
             return 0;
@@ -2757,8 +2752,8 @@ boolean put_in;
 
     if (loot_everything) {
         if (!put_in) {
-            current_container->cknown = 1;
-            for (otmp = current_container->cobj; otmp; otmp = otmp2) {
+            g.current_container->cknown = 1;
+            for (otmp = g.current_container->cobj; otmp; otmp = otmp2) {
                 otmp2 = otmp->nobj;
                 res = out_container(otmp);
                 if (res < 0)
@@ -2766,7 +2761,7 @@ boolean put_in;
                 n_looted += res;
             }
         } else {
-            for (otmp = invent; otmp && current_container; otmp = otmp2) {
+            for (otmp = invent; otmp && g.current_container; otmp = otmp2) {
                 otmp2 = otmp->nobj;
                 res = in_container(otmp);
                 if (res < 0)
@@ -2779,9 +2774,9 @@ boolean put_in;
         if (put_in && flags.invlet_constant)
             mflags |= USE_INVLET;
         if (!put_in)
-            current_container->cknown = 1;
+            g.current_container->cknown = 1;
         Sprintf(buf, "%s what?", action);
-        n = query_objlist(buf, put_in ? &invent : &(current_container->cobj),
+        n = query_objlist(buf, put_in ? &invent : &(g.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n) {
@@ -2795,7 +2790,7 @@ boolean put_in;
                 }
                 res = put_in ? in_container(otmp) : out_container(otmp);
                 if (res < 0) {
-                    if (!current_container) {
+                    if (!g.current_container) {
                         /* otmp caused current_container to explode;
                            both are now gone */
                         otmp = 0; /* and break loop */
