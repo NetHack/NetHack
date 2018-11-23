@@ -22,6 +22,13 @@
         0     \
     }
 
+/* UNDEFINED and UNDEFINED_PTR are used to initialize variables whose
+   initialized value is not relied upon.  UNDEFINED can be used to
+   initialized any value type except pointers.  UNDEFINED_PTR can be used
+   only on pointer types. */
+#define UNDEFINED { 0 }
+#define UNDEFINED_PTR NULL
+
 /* symbolic names for capacity levels */
 enum encumbrance_types {
     UNENCUMBERED = 0,
