@@ -460,6 +460,19 @@ struct instance_globals {
     boolean m_using; /* kludge to use mondided instead of killed */
     /* pickup.c */
     int oldcap; /* last encumberance */
+    /* rumors.c */
+    long true_rumor_size; /* rumor size variables are signed so that value -1
+                            can be used as a flag */
+    long false_rumor_size;
+    unsigned long true_rumor_start; /* rumor start offsets are unsigned because
+                                       they're handled via %lx format */
+    unsigned long false_rumor_start;
+    long true_rumor_end; /* rumor end offsets are signed because they're 
+                            compared with [dlb_]ftell() */
+    long false_rumor_end;
+    int oracle_flg; /* -1=>don't use, 0=>need init, 1=>init done */
+    unsigned oracle_cnt; /* oracles are handled differently from rumors... */
+    unsigned long *oracle_loc;
     /* save.c */
     boolean havestate;
     unsigned ustuck_id; /* need to preserve during save */

@@ -344,6 +344,16 @@ const struct instance_globals g_init = {
     FALSE, /* m_using */
     /* pickup.c */
     0,  /* oldcap */
+    /* rumors.c */
+    0, /* true_rumor_size */
+    0, /* false_rumor_size */
+    UNDEFINED, /* true_rumor_start*/
+    UNDEFINED, /* false_rumor_start*/
+    UNDEFINED, /* true_rumor_end */
+    UNDEFINED, /* false_rumor_end */
+    0, /* oracle_flag */
+    0, /* oracle_cnt */
+    NULL, /* oracle_loc */
     /* save.c */
     TRUE, /* havestate*/
     0, /* ustuck_id */
