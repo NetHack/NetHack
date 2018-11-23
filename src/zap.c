@@ -12,8 +12,6 @@
  */
 #define MAGIC_COOKIE 1000
 
-extern boolean notonhead; /* for long worms */
-
 STATIC_DCL void FDECL(polyuse, (struct obj *, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
@@ -142,7 +140,7 @@ struct obj *otmp;
     if (u.uswallow && mtmp == u.ustuck)
         reveal_invis = FALSE;
 
-    notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
+    g.notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
     skilled_spell = (otmp && otmp->oclass == SPBOOK_CLASS && otmp->blessed);
 
     switch (otyp) {
@@ -479,7 +477,7 @@ struct monst *mtmp;
     struct obj *otmp;
 
     mstatusline(mtmp);
-    if (notonhead)
+    if (g.notonhead)
         return; /* don't show minvent for long worm tail */
 
     if (mtmp->minvent) {
@@ -2607,7 +2605,7 @@ struct obj *obj; /* wand or spell */
     int steedhit = FALSE;
 
     bhitpos.x = u.usteed->mx, bhitpos.y = u.usteed->my;
-    notonhead = FALSE;
+    g.notonhead = FALSE;
     switch (obj->otyp) {
     /*
      * Wands that are allowed to hit the steed
@@ -3290,7 +3288,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         }
 
         if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
-            notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+            g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
                    pass through instead of stop so we call
@@ -4038,7 +4036,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
         buzzmonst:
-            notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
+            g.notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {

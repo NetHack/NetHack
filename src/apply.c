@@ -5,8 +5,6 @@
 
 #include "hack.h"
 
-extern boolean notonhead; /* for long worms */
-
 STATIC_DCL int FDECL(use_camera, (struct obj *));
 STATIC_DCL int FDECL(use_towel, (struct obj *));
 STATIC_DCL boolean FDECL(its_dead, (int, int, int *));
@@ -325,7 +323,7 @@ register struct obj *obj;
     context.stethoscope_movement = youmonst.movement;
 
     bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
-    notonhead = u.uswallow;
+    g.notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
             pline("%s interferes.", Monnam(u.ustuck));
@@ -374,7 +372,7 @@ register struct obj *obj;
 
         /* bhitpos needed by mstatusline() iff mtmp is a long worm */
         bhitpos.x = rx, bhitpos.y = ry;
-        notonhead = (mtmp->mx != rx || mtmp->my != ry);
+        g.notonhead = (mtmp->mx != rx || mtmp->my != ry);
 
         if (mtmp->mundetected) {
             if (!canspotmon(mtmp))
@@ -884,7 +882,7 @@ struct obj *obj;
     mtmp = bhit(u.dx, u.dy, COLNO, INVIS_BEAM,
                 (int FDECL((*), (MONST_P, OBJ_P))) 0,
                 (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
-    if (!mtmp || !haseyes(mtmp->data) || notonhead)
+    if (!mtmp || !haseyes(mtmp->data) || g.notonhead)
         return 1;
 
     /* couldsee(mtmp->mx, mtmp->my) is implied by the fact that bhit()
@@ -972,7 +970,7 @@ struct obj *obj;
             ;
         else if ((mtmp->minvis && !perceives(mtmp->data))
                  /* redundant: can't get here if these are true */
-                 || !haseyes(mtmp->data) || notonhead || !mtmp->mcansee)
+                 || !haseyes(mtmp->data) || g.notonhead || !mtmp->mcansee)
             pline("%s doesn't seem to notice %s reflection.", Monnam(mtmp),
                   mhis(mtmp));
         else
@@ -3034,7 +3032,7 @@ struct obj *obj;
             return 1; /* burn nutrition; maybe pass out */
         context.polearm.hitmon = mtmp;
         check_caitiff(mtmp);
-        notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+        g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
         (void) thitmonst(mtmp, uwep);
     } else if (glyph_is_statue(glyph) /* might be hallucinatory */
                && sobj_at(STATUE, bhitpos.x, bhitpos.y)) {
@@ -3202,7 +3200,7 @@ struct obj *obj;
         bhitpos = cc;
         if ((mtmp = m_at(cc.x, cc.y)) == (struct monst *) 0)
             break;
-        notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+        g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
         save_confirm = flags.confirm;
         if (verysmall(mtmp->data) && !rn2(4)
             && enexto(&cc, u.ux, u.uy, (struct permonst *) 0)) {

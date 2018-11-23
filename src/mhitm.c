@@ -6,8 +6,6 @@
 #include "hack.h"
 #include "artifact.h"
 
-extern boolean notonhead;
-
 static NEARDATA boolean vis, far_noise;
 static NEARDATA long noisetime;
 static NEARDATA struct obj *otmp;
@@ -161,7 +159,7 @@ register struct monst *mtmp;
                 /* mtmp can be killed */
                 bhitpos.x = mon->mx;
                 bhitpos.y = mon->my;
-                notonhead = 0;
+                g.notonhead = 0;
                 result = mattackm(mtmp, mon);
 
                 if (result & MM_AGR_DIED)
@@ -179,7 +177,7 @@ register struct monst *mtmp;
                 if ((result & MM_HIT) && !(result & MM_DEF_DIED) && rn2(4)
                     && mon->movement >= NORMAL_SPEED) {
                     mon->movement -= NORMAL_SPEED;
-                    notonhead = 0;
+                    g.notonhead = 0;
                     (void) mattackm(mon, mtmp); /* return attack */
                 }
 
@@ -1334,7 +1332,7 @@ register struct attack *mattk;
         }
         break;
     case AD_DRIN:
-        if (notonhead || !has_head(pd)) {
+        if (g.notonhead || !has_head(pd)) {
             if (vis && canspotmon(mdef))
                 pline("%s doesn't seem harmed.", Monnam(mdef));
             /* Not clear what to do for green slimes */
