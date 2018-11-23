@@ -207,7 +207,6 @@ NEARDATA char dogname[PL_PSIZ] = DUMMY;
 NEARDATA char catname[PL_PSIZ] = DUMMY;
 NEARDATA char horsename[PL_PSIZ] = DUMMY;
 char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
-int petname_used = 0;
 /* monsters that went down/up together with @ */
 NEARDATA struct monst *mydogs = (struct monst *) 0;
 /* monsters that are moving to another dungeon level */
@@ -285,7 +284,6 @@ char *fqn_prefix_names[PREFIX_COUNT] = {
 };
 #endif
 
-#ifdef PLAYAGAIN
 const struct savefile_info default_sfinfo = {
 #ifdef NHSTDC
     0x00000000UL
@@ -308,53 +306,8 @@ const struct savefile_info default_sfinfo = {
     0x00000000L, 0x00000000L
 #endif
 };
-#endif
 
-NEARDATA struct savefile_info sfcap = {
-#ifdef NHSTDC
-    0x00000000UL
-#else
-    0x00000000L
-#endif
-#if defined(COMPRESS) || defined(ZLIB_COMP)
-        | SFI1_EXTERNALCOMP
-#endif
-#if defined(ZEROCOMP)
-        | SFI1_ZEROCOMP
-#endif
-#if defined(RLECOMP)
-        | SFI1_RLECOMP
-#endif
-    ,
-#ifdef NHSTDC
-    0x00000000UL, 0x00000000UL
-#else
-    0x00000000L, 0x00000000L
-#endif
-};
-
-NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
-#ifdef NHSTDC
-    0x00000000UL
-#else
-    0x00000000L
-#endif
-#if defined(COMPRESS) || defined(ZLIB_COMP)
-        | SFI1_EXTERNALCOMP
-#endif
-#if defined(ZEROCOMP)
-        | SFI1_ZEROCOMP
-#endif
-#if defined(RLECOMP)
-        | SFI1_RLECOMP
-#endif
-    ,
-#ifdef NHSTDC
-    0x00000000UL, 0x00000000UL
-#else
-    0x00000000L, 0x00000000L
-#endif
-};
+NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 
@@ -372,243 +325,14 @@ decl_init()
     return;
 }
 
-#ifdef PLAYAGAIN
-
-static boolean s_firstStart = TRUE;
-
-static boolean
-decl_is_block_zero(p, n)
-unsigned char * p;
-int n;
-{
-    static unsigned char zeroblock[512] = { 0 };
-    unsigned char * sentinel = p + n;
-    while (p < sentinel) {
-        int c = (n < sizeof(zeroblock) ? n : sizeof(zeroblock));
-        if (memcmp(p, zeroblock, c) != 0) return FALSE;
-        p += c;
-    }
-    return TRUE;
-}
-
-static void
-decl_zero_block(p, n)
-unsigned char * p;
-int n;
-{
-    nhassert(!s_firstStart || decl_is_block_zero(p, n));
-    memset(p, 0, n);
-}
-
-#define ZEROARRAY(x) decl_zero_block((void *) &x[0], 0, sizeof(x))
-#define ZEROARRAYN(x,n) decl_zero_block((void *) &x[0], 0, sizeof(x[0])*(n))
-#define ZERO(x) decl_zero_block((void *) &x, 0, sizeof(x))
-#define ZEROPTR(x) { nhassert(x == NULL); x = NULL; }
-#define ZEROPTRNOCHECK(x) { x = NULL; }
-
-/* decl_early_init() is called when we are starting a game.  On first
- * start, it validates that global state is in the expected state.
- * When called on subsequent starts, it initializes global state to
- * expected state.
- *
- * In the case that of global pointers, on subsequent starts it will
- * panic if it finds a non-NULL pointer with the assumption that a
- * pointer has leaked.  */
-
-void
-decl_early_init()
-{
-    hackpid = 0;
-#if defined(UNIX) || defined(VMS)
-    locknum = 0;
-#endif
-#ifdef DEF_PAGER
-    catmore = 0;
-#endif
-
-    ZEROARRAY(bases);
-
-    multi = 0;
-    multi_reason = NULL;
-    nroom = 0;
-    nsubroom = 0;
-    occtime = 0;
-
-    x_maze_max = (COLNO - 1) & ~1;
-    y_maze_max = (ROWNO - 1) & ~1;
-
-    otg_temp = 0;
-
-    ZERO(dungeon_topology);
-    ZERO(quest_status);
-
-    warn_obj_cnt = 0;
-    ZEROARRAYN(smeq, MAXNROFROOMS + 1);
-    doorindex = 0;
-    save_cm = NULL;
-
-    ZERO(killer);
-    done_money = 0;
-    nomovemsg = NULL;
-    ZEROARRAY(plname);
-    ZEROARRAY(pl_character);
-    pl_race = '\0';
-
-    ZEROARRAY(pl_fruit);
-    ffruit = NULL;
-
-    ZEROARRAY(tune);
-
-    occtxt = NULL;
-
-    yn_number = 0;
-
-#if defined(MICRO) || defined(WIN32)
-    ZEROARRAYN(hackdir, PATHLEN);
-#ifdef MICRO
-    ZEROARRAYN(levels, PATHLEN);
-#endif /* MICRO */
-#endif /* MICRO || WIN32 */
-
-#ifdef MFLOPPY
-    ZEROARRAYN(permbones, PATHLEN);
-    ramdisk = FALSE;
-    saveprompt = TRUE;
-#endif
-
-    ZEROARRAY(level_info);
-
-    ZERO(program_state);
-
-    tbx = 0;
-    tby = 0;
-
-    ZERO(m_shot);
-
-    ZEROARRAYN(dungeons, MAXDUNGEON);
-    ZEROPTR(sp_levchn);
-    ZERO(upstair);
-    ZERO(dnstair);
-    ZERO(upladder);
-    ZERO(dnladder);
-    ZERO(sstairs);
-    ZERO(updest);
-    ZERO(dndest);
-    ZERO(inv_pos);
-
-    defer_see_monsters = FALSE;
-    in_mklev = FALSE;
-    stoned = FALSE;
-    unweapon = FALSE;
-    mrg_to_wielded = FALSE;
-
-    in_steed_dismounting = FALSE;
-
-    ZERO(bhitpos);
-    ZEROARRAY(doors);
-
-    ZEROARRAY(rooms);
-    subrooms = &rooms[MAXNROFROOMS + 1];
-    upstairs_room = NULL;
-    dnstairs_room = NULL;
-    sstairs_room = NULL;
-
-    ZERO(level);
-    ZEROPTR(ftrap);
-    ZERO(youmonst);
-    ZERO(context);
-    ZERO(flags);
-#ifdef SYSFLAGS
-    ZERO(sysflags);
-#endif
-    ZERO(iflags);
-    ZERO(u);
-    ZERO(ubirthday);
-    ZERO(urealtime);
-
-    ZEROARRAY(lastseentyp);
-
-    ZEROPTR(invent);
-    ZEROPTRNOCHECK(uwep);
-    ZEROPTRNOCHECK(uarm);
-    ZEROPTRNOCHECK(uswapwep);
-    ZEROPTRNOCHECK(uquiver);
-    ZEROPTRNOCHECK(uarmu);
-    ZEROPTRNOCHECK(uskin);
-    ZEROPTRNOCHECK(uarmc);
-    ZEROPTRNOCHECK(uarmh);
-    ZEROPTRNOCHECK(uarms);
-    ZEROPTRNOCHECK(uarmg);
-    ZEROPTRNOCHECK(uarmf);
-    ZEROPTRNOCHECK(uamul);
-    ZEROPTRNOCHECK(uright);
-    ZEROPTRNOCHECK(uleft);
-    ZEROPTRNOCHECK(ublindf);
-    ZEROPTRNOCHECK(uchain);
-    ZEROPTRNOCHECK(uball);
-
-    ZEROPTR(current_wand);
-    ZEROPTR(thrownobj);
-    ZEROPTR(kickedobj);
-
-    ZEROARRAYN(spl_book, MAXSPELL + 1);
-
-    moves = 1;
-    monstermoves = 1;
-
-    wailmsg = 0L;
-
-    ZEROPTR(migrating_objs);
-    ZEROPTR(billobjs);
-
-    ZERO(zeroobj);
-    ZERO(zeromonst);
-    ZERO(zeroany);
-
-    ZEROARRAYN(dogname, PL_PSIZ);
-    ZEROARRAYN(catname, PL_PSIZ);
-    ZEROARRAYN(horsename, PL_PSIZ);
-    ZERO(preferred_pet);
-    ZERO(petname_used);
-    ZEROPTR(mydogs);
-    ZEROPTR(migrating_mons);
-
-    ZEROARRAY(mvitals);
-
-    ZEROPTR(menu_colorings);
-
-    vision_full_recalc = 0;
-    viz_array = NULL;
-
-    WIN_MESSAGE = WIN_ERR;
-#ifndef STATUS_VIA_WINDOWPORT
-    WIN_STATUS = WIN_ERR;
-#endif
-    WIN_MAP = WIN_ERR;
-    WIN_INVEN = WIN_ERR;
-
-    ZEROARRAYN(toplines, TBUFSZ);
-    ZERO(tc_gbl_data);
-    ZEROARRAYN(fqn_prefix, PREFIX_COUNT);
-
-    sfcap = default_sfinfo;
-    sfrestinfo = default_sfinfo;
-    sfsaveinfo = default_sfinfo;
-
-    ZEROPTR(plinemsg_types);
-
-#ifdef PANICTRACE
-    ARGV0 = NULL;
-#endif
-
-    nhUse_dummy = 0;
-
-    s_firstStart = FALSE;
-}
-#endif
-
 const struct instance_context icontext_initial_state = {
-    0, /* oldcap - last encumberance in pickup.c */
+    0,  /* oldcap - last encumberance in pickup.c */
+    0,  /* petname_used - dog.c */
+    0,  /* jumping_is_magic - apply.c */
+    -1, /* polearm_range_min - apply.c */
+    -1, /* polearm_range_max - apply.c */
+    0,  /* spec_dbon_applies - artifact.c */
+    0,  /* mrank_sz - botl.c */
 };
 
 struct instance_context icontext;
@@ -618,7 +342,9 @@ icontext_init()
 {
     icontext = icontext_initial_state;
 
-    decl_early_init();
+    sfcap = default_sfinfo;
+    sfrestinfo = default_sfinfo;
+    sfsaveinfo = default_sfinfo;
 };
 
 /*decl.c*/

@@ -556,15 +556,6 @@ typedef unsigned char uchar;
 
 #endif
 
-/* PLAYAGAIN support for allowing the game shell to stay open after the player
- * saves or dies.  This requires that the game engine can be re-entered to
- * start another game.
- *
- * This support does not include supporting playing another game when
- * a panic has occured due to undetermined state the engine is left in after a
- * panic */
-/* #define PLAYAGAIN */
-
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES
