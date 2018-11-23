@@ -210,11 +210,6 @@ struct obj *obj;
     return TRUE;
 }
 
-/* used by distant_name() to pass extra information to xname_flags();
-   it would be much cleaner if this were a parameter, but that would
-   require all of the xname() and doname() calls to be modified */
-static int distantname = 0;
-
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
  * we don't want to set dknown if it's not set already.
  */
@@ -233,9 +228,9 @@ char *FDECL((*func), (OBJ_P));
      * object is within X-ray radius and only treat it as distant when
      * beyond that radius.  Logic is iffy but result might be interesting.
      */
-    ++distantname;
+    ++g.distantname;
     str = (*func)(obj);
-    --distantname;
+    --g.distantname;
     return str;
 }
 
@@ -425,7 +420,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind && !distantname)
+    if (!Blind && !g.distantname)
         obj->dknown = TRUE;
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
