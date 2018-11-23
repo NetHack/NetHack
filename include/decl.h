@@ -452,6 +452,10 @@ struct instance_context {
     int spec_dbon_applies; /* coordinate effects from spec_dbon() with 
                             * messages in artifact_hit() - artifact.c */
     int mrank_sz; /* loaded by max_rank_sz - botl.c */
+    short nocreate; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate2; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate3; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate4; /* ini_inv() - u_init.c = STRANGE_OBJECT */
 };
 
 E struct instance_context icontext;

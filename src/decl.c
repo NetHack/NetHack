@@ -333,6 +333,10 @@ const struct instance_context icontext_initial_state = {
     -1, /* polearm_range_max - apply.c */
     0,  /* spec_dbon_applies - artifact.c */
     0,  /* mrank_sz - botl.c */
+    STRANGE_OBJECT, /* nocreate - ini_inv() in u_init.c */
+    STRANGE_OBJECT, /* nocreate2 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate3 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate4 - ini_inv() in u_init.c  */
 };
 
 struct instance_context icontext;
