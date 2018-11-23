@@ -325,8 +325,6 @@ decl_init()
     return;
 }
 
-#define UNDEFINED { 0 }         /* move to hack.h if we are keeping */
-#define UNDEFINED_PTR NULL      /* move to hack.h if we are keeping */
 #define IVMAGIC 0xdeadbeef
 
 const struct instance_globals g_init = {
