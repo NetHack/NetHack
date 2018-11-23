@@ -769,7 +769,7 @@ const struct Align aligns[] = {
 static struct {
     boolean roles[SIZE(roles)];
     short mask;
-} rfilter = UNDEFINED;
+} rfilter = UNDEFINED_VALUE;
 
 STATIC_DCL int NDECL(randrole_filtered);
 STATIC_DCL char *FDECL(promptsep, (char *, int));

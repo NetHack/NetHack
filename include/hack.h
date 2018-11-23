@@ -22,11 +22,11 @@
         0     \
     }
 
-/* UNDEFINED and UNDEFINED_PTR are used to initialize variables whose
-   initialized value is not relied upon.  UNDEFINED can be used to
+/* UNDEFINED_VALUE and UNDEFINED_PTR are used to initialize variables whose
+   initialized value is not relied upon.  UNDEFINED_VALUE can be used to
    initialized any value type except pointers.  UNDEFINED_PTR can be used
    only on pointer types. */
-#define UNDEFINED { 0 }
+#define UNDEFINED_VALUE { 0 }
 #define UNDEFINED_PTR NULL
 
 /* symbolic names for capacity levels */
