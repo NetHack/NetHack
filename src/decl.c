@@ -344,6 +344,10 @@ const struct instance_variables iv_init = {
     FALSE, /* m_using */
     /* pickup.c */
     0,  /* oldcap */
+    /* save.c */
+    TRUE, /* havestate*/
+    0, /* ustuck_id */
+    0, /* usteed_id */
     /* trap.c */
     0, /* force_mintrap */
     /* u_init.c */
@@ -370,6 +374,7 @@ instance_variable_init()
     iv = iv_init;
 
     nhassert(iv_init.magic == IVMAGIC);
+    nhassert(iv.havestate == TRUE);
 
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;
