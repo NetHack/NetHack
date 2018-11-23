@@ -198,7 +198,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         && !Stunned) {
         /* Intelligent chaotic weapons (Stormbringer) want blood */
         if (wep && wep->oartifact == ART_STORMBRINGER) {
-            iv.override_confirmation = TRUE;
+            g.override_confirmation = TRUE;
             return FALSE;
         }
         if (canspotmon(mtmp)) {
@@ -367,7 +367,7 @@ register struct monst *mtmp;
 
     /* possibly set in attack_checks;
        examined in known_hitum, called via hitum or hmonas below */
-    iv.override_confirmation = FALSE;
+    g.override_confirmation = FALSE;
     /* attack_checks() used to use <u.ux+u.dx,u.uy+u.dy> directly, now
        it uses bhitpos instead; it might map an invisible monster there */
     bhitpos.x = u.ux + u.dx;
@@ -448,7 +448,7 @@ int dieroll;
 {
     register boolean malive = TRUE;
 
-    if (iv.override_confirmation) {
+    if (g.override_confirmation) {
         /* this may need to be generalized if weapons other than
            Stormbringer acquire similar anti-social behavior... */
         if (flags.verbose)
@@ -601,7 +601,7 @@ struct attack *uattk;
     /* second attack for two-weapon combat; won't occur if Stormbringer
        overrode confirmation (assumes Stormbringer is primary weapon)
        or if the monster was killed or knocked to different location */
-    if (u.twoweap && !iv.override_confirmation && malive && m_at(x, y) == mon) {
+    if (u.twoweap && !g.override_confirmation && malive && m_at(x, y) == mon) {
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
         dieroll = rnd(20);

@@ -238,7 +238,7 @@ unsigned x;
 char *
 initstate(seed, arg_state, n)
 
-unsigned seed;   /* seed for R. N. G. */
+unsigned seed;   /* seed for RNG */
 char *arg_state; /* pointer to state array */
 int n;           /* # bytes of state info */
 {

@@ -2160,7 +2160,7 @@ register struct monst *mtmp;
     } else {
         register int tt = trap->ttyp;
         boolean in_sight, tear_web, see_it,
-            inescapable = iv.force_mintrap || ((tt == HOLE || tt == PIT)
+            inescapable = g.force_mintrap || ((tt == HOLE || tt == PIT)
                                             && Sokoban && !trap->madeby_u);
         const char *fallverb;
 
@@ -2276,7 +2276,7 @@ register struct monst *mtmp;
                         || mptr == &mons[PM_BUGBEAR])
                         You_hear("the roaring of an angry bear!");
                 }
-            } else if (iv.force_mintrap) {
+            } else if (g.force_mintrap) {
                 if (in_sight) {
                     pline("%s evades %s bear trap!", Monnam(mtmp),
                           a_your[trap->madeby_u]);
@@ -2425,7 +2425,7 @@ register struct monst *mtmp;
             if (is_flyer(mptr) || is_floater(mptr)
                 || (mtmp->wormno && count_wsegs(mtmp) > 5)
                 || is_clinger(mptr)) {
-                if (iv.force_mintrap && !Sokoban) {
+                if (g.force_mintrap && !Sokoban) {
                     /* openfallingtrap; not inescapable here */
                     if (in_sight) {
                         seetrap(trap);
@@ -2462,7 +2462,7 @@ register struct monst *mtmp;
             if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
                 || (mtmp->wormno && count_wsegs(mtmp) > 5)
                 || mptr->msize >= MZ_HUGE) {
-                if (iv.force_mintrap && !Sokoban) {
+                if (g.force_mintrap && !Sokoban) {
                     /* openfallingtrap; not inescapable here */
                     if (in_sight) {
                         seetrap(trap);
@@ -2551,7 +2551,7 @@ register struct monst *mtmp;
                           a_your[trap->madeby_u]);
                 deltrap(trap);
                 newsym(mtmp->mx, mtmp->my);
-            } else if (iv.force_mintrap && !mtmp->mtrapped) {
+            } else if (g.force_mintrap && !mtmp->mtrapped) {
                 if (in_sight) {
                     pline("%s avoids %s spider web!", Monnam(mtmp),
                           a_your[trap->madeby_u]);
@@ -4686,9 +4686,9 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         /* dotrap calls mintrap when mounted hero encounters a web */
         if (u.usteed)
             dotrapflags |= NOWEBMSG;
-        ++iv.force_mintrap;
+        ++g.force_mintrap;
         dotrap(t, dotrapflags);
-        --iv.force_mintrap;
+        --g.force_mintrap;
         result = (u.utrap != 0);
     } else {
         if (mon->mtrapped)
@@ -4696,9 +4696,9 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         /* you notice it if you see the trap close/tremble/whatever
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
-        ++iv.force_mintrap;
+        ++g.force_mintrap;
         result = (mintrap(mon) != 0);
-        --iv.force_mintrap;
+        --g.force_mintrap;
     }
     return result;
 }
@@ -4739,9 +4739,9 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         /* monster will be angered; mintrap doesn't handle that */
         wakeup(mon, TRUE);
-        ++iv.force_mintrap;
+        ++g.force_mintrap;
         result = (mintrap(mon) != 0);
-        --iv.force_mintrap;
+        --g.force_mintrap;
         /* mon might now be on the migrating monsters list */
     }
     return result;
