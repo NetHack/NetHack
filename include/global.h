@@ -366,7 +366,8 @@ struct savefile_info {
 
 /* Supply nhassert macro if not supplied by port */
 #ifndef nhassert
-#define nhassert(expression) ((void)0)
+#define nhassert(e) ((void)0)
 #endif
+
 
 #endif /* GLOBAL_H */
