@@ -464,6 +464,14 @@ struct instance_globals {
     /* pickup.c */
     int oldcap; /* last encumberance */
 
+    /* pline.c */
+    unsigned pline_flags;
+    char prevmsg[BUFSZ];
+#ifdef DUMPLOG
+    unsigned saved_pline_index;  /* slot in saved_plines[] to use next */
+    char *saved_plines[DUMPLOG_MSG_COUNT];
+#endif
+
     /* polyself.c */
     int sex_change_ok; /* controls whether taking on new form or becoming new
                           man can also change sex (ought to be an arg to
