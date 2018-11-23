@@ -630,7 +630,7 @@ extern dlevel_t level; /* structure describing the current level */
 #define MON_BURIED_AT(x, y)                     \
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
-#if EXTRA_SANITY_CHECKS
+#ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) do { \
     if (level.monsters[x][y] && level.monsters[x][y] != m) impossible("place_worm_seg over mon"); \
     level.monsters[x][y] = m; \
