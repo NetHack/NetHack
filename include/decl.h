@@ -454,12 +454,23 @@ struct instance_globals {
                               messages in artifact_hit() */
     /* botl.c */
     int mrank_sz; /* loaded by max_rank_sz */
+
     /* dog.c */
     int petname_used; /* user preferred pet name has been used */
+
     /* muse.c */
     boolean m_using; /* kludge to use mondided instead of killed */
+
     /* pickup.c */
     int oldcap; /* last encumberance */
+
+    /* restore.c */
+    int n_ids_mapped;
+    struct bucket *id_map;
+    boolean restoring;
+    struct fruit *oldfruit;
+    long omoves;
+
     /* rumors.c */
     long true_rumor_size; /* rumor size variables are signed so that value -1
                             can be used as a flag */
@@ -473,6 +484,7 @@ struct instance_globals {
     int oracle_flg; /* -1=>don't use, 0=>need init, 1=>init done */
     unsigned oracle_cnt; /* oracles are handled differently from rumors... */
     unsigned long *oracle_loc;
+
     /* save.c */
     boolean havestate;
     unsigned ustuck_id; /* need to preserve during save */

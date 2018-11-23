@@ -1200,7 +1200,7 @@ unsigned doname_flags;
     }
     /* treat 'restoring' like suppress_price because shopkeeper and
        bill might not be available yet while restore is in progress */
-    if (!iflags.suppress_price && !restoring && is_unpaid(obj)) {
+    if (!iflags.suppress_price && !g.restoring && is_unpaid(obj)) {
         long quotedprice = unpaid_cost(obj, TRUE);
 
         Sprintf(eos(bp), " (%s, %ld %s)",

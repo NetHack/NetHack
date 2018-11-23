@@ -58,7 +58,7 @@ static struct restore_procs {
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
- * map is used by the timer routines when restoring ghost levels.
+ * map is used by the timer routines when g.restoring ghost levels.
  */
 #define N_PER_BUCKET 64
 struct bucket {
@@ -72,19 +72,12 @@ struct bucket {
 STATIC_DCL void NDECL(clear_id_mapping);
 STATIC_DCL void FDECL(add_id_mapping, (unsigned, unsigned));
 
-static int n_ids_mapped = 0;
-static struct bucket *id_map = 0;
-
 #ifdef AMII_GRAPHICS
 void FDECL(amii_setpens, (int)); /* use colors from save file */
 extern int amii_numcolors;
 #endif
 
 #include "display.h"
-
-boolean restoring = FALSE;
-static NEARDATA struct fruit *oldfruit;
-static NEARDATA long omoves;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
@@ -179,11 +172,11 @@ boolean ghostly;
 
         mread(fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
         if (ghostly)
-            tmp_dam->when += (monstermoves - omoves);
+            tmp_dam->when += (monstermoves - g.omoves);
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
-            /* when restoring, there are two passes over the current
+            /* when g.restoring, there are two passes over the current
              * level.  the first time, u.uz isn't set, so neither is
              * shop_keeper().  just wait and process the damage on
              * the second pass.
@@ -216,7 +209,7 @@ struct obj *otmp;
     mread(fd, (genericptr_t) otmp, sizeof(struct obj));
 
     /* next object pointers are invalid; otmp->cobj needs to be left
-       as is--being non-null is key to restoring container contents */
+       as is--being non-null is key to g.restoring container contents */
     otmp->nobj = otmp->nexthere = (struct obj *) 0;
     /* non-null oextra needs to be reconstructed */
     if (otmp->oextra) {
@@ -293,7 +286,7 @@ boolean ghostly, frozen;
          * immediately after old player died.
          */
         if (ghostly && !frozen && !age_is_relative(otmp))
-            otmp->age = monstermoves - omoves + otmp->age;
+            otmp->age = monstermoves - g.omoves + otmp->age;
 
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
@@ -513,7 +506,7 @@ register struct obj *otmp;
 {
     register struct fruit *oldf;
 
-    for (oldf = oldfruit; oldf; oldf = oldf->nextf)
+    for (oldf = g.oldfruit; oldf; oldf = oldf->nextf)
         if (oldf->fid == otmp->spe)
             break;
 
@@ -797,7 +790,7 @@ register int fd;
     int rtmp;
     struct obj *otmp;
 
-    restoring = TRUE;
+    g.restoring = TRUE;
     get_plname_from_file(fd, plname);
     getlev(fd, 0, (xchar) 0, FALSE);
     if (!restgamestate(fd, &stuckid, &steedid)) {
@@ -805,7 +798,7 @@ register int fd;
         savelev(-1, 0, FREE_SAVE); /* discard current level */
         (void) nhclose(fd);
         (void) delete_savefile();
-        restoring = FALSE;
+        g.restoring = FALSE;
         return 0;
     }
     restlevelstate(stuckid, steedid);
@@ -921,7 +914,7 @@ register int fd;
 
     run_timers(); /* expire all timers that have gone off while away */
     docrt();
-    restoring = FALSE;
+    g.restoring = FALSE;
     clear_nhwindow(WIN_MESSAGE);
 
     /* Success! */
@@ -1025,10 +1018,10 @@ boolean ghostly;
     setmode(fd, O_BINARY);
 #endif
     /* Load the old fruit info.  We have to do it first, so the
-     * information is available when restoring the objects.
+     * information is available when g.restoring the objects.
      */
     if (ghostly)
-        oldfruit = loadfruitchn(fd);
+        g.oldfruit = loadfruitchn(fd);
 
     /* First some sanity checks */
     mread(fd, (genericptr_t) &hpid, sizeof(hpid));
@@ -1055,8 +1048,8 @@ boolean ghostly;
     rest_levl(fd,
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     mread(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
-    mread(fd, (genericptr_t) &omoves, sizeof(omoves));
-    elapsed = monstermoves - omoves;
+    mread(fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
+    elapsed = monstermoves - g.omoves;
     mread(fd, (genericptr_t) &upstair, sizeof(stairway));
     mread(fd, (genericptr_t) &dnstair, sizeof(stairway));
     mread(fd, (genericptr_t) &upladder, sizeof(stairway));
@@ -1132,7 +1125,7 @@ boolean ghostly;
     rest_regions(fd, ghostly);
     if (ghostly) {
         /* Now get rid of all the temp fruits... */
-        freefruitchn(oldfruit), oldfruit = 0;
+        freefruitchn(g.oldfruit), g.oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
             && lev < ledger_no(&stronghold_level) && xdnstair == 0) {
@@ -1229,11 +1222,11 @@ clear_id_mapping()
 {
     struct bucket *curr;
 
-    while ((curr = id_map) != 0) {
-        id_map = curr->next;
+    while ((curr = g.id_map) != 0) {
+        g.id_map = curr->next;
         free((genericptr_t) curr);
     }
-    n_ids_mapped = 0;
+    g.n_ids_mapped = 0;
 }
 
 /* Add a mapping to the ID map. */
@@ -1243,18 +1236,18 @@ unsigned gid, nid;
 {
     int idx;
 
-    idx = n_ids_mapped % N_PER_BUCKET;
+    idx = g.n_ids_mapped % N_PER_BUCKET;
     /* idx is zero on first time through, as well as when a new bucket is */
     /* needed */
     if (idx == 0) {
         struct bucket *gnu = (struct bucket *) alloc(sizeof(struct bucket));
-        gnu->next = id_map;
-        id_map = gnu;
+        gnu->next = g.id_map;
+        g.id_map = gnu;
     }
 
-    id_map->map[idx].gid = gid;
-    id_map->map[idx].nid = nid;
-    n_ids_mapped++;
+    g.id_map->map[idx].gid = gid;
+    g.id_map->map[idx].nid = nid;
+    g.n_ids_mapped++;
 }
 
 /*
@@ -1269,11 +1262,11 @@ unsigned gid, *nidp;
     int i;
     struct bucket *curr;
 
-    if (n_ids_mapped)
-        for (curr = id_map; curr; curr = curr->next) {
+    if (g.n_ids_mapped)
+        for (curr = g.id_map; curr; curr = curr->next) {
             /* first bucket might not be totally full */
-            if (curr == id_map) {
-                i = n_ids_mapped % N_PER_BUCKET;
+            if (curr == g.id_map) {
+                i = g.n_ids_mapped % N_PER_BUCKET;
                 if (i == 0)
                     i = N_PER_BUCKET;
             } else
@@ -1623,10 +1616,10 @@ register unsigned int len;
             return;
         } else {
             pline("Read %d instead of %u bytes.", rlen, len);
-            if (restoring) {
+            if (g.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();
-                error("Error restoring old game.");
+                error("Error g.restoring old game.");
             }
             panic("Error reading level file.");
         }
