@@ -545,7 +545,7 @@ struct instance_globals {
 
 E struct instance_globals g;
 
-E void instance_globals_init();
+E void decl_globals_init();
 
 
 #undef E

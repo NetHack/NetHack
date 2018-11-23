@@ -109,8 +109,7 @@ struct lc_vardefs *FDECL(vardef_defined, (struct lc_vardefs *, char *, int));
 void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
 extern void NDECL(monst_init);
-extern void NDECL(objects_init);
-extern void NDECL(decl_init);
+extern void NDECL(objects_globals_init);
 
 void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 
@@ -256,12 +255,15 @@ char **argv;
     argc = SIZE(mac_argv);
     argv = mac_argv;
 #endif
+
+    decl_globals_init();
+    objects_globals_init();
+
     /* Note:  these initializers don't do anything except guarantee that
      *        we're linked properly.
      */
     monst_init();
-    objects_init();
-    decl_init();
+
     /* this one does something... */
     init_obj_classes();
 

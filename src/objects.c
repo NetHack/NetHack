@@ -61,7 +61,7 @@ struct monst { struct monst *dummy; };  /* lint: struct obj's union */
                cost,sdam,ldam,oc1,oc2,nut,color)  { obj }
 #define None (char *) 0 /* less visual distraction for 'no description' */
 
-NEARDATA struct objdescr obj_descr[] =
+NEARDATA struct objdescr obj_descr_init[] =
 #else
 /* second pass -- object definitions */
 #define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
@@ -75,7 +75,7 @@ NEARDATA struct objdescr obj_descr[] =
 #define HARDGEM(n) (0)
 #endif
 
-NEARDATA struct objclass objects[] =
+NEARDATA struct objclass obj_init[] =
 #endif
 {
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
@@ -1169,13 +1169,14 @@ OBJECT(OBJ(None, None),
 /* clang-format on */
 /* *INDENT-ON* */
 
-void NDECL(objects_init);
+struct objdescr obj_descr[SIZE(obj_descr_init)];
+struct objclass objects[SIZE(obj_init)];
 
-/* dummy routine used to force linkage */
 void
-objects_init()
+objects_globals_init()
 {
-    return;
+    memcpy(obj_descr, obj_descr_init, sizeof(obj_descr));
+    memcpy(objects, obj_init, sizeof(objects));
 }
 
 #endif /* !OBJECTS_PASS_2_ */
