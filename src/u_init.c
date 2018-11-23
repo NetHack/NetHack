@@ -991,9 +991,9 @@ register struct trobj *trop;
              */
             obj = mkobj(trop->trclass, FALSE);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == icontext.nocreate
-                   || otyp == icontext.nocreate2 || otyp == icontext.nocreate3
-                   || otyp == icontext.nocreate4 || otyp == RIN_LEVITATION
+            while (otyp == WAN_WISHING || otyp == iv.nocreate
+                   || otyp == iv.nocreate2 || otyp == iv.nocreate3
+                   || otyp == iv.nocreate4 || otyp == RIN_LEVITATION
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID
@@ -1035,16 +1035,16 @@ register struct trobj *trop;
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                icontext.nocreate = RIN_POLYMORPH_CONTROL;
+                iv.nocreate = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                icontext.nocreate = RIN_POLYMORPH;
-                icontext.nocreate2 = SPE_POLYMORPH;
-                icontext.nocreate3 = POT_POLYMORPH;
+                iv.nocreate = RIN_POLYMORPH;
+                iv.nocreate2 = SPE_POLYMORPH;
+                iv.nocreate3 = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                icontext.nocreate4 = otyp;
+                iv.nocreate4 = otyp;
         }
 
         if (urace.malenum != PM_HUMAN) {

@@ -97,7 +97,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     win10_init();
 
-    icontext_init();
+    instance_variable_init();
     sys_early_init();
 
     /* init applicatio structure */
