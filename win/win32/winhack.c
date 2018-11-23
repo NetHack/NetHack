@@ -97,9 +97,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     win10_init();
 
-#ifdef PLAYAGAIN
-    decl_early_init();
-#endif
+    icontext_init();
     sys_early_init();
 
     /* init applicatio structure */

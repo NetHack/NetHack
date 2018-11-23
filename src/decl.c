@@ -215,9 +215,6 @@ NEARDATA struct monst *migrating_mons = (struct monst *) 0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
 
-/* originally from pickup.c */
-int oldcap = 0; /* encumbrance */
-
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
@@ -529,8 +526,6 @@ decl_early_init()
     ZERO(ubirthday);
     ZERO(urealtime);
 
-    ZERO(oldcap);
-
     ZEROARRAY(lastseentyp);
 
     ZEROPTR(invent);
@@ -611,5 +606,19 @@ decl_early_init()
     s_firstStart = FALSE;
 }
 #endif
+
+const struct instance_context icontext_initial_state = {
+    0, /* oldcap - last encumberance in pickup.c */
+};
+
+struct instance_context icontext;
+
+void 
+icontext_init() 
+{
+    icontext = icontext_initial_state;
+
+    decl_early_init();
+};
 
 /*decl.c*/
