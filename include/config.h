@@ -556,6 +556,7 @@ typedef unsigned char uchar;
 
 #endif
 
+
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES

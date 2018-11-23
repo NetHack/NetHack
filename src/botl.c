@@ -64,7 +64,7 @@ do_statusline1()
         Strcpy(nb = eos(nb), rank());
 
     Sprintf(nb = eos(nb), "  ");
-    i = icontext.mrank_sz + 15;
+    i = iv.mrank_sz + 15;
     j = (int) ((nb + 2) - newbot1); /* strlen(newbot1) but less computation */
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
@@ -345,7 +345,7 @@ max_rank_sz()
         if (urole.rank[i].f && (r = strlen(urole.rank[i].f)) > maxr)
             maxr = r;
     }
-    icontext.mrank_sz = maxr;
+    iv.mrank_sz = maxr;
     return;
 }
 
