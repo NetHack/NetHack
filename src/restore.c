@@ -58,7 +58,7 @@ static struct restore_procs {
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
- * map is used by the timer routines when g.restoring ghost levels.
+ * map is used by the timer routines when restoring ghost levels.
  */
 #define N_PER_BUCKET 64
 struct bucket {
@@ -176,7 +176,7 @@ boolean ghostly;
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
-            /* when g.restoring, there are two passes over the current
+            /* when restoring, there are two passes over the current
              * level.  the first time, u.uz isn't set, so neither is
              * shop_keeper().  just wait and process the damage on
              * the second pass.
@@ -209,7 +209,7 @@ struct obj *otmp;
     mread(fd, (genericptr_t) otmp, sizeof(struct obj));
 
     /* next object pointers are invalid; otmp->cobj needs to be left
-       as is--being non-null is key to g.restoring container contents */
+       as is--being non-null is key to restoring container contents */
     otmp->nobj = otmp->nexthere = (struct obj *) 0;
     /* non-null oextra needs to be reconstructed */
     if (otmp->oextra) {
@@ -1018,7 +1018,7 @@ boolean ghostly;
     setmode(fd, O_BINARY);
 #endif
     /* Load the old fruit info.  We have to do it first, so the
-     * information is available when g.restoring the objects.
+     * information is available when restoring the objects.
      */
     if (ghostly)
         g.oldfruit = loadfruitchn(fd);
@@ -1619,7 +1619,7 @@ register unsigned int len;
             if (g.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();
-                error("Error g.restoring old game.");
+                error("Error restoring old game.");
             }
             panic("Error reading level file.");
         }
