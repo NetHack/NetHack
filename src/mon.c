@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1539479657 2018/10/14 01:14:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.260 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1543052701 2018/11/24 09:45:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1618,8 +1618,9 @@ struct monst *mon;
 struct monst **monst_list; /* &migrating_mons or &mydogs or null */
 {
     struct monst *mtmp;
-    boolean unhide = (monst_list != 0);
     int mx = mon->mx, my = mon->my;
+    boolean on_map = (m_at(mx, my) == mon),
+            unhide = (monst_list != 0);
 
     if (!fmon)
         panic("relmon: no fmon available.");
@@ -1633,10 +1634,12 @@ struct monst **monst_list; /* &migrating_mons or &mydogs or null */
             seemimic(mon);
     }
 
-    if (mon->wormno)
-        remove_worm(mon);
-    else
-        remove_monster(mx, my);
+    if (on_map) {
+        if (mon->wormno)
+            remove_worm(mon);
+        else
+            remove_monster(mx, my);
+    }
 
     if (mon == fmon) {
         fmon = fmon->nmon;
@@ -1652,7 +1655,8 @@ struct monst **monst_list; /* &migrating_mons or &mydogs or null */
     }
 
     if (unhide) {
-        newsym(mx, my);
+        if (on_map)
+            newsym(mx, my);
         /* insert into mydogs or migrating_mons */
         mon->nmon = *monst_list;
         *monst_list = mon;
@@ -2515,7 +2519,7 @@ struct monst *mtmp;
 {
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
-    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
+    migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_APPROX_XY, (coord *) 0);
 }
 
 /* make monster mtmp next to you (if possible);

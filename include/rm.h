@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	rm.h	$NHDT-Date: 1543052680 2018/11/24 09:44:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -631,13 +631,17 @@ extern dlevel_t level; /* structure describing the current level */
     (level.monsters[x][y] != (struct monst *) 0 \
      && (level.monsters[x][y])->mburied)
 #ifdef EXTRA_SANITY_CHECKS
-#define place_worm_seg(m, x, y) do { \
-    if (level.monsters[x][y] && level.monsters[x][y] != m) impossible("place_worm_seg over mon"); \
-    level.monsters[x][y] = m; \
+#define place_worm_seg(m, x, y) \
+    do {                                                        \
+        if (level.monsters[x][y] && level.monsters[x][y] != m)  \
+            impossible("place_worm_seg over mon");              \
+        level.monsters[x][y] = m;                               \
     } while(0)
-#define remove_monster(x, y) do { \
-    if (!level.monsters[x][y]) impossible("no monster to remove"); \
-    level.monsters[x][y] = (struct monst *) 0; \
+#define remove_monster(x, y) \
+    do {                                                \
+        if (!level.monsters[x][y])                      \
+            impossible("no monster to remove");         \
+        level.monsters[x][y] = (struct monst *) 0;      \
     } while(0)
 #else
 #define place_worm_seg(m, x, y) level.monsters[x][y] = m
