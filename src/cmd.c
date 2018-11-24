@@ -266,16 +266,6 @@ int xtime;
 
 STATIC_DCL char NDECL(popch);
 
-/* Provide a means to redo the last command.  The flag `in_doagain' is set
- * to true while redoing the command.  This flag is tested in commands that
- * require additional input (like `throw' which requires a thing and a
- * direction), and the input prompt is not shown.  Also, while in_doagain is
- * TRUE, no keystrokes can be saved into the saveq.
- */
-#define BSIZE 20
-static char pushq[BSIZE], saveq[BSIZE];
-static NEARDATA int phead, ptail, shead, stail;
-
 STATIC_OVL char
 popch()
 {
@@ -287,9 +277,9 @@ popch()
     if (occupation)
         return '\0';
     if (in_doagain)
-        return (char) ((shead != stail) ? saveq[stail++] : '\0');
+        return (char) ((g.shead != g.stail) ? g.saveq[g.stail++] : '\0');
     else
-        return (char) ((phead != ptail) ? pushq[ptail++] : '\0');
+        return (char) ((g.phead != g.ptail) ? g.pushq[g.ptail++] : '\0');
 }
 
 char
@@ -310,9 +300,9 @@ pushch(ch)
 char ch;
 {
     if (!ch)
-        phead = ptail = 0;
-    if (phead < BSIZE)
-        pushq[phead++] = ch;
+        g.phead = g.ptail = 0;
+    if (g.phead < BSIZE)
+        g.pushq[g.phead++] = ch;
     return;
 }
 
@@ -325,9 +315,9 @@ char ch;
 {
     if (!in_doagain) {
         if (!ch)
-            phead = ptail = shead = stail = 0;
-        else if (shead < BSIZE)
-            saveq[shead++] = ch;
+            g.phead = g.ptail = g.shead = g.stail = 0;
+        else if (g.shead < BSIZE)
+            g.saveq[g.shead++] = ch;
     }
     return;
 }
@@ -1547,8 +1537,6 @@ doterrain(VOID_ARGS)
 }
 
 /* -enlightenment and conduct- */
-static winid en_win = WIN_ERR;
-static boolean en_via_menu = FALSE;
 static const char You_[] = "You ", are[] = "are ", were[] = "were ",
                   have[] = "have ", had[] = "had ", can[] = "can ",
                   could[] = "could ";
@@ -1570,13 +1558,13 @@ static void
 enlght_out(buf)
 const char *buf;
 {
-    if (en_via_menu) {
+    if (g.en_via_menu) {
         anything any;
 
         any = zeroany;
-        add_menu(en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+        add_menu(g.en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     } else
-        putstr(en_win, 0, buf);
+        putstr(g.en_win, 0, buf);
 }
 
 static void
@@ -1708,10 +1696,10 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
-    en_win = create_nhwindow(NHW_MENU);
-    en_via_menu = !final;
-    if (en_via_menu)
-        start_menu(en_win);
+    g.en_win = create_nhwindow(NHW_MENU);
+    g.en_via_menu = !final;
+    if (g.en_via_menu)
+        start_menu(g.en_win);
 
     Strcpy(tmpbuf, plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
@@ -1746,18 +1734,18 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         attributes_enlightenment(mode, final);
     }
 
-    if (!en_via_menu) {
-        display_nhwindow(en_win, TRUE);
+    if (!g.en_via_menu) {
+        display_nhwindow(g.en_win, TRUE);
     } else {
         menu_item *selected = 0;
 
-        end_menu(en_win, (char *) 0);
-        if (select_menu(en_win, PICK_NONE, &selected) > 0)
+        end_menu(g.en_win, (char *) 0);
+        if (select_menu(g.en_win, PICK_NONE, &selected) > 0)
             free((genericptr_t) selected);
-        en_via_menu = FALSE;
+        g.en_via_menu = FALSE;
     }
-    destroy_nhwindow(en_win);
-    en_win = WIN_ERR;
+    destroy_nhwindow(g.en_win);
+    g.en_win = WIN_ERR;
 }
 
 /*ARGSUSED*/
@@ -3108,8 +3096,8 @@ int final;
     int ngenocided;
 
     /* Create the conduct window */
-    en_win = create_nhwindow(NHW_MENU);
-    putstr(en_win, 0, "Voluntary challenges:");
+    g.en_win = create_nhwindow(NHW_MENU);
+    putstr(g.en_win, 0, "Voluntary challenges:");
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
@@ -3203,9 +3191,9 @@ int final;
     }
 
     /* Pop up the window and wait for a key */
-    display_nhwindow(en_win, TRUE);
-    destroy_nhwindow(en_win);
-    en_win = WIN_ERR;
+    display_nhwindow(g.en_win, TRUE);
+    destroy_nhwindow(g.en_win);
+    g.en_win = WIN_ERR;
 }
 
 /* ordered by command name */
@@ -4499,9 +4487,9 @@ register char *cmd;
         context.move = FALSE;
         return;
     }
-    if (*cmd == DOAGAIN && !in_doagain && saveq[0]) {
+    if (*cmd == DOAGAIN && !in_doagain && g.saveq[0]) {
         in_doagain = TRUE;
-        stail = 0;
+        g.stail = 0;
         rhack((char *) 0); /* read and execute command */
         in_doagain = FALSE;
         return;
@@ -4582,7 +4570,7 @@ register char *cmd;
     case NHKF_CLICKLOOK:
         if (iflags.clicklook) {
             context.move = FALSE;
-            do_look(2, &clicklook_cc);
+            do_look(2, &g.clicklook_cc);
         }
         return;
     case NHKF_TRAVEL:
@@ -5347,8 +5335,8 @@ int x, y, mod;
     cmd[1] = 0;
 
     if (iflags.clicklook && mod == CLICK_2) {
-        clicklook_cc.x = x;
-        clicklook_cc.y = y;
+        g.clicklook_cc.x = x;
+        g.clicklook_cc.y = y;
         cmd[0] = g.Cmd.spkeys[NHKF_CLICKLOOK];
         return cmd;
     }

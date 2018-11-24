@@ -20,11 +20,10 @@ STATIC_OVL boolean
 no_bones_level(lev)
 d_level *lev;
 {
-    extern d_level save_dlevel; /* in do.c */
     s_level *sptr;
 
-    if (ledger_no(&save_dlevel))
-        assign_level(lev, &save_dlevel);
+    if (ledger_no(&g.save_dlevel))
+        assign_level(lev, &g.save_dlevel);
 
     return (boolean) (((sptr = Is_special(lev)) != 0 && !sptr->boneid)
                       || !dungeons[lev->dnum].boneid

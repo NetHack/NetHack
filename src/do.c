@@ -19,8 +19,6 @@ STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
 
-extern int n_dgns; /* number of dungeons, from dungeon.c */
-
 static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
                                             ALL_CLASSES, 0 };
 
@@ -891,9 +889,6 @@ drop_done:
     return n_dropped;
 }
 
-/* on a ladder, used in goto_level */
-static NEARDATA boolean at_ladder = FALSE;
-
 /* the '>' command */
 int
 dodown()
@@ -1024,9 +1019,9 @@ dodown()
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
     } else {
-        at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+        g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
         next_level(!trap);
-        at_ladder = FALSE;
+        g.at_ladder = FALSE;
     }
     return 1;
 }
@@ -1077,13 +1072,11 @@ doup()
         You("are held back by your pet!");
         return 0;
     }
-    at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+    g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
     prev_level(TRUE);
-    at_ladder = FALSE;
+    g.at_ladder = FALSE;
     return 1;
 }
-
-d_level save_dlevel = { 0, 0 };
 
 /* check that we can write out the current level */
 STATIC_OVL int
@@ -1221,7 +1214,7 @@ boolean at_stairs, falling, portal;
                 (void) next_to_u();
                 return;
             } else
-                at_stairs = at_ladder = FALSE;
+                at_stairs = g.at_ladder = FALSE;
         }
     }
 
@@ -1297,7 +1290,7 @@ boolean at_stairs, falling, portal;
         for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
             delete_levelfile(l_idx);
         /* mark #overview data for all dungeon branches as uninteresting */
-        for (l_idx = 0; l_idx < n_dgns; ++l_idx)
+        for (l_idx = 0; l_idx < g.n_dgns; ++l_idx)
             remdun_mapseen(l_idx);
     }
 
@@ -1371,7 +1364,7 @@ boolean at_stairs, falling, portal;
         u_on_newpos(ttrap->tx, ttrap->ty);
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
-            if (at_ladder)
+            if (g.at_ladder)
                 u_on_newpos(xdnladder, ydnladder);
             else if (newdungeon)
                 u_on_sstairs(1);
@@ -1384,10 +1377,10 @@ boolean at_stairs, falling, portal;
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
                       Levitation ? "float" : Flying ? "fly" : "climb",
-                      (Flying && at_ladder) ? " along" : "",
-                      at_ladder ? "ladder" : "stairs");
+                      (Flying && g.at_ladder) ? " along" : "",
+                      g.at_ladder ? "ladder" : "stairs");
         } else { /* down */
-            if (at_ladder)
+            if (g.at_ladder)
                 u_on_newpos(xupladder, yupladder);
             else if (newdungeon)
                 u_on_sstairs(0);
@@ -1398,10 +1391,10 @@ boolean at_stairs, falling, portal;
             } else if (Flying) {
                 if (flags.verbose)
                     You("fly down %s.",
-                        at_ladder ? "along the ladder" : "the stairs");
+                        g.at_ladder ? "along the ladder" : "the stairs");
             } else if (near_capacity() > UNENCUMBERED
                        || Punished || Fumbling) {
-                You("fall down the %s.", at_ladder ? "ladder" : "stairs");
+                You("fall down the %s.", g.at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();
                     ballrelease(FALSE);
@@ -1411,13 +1404,13 @@ boolean at_stairs, falling, portal;
                     dismount_steed(DISMOUNT_FELL);
                 else
                     losehp(Maybe_Half_Phys(rnd(3)),
-                           at_ladder ? "falling off a ladder"
+                           g.at_ladder ? "falling off a ladder"
                                      : "tumbling down a flight of stairs",
                            KILLED_BY);
                 selftouch("Falling, you");
             } else { /* ordinary descent */
                 if (flags.verbose)
-                    You("%s.", at_ladder ? "climb down the ladder"
+                    You("%s.", g.at_ladder ? "climb down the ladder"
                                          : "descend the stairs");
             }
         }
@@ -1615,9 +1608,6 @@ final_level()
     gain_guardian_angel();
 }
 
-static char *dfr_pre_msg = 0,  /* pline() before level change */
-            *dfr_post_msg = 0; /* pline() after level change */
-
 /* change levels at the end of this turn, after monsters finish moving */
 void
 schedule_goto(tolev, at_stairs, falling, portal_flag, pre_msg, post_msg)
@@ -1642,9 +1632,9 @@ const char *pre_msg, *post_msg;
     assign_level(&u.utolev, tolev);
 
     if (pre_msg)
-        dfr_pre_msg = dupstr(pre_msg);
+        g.dfr_pre_msg = dupstr(pre_msg);
     if (post_msg)
-        dfr_post_msg = dupstr(post_msg);
+        g.dfr_post_msg = dupstr(post_msg);
 }
 
 /* handle something like portal ejection */
@@ -1656,8 +1646,8 @@ deferred_goto()
         int typmask = u.utotype; /* save it; goto_level zeroes u.utotype */
 
         assign_level(&dest, &u.utolev);
-        if (dfr_pre_msg)
-            pline1(dfr_pre_msg);
+        if (g.dfr_pre_msg)
+            pline1(g.dfr_pre_msg);
         goto_level(&dest, !!(typmask & 1), !!(typmask & 2), !!(typmask & 4));
         if (typmask & 0200) { /* remove portal */
             struct trap *t = t_at(u.ux, u.uy);
@@ -1667,14 +1657,14 @@ deferred_goto()
                 newsym(u.ux, u.uy);
             }
         }
-        if (dfr_post_msg)
-            pline1(dfr_post_msg);
+        if (g.dfr_post_msg)
+            pline1(g.dfr_post_msg);
     }
     u.utotype = 0; /* our caller keys off of this */
-    if (dfr_pre_msg)
-        free((genericptr_t) dfr_pre_msg), dfr_pre_msg = 0;
-    if (dfr_post_msg)
-        free((genericptr_t) dfr_post_msg), dfr_post_msg = 0;
+    if (g.dfr_pre_msg)
+        free((genericptr_t) g.dfr_pre_msg), g.dfr_pre_msg = 0;
+    if (g.dfr_post_msg)
+        free((genericptr_t) g.dfr_post_msg), g.dfr_post_msg = 0;
 }
 
 /*

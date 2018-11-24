@@ -599,9 +599,9 @@ reglyph_darkroom()
             }
         }
     if (flags.dark_room && iflags.use_color)
-        showsyms[S_darkroom] = showsyms[S_room];
+        g.showsyms[S_darkroom] = g.showsyms[S_room];
     else
-        showsyms[S_darkroom] = showsyms[S_stone];
+        g.showsyms[S_darkroom] = g.showsyms[S_stone];
 }
 
 /* check whether a user-supplied option string is a proper leading
@@ -742,7 +742,7 @@ initoptions_init()
     /* Set the default monster and object class symbols. */
     init_symbols();
     for (i = 0; i < WARNCOUNT; i++)
-        warnsyms[i] = def_warnsyms[i].sym;
+        g.warnsyms[i] = def_warnsyms[i].sym;
     iflags.bouldersym = 0;
 
     /* for "special achievement" tracking (see obj.h,
@@ -771,9 +771,9 @@ initoptions_init()
      */
     /* this detects the IBM-compatible console on most 386 boxes */
     if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-        if (!symset[PRIMARY].name)
+        if (!g.symset[PRIMARY].name)
             load_symset("IBMGraphics", PRIMARY);
-        if (!symset[ROGUESET].name)
+        if (!g.symset[ROGUESET].name)
             load_symset("RogueIBM", ROGUESET);
         switch_symbols(TRUE);
 #ifdef TEXTCOLOR
@@ -788,7 +788,7 @@ initoptions_init()
         /* [could also check "xterm" which emulates vtXXX by default] */
         && !strncmpi(opts, "vt", 2)
         && AS && AE && index(AS, '\016') && index(AE, '\017')) {
-        if (!symset[PRIMARY].name)
+        if (!g.symset[PRIMARY].name)
             load_symset("DECGraphics", PRIMARY);
         switch_symbols(TRUE);
     }
@@ -797,10 +797,10 @@ initoptions_init()
 
 #if defined(MSDOS) || defined(WIN32)
     /* Use IBM defaults. Can be overridden via config file */
-    if (!symset[PRIMARY].name) {
+    if (!g.symset[PRIMARY].name) {
         load_symset("IBMGraphics_2", PRIMARY);
     }
-    if (!symset[ROGUESET].name) {
+    if (!g.symset[ROGUESET].name) {
         load_symset("RogueEpyx", ROGUESET);
     }
 #endif
@@ -1157,7 +1157,7 @@ register uchar *graph_chars;
 
     for (i = 0; i < WARNCOUNT; i++)
         if (graph_chars[i])
-            warnsyms[i] = graph_chars[i];
+            g.warnsyms[i] = graph_chars[i];
 }
 
 STATIC_OVL int
@@ -2288,7 +2288,7 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_opt(opts, FALSE)) != 0) {
-            symset[ROGUESET].name = dupstr(op);
+            g.symset[ROGUESET].name = dupstr(op);
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
                 config_error_add(
@@ -2313,7 +2313,7 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_opt(opts, FALSE)) != 0) {
-            symset[PRIMARY].name = dupstr(op);
+            g.symset[PRIMARY].name = dupstr(op);
             if (!read_sym_file(PRIMARY)) {
                 clear_symsetentry(PRIMARY, TRUE);
                 config_error_add(
@@ -2321,7 +2321,7 @@ boolean tinitial, tfrom_file;
                                  op, SYMBOLS);
                 return FALSE;
             } else {
-                switch_symbols(symset[PRIMARY].name != (char *) 0);
+                switch_symbols(g.symset[PRIMARY].name != (char *) 0);
                 need_redraw = TRUE;
             }
         } else
@@ -3779,10 +3779,10 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         if (!negated) {
             /* There is no rogue level DECgraphics-specific set */
-            if (symset[PRIMARY].name) {
+            if (g.symset[PRIMARY].name) {
                 badflag = TRUE;
             } else {
-                symset[PRIMARY].name = dupstr(fullname);
+                g.symset[PRIMARY].name = dupstr(fullname);
                 if (!read_sym_file(PRIMARY)) {
                     badflag = TRUE;
                     clear_symsetentry(PRIMARY, TRUE);
@@ -3812,12 +3812,12 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         if (!negated) {
             for (i = 0; i < NUM_GRAPHICS; ++i) {
-                if (symset[i].name) {
+                if (g.symset[i].name) {
                     badflag = TRUE;
                 } else {
                     if (i == ROGUESET)
                         sym_name = "RogueIBM";
-                    symset[i].name = dupstr(sym_name);
+                    g.symset[i].name = dupstr(sym_name);
                     if (!read_sym_file(i)) {
                         badflag = TRUE;
                         clear_symsetentry(i, TRUE);
@@ -3850,10 +3850,10 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (!negated) {
-            if (symset[PRIMARY].name) {
+            if (g.symset[PRIMARY].name) {
                 badflag = TRUE;
             } else {
-                symset[PRIMARY].name = dupstr(fullname);
+                g.symset[PRIMARY].name = dupstr(fullname);
                 if (!read_sym_file(PRIMARY)) {
                     badflag = TRUE;
                     clear_symsetentry(PRIMARY, TRUE);
@@ -5211,8 +5211,8 @@ boolean setinitial, setfromfile;
         which_set = rogueflag ? ROGUESET : PRIMARY;
 
         /* clear symset[].name as a flag to read_sym_file() to build list */
-        symset_name = symset[which_set].name;
-        symset[which_set].name = (char *) 0;
+        symset_name = g.symset[which_set].name;
+        g.symset[which_set].name = (char *) 0;
         symset_list = (struct symsetentry *) 0;
 
         res = read_sym_file(which_set);
@@ -5294,7 +5294,7 @@ boolean setinitial, setfromfile;
                         clear_symsetentry(which_set, TRUE);
 
                         /* transfer only the name of the symbol set */
-                        symset[which_set].name = dupstr(sl->name);
+                        g.symset[which_set].name = dupstr(sl->name);
                         ready_to_switch = TRUE;
                         break;
                     }
@@ -5338,8 +5338,8 @@ boolean setinitial, setfromfile;
         if (nothing_to_do)
             return TRUE;
 
-        if (!symset[which_set].name && symset_name)
-            symset[which_set].name = symset_name; /* not dupstr() here */
+        if (!g.symset[which_set].name && symset_name)
+            g.symset[which_set].name = symset_name; /* not dupstr() here */
 
         /* Set default symbols and clear the handling value */
         if (rogueflag)
@@ -5347,7 +5347,7 @@ boolean setinitial, setfromfile;
         else
             init_l_symbols();
 
-        if (symset[which_set].name) {
+        if (g.symset[which_set].name) {
             if (read_sym_file(which_set)) {
                 ready_to_switch = TRUE;
             } else {
@@ -5426,7 +5426,7 @@ char *buf;
         Sprintf(buf, "%c",
                 iflags.bouldersym
                     ? iflags.bouldersym
-                    : showsyms[(int) objects[BOULDER].oc_class + SYM_OFF_O]);
+                    : g.showsyms[(int) objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
     else if (!strcmp(optname, "catname"))
         Sprintf(buf, "%s", catname[0] ? catname : none);
@@ -5611,8 +5611,8 @@ char *buf;
         Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
     } else if (!strcmp(optname, "roguesymset")) {
         Sprintf(buf, "%s",
-                symset[ROGUESET].name ? symset[ROGUESET].name : "default");
-        if (currentgraphics == ROGUESET && symset[ROGUESET].name)
+                g.symset[ROGUESET].name ? g.symset[ROGUESET].name : "default");
+        if (g.currentgraphics == ROGUESET && g.symset[ROGUESET].name)
             Strcat(buf, ", active");
     } else if (!strcmp(optname, "role")) {
         Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
@@ -5671,8 +5671,8 @@ char *buf;
                     FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
     } else if (!strcmp(optname, "symset")) {
         Sprintf(buf, "%s",
-                symset[PRIMARY].name ? symset[PRIMARY].name : "default");
-        if (currentgraphics == PRIMARY && symset[PRIMARY].name)
+                g.symset[PRIMARY].name ? g.symset[PRIMARY].name : "default");
+        if (g.currentgraphics == PRIMARY && g.symset[PRIMARY].name)
             Strcat(buf, ", active");
 #ifdef CURSES_GRAPHICS
     } else if (!strcmp(optname, "term_cols")) {
@@ -5903,9 +5903,9 @@ int which_set;
 {
     clear_symsetentry(which_set, TRUE);
 
-    if (symset[which_set].name)
-        free((genericptr_t) symset[which_set].name);
-    symset[which_set].name = dupstr(s);
+    if (g.symset[which_set].name)
+        free((genericptr_t) g.symset[which_set].name);
+    g.symset[which_set].name = dupstr(s);
 
     if (read_sym_file(which_set)) {
         switch_symbols(TRUE);

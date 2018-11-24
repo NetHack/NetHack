@@ -18,6 +18,8 @@
  #pragma warning(disable : 4244)
 #endif
 
+lev_region *lregions;
+
 typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));
@@ -189,18 +191,12 @@ STATIC_DCL boolean FDECL(sp_level_coder, (sp_lev *));
 
 extern struct engr *head_engr;
 
-extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
-
 /* positions touched by level elements explicitly defined in the des-file */
 static char SpLev_Map[COLNO][ROWNO];
 
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 static NEARDATA xchar xstart, ystart;
 static NEARDATA char xsize, ysize;
-
-char *lev_message = 0;
-lev_region *lregions = 0;
-int num_lregions = 0;
 
 static boolean splev_init_present = FALSE;
 static boolean icedpools = FALSE;
@@ -2966,19 +2962,19 @@ struct sp_coder *coder;
     if (!msg)
         return;
 
-    old_n = lev_message ? (strlen(lev_message) + 1) : 0;
+    old_n = g.lev_message ? (strlen(g.lev_message) + 1) : 0;
     n = strlen(msg);
 
     levmsg = (char *) alloc(old_n + n + 1);
     if (old_n)
         levmsg[old_n - 1] = '\n';
-    if (lev_message)
-        (void) memcpy((genericptr_t) levmsg, (genericptr_t) lev_message,
+    if (g.lev_message)
+        (void) memcpy((genericptr_t) levmsg, (genericptr_t) g.lev_message,
                       old_n - 1);
     (void) memcpy((genericptr_t) &levmsg[old_n], msg, n);
     levmsg[old_n + n] = '\0';
-    Free(lev_message);
-    lev_message = levmsg;
+    Free(g.lev_message);
+    g.lev_message = levmsg;
     opvar_free(op);
 }
 
@@ -4566,21 +4562,21 @@ struct sp_coder *coder;
         get_location(&tmplregion->delarea.x2, &tmplregion->delarea.y2,
                      ANY_LOC, (struct mkroom *) 0);
     }
-    if (num_lregions) {
+    if (g.num_lregions) {
         /* realloc the lregion space to add the new one */
         lev_region *newl = (lev_region *) alloc(
-            sizeof(lev_region) * (unsigned) (1 + num_lregions));
+            sizeof(lev_region) * (unsigned) (1 + g.num_lregions));
 
-        (void) memcpy((genericptr_t) (newl), (genericptr_t) lregions,
-                      sizeof(lev_region) * num_lregions);
-        Free(lregions);
-        num_lregions++;
-        lregions = newl;
+        (void) memcpy((genericptr_t) (newl), (genericptr_t) g.lregions,
+                      sizeof(lev_region) * g.num_lregions);
+        Free(g.lregions);
+        g.num_lregions++;
+        g.lregions = newl;
     } else {
-        num_lregions = 1;
-        lregions = (lev_region *) alloc(sizeof(lev_region));
+        g.num_lregions = 1;
+        g.lregions = (lev_region *) alloc(sizeof(lev_region));
     }
-    (void) memcpy(&lregions[num_lregions - 1], tmplregion,
+    (void) memcpy(&g.lregions[g.num_lregions - 1], tmplregion,
                   sizeof(lev_region));
     free(tmplregion);
 
@@ -4669,11 +4665,12 @@ struct sp_coder *coder;
     troom->needjoining = joined;
 
     if (irregular) {
-        min_rx = max_rx = dx1;
-        min_ry = max_ry = dy1;
+        g.min_rx = g.max_rx = dx1;
+        g.min_ry = g.max_ry = dy1;
         smeq[nroom] = nroom;
         flood_fill_rm(dx1, dy1, nroom + ROOMOFFSET, OV_i(rlit), TRUE);
-        add_room(min_rx, min_ry, max_rx, max_ry, FALSE, OV_i(rtype), TRUE);
+        add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OV_i(rtype),
+                 TRUE);
         troom->rlit = OV_i(rlit);
         troom->irregular = TRUE;
     } else {

@@ -24,42 +24,40 @@ STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 #define TRAVP_GUESS  1
 #define TRAVP_VALID  2
 
-static anything tmp_anything;
-
 anything *
 uint_to_any(ui)
 unsigned ui;
 {
-    tmp_anything = zeroany;
-    tmp_anything.a_uint = ui;
-    return &tmp_anything;
+    g.tmp_anything = zeroany;
+    g.tmp_anything.a_uint = ui;
+    return &g.tmp_anything;
 }
 
 anything *
 long_to_any(lng)
 long lng;
 {
-    tmp_anything = zeroany;
-    tmp_anything.a_long = lng;
-    return &tmp_anything;
+    g.tmp_anything = zeroany;
+    g.tmp_anything.a_long = lng;
+    return &g.tmp_anything;
 }
 
 anything *
 monst_to_any(mtmp)
 struct monst *mtmp;
 {
-    tmp_anything = zeroany;
-    tmp_anything.a_monst = mtmp;
-    return &tmp_anything;
+    g.tmp_anything = zeroany;
+    g.tmp_anything.a_monst = mtmp;
+    return &g.tmp_anything;
 }
 
 anything *
 obj_to_any(obj)
 struct obj *obj;
 {
-    tmp_anything = zeroany;
-    tmp_anything.a_obj = obj;
-    return &tmp_anything;
+    g.tmp_anything = zeroany;
+    g.tmp_anything.a_obj = obj;
+    return &g.tmp_anything;
 }
 
 boolean
@@ -2968,8 +2966,6 @@ weight_cap()
     return (int) carrcap;
 }
 
-static int wc; /* current weight_cap(); valid after call to inv_weight() */
-
 /* returns how far beyond the normal capacity the player is currently. */
 /* inv_weight() is negative if the player is below normal capacity. */
 int
@@ -2985,8 +2981,8 @@ inv_weight()
             wt += otmp->owt;
         otmp = otmp->nobj;
     }
-    wc = weight_cap();
-    return (wt - wc);
+    g.wc = weight_cap();
+    return (wt - g.wc);
 }
 
 /*
@@ -3001,9 +2997,9 @@ int xtra_wt;
 
     if (wt <= 0)
         return UNENCUMBERED;
-    if (wc <= 1)
+    if (g.wc <= 1)
         return OVERLOADED;
-    cap = (wt * 2 / wc) + 1;
+    cap = (wt * 2 / g.wc) + 1;
     return min(cap, OVERLOADED);
 }
 
@@ -3018,7 +3014,7 @@ max_capacity()
 {
     int wt = inv_weight();
 
-    return (wt - (2 * wc));
+    return (wt - (2 * g.wc));
 }
 
 boolean

@@ -120,7 +120,6 @@ struct monst *mon;
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS,
                                          0 };
 
-STATIC_VAR xchar gtyp, gx, gy; /* type and position of dog's current goal */
 
 STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
 
@@ -492,17 +491,17 @@ int after, udist, whappr;
     dog_has_minvent = (droppables(mtmp) != 0);
 
     if (!edog || mtmp->mleashed) { /* he's not going anywhere... */
-        gtyp = APPORT;
-        gx = u.ux;
-        gy = u.uy;
+        g.gtyp = APPORT;
+        g.gx = u.ux;
+        g.gy = u.uy;
     } else {
 #define DDIST(x, y) (dist2(x, y, omx, omy))
 #define SQSRCHRADIUS 5
         int min_x, max_x, min_y, max_y;
         register int nx, ny;
 
-        gtyp = UNDEF; /* no goal as yet */
-        gx = gy = 0;  /* suppress 'used before set' message */
+        g.gtyp = UNDEF; /* no goal as yet */
+        g.gx = g.gy = 0;  /* suppress 'used before set' message */
 
         if ((min_x = omx - SQSRCHRADIUS) < 1)
             min_x = 1;
@@ -520,7 +519,7 @@ int after, udist, whappr;
             if (nx >= min_x && nx <= max_x && ny >= min_y && ny <= max_y) {
                 otyp = dogfood(mtmp, obj);
                 /* skip inferior goals */
-                if (otyp > gtyp || otyp == UNDEF)
+                if (otyp > g.gtyp || otyp == UNDEF)
                     continue;
                 /* avoid cursed items unless starving */
                 if (cursed_object_at(nx, ny)
@@ -531,31 +530,31 @@ int after, udist, whappr;
                     || !can_reach_location(mtmp, mtmp->mx, mtmp->my, nx, ny))
                     continue;
                 if (otyp < MANFOOD) {
-                    if (otyp < gtyp || DDIST(nx, ny) < DDIST(gx, gy)) {
-                        gx = nx;
-                        gy = ny;
-                        gtyp = otyp;
+                    if (otyp < g.gtyp || DDIST(nx, ny) < DDIST(g.gx, g.gy)) {
+                        g.gx = nx;
+                        g.gy = ny;
+                        g.gtyp = otyp;
                     }
-                } else if (gtyp == UNDEF && in_masters_sight
+                } else if (g.gtyp == UNDEF && in_masters_sight
                            && !dog_has_minvent
                            && (!levl[omx][omy].lit || levl[u.ux][u.uy].lit)
                            && (otyp == MANFOOD || m_cansee(mtmp, nx, ny))
                            && edog->apport > rn2(8)
                            && can_carry(mtmp, obj) > 0) {
-                    gx = nx;
-                    gy = ny;
-                    gtyp = APPORT;
+                    g.gx = nx;
+                    g.gy = ny;
+                    g.gtyp = APPORT;
                 }
             }
         }
     }
 
     /* follow player if appropriate */
-    if (gtyp == UNDEF || (gtyp != DOGFOOD && gtyp != APPORT
+    if (g.gtyp == UNDEF || (g.gtyp != DOGFOOD && g.gtyp != APPORT
                           && monstermoves < edog->hungrytime)) {
-        gx = u.ux;
-        gy = u.uy;
-        if (after && udist <= 4 && gx == u.ux && gy == u.uy)
+        g.gx = u.ux;
+        g.gy = u.uy;
+        if (after && udist <= 4 && g.gx == u.ux && g.gy == u.uy)
             return -2;
         appr = (udist >= 9) ? 1 : (mtmp->mflee) ? -1 : 0;
         if (udist > 1) {
@@ -576,34 +575,34 @@ int after, udist, whappr;
         appr = 0;
 
 #define FARAWAY (COLNO + 2) /* position outside screen */
-    if (gx == u.ux && gy == u.uy && !in_masters_sight) {
+    if (g.gx == u.ux && g.gy == u.uy && !in_masters_sight) {
         register coord *cp;
 
         cp = gettrack(omx, omy);
         if (cp) {
-            gx = cp->x;
-            gy = cp->y;
+            g.gx = cp->x;
+            g.gy = cp->y;
             if (edog)
                 edog->ogoal.x = 0;
         } else {
             /* assume master hasn't moved far, and reuse previous goal */
             if (edog && edog->ogoal.x
                 && (edog->ogoal.x != omx || edog->ogoal.y != omy)) {
-                gx = edog->ogoal.x;
-                gy = edog->ogoal.y;
+                g.gx = edog->ogoal.x;
+                g.gy = edog->ogoal.y;
                 edog->ogoal.x = 0;
             } else {
                 int fardist = FARAWAY * FARAWAY;
-                gx = gy = FARAWAY; /* random */
+                g.gx = g.gy = FARAWAY; /* random */
                 do_clear_area(omx, omy, 9, wantdoor, (genericptr_t) &fardist);
 
                 /* here gx == FARAWAY e.g. when dog is in a vault */
-                if (gx == FARAWAY || (gx == omx && gy == omy)) {
-                    gx = u.ux;
-                    gy = u.uy;
+                if (g.gx == FARAWAY || (g.gx == omx && g.gy == omy)) {
+                    g.gx = u.ux;
+                    g.gy = u.uy;
                 } else if (edog) {
-                    edog->ogoal.x = gx;
-                    edog->ogoal.y = gy;
+                    edog->ogoal.x = g.gx;
+                    edog->ogoal.y = g.gy;
                 }
             }
         }
@@ -878,7 +877,7 @@ int after; /* this is extra fast monster movement */
     int chi = -1, nidist, ndist;
     coord poss[9];
     long info[9], allowflags;
-#define GDIST(x, y) (dist2(x, y, gx, gy))
+#define GDIST(x, y) (dist2(x, y, g.gx, g.gy))
 
     /*
      * Tame Angels have isminion set and an ispriest structure instead of
@@ -982,7 +981,7 @@ int after; /* this is extra fast monster movement */
         uncursedcnt++;
     }
 
-    better_with_displacing = should_displace(mtmp, poss, info, cnt, gx, gy);
+    better_with_displacing = should_displace(mtmp, poss, info, cnt, g.gx, g.gy);
 
     chcnt = 0;
     chi = -1;
@@ -1329,8 +1328,8 @@ genericptr_t distance;
     int ndist, *dist_ptr = (int *) distance;
 
     if (*dist_ptr > (ndist = distu(x, y))) {
-        gx = x;
-        gy = y;
+        g.gx = x;
+        g.gy = y;
         *dist_ptr = ndist;
     }
 }

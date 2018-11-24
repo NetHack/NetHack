@@ -9,9 +9,6 @@
     (martial_bonus() || is_bigfoot(youmonst.data) \
      || (uarmf && uarmf->otyp == KICKING_BOOTS))
 
-static NEARDATA struct rm *maploc, nowhere;
-static NEARDATA const char *gate_str;
-
 /* kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
@@ -718,33 +715,33 @@ const char *kickobjnam;
 
     if (*kickobjnam)
         what = kickobjnam;
-    else if (maploc == &nowhere)
+    else if (g.maploc == &g.nowhere)
         what = "nothing";
-    else if (IS_DOOR(maploc->typ))
+    else if (IS_DOOR(g.maploc->typ))
         what = "a door";
-    else if (IS_TREE(maploc->typ))
+    else if (IS_TREE(g.maploc->typ))
         what = "a tree";
-    else if (IS_STWALL(maploc->typ))
+    else if (IS_STWALL(g.maploc->typ))
         what = "a wall";
-    else if (IS_ROCK(maploc->typ))
+    else if (IS_ROCK(g.maploc->typ))
         what = "a rock";
-    else if (IS_THRONE(maploc->typ))
+    else if (IS_THRONE(g.maploc->typ))
         what = "a throne";
-    else if (IS_FOUNTAIN(maploc->typ))
+    else if (IS_FOUNTAIN(g.maploc->typ))
         what = "a fountain";
-    else if (IS_GRAVE(maploc->typ))
+    else if (IS_GRAVE(g.maploc->typ))
         what = "a headstone";
-    else if (IS_SINK(maploc->typ))
+    else if (IS_SINK(g.maploc->typ))
         what = "a sink";
-    else if (IS_ALTAR(maploc->typ))
+    else if (IS_ALTAR(g.maploc->typ))
         what = "an altar";
-    else if (IS_DRAWBRIDGE(maploc->typ))
+    else if (IS_DRAWBRIDGE(g.maploc->typ))
         what = "a drawbridge";
-    else if (maploc->typ == STAIRS)
+    else if (g.maploc->typ == STAIRS)
         what = "the stairs";
-    else if (maploc->typ == LADDER)
+    else if (g.maploc->typ == LADDER)
         what = "a ladder";
-    else if (maploc->typ == IRONBARS)
+    else if (g.maploc->typ == IRONBARS)
         what = "an iron bar";
     else
         what = "something weird";
@@ -887,10 +884,10 @@ dokick()
     u_wipe_engr(2);
 
     if (!isok(x, y)) {
-        maploc = &nowhere;
+        g.maploc = &g.nowhere;
         goto ouch;
     }
-    maploc = &levl[x][y];
+    g.maploc = &levl[x][y];
 
     /*
      * The next five tests should stay in their present order:
@@ -959,49 +956,49 @@ dokick()
         goto ouch;
     }
 
-    if (!IS_DOOR(maploc->typ)) {
-        if (maploc->typ == SDOOR) {
+    if (!IS_DOOR(g.maploc->typ)) {
+        if (g.maploc->typ == SDOOR) {
             if (!Levitation && rn2(30) < avrg_attrib) {
-                cvt_sdoor_to_door(maploc); /* ->typ = DOOR */
+                cvt_sdoor_to_door(g.maploc); /* ->typ = DOOR */
                 pline("Crash!  %s a secret door!",
                       /* don't "kick open" when it's locked
                          unless it also happens to be trapped */
-                      (maploc->doormask & (D_LOCKED | D_TRAPPED)) == D_LOCKED
+                      (g.maploc->doormask & (D_LOCKED | D_TRAPPED)) == D_LOCKED
                           ? "Your kick uncovers"
                           : "You kick open");
                 exercise(A_DEX, TRUE);
-                if (maploc->doormask & D_TRAPPED) {
-                    maploc->doormask = D_NODOOR;
+                if (g.maploc->doormask & D_TRAPPED) {
+                    g.maploc->doormask = D_NODOOR;
                     b_trapped("door", FOOT);
-                } else if (maploc->doormask != D_NODOOR
-                           && !(maploc->doormask & D_LOCKED))
-                    maploc->doormask = D_ISOPEN;
+                } else if (g.maploc->doormask != D_NODOOR
+                           && !(g.maploc->doormask & D_LOCKED))
+                    g.maploc->doormask = D_ISOPEN;
                 feel_newsym(x, y); /* we know it's gone */
-                if (maploc->doormask == D_ISOPEN
-                    || maploc->doormask == D_NODOOR)
+                if (g.maploc->doormask == D_ISOPEN
+                    || g.maploc->doormask == D_NODOOR)
                     unblock_point(x, y); /* vision */
                 return 1;
             } else
                 goto ouch;
         }
-        if (maploc->typ == SCORR) {
+        if (g.maploc->typ == SCORR) {
             if (!Levitation && rn2(30) < avrg_attrib) {
                 pline("Crash!  You kick open a secret passage!");
                 exercise(A_DEX, TRUE);
-                maploc->typ = CORR;
+                g.maploc->typ = CORR;
                 feel_newsym(x, y); /* we know it's gone */
                 unblock_point(x, y); /* vision */
                 return 1;
             } else
                 goto ouch;
         }
-        if (IS_THRONE(maploc->typ)) {
+        if (IS_THRONE(g.maploc->typ)) {
             register int i;
             if (Levitation)
                 goto dumb;
-            if ((Luck < 0 || maploc->doormask) && !rn2(3)) {
-                maploc->typ = ROOM;
-                maploc->doormask = 0; /* don't leave loose ends.. */
+            if ((Luck < 0 || g.maploc->doormask) && !rn2(3)) {
+                g.maploc->typ = ROOM;
+                g.maploc->doormask = 0; /* don't leave loose ends.. */
                 (void) mkgold((long) rnd(200), x, y);
                 if (Blind)
                     pline("CRASH!  You destroy it.");
@@ -1011,7 +1008,7 @@ dokick()
                 }
                 exercise(A_DEX, TRUE);
                 return 1;
-            } else if (Luck > 0 && !rn2(3) && !maploc->looted) {
+            } else if (Luck > 0 && !rn2(3) && !g.maploc->looted) {
                 (void) mkgold((long) rn1(201, 300), x, y);
                 i = Luck + 1;
                 if (i > 6)
@@ -1027,7 +1024,7 @@ dokick()
                     newsym(x, y);
                 }
                 /* prevent endless milking */
-                maploc->looted = T_LOOTED;
+                g.maploc->looted = T_LOOTED;
                 return 1;
             } else if (!rn2(4)) {
                 if (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)) {
@@ -1038,7 +1035,7 @@ dokick()
             }
             goto ouch;
         }
-        if (IS_ALTAR(maploc->typ)) {
+        if (IS_ALTAR(g.maploc->typ)) {
             if (Levitation)
                 goto dumb;
             You("kick %s.", (Blind ? something : "the altar"));
@@ -1048,7 +1045,7 @@ dokick()
             exercise(A_DEX, TRUE);
             return 1;
         }
-        if (IS_FOUNTAIN(maploc->typ)) {
+        if (IS_FOUNTAIN(g.maploc->typ)) {
             if (Levitation)
                 goto dumb;
             You("kick %s.", (Blind ? something : "the fountain"));
@@ -1063,7 +1060,7 @@ dokick()
             exercise(A_DEX, TRUE);
             return 1;
         }
-        if (IS_GRAVE(maploc->typ)) {
+        if (IS_GRAVE(g.maploc->typ)) {
             if (Levitation)
                 goto dumb;
             if (rn2(4))
@@ -1073,8 +1070,8 @@ dokick()
                 || ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10))) {
                 adjalign(-sgn(u.ualign.type));
             }
-            maploc->typ = ROOM;
-            maploc->doormask = 0;
+            g.maploc->typ = ROOM;
+            g.maploc->doormask = 0;
             (void) mksobj_at(ROCK, x, y, TRUE, FALSE);
             del_engr_at(x, y);
             if (Blind)
@@ -1085,9 +1082,9 @@ dokick()
             }
             return 1;
         }
-        if (maploc->typ == IRONBARS)
+        if (g.maploc->typ == IRONBARS)
             goto ouch;
-        if (IS_TREE(maploc->typ)) {
+        if (IS_TREE(g.maploc->typ)) {
             struct obj *treefruit;
 
             /* nothing, fruit or trouble? 75:23.5:1.5% */
@@ -1096,7 +1093,7 @@ dokick()
                     You_hear("a low buzzing."); /* a warning */
                 goto ouch;
             }
-            if (rn2(15) && !(maploc->looted & TREE_LOOTED)
+            if (rn2(15) && !(g.maploc->looted & TREE_LOOTED)
                 && (treefruit = rnd_treefruit_at(x, y))) {
                 long nfruit = 8L - rnl(7), nfall;
                 short frtype = treefruit->otyp;
@@ -1120,9 +1117,9 @@ dokick()
                 exercise(A_DEX, TRUE);
                 exercise(A_WIS, TRUE); /* discovered a new food source! */
                 newsym(x, y);
-                maploc->looted |= TREE_LOOTED;
+                g.maploc->looted |= TREE_LOOTED;
                 return 1;
-            } else if (!(maploc->looted & TREE_SWARM)) {
+            } else if (!(g.maploc->looted & TREE_SWARM)) {
                 int cnt = rnl(4) + 2;
                 int made = 0;
                 coord mm;
@@ -1139,12 +1136,12 @@ dokick()
                     pline("You've attracted the tree's former occupants!");
                 else
                     You("smell stale honey.");
-                maploc->looted |= TREE_SWARM;
+                g.maploc->looted |= TREE_SWARM;
                 return 1;
             }
             goto ouch;
         }
-        if (IS_SINK(maploc->typ)) {
+        if (IS_SINK(g.maploc->typ)) {
             int gend = poly_gender();
             short washerndx = (gend == 1 || (gend == 2 && rn2(2)))
                                   ? PM_INCUBUS
@@ -1159,7 +1156,7 @@ dokick()
                     pline("Klunk!");
                 exercise(A_DEX, TRUE);
                 return 1;
-            } else if (!(maploc->looted & S_LPUDDING) && !rn2(3)
+            } else if (!(g.maploc->looted & S_LPUDDING) && !rn2(3)
                        && !(mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
                 if (Blind)
                     You_hear("a gushing sound.");
@@ -1169,37 +1166,37 @@ dokick()
                 (void) makemon(&mons[PM_BLACK_PUDDING], x, y, NO_MM_FLAGS);
                 exercise(A_DEX, TRUE);
                 newsym(x, y);
-                maploc->looted |= S_LPUDDING;
+                g.maploc->looted |= S_LPUDDING;
                 return 1;
-            } else if (!(maploc->looted & S_LDWASHER) && !rn2(3)
+            } else if (!(g.maploc->looted & S_LDWASHER) && !rn2(3)
                        && !(mvitals[washerndx].mvflags & G_GONE)) {
                 /* can't resist... */
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
                 if (makemon(&mons[washerndx], x, y, NO_MM_FLAGS))
                     newsym(x, y);
-                maploc->looted |= S_LDWASHER;
+                g.maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);
                 return 1;
             } else if (!rn2(3)) {
                 pline("Flupp!  %s.",
                       (Blind ? "You hear a sloshing sound"
                              : "Muddy waste pops up from the drain"));
-                if (!(maploc->looted & S_LRING)) { /* once per sink */
+                if (!(g.maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)
                         You_see("a ring shining in its midst.");
                     (void) mkobj_at(RING_CLASS, x, y, TRUE);
                     newsym(x, y);
                     exercise(A_DEX, TRUE);
                     exercise(A_WIS, TRUE); /* a discovery! */
-                    maploc->looted |= S_LRING;
+                    g.maploc->looted |= S_LRING;
                 }
                 return 1;
             }
             goto ouch;
         }
-        if (maploc->typ == STAIRS || maploc->typ == LADDER
-            || IS_STWALL(maploc->typ)) {
-            if (!IS_STWALL(maploc->typ) && maploc->ladder == LA_DOWN)
+        if (g.maploc->typ == STAIRS || g.maploc->typ == LADDER
+            || IS_STWALL(g.maploc->typ)) {
+            if (!IS_STWALL(g.maploc->typ) && g.maploc->ladder == LA_DOWN)
                 goto dumb;
         ouch:
             pline("Ouch!  That hurts!");
@@ -1212,7 +1209,7 @@ dokick()
                     pline_The("drawbridge is unaffected.");
                     /* update maploc to refer to the drawbridge */
                     (void) find_drawbridge(&x, &y);
-                    maploc = &levl[x][y];
+                    g.maploc = &levl[x][y];
                 }
             }
             if (!rn2(3))
@@ -1226,8 +1223,8 @@ dokick()
         goto dumb;
     }
 
-    if (maploc->doormask == D_ISOPEN || maploc->doormask == D_BROKEN
-        || maploc->doormask == D_NODOOR) {
+    if (g.maploc->doormask == D_ISOPEN || g.maploc->doormask == D_BROKEN
+        || g.maploc->doormask == D_NODOOR) {
     dumb:
         exercise(A_DEX, FALSE);
         if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
@@ -1253,20 +1250,20 @@ dokick()
     if (rnl(35) < avrg_attrib + (!martial() ? 0 : ACURR(A_DEX))) {
         boolean shopdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
         /* break the door */
-        if (maploc->doormask & D_TRAPPED) {
+        if (g.maploc->doormask & D_TRAPPED) {
             if (flags.verbose)
                 You("kick the door.");
             exercise(A_STR, FALSE);
-            maploc->doormask = D_NODOOR;
+            g.maploc->doormask = D_NODOOR;
             b_trapped("door", FOOT);
         } else if (ACURR(A_STR) > 18 && !rn2(5) && !shopdoor) {
             pline("As you kick the door, it shatters to pieces!");
             exercise(A_STR, TRUE);
-            maploc->doormask = D_NODOOR;
+            g.maploc->doormask = D_NODOOR;
         } else {
             pline("As you kick the door, it crashes open!");
             exercise(A_STR, TRUE);
-            maploc->doormask = D_BROKEN;
+            g.maploc->doormask = D_BROKEN;
         }
         feel_newsym(x, y); /* we know we broke it */
         unblock_point(x, y); /* vision */
@@ -1438,11 +1435,11 @@ xchar dlev;          /* if !0 send to dlev near player */
                   dct == oct ? "the " : dct == 1L ? "an" : "", what);
         else if (oct == dct)
             pline("%s adjacent %s %s.", dct == 1L ? "The" : "All the", what,
-                  gate_str);
+                  g.gate_str);
         else
             pline("%s adjacent %s %s.",
                   dct == 1L ? "One of the" : "Some of the",
-                  dct == 1L ? "objects falls" : what, gate_str);
+                  dct == 1L ? "objects falls" : what, g.gate_str);
     }
 
     if (costly && shkp && price) {
@@ -1746,10 +1743,10 @@ long num;
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " and %s %s.", otense(otmp, "fall"), gate_str);
+            Sprintf(eos(xbuf), " and %s %s.", otense(otmp, "fall"), g.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
-        pline("%s %s %s.", obuf, otense(otmp, "fall"), gate_str);
+        pline("%s %s %s.", obuf, otense(otmp, "fall"), g.gate_str);
 }
 
 /* migration destination for objects which fall down to next level */
@@ -1759,25 +1756,25 @@ xchar x, y;
 {
     struct trap *ttmp;
 
-    gate_str = 0;
+    g.gate_str = 0;
     /* this matches the player restriction in goto_level() */
     if (on_level(&u.uz, &qstart_level) && !ok_to_quest())
         return MIGR_NOWHERE;
 
     if ((xdnstair == x && ydnstair == y)
         || (sstairs.sx == x && sstairs.sy == y && !sstairs.up)) {
-        gate_str = "down the stairs";
+        g.gate_str = "down the stairs";
         return (xdnstair == x && ydnstair == y) ? MIGR_STAIRS_UP
                                                 : MIGR_SSTAIRS;
     }
     if (xdnladder == x && ydnladder == y) {
-        gate_str = "down the ladder";
+        g.gate_str = "down the ladder";
         return MIGR_LADDER_UP;
     }
 
     if (((ttmp = t_at(x, y)) != 0 && ttmp->tseen)
         && is_hole(ttmp->ttyp)) {
-        gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
+        g.gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
                                             : "through the hole";
         return MIGR_RANDOM;
     }

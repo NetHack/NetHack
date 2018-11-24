@@ -337,13 +337,109 @@ const struct instance_globals g_init = {
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
+    UNDEFINED_VALUES, /* pushq */
+    UNDEFINED_VALUES, /* saveq */
+    UNDEFINED_VALUE, /* phead */
+    UNDEFINED_VALUE, /* ptail */
+    UNDEFINED_VALUE, /* shead */
+    UNDEFINED_VALUE, /* stail */
+    UNDEFINED_VALUES, /* clicklook_cc */
+    WIN_ERR, /* en_win */
+    FALSE, /* en_via_menu */
+
+    /* dbridge.c */
+    UNDEFINED_VALUES,
+
+    /* dig.c */
+    UNDEFINED_VALUE, /* did_dig_msg */
+
+    /* do.c */
+    FALSE, /* at_ladder */
+    NULL, /* dfr_pre_msg */
+    NULL, /* dfr_post_msg */
+    { 0, 0 }, /* save_dlevel */
+
+    /* do_name.c */
+    NULL, /* gloc_filter_map */
+    UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
+    0, /* via_naming */
 
     /* dog.c */
     0,  /* petname_used */
+    UNDEFINED_VALUE, /* gtyp */
+    UNDEFINED_VALUE, /* gx */
+    UNDEFINED_VALUE, /* gy */
+
+    /* dokick.c */
+    UNDEFINED_PTR, /* maploc */
+    UNDEFINED_VALUES, /* nowhere */
+    UNDEFINED_PTR, /* gate_str */
+
+    /* drawing.c */
+    DUMMY, /* symset */
+    0, /* currentgraphics */
+    DUMMY, /* showsyms */
+    DUMMY, /* l_syms */
+    DUMMY, /* r_syms */
+    DUMMY, /* warnsyms */
+
+    /* dungeon.c */
+    UNDEFINED_VALUE, /* n_dgns */
+    NULL, /* branches */
+    NULL, /* mapseenchn */
+
+    /* eat.c */
+    FALSE, /* force_save_hs */
+
+    /* end.c */
+    UNDEFINED_VALUES,
+    UNDEFINED_VALUES,
+    UNDEFINED_VALUES,
+
+    /* hack.c */
+    UNDEFINED_VALUES,
+    UNDEFINED_VALUE,
+
+    /* invent.c */
+    51, /* lastinvr */
+    0, /* sortloogmode */
+    NULL, /* invbuf */
+    0, /* inbufsize */
+
+    /* lock.c */
+    UNDEFINED_VALUES,
 
     /* makemon.c */
-     { -1, /* choice_count */
-      { 0 } }, /* mchoices */
+    { -1, /* choice_count */
+     { 0 } }, /* mchoices */
+
+    /* mhitm.c */
+    UNDEFINED_VALUE, /* vis */
+    UNDEFINED_VALUE, /* far_noise */
+    UNDEFINED_VALUE, /* noisetime */
+    UNDEFINED_PTR, /* otmp */
+    UNDEFINED_VALUE, /* dieroll */
+
+    /* mhitu.c */
+    UNDEFINED_VALUE, /* mhitu_dieroll */
+
+    /* mklev.c */
+    UNDEFINED_VALUE, /* vault_x */
+    UNDEFINED_VALUE, /* vault_y */
+    UNDEFINED_VALUE, /* made_branch */
+
+    /* mkmap.c */
+    UNDEFINED_PTR, /* new_locations */
+    UNDEFINED_VALUE, /* min_rx */
+    UNDEFINED_VALUE, /* max_rx */
+    UNDEFINED_VALUE, /* min_ry */
+    UNDEFINED_VALUE, /* max_ry */
+    UNDEFINED_VALUE, /* n_loc_filled */
+
+    /* mkmaze.c */
+    { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} }, /* bughack */
+    UNDEFINED_VALUE, /* was_waterlevel */
+
 
     /* mused.c */
     FALSE, /* m_using */
@@ -406,6 +502,11 @@ const struct instance_globals g_init = {
     0, /* ustuck_id */
     0, /* usteed_id */
 
+    /* sp_lev.c */
+    NULL, /* lev_message */
+    NULL, /* lregions */
+    0, /* num_lregions */
+
     /* trap.c */
     0, /* force_mintrap */
 
@@ -434,6 +535,13 @@ void
 decl_globals_init()
 {
     g = g_init;
+
+    g.valuables[0].list = g.gems;
+    g.valuables[0].size = SIZE(g.gems);
+    g.valuables[1].list = g.amulets;
+    g.valuables[1].size = SIZE(g.amulets);
+    g.valuables[2].list = NULL;
+    g.valuables[2].size = 0;
 
     nhassert(g_init.magic == IVMAGIC);
     nhassert(g_init.havestate == TRUE);

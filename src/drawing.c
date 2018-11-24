@@ -17,15 +17,6 @@
 #define C(n)
 #endif
 
-struct symsetentry symset[NUM_GRAPHICS];
-
-int currentgraphics = 0;
-
-nhsym showsyms[SYM_MAX] = DUMMY; /* symbols to be displayed */
-nhsym l_syms[SYM_MAX] = DUMMY;   /* loaded symbols          */
-nhsym r_syms[SYM_MAX] = DUMMY;   /* rogue symbols           */
-
-nhsym warnsyms[WARNCOUNT] = DUMMY; /* the current warning display symbols */
 const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 
@@ -357,9 +348,9 @@ init_symbols()
 void
 update_bouldersym()
 {
-    showsyms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
-    l_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
-    r_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    g.showsyms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    g.l_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    g.r_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
 }
 
 void
@@ -368,20 +359,20 @@ init_showsyms()
     register int i;
 
     for (i = 0; i < MAXPCHARS; i++)
-        showsyms[i + SYM_OFF_P] = defsyms[i].sym;
+        g.showsyms[i + SYM_OFF_P] = defsyms[i].sym;
     for (i = 0; i < MAXOCLASSES; i++)
-        showsyms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+        g.showsyms[i + SYM_OFF_O] = def_oc_syms[i].sym;
     for (i = 0; i < MAXMCLASSES; i++)
-        showsyms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.showsyms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        showsyms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+        g.showsyms[i + SYM_OFF_W] = def_warnsyms[i].sym;
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            showsyms[i + SYM_OFF_X] = iflags.bouldersym
+            g.showsyms[i + SYM_OFF_X] = iflags.bouldersym
                                         ? iflags.bouldersym
                                         : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
-            showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
+            g.showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
 }
 
@@ -392,20 +383,20 @@ init_l_symbols()
     register int i;
 
     for (i = 0; i < MAXPCHARS; i++)
-        l_syms[i + SYM_OFF_P] = defsyms[i].sym;
+        g.l_syms[i + SYM_OFF_P] = defsyms[i].sym;
     for (i = 0; i < MAXOCLASSES; i++)
-        l_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
+        g.l_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
     for (i = 0; i < MAXMCLASSES; i++)
-        l_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.l_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        l_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+        g.l_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            l_syms[i + SYM_OFF_X] = iflags.bouldersym
+            g.l_syms[i + SYM_OFF_X] = iflags.bouldersym
                                       ? iflags.bouldersym
                                       : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
-            l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
+            g.l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
 
     clear_symsetentry(PRIMARY, FALSE);
@@ -420,30 +411,30 @@ init_r_symbols()
        later by the roguesymbols option */
 
     for (i = 0; i < MAXPCHARS; i++)
-        r_syms[i + SYM_OFF_P] = defsyms[i].sym;
-    r_syms[S_vodoor] = r_syms[S_hodoor] = r_syms[S_ndoor] = '+';
-    r_syms[S_upstair] = r_syms[S_dnstair] = '%';
+        g.r_syms[i + SYM_OFF_P] = defsyms[i].sym;
+    g.r_syms[S_vodoor] = g.r_syms[S_hodoor] = g.r_syms[S_ndoor] = '+';
+    g.r_syms[S_upstair] = g.r_syms[S_dnstair] = '%';
 
     for (i = 0; i < MAXOCLASSES; i++)
-        r_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
+        g.r_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
     for (i = 0; i < MAXMCLASSES; i++)
-        r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
+        g.r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
     for (i = 0; i < WARNCOUNT; i++)
-        r_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
+        g.r_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            r_syms[i + SYM_OFF_X] = iflags.bouldersym
+            g.r_syms[i + SYM_OFF_X] = iflags.bouldersym
                                       ? iflags.bouldersym
                                       : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
-            r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
+            g.r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
 
     clear_symsetentry(ROGUESET, FALSE);
     /* default on Rogue level is no color
      * but some symbol sets can override that
      */
-    symset[ROGUESET].nocolor = 1;
+    g.symset[ROGUESET].nocolor = 1;
 }
 
 void
@@ -457,25 +448,25 @@ int whichset;
         /* Adjust graphics display characters on Rogue levels */
 
         for (i = 0; i < SYM_MAX; i++)
-            showsyms[i] = r_syms[i];
+            g.showsyms[i] = g.r_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
             tileview(FALSE);
 #endif
-        currentgraphics = ROGUESET;
+        g.currentgraphics = ROGUESET;
         break;
 
     case PRIMARY:
     default:
         for (i = 0; i < SYM_MAX; i++)
-            showsyms[i] = l_syms[i];
+            g.showsyms[i] = g.l_syms[i];
 
 #if defined(MSDOS) && defined(USE_TILES)
         if (iflags.grmode)
             tileview(TRUE);
 #endif
-        currentgraphics = PRIMARY;
+        g.currentgraphics = PRIMARY;
         break;
     }
 }
@@ -488,11 +479,11 @@ int nondefault;
 
     if (nondefault) {
         for (i = 0; i < SYM_MAX; i++)
-            showsyms[i] = l_syms[i];
+            g.showsyms[i] = g.l_syms[i];
 #ifdef PC9800
         if (SYMHANDLING(H_IBM) && ibmgraphics_mode_callback)
             (*ibmgraphics_mode_callback)();
-        else if (!symset[currentgraphics].name && ascgraphics_mode_callback)
+        else if (!g.symset[g.currentgraphics].name && ascgraphics_mode_callback)
             (*ascgraphics_mode_callback)();
 #endif
 #ifdef TERMLIB
@@ -512,7 +503,7 @@ update_l_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    l_syms[symp->idx] = val;
+    g.l_syms[symp->idx] = val;
 }
 
 void
@@ -520,7 +511,7 @@ update_r_symset(symp, val)
 struct symparse *symp;
 int val;
 {
-    r_syms[symp->idx] = val;
+    g.r_syms[symp->idx] = val;
 }
 
 void
@@ -528,20 +519,20 @@ clear_symsetentry(which_set, name_too)
 int which_set;
 boolean name_too;
 {
-    if (symset[which_set].desc)
-        free((genericptr_t) symset[which_set].desc);
-    symset[which_set].desc = (char *) 0;
+    if (g.symset[which_set].desc)
+        free((genericptr_t) g.symset[which_set].desc);
+    g.symset[which_set].desc = (char *) 0;
 
-    symset[which_set].handling = H_UNK;
-    symset[which_set].nocolor = 0;
+    g.symset[which_set].handling = H_UNK;
+    g.symset[which_set].nocolor = 0;
     /* initialize restriction bits */
-    symset[which_set].primary = 0;
-    symset[which_set].rogue = 0;
+    g.symset[which_set].primary = 0;
+    g.symset[which_set].rogue = 0;
 
     if (name_too) {
-        if (symset[which_set].name)
-            free((genericptr_t) symset[which_set].name);
-        symset[which_set].name = (char *) 0;
+        if (g.symset[which_set].name)
+            free((genericptr_t) g.symset[which_set].name);
+        g.symset[which_set].name = (char *) 0;
     }
 }
 

@@ -15,9 +15,6 @@
 #include "wintty.h"
 #endif
 
-/* from sp_lev.c, for deliver_splev_message() */
-extern char *lev_message;
-
 static void NDECL(dump_qtlist);
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
@@ -676,10 +673,10 @@ deliver_splev_message()
     char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
 
     /* there's no provision for delivering via window instead of pline */
-    if (lev_message) {
+    if (g.lev_message) {
         /* lev_message can span multiple lines using embedded newline chars;
            any segments too long to fit within in_line[] will be truncated */
-        for (str = lev_message; *str; str = nl + 1) {
+        for (str = g.lev_message; *str; str = nl + 1) {
             /* copying will stop at newline if one is present */
             copynchars(in_line, str, (int) (sizeof in_line) - 1);
 
@@ -692,8 +689,8 @@ deliver_splev_message()
                 break; /* done if no newline */
         }
 
-        free((genericptr_t) lev_message);
-        lev_message = 0;
+        free((genericptr_t) g.lev_message);
+        g.lev_message = NULL;
     }
 }
 
