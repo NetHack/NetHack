@@ -594,50 +594,47 @@ void
 init_attr(np)
 register int np;
 {
-    register int i, x, tryct;
+    register int i, x, maxrng = 0;
+    int dist[A_MAX];
 
     for (i = 0; i < A_MAX; i++) {
-        ABASE(i) = AMAX(i) = urole.attrbase[i];
+        ABASE(i) = urole.attrbase[i];
         ATEMP(i) = ATIME(i) = 0;
         np -= urole.attrbase[i];
+        maxrng += dist[i] = urole.attrdist[i];
     }
 
-    tryct = 0;
-    while (np > 0 && tryct < 100) {
-        x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+    while (np > 0 && maxrng > 0) {
+        x = rn2(maxrng);
+        for (i = 0; (x -= dist[i]) > 0; i++)
             ;
-        if (i >= A_MAX)
-            continue; /* impossible */
 
         if (ABASE(i) >= ATTRMAX(i)) {
-            tryct++;
+            maxrng -= dist[i];
+            dist[i] = 0;
             continue;
         }
-        tryct = 0;
         ABASE(i)++;
-        AMAX(i)++;
         np--;
     }
 
-    tryct = 0;
-    while (np < 0 && tryct < 100) { /* for redistribution */
+    while (np < 0 && maxrng > 0) { /* for redistribution */
 
-        x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+        x = rn2(maxrng);
+        for (i = 0; (x -= dist[i]) > 0; i++)
             ;
-        if (i >= A_MAX)
-            continue; /* impossible */
 
         if (ABASE(i) <= ATTRMIN(i)) {
-            tryct++;
+            maxrng -= dist[i];
+            dist[i] = 0;
             continue;
         }
-        tryct = 0;
         ABASE(i)--;
-        AMAX(i)--;
         np++;
     }
+
+    for (i = 0; i < A_MAX; i++)
+        AMAX(i) = ABASE(i);
 }
 
 void
