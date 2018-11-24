@@ -769,7 +769,7 @@ const struct Align aligns[] = {
 static struct {
     boolean roles[SIZE(roles)];
     short mask;
-} rfilter = { UNDEFINED_VALUES, UNDEFINED_VALUE};
+} rfilter = UNDEFINED_VALUES;
 
 STATIC_DCL int NDECL(randrole_filtered);
 STATIC_DCL char *FDECL(promptsep, (char *, int));
@@ -1757,11 +1757,11 @@ winid where;
                                not_yet[] = " not yet specified",
                                rand_choice[] = " random";
     char buf[BUFSZ];
-    int r, c, gend, a, allowmask;
+    int r, c, g, a, allowmask;
 
     r = flags.initrole;
     c = flags.initrace;
-    gend = flags.initgend;
+    g = flags.initgend;
     a = flags.initalign;
     if (r >= 0) {
         allowmask = roles[r].allow;
@@ -1770,9 +1770,9 @@ winid where;
         else if (c >= 0 && !(allowmask & ROLE_RACEMASK & races[c].allow))
             c = ROLE_RANDOM;
         if ((allowmask & ROLE_GENDMASK) == ROLE_MALE)
-            gend = 0; /* role forces male (hypothetical) */
+            g = 0; /* role forces male (hypothetical) */
         else if ((allowmask & ROLE_GENDMASK) == ROLE_FEMALE)
-            gend = 1; /* role forces female (valkyrie) */
+            g = 1; /* role forces female (valkyrie) */
         if ((allowmask & ROLE_ALIGNMASK) == AM_LAWFUL)
             a = 0; /* aligns[lawful] */
         else if ((allowmask & ROLE_ALIGNMASK) == AM_NEUTRAL)
@@ -1804,10 +1804,10 @@ winid where;
                                                           : roles[r].name.m);
     if (r >= 0 && roles[r].name.f) {
         /* distinct female name [caveman/cavewoman, priest/priestess] */
-        if (gend == 1)
+        if (g == 1)
             /* female specified; replace male role name with female one */
             Sprintf(index(buf, ':'), ": %s", roles[r].name.f);
-        else if (gend < 0)
+        else if (g < 0)
             /* gender unspecified; append slash and female role name */
             Sprintf(eos(buf), "/%s", roles[r].name.f);
     }
@@ -1820,11 +1820,11 @@ winid where;
                                                           : races[c].noun);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "gender:");
-    Strcat(buf, (which == RS_GENDER) ? choosing : (gend == ROLE_NONE)
+    Strcat(buf, (which == RS_GENDER) ? choosing : (g == ROLE_NONE)
                                                       ? not_yet
-                                                      : (gend == ROLE_RANDOM)
+                                                      : (g == ROLE_RANDOM)
                                                             ? rand_choice
-                                                            : genders[gend].adj);
+                                                            : genders[g].adj);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "alignment:");
     Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE)
@@ -1852,7 +1852,7 @@ boolean preselect;
     anything any;
     char buf[BUFSZ];
     const char *what = 0, *constrainer = 0, *forcedvalue = 0;
-    int f = 0, r, c, gend, a, i, allowmask;
+    int f = 0, r, c, g, a, i, allowmask;
 
     r = flags.initrole;
     c = flags.initrace;
@@ -1894,16 +1894,16 @@ boolean preselect;
     case RS_GENDER:
         what = "gender";
         f = flags.initgend;
-        gend = ROLE_NONE;
+        g = ROLE_NONE;
         if (r >= 0) {
             allowmask = roles[r].allow & ROLE_GENDMASK;
             if (allowmask == ROLE_MALE)
-                gend = 0; /* genders[male] */
+                g = 0; /* genders[male] */
             else if (allowmask == ROLE_FEMALE)
-                gend = 1; /* genders[female] */
-            if (gend >= 0) {
+                g = 1; /* genders[female] */
+            if (g >= 0) {
                 constrainer = "role";
-                forcedvalue = genders[gend].adj;
+                forcedvalue = genders[g].adj;
             } else if (f >= 0
                        && (allowmask & ~rfilter.mask) == genders[f].allow) {
                 /* if there is only one gender choice available due to user

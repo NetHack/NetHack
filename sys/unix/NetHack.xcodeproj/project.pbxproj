@@ -810,7 +810,6 @@
 				3186A3B121A4B0FD0052BF02 /* bitmfile.h */,
 				3186A36E21A4B0FA0052BF02 /* botl.h */,
 				3186A38721A4B0FB0052BF02 /* color.h */,
-				31B8A30A21A20D730055BD01 /* config.h */,
 				3186A3C621A4B0FE0052BF02 /* config1.h */,
 				3186A37121A4B0FA0052BF02 /* context.h */,
 				3186A3C521A4B0FE0052BF02 /* coord.h */,
@@ -902,6 +901,7 @@
 				3186A36D21A4B0F90052BF02 /* xwindowp.h */,
 				3186A3BF21A4B0FD0052BF02 /* you.h */,
 				3186A3A721A4B0FD0052BF02 /* youprop.h */,
+				31B8A30A21A20D730055BD01 /* config.h */,
 			);
 			name = include;
 			sourceTree = "<group>";

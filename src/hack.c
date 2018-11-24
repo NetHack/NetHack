@@ -1156,10 +1156,10 @@ int x,y;
     int tx = u.tx;
     int ty = u.ty;
     boolean ret;
-    int glyph = glyph_at(x,y);
+    int g = glyph_at(x,y);
     if (x == u.ux && y == u.uy)
         return TRUE;
-    if (isok(x,y) && glyph_is_cmap(glyph) && S_stone == glyph_to_cmap(glyph)
+    if (isok(x,y) && glyph_is_cmap(g) && S_stone == glyph_to_cmap(g)
         && !levl[x][y].seenv)
         return FALSE;
     u.tx = x;

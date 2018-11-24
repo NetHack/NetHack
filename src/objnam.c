@@ -3359,21 +3359,21 @@ retry:
     } else if (!strcmpi(bp, "looking glass")) {
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p - 6, " glass") || !strcmpi(bp, "glass")) {
-        register char *s = bp;
+        register char *g = bp;
 
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
-        if (broken || strstri(s, "broken"))
+        if (broken || strstri(g, "broken"))
             return (struct obj *) 0;
-        if (!strncmpi(s, "worthless ", 10))
-            s += 10;
-        if (!strncmpi(s, "piece of ", 9))
-            s += 9;
-        if (!strncmpi(s, "colored ", 8))
-            s += 8;
-        else if (!strncmpi(s, "coloured ", 9))
-            s += 9;
-        if (!strcmpi(s, "glass")) { /* choose random color */
+        if (!strncmpi(g, "worthless ", 10))
+            g += 10;
+        if (!strncmpi(g, "piece of ", 9))
+            g += 9;
+        if (!strncmpi(g, "colored ", 8))
+            g += 8;
+        else if (!strncmpi(g, "coloured ", 9))
+            g += 9;
+        if (!strcmpi(g, "glass")) { /* choose random color */
             /* 9 different kinds */
             typ = LAST_GEM + rnd(9);
             if (objects[typ].oc_class == GEM_CLASS)
@@ -3384,7 +3384,7 @@ retry:
             char tbuf[BUFSZ];
 
             Strcpy(tbuf, "worthless piece of ");
-            Strcat(tbuf, s); /* assume it starts with the color */
+            Strcat(tbuf, g); /* assume it starts with the color */
             Strcpy(bp, tbuf);
         }
     }

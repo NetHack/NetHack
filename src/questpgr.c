@@ -282,7 +282,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
 {
     const char *pnoun;
-    int godgend;
+    int g;
     char lwhich = lowc(which); /* H,I,J -> h,i,j */
 
     /*
@@ -298,13 +298,13 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
     } else {
-        godgend = (who == 'd') ? quest_status.godgend
+        g = (who == 'd') ? quest_status.godgend
             : (who == 'l') ? quest_status.ldrgend
             : (who == 'n') ? quest_status.nemgend
             : 2; /* default to neuter */
-        pnoun = (lwhich == 'h') ? genders[godgend].he
-                : (lwhich == 'i') ? genders[godgend].him
-                : (lwhich == 'j') ? genders[godgend].his : "?";
+        pnoun = (lwhich == 'h') ? genders[g].he
+                : (lwhich == 'i') ? genders[g].him
+                : (lwhich == 'j') ? genders[g].his : "?";
     }
     Strcpy(cvt_buf, pnoun);
     /* capitalize for H,I,J */
