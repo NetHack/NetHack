@@ -285,11 +285,49 @@ char *fqn_prefix_names[PREFIX_COUNT] = {
 #endif
 
 NEARDATA struct savefile_info sfcap = {
-    SFI1_DEFAULT, SFI2_DEFAULT, SFI3_DEFAULT
+#ifdef NHSTDC
+    0x00000000UL
+#else
+    0x00000000L
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+        | SFI1_EXTERNALCOMP
+#endif
+#if defined(ZEROCOMP)
+        | SFI1_ZEROCOMP
+#endif
+#if defined(RLECOMP)
+        | SFI1_RLECOMP
+#endif
+    ,
+#ifdef NHSTDC
+    0x00000000UL, 0x00000000UL
+#else
+    0x00000000L, 0x00000000L
+#endif
 };
 
 NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
-    SFI1_DEFAULT, SFI2_DEFAULT, SFI3_DEFAULT
+#ifdef NHSTDC
+    0x00000000UL
+#else
+    0x00000000L
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+        | SFI1_EXTERNALCOMP
+#endif
+#if defined(ZEROCOMP)
+        | SFI1_ZEROCOMP
+#endif
+#if defined(RLECOMP)
+        | SFI1_RLECOMP
+#endif
+    ,
+#ifdef NHSTDC
+    0x00000000UL, 0x00000000UL
+#else
+    0x00000000L, 0x00000000L
+#endif
 };
 
 struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
