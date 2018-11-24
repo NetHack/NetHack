@@ -37,7 +37,9 @@ char *argv[];
 {
     boolean resuming;
 
-    icontext_init();
+#ifdef PLAYAGAIN
+    decl_early_init();
+#endif
     sys_early_init();
     Strcpy(default_window_sys, "tty");
     resuming = pcmain(argc, argv);

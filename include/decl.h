@@ -439,20 +439,8 @@ struct early_opt {
     boolean valallowed;
 };
 
-/* instance_context holds per game instance data that does not need to be
- * persisted upon game exit.  This game instance data is one of the first
- * things initialized during the initialization of the game engine.
- * It is initialized with icontext_initial_state found in decl.c */
-
-#define PLAYAGAIN
-
-struct instance_context {
-    int oldcap; /* encumberance - pickup.c */
-};
-
-E struct instance_context icontext;
-
-E void icontext_init();
+/* encumbrance */
+E int oldcap;
 
 
 #undef E

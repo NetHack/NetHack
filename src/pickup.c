@@ -1558,7 +1558,7 @@ encumber_msg()
 {
     int newcap = near_capacity();
 
-    if (icontext.oldcap < newcap) {
+    if (oldcap < newcap) {
         switch (newcap) {
         case 1:
             Your("movements are slowed slightly because of your load.");
@@ -1576,7 +1576,7 @@ encumber_msg()
             break;
         }
         context.botl = 1;
-    } else if (icontext.oldcap > newcap) {
+    } else if (oldcap > newcap) {
         switch (newcap) {
         case 0:
             Your("movements are now unencumbered.");
@@ -1595,7 +1595,7 @@ encumber_msg()
         context.botl = 1;
     }
 
-    icontext.oldcap = newcap;
+    oldcap = newcap;
     return newcap;
 }
 
