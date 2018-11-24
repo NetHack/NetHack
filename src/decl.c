@@ -214,9 +214,6 @@ NEARDATA struct monst *migrating_mons = (struct monst *) 0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
 
-/* originally from pickup.c */
-int oldcap = 0; /* encumbrance */
-
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
@@ -527,8 +524,6 @@ decl_early_init()
     ZERO(u);
     ZERO(ubirthday);
     ZERO(urealtime);
-
-    ZERO(oldcap);
 
     ZEROARRAY(lastseentyp);
 
