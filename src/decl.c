@@ -345,9 +345,6 @@ const struct instance_globals g_init = {
     /* mused.c */
     FALSE, /* m_using */
 
-    /* objname.c */
-    0, /* distantname */
-
     /* pickup.c */
     0,  /* oldcap */
     UNDEFINED_PTR, /* current_container */

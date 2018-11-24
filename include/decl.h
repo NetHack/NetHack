@@ -461,13 +461,6 @@ struct instance_globals {
     /* muse.c */
     boolean m_using; /* kludge to use mondided instead of killed */
 
-    /* objname.c */
-    /* distantname used by distant_name() to pass extra information to
-       xname_flags(); it would be much cleaner if this were a parameter,
-       but that would require all of the xname() and doname() calls to be
-       modified */
-    int distantname;
-
     /* pickup.c */
     int oldcap; /* last encumberance */
     /* current_container is set in use_container(), to be used by the
