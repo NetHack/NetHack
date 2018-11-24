@@ -348,14 +348,6 @@ const struct instance_globals g_init = {
     /* pickup.c */
     0,  /* oldcap */
 
-    /* pline.c */
-    0, /* pline_flags */
-    UNDEFINED_VALUES, /* prevmsg */
-#ifdef DUMPLOG
-    0, /* saved_pline_index */
-    UNDEFINED_VALUES,
-#endif
-
     /* polyself.c */
     0, /* sex_change_ok */
 

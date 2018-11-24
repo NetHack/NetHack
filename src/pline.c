@@ -6,12 +6,18 @@
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
 
+static unsigned pline_flags = 0;
+static char prevmsg[BUFSZ];
+
 static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static void FDECL(execplinehandler, (const char *));
 #endif
 
 #ifdef DUMPLOG
+/* also used in end.c */
+unsigned saved_pline_index = 0; /* slot in saved_plines[] to use next */
+char *saved_plines[DUMPLOG_MSG_COUNT] = { (char *) 0 };
 
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
 void
@@ -25,8 +31,8 @@ const char *line;
      *  The core should take responsibility for that and have
      *  this share it.
      */
-    unsigned indx = g.saved_pline_index; /* next slot to use */
-    char *oldest = g.saved_plines[indx]; /* current content of that slot */
+    unsigned indx = saved_pline_index; /* next slot to use */
+    char *oldest = saved_plines[indx]; /* current content of that slot */
 
     if (oldest && strlen(oldest) >= strlen(line)) {
         /* this buffer will gradually shrink until the 'else' is needed;
@@ -35,9 +41,9 @@ const char *line;
     } else {
         if (oldest)
             free((genericptr_t) oldest);
-        g.saved_plines[indx] = dupstr(line);
+        saved_plines[indx] = dupstr(line);
     }
-    g.saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
+    saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
 }
 
 /* called during save (unlike the interface-specific message history,
@@ -49,9 +55,9 @@ dumplogfreemessages()
     unsigned indx;
 
     for (indx = 0; indx < DUMPLOG_MSG_COUNT; ++indx)
-        if (g.saved_plines[indx])
-            free((genericptr_t) g.saved_plines[indx]), g.saved_plines[indx] = 0;
-    g.saved_pline_index = 0;
+        if (saved_plines[indx])
+            free((genericptr_t) saved_plines[indx]), saved_plines[indx] = 0;
+    saved_pline_index = 0;
 }
 #endif
 
@@ -133,7 +139,7 @@ VA_DECL(const char *, line)
      * Unfortunately, that means Norep() isn't honored (general issue) and
      * that short lines aren't combined into one longer one (tty behavior).
      */
-    if ((g.pline_flags & SUPPRESS_HISTORY) == 0)
+    if ((pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
     /* use raw_print() if we're called too early (or perhaps too late
@@ -147,11 +153,11 @@ VA_DECL(const char *, line)
     }
 
     msgtyp = MSGTYP_NORMAL;
-    no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
-    if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
+    no_repeat = (pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
+    if ((pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
         if (msgtyp == MSGTYP_NOSHOW
-            || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg)))
+            || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
             /* FIXME: we need a way to tell our caller that this message
              * was suppressed so that caller doesn't set iflags.last_msg
              * for something that hasn't been shown, otherwise a subsequent
@@ -175,7 +181,7 @@ VA_DECL(const char *, line)
 
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    (void) strncpy(g.prevmsg, line, BUFSZ), g.prevmsg[BUFSZ - 1] = '\0';
+    (void) strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
@@ -199,9 +205,9 @@ VA_DECL2(unsigned, pflags, const char *, line)
 {
     VA_START(line);
     VA_INIT(line, const char *);
-    g.pline_flags = pflags;
+    pline_flags = pflags;
     vpline(line, VA_ARGS);
-    g.pline_flags = 0;
+    pline_flags = 0;
     VA_END();
     return;
 }
@@ -212,9 +218,9 @@ VA_DECL(const char *, line)
 {
     VA_START(line);
     VA_INIT(line, const char *);
-    g.pline_flags = PLINE_NOREPEAT;
+    pline_flags = PLINE_NOREPEAT;
     vpline(line, VA_ARGS);
-    g.pline_flags = 0;
+    pline_flags = 0;
     VA_END();
     return;
 }
