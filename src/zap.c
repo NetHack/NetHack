@@ -12,14 +12,6 @@
  */
 #define MAGIC_COOKIE 1000
 
-static NEARDATA boolean obj_zapped;
-static NEARDATA int poly_zapped;
-
-extern boolean notonhead; /* for long worms */
-
-/* kludge to use mondied instead of killed */
-extern boolean m_using;
-
 STATIC_DCL void FDECL(polyuse, (struct obj *, int, int));
 STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
 STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
@@ -149,7 +141,7 @@ struct obj *otmp;
     if (u.uswallow && mtmp == u.ustuck)
         reveal_invis = FALSE;
 
-    notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
+    g.notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
     skilled_spell = (otmp && otmp->oclass == SPBOOK_CLASS && otmp->blessed);
 
     switch (otyp) {
@@ -487,7 +479,7 @@ struct monst *mtmp;
     struct obj *otmp;
 
     mstatusline(mtmp);
-    if (notonhead)
+    if (g.notonhead)
         return; /* don't show minvent for long worm tail */
 
     if (mtmp->minvent) {
@@ -1368,13 +1360,13 @@ struct obj *obj;
     if (obj->otyp == SCR_MAIL)
         return;
 #endif
-    obj_zapped = TRUE;
+    g.obj_zapped = TRUE;
 
-    if (poly_zapped < 0) {
+    if (g.poly_zapped < 0) {
         /* some may metamorphosize */
         for (i = obj->quan; i; i--)
             if (!rn2(Luck + 45)) {
-                poly_zapped = objects[obj->otyp].oc_material;
+                g.poly_zapped = objects[obj->otyp].oc_material;
                 break;
             }
     }
@@ -2076,7 +2068,7 @@ schar zz;
             learnwand(obj);
     }
 
-    poly_zapped = -1;
+    g.poly_zapped = -1;
     for (otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
         /* for zap downwards, don't hit object poly'd hero is hiding under */
@@ -2086,8 +2078,8 @@ schar zz;
 
         hitanything += (*fhito)(otmp, obj);
     }
-    if (poly_zapped >= 0)
-        create_polymon(level.objects[tx][ty], poly_zapped);
+    if (g.poly_zapped >= 0)
+        create_polymon(level.objects[tx][ty], g.poly_zapped);
 
     return hitanything;
 }
@@ -2618,7 +2610,7 @@ struct obj *obj; /* wand or spell */
     int steedhit = FALSE;
 
     bhitpos.x = u.usteed->mx, bhitpos.y = u.usteed->my;
-    notonhead = FALSE;
+    g.notonhead = FALSE;
     switch (obj->otyp) {
     /*
      * Wands that are allowed to hit the steed
@@ -2961,16 +2953,16 @@ struct obj *obj; /* wand or spell */
 void
 zapsetup()
 {
-    obj_zapped = FALSE;
+    g.obj_zapped = FALSE;
 }
 
 void
 zapwrapup()
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
-    if (obj_zapped)
+    if (g.obj_zapped)
         You_feel("shuddering vibrations.");
-    obj_zapped = FALSE;
+    g.obj_zapped = FALSE;
 }
 
 /* called for various wand and spell effects - M. Stephenson */
@@ -3301,7 +3293,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         }
 
         if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
-            notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+            g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
                    pass through instead of stop so we call
@@ -4049,7 +4041,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
         buzzmonst:
-            notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
+            g.notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
@@ -5122,7 +5114,7 @@ int damage, tell;
     if (damage) {
         mtmp->mhp -= damage;
         if (DEADMONSTER(mtmp)) {
-            if (m_using)
+            if (g.m_using)
                 monkilled(mtmp, "", AD_RBRE);
             else
                 killed(mtmp);

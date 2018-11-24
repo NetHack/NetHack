@@ -196,6 +196,7 @@ E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;
+
 E const char *occtxt; /* defined when occupation != NULL */
 E const char *nomovemsg;
 E char lock[];
@@ -440,6 +441,113 @@ struct early_opt {
     int minlength;
     boolean valallowed;
 };
+
+/* instance_globals holds engine state that does not need to be
+ * persisted upon game exit.  The initialization state is well defined
+ * an set in decl.c during early early engine initialization.
+ * 
+ * unlike instance_flags, values in the structure can be of any type. */
+
+struct instance_globals {
+    /* apply.c */
+    int jumping_is_magic; /* current jump result of magic */
+    int polearm_range_min;
+    int polearm_range_max;
+    /* artifcat.c */
+    int spec_dbon_applies; /* coordinate effects from spec_dbon() with
+                              messages in artifact_hit() */
+    /* botl.c */
+    int mrank_sz; /* loaded by max_rank_sz */
+
+    /* dog.c */
+    int petname_used; /* user preferred pet name has been used */
+
+    /* muse.c */
+    boolean m_using; /* kludge to use mondided instead of killed */
+
+    /* objname.c */
+    /* distantname used by distant_name() to pass extra information to
+       xname_flags(); it would be much cleaner if this were a parameter,
+       but that would require all of the xname() and doname() calls to be
+       modified */
+    int distantname;
+
+    /* pickup.c */
+    int oldcap; /* last encumberance */
+    /* current_container is set in use_container(), to be used by the
+       callback routines in_container() and out_container() from askchain()
+       and use_container(). Also used by menu_loot() and container_gone(). */
+    struct obj *current_container;
+    boolean abort_looting;
+
+    /* pline.c */
+    unsigned pline_flags;
+    char prevmsg[BUFSZ];
+#ifdef DUMPLOG
+    unsigned saved_pline_index;  /* slot in saved_plines[] to use next */
+    char *saved_plines[DUMPLOG_MSG_COUNT];
+#endif
+
+    /* polyself.c */
+    int sex_change_ok; /* controls whether taking on new form or becoming new
+                          man can also change sex (ought to be an arg to
+                          polymon() and newman() instead) */
+
+    /* potion.c */
+    boolean notonhead; /* for long worms */
+    int potion_nothing;
+    int potion_unkn;
+
+    /* read.c */
+    boolean known;
+
+    /* restore.c */
+    int n_ids_mapped;
+    struct bucket *id_map;
+    boolean restoring;
+    struct fruit *oldfruit;
+    long omoves;
+
+    /* rumors.c */
+    long true_rumor_size; /* rumor size variables are signed so that value -1
+                            can be used as a flag */
+    long false_rumor_size;
+    unsigned long true_rumor_start; /* rumor start offsets are unsigned because
+                                       they're handled via %lx format */
+    unsigned long false_rumor_start;
+    long true_rumor_end; /* rumor end offsets are signed because they're 
+                            compared with [dlb_]ftell() */
+    long false_rumor_end;
+    int oracle_flg; /* -1=>don't use, 0=>need init, 1=>init done */
+    unsigned oracle_cnt; /* oracles are handled differently from rumors... */
+    unsigned long *oracle_loc;
+
+    /* save.c */
+    boolean havestate;
+    unsigned ustuck_id; /* need to preserve during save */
+    unsigned usteed_id; /* need to preserve during save */
+
+    /* trap.c */
+    int force_mintrap; /* mintrap() should take a flags argument, but for time
+                          being we use this */
+    /* u_init.c */
+    short nocreate;
+    short nocreate2;
+    short nocreate3;
+    short nocreate4;
+    /* uhitm.c */ 
+    boolean override_confirmation; /* Used to flag attacks caused by
+                                      Stormbringer's maliciousness. */
+    /* weapon.c */
+    struct obj *propellor;
+    /* zap.c */
+    int  poly_zapped;
+    boolean obj_zapped;
+
+    unsigned long magic; /* validate that structure layout is preserved */
+};
+
+E struct instance_globals g;
 
 #undef E
 
