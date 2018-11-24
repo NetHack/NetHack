@@ -48,10 +48,10 @@ static const int explcolors[] = {
 
 #if defined(USE_TILES) && defined(MSDOS)
 #define HAS_ROGUE_IBM_GRAPHICS \
-    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
+    (g.currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
 #else
 #define HAS_ROGUE_IBM_GRAPHICS \
-    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
+    (g.currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
 #endif
 
 #define is_objpile(x,y) (!Hallucination && level.objects[(x)][(y)] \
@@ -71,7 +71,7 @@ unsigned *ospecial;
     /* condense multiple tests in macro version down to single */
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
     boolean has_rogue_color = (has_rogue_ibm_graphics
-                               && symset[currentgraphics].nocolor == 0);
+                               && g.symset[g.currentgraphics].nocolor == 0);
 
     /*
      *  Map the glyph back to a character and color.
@@ -129,14 +129,14 @@ unsigned *ospecial;
         /* provide a visible difference if normal and lit corridor
            use the same symbol */
         } else if (iflags.use_color && offset == S_litcorr
-                   && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
+                   && g.showsyms[idx] == g.showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
 #endif
         /* try to provide a visible difference between water and lava
            if they use the same symbol and color is disabled */
         } else if (!iflags.use_color && offset == S_lava
-                   && (showsyms[idx] == showsyms[S_pool + SYM_OFF_P]
-                       || showsyms[idx] == showsyms[S_water + SYM_OFF_P])) {
+                   && (g.showsyms[idx] == g.showsyms[S_pool + SYM_OFF_P]
+                       || g.showsyms[idx] == g.showsyms[S_water + SYM_OFF_P])) {
             special |= MG_BW_LAVA;
         } else {
             cmap_color(offset);
@@ -222,7 +222,7 @@ unsigned *ospecial;
         }
     }
 
-    ch = showsyms[idx];
+    ch = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
     if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_color))
@@ -283,7 +283,7 @@ const char *str;
                         else
                             break;
                     so = mapglyph(gv, &ch, &oc, &os, 0, 0);
-                    *put++ = showsyms[so];
+                    *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */
                     continue;
@@ -308,7 +308,7 @@ const char *str;
                         else
                             break;
                 }
-                *put++ = showsyms[so];
+                *put++ = g.showsyms[so];
                 break;
 #endif
             case '\\':

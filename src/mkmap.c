@@ -21,10 +21,6 @@ STATIC_DCL void FDECL(finish_map,
 STATIC_DCL void FDECL(remove_room, (unsigned));
 void FDECL(mkmap, (lev_init *));
 
-static char *new_locations;
-int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */
-static int n_loc_filled;
-
 STATIC_OVL void
 init_map(bg_typ)
 schar bg_typ;
@@ -100,7 +96,7 @@ schar bg_typ, fg_typ;
         }
 }
 
-#define new_loc(i, j) *(new_locations + ((j) * (WIDTH + 1)) + (i))
+#define new_loc(i, j) *(g.new_locations + ((j) * (WIDTH + 1)) + (i))
 
 STATIC_OVL void
 pass_two(bg_typ, fg_typ)
@@ -176,10 +172,10 @@ boolean anyroom;
     sx++; /* compensate for extra decrement */
 
     /* assume sx,sy is valid */
-    if (sx < min_rx)
-        min_rx = sx;
-    if (sy < min_ry)
-        min_ry = sy;
+    if (sx < g.min_rx)
+        g.min_rx = sx;
+    if (sy < g.min_ry)
+        g.min_ry = sy;
 
     for (i = sx; i <= WIDTH && levl[i][sy].typ == fg_typ; i++) {
         levl[i][sy].roomno = rmno;
@@ -199,7 +195,7 @@ boolean anyroom;
                             levl[ii][jj].roomno = SHARED;
                     }
         }
-        n_loc_filled++;
+        g.n_loc_filled++;
     }
     nx = i;
 
@@ -240,10 +236,10 @@ boolean anyroom;
             }
     }
 
-    if (nx > max_rx)
-        max_rx = nx - 1; /* nx is just past valid region */
-    if (sy > max_ry)
-        max_ry = sy;
+    if (nx > g.max_rx)
+        g.max_rx = nx - 1; /* nx is just past valid region */
+    if (sy > g.max_ry)
+        g.max_ry = sy;
 }
 
 /*
@@ -284,12 +280,12 @@ schar bg_typ, fg_typ;
     for (i = 2; i <= WIDTH; i++)
         for (j = 1; j < HEIGHT; j++) {
             if (levl[i][j].typ == fg_typ && levl[i][j].roomno == NO_ROOM) {
-                min_rx = max_rx = i;
-                min_ry = max_ry = j;
-                n_loc_filled = 0;
+                g.min_rx = g.max_rx = i;
+                g.min_ry = g.max_ry = j;
+                g.n_loc_filled = 0;
                 flood_fill_rm(i, j, nroom + ROOMOFFSET, FALSE, FALSE);
-                if (n_loc_filled > 3) {
-                    add_room(min_rx, min_ry, max_rx, max_ry, FALSE, OROOM,
+                if (g.n_loc_filled > 3) {
+                    add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OROOM,
                              TRUE);
                     rooms[nroom - 1].irregular = TRUE;
                     if (nroom >= (MAXNROFROOMS * 2))
@@ -299,8 +295,8 @@ schar bg_typ, fg_typ;
                      * it's a tiny hole; erase it from the map to avoid
                      * having the player end up here with no way out.
                      */
-                    for (sx = min_rx; sx <= max_rx; sx++)
-                        for (sy = min_ry; sy <= max_ry; sy++)
+                    for (sx = g.min_rx; sx <= g.max_rx; sx++)
+                        for (sy = g.min_ry; sy <= g.max_ry; sy++)
                             if ((int) levl[sx][sy].roomno
                                 == nroom + ROOMOFFSET) {
                                 levl[sx][sy].typ = bg_typ;
@@ -460,7 +456,7 @@ lev_init *init_lev;
     if (lit < 0)
         lit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? 1 : 0;
 
-    new_locations = (char *) alloc((WIDTH + 1) * HEIGHT);
+    g.new_locations = (char *) alloc((WIDTH + 1) * HEIGHT);
 
     init_map(bg_typ);
     init_fill(bg_typ, fg_typ);
@@ -485,7 +481,7 @@ lev_init *init_lev;
         level.flags.is_maze_lev = FALSE;
         level.flags.is_cavernous_lev = TRUE;
     }
-    free(new_locations);
+    free(g.new_locations);
 }
 
 /*mkmap.c*/

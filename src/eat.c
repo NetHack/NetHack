@@ -39,8 +39,6 @@ STATIC_DCL const char *FDECL(foodword, (struct obj *));
 STATIC_DCL int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
 
-char msgbuf[BUFSZ];
-
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC))
 
@@ -68,8 +66,6 @@ STATIC_OVL NEARDATA const char allobj[] = {
     FOOD_CLASS,   TOOL_CLASS,   GEM_CLASS,    ROCK_CLASS,
     BALL_CLASS,   CHAIN_CLASS,  SPBOOK_CLASS, 0
 };
-
-STATIC_OVL boolean force_save_hs = FALSE;
 
 /* see hunger states in hack.h - texts used on bottom line */
 const char *hu_stat[] = { "Satiated", "        ", "Hungry  ", "Weak    ",
@@ -1733,6 +1729,7 @@ start_eating(otmp)
 struct obj *otmp;
 {
     const char *old_nomovemsg, *save_nomovemsg;
+    static char msgbuf[BUFSZ];
 
     debugpline2("start_eating: %s (victual = %s)",
                 /* note: fmt_ptr() returns a static buffer but supports
@@ -2758,7 +2755,7 @@ bite()
         do_reset_eat();
         return 0;
     }
-    force_save_hs = TRUE;
+    g.force_save_hs = TRUE;
     if (context.victual.nmod < 0) {
         lesshungry(-context.victual.nmod);
         consume_oeaten(context.victual.piece,
@@ -2768,7 +2765,7 @@ bite()
         lesshungry(1);
         consume_oeaten(context.victual.piece, -1); /* -= 1 */
     }
-    force_save_hs = FALSE;
+    g.force_save_hs = FALSE;
     recalc_wt();
     return 0;
 }
@@ -2845,7 +2842,7 @@ lesshungry(num)
 int num;
 {
     /* See comments in newuhs() for discussion on force_save_hs */
-    boolean iseating = (occupation == eatfood) || force_save_hs;
+    boolean iseating = (occupation == eatfood) || g.force_save_hs;
 
     debugpline1("lesshungry(%d)", num);
     u.uhunger += num;
@@ -2951,7 +2948,7 @@ boolean incr;
      * were added or if HUNGRY and WEAK were separated by a big enough
      * gap to fit two bites.
      */
-    if (occupation == eatfood || force_save_hs) {
+    if (occupation == eatfood || g.force_save_hs) {
         if (!saved_hs) {
             save_hs = u.uhs;
             saved_hs = TRUE;

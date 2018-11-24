@@ -282,16 +282,6 @@ boolean flag;
     return  TRUE;
 }
 
-struct entity {
-    struct monst *emon;     /* youmonst for the player */
-    struct permonst *edata; /* must be non-zero for record to be valid */
-    int ex, ey;
-};
-
-#define ENTITIES 2
-
-static NEARDATA struct entity occupants[ENTITIES];
-
 STATIC_OVL
 struct entity *
 e_at(x, y)
@@ -300,15 +290,15 @@ int x, y;
     int entitycnt;
 
     for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++)
-        if ((occupants[entitycnt].edata) && (occupants[entitycnt].ex == x)
-            && (occupants[entitycnt].ey == y))
+        if ((g.occupants[entitycnt].edata) && (g.occupants[entitycnt].ex == x)
+            && (g.occupants[entitycnt].ey == y))
             break;
     debugpline1("entitycnt = %d", entitycnt);
 #ifdef D_DEBUG
     wait_synch();
 #endif
     return (entitycnt == ENTITIES) ? (struct entity *) 0
-                                   : &(occupants[entitycnt]);
+                                   : &(g.occupants[entitycnt]);
 }
 
 STATIC_OVL void
@@ -471,9 +461,9 @@ int xkill_flags, how;
 
         /* dead long worm handling */
         for (entitycnt = 0; entitycnt < ENTITIES; entitycnt++) {
-            if (etmp != &(occupants[entitycnt])
-                && etmp->emon == occupants[entitycnt].emon)
-                occupants[entitycnt].edata = (struct permonst *) 0;
+            if (etmp != &(g.occupants[entitycnt])
+                && etmp->emon == g.occupants[entitycnt].emon)
+                g.occupants[entitycnt].edata = (struct permonst *) 0;
         }
 #undef mk_message
 #undef mk_corpse
@@ -801,11 +791,11 @@ int x, y;
         break;
     }
     lev2->wall_info = W_NONDIGGABLE;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* Do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tail */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(g.occupants[0]));
+    set_entity(x2, y2, &(g.occupants[1]));
+    do_entity(&(g.occupants[0]));          /* Do set_entity after first */
+    set_entity(x2, y2, &(g.occupants[1])); /* do_entity for worm tail */
+    do_entity(&(g.occupants[1]));
     if (OBJ_AT(x, y) && !Deaf)
         You_hear("smashing and crushing.");
     (void) revive_nasty(x, y, (char *) 0);
@@ -850,11 +840,11 @@ int x, y;
     lev2 = &levl[x2][y2];
     lev2->typ = DOOR;
     lev2->doormask = D_NODOOR;
-    set_entity(x, y, &(occupants[0]));
-    set_entity(x2, y2, &(occupants[1]));
-    do_entity(&(occupants[0]));          /* do set_entity after first */
-    set_entity(x2, y2, &(occupants[1])); /* do_entity for worm tails */
-    do_entity(&(occupants[1]));
+    set_entity(x, y, &(g.occupants[0]));
+    set_entity(x2, y2, &(g.occupants[1]));
+    do_entity(&(g.occupants[0]));          /* do set_entity after first */
+    set_entity(x2, y2, &(g.occupants[1])); /* do_entity for worm tails */
+    do_entity(&(g.occupants[1]));
     (void) revive_nasty(x, y, (char *) 0);
     delallobj(x, y);
     if ((t = t_at(x, y)) != 0)
@@ -883,7 +873,7 @@ int x, y;
     struct obj *otmp;
     int x2, y2, i;
     boolean e_inview;
-    struct entity *etmp1 = &(occupants[0]), *etmp2 = &(occupants[1]);
+    struct entity *etmp1 = &(g.occupants[0]), *etmp2 = &(g.occupants[1]);
 
     lev1 = &levl[x][y];
     if (!IS_DRAWBRIDGE(lev1->typ))

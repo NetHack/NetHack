@@ -167,8 +167,6 @@ static int lockptr;
 extern char *sounddir;
 #endif
 
-extern int n_dgns; /* from dungeon.c */
-
 #if defined(UNIX) && defined(QT_GRAPHICS)
 #define SELECTSAVED
 #endif
@@ -604,7 +602,7 @@ clearlocks()
         sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
 #endif
         /* can't access maxledgerno() before dungeons are created -dlc */
-        for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--)
+        for (x = (g.n_dgns ? maxledgerno() : 0); x >= 0; x--)
             delete_levelfile(x); /* not all levels need be present */
     }
 #endif /* ?PC_LOCKING,&c */
@@ -3182,17 +3180,17 @@ int which_set;
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
            success to use the default; otherwise, return failure */
-        if (symset[which_set].name
-            && (fuzzymatch(symset[which_set].name, "Default symbols",
+        if (g.symset[which_set].name
+            && (fuzzymatch(g.symset[which_set].name, "Default symbols",
                            " -_", TRUE)
-                || !strcmpi(symset[which_set].name, "default")))
+                || !strcmpi(g.symset[which_set].name, "default")))
             clear_symsetentry(which_set, TRUE);
         config_error_done();
-        return (symset[which_set].name == 0) ? 1 : 0;
+        return (g.symset[which_set].name == 0) ? 1 : 0;
     }
     if (!chosen_symset_end)
         config_error_add("Missing finish for symset \"%s\"",
-                         symset[which_set].name ? symset[which_set].name
+                         g.symset[which_set].name ? g.symset[which_set].name
                                                 : "unknown");
 
     config_error_done();
@@ -3256,7 +3254,7 @@ int which_set;
         return 0;
     }
 
-    if (!symset[which_set].name) {
+    if (!g.symset[which_set].name) {
         /* A null symset name indicates that we're just
            building a pick-list of possible symset
            values from the file, so only do that */
@@ -3328,7 +3326,7 @@ int which_set;
             switch (symp->idx) {
             case 0:
                 /* start of symset */
-                if (!strcmpi(bufp, symset[which_set].name)) {
+                if (!strcmpi(bufp, g.symset[which_set].name)) {
                     /* matches desired one */
                     chosen_symset_start = TRUE;
                     /* these init_*() functions clear symset fields too */
@@ -3355,11 +3353,11 @@ int which_set;
                     if (bufp) {
                         if (!strcmpi(bufp, "true") || !strcmpi(bufp, "yes")
                             || !strcmpi(bufp, "on"))
-                            symset[which_set].nocolor = 0;
+                            g.symset[which_set].nocolor = 0;
                         else if (!strcmpi(bufp, "false")
                                  || !strcmpi(bufp, "no")
                                  || !strcmpi(bufp, "off"))
-                            symset[which_set].nocolor = 1;
+                            g.symset[which_set].nocolor = 1;
                     }
                 }
                 break;
@@ -3371,10 +3369,10 @@ int which_set;
                         if (!strcmpi(known_restrictions[n], bufp)) {
                             switch (n) {
                             case 0:
-                                symset[which_set].primary = 1;
+                                g.symset[which_set].primary = 1;
                                 break;
                             case 1:
-                                symset[which_set].rogue = 1;
+                                g.symset[which_set].rogue = 1;
                                 break;
                             }
                             break; /* while loop */
@@ -3405,10 +3403,10 @@ int which_set;
 {
     int i = 0;
 
-    symset[which_set].handling = H_UNK;
+    g.symset[which_set].handling = H_UNK;
     while (known_handling[i]) {
         if (!strcmpi(known_handling[i], handling)) {
-            symset[which_set].handling = i;
+            g.symset[which_set].handling = i;
             return;
         }
         i++;

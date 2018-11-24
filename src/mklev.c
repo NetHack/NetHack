@@ -36,10 +36,8 @@ STATIC_DCL void FDECL(mkinvpos, (XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(mk_knox_portal, (XCHAR_P, XCHAR_P));
 
 #define create_vault() create_room(-1, -1, 2, 2, -1, -1, VAULT, TRUE)
-#define init_vault() vault_x = -1
-#define do_vault() (vault_x != -1)
-static xchar vault_x, vault_y;
-static boolean made_branch; /* used only during level creation */
+#define init_vault() g.vault_x = -1
+#define do_vault() (g.vault_x != -1)
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
@@ -229,8 +227,8 @@ makerooms()
         if (nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
             tried_vault = TRUE;
             if (create_vault()) {
-                vault_x = rooms[nroom].lx;
-                vault_y = rooms[nroom].ly;
+                g.vault_x = rooms[nroom].lx;
+                g.vault_y = rooms[nroom].ly;
                 rooms[nroom].hx = -1;
             }
         } else if (!create_room(-1, -1, -1, -1, -1, -1, OROOM, -1))
@@ -636,7 +634,7 @@ clear_level_structures()
     xdnstair = ydnstair = xupstair = yupstair = 0;
     sstairs.sx = sstairs.sy = 0;
     xdnladder = ydnladder = xupladder = yupladder = 0;
-    made_branch = FALSE;
+    g.made_branch = FALSE;
     clear_regions();
 }
 
@@ -731,20 +729,20 @@ makelevel()
         debugpline0("trying to make a vault...");
         w = 1;
         h = 1;
-        if (check_room(&vault_x, &w, &vault_y, &h, TRUE)) {
+        if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE)) {
         fill_vault:
-            add_room(vault_x, vault_y, vault_x + w, vault_y + h, TRUE, VAULT,
+            add_room(g.vault_x, g.vault_y, g.vault_x + w, g.vault_y + h, TRUE, VAULT,
                      FALSE);
             level.flags.has_vault = 1;
             ++room_threshold;
             fill_room(&rooms[nroom - 1], FALSE);
-            mk_knox_portal(vault_x + w, vault_y + h);
+            mk_knox_portal(g.vault_x + w, g.vault_y + h);
             if (!level.flags.noteleport && !rn2(3))
                 makevtele();
         } else if (rnd_rect() && create_vault()) {
-            vault_x = rooms[nroom].lx;
-            vault_y = rooms[nroom].ly;
-            if (check_room(&vault_x, &w, &vault_y, &h, TRUE))
+            g.vault_x = rooms[nroom].lx;
+            g.vault_y = rooms[nroom].ly;
+            if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE))
                 goto fill_vault;
             else
                 rooms[nroom].hx = -1;
@@ -1139,7 +1137,7 @@ xchar x, y; /* location */
      * a special level is loaded that specifies an SSTAIR location
      * as a favored spot for a branch.
      */
-    if (!br || made_branch)
+    if (!br || g.made_branch)
         return;
 
     if (!x) { /* find random coordinates for branch */
@@ -1179,7 +1177,7 @@ xchar x, y; /* location */
      * per level, if we failed once, we're going to fail again on the
      * next call.
      */
-    made_branch = TRUE;
+    g.made_branch = TRUE;
 }
 
 STATIC_OVL boolean
@@ -1824,7 +1822,6 @@ STATIC_OVL void
 mk_knox_portal(x, y)
 xchar x, y;
 {
-    extern int n_dgns; /* from dungeon.c */
     d_level *source;
     branch *br;
     schar u_depth;
@@ -1840,7 +1837,7 @@ xchar x, y;
     }
 
     /* Already set or 2/3 chance of deferring until a later level. */
-    if (source->dnum < n_dgns || (rn2(3) && !wizard))
+    if (source->dnum < g.n_dgns || (rn2(3) && !wizard))
         return;
 
     if (!(u.uz.dnum == oracle_level.dnum      /* in main dungeon */

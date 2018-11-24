@@ -300,14 +300,9 @@ struct symsetentry {
 #define H_CURS    3
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
+#define WARNCOUNT 6 /* number of different warning levels */
 extern const struct symdef def_warnsyms[WARNCOUNT];
-extern int currentgraphics; /* from drawing.c */
-extern nhsym showsyms[];
-extern nhsym l_syms[];
-extern nhsym r_syms[];
-
-extern struct symsetentry symset[NUM_GRAPHICS]; /* from drawing.c */
-#define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
+#define SYMHANDLING(ht) (g.symset[g.currentgraphics].handling == (ht))
 
 /*
  * The 5 possible states of doors

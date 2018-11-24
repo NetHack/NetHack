@@ -482,9 +482,9 @@ dig(VOID_ARGS)
                    || (dig_target == DIGTYP_ROCK && !IS_ROCK(lev->typ)))
             return 0; /* statue or boulder got taken */
 
-        if (!did_dig_msg) {
+        if (!g.did_dig_msg) {
             You("hit the %s with all your might.", d_target[dig_target]);
-            did_dig_msg = TRUE;
+            g.did_dig_msg = TRUE;
         }
     }
     return 1;
@@ -1116,7 +1116,7 @@ struct obj *obj;
                                                      "chopping at the door",
                                                      "cutting the tree" };
 
-            did_dig_msg = FALSE;
+            g.did_dig_msg = FALSE;
             context.digging.quiet = FALSE;
             if (context.digging.pos.x != rx || context.digging.pos.y != ry
                 || !on_level(&context.digging.level, &u.uz)
@@ -1128,7 +1128,7 @@ struct obj *obj;
                     && (moves <= context.digging.lastdigtime + 2
                         && moves >= context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
-                    did_dig_msg = TRUE;
+                    g.did_dig_msg = TRUE;
                     context.digging.quiet = TRUE;
                 }
                 context.digging.down = context.digging.chew = FALSE;
@@ -1185,7 +1185,7 @@ struct obj *obj;
                 shopdig(0);
         } else
             You("continue %s downward.", verbing);
-        did_dig_msg = FALSE;
+        g.did_dig_msg = FALSE;
         set_occupation(dig, verbing, 0);
     }
     return 1;

@@ -22,10 +22,6 @@ STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 
-/* See comment in mhitm.c.  If we use this a lot it probably should be */
-/* changed to a parameter to mhitu. */
-static int dieroll;
-
 STATIC_OVL void
 hitmsg(mtmp, mattk)
 struct monst *mtmp;
@@ -755,7 +751,7 @@ register struct monst *mtmp;
                         tmp += hittmp;
                         mswings(mtmp, mon_currwep);
                     }
-                    if (tmp > (j = dieroll = rnd(20 + i)))
+                    if (tmp > (j = g.mhitu_dieroll = rnd(20 + i)))
                         sum[i] = hitmu(mtmp, mattk);
                     else
                         missmu(mtmp, (tmp == j), mattk);
@@ -991,7 +987,7 @@ register struct attack *mattk;
                 if (dmg <= 0)
                     dmg = 1;
                 if (!(otmp->oartifact
-                      && artifact_hit(mtmp, &youmonst, otmp, &dmg, dieroll)))
+                      && artifact_hit(mtmp, &youmonst, otmp, &dmg, g.mhitu_dieroll)))
                     hitmsg(mtmp, mattk);
                 if (!dmg)
                     break;

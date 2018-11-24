@@ -44,7 +44,7 @@ int c;
     int i;
 
     for (i = S_sw_tl; i <= S_sw_br; i++)
-        if ((int) showsyms[i] == c)
+        if ((int) g.showsyms[i] == c)
             return TRUE;
     return FALSE;
 }
@@ -851,7 +851,7 @@ struct permonst **for_supplement;
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 0; i < MAXMCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+            if (sym == (looked ? g.showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
                 && def_monsyms[i].explain) {
                 need_to_look = TRUE;
                 if (!found) {
@@ -867,7 +867,7 @@ struct permonst **for_supplement;
         /* handle '@' as a special case if it refers to you and you're
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
-        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
+        if ((looked ? (sym == g.showsyms[S_HUMAN + SYM_OFF_M]
                        && cc.x == u.ux && cc.y == u.uy)
                     : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
             && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
@@ -877,7 +877,7 @@ struct permonst **for_supplement;
     /* Now check for objects */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         for (i = 1; i < MAXOCLASSES; i++) {
-            if (sym == (looked ? showsyms[i + SYM_OFF_O]
+            if (sym == (looked ? g.showsyms[i + SYM_OFF_O]
                                : def_oc_syms[i].sym)
                 || (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
                 need_to_look = TRUE;
@@ -913,7 +913,7 @@ struct permonst **for_supplement;
     }
 
     /* Now check for graphics symbols */
-    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
+    alt_i = (sym == (looked ? g.showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
@@ -929,7 +929,7 @@ struct permonst **for_supplement;
                 x_str = "land"; /* replace "dark part of a room" */
             /* alt_i is now 3 or more and no longer of interest */
         }
-        if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
+        if (sym == (looked ? g.showsyms[i] : defsyms[i].sym) && *x_str) {
             /* avoid "an unexplored", "an stone", "an air", "a water",
                "a floor of a room", "a dark part of a room";
                article==2 => "the", 1 => "an", 0 => (none) */
@@ -972,7 +972,7 @@ struct permonst **for_supplement;
     /* Now check for warning symbols */
     for (i = 1; i < WARNCOUNT; i++) {
         x_str = def_warnsyms[i].explanation;
-        if (sym == (looked ? warnsyms[i] : def_warnsyms[i].sym)) {
+        if (sym == (looked ? g.warnsyms[i] : def_warnsyms[i].sym)) {
             if (!found) {
                 Sprintf(out_str, "%s%s", prefix, def_warnsyms[i].explanation);
                 *firstmatch = def_warnsyms[i].explanation;

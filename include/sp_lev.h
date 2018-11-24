@@ -327,11 +327,6 @@ typedef struct {
     long jmp_target;
 } opjmp;
 
-typedef union str_or_len {
-    char *str;
-    int len;
-} Str_or_Len;
-
 typedef struct {
     xchar init_style; /* one of LVLINIT_foo */
     long flags;
@@ -399,19 +394,6 @@ typedef struct {
     xchar x1, y1, x2, y2;
     xchar fromter, toter, tolit;
 } replaceterrain;
-
-/* values for rtype are defined in dungeon.h */
-typedef struct {
-    struct {
-        xchar x1, y1, x2, y2;
-    } inarea;
-    struct {
-        xchar x1, y1, x2, y2;
-    } delarea;
-    boolean in_islev, del_islev;
-    xchar rtype, padding;
-    Str_or_Len rname;
-} lev_region;
 
 typedef struct {
     struct {

@@ -1508,14 +1508,13 @@ struct obj *obj;
         case CREATE_PORTAL: {
             int i, num_ok_dungeons, last_ok_dungeon = 0;
             d_level newlev;
-            extern int n_dgns; /* from dungeon.c */
             winid tmpwin = create_nhwindow(NHW_MENU);
             anything any;
 
             any = zeroany; /* set all bits to zero */
             start_menu(tmpwin);
             /* use index+1 (cant use 0) as identifier */
-            for (i = num_ok_dungeons = 0; i < n_dgns; i++) {
+            for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {
                 if (!dungeons[i].dunlev_ureached)
                     continue;
                 any.a_int = i + 1;

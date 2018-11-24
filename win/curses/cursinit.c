@@ -791,7 +791,7 @@ curses_init_options()
     /* Make sure that DECgraphics is not set to true via the config
        file, as this will cause display issues.  We can't disable it in
        options.c in case the game is compiled with both tty and curses. */
-    if (!symset[PRIMARY].name || !strcmpi(symset[PRIMARY].name, "DECgraphics")) {
+    if (!g.symset[PRIMARY].name || !strcmpi(g.symset[PRIMARY].name, "DECgraphics")) {
         load_symset("curses",PRIMARY);
         load_symset("default",ROGUESET);
     }

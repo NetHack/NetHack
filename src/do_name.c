@@ -244,13 +244,9 @@ const void *b;
      && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone  \
      && !levl[(x)][(y)].seenv)
 
-static struct opvar *gloc_filter_map = (struct opvar *) 0;
-
 #define GLOC_SAME_AREA(x,y)                                     \
     (isok((x), (y))                                             \
-     && (selection_getpoint((x),(y), gloc_filter_map)))
-
-static int gloc_filter_floodfill_match_glyph;
+     && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
 int
 gloc_filter_classify_glyph(glyph)
@@ -285,11 +281,11 @@ int x, y;
     if (!levl[x][y].seenv)
         return FALSE;
 
-    if (glyph == gloc_filter_floodfill_match_glyph)
+    if (glyph == g.gloc_filter_floodfill_match_glyph)
         return TRUE;
 
     if (gloc_filter_classify_glyph(glyph)
-        == gloc_filter_classify_glyph(gloc_filter_floodfill_match_glyph))
+        == gloc_filter_classify_glyph(g.gloc_filter_floodfill_match_glyph))
         return TRUE;
 
     return FALSE;
@@ -299,18 +295,18 @@ void
 gloc_filter_floodfill(x, y)
 int x, y;
 {
-    gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
+    g.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
-    selection_floodfill(gloc_filter_map, x, y, FALSE);
+    selection_floodfill(g.gloc_filter_map, x, y, FALSE);
 }
 
 void
 gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
-        if (!gloc_filter_map) {
-            gloc_filter_map = selection_opvar((char *) 0);
+        if (!g.gloc_filter_map) {
+            g.gloc_filter_map = selection_opvar((char *) 0);
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -329,9 +325,10 @@ gloc_filter_init()
 void
 gloc_filter_done()
 {
-    if (gloc_filter_map) {
-        opvar_free_x(gloc_filter_map);
-        gloc_filter_map = (struct opvar *) 0;
+    if (g.gloc_filter_map) {
+        opvar_free_x(g.gloc_filter_map);
+        g.gloc_filter_map = (struct opvar *) 0;
+
     }
 }
 
@@ -885,7 +882,7 @@ const char *goal;
                         || glyph_to_cmap(k) == S_corr
                         || glyph_to_cmap(k) == S_litcorr)
                         continue;
-                    if (c == defsyms[sidx].sym || c == (int) showsyms[sidx])
+                    if (c == defsyms[sidx].sym || c == (int) g.showsyms[sidx])
                         matching[sidx] = (char) ++k;
                 }
                 if (k) {
@@ -1184,8 +1181,6 @@ do_mname()
         (void) christen_monst(mtmp, buf);
 }
 
-STATIC_VAR int via_naming = 0;
-
 /*
  * This routine used to change the address of 'obj' so be unsafe if not
  * used with extreme care.  Applying a name to an object no longer
@@ -1257,9 +1252,9 @@ register struct obj *obj;
            a valid artifact name */
         u.uconduct.literate++;
     }
-    ++via_naming; /* This ought to be an argument rather than a static... */
+    ++g.via_naming; /* This ought to be an argument rather than a static... */
     obj = oname(obj, buf);
-    --via_naming; /* ...but oname() is used in a lot of places, so defer. */
+    --g.via_naming; /* ...but oname() is used in a lot of places, so defer. */
 }
 
 struct obj *
@@ -1299,7 +1294,7 @@ const char *name;
         /* if obj is owned by a shop, increase your bill */
         if (obj->unpaid)
             alter_cost(obj, 0L);
-        if (via_naming) {
+        if (g.via_naming) {
             /* violate illiteracy conduct since successfully wrote arti-name */
             u.uconduct.literate++;
         }

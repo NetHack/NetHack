@@ -39,8 +39,6 @@ STATIC_DCL void FDECL(menu_identify, (int));
 STATIC_DCL boolean FDECL(tool_in_use, (struct obj *));
 STATIC_DCL char FDECL(obj_to_let, (struct obj *));
 
-static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
-
 /* wizards can wish for venom, which will become an invisible inventory
  * item without this.  putting it in inv_order would mean venom would
  * suddenly become a choice for all the inventory-class commands, which
@@ -263,9 +261,6 @@ struct obj *obj;
     return res;
 }
 
-/* set by sortloot() for use by sortloot_cmp(); reset by sortloot when done */
-static unsigned sortlootmode = 0;
-
 /* qsort comparison routine for sortloot() */
 STATIC_OVL int CFDECLSPEC
 sortloot_cmp(vptr1, vptr2)
@@ -280,7 +275,7 @@ const genericptr vptr2;
     int val1, val2, c, namcmp;
 
     /* order by object class unless we're doing by-invlet without sortpack */
-    if ((sortlootmode & (SORTLOOT_PACK | SORTLOOT_INVLET))
+    if ((g.sortlootmode & (SORTLOOT_PACK | SORTLOOT_INVLET))
         != SORTLOOT_INVLET) {
         /* Classify each object at most once no matter how many
            comparisons it is involved in. */
@@ -296,7 +291,7 @@ const genericptr vptr2;
             return (int) (val1 - val2);
 
         /* skip sub-classes when ordering by sortpack+invlet */
-        if ((sortlootmode & SORTLOOT_INVLET) == 0) {
+        if ((g.sortlootmode & SORTLOOT_INVLET) == 0) {
             /* Class matches; sort by subclass. */
             val1 = sli1->subclass;
             val2 = sli2->subclass;
@@ -321,7 +316,7 @@ const genericptr vptr2;
     }
 
     /* order by assigned inventory letter */
-    if ((sortlootmode & SORTLOOT_INVLET) != 0) {
+    if ((g.sortlootmode & SORTLOOT_INVLET) != 0) {
         c = obj1->invlet;
         val1 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
                : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
@@ -338,7 +333,7 @@ const genericptr vptr2;
             return val1 - val2;
     }
 
-    if ((sortlootmode & SORTLOOT_LOOT) == 0)
+    if ((g.sortlootmode & SORTLOOT_LOOT) == 0)
         goto tiebreak;
 
     /*
@@ -488,9 +483,9 @@ boolean FDECL((*filterfunc), (OBJ_P));
     /* do the sort; if no sorting is requested, we'll just return
        a sortloot_item array reflecting the current ordering */
     if (mode && n > 1) {
-        sortlootmode = mode; /* extra input for sortloot_cmp() */
+        g.sortlootmode = mode; /* extra input for sortloot_cmp() */
         qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
-        sortlootmode = 0; /* reset static mode flags */
+        g.sortlootmode = 0; /* reset static mode flags */
         /* if sortloot_cmp formatted any objects, discard their strings now */
         for (i = 0; i < n; ++i)
             if (sliarray[i].str)
@@ -520,7 +515,7 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
     unsigned n, i;
     boolean already_sorted = TRUE;
 
-    sortlootmode = mode; /* extra input for sortloot_cmp() */
+    g.sortlootmode = mode; /* extra input for sortloot_cmp() */
     for (n = osli.indx = 0, osli.obj = *olist; (o = osli.obj) != 0;
          osli = nsli) {
         nsli.obj = by_nexthere ? o->nexthere : o->nobj;
@@ -544,7 +539,7 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
         *olist = sliarray[0].obj;
         free((genericptr_t) sliarray);
     }
-    sortlootmode = 0;
+    g.sortlootmode = 0;
 }
 #endif /*0*/
 
@@ -577,7 +572,7 @@ register struct obj *otmp;
     if ((i = otmp->invlet)
         && (('a' <= i && i <= 'z') || ('A' <= i && i <= 'Z')))
         return;
-    for (i = lastinvnr + 1; i != lastinvnr; i++) {
+    for (i = g.lastinvnr + 1; i != g.lastinvnr; i++) {
         if (i == 52) {
             i = -1;
             continue;
@@ -587,7 +582,7 @@ register struct obj *otmp;
     }
     otmp->invlet =
         (inuse[i] ? NOINVSYM : (i < 26) ? ('a' + i) : ('A' + i - 26));
-    lastinvnr = i;
+    g.lastinvnr = i;
 }
 
 /* note: assumes ASCII; toggling a bit puts lowercase in front of uppercase */
@@ -3809,9 +3804,6 @@ STATIC_VAR NEARDATA const char *names[] = {
 STATIC_VAR NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 STATIC_VAR NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
-STATIC_VAR NEARDATA char *invbuf = (char *) 0;
-STATIC_VAR NEARDATA unsigned invbufsiz = 0;
-
 char *
 let_to_name(let, unpaid, showsym)
 char let;
@@ -3833,36 +3825,36 @@ boolean unpaid, showsym;
 
     len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "")
           + (oclass ? (strlen(ocsymfmt) + invbuf_sympadding) : 0);
-    if (len > invbufsiz) {
-        if (invbuf)
-            free((genericptr_t) invbuf);
-        invbufsiz = len + 10; /* add slop to reduce incremental realloc */
-        invbuf = (char *) alloc(invbufsiz);
+    if (len > g.invbufsiz) {
+        if (g.invbuf)
+            free((genericptr_t) g.invbuf);
+        g.invbufsiz = len + 10; /* add slop to reduce incremental realloc */
+        g.invbuf = (char *) alloc(g.invbufsiz);
     }
     if (unpaid)
-        Strcat(strcpy(invbuf, "Unpaid "), class_name);
+        Strcat(strcpy(g.invbuf, "Unpaid "), class_name);
     else
-        Strcpy(invbuf, class_name);
+        Strcpy(g.invbuf, class_name);
     if ((oclass != 0) && showsym) {
-        char *bp = eos(invbuf);
+        char *bp = eos(g.invbuf);
         int mlen = invbuf_sympadding - strlen(class_name);
         while (--mlen > 0) {
             *bp = ' ';
             bp++;
         }
         *bp = '\0';
-        Sprintf(eos(invbuf), ocsymfmt, def_oc_syms[oclass].sym);
+        Sprintf(eos(g.invbuf), ocsymfmt, def_oc_syms[oclass].sym);
     }
-    return invbuf;
+    return g.invbuf;
 }
 
 /* release the static buffer used by let_to_name() */
 void
 free_invbuf()
 {
-    if (invbuf)
-        free((genericptr_t) invbuf), invbuf = (char *) 0;
-    invbufsiz = 0;
+    if (g.invbuf)
+        free((genericptr_t) g.invbuf), g.invbuf = (char *) 0;
+    g.invbufsiz = 0;
 }
 
 /* give consecutive letters to every item in inventory (for !fixinv mode);
@@ -3896,7 +3888,7 @@ reassign()
     }
     if (i >= 52)
         i = 52 - 1;
-    lastinvnr = i;
+    g.lastinvnr = i;
 }
 
 /* #adjust command

@@ -454,7 +454,7 @@ curses_convert_glyph(int ch, int glyph)
 
     /* If user selected a custom character for this object, don't
        override this. */
-    if (((glyph_is_cmap(glyph)) && (ch != showsyms[symbol]))) {
+    if (((glyph_is_cmap(glyph)) && (ch != g.showsyms[symbol]))) {
         return ch;
     }
 

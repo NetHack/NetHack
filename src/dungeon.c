@@ -25,11 +25,6 @@ struct proto_dungeon {
     int n_brs;  /* number of tmpbranch entries */
 };
 
-int n_dgns;     /* number of dungeons (also used in mklev.c and do.c) */
-static branch *branches = (branch *) 0;        /* dungeon branch list */
-
-mapseen *mapseenchn = (struct mapseen *) 0; /*DUNGEON_OVERVIEW*/
-
 struct lchoice {
     int idx;
     schar lev[MAXLINFO];
@@ -88,7 +83,7 @@ dumpit()
     if (!explicitdebug(__FILE__))
         return;
 
-    for (i = 0; i < n_dgns; i++) {
+    for (i = 0; i < g.n_dgns; i++) {
         fprintf(stderr, "\n#%d \"%s\" (%s):\n", i, DD.dname, DD.proto);
         fprintf(stderr, "    num_dunlevs %d, dunlev_ureached %d\n",
                 DD.num_dunlevs, DD.dunlev_ureached);
@@ -112,7 +107,7 @@ dumpit()
         getchar();
     }
     fprintf(stderr, "\nBranches:\n");
-    for (br = branches; br; br = br->next) {
+    for (br = g.branches; br; br = br->next) {
         fprintf(stderr, "%d: %s, end1 %d %d, end2 %d %d, %s\n", br->id,
                 br->type == BR_STAIR
                     ? "stair"
@@ -143,17 +138,17 @@ boolean perform_write, free_data;
     int count;
 
     if (perform_write) {
-        bwrite(fd, (genericptr_t) &n_dgns, sizeof n_dgns);
+        bwrite(fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
         bwrite(fd, (genericptr_t) dungeons,
-               sizeof(dungeon) * (unsigned) n_dgns);
+               sizeof(dungeon) * (unsigned) g.n_dgns);
         bwrite(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
         bwrite(fd, (genericptr_t) tune, sizeof tune);
 
-        for (count = 0, curr = branches; curr; curr = curr->next)
+        for (count = 0, curr = g.branches; curr; curr = curr->next)
             count++;
         bwrite(fd, (genericptr_t) &count, sizeof(count));
 
-        for (curr = branches; curr; curr = curr->next)
+        for (curr = g.branches; curr; curr = curr->next)
             bwrite(fd, (genericptr_t) curr, sizeof(branch));
 
         count = maxledgerno();
@@ -162,28 +157,28 @@ boolean perform_write, free_data;
                (unsigned) count * sizeof(struct linfo));
         bwrite(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
 
-        for (count = 0, curr_ms = mapseenchn; curr_ms;
+        for (count = 0, curr_ms = g.mapseenchn; curr_ms;
              curr_ms = curr_ms->next)
             count++;
         bwrite(fd, (genericptr_t) &count, sizeof(count));
 
-        for (curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next)
+        for (curr_ms = g.mapseenchn; curr_ms; curr_ms = curr_ms->next)
             save_mapseen(fd, curr_ms);
     }
 
     if (free_data) {
-        for (curr = branches; curr; curr = next) {
+        for (curr = g.branches; curr; curr = next) {
             next = curr->next;
             free((genericptr_t) curr);
         }
-        branches = 0;
-        for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
+        g.branches = 0;
+        for (curr_ms = g.mapseenchn; curr_ms; curr_ms = next_ms) {
             next_ms = curr_ms->next;
             if (curr_ms->custom)
                 free((genericptr_t) curr_ms->custom);
             free((genericptr_t) curr_ms);
         }
-        mapseenchn = 0;
+        g.mapseenchn = 0;
     }
 }
 
@@ -196,12 +191,12 @@ int fd;
     int count, i;
     mapseen *curr_ms, *last_ms;
 
-    mread(fd, (genericptr_t) &n_dgns, sizeof(n_dgns));
-    mread(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned) n_dgns);
+    mread(fd, (genericptr_t) &g.n_dgns, sizeof(g.n_dgns));
+    mread(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned) g.n_dgns);
     mread(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
     mread(fd, (genericptr_t) tune, sizeof tune);
 
-    last = branches = (branch *) 0;
+    last = g.branches = (branch *) 0;
 
     mread(fd, (genericptr_t) &count, sizeof(count));
     for (i = 0; i < count; i++) {
@@ -211,7 +206,7 @@ int fd;
         if (last)
             last->next = curr;
         else
-            branches = curr;
+            g.branches = curr;
         last = curr;
     }
 
@@ -231,7 +226,7 @@ int fd;
         if (last_ms)
             last_ms->next = curr_ms;
         else
-            mapseenchn = curr_ms;
+            g.mapseenchn = curr_ms;
         last_ms = curr_ms;
     }
 }
@@ -258,7 +253,7 @@ const char *s;
 {
     xchar i;
 
-    for (i = 0; i < n_dgns; i++)
+    for (i = 0; i < g.n_dgns; i++)
         if (!strcmp(dungeons[i].dname, s))
             return i;
 
@@ -297,7 +292,7 @@ struct proto_dungeon *pd;
         branch *br;
         const char *dnam;
 
-        for (br = branches; br; br = br->next) {
+        for (br = g.branches; br; br = br->next) {
             dnam = dungeons[br->end2.dnum].dname;
             if (!strcmpi(dnam, s)
                 || (!strncmpi(dnam, "The ", 4) && !strcmpi(dnam + 4, s)))
@@ -397,7 +392,7 @@ struct proto_dungeon *pd;
     do {
         if (++i >= num)
             i = 0;
-        for (curr = branches; curr; curr = curr->next)
+        for (curr = g.branches; curr; curr = curr->next)
             if ((curr->end1.dnum == dnum && curr->end1.dlevel == base + i)
                 || (curr->end2.dnum == dnum && curr->end2.dlevel == base + i))
                 break;
@@ -439,7 +434,7 @@ boolean extract_first;
     long new_val, curr_val, prev_val;
 
     if (extract_first) {
-        for (prev = 0, curr = branches; curr; prev = curr, curr = curr->next)
+        for (prev = 0, curr = g.branches; curr; prev = curr, curr = curr->next)
             if (curr == new_branch)
                 break;
 
@@ -448,7 +443,7 @@ boolean extract_first;
         if (prev)
             prev->next = curr->next;
         else
-            branches = curr->next;
+            g.branches = curr->next;
     }
     new_branch->next = (branch *) 0;
 
@@ -464,7 +459,7 @@ boolean extract_first;
     prev = (branch *) 0;
     prev_val = -1;
     new_val = branch_val(new_branch);
-    for (curr = branches; curr;
+    for (curr = g.branches; curr;
          prev_val = curr_val, prev = curr, curr = curr->next) {
         curr_val = branch_val(curr);
         if (prev_val < new_val && new_val <= curr_val)
@@ -474,8 +469,8 @@ boolean extract_first;
         new_branch->next = curr;
         prev->next = new_branch;
     } else {
-        new_branch->next = branches;
-        branches = new_branch;
+        new_branch->next = g.branches;
+        g.branches = new_branch;
     }
 }
 
@@ -763,11 +758,11 @@ init_dungeons()
      * dungeon arrays.
      */
     sp_levchn = (s_level *) 0;
-    Fread((genericptr_t) &n_dgns, sizeof(int), 1, dgn_file);
-    if (n_dgns >= MAXDUNGEON)
+    Fread((genericptr_t) &g.n_dgns, sizeof(int), 1, dgn_file);
+    if (g.n_dgns >= MAXDUNGEON)
         panic("init_dungeons: too many dungeons");
 
-    for (i = 0; i < n_dgns; i++) {
+    for (i = 0; i < g.n_dgns; i++) {
         Fread((genericptr_t) &pd.tmpdungeon[i], sizeof(struct tmpdungeon), 1,
               dgn_file);
         if (!wizard && pd.tmpdungeon[i].chance
@@ -782,7 +777,7 @@ init_dungeons()
             for (j = 0; j < pd.tmpdungeon[i].branches; j++)
                 Fread((genericptr_t) &pd.tmpbranch[cb],
                       sizeof(struct tmpbranch), 1, dgn_file);
-            n_dgns--;
+            g.n_dgns--;
             i--;
             continue;
         }
@@ -938,12 +933,12 @@ init_dungeons()
                  * its entrance (end1) has a bogus dnum, namely
                  * n_dgns.
                  */
-                for (br = branches; br; br = br->next)
+                for (br = g.branches; br; br = br->next)
                     if (on_level(&br->end2, &knox_level))
                         break;
 
                 if (br)
-                    br->end1.dnum = n_dgns;
+                    br->end1.dnum = g.n_dgns;
                 /* adjust the branch's position on the list */
                 insert_branch(br, TRUE);
             }
@@ -1015,7 +1010,7 @@ boolean noquest;
     d_level tmp;
     register schar ret = 0;
 
-    for (i = 0; i < n_dgns; i++) {
+    for (i = 0; i < g.n_dgns; i++) {
         if (noquest && i == quest_dnum)
             continue;
         tmp.dlevel = dungeons[i].dunlev_ureached;
@@ -1050,8 +1045,8 @@ d_level *lev;
 xchar
 maxledgerno()
 {
-    return (xchar) (dungeons[n_dgns - 1].ledger_start
-                    + dungeons[n_dgns - 1].num_dunlevs);
+    return (xchar) (dungeons[g.n_dgns - 1].ledger_start
+                    + dungeons[g.n_dgns - 1].num_dunlevs);
 }
 
 /* return the dungeon that this ledgerno exists in */
@@ -1062,7 +1057,7 @@ xchar ledgerno;
     register int i;
 
     /* find i such that (i->base + 1) <= ledgerno <= (i->base + i->count) */
-    for (i = 0; i < n_dgns; i++)
+    for (i = 0; i < g.n_dgns; i++)
         if (dungeons[i].ledger_start < ledgerno
             && ledgerno <= dungeons[i].ledger_start + dungeons[i].num_dunlevs)
             return (xchar) i;
@@ -1123,7 +1118,7 @@ d_level *lev;
 {
     branch *curr;
 
-    for (curr = branches; curr; curr = curr->next) {
+    for (curr = g.branches; curr; curr = curr->next) {
         if (on_level(lev, &curr->end1) || on_level(lev, &curr->end2))
             return curr;
     }
@@ -1373,7 +1368,7 @@ int levnum;
                  * This assumes that end2 is always the "child" and it is
                  * unique.
                  */
-                for (br = branches; br; br = br->next)
+                for (br = g.branches; br; br = br->next)
                     if (br->end2.dnum == dgn)
                         break;
                 if (!br)
@@ -1425,7 +1420,7 @@ const char *s;
     dnum = dname_to_dnum(s);
 
     /* Find the branch that connects to dungeon i's branch. */
-    for (br = branches; br; br = br->next)
+    for (br = g.branches; br; br = br->next)
         if (br->end2.dnum == dnum)
             break;
 
@@ -1721,8 +1716,8 @@ struct dungeon *dptr;
     /* if other floating branches are added, this will need to change */
     if (idx != knox_level.dnum)
         return FALSE;
-    for (br = branches; br; br = br->next)
-        if (br->end1.dnum == n_dgns && br->end2.dnum == idx)
+    for (br = g.branches; br; br = br->next)
+        if (br->end1.dnum == g.n_dgns && br->end2.dnum == idx)
             return TRUE;
     return FALSE;
 }
@@ -1816,7 +1811,7 @@ struct lchoice *lchoices_p;
     char buf[BUFSZ];
 
     /* This assumes that end1 is the "parent". */
-    for (br = branches; br; br = br->next) {
+    for (br = g.branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
             Sprintf(buf, "%c %s to %s: %d",
@@ -1856,7 +1851,7 @@ xchar *rdgn;
         lchoices.menuletter = 'a';
     }
 
-    for (i = 0, dptr = dungeons; i < n_dgns; i++, dptr++) {
+    for (i = 0, dptr = dungeons; i < g.n_dgns; i++, dptr++) {
         if (bymenu && In_endgame(&u.uz) && i != astral_level.dnum)
             continue;
         unplaced = unplaced_floater(dptr);
@@ -1933,8 +1928,8 @@ xchar *rdgn;
     }
 
     /* Print out floating branches (if any). */
-    for (first = TRUE, br = branches; br; br = br->next) {
-        if (br->end1.dnum == n_dgns) {
+    for (first = TRUE, br = g.branches; br; br = br->next) {
+        if (br->end1.dnum == g.n_dgns) {
             if (first) {
                 putstr(win, 0, "");
                 putstr(win, 0, "Floating branches");
@@ -2006,7 +2001,7 @@ d_level *dest;
         return;
 
     /* we only care about forward branches */
-    for (br = branches; br; br = br->next) {
+    for (br = g.branches; br; br = br->next) {
         if (on_level(source, &br->end1) && on_level(dest, &br->end2))
             break;
         if (on_level(source, &br->end2) && on_level(dest, &br->end1))
@@ -2094,7 +2089,7 @@ d_level *lev;
 {
     mapseen *mptr;
 
-    for (mptr = mapseenchn; mptr; mptr = mptr->next)
+    for (mptr = g.mapseenchn; mptr; mptr = mptr->next)
         if (on_level(&(mptr->lev), lev))
             break;
 
@@ -2107,7 +2102,7 @@ const char *s;
 {
     mapseen *mptr;
 
-    for (mptr = mapseenchn; mptr; mptr = mptr->next)
+    for (mptr = g.mapseenchn; mptr; mptr = mptr->next)
         if (mptr->custom && !strcmpi(s, mptr->custom))
             break;
 
@@ -2122,7 +2117,7 @@ int ledger_num;
     mapseen *mptr;
     struct cemetery *bp;
 
-    for (mptr = mapseenchn; mptr; mptr = mptr->next)
+    for (mptr = g.mapseenchn; mptr; mptr = mptr->next)
         if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel
             == ledger_num)
             break;
@@ -2151,7 +2146,7 @@ int ledger_num;
     mapseen *mptr, *mprev = (mapseen *)0;
     struct cemetery *bp, *bpnext;
 
-    for (mptr = mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
+    for (mptr = g.mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
         if (dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel == ledger_num)
             break;
 
@@ -2172,7 +2167,7 @@ int ledger_num;
         mprev->next = mptr->next;
         free(mptr);
     } else {
-        mapseenchn = mptr->next;
+        g.mapseenchn = mptr->next;
         free(mptr);
     }
 }
@@ -2185,7 +2180,7 @@ mapseen *mptr;
     branch *curr;
     int brindx;
 
-    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx)
+    for (brindx = 0, curr = g.branches; curr; curr = curr->next, ++brindx)
         if (curr == mptr->br)
             break;
     bwrite(fd, (genericptr_t) &brindx, sizeof brindx);
@@ -2211,7 +2206,7 @@ int fd;
     load = (mapseen *) alloc(sizeof *load);
 
     mread(fd, (genericptr_t) &branchnum, sizeof branchnum);
-    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx)
+    for (brindx = 0, curr = g.branches; curr; curr = curr->next, ++brindx)
         if (brindx == branchnum)
             break;
     load->br = curr;
@@ -2246,7 +2241,7 @@ long *total_count, *total_size;
     mapseen *mptr = find_mapseen(&u.uz);
 
     ocount = bcount = acount = osize = bsize = asize = 0L;
-    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
+    for (mptr = g.mapseenchn; mptr; mptr = mptr->next) {
         ++ocount;
         osize += (long) sizeof *mptr;
         for (ce = mptr->final_resting_place; ce; ce = ce->next) {
@@ -2288,7 +2283,7 @@ int dnum;
 {
     mapseen *mptr, **mptraddr;
 
-    mptraddr = &mapseenchn;
+    mptraddr = &g.mapseenchn;
     while ((mptr = *mptraddr) != 0) {
         if (mptr->lev.dnum == dnum) {
 #if 1 /* use this... */
@@ -2330,14 +2325,14 @@ d_level *lev;
     init->lev.dlevel = lev->dlevel;
 
     /* walk until we get to the place where we should insert init */
-    for (mptr = mapseenchn, prev = 0; mptr; prev = mptr, mptr = mptr->next)
+    for (mptr = g.mapseenchn, prev = 0; mptr; prev = mptr, mptr = mptr->next)
         if (mptr->lev.dnum > init->lev.dnum
             || (mptr->lev.dnum == init->lev.dnum
                 && mptr->lev.dlevel > init->lev.dlevel))
             break;
     if (!prev) {
-        init->next = mapseenchn;
-        mapseenchn = init;
+        init->next = g.mapseenchn;
+        g.mapseenchn = init;
     } else {
         mptr = prev->next;
         prev->next = init;
@@ -2413,7 +2408,7 @@ recalc_mapseen()
     if (mptr->flags.unreachable) {
         mptr->flags.unreachable = 0; /* reached it; Eye of the Aethiopica? */
         if (In_quest(&u.uz)) {
-            mapseen *mptrtmp = mapseenchn;
+            mapseen *mptrtmp = g.mapseenchn;
 
             /* when quest was unreachable due to ejection and portal removal,
                getting back to it via arti-invoke should revive annotation
@@ -2716,7 +2711,7 @@ int why, reason, *lastdun_p;
     mapseen *mptr;
     boolean showheader;
 
-    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
+    for (mptr = g.mapseenchn; mptr; mptr = mptr->next) {
         if (viewendgame ^ In_endgame(&mptr->lev))
             continue;
 

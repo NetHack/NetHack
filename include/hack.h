@@ -167,6 +167,27 @@ typedef struct strbuf {
     char   buf[256];
 } strbuf_t;
 
+/* str_or_len from sp_lev.h */
+typedef union str_or_len {
+    char *str;
+    int len;
+} Str_or_Len;
+
+/* values for rtype are defined in dungeon.h */
+/* lev_region from sp_lev.h */
+typedef struct {
+    struct {
+        xchar x1, y1, x2, y2;
+    } inarea;
+    struct {
+        xchar x1, y1, x2, y2;
+    } delarea;
+    boolean in_islev, del_islev;
+    xchar rtype, padding;
+    Str_or_Len rname;
+} lev_region;
+
+
 #include "align.h"
 #include "dungeon.h"
 #include "monsym.h"
@@ -175,6 +196,16 @@ typedef struct strbuf {
 #include "youprop.h"
 #include "wintype.h"
 #include "context.h"
+#include "rm.h"
+
+/* Symbol offsets */
+#define SYM_OFF_P (0)
+#define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)   /* MAXPCHARS from rm.h */
+#define SYM_OFF_M (SYM_OFF_O + MAXOCLASSES) /* MAXOCLASSES from objclass.h */
+#define SYM_OFF_W (SYM_OFF_M + MAXMCLASSES) /* MAXMCLASSES from monsym.h*/
+#define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
+#define SYM_MAX (SYM_OFF_X + MAXOTHER)
+
 #include "decl.h"
 #include "timeout.h"
 
@@ -221,20 +252,11 @@ typedef struct sortloot_item Loot;
 
 #include "trap.h"
 #include "flag.h"
-#include "rm.h"
 #include "vision.h"
 #include "display.h"
 #include "engrave.h"
 #include "rect.h"
 #include "region.h"
-
-/* Symbol offsets */
-#define SYM_OFF_P (0)
-#define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)
-#define SYM_OFF_M (SYM_OFF_O + MAXOCLASSES)
-#define SYM_OFF_W (SYM_OFF_M + MAXMCLASSES)
-#define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
-#define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
 #ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
 #undef NDECL
