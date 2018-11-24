@@ -105,7 +105,7 @@ static const struct innate {
 
 STATIC_DCL void NDECL(exerper);
 STATIC_DCL void FDECL(postadjabil, (long *));
-STATIC_DCL const struct innate *FDECL(role_abil, (int));
+STATIC_DCL const struct innate *FDECL(role_abil, (unsigned));
 STATIC_DCL const struct innate *FDECL(check_innate_abil, (long *, long));
 STATIC_DCL int FDECL(innately, (long *));
 
@@ -673,32 +673,30 @@ long *ability;
 
 STATIC_OVL const struct innate *
 role_abil(r)
-int r;
+unsigned r;
 {
-    const struct {
-        short role;
-        const struct innate *abil;
-    } roleabils[] = {
-        { PM_ARCHEOLOGIST, arc_abil },
-        { PM_BARBARIAN, bar_abil },
-        { PM_CAVEMAN, cav_abil },
-        { PM_HEALER, hea_abil },
-        { PM_KNIGHT, kni_abil },
-        { PM_MONK, mon_abil },
-        { PM_PRIEST, pri_abil },
-        { PM_RANGER, ran_abil },
-        { PM_ROGUE, rog_abil },
-        { PM_SAMURAI, sam_abil },
-        { PM_TOURIST, tou_abil },
-        { PM_VALKYRIE, val_abil },
-        { PM_WIZARD, wiz_abil },
-        { 0, 0 }
+    static const struct innate *roleabils[] = {
+        arc_abil, /* PM_ARCHEOLOGIST */
+        bar_abil, /* PM_BARBARIAN */
+        cav_abil, /* PM_CAVEMAN */
+        0,        /* PM_CAVEWOMAN */
+        hea_abil, /* PM_HEALER */
+        kni_abil, /* PM_KNIGHT */
+        mon_abil, /* PM_MONK */
+        pri_abil, /* PM_PRIEST */
+        0,        /* PM_PRIESTESS */
+        ran_abil, /* PM_RANGER */
+        rog_abil, /* PM_ROGUE */
+        sam_abil, /* PM_SAMURAI */
+        tou_abil, /* PM_TOURIST */
+        val_abil, /* PM_VALKYRIE */
+        wiz_abil, /* PM_WIZARD */
     };
-    int i;
 
-    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++)
-        continue;
-    return roleabils[i].abil;
+    if ((r -= PM_ARCHEOLOGIST) >= SIZE(roleabils))
+      return 0;
+
+    return roleabils[r];
 }
 
 STATIC_OVL const struct innate *
