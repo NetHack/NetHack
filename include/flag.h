@@ -529,58 +529,6 @@ enum runmode_types {
 struct ext_func_tab; /* from func_tab.h */
 #endif
 
-/* special key functions */
-enum nh_keyfunc {
-    NHKF_ESC = 0,
-    NHKF_DOAGAIN,
-
-    NHKF_REQMENU,
-
-    /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,
-    NHKF_RUN2,
-    NHKF_RUSH,
-    NHKF_FIGHT,
-    NHKF_FIGHT2,
-    NHKF_NOPICKUP,
-    NHKF_RUN_NOPICKUP,
-    NHKF_DOINV,
-    NHKF_TRAVEL,
-    NHKF_CLICKLOOK,
-
-    NHKF_REDRAW,
-    NHKF_REDRAW2,
-    NHKF_GETDIR_SELF,
-    NHKF_GETDIR_SELF2,
-    NHKF_GETDIR_HELP,
-    NHKF_COUNT,
-    NHKF_GETPOS_SELF,
-    NHKF_GETPOS_PICK,
-    NHKF_GETPOS_PICK_Q,  /* quick */
-    NHKF_GETPOS_PICK_O,  /* once */
-    NHKF_GETPOS_PICK_V,  /* verbose */
-    NHKF_GETPOS_SHOWVALID,
-    NHKF_GETPOS_AUTODESC,
-    NHKF_GETPOS_MON_NEXT,
-    NHKF_GETPOS_MON_PREV,
-    NHKF_GETPOS_OBJ_NEXT,
-    NHKF_GETPOS_OBJ_PREV,
-    NHKF_GETPOS_DOOR_NEXT,
-    NHKF_GETPOS_DOOR_PREV,
-    NHKF_GETPOS_UNEX_NEXT,
-    NHKF_GETPOS_UNEX_PREV,
-    NHKF_GETPOS_INTERESTING_NEXT,
-    NHKF_GETPOS_INTERESTING_PREV,
-    NHKF_GETPOS_VALID_NEXT,
-    NHKF_GETPOS_VALID_PREV,
-    NHKF_GETPOS_HELP,
-    NHKF_GETPOS_MENU,
-    NHKF_GETPOS_LIMITVIEW,
-    NHKF_GETPOS_MOVESKIP,
-
-    NUM_NHKF
-};
-
 enum gloctypes {
     GLOC_MONS = 0,
     GLOC_OBJS,
@@ -591,27 +539,5 @@ enum gloctypes {
 
     NUM_GLOCS
 };
-
-/* commands[] is used to directly access cmdlist[] instead of looping
-   through it to find the entry for a given input character;
-   move_X is the character used for moving one step in direction X;
-   alphadirchars corresponds to old sdir,
-   dirchars corresponds to ``iflags.num_pad ? ndir : sdir'';
-   pcHack_compat and phone_layout only matter when num_pad is on,
-   swap_yz only matters when it's off */
-struct cmd {
-    unsigned serialno;     /* incremented after each update */
-    boolean num_pad;       /* same as iflags.num_pad except during updates */
-    boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
-    boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
-    boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
-    char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
-    const char *dirchars;      /* current movement/direction characters */
-    const char *alphadirchars; /* same as dirchars if !numpad */
-    const struct ext_func_tab *commands[256]; /* indexed by input character */
-    char spkeys[NUM_NHKF];
-};
-
-extern NEARDATA struct cmd Cmd;
 
 #endif /* FLAG_H */

@@ -5570,10 +5570,10 @@ char *buf;
             "4=on, phone layout, MSDOS compatible",
             "-1=off, y & z swapped", /*[5]*/
         };
-        int indx = Cmd.num_pad
-                       ? (Cmd.phone_layout ? (Cmd.pcHack_compat ? 4 : 3)
-                                           : (Cmd.pcHack_compat ? 2 : 1))
-                       : Cmd.swap_yz ? 5 : 0;
+        int indx = g.Cmd.num_pad
+                       ? (g.Cmd.phone_layout ? (g.Cmd.pcHack_compat ? 4 : 3)
+                                           : (g.Cmd.pcHack_compat ? 2 : 1))
+                       : g.Cmd.swap_yz ? 5 : 0;
 
         Strcpy(buf, numpadmodes[indx]);
     } else if (!strcmp(optname, "objects")) {

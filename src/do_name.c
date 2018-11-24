@@ -100,7 +100,7 @@ const char *goal;
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
-            Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
+            g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E, goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
             "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
@@ -108,47 +108,47 @@ const char *goal;
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
-           visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
+           visctrl(g.Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_MON_PREV]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_MON_PREV]),
                              GLOC_MONS);
     }
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]),
                              GLOC_OBJS);
     }
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* these are primarily useful when choosing a travel
            destination for the '_' command */
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
                              GLOC_DOOR);
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
                              GLOC_EXPLORE);
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
-                             visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
+                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
-            visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
+            visctrl(g.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
         Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+                visctrl(g.Cmd.spkeys[NHKF_GETPOS_MENU]));
         putstr(tmpwin, 0, sbuf);
         Sprintf(sbuf,
                 "Use '%s' to change the mode of limiting possible targets.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+                visctrl(g.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
         putstr(tmpwin, 0, sbuf);
     }
     if (!iflags.terrainmode) {
@@ -156,56 +156,56 @@ const char *goal;
 
         if (getpos_getvalid) {
             Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
             Sprintf(sbuf, "Use '%s' to display valid locations.",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
         Sprintf(sbuf, "Use '%s' to toggle automatic description.",
-                visctrl(Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+                visctrl(g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
          ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
          : "(Reset 'whatis_coord' option to omit coordinates from '%s' text.)",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         }
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
         doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]),
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_O]),
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
         } else {
-            Sprintf(kbuf, "'%s'", visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
+            Sprintf(kbuf, "'%s'", visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
         Sprintf(sbuf, "Type a %s when you are at the right place.", kbuf);
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             Sprintf(sbuf,
        "  '%s' describe current spot, show 'more info', move to another spot.",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot,%s move to another spot;",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]),
                     flags.help ? " prompt if 'more info'," : "");
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot, move to another spot;",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot, stop looking at things;",
-                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]));
+                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
             putstr(tmpwin, 0, sbuf);
         }
     }
@@ -666,18 +666,18 @@ const char *goal;
     int gidx[NUM_GLOCS] = DUMMY;
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
-        pick_chars[i] = Cmd.spkeys[pick_chars_def[i].nhkf];
+        pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
     pick_chars[SIZE(pick_chars_def)] = '\0';
 
     for (i = 0; i < SIZE(mMoOdDxX_def); i++)
-        mMoOdDxX[i] = Cmd.spkeys[mMoOdDxX_def[i]];
+        mMoOdDxX[i] = g.Cmd.spkeys[mMoOdDxX_def[i]];
     mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
 
     if (!goal)
         goal = "desired location";
     if (flags.verbose) {
         pline("(For instructions type a '%s')",
-              visctrl(Cmd.spkeys[NHKF_GETPOS_HELP]));
+              visctrl(g.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
     }
     cx = ccp->x;
@@ -712,7 +712,7 @@ const char *goal;
         if (iflags.autodescribe)
             msg_given = FALSE;
 
-        if (c == Cmd.spkeys[NHKF_ESC]) {
+        if (c == g.Cmd.spkeys[NHKF_ESC]) {
             cx = cy = -10;
             msg_given = TRUE; /* force clear */
             result = -1;
@@ -734,12 +734,12 @@ const char *goal;
         for (i = 0; i < 8; i++) {
             int dx, dy;
 
-            if (Cmd.dirchars[i] == c) {
+            if (g.Cmd.dirchars[i] == c) {
                 /* a normal movement letter or digit */
                 dx = xdir[i];
                 dy = ydir[i];
-            } else if (Cmd.alphadirchars[i] == lowc((char) c)
-                       || (Cmd.num_pad && Cmd.dirchars[i] == (c & 0177))) {
+            } else if (g.Cmd.alphadirchars[i] == lowc((char) c)
+                       || (g.Cmd.num_pad && g.Cmd.dirchars[i] == (c & 0177))) {
                 /* a shifted movement letter or Meta-digit */
                 if (iflags.getloc_moveskip) {
                     /* skip same glyphs */
@@ -782,15 +782,15 @@ const char *goal;
             goto nxtc;
         }
 
-        if (c == Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
-            if (c == Cmd.spkeys[NHKF_GETPOS_HELP])
+        if (c == g.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
+            if (c == g.Cmd.spkeys[NHKF_GETPOS_HELP])
                 getpos_help(force, goal);
             else /* ^R */
                 docrt(); /* redraw */
             /* update message window to reflect that we're still targetting */
             show_goal_msg = TRUE;
             msg_given = TRUE;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
                    && getpos_hilitefunc) {
             if (!hilite_state) {
                 (*getpos_hilitefunc)(0);
@@ -798,7 +798,7 @@ const char *goal;
                 hilite_state = TRUE;
             }
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
@@ -807,7 +807,7 @@ const char *goal;
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
                 "Limiting targets to in sight",
@@ -825,13 +825,13 @@ const char *goal;
             pline("%s.", view_filters[iflags.getloc_filter]);
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
             pline("%s a menu to show possible targets.",
                   iflags.getloc_usemenu ? "Using" : "Not using");
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_SELF]) {
             /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
             for (i = 0; i < NUM_GLOCS; i++)
@@ -839,7 +839,7 @@ const char *goal;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
-        } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
+        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
@@ -944,8 +944,8 @@ const char *goal;
                         Strcpy(note, "aborted");
                     else /* hjkl */
                         Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
-                                Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E,
-                                visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
+                                g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E,
+                                visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
                     msg_given = TRUE;

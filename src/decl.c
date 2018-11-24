@@ -329,12 +329,21 @@ const struct instance_globals g_init = {
 
     /* artifact.c */
     0,  /* spec_dbon_applies */
+    UNDEFINED_VALUES, /* artiexist */
+    UNDEFINED_VALUES, /* artdisco */
 
     /* botl.c */
     0,  /* mrank_sz */
 
+    /* cmd.c */
+    UNDEFINED_VALUES, /* Cmd */
+
     /* dog.c */
     0,  /* petname_used */
+
+    /* makemon.c */
+     { -1, /* choice_count */
+      { 0 } }, /* mchoices */
 
     /* mused.c */
     FALSE, /* m_using */
