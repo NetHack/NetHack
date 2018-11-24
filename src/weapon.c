@@ -387,6 +387,8 @@ static NEARDATA const int pwep[] = { HALBERD,       BARDICHE, SPETUM,
                                      BEC_DE_CORBIN, FAUCHARD, PARTISAN,
                                      LANCE };
 
+static struct obj *propellor;
+
 /* select a ranged weapon for the monster */
 struct obj *
 select_rwep(mtmp)
@@ -399,7 +401,7 @@ register struct monst *mtmp;
 
     char mlet = mtmp->data->mlet;
 
-    iv.propellor = &zeroobj;
+    propellor = &zeroobj;
     Oselect(EGG);      /* cockatrice egg */
     if (mlet == S_KOP) /* pies are first choice for Kops */
         Oselect(CREAM_PIE);
@@ -431,7 +433,7 @@ register struct monst *mtmp;
                     || !mon_hates_silver(mtmp))) {
                 if ((otmp = oselect(mtmp, pwep[i])) != 0
                     && (otmp == mwep || !mweponly)) {
-                    iv.propellor = otmp; /* force the monster to wield it */
+                    propellor = otmp; /* force the monster to wield it */
                     return otmp;
                 }
             }
@@ -452,41 +454,41 @@ register struct monst *mtmp;
             for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
                 if (otmp->oclass == GEM_CLASS
                     && (otmp->otyp != LOADSTONE || !otmp->cursed)) {
-                    iv.propellor = m_carrying(mtmp, SLING);
+                    propellor = m_carrying(mtmp, SLING);
                     return otmp;
                 }
         }
 
         /* KMH -- This belongs here so darts will work */
-        iv.propellor = &zeroobj;
+        propellor = &zeroobj;
 
         prop = (objects[rwep[i]]).oc_skill;
         if (prop < 0) {
             switch (-prop) {
             case P_BOW:
-                iv.propellor = (oselect(mtmp, YUMI));
-                if (!iv.propellor)
-                    iv.propellor = (oselect(mtmp, ELVEN_BOW));
-                if (!iv.propellor)
-                    iv.propellor = (oselect(mtmp, BOW));
-                if (!iv.propellor)
-                    iv.propellor = (oselect(mtmp, ORCISH_BOW));
+                propellor = (oselect(mtmp, YUMI));
+                if (!propellor)
+                    propellor = (oselect(mtmp, ELVEN_BOW));
+                if (!propellor)
+                    propellor = (oselect(mtmp, BOW));
+                if (!propellor)
+                    propellor = (oselect(mtmp, ORCISH_BOW));
                 break;
             case P_SLING:
-                iv.propellor = (oselect(mtmp, SLING));
+                propellor = (oselect(mtmp, SLING));
                 break;
             case P_CROSSBOW:
-                iv.propellor = (oselect(mtmp, CROSSBOW));
+                propellor = (oselect(mtmp, CROSSBOW));
             }
-            if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != iv.propellor
+            if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != propellor
                 && mtmp->weapon_check == NO_WEAPON_WANTED)
-                iv.propellor = 0;
+                propellor = 0;
         }
         /* propellor = obj, propellor to use
          * propellor = &zeroobj, doesn't need a propellor
          * propellor = 0, needed one and didn't have one
          */
-        if (iv.propellor != 0) {
+        if (propellor != 0) {
             /* Note: cannot use m_carrying for loadstones, since it will
              * always select the first object of a type, and maybe the
              * monster is carrying two but only the first is unthrowable.
@@ -633,7 +635,7 @@ register struct monst *mon;
         break;
     case NEED_RANGED_WEAPON:
         (void) select_rwep(mon);
-        obj = iv.propellor;
+        obj = propellor;
         break;
     case NEED_PICK_AXE:
         obj = m_carrying(mon, PICK_AXE);

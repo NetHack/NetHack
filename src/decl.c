@@ -325,51 +325,26 @@ decl_init()
     return;
 }
 
-#define UNDEFINED { 0 }         /* move to hack.h if we are keeping */
-#define UNDEFINED_PTR NULL      /* move to hack.h if we are keeping */
-#define IVMAGIC 0xdeadbeef
-
-const struct instance_variables iv_init = {
-    /* apply.c */
-    0,  /* jumping_is_magic */
-    -1, /* polearm_range_min */
-    -1, /* polearm_range_max  */
-    /* artifact.c */
-    0,  /* spec_dbon_applies */
-    /* botl.c */
-    0,  /* mrank_sz */
-    /* dog.c */
-    0,  /* petname_used */
-    /* mused.c */
-    FALSE, /* m_using */
-    /* pickup.c */
-    0,  /* oldcap */
-    /* trap.c */
-    0, /* force_mintrap */
-    /* u_init.c */
-    STRANGE_OBJECT, /* nocreate */
-    STRANGE_OBJECT, /* nocreate2 */
-    STRANGE_OBJECT, /* nocreate3 */
-    STRANGE_OBJECT, /* nocreate4 */
-    /* uhitm.c */
-    UNDEFINED, /* override_confirmation */
-    /* weapon.c */
-    UNDEFINED_PTR, /* propellor */
-    /* zap.c */
-    UNDEFINED, /* poly_zap */
-    UNDEFINED,  /* obj_zapped */
-
-    IVMAGIC  /* used to validate that structure layout has been preserved */
+const struct instance_context icontext_initial_state = {
+    0,  /* oldcap - last encumberance in pickup.c */
+    0,  /* petname_used - dog.c */
+    0,  /* jumping_is_magic - apply.c */
+    -1, /* polearm_range_min - apply.c */
+    -1, /* polearm_range_max - apply.c */
+    0,  /* spec_dbon_applies - artifact.c */
+    0,  /* mrank_sz - botl.c */
+    STRANGE_OBJECT, /* nocreate - ini_inv() in u_init.c */
+    STRANGE_OBJECT, /* nocreate2 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate3 - ini_inv() in u_init.c  */
+    STRANGE_OBJECT, /* nocreate4 - ini_inv() in u_init.c  */
 };
 
-struct instance_variables iv;
+struct instance_context icontext;
 
 void 
-instance_variable_init() 
+icontext_init() 
 {
-    iv = iv_init;
-
-    nhassert(iv_init.magic == IVMAGIC);
+    icontext = icontext_initial_state;
 
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;

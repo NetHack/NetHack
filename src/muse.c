@@ -8,6 +8,8 @@
 
 #include "hack.h"
 
+boolean m_using = FALSE;
+
 /* Let monsters use magic items.  Arbitrary assumptions: Monsters only use
  * scrolls when they can see, monsters know when wands have 0 charges,
  * monsters cannot recognize if items are cursed are not, monsters which
@@ -668,12 +670,12 @@ struct monst *mtmp;
         zap_oseen = oseen;
         mzapmsg(mtmp, otmp, FALSE);
         otmp->spe--;
-        iv.m_using = TRUE;
+        m_using = TRUE;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
         /* monster learns that teleportation isn't useful here */
         if (level.flags.noteleport)
             mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
-        iv.m_using = FALSE;
+        m_using = FALSE;
         return 2;
     case MUSE_SCR_TELEPORTATION: {
         int obj_is_cursed = otmp->cursed;
@@ -1397,11 +1399,11 @@ struct monst *mtmp;
         otmp->spe--;
         if (oseen)
             makeknown(otmp->otyp);
-        iv.m_using = TRUE;
+        m_using = TRUE;
         buzz((int) (-30 - (otmp->otyp - WAN_MAGIC_MISSILE)),
              (otmp->otyp == WAN_MAGIC_MISSILE) ? 2 : 6, mtmp->mx, mtmp->my,
              sgn(mtmp->mux - mtmp->mx), sgn(mtmp->muy - mtmp->my));
-        iv.m_using = FALSE;
+        m_using = FALSE;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_FIRE_HORN:
     case MUSE_FROST_HORN:
@@ -1411,20 +1413,20 @@ struct monst *mtmp;
         } else
             You_hear("a horn being played.");
         otmp->spe--;
-        iv.m_using = TRUE;
+        m_using = TRUE;
         buzz(-30 - ((otmp->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1),
              rn1(6, 6), mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
              sgn(mtmp->muy - mtmp->my));
-        iv.m_using = FALSE;
+        m_using = FALSE;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
         zap_oseen = oseen;
         mzapmsg(mtmp, otmp, FALSE);
         otmp->spe--;
-        iv.m_using = TRUE;
+        m_using = TRUE;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
-        iv.m_using = FALSE;
+        m_using = FALSE;
         return 2;
     case MUSE_SCR_EARTH: {
         /* TODO: handle steeds */

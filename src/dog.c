@@ -197,7 +197,7 @@ makedog()
         put_saddle_on_mon(otmp, mtmp);
     }
 
-    if (!iv.petname_used++ && *petname)
+    if (!icontext.petname_used++ && *petname)
         mtmp = christen_monst(mtmp, petname);
 
     initedog(mtmp);

@@ -438,51 +438,29 @@ struct early_opt {
     boolean valallowed;
 };
 
-/* instance_variables holds engine state that does not need to be
- * persisted upon game exit.  The initialization state is well defined
- * an set in decl.c during early early engine initialization.
- * 
- * unlike instance_flags, variables can be of any type. */
+/* instance_context holds per game instance data that does not need to be
+ * persisted upon game exit.  This game instance data is one of the first
+ * things initialized during the initialization of the game engine.
+ * It is initialized with icontext_initial_state found in decl.c */
 
-struct instance_variables {
-    /* apply.c */
-    int jumping_is_magic; /* current jump result of magic */
-    int polearm_range_min;
-    int polearm_range_max;
-    /* artifcat.c */
-    int spec_dbon_applies; /* coordinate effects from spec_dbon() with
-                              messages in artifact_hit() */
-    /* botl.c */
-    int mrank_sz; /* loaded by max_rank_sz */
-    /* dog.c */
-    int petname_used; /* user preferred pet name has been used */
-    /* muse.c */
-    boolean m_using; /* kludge to use mondided instead of killed */
-    /* pickup.c */
-    int oldcap; /* last encumberance */
-    /* trap.c */
-    int force_mintrap; /* mintrap() should take a flags argument, but for time
-                          being we use this */
-    /* u_init.c */
-    short nocreate;
-    short nocreate2;
-    short nocreate3;
-    short nocreate4;
-    /* uhitm.c */ 
-    boolean override_confirmation; /* Used to flag attacks caused by
-                                      Stormbringer's maliciousness. */
-    /* weapon.c */
-    struct obj *propellor;
-    /* zap.c */
-    int  poly_zapped;
-    boolean obj_zapped;
-
-    unsigned long magic; /* validate that structure layout is preserved */
+struct instance_context {
+    int oldcap; /* encumberance - pickup.c */
+    int petname_used; /* user preferred pet name has been used - dog.c */
+    int jumping_is_magic; /* current jump result of magic - apply.c */
+    int polearm_range_min; /* apply.c */
+    int polearm_range_max; /* apply.c */
+    int spec_dbon_applies; /* coordinate effects from spec_dbon() with 
+                            * messages in artifact_hit() - artifact.c */
+    int mrank_sz; /* loaded by max_rank_sz - botl.c */
+    short nocreate; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate2; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate3; /* ini_inv() - u_init.c = STRANGE_OBJECT */
+    short nocreate4; /* ini_inv() - u_init.c = STRANGE_OBJECT */
 };
 
-E struct instance_variables iv;
+E struct instance_context icontext;
 
-E void instance_variable_init();
+E void icontext_init();
 
 
 #undef E
