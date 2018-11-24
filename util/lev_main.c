@@ -1637,11 +1637,4 @@ short ospeed;
 #endif
 #endif /* STRICT_REF_DEF */
 
-/* nhassert_failed is called when an nhassert's condition is false */
-void nhassert_failed(const char * exp, const char * file, int line)
-{
-    fprintf(stderr, "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
-    exit(EXIT_FAILURE);
-}
-
 /*lev_main.c*/
