@@ -972,7 +972,7 @@ struct obj *obj;
     /* construct list of directions to show player for likely choices */
     downok = !!can_reach_floor(FALSE);
     dsp = dirsyms;
-    for (sdp = Cmd.dirchars; *sdp; ++sdp) {
+    for (sdp = g.Cmd.dirchars; *sdp; ++sdp) {
         /* filter out useless directions */
         if (u.uswallow) {
             ; /* all directions are viable when swallowed */

@@ -1509,11 +1509,6 @@ register struct permonst *ptr;
     return alshift;
 }
 
-static NEARDATA struct {
-    int choice_count;
-    char mchoices[SPECIAL_PM]; /* value range is 0..127 */
-} rndmonst_state = { -1, { 0 } };
-
 /* select a random monster type */
 struct permonst *
 rndmonst()
@@ -1524,17 +1519,17 @@ rndmonst()
     if (u.uz.dnum == quest_dnum && rn2(7) && (ptr = qt_montype()) != 0)
         return ptr;
 
-    if (rndmonst_state.choice_count < 0) { /* need to recalculate */
+    if (g.rndmonst_state.choice_count < 0) { /* need to recalculate */
         int zlevel, minmlev, maxmlev;
         boolean elemlevel;
         boolean upper;
 
-        rndmonst_state.choice_count = 0;
+        g.rndmonst_state.choice_count = 0;
         /* look for first common monster */
         for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx++) {
             if (!uncommon(mndx))
                 break;
-            rndmonst_state.mchoices[mndx] = 0;
+            g.rndmonst_state.mchoices[mndx] = 0;
         }
         if (mndx == SPECIAL_PM) {
             /* evidently they've all been exterminated */
@@ -1554,7 +1549,7 @@ rndmonst()
          */
         for ( ; mndx < SPECIAL_PM; mndx++) { /* (`mndx' initialized above) */
             ptr = &mons[mndx];
-            rndmonst_state.mchoices[mndx] = 0;
+            g.rndmonst_state.mchoices[mndx] = 0;
             if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
                 continue;
             if (upper && !isupper((uchar) def_monsyms[(int) ptr->mlet].sym))
@@ -1568,8 +1563,8 @@ rndmonst()
             ct = (int) (ptr->geno & G_FREQ) + align_shift(ptr);
             if (ct < 0 || ct > 127)
                 panic("rndmonst: bad count [#%d: %d]", mndx, ct);
-            rndmonst_state.choice_count += ct;
-            rndmonst_state.mchoices[mndx] = (char) ct;
+            g.rndmonst_state.choice_count += ct;
+            g.rndmonst_state.mchoices[mndx] = (char) ct;
         }
         /*
          *      Possible modification:  if choice_count is "too low",
@@ -1577,18 +1572,18 @@ rndmonst()
          */
     } /* choice_count+mchoices[] recalc */
 
-    if (rndmonst_state.choice_count <= 0) {
+    if (g.rndmonst_state.choice_count <= 0) {
         /* maybe no common mons left, or all are too weak or too strong */
-        debugpline1("rndmonst: choice_count=%d", rndmonst_state.choice_count);
+        debugpline1("rndmonst: choice_count=%d", g.rndmonst_state.choice_count);
         return (struct permonst *) 0;
     }
 
     /*
      *  Now, select a monster at random.
      */
-    ct = rnd(rndmonst_state.choice_count);
+    ct = rnd(g.rndmonst_state.choice_count);
     for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx++)
-        if ((ct -= (int) rndmonst_state.mchoices[mndx]) <= 0)
+        if ((ct -= (int) g.rndmonst_state.mchoices[mndx]) <= 0)
             break;
 
     if (mndx == SPECIAL_PM || uncommon(mndx)) { /* shouldn't happen */
@@ -1606,10 +1601,10 @@ int mndx; /* particular species that can no longer be created */
 {
     /* cached selection info is out of date */
     if (mndx == NON_PM) {
-        rndmonst_state.choice_count = -1; /* full recalc needed */
+        g.rndmonst_state.choice_count = -1; /* full recalc needed */
     } else if (mndx < SPECIAL_PM) {
-        rndmonst_state.choice_count -= rndmonst_state.mchoices[mndx];
-        rndmonst_state.mchoices[mndx] = 0;
+        g.rndmonst_state.choice_count -= g.rndmonst_state.mchoices[mndx];
+        g.rndmonst_state.mchoices[mndx] = 0;
     } /* note: safe to ignore extinction of unique monsters */
 }
 

@@ -27,8 +27,6 @@
 STATIC_VAR boolean alt_esc = FALSE;
 #endif
 
-struct cmd Cmd = { 0 }; /* flag.h */
-
 extern const char *hu_stat[];  /* hunger status from eat.c */
 extern const char *enc_stat[]; /* encumbrance status from botl.c */
 
@@ -354,7 +352,7 @@ doextcmd(VOID_ARGS)
         }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
             pline("'%s' prefix has no effect for the %s command.",
-                  visctrl(Cmd.spkeys[NHKF_REQMENU]),
+                  visctrl(g.Cmd.spkeys[NHKF_REQMENU]),
                   extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
         }
@@ -3412,8 +3410,8 @@ const char *
 key2extcmddesc(key)
 uchar key;
 {
-    if (Cmd.commands[key] && Cmd.commands[key]->ef_txt)
-        return Cmd.commands[key]->ef_desc;
+    if (g.Cmd.commands[key] && g.Cmd.commands[key]->ef_txt)
+        return g.Cmd.commands[key]->ef_desc;
     return (char *) 0;
 }
 
@@ -3426,14 +3424,14 @@ const char *command;
 
     /* special case: "nothing" is reserved for unbinding */
     if (!strcmp(command, "nothing")) {
-        Cmd.commands[key] = (struct ext_func_tab *) 0;
+        g.Cmd.commands[key] = (struct ext_func_tab *) 0;
         return TRUE;
     }
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
         if (strcmp(command, extcmd->ef_txt))
             continue;
-        Cmd.commands[key] = extcmd;
+        g.Cmd.commands[key] = extcmd;
 #if 0 /* silently accept key binding for unavailable command (!SHELL,&c) */
         if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0) {
             char buf[BUFSZ];
@@ -3456,7 +3454,7 @@ commands_init()
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++)
         if (extcmd->key)
-            Cmd.commands[extcmd->key] = extcmd;
+            g.Cmd.commands[extcmd->key] = extcmd;
 
     (void) bind_key(C('l'), "redraw"); /* if number_pad is set */
     /*       'b', 'B' : go sw */
@@ -3501,7 +3499,7 @@ boolean *keys_used; /* boolean keys_used[256] */
             continue;
         if (key == ' ' && !flags.rest_on_space)
             continue;
-        if ((extcmd = Cmd.commands[i]) != (struct ext_func_tab *) 0) {
+        if ((extcmd = g.Cmd.commands[i]) != (struct ext_func_tab *) 0) {
             if ((cmdflags && !(extcmd->flags & cmdflags))
                 || (exflags && (extcmd->flags & exflags)))
                 continue;
@@ -3565,29 +3563,29 @@ dokeylist(VOID_ARGS)
     putstr(datawin, 0, "Directional keys:");
     show_direction_keys(datawin, '.', FALSE); /* '.'==self in direction grid */
 
-    keys_used[(uchar) Cmd.move_NW] = keys_used[(uchar) Cmd.move_N]
-        = keys_used[(uchar) Cmd.move_NE] = keys_used[(uchar) Cmd.move_W]
-        = keys_used[(uchar) Cmd.move_E] = keys_used[(uchar) Cmd.move_SW]
-        = keys_used[(uchar) Cmd.move_S] = keys_used[(uchar) Cmd.move_SE]
+    keys_used[(uchar) g.Cmd.move_NW] = keys_used[(uchar) g.Cmd.move_N]
+        = keys_used[(uchar) g.Cmd.move_NE] = keys_used[(uchar) g.Cmd.move_W]
+        = keys_used[(uchar) g.Cmd.move_E] = keys_used[(uchar) g.Cmd.move_SW]
+        = keys_used[(uchar) g.Cmd.move_S] = keys_used[(uchar) g.Cmd.move_SE]
         = TRUE;
 
     if (!iflags.num_pad) {
-        keys_used[(uchar) highc(Cmd.move_NW)]
-            = keys_used[(uchar) highc(Cmd.move_N)]
-            = keys_used[(uchar) highc(Cmd.move_NE)]
-            = keys_used[(uchar) highc(Cmd.move_W)]
-            = keys_used[(uchar) highc(Cmd.move_E)]
-            = keys_used[(uchar) highc(Cmd.move_SW)]
-            = keys_used[(uchar) highc(Cmd.move_S)]
-            = keys_used[(uchar) highc(Cmd.move_SE)] = TRUE;
-        keys_used[(uchar) C(Cmd.move_NW)]
-            = keys_used[(uchar) C(Cmd.move_N)]
-            = keys_used[(uchar) C(Cmd.move_NE)]
-            = keys_used[(uchar) C(Cmd.move_W)]
-            = keys_used[(uchar) C(Cmd.move_E)]
-            = keys_used[(uchar) C(Cmd.move_SW)]
-            = keys_used[(uchar) C(Cmd.move_S)]
-            = keys_used[(uchar) C(Cmd.move_SE)] = TRUE;
+        keys_used[(uchar) highc(g.Cmd.move_NW)]
+            = keys_used[(uchar) highc(g.Cmd.move_N)]
+            = keys_used[(uchar) highc(g.Cmd.move_NE)]
+            = keys_used[(uchar) highc(g.Cmd.move_W)]
+            = keys_used[(uchar) highc(g.Cmd.move_E)]
+            = keys_used[(uchar) highc(g.Cmd.move_SW)]
+            = keys_used[(uchar) highc(g.Cmd.move_S)]
+            = keys_used[(uchar) highc(g.Cmd.move_SE)] = TRUE;
+        keys_used[(uchar) C(g.Cmd.move_NW)]
+            = keys_used[(uchar) C(g.Cmd.move_N)]
+            = keys_used[(uchar) C(g.Cmd.move_NE)]
+            = keys_used[(uchar) C(g.Cmd.move_W)]
+            = keys_used[(uchar) C(g.Cmd.move_E)]
+            = keys_used[(uchar) C(g.Cmd.move_SW)]
+            = keys_used[(uchar) C(g.Cmd.move_S)]
+            = keys_used[(uchar) C(g.Cmd.move_SE)] = TRUE;
         putstr(datawin, 0, "");
         putstr(datawin, 0,
           "Shift-<direction> will move in specified direction until you hit");
@@ -3600,7 +3598,7 @@ dokeylist(VOID_ARGS)
     putstr(datawin, 0, "");
     putstr(datawin, 0, "Miscellaneous keys:");
     for (i = 0; misc_keys[i].desc; i++) {
-        key = Cmd.spkeys[misc_keys[i].nhkf];
+        key = g.Cmd.spkeys[misc_keys[i].nhkf];
         if (key && ((misc_keys[i].numpad && iflags.num_pad)
                     || !misc_keys[i].numpad)) {
             keys_used[(uchar) key] = TRUE;
@@ -3647,7 +3645,7 @@ int NDECL((*fn));
     int i;
 
     for (i = 0; i < 256; ++i)
-        if (Cmd.commands[i] && Cmd.commands[i]->ef_funct == fn)
+        if (g.Cmd.commands[i] && g.Cmd.commands[i]->ef_funct == fn)
             return (char) i;
     return '\0';
 }
@@ -4144,7 +4142,7 @@ const char *command;
     for (i = 0; i < SIZE(spkeys_binds); i++) {
         if (!spkeys_binds[i].name || strcmp(command, spkeys_binds[i].name))
             continue;
-        Cmd.spkeys[spkeys_binds[i].nhkf] = key;
+        g.Cmd.spkeys[spkeys_binds[i].nhkf] = key;
         return TRUE;
     }
     return FALSE;
@@ -4299,97 +4297,97 @@ boolean initial;
 
     if (initial) {
         updated = 1;
-        Cmd.num_pad = FALSE;
-        Cmd.pcHack_compat = Cmd.phone_layout = Cmd.swap_yz = FALSE;
+        g.Cmd.num_pad = FALSE;
+        g.Cmd.pcHack_compat = g.Cmd.phone_layout = g.Cmd.swap_yz = FALSE;
         for (i = 0; i < SIZE(spkeys_binds); i++)
-            Cmd.spkeys[spkeys_binds[i].nhkf] = spkeys_binds[i].key;
+            g.Cmd.spkeys[spkeys_binds[i].nhkf] = spkeys_binds[i].key;
         commands_init();
     } else {
 
         if (backed_dir_cmd) {
             for (i = 0; i < 8; i++) {
-                Cmd.commands[(uchar) Cmd.dirchars[i]] = back_dir_cmd[i];
+                g.Cmd.commands[(uchar) g.Cmd.dirchars[i]] = back_dir_cmd[i];
             }
         }
 
         /* basic num_pad */
         flagtemp = iflags.num_pad;
-        if (flagtemp != Cmd.num_pad) {
-            Cmd.num_pad = flagtemp;
+        if (flagtemp != g.Cmd.num_pad) {
+            g.Cmd.num_pad = flagtemp;
             ++updated;
         }
         /* swap_yz mode (only applicable for !num_pad); intended for
            QWERTZ keyboard used in Central Europe, particularly Germany */
-        flagtemp = (iflags.num_pad_mode & 1) ? !Cmd.num_pad : FALSE;
-        if (flagtemp != Cmd.swap_yz) {
-            Cmd.swap_yz = flagtemp;
+        flagtemp = (iflags.num_pad_mode & 1) ? !g.Cmd.num_pad : FALSE;
+        if (flagtemp != g.Cmd.swap_yz) {
+            g.Cmd.swap_yz = flagtemp;
             ++updated;
-            /* Cmd.swap_yz has been toggled;
+            /* g.Cmd.swap_yz has been toggled;
                perform the swap (or reverse previous one) */
             for (i = 0; i < SIZE(ylist); i++) {
                 c = ylist[i] & 0xff;
-                cmdtmp = Cmd.commands[c];              /* tmp = [y] */
-                Cmd.commands[c] = Cmd.commands[c + 1]; /* [y] = [z] */
-                Cmd.commands[c + 1] = cmdtmp;          /* [z] = tmp */
+                cmdtmp = g.Cmd.commands[c];              /* tmp = [y] */
+                g.Cmd.commands[c] = g.Cmd.commands[c + 1]; /* [y] = [z] */
+                g.Cmd.commands[c + 1] = cmdtmp;          /* [z] = tmp */
             }
         }
         /* MSDOS compatibility mode (only applicable for num_pad) */
-        flagtemp = (iflags.num_pad_mode & 1) ? Cmd.num_pad : FALSE;
-        if (flagtemp != Cmd.pcHack_compat) {
-            Cmd.pcHack_compat = flagtemp;
+        flagtemp = (iflags.num_pad_mode & 1) ? g.Cmd.num_pad : FALSE;
+        if (flagtemp != g.Cmd.pcHack_compat) {
+            g.Cmd.pcHack_compat = flagtemp;
             ++updated;
             /* pcHack_compat has been toggled */
             c = M('5') & 0xff;
-            cmdtmp = Cmd.commands['5'];
-            Cmd.commands['5'] = Cmd.commands[c];
-            Cmd.commands[c] = cmdtmp;
+            cmdtmp = g.Cmd.commands['5'];
+            g.Cmd.commands['5'] = g.Cmd.commands[c];
+            g.Cmd.commands[c] = cmdtmp;
             c = M('0') & 0xff;
-            Cmd.commands[c] = Cmd.pcHack_compat ? Cmd.commands['I'] : 0;
+            g.Cmd.commands[c] = g.Cmd.pcHack_compat ? g.Cmd.commands['I'] : 0;
         }
         /* phone keypad layout (only applicable for num_pad) */
-        flagtemp = (iflags.num_pad_mode & 2) ? Cmd.num_pad : FALSE;
-        if (flagtemp != Cmd.phone_layout) {
-            Cmd.phone_layout = flagtemp;
+        flagtemp = (iflags.num_pad_mode & 2) ? g.Cmd.num_pad : FALSE;
+        if (flagtemp != g.Cmd.phone_layout) {
+            g.Cmd.phone_layout = flagtemp;
             ++updated;
             /* phone_layout has been toggled */
             for (i = 0; i < 3; i++) {
                 c = '1' + i;             /* 1,2,3 <-> 7,8,9 */
-                cmdtmp = Cmd.commands[c];              /* tmp = [1] */
-                Cmd.commands[c] = Cmd.commands[c + 6]; /* [1] = [7] */
-                Cmd.commands[c + 6] = cmdtmp;          /* [7] = tmp */
+                cmdtmp = g.Cmd.commands[c];              /* tmp = [1] */
+                g.Cmd.commands[c] = g.Cmd.commands[c + 6]; /* [1] = [7] */
+                g.Cmd.commands[c + 6] = cmdtmp;          /* [7] = tmp */
                 c = (M('1') & 0xff) + i; /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-                cmdtmp = Cmd.commands[c];              /* tmp = [M-1] */
-                Cmd.commands[c] = Cmd.commands[c + 6]; /* [M-1] = [M-7] */
-                Cmd.commands[c + 6] = cmdtmp;          /* [M-7] = tmp */
+                cmdtmp = g.Cmd.commands[c];              /* tmp = [M-1] */
+                g.Cmd.commands[c] = g.Cmd.commands[c + 6]; /* [M-1] = [M-7] */
+                g.Cmd.commands[c + 6] = cmdtmp;          /* [M-7] = tmp */
             }
         }
     } /*?initial*/
 
     if (updated)
-        Cmd.serialno++;
-    Cmd.dirchars = !Cmd.num_pad
-                       ? (!Cmd.swap_yz ? sdir : sdir_swap_yz)
-                       : (!Cmd.phone_layout ? ndir : ndir_phone_layout);
-    Cmd.alphadirchars = !Cmd.num_pad ? Cmd.dirchars : sdir;
+        g.Cmd.serialno++;
+    g.Cmd.dirchars = !g.Cmd.num_pad
+                       ? (!g.Cmd.swap_yz ? sdir : sdir_swap_yz)
+                       : (!g.Cmd.phone_layout ? ndir : ndir_phone_layout);
+    g.Cmd.alphadirchars = !g.Cmd.num_pad ? g.Cmd.dirchars : sdir;
 
-    Cmd.move_W = Cmd.dirchars[0];
-    Cmd.move_NW = Cmd.dirchars[1];
-    Cmd.move_N = Cmd.dirchars[2];
-    Cmd.move_NE = Cmd.dirchars[3];
-    Cmd.move_E = Cmd.dirchars[4];
-    Cmd.move_SE = Cmd.dirchars[5];
-    Cmd.move_S = Cmd.dirchars[6];
-    Cmd.move_SW = Cmd.dirchars[7];
+    g.Cmd.move_W = g.Cmd.dirchars[0];
+    g.Cmd.move_NW = g.Cmd.dirchars[1];
+    g.Cmd.move_N = g.Cmd.dirchars[2];
+    g.Cmd.move_NE = g.Cmd.dirchars[3];
+    g.Cmd.move_E = g.Cmd.dirchars[4];
+    g.Cmd.move_SE = g.Cmd.dirchars[5];
+    g.Cmd.move_S = g.Cmd.dirchars[6];
+    g.Cmd.move_SW = g.Cmd.dirchars[7];
 
     if (!initial) {
         for (i = 0; i < 8; i++) {
             back_dir_cmd[i] =
-                (struct ext_func_tab *) Cmd.commands[(uchar) Cmd.dirchars[i]];
-            Cmd.commands[(uchar) Cmd.dirchars[i]] = (struct ext_func_tab *) 0;
+                (struct ext_func_tab *) g.Cmd.commands[(uchar) g.Cmd.dirchars[i]];
+            g.Cmd.commands[(uchar) g.Cmd.dirchars[i]] = (struct ext_func_tab *) 0;
         }
         backed_dir_cmd = TRUE;
         for (i = 0; i < 8; i++)
-            (void) bind_key(Cmd.dirchars[i], "nothing");
+            (void) bind_key(g.Cmd.dirchars[i], "nothing");
     }
 }
 
@@ -4475,7 +4473,7 @@ int start,end;
     int i;
 
     for (i = start; i <= end; i++)
-        if (Cmd.spkeys[i] == c)
+        if (g.Cmd.spkeys[i] == c)
             return i;
     return NHKF_ESC;
 }
@@ -4497,7 +4495,7 @@ register char *cmd;
         context.nopick = 0;
         cmd = parse();
     }
-    if (*cmd == Cmd.spkeys[NHKF_ESC]) {
+    if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
         context.move = FALSE;
         return;
     }
@@ -4529,7 +4527,7 @@ register char *cmd;
             prefix_seen = TRUE;
         break;
     case NHKF_RUN2:
-        if (!Cmd.num_pad)
+        if (!g.Cmd.num_pad)
             break;
         /*FALLTHRU*/
     case NHKF_RUN:
@@ -4540,7 +4538,7 @@ register char *cmd;
             prefix_seen = TRUE;
         break;
     case NHKF_FIGHT2:
-        if (!Cmd.num_pad)
+        if (!g.Cmd.num_pad)
             break;
         /*FALLTHRU*/
     /* Effects of movement commands and invisible monsters:
@@ -4575,7 +4573,7 @@ register char *cmd;
             prefix_seen = TRUE;
         break;
     case NHKF_DOINV:
-        if (!Cmd.num_pad)
+        if (!g.Cmd.num_pad)
             break;
         (void) ddoinv(); /* a convenience borrowed from the PC */
         context.move = FALSE;
@@ -4601,7 +4599,7 @@ register char *cmd;
         if (movecmd(*cmd)) { /* ordinary movement */
             context.run = 0; /* only matters here if it was 8 */
             do_walk = TRUE;
-        } else if (movecmd(Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
+        } else if (movecmd(g.Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
             context.run = 1;
             do_rush = TRUE;
         } else if (movecmd(unctrl(*cmd))) {
@@ -4613,9 +4611,9 @@ register char *cmd;
 
     /* some special prefix handling */
     /* overload 'm' prefix to mean "request a menu" */
-    if (prefix_seen && cmd[0] == Cmd.spkeys[NHKF_REQMENU]) {
+    if (prefix_seen && cmd[0] == g.Cmd.spkeys[NHKF_REQMENU]) {
         /* (for func_tab cast, see below) */
-        const struct ext_func_tab *ft = Cmd.commands[cmd[1] & 0xff];
+        const struct ext_func_tab *ft = g.Cmd.commands[cmd[1] & 0xff];
         int NDECL((*func)) = ft ? ((struct ext_func_tab *) ft)->ef_funct : 0;
 
         if (func && accept_menu_prefix(func)) {
@@ -4653,7 +4651,7 @@ register char *cmd;
         context.mv = TRUE;
         domove();
         return;
-    } else if (prefix_seen && cmd[1] == Cmd.spkeys[NHKF_ESC]) {
+    } else if (prefix_seen && cmd[1] == g.Cmd.spkeys[NHKF_ESC]) {
         /* <prefix><escape> */
         /* don't report "unknown command" for change of heart... */
         bad_command = FALSE;
@@ -4666,7 +4664,7 @@ register char *cmd;
         int res, NDECL((*func));
 
         /* current - use *cmd to directly index cmdlist array */
-        if ((tlist = Cmd.commands[*cmd & 0xff]) != 0) {
+        if ((tlist = g.Cmd.commands[*cmd & 0xff]) != 0) {
             if (!wizard && (tlist->flags & WIZMODECMD)) {
                 You_cant("do that!");
                 res = 0;
@@ -4737,14 +4735,14 @@ int
 movecmd(sym)
 char sym;
 {
-    register const char *dp = index(Cmd.dirchars, sym);
+    register const char *dp = index(g.Cmd.dirchars, sym);
 
     u.dz = 0;
     if (!dp || !*dp)
         return 0;
-    u.dx = xdir[dp - Cmd.dirchars];
-    u.dy = ydir[dp - Cmd.dirchars];
-    u.dz = zdir[dp - Cmd.dirchars];
+    u.dx = xdir[dp - g.Cmd.dirchars];
+    u.dy = ydir[dp - g.Cmd.dirchars];
+    u.dz = zdir[dp - g.Cmd.dirchars];
 #if 0 /* now handled elsewhere */
     if (u.dx && u.dy && NODIAG(u.umonnum)) {
         u.dx = u.dy = 0;
@@ -4768,21 +4766,21 @@ boolean
 redraw_cmd(c)
 char c;
 {
-    return (boolean) (c == Cmd.spkeys[NHKF_REDRAW]
-                      || (Cmd.num_pad && c == Cmd.spkeys[NHKF_REDRAW2]));
+    return (boolean) (c == g.Cmd.spkeys[NHKF_REDRAW]
+                      || (g.Cmd.num_pad && c == g.Cmd.spkeys[NHKF_REDRAW2]));
 }
 
 boolean
 prefix_cmd(c)
 char c;
 {
-    return (c == Cmd.spkeys[NHKF_RUSH]
-            || c == Cmd.spkeys[NHKF_RUN]
-            || c == Cmd.spkeys[NHKF_NOPICKUP]
-            || c == Cmd.spkeys[NHKF_RUN_NOPICKUP]
-            || c == Cmd.spkeys[NHKF_FIGHT]
-            || (Cmd.num_pad && (c == Cmd.spkeys[NHKF_RUN2]
-                                || c == Cmd.spkeys[NHKF_FIGHT2])));
+    return (c == g.Cmd.spkeys[NHKF_RUSH]
+            || c == g.Cmd.spkeys[NHKF_RUN]
+            || c == g.Cmd.spkeys[NHKF_NOPICKUP]
+            || c == g.Cmd.spkeys[NHKF_RUN_NOPICKUP]
+            || c == g.Cmd.spkeys[NHKF_FIGHT]
+            || (g.Cmd.num_pad && (c == g.Cmd.spkeys[NHKF_RUN2]
+                                || c == g.Cmd.spkeys[NHKF_FIGHT2])));
 }
 
 /*
@@ -4841,14 +4839,14 @@ retry:
     }
     savech(dirsym);
 
-    if (dirsym == Cmd.spkeys[NHKF_GETDIR_SELF]
-        || dirsym == Cmd.spkeys[NHKF_GETDIR_SELF2]) {
+    if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
+        || dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF2]) {
         u.dx = u.dy = u.dz = 0;
     } else if (!(is_mov = movecmd(dirsym)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
 
         if (!index(quitchars, dirsym)) {
-            help_requested = (dirsym == Cmd.spkeys[NHKF_GETDIR_HELP]);
+            help_requested = (dirsym == g.Cmd.spkeys[NHKF_GETDIR_HELP]);
             if (help_requested || iflags.cmdassist) {
                 did_help = help_dir((s && *s == '^') ? dirsym : '\0',
                                     NHKF_ESC,
@@ -4882,26 +4880,26 @@ boolean nodiag;
         centerchar = ' ';
 
     if (nodiag) {
-        Sprintf(buf, "             %c   ", Cmd.move_N);
+        Sprintf(buf, "             %c   ", g.Cmd.move_N);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
         Sprintf(buf, "          %c- %c -%c",
-                Cmd.move_W, centerchar, Cmd.move_E);
+                g.Cmd.move_W, centerchar, g.Cmd.move_E);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
-        Sprintf(buf, "             %c   ", Cmd.move_S);
+        Sprintf(buf, "             %c   ", g.Cmd.move_S);
         putstr(win, 0, buf);
     } else {
         Sprintf(buf, "          %c  %c  %c",
-                Cmd.move_NW, Cmd.move_N, Cmd.move_NE);
+                g.Cmd.move_NW, g.Cmd.move_N, g.Cmd.move_NE);
         putstr(win, 0, buf);
         putstr(win, 0, "           \\ | / ");
         Sprintf(buf, "          %c- %c -%c",
-                Cmd.move_W, centerchar, Cmd.move_E);
+                g.Cmd.move_W, centerchar, g.Cmd.move_E);
         putstr(win, 0, buf);
         putstr(win, 0, "           / | \\ ");
         Sprintf(buf, "          %c  %c  %c",
-                Cmd.move_SW, Cmd.move_S, Cmd.move_SE);
+                g.Cmd.move_SW, g.Cmd.move_S, g.Cmd.move_SE);
         putstr(win, 0, buf);
     };
 }
@@ -4940,7 +4938,7 @@ const char *msg;
         dothat = "rush";
         break;
     case NHKF_RUN2:
-        if (!Cmd.num_pad)
+        if (!g.Cmd.num_pad)
             break;
         /*FALLTHRU*/
     case NHKF_RUN:
@@ -4948,7 +4946,7 @@ const char *msg;
         dothat = "run";
         break;
     case NHKF_FIGHT2:
-        if (!Cmd.num_pad)
+        if (!g.Cmd.num_pad)
             break;
         /*FALLTHRU*/
     case NHKF_FIGHT:
@@ -4964,8 +4962,8 @@ const char *msg;
     /* for movement prefix followed by '.' or (numpad && 's') to mean 'self';
        note: '-' for hands (inventory form of 'self') is not handled here */
     if (prefixhandling
-        && (sym == Cmd.spkeys[NHKF_GETDIR_SELF]
-            || (Cmd.num_pad && sym == Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
+        && (sym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
+            || (g.Cmd.num_pad && sym == g.Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
         Sprintf(buf, "You can't %s%s yourself.", dothat, how);
     /* for movement prefix followed by up or down */
     } else if (prefixhandling && (sym == '<' || sym == '>')) {
@@ -4981,7 +4979,7 @@ const char *msg;
         if (prefixhandling) {
             if (!*buf)
                 Sprintf(buf, "Invalid direction for '%s' prefix.",
-                        visctrl(Cmd.spkeys[spkey]));
+                        visctrl(g.Cmd.spkeys[spkey]));
             pline("%s", buf);
             return TRUE;
         }
@@ -5039,10 +5037,10 @@ const char *msg;
         putstr(win, 0, "          <  up");
         putstr(win, 0, "          >  down");
         if (!prefixhandling) {
-            int selfi = Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
+            int selfi = g.Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
 
             Sprintf(buf,   "       %4s  direct at yourself",
-                    visctrl(Cmd.spkeys[selfi]));
+                    visctrl(g.Cmd.spkeys[selfi]));
             putstr(win, 0, buf);
         }
     }
@@ -5351,7 +5349,7 @@ int x, y, mod;
     if (iflags.clicklook && mod == CLICK_2) {
         clicklook_cc.x = x;
         clicklook_cc.y = y;
-        cmd[0] = Cmd.spkeys[NHKF_CLICKLOOK];
+        cmd[0] = g.Cmd.spkeys[NHKF_CLICKLOOK];
         return cmd;
     }
 
@@ -5364,7 +5362,7 @@ int x, y, mod;
         } else {
             u.tx = u.ux + x;
             u.ty = u.uy + y;
-            cmd[0] = Cmd.spkeys[NHKF_TRAVEL];
+            cmd[0] = g.Cmd.spkeys[NHKF_TRAVEL];
             return cmd;
         }
 
@@ -5410,7 +5408,7 @@ int x, y, mod;
 
         if (!m_at(u.ux + x, u.uy + y)
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
-            cmd[1] = Cmd.dirchars[dir];
+            cmd[1] = g.Cmd.dirchars[dir];
             cmd[2] = '\0';
             if (iflags.herecmd_menu) {
                 cmd[0] = there_cmd_menu(FALSE, u.ux + x, u.uy + y);
@@ -5461,11 +5459,11 @@ int x, y, mod;
     /* move, attack, etc. */
     cmd[1] = 0;
     if (mod == CLICK_1) {
-        cmd[0] = Cmd.dirchars[dir];
+        cmd[0] = g.Cmd.dirchars[dir];
     } else {
-        cmd[0] = (Cmd.num_pad
-                     ? M(Cmd.dirchars[dir])
-                     : (Cmd.dirchars[dir] - 'a' + 'A')); /* run command */
+        cmd[0] = (g.Cmd.num_pad
+                     ? M(g.Cmd.dirchars[dir])
+                     : (g.Cmd.dirchars[dir] - 'a' + 'A')); /* run command */
     }
 
     return cmd;
@@ -5503,7 +5501,7 @@ boolean historical; /* whether to include in message history: True => yes */
         } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
             cnt = cnt / 10;
             backspaced = TRUE;
-        } else if (key == Cmd.spkeys[NHKF_ESC]) {
+        } else if (key == g.Cmd.spkeys[NHKF_ESC]) {
             break;
         } else if (!allowchars || index(allowchars, key)) {
             *count = cnt;
@@ -5554,7 +5552,7 @@ parse()
 #ifdef ALTMETA
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
-    if (!Cmd.num_pad || (foo = readchar()) == Cmd.spkeys[NHKF_COUNT]) {
+    if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
         long tmpmulti = multi;
 
         foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti, FALSE);
@@ -5565,15 +5563,15 @@ parse()
 #endif
 
     if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
-        && (Cmd.commands[foo & 0x0ff]
-            && (Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
-                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh_core)))
-        foo = Cmd.spkeys[NHKF_ESC];
+        && (g.Cmd.commands[foo & 0x0ff]
+            && (g.Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
+                || g.Cmd.commands[foo & 0x0ff]->ef_funct == dosh_core)))
+        foo = g.Cmd.spkeys[NHKF_ESC];
 
-    if (foo == Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
+    if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
         multi = last_multi = 0;
-    } else if (foo == Cmd.spkeys[NHKF_DOAGAIN] || in_doagain) {
+    } else if (foo == g.Cmd.spkeys[NHKF_DOAGAIN] || in_doagain) {
         multi = last_multi;
     } else {
         last_multi = multi;
@@ -5588,20 +5586,20 @@ parse()
         save_cm = (char *) 0;
     }
     /* in 3.4.3 this was in rhack(), where it was too late to handle M-5 */
-    if (Cmd.pcHack_compat) {
+    if (g.Cmd.pcHack_compat) {
         /* This handles very old inconsistent DOS/Windows behaviour
            in a different way: earlier, the keyboard handler mapped
            these, which caused counts to be strange when entered
            from the number pad. Now do not map them until here. */
         switch (foo) {
         case '5':
-            foo = Cmd.spkeys[NHKF_RUSH];
+            foo = g.Cmd.spkeys[NHKF_RUSH];
             break;
         case M('5'):
-            foo = Cmd.spkeys[NHKF_RUN];
+            foo = g.Cmd.spkeys[NHKF_RUN];
             break;
         case M('0'):
-            foo = Cmd.spkeys[NHKF_DOINV];
+            foo = g.Cmd.spkeys[NHKF_DOINV];
             break;
         default:
             break; /* as is */
@@ -5618,7 +5616,7 @@ parse()
     }
     clear_nhwindow(WIN_MESSAGE);
     if (prezero)
-        in_line[0] = Cmd.spkeys[NHKF_ESC];
+        in_line[0] = g.Cmd.spkeys[NHKF_ESC];
 
     iflags.in_parse = FALSE;
     return in_line;
@@ -5771,7 +5769,7 @@ dotravel(VOID_ARGS)
     iflags.getloc_travelmode = FALSE;
     iflags.travelcc.x = u.tx = cc.x;
     iflags.travelcc.y = u.ty = cc.y;
-    cmd[0] = Cmd.spkeys[NHKF_TRAVEL];
+    cmd[0] = g.Cmd.spkeys[NHKF_TRAVEL];
     readchar_queue = cmd;
     return 0;
 }
