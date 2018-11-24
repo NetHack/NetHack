@@ -14,6 +14,8 @@
  *        the contents, just the total size.
  */
 
+extern boolean notonhead; /* for long worms */
+
 #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
@@ -1252,7 +1254,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             }
             if (!youdefend) {
                 /* allow normal cutworm() call to add extra damage */
-                if (g.notonhead)
+                if (notonhead)
                     return FALSE;
 
                 if (bigmonst(mdef->data)) {
@@ -1295,7 +1297,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 return FALSE;
             wepdesc = artilist[ART_VORPAL_BLADE].name;
             if (!youdefend) {
-                if (!has_head(mdef->data) || g.notonhead || u.uswallow) {
+                if (!has_head(mdef->data) || notonhead || u.uswallow) {
                     if (youattack)
                         pline("Somehow, you miss %s wildly.", mon_nam(mdef));
                     else if (vis)

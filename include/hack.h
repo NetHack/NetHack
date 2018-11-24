@@ -22,13 +22,11 @@
         0     \
     }
 
-/* The UNDEFINED macros are used to initialize variables whose
-   initialized value is not relied upon.
-   UNDEFINED_VALUE: used to initialize any scalar type except pointers.
-   UNDEFINED_VALUES: used to initialize any non scalar type without pointers.
-   UNDEFINED_PTR: can be used only on pointer types. */
-#define UNDEFINED_VALUE 0
-#define UNDEFINED_VALUES { 0 }
+/* UNDEFINED_VALUE and UNDEFINED_PTR are used to initialize variables whose
+   initialized value is not relied upon.  UNDEFINED_VALUE can be used to
+   initialized any value type except pointers.  UNDEFINED_PTR can be used
+   only on pointer types. */
+#define UNDEFINED_VALUE { 0 }
 #define UNDEFINED_PTR NULL
 
 /* symbolic names for capacity levels */

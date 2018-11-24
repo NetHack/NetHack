@@ -464,11 +464,6 @@ struct instance_globals {
     /* pickup.c */
     int oldcap; /* last encumberance */
 
-    /* potion.c */
-    boolean notonhead; /* for long worms */
-    int potion_nothing;
-    int potion_unkn;
-
     /* read.c */
     boolean known;
 

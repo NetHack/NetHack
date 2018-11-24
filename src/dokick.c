@@ -14,6 +14,8 @@ static NEARDATA const char *gate_str;
 
 /* kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
+extern boolean notonhead; /* for long worms */
+
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
                                               XCHAR_P, XCHAR_P));
@@ -677,7 +679,7 @@ xchar x, y;
         if (mon->isshk && kickedobj->where == OBJ_MINVENT
             && kickedobj->ocarry == mon)
             return 1; /* alert shk caught it */
-        g.notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
+        notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
         if (isgold ? ghitm(mon, kickedobj)      /* caught? */
                    : thitmonst(mon, kickedobj)) /* hit && used up? */
             return 1;

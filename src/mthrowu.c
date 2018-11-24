@@ -26,6 +26,7 @@ STATIC_OVL NEARDATA const char *breathwep[] = {
     "strange breath #9"
 };
 
+extern boolean notonhead; /* for long worms */
 STATIC_VAR int mesg_given; /* for m_throw()/thitu() 'miss' message */
 
 /* hero is hit by something other than a monster */
@@ -311,7 +312,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     int objgone = 1;
     struct obj *mon_launcher = archer ? MON_WEP(archer) : NULL;
 
-    g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
     ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
     vis = cansee(bhitpos.x, bhitpos.y);
 
@@ -476,7 +477,7 @@ struct obj *obj;         /* missile (or stack providing it) */
 
     bhitpos.x = x;
     bhitpos.y = y;
-    g.notonhead = FALSE; /* reset potentially stale value */
+    notonhead = FALSE; /* reset potentially stale value */
 
     if (obj->quan == 1L) {
         /*

@@ -7,6 +7,8 @@
 
 #include "mfndpos.h"
 
+extern boolean notonhead;
+
 STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
 STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
 STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
@@ -1021,7 +1023,7 @@ int after; /* this is extra fast monster movement */
             if (after)
                 return 0; /* hit only once each move */
 
-            g.notonhead = 0;
+            notonhead = 0;
             mstatus = mattackm(mtmp, mtmp2);
 
             /* aggressor (pet) died */
