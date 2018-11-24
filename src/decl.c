@@ -345,10 +345,10 @@ const struct instance_globals g_init = {
     /* rumors.c */
     0, /* true_rumor_size */
     0, /* false_rumor_size */
-    UNDEFINED_VALUE, /* true_rumor_start*/
-    UNDEFINED_VALUE, /* false_rumor_start*/
-    UNDEFINED_VALUE, /* true_rumor_end */
-    UNDEFINED_VALUE, /* false_rumor_end */
+    UNDEFINED, /* true_rumor_start*/
+    UNDEFINED, /* false_rumor_start*/
+    UNDEFINED, /* true_rumor_end */
+    UNDEFINED, /* false_rumor_end */
     0, /* oracle_flag */
     0, /* oracle_cnt */
     NULL, /* oracle_loc */
@@ -364,12 +364,12 @@ const struct instance_globals g_init = {
     STRANGE_OBJECT, /* nocreate3 */
     STRANGE_OBJECT, /* nocreate4 */
     /* uhitm.c */
-    UNDEFINED_VALUE, /* override_confirmation */
+    UNDEFINED, /* override_confirmation */
     /* weapon.c */
     UNDEFINED_PTR, /* propellor */
     /* zap.c */
-    UNDEFINED_VALUE, /* poly_zap */
-    UNDEFINED_VALUE,  /* obj_zapped */
+    UNDEFINED, /* poly_zap */
+    UNDEFINED,  /* obj_zapped */
 
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };
