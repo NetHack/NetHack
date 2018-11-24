@@ -115,7 +115,7 @@ adjattrib(ndx, incr, msgflg)
 int ndx, incr;
 int msgflg; /* positive => no message, zero => message, and */
 {           /* negative => conditional (msg if change made) */
-    int old_acurr, old_abase;
+    int old_acurr, old_abase, new_abase;
     boolean abonflg;
     const char *attrstr;
 
@@ -130,25 +130,23 @@ int msgflg; /* positive => no message, zero => message, and */
 
     old_acurr = ACURR(ndx);
     old_abase = ABASE(ndx);
+    new_abase = old_abase + incr;
     if (incr > 0) {
-        ABASE(ndx) += incr;
-        if (ABASE(ndx) > AMAX(ndx)) {
-            incr = ABASE(ndx) - AMAX(ndx);
-            AMAX(ndx) += incr;
-            if (AMAX(ndx) > ATTRMAX(ndx))
-                AMAX(ndx) = ATTRMAX(ndx);
-            ABASE(ndx) = AMAX(ndx);
-        }
+        ABASE(ndx) = min(new_abase, ATTRMAX(ndx));
+        AMAX(ndx) = max(ABASE(ndx), AMAX(ndx));
         attrstr = plusattr[ndx];
         abonflg = (ABON(ndx) < 0);
     } else {
-        ABASE(ndx) += incr;
-        if (ABASE(ndx) < ATTRMIN(ndx)) {
-            incr = ABASE(ndx) - ATTRMIN(ndx);
+        if (ATTRMIN(ndx) <= new_abase) {
+            ABASE(ndx) = new_abase;
+        } else {
+            /*
+             * Player has already abused base attributed below the race minimum.
+             * We move the penalty to affect maximum attribute which can be
+             * restored.
+             */
             ABASE(ndx) = ATTRMIN(ndx);
-            AMAX(ndx) += incr;
-            if (AMAX(ndx) < ATTRMIN(ndx))
-                AMAX(ndx) = ATTRMIN(ndx);
+            AMAX(ndx) = max(AMAX(ndx) - (ATTRMIN(ndx) - new_abase), ATTRMIN(ndx));
         }
         attrstr = minusattr[ndx];
         abonflg = (ABON(ndx) > 0);
