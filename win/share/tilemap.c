@@ -113,6 +113,7 @@ int set, entry;
             we're linked properly.
     */
     monst_init();
+    objects_init();
     (void) def_char_to_objclass(']');
 
     condnum = tilenum = 0;

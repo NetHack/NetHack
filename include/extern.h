@@ -250,7 +250,7 @@ E void FDECL(destroy_drawbridge, (int, int));
 
 /* ### decl.c ### */
 
-E void NDECL(decl_globals_init);
+E void NDECL(decl_init);
 
 /* ### detect.c ### */
 
@@ -1651,7 +1651,7 @@ E void NDECL(rename_disco);
 
 /* ### objects.c ### */
 
-E void NDECL(objects_globals_init);
+E void NDECL(objects_init);
 
 /* ### objnam.c ### */
 

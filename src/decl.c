@@ -318,6 +318,13 @@ const char *ARGV0;
 /* support for lint.h */
 unsigned nhUse_dummy = 0;
 
+/* dummy routine used to force linkage */
+void
+decl_init()
+{
+    return;
+}
+
 #define IVMAGIC 0xdeadbeef
 
 const struct instance_globals g_init = {
@@ -413,7 +420,7 @@ const struct instance_globals g_init = {
 struct instance_globals g;
 
 void 
-decl_globals_init() 
+instance_globals_init() 
 {
     g = g_init;
 

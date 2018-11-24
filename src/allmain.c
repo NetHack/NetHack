@@ -33,7 +33,9 @@ boolean resuming;
     /* Note:  these initializers don't do anything except guarantee that
             we're linked properly.
     */
+    decl_init();
     monst_init();
+    objects_init();
 
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
