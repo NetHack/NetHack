@@ -364,9 +364,5 @@ struct savefile_info {
 #define nethack_enter(argc, argv) ((void) 0)
 #endif
 
-/* Supply nhassert macro if not supplied by port */
-#ifndef nhassert
-#define nhassert(expression) ((void)0)
-#endif
 
 #endif /* GLOBAL_H */
