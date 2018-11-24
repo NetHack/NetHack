@@ -445,7 +445,7 @@ struct early_opt {
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
- * 
+ *
  * unlike instance_flags, values in the structure can be of any type. */
 
 struct instance_globals {
@@ -515,7 +515,7 @@ struct instance_globals {
     unsigned long true_rumor_start; /* rumor start offsets are unsigned because
                                        they're handled via %lx format */
     unsigned long false_rumor_start;
-    long true_rumor_end; /* rumor end offsets are signed because they're 
+    long true_rumor_end; /* rumor end offsets are signed because they're
                             compared with [dlb_]ftell() */
     long false_rumor_end;
     int oracle_flg; /* -1=>don't use, 0=>need init, 1=>init done */
@@ -535,7 +535,7 @@ struct instance_globals {
     short nocreate2;
     short nocreate3;
     short nocreate4;
-    /* uhitm.c */ 
+    /* uhitm.c */
     boolean override_confirmation; /* Used to flag attacks caused by
                                       Stormbringer's maliciousness. */
     /* weapon.c */

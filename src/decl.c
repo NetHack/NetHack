@@ -413,8 +413,8 @@ const struct instance_globals g_init = {
 
 struct instance_globals g;
 
-void 
-decl_globals_init() 
+void
+decl_globals_init()
 {
     g = g_init;
 
