@@ -464,11 +464,6 @@ struct instance_globals {
     /* pickup.c */
     int oldcap; /* last encumberance */
 
-    /* polyself.c */
-    int sex_change_ok; /* controls whether taking on new form or becoming new
-                          man can also change sex (ought to be an arg to
-                          polymon() and newman() instead) */
-
     /* potion.c */
     boolean notonhead; /* for long worms */
     int potion_nothing;
