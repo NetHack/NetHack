@@ -176,7 +176,7 @@ void NDECL(do_fix_sampleconfig);
 #endif
 
 extern void NDECL(monst_init);   /* monst.c */
-extern void NDECL(objects_init); /* objects.c */
+extern void NDECL(objects_globals_init); /* objects.c */
 
 static void NDECL(link_sanity_check);
 static char *FDECL(name_file, (const char *, const char *));
@@ -308,7 +308,6 @@ link_sanity_check()
             we're linked properly.
     */
     monst_init();
-    objects_init();
 
 }
 
@@ -317,6 +316,8 @@ do_makedefs(options)
 char *options;
 {
     boolean more_than_one;
+
+    objects_globals_init();
 
     link_sanity_check();
 

@@ -974,15 +974,11 @@ register struct trobj *trop;
     struct obj *obj;
     int otyp, i;
 
-    while (trop->trclass) {
+	while (trop->trclass) {
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);
         } else { /* UNDEF_TYP */
-            static NEARDATA short nocreate = STRANGE_OBJECT;
-            static NEARDATA short nocreate2 = STRANGE_OBJECT;
-            static NEARDATA short nocreate3 = STRANGE_OBJECT;
-            static NEARDATA short nocreate4 = STRANGE_OBJECT;
             /*
              * For random objects, do not create certain overly powerful
              * items: wand of wishing, ring of levitation, or the
@@ -995,9 +991,9 @@ register struct trobj *trop;
              */
             obj = mkobj(trop->trclass, FALSE);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == nocreate
-                   || otyp == nocreate2 || otyp == nocreate3
-                   || otyp == nocreate4 || otyp == RIN_LEVITATION
+            while (otyp == WAN_WISHING || otyp == g.nocreate
+                   || otyp == g.nocreate2 || otyp == g.nocreate3
+                   || otyp == g.nocreate4 || otyp == RIN_LEVITATION
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID
@@ -1039,16 +1035,16 @@ register struct trobj *trop;
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                nocreate = RIN_POLYMORPH_CONTROL;
+                g.nocreate = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                nocreate = RIN_POLYMORPH;
-                nocreate2 = SPE_POLYMORPH;
-                nocreate3 = POT_POLYMORPH;
+                g.nocreate = RIN_POLYMORPH;
+                g.nocreate2 = SPE_POLYMORPH;
+                g.nocreate3 = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                nocreate4 = otyp;
+                g.nocreate4 = otyp;
         }
 
         if (urace.malenum != PM_HUMAN) {

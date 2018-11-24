@@ -945,7 +945,7 @@ struct monst *mtmp;
 
     /* eat organic objects, including cloth and wood, if present;
        engulf others, except huge rocks and metal attached to player
-       [despite comment at top, doesn't assume that eater is a g.cube] */
+       [despite comment at top, doesn't assume that eater is a g-cube] */
     for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
 
@@ -1020,7 +1020,7 @@ struct monst *mtmp;
                 register struct obj *otmp3;
 
                 /* contents of eaten containers become engulfed; this
-                   is arbitrary, but otherwise g.cubes are too powerful */
+                   is arbitrary, but otherwise g-cubes are too powerful */
                 while ((otmp3 = otmp->cobj) != 0) {
                     obj_extract_self(otmp3);
                     if (otmp->otyp == ICE_BOX && otmp3->otyp == CORPSE) {

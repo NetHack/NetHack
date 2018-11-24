@@ -648,9 +648,6 @@ boolean restoring_msghist;
 {
     static boolean initd = FALSE;
     int idx;
-#ifdef DUMPLOG
-    extern unsigned saved_pline_index; /* pline.c */
-#endif
 
     if (restoring_msghist && !initd) {
         /* we're restoring history from the previous session, but new
@@ -662,7 +659,7 @@ boolean restoring_msghist;
         initd = TRUE;
 #ifdef DUMPLOG
         /* this suffices; there's no need to scrub saved_pline[] pointers */
-        saved_pline_index = 0;
+        g.saved_pline_index = 0;
 #endif
     }
 

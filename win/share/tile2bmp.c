@@ -203,6 +203,8 @@ char *argv[];
     }
 #endif
 
+    objects_globals_init();
+
     tilecount = 0;
     xoffset = yoffset = 0;
     initflag = 0;
@@ -359,4 +361,11 @@ pixel (*pixels)[TILE_X];
 #endif
         }
     }
+}
+
+/* nhassert_failed is called when an nhassert's condition is false */
+void nhassert_failed(const char * exp, const char * file, int line)
+{
+    Fprintf(stderr, "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
+    exit(EXIT_FAILURE);
 }

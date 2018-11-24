@@ -211,11 +211,6 @@ struct obj *obj;
     return TRUE;
 }
 
-/* used by distant_name() to pass extra information to xname_flags();
-   it would be much cleaner if this were a parameter, but that would
-   require all of the xname() and doname() calls to be modified */
-static int distantname = 0;
-
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
  * we don't want to set dknown if it's not set already.
  */
@@ -234,9 +229,9 @@ char *FDECL((*func), (OBJ_P));
      * object is within X-ray radius and only treat it as distant when
      * beyond that radius.  Logic is iffy but result might be interesting.
      */
-    ++distantname;
+    ++g.distantname;
     str = (*func)(obj);
-    --distantname;
+    --g.distantname;
     return str;
 }
 
@@ -426,7 +421,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind && !distantname)
+    if (!Blind && !g.distantname)
         obj->dknown = TRUE;
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -1203,7 +1198,7 @@ unsigned doname_flags;
     }
     /* treat 'restoring' like suppress_price because shopkeeper and
        bill might not be available yet while restore is in progress */
-    if (!iflags.suppress_price && !restoring && is_unpaid(obj)) {
+    if (!iflags.suppress_price && !g.restoring && is_unpaid(obj)) {
         long quotedprice = unpaid_cost(obj, TRUE);
 
         Sprintf(eos(bp), " (%s, %ld %s)",
@@ -3385,21 +3380,21 @@ retry:
     } else if (!strcmpi(bp, "looking glass")) {
         ; /* avoid false hit on "* glass" */
     } else if (!BSTRCMPI(bp, p - 6, " glass") || !strcmpi(bp, "glass")) {
-        register char *g = bp;
+        register char *s = bp;
 
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
-        if (broken || strstri(g, "broken"))
+        if (broken || strstri(s, "broken"))
             return (struct obj *) 0;
-        if (!strncmpi(g, "worthless ", 10))
-            g += 10;
-        if (!strncmpi(g, "piece of ", 9))
-            g += 9;
-        if (!strncmpi(g, "colored ", 8))
-            g += 8;
-        else if (!strncmpi(g, "coloured ", 9))
-            g += 9;
-        if (!strcmpi(g, "glass")) { /* choose random color */
+        if (!strncmpi(s, "worthless ", 10))
+            s += 10;
+        if (!strncmpi(s, "piece of ", 9))
+            s += 9;
+        if (!strncmpi(s, "colored ", 8))
+            s += 8;
+        else if (!strncmpi(s, "coloured ", 9))
+            s += 9;
+        if (!strcmpi(s, "glass")) { /* choose random color */
             /* 9 different kinds */
             typ = LAST_GEM + rnd(9);
             if (objects[typ].oc_class == GEM_CLASS)
@@ -3410,7 +3405,7 @@ retry:
             char tbuf[BUFSZ];
 
             Strcpy(tbuf, "worthless piece of ");
-            Strcat(tbuf, g); /* assume it starts with the color */
+            Strcat(tbuf, s); /* assume it starts with the color */
             Strcpy(bp, tbuf);
         }
     }

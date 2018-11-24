@@ -160,7 +160,6 @@ makedog()
     register struct obj *otmp;
     const char *petname;
     int pettype;
-    static int petname_used = 0;
 
     if (preferred_pet == 'n')
         return ((struct monst *) 0);
@@ -198,7 +197,7 @@ makedog()
         put_saddle_on_mon(otmp, mtmp);
     }
 
-    if (!petname_used++ && *petname)
+    if (!g.petname_used++ && *petname)
         mtmp = christen_monst(mtmp, petname);
 
     initedog(mtmp);

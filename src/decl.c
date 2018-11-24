@@ -285,7 +285,7 @@ char *fqn_prefix_names[PREFIX_COUNT] = {
 };
 #endif
 
-NEARDATA struct savefile_info sfcap = {
+const struct savefile_info default_sfinfo = {
 #ifdef NHSTDC
     0x00000000UL
 #else
@@ -308,28 +308,7 @@ NEARDATA struct savefile_info sfcap = {
 #endif
 };
 
-NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
-#ifdef NHSTDC
-    0x00000000UL
-#else
-    0x00000000L
-#endif
-#if defined(COMPRESS) || defined(ZLIB_COMP)
-        | SFI1_EXTERNALCOMP
-#endif
-#if defined(ZEROCOMP)
-        | SFI1_ZEROCOMP
-#endif
-#if defined(RLECOMP)
-        | SFI1_RLECOMP
-#endif
-    ,
-#ifdef NHSTDC
-    0x00000000UL, 0x00000000UL
-#else
-    0x00000000L, 0x00000000L
-#endif
-};
+NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 
@@ -340,11 +319,111 @@ const char *ARGV0;
 /* support for lint.h */
 unsigned nhUse_dummy = 0;
 
-/* dummy routine used to force linkage */
-void
-decl_init()
+#define IVMAGIC 0xdeadbeef
+
+const struct instance_globals g_init = {
+    /* apply.c */
+    0,  /* jumping_is_magic */
+    -1, /* polearm_range_min */
+    -1, /* polearm_range_max  */
+
+    /* artifact.c */
+    0,  /* spec_dbon_applies */
+
+    /* botl.c */
+    0,  /* mrank_sz */
+
+    /* dog.c */
+    0,  /* petname_used */
+
+    /* mused.c */
+    FALSE, /* m_using */
+
+    /* objname.c */
+    0, /* distantname */
+
+    /* pickup.c */
+    0,  /* oldcap */
+    UNDEFINED_PTR, /* current_container */
+    UNDEFINED_VALUE, /* abort_looting */
+
+    /* pline.c */
+    0, /* pline_flags */
+    UNDEFINED_VALUES, /* prevmsg */
+#ifdef DUMPLOG
+    0, /* saved_pline_index */
+    UNDEFINED_VALUES,
+#endif
+
+    /* polyself.c */
+    0, /* sex_change_ok */
+
+    /* potion.c */
+    FALSE, /* notonhead */
+    UNDEFINED_VALUE, /* potion_nothing */
+    UNDEFINED_VALUE, /* potion_unkn */
+
+    /* read.c */
+    UNDEFINED_VALUE, /* known */
+
+    /* restore.c */
+    0, /* n_ids_mapped */
+    0, /* id_map */
+    FALSE, /* restoring */
+    UNDEFINED_PTR, /* oldfruit */
+    UNDEFINED_VALUE, /* omoves */
+
+    /* rumors.c */
+    0, /* true_rumor_size */
+    0, /* false_rumor_size */
+    UNDEFINED_VALUE, /* true_rumor_start*/
+    UNDEFINED_VALUE, /* false_rumor_start*/
+    UNDEFINED_VALUE, /* true_rumor_end */
+    UNDEFINED_VALUE, /* false_rumor_end */
+    0, /* oracle_flag */
+    0, /* oracle_cnt */
+    NULL, /* oracle_loc */
+
+    /* save.c */
+    TRUE, /* havestate*/
+    0, /* ustuck_id */
+    0, /* usteed_id */
+
+    /* trap.c */
+    0, /* force_mintrap */
+
+    /* u_init.c */
+    STRANGE_OBJECT, /* nocreate */
+    STRANGE_OBJECT, /* nocreate2 */
+    STRANGE_OBJECT, /* nocreate3 */
+    STRANGE_OBJECT, /* nocreate4 */
+
+    /* uhitm.c */
+    UNDEFINED_VALUE, /* override_confirmation */
+
+    /* weapon.c */
+    UNDEFINED_PTR, /* propellor */
+
+    /* zap.c */
+    UNDEFINED_VALUE, /* poly_zap */
+    UNDEFINED_VALUE,  /* obj_zapped */
+
+    IVMAGIC  /* used to validate that structure layout has been preserved */
+};
+
+struct instance_globals g;
+
+void 
+decl_globals_init() 
 {
-    return;
+    g = g_init;
+
+    nhassert(g_init.magic == IVMAGIC);
+    nhassert(g_init.havestate == TRUE);
+
+    sfcap = default_sfinfo;
+    sfrestinfo = default_sfinfo;
+    sfsaveinfo = default_sfinfo;
 }
 
 /*decl.c*/

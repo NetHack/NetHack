@@ -681,14 +681,12 @@ dump_plines()
 {
     int i, j;
     char buf[BUFSZ], **strp;
-    extern char *saved_plines[];
-    extern unsigned saved_pline_index;
 
     Strcpy(buf, " "); /* one space for indentation */
     putstr(0, 0, "Latest messages:");
-    for (i = 0, j = (int) saved_pline_index; i < DUMPLOG_MSG_COUNT;
+    for (i = 0, j = (int) g.saved_pline_index; i < DUMPLOG_MSG_COUNT;
          ++i, j = (j + 1) % DUMPLOG_MSG_COUNT) {
-        strp = &saved_plines[j];
+        strp = &g.saved_plines[j];
         if (*strp) {
             copynchars(&buf[1], *strp, BUFSZ - 1 - 1);
             putstr(0, 0, buf);

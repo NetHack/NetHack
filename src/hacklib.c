@@ -1008,33 +1008,33 @@ char *buf;
     int k;
     time_t timeresult = (time_t) 0;
     struct tm t, *lt;
-    char *g, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
+    char *d, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
 
     if (buf && strlen(buf) == 14) {
-        g = buf;
+        d = buf;
         p = y; /* year */
         for (k = 0; k < 4; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mo; /* month */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = md; /* day */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = h; /* hour */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = mi; /* minutes */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         p = s; /* seconds */
         for (k = 0; k < 2; ++k)
-            *p++ = *g++;
+            *p++ = *d++;
         *p = '\0';
         lt = getlt();
         if (lt) {

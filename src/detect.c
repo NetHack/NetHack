@@ -11,8 +11,6 @@
 #include "hack.h"
 #include "artifact.h"
 
-extern boolean known; /* from read.c */
-
 STATIC_DCL boolean NDECL(unconstrain_map);
 STATIC_DCL void NDECL(reconstrain_map);
 STATIC_DCL void FDECL(browse_map, (int, const char *));
@@ -307,7 +305,7 @@ register struct obj *sobj;
     boolean stale, ugold = FALSE, steedgold = FALSE;
     int ter_typ = TER_DETECT | TER_OBJ;
 
-    known = stale = clear_stale_map(COIN_CLASS,
+    g.known = stale = clear_stale_map(COIN_CLASS,
                                     (unsigned) (sobj->blessed ? GOLD : 0));
 
     /* look for gold carried by monsters (might be in a container) */
@@ -318,7 +316,7 @@ register struct obj *sobj;
             if (mtmp == u.usteed) {
                 steedgold = TRUE;
             } else {
-                known = TRUE;
+                g.known = TRUE;
                 goto outgoldmap; /* skip further searching */
             }
         } else {
@@ -328,7 +326,7 @@ register struct obj *sobj;
                     if (mtmp == u.usteed) {
                         steedgold = TRUE;
                     } else {
-                        known = TRUE;
+                        g.known = TRUE;
                         goto outgoldmap; /* skip further searching */
                     }
                 }
@@ -338,17 +336,17 @@ register struct obj *sobj;
     /* look for gold objects */
     for (obj = fobj; obj; obj = obj->nobj) {
         if (sobj->blessed && o_material(obj, GOLD)) {
-            known = TRUE;
+            g.known = TRUE;
             if (obj->ox != u.ux || obj->oy != u.uy)
                 goto outgoldmap;
         } else if (o_in(obj, COIN_CLASS)) {
-            known = TRUE;
+            g.known = TRUE;
             if (obj->ox != u.ux || obj->oy != u.uy)
                 goto outgoldmap;
         }
     }
 
-    if (!known) {
+    if (!g.known) {
         /* no gold found on floor or monster's inventory.
            adjust message if you have gold in your inventory */
         if (sobj) {
@@ -484,7 +482,7 @@ register struct obj *sobj;
     }
 
     if (!ct && !ctu) {
-        known = stale && !confused;
+        g.known = stale && !confused;
         if (stale) {
             docrt();
             You("sense a lack of %s nearby.", what);
@@ -512,7 +510,7 @@ register struct obj *sobj;
         }
         return !stale;
     } else if (!ct) {
-        known = TRUE;
+        g.known = TRUE;
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
@@ -523,7 +521,7 @@ register struct obj *sobj;
         struct obj *temp;
         int ter_typ = TER_DETECT | TER_OBJ;
 
-        known = TRUE;
+        g.known = TRUE;
         cls();
         (void) unconstrain_map();
         for (obj = fobj; obj; obj = obj->nobj)
