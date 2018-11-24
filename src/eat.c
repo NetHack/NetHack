@@ -101,7 +101,7 @@ register struct obj *obj;
                          || (obj->otyp == EGG));
 
     if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj)
-        /* [g-cubes can eat containers and retain all contents
+        /* [g.cubes can eat containers and retain all contents
             as engulfed items, but poly'd player can't do that] */
         && !Has_contents(obj))
         return TRUE;

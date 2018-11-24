@@ -1360,13 +1360,13 @@ struct obj *obj;
     if (obj->otyp == SCR_MAIL)
         return;
 #endif
-    g.obj_zapped = TRUE;
+    iv.obj_zapped = TRUE;
 
-    if (g.poly_zapped < 0) {
+    if (iv.poly_zapped < 0) {
         /* some may metamorphosize */
         for (i = obj->quan; i; i--)
             if (!rn2(Luck + 45)) {
-                g.poly_zapped = objects[obj->otyp].oc_material;
+                iv.poly_zapped = objects[obj->otyp].oc_material;
                 break;
             }
     }
@@ -2065,7 +2065,7 @@ schar zz;
             learnwand(obj);
     }
 
-    g.poly_zapped = -1;
+    iv.poly_zapped = -1;
     for (otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
         /* for zap downwards, don't hit object poly'd hero is hiding under */
@@ -2075,8 +2075,8 @@ schar zz;
 
         hitanything += (*fhito)(otmp, obj);
     }
-    if (g.poly_zapped >= 0)
-        create_polymon(level.objects[tx][ty], g.poly_zapped);
+    if (iv.poly_zapped >= 0)
+        create_polymon(level.objects[tx][ty], iv.poly_zapped);
 
     return hitanything;
 }
@@ -2950,16 +2950,16 @@ struct obj *obj; /* wand or spell */
 void
 zapsetup()
 {
-    g.obj_zapped = FALSE;
+    iv.obj_zapped = FALSE;
 }
 
 void
 zapwrapup()
 {
     /* if do_osshock() set obj_zapped while polying, give a message now */
-    if (g.obj_zapped)
+    if (iv.obj_zapped)
         You_feel("shuddering vibrations.");
-    g.obj_zapped = FALSE;
+    iv.obj_zapped = FALSE;
 }
 
 /* called for various wand and spell effects - M. Stephenson */
@@ -5035,7 +5035,7 @@ int damage, tell;
     if (damage) {
         mtmp->mhp -= damage;
         if (DEADMONSTER(mtmp)) {
-            if (g.m_using)
+            if (iv.m_using)
                 monkilled(mtmp, "", AD_RBRE);
             else
                 killed(mtmp);

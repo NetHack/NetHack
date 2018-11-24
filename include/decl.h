@@ -438,13 +438,13 @@ struct early_opt {
     boolean valallowed;
 };
 
-/* instance_globals holds engine state that does not need to be
+/* instance_variables holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
  * 
- * unlike instance_flags, values in the structure can be of any type. */
+ * unlike instance_flags, variables can be of any type. */
 
-struct instance_globals {
+struct instance_variables {
     /* apply.c */
     int jumping_is_magic; /* current jump result of magic */
     int polearm_range_min;
@@ -485,9 +485,9 @@ struct instance_globals {
     unsigned long magic; /* validate that structure layout is preserved */
 };
 
-E struct instance_globals g;
+E struct instance_variables iv;
 
-E void instance_globals_init();
+E void instance_variable_init();
 
 
 #undef E

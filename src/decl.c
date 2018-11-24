@@ -329,7 +329,7 @@ decl_init()
 #define UNDEFINED_PTR NULL      /* move to hack.h if we are keeping */
 #define IVMAGIC 0xdeadbeef
 
-const struct instance_globals g_init = {
+const struct instance_variables iv_init = {
     /* apply.c */
     0,  /* jumping_is_magic */
     -1, /* polearm_range_min */
@@ -366,15 +366,15 @@ const struct instance_globals g_init = {
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };
 
-struct instance_globals g;
+struct instance_variables iv;
 
 void 
-instance_globals_init() 
+instance_variable_init() 
 {
-    g = g_init;
+    iv = iv_init;
 
-    nhassert(g_init.magic == IVMAGIC);
-    nhassert(g_init.havestate == TRUE);
+    nhassert(iv_init.magic == IVMAGIC);
+    nhassert(iv.havestate == TRUE);
 
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;

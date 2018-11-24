@@ -97,7 +97,7 @@ char *argv[];
 
     nethack_enter(argc, argv);
 
-    instance_globals_init();
+    instance_variable_init();
     sys_early_init();
 
 #if defined(WIN32) && defined(TTY_GRAPHICS)

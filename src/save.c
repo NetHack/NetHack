@@ -210,8 +210,8 @@ dosave0()
     store_version(fd);
     store_savefileinfo(fd);
     store_plname_in_file(fd);
-    g.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-    g.usteed_id = (u.usteed ? u.usteed->m_id : 0);
+    iv.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
+    iv.usteed_id = (u.usteed ? u.usteed->m_id : 0);
     savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
     savegamestate(fd, WRITE_SAVE | FREE_SAVE);
 
@@ -333,10 +333,10 @@ register int fd, mode;
            sizeof(struct spell) * (MAXSPELL + 1));
     save_artifacts(fd);
     save_oracles(fd, mode);
-    if (g.ustuck_id)
-        bwrite(fd, (genericptr_t) &g.ustuck_id, sizeof g.ustuck_id);
-    if (g.usteed_id)
-        bwrite(fd, (genericptr_t) &g.usteed_id, sizeof g.usteed_id);
+    if (iv.ustuck_id)
+        bwrite(fd, (genericptr_t) &iv.ustuck_id, sizeof iv.ustuck_id);
+    if (iv.usteed_id)
+        bwrite(fd, (genericptr_t) &iv.usteed_id, sizeof iv.usteed_id);
     bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
     bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
     savefruitchn(fd, mode);
@@ -379,7 +379,7 @@ savestateinlock()
      * noop pid rewriting will take place on the first "checkpoint" after
      * the game is started or restored, if checkpointing is off.
      */
-    if (flags.ins_chkpt || g.havestate) {
+    if (flags.ins_chkpt || iv.havestate) {
         /* save the rest of the current game state in the lock file,
          * following the original int pid, the current level number,
          * and the current savefile name, which should not be subject
@@ -417,13 +417,13 @@ savestateinlock()
             store_savefileinfo(fd);
             store_plname_in_file(fd);
 
-            g.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-            g.usteed_id = (u.usteed ? u.usteed->m_id : 0);
+            iv.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
+            iv.usteed_id = (u.usteed ? u.usteed->m_id : 0);
             savegamestate(fd, WRITE_SAVE);
         }
         bclose(fd);
     }
-    g.havestate = flags.ins_chkpt;
+    iv.havestate = flags.ins_chkpt;
 }
 #endif
 
