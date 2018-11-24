@@ -332,29 +332,16 @@ const struct instance_globals g_init = {
     0,  /* jumping_is_magic */
     -1, /* polearm_range_min */
     -1, /* polearm_range_max  */
-
     /* artifact.c */
     0,  /* spec_dbon_applies */
-
     /* botl.c */
     0,  /* mrank_sz */
-
     /* dog.c */
     0,  /* petname_used */
-
     /* mused.c */
     FALSE, /* m_using */
-
     /* pickup.c */
     0,  /* oldcap */
-
-    /* restore.c */
-    0, /* n_ids_mapped */
-    0, /* id_map */
-    FALSE, /* restoring */
-    UNDEFINED_PTR, /* oldfruit */
-    UNDEFINED_VALUE, /* omoves */
-
     /* rumors.c */
     0, /* true_rumor_size */
     0, /* false_rumor_size */
@@ -365,27 +352,21 @@ const struct instance_globals g_init = {
     0, /* oracle_flag */
     0, /* oracle_cnt */
     NULL, /* oracle_loc */
-
     /* save.c */
     TRUE, /* havestate*/
     0, /* ustuck_id */
     0, /* usteed_id */
-
     /* trap.c */
     0, /* force_mintrap */
-
     /* u_init.c */
     STRANGE_OBJECT, /* nocreate */
     STRANGE_OBJECT, /* nocreate2 */
     STRANGE_OBJECT, /* nocreate3 */
     STRANGE_OBJECT, /* nocreate4 */
-
     /* uhitm.c */
     UNDEFINED_VALUE, /* override_confirmation */
-
     /* weapon.c */
     UNDEFINED_PTR, /* propellor */
-
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */
     UNDEFINED_VALUE,  /* obj_zapped */
