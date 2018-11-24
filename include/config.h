@@ -522,6 +522,10 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
+/* EXTRA_SANITY_CHECKS adds extra impossible calls,
+ * probably not useful for normal play */
+/* #define EXTRA_SANITY_CHECKS */
+
 /* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
    so some prompts will remember the previously input text
    (within the same session) */
