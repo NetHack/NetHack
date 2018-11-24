@@ -585,10 +585,10 @@ gd_mv_monaway(grd, nx,ny)
 register struct monst *grd;
 int nx,ny;
 {
-    if (MON_AT(nx, ny) && nx != grd->mx && ny != grd->my) {
+    if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
         if (!Deaf)
             verbalize("Out of my way, scum!");
-        if (!rloc(m_at(nx, ny), FALSE) || m_at(nx, ny))
+        if (!rloc(m_at(nx, ny), FALSE) || MON_AT(nx, ny))
             m_into_limbo(m_at(nx, ny));
     }
 }
