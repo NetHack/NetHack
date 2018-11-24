@@ -27,7 +27,6 @@
 #define C(color)
 #endif
 
-void NDECL(monst_init);
 /*
  *      Entry Format:   (from permonst.h)
  *
@@ -101,7 +100,7 @@ void NDECL(monst_init);
  */
 
 #ifndef SPLITMON_2
-NEARDATA struct permonst mons[] = {
+NEARDATA struct permonst mons_init[] = {
     /*
      * ants
      */
@@ -3228,10 +3227,13 @@ struct permonst _mons2[] = {
 #endif /* !SPLITMON_1 */
 
 #ifndef SPLITMON_1
-/* dummy routine used to force linkage */
+
+struct permonst mons[SIZE(mons_init)];
+
 void
-monst_init()
+monst_globals_init()
 {
+    memcpy(mons, mons_init, sizeof(mons));
     return;
 }
 

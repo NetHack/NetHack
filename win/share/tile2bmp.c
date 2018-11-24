@@ -204,6 +204,7 @@ char *argv[];
 #endif
 
     objects_globals_init();
+    monst_globals_init();
 
     tilecount = 0;
     xoffset = yoffset = 0;

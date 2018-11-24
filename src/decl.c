@@ -338,6 +338,9 @@ const struct instance_globals g_init = {
 
     /* mused.c */
     FALSE, /* m_using */
+    UNDEFINED_VALUE, /* trapx */
+    UNDEFINED_VALUE, /* trapy */
+    UNDEFINED_VALUE, /* zap_oseen */
 
     /* objname.c */
     0, /* distantname */
@@ -362,6 +365,11 @@ const struct instance_globals g_init = {
     FALSE, /* notonhead */
     UNDEFINED_VALUE, /* potion_nothing */
     UNDEFINED_VALUE, /* potion_unkn */
+
+    /* pray.c */
+    UNDEFINED_VALUE, /* p_aligntyp */
+    UNDEFINED_VALUE, /* p_trouble */
+    UNDEFINED_VALUE, /* p_type */
 
     /* read.c */
     UNDEFINED_VALUE, /* known */

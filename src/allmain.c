@@ -30,11 +30,6 @@ boolean resuming;
     int moveamt = 0, wtcap = 0, change = 0;
     boolean monscanmove = FALSE;
 
-    /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
-    monst_init();
-
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
        to use up the save file and require confirmation for explore mode */

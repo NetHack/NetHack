@@ -44,13 +44,6 @@ static struct musable {
      * If it's an object, the object is also set (it's 0 otherwise).
      */
 } m;
-static int trapx, trapy;
-static boolean zap_oseen; /* for wands which use mbhitm and are zapped at
-                           * players.  We usually want an oseen local to
-                           * the function, but this is impossible since the
-                           * function mbhitm has to be compatible with the
-                           * normal zap routines, and those routines don't
-                           * remember who zapped the wand. */
 
 /* Any preliminary checks which may result in the monster being unable to use
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do
@@ -439,13 +432,13 @@ struct monst *mtmp;
                 && !is_floater(mtmp->data)
                 && !mtmp->isshk && !mtmp->isgd && !mtmp->ispriest
                 && Can_fall_thru(&u.uz)) {
-                trapx = xx;
-                trapy = yy;
+                g.trapx = xx;
+                g.trapy = yy;
                 m.has_defense = MUSE_TRAPDOOR;
                 break; /* no need to look at any other spots */
             } else if (t->ttyp == TELEP_TRAP) {
-                trapx = xx;
-                trapy = yy;
+                g.trapx = xx;
+                g.trapy = yy;
                 m.has_defense = MUSE_TELEPORT_TRAP;
             }
         }
@@ -665,7 +658,7 @@ struct monst *mtmp;
         (void) rloc(mtmp, TRUE);
         return 2;
     case MUSE_WAN_TELEPORTATION:
-        zap_oseen = oseen;
+        g.zap_oseen = oseen;
         mzapmsg(mtmp, otmp, FALSE);
         otmp->spe--;
         g.m_using = TRUE;
@@ -813,26 +806,26 @@ struct monst *mtmp;
             return 0;
         m_flee(mtmp);
         if (vis) {
-            struct trap *t = t_at(trapx, trapy);
+            struct trap *t = t_at(g.trapx, g.trapy);
 
             Mnam = Monnam(mtmp);
             pline("%s %s into a %s!", Mnam,
                   vtense(Mnam, locomotion(mtmp->data, "jump")),
                   (t->ttyp == TRAPDOOR) ? "trap door" : "hole");
-            if (levl[trapx][trapy].typ == SCORR) {
-                levl[trapx][trapy].typ = CORR;
-                unblock_point(trapx, trapy);
+            if (levl[g.trapx][g.trapy].typ == SCORR) {
+                levl[g.trapx][g.trapy].typ = CORR;
+                unblock_point(g.trapx, g.trapy);
             }
-            seetrap(t_at(trapx, trapy));
+            seetrap(t_at(g.trapx, g.trapy));
         }
 
         /*  don't use rloc_to() because worm tails must "move" */
         remove_monster(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my); /* update old location */
-        place_monster(mtmp, trapx, trapy);
+        place_monster(mtmp, g.trapx, g.trapy);
         if (mtmp->wormno)
             worm_move(mtmp);
-        newsym(trapx, trapy);
+        newsym(g.trapx, g.trapy);
 
         migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM,
                          (coord *) 0);
@@ -915,15 +908,15 @@ struct monst *mtmp;
             Mnam = Monnam(mtmp);
             pline("%s %s onto a teleport trap!", Mnam,
                   vtense(Mnam, locomotion(mtmp->data, "jump")));
-            seetrap(t_at(trapx, trapy));
+            seetrap(t_at(g.trapx, g.trapy));
         }
         /*  don't use rloc_to() because worm tails must "move" */
         remove_monster(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my); /* update old location */
-        place_monster(mtmp, trapx, trapy);
+        place_monster(mtmp, g.trapx, g.trapy);
         if (mtmp->wormno)
             worm_move(mtmp);
-        newsym(trapx, trapy);
+        newsym(g.trapx, g.trapy);
 
         goto mon_tele;
     case MUSE_POT_HEALING:
@@ -1217,7 +1210,7 @@ register struct obj *otmp;
     case WAN_STRIKING:
         reveal_invis = TRUE;
         if (mtmp == &youmonst) {
-            if (zap_oseen)
+            if (g.zap_oseen)
                 makeknown(WAN_STRIKING);
             if (Antimagic) {
                 shieldeff(u.ux, u.uy);
@@ -1239,18 +1232,18 @@ register struct obj *otmp;
             tmp = d(2, 12);
             hit("wand", mtmp, exclam(tmp));
             (void) resist(mtmp, otmp->oclass, tmp, TELL);
-            if (cansee(mtmp->mx, mtmp->my) && zap_oseen)
+            if (cansee(mtmp->mx, mtmp->my) && g.zap_oseen)
                 makeknown(WAN_STRIKING);
         } else {
             miss("wand", mtmp);
-            if (cansee(mtmp->mx, mtmp->my) && zap_oseen)
+            if (cansee(mtmp->mx, mtmp->my) && g.zap_oseen)
                 makeknown(WAN_STRIKING);
         }
         break;
 #if 0   /* disabled because find_offensive() never picks WAN_TELEPORTATION */
     case WAN_TELEPORTATION:
         if (mtmp == &youmonst) {
-            if (zap_oseen)
+            if (g.zap_oseen)
                 makeknown(WAN_TELEPORTATION);
             tele();
         } else {
@@ -1349,7 +1342,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             case WAN_LOCKING:
             case WAN_STRIKING:
                 if (doorlock(obj, bhitpos.x, bhitpos.y)) {
-                    if (zap_oseen)
+                    if (g.zap_oseen)
                         makeknown(obj->otyp);
                     /* if a shop door gets broken, add it to
                        the shk's fix list (no cost to player) */
@@ -1419,7 +1412,7 @@ struct monst *mtmp;
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     case MUSE_WAN_TELEPORTATION:
     case MUSE_WAN_STRIKING:
-        zap_oseen = oseen;
+        g.zap_oseen = oseen;
         mzapmsg(mtmp, otmp, FALSE);
         otmp->spe--;
         g.m_using = TRUE;
@@ -1647,8 +1640,8 @@ struct monst *mtmp;
                         && !onscary(xx, yy, mtmp)) {
                         /* use trap if it's the correct type */
                         if (t->ttyp == POLY_TRAP) {
-                            trapx = xx;
-                            trapy = yy;
+                            g.trapx = xx;
+                            g.trapy = yy;
                             m.has_misc = MUSE_POLY_TRAP;
                             return TRUE;
                         }
@@ -1876,15 +1869,15 @@ struct monst *mtmp;
                   vtense(Mnam, locomotion(mtmp->data, "jump")));
         }
         if (vis)
-            seetrap(t_at(trapx, trapy));
+            seetrap(t_at(g.trapx, g.trapy));
 
         /*  don't use rloc() due to worms */
         remove_monster(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my);
-        place_monster(mtmp, trapx, trapy);
+        place_monster(mtmp, g.trapx, g.trapy);
         if (mtmp->wormno)
             worm_move(mtmp);
-        newsym(trapx, trapy);
+        newsym(g.trapx, g.trapy);
 
         (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
         return 2;
