@@ -974,6 +974,11 @@ register struct trobj *trop;
     struct obj *obj;
     int otyp, i;
 
+	NEARDATA short nocreate = STRANGE_OBJECT;
+	NEARDATA short nocreate2 = STRANGE_OBJECT;
+	NEARDATA short nocreate3 = STRANGE_OBJECT;
+	NEARDATA short nocreate4 = STRANGE_OBJECT;
+
 	while (trop->trclass) {
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
@@ -991,9 +996,9 @@ register struct trobj *trop;
              */
             obj = mkobj(trop->trclass, FALSE);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == icontext.nocreate
-                   || otyp == icontext.nocreate2 || otyp == icontext.nocreate3
-                   || otyp == icontext.nocreate4 || otyp == RIN_LEVITATION
+            while (otyp == WAN_WISHING || otyp == nocreate
+                   || otyp == nocreate2 || otyp == nocreate3
+                   || otyp == nocreate4 || otyp == RIN_LEVITATION
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID
@@ -1035,16 +1040,16 @@ register struct trobj *trop;
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                icontext.nocreate = RIN_POLYMORPH_CONTROL;
+                nocreate = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                icontext.nocreate = RIN_POLYMORPH;
-                icontext.nocreate2 = SPE_POLYMORPH;
-                icontext.nocreate3 = POT_POLYMORPH;
+                nocreate = RIN_POLYMORPH;
+                nocreate2 = SPE_POLYMORPH;
+                nocreate3 = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                icontext.nocreate4 = otyp;
+                nocreate4 = otyp;
         }
 
         if (urace.malenum != PM_HUMAN) {
