@@ -192,8 +192,6 @@ E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;
-E int petname_used;
-
 E const char *occtxt; /* defined when occupation != NULL */
 E const char *nomovemsg;
 E char lock[];
@@ -441,7 +439,6 @@ struct early_opt {
 
 /* encumbrance */
 E int oldcap;
-
 
 #undef E
 

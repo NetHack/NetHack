@@ -160,6 +160,7 @@ makedog()
     register struct obj *otmp;
     const char *petname;
     int pettype;
+    static int petname_used = 0;
 
     if (preferred_pet == 'n')
         return ((struct monst *) 0);
