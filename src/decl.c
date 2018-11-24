@@ -348,9 +348,6 @@ const struct instance_globals g_init = {
     /* pickup.c */
     0,  /* oldcap */
 
-    /* read.c */
-    UNDEFINED_VALUE, /* known */
-
     /* restore.c */
     0, /* n_ids_mapped */
     0, /* id_map */

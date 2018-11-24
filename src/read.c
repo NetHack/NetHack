@@ -12,6 +12,8 @@
     ((mndx) == urace.malenum \
      || (urace.femalenum != NON_PM && (mndx) == urace.femalenum))
 
+boolean known;
+
 static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
                                           SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
@@ -187,7 +189,7 @@ doread()
     register struct obj *scroll;
     boolean confused, nodisappear;
 
-    g.known = FALSE;
+    known = FALSE;
     if (check_capacity((char *) 0))
         return 0;
     scroll = getobj(readable, "read");
@@ -394,7 +396,7 @@ doread()
     }
     if (!seffects(scroll)) {
         if (!objects[scroll->otyp].oc_name_known) {
-            if (g.known)
+            if (known)
                 learnscroll(scroll);
             else if (!objects[scroll->otyp].oc_uname)
                 docall(scroll);
@@ -799,7 +801,7 @@ int howmuch;
     if (Sokoban)
         return;
 
-    g.known = TRUE;
+    known = TRUE;
     for (zx = 0; zx < COLNO; zx++)
         for (zy = 0; zy < ROWNO; zy++)
             if (howmuch & ALL_MAP || rn2(7)) {
@@ -1011,7 +1013,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     switch (otyp) {
 #ifdef MAIL
     case SCR_MAIL:
-        g.known = TRUE;
+        known = TRUE;
         if (sobj->spe == 2)
             /* "stamped scroll" created via magic marker--without a stamp */
             pline("This scroll is marked \"postage due\".");
@@ -1140,7 +1142,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (s) {
             otmp->spe += s;
             adj_abon(otmp, s);
-            g.known = otmp->known;
+            known = otmp->known;
             /* update shop bill to reflect new higher price */
             if (s > 0 && otmp->unpaid)
                 alter_cost(otmp, 0L);
@@ -1182,7 +1184,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 exercise(A_CON, FALSE);
                 break;
             } else
-                g.known = TRUE;
+                known = TRUE;
         } else { /* armor and scroll both cursed */
             pline("%s.", Yobjnam2(otmp, "vibrate"));
             if (otmp->spe >= -6) {
@@ -1262,7 +1264,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             You("don't remember there being any magic words on this scroll.");
         else
             pline("This scroll seems to be blank.");
-        g.known = TRUE;
+        known = TRUE;
         break;
     case SCR_REMOVE_CURSE:
     case SPE_REMOVE_CURSE: {
@@ -1348,7 +1350,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                             confused ? &mons[PM_ACID_BLOB]
                                      : (struct permonst *) 0,
                             FALSE))
-            g.known = TRUE;
+            known = TRUE;
         /* no need to flush monsters; we ask for identification only if the
          * monsters are not visible
          */
@@ -1428,14 +1430,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                       vis_results ? "is" : "seems",
                       (results < 0) ? "un" : "");
             if (vis_results > 0)
-                g.known = TRUE;
+                known = TRUE;
         }
         break;
     }
     case SCR_GENOCIDE:
         if (!already_known)
             You("have found a scroll of genocide!");
-        g.known = TRUE;
+        known = TRUE;
         if (sblessed)
             do_class_genocide();
         else
@@ -1444,11 +1446,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_LIGHT:
         if (!confused || rn2(5)) {
             if (!Blind)
-                g.known = TRUE;
+                known = TRUE;
             litroom(!confused && !scursed, sobj);
             if (!confused && !scursed) {
                 if (lightdamage(sobj, TRUE, 5))
-                    g.known = TRUE;
+                    known = TRUE;
             }
         } else {
             /* could be scroll of create monster, don't set known ...*/
@@ -1461,7 +1463,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (confused || scursed) {
             level_tele();
         } else {
-            g.known = scrolltele(sobj);
+            known = scrolltele(sobj);
         }
         break;
     case SCR_GOLD_DETECTION:
@@ -1554,7 +1556,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                         cvt_sdoor_to_door(&levl[x][y]);
             /* do_mapping() already reveals secret passages */
         }
-        g.known = TRUE;
+        known = TRUE;
         /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
@@ -1574,7 +1576,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         break;
     case SCR_AMNESIA:
-        g.known = TRUE;
+        known = TRUE;
         forget((!sblessed ? ALL_SPELLS : 0)
                | (!confused || scursed ? ALL_MAP : 0));
         if (Hallucination) /* Ommmmmm! */
@@ -1655,7 +1657,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             else
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
                           sblessed ? "around" : "above");
-            g.known = 1;
+            known = 1;
             sokoban_guilt();
 
             /* Loop through the surrounding squares */
@@ -1680,7 +1682,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         break;
     case SCR_PUNISHMENT:
-        g.known = TRUE;
+        known = TRUE;
         if (confused || sblessed) {
             You_feel("guilty.");
             break;
@@ -1692,7 +1694,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
         if (!already_known)
             You("have found a scroll of stinking cloud!");
-        g.known = TRUE;
+        known = TRUE;
         pline("Where do you want to center the %scloud?",
               already_known ? "stinking " : "");
         cc.x = u.ux;

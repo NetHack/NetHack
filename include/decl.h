@@ -464,9 +464,6 @@ struct instance_globals {
     /* pickup.c */
     int oldcap; /* last encumberance */
 
-    /* read.c */
-    boolean known;
-
     /* restore.c */
     int n_ids_mapped;
     struct bucket *id_map;
