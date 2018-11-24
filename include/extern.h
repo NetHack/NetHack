@@ -1432,6 +1432,7 @@ E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
 E void FDECL(decide_to_shapeshift, (struct monst *, int));
 E boolean FDECL(vamp_stone, (struct monst *));
+E void NDECL(monst_globals_init);
 
 /* ### mondata.c ### */
 
@@ -1503,8 +1504,6 @@ E boolean FDECL(should_displace,
 E boolean FDECL(undesirable_disp, (struct monst *, XCHAR_P, XCHAR_P));
 
 /* ### monst.c ### */
-
-E void NDECL(monst_init);
 
 /* ### monstr.c ### */
 

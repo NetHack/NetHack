@@ -109,10 +109,6 @@ int set, entry;
     int i, j, condnum, tilenum;
     static char buf[BUFSZ];
 
-    /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
-    monst_init();
     (void) def_char_to_objclass(']');
 
     condnum = tilenum = 0;

@@ -175,10 +175,9 @@ void NDECL(do_vision);
 void NDECL(do_fix_sampleconfig);
 #endif
 
-extern void NDECL(monst_init);   /* monst.c */
+extern void NDECL(monst_globals_init);   /* monst.c */
 extern void NDECL(objects_globals_init); /* objects.c */
 
-static void NDECL(link_sanity_check);
 static char *FDECL(name_file, (const char *, const char *));
 static void FDECL(delete_file, (const char *template, const char *));
 static FILE *FDECL(getfp, (const char *, const char *, const char *));
@@ -301,16 +300,6 @@ char *argv[];
 
 #endif
 
-static void
-link_sanity_check()
-{
-    /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
-    monst_init();
-
-}
-
 void
 do_makedefs(options)
 char *options;
@@ -318,8 +307,7 @@ char *options;
     boolean more_than_one;
 
     objects_globals_init();
-
-    link_sanity_check();
+    monst_globals_init();
 
     /* construct the current version number */
     make_version();
@@ -468,8 +456,6 @@ static void
 do_ext_makedefs(int argc, char **argv)
 {
     int todo = 0;
-
-    link_sanity_check();
 
     argc--;
     argv++; /* skip program name */
