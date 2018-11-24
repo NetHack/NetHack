@@ -460,11 +460,6 @@ struct instance_variables {
     boolean m_using; /* kludge to use mondided instead of killed */
     /* pickup.c */
     int oldcap; /* last encumberance */
-    /* save.c */
-    boolean havestate;
-    unsigned ustuck_id; /* need to preserve during save */
-    unsigned usteed_id; /* need to preserve during save */
-
     /* trap.c */
     int force_mintrap; /* mintrap() should take a flags argument, but for time
                           being we use this */
