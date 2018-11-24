@@ -40,6 +40,9 @@ STATIC_DCL int FDECL(count_surround_traps, (int, int));
    of hit points that will fit in a 15 bit integer. */
 #define FATAL_DAMAGE_MODIFIER 200
 
+/* coordinate effects from spec_dbon() with messages in artifact_hit() */
+STATIC_OVL int spec_dbon_applies = 0;
+
 /* flags including which artifacts have already been created */
 static boolean artiexist[1 + NROFARTIFACTS + 1];
 /* and a discovery list for them (no dummy first entry here) */
@@ -844,15 +847,15 @@ int tmp;
 
     if (!weap || (weap->attk.adtyp == AD_PHYS /* check for `NO_ATTK' */
                   && weap->attk.damn == 0 && weap->attk.damd == 0))
-        icontext.spec_dbon_applies = FALSE;
+        spec_dbon_applies = FALSE;
     else if (otmp->oartifact == ART_GRIMTOOTH)
         /* Grimtooth has SPFX settings to warn against elves but we want its
            damage bonus to apply to all targets, so bypass spec_applies() */
-        icontext.spec_dbon_applies = TRUE;
+        spec_dbon_applies = TRUE;
     else
-        icontext.spec_dbon_applies = spec_applies(weap, mon);
+        spec_dbon_applies = spec_applies(weap, mon);
 
-    if (icontext.spec_dbon_applies)
+    if (spec_dbon_applies)
         return weap->attk.damd ? rnd((int) weap->attk.damd) : max(tmp, 1);
     return 0;
 }
@@ -976,14 +979,14 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
         scare_dieroll /= (1 << (mb->spe / 3));
     /* if target successfully resisted the artifact damage bonus,
        reduce overall likelihood of the assorted special effects */
-    if (!icontext.spec_dbon_applies)
+    if (!spec_dbon_applies)
         dieroll += 1;
 
     /* might stun even when attempting a more severe effect, but
        in that case it will only happen if the other effect fails;
        extra damage will apply regardless; 3.4.1: sometimes might
        just probe even when it hasn't been enchanted */
-    do_stun = (max(mb->spe, 0) < rn2(icontext.spec_dbon_applies ? 11 : 7));
+    do_stun = (max(mb->spe, 0) < rn2(spec_dbon_applies ? 11 : 7));
 
     /* the special effects also boost physical damage; increments are
        generally cumulative, but since the stun effect is based on a
@@ -1182,12 +1185,12 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     if (attacks(AD_FIRE, otmp)) {
         if (realizes_damage)
             pline_The("fiery blade %s %s%c",
-                      !icontext.spec_dbon_applies
+                      !spec_dbon_applies
                           ? "hits"
                           : (mdef->data == &mons[PM_WATER_ELEMENTAL])
                                 ? "vaporizes part of"
                                 : "burns",
-                      hittee, !icontext.spec_dbon_applies ? '.' : '!');
+                      hittee, !spec_dbon_applies ? '.' : '!');
         if (!rn2(4))
             (void) destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
         if (!rn2(4))
@@ -1201,8 +1204,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     if (attacks(AD_COLD, otmp)) {
         if (realizes_damage)
             pline_The("ice-cold blade %s %s%c",
-                      !icontext.spec_dbon_applies ? "hits" : "freezes", hittee,
-                      !icontext.spec_dbon_applies ? '.' : '!');
+                      !spec_dbon_applies ? "hits" : "freezes", hittee,
+                      !spec_dbon_applies ? '.' : '!');
         if (!rn2(4))
             (void) destroy_mitem(mdef, POTION_CLASS, AD_COLD);
         return realizes_damage;
@@ -1210,9 +1213,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     if (attacks(AD_ELEC, otmp)) {
         if (realizes_damage)
             pline_The("massive hammer hits%s %s%c",
-                      !icontext.spec_dbon_applies ? "" : "!  Lightning strikes",
-                      hittee, !icontext.spec_dbon_applies ? '.' : '!');
-        if (icontext.spec_dbon_applies)
+                      !spec_dbon_applies ? "" : "!  Lightning strikes",
+                      hittee, !spec_dbon_applies ? '.' : '!');
+        if (spec_dbon_applies)
             wake_nearto(mdef->mx, mdef->my, 4 * 4);
         if (!rn2(5))
             (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
@@ -1223,10 +1226,10 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     if (attacks(AD_MAGM, otmp)) {
         if (realizes_damage)
             pline_The("imaginary widget hits%s %s%c",
-                      !icontext.spec_dbon_applies
+                      !spec_dbon_applies
                           ? ""
                           : "!  A hail of magic missiles strikes",
-                      hittee, !icontext.spec_dbon_applies ? '.' : '!');
+                      hittee, !spec_dbon_applies ? '.' : '!');
         return realizes_damage;
     }
 
@@ -1235,7 +1238,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return Mb_hit(magr, mdef, otmp, dmgptr, dieroll, vis, hittee);
     }
 
-    if (!icontext.spec_dbon_applies) {
+    if (!spec_dbon_applies) {
         /* since damage bonus didn't apply, nothing more to do;
            no further attacks have side-effects on inventory */
         return FALSE;

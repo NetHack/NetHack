@@ -899,7 +899,7 @@ register int fd;
 #ifdef MFLOPPY
     gameDiskPrompt();
 #endif
-    max_rank_sz(); /* to recompute icontext.mrank_sz (botl.c) */
+    max_rank_sz(); /* to recompute mrank_sz (botl.c) */
     /* take care of iron ball & chain */
     for (otmp = fobj; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
