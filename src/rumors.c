@@ -45,6 +45,17 @@ STATIC_DCL void FDECL(init_rumors, (dlb *));
 STATIC_DCL void FDECL(init_oracles, (dlb *));
 STATIC_DCL void FDECL(couldnt_open_file, (const char *));
 
+/* rumor size variables are signed so that value -1 can be used as a flag */
+static long true_rumor_size = 0L, false_rumor_size;
+/* rumor start offsets are unsigned because they're handled via %lx format */
+static unsigned long true_rumor_start, false_rumor_start;
+/* rumor end offsets are signed because they're compared with [dlb_]ftell() */
+static long true_rumor_end, false_rumor_end;
+/* oracles are handled differently from rumors... */
+static int oracle_flg = 0; /* -1=>don't use, 0=>need init, 1=>init done */
+static unsigned oracle_cnt = 0;
+static unsigned long *oracle_loc = 0;
+
 STATIC_OVL void
 init_rumors(fp)
 dlb *fp;
@@ -56,17 +67,17 @@ dlb *fp;
 
     (void) dlb_fgets(line, sizeof line, fp); /* skip "don't edit" comment */
     (void) dlb_fgets(line, sizeof line, fp);
-    if (sscanf(line, rumors_header, &true_count, &g.true_rumor_size,
-               &g.true_rumor_start, &false_count, &g.false_rumor_size,
-               &g.false_rumor_start, &eof_offset) == 7
-        && g.true_rumor_size > 0L
-        && g.false_rumor_size > 0L) {
-        g.true_rumor_end = (long) g.true_rumor_start + g.true_rumor_size;
-        /* assert( g.true_rumor_end == false_rumor_start ); */
-        g.false_rumor_end = (long) g.false_rumor_start + g.false_rumor_size;
-        /* assert( g.false_rumor_end == eof_offset ); */
+    if (sscanf(line, rumors_header, &true_count, &true_rumor_size,
+               &true_rumor_start, &false_count, &false_rumor_size,
+               &false_rumor_start, &eof_offset) == 7
+        && true_rumor_size > 0L
+        && false_rumor_size > 0L) {
+        true_rumor_end = (long) true_rumor_start + true_rumor_size;
+        /* assert( true_rumor_end == false_rumor_start ); */
+        false_rumor_end = (long) false_rumor_start + false_rumor_size;
+        /* assert( false_rumor_end == eof_offset ); */
     } else {
-        g.true_rumor_size = -1L; /* init failed */
+        true_rumor_size = -1L; /* init failed */
         (void) dlb_fclose(fp);
     }
 }
@@ -87,7 +98,7 @@ boolean exclude_cookie;
     char *endp, line[BUFSZ], xbuf[BUFSZ];
 
     rumor_buf[0] = '\0';
-    if (g.true_rumor_size < 0L) /* we couldn't open RUMORFILE */
+    if (true_rumor_size < 0L) /* we couldn't open RUMORFILE */
         return rumor_buf;
 
     rumors = dlb_fopen(RUMORFILE, "r");
@@ -98,9 +109,9 @@ boolean exclude_cookie;
 
         do {
             rumor_buf[0] = '\0';
-            if (g.true_rumor_size == 0L) { /* if this is 1st outrumor() */
+            if (true_rumor_size == 0L) { /* if this is 1st outrumor() */
                 init_rumors(rumors);
-                if (g.true_rumor_size < 0L) { /* init failed */
+                if (true_rumor_size < 0L) { /* init failed */
                     Sprintf(rumor_buf, "Error reading \"%.80s\".", RUMORFILE);
                     return rumor_buf;
                 }
@@ -113,13 +124,13 @@ boolean exclude_cookie;
             switch (adjtruth = truth + rn2(2)) {
             case 2: /*(might let a bogus input arg sneak thru)*/
             case 1:
-                beginning = (long) g.true_rumor_start;
-                tidbit = Rand() % g.true_rumor_size;
+                beginning = (long) true_rumor_start;
+                tidbit = Rand() % true_rumor_size;
                 break;
             case 0: /* once here, 0 => false rather than "either"*/
             case -1:
-                beginning = (long) g.false_rumor_start;
-                tidbit = Rand() % g.false_rumor_size;
+                beginning = (long) false_rumor_start;
+                tidbit = Rand() % false_rumor_size;
                 break;
             default:
                 impossible("strange truth value for rumor");
@@ -128,7 +139,7 @@ boolean exclude_cookie;
             (void) dlb_fseek(rumors, beginning + tidbit, SEEK_SET);
             (void) dlb_fgets(line, sizeof line, rumors);
             if (!dlb_fgets(line, sizeof line, rumors)
-                || (adjtruth > 0 && dlb_ftell(rumors) > g.true_rumor_end)) {
+                || (adjtruth > 0 && dlb_ftell(rumors) > true_rumor_end)) {
                 /* reached end of rumors -- go back to beginning */
                 (void) dlb_fseek(rumors, beginning, SEEK_SET);
                 (void) dlb_fgets(line, sizeof line, rumors);
@@ -146,7 +157,7 @@ boolean exclude_cookie;
             exercise(A_WIS, (adjtruth > 0));
     } else {
         couldnt_open_file(RUMORFILE);
-        g.true_rumor_size = -1; /* don't try to open it again */
+        true_rumor_size = -1; /* don't try to open it again */
     }
 /* this is safe either way, so do it always since we can't get the definition
  * out of makedefs.c
@@ -176,7 +187,7 @@ rumor_check()
     winid tmpwin;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
-    if (g.true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
+    if (true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
     no_rumors:
         pline("rumors not accessible.");
         return;
@@ -188,9 +199,9 @@ rumor_check()
         long ftell_rumor_start = 0L;
 
         rumor_buf[0] = '\0';
-        if (g.true_rumor_size == 0L) { /* if this is 1st outrumor() */
+        if (true_rumor_size == 0L) { /* if this is 1st outrumor() */
             init_rumors(rumors);
-            if (g.true_rumor_size < 0L)
+            if (true_rumor_size < 0L)
                 goto no_rumors; /* init failed */
         }
         tmpwin = create_nhwindow(NHW_TEXT);
@@ -202,17 +213,17 @@ rumor_check()
         Sprintf(
             rumor_buf,
             "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.true_rumor_start, g.true_rumor_start, g.true_rumor_end,
-            (unsigned long) g.true_rumor_end, g.true_rumor_size,
-            (unsigned long) g.true_rumor_size);
+            (long) true_rumor_start, true_rumor_start, true_rumor_end,
+            (unsigned long) true_rumor_end, true_rumor_size,
+            (unsigned long) true_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         Sprintf(
             rumor_buf,
             "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.false_rumor_start, g.false_rumor_start, g.false_rumor_end,
-            (unsigned long) g.false_rumor_end, g.false_rumor_size,
-            (unsigned long) g.false_rumor_size);
+            (long) false_rumor_start, false_rumor_start, false_rumor_end,
+            (unsigned long) false_rumor_end, false_rumor_size,
+            (unsigned long) false_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         /*
@@ -223,7 +234,7 @@ rumor_check()
          * the value read in rumors, and display it.
          */
         rumor_buf[0] = '\0';
-        (void) dlb_fseek(rumors, (long) g.true_rumor_start, SEEK_SET);
+        (void) dlb_fseek(rumors, (long) true_rumor_start, SEEK_SET);
         ftell_rumor_start = dlb_ftell(rumors);
         (void) dlb_fgets(line, sizeof line, rumors);
         if ((endp = index(line, '\n')) != 0)
@@ -233,7 +244,7 @@ rumor_check()
         putstr(tmpwin, 0, rumor_buf);
         /* find last true rumor */
         while (dlb_fgets(line, sizeof line, rumors)
-               && dlb_ftell(rumors) < g.true_rumor_end)
+               && dlb_ftell(rumors) < true_rumor_end)
             continue;
         if ((endp = index(line, '\n')) != 0)
             *endp = 0;
@@ -241,7 +252,7 @@ rumor_check()
         putstr(tmpwin, 0, rumor_buf);
 
         rumor_buf[0] = '\0';
-        (void) dlb_fseek(rumors, (long) g.false_rumor_start, SEEK_SET);
+        (void) dlb_fseek(rumors, (long) false_rumor_start, SEEK_SET);
         ftell_rumor_start = dlb_ftell(rumors);
         (void) dlb_fgets(line, sizeof line, rumors);
         if ((endp = index(line, '\n')) != 0)
@@ -251,7 +262,7 @@ rumor_check()
         putstr(tmpwin, 0, rumor_buf);
         /* find last false rumor */
         while (dlb_fgets(line, sizeof line, rumors)
-               && dlb_ftell(rumors) < g.false_rumor_end)
+               && dlb_ftell(rumors) < false_rumor_end)
             continue;
         if ((endp = index(line, '\n')) != 0)
             *endp = 0;
@@ -263,7 +274,7 @@ rumor_check()
         destroy_nhwindow(tmpwin);
     } else {
         couldnt_open_file(RUMORFILE);
-        g.true_rumor_size = -1; /* don't try to open it again */
+        true_rumor_size = -1; /* don't try to open it again */
     }
 }
 
@@ -368,11 +379,11 @@ dlb *fp;
     (void) dlb_fgets(line, sizeof line, fp); /* skip "don't edit" comment*/
     (void) dlb_fgets(line, sizeof line, fp);
     if (sscanf(line, "%5d\n", &cnt) == 1 && cnt > 0) {
-        g.oracle_cnt = (unsigned) cnt;
-        g.oracle_loc = (unsigned long *) alloc((unsigned) cnt * sizeof(long));
+        oracle_cnt = (unsigned) cnt;
+        oracle_loc = (unsigned long *) alloc((unsigned) cnt * sizeof(long));
         for (i = 0; i < cnt; i++) {
             (void) dlb_fgets(line, sizeof line, fp);
-            (void) sscanf(line, "%5lx\n", &g.oracle_loc[i]);
+            (void) sscanf(line, "%5lx\n", &oracle_loc[i]);
         }
     }
     return;
@@ -383,14 +394,14 @@ save_oracles(fd, mode)
 int fd, mode;
 {
     if (perform_bwrite(mode)) {
-        bwrite(fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-        if (g.oracle_cnt)
-            bwrite(fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof(long));
+        bwrite(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+        if (oracle_cnt)
+            bwrite(fd, (genericptr_t) oracle_loc, oracle_cnt * sizeof(long));
     }
     if (release_data(mode)) {
-        if (g.oracle_cnt) {
-            free((genericptr_t) g.oracle_loc);
-            g.oracle_loc = 0, g.oracle_cnt = 0, g.oracle_flg = 0;
+        if (oracle_cnt) {
+            free((genericptr_t) oracle_loc);
+            oracle_loc = 0, oracle_cnt = 0, oracle_flg = 0;
         }
     }
 }
@@ -399,11 +410,11 @@ void
 restore_oracles(fd)
 int fd;
 {
-    mread(fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
-    if (g.oracle_cnt) {
-        g.oracle_loc = (unsigned long *) alloc(g.oracle_cnt * sizeof(long));
-        mread(fd, (genericptr_t) g.oracle_loc, g.oracle_cnt * sizeof(long));
-        g.oracle_flg = 1; /* no need to call init_oracles() */
+    mread(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+    if (oracle_cnt) {
+        oracle_loc = (unsigned long *) alloc(oracle_cnt * sizeof(long));
+        mread(fd, (genericptr_t) oracle_loc, oracle_cnt * sizeof(long));
+        oracle_flg = 1; /* no need to call init_oracles() */
     }
 }
 
@@ -420,27 +431,27 @@ boolean delphi;
 
     /* early return if we couldn't open ORACLEFILE on previous attempt,
        or if all the oracularities are already exhausted */
-    if (g.oracle_flg < 0 || (g.oracle_flg > 0 && g.oracle_cnt == 0))
+    if (oracle_flg < 0 || (oracle_flg > 0 && oracle_cnt == 0))
         return;
 
     oracles = dlb_fopen(ORACLEFILE, "r");
 
     if (oracles) {
         winid tmpwin;
-        if (g.oracle_flg == 0) { /* if this is the first outoracle() */
+        if (oracle_flg == 0) { /* if this is the first outoracle() */
             init_oracles(oracles);
-            g.oracle_flg = 1;
-            if (g.oracle_cnt == 0)
+            oracle_flg = 1;
+            if (oracle_cnt == 0)
                 return;
         }
         /* oracle_loc[0] is the special oracle;
            oracle_loc[1..oracle_cnt-1] are normal ones */
-        if (g.oracle_cnt <= 1 && !special)
+        if (oracle_cnt <= 1 && !special)
             return; /*(shouldn't happen)*/
-        oracle_idx = special ? 0 : rnd((int) g.oracle_cnt - 1);
-        (void) dlb_fseek(oracles, (long) g.oracle_loc[oracle_idx], SEEK_SET);
+        oracle_idx = special ? 0 : rnd((int) oracle_cnt - 1);
+        (void) dlb_fseek(oracles, (long) oracle_loc[oracle_idx], SEEK_SET);
         if (!special) /* move offset of very last one into this slot */
-            g.oracle_loc[oracle_idx] = g.oracle_loc[--g.oracle_cnt];
+            oracle_loc[oracle_idx] = oracle_loc[--oracle_cnt];
 
         tmpwin = create_nhwindow(NHW_TEXT);
         if (delphi)
@@ -462,7 +473,7 @@ boolean delphi;
         (void) dlb_fclose(oracles);
     } else {
         couldnt_open_file(ORACLEFILE);
-        g.oracle_flg = -1; /* don't try to open it again */
+        oracle_flg = -1; /* don't try to open it again */
     }
 }
 
@@ -504,7 +515,7 @@ struct monst *oracl;
         break;
     case 'n':
         if (umoney <= (long) minor_cost /* don't even ask */
-            || (g.oracle_cnt == 1 || g.oracle_flg < 0))
+            || (oracle_cnt == 1 || oracle_flg < 0))
             return 0;
         Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long) major_cost));
