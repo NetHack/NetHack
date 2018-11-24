@@ -49,4 +49,4 @@ sudo: false
 notifications:
   email:
     recipients:
-      - bhaak@gmx.net
+      - devteam@nethack.org
