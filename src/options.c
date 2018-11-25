@@ -4567,9 +4567,6 @@ int numtotal;
     return opt_idx;
 }
 
-struct symsetentry *symset_list = 0; /* files.c will populate this with
-                                              list of available sets */
-
 STATIC_OVL boolean
 special_handling(optname, setinitial, setfromfile)
 const char *optname;
@@ -5214,14 +5211,14 @@ boolean setinitial, setfromfile;
         /* clear symset[].name as a flag to read_sym_file() to build list */
         symset_name = g.symset[which_set].name;
         g.symset[which_set].name = (char *) 0;
-        symset_list = (struct symsetentry *) 0;
+        g.symset_list = (struct symsetentry *) 0;
 
         res = read_sym_file(which_set);
-        if (res && symset_list) {
+        if (res && g.symset_list) {
             char symsetchoice[BUFSZ];
             int let = 'a', biggest = 0, thissize = 0;
 
-            sl = symset_list;
+            sl = g.symset_list;
             while (sl) {
                 /* check restrictions */
                 if ((!rogueflag && sl->rogue)
@@ -5252,7 +5249,7 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, let++, 0, ATR_NONE,
                      "Default Symbols", MENU_UNSELECTED);
 
-            sl = symset_list;
+            sl = g.symset_list;
             while (sl) {
                 /* check restrictions */
                 if ((!rogueflag && sl->rogue)
@@ -5284,7 +5281,7 @@ boolean setinitial, setfromfile;
 
             if (chosen > -1) {
                 /* chose an actual symset name from file */
-                sl = symset_list;
+                sl = g.symset_list;
                 while (sl) {
                     if (sl->idx == chosen) {
                         if (symset_name) {
@@ -5315,15 +5312,15 @@ boolean setinitial, setfromfile;
             /* The symbols file could not be accessed */
             pline("Unable to access \"%s\" file.", SYMBOLS);
             return TRUE;
-        } else if (!symset_list) {
+        } else if (!g.symset_list) {
             /* The symbols file was empty */
             pline("There were no symbol sets found in \"%s\".", SYMBOLS);
             return TRUE;
         }
 
         /* clean up */
-        while (symset_list) {
-            sl = symset_list;
+        while (g.symset_list) {
+            sl = g.symset_list;
             if (sl->name)
                 free((genericptr_t) sl->name);
             sl->name = (char *) 0;
@@ -5332,7 +5329,7 @@ boolean setinitial, setfromfile;
                 free((genericptr_t) sl->desc);
             sl->desc = (char *) 0;
 
-            symset_list = sl->next;
+            g.symset_list = sl->next;
             free((genericptr_t) sl);
         }
 

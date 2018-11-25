@@ -569,7 +569,7 @@ const char *known_restrictions[] = {
     "primary", "rogue", (const char *) 0,
 };
 
-struct symparse loadsyms[] = {
+const struct symparse loadsyms[] = {
     { SYM_CONTROL, 0, "start" },
     { SYM_CONTROL, 0, "begin" },
     { SYM_CONTROL, 1, "finish" },

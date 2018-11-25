@@ -5320,9 +5320,6 @@ boolean doit;
     return ch;
 }
 
-
-static NEARDATA int last_multi;
-
 /*
  * convert a MAP window position into a movecmd
  */
@@ -5543,7 +5540,7 @@ parse()
         long tmpmulti = multi;
 
         foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti, FALSE);
-        last_multi = multi = tmpmulti;
+        g.last_multi = multi = tmpmulti;
     }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
@@ -5557,11 +5554,11 @@ parse()
 
     if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
-        multi = last_multi = 0;
+        multi = g.last_multi = 0;
     } else if (foo == g.Cmd.spkeys[NHKF_DOAGAIN] || in_doagain) {
-        multi = last_multi;
+        multi = g.last_multi;
     } else {
-        last_multi = multi;
+        g.last_multi = multi;
         savech(0); /* reset input queue */
         savech((char) foo);
     }

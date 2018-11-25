@@ -1378,15 +1378,6 @@ docrt()
 /* Glyph Buffering (3rd screen) ============================================
  */
 
-typedef struct {
-    xchar new; /* perhaps move this bit into the rm structure. */
-    int glyph;
-} gbuf_entry;
-
-static gbuf_entry gbuf[ROWNO][COLNO];
-static char gbuf_start[ROWNO];
-static char gbuf_stop[ROWNO];
-
 /* FIXME: This is a dirty hack, because newsym() doesn't distinguish
  * between object piles and single objects, it doesn't mark the location
  * for update. */
@@ -1395,11 +1386,11 @@ newsym_force(x, y)
 register int x, y;
 {
     newsym(x,y);
-    gbuf[y][x].new = 1;
-    if (gbuf_start[y] > x)
-        gbuf_start[y] = x;
-    if (gbuf_stop[y] < x)
-        gbuf_stop[y] = x;
+    g.gbuf[y][x].gnew = 1;
+    if (g.gbuf_start[y] > x)
+        g.gbuf_start[y] = x;
+    if (g.gbuf_stop[y] < x)
+        g.gbuf_stop[y] = x;
 }
 
 /*
@@ -1475,13 +1466,13 @@ int x, y, glyph;
         return;
     }
 
-    if (gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
-        gbuf[y][x].glyph = glyph;
-        gbuf[y][x].new = 1;
-        if (gbuf_start[y] > x)
-            gbuf_start[y] = x;
-        if (gbuf_stop[y] < x)
-            gbuf_stop[y] = x;
+    if (g.gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
+        g.gbuf[y][x].glyph = glyph;
+        g.gbuf[y][x].gnew = 1;
+        if (g.gbuf_start[y] > x)
+            g.gbuf_start[y] = x;
+        if (g.gbuf_stop[y] < x)
+            g.gbuf_stop[y] = x;
     }
 }
 
@@ -1494,12 +1485,12 @@ int x, y, glyph;
         int i;                         \
                                        \
         for (i = 0; i < ROWNO; i++) {  \
-            gbuf_start[i] = COLNO - 1; \
-            gbuf_stop[i] = 0;          \
+            g.gbuf_start[i] = COLNO - 1; \
+            g.gbuf_stop[i] = 0;          \
         }                              \
     }
 
-static gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
+static const gbuf_entry nul_gbuf = { 0, cmap_to_glyph(S_stone) };
 /*
  * Turn the 3rd screen into stone.
  */
@@ -1510,7 +1501,7 @@ clear_glyph_buffer()
     register gbuf_entry *gptr;
 
     for (y = 0; y < ROWNO; y++) {
-        gptr = &gbuf[y][0];
+        gptr = &g.gbuf[y][0];
         for (x = COLNO; x; x--) {
             *gptr++ = nul_gbuf;
         }
@@ -1528,8 +1519,8 @@ int start, stop, y;
     register int x;
 
     for (x = start; x <= stop; x++)
-        if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, get_bk_glyph(x,y));
+        if (g.gbuf[y][x].glyph != cmap_to_glyph(S_stone))
+            print_glyph(WIN_MAP, x, y, g.gbuf[y][x].glyph, get_bk_glyph(x,y));
 }
 
 void
@@ -1575,11 +1566,11 @@ int cursor_on_u;
 #endif
 
     for (y = 0; y < ROWNO; y++) {
-        register gbuf_entry *gptr = &gbuf[y][x = gbuf_start[y]];
-        for (; x <= gbuf_stop[y]; gptr++, x++)
-            if (gptr->new) {
+        register gbuf_entry *gptr = &g.gbuf[y][x = g.gbuf_start[y]];
+        for (; x <= g.gbuf_stop[y]; gptr++, x++)
+            if (gptr->gnew) {
                 print_glyph(WIN_MAP, x, y, gptr->glyph, get_bk_glyph(x, y));
-                gptr->new = 0;
+                gptr->gnew = 0;
             }
     }
 
@@ -1791,7 +1782,7 @@ xchar x, y;
 {
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
-    return gbuf[y][x].glyph;
+    return g.gbuf[y][x].glyph;
 }
 
 /*
@@ -1812,7 +1803,7 @@ xchar x, y;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
-            && gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
+            && g.gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:

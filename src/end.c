@@ -1637,19 +1637,6 @@ int status;
     nethack_exit(status);
 }
 
-enum vanq_order_modes {
-    VANQ_MLVL_MNDX = 0,
-    VANQ_MSTR_MNDX,
-    VANQ_ALPHA_SEP,
-    VANQ_ALPHA_MIX,
-    VANQ_MCLS_HTOL,
-    VANQ_MCLS_LTOH,
-    VANQ_COUNT_H_L,
-    VANQ_COUNT_L_H,
-
-    NUM_VANQ_ORDER_MODES
-};
-
 static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "traditional: by monster level, by internal monster index",
     "by monster toughness, by internal monster index",
@@ -1660,7 +1647,6 @@ static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "by count, high to low, by internal index within tied count",
     "by count, low to high, by internal index within tied count",
 };
-static int vanq_sortmode = VANQ_MLVL_MNDX;
 
 STATIC_PTR int CFDECLSPEC
 vanqsort_cmp(vptr1, vptr2)
@@ -1672,7 +1658,7 @@ const genericptr vptr2;
     const char *name1, *name2, *punct;
     schar mcls1, mcls2;
 
-    switch (vanq_sortmode) {
+    switch (g.vanq_sortmode) {
     default:
     case VANQ_MLVL_MNDX:
         /* sort by monster level */
@@ -1724,7 +1710,7 @@ const genericptr vptr2;
         if (res == 0) {
             mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
-            if (vanq_sortmode == VANQ_MCLS_HTOL)
+            if (g.vanq_sortmode == VANQ_MCLS_HTOL)
                 res = -res; /* mlevel high to low */
         }
         break;
@@ -1732,7 +1718,7 @@ const genericptr vptr2;
     case VANQ_COUNT_L_H:
         died1 = mvitals[indx1].died, died2 = mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
-        if (vanq_sortmode == VANQ_COUNT_L_H)
+        if (g.vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
         break;
     }
@@ -1759,7 +1745,7 @@ set_vanq_order()
             continue;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, vanqorders[i],
-                 (i == vanq_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (i == g.vanq_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
     }
     end_menu(tmpwin, "Sort order for vanquished monster counts");
 
@@ -1768,12 +1754,12 @@ set_vanq_order()
     if (n > 0) {
         choice = selected[0].item.a_int - 1;
         /* skip preselected entry if we have more than one item chosen */
-        if (n > 1 && choice == vanq_sortmode)
+        if (n > 1 && choice == g.vanq_sortmode)
             choice = selected[1].item.a_int - 1;
         free((genericptr_t) selected);
-        vanq_sortmode = choice;
+        g.vanq_sortmode = choice;
     }
-    return (n < 0) ? -1 : vanq_sortmode;
+    return (n < 0) ? -1 : g.vanq_sortmode;
 }
 
 /* #vanquished command */
@@ -1835,9 +1821,9 @@ boolean ask;
                 if (set_vanq_order() < 0)
                     return;
             }
-            uniq_header = (vanq_sortmode == VANQ_ALPHA_SEP);
-            class_header = (vanq_sortmode == VANQ_MCLS_LTOH
-                            || vanq_sortmode == VANQ_MCLS_HTOL);
+            uniq_header = (g.vanq_sortmode == VANQ_ALPHA_SEP);
+            class_header = (g.vanq_sortmode == VANQ_MCLS_LTOH
+                            || g.vanq_sortmode == VANQ_MCLS_HTOL);
 
             klwin = create_nhwindow(NHW_MENU);
             putstr(klwin, 0, "Vanquished creatures:");
