@@ -51,11 +51,11 @@ enum window_option_types {
  *  option (e.g. time and timed_delay) the shorter one must come first.
  */
 
-static struct Bool_Opt {
+static const struct Bool_Opt {
     const char *name;
     boolean *addr, initvalue;
     int optflags;
-} boolopt[] = {
+} boolopt_init[] = {
     { "acoustics", &flags.acoustics, TRUE, SET_IN_GAME },
 #if defined(SYSFLAGS) && defined(AMIGA)
     /* Amiga altmeta causes Alt+key to be converted into Meta+key by
@@ -449,6 +449,8 @@ static struct Comp_Opt {
     { (char *) 0, (char *) 0, 0, 0 }
 };
 
+static struct Bool_Opt boolopt[SIZE(boolopt_init)];
+
 #ifdef OPTION_LISTS_ONLY
 #undef static
 
@@ -687,6 +689,8 @@ initoptions_init()
     char *opts;
 #endif
     int i;
+
+    memcpy(boolopt, boolopt_init, sizeof(boolopt));
 
     /* set up the command parsing */
     reset_commands(TRUE); /* init */
@@ -6718,5 +6722,6 @@ set_playmode()
 }
 
 #endif /* OPTION_LISTS_ONLY */
+
 
 /*options.c*/

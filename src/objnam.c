@@ -2055,7 +2055,7 @@ struct sing_plur {
 /* word pairs that don't fit into formula-based transformations;
    also some suffices which have very few--often one--matches or
    which aren't systematically reversible (knives, staves) */
-static struct sing_plur one_off[] = {
+static const struct sing_plur one_off[] = {
     { "child",
       "children" },      /* (for wise guys who give their food funny names) */
     { "cubus", "cubi" }, /* in-/suc-cubus */

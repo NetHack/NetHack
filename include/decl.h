@@ -838,6 +838,9 @@ struct instance_globals {
                         * remember who zapped the wand. */
     struct musable m;
 
+    /* o_init.c */
+    short disco[NUM_OBJECTS];
+
     /* objname.c */
     /* distantname used by distant_name() to pass extra information to
        xname_flags(); it would be much cleaner if this were a parameter,

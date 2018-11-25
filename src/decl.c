@@ -499,6 +499,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* zap_oseen */
     UNDEFINED_VALUES, /* m */
 
+    /* o_init.c */
+    DUMMY, /* disco */
+
     /* objname.c */
     0, /* distantname */
 
