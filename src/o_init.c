@@ -12,8 +12,6 @@ STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover, (int));
 STATIC_DCL char *FDECL(oclass_to_name, (CHAR_P, char *));
 
-static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
-
 #ifdef USE_TILES
 STATIC_DCL void NDECL(shuffle_tiles);
 extern short glyph2tile[]; /* from tile.c */
@@ -296,7 +294,7 @@ int fd, mode;
 
     if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) bases, sizeof bases);
-        bwrite(fd, (genericptr_t) disco, sizeof disco);
+        bwrite(fd, (genericptr_t) g.disco, sizeof g.disco);
         bwrite(fd, (genericptr_t) objects,
                sizeof(struct objclass) * NUM_OBJECTS);
     }
@@ -325,7 +323,7 @@ register int fd;
     unsigned int len;
 
     mread(fd, (genericptr_t) bases, sizeof bases);
-    mread(fd, (genericptr_t) disco, sizeof disco);
+    mread(fd, (genericptr_t) g.disco, sizeof g.disco);
     mread(fd, (genericptr_t) objects, sizeof(struct objclass) * NUM_OBJECTS);
     for (i = 0; i < NUM_OBJECTS; i++)
         if (objects[i].oc_uname) {
@@ -351,10 +349,10 @@ boolean credit_hero;
            uname'd) or the next open slot; one or the other will be found
            before we reach the next class...
          */
-        for (dindx = bases[acls]; disco[dindx] != 0; dindx++)
-            if (disco[dindx] == oindx)
+        for (dindx = bases[acls]; g.disco[dindx] != 0; dindx++)
+            if (g.disco[dindx] == oindx)
                 break;
-        disco[dindx] = oindx;
+        g.disco[dindx] = oindx;
 
         if (mark_as_known) {
             objects[oindx].oc_name_known = 1;
@@ -377,19 +375,19 @@ register int oindx;
         register boolean found = FALSE;
 
         /* find the object; shift those behind it forward one slot */
-        for (dindx = bases[acls]; dindx < NUM_OBJECTS && disco[dindx] != 0
+        for (dindx = bases[acls]; dindx < NUM_OBJECTS && g.disco[dindx] != 0
                                   && objects[dindx].oc_class == acls;
              dindx++)
             if (found)
-                disco[dindx - 1] = disco[dindx];
-            else if (disco[dindx] == oindx)
+                g.disco[dindx - 1] = g.disco[dindx];
+            else if (g.disco[dindx] == oindx)
                 found = TRUE;
 
         /* clear last slot */
         if (found)
-            disco[dindx - 1] = 0;
+            g.disco[dindx - 1] = 0;
         else
-            impossible("named object not in disco");
+            impossible("named object not in g.disco");
         update_inventory();
     }
 }
@@ -405,7 +403,7 @@ register int i;
 }
 
 /* items that should stand out once they're known */
-static short uniq_objs[] = {
+static const short uniq_objs[] = {
     AMULET_OF_YENDOR, SPE_BOOK_OF_THE_DEAD, CANDELABRUM_OF_INVOCATION,
     BELL_OF_OPENING,
 };
@@ -446,7 +444,7 @@ dodiscovered() /* free after Robert Viduya */
         prev_class = oclass + 1; /* forced different from oclass */
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
-            if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
+            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
                 ct++;
                 if (oclass != prev_class) {
                     putstr(tmpwin, iflags.menu_headings,
@@ -543,7 +541,7 @@ doclassdisco()
         c = def_oc_syms[(int) oclass].sym;
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
-            if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
+            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
                 if (!index(discosyms, c)) {
                     Sprintf(eos(discosyms), "%c", c);
                     if (!traditional) {
@@ -634,7 +632,7 @@ doclassdisco()
         putstr(tmpwin, iflags.menu_headings, buf);
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
-            if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
+            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
                 Sprintf(buf, "%s %s",
                         objects[dis].oc_pre_discovered ? "*" : " ",
                         obj_typename(dis));
@@ -680,7 +678,7 @@ rename_disco()
         prev_class = oclass + 1; /* forced different from oclass */
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
-            dis = disco[i];
+            dis = g.disco[i];
             if (!dis || !interesting_to_discover(dis))
                 continue;
             ct++;
