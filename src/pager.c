@@ -1340,88 +1340,88 @@ boolean do_mons; /* True => monsters, False => objects */
     destroy_nhwindow(win);
 }
 
+static const char *suptext1[] = {
+    "%s is a member of a marauding horde of orcs",
+    "rumored to have brutally attacked and plundered",
+    "the ordinarily sheltered town that is located ",
+    "deep within The Gnomish Mines.",
+    "",
+    "The members of that vicious horde proudly and ",
+    "defiantly acclaim their allegiance to their",
+    "leader %s in their names.",
+    (char *) 0,
+};
+
+static const char *suptext2[] = {
+    "%s is a nefarious orc who is known to acquire",
+    "property from thieves and sell it off for profit",
+    "or gain. The perpetrator was last seen hanging",
+    "around the stairs leading to the Gnomish Mines.",
+    (char *) 0,
+};
+
 void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
 boolean without_asking;
 {
-    int textidx = 0;
+    const char **textp;
     winid datawin = WIN_ERR;
     char *entrytext = name, *bp = (char *) 0, *bp2 = (char *) 0;
     char question[QBUFSZ];
     boolean yes_to_moreinfo = FALSE;
+    boolean is_marauder = (name && pm && is_orc(pm));
 
     /*
      * Provide some info on some specific things
      * meant to support in-game mythology, and not
      * available from data.base or other sources.
      */
-    if ((name && pm && is_orc(pm) && (strlen(name) < (BUFSZ - 1)))
-        && ((bp = strstri(name, " of ")) != 0) ||
-            (bp2 = strstri(name, " the Fence")) != 0) {
+    if (is_marauder && (strlen(name) < (BUFSZ - 1))) {
         char fullname[BUFSZ];
 
-        Strcpy(fullname, name);
-        if (!without_asking) {
-            Strcpy(question, "More info about \"");
-            /* +2 => length of "\"?" */
-            copynchars(eos(question), entrytext,
-                (int) (sizeof question - 1 - (strlen(question) + 2)));
-            Strcat(question, "\"?");
-            if (yn(question) == 'y')
-            yes_to_moreinfo = TRUE;
-        }
-        if (yes_to_moreinfo) {
-            int i, subs = 0;
-            char *gang = (char *) 0;
+        bp = strstri(name, " of ");
+        bp2 = strstri(name, " the Fence");
 
-            if (bp)
-                textidx = 0;
-            else
-                textidx = 1;
+        if (bp || bp2) {
+            Strcpy(fullname, name);
+            if (!without_asking) {
+                Strcpy(question, "More info about \"");
+                /* +2 => length of "\"?" */
+                copynchars(eos(question), entrytext,
+                    (int) (sizeof question - 1 - (strlen(question) + 2)));
+                Strcat(question, "\"?");
+                if (yn(question) == 'y')
+                yes_to_moreinfo = TRUE;
+            }
+            if (yes_to_moreinfo) {
+                int i, subs = 0;
+                char *gang = (char *) 0;
 
-            static const char *text[2][6] = {
-                 {
-                 "%s is a member of a marauding horde of orcs",
-                 "rumored to have brutally attacked and plundered the ordinarily",
-                 "sheltered town that is located deep within The Gnomish Mines.",
-                 "",
-                 "The members of that vicious horde proudly and defiantly acclaim",
-                 "their allegiance to their leader %s in their names.",
-                },
-                {
-                 "%s is a nefarious orc who is known to acquire property",
-                 "from thieves and sell it off for profit or gain.",
-                 "The perpetrator was last seen hanging around the stairs leading",
-                 "to the Gnomish Mines.",
-                 "",
-                 "",
+                if (bp) {
+                    textp = suptext1;
+                    gang = bp + 4;
+                    *bp = '\0';
+                } else {
+                    textp = suptext2;
+                    gang = "";
+		}
+                datawin = create_nhwindow(NHW_MENU);
+                for (i = 0; textp[i]; i++) {
+                    char buf[BUFSZ];
+                    const char *txt;
+
+                    if (strstri(textp[i], "%s") != 0) {
+                        Sprintf(buf, textp[i], subs++ ? gang : fullname);
+                        txt = buf;
+                    } else
+                        txt = textp[i];
+                    putstr(datawin, 0, txt);
                 }
-            };
-
-            if (bp) {
-               gang = bp + 4;
-               *bp = '\0';
-            } else {
-               gang = "";
+                display_nhwindow(datawin, FALSE);
+                destroy_nhwindow(datawin), datawin = WIN_ERR;
             }
-            
-            datawin = create_nhwindow(NHW_MENU);
-            for (i = 0; i < SIZE(text[textidx]); i++) {
-                char buf[BUFSZ];
-                const char *txt;
-
-                if (strstri(text[textidx][i], "%s") != 0) {
-                    Sprintf(buf, text[textidx][i],
-                            subs++ ? gang : fullname);
-                    txt = buf;
-                } else
-                    txt = text[textidx][i];
-                putstr(datawin, 0, txt);
-            }
-            display_nhwindow(datawin, FALSE);
-            destroy_nhwindow(datawin), datawin = WIN_ERR;
         }
     }
 }
