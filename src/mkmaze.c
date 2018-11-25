@@ -24,9 +24,6 @@ STATIC_DCL void FDECL(migr_booty_item, (int, const char *));
 STATIC_DCL void FDECL(migrate_orc, (struct monst *, unsigned long));
 STATIC_DCL void NDECL(stolen_booty);
 
-lev_region bughack; /* for preserving the insect legs when wallifying
-                     * baalz level */
-
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
     do {                                                         \

@@ -748,7 +748,7 @@ const char *msg;
  *
  */
 
-static struct early_opt earlyopts[] = {
+static const struct early_opt earlyopts[] = {
     {ARG_DEBUG, "debug", 5, TRUE},
     {ARG_VERSION, "version", 4, TRUE},
 #ifdef WIN32

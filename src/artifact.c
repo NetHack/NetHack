@@ -2088,8 +2088,6 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
         clear_bypasses(); /* reset upon final exit */
 }
 
-static int mkot_trap_warn_count = 0;
-
 STATIC_OVL int
 count_surround_traps(x, y)
 int x, y;
@@ -2147,13 +2145,13 @@ mkot_trap_warn()
     if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
         int idx, ntraps = count_surround_traps(u.ux, u.uy);
 
-        if (ntraps != mkot_trap_warn_count) {
+        if (ntraps != g.mkot_trap_warn_count) {
             idx = min(ntraps, SIZE(heat) - 1);
             pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
         }
-        mkot_trap_warn_count = ntraps;
+        g.mkot_trap_warn_count = ntraps;
     } else
-        mkot_trap_warn_count = 0;
+        g.mkot_trap_warn_count = 0;
 }
 
 /* Master Key is magic key if its bless/curse state meets our criteria:

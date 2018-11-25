@@ -18,8 +18,6 @@
  #pragma warning(disable : 4244)
 #endif
 
-lev_region *lregions;
-
 typedef void FDECL((*select_iter_func), (int, int, genericptr));
 
 extern void FDECL(mkmap, (lev_init *));

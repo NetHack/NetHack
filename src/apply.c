@@ -2437,18 +2437,11 @@ struct obj *tstone;
     return;
 }
 
-static struct trapinfo {
-    struct obj *tobj;
-    xchar tx, ty;
-    int time_needed;
-    boolean force_bungle;
-} trapinfo;
-
 void
 reset_trapset()
 {
-    trapinfo.tobj = 0;
-    trapinfo.force_bungle = 0;
+    g.trapinfo.tobj = 0;
+    g.trapinfo.force_bungle = 0;
 }
 
 /* Place a landmine/bear trap.  Helge Hafting */
@@ -2495,22 +2488,23 @@ struct obj *otmp;
         return;
     }
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
-    if (otmp == trapinfo.tobj && u.ux == trapinfo.tx && u.uy == trapinfo.ty) {
+    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx 
+                                && u.uy == g.trapinfo.ty) {
         You("resume setting %s%s.", shk_your(buf, otmp),
             defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
         set_occupation(set_trap, occutext, 0);
         return;
     }
-    trapinfo.tobj = otmp;
-    trapinfo.tx = u.ux, trapinfo.ty = u.uy;
+    g.trapinfo.tobj = otmp;
+    g.trapinfo.tx = u.ux, g.trapinfo.ty = u.uy;
     tmp = ACURR(A_DEX);
-    trapinfo.time_needed =
+    g.trapinfo.time_needed =
         (tmp > 17) ? 2 : (tmp > 12) ? 3 : (tmp > 7) ? 4 : 5;
     if (Blind)
-        trapinfo.time_needed *= 2;
+        g.trapinfo.time_needed *= 2;
     tmp = ACURR(A_STR);
     if (ttyp == BEAR_TRAP && tmp < 18)
-        trapinfo.time_needed += (tmp > 12) ? 1 : (tmp > 7) ? 2 : 4;
+        g.trapinfo.time_needed += (tmp > 12) ? 1 : (tmp > 7) ? 2 : 4;
     /*[fumbling and/or confusion and/or cursed object check(s)
        should be incorporated here instead of in set_trap]*/
     if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
@@ -2527,8 +2521,8 @@ struct obj *otmp;
             if (chance) {
                 switch (ttyp) {
                 case LANDMINE: /* set it off */
-                    trapinfo.time_needed = 0;
-                    trapinfo.force_bungle = TRUE;
+                    g.trapinfo.time_needed = 0;
+                    g.trapinfo.force_bungle = TRUE;
                     break;
                 case BEAR_TRAP: /* drop it without arming it */
                     reset_trapset();
@@ -2554,18 +2548,18 @@ STATIC_PTR
 int
 set_trap()
 {
-    struct obj *otmp = trapinfo.tobj;
+    struct obj *otmp = g.trapinfo.tobj;
     struct trap *ttmp;
     int ttyp;
 
-    if (!otmp || !carried(otmp) || u.ux != trapinfo.tx
-        || u.uy != trapinfo.ty) {
+    if (!otmp || !carried(otmp) || u.ux != g.trapinfo.tx
+        || u.uy != g.trapinfo.ty) {
         /* ?? */
         reset_trapset();
         return 0;
     }
 
-    if (--trapinfo.time_needed > 0)
+    if (--g.trapinfo.time_needed > 0)
         return 1; /* still busy */
 
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
@@ -2576,13 +2570,13 @@ set_trap()
         if (*in_rooms(u.ux, u.uy, SHOPBASE)) {
             add_damage(u.ux, u.uy, 0L); /* schedule removal */
         }
-        if (!trapinfo.force_bungle)
+        if (!g.trapinfo.force_bungle)
             You("finish arming %s.",
                 the(defsyms[trap_to_defsym(what_trap(ttyp))].explanation));
         if (((otmp->cursed || Fumbling) && (rnl(10) > 5))
-            || trapinfo.force_bungle)
+            || g.trapinfo.force_bungle)
             dotrap(ttmp,
-                   (unsigned) (trapinfo.force_bungle ? FORCEBUNGLE : 0));
+                   (unsigned) (g.trapinfo.force_bungle ? FORCEBUNGLE : 0));
     } else {
         /* this shouldn't happen */
         Your("trap setting attempt fails.");
