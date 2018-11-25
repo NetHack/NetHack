@@ -1346,8 +1346,9 @@ char *name;
 struct permonst *pm;
 boolean without_asking;
 {
+    int textidx = 0;
     winid datawin = WIN_ERR;
-    char *entrytext = name, *bp;
+    char *entrytext = name, *bp = (char *) 0, *bp2 = (char *) 0;
     char question[QBUFSZ];
     boolean yes_to_moreinfo = FALSE;
 
@@ -1357,7 +1358,8 @@ boolean without_asking;
      * available from data.base or other sources.
      */
     if (name && pm && is_orc(pm) && (strlen(name) < (BUFSZ - 1))
-        && (bp = strstri(name, " of ")) != 0) {
+        && ((bp = strstri(name, " of ")) != 0) ||
+            (bp2 = strstri(name, " the Fence")) != 0) {
         char fullname[BUFSZ];
 
         Strcpy(fullname, name);
@@ -1372,28 +1374,50 @@ boolean without_asking;
         }
         if (yes_to_moreinfo) {
             int i, subs = 0;
-            char *gang = bp + 4;
-            static const char *text[] = {
-             "%s is a member of a marauding horde of orcs",
-             "rumored to have brutally attacked and plundered the ordinarily",
-             "sheltered town that is located deep within The Gnomish Mines.",
-             "",
-             "The members of that vicious horde proudly and defiantly acclaim",
-             "their allegiance to their leader %s in their names.",
+            char *gang = (char *) 0;
+
+            if (bp)
+                textidx = 0;
+            else
+                textidx = 1;
+
+            static const char *text[2][6] = {
+                 {
+                 "%s is a member of a marauding horde of orcs",
+                 "rumored to have brutally attacked and plundered the ordinarily",
+                 "sheltered town that is located deep within The Gnomish Mines.",
+                 "",
+                 "The members of that vicious horde proudly and defiantly acclaim",
+                 "their allegiance to their leader %s in their names.",
+                },
+                {
+                 "%s is a nefarious orc who is known to acquire property",
+                 "from thieves and sell it off for profit or gain.",
+                 "The perpetrator was last seen hanging around the stairs leading",
+                 "to the Gnomish Mines.",
+                 "",
+                 "",
+                }
             };
 
-            *bp = '\0';
+            if (bp) {
+               gang = bp + 4;
+               *bp = '\0';
+            } else {
+               gang = "";
+            }
+            
             datawin = create_nhwindow(NHW_MENU);
-            for (i = 0; i < SIZE(text); i++) {
+            for (i = 0; i < SIZE(text[textidx]); i++) {
                 char buf[BUFSZ];
                 const char *txt;
 
-                if (strstri(text[i], "%s") != 0) {
-                    Sprintf(buf, text[i],
+                if (strstri(text[textidx][i], "%s") != 0) {
+                    Sprintf(buf, text[textidx][i],
                             subs++ ? gang : fullname);
                     txt = buf;
                 } else
-                    txt = text[i];
+                    txt = text[textidx][i];
                 putstr(datawin, 0, txt);
             }
             display_nhwindow(datawin, FALSE);
