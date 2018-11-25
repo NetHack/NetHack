@@ -3612,26 +3612,10 @@ const char *fmt;
 boolean enable;
 {
     genl_status_enablefield(fieldidx, nm, fmt, enable);
+#ifdef STATUS_HILITES
     /* force re-evaluation of last field on the row */
     setlast = FALSE;
-}
-
-void
-do_setlast()
-{
-    int i, row, fld;
-
-    setlast = TRUE;
-    for (row = 0; row < 2; ++row)
-        for (i = MAX_PER_ROW - 1; i > 0; --i) {
-           fld = fieldorder[row][i];
-
-           if (fld == BL_FLUSH || !status_activefields[fld])
-                continue;
-
-           last_on_row[row] = fld;
-           break;
-	}
+#endif
 }
 
 #ifdef STATUS_HILITES
@@ -3805,6 +3789,24 @@ unsigned long *colormasks;
     }
     /* 3.6.2 we only render on BL_FLUSH (or BL_RESET) */
     return;
+}
+
+void
+do_setlast()
+{
+    int i, row, fld;
+
+    setlast = TRUE;
+    for (row = 0; row < 2; ++row)
+        for (i = MAX_PER_ROW - 1; i > 0; --i) {
+           fld = fieldorder[row][i];
+
+           if (fld == BL_FLUSH || !status_activefields[fld])
+                continue;
+
+           last_on_row[row] = fld;
+           break;
+	}
 }
 
 STATIC_OVL int

@@ -1680,7 +1680,8 @@ unsigned long deliverflags;
 {
     struct obj *otmp, *otmp2;
     int where, maxobj = 1;
-
+    boolean at_crime_scene = In_mines(&u.uz);
+ 
     if ((deliverflags & DF_RANDOM) && cnt > 1)
         maxobj = rnd(cnt);
     else if (deliverflags & DF_ALL)
@@ -1702,8 +1703,12 @@ unsigned long deliverflags;
 
             /* special treatment for orcs and their kind */
             if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
-                if (!has_mname(mtmp))
-                    mtmp = christen_orc(mtmp, ONAME(otmp));
+                if (!has_mname(mtmp)) {
+                    if (at_crime_scene || (!at_crime_scene && !rn2(2)))
+                        mtmp = christen_orc(mtmp,
+                                at_crime_scene ? ONAME(otmp) : (char *) 0,
+                                " the Fence");  /* bought the stolen goods */
+                }
                 free_oname(otmp);
             }
             otmp->corpsenm = 0;
