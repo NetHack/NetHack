@@ -96,7 +96,36 @@ enum hlattribs { HL_UNDEF   = 0x00,
                  HL_ULINE   = 0x08,
                  HL_BLINK   = 0x10,
                  HL_DIM     = 0x20 };
-/* #endif STATUS_HILITES */
+
+#ifdef STATUS_HILITES
+struct hilite_s {
+    enum statusfields fld;
+    boolean set;
+    unsigned anytype;
+    anything value;
+    int behavior;
+    char textmatch[QBUFSZ];
+    enum relationships rel;
+    int coloridx;
+    struct hilite_s *next;
+};
+#endif
+
+struct istat_s {
+    const char *fldname;
+    const char *fldfmt;
+    long time;  /* moves when this field hilite times out */
+    boolean chg; /* need to recalc time? */
+    unsigned anytype;
+    anything a;
+    char *val;
+    int valwidth;
+    enum statusfields idxmax;
+    enum statusfields fld;
+#ifdef STATUS_HILITES
+    struct hilite_s *thresholds;
+#endif
+};
 
 extern const char *status_fieldnames[]; /* in botl.c */
 

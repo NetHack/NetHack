@@ -197,6 +197,7 @@ typedef struct {
 #include "wintype.h"
 #include "context.h"
 #include "rm.h"
+#include "botl.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)

@@ -326,14 +326,22 @@ const struct instance_globals g_init = {
     0,  /* jumping_is_magic */
     -1, /* polearm_range_min */
     -1, /* polearm_range_max  */
+    UNDEFINED_VALUES, /* trapinfo */
 
     /* artifact.c */
     0,  /* spec_dbon_applies */
     UNDEFINED_VALUES, /* artiexist */
     UNDEFINED_VALUES, /* artdisco */
+    0, /* mkot_trap_warn_count */
 
     /* botl.c */
     0,  /* mrank_sz */
+    UNDEFINED_VALUES, /* blstats */
+    FALSE, /* blinit */
+    FALSE, /* update_all */
+    UNDEFINED_VALUES, /* valset */
+    0, /* bl_hilite_moves */
+    UNDEFINED_VALUES, /* cond_hilites */
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
@@ -440,6 +448,9 @@ const struct instance_globals g_init = {
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} }, /* bughack */
     UNDEFINED_VALUE, /* was_waterlevel */
 
+    /* mon.c */
+    UNDEFINED_VALUE, /* vamp_rise_msg */
+    UNDEFINED_VALUE, /* disintegested */
 
     /* mused.c */
     FALSE, /* m_using */

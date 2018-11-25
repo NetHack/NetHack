@@ -545,6 +545,13 @@ struct xlock_s {
     boolean magic_key;
 };
 
+struct trapinfo {
+    struct obj *tobj;
+    xchar tx, ty;
+    int time_needed;
+    boolean force_bungle;
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -559,6 +566,7 @@ struct instance_globals {
     int jumping_is_magic; /* current jump result of magic */
     int polearm_range_min;
     int polearm_range_max;
+    struct trapinfo trapinfo;
 
     /* artifcat.c */
     int spec_dbon_applies; /* coordinate effects from spec_dbon() with
@@ -567,9 +575,16 @@ struct instance_globals {
     boolean artiexist[1 + NROFARTIFACTS + 1];
     /* and a discovery list for them (no dummy first entry here) */
     xchar artidisco[NROFARTIFACTS];
+    int mkot_trap_warn_count;
 
     /* botl.c */
     int mrank_sz; /* loaded by max_rank_sz */
+    struct istat_s blstats[2][MAXBLSTATS];
+    boolean blinit;
+    boolean update_all;
+    boolean valset[MAXBLSTATS];
+    long bl_hilite_moves;
+    unsigned long cond_hilites[BL_ATTCLR_MAX];
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */
@@ -690,6 +705,9 @@ struct instance_globals {
                          * baalz level */
     boolean was_waterlevel; /* ugh... this shouldn't be needed */
 
+    /* mon.c */
+    boolean vamp_rise_msg;
+    boolean disintegested;
 
     /* muse.c */
     boolean m_using; /* kludge to use mondided instead of killed */
