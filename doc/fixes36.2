@@ -220,6 +220,8 @@ end of game while carrying Schroedinger's Box would reveal cat-or-corpse
 	for inventory disclosure or put that info into dumplog, but not both
 attempting to untrap an adjacent trap while on the edge of--not in--a pit
 	failed due to not being able to reach the floor
+magic trap's deafening roar effect wasn't waking nearby monsters
+scattering of objects might leave source location with wrong thing displayed
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -229,6 +231,8 @@ setting the inverse attribute for gold had the space before "$:"
 	getting highlighted along with the gold field
 sortloot segfaulted when filtering a subset of items (seen with 'A' command)
 orctown: prevent Bad fruit #0 and some minor tuning
+orctown: orcs beyond the mines were being given any left-over booty and named
+	as part of the same marauding gang operating within the mines
 make long extended commands list be more navigable
 simplify #wizidentify; don't rely on having bold menu entries
 ensure tmp_at() structures are initialized for all code paths when swallowed

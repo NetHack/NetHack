@@ -785,7 +785,7 @@ stolen_booty(VOID_ARGS)
              * member of the main orc horde.
              */
             if (mtmp->data != &mons[PM_ORC_CAPTAIN])
-                mtmp = christen_orc(mtmp, upstart(gang));
+                mtmp = christen_orc(mtmp, upstart(gang), "");
         }
     }
     /* Lastly, ensure there's several more orcs from the gang along the way.
