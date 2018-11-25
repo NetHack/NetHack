@@ -42,8 +42,6 @@
 #define LSF_SHOW 0x1        /* display the light source */
 #define LSF_NEEDS_FIXUP 0x2 /* need oid fixup */
 
-static light_source *light_base = 0;
-
 STATIC_DCL void FDECL(write_ls, (int, light_source *));
 STATIC_DCL int FDECL(maybe_write_ls, (int, int, BOOLEAN_P));
 
@@ -67,14 +65,14 @@ anything *id;
 
     ls = (light_source *) alloc(sizeof(light_source));
 
-    ls->next = light_base;
+    ls->next = g.light_base;
     ls->x = x;
     ls->y = y;
     ls->range = range;
     ls->type = type;
     ls->id = *id;
     ls->flags = 0;
-    light_base = ls;
+    g.light_base = ls;
 
     vision_full_recalc = 1; /* make the source show up */
 }
@@ -107,7 +105,7 @@ anything *id;
         break;
     }
 
-    for (prev = 0, curr = light_base; curr; prev = curr, curr = curr->next) {
+    for (prev = 0, curr = g.light_base; curr; prev = curr, curr = curr->next) {
         if (curr->type != type)
             continue;
         if (curr->id.a_obj
@@ -115,7 +113,7 @@ anything *id;
             if (prev)
                 prev->next = curr->next;
             else
-                light_base = curr->next;
+                g.light_base = curr->next;
 
             free((genericptr_t) curr);
             vision_full_recalc = 1;
@@ -137,7 +135,7 @@ char **cs_rows;
     light_source *ls;
     char *row;
 
-    for (ls = light_base; ls; ls = ls->next) {
+    for (ls = g.light_base; ls; ls = ls->next) {
         ls->flags &= ~LSF_SHOW;
 
         /*
@@ -255,7 +253,7 @@ int fd, mode, range;
     }
 
     if (release_data(mode)) {
-        for (prev = &light_base; (curr = *prev) != 0;) {
+        for (prev = &g.light_base; (curr = *prev) != 0;) {
             if (!curr->id.a_monst) {
                 impossible("save_light_sources: no id! [range=%d]", range);
                 is_global = 0;
@@ -301,8 +299,8 @@ int fd;
     while (count-- > 0) {
         ls = (light_source *) alloc(sizeof(light_source));
         mread(fd, (genericptr_t) ls, sizeof(light_source));
-        ls->next = light_base;
-        light_base = ls;
+        ls->next = g.light_base;
+        g.light_base = ls;
     }
 }
 
@@ -317,7 +315,7 @@ long *count, *size;
 
     Sprintf(hdrbuf, hdrfmt, (long) sizeof (light_source));
     *count = *size = 0L;
-    for (ls = light_base; ls; ls = ls->next) {
+    for (ls = g.light_base; ls; ls = ls->next) {
         ++*count;
         *size += (long) sizeof *ls;
     }
@@ -332,7 +330,7 @@ boolean ghostly;
     unsigned nid;
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next) {
+    for (ls = g.light_base; ls; ls = ls->next) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
             if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
                 if (ghostly) {
@@ -371,7 +369,7 @@ boolean write_it;
     int count = 0, is_global;
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next) {
+    for (ls = g.light_base; ls; ls = ls->next) {
         if (!ls->id.a_monst) {
             impossible("maybe_write_ls: no id! [range=%d]", range);
             continue;
@@ -408,7 +406,7 @@ light_sources_sanity_check()
     struct obj *otmp;
     unsigned int auint;
 
-    for (ls = light_base; ls; ls = ls->next) {
+    for (ls = g.light_base; ls; ls = ls->next) {
         if (!ls->id.a_monst)
             panic("insane light source: no id!");
         if (ls->type == LS_OBJECT) {
@@ -475,7 +473,7 @@ struct obj *src, *dest;
 {
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == src)
             ls->id.a_obj = dest;
     src->lamplit = 0;
@@ -486,7 +484,7 @@ struct obj *src, *dest;
 boolean
 any_light_source()
 {
-    return (boolean) (light_base != (light_source *) 0);
+    return (boolean) (g.light_base != (light_source *) 0);
 }
 
 /*
@@ -500,7 +498,7 @@ int x, y;
     light_source *ls;
     struct obj *obj;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = g.light_base; ls; ls = ls->next)
         /*
          * Is this position check valid??? Can I assume that the positions
          * will always be correct because the objects would have been
@@ -553,7 +551,7 @@ struct obj *src, *dest;
 {
     light_source *ls, *new_ls;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == src) {
             /*
              * Insert the new source at beginning of list.  This will
@@ -569,8 +567,8 @@ struct obj *src, *dest;
                 vision_full_recalc = 1; /* in case range changed */
             }
             new_ls->id.a_obj = dest;
-            new_ls->next = light_base;
-            light_base = new_ls;
+            new_ls->next = g.light_base;
+            g.light_base = new_ls;
             dest->lamplit = 1; /* now an active light source */
         }
 }
@@ -587,7 +585,7 @@ struct obj *src, *dest;
     if (src != dest)
         end_burn(src, TRUE); /* extinguish candles */
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == dest) {
             ls->range = candle_light_range(dest);
             vision_full_recalc = 1; /* in case range changed */
@@ -603,7 +601,7 @@ int new_radius;
 {
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == obj) {
             if (new_radius != ls->range)
                 vision_full_recalc = 1;
@@ -709,10 +707,10 @@ wiz_light_sources()
     putstr(win, 0, buf);
     putstr(win, 0, "");
 
-    if (light_base) {
+    if (g.light_base) {
         putstr(win, 0, "location range flags  type    id");
         putstr(win, 0, "-------- ----- ------ ----  -------");
-        for (ls = light_base; ls; ls = ls->next) {
+        for (ls = g.light_base; ls; ls = ls->next) {
             Sprintf(buf, "  %2d,%2d   %2d   0x%04x  %s  %s", ls->x, ls->y,
                     ls->range, ls->flags,
                     (ls->type == LS_OBJECT

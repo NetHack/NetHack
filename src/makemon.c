@@ -2112,7 +2112,7 @@ struct monst *mtmp;
         MCORPSENM(mtmp) = NON_PM;
 }
 
-static NEARDATA char syms[] = {
+static const NEARDATA char syms[] = {
     MAXOCLASSES,  MAXOCLASSES + 1, RING_CLASS,   WAND_CLASS,   WEAPON_CLASS,
     FOOD_CLASS,   COIN_CLASS,      SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
     AMULET_CLASS, TOOL_CLASS,      ROCK_CLASS,   GEM_CLASS,    SPBOOK_CLASS,

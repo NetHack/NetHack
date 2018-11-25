@@ -48,7 +48,7 @@ STATIC_DCL char FDECL(obj_to_let, (struct obj *));
  * confused:  'WIZARD' used to be a compile-time conditional so this was
  * guarded by #ifdef WIZARD/.../#endif.]
  */
-static char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
+static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
 /* sortloot() classification; called at most once for each object sorted  */
 STATIC_OVL void
@@ -2464,17 +2464,12 @@ struct obj *list, **last_found;
     return (struct obj *) 0;
 }
 
-/* for perm_invent when operating on a partial inventory display, so that
-   the persistent one doesn't get shrunk during filtering for item selection
-   then regrown to full inventory, possibly being resized in the process */
-static winid cached_pickinv_win = WIN_ERR;
-
 void
 free_pickinv_cache()
 {
-    if (cached_pickinv_win != WIN_ERR) {
-        destroy_nhwindow(cached_pickinv_win);
-        cached_pickinv_win = WIN_ERR;
+    if (g.cached_pickinv_win != WIN_ERR) {
+        destroy_nhwindow(g.cached_pickinv_win);
+        g.cached_pickinv_win = WIN_ERR;
     }
 }
 
@@ -2494,7 +2489,7 @@ long *out_cnt;
     static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp, wizid_fakeobj;
     char ilet, ret;
-    char *invlet = flags.inv_order;
+    const char *invlet = flags.inv_order;
     int n, classcount;
     winid win;                        /* windows being used */
     anything any;
@@ -2510,9 +2505,9 @@ long *out_cnt;
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
            the first time needed and keep it for re-use as needed later */
-        if (cached_pickinv_win == WIN_ERR)
-            cached_pickinv_win = create_nhwindow(NHW_MENU);
-        win = cached_pickinv_win;
+        if (g.cached_pickinv_win == WIN_ERR)
+            g.cached_pickinv_win = create_nhwindow(NHW_MENU);
+        win = g.cached_pickinv_win;
     } else
         win = WIN_INVEN;
 
@@ -2997,22 +2992,20 @@ dounpaid()
     destroy_nhwindow(win);
 }
 
-/* query objlist callback: return TRUE if obj type matches "this_type" */
-static int this_type;
 
 STATIC_OVL boolean
 this_type_only(obj)
 struct obj *obj;
 {
-    boolean res = (obj->oclass == this_type);
+    boolean res = (obj->oclass == g.this_type);
 
     if (obj->oclass == COIN_CLASS) {
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
-        if (this_type && index("BUCX", this_type))
-            res = (this_type == (iflags.goldX ? 'X' : 'U'));
+        if (g.this_type && index("BUCX", g.this_type))
+            res = (g.this_type == (iflags.goldX ? 'X' : 'U'));
     } else {
-        switch (this_type) {
+        switch (g.this_type) {
         case 'B':
             res = (obj->bknown && obj->blessed);
             break;
@@ -3071,7 +3064,7 @@ dotypeinv()
             n = query_category(prompt, invent, i, &pick_list, PICK_ONE);
             if (!n)
                 return 0;
-            this_type = c = pick_list[0].item.a_int;
+            g.this_type = c = pick_list[0].item.a_int;
             free((genericptr_t) pick_list);
         }
     }
@@ -3189,7 +3182,7 @@ dotypeinv()
             You("have no %sobjects%s.", before, after);
             return 0;
         }
-        this_type = oclass;
+        g.this_type = oclass;
     }
     if (query_objlist((char *) 0, &invent,
                       ((flags.invlet_constant ? USE_INVLET : 0)
@@ -4289,14 +4282,12 @@ register struct obj *obj;
     return ret;
 }
 
-/* query objlist callback: return TRUE if obj is at given location */
-static coord only;
 
 STATIC_OVL boolean
 only_here(obj)
 struct obj *obj;
 {
-    return (obj->ox == only.x && obj->oy == only.y);
+    return (obj->ox == g.only.x && obj->oy == g.only.y);
 }
 
 /*
@@ -4323,13 +4314,13 @@ boolean as_if_seen;
         }
 
     if (n) {
-        only.x = x;
-        only.y = y;
+        g.only.x = x;
+        g.only.y = y;
         if (query_objlist("Things that are buried here:",
                           &level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
-        only.x = only.y = 0;
+        g.only.x = g.only.y = 0;
     }
     return n;
 }
