@@ -5,7 +5,7 @@
 #include "hack.h"
 
 /* Note: Arrays are column first, while the screen is row first */
-static int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
+static const int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
                                { S_explode2, S_explode5, S_explode8 },
                                { S_explode3, S_explode6, S_explode9 } };
 

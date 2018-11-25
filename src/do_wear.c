@@ -71,10 +71,6 @@ struct obj *otmp;
     }
 }
 
-/* starting equipment gets auto-worn at beginning of new game,
-   and we don't want stealth or displacement feedback then */
-static boolean initial_don = FALSE; /* manipulated in set_wear() */
-
 /* putting on or taking off an item which confers stealth;
    give feedback and discover it iff stealth state is changing */
 STATIC_OVL
@@ -84,7 +80,7 @@ struct obj *obj;
 long oldprop; /* prop[].extrinsic, with obj->owornmask stripped by caller */
 boolean on;
 {
-    if (on ? initial_don : context.takeoff.cancelled_don)
+    if (on ? g.initial_don : context.takeoff.cancelled_don)
         return;
 
     if (!oldprop /* extrinsic stealth from something else */
@@ -118,7 +114,7 @@ struct obj *obj;
 long oldprop; /* prop[].extrinsic, with obj->owornmask stripped by caller */
 boolean on;
 {
-    if (on ? initial_don : context.takeoff.cancelled_don)
+    if (on ? g.initial_don : context.takeoff.cancelled_don)
         return;
 
     if (!oldprop /* extrinsic displacement from something else */
@@ -1161,7 +1157,7 @@ void
 set_wear(obj)
 struct obj *obj; /* if null, do all worn items; otherwise just obj itself */
 {
-    initial_don = !obj;
+    g.initial_don = !obj;
 
     if (!obj ? ublindf != 0 : (obj == ublindf))
         (void) Blindf_on(ublindf);
@@ -1187,7 +1183,7 @@ struct obj *obj; /* if null, do all worn items; otherwise just obj itself */
     if (!obj ? uarms != 0 : (obj == uarms))
         (void) Shield_on();
 
-    initial_don = FALSE;
+    g.initial_don = FALSE;
 }
 
 /* check whether the target object is currently being put on (or taken off--

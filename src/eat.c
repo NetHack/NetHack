@@ -144,17 +144,15 @@ static const struct {
                 { "", 0, 0, 0 } };
 #define TTSZ SIZE(tintxts)
 
-static char *eatmbuf = 0; /* set by cpostfx() */
-
 /* called after mimicing is over */
 STATIC_PTR int
 eatmdone(VOID_ARGS)
 {
     /* release `eatmbuf' */
-    if (eatmbuf) {
-        if (nomovemsg == eatmbuf)
+    if (g.eatmbuf) {
+        if (nomovemsg == g.eatmbuf)
             nomovemsg = 0;
-        free((genericptr_t) eatmbuf), eatmbuf = 0;
+        free((genericptr_t) g.eatmbuf), g.eatmbuf = 0;
     }
     /* update display */
     if (youmonst.m_ap_type) {
@@ -171,7 +169,7 @@ eatmupdate()
     const char *altmsg = 0;
     int altapp = 0; /* lint suppression */
 
-    if (!eatmbuf || nomovemsg != eatmbuf)
+    if (!g.eatmbuf || nomovemsg != g.eatmbuf)
         return;
 
     if (is_obj_mappear(&youmonst,ORANGE) && !Hallucination) {
@@ -188,11 +186,11 @@ eatmupdate()
 
     if (altmsg) {
         /* replace end-of-mimicking message */
-        if (strlen(altmsg) > strlen(eatmbuf)) {
-            free((genericptr_t) eatmbuf);
-            eatmbuf = (char *) alloc(strlen(altmsg) + 1);
+        if (strlen(altmsg) > strlen(g.eatmbuf)) {
+            free((genericptr_t) g.eatmbuf);
+            g.eatmbuf = (char *) alloc(strlen(altmsg) + 1);
         }
-        nomovemsg = strcpy(eatmbuf, altmsg);
+        nomovemsg = strcpy(g.eatmbuf, altmsg);
         /* update current image */
         youmonst.mappearance = altapp;
         newsym(u.ux, u.uy);
@@ -947,7 +945,7 @@ int pm;
 
     /* in case `afternmv' didn't get called for previously mimicking
        gold, clean up now to avoid `eatmbuf' memory leak */
-    if (eatmbuf)
+    if (g.eatmbuf)
         (void) eatmdone();
 
     switch (pm) {
@@ -1033,8 +1031,8 @@ int pm;
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
                     an(Upolyd ? youmonst.data->mname : urace.noun));
-            eatmbuf = dupstr(buf);
-            nomovemsg = eatmbuf;
+            g.eatmbuf = dupstr(buf);
+            nomovemsg = g.eatmbuf;
             afternmv = eatmdone;
             /* ??? what if this was set before? */
             youmonst.m_ap_type = M_AP_OBJECT;

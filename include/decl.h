@@ -552,6 +552,32 @@ struct trapinfo {
     boolean force_bungle;
 };
 
+typedef struct {
+    xchar gnew; /* perhaps move this bit into the rm structure. */
+    int glyph;
+} gbuf_entry;
+
+enum vanq_order_modes {
+    VANQ_MLVL_MNDX = 0,
+    VANQ_MSTR_MNDX,
+    VANQ_ALPHA_SEP,
+    VANQ_ALPHA_MIX,
+    VANQ_MCLS_HTOL,
+    VANQ_MCLS_LTOH,
+    VANQ_COUNT_H_L,
+    VANQ_COUNT_L_H,
+
+    NUM_VANQ_ORDER_MODES
+};
+
+struct rogueroom {
+    xchar rlx, rly;
+    xchar dx, dy;
+    boolean real;
+    uchar doortable;
+    int nroom; /* Only meaningful for "real" rooms */
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -559,6 +585,7 @@ struct trapinfo {
  * unlike instance_flags, values in the structure can be of any type. */
 
 #define BSIZE 20
+#define WIZKIT_MAX 128
 
 struct instance_globals {
 
@@ -603,6 +630,7 @@ struct instance_globals {
     coord clicklook_cc;
     winid en_win;
     boolean en_via_menu;
+    int last_multi;
 
     /* dbridge.c */
     struct entity occupants[ENTITIES];
@@ -610,6 +638,12 @@ struct instance_globals {
     /* dig.c */
 
     boolean did_dig_msg;
+
+    /* display.c */
+    gbuf_entry gbuf[ROWNO][COLNO];
+    char gbuf_start[ROWNO];
+    char gbuf_stop[ROWNO];
+
 
     /* do.c */
     boolean at_ladder;
@@ -621,6 +655,11 @@ struct instance_globals {
     struct opvar *gloc_filter_map;
     int gloc_filter_floodfill_match_glyph;
     int via_naming;
+
+    /* do_wear.c */
+    /* starting equipment gets auto-worn at beginning of new game,
+       and we don't want stealth or displacement feedback then */
+    boolean initial_don; /* manipulated in set_wear() */
 
     /* dog.c */
     int petname_used; /* user preferred pet name has been used */
@@ -648,12 +687,29 @@ struct instance_globals {
 
     /* eat.c */
     boolean force_save_hs;
+    char *eatmbuf; /* set by cpostfx() */
+
 
     /* end.c */
     struct valuable_data gems[LAST_GEM + 1 - FIRST_GEM + 1]; /* +1 for glass */
     struct valuable_data amulets[LAST_AMULET + 1 - FIRST_AMULET];
     struct val_list valuables[3];
-    
+    int vanq_sortmode;
+
+    /* extralev.c */
+    struct rogueroom r[3][3];
+
+    /* files.c */
+    char wizkit[WIZKIT_MAX];
+    int lockptr;
+    char *config_section_chosen;
+    char *config_section_current;
+    int nesting;
+    int symset_count;             /* for pick-list building only */
+    boolean chosen_symset_start;
+    boolean chosen_symset_end;
+    int symset_which_set;
+
     /* hack.c */
     anything tmp_anything;
     int wc; /* current weight_cap(); valid after call to inv_weight() */
@@ -726,6 +782,10 @@ struct instance_globals {
        but that would require all of the xname() and doname() calls to be
        modified */
     int distantname;
+
+    /* options.c */
+    struct symsetentry *symset_list; /* files.c will populate this with
+                                        list of available sets */
 
     /* pickup.c */
     int oldcap; /* last encumberance */

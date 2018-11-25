@@ -354,12 +354,18 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* clicklook_cc */
     WIN_ERR, /* en_win */
     FALSE, /* en_via_menu */
+    UNDEFINED_VALUE, /* last_multi */
 
     /* dbridge.c */
     UNDEFINED_VALUES,
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
+
+    /* display.c */
+    UNDEFINED_VALUES,
+    UNDEFINED_VALUES,
+    UNDEFINED_VALUES,
 
     /* do.c */
     FALSE, /* at_ladder */
@@ -371,6 +377,9 @@ const struct instance_globals g_init = {
     NULL, /* gloc_filter_map */
     UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
     0, /* via_naming */
+
+    /* do_wear.c */
+    FALSE, /* initial_don */
 
     /* dog.c */
     0,  /* petname_used */
@@ -398,11 +407,27 @@ const struct instance_globals g_init = {
 
     /* eat.c */
     FALSE, /* force_save_hs */
+    NULL, /* eatmbuf */
 
     /* end.c */
     UNDEFINED_VALUES,
     UNDEFINED_VALUES,
     UNDEFINED_VALUES,
+    VANQ_MLVL_MNDX,
+
+    /* extralev.c */
+    UNDEFINED_VALUES,
+
+    /* files.c */
+    UNDEFINED_VALUES, /* wizkit */
+    UNDEFINED_VALUE, /* lockptr */
+    NULL, /* config_section_chosen */
+    NULL, /* config_section_current */
+    0, /* nesting */
+    0, /* symset_count */
+    FALSE, /* chosen_symset_start */
+    FALSE, /* chosen_symset_end */
+    0, /* symset_which_set */
 
     /* hack.c */
     UNDEFINED_VALUES,
@@ -460,6 +485,9 @@ const struct instance_globals g_init = {
 
     /* objname.c */
     0, /* distantname */
+
+    /* options.c */
+    NULL, /* symset_list */
 
     /* pickup.c */
     0,  /* oldcap */

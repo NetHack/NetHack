@@ -125,15 +125,12 @@ struct level_ftrack {
 #endif
 #endif /*HOLD_LOCKFILE_OPEN*/
 
-#define WIZKIT_MAX 128
-static char wizkit[WIZKIT_MAX];
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
 
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
 extern char bbs_id[];
-static int lockptr;
 #ifdef __SASC_60
 #include <proto/dos.h>
 #endif
@@ -143,7 +140,6 @@ extern void FDECL(amii_set_text_font, (char *, int));
 #endif
 
 #if defined(WIN32) || defined(MSDOS)
-static int lockptr;
 #ifdef MSDOS
 #define Delay(a) msleep(a)
 #endif
@@ -214,9 +210,6 @@ STATIC_DCL boolean FDECL(copy_bytes, (int, int));
 STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
 #endif
 
-
-static char *config_section_chosen = (char *) 0;
-static char *config_section_current = (char *) 0;
 
 /*
  * fname_encode()
@@ -1611,8 +1604,6 @@ boolean uncomp;
 
 /* ----------  BEGIN FILE LOCKING HANDLING ----------- */
 
-static int nesting = 0;
-
 #if defined(NO_FILE_LINKS) || defined(USE_FCNTL) /* implies UNIX */
 static int lockfd; /* for lock_file() to pass to unlock_file() */
 #endif
@@ -1674,8 +1665,8 @@ int retryct;
     const char *lockname;
 #endif
 
-    nesting++;
-    if (nesting > 1) {
+    g.nesting++;
+    if (g.nesting > 1) {
         impossible("TRIED TO NEST LOCKS");
         return TRUE;
     }
@@ -1692,7 +1683,7 @@ int retryct;
     if (lockfd == -1) {
         HUP raw_printf("Cannot open file %s.  Is NetHack installed correctly?",
                        filename);
-        nesting--;
+        g.nesting--;
         return FALSE;
     }
     sflock.l_type = F_WRLCK;
@@ -1722,7 +1713,7 @@ int retryct;
             HUP(void) raw_print("I give up.  Sorry.");
             HUP raw_printf("Some other process has an unnatural grip on %s.",
                            filename);
-            nesting--;
+            g.nesting--;
             return FALSE;
         }
 #else
@@ -1742,25 +1733,25 @@ int retryct;
                 HUP(void) raw_print("I give up.  Sorry.");
                 HUP raw_printf("Perhaps there is an old %s around?",
                                lockname);
-                nesting--;
+                g.nesting--;
                 return FALSE;
             }
 
             break;
         case ENOENT:
             HUP raw_printf("Can't find file %s to lock!", filename);
-            nesting--;
+            g.nesting--;
             return FALSE;
         case EACCES:
             HUP raw_printf("No write permission to lock %s!", filename);
-            nesting--;
+            g.nesting--;
             return FALSE;
 #ifdef VMS /* c__translate(vmsfiles.c) */
         case EPERM:
             /* could be misleading, but usually right */
             HUP raw_printf("Can't lock %s due to directory protection.",
                            filename);
-            nesting--;
+            g.nesting--;
             return FALSE;
 #endif
         case EROFS:
@@ -1769,13 +1760,13 @@ int retryct;
             HUP raw_printf("Cannot lock %s.", filename);
             HUP raw_printf(
   "(Perhaps you are running NetHack from inside the distribution package?).");
-            nesting--;
+            g.nesting--;
             return FALSE;
         default:
             HUP perror(lockname);
             HUP raw_printf("Cannot lock %s for unknown reason (%d).",
                            filename, errnosv);
-            nesting--;
+            g.nesting--;
             return FALSE;
         }
 #endif /* USE_FCNTL */
@@ -1786,23 +1777,23 @@ int retryct;
     && !defined(USE_FCNTL)
 #ifdef AMIGA
 #define OPENFAILURE(fd) (!fd)
-    lockptr = 0;
+    g.lockptr = 0;
 #else
 #define OPENFAILURE(fd) (fd < 0)
-    lockptr = -1;
+    g.lockptr = -1;
 #endif
-    while (--retryct && OPENFAILURE(lockptr)) {
+    while (--retryct && OPENFAILURE(g.lockptr)) {
 #if defined(WIN32) && !defined(WIN_CE)
-        lockptr = sopen(lockname, O_RDWR | O_CREAT, SH_DENYRW, S_IWRITE);
+        g.lockptr = sopen(lockname, O_RDWR | O_CREAT, SH_DENYRW, S_IWRITE);
 #else
         (void) DeleteFile(lockname); /* in case dead process was here first */
 #ifdef AMIGA
-        lockptr = Open(lockname, MODE_NEWFILE);
+        g.lockptr = Open(lockname, MODE_NEWFILE);
 #else
-        lockptr = open(lockname, O_RDWR | O_CREAT | O_EXCL, S_IWRITE);
+        g.lockptr = open(lockname, O_RDWR | O_CREAT | O_EXCL, S_IWRITE);
 #endif
 #endif
-        if (OPENFAILURE(lockptr)) {
+        if (OPENFAILURE(g.lockptr)) {
             raw_printf("Waiting for access to %s.  (%d retries left).",
                        filename, retryct);
             Delay(50);
@@ -1810,7 +1801,7 @@ int retryct;
     }
     if (!retryct) {
         raw_printf("I give up.  Sorry.");
-        nesting--;
+        g.nesting--;
         return FALSE;
     }
 #endif /* AMIGA || WIN32 || MSDOS */
@@ -1834,7 +1825,7 @@ const char *filename;
     const char *lockname;
 #endif
 
-    if (nesting == 1) {
+    if (g.nesting == 1) {
 #ifdef USE_FCNTL
         sflock.l_type = F_UNLCK;
         if (fcntl(lockfd, F_SETLK, &sflock) == -1) {
@@ -1857,15 +1848,15 @@ const char *filename;
 #endif /* UNIX || VMS */
 
 #if defined(AMIGA) || defined(WIN32) || defined(MSDOS)
-        if (lockptr)
-            Close(lockptr);
+        if (g.lockptr)
+            Close(g.lockptr);
         DeleteFile(lockname);
-        lockptr = 0;
+        g.lockptr = 0;
 #endif /* AMIGA || WIN32 || MSDOS */
 #endif /* USE_FCNTL */
     }
 
-    nesting--;
+    g.nesting--;
 }
 
 /* ----------  END FILE LOCKING HANDLING ----------- */
@@ -2183,13 +2174,13 @@ char sep;
 STATIC_OVL void
 free_config_sections()
 {
-    if (config_section_chosen) {
-        free(config_section_chosen);
-        config_section_chosen = NULL;
+    if (g.config_section_chosen) {
+        free(g.config_section_chosen);
+        g.config_section_chosen = NULL;
     }
-    if (config_section_current) {
-        free(config_section_current);
-        config_section_current = NULL;
+    if (g.config_section_current) {
+        free(g.config_section_current);
+        g.config_section_current = NULL;
     }
 }
 
@@ -2208,20 +2199,20 @@ char *buf;
 {
     if (is_config_section(buf)) {
         char *send;
-        if (config_section_current) {
-            free(config_section_current);
+        if (g.config_section_current) {
+            free(g.config_section_current);
         }
-        config_section_current = dupstr(&buf[1]);
-        send = rindex(config_section_current, ']');
+        g.config_section_current = dupstr(&buf[1]);
+        send = rindex(g.config_section_current, ']');
         *send = '\0';
-        debugpline1("set config section: '%s'", config_section_current);
+        debugpline1("set config section: '%s'", g.config_section_current);
         return TRUE;
     }
 
-    if (config_section_current) {
-        if (!config_section_chosen)
+    if (g.config_section_current) {
+        if (!g.config_section_chosen)
             return TRUE;
-        if (strcmp(config_section_current, config_section_chosen))
+        if (strcmp(g.config_section_current, g.config_section_chosen))
             return TRUE;
     }
     return FALSE;
@@ -2562,7 +2553,7 @@ char *origbuf;
         }
         switch_symbols(TRUE);
     } else if (match_varname(buf, "WIZKIT", 6)) {
-        (void) strncpy(wizkit, bufp, WIZKIT_MAX - 1);
+        (void) strncpy(g.wizkit, bufp, WIZKIT_MAX - 1);
 #ifdef AMIGA
     } else if (match_varname(buf, "FONT", 4)) {
         char *t;
@@ -2873,58 +2864,58 @@ fopen_wizkit_file()
 
     envp = nh_getenv("WIZKIT");
     if (envp && *envp)
-        (void) strncpy(wizkit, envp, WIZKIT_MAX - 1);
-    if (!wizkit[0])
+        (void) strncpy(g.wizkit, envp, WIZKIT_MAX - 1);
+    if (!g.wizkit[0])
         return (FILE *) 0;
 
 #ifdef UNIX
-    if (access(wizkit, 4) == -1) {
+    if (access(g.wizkit, 4) == -1) {
         /* 4 is R_OK on newer systems */
         /* nasty sneaky attempt to read file through
          * NetHack's setuid permissions -- this is a
          * place a file name may be wholly under the player's
          * control
          */
-        raw_printf("Access to %s denied (%d).", wizkit, errno);
+        raw_printf("Access to %s denied (%d).", g.wizkit, errno);
         wait_synch();
         /* fall through to standard names */
     } else
 #endif
-        if ((fp = fopenp(wizkit, "r")) != (FILE *) 0) {
+        if ((fp = fopenp(g.wizkit, "r")) != (FILE *) 0) {
         return fp;
 #if defined(UNIX) || defined(VMS)
     } else {
         /* access() above probably caught most problems for UNIX */
-        raw_printf("Couldn't open requested config file %s (%d).", wizkit,
+        raw_printf("Couldn't open requested config file %s (%d).", g.wizkit,
                    errno);
         wait_synch();
 #endif
     }
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
+    if ((fp = fopenp(fqname(g.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
         return fp;
 #else
 #ifdef VMS
     envp = nh_getenv("HOME");
     if (envp)
-        Sprintf(tmp_wizkit, "%s%s", envp, wizkit);
+        Sprintf(tmp_wizkit, "%s%s", envp, g.wizkit);
     else
-        Sprintf(tmp_wizkit, "%s%s", "sys$login:", wizkit);
+        Sprintf(tmp_wizkit, "%s%s", "sys$login:", g.wizkit);
     if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
     if (envp)
-        Sprintf(tmp_wizkit, "%s/%s", envp, wizkit);
+        Sprintf(tmp_wizkit, "%s/%s", envp, g.wizkit);
     else
-        Strcpy(tmp_wizkit, wizkit);
+        Strcpy(tmp_wizkit, g.wizkit);
     if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
         return fp;
     else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
-        raw_printf("Couldn't open default wizkit file %s (%d).", tmp_wizkit,
+        raw_printf("Couldn't open default g.wizkit file %s (%d).", tmp_wizkit,
                    errno);
         wait_synch();
     }
@@ -3106,11 +3097,11 @@ boolean FDECL((*proc), (char *));
                         continue;
                     }
                     bufp++;
-                    if (config_section_chosen)
-                        free(config_section_chosen);
+                    if (g.config_section_chosen)
+                        free(g.config_section_chosen);
                     section = choose_random_part(bufp, ',');
                     if (section)
-                        config_section_chosen = dupstr(section);
+                        g.config_section_chosen = dupstr(section);
                     else {
                         config_error_add("No config section to choose");
                         rv = FALSE;
@@ -3136,13 +3127,9 @@ boolean FDECL((*proc), (char *));
     return rv;
 }
 
-extern struct symsetentry *symset_list;  /* options.c */
 extern struct symparse loadsyms[];       /* drawing.c */
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
-static int symset_count = 0;             /* for pick-list building only */
-static boolean chosen_symset_start = FALSE, chosen_symset_end = FALSE;
-static int symset_which_set = 0;
 
 STATIC_OVL
 FILE *
@@ -3167,16 +3154,16 @@ int which_set;
     if (!(fp = fopen_sym_file()))
         return 0;
 
-    symset_count = 0;
-    chosen_symset_start = chosen_symset_end = FALSE;
-    symset_which_set = which_set;
+    g.symset_count = 0;
+    g.chosen_symset_start = g.chosen_symset_end = FALSE;
+    g.symset_which_set = which_set;
 
     config_error_init(TRUE, "symbols", FALSE);
 
     parse_conf_file(fp, proc_symset_line);
     (void) fclose(fp);
 
-    if (!chosen_symset_start && !chosen_symset_end) {
+    if (!g.chosen_symset_start && !g.chosen_symset_end) {
         /* name caller put in symset[which_set].name was not found;
            if it looks like "Default symbols", null it out and return
            success to use the default; otherwise, return failure */
@@ -3188,7 +3175,7 @@ int which_set;
         config_error_done();
         return (g.symset[which_set].name == 0) ? 1 : 0;
     }
-    if (!chosen_symset_end)
+    if (!g.chosen_symset_end)
         config_error_add("Missing finish for symset \"%s\"",
                          g.symset[which_set].name ? g.symset[which_set].name
                                                 : "unknown");
@@ -3202,7 +3189,7 @@ boolean
 proc_symset_line(buf)
 char *buf;
 {
-    return !((boolean) parse_sym_line(buf, symset_which_set));
+    return !((boolean) parse_sym_line(buf, g.symset_which_set));
 }
 
 /* returns 0 on error */
@@ -3235,9 +3222,9 @@ int which_set;
     if (!bufp) {
         if (strncmpi(buf, "finish", 6) == 0) {
             /* end current graphics set */
-            if (chosen_symset_start)
-                chosen_symset_end = TRUE;
-            chosen_symset_start = FALSE;
+            if (g.chosen_symset_start)
+                g.chosen_symset_end = TRUE;
+            g.chosen_symset_start = FALSE;
             return 1;
         }
         config_error_add("No \"finish\"");
@@ -3266,15 +3253,15 @@ int which_set;
                 tmpsp =
                     (struct symsetentry *) alloc(sizeof (struct symsetentry));
                 tmpsp->next = (struct symsetentry *) 0;
-                if (!symset_list) {
-                    symset_list = tmpsp;
-                    symset_count = 0;
+                if (!g.symset_list) {
+                    g.symset_list = tmpsp;
+                    g.symset_count = 0;
                 } else {
-                    symset_count++;
-                    tmpsp->next = symset_list;
-                    symset_list = tmpsp;
+                    g.symset_count++;
+                    tmpsp->next = g.symset_list;
+                    g.symset_list = tmpsp;
                 }
-                tmpsp->idx = symset_count;
+                tmpsp->idx = g.symset_count;
                 tmpsp->name = dupstr(bufp);
                 tmpsp->desc = (char *) 0;
                 tmpsp->nocolor = 0;
@@ -3284,7 +3271,7 @@ int which_set;
                 break;
             case 2:
                 /* handler type identified */
-                tmpsp = symset_list; /* most recent symset */
+                tmpsp = g.symset_list; /* most recent symset */
                 tmpsp->handling = H_UNK;
                 i = 0;
                 while (known_handling[i]) {
@@ -3296,13 +3283,13 @@ int which_set;
                 }
                 break;
             case 3:                  /* description:something */
-                tmpsp = symset_list; /* most recent symset */
+                tmpsp = g.symset_list; /* most recent symset */
                 if (tmpsp && !tmpsp->desc)
                     tmpsp->desc = dupstr(bufp);
                 break;
             case 5:
                 /* restrictions: xxxx*/
-                tmpsp = symset_list; /* most recent symset */
+                tmpsp = g.symset_list; /* most recent symset */
                 for (i = 0; known_restrictions[i]; ++i) {
                     if (!strcmpi(known_restrictions[i], bufp)) {
                         switch (i) {
@@ -3328,7 +3315,7 @@ int which_set;
                 /* start of symset */
                 if (!strcmpi(bufp, g.symset[which_set].name)) {
                     /* matches desired one */
-                    chosen_symset_start = TRUE;
+                    g.chosen_symset_start = TRUE;
                     /* these init_*() functions clear symset fields too */
                     if (which_set == ROGUESET)
                         init_r_symbols();
@@ -3338,18 +3325,18 @@ int which_set;
                 break;
             case 1:
                 /* finish symset */
-                if (chosen_symset_start)
-                    chosen_symset_end = TRUE;
-                chosen_symset_start = FALSE;
+                if (g.chosen_symset_start)
+                    g.chosen_symset_end = TRUE;
+                g.chosen_symset_start = FALSE;
                 break;
             case 2:
                 /* handler type identified */
-                if (chosen_symset_start)
+                if (g.chosen_symset_start)
                     set_symhandling(bufp, which_set);
                 break;
             /* case 3: (description) is ignored here */
             case 4: /* color:off */
-                if (chosen_symset_start) {
+                if (g.chosen_symset_start) {
                     if (bufp) {
                         if (!strcmpi(bufp, "true") || !strcmpi(bufp, "yes")
                             || !strcmpi(bufp, "on"))
@@ -3362,7 +3349,7 @@ int which_set;
                 }
                 break;
             case 5: /* restrictions: xxxx*/
-                if (chosen_symset_start) {
+                if (g.chosen_symset_start) {
                     int n = 0;
 
                     while (known_restrictions[n]) {
@@ -3384,7 +3371,7 @@ int which_set;
             }
         } else { /* !SYM_CONTROL */
             val = sym_val(bufp);
-            if (chosen_symset_start) {
+            if (g.chosen_symset_start) {
                 if (which_set == PRIMARY) {
                     update_l_symset(symp, val);
                 } else if (which_set == ROGUESET) {
