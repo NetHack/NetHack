@@ -438,6 +438,12 @@ const struct instance_globals g_init = {
     0, /* sortloogmode */
     NULL, /* invbuf */
     0, /* inbufsize */
+    WIN_ERR, /* cached_pickinv_win */
+    UNDEFINED_VALUE,
+    UNDEFINED_VALUES,
+
+    /* light.c */
+    NULL, /* light_source */
 
     /* lock.c */
     UNDEFINED_VALUES,
@@ -472,16 +478,26 @@ const struct instance_globals g_init = {
     /* mkmaze.c */
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} }, /* bughack */
     UNDEFINED_VALUE, /* was_waterlevel */
+    UNDEFINED_PTR, /* bbubbles */
+    UNDEFINED_PTR, /* ebubbles */
+    UNDEFINED_PTR, /* wportal */
+    UNDEFINED_VALUE, /* xmin */
+    UNDEFINED_VALUE, /* ymin */
+    UNDEFINED_VALUE, /* xmax */
+    UNDEFINED_VALUE, /* ymax */
 
     /* mon.c */
     UNDEFINED_VALUE, /* vamp_rise_msg */
     UNDEFINED_VALUE, /* disintegested */
+    NULL, /* animal_list */
+    UNDEFINED_VALUE, /* animal_list_count */
 
-    /* mused.c */
+    /* muse.c */
     FALSE, /* m_using */
     UNDEFINED_VALUE, /* trapx */
     UNDEFINED_VALUE, /* trapy */
     UNDEFINED_VALUE, /* zap_oseen */
+    UNDEFINED_VALUES, /* m */
 
     /* objname.c */
     0, /* distantname */

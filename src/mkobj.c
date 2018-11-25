@@ -1436,7 +1436,7 @@ register struct obj *obj;
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }
 
-static int treefruits[] = { APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF };
+static const int treefruits[] = { APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF };
 
 struct obj *
 rnd_treefruit_at(x, y)

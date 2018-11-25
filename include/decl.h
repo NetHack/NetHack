@@ -578,6 +578,49 @@ struct rogueroom {
     int nroom; /* Only meaningful for "real" rooms */
 };
 
+typedef struct ls_t {
+    struct ls_t *next;
+    xchar x, y;  /* source's position */
+    short range; /* source's current range */
+    short flags;
+    short type;  /* type of light source */
+    anything id; /* source's identifier */
+} light_source;
+
+struct container {
+    struct container *next;
+    xchar x, y;
+    short what;
+    genericptr_t list;
+};
+
+enum bubble_contains_types {
+    CONS_OBJ = 0,
+    CONS_MON,
+    CONS_HERO,
+    CONS_TRAP
+};
+
+#define MAX_BMASK 4
+
+struct bubble {
+    xchar x, y;   /* coordinates of the upper left corner */
+    schar dx, dy; /* the general direction of the bubble's movement */
+    uchar bm[MAX_BMASK + 2];    /* bubble bit mask */
+    struct bubble *prev, *next; /* need to traverse the list up and down */
+    struct container *cons;
+};
+
+struct musable {
+    struct obj *offensive;
+    struct obj *defensive;
+    struct obj *misc;
+    int has_offense, has_defense, has_misc;
+    /* =0, no capability; otherwise, different numbers.
+     * If it's an object, the object is also set (it's 0 otherwise).
+     */
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -720,6 +763,18 @@ struct instance_globals {
                             * reset by sortloot when done */
     char *invbuf;
     unsigned invbufsiz;
+    /* for perm_invent when operating on a partial inventory display, so that
+       the persistent one doesn't get shrunk during filtering for item selection
+       then regrown to full inventory, possibly being resized in the process */
+    winid cached_pickinv_win;
+    /* query objlist callback: return TRUE if obj type matches "this_type" */
+    int this_type;
+    /* query objlist callback: return TRUE if obj is at given location */
+    coord only;
+
+    /* light.c */
+    light_source *light_base;
+
 
     /* lock.c */
     struct xlock_s xlock;
@@ -760,10 +815,16 @@ struct instance_globals {
     lev_region bughack; /* for preserving the insect legs when wallifying
                          * baalz level */
     boolean was_waterlevel; /* ugh... this shouldn't be needed */
+    struct bubble *bbubbles;
+    struct bubble *ebubbles;
+    struct trap *wportal;
+    int xmin, ymin, xmax, ymax; /* level boundaries */
 
     /* mon.c */
     boolean vamp_rise_msg;
     boolean disintegested;
+    short *animal_list; /* list of PM values for animal monsters */
+    int animal_list_count;
 
     /* muse.c */
     boolean m_using; /* kludge to use mondided instead of killed */
@@ -775,6 +836,7 @@ struct instance_globals {
                         * function mbhitm has to be compatible with the
                         * normal zap routines, and those routines don't
                         * remember who zapped the wand. */
+    struct musable m;
 
     /* objname.c */
     /* distantname used by distant_name() to pass extra information to

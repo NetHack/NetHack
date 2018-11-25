@@ -3127,7 +3127,6 @@ boolean FDECL((*proc), (char *));
     return rv;
 }
 
-extern struct symparse loadsyms[];       /* drawing.c */
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
 

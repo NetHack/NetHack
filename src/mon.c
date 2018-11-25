@@ -3056,9 +3056,6 @@ struct monst *mon;
     }
 }
 
-static short *animal_list = 0; /* list of PM values for animal monsters */
-static int animal_list_count;
-
 void
 mon_animal_list(construct)
 boolean construct;
@@ -3074,14 +3071,14 @@ boolean construct;
                 animal_temp[n++] = i;
         /* if (n == 0) animal_temp[n++] = NON_PM; */
 
-        animal_list = (short *) alloc(n * sizeof *animal_list);
-        (void) memcpy((genericptr_t) animal_list, (genericptr_t) animal_temp,
-                      n * sizeof *animal_list);
-        animal_list_count = n;
+        g.animal_list = (short *) alloc(n * sizeof *g.animal_list);
+        (void) memcpy((genericptr_t) g.animal_list, (genericptr_t) animal_temp,
+                      n * sizeof *g.animal_list);
+        g.animal_list_count = n;
     } else { /* release */
-        if (animal_list)
-            free((genericptr_t) animal_list), animal_list = 0;
-        animal_list_count = 0;
+        if (g.animal_list)
+            free((genericptr_t) g.animal_list), g.animal_list = 0;
+        g.animal_list_count = 0;
     }
 }
 
@@ -3090,15 +3087,15 @@ pick_animal()
 {
     int res;
 
-    if (!animal_list)
+    if (!g.animal_list)
         mon_animal_list(TRUE);
 
-    res = animal_list[rn2(animal_list_count)];
+    res = g.animal_list[rn2(g.animal_list_count)];
     /* rogue level should use monsters represented by uppercase letters
        only, but since chameleons aren't generated there (not uppercase!)
        we don't perform a lot of retries */
     if (Is_rogue_level(&u.uz) && !isupper((uchar) mons[res].mlet))
-        res = animal_list[rn2(animal_list_count)];
+        res = g.animal_list[rn2(g.animal_list_count)];
     return res;
 }
 

@@ -1371,15 +1371,11 @@ fumaroles()
  * other source files, but they are all so nicely encapsulated here.
  */
 
-static struct bubble *bbubbles, *ebubbles;
-
-static struct trap *wportal;
-static int xmin, ymin, xmax, ymax; /* level boundaries */
 /* bubble movement boundaries */
-#define bxmin (xmin + 1)
-#define bymin (ymin + 1)
-#define bxmax (xmax - 1)
-#define bymax (ymax - 1)
+#define gbxmin (g.xmin + 1)
+#define gbymin (g.ymin + 1)
+#define gbxmax (g.xmax - 1)
+#define gbymax (g.ymax - 1)
 
 STATIC_DCL void NDECL(set_wportal);
 STATIC_DCL void FDECL(mk_bubble, (int, int, int));
@@ -1398,7 +1394,7 @@ movebubbles()
                                        1, 0, 0, 0, 0 };
 
     /* set up the portal the first time bubbles are moved */
-    if (!wportal)
+    if (!g.wportal)
         set_wportal();
 
     vision_recalc(2);
@@ -1412,7 +1408,7 @@ movebubbles()
          * Pick up everything inside of a bubble then fill all bubble
          * locations.
          */
-        for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
+        for (b = up ? g.bbubbles : g.ebubbles; b; b = up ? b->next : b->prev) {
             if (b->cons)
                 panic("movebubbles: cons != null");
             for (i = 0, x = b->x; i < (int) b->bm[0]; i++, x++)
@@ -1511,7 +1507,7 @@ movebubbles()
      * would eventually end up in the last bubble in the chain.
      */
     up = !up;
-    for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
+    for (b = up ? g.bbubbles : g.ebubbles; b; b = up ? b->next : b->prev) {
         int rx = rn2(3), ry = rn2(3);
 
         mv_bubble(b, b->dx + 1 - (!b->dx ? rx : (rx ? 1 : 0)),
@@ -1570,14 +1566,14 @@ int fd, mode;
 
     if (perform_bwrite(mode)) {
         int n = 0;
-        for (b = bbubbles; b; b = b->next)
+        for (b = g.bbubbles; b; b = b->next)
             ++n;
         bwrite(fd, (genericptr_t) &n, sizeof(int));
-        bwrite(fd, (genericptr_t) &xmin, sizeof(int));
-        bwrite(fd, (genericptr_t) &ymin, sizeof(int));
-        bwrite(fd, (genericptr_t) &xmax, sizeof(int));
-        bwrite(fd, (genericptr_t) &ymax, sizeof(int));
-        for (b = bbubbles; b; b = b->next)
+        bwrite(fd, (genericptr_t) &g.xmin, sizeof(int));
+        bwrite(fd, (genericptr_t) &g.ymin, sizeof(int));
+        bwrite(fd, (genericptr_t) &g.xmax, sizeof(int));
+        bwrite(fd, (genericptr_t) &g.ymax, sizeof(int));
+        for (b = g.bbubbles; b; b = b->next)
             bwrite(fd, (genericptr_t) b, sizeof(struct bubble));
     }
     if (release_data(mode))
@@ -1596,24 +1592,24 @@ int fd;
 
     set_wportal();
     mread(fd, (genericptr_t) &n, sizeof(int));
-    mread(fd, (genericptr_t) &xmin, sizeof(int));
-    mread(fd, (genericptr_t) &ymin, sizeof(int));
-    mread(fd, (genericptr_t) &xmax, sizeof(int));
-    mread(fd, (genericptr_t) &ymax, sizeof(int));
+    mread(fd, (genericptr_t) &g.xmin, sizeof(int));
+    mread(fd, (genericptr_t) &g.ymin, sizeof(int));
+    mread(fd, (genericptr_t) &g.xmax, sizeof(int));
+    mread(fd, (genericptr_t) &g.ymax, sizeof(int));
     for (i = 0; i < n; i++) {
         btmp = b;
         b = (struct bubble *) alloc(sizeof(struct bubble));
         mread(fd, (genericptr_t) b, sizeof(struct bubble));
-        if (bbubbles) {
+        if (g.bbubbles) {
             btmp->next = b;
             b->prev = btmp;
         } else {
-            bbubbles = b;
+            g.bbubbles = b;
             b->prev = (struct bubble *) 0;
         }
         mv_bubble(b, 0, 0, TRUE);
     }
-    ebubbles = b;
+    g.ebubbles = b;
     b->next = (struct bubble *) 0;
     g.was_waterlevel = TRUE;
 }
@@ -1652,8 +1648,8 @@ STATIC_OVL void
 set_wportal()
 {
     /* there better be only one magic portal on water level... */
-    for (wportal = ftrap; wportal; wportal = wportal->ntrap)
-        if (wportal->ttyp == MAGIC_PORTAL)
+    for (g.wportal = ftrap; g.wportal; g.wportal = g.wportal->ntrap)
+        if (g.wportal->ttyp == MAGIC_PORTAL)
             return;
     impossible("set_wportal(): no portal!");
 }
@@ -1668,15 +1664,15 @@ setup_waterlevel()
 
     /* ouch, hardcoded... */
 
-    xmin = 3;
-    ymin = 1;
-    xmax = 78;
-    ymax = 20;
+    g.xmin = 3;
+    g.ymin = 1;
+    g.xmax = 78;
+    g.ymax = 20;
 
     /* set hero's memory to water */
 
-    for (x = xmin; x <= xmax; x++)
-        for (y = ymin; y <= ymax; y++)
+    for (x = g.xmin; x <= g.xmax; x++)
+        for (y = g.ymin; y <= g.ymax; y++)
             levl[x][y].glyph = Is_waterlevel(&u.uz) ? water_glyph : air_glyph;
 
     /* make bubbles */
@@ -1689,8 +1685,8 @@ setup_waterlevel()
         yskip = 3 + rn2(3);
     }
 
-    for (x = bxmin; x <= bxmax; x += xskip)
-        for (y = bymin; y <= bymax; y += yskip)
+    for (x = gbxmin; x <= gbxmax; x += xskip)
+        for (y = gbymin; y <= gbymax; y += yskip)
             mk_bubble(x, y, rn2(7));
 }
 
@@ -1701,11 +1697,11 @@ unsetup_waterlevel()
 
     /* free bubbles */
 
-    for (b = bbubbles; b; b = bb) {
+    for (b = g.bbubbles; b; b = bb) {
         bb = b->next;
         free((genericptr_t) b);
     }
-    bbubbles = ebubbles = (struct bubble *) 0;
+    g.bbubbles = g.ebubbles = (struct bubble *) 0;
 }
 
 STATIC_OVL void
@@ -1729,7 +1725,7 @@ int x, y, n;
                  *bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
     struct bubble *b;
 
-    if (x >= bxmax || y >= bymax)
+    if (x >= gbxmax || y >= gbymax)
         return;
     if (n >= SIZE(bmask)) {
         impossible("n too large (mk_bubble)");
@@ -1739,10 +1735,10 @@ int x, y, n;
         panic("bmask size is larger than MAX_BMASK");
     }
     b = (struct bubble *) alloc(sizeof(struct bubble));
-    if ((x + (int) bmask[n][0] - 1) > bxmax)
-        x = bxmax - bmask[n][0] + 1;
-    if ((y + (int) bmask[n][1] - 1) > bymax)
-        y = bymax - bmask[n][1] + 1;
+    if ((x + (int) bmask[n][0] - 1) > gbxmax)
+        x = gbxmax - bmask[n][0] + 1;
+    if ((y + (int) bmask[n][1] - 1) > gbymax)
+        y = gbymax - bmask[n][1] + 1;
     b->x = x;
     b->y = y;
     b->dx = 1 - rn2(3);
@@ -1751,15 +1747,15 @@ int x, y, n;
     (void) memcpy((genericptr_t) b->bm, (genericptr_t) bmask[n],
                   (bmask[n][1] + 2) * sizeof(b->bm[0]));
     b->cons = 0;
-    if (!bbubbles)
-        bbubbles = b;
-    if (ebubbles) {
-        ebubbles->next = b;
-        b->prev = ebubbles;
+    if (!g.bbubbles)
+        g.bbubbles = b;
+    if (g.ebubbles) {
+        g.ebubbles->next = b;
+        b->prev = g.ebubbles;
     } else
         b->prev = (struct bubble *) 0;
     b->next = (struct bubble *) 0;
-    ebubbles = b;
+    g.ebubbles = b;
     mv_bubble(b, 0, 0, TRUE);
 }
 
@@ -1793,42 +1789,42 @@ boolean ini;
          * collision with level borders?
          *      1 = horizontal border, 2 = vertical, 3 = corner
          */
-        if (b->x <= bxmin)
+        if (b->x <= gbxmin)
             colli |= 2;
-        if (b->y <= bymin)
+        if (b->y <= gbymin)
             colli |= 1;
-        if ((int) (b->x + b->bm[0] - 1) >= bxmax)
+        if ((int) (b->x + b->bm[0] - 1) >= gbxmax)
             colli |= 2;
-        if ((int) (b->y + b->bm[1] - 1) >= bymax)
+        if ((int) (b->y + b->bm[1] - 1) >= gbymax)
             colli |= 1;
 
-        if (b->x < bxmin) {
-            pline("bubble xmin: x = %d, xmin = %d", b->x, bxmin);
-            b->x = bxmin;
+        if (b->x < gbxmin) {
+            pline("bubble xmin: x = %d, xmin = %d", b->x, gbxmin);
+            b->x = gbxmin;
         }
-        if (b->y < bymin) {
-            pline("bubble ymin: y = %d, ymin = %d", b->y, bymin);
-            b->y = bymin;
+        if (b->y < gbymin) {
+            pline("bubble ymin: y = %d, ymin = %d", b->y, gbymin);
+            b->y = gbymin;
         }
-        if ((int) (b->x + b->bm[0] - 1) > bxmax) {
+        if ((int) (b->x + b->bm[0] - 1) > gbxmax) {
             pline("bubble xmax: x = %d, xmax = %d", b->x + b->bm[0] - 1,
-                  bxmax);
-            b->x = bxmax - b->bm[0] + 1;
+                  gbxmax);
+            b->x = gbxmax - b->bm[0] + 1;
         }
-        if ((int) (b->y + b->bm[1] - 1) > bymax) {
+        if ((int) (b->y + b->bm[1] - 1) > gbymax) {
             pline("bubble ymax: y = %d, ymax = %d", b->y + b->bm[1] - 1,
-                  bymax);
-            b->y = bymax - b->bm[1] + 1;
+                  gbymax);
+            b->y = gbymax - b->bm[1] + 1;
         }
 
         /* bounce if we're trying to move off the border */
-        if (b->x == bxmin && dx < 0)
+        if (b->x == gbxmin && dx < 0)
             dx = -dx;
-        if (b->x + b->bm[0] - 1 == bxmax && dx > 0)
+        if (b->x + b->bm[0] - 1 == gbxmax && dx > 0)
             dx = -dx;
-        if (b->y == bymin && dy < 0)
+        if (b->y == gbymin && dy < 0)
             dy = -dy;
-        if (b->y + b->bm[1] - 1 == bymax && dy > 0)
+        if (b->y + b->bm[1] - 1 == gbymax && dy > 0)
             dy = -dy;
 
         b->x += dx;
