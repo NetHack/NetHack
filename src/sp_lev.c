@@ -189,21 +189,6 @@ STATIC_DCL boolean FDECL(sp_level_coder, (sp_lev *));
 
 extern struct engr *head_engr;
 
-/* positions touched by level elements explicitly defined in the des-file */
-static char SpLev_Map[COLNO][ROWNO];
-
-static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
-static NEARDATA xchar xstart, ystart;
-static NEARDATA char xsize, ysize;
-
-static boolean splev_init_present = FALSE;
-static boolean icedpools = FALSE;
-static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
-
-static struct obj *container_obj[MAX_CONTAINMENT];
-static int container_idx = 0;
-static struct monst *invent_carrying_monster = NULL;
-
 #define SPLEV_STACK_RESERVE 128
 
 void
@@ -213,7 +198,7 @@ solidify_map()
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y])
+            if (IS_STWALL(levl[x][y].typ) && !g.SpLev_Map[x][y])
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
 }
 
@@ -656,13 +641,13 @@ shuffle_alignments()
 
     /* shuffle 3 alignments */
     i = rn2(3);
-    atmp = ralign[2];
-    ralign[2] = ralign[i];
-    ralign[i] = atmp;
+    atmp = g.ralign[2];
+    g.ralign[2] = g.ralign[i];
+    g.ralign[i] = atmp;
     if (rn2(2)) {
-        atmp = ralign[1];
-        ralign[1] = ralign[0];
-        ralign[0] = atmp;
+        atmp = g.ralign[1];
+        g.ralign[1] = g.ralign[0];
+        g.ralign[0] = atmp;
     }
 }
 
@@ -705,7 +690,7 @@ remove_boundary_syms()
     if (has_bounds) {
         for (x = 0; x < x_maze_max; x++)
             for (y = 0; y < y_maze_max; y++)
-                if ((levl[x][y].typ == CROSSWALL) && SpLev_Map[x][y])
+                if ((levl[x][y].typ == CROSSWALL) && g.SpLev_Map[x][y])
                     levl[x][y].typ = ROOM;
     }
 }
@@ -873,10 +858,10 @@ struct mkroom *croom;
         sx = croom->hx - mx + 1;
         sy = croom->hy - my + 1;
     } else {
-        mx = xstart;
-        my = ystart;
-        sx = xsize;
-        sy = ysize;
+        mx = g.xstart;
+        my = g.ystart;
+        sx = g.xsize;
+        sy = g.ysize;
     }
 
     if (*x >= 0) { /* normal locations */
@@ -1598,7 +1583,7 @@ struct mkroom *croom;
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
                   : (m->align <= -(MAX_REGISTERS + 1))
                      ? induced_align(80)
-                     : (m->align < 0 ? ralign[-m->align - 1] : m->align);
+                     : (m->align < 0 ? g.ralign[-m->align - 1] : m->align);
 
     if (!class)
         pm = (struct permonst *) 0;
@@ -1822,7 +1807,7 @@ struct mkroom *croom;
 
         if (m->has_invent) {
             discard_minvent(mtmp);
-            invent_carrying_monster = mtmp;
+            g.invent_carrying_monster = mtmp;
         }
     }
 }
@@ -1933,8 +1918,8 @@ struct mkroom *croom;
 
     /* contents */
     if (o->containment & SP_OBJ_CONTENT) {
-        if (!container_idx) {
-            if (!invent_carrying_monster) {
+        if (!g.container_idx) {
+            if (!g.invent_carrying_monster) {
                 /*impossible("create_object: no container");*/
                 /* don't complain, the monster may be gone legally
                    (eg. unique demon already generated)
@@ -1948,25 +1933,25 @@ struct mkroom *croom;
                 struct obj *objcheck = otmp;
                 int inuse = -1;
 
-                for (ci = 0; ci < container_idx; ci++)
-                    if (container_obj[ci] == objcheck)
+                for (ci = 0; ci < g.container_idx; ci++)
+                    if (g.container_obj[ci] == objcheck)
                         inuse = ci;
                 remove_object(otmp);
-                if (mpickobj(invent_carrying_monster, otmp)) {
+                if (mpickobj(g.invent_carrying_monster, otmp)) {
                     if (inuse > -1) {
                         impossible(
                      "container given to monster was merged or deallocated.");
-                        for (ci = inuse; ci < container_idx - 1; ci++)
-                            container_obj[ci] = container_obj[ci + 1];
-                        container_obj[container_idx] = NULL;
-                        container_idx--;
+                        for (ci = inuse; ci < g.container_idx - 1; ci++)
+                            g.container_obj[ci] = g.container_obj[ci + 1];
+                        g.container_obj[g.container_idx] = NULL;
+                        g.container_idx--;
                     }
                     /* we lost track of it. */
                     return;
                 }
             }
         } else {
-            struct obj *cobj = container_obj[container_idx - 1];
+            struct obj *cobj = g.container_obj[g.container_idx - 1];
 
             remove_object(otmp);
             if (cobj) {
@@ -1982,9 +1967,9 @@ struct mkroom *croom;
     /* container */
     if (o->containment & SP_OBJ_CONTAINER) {
         delete_contents(otmp);
-        if (container_idx < MAX_CONTAINMENT) {
-            container_obj[container_idx] = otmp;
-            container_idx++;
+        if (g.container_idx < MAX_CONTAINMENT) {
+            g.container_obj[g.container_idx] = otmp;
+            g.container_idx++;
         } else
             impossible("create_object: too deeply nested containers.");
     }
@@ -2039,17 +2024,17 @@ struct mkroom *croom;
         if (Is_mineend_level(&u.uz)) {
             if (otmp->otyp == iflags.mines_prize_type) {
                 otmp->record_achieve_special = MINES_PRIZE;
-                if (++mines_prize_count > 1)
+                if (++g.mines_prize_count > 1)
                     impossible(prize_warning, "mines end");
             }
         } else if (Is_sokoend_level(&u.uz)) {
             if (otmp->otyp == iflags.soko_prize_type1) {
                 otmp->record_achieve_special = SOKO_PRIZE1;
-                if (++soko_prize_count > 1)
+                if (++g.soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             } else if (otmp->otyp == iflags.soko_prize_type2) {
                 otmp->record_achieve_special = SOKO_PRIZE2;
-                if (++soko_prize_count > 1)
+                if (++g.soko_prize_count > 1)
                     impossible(prize_warning, "sokoban end");
             }
         }
@@ -2065,8 +2050,8 @@ struct mkroom *croom;
         boolean dealloced;
 
         (void) bury_an_obj(otmp, &dealloced);
-        if (dealloced && container_idx) {
-            container_obj[container_idx - 1] = NULL;
+        if (dealloced && g.container_idx) {
+            g.container_obj[g.container_idx - 1] = NULL;
         }
     }
 }
@@ -2114,7 +2099,7 @@ struct mkroom *croom;
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
                   : (a->align == -(MAX_REGISTERS + 1))
                      ? induced_align(80)
-                     : (a->align < 0 ? ralign[-a->align - 1] : a->align);
+                     : (a->align < 0 ? g.ralign[-a->align - 1] : a->align);
 
     levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;
@@ -2608,7 +2593,7 @@ int humidity;
         y = rn1(y_maze_max - 3, 3);
         if (--tryct < 0)
             break; /* give up */
-    } while (!(x % 2) || !(y % 2) || SpLev_Map[x][y]
+    } while (!(x % 2) || !(y % 2) || g.SpLev_Map[x][y]
              || !is_ok_location((schar) x, (schar) y, humidity));
 
     m->x = (xchar) x, m->y = (xchar) y;
@@ -2633,7 +2618,7 @@ fill_empty_maze()
 
     for (x = 2; x < x_maze_max; x++)
         for (y = 0; y < y_maze_max; y++)
-            if (SpLev_Map[x][y])
+            if (g.SpLev_Map[x][y])
                 mapcount--;
 
     if ((mapcount > (int) (mapcountmax / 10))) {
@@ -2796,7 +2781,7 @@ lev_init *linit;
             linit->lit = rn2(2);
         if (linit->filling > -1)
             lvlfill_solid(linit->filling, 0);
-        linit->icedpools = icedpools;
+        linit->icedpools = g.icedpools;
         mkmap(linit);
         break;
     }
@@ -2929,9 +2914,9 @@ void
 spo_end_moninvent(coder)
 struct sp_coder *coder UNUSED;
 {
-    if (invent_carrying_monster)
-        m_dowear(invent_carrying_monster, TRUE);
-    invent_carrying_monster = NULL;
+    if (g.invent_carrying_monster)
+        m_dowear(g.invent_carrying_monster, TRUE);
+    g.invent_carrying_monster = NULL;
 }
 
 /*ARGUSED*/
@@ -2939,9 +2924,9 @@ void
 spo_pop_container(coder)
 struct sp_coder *coder UNUSED;
 {
-    if (container_idx > 0) {
-        container_idx--;
-        container_obj[container_idx] = NULL;
+    if (g.container_idx > 0) {
+        g.container_idx--;
+        g.container_obj[g.container_idx] = NULL;
     }
 }
 
@@ -3303,7 +3288,7 @@ struct sp_coder *coder;
     if (lflags & GRAVEYARD)
         level.flags.graveyard = 1;
     if (lflags & ICEDPOOLS)
-        icedpools = TRUE;
+        g.icedpools = TRUE;
     if (lflags & SOLIDIFY)
         coder->solidify = TRUE;
     if (lflags & CORRMAZE)
@@ -3328,7 +3313,7 @@ struct sp_coder *coder;
         || !OV_pop_i(filling) || !OV_pop_i(init_style))
         return;
 
-    splev_init_present = TRUE;
+    g.splev_init_present = TRUE;
 
     init_lev.init_style = OV_i(init_style);
     init_lev.fg = OV_i(fg);
@@ -3465,11 +3450,11 @@ struct sp_coder *coder;
            room,
            and there's no MAP.
         */
-        if (xsize <= 1 && ysize <= 1) {
-            xstart = 1;
-            ystart = 0;
-            xsize = COLNO - 1;
-            ysize = ROWNO;
+        if (g.xsize <= 1 && g.ysize <= 1) {
+            g.xstart = 1;
+            g.ystart = 0;
+            g.xsize = COLNO - 1;
+            g.ysize = ROWNO;
         }
     }
 }
@@ -3490,7 +3475,7 @@ struct sp_coder *coder;
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
     mkstairs(x, y, (char) OV_i(up), coder->croom);
-    SpLev_Map[x][y] = 1;
+    g.SpLev_Map[x][y] = 1;
 
     opvar_free(scoord);
     opvar_free(up);
@@ -3510,7 +3495,7 @@ struct sp_coder *coder;
     get_location_coord(&x, &y, DRY, coder->croom, OV_i(lcoord));
 
     levl[x][y].typ = LADDER;
-    SpLev_Map[x][y] = 1;
+    g.SpLev_Map[x][y] = 1;
     if (OV_i(up)) {
         xupladder = x;
         yupladder = y;
@@ -4294,7 +4279,7 @@ genericptr_t arg;
     }
     set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
     levl[x][y].doormask = typ;
-    SpLev_Map[x][y] = 1;
+    g.SpLev_Map[x][y] = 1;
 }
 
 void
@@ -4710,7 +4695,7 @@ struct sp_coder *coder;
     get_location_coord(&x, &y, DRY | WET | HOT, coder->croom, OV_i(dcoord));
     if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
         impossible("Cannot create drawbridge.");
-    SpLev_Map[x][y] = 1;
+    g.SpLev_Map[x][y] = 1;
 
     opvar_free(dcoord);
     opvar_free(db_open);
@@ -4876,10 +4861,10 @@ struct sp_coder *coder;
         dy1 = (xchar) SP_REGION_Y1(OV_i(r));
         dx2 = (xchar) SP_REGION_X2(OV_i(r));
         dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
-                    dy1 < 0 ? (ystart - 1) : dy1,
-                    dx2 < 0 ? (xstart + xsize + 1) : dx2,
-                    dy2 < 0 ? (ystart + ysize + 1) : dy2);
+        wallify_map(dx1 < 0 ? (g.xstart - 1) : dx1,
+                    dy1 < 0 ? (g.ystart - 1) : dy1,
+                    dx2 < 0 ? (g.xstart + g.xsize + 1) : dx2,
+                    dy2 < 0 ? (g.ystart + g.ysize + 1) : dy2);
         break;
     case 1:
         if (!OV_pop_typ(r, SPOVAR_SEL))
@@ -4914,15 +4899,15 @@ struct sp_coder *coder;
     tmpmazepart.halign = upc.x;
     tmpmazepart.valign = upc.y;
 
-    tmpxsize = xsize;
-    tmpysize = ysize;
-    tmpxstart = xstart;
-    tmpystart = ystart;
+    tmpxsize = g.xsize;
+    tmpysize = g.ysize;
+    tmpxstart = g.xstart;
+    tmpystart = g.ystart;
 
     halign = tmpmazepart.halign;
     valign = tmpmazepart.valign;
-    xsize = tmpmazepart.xsize;
-    ysize = tmpmazepart.ysize;
+    g.xsize = tmpmazepart.xsize;
+    g.ysize = tmpmazepart.ysize;
     switch (tmpmazepart.zaligntyp) {
     default:
     case 0:
@@ -4930,73 +4915,73 @@ struct sp_coder *coder;
     case 1:
         switch ((int) halign) {
         case LEFT:
-            xstart = splev_init_present ? 1 : 3;
+            g.xstart = g.splev_init_present ? 1 : 3;
             break;
         case H_LEFT:
-            xstart = 2 + ((x_maze_max - 2 - xsize) / 4);
+            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) / 4);
             break;
         case CENTER:
-            xstart = 2 + ((x_maze_max - 2 - xsize) / 2);
+            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) / 2);
             break;
         case H_RIGHT:
-            xstart = 2 + ((x_maze_max - 2 - xsize) * 3 / 4);
+            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) * 3 / 4);
             break;
         case RIGHT:
-            xstart = x_maze_max - xsize - 1;
+            g.xstart = x_maze_max - g.xsize - 1;
             break;
         }
         switch ((int) valign) {
         case TOP:
-            ystart = 3;
+            g.ystart = 3;
             break;
         case CENTER:
-            ystart = 2 + ((y_maze_max - 2 - ysize) / 2);
+            g.ystart = 2 + ((y_maze_max - 2 - g.ysize) / 2);
             break;
         case BOTTOM:
-            ystart = y_maze_max - ysize - 1;
+            g.ystart = y_maze_max - g.ysize - 1;
             break;
         }
-        if (!(xstart % 2))
-            xstart++;
-        if (!(ystart % 2))
-            ystart++;
+        if (!(g.xstart % 2))
+            g.xstart++;
+        if (!(g.ystart % 2))
+            g.ystart++;
         break;
     case 2:
         if (!coder->croom) {
-            xstart = 1;
-            ystart = 0;
-            xsize = COLNO - 1 - tmpmazepart.xsize;
-            ysize = ROWNO - tmpmazepart.ysize;
+            g.xstart = 1;
+            g.ystart = 0;
+            g.xsize = COLNO - 1 - tmpmazepart.xsize;
+            g.ysize = ROWNO - tmpmazepart.ysize;
         }
         get_location_coord(&halign, &valign, ANY_LOC, coder->croom,
                            OV_i(mpa));
-        xsize = tmpmazepart.xsize;
-        ysize = tmpmazepart.ysize;
-        xstart = halign;
-        ystart = valign;
+        g.xsize = tmpmazepart.xsize;
+        g.ysize = tmpmazepart.ysize;
+        g.xstart = halign;
+        g.ystart = valign;
         break;
     }
-    if (ystart < 0 || ystart + ysize > ROWNO) {
+    if (g.ystart < 0 || g.ystart + g.ysize > ROWNO) {
         /* try to move the start a bit */
-        ystart += (ystart > 0) ? -2 : 2;
-        if (ysize == ROWNO)
-            ystart = 0;
-        if (ystart < 0 || ystart + ysize > ROWNO)
-            panic("reading special level with ysize too large");
+        g.ystart += (g.ystart > 0) ? -2 : 2;
+        if (g.ysize == ROWNO)
+            g.ystart = 0;
+        if (g.ystart < 0 || g.ystart + g.ysize > ROWNO)
+            panic("reading special level with g.ysize too large");
     }
-    if (xsize <= 1 && ysize <= 1) {
-        xstart = 1;
-        ystart = 0;
-        xsize = COLNO - 1;
-        ysize = ROWNO;
+    if (g.xsize <= 1 && g.ysize <= 1) {
+        g.xstart = 1;
+        g.ystart = 0;
+        g.xsize = COLNO - 1;
+        g.ysize = ROWNO;
     } else {
         xchar x, y, mptyp;
 
         /* Load the map */
-        for (y = ystart; y < ystart + ysize; y++)
-            for (x = xstart; x < xstart + xsize; x++) {
-                mptyp = (mpmap->vardata.str[(y - ystart) * xsize
-                                                  + (x - xstart)] - 1);
+        for (y = g.ystart; y < g.ystart + g.ysize; y++)
+            for (x = g.xstart; x < g.xstart + g.xsize; x++) {
+                mptyp = (mpmap->vardata.str[(y - g.ystart) * g.xsize
+                                                  + (x - g.xstart)] - 1);
                 if (mptyp >= MAX_TYPE)
                     continue;
                 levl[x][y].typ = mptyp;
@@ -5006,7 +4991,7 @@ struct sp_coder *coder;
                 levl[x][y].horizontal = 0;
                 levl[x][y].roomno = 0;
                 levl[x][y].edge = 0;
-                SpLev_Map[x][y] = 1;
+                g.SpLev_Map[x][y] = 1;
                 /*
                  *  Set secret doors to closed (why not trapped too?).  Set
                  *  the horizontal bit.
@@ -5019,7 +5004,7 @@ struct sp_coder *coder;
                      *  (secret) door, then it is horizontal.  This does
                      *  not allow (secret) doors to be corners of rooms.
                      */
-                    if (x != xstart && (IS_WALL(levl[x - 1][y].typ)
+                    if (x != g.xstart && (IS_WALL(levl[x - 1][y].typ)
                                         || levl[x - 1][y].horizontal))
                         levl[x][y].horizontal = 1;
                 } else if (levl[x][y].typ == HWALL
@@ -5027,17 +5012,17 @@ struct sp_coder *coder;
                     levl[x][y].horizontal = 1;
                 else if (levl[x][y].typ == LAVAPOOL)
                     levl[x][y].lit = 1;
-                else if (splev_init_present && levl[x][y].typ == ICE)
-                    levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
+                else if (g.splev_init_present && levl[x][y].typ == ICE)
+                    levl[x][y].icedpool = g.icedpools ? ICED_POOL : ICED_MOAT;
             }
         if (coder->lvl_is_joined)
-            remove_rooms(xstart, ystart, xstart + xsize, ystart + ysize);
+            remove_rooms(g.xstart, g.ystart, g.xstart + g.xsize, g.ystart + g.ysize);
     }
     if (!OV_i(mpkeepr)) {
-        xstart = tmpxstart;
-        ystart = tmpystart;
-        xsize = tmpxsize;
-        ysize = tmpysize;
+        g.xstart = tmpxstart;
+        g.ystart = tmpystart;
+        g.xsize = tmpxsize;
+        g.ysize = tmpysize;
     }
 
     opvar_free(mpxs);
@@ -5316,12 +5301,12 @@ sp_lev *lvl;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
 
-    splev_init_present = FALSE;
-    icedpools = FALSE;
+    g.splev_init_present = FALSE;
+    g.icedpools = FALSE;
     /* achievement tracking; static init would suffice except we need to
        reset if #wizmakemap is used to recreate mines' end or sokoban end;
        once either level is created, these values can be forgotten */
-    mines_prize_count = soko_prize_count = 0;
+    g.mines_prize_count = g.soko_prize_count = 0;
 
     if (wizard) {
         char *met = nh_getenv("SPCODER_MAX_RUNTIME");
@@ -5338,19 +5323,19 @@ sp_lev *lvl;
     shuffle_alignments();
 
     for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi++)
-        container_obj[tmpi] = NULL;
-    container_idx = 0;
+        g.container_obj[tmpi] = NULL;
+    g.container_idx = 0;
 
-    invent_carrying_monster = NULL;
+    g.invent_carrying_monster = NULL;
 
-    (void) memset((genericptr_t) &SpLev_Map[0][0], 0, sizeof SpLev_Map);
+    (void) memset((genericptr_t) &g.SpLev_Map[0][0], 0, sizeof g.SpLev_Map);
 
     level.flags.is_maze_lev = 0;
 
-    xstart = 1;
-    ystart = 0;
-    xsize = COLNO - 1;
-    ysize = ROWNO;
+    g.xstart = 1;
+    g.ystart = 0;
+    g.xsize = COLNO - 1;
+    g.ysize = ROWNO;
 
     while (coder->frame->n_opcode < lvl->n_opcodes && !coder->exit_script) {
         coder->opcode = lvl->opcodes[coder->frame->n_opcode].opcode;
@@ -5911,8 +5896,8 @@ sp_lev *lvl;
             if (!OV_pop_typ(pt, SPOVAR_SEL))
                 panic("no selection for rndcoord");
             if (selection_rndcoord(pt, &x, &y, FALSE)) {
-                x -= xstart;
-                y -= ystart;
+                x -= g.xstart;
+                y -= g.ystart;
             }
             splev_stack_push(coder->stack, opvar_new_coord(x, y));
             opvar_free(pt);

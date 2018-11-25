@@ -1666,11 +1666,6 @@ boolean itemize;
     return buy;
 }
 
-static struct repo { /* repossession context */
-    struct monst *shopkeeper;
-    coord location;
-} repo;
-
 /* routine called after dying (or quitting) */
 boolean
 paybill(croaked)
@@ -1692,8 +1687,8 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
         which has been shut inside a statue] */
 
     /* this is where inventory will end up if any shk takes it */
-    repo.location.x = repo.location.y = 0;
-    repo.shopkeeper = 0;
+    g.repo.location.x = g.repo.location.y = 0;
+    g.repo.shopkeeper = 0;
 
     /*
      * Scan all shopkeepers on the level, to prioritize them:
@@ -1882,17 +1877,17 @@ struct monst *shkp;
         oy = u.uy;
     }
     /* finish_paybill will deposit invent here */
-    repo.location.x = ox;
-    repo.location.y = oy;
-    repo.shopkeeper = shkp;
+    g.repo.location.x = ox;
+    g.repo.location.y = oy;
+    g.repo.shopkeeper = shkp;
 }
 
 /* called at game exit, after inventory disclosure but before making bones */
 void
 finish_paybill()
 {
-    struct monst *shkp = repo.shopkeeper;
-    int ox = repo.location.x, oy = repo.location.y;
+    struct monst *shkp = g.repo.shopkeeper;
+    int ox = g.repo.location.x, oy = g.repo.location.y;
 
 #if 0 /* don't bother */
     if (ox == 0 && oy == 0)
@@ -2846,13 +2841,6 @@ boolean peaceful, silent;
     return value;
 }
 
-/* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
-static char sell_response = 'a';
-static int sell_how = SELL_NORMAL;
-/* can't just use sell_response='y' for auto_credit because the 'a' response
-   shouldn't carry over from ordinary selling to credit selling */
-static boolean auto_credit = FALSE;
-
 void
 sellobj_state(deliberate)
 int deliberate;
@@ -2863,9 +2851,9 @@ int deliberate;
        This retains the old pre-query risk that slippery fingers while in
        shops entailed:  you drop it, you've lost it.
      */
-    sell_response = (deliberate != SELL_NORMAL) ? '\0' : 'a';
-    sell_how = deliberate;
-    auto_credit = FALSE;
+    g.sell_response = (deliberate != SELL_NORMAL) ? '\0' : 'a';
+    g.sell_how = deliberate;
+    g.auto_credit = FALSE;
 }
 
 void
@@ -2907,7 +2895,7 @@ xchar x, y;
 
     /* get one case out of the way: nothing to sell, and no gold */
     if (!(isgold || cgold)
-        && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
+        && ((offer + gltmp) == 0L || g.sell_how == SELL_DONTSELL)) {
         boolean unpaid = is_unpaid(obj);
 
         if (container) {
@@ -2919,7 +2907,7 @@ xchar x, y;
         } else
             obj->no_charge = 1;
 
-        if (!unpaid && (sell_how != SELL_DONTSELL)
+        if (!unpaid && (g.sell_how != SELL_DONTSELL)
             && !special_stock(obj, shkp, FALSE))
             pline("%s seems uninterested.", Shknam(shkp));
         return;
@@ -2983,7 +2971,7 @@ xchar x, y;
                       currency(eshkp->credit));
         }
 
-        if (!offer || sell_how == SELL_DONTSELL) {
+        if (!offer || g.sell_how == SELL_DONTSELL) {
             if (!isgold) {
                 if (container)
                     dropped_container(obj, shkp, FALSE);
@@ -3013,9 +3001,9 @@ xchar x, y;
         char c, qbuf[BUFSZ];
         long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
 
-        if (sell_how == SELL_NORMAL || auto_credit) {
-            c = sell_response = 'y';
-        } else if (sell_response != 'n') {
+        if (g.sell_how == SELL_NORMAL || g.auto_credit) {
+            c = g.sell_response = 'y';
+        } else if (g.sell_response != 'n') {
             pline("%s cannot pay you at present.", Shknam(shkp));
             Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
                     currency(tmpcr));
@@ -3023,7 +3011,7 @@ xchar x, y;
                                (obj->quan == 1L) ? "that" : "those"));
             if (c == 'a') {
                 c = 'y';
-                auto_credit = TRUE;
+                g.auto_credit = TRUE;
             }
         } else /* previously specified "quit" */
             c = 'n';
@@ -3031,7 +3019,7 @@ xchar x, y;
         if (c == 'y') {
             shk_names_obj(
                 shkp, obj,
-                (sell_how != SELL_NORMAL)
+                (g.sell_how != SELL_NORMAL)
                     ? "traded %s for %ld zorkmid%s in %scredit."
                     : "relinquish %s and acquire %ld zorkmid%s in %scredit.",
                 tmpcr, (eshkp->credit > 0L) ? "additional " : "");
@@ -3039,7 +3027,7 @@ xchar x, y;
             subfrombill(obj, shkp);
         } else {
             if (c == 'q')
-                sell_response = 'n';
+                g.sell_response = 'n';
             if (container)
                 dropped_container(obj, shkp, FALSE);
             if (!obj->unpaid)
@@ -3052,7 +3040,7 @@ xchar x, y;
 
         if (short_funds)
             offer = shkmoney;
-        if (!sell_response) {
+        if (!g.sell_response) {
             long yourc = 0L, shksc;
 
             if (container) {
@@ -3105,9 +3093,9 @@ xchar x, y;
         } else
             qbuf[0] = '\0'; /* just to pacify lint */
 
-        switch (sell_response ? sell_response : ynaq(qbuf)) {
+        switch (g.sell_response ? g.sell_response : ynaq(qbuf)) {
         case 'q':
-            sell_response = 'n';
+            g.sell_response = 'n';
             /*FALLTHRU*/
         case 'n':
             if (container)
@@ -3117,7 +3105,7 @@ xchar x, y;
             subfrombill(obj, shkp);
             break;
         case 'a':
-            sell_response = 'y';
+            g.sell_response = 'y';
             /*FALLTHRU*/
         case 'y':
             if (container)
@@ -3127,7 +3115,7 @@ xchar x, y;
             subfrombill(obj, shkp);
             pay(-offer, shkp);
             shk_names_obj(shkp, obj,
-                          (sell_how != SELL_NORMAL)
+                          (g.sell_how != SELL_NORMAL)
                            ? ((!ltmp && cltmp && only_partially_your_contents)
                          ? "sold some items inside %s for %ld gold piece%s.%s"
                          : "sold %s for %ld gold piece%s.%s")

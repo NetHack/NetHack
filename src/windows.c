@@ -185,8 +185,6 @@ wl_addtail(struct winlink *wl)
 }
 #endif /* WINCHAIN */
 
-static struct win_choices *last_winchoice = 0;
-
 boolean
 genl_can_suspend_no(VOID_ARGS)
 {
@@ -253,11 +251,11 @@ const char *s;
         if (!strcmpi(s, winchoices[i].procs->name)) {
             windowprocs = *winchoices[i].procs;
 
-            if (last_winchoice && last_winchoice->ini_routine)
-                (*last_winchoice->ini_routine)(WININIT_UNDO);
+            if (g.last_winchoice && g.last_winchoice->ini_routine)
+                (*g.last_winchoice->ini_routine)(WININIT_UNDO);
             if (winchoices[i].ini_routine)
                 (*winchoices[i].ini_routine)(WININIT);
-            last_winchoice = &winchoices[i];
+            g.last_winchoice = &winchoices[i];
             return;
         }
     }
@@ -374,7 +372,7 @@ commit_windowchain()
                                               p->nextlink->linkdata);
         } else {
             (void) (*p->wincp->chain_routine)(WINCHAIN_INIT, n, p->linkdata,
-                                              last_winchoice->procs, 0);
+                                              g.last_winchoice->procs, 0);
         }
     }
 

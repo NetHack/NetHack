@@ -31,12 +31,6 @@ STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
 STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
 STATIC_DCL boolean FDECL(skip_pager, (BOOLEAN_P));
 
-static char cvt_buf[64];
-static struct qtlists qt_list;
-static dlb *msg_file;
-/* used by ldrname() and neminame(), then copied into cvt_buf */
-static char nambuf[sizeof cvt_buf];
-
 /* dump the character msg list to check appearance;
    build with DEBUG enabled and use DEBUGFILES=questpgr.c
    in sysconf file or environment */
@@ -49,8 +43,8 @@ dump_qtlist()
     if (!explicitdebug(__FILE__))
         return;
 
-    for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
-        (void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
+    for (msg = g.qt_list.chrole; msg->msgnum > 0; msg++) {
+        (void) dlb_fseek(g.msg_file, msg->offset, SEEK_SET);
         deliver_by_window(msg, NHW_MAP);
     }
 #endif /* DEBUG */
@@ -78,8 +72,8 @@ long hdr_offset;
     struct qtmsg *msg_list;
     int n_msgs;
 
-    (void) dlb_fseek(msg_file, hdr_offset, SEEK_SET);
-    Fread(&n_msgs, sizeof(int), 1, msg_file);
+    (void) dlb_fseek(g.msg_file, hdr_offset, SEEK_SET);
+    Fread(&n_msgs, sizeof(int), 1, g.msg_file);
     msg_list = (struct qtmsg *) alloc((unsigned) (n_msgs + 1)
                                       * sizeof (struct qtmsg));
 
@@ -87,7 +81,7 @@ long hdr_offset;
      * Load up the list.
      */
     Fread((genericptr_t) msg_list, n_msgs * sizeof (struct qtmsg), 1,
-          msg_file);
+          g.msg_file);
 
     msg_list[n_msgs].msgnum = -1;
     return msg_list;
@@ -100,8 +94,8 @@ load_qtlist()
     char qt_classes[N_HDR][LEN_HDR];
     long qt_offsets[N_HDR];
 
-    msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
-    if (!msg_file)
+    g.msg_file = dlb_fopen(QTEXT_FILE, RDBMODE);
+    if (!g.msg_file)
         panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
 
     /*
@@ -109,29 +103,29 @@ load_qtlist()
      * each header.
      */
 
-    Fread(&n_classes, sizeof (int), 1, msg_file);
-    Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, msg_file);
-    Fread(qt_offsets, sizeof (long), n_classes, msg_file);
+    Fread(&n_classes, sizeof (int), 1, g.msg_file);
+    Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, g.msg_file);
+    Fread(qt_offsets, sizeof (long), n_classes, g.msg_file);
 
     /*
      * Now construct the message lists for quick reference later
      * on when we are actually paging the messages out.
      */
 
-    qt_list.common = qt_list.chrole = (struct qtmsg *) 0;
+    g.qt_list.common = g.qt_list.chrole = (struct qtmsg *) 0;
 
     for (i = 0; i < n_classes; i++) {
         if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR))
-            qt_list.common = construct_qtlist(qt_offsets[i]);
+            g.qt_list.common = construct_qtlist(qt_offsets[i]);
         else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR))
-            qt_list.chrole = construct_qtlist(qt_offsets[i]);
+            g.qt_list.chrole = construct_qtlist(qt_offsets[i]);
 #if 0 /* UNUSED but available */
         else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR))
-            qt_list.chrace = construct_qtlist(qt_offsets[i]);
+            g.qt_list.chrace = construct_qtlist(qt_offsets[i]);
 #endif
     }
 
-    if (!qt_list.common || !qt_list.chrole)
+    if (!g.qt_list.common || !g.qt_list.chrole)
         impossible("load_qtlist: cannot load quest text.");
     dump_qtlist();
     return; /* no ***DON'T*** close the msg_file */
@@ -141,12 +135,12 @@ load_qtlist()
 void
 unload_qtlist()
 {
-    if (msg_file)
-        (void) dlb_fclose(msg_file), msg_file = 0;
-    if (qt_list.common)
-        free((genericptr_t) qt_list.common), qt_list.common = 0;
-    if (qt_list.chrole)
-        free((genericptr_t) qt_list.chrole), qt_list.chrole = 0;
+    if (g.msg_file)
+        (void) dlb_fclose(g.msg_file), g.msg_file = 0;
+    if (g.qt_list.common)
+        free((genericptr_t) g.qt_list.common), g.qt_list.common = 0;
+    if (g.qt_list.chrole)
+        free((genericptr_t) g.qt_list.chrole), g.qt_list.chrole = 0;
     return;
 }
 
@@ -175,9 +169,9 @@ ldrname()
 {
     int i = urole.ldrnum;
 
-    Sprintf(nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
+    Sprintf(g.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
-    return nambuf;
+    return g.nambuf;
 }
 
 /* return your intermediate target string */
@@ -252,9 +246,9 @@ neminame()
 {
     int i = urole.neminum;
 
-    Sprintf(nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
+    Sprintf(g.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
-    return nambuf;
+    return g.nambuf;
 }
 
 STATIC_OVL const char *
@@ -289,8 +283,8 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
      * which genders[] doesn't handle; cvt_buf[] already contains name.
      */
     if (who == 'o'
-        && (strstri(cvt_buf, "Eyes ")
-            || strcmpi(cvt_buf, makesingular(cvt_buf)))) {
+        && (strstri(g.cvt_buf, "Eyes ")
+            || strcmpi(g.cvt_buf, makesingular(g.cvt_buf)))) {
         pnoun = (lwhich == 'h') ? "they"
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
@@ -303,10 +297,10 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
                 : (lwhich == 'i') ? genders[godgend].him
                 : (lwhich == 'j') ? genders[godgend].his : "?";
     }
-    Strcpy(cvt_buf, pnoun);
+    Strcpy(g.cvt_buf, pnoun);
     /* capitalize for H,I,J */
     if (lwhich != which)
-        cvt_buf[0] = highc(cvt_buf[0]);
+        g.cvt_buf[0] = highc(g.cvt_buf[0]);
     return;
 }
 
@@ -413,7 +407,7 @@ char c;
         str = "";
         break;
     }
-    Strcpy(cvt_buf, str);
+    Strcpy(g.cvt_buf, str);
 }
 
 STATIC_OVL void
@@ -438,17 +432,17 @@ char *in_line, *out_line;
                 switch (*(++c)) {
                 /* insert "a"/"an" prefix */
                 case 'A':
-                    Strcat(cc, An(cvt_buf));
+                    Strcat(cc, An(g.cvt_buf));
                     cc += strlen(cc);
                     continue; /* for */
                 case 'a':
-                    Strcat(cc, an(cvt_buf));
+                    Strcat(cc, an(g.cvt_buf));
                     cc += strlen(cc);
                     continue; /* for */
 
                 /* capitalize */
                 case 'C':
-                    cvt_buf[0] = highc(cvt_buf[0]);
+                    g.cvt_buf[0] = highc(g.cvt_buf[0]);
                     break;
 
                 /* replace name with pronoun;
@@ -467,24 +461,24 @@ char *in_line, *out_line;
 
                 /* pluralize */
                 case 'P':
-                    cvt_buf[0] = highc(cvt_buf[0]);
+                    g.cvt_buf[0] = highc(g.cvt_buf[0]);
                     /*FALLTHRU*/
                 case 'p':
-                    Strcpy(cvt_buf, makeplural(cvt_buf));
+                    Strcpy(g.cvt_buf, makeplural(g.cvt_buf));
                     break;
 
                 /* append possessive suffix */
                 case 'S':
-                    cvt_buf[0] = highc(cvt_buf[0]);
+                    g.cvt_buf[0] = highc(g.cvt_buf[0]);
                     /*FALLTHRU*/
                 case 's':
-                    Strcpy(cvt_buf, s_suffix(cvt_buf));
+                    Strcpy(g.cvt_buf, s_suffix(g.cvt_buf));
                     break;
 
                 /* strip any "the" prefix */
                 case 't':
-                    if (!strncmpi(cvt_buf, "the ", 4)) {
-                        Strcat(cc, &cvt_buf[4]);
+                    if (!strncmpi(g.cvt_buf, "the ", 4)) {
+                        Strcat(cc, &g.cvt_buf[4]);
                         cc += strlen(cc);
                         continue; /* for */
                     }
@@ -494,8 +488,8 @@ char *in_line, *out_line;
                     --c; /* undo switch increment */
                     break;
                 }
-                Strcat(cc, cvt_buf);
-                cc += strlen(cvt_buf);
+                Strcat(cc, g.cvt_buf);
+                cc += strlen(g.cvt_buf);
                 break;
             } /* else fall through */
 
@@ -519,7 +513,7 @@ struct qtmsg *qt_msg;
 
     *in_line = '\0';
     for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
         convert_line(in_line, out_line);
         pline("%s", out_line);
     }
@@ -549,7 +543,7 @@ int how;
     }
 #endif
     for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
         convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
@@ -560,7 +554,7 @@ int how;
        but have a one-line summary which is put there for ^P recall */
     *out_line = '\0';
     if (qt_msg->summary_size) {
-        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        (void) dlb_fgets(in_line, sizeof in_line, g.msg_file);
         convert_line(in_line, out_line);
 #ifdef BETA
     } else if (qt_msg->delivery == 'c') { /* skip for 'qtdump' of 'p' */
@@ -582,7 +576,7 @@ boolean common;
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (program_state.wizkit_wishing)
         return TRUE;
-    if (!(common ? qt_list.common : qt_list.chrole)) {
+    if (!(common ? g.qt_list.common : g.qt_list.chrole)) {
         panic("%s: no %s quest text data available",
               common ? "com_pager" : "qt_pager",
               common ? "common" : "role-specific");
@@ -601,12 +595,12 @@ int msgnum;
     if (skip_pager(TRUE))
         return;
 
-    if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
+    if (!(qt_msg = msg_in(g.qt_list.common, msgnum))) {
         impossible("com_pager: message %d not found.", msgnum);
         return;
     }
 
-    (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
+    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
     if (qt_msg->delivery == 'p')
         deliver_by_pline(qt_msg);
     else if (msgnum == 1)
@@ -625,7 +619,7 @@ int msgnum;
     if (skip_pager(FALSE))
         return;
 
-    qt_msg = msg_in(qt_list.chrole, msgnum);
+    qt_msg = msg_in(g.qt_list.chrole, msgnum);
     if (!qt_msg) {
         /* some roles have an alternate message for return to the goal
            level when the quest artifact is absent (handled by caller)
@@ -634,14 +628,14 @@ int msgnum;
            present which might not be true for wizard mode but we don't
            worry about quest message references in that situation */
         if (msgnum == QT_ALTGOAL)
-            qt_msg = msg_in(qt_list.chrole, QT_NEXTGOAL);
+            qt_msg = msg_in(g.qt_list.chrole, QT_NEXTGOAL);
     }
     if (!qt_msg) {
         impossible("qt_pager: message %d not found.", msgnum);
         return;
     }
 
-    (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
+    (void) dlb_fseek(g.msg_file, qt_msg->offset, SEEK_SET);
     if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
         deliver_by_pline(qt_msg);
     else

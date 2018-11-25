@@ -123,9 +123,9 @@ static char sccsid[] = "@(#)random.c	5.5 (Berkeley) 7/6/88";
 
 #define MAX_TYPES 5 /* max number of types above */
 
-static int degrees[MAX_TYPES] = { DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 };
+static const int degrees[MAX_TYPES] = { DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 };
 
-static int seps[MAX_TYPES] = { SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 };
+static const int seps[MAX_TYPES] = { SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 };
 
 /*
  * Initially, everything is set up as if from :

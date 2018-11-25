@@ -621,6 +621,23 @@ struct musable {
      */
 };
 
+struct h2o_ctx {
+    int dkn_boom, unk_boom; /* track dknown, !dknown separately */
+    boolean ctx_valid;
+};
+
+struct launchplace {
+    struct obj *obj;
+    xchar x, y;
+};
+
+struct repo { /* repossession context */
+    struct monst *shopkeeper;
+    coord location;
+};
+
+
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -629,6 +646,7 @@ struct musable {
 
 #define BSIZE 20
 #define WIZKIT_MAX 128
+#define CVT_BUF_SIZE 64
 
 struct instance_globals {
 
@@ -859,6 +877,14 @@ struct instance_globals {
        and use_container(). Also used by menu_loot() and container_gone(). */
     struct obj *current_container;
     boolean abort_looting;
+    /* Value set by query_objlist() for n_or_more(). */
+    long val_for_n_or_more;
+    /* list of valid menu classes for query_objlist() and allow_category callback
+       (with room for all object classes, 'u'npaid, BUCX, and terminator) */
+    char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
+    boolean class_filter;
+    boolean bucx_filter;
+    boolean shop_filter;
 
     /* pline.c */
     unsigned pline_flags;
@@ -867,6 +893,9 @@ struct instance_globals {
     unsigned saved_pline_index;  /* slot in saved_plines[] to use next */
     char *saved_plines[DUMPLOG_MSG_COUNT];
 #endif
+    /* work buffer for You(), &c and verbalize() */
+    char *you_buf;
+    int you_buf_siz;
 
     /* polyself.c */
     int sex_change_ok; /* controls whether taking on new form or becoming new
@@ -884,6 +913,12 @@ struct instance_globals {
     int p_trouble;
     int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 
+    /* questpgr.c */
+    char cvt_buf[CVT_BUF_SIZE];
+    struct qtlists qt_list;
+    struct dlb_handle *msg_file;
+    /* used by ldrname() and neminame(), then copied into cvt_buf */
+    char nambuf[CVT_BUF_SIZE];
 
     /* read.c */
     boolean known;
@@ -914,14 +949,60 @@ struct instance_globals {
     unsigned ustuck_id; /* need to preserve during save */
     unsigned usteed_id; /* need to preserve during save */
 
+    /* shk.c */
+    /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
+    char sell_response;
+    int sell_how;
+    /* can't just use sell_response='y' for auto_credit because the 'a' response
+       shouldn't carry over from ordinary selling to credit selling */
+    boolean auto_credit;
+    struct repo repo;
+
     /* sp_lev.c */
     char *lev_message;
     lev_region *lregions;
     int num_lregions;
+    /* positions touched by level elements explicitly defined in the des-file */
+    char SpLev_Map[COLNO][ROWNO];
+    xchar xstart, ystart;
+    char xsize, ysize;
+    boolean splev_init_present;
+    boolean icedpools;
+    int mines_prize_count;
+    int soko_prize_count; /* achievements */
+    struct obj *container_obj[MAX_CONTAINMENT];
+    int container_idx;
+    struct monst *invent_carrying_monster;
+    aligntyp ralign[3];
+
+    /* spells.c */
+    int spl_sortmode;   /* index into spl_sortchoices[] */
+    int *spl_orderindx; /* array of spl_book[] indices */
+
+    /* timeout.c */
+    /* ordered timer list */
+    struct fe *timer_base; /* "active" */
+    unsigned long timer_id;
+
+    /* topten.c */
+    winid toptenwin;
+
 
     /* trap.c */
     int force_mintrap; /* mintrap() should take a flags argument, but for time
                           being we use this */
+    /* context for water_damage(), managed by water_damage_chain();
+        when more than one stack of potions of acid explode while processing
+        a chain of objects, use alternate phrasing after the first message */
+    struct h2o_ctx acid_ctx;
+    /*
+     * The following are used to track launched objects to
+     * prevent them from vanishing if you are killed. They
+     * will reappear at the launchplace in bones files.
+     */
+    struct launchplace launchplace;
+
+
     /* u_init.c */
     short nocreate;
     short nocreate2;
@@ -930,8 +1011,13 @@ struct instance_globals {
     /* uhitm.c */
     boolean override_confirmation; /* Used to flag attacks caused by
                                       Stormbringer's maliciousness. */
+
     /* weapon.c */
     struct obj *propellor;
+
+    /* windows.c */
+    struct win_choices *last_winchoice;
+
     /* zap.c */
     int  poly_zapped;
     boolean obj_zapped;

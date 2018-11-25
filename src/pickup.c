@@ -310,9 +310,6 @@ boolean picked_some;
     }
 }
 
-/* Value set by query_objlist() for n_or_more(). */
-static long val_for_n_or_more;
-
 /* query_objlist callback: return TRUE if obj's count is >= reference value */
 STATIC_OVL boolean
 n_or_more(obj)
@@ -320,20 +317,16 @@ struct obj *obj;
 {
     if (obj == uchain)
         return FALSE;
-    return (boolean) (obj->quan >= val_for_n_or_more);
+    return (boolean) (obj->quan >= g.val_for_n_or_more);
 }
 
-/* list of valid menu classes for query_objlist() and allow_category callback
-   (with room for all object classes, 'u'npaid, BUCX, and terminator) */
-static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
-static boolean class_filter, bucx_filter, shop_filter;
 
 /* check valid_menu_classes[] for an entry; also used by askchain() */
 boolean
 menu_class_present(c)
 int c;
 {
-    return (c && index(valid_menu_classes, c)) ? TRUE : FALSE;
+    return (c && index(g.valid_menu_classes, c)) ? TRUE : FALSE;
 }
 
 void
@@ -344,26 +337,26 @@ int c;
 
     if (c == 0) { /* reset */
         vmc_count = 0;
-        class_filter = bucx_filter = shop_filter = FALSE;
+        g.class_filter = g.bucx_filter = g.shop_filter = FALSE;
     } else if (!menu_class_present(c)) {
-        valid_menu_classes[vmc_count++] = (char) c;
+        g.valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
         switch (c) {
         case 'B':
         case 'U':
         case 'C': /*FALLTHRU*/
         case 'X':
-            bucx_filter = TRUE;
+            g.bucx_filter = TRUE;
             break;
         case 'u':
-            shop_filter = TRUE;
+            g.shop_filter = TRUE;
             break;
         default:
-            class_filter = TRUE;
+            g.class_filter = TRUE;
             break;
         }
     }
-    valid_menu_classes[vmc_count] = '\0';
+    g.valid_menu_classes[vmc_count] = '\0';
 }
 
 /* query_objlist callback: return TRUE if not uchain */
@@ -394,12 +387,12 @@ struct obj *obj;
      * coins are either unknown or uncursed based on an option setting.
      */
     if (obj->oclass == COIN_CLASS)
-        return class_filter
-                 ? (index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
-                 : shop_filter /* coins are never unpaid, but check anyway */
+        return g.class_filter
+                 ? (index(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
+                 : g.shop_filter /* coins are never unpaid, but check anyway */
                     ? (obj->unpaid ? TRUE : FALSE)
-                    : bucx_filter
-                       ? (index(valid_menu_classes, iflags.goldX ? 'X' : 'U')
+                    : g.bucx_filter
+                       ? (index(g.valid_menu_classes, iflags.goldX ? 'X' : 'U')
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 
@@ -424,21 +417,21 @@ struct obj *obj;
      */
 
     /* if class is expected but obj's class is not in the list, reject */
-    if (class_filter && !index(valid_menu_classes, obj->oclass))
+    if (g.class_filter && !index(g.valid_menu_classes, obj->oclass))
         return FALSE;
     /* if unpaid is expected and obj isn't unpaid, reject (treat a container
        holding any unpaid object as unpaid even if isn't unpaid itself) */
-    if (shop_filter && !obj->unpaid
+    if (g.shop_filter && !obj->unpaid
         && !(Has_contents(obj) && count_unpaid(obj->cobj) > 0))
         return FALSE;
     /* check for particular bless/curse state */
-    if (bucx_filter) {
+    if (g.bucx_filter) {
         /* first categorize this object's bless/curse state */
         char bucx = !obj->bknown ? 'X'
                       : obj->blessed ? 'B' : obj->cursed ? 'C' : 'U';
 
         /* if its category is not in the list, reject */
-        if (!index(valid_menu_classes, bucx))
+        if (!index(g.valid_menu_classes, bucx))
             return FALSE;
     }
     /* obj didn't fail any of the filter checks, so accept */
@@ -452,8 +445,8 @@ allow_cat_no_uchain(obj)
 struct obj *obj;
 {
     if (obj != uchain
-        && ((index(valid_menu_classes, 'u') && obj->unpaid)
-            || index(valid_menu_classes, obj->oclass)))
+        && ((index(g.valid_menu_classes, 'u') && obj->unpaid)
+            || index(g.valid_menu_classes, obj->oclass)))
         return TRUE;
     return FALSE;
 }
@@ -569,7 +562,7 @@ int what; /* should be a long */
             char qbuf[QBUFSZ];
 
             Sprintf(qbuf, "Pick %d of what?", count);
-            val_for_n_or_more = count; /* set up callback selector */
+            g.val_for_n_or_more = count; /* set up callback selector */
             n = query_objlist(qbuf, objchain_p, traverse_how,
                               &pick_list, PICK_ONE, n_or_more);
             /* correct counts, if any given */

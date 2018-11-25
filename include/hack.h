@@ -167,6 +167,9 @@ typedef struct strbuf {
     char   buf[256];
 } strbuf_t;
 
+/* max. layers of object containment from sp_lev.h */
+#define MAX_CONTAINMENT 10
+
 /* str_or_len from sp_lev.h */
 typedef union str_or_len {
     char *str;
@@ -198,6 +201,7 @@ typedef struct {
 #include "context.h"
 #include "rm.h"
 #include "botl.h"
+#include "qtext.h"
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)

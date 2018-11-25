@@ -1377,8 +1377,6 @@ static const char *spl_sortchoices[NUM_SPELL_SORTBY] = {
     /* a menu choice rather than a sort choice */
     "reassign casting letters to retain current order",
 };
-static int spl_sortmode = 0;   /* index into spl_sortchoices[] */
-static int *spl_orderindx = 0; /* array of spl_book[] indices */
 
 /* qsort callback routine */
 STATIC_PTR int CFDECLSPEC
@@ -1399,7 +1397,7 @@ const genericptr vptr2;
         levl1 = objects[otyp1].oc_level, levl2 = objects[otyp2].oc_level,
         skil1 = objects[otyp1].oc_skill, skil2 = objects[otyp2].oc_skill;
 
-    switch (spl_sortmode) {
+    switch (g.spl_sortmode) {
     case SORTBY_LETTER:
         return indx1 - indx2;
     case SORTBY_ALPHA:
@@ -1450,40 +1448,40 @@ sortspells()
     int n;
 #endif
 
-    if (spl_sortmode == SORTBY_CURRENT)
+    if (g.spl_sortmode == SORTBY_CURRENT)
         return;
     for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; ++n)
         continue;
     if (n < 2)
         return; /* not enough entries to need sorting */
 
-    if (!spl_orderindx) {
+    if (!g.spl_orderindx) {
         /* we haven't done any sorting yet; list is in casting order */
-        if (spl_sortmode == SORTBY_LETTER /* default */
-            || spl_sortmode == SORTRETAINORDER)
+        if (g.spl_sortmode == SORTBY_LETTER /* default */
+            || g.spl_sortmode == SORTRETAINORDER)
             return;
         /* allocate enough for full spellbook rather than just N spells */
-        spl_orderindx = (int *) alloc(MAXSPELL * sizeof(int));
+        g.spl_orderindx = (int *) alloc(MAXSPELL * sizeof(int));
         for (i = 0; i < MAXSPELL; i++)
-            spl_orderindx[i] = i;
+            g.spl_orderindx[i] = i;
     }
 
-    if (spl_sortmode == SORTRETAINORDER) {
+    if (g.spl_sortmode == SORTRETAINORDER) {
         struct spell tmp_book[MAXSPELL];
 
         /* sort spl_book[] rather than spl_orderindx[];
            this also updates the index to reflect the new ordering (we
            could just free it since that ordering becomes the default) */
         for (i = 0; i < MAXSPELL; i++)
-            tmp_book[i] = spl_book[spl_orderindx[i]];
+            tmp_book[i] = spl_book[g.spl_orderindx[i]];
         for (i = 0; i < MAXSPELL; i++)
-            spl_book[i] = tmp_book[i], spl_orderindx[i] = i;
-        spl_sortmode = SORTBY_LETTER; /* reset */
+            spl_book[i] = tmp_book[i], g.spl_orderindx[i] = i;
+        g.spl_sortmode = SORTBY_LETTER; /* reset */
         return;
     }
 
     /* usual case, sort the index rather than the spells themselves */
-    qsort((genericptr_t) spl_orderindx, n, sizeof *spl_orderindx, spell_cmp);
+    qsort((genericptr_t) g.spl_orderindx, n, sizeof *g.spl_orderindx, spell_cmp);
     return;
 }
 
@@ -1513,7 +1511,7 @@ spellsortmenu()
         }
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, let, 0, ATR_NONE, spl_sortchoices[i],
-                 (i == spl_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+                 (i == g.spl_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
     }
     end_menu(tmpwin, "View known spells list sorted");
 
@@ -1522,10 +1520,10 @@ spellsortmenu()
     if (n > 0) {
         choice = selected[0].item.a_int - 1;
         /* skip preselected entry if we have more than one item chosen */
-        if (n > 1 && choice == spl_sortmode)
+        if (n > 1 && choice == g.spl_sortmode)
             choice = selected[1].item.a_int - 1;
         free((genericptr_t) selected);
-        spl_sortmode = choice;
+        g.spl_sortmode = choice;
         return TRUE;
     }
     return FALSE;
@@ -1559,11 +1557,11 @@ dovspell()
             }
         }
     }
-    if (spl_orderindx) {
-        free((genericptr_t) spl_orderindx);
-        spl_orderindx = 0;
+    if (g.spl_orderindx) {
+        free((genericptr_t) g.spl_orderindx);
+        g.spl_orderindx = 0;
     }
-    spl_sortmode = SORTBY_LETTER; /* 0 */
+    g.spl_sortmode = SORTBY_LETTER; /* 0 */
     return 0;
 }
 
@@ -1602,7 +1600,7 @@ int *spell_no;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
              MENU_UNSELECTED);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
-        splnum = !spl_orderindx ? i : spl_orderindx[i];
+        splnum = !g.spl_orderindx ? i : g.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),
                 spelltypemnemonic(spell_skilltype(spellid(splnum))),
                 100 - percent_success(splnum),

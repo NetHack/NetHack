@@ -512,6 +512,11 @@ const struct instance_globals g_init = {
     0,  /* oldcap */
     UNDEFINED_PTR, /* current_container */
     UNDEFINED_VALUE, /* abort_looting */
+    UNDEFINED_VALUE, /* val_for_n_or_more */
+    UNDEFINED_VALUES, /* valid_menu_classes */
+    UNDEFINED_VALUE, /* class_filter */
+    UNDEFINED_VALUE, /* bucx_filter */
+    UNDEFINED_VALUE, /* shop_filter */
 
     /* pline.c */
     0, /* pline_flags */
@@ -520,6 +525,8 @@ const struct instance_globals g_init = {
     0, /* saved_pline_index */
     UNDEFINED_VALUES,
 #endif
+    NULL, /* you_buf */
+    0, /* you_buf_siz */
 
     /* polyself.c */
     0, /* sex_change_ok */
@@ -533,6 +540,12 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* p_aligntyp */
     UNDEFINED_VALUE, /* p_trouble */
     UNDEFINED_VALUE, /* p_type */
+
+    /* questpgr.c */
+    UNDEFINED_VALUES, /* cvt_buf */
+    UNDEFINED_VALUES, /* qt_list */
+    UNDEFINED_PTR, /* msg_file */
+    UNDEFINED_VALUES, /* nambuf */
 
     /* read.c */
     UNDEFINED_VALUE, /* known */
@@ -560,13 +573,45 @@ const struct instance_globals g_init = {
     0, /* ustuck_id */
     0, /* usteed_id */
 
+    /* shk.c */
+    'a', /* sell_response */
+    SELL_NORMAL, /* sell_how */
+    FALSE, /* auto_credit */
+    UNDEFINED_VALUES, /* repo */
+
     /* sp_lev.c */
     NULL, /* lev_message */
     NULL, /* lregions */
     0, /* num_lregions */
+    UNDEFINED_VALUES, /* SplLev_Map */
+    UNDEFINED_VALUE, /* xstart */
+    UNDEFINED_VALUE, /* ystart */
+    UNDEFINED_VALUE, /* xsize */
+    UNDEFINED_VALUE, /* ysize */
+    FALSE, /* splev_init_present */
+    FALSE, /* icedpools */
+    0, /* mines_prize_count */
+    0, /* soki_prize_count */
+    { UNDEFINED_PTR }, /* container_obj */
+    0, /* container_idx */
+    NULL, /* invent_carrying_monster */
+    { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL }, /* ralign */
+
+    /* spells.c */
+    0, /* spl_sortmode */
+    NULL, /* spl_orderindx */
+
+    /* timeout.c */
+    UNDEFINED_PTR, /* timer_base */
+    1, /* timer_id */
+
+    /* topten.c */
+    WIN_ERR, /* topten */
 
     /* trap.c */
     0, /* force_mintrap */
+    { 0, 0, FALSE },
+    UNDEFINED_VALUES,
 
     /* u_init.c */
     STRANGE_OBJECT, /* nocreate */
@@ -579,6 +624,9 @@ const struct instance_globals g_init = {
 
     /* weapon.c */
     UNDEFINED_PTR, /* propellor */
+
+    /* windows.c */
+    NULL, /* last_winchoice */
 
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */

@@ -82,8 +82,6 @@ STATIC_DCL void FDECL(nsb_mung_line, (char *));
 STATIC_DCL void FDECL(nsb_unmung_line, (char *));
 #endif
 
-static winid toptenwin = WIN_ERR;
-
 /* "killed by",&c ["an"] 'killer.name' */
 void
 formatkiller(buf, siz, how, incl_helpless)
@@ -161,20 +159,20 @@ STATIC_OVL void
 topten_print(x)
 const char *x;
 {
-    if (toptenwin == WIN_ERR)
+    if (g.toptenwin == WIN_ERR)
         raw_print(x);
     else
-        putstr(toptenwin, ATR_NONE, x);
+        putstr(g.toptenwin, ATR_NONE, x);
 }
 
 STATIC_OVL void
 topten_print_bold(x)
 const char *x;
 {
-    if (toptenwin == WIN_ERR)
+    if (g.toptenwin == WIN_ERR)
         raw_print_bold(x);
     else
-        putstr(toptenwin, ATR_BOLD, x);
+        putstr(g.toptenwin, ATR_BOLD, x);
 }
 
 int
@@ -517,7 +515,7 @@ time_t when;
         return;
 
     if (iflags.toptenwin) {
-        toptenwin = create_nhwindow(NHW_TEXT);
+        g.toptenwin = create_nhwindow(NHW_TEXT);
     }
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
@@ -769,13 +767,13 @@ time_t when;
 
 showwin:
     if (iflags.toptenwin && !done_stopprint)
-        display_nhwindow(toptenwin, 1);
+        display_nhwindow(g.toptenwin, 1);
 destroywin:
     if (!t0_used)
         dealloc_ttentry(t0);
     if (iflags.toptenwin) {
-        destroy_nhwindow(toptenwin);
-        toptenwin = WIN_ERR;
+        destroy_nhwindow(g.toptenwin);
+        g.toptenwin = WIN_ERR;
     }
 }
 

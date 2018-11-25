@@ -42,9 +42,6 @@ enum lvlinit_types {
     LVLINIT_ROGUE
 };
 
-/* max. layers of object containment */
-#define MAX_CONTAINMENT 10
-
 /* max. # of random registers */
 #define MAX_REGISTERS 10
 
