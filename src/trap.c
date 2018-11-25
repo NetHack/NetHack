@@ -1681,36 +1681,26 @@ struct trap *trap;
     }
 }
 
-/*
- * The following are used to track launched objects to
- * prevent them from vanishing if you are killed. They
- * will reappear at the launchplace in bones files.
- */
-static struct {
-    struct obj *obj;
-    xchar x, y;
-} launchplace;
-
 STATIC_OVL void
 launch_drop_spot(obj, x, y)
 struct obj *obj;
 xchar x, y;
 {
     if (!obj) {
-        launchplace.obj = (struct obj *) 0;
-        launchplace.x = 0;
-        launchplace.y = 0;
+        g.launchplace.obj = (struct obj *) 0;
+        g.launchplace.x = 0;
+        g.launchplace.y = 0;
     } else {
-        launchplace.obj = obj;
-        launchplace.x = x;
-        launchplace.y = y;
+        g.launchplace.obj = obj;
+        g.launchplace.x = x;
+        g.launchplace.y = y;
     }
 }
 
 boolean
 launch_in_progress()
 {
-    if (launchplace.obj)
+    if (g.launchplace.obj)
         return TRUE;
     return FALSE;
 }
@@ -1718,9 +1708,9 @@ launch_in_progress()
 void
 force_launch_placement()
 {
-    if (launchplace.obj) {
-        launchplace.obj->otrapped = 0;
-        place_object(launchplace.obj, launchplace.x, launchplace.y);
+    if (g.launchplace.obj) {
+        g.launchplace.obj->otrapped = 0;
+        place_object(g.launchplace.obj, g.launchplace.x, g.launchplace.y);
     }
 }
 
@@ -3467,14 +3457,6 @@ struct obj *obj;
         erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 }
 
-/* context for water_damage(), managed by water_damage_chain();
-   when more than one stack of potions of acid explode while processing
-   a chain of objects, use alternate phrasing after the first message */
-static struct h2o_ctx {
-    int dkn_boom, unk_boom; /* track dknown, !dknown separately */
-    boolean ctx_valid;
-} acid_ctx = { 0, 0, FALSE };
-
 /* Get an object wet and damage it appropriately.
  *   "ostr", if present, is used instead of the object name in some
  *     messages.
@@ -3573,9 +3555,9 @@ boolean force;
 
             if (Blind && !carried(obj))
                 obj->dknown = 0;
-            if (acid_ctx.ctx_valid)
-                exploded = ((obj->dknown ? acid_ctx.dkn_boom
-                                         : acid_ctx.unk_boom) > 0);
+            if (g.acid_ctx.ctx_valid)
+                exploded = ((obj->dknown ? g.acid_ctx.dkn_boom
+                                         : g.acid_ctx.unk_boom) > 0);
             /* First message is
              * "a [potion|<color> potion|potion of acid] explodes"
              * depending on obj->dknown (potion has been seen) and
@@ -3591,11 +3573,11 @@ boolean force;
                   !exploded ? (one ? "A" : "Some")
                             : (one ? "Another" : "More"),
                   bufp, vtense(bufp, "explode"));
-            if (acid_ctx.ctx_valid) {
+            if (g.acid_ctx.ctx_valid) {
                 if (obj->dknown)
-                    acid_ctx.dkn_boom++;
+                    g.acid_ctx.dkn_boom++;
                 else
-                    acid_ctx.unk_boom++;
+                    g.acid_ctx.unk_boom++;
             }
             setnotworn(obj);
             delobj(obj);
@@ -3637,8 +3619,8 @@ boolean here;
 
     /* initialize acid context: so far, neither seen (dknown) potions of
        acid nor unseen have exploded during this water damage sequence */
-    acid_ctx.dkn_boom = acid_ctx.unk_boom = 0;
-    acid_ctx.ctx_valid = TRUE;
+    g.acid_ctx.dkn_boom = g.acid_ctx.unk_boom = 0;
+    g.acid_ctx.ctx_valid = TRUE;
 
     for (; obj; obj = otmp) {
         otmp = here ? obj->nexthere : obj->nobj;
@@ -3646,8 +3628,8 @@ boolean here;
     }
 
     /* reset acid context */
-    acid_ctx.dkn_boom = acid_ctx.unk_boom = 0;
-    acid_ctx.ctx_valid = FALSE;
+    g.acid_ctx.dkn_boom = g.acid_ctx.unk_boom = 0;
+    g.acid_ctx.ctx_valid = FALSE;
 }
 
 /*

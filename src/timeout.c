@@ -1659,10 +1659,6 @@ STATIC_DCL boolean FDECL(mon_is_local, (struct monst *));
 STATIC_DCL boolean FDECL(timer_is_local, (timer_element *));
 STATIC_DCL int FDECL(maybe_write_timer, (int, int, BOOLEAN_P));
 
-/* ordered timer list */
-static timer_element *timer_base; /* "active" */
-static unsigned long timer_id = 1;
-
 /* If defined, then include names when printing out the timer queue */
 #define VERBOSE_TIMER
 
@@ -1757,7 +1753,7 @@ wiz_timeout_queue()
     putstr(win, 0, "");
     putstr(win, 0, "Active timeout queue:");
     putstr(win, 0, "");
-    print_queue(win, timer_base);
+    print_queue(win, g.timer_base);
 
     /* Timed properies:
      * check every one; the majority can't obtain temporary timeouts in
@@ -1811,7 +1807,7 @@ timer_sanity_check()
     timer_element *curr;
 
     /* this should be much more complete */
-    for (curr = timer_base; curr; curr = curr->next)
+    for (curr = g.timer_base; curr; curr = curr->next)
         if (curr->kind == TIMER_OBJECT) {
             struct obj *obj = curr->arg.a_obj;
 
@@ -1836,9 +1832,9 @@ run_timers()
      * any time.  The list is ordered, we are done when the first element
      * is in the future.
      */
-    while (timer_base && timer_base->timeout <= monstermoves) {
-        curr = timer_base;
-        timer_base = curr->next;
+    while (g.timer_base && g.timer_base->timeout <= monstermoves) {
+        curr = g.timer_base;
+        g.timer_base = curr->next;
 
         if (curr->kind == TIMER_OBJECT)
             (curr->arg.a_obj)->timed--;
@@ -1865,7 +1861,7 @@ anything *arg;
     gnu = (timer_element *) alloc(sizeof(timer_element));
     (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
     gnu->next = 0;
-    gnu->tid = timer_id++;
+    gnu->tid = g.timer_id++;
     gnu->timeout = monstermoves + when;
     gnu->kind = kind;
     gnu->needs_fixup = 0;
@@ -1892,7 +1888,7 @@ anything *arg;
     timer_element *doomed;
     long timeout;
 
-    doomed = remove_timer(&timer_base, func_index, arg);
+    doomed = remove_timer(&g.timer_base, func_index, arg);
 
     if (doomed) {
         timeout = doomed->timeout;
@@ -1916,7 +1912,7 @@ anything *arg;
 {
     timer_element *curr;
 
-    for (curr = timer_base; curr; curr = curr->next) {
+    for (curr = g.timer_base; curr; curr = curr->next) {
         if (curr->func_index == type && curr->arg.a_void == arg->a_void)
             return curr->timeout;
     }
@@ -1933,7 +1929,7 @@ struct obj *src, *dest;
     int count;
     timer_element *curr;
 
-    for (count = 0, curr = timer_base; curr; curr = curr->next)
+    for (count = 0, curr = g.timer_base; curr; curr = curr->next)
         if (curr->kind == TIMER_OBJECT && curr->arg.a_obj == src) {
             curr->arg.a_obj = dest;
             dest->timed++;
@@ -1953,7 +1949,7 @@ struct obj *src, *dest;
 {
     timer_element *curr, *next_timer = 0;
 
-    for (curr = timer_base; curr; curr = next_timer) {
+    for (curr = g.timer_base; curr; curr = next_timer) {
         next_timer = curr->next; /* things may be inserted */
         if (curr->kind == TIMER_OBJECT && curr->arg.a_obj == src) {
             (void) start_timer(curr->timeout - monstermoves, TIMER_OBJECT,
@@ -1972,13 +1968,13 @@ struct obj *obj;
 {
     timer_element *curr, *prev, *next_timer = 0;
 
-    for (prev = 0, curr = timer_base; curr; curr = next_timer) {
+    for (prev = 0, curr = g.timer_base; curr; curr = next_timer) {
         next_timer = curr->next;
         if (curr->kind == TIMER_OBJECT && curr->arg.a_obj == obj) {
             if (prev)
                 prev->next = curr->next;
             else
-                timer_base = curr->next;
+                g.timer_base = curr->next;
             if (timeout_funcs[curr->func_index].cleanup)
                 (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
                                                            curr->timeout);
@@ -2015,14 +2011,14 @@ short func_index;
     timer_element *curr, *prev, *next_timer = 0;
     long where = (((long) x << 16) | ((long) y));
 
-    for (prev = 0, curr = timer_base; curr; curr = next_timer) {
+    for (prev = 0, curr = g.timer_base; curr; curr = next_timer) {
         next_timer = curr->next;
         if (curr->kind == TIMER_LEVEL && curr->func_index == func_index
             && curr->arg.a_long == where) {
             if (prev)
                 prev->next = curr->next;
             else
-                timer_base = curr->next;
+                g.timer_base = curr->next;
             if (timeout_funcs[curr->func_index].cleanup)
                 (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
                                                            curr->timeout);
@@ -2045,7 +2041,7 @@ short func_index;
     timer_element *curr;
     long where = (((long) x << 16) | ((long) y));
 
-    for (curr = timer_base; curr; curr = curr->next) {
+    for (curr = g.timer_base; curr; curr = curr->next) {
         if (curr->kind == TIMER_LEVEL && curr->func_index == func_index
             && curr->arg.a_long == where)
             return curr->timeout;
@@ -2069,7 +2065,7 @@ timer_element *gnu;
 {
     timer_element *curr, *prev;
 
-    for (prev = 0, curr = timer_base; curr; prev = curr, curr = curr->next)
+    for (prev = 0, curr = g.timer_base; curr; prev = curr, curr = curr->next)
         if (curr->timeout >= gnu->timeout)
             break;
 
@@ -2077,7 +2073,7 @@ timer_element *gnu;
     if (prev)
         prev->next = gnu;
     else
-        timer_base = gnu;
+        g.timer_base = gnu;
 }
 
 STATIC_OVL timer_element *
@@ -2231,7 +2227,7 @@ boolean write_it;
     int count = 0;
     timer_element *curr;
 
-    for (curr = timer_base; curr; curr = curr->next) {
+    for (curr = g.timer_base; curr; curr = curr->next) {
         if (range == RANGE_GLOBAL) {
             /* global timers */
 
@@ -2277,7 +2273,7 @@ int fd, mode, range;
 
     if (perform_bwrite(mode)) {
         if (range == RANGE_GLOBAL)
-            bwrite(fd, (genericptr_t) &timer_id, sizeof(timer_id));
+            bwrite(fd, (genericptr_t) &g.timer_id, sizeof(g.timer_id));
 
         count = maybe_write_timer(fd, range, FALSE);
         bwrite(fd, (genericptr_t) &count, sizeof count);
@@ -2285,14 +2281,14 @@ int fd, mode, range;
     }
 
     if (release_data(mode)) {
-        for (prev = 0, curr = timer_base; curr; curr = next_timer) {
+        for (prev = 0, curr = g.timer_base; curr; curr = next_timer) {
             next_timer = curr->next; /* in case curr is removed */
 
             if (!(!!(range == RANGE_LEVEL) ^ !!timer_is_local(curr))) {
                 if (prev)
                     prev->next = curr->next;
                 else
-                    timer_base = curr->next;
+                    g.timer_base = curr->next;
                 free((genericptr_t) curr);
                 /* prev stays the same */
             } else {
@@ -2316,7 +2312,7 @@ long adjust;     /* how much to adjust timeout */
     timer_element *curr;
 
     if (range == RANGE_GLOBAL)
-        mread(fd, (genericptr_t) &timer_id, sizeof timer_id);
+        mread(fd, (genericptr_t) &g.timer_id, sizeof g.timer_id);
 
     /* restore elements */
     mread(fd, (genericptr_t) &count, sizeof count);
@@ -2340,7 +2336,7 @@ long *count, *size;
 
     Sprintf(hdrbuf, hdrfmt, (long) sizeof (timer_element));
     *count = *size = 0L;
-    for (te = timer_base; te; te = te->next) {
+    for (te = g.timer_base; te; te = te->next) {
         ++*count;
         *size += (long) sizeof *te;
     }
@@ -2354,7 +2350,7 @@ boolean ghostly;
     timer_element *curr;
     unsigned nid;
 
-    for (curr = timer_base; curr; curr = curr->next) {
+    for (curr = g.timer_base; curr; curr = curr->next) {
         if (curr->needs_fixup) {
             if (curr->kind == TIMER_OBJECT) {
                 if (ghostly) {

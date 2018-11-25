@@ -219,29 +219,25 @@ VA_DECL(const char *, line)
     return;
 }
 
-/* work buffer for You(), &c and verbalize() */
-static char *you_buf = 0;
-static int you_buf_siz = 0;
-
 static char *
 You_buf(siz)
 int siz;
 {
-    if (siz > you_buf_siz) {
-        if (you_buf)
-            free((genericptr_t) you_buf);
-        you_buf_siz = siz + 10;
-        you_buf = (char *) alloc((unsigned) you_buf_siz);
+    if (siz > g.you_buf_siz) {
+        if (g.you_buf)
+            free((genericptr_t) g.you_buf);
+        g.you_buf_siz = siz + 10;
+        g.you_buf = (char *) alloc((unsigned) g.you_buf_siz);
     }
-    return you_buf;
+    return g.you_buf;
 }
 
 void
 free_youbuf()
 {
-    if (you_buf)
-        free((genericptr_t) you_buf), you_buf = (char *) 0;
-    you_buf_siz = 0;
+    if (g.you_buf)
+        free((genericptr_t) g.you_buf), g.you_buf = (char *) 0;
+    g.you_buf_siz = 0;
 }
 
 /* `prefix' must be a string literal, not a pointer */

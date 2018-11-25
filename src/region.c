@@ -45,7 +45,7 @@ NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,long));
 
 STATIC_DCL void FDECL(reset_region_mids, (NhRegion *));
 
-static callback_proc callbacks[] = {
+static const callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
     inside_gas_cloud,
 #define EXPIRE_GAS_CLOUD 1
