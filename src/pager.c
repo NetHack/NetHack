@@ -1357,7 +1357,7 @@ boolean without_asking;
      * meant to support in-game mythology, and not
      * available from data.base or other sources.
      */
-    if (name && pm && is_orc(pm) && (strlen(name) < (BUFSZ - 1))
+    if ((name && pm && is_orc(pm) && (strlen(name) < (BUFSZ - 1)))
         && ((bp = strstri(name, " of ")) != 0) ||
             (bp2 = strstri(name, " the Fence")) != 0) {
         char fullname[BUFSZ];
