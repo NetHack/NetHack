@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1543052701 2018/11/24 09:45:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.270 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1543100460 2018/11/24 23:01:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.271 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2827,40 +2827,34 @@ boolean via_attack;
 void
 wake_nearby()
 {
-    register struct monst *mtmp;
-
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        if (distu(mtmp->mx, mtmp->my) < u.ulevel * 20) {
-            mtmp->msleeping = 0;
-            if (!unique_corpstat(mtmp->data))
-                mtmp->mstrategy &= ~STRAT_WAITMASK;
-            if (mtmp->mtame) {
-                if (!mtmp->isminion)
-                    EDOG(mtmp)->whistletime = moves;
-                /* Clear mtrack. This is to fix up a pet who is
-                   stuck "fleeing" its master. */
-                memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
-            }
-        }
-    }
+    wake_nearto(u.ux, u.uy, u.ulevel * 20);
 }
 
 /* Wake up monsters near some particular location. */
 void
 wake_nearto(x, y, distance)
-register int x, y, distance;
+int x, y, distance;
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
         if (distance == 0 || dist2(mtmp->mx, mtmp->my, x, y) < distance) {
-            mtmp->msleeping = 0;
-            if (!unique_corpstat(mtmp->data))
-                mtmp->mstrategy &= ~STRAT_WAITMASK;
+            /* sleep for N turns uses mtmp->mfrozen, but so does paralysis
+               so we leave mfrozen monsters alone */
+            mtmp->msleeping = 0; /* wake indeterminate sleep */
+            if (!(mtmp->data->geno & G_UNIQ))
+                mtmp->mstrategy &= ~STRAT_WAITMASK; /* wake 'meditation' */
+            if (context.mon_moving)
+                continue;
+            if (mtmp->mtame) {
+                if (!mtmp->isminion)
+                    EDOG(mtmp)->whistletime = moves;
+                /* Clear mtrack. This is to fix up a pet who is
+                   stuck "fleeing" its master. */
+                memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
+            }
         }
     }
 }

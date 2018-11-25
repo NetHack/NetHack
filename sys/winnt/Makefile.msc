@@ -686,7 +686,8 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
-	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	$(U)makedefs -c
+	-if not exist $(GAMEDIR)\defaults.nh copy fixed_defaults.nh   $(GAMEDIR)\defaults.nh
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 
@@ -1359,6 +1360,7 @@ clean:
 	if exist $(U)dgncomp.exe   del $(U)dgncomp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
+	if exist $(SRC)\fixed_defaults.nh del $(SRC)\fixed_defaults.nh
 	if exist $(O)install.tag   del $(O)install.tag
 	if exist $(O)console.res  del $(O)console.res
 	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP

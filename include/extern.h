@@ -431,7 +431,7 @@ E struct obj *FDECL(realloc_obj,
                     (struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *, char *));
 E char *FDECL(rndorcname, (char *));
-E struct monst *FDECL(christen_orc, (struct monst *, char *));
+E struct monst *FDECL(christen_orc, (struct monst *, char *, char *));
 E const char *FDECL(noveltitle, (int *));
 E const char *FDECL(lookup_novel, (const char *, int *));
 

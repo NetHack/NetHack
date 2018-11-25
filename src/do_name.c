@@ -2088,18 +2088,28 @@ char *s;
 }
 
 struct monst *
-christen_orc(mtmp, gang)
+christen_orc(mtmp, gang, other)
 struct monst *mtmp;
-char *gang;
+char *gang, *other;
 {
     int sz = 0;
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
 
     orcname = rndorcname(buf2);
-    sz = (int) (strlen(gang) + strlen(orcname) + sizeof " of " - sizeof "");
-    if (gang && orcname && sz < BUFSZ) {
-        Sprintf(buf, "%s of %s", upstart(orcname), upstart(gang));
-        mtmp = christen_monst(mtmp, buf);
+    sz = (int) ((gang ? strlen(gang) : other ? strlen(other) : 0)
+            + strlen(orcname) + sizeof " of " - sizeof "");
+    if (sz < BUFSZ) {
+        boolean nameit = FALSE;
+
+        if (gang && orcname) {
+            Sprintf(buf, "%s of %s", upstart(orcname), upstart(gang));
+            nameit = TRUE;
+        } else if (other && orcname) {
+            Sprintf(buf, "%s%s", upstart(orcname), other);
+            nameit = TRUE;
+        }
+        if (nameit)
+            mtmp = christen_monst(mtmp, buf);
     }
     return mtmp;
 }
