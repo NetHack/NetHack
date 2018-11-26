@@ -2766,12 +2766,28 @@ NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
     return MessageBox(hWnd, text, title, type);
 }
 
-static const char *_status_fieldnm[MAXBLSTATS];
-static const char *_status_fieldfmt[MAXBLSTATS];
-static char *_status_vals[MAXBLSTATS];
-static int _status_colors[MAXBLSTATS];
-static int _status_percents[MAXBLSTATS];
-static boolean _status_activefields[MAXBLSTATS];
+static mswin_status_lines _status_lines;
+static mswin_status_string _status_strings[MAXBLSTATS];
+static mswin_status_string _condition_strings[BL_MASK_BITS];
+static mswin_status_field _status_fields[MAXBLSTATS];
+
+static mswin_condition_field _condition_fields[BL_MASK_BITS] = {
+    { BL_MASK_STONE, " Stone" },
+    { BL_MASK_SLIME, " Slime" },
+    { BL_MASK_STRNGL, " Strngl" },
+    { BL_MASK_FOODPOIS, " FoodPois" },
+    { BL_MASK_TERMILL, " TermIll" },
+    { BL_MASK_BLIND, " Blind" },
+    { BL_MASK_DEAF, " Deaf" },
+    { BL_MASK_STUN, " Stun" },
+    { BL_MASK_CONF, " Conf" },
+    { BL_MASK_HALLU, " Hallu" },
+    { BL_MASK_LEV, " Lev" },
+    { BL_MASK_FLY, " Fly" },
+    { BL_MASK_RIDE, " Ride" }
+};
+
+
 extern winid WIN_STATUS;
 
 #ifdef STATUS_HILITES
@@ -2792,15 +2808,62 @@ status_init()   -- core calls this to notify the window port that a status
 void
 mswin_status_init(void)
 {
-    int i;
     logDebug("mswin_status_init()\n");
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        _status_vals[i] = (char *) alloc(BUFSZ);
-        *_status_vals[i] = '\0';
-        _status_activefields[i] = FALSE;
-        _status_fieldfmt[i] = (const char *) 0;
-        _status_colors[i] = CLR_MAX; /* no color */
-        _status_percents[i] = 0;
+
+    for (int i = 0; i < SIZE(_status_fields); i++) {
+        mswin_status_field * status_field = &_status_fields[i];
+        status_field->field_index = i;
+        status_field->enabled = FALSE;
+    }
+
+    for (int i = 0; i < SIZE(_condition_fields); i++) {
+        mswin_condition_field * condition_field = &_condition_fields[i];
+        nhassert(condition_field->mask == (1 << i));
+        condition_field->bit_position = i;
+    }
+
+    for (int i = 0; i < SIZE(_status_strings); i++) {
+        mswin_status_string * status_string = &_status_strings[i];
+        status_string->str = NULL;
+    }
+
+    for (int i = 0; i < SIZE(_condition_strings); i++) {
+        mswin_status_string * status_string = &_condition_strings[i];
+        status_string->str = NULL;
+    }
+
+    for (int lineIndex = 0; lineIndex < SIZE(_status_lines.lines); lineIndex++) {
+        mswin_status_line * line = &_status_lines.lines[lineIndex];
+
+        mswin_status_fields * status_fields = &line->status_fields;
+        status_fields->count = 0;
+
+        mswin_status_strings * status_strings = &line->status_strings;
+        status_strings->count = 0;
+
+        for (int i = 0; i < fieldcounts[lineIndex]; i++) {
+            int field_index = fieldorders[lineIndex][i];
+            nhassert(field_index <= SIZE(_status_fields));
+
+            nhassert(status_fields->count <= SIZE(status_fields->status_fields));
+            status_fields->status_fields[status_fields->count++] = &_status_fields[field_index];
+
+            nhassert(status_strings->count <= SIZE(status_strings->status_strings));
+            status_strings->status_strings[status_strings->count++] =
+                &_status_strings[field_index];
+
+            if (field_index == BL_CONDITION) {
+                for (int j = 0; j < BL_MASK_BITS; j++) {
+                    nhassert(status_strings->count <= SIZE(status_strings->status_strings));
+                    status_strings->status_strings[status_strings->count++] =
+                        &_condition_strings[j];
+                }
+            }
+        }
+    }
+
+
+    for (int i = 0; i < MAXBLSTATS; ++i) {
 #ifdef STATUS_HILITES
         _status_hilites[i].thresholdtype = 0;
         _status_hilites[i].behavior = BL_TH_NONE;
@@ -2820,17 +2883,7 @@ status_finish() -- called when it is time for the window port to tear down
 void
 mswin_status_finish(void)
 {
-    /* tear down routine */
-    int i;
-
     logDebug("mswin_status_finish()\n");
-
-    /* free alloc'd memory here */
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        if (_status_vals[i])
-            free((genericptr_t) _status_vals[i]);
-        _status_vals[i] = (char *) 0;
-    }
 }
 
 /*
@@ -2853,9 +2906,41 @@ mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 {
     logDebug("mswin_status_enablefield(%d, %s, %s, %d)\n", fieldidx, nm, fmt,
              (int) enable);
-    _status_fieldfmt[fieldidx] = fmt;
-    _status_fieldnm[fieldidx] = nm;
-    _status_activefields[fieldidx] = enable;
+
+    nhassert(fieldidx <= SIZE(_status_fields));
+    mswin_status_field * field = &_status_fields[fieldidx];
+
+    nhassert(fieldidx <= SIZE(_status_strings));
+    mswin_status_string * string = &_status_strings[fieldidx];
+
+    if (field != NULL) {
+        field->format = fmt;
+        field->name = nm;
+        field->enabled = enable;
+
+        string->str = (field->enabled ? field->string : NULL);
+
+        if (field->field_index == BL_CONDITION)
+            string->str = NULL;
+
+        string->draw_bar = (field->enabled && field->field_index == BL_TITLE);
+    }
+}
+
+/* TODO: turn this into a commmon helper; multiple identical implementations */
+static int
+mswin_condcolor(bm, bmarray)
+long bm;
+unsigned long *bmarray;
+{
+    int i;
+
+    if (bm && bmarray)
+        for (i = 0; i < CLR_MAX; ++i) {
+            if ((bm & bmarray[i]) != 0)
+                return i;
+        }
+    return NO_COLOR;
 }
 
 /*
@@ -2910,11 +2995,10 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
     MSNHMsgUpdateStatus update_cmd_data;
     int ocolor, ochar;
     unsigned ospecial;
-    long value = -1;
-    boolean reset_state = FALSE;
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, colormasks);
 
+#if 0 // TODO: this code was dead ... do we need to respond to these updates?
     switch (idx) {
         case BL_RESET:
             reset_state = TRUE;
@@ -2924,42 +3008,44 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
         default:
             break;
     }
+#endif
 
     if (idx >= 0) {
-        if (!_status_activefields[idx])
+
+        nhassert(idx <= SIZE(_status_fields));
+        mswin_status_field * status_field = &_status_fields[idx];
+        nhassert(status_field->field_index == idx);
+
+        nhassert(idx <= SIZE(_status_strings));
+        mswin_status_string * status_string = &_status_strings[idx];
+
+        if (!status_field->enabled) {
+            nhassert(status_string->str == NULL);
             return;
-        _status_percents[idx] = percent;
+        }
+
+        // TODO: is color actualy color and attribute OR not?
+        status_field->color = color & 0xff;
+        status_string->color = color & 0xff;
+
         switch (idx) {
         case BL_CONDITION: {
+            mswin_condition_field * condition_field = _condition_fields;
+
+            nhassert(status_string->str == NULL);
+
             cond = *condptr;
-            *_status_vals[idx] = '\0';
-            if (cond & BL_MASK_STONE)
-                Strcat(_status_vals[idx], " Stone");
-            if (cond & BL_MASK_SLIME)
-                Strcat(_status_vals[idx], " Slime");
-            if (cond & BL_MASK_STRNGL)
-                Strcat(_status_vals[idx], " Strngl");
-            if (cond & BL_MASK_FOODPOIS)
-                Strcat(_status_vals[idx], " FoodPois");
-            if (cond & BL_MASK_TERMILL)
-                Strcat(_status_vals[idx], " TermIll");
-            if (cond & BL_MASK_BLIND)
-                Strcat(_status_vals[idx], " Blind");
-            if (cond & BL_MASK_DEAF)
-                Strcat(_status_vals[idx], " Deaf");
-            if (cond & BL_MASK_STUN)
-                Strcat(_status_vals[idx], " Stun");
-            if (cond & BL_MASK_CONF)
-                Strcat(_status_vals[idx], " Conf");
-            if (cond & BL_MASK_HALLU)
-                Strcat(_status_vals[idx], " Hallu");
-            if (cond & BL_MASK_LEV)
-                Strcat(_status_vals[idx], " Lev");
-            if (cond & BL_MASK_FLY)
-                Strcat(_status_vals[idx], " Fly");
-            if (cond & BL_MASK_RIDE)
-                Strcat(_status_vals[idx], " Ride");
-            value = cond;
+
+            for (int i = 0; i < BL_MASK_BITS; i++, condition_field++) {
+                status_string = &_condition_strings[i];
+
+                if (condition_field->mask & cond) {
+                    status_string->str = condition_field->name;
+                    status_string->color = mswin_condcolor(condition_field->mask, colormasks);
+                }
+                else
+                    status_string->str = NULL;
+            }
         } break;
         case BL_GOLD: {
             char buf[BUFSZ];
@@ -2971,33 +3057,34 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
             p = strchr(text, ':');
             if (p) {
                 strncpy(buf + 1, p, sizeof(buf) - 2);
-                value = atol(p + 1);
             } else {
                 buf[1] = ':';
                 strncpy(buf + 2, text, sizeof(buf) - 2);
-                value = atol(text);
             }
-            Sprintf(_status_vals[idx],
-                    _status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s",
-                    buf);
+
+            Sprintf(status_field->string, status_field->format ? status_field->format : "%s", buf);
+            nhassert(status_string->str == status_field->string);
         } break;
         default: {
-            value = atol(text);
-            Sprintf(_status_vals[idx],
-                    _status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s",
+            Sprintf(status_field->string, status_field->format ? status_field->format : "%s",
                     text);
+            nhassert(status_string->str == status_field->string);
         } break;
         }
 
-        _status_colors[idx] = color;
+        /* if we received an update for the hp field, we must update the
+         * bar percent and bar color for the title string */
+        if (idx == BL_HP) {
+            mswin_status_string * title_string = &_status_strings[BL_TITLE];
+
+            title_string->bar_color = color;
+            title_string->bar_percent = percent;
+
+        }
 
         /* send command to status window */
         ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
-        update_cmd_data.n_fields = MAXBLSTATS;
-        update_cmd_data.vals = _status_vals;
-        update_cmd_data.activefields = _status_activefields;
-        update_cmd_data.percents = _status_percents;
-        update_cmd_data.colors = _status_colors;
+        update_cmd_data.status_lines = &_status_lines;
         SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
                 (WPARAM) MSNH_MSG_UPDATE_STATUS, (LPARAM) &update_cmd_data);
     }

@@ -746,6 +746,12 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     glyph = data->map[i][j];
     bkglyph = data->bkmap[i][j];
 
+    if (glyph == NO_GLYPH && bkglyph == NO_GLYPH) {
+        HBRUSH blackBrush = CreateSolidBrush(RGB(0, 0, 0));
+        FillRect(data->backBufferDC, rect, blackBrush);
+        DeleteObject(blackBrush);
+    }
+
     if (bkglyph != NO_GLYPH) {
         ntile = glyph2tile[bkglyph];
         t_x = TILEBMP_X(ntile);
