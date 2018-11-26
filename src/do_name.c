@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1537477563 2018/09/20 21:06:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1543185069 2018/11/25 22:31:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2090,19 +2090,21 @@ char *s;
 struct monst *
 christen_orc(mtmp, gang, other)
 struct monst *mtmp;
-char *gang, *other;
+const char *gang, *other;
 {
     int sz = 0;
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
 
     orcname = rndorcname(buf2);
     sz = (int) ((gang ? strlen(gang) : other ? strlen(other) : 0)
-            + strlen(orcname) + sizeof " of " - sizeof "");
+                + strlen(orcname) + sizeof " of " - sizeof "");
     if (sz < BUFSZ) {
+        char gbuf[BUFSZ];
         boolean nameit = FALSE;
 
         if (gang && orcname) {
-            Sprintf(buf, "%s of %s", upstart(orcname), upstart(gang));
+            Sprintf(buf, "%s of %s", upstart(orcname),
+                    upstart(strcpy(gbuf, gang)));
             nameit = TRUE;
         } else if (other && orcname) {
             Sprintf(buf, "%s%s", upstart(orcname), other);
