@@ -9,7 +9,6 @@
 #include "mhmsg.h"
 #include "mhfont.h"
 
-#define NHSW_LINES 2
 #define MAXWINDOWTEXT BUFSZ
 
 extern COLORREF nhcolor_to_RGB(int c); /* from mhmap */
@@ -60,24 +59,14 @@ void back_buffer_init(back_buffer_t * back_buffer, HWND hWnd, int width, int hei
     back_buffer_size(back_buffer, width, height);
 }
 
+
 typedef struct mswin_nethack_status_window {
     int index;
     char window_text[NHSW_LINES][MAXWINDOWTEXT + 1];
-    int n_fields;
-    const char **vals;
-    boolean *activefields;
-    int *percents;
-    int *colors;
+    mswin_status_lines * status_lines;
     back_buffer_t back_buffer;
 } NHStatusWindow, *PNHStatusWindow;
 
-static int fieldorder1[] = { BL_TITLE, BL_STR, BL_DX,    BL_CO,    BL_IN,
-                             BL_WI,    BL_CH,  BL_ALIGN, BL_SCORE, -1 };
-static int fieldorder2[] = { BL_LEVELDESC, BL_GOLD,      BL_HP,   BL_HPMAX,
-                             BL_ENE,       BL_ENEMAX,    BL_AC,   BL_XP,
-                             BL_EXP,       BL_HD,        BL_TIME, BL_HUNGER,
-                             BL_CAP,       BL_CONDITION, -1 };
-static int *fieldorders[] = { fieldorder1, fieldorder2, NULL };
 
 static TCHAR szStatusWindowClass[] = TEXT("MSNHStatusWndClass");
 LRESULT CALLBACK StatusWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -195,22 +184,19 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case MSNH_MSG_GETTEXT: {
             PMSNHMsgGetText msg_data = (PMSNHMsgGetText) lParam;
 #ifdef STATUS_HILITES
-            int **fop;
-            int *f;
-
             msg_data->buffer[0] = '\0';
-            if (data->n_fields > 0) {
-                for (fop = fieldorders; *fop; fop++) {
-                    for (f = *fop; *f != -1; f++) {
-                        if (data->activefields[*f])
-                            strncat(msg_data->buffer, data->vals[*f],
-                                    msg_data->max_size
-                                    - strlen(msg_data->buffer));
-                    }
-                    strncat(msg_data->buffer, "\r\n",
-                            msg_data->max_size - strlen(msg_data->buffer));
+
+            for (int line = 0; line < NHSW_LINES; line++) {
+                mswin_status_line *status_line = data->status_lines[line].lines;
+                for (int i = 0; i < status_line->status_strings.count; i++) {
+                    mswin_status_string * status_string = status_line->status_strings.status_strings[i];
+                    strncat(msg_data->buffer, status_string->str,
+                        msg_data->max_size - strlen(msg_data->buffer));
                 }
+                strncat(msg_data->buffer, "\r\n",
+                    msg_data->max_size - strlen(msg_data->buffer));
             }
+
 #else
             strncpy(msg_data->buffer, data->window_text[0],
                     msg_data->max_size);
@@ -223,11 +209,7 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         case MSNH_MSG_UPDATE_STATUS: {
             PMSNHMsgUpdateStatus msg_data = (PMSNHMsgUpdateStatus) lParam;
-            data->n_fields = msg_data->n_fields;
-            data->vals = msg_data->vals;
-            data->activefields = msg_data->activefields;
-            data->percents = msg_data->percents;
-            data->colors = msg_data->colors;
+            data->status_lines = msg_data->status_lines;
             InvalidateRect(hWnd, NULL, TRUE);
         } break;
         } /* end switch( wParam ) { */
@@ -273,10 +255,6 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 static LRESULT
 onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    int hpbar_percent = 100;
-    int hpbar_color = NO_COLOR;
-    int *f;
-    int **fop;
     SIZE sz;
     HGDIOBJ normalFont, boldFont;
     WCHAR wbuf[BUFSZ];
@@ -308,12 +286,6 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetBkColor(hdc, status_bg_color);
     SetTextColor(hdc, status_fg_color);
 
-    if (iflags.wc2_hitpointbar && BL_HP < data->n_fields
-        && data->activefields[BL_HP]) {
-        hpbar_percent = data->percents[BL_HP];
-        hpbar_color = data->colors[BL_HP] & 0x00ff;
-    }
-
     clear_rect.left = 0;
     clear_rect.top = 0;
     clear_rect.right = width;
@@ -321,23 +293,38 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     FillRect(hdc, &clear_rect, status_bg_brush);
 
-    for (fop = fieldorders; *fop; fop++) {
+    // TODO: Put it around for loop instead -- temporary to get a better diff
+    if (data->status_lines == NULL) {
+        BitBlt(front_buffer_hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
+
+        EndPaint(hWnd, &ps);
+        return 0;
+    }
+
+    for (int line = 0; line < NHSW_LINES; line++) {
         LONG left = rt.left;
         LONG cy = 0;
         int vlen;
-        for (f = *fop; *f != BL_FLUSH; f++) {
+
+        mswin_status_line * status_line = &data->status_lines->lines[line];
+
+        for (int i = 0; i < status_line->status_strings.count; i++) {
+            mswin_status_string * status_string = status_line->status_strings.status_strings[i];
             int clr, atr;
             int fntatr = ATR_NONE;
             HGDIOBJ fnt;
             COLORREF nFg, nBg;
 
-            if (((*f) >= data->n_fields) || (!data->activefields[*f]))
+            if (status_string->str == NULL || status_string->str[0] == '\0')
                 continue;
-            clr = data->colors[*f] & 0x00ff;
-            atr = (data->colors[*f] & 0xff00) >> 8;
-            vlen = strlen(data->vals[*f]);
 
-            const char *str = data->vals[*f];
+
+            clr = status_string->color & 0x00ff;
+            atr = (status_string->color & 0xff00) >> 8;
+
+            const char *str = status_string->str;
+
+            vlen = strlen(str);
 
             if (atr & HL_BOLD)
                 fntatr = ATR_BOLD;
@@ -362,8 +349,13 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
             nBg = status_bg_color;
 
             sz.cy = -1;
-            if (*f == BL_TITLE && iflags.wc2_hitpointbar) {
-                HBRUSH back_brush = CreateSolidBrush(nhcolor_to_RGB(hpbar_color));
+
+            if (status_string->draw_bar && iflags.wc2_hitpointbar) {
+
+                /* when we are drawing bar we need to look at the hp status
+                 * field to get the correct percentage and color */
+                COLORREF bar_color = nhcolor_to_RGB(status_string->bar_color);
+                HBRUSH back_brush = CreateSolidBrush(bar_color);
                 RECT barrect;
 
                 /* prepare for drawing */
@@ -371,7 +363,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                 SetBkMode(hdc, OPAQUE);
                 SetBkColor(hdc, status_bg_color);
                 /* SetTextColor(hdc, nhcolor_to_RGB(hpbar_color)); */
-				SetTextColor(hdc, status_fg_color);
+                               SetTextColor(hdc, status_fg_color);
 
                 if (useUnicode) {
                     /* get bounding rectangle */
@@ -379,21 +371,22 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                     /* first draw title normally */
                     DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
-                } else {
+                }
+                else {
                     /* get bounding rectangle */
                     GetTextExtentPoint32A(hdc, str, vlen, &sz);
 
                     /* first draw title normally */
                     DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
                 }
-
-                if (hpbar_percent > 0) {
+                int bar_percent = status_string->bar_percent;
+                if (bar_percent > 0) {
                     /* calc bar length */
                     barrect.left = rt.left;
                     barrect.top = rt.top;
                     barrect.bottom = sz.cy;
-                    if (hpbar_percent > 0)
-                        barrect.right = (int)((hpbar_percent * sz.cx) / 100);
+                    if (bar_percent > 0)
+                        barrect.right = (int)((bar_percent * sz.cx) / 100);
                     /* else
                         barrect.right = sz.cx; */
 

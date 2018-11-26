@@ -35,14 +35,15 @@ enum statusfields {
     BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,  /* 1..6 */
     BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
     BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
-    BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION /* 19..22 */
+    BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION, /* 19..22 */
+    BL_COUNT
 };
 
 enum relationships { NO_LTEQGT = -1,
                      EQ_VALUE, LT_VALUE, LE_VALUE,
                      GE_VALUE, GT_VALUE, TXT_VALUE };
 
-#define MAXBLSTATS      (BL_CONDITION + 1)
+#define MAXBLSTATS      (BL_COUNT)
 
 #define BEFORE  0
 #define NOW     1
@@ -63,6 +64,7 @@ enum relationships { NO_LTEQGT = -1,
 #define BL_MASK_LEV             0x00000400L
 #define BL_MASK_FLY             0x00000800L
 #define BL_MASK_RIDE            0x00001000L
+#define BL_MASK_BITS            13 /* number of mask bits that can be set */
 /* clang-format on */
 
 #define REASSESS_ONLY TRUE
