@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1537477570 2018/09/20 21:06:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1543185071 2018/11/25 22:31:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -719,9 +719,10 @@ int otyp;
 const char *gang;
 {
     struct obj *otmp;
+
     otmp = mksobj_migr_to_species(otyp, (unsigned long) M2_ORC, FALSE, FALSE);
     if (otmp && gang) {
-        new_oname(otmp, strlen(gang) + 1); /* removes old name if one is present */
+        new_oname(otmp, strlen(gang) + 1); /* removes old name if present */
         Strcpy(ONAME(otmp), gang);
         if (otyp >= TRIPE_RATION && otyp <= TIN) {
             if (otyp == SLIME_MOLD)

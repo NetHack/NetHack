@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1542798602 2018/11/21 11:10:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.650 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1543185068 2018/11/25 22:31:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.663 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -431,7 +431,8 @@ E struct obj *FDECL(realloc_obj,
                     (struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *, char *));
 E char *FDECL(rndorcname, (char *));
-E struct monst *FDECL(christen_orc, (struct monst *, char *, char *));
+E struct monst *FDECL(christen_orc, (struct monst *, const char *,
+                                     const char *));
 E const char *FDECL(noveltitle, (int *));
 E const char *FDECL(lookup_novel, (const char *, int *));
 

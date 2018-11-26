@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1537477571 2018/09/20 21:06:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1543185072 2018/11/25 22:31:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1397,7 +1397,7 @@ boolean without_asking;
             }
             if (yes_to_moreinfo) {
                 int i, subs = 0;
-                char *gang = (char *) 0;
+                const char *gang = (char *) 0;
 
                 if (bp) {
                     textp = suptext1;
