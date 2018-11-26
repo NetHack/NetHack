@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1541842623 2018/11/10 09:37:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1543185070 2018/11/25 22:31:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1704,10 +1704,12 @@ unsigned long deliverflags;
             /* special treatment for orcs and their kind */
             if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
                 if (!has_mname(mtmp)) {
-                    if (at_crime_scene || (!at_crime_scene && !rn2(2)))
+                    if (at_crime_scene || !rn2(2))
                         mtmp = christen_orc(mtmp,
-                                at_crime_scene ? ONAME(otmp) : (char *) 0,
-                                " the Fence");  /* bought the stolen goods */
+                                            at_crime_scene ? ONAME(otmp)
+                                                           : (char *) 0,
+                                            /* bought the stolen goods */
+                                            " the Fence");
                 }
                 free_oname(otmp);
             }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1542798625 2018/11/21 11:10:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1543188989 2018/11/25 23:36:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,6 +24,7 @@ STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
 #endif
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
+STATIC_DCL int FDECL(delta_cwt, (struct obj *, struct obj *));
 STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
                                     BOOLEAN_P, int *, int *));
 STATIC_DCL int FDECL(lift_object, (struct obj *, struct obj *, long *,
@@ -49,15 +50,6 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 #define FOLLOW(curr, flags) \
     (((flags) & BY_NEXTHERE) ? (curr)->nexthere : (curr)->nobj)
 
-/*
- *  How much the weight of the given container will change when the given
- *  object is removed from it.  This calculation must match the one used
- *  by weight() in mkobj.c.
- */
-#define DELTA_CWT(cont, obj)                                      \
-    ((cont)->cursed ? (obj)->owt * 2 : (cont)->blessed            \
-                                           ? ((obj)->owt + 3) / 4 \
-                                           : ((obj)->owt + 1) / 2)
 #define GOLD_WT(n) (((n) + 50L) / 100L)
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w, n) (((w) * -100L) - ((n) + 50L) - 1L)
@@ -1205,6 +1197,37 @@ int qflags;
     return ccount;
 }
 
+/*
+ *  How much the weight of the given container will change when the given
+ *  object is removed from it.  Use before and after weight amounts rather
+ *  than trying to match the calculation used by weight() in mkobj.c.
+ */
+STATIC_OVL int
+delta_cwt(container, obj)
+struct obj *container, *obj;
+{
+    struct obj **prev;
+    int owt, nwt;
+
+    if (container->otyp != BAG_OF_HOLDING)
+        return obj->owt;
+
+    owt = nwt = container->owt;
+    /* find the object so that we can remove it */
+    for (prev = &container->cobj; *prev; prev = &(*prev)->nobj)
+        if (*prev == obj)
+            break;
+    if (!*prev) {
+        panic("delta_cwt: obj not inside container?");
+    } else {
+        /* temporarily remove the object and calculate resulting weight */
+        *prev = obj->nobj;
+        nwt = weight(container);
+        *prev = obj; /* put the object back; obj->nobj is still valid */
+    }
+    return owt - nwt;
+}
+
 /* could we carry `obj'? if not, could we carry some of it/them? */
 STATIC_OVL long
 carry_count(obj, container, count, telekinesis, wt_before, wt_after)
@@ -1232,9 +1255,7 @@ int *wt_before, *wt_after;
     }
     wt = iw + (int) obj->owt;
     if (adjust_wt)
-        wt -= (container->otyp == BAG_OF_HOLDING)
-                  ? (int) DELTA_CWT(container, obj)
-                  : (int) obj->owt;
+        wt -= delta_cwt(container, obj);
     /* This will go with silver+copper & new gold weight */
     if (is_gold) /* merged gold might affect cumulative weight */
         wt -= (GOLD_WT(umoney) + GOLD_WT(count) - GOLD_WT(umoney + count));
@@ -1262,9 +1283,7 @@ int *wt_before, *wt_after;
                 obj->quan = qq;
                 obj->owt = (unsigned) GOLD_WT(qq);
                 ow = (int) GOLD_WT(umoney + qq);
-                ow -= (container->otyp == BAG_OF_HOLDING)
-                          ? (int) DELTA_CWT(container, obj)
-                          : (int) obj->owt;
+                ow -= delta_cwt(container, obj);
                 if (iw + ow >= 0)
                     break;
                 oow = ow;
@@ -1289,9 +1308,7 @@ int *wt_before, *wt_after;
             obj->quan = qq;
             obj->owt = (unsigned) (ow = weight(obj));
             if (adjust_wt)
-                ow -= (container->otyp == BAG_OF_HOLDING)
-                          ? (int) DELTA_CWT(container, obj)
-                          : (int) obj->owt;
+                ow -= delta_cwt(container, obj);
             if (iw + ow >= 0)
                 break;
             wt = iw + ow;
