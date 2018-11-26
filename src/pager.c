@@ -1353,10 +1353,12 @@ static const char *suptext1[] = {
 };
 
 static const char *suptext2[] = {
-    "%s is a nefarious orc who is known to acquire",
-    "property from thieves and sell it off for profit",
-    "or gain. The perpetrator was last seen hanging",
-    "around the stairs leading to the Gnomish Mines.",
+    "\"%s\" is the common dungeon name of",
+    "a nefarious orc who is known to acquire property",
+    "from thieves and sell it off for profit.",
+    "",
+    "The perpetrator was last seen hanging around the",
+    "stairs leading to the Gnomish Mines.",
     (char *) 0,
 };
 

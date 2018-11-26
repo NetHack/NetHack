@@ -2096,8 +2096,12 @@ const char *gang, *other;
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
 
     orcname = rndorcname(buf2);
-    sz = (int) ((gang ? strlen(gang) : other ? strlen(other) : 0)
-                + strlen(orcname) + sizeof " of " - sizeof "");
+    sz = (int) strlen(orcname);
+    if (gang)
+        sz += (int) (strlen(gang) + sizeof " of " - sizeof "");
+    else if (other)
+        sz += (int) strlen(other);
+
     if (sz < BUFSZ) {
         char gbuf[BUFSZ];
         boolean nameit = FALSE;
