@@ -69,11 +69,7 @@ typedef struct mswin_nhmsg_get_text {
 } MSNHMsgGetText, *PMSNHMsgGetText;
 
 typedef struct mswin_nhmsg_update_status {
-    int n_fields;
-    const char **vals;
-    boolean *activefields;
-    int *percents;
-    int *colors;
+    struct mswin_status_lines * status_lines;
 } MSNHMsgUpdateStatus, *PMSNHMsgUpdateStatus;
 
 #endif
