@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1522891623 2018/04/05 01:27:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1542853884 2018/11/22 02:31:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -165,8 +165,14 @@ char oclass;
 
     if (obj->oclass == oclass)
         return obj;
-
-    if (Has_contents(obj)) {
+    /*
+     * Note:  we exclude SchroedingersBox because the corpse it contains
+     * isn't necessarily a corpse yet.  Resolving the status would lead
+     * to complications if it turns out to be a live cat.  We know that
+     * that Box can't contain anything else because putting something in
+     * would resolve the cat/corpse situation and convert to ordinary box.
+     */
+    if (Has_contents(obj) && !SchroedingersBox(obj)) {
         for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
             if (otmp->oclass == oclass)
                 return otmp;
@@ -442,8 +448,7 @@ outgoldmap:
     return 0;
 }
 
-/* returns 1 if nothing was detected   */
-/* returns 0 if something was detected */
+/* returns 1 if nothing was detected, 0 if something was detected */
 int
 food_detect(sobj)
 register struct obj *sobj;

@@ -205,8 +205,23 @@ successfully paying for shop damage with shop credit would be followed by
 if a migrating monster was killed off because there was no room on the
 	destination level, it would leave a corpse even if it was a type
 	which should never leave one (demon, golem, blob, &c)
+monsters accompanying hero during level change (usually pets) who failed to
+	arrive and tried to re-migrate were being removed from the map after
+	already having been removed [impossible "no monster to remove" if
+	compiled with EXTRA_SANITY_CHECKS enabled] during migration handling
+monsters accompanying hero during level change (usually pets) who failed to
+	arrive and tried to re-migrate (for hero's next visit to the level)
+	ended up being killed because the migration attempt happened right
+	away (same visit by hero, so level still full) and they weren't
+	accompanying hero on the second attempt
+fix for above (all failed arrivals will re-migrate) makes the earlier fix (for
+	invalid corpse being left by monst killed upon migration failure) moot
 end of game while carrying Schroedinger's Box would reveal cat-or-corpse
 	for inventory disclosure or put that info into dumplog, but not both
+attempting to untrap an adjacent trap while on the edge of--not in--a pit
+	failed due to not being able to reach the floor
+magic trap's deafening roar effect wasn't waking nearby monsters
+scattering of objects might leave source location with wrong thing displayed
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
