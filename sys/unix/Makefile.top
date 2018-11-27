@@ -291,7 +291,7 @@ clean:
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
-spotless:
+spotless::
 	( cd src ; $(MAKE) spotless )
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )
