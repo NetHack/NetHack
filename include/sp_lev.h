@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1524287214 2018/04/21 05:06:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1543371689 2018/11/28 02:21:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -221,7 +221,7 @@ enum sp_obj_var_flags {
 #define SPOVAR_SEL 0x09   /* selection. char[COLNO][ROWNO] in str */
 #define SPOVAR_ARRAY 0x40 /* used in splev_var & lc_vardefs, not in opvar */
 
-#define SP_COORD_IS_RANDOM 0x01000000
+#define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */
 #define DRY         0x01

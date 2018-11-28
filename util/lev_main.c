@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1501723418 2017/08/03 01:23:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1543371692 2018/11/28 02:21:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -226,7 +226,7 @@ extern int nh_line_number;
 extern int token_start_pos;
 extern char curr_token[512];
 
-struct lc_vardefs *variable_definitions = NULL;
+struct lc_vardefs *vardefs = NULL;
 struct lc_funcdefs *function_definitions = NULL;
 
 extern int allow_break_statements;
@@ -641,9 +641,18 @@ VA_DECL2(sp_lev *, sp, const char *, fmt)
         switch (*p) {
         case ' ':
             break;
-        case 'i': /* integer */
+        case 'i': /* integer (via plain 'int') */
         {
             struct opvar *ov = New(struct opvar);
+
+            set_opvar_int(ov, (long) VA_NEXT(la, int));
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'l': /* integer (via 'long int') */
+        {
+            struct opvar *ov = New(struct opvar);
+
             set_opvar_int(ov, VA_NEXT(la, long));
             add_opcode(sp, SPO_PUSH, ov);
             break;
@@ -1105,8 +1114,8 @@ char *ldfname;
     (*splev)->n_opcodes = 0;
     (*splev)->opcodes = NULL;
 
-    vardef_free_all(variable_definitions);
-    variable_definitions = NULL;
+    vardef_free_all(vardefs);
+    vardefs = NULL;
 }
 
 /*
@@ -1436,7 +1445,7 @@ sp_lev *sp;
 
     mbuf[((max_hig - 1) * max_len) + (max_len - 1) + 1] = '\0';
 
-    add_opvars(sp, "siio", VA_PASS4(mbuf, (long) max_hig, (long) max_len,
+    add_opvars(sp, "sllo", VA_PASS4(mbuf, (long) max_hig, (long) max_len,
                                     SPO_MAP));
 
     for (dy = 0; dy < max_hig; dy++)

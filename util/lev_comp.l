@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1455415007 2016/02/14 01:56:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1543371690 2018/11/28 02:21:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -77,7 +77,7 @@ long FDECL(corefunc_str_check, (char *, long));
 extern void VDECL(lc_error, (const char *, ...));
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
-extern struct lc_vardefs *variable_definitions;
+extern struct lc_vardefs *vardefs;
 
 extern long FDECL(method_defined, (char *, long, long *));
 
@@ -384,7 +384,7 @@ handle_varstring_check()
     struct lc_vardefs *vd;
 
     yylval.map = dupstr(yytext);
-    if ((vd = vardef_defined(variable_definitions, yytext, 1)) != 0) {
+    if ((vd = vardef_defined(vardefs, yytext, 1)) != 0) {
         long l = vd->var_type;
         int a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
 
