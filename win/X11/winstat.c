@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1540247293 2018/10/22 22:28:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1543447325 2018/11/28 23:22:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,10 +33,9 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
-#include "xwindow.h"
-
 #include "hack.h"
 #include "winX.h"
+#include "xwindow.h"
 
 /*
  * Fancy status form entry storage indices.
