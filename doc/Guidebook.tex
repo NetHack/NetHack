@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{October 16, 2018}
+\date{November 27, 2018}
 
 \maketitle
 
@@ -3445,6 +3445,26 @@ Default `,'.
 Prompt for new form whenever any monster changes shape (default off).
 Debug mode only.
 %.lp
+\item[\ib{mouse\verb+_+support}]
+Allow use of the mouse for input and travel.
+Valid settings are:
+
+%.sd
+%.si
+\newlength{\mwidth}
+\settowidth{\mwidth}{\tt -0}
+\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
+\numbox{0} --- disabled\\
+\numbox{1} --- enabled and make OS adjustment to support mouse use in the game\\
+\numbox{2} --- enabled like {\tt 1}, but does not make any OS adjustments\\
+%.ei
+%.ed
+
+For backward compatibility, omitting a value is the same as specifying {\tt 1}
+and negating
+{\it mouse\verb+_+support\/}
+is the same as specifying {\tt 0}.
+%.lp
 \item[\ib{msghistory}]
 The number of top line messages to save (and be able to recall
 with `{\tt \^{}P}') (default 20).
@@ -3486,37 +3506,6 @@ Start the character with no armor (default false).  Persistent.
 %.lp
 \item[\ib{null}]
 Send padding nulls to the terminal (default on).  Persistent.
-%.lp
-\item[\ib{number\verb+_+pad}]
-Use digit keys instead of letters to move (default 0 or off).\\
-Valid settings are:
-
-%.sd
-%.si
-\newlength{\mwidth}
-\settowidth{\mwidth}{\tt -0}
-\newcommand{\numbox}[1]{\makebox[\mwidth][r]{{\tt #1}}}
-\numbox{0} --- move by letters; `{\tt yuhjklbn}'\\
-\numbox{1} --- move by numbers; digit `{\tt 5}' acts as `{\tt G}' movement prefix\\
-\numbox{2} --- like {\tt 1} but `{\tt 5}' works as `{\tt g}' prefix instead of as `{\tt G}'\\
-\numbox{3} --- by numbers using phone key layout; {\tt 123} above, {\tt 789} below\\
-\numbox{4} --- combines {\tt 3} with {\tt 2}; phone layout plus MS-DOS compatibility\\
-\numbox{-1} --- by letters but use `{\tt z}' to go northwest, `{\tt y}' to zap wands
-%.ei
-%.ed
-
-For backward compatibility, omitting a value is the same as specifying {\tt 1}
-and negating
-{\it number\verb+_+pad\/}
-is the same as specifying {\tt 0}.
-(Settings {\tt 2} and {\tt 4} are for compatibility with MS-DOS or old PC Hack;
-in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
-and `{\tt Alt-0}' acts as `{\tt I}'.
-Setting {\tt -1} is to accommodate some QWERTZ keyboards which have the
-location of the `{\tt y}' and `{\tt z}' keys swapped.)
-When moving by numbers, to enter a count prefix for those commands
-which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
-with the letter `{\tt n}' (``{\tt n12s}'').
 %.lp
 \item[\ib{packorder}]
 Specify the order to list object types in (default
@@ -3939,9 +3928,6 @@ If {\it NetHack\/} can, it should use a large font.
 %.lp
 \item[\ib{map\verb+_+mode}]
 If {\it NetHack\/} can, it should display the map in the manner specified.
-%.lp
-\item[\ib{mouse\verb+_+support}]
-Allow use of the mouse for input and travel.
 %.lp
 \item[\ib{player\verb+_+selection}]
 If {\it NetHack\/} can, it should pop up dialog boxes or use prompts for character selection.
