@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1526112322 2018/05/12 08:05:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.323 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1543395749 2018/11/28 09:02:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2227,7 +2227,7 @@ boolean tinitial, tfrom_file;
             if (mode < 0 || mode > 2 || (mode == 0 && *op != '0')) {
                 config_error_add("Illegal %s parameter '%s'", fullname, op);
                 return FALSE;
-            } else {                              /* mode > 0 */
+            } else { /* mode >= 0 */
                 iflags.wc_mouse_support = mode;
             }
         }
@@ -2288,8 +2288,9 @@ boolean tinitial, tfrom_file;
             symset[ROGUESET].name = dupstr(op);
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
-                config_error_add("Unable to load symbol set \"%s\" from \"%s\"",
-                           op, SYMBOLS);
+                config_error_add(
+                               "Unable to load symbol set \"%s\" from \"%s\"",
+                                 op, SYMBOLS);
                 return FALSE;
             } else {
                 if (!initial && Is_rogue_level(&u.uz))
@@ -5363,10 +5364,10 @@ get_compopt_value(optname, buf)
 const char *optname;
 char *buf;
 {
-    char ocl[MAXOCLASSES + 1];
     static const char none[] = "(none)", randomrole[] = "random",
-                      to_be_done[] = "(to be done)", defopt[] = "default",
-                      defbrief[] = "def";
+                      to_be_done[] = "(to be done)",
+                      defopt[] = "default", defbrief[] = "def";
+    char ocl[MAXOCLASSES + 1];
     int i;
 
     buf[0] = '\0';
@@ -5529,17 +5530,17 @@ char *buf;
 #define MOUSEFIX1 ", O/S adjusted"
 #define MOUSEFIX2 ", O/S unchanged"
 #endif
-        int ms = iflags.wc_mouse_support;
-        static const char *mousemodes[] = {
-            "0=off",
-            "1=on" MOUSEFIX1,
-            "2=on" MOUSEFIX2,
+        static const char *mousemodes[][2] = {
+            { "0=off", "" },
+            { "1=on",  MOUSEFIX1 },
+            { "2=on",  MOUSEFIX2 },
         };
-
-        if (ms >= 0 && ms < SIZE(mousemodes));
-            Strcpy(buf, mousemodes[ms]);
 #undef MOUSEFIX1
 #undef MOUSEFIX2
+        int ms = iflags.wc_mouse_support;
+
+        if (ms >= 0 && ms <= 2)
+            Sprintf(buf, "%s%s", mousemodes[ms][0], mousemodes[ms][1]);
     } else if (!strcmp(optname, "number_pad")) {
         static const char *numpadmodes[] = {
             "0=off", "1=on", "2=on, MSDOS compatible",
