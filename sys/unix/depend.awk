@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1524684206 2018/04/25 19:23:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.6 $
+# $NHDT-Date: 1543447376 2018/11/28 23:22:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.7 $
 #
 # usage:
 #   cd src ; nawk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -39,8 +39,16 @@ FNR == 1	{ output_dep()			#finish previous file
 /^\#[ \t]*include[ \t]+\"/  {			#find `#include "X"'
 		  incl = $2
 		  #[3.4.0: gnomehack headers currently aren't in include]
+		  #[3.6.2: Qt4 headers aren't in include either]
+		  #[3.6.2: curses headers likewise]
 		  if (incl ~ /\.h$/) {
-		    if (incl ~ /^gn/)	# gnomehack special case
+                    if (incl ~ "curses\.h")
+                      incl = ""	 # skip "curses.h"; it should be <curses.h>
+		    else if (incl ~ /^curs/)	# curses special case
+		      incl = "../win/curses/" incl
+		    else if (incl ~ /^qt4/)	# Qt v4 special case
+		      incl = "../win/Qt4/" incl
+		    else if (incl ~ /^gn/)	# gnomehack special case
 		      incl = "../win/gnome/" incl
 		    else
 		      incl = "../include/" incl
@@ -80,7 +88,7 @@ function output_specials(			i, sp, alt_sp)
     print "#", alt_sp, "timestamp"	#output a `make' comment
  #- sub("\\.", "_", alt_sp);  alt_sp = "$(" toupper(alt_sp) ")"
  #+ Some nawks don't have toupper(), so hardwire these instead.
-    sub("config.h", "$(CONFIG_H)", alt_sp);  sub("hack.h", "$(HACK_H)", alt_sp);
+    sub("config.h", "$(CONFIG_H)", alt_sp);  sub("hack.h", "$(HACK_H)", alt_sp)
     format_dep(alt_sp, sp)		#output the target
     print "\ttouch " alt_sp		#output a build command
     alt_deps[sp] = alt_sp		#alternate dependency for depend()

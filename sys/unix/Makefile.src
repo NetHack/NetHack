@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1539968067 2018/10/19 16:54:27 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.58 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1543447374 2018/11/28 23:22:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -462,7 +462,7 @@ SYSCXXSRC = ../sys/share/cppregex.cpp
 GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT4SRC) $(WINBESRC)
 
@@ -775,36 +775,38 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
-cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/patchlevel.h \
+		../include/wincurs.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursmain.c
-curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/func_tab.h \
-		../include/wincurs.h ../win/curses/curswins.h
+curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/curswins.h
 	$(CC) $(CFLAGS) -c ../win/curses/curswins.c
 cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursmisc.h
+		../win/curses/cursmisc.h ../include/func_tab.h ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursmisc.c
-cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/func_tab.h \
-		../include/wincurs.h ../win/curses/cursdial.h
+cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursdial.h ../include/func_tab.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursdial.c
 cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursstat.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursstat.c
 cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinit.h
+		../win/curses/cursinit.h ../include/patchlevel.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursinit.c
-cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinvt.h
-	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
 cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursmesg.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursmesg.c
+cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
+		../win/curses/cursinvt.h
+	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../win/X11/nh72icon ../win/X11/nh56icon ../win/X11/nh32icon
+		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
+		../win/X11/nh32icon
 	$(CC) $(CFLAGS) -c ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/tile2x11.h
@@ -816,7 +818,7 @@ winmesg.o: ../win/X11/winmesg.c ../include/xwindow.h $(HACK_H) ../include/winX.h
 winmisc.o: ../win/X11/winmisc.c $(HACK_H) ../include/func_tab.h \
 		../include/winX.h
 	$(CC) $(CFLAGS) -c ../win/X11/winmisc.c
-winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h
+winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h ../include/xwindow.h
 	$(CC) $(CFLAGS) -c ../win/X11/winstat.c
 wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h ../include/xwindow.h
 	$(CC) $(CFLAGS) -c ../win/X11/wintext.c
@@ -887,51 +889,82 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
-qt4bind.o : ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h
+qt4bind.o: ../win/Qt4/qt4bind.cpp $(HACK_H) ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4click.h ../win/Qt4/qt4delay.h \
+		../win/Qt4/qt4xcmd.h ../win/Qt4/qt4key.h ../win/Qt4/qt4map.h \
+		../win/Qt4/qt4menu.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4plsel.h \
+		../win/Qt4/qt4svsel.h ../win/Qt4/qt4set.h ../win/Qt4/qt4stat.h \
+		../win/Qt4/qt4streq.h ../win/Qt4/qt4yndlg.h \
+		../win/Qt4/qt4str.h ../include/dlb.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4bind.cpp
-qt4click.o : ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
+qt4click.o: ../win/Qt4/qt4click.cpp $(HACK_H) ../win/Qt4/qt4click.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4click.cpp
-qt4clust.o : ../win/Qt4/qt4clust.cpp $(HACK_H) ../win/Qt4/qt4clust.h
+qt4clust.o: ../win/Qt4/qt4clust.cpp ../win/Qt4/qt4clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4clust.cpp
-qt4delay.o : ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
+qt4delay.o: ../win/Qt4/qt4delay.cpp $(HACK_H) ../win/Qt4/qt4delay.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4delay.cpp
-qt4glyph.o : ../win/Qt4/qt4glyph.cpp $(HACK_H) ../win/Qt4/qt4glyph.h
+qt4glyph.o: ../win/Qt4/qt4glyph.cpp $(HACK_H) ../include/tile2x11.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4glyph.cpp
-qt4icon.o : ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
+qt4icon.o: ../win/Qt4/qt4icon.cpp $(HACK_H) ../win/Qt4/qt4icon.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4icon.cpp
-qt4inv.o : ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h
+qt4inv.o: ../win/Qt4/qt4inv.cpp $(HACK_H) ../win/Qt4/qt4inv.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4inv.cpp
-qt4key.o : ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
+qt4key.o: ../win/Qt4/qt4key.cpp $(HACK_H) ../win/Qt4/qt4key.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4key.cpp
-qt4line.o : ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
+qt4line.o: ../win/Qt4/qt4line.cpp $(HACK_H) ../win/Qt4/qt4line.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4line.cpp
-qt4main.o : ../win/Qt4/qt4main.cpp $(HACK_H) qt4main.moc ../win/Qt4/qt4main.h qt4kde0.moc
+qt4main.o: ../win/Qt4/qt4main.cpp $(HACK_H) ../include/patchlevel.h \
+		../win/Qt4/qt4main.h qt4main.moc ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
+		../win/Qt4/qt4map.h ../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h \
+		../win/Qt4/qt4stat.h ../win/Qt4/qt4str.h qt4kde0.moc
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4main.cpp
-qt4map.o : ../win/Qt4/qt4map.cpp $(HACK_H) qt4map.moc ../win/Qt4/qt4map.h
+qt4map.o: ../win/Qt4/qt4map.cpp $(HACK_H) ../win/Qt4/qt4map.h qt4map.moc \
+		../win/Qt4/qt4click.h ../win/Qt4/qt4glyph.h \
+		../include/qt_xpms.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4map.cpp
-qt4menu.o : ../win/Qt4/qt4menu.cpp $(HACK_H) qt4menu.moc ../win/Qt4/qt4menu.h
+qt4menu.o: ../win/Qt4/qt4menu.cpp $(HACK_H) ../win/Qt4/qt4menu.h qt4menu.moc \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4set.h \
+		../win/Qt4/qt4streq.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4menu.cpp
-qt4msg.o : ../win/Qt4/qt4msg.cpp $(HACK_H) qt4msg.moc ../win/Qt4/qt4msg.h
+qt4msg.o: ../win/Qt4/qt4msg.cpp $(HACK_H) ../win/Qt4/qt4msg.h qt4msg.moc \
+		../win/Qt4/qt4map.h ../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4msg.cpp
-qt4plsel.o : ../win/Qt4/qt4plsel.cpp $(HACK_H) qt4plsel.moc ../win/Qt4/qt4plsel.h
+qt4plsel.o: ../win/Qt4/qt4plsel.cpp $(HACK_H) ../win/Qt4/qt4plsel.h \
+		qt4plsel.moc ../win/Qt4/qt4bind.h ../win/Qt4/qt4glyph.h \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4plsel.cpp
-qt4rip.o : ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h
+qt4rip.o: ../win/Qt4/qt4rip.cpp $(HACK_H) ../win/Qt4/qt4rip.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4rip.cpp
-qt4set.o : ../win/Qt4/qt4set.cpp $(HACK_H) qt4set.moc ../win/Qt4/qt4set.h
+qt4set.o: ../win/Qt4/qt4set.cpp $(HACK_H) ../win/Qt4/qt4set.h qt4set.moc \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4set.cpp
-qt4stat.o : ../win/Qt4/qt4stat.cpp $(HACK_H) qt4stat.moc ../win/Qt4/qt4stat.h
+qt4stat.o: ../win/Qt4/qt4stat.cpp $(HACK_H) ../win/Qt4/qt4stat.h qt4stat.moc \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h ../include/qt_xpms.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4stat.cpp
-qt4str.o : ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
+qt4str.o: ../win/Qt4/qt4str.cpp ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4str.cpp
-qt4streq.o : ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h
+qt4streq.o: ../win/Qt4/qt4streq.cpp $(HACK_H) ../win/Qt4/qt4streq.h \
+		../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4streq.cpp
-qt4svsel.o : ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h
+qt4svsel.o: ../win/Qt4/qt4svsel.cpp $(HACK_H) ../win/Qt4/qt4svsel.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4svsel.cpp
-qt4win.o : ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h
+qt4win.o: ../win/Qt4/qt4win.cpp $(HACK_H) ../win/Qt4/qt4win.h \
+		../win/Qt4/qt4bind.h ../win/Qt4/qt4click.h \
+		../win/Qt4/qt4glyph.h ../win/Qt4/qt4inv.h ../win/Qt4/qt4key.h \
+		../win/Qt4/qt4icon.h ../win/Qt4/qt4map.h ../win/Qt4/qt4menu.h \
+		../win/Qt4/qt4msg.h ../win/Qt4/qt4set.h ../win/Qt4/qt4clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4win.cpp
-qt4xcmd.o : ../win/Qt4/qt4xcmd.cpp $(HACK_H) qt4xcmd.moc ../win/Qt4/qt4xcmd.h
+qt4xcmd.o: ../win/Qt4/qt4xcmd.cpp $(HACK_H) ../include/func_tab.h \
+		../win/Qt4/qt4xcmd.h qt4xcmd.moc ../win/Qt4/qt4bind.h \
+		../win/Qt4/qt4set.h ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4xcmd.cpp
-qt4yndlg.o : ../win/Qt4/qt4yndlg.cpp $(HACK_H) qt4yndlg.moc ../win/Qt4/qt4yndlg.h
+qt4yndlg.o: ../win/Qt4/qt4yndlg.cpp $(HACK_H) ../win/Qt4/qt4yndlg.h \
+		qt4yndlg.moc ../win/Qt4/qt4str.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt4/qt4yndlg.cpp
 wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
@@ -948,7 +981,7 @@ attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
 bones.o: bones.c $(HACK_H) ../include/lev.h
 botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
+cmd.o: cmd.c $(HACK_H) ../include/lev.h ../include/func_tab.h
 dbridge.o: dbridge.c $(HACK_H)
 decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
