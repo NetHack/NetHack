@@ -225,7 +225,7 @@ ifdef MAKEFILE_TOP
 #    be changed.
 #
 # Packages that are being distributed must be signed by a Developer ID Installer
-# certificate.  Set DEVERLOPER_CERT to the name of the certificate if you wish
+# certificate.  Set DEVELOPER_CERT to the name of the certificate if you wish
 # for your package to be signed for distribution.
 #
 # If building a package for signing, you must use sudo approriately.
