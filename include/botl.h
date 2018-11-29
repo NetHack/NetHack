@@ -36,14 +36,12 @@ enum statusfields {
     BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, /* 7..12 */
     BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, /* 13..18 */
     BL_HPMAX, BL_LEVELDESC, BL_EXP, BL_CONDITION, /* 19..22 */
-    BL_COUNT
+    MAXBLSTATS
 };
 
 enum relationships { NO_LTEQGT = -1,
                      EQ_VALUE, LT_VALUE, LE_VALUE,
                      GE_VALUE, GT_VALUE, TXT_VALUE };
-
-#define MAXBLSTATS      (BL_COUNT)
 
 #define BEFORE  0
 #define NOW     1

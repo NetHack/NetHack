@@ -34,40 +34,44 @@
 # BUILD DECISIONS SECTION
 #
 # There are currently only 4 decisions that you have to make.
-#	1. 32-bit or 64-bit?
-#	2. Where do you want your build to end up?
-#	3. Do you want debug information in the executable?
-#	4. Do you want additional GUI interfaces in the executable?
-#
-# Note that additional GUI interfaces may require external libraries.
-# Qt is placed where the official installer places it.
-# Other libraries are placed in a subdirectory of your home directory, either
-# x86libs or x64libs depending on whether you're building for 64 bits.
-#
+#	1. Where do you want your build to end up?
+#	2. Do you want debug information in the executable?
+#	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
+#       4. Do you want to include any optional interfaces in the port?
+#          4a) curses
+#          4b) Qt
+#-----------------------------------------------------------------------------------------
+#=========================================================================================
+
 #==============================================================================
+#---------------------------------------------------------------
+# 1. Where do you want the game to be built (which folder)?
+#    If not present prior to compilation it gets created.
+#
+
+GAMEDIR = ../binary
+
 # 1. 32-bit or 64-bit?
 #
 
+#
+#---------------------------------------------------------------
+# 2. Do you want debug information in the executable?
+#
+
+DEBUGINFO = Y
+
+#
+#---------------------------------------------------------------
+# 3. Do you want to explicitly override auto-detection of a 32-bit
+#    or 64-bit executable (save files do not interchange currently)?
+#
 # 64 bit
 #TARGET_CPU=x64
 #
 # 32 bit
 TARGET_CPU=x86
 #
-#---------------------------------------------------------------
-# 2. Where do you want the game to be built (which folder)?
-#    If not present prior to compilation it gets created.
-#
-
-GAMEDIR = ../binary
-
-#
-#---------------------------------------------------------------
-# 3. Do you want debug information in the executable?
-#
-
-DEBUGINFO = Y
-
 #
 #---------------------------------------------------------------
 # 4. Do you want additional GUI interfaces in the executable?
@@ -75,19 +79,47 @@ DEBUGINFO = Y
 #    and is the default.
 #
 
-WANT_WIN_QT4 = N
+#4a Curses window port support
+#
+#
+# 4. Uncomment these and set them appropriately if you want to
+#    include curses port support alongside TTY support in your
+#    NetHack.exe binary. 
+#
+#    You'll have to set PDCURSES_H to the correct location of the 
+#    PDCurses header (.h) files and PDCURSES_C to the location
+#    of your PDCurses C files which must already be resident on 
+#    your machine.
+#
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
+
+#4b Qt
+#
+#WANT_WIN_QT4 = N
 
 # WANT_WIN_QT4 requires Qt 4 or Qt 5, see
 # https://www.qt.io/download-open-source/
 # Earlier versions of Qt are not compatible with Windows
 # For Qt 5, use:
-QT4_DIRECTORY = c:/Qt/Qt5.9.2/5.9.2/mingw53_32
-HAVE_QT5 = Y
+#
+#QT4_DIRECTORY = c:/Qt/Qt5.9.2/5.9.2/mingw53_32
+#HAVE_QT5 = Y
 
 # For Qt 4, comment out the above two lines and use:
+#
 #QT4_DIRECTORY = c:/Qt/4.8.6
 #HAVE_QT5 = N
 
+#
+# Note that additional GUI interfaces may require external libraries.
+# Qt is placed where the official installer places it.
+# Other libraries are placed in a subdirectory of your home directory, either
+# x86libs or x64libs depending on whether you're building for 64 bits.
+#
+
+#
+#==============================================================================
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 #
@@ -100,33 +132,24 @@ HAVE_QT5 = Y
 # Nothing below here should have to be changed.#
 #                                              #
 ################################################
+#
+#==============================================================================
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
 
-# NetHack include files
-INCL  = ../include
-# NetHack data files
-DAT   = ../dat
-# NetHack documentation files
-DOC   = ../doc
-# Utility source
-UTIL  = ../util
-# Main source
-SRC   = ../src
-# Shared system files
-SSYS  = ../sys/share
-# NT Win32 specific files
-MSWSYS = ../sys/winnt
-# window port files (tty)
-TTY   = ../win/tty
-# window port files (WIN32)
-MSWIN = ../win/win32
-# window port files (Qt4)
-QT4 = ../win/Qt4
-# Tile support files
-WSHR  = ../win/share
+INCL    = ../include     # NetHack include files
+DAT     = ../dat         # NetHack data files
+DOC     = ../doc         # NetHack documentation files
+UTIL    = ../util        # Utility source
+SRC     = ../src         # Main source
+SSYS    = ../sys/share   # Shared system files
+MSWSYS  = ../sys/winnt   # mswin specific files
+TTY     = ../win/tty     # window port files (tty)
+MSWIN   = ../win/win32   # window port files (win32)
+WCURSES = ../win/curses  # window port files (curses) 
+WSHR    = ../win/share   # Tile support files 
 
 #
 #  Object directory.
@@ -142,46 +165,6 @@ ifeq "$(WANT_WIN_QT4)" "Y"
     link = g++
 endif
 
-#
-#==========================================
-# Level Compiler Info
-#==========================================
-
-# Yacc/Lex ... if you got 'em.
-#
-# If you have yacc and lex programs (or work-alike such as bison
-# and flex), comment out the upper two macros and uncomment
-# the lower two.
-#
-
-DO_YACC = YACC_MSG
-DO_LEX  = LEX_MSG
-#DO_YACC  = YACC_ACT
-#DO_LEX   = LEX_ACT
-
-# - Specify your yacc and lex programs (or work-alikes) here.
-
-#YACC   = bison -y
-YACC   = byacc
-#YACC   = yacc
-
-#LEX    = lex
-LEX     = flex
-
-#
-# - Specify your flex skeleton file (if needed).
-#
-
-FLEXSKEL =
-#FLEXSKEL = -S../tools/flex.ske
-
-YTABC   = y_tab.c
-YTABH   = y_tab.h
-LEXYYC  = lexyy.c
-
-#==========================================
-# Exe File Info.
-#==========================================
 #
 # Optional high-quality BSD random number generation routines
 # (see pcconf.h). Set to nothing if not used.
@@ -206,10 +189,22 @@ else
 DLBFLG =
 endif
 
+#
+# If you defined ZLIB_COMP in include/config.h and you need
+# to link with the zlib.lib library, uncomment the line below.
+# If necessary, prefix explicit path information to the file name
+# otherwise it assumes the NetHack src directory.
+#
+
+#ZLIB = zlib.lib
+
+#==========================================
 #==========================================
 # Setting up the compiler and linker
 # macros. All builds include the base ones.
 #==========================================
+#==========================================
+
 cflags = -mms-bitfields
 lflags  =
 ifeq  "$(DEBUGINFO)" "Y"
@@ -219,8 +214,6 @@ else
 cdebug =
 linkdebug =
 endif
-
-
 
 CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
 #LFLAGSBASEC = $(linkdebug)
@@ -322,7 +315,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
 
 #
-# These are not invoked during a normal game build in 3.4
+# These are not invoked during a normal game build in 3.4+
 #
 TEXT_IO        = $(O)tiletext.o  $(O)tiletxt.o   $(O)drawing.o \
 	$(O)decl.o    $(O)monst.o     $(O)objects.o
@@ -340,19 +333,19 @@ PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 #
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
-VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o
-VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o
-VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o
-VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
-VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
-VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
-VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
-VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o
-VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
-VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o
-VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o
-VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o
-VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
+VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
+VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
+VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
+VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
+VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
+VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
+VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o
+VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
+VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
+VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
+VOBJ14 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
 VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o
@@ -366,6 +359,7 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ28 = $(O)win10.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -373,20 +367,29 @@ REGEX  = $(O)cppregex.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
+!IFNDEF ADD_CURSES
+CURSESOBJ=
+!ELSE
+CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
+	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
+!ENDIF
+
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
 	$(SOUND) $(O)pcmain.o $(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
-	$(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
-	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
-	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	$(VOBJ26) $(VOBJ27) $(REGEX)
+         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
+         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
+         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
+         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
+         $(CURSESOBJ)
 
 GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+
 ifeq "$(WANT_WIN_QT4)" "Y"
     GUIOBJ += $(O)qt4bind.o $(O)qt4click.o $(O)qt4clust.o $(O)qt4delay.o \
 	$(O)qt4glyph.o $(O)qt4icon.o $(O)qt4inv.o $(O)qt4key.o $(O)qt4line.o \
@@ -400,6 +403,7 @@ GUIHDR = $(MSWIN)/mhaskyn.h $(MSWIN)/mhdlg.h $(MSWIN)/mhfont.h \
 	$(MSWIN)/mhmenu.h $(MSWIN)/mhmsg.h $(MSWIN)/mhmsgwnd.h \
 	$(MSWIN)/mhrip.h $(MSWIN)/mhstatus.h \
 	$(MSWIN)/mhtext.h $(MSWIN)/resource.h $(MSWIN)/winMS.h
+
 ifeq "$(WANT_WIN_QT4)" "Y"
     GUIHDR += $(QT4)/qt4bind.h $(QT4)/qt4click.h $(QT4)/qt4clust.h \
 	$(QT4)/qt4delay.h $(QT4)/qt4glyph.h $(QT4)/qt4icon.h $(QT4)/qt4inv.h \
@@ -410,7 +414,10 @@ ifeq "$(WANT_WIN_QT4)" "Y"
 	$(QT4)/qt4yndlg.h
 endif
 
-KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
+COMCTRL = comctl32.lib
+
+KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll \
+	  $(GAMEDIR)/nhraykey.dll
 
 TILEUTIL16  = $(UTIL)/tile2bmp.exe
 TILEBMP16   = $(SRC)/tiles.bmp
@@ -426,6 +433,35 @@ VVOBJ = $(O)version.o
 ALLOBJ = $(SOBJ) $(DLBOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
 
 OPTIONS_FILE = $(DAT)\options
+
+ifeq "$(ADD_CURSES)" "Y"
+#==========================================
+# PDCurses build macros
+#==========================================
+PDCURSES_CURSES_H	= $(PDCURSES_TOP)/curses.h
+PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
+PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
+PDCSRC                  = $(PDCURSES_TOP)/pdcurses
+PDCWINCON               = $(PDCURSES_TOP)/wincon
+PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o             \
+	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
+	$(O)deprec.o $(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o     \
+	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o   \
+	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o     \
+	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o $(O)terminfo.o $(O)touch.o $(O)util.o $(O)window.o    \
+	$(O)debug.o
+
+PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
+	  $(O)pdcsetsc.o $(O)pdcutil.o
+
+PDCLIB = $(O)pdcurses.a
+
+PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
+
+else
+PDCLIB = 
+endif
 
 #==========================================
 # Header file macros
@@ -463,6 +499,25 @@ TILE_H      = ../win/share/tile.h
 #==========================================
 
 DATABASE = $(DAT)/data.base
+
+#==========================================
+# More compiler setup post-macros
+#==========================================
+#
+ifeq "$(ADD_CURSES)" "Y"
+#CURSESDEF=-D"PDC_DLL_BUILD" -D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+else
+CURSDEF=
+CURSESLIB=
+CURSESINCL=
+endif
+
+ifneq  "$(ADD_CURSES)" "Y"
+INCLDIR= /I../include /I../sys/winnt
+else
+INCLDIR= /I../include /I../sys/winnt /I$(CURSESINCL)
+endif
 
 #==========================================
 #================ RULES ==================
@@ -535,6 +590,63 @@ $(OBJ)/%.o : $(MSWIN)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
+# Rules for files in win\curses
+#==========================================
+
+$(OBJ)/%.o : $(WCURSES)/%.c
+	$(cc) $(CFLAGS)  -o$@  $<
+
+#==========================================
+# Rules for files in PDCurses
+#==========================================
+
+$(OBJ)/%.o : $(PDCURSES_TOP)/%.c
+	$(cc) $(PDCINCL) $(CFLAGS)  -o$@  $<
+
+$(OBJ)/%.o : $(PDCSRC)/%.c
+	$(cc) $(PDCINCL) $(CFLAGS)  -o$@  $<
+
+$(OBJ)/%.o : $(PDCWINCON)/%.c
+	$(cc) $(PDCINCL) $(CFLAGS)  -o$@  $<
+
+#==========================================
+# Level Compiler Info
+#==========================================
+
+# Yacc/Lex ... if you got 'em.
+#
+# If you have yacc and lex programs (or work-alike such as bison
+# and flex), comment out the upper two macros and uncomment
+# the lower two.
+#
+
+DO_YACC = YACC_MSG
+DO_LEX  = LEX_MSG
+#DO_YACC  = YACC_ACT
+#DO_LEX   = LEX_ACT
+
+# - Specify your yacc and lex programs (or work-alikes) here.
+
+#YACC   = bison -y
+YACC   = byacc
+#YACC   = yacc
+
+#LEX    = lex
+LEX     = flex
+
+#
+# - Specify your flex skeleton file (if needed).
+#
+
+FLEXSKEL =
+#FLEXSKEL = -S../tools/flex.ske
+
+YTABC   = y_tab.c
+YTABH   = y_tab.h
+LEXYYC  = lexyy.c
+
+
+#==========================================
 # Rules for files in win/Qt4
 #==========================================
 
@@ -591,7 +703,12 @@ endif
 	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(U)makedefs -c
+	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy fixed_defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,if not exist $(GAMEDIR)/record. goto>$(GAMEDIR)/record.)
+#
+#
 	$(subst /,\,echo install done > $@)
 
 #  copy $(MSWSYS)/winnt.hlp    $(GAMEDIR)
@@ -662,18 +779,26 @@ $(O)gamedir.tag:
 	$(subst /,\,@if not exist $(GAMEDIR)/*.* mkdir $(GAMEDIR))
 	$(subst /,\,@echo directory created > $@)
 
-$(GAMEDIR)/NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
+$(GAMEDIR)/NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o $(KEYDLLS)
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
-		$(O)guistub.o $(O)conres.o $(conlibs) -static -lstdc++
+		$(O)guistub.o $(O)conres.o $(PDCLIB) $(conlibs) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+
+# NetHackW
+# full tty linkage libs:
+#    libs: $(LIBS) $(guilibs) $(COMCTRL)
+#    objs: $(GAMEOBJ) $(GUIOBJ) $(TTYOBJ) $(O)tile.o $(O)nttty.o
+# otherwise:
+#    libs: $(LIBS) $(guilibs) $(COMCTRL)
+#    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)/NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS)
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
-		$(O)winres.o $(guilibs) -static -lstdc++
+		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(O)nhdefkey.o:
@@ -713,9 +838,10 @@ graphicschk:
 	@echo ----
 	$(subst /,\,@echo graphicschk > graphicschk)
 
-#
-#  Secondary Targets.
-#
+
+#==========================================
+#=========== SECONDARY TARGETS ============
+#==========================================
 
 #==========================================
 # Makedefs Stuff
@@ -920,6 +1046,24 @@ else
 	$(subst /,\,echo.>>$@)
 endif
 
+#=================================================
+# For a couple of devteam utilities
+#=================================================
+
+$(U)nhsizes.exe: $(O)nhsizes.o
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o$(U)nhsizes.exe: $(O)nhsizes.o
+
+$(U)nhsize2.exe: $(O)nhsizes2.o
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(O)nhsizes2.o $(O)panic.o $(O)alloc.o
+
+$(O)nhsizes.o: $(CONFIG_H) nhsizes.c
+	$(cc) $(CFLAGSU) -o$@ nhsizes.c
+
+$(O)nhsizes2.o: $(CONFIG_H) nhsizes2.c
+	$(cc) $(CFLAGSU) -o$@ nhsizes2.c
+
 #==========================================
 # Create directory for holding object files
 #==========================================
@@ -928,19 +1072,6 @@ $(O)obj.tag:
 	$(subst /,\,@if not exist $(OBJ)/*.* echo creating directory $(OBJ))
 	$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
 	$(subst /,\,@echo directory created > $@)
-
-
-#==========================================
-#=========== SECONDARY TARGETS ============
-#==========================================
-
-#===========================================
-# Header files NOT distributed in ../include
-#===========================================
-
-$(INCL)/win32api.h: $(MSWSYS)/win32api.h
-	$(subst /,\,copy $(MSWSYS)/win32api.h $@)
-
 
 #==========================================
 # DLB utility and nhdat file creation
@@ -1073,6 +1204,13 @@ $(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
 	$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/til2bm32.c
 
 #==========================================
+# PDCurses Library
+#==========================================
+
+$(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
+	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+        
+#==========================================
 # Housekeeping
 #==========================================
 
@@ -1155,7 +1293,9 @@ spotless: clean
 ifneq "$(OBJ)" ""
 	$(subst /,\,if exist $(OBJ) rmdir $(OBJ)) /s /Q
 endif
-
+ifeq "$(ADD_CURSES)" == "Y"	
+	if exist $(O)pdcurses.lib del $(O)pdcurses.lib
+endif
 clean:
 	$(subst /,\,if exist $(O)*.o del $(O)*.o)
 	$(subst /,\,if exist $(O)utility.tag   del $(O)utility.tag)
@@ -1173,41 +1313,6 @@ clean:
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
-
-# Other files needed by some ports
-$(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/Qt5Widgets.dll : $(QT4_DIRECTORY)/bin/Qt5Widgets.dll
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/QtCore4.dll : $(QT4_DIRECTORY)/bin/QtCore4.dll
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/QtGui4.dll : $(QT4_DIRECTORY)/bin/QtGui4.dll
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/nhtiles.bmp : $(SRC)/tiles.bmp
-	$(subst /,\,@copy $< $@ >nul)
-
-$(GAMEDIR)/rip.xpm : ../win/X11/rip.xpm
-	$(subst /,\,@copy $< $@ >nul)
-
-
-# Dependencies on .moc files (for Qt 4 or 5)
-$(OBJ)/qt4main.o : $(QT4)/qt4main.cpp $(QT4)/qt4main.moc $(QT4)/qt4kde0.moc
-$(OBJ)/qt4map.o : $(QT4)/qt4map.cpp $(QT4)/qt4map.moc
-$(OBJ)/qt4menu.o : $(QT4)/qt4menu.cpp $(QT4)/qt4menu.moc
-$(OBJ)/qt4msg.o : $(QT4)/qt4msg.cpp $(QT4)/qt4msg.moc
-$(OBJ)/qt4plsel.o : $(QT4)/qt4plsel.cpp $(QT4)/qt4plsel.moc
-$(OBJ)/qt4set.o : $(QT4)/qt4set.cpp $(QT4)/qt4set.moc
-$(OBJ)/qt4stat.o : $(QT4)/qt4stat.cpp $(QT4)/qt4stat.moc
-$(OBJ)/qt4xcmd.o : $(QT4)/qt4xcmd.cpp $(QT4)/qt4xcmd.moc
-$(OBJ)/qt4yndlg.o : $(QT4)/qt4yndlg.cpp $(QT4)/qt4yndlg.moc
-
 #
 # dat dependencies
 #
@@ -1223,6 +1328,15 @@ $(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
 
 $(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
 	$(subst /,\,$(U)makedefs -h)
+
+$(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
+	$(U)makedefs -s
 
 $(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
 	$(subst /,\,$(U)makedefs -e)
@@ -1260,6 +1374,63 @@ $(O)tile.o: $(SRC)/tile.c $(HACK_H)
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	$(cc) $(CFLAGS) -o$@ $(U)panic.c
+
+# 
+# sys/share dependencies
+#
+
+(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
+	$(cc) $(CFLAGS) -o$@ ../sys/share/cppregex.cpp
+
+#
+# Other dependencies needed by some ports
+# 
+
+# curses window port dependencies
+
+$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
+$(O)cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+
+# Qt dependencies
+
+$(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/Qt5Widgets.dll : $(QT4_DIRECTORY)/bin/Qt5Widgets.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/QtCore4.dll : $(QT4_DIRECTORY)/bin/QtCore4.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/QtGui4.dll : $(QT4_DIRECTORY)/bin/QtGui4.dll
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/nhtiles.bmp : $(SRC)/tiles.bmp
+	$(subst /,\,@copy $< $@ >nul)
+
+$(GAMEDIR)/rip.xpm : ../win/X11/rip.xpm
+	$(subst /,\,@copy $< $@ >nul)
+
+
+# Dependencies on .moc files (for Qt 4 or 5)
+$(OBJ)/qt4main.o : $(QT4)/qt4main.cpp $(QT4)/qt4main.moc $(QT4)/qt4kde0.moc
+$(OBJ)/qt4map.o : $(QT4)/qt4map.cpp $(QT4)/qt4map.moc
+$(OBJ)/qt4menu.o : $(QT4)/qt4menu.cpp $(QT4)/qt4menu.moc
+$(OBJ)/qt4msg.o : $(QT4)/qt4msg.cpp $(QT4)/qt4msg.moc
+$(OBJ)/qt4plsel.o : $(QT4)/qt4plsel.cpp $(QT4)/qt4plsel.moc
+$(OBJ)/qt4set.o : $(QT4)/qt4set.cpp $(QT4)/qt4set.moc
+$(OBJ)/qt4stat.o : $(QT4)/qt4stat.cpp $(QT4)/qt4stat.moc
+$(OBJ)/qt4xcmd.o : $(QT4)/qt4xcmd.cpp $(QT4)/qt4xcmd.moc
+$(OBJ)/qt4yndlg.o : $(QT4)/qt4yndlg.cpp $(QT4)/qt4yndlg.moc
 
 #
 # The rest are stolen from sys/unix/Makefile.src,

@@ -15,8 +15,10 @@
 // the identifier XCode needs in order to sign your builds.
 //
 // Your DEVELOPMENT_TEAM can be found by opening Keychain Access
-// (found by Finder->Applications->Utilities).  Click on "My Certificates".
-// Look for your "Mac Developer" certificate.  Right click on
+// (found by Finder->Applications->Utilities).  Click on "Login" key chain.
+// Click on catagory "My Certificates".
+//
+// Look for your "Mac Developer" certificate.  Double click on
 // the certificate to open a dialog that shows certificate details.
 // Look for "Organizational Unit" among the details.  This ten digit value
 // is your development team identifier.

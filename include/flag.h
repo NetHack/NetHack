@@ -416,13 +416,13 @@ struct instance_flags {
     boolean wc_popup_dialog;    /* put queries in pop up dialogs instead of
                                  * in the message window */
     boolean wc_eight_bit_input; /* allow eight bit input               */
-    boolean wc_mouse_support;   /* allow mouse support */
     boolean wc2_fullscreen;     /* run fullscreen */
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
     boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
+    int wc_mouse_support;       /* allow mouse support */
     int wc2_term_cols;		/* terminal width, in characters */
     int wc2_term_rows;		/* terminal height, in characters */
     int wc2_windowborders;	/* display borders on NetHack windows */
