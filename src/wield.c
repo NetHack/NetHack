@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1525012623 2018/04/29 14:37:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1543492132 2018/11/29 11:48:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -575,8 +575,13 @@ const char *verb; /* "rub",&c */
     } else {
         struct obj *oldwep = uwep;
 
-        You("now wield %s.", doname(obj));
-        setuwep(obj);
+        if (will_weld(obj)) {
+            /* hope none of ready_weapon()'s early returns apply here... */
+            (void) ready_weapon(obj);
+        } else {
+            You("now wield %s.", doname(obj));
+            setuwep(obj);
+        }
         if (flags.pushweapon && oldwep && uwep != oldwep)
             setuswapwep(oldwep);
     }
