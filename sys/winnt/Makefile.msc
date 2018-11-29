@@ -663,11 +663,11 @@ default : install
 
 all :	install
 
-install: $(O)envchk.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
+install: envchk.tag utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe install.tag
 	 @echo Done.
 
-$(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
-	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
+install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
+	 	$(DAT)\oracles	$(DAT)\quest.dat sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
 	copy nhdat                $(GAMEDIR)
 	copy $(DAT)\license       $(GAMEDIR)
@@ -696,7 +696,7 @@ recover: $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
 	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 
-$(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
+sp_lev.tag: utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\knox.des   \
 	$(DAT)\medusa.des  $(DAT)\oracle.des   $(DAT)\tower.des  \
 	$(DAT)\yendor.des  $(DAT)\arch.des     $(DAT)\barb.des   \
@@ -730,9 +730,9 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(U)levcomp valkyrie.des
 	$(U)levcomp wizard.des
 	cd $(SRC)
-	echo sp_levs done > $(O)sp_lev.tag
+	echo sp_levs done > sp_lev.tag
 
-$(O)utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
+utility.tag: $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
 		$(SRC)\vis_tab.c  \
 		$(U)levcomp.exe	$(INCL)\vis_tab.h \
 		$(U)dgncomp.exe $(TILEUTIL16)
@@ -798,7 +798,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)tile.o $(O)guistub.o
 
 
-$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
+$(GAMEDIR)\NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
@@ -811,7 +811,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 		$(O)guistub.o
 		$(O)console.res
 <<
-	@if exist $(O)install.tag del $(O)install.tag
+	@if exist install.tag del install.tag
 
 # NetHackW
 # full tty linkage libs:
@@ -821,8 +821,8 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 #    libs: $(LIBS) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
-$(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res $(O)gamedir.tag $(KEYDLLS)
+$(GAMEDIR)\NetHackW.exe : gamedir.tag $(O)tile.o $(O)ttystub.o \
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res gamedir.tag $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
@@ -835,9 +835,9 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 <<
 	@echo Adding manifest
 	mt.exe -manifest $(MSWIN)\NetHackW.exe.manifest -outputresource:$(GAMEDIR)\NetHackW.exe;1
-	@if exist $(O)install.tag del $(O)install.tag
+	@if exist install.tag del install.tag
 
-$(O)gamedir.tag:
+gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
@@ -855,7 +855,7 @@ $(O)nhdefkey.def:
 	@echo    KeyHandlerName >>$@
 ! ENDIF
 
-$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o gamedir.tag $(O)$(@B).def
 	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
@@ -874,7 +874,7 @@ $(O)nh340key.def:
 	@echo    KeyHandlerName >>$@
 ! ENDIF
 
-$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nh340key.dll : $(O)$(@B).o gamedir.tag $(O)$(@B).def
 	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
@@ -893,7 +893,7 @@ $(O)nhraykey.def:
 	@echo    KeyHandlerName >>$@
 ! ENDIF
 
-$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o gamedir.tag $(O)$(@B).def
 	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
@@ -938,13 +938,13 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
-$(DAT)\data: $(O)utility.tag    $(DATABASE)
+$(DAT)\data: utility.tag    $(DATABASE)
 	$(U)makedefs -d
 
-$(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
+$(DAT)\rumors: utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
 	$(U)makedefs -r
 
-$(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
+$(DAT)\quest.dat: utility.tag  $(DAT)\quest.txt
 	$(U)makedefs -q
 
 $(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
@@ -959,7 +959,7 @@ $(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
 $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
 	$(U)makedefs -s
 
-$(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
+$(DAT)\dungeon: utility.tag  $(DAT)\dungeon.def
 	$(U)makedefs -e
 	cd $(DAT)
 	$(U)dgncomp dungeon.pdf
@@ -1132,7 +1132,7 @@ $(DAT)\porthelp: $(MSWSYS)\porthelp
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
-	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
+	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -1280,7 +1280,7 @@ $(O)pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 # options.
 #==========================================
 
-$(O)envchk.tag: $(O)obj.tag
+envchk.tag: obj.tag
 !	IF "$(TARGET_CPU)"=="x64"
 	@echo Windows x64 64-bit target build
 !	ELSE
@@ -1296,6 +1296,8 @@ $(O)envchk.tag: $(O)obj.tag
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
 !	ENDIF
+
+obj.tag:
         echo envchk >$@
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
@@ -1364,10 +1366,10 @@ spotless: clean
 	if exist $(DAT)\wizard?.lev	 del $(DAT)\wizard?.lev
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
-	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
+	if exist sp_lev.tag	         del sp_lev.tag
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist nhdat.			 del nhdat.
-	if exist $(O)gamedir.tag         del $(O)gamedir.tag
+	if exist gamedir.tag         del gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
         if exist $(MSWIN)\mnsel.bmp      del $(MSWIN)\mnsel.bmp
@@ -1389,20 +1391,20 @@ spotless: clean
 !ENDIF
 clean:
 	if exist $(O)*.o del $(O)*.o
-	if exist $(O)utility.tag   del $(O)utility.tag
+	if exist utility.tag   del utility.tag
 	if exist $(U)makedefs.exe  del $(U)makedefs.exe
 	if exist $(U)levcomp.exe   del $(U)levcomp.exe
 	if exist $(U)dgncomp.exe   del $(U)dgncomp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
 	if exist $(SRC)\fixed_defaults.nh del $(SRC)\fixed_defaults.nh
-	if exist $(O)install.tag   del $(O)install.tag
+	if exist install.tag   del install.tag
 	if exist $(O)console.res  del $(O)console.res
 	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP
 	if exist $(O)dgncomp.PDB  del $(O)dgncomp.PDB
 	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
 	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
-	if exist $(O)gamedir.tag  del $(O)gamedir.tag
+	if exist gamedir.tag  del gamedir.tag
 	if exist $(O)levcomp.MAP  del $(O)levcomp.MAP
 	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
 	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
@@ -1423,8 +1425,8 @@ clean:
 	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
 	if exist $(O)nhraykey.map del $(O)nhraykey.map
 	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
-	if exist $(O)envchk.tag   del $(O)envchk.tag
-	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
+	if exist envchk.tag   del envchk.tag
+	if exist sp_lev.tag   del sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
 	rem
