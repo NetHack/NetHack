@@ -834,6 +834,8 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 		$(O)ttystub.o
 		$(O)winhack.res
 <<
+	@echo Adding manifest
+	mt.exe -manifest $(MSWIN)\NetHackW.exe.manifest -outputresource:$(GAMEDIR)\NetHackW.exe;1
 	@if exist $(O)install.tag del $(O)install.tag
 
 $(O)gamedir.tag:
