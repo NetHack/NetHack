@@ -135,6 +135,10 @@ TARGET_CPU=x86
 #
 #==============================================================================
 
+SKIP_NETHACKW=Y
+
+#==============================================================================
+
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
@@ -269,7 +273,7 @@ VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
 VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
 VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o
+VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o
 VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
 VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
 VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
@@ -313,10 +317,13 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
 	 $(CURSESOBJ)
 
+ifneq "$(SKIP_NETHACKW)" "Y"
 GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
 	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+
+endif
 
 ifeq "$(WANT_WIN_QT4)" "Y"
     GUIOBJ += $(O)qt4bind.o $(O)qt4click.o $(O)qt4clust.o $(O)qt4delay.o \
@@ -326,11 +333,13 @@ ifeq "$(WANT_WIN_QT4)" "Y"
 	$(O)qt4svsel.o $(O)qt4win.o $(O)qt4xcmd.o $(O)qt4yndlg.o
 endif
 
+ifneq "$(SKIP_NETHACKW)" "Y"
 GUIHDR = $(MSWIN)/mhaskyn.h $(MSWIN)/mhdlg.h $(MSWIN)/mhfont.h \
 	$(MSWIN)/mhinput.h $(MSWIN)/mhmain.h $(MSWIN)/mhmap.h \
 	$(MSWIN)/mhmenu.h $(MSWIN)/mhmsg.h $(MSWIN)/mhmsgwnd.h \
 	$(MSWIN)/mhrip.h $(MSWIN)/mhstatus.h \
 	$(MSWIN)/mhtext.h $(MSWIN)/resource.h $(MSWIN)/winMS.h
+endif
 
 ifeq "$(WANT_WIN_QT4)" "Y"
     GUIHDR += $(QT4)/qt4bind.h $(QT4)/qt4click.h $(QT4)/qt4clust.h \
@@ -669,6 +678,12 @@ $(OBJ)/%.o : $(QT4)/%.cpp
 $(QT4)/%.moc : $(QT4)/%.h
 	$(QT4_DIRECTORY)\bin\moc -o $@ $<
 
+ifeq "$(SKIP_NETHACKW)" "Y"
+NETHACKW_EXE =
+else
+NETHACKW_EXE = $(GAMEDIR)/NetHack.exe
+endif
+
 #==========================================
 #=============== TARGETS ==================
 #==========================================
@@ -690,7 +705,8 @@ default : install
 
 all :   install
 
-install: initialchk $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe install.tag $(EXTRA_FILES)
+install: initialchk $(GAMEDIR)/NetHack.exe $(U)uudecode.exe $(O)winres.o \
+	$(NETHACKW_EXE) install.tag $(EXTRA_FILES)
 	@echo NetHack is up to date.
 	@echo Done.
 
@@ -803,12 +819,14 @@ $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistu
 #    libs: $(LIBS) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
-$(GAMEDIR)/NetHackW.exe : gamedir.tag $(O)tile.o $(O)ttystub.o \
+ifneq "$(SKIP_NETHACKW)" "Y"
+$(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS)
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
 	$(subst /,\,@if exist install.tag del install.tag)
+endif
 
 $(O)nhdefkey.o:
 	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
@@ -923,8 +941,8 @@ $(O)uudecode.o: $(SSYS)/uudecode.c
 
 $(MSWSYS)/NetHack.ico : $(U)uudecode.exe $(MSWSYS)/nhico.uu
 	$(subst /,\,$(U)uudecode.exe $(MSWSYS)/nhico.uu)
-	$(subst /,\,copy NetHack.ico $@)
-	del NetHack.ico
+	cp NetHack.ico $@
+	rm NetHack.ico
 
 $(MSWIN)/NetHack.ico : $(MSWSYS)/NetHack.ico
 	$(subst /,\,copy $< $@)

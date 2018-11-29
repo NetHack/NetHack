@@ -947,7 +947,7 @@ $(DAT)\rumors: utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
 $(DAT)\quest.dat: utility.tag  $(DAT)\quest.txt
 	$(U)makedefs -q
 
-$(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
+$(DAT)\oracles: utility.tag    $(DAT)\oracles.txt
 	$(U)makedefs -h
 
 $(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
