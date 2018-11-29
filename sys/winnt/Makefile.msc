@@ -74,8 +74,8 @@ DEBUGINFO = Y
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=..\..\pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
