@@ -115,10 +115,6 @@ WSHR    = ..\win\share   # Tile support files
 
 OBJ     = o
 
-cc=cl
-link=link
-rc=Rc
-
 #        
 #
 # Optional high-quality BSD random number generation routines
@@ -150,94 +146,6 @@ DLBFLG =
 #
 
 #ZLIB = zlib.lib
-
-#==========================================
-#==========================================
-# Setting up the compiler and linker
-#==========================================
-#==========================================
-
-# Before we get started, this section is used to determine the version of 
-# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
-# is too old or untested.
-#
-#NMAKE version 1414264330 is distributed with VS 15.7.5
-
-#!MESSAGE $(MAKEFLAGS)
-#!MESSAGE $(MAKEDIR)
-#!MESSAGE $(MAKE)
-
-MAKEVERSION=$(_NMAKE_VER:.= )
-MAKEVERSION=$(MAKEVERSION: =)
-#!MESSAGE $(_NMAKE_VER)
-#!MESSAGE $(MAKEVERSION)
-
-VSNEWEST=2017
-!IF ($(MAKEVERSION) < 1000000000)
-VSVER=0000		#untested ancient version
-!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
-VSVER=2010
-!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
-VSVER=2012
-!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
-VSVER=2013
-!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
-VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
-VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1414264330)
-VSVER=2999              #untested future version
-!ENDIF
-
-!IF ($(VSVER) >= 2012)
-!MESSAGE Autodetected Visual Studio $(VSVER)
-!ELSEIF ($(VSVER) == 2999
-!MESSAGE The version of Visual Studio is newer than the most recent at
-!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
-!MESSAGE Because it is newer we'll proceed expecting that the 
-!MESSAGE VS$(VSNEWEST) processing will still work.
-!ELSEIF ($(VSVER) == 0000)
-!MESSAGE The version of Visual Studio appears to be quite old, older
-!MESSAGE than VS2010 which is the oldest supported version by this
-!MESSAGE Makefile, so we'll stop now.
-!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
-!ENDIF
-
-!IF ($(VSVER) == 2010)
-# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
-# DO NOT DELETE THE FOLLOWING LINE
-!include <win32.mak>
-! ENDIF
-
-#These will be in the environment variables with one of the VS2017
-#developer command prompts.
-#VSCMD_ARG_HOST_ARCH=x64
-#VSCMD_ARG_TGT_ARCH=x86
-
-!IFDEF VSCMD_ARG_HOST_ARCH
-!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
-!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
-! IFNDEF TARGET_CPU
-!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
-TARGET_CPU=x64
-!  ELSE
-TARGET_CPU=x86
-!  ENDIF
-! ENDIF
-!ENDIF
-
-!IF "$(TARGET_CPU)" == ""
-TARGET_CPU=x86
-!ENDIF
-
-!IF ($(VSVER) == 2010)
-CL_RECENT=
-!ELSE
-! IF ($(VSVER) > 2010)
-CL_RECENT=-sdl
-! ENDIF
-!ENDIF
-
 
 #==========================================
 #================ MACROS ==================
@@ -436,6 +344,97 @@ TILE_H      = ..\win\share\tile.h
 #==========================================
 
 DATABASE = $(DAT)\data.base
+
+#==========================================
+#==========================================
+# Setting up the compiler and linker
+#==========================================
+#==========================================
+
+cc=cl
+link=link
+rc=Rc
+
+# Before we get started, this section is used to determine the version of 
+# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
+# is too old or untested.
+#
+#NMAKE version 1414264330 is distributed with VS 15.7.5
+
+#!MESSAGE $(MAKEFLAGS)
+#!MESSAGE $(MAKEDIR)
+#!MESSAGE $(MAKE)
+
+MAKEVERSION=$(_NMAKE_VER:.= )
+MAKEVERSION=$(MAKEVERSION: =)
+#!MESSAGE $(_NMAKE_VER)
+#!MESSAGE $(MAKEVERSION)
+
+VSNEWEST=2017
+!IF ($(MAKEVERSION) < 1000000000)
+VSVER=0000		#untested ancient version
+!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
+VSVER=2010
+!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
+VSVER=2012
+!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
+VSVER=2013
+!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
+VSVER=2015
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
+VSVER=$(VSNEWEST)
+!ELSEIF ($(MAKEVERSION) > 1414264330)
+VSVER=2999              #untested future version
+!ENDIF
+
+!IF ($(VSVER) >= 2012)
+!MESSAGE Autodetected Visual Studio $(VSVER)
+!ELSEIF ($(VSVER) == 2999
+!MESSAGE The version of Visual Studio is newer than the most recent at
+!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
+!MESSAGE Because it is newer we'll proceed expecting that the 
+!MESSAGE VS$(VSNEWEST) processing will still work.
+!ELSEIF ($(VSVER) == 0000)
+!MESSAGE The version of Visual Studio appears to be quite old, older
+!MESSAGE than VS2010 which is the oldest supported version by this
+!MESSAGE Makefile, so we'll stop now.
+!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
+# DO NOT DELETE THE FOLLOWING LINE
+!include <win32.mak>
+! ENDIF
+
+#These will be in the environment variables with one of the VS2017
+#developer command prompts.
+#VSCMD_ARG_HOST_ARCH=x64
+#VSCMD_ARG_TGT_ARCH=x86
+
+!IFDEF VSCMD_ARG_HOST_ARCH
+!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
+!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
+! IFNDEF TARGET_CPU
+!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
+TARGET_CPU=x64
+!  ELSE
+TARGET_CPU=x86
+!  ENDIF
+! ENDIF
+!ENDIF
+
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+CL_RECENT=
+!ELSE
+! IF ($(VSVER) > 2010)
+CL_RECENT=-sdl
+! ENDIF
+!ENDIF
 
 #==========================================
 # More compiler setup post-macros
@@ -664,7 +663,7 @@ default : install
 
 all :	install
 
-install: $(O)envchk.tag $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
+install: $(O)envchk.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
 	 @echo Done.
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
@@ -939,6 +938,33 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
+$(DAT)\data: $(O)utility.tag    $(DATABASE)
+	$(U)makedefs -d
+
+$(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
+	$(U)makedefs -r
+
+$(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
+	$(U)makedefs -q
+
+$(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
+	$(U)makedefs -h
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
+	$(U)makedefs -e
+	cd $(DAT)
+	$(U)dgncomp dungeon.pdf
+	cd $(SRC)
+
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
@@ -1080,11 +1106,6 @@ $(O)nhsizes2.o: $(CONFIG_H) nhsizes2.c
 #=================================================
 # Create directory for holding object files
 #=================================================
-
-$(O)obj.tag:
-	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
-	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@echo directory created >$@
 
 #==========================================
 # DLB utility and nhdat file creation
@@ -1276,6 +1297,9 @@ $(O)envchk.tag: $(O)obj.tag
 #	   @echo CL=$(CL)
 !	ENDIF
         echo envchk >$@
+	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
+	@if not exist $(OBJ)\*.* mkdir $(OBJ)
+	@echo directory created >$@
 
 #==========================================
 # Housekeeping
@@ -1343,7 +1367,6 @@ spotless: clean
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
 	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist nhdat.			 del nhdat.
-	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
 	if exist $(O)nh*key.lib          del $(O)nh*key.lib
 	if exist $(O)nh*key.exp          del $(O)nh*key.exp
@@ -1401,7 +1424,6 @@ clean:
 	if exist $(O)nhraykey.map del $(O)nhraykey.map
 	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
 	if exist $(O)envchk.tag   del $(O)envchk.tag
-	if exist $(O)obj.tag      del $(O)obj.tag
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
@@ -1419,37 +1441,6 @@ clean:
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
-
-#
-# dat dependencies
-#
-
-$(DAT)\data: $(O)utility.tag    $(DATABASE)
-	$(U)makedefs -d
-
-$(DAT)\rumors: $(O)utility.tag    $(DAT)\rumors.tru   $(DAT)\rumors.fal
-	$(U)makedefs -r
-
-$(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
-	$(U)makedefs -q
-
-$(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
-	$(U)makedefs -h
-
-$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
-	$(U)makedefs -e
-	cd $(DAT)
-	$(U)dgncomp dungeon.pdf
-	cd $(SRC)
 
 #
 # NT dependencies

@@ -139,31 +139,35 @@ TARGET_CPU=x86
 #  Source directories.    Makedefs hardcodes these, don't change them.
 #
 
-INCL    = ../include     # NetHack include files
-DAT     = ../dat         # NetHack data files
-DOC     = ../doc         # NetHack documentation files
-UTIL    = ../util        # Utility source
-SRC     = ../src         # Main source
-SSYS    = ../sys/share   # Shared system files
-MSWSYS  = ../sys/winnt   # mswin specific files
-TTY     = ../win/tty     # window port files (tty)
-MSWIN   = ../win/win32   # window port files (win32)
-WCURSES = ../win/curses  # window port files (curses) 
-WSHR    = ../win/share   # Tile support files 
+# INCL    - NetHack include files
+# DAT     - NetHack data files
+# DOC     - NetHack documentation files
+# UTIL    - Utility source
+# SRC     - Main source
+# SSYS    - Shared system files
+# MSWSYS  - mswin specific files
+# TTY     - window port files (tty)
+# MSWIN   - window port files (win32)
+# WCURSES - window port files (curses) 
+# WSHR    - Tile support files 
+
+INCL    =../include
+DAT     =../dat
+DOC     =../doc
+UTIL    =../util
+SRC     =../src
+SSYS    =../sys/share
+MSWSYS  =../sys/winnt
+TTY     =../win/tty
+MSWIN   =../win/win32
+WCURSES =../win/curses
+WSHR    =../win/share
 
 #
 #  Object directory.
 #
 
 OBJ = o
-
-cc     = gcc
-cxx    = g++
-rc     = windres
-link   = gcc
-ifeq "$(WANT_WIN_QT4)" "Y"
-    link = g++
-endif
 
 #
 # Optional high-quality BSD random number generation routines
@@ -197,82 +201,6 @@ endif
 #
 
 #ZLIB = zlib.lib
-
-#==========================================
-#==========================================
-# Setting up the compiler and linker
-# macros. All builds include the base ones.
-#==========================================
-#==========================================
-
-cflags = -mms-bitfields
-lflags  =
-ifeq  "$(DEBUGINFO)" "Y"
-cdebug = -g
-linkdebug = -g
-else
-cdebug =
-linkdebug =
-endif
-
-CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
-#LFLAGSBASEC = $(linkdebug)
-#LFLAGSBASEG = $(linkdebug) -mwindows
-
-conlibs = -lgdi32 -lwinmm
-guilibs = -lcomctl32 -lwinmm
-ifeq "$(WANT_WIN_QT4)" "Y"
-    # Might be either Qt 4 or Qt 5
-    ifeq "$(HAVE_QT5)" "Y"
-        guilibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
-        guilibs += $(QT4_DIRECTORY)/lib/libQt5Gui.a
-        guilibs += $(QT4_DIRECTORY)/lib/libQt5Widgets.a
-        conlibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
-    else
-        guilibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
-        guilibs += $(QT4_DIRECTORY)/lib/libQtGui4.a
-        conlibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
-    endif
-endif
-
-#==========================================
-# Extra files needed for some ports
-#==========================================
-EXTRA_FILES =
-ifeq "$(WANT_WIN_QT4)" "Y"
-    ifeq "$(HAVE_QT5)" "Y"
-        EXTRA_FILES += $(GAMEDIR)/Qt5Core.dll
-        EXTRA_FILES += $(GAMEDIR)/Qt5Gui.dll
-        EXTRA_FILES += $(GAMEDIR)/Qt5Widgets.dll
-    else
-    # TODO: define QT 4 DLLs here
-        EXTRA_FILES += $(GAMEDIR)/QtCore4.dll
-        EXTRA_FILES += $(GAMEDIR)/QtGui4.dll
-    endif
-    EXTRA_FILES += $(GAMEDIR)/rip.xpm
-endif
-
-#==========================================
-# Util builds
-#==========================================
-
-CFLAGSU = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-LFLAGSU = $(LFLAGSBASEC)
-
-#==========================================
-# - Game build
-#==========================================
-
-CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-lflags  = $(LFLAGSBASEC) $(linkdebuf)
-
-CXXFLAGS = $(CFLAGS)
-
-ifeq  "$(USE_DLB)" "Y"
-DLB = nhdat
-else
-DLB =
-endif
 
 #==========================================
 #================ MACROS ==================
@@ -359,7 +287,7 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
-VOBJ28 = $(O)win10.o
+#VOBJ28 = $(O)win10.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -367,23 +295,23 @@ REGEX  = $(O)cppregex.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
-!IFNDEF ADD_CURSES
-CURSESOBJ=
-!ELSE
+ifeq "$(ADD_CURSES)" "Y"
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
-!ENDIF
+else
+CURSESOBJ=
+endif
 
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
 	$(SOUND) $(O)pcmain.o $(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
-         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
-         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
-         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
-         $(CURSESOBJ)
+	 $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
+	 $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
+	 $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
+	 $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
+	 $(CURSESOBJ)
 
 GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
@@ -457,8 +385,7 @@ PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o 
 
 PDCLIB = $(O)pdcurses.a
 
-PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
-
+PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCWINCON)
 else
 PDCLIB = 
 endif
@@ -501,7 +428,7 @@ TILE_H      = ../win/share/tile.h
 DATABASE = $(DAT)/data.base
 
 #==========================================
-# More compiler setup post-macros
+# More compiler setup macros
 #==========================================
 #
 ifeq "$(ADD_CURSES)" "Y"
@@ -514,9 +441,93 @@ CURSESINCL=
 endif
 
 ifneq  "$(ADD_CURSES)" "Y"
-INCLDIR= /I../include /I../sys/winnt
+INCLDIR=-I../include -I../sys/winnt
 else
-INCLDIR= /I../include /I../sys/winnt /I$(CURSESINCL)
+INCLDIR=-I../include -I../sys/winnt -I$(CURSESINCL)
+endif
+
+#==========================================
+#==========================================
+# Setting up the compiler and linker
+# macros. All builds include the base ones.
+#==========================================
+#==========================================
+
+cc     = gcc
+cxx    = g++
+rc     = windres
+link   = gcc
+ifeq "$(WANT_WIN_QT4)" "Y"
+    link = g++
+endif
+
+cflags = -mms-bitfields $(INCLDIR)
+lflags  =
+ifeq  "$(DEBUGINFO)" "Y"
+cdebug = -g
+linkdebug = -g
+else
+cdebug =
+linkdebug =
+endif
+
+CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug)
+#LFLAGSBASEC = $(linkdebug)
+#LFLAGSBASEG = $(linkdebug) -mwindows
+
+conlibs = -lgdi32 -lwinmm
+guilibs = -lcomctl32 -lwinmm
+ifeq "$(WANT_WIN_QT4)" "Y"
+    # Might be either Qt 4 or Qt 5
+    ifeq "$(HAVE_QT5)" "Y"
+	guilibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
+	guilibs += $(QT4_DIRECTORY)/lib/libQt5Gui.a
+	guilibs += $(QT4_DIRECTORY)/lib/libQt5Widgets.a
+	conlibs += $(QT4_DIRECTORY)/lib/libQt5Core.a
+    else
+	guilibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
+	guilibs += $(QT4_DIRECTORY)/lib/libQtGui4.a
+	conlibs += $(QT4_DIRECTORY)/lib/libQtCore4.a
+    endif
+endif
+
+#==========================================
+# Extra files needed for some ports
+#==========================================
+EXTRA_FILES =
+ifeq "$(WANT_WIN_QT4)" "Y"
+    ifeq "$(HAVE_QT5)" "Y"
+	EXTRA_FILES += $(GAMEDIR)/Qt5Core.dll
+	EXTRA_FILES += $(GAMEDIR)/Qt5Gui.dll
+	EXTRA_FILES += $(GAMEDIR)/Qt5Widgets.dll
+    else
+    # TODO: define QT 4 DLLs here
+	EXTRA_FILES += $(GAMEDIR)/QtCore4.dll
+	EXTRA_FILES += $(GAMEDIR)/QtGui4.dll
+    endif
+    EXTRA_FILES += $(GAMEDIR)/rip.xpm
+endif
+
+#==========================================
+# Util builds
+#==========================================
+
+CFLAGSU = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
+LFLAGSU = $(LFLAGSBASEC)
+
+#==========================================
+# - Game build
+#==========================================
+
+CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
+lflags  = $(LFLAGSBASEC) $(linkdebuf)
+
+CXXFLAGS = $(CFLAGS)
+
+ifeq  "$(USE_DLB)" "Y"
+DLB = nhdat
+else
+DLB =
 endif
 
 #==========================================
@@ -551,9 +562,6 @@ $(OBJ)/%.o : $(SSYS)/%.cpp
 
 $(OBJ)/%.o : $(MSWSYS)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
-
-$(INCL)/%.h : $(MSWSYS)/%.h
-	@copy $< $@
 
 #==========================================
 # Rules for files in util
@@ -682,12 +690,12 @@ default : install
 
 all :   install
 
-install: graphicschk $(O)obj.tag $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe $(O)install.tag $(EXTRA_FILES)
+install: initialchk $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe install.tag $(EXTRA_FILES)
 	@echo NetHack is up to date.
 	@echo Done.
 
 
-$(O)install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
+install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
 	       $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
 ifeq  "$(USE_DLB)" "Y"
 	$(subst /,\,copy nhdat                $(GAMEDIR))
@@ -717,7 +725,7 @@ recover: $(U)recover.exe
 	$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR)/recover.txt)
 
-$(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
+sp_lev.tag: utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	 $(DAT)/endgame.des $(DAT)/gehennom.des $(DAT)/knox.des   \
 	 $(DAT)/medusa.des  $(DAT)/oracle.des   $(DAT)/tower.des  \
 	 $(DAT)/yendor.des  $(DAT)/arch.des     $(DAT)/barb.des   \
@@ -751,9 +759,9 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)/bigroom.des  $(DAT)/castle.des \
 	$(subst /,\,$(U)levcomp $(DAT)/wizard.des)
 	$(subst /,\,copy *.lev $(DAT))
 	$(subst /,\,del *.lev)
-	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
+	$(subst /,\,echo sp_levs done > sp_lev.tag)
 
-$(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
+utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
 	 $(SRC)/vis_tab.c $(U)levcomp.exe $(INCL)/vis_tab.h \
 	 $(U)dgncomp.exe $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
@@ -774,17 +782,18 @@ $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico
 #==========================================
 #  The game targets.
 #==========================================
-$(O)gamedir.tag:
-	$(subst /,\,@if not exist $(GAMEDIR)/*.* echo creating directory $(GAMEDIR))
-	$(subst /,\,@if not exist $(GAMEDIR)/*.* mkdir $(GAMEDIR))
-	$(subst /,\,@echo directory created > $@)
 
-$(GAMEDIR)/NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
+gamedir.tag:
+	test -d $(GAMEDIR) || echo creating directory $(GAMEDIR)
+	test -d $(GAMEDIR) || mkdir $(GAMEDIR)
+	test -d $(GAMEDIR) && echo directory created > $@
+
+$(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o $(KEYDLLS)
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
 		$(O)guistub.o $(O)conres.o $(PDCLIB) $(conlibs) -static -lstdc++
-	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,@if exist install.tag del install.tag)
 
 # NetHackW
 # full tty linkage libs:
@@ -794,17 +803,17 @@ $(GAMEDIR)/NetHack.exe : $(O)gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)gu
 #    libs: $(LIBS) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
-$(GAMEDIR)/NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
+$(GAMEDIR)/NetHackW.exe : gamedir.tag $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS)
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) -static -lstdc++
-	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
+	$(subst /,\,@if exist install.tag del install.tag)
 
 $(O)nhdefkey.o:
 	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
 
-$(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
+$(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o gamedir.tag
 	@echo Linking $@
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<
@@ -812,7 +821,7 @@ $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 $(O)nh340key.o:
 	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c 
 
-$(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
+$(GAMEDIR)/nh340key.dll : $(O)nh340key.o gamedir.tag
 	@echo Linking $@
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<
@@ -820,7 +829,7 @@ $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
 $(O)nhraykey.o:
 		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c 
 
-$(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o $(O)gamedir.tag
+$(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o gamedir.tag
 	@echo Linking $@
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<
@@ -832,12 +841,15 @@ $(GAME)_.ico : $(MSWSYS)/$(GAME).ico
 # Create directory for holding object files
 #==========================================
 
-graphicschk:
+initialchk: objdir.tag
 	@echo ----
 	@echo NOTE: This build will include tile support.
 	@echo ----
-	$(subst /,\,@echo graphicschk > graphicschk)
 
+objdir.tag:
+	test -d $(OBJ) || echo creating directory $(OBJ)
+	test -d $(OBJ) || mkdir $(OBJ)
+	test -d $(OBJ) && echo directory created > $@
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -852,7 +864,7 @@ $(U)makedefs.exe: $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 	 $(INCL)/objclass.h $(INCL)/monsym.h $(INCL)/qtext.h \
-	 $(INCL)/patchlevel.h $(U)makedefs.c $(O)obj.tag
+	 $(INCL)/patchlevel.h $(U)makedefs.c
 	$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
 #
@@ -875,6 +887,18 @@ $(INCL)/vis_tab.h: $(U)makedefs.exe
 $(SRC)/vis_tab.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -z)
 
+$(DAT)/data: utility.tag    $(DATABASE)
+	$(subst /,\,$(U)makedefs -d)
+
+$(DAT)/rumors: utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
+	$(subst /,\,$(U)makedefs -r)
+
+$(DAT)/quest.dat: utility.tag  $(DAT)/quest.txt
+	$(subst /,\,$(U)makedefs -q)
+
+$(DAT)/oracles: utility.tag    $(DAT)/oracles.txt
+	$(subst /,\,$(U)makedefs -h)
+
 $(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
@@ -884,7 +908,9 @@ $(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
 $(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-
+$(DAT)/dungeon: utility.tag  $(DAT)/dungeon.def
+	$(subst /,\,$(U)makedefs -e)
+	$(subst /,\,$(U)dgncomp $(DAT)/dungeon.pdf)
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -959,7 +985,6 @@ $(O)lev_$(LEX).o: $(HACK_H)   $(INCL)/lev_comp.h $(SP_LEV_H) \
 $(O)lev_main.o:   $(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
 	$(cc) $(LEVCFLAGS) -o$@ $(U)lev_main.c
 
-
 $(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
 ifeq  "$(DO_YACC)" "YACC_ACT"
 	$(subst /,\,$(YACC) -d $(U)lev_comp.y)
@@ -967,7 +992,6 @@ ifeq  "$(DO_YACC)" "YACC_ACT"
 	$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h)
 	$(subst /,\,@del $(YTABC))
 	$(subst /,\,@del $(YTABH))
-
 else
 	@echo $(U)lev_comp.y has changed.
 	@echo To update $(U)lev_yacc.c and $(INCL)/lev_comp.h run $(YACC).
@@ -1068,10 +1092,6 @@ $(O)nhsizes2.o: $(CONFIG_H) nhsizes2.c
 # Create directory for holding object files
 #==========================================
 
-$(O)obj.tag:
-	$(subst /,\,@if not exist $(OBJ)/*.* echo creating directory $(OBJ))
-	$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
-	$(subst /,\,@echo directory created > $@)
 
 #==========================================
 # DLB utility and nhdat file creation
@@ -1093,7 +1113,7 @@ $(DAT)/porthelp: $(MSWSYS)/porthelp
 nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
 	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
-	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
+	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
 	$(subst /,\,echo oracles >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/options echo options >>$(DAT)/dlb.lst)
@@ -1125,7 +1145,7 @@ nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 $(U)recover.exe: $(RECOVOBJS)
 	$(link) $(LFLAGSU) -o$@ $(RECOVOBJS)
 
-$(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)/win32api.h
+$(O)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)/win32api.h
 	$(cc) $(CFLAGSU) -o$@ $(U)recover.c
 
 #==========================================
@@ -1197,10 +1217,10 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 	@echo Linking $@...
 	@$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
 
-$(O)tile2bmp.o: $(WSHR)/tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
+$(O)tile2bmp.o: $(WSHR)/tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h
 	$(cc) $(CFLAGS) -mno-ms-bitfields -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
 
-$(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
+$(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h
 	$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/til2bm32.c
 
 #==========================================
@@ -1209,13 +1229,13 @@ $(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
 
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
-        
+
 #==========================================
 # Housekeeping
 #==========================================
 
 spotless: clean
-	$(subst /,\,if exist graphicschk       del graphicschk)
+	$(subst /,\,if exist initialchk        del initialchk)
 	$(subst /,\,if exist $(INCL)/date.h    del $(INCL)/date.h)
 	$(subst /,\,if exist $(INCL)/onames.h  del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h      del $(INCL)/pm.h)
@@ -1260,7 +1280,7 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/valley.lev   del $(DAT)/valley.lev)
 	$(subst /,\,if exist $(DAT)/water.lev    del $(DAT)/water.lev)
 	$(subst /,\,if exist $(DAT)/wizard?.lev  del $(DAT)/wizard?.lev)
-	$(subst /,\,if exist $(O)sp_lev.tag     del $(O)sp_lev.tag)
+	$(subst /,\,if exist sp_lev.tag     del sp_lev.tag)
 	$(subst /,\,if exist $(SRC)/vis_tab.c   del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
 	$(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
@@ -1272,7 +1292,6 @@ spotless: clean
 	$(subst /,\,if exist $(DAT)/porthelp del $(DAT)/porthelp)
 	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
 	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
-	$(subst /,\,if exist $(INCL)/win32api.h del $(INCL)/win32api.h)
 	$(subst /,\,if exist $(MSWSYS)/NetHack.ico del $(MSWSYS)/NetHack.ico)
 	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
 	$(subst /,\,if exist $(U)dgn_yacc.c del $(U)dgn_yacc.c)
@@ -1291,64 +1310,32 @@ spotless: clean
 	$(subst /,\,if exist $(MSWIN)/rip.bmp del $(MSWIN)/rip.bmp)
 	$(subst /,\,if exist $(MSWIN)/splash.bmp del $(MSWIN)/splash.bmp)
 ifneq "$(OBJ)" ""
-	$(subst /,\,if exist $(OBJ) rmdir $(OBJ)) /s /Q
+	test -d $(OBJ) && rmdir $(OBJ) /S /Q
 endif
-ifeq "$(ADD_CURSES)" == "Y"	
+ifeq "$(ADD_CURSES)" "Y"
 	if exist $(O)pdcurses.lib del $(O)pdcurses.lib
 endif
 clean:
-	$(subst /,\,if exist $(O)*.o del $(O)*.o)
-	$(subst /,\,if exist $(O)utility.tag   del $(O)utility.tag)
-	$(subst /,\,if exist $(U)makedefs.exe  del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)levcomp.exe   del $(U)levcomp.exe)
-	$(subst /,\,if exist $(U)dgncomp.exe   del $(U)dgncomp.exe)
-	$(subst /,\,if exist $(SRC)/*.lnk      del $(SRC)/*.lnk)
-	$(subst /,\,if exist $(SRC)/*.map      del $(SRC)/*.map)
-	$(subst /,\,if exist $(O)install.tag   del $(O)install.tag)
-	$(subst /,\,if exist $(O)gamedir.tag  del $(O)gamedir.tag)
-	$(subst /,\,if exist $(O)obj.tag      del $(O)obj.tag)
-	$(subst /,\,if exist $(TILEBMP16)        del $(TILEBMP16))
-	$(subst /,\,if exist $(TILEBMP32)        del $(TILEBMP32))
-
+	-test -f install.tag && rm install.tag
+	-test -f utility.tag && rm utility.tag
+	-test -f $(U)makedefs.exe && rm $(U)makedefs.exe
+	-test -f $(U)levcomp.exe && rm $(U)levcomp.exe
+	-test -f $(U)dgncomp.exe && rm $(U)dgncomp.exe
+	-rm $(SRC)/*.lnk
+	-rm $(SRC)/*.map
+	-test -f $(TILEBMP16) && rm $(TILEBMP16)
+	-test -f $(TILEBMP32) && rm $(TILEBMP32)
+ 
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
 #
-# dat dependencies
-#
-
-$(DAT)/data: $(O)utility.tag    $(DATABASE)
-	$(subst /,\,$(U)makedefs -d)
-
-$(DAT)/rumors: $(O)utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
-	$(subst /,\,$(U)makedefs -r)
-
-$(DAT)/quest.dat: $(O)utility.tag  $(DAT)/quest.txt
-	$(subst /,\,$(U)makedefs -q)
-
-$(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
-	$(subst /,\,$(U)makedefs -h)
-
-$(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
-	$(U)makedefs -s
-
-$(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
-	$(subst /,\,$(U)makedefs -e)
-	$(subst /,\,$(U)dgncomp $(DAT)/dungeon.pdf)
-
-#
 # NT dependencies
 #
 
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)/win32api.h $(MSWSYS)/nttty.c
+$(O)nttty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h $(MSWSYS)/nttty.c
 	$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(MSWSYS)/nttty.c
-$(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(MSWSYS)/winnt.c
+$(O)winnt.o: $(HACK_H) $(MSWSYS)/win32api.h $(MSWSYS)/winnt.c
 	$(cc) $(CFLAGS) -o$@  $(MSWSYS)/winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
 	$(cc) $(CFLAGS)  -o$@ $(MSWSYS)/ntsound.c
@@ -1386,8 +1373,8 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # Other dependencies needed by some ports
 # 
 
+ifeq "$(ADD_CURSES)" "Y"
 # curses window port dependencies
-
 $(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
 $(O)cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
 $(O)cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
@@ -1396,7 +1383,9 @@ $(O)cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
 $(O)cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
 $(O)cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
 $(O)curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
+endif
 
+ifeq "$(WANT_WIN_QT4)" "Y"
 # Qt dependencies
 
 $(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
@@ -1419,8 +1408,6 @@ $(GAMEDIR)/nhtiles.bmp : $(SRC)/tiles.bmp
 
 $(GAMEDIR)/rip.xpm : ../win/X11/rip.xpm
 	$(subst /,\,@copy $< $@ >nul)
-
-
 # Dependencies on .moc files (for Qt 4 or 5)
 $(OBJ)/qt4main.o : $(QT4)/qt4main.cpp $(QT4)/qt4main.moc $(QT4)/qt4kde0.moc
 $(OBJ)/qt4map.o : $(QT4)/qt4map.cpp $(QT4)/qt4map.moc
@@ -1431,6 +1418,7 @@ $(OBJ)/qt4set.o : $(QT4)/qt4set.cpp $(QT4)/qt4set.moc
 $(OBJ)/qt4stat.o : $(QT4)/qt4stat.cpp $(QT4)/qt4stat.moc
 $(OBJ)/qt4xcmd.o : $(QT4)/qt4xcmd.cpp $(QT4)/qt4xcmd.moc
 $(OBJ)/qt4yndlg.o : $(QT4)/qt4yndlg.cpp $(QT4)/qt4yndlg.moc
+endif
 
 #
 # The rest are stolen from sys/unix/Makefile.src,
@@ -1447,7 +1435,7 @@ $(OBJ)/qt4yndlg.o : $(QT4)/qt4yndlg.cpp $(QT4)/qt4yndlg.moc
 $(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
 	$(cc) $(CFLAGS) -o$@ ../sys/atari/tos.c
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
-		$(INCL)/win32api.h
+		$(MSWSYS)/win32api.h
 	$(cc) $(CFLAGS) -o$@ ../sys/share/pcmain.c
 $(O)pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(cc) $(CFLAGS) -o$@ ../sys/share/pcsys.c
