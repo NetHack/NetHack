@@ -263,6 +263,8 @@ windows-gui: In nethackw, there could be conflicts between menu accelerators
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
 windows-gui: align hpbar behavior at zero hit points with tty behavior
+windows-gui: add support for status_hilites for the player condition field 
+	such as stone, slime, strngl, blind, deaf, stun, conf, etc.
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
 	port, implement a console back buffer to reduce the number of calls
@@ -281,9 +283,14 @@ windows-tty: augment codepage850-to-Unicode mappings that are not displayable
 	with codepage437-to-Unicode mappings that are, to help ensure
 	that rogue-level characters in the status line match their appearance
 	on the map
+windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
+	(fully-functional including disabling QuickEdit on Windows console
+	because QuickEdit intercepts the mouse clicks so NetHack never sees
+	them), or mouse_support:2 (NetHack support on but QuickEdit left as is)
 windows: Added ntassert() mechanism for Windows based port use
 windows: heed OPTIONS=symset:default in config file if it is present 
-windows: add curses window port
+windows: add curses window port which can co-exist with tty in exe and be
+	selectable in user config file via OPTIONS=windowtype:curses
 tty: significant optimizations for performance and per field rendering
 tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
 tty: support BL_RESET in status_update to force an update to all status fields
