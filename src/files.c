@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1542765358 2018/11/21 01:55:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1543395733 2018/11/28 09:02:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2797,8 +2797,9 @@ const char *buf;
         buf = "Unknown error";
 
     if (!config_error_data) {
-        /* assumes pline() is using raw_printf() as this stage */
-        pline("config_error_add: %s.", buf);
+        /* either very early, where pline() will use raw_print(), or
+           player gave bad value when prompted by interactive 'O' command */
+        pline("%s%s.", !iflags.window_inited ? "config_error_add: " : "", buf);
         wait_synch();
         return;
     }

@@ -87,6 +87,7 @@ static void NDECL(restore_original_console_font);
 /* Win32 Screen buffer,coordinate,console I/O information */
 COORD ntcoord;
 INPUT_RECORD ir;
+static boolean orig_QuickEdit;
 
 /* Support for changing console font if existing glyph widths are too wide */
 
@@ -311,8 +312,14 @@ const char *s;
     end_screen();
     if (s)
         raw_print(s);
-
     restore_original_console_font();
+    if (orig_QuickEdit) {
+        DWORD cmode;
+
+        GetConsoleMode(console.hConIn, &cmode);
+        cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
+        SetConsoleMode(console.hConIn, cmode);
+    }
 }
 
 /* called by init_nhwindows() and resume_nhwindows() */
@@ -864,12 +871,30 @@ standoutend()
 void
 toggle_mouse_support()
 {
+    static int qeinit = 0;
     DWORD cmode;
+
     GetConsoleMode(console.hConIn, &cmode);
-    if (iflags.wc_mouse_support)
-        cmode |= ENABLE_MOUSE_INPUT;
-    else
-        cmode &= ~ENABLE_MOUSE_INPUT;
+    if (!qeinit) {
+        qeinit = 1;
+        orig_QuickEdit = ((cmode & ENABLE_QUICK_EDIT_MODE) != 0);
+    }
+    switch(iflags.wc_mouse_support) {
+        case 2:
+                cmode |= ENABLE_MOUSE_INPUT;
+                break;
+        case 1:
+                cmode |= ENABLE_MOUSE_INPUT;
+                cmode &= ~ENABLE_QUICK_EDIT_MODE;
+                cmode |= ENABLE_EXTENDED_FLAGS;
+                break;
+        case 0:
+                /*FALLTHRU*/
+        default:
+                cmode &= ~ENABLE_MOUSE_INPUT;
+                if (orig_QuickEdit)
+                    cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
+    }
     SetConsoleMode(console.hConIn, cmode);
 }
 #endif

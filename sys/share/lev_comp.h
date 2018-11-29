@@ -174,39 +174,39 @@
 #define DICE 430
 typedef union
 {
-	long	i;
-	char*	map;
-	struct {
-		long room;
-		long wall;
-		long door;
-	} corpos;
+    long    i;
+    char    *map;
     struct {
-	long area;
-	long x1;
-	long y1;
-	long x2;
-	long y2;
+        long room;
+        long wall;
+        long door;
+    } corpos;
+    struct {
+        long area;
+        long x1;
+        long y1;
+        long x2;
+        long y2;
     } lregn;
     struct {
-	long x;
-	long y;
+        long x;
+        long y;
     } crd;
     struct {
-	long ter;
-	long lit;
+        long ter;
+        long lit;
     } terr;
     struct {
-	long height;
-	long width;
+        long height;
+        long width;
     } sze;
     struct {
-	long die;
-	long num;
+        long die;
+        long num;
     } dice;
     struct {
-	long cfunc;
-	char *varstr;
+        long cfunc;
+        char *varstr;
     } meth;
 } YYSTYPE;
 extern YYSTYPE yylval;

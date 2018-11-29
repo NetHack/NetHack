@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 16, 2018
+.ds f2 "November 27, 2018
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3136,6 +3136,21 @@ Default \(oq,\(cq.
 .lp monpolycontrol
 Prompt for new form whenever any monster changes shape (default off).
 Debug mode only.
+.lp mouse_support
+Allow use of the mouse for input and travel.
+Valid settings are:
+.PS -1
+.PL "\ 0"
+disabled
+.PL "\ 1"
+enabled and make OS adjustments to support mouse use in the game.
+.PL "\ 2"
+like 1 but does not make any OS adjustments
+.PE
+For backward compatibility, omitting a value is the same as specifying 1
+and negating
+.op mouse_support
+is the same as specifying 0.
 .lp msghistory
 The number of top line messages to keep (and be able to recall
 with \(oq\(haP\(cq) (default 20).
@@ -3557,8 +3572,6 @@ in a window.
 If NetHack can, it should use a large font.
 .lp map_mode
 If NetHack can, it should display the map in the manner specified.
-.lp mouse_support
-Allow use of the mouse for input and travel.
 .lp player_selection
 If NetHack can, it should pop up dialog boxes, or use prompts for character
 selection.

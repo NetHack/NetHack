@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455746893 2016/02/17 22:08:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1543371691 2018/11/28 02:21:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.22 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -114,7 +114,8 @@ int obj_containment = 0;
 
 int in_container_obj = 0;
 
-/* integer value is possibly an inconstant value (eg. dice notation or a variable) */
+/* integer value is possibly an inconstant value (eg. dice notation
+   or a variable) */
 int is_inconstant_number = 0;
 
 int in_switch_statement = 0;
@@ -127,7 +128,7 @@ int n_switch_case_list = 0;
 int allow_break_statements = 0;
 struct lc_breakdef *break_list = NULL;
 
-extern struct lc_vardefs *variable_definitions;
+extern struct lc_vardefs *vardefs; /* variable definitions */
 
 
 struct lc_vardefs *function_tmp_var_defs = NULL;
@@ -148,39 +149,39 @@ extern char curr_token[512];
 
 %union
 {
-	long	i;
-	char*	map;
-	struct {
-		long room;
-		long wall;
-		long door;
-	} corpos;
+    long    i;
+    char    *map;
     struct {
-	long area;
-	long x1;
-	long y1;
-	long x2;
-	long y2;
+        long room;
+        long wall;
+        long door;
+    } corpos;
+    struct {
+        long area;
+        long x1;
+        long y1;
+        long x2;
+        long y2;
     } lregn;
     struct {
-	long x;
-	long y;
+        long x;
+        long y;
     } crd;
     struct {
-	long ter;
-	long lit;
+        long ter;
+        long lit;
     } terr;
     struct {
-	long height;
-	long width;
+        long height;
+        long width;
     } sze;
     struct {
-	long die;
-	long num;
+        long die;
+        long num;
     } dice;
     struct {
-	long cfunc;
-	char *varstr;
+        long cfunc;
+        char *varstr;
     } meth;
 }
 
@@ -214,7 +215,8 @@ extern char curr_token[512];
 %token	<i> MSG_OUTPUT_TYPE
 %token	<i> COMPARE_TYPE
 %token  <i> UNKNOWN_TYPE
-%token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID selection_ID flood_ID
+%token	<i> rect_ID fillrect_ID line_ID randline_ID grow_ID
+%token	<i> selection_ID flood_ID
 %token	<i> rndcoord_ID circle_ID ellipse_ID filter_ID complement_ID
 %token	<i> gradient_ID GRADIENT_TYPE LIMITED HUMIDITY_TYPE
 %token	<i> ',' ':' '(' ')' '[' ']' '{' '}'
@@ -247,12 +249,14 @@ extern char curr_token[512];
 %type	<i> dir_list teleprt_detail
 %type	<i> object_infos object_info monster_infos monster_info
 %type	<i> levstatements stmt_block region_detail_end
-%type	<i> engraving_type flag_list roomregionflag roomregionflags optroomregionflags
+%type	<i> engraving_type flag_list roomregionflag roomregionflags
+%type	<i> optroomregionflags
 %type	<i> humidity_flags
 %type	<i> comparestmt encodecoord encoderegion mapchar
 %type	<i> seen_trap_mask
 %type	<i> encodemonster encodeobj encodeobj_list
-%type	<i> integer_list string_list encodecoord_list encoderegion_list mapchar_list encodemonster_list
+%type	<i> integer_list string_list encodecoord_list encoderegion_list
+%type	<i> mapchar_list encodemonster_list
 %type	<i> opt_percent opt_fillchar
 %type	<i> all_integers
 %type	<i> ter_selection ter_selection_x
@@ -286,21 +290,22 @@ level		: level_def flags levstatements
 		  {
 			if (fatal_error > 0) {
 				(void) fprintf(stderr,
-				"%s: %d errors detected for level \"%s\". No output created!\n",
+              "%s: %d errors detected for level \"%s\". No output created!\n",
 					       fname, fatal_error, $1);
 				fatal_error = 0;
 				got_errors++;
 			} else if (!got_errors) {
 				if (!write_level_file($1, splev)) {
-				    lc_error("Can't write output file for '%s'!", $1);
+                                    lc_error("Can't write output file for '%s'!",
+                                             $1);
 				    exit(EXIT_FAILURE);
 				}
 			}
 			Free($1);
 			Free(splev);
 			splev = NULL;
-			vardef_free_all(variable_definitions);
-			variable_definitions = NULL;
+			vardef_free_all(vardefs);
+			vardefs = NULL;
 		  }
 		;
 
@@ -314,10 +319,11 @@ level_def	: LEVEL_ID ':' STRING
 		      start_level_def(&splev, $3);
 		      if ($5 == -1) {
 			  add_opvars(splev, "iiiiiiiio",
-				     VA_PASS9(LVLINIT_MAZEGRID,HWALL,0,0,
+				     VA_PASS9(LVLINIT_MAZEGRID, HWALL, 0,0,
 					      0,0,0,0, SPO_INITLEVEL));
 		      } else {
-			  long bg = what_map_char((char) $5);
+			  int bg = (int) what_map_char((char) $5);
+
 			  add_opvars(splev, "iiiiiiiio",
 				     VA_PASS9(LVLINIT_SOLIDFILL, bg, 0,0,
 					      0,0,0,0, SPO_INITLEVEL));
@@ -342,21 +348,25 @@ mazefiller	: RANDOM_TYPE
 
 lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 		  {
-		      long filling = $5.ter;
+		      int filling = (int) $5.ter;
+
 		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid fill char type.");
 		      add_opvars(splev, "iiiiiiiio",
-				 LVLINIT_SOLIDFILL,filling,0,(long)$5.lit, 0,0,0,0, SPO_INITLEVEL);
+				 VA_PASS9(LVLINIT_SOLIDFILL, filling,
+                                          0, (int) $5.lit,
+                                          0,0,0,0, SPO_INITLEVEL));
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
 		| LEV_INIT_ID ':' MAZE_GRID_ID ',' CHAR
 		  {
-		      long filling = what_map_char((char) $5);
+		      int filling = (int) what_map_char((char) $5);
+
 		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid fill char type.");
-		      add_opvars(splev, "iiiiiiiio",
-				 VA_PASS9(LVLINIT_MAZEGRID,filling,0,0,
+                      add_opvars(splev, "iiiiiiiio",
+				 VA_PASS9(LVLINIT_MAZEGRID, filling, 0,0,
 					  0,0,0,0, SPO_INITLEVEL));
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
@@ -369,13 +379,14 @@ lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 		  }
 		| LEV_INIT_ID ':' MINES_ID ',' CHAR ',' CHAR ',' BOOLEAN ',' BOOLEAN ',' light_state ',' walled opt_fillchar
 		  {
-		      long fg = what_map_char((char) $5);
-		      long bg = what_map_char((char) $7);
-		      long smoothed = $9;
-		      long joined = $11;
-		      long lit = $13;
-		      long walled = $15;
-		      long filling = $16;
+                      int fg = (int) what_map_char((char) $5),
+                          bg = (int) what_map_char((char) $7);
+                      int smoothed = (int) $9,
+                          joined = (int) $11,
+                          lit = (int) $13,
+                          walled = (int) $15,
+                          filling = (int) $16;
+
 		      if (fg == INVALID_TYPE || fg >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid foreground type.");
 		      if (bg == INVALID_TYPE || bg >= MAX_TYPE)
@@ -387,8 +398,8 @@ lev_init	: LEV_INIT_ID ':' SOLID_FILL_ID ',' terrain_type
 			  lc_error("INIT_MAP: Invalid fill char type.");
 
 		      add_opvars(splev, "iiiiiiiio",
-				 VA_PASS9(LVLINIT_MINES,filling,walled,lit,
-					  joined,smoothed,bg,fg,
+				 VA_PASS9(LVLINIT_MINES, filling, walled, lit,
+					  joined, smoothed, bg, fg,
 					  SPO_INITLEVEL));
 			max_x_map = COLNO-1;
 			max_y_map = ROWNO;
@@ -437,7 +448,8 @@ flags		: /* nothing */
 		  }
 		| FLAGS_ID ':' flag_list
 		  {
-		      add_opvars(splev, "io", VA_PASS2($3, SPO_LEVEL_FLAGS));
+		      add_opvars(splev, "io",
+                                 VA_PASS2((int) $3, SPO_LEVEL_FLAGS));
 		  }
 		;
 
@@ -547,10 +559,14 @@ any_var_or_unk	: VARSTRING
 shuffle_detail	: SHUFFLE_ID ':' any_var_array
 		  {
 		      struct lc_vardefs *vd;
-		      if ((vd = vardef_defined(variable_definitions, $3, 1))) {
+
+		      if ((vd = vardef_defined(vardefs, $3, 1))) {
 			  if (!(vd->var_type & SPOVAR_ARRAY))
-			      lc_error("Trying to shuffle non-array variable '%s'", $3);
-		      } else lc_error("Trying to shuffle undefined variable '%s'", $3);
+			      lc_error("Trying to shuffle non-array variable '%s'",
+                                       $3);
+		      } else
+                          lc_error("Trying to shuffle undefined variable '%s'",
+                                   $3);
 		      add_opvars(splev, "so", VA_PASS2($3, SPO_SHUFFLE_ARRAY));
 		      Free($3);
 		  }
@@ -558,104 +574,118 @@ shuffle_detail	: SHUFFLE_ID ':' any_var_array
 
 variable_define	: any_var_or_arr '=' math_expr_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_INT);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_INT);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' selection_ID ':' ter_selection
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_SEL);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_SEL);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' string_expr
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_STRING);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_STRING);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' terrainid ':' mapchar_or_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_MAPCHAR);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' monsterid ':' monster_or_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MONST);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_MONST);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' objectid ':' object_or_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_OBJ);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' coord_or_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_COORD);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_COORD);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' region_or_var
 		  {
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_REGION);
+		      vardefs = add_vardef_type(vardefs, $1, SPOVAR_REGION);
 		      add_opvars(splev, "iso", VA_PASS3(0, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' '{' integer_list '}'
 		  {
-		      long n_items = $4;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_INT|SPOVAR_ARRAY);
+		      int n_items = (int) $4;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_INT | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' '{' encodecoord_list '}'
 		  {
-		      long n_items = $4;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_COORD|SPOVAR_ARRAY);
+		      int n_items = (int) $4;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_COORD | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' '{' encoderegion_list '}'
 		  {
-		      long n_items = $4;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_REGION|SPOVAR_ARRAY);
+                      int n_items = (int) $4;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_REGION | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' terrainid ':' '{' mapchar_list '}'
 		  {
-		      long n_items = $6;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR|SPOVAR_ARRAY);
+                      int n_items = (int) $6;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_MAPCHAR | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' monsterid ':' '{' encodemonster_list '}'
 		  {
-		      long n_items = $6;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_MONST|SPOVAR_ARRAY);
+		      int n_items = (int) $6;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_MONST | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' objectid ':' '{' encodeobj_list '}'
 		  {
-		      long n_items = $6;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
+                      int n_items = (int) $6;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_OBJ | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
 		  }
 		| any_var_or_arr '=' '{' string_list '}'
 		  {
-		      long n_items = $4;
-		      variable_definitions = add_vardef_type(variable_definitions, $1, SPOVAR_STRING|SPOVAR_ARRAY);
+                      int n_items = (int) $4;
+
+		      vardefs = add_vardef_type(vardefs, $1,
+                                                SPOVAR_STRING | SPOVAR_ARRAY);
 		      add_opvars(splev, "iso",
 				 VA_PASS3(n_items, $1, SPO_VAR_INIT));
 		      Free($1);
@@ -759,8 +789,8 @@ function_define	: FUNCTION_ID NQSTRING '('
 		      splev = &(funcdef->code);
 		      Free($2);
 		      curr_function = funcdef;
-		      function_tmp_var_defs = variable_definitions;
-		      variable_definitions = NULL;
+		      function_tmp_var_defs = vardefs;
+		      vardefs = NULL;
 		  }
 		func_params_list ')'
 		  {
@@ -772,22 +802,26 @@ function_define	: FUNCTION_ID NQSTRING '('
 		      splev = function_splev_backup;
 		      in_function_definition--;
 		      curr_function = NULL;
-		      vardef_free_all(variable_definitions);
-		      variable_definitions = function_tmp_var_defs;
+		      vardef_free_all(vardefs);
+		      vardefs = function_tmp_var_defs;
 		  }
 		;
 
 function_call	: NQSTRING '(' func_call_params_list ')'
 		  {
 		      struct lc_funcdefs *tmpfunc;
+
 		      tmpfunc = funcdef_defined(function_definitions, $1, 1);
 		      if (tmpfunc) {
-			  long l;
-			  long nparams = strlen( $3 );
+			  int l;
+			  int nparams = (int) strlen($3);
 			  char *fparamstr = funcdef_paramtypes(tmpfunc);
+
 			  if (strcmp($3, fparamstr)) {
 			      char *tmps = strdup(decode_parm_str(fparamstr));
-			      lc_error("Function '%s' requires params '%s', got '%s' instead.", $1, tmps, decode_parm_str($3));
+
+			      lc_error("Function '%s' requires params '%s', got '%s' instead.",
+                                       $1, tmps, decode_parm_str($3));
 			      Free(tmps);
 			  }
 			  Free(fparamstr);
@@ -795,9 +829,11 @@ function_call	: NQSTRING '(' func_call_params_list ')'
 			  if (!(tmpfunc->n_called)) {
 			      /* we haven't called the function yet, so insert it in the code */
 			      struct opvar *jmp = New(struct opvar);
+
 			      set_opvar_int(jmp, splev->n_opcodes+1);
 			      add_opcode(splev, SPO_PUSH, jmp);
-			      add_opcode(splev, SPO_JMP, NULL); /* we must jump past it first, then CALL it, due to RETURN. */
+                              /* we must jump past it first, then CALL it, due to RETURN. */
+			      add_opcode(splev, SPO_JMP, NULL);
 
 			      tmpfunc->addr = splev->n_opcodes;
 
@@ -812,9 +848,10 @@ function_call	: NQSTRING '(' func_call_params_list ')'
 			      }
 
 			      splev_add_from(splev, &(tmpfunc->code));
-			      set_opvar_int(jmp, splev->n_opcodes - jmp->vardata.l);
+			      set_opvar_int(jmp,
+                                            splev->n_opcodes - jmp->vardata.l);
 			  }
-			  l = tmpfunc->addr - splev->n_opcodes - 2;
+			  l = (int) (tmpfunc->addr - splev->n_opcodes - 2);
 			  add_opvars(splev, "iio",
 				     VA_PASS3(nparams, l, SPO_CALL));
 			  tmpfunc->n_called++;
@@ -845,7 +882,7 @@ comparestmt     : PERCENT
                   {
 		      /* val > rn2(100) */
 		      add_opvars(splev, "iio",
-				 VA_PASS3((long)$1, 100, SPO_RN2));
+				 VA_PASS3((int) $1, 100, SPO_RN2));
 		      $$ = SPO_JG;
                   }
 		| '[' math_expr_var COMPARE_TYPE math_expr_var ']'
@@ -867,6 +904,7 @@ switchstatement	: SWITCH_ID
 		  '[' integer_or_var ']'
 		  {
 		      struct opvar *chkjmp;
+
 		      if (in_switch_statement > 0)
 			  lc_error("Cannot nest switch-statements.");
 
@@ -935,6 +973,7 @@ switchcase	: CASE_ID all_integers ':'
 		  {
 		      if (n_switch_case_list < MAX_SWITCH_CASES) {
 			  struct opvar *tmppush = New(struct opvar);
+
 			  set_opvar_int(tmppush, splev->n_opcodes);
 			  switch_case_value[n_switch_case_list] = $2;
 			  switch_case_list[n_switch_case_list++] = tmppush;
@@ -986,8 +1025,7 @@ forstmt_start	: FOR_ID any_var_or_unk '=' math_expr_var for_to_span math_expr_va
 		      /* the value of which is already in stack (the 2nd math_expr) */
 		      add_opvars(splev, "iso", VA_PASS3(0, buf, SPO_VAR_INIT));
 
-		      variable_definitions = add_vardef_type(variable_definitions,
-							     $2, SPOVAR_INT);
+		      vardefs = add_vardef_type(vardefs, $2, SPOVAR_INT);
 		      /* define the for-loop variable. value is in stack (1st math_expr) */
 		      add_opvars(splev, "iso", VA_PASS3(0, $2, SPO_VAR_INIT));
 
@@ -1017,6 +1055,7 @@ forstatement	: forstmt_start
 		  }
 		 stmt_block
 		  {
+                      int l;
 		      char buf[256], buf2[256];
 
 		      n_forloops--;
@@ -1035,10 +1074,9 @@ forstatement	: forstmt_start
 				 VA_PASS3(0, forloop_list[n_forloops].varname,
 					  SPO_VAR_INIT));
 		      /* jump back if compared values were not equal */
-		      add_opvars(splev, "io",
-				 VA_PASS2(
-		    forloop_list[n_forloops].jmp_point - splev->n_opcodes - 1,
-					  SPO_JNE));
+                      l = (int) (forloop_list[n_forloops].jmp_point
+                                 - splev->n_opcodes - 1);
+		      add_opvars(splev, "io", VA_PASS2(l, SPO_JNE));
 		      Free(forloop_list[n_forloops].varname);
 		      break_stmt_end(splev);
 		  }
@@ -1065,10 +1103,11 @@ loopstatement	: LOOP_ID '[' integer_or_var ']'
 		      add_opvars(splev, "oio", VA_PASS3(SPO_COPY, 0, SPO_CMP));
 
 		      tmppush = (struct opvar *) if_list[--n_if_list];
-		      set_opvar_int(tmppush, tmppush->vardata.l - splev->n_opcodes-1);
+		      set_opvar_int(tmppush,
+                                    tmppush->vardata.l - splev->n_opcodes-1);
 		      add_opcode(splev, SPO_PUSH, tmppush);
 		      add_opcode(splev, SPO_JG, NULL);
-		      add_opcode(splev, SPO_POP, NULL); /* get rid of the count value in stack */
+		      add_opcode(splev, SPO_POP, NULL); /* discard count */
 		      break_stmt_end(splev);
 		  }
 		;
@@ -1097,8 +1136,10 @@ chancestatement	: comparestmt ':'
 		  {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
+
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+			  set_opvar_int(tmppush,
+                                        splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?!  No start address?");
 		  }
 		;
@@ -1133,8 +1174,10 @@ if_ending	: stmt_block
 		  {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
+
 			  tmppush = (struct opvar *) if_list[--n_if_list];
-			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
+			  set_opvar_int(tmppush,
+                                        splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?!  No start address?");
 		  }
 		| stmt_block
@@ -1150,7 +1193,8 @@ if_ending	: stmt_block
 
 			  tmppush2 = (struct opvar *) if_list[--n_if_list];
 
-			  set_opvar_int(tmppush2, splev->n_opcodes - tmppush2->vardata.l);
+			  set_opvar_int(tmppush2,
+                                      splev->n_opcodes - tmppush2->vardata.l);
 			  if_list[n_if_list++] = tmppush;
 		      } else lc_error("IF: Huh?!  No else-part address?");
 		  }
@@ -1363,21 +1407,21 @@ door_pos	: INTEGER
 map_definition	: NOMAP_ID
 		  {
 		      add_opvars(splev, "ciisiio",
-				 VA_PASS7(0, 0, 1, (char *)0, 0, 0, SPO_MAP));
+				 VA_PASS7(0, 0, 1, (char *) 0, 0, 0, SPO_MAP));
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
 		| GEOMETRY_ID ':' h_justif ',' v_justif roomfill MAP_ID
 		  {
 		      add_opvars(splev, "cii",
-				 VA_PASS3(SP_COORD_PACK(($3),($5)),
-					  1, (long)$6));
+				 VA_PASS3(SP_COORD_PACK(($3), ($5)),
+					  1, (int) $6));
 		      scan_map($7, splev);
 		      Free($7);
 		  }
 		| GEOMETRY_ID ':' coord_or_var roomfill MAP_ID
 		  {
-		      add_opvars(splev, "ii", VA_PASS2(2, (long)$4));
+		      add_opvars(splev, "ii", VA_PASS2(2, (int) $4));
 		      scan_map($5, splev);
 		      Free($5);
 		  }
@@ -1418,6 +1462,7 @@ monster_desc	: monster_or_var ',' coord_or_var monster_infos
 monster_infos	: /* nothing */
 		  {
 		      struct opvar *stopit = New(struct opvar);
+
 		      set_opvar_int(stopit, SP_M_V_END);
 		      add_opcode(splev, SPO_PUSH, stopit);
 		      $$ = 0x0000;
@@ -1438,25 +1483,25 @@ monster_info	: string_expr
 		| MON_ATTITUDE
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$<i>1, SP_M_V_PEACEFUL));
+				 VA_PASS2((int) $<i>1, SP_M_V_PEACEFUL));
 		      $$ = 0x0002;
 		  }
 		| MON_ALERTNESS
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$<i>1, SP_M_V_ASLEEP));
+				 VA_PASS2((int) $<i>1, SP_M_V_ASLEEP));
 		      $$ = 0x0004;
 		  }
 		| alignment_prfx
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$1, SP_M_V_ALIGN));
+				 VA_PASS2((int) $1, SP_M_V_ALIGN));
 		      $$ = 0x0008;
 		  }
 		| MON_APPEARANCE string_expr
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$<i>1, SP_M_V_APPEAR));
+				 VA_PASS2((int) $<i>1, SP_M_V_APPEAR));
 		      $$ = 0x0010;
 		  }
 		| FEMALE_ID
@@ -1512,7 +1557,7 @@ monster_info	: string_expr
 		| SEENTRAPS_ID ':' seen_trap_mask
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$3, SP_M_V_SEENTRAPS));
+				 VA_PASS2((int) $3, SP_M_V_SEENTRAPS));
 		      $$ = 0x8000;
 		  }
 		;
@@ -1520,6 +1565,7 @@ monster_info	: string_expr
 seen_trap_mask	: STRING
 		  {
 		      int token = get_trap_type($1);
+
 		      if (token == ERR || token == 0)
 			  lc_error("Unknown trap type '%s'!", $1);
                       Free($1);
@@ -1544,14 +1590,18 @@ seen_trap_mask	: STRING
 
 object_detail	: OBJECT_ID ':' object_desc
 		  {
-		      long cnt = 0;
-		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
+		      int cnt = 0;
+
+		      if (in_container_obj)
+                          cnt |= SP_OBJ_CONTENT;
 		      add_opvars(splev, "io", VA_PASS2(cnt, SPO_OBJECT));
 		  }
 		| COBJECT_ID ':' object_desc
 		  {
-		      long cnt = SP_OBJ_CONTAINER;
-		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
+		      int cnt = SP_OBJ_CONTAINER;
+
+		      if (in_container_obj)
+                          cnt |= SP_OBJ_CONTENT;
 		      add_opvars(splev, "io", VA_PASS2(cnt, SPO_OBJECT));
 		      in_container_obj++;
 		      break_stmt_start();
@@ -1591,7 +1641,7 @@ object_infos	: /* nothing */
 object_info	: CURSE_TYPE
 		  {
 		      add_opvars(splev, "ii",
-				 VA_PASS2((long)$1, SP_O_V_CURSE));
+				 VA_PASS2((int) $1, SP_O_V_CURSE));
 		      $$ = 0x0001;
 		  }
 		| MONTYPE_ID ':' monster_or_var
@@ -1621,7 +1671,7 @@ object_info	: CURSE_TYPE
 		  }
 		| LIGHT_STATE
 		  {
-		      add_opvars(splev, "ii", VA_PASS2((long)$1, SP_O_V_LIT));
+		      add_opvars(splev, "ii", VA_PASS2((int) $1, SP_O_V_LIT));
 		      $$ = 0x0040;
 		  }
 		| ERODED_ID ':' integer_or_var
@@ -1647,7 +1697,8 @@ object_info	: CURSE_TYPE
 		  }
 		| TRAPPED_STATE
 		  {
-		      add_opvars(splev, "ii", VA_PASS2($1, SP_O_V_TRAPPED));
+		      add_opvars(splev, "ii",
+                                 VA_PASS2((int) 1, SP_O_V_TRAPPED));
 		      $$ = 0x0400;
 		  }
 		| RECHARGED_ID ':' integer_or_var
@@ -1674,7 +1725,7 @@ object_info	: CURSE_TYPE
 
 trap_detail	: TRAP_ID ':' trap_name ',' coord_or_var
 		  {
-		      add_opvars(splev, "io", VA_PASS2((long)$3, SPO_TRAP));
+		      add_opvars(splev, "io", VA_PASS2((int) $3, SPO_TRAP));
 		  }
 		;
 
@@ -1710,13 +1761,13 @@ drawbridge_detail: DRAWBRIDGE_ID ':' coord_or_var ',' DIRECTION ',' door_state
 mazewalk_detail : MAZEWALK_ID ':' coord_or_var ',' DIRECTION
 		  {
 		      add_opvars(splev, "iiio",
-				 VA_PASS4((long)$5, 1, 0, SPO_MAZEWALK));
+				 VA_PASS4((int) $5, 1, 0, SPO_MAZEWALK));
 		  }
 		| MAZEWALK_ID ':' coord_or_var ',' DIRECTION ',' BOOLEAN opt_fillchar
 		  {
 		      add_opvars(splev, "iiio",
-				 VA_PASS4((long)$5, (long)$<i>7,
-					  (long)$8, SPO_MAZEWALK));
+				 VA_PASS4((int) $5, (int) $<i>7,
+					  (int) $8, SPO_MAZEWALK));
 		  }
 		;
 
@@ -1735,14 +1786,14 @@ wallify_detail	: WALLIFY_ID
 ladder_detail	: LADDER_ID ':' coord_or_var ',' UP_OR_DOWN
 		  {
 		      add_opvars(splev, "io",
-				 VA_PASS2((long)$<i>5, SPO_LADDER));
+				 VA_PASS2((int) $<i>5, SPO_LADDER));
 		  }
 		;
 
 stair_detail	: STAIR_ID ':' coord_or_var ',' UP_OR_DOWN
 		  {
 		      add_opvars(splev, "io",
-				 VA_PASS2((long)$<i>5, SPO_STAIR));
+				 VA_PASS2((int) $<i>5, SPO_STAIR));
 		  }
 		;
 
@@ -2040,15 +2091,16 @@ string_or_var	: STRING
 		  }
 		| VARSTRING_STRING
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_STRING);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_STRING);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_STRING_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_STRING|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_STRING | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2071,15 +2123,16 @@ coord_or_var	: encodecoord
 		  }
 		| VARSTRING_COORD
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_COORD);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_COORD);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_COORD_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_COORD|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_COORD | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2088,7 +2141,8 @@ coord_or_var	: encodecoord
 encodecoord	: '(' INTEGER ',' INTEGER ')'
 		  {
 		      if ($2 < 0 || $4 < 0 || $2 >= COLNO || $4 >= ROWNO)
-			  lc_error("Coordinates (%li,%li) out of map range!", $2, $4);
+                          lc_error("Coordinates (%li,%li) out of map range!",
+                                   $2, $4);
 		      $$ = SP_COORD_PACK($2, $4);
 		  }
 		| RANDOM_TYPE
@@ -2097,7 +2151,7 @@ encodecoord	: '(' INTEGER ',' INTEGER ')'
 		  }
 		| RANDOM_TYPE_BRACKET humidity_flags ']'
 		  {
-		      $$ = SP_COORD_PACK_RANDOM( $2 );
+		      $$ = SP_COORD_PACK_RANDOM($2);
 		  }
 		;
 
@@ -2119,15 +2173,16 @@ region_or_var	: encoderegion
 		  }
 		| VARSTRING_REGION
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_REGION);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_REGION);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_REGION_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_REGION|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_REGION | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2136,8 +2191,10 @@ region_or_var	: encoderegion
 encoderegion	: '(' INTEGER ',' INTEGER ',' INTEGER ',' INTEGER ')'
 		  {
 		      long r = SP_REGION_PACK($2, $4, $6, $8);
-		      if ( $2 > $6 || $4 > $8 )
-			  lc_error("Region start > end: (%li,%li,%li,%li)!", $2, $4, $6, $8);
+
+		      if ($2 > $6 || $4 > $8)
+			  lc_error("Region start > end: (%ld,%ld,%ld,%ld)!",
+                                   $2, $4, $6, $8);
 
 		      add_opvars(splev, "r", VA_PASS1(r));
 		      $$ = r;
@@ -2150,15 +2207,16 @@ mapchar_or_var	: mapchar
 		  }
 		| VARSTRING_MAPCHAR
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_MAPCHAR);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_MAPCHAR_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_MAPCHAR|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_MAPCHAR | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2190,15 +2248,16 @@ monster_or_var	: encodemonster
 		  }
 		| VARSTRING_MONST
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_MONST);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_MONST);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_MONST_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_MONST|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_MONST | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2246,15 +2305,16 @@ object_or_var	: encodeobj
 		  }
 		| VARSTRING_OBJ
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_OBJ);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
 		| VARSTRING_OBJ_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_OBJ|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+                                        SPOVAR_OBJ | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
@@ -2267,7 +2327,8 @@ encodeobj	: STRING
 			  lc_error("Unknown object \"%s\"!", $1);
 			  $$ = -1;
 		      } else
-			  $$ = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
+                          /* obj class != 0 to force generation of a specific item */
+                          $$ = SP_OBJ_PACK(m, 1);
                       Free($1);
 		  }
 		| CHAR
@@ -2317,17 +2378,17 @@ math_expr_var	: INTEGER
 		  }
 		| VARSTRING_INT
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_INT);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_INT);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		      is_inconstant_number = 1;
 		  }
 		| VARSTRING_INT_ARRAY '[' math_expr_var ']'
 		  {
-		      check_vardef_type(variable_definitions,
-					$1, SPOVAR_INT|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1,
+					SPOVAR_INT | SPOVAR_ARRAY);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		      is_inconstant_number = 1;
@@ -2398,9 +2459,7 @@ func_param_part	: any_var_or_arr ':' func_param_type
                               lc_error("Unknown func param conversion.");
                               break;
 			  }
-			  variable_definitions = add_vardef_type(
-							 variable_definitions,
-								 $1, vt);
+			  vardefs = add_vardef_type( vardefs, $1, vt);
 		      }
 		      Free($1);
 		  }
@@ -2531,8 +2590,8 @@ ter_selection_x	: coord_or_var
 		  }
 		| VARSTRING_SEL
 		  {
-		      check_vardef_type(variable_definitions, $1, SPOVAR_SEL);
-		      vardef_used(variable_definitions, $1);
+		      check_vardef_type(vardefs, $1, SPOVAR_SEL);
+		      vardef_used(vardefs, $1);
 		      add_opvars(splev, "v", VA_PASS1($1));
 		      Free($1);
 		  }
