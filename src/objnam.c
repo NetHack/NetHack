@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1539938837 2018/10/19 08:47:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1543544340 2018/11/30 02:19:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.226 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1154,11 +1154,11 @@ unsigned doname_flags;
                     (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
 
             if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
-                /* presumably can be felt when blind */
-                Strcat(bp, " (glowing");
+                /* this used to be "(glowing <color>)" when sighted or
+                   "(glowing)" when blind (via feeling warmth), but it
+                   isn't a light source so describe something fainter */
                 if (!Blind)
-                    Sprintf(eos(bp), " %s", glow_color(obj->oartifact));
-                Strcat(bp, ")");
+                    Sprintf(eos(bp), " (%s aura)", glow_color(obj->oartifact));
             }
         }
     }
