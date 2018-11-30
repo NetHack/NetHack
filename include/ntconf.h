@@ -94,6 +94,15 @@ extern void FDECL(interject, (int));
  *===============================================
  */
 
+#ifdef __MINGW32__
+#ifdef strncasecmp
+#undef strncasecmp
+#endif
+#ifdef strcasecmp
+#undef strcasecmp
+#endif
+#endif
+ 
 #ifdef _MSC_VER
 #if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */

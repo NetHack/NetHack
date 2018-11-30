@@ -7,7 +7,7 @@
 
 #ifdef GUISTUB
 #ifdef TTYSTUB
-#error You can't compile this with both GUISTUB and TTYSTUB defined.
+#error You cannot compile this with both GUISTUB and TTYSTUB defined.
 #endif
 
 int GUILaunched;
