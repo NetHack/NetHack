@@ -91,8 +91,8 @@ TARGET_CPU=x86
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=..\..\pdcurses
+ADD_CURSES=Y
+PDCURSES_TOP=..\..\pdcurses
 
 #4b Qt
 #
@@ -207,6 +207,7 @@ endif
 #ZLIB = zlib.lib
 
 # Have windows path styles available for use in commands
+W_OBJ     =$(subst /,\, $(OBJ))
 W_INCL    =$(subst /,\, $(INCL))
 W_DAT     =$(subst /,\, $(DAT))
 W_DOC     =$(subst /,\, $(DOC))
@@ -494,7 +495,7 @@ cdebug =
 linkdebug =
 endif
 
-CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug)
+CFLAGSBASE  = -c $(cflags) $(WINPINC) $(cdebug) $(CURSESDEF)
 #LFLAGSBASEC = $(linkdebug)
 #LFLAGSBASEG = $(linkdebug) -mwindows
 
@@ -625,7 +626,7 @@ $(OBJ)/%.o : $(MSWIN)/%.c
 #==========================================
 
 $(OBJ)/%.o : $(WCURSES)/%.c
-	$(cc) $(CFLAGS)  -o$@  $<
+	$(cc) $(PDCINCL) $(CFLAGS)  -o$@  $<
 
 #==========================================
 # Rules for files in PDCurses
@@ -820,8 +821,8 @@ $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico
 #==========================================
 
 gamedir.tag:
-	test -d $(GAMEDIR) || echo creating directory $(GAMEDIR)
-	test -d $(GAMEDIR) || mkdir $(GAMEDIR)
+	test -d $(GAMEDIR) || echo creating directory $(W_GAMEDIR)
+	test -d $(GAMEDIR) || mkdir $(W_GAMEDIR)
 	test -d $(GAMEDIR) && echo directory created > $@
 
 $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)nttty.o $(O)guistub.o \
@@ -961,7 +962,7 @@ $(O)uudecode.o: $(SSYS)/uudecode.c
 
 $(MSWSYS)/NetHack.ico : $(U)uudecode.exe $(MSWSYS)/nhico.uu
 	$(subst /,\,$(U)uudecode.exe $(MSWSYS)/nhico.uu)
-	copy NetHack.ico $@
+	copy NetHack.ico $(W_MSWSYS)\NetHack.ico
 	del NetHack.ico
 
 $(MSWIN)/NetHack.ico : $(MSWSYS)/NetHack.ico
@@ -1223,9 +1224,11 @@ $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 #==========================================
 
 spotless: clean
-	if exist initialchk del initialchk
-ifneq "$(OBJ)" ""
-	if exist $(W_OBJ)\* rmdir $(W_OBJ) /s /Q
+	if exist o\* del /Q o\*
+	-test -d o && rd o
+	if exist objdir.tag del objdir.tag
+	if exist gamedir.tag del gamedir.tag
+ifneq "$(W_GAMEDIR)" ""
 	if exist $(W_GAMEDIR))\nhdefkey.dll del $(W_GAMEDIR))\nhdefkey.dll
 	if exist $(W_GAMEDIR))\nh340key.dll del $(W_GAMEDIR))\nh340key.dll
 	if exist $(W_GAMEDIR))\nhraykey.dll del $(W_GAMEDIR))\nhraykey.dll
@@ -1233,14 +1236,13 @@ ifneq "$(OBJ)" ""
 	if exist $(W_GAMEDIR))\NetHack.pdb  del $(W_GAMEDIR))\NetHack.pdb
 	if exist $(W_GAMEDIR))\nhdat        del $(W_GAMEDIR))\nhdat
 endif
-	if exist $(W_INCL)\date.h          del $(W_INCL)\date.h
-	if exist $(W_INCL)\onames.h        del $(W_INCL)\onames.h
-	if exist $(W_INCL)\pm.h            del $(W_INCL)\pm.h
-	if exist $(W_INCL)\vis_tab.h       del $(W_INCL)\vis_tab.h
+ifneq "$(W_SRC)" ""
 	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
 	if exist $(W_SRC)\tile.c           del $(W_SRC)\tile.c
-	if exist $(W_UTIL)\*.lnk           del $(W_UTIL)\*.lnk
-	if exist $(W_UTIL)\*.map           del $(W_UTIL)\*.map
+	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
+	if exist nhdat.			   del nhdat.
+endif
+ifneq "$(W_DAT)" ""
 	if exist $(W_DAT)\data             del $(W_DAT)\data
 	if exist $(W_DAT)\rumors           del $(W_DAT)\rumors
 	if exist $(W_DAT)\engrave          del $(W_DAT)\engrave
@@ -1282,13 +1284,15 @@ endif
 	if exist $(W_DAT)\wizard?.lev	   del $(W_DAT)\wizard?.lev
 	if exist $(W_DAT)\dlb.lst          del $(W_DAT)\dlb.lst
 	if exist $(W_DAT)\porthelp	   del $(W_DAT)\porthelp
+endif
+ifneq "$(W_OBJ)" ""
 	if exist $(W_OBJ)\sp_lev.tag	   del $(W_OBJ)\sp_lev.tag
-	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
-	if exist nhdat.			   del nhdat.
 	if exist $(W_OBJ)\obj.tag          del $(W_OBJ)\obj.tag
 	if exist $(W_OBJ)\gamedir.tag      del $(W_OBJ)\gamedir.tag
 	if exist $(W_OBJ)\nh*key.lib       del $(W_OBJ)\nh*key.lib
 	if exist $(W_OBJ)\nh*key.exp       del $(W_OBJ)\nh*key.exp
+endif
+ifneq "$(W_MSWIN)" ""
 	if exist $(W_MSWIN)\mnsel.bmp      del $(W_MSWIN)\mnsel.bmp
 	if exist $(W_MSWIN)\mnselcnt.bmp   del $(W_MSWIN)\mnselcnt.bmp
 	if exist $(W_MSWIN)\mnunsel.bmp    del $(W_MSWIN)\mnunsel.bmp
@@ -1297,23 +1301,52 @@ endif
 	if exist $(W_MSWIN)\rip.bmp        del $(W_MSWIN)\rip.bmp
 	if exist $(W_MSWIN)\splash.bmp     del $(W_MSWIN)\splash.bmp
 	if exist $(W_MSWIN)\nethack.ico    del $(W_MSWIN)\nethack.ico
+endif
+ifneq "$(W_MSWSYS)" ""
 	if exist $(W_MSWSYS)\nethack.ico   del $(W_MSWSYS)\nethack.ico
+endif
+ifneq "$(W_UTIL)" ""
+	if exist $(W_UTIL)\*.lnk           del $(W_UTIL)\*.lnk
+	if exist $(W_UTIL)\*.map           del $(W_UTIL)\*.map
 	if exist $(W_UTIL)\recover.exe     del $(W_UTIL)\recover.exe
 	if exist $(W_UTIL)\tile2bmp.exe    del $(W_UTIL)\tile2bmp.exe
 	if exist $(W_UTIL)\tilemap.exe     del $(W_UTIL)\tilemap.exe
 	if exist $(W_UTIL)\uudecode.exe    del $(W_UTIL)\uudecode.exe
 	if exist $(W_UTIL)\dlb_main.exe    del $(W_UTIL)\dlb_main.exe
+endif
+ifneq "$(W_INCL)" ""
+	if exist $(W_INCL)\date.h          del $(W_INCL)\date.h
+	if exist $(W_INCL)\onames.h        del $(W_INCL)\onames.h
+	if exist $(W_INCL)\pm.h            del $(W_INCL)\pm.h
+	if exist $(W_INCL)\vis_tab.h       del $(W_INCL)\vis_tab.h
+endif
 ifeq "$(ADD_CURSES)" "Y"
+ifneq "$(W_OBJ)" ""
 	if exist $(W_OBJ)\pdcurses.lib     del $(W_OBJ)\pdcurses.lib
 endif
+endif
+	if exist $(W_GAMEDIR)\license. del $(W_GAMEDIR)\license.
+	if exist $(W_GAMEDIR)\nh340key.dll del $(W_GAMEDIR)\nh340key.dll
+	if exist $(W_GAMEDIR)\nhdefkey.dll del $(W_GAMEDIR)\nhdefkey.dll
+	if exist $(W_GAMEDIR)\nhraykey.dll del $(W_GAMEDIR)\nhraykey.dll
+	-test -d ..\binary && rd ..\binary
+
 clean:
-	if exist $(W_OBJ)\*.o              del $(W_OBJ)\*.o
-	if exist $(W_OBJ)\utility.tag      del $(W_OBJ)\utility.tag
+	if exist initialchk del initialchk
+	if exist install.tag del install.tag
+	if exist utility.tag del utility.tag
+ifneq "$(W_UTIL)" ""
 	if exist $(W_UTIL)\makedefs.exe    del $(W_UTIL)\makedefs.exe
 	if exist $(W_UTIL)\levcomp.exe     del $(W_UTIL)\levcomp.exe
 	if exist $(W_UTIL)\dgncomp.exe     del $(W_UTIL)\dgncomp.exe
+endif
+ifneq "$(W_SRC)" ""
 	if exist $(W_SRC)\*.lnk            del $(W_SRC)\*.lnk
 	if exist $(W_SRC)\*.map            del $(W_SRC)\*.map
+endif
+ifneq "$(W_OBJ)" ""
+	if exist $(W_OBJ)\*.o              del $(W_OBJ)\*.o
+	if exist $(W_OBJ)\utility.tag      del $(W_OBJ)\utility.tag
 	if exist $(W_OBJ)\install.tag      del $(W_OBJ)\install.tag
 	if exist $(W_OBJ)\console.res      del $(W_OBJ)\console.res
 	if exist $(W_OBJ)\dgncomp.MAP      del $(W_OBJ)\dgncomp.MAP
@@ -1346,6 +1379,7 @@ clean:
 	if exist $(W_OBJ)\sp_lev.tag       del $(W_OBJ)\sp_lev.tag
 	if exist $(W_OBJ)\uudecode.MAP     del $(W_OBJ)\uudecode.MAP
 	if exist $(W_OBJ)\uudecode.PDB     del $(W_OBJ)\uudecode.PDB
+endif
 	rem
 	rem defer to the steps in ../win/win32/levstuff-mingw32.mak
 	rem 
