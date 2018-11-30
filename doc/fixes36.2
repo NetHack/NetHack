@@ -225,6 +225,10 @@ scattering of objects might leave source location with wrong thing displayed
 for configurations with 'long int' larger than 'int', lev_comp wrote some
 	garbage into the *.lev files, but nethack seemed unaffected by that
 	(at least on little-endian hardare) and loaded the levels successfully
+stinking cloud placed near water could kill underwater creatures
+applying--rather than wielding--a cursed polearm or weapon-tool didn't report
+	that it had become welded to hero's hand(s)
+the message when riding a steed into a pit was composed but not shown
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -242,6 +246,8 @@ ensure tmp_at() structures are initialized for all code paths when swallowed
 trapped-vs-levitation/flying change broke Sting releasing hero from web
 life-saving while poly'd and Unchanging wasn't restoring u.mh (HP as monster)
 change in searching stopped finding unseen monsters except hiders and eels
+buliding with EXTRA_SANITY_CHECKS enabled would issue "no monster to remove"
+	warning if steed was killed out from under the hero
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -263,6 +269,8 @@ windows-gui: In nethackw, there could be conflicts between menu accelerators
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
 windows-gui: align hpbar behavior at zero hit points with tty behavior
+windows-gui: add support for status_hilites for the player condition field 
+	such as stone, slime, strngl, blind, deaf, stun, conf, etc.
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
 	port, implement a console back buffer to reduce the number of calls
@@ -281,9 +289,14 @@ windows-tty: augment codepage850-to-Unicode mappings that are not displayable
 	with codepage437-to-Unicode mappings that are, to help ensure
 	that rogue-level characters in the status line match their appearance
 	on the map
+windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
+	(fully-functional including disabling QuickEdit on Windows console
+	because QuickEdit intercepts the mouse clicks so NetHack never sees
+	them), or mouse_support:2 (NetHack support on but QuickEdit left as is)
 windows: Added ntassert() mechanism for Windows based port use
 windows: heed OPTIONS=symset:default in config file if it is present 
-windows: add curses window port
+windows: add curses window port which can co-exist with tty in exe and be
+	selectable in user config file via OPTIONS=windowtype:curses
 tty: significant optimizations for performance and per field rendering
 tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
 tty: support BL_RESET in status_update to force an update to all status fields
