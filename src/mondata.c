@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1539938825 2018/10/19 08:47:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1543545188 2018/11/30 02:33:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -739,6 +739,10 @@ const char *in_str;
             /* Outdated names */
             { "invisible stalker", PM_STALKER },
             { "high-elf", PM_ELVENKING }, /* PM_HIGH_ELF is obsolete */
+            /* other misspellings or incorrect words */
+            { "wood-elf", PM_WOODLAND_ELF },
+            { "wood elf", PM_WOODLAND_ELF },
+            { "woodland nymph", PM_WOOD_NYMPH },
             { "halfling", PM_HOBBIT },    /* potential guess for polyself */
             { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
             /* Hyphenated names -- it would be nice to handle these via
