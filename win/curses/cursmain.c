@@ -80,6 +80,16 @@ struct window_procs curses_procs = {
     genl_can_suspend_yes,
 };
 
+/*
+ * Global variables for curses interface
+ */
+ 
+int term_rows, term_cols;   /* size of underlying terminal */
+int orig_cursor;	    /* Preserve initial cursor state */
+WINDOW *base_term;          /* underlying terminal window */
+boolean counting;           /* Count window is active */
+WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
+
 /* Track if we're performing an update to the permanent window.
    Needed since we aren't using the normal menu functions to handle
    the inventory window. */

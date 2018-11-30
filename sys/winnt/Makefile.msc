@@ -73,8 +73,8 @@ DEBUGINFO = Y
 #    PDCurses header (.h) files and PDCURSES_C to the location
 #    of your PDCurses C files.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=..\..\pdcurses
+ADD_CURSES=Y
+PDCURSES_TOP=..\..\pdcurses
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -399,7 +399,7 @@ PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o      
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
 	  $(O)pdcsetsc.o $(O)pdcutil.o
 
-PDCLIB = $(O)\pdcurses.lib
+PDCLIB = $(O)pdcurses.lib
 
 PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
 
@@ -1257,16 +1257,19 @@ $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
-#==========================================
+#===============================================================================
 # PDCurses
-#==========================================
+#===============================================================================
 
-$(O)\pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
+$(O)pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 	lib -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
-#==========================================
+$(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscrn.c
+	$(cc) $(PDCINCL) $(cflagsBuild) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
+
+#===============================================================================
 # Housekeeping
-#==========================================
+#===============================================================================
 
 spotless: clean
 ! IF ("$(OBJ)"!="")

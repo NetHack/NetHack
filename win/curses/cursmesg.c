@@ -371,12 +371,12 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     char *tmpstr; /* for free() */
     int maxy, maxx; /* linewrap / scroll */
     int ch;
-
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     int border_space = 0;
     int len = 0; /* of answer string */
     boolean border = curses_window_has_border(MESSAGE_WIN);
-    int orig_cursor = curs_set(0);
+
+    orig_cursor = curs_set(0);
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (border) {
