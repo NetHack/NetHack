@@ -206,6 +206,20 @@ endif
 
 #ZLIB = zlib.lib
 
+# Have windows path styles available for use in commands
+W_INCL    =$(subst /,\, $(INCL))
+W_DAT     =$(subst /,\, $(DAT))
+W_DOC     =$(subst /,\, $(DOC))
+W_UTIL    =$(subst /,\, $(UTIL))
+W_SRC     =$(subst /,\, $(SRC))
+W_SSYS    =$(subst /,\, $(SSYS))
+W_MSWSYS  =$(subst /,\, $(MSWSYS))
+W_TTY     =$(subst /,\, $(TTY))
+W_MSWIN   =$(subst /,\, $(MSWIN))
+W_WCURSES =$(subst /,\, $(WCURSES))
+W_WSHR    =$(subst /,\, $(WSHR))
+W_GAMEDIR =$(subst /,\, $(GAMEDIR))
+
 #==========================================
 #================ MACROS ==================
 #==========================================
@@ -229,17 +243,17 @@ U  = $(UTIL)/
 
 MAKESRC        = $(U)makedefs.c
 
-SPLEVSRC       = $(U)lev_yacc.c  $(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
+SPLEVSRC       = $(U)lev_yacc.c  $(U)lev_lex.c $(U)lev_main.c  $(U)panic.c
 
-DGNCOMPSRC     = $(U)dgn_yacc.c  $(U)dgn_$(LEX).c $(U)dgn_main.c
+DGNCOMPSRC     = $(U)dgn_yacc.c  $(U)dgn_lex.c $(U)dgn_main.c
 
 MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
-SPLEVOBJS      = $(O)lev_yacc.o  $(O)lev_$(LEX).o $(O)lev_main.o \
+LEVCOMPOBJS    = $(O)lev_yacc.o  $(O)lev_lex.o $(O)lev_main.o \
 	$(O)alloc.o   $(O)decl.o      $(O)drawing.o \
 	$(O)monst.o   $(O)objects.o   $(O)panic.o
 
-DGNCOMPOBJS    = $(O)dgn_yacc.o  $(O)dgn_$(LEX).o $(O)dgn_main.o \
+DGNCOMPOBJS    = $(O)dgn_yacc.o  $(O)dgn_lex.o $(O)dgn_main.o \
 	$(O)alloc.o   $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
@@ -645,11 +659,15 @@ DO_LEX  = LEX_MSG
 # - Specify your yacc and lex programs (or work-alikes) here.
 
 #YACC   = bison -y
-YACC   = byacc
+#YACC   = byacc
 #YACC   = yacc
+YACC=
 
 #LEX    = lex
-LEX     = flex
+#LEX    = flex
+LEX=
+export YACC
+export LEX
 
 #
 # - Specify your flex skeleton file (if needed).
@@ -684,6 +702,8 @@ else
 NETHACKW_EXE = $(GAMEDIR)/NetHack.exe
 endif
 
+SHELL=CMD.EXE
+
 #==========================================
 #=============== TARGETS ==================
 #==========================================
@@ -712,7 +732,7 @@ install: initialchk $(GAMEDIR)/NetHack.exe $(U)uudecode.exe $(O)winres.o \
 
 
 install.tag:  $(DAT)/data    $(DAT)/rumors    $(DAT)/dungeon \
-	       $(DAT)/oracles $(DAT)/quest.dat $(O)sp_lev.tag $(DLB)
+	       $(DAT)/oracles $(DAT)/quest.dat sp_lev.tag $(DLB)
 ifeq  "$(USE_DLB)" "Y"
 	$(subst /,\,copy nhdat                $(GAMEDIR))
 	$(subst /,\,copy $(DAT)/license       $(GAMEDIR))
@@ -730,7 +750,7 @@ endif
 	$(U)makedefs -c
 	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy fixed_defaults.nh   $(GAMEDIR)/defaults.nh)
 	$(subst /,\,if not exist $(GAMEDIR)/defaults.nh copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
-	$(subst /,\,if not exist $(GAMEDIR)/record. goto>$(GAMEDIR)/record.)
+	$(subst /,\,-if not exist $(GAMEDIR)/record. goto>$(GAMEDIR)/record.)
 #
 #
 	$(subst /,\,echo install done > $@)
@@ -941,8 +961,8 @@ $(O)uudecode.o: $(SSYS)/uudecode.c
 
 $(MSWSYS)/NetHack.ico : $(U)uudecode.exe $(MSWSYS)/nhico.uu
 	$(subst /,\,$(U)uudecode.exe $(MSWSYS)/nhico.uu)
-	cp NetHack.ico $@
-	rm NetHack.ico
+	copy NetHack.ico $@
+	del NetHack.ico
 
 $(MSWIN)/NetHack.ico : $(MSWSYS)/NetHack.ico
 	$(subst /,\,copy $< $@)
@@ -989,104 +1009,54 @@ $(MSWIN)/splash.bmp: $(U)uudecode.exe $(MSWIN)/splash.uu
 
 LEVCFLAGS=$(cflags) -c -DWIN32 -D_WIN32 -I../include $(cdebug) -DDLB
 
-$(U)levcomp.exe: $(SPLEVOBJS)
-	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(SPLEVOBJS)
+$(U)lev_yacc.c: $(U)lev_comp.y
+	mingw32-make -C ../util -f ../win/win32/levstuff-mingw32.mak $(U)lev_yacc.c
+
+$(U)lev_lex.c: $(HACK_H) $(U)lev_comp.l
+	mingw32-make -C ../util -f ../win/win32/levstuff-mingw32.mak $(U)lev_lex.c
+
+$(INCL)/lev_comp.h:
+	mingw32-make -C ../include -f ../win/win32/levstuff-mingw32.mak $(INCL)/lev_comp.h
 
 $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)/lev_comp.h $(U)lev_yacc.c
 	$(cc) $(LEVCFLAGS) -o$@ $(U)lev_yacc.c
 
-$(O)lev_$(LEX).o: $(HACK_H)   $(INCL)/lev_comp.h $(SP_LEV_H) \
-	$(U)lev_$(LEX).c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)lev_$(LEX).c
+$(O)lev_lex.o: $(HACK_H) $(INCL)/lev_comp.h $(SP_LEV_H) $(U)lev_lex.c
+	$(cc) $(LEVCFLAGS) -o$@ $(U)lev_lex.c
 
 $(O)lev_main.o:   $(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
 	$(cc) $(LEVCFLAGS) -o$@ $(U)lev_main.c
 
-$(U)lev_yacc.c $(INCL)/lev_comp.h : $(U)lev_comp.y
-ifeq  "$(DO_YACC)" "YACC_ACT"
-	$(subst /,\,$(YACC) -d $(U)lev_comp.y)
-	$(subst /,\,copy $(YTABC) $(U)lev_yacc.c)
-	$(subst /,\,copy $(YTABH) $(INCL)/lev_comp.h)
-	$(subst /,\,@del $(YTABC))
-	$(subst /,\,@del $(YTABH))
-else
-	@echo $(U)lev_comp.y has changed.
-	@echo To update $(U)lev_yacc.c and $(INCL)/lev_comp.h run $(YACC).
-	@echo ---
-	@echo For now, we will copy the prebuilt lev_yacc.c and
-	@echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
-	$(subst /,\,@copy $(SSYS)/lev_yacc.c $(U)lev_yacc.c >nul)
-	$(subst /,\,@copy $(SSYS)/lev_comp.h $(INCL)/lev_comp.h >nul)
-	$(subst /,\,echo.>>$(U)lev_yacc.c)
-	$(subst /,\,echo.>>$(INCL)/lev_comp.h)
-endif
-
-$(U)lev_$(LEX).c: $(U)lev_comp.l
-ifeq  "$(DO_LEX)" "LEX_ACT"
-	$(subst /,\,$(LEX) $(FLEXSKEL) $(U)lev_comp.l)
-	$(subst /,\,copy $(LEXYYC) $@)
-	$(subst /,\,@del $(LEXYYC))
-else
-	@echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
-	@echo ---
-	@echo For now, we will copy the prebuilt lev_lex.c
-	@echo from $(SSYS) into $(UTIL) and use it.
-	$(subst /,\,@copy $(SSYS)/lev_lex.c $@ >nul)
-	$(subst /,\,echo.>>$@)
-endif
+$(U)levcomp.exe: $(LEVCOMPOBJS)
+	@echo Linking $@...
+	@$(link) $(LFLAGSU) -o$@ $(LEVCOMPOBJS)
 
 #==========================================
 # Dungeon Compiler Stuff
 #==========================================
+$(U)dgn_yacc.c: $(U)dgn_comp.y
+	mingw32-make -C ../util -f ../win/win32/dgnstuff-mingw32.mak $(U)dgn_yacc.c
+
+$(INCL)/dgn_comp.h:
+	mingw32-make -C ../include -f ../win/win32/dgnstuff-mingw32.mak $(INCL)/dgn_comp.h
+
+$(U)dgn_lex.c: $(U)dgn_comp.l
+	mingw32-make -C ../util -f ../win/win32/dgnstuff-mingw32.mak $(U)dgn_lex.c
+
+$(O)dgn_yacc.o:	$(HACK_H) $(DGN_FILE_H) $(INCL)/dgn_comp.h $(U)dgn_yacc.c
+	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_yacc.c
+
+$(O)dgn_lex.o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
+	$(U)dgn_lex.c
+	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_lex.c
+
+$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
+	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c
 
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
 	@echo Linking $@...
+	@echo Linking $@...
 	@$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
-
-
-$(O)dgn_yacc.o:   $(HACK_H)   $(DGN_FILE_H) $(INCL)/dgn_comp.h $(U)dgn_yacc.c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_yacc.c
-
-$(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)/dgn_comp.h \
-	 $(U)dgn_$(LEX).c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_$(LEX).c
-
-$(O)dgn_main.o:   $(HACK_H) $(U)dgn_main.c
-	$(cc) $(LEVCFLAGS) -o$@ $(U)dgn_main.c
-
-$(U)dgn_yacc.c $(INCL)/dgn_comp.h : $(U)dgn_comp.y
-ifeq  "$(DO_YACC)" "YACC_ACT"
-	$(subst /,\,$(YACC) -d $(U)dgn_comp.y)
-	$(subst /,\,copy $(YTABC) $(U)dgn_yacc.c)
-	$(subst /,\,copy $(YTABH) $(INCL)/dgn_comp.h)
-	$(subst /,\,@del $(YTABC))
-	$(subst /,\,@del $(YTABH))
-else
-	@echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and
-	@echo $(INCL)/dgn_comp.h run $(YACC).
-	@echo ---
-	@echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
-	@echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
-	$(subst /,\,@copy $(SSYS)/dgn_yacc.c $(U)dgn_yacc.c >nul)
-	$(subst /,\,@copy $(SSYS)/dgn_comp.h $(INCL)/dgn_comp.h >nul)
-	$(subst /,\,echo.>>$(U)dgn_yacc.c)
-	$(subst /,\,echo.>>$(INCL)/dgn_comp.h)
-endif
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l
-ifeq  "$(DO_LEX)" "LEX_ACT"
-	$(subst /,\,$(LEX) $(FLEXSKEL) $(U)dgn_comp.l)
-	$(subst /,\,copy $(LEXYYC) $@)
-	$(subst /,\,@del $(LEXYYC))
-else
-	@echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
-	@echo ---
-	@echo For now, we will copy the prebuilt dgn_lex.c
-	@echo from $(SSYS) into $(UTIL) and use it.
-	$(subst /,\,@copy $(SSYS)/dgn_lex.c $@ >nul)
-	$(subst /,\,echo.>>$@)
-endif
 
 #=================================================
 # For a couple of devteam utilities
@@ -1220,11 +1190,11 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 
 
 $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
-	@echo Creating 16x16 binary tile files (this may take some time)
+	@echo Creating 16x16 binary tile files which may take some time
 	$(subst /,\,@$(U)tile2bmp $(TILEBMP16))
 
 #$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
-#	@echo Creating 32x32 binary tile files (this may take some time)
+#	@echo Creating 32x32 binary tile files which may take some time
 #	$(subst /,\,@$(U)til2bm32 $(TILEBMP32))
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
@@ -1253,97 +1223,150 @@ $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 #==========================================
 
 spotless: clean
-	$(subst /,\,if exist initialchk        del initialchk)
-	$(subst /,\,if exist $(INCL)/date.h    del $(INCL)/date.h)
-	$(subst /,\,if exist $(INCL)/onames.h  del $(INCL)/onames.h)
-	$(subst /,\,if exist $(INCL)/pm.h      del $(INCL)/pm.h)
-	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
-	$(subst /,\,if exist $(SRC)/vis_tab.c  del $(SRC)/vis_tab.c)
-	$(subst /,\,if exist $(SRC)/tile.c     del $(SRC)/tile.c)
-	$(subst /,\,if exist $(U)*.lnk         del $(U)*.lnk)
-	$(subst /,\,if exist $(U)*.map         del $(U)*.map)
-	$(subst /,\,if exist $(DAT)/data       del $(DAT)/data)
-	$(subst /,\,if exist $(DAT)/rumors     del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/???-fil?.lev      del $(DAT)/???-fil?.lev)
-	$(subst /,\,if exist $(DAT)/???-goal.lev      del $(DAT)/???-goal.lev)
-	$(subst /,\,if exist $(DAT)/???-loca.lev      del $(DAT)/???-loca.lev)
-	$(subst /,\,if exist $(DAT)/???-strt.lev      del $(DAT)/???-strt.lev)
-	$(subst /,\,if exist $(DAT)/air.lev      del $(DAT)/air.lev)
-	$(subst /,\,if exist $(DAT)/asmodeus.lev      del $(DAT)/asmodeus.lev)
-	$(subst /,\,if exist $(DAT)/astral.lev   del $(DAT)/astral.lev)
-	$(subst /,\,if exist $(DAT)/baalz.lev    del $(DAT)/baalz.lev)
-	$(subst /,\,if exist $(DAT)/bigrm-*.lev  del $(DAT)/bigrm-*.lev)
-	$(subst /,\,if exist $(DAT)/castle.lev   del $(DAT)/castle.lev)
-	$(subst /,\,if exist $(DAT)/data    del $(DAT)/data)
-	$(subst /,\,if exist $(DAT)/dungeon      del $(DAT)/dungeon)
-	$(subst /,\,if exist $(DAT)/dungeon.pdf  del $(DAT)/dungeon.pdf)
-	$(subst /,\,if exist $(DAT)/earth.lev    del $(DAT)/earth.lev)
-	$(subst /,\,if exist $(DAT)/fakewiz?.lev      del $(DAT)/fakewiz?.lev)
-	$(subst /,\,if exist $(DAT)/fire.lev     del $(DAT)/fire.lev)
-	$(subst /,\,if exist $(DAT)/juiblex.lev  del $(DAT)/juiblex.lev)
-	$(subst /,\,if exist $(DAT)/knox.lev     del $(DAT)/knox.lev)
-	$(subst /,\,if exist $(DAT)/medusa-?.lev      del $(DAT)/medusa-?.lev)
-	$(subst /,\,if exist $(DAT)/mine*.lev    del $(DAT)/mine*.lev)
-	$(subst /,\,if exist $(DAT)/options      del $(DAT)/options)
-	$(subst /,\,if exist $(DAT)/ttyoptions   del $(DAT)/ttyoptions)
-	$(subst /,\,if exist $(DAT)/guioptions   del $(DAT)/guioptions)
-	$(subst /,\,if exist $(DAT)/oracle.lev   del $(DAT)/oracle.lev)
-	$(subst /,\,if exist $(DAT)/oracles      del $(DAT)/oracles)
-	$(subst /,\,if exist $(DAT)/orcus.lev    del $(DAT)/orcus.lev)
-	$(subst /,\,if exist $(DAT)/rumors  del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/quest.dat    del $(DAT)/quest.dat)
-	$(subst /,\,if exist $(DAT)/sanctum.lev  del $(DAT)/sanctum.lev)
-	$(subst /,\,if exist $(DAT)/soko?-?.lev  del $(DAT)/soko?-?.lev)
-	$(subst /,\,if exist $(DAT)/tower?.lev   del $(DAT)/tower?.lev)
-	$(subst /,\,if exist $(DAT)/valley.lev   del $(DAT)/valley.lev)
-	$(subst /,\,if exist $(DAT)/water.lev    del $(DAT)/water.lev)
-	$(subst /,\,if exist $(DAT)/wizard?.lev  del $(DAT)/wizard?.lev)
-	$(subst /,\,if exist sp_lev.tag     del sp_lev.tag)
-	$(subst /,\,if exist $(SRC)/vis_tab.c   del $(SRC)/vis_tab.c)
-	$(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
-	$(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
-	$(subst /,\,if exist nhdat.         del nhdat.)
-	$(subst /,\,if exist $(QT4)/*.moc del $(QT4)/*.moc)
-	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
-	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
-	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
-	$(subst /,\,if exist $(DAT)/porthelp del $(DAT)/porthelp)
-	$(subst /,\,if exist $(INCL)/dgn_comp.h del $(INCL)/dgn_comp.h)
-	$(subst /,\,if exist $(INCL)/lev_comp.h del $(INCL)/lev_comp.h)
-	$(subst /,\,if exist $(MSWSYS)/NetHack.ico del $(MSWSYS)/NetHack.ico)
-	$(subst /,\,if exist $(U)dgn_flex.c del $(U)dgn_flex.c)
-	$(subst /,\,if exist $(U)dgn_yacc.c del $(U)dgn_yacc.c)
-	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
-	$(subst /,\,if exist $(U)lev_flex.c del $(U)lev_flex.c)
-	$(subst /,\,if exist $(U)lev_yacc.c del $(U)lev_yacc.c)
-	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
-	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
-	$(subst /,\,if exist $(U)uudecode.exe del $(U)uudecode.exe)
-	$(subst /,\,if exist $(MSWIN)/NetHack.ico del $(MSWIN)/NetHack.ico)
-	$(subst /,\,if exist $(MSWIN)/mnsel.bmp del $(MSWIN)/mnsel.bmp)
-	$(subst /,\,if exist $(MSWIN)/mnselcnt.bmp del $(MSWIN)/mnselcnt.bmp)
-	$(subst /,\,if exist $(MSWIN)/mnunsel.bmp del $(MSWIN)/mnunsel.bmp)
-	$(subst /,\,if exist $(MSWIN)/petmark.bmp del $(MSWIN)/petmark.bmp)
-	$(subst /,\,if exist $(MSWIN)/pilemark.bmp del $(MSWIN)/pilemark.bmp)
-	$(subst /,\,if exist $(MSWIN)/rip.bmp del $(MSWIN)/rip.bmp)
-	$(subst /,\,if exist $(MSWIN)/splash.bmp del $(MSWIN)/splash.bmp)
+	if exist initialchk del initialchk
 ifneq "$(OBJ)" ""
-	test -d $(OBJ) && rmdir $(OBJ) /S /Q
+	if exist $(W_OBJ)\* rmdir $(W_OBJ) /s /Q
+	if exist $(W_GAMEDIR))\nhdefkey.dll del $(W_GAMEDIR))\nhdefkey.dll
+	if exist $(W_GAMEDIR))\nh340key.dll del $(W_GAMEDIR))\nh340key.dll
+	if exist $(W_GAMEDIR))\nhraykey.dll del $(W_GAMEDIR))\nhraykey.dll
+	if exist $(W_GAMEDIR))\NetHack.exe  del $(W_GAMEDIR))\NetHack.exe
+	if exist $(W_GAMEDIR))\NetHack.pdb  del $(W_GAMEDIR))\NetHack.pdb
+	if exist $(W_GAMEDIR))\nhdat        del $(W_GAMEDIR))\nhdat
 endif
+	if exist $(W_INCL)\date.h          del $(W_INCL)\date.h
+	if exist $(W_INCL)\onames.h        del $(W_INCL)\onames.h
+	if exist $(W_INCL)\pm.h            del $(W_INCL)\pm.h
+	if exist $(W_INCL)\vis_tab.h       del $(W_INCL)\vis_tab.h
+	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
+	if exist $(W_SRC)\tile.c           del $(W_SRC)\tile.c
+	if exist $(W_UTIL)\*.lnk           del $(W_UTIL)\*.lnk
+	if exist $(W_UTIL)\*.map           del $(W_UTIL)\*.map
+	if exist $(W_DAT)\data             del $(W_DAT)\data
+	if exist $(W_DAT)\rumors           del $(W_DAT)\rumors
+	if exist $(W_DAT)\engrave          del $(W_DAT)\engrave
+	if exist $(W_DAT)\epitaph          del $(W_DAT)\epitaph
+	if exist $(W_DAT)\bogusmon         del $(W_DAT)\bogusmon
+	if exist $(W_DAT)\???-fil?.lev	   del $(W_DAT)\???-fil?.lev
+	if exist $(W_DAT)\???-goal.lev	   del $(W_DAT)\???-goal.lev
+	if exist $(W_DAT)\???-loca.lev	   del $(W_DAT)\???-loca.lev
+	if exist $(W_DAT)\???-strt.lev	   del $(W_DAT)\???-strt.lev
+	if exist $(W_DAT)\air.lev          del $(W_DAT)\air.lev
+	if exist $(W_DAT)\asmodeus.lev	   del $(W_DAT)\asmodeus.lev
+	if exist $(W_DAT)\astral.lev	   del $(W_DAT)\astral.lev
+	if exist $(W_DAT)\baalz.lev	   del $(W_DAT)\baalz.lev
+	if exist $(W_DAT)\bigrm-*.lev	   del $(W_DAT)\bigrm-*.lev
+	if exist $(W_DAT)\castle.lev	   del $(W_DAT)\castle.lev
+	if exist $(W_DAT)\data		   del $(W_DAT)\data
+	if exist $(W_DAT)\dungeon          del $(W_DAT)\dungeon
+	if exist $(W_DAT)\dungeon.pdf	   del $(W_DAT)\dungeon.pdf
+	if exist $(W_DAT)\earth.lev	   del $(W_DAT)\earth.lev
+	if exist $(W_DAT)\fakewiz?.lev	   del $(W_DAT)\fakewiz?.lev
+	if exist $(W_DAT)\fire.lev	   del $(W_DAT)\fire.lev
+	if exist $(W_DAT)\juiblex.lev	   del $(W_DAT)\juiblex.lev
+	if exist $(W_DAT)\knox.lev	   del $(W_DAT)\knox.lev
+	if exist $(W_DAT)\medusa-?.lev	   del $(W_DAT)\medusa-?.lev
+	if exist $(W_DAT)\mine*.lev	   del $(W_DAT)\mine*.lev
+	if exist $(W_DAT)\options          del $(W_DAT)\options
+	if exist $(W_DAT)\ttyoptions	   del $(W_DAT)\ttyoptions
+	if exist $(W_DAT)\guioptions       del $(W_DAT)\guioptions
+	if exist $(W_DAT)\oracle.lev       del $(W_DAT)\oracle.lev
+	if exist $(W_DAT)\oracles          del $(W_DAT)\oracles
+	if exist $(W_DAT)\orcus.lev	   del $(W_DAT)\orcus.lev
+	if exist $(W_DAT)\rumors           del $(W_DAT)\rumors
+	if exist $(W_DAT)\quest.dat	   del $(W_DAT)\quest.dat
+	if exist $(W_DAT)\sanctum.lev	   del $(W_DAT)\sanctum.lev
+	if exist $(W_DAT)\soko?-?.lev	   del $(W_DAT)\soko?-?.lev
+	if exist $(W_DAT)\tower?.lev	   del $(W_DAT)\tower?.lev
+	if exist $(W_DAT)\valley.lev	   del $(W_DAT)\valley.lev
+	if exist $(W_DAT)\water.lev	   del $(W_DAT)\water.lev
+	if exist $(W_DAT)\wizard?.lev	   del $(W_DAT)\wizard?.lev
+	if exist $(W_DAT)\dlb.lst          del $(W_DAT)\dlb.lst
+	if exist $(W_DAT)\porthelp	   del $(W_DAT)\porthelp
+	if exist $(W_OBJ)\sp_lev.tag	   del $(W_OBJ)\sp_lev.tag
+	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
+	if exist nhdat.			   del nhdat.
+	if exist $(W_OBJ)\obj.tag          del $(W_OBJ)\obj.tag
+	if exist $(W_OBJ)\gamedir.tag      del $(W_OBJ)\gamedir.tag
+	if exist $(W_OBJ)\nh*key.lib       del $(W_OBJ)\nh*key.lib
+	if exist $(W_OBJ)\nh*key.exp       del $(W_OBJ)\nh*key.exp
+	if exist $(W_MSWIN)\mnsel.bmp      del $(W_MSWIN)\mnsel.bmp
+	if exist $(W_MSWIN)\mnselcnt.bmp   del $(W_MSWIN)\mnselcnt.bmp
+	if exist $(W_MSWIN)\mnunsel.bmp    del $(W_MSWIN)\mnunsel.bmp
+	if exist $(W_MSWIN)\petmark.bmp    del $(W_MSWIN)\petmark.bmp
+	if exist $(W_MSWIN)\pilemark.bmp   del $(W_MSWIN)\pilemark.bmp
+	if exist $(W_MSWIN)\rip.bmp        del $(W_MSWIN)\rip.bmp
+	if exist $(W_MSWIN)\splash.bmp     del $(W_MSWIN)\splash.bmp
+	if exist $(W_MSWIN)\nethack.ico    del $(W_MSWIN)\nethack.ico
+	if exist $(W_MSWSYS)\nethack.ico   del $(W_MSWSYS)\nethack.ico
+	if exist $(W_UTIL)\recover.exe     del $(W_UTIL)\recover.exe
+	if exist $(W_UTIL)\tile2bmp.exe    del $(W_UTIL)\tile2bmp.exe
+	if exist $(W_UTIL)\tilemap.exe     del $(W_UTIL)\tilemap.exe
+	if exist $(W_UTIL)\uudecode.exe    del $(W_UTIL)\uudecode.exe
+	if exist $(W_UTIL)\dlb_main.exe    del $(W_UTIL)\dlb_main.exe
 ifeq "$(ADD_CURSES)" "Y"
-	if exist $(O)pdcurses.lib del $(O)pdcurses.lib
+	if exist $(W_OBJ)\pdcurses.lib     del $(W_OBJ)\pdcurses.lib
 endif
 clean:
-	-test -f install.tag && rm install.tag
-	-test -f utility.tag && rm utility.tag
-	-test -f $(U)makedefs.exe && rm $(U)makedefs.exe
-	-test -f $(U)levcomp.exe && rm $(U)levcomp.exe
-	-test -f $(U)dgncomp.exe && rm $(U)dgncomp.exe
-	-rm $(SRC)/*.lnk
-	-rm $(SRC)/*.map
-	-test -f $(TILEBMP16) && rm $(TILEBMP16)
-	-test -f $(TILEBMP32) && rm $(TILEBMP32)
- 
+	if exist $(W_OBJ)\*.o              del $(W_OBJ)\*.o
+	if exist $(W_OBJ)\utility.tag      del $(W_OBJ)\utility.tag
+	if exist $(W_UTIL)\makedefs.exe    del $(W_UTIL)\makedefs.exe
+	if exist $(W_UTIL)\levcomp.exe     del $(W_UTIL)\levcomp.exe
+	if exist $(W_UTIL)\dgncomp.exe     del $(W_UTIL)\dgncomp.exe
+	if exist $(W_SRC)\*.lnk            del $(W_SRC)\*.lnk
+	if exist $(W_SRC)\*.map            del $(W_SRC)\*.map
+	if exist $(W_OBJ)\install.tag      del $(W_OBJ)\install.tag
+	if exist $(W_OBJ)\console.res      del $(W_OBJ)\console.res
+	if exist $(W_OBJ)\dgncomp.MAP      del $(W_OBJ)\dgncomp.MAP
+	if exist $(W_OBJ)\dgncomp.PDB      del $(W_OBJ)\dgncomp.PDB
+	if exist $(W_OBJ)\dlb_main.MAP     del $(W_OBJ)\dlb_main.MAP
+	if exist $(W_OBJ)\dlb_main.PDB     del $(W_OBJ)\dlb_main.PDB
+	if exist $(W_OBJ)\gamedir.tag      del $(W_OBJ)\gamedir.tag
+	if exist $(W_OBJ)\levcomp.MAP      del $(W_OBJ)\levcomp.MAP
+	if exist $(W_OBJ)\levcomp.PDB      del $(W_OBJ)\levcomp.PDB
+	if exist $(W_OBJ)\makedefs.MAP     del $(W_OBJ)\makedefs.MAP
+	if exist $(W_OBJ)\makedefs.PDB     del $(W_OBJ)\makedefs.PDB
+	if exist $(W_OBJ)\NetHack.MAP      del $(W_OBJ)\NetHack.MAP
+	if exist $(W_OBJ)\nh340key.def     del $(W_OBJ)\nh340key.def
+	if exist $(W_OBJ)\nh340key.exp     del $(W_OBJ)\nh340key.exp
+	if exist $(W_OBJ)\nh340key.lib     del $(W_OBJ)\nh340key.lib
+	if exist $(W_OBJ)\nh340key.map     del $(W_OBJ)\nh340key.map
+	if exist $(W_OBJ)\nh340key.PDB     del $(W_OBJ)\nh340key.PDB
+	if exist $(W_OBJ)\nhdefkey.def     del $(W_OBJ)\nhdefkey.def
+	if exist $(W_OBJ)\nhdefkey.exp     del $(W_OBJ)\nhdefkey.exp
+	if exist $(W_OBJ)\nhdefkey.lib     del $(W_OBJ)\nhdefkey.lib
+	if exist $(W_OBJ)\nhdefkey.map     del $(W_OBJ)\nhdefkey.map
+	if exist $(W_OBJ)\nhdefkey.PDB     del $(W_OBJ)\nhdefkey.PDB
+	if exist $(W_OBJ)\nhraykey.def     del $(W_OBJ)\nhraykey.def
+	if exist $(W_OBJ)\nhraykey.exp     del $(W_OBJ)\nhraykey.exp
+	if exist $(W_OBJ)\nhraykey.lib     del $(W_OBJ)\nhraykey.lib
+	if exist $(W_OBJ)\nhraykey.map     del $(W_OBJ)\nhraykey.map
+	if exist $(W_OBJ)\nhraykey.PDB     del $(W_OBJ)\nhraykey.PDB
+	if exist $(W_OBJ)\envchk.tag       del $(W_OBJ)\envchk.tag
+	if exist $(W_OBJ)\obj.tag          del $(W_OBJ)\obj.tag
+	if exist $(W_OBJ)\sp_lev.tag       del $(W_OBJ)\sp_lev.tag
+	if exist $(W_OBJ)\uudecode.MAP     del $(W_OBJ)\uudecode.MAP
+	if exist $(W_OBJ)\uudecode.PDB     del $(W_OBJ)\uudecode.PDB
+	rem
+	rem defer to the steps in ../win/win32/levstuff-mingw32.mak
+	rem 
+	mingw32-make -f ../win/win32/levstuff-mingw32.mak clean
+	rem
+	rem defer to the steps in ../win/win32/dgnstuff-mingw32.mak
+	mingw32-make -f ../win/win32/dgnstuff-mingw32.mak clean
+	$(subst /,\,if exist $(TILEBMP16) del $(TILEBMP16))
+	$(subst /,\,if exist $(TILEBMP32) del $(TILEBMP32))
+
+#clean:
+#	-test -f install.tag && del install.tag
+#	-test -f utility.tag && del utility.tag
+#	-test -f $(U)makedefs.exe && del $(U)makedefs.exe
+#	-test -f $(U)levcomp.exe && del $(U)levcomp.exe
+#	-test -f $(U)dgncomp.exe && del $(U)dgncomp.exe
+#	-del $(SRC)/*.lnk
+#	-del $(SRC)/*.map
+#	-test -f $(TILEBMP16) && del $(TILEBMP16)
+#	-test -f $(TILEBMP32) && del $(TILEBMP32)
+# 
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
@@ -1406,10 +1429,10 @@ endif
 ifeq "$(WANT_WIN_QT4)" "Y"
 # Qt dependencies
 
-$(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
+$(GAMEDIR))/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
 	$(subst /,\,@copy $< $@ >nul)
 
-$(GAMEDIR)/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
+$(GAMEDIR))/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
 	$(subst /,\,@copy $< $@ >nul)
 
 $(GAMEDIR)/Qt5Widgets.dll : $(QT4_DIRECTORY)/bin/Qt5Widgets.dll
