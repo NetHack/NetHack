@@ -1229,12 +1229,13 @@ spotless: clean
 	if exist objdir.tag del objdir.tag
 	if exist gamedir.tag del gamedir.tag
 ifneq "$(W_GAMEDIR)" ""
-	if exist $(W_GAMEDIR))\nhdefkey.dll del $(W_GAMEDIR))\nhdefkey.dll
-	if exist $(W_GAMEDIR))\nh340key.dll del $(W_GAMEDIR))\nh340key.dll
-	if exist $(W_GAMEDIR))\nhraykey.dll del $(W_GAMEDIR))\nhraykey.dll
-	if exist $(W_GAMEDIR))\NetHack.exe  del $(W_GAMEDIR))\NetHack.exe
-	if exist $(W_GAMEDIR))\NetHack.pdb  del $(W_GAMEDIR))\NetHack.pdb
-	if exist $(W_GAMEDIR))\nhdat        del $(W_GAMEDIR))\nhdat
+	if exist $(W_GAMEDIR)\NetHack.exe  del $(W_GAMEDIR)\NetHack.exe
+	if exist $(W_GAMEDIR)\nhdefkey.dll del $(W_GAMEDIR)\nhdefkey.dll
+	if exist $(W_GAMEDIR)\nh340key.dll del $(W_GAMEDIR)\nh340key.dll
+	if exist $(W_GAMEDIR)\nhraykey.dll del $(W_GAMEDIR)\nhraykey.dll
+	if exist $(W_GAMEDIR)\NetHack.exe  del $(W_GAMEDIR)\NetHack.exe
+	if exist $(W_GAMEDIR)\NetHack.pdb  del $(W_GAMEDIR)\NetHack.pdb
+	if exist $(W_GAMEDIR)\nhdat        del $(W_GAMEDIR)\nhdat
 endif
 ifneq "$(W_SRC)" ""
 	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
