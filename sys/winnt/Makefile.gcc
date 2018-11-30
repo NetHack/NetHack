@@ -456,18 +456,16 @@ DATABASE = $(DAT)/data.base
 #==========================================
 #
 ifeq "$(ADD_CURSES)" "Y"
-#CURSESDEF=-D"PDC_DLL_BUILD" -D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
 CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
 else
 CURSDEF=
 CURSESLIB=
-CURSESINCL=
 endif
 
 ifneq  "$(ADD_CURSES)" "Y"
 INCLDIR=-I../include -I../sys/winnt
 else
-INCLDIR=-I../include -I../sys/winnt -I$(CURSESINCL)
+INCLDIR=-I../include -I../sys/winnt
 endif
 
 #==========================================
@@ -601,8 +599,8 @@ $(OBJ)/%.o : $(UTIL)/%.c
 $(OBJ)/%.o : $(WSHR)/%.c
 	$(cc) $(CFLAGS)  -o$@ $<
 
-$(INCL)/%.h : $(WSHR)/%.h
-	@copy $< $@
+#$(INCL)/%.h : $(WSHR)/%.h
+#	@copy $< $@
 
 #{$(WSHR)}.txt{$(DAT)}.txt:
 #	@copy $< $@
@@ -667,8 +665,6 @@ YACC=
 #LEX    = lex
 #LEX    = flex
 LEX=
-export YACC
-export LEX
 
 #
 # - Specify your flex skeleton file (if needed).
@@ -681,6 +677,12 @@ YTABC   = y_tab.c
 YTABH   = y_tab.h
 LEXYYC  = lexyy.c
 
+export YACC
+export LEX
+export FLEXSKEL
+export YTABC
+export YTABH
+export LEXYYC
 
 #==========================================
 # Rules for files in win/Qt4
@@ -811,10 +813,10 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/winhack.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
 	 $(MSWIN)/petmark.bmp $(MSWIN)/pilemark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
 	 $(MSWIN)/splash.bmp
-	@$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
+	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
 
 $(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
-	@$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
+	$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
 
 #==========================================
 #  The game targets.
@@ -886,9 +888,9 @@ initialchk: objdir.tag
 	@echo ----
 
 objdir.tag:
-	test -d $(OBJ) || echo creating directory $(OBJ)
-	test -d $(OBJ) || mkdir $(OBJ)
-	test -d $(OBJ) && echo directory created > $@
+	@test -d $(OBJ) || echo creating directory $(OBJ)
+	@test -d $(OBJ) || mkdir $(OBJ)
+	@test -d $(OBJ) && echo directory created > $@
 
 #==========================================
 #=========== SECONDARY TARGETS ============
@@ -899,7 +901,7 @@ objdir.tag:
 #==========================================
 
 $(U)makedefs.exe: $(MAKEOBJS)
-	@$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
+	$(link) $(LFLAGSU) -o$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 	 $(INCL)/objclass.h $(INCL)/monsym.h $(INCL)/qtext.h \
@@ -956,7 +958,7 @@ $(DAT)/dungeon: utility.tag  $(DAT)/dungeon.def
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-	@$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
+	$(link) $(LFLAGSU) -o$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)/uudecode.c
 
@@ -1030,7 +1032,7 @@ $(O)lev_main.o:   $(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
 
 $(U)levcomp.exe: $(LEVCOMPOBJS)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(LEVCOMPOBJS)
+	$(link) $(LFLAGSU) -o$@ $(LEVCOMPOBJS)
 
 #==========================================
 # Dungeon Compiler Stuff
@@ -1057,7 +1059,7 @@ $(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
 	@echo Linking $@...
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
+	$(link) $(LFLAGSU) -o$@ $(DGNCOMPOBJS)
 
 #=================================================
 # For a couple of devteam utilities
@@ -1065,11 +1067,11 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 
 $(U)nhsizes.exe: $(O)nhsizes.o
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o$(U)nhsizes.exe: $(O)nhsizes.o
+	$(link) $(LFLAGSU) -o$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o$(U)nhsizes.exe: $(O)nhsizes.o
 
 $(U)nhsize2.exe: $(O)nhsizes2.o
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(O)nhsizes2.o $(O)panic.o $(O)alloc.o
+	$(link) $(LFLAGSU) -o$@ $(O)nhsizes2.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
 	$(cc) $(CFLAGSU) -o$@ nhsizes.c
@@ -1087,7 +1089,7 @@ $(O)nhsizes2.o: $(CONFIG_H) nhsizes2.c
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
-	@$(link) $(LFLAGSU) -o$@ $(O)dlb_main.o $(O)dlb.o $(O)alloc.o $(O)panic.o
+	$(link) $(LFLAGSU) -o$@ $(O)dlb_main.o $(O)dlb.o $(O)alloc.o $(O)panic.o
 
 
 $(O)dlb.o:   $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)/dlb.h
@@ -1146,7 +1148,7 @@ $(SRC)/tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
-	@$(link) $(LFLAGSU) -o$@ $(O)tilemap.o
+	$(link) $(LFLAGSU) -o$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H)
 	$(cc) $(CFLAGSU) -o$@ $(WSHR)/tilemap.c
@@ -1178,16 +1180,16 @@ $(O)tilete32.o: $(WSHR)/tiletext.c  $(CONFIG_H) $(TILE_H)
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(GIFREADERS) $(TEXT_IO)
+	$(link) $(LFLAGSU) -o$@ $(GIFREADERS) $(TEXT_IO)
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(GIFREADERS32) $(TEXT_IO32)
+	$(link) $(LFLAGSU) -o$@ $(GIFREADERS32) $(TEXT_IO32)
 
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(PPMWRITERS) $(TEXT_IO)
+	$(link) $(LFLAGSU) -o$@ $(PPMWRITERS) $(TEXT_IO)
 
 
 $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
@@ -1200,11 +1202,11 @@ $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(O)tile2bmp.o $(TEXT_IO)
+	$(link) $(LFLAGSU) -o$@ $(O)tile2bmp.o $(TEXT_IO)
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 	@echo Linking $@...
-	@$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
+	$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
 
 $(O)tile2bmp.o: $(WSHR)/tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h
 	$(cc) $(CFLAGS) -mno-ms-bitfields -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
@@ -1421,13 +1423,13 @@ $(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
 #include the following stub for proper linkage.
 
 $(O)guistub.o: $(HACK_H) $(MSWSYS)/stubs.c
-	@$(cc) $(CFLAGS) -DGUISTUB  -o$@ $(MSWSYS)/stubs.c
+	$(cc) $(CFLAGS) -DGUISTUB  -o$@ $(MSWSYS)/stubs.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
 
 $(O)ttystub.o: $(HACK_H) $(MSWSYS)/stubs.c
-	@$(cc) $(CFLAGS) -DTTYSTUB -o$@ $(MSWSYS)/stubs.c
+	$(cc) $(CFLAGS) -DTTYSTUB -o$@ $(MSWSYS)/stubs.c
 
 $(O)tile.o: $(SRC)/tile.c $(HACK_H)
 
