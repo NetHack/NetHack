@@ -29,6 +29,7 @@ mswin_destroy_reg()
  */
 #ifdef __MINGW32__
 extern char default_window_sys[];
+extern int mingw_main(int argc, char **argv);
 
 int
 main(argc, argv)
@@ -37,10 +38,7 @@ char *argv[];
 {
     boolean resuming;
 
-    sys_early_init();
-    Strcpy(default_window_sys, "tty");
-    resuming = pcmain(argc, argv);
-    moveloop(resuming);
+    resuming = mingw_main(argc, argv);
     nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
