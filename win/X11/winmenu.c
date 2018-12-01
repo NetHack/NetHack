@@ -1162,7 +1162,7 @@ struct menu *curr_menu;
         XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
         XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
 
-        if (!iflags.use_menu_color
+        if (!iflags.use_menu_color || wp->menu_information->disable_mcolors
             || !get_menu_coloring(curr->str, &color, &attr))
             attr = curr->attr;
 

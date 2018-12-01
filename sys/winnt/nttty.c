@@ -1889,7 +1889,7 @@ void nethack_enter_nttty()
             error("Unable to load nhraykey.dll");
     }
 }
-#endif TTY_GRAPHICS
+#endif /* TTY_GRAPHICS */
 
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet

@@ -165,6 +165,7 @@ struct menu_info_t {
     boolean cancelled; /* Menu has been explicitly cancelled. */
     boolean counting;  /* true when menu_count has a valid value */
     boolean permi;
+    boolean disable_mcolors; /* disable menucolors */
 
     int permi_x, permi_y; /* perm_invent window x,y */
     int permi_w, permi_h; /* perm_invent window wid, hei */

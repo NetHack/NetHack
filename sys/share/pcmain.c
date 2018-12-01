@@ -87,9 +87,12 @@ unsigned _stklen = STKSIZ;
  * to help MinGW decide which entry point to choose. If both main and
  * WinMain exist, the resulting executable won't work correctly.
  */
-#ifndef __MINGW32__
 int
+#ifndef __MINGW32__ 
 main(argc, argv)
+#else
+mingw_main(argc, argv)
+#endif
 int argc;
 char *argv[];
 {
@@ -115,7 +118,6 @@ char *argv[];
     /*NOTREACHED*/
     return 0;
 }
-#endif
 
 boolean
 pcmain(argc, argv)

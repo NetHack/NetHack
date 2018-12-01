@@ -229,6 +229,11 @@ stinking cloud placed near water could kill underwater creatures
 applying--rather than wielding--a cursed polearm or weapon-tool didn't report
 	that it had become welded to hero's hand(s)
 the message when riding a steed into a pit was composed but not shown
+dismount that kills steed because there is no room to put it on map blamed the
+	hero; change that to only blame hero if dismount was voluntary
+to emphasize that it's not a light source, change description of wielded Sting
+	from "(glowing light blue)" to "(light blue aura)" when sighted and
+	from "(glowing)" to nothing (not warm enough to feel) when blind
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -328,6 +333,9 @@ X11: don't reuse perm_invent window for picking an object
 X11: obey mouse_support and allow toggling it in game
 X11: obey menu movement keys
 X11: enable menu [cancel] button for PICK_NONE menus
+X11: text popups on OSX wouldn't accept keyboard input unless the 'autofocus'
+	resource was enabled; most noticeable when trying to dismiss 'things
+	that are here' while walking over object piles
 
 
 General New Features
