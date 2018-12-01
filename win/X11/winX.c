@@ -1962,6 +1962,7 @@ boolean complain;
         wp->title = dupstr(str);
 
     wp->menu_information->permi = FALSE;
+    wp->menu_information->disable_mcolors = TRUE;
     (void) X11_select_menu(newwin, PICK_NONE, &menu_list);
     X11_destroy_nhwindow(newwin);
 }

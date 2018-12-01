@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1542388601 2018/11/16 17:16:41 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.31 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1543545915 2018/11/30 02:45:15 $	$NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -140,9 +140,9 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	   config.h config1.h context.h coord.h decl.h def_os2.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
-	   hack.h lev.h macconf.h mextra.h mfndpos.h micro.h \
-	   mkroom.h monattk.h mondata.h monflag.h monst.h monsym.h obj.h \
-	   objclass.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	   hack.h lev.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
+	   os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
 	   tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
@@ -206,8 +206,8 @@ nethack.opt :	$(MAKEFILE)	# this file
       @ write f f$edit("$(HOBJ5)","COLLAPSE")
       @ write f f$edit("$(HOBJ6)","COLLAPSE")
       @ write f "sys$library:starlet.olb/Include=(lib$initialize)
-      @ write f \
- "psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long"
+      @ write f "! psect_attributes Usr, noPic, and Long removed"
+      @ write f "psect_attr=lib$initialize, Con,Rel,Gbl,noShr,noExe,Rd,noWrt"
       @ write f "iosegment=128"
 	close f
 
@@ -378,7 +378,7 @@ attrib.obj :	attrib.c $(HACK_H)
 ball.obj :	ball.c $(HACK_H)
 bones.obj :	bones.c $(HACK_H) $(INC)lev.h
 botl.obj :	botl.c $(HACK_H)
-cmd.obj :	cmd.c $(HACK_H) $(INC)func_tab.h
+cmd.obj :	cmd.c $(HACK_H) $(INC)lev.h $(INC)func_tab.h
 dbridge.obj :	dbridge.c $(HACK_H)
 decl.obj :	decl.c $(HACK_H)
 detect.obj :	detect.c $(HACK_H) $(INC)artifact.h

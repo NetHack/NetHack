@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintext.c	$NHDT-Date: 1450453309 2015/12/18 15:41:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	wintext.c	$NHDT-Date: 1543622533 2018/12/01 00:02:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -281,11 +281,9 @@ struct xwindow *wp;
 #endif
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, True), num_args++;
     XtSetArg(args[num_args], XtNtranslations,
-             XtParseTranslationTable(text_translations));
-    num_args++;
+             XtParseTranslationTable(text_translations)), num_args++;
 
 #ifdef TRANSIENT_TEXT
     wp->popup = XtCreatePopupShell("text", transientShellWidgetClass,
@@ -299,8 +297,9 @@ struct xwindow *wp;
         XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_text()"));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, True), num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(text_translations)), num_args++;
     form = XtCreateManagedWidget("form", formWidgetClass, wp->popup, args,
                                  num_args);
 

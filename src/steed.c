@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1542765364 2018/11/21 01:56:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1543543362 2018/11/30 02:02:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -481,7 +481,7 @@ int reason; /* Player was thrown off etc. */
 {
     struct monst *mtmp;
     struct obj *otmp;
-    coord cc;
+    coord cc, steedcc;
     const char *verb = "fall";
     boolean repair_leg_damage = (Wounded_legs != 0L);
     unsigned save_utrap = u.utrap;
@@ -548,19 +548,55 @@ int reason; /* Player was thrown off etc. */
     /* Release the steed and saddle */
     u.usteed = 0;
     u.ugallop = 0L;
-
-    /* Set player and steed's position.  Try moving the player first
-       unless we're in the midst of creating a bones file. */
-    if (reason == DISMOUNT_BONES) {
-        /* move the steed to an adjacent square */
-        if (enexto(&cc, u.ux, u.uy, mtmp->data))
-            rloc_to(mtmp, cc.x, cc.y);
-        else /* evidently no room nearby; move steed elsewhere */
-            (void) rloc(mtmp, FALSE);
-        return;
+    /*
+     * rloc(), rloc_to(), and monkilled()->mondead()->m_detach() all
+     * expect mtmp to be on the map or else have mtmp->mx be 0, but
+     * setting the latter to 0 here would interfere with dropping
+     * the saddle.  Prior to 3.6.2, being off the map didn't matter.
+     *
+     * place_monster() expects mtmp to be alive and not be u.usteed.
+     *
+     * Unfortunately, <u.ux,u.uy> (former steed's implicit location)
+     * might now be occupied by an engulfer, so we can't just put mtmp
+     * at that spot.  An engulfer's previous spot will be unoccupied
+     * but we don't know where that was and even if we did, it might
+     * be hostile terrain.
+     */
+    steedcc.x = u.ux, steedcc.y = u.uy;
+    if (m_at(u.ux, u.uy)) {
+        /* hero's spot has a monster in it; hero must have been plucked
+           from saddle as engulfer moved into his spot--other dismounts
+           shouldn't run into this situation; find nearest viable spot */
+        if (!enexto(&steedcc, u.ux, u.uy, mtmp->data)
+            /* no spot? must have been engulfed by a lurker-above over
+               water or lava; try requesting a location for a flyer */
+            && !enexto(&steedcc, u.ux, u.uy, &mons[PM_BAT]))
+            /* still no spot; last resort is any spot within bounds */
+            (void) enexto(&steedcc, u.ux, u.uy, &mons[PM_GHOST]);
     }
+    if (!m_at(steedcc.x, steedcc.y)) {
+        if (mtmp->mhp < 1)
+            mtmp->mhp = 0; /* make sure it isn't negative */
+        mtmp->mhp++; /* force at least one hit point, possibly resurrecting */
+        place_monster(mtmp, steedcc.x, steedcc.y);
+        mtmp->mhp--; /* take the extra hit point away: cancel resurrection */
+    } else {
+        impossible("Dismounting: can't place former steed on map.");
+    }
+
     if (!DEADMONSTER(mtmp)) {
-        place_monster(mtmp, u.ux, u.uy);
+        /* if for bones, there's no reason to place the hero;
+           we want to make room for potential ghost, so move steed */
+        if (reason == DISMOUNT_BONES) {
+            /* move the steed to an adjacent square */
+            if (enexto(&cc, u.ux, u.uy, mtmp->data))
+                rloc_to(mtmp, cc.x, cc.y);
+            else /* evidently no room nearby; move steed elsewhere */
+                (void) rloc(mtmp, FALSE);
+            return;
+        }
+
+        /* Set hero's and/or steed's positions.  Try moving the hero first. */
         if (!u.uswallow && !u.ustuck && have_spot) {
             struct permonst *mdat = mtmp->data;
 
@@ -614,20 +650,29 @@ int reason; /* Player was thrown off etc. */
                 if (save_utrap)
                     (void) mintrap(mtmp);
             }
-            /* Couldn't... try placing the steed */
+
+        /* Couldn't move hero... try moving the steed. */
         } else if (enexto(&cc, u.ux, u.uy, mtmp->data)) {
             /* Keep player here, move the steed to cc */
             rloc_to(mtmp, cc.x, cc.y);
             /* Player stays put */
-            /* Otherwise, kill the steed */
-        } else {
-            killed(mtmp);
-            adjalign(-1);
-        }
-    }
 
-    /* Return the player to the floor */
-    if (reason != DISMOUNT_ENGULFED) {
+        /* Otherwise, kill the steed. */
+        } else {
+            if (reason == DISMOUNT_BYCHOICE) {
+                /* [un]#ride: hero gets credit/blame for killing steed */
+                killed(mtmp);
+                adjalign(-1);
+            } else {
+                /* other dismount: kill former steed with no penalty;
+                   damage type is just "neither AD_DGST nor -AD_RBRE" */
+                monkilled(mtmp, "", -AD_PHYS);
+            }
+        }
+    } /* !DEADMONST(mtmp) */
+
+    /* usually return the hero to the surface */
+    if (reason != DISMOUNT_ENGULFED && reason != DISMOUNT_BONES) {
         in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
         in_steed_dismounting = FALSE;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1524413707 2018/04/22 16:15:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1543465755 2018/11/29 04:29:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -87,9 +87,12 @@ unsigned _stklen = STKSIZ;
  * to help MinGW decide which entry point to choose. If both main and
  * WinMain exist, the resulting executable won't work correctly.
  */
-#ifndef __MINGW32__
 int
+#ifndef __MINGW32__ 
 main(argc, argv)
+#else
+mingw_main(argc, argv)
+#endif
 int argc;
 char *argv[];
 {
@@ -115,7 +118,6 @@ char *argv[];
     /*NOTREACHED*/
     return 0;
 }
-#endif
 
 boolean
 pcmain(argc, argv)
@@ -177,7 +179,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     choose_windows(DEFAULT_WINDOW_SYS);
 #else
     choose_windows(default_window_sys);
-    if (argc > 1
+    if (argc >= 1
         && !strcmpi(default_window_sys, "mswin")
         && strstri(argv[0], "nethackw.exe"))
         iflags.windowtype_locked = TRUE;

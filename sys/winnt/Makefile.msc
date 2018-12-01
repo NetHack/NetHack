@@ -71,8 +71,7 @@ DEBUGINFO = Y
 #
 #    You'll have to set PDCURSES_H to the correct location of the 
 #    PDCurses header (.h) files and PDCURSES_C to the location
-#    of your PDCurses C files which must already be resident on 
-#    your machine.
+#    of your PDCurses C files.
 #
 ADD_CURSES=Y
 PDCURSES_TOP=..\..\pdcurses
@@ -90,8 +89,12 @@ PDCURSES_TOP=..\..\pdcurses
 # Nothing below here should have to be changed.#
 #                                              #
 ################################################
+
 #
 #==============================================================================
+
+#  Set the gamedir according to your preference.  
+#  If not present prior to compilation it gets created.
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -115,10 +118,11 @@ WSHR    = ..\win\share   # Tile support files
 
 OBJ     = o
 
-cc=cl
-link=link
-rc=Rc
-
+#
+#==========================================
+# Exe File Info.
+#==========================================
+ 
 #        
 #
 # Optional high-quality BSD random number generation routines
@@ -150,93 +154,6 @@ DLBFLG =
 #
 
 #ZLIB = zlib.lib
-
-#==========================================
-#==========================================
-# Setting up the compiler and linker
-#==========================================
-#==========================================
-
-# Before we get started, this section is used to determine the version of 
-# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
-# is too old or untested.
-#
-#NMAKE version 1414264330 is distributed with VS 15.7.5
-
-#!MESSAGE $(MAKEFLAGS)
-#!MESSAGE $(MAKEDIR)
-#!MESSAGE $(MAKE)
-
-MAKEVERSION=$(_NMAKE_VER:.= )
-MAKEVERSION=$(MAKEVERSION: =)
-#!MESSAGE $(_NMAKE_VER)
-#!MESSAGE $(MAKEVERSION)
-
-VSNEWEST=2017
-!IF ($(MAKEVERSION) < 1000000000)
-VSVER=0000		#untested ancient version
-!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
-VSVER=2010
-!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
-VSVER=2012
-!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
-VSVER=2013
-!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
-VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
-VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1414264330)
-VSVER=2999              #untested future version
-!ENDIF
-
-!IF ($(VSVER) >= 2012)
-!MESSAGE Autodetected Visual Studio $(VSVER)
-!ELSEIF ($(VSVER) == 2999
-!MESSAGE The version of Visual Studio is newer than the most recent at
-!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
-!MESSAGE Because it is newer we'll proceed expecting that the 
-!MESSAGE VS$(VSNEWEST) processing will still work.
-!ELSEIF ($(VSVER) == 0000)
-!MESSAGE The version of Visual Studio appears to be quite old, older
-!MESSAGE than VS2010 which is the oldest supported version by this
-!MESSAGE Makefile, so we'll stop now.
-!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
-!ENDIF
-
-!IF ($(VSVER) == 2010)
-# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
-# DO NOT DELETE THE FOLLOWING LINE
-!include <win32.mak>
-! ENDIF
-
-#These will be in the environment variables with one of the VS2017
-#developer command prompts.
-#VSCMD_ARG_HOST_ARCH=x64
-#VSCMD_ARG_TGT_ARCH=x86
-
-!IFDEF VSCMD_ARG_HOST_ARCH
-!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
-!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
-! IFNDEF TARGET_CPU
-!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
-TARGET_CPU=x64
-!  ELSE
-TARGET_CPU=x86
-!  ENDIF
-! ENDIF
-!ENDIF
-
-!IF "$(TARGET_CPU)" == ""
-TARGET_CPU=x86
-!ENDIF
-
-!IF ($(VSVER) == 2010)
-CL_RECENT=
-!ELSE
-! IF ($(VSVER) > 2010)
-CL_RECENT=-sdl
-! ENDIF
-!ENDIF
 
 
 #==========================================
@@ -272,7 +189,7 @@ RECOVOBJS      = $(O)recover.o
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
 #
-# These are not invoked during a normal game build in 3.4+
+# These are not invoked during a normal game build in 3.4
 #
 TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
 		 $(O)decl.o	$(O)monst.o	$(O)objects.o
@@ -298,19 +215,19 @@ VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
 VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
 VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o
-VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
-VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
-VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
-VOBJ14 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
-VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
-VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o
-VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o
-VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o
-VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o
-VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o
-VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o
-VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o
+VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
+VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
+VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
+VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
+VOBJ14 = $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
+VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
+VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
+VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
+VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o     
+VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o    
+VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o  
+VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
 VOBJ23 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
 VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
@@ -354,8 +271,7 @@ GUIHDR	= $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 
 COMCTRL = comctl32.lib
 
-KEYDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll \
-	$(GAMEDIR)\nhraykey.dll
+KEYDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
 
 TILEUTIL16  = $(UTIL)\tile2bmp.exe
 TILEBMP16   = $(SRC)\tiles.bmp
@@ -438,29 +354,107 @@ TILE_H      = ..\win\share\tile.h
 DATABASE = $(DAT)\data.base
 
 #==========================================
+#==========================================
+# Setting up the compiler and linker
+#==========================================
+#==========================================
+
+cc=cl
+link=link
+rc=Rc
+
+# Before we get started, this section is used to determine the version of 
+# Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
+# is too old or untested.
+#
+#NMAKE version 1414264330 is distributed with VS 15.7.5
+
+#!MESSAGE $(MAKEFLAGS)
+#!MESSAGE $(MAKEDIR)
+#!MESSAGE $(MAKE)
+
+MAKEVERSION=$(_NMAKE_VER:.= )
+MAKEVERSION=$(MAKEVERSION: =)
+#!MESSAGE $(_NMAKE_VER)
+#!MESSAGE $(MAKEVERSION)
+
+VSNEWEST=2017
+!IF ($(MAKEVERSION) < 1000000000)
+VSVER=0000		#untested ancient version
+!ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
+VSVER=2010
+!ELSEIF ($(MAKEVERSION) > 1100000000) && ($(MAKEVERSION) < 1200000000)
+VSVER=2012
+!ELSEIF ($(MAKEVERSION) > 1200000000) && ($(MAKEVERSION) < 1400000000)
+VSVER=2013
+!ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
+VSVER=2015
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1414264331)
+VSVER=$(VSNEWEST)
+!ELSEIF ($(MAKEVERSION) > 1414264330)
+VSVER=2999              #untested future version
+!ENDIF
+
+!IF ($(VSVER) >= 2012)
+!MESSAGE Autodetected Visual Studio $(VSVER)
+!ELSEIF ($(VSVER) == 2999
+!MESSAGE The version of Visual Studio is newer than the most recent at
+!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
+!MESSAGE Because it is newer we'll proceed expecting that the 
+!MESSAGE VS$(VSNEWEST) processing will still work.
+!ELSEIF ($(VSVER) == 0000)
+!MESSAGE The version of Visual Studio appears to be quite old, older
+!MESSAGE than VS2010 which is the oldest supported version by this
+!MESSAGE Makefile, so we'll stop now.
+!ERROR Untested old Visual Studio version with NMAKE $(_NMAKE_VER).
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
+# DO NOT DELETE THE FOLLOWING LINE
+!include <win32.mak>
+! ENDIF
+
+#These will be in the environment variables with one of the VS2017
+#developer command prompts.
+#VSCMD_ARG_HOST_ARCH=x64
+#VSCMD_ARG_TGT_ARCH=x86
+
+!IFDEF VSCMD_ARG_HOST_ARCH
+!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
+!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
+! IFNDEF TARGET_CPU
+!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
+TARGET_CPU=x64
+!  ELSE
+TARGET_CPU=x86
+!  ENDIF
+! ENDIF
+!ENDIF
+
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
+!IF ($(VSVER) == 2010)
+CL_RECENT=
+!ELSE
+! IF ($(VSVER) > 2010)
+CL_RECENT=-sdl
+! ENDIF
+!ENDIF
+
+#==========================================
 # More compiler setup post-macros
 #==========================================
 #----------------------------------------------------------------
 
 !IF "$(ADD_CURSES)" == "Y"
-#CURSESDEF=-D"PDC_DLL_BUILD" -D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
 CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
-CURSESINCL=..\win\curses
 !ELSE
 CURSDEF=
 CURSESLIB=
-CURSESINCL=
 !ENDIF
-
-!IFNDEF ADD_CURSES
-INCLDIR= /I..\include /I..\sys\winnt
-!ELSE
-INCLDIR= /I..\include /I..\sys\winnt /I$(CURSESINCL)
-!ENDIF
-
-#===========================================
-#---- start of Visual Studio Specific macros
-#===========================================
 
 ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
 	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
@@ -531,6 +525,12 @@ conlibs     = $(baselibs)
 guilibs     = $(winlibs)
 #
 
+!IFNDEF ADD_CURSES
+INCLDIR= /I..\include /I..\sys\winnt
+!ELSE
+INCLDIR= /I..\include /I..\sys\winnt
+!ENDIF
+
 #==========================================
 # Util builds
 #==========================================
@@ -549,10 +549,6 @@ DLB = nhdat
 ! ELSE
 DLB =
 ! ENDIF
-
-#==========================================
-#---- end of Visual Studio Specific macros
-#==========================================
 
 #==========================================
 #================ RULES ==================
@@ -632,6 +628,9 @@ DLB =
 {$(WCURSES)}.c{$(OBJ)}.o:
 	@$(cc) $(PDCINCL) $(cflagsBuild)  -Fo$@ $<
 
+#{$(WCURSES)}.txt{$(DAT)}.txt:
+#	@copy $< $@
+
 #==========================================
 # Rules for files in PDCurses
 #==========================================
@@ -683,12 +682,10 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	$(U)makedefs -c
-	-if not exist $(GAMEDIR)\defaults.nh copy fixed_defaults.nh   $(GAMEDIR)\defaults.nh
-	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
-	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
+	-if not exist $(GAMEDIR)\defaults.nh copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 
 #	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
@@ -753,10 +750,10 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
 
 
-#==========================================================================
+#==========================================
 #  The game targets.
-#==========================================================================
-#[VS-start] Visual C
+#==========================================
+
 #  The section for linking the NetHack image looks a little strange at 
 #  first, especially if you are used to UNIX makes, or NDMAKE.  It is 
 #  Microsoft nmake specific, and it gets around the problem of the 
@@ -778,8 +775,6 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 #                       with ^ as we have done below.  Every occurence
 #                       of a <tab> in $(ALLOBJ) is replaced by 
 #                       <+><return><tab>.
-#[VS-end]
-#==========================================================================
 
 GAMEOBJ=$(ALLOBJ:^	=^
 )
@@ -898,14 +893,20 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-
-#==========================================
-#=========== SECONDARY TARGETS ============
-#==========================================
+#
+#  Secondary Targets.
+#
     
 #==========================================
 # Makedefs Stuff
 #==========================================
+$(U)nhsizes.exe: $(O)nhsizes.o
+	@echo Linking $(@:\=/)
+	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
+
+$(O)nhsizes.o: $(CONFIG_H) nhsizes.c
+	@$(cc) $(cflagsBuild) -Fo$@ nhsizes.c
+
 $(U)makedefs.exe:	$(MAKEOBJS)
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
@@ -1058,24 +1059,6 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 <<
 
 #=================================================
-# For a couple of devteam utilities
-#=================================================
-
-$(U)nhsizes.exe: $(O)nhsizes.o
-	@echo Linking $(@:\=/)
-	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
-
-$(U)nhsizes2.exe: $(O)nhsizes2.o
-	@echo Linking $(@:\=/)
-	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes2.o $(O)panic.o $(O)alloc.o
-
-$(O)nhsizes.o: $(CONFIG_H) nhsizes.c
-	@$(cc) $(cflagsBuild) -Fo$@ nhsizes.c
-
-$(O)nhsizes2.o: $(CONFIG_H) nhsizes2.c
-	@$(cc) $(cflagsBuild) -Fo$@ nhsizes2.c
-
-#=================================================
 # Create directory for holding object files
 #=================================================
 
@@ -1083,6 +1066,34 @@ $(O)obj.tag:
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@echo directory created >$@
+
+#==========================================
+# Notify of any CL environment variables
+# in effect since they change the compiler
+# options.
+#==========================================
+
+$(O)envchk.tag: $(O)obj.tag
+!	IF "$(TARGET_CPU)"=="x64"
+	@echo Windows x64 64-bit target build
+!	ELSE
+	@echo Windows x86 32-bit target build
+!	ENDIF
+!IFDEF TTYOBJ
+	@echo tty window support included
+! IF "$(ADD_CURSES)"=="Y"
+	@echo curses window support also included
+! ENDIF
+!ENDIF
+!	IF "$(CL)"!=""
+#	   @echo Warning, the CL Environment variable is defined:
+#	   @echo CL=$(CL)
+!	ENDIF
+        echo envchk >$@
+
+#==========================================
+#=========== SECONDARY TARGETS ============
+#==========================================
 
 #==========================================
 # DLB utility and nhdat file creation
@@ -1244,40 +1255,19 @@ $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
-#==========================================
-# PDCurses Library
-#==========================================
+#===============================================================================
+# PDCurses
+#===============================================================================
 
 $(O)pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 	lib -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
-#==========================================
-# Notify of any CL environment variables
-# in effect since they change the compiler
-# options.
-#==========================================
+$(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscrn.c
+	$(cc) $(PDCINCL) $(cflagsBuild) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
 
-$(O)envchk.tag: $(O)obj.tag
-!	IF "$(TARGET_CPU)"=="x64"
-	@echo Windows x64 64-bit target build
-!	ELSE
-	@echo Windows x86 32-bit target build
-!	ENDIF
-!IFDEF TTYOBJ
-	@echo tty window support included
-! IF "$(ADD_CURSES)"=="Y"
-	@echo curses window support also included
-! ENDIF
-!ENDIF
-!	IF "$(CL)"!=""
-#	   @echo Warning, the CL Environment variable is defined:
-#	   @echo CL=$(CL)
-!	ENDIF
-        echo envchk >$@
-
-#==========================================
+#===============================================================================
 # Housekeeping
-#==========================================
+#===============================================================================
 
 spotless: clean
 ! IF ("$(OBJ)"!="")
@@ -1370,7 +1360,6 @@ clean:
 	if exist $(U)dgncomp.exe   del $(U)dgncomp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
-	if exist $(SRC)\fixed_defaults.nh del $(SRC)\fixed_defaults.nh
 	if exist $(O)install.tag   del $(O)install.tag
 	if exist $(O)console.res  del $(O)console.res
 	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP
@@ -1480,8 +1469,6 @@ $(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
 $(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
 
-$(O)tile.o: $(SRC)\tile.c $(HACK_H)
-
 # 
 # util dependencies
 #
@@ -1495,21 +1482,18 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 
 (O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\cppregex.cpp
-#
-# Other dependencies needed by some ports
+
 # 
-
 # curses window port dependencies
-
-$(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
-$(O)cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
-$(O)cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
-$(O)cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
-$(O)cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
-$(O)cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
-$(O)cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
-$(O)curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
-
+#
+$(O)\cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
+$(O)\cursinit.c: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
+$(O)\cursinvt.c: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)\cursmain.c: $(WCURSES)\cursmain.c $(WCURSES)\cursmain.h $(INCL)\wincurs.h
+$(O)\cursmesg.c: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
+$(O)\cursmisc.c: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
+$(O)\cursstat.c: $(WCURSES)\cursstat.c $(WCURSES)\cursstat.h $(INCL)\wincurs.h
+$(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #
 # The rest are stolen from sys/unix/Makefile.src, 
 # with the following changes:
@@ -1582,6 +1566,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\win\X11\winval.c
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 	@$(CC) $(cflagsBuild) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
