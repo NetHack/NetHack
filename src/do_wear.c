@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1514072526 2017/12/23 23:42:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1543745354 2018/12/02 10:09:14 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1112,13 +1112,7 @@ register struct obj *otmp;
             You("can see!");
     }
     if (changed) {
-        /* blindness has just been toggled */
-        if (Blind_telepat || Infravision)
-            see_monsters();
-        vision_full_recalc = 1; /* recalc vision limits */
-        if (!Blind)
-            learn_unseen_invent();
-        context.botl = 1;
+        toggle_blindness(); /* potion.c */
     }
 }
 
@@ -1157,13 +1151,7 @@ register struct obj *otmp;
         }
     }
     if (changed) {
-        /* blindness has just been toggled */
-        if (Blind_telepat || Infravision)
-            see_monsters();
-        vision_full_recalc = 1; /* recalc vision limits */
-        if (!Blind)
-            learn_unseen_invent();
-        context.botl = 1;
+        toggle_blindness(); /* potion.c */
     }
 }
 

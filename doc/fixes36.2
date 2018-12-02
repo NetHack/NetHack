@@ -234,6 +234,8 @@ dismount that kills steed because there is no room to put it on map blamed the
 to emphasize that it's not a light source, change description of wielded Sting
 	from "(glowing light blue)" to "(light blue aura)" when sighted and
 	from "(glowing)" to nothing (not warm enough to feel) when blind
+glowing Sting quivers if hero becomes blind and quivering Sting glows if
+	blindness ends; it worked for timed blindness but not for blindfold
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -253,6 +255,9 @@ life-saving while poly'd and Unchanging wasn't restoring u.mh (HP as monster)
 change in searching stopped finding unseen monsters except hiders and eels
 buliding with EXTRA_SANITY_CHECKS enabled would issue "no monster to remove"
 	warning if steed was killed out from under the hero
+changing Sting's description to be "(weapon in hand) (light blue aura)" was
+	too close to feedback when objects become blessed; change it again,
+	to "(weapon in hand, flickering/glimmering/gleaming light blue)"
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status

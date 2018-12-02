@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1520797133 2018/03/11 19:38:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1543745356 2018/12/02 10:09:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -306,30 +306,41 @@ boolean talk;
     set_itimeout(&Blinded, xtime);
 
     if (u_could_see ^ can_see_now) { /* one or the other but not both */
-        context.botl = TRUE;
-        vision_full_recalc = 1; /* blindness just got toggled */
-        /* this vision recalculation used to be deferred until
-           moveloop(), but that made it possible for vision
-           irregularities to occur (cited case was force bolt
-           hitting adjacent potion of blindness and then a
-           secret door; hero was blinded by vapors but then
-           got the message "a door appears in the wall") */
-        vision_recalc(0);
-        if (Blind_telepat || Infravision)
-            see_monsters();
-
-        /* avoid either of the sequences
-           "Sting starts glowing", [become blind], "Sting stops quivering" or
-           "Sting starts quivering", [regain sight], "Sting stops glowing"
-           by giving "Sting is quivering" when becoming blind or
-           "Sting is glowing" when regaining sight so that the eventual
-           "stops" message matches */
-        if (warn_obj_cnt && uwep && (EWarn_of_mon & W_WEP) != 0L)
-            Sting_effects(-1);
-        /* update dknown flag for inventory picked up while blind */
-        if (can_see_now)
-            learn_unseen_invent();
+        toggle_blindness();
     }
+}
+
+/* blindness has just started or just ended--caller enforces that;
+   called by Blindf_on(), Blindf_off(), and make_blinded() */
+void
+toggle_blindness()
+{
+    boolean Stinging = (uwep && (EWarn_of_mon & W_WEP) != 0L);
+
+    /* blindness has just been toggled */
+    context.botl = TRUE; /* status conditions need update */
+    vision_full_recalc = 1; /* vision has changed */
+    /* this vision recalculation used to be deferred until moveloop(),
+       but that made it possible for vision irregularities to occur
+       (cited case was force bolt hitting an adjacent potion of blindness
+       and then a secret door; hero was blinded by vapors but then got the
+       message "a door appears in the wall" because wall spot was IN_SIGHT) */
+    vision_recalc(0);
+    if (Blind_telepat || Infravision || Stinging)
+        see_monsters(); /* also counts EWarn_of_mon monsters */
+    /*
+     * Avoid either of the sequences
+     * "Sting starts glowing", [become blind], "Sting stops quivering" or
+     * "Sting starts quivering", [regain sight], "Sting stops glowing"
+     * by giving "Sting is quivering" when becoming blind or
+     * "Sting is glowing" when regaining sight so that the eventual
+     * "stops" message matches the most recent "Sting is ..." one.
+     */
+    if (Stinging)
+        Sting_effects(-1);
+    /* update dknown flag for inventory picked up while blind */
+    if (!Blind)
+        learn_unseen_invent();
 }
 
 boolean
