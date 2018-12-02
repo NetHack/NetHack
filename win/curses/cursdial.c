@@ -595,14 +595,14 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
 
     if (current_menu == NULL) {
         impossible("curses_display_nhmenu: attempt to display nonexistent menu");
-        return;
+        return '\033';
     }
 
     menu_item_ptr = current_menu->entries;
 
     if (menu_item_ptr == NULL) {
         impossible("curses_display_nhmenu: attempt to display empty menu");
-        return;
+        return '\033';
     }
 
     /* Reset items to unselected to clear out selections from previous
