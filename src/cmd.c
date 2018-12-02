@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1542673290 2018/11/20 00:21:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1543711385 2018/12/02 00:43:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5500,6 +5500,12 @@ parse()
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
 #endif
+
+    if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
+        && (Cmd.commands[foo & 0x0ff]
+            && (Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
+                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh)))
+        foo = Cmd.spkeys[NHKF_ESC];
 
     if (foo == Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
