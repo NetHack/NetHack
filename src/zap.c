@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1542798627 2018/11/21 11:10:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.289 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1543744276 2018/12/02 09:51:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -433,7 +433,8 @@ struct obj *otmp;
             dmg = spell_damage_bonus(dmg);
         if (resists_drli(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
-        } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) && !DEADMONSTER(mtmp)) {
+        } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL)
+                   && !DEADMONSTER(mtmp)) {
             mtmp->mhp -= dmg;
             mtmp->mhpmax -= dmg;
             /* die if already level 0, regardless of hit points */
@@ -782,7 +783,7 @@ boolean by_hero;
     if ((mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))
         || (mons[montype].mlet == S_TROLL
             && uwep && uwep->oartifact == ART_TROLLSBANE)) {
-        if (by_hero && cansee(x,y))
+        if (by_hero && cansee(x, y))
             pline("%s twitches feebly.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
         return (struct monst *) 0;
@@ -1831,10 +1832,9 @@ struct obj *obj, *otmp;
          *             from its inventory as a result of the change.
          *             If the items fall to the floor, they are not
          *             subject to direct subsequent polymorphing
-         *             themselves on that same zap. This makes it
-         *             consistent with items that remain in the
-         *             monster's inventory. They are not polymorphed
-         *             either.
+         *             themselves on that same zap.  This makes it
+         *             consistent with items that remain in the monster's
+         *             inventory.  They are not polymorphed either.
          * UNDEAD_TURNING - When an undead creature gets killed via
          *             undead turning, prevent its corpse from being
          *             immediately revived by the same effect.
