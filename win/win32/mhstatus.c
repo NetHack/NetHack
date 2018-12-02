@@ -298,169 +298,166 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     FillRect(hdc, &clear_rect, status_bg_brush);
 
-    // TODO: Put it around for loop instead -- temporary to get a better diff
-    if (data->status_lines == NULL) {
-        BitBlt(front_buffer_hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
+    if (data->status_lines != NULL) {
+        
+        data->has_blink_fields = FALSE;
 
-        EndPaint(hWnd, &ps);
-        return 0;
-    }
+        for (int line = 0; line < NHSW_LINES; line++) {
+            LONG left = rt.left;
+            LONG cy = 0;
+            int vlen;
 
-    data->has_blink_fields = FALSE;
+            mswin_status_line * status_line = &data->status_lines->lines[line];
 
-    for (int line = 0; line < NHSW_LINES; line++) {
-        LONG left = rt.left;
-        LONG cy = 0;
-        int vlen;
+            for (int i = 0; i < status_line->status_strings.count; i++) {
+                mswin_status_string * status_string = status_line->status_strings.status_strings[i];
+                int clr, atr;
+                int fntatr = ATR_NONE;
+                COLORREF nFg, nBg;
 
-        mswin_status_line * status_line = &data->status_lines->lines[line];
+                if (status_string->str == NULL || status_string->str[0] == '\0')
+                    continue;
 
-        for (int i = 0; i < status_line->status_strings.count; i++) {
-            mswin_status_string * status_string = status_line->status_strings.status_strings[i];
-            int clr, atr;
-            int fntatr = ATR_NONE;
-            COLORREF nFg, nBg;
+                clr = status_string->color;
+                atr = status_string->attribute;
 
-            if (status_string->str == NULL || status_string->str[0] == '\0')
-                continue;
+                const char *str = status_string->str;
 
-            clr = status_string->color;
-            atr = status_string->attribute;
+                vlen = strlen(str);
 
-            const char *str = status_string->str;
-
-            vlen = strlen(str);
-
-            if (atr & HL_BOLD)
-                fntatr = ATR_BOLD;
-            else if (atr & HL_INVERSE)
-                fntatr = ATR_INVERSE;
-            else if (atr & HL_ULINE)
-                fntatr = ATR_ULINE;
-            else if (atr & HL_BLINK) {
-                data->has_blink_fields = TRUE;
-                if (data->blink_state) {
+                if (atr & HL_BOLD)
+                    fntatr = ATR_BOLD;
+                else if (atr & HL_INVERSE)
                     fntatr = ATR_INVERSE;
-                    atr |= HL_INVERSE;
+                else if (atr & HL_ULINE)
+                    fntatr = ATR_ULINE;
+                else if (atr & HL_BLINK) {
+                    data->has_blink_fields = TRUE;
+                    if (data->blink_state) {
+                        fntatr = ATR_INVERSE;
+                        atr |= HL_INVERSE;
+                    }
                 }
-            }
-            else if (atr & HL_DIM)
-                fntatr = ATR_DIM;
+                else if (atr & HL_DIM)
+                    fntatr = ATR_DIM;
 
-            cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
+                cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
 
-            BOOL useUnicode = fnt->supportsUnicode;
+                BOOL useUnicode = fnt->supportsUnicode;
 
-            winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+                winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
 
-            nFg = (clr == NO_COLOR ? status_fg_color
-                   : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
-                      : status_fg_color));
+                nFg = (clr == NO_COLOR ? status_fg_color
+                    : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
+                        : status_fg_color));
 
-            if (atr & HL_DIM) {
-                /* make a dim representation - this can produce color shift */
-                float redReduction = 0.5f;
-                float greenReduction = 0.5f;
-                float blueReduction = 0.25f;
-                uchar red = (uchar) (GetRValue(nFg) * (1.0f - redReduction));
-                uchar green = (uchar) (GetGValue(nFg) * (1.0f - greenReduction));
-                uchar blue = (uchar) (GetBValue(nFg) * (1.0f - blueReduction));
-                nFg = RGB(red, green, blue);
-            }
+                if (atr & HL_DIM) {
+                    /* make a dim representation - this can produce color shift */
+                    float redReduction = 0.5f;
+                    float greenReduction = 0.5f;
+                    float blueReduction = 0.25f;
+                    uchar red = (uchar)(GetRValue(nFg) * (1.0f - redReduction));
+                    uchar green = (uchar)(GetGValue(nFg) * (1.0f - greenReduction));
+                    uchar blue = (uchar)(GetBValue(nFg) * (1.0f - blueReduction));
+                    nFg = RGB(red, green, blue);
+                }
 
-            nBg = status_bg_color;
+                nBg = status_bg_color;
 
-            if (status_string->space_in_front)
-                rt.left += fnt->width;
+                if (status_string->space_in_front)
+                    rt.left += fnt->width;
 
-            sz.cy = -1;
+                sz.cy = -1;
 
-            if (status_string->draw_bar && iflags.wc2_hitpointbar) {
-                /* NOTE: we current don't support bar attributes */
+                if (status_string->draw_bar && iflags.wc2_hitpointbar) {
+                    /* NOTE: we current don't support bar attributes */
 
-                /* when we are drawing bar we need to look at the hp status
-                 * field to get the correct percentage and color */
-                COLORREF bar_color = nhcolor_to_RGB(status_string->bar_color);
-                HBRUSH back_brush = CreateSolidBrush(bar_color);
-                RECT barrect;
+                    /* when we are drawing bar we need to look at the hp status
+                     * field to get the correct percentage and color */
+                    COLORREF bar_color = nhcolor_to_RGB(status_string->bar_color);
+                    HBRUSH back_brush = CreateSolidBrush(bar_color);
+                    RECT barrect;
 
-                /* prepare for drawing */
-                SelectObject(hdc, fnt->hFont);
-                SetBkMode(hdc, OPAQUE);
-                SetBkColor(hdc, status_bg_color);
-                SetTextColor(hdc, status_fg_color);
+                    /* prepare for drawing */
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, status_bg_color);
+                    SetTextColor(hdc, status_fg_color);
 
-                if (useUnicode) {
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+                    if (useUnicode) {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
 
-                    /* first draw title normally */
-                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                        /* first draw title normally */
+                        DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    }
+                    else {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                        /* first draw title normally */
+                        DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                    }
+                    int bar_percent = status_string->bar_percent;
+                    if (bar_percent > 0) {
+                        /* calc bar length */
+                        barrect.left = rt.left;
+                        barrect.top = rt.top;
+                        barrect.bottom = sz.cy;
+                        if (bar_percent > 0)
+                            barrect.right = (int)((bar_percent * sz.cx) / 100);
+                        /* else
+                            barrect.right = sz.cx; */
+
+                            /* then draw hpbar on top of title */
+                        FillRect(hdc, &barrect, back_brush);
+                        SetBkMode(hdc, TRANSPARENT);
+                        SetTextColor(hdc, nBg);
+
+                        if (useUnicode)
+                            DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                        else
+                            DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
+                    }
+                    DeleteObject(back_brush);
                 }
                 else {
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32A(hdc, str, vlen, &sz);
+                    if (atr & HL_INVERSE) {
+                        COLORREF tmp = nFg;
+                        nFg = nBg;
+                        nBg = tmp;
+                    }
 
-                    /* first draw title normally */
-                    DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                    /* prepare for drawing */
+                    SelectObject(hdc, fnt->hFont);
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, nBg);
+                    SetTextColor(hdc, nFg);
+
+                    if (useUnicode) {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
+
+                        /* draw */
+                        DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    }
+                    else {
+                        /* get bounding rectangle */
+                        GetTextExtentPoint32A(hdc, str, vlen, &sz);
+
+                        /* draw */
+                        DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
+                    }
                 }
-                int bar_percent = status_string->bar_percent;
-                if (bar_percent > 0) {
-                    /* calc bar length */
-                    barrect.left = rt.left;
-                    barrect.top = rt.top;
-                    barrect.bottom = sz.cy;
-                    if (bar_percent > 0)
-                        barrect.right = (int)((bar_percent * sz.cx) / 100);
-                    /* else
-                        barrect.right = sz.cx; */
+                assert(sz.cy >= 0);
 
-                    /* then draw hpbar on top of title */
-                    FillRect(hdc, &barrect, back_brush);
-                    SetBkMode(hdc, TRANSPARENT);
-                    SetTextColor(hdc, nBg);
-
-                    if (useUnicode)
-                        DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
-                    else
-                        DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
-                }
-                DeleteObject(back_brush);
-            } else {
-                if (atr & HL_INVERSE) {
-                    COLORREF tmp = nFg;
-                    nFg = nBg;
-                    nBg = tmp;
-                }
-
-                /* prepare for drawing */
-                SelectObject(hdc, fnt->hFont);
-                SetBkMode(hdc, OPAQUE);
-                SetBkColor(hdc, nBg);
-                SetTextColor(hdc, nFg);
-
-                if (useUnicode) {
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
-
-                    /* draw */
-                    DrawTextW(hdc, wbuf, vlen, &rt, DT_LEFT);
-                } else {
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32A(hdc, str, vlen, &sz);
-
-                    /* draw */
-                    DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
-                }
+                rt.left += sz.cx;
+                cy = max(cy, sz.cy);
             }
-            assert(sz.cy >= 0);
 
-            rt.left += sz.cx;
-            cy = max(cy, sz.cy);
+            rt.left = left;
+            rt.top += cy;
         }
-
-        rt.left = left;
-        rt.top += cy;
     }
 
     BitBlt(front_buffer_hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);

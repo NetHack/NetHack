@@ -3015,18 +3015,6 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, condmasks);
 
-#if 0 // TODO: this code was dead ... do we need to respond to these updates?
-    switch (idx) {
-        case BL_RESET:
-            reset_state = TRUE;
-            /* FALLTHRU */
-        case BL_FLUSH:
-            /* FALLTHRU */
-        default:
-            break;
-    }
-#endif
-
     if (idx >= 0) {
 
         nhassert(idx <= SIZE(_status_fields));
@@ -3101,11 +3089,14 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
 
         }
 
-        /* send command to status window */
+    }
+
+    if (idx == BL_FLUSH || idx == BL_RESET) {
+        /* send command to status window to update */
         ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
         update_cmd_data.status_lines = &_status_lines;
         SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
-                (WPARAM) MSNH_MSG_UPDATE_STATUS, (LPARAM) &update_cmd_data);
+            (WPARAM)MSNH_MSG_UPDATE_STATUS, (LPARAM)&update_cmd_data);
     }
 }
 
