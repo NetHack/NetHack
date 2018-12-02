@@ -38,7 +38,7 @@ typedef struct mswin_status_string  {
     int color; /* string text color index */
     int attribute; /* string text attributes */
     boolean draw_bar; /* draw a percentage bar  */
-    int bar_percent; /* a percentage to indicate; 100 will draw no percentage bar */
+    int bar_percent; /* a percentage to indicate */
     int bar_color; /* color index of percentage bar */
     int bar_attribute; /* attributes of percentage bar */
 } mswin_status_string;
