@@ -216,7 +216,7 @@ VA_DECL(const char *, s)
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
-    if (windowprocs.name != NULL && !strncmpi(windowprocs.name, "tty", 3)) {
+    if (WINDOWPORT("tty")) {
         buf[0] = '\n';
         (void) vsprintf(&buf[1], s, VA_ARGS);
         Strcat(buf, "\n");
@@ -239,6 +239,11 @@ Delay(int ms)
 void
 win32_abort()
 {
+    boolean is_tty = FALSE;
+
+#ifdef TTY_GRAPHICS
+    is_tty = WINDOWPORT("tty");
+#endif
     if (wizard) {
         int c, ci, ct;
 
@@ -248,13 +253,11 @@ win32_abort()
         msmsg("Execute debug breakpoint wizard?");
         while ((ci = nhgetch()) != '\n') {
             if (ct > 0) {
-#ifdef TTY_GRAPHICS
-                backsp(); /* \b is visible on NT */
-#endif
+                if (is_tty)
+                    backsp(); /* \b is visible on NT console */
                 (void) putchar(' ');
-#ifdef TTY_GRAPHICS
-                backsp();
-#endif
+                if (is_tty)
+                    backsp();
                 ct = 0;
                 c = 'n';
             }

@@ -828,7 +828,7 @@ register int fd;
 #ifdef AMII_GRAPHICS
     {
         extern struct window_procs amii_procs;
-        if (windowprocs.win_init_nhwindows == amii_procs.win_init_nhwindows) {
+        if (WINDOWPORT("amii") {
             extern winid WIN_BASE;
             clear_nhwindow(WIN_BASE); /* hack until there's a hook for this */
         }
@@ -844,7 +844,7 @@ register int fd;
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;
     dotrow = 2;
-    if (strncmpi("X11", windowprocs.name, 3))
+    if (!WINDOWPORT("X11"))
         putstr(WIN_MAP, 0, "Restoring:");
 #endif
     restoreprocs.mread_flags = 1; /* return despite error */
@@ -859,7 +859,7 @@ register int fd;
             dotrow++;
             dotcnt = 0;
         }
-        if (strncmpi("X11", windowprocs.name, 3)) {
+        if (!WINDOWPORT("X11")) {
             putstr(WIN_MAP, 0, ".");
         }
         mark_synch();

@@ -5,7 +5,7 @@
 #ifndef NTCONF_H
 #define NTCONF_H
 
-/* #define SHELL	/* nt use of pcsys routines caused a hang */
+/* #define SHELL */	/* nt use of pcsys routines caused a hang */
 
 #define RANDOM    /* have Berkeley random(3) */
 #define TEXTCOLOR /* Color text */
@@ -43,7 +43,7 @@
  *  The remaining code shouldn't need modification.
  * -----------------------------------------------------------------
  */
-/* #define SHORT_FILENAMES	/* All NT filesystems support long names now
+/* #define SHORT_FILENAMES */ /* All NT filesystems support long names now
  */
 
 #ifdef MICRO
@@ -143,11 +143,13 @@ extern void FDECL(interject, (int));
 #define strncmpi(a, b, c) strnicmp(a, b, c)
 #endif
 
+#ifdef _MSC_VER
 /* Visual Studio defines this in their own headers, which we don't use */
 #ifndef snprintf
 #define snprintf _snprintf
 #pragma warning( \
     disable : 4996) /* deprecation warning suggesting snprintf_s */
+#endif
 #endif
 
 #include <sys/types.h>

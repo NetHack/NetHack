@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1542673290 2018/11/20 00:21:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1543711385 2018/12/02 00:43:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -176,9 +176,6 @@ STATIC_DCL void FDECL(contained_stats, (winid, const char *, long *, long *));
 STATIC_DCL void FDECL(misc_stats, (winid, long *, long *));
 STATIC_PTR int NDECL(wiz_show_stats);
 STATIC_DCL boolean FDECL(accept_menu_prefix, (int NDECL((*))));
-#ifdef PORT_DEBUG
-STATIC_DCL int NDECL(wiz_port_debug);
-#endif
 STATIC_PTR int NDECL(wiz_rumor_check);
 STATIC_PTR int NDECL(doattributes);
 
@@ -1052,7 +1049,7 @@ wiz_show_wmodes(VOID_ARGS)
     int x, y;
     char row[COLNO + 1];
     struct rm *lev;
-    boolean istty = !strcmp(windowprocs.name, "tty");
+    boolean istty = WINDOWPORT("tty");
 
     win = create_nhwindow(NHW_TEXT);
     if (istty)
@@ -3272,10 +3269,6 @@ struct ext_func_tab extcmdlist[] = {
     { ',', "pickup", "pick up things at the current location", dopickup },
     { '\0', "polyself", "polymorph self",
             wiz_polyself, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#ifdef PORT_DEBUG
-    { '\0', "portdebug", "wizard port debug command",
-            wiz_port_debug, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#endif
     { M('p'), "pray", "pray to the gods for help",
             dopray, IFBURIED | AUTOCOMPLETE },
     { C('p'), "prevmsg", "view recent game messages",
@@ -5508,6 +5501,15 @@ parse()
     alt_esc = FALSE; /* readchar() reset */
 #endif
 
+    if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
+        && (Cmd.commands[foo & 0x0ff]
+            && (Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
+#ifdef SHELL
+                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh
+#endif
+                )))
+        foo = Cmd.spkeys[NHKF_ESC];
+
     if (foo == Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
         multi = last_multi = 0;
@@ -5706,58 +5708,6 @@ dotravel(VOID_ARGS)
     readchar_queue = cmd;
     return 0;
 }
-
-#ifdef PORT_DEBUG
-#if defined(WIN32) && defined(TTY_GRAPHICS)
-extern void NDECL(win32con_debug_keystrokes);
-extern void NDECL(win32con_handler_info);
-#endif
-
-int
-wiz_port_debug()
-{
-    int n, k;
-    winid win;
-    anything any;
-    int item = 'a';
-    int num_menu_selections;
-    struct menu_selection_struct {
-        char *menutext;
-        void NDECL((*fn));
-    } menu_selections[] = {
-#if defined(WIN32) && defined(TTY_GRAPHICS)
-        { "test win32 keystrokes (tty only)", win32con_debug_keystrokes },
-        { "show keystroke handler information (tty only)",
-          win32con_handler_info },
-#endif
-        { (char *) 0, (void NDECL((*))) 0 } /* array terminator */
-    };
-
-    num_menu_selections = SIZE(menu_selections) - 1;
-    if (num_menu_selections > 0) {
-        menu_item *pick_list;
-
-        win = create_nhwindow(NHW_MENU);
-        start_menu(win);
-        for (k = 0; k < num_menu_selections; ++k) {
-            any.a_int = k + 1;
-            add_menu(win, NO_GLYPH, &any, item++, 0, ATR_NONE,
-                     menu_selections[k].menutext, MENU_UNSELECTED);
-        }
-        end_menu(win, "Which port debugging feature?");
-        n = select_menu(win, PICK_ONE, &pick_list);
-        destroy_nhwindow(win);
-        if (n > 0) {
-            n = pick_list[0].item.a_int - 1;
-            free((genericptr_t) pick_list);
-            /* execute the function */
-            (*menu_selections[n].fn)();
-        }
-    } else
-        pline("No port-specific debug capability defined.");
-    return 0;
-}
-#endif /*PORT_DEBUG*/
 
 /*
  *   Parameter validator for generic yes/no function to prevent

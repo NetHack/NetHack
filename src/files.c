@@ -1279,7 +1279,7 @@ boolean uncomp;
     int i = 0;
     int f;
 #ifdef TTY_GRAPHICS
-    boolean istty = !strncmpi(windowprocs.name, "tty", 3);
+    boolean istty = WINDOWPORT("tty");
 #endif
 
     Strcpy(cfn, filename);

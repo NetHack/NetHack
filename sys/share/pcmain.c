@@ -499,12 +499,12 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
 #ifdef WIN32
     /*
-        if (!strncmpi(windowprocs.name, "mswin", 5))
+        if (WINDOWPORT("mswin"))
             NHWinMainInit();
         else
     */
 #ifdef TTY_GRAPHICS
-    if (!strncmpi(windowprocs.name, "tty", 3)) {
+    if (WINDOWPORT("tty")) {
         iflags.use_background_glyph = FALSE;
         nttty_open(1);
     } else {
