@@ -305,7 +305,7 @@ void intron() /* enable kbd interupts if enabled when game started */
 {
 #ifdef TTY_GRAPHICS
     /* Ugly hack to keep from changing tty modes for non-tty games -dlc */
-    if (!strcmp(windowprocs.name, "tty") && intr_char != nonesuch
+    if (WINDOWPORT("tty") && intr_char != nonesuch
         && curttyb2.intr_sym != '\003') {
         curttyb2.intr_sym = '\003';
         setctty();
@@ -317,7 +317,7 @@ void introff() /* disable kbd interrupts if required*/
 {
 #ifdef TTY_GRAPHICS
     /* Ugly hack to keep from changing tty modes for non-tty games -dlc */
-    if (!strcmp(windowprocs.name, "tty") && curttyb2.intr_sym != nonesuch) {
+    if (WINDOWPORT("tty") && curttyb2.intr_sym != nonesuch) {
         curttyb2.intr_sym = nonesuch;
         setctty();
     }
@@ -345,7 +345,7 @@ void
 sco_mapon()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
+    if (WINDOWPORT("tty") && sco_flag_console) {
         if (sco_map_valid != -1) {
             ioctl(0, LDSMAP, sco_chanmap_buf);
         }
@@ -358,7 +358,7 @@ void
 sco_mapoff()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
+    if (WINDOWPORT("tty") && sco_flag_console) {
         sco_map_valid = ioctl(0, LDGMAP, sco_chanmap_buf);
         if (sco_map_valid != -1) {
             ioctl(0, LDNMAP, (char *) 0);
@@ -379,7 +379,7 @@ void
 init_sco_cons()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
+    if (WINDOWPORT("tty") && sco_flag_console) {
         atexit(sco_mapon);
         sco_mapoff();
         load_symset("IBMGraphics", PRIMARY);
@@ -409,7 +409,7 @@ void
 linux_mapon()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+    if (WINDOWPORT("tty") && linux_flag_console) {
         write(1, "\033(B", 3);
     }
 #endif
@@ -419,7 +419,7 @@ void
 linux_mapoff()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+    if (WINDOWPORT("tty") && linux_flag_console) {
         write(1, "\033(U", 3);
     }
 #endif
@@ -439,7 +439,7 @@ void
 init_linux_cons()
 {
 #ifdef TTY_GRAPHICS
-    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+    if (WINDOWPORT("tty") && linux_flag_console) {
         atexit(linux_mapon);
         linux_mapoff();
 #ifdef TEXTCOLOR

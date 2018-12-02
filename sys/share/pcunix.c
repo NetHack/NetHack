@@ -198,7 +198,7 @@ getlock()
 #ifndef SELF_RECOVER
         if (eraseoldlocks()) {
 #if defined(WIN32) && defined(TTY_GRAPHICS)
-            if (!strncmpi(windowprocs.name, "tty", 3))
+            if (WINDOWPORT("tty"))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;
@@ -212,7 +212,7 @@ getlock()
 #else /*SELF_RECOVER*/
         if (recover_savefile()) {
 #if defined(WIN32) && defined(TTY_GRAPHICS)
-            if (!strncmpi(windowprocs.name, "tty", 3))
+            if (WINDOWPORT("tty"))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;
