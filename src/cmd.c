@@ -5504,7 +5504,10 @@ parse()
     if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
         && (Cmd.commands[foo & 0x0ff]
             && (Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
-                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh)))
+#ifdef SHELL
+                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh
+#endif
+                )))
         foo = Cmd.spkeys[NHKF_ESC];
 
     if (foo == Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
