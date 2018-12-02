@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1543185068 2018/11/25 22:31:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.663 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1543745352 2018/12/02 10:09:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.664 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -90,6 +90,7 @@ E boolean FDECL(artifact_has_invprop, (struct obj *, UCHAR_P));
 E long FDECL(arti_cost, (struct obj *));
 E struct obj *FDECL(what_gives, (long *));
 E const char *FDECL(glow_color, (int));
+E const char *FDECL(glow_verb, (int, BOOLEAN_P));
 E void FDECL(Sting_effects, (int));
 E int FDECL(retouch_object, (struct obj **, BOOLEAN_P));
 E void FDECL(retouch_equipment, (int));
@@ -1912,11 +1913,12 @@ E void FDECL(set_itimeout, (long *, long));
 E void FDECL(incr_itimeout, (long *, int));
 E void FDECL(make_confused, (long, BOOLEAN_P));
 E void FDECL(make_stunned, (long, BOOLEAN_P));
-E void FDECL(make_blinded, (long, BOOLEAN_P));
 E void FDECL(make_sick, (long, const char *, BOOLEAN_P, int));
 E void FDECL(make_slimed, (long, const char *));
 E void FDECL(make_stoned, (long, const char *, int, const char *));
 E void FDECL(make_vomiting, (long, BOOLEAN_P));
+E void FDECL(make_blinded, (long, BOOLEAN_P));
+E void NDECL(toggle_blindness);
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
 E void FDECL(make_deaf, (long, BOOLEAN_P));
 E void NDECL(self_invis_message);

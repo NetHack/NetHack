@@ -190,7 +190,7 @@ sanitize_name(namebuf)
 char *namebuf;
 {
     int c;
-    boolean strip_8th_bit = (!strcmp(windowprocs.name, "tty")
+    boolean strip_8th_bit = (WINDOWPORT("tty")
                              && !iflags.wc_eight_bit_input);
 
     /* it's tempting to skip this for single-user platforms, since

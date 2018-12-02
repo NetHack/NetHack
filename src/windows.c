@@ -1277,7 +1277,7 @@ winid win UNUSED;
 STATIC_OVL void
 dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
 winid win UNUSED;
-int glyph UNUSED;
+int glyph;
 const anything *identifier UNUSED;
 char ch;
 char gch UNUSED;
