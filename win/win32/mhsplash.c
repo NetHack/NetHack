@@ -170,21 +170,18 @@ mswin_display_splash_window(BOOL show_ver)
 INT_PTR CALLBACK
 NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HDC hdc;
-
     UNREFERENCED_PARAMETER(lParam);
 
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        HDC hdc = GetDC(hWnd);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
         /* set text control font */
-        hdc = GetDC(hWnd);
-        SendMessage(hWnd, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(hWnd, WM_SETFONT, (WPARAM)font->hFont,  0);
         ReleaseDC(hWnd, hdc);
 
         SetFocus(GetDlgItem(hWnd, IDOK));
-        return FALSE;
+    } break;
 
     case WM_PAINT: {
         char VersionString[BUFSZ];
@@ -196,7 +193,7 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         SplashData *splashData = (SplashData *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-        hdc = BeginPaint(hWnd, &ps);
+        HDC hdc = BeginPaint(hWnd, &ps);
         /* Show splash graphic */
 
         hdcBitmap = CreateCompatibleDC(hdc);

@@ -34,10 +34,13 @@ static const int fieldcounts[NHSW_LINES] = { SIZE(fieldorder1) - 1, SIZE(fieldor
  * to represent what needs to be rendered. */
 typedef struct mswin_status_string  {
     const char * str; /* ascii string to be displayed */
-    int color; /* string text color */
-    boolean draw_bar;
+    boolean space_in_front; /* render with a space in front of string */
+    int color; /* string text color index */
+    int attribute; /* string text attributes */
+    boolean draw_bar; /* draw a percentage bar  */
     int bar_percent; /* a percentage to indicate; 100 will draw no percentage bar */
     int bar_color; /* color index of percentage bar */
+    int bar_attribute; /* attributes of percentage bar */
 } mswin_status_string;
 
 typedef struct mswin_status_strings
@@ -51,9 +54,11 @@ typedef struct mswin_status_field {
     boolean enabled; // whether the field is enabled
     const char * name; // name of status field
     const char * format; // format of field
+    boolean space_in_front; // add a space in front of the field
 
     int percent;
     int color;
+    int attribute;
     char string[BUFSZ];
 
 } mswin_status_field;
