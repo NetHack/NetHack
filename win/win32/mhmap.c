@@ -729,8 +729,6 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     data->tileDC = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
 
-    SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
-
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
     clearAll(data);
@@ -989,10 +987,14 @@ onPaint(HWND hWnd)
     PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     /* update back buffer */
+    HBITMAP savedBitmap = SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
+
     for (int i = 0; i < COLNO; i++)
         for (int j = 0; j < ROWNO; j++)
             if (data->mapDirty[i][j])
                 paint(data, i, j);
+
+    SelectObject(data->tileDC, savedBitmap);
 
     PAINTSTRUCT ps;
     HDC hFrontBufferDC = BeginPaint(hWnd, &ps);
