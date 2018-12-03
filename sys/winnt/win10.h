@@ -23,6 +23,8 @@ typedef struct {
     double  scale;  // dpi of monitor / 96
     int     width;  // in pixels
     int     height; // in pixels
+    int     top; // in desktop coordinate pixel space
+    int     left; // in desktop coordinate pixel space
 } MonitorInfo;
 
 extern Win10 gWin10;

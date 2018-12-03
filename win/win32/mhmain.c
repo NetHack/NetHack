@@ -501,6 +501,10 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         exit(1);
         break;
 
+    case WM_DPICHANGED: {
+        mswin_layout_main_window(NULL);
+    } break;
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

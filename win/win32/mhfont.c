@@ -13,14 +13,13 @@
 
 static cached_font font_table[MAXFONTS];
 static int font_table_size = 0;
-HFONT version_splash_font;
 
 #define NHFONT_CODE(win, attr) (((attr & 0xFF) << 8) | (win_type & 0xFF))
 
 static void __cdecl font_table_cleanup(void);
 
-void
-mswin_init_splashfonts(HWND hWnd)
+HFONT
+mswin_create_splashfont(HWND hWnd)
 {
     HDC hdc = GetDC(hWnd);
     double scale = win10_monitor_scale(hWnd);
@@ -40,14 +39,10 @@ mswin_init_splashfonts(HWND hWnd)
     lgfnt.lfQuality = DEFAULT_QUALITY;           // output quality
     lgfnt.lfPitchAndFamily = DEFAULT_PITCH;      // pitch and family
     NH_A2W("Times New Roman", lgfnt.lfFaceName, LF_FACESIZE);
-    version_splash_font = CreateFontIndirect(&lgfnt);
+    HFONT font = CreateFontIndirect(&lgfnt);
     ReleaseDC(hWnd, hdc);
-}
 
-void
-mswin_destroy_splashfonts()
-{
-    DeleteObject(version_splash_font);
+    return font;
 }
 
 BOOL 
