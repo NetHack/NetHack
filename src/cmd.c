@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1543711385 2018/12/02 00:43:05 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.309 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1543797825 2018/12/03 00:43:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.312 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -126,10 +126,10 @@ extern int NDECL(dozap);              /**/
 extern int NDECL(doorganize);         /**/
 #endif /* DUMB */
 
-static int NDECL(dosuspend_core); /**/
-
 static int NDECL((*timed_occ_fn));
 
+STATIC_PTR int NDECL(dosuspend_core);
+STATIC_PTR int NDECL(dosh_core);
 STATIC_PTR int NDECL(doherecmdmenu);
 STATIC_PTR int NDECL(dotherecmdmenu);
 STATIC_PTR int NDECL(doprev_message);
@@ -194,9 +194,6 @@ STATIC_DCL void FDECL(one_characteristic, (int, int, int));
 STATIC_DCL void FDECL(status_enlightenment, (int, int));
 STATIC_DCL void FDECL(attributes_enlightenment, (int, int));
 
-static const char *readchar_queue = "";
-static coord clicklook_cc;
-
 STATIC_DCL void FDECL(add_herecmd_menuitem, (winid, int NDECL((*)),
                                              const char *));
 STATIC_DCL char FDECL(here_cmd_menu, (BOOLEAN_P));
@@ -204,6 +201,13 @@ STATIC_DCL char FDECL(there_cmd_menu, (BOOLEAN_P, int, int));
 STATIC_DCL char *NDECL(parse);
 STATIC_DCL void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, int, const char *));
+
+static const char *readchar_queue = "";
+static coord clicklook_cc;
+/* for rejecting attempts to use wizard mode commands */
+static const char unavailcmd[] = "Unavailable command '%s'.";
+/* for rejecting #if !SHELL, !SUSPEND */
+static const char cmdnotavail[] = "'%s' command not available.";
 
 STATIC_PTR int
 doprev_message(VOID_ARGS)
@@ -438,6 +442,8 @@ doextlist(VOID_ARGS)
             for (efp = extcmdlist; efp->ef_txt; efp++) {
                 int wizc;
 
+                if ((efp->flags & CMD_NOT_AVAILABLE) != 0)
+                    continue;
                 /* if hiding non-autocomplete commands, skip such */
                 if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
                     continue;
@@ -567,7 +573,8 @@ extcmd_via_menu()
         any = zeroany;
         /* populate choices */
         for (efp = extcmdlist; efp->ef_txt; efp++) {
-            if (!(efp->flags & AUTOCOMPLETE)
+            if ((efp->flags & CMD_NOT_AVAILABLE)
+                || !(efp->flags & AUTOCOMPLETE)
                 || (!wizard && (efp->flags & WIZMODECMD)))
                 continue;
             if (!matchlevel || !strncmp(efp->ef_txt, cbuf, matchlevel)) {
@@ -763,8 +770,7 @@ wiz_wish(VOID_ARGS) /* Unlimited wishes for debug mode by Paul Polderman */
         flags.verbose = save_verbose;
         (void) encumber_msg();
     } else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_wish)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_wish)));
     return 0;
 }
 
@@ -784,8 +790,7 @@ wiz_identify(VOID_ARGS)
         (void) display_inventory((char *) 0, FALSE);
         iflags.override_ID = 0;
     } else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_identify)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_identify)));
     return 0;
 }
 
@@ -840,8 +845,7 @@ wiz_map(VOID_ARGS)
         HConfusion = save_Hconf;
         HHallucination = save_Hhallu;
     } else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_map)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_map)));
     return 0;
 }
 
@@ -852,8 +856,7 @@ wiz_genesis(VOID_ARGS)
     if (wizard)
         (void) create_particular();
     else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_genesis)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_genesis)));
     return 0;
 }
 
@@ -864,8 +867,7 @@ wiz_where(VOID_ARGS)
     if (wizard)
         (void) print_dungeon(FALSE, (schar *) 0, (xchar *) 0);
     else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_where)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_where)));
     return 0;
 }
 
@@ -876,8 +878,7 @@ wiz_detect(VOID_ARGS)
     if (wizard)
         (void) findit();
     else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_detect)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_detect)));
     return 0;
 }
 
@@ -888,8 +889,7 @@ wiz_level_tele(VOID_ARGS)
     if (wizard)
         level_tele();
     else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_level_tele)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_level_tele)));
     return 0;
 }
 
@@ -1444,8 +1444,7 @@ wiz_intrinsic(VOID_ARGS)
             free((genericptr_t) pick_list);
         doredraw();
     } else
-        pline("Unavailable command '%s'.",
-              visctrl((int) cmd_from_func(wiz_intrinsic)));
+        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_intrinsic)));
     return 0;
 }
 
@@ -3304,16 +3303,21 @@ struct ext_func_tab extcmdlist[] = {
     { '^', "seetrap", "show the type of adjacent trap", doidtrap, IFBURIED },
     { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
             doprwep, IFBURIED },
-#ifdef SHELL
-    { '!', "shell", "do a shell escape", dosh, IFBURIED | GENERALCMD },
+    { '!', "shell", "do a shell escape",
+            dosh_core, IFBURIED | GENERALCMD
+#ifndef SHELL
+                       | CMD_NOT_AVAILABLE
 #endif /* SHELL */
+    },
     { M('s'), "sit", "sit down", dosit, AUTOCOMPLETE },
     { '\0', "stats", "show memory statistics",
             wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#ifdef SUSPEND
     { C('z'), "suspend", "suspend the game",
-            dosuspend_core, IFBURIED | GENERALCMD },
+            dosuspend_core, IFBURIED | GENERALCMD
+#ifndef SUSPEND
+                            | CMD_NOT_AVAILABLE
 #endif /* SUSPEND */
+    },
     { 'x', "swap", "swap wielded and secondary weapons", doswapweapon },
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
     { 'A', "takeoffall", "remove all armor", doddoremarm },
@@ -3407,6 +3411,14 @@ const char *command;
         if (strcmp(command, extcmd->ef_txt))
             continue;
         Cmd.commands[key] = extcmd;
+#if 0 /* silently accept key binding for unavailable command (!SHELL,&c) */
+        if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0) {
+            char buf[BUFSZ];
+
+            Sprintf(buf, cmdnotavail, extcmd->ef_txt);
+            config_error_add("%s", buf);
+        }
+#endif
         return TRUE;
     }
 
@@ -5504,10 +5516,7 @@ parse()
     if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
         && (Cmd.commands[foo & 0x0ff]
             && (Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
-#ifdef SHELL
-                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh
-#endif
-                )))
+                || Cmd.commands[foo & 0x0ff]->ef_funct == dosh_core)))
         foo = Cmd.spkeys[NHKF_ESC];
 
     if (foo == Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
@@ -5666,15 +5675,22 @@ readchar()
     return (char) sym;
 }
 
+/* '_' command, #travel, via keyboard rather than mouse click */
 STATIC_PTR int
 dotravel(VOID_ARGS)
 {
-    /* Keyboard travel command */
     static char cmd[2];
     coord cc;
 
+    /* [FIXME?  Supporting the ability to disable traveling via mouse
+       click makes some sense, depending upon overall mouse usage.
+       Disabling '_' on a user by user basis makes no sense at all since
+       even if it is typed by accident, aborting when picking a target
+       destination is trivial.  Travel via mouse predates travel via '_',
+       and this use of OPTION=!travel is probably just a mistake....] */
     if (!flags.travelcmd)
         return 0;
+
     cmd[1] = 0;
     cc.x = iflags.travelcc.x;
     cc.y = iflags.travelcc.y;
@@ -5789,8 +5805,9 @@ const char *prompt;
     return confirmed_ok;
 }
 
-int
-dosuspend_core()
+/* ^Z command, #suspend */
+STATIC_PTR int
+dosuspend_core(VOID_ARGS)
 {
 #ifdef SUSPEND
     /* Does current window system support suspend? */
@@ -5799,7 +5816,20 @@ dosuspend_core()
         dosuspend();
     } else
 #endif
-        Norep("Suspend command not available.");
+        Norep(cmdnotavail, "#suspend");
+    return 0;
+}
+
+/* '!' command, #shell */
+STATIC_PTR int
+dosh_core(VOID_ARGS)
+{
+#ifdef SHELL
+    /* access restrictions, if any, are handled in port code */
+    dosh();
+#else
+    Norep(cmdnotavail, "#shell");
+#endif
     return 0;
 }
 
