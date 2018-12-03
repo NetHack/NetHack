@@ -69,7 +69,6 @@ mswin_display_RIP_window(HWND hWnd)
     RECT riprt;
     RECT clientrect;
     RECT textrect;
-    HDC hdc;
     HFONT OldFont;
     MonitorInfo monitorInfo;
 
@@ -98,8 +97,8 @@ mswin_display_RIP_window(HWND hWnd)
     textrect.left += data->x;
     textrect.right -= data->x;
     if (data->window_text) {
-        hdc = GetDC(hWnd);
-        OldFont = SelectObject(hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE));
+        HDC hdc = GetDC(hWnd);
+        OldFont = SelectObject(hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE)->hFont);
         DrawText(hdc, data->window_text, strlen(data->window_text), &textrect,
                  DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
         SelectObject(hdc, OldFont);
@@ -144,21 +143,18 @@ mswin_display_RIP_window(HWND hWnd)
 INT_PTR CALLBACK
 NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HDC hdc;
-    PNHRIPWindow data;
-
-    data = (PNHRIPWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    PNHRIPWindow data = (PNHRIPWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        HDC hdc = GetDC(hWnd);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
+
         /* set text control font */
-        hdc = GetDC(hWnd);
-        SendMessage(hWnd, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(hWnd, WM_SETFONT, (WPARAM)font->hFont, 0);
         ReleaseDC(hWnd, hdc);
 
         SetFocus(GetDlgItem(hWnd, IDOK));
-        return FALSE;
+    } break;
 
     case WM_MSNH_COMMAND:
         onMSNHCommand(hWnd, wParam, lParam);
@@ -172,9 +168,10 @@ NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         HANDLE OldBitmap;
         PAINTSTRUCT ps;
         HFONT OldFont;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
 
-        hdc = BeginPaint(hWnd, &ps);
-        OldFont = SelectObject(hdc, mswin_get_font(NHW_TEXT, 0, hdc, FALSE));
+        OldFont = SelectObject(hdc, font->hFont);
         hdcBitmap = CreateCompatibleDC(hdc);
         SetBkMode(hdc, TRANSPARENT);
         GetClientRect(hWnd, &clientrect);

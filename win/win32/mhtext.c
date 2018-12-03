@@ -84,38 +84,35 @@ mswin_display_text_window(HWND hWnd)
 INT_PTR CALLBACK
 NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HWND control;
-    HDC hdc;
-    PNHTextWindow data;
-    TCHAR title[MAX_LOADSTRING];
+    PNHTextWindow data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        HWND control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        HDC hdc = GetDC(control);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
         /* set text control font */
-        control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        
         if (!control) {
             panic("cannot get text view window");
         }
 
-        hdc = GetDC(control);
-        SendMessage(control, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(control, WM_SETFONT, (WPARAM) font->hFont, 0);
         ReleaseDC(control, hdc);
 
         /* subclass edit control */
         editControlWndProc =
-            (WNDPROC) GetWindowLongPtr(control, GWLP_WNDPROC);
-        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR) NHEditHookWndProc);
+            (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
+        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHEditHookWndProc);
 
         SetFocus(control);
 
         /* Even though the dialog has no caption, you can still set the title
            which shows on Alt-Tab */
+        TCHAR title[MAX_LOADSTRING];
         LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
         SetWindowText(hWnd, title);
-        return FALSE;
+    } break;
 
     case WM_MSNH_COMMAND:
         onMSNHCommand(hWnd, wParam, lParam);
