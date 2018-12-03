@@ -1,4 +1,4 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1523619111 2018/04/13 11:31:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	getline.c	$NHDT-Date: 1543830347 2018/12/03 09:45:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -260,6 +260,8 @@ char *base;
 
     com_index = -1;
     for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0; oindex++) {
+        if (extcmdlist[oindex].flags & CMD_NOT_AVAILABLE)
+            continue;
         if ((extcmdlist[oindex].flags & AUTOCOMPLETE)
             && !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
             && !strncmpi(base, extcmdlist[oindex].ef_txt, strlen(base))) {
