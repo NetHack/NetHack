@@ -576,6 +576,13 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         dirty(data, data->xCur, data->yCur);
         break;
 
+    case WM_DPICHANGED: {
+        RECT rt;
+        GetWindowRect(hWnd, &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
+        ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt) + 1);
+        mswin_update_window_placement(NHW_MAP, &rt);
+    } break;
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -721,8 +728,6 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     data->backBufferDC = CreateCompatibleDC(hDC);
     data->tileDC = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
-
-    SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
 
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
@@ -982,10 +987,14 @@ onPaint(HWND hWnd)
     PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     /* update back buffer */
+    HBITMAP savedBitmap = SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
+
     for (int i = 0; i < COLNO; i++)
         for (int j = 0; j < ROWNO; j++)
             if (data->mapDirty[i][j])
                 paint(data, i, j);
+
+    SelectObject(data->tileDC, savedBitmap);
 
     PAINTSTRUCT ps;
     HDC hFrontBufferDC = BeginPaint(hWnd, &ps);

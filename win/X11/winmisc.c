@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1539892610 2018/10/18 19:56:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1543830350 2018/12/03 09:45:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1890,6 +1890,8 @@ Cardinal *num_params;
             ec_nchars = 1;
         }
         for (i = 0; extcmdlist[i].ef_txt; i++) {
+            if (extcmdlist[i].flags & CMD_NOT_AVAILABLE)
+                continue;
             if (extcmdlist[i].ef_txt[0] == '?')
                 continue;
 
@@ -1926,22 +1928,27 @@ Cardinal *num_params;
 static void
 init_extended_commands_popup()
 {
-    int i, num_commands;
+    int i, j, num_commands, ignore_cmds = 0;
     const char **command_list;
 
     /* count commands */
     for (num_commands = 0; extcmdlist[num_commands].ef_txt; num_commands++)
-        ; /* do nothing */
+        if (extcmdlist[num_commands].flags & CMD_NOT_AVAILABLE)
+            ++ignore_cmds;
 
     /* If the last entry is "help", don't use it. */
     if (strcmp(extcmdlist[num_commands - 1].ef_txt, "?") == 0)
         --num_commands;
 
-    command_list =
-        (const char **) alloc((unsigned) num_commands * sizeof(char *));
+    j = num_commands - ignore_cmds;
+    command_list = (const char **) alloc((unsigned) j * sizeof (char *));
 
-    for (i = 0; i < num_commands; i++)
-        command_list[i] = extcmdlist[i].ef_txt;
+    for (i = j = 0; i < num_commands; i++) {
+        if (extcmdlist[i].flags & CMD_NOT_AVAILABLE)
+            continue;
+        command_list[j++] = extcmdlist[i].ef_txt;
+    }
+    num_commands = j;
 
     extended_command_popup =
         make_menu("extended_commands", "Extended Commands",

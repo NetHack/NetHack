@@ -8,23 +8,18 @@
 #include "winos.h"
 #include "mhfont.h"
 
+/* font table - 64 fonts ought to be enough */
 #define MAXFONTS 64
 
-/* font table - 64 fonts ought to be enough */
-static struct font_table_entry {
-    int code;
-    HFONT hFont;
-    BOOL supportsUnicode;
-} font_table[MAXFONTS];
+static cached_font font_table[MAXFONTS];
 static int font_table_size = 0;
-HFONT version_splash_font;
 
 #define NHFONT_CODE(win, attr) (((attr & 0xFF) << 8) | (win_type & 0xFF))
 
 static void __cdecl font_table_cleanup(void);
 
-void
-mswin_init_splashfonts(HWND hWnd)
+HFONT
+mswin_create_splashfont(HWND hWnd)
 {
     HDC hdc = GetDC(hWnd);
     double scale = win10_monitor_scale(hWnd);
@@ -44,14 +39,10 @@ mswin_init_splashfonts(HWND hWnd)
     lgfnt.lfQuality = DEFAULT_QUALITY;           // output quality
     lgfnt.lfPitchAndFamily = DEFAULT_PITCH;      // pitch and family
     NH_A2W("Times New Roman", lgfnt.lfFaceName, LF_FACESIZE);
-    version_splash_font = CreateFontIndirect(&lgfnt);
+    HFONT font = CreateFontIndirect(&lgfnt);
     ReleaseDC(hWnd, hdc);
-}
 
-void
-mswin_destroy_splashfonts()
-{
-    DeleteObject(version_splash_font);
+    return font;
 }
 
 BOOL 
@@ -66,7 +57,7 @@ mswin_font_supports_unicode(HFONT hFont)
 
 /* create font based on window type, charater attributes and
    window device context */
-HGDIOBJ
+cached_font *
 mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 {
     HFONT fnt = NULL;
@@ -88,7 +79,7 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
             break;
 
     if (!replace && font_index < font_table_size)
-        return font_table[font_index].hFont;
+        return &font_table[font_index];
 
     switch (win_type) {
     case NHW_STATUS:
@@ -102,7 +93,7 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
         lgfnt.lfWeight =
             (attr == ATR_BOLD) ? FW_BOLD : FW_NORMAL; // font weight
         lgfnt.lfItalic = FALSE;            // italic attribute option
-        lgfnt.lfUnderline = FALSE;         // underline attribute option
+        lgfnt.lfUnderline = (attr == ATR_ULINE); // underline attribute option
         lgfnt.lfStrikeOut = FALSE;         // strikeout attribute option
         lgfnt.lfCharSet = mswin_charset(); // character set identifier
         lgfnt.lfOutPrecision = OUT_DEFAULT_PRECIS;   // output precision
@@ -214,7 +205,15 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
     font_table[font_index].hFont = fnt;
     font_table[font_index].supportsUnicode = winos_font_support_cp437(fnt);
 
-    return fnt;
+    HGDIOBJ savedFont = SelectObject(hdc, fnt);
+    SIZE size;
+    GetTextExtentPoint32A(hdc, " ", 1, &size);
+    SelectObject(hdc, savedFont);
+
+    font_table[font_index].height = size.cy;
+    font_table[font_index].width = size.cx;
+
+    return &font_table[font_index];
 }
 
 UINT
