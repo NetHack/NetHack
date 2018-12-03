@@ -275,6 +275,8 @@ Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
 move 'perm_invent' value from flags to iflags to keep it out of save files;
 	affects X11, win32, and curses
+always define shell and suspend commands so that key bindings copied from one
+	platform to another work even if second one disables those commands
 windows-gui: In nethackw, there could be conflicts between menu accelerators 
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
