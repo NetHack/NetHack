@@ -3185,7 +3185,14 @@ int which_set;
         if (symset[which_set].name
             && (fuzzymatch(symset[which_set].name, "Default symbols",
                            " -_", TRUE)
-                || !strcmpi(symset[which_set].name, "default")))
+                || !strcmpi(symset[which_set].name, "default")
+#ifdef CURSES_GRAPHICS
+                /* we don't maintain static symbols for curses
+                 * the system defines these at runtime
+                 */
+                || !strcmpi(symset[which_set].name, "curses")
+#endif
+                ))
             clear_symsetentry(which_set, TRUE);
         config_error_done();
         return (symset[which_set].name == 0) ? 1 : 0;
