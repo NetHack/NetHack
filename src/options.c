@@ -106,7 +106,7 @@ static struct Bool_Opt {
 #endif
     { "clicklook", &iflags.clicklook, FALSE, SET_IN_GAME },
     { "cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME },
-#if defined(MICRO) || defined(WIN32) || defined(CURSES_GRAPHICS)
+#if defined(MICRO) || defined(WIN32)
     { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /*WC*/
 #else /* systems that support multiple terminals, many monochrome */
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
@@ -3625,71 +3625,6 @@ boolean tinitial, tfrom_file;
         return retval;
     }
 #endif
-
-    /* WINCAP2
-     * term_cols:amount */
-    fullname = "term_cols";
-    if (match_optname(opts, fullname, sizeof("term_cols")-1, TRUE)) {
-        op = string_for_opt(opts, negated);
-        iflags.wc2_term_cols = atoi(op);
-        if (negated) bad_negation(fullname, FALSE);
-        return retval;
-    }
-
-    /* WINCAP2
-     * term_rows:amount */
-    fullname = "term_rows";
-    if (match_optname(opts, fullname, sizeof("term_rows")-1, TRUE)) {
-        op = string_for_opt(opts, negated);
-        iflags.wc2_term_rows = atoi(op);
-        if (negated) bad_negation(fullname, FALSE);
-        return retval;
-    }
-
-    /* WINCAP2
-     * petattr:string */
-    fullname = "petattr";
-    if (match_optname(opts, fullname, sizeof("petattr")-1, TRUE)) {
-        op = string_for_opt(opts, negated);
-        if (op && !negated) {
-#ifdef CURSES_GRAPHICS
-            iflags.wc2_petattr = curses_read_attrs(op);
-            if (!curses_read_attrs(op))
-                config_error_add("Unknown %s parameter '%s'", fullname, opts);
-                return FALSE;
-#else
-            /* non-curses windowports will not use this flag anyway
-             * but the above will not compile if we don't have curses.
-             * Just set it to a sensible default: */
-            iflags.wc2_petattr = ATR_INVERSE
-#endif
-        } else if (negated) bad_negation(fullname, TRUE);
-        return retval;
-    }
-
-    /* WINCAP2
-     * windowborders:n */
-    fullname = "windowborders";
-    if (match_optname(opts, fullname, sizeof("windowborders")-1, TRUE)) {
-        op = string_for_opt(opts, negated);
-        if (negated && op) bad_negation(fullname, TRUE);
-        else {
-            if (negated)
-                iflags.wc2_windowborders = 2; /* Off */
-            else if (!op)
-                iflags.wc2_windowborders = 1; /* On */
-            else    /* Value supplied */
-                iflags.wc2_windowborders = atoi(op);
-            if ((iflags.wc2_windowborders > 3) ||
-                (iflags.wc2_windowborders < 1)) {
-                iflags.wc2_windowborders = 0;
-                config_error_add("Unknown %s parameter '%s'", fullname, opts);
-                return FALSE;
-
-            }
-        }
-        return retval;
-    }
 
     /* menustyle:traditional or combination or full or partial */
     fullname = "menustyle";

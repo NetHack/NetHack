@@ -259,6 +259,9 @@ extern void curses_del_menu(winid wid);
 
 extern void curses_status_init(void);
 extern void curses_status_update(int, genericptr_t, int, int, int, unsigned long *);
+/* extern attr_t curses_color_attr(int nh_color, int bg_color); */
+/* extern void curses_update_stats(void); */
+/* extern void curses_decrement_highlight(void); */
 
 /* cursinvt.c */
 

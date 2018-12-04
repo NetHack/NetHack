@@ -198,14 +198,6 @@ REGEXOBJ = posixregex.o
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
 	../win/tty/wintty.c
 WINTTYOBJ = getline.o termcap.o topl.o wintty.o
-# Files for curses interface
-WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
-	../win/curses/cursmisc.c ../win/curses/cursdial.c \
-	../win/curses/cursstat.c ../win/curses/cursinit.c \
-	../win/curses/cursmesg.c ../win/curses/cursinvt.c
-WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
-	cursinit.o cursmesg.o cursinvt.o
-
 #
 # Files for curses interface
 WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
