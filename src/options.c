@@ -106,7 +106,7 @@ static struct Bool_Opt {
 #endif
     { "clicklook", &iflags.clicklook, FALSE, SET_IN_GAME },
     { "cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME },
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32) || defined(CURSES_GRAPHICS)
     { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /*WC*/
 #else /* systems that support multiple terminals, many monochrome */
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
