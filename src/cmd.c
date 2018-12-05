@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1543797825 2018/12/03 00:43:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1543972186 2018/12/05 01:09:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.313 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5694,7 +5694,7 @@ dotravel(VOID_ARGS)
     cmd[1] = 0;
     cc.x = iflags.travelcc.x;
     cc.y = iflags.travelcc.y;
-    if (cc.x == -1 && cc.y == -1) {
+    if (cc.x == 0 && cc.y == 0) {
         /* No cached destination, start attempt from current position */
         cc.x = u.ux;
         cc.y = u.uy;
