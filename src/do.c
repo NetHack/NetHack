@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1543052696 2018/11/24 09:44:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1543972190 2018/12/05 01:09:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1244,6 +1244,17 @@ boolean at_stairs, falling, portal;
     if(dropleveltempsfn) (*dropleveltempsfn)();
 #endif
 
+    /* discard context which applies to the level we're leaving;
+       for lock-picking, container may be carried, in which case we
+       keep context; if on the floor, it's about to be saved+freed and
+       maybe_reset_pick() needs to do its carried() check before that */
+    maybe_reset_pick();
+    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
+    iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination cache */
+    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    /* digging context is level-aware and can actually be resumed if
+       hero returns to the previous level without any intervening dig */
+
     if (falling) /* assuming this is only trap door or hole */
         impact_drop((struct obj *) 0, u.ux, u.uy, newlevel->dlevel);
 
@@ -1600,14 +1611,6 @@ boolean at_stairs, falling, portal;
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
-
-    /* discard context which applied to previous level */
-    maybe_reset_pick(); /* for door or for box not accompanying hero */
-    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
-    iflags.travelcc.x = iflags.travelcc.y = -1; /* travel destination cache */
-    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
-    /* digging context is level-aware and can actually be resumed if
-       hero returns to the previous level without any intervening dig */
 }
 
 STATIC_OVL void

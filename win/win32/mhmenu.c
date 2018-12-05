@@ -297,8 +297,9 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) data);
 
         /* set font for the text cotrol */
+        cached_font * font = mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE);
         SendMessage(control, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE),
+                    (WPARAM) font->hFont,
                     (LPARAM) 0);
         ReleaseDC(control, hdc);
 
@@ -564,8 +565,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         /* calculate dimensions of the added line of text */
         hdc = GetDC(text_view);
-        saveFont =
-            SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
+        cached_font * font = mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE);
+        saveFont = SelectObject(hdc, font->hFont);
         SetRect(&text_rt, 0, 0, 0, 0);
         DrawTextA(hdc, msg_data->text, strlen(msg_data->text), &text_rt,
                  DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX
@@ -629,8 +630,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         /* calculate tabstop size */
         hDC = GetDC(hWnd);
-        saveFont = SelectObject(
-            hDC, mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE));
+        cached_font * font = mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE);
+        saveFont = SelectObject(hDC, font->hFont);
         GetTextMetrics(hDC, &tm);
         p1 = data->menu.items[new_item].str;
         p = strchr(data->menu.items[new_item].str, '\t');
@@ -936,8 +937,8 @@ onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     GetClientRect(GetMenuControl(hWnd), &list_rect);
 
     hdc = GetDC(GetMenuControl(hWnd));
-    saveFont =
-        SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, FALSE));
+    cached_font * font = mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, FALSE);
+    saveFont = SelectObject(hdc, font->hFont);
     GetTextMetrics(hdc, &tm);
 
     /* Set the height of the list box items to max height of the individual
@@ -1000,8 +1001,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     item = &data->menu.items[lpdis->itemID];
 
     tileDC = CreateCompatibleDC(lpdis->hDC);
-    saveFont = SelectObject(
-        lpdis->hDC, mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE));
+    cached_font * font = mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE);
+    saveFont = SelectObject(lpdis->hDC, font->hFont);
     NewBg = menu_bg_brush ? menu_bg_color
                           : (COLORREF) GetSysColor(DEFAULT_COLOR_BG_MENU);
     OldBg = SetBkColor(lpdis->hDC, NewBg);
@@ -1050,8 +1051,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             if (iflags.use_menu_color
                 && (menucolr = get_menu_coloring(item->str, &color, &attr))) {
-                SelectObject(lpdis->hDC, 
-                             mswin_get_font(NHW_MENU, attr, lpdis->hDC, FALSE));
+                cached_font * menu_font = mswin_get_font(NHW_MENU, attr, lpdis->hDC, FALSE);
+                SelectObject(lpdis->hDC, menu_font->hFont);
                 if (color != NO_COLOR)
                     SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
             }
@@ -1165,8 +1166,10 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                           data->menu.items[lpdis->itemID].count);
             }
 
-            SelectObject(lpdis->hDC, mswin_get_font(NHW_MENU, ATR_BLINK,
-                                                    lpdis->hDC, FALSE));
+            /* TOOD: add blinking for blink text */
+
+            cached_font * blink_font = mswin_get_font(NHW_MENU, ATR_BLINK, lpdis->hDC, FALSE);
+            SelectObject(lpdis->hDC, blink_font->hFont);
 
             /* calculate text rectangle */
             SetRect(&drawRect, client_rt.left, lpdis->rcItem.top,

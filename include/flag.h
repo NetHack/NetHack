@@ -369,8 +369,6 @@ struct instance_flags {
     boolean wizweight;       /* display weight of everything in wizard mode */
     boolean cmdassist;       /* provide detailed assistance for some commands */
     boolean clicklook;          /* allow right-clicking for look */
-    boolean msg_is_alert;    /* suggest windowport should grab player's attention
-                              * and request <TAB> acknowlegement */
     int statuslines;         /* default = 2, code support for alternative 3 */
     /*
      * Window capability support.

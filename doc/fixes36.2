@@ -236,6 +236,12 @@ to emphasize that it's not a light source, change description of wielded Sting
 	from "(glowing)" to nothing (not warm enough to feel) when blind
 glowing Sting quivers if hero becomes blind and quivering Sting glows if
 	blindness ends; it worked for timed blindness but not for blindfold
+weapon (wielded pie, egg, potion, boomerang) might be destroyed when hitting a
+	long worm, then freed memory was accessed to decide whether to cut it
+level change after being interruped locking or unlocking a container might
+	access freed memory
+if a restore attempt failed and a new game was started instead, it would use
+	stale context from old game if restoration got far enough to load that
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -258,6 +264,8 @@ buliding with EXTRA_SANITY_CHECKS enabled would issue "no monster to remove"
 changing Sting's description to be "(weapon in hand) (light blue aura)" was
 	too close to feedback when objects become blessed; change it again,
 	to "(weapon in hand, flickering/glimmering/gleaming light blue)"
+fix bit-use collision between WC2_TERM_SIZE and WC2_RESET_STATUS in
+	include/winprocs.h following a recent merge
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -275,6 +283,8 @@ Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
 move 'perm_invent' value from flags to iflags to keep it out of save files;
 	affects X11, win32, and curses
+always define shell and suspend commands so that key bindings copied from one
+	platform to another work even if second one disables those commands
 windows-gui: In nethackw, there could be conflicts between menu accelerators 
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet

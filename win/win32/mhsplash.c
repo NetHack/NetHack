@@ -25,26 +25,97 @@ INT_PTR CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 #define SPLASH_VERSION_X_96DPI 280
 #define SPLASH_VERSION_Y_96DPI 0
 
-extern HFONT version_splash_font;
-
 typedef struct {
+    int boarder_width;
+    int boarder_height;
+    int client_width;
+    int client_height;
+    int ok_control_width;
+    int ok_control_height;
+    int ok_control_offset_x;
+    int ok_control_offset_y;
+    int text_control_width;
+    int text_control_height;
+    int text_control_offset_x;
+    int text_control_offset_y;
+    int window_width;
+    int window_height;
     int width;
     int height;
-    int offsetX;
-    int offsetY;
-    int versionX;
-    int versionY;
+    int offset_x;
+    int offset_y;
+    int version_x;
+    int version_y;
+    HFONT hFont;
 } SplashData;
+
+static void
+mswin_set_splash_data(HWND hWnd, SplashData * sd, double scale)
+{
+    RECT client_rect;
+    RECT window_rect;
+    RECT ok_control_rect;
+    RECT text_control_rect;
+
+    GetClientRect(hWnd, &client_rect);
+    GetWindowRect(hWnd, &window_rect);
+    GetWindowRect(GetDlgItem(hWnd, IDOK), &ok_control_rect);
+    GetWindowRect(GetDlgItem(hWnd, IDC_EXTRAINFO), &text_control_rect);
+
+    sd->boarder_width = (window_rect.right - window_rect.left) -
+                                (client_rect.right - client_rect.left);
+    sd->boarder_height = (window_rect.bottom - window_rect.top) -
+        (client_rect.bottom - client_rect.top);
+
+    sd->ok_control_width = ok_control_rect.right - ok_control_rect.left;
+    sd->ok_control_height = ok_control_rect.bottom - ok_control_rect.top;
+
+    sd->width = (int)(scale * SPLASH_WIDTH_96DPI);
+    sd->height = (int)(scale * SPLASH_HEIGHT_96DPI);
+    sd->offset_x = (int)(scale * SPLASH_OFFSET_X_96DPI);
+    sd->offset_y = (int)(scale * SPLASH_OFFSET_Y_96DPI);
+    sd->version_x = (int)(scale * SPLASH_VERSION_X_96DPI);
+    sd->version_y = (int)(scale * SPLASH_VERSION_Y_96DPI);
+
+    sd->client_width = sd->width + sd->offset_x * 2;
+    sd->client_height = sd->height + sd->ok_control_height +
+        sd->offset_y * 3;
+
+    sd->window_width = sd->client_width + sd->boarder_width;
+    sd->window_height = sd->client_height + sd->boarder_height;
+
+    sd->ok_control_offset_x = (sd->client_width - sd->ok_control_width) / 2;
+    sd->ok_control_offset_y = sd->client_height - sd->ok_control_height - sd->offset_y;
+
+    sd->text_control_width = sd->client_width - sd->offset_x * 2;
+    sd->text_control_height = text_control_rect.bottom - text_control_rect.top;
+
+    sd->text_control_offset_x = sd->offset_x;
+    sd->text_control_offset_y = sd->ok_control_offset_y - sd->offset_y -
+                               sd->text_control_height;
+
+    if (sd->hFont != NULL)
+        DeleteObject(sd->hFont);
+
+    sd->hFont = mswin_create_splashfont(hWnd);
+
+    MoveWindow(hWnd, window_rect.left, window_rect.top,
+        sd->window_width, sd->window_height, TRUE);
+
+    MoveWindow(GetDlgItem(hWnd, IDOK),
+        sd->ok_control_offset_x, sd->ok_control_offset_y,
+        sd->ok_control_width, sd->ok_control_height, TRUE);
+
+    MoveWindow(GetDlgItem(hWnd, IDC_EXTRAINFO),
+        sd->text_control_offset_x, sd->text_control_offset_y,
+        sd->text_control_width, sd->text_control_height, TRUE);
+
+}
 
 void
 mswin_display_splash_window(BOOL show_ver)
 {
     MSG msg;
-    int left, top;
-    RECT splashrt;
-    RECT clientrt;
-    RECT controlrt;
-    int buttop;
     strbuf_t strbuf;
 
     strbuf_init(&strbuf);
@@ -56,57 +127,18 @@ mswin_display_splash_window(BOOL show_ver)
 
     MonitorInfo monitorInfo;
     win10_monitor_info(hWnd, &monitorInfo);
-    
-    SplashData splashData;
 
-    splashData.width = (int) (monitorInfo.scale * SPLASH_WIDTH_96DPI);
-    splashData.height = (int) (monitorInfo.scale * SPLASH_HEIGHT_96DPI);
-    splashData.offsetX = (int) (monitorInfo.scale * SPLASH_OFFSET_X_96DPI);
-    splashData.offsetY = (int) (monitorInfo.scale * SPLASH_OFFSET_Y_96DPI);
-    splashData.versionX = (int) (monitorInfo.scale * SPLASH_VERSION_X_96DPI);
-    splashData.versionY = (int) (monitorInfo.scale * SPLASH_VERSION_Y_96DPI);
+    SplashData splashData;
+    memset(&splashData, 0, sizeof(splashData));
+    mswin_set_splash_data(hWnd, &splashData, monitorInfo.scale);
  
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) &splashData);
     
-    mswin_init_splashfonts(hWnd);
     GetNHApp()->hPopupWnd = hWnd;
-    /* Get control size */
-    GetWindowRect(GetDlgItem(hWnd, IDOK), &controlrt);
-    controlrt.right -= controlrt.left;
-    controlrt.bottom -= controlrt.top;
-    /* Get current client area */
-    GetClientRect(hWnd, &clientrt);
-    /* Get window size */
-    GetWindowRect(hWnd, &splashrt);
-    splashrt.right -= splashrt.left;
-    splashrt.bottom -= splashrt.top;
-    /* Get difference between requested client area and current value */
-    splashrt.right += splashData.width + splashData.offsetX * 2
-                   - clientrt.right;
-    splashrt.bottom += splashData.height + controlrt.bottom 
-                    + splashData.offsetY * 3
-                    - clientrt.bottom;
-    /* Place the window centered */
-    /* On the screen, not on the parent window */
-    left = (monitorInfo.width - splashrt.right) / 2;
-    top = (monitorInfo.height - splashrt.bottom) / 2;
-    MoveWindow(hWnd, left, top, splashrt.right, splashrt.bottom, TRUE);
-    /* Place the OK control */
-    GetClientRect(hWnd, &clientrt);
-    MoveWindow(GetDlgItem(hWnd, IDOK),
-               (clientrt.right - clientrt.left - controlrt.right) / 2,
-               clientrt.bottom - controlrt.bottom - splashData.offsetY,
-               controlrt.right, controlrt.bottom, TRUE);
-    buttop = clientrt.bottom - controlrt.bottom - splashData.offsetY;
-    /* Place the text control */
-    GetWindowRect(GetDlgItem(hWnd, IDC_EXTRAINFO), &controlrt);
-    controlrt.right -= controlrt.left;
-    controlrt.bottom -= controlrt.top;
-    GetClientRect(hWnd, &clientrt);
-    MoveWindow(GetDlgItem(hWnd, IDC_EXTRAINFO),
-        clientrt.left + splashData.offsetX,
-        buttop - controlrt.bottom - splashData.offsetY,
-        clientrt.right - 2 * splashData.offsetX, controlrt.bottom, TRUE);
+
+    int left = monitorInfo.left + (monitorInfo.width - splashData.window_width) / 2;
+    int top = monitorInfo.top + (monitorInfo.height - splashData.window_height) / 2;
+    MoveWindow(hWnd, left, top, splashData.window_width, splashData.window_height, TRUE);
 
     /* Fill the text control */
     strbuf_reserve(&strbuf, BUFSIZ);
@@ -164,27 +196,24 @@ mswin_display_splash_window(BOOL show_ver)
     }
 
     GetNHApp()->hPopupWnd = NULL;
-    mswin_destroy_splashfonts();
+    DeleteObject(splashData.hFont);
 }
 
 INT_PTR CALLBACK
 NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HDC hdc;
-
     UNREFERENCED_PARAMETER(lParam);
 
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        HDC hdc = GetDC(hWnd);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
         /* set text control font */
-        hdc = GetDC(hWnd);
-        SendMessage(hWnd, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(hWnd, WM_SETFONT, (WPARAM)font->hFont,  0);
         ReleaseDC(hWnd, hdc);
 
         SetFocus(GetDlgItem(hWnd, IDOK));
-        return FALSE;
+    } break;
 
     case WM_PAINT: {
         char VersionString[BUFSZ];
@@ -196,14 +225,14 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         SplashData *splashData = (SplashData *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-        hdc = BeginPaint(hWnd, &ps);
+        HDC hdc = BeginPaint(hWnd, &ps);
         /* Show splash graphic */
 
         hdcBitmap = CreateCompatibleDC(hdc);
         SetBkMode(hdc, OPAQUE);
         OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpSplash);
         (*GetNHApp()->lpfnTransparentBlt)(hdc,
-            splashData->offsetX, splashData->offsetY,
+            splashData->offset_x, splashData->offset_y,
             splashData->width, splashData->height, hdcBitmap,
             0, 0, SPLASH_WIDTH_96DPI, SPLASH_HEIGHT_96DPI,
             TILE_BK_COLOR);
@@ -215,11 +244,11 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         /* Print version number */
 
         SetTextColor(hdc, RGB(0, 0, 0));
-        rt.right = rt.left = splashData->offsetX + splashData->versionX;
-        rt.bottom = rt.top = splashData->offsetY + splashData->versionY;
+        rt.right = rt.left = splashData->offset_x + splashData->version_x;
+        rt.bottom = rt.top = splashData->offset_y + splashData->version_y;
         Sprintf(VersionString, "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR,
                 PATCHLEVEL);
-        OldFont = SelectObject(hdc, version_splash_font);
+        OldFont = SelectObject(hdc, splashData->hFont);
         DrawText(hdc, VersionString, strlen(VersionString), &rt,
                  DT_LEFT | DT_NOPREFIX | DT_CALCRECT);
         DrawText(hdc, VersionString, strlen(VersionString), &rt,
@@ -238,6 +267,18 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }
         break;
+
+    case WM_DPICHANGED: {
+        SplashData *splashData = (SplashData *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+        MonitorInfo monitorInfo;
+        win10_monitor_info(hWnd, &monitorInfo);
+
+        mswin_set_splash_data(hWnd, splashData, monitorInfo.scale);
+
+        InvalidateRect(hWnd, NULL, TRUE);
+    } break;
+
     }
     return FALSE;
 }
