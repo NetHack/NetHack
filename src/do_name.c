@@ -57,7 +57,9 @@ static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any unexplored areas", "unexplored area", "unexplored location",
       "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
-      "anything interesting" }
+      "anything interesting" },
+    { "any valid locations", "valid location", "valid location",
+      "valid locations" }
 };
 
 static const char *const gloc_filtertxt[NUM_GFILTER] = {
