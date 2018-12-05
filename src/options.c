@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1543395749 2018/11/28 09:02:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.334 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1543972192 2018/12/05 01:09:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -746,8 +746,6 @@ initoptions_init()
     for (i = 0; i < WARNCOUNT; i++)
         warnsyms[i] = def_warnsyms[i].sym;
     iflags.bouldersym = 0;
-
-    iflags.travelcc.x = iflags.travelcc.y = -1;
 
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
