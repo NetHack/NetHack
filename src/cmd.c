@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1543972186 2018/12/05 01:09:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1544050555 2018/12/05 22:55:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.314 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2740,7 +2740,12 @@ int final;
     }
     if (Polymorph_control)
         you_have("polymorph control", from_what(POLYMORPH_CONTROL));
-    if (Upolyd && u.umonnum != u.ulycn) {
+    if (Upolyd && u.umonnum != u.ulycn
+        /* if we've died from turning into slime, we're polymorphed
+           right now but don't want to list it as a temporary attribute
+           [we need a more reliable way to detect this situation] */
+        && !(final == ENL_GAMEOVERDEAD
+             && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
         Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
         if (wizard)
