@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1541902953 2018/11/11 02:22:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1544003111 2018/12/05 09:45:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,6 +11,7 @@ STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(levitation_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
+STATIC_DCL void FDECL(slimed_to_death, (struct kinfo *));
 STATIC_DCL void NDECL(slip_or_trip);
 STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
@@ -357,6 +358,57 @@ burn_away_slime()
     }
 }
 
+/* countdown timer for turning into green slime has run out; kill our hero */
+STATIC_OVL void
+slimed_to_death(kptr)
+struct kinfo *kptr;
+{
+    /* redundant: polymon() cures sliming when polying into green slime */
+    if (Upolyd && youmonst.data == &mons[PM_GREEN_SLIME]) {
+        dealloc_killer(kptr);
+        return;
+    }
+    /* more sure killer reason is set up */
+    if (kptr && kptr->name[0]) {
+        killer.format = kptr->format;
+        Strcpy(killer.name, kptr->name);
+    } else {
+        killer.format = NO_KILLER_PREFIX;
+        Strcpy(killer.name, "turned into green slime");
+    }
+    dealloc_killer(kptr);
+    /* involuntarily break "never changed form" conduct */
+    u.uconduct.polyselfs++;
+    done(TURNED_SLIME);
+
+    /* life-saved; even so, hero still has turned into green slime;
+       player may have genocided green slimes after being infected */
+    if ((mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
+        killer.format = KILLED_BY;
+        Strcpy(killer.name, "slimicide");
+        /* immediately follows "OK, so you don't die." */
+        pline("Yes, you do.  Green slime has been genocided...");
+        done(GENOCIDED);
+        /* could be life-saved again (only in explore or wizard mode)
+           but green slimes are gone; just stay in current form */
+
+    /* not geno'd; survive as a green slime */
+    } else {
+        /* this part of polyself() isn't in polymon();
+           we assume that green slimes don't emit light */
+        if (emits_light(youmonst.data))
+            del_light_source(LS_MONSTER, monst_to_any(&youmonst));
+        /* undo the 'involuntarily break "never changed form"'
+           increment so that this change isn't counted twice */
+        u.uconduct.polyselfs--;
+        /* can't be Unchanging even if life-saving wasn't due to amulet;
+           hero infected with slime wouldn't have turned into green slime
+           to get here if Unchanging */
+        (void) polymon(PM_GREEN_SLIME);
+    }
+    return;
+}
+
 /* Intrinsic Passes_walls is temporary when your god is trying to fix
    all troubles and then TROUBLE_STUCK_IN_WALL calls safe_teleds() but
    it can't find anywhere to place you.  If that happens you get a small
@@ -469,17 +521,7 @@ nh_timeout()
                 done(STONING);
                 break;
             case SLIMED:
-                if (kptr && kptr->name[0]) {
-                    killer.format = kptr->format;
-                    Strcpy(killer.name, kptr->name);
-                } else {
-                    killer.format = NO_KILLER_PREFIX;
-                    Strcpy(killer.name, "turned into green slime");
-                }
-                dealloc_killer(kptr);
-                /* involuntarily break "never changed form" conduct */
-                u.uconduct.polyselfs++;
-                done(TURNED_SLIME);
+                slimed_to_death(kptr); /* done(TURNED_SLIME) */
                 break;
             case VOMITING:
                 make_vomiting(0L, TRUE);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1542798619 2018/11/21 11:10:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1544003110 2018/12/05 09:45:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1184,7 +1184,12 @@ int how;
         u.ugrave_arise = (NON_PM - 2); /* leave no corpse */
     else if (how == STONING)
         u.ugrave_arise = (NON_PM - 1); /* statue instead of corpse */
-    else if (how == TURNED_SLIME)
+    else if (how == TURNED_SLIME
+             /* it's possible to turn into slime even though green slimes
+                have been genocided:  genocide could occur after hero is
+                already infected or hero could eat a glob of one created
+                before genocide; don't try to arise as one if they're gone */
+             && !(mvitals[PM_GREEN_SLIME].mvflags & G_GENOD))
         u.ugrave_arise = PM_GREEN_SLIME;
 
     if (how == QUIT) {
@@ -1310,11 +1315,14 @@ int how;
         }
     }
 
-    if (u.ugrave_arise >= LOW_PM && u.ugrave_arise != PM_GREEN_SLIME) {
+    if (u.ugrave_arise >= LOW_PM) {
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
-        Your("body rises from the dead as %s...",
+        Your("%s as %s...",
+             (u.ugrave_arise != PM_GREEN_SLIME)
+                 ? "body rises from the dead"
+                 : "revenant persists",
              an(mons[u.ugrave_arise].mname));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
