@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1527042178 2018/05/23 02:22:58 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1544171789 2018/12/07 08:36:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -732,15 +732,14 @@ boolean *valsetlist;
      *  NNNN = the glyph portion
      *  25   = the gold amount
      *
+     * Setting 'chg = 2' is enough to render the field properly, but
+     * not to honor an initial highlight, so force 'update_all = 1'.
      */
-
     if (fld == BL_GOLD) {
-        if (context.rndencode != oldrndencode) {
-            chg = 2;
+        if (context.rndencode != oldrndencode
+            || showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym) {
+            update_all = 1; /* chg = 2; */
             oldrndencode = context.rndencode;
-        }
-        if (oldgoldsym != showsyms[COIN_CLASS + SYM_OFF_O]) {
-            chg = 2;
             oldgoldsym = showsyms[COIN_CLASS + SYM_OFF_O];
         }
     }
