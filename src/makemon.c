@@ -18,15 +18,15 @@ STATIC_DCL boolean FDECL(uncommon, (int));
 STATIC_DCL int FDECL(align_shift, (struct permonst *));
 STATIC_DCL boolean FDECL(mk_gen_ok, (int, int, int));
 STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
-STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int));
+STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int, int));
 STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
 STATIC_DCL void FDECL(m_initweap, (struct monst *));
 STATIC_DCL void FDECL(m_initinv, (struct monst *));
 STATIC_DCL boolean FDECL(makemon_rnd_goodpos, (struct monst *,
                                                unsigned, coord *));
 
-#define m_initsgrp(mtmp, x, y) m_initgrp(mtmp, x, y, 3)
-#define m_initlgrp(mtmp, x, y) m_initgrp(mtmp, x, y, 10)
+#define m_initsgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 3, mmf)
+#define m_initlgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 10, mmf)
 #define toostrong(monindx, lev) (mons[monindx].difficulty > lev)
 #define tooweak(monindx, lev) (mons[monindx].difficulty < lev)
 
@@ -76,9 +76,9 @@ struct permonst *ptr;
 
 /* make a group just like mtmp */
 STATIC_OVL void
-m_initgrp(mtmp, x, y, n)
-register struct monst *mtmp;
-register int x, y, n;
+m_initgrp(mtmp, x, y, n, mmflags)
+struct monst *mtmp;
+int x, y, n, mmflags;
 {
     coord mm;
     register int cnt = rnd(n);
@@ -131,6 +131,8 @@ register int x, y, n;
         if (enexto(&mm, mm.x, mm.y, mtmp->data)) {
             mon = makemon(mtmp->data, mm.x, mm.y, NO_MM_FLAGS);
             if (mon) {
+                if (mmflags & MM_ASLEEP)
+                    mon->msleeping = 1;
                 mon->mpeaceful = FALSE;
                 mon->mavenge = 0;
                 set_malign(mon);
@@ -1193,7 +1195,8 @@ int mmflags;
         newemin(mtmp);
     if (mmflags & MM_EDOG)
         newedog(mtmp);
-
+    if (mmflags & MM_ASLEEP)
+        mtmp->msleeping = 1;
     mtmp->nmon = fmon;
     fmon = mtmp;
     mtmp->m_id = context.ident++;
@@ -1366,12 +1369,12 @@ int mmflags;
     set_malign(mtmp); /* having finished peaceful changes */
     if (anymon) {
         if ((ptr->geno & G_SGROUP) && rn2(2)) {
-            m_initsgrp(mtmp, mtmp->mx, mtmp->my);
+            m_initsgrp(mtmp, mtmp->mx, mtmp->my, mmflags);
         } else if (ptr->geno & G_LGROUP) {
             if (rn2(3))
-                m_initlgrp(mtmp, mtmp->mx, mtmp->my);
+                m_initlgrp(mtmp, mtmp->mx, mtmp->my, mmflags);
             else
-                m_initsgrp(mtmp, mtmp->mx, mtmp->my);
+                m_initsgrp(mtmp, mtmp->mx, mtmp->my, mmflags);
         }
     }
 
