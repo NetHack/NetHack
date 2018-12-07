@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1543744276 2018/12/02 09:51:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1544146046 2018/12/07 01:27:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4719,15 +4719,32 @@ void
 destroy_item(osym, dmgtyp)
 register int osym, dmgtyp;
 {
-    register struct obj *obj, *obj2;
+    register struct obj *obj;
     int dmg, xresist, skip;
     long i, cnt, quan;
     int dindx;
     const char *mult;
     boolean physical_damage;
 
-    for (obj = invent; obj; obj = obj2) {
-        obj2 = obj->nobj;
+    /*
+     * Sometimes destroying an item can change inventory aside from the
+     * item itself (cited case was a potion of polymorph; when destroyed,
+     * potion_breathe() caused hero to transform and that resulted in
+     * destruction of some worn armor).  Unlike other uses of the object
+     * bybass mechanism, destroy_item() can be called multiple times for
+     * same event.  So we have to explicitly clear it before each use and
+     * hope no other section of code expects it to retain previous value.
+     *
+     * FIXME?  Destruction of a ring of levitation could drop hero onto
+     * a fire trap which could destroy other items and we'll get called
+     * recursively.  This should still work, but items beyond the ring
+     * which survive the fire will be marked as already processed by the
+     * inner call, so will always survive the remainder of the outer call
+     * instead of being subjected to original chance of destruction.
+     */
+    bypass_objlist(invent, FALSE); /* clear bypass bit for invent */
+
+    while ((obj = nxt_unbypassed_obj(invent)) != 0) {
         physical_damage = FALSE;
         if (obj->oclass != osym)
             continue; /* test only objs of type osym */
@@ -4820,6 +4837,7 @@ register int osym, dmgtyp;
             skip++;
             break;
         }
+
         if (!skip) {
             if (obj->in_use)
                 --quan; /* one will be used up elsewhere */
@@ -4852,9 +4870,9 @@ register int osym, dmgtyp;
             for (i = 0; i < cnt; i++)
                 useup(obj);
             if (dmg) {
-                if (xresist)
+                if (xresist) {
                     You("aren't hurt!");
-                else {
+                } else {
                     const char *how = destroy_strings[dindx][2];
                     boolean one = (cnt == 1L);
 
@@ -4877,7 +4895,7 @@ destroy_mitem(mtmp, osym, dmgtyp)
 struct monst *mtmp;
 int osym, dmgtyp;
 {
-    struct obj *obj, *obj2;
+    struct obj *obj;
     int skip, tmp = 0;
     long i, cnt, quan;
     int dindx;
@@ -4889,8 +4907,11 @@ int osym, dmgtyp;
     }
 
     vis = canseemon(mtmp);
-    for (obj = mtmp->minvent; obj; obj = obj2) {
-        obj2 = obj->nobj;
+
+    /* see destroy_item(); object destruction could disrupt inventory list */
+    bypass_objlist(mtmp->minvent, FALSE); /* clear bypass bit for invent */
+
+    while ((obj = nxt_unbypassed_obj(mtmp->minvent)) != 0) {
         if (obj->oclass != osym)
             continue; /* test only objs of type osym */
         skip = 0;

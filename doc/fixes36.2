@@ -243,6 +243,14 @@ level change after being interruped locking or unlocking a container might
 if a restore attempt failed and a new game was started instead, it would use
 	stale context from old game if restoration got far enough to load that
 if hero survives turning into slime (life-saving), survive as a green slime
+hero hit by something that causes inventory items to be destroyed with loss of
+	any of those causing other inventory items to be dropped or destroyed,
+	inventory traversal became unreliable (known sequence: potions hit by
+	fire then breahing vapor from boiled unholy water triggering were
+	transformation to beast form; possible sequence: ring of levitation
+	blasted by lightning and dropping hero onto fire trap); [3.6.1 fixed a
+	similar problem with more obvious symptom, an "object lost" panic when
+	the unholy water was wielded; the fix for that wasn't general enough]
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
