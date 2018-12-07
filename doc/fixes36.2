@@ -252,6 +252,9 @@ hero hit by something that causes inventory items to be destroyed with loss of
 	similar problem with more obvious symptom, an "object lost" panic when
 	the unholy water was wielded; the fix for that wasn't general enough]
 add MM_ASLEEP makemon() flag and honor it when creating group for fill_zoo
+add MM_NOGRP makemon() flag as a means of suppressing groups of monsters in
+	a couple places that warrant it when a specific monster type isn't
+	specified on the call to makemon()
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository

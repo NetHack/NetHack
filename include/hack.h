@@ -261,6 +261,7 @@ typedef struct sortloot_item Loot;
 #define MM_EMIN   0x00800   /* add emin structure */
 #define MM_EDOG   0x01000   /* add edog structure */
 #define MM_ASLEEP 0x02000   /* monsters should be generated asleep */
+#define MM_NOGRP  0x04000   /* suppress creation of monster groups */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
