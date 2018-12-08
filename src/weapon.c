@@ -69,11 +69,17 @@ static void
 give_may_advance_msg(skill)
 int skill;
 {
+    static boolean got_enhance_tip = FALSE;
     You_feel("more confident in your %sskills.",
              (skill == P_NONE) ? ""
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
+
+    if (!got_enhance_tip) {
+        pline("(Use the #enhance command to advance them.)");
+    }
+    got_enhance_tip = TRUE;
 }
 
 /* weapon's skill category name for use as generalized description of weapon;
