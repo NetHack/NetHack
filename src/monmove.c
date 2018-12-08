@@ -14,7 +14,6 @@ STATIC_DCL int FDECL(disturb, (struct monst *));
 STATIC_DCL void FDECL(release_hero, (struct monst *));
 STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
-STATIC_DCL int FDECL(count_webbing_walls, (XCHAR_P, XCHAR_P));
 STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
 STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *,
                                   BOOLEAN_P));
@@ -759,24 +758,6 @@ xchar nix,niy;
     return FALSE;
 }
 
-/* returns the number of walls in the four cardinal directions that could
-   hold up a web */
-STATIC_OVL int
-count_webbing_walls(x, y)
-xchar x, y;
-{
-#define holds_up_web(X, Y) ((!isok((X), (Y))                              \
-                             || IS_ROCK(levl[X][Y].typ)                   \
-                             || (levl[X][Y].typ == STAIRS                 \
-                                 && (X) == xupstair && (Y) == yupstair)   \
-                             || (levl[X][Y].typ == LADDER                 \
-                                 && (X) == xupladder && (Y) == yupladder) \
-                             || levl[X][Y].typ == IRONBARS) ? 1 : 0)
-    return (holds_up_web(x, y - 1) + holds_up_web(x + 1, y)
-            + holds_up_web(x, y + 1) + holds_up_web(x - 1, y));
-#undef holds_up_web
-}
-
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1469,27 +1450,6 @@ postmov:
                 newsym(mtmp->mx, mtmp->my);
                 if (mtmp->wormno)
                     see_wsegs(mtmp);
-            }
-        }
-
-        /* maybe spin a web -- this needs work; if the spider is far away,
-           it might spin a lot of webs before hero encounters it */
-        if (webmaker(ptr) && !mtmp->mspec_used && !t_at(mtmp->mx, mtmp->my)) {
-            struct trap *trap;
-            int prob = ((ptr == &mons[PM_GIANT_SPIDER]) ? 15 : 5)
-                      * (count_webbing_walls(mtmp->mx, mtmp->my) + 1);
-
-            if (rn2(1000) < prob
-                && (trap = maketrap(mtmp->mx, mtmp->my, WEB)) != 0) {
-                mtmp->mspec_used = d(4, 4); /* 4..16 */
-                if (cansee(mtmp->mx, mtmp->my)) {
-                    char mbuf[BUFSZ];
-
-                    Strcpy(mbuf,
-                           canspotmon(mtmp) ? y_monnam(mtmp) : something);
-                    pline("%s spins a web.", upstart(mbuf));
-                    trap->tseen = 1;
-                }
             }
         }
 
