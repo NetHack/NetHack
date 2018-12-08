@@ -146,14 +146,15 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)nhlan.c" />
-    <ClCompile Include="$(SysShareDir)pcmain.c" />
     <ClCompile Include="$(SysShareDir)pcsys.c" />
     <ClCompile Include="$(SysShareDir)pcunix.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
+    <ClCompile Include="$(SysShareDir)safeproc.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
       <PreprocessorDefinitions>TTYSTUB;</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="$(SysWinntDir)windmain.c" />
     <ClCompile Include="$(SysWinntDir)winnt.c" />
     <ClCompile Include="$(SysWinntDir)win10.c" />
     <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />

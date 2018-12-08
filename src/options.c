@@ -873,11 +873,16 @@ initoptions_finish()
      * A multi-interface binary might only support status highlighting
      * for some of the interfaces; check whether we asked for it but are
      * using one which doesn't.
+     *
+     * Option processing can take place before a user-decided WindowPort
+     * is even initialized, so check for that too.
      */
-    if (iflags.hilite_delta && !wc2_supported("statushilites")) {
-        raw_printf("Status highlighting not supported for %s interface.",
-                   windowprocs.name);
-        iflags.hilite_delta = 0;
+    if (!WINDOWPORT("safe-startup")) {
+        if (iflags.hilite_delta && !wc2_supported("statushilites")) {
+            raw_printf("Status highlighting not supported for %s interface.",
+                       windowprocs.name);
+            iflags.hilite_delta = 0;
+        }
     }
 #endif
     return;

@@ -15,6 +15,10 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
+#if !defined(SAFEPROCS)
+#error You must #define SAFEPROCS to build winhack.c
+#endif
+
 /* Borland and MinGW redefine "boolean" in shlwapi.h,
    so just use the little bit we need */
 typedef struct _DLLVERSIONINFO {
@@ -66,7 +70,7 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-extern boolean FDECL(pcmain, (int, char **));
+extern boolean FDECL(main, (int, char **));
 static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255
@@ -82,24 +86,44 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     TCHAR *p;
     TCHAR wbuf[BUFSZ];
     char buf[BUFSZ];
+
     DWORD major, minor;
-    boolean resuming;
     /* OSVERSIONINFO osvi; */
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
 
-    /* We must initialize state sufficiently to support calls to panic */
+    /*
+     * Get a set of valid safe windowport function
+     * pointers during early startup initialization.
+     *
+     * When get_safe_procs is called with 0 as the param,
+     * non-functional, but safe function pointers are set
+     * for all windowport routines.
+     *
+     * When get_safe_procs is called with 1 as the param,
+     * raw_print, raw_print_bold, and wait_synch, and nhgetch
+     * are set to use C stdio routines via stdio_raw_print,
+     * stdio_raw_print_bold, stdio_wait_synch, and
+     * stdio_nhgetch.
+     */
+    windowprocs = *get_safe_procs(0);
+
+    /*
+     * Now we are going to override a couple
+     * of the windowprocs functions so that
+     * error messages are handled in a suitable
+     * way for the graphical version.
+     */
     windowprocs.win_raw_print = mswin_raw_print;
     windowprocs.win_raw_print_bold = mswin_raw_print_bold;
     windowprocs.win_wait_synch = mswin_wait_synch;
 
     win10_init();
-
     sys_early_init();
 
-    /* init applicatio structure */
+    /* init application structure */
     _nethack_app.hApp = hInstance;
     _nethack_app.hAccelTable =
         LoadAccelerators(hInstance, (LPCTSTR) IDC_NETHACKW);
@@ -209,10 +233,9 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         }
         free(savefile);
     }
-    resuming = pcmain(argc, argv);
 
-    moveloop(resuming);
-
+    /* let main do the argument processing */
+    (void) main(argc, argv);
     return 0;
 }
 

@@ -47,6 +47,9 @@ WIN32_FIND_DATA ffd;
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
+#if !defined(TTY_GRAPHICS)
+extern void NDECL(backsp);
+#endif
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
