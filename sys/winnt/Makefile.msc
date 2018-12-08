@@ -1503,7 +1503,6 @@ $(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 #   * $(CFLAGS) replaced with $(cflagsBuild)
 #   * $(CC) replaced with @$(CC)
 #   * targets prefixed with $(O)
-#   * the single win32api.h reference uncommented
 # but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
@@ -1512,8 +1511,7 @@ $(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
-$(O)safeprocs.o: ..\sys\share\safeprocs.c $(HACK_H) $(MSWSYS)\win32api.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\safeprocs.c
+	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcsys.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
