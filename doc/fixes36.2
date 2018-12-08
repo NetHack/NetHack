@@ -242,6 +242,22 @@ level change after being interruped locking or unlocking a container might
 	access freed memory
 if a restore attempt failed and a new game was started instead, it would use
 	stale context from old game if restoration got far enough to load that
+if hero survives turning into slime (life-saving), survive as a green slime
+hero hit by something that causes inventory items to be destroyed with loss of
+	any of those causing other inventory items to be dropped or destroyed,
+	inventory traversal became unreliable (known sequence: potions hit by
+	fire then breahing vapor from boiled unholy water triggering were
+	transformation to beast form; possible sequence: ring of levitation
+	blasted by lightning and dropping hero onto fire trap); [3.6.1 fixed a
+	similar problem with more obvious symptom, an "object lost" panic when
+	the unholy water was wielded; the fix for that wasn't general enough]
+add MM_ASLEEP makemon() flag and honor it when creating group for fill_zoo
+at start of session (new game or restore), HILITE_STATUS for gold was ignored
+if player creates any menu colors via 'O' while menucolors is off, issue a
+	reminder that it needs to be on in order for those to become effective
+add MM_NOGRP makemon() flag as a means of suppressing groups of monsters in
+	a couple places that warrant it when a specific monster type isn't
+	specified on the call to makemon()
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -368,7 +384,6 @@ make it clear when a leprechaun dodges your attack
 wizard mode #wizidentify can now select individual items for permanent 
 	identification and don't display the selection to permanently
 	identify everything if everything is already fully identified
-spiders will occasionally spin webs when moving around
 make mine town "orctown" variation a multiple level feature of the mines
 replace #monpolycontrol command with monpolycontrol boolean option
 replace #wizdebug_traveldisplay command with travel_debug boolean option
