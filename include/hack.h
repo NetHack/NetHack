@@ -253,13 +253,15 @@ typedef struct sortloot_item Loot;
 #define MM_IGNOREWATER 0x00008 /* ignore water when positioning */
 #define MM_ADJACENTOK \
     0x00010               /* it is acceptable to use adjacent coordinates */
-#define MM_ANGRY 0x00020  /* monster is created angry */
+#define MM_ANGRY  0x00020  /* monster is created angry */
 #define MM_NONAME 0x00040 /* monster is not christened */
-#define MM_EGD 0x00100    /* add egd structure */
-#define MM_EPRI 0x00200   /* add epri structure */
-#define MM_ESHK 0x00400   /* add eshk structure */
-#define MM_EMIN 0x00800   /* add emin structure */
-#define MM_EDOG 0x01000   /* add edog structure */
+#define MM_EGD    0x00100    /* add egd structure */
+#define MM_EPRI   0x00200   /* add epri structure */
+#define MM_ESHK   0x00400   /* add eshk structure */
+#define MM_EMIN   0x00800   /* add emin structure */
+#define MM_EDOG   0x01000   /* add edog structure */
+#define MM_ASLEEP 0x02000   /* monsters should be generated asleep */
+#define MM_NOGRP  0x04000   /* suppress creation of monster groups */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00

@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1543744276 2018/12/02 09:51:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1544230271 2018/12/08 00:51:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,11 +28,12 @@ STATIC_DCL void FDECL(zhitu, (int, int, const char *, XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
 STATIC_DCL void FDECL(skiprange, (int, int *, int *));
-
 STATIC_DCL int FDECL(zap_hit, (int, int));
 STATIC_OVL void FDECL(disintegrate_mon, (struct monst *, int, const char *));
 STATIC_DCL void FDECL(backfire, (struct obj *));
 STATIC_DCL int FDECL(spell_hit_bonus, (int));
+STATIC_DCL void FDECL(destroy_one_item, (struct obj *, int, int));
+STATIC_DCL void FDECL(wishcmdassist, (int));
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -1846,6 +1847,10 @@ struct obj *obj, *otmp;
          * menu_drop(), askchain() - inventory traversal where multiple
          *             Drop can alter the invent chain while traversal
          *             is in progress (bhito isn't involved).
+         * destroy_item(), destroy_mitem() - inventory traversal where
+         *             item destruction can trigger drop or destruction of
+         *             other item(s) and alter the invent or mon->minvent
+         *             chain, possibly recursively.
          *
          * The bypass bit on all objects is reset each turn, whenever
          * context.bypasses is set.
@@ -4715,159 +4720,233 @@ const char *const destroy_strings[][3] = {
     { "breaks apart and explodes", "", "exploding wand" },
 };
 
-void
-destroy_item(osym, dmgtyp)
-register int osym, dmgtyp;
+/* guts of destroy_item(), which ought to be called maybe_destroy_items();
+   caller must decide whether obj is eligible */
+STATIC_OVL void
+destroy_one_item(obj, osym, dmgtyp)
+struct obj *obj;
+int osym, dmgtyp;
 {
-    register struct obj *obj, *obj2;
-    int dmg, xresist, skip;
     long i, cnt, quan;
-    int dindx;
+    int dmg, xresist, skip, dindx;
     const char *mult;
     boolean physical_damage;
 
-    for (obj = invent; obj; obj = obj2) {
-        obj2 = obj->nobj;
-        physical_damage = FALSE;
-        if (obj->oclass != osym)
-            continue; /* test only objs of type osym */
-        if (obj->oartifact)
-            continue; /* don't destroy artifacts */
-        if (obj->in_use && obj->quan == 1L)
-            continue; /* not available */
-        xresist = skip = 0;
-        /* lint suppression */
-        dmg = dindx = 0;
-        quan = 0L;
+    physical_damage = FALSE;
+    xresist = skip = 0;
+    /* lint suppression */
+    dmg = dindx = 0;
+    quan = 0L;
 
-        switch (dmgtyp) {
-        case AD_COLD:
-            if (osym == POTION_CLASS && obj->otyp != POT_OIL) {
-                quan = obj->quan;
-                dindx = 0;
-                dmg = rnd(4);
-            } else
-                skip++;
-            break;
-        case AD_FIRE:
-            xresist = (Fire_resistance && obj->oclass != POTION_CLASS
-                       && obj->otyp != GLOB_OF_GREEN_SLIME);
-
-            if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
-                skip++;
-            if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-                skip++;
-                if (!Blind)
-                    pline("%s glows a strange %s, but remains intact.",
-                          The(xname(obj)), hcolor("dark red"));
-            }
+    switch (dmgtyp) {
+    case AD_COLD:
+        if (osym == POTION_CLASS && obj->otyp != POT_OIL) {
             quan = obj->quan;
-            switch (osym) {
-            case POTION_CLASS:
-                dindx = (obj->otyp != POT_OIL) ? 1 : 2;
-                dmg = rnd(6);
-                break;
-            case SCROLL_CLASS:
-                dindx = 3;
-                dmg = 1;
-                break;
-            case SPBOOK_CLASS:
-                dindx = 4;
-                dmg = 1;
-                break;
-            case FOOD_CLASS:
-                if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                    dindx = 1; /* boil and explode */
-                    dmg = (obj->owt + 19) / 20;
-                } else {
-                    skip++;
-                }
-                break;
-            default:
-                skip++;
-                break;
-            }
+            dindx = 0;
+            dmg = rnd(4);
+        } else
+            skip++;
+        break;
+    case AD_FIRE:
+        xresist = (Fire_resistance && obj->oclass != POTION_CLASS
+                   && obj->otyp != GLOB_OF_GREEN_SLIME);
+        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
+            skip++;
+        if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+            skip++;
+            if (!Blind)
+                pline("%s glows a strange %s, but remains intact.",
+                      The(xname(obj)), hcolor("dark red"));
+        }
+        quan = obj->quan;
+        switch (osym) {
+        case POTION_CLASS:
+            dindx = (obj->otyp != POT_OIL) ? 1 : 2;
+            dmg = rnd(6);
             break;
-        case AD_ELEC:
-            xresist = (Shock_resistance && obj->oclass != RING_CLASS);
-            quan = obj->quan;
-            switch (osym) {
-            case RING_CLASS:
-                if (obj->otyp == RIN_SHOCK_RESISTANCE) {
-                    skip++;
-                    break;
-                }
-                dindx = 5;
-                dmg = 0;
-                break;
-            case WAND_CLASS:
-                if (obj->otyp == WAN_LIGHTNING) {
-                    skip++;
-                    break;
-                }
-#if 0
-                if (obj == current_wand) {  skip++;  break;  }
-#endif
-                dindx = 6;
-                dmg = rnd(10);
-                break;
-            default:
+        case SCROLL_CLASS:
+            dindx = 3;
+            dmg = 1;
+            break;
+        case SPBOOK_CLASS:
+            dindx = 4;
+            dmg = 1;
+            break;
+        case FOOD_CLASS:
+            if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+                dindx = 1; /* boil and explode */
+                dmg = (obj->owt + 19) / 20;
+            } else {
                 skip++;
-                break;
             }
             break;
         default:
             skip++;
             break;
         }
-        if (!skip) {
-            if (obj->in_use)
-                --quan; /* one will be used up elsewhere */
-            for (i = cnt = 0L; i < quan; i++)
-                if (!rn2(3))
-                    cnt++;
-
-            if (!cnt)
-                continue;
-            mult = (cnt == 1L)
-                   ? (quan == 1L) ? "Your"                        /* 1 of 1 */
-                                  : "One of your"                 /* 1 of N */
-                   : (cnt < quan) ? "Some of your"                /* n of N */
-                                  : (quan == 2L) ? "Both of your" /* 2 of 2 */
-                                                 : "All of your"; /* N of N */
-            pline("%s %s %s!", mult, xname(obj),
-                  destroy_strings[dindx][(cnt > 1L)]);
-            if (osym == POTION_CLASS && dmgtyp != AD_COLD) {
-                if (!breathless(youmonst.data) || haseyes(youmonst.data))
-                    potionbreathe(obj);
+        break;
+    case AD_ELEC:
+        xresist = (Shock_resistance && obj->oclass != RING_CLASS);
+        quan = obj->quan;
+        switch (osym) {
+        case RING_CLASS:
+            if (obj->otyp == RIN_SHOCK_RESISTANCE) {
+                skip++;
+                break;
             }
-            if (obj->owornmask) {
-                if (obj->owornmask & W_RING) /* ring being worn */
-                    Ring_gone(obj);
-                else
-                    setnotworn(obj);
+            dindx = 5;
+            dmg = 0;
+            break;
+        case WAND_CLASS:
+            if (obj->otyp == WAN_LIGHTNING) {
+                skip++;
+                break;
             }
-            if (obj == current_wand)
-                current_wand = 0; /* destroyed */
-            for (i = 0; i < cnt; i++)
-                useup(obj);
-            if (dmg) {
-                if (xresist)
-                    You("aren't hurt!");
-                else {
-                    const char *how = destroy_strings[dindx][2];
-                    boolean one = (cnt == 1L);
+#if 0
+            if (obj == current_wand) {  skip++;  break;  }
+#endif
+            dindx = 6;
+            dmg = rnd(10);
+            break;
+        default:
+            skip++;
+            break;
+        }
+        break;
+    default:
+        skip++;
+        break;
+    }
 
-                    if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
-                        how = "exploding glob of slime";
-                    if (physical_damage)
-                        dmg = Maybe_Half_Phys(dmg);
-                    losehp(dmg, one ? how : (const char *) makeplural(how),
-                           one ? KILLED_BY_AN : KILLED_BY);
-                    exercise(A_STR, FALSE);
-                }
+    if (!skip) {
+        if (obj->in_use)
+            --quan; /* one will be used up elsewhere */
+        for (i = cnt = 0L; i < quan; i++)
+            if (!rn2(3))
+                cnt++;
+
+        if (!cnt)
+            return;
+        mult = (cnt == 1L)
+                ? ((quan == 1L) ? "Your"                         /* 1 of 1 */
+                                : "One of your")                 /* 1 of N */
+                : ((cnt < quan) ? "Some of your"                 /* n of N */
+                                : (quan == 2L) ? "Both of your"  /* 2 of 2 */
+                                               : "All of your"); /* N of N */
+        pline("%s %s %s!", mult, xname(obj),
+              destroy_strings[dindx][(cnt > 1L)]);
+        if (osym == POTION_CLASS && dmgtyp != AD_COLD) {
+            if (!breathless(youmonst.data) || haseyes(youmonst.data))
+                potionbreathe(obj);
+        }
+        if (obj->owornmask) {
+            if (obj->owornmask & W_RING) /* ring being worn */
+                Ring_gone(obj);
+            else
+                setnotworn(obj);
+        }
+        if (obj == current_wand)
+            current_wand = 0; /* destroyed */
+        for (i = 0; i < cnt; i++)
+            useup(obj);
+        if (dmg) {
+            if (xresist) {
+                You("aren't hurt!");
+            } else {
+                const char *how = destroy_strings[dindx][2];
+                boolean one = (cnt == 1L);
+
+                if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
+                    how = "exploding glob of slime";
+                if (physical_damage)
+                    dmg = Maybe_Half_Phys(dmg);
+                losehp(dmg, one ? how : (const char *) makeplural(how),
+                       one ? KILLED_BY_AN : KILLED_BY);
+                exercise(A_STR, FALSE);
             }
         }
+    }
+}
+
+/* target items of specified class for possible destruction */
+void
+destroy_item(osym, dmgtyp)
+int osym, dmgtyp;
+{
+    register struct obj *obj;
+    int i, deferral_indx = 0;
+    /* 1+52+1: try to handle a full inventory; it doesn't matter if
+      inventory actually has more, even if everything should be deferred */
+    unsigned short deferrals[1 + 52 + 1]; /* +1: gold, overflow */
+
+    (void) memset((genericptr_t) deferrals, 0, sizeof deferrals);
+    /*
+     * Sometimes destroying an item can change inventory aside from
+     * the item itself (cited case was a potion of unholy water; when
+     * boiled, potionbreathe() caused hero to transform into were-beast
+     * form and that resulted in dropping or destroying some worn armor).
+     *
+     * Unlike other uses of the object bybass mechanism, destroy_item()
+     * can be called multiple times for the same event.  So we have to
+     * explicitly clear it before each use and hope no other section of
+     * code expects it to retain previous value.
+     *
+     * Destruction of a ring of levitation or form change which pushes
+     * off levitation boots could drop hero onto a fire trap that
+     * could destroy other items and we'll get called recursively.  Or
+     * onto a trap which transports hero elsewhere, which won't disrupt
+     * traversal but could yield message sequencing issues.  So we
+     * defer handling such things until after rest of inventory has
+     * been processed.  If some other combination of items and events
+     * triggers a recursive call, rest of inventory after the triggering
+     * item will be skipped by the outer call since the inner one will
+     * have set the bypass bits of the whole list.
+     *
+     * [Unfortunately, death while poly'd into flyer and subsequent
+     * rehumanization could also drop hero onto a trap, and there's no
+     * straightforward way to defer that.  Things could be improved by
+     * redoing this to use two passes, first to collect a list or array
+     * of o_id and quantity of what is targetted for destruction,
+     * second pass to handle the destruction.]
+     */
+    bypass_objlist(invent, FALSE); /* clear bypass bit for invent */
+
+    while ((obj = nxt_unbypassed_obj(invent)) != 0) {
+        if (obj->oclass != osym)
+            continue; /* test only objs of type osym */
+        if (obj->oartifact)
+            continue; /* don't destroy artifacts */
+        if (obj->in_use && obj->quan == 1L)
+            continue; /* not available */
+
+        /* if loss of this item might dump us onto a trap, hold off
+           until later because potential recursive destroy_item() will
+           result in setting bypass bits on whole chain--we would skip
+           the rest as already processed once control returns here */
+        if (deferral_indx < SIZE(deferrals)
+            && ((obj->owornmask != 0L
+                 && (objects[obj->otyp].oc_oprop == LEVITATION
+                     || objects[obj->otyp].oc_oprop == FLYING))
+                /* destroyed wands and potions of polymorph don't trigger
+                   polymorph so don't need to be deferred */
+                || (obj->otyp == POT_WATER && u.ulycn >= LOW_PM
+                    && (Upolyd ? obj->blessed : obj->cursed)))) {
+            deferrals[deferral_indx++] = obj->o_id;
+            continue;
+        }
+        /* obj is eligible; maybe destroy it */
+        destroy_one_item(obj, osym, dmgtyp);
+    }
+    /* if we saved some items for later (most likely just a worn ring
+       of levitation) and they're still in inventory, handle them now */
+    for (i = 0; i < deferral_indx; ++i) {
+        /* note: obj->nobj is only referenced when obj is skipped;
+           having obj be dropped or destroyed won't affect traversal */
+        for (obj = invent; obj; obj = obj->nobj)
+            if (obj->o_id == deferrals[i]) {
+                destroy_one_item(obj, osym, dmgtyp);
+                break;
+            }
     }
     return;
 }
@@ -4877,7 +4956,7 @@ destroy_mitem(mtmp, osym, dmgtyp)
 struct monst *mtmp;
 int osym, dmgtyp;
 {
-    struct obj *obj, *obj2;
+    struct obj *obj;
     int skip, tmp = 0;
     long i, cnt, quan;
     int dindx;
@@ -4889,8 +4968,11 @@ int osym, dmgtyp;
     }
 
     vis = canseemon(mtmp);
-    for (obj = mtmp->minvent; obj; obj = obj2) {
-        obj2 = obj->nobj;
+
+    /* see destroy_item(); object destruction could disrupt inventory list */
+    bypass_objlist(mtmp->minvent, FALSE); /* clear bypass bit for minvent */
+
+    while ((obj = nxt_unbypassed_obj(mtmp->minvent)) != 0) {
         if (obj->oclass != osym)
             continue; /* test only objs of type osym */
         skip = 0;
