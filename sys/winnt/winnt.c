@@ -53,6 +53,7 @@ static HWND GetConsoleHwnd(void);
 #if !defined(TTY_GRAPHICS)
 extern void NDECL(backsp);
 #endif
+int NDECL(windows_console_custom_nhgetch);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -508,14 +509,27 @@ int code;
      * GUILaunched is defined and set in nttty.c.
      */
 
-    if (GUILaunched)
-        getreturn_enabled = TRUE;
-    else
+
+    if (!GUILaunched) {
         windowprocs = *get_safe_procs(1);
+        /* use our custom version which works
+           a little cleaner than the stdio one */
+        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
+    }
     if (getreturn_enabled)
         wait_synch();
     exit(code);
 }
+
+#undef kbhit
+#include <conio.h>
+
+int
+windows_console_custom_nhgetch(VOID_ARGS)
+{
+    return _getch();
+}
+
 
 void
 getreturn(str)

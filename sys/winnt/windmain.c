@@ -33,6 +33,7 @@ int FDECL(windows_nh_poskey, (int *, int *, int *));
 void FDECL(windows_raw_print, (const char *));
 char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
 void FDECL(windows_getlin, (const char *, char *));
+extern int NDECL(windows_console_custom_nhgetch);
 
 char orgdir[PATHLEN];
 boolean getreturn_enabled;
@@ -72,6 +73,9 @@ char *argv[];
      */
     if (!WINDOWPORT("safe-startup"))
         windowprocs = *get_safe_procs(1);
+    if (!GUILaunched)
+        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
+
     sys_early_init();
 #ifdef _MSC_VER
 # ifdef DEBUG
@@ -311,6 +315,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 /*
  * It seems you really want to play.
  */
+
     /* In 3.6.0, several ports process options before they init
      * the window port. This allows settings that impact window
      * ports to be specified or read from the sys or user config files.

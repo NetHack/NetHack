@@ -527,7 +527,7 @@ stdio_wait_synch()
 
     fprintf(stdout, "--More--");
     (void) fflush(stdout);
-    while (!index(valid, stdio_nhgetch()))
+    while (!index(valid, nhgetch()))
         ;
 }
 
