@@ -160,7 +160,10 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     // calculate back buffer scale
     data->monitorScale = win10_monitor_scale(hWnd);
 
-    if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+    boolean bText = data->bAsciiMode ||
+                    (u.uz.dlevel != 0 && Is_rogue_level(&u.uz));
+
+    if (bText) {
         data->backScale = data->monitorScale;
     } else {
         data->backScale = 1.0;
@@ -170,7 +173,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     data->xBackTile = (int) (data->tileWidth * data->backScale);
     data->yBackTile = (int) (data->tileHeight * data->backScale);
 
-    if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+    if (bText) {
         LOGFONT lgfnt;
 
         ZeroMemory(&lgfnt, sizeof(lgfnt));
@@ -195,21 +198,27 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
         }
 
         TEXTMETRIC textMetrics;
-        HFONT font;
+        HFONT font = NULL;
 
         while (1) {
+
+            if (font != NULL)
+                DeleteObject(font);
+
             font = CreateFontIndirect(&lgfnt);
 
             SelectObject(data->backBufferDC, font);
 
             GetTextMetrics(data->backBufferDC, &textMetrics);
 
-            if (textMetrics.tmHeight > data->yBackTile) {
+            if (textMetrics.tmHeight > data->yBackTile &&
+                lgfnt.lfHeight < -MIN_FONT_HEIGHT) {
                 lgfnt.lfHeight++;
                 continue;
             }
 
-            if (textMetrics.tmAveCharWidth > data->xBackTile) {
+            if (textMetrics.tmAveCharWidth > data->xBackTile &&
+                lgfnt.lfWeight < -MIN_FONT_WIDTH) {
                 lgfnt.lfWidth++;
                 continue;
             }
@@ -270,7 +279,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     } else {
 
-        if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+        if (bText) {
             data->frontScale = 1.0;
         } else {
             data->frontScale = data->monitorScale;
