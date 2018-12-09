@@ -2115,7 +2115,7 @@ const char *const *alt_as_is; /* another set like as_is[] */
     /* skip "ox" -> "oxen" entry when pluralizing "<something>ox"
        unless it is muskox */
     if (to_plural && baselen > 2 && !strcmpi(endstring - 2, "ox")
-        && baselen > 5 && strcmpi(endstring - 6, "muskox")) {
+        && !(baselen > 5 && !strcmpi(endstring - 6, "muskox"))) {
         /* "fox" -> "foxes" */
         Strcasecpy(endstring, "es");
         return TRUE;
