@@ -1461,7 +1461,7 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 #
 
 $(O)winhack.o: $(HACK_H) $(MSWIN)\winhack.c
-	@$(cc) $(cflagsBuild) -DSAFEPROCS -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
+	@$(cc) $(cflagsBuild) -I$(MSWSYS) -I$(MSWIN) -Fo$@ $(MSWIN)\winhack.c
 
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
