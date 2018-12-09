@@ -108,16 +108,16 @@ OPTIONS=suppress_alert:3.3.1
 OPTIONS=map_mode:tiles,scroll_margin:10
 
 # Message window settings
-OPTIONS=font_message:Arial,font_size_message:9,align_message:top
+OPTIONS=font_message:Arial,font_size_message:14,align_message:top
 
 # Menu settings
-OPTIONS=font_menu:Arial,font_size_menu:9
+OPTIONS=font_menu:Arial,font_size_menu:14
 
 # Text settings
-OPTIONS=font_text:Courier New,font_size_text:9
+OPTIONS=font_text:Courier New,font_size_text:14
 
 # Status window settings
-OPTIONS=font_status:Courier New,font_size_status:9
+OPTIONS=font_status:Courier New,font_size_status:14
 
 # Other
 OPTIONS=hilite_pet,!toptenwin
@@ -136,7 +136,7 @@ OPTIONS=hilite_pet,!toptenwin
 
 # "Nethack mode" colors
 OPTIONS=windowcolors:status white/#000000 message white/#000000 text white/#000000 menu white/#000000 menutext white/#000000
-OPTIONS=vary_msgcount:1
+OPTIONS=vary_msgcount:4
 
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
