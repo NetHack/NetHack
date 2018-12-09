@@ -43,6 +43,9 @@ boolean win32_cursorblink;
 /* globals required within here */
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+extern int GUILaunched;
+boolean getreturn_enabled;
+int redirect_stdout;
 
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
@@ -493,6 +496,38 @@ void nhassert_failed(const char * exp, const char * file, int line)
     // strip off the newline
     message[strlen(message) - 1] = '\0';
     error(message);
+}
+
+void
+nethack_exit(code)
+int code;
+{
+    /* Only if we started from the GUI, not the command prompt,
+     * we need to get one last return, so the score board does
+     * not vanish instantly after being created.
+     * GUILaunched is defined and set in nttty.c.
+     */
+    synch_cursor();
+    if (GUILaunched)
+        getreturn("to end");
+    synch_cursor();
+    getreturn_enabled = TRUE;
+    wait_synch();
+    exit(code);
+}
+
+void
+getreturn(str)
+const char *str;
+{
+    char buf[BUFSZ];
+
+    if (!getreturn_enabled)
+        return;
+    Sprintf(buf,"Hit <Enter> %s.", str);
+    raw_print(buf);
+    wait_synch();
+    return;
 }
 
 /* nethack_enter_winnt() is called from main immediately after
