@@ -11,7 +11,7 @@
  * assigned to the windowproc function pointers very early
  * in the startup initialization, perhaps immediately even.
  * It requires only the following call:
- *          windowprocs = get_safe_procs(0);
+ *          windowprocs = *get_safe_procs(0);
  *
  * The game startup can trigger functions in other modules
  * that make assumptions on a WindowPort being available
@@ -45,12 +45,23 @@
  *
  * The additional platform-independent, but more functional
  * routines provided in here should be assigned after the
- *    windowprocs = get_safe_procs()
- * call. Here's a list of them:
+ *    windowprocs = *get_safe_procs(n)
+ * call.
  *
- *  
+ *  Usage:
+ *   
+ *    windowprocs = *get_safe_procs(0);
+ *   initializes a set of winprocs function pointers that ensure
+ *   none of the function pointers are left null, but that's all
+ *   it does.
+ *   
+ *    windowprocs = *get_safe_procs(1);
+ *   initializes a set of winprocs functions pointers that ensure
+ *   none of the function pointers are left null, but also
+ *   provides some basic output and input functionality using
+ *   nothing other than C stdio routines (no platform-specific
+ *   or OS-specific code).
  *
- * 
  * ***********************************************************
  */
 
