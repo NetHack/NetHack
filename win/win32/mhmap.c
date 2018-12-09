@@ -15,7 +15,7 @@
 #include "color.h"
 #include "patchlevel.h"
 
-#define NHMAP_FONT_NAME TEXT("Terminal")
+#define NHMAP_FONT_NAME TEXT("Courier New")
 #define MAXWINDOWTEXT 255
 
 #define CURSOR_BLINK_INTERVAL 1000 // milliseconds
@@ -187,7 +187,6 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
         lgfnt.lfEscapement = 0;                    // angle of escapement
         lgfnt.lfOrientation = 0;                   // base-line orientation angle
         lgfnt.lfWeight = FW_SEMIBOLD;                // font weight
-//        lgfnt.lfWeight = FW_NORMAL;                // font weight
         lgfnt.lfItalic = FALSE;                    // italic attribute option
         lgfnt.lfUnderline = FALSE;                 // underline attribute option
         lgfnt.lfStrikeOut = FALSE;                 // strikeout attribute option
@@ -200,8 +199,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
             NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
         } else {
             lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
-//            NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
-            NH_A2W("Courier New", lgfnt.lfFaceName, LF_FACESIZE);
+            NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
         }
 
         TEXTMETRIC textMetrics;
