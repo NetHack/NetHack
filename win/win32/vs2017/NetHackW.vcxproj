@@ -20,7 +20,7 @@
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;NOTTYGRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;SAFEPROCS;NOTTYGRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -149,7 +149,6 @@
     <ClCompile Include="$(SysShareDir)pcsys.c" />
     <ClCompile Include="$(SysShareDir)pcunix.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
-    <ClCompile Include="$(SysShareDir)safeproc.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
       <PreprocessorDefinitions>TTYSTUB;</PreprocessorDefinitions>
@@ -157,6 +156,7 @@
     <ClCompile Include="$(SysWinntDir)windmain.c" />
     <ClCompile Include="$(SysWinntDir)winnt.c" />
     <ClCompile Include="$(SysWinntDir)win10.c" />
+    <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />
     <ClCompile Include="$(WinWin32Dir)mhdlg.c" />
     <ClCompile Include="$(WinWin32Dir)mhfont.c" />

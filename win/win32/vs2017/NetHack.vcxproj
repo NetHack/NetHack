@@ -34,7 +34,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;WIN32CON;DLB;MSWIN_GRAPHICS;SAFEPROCS;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -154,7 +154,6 @@
     <ClCompile Include="$(SysShareDir)pcsys.c" />
     <ClCompile Include="$(SysShareDir)pcunix.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
-    <ClCompile Include="$(SysShareDir)safeproc.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)nttty.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
@@ -162,6 +161,7 @@
     </ClCompile>
     <ClCompile Include="$(SysWinntDir)windmain.c" />
     <ClCompile Include="$(SysWinntDir)winnt.c" />
+    <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinTtyDir)getline.c" />
     <ClCompile Include="$(WinTtyDir)topl.c" />
     <ClCompile Include="$(WinTtyDir)wintty.c" />
