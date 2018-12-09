@@ -495,12 +495,12 @@ void nhassert_failed(const char * exp, const char * file, int line)
     error(message);
 }
 
-/* nethack_enter_winnt() is the first thing called from main */
+/* nethack_enter_winnt() is called from main immediately after
+   initializing the window port */
 void nethack_enter_winnt()
 {
-#ifdef TTY_GRAPHICS
-    nethack_enter_nttty();
-#endif
+	if (WINDOWPORT("tty"))
+		nethack_enter_nttty();
 }
 
 /* CP437 to Unicode mapping according to the Unicode Consortium */

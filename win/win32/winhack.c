@@ -63,6 +63,8 @@ _nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
 
 // Global Variables:
 NHWinApp _nethack_app;
+extern int GUILaunched;     /* We tell shared startup code in windmain.c
+                               that the GUI was launched via this */
 
 #ifdef __BORLANDC__
 #define _stricmp(s1, s2) stricmp(s1, s2)
@@ -233,7 +235,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         }
         free(savefile);
     }
-
+    GUILaunched = 1;
     /* let main do the argument processing */
     (void) main(argc, argv);
     return 0;

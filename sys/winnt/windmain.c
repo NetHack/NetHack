@@ -241,16 +241,20 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             Strcpy(hackdir, dir);
         }
         if (argc > 1) {
+#if 0
 #if !defined(TTY_GRAPHICS)
             int sfd = 0;
             boolean tmpconsole = FALSE;
             hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
+#endif /* 0 */
+
             /*
              * Now we know the directory containing 'record' and
              * may do a prscore().
              */
             if (!strncmp(argv[1], "-s", 2)) {
+#if 0
 #if !defined(TTY_GRAPHICS)
                 /*
                  * Check to see if we're redirecting to a file.
@@ -264,11 +268,13 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                     nethack_exit(EXIT_SUCCESS);
                 }
 #endif
+#endif /* 0 */
 #ifdef SYSCF
                 initoptions();
 #endif
                 prscore(argc, argv);
 
+#if 0
 #if !defined(TTY_GRAPHICS)
                 if (tmpconsole) {
                     getreturn("to exit");
@@ -276,25 +282,26 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                     tmpconsole = FALSE;
                 }
 #endif
+#endif /* 0 */
                 nethack_exit(EXIT_SUCCESS);
             }
-
-#if defined(MSWIN_GRAPHICS)
-            if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
-                mswin_destroy_reg();
-                nethack_exit(EXIT_SUCCESS);
+            if (GUILaunched) {
+                if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
+                    mswin_destroy_reg();
+                    nethack_exit(EXIT_SUCCESS);
+                }
             }
-#endif
-            /* Don't initialize the window system just to print usage */
+            /* Don't initialize the full window system just to print usage */
             if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
                 nhusage();
-
+#if 0
 #if !defined(TTY_GRAPHICS)
                 if (tmpconsole) {
                     getreturn("to exit");
                     freefakeconsole();
                     tmpconsole = FALSE;
                 }
+#endif
 #endif
                 nethack_exit(EXIT_SUCCESS);
             }
@@ -313,18 +320,19 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     if (argc >= 1
         && !strcmpi(default_window_sys, "mswin")
-        && strstri(argv[0], "nethackw.exe"))
+        && (strstri(argv[0], "nethackw.exe") || GUILaunched))
             iflags.windowtype_locked = TRUE;
 
+    if (!iflags.windowtype_locked) {
 #if defined(TTY_GRAPHICS)
-    if (!iflags.windowtype_locked)
         Strcpy(default_window_sys, "tty");
 #else
 #if defined(CURSES_GRAPHICS)
-    if (!iflags.windowtype_locked)
         Strcpy(default_window_sys, "curses");    
-#endif
-#endif
+#endif /* CURSES */
+#endif /* TTY */
+    }
+
     choose_windows(default_window_sys);
     if (!dlb_init()) {
         pline(
