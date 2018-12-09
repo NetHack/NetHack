@@ -507,12 +507,13 @@ int code;
      * not vanish instantly after being created.
      * GUILaunched is defined and set in nttty.c.
      */
-    synch_cursor();
+
     if (GUILaunched)
-        getreturn("to end");
-    synch_cursor();
-    getreturn_enabled = TRUE;
-    wait_synch();
+        getreturn_enabled = TRUE;
+    else
+        windowprocs = *get_safe_procs(1);
+    if (getreturn_enabled)
+        wait_synch();
     exit(code);
 }
 
