@@ -35,7 +35,7 @@ char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
 void FDECL(windows_getlin, (const char *, char *));
 
 char orgdir[PATHLEN];
-extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
+boolean getreturn_enabled;
 extern int redirect_stdout;       /* from sys/share/pcsys.c */
 extern int GUILaunched;
 HANDLE hStdOut;
@@ -58,7 +58,6 @@ mingw_main(argc, argv)
 int argc;
 char *argv[];
 {
-    boolean save_getreturn_status = getreturn_enabled;
     boolean resuming = FALSE; /* assume new game */
     register int fd;
     register char *dir;
@@ -199,8 +198,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             }
         }
     }
-    save_getreturn_status = getreturn_enabled;
-    getreturn_enabled = TRUE;
+    if (GUILaunched || IsDebuggerPresent()) {
+        getreturn_enabled = TRUE;
+    }
     check_recordfile((char *) 0);
     initoptions();
     if (!validate_prefix_locations(failbuf)) {
@@ -307,7 +307,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             }
         }
     }
-    getreturn_enabled = save_getreturn_status;
 
 /*
  * It seems you really want to play.
@@ -393,7 +392,6 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      */
     vision_init();
     display_gamewindows();
-    getreturn_enabled = TRUE;
     /*
      * First, try to find and restore a save file for specified character.
      * We'll return here if new game player_selection() renames the hero.
