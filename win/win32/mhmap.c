@@ -160,25 +160,33 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     // calculate back buffer scale
     data->monitorScale = win10_monitor_scale(hWnd);
 
-    if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+    boolean bText = data->bAsciiMode || (u.uz.dlevel != 0 && Is_rogue_level(&u.uz));
+
+    if (bText && !data->bFitToScreenMode)
         data->backScale = data->monitorScale;
-    } else {
+    else
         data->backScale = 1.0;
-    }
 
     /* set back buffer tile size */
-    data->xBackTile = (int) (data->tileWidth * data->backScale);
-    data->yBackTile = (int) (data->tileHeight * data->backScale);
+    if (bText && data->bFitToScreenMode) {
+        data->xBackTile = wnd_size.cx / COLNO;
+        data->yBackTile = wnd_size.cy / ROWNO;
+        data->yBackTile = max(data->yBackTile, 12);
+    } else {
+        data->xBackTile = (int)(data->tileWidth * data->backScale);
+        data->yBackTile = (int)(data->tileHeight * data->backScale);
+    }
 
-    if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+    if (bText) {
         LOGFONT lgfnt;
 
         ZeroMemory(&lgfnt, sizeof(lgfnt));
-        lgfnt.lfHeight = -data->yBackTile;          // height of font
-        lgfnt.lfWidth = -data->xBackTile;           // average character width
+        lgfnt.lfHeight = -data->yBackTile;         // height of font
+        lgfnt.lfWidth = 0;                         // average character width
         lgfnt.lfEscapement = 0;                    // angle of escapement
         lgfnt.lfOrientation = 0;                   // base-line orientation angle
-        lgfnt.lfWeight = FW_NORMAL;                // font weight
+        lgfnt.lfWeight = FW_SEMIBOLD;                // font weight
+//        lgfnt.lfWeight = FW_NORMAL;                // font weight
         lgfnt.lfItalic = FALSE;                    // italic attribute option
         lgfnt.lfUnderline = FALSE;                 // underline attribute option
         lgfnt.lfStrikeOut = FALSE;                 // strikeout attribute option
@@ -191,13 +199,18 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
             NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
         } else {
             lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
-            NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+//            NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            NH_A2W("Courier New", lgfnt.lfFaceName, LF_FACESIZE);
         }
 
         TEXTMETRIC textMetrics;
-        HFONT font;
+        HFONT font = NULL;
 
         while (1) {
+
+            if (font != NULL)
+                DeleteObject(font);
+
             font = CreateFontIndirect(&lgfnt);
 
             SelectObject(data->backBufferDC, font);
@@ -210,7 +223,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
             }
 
             if (textMetrics.tmAveCharWidth > data->xBackTile) {
-                lgfnt.lfWidth++;
+                lgfnt.lfHeight++;
                 continue;
             }
 
@@ -256,7 +269,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     /* calculate front buffer tile size */
 
-    if (wnd_size.cx > 0 && wnd_size.cy > 0 && data->bFitToScreenMode) {
+    if (wnd_size.cx > 0 && wnd_size.cy > 0 && !bText && data->bFitToScreenMode) {
         double windowAspectRatio =
             (double) wnd_size.cx / (double) wnd_size.cy;
 
@@ -893,9 +906,22 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
     #endif
         if (data->bUnicodeFont) {
             wch = winos_ascii_to_wide(ch);
-            DrawTextW(data->backBufferDC, &wch, 1, rect,
-                        DT_CENTER | DT_VCENTER | DT_NOPREFIX
-                            | DT_SINGLELINE);
+            if (wch == 0x2591 || wch == 0x2592) {
+                int level = 80;
+                HBRUSH brush = CreateSolidBrush(RGB(level, level, level));
+                FillRect(data->backBufferDC, rect, brush);
+                DeleteObject(brush);
+                level = (wch == 0x2591 ? 100 : 200);
+                brush = CreateSolidBrush(RGB(level, level, level));
+                RECT smallRect = { rect->left + 1, rect->top + 1,
+                                    rect->right - 1, rect->bottom - 1 };
+                FillRect(data->backBufferDC, &smallRect, brush);
+                DeleteObject(brush);
+            } else {
+                DrawTextW(data->backBufferDC, &wch, 1, rect,
+                    DT_CENTER | DT_VCENTER | DT_NOPREFIX
+                    | DT_SINGLELINE);
+            }
         } else {
             DrawTextA(data->backBufferDC, &ch, 1, rect,
                         DT_CENTER | DT_VCENTER | DT_NOPREFIX
