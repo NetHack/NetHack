@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1543395749 2018/11/28 09:02:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.334 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544174413 2018/12/07 09:20:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -106,7 +106,7 @@ static struct Bool_Opt {
 #endif
     { "clicklook", &iflags.clicklook, FALSE, SET_IN_GAME },
     { "cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME },
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32) || defined(CURSES_GRAPHICS)
     { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /*WC*/
 #else /* systems that support multiple terminals, many monochrome */
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
@@ -747,8 +747,6 @@ initoptions_init()
         warnsyms[i] = def_warnsyms[i].sym;
     iflags.bouldersym = 0;
 
-    iflags.travelcc.x = iflags.travelcc.y = -1;
-
     /* for "special achievement" tracking (see obj.h,
        create_object(sp_lev.c), addinv_core1(invent.c) */
     iflags.mines_prize_type = LUCKSTONE;
@@ -875,11 +873,16 @@ initoptions_finish()
      * A multi-interface binary might only support status highlighting
      * for some of the interfaces; check whether we asked for it but are
      * using one which doesn't.
+     *
+     * Option processing can take place before a user-decided WindowPort
+     * is even initialized, so check for that too.
      */
-    if (iflags.hilite_delta && !wc2_supported("statushilites")) {
-        raw_printf("Status highlighting not supported for %s interface.",
-                   windowprocs.name);
-        iflags.hilite_delta = 0;
+    if (!WINDOWPORT("safe-startup")) {
+        if (iflags.hilite_delta && !wc2_supported("statushilites")) {
+            raw_printf("Status highlighting not supported for %s interface.",
+                       windowprocs.name);
+            iflags.hilite_delta = 0;
+        }
     }
 #endif
     return;
@@ -4285,7 +4288,7 @@ static struct other_opts {
     int NDECL((*othr_count_func));
 } othropt[] = {
     { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC, count_apes },
-    { "menucolors", SET_IN_GAME, OPT_OTHER_MENUCOLOR, count_menucolors },
+    { "menu colors", SET_IN_GAME, OPT_OTHER_MENUCOLOR, count_menucolors },
     { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE, msgtype_count },
 #ifdef STATUS_HILITES
     { "status hilite rules", SET_IN_GAME, OPT_OTHER_STATHILITE,
@@ -4459,7 +4462,7 @@ doset() /* changing options via menu by Per Liboriussen */
                 }
 #endif
             } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
-                    (void) special_handling("menucolors", setinitial,
+                    (void) special_handling("menu_colors", setinitial,
                                             fromfile);
             } else if (opt_indx == OPT_OTHER_MSGTYPE) {
                     (void) special_handling("msgtype", setinitial, fromfile);
@@ -5038,7 +5041,7 @@ boolean setinitial, setfromfile;
             if (pick_cnt >= 0)
                 goto msgtypes_again;
         }
-    } else if (!strcmp("menucolors", optname)) {
+    } else if (!strcmp("menu_colors", optname)) {
         int opt_idx, nmc, mcclr, mcattr;
         char mcbuf[BUFSZ] = DUMMY;
 
@@ -5046,11 +5049,15 @@ boolean setinitial, setfromfile;
         nmc = count_menucolors();
         opt_idx = handle_add_list_remove("menucolor", nmc);
         if (opt_idx == 3) { /* done */
+    menucolors_done:
+            if (nmc > 0 && !iflags.use_menu_color)
+                pline(
+    "To have menu colors become active, toggle 'menucolors' option to True.");
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new menucolor pattern?", mcbuf);
             if (*mcbuf == '\033')
-                return TRUE;
+                goto menucolors_done;
             if (*mcbuf
                 && test_regex_pattern(mcbuf, (const char *)0)
                 && (mcclr = query_color((char *) 0)) != -1

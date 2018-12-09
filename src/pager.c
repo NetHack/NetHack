@@ -187,6 +187,8 @@ struct obj **obj_p;
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = context.current_fruit; /* give it a type */
+        else if (otmp->otyp == LEASH)
+            otmp->leashmon = 0;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
         else if (otmp->otyp == CORPSE && glyph_is_body(glyph))

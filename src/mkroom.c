@@ -341,7 +341,7 @@ struct mkroom *sroom;
                                              : (type == ANTHOLE)
                                                  ? antholemon()
                                                  : (struct permonst *) 0,
-                          sx, sy, NO_MM_FLAGS);
+                          sx, sy, MM_ASLEEP);
             if (mon) {
                 mon->msleeping = 1;
                 if (type == COURT && mon->mpeaceful) {

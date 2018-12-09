@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1456528599 2016/02/26 23:16:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1543892216 2018/12/04 02:56:56 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -314,10 +314,10 @@ register struct monst *worm;
  *  that both halves will survive.
  */
 void
-cutworm(worm, x, y, weap)
+cutworm(worm, x, y, cuttier)
 struct monst *worm;
 xchar x, y;
-struct obj *weap;
+boolean cuttier; /* hit is by wielded blade or axe or by thrown axe */
 {
     register struct wseg *curr, *new_tail;
     register struct monst *new_worm;
@@ -330,12 +330,10 @@ struct obj *weap;
     if (x == worm->mx && y == worm->my)
         return; /* hit on head */
 
-    /* cutting goes best with a bladed weapon */
-    cut_chance = rnd(20); /* Normally  1-16 does not cut */
-    /* Normally 17-20 does */
-
-    if (weap && is_blade(weap)) /* With a blade 1- 6 does not cut */
-        cut_chance += 10;       /*              7-20 does         */
+    /* cutting goes best with a cuttier weapon */
+    cut_chance = rnd(20); /* Normally     1-16 does not cut, 17-20 does, */
+    if (cuttier)
+        cut_chance += 10; /* with a blade 1- 6 does not cut,  7-20 does. */
 
     if (cut_chance < 17)
         return; /* not good enough */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1541902953 2018/11/11 02:22:33 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1544050558 2018/12/05 22:55:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,6 +11,7 @@ STATIC_DCL void NDECL(vomiting_dialogue);
 STATIC_DCL void NDECL(choke_dialogue);
 STATIC_DCL void NDECL(levitation_dialogue);
 STATIC_DCL void NDECL(slime_dialogue);
+STATIC_DCL void FDECL(slimed_to_death, (struct kinfo *));
 STATIC_DCL void NDECL(slip_or_trip);
 STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
 STATIC_DCL void FDECL(lantern_message, (struct obj *));
@@ -310,6 +311,13 @@ slime_dialogue()
 {
     register long i = (Slimed & TIMEOUT) / 2L;
 
+    if (i == 1L) {
+        /* display as green slime during "You have become green slime."
+           but don't worry about not being able to see self; if already
+           mimicking something else at the time, implicitly be revealed */
+        youmonst.m_ap_type = M_AP_MONSTER;
+        youmonst.mappearance = PM_GREEN_SLIME;
+    }
     if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
@@ -355,6 +363,62 @@ burn_away_slime()
     if (Slimed) {
         make_slimed(0L, "The slime that covers you is burned away!");
     }
+}
+
+/* countdown timer for turning into green slime has run out; kill our hero */
+STATIC_OVL void
+slimed_to_death(kptr)
+struct kinfo *kptr;
+{
+    uchar save_mvflags;
+
+    /* redundant: polymon() cures sliming when polying into green slime */
+    if (Upolyd && youmonst.data == &mons[PM_GREEN_SLIME]) {
+        dealloc_killer(kptr);
+        return;
+    }
+    /* more sure killer reason is set up */
+    if (kptr && kptr->name[0]) {
+        killer.format = kptr->format;
+        Strcpy(killer.name, kptr->name);
+    } else {
+        killer.format = NO_KILLER_PREFIX;
+        Strcpy(killer.name, "turned into green slime");
+    }
+    dealloc_killer(kptr);
+
+    /*
+     * Polymorph into a green slime, which might destroy some worn armor
+     * (potentially affecting bones) and dismount from steed.
+     * Can't be Unchanging; wouldn't have turned into slime if we were.
+     * Despite lack of Unchanging, neither done() nor savelife() calls
+     * rehumanize() if hero dies while polymorphed.
+     * polymon() undoes the slime countdown's mimick-green-slime hack
+     * but does not perform polyself()'s light source bookkeeping.
+     * No longer need to manually increment uconduct.polyselfs to reflect
+     * [formerly implicit] change of form; polymon() takes care of that.
+     * Temporarily ungenocide if necessary.
+     */
+    if (emits_light(youmonst.data))
+        del_light_source(LS_MONSTER, monst_to_any(&youmonst));
+    save_mvflags = mvitals[PM_GREEN_SLIME].mvflags;
+    mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
+    (void) polymon(PM_GREEN_SLIME);
+    mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
+    done(TURNED_SLIME);
+
+    /* life-saved; even so, hero still has turned into green slime;
+       player may have genocided green slimes after being infected */
+    if ((mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
+        killer.format = KILLED_BY;
+        Strcpy(killer.name, "slimicide");
+        /* immediately follows "OK, so you don't die." */
+        pline("Yes, you do.  Green slime has been genocided...");
+        done(GENOCIDED);
+        /* could be life-saved again (only in explore or wizard mode)
+           but green slimes are gone; just stay in current form */
+    }
+    return;
 }
 
 /* Intrinsic Passes_walls is temporary when your god is trying to fix
@@ -469,17 +533,7 @@ nh_timeout()
                 done(STONING);
                 break;
             case SLIMED:
-                if (kptr && kptr->name[0]) {
-                    killer.format = kptr->format;
-                    Strcpy(killer.name, kptr->name);
-                } else {
-                    killer.format = NO_KILLER_PREFIX;
-                    Strcpy(killer.name, "turned into green slime");
-                }
-                dealloc_killer(kptr);
-                /* involuntarily break "never changed form" conduct */
-                u.uconduct.polyselfs++;
-                done(TURNED_SLIME);
+                slimed_to_death(kptr); /* done(TURNED_SLIME) */
                 break;
             case VOMITING:
                 make_vomiting(0L, TRUE);

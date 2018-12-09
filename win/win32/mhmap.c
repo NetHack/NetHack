@@ -160,7 +160,8 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
     // calculate back buffer scale
     data->monitorScale = win10_monitor_scale(hWnd);
 
-    boolean bText = data->bAsciiMode || (u.uz.dlevel != 0 && Is_rogue_level(&u.uz));
+    boolean bText = data->bAsciiMode ||
+                    (u.uz.dlevel != 0 && Is_rogue_level(&u.uz));
 
     if (bText && !data->bFitToScreenMode)
         data->backScale = data->monitorScale;
@@ -217,12 +218,9 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
             GetTextMetrics(data->backBufferDC, &textMetrics);
 
-            if (textMetrics.tmHeight > data->yBackTile) {
-                lgfnt.lfHeight++;
-                continue;
-            }
-
-            if (textMetrics.tmAveCharWidth > data->xBackTile) {
+            if ((textMetrics.tmHeight > data->yBackTile ||
+                 textMetrics.tmAveCharWidth > data->xBackTile) &&
+                lgfnt.lfHeight < -MIN_FONT_HEIGHT) {
                 lgfnt.lfHeight++;
                 continue;
             }
@@ -283,7 +281,7 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     } else {
 
-        if (data->bAsciiMode || Is_rogue_level(&u.uz)) {
+        if (bText) {
             data->frontScale = 1.0;
         } else {
             data->frontScale = data->monitorScale;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1542765366 2018/11/21 01:56:06 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1543892215 2018/12/04 02:56:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -449,7 +449,9 @@ int rollneeded, armorpenalty; /* for monks */
 struct attack *uattk;
 int dieroll;
 {
-    register boolean malive = TRUE;
+    boolean malive = TRUE,
+            /* hmon() might destroy weapon; remember aspect for cutworm */
+            slice_or_chop = (weapon && (is_blade(weapon) || is_axe(weapon)));
 
     if (override_confirmation) {
         /* this may need to be generalized if weapons other than
@@ -490,7 +492,7 @@ int dieroll;
                 u.uconduct.weaphit = oldweaphit;
             }
             if (mon->wormno && *mhit)
-                cutworm(mon, x, y, weapon);
+                cutworm(mon, x, y, slice_or_chop);
         }
     }
     return malive;

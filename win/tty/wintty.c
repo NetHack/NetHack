@@ -2046,7 +2046,7 @@ struct WinDesc *cw;
                 tty_nhbell();
                 break;
             } else {
-                char searchbuf[BUFSZ + 2], tmpbuf[BUFSZ];
+                char searchbuf[BUFSZ + 2], tmpbuf[BUFSZ] = DUMMY;
                 boolean on_curr_page = FALSE;
                 int lineno = 0;
 
