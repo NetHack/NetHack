@@ -500,7 +500,7 @@ Do not write any files.
 Force, version 1:  
 Perform substitution even if the file has not changed,
 except no dot files are processed unless listed directly on the command line.
-This prevents accidents with editor temprorary files while recursing.  Note
+This prevents accidents with editor temporary files while recursing.  Note
 that this overloads the C<-f> option of C<git add> and C<git commit>.
 
 =item C<-F>
