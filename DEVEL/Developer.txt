@@ -38,7 +38,7 @@ things.
 A public repository of the latest NetHack code that we've made 
 available can be obtained via git from either of two locations:
     https://github.com/NetHack/NetHack
-      or
+     or
     https://sourceforge.net/p/nethack/NetHack/
 
 Branches:
