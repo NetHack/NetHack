@@ -221,6 +221,10 @@ enum getloc_filters {
     NUM_GFILTER
 };
 
+/* max size of a windowtype option */
+#define WINTYPELEN 16
+char chosen_windowtype[WINTYPELEN];
+
 struct debug_flags {
     boolean test;
 #ifdef TTY_GRAPHICS
@@ -445,6 +449,9 @@ struct instance_flags {
     short soko_prize_type2;     /* amulet of reflection */
     struct debug_flags debug;
     boolean windowtype_locked;  /* windowtype can't change from configfile */
+    boolean windowtype_deferred; /* pick a windowport and store it in
+                                    chosen_windowport[], but do not switch to
+                                    it in the midst of options processing */
 };
 
 /*

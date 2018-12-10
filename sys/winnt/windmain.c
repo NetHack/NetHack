@@ -22,6 +22,7 @@ char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
 E void FDECL(nethack_exit, (int));
+E char chosen_windowtype[WINTYPELEN];   /* flag.h */
 #if defined(MSWIN_GRAPHICS)
 E void NDECL(mswin_destroy_reg);
 #endif
@@ -36,6 +37,7 @@ void FDECL(windows_getlin, (const char *, char *));
 extern int NDECL(windows_console_custom_nhgetch);
 
 char orgdir[PATHLEN];
+char *dir;
 boolean getreturn_enabled;
 extern int redirect_stdout;       /* from sys/share/pcsys.c */
 extern int GUILaunched;
@@ -60,8 +62,8 @@ int argc;
 char *argv[];
 {
     boolean resuming = FALSE; /* assume new game */
-    register int fd;
-    register char *dir;
+    int fd;
+    char *windowtype = NULL;
     char *envp = NULL;
     char *sptr = NULL;
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
@@ -205,8 +207,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (GUILaunched || IsDebuggerPresent()) {
         getreturn_enabled = TRUE;
     }
+
     check_recordfile((char *) 0);
-    initoptions();
+    iflags.windowtype_deferred = TRUE;
+    initoptions();                  
     if (!validate_prefix_locations(failbuf)) {
         raw_printf("Some invalid directory locations were specified:\n\t%s\n",
                    failbuf);
@@ -214,119 +218,18 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     }
     if (!hackdir[0])
         Strcpy(hackdir, orgdir);
-    if (argc > 1) {
-        if (argcheck(argc, argv, ARG_VERSION) == 2)
-            nethack_exit(EXIT_SUCCESS);
-
-        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
-            argc--;
-            argv++;
-	}
-	if (argcheck(argc, argv, ARG_WINDOWS) == 1) {
-	    argc--;
-	    argv++;
-	}
-        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
-            /* avoid matching "-dec" for DECgraphics; since the man page
-             * says -d directory, hope nobody's using -desomething_else
-             */
-            argc--;
-            argv++;
-            dir = argv[0] + 2;
-            if (*dir == '=' || *dir == ':')
-                dir++;
-            if (!*dir && argc > 1) {
-                argc--;
-                argv++;
-                dir = argv[0];
-            }
-            if (!*dir)
-                error("Flag -d must be followed by a directory name.");
-            Strcpy(hackdir, dir);
-        }
-        if (argc > 1) {
-#if 0
-#if !defined(TTY_GRAPHICS)
-            int sfd = 0;
-            boolean tmpconsole = FALSE;
-            hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-#endif
-#endif /* 0 */
-
-            /*
-             * Now we know the directory containing 'record' and
-             * may do a prscore().
-             */
-            if (!strncmp(argv[1], "-s", 2)) {
-#if 0
-#if !defined(TTY_GRAPHICS)
-                /*
-                 * Check to see if we're redirecting to a file.
-                 */
-                sfd = (int) _fileno(stdout);
-                redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
-
-                if (!redirect_stdout && !hStdOut) {
-                    raw_printf(
-                        "-s is not supported for the Graphical Interface\n");
-                    nethack_exit(EXIT_SUCCESS);
-                }
-#endif
-#endif /* 0 */
-#ifdef SYSCF
-                initoptions();
-#endif
-                prscore(argc, argv);
-
-#if 0
-#if !defined(TTY_GRAPHICS)
-                if (tmpconsole) {
-                    getreturn("to exit");
-                    freefakeconsole();
-                    tmpconsole = FALSE;
-                }
-#endif
-#endif /* 0 */
-                nethack_exit(EXIT_SUCCESS);
-            }
-            if (GUILaunched) {
-                if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
-                    mswin_destroy_reg();
-                    nethack_exit(EXIT_SUCCESS);
-                }
-            }
-            /* Don't initialize the full window system just to print usage */
-            if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
-                nhusage();
-#if 0
-#if !defined(TTY_GRAPHICS)
-                if (tmpconsole) {
-                    getreturn("to exit");
-                    freefakeconsole();
-                    tmpconsole = FALSE;
-                }
-#endif
-#endif
-                nethack_exit(EXIT_SUCCESS);
-            }
-        }
-    }
-
+    process_options(argc, argv);
+    
 /*
  * It seems you really want to play.
  */
-
-    /* In 3.6.0, several ports process options before they init
-     * the window port. This allows settings that impact window
-     * ports to be specified or read from the sys or user config files.
-     */
-    process_options(argc, argv);
 
     if (argc >= 1
         && !strcmpi(default_window_sys, "mswin")
         && (strstri(argv[0], "nethackw.exe") || GUILaunched))
             iflags.windowtype_locked = TRUE;
 
+    windowtype = default_window_sys;
     if (!iflags.windowtype_locked) {
 #if defined(TTY_GRAPHICS)
         Strcpy(default_window_sys, "tty");
@@ -335,9 +238,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         Strcpy(default_window_sys, "curses");    
 #endif /* CURSES */
 #endif /* TTY */
+        if (iflags.windowtype_deferred && chosen_windowtype[0])
+            windowtype = chosen_windowtype;
     }
+    choose_windows(windowtype);
 
-    choose_windows(default_window_sys);
     if (!dlb_init()) {
         pline(
             "%s\n%s\n%s\n%s\n\nNetHack was unable to open the required file "
@@ -459,6 +364,63 @@ char *argv[];
     /*
      * Process options.
      */
+    if (argc > 1) {
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
+            nethack_exit(EXIT_SUCCESS);
+
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+	}
+	if (argcheck(argc, argv, ARG_WINDOWS) == 1) {
+	    argc--;
+	    argv++;
+	}
+        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+            /* avoid matching "-dec" for DECgraphics; since the man page
+             * says -d directory, hope nobody's using -desomething_else
+             */
+            argc--;
+            argv++;
+            dir = argv[0] + 2;
+            if (*dir == '=' || *dir == ':')
+                dir++;
+            if (!*dir && argc > 1) {
+                argc--;
+                argv++;
+                dir = argv[0];
+            }
+            if (!*dir)
+                error("Flag -d must be followed by a directory name.");
+            Strcpy(hackdir, dir);
+        }
+
+        if (argc > 1) {
+            /*
+             * Now we know the directory containing 'record' and
+             * may do a prscore().
+             */
+            if (!strncmp(argv[1], "-s", 2)) {
+#ifdef SYSCF
+                initoptions();
+#endif
+                prscore(argc, argv);
+
+                nethack_exit(EXIT_SUCCESS);
+            }
+            if (GUILaunched) {
+                if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
+                    mswin_destroy_reg();
+                    nethack_exit(EXIT_SUCCESS);
+                }
+            }
+            /* Don't initialize the full window system just to print usage */
+            if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
+                nhusage();
+                nethack_exit(EXIT_SUCCESS);
+            }
+        }
+    }
     while (argc > 1 && argv[1][0] == '-') {
         argv++;
         argc--;
@@ -528,18 +490,12 @@ char *argv[];
                     flags.initrace = i;
             }
             break;
-#if 0
         case 'w': /* windowtype */
-#if defined(TTY_GRAPHICS)
-            if (!strncmpi(&argv[0][2], "tty", 3)) {
-                nttty_open(1);
-            }
-#endif
             config_error_init(FALSE, "command line", FALSE);
-            choose_windows(&argv[0][2]);
+            if (strlen(&argv[0][2]) < (WINTYPELEN - 1))
+                Strcpy(chosen_windowtype, &argv[0][2]);
             config_error_done();
             break;
-#endif
         case '@':
             flags.randomall = 1;
             break;

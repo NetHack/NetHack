@@ -20,7 +20,6 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #endif
 
 #define BACKWARD_COMPAT
-#define WINTYPELEN 16
 
 #ifdef DEFAULT_WC_TILED_MAP
 #define PREFER_TILED TRUE
@@ -3519,10 +3518,14 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            char buf[WINTYPELEN];
+            if (!iflags.windowtype_deferred) {
+                char buf[WINTYPELEN];
 
-            nmcpy(buf, op, WINTYPELEN);
-            choose_windows(buf);
+                nmcpy(buf, op, WINTYPELEN);
+                choose_windows(buf);
+            } else {
+                nmcpy(chosen_windowtype, op, WINTYPELEN);
+	    }
         } else
             return FALSE;
         return retval;
