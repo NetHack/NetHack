@@ -234,7 +234,8 @@ do_statusline2()
 void
 bot()
 {
-    if (youmonst.data && iflags.status_updates) {
+    /* dosave() flags completion by setting u.uhp to -1 */
+    if ((u.uhp != -1) && youmonst.data && iflags.status_updates) {
 #ifdef STATUS_HILITES
         bot_via_windowport();
 #else
