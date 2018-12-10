@@ -221,10 +221,6 @@ enum getloc_filters {
     NUM_GFILTER
 };
 
-/* max size of a windowtype option */
-#define WINTYPELEN 16
-char chosen_windowtype[WINTYPELEN];
-
 struct debug_flags {
     boolean test;
 #ifdef TTY_GRAPHICS
