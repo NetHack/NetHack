@@ -85,6 +85,7 @@ static struct Bool_Opt {
     { "autodescribe", &iflags.autodescribe, TRUE, SET_IN_GAME },
     { "autodig", &flags.autodig, FALSE, SET_IN_GAME },
     { "autoopen", &flags.autoopen, TRUE, SET_IN_GAME },
+    { "autosearch", &flags.autosearch, FALSE, SET_IN_GAME },
     { "autopickup", &flags.pickup, TRUE, SET_IN_GAME },
     { "autoquiver", &flags.autoquiver, FALSE, SET_IN_GAME },
 #if defined(MICRO) && !defined(AMIGA)
@@ -5878,6 +5879,18 @@ char *buf;
     if (!buf[0])
         Strcpy(buf, "unknown");
     return buf;
+}
+
+int
+dotoggleautosearch()
+{
+    flags.autosearch = !flags.autosearch;
+    if (flags.autosearch) {
+        pline("Autosearch On.");
+    } else {
+        pline("Autosearch Off.");
+    }
+    return 0;
 }
 
 int

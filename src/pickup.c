@@ -525,11 +525,11 @@ int what; /* should be a long */
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
-        /* multi && !context.run means they are in the middle of some other
+        /* multi < 0 && !context.run means they are in the middle of some other
          * action, or possibly paralyzed, sleeping, etc.... and they just
          * teleported onto the object.  They shouldn't pick it up.
          */
-        if ((multi && !context.run) || (autopickup && !flags.pickup)) {
+        if ((multi < 0 && !context.run) || (autopickup && !flags.pickup)) {
             check_here(FALSE);
             return 0;
         }
