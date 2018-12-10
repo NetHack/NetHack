@@ -260,6 +260,12 @@ if player creates any menu colors via 'O' while menucolors is off, issue a
 	reminder that it needs to be on in order for those to become effective
 setting second or later named fruit to value beginning with two or more spaces
 	followed by non-space gave "singular of null?" warning
+when blocking/unblocking of levitation or flying was updated due to walking
+	onto different terrain, the relevant status condition wasn't updated
+	on the screen until some other status update happened
+if levitating hero poly'd into pass-wall creature jumped or teleported from
+	terrain that allowed levitation to terrain that didn't or vice versa,
+	blocking of levitation wasn't updated properly
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository

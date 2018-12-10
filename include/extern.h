@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1543892214 2018/12/04 02:56:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.665 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1544401264 2018/12/10 00:21:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.666 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -854,6 +854,7 @@ E boolean NDECL(u_rooted);
 E void NDECL(domove);
 E boolean NDECL(overexertion);
 E void NDECL(invocation_message);
+E void NDECL(switch_terrain);
 E boolean FDECL(pooleffects, (BOOLEAN_P));
 E void FDECL(spoteffects, (BOOLEAN_P));
 E char *FDECL(in_rooms, (XCHAR_P, XCHAR_P, int));
