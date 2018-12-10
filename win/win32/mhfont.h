@@ -9,6 +9,9 @@
 
 #include "winMS.h"
 
+#define MIN_FONT_WIDTH 9
+#define MIN_FONT_HEIGHT 12
+
 typedef struct cached_font {
     int code;
     HFONT hFont;

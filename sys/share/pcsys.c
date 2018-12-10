@@ -391,19 +391,11 @@ char *name;
     return;
 }
 
-#ifdef WIN32
-boolean getreturn_enabled;
-int redirect_stdout;
-#endif
-
+#ifndef WIN32
 void
 getreturn(str)
 const char *str;
 {
-#ifdef WIN32
-    if (!getreturn_enabled)
-        return;
-#endif
 #ifdef TOS
     msmsg("Hit <Return> %s.", str);
 #else
@@ -414,7 +406,6 @@ const char *str;
     return;
 }
 
-#ifndef WIN32
 void msmsg
 VA_DECL(const char *, fmt)
 {
@@ -492,7 +483,7 @@ const char *name, *mode;
     return (FILE *) 0;
 }
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void
 nethack_exit(code)
 int code;
@@ -551,4 +542,4 @@ msexit()
     wait_synch();
     return;
 }
-#endif /* MICRO || WIN32 || OS2 */
+#endif /* MICRO || OS2 */

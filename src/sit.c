@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1458341129 2016/03/18 22:45:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -281,7 +281,7 @@ dosit()
 
         if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
             /* may have teleported */
-            levl[u.ux][u.uy].typ = ROOM;
+            levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
             pline_The("throne vanishes in a puff of logic.");
             newsym(u.ux, u.uy);
         }

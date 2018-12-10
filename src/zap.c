@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1544230271 2018/12/08 00:51:11 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4374,7 +4374,7 @@ short exploding_wand_typ;
                     msgtxt = "Some water evaporates.";
             } else {
                 rangemod -= 3;
-                lev->typ = ROOM;
+                lev->typ = ROOM, lev->flags = 0;
                 t = maketrap(x, y, PIT);
                 if (t)
                     t->tseen = 1;
@@ -4413,9 +4413,9 @@ short exploding_wand_typ;
                     lev->drawbridgemask &= ~DB_UNDER; /* clear lava */
                     lev->drawbridgemask |= (lava ? DB_FLOOR : DB_ICE);
                 } else {
-                    if (!lava)
-                        lev->icedpool = (lev->typ == POOL) ? ICED_POOL
-                                                           : ICED_MOAT;
+                    lev->icedpool = lava ? 0
+                                         : (lev->typ == POOL) ? ICED_POOL
+                                                              : ICED_MOAT;
                     lev->typ = lava ? ROOM : ICE;
                 }
                 bury_objs(x, y);
@@ -4490,15 +4490,14 @@ short exploding_wand_typ;
                     Norep("The %s melt.", defsyms[S_bars].explanation);
                 if (*in_rooms(x, y, SHOPBASE)) {
                     /* in case we ever have a shop bounded by bars */
-                    lev->typ = ROOM;
+                    lev->typ = ROOM, lev->flags = 0;
                     if (see_it)
                         newsym(x, y);
                     add_damage(x, y, (type >= 0) ? SHOP_BARS_COST : 0L);
                     if (type >= 0)
                         *shopdamage = TRUE;
                 } else {
-                    lev->typ = DOOR;
-                    lev->doormask = D_NODOOR;
+                    lev->typ = DOOR, lev->doormask = D_NODOOR;
                     if (see_it)
                         newsym(x, y);
                 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1523306912 2018/04/09 20:48:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1544401270 2018/12/10 00:21:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -340,6 +340,11 @@ boolean allow_drag;
     vision_full_recalc = 1;
     nomul(0);
     vision_recalc(0); /* vision before effects */
+    /* if terrain type changes, levitation or flying might become blocked
+       or unblocked; might issue message, so do this after map+vision has
+       been updated for new location instead of right after u_on_newpos() */
+    if (levl[u.ux][u.uy].typ != levl[u.ux0][u.uy0].typ)
+        switch_terrain();
     if (telescroll) {
         /* when teleporting by scroll, we need to handle discovery
            now before getting feedback about any objects at our

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1543972190 2018/12/05 01:09:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.176 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1544442710 2018/12/10 11:51:50 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.177 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,7 +67,7 @@ boolean pushing;
                 levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
                 levl[rx][ry].drawbridgemask |= DB_FLOOR;
             } else
-                levl[rx][ry].typ = ROOM;
+                levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
 
             if (ttmp)
                 (void) delfloortrap(ttmp);
@@ -276,22 +276,29 @@ STATIC_DCL void
 polymorph_sink()
 {
     uchar sym = S_sink;
+    boolean sinklooted;
 
     if (levl[u.ux][u.uy].typ != SINK)
         return;
 
+    sinklooted = levl[u.ux][u.uy].looted != 0;
     level.flags.nsinks--;
-    levl[u.ux][u.uy].doormask = 0;
+    levl[u.ux][u.uy].doormask = 0; /* levl[][].flags */
     switch (rn2(4)) {
     default:
     case 0:
         sym = S_fountain;
         levl[u.ux][u.uy].typ = FOUNTAIN;
+        levl[u.ux][u.uy].blessedftn = 0;
+        if (sinklooted)
+            SET_FOUNTAIN_LOOTED(u.ux, u.uy);
         level.flags.nfountains++;
         break;
     case 1:
         sym = S_throne;
         levl[u.ux][u.uy].typ = THRONE;
+        if (sinklooted)
+            levl[u.ux][u.uy].looted = T_LOOTED;
         break;
     case 2:
         sym = S_altar;
