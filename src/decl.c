@@ -17,6 +17,7 @@ int locknum = 0; /* max num of simultaneous users */
 #ifdef DEF_PAGER
 char *catmore = 0; /* default pager */
 #endif
+char chosen_windowtype[WINTYPELEN];
 
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 

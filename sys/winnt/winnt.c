@@ -43,10 +43,17 @@ boolean win32_cursorblink;
 /* globals required within here */
 HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+extern int GUILaunched;
+boolean getreturn_enabled;
+int redirect_stdout;
 
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
+#if !defined(TTY_GRAPHICS)
+extern void NDECL(backsp);
+#endif
+int NDECL(windows_console_custom_nhgetch);
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -492,12 +499,58 @@ void nhassert_failed(const char * exp, const char * file, int line)
     error(message);
 }
 
-/* nethack_enter_winnt() is the first thing called from main */
+void
+nethack_exit(code)
+int code;
+{
+    /* Only if we started from the GUI, not the command prompt,
+     * we need to get one last return, so the score board does
+     * not vanish instantly after being created.
+     * GUILaunched is defined and set in nttty.c.
+     */
+
+
+    if (!GUILaunched) {
+        windowprocs = *get_safe_procs(1);
+        /* use our custom version which works
+           a little cleaner than the stdio one */
+        windowprocs.win_nhgetch = windows_console_custom_nhgetch;
+    }
+    if (getreturn_enabled)
+        wait_synch();
+    exit(code);
+}
+
+#undef kbhit
+#include <conio.h>
+
+int
+windows_console_custom_nhgetch(VOID_ARGS)
+{
+    return _getch();
+}
+
+
+void
+getreturn(str)
+const char *str;
+{
+    char buf[BUFSZ];
+
+    if (!getreturn_enabled)
+        return;
+    Sprintf(buf,"Hit <Enter> %s.", str);
+    raw_print(buf);
+    wait_synch();
+    return;
+}
+
+/* nethack_enter_winnt() is called from main immediately after
+   initializing the window port */
 void nethack_enter_winnt()
 {
-#ifdef TTY_GRAPHICS
-    nethack_enter_nttty();
-#endif
+	if (WINDOWPORT("tty"))
+		nethack_enter_nttty();
 }
 
 /* CP437 to Unicode mapping according to the Unicode Consortium */

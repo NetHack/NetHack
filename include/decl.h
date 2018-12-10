@@ -25,6 +25,10 @@ E char SAVEF[];
 E char SAVEP[];
 #endif
 
+/* max size of a windowtype option */
+#define WINTYPELEN 16
+E char chosen_windowtype[WINTYPELEN];
+
 E NEARDATA int bases[MAXOCLASSES];
 
 E NEARDATA int multi;

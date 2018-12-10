@@ -96,13 +96,11 @@ clear_screen()
     return;
 }
 
-#ifdef TTY_GRAPHICS
 void
 backsp()
 {
     return;
 }
-#endif
 
 int
 has_color(int color)

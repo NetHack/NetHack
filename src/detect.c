@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1542853884 2018/11/22 02:31:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1544437284 2018/12/10 10:21:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1308,7 +1308,8 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
     struct obj *otmp;
     long save_EDetect_mons;
     char save_viz_uyux;
-    boolean unconstrained, refresh = FALSE, mdetected = FALSE,
+    boolean unconstrained, refresh = FALSE,
+            mdetected = FALSE, odetected = FALSE,
             /* fake spellbook 'sobj' implies hero has cast the spell;
                when book is blessed, casting is skilled or expert level;
                if already clairvoyant, non-skilled spell acts like skilled */
@@ -1363,6 +1364,10 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
                 if (extended)
                     otmp->dknown = 1;
                 map_object(otmp, TRUE);
+                newglyph = glyph_at(zx, zy);
+                /* if otmp is underwater, we'll need to redisplay the water */
+                if (newglyph != oldglyph && covers_objects(zx, zy))
+                    odetected = TRUE;
             }
             /* if there is a monster here, see or detect it,
                possibly as "remembered, unseen monster" */
@@ -1385,7 +1390,7 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
             }
         }
 
-    if (!level.flags.hero_memory || unconstrained || mdetected) {
+    if (!level.flags.hero_memory || unconstrained || mdetected || odetected) {
         flush_screen(1);                 /* flush temp screen */
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that
