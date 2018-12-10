@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1517877380 2018/02/06 00:36:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1544442712 2018/12/10 11:51:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1474,6 +1474,7 @@ dissolve_bars(x, y)
 register int x, y;
 {
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
+    levl[x][y].flags = 0;
     newsym(x, y);
 }
 
