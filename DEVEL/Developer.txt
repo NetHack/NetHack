@@ -36,9 +36,9 @@ things.
 ------------------------------------------------------------------------------
 2. git repositories
 The public NetHack git repository is available (read-only) at:
-  git://git.code.sf.net/p/nethack/NHsource
-    or
-  https://github.com/NetHack/NetHack.git
+    https://github.com/NetHack/NetHack
+     or
+    https://sourceforge.net/p/nethack/NetHack/
 
 Branches:
 NetHack-3.6.0	The 3.6.0 release code and subsequent fixes and additions.
