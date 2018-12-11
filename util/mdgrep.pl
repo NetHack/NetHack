@@ -3,14 +3,6 @@
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
-###
-### NOTE: We do not require Perl at build time, so if you change this file
-###       you MUST rebuild mdgrep.h with:
-###           cd util; make mdgreph
-### BUT: Makefile.dat only makes sure makedefs exists, it doesn't assure it
-###      is up to date, so as a practical matter you should make clean. XXX
-###
-
 # MAKEDEFS:
 @commands = qw/grep/;
 
@@ -30,7 +22,7 @@
 	SAFERHANGUP MFLOPPY NOCWD_ASSUMPTIONS
 	VAR_PLAYGROUND DLB SHELL SUSPEND NOSAVEONHANGUP HANGUPHANDLING
 	BSD_JOB_CONTROL MAIL POSIX_JOB_CONTROL INSURANCE
-	UNICODE_DRAWING UNICODE_WIDEWINPORT UNICODE_PLAYERTEXT CONWAY
+	UNICODE_DRAWING UNICODE_WIDEWINPORT UNICODE_PLAYERTEXT
 /;
 
 # Miscellaneous
@@ -97,23 +89,23 @@ sub gen_magic {
 # NB: Do NOT make grep_vars const - it needs to be writable for some debugging
 # options.
 sub gen_file {
-	print OUT "static struct grep_var grep_vars[] = {\n";
+	print OUT "static struct grep_var grep_vars[]={\n";
 	foreach(@_){
 		if(defined $magic{$_}){
 			print OUT <<E_O_M;
-                                       { "$_", $magic{$_} },
+	{"$_", $magic{$_}},
 E_O_M
 			next;
 		}
 		print OUT <<E_O_M;
 #if defined($_)
-                                       { "$_", 1 },
+	{"$_", 1},
 #else
-                                       { "$_", 0 },
+	{"$_", 0},
 #endif
 E_O_M
 	}
-	print OUT "                                       { 0, 0 }\n};\n";
+	print OUT "\t{0,0}\n};\n";
 }
 
 sub gen_commands {

@@ -1170,9 +1170,6 @@ boolean at_stairs, falling, portal;
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
-#ifdef CONWAY
-     char need_late_reload_call = 0;
-#endif
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1246,10 +1243,6 @@ boolean at_stairs, falling, portal;
     fd = currentlevel_rewrite();
     if (fd < 0)
         return;
-#ifdef DROPLEVEL
-    /* We're now committed to the level change. */
-    if(dropleveltempsfn) (*dropleveltempsfn)();
-#endif
 
     /* discard context which applies to the level we're leaving;
        for lock-picking, container may be carried, in which case we
@@ -1357,10 +1350,6 @@ boolean at_stairs, falling, portal;
         getlev(fd, hackpid, new_ledger, FALSE);
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
-#ifdef CONWAY
-		/* XXX move into DROPLEVEL framework? */
-	need_late_reload_call = 1;
-#endif
     }
     reglyph_darkroom();
     /* do this prior to level-change pline messages */
@@ -1581,10 +1570,6 @@ boolean at_stairs, falling, portal;
     } else {
         if (new && Is_rogue_level(&u.uz))
             You("enter what seems to be an older, more primitive world.");
-#ifdef CONWAY
-        if (level.flags.conway)
-            You("feel the rules of Life are different here.");
-#endif
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
@@ -1601,15 +1586,6 @@ boolean at_stairs, falling, portal;
     assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
 #ifdef INSURANCE
     save_currentstate();
-#endif
-#ifdef CONWAY
-    if (need_late_reload_call){
-		/* This MUST be after save_currenstate() to prevent freeing
-		 * the state table we just allocated. */
-        if(level.flags.conway){
-	    conway_restore();
-        }
-    }
 #endif
 
     if ((annotation = get_annotation(&u.uz)) != 0)

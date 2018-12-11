@@ -1301,14 +1301,6 @@ NEARDATA struct permonst mons[] = {
         M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
         M2_HOSTILE | M2_NEUTER, 0, 1, CLR_BRIGHT_GREEN),
-		/* mildew: M1_NOEYES - should be blind but doesn't play well */
-    MON("mildew", S_FUNGUS,
-        LVL(2, 1, 9, 0, 0), (G_NOGEN|G_NOCORPSE),
-        A(ATTK(AT_NONE, AD_STCK, 1, 2), /*ATTK(AT_TUCH, AD_STCK, 0, 0),*/
-          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(20, 200, MS_SILENT, MZ_SMALL), 0, 0,
-        M1_BREATHLESS|M1_NOLIMBS|M1_NOHEAD|M1_MINDLESS|M1_NOTAKE|M1_REGEN|M1_OMNIVORE,
-        M2_HOSTILE|M2_NEUTER|M2_NASTY, 0, CLR_GRAY),
     MON("brown mold", S_FUNGUS, LVL(1, 0, 9, 0, 0), (G_GENO | 1),
         A(ATTK(AT_NONE, AD_COLD, 0, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),

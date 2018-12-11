@@ -428,10 +428,6 @@ E struct plinemsg_type *plinemsg_types;
 E const char *ARGV0;
 #endif
 
-#ifdef DROPLEVEL
-E void NDECL((*dropleveltempsfn));
-#endif
-
 enum earlyarg {ARG_DEBUG, ARG_VERSION
 #ifdef WIN32
     ,ARG_WINDOWS

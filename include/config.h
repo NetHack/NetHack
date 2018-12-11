@@ -531,19 +531,6 @@ typedef unsigned char uchar;
    (within the same session) */
 /* #define EDIT_GETLIN */
 
-/* Section 4b - Features causing save file incompatibility
- * Features listed in this section change the format of save and/or
- * bones files, so in addition to the warning at the start of Section 4
- * games using these features will not be compatible with previously saved
- * games (and may not be compatible with anything in the future as well).
- * To emphasize the point, you must: */
-/* #define BREAK_360_SAVE_COMPAT */
-/* to enable them. */
-
-#ifdef BREAK_360_SAVE_COMPAT
-# define CONWAY                        /* Conway's Life level */
-#endif
-
 /* #define DUMPLOG */  /* End-of-game dump logs */
 #ifdef DUMPLOG
 

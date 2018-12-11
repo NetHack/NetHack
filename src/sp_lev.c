@@ -2563,8 +2563,6 @@ region *tmpregion;
     }
 }
 
-/* initialization common to all special levels */
-/* XXX dup name in mkmap.c */
 STATIC_OVL void
 wallify_map(x1, y1, x2, y2)
 int x1, y1, x2, y2;
@@ -3316,10 +3314,6 @@ struct sp_coder *coder;
         coder->solidify = TRUE;
     if (lflags & CORRMAZE)
         level.flags.corrmaze = TRUE;
-#ifdef CONWAY
-    if (lflags & FLAG_CONWAY)
-        level.flags.conway = 1;
-#endif
     if (lflags & CHECK_INACCESSIBLES)
         coder->check_inaccessibles = TRUE;
 

@@ -337,11 +337,6 @@ struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 const char *ARGV0;
 #endif
 
-/* XXX see comment in save.c */
-#ifdef CONWAY
-void NDECL((*dropleveltempsfn)) = 0;
-#endif
-
 /* support for lint.h */
 unsigned nhUse_dummy = 0;
 

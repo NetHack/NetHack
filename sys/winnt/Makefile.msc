@@ -703,7 +703,7 @@ $(O)sp_lev.tag: $(O)utility.tag $(DAT)\bigroom.des  $(DAT)\castle.des \
 	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
 	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des
 	cd $(DAT)
-	$(U)makedefs --input bigroom.des --output - --grep | $(U)levcomp
+	$(U)levcomp bigroom.des
 	$(U)levcomp castle.des
 	$(U)levcomp endgame.des
 	$(U)levcomp gehennom.des

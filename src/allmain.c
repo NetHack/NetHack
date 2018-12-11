@@ -302,11 +302,6 @@ boolean resuming;
                     /* vision while buried done here */
                     else if (u.uburied)
                         under_ground(0);
-#ifdef CONWAY
-                    if (level.flags.conway){
-                        conway_update();
-                    }
-#endif
 
                     /* when immobile, count is in turns */
                     if (multi < 0) {
