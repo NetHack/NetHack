@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1544608467 2018/12/12 09:54:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.273 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1544658160 2018/12/12 23:42:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -60,10 +60,12 @@ const char *msg;
             mtmp->mnum = mndx;
         }
         if (DEADMONSTER(mtmp)) {
+#if 0
             /* bad if not fmons list or if not vault guard */
             if (strcmp(msg, "fmon") || !mtmp->isgd)
                 impossible("dead monster on %s; %s at <%d,%d>",
                            msg, mons[mndx].mname, mtmp->mx, mtmp->my);
+#endif
             return;
         }
         if (chk_geno && (mvitals[mndx].mvflags & G_GENOD) != 0)
@@ -89,6 +91,7 @@ mon_sanity_check()
     struct monst *mtmp, *m;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        /* dead monsters should still have sane data */
         sanity_check_single_mon(mtmp, TRUE, "fmon");
         if (DEADMONSTER(mtmp) && !mtmp->isgd)
             continue;
@@ -727,7 +730,10 @@ movemon()
            mon->isgd flag so that dmonsfree() will get rid of mon) */
         if (mtmp->isgd && !mtmp->mx) {
             /* parked at <0,0>; eventually isgd should get set to false */
-            (void) gd_move(mtmp);
+            if (monstermoves > mtmp->mlstmv) {
+                (void) gd_move(mtmp);
+                mtmp->mlstmv = monstermoves;
+            }
             continue;
         }
         if (DEADMONSTER(mtmp))
