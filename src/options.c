@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544396581 2018/12/09 23:03:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.340 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544669347 2018/12/13 02:49:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.343 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2986,12 +2986,17 @@ boolean tinitial, tfrom_file;
             use_menu = TRUE;
             if (flags.menu_style == MENU_TRADITIONAL
                 || flags.menu_style == MENU_COMBINATION) {
+                boolean wasspace;
+
                 use_menu = FALSE;
                 Sprintf(qbuf, "New %s: [%s am] (%s)", fullname, ocl,
                         *tbuf ? tbuf : "all");
                 getlin(qbuf, abuf);
+                wasspace = (abuf[0] == ' '); /* before mungspaces */
                 op = mungspaces(abuf);
-                if (abuf[0] == '\0' || abuf[0] == '\033')
+                if (wasspace && !abuf[0])
+                    ; /* one or more spaces will remove old value */
+                else if (!abuf[0] || abuf[0] == '\033')
                     op = tbuf; /* restore */
                 else if (abuf[0] == 'm')
                     use_menu = TRUE;
