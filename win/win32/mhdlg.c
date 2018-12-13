@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhdlg.c	$NHDT-Date: 1432512812 2015/05/25 00:13:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mhdlg.c	$NHDT-Date: 1544695946 2018/12/13 10:12:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,6 +25,14 @@ INT_PTR CALLBACK GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 int
 mswin_getlin_window(const char *question, char *result, size_t result_size)
 {
+    if (iflags.debug_fuzzer) {
+        random_response(result, (int) result_size);
+        if (result[0] != '\0')
+            return IDOK;
+        else
+            return IDCANCEL;
+    }
+
     INT_PTR ret;
     struct getlin_data data;
 

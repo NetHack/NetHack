@@ -282,6 +282,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->window_text = NULL;
         break;
     }
+
+	case MSNH_MSG_RANDOM_INPUT:
+		nhassert(0); // unexpected
+		break;
+
     }
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1544050555 2018/12/05 22:55:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.314 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1544695944 2018/12/13 10:12:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2019,6 +2019,22 @@ int final;
             enl_msg(Your_wallet, "contains ", "contained ", buf, "");
         }
     }
+
+    if (flags.pickup) {
+        char ocl[MAXOCLASSES + 1];
+
+        Strcpy(buf, "on");
+        oc_to_str(flags.pickup_types, ocl);
+        Sprintf(eos(buf), " for %s%s%s",
+                *ocl ? "'" : "", *ocl ? ocl : "all types", *ocl ? "'" : "");
+        if (flags.pickup_thrown && *ocl) /* *ocl: don't show if 'all types' */
+            Strcat(buf, " plus thrown");
+        if (iflags.autopickup_exceptions[AP_GRAB]
+            || iflags.autopickup_exceptions[AP_LEAVE])
+            Strcat(buf, ", with exceptions");
+    } else
+        Strcpy(buf, "off");
+    enl_msg("Auto-pickup ", "is ", "was ", buf, "");
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
@@ -4419,6 +4435,28 @@ randomkey()
     }
 
     return c;
+}
+
+void
+random_response(buf, sz)
+char *buf;
+int sz;
+{
+    char c;
+    int count = 0;
+
+    for (;;) {
+        c = randomkey();
+        if (c == '\n')
+            break;
+        if (c == '\033') {
+            count = 0;
+            break;
+        }
+        if (count < sz - 1)
+            buf[count++] = c;
+    }
+    buf[count] = '\0';
 }
 
 int

@@ -529,6 +529,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         child = GetNHApp()->windowlist[msg_param->wid].win;
     } break;
+
+	case MSNH_MSG_RANDOM_INPUT:
+		nhassert(0); // unexpected
+		break;
+
     }
 }
 

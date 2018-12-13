@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544396581 2018/12/09 23:03:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.340 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544669666 2018/12/13 02:54:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -557,7 +557,6 @@ STATIC_DCL int NDECL(count_menucolors);
 STATIC_DCL boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
                                            char *, char **));
 
-STATIC_DCL void FDECL(oc_to_str, (char *, char *));
 STATIC_DCL void FDECL(doset_add_menu, (winid, const char *, int));
 STATIC_DCL void FDECL(opts_add_others, (winid, const char *, int,
                                         char *, int));
@@ -2986,12 +2985,17 @@ boolean tinitial, tfrom_file;
             use_menu = TRUE;
             if (flags.menu_style == MENU_TRADITIONAL
                 || flags.menu_style == MENU_COMBINATION) {
+                boolean wasspace;
+
                 use_menu = FALSE;
                 Sprintf(qbuf, "New %s: [%s am] (%s)", fullname, ocl,
                         *tbuf ? tbuf : "all");
                 getlin(qbuf, abuf);
+                wasspace = (abuf[0] == ' '); /* before mungspaces */
                 op = mungspaces(abuf);
-                if (abuf[0] == '\0' || abuf[0] == '\033')
+                if (wasspace && !abuf[0])
+                    ; /* one or more spaces will remove old value */
+                else if (!abuf[0] || abuf[0] == '\033')
                     op = tbuf; /* restore */
                 else if (abuf[0] == 'm')
                     use_menu = TRUE;
@@ -4081,7 +4085,7 @@ static NEARDATA const char *sortltype[] = { "none", "loot", "full" };
  * Convert the given string of object classes to a string of default object
  * symbols.
  */
-STATIC_OVL void
+void
 oc_to_str(src, dest)
 char *src, *dest;
 {
