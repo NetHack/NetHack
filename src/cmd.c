@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1544669664 2018/12/13 02:54:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.315 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1544695944 2018/12/13 10:12:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4442,23 +4442,21 @@ random_response(buf, sz)
 char *buf;
 int sz;
 {
-	int count = 0;
-	while (1) {
-		char c = randomkey();
+    char c;
+    int count = 0;
 
-		if (c == '\n')
-			break;
-
-		if (c == '\033') {
-			count = 0;
-			break;
-		}
-
-		if (count < sz)
-			buf[count++] = c;
-	}
-
-	buf[count] = '\0';
+    for (;;) {
+        c = randomkey();
+        if (c == '\n')
+            break;
+        if (c == '\033') {
+            count = 0;
+            break;
+        }
+        if (count < sz - 1)
+            buf[count++] = c;
+    }
+    buf[count] = '\0';
 }
 
 int
