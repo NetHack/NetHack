@@ -4421,6 +4421,27 @@ randomkey()
     return c;
 }
 
+void random_response(char * buf, int size)
+{
+	int count = 0;
+	while (1) {
+		char c = randomkey();
+
+		if (c == '\n')
+			break;
+
+		if (c == '\033') {
+			count = 0;
+			break;
+		}
+
+		if (count < size)
+			buf[count++] = c;
+	}
+
+	buf[count] = '\0';
+}
+
 int
 ch2spkeys(c, start, end)
 char c;

@@ -21,6 +21,7 @@
 #define MSNH_MSG_CARET 110
 #define MSNH_MSG_GETTEXT 111
 #define MSNH_MSG_UPDATE_STATUS 112
+#define MSNH_MSG_RANDOM_INPUT 113
 
 typedef struct mswin_nhmsg_add_wnd {
     winid wid;

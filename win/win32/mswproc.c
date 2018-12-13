@@ -2102,14 +2102,24 @@ mswin_main_loop()
 {
     MSG msg;
 
-    while (!mswin_have_input() && GetMessage(&msg, NULL, 0, 0) != 0) {
-        if (GetNHApp()->regNetHackMode
-            || !TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
-                                     &msg)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+	while (!mswin_have_input()) {
+		if (!iflags.debug_fuzzer || PeekMessage(&msg, NULL, 0, 0, FALSE)) {
+			if(GetMessage(&msg, NULL, 0, 0) != 0) {
+				if (GetNHApp()->regNetHackMode
+					|| !TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
+											 &msg)) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+			} else {
+				/* WM_QUIT */
+				break;
+			}
+		} else {
+			nhassert(iflags.debug_fuzzer);
+			NHEVENT_KBD(randomkey());
+		}
+	}
 }
 
 /* clean up and quit */
@@ -2222,16 +2232,25 @@ mswin_popup_display(HWND hWnd, int *done_indicator)
     SetFocus(hWnd);
 
     /* go into message loop */
-    while (IsWindow(hWnd) && (done_indicator == NULL || !*done_indicator)
-           && GetMessage(&msg, NULL, 0, 0) != 0) {
-        if (!IsDialogMessage(hWnd, &msg)) {
-            if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
-                                      &msg)) {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-    }
+	while (IsWindow(hWnd) && (done_indicator == NULL || !*done_indicator)) {
+		if (!iflags.debug_fuzzer || PeekMessage(&msg, NULL, 0, 0, FALSE)) {
+			if(GetMessage(&msg, NULL, 0, 0) != 0) {
+				if (!IsDialogMessage(hWnd, &msg)) {
+					if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
+											  &msg)) {
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
+					}
+				}
+			} else {
+				/* WM_QUIT */
+				break;
+			}
+		} else {
+			nhassert(iflags.debug_fuzzer);
+			PostMessage(hWnd, WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
+		}
+	}
 }
 
 void

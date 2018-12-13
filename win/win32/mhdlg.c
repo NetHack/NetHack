@@ -25,6 +25,14 @@ INT_PTR CALLBACK GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 int
 mswin_getlin_window(const char *question, char *result, size_t result_size)
 {
+	if (iflags.debug_fuzzer) {
+		random_response(result, result_size);
+		if (result[0] != '\0')
+			return IDOK;
+		else 
+			return IDCANCEL;
+	}
+
     INT_PTR ret;
     struct getlin_data data;
 
