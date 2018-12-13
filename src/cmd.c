@@ -4437,7 +4437,10 @@ randomkey()
     return c;
 }
 
-void random_response(char * buf, int size)
+void
+random_response(buf, sz)
+char *buf;
+int sz;
 {
 	int count = 0;
 	while (1) {
@@ -4451,7 +4454,7 @@ void random_response(char * buf, int size)
 			break;
 		}
 
-		if (count < size)
+		if (count < sz)
 			buf[count++] = c;
 	}
 
