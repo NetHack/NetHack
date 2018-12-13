@@ -348,7 +348,10 @@ attempt_restore:
         if (discover)
             You("are in non-scoring discovery mode.");
     }
-    moveloop(resuming);
+
+	//	iflags.debug_fuzzer = TRUE;
+
+	moveloop(resuming);
     nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;

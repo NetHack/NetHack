@@ -687,6 +687,18 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             ZeroMemory(data->menu.prompt, sizeof(data->menu.prompt));
         }
     } break;
+
+	case MSNH_MSG_RANDOM_INPUT: {
+		char c = randomkey();
+		if (c == '\n')
+			PostMessage(hWnd, WM_COMMAND, MAKELONG(IDOK, 0), 0);
+		else if (c == '\033')
+			PostMessage(hWnd, WM_COMMAND, MAKELONG(IDCANCEL, 0), 0);
+		else
+			PostMessage(GetDlgItem(hWnd, IDC_TEXT_CONTROL), WM_CHAR, c, 0);
+
+	} break;
+
     }
 }
 /*-----------------------------------------------------------------------------*/

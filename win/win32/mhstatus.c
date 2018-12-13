@@ -219,6 +219,11 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             data->status_lines = msg_data->status_lines;
             InvalidateRect(hWnd, NULL, TRUE);
         } break;
+
+		case MSNH_MSG_RANDOM_INPUT:
+			nhassert(0); // unexpected
+			break;
+
         } /* end switch( wParam ) { */
     } break;
 

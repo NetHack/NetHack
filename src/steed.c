@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1544608468 2018/12/12 09:54:28 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1544666049 2018/12/13 01:54:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -756,7 +756,7 @@ int x, y;
         return;
     }
     if (level.monsters[x][y])
-        impossible("placing monster over another?");
+        impossible("placing monster over another at <%d,%d>?", x, y);
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
 }
