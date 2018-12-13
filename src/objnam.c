@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1544492043 2018/12/11 01:34:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.229 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1544520422 2018/12/11 09:27:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.230 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1220,7 +1220,7 @@ unsigned doname_flags;
         Strcpy(tmpbuf, prefix + 2);
         /* set prefix[] to "", "a ", or "an " */
         (void) just_an(prefix, *tmpbuf ? tmpbuf : bp);
-        /* apprend remainder of original prefix */
+        /* append remainder of original prefix */
         Strcat(prefix, tmpbuf);
     }
 
@@ -1629,7 +1629,7 @@ const char *str;
         impossible("Alphabet soup: 'an(%s)'.", str ? "\"\"" : "<null>");
         return strcpy(buf, "an []");
     }
-    just_an(buf, str);
+    (void) just_an(buf, str);
     return strcat(buf, str);
 }
 

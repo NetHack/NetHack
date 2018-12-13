@@ -293,6 +293,7 @@ changing Sting's description to be "(weapon in hand) (light blue aura)" was
 fix bit-use collision between WC2_TERM_SIZE and WC2_RESET_STATUS in
 	include/winprocs.h following a recent merge
 fix foxen pluralization again after underflow remedy reintroduced the problem
+fix "placing monster over another?" warning for vault guards
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -405,6 +406,7 @@ for ^X and enlightenment, display the information in a menu rather than a
 	'<' (menu_previous_page) and '^' (menu_first_page) menu keys;
 	needed for interfaces (tty) without text popup scrollbar support;
 	end of game disclosure of attributes remains single-forward-pass
+for ^X, include current state of 'autopickup'
 
 
 NetHack Community Patches (or Variation) Included
