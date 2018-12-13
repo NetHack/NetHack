@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1542765368 2018/11/21 01:56:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1544608469 2018/12/12 09:54:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,7 @@ STATIC_DCL struct monst *NDECL(findgd);
 STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(blackout, (int, int));
 STATIC_DCL void FDECL(restfakecorr, (struct monst *));
+STATIC_DCL void FDECL(parkguard, (struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
@@ -22,8 +23,8 @@ struct monst *mtmp;
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
     if (!EGD(mtmp)) {
-        EGD(mtmp) = (struct egd *) alloc(sizeof(struct egd));
-        (void) memset((genericptr_t) EGD(mtmp), 0, sizeof(struct egd));
+        EGD(mtmp) = (struct egd *) alloc(sizeof (struct egd));
+        (void) memset((genericptr_t) EGD(mtmp), 0, sizeof (struct egd));
     }
 }
 
@@ -38,6 +39,9 @@ struct monst *mtmp;
     mtmp->isgd = 0;
 }
 
+/* try to remove the temporary corridor (from vault to rest of map) being
+   maintained by guard 'grd'; if guard is still in it, removal will fail,
+   to be tried again later */
 STATIC_OVL boolean
 clear_fcorr(grd, forceshow)
 struct monst *grd;
@@ -53,10 +57,14 @@ boolean forceshow;
     if (!on_level(&egrd->gdlevel, &u.uz))
         return TRUE;
 
+    /* note: guard remains on 'fmons' list (alive or dead, at off-map
+       coordinate <0,0>), until temporary corridor from vault back to
+       civilization has been removed */
     while ((fcbeg = egrd->fcbeg) < egrd->fcend) {
         fcx = egrd->fakecorr[fcbeg].fx;
         fcy = egrd->fakecorr[fcbeg].fy;
-        if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy)) && egrd->gddone)
+        if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy))
+            && egrd->gddone)
             forceshow = TRUE;
         if ((u.ux == fcx && u.uy == fcy && !DEADMONSTER(grd))
             || (!forceshow && couldsee(fcx, fcy))
@@ -137,6 +145,26 @@ struct monst *grd;
     }
 }
 
+/* move guard--dead to alive--to <0,0> until temporary corridor is removed */
+STATIC_OVL void
+parkguard(grd)
+struct monst *grd;
+{
+    /* either guard is dead or will now be treated as if so;
+       monster traversal loops should skip it */
+    if (grd == context.polearm.hitmon)
+        context.polearm.hitmon = 0;
+    if (grd->mx) {
+        remove_monster(grd->mx, grd->my);
+        newsym(grd->mx, grd->my);
+        place_monster(grd, 0, 0);
+        /* [grd->mx,my just got set to 0,0 by place_monster(), so this
+           just sets EGD(grd)->ogx,ogy to 0,0 too; is that what we want?] */
+        EGD(grd)->ogx = grd->mx;
+        EGD(grd)->ogy = grd->my;
+    }
+}
+
 /* called in mon.c */
 boolean
 grddead(grd)
@@ -147,16 +175,8 @@ struct monst *grd;
     if (!dispose) {
         /* destroy guard's gold; drop any other inventory */
         relobj(grd, 0, FALSE);
-        /* guard is dead; monster traversal loops should skip it */
         grd->mhp = 0;
-        if (grd == context.polearm.hitmon)
-            context.polearm.hitmon = 0;
-        /* see comment by newpos in gd_move() */
-        remove_monster(grd->mx, grd->my);
-        newsym(grd->mx, grd->my);
-        place_monster(grd, 0, 0);
-        EGD(grd)->ogx = grd->mx;
-        EGD(grd)->ogy = grd->my;
+        parkguard(grd);
         dispose = clear_fcorr(grd, TRUE);
     }
     if (dispose)
@@ -226,13 +246,12 @@ invault()
         u.uinvault = 0;
         return;
     }
-
     vaultroom -= ROOMOFFSET;
 
     guard = findgd();
     if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
         /* if time ok and no guard now. */
-        char buf[BUFSZ] = DUMMY;
+        char buf[BUFSZ];
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
         long umoney;
@@ -387,6 +406,7 @@ invault()
             nomul(0);
             unmul((char *) 0);
         }
+        buf[0] = '\0';
         trycount = 5;
         do {
             getlin(Deaf ? "You are required to supply your name. -"
@@ -401,7 +421,7 @@ invault()
         }
 
         if (!strcmpi(buf, "Croesus") || !strcmpi(buf, "Kroisos")
-            || !strcmpi(buf, "Creosote")) {
+            || !strcmpi(buf, "Creosote")) { /* Discworld */
             if (!mvitals[PM_CROESUS].died) {
                 if (Deaf) {
                     if (!Blind)
@@ -468,9 +488,9 @@ invault()
         EGD(guard)->fcbeg = 0;
         EGD(guard)->fakecorr[0].fx = x;
         EGD(guard)->fakecorr[0].fy = y;
-        if (IS_WALL(levl[x][y].typ))
+        if (IS_WALL(levl[x][y].typ)) {
             EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
-        else { /* the initial guard location is a dug door */
+        } else { /* the initial guard location is a dug door */
             int vlt = EGD(guard)->vroom;
             xchar lowx = rooms[vlt].lx, hix = rooms[vlt].hx;
             xchar lowy = rooms[vlt].ly, hiy = rooms[vlt].hy;
@@ -603,27 +623,29 @@ register struct monst *grd;
     int x, y, nx, ny, m, n;
     int dx, dy, gx, gy, fci;
     uchar typ;
+    struct rm *crm;
     struct fakecorridor *fcp;
     register struct egd *egrd = EGD(grd);
-    struct rm *crm;
-    boolean goldincorridor = FALSE,
-            u_in_vault = vault_occupied(u.urooms) ? TRUE : FALSE,
-            grd_in_vault = *in_rooms(grd->mx, grd->my, VAULT) ? TRUE : FALSE;
-    boolean disappear_msg_seen = FALSE, semi_dead = (DEADMONSTER(grd));
-    long umoney = money_cnt(invent);
-    register boolean u_carry_gold = ((umoney + hidden_gold()) > 0L);
-    boolean see_guard, newspot = FALSE;
+    long umoney = 0L;
+    boolean goldincorridor = FALSE, u_in_vault = FALSE, grd_in_vault = FALSE,
+            disappear_msg_seen = FALSE, semi_dead = DEADMONSTER(grd),
+            u_carry_gold = FALSE, newspot = FALSE, see_guard;
 
     if (!on_level(&(egrd->gdlevel), &u.uz))
         return -1;
     nx = ny = m = n = 0;
+    if (semi_dead || !grd->mx || egrd->gddone) {
+        egrd->gddone = 1;
+        goto cleanup;
+    }
+    debugpline1("gd_move: %s guard", grd->mpeaceful ? "peaceful" : "hostile");
+
+    u_in_vault = vault_occupied(u.urooms) ? TRUE : FALSE;
+    grd_in_vault = *in_rooms(grd->mx, grd->my, VAULT) ? TRUE : FALSE;
     if (!u_in_vault && !grd_in_vault)
         wallify_vault(grd);
+
     if (!grd->mpeaceful) {
-        if (semi_dead) {
-            egrd->gddone = 1;
-            goto newpos;
-        }
         if (!u_in_vault
             && (grd_in_vault || (in_fcorridor(grd, grd->mx, grd->my)
                                  && !in_fcorridor(grd, u.ux, u.uy)))) {
@@ -647,6 +669,9 @@ register struct monst *grd;
         grd->mpeaceful = 0;
         return -1;
     }
+
+    umoney = money_cnt(invent);
+    u_carry_gold = umoney > 0L || hidden_gold() > 0L;
     if (egrd->fcend == 1) {
         if (u_in_vault && (u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
             if (egrd->warncnt == 3 && !Deaf)
@@ -696,7 +721,6 @@ register struct monst *grd;
             } else {
                 if (!Deaf)
                     verbalize("Well, begone.");
-                wallify_vault(grd);
                 egrd->gddone = 1;
                 goto cleanup;
             }
@@ -881,7 +905,7 @@ proceed:
     fcp->fy = ny;
     fcp->ftyp = typ;
 newpos:
-    gd_mv_monaway(grd, nx,ny);
+    gd_mv_monaway(grd, nx, ny);
     if (egrd->gddone) {
         /* The following is a kludge.  We need to keep    */
         /* the guard around in order to be able to make   */
@@ -893,17 +917,14 @@ newpos:
         /* At the end of the process, the guard is killed */
         /* in restfakecorr().                             */
     cleanup:
-        x = grd->mx;
-        y = grd->my;
-
+        x = grd->mx, y = grd->my;
         see_guard = canspotmon(grd);
+        parkguard(grd); /* move to <0,0> */
         wallify_vault(grd);
-        remove_monster(grd->mx, grd->my);
-        newsym(grd->mx, grd->my);
-        place_monster(grd, 0, 0);
-        egrd->ogx = grd->mx;
-        egrd->ogy = grd->my;
         restfakecorr(grd);
+        debugpline2("gd_move: %scleanup%s",
+                    grd->isgd ? "" : "final ",
+                    grd->isgd ? " attempt" : "");
         if (!semi_dead && (in_fcorridor(grd, u.ux, u.uy) || cansee(x, y))) {
             if (!disappear_msg_seen && see_guard)
                 pline("Suddenly, %s disappears.", noit_mon_nam(grd));

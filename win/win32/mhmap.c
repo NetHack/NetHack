@@ -15,7 +15,8 @@
 #include "color.h"
 #include "patchlevel.h"
 
-#define NHMAP_FONT_NAME TEXT("Courier New")
+#define NHMAP_FONT_NAME TEXT("Terminal")
+#define NHMAP_TTFONT_NAME TEXT("Consolas")
 #define MAXWINDOWTEXT 255
 
 #define CURSOR_BLINK_INTERVAL 1000 // milliseconds
@@ -182,24 +183,38 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
         LOGFONT lgfnt;
 
         ZeroMemory(&lgfnt, sizeof(lgfnt));
-        lgfnt.lfHeight = -data->yBackTile;         // height of font
-        lgfnt.lfWidth = 0;                         // average character width
+        if (data->bFitToScreenMode) {
+            lgfnt.lfHeight = -data->yBackTile;     // height of font
+            lgfnt.lfWidth = 0;                     // average character width
+        } else {
+            lgfnt.lfHeight = -data->yBackTile;     // height of font
+            lgfnt.lfWidth = -data->xBackTile;      // average character width
+        }
         lgfnt.lfEscapement = 0;                    // angle of escapement
         lgfnt.lfOrientation = 0;                   // base-line orientation angle
-        lgfnt.lfWeight = FW_SEMIBOLD;                // font weight
+        lgfnt.lfWeight = FW_NORMAL;                // font weight
         lgfnt.lfItalic = FALSE;                    // italic attribute option
         lgfnt.lfUnderline = FALSE;                 // underline attribute option
         lgfnt.lfStrikeOut = FALSE;                 // strikeout attribute option
         lgfnt.lfCharSet = mswin_charset();         // character set identifier
         lgfnt.lfOutPrecision = OUT_DEFAULT_PRECIS; // output precision
         lgfnt.lfClipPrecision = CLIP_DEFAULT_PRECIS; // clipping precision
-        lgfnt.lfQuality = NONANTIALIASED_QUALITY;           // output quality
+        if (data->bFitToScreenMode) {
+            lgfnt.lfQuality = ANTIALIASED_QUALITY; // output quality
+        } else {
+            lgfnt.lfQuality = NONANTIALIASED_QUALITY; // output quality
+        }
         if (iflags.wc_font_map && *iflags.wc_font_map) {
             lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
             NH_A2W(iflags.wc_font_map, lgfnt.lfFaceName, LF_FACESIZE);
         } else {
-            lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
-            NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            if (!data->bFitToScreenMode) {
+                lgfnt.lfPitchAndFamily = FIXED_PITCH; // pitch and family
+                NH_A2W(NHMAP_FONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            } else {
+                lgfnt.lfPitchAndFamily = DEFAULT_PITCH; // pitch and family
+                NH_A2W(NHMAP_TTFONT_NAME, lgfnt.lfFaceName, LF_FACESIZE);
+            }
         }
 
         TEXTMETRIC textMetrics;
@@ -215,6 +230,9 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
             SelectObject(data->backBufferDC, font);
 
             GetTextMetrics(data->backBufferDC, &textMetrics);
+
+            if (!data->bFitToScreenMode)
+                break;
 
             if ((textMetrics.tmHeight > data->yBackTile ||
                  textMetrics.tmAveCharWidth > data->xBackTile) &&
