@@ -740,8 +740,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
-		#../include/win32api.h
+pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pcsys.c
