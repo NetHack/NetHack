@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544748881 2018/12/14 00:54:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.345 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544751219 2018/12/14 01:33:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.346 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3001,6 +3001,8 @@ boolean tinitial, tfrom_file;
                     use_menu = TRUE;
             }
             if (use_menu) {
+                if (wizard && !index(ocl, VENOM_SYM))
+                    strkitten(ocl, VENOM_SYM);
                 (void) choose_classes_menu("Autopickup what?", 1, TRUE, ocl,
                                            tbuf);
                 op = tbuf;
@@ -6329,10 +6331,28 @@ char *class_select;
                 break;
         }
     }
+    if (category == 1 && next_accelerator <= 'z') {
+        /* for objects, add "A - ' '  all classes", after a separator */
+        any = zeroany;
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        any.a_int = (int) ' ';
+        Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
+        /* we won't preselect this even if the incoming list is empty;
+           having it selected means that it would have to be explicitly
+           de-selected in order to select anything else */
+        add_menu(win, NO_GLYPH, &any, 'A', 0, ATR_NONE, buf, MENU_UNSELECTED);
+    }
     end_menu(win, prompt);
     n = select_menu(win, way ? PICK_ANY : PICK_ONE, &pick_list);
     destroy_nhwindow(win);
     if (n > 0) {
+        /* first check for 'all'; it means 'use a blank list'
+           rather than 'collect every possible choice' */
+        for (i = 0; i < n; ++i)
+            if (pick_list[i].item.a_int == ' ') {
+                pick_list[0].item.a_int = ' ';
+                n = 1; /* return 1; also an implicit 'break;' */
+            }
         for (i = 0; i < n; ++i)
             *class_select++ = (char) pick_list[i].item.a_int;
         free((genericptr_t) pick_list);
