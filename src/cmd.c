@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1544695944 2018/12/13 10:12:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1544748881 2018/12/14 00:54:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2034,7 +2034,7 @@ int final;
             Strcat(buf, ", with exceptions");
     } else
         Strcpy(buf, "off");
-    enl_msg("Auto-pickup ", "is ", "was ", buf, "");
+    enl_msg("Autopickup ", "is ", "was ", buf, "");
 }
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
