@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544669666 2018/12/13 02:54:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544748881 2018/12/14 00:54:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.345 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3001,7 +3001,7 @@ boolean tinitial, tfrom_file;
                     use_menu = TRUE;
             }
             if (use_menu) {
-                (void) choose_classes_menu("Auto-Pickup what?", 1, TRUE, ocl,
+                (void) choose_classes_menu("Autopickup what?", 1, TRUE, ocl,
                                            tbuf);
                 op = tbuf;
             }
