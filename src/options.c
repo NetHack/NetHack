@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1544751219 2018/12/14 01:33:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.346 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1544773907 2018/12/14 07:51:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6346,13 +6346,15 @@ char *class_select;
     n = select_menu(win, way ? PICK_ANY : PICK_ONE, &pick_list);
     destroy_nhwindow(win);
     if (n > 0) {
-        /* first check for 'all'; it means 'use a blank list'
-           rather than 'collect every possible choice' */
-        for (i = 0; i < n; ++i)
-            if (pick_list[i].item.a_int == ' ') {
-                pick_list[0].item.a_int = ' ';
-                n = 1; /* return 1; also an implicit 'break;' */
-            }
+        if (category == 1) {
+            /* for object classes, first check for 'all'; it means 'use
+               a blank list' rather than 'collect every possible choice' */
+            for (i = 0; i < n; ++i)
+                if (pick_list[i].item.a_int == ' ') {
+                    pick_list[0].item.a_int = ' ';
+                    n = 1; /* return 1; also an implicit 'break;' */
+                }
+        }
         for (i = 0; i < n; ++i)
             *class_select++ = (char) pick_list[i].item.a_int;
         free((genericptr_t) pick_list);
