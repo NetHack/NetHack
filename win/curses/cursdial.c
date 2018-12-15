@@ -164,6 +164,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
                               CHAR_P def)
 {
     WINDOW *askwin = NULL;
+    WINDOW *message_window;
     int answer, count, maxwidth, map_height, map_width;
     char *linestr;
     char askstr[BUFSZ + QBUFSZ];
@@ -180,6 +181,9 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         map_width = term_cols;
     }
 
+#ifdef PDCURSES
+    message_window = curses_get_nhwin(MESSAGE_WIN);
+#endif
     maxwidth = map_width - 2;
 
     if (choices != NULL) {
@@ -241,8 +245,11 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     /*curses_stupid_hack = 0; */
 
     while (1) {
+#ifdef PDCURSES
+        answer = wgetch(message_window);
+#else
         answer = getch();
-
+#endif
         if (answer == ERR) {
             answer = def;
             break;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1526909614 2018/05/21 13:33:34 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1544842261 2018/12/15 02:51:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3512,31 +3512,30 @@ static struct tty_status_fields
 static int hpbar_percent, hpbar_color;
 static struct condition_t {
     long mask;
-    const char *text[3];  /* 3: potential display values, progressively
-                           * smaller */
+    const char *text[3]; /* 3: potential display vals, progressively shorter */
 } conditions[] = {
     /* The sequence order of these matters */
-   { BL_MASK_STONE,    {"Stone", "Ston", "Sto"}},
-   { BL_MASK_SLIME,    {"Slime", "Slim", "Slm"}},
-   { BL_MASK_STRNGL,   {"Strngl", "Stngl", "Str"}},
-   { BL_MASK_FOODPOIS, {"FoodPois", "Fpois", "Poi"}},
-   { BL_MASK_TERMILL,  {"TermIll" , "Ill", "Ill"}},
-   { BL_MASK_BLIND,    {"Blind", "Blnd", "Bl"}},
-   { BL_MASK_DEAF,     {"Deaf", "Def", "Df"}},
-   { BL_MASK_STUN,     {"Stun", "Stun", "St"}},
-   { BL_MASK_CONF,     {"Conf", "Cnf", "Cn"}},
-   { BL_MASK_HALLU,    {"Hallu", "Hal", "Ha"}},
-   { BL_MASK_LEV,      {"Lev", "Lev", "Lv"}},
-   { BL_MASK_FLY,      {"Fly", "Fly", "Fl"}},
-   { BL_MASK_RIDE,     {"Ride", "Rid", "Ri"}},
+    { BL_MASK_STONE,    { "Stone",    "Ston",  "Sto" } },
+    { BL_MASK_SLIME,    { "Slime",    "Slim",  "Slm" } },
+    { BL_MASK_STRNGL,   { "Strngl",   "Stngl", "Str" } },
+    { BL_MASK_FOODPOIS, { "FoodPois", "Fpois", "Poi" } },
+    { BL_MASK_TERMILL,  { "TermIll" , "Ill",   "Ill" } },
+    { BL_MASK_BLIND,    { "Blind",    "Blnd",  "Bl"  } },
+    { BL_MASK_DEAF,     { "Deaf",     "Def",   "Df"  } },
+    { BL_MASK_STUN,     { "Stun",     "Stun",  "St"  } },
+    { BL_MASK_CONF,     { "Conf",     "Cnf",   "Cf"  } },
+    { BL_MASK_HALLU,    { "Hallu",    "Hal",   "Hl"  } },
+    { BL_MASK_LEV,      { "Lev",      "Lev",   "Lv"  } },
+    { BL_MASK_FLY,      { "Fly",      "Fly",   "Fl"  } },
+    { BL_MASK_RIDE,     { "Ride",     "Rid",   "Rd"  } },
 };
 static const char *encvals[3][6] = {
-    { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded"},
-    { "", "Burden", "Stress", "Strain", "Overtax", "Overload" },
-    { "", "Brd", "Strs", "Strn", "Ovtx", "Ovld" }
+    { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded" },
+    { "", "Burden",   "Stress",   "Strain",   "Overtax",   "Overload"   },
+    { "", "Brd",      "Strs",     "Strn",     "Ovtx",      "Ovld"       }
 };
 #define MAX_PER_ROW 15
-static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: two status lines */
+static enum statusfields fieldorder[2][MAX_PER_ROW] = { /* 2: 2 status lines */
     { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
       BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
       BL_FLUSH },

@@ -9,15 +9,15 @@
 #include "wintty.h"
 
 #include <sys/stat.h>
-#if defined(WIN32) || defined(MSDOS)
+#if defined(MSDOS)
 #include <errno.h>
 #endif
 
-#if defined(WIN32) || defined(MSDOS)
+#if defined(MSDOS)
 extern char orgdir[];
 #endif
 
-#if defined(WIN32) && defined(TTY_GRAPHICS)
+#if defined(TTY_GRAPHICS)
 extern void NDECL(backsp);
 extern void NDECL(clear_screen);
 #endif
@@ -49,7 +49,7 @@ int fd;
 	return(0);
     }
 #else
-#if (defined(MICRO) || defined(WIN32)) && !defined(NO_FSTAT)
+#if (defined(MICRO)) && !defined(NO_FSTAT)
     if(fstat(fd, &buf)) {
 	if(moves > 1) pline("Cannot get status of saved level? ");
 	else pline("Cannot get status of saved game.");
@@ -126,28 +126,7 @@ getlock()
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-#if defined(WIN32) || defined(HOLD_LOCKFILE_OPEN)
-#if defined(HOLD_LOCKFILE_OPEN)
-        if (errno == EACCES) {
-#define OOPS_BUFSZ 512
-            char oops[OOPS_BUFSZ];
-            Strcpy(
-                oops,
-                "\nThere are files from a game in progress under your name.");
-            Strcat(oops, "\nThe files are locked or inaccessible.");
-            Strcat(oops, " Is the other game still running?\n");
-            if (strlen(fq_lock) < ((OOPS_BUFSZ - 16) - strlen(oops)))
-                Sprintf(eos(oops), "Cannot open %s", fq_lock);
-            Strcat(oops, "\n");
-            unlock_file(HLOCK);
-            error(oops);
-        } else
-#endif
-            error("Bad directory or name: %s\n%s\n", fq_lock,
-                  strerror(errno));
-#else
         perror(fq_lock);
-#endif
         unlock_file(HLOCK);
         error("Cannot open %s", fq_lock);
     }
@@ -197,10 +176,6 @@ getlock()
     if (c == 'y' || c == 'Y')
 #ifndef SELF_RECOVER
         if (eraseoldlocks()) {
-#if defined(WIN32) && defined(TTY_GRAPHICS)
-            if (WINDOWPORT("tty"))
-                clear_screen(); /* display gets fouled up otherwise */
-#endif
             goto gotlock;
         } else {
             unlock_file(HLOCK);
@@ -211,7 +186,7 @@ getlock()
         }
 #else /*SELF_RECOVER*/
         if (recover_savefile()) {
-#if defined(WIN32) && defined(TTY_GRAPHICS)
+#if defined(TTY_GRAPHICS)
             if (WINDOWPORT("tty"))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif
@@ -241,13 +216,7 @@ gotlock:
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-#if defined(WIN32)
-        error("cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", fq_lock,
-              strerror(ern), " Are you sure that the directory",
-              fqn_prefix[LEVELPREFIX]);
-#else
         error("cannot creat file (%s.)", fq_lock);
-#endif
     } else {
         if (write(fd, (char *) &hackpid, sizeof(hackpid))
             != sizeof(hackpid)) {
@@ -270,7 +239,6 @@ gotlock:
 }
 #endif /* PC_LOCKING */
 
-#ifndef WIN32
 void
 regularize(s)
 /*
@@ -290,7 +258,6 @@ register char *s;
             *lp == '|' || *lp >= 127 || (*lp >= '[' && *lp <= ']'))
             *lp = '_';
 }
-#endif /* WIN32 */
 
 #ifdef __EMX__
 void

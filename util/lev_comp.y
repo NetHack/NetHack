@@ -1698,7 +1698,7 @@ object_info	: CURSE_TYPE
 		| TRAPPED_STATE
 		  {
 		      add_opvars(splev, "ii",
-                                 VA_PASS2((int) 1, SP_O_V_TRAPPED));
+                                 VA_PASS2((int) $1, SP_O_V_TRAPPED));
 		      $$ = 0x0400;
 		  }
 		| RECHARGED_ID ':' integer_or_var
