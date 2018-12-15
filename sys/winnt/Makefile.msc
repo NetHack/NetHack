@@ -248,8 +248,7 @@ CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
 !ENDIF
 
-SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
-	   $(SOUND) 	$(O)nhlan.o
+SOBJ   = $(O)winnt.o $(O)pcsys.o $(SOUND) $(O)nhlan.o
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
@@ -1511,14 +1510,10 @@ $(O)\curswins.c: $(WCURSES)\curswins.c $(WCURSES)\curswins.h $(INCL)\wincurs.h
 
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\atari\tos.c
-$(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcsys.c
 $(O)pctty.o: ..\sys\share\pctty.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pctty.c
-$(O)pcunix.o: ..\sys\share\pcunix.c $(HACK_H)
-	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\pcunix.c
 $(O)random.o: ..\sys\share\random.c $(HACK_H)
 	@$(CC) $(cflagsBuild) -Fo$@ ..\sys\share\random.c
 $(O)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h

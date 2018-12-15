@@ -143,7 +143,7 @@ curses_block(boolean noscroll)
 {
     int height, width, ret = 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    char *resp = " \n\033"; /* space, enter, esc */
+    char *resp = " \r\n\033"; /* space, enter, esc */
 
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
@@ -429,7 +429,11 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         wmove(win, my, mx);
         curs_set(1);
         wrefresh(win);
+#ifdef PDCURSES
+        ch = wgetch(win);
+#else
         ch = getch();
+#endif
         curs_set(0);
         switch(ch) {
         case '\033': /* DOESCAPE */

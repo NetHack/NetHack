@@ -619,7 +619,13 @@ raw_print(str)  -- Print directly to a screen, or otherwise guarantee that
 void
 curses_raw_print(const char *str)
 {
+#ifdef PDCURSES
+    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+
+    curses_message_win_puts(str, FALSE);
+#else
     puts(str);
+#endif
 }
 
 /*
