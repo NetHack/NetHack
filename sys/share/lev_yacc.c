@@ -3942,7 +3942,7 @@ break;
 case 240:
 {
 		      add_opvars(splev, "ii",
-                                 VA_PASS2((int) 1, SP_O_V_TRAPPED));
+                                 VA_PASS2((int) (yyvsp[0].i), SP_O_V_TRAPPED));
 		      yyval.i = 0x0400;
 		  }
 break;
