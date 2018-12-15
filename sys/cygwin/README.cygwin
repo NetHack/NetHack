@@ -14,11 +14,14 @@ Instructions for building and installing nethack under cygwin
 1. First, open the cygwin setup program and make sure the following
    packages are installed:
 
+	gcc-core (about 19M, under Devel category)
+	gdb (abotu 2.8M, under Develo category)
+	libncurses-devel (about 1.2M, under Libs category)
 	make (about 450k, under Devel category)
-	byacc (about 70k, under Devel category)
+	cygwin-devel (about 350k, under Devel category)
 	flex (about 350k, under Devel category)
 	m4 (about 270k, under Interpreters category)
-	libncurses-devel (about 1.2M, under Libs category)
+	byacc (about 70k, under Devel category)
 
 2. Next, check the cygwin_hints file in this directory, and change anything
    you'd like customized for your system.  Building and installing should
