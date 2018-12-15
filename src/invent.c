@@ -2648,6 +2648,17 @@ display_pickinv(
         gotsomething = TRUE;
     }
 
+    /* Show weight total and item limit. Only for full invent display, not
+     * within getobj. */
+    if (!lets) {
+        char invheading[QBUFSZ];
+        int wcap = weight_cap();
+        Sprintf(invheading, "Inventory: %d/%d weight (%d/52 slots)",
+                inv_weight() + wcap, wcap, inv_cnt(FALSE));
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_BOLD, invheading,
+                 MENU_ITEMFLAGS_NONE);
+    }
+
  nextclass:
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
