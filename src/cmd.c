@@ -3406,6 +3406,8 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
+int extcmdlist_length = SIZE(extcmdlist) - 1;
+
 const char *
 key2extcmddesc(key)
 uchar key;
