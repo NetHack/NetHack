@@ -294,7 +294,8 @@ const char *s;
                          s, buf);
     }
 
-    if (windowprocs.win_raw_print == def_raw_print)
+    if (windowprocs.win_raw_print == def_raw_print
+            || WINDOWPORT("safe-startup"))
         nh_terminate(EXIT_SUCCESS);
 }
 

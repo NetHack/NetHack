@@ -22,7 +22,7 @@
 	  <PreprocessorDefinitions>CURSES_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
-      <AdditionalLibraryDirectories>$(PDCURSES)\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ToolsDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>PDCurses.lib;%(AdditionalDependencies)</AdditionalDependencies>
 	  </Link>
   </ItemDefinitionGroup>

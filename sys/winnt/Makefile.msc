@@ -287,9 +287,10 @@ ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ)
 OPTIONS_FILE = $(DAT)\options
 
 !IF "$(ADD_CURSES)" == "Y"	
-#==========================================
+#===============-=================================================
 # PDCurses build macros
-#==========================================
+# Latest PDCurses from https://github.com/wmcbrine/PDCurses.git
+#=================================================================
 
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
 PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
