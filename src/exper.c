@@ -1,10 +1,12 @@
-/* NetHack 3.6	exper.c	$NHDT-Date: 1541145516 2018/11/02 07:58:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	exper.c	$NHDT-Date: 1544917599 2018/12/15 23:46:39 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#ifndef LONG_MAX
 #include <limits.h>
+#endif
 
 STATIC_DCL int FDECL(enermod, (int));
 

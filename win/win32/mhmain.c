@@ -195,7 +195,7 @@ static const char scanmap[] = {
 LRESULT CALLBACK
 MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PNHMainWindow data;
+    PNHMainWindow data = (PNHMainWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     switch (message) {
     case WM_CREATE:
@@ -225,7 +225,6 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_KEYDOWN: {
-        data = (PNHMainWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
         /* translate arrow keys into nethack commands */
         switch (wParam) {
@@ -331,6 +330,15 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_ADD:
             NHEVENT_KBD(KEYTABLE(KEY_PLUS));
             return 0;
+
+#if defined(DEBUG) && defined(_MSC_VER)
+        case VK_PAUSE:
+            if (IsDebuggerPresent()) {
+                iflags.debug_fuzzer = !iflags.debug_fuzzer;
+                return 0;
+            }
+            break;
+#endif
 
         case VK_CLEAR: /* This is the '5' key */
             NHEVENT_KBD(KEYTABLE(KEY_GOINTERESTING));
@@ -530,9 +538,10 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         child = GetNHApp()->windowlist[msg_param->wid].win;
     } break;
 
-	case MSNH_MSG_RANDOM_INPUT:
-		nhassert(0); // unexpected
-		break;
+    case MSNH_MSG_RANDOM_INPUT: {
+        nhassert(iflags.debug_fuzzer);
+        NHEVENT_KBD(randomkey());
+    } break;
 
     }
 }
