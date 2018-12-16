@@ -168,7 +168,7 @@ int
 mswin_ext_cmd_window(int *selection)
 {
     if (iflags.debug_fuzzer) {
-        *selection = rn2(extcmdlist_length + 1) - 1;
+        *selection = rnd_extcmd_idx();
 
         if (*selection != -1)
             return IDOK;

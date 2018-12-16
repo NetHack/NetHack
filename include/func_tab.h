@@ -22,6 +22,5 @@ struct ext_func_tab {
 };
 
 extern struct ext_func_tab extcmdlist[];
-extern int extcmdlist_length;
 
 #endif /* FUNC_TAB_H */
