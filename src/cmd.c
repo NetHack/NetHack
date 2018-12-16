@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1544748881 2018/12/14 00:54:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.319 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1544920233 2018/12/16 00:30:33 $  $NHDT-Branch: win-minor $:$NHDT-Revision: 1.321 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4459,6 +4459,12 @@ int sz;
             buf[count++] = c;
     }
     buf[count] = '\0';
+}
+
+int
+rnd_extcmd_idx(VOID_ARGS)
+{
+    return rn2(extcmdlist_length + 1) - 1;
 }
 
 int
