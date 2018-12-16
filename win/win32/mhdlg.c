@@ -167,6 +167,15 @@ INT_PTR CALLBACK ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
 int
 mswin_ext_cmd_window(int *selection)
 {
+    if (iflags.debug_fuzzer) {
+        *selection = rnd_extcmd_idx();
+
+        if (*selection != -1)
+            return IDOK;
+        else
+            return IDCANCEL;
+    }
+
     INT_PTR ret;
     struct extcmd_data data;
 
