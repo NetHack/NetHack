@@ -23,7 +23,6 @@
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\debug.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\delch.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\deleteln.c" />
-    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\deprec.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getch.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getstr.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getyx.c" />
@@ -48,7 +47,6 @@
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\scr_dump.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\slk.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\termattr.c" />
-    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\terminfo.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\touch.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\util.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\window.c" />
