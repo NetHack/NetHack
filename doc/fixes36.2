@@ -273,6 +273,11 @@ make it easier to clear 'pickup_types' (menustyles Traditional and Combination
 	allowed unselecting every object class; now 'all classes' is a choice)
 distribution of monsters selected by mkclass() didn't match expected distrib
 	(cited example was ndemon() creating twice as many incubi as succubi)
+while inside a shop, dropping an unpaid item inside an engulfer would leave
+	that item 'unpaid' and it would remain so on shop floor after the
+	the engulfer was killed; treat dropping shop items inside an engulfer
+	as stealing them and giving them to that engulfer--hero must pay for
+	for them and shop retains ownership of them
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
