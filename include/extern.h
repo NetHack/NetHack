@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1544669659 2018/12/13 02:54:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.667 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1544998887 2018/12/16 22:21:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.671 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1152,6 +1152,7 @@ E boolean FDECL(create_critters, (int, struct permonst *, BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
 E void FDECL(reset_rndmonst, (int));
 E struct permonst *FDECL(mkclass, (CHAR_P, int));
+E struct permonst *FDECL(mkclass_aligned, (CHAR_P, int, ALIGNTYP_P));
 E int FDECL(mkclass_poly, (int));
 E int FDECL(adj_lev, (struct permonst *));
 E struct permonst *FDECL(grow_up, (struct monst *, struct monst *));
