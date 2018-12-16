@@ -354,6 +354,8 @@ tty: significant optimizations for performance and per field rendering
 tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
 tty: support BL_RESET in status_update to force an update to all status fields
 tty: stop hitpointbar from jumping to 100% health at zero hit points
+tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
+	and using up all available CPU time
 MacOSX: add curses window port
 MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
 MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
