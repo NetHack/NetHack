@@ -78,6 +78,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nhraykey", "nhraykey.vcxpro
 		{BA3DD34C-04B7-40D0-B373-9329AA9E8945} = {BA3DD34C-04B7-40D0-B373-9329AA9E8945}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PDCurses", "PDCurses.vcxproj", "{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -190,6 +192,14 @@ Global
 		{2E1F4BB3-3BD7-43AD-8E64-D3B8A2F5D7B2}.Release|Win32.Build.0 = Release|Win32
 		{2E1F4BB3-3BD7-43AD-8E64-D3B8A2F5D7B2}.Release|x64.ActiveCfg = Release|x64
 		{2E1F4BB3-3BD7-43AD-8E64-D3B8A2F5D7B2}.Release|x64.Build.0 = Release|x64
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Debug|Win32.Build.0 = Debug|Win32
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Debug|x64.ActiveCfg = Debug|x64
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Debug|x64.Build.0 = Debug|x64
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|Win32.ActiveCfg = Release|Win32
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|Win32.Build.0 = Release|Win32
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|x64.ActiveCfg = Release|x64
+		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
