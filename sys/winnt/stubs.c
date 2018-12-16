@@ -11,10 +11,10 @@
 #endif
 
 int GUILaunched;
-struct window_procs mswin_procs = { "guistubs" };
+struct window_procs mswin_procs = { "-guistubs" };
 
 #ifdef QT_GRAPHICS
-struct window_procs Qt_procs = { "guistubs" };
+struct window_procs Qt_procs = { "-guistubs" };
 int qt_tilewidth, qt_tileheight, qt_fontsize, qt_compact_mode;
 #endif
 void
@@ -54,7 +54,7 @@ char *argv[];
 HANDLE hConIn;
 HANDLE hConOut;
 int GUILaunched;
-struct window_procs tty_procs = { "ttystubs" };
+struct window_procs tty_procs = { "-ttystubs" };
 
 void
 win_tty_init(dir)
