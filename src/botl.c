@@ -1,10 +1,12 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1544229439 2018/12/08 00:37:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1544917592 2018/12/15 23:46:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#ifndef LONG_MAX
 #include <limits.h>
+#endif
 
 extern const char *hu_stat[]; /* defined in eat.c */
 
@@ -1394,13 +1396,10 @@ int newcolor;
 /*
  * get_hilite_color
  *
- * Figures out, based on the value and the
- * direction it is moving, the color that the field
- * should be displayed in.
+ * Figures out, based on the value and the direction it is moving,
+ * the color that the field should be displayed in.
  *
- *
- * Provide get_hilite_color() with the following
- * to work with:
+ * Provide get_hilite_color() with the following to work with:
  *     actual value vp
  *          useful for BL_TH_VAL_ABSOLUTE
  *     indicator of down, up, or the same (-1, 1, 0) chg
@@ -1416,7 +1415,6 @@ int newcolor;
  *                   color = 0x00FF
  *                   attrib= 0xFF00
  */
-
 STATIC_OVL void
 get_hilite_color(idx, fldidx, vp, chg, pc, colorptr)
 int idx, fldidx, chg, pc;
@@ -1432,14 +1430,21 @@ int *colorptr;
         return;
 
     if (blstats[idx][fldidx].thresholds) {
+        int dt;
         /* there are hilites set here */
         int max_pc = -1, min_pc = 101;
-        int max_val = -LARGEST_INT, min_val = LARGEST_INT;
+        /* LARGEST_INT isn't INT_MAX; it fits within 16 bits, but that
+           value is big enough to handle all 'int' status fields */
+        int max_ival = -LARGEST_INT, min_ival = LARGEST_INT;
+        /* LONG_MAX comes from <limits.h> which might not be available for
+           ancient configurations; we don't need LONG_MIN */
+        long max_lval = -LONG_MAX, min_lval = LONG_MAX;
         boolean exactmatch = FALSE, updown = FALSE, changed = FALSE,
                 perc_or_abs = FALSE;
 
         /* min_/max_ are used to track best fit */
         for (hl = blstats[idx][fldidx].thresholds; hl; hl = hl->next) {
+            dt = initblstats[fldidx].anytype; /* only needed for 'absolute' */
             /* if we've already matched a temporary highlight, it takes
                precedence over all persistent ones; we still process
                updown rules to get the last one which qualifies */
@@ -1451,7 +1456,7 @@ int *colorptr;
                 continue;
 
             switch (hl->behavior) {
-            case BL_TH_VAL_PERCENTAGE:
+            case BL_TH_VAL_PERCENTAGE: /* percent values are always ANY_INT */
                 if (hl->rel == EQ_VALUE && pc == hl->value.a_int) {
                     merge_bestcolor(&bestcolor, hl->coloridx);
                     min_pc = max_pc = hl->value.a_int;
@@ -1484,7 +1489,7 @@ int *colorptr;
                     perc_or_abs = TRUE;
                 }
                 break;
-            case BL_TH_UPDOWN:
+            case BL_TH_UPDOWN: /* uses 'chg' (set by caller), not 'dt' */
                 /* specific 'up' or 'down' takes precedence over general
                    'changed' regardless of their order in the rule set */
                 if (chg < 0 && hl->rel == LT_VALUE) {
@@ -1498,45 +1503,81 @@ int *colorptr;
                     changed = TRUE;
                 }
                 break;
-            case BL_TH_VAL_ABSOLUTE:
-            /*
-             * TODO:
-             *  This covers data type ANY_INT.  We need to handle ANY_LONG
-             *  separately using a_long and new min_lval, max_lval.
-             */
-                if (hl->rel == EQ_VALUE && hl->value.a_int == value->a_int) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                    min_val = max_val = hl->value.a_int;
-                    exactmatch = perc_or_abs = TRUE;
-                } else if (exactmatch) {
-                    ; /* already found best fit, skip lt,ge,&c */
-                } else if (hl->rel == LT_VALUE
-                           && (value->a_int < hl->value.a_int)
-                           && (hl->value.a_int <= min_val)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                    min_val = hl->value.a_int;
-                    perc_or_abs = TRUE;
-                } else if (hl->rel == LE_VALUE
-                           && (value->a_int <= hl->value.a_int)
-                           && (hl->value.a_int <= min_val)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                    min_val = hl->value.a_int;
-                    perc_or_abs = TRUE;
-                } else if (hl->rel == GT_VALUE
-                           && (value->a_int > hl->value.a_int)
-                           && (hl->value.a_int >= max_val)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                    max_val = hl->value.a_int;
-                    perc_or_abs = TRUE;
-                } else if (hl->rel == GE_VALUE
-                           && (value->a_int >= hl->value.a_int)
-                           && (hl->value.a_int >= max_val)) {
-                    merge_bestcolor(&bestcolor, hl->coloridx);
-                    max_val = hl->value.a_int;
-                    perc_or_abs = TRUE;
+            case BL_TH_VAL_ABSOLUTE: /* either ANY_INT or ANY_LONG */
+                /*
+                 * The int and long variations here are identical aside from
+                 * union field and min_/max_ variable names.  If you change
+                 * one, be sure to make a corresponding change in the other.
+                 */
+                if (dt == ANY_INT) {
+                    if (hl->rel == EQ_VALUE
+                        && hl->value.a_int == value->a_int) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_ival = max_ival = hl->value.a_int;
+                        exactmatch = perc_or_abs = TRUE;
+                    } else if (exactmatch) {
+                        ; /* already found best fit, skip lt,ge,&c */
+                    } else if (hl->rel == LT_VALUE
+                               && (value->a_int < hl->value.a_int)
+                               && (hl->value.a_int <= min_ival)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_ival = hl->value.a_int;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == LE_VALUE
+                               && (value->a_int <= hl->value.a_int)
+                               && (hl->value.a_int <= min_ival)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_ival = hl->value.a_int;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == GT_VALUE
+                               && (value->a_int > hl->value.a_int)
+                               && (hl->value.a_int >= max_ival)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        max_ival = hl->value.a_int;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == GE_VALUE
+                               && (value->a_int >= hl->value.a_int)
+                               && (hl->value.a_int >= max_ival)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        max_ival = hl->value.a_int;
+                        perc_or_abs = TRUE;
+                    }
+                } else { /* ANY_LONG */
+                    if (hl->rel == EQ_VALUE
+                        && hl->value.a_long == value->a_long) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_lval = max_lval = hl->value.a_long;
+                        exactmatch = perc_or_abs = TRUE;
+                    } else if (exactmatch) {
+                        ; /* already found best fit, skip lt,ge,&c */
+                    } else if (hl->rel == LT_VALUE
+                               && (value->a_long < hl->value.a_long)
+                               && (hl->value.a_long <= min_lval)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_lval = hl->value.a_long;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == LE_VALUE
+                               && (value->a_long <= hl->value.a_long)
+                               && (hl->value.a_long <= min_lval)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        min_lval = hl->value.a_long;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == GT_VALUE
+                               && (value->a_long > hl->value.a_long)
+                               && (hl->value.a_long >= max_lval)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        max_lval = hl->value.a_long;
+                        perc_or_abs = TRUE;
+                    } else if (hl->rel == GE_VALUE
+                               && (value->a_long >= hl->value.a_long)
+                               && (hl->value.a_long >= max_lval)) {
+                        merge_bestcolor(&bestcolor, hl->coloridx);
+                        max_lval = hl->value.a_long;
+                        perc_or_abs = TRUE;
+                    }
                 }
                 break;
-            case BL_TH_TEXTMATCH:
+            case BL_TH_TEXTMATCH: /* ANY_STR */
                 txtstr = blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     /* "<name> the <rank-title>", skip past "<name> the " */

@@ -297,6 +297,8 @@ fix bit-use collision between WC2_TERM_SIZE and WC2_RESET_STATUS in
 	include/winprocs.h following a recent merge
 fix foxen pluralization again after underflow remedy reintroduced the problem
 fix "placing monster over another?" warning for vault guards
+status highlighting classified gold, time, and experience-points as data type
+	'long' but when selecting hilite rule to use treated them as 'int'
 tty: turn off an optimization that is the suspected cause of Windows reported 
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -352,6 +354,8 @@ tty: significant optimizations for performance and per field rendering
 tty: use WC2_FLUSH_STATUS to buffer changes until BL_FLUSH is received
 tty: support BL_RESET in status_update to force an update to all status fields
 tty: stop hitpointbar from jumping to 100% health at zero hit points
+tty: try harder to prevent a disconnected terminal (SIGHUP) from running amok
+	and using up all available CPU time
 MacOSX: add curses window port
 MacOSX: add Xcode project to sys/unixNetHack.xcodeproj
 MacOSX: add Xcode supporting files README.xcode and XCode.xcconfig
