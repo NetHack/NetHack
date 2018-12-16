@@ -24,7 +24,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 29, 2018
+.ds f2 "December 15, 2018
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4934,8 +4934,8 @@ again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
 public NetHack server at nethack.alt.org. Thanks to \fBKeith Simpson\fP
 and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
-NetHack tournaments such as Junethack and in days past,
-devnull.net (gone for now, but not forgotten).
+NetHack tournaments such as Junethack, The November NetHack Tournament 
+and in days past, devnull.net (gone for now, but not forgotten).
 .pg
 .ce
 - - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too far
