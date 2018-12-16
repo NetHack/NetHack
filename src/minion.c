@@ -1,4 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	minion.c	$NHDT-Date: 1544998886 2018/12/16 22:21:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -256,7 +256,7 @@ register struct monst *mtmp;
               flags.female ? "Sister" : "Brother");
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
-        return (1);
+        return 1;
     }
     cash = money_cnt(invent);
     demand =
@@ -292,7 +292,7 @@ register struct monst *mtmp;
         }
     }
     mongone(mtmp);
-    return (1);
+    return 1;
 }
 
 long
@@ -323,7 +323,7 @@ struct monst *mtmp;
     }
     (void) money2mon(mtmp, offer);
     context.botl = 1;
-    return (offer);
+    return offer;
 }
 
 int
@@ -336,9 +336,9 @@ aligntyp atyp;
         pm = rn1(PM_DEMOGORGON + 1 - PM_ORCUS, PM_ORCUS);
         if (!(mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
-            return (pm);
+            return pm;
     }
-    return (dlord(atyp)); /* approximate */
+    return dlord(atyp); /* approximate */
 }
 
 int
@@ -351,9 +351,9 @@ aligntyp atyp;
         pm = rn1(PM_YEENOGHU + 1 - PM_JUIBLEX, PM_JUIBLEX);
         if (!(mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
-            return (pm);
+            return pm;
     }
-    return (ndemon(atyp)); /* approximate */
+    return ndemon(atyp); /* approximate */
 }
 
 /* create lawful (good) lord */
@@ -361,9 +361,9 @@ int
 llord()
 {
     if (!(mvitals[PM_ARCHON].mvflags & G_GONE))
-        return (PM_ARCHON);
+        return PM_ARCHON;
 
-    return (lminion()); /* approximate */
+    return lminion(); /* approximate */
 }
 
 int
@@ -375,7 +375,7 @@ lminion()
     for (tryct = 0; tryct < 20; tryct++) {
         ptr = mkclass(S_ANGEL, 0);
         if (ptr && !is_lord(ptr))
-            return (monsndx(ptr));
+            return monsndx(ptr);
     }
 
     return NON_PM;
@@ -383,19 +383,26 @@ lminion()
 
 int
 ndemon(atyp)
-aligntyp atyp;
+aligntyp atyp; /* A_NONE is used for 'any alignment' */
 {
-    int tryct;
     struct permonst *ptr;
 
-    for (tryct = 0; tryct < 20; tryct++) {
-        ptr = mkclass(S_DEMON, 0);
-        if (ptr && is_ndemon(ptr)
-            && (atyp == A_NONE || sgn(ptr->maligntyp) == sgn(atyp)))
-            return (monsndx(ptr));
-    }
-
-    return NON_PM;
+    /*
+     * 3.6.2:  [fix #H2204, 22-Dec-2010, eight years later...]
+     * pick a correctly aligned demon in one try.  This used to
+     * use mkclass() to choose a random demon type and keep trying
+     * (up to 20 times) until it got one with the desired alignment.
+     * mkclass_aligned() skips wrongly aligned potential candidates.
+     * [The only neutral demons are djinni and mail daemon and
+     * mkclass() won't pick them, but call it anyway in case either
+     * aspect of that changes someday.]
+     */
+#if 0
+    if (atyp == A_NEUTRAL)
+        return NON_PM;
+#endif
+    ptr = mkclass_aligned(S_DEMON, 0, atyp);
+    return (ptr && is_ndemon(ptr)) ? monsndx(ptr) : NON_PM;
 }
 
 /* guardian angel has been affected by conflict so is abandoning hero */
