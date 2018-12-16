@@ -803,7 +803,7 @@ skip0:
         if (u.uhave.amulet || !rn2(3)) {
             x = somex(croom);
             y = somey(croom);
-            tmonst = makemon((struct permonst *) 0, x, y, (MM_NOGRP | MM_ASLEEP));
+            tmonst = makemon((struct permonst *) 0, x, y, MM_NOGRP);
             if (tmonst && tmonst->data == &mons[PM_GIANT_SPIDER]
                 && !occupied(x, y))
                 (void) maketrap(x, y, WEB);
