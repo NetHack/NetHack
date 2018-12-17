@@ -704,7 +704,7 @@ boolean *valsetlist;
     if (fld == BL_GOLD
         && (context.rndencode != oldrndencode
             || g.showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym)) {
-        update_all = TRUE; /* chg = 2; */
+        g.update_all = TRUE; /* chg = 2; */
         oldrndencode = context.rndencode;
         oldgoldsym = g.showsyms[COIN_CLASS + SYM_OFF_O];
     }
