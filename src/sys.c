@@ -22,6 +22,7 @@ sys_early_init()
 {
     decl_globals_init();
     objects_globals_init();
+    monst_globals_init();
 
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
