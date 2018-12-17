@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1545036280 2018/12/17 08:44:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.672 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1545043771 2018/12/17 10:49:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.673 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -974,7 +974,6 @@ E boolean NDECL(have_lizard);
 E struct obj *NDECL(u_have_novel);
 E struct obj *FDECL(o_on, (unsigned int, struct obj *));
 E boolean FDECL(obj_here, (struct obj *, int, int));
-E int FDECL(ckunpaid, (struct obj *));
 E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int, int));
