@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1545005168 2018/12/17 00:06:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1545043771 2018/12/17 10:49:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -588,8 +588,7 @@ register struct obj *obj;
 
             /* doname can call s_suffix, reusing its buffer */
             Strcpy(monbuf, s_suffix(mon_nam(u.ustuck)));
-            onam_p = obj->unpaid ? yobjnam(obj, (char *) 0) : doname(obj);
-
+            onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
             You("drop %s into %s %s.", onam_p, monbuf,
                 mbodypart(u.ustuck, STOMACH));
         }
@@ -684,7 +683,7 @@ boolean with_impact;
                 could_grow = (obj->corpsenm == PM_WRAITH);
                 could_heal = (obj->corpsenm == PM_NURSE);
             }
-            if (obj->unpaid)
+            if (is_unpaid(obj))
                 (void) stolen_value(obj, u.ux, u.uy, TRUE, FALSE);
             (void) mpickobj(u.ustuck, obj);
             if (is_animal(u.ustuck->data)) {
