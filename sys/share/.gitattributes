@@ -9,9 +9,9 @@ Makefile.lib	NH_filestag=(file%s_for_MSDOS_and_OS/2_versions_-_untested_for_3.6.
 #termcap.uu NH_filestag=(file%s_for_MSDOS_and_OS/2_versions_-_untested_for_3.6.2)
 termcap.uu	NH_filestag=>Makefile.lib
 
-pcmain.c	NH_filestag=(file_for_MSDOS,_OS/2,_NT,_Amiga,_and_Atari_versions_-_untested_for_3.6.2)
+pcmain.c	NH_filestag=(file_for_MSDOS,_OS/2,_Amiga,_and_Atari_versions_-_untested_for_3.6.2)
 
-pcsys.c		NH_filestag=(file%s_for_MSDOS,_OS/2,_NT,_and_Atari_versions_-_untested_for_3.6.2)
+pcsys.c		NH_filestag=(file%s_for_MSDOS,_OS/2_and_Atari_versions_-_untested_for_3.6.2)
 pcunix.c	NH_filestag=>pcsys.c
 
 NetHack.cnf	NH_filestag=(file_for_MSDOS,_OS/2,_and_Atari_versions_-_untested_for_3.6.2)
