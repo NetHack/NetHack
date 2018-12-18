@@ -503,8 +503,10 @@ int nondefault;
         if (SYMHANDLING(H_CURS) && cursesgraphics_mode_callback)
             (*cursesgraphics_mode_callback)();		
 # endif
-    } else
-        init_symbols();
+    } else {
+        init_l_symbols();
+        init_showsyms();
+    }
 }
 
 void

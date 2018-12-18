@@ -312,6 +312,10 @@ fix foxen pluralization again after underflow remedy reintroduced the problem
 fix "placing monster over another?" warning for vault guards
 status highlighting classifies gold, time, and experience-points as data type
 	'long' but when selecting hilite rule to use treated them as 'int'
+a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
+	was disabling color on RogueEpyx even though the symset is 
+	meant to have color due to an errant init_symbols() during the
+	processing of symset:default after already processing RogueEpyx
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status

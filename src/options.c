@@ -761,6 +761,7 @@ initoptions_init()
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     switch_symbols(FALSE); /* set default characters */
+    init_r_symbols();
 #if defined(UNIX) && defined(TTY_GRAPHICS)
     /*
      * Set defaults for some options depending on what we can
