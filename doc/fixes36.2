@@ -1,8 +1,8 @@
 $NHDT-Branch: $:$NHDT-Revision: $ $NHDT-Date: $
 
 This fixes36.2 file is here to capture information about updates in the 3.6.x
-lineage following the release of 3.6.1 in April 2018. Please note, however, 
-that another 3.6.x release is not anticipated after 3.6.2, and most developer 
+lineage following the release of 3.6.1 in April 2018. Please note, however,
+that another 3.6.x release is not anticipated after 3.6.2, and most developer
 focus will shift to the next major release.
 
 General Fixes and Modified Features
@@ -21,7 +21,7 @@ targetting with a polearm could give away location of hidden monster
 static prototype could be left orphaned depending on #defines in rip.c
 config file error handling routines were calling xx_wait_synch early
 	even before the window system was initialized; add a default routine
-status_finish() in botl.c would unconditionally invoke the window port's 
+status_finish() in botl.c would unconditionally invoke the window port's
 	win_status_finish() routine which was problematic if the windowport
 	wasn't initialized yet
 using 'O' to set up a hilite_status rule for string comparison, the menu for
@@ -30,6 +30,8 @@ using 'O' to set up a hilite_status rule for string comparison, the menu for
 when finishing using 'O' to examine or set hilite_status rules, if the
 	'statushilites' option is 0 and there is at least one rule, give a
 	reminder about setting it to non-zero to activate highlighting
+if player creates any menu colors via 'O' while menucolors is off, issue a
+	reminder that it needs to be on in order for those to become effective
 end of game disclosure was exercising Wisdom when revealing inventory and
 	also repeatedly updating persistent inventory window if enabled
 internals for 'sortloot' option have been changed to not reorder the actual
@@ -70,7 +72,7 @@ attempting to update permanent inventory window during restore had problems
 	were restored) and named fruit
 remembered corpse which isn't there anymore would be described by farlook as
 	the corpse of a random monster type
-when eating a tin of spinach, don't "feel like Popeye" is sustain-abilities
+when eating a tin of spinach, don't "feel like Popeye" if sustain-abilities
 	prevents any strength gain
 summary text [for message history] of quest message Pri 00081 (Priest quest
 	success message given when bringing quest artifact to leader)
@@ -104,11 +106,11 @@ wizard mode ^I^I didn't make temporary identifications become persistent if
 	the build configuration makes plain 'char' unsigned
 wizard mode #wizidentify didn't disclose extra information for unID'd items if
 	key bindings took away ^I and didn't bind #wizidentify to another key
-make transformation message of a deliberate apply of a figurine seem a bit 
+make transformation message of a deliberate apply of a figurine seem a bit
 	less definite when blind and place unseen monster marker at the spot
 	you think it should be
-add window port status_update() value BL_RESET to use as a flag to 
-	redraw all status fields, distinguished from BL_FLUSH which now only
+add window port status_update() value BL_RESET to use as a flag to redraw
+	all status fields, distinguished from BL_FLUSH which now only
 	specifies that the bot() call has completed so any buffered changes
 	should now be rendered
 for hilite_status of string status fields (title, dungeon-level, alignment),
@@ -125,16 +127,16 @@ poly'd shapechanger and hiding mimic will revert to normal when cancelled,
 	like werecreature in beast form and non-Unchanging hero
 cancelled shapeshifter is no longer able to change shape
 cancelled shapeshifter hit by polymorph magic will become uncancelled
-polymorph zap which creates a new long worm (or retains an old one via wizard
-	mode monpolycontrol) can hit that worm multiple times (tail segments)
+polymorph zap which created a new long worm (or retains an old one via wizard
+	mode monpolycontrol) could hit that worm multiple times (tail segments)
 wishing for "orange" could yield orange or orange colored gem/potion/spellbook
-a sleeping or paralyzed mon would be frightened by its reflection when 
+a sleeping or paralyzed mon would be frightened by its reflection when
 	applying a mirror
 prevent leash showing unseen monster as "attached to it"
 gremlins seemed impervious to Sunsword's light yet a flash from a camera
 	caused them to cry out in pain
-when objects migrate (fall down stairs) and invisible hero (w/o see invisible,
-	no-autopickup) descends, stairs get shown instead of object(s) on them
+when objects migrated (fell down stairs) and invisible hero (w/o see invisible,
+	no-autopickup) descended, stairs got shown instead of object(s) on them
 drum of earthquake was causing deafness but oddly enough only when used up
 known bear trap was being forgotten about by a player polymorphed into a
 	flying monster if the player unsuccessfully tried to #untrap it and
@@ -196,6 +198,8 @@ avoid potential buffer overflow if object with very long name knocks other
 #wizintrinsic for 'warn_of_mon' didn't set any type of monster (now grid bugs)
 clairvoyance would show trap instead of a monster on/in that trap, which was
 	intentional, but when clairvoyance finished the monster wasn't shown
+clairvoyance revealing underwater or under-lava objects left object displayed
+	instead of restoring the water or lava
 nurse corpse/tin chance to convey poison resistance when eaten was not honored
 make tame vampires be more aggressive when shifted to bat/fog/wolf form
 a stale gold symbol could be displayed on the status line following a switch
@@ -229,11 +233,12 @@ stinking cloud placed near water could kill underwater creatures
 applying--rather than wielding--a cursed polearm or weapon-tool didn't report
 	that it had become welded to hero's hand(s)
 the message when riding a steed into a pit was composed but not shown
-dismount that kills steed because there is no room to put it on map blamed the
-	hero; change that to only blame hero if dismount was voluntary
+dismount that killed steed because there was no room to put it on map blamed
+	hero; change that to only blame hero if dismount is voluntary
 to emphasize that it's not a light source, change description of wielded Sting
 	from "(glowing light blue)" to "(light blue aura)" when sighted and
 	from "(glowing)" to nothing (not warm enough to feel) when blind
+	[subsequently changed in different manner; see 'exposed via git' below]
 glowing Sting quivers if hero becomes blind and quivering Sting glows if
 	blindness ends; it worked for timed blindness but not for blindfold
 weapon (wielded pie, egg, potion, boomerang) might be destroyed when hitting a
@@ -246,7 +251,7 @@ if hero survives turning into slime (life-saving), survive as a green slime
 hero hit by something that causes inventory items to be destroyed with loss of
 	any of those causing other inventory items to be dropped or destroyed,
 	inventory traversal became unreliable (known sequence: potions hit by
-	fire then breahing vapor from boiled unholy water triggering were
+	fire then breathing vapor from boiled unholy water triggering 'were'
 	transformation to beast form; possible sequence: ring of levitation
 	blasted by lightning and dropping hero onto fire trap); [3.6.1 fixed a
 	similar problem with more obvious symptom, an "object lost" panic when
@@ -256,18 +261,14 @@ add MM_NOGRP makemon() flag as a means of suppressing groups of monsters in
 	a couple places that warrant it when a specific monster type isn't
 	specified on the call to makemon()
 at start of session (new game or restore), HILITE_STATUS for gold was ignored
-if player creates any menu colors via 'O' while menucolors is off, issue a
-	reminder that it needs to be on in order for those to become effective
 setting second or later named fruit to value beginning with two or more spaces
 	followed by non-space gave "singular of null?" warning
 when blocking/unblocking of levitation or flying was updated due to walking
 	onto different terrain, the relevant status condition wasn't updated
 	on the screen until some other status update happened
-if levitating hero poly'd into pass-wall creature jumped or teleported from
+if levitating hero in pass-wall creature form jumped or teleported from
 	terrain that allowed levitation to terrain that didn't or vice versa,
 	blocking of levitation wasn't updated properly
-clairvoyance revealing underwater or under-lava objects left object displayed
-	instead of restoring the water or lava
 make it easier to clear 'pickup_types' (menustyles Traditional and Combination
 	could do so by setting it to 'a'; now ' ' works too; Full and Partial
 	allowed unselecting every object class; now 'all classes' is a choice)
@@ -277,7 +278,7 @@ while inside a shop, dropping an unpaid item inside an engulfer would leave
 	that item 'unpaid' and it would remain so on shop floor after the
 	the engulfer was killed; treat dropping shop items inside an engulfer
 	as stealing them and giving them to that engulfer--hero must pay for
-	for them and shop retains ownership of them
+	them and shop retains ownership of them
 while levitating inside a shop, throwing an unpaid item and having recoil move
 	hero out of shop (or to shopkeeper's spot in front of door) would
 	leave the item unpaid on shop floor and also on the shop's bill but
@@ -291,7 +292,7 @@ fix access violation when --debug:xxxx has no other args after it
 setting the inverse attribute for gold had the space before "$:"
 	getting highlighted along with the gold field
 sortloot segfaulted when filtering a subset of items (seen with 'A' command)
-orctown: prevent Bad fruit #0 and some minor tuning
+orctown: prevent "Bad fruit #0" and some minor tuning
 orctown: orcs beyond the mines were being given any left-over booty and named
 	as part of the same marauding gang operating within the mines
 make long extended commands list be more navigable
@@ -309,9 +310,9 @@ fix bit-use collision between WC2_TERM_SIZE and WC2_RESET_STATUS in
 	include/winprocs.h following a recent merge
 fix foxen pluralization again after underflow remedy reintroduced the problem
 fix "placing monster over another?" warning for vault guards
-status highlighting classified gold, time, and experience-points as data type
+status highlighting classifies gold, time, and experience-points as data type
 	'long' but when selecting hilite rule to use treated them as 'int'
-tty: turn off an optimization that is the suspected cause of Windows reported 
+tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
 	values so that comparisons are correct
@@ -327,39 +328,38 @@ X11: rollback disabling of keystroke input for PICK_NONE menus (for scrolling)
 Platform- and/or Interface-Specific Fixes or Features
 -----------------------------------------------------
 move 'perm_invent' value from flags to iflags to keep it out of save files;
-	affects X11, win32, and curses
+	affects X11, win32, and curses (save file compatibility is preserved)
 always define shell and suspend commands so that key bindings copied from one
 	platform to another work even if second one disables those commands
-windows-gui: In nethackw, there could be conflicts between menu accelerators 
+windows-gui: In nethackw, there could be conflicts between menu accelerators
 	and an extra choice accelerator to fix H7132.
 windows-gui: recognize new BL_RESET in status_update; no change in behavior yet
 windows-gui: align hpbar behavior at zero hit points with tty behavior
-windows-gui: add support for status_hilites for the player condition field 
+windows-gui: add support for status_hilites for the player condition field
 	such as stone, slime, strngl, blind, deaf, stun, conf, etc.
 windows-tty: Specify both width and height when creating font for width testing
 windows-tty: To counter lag problems that were occuring with the Win32 console
 	port, implement a console back buffer to reduce the number of calls
-	made to  WriteConsoleOutputXXX
+	made to WriteConsoleOutputXXX
 windows-tty: Additional changes to xputc_core() and early_raw_print() to
-	manage  the cursor position correctly as that is needed to handle
-	raw printing  correctly
-windows-tty: Added check for when we might be running off the bottom of the 
+	manage the cursor position correctly as that is needed to handle
+	raw printing correctly
+windows-tty: Added check for when we might be running off the bottom of the
 	screen when handling msmsg()
 windows-tty: Added runtime checks to keep cursor always within bounds
 windows-tty: Fix memory leaks as reported in H5779
-windows-tty: Use nhraykey by default if the players keyboard layout is 
+windows-tty: Use nhraykey by default if the player's keyboard layout is
 	non-english as reported in H4216
 windows-tty: We now support changing altkeyhandler in game
 windows-tty: augment codepage850-to-Unicode mappings that are not displayable
-	with codepage437-to-Unicode mappings that are, to help ensure
-	that rogue-level characters in the status line match their appearance
-	on the map
+	with codepage437-to-Unicode mappings that are, to help ensure that
+	rogue-level characters o status line match their appearance on map
 windows-tty: add support for mouse_support:0 (disabled), mouse_support:1
 	(fully-functional including disabling QuickEdit on Windows console
 	because QuickEdit intercepts the mouse clicks so NetHack never sees
 	them), or mouse_support:2 (NetHack support on but QuickEdit left as is)
 windows: Added ntassert() mechanism for Windows based port use
-windows: heed OPTIONS=symset:default in config file if it is present 
+windows: heed OPTIONS=symset:default in config file if it is present
 windows: add curses window port which can co-exist with tty in exe and be
 	selectable in user config file via OPTIONS=windowtype:curses
 tty: significant optimizations for performance and per field rendering
@@ -412,7 +412,7 @@ sortloot option has been enhanced to improve object ordering; primarily,
 	within each class or sub-class of objects
 YAFM when stumbling on an undetected monster while hallucinating
 make it clear when a leprechaun dodges your attack
-wizard mode #wizidentify can now select individual items for permanent 
+wizard mode #wizidentify can now select individual items for permanent
 	identification and don't display the selection to permanently
 	identify everything if everything is already fully identified
 make mine town "orctown" variation a multiple level feature of the mines
@@ -431,13 +431,13 @@ for ^X, include current state of 'autopickup'
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 curses: the community patch for an optional curses window-port was
-	incorporated into the NetHack source code tree. The curses
+	incorporated into the NetHack source code tree.  The curses
 	window-port evolved from work originally done by Karl Garrison,
-	and has been in use in several NetHack variants and on 
+	and has been in use in several NetHack variants and on
 	nethack.alt.org and on www.hardfought.org/nethack/ for a while.
-	It is available and tested for 3.6.2 for Windows with PDCurses 
+	It is available and tested for 3.6.2 for Windows with PDCurses
 	layered underneath, and for Mac OSX and Unix (using ncurses as
-	the layer underneath). It may also work for DOS with PDCurses
+	the layer underneath).  It may also work for DOS with PDCurses
 	layered underneath, but that has not been tested.
 
 
