@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1544920233 2018/12/16 00:30:33 $  $NHDT-Branch: win-minor $:$NHDT-Revision: 1.321 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1545128652 2018/12/18 10:24:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.322 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5544,7 +5544,6 @@ parse()
     static char in_line[COLNO];
 #endif
     register int foo;
-    boolean prezero = FALSE;
 
     iflags.in_parse = TRUE;
     multi = 0;
@@ -5617,8 +5616,6 @@ parse()
         in_line[2] = 0;
     }
     clear_nhwindow(WIN_MESSAGE);
-    if (prezero)
-        in_line[0] = Cmd.spkeys[NHKF_ESC];
 
     iflags.in_parse = FALSE;
     return in_line;
