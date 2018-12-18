@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1543185072 2018/11/25 22:31:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1545129848 2018/12/18 10:44:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -527,14 +527,14 @@ char *supplemental_name;
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
-        pline("Cannot open data file!");
+        pline("Cannot open 'data' file!");
         return;
     }
     /* If someone passed us garbage, prevent fault. */
     if (!inp || strlen(inp) > (BUFSZ - 1)) {
         impossible("bad do_look buffer passed (%s)!",
                    !inp ? "null" : "too long");
-        return;
+        goto checkfile_done;
     }
 
     /* To prevent the need for entries in data.base like *ngel to account
