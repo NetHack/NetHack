@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1501725407 2017/08/03 01:56:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	priest.c	$NHDT-Date: 1545131519 2018/12/18 11:11:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,7 +53,9 @@ register xchar omx, omy, gx, gy;
     coord poss[9];
     long info[9];
     long allowflags;
+#if 0 /* dead code; see below */
     struct obj *ib = (struct obj *) 0;
+#endif
 
     if (omx == gx && omy == gy)
         return 0;
@@ -121,6 +123,7 @@ pick_move:
         newsym(nix, niy);
         if (mtmp->isshk && !in_his_shop && inhishop(mtmp))
             check_special_room(FALSE);
+#if 0 /* dead code; maybe someday someone will track down why... */
         if (ib) {
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s picks up %s.", Monnam(mtmp),
@@ -128,6 +131,7 @@ pick_move:
             obj_extract_self(ib);
             (void) mpickobj(mtmp, ib);
         }
+#endif
         return 1;
     }
     return 0;
