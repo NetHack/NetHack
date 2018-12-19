@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1544917598 2018/12/15 23:46:38 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1545172226 2018/12/18 22:30:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,14 +128,17 @@ static boolean NDECL(NH_panictrace_libc);
 static boolean NDECL(NH_panictrace_gdb);
 
 #ifndef NO_SIGNAL
-/*ARGSUSED*/
-void panictrace_handler(
-    sig_unused) /* called as signal() handler, so sent at least one arg */
+/* called as signal() handler, so sent at least one arg */
+/*ARGUSED*/
+void
+panictrace_handler(sig_unused)
 int sig_unused UNUSED;
 {
 #define SIG_MSG "\nSignal received.\n"
-    (void) write(2, SIG_MSG, sizeof(SIG_MSG) - 1);
-    NH_abort();
+    int f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
+
+    nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
+    NH_abort(); /* ... and we're already in the process of quitting? */
 }
 
 void
@@ -201,7 +204,7 @@ NH_abort()
        traceback and exit; 2 = show traceback and stay in debugger */
     /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
     vms_traceback(gdb_prio);
-    (void) libc_prio; /* half-hearted attempt at lint suppression */
+    nhUse(libc_prio);
 
 #endif /* ?VMS */
 

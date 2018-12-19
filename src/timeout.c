@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1544050558 2018/12/05 22:55:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1545182148 2018/12/19 01:15:48 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1423,6 +1423,8 @@ boolean already_lit;
 
     case POT_OIL:
         turns = obj->age;
+        if (obj->odiluted)
+            turns = (3L * turns + 2L) / 4L;
         radius = 1; /* very dim light */
         break;
 
