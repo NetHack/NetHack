@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1543101719 2018/11/24 23:21:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1545182146 2018/12/19 01:15:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.60 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -780,12 +780,15 @@ struct obj *obj; /* only scatter this obj        */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(x, y)
+splatter_burning_oil(x, y, diluted_oil)
 int x, y;
+boolean diluted_oil;
 {
+    int dmg = d(diluted_oil ? 3 : 4, 4);
+
 /* ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
 #define ZT_SPELL_O_FIRE 11 /* value kludge, see zap.c */
-    explode(x, y, ZT_SPELL_O_FIRE, d(4, 4), BURNING_OIL, EXPL_FIERY);
+    explode(x, y, ZT_SPELL_O_FIRE, dmg, BURNING_OIL, EXPL_FIERY);
 }
 
 /* lit potion of oil is exploding; extinguish it as a light source before
@@ -795,10 +798,12 @@ explode_oil(obj, x, y)
 struct obj *obj;
 int x, y;
 {
+    boolean diluted_oil = obj->odiluted;
+
     if (!obj->lamplit)
         impossible("exploding unlit oil");
     end_burn(obj, TRUE);
-    splatter_burning_oil(x, y);
+    splatter_burning_oil(x, y, diluted_oil);
 }
 
 /*explode.c*/
