@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1545043771 2018/12/17 10:49:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.673 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1545182146 2018/12/19 01:15:46 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.674 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -739,7 +739,7 @@ E long FDECL(rndexp, (BOOLEAN_P));
 
 E void FDECL(explode, (int, int, int, int, CHAR_P, int));
 E long FDECL(scatter, (int, int, int, unsigned int, struct obj *));
-E void FDECL(splatter_burning_oil, (int, int));
+E void FDECL(splatter_burning_oil, (int, int, BOOLEAN_P));
 E void FDECL(explode_oil, (struct obj *, int, int));
 
 /* ### extralev.c ### */
