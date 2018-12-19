@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *  System related functions for MSDOS, OS/2, TOS, and Windows NT
+ *  System related functions for MSDOS, OS/2, TOS
  */
 
 #define NEED_VARARGS
@@ -28,7 +28,7 @@
 #define filesize filesize_nh
 #endif
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void FDECL(nethack_exit, (int));
 #else
 #define nethack_exit exit
@@ -51,11 +51,7 @@ STATIC_DCL boolean NDECL(comspec_exists);
 #endif
 #endif
 
-#ifdef WIN32
-extern int GUILaunched; /* from nttty.c */
-#endif
-
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO)
 
 void
 flushout()
@@ -391,7 +387,6 @@ char *name;
     return;
 }
 
-#ifndef WIN32
 void
 getreturn(str)
 const char *str;
@@ -420,7 +415,6 @@ VA_DECL(const char *, fmt)
     VA_END();
     return;
 }
-#endif
 
 /*
  * Follow the PATH, trying to fopen the file.
@@ -507,9 +501,7 @@ msexit()
 
     flushout();
 #ifndef TOS
-#ifndef WIN32
     enable_ctrlP(); /* in case this wasn't done */
-#endif
 #endif
 #ifdef MFLOPPY
     if (ramdisk)
@@ -526,18 +518,6 @@ msexit()
     if (colors_changed)
         restore_colors();
 #endif
-#endif
-#ifdef WIN32
-    /* Only if we started from the GUI, not the command prompt,
-     * we need to get one last return, so the score board does
-     * not vanish instantly after being created.
-     * GUILaunched is defined and set in nttty.c.
-     */
-    synch_cursor();
-    if (GUILaunched)
-        getreturn("to end");
-    synch_cursor();
-    getreturn_enabled = TRUE;
 #endif
     wait_synch();
     return;
