@@ -1,17 +1,17 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1544608469 2018/12/12 09:54:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1545217597 2018/12/19 11:06:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-STATIC_DCL struct monst *NDECL(findgd);
-
 STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *, BOOLEAN_P));
 STATIC_DCL void FDECL(blackout, (int, int));
 STATIC_DCL void FDECL(restfakecorr, (struct monst *));
 STATIC_DCL void FDECL(parkguard, (struct monst *));
 STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
+STATIC_DCL struct monst *NDECL(findgd);
+STATIC_DCL boolean FDECL(find_guard_dest, (struct monst *, xchar *, xchar *));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
 STATIC_DCL void FDECL(gd_mv_monaway, (struct monst *, int, int));
@@ -232,6 +232,44 @@ char *array;
     return '\0';
 }
 
+STATIC_OVL boolean
+find_guard_dest(guard, rx, ry)
+struct monst *guard;
+xchar *rx, *ry;
+{
+    register int x, y, dd, lx = 0, ly = 0;
+
+    for (dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
+        for (y = u.uy - dd; y <= u.uy + dd; ly = y, y++) {
+            if (y < 0 || y > ROWNO - 1)
+                continue;
+            for (x = u.ux - dd; x <= u.ux + dd; lx = x, x++) {
+                if (y != u.uy - dd && y != u.uy + dd && x != u.ux - dd)
+                    x = u.ux + dd;
+                if (x < 1 || x > COLNO - 1)
+                    continue;
+                if (guard && ((x == guard->mx && y == guard->my)
+                              || (guard->isgd && in_fcorridor(guard, x, y))))
+                    continue;
+                if (levl[x][y].typ == CORR) {
+                    lx = (x < u.ux) ? x + 1 : (x > u.ux) ? x - 1 : x;
+                    ly = (y < u.uy) ? y + 1 : (y > u.uy) ? y - 1 : y;
+                    if (levl[lx][ly].typ != STONE && levl[lx][ly].typ != CORR)
+                        goto incr_radius;
+                    *rx = x;
+                    *ry = y;
+                    return TRUE;
+                }
+            }
+        }
+ incr_radius:
+        ;
+    }
+    impossible("Not a single corridor on this level?");
+    tele();
+    return FALSE;
+}
+
 void
 invault()
 {
@@ -252,49 +290,14 @@ invault()
     if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
         /* if time ok and no guard now. */
         char buf[BUFSZ];
-        register int x, y, dd, gx, gy;
-        int lx = 0, ly = 0;
+        register int x, y, gx, gy;
+        xchar rx, ry;
         long umoney;
 
         /* first find the goal for the guard */
-        for (dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
-            for (y = u.uy - dd; y <= u.uy + dd; ly = y, y++) {
-                if (y < 0 || y > ROWNO - 1)
-                    continue;
-                for (x = u.ux - dd; x <= u.ux + dd; lx = x, x++) {
-                    if (y != u.uy - dd && y != u.uy + dd && x != u.ux - dd)
-                        x = u.ux + dd;
-                    if (x < 1 || x > COLNO - 1)
-                        continue;
-                    if (levl[x][y].typ == CORR) {
-                        if (x < u.ux)
-                            lx = x + 1;
-                        else if (x > u.ux)
-                            lx = x - 1;
-                        else
-                            lx = x;
-                        if (y < u.uy)
-                            ly = y + 1;
-                        else if (y > u.uy)
-                            ly = y - 1;
-                        else
-                            ly = y;
-                        if (levl[lx][ly].typ != STONE
-                            && levl[lx][ly].typ != CORR)
-                            goto incr_radius;
-                        goto fnd;
-                    }
-                }
-            }
-        incr_radius:
-            ;
-        }
-        impossible("Not a single corridor on this level??");
-        tele();
-        return;
-    fnd:
-        gx = x;
-        gy = y;
+        if (!find_guard_dest((struct monst *)0, &rx, &ry))
+            return;
+        gx = rx, gy = ry;
 
         /* next find a good place for a door in the wall */
         x = u.ux;
@@ -621,7 +624,7 @@ gd_move(grd)
 register struct monst *grd;
 {
     int x, y, nx, ny, m, n;
-    int dx, dy, gx, gy, fci;
+    int dx, dy, gx = 0, gy = 0, fci;
     uchar typ;
     struct rm *crm;
     struct fakecorridor *fcp;
@@ -705,7 +708,7 @@ register struct monst *grd;
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 newsym(m, n);
                 grd->mpeaceful = 0;
-            letknow:
+ letknow:
                 if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
                     You_hear("%s.",
                              m_carrying(grd, TIN_WHISTLE)
@@ -848,10 +851,10 @@ register struct monst *grd;
                     goto proceed;
                 }
             }
-        nextnxy:
+ nextnxy:
             ;
         }
-nextpos:
+ nextpos:
     nx = x;
     ny = y;
     gx = egrd->gdx;
@@ -892,19 +895,30 @@ nextpos:
         break;
     }
     crm->typ = CORR;
-proceed:
+ proceed:
     newspot = TRUE;
     unblock_point(nx, ny); /* doesn't block light */
     if (cansee(nx, ny))
         newsym(nx, ny);
 
-    fcp = &(egrd->fakecorr[egrd->fcend]);
-    if (egrd->fcend++ == FCSIZ)
-        panic("fakecorr overflow");
-    fcp->fx = nx;
-    fcp->fy = ny;
-    fcp->ftyp = typ;
-newpos:
+    if ((nx != gx || ny != gy) || (grd->mx != gx || grd->my != gy)) {
+        fcp = &(egrd->fakecorr[egrd->fcend]);
+        if (egrd->fcend++ == FCSIZ)
+            panic("fakecorr overflow");
+        fcp->fx = nx;
+        fcp->fy = ny;
+        fcp->ftyp = typ;
+    } else if (!egrd->gddone) {
+        /* We're stuck, so try to find a new destination. */
+        if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)
+            || (egrd->gdx == gx && egrd->gdy == gy)) {
+            pline("%s, confused, disappears.", Monnam(grd));
+            disappear_msg_seen = TRUE;
+            goto cleanup;
+        } else
+            goto nextpos;
+    }
+ newpos:
     gd_mv_monaway(grd, nx, ny);
     if (egrd->gddone) {
         /* The following is a kludge.  We need to keep    */
@@ -916,7 +930,7 @@ newpos:
         /* to avoid a check at the top of this function.  */
         /* At the end of the process, the guard is killed */
         /* in restfakecorr().                             */
-    cleanup:
+ cleanup:
         x = grd->mx, y = grd->my;
         see_guard = canspotmon(grd);
         parkguard(grd); /* move to <0,0> */
