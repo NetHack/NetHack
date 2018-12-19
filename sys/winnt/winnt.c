@@ -660,6 +660,26 @@ const char *window_opt;
     }
     return 0;
 }
+
+/*
+ * Add a backslash to any name not ending in /, \ or :	 There must
+ * be room for the \
+ */
+void
+append_slash(name)
+char *name;
+{
+    char *ptr;
+
+    if (!*name)
+        return;
+    ptr = name + (strlen(name) - 1);
+    if (*ptr != '\\' && *ptr != '/' && *ptr != ':') {
+        *++ptr = '\\';
+        *++ptr = '\0';
+    }
+    return;
+}
 #endif /* WIN32 */
 
 /*winnt.c*/
