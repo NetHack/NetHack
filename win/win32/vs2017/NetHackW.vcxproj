@@ -146,7 +146,6 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)nhlan.c" />
-    <ClCompile Include="$(SysShareDir)pcsys.c" />
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWinntDir)ntsound.c" />
     <ClCompile Include="$(SysWinntDir)stubs.c">
