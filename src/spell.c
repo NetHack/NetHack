@@ -331,8 +331,8 @@ void
 book_cursed(book)
 struct obj *book;
 {
-    if (occupation == learn && context.spbook.book == book
-        && book->cursed && book->bknown && multi >= 0)
+    if (g.occupation == learn && context.spbook.book == book
+        && book->cursed && book->bknown && g.multi >= 0)
         stop_occupation();
 }
 
@@ -353,7 +353,7 @@ learn(VOID_ARGS)
         context.spbook.book = 0; /* no longer studying */
         context.spbook.o_id = 0;
         nomul(context.spbook.delay); /* remaining delay is uninterrupted */
-        multi_reason = "reading a book";
+        g.multi_reason = "reading a book";
         nomovemsg = 0;
         context.spbook.delay = 0;
         return 0;
@@ -556,7 +556,7 @@ register struct obj *spellbook;
             boolean gone = cursed_book(spellbook);
 
             nomul(context.spbook.delay); /* study time */
-            multi_reason = "reading a book";
+            g.multi_reason = "reading a book";
             nomovemsg = 0;
             context.spbook.delay = 0;
             if (gone || !rn2(3)) {
@@ -574,7 +574,7 @@ register struct obj *spellbook;
                 spellbook->in_use = FALSE;
             }
             nomul(context.spbook.delay);
-            multi_reason = "reading a book";
+            g.multi_reason = "reading a book";
             nomovemsg = 0;
             context.spbook.delay = 0;
             return 1;

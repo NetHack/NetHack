@@ -237,8 +237,8 @@ ok_to_throw(shotlimit_p)
 int *shotlimit_p; /* (see dothrow()) */
 {
     /* kludge to work around parse()'s pre-decrement of `multi' */
-    *shotlimit_p = (multi || save_cm) ? multi + 1 : 0;
-    multi = 0; /* reset; it's been used up */
+    *shotlimit_p = (g.multi || save_cm) ? g.multi + 1 : 0;
+    g.multi = 0; /* reset; it's been used up */
 
     if (notake(youmonst.data)) {
         You("are physically incapable of throwing or shooting anything.");
@@ -714,7 +714,7 @@ int x, y;
     if (is_pool(x, y) && !u.uinwater) {
         if ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
             || !(Levitation || Flying || Wwalking)) {
-            multi = 0; /* can move, so drown() allows crawling out of water */
+            g.multi = 0; /* can move, so drown() allows crawling out of water */
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
@@ -834,7 +834,7 @@ boolean verbose;
         return; /* paranoia */
 
     nomul(-range);
-    multi_reason = "moving through the air";
+    g.multi_reason = "moving through the air";
     nomovemsg = ""; /* it just happens */
     if (verbose)
         You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");

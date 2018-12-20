@@ -450,7 +450,7 @@ boolean message;
     struct obj *piece = context.victual.piece;
 
     piece->in_use = TRUE;
-    occupation = 0; /* do this early, so newuhs() knows we're done */
+    g.occupation = 0; /* do this early, so newuhs() knows we're done */
     newuhs(FALSE);
     if (nomovemsg) {
         if (message)
@@ -1025,7 +1025,7 @@ int pm;
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            multi_reason = "pretending to be a pile of gold";
+            g.multi_reason = "pretending to be a pile of gold";
             Sprintf(buf,
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
@@ -1033,7 +1033,7 @@ int pm;
                     an(Upolyd ? youmonst.data->mname : urace.noun));
             g.eatmbuf = dupstr(buf);
             nomovemsg = g.eatmbuf;
-            afternmv = eatmdone;
+            g.afternmv = eatmdone;
             /* ??? what if this was set before? */
             youmonst.m_ap_type = M_AP_OBJECT;
             youmonst.mappearance = Hallucination ? ORANGE : GOLD_PIECE;
@@ -1574,9 +1574,9 @@ struct obj *obj;
         incr_itimeout(&HDeaf, duration);
         context.botl = TRUE;
         nomul(-duration);
-        multi_reason = "unconscious from rotten food";
+        g.multi_reason = "unconscious from rotten food";
         nomovemsg = "You are conscious again.";
-        afternmv = Hear_again;
+        g.afternmv = Hear_again;
         return 1;
     }
     return 0;
@@ -2085,7 +2085,7 @@ eatspecial()
     /* lesshungry wants an occupation to handle choke messages correctly */
     set_occupation(eatfood, "eating non-food", 0);
     lesshungry(context.victual.nmod);
-    occupation = 0;
+    g.occupation = 0;
     context.victual.piece = (struct obj *) 0;
     context.victual.o_id = 0;
     context.victual.eating = 0;
@@ -2840,7 +2840,7 @@ lesshungry(num)
 int num;
 {
     /* See comments in newuhs() for discussion on force_save_hs */
-    boolean iseating = (occupation == eatfood) || g.force_save_hs;
+    boolean iseating = (g.occupation == eatfood) || g.force_save_hs;
 
     debugpline1("lesshungry(%d)", num);
     u.uhunger += num;
@@ -2850,7 +2850,7 @@ int num;
                 choke(context.victual.piece);
                 reset_eat();
             } else
-                choke(occupation == opentin ? context.tin.tin
+                choke(g.occupation == opentin ? context.tin.tin
                                             : (struct obj *) 0);
             /* no reset_eat() */
         }
@@ -2864,7 +2864,7 @@ int num;
                 pline("You're having a hard time getting all of it down.");
                 nomovemsg = "You're finally finished.";
                 if (!context.victual.eating) {
-                    multi = -2;
+                    g.multi = -2;
                 } else {
                     context.victual.fullwarn = TRUE;
                     if (context.victual.canchoke
@@ -2905,7 +2905,7 @@ is_fainted()
 void
 reset_faint()
 {
-    if (afternmv == unfaint)
+    if (g.afternmv == unfaint)
         unmul("You revive.");
 }
 
@@ -2946,7 +2946,7 @@ boolean incr;
      * were added or if HUNGRY and WEAK were separated by a big enough
      * gap to fit two bites.
      */
-    if (occupation == eatfood || g.force_save_hs) {
+    if (g.occupation == eatfood || g.force_save_hs) {
         if (!saved_hs) {
             save_hs = u.uhs;
             saved_hs = TRUE;
@@ -2967,7 +2967,7 @@ boolean incr;
         if (is_fainted())
             newhs = FAINTED;
         if (u.uhs <= WEAK || rn2(20 - uhunger_div_by_10) >= 19) {
-            if (!is_fainted() && multi >= 0 /* %% */) {
+            if (!is_fainted() && g.multi >= 0 /* %% */) {
                 int duration = 10 - uhunger_div_by_10;
 
                 /* stop what you're doing, then faint */
@@ -2976,9 +2976,9 @@ boolean incr;
                 incr_itimeout(&HDeaf, duration);
                 context.botl = TRUE;
                 nomul(-duration);
-                multi_reason = "fainted from lack of food";
+                g.multi_reason = "fainted from lack of food";
                 nomovemsg = "You regain consciousness.";
-                afternmv = unfaint;
+                g.afternmv = unfaint;
                 newhs = FAINTED;
                 if (!Levitation)
                     selftouch("Falling, you");
@@ -3028,8 +3028,8 @@ boolean incr;
                             : (u.uhunger < 145)
                                   ? "feel hungry."
                                   : "are beginning to feel hungry.");
-            if (incr && occupation
-                && (occupation != eatfood && occupation != opentin))
+            if (incr && g.occupation
+                && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
             context.travel = context.travel1 = context.mv = context.run = 0;
             break;
@@ -3048,8 +3048,8 @@ boolean incr;
                         ? "feel weak now."
                         : (u.uhunger < 45) ? "feel weak."
                                            : "are beginning to feel weak.");
-            if (incr && occupation
-                && (occupation != eatfood && occupation != opentin))
+            if (incr && g.occupation
+                && (g.occupation != eatfood && g.occupation != opentin))
                 stop_occupation();
             context.travel = context.travel1 = context.mv = context.run = 0;
             break;
@@ -3195,9 +3195,9 @@ vomit() /* A good idea from David Neves */
     /* nomul()/You_can_move_again used to be unconditional, which was
        viable while eating but not for Vomiting countdown where hero might
        be immobilized for some other reason at the time vomit() is called */
-    if (multi >= -2) {
+    if (g.multi >= -2) {
         nomul(-2);
-        multi_reason = "vomiting";
+        g.multi_reason = "vomiting";
         nomovemsg = You_can_move_again;
     }
 }
@@ -3281,10 +3281,10 @@ maybe_finished_meal(stopping)
 boolean stopping;
 {
     /* in case consume_oeaten() has decided that the food is all gone */
-    if (occupation == eatfood
+    if (g.occupation == eatfood
         && context.victual.usedtime >= context.victual.reqtime) {
         if (stopping)
-            occupation = 0; /* for do_reset_eat */
+            g.occupation = 0; /* for do_reset_eat */
         (void) eatfood();   /* calls done_eating() to use up
                                context.victual.piece */
         return TRUE;
@@ -3304,7 +3304,7 @@ int threat;
     struct obj *otin;
     int mndx;
 
-    if (occupation != opentin)
+    if (g.occupation != opentin)
         return FALSE;
     otin = context.tin.tin;
     /* make sure hero still has access to tin */

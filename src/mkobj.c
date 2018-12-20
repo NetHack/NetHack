@@ -260,7 +260,7 @@ boolean artif;
         oclass = iprobs->iclass;
     }
 
-    i = bases[(int) oclass];
+    i = g.bases[(int) oclass];
     while ((prob -= objects[i].oc_prob) > 0)
         i++;
 

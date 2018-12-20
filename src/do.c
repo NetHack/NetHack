@@ -1343,7 +1343,7 @@ boolean at_stairs, falling, portal;
             error("Cannot continue this game.");
         }
         minit(); /* ZEROCOMP */
-        getlev(fd, hackpid, new_ledger, FALSE);
+        getlev(fd, g.hackpid, new_ledger, FALSE);
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
     }

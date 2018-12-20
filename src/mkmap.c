@@ -283,12 +283,12 @@ schar bg_typ, fg_typ;
                 g.min_rx = g.max_rx = i;
                 g.min_ry = g.max_ry = j;
                 g.n_loc_filled = 0;
-                flood_fill_rm(i, j, nroom + ROOMOFFSET, FALSE, FALSE);
+                flood_fill_rm(i, j, g.nroom + ROOMOFFSET, FALSE, FALSE);
                 if (g.n_loc_filled > 3) {
                     add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OROOM,
                              TRUE);
-                    rooms[nroom - 1].irregular = TRUE;
-                    if (nroom >= (MAXNROFROOMS * 2))
+                    rooms[g.nroom - 1].irregular = TRUE;
+                    if (g.nroom >= (MAXNROFROOMS * 2))
                         goto joinm;
                 } else {
                     /*
@@ -298,7 +298,7 @@ schar bg_typ, fg_typ;
                     for (sx = g.min_rx; sx <= g.max_rx; sx++)
                         for (sy = g.min_ry; sy <= g.max_ry; sy++)
                             if ((int) levl[sx][sy].roomno
-                                == nroom + ROOMOFFSET) {
+                                == g.nroom + ROOMOFFSET) {
                                 levl[sx][sy].typ = bg_typ;
                                 levl[sx][sy].roomno = NO_ROOM;
                             }
@@ -313,7 +313,7 @@ joinm:
      * so don't call sort_rooms(), which can screw up the roomno's
      * validity in the levl structure.
      */
-    for (croom = &rooms[0], croom2 = croom + 1; croom2 < &rooms[nroom];) {
+    for (croom = &rooms[0], croom2 = croom + 1; croom2 < &rooms[g.nroom];) {
         /* pick random starting and end locations for "corridor" */
         if (!somexy(croom, &sm) || !somexy(croom2, &em)) {
             /* ack! -- the level is going to be busted */
@@ -356,7 +356,7 @@ boolean lit, walled, icedpools;
                     || (bg_typ == TREE && levl[i][j].typ == bg_typ)
                     || (walled && IS_WALL(levl[i][j].typ)))
                     levl[i][j].lit = TRUE;
-        for (i = 0; i < nroom; i++)
+        for (i = 0; i < g.nroom; i++)
             rooms[i].rlit = 1;
     }
     /* light lava even if everything's otherwise unlit;
@@ -386,7 +386,7 @@ int lx, ly, hx, hy;
     int i;
     struct mkroom *croom;
 
-    for (i = nroom - 1; i >= 0; --i) {
+    for (i = g.nroom - 1; i >= 0; --i) {
         croom = &rooms[i];
         if (croom->hx < lx || croom->lx >= hx || croom->hy < ly
             || croom->ly >= hy)
@@ -416,7 +416,7 @@ remove_room(roomno)
 unsigned roomno;
 {
     struct mkroom *croom = &rooms[roomno];
-    struct mkroom *maxroom = &rooms[--nroom];
+    struct mkroom *maxroom = &rooms[--g.nroom];
     int i, j;
     unsigned oroomno;
 
@@ -428,7 +428,7 @@ unsigned roomno;
                       sizeof(struct mkroom));
 
         /* since maxroom moved, update affected level roomno values */
-        oroomno = nroom + ROOMOFFSET;
+        oroomno = g.nroom + ROOMOFFSET;
         roomno += ROOMOFFSET;
         for (i = croom->lx; i <= croom->hx; ++i)
             for (j = croom->ly; j <= croom->hy; ++j) {

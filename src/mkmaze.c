@@ -229,7 +229,7 @@ int dir;
 {
     mz_move(x, y, dir);
     mz_move(x, y, dir);
-    if (x < 3 || y < 3 || x > x_maze_max || y > y_maze_max
+    if (x < 3 || y < 3 || x > g.x_maze_max || y > g.y_maze_max
         || levl[x][y].typ != STONE)
         return FALSE;
     return TRUE;
@@ -240,8 +240,8 @@ STATIC_OVL void
 maze0xy(cc)
 coord *cc;
 {
-    cc->x = 3 + 2 * rn2((x_maze_max >> 1) - 1);
-    cc->y = 3 + 2 * rn2((y_maze_max >> 1) - 1);
+    cc->x = 3 + 2 * rn2((g.x_maze_max >> 1) - 1);
+    cc->y = 3 + 2 * rn2((g.y_maze_max >> 1) - 1);
     return;
 }
 
@@ -281,7 +281,7 @@ d_level *lev;
          * if there are rooms and this a branch, let place_branch choose
          * the branch location (to avoid putting branches in corridors).
          */
-        if (rtype == LR_BRANCH && nroom) {
+        if (rtype == LR_BRANCH && g.nroom) {
             place_branch(Is_branchlev(&u.uz), 0, 0);
             return;
         }
@@ -807,7 +807,7 @@ maze_inbounds(x, y)
 int x, y;
 {
     return (x >= 2 && y >= 2
-            && x < x_maze_max && y < y_maze_max && isok(x, y));
+            && x < g.x_maze_max && y < g.y_maze_max && isok(x, y));
 }
 
 void
@@ -818,8 +818,8 @@ xchar typ;
     int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
 
     dirok[0] = 0; /* lint suppression */
-    for (x = 2; x < x_maze_max; x++)
-        for (y = 2; y < y_maze_max; y++)
+    for (x = 2; x < g.x_maze_max; x++)
+        for (y = 2; y < g.y_maze_max; y++)
             if (ACCESSIBLE(levl[x][y].typ) && (x % 2) && (y % 2)) {
                 idx = idx2 = 0;
                 for (dir = 0; dir < 4; dir++) {
@@ -864,8 +864,8 @@ int wallthick;
 {
     int x,y;
     coord mm;
-    int tmp_xmax = x_maze_max;
-    int tmp_ymax = y_maze_max;
+    int tmp_xmax = g.x_maze_max;
+    int tmp_ymax = g.y_maze_max;
     int rdx = 0;
     int rdy = 0;
     int scale;
@@ -881,8 +881,8 @@ int wallthick;
         corrwid = 5;
 
     scale = corrwid + wallthick;
-    rdx = (x_maze_max / scale);
-    rdy = (y_maze_max / scale);
+    rdx = (g.x_maze_max / scale);
+    rdy = (g.y_maze_max / scale);
 
     if (level.flags.corrmaze)
         for (x = 2; x < (rdx * 2); x++)
@@ -894,8 +894,8 @@ int wallthick;
                 levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
 
     /* set upper bounds for maze0xy and walkfrom */
-    x_maze_max = (rdx * 2);
-    y_maze_max = (rdy * 2);
+    g.x_maze_max = (rdx * 2);
+    g.y_maze_max = (rdy * 2);
 
     /* create maze */
     maze0xy(&mm);
@@ -905,8 +905,8 @@ int wallthick;
         maze_remove_deadends((level.flags.corrmaze) ? CORR : ROOM);
 
     /* restore bounds */
-    x_maze_max = tmp_xmax;
-    y_maze_max = tmp_ymax;
+    g.x_maze_max = tmp_xmax;
+    g.y_maze_max = tmp_ymax;
 
     /* scale maze up if needed */
     if (scale > 2) {
@@ -914,27 +914,27 @@ int wallthick;
         int rx = 1, ry = 1;
 
         /* back up the existing smaller maze */
-        for (x = 1; x < x_maze_max; x++)
-            for (y = 1; y < y_maze_max; y++) {
+        for (x = 1; x < g.x_maze_max; x++)
+            for (y = 1; y < g.y_maze_max; y++) {
                 tmpmap[x][y] = levl[x][y].typ;
             }
 
         /* do the scaling */
         rx = x = 2;
-        while (rx < x_maze_max) {
+        while (rx < g.x_maze_max) {
             int mx = (x % 2) ? corrwid
                              : ((x == 2 || x == (rdx * 2)) ? 1
                                                            : wallthick);
             ry = y = 2;
-            while (ry < y_maze_max) {
+            while (ry < g.y_maze_max) {
                 int dx = 0, dy = 0;
                 int my = (y % 2) ? corrwid
                                  : ((y == 2 || y == (rdy * 2)) ? 1
                                                                : wallthick);
                 for (dx = 0; dx < mx; dx++)
                     for (dy = 0; dy < my; dy++) {
-                        if (rx+dx >= x_maze_max
-                            || ry+dy >= y_maze_max)
+                        if (rx+dx >= g.x_maze_max
+                            || ry+dy >= g.y_maze_max)
                             break;
                         levl[rx + dx][ry + dy].typ = tmpmap[x][y];
                     }
@@ -1026,7 +1026,7 @@ const char *s;
     }
 
     if (!level.flags.corrmaze)
-        wallification(2, 2, x_maze_max, y_maze_max);
+        wallification(2, 2, g.x_maze_max, g.y_maze_max);
 
     mazexy(&mm);
     mkstairs(mm.x, mm.y, 1, (struct mkroom *) 0); /* up */
@@ -1049,13 +1049,13 @@ const char *s;
 #define INVPOS_X_MARGIN (6 - 2)
 #define INVPOS_Y_MARGIN (5 - 2)
 #define INVPOS_DISTANCE 11
-        int x_range = x_maze_max - x_maze_min - 2 * INVPOS_X_MARGIN - 1,
-            y_range = y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
+        int x_range = g.x_maze_max - x_maze_min - 2 * INVPOS_X_MARGIN - 1,
+            y_range = g.y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
 
         if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
             || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
             debugpline2("inv_pos: maze is too small! (%d x %d)",
-                        x_maze_max, y_maze_max);
+                        g.x_maze_max, g.y_maze_max);
         }
         inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
         do {
@@ -1205,8 +1205,8 @@ coord *cc;
     int cpt = 0;
 
     do {
-        cc->x = 1 + rn2(x_maze_max);
-        cc->y = 1 + rn2(y_maze_max);
+        cc->x = 1 + rn2(g.x_maze_max);
+        cc->y = 1 + rn2(g.y_maze_max);
         cpt++;
     } while (cpt < 100
              && levl[cc->x][cc->y].typ
@@ -1215,8 +1215,8 @@ coord *cc;
         int x, y;
 
         /* last try */
-        for (x = 1; x < x_maze_max; x++)
-            for (y = 1; y < y_maze_max; y++) {
+        for (x = 1; x < g.x_maze_max; x++)
+            for (y = 1; y < g.y_maze_max; y++) {
                 cc->x = x;
                 cc->y = y;
                 if (levl[cc->x][cc->y].typ

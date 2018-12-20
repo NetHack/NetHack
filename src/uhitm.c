@@ -2144,7 +2144,7 @@ register struct attack *mattk;
                         if (Slow_digestion)
                             tmp *= 2;
                         nomul(-tmp);
-                        multi_reason = "digesting something";
+                        g.multi_reason = "digesting something";
                         nomovemsg = msgbuf;
                     } else
                         pline1(msgbuf);
@@ -2479,7 +2479,7 @@ register struct monst *mon;
         }
         if (!Upolyd)
             break; /* No extra attacks if no longer a monster */
-        if (multi < 0)
+        if (g.multi < 0)
             break; /* If paralyzed while attacking, i.e. floating eye */
     }
     return (boolean) (nsum != 0);
@@ -2646,7 +2646,7 @@ boolean wep_was_destroyed;
                     } else {
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
-                        multi_reason = "frozen by a monster's gaze";
+                        g.multi_reason = "frozen by a monster's gaze";
                         nomovemsg = 0;
                     }
                 } else {
@@ -2661,7 +2661,7 @@ boolean wep_was_destroyed;
                 You("are frozen by %s!", mon_nam(mon));
                 nomovemsg = You_can_move_again;
                 nomul(-tmp);
-                multi_reason = "frozen by a monster";
+                g.multi_reason = "frozen by a monster";
                 exercise(A_DEX, FALSE);
             }
             break;

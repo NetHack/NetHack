@@ -168,7 +168,7 @@ xchar x, y;
 boolean
 is_digging()
 {
-    if (occupation == dig) {
+    if (g.occupation == dig) {
         return TRUE;
     }
     return FALSE;
@@ -492,7 +492,7 @@ dig(VOID_ARGS)
 int
 holetime()
 {
-    if (occupation != dig || !*u.ushops)
+    if (g.occupation != dig || !*u.ushops)
         return -1;
     return ((250 - context.digging.effort) / 20);
 }
@@ -1063,7 +1063,7 @@ struct obj *obj;
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
-                multi_reason = "stuck in a spider web";
+                g.multi_reason = "stuck in a spider web";
                 nomovemsg = "You pull free.";
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");

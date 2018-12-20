@@ -27,7 +27,6 @@ char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
 E void FDECL(nethack_exit, (int));
-E char chosen_windowtype[WINTYPELEN];   /* flag.h */
 #if defined(MSWIN_GRAPHICS)
 E void NDECL(mswin_destroy_reg);
 #endif
@@ -122,7 +121,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 # endif
 #endif
 
-    hname = "NetHack"; /* used for syntax messages */
+    g.hname = "NetHack"; /* used for syntax messages */
     /* Save current directory and make sure it gets restored when
      * the game is exited.
      */
@@ -258,8 +257,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         Strcpy(default_window_sys, "curses");    
 #endif /* CURSES */
 #endif /* TTY */
-        if (iflags.windowtype_deferred && chosen_windowtype[0])
-            windowtype = chosen_windowtype;
+        if (iflags.windowtype_deferred && g.chosen_windowtype[0])
+            windowtype = g.chosen_windowtype;
     }
     choose_windows(windowtype);
 
@@ -312,8 +311,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (fd < 0) {
         raw_print("Cannot create lock file");
     } else {
-        hackpid = GetCurrentProcessId();
-        write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
+        g.hackpid = GetCurrentProcessId();
+        write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
         nhclose(fd);
     }
     /*
@@ -516,7 +515,7 @@ char *argv[];
         case 'w': /* windowtype */
             config_error_init(FALSE, "command line", FALSE);
             if (strlen(&argv[0][2]) < (WINTYPELEN - 1))
-                Strcpy(chosen_windowtype, &argv[0][2]);
+                Strcpy(g.chosen_windowtype, &argv[0][2]);
             config_error_done();
             break;
         case '@':
@@ -553,12 +552,12 @@ nhusage()
      */
     (void) Sprintf(buf2, "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
                          "[maxrank] [name]...\n       or",
-                   hname);
+                   g.hname);
     ADD_USAGE(buf2);
 
     (void) Sprintf(
         buf2, "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
-        hname);
+        g.hname);
     ADD_USAGE(buf2);
 #ifdef NEWS
     ADD_USAGE(" [-n]");
@@ -904,8 +903,8 @@ gotlock:
               fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
-        if (write(fd, (char *) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif

@@ -1289,7 +1289,7 @@ long augmented_time;
     /*
      * This 'multi' handling may need some tuning...
      */
-    if (multi)
+    if (g.multi)
         return FALSE;
 
     if (bl_p->time == 0 || bl_p->time >= augmented_time)

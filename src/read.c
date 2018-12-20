@@ -735,7 +735,7 @@ int oclass;
 {
     int i;
 
-    for (i = bases[oclass];
+    for (i = g.bases[oclass];
          i < NUM_OBJECTS && objects[i].oc_class == oclass; i++)
         forget_single_object(i);
 }
@@ -2520,7 +2520,7 @@ struct _create_particular_data *d;
         }
         whichpm = &mons[d->which];
     }
-    for (i = 0; i <= multi; i++) {
+    for (i = 0; i <= g.multi; i++) {
         if (d->monclass != MAXMCLASSES)
             whichpm = mkclass(d->monclass, 0);
         else if (d->randmonst)

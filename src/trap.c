@@ -1848,7 +1848,7 @@ int style;
                 break;
             }
         } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
-            if (multi)
+            if (g.multi)
                 nomul(0);
             if (thitu(9 + singleobj->spe, dmgval(singleobj, &youmonst),
                       &singleobj, (char *) 0))
@@ -2641,7 +2641,7 @@ register struct monst *mtmp;
             if (DEADMONSTER(mtmp))
                 trapkilled = TRUE;
             if (unconscious()) {
-                multi = -1;
+                g.multi = -1;
                 nomovemsg = "The explosion awakens you!";
             }
             break;
@@ -3777,7 +3777,7 @@ drown()
     if (is_fainted())
         reset_faint();
     /* can't crawl if unable to move (crawl_ok flag stays false) */
-    if (multi < 0 || (Upolyd && !youmonst.data->mmove))
+    if (g.multi < 0 || (Upolyd && !youmonst.data->mmove))
         goto crawl;
     /* look around for a place to crawl to */
     for (i = 0; i < 100; i++) {
@@ -4887,7 +4887,7 @@ boolean disarm;
             if (!Free_action) {
                 pline("Suddenly you are frozen in place!");
                 nomul(-d(5, 6));
-                multi_reason = "frozen by a trap";
+                g.multi_reason = "frozen by a trap";
                 exercise(A_DEX, FALSE);
                 nomovemsg = You_can_move_again;
             } else
@@ -5177,7 +5177,7 @@ boolean nocorpse;
 boolean
 unconscious()
 {
-    if (multi >= 0)
+    if (g.multi >= 0)
         return FALSE;
 
     return (boolean) (u.usleep

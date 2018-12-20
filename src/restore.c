@@ -1068,8 +1068,8 @@ boolean ghostly;
     mread(fd, (genericptr_t) &level.flags, sizeof(level.flags));
     mread(fd, (genericptr_t) doors, sizeof(doors));
     rest_rooms(fd); /* No joke :-) */
-    if (nroom)
-        doorindex = rooms[nroom - 1].fdoor + rooms[nroom - 1].doorct;
+    if (g.nroom)
+        doorindex = rooms[g.nroom - 1].fdoor + rooms[g.nroom - 1].doorct;
     else
         doorindex = 0;
 

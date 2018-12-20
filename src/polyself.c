@@ -188,7 +188,7 @@ const char *fmt, *arg;
         uunstick();
     find_ac();
     if (was_mimicking) {
-        if (multi < 0)
+        if (g.multi < 0)
             unmul("");
         youmonst.m_ap_type = M_AP_NOTHING;
     }
@@ -631,7 +631,7 @@ int mntmp;
     }
 
     /* if stuck mimicking gold, stop immediately */
-    if (multi < 0 && youmonst.m_ap_type == M_AP_OBJECT
+    if (g.multi < 0 && youmonst.m_ap_type == M_AP_OBJECT
         && youmonst.data->mlet != S_MIMIC)
         unmul("");
     /* if becoming a non-mimic, stop mimicking anything */
@@ -1384,7 +1384,7 @@ dogaze()
                                   ? -d((int) mtmp->m_lev + 1,
                                        (int) mtmp->data->mattk[0].damd)
                                   : -200);
-                        multi_reason = "frozen by a monster's gaze";
+                        g.multi_reason = "frozen by a monster's gaze";
                         nomovemsg = 0;
                         return 1;
                     } else

@@ -192,7 +192,7 @@ xchar x, y;
         for (i = 0; i < NATTK; i++) {
             /* first of two kicks might have provoked counterattack
                that has incapacitated the hero (ie, floating eye) */
-            if (multi < 0)
+            if (g.multi < 0)
                 break;
 
             uattk = &youmonst.data->mattk[i];

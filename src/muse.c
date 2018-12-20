@@ -1068,7 +1068,7 @@ struct monst *mtmp;
                 g.m.has_offense = MUSE_WAN_DEATH;
             }
             nomore(MUSE_WAN_SLEEP);
-            if (obj->otyp == WAN_SLEEP && obj->spe > 0 && multi >= 0) {
+            if (obj->otyp == WAN_SLEEP && obj->spe > 0 && g.multi >= 0) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_SLEEP;
             }
@@ -1127,7 +1127,7 @@ struct monst *mtmp;
         }
 #endif
         nomore(MUSE_POT_PARALYSIS);
-        if (obj->otyp == POT_PARALYSIS && multi >= 0) {
+        if (obj->otyp == POT_PARALYSIS && g.multi >= 0) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_POT_PARALYSIS;
         }
@@ -1963,7 +1963,7 @@ struct monst *mtmp;
     display_nhwindow(WIN_MAP, TRUE);
     docrt();
     if (unconscious()) {
-        multi = -1;
+        g.multi = -1;
         nomovemsg = "Aggravated, you are jolted into full consciousness.";
     }
     newsym(mtmp->mx, mtmp->my);

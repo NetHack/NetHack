@@ -539,7 +539,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             if (ohitmon(mtmp, singleobj, range, TRUE))
                 break;
         } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
-            if (multi)
+            if (g.multi)
                 nomul(0);
 
             if (singleobj->oclass == GEM_CLASS

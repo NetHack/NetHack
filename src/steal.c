@@ -260,7 +260,7 @@ char *objnambuf;
     /* food being eaten might already be used up but will not have
        been removed from inventory yet; we don't want to steal that,
        so this will cause it to be removed now */
-    if (occupation)
+    if (g.occupation)
         (void) maybe_finished_meal(FALSE);
 
     if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
@@ -402,7 +402,7 @@ gotobj:
                 /* can't charm you without first waking you */
                 if (Unaware)
                     unmul((char *) 0);
-                slowly = (armordelay >= 1 || multi < 0);
+                slowly = (armordelay >= 1 || g.multi < 0);
                 if (flags.female)
                     pline("%s charms you.  You gladly %s your %s.",
                           !seen ? "She" : Monnam(mtmp),
@@ -423,18 +423,18 @@ gotobj:
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
-                multi_reason = "taking off clothes";
+                g.multi_reason = "taking off clothes";
                 nomovemsg = 0;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;
-                if (multi < 0) {
+                if (g.multi < 0) {
                     /*
                     multi = 0;
                     afternmv = 0;
                     */
                     stealoid = otmp->o_id;
                     stealmid = mtmp->m_id;
-                    afternmv = stealarm;
+                    g.afternmv = stealarm;
                     return 0;
                 }
             }
@@ -465,7 +465,7 @@ gotobj:
         minstapetrify(mtmp, TRUE);
         return -1;
     }
-    return (multi < 0) ? 0 : 1;
+    return (g.multi < 0) ? 0 : 1;
 }
 
 /* Returns 1 if otmp is free'd, 0 otherwise. */

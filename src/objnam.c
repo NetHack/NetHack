@@ -1152,10 +1152,10 @@ unsigned doname_flags;
             Sprintf(eos(bp), " (%sweapon in %s)",
                     (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
 
-            if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
+            if (g.warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
                 if (!Blind) /* we know bp[] ends with ')'; overwrite that */
                     Sprintf(eos(bp) - 1, ", %s %s)",
-                            glow_verb(warn_obj_cnt, TRUE),
+                            glow_verb(g.warn_obj_cnt, TRUE),
                             glow_color(obj->oartifact));
             }
         }
@@ -2728,7 +2728,7 @@ schar skill;
     int i, n = 0;
     short otyp = STRANGE_OBJECT;
 
-    for (i = bases[WEAPON_CLASS];
+    for (i = g.bases[WEAPON_CLASS];
          i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
         if (objects[i].oc_skill == skill) {
             n++;
@@ -2736,7 +2736,7 @@ schar skill;
         }
     if (n > 0) {
         n = rn2(n);
-        for (i = bases[WEAPON_CLASS];
+        for (i = g.bases[WEAPON_CLASS];
              i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
             if (objects[i].oc_skill == skill)
                 if (--n < 0)
@@ -2769,7 +2769,7 @@ int xtra_prob; /* to force 0% random generation items to also be considered */
      * "blank" would have 10/11 chance to yield a blook even though
      * scrolls are supposed to be much more common than books.]
      */
-    for (i = oclass ? bases[(int) oclass] : STRANGE_OBJECT + 1;
+    for (i = oclass ? g.bases[(int) oclass] : STRANGE_OBJECT + 1;
          i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass);
          ++i) {
         /* don't match extra descriptions (w/o real name) */
@@ -3416,7 +3416,7 @@ retry:
 srch:
     /* check real names of gems first */
     if (!oclass && actualn) {
-        for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
+        for (i = g.bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
 
             if ((zn = OBJ_NAME(objects[i])) != 0 && !strcmpi(actualn, zn)) {

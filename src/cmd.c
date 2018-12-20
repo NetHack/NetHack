@@ -218,9 +218,9 @@ STATIC_PTR int
 timed_occupation(VOID_ARGS)
 {
     (*timed_occ_fn)();
-    if (multi > 0)
-        multi--;
-    return multi > 0;
+    if (g.multi > 0)
+        g.multi--;
+    return g.multi > 0;
 }
 
 /* If you have moved since initially setting some occupations, they
@@ -255,12 +255,12 @@ const char *txt;
 int xtime;
 {
     if (xtime) {
-        occupation = timed_occupation;
+        g.occupation = timed_occupation;
         timed_occ_fn = fn;
     } else
-        occupation = fn;
+        g.occupation = fn;
     occtxt = txt;
-    occtime = 0;
+    g.occtime = 0;
     return;
 }
 
@@ -274,9 +274,9 @@ popch()
      * ABORT character (as checked in pcmain.c), that character will be
      * pushed back on the pushq.
      */
-    if (occupation)
+    if (g.occupation)
         return '\0';
-    if (in_doagain)
+    if (g.in_doagain)
         return (char) ((g.shead != g.stail) ? g.saveq[g.stail++] : '\0');
     else
         return (char) ((g.phead != g.ptail) ? g.pushq[g.ptail++] : '\0');
@@ -313,7 +313,7 @@ void
 savech(ch)
 char ch;
 {
-    if (!in_doagain) {
+    if (!g.in_doagain) {
         if (!ch)
             g.phead = g.ptail = g.shead = g.stail = 0;
         else if (g.shead < BSIZE)
@@ -4487,11 +4487,11 @@ register char *cmd;
         context.move = FALSE;
         return;
     }
-    if (*cmd == DOAGAIN && !in_doagain && g.saveq[0]) {
-        in_doagain = TRUE;
+    if (*cmd == DOAGAIN && !g.in_doagain && g.saveq[0]) {
+        g.in_doagain = TRUE;
         g.stail = 0;
         rhack((char *) 0); /* read and execute command */
-        in_doagain = FALSE;
+        g.in_doagain = FALSE;
         return;
     }
     /* Special case of *cmd == ' ' handled better below */
@@ -4565,7 +4565,7 @@ register char *cmd;
             break;
         (void) ddoinv(); /* a convenience borrowed from the PC */
         context.move = FALSE;
-        multi = 0;
+        g.multi = 0;
         return;
     case NHKF_CLICKLOOK:
         if (iflags.clicklook) {
@@ -4620,20 +4620,20 @@ register char *cmd;
         context.run = 0;
         context.nopick = context.forcefight = FALSE;
         context.move = context.mv = FALSE;
-        multi = 0;
+        g.multi = 0;
         return;
     }
 
     if (do_walk) {
-        if (multi)
+        if (g.multi)
             context.mv = TRUE;
         domove();
         context.forcefight = 0;
         return;
     } else if (do_rush) {
         if (firsttime) {
-            if (!multi)
-                multi = max(COLNO, ROWNO);
+            if (!g.multi)
+                g.multi = max(COLNO, ROWNO);
             u.last_str_turn = 0;
         }
         context.mv = TRUE;
@@ -4663,13 +4663,13 @@ register char *cmd;
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
                 func = ((struct ext_func_tab *) tlist)->ef_funct;
-                if (tlist->f_text && !occupation && multi)
-                    set_occupation(func, tlist->f_text, multi);
+                if (tlist->f_text && !g.occupation && g.multi)
+                    set_occupation(func, tlist->f_text, g.multi);
                 res = (*func)(); /* perform the command */
             }
             if (!res) {
                 context.move = FALSE;
-                multi = 0;
+                g.multi = 0;
             }
             return;
         }
@@ -4690,7 +4690,7 @@ register char *cmd;
     }
     /* didn't move */
     context.move = FALSE;
-    multi = 0;
+    g.multi = 0;
     return;
 }
 
@@ -4813,7 +4813,7 @@ const char *s;
     int is_mov;
 
 retry:
-    if (in_doagain || *readchar_queue)
+    if (g.in_doagain || *readchar_queue)
         dirsym = readchar();
     else
         dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
@@ -5529,7 +5529,7 @@ parse()
     register int foo;
 
     iflags.in_parse = TRUE;
-    multi = 0;
+    g.multi = 0;
     context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
@@ -5537,10 +5537,10 @@ parse()
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
     if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
-        long tmpmulti = multi;
+        long tmpmulti = g.multi;
 
         foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti, FALSE);
-        g.last_multi = multi = tmpmulti;
+        g.last_multi = g.multi = tmpmulti;
     }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
@@ -5554,17 +5554,17 @@ parse()
 
     if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
-        multi = g.last_multi = 0;
-    } else if (foo == g.Cmd.spkeys[NHKF_DOAGAIN] || in_doagain) {
-        multi = g.last_multi;
+        g.multi = g.last_multi = 0;
+    } else if (foo == g.Cmd.spkeys[NHKF_DOAGAIN] || g.in_doagain) {
+        g.multi = g.last_multi;
     } else {
-        g.last_multi = multi;
+        g.last_multi = g.multi;
         savech(0); /* reset input queue */
         savech((char) foo);
     }
 
-    if (multi) {
-        multi--;
+    if (g.multi) {
+        g.multi--;
         save_cm = in_line;
     } else {
         save_cm = (char *) 0;
@@ -5667,7 +5667,7 @@ readchar()
     if (*readchar_queue)
         sym = *readchar_queue++;
     else
-        sym = in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
+        sym = g.in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
 
 #ifdef NR_OF_EOFS
     if (sym == EOF) {

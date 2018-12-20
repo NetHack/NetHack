@@ -1221,7 +1221,7 @@ dopay()
     int pass, tmp, sk = 0, seensk = 0;
     boolean paid = FALSE, stashed_gold = (hidden_gold() > 0L);
 
-    multi = 0;
+    g.multi = 0;
 
     /* Find how many shk's there are, how many are in
      * sight, and are you in a shop room with one.

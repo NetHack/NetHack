@@ -97,10 +97,10 @@ void
 sort_rooms()
 {
 #if defined(SYSV) || defined(DGUX)
-    qsort((genericptr_t) rooms, (unsigned) nroom, sizeof(struct mkroom),
+    qsort((genericptr_t) rooms, (unsigned) g.nroom, sizeof(struct mkroom),
           do_comp);
 #else
-    qsort((genericptr_t) rooms, nroom, sizeof(struct mkroom), do_comp);
+    qsort((genericptr_t) rooms, g.nroom, sizeof(struct mkroom), do_comp);
 #endif
 }
 
@@ -189,12 +189,12 @@ boolean special;
 {
     register struct mkroom *croom;
 
-    croom = &rooms[nroom];
+    croom = &rooms[g.nroom];
     do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
                        (boolean) TRUE);
     croom++;
     croom->hx = -1;
-    nroom++;
+    g.nroom++;
 }
 
 void
@@ -207,13 +207,13 @@ boolean special;
 {
     register struct mkroom *croom;
 
-    croom = &subrooms[nsubroom];
+    croom = &subrooms[g.nsubroom];
     do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
                        (boolean) FALSE);
     proom->sbrooms[proom->nsubrooms++] = croom;
     croom++;
     croom->hx = -1;
-    nsubroom++;
+    g.nsubroom++;
 }
 
 STATIC_OVL void
@@ -223,13 +223,13 @@ makerooms()
 
     /* make rooms until satisfied */
     /* rnd_rect() will returns 0 if no more rects are available... */
-    while (nroom < MAXNROFROOMS && rnd_rect()) {
-        if (nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
+    while (g.nroom < MAXNROFROOMS && rnd_rect()) {
+        if (g.nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
             tried_vault = TRUE;
             if (create_vault()) {
-                g.vault_x = rooms[nroom].lx;
-                g.vault_y = rooms[nroom].ly;
-                rooms[nroom].hx = -1;
+                g.vault_x = rooms[g.nroom].lx;
+                g.vault_y = rooms[g.nroom].ly;
+                rooms[g.nroom].hx = -1;
             }
         } else if (!create_room(-1, -1, -1, -1, -1, -1, OROOM, -1))
             return;
@@ -318,26 +318,26 @@ makecorridors()
     int a, b, i;
     boolean any = TRUE;
 
-    for (a = 0; a < nroom - 1; a++) {
+    for (a = 0; a < g.nroom - 1; a++) {
         join(a, a + 1, FALSE);
         if (!rn2(50))
             break; /* allow some randomness */
     }
-    for (a = 0; a < nroom - 2; a++)
+    for (a = 0; a < g.nroom - 2; a++)
         if (smeq[a] != smeq[a + 2])
             join(a, a + 2, FALSE);
-    for (a = 0; any && a < nroom; a++) {
+    for (a = 0; any && a < g.nroom; a++) {
         any = FALSE;
-        for (b = 0; b < nroom; b++)
+        for (b = 0; b < g.nroom; b++)
             if (smeq[a] != smeq[b]) {
                 join(a, b, FALSE);
                 any = TRUE;
             }
     }
-    if (nroom > 2)
-        for (i = rn2(nroom) + 4; i; i--) {
-            a = rn2(nroom);
-            b = rn2(nroom - 2);
+    if (g.nroom > 2)
+        for (i = rn2(g.nroom) + 4; i; i--) {
+            a = rn2(g.nroom);
+            b = rn2(g.nroom - 2);
             if (b >= a)
                 b += 2;
             join(a, b, TRUE);
@@ -361,12 +361,12 @@ register struct mkroom *aroom;
     for (tmp = doorindex; tmp > aroom->fdoor; tmp--)
         doors[tmp] = doors[tmp - 1];
 
-    for (i = 0; i < nroom; i++) {
+    for (i = 0; i < g.nroom; i++) {
         broom = &rooms[i];
         if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
             broom->fdoor++;
     }
-    for (i = 0; i < nsubroom; i++) {
+    for (i = 0; i < g.nsubroom; i++) {
         broom = &subrooms[i];
         if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
             broom->fdoor++;
@@ -489,7 +489,7 @@ int trap_type;
 
     if (doorindex < DOORMAX) {
         while (vct--) {
-            aroom = &rooms[rn2(nroom)];
+            aroom = &rooms[rn2(g.nroom)];
             if (aroom->rtype != OROOM)
                 continue; /* not an ordinary room */
             if (aroom->doorct == 1 && rn2(5))
@@ -545,7 +545,7 @@ int trap_type;
 STATIC_OVL void
 make_niches()
 {
-    int ct = rnd((nroom >> 1) + 1), dep = depth(&u.uz);
+    int ct = rnd((g.nroom >> 1) + 1), dep = depth(&u.uz);
     boolean ltptr = (!level.flags.noteleport && dep > 15),
             vamp = (dep > 5 && dep < 25);
 
@@ -624,9 +624,9 @@ clear_level_structures()
     level.flags.wizard_bones = 0;
     level.flags.corrmaze = 0;
 
-    nroom = 0;
+    g.nroom = 0;
     rooms[0].hx = -1;
-    nsubroom = 0;
+    g.nsubroom = 0;
     subrooms[0].hx = -1;
     doorindex = 0;
     init_rect();
@@ -696,12 +696,12 @@ makelevel()
     sort_rooms();
 
     /* construct stairs (up and down in different rooms if possible) */
-    croom = &rooms[rn2(nroom)];
+    croom = &rooms[rn2(g.nroom)];
     if (!Is_botlevel(&u.uz))
         mkstairs(somex(croom), somey(croom), 0, croom); /* down */
-    if (nroom > 1) {
+    if (g.nroom > 1) {
         troom = croom;
-        croom = &rooms[rn2(nroom - 1)];
+        croom = &rooms[rn2(g.nroom - 1)];
         if (croom == troom)
             croom++;
     }
@@ -735,17 +735,17 @@ makelevel()
                      FALSE);
             level.flags.has_vault = 1;
             ++room_threshold;
-            fill_room(&rooms[nroom - 1], FALSE);
+            fill_room(&rooms[g.nroom - 1], FALSE);
             mk_knox_portal(g.vault_x + w, g.vault_y + h);
             if (!level.flags.noteleport && !rn2(3))
                 makevtele();
         } else if (rnd_rect() && create_vault()) {
-            g.vault_x = rooms[nroom].lx;
-            g.vault_y = rooms[nroom].ly;
+            g.vault_x = rooms[g.nroom].lx;
+            g.vault_y = rooms[g.nroom].ly;
             if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE))
                 goto fill_vault;
             else
-                rooms[nroom].hx = -1;
+                rooms[g.nroom].hx = -1;
         }
     }
 
@@ -755,7 +755,7 @@ makelevel()
         if (wizard && nh_getenv("SHOPTYPE"))
             mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
-                 && nroom >= room_threshold && rn2(u_depth) < 3)
+                 && g.nroom >= room_threshold && rn2(u_depth) < 3)
             mkroom(SHOPBASE);
         else if (u_depth > 4 && !rn2(6))
             mkroom(COURT);
@@ -838,7 +838,7 @@ skip0:
          *  of rooms; about 5 - 7.5% for 2 boxes, least likely
          *  when few rooms; chance for 3 or more is negligible.
          */
-        if (!rn2(nroom * 5 / 2))
+        if (!rn2(g.nroom * 5 / 2))
             (void) mksobj_at((rn2(3)) ? LARGE_BOX : CHEST, somex(croom),
                              somey(croom), TRUE, FALSE);
 
@@ -995,7 +995,7 @@ mklev()
     if (level.flags.has_morgue)
         level.flags.graveyard = 1;
     if (!level.flags.is_maze_lev) {
-        for (croom = &rooms[0]; croom != &rooms[nroom]; croom++)
+        for (croom = &rooms[0]; croom != &rooms[g.nroom]; croom++)
 #ifdef SPECIALIZATION
             topologize(croom, FALSE);
 #else
@@ -1081,19 +1081,19 @@ coord *mp;
 {
     struct mkroom *croom = 0;
 
-    if (nroom == 0) {
+    if (g.nroom == 0) {
         mazexy(mp); /* already verifies location */
     } else {
         /* not perfect - there may be only one stairway */
-        if (nroom > 2) {
+        if (g.nroom > 2) {
             int tryct = 0;
 
             do
-                croom = &rooms[rn2(nroom)];
+                croom = &rooms[rn2(g.nroom)];
             while ((croom == dnstairs_room || croom == upstairs_room
                     || croom->rtype != OROOM) && (++tryct < 100));
         } else
-            croom = &rooms[rn2(nroom)];
+            croom = &rooms[rn2(g.nroom)];
 
         do {
             if (!somexy(croom, mp))
@@ -1113,7 +1113,7 @@ xchar x, y;
     int i;
     struct mkroom *curr;
 
-    for (curr = rooms, i = 0; i < nroom; curr++, i++)
+    for (curr = rooms, i = 0; i < g.nroom; curr++, i++)
         if (inside_room(curr, x, y))
             return curr;
     ;
@@ -1733,7 +1733,7 @@ int dist;
 
     /* clip at existing map borders if necessary */
     if (!within_bounded_area(x, y, x_maze_min + 1, y_maze_min + 1,
-                             x_maze_max - 1, y_maze_max - 1)) {
+                             g.x_maze_max - 1, g.y_maze_max - 1)) {
         /* only outermost 2 columns and/or rows may be truncated due to edge
          */
         if (dist < (7 - 2))

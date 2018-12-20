@@ -302,7 +302,7 @@ int sig_unused UNUSED;
         clear_nhwindow(WIN_MESSAGE);
         curs_on_u();
         wait_synch();
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
     } else {
         (void) done2();
@@ -322,9 +322,9 @@ done2()
         clear_nhwindow(WIN_MESSAGE);
         curs_on_u();
         wait_synch();
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
-        if (multi == 0) {
+        if (g.multi == 0) {
             u.uinvulnerable = FALSE; /* avoid ctrl-C bug -dlc */
             u.usleep = 0;
         }
@@ -519,16 +519,16 @@ int how;
 {
     int i;
 
-    if (multi_reason) {
+    if (g.multi_reason) {
         for (i = 0; i < SIZE(death_fixups); ++i)
             if (death_fixups[i].why == how
-                && !strcmp(death_fixups[i].exclude, multi_reason)) {
+                && !strcmp(death_fixups[i].exclude, g.multi_reason)) {
                 if (death_fixups[i].include) /* substitute alternate reason */
-                    multi_reason = death_fixups[i].include;
+                    g.multi_reason = death_fixups[i].include;
                 else /* remove the helplessness reason */
-                    multi_reason = (char *) 0;
+                    g.multi_reason = (char *) 0;
                 if (death_fixups[i].unmulti) /* possibly hide helplessness */
-                    multi = 0L;
+                    g.multi = 0L;
                 break;
             }
     }
@@ -848,10 +848,10 @@ int how;
         init_uhunger();
     nomovemsg = "You survived that attempt on your life.";
     context.move = 0;
-    if (multi > 0)
-        multi = 0;
+    if (g.multi > 0)
+        g.multi = 0;
     else
-        multi = -1;
+        g.multi = -1;
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
     context.botl = 1;
@@ -1194,7 +1194,7 @@ int how;
     if (how == ESCAPED || how == PANICKED)
         killer.format = NO_KILLER_PREFIX;
 
-    fixup_death(how); /* actually, fixup multi_reason */
+    fixup_death(how); /* actually, fixup g.multi_reason */
 
     if (how != PANICKED) {
         /* these affect score and/or bones, but avoid them during panic */

@@ -17,7 +17,7 @@ boolean
 picking_lock(x, y)
 int *x, *y;
 {
-    if (occupation == picklock) {
+    if (g.occupation == picklock) {
         *x = u.ux + u.dx;
         *y = u.uy + u.dy;
         return TRUE;
@@ -31,7 +31,7 @@ boolean
 picking_at(x, y)
 int x, y;
 {
-    return (boolean) (occupation == picklock && g.xlock.door == &levl[x][y]);
+    return (boolean) (g.occupation == picklock && g.xlock.door == &levl[x][y]);
 }
 
 /* produce an occupation string appropriate for the current activity */

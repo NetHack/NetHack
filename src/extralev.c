@@ -216,13 +216,13 @@ makeroguerooms()
      */
 #define here g.r[x][y]
 
-    nroom = 0;
+    g.nroom = 0;
     for (y = 0; y < 3; y++)
         for (x = 0; x < 3; x++) {
             /* Note: we want to insure at least 1 room.  So, if the
              * first 8 are all dummies, force the last to be a room.
              */
-            if (!rn2(5) && (nroom || (x < 2 && y < 2))) {
+            if (!rn2(5) && (g.nroom || (x < 2 && y < 2))) {
                 /* Arbitrary: dummy rooms may only go where real
                  * ones do.
                  */
@@ -237,19 +237,19 @@ makeroguerooms()
                 /* boundaries of room floor */
                 here.rlx = rnd(23 - here.dx + 1);
                 here.rly = rnd(((y == 2) ? 5 : 4) - here.dy + 1);
-                nroom++;
+                g.nroom++;
             }
             here.doortable = 0;
         }
     miniwalk(rn2(3), rn2(3));
-    nroom = 0;
+    g.nroom = 0;
     for (y = 0; y < 3; y++)
         for (x = 0; x < 3; x++) {
             if (here.real) { /* Make a room */
                 int lowx, lowy, hix, hiy;
 
-                g.r[x][y].nroom = nroom;
-                smeq[nroom] = nroom;
+                g.r[x][y].nroom = g.nroom;
+                smeq[g.nroom] = g.nroom;
 
                 lowx = 1 + 26 * x + here.rlx;
                 lowy = 7 * y + here.rly;
@@ -297,9 +297,9 @@ makerogueghost()
     struct mkroom *croom;
     int x, y;
 
-    if (!nroom)
+    if (!g.nroom)
         return; /* Should never happen */
-    croom = &rooms[rn2(nroom)];
+    croom = &rooms[rn2(g.nroom)];
     x = somex(croom);
     y = somey(croom);
     if (!(ghost = makemon(&mons[PM_GHOST], x, y, NO_MM_FLAGS)))

@@ -409,7 +409,7 @@ shkveg()
 
     j = maxprob = 0;
     ok[0] = 0; /* lint suppression */
-    for (i = bases[(int) oclass]; i < NUM_OBJECTS; ++i) {
+    for (i = g.bases[(int) oclass]; i < NUM_OBJECTS; ++i) {
         if (objects[i].oc_class != oclass)
             break;
 

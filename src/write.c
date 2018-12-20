@@ -164,8 +164,8 @@ register struct obj *pen;
 
     deferred = 0;       /* not any scroll or book */
     deferralchance = 0; /* incremented for each oc_uname match */
-    first = bases[(int) paper->oclass];
-    last = bases[(int) paper->oclass + 1] - 1;
+    first = g.bases[(int) paper->oclass];
+    last = g.bases[(int) paper->oclass + 1] - 1;
     for (i = first; i <= last; i++) {
         /* extra shufflable descr not representing a real object */
         if (!OBJ_NAME(objects[i]))

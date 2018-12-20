@@ -366,7 +366,7 @@ const char *name;
     if (!objects[otyp].oc_name_known
         && (odesc = OBJ_DESCR(objects[otyp])) != 0) {
         obj_shuffle_range(otyp, &lo, &hi);
-        for (i = bases[ocls]; i < NUM_OBJECTS; i++) {
+        for (i = g.bases[ocls]; i < NUM_OBJECTS; i++) {
             if (objects[i].oc_class != ocls)
                 break;
             if (!objects[i].oc_name_known
@@ -1054,7 +1054,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 resisted = TRUE;
             } else {
                 nomul(-3);
-                multi_reason = "being scared stiff";
+                g.multi_reason = "being scared stiff";
                 nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(youmonst.data)) {
                     u.ustuck = (struct monst *) 0;
@@ -1882,14 +1882,14 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
-        int oldstr = glow_strength(warn_obj_cnt),
+        int oldstr = glow_strength(g.warn_obj_cnt),
             newstr = glow_strength(orc_count);
 
-        if (orc_count == -1 && warn_obj_cnt > 0) {
+        if (orc_count == -1 && g.warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
             pline("%s is %s.", bare_artifactname(uwep),
-                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
+                  glow_verb(Blind ? 0 : g.warn_obj_cnt, TRUE));
         } else if (newstr > 0 && newstr != oldstr) {
             /* 'start' message */
             if (!Blind)
@@ -1900,10 +1900,10 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
             else if (oldstr == 0) /* quivers */
                 pline("%s %s slightly.", bare_artifactname(uwep),
                       otense(uwep, glow_verb(0, FALSE)));
-        } else if (orc_count == 0 && warn_obj_cnt > 0) {
+        } else if (orc_count == 0 && g.warn_obj_cnt > 0) {
             /* 'stop' message */
             pline("%s stops %s.", bare_artifactname(uwep),
-                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
+                  glow_verb(Blind ? 0 : g.warn_obj_cnt, TRUE));
         }
     }
 }

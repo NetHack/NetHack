@@ -601,8 +601,8 @@ schar lit;
 {
     int x, y;
 
-    for (x = 2; x <= x_maze_max; x++)
-        for (y = 0; y <= y_maze_max; y++) {
+    for (x = 2; x <= g.x_maze_max; x++)
+        for (y = 0; y <= g.y_maze_max; y++) {
             SET_TYPLIT(x, y, filling, lit);
         }
 }
@@ -688,8 +688,8 @@ remove_boundary_syms()
                 break;
             }
     if (has_bounds) {
-        for (x = 0; x < x_maze_max; x++)
-            for (y = 0; y < y_maze_max; y++)
+        for (x = 0; x < g.x_maze_max; x++)
+            for (y = 0; y < g.y_maze_max; y++)
                 if ((levl[x][y].typ == CROSSWALL) && g.SpLev_Map[x][y])
                     levl[x][y].typ = ROOM;
     }
@@ -766,7 +766,7 @@ link_doors_rooms()
                    directive, set/clear levl[][].horizontal for it */
                 set_door_orientation(x, y);
 
-                for (tmpi = 0; tmpi < nroom; tmpi++) {
+                for (tmpi = 0; tmpi < g.nroom; tmpi++) {
                     maybe_add_door(x, y, &rooms[tmpi]);
                     for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
                         maybe_add_door(x, y, rooms[tmpi].sbrooms[m]);
@@ -780,7 +780,7 @@ fill_rooms()
 {
     int tmpi, m;
 
-    for (tmpi = 0; tmpi < nroom; tmpi++) {
+    for (tmpi = 0; tmpi < g.nroom; tmpi++) {
         if (rooms[tmpi].needfill)
             fill_room(&rooms[tmpi], (rooms[tmpi].needfill == 2));
         for (m = 0; m < rooms[tmpi].nsubrooms; m++)
@@ -905,8 +905,8 @@ found_it:
     if (!(humidity & ANY_LOC) && !isok(*x, *y)) {
         if (!(humidity & NO_LOC_WARN)) {
             /*warning("get_location:  (%d,%d) out of bounds", *x, *y);*/
-            *x = x_maze_max;
-            *y = y_maze_max;
+            *x = g.x_maze_max;
+            *y = g.y_maze_max;
         } else {
             *x = *y = -1;
         }
@@ -1179,10 +1179,10 @@ xchar rtype, rlit;
                    + rn2(hx - (lx > 0 ? lx : 3) - dx - xborder + 1);
             yabs = ly + (ly > 0 ? ylim : 2)
                    + rn2(hy - (ly > 0 ? ly : 2) - dy - yborder + 1);
-            if (ly == 0 && hy >= (ROWNO - 1) && (!nroom || !rn2(nroom))
+            if (ly == 0 && hy >= (ROWNO - 1) && (!g.nroom || !rn2(g.nroom))
                 && (yabs + dy > ROWNO / 2)) {
                 yabs = rn1(3, 2);
-                if (nroom < 4 && dy > 1)
+                if (g.nroom < 4 && dy > 1)
                     dy--;
             }
             if (!check_room(&xabs, &dx, &yabs, &dy, vault)) {
@@ -1260,12 +1260,12 @@ xchar rtype, rlit;
     split_rects(r1, &r2);
 
     if (!vault) {
-        smeq[nroom] = nroom;
+        smeq[g.nroom] = g.nroom;
         add_room(xabs, yabs, xabs + wtmp - 1, yabs + htmp - 1, rlit, rtype,
                  FALSE);
     } else {
-        rooms[nroom].lx = xabs;
-        rooms[nroom].ly = yabs;
+        rooms[g.nroom].lx = xabs;
+        rooms[g.nroom].ly = yabs;
     }
     return TRUE;
 }
@@ -2327,7 +2327,7 @@ fix_stair_rooms()
         && !((dnstairs_room->lx <= xdnstair && xdnstair <= dnstairs_room->hx)
              && (dnstairs_room->ly <= ydnstair
                  && ydnstair <= dnstairs_room->hy))) {
-        for (i = 0; i < nroom; i++) {
+        for (i = 0; i < g.nroom; i++) {
             croom = &rooms[i];
             if ((croom->lx <= xdnstair && xdnstair <= croom->hx)
                 && (croom->ly <= ydnstair && ydnstair <= croom->hy)) {
@@ -2335,14 +2335,14 @@ fix_stair_rooms()
                 break;
             }
         }
-        if (i == nroom)
+        if (i == g.nroom)
             panic("Couldn't find dnstair room in fix_stair_rooms!");
     }
     if (xupstair
         && !((upstairs_room->lx <= xupstair && xupstair <= upstairs_room->hx)
              && (upstairs_room->ly <= yupstair
                  && yupstair <= upstairs_room->hy))) {
-        for (i = 0; i < nroom; i++) {
+        for (i = 0; i < g.nroom; i++) {
             croom = &rooms[i];
             if ((croom->lx <= xupstair && xupstair <= croom->hx)
                 && (croom->ly <= yupstair && yupstair <= croom->hy)) {
@@ -2350,7 +2350,7 @@ fix_stair_rooms()
                 break;
             }
         }
-        if (i == nroom)
+        if (i == g.nroom)
             panic("Couldn't find upstair room in fix_stair_rooms!");
     }
 }
@@ -2490,10 +2490,10 @@ struct mkroom *mkr;
     xchar rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
 
     if (mkr) {
-        aroom = &subrooms[nsubroom];
+        aroom = &subrooms[g.nsubroom];
         okroom = create_subroom(mkr, r->x, r->y, r->w, r->h, rtype, r->rlit);
     } else {
-        aroom = &rooms[nroom];
+        aroom = &rooms[g.nroom];
         okroom = create_room(r->x, r->y, r->w, r->h, r->xalign, r->yalign,
                              rtype, r->rlit);
     }
@@ -2589,8 +2589,8 @@ int humidity;
        `humidity' screening might drastically change the chances */
 
     do {
-        x = rn1(x_maze_max - 3, 3);
-        y = rn1(y_maze_max - 3, 3);
+        x = rn1(g.x_maze_max - 3, 3);
+        y = rn1(g.y_maze_max - 3, 3);
         if (--tryct < 0)
             break; /* give up */
     } while (!(x % 2) || !(y % 2) || g.SpLev_Map[x][y]
@@ -2613,11 +2613,11 @@ fill_empty_maze()
     xchar x, y;
     coord mm;
 
-    mapcountmax = mapcount = (x_maze_max - 2) * (y_maze_max - 2);
+    mapcountmax = mapcount = (g.x_maze_max - 2) * (g.y_maze_max - 2);
     mapcountmax = mapcountmax / 2;
 
-    for (x = 2; x < x_maze_max; x++)
-        for (y = 0; y < y_maze_max; y++)
+    for (x = 2; x < g.x_maze_max; x++)
+        for (y = 0; y < g.y_maze_max; y++)
             if (g.SpLev_Map[x][y])
                 mapcount--;
 
@@ -2771,7 +2771,7 @@ lev_init *linit;
         lvlfill_solid(linit->filling, linit->lit);
         break;
     case LVLINIT_MAZEGRID:
-        lvlfill_maze_grid(2, 0, x_maze_max, y_maze_max, linit->filling);
+        lvlfill_maze_grid(2, 0, g.x_maze_max, g.y_maze_max, linit->filling);
         break;
     case LVLINIT_ROGUE:
         makeroguerooms();
@@ -4620,7 +4620,7 @@ struct sp_coder *coder;
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
     room_not_needed = (OV_i(rtype) == OROOM && !irregular && !prefilled);
-    if (room_not_needed || nroom >= MAXNROFROOMS) {
+    if (room_not_needed || g.nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed)
             impossible("Too many rooms on new level!");
@@ -4639,7 +4639,7 @@ struct sp_coder *coder;
         return;
     }
 
-    troom = &rooms[nroom];
+    troom = &rooms[g.nroom];
 
     /* mark rooms that must be filled, but do it later */
     if (OV_i(rtype) != OROOM)
@@ -4650,8 +4650,8 @@ struct sp_coder *coder;
     if (irregular) {
         g.min_rx = g.max_rx = dx1;
         g.min_ry = g.max_ry = dy1;
-        smeq[nroom] = nroom;
-        flood_fill_rm(dx1, dy1, nroom + ROOMOFFSET, OV_i(rlit), TRUE);
+        smeq[g.nroom] = g.nroom;
+        flood_fill_rm(dx1, dy1, g.nroom + ROOMOFFSET, OV_i(rlit), TRUE);
         add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OV_i(rtype),
                  TRUE);
         troom->rlit = OV_i(rlit);
@@ -4918,16 +4918,16 @@ struct sp_coder *coder;
             g.xstart = g.splev_init_present ? 1 : 3;
             break;
         case H_LEFT:
-            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) / 4);
+            g.xstart = 2 + ((g.x_maze_max - 2 - g.xsize) / 4);
             break;
         case CENTER:
-            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) / 2);
+            g.xstart = 2 + ((g.x_maze_max - 2 - g.xsize) / 2);
             break;
         case H_RIGHT:
-            g.xstart = 2 + ((x_maze_max - 2 - g.xsize) * 3 / 4);
+            g.xstart = 2 + ((g.x_maze_max - 2 - g.xsize) * 3 / 4);
             break;
         case RIGHT:
-            g.xstart = x_maze_max - g.xsize - 1;
+            g.xstart = g.x_maze_max - g.xsize - 1;
             break;
         }
         switch ((int) valign) {
@@ -4935,10 +4935,10 @@ struct sp_coder *coder;
             g.ystart = 3;
             break;
         case CENTER:
-            g.ystart = 2 + ((y_maze_max - 2 - g.ysize) / 2);
+            g.ystart = 2 + ((g.y_maze_max - 2 - g.ysize) / 2);
             break;
         case BOTTOM:
-            g.ystart = y_maze_max - g.ysize - 1;
+            g.ystart = g.y_maze_max - g.ysize - 1;
             break;
         }
         if (!(g.xstart % 2))

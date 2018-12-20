@@ -841,7 +841,7 @@ struct obj *obj;
                         pline("Yikes!  You've frozen yourself!");
                     if (!Hallucination || !rn2(4)) {
                         nomul(-rnd(MAXULEV + 6 - u.ulevel));
-                        multi_reason = "gazing into a mirror";
+                        g.multi_reason = "gazing into a mirror";
                     }
                     nomovemsg = 0; /* default, "you can move again" */
                 }
@@ -1029,7 +1029,7 @@ struct obj **optr;
                     break;
                 case 2: /* no explanation; it just happens... */
                     nomovemsg = "";
-                    multi_reason = NULL;
+                    g.multi_reason = NULL;
                     nomul(-rnd(2));
                     break;
                 }
@@ -1786,7 +1786,7 @@ int magic; /* 0=Physical, otherwise skill level */
         teleds(cc.x, cc.y, FALSE);
         sokoban_guilt();
         nomul(-1);
-        multi_reason = "jumping around";
+        g.multi_reason = "jumping around";
         nomovemsg = "";
         morehungry(rnd(25));
         return 1;
@@ -2230,7 +2230,7 @@ struct obj **optr;
             return;
     }
     if (!getdir((char *) 0)) {
-        context.move = multi = 0;
+        context.move = g.multi = 0;
         return;
     }
     x = u.ux + u.dx;

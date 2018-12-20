@@ -295,12 +295,12 @@ tty_get_ext_cmd()
     suppress_history = TRUE;
     /* maybe a runtime option?
      * hooked_tty_getlin("#", buf,
-     *                   (flags.cmd_comp && !in_doagain)
+     *                   (flags.cmd_comp && !g.in_doagain)
      *                      ? ext_cmd_getlin_hook
      *                      : (getlin_hook_proc) 0);
      */
     buf[0] = '\0';
-    hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc) 0
+    hooked_tty_getlin("#", buf, g.in_doagain ? (getlin_hook_proc) 0
                                            : ext_cmd_getlin_hook);
     (void) mungspaces(buf);
     if (buf[0] == 0 || buf[0] == '\033')
@@ -310,7 +310,7 @@ tty_get_ext_cmd()
         if (!strcmpi(buf, extcmdlist[i].ef_txt))
             break;
 
-    if (!in_doagain) {
+    if (!g.in_doagain) {
         int j;
         for (j = 0; buf[j]; j++)
             savech(buf[j]);

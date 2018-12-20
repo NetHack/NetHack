@@ -507,7 +507,7 @@ int roomno;
             if (flags.verbose)
                 You("are frightened to death, and unable to move.");
             nomul(-3);
-            multi_reason = "being terrified of a ghost";
+            g.multi_reason = "being terrified of a ghost";
             nomovemsg = "You regain your composure.";
         }
     }

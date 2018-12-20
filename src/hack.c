@@ -1862,7 +1862,7 @@ domove()
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
-        multi_reason = "dragging an iron ball";
+        g.multi_reason = "dragging an iron ball";
         nomovemsg = "";
     }
 
@@ -1902,7 +1902,7 @@ overexertion()
             fall_asleep(-10, FALSE);
         }
     }
-    return (boolean) (multi < 0); /* might have fainted (forced to sleep) */
+    return (boolean) (g.multi < 0); /* might have fainted (forced to sleep) */
 }
 
 void
@@ -2565,8 +2565,8 @@ dopickup(VOID_ARGS)
     int count, tmpcount, ret;
 
     /* awful kludge to work around parse()'s pre-decrement */
-    count = (multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? multi + 1 : 0;
-    multi = 0; /* always reset */
+    count = (g.multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? g.multi + 1 : 0;
+    g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks() >= 0))
         return ret;
@@ -2807,13 +2807,13 @@ void
 nomul(nval)
 register int nval;
 {
-    if (multi < nval)
+    if (g.multi < nval)
         return;              /* This is a bug fix by ab@unido */
     u.uinvulnerable = FALSE; /* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
-    multi = nval;
+    g.multi = nval;
     if (nval == 0)
-        multi_reason = NULL;
+        g.multi_reason = NULL;
     context.travel = context.travel1 = context.mv = context.run = 0;
 }
 
@@ -2822,7 +2822,7 @@ void
 unmul(msg_override)
 const char *msg_override;
 {
-    multi = 0; /* caller will usually have done this already */
+    g.multi = 0; /* caller will usually have done this already */
     if (msg_override)
         nomovemsg = msg_override;
     else if (!nomovemsg)
@@ -2831,13 +2831,13 @@ const char *msg_override;
         pline("%s", nomovemsg);
     nomovemsg = 0;
     u.usleep = 0;
-    multi_reason = NULL;
-    if (afternmv) {
-        int NDECL((*f)) = afternmv;
+    g.multi_reason = NULL;
+    if (g.afternmv) {
+        int NDECL((*f)) = g.afternmv;
 
         /* clear afternmv before calling it (to override the
            encumbrance hack for levitation--see weight_cap()) */
-        afternmv = (int NDECL((*))) 0;
+        g.afternmv = (int NDECL((*))) 0;
         (void) (*f)();
     }
 }
@@ -2920,7 +2920,7 @@ weight_cap()
        confer are enabled at the start rather than the end; that
        causes message sequencing issues for boots of levitation
        so defer their encumbrance benefit until they're fully worn */
-    if (afternmv == Boots_on && (ELevitation & W_ARMF) != 0L) {
+    if (g.afternmv == Boots_on && (ELevitation & W_ARMF) != 0L) {
         ELevitation &= ~W_ARMF;
         float_vs_flight(); /* in case Levitation is blocking Flying */
     }

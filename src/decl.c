@@ -5,34 +5,13 @@
 
 #include "hack.h"
 
-int NDECL((*afternmv));
-int NDECL((*occupation));
-
 /* from xxxmain.c */
-const char *hname = 0; /* name of the game (argv[0] of main) */
-int hackpid = 0;       /* current process id */
 #if defined(UNIX) || defined(VMS)
 int locknum = 0; /* max num of simultaneous users */
 #endif
 #ifdef DEF_PAGER
 char *catmore = 0; /* default pager */
 #endif
-char chosen_windowtype[WINTYPELEN];
-
-NEARDATA int bases[MAXOCLASSES] = DUMMY;
-
-NEARDATA int multi = 0;
-const char *multi_reason = NULL;
-NEARDATA int nroom = 0;
-NEARDATA int nsubroom = 0;
-NEARDATA int occtime = 0;
-
-/* maze limits must be even; masking off lowest bit guarantees that */
-int x_maze_max = (COLNO - 1) & ~1, y_maze_max = (ROWNO - 1) & ~1;
-
-int otg_temp; /* used by object_to_glyph() [otg] */
-
-NEARDATA int in_doagain = 0;
 
 /*
  *      The following structure will be initialized at startup time with
@@ -42,7 +21,6 @@ struct dgn_topology dungeon_topology = { DUMMY };
 
 struct q_score quest_status = DUMMY;
 
-NEARDATA int warn_obj_cnt = 0;
 NEARDATA int smeq[MAXNROFROOMS + 1] = DUMMY;
 NEARDATA int doorindex = 0;
 NEARDATA char *save_cm = 0;
@@ -358,6 +336,25 @@ const struct instance_globals g_init = {
 
     /* dbridge.c */
     UNDEFINED_VALUES,
+
+    /* decl.c */
+    UNDEFINED_PTR, /* occupation */
+    UNDEFINED_PTR, /* afternmv */
+    UNDEFINED_PTR, /* hname */
+    0, /* hackpid */
+    UNDEFINED_VALUES, /* chosen_windowtype */
+    DUMMY, /* bases */
+    0, /* multi */
+    NULL, /* g.multi_reason */
+    0, /* nroom */
+    0, /* nsubroom */
+    0, /* occtime */
+    0, /* warn_obj_cnt */
+    /* maze limits must be even; masking off lowest bit guarantees that */
+    (COLNO - 1) & ~1, /* x_maze_max */
+    (ROWNO - 1) & ~1, /* y_maze_max */
+    UNDEFINED_VALUE, /* otg_temp */
+    0, /* in_doagain */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */

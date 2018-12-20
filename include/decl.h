@@ -8,11 +8,6 @@
 
 #define E extern
 
-E int NDECL((*occupation));
-E int NDECL((*afternmv));
-
-E const char *hname;
-E int hackpid;
 #if defined(UNIX) || defined(VMS)
 E int locknum;
 #endif
@@ -27,22 +22,6 @@ E char SAVEP[];
 
 /* max size of a windowtype option */
 #define WINTYPELEN 16
-E char chosen_windowtype[WINTYPELEN];
-
-E NEARDATA int bases[MAXOCLASSES];
-
-E NEARDATA int multi;
-E const char *multi_reason;
-E NEARDATA int nroom;
-E NEARDATA int nsubroom;
-E NEARDATA int occtime;
-
-E NEARDATA int warn_obj_cnt; /* count of monsters meeting criteria */
-
-E int x_maze_max, y_maze_max;
-E int otg_temp;
-
-E NEARDATA int in_doagain;
 
 E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_oracle_level;
@@ -695,6 +674,24 @@ struct instance_globals {
 
     /* dbridge.c */
     struct entity occupants[ENTITIES];
+
+    /* decl.c */
+    int NDECL((*occupation));
+    int NDECL((*afternmv));
+    const char *hname; /* name of the game (argv[0] of main) */
+    int hackpid;
+    char chosen_windowtype[WINTYPELEN];
+    int bases[MAXOCLASSES];
+    int multi;
+    const char *multi_reason;
+    int nroom;
+    int nsubroom;
+    int occtime;
+    int warn_obj_cnt; /* count of monsters meeting criteria */
+    int x_maze_max;
+    int y_maze_max;
+    int otg_temp; /* used by object_to_glyph() [otg] */
+    int in_doagain;
 
     /* dig.c */
 

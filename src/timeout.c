@@ -121,7 +121,7 @@ stoned_dialogue()
     switch ((int) i) {
     case 5: /* slowing down */
         HFast = 0L;
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
         break;
     case 4: /* limbs stiffening */
@@ -129,13 +129,13 @@ stoned_dialogue()
            don't stop attempt to eat tin--might be lizard or acidic */
         if (!Popeye(STONED))
             stop_occupation();
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
         break;
     case 3: /* limbs turned to stone */
         stop_occupation();
         nomul(-3); /* can't move anymore */
-        multi_reason = "getting stoned";
+        g.multi_reason = "getting stoned";
         nomovemsg = You_can_move_again; /* not unconscious */
         /* "your limbs have turned to stone" so terminate wounded legs */
         if (Wounded_legs && !u.usteed)
@@ -187,7 +187,7 @@ vomiting_dialogue()
     /*FALLTHRU*/
     case 9:
         make_confused((HConfusion & TIMEOUT) + (long) d(2, 4), FALSE);
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
         break;
     case 8:
@@ -341,7 +341,7 @@ slime_dialogue()
         HFast = 0L; /* lose intrinsic speed */
         if (!Popeye(SLIMED))
             stop_occupation();
-        if (multi > 0)
+        if (g.multi > 0)
             nomul(0);
         break;
     case 2L: /* skin begins to peel */
@@ -675,7 +675,7 @@ nh_timeout()
                 if (u.umoved && !Levitation) {
                     slip_or_trip();
                     nomul(-2);
-                    multi_reason = "fumbling";
+                    g.multi_reason = "fumbling";
                     nomovemsg = "";
                     /* The more you are carrying the more likely you
                      * are to make noise when you fumble.  Adjustments
@@ -708,14 +708,14 @@ boolean wakeup_msg;
 {
     stop_occupation();
     nomul(how_long);
-    multi_reason = "sleeping";
+    g.multi_reason = "sleeping";
     /* generally don't notice sounds while sleeping */
-    if (wakeup_msg && multi == how_long) {
+    if (wakeup_msg && g.multi == how_long) {
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
         incr_itimeout(&HDeaf, how_long);
         context.botl = TRUE;
-        afternmv = Hear_again; /* this won't give any messages */
+        g.afternmv = Hear_again; /* this won't give any messages */
     }
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = monstermoves;
@@ -1583,7 +1583,7 @@ do_storms()
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);
-            multi_reason = "hiding from thunderstorm";
+            g.multi_reason = "hiding from thunderstorm";
             nomovemsg = 0;
         }
     } else

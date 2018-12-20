@@ -3539,7 +3539,7 @@ boolean tinitial, tfrom_file;
                 nmcpy(buf, op, WINTYPELEN);
                 choose_windows(buf);
             } else {
-                nmcpy(chosen_windowtype, op, WINTYPELEN);
+                nmcpy(g.chosen_windowtype, op, WINTYPELEN);
 	    }
         } else
             return FALSE;
@@ -6172,7 +6172,7 @@ struct fruit *replace_fruit;
         /* disallow naming after other foods (since it'd be impossible
          * to tell the difference)
          */
-        for (i = bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
+        for (i = g.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
             if (!strcmp(OBJ_NAME(objects[i]), pl_fruit)) {
                 found = TRUE;
                 break;

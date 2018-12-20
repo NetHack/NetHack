@@ -1198,19 +1198,19 @@ struct obj *otmp;
     if (doffing(otmp))
         result = TRUE;
     else if (otmp == uarm)
-        result = (afternmv == Armor_on);
+        result = (g.afternmv == Armor_on);
     else if (otmp == uarmu)
-        result = (afternmv == Shirt_on);
+        result = (g.afternmv == Shirt_on);
     else if (otmp == uarmc)
-        result = (afternmv == Cloak_on);
+        result = (g.afternmv == Cloak_on);
     else if (otmp == uarmf)
-        result = (afternmv == Boots_on);
+        result = (g.afternmv == Boots_on);
     else if (otmp == uarmh)
-        result = (afternmv == Helmet_on);
+        result = (g.afternmv == Helmet_on);
     else if (otmp == uarmg)
-        result = (afternmv == Gloves_on);
+        result = (g.afternmv == Gloves_on);
     else if (otmp == uarms)
-        result = (afternmv == Shield_on);
+        result = (g.afternmv == Shield_on);
 
     return result;
 }
@@ -1226,19 +1226,19 @@ struct obj *otmp;
 
     /* 'T' (or 'R' used for armor) sets afternmv, 'A' sets takeoff.what */
     if (otmp == uarm)
-        result = (afternmv == Armor_off || what == WORN_ARMOR);
+        result = (g.afternmv == Armor_off || what == WORN_ARMOR);
     else if (otmp == uarmu)
-        result = (afternmv == Shirt_off || what == WORN_SHIRT);
+        result = (g.afternmv == Shirt_off || what == WORN_SHIRT);
     else if (otmp == uarmc)
-        result = (afternmv == Cloak_off || what == WORN_CLOAK);
+        result = (g.afternmv == Cloak_off || what == WORN_CLOAK);
     else if (otmp == uarmf)
-        result = (afternmv == Boots_off || what == WORN_BOOTS);
+        result = (g.afternmv == Boots_off || what == WORN_BOOTS);
     else if (otmp == uarmh)
-        result = (afternmv == Helmet_off || what == WORN_HELMET);
+        result = (g.afternmv == Helmet_off || what == WORN_HELMET);
     else if (otmp == uarmg)
-        result = (afternmv == Gloves_off || what == WORN_GLOVES);
+        result = (g.afternmv == Gloves_off || what == WORN_GLOVES);
     else if (otmp == uarms)
-        result = (afternmv == Shield_off || what == WORN_SHIELD);
+        result = (g.afternmv == Shield_off || what == WORN_SHIELD);
     /* these 1-turn items don't need 'afternmv' checks */
     else if (otmp == uamul)
         result = (what == WORN_AMUL);
@@ -1289,11 +1289,11 @@ cancel_don()
      * otherwise finish)
      */
     context.takeoff.cancelled_don =
-        (afternmv == Boots_on || afternmv == Helmet_on
-         || afternmv == Gloves_on || afternmv == Armor_on);
-    afternmv = (int NDECL((*))) 0;
+        (g.afternmv == Boots_on || g.afternmv == Helmet_on
+         || g.afternmv == Gloves_on || g.afternmv == Armor_on);
+    g.afternmv = (int NDECL((*))) 0;
     nomovemsg = (char *) 0;
-    multi = 0;
+    g.multi = 0;
     context.takeoff.delay = 0;
     context.takeoff.what = 0L;
 }
@@ -1321,14 +1321,14 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
        by unmul() since the on or off action isn't completing */
-    afternmv = (int NDECL((*))) 0;
+    g.afternmv = (int NDECL((*))) 0;
     if (putting_on || otmp != stolenobj) {
         Sprintf(buf, "You stop %s %s.",
                 putting_on ? "putting on" : "taking off",
                 thesimpleoname(otmp));
     } else {
         buf[0] = '\0';   /* silently stop doffing stolenobj */
-        result = -multi; /* remember this before calling unmul() */
+        result = -g.multi; /* remember this before calling unmul() */
     }
     unmul(buf);
     /* while putting on, item becomes worn immediately but side-effects are
@@ -1527,22 +1527,22 @@ register struct obj *otmp;
         return 0;
     if (delay) {
         nomul(delay);
-        multi_reason = "disrobing";
+        g.multi_reason = "disrobing";
         if (is_helmet(otmp)) {
             /* ick... */
             nomovemsg = !strcmp(helm_simple_name(otmp), "hat")
                             ? "You finish taking off your hat."
                             : "You finish taking off your helmet.";
-            afternmv = Helmet_off;
+            g.afternmv = Helmet_off;
         } else if (is_gloves(otmp)) {
             nomovemsg = "You finish taking off your gloves.";
-            afternmv = Gloves_off;
+            g.afternmv = Gloves_off;
         } else if (is_boots(otmp)) {
             nomovemsg = "You finish taking off your boots.";
-            afternmv = Boots_off;
+            g.afternmv = Boots_off;
         } else {
             nomovemsg = "You finish taking off your suit.";
-            afternmv = Armor_off;
+            g.afternmv = Armor_off;
         }
     } else {
         /* Be warned!  We want off_msg after removing the item to
@@ -1906,15 +1906,15 @@ struct obj *obj;
         delay = -objects[obj->otyp].oc_delay;
         if (delay) {
             nomul(delay);
-            multi_reason = "dressing up";
+            g.multi_reason = "dressing up";
             if (is_boots(obj))
-                afternmv = Boots_on;
+                g.afternmv = Boots_on;
             if (is_helmet(obj))
-                afternmv = Helmet_on;
+                g.afternmv = Helmet_on;
             if (is_gloves(obj))
-                afternmv = Gloves_on;
+                g.afternmv = Gloves_on;
             if (obj == uarm)
-                afternmv = Armor_on;
+                g.afternmv = Armor_on;
             nomovemsg = "You finish your dressing maneuver.";
         } else {
             if (is_cloak(obj))

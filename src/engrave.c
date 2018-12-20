@@ -489,7 +489,7 @@ doengrave()
     struct obj *otmp; /* Object selected with which to engrave */
     char *writer;
 
-    multi = 0;              /* moves consumed */
+    g.multi = 0;              /* moves consumed */
     nomovemsg = (char *) 0; /* occupation end message */
 
     buf[0] = (char) 0;
@@ -1064,21 +1064,21 @@ doengrave()
      */
     switch (type) {
     default:
-        multi = -(len / 10);
-        if (multi)
+        g.multi = -(len / 10);
+        if (g.multi)
             nomovemsg = "You finish your weird engraving.";
         break;
     case DUST:
-        multi = -(len / 10);
-        if (multi)
+        g.multi = -(len / 10);
+        if (g.multi)
             nomovemsg = "You finish writing in the dust.";
         break;
     case HEADSTONE:
     case ENGRAVE:
-        multi = -(len / 10);
+        g.multi = -(len / 10);
         if (otmp->oclass == WEAPON_CLASS
             && (otmp->otyp != ATHAME || otmp->cursed)) {
-            multi = -len;
+            g.multi = -len;
             maxelen = ((otmp->spe + 3) * 2) + 1;
             /* -2 => 3, -1 => 5, 0 => 7, +1 => 9, +2 => 11
              * Note: this does not allow a +0 anything (except an athame)
@@ -1088,44 +1088,44 @@ doengrave()
             pline("%s dull.", Yobjnam2(otmp, "get"));
             costly_alteration(otmp, COST_DEGRD);
             if (len > maxelen) {
-                multi = -maxelen;
+                g.multi = -maxelen;
                 otmp->spe = -3;
             } else if (len > 1)
                 otmp->spe -= len >> 1;
             else
                 otmp->spe -= 1; /* Prevent infinite engraving */
         } else if (otmp->oclass == RING_CLASS || otmp->oclass == GEM_CLASS) {
-            multi = -len;
+            g.multi = -len;
         }
-        if (multi)
+        if (g.multi)
             nomovemsg = "You finish engraving.";
         break;
     case BURN:
-        multi = -(len / 10);
-        if (multi)
+        g.multi = -(len / 10);
+        if (g.multi)
             nomovemsg = is_ice(u.ux, u.uy)
                           ? "You finish melting your message into the ice."
                           : "You finish burning your message into the floor.";
         break;
     case MARK:
-        multi = -(len / 10);
+        g.multi = -(len / 10);
         if (otmp->otyp == MAGIC_MARKER) {
             maxelen = otmp->spe * 2; /* one charge / 2 letters */
             if (len > maxelen) {
                 Your("marker dries out.");
                 otmp->spe = 0;
-                multi = -(maxelen / 10);
+                g.multi = -(maxelen / 10);
             } else if (len > 1)
                 otmp->spe -= len >> 1;
             else
                 otmp->spe -= 1; /* Prevent infinite graffiti */
         }
-        if (multi)
+        if (g.multi)
             nomovemsg = "You finish defacing the dungeon.";
         break;
     case ENGR_BLOOD:
-        multi = -(len / 10);
-        if (multi)
+        g.multi = -(len / 10);
+        if (g.multi)
             nomovemsg = "You finish scrawling.";
         break;
     }
@@ -1137,7 +1137,7 @@ doengrave()
                 maxelen--;
         if (!maxelen && *sp) {
             *sp = '\0';
-            if (multi)
+            if (g.multi)
                 nomovemsg = "You cannot write any more.";
             You("are only able to write \"%s\".", ebuf);
         }
@@ -1147,7 +1147,7 @@ doengrave()
         Strcpy(buf, oep->engr_txt);
     (void) strncat(buf, ebuf, BUFSZ - (int) strlen(buf) - 1);
     /* Put the engraving onto the map */
-    make_engr_at(u.ux, u.uy, buf, moves - multi, type);
+    make_engr_at(u.ux, u.uy, buf, moves - g.multi, type);
 
     if (post_engr_text[0])
         pline("%s", post_engr_text);

@@ -247,7 +247,7 @@ boolean resuming;
                                  && !rn2(80 - (20 * night())))
                             change = 2;
                         if (change && !Unchanging) {
-                            if (multi >= 0) {
+                            if (g.multi >= 0) {
                                 stop_occupation();
                                 if (change == 1)
                                     polyself(0);
@@ -258,7 +258,7 @@ boolean resuming;
                         }
                     }
 
-                    if (Searching && multi >= 0)
+                    if (Searching && g.multi >= 0)
                         (void) dosearch0(1);
                     if (Warning)
                         warnreveal();
@@ -297,8 +297,8 @@ boolean resuming;
                         under_ground(0);
 
                     /* when immobile, count is in turns */
-                    if (multi < 0) {
-                        if (++multi == 0) { /* finished yet? */
+                    if (g.multi < 0) {
+                        if (++g.multi == 0) { /* finished yet? */
                             unmul((char *) 0);
                             /* if unmul caused a level change, take it now */
                             if (u.utotype)
@@ -356,7 +356,7 @@ boolean resuming;
 
         context.move = 1;
 
-        if (multi >= 0 && occupation) {
+        if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
             abort_lev = 0;
             if (kbhit()) {
@@ -365,11 +365,11 @@ boolean resuming;
                 else
                     pushch(ch);
             }
-            if (!abort_lev && (*occupation)() == 0)
+            if (!abort_lev && (*g.occupation)() == 0)
 #else
-            if ((*occupation)() == 0)
+            if ((*g.occupation)() == 0)
 #endif
-                occupation = 0;
+                g.occupation = 0;
             if (
 #if defined(MICRO) || defined(WIN32)
                 abort_lev ||
@@ -379,7 +379,7 @@ boolean resuming;
                 reset_eat();
             }
 #if defined(MICRO) || defined(WIN32)
-            if (!(++occtime % 7))
+            if (!(++g.occtime % 7))
                 display_nhwindow(WIN_MAP, FALSE);
 #endif
             continue;
@@ -395,9 +395,9 @@ boolean resuming;
 
         u.umoved = FALSE;
 
-        if (multi > 0) {
+        if (g.multi > 0) {
             lookaround();
-            if (!multi) {
+            if (!g.multi) {
                 /* lookaround may clear multi */
                 context.move = 0;
                 if (flags.time)
@@ -405,15 +405,15 @@ boolean resuming;
                 continue;
             }
             if (context.mv) {
-                if (multi < COLNO && !--multi)
+                if (g.multi < COLNO && !--g.multi)
                     context.travel = context.travel1 = context.mv =
                         context.run = 0;
                 domove();
             } else {
-                --multi;
+                --g.multi;
                 rhack(save_cm);
             }
-        } else if (multi == 0) {
+        } else if (g.multi == 0) {
 #ifdef MAIL
             ckmailstatus();
 #endif
@@ -429,7 +429,7 @@ boolean resuming;
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!context.run || flags.runmode == RUN_TPORT)
-            && (multi && (!context.travel ? !(multi % 7) : !(moves % 7L)))) {
+            && (g.multi && (!context.travel ? !(g.multi % 7) : !(moves % 7L)))) {
             if (flags.time && context.run)
                 context.botl = 1;
             display_nhwindow(WIN_MAP, FALSE);
@@ -510,14 +510,14 @@ int wtcap;
 void
 stop_occupation()
 {
-    if (occupation) {
+    if (g.occupation) {
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", occtxt);
-        occupation = 0;
+        g.occupation = 0;
         context.botl = 1; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
-    } else if (multi >= 0) {
+    } else if (g.multi >= 0) {
         nomul(0);
     }
 }
@@ -728,7 +728,7 @@ STATIC_DCL void
 interrupt_multi(msg)
 const char *msg;
 {
-    if (multi > 0 && !context.travel && !context.run) {
+    if (g.multi > 0 && !context.travel && !context.run) {
         nomul(0);
         if (flags.verbose && msg)
             Norep("%s", msg);

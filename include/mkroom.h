@@ -106,7 +106,7 @@ enum roomtype_types {
 #define IS_SUBROOM_INDEX(x) ((x) > MAXNROFROOMS && (x) < (MAXNROFROOMS * 2))
 #define ROOM_INDEX(x) ((x) -rooms)
 #define SUBROOM_INDEX(x) ((x) -subrooms)
-#define IS_LAST_ROOM_PTR(x) (ROOM_INDEX(x) == nroom)
-#define IS_LAST_SUBROOM_PTR(x) (!nsubroom || SUBROOM_INDEX(x) == nsubroom)
+#define IS_LAST_ROOM_PTR(x) (ROOM_INDEX(x) == g.nroom)
+#define IS_LAST_SUBROOM_PTR(x) (!g.nsubroom || SUBROOM_INDEX(x) == g.nsubroom)
 
 #endif /* MKROOM_H */

@@ -1171,7 +1171,7 @@ aligntyp g_align;
                         || carrying(MAGIC_MARKER))
                         break;
                 }
-                otmp->otyp = rnd_class(bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
+                otmp->otyp = rnd_class(g.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
             }
             bless(otmp);
             at_your_feet("A spellbook");
@@ -1394,7 +1394,7 @@ dosacrifice()
                         dmon->mpeaceful = TRUE;
                     You("are terrified, and unable to move.");
                     nomul(-3);
-                    multi_reason = "being terrified of a demon";
+                    g.multi_reason = "being terrified of a demon";
                     nomovemsg = 0;
                 } else
                     pline_The("%s.", demonless_msg);
@@ -1833,9 +1833,9 @@ dopray()
         }
     }
     nomul(-3);
-    multi_reason = "praying";
+    g.multi_reason = "praying";
     nomovemsg = "You finish your prayer.";
-    afternmv = prayer_done;
+    g.afternmv = prayer_done;
 
     if (g.p_type == 3 && !Inhell) {
         /* if you've been true to your god you can't die while you pray */
@@ -2003,7 +2003,7 @@ doturn()
         }
     }
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
-    multi_reason = "trying to turn the monsters";
+    g.multi_reason = "trying to turn the monsters";
     nomovemsg = You_can_move_again;
     return 1;
 }
