@@ -679,7 +679,7 @@ struct instance_globals {
     int NDECL((*occupation));
     int NDECL((*afternmv));
     const char *hname; /* name of the game (argv[0] of main) */
-    int hackpid;
+    int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
     int bases[MAXOCLASSES];
     int multi;
