@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1545217597 2018/12/19 11:06:37 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1545269451 2018/12/20 01:30:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,6 +15,7 @@ STATIC_DCL boolean FDECL(find_guard_dest, (struct monst *, xchar *, xchar *));
 STATIC_DCL void FDECL(move_gold, (struct obj *, int));
 STATIC_DCL void FDECL(wallify_vault, (struct monst *));
 STATIC_DCL void FDECL(gd_mv_monaway, (struct monst *, int, int));
+STATIC_OVL void FDECL(gd_pick_corridor_gold, (struct monst *, int, int));
 
 void
 newegd(mtmp)
@@ -604,9 +605,9 @@ struct monst *grd;
 }
 
 STATIC_OVL void
-gd_mv_monaway(grd, nx,ny)
+gd_mv_monaway(grd, nx, ny)
 register struct monst *grd;
-int nx,ny;
+int nx, ny;
 {
     if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
         if (!Deaf)
@@ -614,6 +615,97 @@ int nx,ny;
         if (!rloc(m_at(nx, ny), FALSE) || MON_AT(nx, ny))
             m_into_limbo(m_at(nx, ny));
     }
+}
+
+/* have guard pick gold off the floor, possibly moving to the gold's
+   position before message and back to his current spot after */
+STATIC_OVL void
+gd_pick_corridor_gold(grd, goldx, goldy)
+struct monst *grd;
+int goldx, goldy; /* <gold->ox, gold->oy> */
+{
+    struct obj *gold;
+    coord newcc, bestcc;
+    int gdelta, newdelta, bestdelta, tryct,
+        guardx = grd->mx, guardy = grd->my;
+    boolean under_u = (goldx == u.ux && goldy == u.uy),
+            see_it = cansee(goldx, goldy);
+
+    if (under_u) {
+        /* Grab the gold from between the hero's feet.
+           If guard is two or more steps away; bring him closer first. */
+        gold = g_at(goldx, goldy);
+        if (!gold) {
+            impossible("vault guard: no gold at hero's feet?");
+            return;
+        }
+        gdelta = distu(guardx, guardy);
+        if (gdelta > 2 && see_it) { /* skip if player won't see it */
+            bestdelta = gdelta;
+            bestcc.x = (xchar) guardx, bestcc.y = (xchar) guardy;
+            tryct = 9;
+            do {
+                /* pick an available spot nearest the hero and also try
+                   to find the one meeting that criterium which is nearest
+                   the guard's current location */
+                if (enexto(&newcc, goldx, goldy, grd->data)) {
+                    if ((newdelta = distu(newcc.x, newcc.y)) < bestdelta
+                        || (newdelta == bestdelta
+                            && dist2(newcc.x, newcc.y, guardx, guardy)
+                               < dist2(bestcc.x, bestcc.y, guardx, guardy))) {
+                        bestdelta = newdelta;
+                        bestcc = newcc;
+                    }
+                }
+            } while (--tryct >= 0);
+
+            if (bestdelta < gdelta) {
+                remove_monster(guardx, guardy);
+                newsym(guardx, guardy);
+                place_monster(grd, (int) bestcc.x, (int) bestcc.y);
+                newsym(grd->mx, grd->my);
+            }
+        }
+        obj_extract_self(gold);
+        add_to_minv(grd, gold);
+        newsym(goldx, goldy);
+
+    /* guard is already at gold's location */
+    } else if (goldx == guardx && goldy == guardy) {
+        mpickgold(grd); /* does a newsym */
+
+    /* gold is at some third spot, neither guard's nor hero's */
+    } else {
+        /* just for insurance... */
+        gd_mv_monaway(grd, goldx, goldy); /* make room for guard */
+        if (see_it) { /* skip if player won't see the message */
+            remove_monster(grd->mx, grd->my);
+            newsym(grd->mx, grd->my);
+            place_monster(grd, goldx, goldy); /* sets <grd->mx, grd->my> */
+        }
+        mpickgold(grd); /* does a newsym */
+    }
+
+    if (see_it) { /* cansee(goldx, goldy) */
+        char monnambuf[BUFSZ];
+
+        Strcpy(monnambuf, Monnam(grd));
+        if (!strcmpi(monnambuf, "It"))
+            Strcpy(monnambuf, "Someone");
+        pline("%s%s picks up the gold%s.", monnambuf,
+              (grd->mpeaceful && EGD(grd)->warncnt > 5)
+                 ? " calms down and" : "",
+              under_u ? " from beneath you" : "");
+    }
+
+    /* if guard was moved to get the gold, move him back */
+    if (grd->mx != guardx || grd->my != guardy) {
+        remove_monster(grd->mx, grd->my);
+        newsym(grd->mx, grd->my);
+        place_monster(grd, guardx, guardy);
+        newsym(guardx, guardy);
+    }
+    return;
 }
 
 /*
@@ -774,35 +866,12 @@ register struct monst *grd;
             m = egrd->fakecorr[fci].fx;
             n = egrd->fakecorr[fci].fy;
             goldincorridor = TRUE;
+            break;
         }
+    /* new gold can appear if it was embedded in stone and hero kicks it
+       (on even via wish and drop) so don't assume hero has been warned */
     if (goldincorridor && !egrd->gddone) {
-        x = grd->mx;
-        y = grd->my;
-        if (m == u.ux && n == u.uy) {
-            struct obj *gold = g_at(m, n);
-            /* Grab the gold from between the hero's feet.  */
-            obj_extract_self(gold);
-            add_to_minv(grd, gold);
-            newsym(m, n);
-        } else if (m == x && n == y) {
-            mpickgold(grd); /* does a newsym */
-        } else {
-            /* just for insurance... */
-            gd_mv_monaway(grd, m,n);
-            remove_monster(grd->mx, grd->my);
-            newsym(grd->mx, grd->my);
-            place_monster(grd, m, n);
-            mpickgold(grd); /* does a newsym */
-        }
-        if (cansee(m, n))
-            pline("%s%s picks up the gold.", Monnam(grd),
-                  grd->mpeaceful ? " calms down and" : "");
-        if (x != grd->mx || y != grd->my) {
-            remove_monster(grd->mx, grd->my);
-            newsym(grd->mx, grd->my);
-            place_monster(grd, x, y);
-            newsym(x, y);
-        }
+        gd_pick_corridor_gold(grd, m, n);
         if (!grd->mpeaceful)
             return -1;
         egrd->warncnt = 5;
