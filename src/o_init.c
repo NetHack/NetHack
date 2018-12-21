@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1528332336 2018/06/07 00:45:36 $  $NHDT-Branch: NetHack-3.6.2 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1545383615 2018/12/21 09:13:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,8 +362,11 @@ boolean credit_hero;
                 exercise(A_WIS, TRUE);
         }
         /* moves==1L => initial inventory, gameover => final disclosure */
-        if (moves > 1L && !program_state.gameover)
+        if (moves > 1L && !program_state.gameover) {
+            if (objects[oindx].oc_class == GEM_CLASS)
+                gem_learned(oindx); /* could affect price of unpaid gems */
             update_inventory();
+        }
     }
 }
 
@@ -390,6 +393,9 @@ register int oindx;
             disco[dindx - 1] = 0;
         else
             impossible("named object not in disco");
+
+        if (objects[oindx].oc_class == GEM_CLASS)
+            gem_learned(oindx); /* ok, it's actually been unlearned */
         update_inventory();
     }
 }
