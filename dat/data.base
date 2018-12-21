@@ -1,5 +1,5 @@
 # NetHack 3.6	data.base
-# $NHDT-Date: 1524683801 2018/04/25 19:16:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $
+# $NHDT-Date: 1545359287 2018/12/21 02:28:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.87 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -1629,9 +1629,19 @@ eye of the aethiopica
 	the power to instantly open a portal to any other area of the
 	dungeon, allowing its invoker to travel quickly between
 	areas.
+# note:  The Eyes of the Overworld is the title of Jack Vance's sequel
+# to The Dying Earth and in it the 'Eyes' were separate "cusps" that
+# needed to be worn like contact lenses, one on each eyeball.  Wearing
+# just one and attempting to look with both eyes caused instant stun.
+# And when wearing two you couldn't see normal world, only a projection
+# of it that had similar topology but where everything was "better".
+# NetHack simplifies things:  a pair of lenses is a single item like
+# spectacles (eyeglasses), and the effect of wearing these lenses has
+# been changed to be useful to game play (Xray vision).  [The quote is
+# not derived from the book.]
 eyes of the overworld
-	... and finally there is "the Eyes of the Overworld".  This
-	obscure artifact pushes the wearer's view sense into the
+	The Eyes of the Overworld is a rather obscure artifact.
+	These magical lenses push the wearer's view sense into the
 	"overworld" -- another name for a segment of the Astral Plane.
 	Usually, there is nothing to be seen.  However, the wearer
 	is also able to look back and see the area around herself,
