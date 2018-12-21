@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1545259929 2018/12/19 22:52:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.275 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1545430257 2018/12/21 22:10:57 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.276 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -541,6 +541,12 @@ register struct monst *mtmp;
          * themselves  --ALI
          */
         if (!is_clinger(mtmp->data) && !likes_lava(mtmp->data)) {
+            /* not fair...?  hero doesn't automatically teleport away
+               from lava, just from water */
+            if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
+                if (rloc(mtmp, TRUE))
+                    return 0;
+            }
             if (!resists_fire(mtmp)) {
                 if (cansee(mtmp->mx, mtmp->my)) {
                     struct attack *dummy = &mtmp->data->mattk[0];
@@ -551,7 +557,14 @@ register struct monst *mtmp;
                              : !strcmp(how, "melting") ? "melts away"
                                 : "burns to a crisp");
                 }
-                mondead(mtmp);
+                /* unlike fire -> melt ice -> pool, there's no way for the
+                   hero to create lava beneath a monster, so the !mon_moving
+                   case is not expected to happen (and we haven't made a
+                   player-against-monster variation of the message above) */
+                if (context.mon_moving)
+                    mondead(mtmp);
+                else
+                    xkilled(mtmp, XKILL_NOMSG);
             } else {
                 mtmp->mhp -= 1;
                 if (DEADMONSTER(mtmp)) {
@@ -576,16 +589,29 @@ register struct monst *mtmp;
          */
         if (!is_clinger(mtmp->data) && !is_swimmer(mtmp->data)
             && !amphibious(mtmp->data)) {
+            /* like hero with teleport intrinsic or spell, teleport away
+               if possible */
+            if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
+                if (rloc(mtmp, TRUE))
+                    return 0;
+            }
             if (cansee(mtmp->mx, mtmp->my)) {
-                pline("%s drowns.", Monnam(mtmp));
+                if (context.mon_moving)
+                    pline("%s drowns.", Monnam(mtmp));
+                else
+                    /* hero used fire to melt ice that monster was on */
+                    You("drown %s.", mon_nam(mtmp));
             }
             if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
                 /* This can happen after a purple worm plucks you off a
-                flying steed while you are over water. */
+                   flying steed while you are over water. */
                 pline("%s sinks as %s rushes in and flushes you out.",
                       Monnam(mtmp), hliquid("water"));
             }
-            mondead(mtmp);
+            if (context.mon_moving)
+                mondead(mtmp);
+            else
+                xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp)) {
                 water_damage_chain(mtmp->minvent, FALSE);
                 (void) rloc(mtmp, FALSE);
