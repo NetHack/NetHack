@@ -1891,6 +1891,9 @@ grow_up(struct monst *mtmp, struct monst *victim)
         } else if (canspotmon(mtmp)) {
             char buf[BUFSZ];
 
+            if (Hallucination)
+                pline("What? %s is evolving!", Monnam(mtmp));
+
             /* 3.6.1:
              * Temporary (?) hack to fix growing into opposite gender.
              */
