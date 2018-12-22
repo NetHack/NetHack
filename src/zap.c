@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.302 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1545431660 2018/12/21 22:34:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4040,8 +4040,12 @@ boolean say; /* Announce out of sight hit/miss events if true */
         /* hit() and miss() need bhitpos to match the target */
         bhitpos.x = sx, bhitpos.y = sy;
         /* Fireballs only damage when they explode */
-        if (type != ZT_SPELL(ZT_FIRE))
+        if (type != ZT_SPELL(ZT_FIRE)) {
             range += zap_over_floor(sx, sy, type, &shopdamage, 0);
+            /* zap with fire -> melt ice -> drown monster, so monster
+               found and cached above might not be here any more */
+            mon = m_at(sx, sy);
+        }
 
         if (mon) {
             if (type == ZT_SPELL(ZT_FIRE))
@@ -4244,6 +4248,7 @@ const char *msg;
 {
     struct rm *lev = &levl[x][y];
     struct obj *otmp;
+    struct monst *mtmp;
 
     if (!msg)
         msg = "The ice crackles and melts.";
@@ -4281,6 +4286,8 @@ const char *msg;
     }
     if (x == u.ux && y == u.uy)
         spoteffects(TRUE); /* possibly drown, notice objects */
+    else if (is_pool(x, y) && (mtmp = m_at(x, y)) != 0)
+        (void) minliquid(mtmp);
 }
 
 #define MIN_ICE_TIME 50
@@ -4327,11 +4334,15 @@ long timeout UNUSED;
 {
     xchar x, y;
     long where = arg->a_long;
+    boolean save_mon_moving = context.mon_moving; /* will be False */
 
+    /* melt_ice -> minliquid -> mondead|xkilled shouldn't credit/blame hero */
+    context.mon_moving = TRUE; /* hero isn't causing this ice to melt */
     y = (xchar) (where & 0xFFFF);
     x = (xchar) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
     melt_ice(x, y, "Some ice melts away.");
+    context.mon_moving = save_mon_moving;
 }
 
 /* Burn floor scrolls, evaporate pools, etc... in a single square.
