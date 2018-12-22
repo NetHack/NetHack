@@ -299,6 +299,8 @@ unsigned nhUse_dummy = 0;
 
 #define IVMAGIC 0xdeadbeef
 
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+
 const struct instance_globals g_init = {
     /* apply.c */
     0,  /* jumping_is_magic */

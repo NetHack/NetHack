@@ -493,7 +493,7 @@ tty_start_screen()
     /* set up callback in case option is not set yet but toggled later */
     decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
 #endif
-    if (Cmd.num_pad)
+    if (g.Cmd.num_pad)
         tty_number_pad(1); /* make keypad send digits */
 }
 

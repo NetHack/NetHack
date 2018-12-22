@@ -92,8 +92,8 @@ char *argv[];
     }
 #endif
 
-    hname = argv[0];
-    hackpid = getpid();
+    g.hname = argv[0];
+    g.hackpid = getpid();
     (void) umask(0777 & ~FCMASK);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -152,7 +152,7 @@ char *argv[];
             initoptions();
 #endif
 #ifdef PANICTRACE
-            ARGV0 = hname; /* save for possible stack trace */
+            ARGV0 = g.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
             panictrace_setsignals(TRUE);
 #endif
@@ -180,7 +180,7 @@ char *argv[];
 #endif
     initoptions();
 #ifdef PANICTRACE
-    ARGV0 = hname; /* save for possible stack trace */
+    ARGV0 = g.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
     panictrace_setsignals(TRUE);
 #endif
