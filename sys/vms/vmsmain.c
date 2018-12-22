@@ -47,8 +47,8 @@ char *argv[];
     sys_early_init();
 
     atexit(byebye);
-    hname = argv[0];
-    hname = vms_basename(hname); /* name used in 'usage' type messages */
+    g.hname = argv[0];
+    g.hname = vms_basename(g.hname); /* name used in 'usage' type messages */
     hackpid = getpid();
     (void) umask(0);
 

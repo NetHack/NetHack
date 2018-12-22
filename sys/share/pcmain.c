@@ -131,11 +131,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #ifdef TOS
     long clock_time;
     if (*argv[0]) { /* only a CLI can give us argv[0] */
-        hname = argv[0];
+        g.hname = argv[0];
         run_from_desktop = FALSE;
     } else
 #endif
-        hname = "NetHack"; /* used for syntax messages */
+        g.hname = "NetHack"; /* used for syntax messages */
 
     choose_windows(DEFAULT_WINDOW_SYS);
 
@@ -675,12 +675,12 @@ nhusage()
      */
     (void) Sprintf(buf2, "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
                          "[maxrank] [name]...\n       or",
-                   hname);
+                   g.hname);
     ADD_USAGE(buf2);
 
     (void) Sprintf(
         buf2, "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
-        hname);
+        g.hname);
     ADD_USAGE(buf2);
 #ifdef NEWS
     ADD_USAGE(" [-n]");

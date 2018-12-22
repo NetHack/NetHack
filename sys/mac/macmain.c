@@ -43,12 +43,12 @@ main(void)
     windowprocs = mac_procs;
     InitMac();
 
-    hname = "Mac Hack";
+    g.hname = "Mac Hack";
     hackpid = getpid();
 
     setrandom();
     initoptions();
-    init_nhwindows(&argc, (char **) &hname);
+    init_nhwindows(&argc, (char **) &g.hname);
 
     /*
      * It seems you really want to play.
