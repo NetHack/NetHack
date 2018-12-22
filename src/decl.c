@@ -299,7 +299,9 @@ unsigned nhUse_dummy = 0;
 
 #define IVMAGIC 0xdeadbeef
 
+#ifdef GCC_WARN
 #pragma GCC diagnostic ignored "-Wmissing-braces"
+#endif
 
 const struct instance_globals g_init = {
     /* apply.c */
