@@ -171,16 +171,16 @@ vms_getchar()
         } else if (kb_buf == ESC || kb_buf == CSI || kb_buf == SS3) {
             switch (parse_function_key((int) kb_buf)) {
             case SMG$K_TRM_UP:
-                key = Cmd.move_N;
+                key = g.Cmd.move_N;
                 break;
             case SMG$K_TRM_DOWN:
-                key = Cmd.move_S;
+                key = g.Cmd.move_S;
                 break;
             case SMG$K_TRM_LEFT:
-                key = Cmd.move_W;
+                key = g.Cmd.move_W;
                 break;
             case SMG$K_TRM_RIGHT:
-                key = Cmd.move_E;
+                key = g.Cmd.move_E;
                 break;
             default:
                 key = ESC;
@@ -201,16 +201,16 @@ vms_getchar()
         smg$read_keystroke(&kb, &key);
         switch (key) {
         case SMG$K_TRM_UP:
-            key = Cmd.move_N;
+            key = g.Cmd.move_N;
             break;
         case SMG$K_TRM_DOWN:
-            key = Cmd.move_S;
+            key = g.Cmd.move_S;
             break;
         case SMG$K_TRM_LEFT:
-            key = Cmd.move_W;
+            key = g.Cmd.move_W;
             break;
         case SMG$K_TRM_RIGHT:
-            key = Cmd.move_E;
+            key = g.Cmd.move_E;
             break;
         case '\r':
             key = '\n';
