@@ -448,8 +448,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (fd < 0) {
         raw_print("Cannot create lock file");
     } else {
-        hackpid = 1;
-        write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
+        g.hackpid = 1;
+        write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
         nhclose(fd);
     }
 #ifdef MFLOPPY

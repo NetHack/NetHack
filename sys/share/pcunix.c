@@ -218,8 +218,8 @@ gotlock:
 #endif
         error("cannot creat file (%s.)", fq_lock);
     } else {
-        if (write(fd, (char *) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif

@@ -243,8 +243,8 @@ getlock(void)
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {

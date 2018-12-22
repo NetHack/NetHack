@@ -144,8 +144,8 @@ gotlock:
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (char *) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
+            != sizeof(g.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {
