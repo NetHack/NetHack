@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1544442712 2018/12/10 11:51:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1545439153 2018/12/22 00:39:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -252,6 +252,48 @@ struct monst *mon;
     }
 }
 
+/* killer bee 'mon' is on a spot containing lump of royal jelly 'obj' and
+   will eat it if there is no queen bee on the level; return 1: mon died,
+   0: mon ate jelly and lived; -1: mon didn't eat jelly to use its move */
+int
+bee_eat_jelly(mon, obj)
+struct monst *mon;
+struct obj *obj;
+{
+    int m_delay;
+    struct monst *mtmp = 0;
+
+    /* find a queen bee */
+    if ((mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            if (mtmp->data == &mons[PM_QUEEN_BEE])
+                break;
+        }
+    /* if there's no queen on the level, eat the royal jelly and become one */
+    if (!mtmp) {
+        m_delay = obj->blessed ? 3 : !obj->cursed ? 5 : 7;
+        if (obj->quan > 1L)
+            obj = splitobj(obj, 1L);
+        if (canseemon(mon))
+            pline("%s eats %s.", Monnam(mon), an(xname(obj)));
+        delobj(obj);
+
+        if ((int) mon->m_lev < mons[PM_QUEEN_BEE].mlevel - 1)
+            mon->m_lev = (uchar) (mons[PM_QUEEN_BEE].mlevel - 1);
+        /* there should be delay after eating, but that's too much
+           hassle; transform immediately, then have a short delay */
+        (void) grow_up(mon, (struct monst *) 0);
+
+        if (DEADMONSTER(mon))
+            return 1; /* dead; apparently queen bees have been genocided */
+        mon->mfrozen = m_delay, mon->mcanmove = 0;
+        return 0; /* bee used its move */
+    }
+    return -1; /* a queen is already present; ordinary bee hasn't moved yet */
+}
+
 #define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN]     \
                           && (uwep && artifact_light(uwep) && uwep->lamplit))
 /* we could include this in the above macro, but probably overkill/overhead */
@@ -369,7 +411,8 @@ register struct monst *mtmp;
 {
     register struct permonst *mdat;
     register int tmp = 0;
-    int inrange, nearby, scared;
+    int inrange, nearby, scared, res;
+    struct obj *otmp;
 
     /*  Pre-movement adjustments
      */
@@ -377,11 +420,10 @@ register struct monst *mtmp;
     mdat = mtmp->data;
 
     if (mtmp->mstrategy & STRAT_ARRIVE) {
-        int res = m_arrival(mtmp);
+        res = m_arrival(mtmp);
         if (res >= 0)
             return res;
     }
-
     /* check for waitmask status change */
     if ((mtmp->mstrategy & STRAT_WAITFORU)
         && (m_canseeu(mtmp) || mtmp->mhp < mtmp->mhpmax))
@@ -539,9 +581,9 @@ register struct monst *mtmp;
             }
         }
     }
-toofar:
+ toofar:
 
-    /* If monster is nearby you, and has to wield a weapon, do so.   This
+    /* If monster is nearby you, and has to wield a weapon, do so.  This
      * costs the monster a move, of course.
      */
     if ((!mtmp->mpeaceful || Conflict) && inrange
@@ -568,6 +610,14 @@ toofar:
 
     /*  Now the actual movement phase
      */
+
+    if (mdat == &mons[PM_KILLER_BEE]
+        /* could be smarter and deliberately move to royal jelly, but
+           then we'd need to scan the level for queen bee in advance;
+           avoid that overhead and rely on serendipity... */
+        && (otmp = sobj_at(LUMP_OF_ROYAL_JELLY, mtmp->mx, mtmp->my)) != 0
+        && (res = bee_eat_jelly(mtmp, otmp)) >= 0)
+        return res;
 
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))

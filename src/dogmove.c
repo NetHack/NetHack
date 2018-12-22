@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1502753407 2017/08/14 23:30:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1545439152 2018/12/22 00:39:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -208,7 +208,7 @@ boolean devour;
 {
     register struct edog *edog = EDOG(mtmp);
     boolean poly, grow, heal, eyes, slimer, deadmimic;
-    int nutrit;
+    int nutrit, res;
     long oprice;
     char objnambuf[BUFSZ];
 
@@ -247,6 +247,11 @@ boolean devour;
         newsym(x, y);
         newsym(mtmp->mx, mtmp->my);
     }
+    if (mtmp->data == &mons[PM_KILLER_BEE]
+        && obj->otyp == LUMP_OF_ROYAL_JELLY
+        && (res = bee_eat_jelly(mtmp, obj)) >= 0)
+        /* bypass most of dog_eat(), including apport update */
+        return (res + 1); /* 1 -> 2, 0 -> 1; -1, keep going */
 
     /* food items are eaten one at a time; entire stack for other stuff */
     if (obj->quan > 1L && obj->oclass == FOOD_CLASS)
@@ -376,8 +381,9 @@ struct edog *edog;
             else
                 You_feel("worried about %s.", y_monnam(mtmp));
             stop_occupation();
-        } else if (monstermoves > edog->hungrytime + 750 || DEADMONSTER(mtmp)) {
-        dog_died:
+        } else if (monstermoves > edog->hungrytime + 750
+                   || DEADMONSTER(mtmp)) {
+ dog_died:
             if (mtmp->mleashed && mtmp != u.usteed)
                 Your("leash goes slack.");
             else if (cansee(mtmp->mx, mtmp->my))
@@ -1181,7 +1187,7 @@ int after; /* this is extra fast monster movement */
         }
     }
 
-newdogpos:
+ newdogpos:
     if (nix != omx || niy != omy) {
         boolean wasseen;
 
@@ -1253,7 +1259,7 @@ newdogpos:
         }
         cc.x = mtmp->mx;
         cc.y = mtmp->my;
-    dognext:
+ dognext:
         if (!m_in_out_region(mtmp, nix, niy))
             return 1;
         remove_monster(mtmp->mx, mtmp->my);

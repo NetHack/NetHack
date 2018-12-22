@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1544998885 2018/12/16 22:21:25 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1545439153 2018/12/22 00:39:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1796,9 +1796,11 @@ struct monst *mtmp, *victim;
         return (struct permonst *) 0;
 
     /* note:  none of the monsters with special hit point calculations
-       have both little and big forms */
+       have both little and big forms (killer bee can't grow into queen
+       bee by just killing things, so isn't in the little_to_big list) */
     oldtype = monsndx(ptr);
-    newtype = little_to_big(oldtype);
+    newtype = (oldtype == PM_KILLER_BEE && !victim) ? PM_QUEEN_BEE
+                                                    : little_to_big(oldtype);
     if (newtype == PM_PRIEST && mtmp->female)
         newtype = PM_PRIESTESS;
 
