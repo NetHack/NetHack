@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1544666049 2018/12/13 01:54:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1545441042 2018/12/22 01:10:42 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -366,7 +366,7 @@ exercise_steed()
         return;
 
     /* It takes many turns of riding to exercise skill */
-    if (u.urideturns++ >= 100) {
+    if (++u.urideturns >= 100) {
         u.urideturns = 0;
         use_skill(P_RIDING, 1);
     }
