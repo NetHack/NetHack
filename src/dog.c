@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1543052701 2018/11/24 09:45:01 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1545439150 2018/12/22 00:39:10 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -757,6 +757,21 @@ register struct obj *obj;
         if ((obj->otyp == CORPSE || obj->otyp == EGG) && touch_petrifies(fptr)
             && !resists_ston(mon))
             return POISON;
+        if (obj->otyp == LUMP_OF_ROYAL_JELLY
+            && mon->data == &mons[PM_KILLER_BEE]) {
+            struct monst *mtmp = 0;
+
+            /* if there's a queen bee on the level, don't eat royal jelly;
+               if there isn't, do eat it and grow into a queen */
+            if ((mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+                    if (DEADMONSTER(mtmp))
+                        continue;
+                    if (mtmp->data == &mons[PM_QUEEN_BEE])
+                        break;
+                }
+            return !mtmp ? DOGFOOD : TABU;
+        }
         if (!carni && !herbi)
             return obj->cursed ? UNDEF : APPORT;
 
