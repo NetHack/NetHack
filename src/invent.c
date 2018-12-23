@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1545043772 2018/12/17 10:49:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1545597422 2018/12/23 20:37:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.245 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -975,9 +975,9 @@ const char *drop_fmt, *drop_arg, *hold_msg;
         }
     }
     if (Fumbling) {
-        if (drop_fmt)
-            pline(drop_fmt, drop_arg);
-        dropy(obj);
+        obj->nomerge = 1;
+        obj = addinv(obj); /* dropping expects obj to be in invent */
+        goto drop_it;
     } else {
         long oquan = obj->quan;
         int prev_encumbr = near_capacity(); /* before addinv() */
@@ -994,12 +994,10 @@ const char *drop_fmt, *drop_arg, *hold_msg;
         obj = addinv(obj);
         if (inv_cnt(FALSE) > 52 || ((obj->otyp != LOADSTONE || !obj->cursed)
                                     && near_capacity() > prev_encumbr)) {
-            if (drop_fmt)
-                pline(drop_fmt, drop_arg);
             /* undo any merge which took place */
             if (obj->quan > oquan)
                 obj = splitobj(obj, oquan);
-            dropx(obj);
+            goto drop_it;
         } else {
             if (flags.autoquiver && !uquiver && !obj->owornmask
                 && (is_missile(obj) || ammo_and_launcher(obj, uwep)
@@ -1010,6 +1008,18 @@ const char *drop_fmt, *drop_arg, *hold_msg;
         }
     }
     return obj;
+
+ drop_it:
+    if (drop_fmt)
+        pline(drop_fmt, drop_arg);
+    obj->nomerge = 0;
+    if (can_reach_floor(TRUE)) {
+        dropx(obj);
+    } else {
+        freeinv(obj);
+        hitfloor(obj, FALSE);
+    }
+    return (struct obj *) 0; /* might be gone */
 }
 
 /* useup() all of an item regardless of its quantity */
