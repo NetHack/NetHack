@@ -336,6 +336,7 @@ a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
 	meant to have color; that was due to an errant init_symbols() call
 	during the processing of symset:default done after RogueEpyx had
 	already been processed
+avoid potential segfault when doing 'more information' lookup
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status

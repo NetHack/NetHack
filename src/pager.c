@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1545361111 2018/12/21 02:58:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1545595360 2018/12/23 20:02:40 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -646,9 +646,9 @@ char *supplemental_name;
            The Eyes of the Overworld" simplified above to "lenses named
            The Eyes of the Overworld", now reduced to "The Eyes of the
            Overworld", skip "The" as with base name processing) */
-        if (!strncmpi(alt, "a ", 2)
-            || !strncmpi(alt, "an ", 3)
-            || !strncmpi(alt, "the ", 4))
+        if (alt && (!strncmpi(alt, "a ", 2)
+                    || !strncmpi(alt, "an ", 3)
+                    || !strncmpi(alt, "the ", 4)))
             alt = index(alt, ' ') + 1;
         /* remove charges or "(lit)" or wizmode "(N aum)" */
         if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
