@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1545525307 2018/12/23 00:35:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1545596010 2018/12/23 20:13:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1279,14 +1279,16 @@ register int after;
                 && ((levl[nix][niy].doormask & (D_LOCKED | D_CLOSED)) != 0)
                 && can_fog(mtmp)) {
                 if (sawmon) {
-                    remove_monster(nix, niy), place_monster(mtmp, omx, omy);
+                    remove_monster(nix, niy);
+                    place_monster(mtmp, omx, omy);
                     newsym(nix, niy), newsym(omx, omy);
                 }
                 if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD], sawmon)) {
                     ptr = mtmp->data; /* update cached value */
                 }
                 if (sawmon) {
-                    remove_monster(omx, omy), place_monster(mtmp, nix, niy);
+                    remove_monster(omx, omy);
+                    place_monster(mtmp, nix, niy);
                     newsym(omx, omy), newsym(nix, niy);
                 }
             }
