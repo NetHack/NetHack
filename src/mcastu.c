@@ -673,7 +673,7 @@ int spellnum;
             nomul(-dmg);
             g.multi_reason = "paralyzed by a monster";
         }
-        nomovemsg = 0;
+        g.nomovemsg = 0;
         dmg = 0;
         break;
     case CLC_CONFUSE_YOU:
@@ -855,7 +855,7 @@ register struct attack *mattk;
                 pline("%s zaps you with a %s!", Monnam(mtmp),
                       flash_types[ad_to_typ(mattk->adtyp)]);
             buzz(-ad_to_typ(mattk->adtyp), (int) mattk->damn, mtmp->mx,
-                 mtmp->my, sgn(tbx), sgn(tby));
+                 mtmp->my, sgn(g.tbx), sgn(g.tby));
         } else
             impossible("Monster spell %d cast", mattk->adtyp - 1);
     }

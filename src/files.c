@@ -738,7 +738,7 @@ d_level *lev;
        in the quest branch, skipping the boneid character 'Q' and the
        first letter of the role's filecode; bones loading still worked
        because the bonesid used for validation had the same error */
-    Sprintf(dptr, "%c%s", dungeons[lev->dnum].boneid,
+    Sprintf(dptr, "%c%s", g.dungeons[lev->dnum].boneid,
             In_quest(lev) ? urole.filecode : "0");
     if ((sptr = Is_special(lev)) != 0)
         Sprintf(eos(dptr), ".%c", sptr->boneid);
@@ -896,14 +896,14 @@ compress_bonesfile()
 
 /* ----------  BEGIN SAVE FILE HANDLING ----------- */
 
-/* set savefile name in OS-dependent manner from pre-existing plname,
+/* set savefile name in OS-dependent manner from pre-existing g.plname,
  * avoiding troublesome characters */
 void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
 #ifdef VMS
-    Sprintf(SAVEF, "[.save]%d%s", getuid(), plname);
+    Sprintf(SAVEF, "[.save]%d%s", getuid(), g.plname);
     if (regularize_it)
         regularize(SAVEF + 7);
     Strcat(SAVEF, ";1");
@@ -916,10 +916,10 @@ boolean regularize_it;
     {
         int i = strlen(SAVEP);
 #ifdef AMIGA
-        /* plname has to share space with SAVEP and ".sav" */
-        (void) strncat(SAVEF, plname, FILENAME - i - 4);
+        /* g.plname has to share space with SAVEP and ".sav" */
+        (void) strncat(SAVEF, g.plname, FILENAME - i - 4);
 #else
-        (void) strncat(SAVEF, plname, 8);
+        (void) strncat(SAVEF, g.plname, 8);
 #endif
         if (regularize_it)
             regularize(SAVEF + i);
@@ -935,14 +935,14 @@ boolean regularize_it;
 
         /* Obtain the name of the logged on user and incorporate
          * it into the name. */
-        Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
+        Sprintf(fnamebuf, "%s-%s", get_username(0), g.plname);
         if (regularize_it)
             ++legal; /* skip '*' wildcard character */
         (void) fname_encode(legal, '%', fnamebuf, encodedfnamebuf, BUFSZ);
         Sprintf(SAVEF, "%s%s", encodedfnamebuf, SAVE_EXTENSION);
     }
 #else  /* not VMS or MICRO or WIN32 */
-    Sprintf(SAVEF, "save/%d%s", (int) getuid(), plname);
+    Sprintf(SAVEF, "save/%d%s", (int) getuid(), g.plname);
     if (regularize_it)
         regularize(SAVEF + 5); /* avoid . or / in name */
 #endif /* WIN32 */
@@ -1130,7 +1130,7 @@ get_saved_games()
         char *foundfile;
         const char *fq_save;
 
-        Strcpy(plname, "*");
+        Strcpy(g.plname, "*");
         set_savefile_name(FALSE);
 #if defined(ZLIB_COMP)
         Strcat(SAVEF, COMPRESS_EXTENSION);
@@ -1200,7 +1200,7 @@ get_saved_games()
     }
 #endif
 #ifdef VMS
-    Strcpy(plname, "*");
+    Strcpy(g.plname, "*");
     set_savefile_name(FALSE);
     j = vms_get_saved_games(SAVEF, &result);
 #endif /* VMS */
@@ -2359,7 +2359,7 @@ char *origbuf;
 #endif /*NOCWD_ASSUMPTIONS*/
 
     } else if (match_varname(buf, "NAME", 4)) {
-        (void) strncpy(plname, bufp, PL_NSIZ - 1);
+        (void) strncpy(g.plname, bufp, PL_NSIZ - 1);
     } else if (match_varname(buf, "ROLE", 4)
                || match_varname(buf, "CHARACTER", 4)) {
         if ((len = str2role(bufp)) >= 0)
@@ -3540,7 +3540,7 @@ const char *reason; /* explanation */
         if (lfile) {
 #ifdef PANICLOG_FMT2
             (void) fprintf(lfile, "%ld %s: %s %s\n",
-                           ubirthday, (plname ? plname : "(none)"),
+                           ubirthday, (g.plname ? g.plname : "(none)"),
                            type, reason);
 #else
             time_t now = getnow();

@@ -405,8 +405,8 @@ register struct monst *mtmp;
     if (u.twoweap && !can_twoweapon())
         untwoweapon();
 
-    if (unweapon) {
-        unweapon = FALSE;
+    if (g.unweapon) {
+        g.unweapon = FALSE;
         if (flags.verbose) {
             if (uwep)
                 You("begin bashing monsters with %s.", yname(uwep));
@@ -752,7 +752,7 @@ int dieroll;
                           mon_nam(mon), more_than_1 ? "one of " : "",
                           yname(obj));
                     if (!more_than_1)
-                        uwepgone(); /* set unweapon */
+                        uwepgone(); /* set g.unweapon */
                     useup(obj);
                     if (!more_than_1)
                         obj = (struct obj *) 0;
@@ -934,7 +934,7 @@ int dieroll;
                     /* egg is always either used up or transformed, so next
                        hand-to-hand attack should yield a "bashing" mesg */
                     if (obj == uwep)
-                        unweapon = TRUE;
+                        g.unweapon = TRUE;
                     if (obj->spe && obj->corpsenm >= LOW_PM) {
                         if (obj->quan < 5L)
                             change_luck((schar) - (obj->quan));
@@ -1162,7 +1162,7 @@ int dieroll;
             /* (must be either primary or secondary weapon to get here) */
             u.twoweap = FALSE; /* untwoweapon() is too verbose here */
             if (obj == uwep)
-                uwepgone(); /* set unweapon */
+                uwepgone(); /* set g.unweapon */
             /* minor side-effect: broken lance won't split puddings */
             useup(obj);
             obj = 0;
@@ -1234,7 +1234,7 @@ int dieroll;
 
     if (!hittxt /*( thrown => obj exists )*/
         && (!destroyed
-            || (thrown && m_shot.n > 1 && m_shot.o == obj->otyp))) {
+            || (thrown && g.m_shot.n > 1 && g.m_shot.o == obj->otyp))) {
         if (thrown)
             hit(mshot_xname(obj), mon, exclam(tmp));
         else if (!flags.verbose)
@@ -2037,7 +2037,7 @@ register struct attack *mattk;
 #ifdef LINT /* static char msgbuf[BUFSZ]; */
     char msgbuf[BUFSZ];
 #else
-    static char msgbuf[BUFSZ]; /* for nomovemsg */
+    static char msgbuf[BUFSZ]; /* for g.nomovemsg */
 #endif
     register int tmp;
     register int dam = d((int) mattk->damn, (int) mattk->damd);
@@ -2145,7 +2145,7 @@ register struct attack *mattk;
                             tmp *= 2;
                         nomul(-tmp);
                         g.multi_reason = "digesting something";
-                        nomovemsg = msgbuf;
+                        g.nomovemsg = msgbuf;
                     } else
                         pline1(msgbuf);
                     if (pd == &mons[PM_GREEN_SLIME]) {
@@ -2647,7 +2647,7 @@ boolean wep_was_destroyed;
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
                         g.multi_reason = "frozen by a monster's gaze";
-                        nomovemsg = 0;
+                        g.nomovemsg = 0;
                     }
                 } else {
                     pline("%s cannot defend itself.",
@@ -2659,7 +2659,7 @@ boolean wep_was_destroyed;
                 You("momentarily stiffen.");
             } else { /* gelatinous cube */
                 You("are frozen by %s!", mon_nam(mon));
-                nomovemsg = You_can_move_again;
+                g.nomovemsg = You_can_move_again;
                 nomul(-tmp);
                 g.multi_reason = "frozen by a monster";
                 exercise(A_DEX, FALSE);

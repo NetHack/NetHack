@@ -520,7 +520,7 @@ int control;
     int oldseenv;                            /* previous seenv value */
 
     vision_full_recalc = 0; /* reset flag */
-    if (in_mklev || !iflags.vision_inited)
+    if (g.in_mklev || !iflags.vision_inited)
         return;
 
     /*

@@ -459,7 +459,7 @@ ghost_from_bottle()
         You("are frightened to death, and unable to move.");
     nomul(-3);
     g.multi_reason = "being frightened to death";
-    nomovemsg = "You regain your composure.";
+    g.nomovemsg = "You regain your composure.";
 }
 
 /* "Quaffing is like drinking, except you spill more." - Terry Pratchett */
@@ -686,7 +686,7 @@ register struct obj *otmp;
         if (otmp->cursed) {
             You("pass out.");
             g.multi = -rnd(15);
-            nomovemsg = "You awake with a headache.";
+            g.nomovemsg = "You awake with a headache.";
         }
         break;
     case POT_ENLIGHTENMENT:
@@ -780,7 +780,7 @@ register struct obj *otmp;
                      surface(u.ux, u.uy));
             nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
             g.multi_reason = "frozen by a potion";
-            nomovemsg = You_can_move_again;
+            g.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         }
         break;
@@ -1026,7 +1026,7 @@ register struct obj *otmp;
             if (BLevitation) {
                 ; /* rising via levitation is blocked */
             } else if ((u.ux == xupstair && u.uy == yupstair)
-                    || (sstairs.up && u.ux == sstairs.sx && u.uy == sstairs.sy)
+                    || (g.sstairs.up && u.ux == g.sstairs.sx && u.uy == g.sstairs.sy)
                     || (xupladder && u.ux == xupladder && u.uy == yupladder)) {
                 (void) doup();
                 /* in case we're already Levitating, which would have
@@ -1683,7 +1683,7 @@ register struct obj *obj;
             pline("%s seems to be holding you.", Something);
             nomul(-rnd(5));
             g.multi_reason = "frozen by a potion";
-            nomovemsg = You_can_move_again;
+            g.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
             You("stiffen momentarily.");
@@ -1694,7 +1694,7 @@ register struct obj *obj;
             You_feel("rather tired.");
             nomul(-rnd(5));
             g.multi_reason = "sleeping off a magical draught";
-            nomovemsg = You_can_move_again;
+            g.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
             You("yawn.");

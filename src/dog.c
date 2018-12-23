@@ -393,7 +393,7 @@ boolean with_you;
         xlocale = xdnladder, ylocale = ydnladder;
         break;
     case MIGR_SSTAIRS:
-        xlocale = sstairs.sx, ylocale = sstairs.sy;
+        xlocale = g.sstairs.sx, ylocale = g.sstairs.sy;
         break;
     case MIGR_PORTAL:
         if (In_endgame(&u.uz)) {
@@ -402,8 +402,8 @@ boolean with_you;
                that we know that the current endgame levels always
                build upwards and never have any exclusion subregion
                inside their TELEPORT_REGION settings. */
-            xlocale = rn1(updest.hx - updest.lx + 1, updest.lx);
-            ylocale = rn1(updest.hy - updest.ly + 1, updest.ly);
+            xlocale = rn1(g.updest.hx - g.updest.lx + 1, g.updest.lx);
+            ylocale = rn1(g.updest.hy - g.updest.ly + 1, g.updest.ly);
             break;
         }
         /* find the arrival portal */
@@ -944,7 +944,7 @@ register struct obj *obj;
         || (obj && dogfood(mtmp, obj) >= MANFOOD))
         return FALSE;
 
-    if (mtmp->m_id == quest_status.leader_m_id)
+    if (mtmp->m_id == g.quest_status.leader_m_id)
         return FALSE;
 
     /* add the pet extension */

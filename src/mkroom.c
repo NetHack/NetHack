@@ -617,7 +617,7 @@ register struct mkroom *sroom;
 {
     if (sroom == dnstairs_room)
         return TRUE;
-    if (sstairs.sx && !sstairs.up)
+    if (g.sstairs.sx && !g.sstairs.up)
         return (boolean) (sroom == sstairs_room);
     return FALSE;
 }
@@ -628,7 +628,7 @@ register struct mkroom *sroom;
 {
     if (sroom == upstairs_room)
         return TRUE;
-    if (sstairs.sx && sstairs.up)
+    if (g.sstairs.sx && g.sstairs.up)
         return (boolean) (sroom == sstairs_room);
     return FALSE;
 }

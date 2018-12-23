@@ -603,10 +603,10 @@ boolean adjacentok; /* False: at obj's spot only, True: nearby is allowed */
         if (mtmp->m_id) {
             mtmp2->m_id = mtmp->m_id;
             /* might be bringing quest leader back to life */
-            if (quest_status.leader_is_dead
+            if (g.quest_status.leader_is_dead
                 /* leader_is_dead implies leader_m_id is valid */
-                && mtmp2->m_id == quest_status.leader_m_id)
-                quest_status.leader_is_dead = FALSE;
+                && mtmp2->m_id == g.quest_status.leader_m_id)
+                g.quest_status.leader_is_dead = FALSE;
         }
         mtmp2->mx = mtmp->mx;
         mtmp2->my = mtmp->my;

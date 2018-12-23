@@ -665,7 +665,7 @@ struct obj *instr;
         if (c == 'q') {
             goto nevermind;
         } else if (c == 'y') {
-            Strcpy(buf, tune);
+            Strcpy(buf, g.tune);
         } else {
             getlin("What tune are you playing? [5 notes, A-G]", buf);
             (void) mungspaces(buf);
@@ -719,7 +719,7 @@ struct obj *instr;
          */
         if (Is_stronghold(&u.uz)) {
             exercise(A_WIS, TRUE); /* just for trying */
-            if (!strcmp(buf, tune)) {
+            if (!strcmp(buf, g.tune)) {
                 /* Search for the drawbridge */
                 for (y = u.uy - 1; y <= u.uy + 1; y++)
                     for (x = u.ux - 1; x <= u.ux + 1; x++)
@@ -756,13 +756,13 @@ struct obj *instr;
 
                     for (x = 0; x < (int) strlen(buf); x++)
                         if (x < 5) {
-                            if (buf[x] == tune[x]) {
+                            if (buf[x] == g.tune[x]) {
                                 gears++;
                                 matched[x] = TRUE;
                             } else
                                 for (y = 0; y < 5; y++)
-                                    if (!matched[y] && buf[x] == tune[y]
-                                        && buf[y] != tune[y]) {
+                                    if (!matched[y] && buf[x] == g.tune[y]
+                                        && buf[y] != g.tune[y]) {
                                         tumblers++;
                                         matched[y] = TRUE;
                                         break;

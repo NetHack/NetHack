@@ -328,7 +328,7 @@ register int fd, mode;
     savelevchn(fd, mode);
     bwrite(fd, (genericptr_t) &moves, sizeof moves);
     bwrite(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
-    bwrite(fd, (genericptr_t) &quest_status, sizeof(struct q_score));
+    bwrite(fd, (genericptr_t) &g.quest_status, sizeof(struct q_score));
     bwrite(fd, (genericptr_t) spl_book,
            sizeof(struct spell) * (MAXSPELL + 1));
     save_artifacts(fd);
@@ -337,8 +337,8 @@ register int fd, mode;
         bwrite(fd, (genericptr_t) &g.ustuck_id, sizeof g.ustuck_id);
     if (g.usteed_id)
         bwrite(fd, (genericptr_t) &g.usteed_id, sizeof g.usteed_id);
-    bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
-    bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
+    bwrite(fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
+    bwrite(fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
     savefruitchn(fd, mode);
     savenames(fd, mode);
     save_waterlevel(fd, mode);
@@ -505,13 +505,13 @@ int mode;
              (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     bwrite(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
     bwrite(fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
-    bwrite(fd, (genericptr_t) &upstair, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &dnstair, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &upladder, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &dnladder, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &sstairs, sizeof(stairway));
-    bwrite(fd, (genericptr_t) &updest, sizeof(dest_area));
-    bwrite(fd, (genericptr_t) &dndest, sizeof(dest_area));
+    bwrite(fd, (genericptr_t) &g.upstair, sizeof(stairway));
+    bwrite(fd, (genericptr_t) &g.dnstair, sizeof(stairway));
+    bwrite(fd, (genericptr_t) &g.upladder, sizeof(stairway));
+    bwrite(fd, (genericptr_t) &g.dnladder, sizeof(stairway));
+    bwrite(fd, (genericptr_t) &g.sstairs, sizeof(stairway));
+    bwrite(fd, (genericptr_t) &g.updest, sizeof(dest_area));
+    bwrite(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
     bwrite(fd, (genericptr_t) &level.flags, sizeof(level.flags));
     bwrite(fd, (genericptr_t) doors, sizeof(doors));
     save_rooms(fd); /* no dynamic memory to reclaim */
@@ -898,12 +898,12 @@ register int fd, mode;
     s_level *tmplev, *tmplev2;
     int cnt = 0;
 
-    for (tmplev = sp_levchn; tmplev; tmplev = tmplev->next)
+    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev->next)
         cnt++;
     if (perform_bwrite(mode))
         bwrite(fd, (genericptr_t) &cnt, sizeof(int));
 
-    for (tmplev = sp_levchn; tmplev; tmplev = tmplev2) {
+    for (tmplev = g.sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
         if (perform_bwrite(mode))
             bwrite(fd, (genericptr_t) tmplev, sizeof(s_level));
@@ -911,7 +911,7 @@ register int fd, mode;
             free((genericptr_t) tmplev);
     }
     if (release_data(mode))
-        sp_levchn = 0;
+        g.sp_levchn = 0;
 }
 
 /* used when saving a level and also when saving dungeon overview data */
@@ -1193,7 +1193,7 @@ int fd, mode;
     static struct fruit zerofruit;
     register struct fruit *f2, *f1;
 
-    f1 = ffruit;
+    f1 = g.ffruit;
     while (f1) {
         f2 = f1->nextf;
         if (f1->fid >= 0 && perform_bwrite(mode))
@@ -1205,7 +1205,7 @@ int fd, mode;
     if (perform_bwrite(mode))
         bwrite(fd, (genericptr_t) &zerofruit, sizeof zerofruit);
     if (release_data(mode))
-        ffruit = 0;
+        g.ffruit = 0;
 }
 
 void
@@ -1217,7 +1217,7 @@ int fd;
     bufoff(fd);
     /* bwrite() before bufon() uses plain write() */
     bwrite(fd, (genericptr_t) &plsiztmp, sizeof(plsiztmp));
-    bwrite(fd, (genericptr_t) plname, plsiztmp);
+    bwrite(fd, (genericptr_t) g.plname, plsiztmp);
     bufon(fd);
     return;
 }

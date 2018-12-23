@@ -420,7 +420,7 @@ invault()
 
         if (u.ualign.type == A_LAWFUL
             /* ignore trailing text, in case player includes rank */
-            && strncmpi(buf, plname, (int) strlen(plname)) != 0) {
+            && strncmpi(buf, g.plname, (int) strlen(g.plname)) != 0) {
             adjalign(-1); /* Liar! */
         }
 
@@ -1060,7 +1060,7 @@ paygd()
         gx = rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
-                plname, mons[u.umonster].mname);
+                g.plname, mons[u.umonster].mname);
         make_grave(gx, gy, buf);
     }
     for (coins = invent; coins; coins = nextcoins) {

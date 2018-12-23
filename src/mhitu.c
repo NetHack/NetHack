@@ -487,11 +487,11 @@ register struct monst *mtmp;
                         || u.umonnum == PM_TRAPPER)
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
-                              m_monnam(mtmp), youmonst.data->mname, plname);
+                              m_monnam(mtmp), youmonst.data->mname, g.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
-                              m_monnam(mtmp), youmonst.data->mname, plname,
+                              m_monnam(mtmp), youmonst.data->mname, g.plname,
                               doname(level.objects[u.ux][u.uy]));
                     if (obj)
                         obj->spe = save_spe;
@@ -514,7 +514,7 @@ register struct monst *mtmp;
             pline("It gets stuck on you.");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
-                  youmonst.data->mname, plname);
+                  youmonst.data->mname, g.plname);
         if (sticky)
             u.ustuck = mtmp;
         youmonst.m_ap_type = M_AP_NOTHING;
@@ -536,7 +536,7 @@ register struct monst *mtmp;
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
                   mimic_obj_name(&youmonst), an(mons[u.umonnum].mname),
-                  plname);
+                  g.plname);
         if (g.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
@@ -781,7 +781,7 @@ register struct monst *mtmp;
         if (sum[i] == 1) { /* successful attack */
             if (u.usleep && u.usleep < monstermoves && !rn2(10)) {
                 g.multi = -1;
-                nomovemsg = "The combat suddenly awakens you.";
+                g.nomovemsg = "The combat suddenly awakens you.";
             }
         }
         if (sum[i] == 2)
@@ -1165,7 +1165,7 @@ register struct attack *mattk;
                     You("are frozen!");
                 else
                     You("are frozen by %s!", mon_nam(mtmp));
-                nomovemsg = You_can_move_again;
+                g.nomovemsg = You_can_move_again;
                 nomul(-rnd(10));
                 g.multi_reason = "paralyzed by a monster";
                 exercise(A_DEX, FALSE);
@@ -2138,7 +2138,7 @@ struct attack *mattk;
             }
             if (useeit)
                 pline("%s is turned to stone!", Monnam(mtmp));
-            stoned = TRUE;
+            g.stoned = TRUE;
             killed(mtmp);
 
             if (!DEADMONSTER(mtmp))
@@ -2775,7 +2775,7 @@ struct attack *mattk;
                 return 1;
             }
             pline("%s turns to stone!", Monnam(mtmp));
-            stoned = 1;
+            g.stoned = 1;
             xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp))
                 return 1;
@@ -2909,7 +2909,7 @@ cloneu()
     if (!mon)
         return NULL;
     mon->mcloned = 1;
-    mon = christen_monst(mon, plname);
+    mon = christen_monst(mon, g.plname);
     initedog(mon);
     mon->m_lev = youmonst.data->mlevel;
     mon->mhpmax = u.mhmax;

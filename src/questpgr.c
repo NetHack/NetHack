@@ -289,9 +289,9 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
     } else {
-        godgend = (who == 'd') ? quest_status.godgend
-            : (who == 'l') ? quest_status.ldrgend
-            : (who == 'n') ? quest_status.nemgend
+        godgend = (who == 'd') ? g.quest_status.godgend
+            : (who == 'l') ? g.quest_status.ldrgend
+            : (who == 'n') ? g.quest_status.nemgend
             : 2; /* default to neuter */
         pnoun = (lwhich == 'h') ? genders[godgend].he
                 : (lwhich == 'i') ? genders[godgend].him
@@ -326,7 +326,7 @@ char c;
 
     switch (c) {
     case 'p':
-        str = plname;
+        str = g.plname;
         break;
     case 'c':
         str = (flags.female && urole.name.f) ? urole.name.f : urole.name.m;
@@ -398,7 +398,7 @@ char c;
         str = Blind ? "sense" : "see";
         break;
     case 'Z':
-        str = dungeons[0].dname;
+        str = g.dungeons[0].dname;
         break;
     case '%':
         str = "%";

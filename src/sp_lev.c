@@ -748,7 +748,7 @@ maybe_add_door(x, y, droom)
 int x, y;
 struct mkroom *droom;
 {
-    if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x, y))
+    if (droom->hx >= 0 && g.doorindex < DOORMAX && inside_room(droom, x, y))
         add_door(x, y, droom);
 }
 
@@ -1260,7 +1260,7 @@ xchar rtype, rlit;
     split_rects(r1, &r2);
 
     if (!vault) {
-        smeq[g.nroom] = g.nroom;
+        g.smeq[g.nroom] = g.nroom;
         add_room(xabs, yabs, xabs + wtmp - 1, yabs + htmp - 1, rlit, rtype,
                  FALSE);
     } else {
@@ -4650,7 +4650,7 @@ struct sp_coder *coder;
     if (irregular) {
         g.min_rx = g.max_rx = dx1;
         g.min_ry = g.max_ry = dy1;
-        smeq[g.nroom] = g.nroom;
+        g.smeq[g.nroom] = g.nroom;
         flood_fill_rm(dx1, dy1, g.nroom + ROOMOFFSET, OV_i(rlit), TRUE);
         add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OV_i(rtype),
                  TRUE);

@@ -715,7 +715,7 @@ time_t when; /* date+time at end of game */
     putstr(0, 0, "");
 
     /* character name and basic role info */
-    Sprintf(pbuf, "%s, %s %s %s %s", plname,
+    Sprintf(pbuf, "%s, %s %s %s %s", g.plname,
             aligns[1 - u.ualign.type].adj,
             genders[flags.female].adj,
             urace.adj,
@@ -846,7 +846,7 @@ int how;
     }
     if (how == CHOKING)
         init_uhunger();
-    nomovemsg = "You survived that attempt on your life.";
+    g.nomovemsg = "You survived that attempt on your life.";
     context.move = 0;
     if (g.multi > 0)
         g.multi = 0;
@@ -1270,8 +1270,8 @@ int how;
                        ? urace.femalenum
                        : urace.malenum;
         }
-        corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, plname);
-        Sprintf(pbuf, "%s, ", plname);
+        corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, g.plname);
+        Sprintf(pbuf, "%s, ", g.plname);
         formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
     }
@@ -1328,7 +1328,7 @@ int how;
 
     /* update gold for the rip output, which can't use hidden_gold()
        (containers will be gone by then if bones just got saved...) */
-    done_money = umoney;
+    g.done_money = umoney;
 
     /* clean up unneeded windows */
     if (have_windows) {
@@ -1374,7 +1374,7 @@ int how;
         /* don't bother counting to see whether it should be plural */
     }
 
-    Sprintf(pbuf, "%s %s the %s...", Goodbye(), plname,
+    Sprintf(pbuf, "%s %s the %s...", Goodbye(), g.plname,
             (how != ASCENDED)
                 ? (const char *) ((flags.female && urole.name.f)
                     ? urole.name.f
@@ -1484,7 +1484,7 @@ int how;
                     (u.uz.dlevel < 0) ? "passed away" : ends[how]);
         } else {
             /* more conventional demise */
-            const char *where = dungeons[u.uz.dnum].dname;
+            const char *where = g.dungeons[u.uz.dnum].dname;
 
             if (Is_astralevel(&u.uz))
                 where = "The Astral Plane";

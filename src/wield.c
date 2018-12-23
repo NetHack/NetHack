@@ -87,7 +87,7 @@ register struct obj *obj;
     struct obj *olduwep = uwep;
 
     if (obj == uwep)
-        return; /* necessary to not set unweapon */
+        return; /* necessary to not set g.unweapon */
     /* This message isn't printed in the caller because it happens
      * *whenever* Sunsword is unwielded, from whatever cause.
      */
@@ -106,12 +106,12 @@ register struct obj *obj;
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
      */
     if (obj) {
-        unweapon = (obj->oclass == WEAPON_CLASS)
+        g.unweapon = (obj->oclass == WEAPON_CLASS)
                        ? is_launcher(obj) || is_ammo(obj) || is_missile(obj)
                              || (is_pole(obj) && !u.usteed)
                        : !is_weptool(obj) && !is_wet_towel(obj);
     } else
-        unweapon = TRUE; /* for "bare hands" message */
+        g.unweapon = TRUE; /* for "bare hands" message */
 }
 
 STATIC_OVL boolean
@@ -275,7 +275,7 @@ dowield()
     else if (wep == uwep) {
         You("are already wielding that!");
         if (is_weptool(wep) || is_wet_towel(wep))
-            unweapon = FALSE; /* [see setuwep()] */
+            g.unweapon = FALSE; /* [see setuwep()] */
         return 0;
     } else if (welded(uwep)) {
         weldmsg(uwep);
@@ -591,7 +591,7 @@ const char *verb; /* "rub",&c */
     if (u.twoweap)
         untwoweapon();
     if (obj->oclass != WEAPON_CLASS)
-        unweapon = TRUE;
+        g.unweapon = TRUE;
     return TRUE;
 }
 
@@ -685,7 +685,7 @@ uwepgone()
                 pline("%s shining.", Tobjnam(uwep, "stop"));
         }
         setworn((struct obj *) 0, W_WEP);
-        unweapon = TRUE;
+        g.unweapon = TRUE;
         update_inventory();
     }
 }

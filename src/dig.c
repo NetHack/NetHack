@@ -1064,7 +1064,7 @@ struct obj *obj;
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
                 g.multi_reason = "stuck in a spider web";
-                nomovemsg = "You pull free.";
+                g.nomovemsg = "You pull free.";
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");
                 wake_nearby();
@@ -1645,13 +1645,13 @@ char *msg;
         else if (IS_ALTAR(ltyp))
             supporting = "altar";
         else if ((cc->x == xupstair && cc->y == yupstair)
-                 || (cc->x == sstairs.sx && cc->y == sstairs.sy
-                     && sstairs.up))
+                 || (cc->x == g.sstairs.sx && cc->y == g.sstairs.sy
+                     && g.sstairs.up))
             /* "staircase up" */
             supporting = "stairs";
         else if ((cc->x == xdnstair && cc->y == ydnstair)
-                 || (cc->x == sstairs.sx && cc->y == sstairs.sy
-                     && !sstairs.up))
+                 || (cc->x == g.sstairs.sx && cc->y == g.sstairs.sy
+                     && !g.sstairs.up))
             /* "staircase down" */
             supporting = "stairs";
         else if (ltyp == DRAWBRIDGE_DOWN   /* "lowered drawbridge" */

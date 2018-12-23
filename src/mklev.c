@@ -144,11 +144,11 @@ boolean is_room;
     croom->hy = hiy;
     croom->rtype = rtype;
     croom->doorct = 0;
-    /* if we're not making a vault, doorindex will still be 0
+    /* if we're not making a vault, g.doorindex will still be 0
      * if we are, we'll have problems adding niches to the previous room
-     * unless fdoor is at least doorindex
+     * unless fdoor is at least g.doorindex
      */
-    croom->fdoor = doorindex;
+    croom->fdoor = g.doorindex;
     croom->irregular = FALSE;
 
     croom->nsubrooms = 0;
@@ -253,7 +253,7 @@ boolean nxcor;
     /* find positions cc and tt for doors in croom and troom
        and direction for a corridor between them */
 
-    if (troom->hx < 0 || croom->hx < 0 || doorindex >= DOORMAX)
+    if (troom->hx < 0 || croom->hx < 0 || g.doorindex >= DOORMAX)
         return;
     if (troom->lx > croom->hx) {
         dx = 1;
@@ -306,10 +306,10 @@ boolean nxcor;
     if (okdoor(tt.x, tt.y) || !nxcor)
         dodoor(tt.x, tt.y, troom);
 
-    if (smeq[a] < smeq[b])
-        smeq[b] = smeq[a];
+    if (g.smeq[a] < g.smeq[b])
+        g.smeq[b] = g.smeq[a];
     else
-        smeq[a] = smeq[b];
+        g.smeq[a] = g.smeq[b];
 }
 
 void
@@ -324,12 +324,12 @@ makecorridors()
             break; /* allow some randomness */
     }
     for (a = 0; a < g.nroom - 2; a++)
-        if (smeq[a] != smeq[a + 2])
+        if (g.smeq[a] != g.smeq[a + 2])
             join(a, a + 2, FALSE);
     for (a = 0; any && a < g.nroom; a++) {
         any = FALSE;
         for (b = 0; b < g.nroom; b++)
-            if (smeq[a] != smeq[b]) {
+            if (g.smeq[a] != g.smeq[b]) {
                 join(a, b, FALSE);
                 any = TRUE;
             }
@@ -354,11 +354,11 @@ register struct mkroom *aroom;
     int i;
 
     if (aroom->doorct == 0)
-        aroom->fdoor = doorindex;
+        aroom->fdoor = g.doorindex;
 
     aroom->doorct++;
 
-    for (tmp = doorindex; tmp > aroom->fdoor; tmp--)
+    for (tmp = g.doorindex; tmp > aroom->fdoor; tmp--)
         doors[tmp] = doors[tmp - 1];
 
     for (i = 0; i < g.nroom; i++) {
@@ -372,7 +372,7 @@ register struct mkroom *aroom;
             broom->fdoor++;
     }
 
-    doorindex++;
+    g.doorindex++;
     doors[aroom->fdoor].x = x;
     doors[aroom->fdoor].y = y;
 }
@@ -487,7 +487,7 @@ int trap_type;
     int dy, xx, yy;
     struct trap *ttmp;
 
-    if (doorindex < DOORMAX) {
+    if (g.doorindex < DOORMAX) {
         while (vct--) {
             aroom = &rooms[rn2(g.nroom)];
             if (aroom->rtype != OROOM)
@@ -628,11 +628,11 @@ clear_level_structures()
     rooms[0].hx = -1;
     g.nsubroom = 0;
     subrooms[0].hx = -1;
-    doorindex = 0;
+    g.doorindex = 0;
     init_rect();
     init_vault();
     xdnstair = ydnstair = xupstair = yupstair = 0;
-    sstairs.sx = sstairs.sy = 0;
+    g.sstairs.sx = g.sstairs.sy = 0;
     xdnladder = ydnladder = xupladder = yupladder = 0;
     g.made_branch = FALSE;
     clear_regions();
@@ -660,7 +660,7 @@ makelevel()
         if (slev && !Is_rogue_level(&u.uz)) {
             makemaz(slev->proto);
             return;
-        } else if (dungeons[u.uz.dnum].proto[0]) {
+        } else if (g.dungeons[u.uz.dnum].proto[0]) {
             makemaz("");
             return;
         } else if (In_mines(&u.uz)) {
@@ -984,11 +984,11 @@ mklev()
     if (getbones())
         return;
 
-    in_mklev = TRUE;
+    g.in_mklev = TRUE;
     makelevel();
     bound_digging();
     mineralize(-1, -1, -1, -1, FALSE);
-    in_mklev = FALSE;
+    g.in_mklev = FALSE;
     /* has_morgue gets cleared once morgue is entered; graveyard stays
        set (graveyard might already be set even when has_morgue is clear
        [see fixup_special()], so don't update it unconditionally) */
@@ -1161,14 +1161,14 @@ xchar x, y; /* location */
     if (br->type == BR_PORTAL) {
         mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
-        sstairs.sx = x;
-        sstairs.sy = y;
-        sstairs.up =
+        g.sstairs.sx = x;
+        g.sstairs.sy = y;
+        g.sstairs.up =
             (char) on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
-        assign_level(&sstairs.tolev, dest);
+        assign_level(&g.sstairs.tolev, dest);
         sstairs_room = br_room;
 
-        levl[x][y].ladder = sstairs.up ? LA_UP : LA_DOWN;
+        levl[x][y].ladder = g.sstairs.up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
     }
     /*
@@ -1217,7 +1217,7 @@ xchar x, y;
     boolean near_door = bydoor(x, y);
 
     return ((levl[x][y].typ == HWALL || levl[x][y].typ == VWALL)
-            && doorindex < DOORMAX && !near_door);
+            && g.doorindex < DOORMAX && !near_door);
 }
 
 void
@@ -1225,7 +1225,7 @@ dodoor(x, y, aroom)
 int x, y;
 struct mkroom *aroom;
 {
-    if (doorindex >= DOORMAX) {
+    if (g.doorindex >= DOORMAX) {
         impossible("DOORMAX exceeded?");
         return;
     }
@@ -1661,8 +1661,8 @@ struct mkroom *croom;
 
 /*
  * Major level transmutation: add a set of stairs (to the Sanctum) after
- * an earthquake that leaves behind a a new topology, centered at inv_pos.
- * Assumes there are no rooms within the invocation area and that inv_pos
+ * an earthquake that leaves behind a a new topology, centered at g.inv_pos.
+ * Assumes there are no rooms within the invocation area and that g.inv_pos
  * is not too close to the edge of the map.  Also assume the hero can see,
  * which is guaranteed for normal play due to the fact that sight is needed
  * to read the Book of the Dead.
@@ -1671,8 +1671,8 @@ void
 mkinvokearea()
 {
     int dist;
-    xchar xmin = inv_pos.x, xmax = inv_pos.x;
-    xchar ymin = inv_pos.y, ymax = inv_pos.y;
+    xchar xmin = g.inv_pos.x, xmax = g.inv_pos.x;
+    xchar ymin = g.inv_pos.y, ymax = g.inv_pos.y;
     register xchar i;
 
     pline_The("floor shakes violently under you!");

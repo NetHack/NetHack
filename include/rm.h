@@ -534,7 +534,7 @@ struct damage {
    an existing bones level; if so, most recent victim will be first in list */
 struct cemetery {
     struct cemetery *next; /* next struct is previous dead character... */
-    /* "plname" + "-ROLe" + "-RACe" + "-GENder" + "-ALIgnment" + \0 */
+    /* "g.plname" + "-ROLe" + "-RACe" + "-GENder" + "-ALIgnment" + \0 */
     char who[PL_NSIZ + 4 * (1 + 3) + 1];
     /* death reason, same as in score/log file */
     char how[100 + 1]; /* [DTHSZ+1] */

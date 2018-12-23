@@ -636,7 +636,7 @@ struct mkroom *sroom;
             pline("Where is shopdoor?");
             pline("Room at (%d,%d),(%d,%d).", sroom->lx, sroom->ly, sroom->hx,
                   sroom->hy);
-            pline("doormax=%d doorct=%d fdoor=%d", doorindex, sroom->doorct,
+            pline("doormax=%d doorct=%d fdoor=%d", g.doorindex, sroom->doorct,
                   sh);
             while (j--) {
                 pline("door [%d,%d]", doors[sh].x, doors[sh].y);

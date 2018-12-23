@@ -424,7 +424,7 @@ gotobj:
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
                 g.multi_reason = "taking off clothes";
-                nomovemsg = 0;
+                g.nomovemsg = 0;
                 remove_worn_item(otmp, TRUE);
                 otmp->cursed = curssv;
                 if (g.multi < 0) {

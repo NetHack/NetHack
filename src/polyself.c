@@ -251,9 +251,9 @@ change_sex()
         u.mfemale = !u.mfemale;
     max_rank_sz(); /* [this appears to be superfluous] */
     if ((already_polyd ? u.mfemale : flags.female) && urole.name.f)
-        Strcpy(pl_character, urole.name.f);
+        Strcpy(g.pl_character, urole.name.f);
     else
-        Strcpy(pl_character, urole.name.m);
+        Strcpy(g.pl_character, urole.name.m);
     u.umonster = ((already_polyd ? u.mfemale : flags.female)
                   && urole.femalenum != NON_PM)
                      ? urole.femalenum
@@ -1385,7 +1385,7 @@ dogaze()
                                        (int) mtmp->data->mattk[0].damd)
                                   : -200);
                         g.multi_reason = "frozen by a monster's gaze";
-                        nomovemsg = 0;
+                        g.nomovemsg = 0;
                         return 1;
                     } else
                         You("stiffen momentarily under %s gaze.",

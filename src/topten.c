@@ -333,7 +333,7 @@ struct toptenentry *tt;
 
 #ifdef XLOGFILE
 
-/* as tab is never used in eg. plname or death, no need to mangle those. */
+/* as tab is never used in eg. g.plname or death, no need to mangle those. */
 STATIC_OVL void
 writexlentry(rfile, tt, how)
 FILE *rfile;
@@ -361,7 +361,7 @@ int how;
     formatkiller(tmpbuf, sizeof tmpbuf, how, FALSE);
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
-            XLOG_SEP, plname, XLOG_SEP, tmpbuf);
+            XLOG_SEP, g.plname, XLOG_SEP, tmpbuf);
     if (g.multi)
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 g.multi_reason ? g.multi_reason : "helpless");
@@ -551,7 +551,7 @@ time_t when;
     copynchars(t0->plrace, urace.filecode, ROLESZ);
     copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
     copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
-    copynchars(t0->name, plname, NAMSZ);
+    copynchars(t0->name, g.plname, NAMSZ);
     formatkiller(t0->death, sizeof t0->death, how, TRUE);
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
@@ -880,7 +880,7 @@ boolean so;
             }
             Sprintf(eos(linebuf), fmt, arg);
         } else {
-            Sprintf(eos(linebuf), " in %s", dungeons[t1->deathdnum].dname);
+            Sprintf(eos(linebuf), " in %s", g.dungeons[t1->deathdnum].dname);
             if (t1->deathdnum != knox_level.dnum)
                 Sprintf(eos(linebuf), " on level %d", t1->deathlev);
             if (t1->deathlev != t1->maxlvl)
@@ -1061,7 +1061,7 @@ char **argv;
             playerct = 0;
             players = (const char **) 0;
         } else {
-            player0 = plname;
+            player0 = g.plname;
             if (!*player0)
 #ifdef AMIGA
                 player0 = "all"; /* single user system */

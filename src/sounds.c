@@ -505,7 +505,7 @@ register struct monst *mtmp;
         return 0;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
-    if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
+    if (mtmp->m_id == g.quest_status.leader_m_id && msound > MS_ANIMAL)
         msound = MS_LEADER;
     /* make sure it's your role's quest guardian; adjust if not */
     else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
@@ -720,7 +720,7 @@ register struct monst *mtmp;
         You("freeze for a moment.");
         nomul(-2);
         g.multi_reason = "scared by rattling";
-        nomovemsg = 0;
+        g.nomovemsg = 0;
         break;
     case MS_LAUGH: {
         static const char *const laugh_msg[4] = {

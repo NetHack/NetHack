@@ -19,26 +19,8 @@ char *catmore = 0; /* default pager */
  */
 struct dgn_topology dungeon_topology = { DUMMY };
 
-struct q_score quest_status = DUMMY;
-
-NEARDATA int smeq[MAXNROFROOMS + 1] = DUMMY;
-NEARDATA int doorindex = 0;
-NEARDATA char *save_cm = 0;
-
 NEARDATA struct kinfo killer = DUMMY;
-NEARDATA long done_money = 0;
-const char *nomovemsg = 0;
-NEARDATA char plname[PL_NSIZ] = DUMMY; /* player name */
-NEARDATA char pl_character[PL_CSIZ] = DUMMY;
-NEARDATA char pl_race = '\0';
 
-NEARDATA char pl_fruit[PL_FSIZ] = DUMMY;
-NEARDATA struct fruit *ffruit = (struct fruit *) 0;
-
-NEARDATA char tune[6] = DUMMY;
-NEARDATA boolean ransacked = 0;
-
-const char *occtxt = DUMMY;
 const char quitchars[] = " \r\n\033";
 const char vowels[] = "aeiouAEIOU";
 const char ynchars[] = "yn";
@@ -72,30 +54,6 @@ NEARDATA struct sinfo program_state;
 const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
-
-NEARDATA schar tbx = 0, tby = 0; /* mthrowu: target */
-
-/* for xname handling of multiple shot missile volleys:
-   number of shots, index of current one, validity check, shoot vs throw */
-NEARDATA struct multishot m_shot = { 0, 0, STRANGE_OBJECT, FALSE };
-
-NEARDATA dungeon dungeons[MAXDUNGEON]; /* ini'ed by init_dungeon() */
-NEARDATA s_level *sp_levchn;
-NEARDATA stairway upstair = { 0, 0, { 0, 0 }, 0 },
-                  dnstair = { 0, 0, { 0, 0 }, 0 };
-NEARDATA stairway upladder = { 0, 0, { 0, 0 }, 0 },
-                  dnladder = { 0, 0, { 0, 0 }, 0 };
-NEARDATA stairway sstairs = { 0, 0, { 0, 0 }, 0 };
-NEARDATA dest_area updest = { 0, 0, 0, 0, 0, 0, 0, 0 };
-NEARDATA dest_area dndest = { 0, 0, 0, 0, 0, 0, 0, 0 };
-NEARDATA coord inv_pos = { 0, 0 };
-
-NEARDATA boolean defer_see_monsters = FALSE;
-NEARDATA boolean in_mklev = FALSE;
-NEARDATA boolean stoned = FALSE; /* done to monsters hit by 'c' */
-NEARDATA boolean unweapon = FALSE;
-NEARDATA boolean mrg_to_wielded = FALSE;
-/* weapon picked is merged with wielded one */
 
 NEARDATA boolean in_steed_dismounting = FALSE;
 
@@ -339,7 +297,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* last_multi */
 
     /* dbridge.c */
-    UNDEFINED_VALUES,
+    UNDEFINED_VALUES, /* occupants */
 
     /* decl.c */
     UNDEFINED_PTR, /* occupation */
@@ -359,14 +317,45 @@ const struct instance_globals g_init = {
     (ROWNO - 1) & ~1, /* y_maze_max */
     UNDEFINED_VALUE, /* otg_temp */
     0, /* in_doagain */
+    DUMMY, /* dnstair */
+    DUMMY, /* upstair */
+    DUMMY, /* dnladder */
+    DUMMY, /* upladder */
+    DUMMY, /* smeq */
+    0, /* doorindex */
+    NULL, /* save_cm */
+    0, /* done_money */
+    NULL, /* nomovemsg */
+    DUMMY, /* plname */
+    DUMMY, /* pl_character */
+    '\0', /* pl_race */
+    DUMMY, /* pl_fruit */
+    NULL, /* ffruit */
+    DUMMY, /* tune */
+    NULL, /* occtxt */
+    0, /* tbx */
+    0, /* tby */
+    UNDEFINED_PTR, /* sp_levchn */
+    { 0, 0, STRANGE_OBJECT, FALSE }, /* m_shot */
+    UNDEFINED_VALUES, /* dungeons */
+    { 0, 0, { 0, 0 }, 0 }, /* sstairs */
+    { 0, 0, 0, 0, 0, 0, 0, 0 }, /* updest */
+    { 0, 0, 0, 0, 0, 0, 0, 0 }, /* dndest */
+    { 0, 0} , /* inv_pos */
+    FALSE, /* defer_see_monsters */
+    FALSE, /* in_mklev */
+    FALSE, /* stoned */
+    FALSE, /* unweapon */
+    FALSE, /* mrg_to_wielded */
+
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
 
     /* display.c */
-    UNDEFINED_VALUES,
-    UNDEFINED_VALUES,
-    UNDEFINED_VALUES,
+    UNDEFINED_VALUES, /* gbuf */
+    UNDEFINED_VALUES, /* gbuf_start */
+    UNDEFINED_VALUES, /* gbug_stop */
 
     /* do.c */
     FALSE, /* at_ladder */
@@ -486,6 +475,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ymin */
     UNDEFINED_VALUE, /* xmax */
     UNDEFINED_VALUE, /* ymax */
+    0, /* ransacked */
 
     /* mon.c */
     UNDEFINED_VALUE, /* vamp_rise_msg */
@@ -541,6 +531,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* p_aligntyp */
     UNDEFINED_VALUE, /* p_trouble */
     UNDEFINED_VALUE, /* p_type */
+
+    /* quest.c */
+    DUMMY, /* quest_status */
 
     /* questpgr.c */
     UNDEFINED_VALUES, /* cvt_buf */

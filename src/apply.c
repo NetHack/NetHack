@@ -843,7 +843,7 @@ struct obj *obj;
                         nomul(-rnd(MAXULEV + 6 - u.ulevel));
                         g.multi_reason = "gazing into a mirror";
                     }
-                    nomovemsg = 0; /* default, "you can move again" */
+                    g.nomovemsg = 0; /* default, "you can move again" */
                 }
             } else if (youmonst.data->mlet == S_VAMPIRE)
                 You("don't have a reflection.");
@@ -919,7 +919,7 @@ struct obj *obj;
             return 1;
         if (vis)
             pline("%s is turned to stone!", Monnam(mtmp));
-        stoned = TRUE;
+        g.stoned = TRUE;
         killed(mtmp);
     } else if (monable && mtmp->data == &mons[PM_FLOATING_EYE]) {
         int tmp = d((int) mtmp->m_lev, (int) mtmp->data->mattk[0].damd);
@@ -1028,7 +1028,7 @@ struct obj **optr;
                     mon_adjust_speed(mtmp, 2, (struct obj *) 0);
                     break;
                 case 2: /* no explanation; it just happens... */
-                    nomovemsg = "";
+                    g.nomovemsg = "";
                     g.multi_reason = NULL;
                     nomul(-rnd(2));
                     break;
@@ -1787,7 +1787,7 @@ int magic; /* 0=Physical, otherwise skill level */
         sokoban_guilt();
         nomul(-1);
         g.multi_reason = "jumping around";
-        nomovemsg = "";
+        g.nomovemsg = "";
         morehungry(rnd(25));
         return 1;
     }

@@ -890,7 +890,7 @@ makepicks:
             Sprintf(plbuf, " %s", genders[GEND].adj);
         else
             *plbuf = '\0'; /* omit redundant gender */
-        Sprintf(pbuf, "%s, %s%s %s %s", plname, aligns[ALGN].adj, plbuf,
+        Sprintf(pbuf, "%s, %s%s %s %s", g.plname, aligns[ALGN].adj, plbuf,
                 races[RACE].adj,
                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                                                   : roles[ROLE].name.m);
@@ -940,8 +940,8 @@ makepicks:
                GEND, ALGN; we'll override that and honor only the name */
             saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
                 saveALGN = ALGN;
-            *plname = '\0';
-            plnamesuffix(); /* calls askname() when plname[] is empty */
+            *g.plname = '\0';
+            plnamesuffix(); /* calls askname() when g.plname[] is empty */
             ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
                 ALGN = saveALGN;
             break; /* getconfirmation is still True */
@@ -1167,7 +1167,7 @@ int role, race, gend;
 }
 
 /*
- * plname is filled either by an option (-u Player  or  -uPlayer) or
+ * g.plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before display_gamewindows().
@@ -1187,7 +1187,7 @@ tty_askname()
         case 0:
             break; /* no game chosen; start new game */
         case 1:
-            return; /* plname[] has been set */
+            return; /* g.plname[] has been set */
         }
 #endif /* SELECTSAVED */
 
@@ -1250,7 +1250,7 @@ tty_askname()
                     !(c >= '0' && c <= '9' && ct > 0))
                     c = '_';
 #endif
-            if (ct < (int) (sizeof plname) - 1) {
+            if (ct < (int) (sizeof g.plname) - 1) {
 #if defined(MICRO)
 #if defined(MSDOS)
                 if (iflags.grmode) {
@@ -1261,13 +1261,13 @@ tty_askname()
 #else
                 (void) putchar(c);
 #endif
-                plname[ct++] = c;
+                g.plname[ct++] = c;
 #ifdef WIN32CON
                 ttyDisplay->curx++;
 #endif
             }
         }
-        plname[ct] = 0;
+        g.plname[ct] = 0;
     } while (ct == 0);
 
     /* move to next line to simulate echo of user's <return> */

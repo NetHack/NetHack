@@ -249,7 +249,7 @@ struct obj *otmp, *mwep;
                      mtarg ? mtarg->my : mtmp->muy),
         multishot = monmulti(mtmp, otmp, mwep);
         /*
-         * Caller must have called linedup() to set up tbx, tby.
+         * Caller must have called linedup() to set up g.tbx, g.tby.
          */
 
     if (canseemon(mtmp)) {
@@ -266,33 +266,33 @@ struct obj *otmp, *mwep;
             onm = singular(otmp, xname);
             onm = obj_is_pname(otmp) ? the(onm) : an(onm);
         }
-        m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
+        g.m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
         Strcpy(trgbuf, mtarg ? mon_nam(mtarg) : "");
         if (!strcmp(trgbuf, "it"))
             Strcpy(trgbuf, humanoid(mtmp->data) ? "someone" : something);
         pline("%s %s %s%s%s!", Monnam(mtmp),
-              m_shot.s ? "shoots" : "throws", onm,
+              g.m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);
-        m_shot.o = otmp->otyp;
+        g.m_shot.o = otmp->otyp;
     } else {
-        m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
+        g.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
     }
-    m_shot.n = multishot;
-    for (m_shot.i = 1; m_shot.i <= m_shot.n; m_shot.i++) {
-        m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby), dm, otmp);
+    g.m_shot.n = multishot;
+    for (g.m_shot.i = 1; g.m_shot.i <= g.m_shot.n; g.m_shot.i++) {
+        m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), dm, otmp);
         /* conceptually all N missiles are in flight at once, but
            if mtmp gets killed (shot kills adjacent gas spore and
            triggers explosion, perhaps), inventory will be dropped
            and otmp might go away via merging into another stack */
-        if (DEADMONSTER(mtmp) && m_shot.i < m_shot.n)
+        if (DEADMONSTER(mtmp) && g.m_shot.i < g.m_shot.n)
             /* cancel pending shots (perhaps ought to give a message here
                since we gave one above about throwing/shooting N missiles) */
             break; /* endmultishot(FALSE); */
     }
-    /* reset 'm_shot' */
-    m_shot.n = m_shot.i = 0;
-    m_shot.o = STRANGE_OBJECT;
-    m_shot.s = FALSE;
+    /* reset 'g.m_shot' */
+    g.m_shot.n = g.m_shot.i = 0;
+    g.m_shot.o = STRANGE_OBJECT;
+    g.m_shot.s = FALSE;
 }
 
 /* an object launched by someone/thing other than player attacks a monster;
@@ -653,7 +653,7 @@ struct obj *obj;         /* missile (or stack providing it) */
         if (!range /* reached end of path */
             || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
-                if (m_shot.n > 1
+                if (g.m_shot.n > 1
                     && (!mesg_given || bhitpos.x != u.ux || bhitpos.y != u.uy)
                     && (cansee(bhitpos.x, bhitpos.y)
                         || (archer && canseemon(archer))))
@@ -759,7 +759,7 @@ struct attack *mattk;
             if (canseemon(mtmp))
                 pline("%s spits venom!", Monnam(mtmp));
             target = mtarg;
-            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
+            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
                     distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
             target = (struct monst *)0;
             nomul(0);
@@ -804,7 +804,7 @@ struct attack  *mattk;
                 if (canseemon(mtmp))
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
                 dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
-                       mtmp->mx, mtmp->my, sgn(tbx), sgn(tby), FALSE);
+                       mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), FALSE);
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the target fell asleep.
@@ -960,7 +960,7 @@ struct attack *mattk;
                  - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
             if (canseemon(mtmp))
                 pline("%s spits venom!", Monnam(mtmp));
-            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
+            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);
             return 0;
@@ -997,7 +997,7 @@ struct attack *mattk;
                     pline("%s breathes %s!", Monnam(mtmp),
                           breathwep[typ - 1]);
                 buzz((int) (-20 - (typ - 1)), (int) mattk->damn, mtmp->mx,
-                     mtmp->my, sgn(tbx), sgn(tby));
+                     mtmp->my, sgn(g.tbx), sgn(g.tby));
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the player fell asleep.
@@ -1021,16 +1021,16 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
     int dx, dy, boulderspots;
 
     /* These two values are set for use after successful return. */
-    tbx = ax - bx;
-    tby = ay - by;
+    g.tbx = ax - bx;
+    g.tby = ay - by;
 
     /* sometimes displacement makes a monster think that you're at its
        own location; prevent it from throwing and zapping in that case */
-    if (!tbx && !tby)
+    if (!g.tbx && !g.tby)
         return FALSE;
 
-    if ((!tbx || !tby || abs(tbx) == abs(tby)) /* straight line or diagonal */
-        && distmin(tbx, tby, 0, 0) < BOLT_LIM) {
+    if ((!g.tbx || !g.tby || abs(g.tbx) == abs(g.tby)) /* straight line or diagonal */
+        && distmin(g.tbx, g.tby, 0, 0) < BOLT_LIM) {
         if ((ax == u.ux && ay == u.uy) ? (boolean) couldsee(bx, by)
                                        : clear_path(ax, ay, bx, by))
             return TRUE;

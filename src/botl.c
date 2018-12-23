@@ -44,7 +44,7 @@ do_statusline1()
     register char *nb;
     register int i, j;
 
-    Strcpy(newbot1, plname);
+    Strcpy(newbot1, g.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
     newbot1[10] = 0;
@@ -379,7 +379,7 @@ char *buf;
 
     /* TODO:    Add in dungeon name */
     if (Is_knox(&u.uz))
-        Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "%s ", g.dungeons[u.uz.dnum].dname);
     else if (In_quest(&u.uz))
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
     else if (In_endgame(&u.uz))
@@ -515,7 +515,7 @@ bot_via_windowport()
     /*
      *  Player name and title.
      */
-    Strcpy(nb = buf, plname);
+    Strcpy(nb = buf, g.plname);
     nb[0] = highc(nb[0]);
     nb[10] = '\0';
     Sprintf(nb = eos(nb), " the ");
@@ -1542,7 +1542,7 @@ int *colorptr;
                 txtstr = g.blstats[idx][fldidx].val;
                 if (fldidx == BL_TITLE)
                     /* "<name> the <rank-title>", skip past "<name> the " */
-                    txtstr += (strlen(plname) + sizeof " the " - sizeof "");
+                    txtstr += (strlen(g.plname) + sizeof " the " - sizeof "");
                 if (hl->rel == TXT_VALUE && hl->textmatch[0]) {
                     if (fuzzymatch(hl->textmatch, txtstr, "\" -_", TRUE)) {
                         merge_bestcolor(&bestcolor, hl->coloridx);

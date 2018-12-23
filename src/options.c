@@ -818,7 +818,7 @@ initoptions_init()
 
     /* since this is done before init_objects(), do partial init here */
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
-    nmcpy(pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
+    nmcpy(g.pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
 }
 
 void
@@ -858,7 +858,7 @@ initoptions_finish()
         config_error_done();
     }
 
-    (void) fruitadd(pl_fruit, (struct fruit *) 0);
+    (void) fruitadd(g.pl_fruit, (struct fruit *) 0);
     /*
      * Remove "slime mold" from list of object names.  This will
      * prevent it from being wished unless it's actually present
@@ -2090,7 +2090,7 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s '%s'", fullname, op);
                 return FALSE;
             } else /* Backwards compatibility */
-                nmcpy(pl_character, op, PL_NSIZ);
+                nmcpy(g.pl_character, op, PL_NSIZ);
         } else
             return FALSE;
         return retval;
@@ -2104,7 +2104,7 @@ boolean tinitial, tfrom_file;
                 config_error_add("Unknown %s '%s'", fullname, op);
                 return FALSE;
             } else /* Backwards compatibility */
-                pl_race = *op;
+                g.pl_race = *op;
         } else
             return FALSE;
         return retval;
@@ -2615,7 +2615,7 @@ boolean tinitial, tfrom_file;
             f = fruit_from_name(op, FALSE, &fnum);
             if (!f) {
                 if (!flags.made_fruit)
-                    forig = fruit_from_name(pl_fruit, FALSE, (int *) 0);
+                    forig = fruit_from_name(g.pl_fruit, FALSE, (int *) 0);
 
                 if (!forig && fnum >= 100) {
                     config_error_add(
@@ -2625,18 +2625,18 @@ boolean tinitial, tfrom_file;
             }
         }
     goodfruit:
-        nmcpy(pl_fruit, op, PL_FSIZ);
-        sanitize_name(pl_fruit);
+        nmcpy(g.pl_fruit, op, PL_FSIZ);
+        sanitize_name(g.pl_fruit);
         /* OBJ_NAME(objects[SLIME_MOLD]) won't work for this after
            initialization; it gets changed to generic "fruit" */
-        if (!*pl_fruit)
-            nmcpy(pl_fruit, "slime mold", PL_FSIZ);
+        if (!*g.pl_fruit)
+            nmcpy(g.pl_fruit, "slime mold", PL_FSIZ);
         if (!initial) {
             /* if 'forig' is nonNull, we replace it rather than add
                a new fruit; it can only be nonNull if no fruits have
                been created since the previous name was put in place */
-            (void) fruitadd(pl_fruit, forig);
-            pline("Fruit is now \"%s\".", pl_fruit);
+            (void) fruitadd(g.pl_fruit, forig);
+            pline("Fruit is now \"%s\".", g.pl_fruit);
         }
         /* If initial, then initoptions is allowed to do it instead
          * of here (initoptions always has to do it even if there's
@@ -2767,7 +2767,7 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            nmcpy(plname, op, PL_NSIZ);
+            nmcpy(g.plname, op, PL_NSIZ);
         } else
             return FALSE;
         return retval;
@@ -5485,7 +5485,7 @@ char *buf;
         else
             Strcpy(buf, defopt);
     } else if (!strcmp(optname, "fruit"))
-        Sprintf(buf, "%s", pl_fruit);
+        Sprintf(buf, "%s", g.pl_fruit);
     else if (!strcmp(optname, "gender"))
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
     else if (!strcmp(optname, "horsename"))
@@ -5544,7 +5544,7 @@ char *buf;
                                : "reversed");
 #endif
     } else if (!strcmp(optname, "name")) {
-        Sprintf(buf, "%s", plname);
+        Sprintf(buf, "%s", g.plname);
     } else if (!strcmp(optname, "mouse_support")) {
 #ifdef WIN32
 #define MOUSEFIX1 ", QuickEdit off"
@@ -6152,7 +6152,7 @@ struct fruit *replace_fruit;
     register struct fruit *f;
     int highest_fruit_id = 0;
     char buf[PL_FSIZ], altname[PL_FSIZ];
-    boolean user_specified = (str == pl_fruit);
+    boolean user_specified = (str == g.pl_fruit);
     /* if not user-specified, then it's a fruit name for a fruit on
      * a bones level...
      */
@@ -6166,14 +6166,14 @@ struct fruit *replace_fruit;
         /* force fruit to be singular; this handling is not
            needed--or wanted--for fruits from bones because
            they already received it in their original game */
-        nmcpy(pl_fruit, makesingular(str), PL_FSIZ);
-        /* assert( str == pl_fruit ); */
+        nmcpy(g.pl_fruit, makesingular(str), PL_FSIZ);
+        /* assert( str == g.pl_fruit ); */
 
         /* disallow naming after other foods (since it'd be impossible
          * to tell the difference)
          */
         for (i = g.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
-            if (!strcmp(OBJ_NAME(objects[i]), pl_fruit)) {
+            if (!strcmp(OBJ_NAME(objects[i]), g.pl_fruit)) {
                 found = TRUE;
                 break;
             }
@@ -6181,7 +6181,7 @@ struct fruit *replace_fruit;
         {
             char *c;
 
-            for (c = pl_fruit; *c >= '0' && *c <= '9'; c++)
+            for (c = g.pl_fruit; *c >= '0' && *c <= '9'; c++)
                 continue;
             if (isspace((uchar) *c) || *c == 0)
                 numeric = TRUE;
@@ -6198,9 +6198,9 @@ struct fruit *replace_fruit;
             || ((str_end_is(str, " corpse")
                  || str_end_is(str, " egg"))
                 && name_to_mon(str) >= LOW_PM)) {
-            Strcpy(buf, pl_fruit);
-            Strcpy(pl_fruit, "candied ");
-            nmcpy(pl_fruit + 8, buf, PL_FSIZ - 8);
+            Strcpy(buf, g.pl_fruit);
+            Strcpy(g.pl_fruit, "candied ");
+            nmcpy(g.pl_fruit + 8, buf, PL_FSIZ - 8);
         }
         *altname = '\0';
         /* This flag indicates that a fruit has been made since the
@@ -6242,8 +6242,8 @@ struct fruit *replace_fruit;
     f->fid = ++highest_fruit_id;
     /* we used to go out of our way to add it at the end of the list,
        but the order is arbitrary so use simpler insertion at start */
-    f->nextf = ffruit;
-    ffruit = f;
+    f->nextf = g.ffruit;
+    g.ffruit = f;
  nonew:
     if (user_specified)
         context.current_fruit = f->fid;
@@ -6712,7 +6712,7 @@ set_playmode()
 {
     if (wizard) {
         if (authorize_wizard_mode())
-            Strcpy(plname, "wizard");
+            Strcpy(g.plname, "wizard");
         else
             wizard = FALSE; /* not allowed or not available */
         /* force explore mode if we didn't make it into wizard mode */

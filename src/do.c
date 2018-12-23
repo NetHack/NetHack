@@ -898,8 +898,8 @@ dodown()
 {
     struct trap *trap = 0;
     boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair)
-                           || (u.ux == sstairs.sx && u.uy == sstairs.sy
-                               && !sstairs.up)),
+                           || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
+                               && !g.sstairs.up)),
             ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
 
     if (u_rooted())
@@ -1044,8 +1044,8 @@ doup()
 
     if ((u.ux != xupstair || u.uy != yupstair)
         && (!xupladder || u.ux != xupladder || u.uy != yupladder)
-        && (!sstairs.sx || u.ux != sstairs.sx || u.uy != sstairs.sy
-            || !sstairs.up)) {
+        && (!g.sstairs.sx || u.ux != g.sstairs.sx || u.uy != g.sstairs.sy
+            || !g.sstairs.up)) {
         You_cant("go up here.");
         return 0;
     }
@@ -1324,8 +1324,8 @@ boolean at_stairs, falling, portal;
 
     /* set default level change destination areas */
     /* the special level code may override these */
-    (void) memset((genericptr_t) &updest, 0, sizeof updest);
-    (void) memset((genericptr_t) &dndest, 0, sizeof dndest);
+    (void) memset((genericptr_t) &g.updest, 0, sizeof g.updest);
+    (void) memset((genericptr_t) &g.dndest, 0, sizeof g.dndest);
 
     if (!(level_info[new_ledger].flags & LFILE_EXISTS)) {
         /* entering this level for first time; make it now */
@@ -1569,7 +1569,7 @@ boolean at_stairs, falling, portal;
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
-                 || quest_status.leader_is_dead)) {
+                 || g.quest_status.leader_is_dead)) {
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
                 com_pager(2); /* main "leader needs help" message */

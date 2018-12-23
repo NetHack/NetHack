@@ -1497,11 +1497,11 @@ boolean telekinesis; /* not picking it up directly by hand */
     obj = pick_obj(obj);
 
     if (uwep && uwep == obj)
-        mrg_to_wielded = TRUE;
+        g.mrg_to_wielded = TRUE;
     nearload = near_capacity();
     prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0, obj,
           count);
-    mrg_to_wielded = FALSE;
+    g.mrg_to_wielded = FALSE;
     return 1;
 }
 
@@ -2481,7 +2481,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         if (g.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
             g.multi_reason = "opening a container";
-            nomovemsg = "";
+            g.nomovemsg = "";
         }
         g.abort_looting = TRUE;
         return 1;
@@ -3088,7 +3088,7 @@ struct obj *box; /* or bag */
         if (g.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
             g.multi_reason = "tipping a container";
-            nomovemsg = "";
+            g.nomovemsg = "";
         }
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {
         boolean bag = box->otyp == BAG_OF_TRICKS;

@@ -2642,7 +2642,7 @@ register struct monst *mtmp;
                 trapkilled = TRUE;
             if (unconscious()) {
                 g.multi = -1;
-                nomovemsg = "The explosion awakens you!";
+                g.nomovemsg = "The explosion awakens you!";
             }
             break;
         case POLY_TRAP:
@@ -2750,7 +2750,7 @@ boolean byplayer;
     if (cansee(mon->mx, mon->my))
         pline("%s turns to stone.", Monnam(mon));
     if (byplayer) {
-        stoned = TRUE;
+        g.stoned = TRUE;
         xkilled(mon, XKILL_NOMSG);
     } else
         monstone(mon);
@@ -4905,7 +4905,7 @@ boolean disarm;
                 nomul(-d(5, 6));
                 g.multi_reason = "frozen by a trap";
                 exercise(A_DEX, FALSE);
-                nomovemsg = You_can_move_again;
+                g.nomovemsg = You_can_move_again;
             } else
                 You("momentarily stiffen.");
             break;
@@ -5197,10 +5197,10 @@ unconscious()
         return FALSE;
 
     return (boolean) (u.usleep
-                      || (nomovemsg
-                          && (!strncmp(nomovemsg, "You awake", 9)
-                              || !strncmp(nomovemsg, "You regain con", 14)
-                              || !strncmp(nomovemsg, "You are consci", 14))));
+                      || (g.nomovemsg
+                          && (!strncmp(g.nomovemsg, "You awake", 9)
+                              || !strncmp(g.nomovemsg, "You regain con", 14)
+                              || !strncmp(g.nomovemsg, "You are consci", 14))));
 }
 
 static const char lava_killer[] = "molten lava";
@@ -5395,7 +5395,7 @@ maybe_finish_sokoban()
 {
     struct trap *t;
 
-    if (Sokoban && !in_mklev) {
+    if (Sokoban && !g.in_mklev) {
         /* scan all remaining traps, ignoring any created by the hero;
            if this level has no more pits or holes, the current sokoban
            puzzle has been solved */

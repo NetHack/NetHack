@@ -238,7 +238,7 @@ struct instance_flags {
      * a structure of their own elsewhere some day.
      */
     boolean debug_fuzzer;  /* fuzz testing */
-    boolean defer_plname;  /* X11 hack: askname() might not set plname */
+    boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */

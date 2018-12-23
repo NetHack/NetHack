@@ -287,17 +287,17 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (WINDOWPORT("tty"))
         toggle_mouse_support();
 
-    /* strip role,race,&c suffix; calls askname() if plname[] is empty
+    /* strip role,race,&c suffix; calls askname() if g.plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
-    set_playmode(); /* sets plname to "wizard" for wizard mode */
+    set_playmode(); /* sets g.plname to "wizard" for wizard mode */
     /* until the getlock code is resolved, override askname()'s
        setting of renameallowed; when False, player_selection()
        won't resent renaming as an option */
     iflags.renameallowed = FALSE;
     /* Obtain the name of the logged on user and incorporate
      * it into the name. */
-    Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
+    Sprintf(fnamebuf, "%s-%s", get_username(0), g.plname);
     (void) fname_encode(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.", '%',
         fnamebuf, encodedfnamebuf, BUFSZ);
@@ -471,11 +471,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -582,7 +582,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-    if (!strcmp(plname, WIZARD_NAME))
+    if (!strcmp(g.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }

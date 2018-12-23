@@ -1292,7 +1292,7 @@ cancel_don()
         (g.afternmv == Boots_on || g.afternmv == Helmet_on
          || g.afternmv == Gloves_on || g.afternmv == Armor_on);
     g.afternmv = (int NDECL((*))) 0;
-    nomovemsg = (char *) 0;
+    g.nomovemsg = (char *) 0;
     g.multi = 0;
     context.takeoff.delay = 0;
     context.takeoff.what = 0L;
@@ -1530,18 +1530,18 @@ register struct obj *otmp;
         g.multi_reason = "disrobing";
         if (is_helmet(otmp)) {
             /* ick... */
-            nomovemsg = !strcmp(helm_simple_name(otmp), "hat")
+            g.nomovemsg = !strcmp(helm_simple_name(otmp), "hat")
                             ? "You finish taking off your hat."
                             : "You finish taking off your helmet.";
             g.afternmv = Helmet_off;
         } else if (is_gloves(otmp)) {
-            nomovemsg = "You finish taking off your gloves.";
+            g.nomovemsg = "You finish taking off your gloves.";
             g.afternmv = Gloves_off;
         } else if (is_boots(otmp)) {
-            nomovemsg = "You finish taking off your boots.";
+            g.nomovemsg = "You finish taking off your boots.";
             g.afternmv = Boots_off;
         } else {
-            nomovemsg = "You finish taking off your suit.";
+            g.nomovemsg = "You finish taking off your suit.";
             g.afternmv = Armor_off;
         }
     } else {
@@ -1915,7 +1915,7 @@ struct obj *obj;
                 g.afternmv = Gloves_on;
             if (obj == uarm)
                 g.afternmv = Armor_on;
-            nomovemsg = "You finish your dressing maneuver.";
+            g.nomovemsg = "You finish your dressing maneuver.";
         } else {
             if (is_cloak(obj))
                 (void) Cloak_on();

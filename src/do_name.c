@@ -1135,7 +1135,7 @@ do_mname()
             mtmp = u.usteed;
         } else {
             pline("This %s creature is called %s and cannot be renamed.",
-                  beautiful(), plname);
+                  beautiful(), g.plname);
             return;
         }
     } else
@@ -1572,7 +1572,7 @@ static const char *const ghostnames[] = {
 const char *
 rndghostname()
 {
-    return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))] : (const char *) plname;
+    return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))] : (const char *) g.plname;
 }
 
 /*

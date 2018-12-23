@@ -347,9 +347,9 @@ xchar *sy;
         }
     }
 
-    if (!x && sstairs.sx) {
-        x = sstairs.sx;
-        y = sstairs.sy;
+    if (!x && g.sstairs.sx) {
+        x = g.sstairs.sx;
+        y = g.sstairs.sy;
     }
 
     if (x && y) {

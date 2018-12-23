@@ -255,7 +255,7 @@ boolean ghostly;
         /* savebones guarantees that non-homed shk's will be gone */
         if (ghostly) {
             assign_level(&eshkp->shoplevel, &u.uz);
-            if (ANGRY(shkp) && strncmpi(eshkp->customer, plname, PL_NSIZ))
+            if (ANGRY(shkp) && strncmpi(eshkp->customer, g.plname, PL_NSIZ))
                 pacify_shk(shkp);
         }
     }
@@ -432,7 +432,7 @@ boolean newlev;
         if (!Deaf && !muteshk(shkp))
             verbalize(NOTANGRY(shkp) ? "%s!  Please pay before leaving."
                                  : "%s!  Don't you leave without paying!",
-                      plname);
+                      g.plname);
         else
             pline("%s %s that you need to pay before leaving%s",
                   Shknam(shkp),
@@ -568,11 +568,11 @@ char *enterstring;
     eshkp->bill_p = &(eshkp->bill[0]);
 
     if ((!eshkp->visitct || *eshkp->customer)
-        && strncmpi(eshkp->customer, plname, PL_NSIZ)) {
+        && strncmpi(eshkp->customer, g.plname, PL_NSIZ)) {
         /* You seem to be new here */
         eshkp->visitct = 0;
         eshkp->following = 0;
-        (void) strncpy(eshkp->customer, plname, PL_NSIZ);
+        (void) strncpy(eshkp->customer, g.plname, PL_NSIZ);
         pacify_shk(shkp);
     }
 
@@ -593,7 +593,7 @@ char *enterstring;
 
     if (ANGRY(shkp)) {
         if (!Deaf && !muteshk(shkp))
-            verbalize("So, %s, you dare return to %s %s?!", plname,
+            verbalize("So, %s, you dare return to %s %s?!", g.plname,
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
             pline("%s seems %s over your return to %s %s!",
@@ -608,7 +608,7 @@ char *enterstring;
                   Shknam(shkp), noit_mhis(shkp));
     } else {
         if (!Deaf && !muteshk(shkp))
-            verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), plname,
+            verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), g.plname,
                       eshkp->visitct++ ? " again" : "",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
@@ -1159,7 +1159,7 @@ register struct monst *shkp;
         return;
 
     rile_shk(shkp);
-    (void) strncpy(ESHK(shkp)->customer, plname, PL_NSIZ);
+    (void) strncpy(ESHK(shkp)->customer, g.plname, PL_NSIZ);
     ESHK(shkp)->following = 1;
 }
 
@@ -1398,7 +1398,7 @@ proceed:
                     : shkname(shkp),
                 noit_mhim(shkp));
             pay(1000L, shkp);
-            if (strncmp(eshkp->customer, plname, PL_NSIZ) || rn2(3))
+            if (strncmp(eshkp->customer, g.plname, PL_NSIZ) || rn2(3))
                 make_happy_shk(shkp, FALSE);
             else
                 pline("But %s is as angry as ever.", shkname(shkp));
@@ -1835,7 +1835,7 @@ int croaked;
             context.botl = 1;
             pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
                   takes, loss, currency(loss),
-                  strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
+                  strncmp(eshkp->customer, g.plname, PL_NSIZ) ? "" : "you ",
                   noit_mhim(shkp));
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp);
@@ -2885,7 +2885,7 @@ boolean peaceful, silent;
         if (!silent) {
             if (canseemon(shkp)) {
                 Norep("%s booms: \"%s, you are a thief!\"",
-                      Shknam(shkp), plname);
+                      Shknam(shkp), g.plname);
             } else
                 Norep("You hear a scream, \"Thief!\"");
         }
@@ -3685,17 +3685,17 @@ struct monst *shkp;
             return 0;
         }
         if (eshkp->following) {
-            if (strncmp(eshkp->customer, plname, PL_NSIZ)) {
+            if (strncmp(eshkp->customer, g.plname, PL_NSIZ)) {
                 if (!Deaf && !muteshk(shkp))
                     verbalize("%s, %s!  I was looking for %s.", Hello(shkp),
-                              plname, eshkp->customer);
+                              g.plname, eshkp->customer);
                 eshkp->following = 0;
                 return 0;
             }
             if (moves > followmsg + 4) {
                 if (!Deaf && !muteshk(shkp))
                     verbalize("%s, %s!  Didn't you forget to pay?",
-                              Hello(shkp), plname);
+                              Hello(shkp), g.plname);
                 else
                     pline("%s holds out %s upturned %s.",
                           Shknam(shkp), noit_mhis(shkp),
@@ -3985,7 +3985,7 @@ boolean cant_mollify;
     y = appear_here->place.y;
 
     /* not the best introduction to the shk... */
-    (void) strncpy(ESHK(shkp)->customer, plname, PL_NSIZ);
+    (void) strncpy(ESHK(shkp)->customer, g.plname, PL_NSIZ);
 
     /* if the shk is already on the war path, be sure it's all out */
     if (ANGRY(shkp) || ESHK(shkp)->following) {
@@ -4272,15 +4272,15 @@ struct monst *shkp;
               (!Deaf && !muteshk(shkp)) ? "mentions" : "indicates",
               noit_mhe(shkp), eshk->robbed ? "non-paying" : "rude");
     } else if (eshk->following) {
-        if (strncmp(eshk->customer, plname, PL_NSIZ)) {
+        if (strncmp(eshk->customer, g.plname, PL_NSIZ)) {
             if (!Deaf && !muteshk(shkp))
                 verbalize("%s %s!  I was looking for %s.",
-                      Hello(shkp), plname, eshk->customer);
+                      Hello(shkp), g.plname, eshk->customer);
             eshk->following = 0;
         } else {
             if (!Deaf && !muteshk(shkp))
                 verbalize("%s %s!  Didn't you forget to pay?",
-                          Hello(shkp), plname);
+                          Hello(shkp), g.plname);
             else
                 pline("%s taps you on the %s.",
                       Shknam(shkp), body_part(ARM));

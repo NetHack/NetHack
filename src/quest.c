@@ -10,7 +10,7 @@
 #include "qtext.h"
 
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
-#define Qstat(x) (quest_status.x)
+#define Qstat(x) (g.quest_status.x)
 
 STATIC_DCL void NDECL(on_start);
 STATIC_DCL void NDECL(on_locate);

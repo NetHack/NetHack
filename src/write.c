@@ -301,7 +301,7 @@ found:
                 Strcpy(namebuf, OBJ_DESCR(objects[new_obj->otyp]));
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
-                Sprintf(namebuf, "%s was here!", plname);
+                Sprintf(namebuf, "%s was here!", g.plname);
             You("write \"%s\" and the scroll disappears.", namebuf);
             useup(paper);
         }

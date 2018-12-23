@@ -169,9 +169,9 @@ coord *startp;
         startp->y = upstair.sy;
         return TRUE;
     }
-    if (couldsee(dnstair.sx, dnstair.sy)) {
-        startp->x = dnstair.sx;
-        startp->y = dnstair.sy;
+    if (couldsee(g.dnstair.sx, g.dnstair.sy)) {
+        startp->x = g.dnstair.sx;
+        startp->y = g.dnstair.sy;
         return TRUE;
     }
 
@@ -403,7 +403,7 @@ struct mail_info *info;
         goto go_back;
 
     message_seen = TRUE;
-    verbalize("%s, %s!  %s.", Hello(md), plname, info->display_txt);
+    verbalize("%s, %s!  %s.", Hello(md), g.plname, info->display_txt);
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);

@@ -242,12 +242,12 @@ fruitname(juice)
 boolean juice; /* whether or not to append " juice" to the name */
 {
     char *buf = nextobuf();
-    const char *fruit_nam = strstri(pl_fruit, " of ");
+    const char *fruit_nam = strstri(g.pl_fruit, " of ");
 
     if (fruit_nam)
         fruit_nam += 4; /* skip past " of " */
     else
-        fruit_nam = pl_fruit; /* use it as is */
+        fruit_nam = g.pl_fruit; /* use it as is */
 
     Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? " juice" : "");
     return buf;
@@ -260,7 +260,7 @@ int indx;
 {
     struct fruit *f;
 
-    for (f = ffruit; f; f = f->nextf)
+    for (f = g.ffruit; f; f = f->nextf)
         if (f->fid == indx)
             break;
     return f;
@@ -283,7 +283,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
     if (highest_fid)
         *highest_fid = 0;
     /* first try for an exact match */
-    for (f = ffruit; f; f = f->nextf)
+    for (f = g.ffruit; f; f = f->nextf)
         if (!strcmp(f->fname, fname))
             return f;
         else if (highest_fid && f->fid > *highest_fid)
@@ -294,7 +294,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
        matches, not the first */
     if (!exact) {
         tentativef = 0;
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             k = strlen(f->fname);
             if (!strncmp(f->fname, fname, k)
                 && (!fname[k] || fname[k] == ' ')
@@ -307,7 +307,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
        for exact match, that's trivial, but for prefix, it's hard */
     if (!f) {
         altfname = makesingular(fname);
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             if (!strcmp(f->fname, altfname))
                 break;
         }
@@ -318,7 +318,7 @@ int *highest_fid; /* optional output; only valid if 'fname' isn't found */
         unsigned fname_k = strlen(fname); /* length of assumed plural fname */
 
         tentativef = 0;
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             k = strlen(f->fname);
             /* reload fnamebuf[] each iteration in case it gets modified;
                there's no need to recalculate fname_k */
@@ -356,7 +356,7 @@ boolean forward;
 
     for (i = 0; i < k; ++i)
         allfr[i] = (struct fruit *) 0;
-    for (f = ffruit; f; f = f->nextf) {
+    for (f = g.ffruit; f; f = f->nextf) {
         /* without sanity checking, this would reduce to 'allfr[f->fid]=f' */
         j = f->fid;
         if (j < 1 || j >= k) {
@@ -368,7 +368,7 @@ boolean forward;
         }
         allfr[j] = f;
     }
-    ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
+    g.ffruit = 0; /* reset linked list; we're rebuilding it from scratch */
     /* slot [0] will always be empty; must start 'i' at 1 to avoid
        [k - i] being out of bounds during first iteration */
     for (i = 1; i < k; ++i) {
@@ -376,8 +376,8 @@ boolean forward;
            for backward ordering, go from low to high */
         j = forward ? (k - i) : i;
         if (allfr[j]) {
-            allfr[j]->nextf = ffruit;
-            ffruit = allfr[j];
+            allfr[j]->nextf = g.ffruit;
+            g.ffruit = allfr[j];
         }
     }
 }
@@ -767,10 +767,10 @@ struct obj *obj;
     char tmpbuf[BUFSZ];
     char *onm = xname(obj);
 
-    if (m_shot.n > 1 && m_shot.o == obj->otyp) {
+    if (g.m_shot.n > 1 && g.m_shot.o == obj->otyp) {
         /* "the Nth arrow"; value will eventually be passed to an() or
            The(), both of which correctly handle this "the " prefix */
-        Sprintf(tmpbuf, "the %d%s ", m_shot.i, ordin(m_shot.i));
+        Sprintf(tmpbuf, "the %d%s ", g.m_shot.i, ordin(g.m_shot.i));
         onm = strprepend(onm, tmpbuf);
     }
     return onm;
@@ -1139,7 +1139,7 @@ unsigned doname_flags;
         break;
     }
 
-    if ((obj->owornmask & W_WEP) && !mrg_to_wielded) {
+    if ((obj->owornmask & W_WEP) && !g.mrg_to_wielded) {
         if (obj->quan != 1L) {
             Strcat(bp, " (wielded)");
         } else {
@@ -3503,7 +3503,7 @@ srch:
             fp += l;
         }
 
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             /* match type: 0=none, 1=exact, 2=singular, 3=plural */
             int ftyp = 0;
 

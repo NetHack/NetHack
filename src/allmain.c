@@ -62,8 +62,8 @@ boolean resuming;
     }
 
     (void) encumber_msg(); /* in case they auto-picked up something */
-    if (defer_see_monsters) {
-        defer_see_monsters = FALSE;
+    if (g.defer_see_monsters) {
+        g.defer_see_monsters = FALSE;
         see_monsters();
     }
     initrack();
@@ -411,7 +411,7 @@ boolean resuming;
                 domove();
             } else {
                 --g.multi;
-                rhack(save_cm);
+                rhack(g.save_cm);
             }
         } else if (g.multi == 0) {
 #ifdef MAIL
@@ -512,7 +512,7 @@ stop_occupation()
 {
     if (g.occupation) {
         if (!maybe_finished_meal(TRUE))
-            You("stop %s.", occtxt);
+            You("stop %s.", g.occtxt);
         g.occupation = 0;
         context.botl = 1; /* in case u.uhs changed */
         nomul(0);
@@ -664,7 +664,7 @@ boolean new_game; /* false => restoring an old game */
 
     pline(new_game ? "%s %s, welcome to NetHack!  You are a%s %s %s."
                    : "%s %s, the%s %s %s, welcome back to NetHack!",
-          Hello((struct monst *) 0), plname, buf, urace.adj,
+          Hello((struct monst *) 0), g.plname, buf, urace.adj,
           (currentgend && urole.name.f) ? urole.name.f : urole.name.m);
 }
 
@@ -685,31 +685,31 @@ do_positionbar()
         *p++ = '<';
         *p++ = upstair.sx;
     }
-    if (sstairs.sx
-        && (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph)
+    if (g.sstairs.sx
+        && (glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                 == S_upstair
-            || glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph)
+            || glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                    == S_upladder)) {
         *p++ = '<';
-        *p++ = sstairs.sx;
+        *p++ = g.sstairs.sx;
     }
 
     /* down stairway */
-    if (dnstair.sx
-        && (glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph)
+    if (g.dnstair.sx
+        && (glyph_to_cmap(level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
                 == S_dnstair
-            || glyph_to_cmap(level.locations[dnstair.sx][dnstair.sy].glyph)
+            || glyph_to_cmap(level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
                    == S_dnladder)) {
         *p++ = '>';
-        *p++ = dnstair.sx;
+        *p++ = g.dnstair.sx;
     }
-    if (sstairs.sx
-        && (glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph)
+    if (g.sstairs.sx
+        && (glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                 == S_dnstair
-            || glyph_to_cmap(level.locations[sstairs.sx][sstairs.sy].glyph)
+            || glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                    == S_dnladder)) {
         *p++ = '>';
-        *p++ = sstairs.sx;
+        *p++ = g.sstairs.sx;
     }
 
     /* hero location */

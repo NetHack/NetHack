@@ -150,8 +150,8 @@ eatmdone(VOID_ARGS)
 {
     /* release `eatmbuf' */
     if (g.eatmbuf) {
-        if (nomovemsg == g.eatmbuf)
-            nomovemsg = 0;
+        if (g.nomovemsg == g.eatmbuf)
+            g.nomovemsg = 0;
         free((genericptr_t) g.eatmbuf), g.eatmbuf = 0;
     }
     /* update display */
@@ -169,7 +169,7 @@ eatmupdate()
     const char *altmsg = 0;
     int altapp = 0; /* lint suppression */
 
-    if (!g.eatmbuf || nomovemsg != g.eatmbuf)
+    if (!g.eatmbuf || g.nomovemsg != g.eatmbuf)
         return;
 
     if (is_obj_mappear(&youmonst,ORANGE) && !Hallucination) {
@@ -190,7 +190,7 @@ eatmupdate()
             free((genericptr_t) g.eatmbuf);
             g.eatmbuf = (char *) alloc(strlen(altmsg) + 1);
         }
-        nomovemsg = strcpy(g.eatmbuf, altmsg);
+        g.nomovemsg = strcpy(g.eatmbuf, altmsg);
         /* update current image */
         youmonst.mappearance = altapp;
         newsym(u.ux, u.uy);
@@ -452,10 +452,10 @@ boolean message;
     piece->in_use = TRUE;
     g.occupation = 0; /* do this early, so newuhs() knows we're done */
     newuhs(FALSE);
-    if (nomovemsg) {
+    if (g.nomovemsg) {
         if (message)
-            pline1(nomovemsg);
-        nomovemsg = 0;
+            pline1(g.nomovemsg);
+        g.nomovemsg = 0;
     } else if (message)
         You("finish eating %s.", food_xname(piece, TRUE));
 
@@ -1032,7 +1032,7 @@ int pm;
                        : "You now prefer mimicking %s again.",
                     an(Upolyd ? youmonst.data->mname : urace.noun));
             g.eatmbuf = dupstr(buf);
-            nomovemsg = g.eatmbuf;
+            g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
             /* ??? what if this was set before? */
             youmonst.m_ap_type = M_AP_OBJECT;
@@ -1575,7 +1575,7 @@ struct obj *obj;
         context.botl = TRUE;
         nomul(-duration);
         g.multi_reason = "unconscious from rotten food";
-        nomovemsg = "You are conscious again.";
+        g.nomovemsg = "You are conscious again.";
         g.afternmv = Hear_again;
         return 1;
     }
@@ -1750,19 +1750,19 @@ struct obj *otmp;
         }
     }
 
-    old_nomovemsg = nomovemsg;
+    old_nomovemsg = g.nomovemsg;
     if (bite()) {
         /* survived choking, finish off food that's nearly done;
            need this to handle cockatrice eggs, fortune cookies, etc */
         if (++context.victual.usedtime >= context.victual.reqtime) {
-            /* don't want done_eating() to issue nomovemsg if it
+            /* don't want done_eating() to issue g.nomovemsg if it
                is due to vomit() called by bite() */
-            save_nomovemsg = nomovemsg;
+            save_nomovemsg = g.nomovemsg;
             if (!old_nomovemsg)
-                nomovemsg = 0;
+                g.nomovemsg = 0;
             done_eating(FALSE);
             if (!old_nomovemsg)
-                nomovemsg = save_nomovemsg;
+                g.nomovemsg = save_nomovemsg;
         }
         return;
     }
@@ -2862,7 +2862,7 @@ int num;
             if (!context.victual.eating
                 || (context.victual.eating && !context.victual.fullwarn)) {
                 pline("You're having a hard time getting all of it down.");
-                nomovemsg = "You're finally finished.";
+                g.nomovemsg = "You're finally finished.";
                 if (!context.victual.eating) {
                     g.multi = -2;
                 } else {
@@ -2873,7 +2873,7 @@ int num;
                         if (yn_function("Continue eating?", ynchars, 'n')
                             != 'y') {
                             reset_eat();
-                            nomovemsg = (char *) 0;
+                            g.nomovemsg = (char *) 0;
                         }
                     }
                 }
@@ -2977,7 +2977,7 @@ boolean incr;
                 context.botl = TRUE;
                 nomul(-duration);
                 g.multi_reason = "fainted from lack of food";
-                nomovemsg = "You regain consciousness.";
+                g.nomovemsg = "You regain consciousness.";
                 g.afternmv = unfaint;
                 newhs = FAINTED;
                 if (!Levitation)
@@ -3198,7 +3198,7 @@ vomit() /* A good idea from David Neves */
     if (g.multi >= -2) {
         nomul(-2);
         g.multi_reason = "vomiting";
-        nomovemsg = You_can_move_again;
+        g.nomovemsg = You_can_move_again;
     }
 }
 

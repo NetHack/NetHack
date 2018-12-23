@@ -139,15 +139,15 @@ register int fd;
     int cnt;
     s_level *tmplev, *x;
 
-    sp_levchn = (s_level *) 0;
+    g.sp_levchn = (s_level *) 0;
     mread(fd, (genericptr_t) &cnt, sizeof(int));
     for (; cnt > 0; cnt--) {
         tmplev = (s_level *) alloc(sizeof(s_level));
         mread(fd, (genericptr_t) tmplev, sizeof(s_level));
-        if (!sp_levchn)
-            sp_levchn = tmplev;
+        if (!g.sp_levchn)
+            g.sp_levchn = tmplev;
         else {
-            for (x = sp_levchn; x->next; x = x->next)
+            for (x = g.sp_levchn; x->next; x = x->next)
                 ;
             x->next = tmplev;
         }
@@ -658,7 +658,7 @@ unsigned int *stuckid, *steedid;
      * side-effects too early in the game.
      * Disable see_monsters() here, re-enable it at the top of moveloop()
      */
-    defer_see_monsters = TRUE;
+    g.defer_see_monsters = TRUE;
 
     /* this comes after inventory has been loaded */
     for (otmp = invent; otmp; otmp = otmp->nobj)
@@ -672,13 +672,13 @@ unsigned int *stuckid, *steedid;
     uwep = 0;      /* clear it and have setuwep() reinit */
     setuwep(otmp); /* (don't need any null check here) */
     if (!uwep || uwep->otyp == PICK_AXE || uwep->otyp == GRAPPLING_HOOK)
-        unweapon = TRUE;
+        g.unweapon = TRUE;
 
     restore_dungeon(fd);
     restlevchn(fd);
     mread(fd, (genericptr_t) &moves, sizeof moves);
     mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
-    mread(fd, (genericptr_t) &quest_status, sizeof (struct q_score));
+    mread(fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
     mread(fd, (genericptr_t) spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     restore_artifacts(fd);
     restore_oracles(fd);
@@ -686,11 +686,11 @@ unsigned int *stuckid, *steedid;
         mread(fd, (genericptr_t) stuckid, sizeof *stuckid);
     if (u.usteed)
         mread(fd, (genericptr_t) steedid, sizeof *steedid);
-    mread(fd, (genericptr_t) pl_character, sizeof pl_character);
+    mread(fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
 
-    mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
-    freefruitchn(ffruit); /* clean up fruit(s) made by initoptions() */
-    ffruit = loadfruitchn(fd);
+    mread(fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
+    freefruitchn(g.ffruit); /* clean up fruit(s) made by initoptions() */
+    g.ffruit = loadfruitchn(fd);
 
     restnames(fd);
     restore_waterlevel(fd);
@@ -799,7 +799,7 @@ register int fd;
     struct obj *otmp;
 
     g.restoring = TRUE;
-    get_plname_from_file(fd, plname);
+    get_plname_from_file(fd, g.plname);
     getlev(fd, 0, (xchar) 0, FALSE);
     if (!restgamestate(fd, &stuckid, &steedid)) {
         display_nhwindow(WIN_MESSAGE, TRUE);
@@ -839,7 +839,7 @@ register int fd;
 #endif
     clear_nhwindow(WIN_MESSAGE);
     You("return to level %d in %s%s.", depth(&u.uz),
-        dungeons[u.uz.dnum].dname,
+        g.dungeons[u.uz.dnum].dname,
         flags.debug ? " while in debug mode"
                     : flags.explore ? " while in explore mode" : "");
     curs(WIN_MAP, 1, 1);
@@ -877,7 +877,7 @@ register int fd;
     (void) lseek(fd, (off_t) 0, 0);
 #endif
     (void) validate(fd, (char *) 0); /* skip version and savefile info */
-    get_plname_from_file(fd, plname);
+    get_plname_from_file(fd, g.plname);
 
     getlev(fd, 0, (xchar) 0, FALSE);
     (void) nhclose(fd);
@@ -1058,20 +1058,20 @@ boolean ghostly;
     mread(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
     mread(fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
     elapsed = monstermoves - g.omoves;
-    mread(fd, (genericptr_t) &upstair, sizeof(stairway));
-    mread(fd, (genericptr_t) &dnstair, sizeof(stairway));
-    mread(fd, (genericptr_t) &upladder, sizeof(stairway));
-    mread(fd, (genericptr_t) &dnladder, sizeof(stairway));
-    mread(fd, (genericptr_t) &sstairs, sizeof(stairway));
-    mread(fd, (genericptr_t) &updest, sizeof(dest_area));
-    mread(fd, (genericptr_t) &dndest, sizeof(dest_area));
+    mread(fd, (genericptr_t) &g.upstair, sizeof(stairway));
+    mread(fd, (genericptr_t) &g.dnstair, sizeof(stairway));
+    mread(fd, (genericptr_t) &g.upladder, sizeof(stairway));
+    mread(fd, (genericptr_t) &g.dnladder, sizeof(stairway));
+    mread(fd, (genericptr_t) &g.sstairs, sizeof(stairway));
+    mread(fd, (genericptr_t) &g.updest, sizeof(dest_area));
+    mread(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
     mread(fd, (genericptr_t) &level.flags, sizeof(level.flags));
     mread(fd, (genericptr_t) doors, sizeof(doors));
     rest_rooms(fd); /* No joke :-) */
     if (g.nroom)
-        doorindex = rooms[g.nroom - 1].fdoor + rooms[g.nroom - 1].doorct;
+        g.doorindex = rooms[g.nroom - 1].fdoor + rooms[g.nroom - 1].doorct;
     else
-        doorindex = 0;
+        g.doorindex = 0;
 
     restore_timers(fd, RANGE_LEVEL, ghostly, elapsed);
     restore_light_sources(fd);
@@ -1157,8 +1157,8 @@ boolean ghostly;
             switch (br->type) {
             case BR_STAIR:
             case BR_NO_END1:
-            case BR_NO_END2: /* OK to assign to sstairs if it's not used */
-                assign_level(&sstairs.tolev, &ltmp);
+            case BR_NO_END2: /* OK to assign to g.sstairs if it's not used */
+                assign_level(&g.sstairs.tolev, &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
                 for (trap = ftrap; trap; trap = trap->ntrap)
@@ -1317,7 +1317,7 @@ boolean ghostly;
 
 #ifdef SELECTSAVED
 /* put up a menu listing each character from this player's saved games;
-   returns 1: use plname[], 0: new game, -1: quit */
+   returns 1: use g.plname[], 0: new game, -1: quit */
 int
 restore_menu(bannerwin)
 winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
@@ -1328,7 +1328,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
     menu_item *chosen_game = (menu_item *) 0;
     int k, clet, ch = 0; /* ch: 0 => new game */
 
-    *plname = '\0';
+    *g.plname = '\0';
     saved = get_saved_games(); /* array of character names */
     if (saved && *saved) {
         tmpwin = create_nhwindow(NHW_MENU);
@@ -1364,7 +1364,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
             ch = chosen_game->item.a_int;
             if (ch > 0)
-                Strcpy(plname, saved[ch - 1]);
+                Strcpy(g.plname, saved[ch - 1]);
             else if (ch < 0)
                 ++ch; /* -1 -> 0 (new game), -2 -> -1 (quit) */
             free((genericptr_t) chosen_game);

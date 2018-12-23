@@ -681,7 +681,7 @@ invocation_pos(x, y)
 xchar x, y;
 {
     return (boolean) (Invocation_lev(&u.uz)
-                      && x == inv_pos.x && y == inv_pos.y);
+                      && x == g.inv_pos.x && y == g.inv_pos.y);
 }
 
 /* return TRUE if (dx,dy) is an OK place to move
@@ -1863,7 +1863,7 @@ domove()
     if (cause_delay) {
         nomul(-2);
         g.multi_reason = "dragging an iron ball";
-        nomovemsg = "";
+        g.nomovemsg = "";
     }
 
     if (context.run && flags.runmode != RUN_TPORT) {
@@ -2418,10 +2418,10 @@ register boolean newlev;
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
             if (oracle) {
                 if (!oracle->mpeaceful)
-                    verbalize("You're in Delphi, %s.", plname);
+                    verbalize("You're in Delphi, %s.", g.plname);
                 else
                     verbalize("%s, %s, welcome to Delphi!",
-                              Hello((struct monst *) 0), plname);
+                              Hello((struct monst *) 0), g.plname);
             } else
                 msg_given = FALSE;
             break;
@@ -2565,7 +2565,7 @@ dopickup(VOID_ARGS)
     int count, tmpcount, ret;
 
     /* awful kludge to work around parse()'s pre-decrement */
-    count = (g.multi || (save_cm && *save_cm == cmd_from_func(dopickup))) ? g.multi + 1 : 0;
+    count = (g.multi || (g.save_cm && *g.save_cm == cmd_from_func(dopickup))) ? g.multi + 1 : 0;
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks() >= 0))
@@ -2824,12 +2824,12 @@ const char *msg_override;
 {
     g.multi = 0; /* caller will usually have done this already */
     if (msg_override)
-        nomovemsg = msg_override;
-    else if (!nomovemsg)
-        nomovemsg = You_can_move_again;
-    if (*nomovemsg)
-        pline("%s", nomovemsg);
-    nomovemsg = 0;
+        g.nomovemsg = msg_override;
+    else if (!g.nomovemsg)
+        g.nomovemsg = You_can_move_again;
+    if (*g.nomovemsg)
+        pline("%s", g.nomovemsg);
+    g.nomovemsg = 0;
     u.usleep = 0;
     g.multi_reason = NULL;
     if (g.afternmv) {

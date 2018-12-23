@@ -198,20 +198,20 @@ int shotlimit;
             multishot = shotlimit;
     }
 
-    m_shot.s = ammo_and_launcher(obj, uwep) ? TRUE : FALSE;
+    g.m_shot.s = ammo_and_launcher(obj, uwep) ? TRUE : FALSE;
     /* give a message if shooting more than one, or if player
        attempted to specify a count */
     if (multishot > 1 || shotlimit > 0) {
         /* "You shoot N arrows." or "You throw N daggers." */
-        You("%s %d %s.", m_shot.s ? "shoot" : "throw",
+        You("%s %d %s.", g.m_shot.s ? "shoot" : "throw",
             multishot, /* (might be 1 if player gave shotlimit) */
             (multishot == 1) ? singular(obj, xname) : xname(obj));
     }
 
     wep_mask = obj->owornmask;
-    m_shot.o = obj->otyp;
-    m_shot.n = multishot;
-    for (m_shot.i = 1; m_shot.i <= m_shot.n; m_shot.i++) {
+    g.m_shot.o = obj->otyp;
+    g.m_shot.n = multishot;
+    for (g.m_shot.i = 1; g.m_shot.i <= g.m_shot.n; g.m_shot.i++) {
         twoweap = u.twoweap;
         /* split this object off from its slot if necessary */
         if (obj->quan > 1L) {
@@ -224,9 +224,9 @@ int shotlimit;
         freeinv(otmp);
         throwit(otmp, wep_mask, twoweap);
     }
-    m_shot.n = m_shot.i = 0;
-    m_shot.o = STRANGE_OBJECT;
-    m_shot.s = FALSE;
+    g.m_shot.n = g.m_shot.i = 0;
+    g.m_shot.o = STRANGE_OBJECT;
+    g.m_shot.s = FALSE;
 
     return 1;
 }
@@ -237,7 +237,7 @@ ok_to_throw(shotlimit_p)
 int *shotlimit_p; /* (see dothrow()) */
 {
     /* kludge to work around parse()'s pre-decrement of `multi' */
-    *shotlimit_p = (g.multi || save_cm) ? g.multi + 1 : 0;
+    *shotlimit_p = (g.multi || g.save_cm) ? g.multi + 1 : 0;
     g.multi = 0; /* reset; it's been used up */
 
     if (notake(youmonst.data)) {
@@ -403,13 +403,13 @@ void
 endmultishot(verbose)
 boolean verbose;
 {
-    if (m_shot.i < m_shot.n) {
+    if (g.m_shot.i < g.m_shot.n) {
         if (verbose && !context.mon_moving) {
             You("stop %s after the %d%s %s.",
-                m_shot.s ? "firing" : "throwing", m_shot.i, ordin(m_shot.i),
-                m_shot.s ? "shot" : "toss");
+                g.m_shot.s ? "firing" : "throwing", g.m_shot.i, ordin(g.m_shot.i),
+                g.m_shot.s ? "shot" : "toss");
         }
-        m_shot.n = m_shot.i; /* make current shot be the last */
+        g.m_shot.n = g.m_shot.i; /* make current shot be the last */
     }
 }
 
@@ -835,7 +835,7 @@ boolean verbose;
 
     nomul(-range);
     g.multi_reason = "moving through the air";
-    nomovemsg = ""; /* it just happens */
+    g.nomovemsg = ""; /* it just happens */
     if (verbose)
         You("%s in the opposite direction.", range > 1 ? "hurtle" : "float");
     /* if we're in the midst of shooting multiple projectiles, stop */
@@ -1492,7 +1492,7 @@ boolean maybe_wakeup;
 
 #define quest_arti_hits_leader(obj, mon)      \
     (obj->oartifact && is_quest_artifact(obj) \
-     && mon->m_id == quest_status.leader_m_id)
+     && mon->m_id == g.quest_status.leader_m_id)
 
 /*
  * Object thrown by player arrives at monster's location.

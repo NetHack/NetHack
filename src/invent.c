@@ -3244,10 +3244,10 @@ char *buf;
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
     } else if ((x == xupstair && y == yupstair)
-               || (x == sstairs.sx && y == sstairs.sy && sstairs.up))
+               || (x == g.sstairs.sx && y == g.sstairs.sy && g.sstairs.up))
         cmap = S_upstair; /* "staircase up" */
     else if ((x == xdnstair && y == ydnstair)
-             || (x == sstairs.sx && y == sstairs.sy && !sstairs.up))
+             || (x == g.sstairs.sx && y == g.sstairs.sy && !g.sstairs.up))
         cmap = S_dnstair; /* "staircase down" */
     else if (x == xupladder && y == yupladder)
         cmap = S_upladder; /* "ladder up" */

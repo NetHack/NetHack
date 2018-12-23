@@ -292,7 +292,7 @@ struct obj *box;
     case SACK:
     case OILSKIN_SACK:
         /* initial inventory: sack starts out empty */
-        if (moves <= 1 && !in_mklev) {
+        if (moves <= 1 && !g.in_mklev) {
             n = 0;
             break;
         }
@@ -1168,7 +1168,7 @@ struct obj *body;
         return;
 
     action = ROT_CORPSE;             /* default action: rot away */
-    rot_adjust = in_mklev ? 25 : 10; /* give some variation */
+    rot_adjust = g.in_mklev ? 25 : 10; /* give some variation */
     corpse_age = monstermoves - body->age;
     if (corpse_age > ROT_AGE)
         when = rot_adjust;

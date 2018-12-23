@@ -556,7 +556,7 @@ plselInitDialog(HWND hWnd)
     Button_SetCheck(data->control_aligns[0], BST_CHECKED);
 
     /* set player name */
-    SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(plname, wbuf, sizeof(wbuf)));
+    SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(g.plname, wbuf, sizeof(wbuf)));
 
     plselRandomize(data);
 

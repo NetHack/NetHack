@@ -251,7 +251,7 @@ register struct monst *mtmp;
                 break;
             }
             if (mm == PM_ELVENKING) {
-                if (rn2(3) || (in_mklev && Is_earthlevel(&u.uz)))
+                if (rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
                 if (!rn2(50))
                     (void) mongets(mtmp, CRYSTAL_BALL);
@@ -708,7 +708,7 @@ register struct monst *mtmp;
         break;
     case S_GIANT:
         if (ptr == &mons[PM_MINOTAUR]) {
-            if (!rn2(3) || (in_mklev && Is_earthlevel(&u.uz)))
+            if (!rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
                 (void) mongets(mtmp, WAN_DIGGING);
         } else if (is_giant(ptr)) {
             for (cnt = rn2((int) (mtmp->m_lev / 2)); cnt; cnt--) {
@@ -778,7 +778,7 @@ register struct monst *mtmp;
         }
         break;
     case S_GNOME:
-        if (!rn2((In_mines(&u.uz) && in_mklev) ? 20 : 60)) {
+        if (!rn2((In_mines(&u.uz) && g.in_mklev) ? 20 : 60)) {
             otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
             otmp->quan = 1;
             otmp->owt = weight(otmp);
@@ -1039,7 +1039,7 @@ coord *cc;
     do {
         nx = rn1(COLNO - 3, 2);
         ny = rn2(ROWNO);
-        good = (!in_mklev && cansee(nx,ny)) ? FALSE
+        good = (!g.in_mklev && cansee(nx,ny)) ? FALSE
                                             : goodpos(nx, ny, mon, gpflags);
     } while ((++tryct < 50) && !good);
 
@@ -1050,7 +1050,7 @@ coord *cc;
         int xofs = nx;
         int yofs = ny;
         int dx,dy;
-        int bl = (in_mklev || Blind) ? 1 : 0;
+        int bl = (g.in_mklev || Blind) ? 1 : 0;
 
         for ( ; bl < 2; bl++) {
             for (dx = 0; dx < COLNO; dx++)
@@ -1065,18 +1065,18 @@ coord *cc;
             if (bl == 0 && (!mon || mon->data->mmove)) {
                 /* all map positions are visible (or not good),
                    try to pick something logical */
-                if (dnstair.sx && !rn2(2)) {
-                    nx = dnstair.sx;
-                    ny = dnstair.sy;
-                } else if (upstair.sx && !rn2(2)) {
-                    nx = upstair.sx;
-                    ny = upstair.sy;
-                } else if (dnladder.sx && !rn2(2)) {
-                    nx = dnladder.sx;
-                    ny = dnladder.sy;
-                } else if (upladder.sx && !rn2(2)) {
-                    nx = upladder.sx;
-                    ny = upladder.sy;
+                if (g.dnstair.sx && !rn2(2)) {
+                    nx = g.dnstair.sx;
+                    ny = g.dnstair.sy;
+                } else if (g.upstair.sx && !rn2(2)) {
+                    nx = g.upstair.sx;
+                    ny = g.upstair.sy;
+                } else if (g.dnladder.sx && !rn2(2)) {
+                    nx = g.dnladder.sx;
+                    ny = g.dnladder.sy;
+                } else if (g.upladder.sx && !rn2(2)) {
+                    nx = g.upladder.sx;
+                    ny = g.upladder.sy;
                 }
                 if (goodpos(nx, ny, mon, gpflags))
                     goto gotgood;
@@ -1094,7 +1094,7 @@ coord *cc;
 /*
  * called with [x,y] = coordinates;
  *      [0,0] means anyplace
- *      [u.ux,u.uy] means: near player (if !in_mklev)
+ *      [u.ux,u.uy] means: near player (if !g.in_mklev)
  *
  *      In case we make a monster group, only return the one at [x,y].
  */
@@ -1124,7 +1124,7 @@ int mmflags;
             return (struct monst *) 0;
         x = cc.x;
         y = cc.y;
-    } else if (byyou && !in_mklev) {
+    } else if (byyou && !g.in_mklev) {
         coord bypos;
 
         if (enexto_core(&bypos, u.ux, u.uy, ptr, gpflags)) {
@@ -1202,7 +1202,7 @@ int mmflags;
         mtmp->m_id = context.ident++; /* ident overflowed */
     set_mon_data(mtmp, ptr, 0);
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
-        quest_status.leader_m_id = mtmp->m_id;
+        g.quest_status.leader_m_id = mtmp->m_id;
     mtmp->mnum = mndx;
 
     /* set up level and hit points */
@@ -1216,9 +1216,9 @@ int mmflags;
        but for ones which can be random, it has already been chosen
        (in role_init(), for possible use by the quest pager code) */
     else if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
-        mtmp->female = quest_status.ldrgend;
+        mtmp->female = g.quest_status.ldrgend;
     else if (ptr->msound == MS_NEMESIS && quest_info(MS_NEMESIS) == mndx)
-        mtmp->female = quest_status.nemgend;
+        mtmp->female = g.quest_status.nemgend;
     else
         mtmp->female = rn2(2); /* ignored for neuters */
 
@@ -1238,7 +1238,7 @@ int mmflags;
         break;
     case S_SPIDER:
     case S_SNAKE:
-        if (in_mklev)
+        if (g.in_mklev)
             if (x && y)
                 (void) mkobj_at(0, x, y, TRUE);
         (void) hideunder(mtmp);
@@ -1315,7 +1315,7 @@ int mmflags;
     if (mitem && allow_minvent)
         (void) mongets(mtmp, mitem);
 
-    if (in_mklev) {
+    if (g.in_mklev) {
         if ((is_ndemon(ptr) || mndx == PM_WUMPUS
              || mndx == PM_LONG_WORM || mndx == PM_GIANT_EEL)
             && !u.uhave.amulet && rn2(5))
@@ -1406,7 +1406,7 @@ int mmflags;
     if (allow_minvent && migrating_objs)
         deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case of waiting items */
 
-    if (!in_mklev)
+    if (!g.in_mklev)
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 
     return mtmp;
@@ -1491,7 +1491,7 @@ register struct permonst *ptr;
         lev = Is_special(&u.uz);
         oldmoves = moves;
     }
-    switch ((lev) ? lev->flags.align : dungeons[u.uz.dnum].flags.align) {
+    switch ((lev) ? lev->flags.align : g.dungeons[u.uz.dnum].flags.align) {
     default: /* just in case */
     case AM_NONE:
         alshift = 0;

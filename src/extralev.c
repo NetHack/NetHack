@@ -249,7 +249,7 @@ makeroguerooms()
                 int lowx, lowy, hix, hiy;
 
                 g.r[x][y].nroom = g.nroom;
-                smeq[g.nroom] = g.nroom;
+                g.smeq[g.nroom] = g.nroom;
 
                 lowx = 1 + 26 * x + here.rlx;
                 lowy = 7 * y + here.rly;

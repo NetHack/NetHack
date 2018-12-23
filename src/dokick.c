@@ -1331,8 +1331,8 @@ schar loc;
         cc->y = u.uz.dlevel + 1;
         break;
     case MIGR_SSTAIRS:
-        cc->x = sstairs.tolev.dnum;
-        cc->y = sstairs.tolev.dlevel;
+        cc->x = g.sstairs.tolev.dnum;
+        cc->y = g.sstairs.tolev.dlevel;
         break;
     default:
     case MIGR_NOWHERE:
@@ -1447,11 +1447,11 @@ xchar dlev;          /* if !0 send to dlev near player */
             You("removed %ld %s worth of goods!", price, currency(price));
             if (cansee(shkp->mx, shkp->my)) {
                 if (ESHK(shkp)->customer[0] == 0)
-                    (void) strncpy(ESHK(shkp)->customer, plname, PL_NSIZ);
+                    (void) strncpy(ESHK(shkp)->customer, g.plname, PL_NSIZ);
                 if (angry)
                     pline("%s is infuriated!", Monnam(shkp));
                 else
-                    pline("\"%s, you are a thief!\"", plname);
+                    pline("\"%s, you are a thief!\"", g.plname);
             } else
                 You_hear("a scream, \"Thief!\"");
             hot_pursuit(shkp);
@@ -1628,7 +1628,7 @@ boolean near_hero;
             nx = xupladder, ny = yupladder;
             break;
         case MIGR_SSTAIRS:
-            nx = sstairs.sx, ny = sstairs.sy;
+            nx = g.sstairs.sx, ny = g.sstairs.sy;
             break;
         case MIGR_WITH_HERO:
             nx = u.ux, ny = u.uy;
@@ -1762,7 +1762,7 @@ xchar x, y;
         return MIGR_NOWHERE;
 
     if ((xdnstair == x && ydnstair == y)
-        || (sstairs.sx == x && sstairs.sy == y && !sstairs.up)) {
+        || (g.sstairs.sx == x && g.sstairs.sy == y && !g.sstairs.up)) {
         g.gate_str = "down the stairs";
         return (xdnstair == x && ydnstair == y) ? MIGR_STAIRS_UP
                                                 : MIGR_SSTAIRS;

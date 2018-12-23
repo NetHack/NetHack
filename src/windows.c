@@ -1147,10 +1147,10 @@ char *buf;
                 Sprintf(tmpbuf, "%ld", uid);
                 break;
             case 'n': /* player name */
-                Sprintf(tmpbuf, "%s", *plname ? plname : "unknown");
+                Sprintf(tmpbuf, "%s", *g.plname ? g.plname : "unknown");
                 break;
             case 'N': /* first character of player name */
-                Sprintf(tmpbuf, "%c", *plname ? *plname : 'u');
+                Sprintf(tmpbuf, "%c", *g.plname ? *g.plname : 'u');
                 break;
             }
 

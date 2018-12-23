@@ -1055,7 +1055,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
             } else {
                 nomul(-3);
                 g.multi_reason = "being scared stiff";
-                nomovemsg = "";
+                g.nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(youmonst.data)) {
                     u.ustuck = (struct monst *) 0;
                     You("release %s!", mon_nam(magr));
@@ -1515,11 +1515,11 @@ struct obj *obj;
             start_menu(tmpwin);
             /* use index+1 (cant use 0) as identifier */
             for (i = num_ok_dungeons = 0; i < g.n_dgns; i++) {
-                if (!dungeons[i].dunlev_ureached)
+                if (!g.dungeons[i].dunlev_ureached)
                     continue;
                 any.a_int = i + 1;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         dungeons[i].dname, MENU_UNSELECTED);
+                         g.dungeons[i].dname, MENU_UNSELECTED);
                 num_ok_dungeons++;
                 last_ok_dungeon = i;
             }
@@ -1547,10 +1547,10 @@ struct obj *obj;
              * The closest level is either the entry or dunlev_ureached.
              */
             newlev.dnum = i;
-            if (dungeons[i].depth_start >= depth(&u.uz))
-                newlev.dlevel = dungeons[i].entry_lev;
+            if (g.dungeons[i].depth_start >= depth(&u.uz))
+                newlev.dlevel = g.dungeons[i].entry_lev;
             else
-                newlev.dlevel = dungeons[i].dunlev_ureached;
+                newlev.dlevel = g.dungeons[i].dunlev_ureached;
 
             if (u.uhave.amulet || In_endgame(&u.uz) || In_endgame(&newlev)
                 || newlev.dnum == u.uz.dnum || !next_to_u()) {

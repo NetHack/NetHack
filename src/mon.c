@@ -279,7 +279,7 @@ int mndx;
      || is_reviver((mon)->data)                                         \
         /* normally quest leader will be unique, */                     \
         /* but he or she might have been polymorphed  */                \
-     || (mon)->m_id == quest_status.leader_m_id                         \
+     || (mon)->m_id == g.quest_status.leader_m_id                         \
         /* special cancellation handling for these */                   \
      || (dmgtype((mon)->data, AD_SEDU) || dmgtype((mon)->data, AD_SSEX)))
 
@@ -2008,8 +2008,8 @@ register struct monst *mtmp;
         mvitals[tmp].died++;
 
     /* if it's a (possibly polymorphed) quest leader, mark him as dead */
-    if (mtmp->m_id == quest_status.leader_m_id)
-        quest_status.leader_is_dead = TRUE;
+    if (mtmp->m_id == g.quest_status.leader_m_id)
+        g.quest_status.leader_is_dead = TRUE;
 #ifdef MAIL
     /* if the mail daemon dies, no more mail delivery.  -3. */
     if (tmp == PM_MAIL_DAEMON)
@@ -2351,7 +2351,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     g.vamp_rise_msg = FALSE; /* might get set in mondead(); only checked below */
     g.disintegested = nocorpse; /* alternate vamp_rise message needed if true */
     /* dispose of monster and make cadaver */
-    if (stoned)
+    if (g.stoned)
         monstone(mtmp);
     else
         mondead(mtmp);
@@ -2362,7 +2362,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
          * lifesaved_monster() since the message appears only when _you_
          * kill it (as opposed to visible lifesaving which always appears).
          */
-        stoned = FALSE;
+        g.stoned = FALSE;
         if (!cansee(x, y) && !g.vamp_rise_msg)
             pline("Maybe not...");
         return;
@@ -2371,8 +2371,8 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     mdat = mtmp->data; /* note: mondead can change mtmp->data */
     mndx = monsndx(mdat);
 
-    if (stoned) {
-        stoned = FALSE;
+    if (g.stoned) {
+        g.stoned = FALSE;
         goto cleanup;
     }
 
@@ -2448,7 +2448,7 @@ cleanup:
     newexplevel(); /* will decide if you go up */
 
     /* adjust alignment points */
-    if (mtmp->m_id == quest_status.leader_m_id) { /* REAL BAD! */
+    if (mtmp->m_id == g.quest_status.leader_m_id) { /* REAL BAD! */
         adjalign(-(u.ualign.record + (int) ALIGNLIM / 2));
         pline("That was %sa bad idea...",
               u.uevent.qcompleted ? "probably " : "");
@@ -2594,7 +2594,7 @@ struct monst *mtmp;
     if (!isok(mm.x, mm.y))
         return;
     rloc_to(mtmp, mm.x, mm.y);
-    if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
+    if (!g.in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (!couldspot && canspotmon(mtmp))
             pline("%s suddenly %s!", Amonnam(mtmp),
@@ -3223,7 +3223,7 @@ isspecmon(mon)
 struct monst *mon;
 {
     return (mon->isshk || mon->ispriest || mon->isgd
-            || mon->m_id == quest_status.leader_m_id);
+            || mon->m_id == g.quest_status.leader_m_id);
 }
 
 /* restrict certain special monsters (shopkeepers, aligned priests,

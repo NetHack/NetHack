@@ -1047,7 +1047,7 @@ aligntyp g_align;
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
                     You_hear("a divine music...");
-                    pline("It sounds like:  \"%s\".", tune);
+                    pline("It sounds like:  \"%s\".", g.tune);
                     u.uevent.uheard_tune++;
                     break;
                 }
@@ -1395,7 +1395,7 @@ dosacrifice()
                     You("are terrified, and unable to move.");
                     nomul(-3);
                     g.multi_reason = "being terrified of a demon";
-                    nomovemsg = 0;
+                    g.nomovemsg = 0;
                 } else
                     pline_The("%s.", demonless_msg);
             }
@@ -1834,7 +1834,7 @@ dopray()
     }
     nomul(-3);
     g.multi_reason = "praying";
-    nomovemsg = "You finish your prayer.";
+    g.nomovemsg = "You finish your prayer.";
     g.afternmv = prayer_done;
 
     if (g.p_type == 3 && !Inhell) {
@@ -2004,7 +2004,7 @@ doturn()
     }
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
     g.multi_reason = "trying to turn the monsters";
-    nomovemsg = You_can_move_again;
+    g.nomovemsg = You_can_move_again;
     return 1;
 }
 

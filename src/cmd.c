@@ -258,7 +258,7 @@ int xtime;
         timed_occ_fn = fn;
     } else
         g.occupation = fn;
-    occtxt = txt;
+    g.occtxt = txt;
     g.occtime = 0;
     return;
 }
@@ -1190,7 +1190,7 @@ wiz_map_levltyp(VOID_ARGS)
             Strcat(dsc, " endgame");
         else {
             /* somebody's added a dungeon branch we're not expecting */
-            const char *brname = dungeons[u.uz.dnum].dname;
+            const char *brname = g.dungeons[u.uz.dnum].dname;
 
             if (!brname || !*brname)
                 brname = "unknown";
@@ -1700,7 +1700,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     if (g.en_via_menu)
         start_menu(g.en_win);
 
-    Strcpy(tmpbuf, plname);
+    Strcpy(tmpbuf, g.plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
@@ -1880,13 +1880,13 @@ int final;
                 !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
-        Sprintf(buf, "on the %s level", dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "on the %s level", g.dungeons[u.uz.dnum].dname);
         /* TODO? maybe phrase it differently when actually inside the fort,
            if we're able to determine that (not trivial) */
     } else {
         char dgnbuf[QBUFSZ];
 
-        Strcpy(dgnbuf, dungeons[u.uz.dnum].dname);
+        Strcpy(dgnbuf, g.dungeons[u.uz.dnum].dname);
         if (!strncmpi(dgnbuf, "The ", 4))
             *dgnbuf = lowc(*dgnbuf);
         Sprintf(tmpbuf, "level %d",
@@ -2837,14 +2837,14 @@ int final;
         struct fruit *f;
 
         reorder_fruit(TRUE); /* sort by fruit index, from low to high;
-                              * this modifies the ffruit chain, so could
+                              * this modifies the g.ffruit chain, so could
                               * possibly mask or even introduce a problem,
                               * but it does useful sanity checking */
-        for (f = ffruit; f; f = f->nextf) {
+        for (f = g.ffruit; f; f = f->nextf) {
             Sprintf(buf, "Fruit #%d ", f->fid);
             enl_msg(buf, "is ", "was ", f->fname, "");
         }
-        enl_msg("The current fruit ", "is ", "was ", pl_fruit, "");
+        enl_msg("The current fruit ", "is ", "was ", g.pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
         enl_msg("The made fruit flag ", "is ", "was ", buf, "");
     }
@@ -2925,7 +2925,7 @@ minimal_enlightenment()
              "Starting", FALSE);
 
     /* Starting name, race, role, gender */
-    Sprintf(buf, fmtstr, "name", plname);
+    Sprintf(buf, fmtstr, "name", g.plname);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     Sprintf(buf, fmtstr, "race", urace.noun);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
@@ -5247,7 +5247,7 @@ boolean doit;
                              "Sit on the throne");
 
     if ((u.ux == xupstair && u.uy == yupstair)
-        || (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up)
+        || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy && g.sstairs.up)
         || (u.ux == xupladder && u.uy == yupladder)) {
         Sprintf(buf, "Go up the %s",
                 (u.ux == xupladder && u.uy == yupladder)
@@ -5255,7 +5255,7 @@ boolean doit;
         add_herecmd_menuitem(win, doup, buf);
     }
     if ((u.ux == xdnstair && u.uy == ydnstair)
-        || (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)
+        || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy && !g.sstairs.up)
         || (u.ux == xdnladder && u.uy == ydnladder)) {
         Sprintf(buf, "Go down the %s",
                 (u.ux == xupladder && u.uy == yupladder)
@@ -5365,14 +5365,14 @@ int x, y, mod;
                 cmd[0] = cmd_from_func(dosit);
                 return cmd;
             } else if ((u.ux == xupstair && u.uy == yupstair)
-                       || (u.ux == sstairs.sx && u.uy == sstairs.sy
-                           && sstairs.up)
+                       || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
+                           && g.sstairs.up)
                        || (u.ux == xupladder && u.uy == yupladder)) {
                 cmd[0] = cmd_from_func(doup);
                 return cmd;
             } else if ((u.ux == xdnstair && u.uy == ydnstair)
-                       || (u.ux == sstairs.sx && u.uy == sstairs.sy
-                           && !sstairs.up)
+                       || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
+                           && !g.sstairs.up)
                        || (u.ux == xdnladder && u.uy == ydnladder)) {
                 cmd[0] = cmd_from_func(dodown);
                 return cmd;
@@ -5564,9 +5564,9 @@ parse()
 
     if (g.multi) {
         g.multi--;
-        save_cm = in_line;
+        g.save_cm = in_line;
     } else {
-        save_cm = (char *) 0;
+        g.save_cm = (char *) 0;
     }
     /* in 3.4.3 this was in rhack(), where it was too late to handle M-5 */
     if (g.Cmd.pcHack_compat) {

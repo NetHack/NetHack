@@ -400,7 +400,7 @@ xchar e_type;
     ep->engr_txt = (char *) (ep + 1);
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
-    if (!in_mklev && !strcmp(s, "Elbereth"))
+    if (!g.in_mklev && !strcmp(s, "Elbereth"))
         exercise(A_WIS, TRUE);
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
@@ -490,7 +490,7 @@ doengrave()
     char *writer;
 
     g.multi = 0;              /* moves consumed */
-    nomovemsg = (char *) 0; /* occupation end message */
+    g.nomovemsg = (char *) 0; /* occupation end message */
 
     buf[0] = (char) 0;
     ebuf[0] = (char) 0;
@@ -1066,12 +1066,12 @@ doengrave()
     default:
         g.multi = -(len / 10);
         if (g.multi)
-            nomovemsg = "You finish your weird engraving.";
+            g.nomovemsg = "You finish your weird engraving.";
         break;
     case DUST:
         g.multi = -(len / 10);
         if (g.multi)
-            nomovemsg = "You finish writing in the dust.";
+            g.nomovemsg = "You finish writing in the dust.";
         break;
     case HEADSTONE:
     case ENGRAVE:
@@ -1098,12 +1098,12 @@ doengrave()
             g.multi = -len;
         }
         if (g.multi)
-            nomovemsg = "You finish engraving.";
+            g.nomovemsg = "You finish engraving.";
         break;
     case BURN:
         g.multi = -(len / 10);
         if (g.multi)
-            nomovemsg = is_ice(u.ux, u.uy)
+            g.nomovemsg = is_ice(u.ux, u.uy)
                           ? "You finish melting your message into the ice."
                           : "You finish burning your message into the floor.";
         break;
@@ -1121,12 +1121,12 @@ doengrave()
                 otmp->spe -= 1; /* Prevent infinite graffiti */
         }
         if (g.multi)
-            nomovemsg = "You finish defacing the dungeon.";
+            g.nomovemsg = "You finish defacing the dungeon.";
         break;
     case ENGR_BLOOD:
         g.multi = -(len / 10);
         if (g.multi)
-            nomovemsg = "You finish scrawling.";
+            g.nomovemsg = "You finish scrawling.";
         break;
     }
 
@@ -1138,7 +1138,7 @@ doengrave()
         if (!maxelen && *sp) {
             *sp = '\0';
             if (g.multi)
-                nomovemsg = "You cannot write any more.";
+                g.nomovemsg = "You cannot write any more.";
             You("are only able to write \"%s\".", ebuf);
         }
     }

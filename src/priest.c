@@ -508,7 +508,7 @@ int roomno;
                 You("are frightened to death, and unable to move.");
             nomul(-3);
             g.multi_reason = "being terrified of a ghost";
-            nomovemsg = "You regain your composure.";
+            g.nomovemsg = "You regain your composure.";
         }
     }
 }
@@ -785,8 +785,8 @@ struct monst *priest;
         break;
     }
 
-    buzz(-10 - (AD_ELEC - 1), 6, x, y, sgn(tbx),
-         sgn(tby)); /* bolt of lightning */
+    buzz(-10 - (AD_ELEC - 1), 6, x, y, sgn(g.tbx),
+         sgn(g.tby)); /* bolt of lightning */
     exercise(A_WIS, FALSE);
 }
 
@@ -1088,7 +1088,7 @@ ustatusline()
         Strcat(info, mon_nam(u.ustuck));
     }
 
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", g.plname,
           piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);

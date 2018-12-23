@@ -26,7 +26,7 @@ d_level *lev;
         assign_level(lev, &g.save_dlevel);
 
     return (boolean) (((sptr = Is_special(lev)) != 0 && !sptr->boneid)
-                      || !dungeons[lev->dnum].boneid
+                      || !g.dungeons[lev->dnum].boneid
                       /* no bones on the last or multiway branch levels
                          in any dungeon (level 1 isn't multiway) */
                       || Is_botlevel(lev)
@@ -384,7 +384,7 @@ make_bones:
     /* mark all fruits as nonexistent; when we come to them we'll mark
      * them as existing (using goodfruit())
      */
-    for (f = ffruit; f; f = f->nextf)
+    for (f = g.ffruit; f; f = f->nextf)
         f->fid = -f->fid;
 
     /* check iron balls separately--maybe they're not carrying it */
@@ -396,7 +396,7 @@ make_bones:
         struct obj *otmp;
 
         /* embed your possessions in your statue */
-        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, plname);
+        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, g.plname);
 
         drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
         if (!otmp)
@@ -408,19 +408,19 @@ make_bones:
         /* trick makemon() into allowing monster creation
          * on your location
          */
-        in_mklev = TRUE;
+        g.in_mklev = TRUE;
         mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NONAME);
-        in_mklev = FALSE;
+        g.in_mklev = FALSE;
         if (!mtmp)
             return;
-        mtmp = christen_monst(mtmp, plname);
+        mtmp = christen_monst(mtmp, g.plname);
         if (corpse)
             (void) obj_attach_mid(corpse, mtmp->m_id);
     } else {
         /* give your possessions to the monster you become */
-        in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
+        g.in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
         mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
-        in_mklev = FALSE;
+        g.in_mklev = FALSE;
         if (!mtmp) {
             drop_upon_death((struct monst *) 0, (struct obj *) 0, u.ux, u.uy);
             u.ugrave_arise = NON_PM; /* in case caller cares */
@@ -430,7 +430,7 @@ make_bones:
            carries one; don't bother forcing it to become worn */
         if (mtmp->data->mlet == S_MUMMY && !carrying(MUMMY_WRAPPING))
             (void) mongets(mtmp, MUMMY_WRAPPING);
-        mtmp = christen_monst(mtmp, plname);
+        mtmp = christen_monst(mtmp, g.plname);
         newsym(u.ux, u.uy);
         /* ["Your body rises from the dead as an <mname>..." used
            to be given here, but it has been moved to done() so that
@@ -479,7 +479,7 @@ make_bones:
     /* format name+role,&c, death reason, and date+time;
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
-    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", plname, urole.filecode,
+    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", g.plname, urole.filecode,
             urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);

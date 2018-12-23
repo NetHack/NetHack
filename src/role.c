@@ -1704,22 +1704,22 @@ plnamesuffix()
     /* some generic user names will be ignored in favor of prompting */
     if (sysopt.genericusers) {
         if (*sysopt.genericusers == '*') {
-            *plname = '\0';
+            *g.plname = '\0';
         } else {
-            i = (int) strlen(plname);
-            if ((sptr = strstri(sysopt.genericusers, plname)) != 0
+            i = (int) strlen(g.plname);
+            if ((sptr = strstri(sysopt.genericusers, g.plname)) != 0
                 && (sptr == sysopt.genericusers || sptr[-1] == ' ')
                 && (sptr[i] == ' ' || sptr[i] == '\0'))
-                *plname = '\0'; /* call askname() */
+                *g.plname = '\0'; /* call askname() */
         }
     }
 
     do {
-        if (!*plname)
-            askname(); /* fill plname[] if necessary, or set defer_plname */
+        if (!*g.plname)
+            askname(); /* fill g.plname[] if necessary, or set defer_plname */
 
         /* Look for tokens delimited by '-' */
-        if ((eptr = index(plname, '-')) != (char *) 0)
+        if ((eptr = index(g.plname, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
             /* Isolate the next token */
@@ -1737,10 +1737,10 @@ plnamesuffix()
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!*plname && !iflags.defer_plname);
+    } while (!*g.plname && !iflags.defer_plname);
 
-    /* commas in the plname confuse the record file, convert to spaces */
-    for (sptr = plname; *sptr; sptr++) {
+    /* commas in the g.plname confuse the record file, convert to spaces */
+    for (sptr = g.plname; *sptr; sptr++) {
         if (*sptr == ',')
             *sptr = ' ';
     }
@@ -1794,7 +1794,7 @@ winid where;
        to narrow something done to a single choice] */
 
     Sprintf(buf, "%12s ", "name:");
-    Strcat(buf, (which == RS_NAME) ? choosing : !*plname ? not_yet : plname);
+    Strcat(buf, (which == RS_NAME) ? choosing : !*g.plname ? not_yet : g.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
     Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE)
@@ -2011,15 +2011,15 @@ role_init()
     /* Check for a valid role.  Try flags.initrole first. */
     if (!validrole(flags.initrole)) {
         /* Try the player letter second */
-        if ((flags.initrole = str2role(pl_character)) < 0)
+        if ((flags.initrole = str2role(g.pl_character)) < 0)
             /* None specified; pick a random role */
             flags.initrole = randrole_filtered();
     }
 
     /* We now have a valid role index.  Copy the role name back. */
     /* This should become OBSOLETE */
-    Strcpy(pl_character, roles[flags.initrole].name.m);
-    pl_character[PL_CSIZ - 1] = '\0';
+    Strcpy(g.pl_character, roles[flags.initrole].name.m);
+    g.pl_character[PL_CSIZ - 1] = '\0';
 
     /* Check for a valid race */
     if (!validrace(flags.initrole, flags.initrace))
@@ -2054,7 +2054,7 @@ role_init()
         pm->maligntyp = alignmnt * 3;
         /* if gender is random, we choose it now instead of waiting
            until the leader monster is created */
-        quest_status.ldrgend =
+        g.quest_status.ldrgend =
             is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm)
                                                         ? 0
                                                         : (rn2(100) < 50);
@@ -2077,7 +2077,7 @@ role_init()
         pm->mflags3 |= M3_WANTSARTI | M3_WAITFORU;
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
+        g.quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
                                    : is_male(pm) ? 0 : (rn2(100) < 50);
     }
 
@@ -2093,7 +2093,7 @@ role_init()
         urole.cgod = roles[flags.pantheon].cgod;
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
-    quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
+    g.quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
 
     /* Fix up infravision */
     if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {

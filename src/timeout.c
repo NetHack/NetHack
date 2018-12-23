@@ -136,7 +136,7 @@ stoned_dialogue()
         stop_occupation();
         nomul(-3); /* can't move anymore */
         g.multi_reason = "getting stoned";
-        nomovemsg = You_can_move_again; /* not unconscious */
+        g.nomovemsg = You_can_move_again; /* not unconscious */
         /* "your limbs have turned to stone" so terminate wounded legs */
         if (Wounded_legs && !u.usteed)
             heal_legs(2);
@@ -676,7 +676,7 @@ nh_timeout()
                     slip_or_trip();
                     nomul(-2);
                     g.multi_reason = "fumbling";
-                    nomovemsg = "";
+                    g.nomovemsg = "";
                     /* The more you are carrying the more likely you
                      * are to make noise when you fumble.  Adjustments
                      * to this number must be thoroughly play tested.
@@ -719,7 +719,7 @@ boolean wakeup_msg;
     }
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = monstermoves;
-    nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
+    g.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
 }
 
 /* Attach an egg hatch timeout to the given egg.
@@ -1584,7 +1584,7 @@ do_storms()
             stop_occupation();
             nomul(-3);
             g.multi_reason = "hiding from thunderstorm";
-            nomovemsg = 0;
+            g.nomovemsg = 0;
         }
     } else
         You_hear("a rumbling noise.");

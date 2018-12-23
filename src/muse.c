@@ -367,8 +367,8 @@ struct monst *mtmp;
                 g.m.has_defense = MUSE_DOWNSTAIRS;
         } else if (x == xupstair && y == yupstair) {
             g.m.has_defense = MUSE_UPSTAIRS;
-        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
-            if (sstairs.up || !is_floater(mtmp->data))
+        } else if (g.sstairs.sx && x == g.sstairs.sx && y == g.sstairs.sy) {
+            if (g.sstairs.up || !is_floater(mtmp->data))
                 g.m.has_defense = MUSE_SSTAIRS;
         }
     } else if (levl[x][y].typ == LADDER) {
@@ -377,8 +377,8 @@ struct monst *mtmp;
         } else if (x == xdnladder && y == ydnladder) {
             if (!is_floater(mtmp->data))
                 g.m.has_defense = MUSE_DN_LADDER;
-        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
-            if (sstairs.up || !is_floater(mtmp->data))
+        } else if (g.sstairs.sx && x == g.sstairs.sx && y == g.sstairs.sy) {
+            if (g.sstairs.up || !is_floater(mtmp->data))
                 g.m.has_defense = MUSE_SSTAIRS;
         }
     } else {
@@ -703,8 +703,8 @@ struct monst *mtmp;
         if (IS_FURNITURE(levl[mtmp->mx][mtmp->my].typ)
             || IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ)
             || (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0)
-            || (sstairs.sx && sstairs.sx == mtmp->mx
-                && sstairs.sy == mtmp->my)) {
+            || (g.sstairs.sx && g.sstairs.sx == mtmp->mx
+                && g.sstairs.sy == mtmp->my)) {
             pline_The("digging ray is ineffective.");
             return 2;
         }
@@ -884,12 +884,12 @@ struct monst *mtmp;
         }
         if (vismon)
             pline("%s escapes %sstairs!", Monnam(mtmp),
-                  sstairs.up ? "up" : "down");
+                  g.sstairs.up ? "up" : "down");
         /* going from the Valley to Castle (Stronghold) has no sstairs
-           to target, but having sstairs.<sx,sy> == <0,0> will work the
+           to target, but having g.sstairs.<sx,sy> == <0,0> will work the
            same as specifying MIGR_RANDOM when mon_arrive() eventually
            places the monster, so we can use MIGR_SSTAIRS unconditionally */
-        migrate_to_level(mtmp, ledger_no(&sstairs.tolev), MIGR_SSTAIRS,
+        migrate_to_level(mtmp, ledger_no(&g.sstairs.tolev), MIGR_SSTAIRS,
                          (coord *) 0);
         return 2;
     case MUSE_TELEPORT_TRAP:
@@ -1119,7 +1119,7 @@ struct monst *mtmp;
             && (onscary(u.ux, u.uy, mtmp)
                 || (u.ux == xupstair && u.uy == yupstair)
                 || (u.ux == xdnstair && u.uy == ydnstair)
-                || (u.ux == sstairs.sx && u.uy == sstairs.sy)
+                || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy)
                 || (u.ux == xupladder && u.uy == yupladder)
                 || (u.ux == xdnladder && u.uy == ydnladder))) {
             g.m.offensive = obj;
@@ -1964,7 +1964,7 @@ struct monst *mtmp;
     docrt();
     if (unconscious()) {
         g.multi = -1;
-        nomovemsg = "Aggravated, you are jolted into full consciousness.";
+        g.nomovemsg = "Aggravated, you are jolted into full consciousness.";
     }
     newsym(mtmp->mx, mtmp->my);
     if (!canspotmon(mtmp))

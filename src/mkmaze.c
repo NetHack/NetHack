@@ -503,24 +503,24 @@ fixup_special()
         case LR_DOWNTELE:
             /* save the region outlines for goto_level() */
             if (r->rtype == LR_TELE || r->rtype == LR_UPTELE) {
-                updest.lx = r->inarea.x1;
-                updest.ly = r->inarea.y1;
-                updest.hx = r->inarea.x2;
-                updest.hy = r->inarea.y2;
-                updest.nlx = r->delarea.x1;
-                updest.nly = r->delarea.y1;
-                updest.nhx = r->delarea.x2;
-                updest.nhy = r->delarea.y2;
+                g.updest.lx = r->inarea.x1;
+                g.updest.ly = r->inarea.y1;
+                g.updest.hx = r->inarea.x2;
+                g.updest.hy = r->inarea.y2;
+                g.updest.nlx = r->delarea.x1;
+                g.updest.nly = r->delarea.y1;
+                g.updest.nhx = r->delarea.x2;
+                g.updest.nhy = r->delarea.y2;
             }
             if (r->rtype == LR_TELE || r->rtype == LR_DOWNTELE) {
-                dndest.lx = r->inarea.x1;
-                dndest.ly = r->inarea.y1;
-                dndest.hx = r->inarea.x2;
-                dndest.hy = r->inarea.y2;
-                dndest.nlx = r->delarea.x1;
-                dndest.nly = r->delarea.y1;
-                dndest.nhx = r->delarea.x2;
-                dndest.nhy = r->delarea.y2;
+                g.dndest.lx = r->inarea.x1;
+                g.dndest.ly = r->inarea.y1;
+                g.dndest.hx = r->inarea.x2;
+                g.dndest.hy = r->inarea.y2;
+                g.dndest.nlx = r->delarea.x1;
+                g.dndest.nly = r->delarea.y1;
+                g.dndest.nhx = r->delarea.x2;
+                g.dndest.nhy = r->delarea.y2;
             }
             /* place_lregion gets called from goto_level() */
             break;
@@ -606,7 +606,7 @@ fixup_special()
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
-    } else if (u.uz.dnum == mines_dnum && ransacked) {
+    } else if (u.uz.dnum == mines_dnum && g.ransacked) {
        stolen_booty();
     }
 
@@ -620,7 +620,7 @@ check_ransacked(s)
 char *s;
 {
     /* this kludge only works as long as orctown is minetn-1 */
-    ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
+    g.ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
 }
 
 #define ORC_LEADER 1
@@ -636,7 +636,7 @@ unsigned long mflags;
 
     cur_depth = (int) depth(&u.uz);
     max_depth = dunlevs_in_dungeon(&u.uz)
-                + (dungeons[u.uz.dnum].depth_start - 1);
+                + (g.dungeons[u.uz.dnum].depth_start - 1);
     if (mflags == ORC_LEADER) {
         /* Note that the orc leader will take possession of any
          * remaining stuff not already delivered to other
@@ -797,7 +797,7 @@ stolen_booty(VOID_ARGS)
             migrate_orc(mtmp, 0UL);
         }
     }
-    ransacked = 0;
+    g.ransacked = 0;
 }
 
 #undef ORC_LEADER
@@ -963,19 +963,19 @@ const char *s;
             Sprintf(protofile, "%s-%d", s, rnd((int) sp->rndlevs));
         else
             Strcpy(protofile, s);
-    } else if (*(dungeons[u.uz.dnum].proto)) {
+    } else if (*(g.dungeons[u.uz.dnum].proto)) {
         if (dunlevs_in_dungeon(&u.uz) > 1) {
             if (sp && sp->rndlevs)
-                Sprintf(protofile, "%s%d-%d", dungeons[u.uz.dnum].proto,
+                Sprintf(protofile, "%s%d-%d", g.dungeons[u.uz.dnum].proto,
                         dunlev(&u.uz), rnd((int) sp->rndlevs));
             else
-                Sprintf(protofile, "%s%d", dungeons[u.uz.dnum].proto,
+                Sprintf(protofile, "%s%d", g.dungeons[u.uz.dnum].proto,
                         dunlev(&u.uz));
         } else if (sp && sp->rndlevs) {
-            Sprintf(protofile, "%s-%d", dungeons[u.uz.dnum].proto,
+            Sprintf(protofile, "%s-%d", g.dungeons[u.uz.dnum].proto,
                     rnd((int) sp->rndlevs));
         } else
-            Strcpy(protofile, dungeons[u.uz.dnum].proto);
+            Strcpy(protofile, g.dungeons[u.uz.dnum].proto);
 
     } else
         Strcpy(protofile, "");
@@ -1054,10 +1054,10 @@ const char *s;
 
         if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
             || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
-            debugpline2("inv_pos: maze is too small! (%d x %d)",
+            debugpline2("g.inv_pos: maze is too small! (%d x %d)",
                         g.x_maze_max, g.y_maze_max);
         }
-        inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
+        g.inv_pos.x = g.inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
         do {
             x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
@@ -1067,9 +1067,9 @@ const char *s;
                  || abs(x - xupstair) == abs(y - yupstair)
                  || distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE
                  || !SPACE_POS(levl[x][y].typ) || occupied(x, y));
-        inv_pos.x = x;
-        inv_pos.y = y;
-        maketrap(inv_pos.x, inv_pos.y, VIBRATING_SQUARE);
+        g.inv_pos.x = x;
+        g.inv_pos.y = y;
+        maketrap(g.inv_pos.x, g.inv_pos.y, VIBRATING_SQUARE);
 #undef INVPOS_X_MARGIN
 #undef INVPOS_Y_MARGIN
 #undef INVPOS_DISTANCE
@@ -1335,7 +1335,7 @@ xchar x, y, todnum, todlevel;
         return;
     }
     debugpline4("mkportal: at <%d,%d>, to %s, level %d", x, y,
-                dungeons[todnum].dname, todlevel);
+                g.dungeons[todnum].dname, todlevel);
     ttmp->dst.dnum = todnum;
     ttmp->dst.dlevel = todlevel;
     return;

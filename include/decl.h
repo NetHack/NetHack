@@ -86,35 +86,19 @@ E struct dgn_topology { /* special dungeon levels for speed */
 #define sokoend_level           (dungeon_topology.d_sokoend_level)
 /* clang-format on */
 
-E NEARDATA stairway dnstair, upstair; /* stairs up and down */
-#define xdnstair (dnstair.sx)
-#define ydnstair (dnstair.sy)
-#define xupstair (upstair.sx)
-#define yupstair (upstair.sy)
+#define xdnstair (g.dnstair.sx)
+#define ydnstair (g.dnstair.sy)
+#define xupstair (g.upstair.sx)
+#define yupstair (g.upstair.sy)
 
-E NEARDATA stairway dnladder, upladder; /* ladders up and down */
-#define xdnladder (dnladder.sx)
-#define ydnladder (dnladder.sy)
-#define xupladder (upladder.sx)
-#define yupladder (upladder.sy)
+#define xdnladder (g.dnladder.sx)
+#define ydnladder (g.dnladder.sy)
+#define xupladder (g.upladder.sx)
+#define yupladder (g.upladder.sy)
 
-E NEARDATA stairway sstairs;
-
-E NEARDATA dest_area updest, dndest; /* level-change destination areas */
-
-E NEARDATA coord inv_pos;
-E NEARDATA dungeon dungeons[];
-E NEARDATA s_level *sp_levchn;
-#define dunlev_reached(x) (dungeons[(x)->dnum].dunlev_ureached)
+#define dunlev_reached(x) (g.dungeons[(x)->dnum].dunlev_ureached)
 
 #include "quest.h"
-E struct q_score quest_status;
-
-E NEARDATA char pl_character[PL_CSIZ];
-E NEARDATA char pl_race; /* character's race */
-
-E NEARDATA char pl_fruit[PL_FSIZ];
-E NEARDATA struct fruit *ffruit;
 
 E NEARDATA char tune[6];
 
@@ -140,9 +124,6 @@ E NEARDATA struct sinfo {
     int wizkit_wishing;
 } program_state;
 
-E boolean restoring;
-E boolean ransacked;
-
 E const char quitchars[];
 E const char vowels[];
 E const char ynchars[];
@@ -152,10 +133,6 @@ E const char ynNaqchars[];
 E NEARDATA long yn_number;
 
 E const char disclosure_options[];
-
-E NEARDATA int smeq[];
-E NEARDATA int doorindex;
-E NEARDATA char *save_cm;
 
 E NEARDATA struct kinfo {
     struct kinfo *next; /* chain of delayed killers */
@@ -167,35 +144,23 @@ E NEARDATA struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
-E long done_money;
-E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];
 E NEARDATA char horsename[];
 E char preferred_pet;
 
-E const char *occtxt; /* defined when occupation != NULL */
-E const char *nomovemsg;
 E char lock[];
 
 E const schar xdir[], ydir[], zdir[];
 
-E NEARDATA schar tbx, tby; /* set in mthrowu.c */
-
-E NEARDATA struct multishot {
+struct multishot {
     int n, i;
     short o;
     boolean s;
-} m_shot;
+};
 
 E NEARDATA long moves, monstermoves;
 E NEARDATA long wailmsg;
-
-E NEARDATA boolean in_mklev;
-E NEARDATA boolean stoned;
-E NEARDATA boolean unweapon;
-E NEARDATA boolean mrg_to_wielded;
-E NEARDATA boolean defer_see_monsters;
 
 E NEARDATA boolean in_steed_dismounting;
 
@@ -692,6 +657,38 @@ struct instance_globals {
     int y_maze_max;
     int otg_temp; /* used by object_to_glyph() [otg] */
     int in_doagain;
+    stairway dnstair; /* stairs down */
+    stairway upstair; /* stairs up */
+    stairway dnladder; /* ladder down */
+    stairway upladder; /* ladder up */
+    int smeq[MAXNROFROOMS + 1];
+    int doorindex;
+    char *save_cm;
+    long done_money;
+    const char *nomovemsg;
+    char plname[PL_NSIZ]; /* player name */
+    char pl_character[PL_CSIZ];
+    char pl_race; /* character's race */
+    char pl_fruit[PL_FSIZ];
+    struct fruit *ffruit;
+    char tune[6];
+    const char *occtxt; /* defined when occupation != NULL */
+    schar tbx;  /* mthrowu: target x */
+    schar tby;  /* mthrowu: target y */
+    s_level * sp_levchn;
+    /* for xname handling of multiple shot missile volleys:
+       number of shots, index of current one, validity check, shoot vs throw */
+    struct multishot m_shot;
+    dungeon dungeons[MAXDUNGEON]; /* ini'ed by init_dungeon() */
+    stairway sstairs;
+    dest_area updest;
+    dest_area dndest;
+    coord inv_pos;
+    boolean defer_see_monsters;
+    boolean in_mklev;
+    boolean stoned; /* done to monsters hit by 'c' */
+    boolean unweapon;
+    boolean mrg_to_wielded; /* weapon picked is merged with wielded one */
 
     /* dig.c */
 
@@ -834,6 +831,7 @@ struct instance_globals {
     struct bubble *ebubbles;
     struct trap *wportal;
     int xmin, ymin, xmax, ymax; /* level boundaries */
+    boolean ransacked;
 
     /* mon.c */
     boolean vamp_rise_msg;
@@ -909,6 +907,9 @@ struct instance_globals {
     aligntyp p_aligntyp;
     int p_trouble;
     int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
+
+    /* quest.c */
+    struct q_score quest_status;
 
     /* questpgr.c */
     char cvt_buf[CVT_BUF_SIZE];

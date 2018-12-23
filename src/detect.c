@@ -971,7 +971,7 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
     if (detect_obj_traps(invent, FALSE, 0) != OTRAP_NONE)
         found = TRUE;
     /* door traps */
-    for (door = 0; door < doorindex; door++) {
+    for (door = 0; door < g.doorindex; door++) {
         cc = doors[door];
         if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
             if (cc.x != u.ux || cc.y != u.uy)
@@ -1009,7 +1009,7 @@ outtrapmap:
     for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
         sense_trap(ttmp, 0, 0, cursed_src);
 
-    for (door = 0; door < doorindex; door++) {
+    for (door = 0; door < g.doorindex; door++) {
         cc = doors[door];
         if (levl[cc.x][cc.y].doormask & D_TRAPPED)
             sense_trap((struct trap *) 0, cc.x, cc.y, cursed_src);
@@ -1184,7 +1184,7 @@ struct obj **optr;
     You("peer into %s...", the(xname(obj)));
     nomul(-rnd(10));
     g.multi_reason = "gazing into a crystal ball";
-    nomovemsg = "";
+    g.nomovemsg = "";
     if (obj->spe <= 0) {
         pline_The("vision is unclear.");
     } else {
