@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1544442712 2018/12/10 11:51:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1545525307 2018/12/23 00:35:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -896,7 +896,7 @@ register int after;
         mmoved = 1;
         goto postmov;
     }
-not_special:
+ not_special:
     if (u.uswallow && !mtmp->mflee && u.ustuck != mtmp)
         return 1;
     omx = mtmp->mx;
@@ -1157,7 +1157,7 @@ not_special:
                 chi = i;
                 mmoved = 1;
             }
-        nxti:
+ nxti:
             ;
         }
     }
@@ -1201,6 +1201,7 @@ not_special:
         if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy)) {
             struct monst *mtmp2;
             int mstatus;
+
             mtmp2 = m_at(nix, niy);
 
             notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
@@ -1224,6 +1225,7 @@ not_special:
         if ((info[chi] & ALLOW_MDISP)) {
             struct monst *mtmp2;
             int mstatus;
+
             mtmp2 = m_at(nix, niy);
             mstatus = mdisplacem(mtmp, mtmp2, FALSE);
             if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED))
@@ -1235,6 +1237,7 @@ not_special:
 
         if (!m_in_out_region(mtmp, nix, niy))
             return 3;
+
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
         for (j = MTSZ - 1; j > 0; j--)
@@ -1252,18 +1255,49 @@ not_special:
         if (mtmp->wormno)
             worm_nomove(mtmp);
     }
-postmov:
+ postmov:
     if (mmoved == 1 || mmoved == 3) {
         boolean canseeit = cansee(mtmp->mx, mtmp->my);
 
         if (mmoved == 1) {
+            /* normal monster move will already have <nix,niy>,
+               but pet dog_move() with 'goto postmov' won't */
+            nix = mtmp->mx, niy = mtmp->my;
+            /* sequencing issue:  when monster movement decides that a
+               monster can move to a door location, it moves the monster
+               there before dealing with the door rather than after;
+               so a vampire/bat that is going to shift to fog cloud and
+               pass under the door is already there but transformation
+               into fog form--and its message, when in sight--has not
+               happened yet; we have to move monster back to previous
+               location before performing the vamp_shift() to make the
+               message happen at right time, then back to the door again
+               [if we did the shift above, before moving the monster,
+               we would need to duplicate it in dog_move()...] */
+            if (is_vampshifter(mtmp) && !amorphous(mtmp->data)
+                && IS_DOOR(levl[nix][niy].typ)
+                && ((levl[nix][niy].doormask & (D_LOCKED | D_CLOSED)) != 0)
+                && can_fog(mtmp)) {
+                if (sawmon) {
+                    remove_monster(nix, niy), place_monster(mtmp, omx, omy);
+                    newsym(nix, niy), newsym(omx, omy);
+                }
+                if (vamp_shift(mtmp, &mons[PM_FOG_CLOUD], sawmon)) {
+                    ptr = mtmp->data; /* update cached value */
+                }
+                if (sawmon) {
+                    remove_monster(omx, omy), place_monster(mtmp, nix, niy);
+                    newsym(omx, omy), newsym(nix, niy);
+                }
+            }
+
             newsym(omx, omy); /* update the old position */
             if (mintrap(mtmp) >= 2) {
                 if (mtmp->mx)
                     newsym(mtmp->mx, mtmp->my);
                 return 2; /* it died */
             }
-            ptr = mtmp->data;
+            ptr = mtmp->data; /* in case mintrap() caused polymorph */
 
             /* open a door, or crash through it, if 'mtmp' can */
             if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
@@ -1284,18 +1318,11 @@ postmov:
                     btrapped = FALSE;
                 }
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
-                    && (amorphous(ptr)
-                        || (can_fog(mtmp)
-                            && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
-                                          sawmon)))) {
-                    /* update cached value for vamp_shift() case */
-                    ptr = mtmp->data;
+                    && amorphous(ptr)) {
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
-                               || ptr->mlet == S_LIGHT)
-                                  ? "flows"
-                                  : "oozes");
+                               || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
                 } else if (here->doormask & D_LOCKED && can_unlock) {
                     if (btrapped) {
                         here->doormask = D_NODOOR;
@@ -1684,6 +1711,9 @@ boolean domsg;
         pline("You %s %s where %s was.",
               !canseemon(mon) ? "now detect" : "observe",
               noname_monnam(mon, ARTICLE_A), oldmtype);
+        /* this message is given when it turns into a fog cloud
+           in order to move under a closed door */
+        display_nhwindow(WIN_MESSAGE, FALSE);
     }
 
     return reslt;
