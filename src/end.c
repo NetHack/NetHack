@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1545172226 2018/12/18 22:30:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1545646111 2018/12/24 10:08:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.160 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -836,16 +836,13 @@ int how;
     u.uhp = u.uhpmax;
     if (Upolyd) /* Unchanging, or death which bypasses losing hit points */
         u.mh = u.mhmax;
-    if (u.uhunger < 500) {
-        u.uhunger = 500;
-        newuhs(FALSE);
+    if (u.uhunger < 500 || how == CHOKING) {
+        init_uhunger();
     }
     /* cure impending doom of sickness hero won't have time to fix */
     if ((Sick & TIMEOUT) == 1L) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
-    if (how == CHOKING)
-        init_uhunger();
     g.nomovemsg = "You survived that attempt on your life.";
     context.move = 0;
     if (g.multi > 0)
@@ -1037,9 +1034,12 @@ int how;
     if (iflags.debug_fuzzer) {
         if (!(program_state.panicking || how == PANICKED)) {
             savelife(how);
-            /* periodically restore characteristics and lost exp levels */
+            /* periodically restore characteristics and lost exp levels
+               or cure lycanthropy */
             if (!rn2(10)) {
-                struct obj *potion = mksobj(POT_RESTORE_ABILITY, TRUE, FALSE);
+                struct obj *potion = mksobj((u.ulycn > LOW_PM && !rn2(3))
+                                            ? POT_WATER : POT_RESTORE_ABILITY,
+                                            TRUE, FALSE);
 
                 bless(potion);
                 (void) peffects(potion); /* always -1 for restore ability */

@@ -156,9 +156,6 @@ a wand of polymorph lost its magical ability for the turn just because the
 	much sense
 floating eye is classified as a flyer but flying is blocked while levitating,
 	so don't set intrinsic flying if hero is polymorphed into one
-being trapped (bear trap, web, molten or solidified lava, chained to buried
-	iron ball) blocks both levitation and flight (note: being stuck in a
-	pit ends when either of those starts so doesn't apply)
 change default value for the 'autodescribe' option to 'on'
 Elbereth hypocrisy penalty doesn't apply if attacking a monster which isn't
 	frightened by Elbereth; normal scuffing of engravings still applies
@@ -300,6 +297,12 @@ identifying or forgetting gem types now adjusts prices for gems already on
 when fire converts an ice location into a water location, dunk any monster on
 	that spot immediately instead of waiting until its next move
 training riding skill had an off-by-one bug when counting turns riding
+message sequencing when vampire shifts to fog cloud to pass under closed door:
+	when in sight, give form change message before moving to door spot
+limit carrying heavy loads from water to land
+failing to carry a wished-for item behaved differenctly from dropping one
+life-saving while weak/starving/fainting boosted nutrition without restoring
+	lost point of strength, making temporary loss be permanent
 
 
 Fixes to Post-3.6.1 Problems that Were Exposed Via git Repository
@@ -333,6 +336,7 @@ a config file line with OPTIONS=symset:default, roguesymset:RogueEpyx
 	meant to have color; that was due to an errant init_symbols() call
 	during the processing of symset:default done after RogueEpyx had
 	already been processed
+avoid potential segfault when doing 'more information' lookup
 tty: turn off an optimization that is the suspected cause of Windows reported
 	partial status lines following level changes
 tty: ensure that current status fields are always copied to prior status
@@ -447,6 +451,11 @@ for ^X and enlightenment, display the information in a menu rather than a
 	needed for interfaces (tty) without text popup scrollbar support;
 	end of game disclosure of attributes remains single-forward-pass
 for ^X, include current state of 'autopickup'
+being trapped (bear trap, web, molten or solidified lava, chained to buried
+	iron ball) blocks both levitation and flight (note: being stuck in a
+	pit ends when either of those starts so doesn't apply)
+early level traps are sometimes covered by the remains of fake players
+fake player characters resist Conflict
 
 
 NetHack Community Patches (or Variation) Included
