@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1545182147 2018/12/19 01:15:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1545597429 2018/12/23 20:37:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2234,6 +2234,7 @@ more_dips:
         singlepotion =
             hold_another_object(singlepotion, "You juggle and drop %s!",
                                 doname(singlepotion), (const char *) 0);
+        nhUse(singlepotion);
         update_inventory();
         return 1;
     }

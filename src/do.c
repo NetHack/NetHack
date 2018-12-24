@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1545043771 2018/12/17 10:49:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1545597418 2018/12/23 20:36:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -610,7 +610,7 @@ register struct obj *obj;
             if (obj->oclass == COIN_CLASS)
                 context.botl = 1;
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
             if (levhack)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
             return 1;

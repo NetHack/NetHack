@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1543188989 2018/11/25 23:36:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1545597427 2018/12/23 20:37:07 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2010,6 +2010,7 @@ boolean *prev_loot;
             }
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
+            nhUse(otmp);
             timepassed = rnd(3);
             if (prev_loot)
                 *prev_loot = TRUE;
@@ -3175,7 +3176,7 @@ struct obj *box; /* or bag */
 
             if (highdrop) {
                 /* might break or fall down stairs; handles altars itself */
-                hitfloor(otmp);
+                hitfloor(otmp, TRUE);
             } else {
                 if (altarizing) {
                     doaltarobj(otmp);

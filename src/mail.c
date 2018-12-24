@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1542765359 2018/11/21 01:55:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1545597424 2018/12/23 20:37:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -186,7 +186,7 @@ coord *startp;
      */
     lax = 0; /* be picky */
     max_distance = -1;
-retry:
+ retry:
     for (row = 0; row < ROWNO; row++) {
         if (viz_rmin[row] < viz_rmax[row]) {
             /* There are valid positions on this row. */
@@ -418,15 +418,17 @@ struct mail_info *info;
         display_nhwindow(WIN_MESSAGE, FALSE);
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);
+        nhUse(obj);
     }
 
-/* zip back to starting location */
-go_back:
+ go_back:
+    /* zip back to starting location */
     if (!md_rush(md, start.x, start.y))
         md->mx = md->my = 0; /* for mongone, md is not on map */
     mongone(md);
-/* deliver some classes of messages even if no daemon ever shows up */
-give_up:
+
+ give_up:
+    /* deliver some classes of messages even if no daemon ever shows up */
     if (!message_seen && info->message_typ == MSG_OTHER)
         pline("Hark!  \"%s.\"", info->display_txt);
 }
@@ -609,7 +611,7 @@ boolean adminmsg;
     else
         unlink(mailbox);
     return;
-bail:
+ bail:
     /* bail out _professionally_ */
     if (!adminmsg)
         pline("It appears to be all gibberish.");

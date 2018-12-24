@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1545431660 2018/12/21 22:34:20 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.303 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1545614662 2018/12/24 01:24:22 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5081,6 +5081,11 @@ int damage, tell;
 {
     int resisted;
     int alev, dlev;
+
+    /* fake players always pass resistance test against Conflict
+       (this doesn't guarantee that they're never affected by it) */
+    if (oclass == RING_CLASS && !damage && !tell && is_mplayer(mtmp->data))
+        return 1;
 
     /* attack level */
     switch (oclass) {
