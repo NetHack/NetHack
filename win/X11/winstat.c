@@ -1060,7 +1060,7 @@ long new_value;
 
     if (attr_rec->type == SV_LABEL) {
         if (attr_rec == &shown_stats[F_NAME]) {
-            Strcpy(buf, plname);
+            Strcpy(buf, g.plname);
             buf[0] = highc(buf[0]);
             Strcat(buf, " the ");
             if (Upolyd) {

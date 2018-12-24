@@ -1152,7 +1152,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     wmove(win, y, x);
 
     get_playerrank(rank);
-    sprintf(buf, "%s the %s", plname, rank);
+    sprintf(buf, "%s the %s", g.plname, rank);
 
     /* Use the title as HP bar (similar to hitpointbar) */
     draw_bar(TRUE, hp, hpmax, buf);
@@ -1239,7 +1239,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     char race[BUFSZ];
     Strcpy(race, urace.adj);
     race[0] = highc(race[0]);
-    wprintw(win, "%s the %s %s%s%s", plname,
+    wprintw(win, "%s the %s %s%s%s", g.plname,
             (u.ualign.type == A_CHAOTIC ? "Chaotic" :
              u.ualign.type == A_NEUTRAL ? "Neutral" : "Lawful"),
             Upolyd ? "" : race, Upolyd ? "" : " ",
@@ -1358,7 +1358,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     int ranklen = strlen(rank);
-    int namelen = strlen(plname);
+    int namelen = strlen(g.plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
     if (!iflags.hitpointbar)
@@ -1375,7 +1375,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
-    sprintf(buf, "%-*s the %-*s", namelen, plname, ranklen, rank);
+    sprintf(buf, "%-*s the %-*s", namelen, g.plname, ranklen, rank);
     draw_bar(TRUE, hp, hpmax, buf);
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);

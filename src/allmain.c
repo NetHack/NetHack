@@ -677,13 +677,13 @@ do_positionbar()
 
     p = pbar;
     /* up stairway */
-    if (upstair.sx
-        && (glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph)
+    if (g.upstair.sx
+        && (glyph_to_cmap(level.locations[g.upstair.sx][g.upstair.sy].glyph)
                 == S_upstair
-            || glyph_to_cmap(level.locations[upstair.sx][upstair.sy].glyph)
+            || glyph_to_cmap(level.locations[g.upstair.sx][g.upstair.sy].glyph)
                    == S_upladder)) {
         *p++ = '<';
-        *p++ = upstair.sx;
+        *p++ = g.upstair.sx;
     }
     if (g.sstairs.sx
         && (glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)

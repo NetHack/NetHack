@@ -229,11 +229,11 @@ char *argv[];
          * dash matches role, race, gender, or alignment.
          */
         /* guard against user names with hyphens in them */
-        int len = (int) strlen(plname);
+        int len = (int) strlen(g.plname);
         /* append the current role, if any, so that last dash is ours */
-        if (++len < (int) sizeof plname)
-            (void) strncat(strcat(plname, "-"), pl_character,
-                           sizeof plname - len - 1);
+        if (++len < (int) sizeof g.plname)
+            (void) strncat(strcat(g.plname, "-"), g.pl_character,
+                           sizeof g.plname - len - 1);
     }
     /* strip role,race,&c suffix; calls askname() if plname[] is empty
        or holds a generic user name like "player" or "games" */
@@ -275,12 +275,12 @@ attempt_restore:
      * clock, &c not currently in use in the playground directory
      * (for locknum > 0).
      */
-    if (*plname) {
+    if (*g.plname) {
         getlock();
         program_state.preserve_locks = 0; /* after getlock() */
     }
 
-    if (*plname && (fd = restore_saved_game()) >= 0) {
+    if (*g.plname && (fd = restore_saved_game()) >= 0) {
         const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
@@ -311,7 +311,7 @@ attempt_restore:
     }
 
     if (!resuming) {
-        boolean neednewlock = (!*plname);
+        boolean neednewlock = (!*g.plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
@@ -320,7 +320,7 @@ attempt_restore:
             if (!plsel_once)
                 player_selection();
             plsel_once = TRUE;
-            if (neednewlock && *plname)
+            if (neednewlock && *g.plname)
                 goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
@@ -388,11 +388,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2]) {
-                (void) strncpy(plname, argv[0] + 2, sizeof plname - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof g.plname - 1);
             } else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof plname - 1);
+                (void) strncpy(g.plname, argv[0], sizeof g.plname - 1);
             } else {
                 raw_print("Player name expected after -u");
             }
@@ -540,7 +540,7 @@ whoami()
      * Note that we trust the user here; it is possible to play under
      * somebody else's name.
      */
-    if (!*plname) {
+    if (!*g.plname) {
         register const char *s;
 
         s = nh_getenv("USER");
@@ -550,8 +550,8 @@ whoami()
             s = getlogin();
 
         if (s && *s) {
-            (void) strncpy(plname, s, sizeof plname - 1);
-            if (index(plname, '-'))
+            (void) strncpy(g.plname, s, sizeof g.plname - 1);
+            if (index(g.plname, '-'))
                 return TRUE;
         }
     }
@@ -661,7 +661,7 @@ char *optstr;
     if (!pw)
         return FALSE;
     if (sysopt.check_plname)
-        pwname = plname;
+        pwname = g.plname;
     else
         pwname = pw->pw_name;
     pwlen = strlen(pwname);

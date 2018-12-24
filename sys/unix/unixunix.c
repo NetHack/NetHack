@@ -120,7 +120,7 @@ getlock()
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
     if (!locknum)
-        Sprintf(lock, "%u%s", (unsigned) getuid(), plname);
+        Sprintf(lock, "%u%s", (unsigned) getuid(), g.plname);
 
     regularize(lock);
     set_levelfile_name(lock, 0);

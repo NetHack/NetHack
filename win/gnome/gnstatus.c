@@ -440,7 +440,7 @@ ghack_status_window_update_stats()
     long umoney;
 
     /* First, fill in the player name and the dungeon level */
-    strcpy(buf, plname);
+    strcpy(buf, g.plname);
     if ('a' <= buf[0] && buf[0] <= 'z')
         buf[0] += 'A' - 'a';
     strcat(buf, " the ");

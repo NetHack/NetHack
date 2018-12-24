@@ -1713,7 +1713,7 @@ Cardinal *num_params;
     nhUse(num_params);
 
     nh_XtPopdown(w);
-    (void) strcpy(plname, "Mumbles"); /* give them a name... ;-) */
+    (void) strcpy(g.plname, "Mumbles"); /* give them a name... ;-) */
     exit_x_event = TRUE;
 }
 
@@ -1741,11 +1741,11 @@ XtPointer call_data;
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof plname - 1)
-        len = sizeof plname - 1;
+    if (len >= sizeof g.plname - 1)
+        len = sizeof g.plname - 1;
 
-    (void) strncpy(plname, s, len);
-    plname[len] = '\0';
+    (void) strncpy(g.plname, s, len);
+    g.plname[len] = '\0';
     XtFree(s);
 
     nh_XtPopdown(XtParent(dialog));
@@ -1778,7 +1778,7 @@ X11_askname()
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, plname, PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, g.plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */

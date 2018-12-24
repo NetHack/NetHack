@@ -172,9 +172,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     QVBoxLayout *namelayout = new QVBoxLayout(namebox);
     QLineEdit* name = new QLineEdit(namebox);
     namelayout->addWidget(name);
-    name->setMaxLength(sizeof(plname)-1);
-    if ( strncmp(plname,"player",6) && strncmp(plname,"games",5) )
-	name->setText(plname);
+    name->setMaxLength(sizeof(g.plname)-1);
+    if ( strncmp(g.plname,"player",6) && strncmp(g.plname,"games",5) )
+	name->setText(g.plname);
     connect(name, SIGNAL(textChanged(const QString&)),
 	    this, SLOT(selectName(const QString&)) );
     name->setFocus();
@@ -370,7 +370,7 @@ void NetHackQtPlayerSelector::Randomize()
 
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    str_copy(plname,n.toLatin1().constData(),SIZE(plname));
+    str_copy(g.plname,n.toLatin1().constData(),SIZE(g.plname));
 }
 
 void NetHackQtPlayerSelector::selectRole(int crow, int ccol, int prow, int pcol)

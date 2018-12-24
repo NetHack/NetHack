@@ -257,11 +257,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -368,8 +368,8 @@ whoami()
      */
     register char *s;
 
-    if (!*plname && (s = nh_getenv("USER")))
-        (void) lcase(strncpy(plname, s, sizeof(plname) - 1));
+    if (!*g.plname && (s = nh_getenv("USER")))
+        (void) lcase(strncpy(g.plname, s, sizeof(g.plname) - 1));
 }
 
 static void

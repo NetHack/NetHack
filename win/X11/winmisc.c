@@ -358,11 +358,11 @@ plsel_dialog_acceptvalues()
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
 
-    (void) strncpy(plname, (char *) s, sizeof plname - 1);
-    plname[sizeof plname - 1] = '\0';
-    (void) mungspaces(plname);
-    if (strlen(plname) < 1)
-        (void) strcpy(plname, "Mumbles");
+    (void) strncpy(g.plname, (char *) s, sizeof g.plname - 1);
+    g.plname[sizeof g.plname - 1] = '\0';
+    (void) mungspaces(g.plname);
+    if (strlen(g.plname) < 1)
+        (void) strcpy(g.plname, "Mumbles");
     iflags.renameinprogress = FALSE;
 }
 
@@ -829,8 +829,8 @@ Widget form;
     XtSetArg(args[num_args], nhStr(XtNeditType),
              !plsel_ask_name ? XawtextRead : XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), plname); num_args++;
-    XtSetArg(args[num_args], XtNinsertPosition, strlen(plname)); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), g.plname); num_args++;
+    XtSetArg(args[num_args], XtNinsertPosition, strlen(g.plname)); num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(plsel_input_accelerators)); num_args++;
     plsel_name_input = XtCreateManagedWidget("name_input",
@@ -1564,15 +1564,15 @@ void
 X11_player_selection()
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
-        if (!*plname) {
+        if (!*g.plname) {
 #ifdef UNIX
             char *defplname = get_login_name();
 #else
             char *defplname = (char *)0;
 #endif
-            (void) strncpy(plname, defplname ? defplname : "Mumbles",
-                           sizeof plname - 1);
-            plname[sizeof plname - 1] = '\0';
+            (void) strncpy(g.plname, defplname ? defplname : "Mumbles",
+                           sizeof g.plname - 1);
+            g.plname[sizeof g.plname - 1] = '\0';
             iflags.renameinprogress = TRUE;
         }
         X11_player_selection_dialog();

@@ -182,7 +182,7 @@ FormatStatusString(char *text, int format)
     int hp, hpmax;
     int cap = near_capacity();
 
-    Strcpy(text, plname);
+    Strcpy(text, g.plname);
     if ('a' <= text[0] && text[0] <= 'z')
         text[0] += 'A' - 'a';
     text[10] = 0;

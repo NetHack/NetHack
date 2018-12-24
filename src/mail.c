@@ -164,9 +164,9 @@ coord *startp;
      * Arrive at an up or down stairwell if it is in line of sight from the
      * hero.
      */
-    if (couldsee(upstair.sx, upstair.sy)) {
-        startp->x = upstair.sx;
-        startp->y = upstair.sy;
+    if (couldsee(g.upstair.sx, g.upstair.sy)) {
+        startp->x = g.upstair.sx;
+        startp->y = g.upstair.sy;
         return TRUE;
     }
     if (couldsee(g.dnstair.sx, g.dnstair.sy)) {

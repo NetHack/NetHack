@@ -132,14 +132,14 @@ whoami(void)
      */
     char *s;
 
-    if (*plname)
+    if (*g.plname)
         return;
     if (s = nh_getenv("USER")) {
-        (void) strncpy(plname, s, sizeof(plname) - 1);
+        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
         return;
     }
     if (s = nh_getenv("LOGNAME")) {
-        (void) strncpy(plname, s, sizeof(plname) - 1);
+        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
         return;
     }
 }
@@ -177,11 +177,11 @@ process_options(int argc, char **argv)
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -236,7 +236,7 @@ getlock(void)
 {
     int fd;
 
-    Sprintf(lock, "%d%s", getuid(), plname);
+    Sprintf(lock, "%d%s", getuid(), g.plname);
     regularize(lock);
     set_levelfile_name(lock, 0);
     fd = creat(lock, FCMASK);

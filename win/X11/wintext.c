@@ -492,7 +492,7 @@ calculate_rip_text(int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", plname);
+    Sprintf(rip_line[NAME_LINE], "%s", g.plname);
 
     /* Put $ on stone */
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);

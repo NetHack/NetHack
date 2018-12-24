@@ -184,7 +184,7 @@ void NetHackQtBind::qt_askname()
 	NetHackQtSavedGameSelector sgsel((const char**)saved);
 	ch = sgsel.choose();
 	if ( ch >= 0 )
-	    str_copy(plname, saved[ch], SIZE(plname));
+	    str_copy(g.plname, saved[ch], SIZE(g.plname));
     }
     free_saved_games(saved);
 

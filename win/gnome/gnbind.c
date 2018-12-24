@@ -355,7 +355,7 @@ gnome_askname()
 
     /* Ask for a name and stuff the response into plname, a nethack global */
     ret = ghack_ask_string_dialog("What is your name?", "gandalf",
-                                  "GnomeHack", plname);
+                                  "GnomeHack", g.plname);
 
     /* Quit if they want to quit... */
     if (ret == -1) {
@@ -1169,7 +1169,7 @@ gnome_outrip(winid wid, int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(buf, "%s\n", plname);
+    Sprintf(buf, "%s\n", g.plname);
     Strcat(ripString, buf);
 
     /* Put $ on stone */

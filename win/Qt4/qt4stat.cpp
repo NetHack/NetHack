@@ -434,7 +434,7 @@ void NetHackQtStatusWindow::updateStats()
 	buf = rank_of(u.ulevel, pl_character[0], ::flags.female);
     }
     QString buf2;
-    buf2.sprintf("%s the %s", plname, buf.toLatin1().constData());
+    buf2.sprintf("%s the %s", g.plname, buf.toLatin1().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     char buf3[BUFSZ];

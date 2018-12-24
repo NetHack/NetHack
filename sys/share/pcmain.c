@@ -421,20 +421,20 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * overwritten without confirmation when a user starts up
  * another game with the same player name.
  */
-    Strcpy(lock, plname);
+    Strcpy(lock, g.plname);
     regularize(lock);
     getlock();
 #else        /* What follows is !PC_LOCKING */
 #ifdef AMIGA /* We'll put the bones & levels in the user specified directory \
                 -jhsa */
-    Strcat(lock, plname);
+    Strcat(lock, g.plname);
     Strcat(lock, ".99");
 #else
 #ifndef MFLOPPY
     /* I'm not sure what, if anything, is left here, but MFLOPPY has
      * conflicts with set_lock_and_bones() in files.c.
      */
-    Strcpy(lock, plname);
+    Strcpy(lock, g.plname);
     Strcat(lock, ".99");
     regularize(lock); /* is this necessary? */
                       /* not compatible with full path a la AMIGA */
@@ -565,11 +565,11 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -747,7 +747,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-    if (!strcmp(plname, WIZARD_NAME))
+    if (!strcmp(g.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }

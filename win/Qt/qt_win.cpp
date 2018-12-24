@@ -1011,9 +1011,9 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
     QButtonGroup* namebox = new QButtonGroup(1,Horizontal,"Name",this);
     QLineEdit* name = new QLineEdit(namebox);
-    name->setMaxLength(sizeof(plname)-1);
-    if ( strncmp(plname,"player",6) && strncmp(plname,"games",5) )
-	name->setText(plname);
+    name->setMaxLength(sizeof(g.plname)-1);
+    if ( strncmp(g.plname,"player",6) && strncmp(g.plname,"games",5) )
+	name->setText(g.plname);
     connect(name, SIGNAL(textChanged(const QString&)),
 	    this, SLOT(selectName(const QString&)) );
     name->setFocus();
@@ -1169,7 +1169,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
 
 void NetHackQtPlayerSelector::selectName(const QString& n)
 {
-    strncpy(plname,n.latin1(),sizeof(plname)-1);
+    strncpy(g.plname,n.latin1(),sizeof(g.plname)-1);
 }
 
 void NetHackQtPlayerSelector::selectRole()
@@ -2529,7 +2529,7 @@ void NetHackQtStatusWindow::updateStats()
 	encumber.setLabel(enc);
 	encumber.show();
     }
-    Strcpy(buf, plname);
+    Strcpy(buf, g.plname);
     if ('a' <= buf[0] && buf[0] <= 'z') buf[0] += 'A'-'a';
     Strcat(buf, " the ");
     if (u.mtimedone) {
@@ -3302,7 +3302,7 @@ static char** rip_line=0;
     long year;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", plname);
+    Sprintf(rip_line[NAME_LINE], "%s", g.plname);
 
     /* Put $ on stone */
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
@@ -4621,7 +4621,7 @@ void NetHackQtBind::qt_askname()
 	NetHackQtSavedGameSelector sgsel((const char**)saved);
 	ch = sgsel.choose();
 	if ( ch >= 0 )
-	    strcpy(plname,saved[ch]);
+	    strcpy(g.plname,saved[ch]);
     }
     free_saved_games(saved);
 
