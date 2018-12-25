@@ -218,7 +218,7 @@ register const char *s; /* chars allowed besides return */
     morc = 0;
     while (
 #ifdef HANGUPHANDLING
-        !program_state.done_hup &&
+        !g.program_state.done_hup &&
 #endif
         (c = tty_nhgetch()) != EOF) {
         if (c == '\n' || c == '\r')

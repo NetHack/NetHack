@@ -204,7 +204,7 @@ struct obj *obj;
 {
     if (!obj->oartifact || !has_oname(obj))
         return FALSE;
-    if (!program_state.gameover && !iflags.override_ID) {
+    if (!g.program_state.gameover && !iflags.override_ID) {
         if (not_fully_identified(obj))
             return FALSE;
     }
@@ -692,7 +692,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (pluralize)
         Strcpy(buf, makeplural(buf));
 
-    if (obj->otyp == T_SHIRT && program_state.gameover) {
+    if (obj->otyp == T_SHIRT && g.program_state.gameover) {
         char tmpbuf[BUFSZ];
 
         Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
@@ -3550,7 +3550,7 @@ srch:
  * Disallow such topology tweaks for WIZKIT startup wishes.
  */
 wiztrap:
-    if (wizard && !program_state.wizkit_wishing) {
+    if (wizard && !g.program_state.wizkit_wishing) {
         struct rm *lev;
         int trap, x = u.ux, y = u.uy;
 

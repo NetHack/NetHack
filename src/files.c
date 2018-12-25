@@ -577,7 +577,7 @@ void
 clearlocks()
 {
 #ifdef HANGUPHANDLING
-    if (program_state.preserve_locks)
+    if (g.program_state.preserve_locks)
         return;
 #endif
 #if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
@@ -1611,7 +1611,7 @@ static int lockfd; /* for lock_file() to pass to unlock_file() */
 struct flock sflock; /* for unlocking, same as above */
 #endif
 
-#define HUP if (!program_state.done_hup)
+#define HUP if (!g.program_state.done_hup)
 
 #ifndef USE_FCNTL
 STATIC_OVL char *
@@ -2341,13 +2341,13 @@ char *origbuf;
             *ptr = '\0';
 #ifdef MFLOPPY
             if (*(ptr + 1) == 'n' || *(ptr + 1) == 'N') {
-                g.g.saveprompt = FALSE;
+                g.saveprompt = FALSE;
             }
 #endif
         }
 #if defined(SYSFLAGS) && defined(MFLOPPY)
         else
-            g.g.g.saveprompt = sysflags.asksavedisk;
+            g.saveprompt = sysflags.asksavedisk;
 #endif
 
         (void) strncpy(SAVEP, bufp, SAVESIZE - 1);
@@ -2974,14 +2974,14 @@ read_wizkit()
     if (!wizard || !(fp = fopen_wizkit_file()))
         return;
 
-    program_state.wizkit_wishing = 1;
+    g.program_state.wizkit_wishing = 1;
     config_error_init(TRUE, "WIZKIT", FALSE);
 
     parse_conf_file(fp, proc_wizkit_line);
     (void) fclose(fp);
 
     config_error_done();
-    program_state.wizkit_wishing = 0;
+    g.program_state.wizkit_wishing = 0;
 
     return;
 }
@@ -3531,8 +3531,8 @@ const char *reason; /* explanation */
     FILE *lfile;
     char buf[BUFSZ];
 
-    if (!program_state.in_paniclog) {
-        program_state.in_paniclog = 1;
+    if (!g.program_state.in_paniclog) {
+        g.program_state.in_paniclog = 1;
         lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
         if (lfile) {
 #ifdef PANICLOG_FMT2
@@ -3550,7 +3550,7 @@ const char *reason; /* explanation */
 #endif /* !PANICLOG_FMT2 */
             (void) fclose(lfile);
         }
-        program_state.in_paniclog = 0;
+        g.program_state.in_paniclog = 0;
     }
 #endif /* PANICLOG */
     return;

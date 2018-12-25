@@ -1029,7 +1029,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 
 void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
 {
-    if ( program_state.something_worth_saving ) {
+    if ( g.program_state.something_worth_saving ) {
 	switch ( QMessageBox::information( this, "NetHack",
 	    "This will end your NetHack session",
 	    "&Save", "&Cancel", 0, 1 ) )

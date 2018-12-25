@@ -1224,7 +1224,7 @@ void
 mswin_update_inventory()
 {
     logDebug("mswin_update_inventory()\n");
-    if (iflags.perm_invent && program_state.something_worth_saving
+    if (iflags.perm_invent && g.program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }

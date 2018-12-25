@@ -72,10 +72,10 @@ boolean resuming;
     g.youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
     g.context.move = 0;
 
-    program_state.in_moveloop = 1;
+    g.program_state.in_moveloop = 1;
     for (;;) {
 #ifdef SAFERHANGUP
-        if (program_state.done_hup)
+        if (g.program_state.done_hup)
             end_of_input();
 #endif
         get_nh_event();
@@ -623,7 +623,7 @@ newgame()
 #ifdef INSURANCE
     save_currentstate();
 #endif
-    program_state.something_worth_saving++; /* useful data now exists */
+    g.program_state.something_worth_saving++; /* useful data now exists */
 
     /* Success! */
     welcome(TRUE);

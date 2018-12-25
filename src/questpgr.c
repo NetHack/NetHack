@@ -574,7 +574,7 @@ skip_pager(common)
 boolean common;
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
-    if (program_state.wizkit_wishing)
+    if (g.program_state.wizkit_wishing)
         return TRUE;
     if (!(common ? g.qt_list.common : g.qt_list.chrole)) {
         panic("%s: no %s quest text data available",

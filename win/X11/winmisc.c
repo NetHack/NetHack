@@ -1266,7 +1266,7 @@ X11_player_selection_dialog()
     if (plsel_align_radios)
         free(plsel_align_radios);
 
-    if (ps_selected == PS_QUIT || program_state.done_hup) {
+    if (ps_selected == PS_QUIT || g.program_state.done_hup) {
         clearlocks();
         X11_exit_nhwindows((char *) 0);
         nh_terminate(0);
@@ -1341,7 +1341,7 @@ X11_player_selection_prompts()
         XtDestroyWidget(popup);
         free((genericptr_t) choices), choices = 0;
 
-        if (ps_selected == PS_QUIT || program_state.done_hup) {
+        if (ps_selected == PS_QUIT || g.program_state.done_hup) {
             clearlocks();
             X11_exit_nhwindows((char *) 0);
             nh_terminate(0);
@@ -1410,7 +1410,7 @@ X11_player_selection_prompts()
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || program_state.done_hup) {
+            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1478,7 +1478,7 @@ X11_player_selection_prompts()
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || program_state.done_hup) {
+            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1544,7 +1544,7 @@ X11_player_selection_prompts()
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || program_state.done_hup) {
+            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);

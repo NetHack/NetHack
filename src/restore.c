@@ -888,7 +888,7 @@ register int fd;
     reset_restpref();
 
     restlevelstate(stuckid, steedid);
-    program_state.something_worth_saving = 1; /* useful data now exists */
+    g.program_state.something_worth_saving = 1; /* useful data now exists */
 
     if (!wizard && !discover)
         (void) delete_savefile();

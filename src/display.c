@@ -719,7 +719,7 @@ register int x, y;
     if (g.in_mklev)
         return;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
 
@@ -1561,7 +1561,7 @@ int cursor_on_u;
         return; /* if already flushing then return */
     flushing = 1;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
 

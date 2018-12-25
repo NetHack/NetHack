@@ -1622,7 +1622,7 @@ boolean called;
     boolean name_at_start, has_adjectives;
     char *bp;
 
-    if (program_state.gameover)
+    if (g.program_state.gameover)
         suppress |= SUPPRESS_HALLUCINATION;
     if (article == ARTICLE_YOUR && !mtmp->mtame)
         article = ARTICLE_THE;
@@ -1630,7 +1630,7 @@ boolean called;
     do_hallu = Hallucination && !(suppress & SUPPRESS_HALLUCINATION);
     do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
     do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
-            && !program_state.gameover && mtmp != u.usteed
+            && !g.program_state.gameover && mtmp != u.usteed
             && !(u.uswallow && mtmp == u.ustuck) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
     do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);

@@ -103,10 +103,10 @@ VA_DECL(const char *, line)
     if (!line || !*line)
         return;
 #ifdef HANGUPHANDLING
-    if (program_state.done_hup)
+    if (g.program_state.done_hup)
         return;
 #endif
-    if (program_state.wizkit_wishing)
+    if (g.program_state.wizkit_wishing)
         return;
 
     if (index(line, '%')) {
@@ -445,10 +445,10 @@ VA_DECL(const char *, s)
 
     VA_START(s);
     VA_INIT(s, const char *);
-    if (program_state.in_impossible)
+    if (g.program_state.in_impossible)
         panic("impossible called impossible");
 
-    program_state.in_impossible = 1;
+    g.program_state.in_impossible = 1;
     Vsprintf(pbuf, s, VA_ARGS);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
@@ -457,11 +457,11 @@ VA_DECL(const char *, s)
     pline("%s", VA_PASS1(pbuf));
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
-    if (program_state.something_worth_saving)
+    if (g.program_state.something_worth_saving)
         Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
     pline("%s", VA_PASS1(pbuf));
 
-    program_state.in_impossible = 0;
+    g.program_state.in_impossible = 0;
     VA_END();
 }
 

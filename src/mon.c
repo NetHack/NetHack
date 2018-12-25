@@ -739,7 +739,7 @@ movemon()
         if (u.utotype
 #ifdef SAFERHANGUP
             /* or if the program has lost contact with the user */
-            || program_state.done_hup
+            || g.program_state.done_hup
 #endif
             ) {
             somebody_can_move = FALSE;

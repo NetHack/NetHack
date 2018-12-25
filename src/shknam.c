@@ -851,7 +851,7 @@ struct monst *mtmp;
     } else {
         const char *shknm = ESHK(mtmp)->shknam;
 
-        if (Hallucination && !program_state.gameover) {
+        if (Hallucination && !g.program_state.gameover) {
             const char *const *nlp;
             int num;
 

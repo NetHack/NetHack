@@ -443,7 +443,7 @@ tgetch()
     really_move_cursor();
     if (iflags.debug_fuzzer)
         return randomkey();
-    return (program_state.done_hup)
+    return (g.program_state.done_hup)
                ? '\033'
                : keyboard_handler.pCheckInput(
                    console.hConIn, &ir, &count, iflags.num_pad, 0, &mod, &cc);
@@ -459,7 +459,7 @@ int *x, *y, *mod;
     really_move_cursor();
     if (iflags.debug_fuzzer)
         return randomkey();
-    ch = (program_state.done_hup)
+    ch = (g.program_state.done_hup)
              ? '\033'
              : keyboard_handler.pCheckInput(
                    console.hConIn, &ir, &count, iflags.num_pad, 1, mod, &cc);

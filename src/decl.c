@@ -5,8 +5,6 @@
 
 #include "hack.h"
 
-/* from xxxmain.c */
-
 const char quitchars[] = " \r\n\033";
 const char vowels[] = "aeiouAEIOU";
 const char ynchars[] = "yn";
@@ -16,8 +14,6 @@ const char ynNaqchars[] = "yn#aq";
 NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgco";
-
-NEARDATA struct sinfo program_state;
 
 /* x/y/z deltas for the 10 movement directions (8 compass pts, 2 up/down) */
 const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
@@ -108,9 +104,7 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "gemstone",   "stone" };
 
 /* Global windowing data, defined here for multi-window-system support */
-NEARDATA winid WIN_MESSAGE = WIN_ERR;
-NEARDATA winid WIN_STATUS = WIN_ERR;
-NEARDATA winid WIN_MAP = WIN_ERR, WIN_INVEN = WIN_ERR;
+NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
 
 #ifdef PREFIXES_IN_USE
 const char *fqn_prefix_names[PREFIX_COUNT] = {
@@ -296,6 +290,7 @@ const struct instance_globals g_init = {
     "levels.*", /* alllevels */
     "bones*.*", /* allbones */
 #endif
+    UNDEFINED_VALUES, /* program_state */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
@@ -627,6 +622,9 @@ decl_globals_init()
     uwep = uarm = uswapwep = uquiver = uarmu = uskin = uarmc = NULL;
     uarmh = uarms = uarmg = uarmf = uamul = uright = uleft = NULL;
     ublindf = uchain = uball = NULL;
+
+    WIN_MESSAGE =  WIN_STATUS =  WIN_MAP = WIN_INVEN = WIN_ERR;
+
 
 }
 

@@ -623,7 +623,7 @@ curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if (((g.moves <= 1) && !g.invent) || program_state.gameover) {
+    if (((g.moves <= 1) && !g.invent) || g.program_state.gameover) {
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */

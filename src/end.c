@@ -49,7 +49,7 @@ extern void FDECL(nethack_exit, (int));
 #define nethack_exit exit
 #endif
 
-#define done_stopprint program_state.stopprint
+#define done_stopprint g.program_state.stopprint
 
 #ifndef PANICTRACE
 #define NH_abort NH_abort_
@@ -380,7 +380,7 @@ static void
 done_hangup(sig)
 int sig;
 {
-    program_state.done_hup++;
+    g.program_state.done_hup++;
     sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
     done_intr(sig);
     return;
@@ -545,7 +545,7 @@ VA_DECL(const char *, str)
     VA_START(str);
     VA_INIT(str, char *);
 
-    if (program_state.panicking++)
+    if (g.program_state.panicking++)
         NH_abort(); /* avoid loops - this should never happen*/
 
     if (iflags.window_inited) {
@@ -555,9 +555,9 @@ VA_DECL(const char *, str)
         iflags.window_inited = 0; /* they're gone; force raw_print()ing */
     }
 
-    raw_print(program_state.gameover
+    raw_print(g.program_state.gameover
                   ? "Postgame wrapup disrupted."
-                  : !program_state.something_worth_saving
+                  : !g.program_state.something_worth_saving
                         ? "Program initialization has failed."
                         : "Suddenly, the dungeon collapses.");
 #ifndef MICRO
@@ -565,11 +565,11 @@ VA_DECL(const char *, str)
     if (!wizard)
         raw_printf("Report the following error to \"%s\" or at \"%s\".",
                    DEVTEAM_EMAIL, DEVTEAM_URL);
-    else if (program_state.something_worth_saving)
+    else if (g.program_state.something_worth_saving)
         raw_print("\nError save file being written.\n");
 #else /* !NOTIFY_NETHACK_BUGS */
     if (!wizard) {
-        const char *maybe_rebuild = !program_state.something_worth_saving
+        const char *maybe_rebuild = !g.program_state.something_worth_saving
                                      ? "."
                                      : "\nand it may be possible to rebuild.";
 
@@ -587,7 +587,7 @@ VA_DECL(const char *, str)
     /* XXX can we move this above the prints?  Then we'd be able to
      * suppress "it may be possible to rebuild" based on dosave0()
      * or say it's NOT possible to rebuild. */
-    if (program_state.something_worth_saving && !iflags.debug_fuzzer) {
+    if (g.program_state.something_worth_saving && !iflags.debug_fuzzer) {
         set_error_savefile();
         if (dosave0()) {
             /* os/win port specific recover instructions */
@@ -1018,9 +1018,9 @@ int how;
             return;
         }
     }
-    if (program_state.panicking
+    if (g.program_state.panicking
 #ifdef HANGUPHANDLING
-        || program_state.done_hup
+        || g.program_state.done_hup
 #endif
         ) {
         /* skip status update if panicking or disconnected */
@@ -1032,7 +1032,7 @@ int how;
     }
 
     if (iflags.debug_fuzzer) {
-        if (!(program_state.panicking || how == PANICKED)) {
+        if (!(g.program_state.panicking || how == PANICKED)) {
             savelife(how);
             /* periodically restore characteristics and lost exp levels
                or cure lycanthropy */
@@ -1123,9 +1123,9 @@ int how;
     /*
      *  The game is now over...
      */
-    program_state.gameover = 1;
+    g.program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
-    program_state.something_worth_saving = 0;
+    g.program_state.something_worth_saving = 0;
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
 
@@ -1611,13 +1611,13 @@ void
 nh_terminate(status)
 int status;
 {
-    program_state.in_moveloop = 0; /* won't be returning to normal play */
+    g.program_state.in_moveloop = 0; /* won't be returning to normal play */
 #ifdef MAC
     getreturn("to exit");
 #endif
     /* don't bother to try to release memory if we're in panic mode, to
        avoid trouble in case that happens to be due to memory problems */
-    if (!program_state.panicking) {
+    if (!g.program_state.panicking) {
         freedynamicdata();
         dlb_cleanup();
     }
@@ -1630,10 +1630,10 @@ int status;
      */
     /* don't call exit() if already executing within an exit handler;
        that would cancel any other pending user-mode handlers */
-    if (program_state.exiting)
+    if (g.program_state.exiting)
         return;
 #endif
-    program_state.exiting = 1;
+    g.program_state.exiting = 1;
     nethack_exit(status);
 }
 

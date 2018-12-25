@@ -75,7 +75,7 @@ eraseoldlocks()
 {
     register int i;
 
-    program_state.preserve_locks = 0; /* not required but shows intent */
+    g.program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up

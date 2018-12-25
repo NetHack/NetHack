@@ -391,7 +391,7 @@ byebye()
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
     hup = (void FDECL((*), (int) )) signal(SIGHUP, SIG_IGN);
-    if (!program_state.exiting++ && hup != (void FDECL((*), (int) )) SIG_DFL
+    if (!g.program_state.exiting++ && hup != (void FDECL((*), (int) )) SIG_DFL
         && hup != (void FDECL((*), (int) )) SIG_IGN) {
         (*hup)(SIGHUP);
     }
@@ -414,7 +414,7 @@ genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
     if (condition == SS$_ACCVIO /* access violation */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
-        program_state.done_hup = TRUE; /* pretend hangup has been attempted */
+        g.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #ifndef BETA
         if (wizard)
 #endif

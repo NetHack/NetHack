@@ -220,7 +220,7 @@ struct obj *obj;
     if (wizard) { /* flags.debug */
         /* paranoia:  before toggling off wizard mode, guard against a
            panic in xname() producing a normal mode panic save file */
-        program_state.something_worth_saving = 0;
+        g.program_state.something_worth_saving = 0;
         flags.debug = FALSE;
     }
 
@@ -228,7 +228,7 @@ struct obj *obj;
 
     if (save_debug) {
         flags.debug = TRUE;
-        program_state.something_worth_saving = 1;
+        g.program_state.something_worth_saving = 1;
     }
     /* restore the object */
     if (obj->oclass == POTION_CLASS) {

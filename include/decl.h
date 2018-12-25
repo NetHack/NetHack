@@ -98,7 +98,7 @@ E NEARDATA char tune[6];
 
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 
-E NEARDATA struct sinfo {
+struct sinfo {
     int gameover;  /* self explanatory? */
     int stopprint; /* inhibit further end of game disclosure */
 #ifdef HANGUPHANDLING
@@ -115,7 +115,7 @@ E NEARDATA struct sinfo {
     int in_paniclog;
 #endif
     int wizkit_wishing;
-} program_state;
+};
 
 E const char quitchars[];
 E const char vowels[];
@@ -713,6 +713,7 @@ struct instance_globals {
     const char *alllevels = "levels.*";
     const char *allbones = "bones*.*";
 #endif
+    struct sinfo program_state;
 
     /* dig.c */
 

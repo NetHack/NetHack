@@ -744,7 +744,7 @@ struct obj *obj;
          */
         if (!obj->oerodeproof || !rn2(10)) {
             /* if monsters aren't moving, assume player is responsible */
-            if (!g.context.mon_moving && !program_state.gameover)
+            if (!g.context.mon_moving && !g.program_state.gameover)
                 costly_alteration(obj, COST_DEGRD);
             obj->otyp = WORM_TOOTH;
             obj->oerodeproof = 0;

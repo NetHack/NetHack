@@ -4029,7 +4029,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 
 void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
 {
-    if ( program_state.something_worth_saving ) {
+    if ( g.program_state.something_worth_saving ) {
 	switch ( QMessageBox::information( this, "NetHack",
 	    "This will end your NetHack session",
 	    "&Save", "&Cancel", 0, 1 ) )
@@ -4840,7 +4840,7 @@ void NetHackQtBind::qt_update_inventory()
     if (main)
 	main->updateInventory();
     /* doesn't work yet
-    if (program_state.something_worth_saving && iflags.perm_invent)
+    if (g.program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, FALSE);
     */
 }
@@ -4894,14 +4894,14 @@ int NetHackQtBind::qt_nhgetch()
     //
     while (keybuffer.Empty()
 #ifdef SAFERHANGUP
-	   && !program_state.done_hup
+	   && !g.program_state.done_hup
 #endif
 	   ) {
 	qApp->enter_loop();
     }
 
 #ifdef SAFERHANGUP
-    if (program_state.done_hup && keybuffer.Empty()) return '\033';
+    if (g.program_state.done_hup && keybuffer.Empty()) return '\033';
 #endif
     return keybuffer.GetAscii();
 }
@@ -4915,13 +4915,13 @@ int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
     //
     while (keybuffer.Empty() && clickbuffer.Empty()
 #ifdef SAFERHANGUP
-	   && !program_state.done_hup
+	   && !g.program_state.done_hup
 #endif
 	   ) {
 	qApp->enter_loop();
     }
 #ifdef SAFERHANGUP
-    if (program_state.done_hup && keybuffer.Empty()) return '\033';
+    if (g.program_state.done_hup && keybuffer.Empty()) return '\033';
 #endif
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
@@ -5170,7 +5170,7 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 
     bool result=QApplication::notify(receiver,event);
 #ifdef SAFERHANGUP
-    if (program_state.done_hup) {
+    if (g.program_state.done_hup) {
 	keybuffer.Put('\033');
 	qApp->exit_loop();
 	return TRUE;
