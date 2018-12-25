@@ -77,11 +77,11 @@ int fd;
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) delete (lock);
+        set_levelfile_name(g.lock, i);
+        (void) delete (g.lock);
     }
-    set_levelfile_name(lock, 0);
-    if (delete (lock))
+    set_levelfile_name(g.lock, 0);
+    if (delete (g.lock))
         return 0; /* cannot remove it */
     return 1;     /* success! */
 }
@@ -106,27 +106,27 @@ getlock()
         error("Quitting.");
     }
 
-    /* default value of lock[] is "1lock" where '1' gets changed to
+    /* default value of g.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
     if (!g.locknum)
-        Sprintf(lock, "_%u%s", (unsigned) getuid(), plname);
+        Sprintf(g.lock, "_%u%s", (unsigned) getuid(), plname);
 
-    regularize(lock);
-    set_levelfile_name(lock, 0);
+    regularize(g.lock);
+    set_levelfile_name(g.lock, 0);
     if (g.locknum > 25)
         g.locknum = 25;
 
     do {
         if (g.locknum)
-            lock[0] = 'a' + i++;
+            g.lock[0] = 'a' + i++;
 
-        if ((fd = open(lock, 0, 0)) == -1) {
+        if ((fd = open(g.lock, 0, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
-            perror(lock);
+            perror(g.lock);
             unlock_file(HLOCK);
-            error("Cannot open %s", lock);
+            error("Cannot open %s", g.lock);
         }
 
         if (veryold(fd)) /* if true, this closes fd and unlinks lock */
@@ -139,7 +139,7 @@ getlock()
                   : "There is a game in progress under your name.");
 
 gotlock:
-    fd = creat(lock, FCMASK);
+    fd = creat(g.lock, FCMASK);
     unlock_file(HLOCK);
     if (fd == -1) {
         error("cannot creat lock file.");

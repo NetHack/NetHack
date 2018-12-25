@@ -236,10 +236,10 @@ getlock(void)
 {
     int fd;
 
-    Sprintf(lock, "%d%s", getuid(), g.plname);
-    regularize(lock);
-    set_levelfile_name(lock, 0);
-    fd = creat(lock, FCMASK);
+    Sprintf(g.lock, "%d%s", getuid(), g.plname);
+    regularize(g.lock);
+    set_levelfile_name(g.lock, 0);
+    fd = creat(g.lock, FCMASK);
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {

@@ -421,22 +421,22 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * overwritten without confirmation when a user starts up
  * another game with the same player name.
  */
-    Strcpy(lock, g.plname);
-    regularize(lock);
+    Strcpy(g.lock, g.plname);
+    regularize(g.lock);
     getlock();
 #else        /* What follows is !PC_LOCKING */
 #ifdef AMIGA /* We'll put the bones & levels in the user specified directory \
                 -jhsa */
-    Strcat(lock, g.plname);
-    Strcat(lock, ".99");
+    Strcat(g.lock, g.plname);
+    Strcat(g.lock, ".99");
 #else
 #ifndef MFLOPPY
     /* I'm not sure what, if anything, is left here, but MFLOPPY has
      * conflicts with set_lock_and_bones() in files.c.
      */
-    Strcpy(lock, g.plname);
-    Strcat(lock, ".99");
-    regularize(lock); /* is this necessary? */
+    Strcpy(g.lock, g.plname);
+    Strcat(g.lock, ".99");
+    regularize(g.lock); /* is this necessary? */
                       /* not compatible with full path a la AMIGA */
 #endif
 #endif

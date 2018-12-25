@@ -85,14 +85,14 @@ eraseoldlocks()
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        set_levelfile_name(g.lock, i);
+        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(lock, 0);
+    set_levelfile_name(g.lock, 0);
 #ifdef HOLD_LOCKFILE_OPEN
     really_close();
 #endif
-    if (unlink(fqname(lock, LEVELPREFIX, 0)))
+    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return (1);   /* success! */
 }
@@ -117,9 +117,9 @@ getlock()
     }
 
     /* regularize(lock); */ /* already done in pcmain */
-    Sprintf(tbuf, "%s", fqname(lock, LEVELPREFIX, 0));
-    set_levelfile_name(lock, 0);
-    fq_lock = fqname(lock, LEVELPREFIX, 1);
+    Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0));
+    set_levelfile_name(g.lock, 0);
+    fq_lock = fqname(g.lock, LEVELPREFIX, 1);
     if ((fd = open(fq_lock, 0)) == -1) {
         if (errno == ENOENT)
             goto gotlock; /* no such file */

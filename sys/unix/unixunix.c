@@ -82,11 +82,11 @@ eraseoldlocks()
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        set_levelfile_name(g.lock, i);
+        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(lock, 0);
-    if (unlink(fqname(lock, LEVELPREFIX, 0)))
+    set_levelfile_name(g.lock, 0);
+    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return 1;     /* success! */
 }
@@ -116,22 +116,22 @@ getlock()
         error("%s", "");
     }
 
-    /* default value of lock[] is "1lock" where '1' gets changed to
+    /* default value of g.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
     if (!g.locknum)
-        Sprintf(lock, "%u%s", (unsigned) getuid(), g.plname);
+        Sprintf(g.lock, "%u%s", (unsigned) getuid(), g.plname);
 
-    regularize(lock);
-    set_levelfile_name(lock, 0);
+    regularize(g.lock);
+    set_levelfile_name(g.lock, 0);
 
     if (g.locknum) {
         if (g.locknum > 25)
             g.locknum = 25;
 
         do {
-            lock[0] = 'a' + i++;
-            fq_lock = fqname(lock, LEVELPREFIX, 0);
+            g.lock[0] = 'a' + i++;
+            fq_lock = fqname(g.lock, LEVELPREFIX, 0);
 
             if ((fd = open(fq_lock, 0)) == -1) {
                 if (errno == ENOENT)
@@ -150,7 +150,7 @@ getlock()
         unlock_file(HLOCK);
         error("Too many hacks running now.");
     } else {
-        fq_lock = fqname(lock, LEVELPREFIX, 0);
+        fq_lock = fqname(g.lock, LEVELPREFIX, 0);
         if ((fd = open(fq_lock, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
