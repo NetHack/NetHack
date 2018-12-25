@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1545646111 2018/12/24 10:08:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1545771927 2018/12/25 21:05:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1534,12 +1534,7 @@ boolean identified, all_containers, reportempty;
 {
     register struct obj *box, *obj;
     char buf[BUFSZ];
-    boolean cat,
-            dumping =
-#ifdef DUMPLOG
-                     iflags.in_dumplog ? TRUE :
-#endif
-                     FALSE;
+    boolean cat, dumping = iflags.in_dumplog;
 
     for (box = list; box; box = box->nobj) {
         if (Is_container(box) || box->otyp == STATUE) {

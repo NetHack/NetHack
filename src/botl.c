@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1544917592 2018/12/15 23:46:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1545705812 2018/12/25 02:43:32 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,6 +35,14 @@ get_strength_str()
         Sprintf(buf, "%-1d", st);
 
     return buf;
+}
+
+void
+check_gold_symbol()
+{
+    nhsym goldch = showsyms[COIN_CLASS + SYM_OFF_O];
+
+    iflags.invis_goldsym = (goldch <= (nhsym) ' ');
 }
 
 char *
@@ -86,17 +94,6 @@ do_statusline1()
     return newbot1;
 }
 
-void
-check_gold_symbol()
-{
-    int goldch, goldoc;
-    unsigned int goldos;
-    int goldglyph = objnum_to_glyph(GOLD_PIECE);
-
-    (void) mapglyph(goldglyph, &goldch, &goldoc, &goldos, 0, 0);
-    iflags.invis_goldsym = ((char) goldch <= ' ');
-}
-
 char *
 do_statusline2()
 {
@@ -125,7 +122,7 @@ do_statusline2()
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
-            : encglyph(objnum_to_glyph(GOLD_PIECE)),
+              : encglyph(objnum_to_glyph(GOLD_PIECE)),
             min(money, 999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
@@ -586,9 +583,10 @@ bot_via_windowport()
      * sequence.
      */
     Sprintf(g.blstats[idx][BL_GOLD].val, "%s:%ld",
-            encglyph(objnum_to_glyph(GOLD_PIECE)),
-            g.blstats[idx][BL_GOLD].a.a_long);
-    g.valset[BL_GOLD] = TRUE; /* indicate val already set */
+            (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
+              : encglyph(objnum_to_glyph(GOLD_PIECE)),
+            blstats[idx][BL_GOLD].a.a_long);
+    valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
     g.blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
@@ -690,8 +688,7 @@ boolean *valsetlist;
      *
      * Also, even if context.rndencode hasn't changed and the
      * gold amount itself hasn't changed, the glyph portion of the
-     * encoding may have changed if a new symset was put into
-     * effect.
+     * encoding may have changed if a new symset was put into effect.
      *
      *  \GXXXXNNNN:25
      *  XXXX = the context.rndencode portion
@@ -714,7 +711,7 @@ boolean *valsetlist;
     if (!g.update_all && !chg) {
         reset = hilite_reset_needed(prev, g.bl_hilite_moves);
         if (reset)
-          curr->time = prev->time = 0L;
+            curr->time = prev->time = 0L;
     }
 #endif
 
