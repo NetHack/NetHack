@@ -762,15 +762,15 @@ xchar ltmp;
 #ifdef AMIGA
         clearlocks();
 #else /* !AMIGA */
-        eraseall(levels, alllevels);
-        eraseall(levels, allbones);
+        eraseall(levels, g.alllevels);
+        eraseall(levels, g.allbones);
 
         /* Perhaps the person would like to play without a
          * RAMdisk.
          */
-        if (ramdisk) {
+        if (g.ramdisk) {
             /* PlaywoRAMdisk may not return, but if it does
-             * it is certain that ramdisk will be 0.
+             * it is certain that g.ramdisk will be 0.
              */
             playwoRAMdisk();
             /* Rewind save file and try again */

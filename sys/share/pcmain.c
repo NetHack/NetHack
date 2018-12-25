@@ -628,7 +628,7 @@ char *argv[];
         /* Player doesn't want to use a RAM disk
          */
         case 'R':
-            ramdisk = FALSE;
+            g.ramdisk = FALSE;
             break;
 #endif
 #endif

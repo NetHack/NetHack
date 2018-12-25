@@ -1419,8 +1419,8 @@ int lev;
 {
     char to[PATHLEN], from[PATHLEN];
 
-    Sprintf(from, "%s%s", permbones, alllevels);
-    Sprintf(to, "%s%s", levels, alllevels);
+    Sprintf(from, "%s%s", g.permbones, g.alllevels);
+    Sprintf(to, "%s%s", levels, g.alllevels);
     set_levelfile_name(from, lev);
     set_levelfile_name(to, lev);
     if (iflags.checkspace) {
@@ -1445,7 +1445,7 @@ swapout_oldest()
     int i, oldest;
     long oldtime;
 
-    if (!ramdisk)
+    if (!g.ramdisk)
         return FALSE;
     for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
         if (g.level_info[i].where == ACTIVE
@@ -1455,8 +1455,8 @@ swapout_oldest()
         }
     if (!oldest)
         return FALSE;
-    Sprintf(from, "%s%s", levels, alllevels);
-    Sprintf(to, "%s%s", permbones, alllevels);
+    Sprintf(from, "%s%s", levels, g.alllevels);
+    Sprintf(to, "%s%s", g.permbones, g.alllevels);
     set_levelfile_name(from, oldest);
     set_levelfile_name(to, oldest);
     if (wizard) {

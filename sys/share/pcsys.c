@@ -167,18 +167,18 @@ int mode;
     char copy[8], *comspec;
 #endif
 
-    if (!ramdisk)
+    if (!g.ramdisk)
         return;
 
     /* Find the name of the last file to be transferred
      */
-    frompath = (mode != TOPERM) ? permbones : levels;
+    frompath = (mode != TOPERM) ? g.permbones : g.levels;
     foundfile = foundfile_buffer();
     last[0] = '\0';
-    Sprintf(from, "%s%s", frompath, allbones);
-    topath = (mode == TOPERM) ? permbones : levels;
+    Sprintf(from, "%s%s", frompath, g.allbones);
+    topath = (mode == TOPERM) ? g.permbones : g.levels;
 #ifdef TOS
-    eraseall(topath, allbones);
+    eraseall(topath, g.allbones);
 #endif
     if (findfirst(from))
         do {
@@ -199,10 +199,10 @@ int mode;
 
         /* Remove any bones files in `to' directory.
          */
-        eraseall(topath, allbones);
+        eraseall(topath, g.allbones);
 
         /* Copy `from' to `to' */
-        Sprintf(to, "%s%s", topath, allbones);
+        Sprintf(to, "%s%s", topath, g.allbones);
         comspec = getcomspec();
         status = spawnl(P_WAIT, comspec, comspec, copy, from, to, "> nul",
                         (char *) 0);
@@ -216,7 +216,7 @@ int mode;
     Sprintf(to, "%s%s", topath, last);
     if (findfirst(to)) {
         if (mode == TOPERM)
-            eraseall(frompath, allbones);
+            eraseall(frompath, g.allbones);
         return;
     }
 
@@ -225,7 +225,7 @@ error_copying:
 #endif
     /* Last file didn't get there.
      */
-    Sprintf(to, "%s%s", topath, allbones);
+    Sprintf(to, "%s%s", topath, g.allbones);
     msmsg("Can't copy \"%s\" to \"%s\" -- ", from, to);
 #ifndef TOS
     if (status < 0)
@@ -236,10 +236,10 @@ error_copying:
                   ? "insufficient disk space."
                   : "bad path(s)?");
     if (mode == TOPERM) {
-        msmsg("Bones will be left in \"%s\"\n", *levels ? levels : hackdir);
+        msmsg("Bones will be left in \"%s\"\n", *g.levels ? g.levels : hackdir);
     } else {
         /* Remove all bones files on the RAMdisk */
-        eraseall(levels, allbones);
+        eraseall(g.levels, g.allbones);
         playwoRAMdisk();
     }
     return;
@@ -252,10 +252,10 @@ playwoRAMdisk()
 
     msmsg("Do you wish to play without a RAMdisk? [yn] (n)");
 
-    /* Set ramdisk false *before* exit-ing (because msexit calls
+    /* Set g.ramdisk false *before* exit-ing (because msexit calls
      * copybones)
      */
-    ramdisk = FALSE;
+    g.ramdisk = FALSE;
     c = tgetch();
     if (c == 'Y')
         c = 'y';
@@ -504,7 +504,7 @@ msexit()
     enable_ctrlP(); /* in case this wasn't done */
 #endif
 #ifdef MFLOPPY
-    if (ramdisk)
+    if (g.ramdisk)
         copybones(TOPERM);
 #endif
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)

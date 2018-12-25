@@ -8,13 +8,6 @@
 
 #define E extern
 
-#if defined(UNIX) || defined(VMS)
-E int locknum;
-#endif
-#ifdef DEF_PAGER
-E char *catmore;
-#endif /* DEF_PAGER */
-
 E char SAVEF[];
 #ifdef MICRO
 E char SAVEP[];
@@ -704,6 +697,22 @@ struct instance_globals {
     struct obj zeroobj; /* used to zero out a struct obj */
     struct monst zeromonst;  /* used to zero out a struct monst */
     anything zeroany; /* used to zero out union any */
+#if defined(UNIX) || defined(VMS)
+    int locknum; /* max num of simultaneous users */
+#endif
+#ifdef DEF_PAGER
+    char *catmore; /* default pager */
+#endif
+#ifdef MICRO
+    char levels[PATHLEN]; /* where levels are */
+#endif /* MICRO */
+#ifdef MFLOPPY
+    char permbones[PATHLEN]; /* where permanent copy of bones go */
+    int ramdisk = FALSE;     /* whether to copy bones to levels or not */
+    int saveprompt = TRUE;
+    const char *alllevels = "levels.*";
+    const char *allbones = "bones*.*";
+#endif
 
     /* dig.c */
 

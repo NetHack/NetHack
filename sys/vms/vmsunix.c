@@ -109,16 +109,16 @@ getlock()
     /* default value of lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
-    if (!locknum)
+    if (!g.lockum)
         Sprintf(lock, "_%u%s", (unsigned) getuid(), plname);
 
     regularize(lock);
     set_levelfile_name(lock, 0);
-    if (locknum > 25)
-        locknum = 25;
+    if (g.lockum > 25)
+        g.lockum = 25;
 
     do {
-        if (locknum)
+        if (g.lockum)
             lock[0] = 'a' + i++;
 
         if ((fd = open(lock, 0, 0)) == -1) {
@@ -132,10 +132,10 @@ getlock()
         if (veryold(fd)) /* if true, this closes fd and unlinks lock */
             goto gotlock;
         (void) close(fd);
-    } while (i < locknum);
+    } while (i < g.lockum);
 
     unlock_file(HLOCK);
-    error(locknum ? "Too many hacks running now."
+    error(g.lockum ? "Too many hacks running now."
                   : "There is a game in progress under your name.");
 
 gotlock:

@@ -6,12 +6,6 @@
 #include "hack.h"
 
 /* from xxxmain.c */
-#if defined(UNIX) || defined(VMS)
-int locknum = 0; /* max num of simultaneous users */
-#endif
-#ifdef DEF_PAGER
-char *catmore = 0; /* default pager */
-#endif
 
 const char quitchars[] = " \r\n\033";
 const char vowels[] = "aeiouAEIOU";
@@ -22,18 +16,6 @@ const char ynNaqchars[] = "yn#aq";
 NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgco";
-
-#ifdef MICRO
-char levels[PATHLEN]; /* where levels are */
-#endif /* MICRO */
-
-#ifdef MFLOPPY
-char permbones[PATHLEN]; /* where permanent copy of bones go */
-int ramdisk = FALSE;     /* whether to copy bones to levels or not */
-int saveprompt = TRUE;
-const char *alllevels = "levels.*";
-const char *allbones = "bones*.*";
-#endif
 
 NEARDATA struct sinfo program_state;
 
@@ -298,6 +280,22 @@ const struct instance_globals g_init = {
     DUMMY, /* zeroobj */
     DUMMY, /* zeromonst */
     DUMMY, /* zeronay */
+#if defined(UNIX) || defined(VMS)
+    0, /* locknum */
+#endif
+#ifdef DEF_PAGER
+    NULL, /* catmore */
+#endif
+#ifdef MICRO
+    UNDEFINED_VALUES, /* levels */
+#endif /* MICRO */
+#ifdef MFLOPPY
+    UNDEFINED_VALUES, /* permbones */
+    FALSE,     /*ramdisk */
+    TRUE, /* saveprompt */
+    "levels.*", /* alllevels */
+    "bones*.*", /* allbones */
+#endif
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */

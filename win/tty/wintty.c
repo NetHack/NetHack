@@ -2722,9 +2722,9 @@ boolean complain;
                 if (complain)
                     raw_printf("Cannot open %s as stdin.", fname);
             } else {
-                (void) execlp(catmore, "page", (char *) 0);
+                (void) execlp(g.catmore, "page", (char *) 0);
                 if (complain)
-                    raw_printf("Cannot exec %s.", catmore);
+                    raw_printf("Cannot exec %s.", g.catmore);
             }
             if (complain)
                 sleep(10); /* want to wait_synch() but stdin is gone */

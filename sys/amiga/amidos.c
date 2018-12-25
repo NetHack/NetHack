@@ -211,7 +211,7 @@ const char *path, *files;
     struct FileInfoBlock *fibp;
     int chklen;
 #ifdef BETA
-    if(files != alllevels)panic("eraseall");
+    if(files != g.alllevels)panic("eraseall");
 #endif
     chklen=(int)index(files,'*')-(int)files;
 

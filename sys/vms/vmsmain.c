@@ -141,7 +141,7 @@ char *argv[];
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        locknum = 0;
+        g.lockum = 0;
     } else {
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
@@ -149,14 +149,14 @@ char *argv[];
     }
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when locknum == 0)
-     * or if there are too many active games (when locknum > 0).
+     * in progress for current character name (when g.lockum == 0)
+     * or if there are too many active games (when g.lockum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !locknum) or on first available of alock, block,
+     * name (for !g.lockum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for locknum > 0).
+     * (for g.lockum > 0).
      */
     getlock();
 
@@ -212,7 +212,7 @@ attempt_restore:
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!locknum) {
+                if (!g.lockum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -315,10 +315,10 @@ char *argv[];
     }
 
     if (argc > 1)
-        locknum = atoi(argv[1]);
+        g.lockum = atoi(argv[1]);
 #ifdef MAX_NR_OF_PLAYERS
-    if (!locknum || locknum > MAX_NR_OF_PLAYERS)
-        locknum = MAX_NR_OF_PLAYERS;
+    if (!g.lockum || g.lockum > MAX_NR_OF_PLAYERS)
+        g.lockum = MAX_NR_OF_PLAYERS;
 #endif
 }
 

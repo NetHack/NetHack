@@ -433,20 +433,20 @@ int prefix;
 void
 set_lock_and_bones()
 {
-    if (!ramdisk) {
-        Strcpy(levels, permbones);
-        Strcpy(bones, permbones);
+    if (!g.ramdisk) {
+        Strcpy(levels, g.permbones);
+        Strcpy(bones, g.permbones);
     }
-    append_slash(permbones);
-    append_slash(levels);
+    append_slash(g.permbones);
+    append_slash(g.levels);
 #ifdef AMIGA
     strncat(levels, bbs_id, PATHLEN);
 #endif
     append_slash(bones);
     Strcat(bones, "bonesnn.*");
-    Strcpy(lock, levels);
+    Strcpy(lock, g.levels);
 #ifndef AMIGA
-    Strcat(lock, alllevels);
+    Strcat(lock, g.alllevels);
 #endif
     return;
 }
@@ -581,9 +581,9 @@ clearlocks()
         return;
 #endif
 #if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
-    eraseall(levels, alllevels);
-    if (ramdisk)
-        eraseall(permbones, alllevels);
+    eraseall(levels, g.alllevels);
+    if (g.ramdisk)
+        eraseall(g.permbones, g.alllevels);
 #else
     {
         register int x;
@@ -2323,34 +2323,31 @@ char *origbuf;
         if (strlen(bufp) >= PATHLEN)
             bufp[PATHLEN - 1] = '\0';
         Strcpy(levels, bufp);
-        ramdisk = (strcmp(permbones, levels) != 0);
+        g.ramdisk = (strcmp(g.permbones, levels) != 0);
         ramdisk_specified = TRUE;
 #endif
 #endif
     } else if (match_varname(buf, "LEVELS", 4)) {
         if (strlen(bufp) >= PATHLEN)
             bufp[PATHLEN - 1] = '\0';
-        Strcpy(permbones, bufp);
+        Strcpy(g.permbones, bufp);
         if (!ramdisk_specified || !*levels)
             Strcpy(levels, bufp);
-        ramdisk = (strcmp(permbones, levels) != 0);
+        g.ramdisk = (strcmp(g.permbones, levels) != 0);
     } else if (match_varname(buf, "SAVE", 4)) {
-#ifdef MFLOPPY
-        extern int saveprompt;
-#endif
         char *ptr;
 
         if ((ptr = index(bufp, ';')) != 0) {
             *ptr = '\0';
 #ifdef MFLOPPY
             if (*(ptr + 1) == 'n' || *(ptr + 1) == 'N') {
-                saveprompt = FALSE;
+                g.g.saveprompt = FALSE;
             }
 #endif
         }
 #if defined(SYSFLAGS) && defined(MFLOPPY)
         else
-            saveprompt = sysflags.asksavedisk;
+            g.g.g.saveprompt = sysflags.asksavedisk;
 #endif
 
         (void) strncpy(SAVEP, bufp, SAVESIZE - 1);
