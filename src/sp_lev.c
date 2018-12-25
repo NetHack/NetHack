@@ -1589,7 +1589,7 @@ struct mkroom *croom;
         pm = (struct permonst *) 0;
     else if (m->id != NON_PM) {
         pm = &mons[m->id];
-        g_mvflags = (unsigned) mvitals[monsndx(pm)].mvflags;
+        g_mvflags = (unsigned) g.mvitals[monsndx(pm)].mvflags;
         if ((pm->geno & G_UNIQ) && (g_mvflags & G_EXTINCT))
             return;
         else if (g_mvflags & G_GONE)    /* genocided or extinct */
@@ -2313,8 +2313,8 @@ schar ftyp, btyp;
 
 /*
  * Disgusting hack: since special levels have their rooms filled before
- * sorting the rooms, we have to re-arrange the speed values upstairs_room
- * and dnstairs_room after the rooms have been sorted.  On normal levels,
+ * sorting the rooms, we have to re-arrange the speed values g.upstairs_room
+ * and g.dnstairs_room after the rooms have been sorted.  On normal levels,
  * stairs don't get created until _after_ sorting takes place.
  */
 STATIC_OVL void
@@ -2324,14 +2324,14 @@ fix_stair_rooms()
     struct mkroom *croom;
 
     if (xdnstair
-        && !((dnstairs_room->lx <= xdnstair && xdnstair <= dnstairs_room->hx)
-             && (dnstairs_room->ly <= ydnstair
-                 && ydnstair <= dnstairs_room->hy))) {
+        && !((g.dnstairs_room->lx <= xdnstair && xdnstair <= g.dnstairs_room->hx)
+             && (g.dnstairs_room->ly <= ydnstair
+                 && ydnstair <= g.dnstairs_room->hy))) {
         for (i = 0; i < g.nroom; i++) {
             croom = &rooms[i];
             if ((croom->lx <= xdnstair && xdnstair <= croom->hx)
                 && (croom->ly <= ydnstair && ydnstair <= croom->hy)) {
-                dnstairs_room = croom;
+                g.dnstairs_room = croom;
                 break;
             }
         }
@@ -2339,14 +2339,14 @@ fix_stair_rooms()
             panic("Couldn't find dnstair room in fix_stair_rooms!");
     }
     if (xupstair
-        && !((upstairs_room->lx <= xupstair && xupstair <= upstairs_room->hx)
-             && (upstairs_room->ly <= yupstair
-                 && yupstair <= upstairs_room->hy))) {
+        && !((g.upstairs_room->lx <= xupstair && xupstair <= g.upstairs_room->hx)
+             && (g.upstairs_room->ly <= yupstair
+                 && yupstair <= g.upstairs_room->hy))) {
         for (i = 0; i < g.nroom; i++) {
             croom = &rooms[i];
             if ((croom->lx <= xupstair && xupstair <= croom->hx)
                 && (croom->ly <= yupstair && yupstair <= croom->hy)) {
-                upstairs_room = croom;
+                g.upstairs_room = croom;
                 break;
             }
         }
@@ -4458,7 +4458,7 @@ ensure_way_out()
 {
     static const char nhFunc[] = "ensure_way_out";
     struct opvar *ov = selection_opvar((char *) 0);
-    struct trap *ttmp = ftrap;
+    struct trap *ttmp = g.ftrap;
     int x,y;
     boolean ret = TRUE;
 

@@ -113,8 +113,8 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
          * not stay there, so the player will have suddenly forgotten
          * the square's contents for no apparent reason.
         if (!canspotmon(mtmp)
-            && !glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph))
-            map_invisible(bhitpos.x, bhitpos.y);
+            && !glyph_is_invisible(levl[g.bhitpos.x][g.bhitpos.y].glyph))
+            map_invisible(g.bhitpos.x, g.bhitpos.y);
          */
         return FALSE;
     }
@@ -123,7 +123,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
        cases which might change it (by placing or removing
        'rembered, unseen monster' glyph or revealing a mimic)
        always return without further reference to this */
-    glyph = glyph_at(bhitpos.x, bhitpos.y);
+    glyph = glyph_at(g.bhitpos.x, g.bhitpos.y);
 
     /* Put up an invisible monster marker, but with exceptions for
      * monsters that hide and monsters you've been warned about.
@@ -137,7 +137,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         && !glyph_is_warning(glyph) && !glyph_is_invisible(glyph)
         && !(!Blind && mtmp->mundetected && hides_under(mtmp->data))) {
         pline("Wait!  There's %s there you can't see!", something);
-        map_invisible(bhitpos.x, bhitpos.y);
+        map_invisible(g.bhitpos.x, g.bhitpos.y);
         /* if it was an invisible mimic, treat it as if we stumbled
          * onto a visible mimic
          */
@@ -384,9 +384,9 @@ register struct monst *mtmp;
        examined in known_hitum, called via hitum or hmonas below */
     g.override_confirmation = FALSE;
     /* attack_checks() used to use <u.ux+u.dx,u.uy+u.dy> directly, now
-       it uses bhitpos instead; it might map an invisible monster there */
-    bhitpos.x = u.ux + u.dx;
-    bhitpos.y = u.uy + u.dy;
+       it uses g.bhitpos instead; it might map an invisible monster there */
+    g.bhitpos.x = u.ux + u.dx;
+    g.bhitpos.y = u.uy + u.dy;
     if (attack_checks(mtmp, uwep))
         return TRUE;
 
@@ -2129,7 +2129,7 @@ register struct attack *mattk;
                 } else {
                     tmp = 1 + (pd->cwt >> 8);
                     if (corpse_chance(mdef, &youmonst, TRUE)
-                        && !(mvitals[monsndx(pd)].mvflags & G_NOCORPSE)) {
+                        && !(g.mvitals[monsndx(pd)].mvflags & G_NOCORPSE)) {
                         /* nutrition only if there can be a corpse */
                         u.uhunger += (pd->cnutrit + 1) / 2;
                     } else

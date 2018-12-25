@@ -74,7 +74,7 @@ anything *id;
     ls->flags = 0;
     g.light_base = ls;
 
-    vision_full_recalc = 1; /* make the source show up */
+    g.vision_full_recalc = 1; /* make the source show up */
 }
 
 /*
@@ -116,7 +116,7 @@ anything *id;
                 g.light_base = curr->next;
 
             free((genericptr_t) curr);
-            vision_full_recalc = 1;
+            g.vision_full_recalc = 1;
             return;
         }
     }
@@ -225,11 +225,11 @@ unsigned fmflags;
             if (!DEADMONSTER(mtmp) && mtmp->m_id == nid)
                 return mtmp;
     if (fmflags & FM_MIGRATE)
-        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
+        for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon)
             if (mtmp->m_id == nid)
                 return mtmp;
     if (fmflags & FM_MYDOGS)
-        for (mtmp = mydogs; mtmp; mtmp = mtmp->nmon)
+        for (mtmp = g.mydogs; mtmp; mtmp = mtmp->nmon)
             if (mtmp->m_id == nid)
                 return mtmp;
     return (struct monst *) 0;
@@ -564,7 +564,7 @@ struct obj *src, *dest;
                 /* split candles may emit less light than original group */
                 ls->range = candle_light_range(src);
                 new_ls->range = candle_light_range(dest);
-                vision_full_recalc = 1; /* in case range changed */
+                g.vision_full_recalc = 1; /* in case range changed */
             }
             new_ls->id.a_obj = dest;
             new_ls->next = g.light_base;
@@ -588,7 +588,7 @@ struct obj *src, *dest;
     for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == dest) {
             ls->range = candle_light_range(dest);
-            vision_full_recalc = 1; /* in case range changed */
+            g.vision_full_recalc = 1; /* in case range changed */
             break;
         }
 }
@@ -604,7 +604,7 @@ int new_radius;
     for (ls = g.light_base; ls; ls = ls->next)
         if (ls->type == LS_OBJECT && ls->id.a_obj == obj) {
             if (new_radius != ls->range)
-                vision_full_recalc = 1;
+                g.vision_full_recalc = 1;
             ls->range = new_radius;
             return;
         }

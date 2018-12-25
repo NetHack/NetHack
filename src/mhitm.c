@@ -148,8 +148,8 @@ register struct monst *mtmp;
                 }
 
                 /* mtmp can be killed */
-                bhitpos.x = mon->mx;
-                bhitpos.y = mon->my;
+                g.bhitpos.x = mon->mx;
+                g.bhitpos.y = mon->my;
                 g.notonhead = 0;
                 result = mattackm(mtmp, mon);
 
@@ -871,7 +871,7 @@ register struct attack *mattk;
          */
         num = monsndx(pd);
         if (magr->mtame && !magr->isminion
-            && !(mvitals[num].mvflags & G_NOCORPSE)) {
+            && !(g.mvitals[num].mvflags & G_NOCORPSE)) {
             struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
             int nutrit;
 

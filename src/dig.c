@@ -78,7 +78,7 @@ boolean waslit, rockit;
         lev->waslit = (rockit ? FALSE : TRUE);
     lev->horizontal = FALSE;
     /* short-circuit vision recalc */
-    viz_array[y][x] = (dist < 3) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
+    g.viz_array[y][x] = (dist < 3) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
     lev->typ = (rockit ? STONE : ROOM); /* flags set via doormask above */
     if (dist >= 3)
         impossible("mkcavepos called with dist %d", dist);
@@ -133,7 +133,7 @@ register boolean rockit;
         newsym(u.ux, u.uy); /* in case player is invisible */
     }
 
-    vision_full_recalc = 1; /* everything changed */
+    g.vision_full_recalc = 1; /* everything changed */
 }
 
 /* When digging into location <x,y>, what are you actually digging into? */
@@ -618,7 +618,7 @@ int ttyp;
         if (at_u) {
             if (!wont_fall) {
                 set_utrap(rn1(4, 2), TT_PIT);
-                vision_full_recalc = 1; /* vision limits change */
+                g.vision_full_recalc = 1; /* vision limits change */
             } else
                 reset_utrap(TRUE);
             if (oldobjs != newobjs) /* something unearthed */

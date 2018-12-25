@@ -807,7 +807,7 @@ int howmuch;
                 levl[zx][zy].seenv = 0;
                 levl[zx][zy].waslit = 0;
                 levl[zx][zy].glyph = cmap_to_glyph(S_stone);
-                lastseentyp[zx][zy] = STONE;
+                g.lastseentyp[zx][zy] = STONE;
             }
     /* forget overview data for this level */
     forget_mapseen(ledger_no(&u.uz));
@@ -820,7 +820,7 @@ forget_traps()
     register struct trap *trap;
 
     /* forget all traps (except the one the hero is in :-) */
-    for (trap = ftrap; trap; trap = trap->ntrap)
+    for (trap = g.ftrap; trap; trap = trap->ntrap)
         if ((trap->tx != u.ux || trap->ty != u.uy) && (trap->ttyp != HOLE))
             trap->tseen = 0;
 }
@@ -856,8 +856,8 @@ int percent;
      */
     indices[0] = 0; /* lint suppression */
     for (count = 0, i = 0; i <= maxl; i++)
-        if ((level_info[i].flags & VISITED)
-            && !(level_info[i].flags & FORGOTTEN) && i != this_lev) {
+        if ((g.level_info[i].flags & VISITED)
+            && !(g.level_info[i].flags & FORGOTTEN) && i != this_lev) {
             if (ledger_to_dnum(i) == sokoban_dnum)
                 percent += 2;
             else
@@ -873,7 +873,7 @@ int percent;
         /* forget first % of randomized indices */
         count = ((count * percent) + 50) / 100;
         for (i = 0; i < count; i++) {
-            level_info[indices[i]].flags |= FORGOTTEN;
+            g.level_info[indices[i]].flags |= FORGOTTEN;
             forget_mapseen(indices[i]);
         }
     }
@@ -2008,7 +2008,7 @@ struct obj *obj;
             move_bc(0, 0, uball->ox, uball->oy, uchain->ox, uchain->oy);
     }
 
-    vision_full_recalc = 1; /* delayed vision recalculation */
+    g.vision_full_recalc = 1; /* delayed vision recalculation */
     if (gremlins) {
         struct litmon *gremlin;
 
@@ -2054,7 +2054,7 @@ do_class_genocide()
             if (mons[i].mlet == class) {
                 if (!(mons[i].geno & G_GENO))
                     immunecnt++;
-                else if (mvitals[i].mvflags & G_GENOD)
+                else if (g.mvitals[i].mvflags & G_GENOD)
                     gonecnt++;
                 else
                     goodcnt++;
@@ -2095,11 +2095,11 @@ do_class_genocide()
                  */
                 if (Your_Own_Role(i) || Your_Own_Race(i)
                     || ((mons[i].geno & G_GENO)
-                        && !(mvitals[i].mvflags & G_GENOD))) {
+                        && !(g.mvitals[i].mvflags & G_GENOD))) {
                     /* This check must be first since player monsters might
                      * have G_GENOD or !G_GENO.
                      */
-                    mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
+                    g.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
                     reset_rndmonst(i);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
@@ -2129,7 +2129,7 @@ do_class_genocide()
                             gameover = TRUE;
                         }
                     }
-                } else if (mvitals[i].mvflags & G_GENOD) {
+                } else if (g.mvitals[i].mvflags & G_GENOD) {
                     if (!gameover)
                         pline("All %s are already nonexistent.", nam);
                 } else if (!gameover) {
@@ -2216,7 +2216,7 @@ int how;
             }
 
             mndx = name_to_mon(buf);
-            if (mndx == NON_PM || (mvitals[mndx].mvflags & G_GENOD)) {
+            if (mndx == NON_PM || (g.mvitals[mndx].mvflags & G_GENOD)) {
                 pline("Such creatures %s exist in this world.",
                       (mndx == NON_PM) ? "do not" : "no longer");
                 continue;
@@ -2270,20 +2270,20 @@ int how;
     }
     if (how & REALLY) {
         /* setting no-corpse affects wishing and random tin generation */
-        mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
+        g.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
         pline("Wiped out %s%s.", which,
               (*which != 'a') ? buf : makeplural(buf));
 
         if (killplayer) {
             /* might need to wipe out dual role */
             if (urole.femalenum != NON_PM && mndx == urole.malenum)
-                mvitals[urole.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
+                g.mvitals[urole.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
             if (urole.femalenum != NON_PM && mndx == urole.femalenum)
-                mvitals[urole.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
+                g.mvitals[urole.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
             if (urace.femalenum != NON_PM && mndx == urace.malenum)
-                mvitals[urace.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
+                g.mvitals[urace.femalenum].mvflags |= (G_GENOD | G_NOCORPSE);
             if (urace.femalenum != NON_PM && mndx == urace.femalenum)
-                mvitals[urace.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
+                g.mvitals[urace.malenum].mvflags |= (G_GENOD | G_NOCORPSE);
 
             u.uhp = -1;
             if (how & PLAYER) {
@@ -2316,12 +2316,12 @@ int how;
         int cnt = 0, census = monster_census(FALSE);
 
         if (!(mons[mndx].geno & G_UNIQ)
-            && !(mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)))
+            && !(g.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)))
             for (i = rn1(3, 4); i > 0; i--) {
                 if (!makemon(ptr, u.ux, u.uy, NO_MINVENT))
                     break; /* couldn't make one */
                 ++cnt;
-                if (mvitals[mndx].mvflags & G_EXTINCT)
+                if (g.mvitals[mndx].mvflags & G_EXTINCT)
                     break; /* just made last one */
             }
         if (cnt) {

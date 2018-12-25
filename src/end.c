@@ -489,7 +489,7 @@ int how;
     /* this could happen if a high-end vampire kills the hero
        when ordinary vampires are genocided; ditto for wraiths */
     if (u.ugrave_arise >= LOW_PM
-        && (mvitals[u.ugrave_arise].mvflags & G_GENOD))
+        && (g.mvitals[u.ugrave_arise].mvflags & G_GENOD))
         u.ugrave_arise = NON_PM;
 
     done(how);
@@ -1134,10 +1134,10 @@ int how;
     inven_inuse(TRUE);
     /* maybe not on object lists; if an active light source, would cause
        big trouble (`obj_is_local' panic) for savebones() -> savelev() */
-    if (thrownobj && thrownobj->where == OBJ_FREE)
-        dealloc_obj(thrownobj);
-    if (kickedobj && kickedobj->where == OBJ_FREE)
-        dealloc_obj(kickedobj);
+    if (g.thrownobj && g.thrownobj->where == OBJ_FREE)
+        dealloc_obj(g.thrownobj);
+    if (g.kickedobj && g.kickedobj->where == OBJ_FREE)
+        dealloc_obj(g.kickedobj);
 
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
@@ -1180,7 +1180,7 @@ int how;
                 have been genocided:  genocide could occur after hero is
                 already infected or hero could eat a glob of one created
                 before genocide; don't try to arise as one if they're gone */
-             && !(mvitals[PM_GREEN_SLIME].mvflags & G_GENOD))
+             && !(g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD))
         u.ugrave_arise = PM_GREEN_SLIME;
 
     if (how == QUIT) {
@@ -1244,7 +1244,7 @@ int how;
         dump_everything(how, endtime);
     }
 
-    /* if pets will contribute to score, populate mydogs list now
+    /* if pets will contribute to score, populate g.mydogs list now
        (bones creation isn't a factor, but pline() messaging is; used to
        be done even sooner, but we need it to come after dump_everything()
        so that any accompanying pets are still on the map during dump) */
@@ -1258,7 +1258,7 @@ int how;
     /* grave creation should be after disclosure so it doesn't have
        this grave in the current level's features for #overview */
     if (bones_ok && u.ugrave_arise == NON_PM
-        && !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
+        && !(g.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
         int mnum = u.umonnum;
 
         if (!Upolyd) {
@@ -1407,8 +1407,8 @@ int how;
         /* count the points for artifacts */
         artifact_score(invent, TRUE, endwin);
 
-        viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
-        mtmp = mydogs;
+        g.viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
+        mtmp = g.mydogs;
         Strcpy(pbuf, "You");
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
@@ -1418,7 +1418,7 @@ int how;
                 mtmp = mtmp->nmon;
             }
             /* [it might be more robust to create a housecat and add it to
-               mydogs; it doesn't have to be placed on the map for that] */
+               g.mydogs; it doesn't have to be placed on the map for that] */
             if (Schroedingers_cat) {
                 int mhp, m_lev = adj_lev(&mons[PM_HOUSECAT]);
 
@@ -1716,7 +1716,7 @@ const genericptr vptr2;
         break;
     case VANQ_COUNT_H_L:
     case VANQ_COUNT_L_H:
-        died1 = mvitals[indx1].died, died2 = mvitals[indx2].died;
+        died1 = g.mvitals[indx1].died, died2 = g.mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
         if (g.vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
@@ -1795,7 +1795,7 @@ boolean ask;
     /* get totals first */
     ntypes = 0;
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if ((nkilled = (int) mvitals[i].died) == 0)
+        if ((nkilled = (int) g.mvitals[i].died) == 0)
             continue;
         mindx[ntypes++] = i;
         total_killed += (long) nkilled;
@@ -1833,7 +1833,7 @@ boolean ask;
             qsort((genericptr_t) mindx, ntypes, sizeof *mindx, vanqsort_cmp);
             for (ni = 0; ni < ntypes; ni++) {
                 i = mindx[ni];
-                nkilled = mvitals[i].died;
+                nkilled = g.mvitals[i].died;
                 mlet = mons[i].mlet;
                 if (class_header && mlet != prev_mlet) {
                     Strcpy(buf, def_monsyms[(int) mlet].explain);
@@ -1912,7 +1912,7 @@ num_genocides()
     int i, n = 0;
 
     for (i = LOW_PM; i < NUMMONS; ++i) {
-        if (mvitals[i].mvflags & G_GENOD) {
+        if (g.mvitals[i].mvflags & G_GENOD) {
             ++n;
             if (UniqCritterIndx(i))
                 impossible("unique creature '%d: %s' genocided?",
@@ -1930,7 +1930,7 @@ num_extinct()
     for (i = LOW_PM; i < NUMMONS; ++i) {
         if (UniqCritterIndx(i))
             continue;
-        if ((mvitals[i].mvflags & G_GONE) == G_EXTINCT)
+        if ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
             ++n;
     }
     return n;
@@ -1978,7 +1978,7 @@ boolean ask;
                    however, they're never reported as extinct, so skip them */
                 if (UniqCritterIndx(i))
                     continue;
-                if (mvitals[i].mvflags & G_GONE) {
+                if (g.mvitals[i].mvflags & G_GONE) {
                     Sprintf(buf, " %s", makeplural(mons[i].mname));
                     /*
                      * "Extinct" is unfortunate terminology.  A species
@@ -1986,7 +1986,7 @@ boolean ask;
                      * but there might be members of the species still
                      * alive, contradicting the meaning of the word.
                      */
-                    if ((mvitals[i].mvflags & G_GONE) == G_EXTINCT)
+                    if ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
                         Strcat(buf, " (extinct)");
                     putstr(klwin, 0, buf);
                 }

@@ -699,19 +699,19 @@ struct obj *obj; /* only scatter this obj        */
     while (farthest-- > 0) {
         for (stmp = schain; stmp; stmp = stmp->next) {
             if ((stmp->range-- > 0) && (!stmp->stopped)) {
-                bhitpos.x = stmp->ox + stmp->dx;
-                bhitpos.y = stmp->oy + stmp->dy;
-                typ = levl[bhitpos.x][bhitpos.y].typ;
-                if (!isok(bhitpos.x, bhitpos.y)) {
-                    bhitpos.x -= stmp->dx;
-                    bhitpos.y -= stmp->dy;
+                g.bhitpos.x = stmp->ox + stmp->dx;
+                g.bhitpos.y = stmp->oy + stmp->dy;
+                typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
+                if (!isok(g.bhitpos.x, g.bhitpos.y)) {
+                    g.bhitpos.x -= stmp->dx;
+                    g.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
                 } else if (!ZAP_POS(typ)
-                           || closed_door(bhitpos.x, bhitpos.y)) {
-                    bhitpos.x -= stmp->dx;
-                    bhitpos.y -= stmp->dy;
+                           || closed_door(g.bhitpos.x, g.bhitpos.y)) {
+                    g.bhitpos.x -= stmp->dx;
+                    g.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
-                } else if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+                } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
                     if (scflags & MAY_HITMON) {
                         stmp->range--;
                         if (ohitmon(mtmp, stmp->obj, 1, FALSE)) {
@@ -719,7 +719,7 @@ struct obj *obj; /* only scatter this obj        */
                             stmp->stopped = TRUE;
                         }
                     }
-                } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+                } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
                     if (scflags & MAY_HITYOU) {
                         int hitvalu, hitu;
 
@@ -739,12 +739,12 @@ struct obj *obj; /* only scatter this obj        */
                     }
                 } else {
                     if (scflags & VIS_EFFECTS) {
-                        /* tmp_at(bhitpos.x, bhitpos.y); */
+                        /* tmp_at(g.bhitpos.x, g.bhitpos.y); */
                         /* delay_output(); */
                     }
                 }
-                stmp->ox = bhitpos.x;
-                stmp->oy = bhitpos.y;
+                stmp->ox = g.bhitpos.x;
+                stmp->oy = g.bhitpos.y;
             }
         }
     }

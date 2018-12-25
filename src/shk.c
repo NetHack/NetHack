@@ -296,13 +296,13 @@ register struct monst *shkp;
     clear_unpaid(shkp, invent);
     clear_unpaid(shkp, fobj);
     clear_unpaid(shkp, level.buriedobjlist);
-    if (thrownobj)
-        clear_unpaid_obj(shkp, thrownobj);
-    if (kickedobj)
-        clear_unpaid_obj(shkp, kickedobj);
+    if (g.thrownobj)
+        clear_unpaid_obj(shkp, g.thrownobj);
+    if (g.kickedobj)
+        clear_unpaid_obj(shkp, g.kickedobj);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         clear_unpaid(shkp, mtmp->minvent);
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon)
         clear_unpaid(shkp, mtmp->minvent);
 
     while ((obj = billobjs) != 0) {
@@ -346,10 +346,10 @@ register boolean nearshop;
     if (!Deaf)
         pline("An alarm sounds!");
 
-    nokops = ((mvitals[PM_KEYSTONE_KOP].mvflags & G_GONE)
-              && (mvitals[PM_KOP_SERGEANT].mvflags & G_GONE)
-              && (mvitals[PM_KOP_LIEUTENANT].mvflags & G_GONE)
-              && (mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
+    nokops = ((g.mvitals[PM_KEYSTONE_KOP].mvflags & G_GONE)
+              && (g.mvitals[PM_KOP_SERGEANT].mvflags & G_GONE)
+              && (g.mvitals[PM_KOP_LIEUTENANT].mvflags & G_GONE)
+              && (g.mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
 
     if (!angry_guards(!!Deaf) && nokops) {
         if (flags.verbose && !Deaf)
@@ -1946,8 +1946,8 @@ unsigned id;
 
     /* not found yet; check inventory for members of various monst lists */
     mmtmp[0] = fmon;
-    mmtmp[1] = migrating_mons;
-    mmtmp[2] = mydogs; /* for use during level changes */
+    mmtmp[1] = g.migrating_mons;
+    mmtmp[2] = g.mydogs; /* for use during level changes */
     for (i = 0; i < 3; i++)
         for (mon = mmtmp[i]; mon; mon = mon->nmon)
             if ((obj = o_on(id, mon->minvent)) != 0)
@@ -3880,7 +3880,7 @@ register int fall;
                 || (obj == uswapwep && u.twoweap)
                 || (obj->otyp == LEASH && obj->leashmon))
                 continue;
-            if (obj == current_wand)
+            if (obj == g.current_wand)
                 continue;
             setnotworn(obj);
             freeinv(obj);
@@ -3907,7 +3907,7 @@ coord *mm;
         if ((cnt = k_cnt[k]) == 0)
             break;
         mndx = k_mndx[k];
-        if (mvitals[mndx].mvflags & G_GONE)
+        if (g.mvitals[mndx].mvflags & G_GONE)
             continue;
 
         while (cnt--)

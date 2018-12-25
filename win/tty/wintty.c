@@ -342,7 +342,7 @@ int sig_unused UNUSED;
                 ttyDisplay->toplin = i;
                 flush_screen(1);
                 if (i) {
-                    addtopl(toplines);
+                    addtopl(g.toplines);
                 } else
                     for (i = WIN_INVEN; i < MAXWIN; i++)
                         if (wins[i] && wins[i]->active) {

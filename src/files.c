@@ -508,7 +508,7 @@ char errbuf[];
 #endif /* MICRO || WIN32 */
 
     if (fd >= 0)
-        level_info[lev].flags |= LFILE_EXISTS;
+        g.level_info[lev].flags |= LFILE_EXISTS;
     else if (errbuf) /* failure explanation */
         Sprintf(errbuf, "Cannot create file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
@@ -530,7 +530,7 @@ char errbuf[];
     fq_lock = fqname(lock, LEVELPREFIX, 0);
 #ifdef MFLOPPY
     /* If not currently accessible, swap it in. */
-    if (level_info[lev].where != ACTIVE)
+    if (g.level_info[lev].where != ACTIVE)
         swapin_file(lev);
 #endif
 #ifdef MAC
@@ -562,14 +562,14 @@ int lev;
      * Level 0 might be created by port specific code that doesn't
      * call create_levfile(), so always assume that it exists.
      */
-    if (lev == 0 || (level_info[lev].flags & LFILE_EXISTS)) {
+    if (lev == 0 || (g.level_info[lev].flags & LFILE_EXISTS)) {
         set_levelfile_name(lock, lev);
 #ifdef HOLD_LOCKFILE_OPEN
         if (lev == 0)
             really_close();
 #endif
         (void) unlink(fqname(lock, LEVELPREFIX, 0));
-        level_info[lev].flags &= ~LFILE_EXISTS;
+        g.level_info[lev].flags &= ~LFILE_EXISTS;
     }
 }
 
@@ -2364,10 +2364,10 @@ char *origbuf;
                || match_varname(buf, "CHARACTER", 4)) {
         if ((len = str2role(bufp)) >= 0)
             flags.initrole = len;
-    } else if (match_varname(buf, "DOGNAME", 3)) {
-        (void) strncpy(dogname, bufp, PL_PSIZ - 1);
-    } else if (match_varname(buf, "CATNAME", 3)) {
-        (void) strncpy(catname, bufp, PL_PSIZ - 1);
+    } else if (match_varname(buf, "dogname", 3)) {
+        (void) strncpy(g.dogname, bufp, PL_PSIZ - 1);
+    } else if (match_varname(buf, "catname", 3)) {
+        (void) strncpy(g.catname, bufp, PL_PSIZ - 1);
 
 #ifdef SYSCF
     } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {

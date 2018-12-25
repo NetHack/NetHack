@@ -299,7 +299,7 @@ struct obj *otmp, *mwep;
    return 1 if the object has stopped moving (hit or its range used up) */
 int
 ohitmon(mtmp, otmp, range, verbose)
-struct monst *mtmp; /* accidental target, located at <bhitpos.x,.y> */
+struct monst *mtmp; /* accidental target, located at <g.bhitpos.x,.y> */
 struct obj *otmp;   /* missile; might be destroyed by drop_throw */
 int range;          /* how much farther will object travel if it misses;
                        use -1 to signify to keep going even after hit,
@@ -311,9 +311,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     int objgone = 1;
     struct obj *mon_launcher = archer ? MON_WEP(archer) : NULL;
 
-    g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+    g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
     ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
-    vis = cansee(bhitpos.x, bhitpos.y);
+    vis = cansee(g.bhitpos.x, g.bhitpos.y);
 
     tmp = 5 + find_mac(mtmp) + omon_adj(mtmp, otmp, FALSE);
     /* High level monsters will be more likely to hit */
@@ -435,7 +435,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             mtmp->mblinded = tmp;
         }
 
-        objgone = drop_throw(otmp, 1, bhitpos.x, bhitpos.y);
+        objgone = drop_throw(otmp, 1, g.bhitpos.x, g.bhitpos.y);
         if (!objgone && range == -1) { /* special case */
             obj_extract_self(otmp);    /* free it for motion again */
             return 0;
@@ -447,21 +447,21 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
 
 #define MT_FLIGHTCHECK(pre)                                             \
     (/* missile hits edge of screen */                                  \
-     !isok(bhitpos.x + dx, bhitpos.y + dy)                              \
+     !isok(g.bhitpos.x + dx, g.bhitpos.y + dy)                              \
      /* missile hits the wall */                                        \
-     || IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ)               \
+     || IS_ROCK(levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ)               \
      /* missile hit closed door */                                      \
-     || closed_door(bhitpos.x + dx, bhitpos.y + dy)                     \
+     || closed_door(g.bhitpos.x + dx, g.bhitpos.y + dy)                     \
      /* missile might hit iron bars */                                  \
      /* the random chance for small objects hitting bars is */          \
      /* skipped when reaching them at point blank range */              \
-     || (levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS           \
+     || (levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ == IRONBARS           \
          && hits_bars(&singleobj,                                       \
-                      bhitpos.x, bhitpos.y,                             \
-                      bhitpos.x + dx, bhitpos.y + dy,                   \
+                      g.bhitpos.x, g.bhitpos.y,                             \
+                      g.bhitpos.x + dx, g.bhitpos.y + dy,                   \
                       ((pre) ? 0 : !rn2(5)), 0))                        \
      /* Thrown objects "sink" */                                        \
-     || (!(pre) && IS_SINK(levl[bhitpos.x][bhitpos.y].typ)))
+     || (!(pre) && IS_SINK(levl[g.bhitpos.x][g.bhitpos.y].typ)))
 
 void
 m_throw(mon, x, y, dx, dy, range, obj)
@@ -474,8 +474,8 @@ struct obj *obj;         /* missile (or stack providing it) */
     char sym = obj->oclass;
     int hitu = 0, oldumort, blindinc = 0;
 
-    bhitpos.x = x;
-    bhitpos.y = y;
+    g.bhitpos.x = x;
+    g.bhitpos.y = y;
     g.notonhead = FALSE; /* reset potentially stale value */
 
     if (obj->quan == 1L) {
@@ -515,13 +515,13 @@ struct obj *obj;         /* missile (or stack providing it) */
         dy = rn2(3) - 1;
         /* check validity of new direction */
         if (!dx && !dy) {
-            (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
+            (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
             return;
         }
     }
 
     if (MT_FLIGHTCHECK(TRUE)) {
-        (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
+        (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
         return;
     }
     mesg_given = 0; /* a 'missile misses' message has not yet been shown */
@@ -533,12 +533,12 @@ struct obj *obj;         /* missile (or stack providing it) */
     if (sym)
         tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
     while (range-- > 0) { /* Actually the loop is always exited by break */
-        bhitpos.x += dx;
-        bhitpos.y += dy;
-        if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+        g.bhitpos.x += dx;
+        g.bhitpos.y += dy;
+        if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
             if (ohitmon(mtmp, singleobj, range, TRUE))
                 break;
-        } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+        } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
             if (g.multi)
                 nomul(0);
 
@@ -654,18 +654,18 @@ struct obj *obj;         /* missile (or stack providing it) */
             || MT_FLIGHTCHECK(FALSE)) {
             if (singleobj) { /* hits_bars might have destroyed it */
                 if (g.m_shot.n > 1
-                    && (!mesg_given || bhitpos.x != u.ux || bhitpos.y != u.uy)
-                    && (cansee(bhitpos.x, bhitpos.y)
+                    && (!mesg_given || g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)
+                    && (cansee(g.bhitpos.x, g.bhitpos.y)
                         || (archer && canseemon(archer))))
                     pline("%s misses.", The(mshot_xname(singleobj)));
-                (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
+                (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
             }
             break;
         }
-        tmp_at(bhitpos.x, bhitpos.y);
+        tmp_at(g.bhitpos.x, g.bhitpos.y);
         delay_output();
     }
-    tmp_at(bhitpos.x, bhitpos.y);
+    tmp_at(g.bhitpos.x, g.bhitpos.y);
     delay_output();
     tmp_at(DISP_END, 0);
     mesg_given = 0; /* reset */

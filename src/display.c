@@ -139,7 +139,7 @@ STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
 STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
-#define remember_topology(x, y) (lastseentyp[x][y] = levl[x][y].typ)
+#define remember_topology(x, y) (g.lastseentyp[x][y] = levl[x][y].typ)
 
 /*
  * magic_map_background()
@@ -413,7 +413,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
             if (!sensed) {
                 show_glyph(x, y, glyph);
                 /* override real topology with mimic's fake one */
-                lastseentyp[x][y] = cmap_to_type(sym);
+                g.lastseentyp[x][y] = cmap_to_type(sym);
             }
             break;
         }
@@ -588,7 +588,7 @@ xchar x, y;
          *
          *      + Stone, walls, and closed doors.
          *      + Boulders.  [see a boulder before a doorway]
-         *      + Doors.
+         *      + doors.
          *      + Room/water positions
          *      + Everything else (hallways!)
          */
@@ -1301,7 +1301,7 @@ see_traps()
     struct trap *trap;
     int glyph;
 
-    for (trap = ftrap; trap; trap = trap->ntrap) {
+    for (trap = g.ftrap; trap; trap = trap->ntrap) {
         glyph = glyph_at(trap->tx, trap->ty);
         if (glyph_is_trap(glyph))
             newsym(trap->tx, trap->ty);

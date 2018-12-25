@@ -46,8 +46,6 @@ const char *alllevels = "levels.*";
 const char *allbones = "bones*.*";
 #endif
 
-struct linfo level_info[MAXLINFO];
-
 NEARDATA struct sinfo program_state;
 
 /* x/y/z deltas for the 10 movement directions (8 compass pts, 2 up/down) */
@@ -55,17 +53,10 @@ const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
-NEARDATA boolean in_steed_dismounting = FALSE;
-
-NEARDATA coord bhitpos = DUMMY;
-NEARDATA coord doors[DOORMAX] = { DUMMY };
-
 NEARDATA struct mkroom rooms[(MAXNROFROOMS + 1) * 2] = { DUMMY };
 NEARDATA struct mkroom *subrooms = &rooms[MAXNROFROOMS + 1];
-struct mkroom *upstairs_room, *dnstairs_room, *sstairs_room;
 
 dlevel_t level; /* level map */
-struct trap *ftrap = (struct trap *) 0;
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
@@ -76,10 +67,6 @@ NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 NEARDATA time_t ubirthday = DUMMY;
 NEARDATA struct u_realtime urealtime = DUMMY;
-
-schar lastseentyp[COLNO][ROWNO] = {
-    DUMMY
-}; /* last seen/touched dungeon typ */
 
 NEARDATA struct obj
     *invent = (struct obj *) 0,
@@ -94,11 +81,6 @@ NEARDATA struct obj
     *uright = (struct obj *) 0, *uleft = (struct obj *) 0,
     *ublindf = (struct obj *) 0, *uchain = (struct obj *) 0,
     *uball = (struct obj *) 0;
-/* some objects need special handling during destruction or placement */
-NEARDATA struct obj
-    *current_wand = 0,  /* wand currently zapped/applied */
-    *thrownobj = 0,     /* object in flight due to throwing */
-    *kickedobj = 0;     /* object in flight due to kicking */
 
 #ifdef TEXTCOLOR
 /*
@@ -122,8 +104,6 @@ const int shield_static[SHIELD_COUNT] = {
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
 };
 
-NEARDATA struct spell spl_book[MAXSPELL + 1] = { DUMMY };
-
 NEARDATA long moves = 1L, monstermoves = 1L;
 /* These diverge when player is Fast */
 NEARDATA long wailmsg = 0L;
@@ -139,24 +119,10 @@ NEARDATA struct monst zeromonst = DUMMY;
 /* used to zero out union any; initializer deliberately omitted */
 NEARDATA anything zeroany;
 
-/* originally from dog.c */
-NEARDATA char dogname[PL_PSIZ] = DUMMY;
-NEARDATA char catname[PL_PSIZ] = DUMMY;
-NEARDATA char horsename[PL_PSIZ] = DUMMY;
-char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
-/* monsters that went down/up together with @ */
-NEARDATA struct monst *mydogs = (struct monst *) 0;
-/* monsters that are moving to another dungeon level */
-NEARDATA struct monst *migrating_mons = (struct monst *) 0;
-
-NEARDATA struct mvitals mvitals[NUMMONS];
-
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
 };
-
-struct menucoloring *menu_colorings = NULL;
 
 const char *c_obj_colors[] = {
     "black",          /* CLR_BLACK */
@@ -197,15 +163,11 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "platinum",   "mithril", "plastic",    "glass",
                              "gemstone",   "stone" };
 
-/* Vision */
-NEARDATA boolean vision_full_recalc = 0;
-NEARDATA char **viz_array = 0; /* used in cansee() and couldsee() macros */
-
 /* Global windowing data, defined here for multi-window-system support */
 NEARDATA winid WIN_MESSAGE = WIN_ERR;
 NEARDATA winid WIN_STATUS = WIN_ERR;
 NEARDATA winid WIN_MAP = WIN_ERR, WIN_INVEN = WIN_ERR;
-char toplines[TBUFSZ];
+
 /* Windowing stuff that's really tty oriented, but present for all ports */
 struct tc_gbl_data tc_gbl_data = { 0, 0, 0, 0 }; /* AS,AE, LI,CO */
 
@@ -245,8 +207,6 @@ const struct savefile_info default_sfinfo = {
 };
 
 NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
-
-struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 
 #ifdef PANICTRACE
 const char *ARGV0;
@@ -347,7 +307,22 @@ const struct instance_globals g_init = {
     FALSE, /* stoned */
     FALSE, /* unweapon */
     FALSE, /* mrg_to_wielded */
-
+    NULL, /* plinemsg_types */
+    UNDEFINED_VALUES, /* toplines */
+    UNDEFINED_PTR, /* upstairs_room */
+    UNDEFINED_PTR, /* dnstairs_room */
+    UNDEFINED_PTR, /* sstairs_room */
+    DUMMY, /* bhitpos */
+    FALSE, /* in_steed_dismounting */
+    DUMMY, /* doors */
+    NULL, /* menu_colorings */
+    DUMMY, /* lastseentyp */
+    DUMMY, /* spl_book */
+    UNDEFINED_VALUES, /* level_info */
+    NULL, /* ftrap */
+    NULL, /* current_wand */
+    NULL, /* thrownobj */
+    NULL, /* kickedobj */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
@@ -376,6 +351,13 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* gtyp */
     UNDEFINED_VALUE, /* gx */
     UNDEFINED_VALUE, /* gy */
+    DUMMY, /* dogname */
+    DUMMY, /* catname */
+    DUMMY, /* horsename */
+    UNDEFINED_VALUE, /* preferred_pet */
+    NULL, /* mydogs */
+    NULL, /* migrating_mons */
+    UNDEFINED_VALUES, /* mvitals */
 
     /* dokick.c */
     UNDEFINED_PTR, /* maploc */
@@ -615,6 +597,12 @@ const struct instance_globals g_init = {
 
     /* uhitm.c */
     UNDEFINED_VALUE, /* override_confirmation */
+
+    /* vision.c */
+    NULL, /* viz_array */
+    NULL, /* viz_rmin */
+    NULL, /* viz_rmax */
+    FALSE, /* vision_full_recalc */
 
     /* weapon.c */
     UNDEFINED_PTR, /* propellor */

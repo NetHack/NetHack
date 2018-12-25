@@ -1121,7 +1121,7 @@ unsigned doname_flags;
                 Strcat(prefix, "stale ");
 #endif
             if (omndx >= LOW_PM
-                && (known || (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
+                && (known || (g.mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
                 Strcat(prefix, mons[omndx].mname);
                 Strcat(prefix, " ");
                 if (obj->spe)
@@ -3812,14 +3812,14 @@ typfnd:
             if (dead_species(mntmp, FALSE)) {
                 otmp->corpsenm = NON_PM; /* it's empty */
             } else if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
-                       && !(mvitals[mntmp].mvflags & G_NOCORPSE)
+                       && !(g.mvitals[mntmp].mvflags & G_NOCORPSE)
                        && mons[mntmp].cnutrit != 0) {
                 otmp->corpsenm = mntmp;
             }
             break;
         case CORPSE:
             if ((!(mons[mntmp].geno & G_UNIQ) || wizard)
-                && !(mvitals[mntmp].mvflags & G_NOCORPSE)) {
+                && !(g.mvitals[mntmp].mvflags & G_NOCORPSE)) {
                 if (mons[mntmp].msound == MS_GUARDIAN)
                     mntmp = genus(mntmp, 1);
                 set_corpsenm(otmp, mntmp);

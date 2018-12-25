@@ -66,7 +66,7 @@ const char *msg;
 #endif
             return;
         }
-        if (chk_geno && (mvitals[mndx].mvflags & G_GENOD) != 0)
+        if (chk_geno && (g.mvitals[mndx].mvflags & G_GENOD) != 0)
             impossible("genocided %s in play (%s)", mons[mndx].mname, msg);
     }
     if (mtmp->isshk && !has_eshk(mtmp))
@@ -131,7 +131,7 @@ mon_sanity_check()
                                mtmp->mx, mtmp->my, x, y);
             }
 
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
     }
 }
@@ -435,7 +435,7 @@ unsigned corpseflags;
         return obj;
     default_1:
     default:
-        if (mvitals[mndx].mvflags & G_NOCORPSE) {
+        if (g.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {
             corpstatflags |= CORPSTAT_INIT;
@@ -681,7 +681,7 @@ mcalcdistress()
         /* must check non-moving monsters once/turn in case
          * they managed to end up in liquid */
         if (mtmp->data->mmove == 0) {
-            if (vision_full_recalc)
+            if (g.vision_full_recalc)
                 vision_recalc(0);
             if (minliquid(mtmp))
                 continue;
@@ -771,7 +771,7 @@ movemon()
         if (mtmp->movement >= NORMAL_SPEED)
             somebody_can_move = TRUE;
 
-        if (vision_full_recalc)
+        if (g.vision_full_recalc)
             vision_recalc(0); /* vision! */
 
         /* reset obj bypasses before next monster moves */
@@ -831,7 +831,7 @@ movemon()
     }
 
     if (any_light_source())
-        vision_full_recalc = 1; /* in case a mon moved with a light source */
+        g.vision_full_recalc = 1; /* in case a mon moved with a light source */
     /* reset obj bypasses after last monster has moved */
     if (context.bypasses)
         clear_bypasses();
@@ -1664,7 +1664,7 @@ struct monst *mtmp, *mtmp2;
 void
 relmon(mon, monst_list)
 struct monst *mon;
-struct monst **monst_list; /* &migrating_mons or &mydogs or null */
+struct monst **monst_list; /* &g.migrating_mons or &g.mydogs or null */
 {
     struct monst *mtmp;
     int mx = mon->mx, my = mon->my;
@@ -1706,7 +1706,7 @@ struct monst **monst_list; /* &migrating_mons or &mydogs or null */
     if (unhide) {
         if (on_map)
             newsym(mx, my);
-        /* insert into mydogs or migrating_mons */
+        /* insert into g.mydogs or g.migrating_mons */
         mon->nmon = *monst_list;
         *monst_list = mon;
     } else {
@@ -1877,7 +1877,7 @@ struct monst *mtmp;
         /* equip replacement amulet, if any, on next move */
         mtmp->misc_worn_check |= I_SPECIAL;
 
-        surviver = !(mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);
+        surviver = !(g.mvitals[monsndx(mtmp->data)].mvflags & G_GENOD);
         mtmp->mcanmove = 1;
         mtmp->mfrozen = 0;
         if (mtmp->mtame && !mtmp->isminion) {
@@ -1915,7 +1915,7 @@ register struct monst *mtmp;
 
         /* this only happens if shapeshifted */
         if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
-            && !(mvitals[mndx].mvflags & G_GENOD)) {
+            && !(g.mvitals[mndx].mvflags & G_GENOD)) {
             char buf[BUFSZ];
             boolean in_door = (amorphous(mtmp->data)
                                && closed_door(mtmp->mx, mtmp->my)),
@@ -1994,7 +1994,7 @@ register struct monst *mtmp;
         set_mon_data(mtmp, &mons[PM_HUMAN_WERERAT], -1);
 
     /*
-     * mvitals[].died does double duty as total number of dead monsters
+     * g.mvitals[].died does double duty as total number of dead monsters
      * and as experience factor for the player killing more monsters.
      * this means that a dragon dying by other means reduces the
      * experience the player gets for killing a dragon directly; this
@@ -2004,8 +2004,8 @@ register struct monst *mtmp;
      * for rings of conflict and such.
      */
     tmp = monsndx(mtmp->data);
-    if (mvitals[tmp].died < 255)
-        mvitals[tmp].died++;
+    if (g.mvitals[tmp].died < 255)
+        g.mvitals[tmp].died++;
 
     /* if it's a (possibly polymorphed) quest leader, mark him as dead */
     if (mtmp->m_id == g.quest_status.leader_m_id)
@@ -2013,7 +2013,7 @@ register struct monst *mtmp;
 #ifdef MAIL
     /* if the mail daemon dies, no more mail delivery.  -3. */
     if (tmp == PM_MAIL_DAEMON)
-        mvitals[tmp].mvflags |= G_GENOD;
+        g.mvitals[tmp].mvflags |= G_GENOD;
 #endif
 
     if (mtmp->data->mlet == S_KOP) {
@@ -2273,7 +2273,7 @@ struct monst *mtmp;
             u.uswldtim = 0;
             if (Punished && uchain->where != OBJ_FLOOR)
                 placebc();
-            vision_full_recalc = 1;
+            g.vision_full_recalc = 1;
             docrt();
             /* prevent swallower (mtmp might have just poly'd into something
                without an engulf attack) from immediately re-engulfing */
@@ -2337,15 +2337,15 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     if (mtmp->mtame && !mtmp->isminion)
         EDOG(mtmp)->killed_by_u = 1;
 
-    if (wasinside && thrownobj && thrownobj != uball) {
+    if (wasinside && g.thrownobj && g.thrownobj != uball) {
         /* thrown object has killed hero's engulfer; add it to mon's
            inventory now so that it will be placed with mon's other
            stuff prior to lookhere/autopickup when hero is expelled
            below (as a side-effect, this missile has immunity from
            being consumed [for this shot/throw only]) */
-        mpickobj(mtmp, thrownobj);
+        mpickobj(mtmp, g.thrownobj);
         /* let throwing code know that missile has been disposed of */
-        thrownobj = 0;
+        g.thrownobj = 0;
     }
 
     g.vamp_rise_msg = FALSE; /* might get set in mondead(); only checked below */
@@ -2389,7 +2389,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         int otyp;
 
         /* illogical but traditional "treasure drop" */
-        if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE)
+        if (!rn2(6) && !(g.mvitals[mndx].mvflags & G_NOCORPSE)
             /* no extra item from swallower or steed */
             && (x != u.ux || y != u.uy)
             /* no extra item from kops--too easy to abuse */
@@ -2443,7 +2443,7 @@ cleanup:
     }
 
     /* give experience points */
-    tmp = experience(mtmp, (int) mvitals[mndx].died);
+    tmp = experience(mtmp, (int) g.mvitals[mndx].died);
     more_experienced(tmp, 0);
     newexplevel(); /* will decide if you go up */
 
@@ -2512,7 +2512,7 @@ struct monst *mtmp;
 
         /* this only happens if shapeshifted */
         if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
-            && !(mvitals[mndx].mvflags & G_GENOD)) {
+            && !(g.mvitals[mndx].mvflags & G_GENOD)) {
             char buf[BUFSZ];
             boolean in_door = (amorphous(mtmp->data)
                                && closed_door(mtmp->mx, mtmp->my));
@@ -3068,10 +3068,10 @@ struct monst *mon;
     if ((is_hider(mon->data) || hider_under)
         && !(mon->mundetected || mon->m_ap_type)) {
         xchar x = mon->mx, y = mon->my;
-        char save_viz = viz_array[y][x];
+        char save_viz = g.viz_array[y][x];
 
         /* override vision, forcing hero to be unable to see monster's spot */
-        viz_array[y][x] &= ~(IN_SIGHT | COULD_SEE);
+        g.viz_array[y][x] &= ~(IN_SIGHT | COULD_SEE);
         if (is_hider(mon->data))
             (void) restrap(mon);
         /* try again if mimic missed its 1/3 chance to hide */
@@ -3079,7 +3079,7 @@ struct monst *mon;
             (void) restrap(mon);
         if (hider_under)
             (void) hideunder(mon);
-        viz_array[y][x] = save_viz;
+        g.viz_array[y][x] = save_viz;
     }
 }
 
@@ -3427,7 +3427,7 @@ int mndx;
     if (mndx == NON_PM)
         return 0;
     mdat = &mons[mndx];
-    if ((mvitals[mndx].mvflags & G_GENOD) != 0)
+    if ((g.mvitals[mndx].mvflags & G_GENOD) != 0)
         return 0;
     if (is_placeholder(mdat))
         return 0;
@@ -3518,7 +3518,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         } while (--tryct > 0);
         if (!tryct)
             return 0;
-    } else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
+    } else if (g.mvitals[monsndx(mdat)].mvflags & G_GENOD)
         return 0; /* passed in mdat is genocided */
 
     if (mdat == olddata)
@@ -3750,8 +3750,8 @@ boolean egg;
      * overpopulation does not kill eggs.
      */
     alt_idx = egg ? big_to_little(m_idx) : m_idx;
-    return (boolean) ((mvitals[m_idx].mvflags & G_GENOD) != 0
-                      || (mvitals[alt_idx].mvflags & G_GENOD) != 0);
+    return (boolean) ((g.mvitals[m_idx].mvflags & G_GENOD) != 0
+                      || (g.mvitals[alt_idx].mvflags & G_GENOD) != 0);
 }
 
 /* kill off any eggs of genocided monsters */
@@ -3810,8 +3810,8 @@ kill_genocided_monsters()
             continue;
         mndx = monsndx(mtmp->data);
         kill_cham = (mtmp->cham >= LOW_PM
-                     && (mvitals[mtmp->cham].mvflags & G_GENOD));
-        if ((mvitals[mndx].mvflags & G_GENOD) || kill_cham) {
+                     && (g.mvitals[mtmp->cham].mvflags & G_GENOD));
+        if ((g.mvitals[mndx].mvflags & G_GENOD) || kill_cham) {
             if (mtmp->cham >= LOW_PM && !kill_cham)
                 (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
             else

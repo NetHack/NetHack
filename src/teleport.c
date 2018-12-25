@@ -337,7 +337,7 @@ boolean allow_drag;
      */
     newsym(u.ux0, u.uy0);
     see_monsters();
-    vision_full_recalc = 1;
+    g.vision_full_recalc = 1;
     nomul(0);
     vision_recalc(0); /* vision before effects */
     /* if terrain type changes, levitation or flying might become blocked
@@ -537,7 +537,7 @@ boolean break_the_rules;
             /* Try to use teleport away spell. */
             if (objects[SPE_TELEPORT_AWAY].oc_name_known && !Confusion)
                 for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                    if (spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY) {
+                    if (g.spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY) {
                         castit = TRUE;
                         break;
                     }

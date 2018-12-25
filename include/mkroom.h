@@ -47,10 +47,6 @@ extern NEARDATA struct mkroom *subrooms;
  * there is at most one non-vault special room on a level
  */
 
-extern struct mkroom *dnstairs_room, *upstairs_room, *sstairs_room;
-
-extern NEARDATA coord doors[DOORMAX];
-
 /* values for rtype in the room definition structure */
 enum roomtype_types {
     OROOM = 0,      /* ordinary room */

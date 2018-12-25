@@ -9,7 +9,7 @@
     (martial_bonus() || is_bigfoot(youmonst.data) \
      || (uarmf && uarmf->otyp == KICKING_BOOTS))
 
-/* kickedobj (decl.c) tracks a kicked object until placed or destroyed */
+/* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
@@ -128,8 +128,8 @@ xchar x, y;
     if (mon) {
         boolean save_forcefight = context.forcefight;
 
-        bhitpos.x = x;
-        bhitpos.y = y;
+        g.bhitpos.x = x;
+        g.bhitpos.y = y;
         if (!mon->mpeaceful || !canspotmon(mon))
             context.forcefight = TRUE; /* attack even if invisible */
         /* kicking might be halted by discovery of hidden monster,
@@ -405,7 +405,7 @@ xchar x, y; /* coordinates where object was before the impact, not after */
     insider = (*u.ushops && inside_shop(u.ux, u.uy)
                && *in_rooms(x, y, SHOPBASE) == *u.ushops);
     /* if dropped or thrown, shop ownership flags are set on this obj */
-    frominv = (obj != kickedobj);
+    frominv = (obj != g.kickedobj);
 
     for (otmp = obj->cobj; otmp; otmp = otmp2) {
         const char *result = (char *) 0;
@@ -463,12 +463,12 @@ char *kickobjnam;
 
     *kickobjnam = '\0';
     /* if a pile, the "top" object gets kicked */
-    kickedobj = level.objects[x][y];
-    if (kickedobj) {
-        /* kick object; if doing is fatal, done() will clean up kickedobj */
-        Strcpy(kickobjnam, killer_xname(kickedobj)); /* matters iff res==0 */
+    g.kickedobj = level.objects[x][y];
+    if (g.kickedobj) {
+        /* kick object; if doing is fatal, done() will clean up g.kickedobj */
+        Strcpy(kickobjnam, killer_xname(g.kickedobj)); /* matters iff res==0 */
         res = really_kick_object(x, y);
-        kickedobj = (struct obj *) 0;
+        g.kickedobj = (struct obj *) 0;
     }
     return res;
 }
@@ -484,9 +484,9 @@ xchar x, y;
     char bhitroom;
     boolean costly, isgold, slide = FALSE;
 
-    /* kickedobj should always be set due to conditions of call */
-    if (!kickedobj || kickedobj->otyp == BOULDER || kickedobj == uball
-        || kickedobj == uchain)
+    /* g.kickedobj should always be set due to conditions of call */
+    if (!g.kickedobj || g.kickedobj->otyp == BOULDER || g.kickedobj == uball
+        || g.kickedobj == uchain)
         return 0;
 
     if ((trap = t_at(x, y)) != 0) {
@@ -510,24 +510,24 @@ xchar x, y;
         return 1;
     }
 
-    if (!uarmf && kickedobj->otyp == CORPSE
-        && touch_petrifies(&mons[kickedobj->corpsenm]) && !Stone_resistance) {
+    if (!uarmf && g.kickedobj->otyp == CORPSE
+        && touch_petrifies(&mons[g.kickedobj->corpsenm]) && !Stone_resistance) {
         You("kick %s with your bare %s.",
-            corpse_xname(kickedobj, (const char *) 0, CXN_PFX_THE),
+            corpse_xname(g.kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
         if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
             Sprintf(killer.name, "kicking %s barefoot",
-                    killer_xname(kickedobj));
+                    killer_xname(g.kickedobj));
             instapetrify(killer.name);
         }
     }
 
     /* range < 2 means the object will not move.  */
     /* maybe dexterity should also figure here.   */
-    range = (int) ((ACURRSTR) / 2 - kickedobj->owt / 40);
+    range = (int) ((ACURRSTR) / 2 - g.kickedobj->owt / 40);
 
     if (martial())
         range += rnd(3);
@@ -541,12 +541,12 @@ xchar x, y;
     } else {
         if (is_ice(x, y))
             range += rnd(3), slide = TRUE;
-        if (kickedobj->greased)
+        if (g.kickedobj->greased)
             range += rnd(3), slide = TRUE;
     }
 
     /* Mjollnir is magically too heavy to kick */
-    if (kickedobj->oartifact == ART_MJOLLNIR)
+    if (g.kickedobj->oartifact == ART_MJOLLNIR)
         range = 1;
 
     /* see if the object has a place to move into */
@@ -554,10 +554,10 @@ xchar x, y;
         || closed_door(x + u.dx, y + u.dy))
         range = 1;
 
-    costly = (!(kickedobj->no_charge && !Has_contents(kickedobj))
+    costly = (!(g.kickedobj->no_charge && !Has_contents(g.kickedobj))
               && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
               && costly_spot(x, y));
-    isgold = (kickedobj->oclass == COIN_CLASS);
+    isgold = (g.kickedobj->oclass == COIN_CLASS);
 
     if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
         if ((!martial() && rn2(20) > ACURR(A_DEX))
@@ -566,49 +566,49 @@ xchar x, y;
                 pline("It doesn't come loose.");
             else
                 pline("%s %sn't come loose.",
-                      The(distant_name(kickedobj, xname)),
-                      otense(kickedobj, "do"));
+                      The(distant_name(g.kickedobj, xname)),
+                      otense(g.kickedobj, "do"));
             return (!rn2(3) || martial());
         }
         if (Blind)
             pline("It comes loose.");
         else
-            pline("%s %s loose.", The(distant_name(kickedobj, xname)),
-                  otense(kickedobj, "come"));
-        obj_extract_self(kickedobj);
+            pline("%s %s loose.", The(distant_name(g.kickedobj, xname)),
+                  otense(g.kickedobj, "come"));
+        obj_extract_self(g.kickedobj);
         newsym(x, y);
         if (costly && (!costly_spot(u.ux, u.uy)
                        || !index(u.urooms, *in_rooms(x, y, SHOPBASE))))
-            addtobill(kickedobj, FALSE, FALSE, FALSE);
-        if (!flooreffects(kickedobj, u.ux, u.uy, "fall")) {
-            place_object(kickedobj, u.ux, u.uy);
-            stackobj(kickedobj);
+            addtobill(g.kickedobj, FALSE, FALSE, FALSE);
+        if (!flooreffects(g.kickedobj, u.ux, u.uy, "fall")) {
+            place_object(g.kickedobj, u.ux, u.uy);
+            stackobj(g.kickedobj);
             newsym(u.ux, u.uy);
         }
         return 1;
     }
 
     /* a box gets a chance of breaking open here */
-    if (Is_box(kickedobj)) {
-        boolean otrp = kickedobj->otrapped;
+    if (Is_box(g.kickedobj)) {
+        boolean otrp = g.kickedobj->otrapped;
 
         if (range < 2)
             pline("THUD!");
-        container_impact_dmg(kickedobj, x, y);
-        if (kickedobj->olocked) {
+        container_impact_dmg(g.kickedobj, x, y);
+        if (g.kickedobj->olocked) {
             if (!rn2(5) || (martial() && !rn2(2))) {
                 You("break open the lock!");
-                breakchestlock(kickedobj, FALSE);
+                breakchestlock(g.kickedobj, FALSE);
                 if (otrp)
-                    (void) chest_trap(kickedobj, LEG, FALSE);
+                    (void) chest_trap(g.kickedobj, LEG, FALSE);
                 return 1;
             }
         } else {
             if (!rn2(3) || (martial() && !rn2(2))) {
                 pline_The("lid slams open, then falls shut.");
-                kickedobj->lknown = 1;
+                g.kickedobj->lknown = 1;
                 if (otrp)
-                    (void) chest_trap(kickedobj, LEG, FALSE);
+                    (void) chest_trap(g.kickedobj, LEG, FALSE);
                 return 1;
             }
         }
@@ -618,7 +618,7 @@ xchar x, y;
     }
 
     /* fragile objects should not be kicked */
-    if (hero_breaks(kickedobj, kickedobj->ox, kickedobj->oy, FALSE))
+    if (hero_breaks(g.kickedobj, g.kickedobj->ox, g.kickedobj->oy, FALSE))
         return 1;
 
     /* too heavy to move.  range is calculated as potential distance from
@@ -626,14 +626,14 @@ xchar x, y;
      * from its current position
      */
     if (range < 2) {
-        if (!Is_box(kickedobj))
+        if (!Is_box(g.kickedobj))
             pline("Thump!");
         return (!rn2(3) || martial());
     }
 
-    if (kickedobj->quan > 1L) {
+    if (g.kickedobj->quan > 1L) {
         if (!isgold) {
-            kickedobj = splitobj(kickedobj, 1L);
+            g.kickedobj = splitobj(g.kickedobj, 1L);
         } else {
             if (rn2(20)) {
                 static NEARDATA const char *const flyingcoinmsg[] = {
@@ -644,11 +644,11 @@ xchar x, y;
                 pline("Thwwpingg!");
                 You("%s!", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
                 (void) scatter(x, y, rn2(3) + 1, VIS_EFFECTS | MAY_HIT,
-                               kickedobj);
+                               g.kickedobj);
                 newsym(x, y);
                 return 1;
             }
-            if (kickedobj->quan > 300L) {
+            if (g.kickedobj->quan > 300L) {
                 pline("Thump!");
                 return (!rn2(3) || martial());
             }
@@ -656,52 +656,52 @@ xchar x, y;
     }
 
     if (slide && !Blind)
-        pline("Whee!  %s %s across the %s.", Doname2(kickedobj),
-              otense(kickedobj, "slide"), surface(x, y));
+        pline("Whee!  %s %s across the %s.", Doname2(g.kickedobj),
+              otense(g.kickedobj, "slide"), surface(x, y));
 
     if (costly && !isgold)
-        addtobill(kickedobj, FALSE, FALSE, TRUE);
-    obj_extract_self(kickedobj);
-    (void) snuff_candle(kickedobj);
+        addtobill(g.kickedobj, FALSE, FALSE, TRUE);
+    obj_extract_self(g.kickedobj);
+    (void) snuff_candle(g.kickedobj);
     newsym(x, y);
     mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
                (int FDECL((*), (MONST_P, OBJ_P))) 0,
-               (int FDECL((*), (OBJ_P, OBJ_P))) 0, &kickedobj);
-    if (!kickedobj)
+               (int FDECL((*), (OBJ_P, OBJ_P))) 0, &g.kickedobj);
+    if (!g.kickedobj)
         return 1; /* object broken */
 
     if (mon) {
-        if (mon->isshk && kickedobj->where == OBJ_MINVENT
-            && kickedobj->ocarry == mon)
+        if (mon->isshk && g.kickedobj->where == OBJ_MINVENT
+            && g.kickedobj->ocarry == mon)
             return 1; /* alert shk caught it */
-        g.notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
-        if (isgold ? ghitm(mon, kickedobj)      /* caught? */
-                   : thitmonst(mon, kickedobj)) /* hit && used up? */
+        g.notonhead = (mon->mx != g.bhitpos.x || mon->my != g.bhitpos.y);
+        if (isgold ? ghitm(mon, g.kickedobj)      /* caught? */
+                   : thitmonst(mon, g.kickedobj)) /* hit && used up? */
             return 1;
     }
 
     /* the object might have fallen down a hole;
        ship_object() will have taken care of shop billing */
-    if (kickedobj->where == OBJ_MIGRATING)
+    if (g.kickedobj->where == OBJ_MIGRATING)
         return 1;
 
-    bhitroom = *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE);
-    if (costly && (!costly_spot(bhitpos.x, bhitpos.y)
+    bhitroom = *in_rooms(g.bhitpos.x, g.bhitpos.y, SHOPBASE);
+    if (costly && (!costly_spot(g.bhitpos.x, g.bhitpos.y)
                    || *in_rooms(x, y, SHOPBASE) != bhitroom)) {
         if (isgold)
-            costly_gold(x, y, kickedobj->quan);
+            costly_gold(x, y, g.kickedobj->quan);
         else
-            (void) stolen_value(kickedobj, x, y, (boolean) shkp->mpeaceful,
+            (void) stolen_value(g.kickedobj, x, y, (boolean) shkp->mpeaceful,
                                 FALSE);
     }
 
-    if (flooreffects(kickedobj, bhitpos.x, bhitpos.y, "fall"))
+    if (flooreffects(g.kickedobj, g.bhitpos.x, g.bhitpos.y, "fall"))
         return 1;
-    if (kickedobj->unpaid)
-        subfrombill(kickedobj, shkp);
-    place_object(kickedobj, bhitpos.x, bhitpos.y);
-    stackobj(kickedobj);
-    newsym(kickedobj->ox, kickedobj->oy);
+    if (g.kickedobj->unpaid)
+        subfrombill(g.kickedobj, shkp);
+    place_object(g.kickedobj, g.bhitpos.x, g.bhitpos.y);
+    stackobj(g.kickedobj);
+    newsym(g.kickedobj->ox, g.kickedobj->oy);
     return 1;
 }
 
@@ -1089,7 +1089,7 @@ dokick()
 
             /* nothing, fruit or trouble? 75:23.5:1.5% */
             if (rn2(3)) {
-                if (!rn2(6) && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE))
+                if (!rn2(6) && !(g.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
                     You_hear("a low buzzing."); /* a warning */
                 goto ouch;
             }
@@ -1157,7 +1157,7 @@ dokick()
                 exercise(A_DEX, TRUE);
                 return 1;
             } else if (!(g.maploc->looted & S_LPUDDING) && !rn2(3)
-                       && !(mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
+                       && !(g.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
                 if (Blind)
                     You_hear("a gushing sound.");
                 else
@@ -1169,7 +1169,7 @@ dokick()
                 g.maploc->looted |= S_LPUDDING;
                 return 1;
             } else if (!(g.maploc->looted & S_LDWASHER) && !rn2(3)
-                       && !(mvitals[washerndx].mvflags & G_GONE)) {
+                       && !(g.mvitals[washerndx].mvflags & G_GONE)) {
                 /* can't resist... */
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
                 if (makemon(&mons[washerndx], x, y, NO_MM_FLAGS))

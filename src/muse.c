@@ -58,8 +58,8 @@ struct obj *obj;
 
         potion_descr = OBJ_DESCR(objects[obj->otyp]);
         if (potion_descr && !strcmp(potion_descr, "milky")) {
-            if (!(mvitals[PM_GHOST].mvflags & G_GONE)
-                && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_GHOST].born))) {
+            if (!(g.mvitals[PM_GHOST].mvflags & G_GONE)
+                && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
                 if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST]))
                     return 0;
                 mquaffmsg(mon, obj);
@@ -84,8 +84,8 @@ struct obj *obj;
             }
         }
         if (potion_descr && !strcmp(potion_descr, "smoky")
-            && !(mvitals[PM_DJINNI].mvflags & G_GONE)
-            && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_DJINNI].born))) {
+            && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
+            && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
             if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI]))
                 return 0;
             mquaffmsg(mon, obj);
@@ -1252,9 +1252,9 @@ register struct obj *otmp;
         break;
     }
     if (reveal_invis) {
-        if (!DEADMONSTER(mtmp) && cansee(bhitpos.x, bhitpos.y)
+        if (!DEADMONSTER(mtmp) && cansee(g.bhitpos.x, g.bhitpos.y)
             && !canspotmon(mtmp))
-            map_invisible(bhitpos.x, bhitpos.y);
+            map_invisible(g.bhitpos.x, g.bhitpos.y);
     }
     return 0;
 }
@@ -1277,22 +1277,22 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
     register uchar typ;
     int ddx, ddy;
 
-    bhitpos.x = mon->mx;
-    bhitpos.y = mon->my;
+    g.bhitpos.x = mon->mx;
+    g.bhitpos.y = mon->my;
     ddx = sgn(mon->mux - mon->mx);
     ddy = sgn(mon->muy - mon->my);
 
     while (range-- > 0) {
         int x, y;
 
-        bhitpos.x += ddx;
-        bhitpos.y += ddy;
-        x = bhitpos.x;
-        y = bhitpos.y;
+        g.bhitpos.x += ddx;
+        g.bhitpos.y += ddy;
+        x = g.bhitpos.x;
+        y = g.bhitpos.y;
 
         if (!isok(x, y)) {
-            bhitpos.x -= ddx;
-            bhitpos.y -= ddy;
+            g.bhitpos.x -= ddx;
+            g.bhitpos.y -= ddy;
             break;
         }
         if (find_drawbridge(&x, &y))
@@ -1300,12 +1300,12 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             case WAN_STRIKING:
                 destroy_drawbridge(x, y);
             }
-        if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+        if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
             (*fhitm)(&youmonst, obj);
             range -= 3;
-        } else if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
-            if (cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp))
-                map_invisible(bhitpos.x, bhitpos.y);
+        } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
+            if (cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp))
+                map_invisible(g.bhitpos.x, g.bhitpos.y);
             (*fhitm)(mtmp, obj);
             range -= 3;
         }
@@ -1314,7 +1314,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             int hitanything = 0;
             register struct obj *next_obj;
 
-            for (otmp = level.objects[bhitpos.x][bhitpos.y]; otmp;
+            for (otmp = level.objects[g.bhitpos.x][g.bhitpos.y]; otmp;
                  otmp = next_obj) {
                 /* Fix for polymorph bug, Tim Wright */
                 next_obj = otmp->nexthere;
@@ -1323,7 +1323,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             if (hitanything)
                 range--;
         }
-        typ = levl[bhitpos.x][bhitpos.y].typ;
+        typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
         if (IS_DOOR(typ) || typ == SDOOR) {
             switch (obj->otyp) {
             /* note: monsters don't use opening or locking magic
@@ -1331,23 +1331,23 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             case WAN_OPENING:
             case WAN_LOCKING:
             case WAN_STRIKING:
-                if (doorlock(obj, bhitpos.x, bhitpos.y)) {
+                if (doorlock(obj, g.bhitpos.x, g.bhitpos.y)) {
                     if (g.zap_oseen)
                         makeknown(obj->otyp);
                     /* if a shop door gets broken, add it to
                        the shk's fix list (no cost to player) */
-                    if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN
-                        && *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE))
-                        add_damage(bhitpos.x, bhitpos.y, 0L);
+                    if (levl[g.bhitpos.x][g.bhitpos.y].doormask == D_BROKEN
+                        && *in_rooms(g.bhitpos.x, g.bhitpos.y, SHOPBASE))
+                        add_damage(g.bhitpos.x, g.bhitpos.y, 0L);
                 }
                 break;
             }
         }
         if (!ZAP_POS(typ)
-            || (IS_DOOR(typ) && (levl[bhitpos.x][bhitpos.y].doormask
+            || (IS_DOOR(typ) && (levl[g.bhitpos.x][g.bhitpos.y].doormask
                                  & (D_LOCKED | D_CLOSED)))) {
-            bhitpos.x -= ddx;
-            bhitpos.y -= ddy;
+            g.bhitpos.x -= ddx;
+            g.bhitpos.y -= ddy;
             break;
         }
     }

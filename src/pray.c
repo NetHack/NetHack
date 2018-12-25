@@ -789,7 +789,7 @@ gcrownu()
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
         for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-            if (spl_book[sp_no].sp_id == class_gift) {
+            if (g.spl_book[sp_no].sp_id == class_gift) {
                 if (ok_wep(uwep))
                     obj = uwep; /* to be blessed,&c */
                 break;
@@ -1161,7 +1161,7 @@ aligntyp g_align;
             while (--trycnt > 0) {
                 if (otmp->otyp != SPE_BLANK_PAPER) {
                     for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                        if (spl_book[sp_no].sp_id == otmp->otyp)
+                        if (g.spl_book[sp_no].sp_id == otmp->otyp)
                             break;
                     if (sp_no == MAXSPELL
                         && !P_RESTRICTED(spell_skilltype(otmp->otyp)))
@@ -1921,9 +1921,9 @@ doturn()
         int sp_no;
 
         for (sp_no = 0; sp_no < MAXSPELL; ++sp_no) {
-            if (spl_book[sp_no].sp_id == NO_SPELL)
+            if (g.spl_book[sp_no].sp_id == NO_SPELL)
                 break;
-            else if (spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
+            else if (g.spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
                 return spelleffects(sp_no, FALSE);
         }
         You("don't know how to turn undead!");

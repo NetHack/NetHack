@@ -99,7 +99,7 @@ boolean forceshow;
         map_location(fcx, fcy, 1); /* bypass vision */
         if (!ACCESSIBLE(lev->typ))
             block_point(fcx, fcy);
-        vision_full_recalc = 1;
+        g.vision_full_recalc = 1;
         egrd->fcbeg++;
     }
     if (sawcorridor)
@@ -426,7 +426,7 @@ invault()
 
         if (!strcmpi(buf, "Croesus") || !strcmpi(buf, "Kroisos")
             || !strcmpi(buf, "Creosote")) { /* Discworld */
-            if (!mvitals[PM_CROESUS].died) {
+            if (!g.mvitals[PM_CROESUS].died) {
                 if (Deaf) {
                     if (!Blind)
                         pline("%s waves goodbye.", noit_Monnam(guard));
@@ -583,10 +583,10 @@ struct monst *grd;
                  * hack: player knows walls are restored because of the
                  * message, below, so show this on the screen.
                  */
-                tmp_viz = viz_array[y][x];
-                viz_array[y][x] = IN_SIGHT | COULD_SEE;
+                tmp_viz = g.viz_array[y][x];
+                g.viz_array[y][x] = IN_SIGHT | COULD_SEE;
                 newsym(x, y);
-                viz_array[y][x] = tmp_viz;
+                g.viz_array[y][x] = tmp_viz;
                 block_point(x, y);
                 fixed = TRUE;
             }

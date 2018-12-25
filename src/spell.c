@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-/* spellmenu arguments; 0 thru n-1 used as spl_book[] index when swapping */
+/* spellmenu arguments; 0 thru n-1 used as g.spl_book[] index when swapping */
 #define SPELLMENU_CAST (-2)
 #define SPELLMENU_VIEW (-1)
 #define SPELLMENU_SORT (MAXSPELL) /* special menu entry */
@@ -18,9 +18,9 @@
    initialization; spell memory is decremented at the end of each turn,
    including the turn on which the spellbook is read; without the extra
    increment, the hero used to get cheated out of 1 turn of retention */
-#define incrnknow(spell, x) (spl_book[spell].sp_know = KEEN + (x))
+#define incrnknow(spell, x) (g.spl_book[spell].sp_know = KEEN + (x))
 
-#define spellev(spell) spl_book[spell].sp_lev
+#define spellev(spell) g.spl_book[spell].sp_lev
 #define spellname(spell) OBJ_NAME(objects[spellid(spell)])
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
@@ -410,8 +410,8 @@ learn(VOID_ARGS)
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
-            spl_book[i].sp_id = booktype;
-            spl_book[i].sp_lev = objects[booktype].oc_level;
+            g.spl_book[i].sp_id = booktype;
+            g.spl_book[i].sp_lev = objects[booktype].oc_level;
             incrnknow(i, 1);
             book->spestudied++;
             You(i > 0 ? "add %s to your repertoire." : "learn %s.", splname);
@@ -1387,13 +1387,13 @@ const genericptr vptr2;
     /*
      * gather up all of the possible parameters except spell name
      * in advance, even though some might not be needed:
-     *  indx. = spl_orderindx[] index into spl_book[];
-     *  otyp. = spl_book[] index into objects[];
+     *  indx. = spl_orderindx[] index into g.spl_book[];
+     *  otyp. = g.spl_book[] index into objects[];
      *  levl. = spell level;
      *  skil. = skill group aka spell class.
      */
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
-        otyp1 = spl_book[indx1].sp_id, otyp2 = spl_book[indx2].sp_id,
+        otyp1 = g.spl_book[indx1].sp_id, otyp2 = g.spl_book[indx2].sp_id,
         levl1 = objects[otyp1].oc_level, levl2 = objects[otyp2].oc_level,
         skil1 = objects[otyp1].oc_skill, skil2 = objects[otyp2].oc_skill;
 
@@ -1469,13 +1469,13 @@ sortspells()
     if (g.spl_sortmode == SORTRETAINORDER) {
         struct spell tmp_book[MAXSPELL];
 
-        /* sort spl_book[] rather than spl_orderindx[];
+        /* sort g.spl_book[] rather than spl_orderindx[];
            this also updates the index to reflect the new ordering (we
            could just free it since that ordering becomes the default) */
         for (i = 0; i < MAXSPELL; i++)
-            tmp_book[i] = spl_book[g.spl_orderindx[i]];
+            tmp_book[i] = g.spl_book[g.spl_orderindx[i]];
         for (i = 0; i < MAXSPELL; i++)
-            spl_book[i] = tmp_book[i], g.spl_orderindx[i] = i;
+            g.spl_book[i] = tmp_book[i], g.spl_orderindx[i] = i;
         g.spl_sortmode = SORTBY_LETTER; /* reset */
         return;
     }
@@ -1551,9 +1551,9 @@ dovspell()
                 if (!dospellmenu(qbuf, splnum, &othnum))
                     break;
 
-                spl_tmp = spl_book[splnum];
-                spl_book[splnum] = spl_book[othnum];
-                spl_book[othnum] = spl_tmp;
+                spl_tmp = g.spl_book[splnum];
+                g.spl_book[splnum] = g.spl_book[othnum];
+                g.spl_book[othnum] = spl_tmp;
             }
         }
     }
@@ -1568,7 +1568,7 @@ dovspell()
 STATIC_OVL boolean
 dospellmenu(prompt, splaction, spell_no)
 const char *prompt;
-int splaction; /* SPELLMENU_CAST, SPELLMENU_VIEW, or spl_book[] index */
+int splaction; /* SPELLMENU_CAST, SPELLMENU_VIEW, or g.spl_book[] index */
 int *spell_no;
 {
     winid tmpwin;
@@ -1825,8 +1825,8 @@ struct obj *obj;
         /* initial inventory shouldn't contain duplicate spellbooks */
         impossible("Spell %s already known.", OBJ_NAME(objects[otyp]));
     } else {
-        spl_book[i].sp_id = otyp;
-        spl_book[i].sp_lev = objects[otyp].oc_level;
+        g.spl_book[i].sp_id = otyp;
+        g.spl_book[i].sp_lev = objects[otyp].oc_level;
         incrnknow(i, 0);
     }
     return;

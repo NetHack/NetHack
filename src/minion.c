@@ -120,7 +120,7 @@ struct monst *mon;
      * If this daemon is unique and being re-summoned (the only way we
      * could get this far with an extinct dtype), try another.
      */
-    if (mvitals[dtype].mvflags & G_GONE) {
+    if (g.mvitals[dtype].mvflags & G_GONE) {
         dtype = ndemon(atyp);
         if (dtype == NON_PM)
             return 0;
@@ -334,7 +334,7 @@ aligntyp atyp;
 
     for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
         pm = rn1(PM_DEMOGORGON + 1 - PM_ORCUS, PM_ORCUS);
-        if (!(mvitals[pm].mvflags & G_GONE)
+        if (!(g.mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
             return pm;
     }
@@ -349,7 +349,7 @@ aligntyp atyp;
 
     for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
         pm = rn1(PM_YEENOGHU + 1 - PM_JUIBLEX, PM_JUIBLEX);
-        if (!(mvitals[pm].mvflags & G_GONE)
+        if (!(g.mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
             return pm;
     }
@@ -360,7 +360,7 @@ aligntyp atyp;
 int
 llord()
 {
-    if (!(mvitals[PM_ARCHON].mvflags & G_GONE))
+    if (!(g.mvitals[PM_ARCHON].mvflags & G_GONE))
         return PM_ARCHON;
 
     return lminion(); /* approximate */

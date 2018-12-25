@@ -72,7 +72,7 @@ getlin_hook_proc hook;
 
     for (;;) {
         (void) fflush(stdout);
-        Strcat(strcat(strcpy(toplines, query), " "), obufp);
+        Strcat(strcat(strcpy(g.toplines, query), " "), obufp);
         c = pgetchar();
         if (c == '\033' || c == EOF) {
             if (c == '\033' && obufp[0] != '\0') {
@@ -200,11 +200,11 @@ getlin_hook_proc hook;
     if (suppress_history) {
         /* prevent next message from pushing current query+answer into
            tty message history */
-        *toplines = '\0';
+        *g.toplines = '\0';
 #ifdef DUMPLOG
     } else {
         /* needed because we've bypassed pline() */
-        dumplogmsg(toplines);
+        dumplogmsg(g.toplines);
 #endif
     }
 }

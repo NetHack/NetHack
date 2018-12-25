@@ -312,7 +312,7 @@ can_make_bones()
     }
     if (!Is_branchlev(&u.uz)) {
         /* no bones on non-branches with portals */
-        for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
+        for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap)
             if (ttmp->ttyp == MAGIC_PORTAL)
                 return FALSE;
     }
@@ -451,7 +451,7 @@ make_bones:
         if (mtmp->mtame)
             mtmp->mtame = mtmp->mpeaceful = 0;
     }
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
         ttmp->madeby_u = 0;
         ttmp->tseen = (ttmp->ttyp == HOLE);
     }
@@ -468,7 +468,7 @@ make_bones:
             levl[x][y].seenv = 0;
             levl[x][y].waslit = 0;
             levl[x][y].glyph = cmap_to_glyph(S_stone);
-            lastseentyp[x][y] = 0;
+            g.lastseentyp[x][y] = 0;
         }
 
     /* Attach bones info to the current level before saving. */

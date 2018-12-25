@@ -939,7 +939,7 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
         u.usteed->mx = u.ux, u.usteed->my = u.uy;
 
     /* floor/ceiling traps */
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
         if (ttmp->tx != u.ux || ttmp->ty != u.uy)
             goto outtrapmap;
         else
@@ -972,7 +972,7 @@ struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
         found = TRUE;
     /* door traps */
     for (door = 0; door < g.doorindex; door++) {
-        cc = doors[door];
+        cc = g.doors[door];
         if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
             if (cc.x != u.ux || cc.y != u.uy)
                 goto outtrapmap;
@@ -1006,11 +1006,11 @@ outtrapmap:
     }
     (void) detect_obj_traps(invent, TRUE, cursed_src);
 
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap)
         sense_trap(ttmp, 0, 0, cursed_src);
 
     for (door = 0; door < g.doorindex; door++) {
-        cc = doors[door];
+        cc = g.doors[door];
         if (levl[cc.x][cc.y].doormask & D_TRAPPED)
             sense_trap((struct trap *) 0, cc.x, cc.y, cursed_src);
     }
@@ -1341,9 +1341,9 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
      */
 
     /* if hero is engulfed, show engulfer at <u.ux,u.uy> */
-    save_viz_uyux = viz_array[u.uy][u.ux];
+    save_viz_uyux = g.viz_array[u.uy][u.ux];
     if (u.uswallow)
-        viz_array[u.uy][u.ux] |= IN_SIGHT; /* <x,y> are reversed to [y][x] */
+        g.viz_array[u.uy][u.ux] |= IN_SIGHT; /* <x,y> are reversed to [y][x] */
     save_EDetect_mons = EDetect_monsters;
     /* for skilled spell, getpos() scanning of the map will display all
        monsters within range; otherwise, "unseen creature" will be shown */
@@ -1401,7 +1401,7 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
     }
     reconstrain_map();
     EDetect_monsters = save_EDetect_mons;
-    viz_array[u.uy][u.ux] = save_viz_uyux;
+    g.viz_array[u.uy][u.ux] = save_viz_uyux;
 
     /* replace monsters with remembered,unseen monster, then run
        see_monsters() to update visible ones and warned-of ones */
@@ -1787,7 +1787,7 @@ sokoban_detect()
         }
 
     /* Map the traps */
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
         ttmp->tseen = 1;
         map_trap(ttmp, 1);
         /* set sokoban_rules when there is at least one pit or hole */
@@ -1846,7 +1846,7 @@ int default_glyph, which_subset;
             || glyph_is_invisible(glyph)) {
             if (!seenv) {
                 glyph = default_glyph;
-            } else if (lastseentyp[x][y] == levl[x][y].typ) {
+            } else if (g.lastseentyp[x][y] == levl[x][y].typ) {
                 glyph = back_to_glyph(x, y);
             } else {
                 /* look for a mimic here posing as furniture;
@@ -1864,7 +1864,7 @@ int default_glyph, which_subset;
                        but we've got no other choice) */
                     schar save_typ = levl[x][y].typ;
 
-                    levl[x][y].typ = lastseentyp[x][y];
+                    levl[x][y].typ = g.lastseentyp[x][y];
                     glyph = back_to_glyph(x, y);
                     levl[x][y].typ = save_typ;
                 }

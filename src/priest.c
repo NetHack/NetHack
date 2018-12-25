@@ -495,7 +495,7 @@ int roomno;
         if (!rn2(5)
             && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS))
                    != 0) {
-            int ngen = mvitals[PM_GHOST].born;
+            int ngen = g.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
                 pline("A%s ghost appears next to you%c",
                       ngen < 5 ? "n enormous" : "",
@@ -959,7 +959,7 @@ struct monst *mtmp;
             Strcat(info, ", single segment");
         } else {
             ++nsegs; /* include head in the segment count */
-            segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
+            segndx = wseg_at(mtmp, g.bhitpos.x, g.bhitpos.y);
             Sprintf(eos(info), ", %d%s of %d segments",
                     segndx, ordin(segndx), nsegs);
         }

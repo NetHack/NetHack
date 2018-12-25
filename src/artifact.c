@@ -599,7 +599,7 @@ long wp_mask;
             u.xray_range = 3;
         else
             u.xray_range = -1;
-        vision_full_recalc = 1;
+        g.vision_full_recalc = 1;
     }
     if ((spfx & SPFX_REFLECT) && (wp_mask & W_WEP)) {
         if (on)

@@ -311,15 +311,15 @@ struct mkroom *sroom;
             if (sroom->irregular) {
                 if ((int) levl[sx][sy].roomno != rmno || levl[sx][sy].edge
                     || (sroom->doorct
-                        && distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1))
+                        && distmin(sx, sy, g.doors[sh].x, g.doors[sh].y) <= 1))
                     continue;
             } else if (!SPACE_POS(levl[sx][sy].typ)
                        || (sroom->doorct
-                           && ((sx == sroom->lx && doors[sh].x == sx - 1)
-                               || (sx == sroom->hx && doors[sh].x == sx + 1)
-                               || (sy == sroom->ly && doors[sh].y == sy - 1)
+                           && ((sx == sroom->lx && g.doors[sh].x == sx - 1)
+                               || (sx == sroom->hx && g.doors[sh].x == sx + 1)
+                               || (sy == sroom->ly && g.doors[sh].y == sy - 1)
                                || (sy == sroom->hy
-                                   && doors[sh].y == sy + 1))))
+                                   && g.doors[sh].y == sy + 1))))
                 continue;
             /* don't place monster on explicitly placed throne */
             if (type == COURT && IS_THRONE(levl[sx][sy].typ))
@@ -353,7 +353,7 @@ struct mkroom *sroom;
             case ZOO:
             case LEPREHALL:
                 if (sroom->doorct) {
-                    int distval = dist2(sx, sy, doors[sh].x, doors[sh].y);
+                    int distval = dist2(sx, sy, g.doors[sh].x, g.doors[sh].y);
                     i = sq(distval);
                 } else
                     i = goldlim;
@@ -502,9 +502,9 @@ antholemon()
             break;
         }
         /* try again if chosen type has been genocided or used up */
-    } while (++trycnt < 3 && (mvitals[mtyp].mvflags & G_GONE));
+    } while (++trycnt < 3 && (g.mvitals[mtyp].mvflags & G_GONE));
 
-    return ((mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
+    return ((g.mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
                                              : &mons[mtyp]);
 }
 
@@ -615,10 +615,10 @@ boolean
 has_dnstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == dnstairs_room)
+    if (sroom == g.dnstairs_room)
         return TRUE;
     if (g.sstairs.sx && !g.sstairs.up)
-        return (boolean) (sroom == sstairs_room);
+        return (boolean) (sroom == g.sstairs_room);
     return FALSE;
 }
 
@@ -626,10 +626,10 @@ boolean
 has_upstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == upstairs_room)
+    if (sroom == g.upstairs_room)
         return TRUE;
     if (g.sstairs.sx && g.sstairs.up)
-        return (boolean) (sroom == sstairs_room);
+        return (boolean) (sroom == g.sstairs_room);
     return FALSE;
 }
 
@@ -785,7 +785,7 @@ squadmon()
     }
     mndx = squadprob[rn2(NSTYPES)].pm;
 gotone:
-    if (!(mvitals[mndx].mvflags & G_GONE))
+    if (!(g.mvitals[mndx].mvflags & G_GONE))
         return &mons[mndx];
     else
         return (struct permonst *) 0;

@@ -346,7 +346,7 @@ boolean resuming;
             } else if (Warning || Warn_of_mon)
                 see_monsters();
 
-            if (vision_full_recalc)
+            if (g.vision_full_recalc)
                 vision_recalc(0); /* vision! */
         }
         if (context.botl || context.botlx) {
@@ -425,7 +425,7 @@ boolean resuming;
         else if (flags.time && (!context.move || !context.mv))
             context.botl = 1;
 
-        if (vision_full_recalc)
+        if (g.vision_full_recalc)
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!context.run || flags.runmode == RUN_TPORT)
@@ -576,7 +576,7 @@ newgame()
     context.tribute.tributesz = sizeof(struct tribute_info);
 
     for (i = LOW_PM; i < NUMMONS; i++)
-        mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+        g.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
 
     init_objects(); /* must be before u_init() */
 

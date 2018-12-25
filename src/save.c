@@ -188,8 +188,8 @@ dosave0()
         needed = bytes_counted;
 
         for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
-            if (ltmp != ledger_no(&u.uz) && level_info[ltmp].where)
-                needed += level_info[ltmp].size + (sizeof ltmp);
+            if (ltmp != ledger_no(&u.uz) && g.level_info[ltmp].where)
+                needed += g.level_info[ltmp].size + (sizeof ltmp);
         fds = freediskspace(fq_save);
         if (needed > fds) {
             HUP
@@ -231,7 +231,7 @@ dosave0()
     for (ltmp = (xchar) 1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&uz_save))
             continue;
-        if (!(level_info[ltmp].flags & LFILE_EXISTS))
+        if (!(g.level_info[ltmp].flags & LFILE_EXISTS))
             continue;
 #ifdef MICRO
         curs(WIN_MAP, 1 + dotcnt++, dotrow);
@@ -300,7 +300,7 @@ register int fd, mode;
     urealtime.start_timing = urealtime.finish_time;
     save_killers(fd, mode);
 
-    /* must come before migrating_objs and migrating_mons are freed */
+    /* must come before migrating_objs and g.migrating_mons are freed */
     save_timers(fd, mode, RANGE_GLOBAL);
     save_light_sources(fd, mode, RANGE_GLOBAL);
 
@@ -315,13 +315,13 @@ register int fd, mode;
     }
 
     saveobjchn(fd, migrating_objs, mode);
-    savemonchn(fd, migrating_mons, mode);
+    savemonchn(fd, g.migrating_mons, mode);
     if (release_data(mode)) {
         invent = 0;
         migrating_objs = 0;
-        migrating_mons = 0;
+        g.migrating_mons = 0;
     }
-    bwrite(fd, (genericptr_t) mvitals, sizeof(mvitals));
+    bwrite(fd, (genericptr_t) g.mvitals, sizeof(g.mvitals));
 
     save_dungeon(fd, (boolean) !!perform_bwrite(mode),
                  (boolean) !!release_data(mode));
@@ -329,7 +329,7 @@ register int fd, mode;
     bwrite(fd, (genericptr_t) &moves, sizeof moves);
     bwrite(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
     bwrite(fd, (genericptr_t) &g.quest_status, sizeof(struct q_score));
-    bwrite(fd, (genericptr_t) spl_book,
+    bwrite(fd, (genericptr_t) g.spl_book,
            sizeof(struct spell) * (MAXSPELL + 1));
     save_artifacts(fd);
     save_oracles(fd, mode);
@@ -451,9 +451,9 @@ int mode;
         savelev0(fd, lev, mode);
     }
     if (mode != FREE_SAVE) {
-        level_info[lev].where = ACTIVE;
-        level_info[lev].time = moves;
-        level_info[lev].size = bytes_counted;
+        g.level_info[lev].where = ACTIVE;
+        g.level_info[lev].time = moves;
+        g.level_info[lev].size = bytes_counted;
     }
     return TRUE;
 }
@@ -491,7 +491,7 @@ int mode;
     count_only = (mode & COUNT_SAVE);
 #endif
     if (lev >= 0 && lev <= maxledgerno())
-        level_info[lev].flags |= VISITED;
+        g.level_info[lev].flags |= VISITED;
     bwrite(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
 #ifdef TOS
     tlev = lev;
@@ -503,7 +503,7 @@ int mode;
     savecemetery(fd, mode, &level.bonesinfo);
     savelevl(fd,
              (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-    bwrite(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
+    bwrite(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
     bwrite(fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
     bwrite(fd, (genericptr_t) &g.upstair, sizeof(stairway));
     bwrite(fd, (genericptr_t) &g.dnstair, sizeof(stairway));
@@ -513,7 +513,7 @@ int mode;
     bwrite(fd, (genericptr_t) &g.updest, sizeof(dest_area));
     bwrite(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
     bwrite(fd, (genericptr_t) &level.flags, sizeof(level.flags));
-    bwrite(fd, (genericptr_t) doors, sizeof(doors));
+    bwrite(fd, (genericptr_t) g.doors, sizeof(g.doors));
     save_rooms(fd); /* no dynamic memory to reclaim */
 
 /* from here on out, saving also involves allocated memory cleanup */
@@ -527,7 +527,7 @@ skip_lots:
 
     savemonchn(fd, fmon, mode);
     save_worm(fd, mode); /* save worm information */
-    savetrapchn(fd, ftrap, mode);
+    savetrapchn(fd, g.ftrap, mode);
     saveobjchn(fd, fobj, mode);
     saveobjchn(fd, level.buriedobjlist, mode);
     saveobjchn(fd, billobjs, mode);
@@ -538,7 +538,7 @@ skip_lots:
             for (x = 0; x < COLNO; x++)
                 level.monsters[x][y] = 0;
         fmon = 0;
-        ftrap = 0;
+        g.ftrap = 0;
         fobj = 0;
         level.buriedobjlist = 0;
         billobjs = 0;
@@ -1159,7 +1159,7 @@ register struct monst *mtmp;
         bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 }
 
-/* save traps; ftrap is the only trap chain so the 2nd arg is superfluous */
+/* save traps; g.ftrap is the only trap chain so the 2nd arg is superfluous */
 STATIC_OVL void
 savetrapchn(fd, trap, mode)
 int fd;
@@ -1357,7 +1357,7 @@ freedynamicdata()
     clear_regions();
     freemonchn(fmon);
     free_worm(); /* release worm segment information */
-    freetrapchn(ftrap);
+    freetrapchn(g.ftrap);
     freeobjchn(fobj);
     freeobjchn(level.buriedobjlist);
     freeobjchn(billobjs);
@@ -1370,8 +1370,8 @@ freedynamicdata()
     free_light_sources(RANGE_GLOBAL);
     freeobjchn(invent);
     freeobjchn(migrating_objs);
-    freemonchn(migrating_mons);
-    freemonchn(mydogs); /* ascension or dungeon escape */
+    freemonchn(g.migrating_mons);
+    freemonchn(g.mydogs); /* ascension or dungeon escape */
     /* freelevchn();  --  [folded into free_dungeons()] */
     free_animals();
     free_oracles();
@@ -1424,7 +1424,7 @@ int lev;
     set_levelfile_name(from, lev);
     set_levelfile_name(to, lev);
     if (iflags.checkspace) {
-        while (level_info[lev].size > freediskspace(to))
+        while (g.level_info[lev].size > freediskspace(to))
             if (!swapout_oldest())
                 return FALSE;
     }
@@ -1434,7 +1434,7 @@ int lev;
     }
     copyfile(from, to);
     (void) unlink(from);
-    level_info[lev].where = ACTIVE;
+    g.level_info[lev].where = ACTIVE;
     return TRUE;
 }
 
@@ -1448,10 +1448,10 @@ swapout_oldest()
     if (!ramdisk)
         return FALSE;
     for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
-        if (level_info[i].where == ACTIVE
-            && (!oldtime || level_info[i].time < oldtime)) {
+        if (g.level_info[i].where == ACTIVE
+            && (!oldtime || g.level_info[i].time < oldtime)) {
             oldest = i;
-            oldtime = level_info[i].time;
+            oldtime = g.level_info[i].time;
         }
     if (!oldest)
         return FALSE;
@@ -1465,7 +1465,7 @@ swapout_oldest()
     }
     copyfile(from, to);
     (void) unlink(from);
-    level_info[oldest].where = SWAPPED;
+    g.level_info[oldest].where = SWAPPED;
     return TRUE;
 }
 

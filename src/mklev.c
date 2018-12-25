@@ -359,7 +359,7 @@ register struct mkroom *aroom;
     aroom->doorct++;
 
     for (tmp = g.doorindex; tmp > aroom->fdoor; tmp--)
-        doors[tmp] = doors[tmp - 1];
+        g.doors[tmp] = g.doors[tmp - 1];
 
     for (i = 0; i < g.nroom; i++) {
         broom = &rooms[i];
@@ -373,8 +373,8 @@ register struct mkroom *aroom;
     }
 
     g.doorindex++;
-    doors[aroom->fdoor].x = x;
-    doors[aroom->fdoor].y = y;
+    g.doors[aroom->fdoor].x = x;
+    g.doors[aroom->fdoor].y = y;
 }
 
 STATIC_OVL void
@@ -385,7 +385,7 @@ int type;
 {
     boolean shdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
 
-    if (!IS_WALL(levl[x][y].typ)) /* avoid SDOORs on already made doors */
+    if (!IS_WALL(levl[x][y].typ)) /* avoid S.doors on already made doors */
         type = DOOR;
     levl[x][y].typ = type;
     if (type == DOOR) {
@@ -420,9 +420,9 @@ int type;
             struct monst *mtmp;
 
             if (level_difficulty() >= 9 && !rn2(5)
-                && !((mvitals[PM_SMALL_MIMIC].mvflags & G_GONE)
-                     && (mvitals[PM_LARGE_MIMIC].mvflags & G_GONE)
-                     && (mvitals[PM_GIANT_MIMIC].mvflags & G_GONE))) {
+                && !((g.mvitals[PM_SMALL_MIMIC].mvflags & G_GONE)
+                     && (g.mvitals[PM_LARGE_MIMIC].mvflags & G_GONE)
+                     && (g.mvitals[PM_GIANT_MIMIC].mvflags & G_GONE))) {
                 /* make a mimic instead */
                 levl[x][y].doormask = D_NODOOR;
                 mtmp = makemon(mkclass(S_MIMIC, 0), x, y, NO_MM_FLAGS);
@@ -760,26 +760,26 @@ makelevel()
         else if (u_depth > 4 && !rn2(6))
             mkroom(COURT);
         else if (u_depth > 5 && !rn2(8)
-                 && !(mvitals[PM_LEPRECHAUN].mvflags & G_GONE))
+                 && !(g.mvitals[PM_LEPRECHAUN].mvflags & G_GONE))
             mkroom(LEPREHALL);
         else if (u_depth > 6 && !rn2(7))
             mkroom(ZOO);
         else if (u_depth > 8 && !rn2(5))
             mkroom(TEMPLE);
         else if (u_depth > 9 && !rn2(5)
-                 && !(mvitals[PM_KILLER_BEE].mvflags & G_GONE))
+                 && !(g.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
             mkroom(BEEHIVE);
         else if (u_depth > 11 && !rn2(6))
             mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
             mkroom(ANTHOLE);
         else if (u_depth > 14 && !rn2(4)
-                 && !(mvitals[PM_SOLDIER].mvflags & G_GONE))
+                 && !(g.mvitals[PM_SOLDIER].mvflags & G_GONE))
             mkroom(BARRACKS);
         else if (u_depth > 15 && !rn2(6))
             mkroom(SWAMP);
         else if (u_depth > 16 && !rn2(8)
-                 && !(mvitals[PM_COCKATRICE].mvflags & G_GONE))
+                 && !(g.mvitals[PM_COCKATRICE].mvflags & G_GONE))
             mkroom(COCKNEST);
     }
 
@@ -1090,7 +1090,7 @@ coord *mp;
 
             do
                 croom = &rooms[rn2(g.nroom)];
-            while ((croom == dnstairs_room || croom == upstairs_room
+            while ((croom == g.dnstairs_room || croom == g.upstairs_room
                     || croom->rtype != OROOM) && (++tryct < 100));
         } else
             croom = &rooms[rn2(g.nroom)];
@@ -1166,7 +1166,7 @@ xchar x, y; /* location */
         g.sstairs.up =
             (char) on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
         assign_level(&g.sstairs.tolev, dest);
-        sstairs_room = br_room;
+        g.sstairs_room = br_room;
 
         levl[x][y].ladder = g.sstairs.up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
@@ -1520,11 +1520,11 @@ struct mkroom *croom;
     if (up) {
         xupstair = x;
         yupstair = y;
-        upstairs_room = croom;
+        g.upstairs_room = croom;
     } else {
         xdnstair = x;
         ydnstair = y;
-        dnstairs_room = croom;
+        g.dnstairs_room = croom;
     }
 
     levl[x][y].typ = STAIRS;
@@ -1714,7 +1714,7 @@ mkinvokearea()
     You("are standing at the top of a stairwell leading down!");
     mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0); /* down */
     newsym(u.ux, u.uy);
-    vision_full_recalc = 1; /* everything changed */
+    g.vision_full_recalc = 1; /* everything changed */
 }
 
 /* Change level topology.  Boulders in the vicinity are eliminated.
@@ -1765,7 +1765,7 @@ int dist;
     lev->waslit = TRUE;
     lev->horizontal = FALSE;
     /* short-circuit vision recalc */
-    viz_array[y][x] = (dist < 6) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
+    g.viz_array[y][x] = (dist < 6) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
 
     switch (dist) {
     case 1: /* fire traps */

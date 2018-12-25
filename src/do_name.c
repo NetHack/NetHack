@@ -913,7 +913,7 @@ const char *goal;
                                         goto foundc;
                                 }
                                 /* last, try actual terrain here (shouldn't
-                                   we be using lastseentyp[][] instead?) */
+                                   we be using g.lastseentyp[][] instead?) */
                                 if (levl[tx][ty].seenv) {
                                     k = back_to_glyph(tx, ty);
                                     if (glyph_is_cmap(k)
@@ -1066,7 +1066,7 @@ const char *name;
     int lth;
     char buf[PL_PSIZ];
 
-    /* dogname & catname are PL_PSIZ arrays; object names have same limit */
+    /* g.dogname & g.catname are PL_PSIZ arrays; object names have same limit */
     lth = (name && *name) ? ((int) strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
         lth = PL_PSIZ;

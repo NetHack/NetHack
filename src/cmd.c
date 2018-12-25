@@ -802,7 +802,7 @@ wiz_makemap(VOID_ARGS)
         savelev(-1, ledger_no(&u.uz), FREE_SAVE);
         mklev();
         vision_reset();
-        vision_full_recalc = 1;
+        g.vision_full_recalc = 1;
         cls();
         (void) safe_teleds(TRUE);
         if (Punished) {
@@ -824,7 +824,7 @@ wiz_map(VOID_ARGS)
         long save_Hconf = HConfusion, save_Hhallu = HHallucination;
 
         HConfusion = HHallucination = 0L;
-        for (t = ftrap; t != 0; t = t->ntrap) {
+        for (t = g.ftrap; t != 0; t = t->ntrap) {
             t->tseen = 1;
             map_trap(t, TRUE);
         }
@@ -1008,11 +1008,11 @@ wiz_show_vision(VOID_ARGS)
             if (x == u.ux && y == u.uy)
                 row[x] = '@';
             else {
-                v = viz_array[y][x]; /* data access should be hidden */
+                v = g.viz_array[y][x]; /* data access should be hidden */
                 if (v == 0)
                     row[x] = ' ';
                 else
-                    row[x] = '0' + viz_array[y][x];
+                    row[x] = '0' + g.viz_array[y][x];
             }
         }
         /* remove trailing spaces */
@@ -3754,7 +3754,7 @@ long *total_size;
      * inventory */
     for (mon = fmon; mon; mon = mon->nmon)
         count_obj(mon->minvent, &count, &size, FALSE, TRUE);
-    for (mon = migrating_mons; mon; mon = mon->nmon)
+    for (mon = g.migrating_mons; mon; mon = mon->nmon)
         count_obj(mon->minvent, &count, &size, FALSE, TRUE);
 
     if (count || size) {
@@ -3806,7 +3806,7 @@ long *total_size;
     char buf[BUFSZ];
     long count, size;
     struct monst *mon;
-    /* mon->wormno means something different for migrating_mons and mydogs */
+    /* mon->wormno means something different for g.migrating_mons and g.mydogs */
     boolean incl_wsegs = !strcmpi(src, "fmon");
 
     count = size = 0L;
@@ -3840,7 +3840,7 @@ long *total_size;
      * others only if nonzero
      */
     count = size = 0L;
-    for (tt = ftrap; tt; tt = tt->ntrap) {
+    for (tt = g.ftrap; tt; tt = tt->ntrap) {
         ++count;
         size += (long) sizeof *tt;
     }
@@ -3970,7 +3970,7 @@ wiz_show_stats()
     obj_chain(win, "billobjs", billobjs, FALSE,
               &total_obj_count, &total_obj_size);
     mon_invent_chain(win, "minvent", fmon, &total_obj_count, &total_obj_size);
-    mon_invent_chain(win, "migrating minvent", migrating_mons,
+    mon_invent_chain(win, "migrating minvent", g.migrating_mons,
                      &total_obj_count, &total_obj_size);
     contained_stats(win, "contained", &total_obj_count, &total_obj_size);
     putstr(win, 0, stats_sep);
@@ -3982,12 +3982,12 @@ wiz_show_stats()
     Sprintf(buf, "  Monsters, base size %ld", (long) sizeof (struct monst));
     putstr(win, 0, buf);
     mon_chain(win, "fmon", fmon, TRUE, &total_mon_count, &total_mon_size);
-    mon_chain(win, "migrating", migrating_mons, FALSE,
+    mon_chain(win, "migrating", g.migrating_mons, FALSE,
               &total_mon_count, &total_mon_size);
-    /* 'mydogs' is only valid during level change or end of game disclosure,
+    /* 'g.mydogs' is only valid during level change or end of game disclosure,
        but conceivably we've been called from within debugger at such time */
-    if (mydogs) /* monsters accompanying hero */
-        mon_chain(win, "mydogs", mydogs, FALSE,
+    if (g.mydogs) /* monsters accompanying hero */
+        mon_chain(win, "mydogs", g.mydogs, FALSE,
                   &total_mon_count, &total_mon_size);
     putstr(win, 0, stats_sep);
     Sprintf(buf, template, "  Mon total", total_mon_count, total_mon_size);

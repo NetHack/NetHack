@@ -141,7 +141,7 @@ struct obj *otmp;
     if (u.uswallow && mtmp == u.ustuck)
         reveal_invis = FALSE;
 
-    g.notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
+    g.notonhead = (mtmp->mx != g.bhitpos.x || mtmp->my != g.bhitpos.y);
     skilled_spell = (otmp && otmp->oclass == SPBOOK_CLASS && otmp->blessed);
 
     switch (otyp) {
@@ -456,14 +456,14 @@ struct obj *otmp;
         } else if (mtmp->m_ap_type)
             seemimic(mtmp); /* might unblock if mimicing a boulder/door */
     }
-    /* note: bhitpos won't be set if swallowed, but that's okay since
+    /* note: g.bhitpos won't be set if swallowed, but that's okay since
      * reveal_invis will be false.  We can't use mtmp->mx, my since it
      * might be an invisible worm hit on the tail.
      */
     if (reveal_invis) {
-        if (!DEADMONSTER(mtmp) && cansee(bhitpos.x, bhitpos.y)
+        if (!DEADMONSTER(mtmp) && cansee(g.bhitpos.x, g.bhitpos.y)
             && !canspotmon(mtmp))
-            map_invisible(bhitpos.x, bhitpos.y);
+            map_invisible(g.bhitpos.x, g.bhitpos.y);
     }
     /* if effect was observable then discover the wand type provided
        that the wand itself has been seen */
@@ -1337,7 +1337,7 @@ int okind;
         break;
     }
 
-    if (!(mvitals[pm_index].mvflags & G_GENOD))
+    if (!(g.mvitals[pm_index].mvflags & G_GENOD))
         mdat = &mons[pm_index];
 
     mtmp = makemon(mdat, obj->ox, obj->oy, NO_MM_FLAGS);
@@ -2213,10 +2213,10 @@ dozap()
          * buzz(AD_ELEC) -> destroy_item(WAND_CLASS) ->
          * useup -> obfree -> dealloc_obj -> free(obj)
          */
-        current_wand = obj;
+        g.current_wand = obj;
         weffects(obj);
-        obj = current_wand;
-        current_wand = 0;
+        obj = g.current_wand;
+        g.current_wand = 0;
     }
     if (obj && obj->spe < 0) {
         pline("%s to dust.", Tobjnam(obj, "turn"));
@@ -2609,7 +2609,7 @@ struct obj *obj; /* wand or spell */
 {
     int steedhit = FALSE;
 
-    bhitpos.x = u.usteed->mx, bhitpos.y = u.usteed->my;
+    g.bhitpos.x = u.usteed->mx, g.bhitpos.y = u.usteed->my;
     g.notonhead = FALSE;
     switch (obj->otyp) {
     /*
@@ -3101,7 +3101,7 @@ const char *str;
 struct monst *mtmp;
 const char *force; /* usually either "." or "!" */
 {
-    if ((!cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp)
+    if ((!cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp)
          && !(u.uswallow && mtmp == u.ustuck)) || !flags.verbose)
         pline("%s %s it.", The(str), vtense(str, "hit"));
     else
@@ -3116,7 +3116,7 @@ register struct monst *mtmp;
 {
     pline(
         "%s %s %s.", The(str), vtense(str, "miss"),
-        ((cansee(bhitpos.x, bhitpos.y) || canspotmon(mtmp)) && flags.verbose)
+        ((cansee(g.bhitpos.x, g.bhitpos.y) || canspotmon(mtmp)) && flags.verbose)
             ? mon_nam(mtmp)
             : "it");
 }
@@ -3142,7 +3142,7 @@ int range, *skipstart, *skipend;
  *      when a light beam is flashed (FLASHED_LIGHT)
  *      when a mirror is applied (INVIS_BEAM)
  *  A thrown/kicked object falls down at end of its range or when a monster
- *  is hit.  The variable 'bhitpos' is set to the final position of the weapon
+ *  is hit.  The variable 'g.bhitpos' is set to the final position of the weapon
  *  thrown/zapped.  The ray of a wand may affect (by calling a provided
  *  function) several objects and monsters on its path.  The return value
  *  is the monster hit (weapon != ZAPPED_WAND), or a null monster pointer.
@@ -3174,12 +3174,12 @@ struct obj **pobj; /* object tossed/used, set to NULL
 
     if (weapon == KICKED_WEAPON) {
         /* object starts one square in front of player */
-        bhitpos.x = u.ux + ddx;
-        bhitpos.y = u.uy + ddy;
+        g.bhitpos.x = u.ux + ddx;
+        g.bhitpos.y = u.uy + ddy;
         range--;
     } else {
-        bhitpos.x = u.ux;
-        bhitpos.y = u.uy;
+        g.bhitpos.x = u.ux;
+        g.bhitpos.y = u.uy;
     }
 
     if (weapon == THROWN_WEAPON && obj && obj->otyp == ROCK) {
@@ -3199,14 +3199,14 @@ struct obj **pobj; /* object tossed/used, set to NULL
     while (range-- > 0) {
         int x, y;
 
-        bhitpos.x += ddx;
-        bhitpos.y += ddy;
-        x = bhitpos.x;
-        y = bhitpos.y;
+        g.bhitpos.x += ddx;
+        g.bhitpos.y += ddy;
+        x = g.bhitpos.x;
+        y = g.bhitpos.y;
 
         if (!isok(x, y)) {
-            bhitpos.x -= ddx;
-            bhitpos.y -= ddy;
+            g.bhitpos.x -= ddx;
+            g.bhitpos.y -= ddy;
             break;
         }
 
@@ -3216,17 +3216,17 @@ struct obj **pobj; /* object tossed/used, set to NULL
             return mtmp;
         }
 
-        typ = levl[bhitpos.x][bhitpos.y].typ;
+        typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
 
         /* iron bars will block anything big enough */
         if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && typ == IRONBARS
-            && hits_bars(pobj, x - ddx, y - ddy, bhitpos.x, bhitpos.y,
+            && hits_bars(pobj, x - ddx, y - ddy, g.bhitpos.x, g.bhitpos.y,
                          point_blank ? 0 : !rn2(5), 1)) {
             /* caveat: obj might now be null... */
             obj = *pobj;
-            bhitpos.x -= ddx;
-            bhitpos.y -= ddy;
+            g.bhitpos.x -= ddx;
+            g.bhitpos.y -= ddy;
             break;
         }
 
@@ -3236,15 +3236,15 @@ struct obj **pobj; /* object tossed/used, set to NULL
             switch (obj->otyp) {
             case WAN_OPENING:
             case SPE_KNOCK:
-                if (is_db_wall(bhitpos.x, bhitpos.y)) {
-                    if (cansee(x, y) || cansee(bhitpos.x, bhitpos.y))
+                if (is_db_wall(g.bhitpos.x, g.bhitpos.y)) {
+                    if (cansee(x, y) || cansee(g.bhitpos.x, g.bhitpos.y))
                         learn_it = TRUE;
                     open_drawbridge(x, y);
                 }
                 break;
             case WAN_LOCKING:
             case SPE_WIZARD_LOCK:
-                if ((cansee(x, y) || cansee(bhitpos.x, bhitpos.y))
+                if ((cansee(x, y) || cansee(g.bhitpos.x, g.bhitpos.y))
                     && levl[x][y].typ == DRAWBRIDGE_DOWN)
                     learn_it = TRUE;
                 close_drawbridge(x, y);
@@ -3260,7 +3260,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 learnwand(obj);
         }
 
-        mtmp = m_at(bhitpos.x, bhitpos.y);
+        mtmp = m_at(g.bhitpos.x, g.bhitpos.y);
 
         /*
          * skipping rocks
@@ -3268,7 +3268,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
          * skiprange_start is only set if this is a thrown rock
          */
         if (skiprange_start && (range == skiprange_start) && allow_skip) {
-            if (is_pool(bhitpos.x, bhitpos.y) && !mtmp) {
+            if (is_pool(g.bhitpos.x, g.bhitpos.y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
                     pline("%s %s%s.", Yname2(obj), otense(obj, "skip"),
@@ -3293,7 +3293,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         }
 
         if (mtmp && !(in_skip && M_IN_WATER(mtmp->data))) {
-            g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+            g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
                    pass through instead of stop so we call
@@ -3323,8 +3323,8 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 if (!tethered_weapon)
                     tmp_at(DISP_END, 0);
 
-                if (cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp))
-                    map_invisible(bhitpos.x, bhitpos.y);
+                if (cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp))
+                    map_invisible(g.bhitpos.x, g.bhitpos.y);
                 return mtmp;
             } else {
                 /* ZAPPED_WAND */
@@ -3333,20 +3333,20 @@ struct obj **pobj; /* object tossed/used, set to NULL
             }
         } else {
             if (weapon == ZAPPED_WAND && obj->otyp == WAN_PROBING
-                && glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph)) {
-                unmap_object(bhitpos.x, bhitpos.y);
+                && glyph_is_invisible(levl[g.bhitpos.x][g.bhitpos.y].glyph)) {
+                unmap_object(g.bhitpos.x, g.bhitpos.y);
                 newsym(x, y);
             }
         }
         if (fhito) {
-            if (bhitpile(obj, fhito, bhitpos.x, bhitpos.y, 0))
+            if (bhitpile(obj, fhito, g.bhitpos.x, g.bhitpos.y, 0))
                 range--;
         } else {
             if (weapon == KICKED_WEAPON
                 && ((obj->oclass == COIN_CLASS
-                     && OBJ_AT(bhitpos.x, bhitpos.y))
-                    || ship_object(obj, bhitpos.x, bhitpos.y,
-                                   costly_spot(bhitpos.x, bhitpos.y)))) {
+                     && OBJ_AT(g.bhitpos.x, g.bhitpos.y))
+                    || ship_object(obj, g.bhitpos.x, g.bhitpos.y,
+                                   costly_spot(g.bhitpos.x, g.bhitpos.y)))) {
                 tmp_at(DISP_END, 0);
                 return (struct monst *) 0;
             }
@@ -3359,38 +3359,38 @@ struct obj **pobj; /* object tossed/used, set to NULL
             case SPE_KNOCK:
             case SPE_WIZARD_LOCK:
             case SPE_FORCE_BOLT:
-                if (doorlock(obj, bhitpos.x, bhitpos.y)) {
-                    if (cansee(bhitpos.x, bhitpos.y)
+                if (doorlock(obj, g.bhitpos.x, g.bhitpos.y)) {
+                    if (cansee(g.bhitpos.x, g.bhitpos.y)
                         || (obj->otyp == WAN_STRIKING && !Deaf))
                         learnwand(obj);
-                    if (levl[bhitpos.x][bhitpos.y].doormask == D_BROKEN
-                        && *in_rooms(bhitpos.x, bhitpos.y, SHOPBASE)) {
+                    if (levl[g.bhitpos.x][g.bhitpos.y].doormask == D_BROKEN
+                        && *in_rooms(g.bhitpos.x, g.bhitpos.y, SHOPBASE)) {
                         shopdoor = TRUE;
-                        add_damage(bhitpos.x, bhitpos.y, SHOP_DOOR_COST);
+                        add_damage(g.bhitpos.x, g.bhitpos.y, SHOP_DOOR_COST);
                     }
                 }
                 break;
             }
         }
-        if (!ZAP_POS(typ) || closed_door(bhitpos.x, bhitpos.y)) {
-            bhitpos.x -= ddx;
-            bhitpos.y -= ddy;
+        if (!ZAP_POS(typ) || closed_door(g.bhitpos.x, g.bhitpos.y)) {
+            g.bhitpos.x -= ddx;
+            g.bhitpos.y -= ddy;
             break;
         }
         if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) {
             /* 'I' present but no monster: erase */
             /* do this before the tmp_at() */
-            if (glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph)
+            if (glyph_is_invisible(levl[g.bhitpos.x][g.bhitpos.y].glyph)
                 && cansee(x, y)) {
-                unmap_object(bhitpos.x, bhitpos.y);
+                unmap_object(g.bhitpos.x, g.bhitpos.y);
                 newsym(x, y);
             }
-            tmp_at(bhitpos.x, bhitpos.y);
+            tmp_at(g.bhitpos.x, g.bhitpos.y);
             delay_output();
             /* kicked objects fall in pools */
             if ((weapon == KICKED_WEAPON)
-                && (is_pool(bhitpos.x, bhitpos.y)
-                    || is_lava(bhitpos.x, bhitpos.y)))
+                && (is_pool(g.bhitpos.x, g.bhitpos.y)
+                    || is_lava(g.bhitpos.x, g.bhitpos.y)))
                 break;
             if (IS_SINK(typ) && weapon != FLASHED_LIGHT)
                 break; /* physical objects fall onto sink */
@@ -3463,8 +3463,8 @@ int dx, dy;
      * (invert rows for corresponding clockwise patterns)
      */
 
-    bhitpos.x = u.ux;
-    bhitpos.y = u.uy;
+    g.bhitpos.x = u.ux;
+    g.bhitpos.y = u.uy;
     boom = counterclockwise ? S_boomleft : S_boomright;
     for (i = 0; i < 8; i++)
         if (xdir[i] == dx && ydir[i] == dy)
@@ -3476,20 +3476,20 @@ int dx, dy;
         tmp_at(DISP_CHANGE, cmap_to_glyph(boom)); /* change glyph */
         dx = xdir[i];
         dy = ydir[i];
-        bhitpos.x += dx;
-        bhitpos.y += dy;
-        if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+        g.bhitpos.x += dx;
+        g.bhitpos.y += dy;
+        if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
             m_respond(mtmp);
             tmp_at(DISP_END, 0);
             return mtmp;
         }
-        if (!ZAP_POS(levl[bhitpos.x][bhitpos.y].typ)
-            || closed_door(bhitpos.x, bhitpos.y)) {
-            bhitpos.x -= dx;
-            bhitpos.y -= dy;
+        if (!ZAP_POS(levl[g.bhitpos.x][g.bhitpos.y].typ)
+            || closed_door(g.bhitpos.x, g.bhitpos.y)) {
+            g.bhitpos.x -= dx;
+            g.bhitpos.y -= dy;
             break;
         }
-        if (bhitpos.x == u.ux && bhitpos.y == u.uy) { /* ct == 9 */
+        if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) { /* ct == 9 */
             if (Fumbling || rn2(20) >= ACURR(A_DEX)) {
                 /* we hit ourselves */
                 (void) thitu(10 + obj->spe, dmgval(obj, &youmonst), &obj,
@@ -3502,9 +3502,9 @@ int dx, dy;
                 return &youmonst;
             }
         }
-        tmp_at(bhitpos.x, bhitpos.y);
+        tmp_at(g.bhitpos.x, g.bhitpos.y);
         delay_output();
-        if (IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+        if (IS_SINK(levl[g.bhitpos.x][g.bhitpos.y].typ)) {
             if (!Deaf)
                 pline("Klonk!");
             break; /* boomerang falls on sink */
@@ -4005,7 +4005,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
     range = rn1(7, 7);
     if (dx == 0 && dy == 0)
         range = 1;
-    save_bhitpos = bhitpos;
+    save_bhitpos = g.bhitpos;
 
     tmp_at(DISP_BEAM, zapdir_to_glyph(dx, dy, abstype));
     while (range-- > 0) {
@@ -4029,8 +4029,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
             delay_output(); /* wait a little */
         }
 
-        /* hit() and miss() need bhitpos to match the target */
-        bhitpos.x = sx, bhitpos.y = sy;
+        /* hit() and miss() need g.bhitpos to match the target */
+        g.bhitpos.x = sx, g.bhitpos.y = sy;
         /* Fireballs only damage when they explode */
         if (type != ZT_SPELL(ZT_FIRE)) {
             range += zap_over_floor(sx, sy, type, &shopdamage, 0);
@@ -4045,7 +4045,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
         buzzmonst:
-            g.notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
+            g.notonhead = (mon->mx != g.bhitpos.x || mon->my != g.bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
@@ -4230,7 +4230,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                                    ? "disintegrate"
                                    : "destroy",
                        FALSE);
-    bhitpos = save_bhitpos;
+    g.bhitpos = save_bhitpos;
 }
 
 void
@@ -4439,7 +4439,7 @@ short exploding_wand_typ;
                         u.uinwater = 0;
                         u.uundetected = 0;
                         docrt();
-                        vision_full_recalc = 1;
+                        g.vision_full_recalc = 1;
                     } else if (u.utrap && u.utraptype == TT_LAVA) {
                         if (Passes_walls) {
                             You("pass through the now-solid rock.");
@@ -4805,7 +4805,7 @@ int osym, dmgtyp;
                 break;
             }
 #if 0
-            if (obj == current_wand) {  skip++;  break;  }
+            if (obj == g.current_wand) {  skip++;  break;  }
 #endif
             dindx = 6;
             dmg = rnd(10);
@@ -4847,8 +4847,8 @@ int osym, dmgtyp;
             else
                 setnotworn(obj);
         }
-        if (obj == current_wand)
-            current_wand = 0; /* destroyed */
+        if (obj == g.current_wand)
+            g.current_wand = 0; /* destroyed */
         for (i = 0; i < cnt; i++)
             useup(obj);
         if (dmg) {

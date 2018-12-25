@@ -496,7 +496,7 @@ int psflags;
         if (draconian) {
         do_merge:
             mntmp = armor_to_dragon(uarm->otyp);
-            if (!(mvitals[mntmp].mvflags & G_GENOD)) {
+            if (!(g.mvitals[mntmp].mvflags & G_GENOD)) {
                 /* allow G_EXTINCT */
                 if (Is_dragon_scales(uarm)) {
                     /* dragon scales remain intact as uskin */
@@ -602,7 +602,7 @@ int mntmp;
             was_blind = !!Blind, dochange = FALSE;
     int mlvl;
 
-    if (mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
+    if (g.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("rather %s-ish.", mons[mntmp].mname);
         exercise(A_WIS, TRUE);
         return 0;
@@ -840,7 +840,7 @@ int mntmp;
     check_strangling(TRUE); /* maybe start strangling */
 
     context.botl = 1;
-    vision_full_recalc = 1;
+    g.vision_full_recalc = 1;
     see_monsters();
     (void) encumber_msg();
 
@@ -1056,7 +1056,7 @@ rehumanize()
     nomul(0);
 
     context.botl = 1;
-    vision_full_recalc = 1;
+    g.vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
         You("and %s return gently to the %s.",
@@ -1839,12 +1839,12 @@ polysense()
 boolean
 ugenocided()
 {
-    return (boolean) ((mvitals[urole.malenum].mvflags & G_GENOD)
+    return (boolean) ((g.mvitals[urole.malenum].mvflags & G_GENOD)
                       || (urole.femalenum != NON_PM
-                          && (mvitals[urole.femalenum].mvflags & G_GENOD))
-                      || (mvitals[urace.malenum].mvflags & G_GENOD)
+                          && (g.mvitals[urole.femalenum].mvflags & G_GENOD))
+                      || (g.mvitals[urace.malenum].mvflags & G_GENOD)
                       || (urace.femalenum != NON_PM
-                          && (mvitals[urace.femalenum].mvflags & G_GENOD)));
+                          && (g.mvitals[urace.femalenum].mvflags & G_GENOD)));
 }
 
 /* how hero feels "inside" after self-genocide of role or race */

@@ -153,7 +153,7 @@ boolean perform_write, free_data;
 
         count = maxledgerno();
         bwrite(fd, (genericptr_t) &count, sizeof count);
-        bwrite(fd, (genericptr_t) level_info,
+        bwrite(fd, (genericptr_t) g.level_info,
                (unsigned) count * sizeof(struct linfo));
         bwrite(fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
 
@@ -214,7 +214,7 @@ int fd;
     if (count >= MAXLINFO)
         panic("level information count larger (%d) than allocated size",
               count);
-    mread(fd, (genericptr_t) level_info,
+    mread(fd, (genericptr_t) g.level_info,
           (unsigned) count * sizeof(struct linfo));
     mread(fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
 
@@ -1677,7 +1677,7 @@ const char *nam;
                  && dlev.dnum == valley_level.dnum))
             && (/* either wizard mode or else seen and not forgotten */
                 wizard
-                || (level_info[idx].flags & (FORGOTTEN | VISITED))
+                || (g.level_info[idx].flags & (FORGOTTEN | VISITED))
                        == VISITED)) {
             lev = depth(&dlev);
         }
@@ -1692,8 +1692,8 @@ const char *nam;
             idx &= 0x00FF;
             if (/* either wizard mode, or else _both_ sides of branch seen */
                 wizard
-                || ((level_info[idx].flags & (FORGOTTEN | VISITED)) == VISITED
-                    && (level_info[idxtoo].flags & (FORGOTTEN | VISITED))
+                || ((g.level_info[idx].flags & (FORGOTTEN | VISITED)) == VISITED
+                    && (g.level_info[idxtoo].flags & (FORGOTTEN | VISITED))
                            == VISITED)) {
                 if (ledger_to_dnum(idxtoo) == u.uz.dnum)
                     idx = idxtoo;
@@ -1956,7 +1956,7 @@ xchar *rdgn;
            dungeon matched with one in the corresponding branch), the
            elemental planes have singletons (connection to next plane) */
         *buf = '\0';
-        for (trap = ftrap; trap; trap = trap->ntrap)
+        for (trap = g.ftrap; trap; trap = trap->ntrap)
             if (trap->ttyp == MAGIC_PORTAL)
                 break;
 
@@ -2317,9 +2317,9 @@ d_level *lev;
        explicitly initialize pointers to null */
     init->next = 0, init->br = 0, init->custom = 0;
     init->final_resting_place = 0;
-    /* lastseentyp[][] is reused for each level, so get rid of
+    /* g.lastseentyp[][] is reused for each level, so get rid of
        previous level's data */
-    (void) memset((genericptr_t) lastseentyp, 0, sizeof lastseentyp);
+    (void) memset((genericptr_t) g.lastseentyp, 0, sizeof g.lastseentyp);
 
     init->lev.dnum = lev->dnum;
     init->lev.dlevel = lev->dlevel;
@@ -2483,7 +2483,7 @@ recalc_mapseen()
         }
     }
 
-    /* Update lastseentyp with typ if and only if it is in sight or the
+    /* Update g.lastseentyp with typ if and only if it is in sight or the
      * hero can feel it on their current location (i.e. not levitating).
      * This *should* give the "last known typ" for each dungeon location.
      * (At the very least, it's a better assumption than determining what
@@ -2494,7 +2494,7 @@ recalc_mapseen()
      * we could track "features" and then update them all here, and keep
      * track of when new features are created or destroyed, but this
      * seemed the most elegant, despite adding more data to struct rm.
-     * [3.6.0: we're using lastseentyp[][] rather than level.locations
+     * [3.6.0: we're using g.lastseentyp[][] rather than level.locations
      * to track the features seen.]
      *
      * Although no current windowing systems (can) do this, this would add
@@ -2510,10 +2510,10 @@ recalc_mapseen()
                 if ((mtmp = m_at(x, y)) != 0
                     && mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp))
                     ltyp = cmap_to_type(mtmp->mappearance);
-                lastseentyp[x][y] = ltyp;
+                g.lastseentyp[x][y] = ltyp;
             }
 
-            switch (lastseentyp[x][y]) {
+            switch (g.lastseentyp[x][y]) {
 #if 0
             case ICE:
                 count = mptr->feat.ice + 1;
@@ -2637,7 +2637,7 @@ recalc_mapseen()
        guarantee of either a grave or a ghost, so we go by whether the
        current hero has seen the map location where each old one died */
     for (bp = mptr->final_resting_place; bp; bp = bp->next)
-        if (lastseentyp[bp->frpx][bp->frpy]) {
+        if (g.lastseentyp[bp->frpx][bp->frpy]) {
             bp->bonesknown = TRUE;
             mptr->flags.knownbones = 1;
         }

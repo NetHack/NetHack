@@ -103,7 +103,6 @@ E struct dgn_topology { /* special dungeon levels for speed */
 E NEARDATA char tune[6];
 
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
-E struct linfo level_info[MAXLINFO];
 
 E NEARDATA struct sinfo {
     int gameover;  /* self explanatory? */
@@ -144,11 +143,6 @@ E NEARDATA struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
-E NEARDATA char dogname[];
-E NEARDATA char catname[];
-E NEARDATA char horsename[];
-E char preferred_pet;
-
 E char lock[];
 
 E const schar xdir[], ydir[], zdir[];
@@ -162,12 +156,9 @@ struct multishot {
 E NEARDATA long moves, monstermoves;
 E NEARDATA long wailmsg;
 
-E NEARDATA boolean in_steed_dismounting;
-
 E const int shield_static[];
 
 #include "spell.h"
-E NEARDATA struct spell spl_book[]; /* sized in decl.c */
 
 #include "color.h"
 #ifdef TEXTCOLOR
@@ -188,7 +179,6 @@ E NEARDATA struct obj *uchain; /* defined only when punished */
 E NEARDATA struct obj *uball;
 E NEARDATA struct obj *migrating_objs;
 E NEARDATA struct obj *billobjs;
-E NEARDATA struct obj *current_wand, *thrownobj, *kickedobj;
 
 E NEARDATA struct obj zeroobj; /* for init; &zeroobj used as special value */
 
@@ -206,13 +196,12 @@ E NEARDATA struct u_realtime urealtime;
 
 E NEARDATA struct monst zeromonst; /* for init of new or temp monsters */
 E NEARDATA struct monst youmonst; /* monster details when hero is poly'd */
-E NEARDATA struct monst *mydogs, *migrating_mons;
 
-E NEARDATA struct mvitals {
+struct mvitals {
     uchar born;
     uchar died;
     uchar mvflags;
-} mvitals[NUMMONS];
+};
 
 E NEARDATA struct c_color_names {
     const char *const c_black, *const c_amber, *const c_golden,
@@ -268,10 +257,6 @@ E const char *materialnm[];
 #define EXACT_NAME 0x0F
 #define SUPPRESS_NAME 0x10
 
-/* Vision */
-E NEARDATA boolean vision_full_recalc; /* TRUE if need vision recalc */
-E NEARDATA char **viz_array;           /* could see/in sight row pointers */
-
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;
 E NEARDATA winid WIN_STATUS;
@@ -286,7 +271,6 @@ E NEARDATA winid WIN_MAP, WIN_INVEN;
 #define Sprintf1(buf, cstr) Sprintf(buf, "%s", cstr)
 #define panic1(cstr) panic("%s", cstr)
 
-E char toplines[];
 #ifndef TCAP_H
 E struct tc_gbl_data {   /* also declared in tcap.h */
     char *tc_AS, *tc_AE; /* graphics start and end (tty font swapping) */
@@ -364,8 +348,6 @@ struct plinemsg_type {
 #define MSGTYP_STOP     3
 /* bitmask for callers of hide_unhide_msgtypes() */
 #define MSGTYP_MASK_REP_SHOW ((1 << MSGTYP_NOREP) | (1 << MSGTYP_NOSHOW))
-
-E struct plinemsg_type *plinemsg_types;
 
 #ifdef PANICTRACE
 E const char *ARGV0;
@@ -689,6 +671,24 @@ struct instance_globals {
     boolean stoned; /* done to monsters hit by 'c' */
     boolean unweapon;
     boolean mrg_to_wielded; /* weapon picked is merged with wielded one */
+    struct plinemsg_type *plinemsg_types;
+    char toplines[TBUFSZ];
+    struct mkroom *upstairs_room;
+    struct mkroom *dnstairs_room;
+    struct mkroom *sstairs_room;
+    coord bhitpos; /* place where throw or zap hits or stops */
+    boolean in_steed_dismounting;
+    coord doors[DOORMAX];
+    struct menucoloring *menu_colorings;
+    schar lastseentyp[COLNO][ROWNO]; /* last seen/touched dungeon typ */
+    struct spell spl_book[MAXSPELL + 1];
+    struct linfo level_info[MAXLINFO];
+    struct trap *ftrap;
+    /* some objects need special handling during destruction or placement */
+    struct obj *current_wand;  /* wand currently zapped/applied */
+    struct obj *thrownobj;     /* object in flight due to throwing */
+    struct obj *kickedobj;     /* object in flight due to kicking */
+
 
     /* dig.c */
 
@@ -721,6 +721,13 @@ struct instance_globals {
     xchar gtyp;  /* type of dog's current goal */
     xchar gx; /* x position of dog's current goal */
     char  gy; /* y position of dog's current goal */
+    char dogname[PL_PSIZ];
+    char catname[PL_PSIZ];
+    char horsename[PL_PSIZ];
+    char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */    
+    struct monst *mydogs; /* monsters that went down/up together with @ */
+    struct monst *migrating_mons; /* monsters moving to another level */
+    struct mvitals mvitals[NUMMONS];
 
     /* dokick.c */
     struct rm *maploc;
@@ -975,7 +982,7 @@ struct instance_globals {
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */
-    int *spl_orderindx; /* array of spl_book[] indices */
+    int *spl_orderindx; /* array of g.spl_book[] indices */
 
     /* timeout.c */
     /* ordered timer list */
@@ -1009,6 +1016,12 @@ struct instance_globals {
     /* uhitm.c */
     boolean override_confirmation; /* Used to flag attacks caused by
                                       Stormbringer's maliciousness. */
+
+    /* vision.c */
+    char **viz_array; /* used in cansee() and couldsee() macros */
+    char *viz_rmin;			/* min could see indices */
+    char *viz_rmax;			/* max could see indices */
+    boolean vision_full_recalc;
 
     /* weapon.c */
     struct obj *propellor;

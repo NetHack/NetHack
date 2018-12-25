@@ -806,7 +806,7 @@ boolean artif;
                 tryct = 50;
                 do
                     otmp->corpsenm = undead_to_corpse(rndmonnum());
-                while ((mvitals[otmp->corpsenm].mvflags & G_NOCORPSE)
+                while ((g.mvitals[otmp->corpsenm].mvflags & G_NOCORPSE)
                        && (--tryct > 0));
                 if (tryct == 0) {
                     /* perhaps rndmonnum() only wants to make G_NOCORPSE
@@ -836,7 +836,7 @@ boolean artif;
                     for (tryct = 200; tryct > 0; --tryct) {
                         mndx = undead_to_corpse(rndmonnum());
                         if (mons[mndx].cnutrit
-                            && !(mvitals[mndx].mvflags & G_NOCORPSE)) {
+                            && !(g.mvitals[mndx].mvflags & G_NOCORPSE)) {
                             otmp->corpsenm = mndx;
                             set_tin_variety(otmp, RANDOM_TIN);
                             break;
@@ -1054,7 +1054,7 @@ boolean artif;
     case CORPSE:
         if (otmp->corpsenm == NON_PM) {
             otmp->corpsenm = undead_to_corpse(rndmonnum());
-            if (mvitals[otmp->corpsenm].mvflags & (G_NOCORPSE | G_GONE))
+            if (g.mvitals[otmp->corpsenm].mvflags & (G_NOCORPSE | G_GONE))
                 otmp->corpsenm = urole.malenum;
         }
         /*FALLTHRU*/
@@ -2115,10 +2115,10 @@ struct obj *obj;
     if (obj_sheds_light(obj))
         del_light_source(LS_OBJECT, obj_to_any(obj));
 
-    if (obj == thrownobj)
-        thrownobj = 0;
-    if (obj == kickedobj)
-        kickedobj = 0;
+    if (obj == g.thrownobj)
+        g.thrownobj = 0;
+    if (obj == g.kickedobj)
+        g.kickedobj = 0;
 
     if (obj->oextra)
         dealloc_oextra(obj);
@@ -2248,26 +2248,26 @@ obj_sanity_check()
     objlist_sanity(billobjs, OBJ_ONBILL, "bill sanity");
 
     mon_obj_sanity(fmon, "minvent sanity");
-    mon_obj_sanity(migrating_mons, "migrating minvent sanity");
+    mon_obj_sanity(g.migrating_mons, "migrating minvent sanity");
     /* monsters temporarily in transit;
        they should have arrived with hero by the time we get called */
-    if (mydogs) {
-        impossible("mydogs sanity [not empty]");
-        mon_obj_sanity(mydogs, "mydogs minvent sanity");
+    if (g.mydogs) {
+        impossible("g.mydogs sanity [not empty]");
+        mon_obj_sanity(g.mydogs, "mydogs minvent sanity");
     }
 
     /* objects temporarily freed from invent/floor lists;
        they should have arrived somewhere by the time we get called */
-    if (thrownobj)
-        insane_object(thrownobj, ofmt3, "thrownobj sanity",
+    if (g.thrownobj)
+        insane_object(g.thrownobj, ofmt3, "g.thrownobj sanity",
                       (struct monst *) 0);
-    if (kickedobj)
-        insane_object(kickedobj, ofmt3, "kickedobj sanity",
+    if (g.kickedobj)
+        insane_object(g.kickedobj, ofmt3, "g.kickedobj sanity",
                       (struct monst *) 0);
-    /* current_wand isn't removed from invent while in use, but should
+    /* g.current_wand isn't removed from invent while in use, but should
        be Null between moves when we're called */
-    if (current_wand)
-        insane_object(current_wand, ofmt3, "current_wand sanity",
+    if (g.current_wand)
+        insane_object(g.current_wand, ofmt3, "g.current_wand sanity",
                       (struct monst *) 0);
 }
 

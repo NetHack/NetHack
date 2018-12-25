@@ -63,9 +63,9 @@ pet_type()
 {
     if (urole.petnum != NON_PM)
         return  urole.petnum;
-    else if (preferred_pet == 'c')
+    else if (g.preferred_pet == 'c')
         return  PM_KITTEN;
-    else if (preferred_pet == 'd')
+    else if (g.preferred_pet == 'd')
         return  PM_LITTLE_DOG;
     else
         return  rn2(2) ? PM_KITTEN : PM_LITTLE_DOG;
@@ -89,7 +89,7 @@ boolean quietly;
             /* activating a figurine provides one way to exceed the
                maximum number of the target critter created--unless
                it has a special limit (erinys, Nazgul) */
-            if ((mvitals[mndx].mvflags & G_EXTINCT)
+            if ((g.mvitals[mndx].mvflags & G_EXTINCT)
                 && mbirth_limit(mndx) != MAXMONNO) {
                 if (!quietly)
                     /* have just been given "You <do something with>
@@ -161,16 +161,16 @@ makedog()
     const char *petname;
     int pettype;
 
-    if (preferred_pet == 'n')
+    if (g.preferred_pet == 'n')
         return ((struct monst *) 0);
 
     pettype = pet_type();
     if (pettype == PM_LITTLE_DOG)
-        petname = dogname;
+        petname = g.dogname;
     else if (pettype == PM_PONY)
-        petname = horsename;
+        petname = g.horsename;
     else
-        petname = catname;
+        petname = g.catname;
 
     /* default pet names */
     if (!*petname && pettype == PM_LITTLE_DOG) {
@@ -227,8 +227,8 @@ losedogs()
     int dismissKops = 0;
 
     /*
-     * First, scan migrating_mons for shopkeepers who want to dismiss Kops,
-     * and scan mydogs for shopkeepers who want to retain kops.
+     * First, scan g.migrating_mons for shopkeepers who want to dismiss Kops,
+     * and scan g.mydogs for shopkeepers who want to retain kops.
      * Second, dismiss kops if warranted, making more room for arrival.
      * Third, place monsters accompanying the hero.
      * Last, place migrating monsters coming to this level.
@@ -240,7 +240,7 @@ losedogs()
      */
 
     /* check for returning shk(s) */
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->mux != u.uz.dnum || mtmp->muy != u.uz.dlevel)
             continue;
         if (mtmp->isshk) {
@@ -256,11 +256,11 @@ losedogs()
             }
         }
     }
-    /* make the same check for mydogs */
-    for (mtmp = mydogs; mtmp && dismissKops >= 0; mtmp = mtmp->nmon) {
+    /* make the same check for g.mydogs */
+    for (mtmp = g.mydogs; mtmp && dismissKops >= 0; mtmp = mtmp->nmon) {
         if (mtmp->isshk) {
             /* hostile shk might accompany hero [ESHK(mtmp)->dismiss_kops
-               can't be set here; it's only used for migrating_mons] */
+               can't be set here; it's only used for g.migrating_mons] */
             if (!mtmp->mpeaceful)
                 dismissKops = -1;
         }
@@ -273,22 +273,22 @@ losedogs()
         make_happy_shoppers(TRUE);
 
     /* place pets and/or any other monsters who accompany hero */
-    while ((mtmp = mydogs) != 0) {
-        mydogs = mtmp->nmon;
+    while ((mtmp = g.mydogs) != 0) {
+        g.mydogs = mtmp->nmon;
         mon_arrive(mtmp, TRUE);
     }
 
     /* time for migrating monsters to arrive;
        monsters who belong on this level but fail to arrive get put
        back onto the list (at head), so traversing it is tricky */
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp2) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
         if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel) {
-            /* remove mtmp from migrating_mons list */
-            if (mtmp == migrating_mons) {
-                migrating_mons = mtmp->nmon;
+            /* remove mtmp from g.migrating_mons list */
+            if (mtmp == g.migrating_mons) {
+                g.migrating_mons = mtmp->nmon;
             } else {
-                for (mtmp0 = migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
+                for (mtmp0 = g.migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
                     if (mtmp0->nmon == mtmp) {
                         mtmp0->nmon = mtmp->nmon;
                         break;
@@ -407,7 +407,7 @@ boolean with_you;
             break;
         }
         /* find the arrival portal */
-        for (t = ftrap; t; t = t->ntrap)
+        for (t = g.ftrap; t; t = t->ntrap)
             if (t->ttyp == MAGIC_PORTAL)
                 break;
         if (t) {
@@ -656,7 +656,7 @@ boolean pets_only; /* true for ascension or final escape */
                 obj->no_charge = 0;
             }
 
-            relmon(mtmp, &mydogs);   /* move it from map to mydogs */
+            relmon(mtmp, &g.mydogs);   /* move it from map to g.mydogs */
             mtmp->mx = mtmp->my = 0; /* avoid mnexto()/MON_AT() problem */
             mtmp->wormno = num_segs;
             mtmp->mlstmv = monstermoves;
@@ -710,7 +710,7 @@ coord *cc;   /* optional destination coordinates */
         mtmp->mtame--;
         m_unleash(mtmp, TRUE);
     }
-    relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
+    relmon(mtmp, &g.migrating_mons); /* move it from map to g.migrating_mons */
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
     new_lev.dlevel = ledger_to_dlev((xchar) tolev);
@@ -762,7 +762,7 @@ register struct obj *obj;
 
             /* if there's a queen bee on the level, don't eat royal jelly;
                if there isn't, do eat it and grow into a queen */
-            if ((mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
+            if ((g.mvitals[PM_QUEEN_BEE].mvflags & G_GENOD) == 0)
                 for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                     if (DEADMONSTER(mtmp))
                         continue;

@@ -316,7 +316,7 @@ toggle_blindness()
 
     /* blindness has just been toggled */
     context.botl = TRUE; /* status conditions need update */
-    vision_full_recalc = 1; /* vision has changed */
+    g.vision_full_recalc = 1; /* vision has changed */
     /* this vision recalculation used to be deferred until moveloop(),
        but that made it possible for vision irregularities to occur
        (cited case was force bolt hitting an adjacent potion of blindness
@@ -522,14 +522,14 @@ dodrink()
     potion_descr = OBJ_DESCR(objects[otmp->otyp]);
     if (potion_descr) {
         if (!strcmp(potion_descr, "milky")
-            && !(mvitals[PM_GHOST].mvflags & G_GONE)
-            && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_GHOST].born))) {
+            && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
+            && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
             ghost_from_bottle();
             useup(otmp);
             return 1;
         } else if (!strcmp(potion_descr, "smoky")
-                   && !(mvitals[PM_DJINNI].mvflags & G_GONE)
-                   && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_DJINNI].born))) {
+                   && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
+                   && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
             djinni_from_bottle(otmp);
             useup(otmp);
             return 1;

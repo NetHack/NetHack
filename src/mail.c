@@ -41,8 +41,6 @@ STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
 STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
 STATIC_DCL void FDECL(newmail, (struct mail_info *));
 
-extern char *viz_rmin, *viz_rmax; /* line-of-sight limits (vision.c) */
-
 #if !defined(UNIX) && !defined(VMS)
 int mustgetmail = -1;
 #endif
@@ -181,23 +179,23 @@ coord *startp;
      * position that could be seen.  What we really ought to be doing is
      * finding a path from a stairwell...
      *
-     * The arrays viz_rmin[] and viz_rmax[] are set even when blind.  These
+     * The arrays g.viz_rmin[] and g.viz_rmax[] are set even when blind.  These
      * are the LOS limits for each row.
      */
     lax = 0; /* be picky */
     max_distance = -1;
  retry:
     for (row = 0; row < ROWNO; row++) {
-        if (viz_rmin[row] < viz_rmax[row]) {
+        if (g.viz_rmin[row] < g.viz_rmax[row]) {
             /* There are valid positions on this row. */
-            dd = distu(viz_rmin[row], row);
+            dd = distu(g.viz_rmin[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmin[row];
+                    startp->x = g.viz_rmin[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmin[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmin[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -205,14 +203,14 @@ coord *startp;
                     *startp = testcc;
                 }
             }
-            dd = distu(viz_rmax[row], row);
+            dd = distu(g.viz_rmax[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = viz_rmax[row];
+                    startp->x = g.viz_rmax[row];
 
-                } else if (enexto(&testcc, (xchar) viz_rmax[row], row,
+                } else if (enexto(&testcc, (xchar) g.viz_rmax[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {

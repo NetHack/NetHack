@@ -68,7 +68,7 @@ amulet()
     if ((((amu = uamul) != 0 && amu->otyp == AMULET_OF_YENDOR)
          || ((amu = uwep) != 0 && amu->otyp == AMULET_OF_YENDOR))
         && !rn2(15)) {
-        for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+        for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
             if (ttmp->ttyp == MAGIC_PORTAL) {
                 int du = distu(ttmp->tx, ttmp->ty);
                 if (du <= 9)
@@ -637,7 +637,7 @@ resurrect()
     } else {
         /* look for a migrating Wizard */
         verb = "elude";
-        mmtmp = &migrating_mons;
+        mmtmp = &g.migrating_mons;
         while ((mtmp = *mmtmp) != 0) {
             if (mtmp->iswiz
                 /* if he has the Amulet, he won't bring it to you */

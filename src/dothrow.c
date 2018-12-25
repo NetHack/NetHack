@@ -26,7 +26,7 @@ static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
 static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
                                          GEM_CLASS, 0 };
 
-/* thrownobj (decl.c) tracks an object until it lands */
+/* g.thrownobj (decl.c) tracks an object until it lands */
 
 /* Throw the selected object, asking for direction */
 STATIC_OVL int
@@ -1041,12 +1041,12 @@ boolean hitsroof;
             You("turn to stone.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */
-            thrownobj = 0;  /* now either gone or on floor */
+            g.thrownobj = 0;  /* now either gone or on floor */
             done(STONING);
             return obj ? TRUE : FALSE;
         }
         hitfloor(obj, TRUE);
-        thrownobj = 0;
+        g.thrownobj = 0;
         losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
     }
     return TRUE;
@@ -1071,8 +1071,8 @@ sho_obj_return_to_u(obj)
 struct obj *obj;
 {
     /* might already be our location (bounced off a wall) */
-    if ((u.dx || u.dy) && (bhitpos.x != u.ux || bhitpos.y != u.uy)) {
-        int x = bhitpos.x - u.dx, y = bhitpos.y - u.dy;
+    if ((u.dx || u.dy) && (g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)) {
+        int x = g.bhitpos.x - u.dx, y = g.bhitpos.y - u.dy;
 
         tmp_at(DISP_FLASH, obj_to_glyph(obj));
         while (isok(x,y) && (x != u.ux || y != u.uy)) {
@@ -1135,13 +1135,13 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         u.dz = 1;
     }
 
-    thrownobj = obj;
-    thrownobj->was_thrown = 1;
+    g.thrownobj = obj;
+    g.thrownobj->was_thrown = 1;
 
     if (u.uswallow) {
         mon = u.ustuck;
-        bhitpos.x = mon->mx;
-        bhitpos.y = mon->my;
+        g.bhitpos.x = mon->mx;
+        g.bhitpos.y = mon->my;
         if (tethered_weapon)
             tmp_at(DISP_TETHER, obj_to_glyph(obj));
     } else if (u.dz) {
@@ -1168,7 +1168,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         } else {
             hitfloor(obj, TRUE);
         }
-        thrownobj = (struct obj *) 0;
+        g.thrownobj = (struct obj *) 0;
         return;
 
     } else if (obj->otyp == BOOMERANG && !Underwater) {
@@ -1183,7 +1183,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                 setworn(obj, wep_mask);
                 u.twoweap = twoweap;
             }
-            thrownobj = (struct obj *) 0;
+            g.thrownobj = (struct obj *) 0;
             return;
         }
     } else {
@@ -1247,7 +1247,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                    tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON,
                    (int FDECL((*), (MONST_P, OBJ_P))) 0,
                    (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
-        thrownobj = obj; /* obj may be null now */
+        g.thrownobj = obj; /* obj may be null now */
 
         /* have to do this after bhit() so u.ux & u.uy are correct */
         if (Is_airlevel(&u.uz) || Levitation)
@@ -1267,14 +1267,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         boolean obj_gone;
 
         if (mon->isshk && obj->where == OBJ_MINVENT && obj->ocarry == mon) {
-            thrownobj = (struct obj *) 0;
+            g.thrownobj = (struct obj *) 0;
             return; /* alert shk caught it */
         }
         (void) snuff_candle(obj);
-        g.notonhead = (bhitpos.x != mon->mx || bhitpos.y != mon->my);
+        g.notonhead = (g.bhitpos.x != mon->mx || g.bhitpos.y != mon->my);
         obj_gone = thitmonst(mon, obj);
         /* Monster may have been tamed; this frees old mon */
-        mon = m_at(bhitpos.x, bhitpos.y);
+        mon = m_at(g.bhitpos.x, g.bhitpos.y);
 
         /* [perhaps this should be moved into thitmonst or hmon] */
         if (mon && mon->isshk
@@ -1283,27 +1283,27 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             hot_pursuit(mon);
 
         if (obj_gone)
-            thrownobj = 0;
+            g.thrownobj = 0;
     }
 
-    if (!thrownobj) {
+    if (!g.thrownobj) {
         /* missile has already been handled */
         if (tethered_weapon) tmp_at(DISP_END, 0);
     } else if (u.uswallow) {
         if (tethered_weapon) {
             tmp_at(DISP_END, 0);
-            pline("%s returns to your hand!", The(xname(thrownobj)));
-            thrownobj = addinv(thrownobj);
+            pline("%s returns to your hand!", The(xname(g.thrownobj)));
+            g.thrownobj = addinv(g.thrownobj);
             (void) encumber_msg();
             /* in case addinv() autoquivered */
-            if (thrownobj->owornmask & W_QUIVER)
+            if (g.thrownobj->owornmask & W_QUIVER)
                 setuqwep((struct obj *) 0);
-            setuwep(thrownobj);
+            setuwep(g.thrownobj);
         } else {
             /* ball is not picked up by monster */
             if (obj != uball)
                 (void) mpickobj(u.ustuck, obj);
-            thrownobj = (struct obj *) 0;
+            g.thrownobj = (struct obj *) 0;
         }
     } else {
         /* Mjollnir must we wielded to be thrown--caller verifies this;
@@ -1326,8 +1326,8 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                         setuqwep((struct obj *) 0);
                     setuwep(obj);
                     u.twoweap = twoweap;
-                    if (cansee(bhitpos.x, bhitpos.y))
-                        newsym(bhitpos.x, bhitpos.y);
+                    if (cansee(g.bhitpos.x, g.bhitpos.y))
+                        newsym(g.bhitpos.x, g.bhitpos.y);
                 } else {
                     int dmg = rn2(2);
 
@@ -1350,12 +1350,12 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                                KILLED_BY);
                     }
                     if (ship_object(obj, u.ux, u.uy, FALSE)) {
-                        thrownobj = (struct obj *) 0;
+                        g.thrownobj = (struct obj *) 0;
                         return;
                     }
                     dropy(obj);
                 }
-                thrownobj = (struct obj *) 0;
+                g.thrownobj = (struct obj *) 0;
                 return;
             } else {
                 if (tethered_weapon) tmp_at(DISP_END, 0);
@@ -1371,55 +1371,55 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             }
         }
 
-        if (!IS_SOFT(levl[bhitpos.x][bhitpos.y].typ) && breaktest(obj)) {
+        if (!IS_SOFT(levl[g.bhitpos.x][g.bhitpos.y].typ) && breaktest(obj)) {
             tmp_at(DISP_FLASH, obj_to_glyph(obj));
-            tmp_at(bhitpos.x, bhitpos.y);
+            tmp_at(g.bhitpos.x, g.bhitpos.y);
             delay_output();
             tmp_at(DISP_END, 0);
-            breakmsg(obj, cansee(bhitpos.x, bhitpos.y));
-            breakobj(obj, bhitpos.x, bhitpos.y, TRUE, TRUE);
-            thrownobj = (struct obj *) 0;
+            breakmsg(obj, cansee(g.bhitpos.x, g.bhitpos.y));
+            breakobj(obj, g.bhitpos.x, g.bhitpos.y, TRUE, TRUE);
+            g.thrownobj = (struct obj *) 0;
             return;
         }
-        if (flooreffects(obj, bhitpos.x, bhitpos.y, "fall")) {
-            thrownobj = (struct obj *) 0;
+        if (flooreffects(obj, g.bhitpos.x, g.bhitpos.y, "fall")) {
+            g.thrownobj = (struct obj *) 0;
             return;
         }
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
-            if (cansee(bhitpos.x, bhitpos.y))
+            if (cansee(g.bhitpos.x, g.bhitpos.y))
                 pline("%s snatches up %s.", Monnam(mon), the(xname(obj)));
             if (*u.ushops || obj->unpaid)
-                check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
+                check_shop_obj(obj, g.bhitpos.x, g.bhitpos.y, FALSE);
             (void) mpickobj(mon, obj); /* may merge and free obj */
-            thrownobj = (struct obj *) 0;
+            g.thrownobj = (struct obj *) 0;
             return;
         }
         (void) snuff_candle(obj);
-        if (!mon && ship_object(obj, bhitpos.x, bhitpos.y, FALSE)) {
-            thrownobj = (struct obj *) 0;
+        if (!mon && ship_object(obj, g.bhitpos.x, g.bhitpos.y, FALSE)) {
+            g.thrownobj = (struct obj *) 0;
             return;
         }
-        thrownobj = (struct obj *) 0;
-        place_object(obj, bhitpos.x, bhitpos.y);
+        g.thrownobj = (struct obj *) 0;
+        place_object(obj, g.bhitpos.x, g.bhitpos.y);
         /* container contents might break;
-           do so before turning ownership of thrownobj over to shk
+           do so before turning ownership of g.thrownobj over to shk
            (container_impact_dmg handles item already owned by shop) */
-        if (!IS_SOFT(levl[bhitpos.x][bhitpos.y].typ))
-            /* <x,y> is spot where you initiated throw, not bhitpos */
+        if (!IS_SOFT(levl[g.bhitpos.x][g.bhitpos.y].typ))
+            /* <x,y> is spot where you initiated throw, not g.bhitpos */
             container_impact_dmg(obj, u.ux, u.uy);
         /* charge for items thrown out of shop;
            shk takes possession for items thrown into one */
         if ((*u.ushops || obj->unpaid) && obj != uball)
-            check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
+            check_shop_obj(obj, g.bhitpos.x, g.bhitpos.y, FALSE);
 
         stackobj(obj);
         if (obj == uball)
-            drop_ball(bhitpos.x, bhitpos.y);
-        if (cansee(bhitpos.x, bhitpos.y))
-            newsym(bhitpos.x, bhitpos.y);
+            drop_ball(g.bhitpos.x, g.bhitpos.y);
+        if (cansee(g.bhitpos.x, g.bhitpos.y))
+            newsym(g.bhitpos.x, g.bhitpos.y);
         if (obj_sheds_light(obj))
-            vision_full_recalc = 1;
+            g.vision_full_recalc = 1;
     }
 }
 
@@ -1503,7 +1503,7 @@ boolean maybe_wakeup;
 int
 thitmonst(mon, obj)
 register struct monst *mon;
-register struct obj *obj; /* thrownobj or kickedobj or uwep */
+register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
 {
     register int tmp;     /* Base chance to hit */
     register int disttmp; /* distance modifier */
@@ -1512,7 +1512,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
     int dieroll;
 
     hmode = (obj == uwep) ? HMON_APPLIED
-              : (obj == kickedobj) ? HMON_KICKED
+              : (obj == g.kickedobj) ? HMON_KICKED
                 : HMON_THROWN;
 
     /* Differences from melee weapons:
@@ -1652,7 +1652,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                 tmp += 4;
             else if (throwing_weapon(obj)) /* meant to be thrown */
                 tmp += 2;
-            else if (obj == thrownobj) /* not meant to be thrown */
+            else if (obj == g.thrownobj) /* not meant to be thrown */
                 tmp -= 2;
             /* we know we're dealing with a weapon or weptool handled
                by WEAPON_SKILLS once ammo objects have been excluded */
@@ -1660,7 +1660,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
         }
 
         if (tmp >= dieroll) {
-            boolean wasthrown = (thrownobj != 0),
+            boolean wasthrown = (g.thrownobj != 0),
                     /* remember weapon attribute; hmon() might destroy obj */
                     chopper = is_axe(obj);
 
@@ -1669,14 +1669,14 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                 u.uconduct.weaphit++;
             if (hmon(mon, obj, hmode, dieroll)) { /* mon still alive */
                 if (mon->wormno)
-                    cutworm(mon, bhitpos.x, bhitpos.y, chopper);
+                    cutworm(mon, g.bhitpos.x, g.bhitpos.y, chopper);
             }
             exercise(A_DEX, TRUE);
             /* if hero was swallowed and projectile killed the engulfer,
                'obj' got added to engulfer's inventory and then dropped,
                so we can't safely use that pointer anymore; it escapes
                the chance to be used up here... */
-            if (wasthrown && !thrownobj)
+            if (wasthrown && !g.thrownobj)
                 return 1;
 
             /* projectiles other than magic stones sometimes disappear
@@ -1701,7 +1701,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
 
                 if (broken) {
                     if (*u.ushops || obj->unpaid)
-                        check_shop_obj(obj, bhitpos.x, bhitpos.y, TRUE);
+                        check_shop_obj(obj, g.bhitpos.x, g.bhitpos.y, TRUE);
                     obfree(obj, (struct obj *) 0);
                     return 1;
                 }
@@ -2125,8 +2125,8 @@ struct obj *obj;
                 pline("Fortunately, you are wearing %s!",
                       an(helm_simple_name(uarmh)));
         }
-        bhitpos.x = u.ux;
-        bhitpos.y = u.uy;
+        g.bhitpos.x = u.ux;
+        g.bhitpos.y = u.uy;
     } else {
         /* consistent with range for normal objects */
         range = (int) ((ACURRSTR) / 2 - obj->owt / 40);
@@ -2135,8 +2135,8 @@ struct obj *obj;
         odx = u.ux + u.dx;
         ody = u.uy + u.dy;
         if (!ZAP_POS(levl[odx][ody].typ) || closed_door(odx, ody)) {
-            bhitpos.x = u.ux;
-            bhitpos.y = u.uy;
+            g.bhitpos.x = u.ux;
+            g.bhitpos.y = u.uy;
         } else {
             mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
                        (int FDECL((*), (MONST_P, OBJ_P))) 0,
@@ -2147,21 +2147,21 @@ struct obj *obj;
                 if (ghitm(mon, obj)) /* was it caught? */
                     return 1;
             } else {
-                if (ship_object(obj, bhitpos.x, bhitpos.y, FALSE))
+                if (ship_object(obj, g.bhitpos.x, g.bhitpos.y, FALSE))
                     return 1;
             }
         }
     }
 
-    if (flooreffects(obj, bhitpos.x, bhitpos.y, "fall"))
+    if (flooreffects(obj, g.bhitpos.x, g.bhitpos.y, "fall"))
         return 1;
     if (u.dz > 0)
-        pline_The("gold hits the %s.", surface(bhitpos.x, bhitpos.y));
-    place_object(obj, bhitpos.x, bhitpos.y);
+        pline_The("gold hits the %s.", surface(g.bhitpos.x, g.bhitpos.y));
+    place_object(obj, g.bhitpos.x, g.bhitpos.y);
     if (*u.ushops)
-        sellobj(obj, bhitpos.x, bhitpos.y);
+        sellobj(obj, g.bhitpos.x, g.bhitpos.y);
     stackobj(obj);
-    newsym(bhitpos.x, bhitpos.y);
+    newsym(g.bhitpos.x, g.bhitpos.y);
     return 1;
 }
 

@@ -322,7 +322,7 @@ register struct obj *obj;
     context.stethoscope_move = moves;
     context.stethoscope_movement = youmonst.movement;
 
-    bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
+    g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
     g.notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
@@ -370,8 +370,8 @@ register struct obj *obj;
         const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *) 0,
                                    SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
 
-        /* bhitpos needed by mstatusline() iff mtmp is a long worm */
-        bhitpos.x = rx, bhitpos.y = ry;
+        /* g.bhitpos needed by mstatusline() iff mtmp is a long worm */
+        g.bhitpos.x = rx, g.bhitpos.y = ry;
         g.notonhead = (mtmp->mx != rx || mtmp->my != ry);
 
         if (mtmp->mundetected) {
@@ -1010,9 +1010,9 @@ struct obj **optr;
 #endif
         if (obj->cursed && !rn2(4)
             /* note: once any of them are gone, we stop all of them */
-            && !(mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
-            && !(mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
-            && !(mvitals[PM_MOUNTAIN_NYMPH].mvflags & G_GONE)
+            && !(g.mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
+            && !(g.mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
+            && !(g.mvitals[PM_MOUNTAIN_NYMPH].mvflags & G_GONE)
             && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MINVENT))
                    != 0) {
             You("summon %s!", a_monnam(mtmp));
@@ -1639,9 +1639,9 @@ int magic; /* 0=Physical, otherwise skill level */
         int sp_no;
 
         for (sp_no = 0; sp_no < MAXSPELL; ++sp_no)
-            if (spl_book[sp_no].sp_id == NO_SPELL)
+            if (g.spl_book[sp_no].sp_id == NO_SPELL)
                 break;
-            else if (spl_book[sp_no].sp_id == SPE_JUMPING)
+            else if (g.spl_book[sp_no].sp_id == SPE_JUMPING)
                 return spelleffects(sp_no, FALSE);
     }
 
@@ -2729,7 +2729,7 @@ struct obj *obj;
                     You("yank yourself out of the pit!");
                     teleds(cc.x, cc.y, TRUE);
                     reset_utrap(TRUE);
-                    vision_full_recalc = 1;
+                    g.vision_full_recalc = 1;
                 }
             } else {
                 pline1(msg_slipsfree);
@@ -3018,19 +3018,19 @@ struct obj *obj;
 
     context.polearm.hitmon = (struct monst *) 0;
     /* Attack the monster there */
-    bhitpos = cc;
-    if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *) 0) {
+    g.bhitpos = cc;
+    if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != (struct monst *) 0) {
         if (attack_checks(mtmp, uwep))
             return res;
         if (overexertion())
             return 1; /* burn nutrition; maybe pass out */
         context.polearm.hitmon = mtmp;
         check_caitiff(mtmp);
-        g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+        g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
         (void) thitmonst(mtmp, uwep);
     } else if (glyph_is_statue(glyph) /* might be hallucinatory */
-               && sobj_at(STATUE, bhitpos.x, bhitpos.y)) {
-        struct trap *t = t_at(bhitpos.x, bhitpos.y);
+               && sobj_at(STATUE, g.bhitpos.x, g.bhitpos.y)) {
+        struct trap *t = t_at(g.bhitpos.x, g.bhitpos.y);
 
         if (t && t->ttyp == STATUE_TRAP
             && activate_statue_trap(t, t->tx, t->ty, FALSE)) {
@@ -3042,11 +3042,11 @@ struct obj *obj;
                because the player is probably attempting to attack it;
                other statues obscured by anything are just ignored. */
             pline("Thump!  Your blow bounces harmlessly off the statue.");
-            wake_nearto(bhitpos.x, bhitpos.y, 25);
+            wake_nearto(g.bhitpos.x, g.bhitpos.y, 25);
         }
     } else {
         /* no monster here and no statue seen or remembered here */
-        (void) unmap_invisible(bhitpos.x, bhitpos.y);
+        (void) unmap_invisible(g.bhitpos.x, g.bhitpos.y);
         You("miss; there is no one there to hit.");
     }
     u_wipe_engr(2); /* same as for melee or throwing */
@@ -3191,10 +3191,10 @@ struct obj *obj;
         }
         break;
     case 2: /* Monster */
-        bhitpos = cc;
+        g.bhitpos = cc;
         if ((mtmp = m_at(cc.x, cc.y)) == (struct monst *) 0)
             break;
-        g.notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
+        g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
         save_confirm = flags.confirm;
         if (verysmall(mtmp->data) && !rn2(4)
             && enexto(&cc, u.ux, u.uy, (struct permonst *) 0)) {
@@ -3280,7 +3280,7 @@ struct obj *obj;
         costly_alteration(obj, COST_DSTROY);
     }
 
-    current_wand = obj; /* destroy_item might reset this */
+    g.current_wand = obj; /* destroy_item might reset this */
     freeinv(obj);       /* hide it from destroy_item instead... */
     setnotworn(obj);    /* so we need to do this ourselves */
 
@@ -3358,8 +3358,8 @@ struct obj *obj;
 
     /* this makes it hit us last, so that we can see the action first */
     for (i = 0; i <= 8; i++) {
-        bhitpos.x = x = obj->ox + xdir[i];
-        bhitpos.y = y = obj->oy + ydir[i];
+        g.bhitpos.x = x = obj->ox + xdir[i];
+        g.bhitpos.y = y = obj->oy + ydir[i];
         if (!isok(x, y))
             continue;
 
@@ -3458,8 +3458,8 @@ struct obj *obj;
         litroom(TRUE, obj); /* only needs to be done once */
 
 discard_broken_wand:
-    obj = current_wand; /* [see dozap() and destroy_item()] */
-    current_wand = 0;
+    obj = g.current_wand; /* [see dozap() and destroy_item()] */
+    g.current_wand = 0;
     if (obj)
         delobj(obj);
     nomul(0);

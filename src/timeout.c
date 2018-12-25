@@ -401,15 +401,15 @@ struct kinfo *kptr;
      */
     if (emits_light(youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&youmonst));
-    save_mvflags = mvitals[PM_GREEN_SLIME].mvflags;
-    mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
+    save_mvflags = g.mvitals[PM_GREEN_SLIME].mvflags;
+    g.mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
     (void) polymon(PM_GREEN_SLIME);
-    mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
+    g.mvitals[PM_GREEN_SLIME].mvflags = save_mvflags;
     done(TURNED_SLIME);
 
     /* life-saved; even so, hero still has turned into green slime;
        player may have genocided green slimes after being infected */
-    if ((mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
+    if ((g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
         killer.format = KILLED_BY;
         Strcpy(killer.name, "slimicide");
         /* immediately follows "OK, so you don't die." */
@@ -794,7 +794,7 @@ long timeout;
         hatchcount = rnd((int) egg->quan);
         cansee_hatchspot = cansee(x, y) && !silent;
         if (!(mons[mnum].geno & G_UNIQ)
-            && !(mvitals[mnum].mvflags & (G_GENOD | G_EXTINCT))) {
+            && !(g.mvitals[mnum].mvflags & (G_GENOD | G_EXTINCT))) {
             for (i = hatchcount; i > 0; i--) {
                 if (!enexto(&cc, x, y, &mons[mnum])
                     || !(mon = makemon(&mons[mnum], cc.x, cc.y, NO_MINVENT)))
@@ -809,7 +809,7 @@ long timeout;
                             mon->mtame = 20;
                     }
                 }
-                if (mvitals[mnum].mvflags & G_EXTINCT)
+                if (g.mvitals[mnum].mvflags & G_EXTINCT)
                     break;  /* just made last one */
                 mon2 = mon; /* in case makemon() fails on 2nd egg */
             }
@@ -936,7 +936,7 @@ int mnum;
 {
     /* baby monsters hatch from grown-up eggs */
     mnum = little_to_big(mnum);
-    mvitals[mnum].mvflags |= MV_KNOWS_EGG;
+    g.mvitals[mnum].mvflags |= MV_KNOWS_EGG;
     /* we might have just learned about other eggs being carried */
     update_inventory();
 }
@@ -2183,11 +2183,11 @@ struct monst *mon;
 {
     struct monst *curr;
 
-    for (curr = migrating_mons; curr; curr = curr->nmon)
+    for (curr = g.migrating_mons; curr; curr = curr->nmon)
         if (curr == mon)
             return FALSE;
-    /* `mydogs' is used during level changes, never saved and restored */
-    for (curr = mydogs; curr; curr = curr->nmon)
+    /* `g.mydogs' is used during level changes, never saved and restored */
+    for (curr = g.mydogs; curr; curr = curr->nmon)
         if (curr == mon)
             return FALSE;
     return TRUE;

@@ -1320,8 +1320,6 @@ STATIC_VAR const struct paranoia_opts {
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
-extern struct menucoloring *menu_colorings;
-
 static const struct {
     const char *name;
     const int color;
@@ -1631,8 +1629,8 @@ char *pattern;
         return FALSE;
     }
     tmp->pattern = dupstr(pattern);
-    tmp->next = plinemsg_types;
-    plinemsg_types = tmp;
+    tmp->next = g.plinemsg_types;
+    g.plinemsg_types = tmp;
     return TRUE;
 }
 
@@ -1641,20 +1639,20 @@ msgtype_free()
 {
     struct plinemsg_type *tmp, *tmp2 = 0;
 
-    for (tmp = plinemsg_types; tmp; tmp = tmp2) {
+    for (tmp = g.plinemsg_types; tmp; tmp = tmp2) {
         tmp2 = tmp->next;
         free((genericptr_t) tmp->pattern);
         regex_free(tmp->regex);
         free((genericptr_t) tmp);
     }
-    plinemsg_types = (struct plinemsg_type *) 0;
+    g.plinemsg_types = (struct plinemsg_type *) 0;
 }
 
 STATIC_OVL void
 free_one_msgtype(idx)
 int idx; /* 0 .. */
 {
-    struct plinemsg_type *tmp = plinemsg_types;
+    struct plinemsg_type *tmp = g.plinemsg_types;
     struct plinemsg_type *prev = NULL;
 
     while (tmp) {
@@ -1667,7 +1665,7 @@ int idx; /* 0 .. */
             if (prev)
                 prev->next = next;
             else
-                plinemsg_types = next;
+                g.plinemsg_types = next;
             return;
         }
         idx--;
@@ -1681,7 +1679,7 @@ msgtype_type(msg, norepeat)
 const char *msg;
 boolean norepeat; /* called from Norep(via pline) */
 {
-    struct plinemsg_type *tmp = plinemsg_types;
+    struct plinemsg_type *tmp = g.plinemsg_types;
 
     while (tmp) {
         /* we don't exclude entries with negative msgtype values
@@ -1704,7 +1702,7 @@ int hide_mask;
     int mt;
 
     /* negative msgtype value won't be recognized by pline, so does nothing */
-    for (tmp = plinemsg_types; tmp; tmp = tmp->next) {
+    for (tmp = g.plinemsg_types; tmp; tmp = tmp->next) {
         mt = tmp->msgtype;
         if (!hide)
             mt = -mt; /* unhide: negate negative, yielding positive */
@@ -1717,7 +1715,7 @@ STATIC_OVL int
 msgtype_count(VOID_ARGS)
 {
     int c = 0;
-    struct plinemsg_type *tmp = plinemsg_types;
+    struct plinemsg_type *tmp = g.plinemsg_types;
 
     while (tmp) {
         c++;
@@ -1797,11 +1795,11 @@ int c, a;
         free(tmp);
         return FALSE;
     } else {
-        tmp->next = menu_colorings;
+        tmp->next = g.menu_colorings;
         tmp->origstr = dupstr(str);
         tmp->color = c;
         tmp->attr = a;
-        menu_colorings = tmp;
+        g.menu_colorings = tmp;
         return TRUE;
     }
 }
@@ -1862,7 +1860,7 @@ int *color, *attr;
     struct menucoloring *tmpmc;
 
     if (iflags.use_menu_color)
-        for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+        for (tmpmc = g.menu_colorings; tmpmc; tmpmc = tmpmc->next)
             if (regex_match(str, tmpmc->match)) {
                 *color = tmpmc->color;
                 *attr = tmpmc->attr;
@@ -1874,7 +1872,7 @@ int *color, *attr;
 void
 free_menu_coloring()
 {
-    struct menucoloring *tmp = menu_colorings;
+    struct menucoloring *tmp = g.menu_colorings;
 
     while (tmp) {
         struct menucoloring *tmp2 = tmp->next;
@@ -1890,7 +1888,7 @@ STATIC_OVL void
 free_one_menu_coloring(idx)
 int idx; /* 0 .. */
 {
-    struct menucoloring *tmp = menu_colorings;
+    struct menucoloring *tmp = g.menu_colorings;
     struct menucoloring *prev = NULL;
 
     while (tmp) {
@@ -1903,7 +1901,7 @@ int idx; /* 0 .. */
             if (prev)
                 prev->next = next;
             else
-                menu_colorings = next;
+                g.menu_colorings = next;
             return;
         }
         idx--;
@@ -1916,7 +1914,7 @@ STATIC_OVL int
 count_menucolors(VOID_ARGS)
 {
     int count = 0;
-    struct menucoloring *tmp = menu_colorings;
+    struct menucoloring *tmp = g.menu_colorings;
 
     while (tmp) {
         count++;
@@ -2140,23 +2138,23 @@ boolean tinitial, tfrom_file;
             } else
                 switch (lowc(*op)) {
                 case 'd': /* dog */
-                    preferred_pet = 'd';
+                    g.preferred_pet = 'd';
                     break;
                 case 'c': /* cat */
                 case 'f': /* feline */
-                    preferred_pet = 'c';
+                    g.preferred_pet = 'c';
                     break;
                 case 'h': /* horse */
                 case 'q': /* quadruped */
                     /* avoids giving "unrecognized type of pet" but
                        pet_type(dog.c) won't actually honor this */
-                    preferred_pet = 'h';
+                    g.preferred_pet = 'h';
                     break;
                 case 'n': /* no pet */
-                    preferred_pet = 'n';
+                    g.preferred_pet = 'n';
                     break;
                 case '*': /* random */
-                    preferred_pet = '\0';
+                    g.preferred_pet = '\0';
                     break;
                 default:
                     config_error_add("Unrecognized pet type '%s'.", op);
@@ -2164,7 +2162,7 @@ boolean tinitial, tfrom_file;
                     break;
                 }
         } else if (negated)
-            preferred_pet = 'n';
+            g.preferred_pet = 'n';
         return retval;
     }
 
@@ -2176,10 +2174,10 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            nmcpy(catname, op, PL_PSIZ);
+            nmcpy(g.catname, op, PL_PSIZ);
         } else
             return FALSE;
-        sanitize_name(catname);
+        sanitize_name(g.catname);
         return retval;
     }
 
@@ -2191,10 +2189,10 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            nmcpy(dogname, op, PL_PSIZ);
+            nmcpy(g.dogname, op, PL_PSIZ);
         } else
             return FALSE;
-        sanitize_name(dogname);
+        sanitize_name(g.dogname);
         return retval;
     }
 
@@ -2206,10 +2204,10 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return FALSE;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            nmcpy(horsename, op, PL_PSIZ);
+            nmcpy(g.horsename, op, PL_PSIZ);
         } else
             return FALSE;
-        sanitize_name(horsename);
+        sanitize_name(g.horsename);
         return retval;
     }
 
@@ -3974,7 +3972,7 @@ boolean tinitial, tfrom_file;
                  * isn't set up yet.
                  */
                 vision_recalc(2);       /* shut down vision */
-                vision_full_recalc = 1; /* delayed recalc */
+                g.vision_full_recalc = 1; /* delayed recalc */
                 if (iflags.use_color)
                     need_redraw = TRUE; /* darkroom refresh */
             } else if (boolopt[i].addr == &flags.showrace
@@ -5022,7 +5020,7 @@ boolean setinitial, setfromfile;
             unsigned ln;
             const char *mtype;
             menu_item *pick_list = (menu_item *) 0;
-            struct plinemsg_type *tmp = plinemsg_types;
+            struct plinemsg_type *tmp = g.plinemsg_types;
 
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
@@ -5089,7 +5087,7 @@ boolean setinitial, setfromfile;
             unsigned ln;
             const char *sattr, *sclr;
             menu_item *pick_list = (menu_item *) 0;
-            struct menucoloring *tmp = menu_colorings;
+            struct menucoloring *tmp = g.menu_colorings;
             char clrbuf[QBUFSZ];
 
             tmpwin = create_nhwindow(NHW_MENU);
@@ -5431,7 +5429,7 @@ char *buf;
                     : g.showsyms[(int) objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
     else if (!strcmp(optname, "catname"))
-        Sprintf(buf, "%s", catname[0] ? catname : none);
+        Sprintf(buf, "%s", g.catname[0] ? g.catname : none);
     else if (!strcmp(optname, "disclose"))
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             if (i)
@@ -5440,7 +5438,7 @@ char *buf;
             (void) strkitten(buf, disclosure_options[i]);
         }
     else if (!strcmp(optname, "dogname"))
-        Sprintf(buf, "%s", dogname[0] ? dogname : none);
+        Sprintf(buf, "%s", g.dogname[0] ? g.dogname : none);
     else if (!strcmp(optname, "dungeon"))
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "effects"))
@@ -5489,7 +5487,7 @@ char *buf;
     else if (!strcmp(optname, "gender"))
         Sprintf(buf, "%s", rolestring(flags.initgend, genders, adj));
     else if (!strcmp(optname, "horsename"))
-        Sprintf(buf, "%s", horsename[0] ? horsename : none);
+        Sprintf(buf, "%s", g.horsename[0] ? g.horsename : none);
     else if (!strcmp(optname, "map_mode")) {
         i = iflags.wc_map_mode;
         Sprintf(buf, "%s",
@@ -5595,10 +5593,10 @@ char *buf;
                 Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
         Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
     } else if (!strcmp(optname, "pettype")) {
-        Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"
-                           : (preferred_pet == 'd') ? "dog"
-                             : (preferred_pet == 'h') ? "horse"
-                               : (preferred_pet == 'n') ? "none"
+        Sprintf(buf, "%s", (g.preferred_pet == 'c') ? "cat"
+                           : (g.preferred_pet == 'd') ? "dog"
+                             : (g.preferred_pet == 'h') ? "horse"
+                               : (g.preferred_pet == 'n') ? "none"
                                  : "random");
     } else if (!strcmp(optname, "pickup_burden")) {
         Sprintf(buf, "%s", burdentype[flags.pickup_burden]);

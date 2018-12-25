@@ -69,17 +69,6 @@ char circle_start[] = {
 /* Vision (arbitrary line of sight)
  * =========================================*/
 
-/*------ global variables ------*/
-
-#if 0 /* (moved to decl.c) */
-/* True if we need to run a full vision recalculation. */
-boolean vision_full_recalc = 0;
-
-/* Pointers to the current vision array. */
-char    **viz_array;
-#endif
-char *viz_rmin, *viz_rmax; /* current vision cs bounds */
-
 /*------ local variables ------*/
 
 static char could_see[2][ROWNO][COLNO]; /* vision work space */
@@ -128,11 +117,11 @@ vision_init()
     }
 
     /* Start out with cs0 as our current array */
-    viz_array = cs_rows0;
-    viz_rmin = cs_rmin0;
-    viz_rmax = cs_rmax0;
+    g.viz_array = cs_rows0;
+    g.viz_rmin = cs_rmin0;
+    g.viz_rmax = cs_rmax0;
 
-    vision_full_recalc = 0;
+    g.vision_full_recalc = 0;
     (void) memset((genericptr_t) could_see, 0, sizeof(could_see));
 
     /* Initialize the vision algorithm (currently C or D). */
@@ -197,9 +186,9 @@ vision_reset()
     register struct rm *lev;
 
     /* Start out with cs0 as our current array */
-    viz_array = cs_rows0;
-    viz_rmin = cs_rmin0;
-    viz_rmax = cs_rmax0;
+    g.viz_array = cs_rows0;
+    g.viz_rmin = cs_rmin0;
+    g.viz_rmax = cs_rmax0;
 
     (void) memset((genericptr_t) could_see, 0, sizeof(could_see));
 
@@ -243,7 +232,7 @@ vision_reset()
     }
 
     iflags.vision_inited = 1; /* vision is ready */
-    vision_full_recalc = 1;   /* we want to run vision_recalc() */
+    g.vision_full_recalc = 1;   /* we want to run vision_recalc() */
 }
 
 /*
@@ -260,7 +249,7 @@ char **rmin, **rmax;
     register int row;
     register char *nrmin, *nrmax;
 
-    if (viz_array == cs_rows0) {
+    if (g.viz_array == cs_rows0) {
         *rows = cs_rows1;
         *rmin = cs_rmin1;
         *rmax = cs_rmax1;
@@ -519,7 +508,7 @@ int control;
     unsigned char *sv;                       /* ptr to seen angle bits */
     int oldseenv;                            /* previous seenv value */
 
-    vision_full_recalc = 0; /* reset flag */
+    g.vision_full_recalc = 0; /* reset flag */
     if (g.in_mklev || !iflags.vision_inited)
         return;
 
@@ -555,15 +544,15 @@ int control;
          * anything, so we only need update positions we used to be able
          * to see.
          */
-        temp_array = viz_array; /* set viz_array so newsym() will work */
-        viz_array = next_array;
+        temp_array = g.viz_array; /* set g.viz_array so newsym() will work */
+        g.viz_array = next_array;
 
         for (row = 0; row < ROWNO; row++) {
             old_row = temp_array[row];
 
             /* Find the min and max positions on the row. */
-            start = min(viz_rmin[row], next_rmin[row]);
-            stop = max(viz_rmax[row], next_rmax[row]);
+            start = min(g.viz_rmin[row], next_rmin[row]);
+            stop = max(g.viz_rmax[row], next_rmax[row]);
 
             for (col = start; col <= stop; col++)
                 if (old_row[col] & IN_SIGHT)
@@ -692,10 +681,10 @@ int control;
     do_light_sources(next_array);
 
     /*
-     * Make the viz_array the new array so that cansee() will work correctly.
+     * Make the g.viz_array the new array so that cansee() will work correctly.
      */
-    temp_array = viz_array;
-    viz_array = next_array;
+    temp_array = g.viz_array;
+    g.viz_array = next_array;
 
     /*
      * The main update loop.  Here we do two things:
@@ -721,8 +710,8 @@ int control;
         old_row = temp_array[row];
 
         /* Find the min and max positions on the row. */
-        start = min(viz_rmin[row], next_rmin[row]);
-        stop = max(viz_rmax[row], next_rmax[row]);
+        start = min(g.viz_rmin[row], next_rmin[row]);
+        stop = max(g.viz_rmax[row], next_rmax[row]);
         lev = &levl[start][row];
 
         sv = &seenv_matrix[dy + 1][start < u.ux ? 0 : (start > u.ux ? 2 : 1)];
@@ -829,8 +818,8 @@ skip:
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */
-    viz_rmin = next_rmin;
-    viz_rmax = next_rmax;
+    g.viz_rmin = next_rmin;
+    g.viz_rmax = next_rmax;
 
     recalc_mapseen();
 }
@@ -855,8 +844,8 @@ int x, y;
      * was out of night-vision range of the hero.  Suddenly the hero should
      * see the lit room.
      */
-    if (viz_array[y][x])
-        vision_full_recalc = 1;
+    if (g.viz_array[y][x])
+        g.vision_full_recalc = 1;
 }
 
 /*
@@ -872,8 +861,8 @@ int x, y;
 
     /* recalc light sources here? */
 
-    if (viz_array[y][x])
-        vision_full_recalc = 1;
+    if (g.viz_array[y][x])
+        g.vision_full_recalc = 1;
 }
 
 /*==========================================================================*\
@@ -2766,7 +2755,7 @@ genericptr_t arg;
 
         if (range > MAX_RADIUS || range < 1)
             panic("do_clear_area:  illegal range %d", range);
-        if (vision_full_recalc)
+        if (g.vision_full_recalc)
             vision_recalc(0); /* recalc vision if dirty */
         limits = circle_ptr(range);
         if ((max_y = (srow + range)) >= ROWNO)

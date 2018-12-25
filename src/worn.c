@@ -756,13 +756,13 @@ clear_bypasses()
         if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp))
             MCORPSENM(mtmp) = NON_PM;
     }
-    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
             otmp->bypass = 0;
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
-    /* billobjs and mydogs chains don't matter here */
+    /* billobjs and g.mydogs chains don't matter here */
     context.bypasses = FALSE;
 }
 

@@ -813,7 +813,7 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     struct monst *m2;
 
     /* may be too weak or have been extinguished for population control */
-    if (mon->mhp <= 1 || (mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
+    if (mon->mhp <= 1 || (g.mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
         return (struct monst *) 0;
 
     if (x == 0) {
@@ -924,24 +924,24 @@ boolean ghostly;
 {
     boolean result;
     uchar lim = mbirth_limit(mndx);
-    boolean gone = (mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
+    boolean gone = (g.mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
 
-    result = (((int) mvitals[mndx].born < lim) && !gone) ? TRUE : FALSE;
+    result = (((int) g.mvitals[mndx].born < lim) && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
     if ((mons[mndx].geno & G_UNIQ) && mndx != PM_HIGH_PRIEST)
-        mvitals[mndx].mvflags |= G_EXTINCT;
+        g.mvitals[mndx].mvflags |= G_EXTINCT;
 
-    if (mvitals[mndx].born < 255 && tally
+    if (g.mvitals[mndx].born < 255 && tally
         && (!ghostly || (ghostly && result)))
-        mvitals[mndx].born++;
-    if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN)
-        && !(mvitals[mndx].mvflags & G_EXTINCT)) {
+        g.mvitals[mndx].born++;
+    if ((int) g.mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN)
+        && !(g.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (wizard) {
             debugpline1("Automatically extinguished %s.",
                         makeplural(mons[mndx].mname));
         }
-        mvitals[mndx].mvflags |= G_EXTINCT;
+        g.mvitals[mndx].mvflags |= G_EXTINCT;
         reset_rndmonst(mndx);
     }
     return result;
@@ -1151,9 +1151,9 @@ int mmflags;
         mndx = monsndx(ptr);
         /* if you are to make a specific monster and it has
            already been genocided, return */
-        if (mvitals[mndx].mvflags & G_GENOD)
+        if (g.mvitals[mndx].mvflags & G_GENOD)
             return (struct monst *) 0;
-        if (wizard && (mvitals[mndx].mvflags & G_EXTINCT)) {
+        if (wizard && (g.mvitals[mndx].mvflags & G_EXTINCT)) {
             debugpline1("Explicitly creating extinct monster %s.",
                         mons[mndx].mname);
         }
@@ -1466,7 +1466,7 @@ int mndx;
 {
     if (mons[mndx].geno & (G_NOGEN | G_UNIQ))
         return TRUE;
-    if (mvitals[mndx].mvflags & G_GONE)
+    if (g.mvitals[mndx].mvflags & G_GONE)
         return TRUE;
     if (Inhell)
         return (boolean) (mons[mndx].maligntyp > A_NEUTRAL);
@@ -1615,7 +1615,7 @@ int mndx, mvflagsmask, genomask;
 {
     struct permonst *ptr = &mons[mndx];
 
-    if (mvitals[mndx].mvflags & mvflagsmask)
+    if (g.mvitals[mndx].mvflags & mvflagsmask)
         return FALSE;
     if (ptr->geno & genomask)
         return FALSE;
@@ -1756,7 +1756,7 @@ register struct permonst *ptr;
         /* does not depend on other strengths, but does get stronger
          * every time he is killed
          */
-        tmp = ptr->mlevel + mvitals[PM_WIZARD_OF_YENDOR].died;
+        tmp = ptr->mlevel + g.mvitals[PM_WIZARD_OF_YENDOR].died;
         if (tmp > 49)
             tmp = 49;
         return tmp;
@@ -1855,12 +1855,12 @@ struct monst *mtmp, *victim;
         /* new form might force gender change */
         fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
 
-        if (mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
+        if (g.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
                       an(ptr->mname), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
-            set_mon_data(mtmp, ptr, -1); /* keep mvitals[] accurate */
+            set_mon_data(mtmp, ptr, -1); /* keep g.mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {

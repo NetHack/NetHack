@@ -643,11 +643,11 @@ int x, y;
     portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
     if (Blind) {
         int oldglyph = door->glyph;
-        schar oldlastseentyp = lastseentyp[cc.x][cc.y];
+        schar oldlastseentyp = g.lastseentyp[cc.x][cc.y];
 
         feel_location(cc.x, cc.y);
         if (door->glyph != oldglyph
-            || lastseentyp[cc.x][cc.y] != oldlastseentyp)
+            || g.lastseentyp[cc.x][cc.y] != oldlastseentyp)
             res = 1; /* learned something */
     }
 
@@ -789,10 +789,10 @@ doclose()
     portcullis = (is_drawbridge_wall(x, y) >= 0);
     if (Blind) {
         int oldglyph = door->glyph;
-        schar oldlastseentyp = lastseentyp[x][y];
+        schar oldlastseentyp = g.lastseentyp[x][y];
 
         feel_location(x, y);
-        if (door->glyph != oldglyph || lastseentyp[x][y] != oldlastseentyp)
+        if (door->glyph != oldglyph || g.lastseentyp[x][y] != oldlastseentyp)
             res = 1; /* learned something */
     }
 
@@ -1016,7 +1016,7 @@ int x, y;
             unblock_point(x, y);
             newsym(x, y);
             /* force vision recalc before printing more messages */
-            if (vision_full_recalc)
+            if (g.vision_full_recalc)
                 vision_recalc(0);
             loudness = 20;
         } else

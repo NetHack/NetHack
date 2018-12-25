@@ -225,7 +225,7 @@ unsigned whichchains;
         }
     if (!qarti && (whichchains & (1 << OBJ_MIGRATING)) != 0) {
         /* check migrating objects and minvent of migrating monsters */
-        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+        for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
             if ((qarti = find_qarti(mtmp->minvent)) != 0)
@@ -650,12 +650,12 @@ qt_montype()
 
     if (rn2(5)) {
         qpm = urole.enemy1num;
-        if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
+        if (qpm != NON_PM && rn2(5) && !(g.mvitals[qpm].mvflags & G_GENOD))
             return &mons[qpm];
         return mkclass(urole.enemy1sym, 0);
     }
     qpm = urole.enemy2num;
-    if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
+    if (qpm != NON_PM && rn2(5) && !(g.mvitals[qpm].mvflags & G_GENOD))
         return &mons[qpm];
     return mkclass(urole.enemy2sym, 0);
 }

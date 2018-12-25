@@ -596,8 +596,8 @@ struct mkroom *sroom;
 
     /* place the shopkeeper in the given room */
     sh = sroom->fdoor;
-    sx = doors[sh].x;
-    sy = doors[sh].y;
+    sx = g.doors[sh].x;
+    sy = g.doors[sh].y;
 
     /* check that the shopkeeper placement is sane */
     if (sroom->irregular) {
@@ -639,7 +639,7 @@ struct mkroom *sroom;
             pline("doormax=%d doorct=%d fdoor=%d", g.doorindex, sroom->doorct,
                   sh);
             while (j--) {
-                pline("door [%d,%d]", doors[sh].x, doors[sh].y);
+                pline("door [%d,%d]", g.doors[sh].x, g.doors[sh].y);
                 sh++;
             }
             display_nhwindow(WIN_MESSAGE, FALSE);
@@ -663,7 +663,7 @@ struct mkroom *sroom;
     sroom->resident = shk;
     eshkp->shoptype = sroom->rtype;
     assign_level(&eshkp->shoplevel, &u.uz);
-    eshkp->shd = doors[sh];
+    eshkp->shd = g.doors[sh];
     eshkp->shk.x = sx;
     eshkp->shk.y = sy;
     eshkp->robbed = eshkp->credit = eshkp->debit = eshkp->loan = 0L;
@@ -687,12 +687,12 @@ int rmno, sh, sx,sy;
     if (sroom->irregular) {
         if (levl[sx][sy].edge
             || (int) levl[sx][sy].roomno != rmno
-            || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
+            || distmin(sx, sy, g.doors[sh].x, g.doors[sh].y) <= 1)
             return FALSE;
-    } else if ((sx == sroom->lx && doors[sh].x == sx - 1)
-               || (sx == sroom->hx && doors[sh].x == sx + 1)
-               || (sy == sroom->ly && doors[sh].y == sy - 1)
-               || (sy == sroom->hy && doors[sh].y == sy + 1))
+    } else if ((sx == sroom->lx && g.doors[sh].x == sx - 1)
+               || (sx == sroom->hx && g.doors[sh].x == sx + 1)
+               || (sy == sroom->ly && g.doors[sh].y == sy - 1)
+               || (sy == sroom->hy && g.doors[sh].y == sy + 1))
         return FALSE;
     return TRUE;
 }
@@ -720,8 +720,8 @@ register struct mkroom *sroom;
         return;
 
     /* make sure no doorways without doors, and no trapped doors, in shops */
-    sx = doors[sroom->fdoor].x;
-    sy = doors[sroom->fdoor].y;
+    sx = g.doors[sroom->fdoor].x;
+    sy = g.doors[sroom->fdoor].y;
     if (levl[sx][sy].doormask == D_NODOOR) {
         levl[sx][sy].doormask = D_ISOPEN;
         newsym(sx, sy);

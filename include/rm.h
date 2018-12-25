@@ -345,7 +345,7 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define CLEAR_FOUNTAIN_LOOTED(x, y) levl[x][y].looted &= ~F_LOOTED;
 
 /*
- * Doors are even worse :-) The special warning has a side effect
+ * doors are even worse :-) The special warning has a side effect
  * of instantly trapping the door, and if it was defined as trapped,
  * the guards consider that you have already been warned!
  */
@@ -595,8 +595,6 @@ typedef struct {
     struct cemetery *bonesinfo;
     struct levelflags flags;
 } dlevel_t;
-
-extern schar lastseentyp[COLNO][ROWNO]; /* last seen/touched dungeon typ */
 
 extern dlevel_t level; /* structure describing the current level */
 

@@ -214,8 +214,6 @@ typedef struct {
 #include "decl.h"
 #include "timeout.h"
 
-NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
-
 /* types of calls to bhit() */
 enum bhit_call_types {
     ZAPPED_WAND = 0,
@@ -357,7 +355,7 @@ typedef struct sortloot_item Loot;
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */
 #define FM_MIGRATE 0x02 /* search the migrating monster chain */
-#define FM_MYDOGS 0x04  /* search mydogs */
+#define FM_MYDOGS 0x04  /* search g.mydogs */
 #define FM_EVERYWHERE (FM_FMON | FM_MIGRATE | FM_MYDOGS)
 
 /* Flags to control pick_[race,role,gend,align] routines in role.c */

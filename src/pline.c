@@ -162,7 +162,7 @@ VA_DECL(const char *, line)
             goto pline_done;
     }
 
-    if (vision_full_recalc)
+    if (g.vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */

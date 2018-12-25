@@ -650,8 +650,8 @@ unsigned int *stuckid, *steedid;
     }
 
     migrating_objs = restobjchn(fd, FALSE, FALSE);
-    migrating_mons = restmonchn(fd, FALSE);
-    mread(fd, (genericptr_t) mvitals, sizeof(mvitals));
+    g.migrating_mons = restmonchn(fd, FALSE);
+    mread(fd, (genericptr_t) g.mvitals, sizeof(g.mvitals));
 
     /*
      * There are some things after this that can have unintended display
@@ -679,7 +679,7 @@ unsigned int *stuckid, *steedid;
     mread(fd, (genericptr_t) &moves, sizeof moves);
     mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
     mread(fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
-    mread(fd, (genericptr_t) spl_book, (MAXSPELL + 1) * sizeof (struct spell));
+    mread(fd, (genericptr_t) g.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     restore_artifacts(fd);
     restore_oracles(fd);
     if (u.ustuck)
@@ -918,7 +918,7 @@ register int fd;
        but before docrt(). */
     reglyph_darkroom();
     vision_reset();
-    vision_full_recalc = 1; /* recompute vision (not saved) */
+    g.vision_full_recalc = 1; /* recompute vision (not saved) */
 
     run_timers(); /* expire all timers that have gone off while away */
     docrt();
@@ -1055,7 +1055,7 @@ boolean ghostly;
     restcemetery(fd, &level.bonesinfo);
     rest_levl(fd,
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-    mread(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
+    mread(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
     mread(fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
     elapsed = monstermoves - g.omoves;
     mread(fd, (genericptr_t) &g.upstair, sizeof(stairway));
@@ -1066,7 +1066,7 @@ boolean ghostly;
     mread(fd, (genericptr_t) &g.updest, sizeof(dest_area));
     mread(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
     mread(fd, (genericptr_t) &level.flags, sizeof(level.flags));
-    mread(fd, (genericptr_t) doors, sizeof(doors));
+    mread(fd, (genericptr_t) g.doors, sizeof(g.doors));
     rest_rooms(fd); /* No joke :-) */
     if (g.nroom)
         g.doorindex = rooms[g.nroom - 1].fdoor + rooms[g.nroom - 1].doorct;
@@ -1078,12 +1078,12 @@ boolean ghostly;
     fmon = restmonchn(fd, ghostly);
 
     rest_worm(fd); /* restore worm information */
-    ftrap = 0;
+    g.ftrap = 0;
     while (trap = newtrap(),
            mread(fd, (genericptr_t) trap, sizeof(struct trap)),
            trap->tx != 0) { /* need "!= 0" to work around DICE 3.0 bug */
-        trap->ntrap = ftrap;
-        ftrap = trap;
+        trap->ntrap = g.ftrap;
+        g.ftrap = trap;
     }
     dealloc_trap(trap);
     fobj = restobjchn(fd, ghostly, FALSE);
@@ -1161,7 +1161,7 @@ boolean ghostly;
                 assign_level(&g.sstairs.tolev, &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
-                for (trap = ftrap; trap; trap = trap->ntrap)
+                for (trap = g.ftrap; trap; trap = trap->ntrap)
                     if (trap->ttyp == MAGIC_PORTAL)
                         break;
                 if (!trap)
@@ -1173,7 +1173,7 @@ boolean ghostly;
             struct trap *ttmp = 0;
 
             /* Remove any dangling portals. */
-            for (trap = ftrap; trap; trap = ttmp) {
+            for (trap = g.ftrap; trap; trap = ttmp) {
                 ttmp = trap->ntrap;
                 if (trap->ttyp == MAGIC_PORTAL)
                     deltrap(trap);

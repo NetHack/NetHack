@@ -157,8 +157,8 @@ int ef_flags;
     victim = carried(otmp) ? &youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
     uvictim = (victim == &youmonst);
     vismon = victim && (victim != &youmonst) && canseemon(victim);
-    /* Is bhitpos correct here? Ugh. */
-    visobj = !victim && cansee(bhitpos.x, bhitpos.y);
+    /* Is g.bhitpos correct here? Ugh. */
+    visobj = !victim && cansee(g.bhitpos.x, g.bhitpos.y);
 
     switch (type) {
     case ERODE_BURN:
@@ -356,7 +356,7 @@ int x, y, typ;
 
         for (k = 0; k < 12; ++k)
             tavail[k] = tpick[k] = 0;
-        for (t = ftrap; t; t = t->ntrap)
+        for (t = g.ftrap; t; t = t->ntrap)
             if (t->ttyp == SQKY_BOARD && t != ttmp)
                 tavail[t->tnote] = 1;
         /* now populate tpick[] with the available indices */
@@ -427,8 +427,8 @@ int x, y, typ;
     }
 
     if (!oldplace) {
-        ttmp->ntrap = ftrap;
-        ftrap = ttmp;
+        ttmp->ntrap = g.ftrap;
+        g.ftrap = ttmp;
     } else {
         /* oldplace;
            it shouldn't be possible to override a sokoban pit or hole
@@ -1269,7 +1269,7 @@ unsigned trflags;
             }
             if (!conj_pit)
                 selftouch("Falling, you");
-            vision_full_recalc = 1; /* vision limits change */
+            g.vision_full_recalc = 1; /* vision limits change */
             exercise(A_STR, FALSE);
             exercise(A_DEX, FALSE);
         }
@@ -1775,8 +1775,8 @@ int style;
                       sizeof(struct dig_info));
 
     dist = distmin(x1, y1, x2, y2);
-    bhitpos.x = x1;
-    bhitpos.y = y1;
+    g.bhitpos.x = x1;
+    g.bhitpos.y = y1;
     dx = sgn(x2 - x1);
     dy = sgn(y2 - y1);
     switch (style) {
@@ -1799,10 +1799,10 @@ int style;
     default:
         if (!delaycnt)
             delaycnt = 1;
-        if (!cansee(bhitpos.x, bhitpos.y))
+        if (!cansee(g.bhitpos.x, g.bhitpos.y))
             curs_on_u();
         tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
-        tmp_at(bhitpos.x, bhitpos.y);
+        tmp_at(g.bhitpos.x, g.bhitpos.y);
     }
     /* Mark a spot to place object in bones files to prevent
      * loss of object. Use the starting spot to ensure that
@@ -1812,27 +1812,27 @@ int style;
      * that would prevent it from ever getting there (bars), and we
      * can't tell that yet.
      */
-    launch_drop_spot(singleobj, bhitpos.x, bhitpos.y);
+    launch_drop_spot(singleobj, g.bhitpos.x, g.bhitpos.y);
 
     /* Set the object in motion */
     while (dist-- > 0 && !used_up) {
         struct trap *t;
-        tmp_at(bhitpos.x, bhitpos.y);
+        tmp_at(g.bhitpos.x, g.bhitpos.y);
         tmp = delaycnt;
 
         /* dstage@u.washington.edu -- Delay only if hero sees it */
-        if (cansee(bhitpos.x, bhitpos.y))
+        if (cansee(g.bhitpos.x, g.bhitpos.y))
             while (tmp-- > 0)
                 delay_output();
 
-        bhitpos.x += dx;
-        bhitpos.y += dy;
-        t = t_at(bhitpos.x, bhitpos.y);
+        g.bhitpos.x += dx;
+        g.bhitpos.y += dy;
+        t = t_at(g.bhitpos.x, g.bhitpos.y);
 
-        if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
+        if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
                 if (rn2(3)) {
-                    if (cansee(bhitpos.x, bhitpos.y))
+                    if (cansee(g.bhitpos.x, g.bhitpos.y))
                         pline("%s snatches the boulder.", Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
@@ -1847,7 +1847,7 @@ int style;
                 launch_drop_spot((struct obj *) 0, 0, 0);
                 break;
             }
-        } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
+        } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
             if (g.multi)
                 nomul(0);
             if (thitu(9 + singleobj->spe, dmgval(singleobj, &youmonst),
@@ -1855,8 +1855,8 @@ int style;
                 stop_occupation();
         }
         if (style == ROLL) {
-            if (down_gate(bhitpos.x, bhitpos.y) != -1) {
-                if (ship_object(singleobj, bhitpos.x, bhitpos.y, FALSE)) {
+            if (down_gate(g.bhitpos.x, g.bhitpos.y) != -1) {
+                if (ship_object(singleobj, g.bhitpos.x, g.bhitpos.y, FALSE)) {
                     used_up = TRUE;
                     launch_drop_spot((struct obj *) 0, 0, 0);
                     break;
@@ -1868,27 +1868,27 @@ int style;
                     if (rn2(10) > 2) {
                         pline(
                             "KAABLAMM!!!%s",
-                            cansee(bhitpos.x, bhitpos.y)
+                            cansee(g.bhitpos.x, g.bhitpos.y)
                                 ? " The rolling boulder triggers a land mine."
                                 : "");
                         deltrap(t);
-                        del_engr_at(bhitpos.x, bhitpos.y);
-                        place_object(singleobj, bhitpos.x, bhitpos.y);
+                        del_engr_at(g.bhitpos.x, g.bhitpos.y);
+                        place_object(singleobj, g.bhitpos.x, g.bhitpos.y);
                         singleobj->otrapped = 0;
                         fracture_rock(singleobj);
-                        (void) scatter(bhitpos.x, bhitpos.y, 4,
+                        (void) scatter(g.bhitpos.x, g.bhitpos.y, 4,
                                        MAY_DESTROY | MAY_HIT | MAY_FRACTURE
                                            | VIS_EFFECTS,
                                        (struct obj *) 0);
-                        if (cansee(bhitpos.x, bhitpos.y))
-                            newsym(bhitpos.x, bhitpos.y);
+                        if (cansee(g.bhitpos.x, g.bhitpos.y))
+                            newsym(g.bhitpos.x, g.bhitpos.y);
                         used_up = TRUE;
                         launch_drop_spot((struct obj *) 0, 0, 0);
                     }
                     break;
                 case LEVEL_TELEP:
                 case TELEP_TRAP:
-                    if (cansee(bhitpos.x, bhitpos.y))
+                    if (cansee(g.bhitpos.x, g.bhitpos.y))
                         pline("Suddenly the rolling boulder disappears!");
                     else
                         You_hear("a rumbling stop abruptly.");
@@ -1917,7 +1917,7 @@ int style;
                 case TRAPDOOR:
                     /* the boulder won't be used up if there is a
                        monster in the trap; stop rolling anyway */
-                    x2 = bhitpos.x, y2 = bhitpos.y; /* stops here */
+                    x2 = g.bhitpos.x, y2 = g.bhitpos.y; /* stops here */
                     if (flooreffects(singleobj, x2, y2, "fall")) {
                         used_up = TRUE;
                         launch_drop_spot((struct obj *) 0, 0, 0);
@@ -1928,43 +1928,43 @@ int style;
                 if (used_up || dist == -1)
                     break;
             }
-            if (flooreffects(singleobj, bhitpos.x, bhitpos.y, "fall")) {
+            if (flooreffects(singleobj, g.bhitpos.x, g.bhitpos.y, "fall")) {
                 used_up = TRUE;
                 launch_drop_spot((struct obj *) 0, 0, 0);
                 break;
             }
             if (otyp == BOULDER
-                && (otmp2 = sobj_at(BOULDER, bhitpos.x, bhitpos.y)) != 0) {
+                && (otmp2 = sobj_at(BOULDER, g.bhitpos.x, g.bhitpos.y)) != 0) {
                 const char *bmsg = " as one boulder sets another in motion";
 
-                if (!isok(bhitpos.x + dx, bhitpos.y + dy) || !dist
-                    || IS_ROCK(levl[bhitpos.x + dx][bhitpos.y + dy].typ))
+                if (!isok(g.bhitpos.x + dx, g.bhitpos.y + dy) || !dist
+                    || IS_ROCK(levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ))
                     bmsg = " as one boulder hits another";
 
                 You_hear("a loud crash%s!",
-                         cansee(bhitpos.x, bhitpos.y) ? bmsg : "");
+                         cansee(g.bhitpos.x, g.bhitpos.y) ? bmsg : "");
                 obj_extract_self(otmp2);
                 /* pass off the otrapped flag to the next boulder */
                 otmp2->otrapped = singleobj->otrapped;
                 singleobj->otrapped = 0;
-                place_object(singleobj, bhitpos.x, bhitpos.y);
+                place_object(singleobj, g.bhitpos.x, g.bhitpos.y);
                 singleobj = otmp2;
                 otmp2 = (struct obj *) 0;
-                wake_nearto(bhitpos.x, bhitpos.y, 10 * 10);
+                wake_nearto(g.bhitpos.x, g.bhitpos.y, 10 * 10);
             }
         }
-        if (otyp == BOULDER && closed_door(bhitpos.x, bhitpos.y)) {
-            if (cansee(bhitpos.x, bhitpos.y))
+        if (otyp == BOULDER && closed_door(g.bhitpos.x, g.bhitpos.y)) {
+            if (cansee(g.bhitpos.x, g.bhitpos.y))
                 pline_The("boulder crashes through a door.");
-            levl[bhitpos.x][bhitpos.y].doormask = D_BROKEN;
+            levl[g.bhitpos.x][g.bhitpos.y].doormask = D_BROKEN;
             if (dist)
-                unblock_point(bhitpos.x, bhitpos.y);
+                unblock_point(g.bhitpos.x, g.bhitpos.y);
         }
 
         /* if about to hit iron bars, do so now */
-        if (dist > 0 && isok(bhitpos.x + dx, bhitpos.y + dy)
-            && levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
-            x2 = bhitpos.x, y2 = bhitpos.y; /* object stops here */
+        if (dist > 0 && isok(g.bhitpos.x + dx, g.bhitpos.y + dy)
+            && levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ == IRONBARS) {
+            x2 = g.bhitpos.x, y2 = g.bhitpos.y; /* object stops here */
             if (hits_bars(&singleobj,
                           x2, y2, x2+dx, y2+dy,
                           !rn2(20), 0)) {
@@ -2815,7 +2815,7 @@ float_up()
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
             You("float up, out of the pit!");
-            vision_full_recalc = 1; /* vision limits change */
+            g.vision_full_recalc = 1; /* vision limits change */
             fill_pit(u.ux, u.uy);
         } else if (u.utraptype == TT_LAVA /* molten lava */
                    || u.utraptype == TT_INFLOOR) { /* solidified lava */
@@ -2950,7 +2950,7 @@ long hmask, emask; /* might cancel timeout */
         u.uy = uball->oy;
         movobj(uchain, uball->ox, uball->oy);
         newsym(u.ux0, u.uy0);
-        vision_full_recalc = 1; /* in case the hero moved. */
+        g.vision_full_recalc = 1; /* in case the hero moved. */
     }
     /* check for falling into pool - added by GAN 10/20/86 */
     if (!Flying) {
@@ -3059,7 +3059,7 @@ climb_pit()
         You("ascend from the pit.");
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
-        vision_full_recalc = 1; /* vision limits change */
+        g.vision_full_recalc = 1; /* vision limits change */
     } else if (!rn2(2) && sobj_at(BOULDER, u.ux, u.uy)) {
         Your("%s gets stuck in a crevice.", body_part(LEG));
         display_nhwindow(WIN_MESSAGE, FALSE);
@@ -3071,7 +3071,7 @@ climb_pit()
         You("%s from the pit.", Flying ? "fly" : "climb");
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
-        vision_full_recalc = 1; /* vision limits change */
+        g.vision_full_recalc = 1; /* vision limits change */
     } else if (!(--u.utrap)) {
         reset_utrap(FALSE);
         You("%s to the edge of the pit.",
@@ -3079,7 +3079,7 @@ climb_pit()
                 ? "struggle against the air currents and float"
                 : u.usteed ? "ride" : "crawl");
         fill_pit(u.ux, u.uy);
-        vision_full_recalc = 1; /* vision limits change */
+        g.vision_full_recalc = 1; /* vision limits change */
     } else if (u.dz || flags.verbose) {
         if (u.usteed)
             Norep("%s is still in a pit.", upstart(y_monnam(u.usteed)));
@@ -3420,7 +3420,7 @@ xchar x, y;
             /* this feedback is pretty clunky and can become very verbose
                when former contents of a burned container get here via
                flooreffects() */
-            if (obj == thrownobj || obj == kickedobj)
+            if (obj == g.thrownobj || obj == g.kickedobj)
                 pline("%s %s up!", is_plural(obj) ? "They" : "It",
                       otense(obj, "burn"));
             else
@@ -3764,7 +3764,7 @@ drown()
         vision_recalc(2); /* unsee old position */
         u.uinwater = 1;
         under_water(1);
-        vision_full_recalc = 1;
+        g.vision_full_recalc = 1;
         return FALSE;
     }
     if ((Teleportation || can_teleport(youmonst.data)) && !Unaware
@@ -4942,7 +4942,7 @@ struct trap *
 t_at(x, y)
 register int x, y;
 {
-    register struct trap *trap = ftrap;
+    register struct trap *trap = g.ftrap;
 
     while (trap) {
         if (trap->tx == x && trap->ty == y)
@@ -4959,10 +4959,10 @@ register struct trap *trap;
     register struct trap *ttmp;
 
     clear_conjoined_pits(trap);
-    if (trap == ftrap) {
-        ftrap = ftrap->ntrap;
+    if (trap == g.ftrap) {
+        g.ftrap = g.ftrap->ntrap;
     } else {
-        for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
+        for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap)
             if (ttmp->ntrap == trap)
                 break;
         if (!ttmp)
@@ -5399,7 +5399,7 @@ maybe_finish_sokoban()
         /* scan all remaining traps, ignoring any created by the hero;
            if this level has no more pits or holes, the current sokoban
            puzzle has been solved */
-        for (t = ftrap; t; t = t->ntrap) {
+        for (t = g.ftrap; t; t = t->ntrap) {
             if (t->madeby_u)
                 continue;
             if (t->ttyp == PIT || t->ttyp == HOLE)

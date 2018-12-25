@@ -199,7 +199,7 @@ boolean seal;
            portal will be deleted as part of arrival on that level.
            If monster movement is in progress, any who haven't moved
            yet will now miss out on a chance to wander through it... */
-        for (t = ftrap; t; t = t->ntrap)
+        for (t = g.ftrap; t; t = t->ntrap)
             if (t->ttyp == MAGIC_PORTAL)
                 break;
         if (t)

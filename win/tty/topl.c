@@ -41,7 +41,7 @@ tty_doprev_message()
                     putstr(prevmsg_win, 0, cw->data[i]);
                 i = (i + 1) % cw->rows;
             } while (i != cw->maxcol);
-            putstr(prevmsg_win, 0, toplines);
+            putstr(prevmsg_win, 0, g.toplines);
             display_nhwindow(prevmsg_win, TRUE);
             destroy_nhwindow(prevmsg_win);
         } else if (iflags.prevmsg_window == 'c') { /* combination */
@@ -49,7 +49,7 @@ tty_doprev_message()
                 morc = 0;
                 if (cw->maxcol == cw->maxrow) {
                     ttyDisplay->dismiss_more = C('p'); /* ^P ok at --More-- */
-                    redotoplin(toplines);
+                    redotoplin(g.toplines);
                     cw->maxcol--;
                     if (cw->maxcol < 0)
                         cw->maxcol = cw->rows - 1;
@@ -74,7 +74,7 @@ tty_doprev_message()
                             putstr(prevmsg_win, 0, cw->data[i]);
                         i = (i + 1) % cw->rows;
                     } while (i != cw->maxcol);
-                    putstr(prevmsg_win, 0, toplines);
+                    putstr(prevmsg_win, 0, g.toplines);
                     display_nhwindow(prevmsg_win, TRUE);
                     destroy_nhwindow(prevmsg_win);
                 }
@@ -86,7 +86,7 @@ tty_doprev_message()
             prevmsg_win = create_nhwindow(NHW_MENU);
             putstr(prevmsg_win, 0, "Message History");
             putstr(prevmsg_win, 0, "");
-            putstr(prevmsg_win, 0, toplines);
+            putstr(prevmsg_win, 0, g.toplines);
             cw->maxcol = cw->maxrow - 1;
             if (cw->maxcol < 0)
                 cw->maxcol = cw->rows - 1;
@@ -109,7 +109,7 @@ tty_doprev_message()
         do {
             morc = 0;
             if (cw->maxcol == cw->maxrow)
-                redotoplin(toplines);
+                redotoplin(g.toplines);
             else if (cw->data[cw->maxcol])
                 redotoplin(cw->data[cw->maxcol]);
             cw->maxcol--;
@@ -149,9 +149,9 @@ remember_topl()
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
-    unsigned len = strlen(toplines) + 1;
+    unsigned len = strlen(g.toplines) + 1;
 
-    if ((cw->flags & WIN_LOCKHISTORY) || !*toplines)
+    if ((cw->flags & WIN_LOCKHISTORY) || !*g.toplines)
         return;
 
     if (len > (unsigned) cw->datlen[idx]) {
@@ -161,8 +161,8 @@ remember_topl()
         cw->data[idx] = (char *) alloc(len);
         cw->datlen[idx] = (short) len;
     }
-    Strcpy(cw->data[idx], toplines);
-    *toplines = '\0';
+    Strcpy(cw->data[idx], g.toplines);
+    *g.toplines = '\0';
     cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
 }
 
@@ -232,10 +232,10 @@ register const char *bp;
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
     if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) && cw->cury == 0
-        && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
+        && n0 + (int) strlen(g.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
-        Strcat(toplines, "  ");
-        Strcat(toplines, bp);
+        Strcat(g.toplines, "  ");
+        Strcat(g.toplines, bp);
         cw->curx += 2;
         if (!(cw->flags & WIN_STOP))
             addtopl(bp);
@@ -249,10 +249,10 @@ register const char *bp;
         }
     }
     remember_topl();
-    (void) strncpy(toplines, bp, TBUFSZ);
-    toplines[TBUFSZ - 1] = 0;
+    (void) strncpy(g.toplines, bp, TBUFSZ);
+    g.toplines[TBUFSZ - 1] = 0;
 
-    for (tl = toplines; n0 >= CO; ) {
+    for (tl = g.toplines; n0 >= CO; ) {
         otl = tl;
         for (tl += CO - 1; tl != otl; --tl)
             if (*tl == ' ')
@@ -269,7 +269,7 @@ register const char *bp;
     if (!notdied)
         cw->flags &= ~WIN_STOP;
     if (!(cw->flags & WIN_STOP))
-        redotoplin(toplines);
+        redotoplin(g.toplines);
 }
 
 STATIC_OVL
@@ -503,10 +503,10 @@ char def;
         Sprintf(rtmp, "#%ld", yn_number);
     else
         (void) key2txt(q, rtmp);
-    /* addtopl(rtmp); -- rewrite toplines instead */
-    Sprintf(toplines, "%s%s", prompt, rtmp);
+    /* addtopl(rtmp); -- rewrite g.toplines instead */
+    Sprintf(g.toplines, "%s%s", prompt, rtmp);
 #ifdef DUMPLOG
-    dumplogmsg(toplines);
+    dumplogmsg(g.toplines);
 #endif
     ttyDisplay->inread--;
     ttyDisplay->toplin = 2;
@@ -536,7 +536,7 @@ boolean purge; /* clear message history buffer as we copy it */
         return;
     cw = wins[WIN_MESSAGE];
 
-    /* flush toplines[], moving most recent message to history */
+    /* flush g.toplines[], moving most recent message to history */
     remember_topl();
 
     /* for a passive snapshot, we just copy pointers, so can't allow further
@@ -666,17 +666,17 @@ boolean restoring_msghist;
     if (msg) {
         /* move most recent message to history, make this become most recent */
         remember_topl();
-        Strcpy(toplines, msg);
+        Strcpy(g.toplines, msg);
 #ifdef DUMPLOG
-        dumplogmsg(toplines);
+        dumplogmsg(g.toplines);
 #endif
     } else if (snapshot_mesgs) {
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();
-            Strcpy(toplines, snapshot_mesgs[idx]);
+            Strcpy(g.toplines, snapshot_mesgs[idx]);
 #ifdef DUMPLOG
-            dumplogmsg(toplines);
+            dumplogmsg(g.toplines);
 #endif
         }
         /* now release the snapshot */

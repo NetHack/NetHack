@@ -99,7 +99,7 @@ boolean pushing;
             if (fills_up && u.uinwater && distu(rx, ry) == 0) {
                 u.uinwater = 0;
                 docrt();
-                vision_full_recalc = 1;
+                g.vision_full_recalc = 1;
                 You("find yourself on dry land again!");
             } else if (lava && distu(rx, ry) <= 2) {
                 int dmg;
@@ -1327,11 +1327,11 @@ boolean at_stairs, falling, portal;
     (void) memset((genericptr_t) &g.updest, 0, sizeof g.updest);
     (void) memset((genericptr_t) &g.dndest, 0, sizeof g.dndest);
 
-    if (!(level_info[new_ledger].flags & LFILE_EXISTS)) {
+    if (!(g.level_info[new_ledger].flags & LFILE_EXISTS)) {
         /* entering this level for first time; make it now */
-        if (level_info[new_ledger].flags & (FORGOTTEN | VISITED)) {
+        if (g.level_info[new_ledger].flags & (FORGOTTEN | VISITED)) {
             impossible("goto_level: returning to discarded level?");
-            level_info[new_ledger].flags &= ~(FORGOTTEN | VISITED);
+            g.level_info[new_ledger].flags &= ~(FORGOTTEN | VISITED);
         }
         mklev();
         new = TRUE; /* made the level */
@@ -1350,14 +1350,14 @@ boolean at_stairs, falling, portal;
     reglyph_darkroom();
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
-    vision_full_recalc = 0; /* don't let that reenable vision yet */
+    g.vision_full_recalc = 0; /* don't let that reenable vision yet */
     flush_screen(-1);       /* ensure all map flushes are postponed */
 
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         register struct trap *ttrap;
 
-        for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap)
+        for (ttrap = g.ftrap; ttrap; ttrap = ttrap->ntrap)
             if (ttrap->ttyp == MAGIC_PORTAL)
                 break;
 
@@ -1472,11 +1472,11 @@ boolean at_stairs, falling, portal;
     else if (Is_firelevel(&u.uz))
         fumaroles();
 
-    if (level_info[new_ledger].flags & FORGOTTEN) {
+    if (g.level_info[new_ledger].flags & FORGOTTEN) {
         forget_map(ALL_MAP); /* forget the map */
         forget_traps();      /* forget all traps too */
         familiar = TRUE;
-        level_info[new_ledger].flags &= ~FORGOTTEN;
+        g.level_info[new_ledger].flags &= ~FORGOTTEN;
     }
 
     /* Reset the screen. */
@@ -1554,7 +1554,7 @@ boolean at_stairs, falling, portal;
             pline_The("heat and smoke are gone.");
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
-        if (new || !mvitals[PM_CROESUS].died) {
+        if (new || !g.mvitals[PM_CROESUS].died) {
             You("have penetrated a high security area!");
             pline("An alarm sounds!");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {

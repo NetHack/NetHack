@@ -1517,7 +1517,7 @@ movebubbles()
     /* put attached ball&chain back */
     if (Is_waterlevel(&u.uz) && Punished)
         placebc();
-    vision_full_recalc = 1;
+    g.vision_full_recalc = 1;
 }
 
 /* when moving in water, possibly (1 in 3) alter the intended destination */
@@ -1648,7 +1648,7 @@ STATIC_OVL void
 set_wportal()
 {
     /* there better be only one magic portal on water level... */
-    for (g.wportal = ftrap; g.wportal; g.wportal = g.wportal->ntrap)
+    for (g.wportal = g.ftrap; g.wportal; g.wportal = g.wportal->ntrap)
         if (g.wportal->ttyp == MAGIC_PORTAL)
             return;
     impossible("set_wportal(): no portal!");

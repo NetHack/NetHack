@@ -192,7 +192,7 @@ moverock()
                        the pit will temporarily be seen even
                        if this is one among multiple boulders */
                     if (!Blind)
-                        viz_array[ry][rx] |= IN_SIGHT;
+                        g.viz_array[ry][rx] |= IN_SIGHT;
                     if (!flooreffects(otmp, rx, ry, "fall")) {
                         place_object(otmp, rx, ry);
                     }
@@ -1531,8 +1531,8 @@ domove()
 
     u.ux0 = u.ux;
     u.uy0 = u.uy;
-    bhitpos.x = x;
-    bhitpos.y = y;
+    g.bhitpos.x = x;
+    g.bhitpos.y = y;
     tmpr = &levl[x][y];
 
     /* attack monster */
@@ -1812,7 +1812,7 @@ domove()
 
                     u.uconduct.killer++;
                     mndx = monsndx(mtmp->data);
-                    tmp = experience(mtmp, (int) mvitals[mndx].died);
+                    tmp = experience(mtmp, (int) g.mvitals[mndx].died);
                     more_experienced(tmp, 0);
                     newexplevel(); /* will decide if you go up */
                 }
@@ -2020,7 +2020,7 @@ boolean newspot;             /* true if called by spoteffects */
             u.uinwater = 0;       /* leave the water */
             if (was_underwater) { /* restore vision */
                 docrt();
-                vision_full_recalc = 1;
+                g.vision_full_recalc = 1;
             }
         }
     }
@@ -2100,7 +2100,7 @@ boolean pick;
     check_special_room(FALSE);
     if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
         dosinkfall();
-    if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
+    if (!g.in_steed_dismounting) { /* if dismounting, we'll check again later */
         boolean pit;
 
         /* if levitation is due to time out at the end of this

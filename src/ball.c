@@ -752,7 +752,7 @@ xchar x, y;
             u.ux = x - u.dx;
             u.uy = y - u.dy;
         }
-        vision_full_recalc = 1; /* hero has moved, recalculate vision later */
+        g.vision_full_recalc = 1; /* hero has moved, recalculate vision later */
 
         if (Blind) {
             /* drop glyph under the chain */
