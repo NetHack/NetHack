@@ -562,10 +562,10 @@ long wp_mask;
         if (spec_m2(otmp)) {
             if (on) {
                 EWarn_of_mon |= wp_mask;
-                context.warntype.obj |= spec_m2(otmp);
+                g.context.warntype.obj |= spec_m2(otmp);
             } else {
                 EWarn_of_mon &= ~wp_mask;
-                context.warntype.obj &= ~spec_m2(otmp);
+                g.context.warntype.obj &= ~spec_m2(otmp);
             }
             see_monsters();
         } else {
@@ -1033,7 +1033,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                     u.uenmax--;
                     if (u.uen > 0)
                         u.uen--;
-                    context.botl = 1;
+                    g.context.botl = 1;
                 }
             } else {
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
@@ -1042,7 +1042,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                     You("absorb magical energy!");
                     u.uenmax++;
                     u.uen++;
-                    context.botl = 1;
+                    g.context.botl = 1;
                 }
             }
         }
@@ -1464,7 +1464,7 @@ struct obj *obj;
                 make_slimed(0L, (char *) 0);
             if (Blinded > creamed)
                 make_blinded(creamed, FALSE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         }
         case ENERGY_BOOST: {
@@ -1477,7 +1477,7 @@ struct obj *obj;
             if (epboost) {
                 You_feel("re-energized.");
                 u.uen += epboost;
-                context.botl = 1;
+                g.context.botl = 1;
             } else
                 goto nothing_special;
             break;
@@ -1807,7 +1807,7 @@ long *abil;
 
     for (obj = g.invent; obj; obj = obj->nobj) {
         if (obj->oartifact
-            && (abil != &EWarn_of_mon || context.warntype.obj)) {
+            && (abil != &EWarn_of_mon || g.context.warntype.obj)) {
             const struct artifact *art = get_artifact(obj);
 
             if (art) {

@@ -372,8 +372,8 @@ xchar x, y;
     struct obj *boulder = sobj_at(BOULDER, x, y);
     const char *digtxt = (char *) 0, *dmgtxt = (char *) 0;
 
-    if (context.digging.down) /* not continuing previous dig (w/ pick-axe) */
-        (void) memset((genericptr_t) &context.digging, 0,
+    if (g.context.digging.down) /* not continuing previous dig (w/ pick-axe) */
+        (void) memset((genericptr_t) &g.context.digging, 0,
                       sizeof (struct dig_info));
 
     if (!boulder
@@ -388,16 +388,16 @@ xchar x, y;
                     : "hard stone");
         nomul(0);
         return 1;
-    } else if (context.digging.pos.x != x || context.digging.pos.y != y
-               || !on_level(&context.digging.level, &u.uz)) {
-        context.digging.down = FALSE;
-        context.digging.chew = TRUE;
-        context.digging.warned = FALSE;
-        context.digging.pos.x = x;
-        context.digging.pos.y = y;
-        assign_level(&context.digging.level, &u.uz);
+    } else if (g.context.digging.pos.x != x || g.context.digging.pos.y != y
+               || !on_level(&g.context.digging.level, &u.uz)) {
+        g.context.digging.down = FALSE;
+        g.context.digging.chew = TRUE;
+        g.context.digging.warned = FALSE;
+        g.context.digging.pos.x = x;
+        g.context.digging.pos.y = y;
+        assign_level(&g.context.digging.level, &u.uz);
         /* solid rock takes more work & time to dig through */
-        context.digging.effort =
+        g.context.digging.effort =
             (IS_ROCK(lev->typ) && !IS_TREE(lev->typ) ? 30 : 60) + u.udaminc;
         You("start chewing %s %s.",
             (boulder || IS_TREE(lev->typ) || lev->typ == IRONBARS)
@@ -414,10 +414,10 @@ xchar x, y;
                             : "door");
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
-    } else if ((context.digging.effort += (30 + u.udaminc)) <= 100) {
+    } else if ((g.context.digging.effort += (30 + u.udaminc)) <= 100) {
         if (flags.verbose)
             You("%s chewing on the %s.",
-                context.digging.chew ? "continue" : "begin",
+                g.context.digging.chew ? "continue" : "begin",
                 boulder
                     ? "boulder"
                     : IS_TREE(lev->typ)
@@ -427,7 +427,7 @@ xchar x, y;
                             : (lev->typ == IRONBARS)
                                 ? "bars"
                                 : "door");
-        context.digging.chew = TRUE;
+        g.context.digging.chew = TRUE;
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     }
@@ -451,7 +451,7 @@ xchar x, y;
             || sobj_at(BOULDER, x, y)) {
             block_point(x, y); /* delobj will unblock the point */
             /* reset dig state */
-            (void) memset((genericptr_t) &context.digging, 0,
+            (void) memset((genericptr_t) &g.context.digging, 0,
                           sizeof (struct dig_info));
             return 1;
         }
@@ -510,7 +510,7 @@ xchar x, y;
         You1(digtxt); /* after newsym */
     if (dmgtxt)
         pay_for_damage(dmgtxt, FALSE);
-    (void) memset((genericptr_t) &context.digging, 0,
+    (void) memset((genericptr_t) &g.context.digging, 0,
                   sizeof (struct dig_info));
     return 0;
 }
@@ -697,7 +697,7 @@ int mode;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
-    context.door_opened = FALSE;
+    g.context.door_opened = FALSE;
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
@@ -729,7 +729,7 @@ int mode;
             /* Eat the rock. */
             if (mode == DO_MOVE && still_chewing(x, y))
                 return FALSE;
-        } else if (flags.autodig && !context.run && !context.nopick && uwep
+        } else if (flags.autodig && !g.context.run && !g.context.nopick && uwep
                    && is_pick(uwep)) {
             /* MRKR: Automatic digging when wielding the appropriate tool */
             if (mode == DO_MOVE)
@@ -773,9 +773,9 @@ int mode;
                     if (amorphous(g.youmonst.data))
                         You(
    "try to ooze under the door, but can't squeeze your possessions through.");
-                    if (flags.autoopen && !context.run && !Confusion
+                    if (flags.autoopen && !g.context.run && !Confusion
                         && !Stunned && !Fumbling) {
-                        context.door_opened = context.move =
+                        g.context.door_opened = g.context.move =
                             doopen_indir(x, y);
                     } else if (x == ux || y == uy) {
                         if (Blind || Stunned || ACURR(A_DEX) < 10
@@ -837,7 +837,7 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (context.run == 8 && (mode != DO_MOVE)
+    if (g.context.run == 8 && (mode != DO_MOVE)
         && (x != u.ux || y != u.uy)) {
         struct trap *t = t_at(x, y);
 
@@ -862,7 +862,7 @@ int mode;
     }
 
     if (sobj_at(BOULDER, x, y) && (Sokoban || !Passes_walls)) {
-        if (!(Blind || Hallucination) && (context.run >= 2)
+        if (!(Blind || Hallucination) && (g.context.run >= 2)
             && mode != TEST_TRAV) {
             if (mode == DO_MOVE && iflags.mention_walls)
                 pline("A boulder blocks your path.");
@@ -911,10 +911,10 @@ findtravelpath(mode)
 int mode;
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
-    if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && context.travel1
+    if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
         && distmin(u.ux, u.uy, u.tx, u.ty) == 1
         && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
-        context.run = 0;
+        g.context.run = 0;
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
             if (mode == TRAVP_TRAVEL) {
                 u.dx = u.tx - u.ux;
@@ -925,7 +925,7 @@ int mode;
             return TRUE;
         }
         if (mode == TRAVP_TRAVEL)
-            context.run = 8;
+            g.context.run = 8;
     }
     if (u.tx != u.ux || u.ty != u.uy) {
         xchar travel[COLNO][ROWNO];
@@ -1041,7 +1041,7 @@ int mode;
                                     && x == u.tx && y == u.ty) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
-                                    context.run = 8;
+                                    g.context.run = 8;
                                     iflags.travelcc.x = iflags.travelcc.y = 0;
                                 }
                                 return TRUE;
@@ -1341,10 +1341,10 @@ domove()
 
     u_wipe_engr(rnd(5));
 
-    if (context.travel) {
+    if (g.context.travel) {
         if (!findtravelpath(FALSE))
             (void) findtravelpath(TRUE);
-        context.travel1 = 0;
+        g.context.travel1 = 0;
     }
 
     if (((wtcap = near_capacity()) >= OVERLOADED
@@ -1448,7 +1448,7 @@ domove()
         if (((trap = t_at(x, y)) && trap->tseen)
             || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
-            if (context.run >= 2) {
+            if (g.context.run >= 2) {
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
                         int tt = what_trap(trap->ttyp);
@@ -1461,7 +1461,7 @@ domove()
                     }
                 }
                 nomul(0);
-                context.move = 0;
+                g.context.move = 0;
                 return;
             } else
                 nomul(0);
@@ -1517,13 +1517,13 @@ domove()
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
-            if (context.run && ((!Blind && mon_visible(mtmp)
+            if (g.context.run && ((!Blind && mon_visible(mtmp)
                                  && ((mtmp->m_ap_type != M_AP_FURNITURE
                                       && mtmp->m_ap_type != M_AP_OBJECT)
                                      || Protection_from_shape_changers))
                                 || sensemon(mtmp))) {
                 nomul(0);
-                context.move = 0;
+                g.context.move = 0;
                 return;
             }
         }
@@ -1540,7 +1540,7 @@ domove()
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safepet(mtmp) || context.forcefight)
+        if (!is_safepet(mtmp) || g.context.forcefight)
             nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
@@ -1557,7 +1557,7 @@ domove()
          * attack_check(), which still wastes a turn, but prints a
          * different message and makes the player remember the monster.
          */
-        if (context.nopick && !context.travel
+        if (g.context.nopick && !g.context.travel
             && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
             if (mtmp->m_ap_type && !Protection_from_shape_changers
                 && !sensemon(mtmp))
@@ -1569,7 +1569,7 @@ domove()
                 You("move right into %s.", mon_nam(mtmp));
             return;
         }
-        if (context.forcefight || !mtmp->mundetected || sensemon(mtmp)
+        if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
             || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
                 && !is_safepet(mtmp))) {
             /* try to attack; note that it might evade */
@@ -1579,7 +1579,7 @@ domove()
         }
     }
 
-    if (context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
+    if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
         struct obj *obj = uwep;
 
         if (breaktest(obj)) {
@@ -1594,9 +1594,9 @@ domove()
     }
 
     /* specifying 'F' with no monster wastes a turn */
-    if (context.forcefight
+    if (g.context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
+        || (glyph_is_invisible(levl[x][y].glyph) && !g.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
                 solid = !accessible(x, y);
@@ -1614,7 +1614,7 @@ domove()
 
             /* force fight at boulder/statue or wall/door while wielding
                pick:  start digging to break the boulder or wall */
-            if (context.forcefight
+            if (g.context.forcefight
                 /* can we dig? */
                 && uwep && dig_typ(uwep, x, y)
                 /* should we dig? */
@@ -1688,8 +1688,8 @@ domove()
     }
 
     if (!test_move(u.ux, u.uy, x - u.ux, y - u.uy, DO_MOVE)) {
-        if (!context.door_opened) {
-            context.move = 0;
+        if (!g.context.door_opened) {
+            g.context.move = 0;
             nomul(0);
         }
         return;
@@ -1835,8 +1835,8 @@ domove()
     }
 
     reset_occupations();
-    if (context.run) {
-        if (context.run < 8)
+    if (g.context.run) {
+        if (g.context.run < 8)
             if (IS_DOOR(tmpr->typ) || IS_ROCK(tmpr->typ)
                 || IS_FURNITURE(tmpr->typ))
                 nomul(0);
@@ -1880,11 +1880,11 @@ domove()
         g.nomovemsg = "";
     }
 
-    if (context.run && flags.runmode != RUN_TPORT) {
+    if (g.context.run && flags.runmode != RUN_TPORT) {
         /* display every step or every 7th step depending upon mode */
         if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
             if (flags.time)
-                context.botl = 1;
+                g.context.botl = 1;
             curs_on_u();
             delay_output();
             if (flags.runmode == RUN_CRAWL) {
@@ -1981,7 +1981,7 @@ switch_terrain()
             You("start flying.");
     }
     if ((!Levitation ^ was_levitating) || (!Flying ^ was_flying))
-        context.botl = TRUE; /* update Lev/Fly status condition */
+        g.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
 /* extracted from spoteffects; called by spoteffects to check for entering or
@@ -2612,7 +2612,7 @@ lookaround()
         return;
     }
 
-    if (Blind || context.run == 0)
+    if (Blind || g.context.run == 0)
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
@@ -2625,9 +2625,9 @@ lookaround()
                 && mtmp->m_ap_type != M_AP_FURNITURE
                 && mtmp->m_ap_type != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
-                if ((context.run != 1 && !mtmp->mtame)
+                if ((g.context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
-                        && !context.travel)) {
+                        && !g.context.travel)) {
                     if (iflags.mention_walls)
                         pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
@@ -2645,7 +2645,7 @@ lookaround()
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 if (x != u.ux && y != u.uy)
                     continue;
-                if (context.run != 1) {
+                if (g.context.run != 1) {
                     if (iflags.mention_walls)
                         You("stop in front of the door.");
                     goto stop;
@@ -2654,8 +2654,8 @@ lookaround()
             } else if (levl[x][y].typ == CORR) {
             bcorr:
                 if (levl[u.ux][u.uy].typ != ROOM) {
-                    if (context.run == 1 || context.run == 3
-                        || context.run == 8) {
+                    if (g.context.run == 1 || g.context.run == 3
+                        || g.context.run == 8) {
                         i = dist2(x, y, u.ux + u.dx, u.uy + u.dy);
                         if (i > 2)
                             continue;
@@ -2672,7 +2672,7 @@ lookaround()
                 }
                 continue;
             } else if ((trap = t_at(x, y)) && trap->tseen) {
-                if (context.run == 1)
+                if (g.context.run == 1)
                     goto bcorr; /* if you must */
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
@@ -2700,9 +2700,9 @@ lookaround()
                 }
                 continue;
             } else { /* e.g. objects or trap or stairs */
-                if (context.run == 1)
+                if (g.context.run == 1)
                     goto bcorr;
-                if (context.run == 8)
+                if (g.context.run == 8)
                     continue;
                 if (mtmp)
                     continue; /* d */
@@ -2715,12 +2715,12 @@ lookaround()
             return;
         } /* end for loops */
 
-    if (corrct > 1 && context.run == 2) {
+    if (corrct > 1 && g.context.run == 2) {
         if (iflags.mention_walls)
             pline_The("corridor widens here.");
         goto stop;
     }
-    if ((context.run == 1 || context.run == 3 || context.run == 8) && !noturn
+    if ((g.context.run == 1 || g.context.run == 3 || g.context.run == 8) && !noturn
         && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */
         if (i0 == 2) {
@@ -2828,7 +2828,7 @@ register int nval;
     g.multi = nval;
     if (nval == 0)
         g.multi_reason = NULL;
-    context.travel = context.travel1 = context.mv = context.run = 0;
+    g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
 }
 
 /* called when a non-movement, multi-turn action has completed */
@@ -2900,7 +2900,7 @@ boolean k_format;
         u.mh -= n;
         if (u.mhmax < u.mh)
             u.mhmax = u.mh;
-        context.botl = 1;
+        g.context.botl = 1;
         if (u.mh < 1)
             rehumanize();
         else if (n > 0 && u.mh * 10 < u.mhmax && Unchanging)
@@ -2912,8 +2912,8 @@ boolean k_format;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
     else
-        context.travel = context.travel1 = context.mv = context.run = 0;
-    context.botl = 1;
+        g.context.travel = g.context.travel1 = g.context.mv = g.context.run = 0;
+    g.context.botl = 1;
     if (u.uhp < 1) {
         g.killer.format = k_format;
         if (g.killer.name != knam) /* the thing that killed you */

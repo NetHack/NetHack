@@ -13,12 +13,6 @@ int locknum = 0; /* max num of simultaneous users */
 char *catmore = 0; /* default pager */
 #endif
 
-/*
- *      The following structure will be initialized at startup time with
- *      the level numbers of some "important" things in the game.
- */
-
-
 const char quitchars[] = " \r\n\033";
 const char vowels[] = "aeiouAEIOU";
 const char ynchars[] = "yn";
@@ -48,7 +42,6 @@ const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
-NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
 #ifdef SYSFLAGS
 NEARDATA struct sysflag sysflags = DUMMY;
@@ -318,6 +311,7 @@ const struct instance_globals g_init = {
 #endif /* MICRO || WIN32 */
     DUMMY, /* youmonst */
     NULL, /* invent */
+    DUMMY, /* context */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */

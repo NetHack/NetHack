@@ -3958,7 +3958,7 @@ boolean tinitial, tfrom_file;
 #ifdef STATUS_HILITES
                 status_initialize(REASSESS_ONLY);
 #endif
-                context.botl = TRUE;
+                g.context.botl = TRUE;
             } else if (boolopt[i].addr == &flags.invlet_constant) {
                 if (flags.invlet_constant)
                     reassign();
@@ -6244,7 +6244,7 @@ struct fruit *replace_fruit;
     g.ffruit = f;
  nonew:
     if (user_specified)
-        context.current_fruit = f->fid;
+        g.context.current_fruit = f->fid;
     return f->fid;
 }
 

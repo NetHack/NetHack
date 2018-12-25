@@ -344,7 +344,7 @@ int trouble;
         }
         You("can breathe again.");
         Strangled = 0;
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case TROUBLE_LAVA:
         You("are back on solid ground.");
@@ -358,7 +358,7 @@ int trouble;
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
         init_uhunger();
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case TROUBLE_SICK:
         You_feel("better.");
@@ -384,14 +384,14 @@ int trouble;
         if (u.uhpmax <= 5)
             u.uhpmax = 5 + 1;
         u.uhp = u.uhpmax;
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case TROUBLE_COLLAPSING:
         /* override Fixed_abil; uncurse that if feasible */
         You_feel("%sstronger.",
                  (AMAX(A_STR) - ABASE(A_STR) > 6) ? "much " : "");
         ABASE(A_STR) = AMAX(A_STR);
-        context.botl = 1;
+        g.context.botl = 1;
         if (Fixed_abil) {
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
@@ -503,7 +503,7 @@ int trouble;
         for (i = 0; i < A_MAX; i++) {
             if (ABASE(i) < AMAX(i)) {
                 ABASE(i) = AMAX(i);
-                context.botl = 1;
+                g.context.botl = 1;
             }
         }
         (void) encumber_msg();
@@ -1071,7 +1071,7 @@ aligntyp g_align;
                 u.mh = u.mhmax;
             if (ABASE(A_STR) < AMAX(A_STR)) {
                 ABASE(A_STR) = AMAX(A_STR);
-                context.botl = 1; /* before potential message */
+                g.context.botl = 1; /* before potential message */
                 (void) encumber_msg();
             }
             if (u.uhunger < 900)
@@ -1086,7 +1086,7 @@ aligntyp g_align;
                rather than issuing a pat-on-head */
             u.ucreamed = 0;
             make_blinded(0L, TRUE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         case 4: {
             register struct obj *otmp;

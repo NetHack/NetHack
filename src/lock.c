@@ -490,7 +490,7 @@ struct obj *pick;
             g.xlock.box = 0;
         }
     }
-    context.move = 0;
+    g.context.move = 0;
     g.xlock.chance = ch;
     g.xlock.picktyp = picktyp;
     g.xlock.magic_key = is_magic_key(&g.youmonst, pick);

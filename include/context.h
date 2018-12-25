@@ -142,6 +142,4 @@ struct context_info {
     struct novel_tracking novel;
 };
 
-extern NEARDATA struct context_info context;
-
 #endif /* CONTEXT_H */

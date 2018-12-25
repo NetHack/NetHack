@@ -80,7 +80,7 @@ struct obj *obj;
 long oldprop; /* prop[].extrinsic, with obj->owornmask stripped by caller */
 boolean on;
 {
-    if (on ? g.initial_don : context.takeoff.cancelled_don)
+    if (on ? g.initial_don : g.context.takeoff.cancelled_don)
         return;
 
     if (!oldprop /* extrinsic stealth from something else */
@@ -114,7 +114,7 @@ struct obj *obj;
 long oldprop; /* prop[].extrinsic, with obj->owornmask stripped by caller */
 boolean on;
 {
-    if (on ? g.initial_don : context.takeoff.cancelled_don)
+    if (on ? g.initial_don : g.context.takeoff.cancelled_don)
         return;
 
     if (!oldprop /* extrinsic displacement from something else */
@@ -203,14 +203,14 @@ Boots_off(VOID_ARGS)
     int otyp = otmp->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_BOOTS;
 
-    context.takeoff.mask &= ~W_ARMF;
+    g.context.takeoff.mask &= ~W_ARMF;
     /* For levitation, float_down() returns if Levitation, so we
      * must do a setworn() _before_ the levitation case.
      */
     setworn((struct obj *) 0, W_ARMF);
     switch (otyp) {
     case SPEED_BOOTS:
-        if (!Very_fast && !context.takeoff.cancelled_don) {
+        if (!Very_fast && !g.context.takeoff.cancelled_don) {
             makeknown(otyp);
             You_feel("yourself slow down%s.", Fast ? " a bit" : "");
         }
@@ -219,7 +219,7 @@ Boots_off(VOID_ARGS)
         /* check for lava since fireproofed boots make it viable */
         if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))
             && !Levitation && !Flying && !is_clinger(g.youmonst.data)
-            && !context.takeoff.cancelled_don
+            && !g.context.takeoff.cancelled_don
             /* avoid recursive call to lava_effects() */
             && !iflags.in_lava_effects) {
             /* make boots known in case you survive the drowning */
@@ -236,7 +236,7 @@ Boots_off(VOID_ARGS)
         break;
     case LEVITATION_BOOTS:
         if (!oldprop && !HLevitation && !(BLevitation & FROMOUTSIDE)
-            && !context.takeoff.cancelled_don) {
+            && !g.context.takeoff.cancelled_don) {
             (void) float_down(0L, 0L);
             makeknown(otyp);
         } else {
@@ -252,7 +252,7 @@ Boots_off(VOID_ARGS)
     default:
         impossible(unknown_type, c_boots, otyp);
     }
-    context.takeoff.cancelled_don = FALSE;
+    g.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
 
@@ -316,7 +316,7 @@ Cloak_off(VOID_ARGS)
     int otyp = otmp->otyp;
     long oldprop = u.uprops[objects[otyp].oc_oprop].extrinsic & ~WORN_CLOAK;
 
-    context.takeoff.mask &= ~W_ARMC;
+    g.context.takeoff.mask &= ~W_ARMC;
     /* For mummy wrapping, taking it off first resets `Invisible'. */
     setworn((struct obj *) 0, W_ARMC);
     switch (otyp) {
@@ -382,7 +382,7 @@ Helmet_on(VOID_ARGS)
          * and the actual enchantment of the hat is irrelevant.
          */
         ABON(A_CHA) += (Role_if(PM_WIZARD) ? 1 : -1);
-        context.botl = 1;
+        g.context.botl = 1;
         makeknown(uarmh->otyp);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
@@ -404,7 +404,7 @@ Helmet_on(VOID_ARGS)
                       hcolor(NH_BLACK));
             curse(uarmh);
         }
-        context.botl = 1; /* reveal new alignment or INT & WIS */
+        g.context.botl = 1; /* reveal new alignment or INT & WIS */
         if (Hallucination) {
             pline("My brain hurts!"); /* Monty Python's Flying Circus */
         } else if (uarmh && uarmh->otyp == DUNCE_CAP) {
@@ -427,7 +427,7 @@ Helmet_on(VOID_ARGS)
 int
 Helmet_off(VOID_ARGS)
 {
-    context.takeoff.mask &= ~W_ARMH;
+    g.context.takeoff.mask &= ~W_ARMH;
 
     switch (uarmh->otyp) {
     case FEDORA:
@@ -438,12 +438,12 @@ Helmet_off(VOID_ARGS)
     case ORCISH_HELM:
         break;
     case DUNCE_CAP:
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case CORNUTHAUM:
-        if (!context.takeoff.cancelled_don) {
+        if (!g.context.takeoff.cancelled_don) {
             ABON(A_CHA) += (Role_if(PM_WIZARD) ? -1 : 1);
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case HELM_OF_TELEPATHY:
@@ -452,7 +452,7 @@ Helmet_off(VOID_ARGS)
         see_monsters();
         return 0;
     case HELM_OF_BRILLIANCE:
-        if (!context.takeoff.cancelled_don)
+        if (!g.context.takeoff.cancelled_don)
             adj_abon(uarmh, -uarmh->spe);
         break;
     case HELM_OF_OPPOSITE_ALIGNMENT:
@@ -465,7 +465,7 @@ Helmet_off(VOID_ARGS)
         impossible(unknown_type, c_helmet, uarmh->otyp);
     }
     setworn((struct obj *) 0, W_ARMH);
-    context.takeoff.cancelled_don = FALSE;
+    g.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
 
@@ -485,7 +485,7 @@ Gloves_on(VOID_ARGS)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        context.botl = 1; /* taken care of in attrib.c */
+        g.context.botl = 1; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
         adj_abon(uarmg, uarmg->spe);
@@ -525,9 +525,9 @@ Gloves_off(VOID_ARGS)
 {
     long oldprop =
         u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
-    boolean on_purpose = !context.mon_moving && !uarmg->in_use;
+    boolean on_purpose = !g.context.mon_moving && !uarmg->in_use;
 
-    context.takeoff.mask &= ~W_ARMG;
+    g.context.takeoff.mask &= ~W_ARMG;
 
     switch (uarmg->otyp) {
     case LEATHER_GLOVES:
@@ -538,17 +538,17 @@ Gloves_off(VOID_ARGS)
         break;
     case GAUNTLETS_OF_POWER:
         makeknown(uarmg->otyp);
-        context.botl = 1; /* taken care of in attrib.c */
+        g.context.botl = 1; /* taken care of in attrib.c */
         break;
     case GAUNTLETS_OF_DEXTERITY:
-        if (!context.takeoff.cancelled_don)
+        if (!g.context.takeoff.cancelled_don)
             adj_abon(uarmg, -uarmg->spe);
         break;
     default:
         impossible(unknown_type, c_gloves, uarmg->otyp);
     }
     setworn((struct obj *) 0, W_ARMG);
-    context.takeoff.cancelled_don = FALSE;
+    g.context.takeoff.cancelled_don = FALSE;
     (void) encumber_msg(); /* immediate feedback for GoP */
 
     /* prevent wielding cockatrice when not wearing gloves */
@@ -588,7 +588,7 @@ Shield_on(VOID_ARGS)
 int
 Shield_off(VOID_ARGS)
 {
-    context.takeoff.mask &= ~W_ARMS;
+    g.context.takeoff.mask &= ~W_ARMS;
 
     /* no shield currently requires special handling when taken off, but we
        keep this uncommented in case somebody adds a new one which does */
@@ -628,7 +628,7 @@ Shirt_on(VOID_ARGS)
 int
 Shirt_off(VOID_ARGS)
 {
-    context.takeoff.mask &= ~W_ARMU;
+    g.context.takeoff.mask &= ~W_ARMU;
 
     /* no shirt currently requires special handling when taken off, but we
        keep this uncommented in case somebody adds a new one which does */
@@ -658,9 +658,9 @@ Armor_on(VOID_ARGS)
 int
 Armor_off(VOID_ARGS)
 {
-    context.takeoff.mask &= ~W_ARM;
+    g.context.takeoff.mask &= ~W_ARM;
     setworn((struct obj *) 0, W_ARM);
-    context.takeoff.cancelled_don = FALSE;
+    g.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
 
@@ -670,9 +670,9 @@ Armor_off(VOID_ARGS)
 int
 Armor_gone()
 {
-    context.takeoff.mask &= ~W_ARM;
+    g.context.takeoff.mask &= ~W_ARM;
     setnotworn(uarm);
-    context.takeoff.cancelled_don = FALSE;
+    g.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
 
@@ -711,7 +711,7 @@ Amulet_on()
             makeknown(AMULET_OF_CHANGE);
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
-            context.botl = 1;
+            g.context.botl = 1;
         } else
             /* already polymorphed into single-gender monster; only
                changed the character's base sex */
@@ -728,7 +728,7 @@ Amulet_on()
         if (can_be_strangled(&g.youmonst)) {
             makeknown(AMULET_OF_STRANGULATION);
             Strangled = 6L;
-            context.botl = TRUE;
+            g.context.botl = TRUE;
             pline("It constricts your throat!");
         }
         break;
@@ -748,7 +748,7 @@ Amulet_on()
 void
 Amulet_off()
 {
-    context.takeoff.mask &= ~W_AMUL;
+    g.context.takeoff.mask &= ~W_AMUL;
 
     switch (uamul->otyp) {
     case AMULET_OF_ESP:
@@ -780,7 +780,7 @@ Amulet_off()
     case AMULET_OF_STRANGULATION:
         if (Strangled) {
             Strangled = 0L;
-            context.botl = TRUE;
+            g.context.botl = TRUE;
             if (Breathless)
                 Your("%s is no longer constricted!", body_part(NECK));
             else
@@ -927,7 +927,7 @@ register struct obj *obj;
            already discovered, both handled by learnring()] */
         if (observable || !extremeattr(which))
             learnring(obj, observable);
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         u.uhitinc += obj->spe;
@@ -959,7 +959,7 @@ boolean gone;
     int old_attrib, which;
     boolean observable;
 
-    context.takeoff.mask &= ~mask;
+    g.context.takeoff.mask &= ~mask;
     if (!(u.uprops[objects[obj->otyp].oc_oprop].extrinsic & mask))
         impossible("Strange... I didn't know you had that ring.");
     if (gone)
@@ -1037,7 +1037,7 @@ boolean gone;
         /* same criteria as Ring_on() */
         if (observable || !extremeattr(which))
             learnring(obj, observable);
-        context.botl = 1;
+        g.context.botl = 1;
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         u.uhitinc -= obj->spe;
@@ -1122,7 +1122,7 @@ register struct obj *otmp;
         impossible("Blindf_off without otmp");
         return;
     }
-    context.takeoff.mask &= ~W_TOOL;
+    g.context.takeoff.mask &= ~W_TOOL;
     setworn((struct obj *) 0, otmp->owornmask);
     off_msg(otmp);
 
@@ -1221,7 +1221,7 @@ boolean
 doffing(otmp)
 struct obj *otmp;
 {
-    long what = context.takeoff.what;
+    long what = g.context.takeoff.what;
     boolean result = FALSE;
 
     /* 'T' (or 'R' used for armor) sets afternmv, 'A' sets takeoff.what */
@@ -1274,9 +1274,9 @@ long slotmask;
      * matter whether cancel_don() gets called here--the item has already
      * been removed by now.]
      */
-    if (!(context.takeoff.mask & I_SPECIAL) && donning(obj))
+    if (!(g.context.takeoff.mask & I_SPECIAL) && donning(obj))
         cancel_don(); /* applies to doffing too */
-    context.takeoff.mask &= ~slotmask;
+    g.context.takeoff.mask &= ~slotmask;
 }
 
 /* despite their names, cancel_don() and cancel_doff() both apply to both
@@ -1288,14 +1288,14 @@ cancel_don()
      * wasting time on it (and don't dereference it when donning would
      * otherwise finish)
      */
-    context.takeoff.cancelled_don =
+    g.context.takeoff.cancelled_don =
         (g.afternmv == Boots_on || g.afternmv == Helmet_on
          || g.afternmv == Gloves_on || g.afternmv == Armor_on);
     g.afternmv = (int NDECL((*))) 0;
     g.nomovemsg = (char *) 0;
     g.multi = 0;
-    context.takeoff.delay = 0;
-    context.takeoff.what = 0L;
+    g.context.takeoff.delay = 0;
+    g.context.takeoff.what = 0L;
 }
 
 /* called by steal() during theft from hero; interrupt donning/doffing */
@@ -1420,11 +1420,11 @@ struct obj *obj;
         return 0;
     }
 
-    reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
+    reset_remarm(); /* clear g.context.takeoff.mask and g.context.takeoff.what */
     (void) select_off(obj);
-    if (!context.takeoff.mask)
+    if (!g.context.takeoff.mask)
         return 0;
-    /* none of armoroff()/Ring_/Amulet/Blindf_off() use context.takeoff.mask */
+    /* none of armoroff()/Ring_/Amulet/Blindf_off() use g.context.takeoff.mask */
     reset_remarm();
 
     if (obj->owornmask & W_ARMOR) {
@@ -1570,7 +1570,7 @@ register struct obj *otmp;
             setworn((struct obj *) 0, otmp->owornmask & W_ARMOR);
         off_msg(otmp);
     }
-    context.takeoff.mask = context.takeoff.what = 0L;
+    g.context.takeoff.mask = g.context.takeoff.what = 0L;
     return 1;
 }
 
@@ -1798,7 +1798,7 @@ struct obj *obj;
                 You("are suddenly overcome with shame and change your mind.");
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
-            context.botl = 1; /*for AC after zeroing u.ublessed */
+            g.context.botl = 1; /*for AC after zeroing u.ublessed */
             return 1;
         }
     } else {
@@ -1925,7 +1925,7 @@ struct obj *obj;
                 (void) Shirt_on();
             on_msg(obj);
         }
-        context.takeoff.mask = context.takeoff.what = 0L;
+        g.context.takeoff.mask = g.context.takeoff.what = 0L;
     } else { /* not armor */
         boolean give_feedback = FALSE;
 
@@ -2035,7 +2035,7 @@ find_ac()
 
     if (uac != u.uac) {
         u.uac = uac;
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 
@@ -2279,33 +2279,33 @@ register struct obj *otmp;
     }
 
     if (otmp == uarm)
-        context.takeoff.mask |= WORN_ARMOR;
+        g.context.takeoff.mask |= WORN_ARMOR;
     else if (otmp == uarmc)
-        context.takeoff.mask |= WORN_CLOAK;
+        g.context.takeoff.mask |= WORN_CLOAK;
     else if (otmp == uarmf)
-        context.takeoff.mask |= WORN_BOOTS;
+        g.context.takeoff.mask |= WORN_BOOTS;
     else if (otmp == uarmg)
-        context.takeoff.mask |= WORN_GLOVES;
+        g.context.takeoff.mask |= WORN_GLOVES;
     else if (otmp == uarmh)
-        context.takeoff.mask |= WORN_HELMET;
+        g.context.takeoff.mask |= WORN_HELMET;
     else if (otmp == uarms)
-        context.takeoff.mask |= WORN_SHIELD;
+        g.context.takeoff.mask |= WORN_SHIELD;
     else if (otmp == uarmu)
-        context.takeoff.mask |= WORN_SHIRT;
+        g.context.takeoff.mask |= WORN_SHIRT;
     else if (otmp == uleft)
-        context.takeoff.mask |= LEFT_RING;
+        g.context.takeoff.mask |= LEFT_RING;
     else if (otmp == uright)
-        context.takeoff.mask |= RIGHT_RING;
+        g.context.takeoff.mask |= RIGHT_RING;
     else if (otmp == uamul)
-        context.takeoff.mask |= WORN_AMUL;
+        g.context.takeoff.mask |= WORN_AMUL;
     else if (otmp == ublindf)
-        context.takeoff.mask |= WORN_BLINDF;
+        g.context.takeoff.mask |= WORN_BLINDF;
     else if (otmp == uwep)
-        context.takeoff.mask |= W_WEP;
+        g.context.takeoff.mask |= W_WEP;
     else if (otmp == uswapwep)
-        context.takeoff.mask |= W_SWAPWEP;
+        g.context.takeoff.mask |= W_SWAPWEP;
     else if (otmp == uquiver)
-        context.takeoff.mask |= W_QUIVER;
+        g.context.takeoff.mask |= W_QUIVER;
 
     else
         impossible("select_off: %s???", doname(otmp));
@@ -2317,9 +2317,9 @@ STATIC_OVL struct obj *
 do_takeoff()
 {
     struct obj *otmp = (struct obj *) 0;
-    struct takeoff_info *doff = &context.takeoff;
+    struct takeoff_info *doff = &g.context.takeoff;
 
-    context.takeoff.mask |= I_SPECIAL; /* set flag for cancel_doff() */
+    g.context.takeoff.mask |= I_SPECIAL; /* set flag for cancel_doff() */
     if (doff->what == W_WEP) {
         if (!cursed(uwep)) {
             setuwep((struct obj *) 0);
@@ -2379,7 +2379,7 @@ do_takeoff()
     } else {
         impossible("do_takeoff: taking off %lx", doff->what);
     }
-    context.takeoff.mask &= ~I_SPECIAL; /* clear cancel_doff() flag */
+    g.context.takeoff.mask &= ~I_SPECIAL; /* clear cancel_doff() flag */
 
     return otmp;
 }
@@ -2391,7 +2391,7 @@ take_off(VOID_ARGS)
 {
     register int i;
     register struct obj *otmp;
-    struct takeoff_info *doff = &context.takeoff;
+    struct takeoff_info *doff = &g.context.takeoff;
 
     if (doff->what) {
         if (doff->delay > 0) {
@@ -2480,8 +2480,8 @@ take_off(VOID_ARGS)
 void
 reset_remarm()
 {
-    context.takeoff.what = context.takeoff.mask = 0L;
-    context.takeoff.disrobing[0] = '\0';
+    g.context.takeoff.what = g.context.takeoff.mask = 0L;
+    g.context.takeoff.disrobing[0] = '\0';
 }
 
 /* the 'A' command -- remove multiple worn items */
@@ -2490,9 +2490,9 @@ doddoremarm()
 {
     int result = 0;
 
-    if (context.takeoff.what || context.takeoff.mask) {
-        You("continue %s.", context.takeoff.disrobing);
-        set_occupation(take_off, context.takeoff.disrobing, 0);
+    if (g.context.takeoff.what || g.context.takeoff.mask) {
+        You("continue %s.", g.context.takeoff.disrobing);
+        set_occupation(take_off, g.context.takeoff.disrobing, 0);
         return 0;
     } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf && !uleft
                && !uright && !wearing_armor()) {
@@ -2506,13 +2506,13 @@ doddoremarm()
                              (unsigned *) 0)) < -1)
         result = menu_remarm(result);
 
-    if (context.takeoff.mask) {
+    if (g.context.takeoff.mask) {
         /* default activity for armor and/or accessories,
            possibly combined with weapons */
-        (void) strncpy(context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
+        (void) strncpy(g.context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
         /* specific activity when handling weapons only */
-        if (!(context.takeoff.mask & ~W_WEAPON))
-            (void) strncpy(context.takeoff.disrobing, "disarming",
+        if (!(g.context.takeoff.mask & ~W_WEAPON))
+            (void) strncpy(g.context.takeoff.disrobing, "disarming",
                            CONTEXTVERBSZ);
         (void) take_off();
     }
@@ -2649,7 +2649,7 @@ register schar delta;
             makeknown(uarmg->otyp);
             ABON(A_DEX) += (delta);
         }
-        context.botl = 1;
+        g.context.botl = 1;
     }
     if (uarmh && uarmh == otmp && otmp->otyp == HELM_OF_BRILLIANCE) {
         if (delta) {
@@ -2657,7 +2657,7 @@ register schar delta;
             ABON(A_INT) += (delta);
             ABON(A_WIS) += (delta);
         }
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 

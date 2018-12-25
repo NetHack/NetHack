@@ -587,7 +587,7 @@ nh_timeout()
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
-                context.botl = TRUE;
+                g.context.botl = TRUE;
                 if (!Deaf)
                     stop_occupation();
                 break;
@@ -632,7 +632,7 @@ nh_timeout()
             case FLYING:
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
-                    context.botl = 1;
+                    g.context.botl = 1;
                     You("land.");
                     spoteffects(TRUE);
                 }
@@ -640,11 +640,11 @@ nh_timeout()
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {
-                    context.warntype.speciesidx = NON_PM;
-                    if (context.warntype.species) {
+                    g.context.warntype.speciesidx = NON_PM;
+                    if (g.context.warntype.species) {
                         You("are no longer warned about %s.",
-                            makeplural(context.warntype.species->mname));
-                        context.warntype.species = (struct permonst *) 0;
+                            makeplural(g.context.warntype.species->mname));
+                        g.context.warntype.species = (struct permonst *) 0;
                     }
                 }
                 break;
@@ -714,7 +714,7 @@ boolean wakeup_msg;
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
         incr_itimeout(&HDeaf, how_long);
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         g.afternmv = Hear_again; /* this won't give any messages */
     }
     /* early wakeup from combat won't be possible until next monster turn */
@@ -1579,7 +1579,7 @@ do_storms()
         /* Even if already deaf, we sense the thunder's vibrations. */
         pline("Kaboom!!!  Boom!!  Boom!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);

@@ -1518,7 +1518,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 else
                     u.uen = u.uenmax; /* otherwise restore current to max  */
             }
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         }
         /* known = TRUE; -- handled inline here */

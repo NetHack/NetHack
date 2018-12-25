@@ -459,7 +459,7 @@ unsigned corpseflags;
 
     /* if polymorph or undead turning has killed this monster,
        prevent the same attack beam from hitting its corpse */
-    if (context.bypasses)
+    if (g.context.bypasses)
         bypass_obj(obj);
 
     if (has_mname(mtmp))
@@ -559,7 +559,7 @@ register struct monst *mtmp;
                    hero to create lava beneath a monster, so the !mon_moving
                    case is not expected to happen (and we haven't made a
                    player-against-monster variation of the message above) */
-                if (context.mon_moving)
+                if (g.context.mon_moving)
                     mondead(mtmp);
                 else
                     xkilled(mtmp, XKILL_NOMSG);
@@ -594,7 +594,7 @@ register struct monst *mtmp;
                     return 0;
             }
             if (cansee(mtmp->mx, mtmp->my)) {
-                if (context.mon_moving)
+                if (g.context.mon_moving)
                     pline("%s drowns.", Monnam(mtmp));
                 else
                     /* hero used fire to melt ice that monster was on */
@@ -606,7 +606,7 @@ register struct monst *mtmp;
                 pline("%s sinks as %s rushes in and flushes you out.",
                       Monnam(mtmp), hliquid("water"));
             }
-            if (context.mon_moving)
+            if (g.context.mon_moving)
                 mondead(mtmp);
             else
                 xkilled(mtmp, XKILL_NOMSG);
@@ -645,7 +645,7 @@ struct monst *mon;
     else if (mon->mspeed == MFAST)
         mmove = (4 * mmove + 2) / 3;
 
-    if (mon == u.usteed && u.ugallop && context.mv) {
+    if (mon == u.usteed && u.ugallop && g.context.mv) {
         /* increase movement by a factor of 1.5; also increase variance of
            movement speed (if it's naturally 24, we don't want it to always
            become 36) */
@@ -775,7 +775,7 @@ movemon()
             vision_recalc(0); /* vision! */
 
         /* reset obj bypasses before next monster moves */
-        if (context.bypasses)
+        if (g.context.bypasses)
             clear_bypasses();
         clear_splitobjs();
         if (minliquid(mtmp))
@@ -833,7 +833,7 @@ movemon()
     if (any_light_source())
         g.vision_full_recalc = 1; /* in case a mon moved with a light source */
     /* reset obj bypasses after last monster has moved */
-    if (context.bypasses)
+    if (g.context.bypasses)
         clear_bypasses();
     clear_splitobjs();
     /* remove dead monsters; dead vault guard will be left at <0,0>
@@ -1802,8 +1802,8 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
 {
     boolean onmap = (mtmp->mx > 0);
 
-    if (mtmp == context.polearm.hitmon)
-        context.polearm.hitmon = 0;
+    if (mtmp == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = 0;
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
@@ -2765,7 +2765,7 @@ boolean via_attack;
     }
 
     /* attacking your own quest leader will anger his or her guardians */
-    if (!context.mon_moving /* should always be the case here */
+    if (!g.context.mon_moving /* should always be the case here */
         && mtmp->data == &mons[quest_info(MS_LEADER)]) {
         struct monst *mon;
         struct permonst *q_guardian = &mons[quest_info(MS_GUARDIAN)];
@@ -2792,7 +2792,7 @@ boolean via_attack;
     }
 
     /* make other peaceful monsters react */
-    if (!context.mon_moving) {
+    if (!g.context.mon_moving) {
         static const char *const Exclam[] = {
             "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
         };
@@ -2862,7 +2862,7 @@ boolean via_attack;
     mtmp->msleeping = 0;
     if (mtmp->m_ap_type) {
         seemimic(mtmp);
-    } else if (context.forcefight && !context.mon_moving
+    } else if (g.context.forcefight && !g.context.mon_moving
                && mtmp->mundetected) {
         mtmp->mundetected = 0;
         newsym(mtmp->mx, mtmp->my);
@@ -2895,7 +2895,7 @@ int x, y, distance;
             mtmp->msleeping = 0; /* wake indeterminate sleep */
             if (!(mtmp->data->geno & G_UNIQ))
                 mtmp->mstrategy &= ~STRAT_WAITMASK; /* wake 'meditation' */
-            if (context.mon_moving)
+            if (g.context.mon_moving)
                 continue;
             if (mtmp->mtame) {
                 if (!mtmp->isminion)
@@ -3653,7 +3653,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     mon_break_armor(mtmp, polyspot);
     if (!(mtmp->misc_worn_check & W_ARMG))
         mselftouch(mtmp, "No longer petrify-resistant, ",
-                   !context.mon_moving);
+                   !g.context.mon_moving);
     m_dowear(mtmp, FALSE);
 
     /* This ought to re-test can_carry() on each item in the inventory

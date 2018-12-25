@@ -161,7 +161,7 @@ struct monst {
 #define MON_NOWEP(mon) ((mon)->mw = (struct obj *) 0)
 
 #define DEADMONSTER(mon) ((mon)->mhp < 1)
-#define is_starting_pet(mon) ((mon)->m_id == context.startingpet_mid)
+#define is_starting_pet(mon) ((mon)->m_id == g.context.startingpet_mid)
 #define is_vampshifter(mon)                                      \
     ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LORD \
      || (mon)->cham == PM_VLAD_THE_IMPALER)

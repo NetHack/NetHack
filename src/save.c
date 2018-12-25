@@ -284,7 +284,7 @@ register int fd, mode;
 #endif
     uid = (unsigned long) getuid();
     bwrite(fd, (genericptr_t) &uid, sizeof uid);
-    bwrite(fd, (genericptr_t) &context, sizeof(struct context_info));
+    bwrite(fd, (genericptr_t) &g.context, sizeof(struct context_info));
     bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
 #ifdef SYSFLAGS
     bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
@@ -1037,17 +1037,17 @@ register struct obj *otmp;
              * Always invalidate the pointer, but ensure that we have
              * the o_id in order to restore the pointer on reload.
              */
-            if (otmp == context.victual.piece) {
-                context.victual.o_id = otmp->o_id;
-                context.victual.piece = (struct obj *) 0;
+            if (otmp == g.context.victual.piece) {
+                g.context.victual.o_id = otmp->o_id;
+                g.context.victual.piece = (struct obj *) 0;
             }
-            if (otmp == context.tin.tin) {
-                context.tin.o_id = otmp->o_id;
-                context.tin.tin = (struct obj *) 0;
+            if (otmp == g.context.tin.tin) {
+                g.context.tin.o_id = otmp->o_id;
+                g.context.tin.tin = (struct obj *) 0;
             }
-            if (otmp == context.spbook.book) {
-                context.spbook.o_id = otmp->o_id;
-                context.spbook.book = (struct obj *) 0;
+            if (otmp == g.context.spbook.book) {
+                g.context.spbook.o_id = otmp->o_id;
+                g.context.spbook.book = (struct obj *) 0;
             }
             otmp->where = OBJ_FREE; /* set to free so dealloc will work */
             otmp->nobj = NULL;      /* nobj saved into otmp2 */
@@ -1146,9 +1146,9 @@ register struct monst *mtmp;
         if (mtmp->minvent)
             saveobjchn(fd, mtmp->minvent, mode);
         if (release_data(mode)) {
-            if (mtmp == context.polearm.hitmon) {
-                context.polearm.m_id = mtmp->m_id;
-                context.polearm.hitmon = NULL;
+            if (mtmp == g.context.polearm.hitmon) {
+                g.context.polearm.m_id = mtmp->m_id;
+                g.context.polearm.hitmon = NULL;
             }
             mtmp->nmon = NULL;  /* nmon saved into mtmp2 */
             dealloc_monst(mtmp);

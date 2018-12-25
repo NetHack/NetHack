@@ -135,7 +135,7 @@ register struct monst *mtmp;
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
         monflee(mtmp, 0, FALSE, FALSE);
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 

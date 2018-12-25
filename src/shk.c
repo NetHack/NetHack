@@ -118,7 +118,7 @@ long amount;
         remove_worn_item(ygold, FALSE); /* quiver */
     freeinv(ygold);
     add_to_minv(mon, ygold);
-    context.botl = 1;
+    g.context.botl = 1;
     return amount;
 }
 
@@ -153,7 +153,7 @@ long amount;
         dropy(mongold);
     } else {
         addinv(mongold);
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 
@@ -1003,7 +1003,7 @@ register struct monst *shkp;
         money2mon(shkp, balance);
     else if (balance < 0)
         money2u(shkp, -balance);
-    context.botl = 1;
+    g.context.botl = 1;
     if (robbed) {
         robbed -= tmp;
         if (robbed < 0)
@@ -1445,7 +1445,7 @@ proceed:
                 eshkp->debit = 0L;
                 eshkp->loan = 0L;
                 You("pay that debt.");
-                context.botl = 1;
+                g.context.botl = 1;
             } else {
                 dtmp -= eshkp->credit;
                 eshkp->credit = 0L;
@@ -1454,7 +1454,7 @@ proceed:
                 eshkp->loan = 0L;
                 pline("That debt is partially offset by your credit.");
                 You("pay the remainder.");
-                context.botl = 1;
+                g.context.botl = 1;
             }
             paid = TRUE;
         }
@@ -1824,7 +1824,7 @@ int croaked;
                 eshkp->robbed = 0L;
             if (umoney > 0L) {
                 money2mon(shkp, umoney);
-                context.botl = 1;
+                g.context.botl = 1;
             }
             pline("%s %s all your possessions.", Shknam(shkp), takes);
             taken = TRUE;
@@ -1832,7 +1832,7 @@ int croaked;
             set_repo_loc(shkp);
         } else {
             money2mon(shkp, loss);
-            context.botl = 1;
+            g.context.botl = 1;
             pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
                   takes, loss, currency(loss),
                   strncmp(eshkp->customer, g.plname, PL_NSIZ) ? "" : "you ",
@@ -2699,7 +2699,7 @@ register struct monst *shkp;
             otmp = newobj();
             *otmp = *obj;
             otmp->oextra = (struct oextra *) 0;
-            bp->bo_id = otmp->o_id = context.ident++;
+            bp->bo_id = otmp->o_id = g.context.ident++;
             otmp->where = OBJ_FREE;
             otmp->quan = (bp->bquan -= obj->quan);
             otmp->owt = 0; /* superfluous */
@@ -4076,7 +4076,7 @@ boolean cant_mollify;
         cost_of_damage = check_credit(cost_of_damage, shkp);
         if (cost_of_damage > 0L) {
             money2mon(shkp, cost_of_damage);
-            context.botl = 1;
+            g.context.botl = 1;
         }
         pline("Mollified, %s accepts your restitution.", shkname(shkp));
         /* move shk back to his home loc */

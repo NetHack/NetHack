@@ -836,9 +836,9 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     m2->mextra = (struct mextra *) 0;
     m2->nmon = fmon;
     fmon = m2;
-    m2->m_id = context.ident++;
+    m2->m_id = g.context.ident++;
     if (!m2->m_id)
-        m2->m_id = context.ident++; /* ident overflowed */
+        m2->m_id = g.context.ident++; /* ident overflowed */
     m2->mx = mm.x;
     m2->my = mm.y;
 
@@ -876,7 +876,7 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     }
 
     /* not all clones caused by player are tame or peaceful */
-    if (!context.mon_moving) {
+    if (!g.context.mon_moving) {
         if (mon->mtame)
             m2->mtame = rn2(max(2 + u.uluck, 2)) ? mon->mtame : 0;
         else if (mon->mpeaceful)
@@ -1197,9 +1197,9 @@ int mmflags;
         mtmp->msleeping = 1;
     mtmp->nmon = fmon;
     fmon = mtmp;
-    mtmp->m_id = context.ident++;
+    mtmp->m_id = g.context.ident++;
     if (!mtmp->m_id)
-        mtmp->m_id = context.ident++; /* ident overflowed */
+        mtmp->m_id = g.context.ident++; /* ident overflowed */
     set_mon_data(mtmp, ptr, 0);
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
         g.quest_status.leader_m_id = mtmp->m_id;
@@ -1300,8 +1300,8 @@ int mmflags;
         }
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
-        context.no_of_wizards++;
-        if (context.no_of_wizards == 1 && Is_earthlevel(&u.uz))
+        g.context.no_of_wizards++;
+        if (g.context.no_of_wizards == 1 && Is_earthlevel(&u.uz))
             mitem = SPE_DIG;
     } else if (mndx == PM_GHOST && !(mmflags & MM_NONAME)) {
         mtmp = christen_monst(mtmp, rndghostname());

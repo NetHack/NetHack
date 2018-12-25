@@ -394,9 +394,9 @@ struct obj *obj2, *obj1;
         OMONST(obj2)->mextra = (struct mextra *) 0;
         OMONST(obj2)->nmon = (struct monst *) 0;
 #if 0
-        OMONST(obj2)->m_id = context.ident++;
+        OMONST(obj2)->m_id = g.context.ident++;
         if (OMONST(obj2)->m_id) /* ident overflowed */
-            OMONST(obj2)->m_id = context.ident++;
+            OMONST(obj2)->m_id = g.context.ident++;
 #endif
         if (OMONST(obj1)->mextra)
             copy_mextra(OMONST(obj2), OMONST(obj1));
@@ -436,9 +436,9 @@ long num;
     otmp = newobj();
     *otmp = *obj; /* copies whole structure */
     otmp->oextra = (struct oextra *) 0;
-    otmp->o_id = context.ident++;
+    otmp->o_id = g.context.ident++;
     if (!otmp->o_id)
-        otmp->o_id = context.ident++; /* ident overflowed */
+        otmp->o_id = g.context.ident++; /* ident overflowed */
     otmp->timed = 0;                  /* not timed, yet */
     otmp->lamplit = 0;                /* ditto */
     otmp->owornmask = 0L;             /* new object isn't worn */
@@ -447,8 +447,8 @@ long num;
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
 
-    context.objsplit.parent_oid = obj->o_id;
-    context.objsplit.child_oid = otmp->o_id;
+    g.context.objsplit.parent_oid = obj->o_id;
+    g.context.objsplit.child_oid = otmp->o_id;
     obj->nobj = otmp;
     /* Only set nexthere when on the floor, nexthere is also used */
     /* as a back pointer to the container object when contained. */
@@ -503,17 +503,17 @@ struct obj *obj;
     }
 
     /* first try the expected case; obj is split from another stack */
-    if (obj->o_id == context.objsplit.child_oid) {
+    if (obj->o_id == g.context.objsplit.child_oid) {
         /* parent probably precedes child and will require list traversal */
         ochild = obj;
-        target_oid = context.objsplit.parent_oid;
+        target_oid = g.context.objsplit.parent_oid;
         if (obj->nobj && obj->nobj->o_id == target_oid)
             oparent = obj->nobj;
-    } else if (obj->o_id == context.objsplit.parent_oid) {
+    } else if (obj->o_id == g.context.objsplit.parent_oid) {
         /* alternate scenario: another stack was split from obj;
            child probably follows parent and will be found here */
         oparent = obj;
-        target_oid = context.objsplit.child_oid;
+        target_oid = g.context.objsplit.child_oid;
         if (obj->nobj && obj->nobj->o_id == target_oid)
             ochild = obj->nobj;
     }
@@ -542,7 +542,7 @@ struct obj *obj;
 void
 clear_splitobjs()
 {
-    context.objsplit.parent_oid = context.objsplit.child_oid = 0;
+    g.context.objsplit.parent_oid = g.context.objsplit.child_oid = 0;
 }
 
 /*
@@ -643,9 +643,9 @@ register struct obj *otmp;
     *dummy = *otmp;
     dummy->oextra = (struct oextra *) 0;
     dummy->where = OBJ_FREE;
-    dummy->o_id = context.ident++;
+    dummy->o_id = g.context.ident++;
     if (!dummy->o_id)
-        dummy->o_id = context.ident++; /* ident overflowed */
+        dummy->o_id = g.context.ident++; /* ident overflowed */
     dummy->timed = 0;
     copy_oextra(dummy, otmp);
     if (has_omid(dummy))
@@ -762,9 +762,9 @@ boolean artif;
     otmp = newobj();
     *otmp = zeroobj;
     otmp->age = g.monstermoves;
-    otmp->o_id = context.ident++;
+    otmp->o_id = g.context.ident++;
     if (!otmp->o_id)
-        otmp->o_id = context.ident++; /* ident overflowed */
+        otmp->o_id = g.context.ident++; /* ident overflowed */
     otmp->quan = 1L;
     otmp->oclass = let;
     otmp->otyp = otyp;
@@ -845,7 +845,7 @@ boolean artif;
                 blessorcurse(otmp, 10);
                 break;
             case SLIME_MOLD:
-                otmp->spe = context.current_fruit;
+                otmp->spe = g.context.current_fruit;
                 flags.made_fruit = TRUE;
                 break;
             case KELP_FROND:
@@ -947,7 +947,7 @@ boolean artif;
             break;
         case AMULET_CLASS:
             if (otmp->otyp == AMULET_OF_YENDOR)
-                context.made_amulet = TRUE;
+                g.context.made_amulet = TRUE;
             if (rn2(10) && (otmp->otyp == AMULET_OF_STRANGULATION
                             || otmp->otyp == AMULET_OF_CHANGE
                             || otmp->otyp == AMULET_OF_RESTFUL_SLEEP)) {

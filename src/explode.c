@@ -449,7 +449,7 @@ int expltype;
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
 
-                    if (!context.mon_moving) {
+                    if (!g.context.mon_moving) {
                         xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
@@ -471,7 +471,7 @@ int expltype;
                             adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
                     }
-                } else if (!context.mon_moving) {
+                } else if (!g.context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
                 }
@@ -521,7 +521,7 @@ int expltype;
                 u.mh -= damu;
             else
                 u.uhp -= damu;
-            context.botl = 1;
+            g.context.botl = 1;
         }
 
         if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {

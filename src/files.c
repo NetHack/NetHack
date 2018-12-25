@@ -3910,7 +3910,7 @@ boolean wildcards;
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
 
-#define MAXPASSAGES SIZE(context.novel.pasg) /* 20 */
+#define MAXPASSAGES SIZE(g.context.novel.pasg) /* 20 */
 
 static int FDECL(choose_passage, (int, unsigned));
 
@@ -3928,32 +3928,32 @@ unsigned oid; /* book.o_id, used to determine whether re-reading same book */
 
     /* if a different book or we've used up all the passages already,
        reset in order to have all 'passagecnt' passages available */
-    if (oid != context.novel.id || context.novel.count == 0) {
+    if (oid != g.context.novel.id || g.context.novel.count == 0) {
         int i, range = passagecnt, limit = MAXPASSAGES;
 
-        context.novel.id = oid;
+        g.context.novel.id = oid;
         if (range <= limit) {
             /* collect all of the N indices */
-            context.novel.count = passagecnt;
+            g.context.novel.count = passagecnt;
             for (idx = 0; idx < MAXPASSAGES; idx++)
-                context.novel.pasg[idx] = (xchar) ((idx < passagecnt)
+                g.context.novel.pasg[idx] = (xchar) ((idx < passagecnt)
                                                    ? idx + 1 : 0);
         } else {
             /* collect MAXPASSAGES of the N indices */
-            context.novel.count = MAXPASSAGES;
+            g.context.novel.count = MAXPASSAGES;
             for (idx = i = 0; i < passagecnt; ++i, --range)
                 if (range > 0 && rn2(range) < limit) {
-                    context.novel.pasg[idx++] = (xchar) (i + 1);
+                    g.context.novel.pasg[idx++] = (xchar) (i + 1);
                     --limit;
                 }
         }
     }
 
-    idx = rn2(context.novel.count);
-    res = (int) context.novel.pasg[idx];
+    idx = rn2(g.context.novel.count);
+    res = (int) g.context.novel.pasg[idx];
     /* move the last slot's passage index into the slot just used
        and reduce the number of passages available */
-    context.novel.pasg[idx] = context.novel.pasg[--context.novel.count];
+    g.context.novel.pasg[idx] = g.context.novel.pasg[--g.context.novel.count];
     return res;
 }
 

@@ -130,7 +130,7 @@ float_vs_flight()
         BLevitation |= I_SPECIAL;
     else
         BLevitation &= ~I_SPECIAL;
-    context.botl = TRUE;
+    g.context.botl = TRUE;
 }
 
 /* for changing into form that's immune to strangulation */
@@ -145,7 +145,7 @@ boolean on;
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&g.youmonst)) {
             Strangled = 6L;
-            context.botl = TRUE;
+            g.context.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
                  Strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
@@ -156,7 +156,7 @@ boolean on;
     } else {
         if (Strangled && !can_be_strangled(&g.youmonst)) {
             Strangled = 0L;
-            context.botl = TRUE;
+            g.context.botl = TRUE;
             You("are no longer being strangled.");
         }
     }
@@ -379,7 +379,7 @@ newman()
         make_slimed(10L, (const char *) 0);
     }
 
-    context.botl = 1;
+    g.context.botl = 1;
     see_monsters();
     (void) encumber_msg();
 
@@ -520,7 +520,7 @@ int psflags;
                        of evaporation due to over enchanting */
                     uarm->otyp += GRAY_DRAGON_SCALES - GRAY_DRAGON_SCALE_MAIL;
                     uarm->dknown = 1;
-                    context.botl = 1; /* AC is changing */
+                    g.context.botl = 1; /* AC is changing */
                 }
                 uskin = uarm;
                 uarm = (struct obj *) 0;
@@ -839,7 +839,7 @@ int mntmp;
     }
     check_strangling(TRUE); /* maybe start strangling */
 
-    context.botl = 1;
+    g.context.botl = 1;
     g.vision_full_recalc = 1;
     see_monsters();
     (void) encumber_msg();
@@ -1055,7 +1055,7 @@ rehumanize()
     }
     nomul(0);
 
-    context.botl = 1;
+    g.context.botl = 1;
     g.vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
@@ -1080,7 +1080,7 @@ dobreathe()
         return 0;
     }
     u.uen -= 15;
-    context.botl = 1;
+    g.context.botl = 1;
 
     if (!getdir((char *) 0))
         return 0;
@@ -1269,7 +1269,7 @@ dosummon()
         return 0;
     }
     u.uen -= 10;
-    context.botl = 1;
+    g.context.botl = 1;
 
     You("call upon your brethren for help!");
     exercise(A_WIS, TRUE);
@@ -1310,7 +1310,7 @@ dogaze()
         return 0;
     }
     u.uen -= 15;
-    context.botl = 1;
+    g.context.botl = 1;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -1509,7 +1509,7 @@ domindblast()
         return 0;
     }
     u.uen -= 10;
-    context.botl = 1;
+    g.context.botl = 1;
 
     You("concentrate.");
     pline("A wave of psychic energy pours out.");
@@ -1759,7 +1759,7 @@ int damtype, dam;
         u.mh += heal;
         if (u.mh > u.mhmax)
             u.mh = u.mhmax;
-        context.botl = 1;
+        g.context.botl = 1;
         pline("Strangely, you feel better than before.");
         exercise(A_STR, TRUE);
     }
@@ -1813,9 +1813,9 @@ polysense()
 {
     short warnidx = NON_PM;
 
-    context.warntype.speciesidx = NON_PM;
-    context.warntype.species = 0;
-    context.warntype.polyd = 0;
+    g.context.warntype.speciesidx = NON_PM;
+    g.context.warntype.species = 0;
+    g.context.warntype.polyd = 0;
     HWarn_of_mon &= ~FROMRACE;
 
     switch (u.umonnum) {
@@ -1824,13 +1824,13 @@ polysense()
         break;
     case PM_VAMPIRE:
     case PM_VAMPIRE_LORD:
-        context.warntype.polyd = M2_HUMAN | M2_ELF;
+        g.context.warntype.polyd = M2_HUMAN | M2_ELF;
         HWarn_of_mon |= FROMRACE;
         return;
     }
     if (warnidx >= LOW_PM) {
-        context.warntype.speciesidx = warnidx;
-        context.warntype.species = &mons[warnidx];
+        g.context.warntype.speciesidx = warnidx;
+        g.context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;
     }
 }

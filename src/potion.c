@@ -69,7 +69,7 @@ boolean talk;
             You_feel("less %s now.", Hallucination ? "trippy" : "confused");
     }
     if ((xtime && !old) || (!xtime && old))
-        context.botl = TRUE;
+        g.context.botl = TRUE;
 
     set_itimeout(&HConfusion, xtime);
 }
@@ -98,7 +98,7 @@ boolean talk;
         }
     }
     if ((!xtime && old) || (xtime && !old))
-        context.botl = TRUE;
+        g.context.botl = TRUE;
 
     set_itimeout(&HStun, xtime);
 }
@@ -133,7 +133,7 @@ int type;
         }
         set_itimeout(&Sick, xtime);
         u.usick_type |= type;
-        context.botl = TRUE;
+        g.context.botl = TRUE;
     } else if (old && (type & u.usick_type)) {
         /* was sick, now not */
         u.usick_type &= ~type;
@@ -146,7 +146,7 @@ int type;
                 You_feel("cured.  What a relief!");
             Sick = 0L; /* set_itimeout(&Sick, 0L) */
         }
-        context.botl = TRUE;
+        g.context.botl = TRUE;
     }
 
     kptr = find_delayed_killer(SICK);
@@ -178,7 +178,7 @@ const char *msg;
 #endif
     set_itimeout(&Slimed, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -202,7 +202,7 @@ const char *killername;
 #endif
     set_itimeout(&Stoned, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -223,7 +223,7 @@ boolean talk;
         talk = FALSE;
 
     set_itimeout(&Vomiting, xtime);
-    context.botl = TRUE;
+    g.context.botl = TRUE;
     if (!xtime && old)
         if (talk)
             You_feel("much less nauseated now.");
@@ -315,7 +315,7 @@ toggle_blindness()
     boolean Stinging = (uwep && (EWarn_of_mon & W_WEP) != 0L);
 
     /* blindness has just been toggled */
-    context.botl = TRUE; /* status conditions need update */
+    g.context.botl = TRUE; /* status conditions need update */
     g.vision_full_recalc = 1; /* vision has changed */
     /* this vision recalculation used to be deferred until moveloop(),
        but that made it possible for vision irregularities to occur
@@ -405,7 +405,7 @@ long mask; /* nonzero if resistance status should change by mask */
         (eg. Qt windowport's equipped items display) */
         update_inventory();
 
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         if (talk)
             pline(message, verb);
     }
@@ -424,7 +424,7 @@ boolean talk;
 
     set_itimeout(&HDeaf, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         if (talk)
             You(old ? "can hear again." : "are unable to hear anything.");
     }
@@ -591,7 +591,7 @@ register struct obj *otmp;
                    WEAK or worse, but that's handled via ATEMP(A_STR) now */
                 if (ABASE(i) < lim) {
                     ABASE(i) = lim;
-                    context.botl = 1;
+                    g.context.botl = 1;
                     /* only first found if not blessed */
                     if (!otmp->blessed)
                         break;
@@ -1083,7 +1083,7 @@ register struct obj *otmp;
             u.uen = u.uenmax;
         else if (u.uen <= 0)
             u.uen = 0;
-        context.botl = 1;
+        g.context.botl = 1;
         exercise(A_WIS, TRUE);
         break;
     }
@@ -1163,7 +1163,7 @@ register boolean curesick, cureblind;
         make_vomiting(0L, TRUE);
         make_sick(0L, (char *) 0, TRUE, SICK_ALL);
     }
-    context.botl = 1;
+    g.context.botl = 1;
     return;
 }
 
@@ -1567,7 +1567,7 @@ int how;
            when inside a tended shop */
         if (!shkp) /* if shkp was killed, unpaid ought to cleared already */
             obj->unpaid = 0;
-        else if (context.mon_moving) /* obj thrown by monster */
+        else if (g.context.mon_moving) /* obj thrown by monster */
             subfrombill(obj, shkp);
         else /* obj thrown by hero */
             (void) stolen_value(obj, u.ux, u.uy, (boolean) shkp->mpeaceful,
@@ -1610,7 +1610,7 @@ register struct obj *obj;
                     ABASE(i)++;
                     /* only first found if not blessed */
                     isdone = !(obj->blessed);
-                    context.botl = 1;
+                    g.context.botl = 1;
                 }
                 if (++i >= A_MAX)
                     i = 0;
@@ -1619,24 +1619,24 @@ register struct obj *obj;
         break;
     case POT_FULL_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, context.botl = 1;
+            u.mh++, g.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, context.botl = 1;
+            u.uhp++, g.context.botl = 1;
         cureblind = TRUE;
         /*FALLTHRU*/
     case POT_EXTRA_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, context.botl = 1;
+            u.mh++, g.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, context.botl = 1;
+            u.uhp++, g.context.botl = 1;
         if (!obj->cursed)
             cureblind = TRUE;
         /*FALLTHRU*/
     case POT_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, context.botl = 1;
+            u.mh++, g.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, context.botl = 1;
+            u.uhp++, g.context.botl = 1;
         if (obj->blessed)
             cureblind = TRUE;
         if (cureblind)
@@ -1656,7 +1656,7 @@ register struct obj *obj;
                 else
                     u.uhp -= 5;
             }
-            context.botl = 1;
+            g.context.botl = 1;
             exercise(A_CON, FALSE);
         }
         break;
@@ -2348,7 +2348,7 @@ struct monst *mon,  /* monster being split */
         if (mtmp2) {
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
-            context.botl = 1;
+            g.context.botl = 1;
             You("multiply%s!", reason);
         }
     } else {

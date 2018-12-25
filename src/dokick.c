@@ -126,18 +126,18 @@ struct monst *mon;
 xchar x, y;
 {
     if (mon) {
-        boolean save_forcefight = context.forcefight;
+        boolean save_forcefight = g.context.forcefight;
 
         g.bhitpos.x = x;
         g.bhitpos.y = y;
         if (!mon->mpeaceful || !canspotmon(mon))
-            context.forcefight = TRUE; /* attack even if invisible */
+            g.context.forcefight = TRUE; /* attack even if invisible */
         /* kicking might be halted by discovery of hidden monster,
            by player declining to attack peaceful monster,
            or by passing out due to encumbrance */
         if (attack_checks(mon, (struct obj *) 0) || overexertion())
             mon = 0; /* don't kick after all */
-        context.forcefight = save_forcefight;
+        g.context.forcefight = save_forcefight;
     }
     return (boolean) (mon != 0);
 }
@@ -872,12 +872,12 @@ dokick()
     mtmp = isok(x, y) ? m_at(x, y) : 0;
     /* might not kick monster if it is hidden and becomes revealed,
        if it is peaceful and player declines to attack, or if the
-       hero passes out due to encumbrance with low hp; context.move
+       hero passes out due to encumbrance with low hp; g.context.move
        will be 1 unless player declines to kick peaceful monster */
     if (mtmp) {
         oldglyph = glyph_at(x, y);
         if (!maybe_kick_monster(mtmp, x, y))
-            return context.move;
+            return g.context.move;
     }
 
     wake_nearby();
@@ -924,7 +924,7 @@ dokick()
             map_invisible(x, y);
         }
         /* recoil if floating */
-        if ((Is_airlevel(&u.uz) || Levitation) && context.move) {
+        if ((Is_airlevel(&u.uz) || Levitation) && g.context.move) {
             int range;
 
             range =

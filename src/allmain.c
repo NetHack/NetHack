@@ -51,11 +51,11 @@ boolean resuming;
     }
 
     if (!resuming) { /* new game */
-        context.rndencode = rnd(9000);
+        g.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
     }
-    context.botlx = TRUE; /* for STATUS_HILITES */
+    g.context.botlx = TRUE; /* for STATUS_HILITES */
     update_inventory(); /* for perm_invent */
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
@@ -70,7 +70,7 @@ boolean resuming;
 
     u.uz0.dlevel = u.uz.dlevel;
     g.youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
-    context.move = 0;
+    g.context.move = 0;
 
     program_state.in_moveloop = 1;
     for (;;) {
@@ -83,20 +83,20 @@ boolean resuming;
         do_positionbar();
 #endif
 
-        if (context.move) {
+        if (g.context.move) {
             /* actual time passed */
             g.youmonst.movement -= NORMAL_SPEED;
 
             do { /* hero can't move this turn loop */
                 wtcap = encumber_msg();
 
-                context.mon_moving = TRUE;
+                g.context.mon_moving = TRUE;
                 do {
                     monscanmove = movemon();
                     if (g.youmonst.movement >= NORMAL_SPEED)
                         break; /* it's now your turn */
                 } while (monscanmove);
-                context.mon_moving = FALSE;
+                g.context.mon_moving = FALSE;
 
                 if (!monscanmove && g.youmonst.movement < NORMAL_SPEED) {
                     /* both you and the monsters are out of steam this round
@@ -173,8 +173,8 @@ boolean resuming;
 
                     if (u.ublesscnt)
                         u.ublesscnt--;
-                    if (flags.time && !context.run)
-                        context.botl = 1;
+                    if (flags.time && !g.context.run)
+                        g.context.botl = 1;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -219,7 +219,7 @@ boolean resuming;
                             (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
-                        context.botl = 1;
+                        g.context.botl = 1;
                         if (u.uen == u.uenmax)
                             interrupt_multi("You feel full of energy.");
                     }
@@ -314,7 +314,7 @@ boolean resuming;
             /******************************************/
 
             status_eval_next_unhilite();
-            if (context.bypasses)
+            if (g.context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
                 && !BClairvoyant && !(g.moves % 15) && !rn2(2))
@@ -333,7 +333,7 @@ boolean resuming;
 
         clear_splitobjs();
         find_ac();
-        if (!context.mv || Blind) {
+        if (!g.context.mv || Blind) {
             /* redo monsters if hallu or wearing a helm of telepathy */
             if (Hallucination) { /* update screen randomly */
                 see_monsters();
@@ -349,12 +349,12 @@ boolean resuming;
             if (g.vision_full_recalc)
                 vision_recalc(0); /* vision! */
         }
-        if (context.botl || context.botlx) {
+        if (g.context.botl || g.context.botlx) {
             bot();
             curs_on_u();
         }
 
-        context.move = 1;
+        g.context.move = 1;
 
         if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
@@ -399,15 +399,15 @@ boolean resuming;
             lookaround();
             if (!g.multi) {
                 /* lookaround may clear multi */
-                context.move = 0;
+                g.context.move = 0;
                 if (flags.time)
-                    context.botl = 1;
+                    g.context.botl = 1;
                 continue;
             }
-            if (context.mv) {
+            if (g.context.mv) {
                 if (g.multi < COLNO && !--g.multi)
-                    context.travel = context.travel1 = context.mv =
-                        context.run = 0;
+                    g.context.travel = g.context.travel1 = g.context.mv =
+                        g.context.run = 0;
                 domove();
             } else {
                 --g.multi;
@@ -421,17 +421,17 @@ boolean resuming;
         }
         if (u.utotype)       /* change dungeon level */
             deferred_goto(); /* after rhack() */
-        /* !context.move here: multiple movement command stopped */
-        else if (flags.time && (!context.move || !context.mv))
-            context.botl = 1;
+        /* !g.context.move here: multiple movement command stopped */
+        else if (flags.time && (!g.context.move || !g.context.mv))
+            g.context.botl = 1;
 
         if (g.vision_full_recalc)
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
-        if ((!context.run || flags.runmode == RUN_TPORT)
-            && (g.multi && (!context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
-            if (flags.time && context.run)
-                context.botl = 1;
+        if ((!g.context.run || flags.runmode == RUN_TPORT)
+            && (g.multi && (!g.context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
+            if (flags.time && g.context.run)
+                g.context.botl = 1;
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
@@ -461,7 +461,7 @@ int wtcap;
                 heal = 1;
         }
         if (heal) {
-            context.botl = 1;
+            g.context.botl = 1;
             u.mh += heal;
             reached_full = (u.mh == u.mhmax);
         }
@@ -493,7 +493,7 @@ int wtcap;
                 heal = 1;
 
             if (heal) {
-                context.botl = 1;
+                g.context.botl = 1;
                 u.uhp += heal;
                 if (u.uhp > u.uhpmax)
                     u.uhp = u.uhpmax;
@@ -514,7 +514,7 @@ stop_occupation()
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", g.occtxt);
         g.occupation = 0;
-        context.botl = 1; /* in case u.uhs changed */
+        g.context.botl = 1; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
     } else if (g.multi >= 0) {
@@ -567,13 +567,13 @@ newgame()
     gameDiskPrompt();
 #endif
 
-    context.botlx = 1;
-    context.ident = 1;
-    context.stethoscope_move = -1L;
-    context.warnlevel = 1;
-    context.next_attrib_check = 600L; /* arbitrary first setting */
-    context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
-    context.tribute.tributesz = sizeof(struct tribute_info);
+    g.context.botlx = 1;
+    g.context.ident = 1;
+    g.context.stethoscope_move = -1L;
+    g.context.warnlevel = 1;
+    g.context.next_attrib_check = 600L; /* arbitrary first setting */
+    g.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
+    g.context.tribute.tributesz = sizeof(struct tribute_info);
 
     for (i = LOW_PM; i < NUMMONS; i++)
         g.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
@@ -728,7 +728,7 @@ STATIC_DCL void
 interrupt_multi(msg)
 const char *msg;
 {
-    if (g.multi > 0 && !context.travel && !context.run) {
+    if (g.multi > 0 && !g.context.travel && !g.context.run) {
         nomul(0);
         if (flags.verbose && msg)
             Norep("%s", msg);

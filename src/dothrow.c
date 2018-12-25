@@ -49,8 +49,8 @@ int shotlimit;
          * been split from there (possibly triggering a panic in addinv),
          * and freeinv+addinv potentially has other side-effects.
          */
-        if (obj->o_id == context.objsplit.parent_oid
-            || obj->o_id == context.objsplit.child_oid)
+        if (obj->o_id == g.context.objsplit.parent_oid
+            || obj->o_id == g.context.objsplit.child_oid)
             (void) unsplitobj(obj);
         return 0; /* no time passes */
     }
@@ -404,7 +404,7 @@ endmultishot(verbose)
 boolean verbose;
 {
     if (g.m_shot.i < g.m_shot.n) {
-        if (verbose && !context.mon_moving) {
+        if (verbose && !g.context.mon_moving) {
             You("stop %s after the %d%s %s.",
                 g.m_shot.s ? "firing" : "throwing", g.m_shot.i, ordin(g.m_shot.i),
                 g.m_shot.s ? "shot" : "toss");

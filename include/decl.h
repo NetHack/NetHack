@@ -698,6 +698,7 @@ struct instance_globals {
 #endif /* MICRO || WIN32 */
     struct monst youmonst;
     struct obj *invent;
+    struct context_info context;
 
 
     /* dig.c */

@@ -26,7 +26,7 @@ take_gold()
         You_feel("a strange sensation.");
     } else {
         You("notice you have no money!");
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 
@@ -189,7 +189,7 @@ dosit()
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
                 heal_legs(0);
-                context.botl = 1;
+                g.context.botl = 1;
                 break;
             case 5:
                 take_gold();

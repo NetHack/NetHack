@@ -844,18 +844,18 @@ int how;
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
     g.nomovemsg = "You survived that attempt on your life.";
-    context.move = 0;
+    g.context.move = 0;
     if (g.multi > 0)
         g.multi = 0;
     else
         g.multi = -1;
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
-    context.botl = 1;
+    g.context.botl = 1;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();
-    if (!context.mon_moving)
+    if (!g.context.mon_moving)
         endmultishot(FALSE);
     if (u.uswallow) {
         /* might drop hero onto a trap that kills her all over again */
@@ -1024,10 +1024,10 @@ int how;
 #endif
         ) {
         /* skip status update if panicking or disconnected */
-        context.botl = context.botlx = FALSE;
+        g.context.botl = g.context.botlx = FALSE;
     } else {
         /* otherwise force full status update */
-        context.botlx = TRUE;
+        g.context.botlx = TRUE;
         bot();
     }
 
@@ -1067,7 +1067,7 @@ int how;
                current HP to zero (0 HP when turning into green slime
                is iffy but we don't have much choice--that is fatal) */
             u.uhp = u.mh = 0;
-            context.botl = 1;
+            g.context.botl = 1;
         }
     }
     if (Lifesaved && (how <= GENOCIDED)) {

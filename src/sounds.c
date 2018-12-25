@@ -365,7 +365,7 @@ register struct monst *mtmp;
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
     }
@@ -408,7 +408,7 @@ register struct monst *mtmp;
         }
     if (yelp_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, yelp_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
@@ -442,7 +442,7 @@ register struct monst *mtmp;
         }
     if (whimper_verb) {
         pline("%s %s.", Monnam(mtmp), vtense((char *) 0, whimper_verb));
-        if (context.run)
+        if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }
@@ -915,7 +915,7 @@ register struct monst *mtmp;
         boolean ms_Death = (ptr == &mons[PM_DEATH]);
 
         /* 3.6 tribute */
-        if (ms_Death && !context.tribute.Deathnotice
+        if (ms_Death && !g.context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
@@ -925,7 +925,7 @@ register struct monst *mtmp;
                     Strcat(verbuf, "  I may have been misquoted there.");
                 verbl_msg = verbuf;
             }
-            context.tribute.Deathnotice = 1;
+            g.context.tribute.Deathnotice = 1;
         } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
             verbl_msg = verbuf;
         /* end of tribute addition */

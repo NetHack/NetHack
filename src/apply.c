@@ -317,10 +317,10 @@ register struct obj *obj;
     if (!getdir((char *) 0))
         return 0;
 
-    res = (g.moves == context.stethoscope_move)
-          && (g.youmonst.movement == context.stethoscope_movement);
-    context.stethoscope_move = g.moves;
-    context.stethoscope_movement = g.youmonst.movement;
+    res = (g.moves == g.context.stethoscope_move)
+          && (g.youmonst.movement == g.context.stethoscope_movement);
+    g.context.stethoscope_move = g.moves;
+    g.context.stethoscope_movement = g.youmonst.movement;
 
     g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
     g.notonhead = u.uswallow;
@@ -1918,7 +1918,7 @@ struct obj *obj;
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
                 pline("Nothing seems to happen.");
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
-            context.botl = TRUE;
+            g.context.botl = TRUE;
             break;
         }
         return;
@@ -2053,7 +2053,7 @@ struct obj *obj;
     else if (!did_prop)
         pline("Nothing seems to happen.");
 
-    context.botl = (did_attr || did_prop);
+    g.context.botl = (did_attr || did_prop);
 #undef PROP_COUNT
 #undef ATTR_COUNT
 #undef prop2trbl
@@ -2230,7 +2230,7 @@ struct obj **optr;
             return;
     }
     if (!getdir((char *) 0)) {
-        context.move = g.multi = 0;
+        g.context.move = g.multi = 0;
         return;
     }
     x = u.ux + u.dx;
@@ -2676,7 +2676,7 @@ struct obj *obj;
         You("hit your %s with your bullwhip.", body_part(FOOT));
         Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
-        context.botl = 1;
+        g.context.botl = 1;
         return 1;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
@@ -2943,7 +2943,7 @@ struct obj *obj;
     int res = 0, typ, max_range, min_range, glyph;
     coord cc;
     struct monst *mtmp;
-    struct monst *hitm = context.polearm.hitmon;
+    struct monst *hitm = g.context.polearm.hitmon;
 
     /* Are you allowed to use the pole? */
     if (u.uswallow) {
@@ -3016,7 +3016,7 @@ struct obj *obj;
         return res;
     }
 
-    context.polearm.hitmon = (struct monst *) 0;
+    g.context.polearm.hitmon = (struct monst *) 0;
     /* Attack the monster there */
     g.bhitpos = cc;
     if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != (struct monst *) 0) {
@@ -3024,7 +3024,7 @@ struct obj *obj;
             return res;
         if (overexertion())
             return 1; /* burn nutrition; maybe pass out */
-        context.polearm.hitmon = mtmp;
+        g.context.polearm.hitmon = mtmp;
         check_caitiff(mtmp);
         g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
         (void) thitmonst(mtmp, uwep);
@@ -3411,11 +3411,11 @@ struct obj *obj;
              */
             if ((mon = m_at(x, y)) != 0) {
                 (void) bhitm(mon, obj);
-                /* if (context.botl) bot(); */
+                /* if (g.context.botl) bot(); */
             }
             if (affects_objects && g.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
-                if (context.botl)
+                if (g.context.botl)
                     bot(); /* potion effects */
             }
         } else {
@@ -3433,7 +3433,7 @@ struct obj *obj;
              */
             if (affects_objects && g.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
-                if (context.botl)
+                if (g.context.botl)
                     bot(); /* potion effects */
             }
             damage = zapyourself(obj, FALSE);
@@ -3441,7 +3441,7 @@ struct obj *obj;
                 Sprintf(buf, "killed %sself by breaking a wand", uhim());
                 losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
             }
-            if (context.botl)
+            if (g.context.botl)
                 bot(); /* blindness */
         }
     }

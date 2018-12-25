@@ -775,7 +775,7 @@ register struct monst *mtmp;
         default: /* no attack */
             break;
         }
-        if (context.botl)
+        if (g.context.botl)
             bot();
         /* give player a chance of waking up before dying -kaa */
         if (sum[i] == 1) { /* successful attack */
@@ -1014,7 +1014,7 @@ register struct attack *mattk;
                         exercise(A_STR, FALSE);
                     /* inflict damage now; we know it can't be fatal */
                     u.mh -= tmp;
-                    context.botl = 1;
+                    g.context.botl = 1;
                     dmg = 0; /* don't inflict more damage below */
                     if (cloneu())
                         You("divide as %s hits you!", mon_nam(mtmp));
@@ -1450,7 +1450,7 @@ register struct attack *mattk;
                 exercise(A_CON, TRUE);
             if (Sick)
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-            context.botl = 1;
+            g.context.botl = 1;
             if (goaway) {
                 mongone(mtmp);
                 return 2;
@@ -1690,7 +1690,7 @@ register struct attack *mattk;
                 *hpmax_p = lowerlimit;
             /* else unlikely...
              * already at or below minimum threshold; do nothing */
-            context.botl = 1;
+            g.context.botl = 1;
         }
 
         mdamageu(mtmp, dmg);
@@ -2300,7 +2300,7 @@ mdamageu(mtmp, n)
 struct monst *mtmp;
 int n;
 {
-    context.botl = 1;
+    g.context.botl = 1;
     if (Upolyd) {
         u.mh -= n;
         if (u.mh < 1)
@@ -2552,13 +2552,13 @@ struct monst *mon;
             You("are down in the dumps.");
             (void) adjattrib(A_CON, -1, TRUE);
             exercise(A_CON, FALSE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         case 2:
             Your("senses are dulled.");
             (void) adjattrib(A_WIS, -1, TRUE);
             exercise(A_WIS, FALSE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         case 3:
             if (!resists_drli(&g.youmonst)) {
@@ -2594,13 +2594,13 @@ struct monst *mon;
             You_feel("good enough to do it again.");
             (void) adjattrib(A_CON, 1, TRUE);
             exercise(A_CON, TRUE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         case 2:
             You("will always remember %s...", noit_mon_nam(mon));
             (void) adjattrib(A_WIS, 1, TRUE);
             exercise(A_WIS, TRUE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         case 3:
             pline("That was a very educational experience.");
@@ -2613,7 +2613,7 @@ struct monst *mon;
             if (Upolyd)
                 u.mh = u.mhmax;
             exercise(A_STR, TRUE);
-            context.botl = 1;
+            g.context.botl = 1;
             break;
         }
     }
@@ -2646,7 +2646,7 @@ struct monst *mon;
             pline("%s takes %ld %s for services rendered!", noit_Monnam(mon),
                   cost, currency(cost));
             money2mon(mon, cost);
-            context.botl = 1;
+            g.context.botl = 1;
         }
     }
     if (!rn2(25))
@@ -2915,7 +2915,7 @@ cloneu()
     mon->mhpmax = u.mhmax;
     mon->mhp = u.mh / 2;
     u.mh -= mon->mhp;
-    context.botl = 1;
+    g.context.botl = 1;
     return mon;
 }
 

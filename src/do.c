@@ -608,7 +608,7 @@ register struct obj *obj;
                 You("drop %s.", doname(obj));
             /* Ensure update when we drop gold objects */
             if (obj->oclass == COIN_CLASS)
-                context.botl = 1;
+                g.context.botl = 1;
             freeinv(obj);
             hitfloor(obj, TRUE);
             if (levhack)
@@ -631,7 +631,7 @@ register struct obj *obj;
 {
     /* Ensure update when we drop gold objects */
     if (obj->oclass == COIN_CLASS)
-        context.botl = 1;
+        g.context.botl = 1;
     freeinv(obj);
     if (!u.uswallow) {
         if (ship_object(obj, u.ux, u.uy, FALSE))
@@ -744,7 +744,7 @@ struct obj *obj;
          */
         if (!obj->oerodeproof || !rn2(10)) {
             /* if monsters aren't moving, assume player is responsible */
-            if (!context.mon_moving && !program_state.gameover)
+            if (!g.context.mon_moving && !program_state.gameover)
                 costly_alteration(obj, COST_DEGRD);
             obj->otyp = WORM_TOOTH;
             obj->oerodeproof = 0;
@@ -964,7 +964,7 @@ dodown()
             return 1;
         } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
-            if (flags.autodig && !context.nopick && uwep && is_pick(uwep)) {
+            if (flags.autodig && !g.context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else {
                 You_cant("go down here.");
@@ -1247,7 +1247,7 @@ boolean at_stairs, falling, portal;
     maybe_reset_pick();
     reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
     iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination cache */
-    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    g.context.polearm.hitmon = (struct monst *) 0; /* polearm target */
     /* digging context is level-aware and can actually be resumed if
        hero returns to the previous level without any intervening dig */
 
@@ -1874,7 +1874,7 @@ register int timex;
 
     if (!Wounded_legs) {
         ATEMP(A_DEX)--;
-        context.botl = 1;
+        g.context.botl = 1;
     }
 
     if (!Wounded_legs || (HWounded_legs & TIMEOUT))
@@ -1890,7 +1890,7 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
     if (Wounded_legs) {
         if (ATEMP(A_DEX) < 0) {
             ATEMP(A_DEX)++;
-            context.botl = 1;
+            g.context.botl = 1;
         }
 
         /* when mounted, wounded legs applies to the steed;

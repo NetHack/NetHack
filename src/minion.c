@@ -322,7 +322,7 @@ struct monst *mtmp;
         You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
-    context.botl = 1;
+    g.context.botl = 1;
     return offer;
 }
 

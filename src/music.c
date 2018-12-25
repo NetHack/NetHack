@@ -621,7 +621,7 @@ struct obj *instr;
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         break;
     default:
         impossible("What a weird instrument (%d)!", instr->otyp);

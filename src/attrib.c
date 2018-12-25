@@ -167,7 +167,7 @@ int msgflg; /* positive => no message, zero => message, and */
 
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    context.botl = 1;
+    g.context.botl = 1;
     if (g.moves > 1 && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
@@ -294,7 +294,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     if (i == 0 && typ != A_CHA) {
         /* instant kill */
         u.uhp = -1;
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         pline_The("poison was deadly...");
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */
@@ -379,13 +379,13 @@ restore_attrib()
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                context.botl = 1;
+                g.context.botl = 1;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    if (context.botl)
+    if (g.context.botl)
         (void) encumber_msg();
 }
 
@@ -513,11 +513,11 @@ exerchk()
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (g.moves >= context.next_attrib_check) {
+    if (g.moves >= g.context.next_attrib_check) {
         debugpline1("exerchk: ready to test. multi = %d.", g.multi);
     }
     /*  Are we ready for a test? */
-    if (g.moves >= context.next_attrib_check && !g.multi) {
+    if (g.moves >= g.context.next_attrib_check && !g.multi) {
         debugpline0("exerchk: testing.");
         /*
          *      Law of diminishing returns (Part II):
@@ -587,8 +587,8 @@ exerchk()
                platform-dependent rounding/truncation for negative vals */
             AEXE(i) = (abs(ax) / 2) * mod_val;
         }
-        context.next_attrib_check += rn1(200, 800);
-        debugpline1("exerchk: next check at %ld.", context.next_attrib_check);
+        g.context.next_attrib_check += rn1(200, 800);
+        debugpline1("exerchk: next check at %ld.", g.context.next_attrib_check);
     }
 }
 
@@ -1124,7 +1124,7 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
     aligntyp oldalign = u.ualign.type;
 
     u.ublessed = 0;   /* lose divine protection */
-    context.botl = 1; /* status line needs updating */
+    g.context.botl = 1; /* status line needs updating */
     if (reason == 0) {
         /* conversion via altar */
         u.ualignbase[A_CURRENT] = (aligntyp) newalign;

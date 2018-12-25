@@ -246,7 +246,7 @@ bot()
         putmixed(WIN_STATUS, 0, do_statusline2());
 #endif
     }
-    context.botl = context.botlx = 0;
+    g.context.botl = g.context.botlx = 0;
 }
 
 /* convert experience level (1..30) to rank index (0..8) */
@@ -683,18 +683,18 @@ boolean *valsetlist;
     chg = g.update_all ? 0 : compare_blstats(prev, curr);
 
     /* Temporary? hack: moveloop()'s prolog for a new game sets
-     * context.rndencode after the status window has been init'd,
+     * g.context.rndencode after the status window has been init'd,
      * so $:0 has already been encoded and cached by the window
      * port.  Without this hack, gold's \G sequence won't be
      * recognized and ends up being displayed as-is for 'g.update_all'.
      *
-     * Also, even if context.rndencode hasn't changed and the
+     * Also, even if g.context.rndencode hasn't changed and the
      * gold amount itself hasn't changed, the glyph portion of the
      * encoding may have changed if a new symset was put into
      * effect.
      *
      *  \GXXXXNNNN:25
-     *  XXXX = the context.rndencode portion
+     *  XXXX = the g.context.rndencode portion
      *  NNNN = the glyph portion
      *  25   = the gold amount
      *
@@ -702,10 +702,10 @@ boolean *valsetlist;
      * not to honor an initial highlight, so force 'update_all = TRUE'.
      */
     if (fld == BL_GOLD
-        && (context.rndencode != oldrndencode
+        && (g.context.rndencode != oldrndencode
             || g.showsyms[COIN_CLASS + SYM_OFF_O] != oldgoldsym)) {
         g.update_all = TRUE; /* chg = 2; */
-        oldrndencode = context.rndencode;
+        oldrndencode = g.context.rndencode;
         oldgoldsym = g.showsyms[COIN_CLASS + SYM_OFF_O];
     }
 
@@ -780,9 +780,9 @@ boolean *valsetlist;
      *     fields that have changed since the previous update.
      *
      * In both of those situations, we need to force updates to
-     * all of the fields when context.botlx is set. The tty port in
+     * all of the fields when g.context.botlx is set. The tty port in
      * particular has a problem if that isn't done, since the core sets
-     * context.botlx when a menu or text display obliterates the status
+     * g.context.botlx when a menu or text display obliterates the status
      * line.
      *
      * For those situations, to trigger the full update of every field
@@ -794,14 +794,14 @@ boolean *valsetlist;
      * the display, call status_update() with BL_FLUSH.
      *
      */
-    if (context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
+    if (g.context.botlx && (windowprocs.wincap2 & WC2_RESET_STATUS) != 0L)
         status_update(BL_RESET, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &g.cond_hilites[0]);
     else if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, &g.cond_hilites[0]);
 
-    context.botl = context.botlx = 0;
+    g.context.botl = g.context.botlx = 0;
     g.update_all = FALSE;
 }
 
@@ -837,7 +837,7 @@ status_eval_next_unhilite()
             next_unhilite = this_unhilite;
     }
     if (next_unhilite > 0L && next_unhilite < g.bl_hilite_moves)
-        context.botl = TRUE;
+        g.context.botl = TRUE;
 }
 
 void
@@ -1317,7 +1317,7 @@ reset_status_hilites()
             g.blstats[0][i].time = g.blstats[1][i].time = 0L;
         g.update_all = TRUE;
     }
-    context.botlx = TRUE;
+    g.context.botlx = TRUE;
 }
 
 /* test whether the text from a title rule matches the string for

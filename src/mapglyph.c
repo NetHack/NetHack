@@ -245,7 +245,7 @@ int glyph;
 {
     static char encbuf[20]; /* 10+1 would suffice */
 
-    Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
+    Sprintf(encbuf, "\\G%04X%04X", g.context.rndencode, glyph);
     return encbuf;
 }
 
@@ -275,7 +275,7 @@ const char *str;
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
-                if (rndchk == context.rndencode) {
+                if (rndchk == g.context.rndencode) {
                     gv = dcount = 0;
                     for (; *str && ++dcount <= 4; ++str)
                         if ((dp = index(hex, *str)) != 0)
@@ -300,7 +300,7 @@ const char *str;
                         rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
                     else
                         break;
-                if (rndchk == context.rndencode) {
+                if (rndchk == g.context.rndencode) {
                     dcount = 0;
                     for (; *str && ++dcount <= 2; ++str)
                         if ((dp = index(hex, *str)) != 0)

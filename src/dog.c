@@ -190,7 +190,7 @@ makedog()
     if (!mtmp)
         return ((struct monst *) 0); /* pets were genocided */
 
-    context.startingpet_mid = mtmp->m_id;
+    g.context.startingpet_mid = mtmp->m_id;
     /* Horses already wear a saddle */
     if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
@@ -728,8 +728,8 @@ coord *cc;   /* optional destination coordinates */
     mtmp->mux = new_lev.dnum;
     mtmp->muy = new_lev.dlevel;
     mtmp->mx = mtmp->my = 0; /* this implies migration */
-    if (mtmp == context.polearm.hitmon)
-        context.polearm.hitmon = (struct monst *) 0;
+    if (mtmp == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = (struct monst *) 0;
 }
 
 /* return quality of food; the lower the better */

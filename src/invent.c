@@ -769,7 +769,7 @@ addinv_core1(obj)
 struct obj *obj;
 {
     if (obj->oclass == COIN_CLASS) {
-        context.botl = 1;
+        g.context.botl = 1;
     } else if (obj->otyp == AMULET_OF_YENDOR) {
         if (u.uhave.amulet)
             impossible("already have amulet?");
@@ -1068,7 +1068,7 @@ freeinv_core(obj)
 struct obj *obj;
 {
     if (obj->oclass == COIN_CLASS) {
-        context.botl = 1;
+        g.context.botl = 1;
         return;
     } else if (obj->otyp == AMULET_OF_YENDOR) {
         if (!u.uhave.amulet)
@@ -1099,7 +1099,7 @@ struct obj *obj;
         curse(obj);
     } else if (confers_luck(obj)) {
         set_moreluck();
-        context.botl = 1;
+        g.context.botl = 1;
     } else if (obj->otyp == FIGURINE && obj->timed) {
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(obj));
     }
@@ -1749,7 +1749,7 @@ redo_menu:
                 continue;
             }
         }
-        context.botl = 1; /* May have changed the amount of money */
+        g.context.botl = 1; /* May have changed the amount of money */
         savech(ilet);
         /* [we used to set otmp (by finding ilet in invent) here, but
            that's been moved above so that otmp can be checked earlier] */
@@ -2009,7 +2009,7 @@ unsigned *resultflags;
         }
 
         if (oc_of_sym == COIN_CLASS && !combo) {
-            context.botl = 1;
+            g.context.botl = 1;
         } else if (sym == 'a') {
             allflag = TRUE;
         } else if (sym == 'A') {

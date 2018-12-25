@@ -100,7 +100,7 @@ register struct obj *obj;
     if (uwep == obj
         && ((uwep && uwep->oartifact == ART_OGRESMASHER)
             || (olduwep && olduwep->oartifact == ART_OGRESMASHER)))
-        context.botl = 1;
+        g.context.botl = 1;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
@@ -363,7 +363,7 @@ dowieldquiver()
     /* will_weld(), touch_petrifies(), etc. */
     g.multi = 0;
     /* forget last splitobj() before calling getobj() with ALLOW_COUNT */
-    context.objsplit.child_oid = context.objsplit.parent_oid = 0;
+    g.context.objsplit.child_oid = g.context.objsplit.parent_oid = 0;
 
     /* Prompt for a new quiver: "What do you want to ready?"
        (Include gems/stones as likely candidates if either primary
@@ -388,11 +388,11 @@ dowieldquiver()
             You("already have no ammunition readied!");
         }
         return 0;
-    } else if (newquiver->o_id == context.objsplit.child_oid) {
+    } else if (newquiver->o_id == g.context.objsplit.child_oid) {
         /* if newquiver is the result of supplying a count to getobj()
            we don't want to split something already in the quiver;
            for any other item, we need to give it its own inventory slot */
-        if (uquiver && uquiver->o_id == context.objsplit.parent_oid) {
+        if (uquiver && uquiver->o_id == g.context.objsplit.parent_oid) {
             unsplitobj(newquiver);
             goto already_quivered;
         }

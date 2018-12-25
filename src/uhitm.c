@@ -104,7 +104,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
     if (u.uswallow && mtmp == u.ustuck)
         return FALSE;
 
-    if (context.forcefight) {
+    if (g.context.forcefight) {
         /* Do this in the caller, after we checked that the monster
          * didn't die from the blow.  Reason: putting the 'I' there
          * causes the hero to forget the square's contents since
@@ -216,7 +216,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
 
             Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
             if (!paranoid_query(ParanoidHit, qbuf)) {
-                context.move = 0;
+                g.context.move = 0;
                 return TRUE;
             }
         }
@@ -336,7 +336,7 @@ register struct monst *mtmp;
      * you'll usually just swap places if this is a movement command
      */
     /* Intelligent chaotic weapons (Stormbringer) want blood */
-    if (is_safepet(mtmp) && !context.forcefight) {
+    if (is_safepet(mtmp) && !g.context.forcefight) {
         if (!uwep || uwep->oartifact != ART_STORMBRINGER) {
             /* There are some additional considerations: this won't work
              * if in a shop or Punished or you miss a random roll or
@@ -366,13 +366,13 @@ register struct monst *mtmp;
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
-                context.travel = context.travel1 = context.mv = context.run
+                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
                     = 0;
                 return TRUE;
             } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
                         || (mtmp->data->mmove == 0)) && rn2(6)) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
-                context.travel = context.travel1 = context.mv = context.run
+                g.context.travel = g.context.travel1 = g.context.mv = g.context.run
                     = 0;
                 return TRUE;
             } else
@@ -443,7 +443,7 @@ register struct monst *mtmp;
      * and it returned 0 (it's okay to attack), and the monster didn't
      * evade.
      */
-    if (context.forcefight && !DEADMONSTER(mtmp) && !canspotmon(mtmp)
+    if (g.context.forcefight && !DEADMONSTER(mtmp) && !canspotmon(mtmp)
         && !glyph_is_invisible(levl[u.ux + u.dx][u.uy + u.dy].glyph)
         && !(u.uswallow && mtmp == u.ustuck))
         map_invisible(u.ux + u.dx, u.uy + u.dy);
@@ -2882,7 +2882,7 @@ struct obj *otmp; /* source of flash */
                 light_hits_gremlin(mtmp, amt);
             }
             if (!DEADMONSTER(mtmp)) {
-                if (!context.mon_moving)
+                if (!g.context.mon_moving)
                     setmangry(mtmp, TRUE);
                 if (tmp < 9 && !mtmp->isshk && rn2(4))
                     monflee(mtmp, rn2(4) ? rnd(100) : 0, FALSE, TRUE);
@@ -2904,7 +2904,7 @@ int dmg;
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);
     if (DEADMONSTER(mon)) {
-        if (context.mon_moving)
+        if (g.context.mon_moving)
             monkilled(mon, (char *) 0, AD_BLND);
         else
             killed(mon);

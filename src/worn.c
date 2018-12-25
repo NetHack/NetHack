@@ -713,7 +713,7 @@ clear_bypasses()
     /*
      * 'Object' bypass is also used for one monster function:
      * polymorph control of long worms.  Activated via setting
-     * context.bypasses even if no specific object has been
+     * g.context.bypasses even if no specific object has been
      * bypassed.
      */
 
@@ -763,7 +763,7 @@ clear_bypasses()
            be just created by polymorph and migrating at the same time */
     }
     /* g.billobjs and g.mydogs chains don't matter here */
-    context.bypasses = FALSE;
+    g.context.bypasses = FALSE;
 }
 
 void
@@ -771,7 +771,7 @@ bypass_obj(obj)
 struct obj *obj;
 {
     obj->bypass = 1;
-    context.bypasses = TRUE;
+    g.context.bypasses = TRUE;
 }
 
 /* set or clear the bypass bit in a list of objects */
@@ -781,7 +781,7 @@ struct obj *objchain;
 boolean on; /* TRUE => set, FALSE => clear */
 {
     if (on && objchain)
-        context.bypasses = TRUE;
+        g.context.bypasses = TRUE;
     while (objchain) {
         objchain->bypass = on ? 1 : 0;
         objchain = objchain->nobj;

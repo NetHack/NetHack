@@ -275,7 +275,7 @@ boolean ghostly, frozen;
             otmp2->nobj = otmp;
 
         if (ghostly) {
-            unsigned nid = context.ident++;
+            unsigned nid = g.context.ident++;
             add_id_mapping(otmp->o_id, nid);
             otmp->o_id = nid;
         }
@@ -322,12 +322,12 @@ boolean ghostly, frozen;
             otmp->bypass = 0;
         if (!ghostly) {
             /* fix the pointers */
-            if (otmp->o_id == context.victual.o_id)
-                context.victual.piece = otmp;
-            if (otmp->o_id == context.tin.o_id)
-                context.tin.tin = otmp;
-            if (otmp->o_id == context.spbook.o_id)
-                context.spbook.book = otmp;
+            if (otmp->o_id == g.context.victual.o_id)
+                g.context.victual.piece = otmp;
+            if (otmp->o_id == g.context.tin.o_id)
+                g.context.tin.tin = otmp;
+            if (otmp->o_id == g.context.spbook.o_id)
+                g.context.spbook.book = otmp;
         }
         otmp2 = otmp;
     }
@@ -419,7 +419,7 @@ boolean ghostly;
             mtmp2->nmon = mtmp;
 
         if (ghostly) {
-            unsigned nid = context.ident++;
+            unsigned nid = g.context.ident++;
             add_id_mapping(mtmp->m_id, nid);
             mtmp->m_id = nid;
         }
@@ -459,8 +459,8 @@ boolean ghostly;
             restpriest(mtmp, ghostly);
 
         if (!ghostly) {
-            if (mtmp->m_id == context.polearm.m_id)
-                context.polearm.hitmon = mtmp;
+            if (mtmp->m_id == g.context.polearm.m_id)
+                g.context.polearm.hitmon = mtmp;
         }
         mtmp2 = mtmp;
     }
@@ -548,12 +548,12 @@ unsigned int *stuckid, *steedid;
             return FALSE;
     }
 
-    newgamecontext = context; /* copy statically init'd context */
-    mread(fd, (genericptr_t) &context, sizeof (struct context_info));
-    context.warntype.species = (context.warntype.speciesidx >= LOW_PM)
-                                  ? &mons[context.warntype.speciesidx]
+    newgamecontext = g.context; /* copy statically init'd context */
+    mread(fd, (genericptr_t) &g.context, sizeof (struct context_info));
+    g.context.warntype.species = (g.context.warntype.speciesidx >= LOW_PM)
+                                  ? &mons[g.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
-    /* context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
+    /* g.context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
        are pointers which get set to Null during save and will be recovered
        via corresponding o_id or m_id while objs or mons are being restored */
 
@@ -625,7 +625,7 @@ unsigned int *stuckid, *steedid;
 #ifdef SYSFLAGS
         sysflags = newgamesysflags;
 #endif
-        context = newgamecontext;
+        g.context = newgamecontext;
         return FALSE;
     }
     /* in case hangup save occurred in midst of level change */

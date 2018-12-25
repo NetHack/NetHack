@@ -1241,7 +1241,7 @@ see_monsters()
         newsym(mon->mx, mon->my);
         if (mon->wormno)
             see_wsegs(mon);
-        if (Warn_of_mon && (context.warntype.obj & mon->data->mflags2) != 0L)
+        if (Warn_of_mon && (g.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
     /*
@@ -1370,7 +1370,7 @@ docrt()
     /* overlay with monsters */
     see_monsters();
 
-    context.botlx = 1; /* force a redraw of the bottom line */
+    g.context.botlx = 1; /* force a redraw of the bottom line */
 }
 
 /* =========================================================================
@@ -1532,7 +1532,7 @@ cls()
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    context.botlx = 1;                    /* force update of botl window */
+    g.context.botlx = 1;                    /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* this is sort of an extra effort, but OK */
@@ -1579,7 +1579,7 @@ int cursor_on_u;
     display_nhwindow(WIN_MAP, FALSE);
     reset_glyph_bbox();
     flushing = 0;
-    if (context.botl || context.botlx)
+    if (g.context.botl || g.context.botlx)
         bot();
 }
 

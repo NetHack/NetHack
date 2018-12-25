@@ -463,7 +463,7 @@ boolean mkspecl;
         struct obj *novel = mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
 
         if (novel)
-            context.tribute.bookstock = TRUE;
+            g.context.tribute.bookstock = TRUE;
         return;
     }
 
@@ -748,7 +748,7 @@ register struct mkroom *sroom;
         make_engr_at(m, n, buf, 0L, DUST);
     }
 
-    if (context.tribute.enabled && !context.tribute.bookstock) {
+    if (g.context.tribute.enabled && !g.context.tribute.bookstock) {
         /*
          * Out of the number of spots where we're actually
          * going to put stuff, randomly single out one in particular.

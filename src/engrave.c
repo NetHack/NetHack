@@ -373,7 +373,7 @@ int x, y;
             } else
                 et = ep->engr_txt;
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
-            if (context.run > 1)
+            if (g.context.run > 1)
                 nomul(0);
         }
     }

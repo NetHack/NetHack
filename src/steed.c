@@ -354,7 +354,7 @@ boolean force;      /* Quietly force this animal */
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TRUE);
-    context.botl = TRUE;
+    g.context.botl = TRUE;
     return TRUE;
 }
 
@@ -676,11 +676,11 @@ int reason; /* Player was thrown off etc. */
         g.in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
         g.in_steed_dismounting = FALSE;
-        context.botl = TRUE;
+        g.context.botl = TRUE;
         (void) encumber_msg();
         g.vision_full_recalc = 1;
     } else
-        context.botl = TRUE;
+        g.context.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
         g.unweapon = TRUE;

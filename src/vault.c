@@ -153,8 +153,8 @@ struct monst *grd;
 {
     /* either guard is dead or will now be treated as if so;
        monster traversal loops should skip it */
-    if (grd == context.polearm.hitmon)
-        context.polearm.hitmon = 0;
+    if (grd == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = 0;
     if (grd->mx) {
         remove_monster(grd->mx, grd->my);
         newsym(grd->mx, grd->my);

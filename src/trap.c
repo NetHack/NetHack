@@ -405,7 +405,7 @@ int x, y, typ;
             && (is_hole(typ) || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
             add_damage(x, y, /* schedule repair */
                        ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
-                        && !context.mon_moving)
+                        && !g.context.mon_moving)
                            ? SHOP_HOLE_COST
                            : 0L);
         lev->doormask = 0;     /* subsumes altarmask, icedpool... */
@@ -681,7 +681,7 @@ int *fail_reason;
 
     /* if this isn't caused by a monster using a wand of striking,
        there might be consequences for the hero */
-    if (!context.mon_moving) {
+    if (!g.context.mon_moving) {
         /* if statue is owned by a shop, hero will have to pay for it;
            stolen_value gives a message (about debt or use of credit)
            which refers to "it" so needs to follow a message describing
@@ -1766,12 +1766,12 @@ int style;
     }
     newsym(x1, y1);
     /* in case you're using a pick-axe to chop the boulder that's being
-       launched (perhaps a monster triggered it), destroy context so that
+       launched (perhaps a monster triggered it), destroy g.context so that
        next dig attempt never thinks you're resuming previous effort */
     if ((otyp == BOULDER || otyp == STATUE)
-        && singleobj->ox == context.digging.pos.x
-        && singleobj->oy == context.digging.pos.y)
-        (void) memset((genericptr_t) &context.digging, 0,
+        && singleobj->ox == g.context.digging.pos.x
+        && singleobj->oy == g.context.digging.pos.y)
+        (void) memset((genericptr_t) &g.context.digging, 0,
                       sizeof(struct dig_info));
 
     dist = distmin(x1, y1, x2, y2);
@@ -2810,7 +2810,7 @@ boolean byplayer;
 void
 float_up()
 {
-    context.botl = TRUE;
+    g.context.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             reset_utrap(FALSE);
@@ -2921,7 +2921,7 @@ long hmask, emask; /* might cancel timeout */
         (void) encumber_msg(); /* carrying capacity might have changed */
         return 0;
     }
-    context.botl = TRUE;
+    g.context.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */
@@ -3137,11 +3137,11 @@ struct obj *box; /* null for floor trap */
         if (alt > num)
             num = alt;
         if (u.mhmax > mons[u.umonnum].mlevel)
-            u.mhmax -= rn2(min(u.mhmax, num + 1)), context.botl = 1;
+            u.mhmax -= rn2(min(u.mhmax, num + 1)), g.context.botl = 1;
     } else {
         num = d(2, 4);
         if (u.uhpmax > u.ulevel)
-            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), context.botl = 1;
+            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), g.context.botl = 1;
     }
     if (!num)
         You("are uninjured.");
@@ -3185,12 +3185,12 @@ domagictrap()
         if (!Deaf) {
             You_hear("a deafening roar!");
             incr_itimeout(&HDeaf, rn1(20, 30));
-            context.botl = TRUE;
+            g.context.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
             You_feel("rankled.");
             incr_itimeout(&HDeaf, rn1(5, 15));
-            context.botl = TRUE;
+            g.context.botl = TRUE;
         }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
@@ -3874,7 +3874,7 @@ int n;
                 u.uenmax = 0;
             u.uen = 0;
         }
-        context.botl = 1;
+        g.context.botl = 1;
     }
 }
 

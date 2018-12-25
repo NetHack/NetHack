@@ -186,7 +186,7 @@ struct obj **obj_p;
         if (otmp->oclass == COIN_CLASS)
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
-            otmp->spe = context.current_fruit; /* give it a type */
+            otmp->spe = g.context.current_fruit; /* give it a type */
         else if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
@@ -340,8 +340,8 @@ int x, y;
                 if (Hallucination) {
                     Strcat(monbuf, "paranoid delusion");
                 } else {
-                    unsigned long mW = (context.warntype.obj
-                                        | context.warntype.polyd),
+                    unsigned long mW = (g.context.warntype.obj
+                                        | g.context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
                     const char *whom = ((mW & M2_HUMAN & m2) ? "human"
                                         : (mW & M2_ELF & m2) ? "elf"

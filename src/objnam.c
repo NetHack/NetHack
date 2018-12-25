@@ -2825,7 +2825,7 @@ struct obj *no_wish;
     int tmp, tinv, tvariety;
     int wetness, gsize = 0;
     struct fruit *f;
-    int ftype = context.current_fruit;
+    int ftype = g.context.current_fruit;
     char fruitbuf[BUFSZ], globbuf[BUFSZ];
     /* Fruits may not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
@@ -3275,7 +3275,7 @@ struct obj *no_wish;
         otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
         otmp->quan = (long) cnt;
         otmp->owt = weight(otmp);
-        context.botl = 1;
+        g.context.botl = 1;
         return otmp;
     }
 

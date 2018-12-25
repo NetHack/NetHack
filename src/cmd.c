@@ -1409,9 +1409,9 @@ wiz_intrinsic(VOID_ARGS)
                 break;
             case WARN_OF_MON:
                 if (!Warn_of_mon) {
-                    context.warntype.speciesidx = PM_GRID_BUG;
-                    context.warntype.species
-                                         = &mons[context.warntype.speciesidx];
+                    g.context.warntype.speciesidx = PM_GRID_BUG;
+                    g.context.warntype.species
+                                         = &mons[g.context.warntype.speciesidx];
                 }
                 goto def_feedback;
             case LEVITATION:
@@ -1425,7 +1425,7 @@ wiz_intrinsic(VOID_ARGS)
                 incr_itimeout(&u.uprops[p].intrinsic, amt);
                 break;
             }
-            context.botl = 1; /* probably not necessary... */
+            g.context.botl = 1; /* probably not necessary... */
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
@@ -2530,32 +2530,32 @@ int final;
         you_are("telepathic", from_what(TELEPAT));
     if (Warning)
         you_are("warned", from_what(WARNING));
-    if (Warn_of_mon && context.warntype.obj) {
+    if (Warn_of_mon && g.context.warntype.obj) {
         Sprintf(buf, "aware of the presence of %s",
-                (context.warntype.obj & M2_ORC) ? "orcs"
-                : (context.warntype.obj & M2_ELF) ? "elves"
-                : (context.warntype.obj & M2_DEMON) ? "demons" : something);
+                (g.context.warntype.obj & M2_ORC) ? "orcs"
+                : (g.context.warntype.obj & M2_ELF) ? "elves"
+                : (g.context.warntype.obj & M2_DEMON) ? "demons" : something);
         you_are(buf, from_what(WARN_OF_MON));
     }
-    if (Warn_of_mon && context.warntype.polyd) {
+    if (Warn_of_mon && g.context.warntype.polyd) {
         Sprintf(buf, "aware of the presence of %s",
-                ((context.warntype.polyd & (M2_HUMAN | M2_ELF))
+                ((g.context.warntype.polyd & (M2_HUMAN | M2_ELF))
                  == (M2_HUMAN | M2_ELF))
                     ? "humans and elves"
-                    : (context.warntype.polyd & M2_HUMAN)
+                    : (g.context.warntype.polyd & M2_HUMAN)
                           ? "humans"
-                          : (context.warntype.polyd & M2_ELF)
+                          : (g.context.warntype.polyd & M2_ELF)
                                 ? "elves"
-                                : (context.warntype.polyd & M2_ORC)
+                                : (g.context.warntype.polyd & M2_ORC)
                                       ? "orcs"
-                                      : (context.warntype.polyd & M2_DEMON)
+                                      : (g.context.warntype.polyd & M2_DEMON)
                                             ? "demons"
                                             : "certain monsters");
         you_are(buf, "");
     }
-    if (Warn_of_mon && context.warntype.speciesidx >= LOW_PM) {
+    if (Warn_of_mon && g.context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-                makeplural(mons[context.warntype.speciesidx].mname));
+                makeplural(mons[g.context.warntype.speciesidx].mname));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -4479,11 +4479,11 @@ register char *cmd;
         end_of_input();
 #endif
     if (firsttime) {
-        context.nopick = 0;
+        g.context.nopick = 0;
         cmd = parse();
     }
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
-        context.move = FALSE;
+        g.context.move = FALSE;
         return;
     }
     if (*cmd == DOAGAIN && !g.in_doagain && g.saveq[0]) {
@@ -4496,19 +4496,19 @@ register char *cmd;
     /* Special case of *cmd == ' ' handled better below */
     if (!*cmd || *cmd == (char) 0377) {
         nhbell();
-        context.move = FALSE;
+        g.context.move = FALSE;
         return; /* probably we just had an interrupt */
     }
 
     /* handle most movement commands */
     do_walk = do_rush = prefix_seen = FALSE;
-    context.travel = context.travel1 = 0;
+    g.context.travel = g.context.travel1 = 0;
     spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_CLICKLOOK);
 
     switch (spkey) {
     case NHKF_RUSH:
         if (movecmd(cmd[1])) {
-            context.run = 2;
+            g.context.run = 2;
             do_rush = TRUE;
         } else
             prefix_seen = TRUE;
@@ -4519,7 +4519,7 @@ register char *cmd;
         /*FALLTHRU*/
     case NHKF_RUN:
         if (movecmd(lowc(cmd[1]))) {
-            context.run = 3;
+            g.context.run = 3;
             do_rush = TRUE;
         } else
             prefix_seen = TRUE;
@@ -4535,15 +4535,15 @@ register char *cmd;
      */
     case NHKF_FIGHT:
         if (movecmd(cmd[1])) {
-            context.forcefight = 1;
+            g.context.forcefight = 1;
             do_walk = TRUE;
         } else
             prefix_seen = TRUE;
         break;
     case NHKF_NOPICKUP:
         if (movecmd(cmd[1]) || u.dz) {
-            context.run = 0;
-            context.nopick = 1;
+            g.context.run = 0;
+            g.context.nopick = 1;
             if (!u.dz)
                 do_walk = TRUE;
             else
@@ -4553,8 +4553,8 @@ register char *cmd;
         break;
     case NHKF_RUN_NOPICKUP:
         if (movecmd(lowc(cmd[1]))) {
-            context.run = 1;
-            context.nopick = 1;
+            g.context.run = 1;
+            g.context.nopick = 1;
             do_rush = TRUE;
         } else
             prefix_seen = TRUE;
@@ -4563,34 +4563,34 @@ register char *cmd;
         if (!g.Cmd.num_pad)
             break;
         (void) ddoinv(); /* a convenience borrowed from the PC */
-        context.move = FALSE;
+        g.context.move = FALSE;
         g.multi = 0;
         return;
     case NHKF_CLICKLOOK:
         if (iflags.clicklook) {
-            context.move = FALSE;
+            g.context.move = FALSE;
             do_look(2, &g.clicklook_cc);
         }
         return;
     case NHKF_TRAVEL:
         if (flags.travelcmd) {
-            context.travel = 1;
-            context.travel1 = 1;
-            context.run = 8;
-            context.nopick = 1;
+            g.context.travel = 1;
+            g.context.travel1 = 1;
+            g.context.run = 8;
+            g.context.nopick = 1;
             do_rush = TRUE;
             break;
         }
         /*FALLTHRU*/
     default:
         if (movecmd(*cmd)) { /* ordinary movement */
-            context.run = 0; /* only matters here if it was 8 */
+            g.context.run = 0; /* only matters here if it was 8 */
             do_walk = TRUE;
         } else if (movecmd(g.Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
-            context.run = 1;
+            g.context.run = 1;
             do_rush = TRUE;
         } else if (movecmd(unctrl(*cmd))) {
-            context.run = 3;
+            g.context.run = 3;
             do_rush = TRUE;
         }
         break;
@@ -4609,25 +4609,25 @@ register char *cmd;
         }
     }
 
-    if ((do_walk || do_rush) && !context.travel && !dxdy_moveok()) {
+    if ((do_walk || do_rush) && !g.context.travel && !dxdy_moveok()) {
         /* trying to move diagonally as a grid bug;
            this used to be treated by movecmd() as not being
            a movement attempt, but that didn't provide for any
            feedback and led to strangeness if the key pressed
            ('u' in particular) was overloaded for num_pad use */
         You_cant("get there from here...");
-        context.run = 0;
-        context.nopick = context.forcefight = FALSE;
-        context.move = context.mv = FALSE;
+        g.context.run = 0;
+        g.context.nopick = g.context.forcefight = FALSE;
+        g.context.move = g.context.mv = FALSE;
         g.multi = 0;
         return;
     }
 
     if (do_walk) {
         if (g.multi)
-            context.mv = TRUE;
+            g.context.mv = TRUE;
         domove();
-        context.forcefight = 0;
+        g.context.forcefight = 0;
         return;
     } else if (do_rush) {
         if (firsttime) {
@@ -4635,7 +4635,7 @@ register char *cmd;
                 g.multi = max(COLNO, ROWNO);
             u.last_str_turn = 0;
         }
-        context.mv = TRUE;
+        g.context.mv = TRUE;
         domove();
         return;
     } else if (prefix_seen && cmd[1] == g.Cmd.spkeys[NHKF_ESC]) {
@@ -4667,7 +4667,7 @@ register char *cmd;
                 res = (*func)(); /* perform the command */
             }
             if (!res) {
-                context.move = FALSE;
+                g.context.move = FALSE;
                 g.multi = 0;
             }
             return;
@@ -4688,7 +4688,7 @@ register char *cmd;
             Norep("Unknown command '%s'.", expcmd);
     }
     /* didn't move */
-    context.move = FALSE;
+    g.context.move = FALSE;
     g.multi = 0;
     return;
 }
@@ -5529,7 +5529,7 @@ parse()
 
     iflags.in_parse = TRUE;
     g.multi = 0;
-    context.move = 1;
+    g.context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
 #ifdef ALTMETA

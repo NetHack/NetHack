@@ -895,7 +895,7 @@ long ttl;
         tmprect.hy--;
     }
     ff->ttl = ttl;
-    if (!g.in_mklev && !context.mon_moving)
+    if (!g.in_mklev && !g.context.mon_moving)
         set_heros_fault(ff); /* assume player has created it */
  /* ff->can_enter_f = enter_force_field; */
  /* ff->can_leave_f = enter_force_field; */
@@ -1038,7 +1038,7 @@ int damage;
         tmprect.hy--;
     }
     cloud->ttl = rn1(3, 4);
-    if (!g.in_mklev && !context.mon_moving)
+    if (!g.in_mklev && !g.context.mon_moving)
         set_heros_fault(cloud); /* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;

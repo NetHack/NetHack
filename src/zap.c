@@ -205,7 +205,7 @@ struct obj *otmp;
                 dmg *= 2;
             if (otyp == SPE_TURN_UNDEAD)
                 dmg = spell_damage_bonus(dmg);
-            context.bypasses = TRUE; /* for make_corpse() */
+            g.context.bypasses = TRUE; /* for make_corpse() */
             if (!resist(mtmp, otmp->oclass, dmg, NOTELL)) {
                 if (!DEADMONSTER(mtmp))
                     monflee(mtmp, 0, FALSE, TRUE);
@@ -244,7 +244,7 @@ struct obj *otmp;
                     pline("%s shudders!", Monnam(mtmp));
                     learn_it = TRUE;
                 }
-                /* context.bypasses = TRUE; ## for make_corpse() */
+                /* g.context.bypasses = TRUE; ## for make_corpse() */
                 /* no corpse after system shock */
                 xkilled(mtmp, XKILL_GIVEMSG | XKILL_NOCORPSE);
             } else if (newcham(mtmp, (struct permonst *) 0,
@@ -273,7 +273,7 @@ struct obj *otmp;
                 /* flag to indicate that cleanup is needed; object
                    bypass cleanup also clears mon->mextra->mcorpsenm
                    for all long worms on the level */
-                context.bypasses = TRUE;
+                g.context.bypasses = TRUE;
             }
         }
         break;
@@ -975,7 +975,7 @@ struct monst *mon;
         }
 
         /* for a stack, only one is revived */
-        if ((mtmp2 = revive(otmp, !context.mon_moving)) != 0) {
+        if ((mtmp2 = revive(otmp, !g.context.mon_moving)) != 0) {
             ++res;
             if (youseeit)
                 pline("%s%s suddenly comes alive!", owner, corpse);
@@ -998,19 +998,19 @@ register struct obj *obj;
     case RIN_GAIN_STRENGTH:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_STR) -= obj->spe;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_GAIN_CONSTITUTION:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CON) -= obj->spe;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_ADORNMENT:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CHA) -= obj->spe;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_INCREASE_ACCURACY:
@@ -1024,14 +1024,14 @@ register struct obj *obj;
     case GAUNTLETS_OF_DEXTERITY:
         if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
             ABON(A_DEX) -= obj->spe;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT) -= obj->spe;
             ABON(A_WIS) -= obj->spe;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
         /* case RIN_PROTECTION:  not needed */
@@ -1116,19 +1116,19 @@ boolean by_you;
     case RIN_GAIN_STRENGTH:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_STR)--;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_GAIN_CONSTITUTION:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CON)--;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_ADORNMENT:
         if ((obj->owornmask & W_RING) && u_ring) {
             ABON(A_CHA)--;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case RIN_INCREASE_ACCURACY:
@@ -1141,25 +1141,25 @@ boolean by_you;
         break;
     case RIN_PROTECTION:
         if (u_ring)
-            context.botl = 1; /* bot() will recalc u.uac */
+            g.context.botl = 1; /* bot() will recalc u.uac */
         break;
     case HELM_OF_BRILLIANCE:
         if ((obj->owornmask & W_ARMH) && (obj == uarmh)) {
             ABON(A_INT)--;
             ABON(A_WIS)--;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     case GAUNTLETS_OF_DEXTERITY:
         if ((obj->owornmask & W_ARMG) && (obj == uarmg)) {
             ABON(A_DEX)--;
-            context.botl = 1;
+            g.context.botl = 1;
         }
         break;
     default:
         break;
     }
-    if (context.botl)
+    if (g.context.botl)
         bot();
     if (carried(obj))
         update_inventory();
@@ -1190,7 +1190,7 @@ struct obj *obj;
 {
     int zap_odds;
 
-    if (context.bypasses && obj->bypass)
+    if (g.context.bypasses && obj->bypass)
         return FALSE;
 
     if (obj->oclass == WAND_CLASS)
@@ -1223,7 +1223,7 @@ int mat, minwt;
 
     for (otmp = objhdr; minwt > 0 && otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
-        if (context.bypasses && otmp->bypass)
+        if (g.context.bypasses && otmp->bypass)
             continue;
         if (otmp == uball || otmp == uchain)
             continue;
@@ -1267,7 +1267,7 @@ int okind;
     const char *material;
     int pm_index;
 
-    if (context.bypasses) {
+    if (g.context.bypasses) {
         /* this is approximate because the "no golems" !obj->nexthere
            check below doesn't understand bypassed objects; but it
            should suffice since bypassed objects always end up as a
@@ -1845,13 +1845,13 @@ struct obj *obj, *otmp;
          *             chain, possibly recursively.
          *
          * The bypass bit on all objects is reset each turn, whenever
-         * context.bypasses is set.
+         * g.context.bypasses is set.
          *
-         * We check the obj->bypass bit above AND context.bypasses
+         * We check the obj->bypass bit above AND g.context.bypasses
          * as a safeguard against any stray occurrence left in an obj
          * struct someplace, although that should never happen.
          */
-        if (context.bypasses) {
+        if (g.context.bypasses) {
             return 0;
         } else {
             debugpline1("%s for a moment.", Tobjnam(obj, "pulsate"));
@@ -1960,7 +1960,7 @@ struct obj *obj, *otmp;
             } else {
                 int oox = obj->ox;
                 int ooy = obj->oy;
-                if (context.mon_moving
+                if (g.context.mon_moving
                         ? !breaks(obj, obj->ox, obj->oy)
                         : !hero_breaks(obj, obj->ox, obj->oy, FALSE))
                     maybelearnit = FALSE; /* nothing broke */
@@ -2689,7 +2689,7 @@ boolean youattack, allow_cancel_kill, self_cancel;
              otmp = otmp->nobj)
             cancel_item(otmp);
         if (youdefend) {
-            context.botl = 1; /* potential AC change */
+            g.context.botl = 1; /* potential AC change */
             find_ac();
         }
     }
@@ -4326,15 +4326,15 @@ long timeout UNUSED;
 {
     xchar x, y;
     long where = arg->a_long;
-    boolean save_mon_moving = context.mon_moving; /* will be False */
+    boolean save_mon_moving = g.context.mon_moving; /* will be False */
 
     /* melt_ice -> minliquid -> mondead|xkilled shouldn't credit/blame hero */
-    context.mon_moving = TRUE; /* hero isn't causing this ice to melt */
+    g.context.mon_moving = TRUE; /* hero isn't causing this ice to melt */
     y = (xchar) (where & 0xFFFF);
     x = (xchar) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
     melt_ice(x, y, "Some ice melts away.");
-    context.mon_moving = save_mon_moving;
+    g.context.mon_moving = save_mon_moving;
 }
 
 /* Burn floor scrolls, evaporate pools, etc... in a single square.
@@ -4638,7 +4638,7 @@ fracture_rock(obj)
 register struct obj *obj; /* no texts here! */
 {
     xchar x, y;
-    boolean by_you = !context.mon_moving;
+    boolean by_you = !g.context.mon_moving;
 
     if (by_you && get_obj_location(obj, &x, &y, 0) && costly_spot(x, y)) {
         struct monst *shkp = 0;
@@ -4680,7 +4680,7 @@ register struct obj *obj;
     /* [obj is assumed to be on floor, so no get_obj_location() needed] */
     struct trap *trap = t_at(obj->ox, obj->oy);
     struct obj *item;
-    boolean by_you = !context.mon_moving;
+    boolean by_you = !g.context.mon_moving;
 
     if (trap && trap->ttyp == STATUE_TRAP
         && activate_statue_trap(trap, obj->ox, obj->oy, TRUE))
