@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1544520422 2018/12/11 09:27:02 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.230 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1545774525 2018/12/25 21:48:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.231 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1210,10 +1210,15 @@ unsigned doname_flags;
                 obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
     } else if (with_price) {
-        long price = get_cost_of_shop_item(obj);
+        long price = get_cost_of_shop_item(obj); /* updates obj->ox,oy */
 
-        if (price > 0)
+        if (price > 0L)
             Sprintf(eos(bp), " (%ld %s)", price, currency(price));
+        else if (obj->no_charge /* only set for items on shop floor */
+                 && *u.ushops /* but make sure hero is inside same shop */
+                 && (*in_rooms(u.ux, u.uy, SHOPBASE)
+                     == *in_rooms(obj->ox, obj->oy, SHOPBASE)))
+            Strcat(bp, " (no charge)");
     }
     if (!strncmp(prefix, "a ", 2)) {
         /* save current prefix, without "a "; might be empty */
