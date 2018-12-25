@@ -1150,7 +1150,7 @@ int how;
      * On those rare occasions you get hosed immediately, go out
      * smiling... :-)  -3.
      */
-    if (moves <= 1 && how < PANICKED) /* You die... --More-- */
+    if (g.moves <= 1 && how < PANICKED) /* You die... --More-- */
         pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
 
     if (have_windows)
@@ -1499,7 +1499,7 @@ int how;
     }
 
     Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.", umoney,
-            plur(umoney), moves, plur(moves));
+            plur(umoney), g.moves, plur(g.moves));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     Sprintf(pbuf,
             "You were level %d with a maximum of %d hit point%s when you %s.",

@@ -1822,7 +1822,7 @@ int final;
                      way sooner (in other words, didn't start that way) */
                   ? (!final ? "now " : "belatedly ")
                   /* atheist (ignored in very early game) */
-                  : (!u.uconduct.gnostic && moves > 1000L)
+                  : (!u.uconduct.gnostic && g.moves > 1000L)
                      ? "nominally "
                      /* lastly, normal case */
                      : "",
@@ -1902,11 +1902,11 @@ int final;
     you_are(buf, "");
 
     /* this is shown even if the 'time' option is off */
-    if (moves == 1L) {
+    if (g.moves == 1L) {
         you_have("just started your adventure", "");
     } else {
         /* 'turns' grates on the nerves in this context... */
-        Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
+        Sprintf(buf, "the dungeon %ld turn%s ago", g.moves, plur(g.moves));
         /* same phrasing for current and final: "entered" is unconditional */
         enlght_line(You_, "entered ", buf, "");
     }
@@ -3749,7 +3749,7 @@ long *total_size;
     count_obj(invent, &count, &size, FALSE, TRUE);
     count_obj(fobj, &count, &size, FALSE, TRUE);
     count_obj(g.level.buriedobjlist, &count, &size, FALSE, TRUE);
-    count_obj(migrating_objs, &count, &size, FALSE, TRUE);
+    count_obj(g.migrating_objs, &count, &size, FALSE, TRUE);
     /* DEADMONSTER check not required in this loop since they have no
      * inventory */
     for (mon = fmon; mon; mon = mon->nmon)
@@ -3965,9 +3965,9 @@ wiz_show_stats()
     obj_chain(win, "fobj", fobj, TRUE, &total_obj_count, &total_obj_size);
     obj_chain(win, "buried", g.level.buriedobjlist, FALSE,
               &total_obj_count, &total_obj_size);
-    obj_chain(win, "migrating obj", migrating_objs, FALSE,
+    obj_chain(win, "migrating obj", g.migrating_objs, FALSE,
               &total_obj_count, &total_obj_size);
-    obj_chain(win, "billobjs", billobjs, FALSE,
+    obj_chain(win, "billobjs", g.billobjs, FALSE,
               &total_obj_count, &total_obj_size);
     mon_invent_chain(win, "minvent", fmon, &total_obj_count, &total_obj_size);
     mon_invent_chain(win, "migrating minvent", g.migrating_mons,

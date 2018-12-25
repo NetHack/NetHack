@@ -741,7 +741,7 @@ clear_bypasses()
     }
     for (otmp = invent; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;
-    for (otmp = migrating_objs; otmp; otmp = otmp->nobj)
+    for (otmp = g.migrating_objs; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -762,7 +762,7 @@ clear_bypasses()
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
-    /* billobjs and g.mydogs chains don't matter here */
+    /* g.billobjs and g.mydogs chains don't matter here */
     context.bypasses = FALSE;
 }
 

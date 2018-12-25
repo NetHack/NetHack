@@ -168,7 +168,7 @@ int msgflg; /* positive => no message, zero => message, and */
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
     context.botl = 1;
-    if (moves > 1 && (ndx == A_STR || ndx == A_CON))
+    if (g.moves > 1 && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }
@@ -421,14 +421,14 @@ boolean inc_or_dec;
                                                                       : "Con",
                     (inc_or_dec) ? "inc" : "dec", AEXE(i));
     }
-    if (moves > 0 && (i == A_STR || i == A_CON))
+    if (g.moves > 0 && (i == A_STR || i == A_CON))
         (void) encumber_msg();
 }
 
 STATIC_OVL void
 exerper()
 {
-    if (!(moves % 10)) {
+    if (!(g.moves % 10)) {
         /* Hunger Checks */
 
         int hs = (u.uhunger > 1000) ? SATIATED : (u.uhunger > 150)
@@ -478,7 +478,7 @@ exerper()
     }
 
     /* status checks */
-    if (!(moves % 5)) {
+    if (!(g.moves % 5)) {
         debugpline0("exerper: Status checks");
         if ((HClairvoyant & (INTRINSIC | TIMEOUT)) && !BClairvoyant)
             exercise(A_WIS, TRUE);
@@ -513,11 +513,11 @@ exerchk()
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (moves >= context.next_attrib_check) {
+    if (g.moves >= context.next_attrib_check) {
         debugpline1("exerchk: ready to test. multi = %d.", g.multi);
     }
     /*  Are we ready for a test? */
-    if (moves >= context.next_attrib_check && !g.multi) {
+    if (g.moves >= context.next_attrib_check && !g.multi) {
         debugpline0("exerchk: testing.");
         /*
          *      Law of diminishing returns (Part II):
@@ -971,7 +971,7 @@ newhp()
             hp += rnd(urole.hpadv.inrnd);
         if (urace.hpadv.inrnd > 0)
             hp += rnd(urace.hpadv.inrnd);
-        if (moves <= 1L) { /* initial hero; skip for polyself to new man */
+        if (g.moves <= 1L) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
             u.ualign.record = urole.initrecord;

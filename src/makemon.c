@@ -1403,7 +1403,7 @@ int mmflags;
             mtmp->mstrategy |= STRAT_APPEARMSG;
     }
 
-    if (allow_minvent && migrating_objs)
+    if (allow_minvent && g.migrating_objs)
         deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case of waiting items */
 
     if (!g.in_mklev)
@@ -1487,9 +1487,9 @@ register struct permonst *ptr;
     static NEARDATA s_level *lev;
     register int alshift;
 
-    if (oldmoves != moves) {
+    if (oldmoves != g.moves) {
         lev = Is_special(&u.uz);
-        oldmoves = moves;
+        oldmoves = g.moves;
     }
     switch ((lev) ? lev->flags.align : g.dungeons[u.uz.dnum].flags.align) {
     default: /* just in case */

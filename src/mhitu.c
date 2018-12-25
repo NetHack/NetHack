@@ -779,7 +779,7 @@ register struct monst *mtmp;
             bot();
         /* give player a chance of waking up before dying -kaa */
         if (sum[i] == 1) { /* successful attack */
-            if (u.usleep && u.usleep < monstermoves && !rn2(10)) {
+            if (u.usleep && u.usleep < g.monstermoves && !rn2(10)) {
                 g.multi = -1;
                 g.nomovemsg = "The combat suddenly awakens you.";
             }
@@ -1463,7 +1463,7 @@ register struct attack *mattk;
             dmg = 0;
         } else {
             if (Role_if(PM_HEALER)) {
-                if (!Deaf && !(moves % 5))
+                if (!Deaf && !(g.moves % 5))
                     verbalize("Doc, I can't help you unless you cooperate.");
                 dmg = 0;
             } else

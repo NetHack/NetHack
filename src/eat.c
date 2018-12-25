@@ -643,9 +643,9 @@ boolean allowmsg;
     /* when poly'd into a mind flayer, multiple tentacle hits in one
        turn cause multiple digestion checks to occur; avoid giving
        multiple luck penalties for the same attack */
-    if (moves == ate_brains)
+    if (g.moves == ate_brains)
         return FALSE;
-    ate_brains = moves; /* ate_anything, not just brains... */
+    ate_brains = g.moves; /* ate_anything, not just brains... */
 
     if (!CANNIBAL_ALLOWED()
         /* non-cannibalistic heroes shouldn't eat own species ever
@@ -1604,7 +1604,7 @@ struct obj *otmp;
     if (!nonrotting_corpse(mnum)) {
         long age = peek_at_iced_corpse_age(otmp);
 
-        rotted = (monstermoves - age) / (10L + rn2(20));
+        rotted = (g.monstermoves - age) / (10L + rn2(20));
         if (otmp->cursed)
             rotted += 2L;
         else if (otmp->blessed)
@@ -2317,7 +2317,7 @@ struct obj *otmp;
 
             /* worst case rather than random
                in this calculation to force prompt */
-            rotted = (monstermoves - age) / (10L + 0 /* was rn2(20) */);
+            rotted = (g.monstermoves - age) / (10L + 0 /* was rn2(20) */);
             if (otmp->cursed)
                 rotted += 2L;
             else if (otmp->blessed)
@@ -2661,7 +2661,7 @@ doeat()
         context.victual.reqtime = objects[otmp->otyp].oc_delay;
         if (otmp->otyp != FORTUNE_COOKIE
             && (otmp->cursed || (!nonrotting_food(otmp->otyp)
-                                 && (monstermoves - otmp->age)
+                                 && (g.monstermoves - otmp->age)
                                         > (otmp->blessed ? 50L : 30L)
                                  && (otmp->orotten || !rn2(7))))) {
             if (rottenfood(otmp)) {
@@ -2786,7 +2786,7 @@ gethungry()
         && !Slow_digestion)
         u.uhunger--; /* ordinary food consumption */
 
-    if (moves % 2) { /* odd turns */
+    if (g.moves % 2) { /* odd turns */
         /* Regeneration uses up food, unless due to an artifact */
         if ((HRegeneration & ~FROMFORM)
             || (ERegeneration & ~(W_ARTI | W_WEP)))
@@ -2801,7 +2801,7 @@ gethungry()
             u.uhunger--;
         /* +0 charged rings don't do anything, so don't affect hunger.
            Slow digestion cancels move hunger but still causes ring hunger. */
-        switch ((int) (moves % 20)) { /* note: use even cases only */
+        switch ((int) (g.moves % 20)) { /* note: use even cases only */
         case 4:
             if (uleft && (uleft->spe || !objects[uleft->otyp].oc_charged))
                 u.uhunger--;

@@ -241,7 +241,7 @@ struct obj *book2;
                     arti_cursed = TRUE;
             }
             if (otmp->otyp == BELL_OF_OPENING
-                && (moves - otmp->age) < 5L) { /* you rang it recently */
+                && (g.moves - otmp->age) < 5L) { /* you rang it recently */
                 if (!otmp->cursed)
                     arti2_primed = TRUE;
                 else

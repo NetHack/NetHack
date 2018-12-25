@@ -1601,7 +1601,7 @@ boolean near_hero;
     int where;
     boolean nobreak, noscatter;
 
-    for (otmp = migrating_objs; otmp; otmp = otmp2) {
+    for (otmp = g.migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox != u.uz.dnum || otmp->oy != u.uz.dlevel)
             continue;
@@ -1685,7 +1685,7 @@ unsigned long deliverflags;
         maxobj = 1;
 
     cnt = 0;
-    for (otmp = migrating_objs; otmp; otmp = otmp2) {
+    for (otmp = g.migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         where = (int) (otmp->owornmask & 0x7fffL); /* destination code */
         if ((where & MIGR_TO_SPECIES) == 0)

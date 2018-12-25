@@ -627,7 +627,7 @@ int mode;
     if (!perform_bwrite(mode))
         goto skip_lots;
 
-    bwrite(fd, (genericptr_t) &moves, sizeof(moves)); /* timestamp */
+    bwrite(fd, (genericptr_t) &g.moves, sizeof(g.moves)); /* timestamp */
     bwrite(fd, (genericptr_t) &n_regions, sizeof(n_regions));
     for (i = 0; i < n_regions; i++) {
         bwrite(fd, (genericptr_t) &regions[i]->bounding_box, sizeof(NhRect));
@@ -687,7 +687,7 @@ boolean ghostly; /* If a bones file restore */
     if (ghostly)
         tmstamp = 0;
     else
-        tmstamp = (moves - tmstamp);
+        tmstamp = (g.moves - tmstamp);
     mread(fd, (genericptr_t) &n_regions, sizeof(n_regions));
     max_regions = n_regions;
     if (n_regions > 0)

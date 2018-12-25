@@ -60,9 +60,9 @@ register struct attack *mattk;
 {
     boolean farq = (distu(magr->mx, magr->my) > 15);
 
-    if (!Deaf && (farq != g.far_noise || moves - g.noisetime > 10)) {
+    if (!Deaf && (farq != g.far_noise || g.moves - g.noisetime > 10)) {
         g.far_noise = farq;
-        g.noisetime = moves;
+        g.noisetime = g.moves;
         You_hear("%s%s.",
                  (mattk->aatyp == AT_EXPL) ? "an explosion" : "some noises",
                  farq ? " in the distance" : "");
@@ -342,7 +342,7 @@ register struct monst *magr, *mdef;
      * some cases, in which case this still counts as its move for the round
      * and it shouldn't move again.
      */
-    magr->mlstmv = monstermoves;
+    magr->mlstmv = g.monstermoves;
 
     /* Now perform all attacks for the monster. */
     for (i = 0; i < NATTK; i++) {

@@ -213,8 +213,8 @@ boolean devour;
     char objnambuf[BUFSZ];
 
     objnambuf[0] = '\0';
-    if (edog->hungrytime < monstermoves)
-        edog->hungrytime = monstermoves;
+    if (edog->hungrytime < g.monstermoves)
+        edog->hungrytime = g.monstermoves;
     nutrit = dog_nutrition(mtmp, obj);
 
     deadmimic = (obj->otyp == CORPSE && (obj->corpsenm == PM_SMALL_MIMIC
@@ -294,7 +294,7 @@ boolean devour;
 #ifdef LINT
         edog->apport = 0;
 #else
-        edog->apport += (int) (200L / ((long) edog->dropdist + monstermoves
+        edog->apport += (int) (200L / ((long) edog->dropdist + g.monstermoves
                                        - edog->droptime));
 #endif
     if (mtmp->data == &mons[PM_RUST_MONSTER] && obj->oerodeproof) {
@@ -360,9 +360,9 @@ dog_hunger(mtmp, edog)
 struct monst *mtmp;
 struct edog *edog;
 {
-    if (monstermoves > edog->hungrytime + 500) {
+    if (g.monstermoves > edog->hungrytime + 500) {
         if (!carnivorous(mtmp->data) && !herbivorous(mtmp->data)) {
-            edog->hungrytime = monstermoves + 500;
+            edog->hungrytime = g.monstermoves + 500;
             /* but not too high; it might polymorph */
         } else if (!edog->mhpmax_penalty) {
             /* starving pets are limited in healing */
@@ -381,7 +381,7 @@ struct edog *edog;
             else
                 You_feel("worried about %s.", y_monnam(mtmp));
             stop_occupation();
-        } else if (monstermoves > edog->hungrytime + 750
+        } else if (g.monstermoves > edog->hungrytime + 750
                    || DEADMONSTER(mtmp)) {
  dog_died:
             if (mtmp->mleashed && mtmp != u.usteed)
@@ -427,7 +427,7 @@ int udist;
                 if (edog->apport > 1)
                     edog->apport--;
                 edog->dropdist = udist; /* hpscdi!jon */
-                edog->droptime = monstermoves;
+                edog->droptime = g.monstermoves;
             }
     } else {
         if ((obj = g.level.objects[omx][omy]) != 0
@@ -557,7 +557,7 @@ int after, udist, whappr;
 
     /* follow player if appropriate */
     if (g.gtyp == UNDEF || (g.gtyp != DOGFOOD && g.gtyp != APPORT
-                          && monstermoves < edog->hungrytime)) {
+                          && g.monstermoves < edog->hungrytime)) {
         g.gx = u.ux;
         g.gy = u.uy;
         if (after && udist <= 4 && g.gx == u.ux && g.gy == u.uy)
@@ -923,7 +923,7 @@ int after; /* this is extra fast monster movement */
         else if (j == 1)
             goto newdogpos; /* eating something */
 
-        whappr = (monstermoves - edog->whistletime < 5);
+        whappr = (g.monstermoves - edog->whistletime < 5);
     } else
         whappr = 0;
 
@@ -1034,7 +1034,7 @@ int after; /* this is extra fast monster movement */
                 return 2;
 
             if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
-                && mtmp2->mlstmv != monstermoves
+                && mtmp2->mlstmv != g.monstermoves
                 && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
                 && monnear(mtmp2, mtmp->mx, mtmp->my)) {
@@ -1087,7 +1087,7 @@ int after; /* this is extra fast monster movement */
                     cursemsg[i] = TRUE;
                 } else if ((otyp = dogfood(mtmp, obj)) < MANFOOD
                          && (otyp < ACCFOOD
-                             || edog->hungrytime <= monstermoves)) {
+                             || edog->hungrytime <= g.monstermoves)) {
                     /* Note: our dog likes the food so much that he
                      * might eat it even when it conceals a cursed object */
                     nix = nx;
@@ -1142,7 +1142,7 @@ int after; /* this is extra fast monster movement */
         /* How hungry is the pet? */
         if (!mtmp->isminion) {
             struct edog *dog = EDOG(mtmp);
-            hungry = (monstermoves > (dog->hungrytime + 300));
+            hungry = (g.monstermoves > (dog->hungrytime + 300));
         }
 
         /* Identify the best target in a straight line from the pet;

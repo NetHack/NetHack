@@ -440,7 +440,7 @@ ckmailstatus()
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (g.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -498,12 +498,12 @@ ckmailstatus()
 
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
-        || moves < laststattime + MAILCKFREQ
+        || g.moves < laststattime + MAILCKFREQ
 #endif
         )
         return;
 
-    laststattime = moves;
+    laststattime = g.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
@@ -623,8 +623,8 @@ ck_server_admin_msg()
     static struct stat ost,nst;
     static long lastchk = 0;
 
-    if (moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = moves;
+    if (g.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = g.moves;
 
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)

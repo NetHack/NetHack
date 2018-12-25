@@ -460,7 +460,7 @@ dig(VOID_ARGS)
             newsym(dpx, dpy);
         }
     cleanup:
-        context.digging.lastdigtime = moves;
+        context.digging.lastdigtime = g.moves;
         context.digging.quiet = FALSE;
         context.digging.level.dnum = 0;
         context.digging.level.dlevel = -1;
@@ -1123,8 +1123,8 @@ struct obj *obj;
                     && !context.digging.down
                     && context.digging.pos.x == u.ux
                     && context.digging.pos.y == u.uy
-                    && (moves <= context.digging.lastdigtime + 2
-                        && moves >= context.digging.lastdigtime)) {
+                    && (g.moves <= context.digging.lastdigtime + 2
+                        && g.moves >= context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
                     g.did_dig_msg = TRUE;
                     context.digging.quiet = TRUE;

@@ -2012,13 +2012,13 @@ boolean from_invent;
                     at start of this turn, so that "simultaneous"
                     multiple breakage isn't drastically worse than
                     single breakage.  (ought to be done via ESHK)  */
-                if (moves != lastmovetime)
+                if (g.moves != lastmovetime)
                     peaceful_shk = shkp->mpeaceful;
                 if (stolen_value(obj, x, y, peaceful_shk, FALSE) > 0L
                     && (*o_shop != u.ushops[0] || !inside_shop(u.ux, u.uy))
-                    && moves != lastmovetime)
+                    && g.moves != lastmovetime)
                     make_angry_shk(shkp, x, y);
-                lastmovetime = moves;
+                lastmovetime = g.moves;
             }
         }
     }

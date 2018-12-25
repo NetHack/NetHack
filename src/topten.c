@@ -366,7 +366,7 @@ int how;
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 g.multi_reason ? g.multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
-            encodeconduct(), XLOG_SEP, moves, XLOG_SEP, encodeachieve());
+            encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP, encodeachieve());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
             (long) urealtime.realtime, XLOG_SEP,
             (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);

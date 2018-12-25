@@ -292,7 +292,7 @@ struct obj *box;
     case SACK:
     case OILSKIN_SACK:
         /* initial inventory: sack starts out empty */
-        if (moves <= 1 && !g.in_mklev) {
+        if (g.moves <= 1 && !g.in_mklev) {
             n = 0;
             break;
         }
@@ -761,7 +761,7 @@ boolean artif;
 
     otmp = newobj();
     *otmp = zeroobj;
-    otmp->age = monstermoves;
+    otmp->age = g.monstermoves;
     otmp->o_id = context.ident++;
     if (!otmp->o_id)
         otmp->o_id = context.ident++; /* ident overflowed */
@@ -987,7 +987,7 @@ boolean artif;
                 otmp = mk_artifact(otmp, (aligntyp) A_NONE);
             /* simulate lacquered armor for samurai */
             if (Role_if(PM_SAMURAI) && otmp->otyp == SPLINT_MAIL
-                && (moves <= 1 || In_quest(&u.uz))) {
+                && (g.moves <= 1 || In_quest(&u.uz))) {
 #ifdef UNIXPC
                 /* optimizer bitfield bug */
                 otmp->oerodeproof = 1;
@@ -1169,7 +1169,7 @@ struct obj *body;
 
     action = ROT_CORPSE;             /* default action: rot away */
     rot_adjust = g.in_mklev ? 25 : 10; /* give some variation */
-    corpse_age = monstermoves - body->age;
+    corpse_age = g.monstermoves - body->age;
     if (corpse_age > ROT_AGE)
         when = rot_adjust;
     else
@@ -1774,12 +1774,12 @@ struct obj *otmp;
 
     if (otmp->otyp == CORPSE && otmp->on_ice) {
         /* Adjust the age; must be same as obj_timer_checks() for off ice*/
-        age = monstermoves - otmp->age;
+        age = g.monstermoves - otmp->age;
         retval += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
         debugpline3(
           "The %s age has ice modifications: otmp->age = %ld, returning %ld.",
                     s_suffix(doname(otmp)), otmp->age, retval);
-        debugpline1("Effective age of corpse: %ld.", monstermoves - retval);
+        debugpline1("Effective age of corpse: %ld.", g.monstermoves - retval);
     }
     return retval;
 }
@@ -1818,8 +1818,8 @@ int force; /* 0 = no force so do checks, <0 = force off, >0 force on */
                later calculations behave as if it had been on ice during
                that time (longwinded way of saying this is the inverse
                of removing it from the ice and of peeking at its age). */
-            age = monstermoves - otmp->age;
-            otmp->age = monstermoves - (age * ROT_ICE_ADJUSTMENT);
+            age = g.monstermoves - otmp->age;
+            otmp->age = g.monstermoves - (age * ROT_ICE_ADJUSTMENT);
         }
 
     /* Check for corpses coming off ice */
@@ -1840,7 +1840,7 @@ int force; /* 0 = no force so do checks, <0 = force off, >0 force on */
             tleft /= ROT_ICE_ADJUSTMENT;
             restart_timer = TRUE;
             /* Adjust the age */
-            age = monstermoves - otmp->age;
+            age = g.monstermoves - otmp->age;
             otmp->age += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
         }
     }
@@ -1907,7 +1907,7 @@ struct monst *mtmp;
  *      OBJ_MINVENT     monster's invent chain
  *      OBJ_MIGRATING   migrating chain
  *      OBJ_BURIED      level.buriedobjs chain
- *      OBJ_ONBILL      on billobjs chain
+ *      OBJ_ONBILL      on g.billobjs chain
  */
 void
 obj_extract_self(obj)
@@ -1930,13 +1930,13 @@ struct obj *obj;
         extract_nobj(obj, &obj->ocarry->minvent);
         break;
     case OBJ_MIGRATING:
-        extract_nobj(obj, &migrating_objs);
+        extract_nobj(obj, &g.migrating_objs);
         break;
     case OBJ_BURIED:
         extract_nobj(obj, &g.level.buriedobjlist);
         break;
     case OBJ_ONBILL:
-        extract_nobj(obj, &billobjs);
+        extract_nobj(obj, &g.billobjs);
         break;
     default:
         panic("obj_extract_self");
@@ -2055,8 +2055,8 @@ struct obj *obj;
         panic("add_to_migration: obj not free");
 
     obj->where = OBJ_MIGRATING;
-    obj->nobj = migrating_objs;
-    migrating_objs = obj;
+    obj->nobj = g.migrating_objs;
+    g.migrating_objs = obj;
 }
 
 void
@@ -2243,9 +2243,9 @@ obj_sanity_check()
             }
 
     objlist_sanity(invent, OBJ_INVENT, "invent sanity");
-    objlist_sanity(migrating_objs, OBJ_MIGRATING, "migrating sanity");
+    objlist_sanity(g.migrating_objs, OBJ_MIGRATING, "migrating sanity");
     objlist_sanity(g.level.buriedobjlist, OBJ_BURIED, "buried sanity");
-    objlist_sanity(billobjs, OBJ_ONBILL, "bill sanity");
+    objlist_sanity(g.billobjs, OBJ_ONBILL, "bill sanity");
 
     mon_obj_sanity(fmon, "minvent sanity");
     mon_obj_sanity(g.migrating_mons, "migrating minvent sanity");
@@ -2732,10 +2732,10 @@ struct obj **obj1, **obj2;
             o2wt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
             /* averaging the relative ages is less likely to overflow
                than averaging the absolute ages directly */
-            agetmp = (((moves - otmp1->age) * o1wt
-                       + (moves - otmp2->age) * o2wt)
+            agetmp = (((g.moves - otmp1->age) * o1wt
+                       + (g.moves - otmp2->age) * o2wt)
                       / (o1wt + o2wt));
-            otmp1->age = moves - agetmp; /* conv. relative back to absolute */
+            otmp1->age = g.moves - agetmp; /* conv. relative back to absolute */
             otmp1->owt += o2wt;
             if (otmp1->oeaten)
                 otmp1->oeaten += o2wt;

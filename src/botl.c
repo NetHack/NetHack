@@ -152,7 +152,7 @@ do_statusline2()
 
     /* time/move counter */
     if (flags.time)
-        Sprintf(tmmv, "T:%ld", moves);
+        Sprintf(tmmv, "T:%ld", g.moves);
     else
         tmmv[0] = '\0';
     tln = strlen(tmmv);
@@ -605,7 +605,7 @@ bot_via_windowport()
     g.blstats[idx][BL_EXP].a.a_long = u.uexp;
 
     /* Time (moves) */
-    g.blstats[idx][BL_TIME].a.a_long = moves;
+    g.blstats[idx][BL_TIME].a.a_long = g.moves;
 
     /* Hunger */
     /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
@@ -812,7 +812,7 @@ status_eval_next_unhilite()
     struct istat_s *curr = NULL;
     long next_unhilite, this_unhilite;
 
-    g.bl_hilite_moves = moves;
+    g.bl_hilite_moves = g.moves;
     /* figure out when the next unhilight needs to be performed */
     next_unhilite = 0L;
     for (i = 0; i < MAXBLSTATS; ++i) {

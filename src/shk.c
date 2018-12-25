@@ -305,7 +305,7 @@ register struct monst *shkp;
     for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon)
         clear_unpaid(shkp, mtmp->minvent);
 
-    while ((obj = billobjs) != 0) {
+    while ((obj = g.billobjs) != 0) {
         obj_extract_self(obj);
         dealloc_obj(obj);
     }
@@ -693,7 +693,7 @@ struct obj *obj;
 
         /* if you bring a sack of N picks into a shop to sell,
            don't repeat this N times when they're taken out */
-        if (moves != pickmovetime) {
+        if (g.moves != pickmovetime) {
             if (!Deaf && !muteshk(shkp))
                 verbalize("You sneaky %s!  Get out of here with that pick!",
                       cad(FALSE));
@@ -703,7 +703,7 @@ struct obj *obj;
                       haseyes(shkp->data) ? "glares at"
                                           : "is dismayed because of");
         }
-        pickmovetime = moves;
+        pickmovetime = g.moves;
     }
 }
 
@@ -1915,7 +1915,7 @@ register struct bill_x *bp;
     register unsigned int id = bp->bo_id;
 
     if (bp->useup)
-        obj = o_on(id, billobjs);
+        obj = o_on(id, g.billobjs);
     else
         obj = find_oid(id);
     return obj;
@@ -1924,7 +1924,7 @@ register struct bill_x *bp;
 /*
  * Look for o_id on all lists but billobj.  Return obj or NULL if not found.
  * Its OK for restore_timers() to call this function, there should not
- * be any timeouts on the billobjs chain.
+ * be any timeouts on the g.billobjs chain.
  */
 struct obj *
 find_oid(id)
@@ -1941,7 +1941,7 @@ unsigned id;
         return obj;
     if ((obj = o_on(id, g.level.buriedobjlist)) != 0)
         return obj;
-    if ((obj = o_on(id, migrating_objs)) != 0)
+    if ((obj = o_on(id, g.migrating_objs)) != 0)
         return obj;
 
     /* not found yet; check inventory for members of various monst lists */
@@ -2402,7 +2402,7 @@ struct monst *shkp;
     bp->bo_id = obj->o_id;
     bp->bquan = obj->quan;
     if (dummy) {              /* a dummy object must be inserted into  */
-        bp->useup = 1;        /* the billobjs chain here.  crucial for */
+        bp->useup = 1;        /* the g.billobjs chain here.  crucial for */
         add_to_billobjs(obj); /* eating floorfood in shop.  see eat.c  */
     } else
         bp->useup = 0;
@@ -2420,8 +2420,8 @@ struct obj *obj;
     if (obj->timed)
         obj_stop_timers(obj);
 
-    obj->nobj = billobjs;
-    billobjs = obj;
+    obj->nobj = g.billobjs;
+    g.billobjs = obj;
     obj->where = OBJ_ONBILL;
 }
 
@@ -3360,12 +3360,12 @@ long cost;
     for (tmp_dam = g.level.damagelist; tmp_dam; tmp_dam = tmp_dam->next)
         if (tmp_dam->place.x == x && tmp_dam->place.y == y) {
             tmp_dam->cost += cost;
-            tmp_dam->when = monstermoves; /* needed by pay_for_damage() */
+            tmp_dam->when = g.monstermoves; /* needed by pay_for_damage() */
             return;
         }
     tmp_dam = (struct damage *) alloc((unsigned) sizeof *tmp_dam);
     (void) memset((genericptr_t) tmp_dam, 0, sizeof *tmp_dam);
-    tmp_dam->when = monstermoves;
+    tmp_dam->when = g.monstermoves;
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
     tmp_dam->cost = cost;
@@ -3521,7 +3521,7 @@ boolean catchup; /* restoring a level */
     struct trap *ttmp;
     int i, k, ix, iy, disposition = 1;
 
-    if ((monstermoves - tmp_dam->when) < REPAIR_DELAY)
+    if ((g.monstermoves - tmp_dam->when) < REPAIR_DELAY)
         return 0;
     if (shkp->msleeping || !shkp->mcanmove || ESHK(shkp)->following)
         return 0;
@@ -3692,7 +3692,7 @@ struct monst *shkp;
                 eshkp->following = 0;
                 return 0;
             }
-            if (moves > followmsg + 4) {
+            if (g.moves > followmsg + 4) {
                 if (!Deaf && !muteshk(shkp))
                     verbalize("%s, %s!  Didn't you forget to pay?",
                               Hello(shkp), g.plname);
@@ -3700,7 +3700,7 @@ struct monst *shkp;
                     pline("%s holds out %s upturned %s.",
                           Shknam(shkp), noit_mhis(shkp),
                           mbodypart(shkp, HAND));
-                followmsg = moves;
+                followmsg = g.moves;
                 if (!rn2(9)) {
                     pline("%s doesn't like customers who don't pay.",
                           Shknam(shkp));
@@ -3938,7 +3938,7 @@ boolean cant_mollify;
     for (tmp_dam = g.level.damagelist; tmp_dam; tmp_dam = tmp_dam->next) {
         char *shp;
 
-        if (tmp_dam->when != monstermoves || !tmp_dam->cost)
+        if (tmp_dam->when != g.monstermoves || !tmp_dam->cost)
             continue;
         cost_of_damage += tmp_dam->cost;
         Strcpy(shops_affected,

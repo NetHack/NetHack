@@ -154,9 +154,6 @@ struct multishot {
     boolean s;
 };
 
-E NEARDATA long moves, monstermoves;
-E NEARDATA long wailmsg;
-
 E const int shield_static[];
 
 #include "spell.h"
@@ -178,8 +175,6 @@ E NEARDATA struct obj *invent, *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
 
 E NEARDATA struct obj *uchain; /* defined only when punished */
 E NEARDATA struct obj *uball;
-E NEARDATA struct obj *migrating_objs;
-E NEARDATA struct obj *billobjs;
 
 E NEARDATA struct obj zeroobj; /* for init; &zeroobj used as special value */
 
@@ -694,6 +689,11 @@ struct instance_globals {
     struct mkroom rooms[(MAXNROFROOMS + 1) * 2];
     struct mkroom *subrooms;
     dlevel_t level; /* level map */
+    long moves;
+    long monstermoves; /* moves and monstermoves diverge when player is Fast */
+    long wailmsg;
+    struct obj *migrating_objs; /* objects moving to another dungeon level */    
+    struct obj *billobjs; /* objects not yet paid for */
 
     /* dig.c */
 

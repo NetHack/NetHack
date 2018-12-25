@@ -406,7 +406,7 @@ int roomno;
         sanctum = (priest->data == &mons[PM_HIGH_PRIEST]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
         can_speak = (priest->mcanmove && !priest->msleeping);
-        if (can_speak && !Deaf && moves >= epri_p->intone_time) {
+        if (can_speak && !Deaf && g.moves >= epri_p->intone_time) {
             unsigned save_priest = priest->ispriest;
 
             /* don't reveal the altar's owner upon temple entry in
@@ -417,7 +417,7 @@ int roomno;
             pline("%s intones:",
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");
             priest->ispriest = save_priest;
-            epri_p->intone_time = moves + (long) d(10, 500); /* ~2505 */
+            epri_p->intone_time = g.moves + (long) d(10, 500); /* ~2505 */
             /* make sure that we don't suppress entry message when
                we've just given its "priest intones" introduction */
             epri_p->enter_time = 0L;
@@ -435,7 +435,7 @@ int roomno;
                 /* repeat visit, or attacked priest before entering */
                 msg1 = "You desecrate this place by your presence!";
             }
-        } else if (moves >= epri_p->enter_time) {
+        } else if (g.moves >= epri_p->enter_time) {
             Sprintf(buf, "Pilgrim, you enter a %s place!",
                     !shrined ? "desecrated" : "sacred");
             msg1 = buf;
@@ -444,7 +444,7 @@ int roomno;
             verbalize1(msg1);
             if (msg2)
                 verbalize1(msg2);
-            epri_p->enter_time = moves + (long) d(10, 100); /* ~505 */
+            epri_p->enter_time = g.moves + (long) d(10, 100); /* ~505 */
         }
         if (!sanctum) {
             if (!shrined || !p_coaligned(priest)
@@ -462,9 +462,9 @@ int roomno;
             /* give message if we haven't seen it recently or
                if alignment update has caused it to switch from
                forbidding to sense-of-peace or vice versa */
-            if (moves >= *this_time || *other_time >= *this_time) {
+            if (g.moves >= *this_time || *other_time >= *this_time) {
                 You(msg1, msg2);
-                *this_time = moves + (long) d(10, 20); /* ~55 */
+                *this_time = g.moves + (long) d(10, 20); /* ~55 */
                 /* avoid being tricked by the RNG:  switch might have just
                    happened and previous random threshold could be larger */
                 if (*this_time <= *other_time)
@@ -630,9 +630,9 @@ register struct monst *priest;
         } else {
             verbalize("Thy selfless generosity is deeply appreciated.");
             if (money_cnt(invent) < (offer * 2L) && coaligned) {
-                if (strayed && (moves - u.ucleansed) > 5000L) {
+                if (strayed && (g.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */
-                    u.ucleansed = moves;
+                    u.ucleansed = g.moves;
                 } else {
                     adjalign(2);
                 }

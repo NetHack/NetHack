@@ -637,9 +637,9 @@ register struct monst *mtmp;
         } else if (mtmp->mpeaceful) {
             if (mtmp->mtame
                 && (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
-                    || moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
+                    || g.moves > EDOG(mtmp)->hungrytime || mtmp->mtame < 5))
                 pline_msg = "whines.";
-            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > moves + 1000)
+            else if (mtmp->mtame && EDOG(mtmp)->hungrytime > g.moves + 1000)
                 pline_msg = "yips.";
             else {
                 if (mtmp->data
@@ -655,9 +655,9 @@ register struct monst *mtmp;
             if (mtmp->mconf || mtmp->mflee || mtmp->mtrapped
                 || mtmp->mtame < 5)
                 pline_msg = "yowls.";
-            else if (moves > EDOG(mtmp)->hungrytime)
+            else if (g.moves > EDOG(mtmp)->hungrytime)
                 pline_msg = "meows.";
-            else if (EDOG(mtmp)->hungrytime > moves + 1000)
+            else if (EDOG(mtmp)->hungrytime > g.moves + 1000)
                 pline_msg = "purrs.";
             else
                 pline_msg = "mews.";
@@ -694,7 +694,7 @@ register struct monst *mtmp;
     case MS_NEIGH:
         if (mtmp->mtame < 5)
             pline_msg = "neighs.";
-        else if (moves > EDOG(mtmp)->hungrytime)
+        else if (g.moves > EDOG(mtmp)->hungrytime)
             pline_msg = "whinnies.";
         else
             pline_msg = "whickers.";
@@ -792,7 +792,7 @@ register struct monst *mtmp;
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
             pline_msg = "asks for a potion of healing.";
         else if (mtmp->mtame && !mtmp->isminion
-                 && moves > EDOG(mtmp)->hungrytime)
+                 && g.moves > EDOG(mtmp)->hungrytime)
             verbl_msg = "I'm hungry.";
         /* Specific monsters' interests */
         else if (is_elf(ptr))

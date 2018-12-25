@@ -459,7 +459,7 @@ nh_timeout()
         baseluck -= 1;
 
     if (u.uluck != baseluck
-        && moves % ((u.uhave.amulet || u.ugangr) ? 300 : 600) == 0) {
+        && g.moves % ((u.uhave.amulet || u.ugangr) ? 300 : 600) == 0) {
         /* Cursed luckstones stop bad luck from timing out; blessed luckstones
          * stop good luck from timing out; normal luckstones stop both;
          * neither is stopped if you don't have a luckstone.
@@ -718,7 +718,7 @@ boolean wakeup_msg;
         g.afternmv = Hear_again; /* this won't give any messages */
     }
     /* early wakeup from combat won't be possible until next monster turn */
-    u.usleep = monstermoves;
+    u.usleep = g.monstermoves;
     g.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;
 }
 
@@ -787,7 +787,7 @@ long timeout;
     mnum = big_to_little(egg->corpsenm);
     /* The identity of one's father is learned, not innate */
     yours = (egg->spe || (!flags.female && carried(egg) && !rn2(2)));
-    silent = (timeout != monstermoves); /* hatched while away */
+    silent = (timeout != g.monstermoves); /* hatched while away */
 
     /* only can hatch when in INVENT, FLOOR, MINVENT */
     if (get_obj_location(egg, &x, &y, 0)) {
@@ -1107,8 +1107,8 @@ long timeout;
     many = menorah ? obj->spe > 1 : obj->quan > 1L;
 
     /* timeout while away */
-    if (timeout != monstermoves) {
-        long how_long = monstermoves - timeout;
+    if (timeout != g.monstermoves) {
+        long how_long = g.monstermoves - timeout;
 
         if (how_long >= obj->age) {
             obj->age = 0;
@@ -1537,7 +1537,7 @@ long expire_time;
     del_light_source(LS_OBJECT, obj_to_any(obj));
 
     /* restore unused time */
-    obj->age += expire_time - monstermoves;
+    obj->age += expire_time - g.monstermoves;
 
     obj->lamplit = 0;
 
@@ -1601,7 +1601,7 @@ do_storms()
  *  boolean start_timer(long timeout,short kind,short func_index,
  *                      anything *arg)
  *      Start a timer of kind 'kind' that will expire at time
- *      monstermoves+'timeout'.  Call the function at 'func_index'
+ *      g.monstermoves+'timeout'.  Call the function at 'func_index'
  *      in the timeout table using argument 'arg'.  Return TRUE if
  *      a timer was started.  This places the timer on a list ordered
  *      "sooner" to "later".  If an object, increment the object's
@@ -1748,7 +1748,7 @@ wiz_timeout_queue()
     if (win == WIN_ERR)
         return 0;
 
-    Sprintf(buf, "Current time = %ld.", monstermoves);
+    Sprintf(buf, "Current time = %ld.", g.monstermoves);
     putstr(win, 0, buf);
     putstr(win, 0, "");
     putstr(win, 0, "Active timeout queue:");
@@ -1832,7 +1832,7 @@ run_timers()
      * any time.  The list is ordered, we are done when the first element
      * is in the future.
      */
-    while (g.timer_base && g.timer_base->timeout <= monstermoves) {
+    while (g.timer_base && g.timer_base->timeout <= g.monstermoves) {
         curr = g.timer_base;
         g.timer_base = curr->next;
 
@@ -1862,7 +1862,7 @@ anything *arg;
     (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
     gnu->next = 0;
     gnu->tid = g.timer_id++;
-    gnu->timeout = monstermoves + when;
+    gnu->timeout = g.monstermoves + when;
     gnu->kind = kind;
     gnu->needs_fixup = 0;
     gnu->func_index = func_index;
@@ -1897,7 +1897,7 @@ anything *arg;
         if (timeout_funcs[doomed->func_index].cleanup)
             (*timeout_funcs[doomed->func_index].cleanup)(arg, timeout);
         free((genericptr_t) doomed);
-        return (timeout - monstermoves);
+        return (timeout - g.monstermoves);
     }
     return 0L;
 }
@@ -1952,7 +1952,7 @@ struct obj *src, *dest;
     for (curr = g.timer_base; curr; curr = next_timer) {
         next_timer = curr->next; /* things may be inserted */
         if (curr->kind == TIMER_OBJECT && curr->arg.a_obj == src) {
-            (void) start_timer(curr->timeout - monstermoves, TIMER_OBJECT,
+            (void) start_timer(curr->timeout - g.monstermoves, TIMER_OBJECT,
                                curr->func_index, obj_to_any(dest));
         }
     }
@@ -2055,7 +2055,7 @@ xchar x, y;
 short func_index;
 {
     long expires = spot_time_expires(x, y, func_index);
-    return (expires > 0L) ? expires - monstermoves : 0L;
+    return (expires > 0L) ? expires - g.monstermoves : 0L;
 }
 
 /* Insert timer into the global queue */

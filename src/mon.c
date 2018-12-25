@@ -754,9 +754,9 @@ movemon()
            mon->isgd flag so that dmonsfree() will get rid of mon) */
         if (mtmp->isgd && !mtmp->mx) {
             /* parked at <0,0>; eventually isgd should get set to false */
-            if (monstermoves > mtmp->mlstmv) {
+            if (g.monstermoves > mtmp->mlstmv) {
                 (void) gd_move(mtmp);
-                mtmp->mlstmv = monstermoves;
+                mtmp->mlstmv = g.monstermoves;
             }
             continue;
         }
@@ -1048,7 +1048,7 @@ struct monst *mtmp;
                 while ((otmp3 = otmp->cobj) != 0) {
                     obj_extract_self(otmp3);
                     if (otmp->otyp == ICE_BOX && otmp3->otyp == CORPSE) {
-                        otmp3->age = monstermoves - otmp3->age;
+                        otmp3->age = g.monstermoves - otmp3->age;
                         start_corpse_timeout(otmp3);
                     }
                     (void) mpickobj(mtmp, otmp3);
@@ -2899,7 +2899,7 @@ int x, y, distance;
                 continue;
             if (mtmp->mtame) {
                 if (!mtmp->isminion)
-                    EDOG(mtmp)->whistletime = moves;
+                    EDOG(mtmp)->whistletime = g.moves;
                 /* Clear mtrack. This is to fix up a pet who is
                    stuck "fleeing" its master. */
                 memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
@@ -3823,7 +3823,7 @@ kill_genocided_monsters()
 
     kill_eggs(invent);
     kill_eggs(fobj);
-    kill_eggs(migrating_objs);
+    kill_eggs(g.migrating_objs);
     kill_eggs(g.level.buriedobjlist);
 }
 

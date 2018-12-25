@@ -159,8 +159,8 @@ boolean resuming;
                         youmonst.movement = 0;
                     settrack();
 
-                    monstermoves++;
-                    moves++;
+                    g.monstermoves++;
+                    g.moves++;
 
                     /********************************/
                     /* once-per-turn things go here */
@@ -196,8 +196,8 @@ boolean resuming;
 
                     /* moving around while encumbered is hard work */
                     if (wtcap > MOD_ENCUMBER && u.umoved) {
-                        if (!(wtcap < EXT_ENCUMBER ? moves % 30
-                                                   : moves % 10)) {
+                        if (!(wtcap < EXT_ENCUMBER ? g.moves % 30
+                                                   : g.moves % 10)) {
                             if (Upolyd && u.mh > 1) {
                                 u.mh--;
                             } else if (!Upolyd && u.uhp > 1) {
@@ -212,7 +212,7 @@ boolean resuming;
 
                     if (u.uen < u.uenmax
                         && ((wtcap < MOD_ENCUMBER
-                             && (!(moves % ((MAXULEV + 8 - u.ulevel)
+                             && (!(g.moves % ((MAXULEV + 8 - u.ulevel)
                                             * (Role_if(PM_WIZARD) ? 3 : 4)
                                             / 6)))) || Energy_regeneration)) {
                         u.uen += rn1(
@@ -317,7 +317,7 @@ boolean resuming;
             if (context.bypasses)
                 clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
-                && !BClairvoyant && !(moves % 15) && !rn2(2))
+                && !BClairvoyant && !(g.moves % 15) && !rn2(2))
                 do_vicinity_map((struct obj *) 0);
             if (u.utrap && u.utraptype == TT_LAVA)
                 sink_into_lava();
@@ -429,7 +429,7 @@ boolean resuming;
             vision_recalc(0); /* vision! */
         /* when running in non-tport mode, this gets done through domove() */
         if ((!context.run || flags.runmode == RUN_TPORT)
-            && (g.multi && (!context.travel ? !(g.multi % 7) : !(moves % 7L)))) {
+            && (g.multi && (!context.travel ? !(g.multi % 7) : !(g.moves % 7L)))) {
             if (flags.time && context.run)
                 context.botl = 1;
             display_nhwindow(WIN_MAP, FALSE);
@@ -454,10 +454,10 @@ int wtcap;
             /* eel out of water loses hp, similar to monster eels;
                as hp gets lower, rate of further loss slows down */
             if (u.mh > 1 && !Regeneration && rn2(u.mh) > rn2(8)
-                && (!Half_physical_damage || !(moves % 2L)))
+                && (!Half_physical_damage || !(g.moves % 2L)))
                 heal = -1;
         } else if (u.mh < u.mhmax) {
-            if (Regeneration || (encumbrance_ok && !(moves % 20L)))
+            if (Regeneration || (encumbrance_ok && !(g.moves % 20L)))
                 heal = 1;
         }
         if (heal) {
@@ -474,7 +474,7 @@ int wtcap;
            for the player, but it didn't make sense for gameplay...] */
         if (u.uhp < u.uhpmax && (encumbrance_ok || Regeneration)) {
             if (u.ulevel > 9) {
-                if (!(moves % 3L)) {
+                if (!(g.moves % 3L)) {
                     int Con = (int) ACURR(A_CON);
 
                     if (Con <= 12) {
@@ -486,7 +486,7 @@ int wtcap;
                     }
                 }
             } else { /* u.ulevel <= 9 */
-                if (!(moves % (long) ((MAXULEV + 12) / (u.ulevel + 2) + 1)))
+                if (!(g.moves % (long) ((MAXULEV + 12) / (u.ulevel + 2) + 1)))
                     heal = 1;
             }
             if (Regeneration && !heal)

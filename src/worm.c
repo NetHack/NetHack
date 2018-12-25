@@ -219,9 +219,9 @@ struct monst *worm;
     seg->nseg = new_seg;    /* attach it to the end of the list */
     wheads[wnum] = new_seg; /* move the end pointer */
 
-    if (wgrowtime[wnum] <= moves) {
+    if (wgrowtime[wnum] <= g.moves) {
         if (!wgrowtime[wnum])
-            wgrowtime[wnum] = moves + rnd(5);
+            wgrowtime[wnum] = g.moves + rnd(5);
         else
             wgrowtime[wnum] += rn1(15, 3);
         worm->mhp += 3;

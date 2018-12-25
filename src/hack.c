@@ -279,7 +279,7 @@ moverock()
 #endif
             dopush:
                 if (!u.usteed) {
-                    if (moves > lastmovetime + 2 || moves < lastmovetime)
+                    if (g.moves > lastmovetime + 2 || g.moves < lastmovetime)
                         pline("With %s effort you move %s.",
                               throws_rocks(youmonst.data) ? "little"
                                                           : "great",
@@ -288,7 +288,7 @@ moverock()
                 } else
                     pline("%s moves %s.", upstart(y_monnam(u.usteed)),
                           the(xname(otmp)));
-                lastmovetime = moves;
+                lastmovetime = g.moves;
             }
 
             /* Move the boulder *after* the message. */
@@ -1882,7 +1882,7 @@ domove()
 
     if (context.run && flags.runmode != RUN_TPORT) {
         /* display every step or every 7th step depending upon mode */
-        if (flags.runmode != RUN_LEAP || !(moves % 7L)) {
+        if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
             if (flags.time)
                 context.botl = 1;
             curs_on_u();
@@ -1905,7 +1905,7 @@ overexertion()
        position, but is now called by attack() so that it doesn't
        execute if you decline to attack a peaceful monster */
     gethungry();
-    if ((moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
+    if ((g.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
         int *hp = (!Upolyd ? &u.uhp : &u.mh);
 
         if (*hp > 1) {
@@ -2863,10 +2863,10 @@ maybe_wail()
                               SHOCK_RES, FIRE_RES, SLEEP_RES, DISINT_RES,
                               TELEPORT_CONTROL, STEALTH, FAST, INVIS };
 
-    if (moves <= wailmsg + 50)
+    if (g.moves <= g.wailmsg + 50)
         return;
 
-    wailmsg = moves;
+    g.wailmsg = g.moves;
     if (Role_if(PM_WIZARD) || Race_if(PM_ELF) || Role_if(PM_VALKYRIE)) {
         const char *who;
         int i, powercnt;

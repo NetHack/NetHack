@@ -317,9 +317,9 @@ register struct obj *obj;
     if (!getdir((char *) 0))
         return 0;
 
-    res = (moves == context.stethoscope_move)
+    res = (g.moves == context.stethoscope_move)
           && (youmonst.movement == context.stethoscope_movement);
-    context.stethoscope_move = moves;
+    context.stethoscope_move = g.moves;
     context.stethoscope_movement = youmonst.movement;
 
     g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
@@ -1059,7 +1059,7 @@ struct obj **optr;
 #ifdef AMIGA
             amii_speaker(obj, "aefeaefeaefeaefeaefe", AMII_LOUDER_VOLUME);
 #endif
-            obj->age = moves;
+            obj->age = g.moves;
             learno = TRUE;
             wakem = TRUE;
 
@@ -2083,7 +2083,7 @@ long timeout;
         debugpline0("null figurine in fig_transform()");
         return;
     }
-    silent = (timeout != monstermoves); /* happened while away */
+    silent = (timeout != g.monstermoves); /* happened while away */
     okay_spot = get_obj_location(figurine, &cc.x, &cc.y, 0);
     if (figurine->where == OBJ_INVENT || figurine->where == OBJ_MINVENT)
         okay_spot = enexto(&cc, cc.x, cc.y, &mons[figurine->corpsenm]);

@@ -300,7 +300,7 @@ register int fd, mode;
     urealtime.start_timing = urealtime.finish_time;
     save_killers(fd, mode);
 
-    /* must come before migrating_objs and g.migrating_mons are freed */
+    /* must come before g.migrating_objs and g.migrating_mons are freed */
     save_timers(fd, mode, RANGE_GLOBAL);
     save_light_sources(fd, mode, RANGE_GLOBAL);
 
@@ -314,11 +314,11 @@ register int fd, mode;
         saveobjchn(fd, (struct obj *) 0, mode);
     }
 
-    saveobjchn(fd, migrating_objs, mode);
+    saveobjchn(fd, g.migrating_objs, mode);
     savemonchn(fd, g.migrating_mons, mode);
     if (release_data(mode)) {
         invent = 0;
-        migrating_objs = 0;
+        g.migrating_objs = 0;
         g.migrating_mons = 0;
     }
     bwrite(fd, (genericptr_t) g.mvitals, sizeof(g.mvitals));
@@ -326,8 +326,8 @@ register int fd, mode;
     save_dungeon(fd, (boolean) !!perform_bwrite(mode),
                  (boolean) !!release_data(mode));
     savelevchn(fd, mode);
-    bwrite(fd, (genericptr_t) &moves, sizeof moves);
-    bwrite(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
+    bwrite(fd, (genericptr_t) &g.moves, sizeof g.moves);
+    bwrite(fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
     bwrite(fd, (genericptr_t) &g.quest_status, sizeof(struct q_score));
     bwrite(fd, (genericptr_t) g.spl_book,
            sizeof(struct spell) * (MAXSPELL + 1));
@@ -452,7 +452,7 @@ int mode;
     }
     if (mode != FREE_SAVE) {
         g.level_info[lev].where = ACTIVE;
-        g.level_info[lev].time = moves;
+        g.level_info[lev].time = g.moves;
         g.level_info[lev].size = bytes_counted;
     }
     return TRUE;
@@ -504,7 +504,7 @@ int mode;
     savelevl(fd,
              (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     bwrite(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
-    bwrite(fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
+    bwrite(fd, (genericptr_t) &g.monstermoves, sizeof(g.monstermoves));
     bwrite(fd, (genericptr_t) &g.upstair, sizeof(stairway));
     bwrite(fd, (genericptr_t) &g.dnstair, sizeof(stairway));
     bwrite(fd, (genericptr_t) &g.upladder, sizeof(stairway));
@@ -530,7 +530,7 @@ skip_lots:
     savetrapchn(fd, g.ftrap, mode);
     saveobjchn(fd, fobj, mode);
     saveobjchn(fd, g.level.buriedobjlist, mode);
-    saveobjchn(fd, billobjs, mode);
+    saveobjchn(fd, g.billobjs, mode);
     if (release_data(mode)) {
         int x,y;
 
@@ -541,7 +541,7 @@ skip_lots:
         g.ftrap = 0;
         fobj = 0;
         g.level.buriedobjlist = 0;
-        billobjs = 0;
+        g.billobjs = 0;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
     save_engravings(fd, mode);
@@ -1360,7 +1360,7 @@ freedynamicdata()
     freetrapchn(g.ftrap);
     freeobjchn(fobj);
     freeobjchn(g.level.buriedobjlist);
-    freeobjchn(billobjs);
+    freeobjchn(g.billobjs);
     free_engravings();
     freedamage();
 
@@ -1369,7 +1369,7 @@ freedynamicdata()
     free_timers(RANGE_GLOBAL);
     free_light_sources(RANGE_GLOBAL);
     freeobjchn(invent);
-    freeobjchn(migrating_objs);
+    freeobjchn(g.migrating_objs);
     freemonchn(g.migrating_mons);
     freemonchn(g.mydogs); /* ascension or dungeon escape */
     /* freelevchn();  --  [folded into free_dungeons()] */

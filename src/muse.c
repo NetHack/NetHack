@@ -2267,14 +2267,14 @@ boolean stoning; /* True: stop petrification, False: cure stun && confusion */
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);
 
-        if (edog->hungrytime < monstermoves)
-            edog->hungrytime = monstermoves;
+        if (edog->hungrytime < g.monstermoves)
+            edog->hungrytime = g.monstermoves;
         edog->hungrytime += nutrit;
         mon->mconf = 0;
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = monstermoves;
+    mon->mlstmv = g.monstermoves;
 }
 
 /* decide whether obj can cure petrification; also used when picking up */
@@ -2506,7 +2506,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = monstermoves;
+    mon->mlstmv = g.monstermoves;
     return res;
 }
 

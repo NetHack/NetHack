@@ -98,15 +98,6 @@ const int shield_static[SHIELD_COUNT] = {
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
 };
 
-NEARDATA long moves = 1L, monstermoves = 1L;
-/* These diverge when player is Fast */
-NEARDATA long wailmsg = 0L;
-
-/* objects that are moving to another dungeon level */
-NEARDATA struct obj *migrating_objs = (struct obj *) 0;
-/* objects not yet paid for */
-NEARDATA struct obj *billobjs = (struct obj *) 0;
-
 /* used to zero all elements of a struct obj and a struct monst */
 NEARDATA struct obj zeroobj = DUMMY;
 NEARDATA struct monst zeromonst = DUMMY;
@@ -322,6 +313,11 @@ const struct instance_globals g_init = {
     DUMMY, /* rooms */
     NULL, /* subrooms */
     UNDEFINED_VALUES, /* level */
+    1, /* moves */
+    1, /* monstermoves */
+    0, /* wailmsg */
+    NULL, /* migrating_objs */
+    NULL, /* billobjs */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */

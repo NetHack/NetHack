@@ -269,7 +269,7 @@ boolean strict;
 {
     register struct engr *ep = engr_at(x, y);
 
-    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
+    if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= g.moves) {
         return strict ? (fuzzymatch(ep->engr_txt, s, "", TRUE))
                       : (strstri(ep->engr_txt, s) != 0);
     }
@@ -901,7 +901,7 @@ doengrave()
     }
     /* Something has changed the engraving here */
     if (*buf) {
-        make_engr_at(u.ux, u.uy, buf, moves, type);
+        make_engr_at(u.ux, u.uy, buf, g.moves, type);
         if (!Blind)
             pline_The("engraving now reads: \"%s\".", buf);
         ptext = FALSE;
@@ -1147,7 +1147,7 @@ doengrave()
         Strcpy(buf, oep->engr_txt);
     (void) strncat(buf, ebuf, BUFSZ - (int) strlen(buf) - 1);
     /* Put the engraving onto the map */
-    make_engr_at(u.ux, u.uy, buf, moves - g.multi, type);
+    make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, type);
 
     if (post_engr_text[0])
         pline("%s", post_engr_text);
@@ -1215,7 +1215,7 @@ int fd;
          * normal levels as the player must have finished engraving
          * to be able to move again.
          */
-        ep->engr_time = moves;
+        ep->engr_time = g.moves;
     }
 }
 

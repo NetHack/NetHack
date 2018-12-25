@@ -172,7 +172,7 @@ boolean ghostly;
 
         mread(fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
         if (ghostly)
-            tmp_dam->when += (monstermoves - g.omoves);
+            tmp_dam->when += (g.monstermoves - g.omoves);
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
@@ -286,7 +286,7 @@ boolean ghostly, frozen;
          * immediately after old player died.
          */
         if (ghostly && !frozen && !age_is_relative(otmp))
-            otmp->age = monstermoves - g.omoves + otmp->age;
+            otmp->age = g.monstermoves - g.omoves + otmp->age;
 
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
@@ -649,7 +649,7 @@ unsigned int *stuckid, *steedid;
             impossible("restgamestate: lost ball & chain");
     }
 
-    migrating_objs = restobjchn(fd, FALSE, FALSE);
+    g.migrating_objs = restobjchn(fd, FALSE, FALSE);
     g.migrating_mons = restmonchn(fd, FALSE);
     mread(fd, (genericptr_t) g.mvitals, sizeof(g.mvitals));
 
@@ -676,8 +676,8 @@ unsigned int *stuckid, *steedid;
 
     restore_dungeon(fd);
     restlevchn(fd);
-    mread(fd, (genericptr_t) &moves, sizeof moves);
-    mread(fd, (genericptr_t) &monstermoves, sizeof monstermoves);
+    mread(fd, (genericptr_t) &g.moves, sizeof g.moves);
+    mread(fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
     mread(fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
     mread(fd, (genericptr_t) g.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     restore_artifacts(fd);
@@ -1057,7 +1057,7 @@ boolean ghostly;
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     mread(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
     mread(fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
-    elapsed = monstermoves - g.omoves;
+    elapsed = g.monstermoves - g.omoves;
     mread(fd, (genericptr_t) &g.upstair, sizeof(stairway));
     mread(fd, (genericptr_t) &g.dnstair, sizeof(stairway));
     mread(fd, (genericptr_t) &g.upladder, sizeof(stairway));
@@ -1091,7 +1091,7 @@ boolean ghostly;
     /* restobjchn()'s `frozen' argument probably ought to be a callback
        routine so that we can check for objects being buried under ice */
     g.level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
-    billobjs = restobjchn(fd, ghostly, FALSE);
+    g.billobjs = restobjchn(fd, ghostly, FALSE);
     rest_engravings(fd);
 
     /* reset level.monsters for new level */
