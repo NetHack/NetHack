@@ -241,7 +241,7 @@ char *argv[];
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        g.lockum = 0;
+        g.locknum = 0;
     } else {
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
@@ -266,14 +266,14 @@ attempt_restore:
 
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when g.lockum == 0)
-     * or if there are too many active games (when g.lockum > 0).
+     * in progress for current character name (when g.locknum == 0)
+     * or if there are too many active games (when g.locknum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !g.lockum) or on first available of alock, block,
+     * name (for !g.locknum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for g.lockum > 0).
+     * (for g.locknum > 0).
      */
     if (*g.plname) {
         getlock();
@@ -327,7 +327,7 @@ attempt_restore:
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!g.lockum) {
+                if (!g.locknum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -452,17 +452,17 @@ char *argv[];
 #else
     /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     if (argc > 1)
-        g.lockum = atoi(argv[1]);
+        g.locknum = atoi(argv[1]);
 #endif
 #ifdef MAX_NR_OF_PLAYERS
     /* limit to compile-time limit */
-    if (!g.lockum || g.lockum > MAX_NR_OF_PLAYERS)
-        g.lockum = MAX_NR_OF_PLAYERS;
+    if (!g.locknum || g.locknum > MAX_NR_OF_PLAYERS)
+        g.locknum = MAX_NR_OF_PLAYERS;
 #endif
 #ifdef SYSCF
     /* let syscf override compile-time limit */
-    if (!g.lockum || (sysopt.maxplayers && g.lockum > sysopt.maxplayers))
-        g.lockum = sysopt.maxplayers;
+    if (!g.locknum || (sysopt.maxplayers && g.locknum > sysopt.maxplayers))
+        g.locknum = sysopt.maxplayers;
 #endif
 }
 
