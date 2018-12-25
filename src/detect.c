@@ -404,7 +404,7 @@ outgoldmap:
             continue; /* probably overkill here */
         temp = 0;
         if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
-            gold = zeroobj; /* ensure oextra is cleared too */
+            gold = g.zeroobj; /* ensure oextra is cleared too */
             gold.otyp = GOLD_PIECE;
             gold.quan = (long) rnd(10); /* usually more than 1 */
             gold.ox = mtmp->mx;
@@ -730,7 +730,7 @@ int class;            /* an object class, 0 for all */
             && (!class || class == objects[mtmp->mappearance].oc_class)) {
             struct obj temp;
 
-            temp = zeroobj;
+            temp = g.zeroobj;
             temp.otyp = mtmp->mappearance; /* needed for obj_to_glyph() */
             temp.quan = 1L;
             temp.ox = mtmp->mx;
@@ -741,7 +741,7 @@ int class;            /* an object class, 0 for all */
                    && (!class || class == COIN_CLASS)) {
             struct obj gold;
 
-            gold = zeroobj; /* ensure oextra is cleared too */
+            gold = g.zeroobj; /* ensure oextra is cleared too */
             gold.otyp = GOLD_PIECE;
             gold.quan = (long) rnd(10); /* usually more than 1 */
             gold.ox = mtmp->mx;
@@ -857,7 +857,7 @@ int src_cursed;
     if (Hallucination || src_cursed) {
         struct obj obj; /* fake object */
 
-        obj = zeroobj;
+        obj = g.zeroobj;
         if (trap) {
             obj.ox = trap->tx;
             obj.oy = trap->ty;

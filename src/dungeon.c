@@ -726,8 +726,8 @@ init_dungeons()
         Strcat(tbuf, "\" from ");
 #ifdef PREFIXES_IN_USE
         Strcat(tbuf, "\n\"");
-        if (fqn_prefix[DATAPREFIX])
-            Strcat(tbuf, fqn_prefix[DATAPREFIX]);
+        if (g.fqn_prefix[DATAPREFIX])
+            Strcat(tbuf, g.fqn_prefix[DATAPREFIX]);
 #else
         Strcat(tbuf, "\"");
 #endif
@@ -737,7 +737,7 @@ init_dungeons()
 #endif
 #ifdef WIN32
         interject_assistance(1, INTERJECT_PANIC, (genericptr_t) tbuf,
-                             (genericptr_t) fqn_prefix[DATAPREFIX]);
+                             (genericptr_t) g.fqn_prefix[DATAPREFIX]);
 #endif
         panic1(tbuf);
     }
@@ -1752,7 +1752,7 @@ boolean unreachable;
     lchoices->lev[lchoices->idx] = lvl_p->dlevel;
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;
     lchoices->playerlev[lchoices->idx] = depth(lvl_p);
-    any = zeroany;
+    any = g.zeroany;
     if (unreachable) {
         /* not selectable, but still consumes next menuletter;
            prepend padding in place of missing menu selector */
@@ -1872,7 +1872,7 @@ xchar *rdgn;
                         dptr->depth_start + dptr->entry_lev - 1);
         }
         if (bymenu) {
-            any = zeroany;
+            any = g.zeroany;
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
                      MENU_UNSELECTED);
         } else

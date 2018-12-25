@@ -1090,7 +1090,7 @@ coord *click_cc;
             winid win;
             anything any;
 
-            any = zeroany;
+            any = g.zeroany;
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
             any.a_char = '/';
@@ -1108,7 +1108,7 @@ coord *click_cc;
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
                      "something else (by symbol or name)", MENU_UNSELECTED);
             if (!u.uswallow && !Hallucination) {
-                any = zeroany;
+                any = g.zeroany;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                          "", MENU_UNSELECTED);
                 /* these options work sensibly for the swallowed case,
@@ -1955,7 +1955,7 @@ dohelp()
     anything any;
     int sel;
 
-    any = zeroany; /* zero all bits */
+    any = g.zeroany; /* zero all bits */
     start_menu(tmpwin);
 
     for (i = 0; help_menu_items[i].text; i++) {

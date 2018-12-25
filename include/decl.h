@@ -176,10 +176,6 @@ E NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
 E NEARDATA struct obj *uchain; /* defined only when punished */
 E NEARDATA struct obj *uball;
 
-E NEARDATA struct obj zeroobj; /* for init; &zeroobj used as special value */
-
-E NEARDATA anything zeroany;   /* init'd and defined in decl.c */
-
 #include "you.h"
 E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;
@@ -190,19 +186,20 @@ E NEARDATA struct u_realtime urealtime;
 #include "pm.h"
 #endif
 
-E NEARDATA struct monst zeromonst; /* for init of new or temp monsters */
-
 struct mvitals {
     uchar born;
     uchar died;
     uchar mvflags;
 };
 
-E NEARDATA struct c_color_names {
+struct c_color_names {
     const char *const c_black, *const c_amber, *const c_golden,
         *const c_light_blue, *const c_red, *const c_green, *const c_silver,
         *const c_blue, *const c_purple, *const c_white, *const c_orange;
-} c_color_names;
+};
+
+E NEARDATA const struct c_color_names c_color_names;
+
 #define NH_BLACK c_color_names.c_black
 #define NH_AMBER c_color_names.c_amber
 #define NH_GOLDEN c_color_names.c_golden
@@ -218,12 +215,15 @@ E NEARDATA struct c_color_names {
 /* The names of the colors used for gems, etc. */
 E const char *c_obj_colors[];
 
-E struct c_common_strings {
+struct c_common_strings {
     const char *const c_nothing_happens, *const c_thats_enough_tries,
         *const c_silly_thing_to, *const c_shudder_for_moment,
         *const c_something, *const c_Something, *const c_You_can_move_again,
         *const c_Never_mind, *c_vision_clears, *const c_the_your[2];
-} c_common_strings;
+};
+
+E const struct c_common_strings c_common_strings;
+
 #define nothing_happens c_common_strings.c_nothing_happens
 #define thats_enough_tries c_common_strings.c_thats_enough_tries
 #define silly_thing_to c_common_strings.c_silly_thing_to
@@ -271,10 +271,10 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
     char *tc_AS, *tc_AE; /* graphics start and end (tty font swapping) */
     int tc_LI, tc_CO;    /* lines and columns */
 } tc_gbl_data;
-#define AS tc_gbl_data.tc_AS
-#define AE tc_gbl_data.tc_AE
-#define LI tc_gbl_data.tc_LI
-#define CO tc_gbl_data.tc_CO
+#define AS g.tc_gbl_data.tc_AS
+#define AE g.tc_gbl_data.tc_AE
+#define LI g.tc_gbl_data.tc_LI
+#define CO g.tc_gbl_data.tc_CO
 #endif
 
 /* xxxexplain[] is in drawing.c */
@@ -308,9 +308,8 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
 #define PREFIXES_IN_USE
 #endif
 
-E char *fqn_prefix[PREFIX_COUNT];
 #ifdef PREFIXES_IN_USE
-E char *fqn_prefix_names[PREFIX_COUNT];
+E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
@@ -699,7 +698,12 @@ struct instance_globals {
     struct monst youmonst;
     struct obj *invent;
     struct context_info context;
-
+    char *fqn_prefix[PREFIX_COUNT];
+    /* Windowing stuff that's really tty oriented, but present for all ports */
+    struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */     
+    struct obj zeroobj; /* used to zero out a struct obj */
+    struct monst zeromonst;  /* used to zero out a struct monst */
+    anything zeroany; /* used to zero out union any */
 
     /* dig.c */
 

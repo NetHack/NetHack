@@ -399,7 +399,7 @@ register struct monst *mtmp;
 
     char mlet = mtmp->data->mlet;
 
-    g.propellor = &zeroobj;
+    g.propellor = &g.zeroobj;
     Oselect(EGG);      /* cockatrice egg */
     if (mlet == S_KOP) /* pies are first choice for Kops */
         Oselect(CREAM_PIE);
@@ -458,7 +458,7 @@ register struct monst *mtmp;
         }
 
         /* KMH -- This belongs here so darts will work */
-        g.propellor = &zeroobj;
+        g.propellor = &g.zeroobj;
 
         prop = (objects[rwep[i]]).oc_skill;
         if (prop < 0) {
@@ -483,7 +483,7 @@ register struct monst *mtmp;
                 g.propellor = 0;
         }
         /* propellor = obj, propellor to use
-         * propellor = &zeroobj, doesn't need a propellor
+         * propellor = &g.zeroobj, doesn't need a propellor
          * propellor = 0, needed one and didn't have one
          */
         if (g.propellor != 0) {
@@ -663,7 +663,7 @@ register struct monst *mon;
                    mon_nam(mon));
         return 0;
     }
-    if (obj && obj != &zeroobj) {
+    if (obj && obj != &g.zeroobj) {
         struct obj *mw_tmp = MON_WEP(mon);
         if (mw_tmp && mw_tmp->otyp == obj->otyp) {
             /* already wielding it */
@@ -1045,7 +1045,7 @@ enhance_weapon_skill()
         /* start with a legend if any entries will be annotated
            with "*" or "#" below */
         if (eventually_advance > 0 || maxxed_cnt > 0) {
-            any = zeroany;
+            any = g.zeroany;
             if (eventually_advance > 0) {
                 Sprintf(buf, "(Skill%s flagged by \"*\" may be enhanced %s.)",
                         plur(eventually_advance),
@@ -1074,7 +1074,7 @@ enhance_weapon_skill()
             for (i = skill_ranges[pass].first; i <= skill_ranges[pass].last;
                  i++) {
                 /* Print headings for skill types */
-                any = zeroany;
+                any = g.zeroany;
                 if (i == skill_ranges[pass].first)
                     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                              skill_ranges[pass].name, MENU_UNSELECTED);

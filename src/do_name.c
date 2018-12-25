@@ -582,7 +582,7 @@ int gloc;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
-    any = zeroany;
+    any = g.zeroany;
 
     /* gather_locs returns array[0] == you. skip it. */
     for (i = 1; i < gcount; i++) {
@@ -1332,7 +1332,7 @@ docallcmd()
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any = zeroany;
+    any = g.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
              "a monster", MENU_UNSELECTED);

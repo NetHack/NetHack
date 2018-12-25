@@ -112,7 +112,7 @@ struct obj *otmp;
     if (!OMONST(otmp)) {
         struct monst *m = newmonst();
 
-        *m = zeromonst;
+        *m = g.zeromonst;
         OMONST(otmp) = m;
     }
 }
@@ -760,7 +760,7 @@ boolean artif;
     char let = objects[otyp].oc_class;
 
     otmp = newobj();
-    *otmp = zeroobj;
+    *otmp = g.zeroobj;
     otmp->age = g.monstermoves;
     otmp->o_id = g.context.ident++;
     if (!otmp->o_id)

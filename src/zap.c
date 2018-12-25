@@ -5208,7 +5208,7 @@ makewish()
     int tries = 0;
 
     promptbuf[0] = '\0';
-    nothing = zeroobj; /* lint suppression; only its address matters */
+    nothing = g.zeroobj; /* lint suppression; only its address matters */
     if (flags.verbose)
         You("may wish for an object.");
 retry:
@@ -5226,7 +5226,7 @@ retry:
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &zeroobj.  That includes gold, or an artifact that
+     *  otmp == &g.zeroobj.  That includes gold, or an artifact that
      *  has been denied.  Wishing for "nothing" requires a separate
      *  value to remain distinct.
      */
@@ -5248,7 +5248,7 @@ retry:
     /* KMH, conduct */
     u.uconduct.wishes++;
 
-    if (otmp != &zeroobj) {
+    if (otmp != &g.zeroobj) {
         const char
             *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),
             *oops_msg = (u.uswallow

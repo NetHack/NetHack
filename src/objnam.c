@@ -734,7 +734,7 @@ struct obj *obj;
 
     /* caveat: this makes a lot of assumptions about which fields
        are required in order for xname() to yield a sensible result */
-    bareobj = zeroobj;
+    bareobj = g.zeroobj;
     bareobj.otyp = otyp;
     bareobj.oclass = obj->oclass;
     bareobj.dknown = obj->dknown;
@@ -2806,7 +2806,7 @@ char oclass;
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
  * if asking explicitly for "nothing" (or "nil") return no_wish;
- * if not an object return &zeroobj; if an error (no matching object),
+ * if not an object return &g.zeroobj; if an error (no matching object),
  * return null.
  */
 struct obj *
@@ -3571,7 +3571,7 @@ wiztrap:
                       (trap != MAGIC_PORTAL) ? "" : " to nowhere");
             } else
                 pline("Creation of %s failed.", an(tname));
-            return &zeroobj;
+            return &g.zeroobj;
         }
 
         /* furniture and terrain */
@@ -3584,20 +3584,20 @@ wiztrap:
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
         if (!BSTRCMPI(bp, p - 6, "throne")) {
             lev->typ = THRONE;
             pline("A throne.");
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
         if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
             g.level.flags.nsinks++;
             pline("A sink.");
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
         /* ("water" matches "potion of water" rather than terrain) */
         if (!BSTRCMPI(bp, p - 4, "pool") || !BSTRCMPI(bp, p - 4, "moat")) {
@@ -3607,7 +3607,7 @@ wiztrap:
             /* Must manually make kelp! */
             water_damage_chain(g.level.objects[x][y], TRUE);
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
         if (!BSTRCMPI(bp, p - 4, "lava")) { /* also matches "molten lava" */
             lev->typ = LAVAPOOL;
@@ -3616,7 +3616,7 @@ wiztrap:
             if (!(Levitation || Flying))
                 (void) lava_effects();
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 5, "altar")) {
@@ -3636,7 +3636,7 @@ wiztrap:
             lev->altarmask = Align2amask(al);
             pline("%s altar.", An(align_str(al)));
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 5, "grave")
@@ -3645,7 +3645,7 @@ wiztrap:
             pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
                                             : "Can't place a grave here");
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 4, "tree")) {
@@ -3653,14 +3653,14 @@ wiztrap:
             pline("A tree.");
             newsym(x, y);
             block_point(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 4, "bars")) {
             lev->typ = IRONBARS;
             pline("Iron bars.");
             newsym(x, y);
-            return &zeroobj;
+            return &g.zeroobj;
         }
     }
 
@@ -3969,7 +3969,7 @@ typfnd:
          || (otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0);
-        otmp = &zeroobj;
+        otmp = &g.zeroobj;
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
     }

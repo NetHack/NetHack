@@ -524,7 +524,7 @@ makepicks:
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
-                    any = zeroany; /* separator, not a choice */
+                    any = g.zeroany; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
                     role_menu_extra(RS_RACE, win, FALSE);
@@ -618,7 +618,7 @@ makepicks:
                         role_selection_prolog(RS_RACE, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = g.zeroany; /* zero out all bits */
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
                         /* add miscellaneous menu entries */
@@ -711,7 +711,7 @@ makepicks:
                         role_selection_prolog(RS_GENDER, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = g.zeroany; /* zero out all bits */
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
                         /* add miscellaneous menu entries */
@@ -802,7 +802,7 @@ makepicks:
                         role_selection_prolog(RS_ALGNMNT, BASE_WINDOW);
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
-                        any = zeroany; /* zero out all bits */
+                        any = g.zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
@@ -882,7 +882,7 @@ makepicks:
         role_selection_prolog(ROLE_NONE, BASE_WINDOW);
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        any = zeroany; /* zero out all bits */
+        any = g.zeroany; /* zero out all bits */
         any.a_int = 0;
         if (!roles[ROLE].name.f
             && (roles[ROLE].allow & ROLE_GENDMASK)
@@ -984,7 +984,7 @@ reset_role_filtering()
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any = zeroany;
+    any = g.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1039,7 +1039,7 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
     boolean role_ok;
     char thisch, lastch = '\0', rolenamebuf[50];
 
-    any = zeroany; /* zero out all bits */
+    any = g.zeroany; /* zero out all bits */
     for (i = 0; roles[i].name.m; i++) {
         role_ok = ok_role(i, race, gend, algn);
         if (filtering && !role_ok)
@@ -1082,7 +1082,7 @@ int role, gend, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = g.zeroany;
     for (i = 0; races[i].noun; i++) {
         race_ok = ok_race(role, i, gend, algn);
         if (filtering && !race_ok)
@@ -1115,7 +1115,7 @@ int role, race, algn;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = g.zeroany;
     for (i = 0; i < ROLE_GENDERS; i++) {
         gend_ok = ok_gend(role, race, i, algn);
         if (filtering && !gend_ok)
@@ -1146,7 +1146,7 @@ int role, race, gend;
     int i;
     char this_ch;
 
-    any = zeroany;
+    any = g.zeroany;
     for (i = 0; i < ROLE_ALIGNS; i++) {
         algn_ok = ok_align(role, race, gend, i);
         if (filtering && !algn_ok)
@@ -2901,7 +2901,7 @@ const char *prompt; /* prompt to for menu */
     if (prompt) {
         anything any;
 
-        any = zeroany; /* not selectable */
+        any = g.zeroany; /* not selectable */
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                      MENU_UNSELECTED);
         tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt,

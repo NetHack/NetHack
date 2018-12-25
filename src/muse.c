@@ -2354,7 +2354,7 @@ boolean by_you;
        spells could toss pillar of fire at self--probably too suicidal] */
     if (!mon->mcan && !mon->mspec_used
         && attacktype_fordmg(mptr, AT_BREA, AD_FIRE)) {
-        odummy = zeroobj; /* otyp == STRANGE_OBJECT */
+        odummy = g.zeroobj; /* otyp == STRANGE_OBJECT */
         return muse_unslime(mon, &odummy, (struct trap *) 0, by_you);
     }
 
@@ -2393,7 +2393,7 @@ boolean by_you;
             }
         }
         if (t && t->ttyp == FIRE_TRAP)
-            return muse_unslime(mon, &zeroobj, t, by_you);
+            return muse_unslime(mon, &g.zeroobj, t, by_you);
 
     } /* MUSE */
 

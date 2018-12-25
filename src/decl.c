@@ -42,27 +42,21 @@ const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
-NEARDATA struct flag flags = DUMMY;
+NEARDATA struct flag flags;
 #ifdef SYSFLAGS
-NEARDATA struct sysflag sysflags = DUMMY;
+NEARDATA struct sysflag sysflags;
 #endif
-NEARDATA struct instance_flags iflags = DUMMY;
-NEARDATA struct you u = DUMMY;
-NEARDATA time_t ubirthday = DUMMY;
-NEARDATA struct u_realtime urealtime = DUMMY;
+NEARDATA struct instance_flags iflags;
+NEARDATA struct you u;
+NEARDATA time_t ubirthday;
+NEARDATA struct u_realtime urealtime;
 
-NEARDATA struct obj
-    *uwep = (struct obj *) 0, *uarm = (struct obj *) 0,
-    *uswapwep = (struct obj *) 0,
-    *uquiver = (struct obj *) 0,       /* quiver */
-        *uarmu = (struct obj *) 0,     /* under-wear, so to speak */
-            *uskin = (struct obj *) 0, /* dragon armor, if a dragon */
-                *uarmc = (struct obj *) 0, *uarmh = (struct obj *) 0,
-    *uarms = (struct obj *) 0, *uarmg = (struct obj *) 0,
-    *uarmf = (struct obj *) 0, *uamul = (struct obj *) 0,
-    *uright = (struct obj *) 0, *uleft = (struct obj *) 0,
-    *ublindf = (struct obj *) 0, *uchain = (struct obj *) 0,
-    *uball = (struct obj *) 0;
+NEARDATA struct obj *uwep, *uarm, *uswapwep,
+    *uquiver, /* quiver */
+    *uarmu, /* under-wear, so to speak */
+    *uskin, /* dragon armor, if a dragon */
+    *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
+    *uright, *uleft, *ublindf, *uchain, *uball;
 
 #ifdef TEXTCOLOR
 /*
@@ -86,13 +80,8 @@ const int shield_static[SHIELD_COUNT] = {
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
 };
 
-/* used to zero all elements of a struct obj and a struct monst */
-NEARDATA struct obj zeroobj = DUMMY;
-NEARDATA struct monst zeromonst = DUMMY;
-/* used to zero out union any; initializer deliberately omitted */
-NEARDATA anything zeroany;
 
-NEARDATA struct c_color_names c_color_names = {
+NEARDATA const struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
 };
@@ -116,7 +105,7 @@ const char *c_obj_colors[] = {
     "white",          /* CLR_WHITE */
 };
 
-struct c_common_strings c_common_strings = { "Nothing happens.",
+const struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "That's enough tries!",
                                              "That is a silly thing to %s.",
                                              "shudder for a moment.",
@@ -141,16 +130,8 @@ NEARDATA winid WIN_MESSAGE = WIN_ERR;
 NEARDATA winid WIN_STATUS = WIN_ERR;
 NEARDATA winid WIN_MAP = WIN_ERR, WIN_INVEN = WIN_ERR;
 
-/* Windowing stuff that's really tty oriented, but present for all ports */
-struct tc_gbl_data tc_gbl_data = { 0, 0, 0, 0 }; /* AS,AE, LI,CO */
-
-char *fqn_prefix[PREFIX_COUNT] = { (char *) 0, (char *) 0, (char *) 0,
-                                   (char *) 0, (char *) 0, (char *) 0,
-                                   (char *) 0, (char *) 0, (char *) 0,
-                                   (char *) 0 };
-
 #ifdef PREFIXES_IN_USE
-char *fqn_prefix_names[PREFIX_COUNT] = {
+const char *fqn_prefix_names[PREFIX_COUNT] = {
     "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
     "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
 };
@@ -312,6 +293,11 @@ const struct instance_globals g_init = {
     DUMMY, /* youmonst */
     NULL, /* invent */
     DUMMY, /* context */
+    DUMMY, /* fqn_prefix */
+    DUMMY, /* tc_gbl_data */
+    DUMMY, /* zeroobj */
+    DUMMY, /* zeromonst */
+    DUMMY, /* zeronay */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
@@ -608,6 +594,8 @@ const struct instance_globals g_init = {
 
 struct instance_globals g;
 
+#define ZERO(x) memset(&x, 0, sizeof(x))
+
 void
 decl_globals_init()
 {
@@ -628,6 +616,19 @@ decl_globals_init()
     sfsaveinfo = default_sfinfo;
 
     g.subrooms = &g.rooms[MAXNROFROOMS + 1];
+
+    ZERO(flags);
+#ifdef SYSFLAGS
+    ZERO(sysflags);
+#endif
+    ZERO(iflags);
+    ZERO(u);
+    ZERO(ubirthday);
+    ZERO(urealtime);
+
+    uwep = uarm = uswapwep = uquiver = uarmu = uskin = uarmc = NULL;
+    uarmh = uarms = uarmg = uarmf = uamul = uright = uleft = NULL;
+    ublindf = uchain = uball = NULL;
 
 }
 

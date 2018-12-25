@@ -1376,7 +1376,7 @@ const char *action;
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
  *      (struct obj *) 0        error return: no object.
- *      &zeroobj                explicitly no object (as in w-).
+ *      &g.zeroobj                explicitly no object (as in w-).
 !!!! test if gold can be used in unusual ways (eaten etc.)
 !!!! may be able to remove "usegold"
  */
@@ -1664,7 +1664,7 @@ register const char *let, *word;
                 You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
                     suf ? suf : "");
             }
-            return (allownone ? &zeroobj : (struct obj *) 0);
+            return (allownone ? &g.zeroobj : (struct obj *) 0);
         }
 redo_menu:
         /* since gold is now kept in inventory, we need to do processing for
@@ -1697,7 +1697,7 @@ redo_menu:
             if (!ilet)
                 continue;
             if (ilet == HANDS_SYM)
-                return &zeroobj;
+                return &g.zeroobj;
             if (ilet == '\033') {
                 if (flags.verbose)
                     pline1(Never_mind);
@@ -2587,7 +2587,7 @@ long *out_cnt;
                             (boolean FDECL((*), (OBJ_P))) 0);
 
     start_menu(win);
-    any = zeroany;
+    any = g.zeroany;
     if (wizard && iflags.override_ID) {
         int unid_cnt;
         char prompt[QBUFSZ];
@@ -2635,7 +2635,7 @@ nextclass:
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (wizid && !not_fully_identified(otmp))
                 continue;
-            any = zeroany; /* all bits zero */
+            any = g.zeroany; /* all bits zero */
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
@@ -2661,7 +2661,7 @@ nextclass:
         }
     }
     if (iflags.force_invmenu && lets && want_reply) {
-        any = zeroany;
+        any = g.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                  "Special", MENU_UNSELECTED);
         any.a_char = '*';
@@ -2674,7 +2674,7 @@ nextclass:
        recognized via any.a_char still being zero; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
     if (iflags.perm_invent && !lets && !any.a_char) {
-        any = zeroany;
+        any = g.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, 0,
                  not_carrying_anything, MENU_UNSELECTED);
         want_reply = FALSE;
@@ -2746,7 +2746,7 @@ char avoidlet;
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
         while (!invdone) {
-            any = zeroany; /* set all bits to zero */
+            any = g.zeroany; /* set all bits to zero */
             classcount = 0;
             for (otmp = g.invent; otmp; otmp = otmp->nobj) {
                 ilet = otmp->invlet;
@@ -2754,7 +2754,7 @@ char avoidlet;
                     continue;
                 if (!flags.sortpack || otmp->oclass == *invlet) {
                     if (flags.sortpack && !classcount) {
-                        any = zeroany; /* zero */
+                        any = g.zeroany; /* zero */
                         add_menu(win, NO_GLYPH, &any, 0, 0,
                                  iflags.menu_headings,
                                  let_to_name(*invlet, FALSE, FALSE),
@@ -4170,7 +4170,7 @@ const char *hdr, *txt;
     anything any;
     menu_item *selected;
 
-    any = zeroany;
+    any = g.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, hdr,

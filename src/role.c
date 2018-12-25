@@ -1951,7 +1951,7 @@ boolean preselect;
         break;
     }
 
-    any = zeroany; /* zero out all bits */
+    any = g.zeroany; /* zero out all bits */
     if (constrainer) {
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */

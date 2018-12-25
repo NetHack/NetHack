@@ -346,19 +346,19 @@ int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 #else
     if (!basenam || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
         return basenam;
-    if (!fqn_prefix[whichprefix])
+    if (!g.fqn_prefix[whichprefix])
         return basenam;
     if (buffnum < 0 || buffnum >= FQN_NUMBUF) {
         impossible("Invalid fqn_filename_buffer specified: %d", buffnum);
         buffnum = 0;
     }
-    if (strlen(fqn_prefix[whichprefix]) + strlen(basenam)
+    if (strlen(g.fqn_prefix[whichprefix]) + strlen(basenam)
         >= FQN_MAX_FILENAME) {
-        impossible("fqname too long: %s + %s", fqn_prefix[whichprefix],
+        impossible("fqname too long: %s + %s", g.fqn_prefix[whichprefix],
                    basenam);
         return basenam; /* XXX */
     }
-    Strcpy(fqn_filename_buffer[buffnum], fqn_prefix[whichprefix]);
+    Strcpy(fqn_filename_buffer[buffnum], g.fqn_prefix[whichprefix]);
     return strcat(fqn_filename_buffer[buffnum], basenam);
 #endif
 }
@@ -399,7 +399,7 @@ char *reasonbuf; /* reasonbuf must be at least BUFSZ, supplied by caller */
             if (!(details = strerror(errno)))
 #endif
                 details = "";
-            Sprintf(panicbuf2, "\"%s\", (%d) %s", fqn_prefix[prefcnt], errno,
+            Sprintf(panicbuf2, "\"%s\", (%d) %s", g.fqn_prefix[prefcnt], errno,
                     details);
             paniclog(panicbuf1, panicbuf2);
             failcount++;
@@ -2123,9 +2123,9 @@ int prefixid;
     if ((ptr = index(bufp, ';')) != 0)
         *ptr = '\0';
     if (strlen(bufp) > 0) {
-        fqn_prefix[prefixid] = (char *) alloc(strlen(bufp) + 2);
-        Strcpy(fqn_prefix[prefixid], bufp);
-        append_slash(fqn_prefix[prefixid]);
+        g.fqn_prefix[prefixid] = (char *) alloc(strlen(bufp) + 2);
+        Strcpy(g.fqn_prefix[prefixid], bufp);
+        append_slash(g.fqn_prefix[prefixid]);
     }
 }
 #endif
@@ -2269,7 +2269,7 @@ char *origbuf;
 
     /* Go through possible variables */
     /* some of these (at least LEVELS and SAVE) should now set the
-     * appropriate fqn_prefix[] rather than specialized variables
+     * appropriate g.fqn_prefix[] rather than specialized variables
      */
     if (match_varname(buf, "OPTIONS", 4)) {
         /* hack: un-mungspaces to allow consecutive spaces in
@@ -2929,7 +2929,7 @@ STATIC_DCL void
 wizkit_addinv(obj)
 struct obj *obj;
 {
-    if (!obj || obj == &zeroobj)
+    if (!obj || obj == &g.zeroobj)
         return;
 
     /* subset of starting inventory pre-ID */
@@ -2959,7 +2959,7 @@ char *buf;
     struct obj *otmp = readobjnam(buf, (struct obj *) 0);
 
     if (otmp) {
-        if (otmp != &zeroobj)
+        if (otmp != &g.zeroobj)
             wizkit_addinv(otmp);
     } else {
         /* .60 limits output line width to 79 chars */

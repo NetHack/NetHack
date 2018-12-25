@@ -1333,7 +1333,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
     if (saved && *saved) {
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
-        any = zeroany; /* no selection */
+        any = g.zeroany; /* no selection */
         if (bannerwin != WIN_ERR) {
             /* for tty; erase copyright notice and redo it in the menu */
             clear_nhwindow(bannerwin);

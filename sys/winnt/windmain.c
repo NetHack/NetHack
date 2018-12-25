@@ -162,22 +162,22 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
         (void) strncpy(g.hackdir, dir, PATHLEN - 1);
         g.hackdir[PATHLEN - 1] = '\0';
-        fqn_prefix[0] = (char *) alloc(strlen(g.hackdir) + 2);
-        Strcpy(fqn_prefix[0], g.hackdir);
-        append_slash(fqn_prefix[0]);
+        g.fqn_prefix[0] = (char *) alloc(strlen(g.hackdir) + 2);
+        Strcpy(g.fqn_prefix[0], g.hackdir);
+        append_slash(g.fqn_prefix[0]);
         for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
-             fqn_prefix[prefcnt] = fqn_prefix[0];
+             g.fqn_prefix[prefcnt] = g.fqn_prefix[0];
         /* sysconf should be searched for in this location */
         envp = nh_getenv("COMMONPROGRAMFILES");
         if (envp) {
             if ((sptr = index(envp, ';')) != 0)
                 *sptr = '\0';
             if (strlen(envp) > 0) {
-                fqn_prefix[SYSCONFPREFIX] =
+                g.fqn_prefix[SYSCONFPREFIX] =
                     (char *) alloc(strlen(envp) + 10);
-                Strcpy(fqn_prefix[SYSCONFPREFIX], envp);
-                append_slash(fqn_prefix[SYSCONFPREFIX]);
-                Strcat(fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                Strcpy(g.fqn_prefix[SYSCONFPREFIX], envp);
+                append_slash(g.fqn_prefix[SYSCONFPREFIX]);
+                Strcat(g.fqn_prefix[SYSCONFPREFIX], "NetHack\\");
             }
         }
 
@@ -198,7 +198,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             /* No SYSCF_FILE where there should be one, and
                without an installer, a user may not be able
                to place one there. So, let's try somewhere else... */
-             fqn_prefix[SYSCONFPREFIX] = fqn_prefix[0];
+             g.fqn_prefix[SYSCONFPREFIX] = g.fqn_prefix[0];
 
             /* Is there a SYSCF_FILE there? */
             fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
@@ -216,10 +216,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             if ((sptr = index(envp, ';')) != 0)
                 *sptr = '\0';
             if (strlen(envp) > 0) {
-                fqn_prefix[CONFIGPREFIX] =
+                g.fqn_prefix[CONFIGPREFIX] =
                     (char *) alloc(strlen(envp) + 2);
-                Strcpy(fqn_prefix[CONFIGPREFIX], envp);
-                append_slash(fqn_prefix[CONFIGPREFIX]);
+                Strcpy(g.fqn_prefix[CONFIGPREFIX], envp);
+                append_slash(g.fqn_prefix[CONFIGPREFIX]);
             }
         }
     }
@@ -900,7 +900,7 @@ gotlock:
 #endif
         Sprintf(oops, "cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", fq_lock,
               strerror(ern), " Are you sure that the directory",
-              fqn_prefix[LEVELPREFIX]);
+              g.fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
         if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))

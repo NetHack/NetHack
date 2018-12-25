@@ -89,7 +89,7 @@ anything *id;
     light_source *curr, *prev;
     anything tmp_id;
 
-    tmp_id = zeroany;
+    tmp_id = g.zeroany;
     /* need to be prepared for dealing a with light source which
        has only been partially restored during a level change
        (in particular: chameleon vs prot. from shape changers) */
@@ -443,14 +443,14 @@ light_source *ls;
             arg_save = ls->id;
             if (ls->type == LS_OBJECT) {
                 otmp = ls->id.a_obj;
-                ls->id = zeroany;
+                ls->id = g.zeroany;
                 ls->id.a_uint = otmp->o_id;
                 if (find_oid((unsigned) ls->id.a_uint) != otmp)
                     impossible("write_ls: can't find obj #%u!",
                                ls->id.a_uint);
             } else { /* ls->type == LS_MONSTER */
                 mtmp = (struct monst *) ls->id.a_monst;
-                ls->id = zeroany;
+                ls->id = g.zeroany;
                 ls->id.a_uint = mtmp->m_id;
                 if (find_mid((unsigned) ls->id.a_uint, FM_EVERYWHERE) != mtmp)
                     impossible("write_ls: can't find mon #%u!",

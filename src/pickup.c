@@ -869,7 +869,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
-    any = zeroany;
+    any = g.zeroany;
     /*
      * Run through the list and add the objects to the menu.  If
      * INVORDER_SORT is set, we'll run through the list once for
@@ -892,7 +892,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
             if ((*allow)(curr)) {
                 /* if sorting, print type name (once only) */
                 if (sorted && !printed_type_name) {
-                    any = zeroany;
+                    any = g.zeroany;
                     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                              let_to_name(*pack, FALSE,
                                          ((how != PICK_NONE)
@@ -917,14 +917,14 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
     if (engulfer) {
         char buf[BUFSZ];
 
-        any = zeroany;
+        any = g.zeroany;
         if (sorted && n > 1) {
             Sprintf(buf, "%s Creatures",
                     is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
                      MENU_UNSELECTED);
         }
-        fake_hero_object = zeroobj;
+        fake_hero_object = g.zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */
         any.a_obj = &fake_hero_object;
         add_menu(win, mon_to_glyph(&g.youmonst), &any,
@@ -959,7 +959,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
             n = 0;
         } else if (k < n) {
             /* other stuff plus fake_hero; last slot is now unused */
-            (*pick_list)[k].item = zeroany;
+            (*pick_list)[k].item = g.zeroany;
             (*pick_list)[k].count = 0L;
             n = k;
         }
@@ -1046,20 +1046,20 @@ int how;               /* type of query */
 
     if (qflags & CHOOSE_ALL) {
         invlet = 'A';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'A';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
                                        : "Auto-select every item",
                  MENU_UNSELECTED);
 
-        any = zeroany;
+        any = g.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     }
 
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
         invlet = 'a';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  (qflags & WORN_TYPES) ? "All worn types" : "All types",
@@ -1074,7 +1074,7 @@ int how;               /* type of query */
                 if (ofilter && !(*ofilter)(curr))
                     continue;
                 if (!collected_type_name) {
-                    any = zeroany;
+                    any = g.zeroany;
                     any.a_int = curr->oclass;
                     add_menu(
                         win, NO_GLYPH, &any, invlet++,
@@ -1096,14 +1096,14 @@ int how;               /* type of query */
 
     if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
         || do_uncursed || do_buc_unknown) {
-        any = zeroany;
+        any = g.zeroany;
         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     }
 
     /* unpaid items if there are any */
     if (do_unpaid) {
         invlet = 'u';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'u';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE, "Unpaid items",
                  MENU_UNSELECTED);
@@ -1111,7 +1111,7 @@ int how;               /* type of query */
     /* billed items: checked by caller, so always include if BILLED_TYPES */
     if (qflags & BILLED_TYPES) {
         invlet = 'x';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'x';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Unpaid items already used up", MENU_UNSELECTED);
@@ -1122,28 +1122,28 @@ int how;               /* type of query */
        reversing the usual sequence of 'U' and 'C' in BUCX */
     if (do_blessed) {
         invlet = 'B';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'B';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Items known to be Blessed", MENU_UNSELECTED);
     }
     if (do_cursed) {
         invlet = 'C';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'C';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Items known to be Cursed", MENU_UNSELECTED);
     }
     if (do_uncursed) {
         invlet = 'U';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'U';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Items known to be Uncursed", MENU_UNSELECTED);
     }
     if (do_buc_unknown) {
         invlet = 'X';
-        any = zeroany;
+        any = g.zeroany;
         any.a_int = 'X';
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Items of unknown Bless/Curse status", MENU_UNSELECTED);
@@ -1947,7 +1947,7 @@ reverse_loot()
             coffers->owt = weight(coffers);
             coffers->cknown = 0;
             if (!coffers->olocked) {
-                boxdummy = zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
+                boxdummy = g.zeroobj, boxdummy.otyp = SPE_WIZARD_LOCK;
                 (void) boxlock(coffers, &boxdummy);
             }
         } else if (levl[x][y].looted != T_LOOTED
@@ -2833,7 +2833,7 @@ boolean outokay, inokay, alreadyused, more_containers;
     int n;
     const char *menuselector = flags.lootabc ? abc_chars : lootchars;
 
-    any = zeroany;
+    any = g.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
 
@@ -2930,7 +2930,7 @@ dotip()
                 menu_item *pick_list = (menu_item *) 0;
                 struct obj dummyobj, *otmp;
 
-                any = zeroany;
+                any = g.zeroany;
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
 
@@ -2943,7 +2943,7 @@ dotip()
                                  doname(cobj), MENU_UNSELECTED);
                     }
                 if (g.invent) {
-                    any = zeroany;
+                    any = g.zeroany;
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                              "", MENU_UNSELECTED);
                     any.a_obj = &dummyobj;

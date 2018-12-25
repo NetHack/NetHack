@@ -2105,7 +2105,7 @@ timer_element *timer;
 {
     anything arg_save;
 
-    arg_save = zeroany;
+    arg_save = g.zeroany;
     switch (timer->kind) {
     case TIMER_GLOBAL:
     case TIMER_LEVEL:
@@ -2119,7 +2119,7 @@ timer_element *timer;
         else {
             /* replace object pointer with id */
             arg_save.a_obj = timer->arg.a_obj;
-            timer->arg = zeroany;
+            timer->arg = g.zeroany;
             timer->arg.a_uint = (arg_save.a_obj)->o_id;
             timer->needs_fixup = 1;
             bwrite(fd, (genericptr_t) timer, sizeof(timer_element));
@@ -2134,7 +2134,7 @@ timer_element *timer;
         else {
             /* replace monster pointer with id */
             arg_save.a_monst = timer->arg.a_monst;
-            timer->arg = zeroany;
+            timer->arg = g.zeroany;
             timer->arg.a_uint = (arg_save.a_monst)->m_id;
             timer->needs_fixup = 1;
             bwrite(fd, (genericptr_t) timer, sizeof(timer_element));

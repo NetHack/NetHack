@@ -3260,7 +3260,7 @@ domagictrap()
             struct obj pseudo;
             long save_conf = HConfusion;
 
-            pseudo = zeroobj; /* neither cursed nor blessed,
+            pseudo = g.zeroobj; /* neither cursed nor blessed,
                                  and zero out oextra */
             pseudo.otyp = SCR_REMOVE_CURSE;
             HConfusion = 0L;

@@ -28,7 +28,7 @@ anything *
 uint_to_any(ui)
 unsigned ui;
 {
-    g.tmp_anything = zeroany;
+    g.tmp_anything = g.zeroany;
     g.tmp_anything.a_uint = ui;
     return &g.tmp_anything;
 }
@@ -37,7 +37,7 @@ anything *
 long_to_any(lng)
 long lng;
 {
-    g.tmp_anything = zeroany;
+    g.tmp_anything = g.zeroany;
     g.tmp_anything.a_long = lng;
     return &g.tmp_anything;
 }
@@ -46,7 +46,7 @@ anything *
 monst_to_any(mtmp)
 struct monst *mtmp;
 {
-    g.tmp_anything = zeroany;
+    g.tmp_anything = g.zeroany;
     g.tmp_anything.a_monst = mtmp;
     return &g.tmp_anything;
 }
@@ -55,7 +55,7 @@ anything *
 obj_to_any(obj)
 struct obj *obj;
 {
-    g.tmp_anything = zeroany;
+    g.tmp_anything = g.zeroany;
     g.tmp_anything.a_obj = obj;
     return &g.tmp_anything;
 }
