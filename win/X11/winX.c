@@ -946,8 +946,8 @@ const char *str;
 
     switch (wp->type) {
     case NHW_MESSAGE:
-        (void) strncpy(toplines, str, TBUFSZ); /* for Norep(). */
-        toplines[TBUFSZ - 1] = 0;
+        (void) strncpy(g.toplines, str, TBUFSZ); /* for Norep(). */
+        g.toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
 #ifndef STATUS_HILITES
