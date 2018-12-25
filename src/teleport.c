@@ -39,7 +39,7 @@ unsigned gpflags;
      * which could be co-located and thus get restricted a bit too much.
      * oh well.
      */
-    if (mtmp != &youmonst && x == u.ux && y == u.uy
+    if (mtmp != &g.youmonst && x == u.ux && y == u.uy
         && (!u.usteed || mtmp != u.usteed))
         return FALSE;
 
@@ -61,7 +61,7 @@ unsigned gpflags;
 
         mdat = mtmp->data;
         if (is_pool(x, y) && !ignorewater) {
-            if (mtmp == &youmonst)
+            if (mtmp == &g.youmonst)
                 return (Levitation || Flying || Wwalking || Swimming
                         || Amphibious);
             else
@@ -70,11 +70,11 @@ unsigned gpflags;
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y)) {
-            if (mtmp == &youmonst)
+            if (mtmp == &g.youmonst)
                 return (Levitation || Flying
                         || (Fire_resistance && Wwalking && uarmf
                             && uarmf->oerodeproof)
-                        || (Upolyd && likes_lava(youmonst.data)));
+                        || (Upolyd && likes_lava(g.youmonst.data)));
             else
                 return (is_floater(mdat) || is_flyer(mdat)
                         || likes_lava(mdat));
@@ -237,7 +237,7 @@ boolean trapok;
 {
     if (!trapok && t_at(x, y))
         return FALSE;
-    if (!goodpos(x, y, &youmonst, 0))
+    if (!goodpos(x, y, &g.youmonst, 0))
         return FALSE;
     if (!tele_jump_ok(u.ux, u.uy, x, y))
         return FALSE;
@@ -294,9 +294,9 @@ boolean allow_drag;
     u.ux0 = u.ux;
     u.uy0 = u.uy;
 
-    if (!hideunder(&youmonst) && youmonst.data->mlet == S_MIMIC) {
+    if (!hideunder(&g.youmonst) && g.youmonst.data->mlet == S_MIMIC) {
         /* mimics stop being unnoticed */
-        youmonst.m_ap_type = M_AP_NOTHING;
+        g.youmonst.m_ap_type = M_AP_NOTHING;
     }
 
     if (u.uswallow) {
@@ -526,14 +526,14 @@ boolean break_the_rules;
         }
         if (trap)
             You("%s onto the teleportation trap.",
-                locomotion(youmonst.data, "jump"));
+                locomotion(g.youmonst.data, "jump"));
     }
     if (!trap) {
         boolean castit = FALSE;
         register int sp_no = 0, energy = 0;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
-                               && !can_teleport(youmonst.data))) {
+                               && !can_teleport(g.youmonst.data))) {
             /* Try to use teleport away spell. */
             if (objects[SPE_TELEPORT_AWAY].oc_name_known && !Confusion)
                 for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
@@ -694,10 +694,10 @@ level_tele()
             if (ynq("Go to Nowhere.  Are you sure?") != 'y')
                 return;
             You("%s in agony as your body begins to warp...",
-                is_silent(youmonst.data) ? "writhe" : "scream");
+                is_silent(g.youmonst.data) ? "writhe" : "scream");
             display_nhwindow(WIN_MESSAGE, FALSE);
             You("cease to exist.");
-            if (invent)
+            if (g.invent)
                 Your("possessions land on the %s with a thud.",
                      surface(u.ux, u.uy));
             g.killer.format = NO_KILLER_PREFIX;
@@ -705,7 +705,7 @@ level_tele()
             done(DIED);
             pline("An energized cloud of dust begins to coalesce.");
             Your("body rematerializes%s.",
-                 invent ? ", and you gather up all your possessions" : "");
+                 g.invent ? ", and you gather up all your possessions" : "");
             return;
         }
 
@@ -917,7 +917,7 @@ unsigned trflags;
     else
         Sprintf(verbbuf, "%s onto",
                 Levitation ? (const char *) "float"
-                           : locomotion(youmonst.data, "step"));
+                           : locomotion(g.youmonst.data, "step"));
     You("%s a level teleport trap!", verbbuf);
 
     if (Antimagic) {

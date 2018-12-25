@@ -266,7 +266,7 @@ chat_with_leader()
     } else if (u.uhave.questart) {
         struct obj *otmp;
 
-        for (otmp = invent; otmp; otmp = otmp->nobj)
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (is_quest_artifact(otmp))
                 break;
 

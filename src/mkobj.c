@@ -492,7 +492,7 @@ struct obj *obj;
     default:
         return (struct obj *) 0;
     case OBJ_INVENT:
-        list = invent;
+        list = g.invent;
         break;
     case OBJ_MINVENT:
         list = obj->ocarry->minvent;
@@ -567,7 +567,7 @@ struct obj *otmp;
     case OBJ_INVENT:
         otmp->nobj = obj->nobj;
         obj->nobj = otmp;
-        extract_nobj(obj, &invent);
+        extract_nobj(obj, &g.invent);
         break;
     case OBJ_CONTAINED:
         otmp->nobj = obj->nobj;
@@ -2242,7 +2242,7 @@ obj_sanity_check()
                 }
             }
 
-    objlist_sanity(invent, OBJ_INVENT, "invent sanity");
+    objlist_sanity(g.invent, OBJ_INVENT, "invent sanity");
     objlist_sanity(g.migrating_objs, OBJ_MIGRATING, "migrating sanity");
     objlist_sanity(g.level.buriedobjlist, OBJ_BURIED, "buried sanity");
     objlist_sanity(g.billobjs, OBJ_ONBILL, "bill sanity");

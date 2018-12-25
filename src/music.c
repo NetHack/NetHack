@@ -176,7 +176,7 @@ struct monst *bugler; /* monster that played instrument */
     int distance, distm;
 
     /* distance of affected non-soldier monsters to bugler */
-    distance = ((bugler == &youmonst) ? u.ulevel : bugler->data->mlevel) * 30;
+    distance = ((bugler == &g.youmonst) ? u.ulevel : bugler->data->mlevel) * 30;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -189,7 +189,7 @@ struct monst *bugler; /* monster that played instrument */
                 pline("%s is now ready for battle!", Monnam(mtmp));
             else
                 Norep("You hear the rattle of battle gear being readied.");
-        } else if ((distm = ((bugler == &youmonst)
+        } else if ((distm = ((bugler == &g.youmonst)
                                  ? distu(mtmp->mx, mtmp->my)
                                  : dist2(bugler->mx, bugler->my, mtmp->mx,
                                          mtmp->my))) < distance) {
@@ -388,7 +388,7 @@ int force;
                             reset_utrap(TRUE);
                         }
                         if (Levitation || Flying
-                            || is_clinger(youmonst.data)) {
+                            || is_clinger(g.youmonst.data)) {
                             if (!tu_pit) { /* no pit here previously */
                                 pline("A chasm opens up under you!");
                                 You("don't fall in!");
@@ -416,8 +416,8 @@ int force;
                                 exercise(A_DEX, TRUE);
                             else
                                 selftouch(
-                                    (Upolyd && (slithy(youmonst.data)
-                                                || nolimbs(youmonst.data)))
+                                    (Upolyd && (slithy(g.youmonst.data)
+                                                || nolimbs(g.youmonst.data)))
                                         ? "Shaken, you"
                                         : "Falling down, you");
                         }
@@ -579,7 +579,7 @@ struct obj *instr;
         break;
     case BUGLE: /* Awaken & attract soldiers */
         You("extract a loud noise from %s.", yname(instr));
-        awaken_soldiers(&youmonst);
+        awaken_soldiers(&g.youmonst);
         exercise(A_WIS, FALSE);
         break;
     case MAGIC_HARP: /* Charm monsters */
@@ -648,7 +648,7 @@ struct obj *instr;
     } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN
                 || instr->otyp == FIRE_HORN || instr->otyp == BUGLE)
-               && !can_blow(&youmonst)) {
+               && !can_blow(&g.youmonst)) {
         You("are incapable of playing %s.", the(distant_name(instr, xname)));
         return 0;
     }

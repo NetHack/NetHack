@@ -218,7 +218,7 @@ Boots_off(VOID_ARGS)
     case WATER_WALKING_BOOTS:
         /* check for lava since fireproofed boots make it viable */
         if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))
-            && !Levitation && !Flying && !is_clinger(youmonst.data)
+            && !Levitation && !Flying && !is_clinger(g.youmonst.data)
             && !context.takeoff.cancelled_don
             /* avoid recursive call to lava_effects() */
             && !iflags.in_lava_effects) {
@@ -725,7 +725,7 @@ Amulet_on()
         break;
     }
     case AMULET_OF_STRANGULATION:
-        if (can_be_strangled(&youmonst)) {
+        if (can_be_strangled(&g.youmonst)) {
             makeknown(AMULET_OF_STRANGULATION);
             Strangled = 6L;
             context.botl = TRUE;
@@ -768,7 +768,7 @@ Amulet_off()
             /* HMagical_breathing must be set off
                 before calling drown() */
             setworn((struct obj *) 0, W_AMUL);
-            if (!breathless(youmonst.data) && !amphibious(youmonst.data)
+            if (!breathless(g.youmonst.data) && !amphibious(g.youmonst.data)
                 && !Swimming) {
                 You("suddenly inhale an unhealthy amount of %s!",
                     hliquid("water"));
@@ -1308,7 +1308,7 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     boolean putting_on;
     int result = 0;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if ((otmp->owornmask & W_ARMOR) && donning(otmp))
             break;
     /* at most one item will pass donning() test at any given time */
@@ -1606,7 +1606,7 @@ boolean noisy;
 
     /* this is the same check as for 'W' (dowear), but different message,
        in case we get here via 'P' (doputon) */
-    if (verysmall(youmonst.data) || nohands(youmonst.data)) {
+    if (verysmall(g.youmonst.data) || nohands(g.youmonst.data)) {
         if (noisy)
             You("can't wear any armor in your current form.");
         return 0;
@@ -1619,10 +1619,10 @@ boolean noisy;
                     : is_suit(otmp)
                         ? c_suit
                         : 0;
-    if (which && cantweararm(youmonst.data)
+    if (which && cantweararm(g.youmonst.data)
         /* same exception for cloaks as used in m_dowear() */
-        && (which != c_cloak || youmonst.data->msize != MZ_SMALL)
-        && (racial_exception(&youmonst, otmp) < 1)) {
+        && (which != c_cloak || g.youmonst.data->msize != MZ_SMALL)
+        && (racial_exception(&g.youmonst, otmp) < 1)) {
         if (noisy)
             pline_The("%s will not fit on your body.", which);
         return 0;
@@ -1644,12 +1644,12 @@ boolean noisy;
             if (noisy)
                 already_wearing(an(helm_simple_name(uarmh)));
             err++;
-        } else if (Upolyd && has_horns(youmonst.data) && !is_flimsy(otmp)) {
+        } else if (Upolyd && has_horns(g.youmonst.data) && !is_flimsy(otmp)) {
             /* (flimsy exception matches polyself handling) */
             if (noisy)
                 pline_The("%s won't fit over your horn%s.",
                           helm_simple_name(otmp),
-                          plur(num_horns(youmonst.data)));
+                          plur(num_horns(g.youmonst.data)));
             err++;
         } else
             *mask = W_ARMH;
@@ -1676,11 +1676,11 @@ boolean noisy;
             if (noisy)
                 already_wearing(c_boots);
             err++;
-        } else if (Upolyd && slithy(youmonst.data)) {
+        } else if (Upolyd && slithy(g.youmonst.data)) {
             if (noisy)
                 You("have no feet..."); /* not body_part(FOOT) */
             err++;
-        } else if (Upolyd && youmonst.data->mlet == S_CENTAUR) {
+        } else if (Upolyd && g.youmonst.data->mlet == S_CENTAUR) {
             /* break_armor() pushes boots off for centaurs,
                so don't let dowear() put them back on... */
             if (noisy)
@@ -1807,13 +1807,13 @@ struct obj *obj;
             char answer, qbuf[QBUFSZ];
             int res = 0;
 
-            if (nolimbs(youmonst.data)) {
+            if (nolimbs(g.youmonst.data)) {
                 You("cannot make the ring stick to your body.");
                 return 0;
             }
             if (uleft && uright) {
                 There("are no more %s%s to fill.",
-                      humanoid(youmonst.data) ? "ring-" : "",
+                      humanoid(g.youmonst.data) ? "ring-" : "",
                       makeplural(body_part(FINGER)));
                 return 0;
             }
@@ -1824,7 +1824,7 @@ struct obj *obj;
             } else {
                 do {
                     Sprintf(qbuf, "Which %s%s, Right or Left?",
-                            humanoid(youmonst.data) ? "ring-" : "",
+                            humanoid(g.youmonst.data) ? "ring-" : "",
                             body_part(FINGER));
                     answer = yn_function(qbuf, "rl", '\0');
                     switch (answer) {
@@ -1959,7 +1959,7 @@ dowear()
 
     /* cantweararm() checks for suits of armor, not what we want here;
        verysmall() or nohands() checks for shields, gloves, etc... */
-    if (verysmall(youmonst.data) || nohands(youmonst.data)) {
+    if (verysmall(g.youmonst.data) || nohands(g.youmonst.data)) {
         pline("Don't even bother.");
         return 0;
     }
@@ -1983,7 +1983,7 @@ doputon()
         && uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf) {
         /* 'P' message doesn't mention armor */
         Your("%s%s are full, and you're already wearing an amulet and %s.",
-             humanoid(youmonst.data) ? "ring-" : "",
+             humanoid(g.youmonst.data) ? "ring-" : "",
              makeplural(body_part(FINGER)),
              (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
         return 0;
@@ -2050,7 +2050,7 @@ glibr()
     leftfall = (uleft && !uleft->cursed
                 && (!uwep || !welded(uwep) || !bimanual(uwep)));
     rightfall = (uright && !uright->cursed && (!welded(uwep)));
-    if (!uarmg && (leftfall || rightfall) && !nolimbs(youmonst.data)) {
+    if (!uarmg && (leftfall || rightfall) && !nolimbs(g.youmonst.data)) {
         /* changed so cursed rings don't fall off, GAN 10/30/86 */
         Your("%s off your %s.",
              (leftfall && rightfall) ? "rings slip" : "ring slips",
@@ -2132,22 +2132,22 @@ struct monst *victim;
 {
     register struct obj *otmph, *otmp;
 
-    otmph = (victim == &youmonst) ? uarmc : which_armor(victim, W_ARMC);
+    otmph = (victim == &g.youmonst) ? uarmc : which_armor(victim, W_ARMC);
     if (!otmph)
-        otmph = (victim == &youmonst) ? uarm : which_armor(victim, W_ARM);
+        otmph = (victim == &g.youmonst) ? uarm : which_armor(victim, W_ARM);
     if (!otmph)
-        otmph = (victim == &youmonst) ? uarmu : which_armor(victim, W_ARMU);
+        otmph = (victim == &g.youmonst) ? uarmu : which_armor(victim, W_ARMU);
 
-    otmp = (victim == &youmonst) ? uarmh : which_armor(victim, W_ARMH);
+    otmp = (victim == &g.youmonst) ? uarmh : which_armor(victim, W_ARMH);
     if (otmp && (!otmph || !rn2(4)))
         otmph = otmp;
-    otmp = (victim == &youmonst) ? uarmg : which_armor(victim, W_ARMG);
+    otmp = (victim == &g.youmonst) ? uarmg : which_armor(victim, W_ARMG);
     if (otmp && (!otmph || !rn2(4)))
         otmph = otmp;
-    otmp = (victim == &youmonst) ? uarmf : which_armor(victim, W_ARMF);
+    otmp = (victim == &g.youmonst) ? uarmf : which_armor(victim, W_ARMF);
     if (otmp && (!otmph || !rn2(4)))
         otmph = otmp;
-    otmp = (victim == &youmonst) ? uarms : which_armor(victim, W_ARMS);
+    otmp = (victim == &g.youmonst) ? uarms : which_armor(victim, W_ARMS);
     if (otmp && (!otmph || !rn2(4)))
         otmph = otmp;
     return otmph;
@@ -2167,7 +2167,7 @@ int otyp;
     if (ring && ring->otyp == otyp) {
         /* reasons ring can't be removed match those checked by select_off();
            limbless case has extra checks because ordinarily it's temporary */
-        if (nolimbs(youmonst.data) && uamul
+        if (nolimbs(g.youmonst.data) && uamul
             && uamul->otyp == AMULET_OF_UNCHANGING && uamul->cursed)
             return uamul;
         if (welded(uwep) && (ring == uright || bimanual(uwep)))
@@ -2204,7 +2204,7 @@ register struct obj *otmp;
 
     /* special ring checks */
     if (otmp == uright || otmp == uleft) {
-        if (nolimbs(youmonst.data)) {
+        if (nolimbs(g.youmonst.data)) {
             pline_The("ring is stuck.");
             return 0;
         }
@@ -2536,7 +2536,7 @@ int retry;
     } else if (flags.menu_style == MENU_FULL) {
         all_worn_categories = FALSE;
         n = query_category("What type of things do you want to take off?",
-                           invent, (WORN_TYPES | ALL_TYPES
+                           g.invent, (WORN_TYPES | ALL_TYPES
                                     | UNPAID_TYPES | BUCX_TYPES),
                            &pick_list, PICK_ANY);
         if (!n)
@@ -2561,7 +2561,7 @@ int retry;
         || menu_class_present('C') || menu_class_present('X'))
         all_worn_categories = FALSE;
 
-    n = query_objlist("What do you want to take off?", &invent,
+    n = query_objlist("What do you want to take off?", &g.invent,
                       (SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT),
                       &pick_list, PICK_ANY,
                       all_worn_categories ? is_worn : is_worn_by_type);

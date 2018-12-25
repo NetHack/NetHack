@@ -304,7 +304,7 @@ register struct obj *obj;
     boolean interference = (u.uswallow && is_whirly(u.ustuck->data)
                             && !rn2(Role_if(PM_HEALER) ? 10 : 3));
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You("have no hands!"); /* not `body_part(HAND)' */
         return 0;
     } else if (Deaf) {
@@ -318,9 +318,9 @@ register struct obj *obj;
         return 0;
 
     res = (g.moves == context.stethoscope_move)
-          && (youmonst.movement == context.stethoscope_movement);
+          && (g.youmonst.movement == context.stethoscope_movement);
     context.stethoscope_move = g.moves;
-    context.stethoscope_movement = youmonst.movement;
+    context.stethoscope_movement = g.youmonst.movement;
 
     g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
     g.notonhead = u.uswallow;
@@ -433,7 +433,7 @@ STATIC_OVL void
 use_whistle(obj)
 struct obj *obj;
 {
-    if (!can_blow(&youmonst)) {
+    if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (Underwater) {
         You("blow bubbles through %s.", yname(obj));
@@ -455,7 +455,7 @@ struct obj *obj;
 {
     register struct monst *mtmp, *nextmon;
 
-    if (!can_blow(&youmonst)) {
+    if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
         You("produce a %shigh-pitched humming noise.",
@@ -515,7 +515,7 @@ number_leashed()
     int i = 0;
     struct obj *obj;
 
-    for (obj = invent; obj; obj = obj->nobj)
+    for (obj = g.invent; obj; obj = obj->nobj)
         if (obj->otyp == LEASH && obj->leashmon != 0)
             i++;
     return i;
@@ -548,7 +548,7 @@ boolean feedback;
         else
             Your("leash falls slack.");
     }
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == LEASH && otmp->leashmon == (int) mtmp->m_id)
             otmp->leashmon = 0;
     mtmp->mleashed = 0;
@@ -561,7 +561,7 @@ unleash_all()
     register struct obj *otmp;
     register struct monst *mtmp;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
@@ -684,7 +684,7 @@ struct monst *mtmp;
 {
     struct obj *otmp;
 
-    otmp = invent;
+    otmp = g.invent;
     while (otmp) {
         if (otmp->otyp == LEASH && otmp->leashmon == (int) mtmp->m_id)
             return otmp;
@@ -706,7 +706,7 @@ next_to_u()
             if (distu(mtmp->mx, mtmp->my) > 2)
                 mnexto(mtmp);
             if (distu(mtmp->mx, mtmp->my) > 2) {
-                for (otmp = invent; otmp; otmp = otmp->nobj)
+                for (otmp = g.invent; otmp; otmp = otmp->nobj)
                     if (otmp->otyp == LEASH
                         && otmp->leashmon == (int) mtmp->m_id) {
                         if (otmp->cursed)
@@ -732,7 +732,7 @@ register xchar x, y;
     register struct obj *otmp;
     register struct monst *mtmp;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp != LEASH || otmp->leashmon == 0)
             continue;
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -845,7 +845,7 @@ struct obj *obj;
                     }
                     g.nomovemsg = 0; /* default, "you can move again" */
                 }
-            } else if (youmonst.data->mlet == S_VAMPIRE)
+            } else if (g.youmonst.data->mlet == S_VAMPIRE)
                 You("don't have a reflection.");
             else if (u.umonnum == PM_UMBER_HULK) {
                 pline("Huh?  That doesn't look like you!");
@@ -1525,7 +1525,7 @@ int x, y;
     /* let giants jump over boulders (what about Flying?
        and is there really enough head room for giants to jump
        at all, let alone over something tall?) */
-    if (sobj_at(BOULDER, x, y) && !throws_rocks(youmonst.data))
+    if (sobj_at(BOULDER, x, y) && !throws_rocks(g.youmonst.data))
         return FALSE;
     return TRUE;
 }
@@ -1645,7 +1645,7 @@ int magic; /* 0=Physical, otherwise skill level */
                 return spelleffects(sp_no, FALSE);
     }
 
-    if (!magic && (nolimbs(youmonst.data) || slithy(youmonst.data))) {
+    if (!magic && (nolimbs(g.youmonst.data) || slithy(g.youmonst.data))) {
         /* normally (nolimbs || slithy) implies !Jumping,
            but that isn't necessarily the case for knights */
         You_cant("jump; you have no legs!");
@@ -1827,7 +1827,7 @@ struct obj *obj;
         && !uarmg) {
         char kbuf[BUFSZ];
 
-        if (poly_when_stoned(youmonst.data))
+        if (poly_when_stoned(g.youmonst.data))
             You("tin %s without wearing gloves.",
                 an(mons[corpse->corpsenm].mname));
         else {
@@ -2290,7 +2290,7 @@ struct obj *obj;
         if (otmp != &zeroobj) {
             You("cover %s with a thick layer of grease.", yname(otmp));
             otmp->greased = 1;
-            if (obj->cursed && !nohands(youmonst.data)) {
+            if (obj->cursed && !nohands(g.youmonst.data)) {
                 incr_itimeout(&Glib, rnd(15));
                 pline("Some of the grease gets all over your %s.",
                       makeplural(body_part(HAND)));
@@ -2455,7 +2455,7 @@ struct obj *otmp;
     int levtyp = levl[u.ux][u.uy].typ;
     const char *occutext = "setting the trap";
 
-    if (nohands(youmonst.data))
+    if (nohands(g.youmonst.data))
         what = "without hands";
     else if (Stunned)
         what = "while stunned";
@@ -2725,7 +2725,7 @@ struct obj *obj;
             cc.y = ry;
             You("wrap your bullwhip around %s.", wrapped_what);
             if (proficient && rn2(proficient + 2)) {
-                if (!mtmp || enexto(&cc, rx, ry, youmonst.data)) {
+                if (!mtmp || enexto(&cc, rx, ry, g.youmonst.data)) {
                     You("yank yourself out of the pit!");
                     teleds(cc.x, cc.y, TRUE);
                     reset_utrap(TRUE);
@@ -2788,7 +2788,7 @@ struct obj *obj;
                         int hitu, hitvalu;
 
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu, dmgval(otmp, &youmonst),
+                        hitu = thitu(hitvalu, dmgval(otmp, &g.youmonst),
                                      &otmp, (char *)0);
                         if (hitu) {
                             pline_The("%s hits you as you try to snatch it!",
@@ -2804,7 +2804,7 @@ struct obj *obj;
                     if (otmp->otyp == CORPSE
                         && touch_petrifies(&mons[otmp->corpsenm]) && !uarmg
                         && !Stone_resistance
-                        && !(poly_when_stoned(youmonst.data)
+                        && !(poly_when_stoned(g.youmonst.data)
                              && polymon(PM_STONE_GOLEM))) {
                         char kbuf[BUFSZ];
 
@@ -3071,7 +3071,7 @@ struct obj *obj;
         pline("You immerse your %s in %s%s.", body_part(FACE),
               several ? "one of " : "",
               several ? makeplural(the(xname(obj))) : the(xname(obj)));
-    if (can_blnd((struct monst *) 0, &youmonst, AT_WEAP, obj)) {
+    if (can_blnd((struct monst *) 0, &g.youmonst, AT_WEAP, obj)) {
         int blindinc = rnd(25);
         u.ucreamed += blindinc;
         make_blinded(Blinded + (long) blindinc, FALSE);
@@ -3262,7 +3262,7 @@ struct obj *obj;
                                  "?", obj, yname, ysimple_name, "the wand")))
         return 0;
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You_cant("break %s without hands!", yname(obj));
         return 0;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
@@ -3492,7 +3492,7 @@ char class_list[];
     knowoil = objects[POT_OIL].oc_name_known;
     knowtouchstone = objects[TOUCHSTONE].oc_name_known;
     addpotions = addstones = addfood = FALSE;
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         otyp = otmp->otyp;
         if (otyp == POT_OIL
             || (otmp->oclass == POTION_CLASS

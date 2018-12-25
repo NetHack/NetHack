@@ -369,7 +369,7 @@ doread()
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
     if (scroll->otyp != SCR_BLANK_PAPER) {
-        boolean silently = !can_chant(&youmonst);
+        boolean silently = !can_chant(&g.youmonst);
 
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
@@ -1031,7 +1031,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         boolean special_armor;
         boolean same_color;
 
-        otmp = some_armor(&youmonst);
+        otmp = some_armor(&g.youmonst);
         if (!otmp) {
             strange_feeling(sobj, !Blind
                                       ? "Your skin glows then fades."
@@ -1153,7 +1153,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     }
     case SCR_DESTROY_ARMOR: {
-        otmp = some_armor(&youmonst);
+        otmp = some_armor(&g.youmonst);
         if (confused) {
             if (!otmp) {
                 strange_feeling(sobj, "Your bones itch.");
@@ -1194,7 +1194,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     } break;
     case SCR_CONFUSE_MONSTER:
     case SPE_CONFUSE_MONSTER:
-        if (youmonst.data->mlet != S_HUMAN || scursed) {
+        if (g.youmonst.data->mlet != S_HUMAN || scursed) {
             if (!HConfusion)
                 You_feel("confused.");
             make_confused(HConfusion + rnd(100), FALSE);
@@ -1277,7 +1277,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (scursed) {
             pline_The("scroll disintegrates.");
         } else {
-            for (obj = invent; obj; obj = obj->nobj) {
+            for (obj = g.invent; obj; obj = obj->nobj) {
                 long wornmask;
 
                 /* gold isn't subject to cursing and blessing */
@@ -1481,7 +1481,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         sobj = 0; /* it's gone */
         if (confused)
             You("identify this as an identify scroll.");
-        else if (!already_known || !invent)
+        else if (!already_known || !g.invent)
             /* force feedback now if invent became
                empty after using up this scroll */
             pline("This is an identify scroll.");
@@ -1496,7 +1496,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             if (cval == 1 && sblessed && Luck > 0)
                 ++cval;
         }
-        if (invent && !confused) {
+        if (g.invent && !confused) {
             identify_pack(cval, !already_known);
         } else if (otyp == SPE_IDENTIFY) {
             /* when casting a spell we know we're not confused,
@@ -1738,10 +1738,10 @@ boolean confused, helmet_protects, byu, skip_uswallow;
         return;
     otmp2->quan = confused ? rn1(5, 2) : 1;
     otmp2->owt = weight(otmp2);
-    if (!amorphous(youmonst.data) && !Passes_walls
-        && !noncorporeal(youmonst.data) && !unsolid(youmonst.data)) {
+    if (!amorphous(g.youmonst.data) && !Passes_walls
+        && !noncorporeal(g.youmonst.data) && !unsolid(g.youmonst.data)) {
         You("are hit by %s!", doname(otmp2));
-        dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
+        dmg = dmgval(otmp2, &g.youmonst) * otmp2->quan;
         if (uarmh && helmet_protects) {
             if (is_metallic(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
@@ -1945,7 +1945,7 @@ struct obj *obj;
         }
 
         /* the magic douses lamps, et al, too */
-        for (otmp = invent; otmp; otmp = otmp->nobj)
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (otmp->lamplit)
                 (void) snuff_lit(otmp);
     } else { /* on */
@@ -2247,7 +2247,7 @@ int how;
                 continue;
             }
             /* KMH -- Unchanging prevents rehumanization */
-            if (Unchanging && ptr == youmonst.data)
+            if (Unchanging && ptr == g.youmonst.data)
                 killplayer++;
             break;
         }
@@ -2257,7 +2257,7 @@ int how;
     which = "all ";
     if (Hallucination) {
         if (Upolyd)
-            Strcpy(buf, youmonst.data->mname);
+            Strcpy(buf, g.youmonst.data->mname);
         else {
             Strcpy(buf, (flags.female && urole.name.f) ? urole.name.f
                                                        : urole.name.m);
@@ -2301,12 +2301,12 @@ int how;
             /* Polymorphed characters will die as soon as they're rehumanized.
              */
             /* KMH -- Unchanging prevents rehumanization */
-            if (Upolyd && ptr != youmonst.data) {
+            if (Upolyd && ptr != g.youmonst.data) {
                 delayed_killer(POLYMORPH, g.killer.format, g.killer.name);
                 You_feel("%s inside.", udeadinside());
             } else
                 done(GENOCIDED);
-        } else if (ptr == youmonst.data) {
+        } else if (ptr == g.youmonst.data) {
             rehumanize();
         }
         reset_rndmonst(mndx);
@@ -2350,8 +2350,8 @@ struct obj *sobj;
         uball->owt += IRON_BALL_W_INCR * (1 + sobj->cursed);
         return;
     }
-    if (amorphous(youmonst.data) || is_whirly(youmonst.data)
-        || unsolid(youmonst.data)) {
+    if (amorphous(g.youmonst.data) || is_whirly(g.youmonst.data)
+        || unsolid(g.youmonst.data)) {
         if (!reuse_ball) {
             pline("A ball and chain appears, then falls away.");
             dropy(mkobj(BALL_CLASS, TRUE));

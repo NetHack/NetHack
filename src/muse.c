@@ -1191,7 +1191,7 @@ register struct obj *otmp;
     int tmp;
     boolean reveal_invis = FALSE;
 
-    if (mtmp != &youmonst) {
+    if (mtmp != &g.youmonst) {
         mtmp->msleeping = 0;
         if (mtmp->m_ap_type)
             seemimic(mtmp);
@@ -1199,7 +1199,7 @@ register struct obj *otmp;
     switch (otmp->otyp) {
     case WAN_STRIKING:
         reveal_invis = TRUE;
-        if (mtmp == &youmonst) {
+        if (mtmp == &g.youmonst) {
             if (g.zap_oseen)
                 makeknown(WAN_STRIKING);
             if (Antimagic) {
@@ -1232,7 +1232,7 @@ register struct obj *otmp;
         break;
 #if 0   /* disabled because find_offensive() never picks WAN_TELEPORTATION */
     case WAN_TELEPORTATION:
-        if (mtmp == &youmonst) {
+        if (mtmp == &g.youmonst) {
             if (g.zap_oseen)
                 makeknown(WAN_TELEPORTATION);
             tele();
@@ -1301,7 +1301,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
                 destroy_drawbridge(x, y);
             }
         if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
-            (*fhitm)(&youmonst, obj);
+            (*fhitm)(&g.youmonst, obj);
             range -= 3;
         } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
             if (cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp))
@@ -2151,7 +2151,7 @@ const char *fmt, *str;
         if (fmt && str)
             pline(fmt, str, uskin ? "luster" : "armor");
         return TRUE;
-    } else if (youmonst.data == &mons[PM_SILVER_DRAGON]) {
+    } else if (g.youmonst.data == &mons[PM_SILVER_DRAGON]) {
         if (fmt && str)
             pline(fmt, str, "scales");
         return TRUE;

@@ -6,7 +6,7 @@
 
 #define is_bigfoot(x) ((x) == &mons[PM_SASQUATCH])
 #define martial()                                 \
-    (martial_bonus() || is_bigfoot(youmonst.data) \
+    (martial_bonus() || is_bigfoot(g.youmonst.data) \
      || (uarmf && uarmf->otyp == KICKING_BOOTS))
 
 /* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
@@ -182,7 +182,7 @@ xchar x, y;
      * normally, getting all your attacks _including_ all your kicks.
      * If you have >1 kick attack, you get all of them.
      */
-    if (Upolyd && attacktype(youmonst.data, AT_KICK)) {
+    if (Upolyd && attacktype(g.youmonst.data, AT_KICK)) {
         struct attack *uattk;
         int sum, kickdieroll, armorpenalty,
             attknum = 0,
@@ -195,7 +195,7 @@ xchar x, y;
             if (g.multi < 0)
                 break;
 
-            uattk = &youmonst.data->mattk[i];
+            uattk = &g.youmonst.data->mattk[i];
             /* we only care about kicking attacks here */
             if (uattk->aatyp != AT_KICK)
                 continue;
@@ -336,7 +336,7 @@ register struct obj *gold;
             else
                 verbalize("Thanks, scum!");
         } else if (mtmp->isgd) {
-            umoney = money_cnt(invent);
+            umoney = money_cnt(g.invent);
             /* Some of these are iffy, because a hostile guard
                won't become peaceful and resume leading hero
                out of the vault.  If he did do that, player
@@ -364,7 +364,7 @@ register struct obj *gold;
                     goldreqd = 750L;
 
                 if (goldreqd) {
-                    umoney = money_cnt(invent);
+                    umoney = money_cnt(g.invent);
                     if (value
                         > goldreqd
                               + (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA))
@@ -515,7 +515,7 @@ xchar x, y;
         You("kick %s with your bare %s.",
             corpse_xname(g.kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
-        if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+        if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
@@ -759,10 +759,10 @@ dokick()
     char buf[BUFSZ], kickobjnam[BUFSZ];
 
     kickobjnam[0] = '\0';
-    if (nolimbs(youmonst.data) || slithy(youmonst.data)) {
+    if (nolimbs(g.youmonst.data) || slithy(g.youmonst.data)) {
         You("have no legs to kick with.");
         no_kick = TRUE;
-    } else if (verysmall(youmonst.data)) {
+    } else if (verysmall(g.youmonst.data)) {
         You("are too small to do any kicking.");
         no_kick = TRUE;
     } else if (u.usteed) {
@@ -787,7 +787,7 @@ dokick()
     } else if (near_capacity() > SLT_ENCUMBER) {
         Your("load is too heavy to balance yourself for a kick.");
         no_kick = TRUE;
-    } else if (youmonst.data->mlet == S_LIZARD) {
+    } else if (g.youmonst.data->mlet == S_LIZARD) {
         Your("legs cannot kick effectively.");
         no_kick = TRUE;
     } else if (u.uinwater && !rn2(2)) {
@@ -928,7 +928,7 @@ dokick()
             int range;
 
             range =
-                ((int) youmonst.data->cwt + (weight_cap() + inv_weight()));
+                ((int) g.youmonst.data->cwt + (weight_cap() + inv_weight()));
             if (range < 1)
                 range = 1; /* divide by zero avoidance */
             range = (3 * (int) mdat->cwt) / range;

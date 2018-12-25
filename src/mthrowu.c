@@ -82,7 +82,7 @@ const char *name; /* if null, then format `*objp' */
         } else if (obj && obj->oclass == POTION_CLASS) {
             /* an explosion which scatters objects might hit hero with one
                (potions deliberately thrown at hero are handled by m_throw) */
-            potionhit(&youmonst, obj, POTHIT_OTHER_THROW);
+            potionhit(&g.youmonst, obj, POTHIT_OTHER_THROW);
             *objp = obj = 0; /* potionhit() uses up the potion */
         } else {
             if (obj && objects[obj->otyp].oc_material == SILVER
@@ -134,7 +134,7 @@ int x, y;
             if (!flooreffects(obj, x, y, "fall")) {
                 place_object(obj, x, y);
                 if (!mtmp && x == u.ux && y == u.uy)
-                    mtmp = &youmonst;
+                    mtmp = &g.youmonst;
                 if (mtmp && ohit)
                     passive_obj(mtmp, obj, (struct attack *) 0);
                 stackobj(obj);
@@ -544,7 +544,7 @@ struct obj *obj;         /* missile (or stack providing it) */
 
             if (singleobj->oclass == GEM_CLASS
                 && singleobj->otyp <= LAST_GEM + 9 /* 9 glass colors */
-                && is_unicorn(youmonst.data)) {
+                && is_unicorn(g.youmonst.data)) {
                 if (singleobj->otyp > LAST_GEM) {
                     You("catch the %s.", xname(singleobj));
                     You("are not interested in %s junk.",
@@ -565,7 +565,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             if (singleobj->oclass == POTION_CLASS) {
                 if (!Blind)
                     singleobj->dknown = 1;
-                potionhit(&youmonst, singleobj, POTHIT_MONST_THROW);
+                potionhit(&g.youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }
             oldumort = u.umortality;
@@ -584,7 +584,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                 hitu = thitu(8, 0, &singleobj, (char *) 0);
                 break;
             default:
-                dam = dmgval(singleobj, &youmonst);
+                dam = dmgval(singleobj, &g.youmonst);
                 hitv = 3 - distmin(u.ux, u.uy, mon->mx, mon->my);
                 if (hitv < -4)
                     hitv = -4;
@@ -596,7 +596,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                     if (singleobj->otyp == ELVEN_ARROW)
                         dam++;
                 }
-                if (bigmonst(youmonst.data))
+                if (bigmonst(g.youmonst.data))
                     hitv++;
                 hitv += 8 + singleobj->spe;
                 if (dam < 1)
@@ -613,7 +613,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                             poison is limited to attrib loss */
                          (u.umortality > oldumort) ? 0 : 10, TRUE);
             }
-            if (hitu && can_blnd((struct monst *) 0, &youmonst,
+            if (hitu && can_blnd((struct monst *) 0, &g.youmonst,
                                  (uchar) ((singleobj->otyp == BLINDING_VENOM)
                                              ? AT_SPIT
                                              : AT_WEAP),
@@ -628,7 +628,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                 } else if (singleobj->otyp == BLINDING_VENOM) {
                     const char *eyes = body_part(EYE);
 
-                    if (eyecount(youmonst.data) != 1)
+                    if (eyecount(g.youmonst.data) != 1)
                         eyes = makeplural(eyes);
                     /* venom in the eyes */
                     if (!Blind)
@@ -639,7 +639,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             }
             if (hitu && singleobj->otyp == EGG) {
                 if (!Stoned && !Stone_resistance
-                    && !(poly_when_stoned(youmonst.data)
+                    && !(poly_when_stoned(g.youmonst.data)
                          && polymon(PM_STONE_GOLEM))) {
                     make_stoned(5L, (char *) 0, KILLED_BY, "");
                 }
@@ -897,11 +897,11 @@ struct monst *mtmp;
                   obj_is_pname(otmp) ? the(onm) : an(onm));
         }
 
-        dam = dmgval(otmp, &youmonst);
+        dam = dmgval(otmp, &g.youmonst);
         hitv = 3 - distmin(u.ux, u.uy, mtmp->mx, mtmp->my);
         if (hitv < -4)
             hitv = -4;
-        if (bigmonst(youmonst.data))
+        if (bigmonst(g.youmonst.data))
             hitv++;
         hitv += 8 + otmp->spe;
         if (dam < 1)
@@ -1072,8 +1072,8 @@ register struct monst *mtmp;
 
     /* hero concealment usually trumps monst awareness of being lined up */
     if (Upolyd && rn2(25)
-        && (u.uundetected || (youmonst.m_ap_type != M_AP_NOTHING
-                              && youmonst.m_ap_type != M_AP_MONSTER)))
+        && (u.uundetected || (g.youmonst.m_ap_type != M_AP_NOTHING
+                              && g.youmonst.m_ap_type != M_AP_MONSTER)))
         return FALSE;
 
     ignore_boulders = (throws_rocks(mtmp->data)

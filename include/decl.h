@@ -169,7 +169,7 @@ E const struct class_sym def_monsyms[MAXMCLASSES]; /* default class symbols */
 E uchar monsyms[MAXMCLASSES];                      /* current class symbols */
 
 #include "obj.h"
-E NEARDATA struct obj *invent, *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
+E NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
     *uarmu, /* under-wear, so to speak */
     *uskin, *uamul, *uleft, *uright, *ublindf, *uwep, *uswapwep, *uquiver;
 
@@ -191,7 +191,6 @@ E NEARDATA struct u_realtime urealtime;
 #endif
 
 E NEARDATA struct monst zeromonst; /* for init of new or temp monsters */
-E NEARDATA struct monst youmonst; /* monster details when hero is poly'd */
 
 struct mvitals {
     uchar born;
@@ -694,6 +693,12 @@ struct instance_globals {
     long wailmsg;
     struct obj *migrating_objs; /* objects moving to another dungeon level */    
     struct obj *billobjs; /* objects not yet paid for */
+#if defined(MICRO) || defined(WIN32)
+    char hackdir[PATHLEN]; /* where rumors, help, record are */
+#endif /* MICRO || WIN32 */
+    struct monst youmonst;
+    struct obj *invent;
+
 
     /* dig.c */
 

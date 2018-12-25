@@ -92,7 +92,7 @@ register struct monst *mtmp;
         fgold = fgold->nexthere;
 
     /* Do you have real gold? */
-    ygold = findgold(invent);
+    ygold = findgold(g.invent);
 
     if (fgold && (!ygold || fgold->quan > ygold->quan || !rn2(5))) {
         obj_extract_self(fgold);
@@ -103,7 +103,7 @@ register struct monst *mtmp;
             whose = s_suffix(y_monnam(who));
             what = makeplural(mbodypart(who, FOOT));
         } else {
-            who = &youmonst;
+            who = &g.youmonst;
             whose = "your";
             what = makeplural(body_part(FOOT));
         }
@@ -123,7 +123,7 @@ register struct monst *mtmp;
     } else if (ygold) {
         const int gold_price = objects[GOLD_PIECE].oc_cost;
 
-        tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
+        tmp = (somegold(money_cnt(g.invent)) + gold_price - 1) / gold_price;
         tmp = min(tmp, ygold->quan);
         if (tmp < ygold->quan)
             ygold = splitobj(ygold, tmp);
@@ -149,7 +149,7 @@ stealarm(VOID_ARGS)
     register struct monst *mtmp;
     register struct obj *otmp;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         if (otmp->o_id == stealoid) {
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (mtmp->m_id == stealmid) {
@@ -263,7 +263,7 @@ char *objnambuf;
     if (g.occupation)
         (void) maybe_finished_meal(FALSE);
 
-    if (!invent || (inv_cnt(FALSE) == 1 && uskin)) {
+    if (!g.invent || (inv_cnt(FALSE) == 1 && uskin)) {
     nothing_to_steal:
         /* Not even a thousand men in armor can strip a naked man. */
         if (Blind)
@@ -287,14 +287,14 @@ char *objnambuf;
 
 retry:
     tmp = 0;
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
             && otmp->oclass != COIN_CLASS)
             tmp += (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
     if (!tmp)
         goto nothing_to_steal;
     tmp = rn2(tmp);
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
             && otmp->oclass != COIN_CLASS) {
             tmp -= (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
@@ -519,12 +519,12 @@ struct monst *mtmp;
     /* target every quest artifact, not just current role's;
        if hero has more than one, choose randomly so that player
        can't use inventory ordering to influence the theft */
-    for (n = 0, obj = invent; obj; obj = obj->nobj)
+    for (n = 0, obj = g.invent; obj; obj = obj->nobj)
         if (any_quest_artifact(obj))
             ++n, otmp = obj;
     if (n > 1) {
         n = rnd(n);
-        for (otmp = invent; otmp; otmp = otmp->nobj)
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (any_quest_artifact(otmp) && !--n)
                 break;
     }
@@ -545,12 +545,12 @@ struct monst *mtmp;
             return; /* you have nothing of special interest */
 
         /* If we get here, real and fake have been set up. */
-        for (n = 0, obj = invent; obj; obj = obj->nobj)
+        for (n = 0, obj = g.invent; obj; obj = obj->nobj)
             if (obj->otyp == real || (obj->otyp == fake && !mtmp->iswiz))
                 ++n, otmp = obj;
         if (n > 1) {
             n = rnd(n);
-            for (otmp = invent; otmp; otmp = otmp->nobj)
+            for (otmp = g.invent; otmp; otmp = otmp->nobj)
                 if ((otmp->otyp == real
                      || (otmp->otyp == fake && !mtmp->iswiz)) && !--n)
                     break;

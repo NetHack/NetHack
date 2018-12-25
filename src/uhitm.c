@@ -259,7 +259,7 @@ int *attk_count, *role_roll_penalty;
     *role_roll_penalty = 0; /* default is `none' */
 
     tmp = 1 + Luck + abon() + find_mac(mtmp) + u.uhitinc
-          + maybe_polyd(youmonst.data->mlevel, u.ulevel);
+          + maybe_polyd(g.youmonst.data->mlevel, u.ulevel);
 
     /* some actions should occur only once during multiple attacks */
     if (!(*attk_count)++) {
@@ -293,7 +293,7 @@ int *attk_count, *role_roll_penalty;
             tmp += (u.ulevel / 3) + 2;
     }
     if (is_orc(mtmp->data)
-        && maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+        && maybe_polyd(is_elf(g.youmonst.data), Race_if(PM_ELF)))
         tmp++;
 
     /* encumbrance: with a lot of luggage, your agility diminishes */
@@ -390,7 +390,7 @@ register struct monst *mtmp;
     if (attack_checks(mtmp, uwep))
         return TRUE;
 
-    if (Upolyd && noattacks(youmonst.data)) {
+    if (Upolyd && noattacks(g.youmonst.data)) {
         /* certain "pacifist" monsters don't attack */
         You("have no way to attack monsters physically.");
         mtmp->mstrategy &= ~STRAT_WAITMASK;
@@ -410,7 +410,7 @@ register struct monst *mtmp;
         if (flags.verbose) {
             if (uwep)
                 You("begin bashing monsters with %s.", yname(uwep));
-            else if (!cantwield(youmonst.data))
+            else if (!cantwield(g.youmonst.data))
                 You("begin %s monsters with your %s %s.",
                     ing_suffix(Role_if(PM_MONK) ? "strike" : "bash"),
                     uarmg ? "gloved" : "bare", /* Del Lamb */
@@ -434,7 +434,7 @@ register struct monst *mtmp;
     if (Upolyd)
         (void) hmonas(mtmp);
     else
-        (void) hitum(mtmp, youmonst.data->mattk);
+        (void) hitum(mtmp, g.youmonst.data->mattk);
     mtmp->mstrategy &= ~STRAT_WAITMASK;
 
  atk_done:
@@ -493,7 +493,7 @@ int dieroll;
                 /* maybe should regurgitate if swallowed? */
                 monflee(mon, !rn2(3) ? rnd(100) : 0, FALSE, TRUE);
 
-                if (u.ustuck == mon && !u.uswallow && !sticks(youmonst.data))
+                if (u.ustuck == mon && !u.uswallow && !sticks(g.youmonst.data))
                     u.ustuck = 0;
             }
             /* Vorpal Blade hit converted to miss */
@@ -811,7 +811,7 @@ int dieroll;
                 }
 
                 if (obj->oartifact
-                    && artifact_hit(&youmonst, mon, obj, &tmp, dieroll)) {
+                    && artifact_hit(&g.youmonst, mon, obj, &tmp, dieroll)) {
                     if (DEADMONSTER(mon)) /* artifact killed monster */
                         return FALSE;
                     if (tmp == 0)
@@ -995,7 +995,7 @@ int dieroll;
                 case CREAM_PIE:
                 case BLINDING_VENOM:
                     mon->msleeping = 0;
-                    if (can_blnd(&youmonst, mon,
+                    if (can_blnd(&g.youmonst, mon,
                                  (uchar) (obj->otyp == BLINDING_VENOM
                                              ? AT_SPIT
                                              : AT_WEAP),
@@ -1448,7 +1448,7 @@ demonpet()
 
     pline("Some hell-p has arrived!");
     i = !rn2(6) ? ndemon(u.ualign.type) : NON_PM;
-    pm = i != NON_PM ? &mons[i] : youmonst.data;
+    pm = i != NON_PM ? &mons[i] : g.youmonst.data;
     if ((dtmp = makemon(pm, u.ux, u.uy, NO_MM_FLAGS)) != 0)
         (void) tamedog(dtmp, (struct obj *) 0);
     exercise(A_WIS, TRUE);
@@ -1463,7 +1463,7 @@ struct obj *otmp;
         return FALSE;
 
 #if 0   /* no poly_when_stoned() critter has theft capability */
-    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+    if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
         display_nhwindow(WIN_MESSAGE, FALSE);   /* --More-- */
         return TRUE;
     }
@@ -1494,7 +1494,7 @@ struct attack *mattk;
 
     /* look for worn body armor */
     stealoid = (struct obj *) 0;
-    if (could_seduce(&youmonst, mdef, mattk)) {
+    if (could_seduce(&g.youmonst, mdef, mattk)) {
         /* find armor, and move it to end of inventory in the process */
         minvent_ptr = &mdef->minvent;
         while ((otmp = *minvent_ptr) != 0)
@@ -1511,7 +1511,7 @@ struct attack *mattk;
     }
 
     if (stealoid) { /* we will be taking everything */
-        if (gender(mdef) == (int) u.mfemale && youmonst.data->mlet == S_NYMPH)
+        if (gender(mdef) == (int) u.mfemale && g.youmonst.data->mlet == S_NYMPH)
             You("charm %s.  She gladly hands over her possessions.",
                 mon_nam(mdef));
         else
@@ -1574,7 +1574,7 @@ register struct attack *mattk;
     /* since hero can't be cancelled, only defender's armor applies */
     negated = !(rn2(10) >= 3 * armpro);
 
-    if (is_demon(youmonst.data) && !rn2(13) && !uwep
+    if (is_demon(g.youmonst.data) && !rn2(13) && !uwep
         && u.umonnum != PM_SUCCUBUS && u.umonnum != PM_INCUBUS
         && u.umonnum != PM_BALROG) {
         demonpet();
@@ -1711,7 +1711,7 @@ register struct attack *mattk;
         mongold = findgold(mdef->minvent);
         if (mongold) {
             obj_extract_self(mongold);
-            if (merge_choice(invent, mongold) || inv_cnt(FALSE) < 52) {
+            if (merge_choice(g.invent, mongold) || inv_cnt(FALSE) < 52) {
                 addinv(mongold);
                 Your("purse feels heavier.");
             } else {
@@ -1739,7 +1739,7 @@ register struct attack *mattk;
         }
         break;
     case AD_BLND:
-        if (can_blnd(&youmonst, mdef, mattk->aatyp, (struct obj *) 0)) {
+        if (can_blnd(&g.youmonst, mdef, mattk->aatyp, (struct obj *) 0)) {
             if (!Blind && mdef->mcansee)
                 pline("%s is blinded.", Monnam(mdef));
             mdef->mcansee = 0;
@@ -1811,7 +1811,7 @@ register struct attack *mattk;
     case AD_DRDX:
     case AD_DRCO:
         if (!negated && !rn2(8)) {
-            Your("%s was poisoned!", mpoisons_subj(&youmonst, mattk));
+            Your("%s was poisoned!", mpoisons_subj(&g.youmonst, mattk));
             if (resists_poison(mdef)) {
                 pline_The("poison doesn't seem to affect %s.", mon_nam(mdef));
             } else {
@@ -1847,7 +1847,7 @@ register struct attack *mattk;
             break;
         }
 
-        (void) eat_brains(&youmonst, mdef, TRUE, &tmp);
+        (void) eat_brains(&g.youmonst, mdef, TRUE, &tmp);
         break;
     }
     case AD_STCK:
@@ -2013,7 +2013,7 @@ struct monst *mdef;
 {
     if (!Invisible) {
         map_location(u.ux, u.uy, TRUE);
-        tmp_at(DISP_ALWAYS, mon_to_glyph(&youmonst));
+        tmp_at(DISP_ALWAYS, mon_to_glyph(&g.youmonst));
         tmp_at(mdef->mx, mdef->my);
     }
     You("engulf %s!", mon_nam(mdef));
@@ -2054,7 +2054,7 @@ register struct attack *mattk;
      * after exactly 1 round of attack otherwise.  -KAA
      */
 
-    if (!engulf_target(&youmonst, mdef))
+    if (!engulf_target(&g.youmonst, mdef))
         return 0;
 
     if (u.uhunger < 1500 && !u.uswallow) {
@@ -2128,7 +2128,7 @@ register struct attack *mattk;
                         body_part(STOMACH));
                 } else {
                     tmp = 1 + (pd->cwt >> 8);
-                    if (corpse_chance(mdef, &youmonst, TRUE)
+                    if (corpse_chance(mdef, &g.youmonst, TRUE)
                         && !(g.mvitals[monsndx(pd)].mvflags & G_NOCORPSE)) {
                         /* nutrition only if there can be a corpse */
                         u.uhunger += (pd->cnutrit + 1) / 2;
@@ -2161,7 +2161,7 @@ register struct attack *mattk;
                 end_engulf();
                 return 2;
             case AD_PHYS:
-                if (youmonst.data == &mons[PM_FOG_CLOUD]) {
+                if (g.youmonst.data == &mons[PM_FOG_CLOUD]) {
                     pline("%s is laden with your moisture.", Monnam(mdef));
                     if (amphibious(pd) && !flaming(pd)) {
                         dam = 0;
@@ -2178,7 +2178,7 @@ register struct attack *mattk;
                 }
                 break;
             case AD_BLND:
-                if (can_blnd(&youmonst, mdef, mattk->aatyp,
+                if (can_blnd(&g.youmonst, mdef, mattk->aatyp,
                              (struct obj *) 0)) {
                     if (mdef->mcansee)
                         pline("%s can't see in there!", Monnam(mdef));
@@ -2237,9 +2237,9 @@ register struct attack *mattk;
                 if (DEADMONSTER(mdef)) /* not lifesaved */
                     return 2;
             }
-            You("%s %s!", is_animal(youmonst.data) ? "regurgitate" : "expel",
+            You("%s %s!", is_animal(g.youmonst.data) ? "regurgitate" : "expel",
                 mon_nam(mdef));
-            if (Slow_digestion || is_animal(youmonst.data)) {
+            if (Slow_digestion || is_animal(g.youmonst.data)) {
                 pline("Obviously, you didn't like %s taste.",
                       s_suffix(mon_nam(mdef)));
             }
@@ -2257,7 +2257,7 @@ boolean wouldhavehit;
     if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
         Your("armor is rather cumbersome...");
 
-    if (could_seduce(&youmonst, mdef, mattk))
+    if (could_seduce(&g.youmonst, mdef, mattk))
         You("pretend to be friendly to %s.", mon_nam(mdef));
     else if (canspotmon(mdef) && flags.verbose)
         You("miss %s.", mon_nam(mdef));
@@ -2280,7 +2280,7 @@ register struct monst *mon;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
-        mattk = getmattk(&youmonst, mon, i, sum, &alt_attk);
+        mattk = getmattk(&g.youmonst, mon, i, sum, &alt_attk);
         weapon = 0;
         switch (mattk->aatyp) {
         case AT_WEAP:
@@ -2336,11 +2336,11 @@ register struct monst *mon;
                 sum[i] = damageum(mon, mattk);
             break;
         case AT_CLAW:
-            if (uwep && !cantwield(youmonst.data) && !weapon_used)
+            if (uwep && !cantwield(g.youmonst.data) && !weapon_used)
                 goto use_weapon;
             /*FALLTHRU*/
         case AT_TUCH:
-            if (uwep && youmonst.data->mlet == S_LICH && !weapon_used)
+            if (uwep && g.youmonst.data->mlet == S_LICH && !weapon_used)
                 goto use_weapon;
             /*FALLTHRU*/
         case AT_KICK:
@@ -2356,7 +2356,7 @@ register struct monst *mon;
                 int compat;
 
                 if (!u.uswallow
-                    && (compat = could_seduce(&youmonst, mon, mattk))) {
+                    && (compat = could_seduce(&g.youmonst, mon, mattk))) {
                     You("%s %s %s.",
                         mon->mcansee && haseyes(mon->data) ? "smile at"
                                                            : "talk to",
@@ -2447,9 +2447,9 @@ register struct monst *mon;
             /* No check for uwep; if wielding nothing we want to
              * do the normal 1-2 points bare hand damage...
              */
-            if ((youmonst.data->mlet == S_KOBOLD
-                 || youmonst.data->mlet == S_ORC
-                 || youmonst.data->mlet == S_GNOME) && !weapon_used)
+            if ((g.youmonst.data->mlet == S_KOBOLD
+                 || g.youmonst.data->mlet == S_ORC
+                 || g.youmonst.data->mlet == S_GNOME) && !weapon_used)
                 goto use_weapon;
             /*FALLTHRU*/
 
@@ -2539,7 +2539,7 @@ boolean wep_was_destroyed;
             if (!Acid_resistance)
                 mdamageu(mon, tmp);
             if (!rn2(30))
-                erode_armor(&youmonst, ERODE_CORRODE);
+                erode_armor(&g.youmonst, ERODE_CORRODE);
         }
         if (mhit && weapon) {
             if (aatyp == AT_KICK) {
@@ -2568,7 +2568,7 @@ boolean wep_was_destroyed;
                 || (protector == W_ARMH && !uarmh)
                 || (protector == (W_ARMC | W_ARMG) && (!uarmc || !uarmg))) {
                 if (!Stone_resistance
-                    && !(poly_when_stoned(youmonst.data)
+                    && !(poly_when_stoned(g.youmonst.data)
                          && polymon(PM_STONE_GOLEM))) {
                     done_in_by(mon, STONING); /* "You turn to stone..." */
                     return 2;
@@ -2682,7 +2682,7 @@ boolean wep_was_destroyed;
                     mon->mhpmax = mon->mhp;
                 /* at a certain point, the monster will reproduce! */
                 if (mon->mhpmax > ((int) (mon->m_lev + 1) * 8))
-                    (void) split_mon(mon, &youmonst);
+                    (void) split_mon(mon, &g.youmonst);
             }
             break;
         case AD_STUN: /* specifically yellow mold */

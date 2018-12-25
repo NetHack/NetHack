@@ -114,7 +114,7 @@ stoned_dialogue()
         char buf[BUFSZ];
 
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
-        if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
+        if (nolimbs(g.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
         pline1(buf);
     }
@@ -198,7 +198,7 @@ vomiting_dialogue()
         break;
     case 2:
         txt = vomiting_texts[4];
-        if (cantvomit(youmonst.data))
+        if (cantvomit(g.youmonst.data))
             txt = "gag uncontrollably.";
         else if (Hallucination)
             /* "hurl" is short for "hurl chunks" which is slang for
@@ -207,7 +207,7 @@ vomiting_dialogue()
         break;
     case 0:
         stop_occupation();
-        if (!cantvomit(youmonst.data)) {
+        if (!cantvomit(g.youmonst.data)) {
             morehungry(20);
             /* case 2 used to be "You suddenly vomit!" but it wasn't sudden
                since you've just been through the earlier messages of the
@@ -315,14 +315,14 @@ slime_dialogue()
         /* display as green slime during "You have become green slime."
            but don't worry about not being able to see self; if already
            mimicking something else at the time, implicitly be revealed */
-        youmonst.m_ap_type = M_AP_MONSTER;
-        youmonst.mappearance = PM_GREEN_SLIME;
+        g.youmonst.m_ap_type = M_AP_MONSTER;
+        g.youmonst.mappearance = PM_GREEN_SLIME;
     }
     if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
-        if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
+        if (nolimbs(g.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
 
         if (index(buf, '%')) {
@@ -373,7 +373,7 @@ struct kinfo *kptr;
     uchar save_mvflags;
 
     /* redundant: polymon() cures sliming when polying into green slime */
-    if (Upolyd && youmonst.data == &mons[PM_GREEN_SLIME]) {
+    if (Upolyd && g.youmonst.data == &mons[PM_GREEN_SLIME]) {
         dealloc_killer(kptr);
         return;
     }
@@ -399,8 +399,8 @@ struct kinfo *kptr;
      * [formerly implicit] change of form; polymon() takes care of that.
      * Temporarily ungenocide if necessary.
      */
-    if (emits_light(youmonst.data))
-        del_light_source(LS_MONSTER, monst_to_any(&youmonst));
+    if (emits_light(g.youmonst.data))
+        del_light_source(LS_MONSTER, monst_to_any(&g.youmonst));
     save_mvflags = g.mvitals[PM_GREEN_SLIME].mvflags;
     g.mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
     (void) polymon(PM_GREEN_SLIME);
@@ -489,8 +489,8 @@ nh_timeout()
         phaze_dialogue();
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging)
-            u.mtimedone = rnd(100 * youmonst.data->mlevel + 1);
-        else if (is_were(youmonst.data))
+            u.mtimedone = rnd(100 * g.youmonst.data->mlevel + 1);
+        else if (is_were(g.youmonst.data))
             you_unwere(FALSE); /* if polycontrl, asks whether to rehumanize */
         else
             rehumanize();

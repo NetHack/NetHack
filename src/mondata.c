@@ -102,10 +102,10 @@ struct monst *mon;
 
     if (is_undead(ptr) || is_demon(ptr) || is_were(ptr)
         /* is_were() doesn't handle hero in human form */
-        || (mon == &youmonst && u.ulycn >= LOW_PM)
+        || (mon == &g.youmonst && u.ulycn >= LOW_PM)
         || ptr == &mons[PM_DEATH] || is_vampshifter(mon))
         return TRUE;
-    wep = (mon == &youmonst) ? uwep : MON_WEP(mon);
+    wep = (mon == &g.youmonst) ? uwep : MON_WEP(mon);
     return (boolean) (wep && wep->oartifact && defends(AD_DRLI, wep));
 }
 
@@ -115,7 +115,7 @@ resists_magm(mon)
 struct monst *mon;
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &youmonst);
+    boolean is_you = (mon == &g.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -128,7 +128,7 @@ struct monst *mon;
     if (o && o->oartifact && defends(AD_MAGM, o))
         return TRUE;
     /* check for magic resistance granted by worn or carried items */
-    o = is_you ? invent : mon->minvent;
+    o = is_you ? g.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -149,7 +149,7 @@ resists_blnd(mon)
 struct monst *mon;
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &youmonst);
+    boolean is_you = (mon == &g.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -166,7 +166,7 @@ struct monst *mon;
     o = is_you ? uwep : MON_WEP(mon);
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
-    o = is_you ? invent : mon->minvent;
+    o = is_you ? g.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -190,7 +190,7 @@ struct monst *mdef;
 uchar aatyp;
 struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
 {
-    boolean is_you = (mdef == &youmonst);
+    boolean is_you = (mdef == &g.youmonst);
     boolean check_visor = FALSE;
     struct obj *o;
     const char *s;
@@ -226,7 +226,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
             return TRUE; /* no defense */
         } else
             return FALSE; /* other objects cannot cause blindness yet */
-        if ((magr == &youmonst) && u.uswallow)
+        if ((magr == &g.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         break;
 
@@ -241,7 +241,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
         /* e.g. raven: all ublindf, including LENSES, protect */
         if (is_you && ublindf)
             return FALSE;
-        if ((magr == &youmonst) && u.uswallow)
+        if ((magr == &g.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         check_visor = TRUE;
         break;
@@ -259,7 +259,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
 
     /* check if wearing a visor (only checked if visor might help) */
     if (check_visor) {
-        o = (mdef == &youmonst) ? invent : mdef->minvent;
+        o = (mdef == &g.youmonst) ? g.invent : mdef->minvent;
         for (; o; o = o->nobj)
             if ((o->owornmask & W_ARMH)
                 && (s = OBJ_DESCR(objects[o->otyp])) != (char *) 0
@@ -340,7 +340,7 @@ struct monst *mtmp;
         && (breathless(mtmp->data) || verysmall(mtmp->data)
             || !has_head(mtmp->data) || mtmp->data->mlet == S_EEL))
         return FALSE;
-    if ((mtmp == &youmonst) && Strangled)
+    if ((mtmp == &g.youmonst) && Strangled)
         return FALSE;
     return TRUE;
 }
@@ -350,7 +350,7 @@ boolean
 can_chant(mtmp)
 struct monst *mtmp;
 {
-    if ((mtmp == &youmonst && Strangled)
+    if ((mtmp == &g.youmonst && Strangled)
         || is_silent(mtmp->data) || !has_head(mtmp->data)
         || mtmp->data->msound == MS_BUZZ || mtmp->data->msound == MS_BURBLE)
         return FALSE;
@@ -374,10 +374,10 @@ struct monst *mon;
        are non-breathing creatures which have higher brain function. */
     if (!has_head(mon->data))
         return FALSE;
-    if (mon == &youmonst) {
+    if (mon == &g.youmonst) {
         /* hero can't be mindless but poly'ing into mindless form can
            confer strangulation protection */
-        nobrainer = mindless(youmonst.data);
+        nobrainer = mindless(g.youmonst.data);
         nonbreathing = Breathless;
     } else {
         nobrainer = mindless(mon->data);
@@ -1075,7 +1075,7 @@ const struct permonst *
 raceptr(mtmp)
 struct monst *mtmp;
 {
-    if (mtmp == &youmonst && !Upolyd)
+    if (mtmp == &g.youmonst && !Upolyd)
         return &mons[urace.malenum];
     else
         return mtmp->data;

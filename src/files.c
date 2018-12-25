@@ -2313,7 +2313,7 @@ char *origbuf;
 #else /*NOCWD_ASSUMPTIONS*/
 #ifdef MICRO
     } else if (match_varname(buf, "HACKDIR", 4)) {
-        (void) strncpy(hackdir, bufp, PATHLEN - 1);
+        (void) strncpy(g.hackdir, bufp, PATHLEN - 1);
 #ifdef MFLOPPY
     } else if (match_varname(buf, "RAMDISK", 3)) {
 /* The following ifdef is NOT in the wrong
@@ -2938,7 +2938,7 @@ struct obj *obj;
         obj->bknown = 1;
     /* same criteria as lift_object()'s check for available inventory slot */
     if (obj->oclass != COIN_CLASS && inv_cnt(FALSE) >= 52
-        && !merge_choice(invent, obj)) {
+        && !merge_choice(g.invent, obj)) {
         /* inventory overflow; can't just place & stack object since
            hero isn't in position yet, so schedule for arrival later */
         add_to_migration(obj);

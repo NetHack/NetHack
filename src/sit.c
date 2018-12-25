@@ -14,7 +14,7 @@ take_gold()
     struct obj *otmp, *nobj;
     int lost_money = 0;
 
-    for (otmp = invent; otmp; otmp = nobj) {
+    for (otmp = g.invent; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (otmp->oclass == COIN_CLASS) {
             lost_money = 1;
@@ -42,7 +42,7 @@ dosit()
         You("are already sitting on %s.", mon_nam(u.usteed));
         return 0;
     }
-    if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
+    if (u.uundetected && is_hider(g.youmonst.data) && u.umonnum != PM_TRAPPER)
         u.uundetected = 0; /* no longer on the ceiling */
 
     if (!can_reach_floor(FALSE)) {
@@ -53,7 +53,7 @@ dosit()
         else
             You("are sitting on air.");
         return 0;
-    } else if (u.ustuck && !sticks(youmonst.data)) {
+    } else if (u.ustuck && !sticks(g.youmonst.data)) {
         /* holding monster is next to hero rather than beneath, but
            hero is in no condition to actually sit at has/her own spot */
         if (humanoid(u.ustuck->data))
@@ -71,9 +71,9 @@ dosit()
         register struct obj *obj;
 
         obj = g.level.objects[u.ux][u.uy];
-        if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
+        if (g.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
             You("coil up around your %shoard.",
-                (obj->quan + money_cnt(invent) < u.ulevel * 1000) ? "meager "
+                (obj->quan + money_cnt(g.invent) < u.ulevel * 1000) ? "meager "
                                                                   : "");
         } else {
             You("sit on %s.", the(xname(obj)));
@@ -130,7 +130,7 @@ dosit()
             (void) water_damage(uarm, "armor", TRUE);
     } else if (IS_SINK(typ)) {
         You(sit_message, defsyms[S_sink].explanation);
-        Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
+        Your("%s gets wet.", humanoid(g.youmonst.data) ? "rump" : "underside");
     } else if (IS_ALTAR(typ)) {
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
@@ -144,7 +144,7 @@ dosit()
         /* must be WWalking */
         You(sit_message, hliquid("lava"));
         burn_away_slime();
-        if (likes_lava(youmonst.data)) {
+        if (likes_lava(g.youmonst.data)) {
             pline_The("%s feels warm.", hliquid("lava"));
             return 1;
         }
@@ -258,7 +258,7 @@ dosit()
                 break;
             case 12:
                 You("are granted an insight!");
-                if (invent) {
+                if (g.invent) {
                     /* rn2(5) agrees w/seffects() */
                     identify_pack(rn2(5), FALSE);
                 }
@@ -273,7 +273,7 @@ dosit()
                 break;
             }
         } else {
-            if (is_prince(youmonst.data))
+            if (is_prince(g.youmonst.data))
                 You_feel("very comfortable here.");
             else
                 You_feel("somehow out of place...");
@@ -285,7 +285,7 @@ dosit()
             pline_The("throne vanishes in a puff of logic.");
             newsym(u.ux, u.uy);
         }
-    } else if (lays_eggs(youmonst.data)) {
+    } else if (lays_eggs(g.youmonst.data)) {
         struct obj *uegg;
 
         if (!flags.female) {
@@ -335,7 +335,7 @@ rndcurse()
         You(mal_aura, "you");
     }
 
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         /* gold isn't subject to being cursed or blessed */
         if (otmp->oclass == COIN_CLASS)
             continue;
@@ -345,7 +345,7 @@ rndcurse()
         for (cnt = rnd(6 / ((!!Antimagic) + (!!Half_spell_damage) + 1));
              cnt > 0; cnt--) {
             onum = rnd(nobj);
-            for (otmp = invent; otmp; otmp = otmp->nobj) {
+            for (otmp = g.invent; otmp; otmp = otmp->nobj) {
                 /* as above */
                 if (otmp->oclass == COIN_CLASS)
                     continue;

@@ -29,12 +29,9 @@ NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgco";
 
-#if defined(MICRO) || defined(WIN32)
-char hackdir[PATHLEN]; /* where rumors, help, record are */
 #ifdef MICRO
 char levels[PATHLEN]; /* where levels are */
-#endif
-#endif /* MICRO || WIN32 */
+#endif /* MICRO */
 
 #ifdef MFLOPPY
 char permbones[PATHLEN]; /* where permanent copy of bones go */
@@ -51,7 +48,6 @@ const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
-NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
 #ifdef SYSFLAGS
@@ -63,7 +59,6 @@ NEARDATA time_t ubirthday = DUMMY;
 NEARDATA struct u_realtime urealtime = DUMMY;
 
 NEARDATA struct obj
-    *invent = (struct obj *) 0,
     *uwep = (struct obj *) 0, *uarm = (struct obj *) 0,
     *uswapwep = (struct obj *) 0,
     *uquiver = (struct obj *) 0,       /* quiver */
@@ -318,6 +313,9 @@ const struct instance_globals g_init = {
     0, /* wailmsg */
     NULL, /* migrating_objs */
     NULL, /* billobjs */
+    UNDEFINED_VALUES, /* hackdir */
+    DUMMY, /* youmonst */
+    NULL, /* invent */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */

@@ -656,7 +656,7 @@ which_armor(mon, flag)
 struct monst *mon;
 long flag;
 {
-    if (mon == &youmonst) {
+    if (mon == &g.youmonst) {
         switch (flag) {
         case W_ARM:
             return uarm;
@@ -739,7 +739,7 @@ clear_bypasses()
 #endif /*0*/
         }
     }
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;
     for (otmp = g.migrating_objs; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;

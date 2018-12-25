@@ -2066,7 +2066,7 @@ boolean was_swallowed; /* digestion */
             else
                 tmp = 0;
             if (was_swallowed && magr) {
-                if (magr == &youmonst) {
+                if (magr == &g.youmonst) {
                     There("is an explosion in your %s!", body_part(STOMACH));
                     Sprintf(g.killer.name, "%s explosion",
                             s_suffix(mdat->mname));
@@ -2229,7 +2229,7 @@ struct monst *mdef;
     if (wasinside) {
         if (is_animal(mdef->data))
             You("%s through an opening in the new %s.",
-                locomotion(youmonst.data, "jump"), xname(otmp));
+                locomotion(g.youmonst.data, "jump"), xname(otmp));
     }
 }
 
@@ -3030,7 +3030,7 @@ hideunder(mtmp)
 struct monst *mtmp;
 {
     struct trap *t;
-    boolean undetected = FALSE, is_u = (mtmp == &youmonst);
+    boolean undetected = FALSE, is_u = (mtmp == &g.youmonst);
     xchar x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
     if (mtmp == u.ustuck) {
@@ -3046,7 +3046,7 @@ struct monst *mtmp;
 
         /* most monsters won't hide under cockatrice corpse */
         if (otmp->nexthere || otmp->otyp != CORPSE
-            || (mtmp == &youmonst ? Stone_resistance : resists_ston(mtmp))
+            || (mtmp == &g.youmonst ? Stone_resistance : resists_ston(mtmp))
             || !touch_petrifies(&mons[otmp->corpsenm]))
             undetected = TRUE;
     }
@@ -3608,7 +3608,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                 /* update swallow glyphs for new monster */
                 swallowed(0);
             }
-        } else if (!sticks(mdat) && !sticks(youmonst.data))
+        } else if (!sticks(mdat) && !sticks(g.youmonst.data))
             unstuck(mtmp);
     }
 
@@ -3821,7 +3821,7 @@ kill_genocided_monsters()
             kill_eggs(mtmp->minvent);
     }
 
-    kill_eggs(invent);
+    kill_eggs(g.invent);
     kill_eggs(fobj);
     kill_eggs(g.migrating_objs);
     kill_eggs(g.level.buriedobjlist);
@@ -3951,7 +3951,7 @@ struct permonst *mdat;
     boolean msg_given = FALSE;
 
     if (mdat) {
-        if (!olfaction(youmonst.data))
+        if (!olfaction(g.youmonst.data))
             return FALSE;
         mndx = monsndx(mdat);
         switch (mndx) {
@@ -4047,7 +4047,7 @@ struct permonst *mdat;
                 msg_given = TRUE;
                 break;
             case S_ORC:
-                if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+                if (maybe_polyd(is_orc(g.youmonst.data), Race_if(PM_ORC)))
                     You("notice an attractive smell.");
                 else
                     pline("A foul stench makes you feel a little nauseated.");

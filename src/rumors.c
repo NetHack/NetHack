@@ -477,7 +477,7 @@ struct monst *oracl;
     char qbuf[QBUFSZ];
 
     g.multi = 0;
-    umoney = money_cnt(invent);
+    umoney = money_cnt(g.invent);
 
     if (!oracl) {
         There("is no one here to consult.");

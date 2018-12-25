@@ -14,8 +14,8 @@
  * Light sources are "things" that have a physical position and range.
  * They have a type, which gives us information about them.  Currently
  * they are only attached to objects and monsters.  Note well:  the
- * polymorphed-player handling assumes that both youmonst.m_id and
- * youmonst.mx will always remain 0.
+ * polymorphed-player handling assumes that both g.youmonst.m_id and
+ * g.youmonst.mx will always remain 0.
  *
  * Light sources, like timers, either follow game play (RANGE_GLOBAL) or
  * stay on a level (RANGE_LEVEL).  Light sources are unique by their
@@ -219,7 +219,7 @@ unsigned fmflags;
     struct monst *mtmp;
 
     if (!nid)
-        return &youmonst;
+        return &g.youmonst;
     if (fmflags & FM_FMON)
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
             if (!DEADMONSTER(mtmp) && mtmp->m_id == nid)
@@ -718,7 +718,7 @@ wiz_light_sources()
                        : ls->type == LS_MONSTER
                           ? (mon_is_local(ls->id.a_monst)
                              ? "mon"
-                             : (ls->id.a_monst == &youmonst)
+                             : (ls->id.a_monst == &g.youmonst)
                                 ? "you"
                                 /* migrating monster */
                                 : "<m>")

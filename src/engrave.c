@@ -159,7 +159,7 @@ boolean check_pit;
 
     return (boolean) ((!Levitation || Is_airlevel(&u.uz)
                        || Is_waterlevel(&u.uz))
-                      && (!u.uundetected || !is_hider(youmonst.data)
+                      && (!u.uundetected || !is_hider(g.youmonst.data)
                           || u.umonnum == PM_TRAPPER));
 }
 
@@ -498,7 +498,7 @@ doengrave()
     maxelen = BUFSZ - 1;
     if (oep)
         oetype = oep->engr_type;
-    if (is_demon(youmonst.data) || youmonst.data->mlet == S_VAMPIRE)
+    if (is_demon(g.youmonst.data) || g.youmonst.data->mlet == S_VAMPIRE)
         type = ENGR_BLOOD;
 
     /* Can the adventurer engrave at all? */
@@ -527,7 +527,7 @@ doengrave()
         You_cant("write here.");
         return 0;
     }
-    if (cantwield(youmonst.data)) {
+    if (cantwield(g.youmonst.data)) {
         You_cant("even hold anything!");
         return 0;
     }
@@ -1151,7 +1151,7 @@ doengrave()
 
     if (post_engr_text[0])
         pline("%s", post_engr_text);
-    if (doblind && !resists_blnd(&youmonst)) {
+    if (doblind && !resists_blnd(&g.youmonst)) {
         You("are blinded by the flash!");
         make_blinded((long) rnd(50), FALSE);
         if (!Blind)

@@ -646,14 +646,14 @@ struct monst *magr, *mdef;
 
     /* (hypothetical) engulfers who can pass through walls aren't
      limited by rock|trees|bars */
-    if ((magr == &youmonst) ? Passes_walls : passes_walls(magr->data))
+    if ((magr == &g.youmonst) ? Passes_walls : passes_walls(magr->data))
         return TRUE;
 
     /* don't swallow something in a spot where attacker wouldn't
        otherwise be able to move onto; we don't want to engulf
        a wall-phaser and end up with a non-phaser inside a wall */
     dx = mdef->mx, dy = mdef->my;
-    if (mdef == &youmonst)
+    if (mdef == &g.youmonst)
         dx = u.ux, dy = u.uy;
     lev = &levl[dx][dy];
     if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
@@ -1456,7 +1456,7 @@ slept_monst(mon)
 struct monst *mon;
 {
     if ((mon->msleeping || !mon->mcanmove) && mon == u.ustuck
-        && !sticks(youmonst.data) && !u.uswallow) {
+        && !sticks(g.youmonst.data) && !u.uswallow) {
         pline("%s grip relaxes.", s_suffix(Monnam(mon)));
         unstuck(mon);
     }

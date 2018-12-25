@@ -245,7 +245,7 @@ struct monst *mon;
     if (mon == u.ustuck) {
         if (u.uswallow) {
             expels(mon, mon->data, TRUE);
-        } else if (!sticks(youmonst.data)) {
+        } else if (!sticks(g.youmonst.data)) {
             unstuck(mon); /* let go */
             You("get released!");
         }
@@ -512,7 +512,7 @@ register struct monst *mtmp;
             pline("%s whispers at thin air.",
                   cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
 
-            if (is_demon(youmonst.data)) {
+            if (is_demon(g.youmonst.data)) {
                 /* "Good hunting, brother" */
                 if (!tele_restrict(mtmp))
                     (void) rloc(mtmp, TRUE);
@@ -621,7 +621,7 @@ register struct monst *mtmp;
 
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
-        || (mdat->mlet == S_LEPRECHAUN && !findgold(invent)
+        || (mdat->mlet == S_LEPRECHAUN && !findgold(g.invent)
             && (findgold(mtmp->minvent) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
         || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
@@ -723,7 +723,7 @@ boolean
 itsstuck(mtmp)
 register struct monst *mtmp;
 {
-    if (sticks(youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
+    if (sticks(g.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
         return TRUE;
     }
@@ -962,8 +962,8 @@ register int after;
 
         if (!mtmp->mcansee
             || (should_see && Invis && !perceives(ptr) && rn2(11))
-            || is_obj_mappear(&youmonst,STRANGE_OBJECT) || u.uundetected
-            || (is_obj_mappear(&youmonst,GOLD_PIECE) && !likes_gold(ptr))
+            || is_obj_mappear(&g.youmonst,STRANGE_OBJECT) || u.uundetected
+            || (is_obj_mappear(&g.youmonst,GOLD_PIECE) && !likes_gold(ptr))
             || (mtmp->mpeaceful && !mtmp->isshk) /* allow shks to follow */
             || ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
                  || ptr->mlet == S_LIGHT) && !rn2(3)))
@@ -972,7 +972,7 @@ register int after;
         if (monsndx(ptr) == PM_LEPRECHAUN && (appr == 1)
             && ((lepgold = findgold(mtmp->minvent))
                 && (lepgold->quan
-                    > ((ygold = findgold(invent)) ? ygold->quan : 0L))))
+                    > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
             appr = -1;
 
         if (!should_see && can_track(ptr)) {
@@ -989,7 +989,7 @@ register int after;
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
                && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
-                   <= (throws_rocks(youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
+                   <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
 
         if (appr != 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the
@@ -1583,7 +1583,7 @@ register struct monst *mtmp;
 {
     boolean notseen, gotu;
     register int disp, mx = mtmp->mux, my = mtmp->muy;
-    long umoney = money_cnt(invent);
+    long umoney = money_cnt(g.invent);
 
     /*
      * do cheapest and/or most likely tests first
@@ -1685,8 +1685,8 @@ struct monst *mtmp;
 {
     struct obj *chain, *obj;
 
-    if (mtmp == &youmonst) {
-        chain = invent;
+    if (mtmp == &g.youmonst) {
+        chain = g.invent;
     } else {
         chain = mtmp->minvent;
     }

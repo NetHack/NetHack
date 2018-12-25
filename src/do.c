@@ -26,7 +26,7 @@ static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
 int
 dodrop()
 {
-    int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
+    int result, i = (g.invent) ? 0 : (SIZE(drop_types) - 1);
 
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
@@ -164,7 +164,7 @@ const char *verb;
                 }
                 mtmp->mtrapped = 0;
             } else {
-                if (!Passes_walls && !throws_rocks(youmonst.data)) {
+                if (!Passes_walls && !throws_rocks(g.youmonst.data)) {
                     losehp(Maybe_Half_Phys(rnd(15)),
                            "squished under a boulder", NO_KILLER_PREFIX);
                     return FALSE; /* player remains trapped */
@@ -759,7 +759,7 @@ doddrop()
 {
     int result = 0;
 
-    if (!invent) {
+    if (!g.invent) {
         You("have nothing to drop.");
         return 0;
     }
@@ -793,7 +793,7 @@ int retry;
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        n = query_category("Drop what type of items?", invent,
+        n = query_category("Drop what type of items?", g.invent,
                            UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL | BUC_BLESSED
                                | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
                            &pick_list, PICK_ANY);
@@ -827,7 +827,7 @@ int retry;
          * Dropping a burning potion of oil while levitating can cause
          * an explosion which might destroy some of hero's inventory,
          * so the old code
-         *      for (otmp = invent; otmp; otmp = otmp2) {
+         *      for (otmp = g.invent; otmp; otmp = otmp2) {
          *          otmp2 = otmp->nobj;
          *          n_dropped += drop(otmp);
          *      }
@@ -837,15 +837,15 @@ int retry;
          * not droppable) and rescan inventory until no unbypassed
          * items remain.
          */
-        bypass_objlist(invent, FALSE); /* clear bypass bit for invent */
-        while ((otmp = nxt_unbypassed_obj(invent)) != 0)
+        bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */
+        while ((otmp = nxt_unbypassed_obj(g.invent)) != 0)
             n_dropped += drop(otmp);
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
-        bypass_objlist(invent, FALSE);
+        bypass_objlist(g.invent, FALSE);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-        n = query_objlist("What would you like to drop?", &invent,
+        n = query_objlist("What would you like to drop?", &g.invent,
                           (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n > 0) {
@@ -853,18 +853,18 @@ int retry;
              * picklist[] contains a set of pointers into inventory, but
              * as soon as something gets dropped, they might become stale
              * (see the drop_everything code above for an explanation).
-             * Just checking to see whether one is still in the invent
+             * Just checking to see whether one is still in the g.invent
              * chain is not sufficient validation since destroyed items
              * will be freed and items we've split here might have already
              * reused that memory and put the same pointer value back into
-             * invent.  Ditto for using invlet to validate.  So we start
-             * by setting bypass on all of invent, then check each pointer
-             * to verify that it is in invent and has that bit set.
+             * g.invent.  Ditto for using invlet to validate.  So we start
+             * by setting bypass on all of g.invent, then check each pointer
+             * to verify that it is in g.invent and has that bit set.
              */
-            bypass_objlist(invent, TRUE);
+            bypass_objlist(g.invent, TRUE);
             for (i = 0; i < n; i++) {
                 otmp = pick_list[i].item.a_obj;
-                for (otmp2 = invent; otmp2; otmp2 = otmp2->nobj)
+                for (otmp2 = g.invent; otmp2; otmp2 = otmp2->nobj)
                     if (otmp2 == otmp)
                         break;
                 if (!otmp2 || !otmp2->bypass)
@@ -883,7 +883,7 @@ int retry;
                 }
                 n_dropped += drop(otmp);
             }
-            bypass_objlist(invent, FALSE); /* reset invent to normal */
+            bypass_objlist(g.invent, FALSE); /* reset g.invent to normal */
             free((genericptr_t) pick_list);
         }
     }
@@ -916,7 +916,7 @@ dodown()
             if (ELevitation & W_ARTI) {
                 struct obj *obj;
 
-                for (obj = invent; obj; obj = obj->nobj) {
+                for (obj = g.invent; obj; obj = obj->nobj) {
                     if (obj->oartifact
                         && artifact_has_invprop(obj, LEVITATION)) {
                         if (obj->age < g.monstermoves)
@@ -996,9 +996,9 @@ dodown()
 
     if (trap) {
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
-        const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
+        const char *actn = Flying ? "fly" : locomotion(g.youmonst.data, "jump");
 
-        if (youmonst.data->msize >= MZ_HUGE) {
+        if (g.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
 
             You("don't fit %s easily.", down_or_thru);
@@ -1448,7 +1448,7 @@ boolean at_stairs, falling, portal;
            the latter was done unconditionally. */
         coord cc;
 
-        if (!rn2(2) && enexto(&cc, u.ux, u.uy, youmonst.data)
+        if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
             && distu(cc.x, cc.y) <= 2)
             u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
         else

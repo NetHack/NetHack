@@ -488,7 +488,7 @@ long wp_mask;
     if (mask && wp_mask == W_ART && !on) {
         /* find out if some other artifact also confers this intrinsic;
            if so, leave the mask alone */
-        for (obj = invent; obj; obj = obj->nobj) {
+        for (obj = g.invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
                 if (art && art->cary.adtyp == dtyp) {
@@ -509,7 +509,7 @@ long wp_mask;
     spfx = (wp_mask != W_ART) ? oart->spfx : oart->cspfx;
     if (spfx && wp_mask == W_ART && !on) {
         /* don't change any spfx also conferred by other artifacts */
-        for (obj = invent; obj; obj = obj->nobj)
+        for (obj = g.invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
                 art = get_artifact(obj);
                 if (art)
@@ -646,7 +646,7 @@ struct monst *mon;
     if (!oart)
         return 1;
 
-    yours = (mon == &youmonst);
+    yours = (mon == &g.youmonst);
     /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     self_willed = ((oart->spfx & SPFX_INTEL) != 0);
@@ -751,7 +751,7 @@ struct monst *mtmp;
     if (!(weap->spfx & (SPFX_DBONUS | SPFX_ATTK)))
         return (weap->attk.adtyp == AD_PHYS);
 
-    yours = (mtmp == &youmonst);
+    yours = (mtmp == &g.youmonst);
     ptr = mtmp->data;
 
     if (weap->spfx & SPFX_DMONS) {
@@ -960,7 +960,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
     const char *verb, *fakename;
-    boolean youattack = (magr == &youmonst), youdefend = (mdef == &youmonst),
+    boolean youattack = (magr == &g.youmonst), youdefend = (mdef == &g.youmonst),
             resisted = FALSE, do_stun, do_confuse, result;
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
@@ -1016,7 +1016,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
     /* now perform special effects */
     switch (attack_indx) {
     case MB_INDEX_CANCEL:
-        old_uasmon = youmonst.data;
+        old_uasmon = g.youmonst.data;
         /* No mdef->mcan check: even a cancelled monster can be polymorphed
          * into a golem, and the "cancel" effect acts as if some magical
          * energy remains in spellcasting defenders to be absorbed later.
@@ -1026,7 +1026,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
         } else {
             do_stun = FALSE;
             if (youdefend) {
-                if (youmonst.data != old_uasmon)
+                if (g.youmonst.data != old_uasmon)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
                     You("lose magical energy!");
@@ -1056,7 +1056,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 nomul(-3);
                 g.multi_reason = "being scared stiff";
                 g.nomovemsg = "";
-                if (magr && magr == u.ustuck && sticks(youmonst.data)) {
+                if (magr && magr == u.ustuck && sticks(g.youmonst.data)) {
                     u.ustuck = (struct monst *) 0;
                     You("release %s!", mon_nam(magr));
                 }
@@ -1145,8 +1145,8 @@ struct obj *otmp;
 int *dmgptr;
 int dieroll; /* needed for Magicbane and vorpal blades */
 {
-    boolean youattack = (magr == &youmonst);
-    boolean youdefend = (mdef == &youmonst);
+    boolean youattack = (magr == &g.youmonst);
+    boolean youdefend = (mdef == &g.youmonst);
     boolean vis = (!youattack && magr && cansee(magr->mx, magr->my))
                   || (!youdefend && cansee(mdef->mx, mdef->my))
                   || (youattack && u.uswallow && mdef == u.ustuck && !Blind);
@@ -1265,7 +1265,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 otmp->dknown = TRUE;
                 return TRUE;
             } else {
-                if (bigmonst(youmonst.data)) {
+                if (bigmonst(g.youmonst.data)) {
                     pline("%s cuts deeply into you!",
                           magr ? Monnam(magr) : wepdesc);
                     *dmgptr *= 2;
@@ -1312,13 +1312,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 otmp->dknown = TRUE;
                 return TRUE;
             } else {
-                if (!has_head(youmonst.data)) {
+                if (!has_head(g.youmonst.data)) {
                     pline("Somehow, %s misses you wildly.",
                           magr ? mon_nam(magr) : wepdesc);
                     *dmgptr = 0;
                     return TRUE;
                 }
-                if (noncorporeal(youmonst.data) || amorphous(youmonst.data)) {
+                if (noncorporeal(g.youmonst.data) || amorphous(g.youmonst.data)) {
                     pline("%s slices through your %s.", wepdesc,
                           body_part(NECK));
                     return TRUE;
@@ -1805,7 +1805,7 @@ long *abil;
     spfx = abil_to_spfx(abil);
     wornbits = (wornmask & *abil);
 
-    for (obj = invent; obj; obj = obj->nobj) {
+    for (obj = g.invent; obj; obj = obj->nobj) {
         if (obj->oartifact
             && (abil != &EWarn_of_mon || context.warntype.obj)) {
             const struct artifact *art = get_artifact(obj);
@@ -1920,11 +1920,11 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
 {
     struct obj *obj = *objp;
 
-    if (touch_artifact(obj, &youmonst)) {
+    if (touch_artifact(obj, &g.youmonst)) {
         char buf[BUFSZ];
         int dmg = 0, tmp;
         boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
-                bane = bane_applies(get_artifact(obj), &youmonst);
+                bane = bane_applies(get_artifact(obj), &g.youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
         if (!ag && !bane)
@@ -1955,7 +1955,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
         struct obj *otmp;
 
         remove_worn_item(obj, FALSE);
-        for (otmp = invent; otmp; otmp = otmp->nobj)
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (otmp == obj)
                 break;
         if (!otmp)
@@ -2076,9 +2076,9 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
     /* loss of levitation (silver ring, or Heart of Ahriman invocation)
        might cause hero to lose inventory items (by dropping into lava,
        for instance), so inventory traversal needs to rescan the whole
-       invent chain each time it moves on to another object; we use bypass
+       g.invent chain each time it moves on to another object; we use bypass
        handling to keep track of which items have already been processed */
-    while ((obj = nxt_unbypassed_obj(invent)) != 0)
+    while ((obj = nxt_unbypassed_obj(g.invent)) != 0)
         (void) untouchable(obj, dropit);
 
     if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed)
@@ -2164,7 +2164,7 @@ struct monst *mon; /* if null, non-rogue is assumed */
 struct obj *obj;
 {
     if (((obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY)
-         && ((mon == &youmonst) ? Role_if(PM_ROGUE)
+         && ((mon == &g.youmonst) ? Role_if(PM_ROGUE)
                                 : (mon && mon->data == &mons[PM_ROGUE])))
         ? !obj->cursed : obj->blessed)
         return TRUE;
@@ -2180,8 +2180,8 @@ struct monst *mon; /* if null, hero assumed */
     short key = artilist[ART_MASTER_KEY_OF_THIEVERY].otyp;
 
     if (!mon)
-        mon = &youmonst;
-    for (o = ((mon == &youmonst) ? invent : mon->minvent); o;
+        mon = &g.youmonst;
+    for (o = ((mon == &g.youmonst) ? g.invent : mon->minvent); o;
          o = nxtobj(o, key, FALSE)) {
         if (is_magic_key(mon, o))
             return o;

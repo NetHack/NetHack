@@ -1336,7 +1336,7 @@ docallcmd()
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
              "a monster", MENU_UNSELECTED);
-    if (invent) {
+    if (g.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
@@ -1497,7 +1497,7 @@ namefloorobj()
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
     Sprintf(buf, "object on map (or '.' for one %s you)",
-            (u.uundetected && hides_under(youmonst.data)) ? "over" : "under");
+            (u.uundetected && hides_under(g.youmonst.data)) ? "over" : "under");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (cc.x == u.ux && cc.y == u.uy) {

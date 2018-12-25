@@ -588,7 +588,7 @@ drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
         You("cannot %sdrag the heavy iron ball.",
-            invent ? "carry all that and also " : "");
+            g.invent ? "carry all that and also " : "");
         nomul(0);
         return FALSE;
     }
@@ -777,7 +777,7 @@ xchar x, y;
 STATIC_OVL void
 litter()
 {
-    struct obj *otmp = invent, *nextobj;
+    struct obj *otmp = g.invent, *nextobj;
     int capacity = weight_cap();
 
     while (otmp) {

@@ -904,7 +904,7 @@ register struct obj *obj;
     if (mtmp == u.ustuck) {
         if (u.uswallow)
             expels(mtmp, mtmp->data, TRUE);
-        else if (!(Upolyd && sticks(youmonst.data)))
+        else if (!(Upolyd && sticks(g.youmonst.data)))
             unstuck(mtmp);
     }
 
@@ -940,7 +940,7 @@ register struct obj *obj;
         /* monsters with conflicting structures cannot be tamed */
         || mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion
         || is_covetous(mtmp->data) || is_human(mtmp->data)
-        || (is_demon(mtmp->data) && !is_demon(youmonst.data))
+        || (is_demon(mtmp->data) && !is_demon(g.youmonst.data))
         || (obj && dogfood(mtmp, obj) >= MANFOOD))
         return FALSE;
 
@@ -1002,7 +1002,7 @@ boolean was_dead;
             if (!rn2(edog->abuse + 1))
                 mtmp->mpeaceful = 1;
         if (!quietly && cansee(mtmp->mx, mtmp->my)) {
-            if (haseyes(youmonst.data)) {
+            if (haseyes(g.youmonst.data)) {
                 if (haseyes(mtmp->data))
                     pline("%s %s to look you in the %s.", Monnam(mtmp),
                           mtmp->mpeaceful ? "seems unable" : "refuses",

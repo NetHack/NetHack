@@ -101,7 +101,7 @@ money2mon(mon, amount)
 struct monst *mon;
 long amount;
 {
-    struct obj *ygold = findgold(invent);
+    struct obj *ygold = findgold(g.invent);
 
     if (amount <= 0) {
         impossible("%s payment in money2mon!", amount ? "negative" : "zero");
@@ -148,7 +148,7 @@ long amount;
         mongold = splitobj(mongold, amount);
     obj_extract_self(mongold);
 
-    if (!merge_choice(invent, mongold) && inv_cnt(FALSE) >= 52) {
+    if (!merge_choice(g.invent, mongold) && inv_cnt(FALSE) >= 52) {
         You("have no room for the money!");
         dropy(mongold);
     } else {
@@ -293,7 +293,7 @@ register struct monst *shkp;
     register struct obj *obj;
     register struct monst *mtmp;
 
-    clear_unpaid(shkp, invent);
+    clear_unpaid(shkp, g.invent);
     clear_unpaid(shkp, fobj);
     clear_unpaid(shkp, g.level.buriedobjlist);
     if (g.thrownobj)
@@ -1330,7 +1330,7 @@ proceed:
     }
 
     if (shkp != resident && NOTANGRY(shkp)) {
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         if (!ltmp)
             You("do not owe %s anything.", shkname(shkp));
         else if (!umoney) {
@@ -1360,7 +1360,7 @@ proceed:
 
     /* ltmp is still eshkp->robbed here */
     if (!eshkp->billct && !eshkp->debit) {
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         if (!ltmp && NOTANGRY(shkp)) {
             You("do not owe %s anything.", shkname(shkp));
             if (!umoney)
@@ -1417,7 +1417,7 @@ proceed:
         long loan = eshkp->loan;
         char sbuf[BUFSZ];
 
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         Sprintf(sbuf, "You owe %s %ld %s ", shkname(shkp), dtmp,
                 currency(dtmp));
         if (loan) {
@@ -1464,7 +1464,7 @@ proceed:
         register boolean itemize;
         int iprompt;
 
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         if (!umoney && !eshkp->credit) {
             You("%shave no money or credit%s.",
                 stashed_gold ? "seem to " : "", paid ? " left" : "");
@@ -1567,7 +1567,7 @@ boolean itemize;
 {
     register struct obj *obj = *obj_p;
     long ltmp, quan, save_quan;
-    long umoney = money_cnt(invent);
+    long umoney = money_cnt(g.invent);
     int buy;
     boolean stashed_gold = (hidden_gold() > 0L), consumed = (which == 0);
 
@@ -1791,7 +1791,7 @@ int croaked;
     if (roomno == eshkp->shoproom && inhishop(shkp) && !eshkp->billct
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
-        taken = (invent != 0);
+        taken = (g.invent != 0);
         if (taken)
             pline("%s gratefully inherits all your possessions.",
                   Shknam(shkp));
@@ -1808,9 +1808,9 @@ int croaked;
     }
 
     if (eshkp->following || ANGRY(shkp) || take) {
-        if (!invent)
+        if (!g.invent)
             goto skip;
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         takes[0] = '\0';
         if (!shkp->mcanmove || shkp->msleeping)
             Strcat(takes, "wakes up and ");
@@ -1897,7 +1897,7 @@ finish_paybill()
     unleash_all();
     /* if hero has any gold left, take it into shopkeeper's possession */
     if (shkp) {
-        long umoney = money_cnt(invent);
+        long umoney = money_cnt(g.invent);
 
         if (umoney)
             money2mon(shkp, umoney);
@@ -1935,7 +1935,7 @@ unsigned id;
     int i;
 
     /* first check various obj lists directly */
-    if ((obj = o_on(id, invent)) != 0)
+    if ((obj = o_on(id, g.invent)) != 0)
         return obj;
     if ((obj = o_on(id, fobj)) != 0)
         return obj;
@@ -2635,12 +2635,12 @@ char *buf;
                                            "most renowned and sacred" };
 
     Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
-    if (is_vampire(youmonst.data))
+    if (is_vampire(g.youmonst.data))
         Strcat(buf, (flags.female) ? " dark lady" : " dark lord");
-    else if (is_elf(youmonst.data))
+    else if (is_elf(g.youmonst.data))
         Strcat(buf, (flags.female) ? " hiril" : " hir");
     else
-        Strcat(buf, !is_human(youmonst.data) ? " creature"
+        Strcat(buf, !is_human(g.youmonst.data) ? " creature"
                                              : (flags.female) ? " lady"
                                                               : " sir");
 }
@@ -3874,7 +3874,7 @@ register int fall;
         } else
             pline("%s %s your backpack!", Shknam(shkp), grabs);
 
-        for (obj = invent; obj; obj = obj2) {
+        for (obj = g.invent; obj; obj = obj2) {
             obj2 = obj->nobj;
             if ((obj->owornmask & ~(W_SWAPWEP | W_QUIVER)) != 0
                 || (obj == uswapwep && u.twoweap)
@@ -4038,7 +4038,7 @@ boolean cant_mollify;
     }
 
     if ((um_dist(x, y, 1) && !uinshp) || cant_mollify
-        || (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
+        || (money_cnt(g.invent) + ESHK(shkp)->credit) < cost_of_damage
         || !rn2(50)) {
     getcad:
         if (muteshk(shkp)) {
@@ -4617,7 +4617,7 @@ boolean altusage; /* used as a verbalized exclamation:  \"Cad! ...\" */
 {
     const char *res = 0;
 
-    switch (is_demon(youmonst.data) ? 3 : poly_gender()) {
+    switch (is_demon(g.youmonst.data) ? 3 : poly_gender()) {
     case 0:
         res = "cad";
         break;
@@ -4636,7 +4636,7 @@ boolean altusage; /* used as a verbalized exclamation:  \"Cad! ...\" */
         break;
     }
     if (altusage) {
-        char *cadbuf = mon_nam(&youmonst); /* snag an output buffer */
+        char *cadbuf = mon_nam(&g.youmonst); /* snag an output buffer */
 
         /* alternate usage adds a leading double quote and trailing
            exclamation point plus sentence separating spaces */

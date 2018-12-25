@@ -382,18 +382,18 @@ invault()
             mongone(guard);
             return;
         }
-        if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
-            if (youmonst.m_ap_type == M_AP_OBJECT
-                && youmonst.mappearance != GOLD_PIECE)
+        if (g.youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
+            if (g.youmonst.m_ap_type == M_AP_OBJECT
+                && g.youmonst.mappearance != GOLD_PIECE)
                 if (!Deaf)
                     verbalize("Hey!  Who left that %s in here?",
-                              mimic_obj_name(&youmonst));
+                              mimic_obj_name(&g.youmonst));
             /* You're mimicking some object or you're hidden. */
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
             mongone(guard);
             return;
         }
-        if (Strangled || is_silent(youmonst.data) || g.multi < 0) {
+        if (Strangled || is_silent(g.youmonst.data) || g.multi < 0) {
             /* [we ought to record whether this this message has already
                been given in order to vary it upon repeat visits, but
                discarding the monster and its egd data renders that hard] */
@@ -458,7 +458,7 @@ invault()
                     (Blind) ? "" : "appear to ");
         else
             verbalize("I don't know you.");
-        umoney = money_cnt(invent);
+        umoney = money_cnt(g.invent);
         if (!umoney && !hidden_gold()) {
             if (Deaf)
                 pline("%s stomps%s.", noit_Monnam(guard),
@@ -470,7 +470,7 @@ invault()
                 if (Deaf) {
                     if (!Blind)
                         pline("%s glares at you%s.", noit_Monnam(guard),
-                              invent ? "r stuff" : "");
+                              g.invent ? "r stuff" : "");
                 } else {
                    verbalize("You have hidden gold.");
                 }
@@ -765,7 +765,7 @@ register struct monst *grd;
         return -1;
     }
 
-    umoney = money_cnt(invent);
+    umoney = money_cnt(g.invent);
     u_carry_gold = umoney > 0L || hidden_gold() > 0L;
     if (egrd->fcend == 1) {
         if (u_in_vault && (u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
@@ -879,7 +879,7 @@ register struct monst *grd;
     }
     if (um_dist(grd->mx, grd->my, 1) || egrd->gddone) {
         if (!egrd->gddone && !rn2(10) && !Deaf && !u.uswallow
-            && !(u.ustuck && !sticks(youmonst.data)))
+            && !(u.ustuck && !sticks(g.youmonst.data)))
             verbalize("Move along!");
         restfakecorr(grd);
         return 0; /* didn't move */
@@ -1037,7 +1037,7 @@ void
 paygd()
 {
     register struct monst *grd = findgd();
-    long umoney = money_cnt(invent);
+    long umoney = money_cnt(g.invent);
     struct obj *coins, *nextcoins;
     int gx, gy;
     char buf[BUFSZ];
@@ -1063,7 +1063,7 @@ paygd()
                 g.plname, mons[u.umonster].mname);
         make_grave(gx, gy, buf);
     }
-    for (coins = invent; coins; coins = nextcoins) {
+    for (coins = g.invent; coins; coins = nextcoins) {
         nextcoins = coins->nobj;
         if (objects[coins->otyp].oc_class == COIN_CLASS) {
             freeinv(coins);
@@ -1080,7 +1080,7 @@ hidden_gold()
     long value = 0L;
     struct obj *obj;
 
-    for (obj = invent; obj; obj = obj->nobj)
+    for (obj = g.invent; obj; obj = obj->nobj)
         if (Has_contents(obj))
             value += contained_gold(obj);
     /* unknown gold stuck inside statues may cause some consternation... */

@@ -299,7 +299,7 @@ drinkfountain()
             pline("This water's no good!");
             morehungry(rn1(20, 11));
             exercise(A_CON, FALSE);
-            for (obj = invent; obj; obj = obj->nobj)
+            for (obj = g.invent; obj; obj = obj->nobj)
                 if (!rn2(5))
                     curse(obj);
             break;
@@ -457,13 +457,13 @@ register struct obj *obj;
     case 28: /* Strange feeling */
         pline("An urge to take a bath overwhelms you.");
         {
-            long money = money_cnt(invent);
+            long money = money_cnt(g.invent);
             struct obj *otmp;
             if (money > 10) {
                 /* Amount to lose.  Might get rounded up as fountains don't
                  * pay change... */
                 money = somegold(money) / 10;
-                for (otmp = invent; otmp && money > 0; otmp = otmp->nobj)
+                for (otmp = g.invent; otmp && money > 0; otmp = otmp->nobj)
                     if (otmp->oclass == COIN_CLASS) {
                         int denomination = objects[otmp->otyp].oc_cost;
                         long coin_loss =

@@ -1451,7 +1451,7 @@ const struct def_skill *class_skill;
     }
 
     /* Set skill for all weapons in inventory to be basic */
-    for (obj = invent; obj; obj = obj->nobj) {
+    for (obj = g.invent; obj; obj = obj->nobj) {
         /* don't give skill just because of carried ammo, wait until
            we see the relevant launcher (prevents an archeologist's
            touchstone from inadvertently providing skill in sling) */

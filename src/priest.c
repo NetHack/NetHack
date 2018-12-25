@@ -573,7 +573,7 @@ register struct monst *priest;
         priest->mpeaceful = 0;
         return;
     }
-    if (!money_cnt(invent)) {
+    if (!money_cnt(g.invent)) {
         if (coaligned && !strayed) {
             long pmoney = money_cnt(priest->minvent);
             if (pmoney > 0L) {
@@ -597,7 +597,7 @@ register struct monst *priest;
             if (coaligned)
                 adjalign(-1);
         } else if (offer < (u.ulevel * 200)) {
-            if (money_cnt(invent) > (offer * 2L)) {
+            if (money_cnt(g.invent) > (offer * 2L)) {
                 verbalize("Cheapskate.");
             } else {
                 verbalize("I thank thee for thy contribution.");
@@ -606,7 +606,7 @@ register struct monst *priest;
             }
         } else if (offer < (u.ulevel * 400)) {
             verbalize("Thou art indeed a pious individual.");
-            if (money_cnt(invent) < (offer * 2L)) {
+            if (money_cnt(g.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
                 verbalize("I bestow upon thee a blessing.");
@@ -629,7 +629,7 @@ register struct monst *priest;
                 u.ublessed++;
         } else {
             verbalize("Thy selfless generosity is deeply appreciated.");
-            if (money_cnt(invent) < (offer * 2L) && coaligned) {
+            if (money_cnt(g.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (g.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */
                     u.ucleansed = g.moves;
@@ -1007,7 +1007,7 @@ struct monst *mtmp;
     if (mtmp->minvis)
         Strcat(info, ", invisible");
     if (mtmp == u.ustuck)
-        Strcat(info, sticks(youmonst.data) ? ", held by you"
+        Strcat(info, sticks(g.youmonst.data) ? ", held by you"
                       : !u.uswallow ? ", holding you"
                          : attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST)
                             ? ", digesting you"
@@ -1057,7 +1057,7 @@ ustatusline()
         Strcat(info, ", blind");
         if (u.ucreamed) {
             if ((long) u.ucreamed < Blinded || Blindfolded
-                || !haseyes(youmonst.data))
+                || !haseyes(g.youmonst.data))
                 Strcat(info, ", cover");
             Strcat(info, "ed by sticky goop");
         } /* note: "goop" == "glop"; variation is intentional */
@@ -1081,7 +1081,7 @@ ustatusline()
     if (Invis)
         Strcat(info, ", invisible");
     if (u.ustuck) {
-        if (sticks(youmonst.data))
+        if (sticks(g.youmonst.data))
             Strcat(info, ", holding ");
         else
             Strcat(info, ", held by ");

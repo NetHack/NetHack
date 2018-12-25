@@ -153,7 +153,7 @@ stuck_in_wall()
             if (!isok(x, y)
                 || (IS_ROCK(levl[x][y].typ)
                     && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
-                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
+                || (blocked_boulder(i, j) && !throws_rocks(g.youmonst.data)))
                 ++count;
         }
     }
@@ -209,13 +209,13 @@ in_trouble()
         || stuck_ring(uleft, RIN_LEVITATION)
         || stuck_ring(uright, RIN_LEVITATION))
         return TROUBLE_CURSED_LEVITATION;
-    if (nohands(youmonst.data) || !freehand()) {
+    if (nohands(g.youmonst.data) || !freehand()) {
         /* for bag/box access [cf use_container()]...
            make sure it's a case that we know how to handle;
            otherwise "fix all troubles" would get stuck in a loop */
         if (welded(uwep))
             return TROUBLE_UNUSEABLE_HANDS;
-        if (Upolyd && nohands(youmonst.data)
+        if (Upolyd && nohands(g.youmonst.data)
             && (!Unchanging || ((otmp = unchanger()) != 0 && otmp->cursed)))
             return TROUBLE_UNUSEABLE_HANDS;
     }
@@ -238,7 +238,7 @@ in_trouble()
             return TROUBLE_SADDLE;
     }
 
-    if (Blinded > 1 && haseyes(youmonst.data)
+    if (Blinded > 1 && haseyes(g.youmonst.data)
         && (!u.uswallow
             || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         return TROUBLE_BLIND;
@@ -266,7 +266,7 @@ worst_cursed_item()
 
     /* if strained or worse, check for loadstone first */
     if (near_capacity() >= HVY_ENCUMBER) {
-        for (otmp = invent; otmp; otmp = otmp->nobj)
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (Cursed_obj(otmp, LOADSTONE))
                 return otmp;
     }
@@ -310,7 +310,7 @@ worst_cursed_item()
         otmp = uswapwep;
     /* all worn items ought to be handled by now */
     } else {
-        for (otmp = invent; otmp; otmp = otmp->nobj) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
             if (!otmp->cursed)
                 continue;
             if (otmp->otyp == LOADSTONE || confers_luck(otmp))
@@ -438,7 +438,7 @@ int trouble;
             otmp = uwep;
             goto decurse;
         }
-        if (Upolyd && nohands(youmonst.data)) {
+        if (Upolyd && nohands(g.youmonst.data)) {
             if (!Unchanging) {
                 Your("shape becomes uncertain.");
                 rehumanize(); /* "You return to {normal} form." */
@@ -447,7 +447,7 @@ int trouble;
                 goto decurse;
             }
         }
-        if (nohands(youmonst.data) || !freehand())
+        if (nohands(g.youmonst.data) || !freehand())
             impossible("fix_worst_trouble: couldn't cure hands.");
         break;
     case TROUBLE_CURSED_BLINDFOLD:
@@ -511,7 +511,7 @@ int trouble;
     case TROUBLE_BLIND: {
         const char *eyes = body_part(EYE);
 
-        if (eyecount(youmonst.data) != 1)
+        if (eyecount(g.youmonst.data) != 1)
             eyes = makeplural(eyes);
         Your("%s %s better.", eyes, vtense(eyes, "feel"));
         u.ucreamed = 0;
@@ -673,7 +673,7 @@ aligntyp resp_god;
               (ugod_is_angry() && resp_god == u.ualign.type)
                   ? "hast strayed from the path"
                   : "art arrogant",
-              youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+              g.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
         verbalize("Thou must relearn thy lessons!");
         (void) adjattrib(A_WIS, -1, FALSE);
         losexp((char *) 0);
@@ -699,7 +699,7 @@ aligntyp resp_god;
                       ? "scorn"
                       : "call upon");
         pline("\"Then die, %s!\"",
-              youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+              g.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
         summon_minion(resp_god, FALSE);
         break;
 
@@ -1038,7 +1038,7 @@ aligntyp g_align;
             if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered) {
                 if (u.uevent.uheard_tune < 1) {
                     godvoice(g_align, (char *) 0);
-                    verbalize("Hark, %s!", youmonst.data->mlet == S_HUMAN
+                    verbalize("Hark, %s!", g.youmonst.data->mlet == S_HUMAN
                                                ? "mortal"
                                                : "creature");
                     verbalize(
@@ -1096,7 +1096,7 @@ aligntyp g_align;
                 You_feel("the power of %s.", u_gname());
             else
                 You("are surrounded by %s aura.", an(hcolor(NH_LIGHT_BLUE)));
-            for (otmp = invent; otmp; otmp = otmp->nobj) {
+            for (otmp = g.invent; otmp; otmp = otmp->nobj) {
                 if (otmp->cursed
                     && (otmp != uarmh /* [see worst_cursed_item()] */
                         || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
@@ -1342,7 +1342,7 @@ dosacrifice()
         }
 
         if (your_race(ptr)) {
-            if (is_demon(youmonst.data)) {
+            if (is_demon(g.youmonst.data)) {
                 You("find the idea very satisfying.");
                 exercise(A_WIS, TRUE);
             } else if (u.ualign.type != A_CHAOTIC) {
@@ -1766,7 +1766,7 @@ boolean praying; /* false means no messages should be given */
     g.p_aligntyp = on_altar() ? a_align(u.ux, u.uy) : u.ualign.type;
     g.p_trouble = in_trouble();
 
-    if (is_demon(youmonst.data) && (g.p_aligntyp != A_CHAOTIC)) {
+    if (is_demon(g.youmonst.data) && (g.p_aligntyp != A_CHAOTIC)) {
         if (praying)
             pline_The("very idea of praying to a %s god is repugnant to you.",
                       g.p_aligntyp ? "lawful" : "neutral");
@@ -1796,7 +1796,7 @@ boolean praying; /* false means no messages should be given */
             g.p_type = 3;
     }
 
-    if (is_undead(youmonst.data) && !Inhell
+    if (is_undead(g.youmonst.data) && !Inhell
         && (g.p_aligntyp == A_LAWFUL || (g.p_aligntyp == A_NEUTRAL && !rn2(10))))
         g.p_type = -1;
     /* Note:  when !praying, the random factor for neutrals makes the
@@ -1932,7 +1932,7 @@ doturn()
     u.uconduct.gnostic++;
 
     if ((u.ualign.type != A_CHAOTIC
-         && (is_demon(youmonst.data) || is_undead(youmonst.data)))
+         && (is_demon(g.youmonst.data) || is_undead(g.youmonst.data)))
         || u.ugangr > 6) { /* "Die, mortal!" */
         pline("For some reason, %s seems to ignore you.", u_gname());
         aggravate();

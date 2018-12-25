@@ -933,7 +933,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         ofn.nMaxFile = SIZE(filename);
         ofn.lpstrFileTitle = NULL;
         ofn.nMaxFileTitle = 0;
-        ofn.lpstrInitialDir = NH_A2W(hackdir, whackdir, MAX_PATH);
+        ofn.lpstrInitialDir = NH_A2W(g.hackdir, whackdir, MAX_PATH);
         ofn.lpstrTitle = NULL;
         ofn.Flags = OFN_LONGNAMES | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
         ofn.nFileOffset = 0;

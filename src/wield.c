@@ -263,7 +263,7 @@ dowield()
 
     /* May we attempt this? */
     g.multi = 0;
-    if (cantwield(youmonst.data)) {
+    if (cantwield(g.youmonst.data)) {
         pline("Don't be ridiculous!");
         return 0;
     }
@@ -314,7 +314,7 @@ doswapweapon()
 
     /* May we attempt this? */
     g.multi = 0;
-    if (cantwield(youmonst.data)) {
+    if (cantwield(g.youmonst.data)) {
         pline("Don't be ridiculous!");
         return 0;
     }
@@ -554,7 +554,7 @@ const char *verb; /* "rub",&c */
         }
         return FALSE;
     }
-    if (cantwield(youmonst.data)) {
+    if (cantwield(g.youmonst.data)) {
         You_cant("hold %s strongly enough.", more_than_1 ? "them" : "it");
         return FALSE;
     }
@@ -601,7 +601,7 @@ can_twoweapon()
     struct obj *otmp;
 
 #define NOT_WEAPON(obj) (!is_weptool(obj) && obj->oclass != WEAPON_CLASS)
-    if (!could_twoweap(youmonst.data)) {
+    if (!could_twoweap(g.youmonst.data)) {
         if (Upolyd)
             You_cant("use two weapons in your current form.");
         else

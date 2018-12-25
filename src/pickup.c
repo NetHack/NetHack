@@ -160,7 +160,7 @@ int *menu_on_demand;
         ilets[iletct++] = ' ';
         ilets[iletct++] = 'a';
         ilets[iletct++] = 'A';
-        ilets[iletct++] = (objs == invent ? 'i' : ':');
+        ilets[iletct++] = (objs == g.invent ? 'i' : ':');
     }
     if (itemcount && menu_on_demand)
         ilets[iletct++] = 'm';
@@ -258,7 +258,7 @@ boolean remotely;
         || !touch_petrifies(&mons[obj->corpsenm]) || Stone_resistance)
         return FALSE;
 
-    if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
+    if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
         display_nhwindow(WIN_MESSAGE, FALSE); /* --More-- */
         return FALSE;
     }
@@ -521,7 +521,7 @@ int what; /* should be a long */
             check_here(FALSE);
             return 0;
         }
-        if (notake(youmonst.data)) {
+        if (notake(g.youmonst.data)) {
             if (!autopickup)
                 You("are physically incapable of picking anything up.");
             else
@@ -683,8 +683,8 @@ int what; /* should be a long */
     }
 
     if (!u.uswallow) {
-        if (hides_under(youmonst.data))
-            (void) hideunder(&youmonst);
+        if (hides_under(g.youmonst.data))
+            (void) hideunder(&g.youmonst);
 
         /* position may need updating (invisible hero) */
         if (n_picked)
@@ -927,7 +927,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         fake_hero_object = zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */
         any.a_obj = &fake_hero_object;
-        add_menu(win, mon_to_glyph(&youmonst), &any,
+        add_menu(win, mon_to_glyph(&g.youmonst), &any,
                  /* fake inventory letter, no group accelerator */
                  CONTAINED_SYM, 0, ATR_NONE, an(self_lookat(buf)),
                  MENU_UNSELECTED);
@@ -1234,7 +1234,7 @@ int *wt_before, *wt_after;
 
     savequan = obj->quan;
     saveowt = obj->owt;
-    umoney = money_cnt(invent);
+    umoney = money_cnt(g.invent);
     iw = max_capacity();
 
     if (count != savequan) {
@@ -1335,7 +1335,7 @@ int *wt_before, *wt_after;
 
     if (!container)
         Strcpy(where, "here"); /* slightly shorter form */
-    if (invent || umoney) {
+    if (g.invent || umoney) {
         prefx1 = "you cannot ";
         prefx2 = "";
         suffx = " any more";
@@ -1370,9 +1370,9 @@ boolean telekinesis;
        and for boulder picked up by hero poly'd into a giant; override
        availability of open inventory slot iff not already carrying one */
     if (obj->otyp == LOADSTONE
-        || (obj->otyp == BOULDER && throws_rocks(youmonst.data))) {
+        || (obj->otyp == BOULDER && throws_rocks(g.youmonst.data))) {
         if (inv_cnt(FALSE) < 52 || !carrying(obj->otyp)
-            || merge_choice(invent, obj))
+            || merge_choice(g.invent, obj))
             return 1; /* lift regardless of current situation */
         /* if we reach here, we're out of slots and already have at least
            one of these, so treat this one more like a normal item */
@@ -1388,7 +1388,7 @@ boolean telekinesis;
     } else if (obj->oclass != COIN_CLASS
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
-               && inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
+               && inv_cnt(FALSE) >= 52 && !merge_choice(g.invent, obj)) {
         Your("knapsack cannot accommodate any more items.");
         result = -1; /* nothing lifted */
     } else {
@@ -1461,7 +1461,7 @@ boolean telekinesis; /* not picking it up directly by hand */
 
     if (obj == uchain) { /* do not pick up attached chain */
         return 0;
-    } else if (obj->oartifact && !touch_artifact(obj, &youmonst)) {
+    } else if (obj->oartifact && !touch_artifact(obj, &g.youmonst)) {
         return 0;
     } else if (obj->otyp == CORPSE) {
         if (fatal_corpse_mistake(obj, telekinesis)
@@ -1573,7 +1573,7 @@ encumber_msg()
             break;
         case 3:
             You("%s under your heavy load.  Movement is very hard.",
-                stagger(youmonst.data, "stagger"));
+                stagger(g.youmonst.data, "stagger"));
             break;
         default:
             You("%s move a handspan with this load!",
@@ -1594,7 +1594,7 @@ encumber_msg()
             break;
         case 3:
             You("%s under your load.  Movement is still very hard.",
-                stagger(youmonst.data, "stagger"));
+                stagger(g.youmonst.data, "stagger"));
             break;
         }
         context.botl = 1;
@@ -1643,7 +1643,7 @@ boolean looting; /* loot vs tip */
         You("cannot %s things that are deep in the %s.", verb,
             hliquid(is_lava(x, y) ? "lava" : "water"));
         return FALSE;
-    } else if (nolimbs(youmonst.data)) {
+    } else if (nolimbs(g.youmonst.data)) {
         pline("Without limbs, you cannot %s anything.", verb);
         return FALSE;
     } else if (looting && !freehand()) {
@@ -1731,7 +1731,7 @@ doloot()
         /* "Can't do that while carrying so much stuff." */
         return 0;
     }
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You("have no hands!"); /* not `body_part(HAND)' */
         return 0;
     }
@@ -1900,7 +1900,7 @@ reverse_loot()
     if (!rn2(3)) {
         /* n objects: 1/(n+1) chance per object plus 1/(n+1) to fall off end
          */
-        for (n = inv_cnt(TRUE), otmp = invent; otmp; --n, otmp = otmp->nobj)
+        for (n = inv_cnt(TRUE), otmp = g.invent; otmp; --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
                 prinv("You find old loot:", otmp, 0L);
                 return TRUE;
@@ -1909,7 +1909,7 @@ reverse_loot()
     }
 
     /* find a money object to mess with */
-    for (goldob = invent; goldob; goldob = goldob->nobj)
+    for (goldob = g.invent; goldob; goldob = goldob->nobj)
         if (goldob->oclass == COIN_CLASS) {
             contribution = ((long) rnd(5) * goldob->quan + 4L) / 5L;
             if (contribution < goldob->quan)
@@ -1991,7 +1991,7 @@ boolean *prev_loot;
                 x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
-            if (nolimbs(youmonst.data)) {
+            if (nolimbs(g.youmonst.data)) {
                 You_cant("do that without limbs."); /* not body_part(HAND) */
                 return 0;
             }
@@ -2247,7 +2247,7 @@ register struct obj *obj;
         obj->owt = weight(obj);
     }
 
-    if (obj->oartifact && !touch_artifact(obj, &youmonst))
+    if (obj->oartifact && !touch_artifact(obj, &g.youmonst))
         return 0;
 
     if (fatal_corpse_mistake(obj, FALSE))
@@ -2436,7 +2436,7 @@ boolean more_containers;
 boolean
 u_handsy()
 {
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You("have no hands!"); /* not `body_part(HAND)' */
         return FALSE;
     } else if (!freehand()) {
@@ -2510,8 +2510,8 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
         g.current_container->owt = weight(g.current_container);
     }
-    inokay = (invent != 0
-              && !(invent == g.current_container && !g.current_container->nobj));
+    inokay = (g.invent != 0
+              && !(g.invent == g.current_container && !g.current_container->nobj));
     outokay = Has_contents(g.current_container);
     if (!outokay) /* preformat the empty-container message */
         Sprintf(emptymsg, "%s is %sempty.", Ysimple_name2(g.current_container),
@@ -2621,8 +2621,8 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     }
 
     if ((loot_in || stash_one)
-        && (!invent || (invent == g.current_container && !invent->nobj))) {
-        You("don't have anything%s to %s.", invent ? " else" : "",
+        && (!g.invent || (g.invent == g.current_container && !g.invent->nobj))) {
+        You("don't have anything%s to %s.", g.invent ? " else" : "",
             stash_one ? "stash" : "put in");
         loot_in = stash_one = FALSE;
     }
@@ -2704,7 +2704,7 @@ boolean put_in;
 
     if (put_in) {
         action = "put in";
-        objlist = &invent;
+        objlist = &g.invent;
         actionfunc = in_container;
         checkfunc = ck_bag;
     } else {
@@ -2746,7 +2746,7 @@ boolean put_in;
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL);
-        n = query_category(buf, put_in ? invent : g.current_container->cobj,
+        n = query_category(buf, put_in ? g.invent : g.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
             return 0;
@@ -2772,7 +2772,7 @@ boolean put_in;
                 n_looted += res;
             }
         } else {
-            for (otmp = invent; otmp && g.current_container; otmp = otmp2) {
+            for (otmp = g.invent; otmp && g.current_container; otmp = otmp2) {
                 otmp2 = otmp->nobj;
                 res = in_container(otmp);
                 if (res < 0)
@@ -2787,7 +2787,7 @@ boolean put_in;
         if (!put_in)
             g.current_container->cknown = 1;
         Sprintf(buf, "%s what?", action);
-        n = query_objlist(buf, put_in ? &invent : &(g.current_container->cobj),
+        n = query_objlist(buf, put_in ? &g.invent : &(g.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n) {
@@ -2942,7 +2942,7 @@ dotip()
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                                  doname(cobj), MENU_UNSELECTED);
                     }
-                if (invent) {
+                if (g.invent) {
                     any = zeroany;
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                              "", MENU_UNSELECTED);
@@ -2974,7 +2974,7 @@ dotip()
                 }
                 if (n == -1)
                     return 0;
-                /* else pick-from-invent below */
+                /* else pick-from-g.invent below */
             } else {
                 for (cobj = g.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
                     nobj = cobj->nexthere;

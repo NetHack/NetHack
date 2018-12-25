@@ -336,7 +336,7 @@ boolean parameter; /* So I can't think up of a good name.  So sue me. --KAA */
     register struct obj *otmp;
     register long bonchance = 0;
 
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) {
             if (otmp->cursed)
                 bonchance -= otmp->quan;
@@ -789,7 +789,7 @@ int propidx;
            ignore innateness if equipment is going to claim responsibility */
         && !u.uprops[propidx].extrinsic)
         return FROM_ROLE;
-    if (propidx == BLINDED && !haseyes(youmonst.data))
+    if (propidx == BLINDED && !haseyes(g.youmonst.data))
         return FROM_FORM;
     return FROM_NONE;
 }
@@ -1031,7 +1031,7 @@ int x;
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
-            && (youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
+            && (g.youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
                 || u.umonnum == PM_INCUBUS))
             return (schar) 18;
     } else if (x == A_CON) {

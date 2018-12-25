@@ -174,7 +174,7 @@ is_digging()
     return FALSE;
 }
 
-#define BY_YOU (&youmonst)
+#define BY_YOU (&g.youmonst)
 #define BY_OBJECT ((struct monst *) 0)
 
 boolean
@@ -324,7 +324,7 @@ dig(VOID_ARGS)
         } else if (ttmp && ttmp->ttyp == BEAR_TRAP && u.utrap) {
             if (rnl(7) > (Fumbling ? 1 : 4)) {
                 char kbuf[BUFSZ];
-                int dmg = dmgval(uwep, &youmonst) + dbon();
+                int dmg = dmgval(uwep, &g.youmonst) + dbon();
 
                 if (dmg < 1)
                     dmg = 1;
@@ -2017,8 +2017,8 @@ long timeout;
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(youmonst.data))
-            (void) hideunder(&youmonst);
+        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(g.youmonst.data))
+            (void) hideunder(&g.youmonst);
         newsym(x, y);
     } else if (in_invent)
         update_inventory();
@@ -2078,27 +2078,27 @@ void
 escape_tomb()
 {
     debugpline0("escape_tomb");
-    if ((Teleportation || can_teleport(youmonst.data))
+    if ((Teleportation || can_teleport(g.youmonst.data))
         && (Teleport_control || rn2(3) < Luck+2)) {
         You("attempt a teleport spell.");
         (void) dotele(FALSE);        /* calls unearth_you() */
     } else if (u.uburied) { /* still buried after 'port attempt */
         boolean good;
 
-        if (amorphous(youmonst.data) || Passes_walls
-            || noncorporeal(youmonst.data)
-            || (unsolid(youmonst.data)
-                && youmonst.data != &mons[PM_WATER_ELEMENTAL])
-            || (tunnels(youmonst.data) && !needspick(youmonst.data))) {
+        if (amorphous(g.youmonst.data) || Passes_walls
+            || noncorporeal(g.youmonst.data)
+            || (unsolid(g.youmonst.data)
+                && g.youmonst.data != &mons[PM_WATER_ELEMENTAL])
+            || (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))) {
             You("%s up through the %s.",
-                (tunnels(youmonst.data) && !needspick(youmonst.data))
+                (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))
                    ? "try to tunnel"
-                   : (amorphous(youmonst.data))
+                   : (amorphous(g.youmonst.data))
                       ? "ooze"
                       : "phase",
                 surface(u.ux, u.uy));
 
-            good = (tunnels(youmonst.data) && !needspick(youmonst.data))
+            good = (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))
                       ? dighole(TRUE, FALSE, (coord *)0) : TRUE;
             if (good)
                 unearth_you();

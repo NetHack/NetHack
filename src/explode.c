@@ -92,7 +92,7 @@ int expltype;
        so might get hit by double damage */
     grabbed = grabbing = FALSE;
     if (u.ustuck && !u.uswallow) {
-        if (Upolyd && sticks(youmonst.data))
+        if (Upolyd && sticks(g.youmonst.data))
             grabbing = TRUE;
         else
             grabbed = TRUE;
@@ -184,8 +184,8 @@ int expltype;
                     break;
                 case AD_DISN:
                     explmask[i][j] = (olet == WAND_CLASS)
-                                         ? !!(nonliving(youmonst.data)
-                                              || is_demon(youmonst.data))
+                                         ? !!(nonliving(g.youmonst.data)
+                                              || is_demon(g.youmonst.data))
                                          : !!Disint_resistance;
                     break;
                 case AD_ELEC:
@@ -501,7 +501,7 @@ int expltype;
         } else if (adtyp == AD_PHYS || physical_dmg)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE)
-            (void) burnarmor(&youmonst);
+            (void) burnarmor(&g.youmonst);
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
         destroy_item(POTION_CLASS, (int) adtyp);
@@ -726,9 +726,9 @@ struct obj *obj; /* only scatter this obj        */
                         if (g.multi)
                             nomul(0);
                         hitvalu = 8 + stmp->obj->spe;
-                        if (bigmonst(youmonst.data))
+                        if (bigmonst(g.youmonst.data))
                             hitvalu++;
-                        hitu = thitu(hitvalu, dmgval(stmp->obj, &youmonst),
+                        hitu = thitu(hitvalu, dmgval(stmp->obj, &g.youmonst),
                                      &stmp->obj, (char *) 0);
                         if (!stmp->obj)
                             stmp->stopped = TRUE;

@@ -122,7 +122,7 @@ boolean quietly;
 {
     register struct obj *otmp, *otmp2;
 
-    for (otmp = invent; otmp; otmp = otmp2) {
+    for (otmp = g.invent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
             if (!quietly)
@@ -635,7 +635,7 @@ unsigned int *stuckid, *steedid;
     restore_killers(fd);
     restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
     restore_light_sources(fd);
-    invent = restobjchn(fd, FALSE, FALSE);
+    g.invent = restobjchn(fd, FALSE, FALSE);
     /* tmp_bc only gets set here if the ball & chain were orphaned
        because you were swallowed; otherwise they will be on the floor
        or in your inventory */
@@ -661,7 +661,7 @@ unsigned int *stuckid, *steedid;
     g.defer_see_monsters = TRUE;
 
     /* this comes after inventory has been loaded */
-    for (otmp = invent; otmp; otmp = otmp->nobj)
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
     /* reset weapon so that player will get a reminder about "bashing"

@@ -121,7 +121,7 @@ do_statusline2()
 
     /* dungeon location plus gold */
     (void) describe_level(dloc); /* includes at least one trailing space */
-    if ((money = money_cnt(invent)) < 0L)
+    if ((money = money_cnt(g.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
@@ -236,7 +236,7 @@ void
 bot()
 {
     /* dosave() flags completion by setting u.uhp to -1 */
-    if ((u.uhp != -1) && youmonst.data && iflags.status_updates) {
+    if ((u.uhp != -1) && g.youmonst.data && iflags.status_updates) {
 #ifdef STATUS_HILITES
         bot_via_windowport();
 #else
@@ -359,7 +359,7 @@ botl_score()
     long deepest = deepest_lev_reached(FALSE);
     long utotal;
 
-    utotal = money_cnt(invent) + hidden_gold();
+    utotal = money_cnt(g.invent) + hidden_gold();
     if ((utotal -= u.umoney0) < 0L)
         utotal = 0L;
     utotal += u.urexp + (50 * (deepest - 1))
@@ -567,7 +567,7 @@ bot_via_windowport()
     g.valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
 
     /* Gold */
-    if ((money = money_cnt(invent)) < 0L)
+    if ((money = money_cnt(g.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     g.blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
     /*

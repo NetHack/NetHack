@@ -104,7 +104,7 @@ register struct obj *pen;
     boolean by_descr = FALSE;
     const char *typeword;
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You("need hands to be able to write!");
         return 0;
     } else if (Glib) {
@@ -287,7 +287,7 @@ found:
     /* if known, then either by-name or by-descr works */
     if (!objects[new_obj->otyp].oc_name_known
         /* else if named, then only by-descr works */
-        && !(by_descr && label_known(new_obj->otyp, invent))
+        && !(by_descr && label_known(new_obj->otyp, g.invent))
         /* and Luck might override after both checks have failed */
         && rnl(Role_if(PM_WIZARD) ? 5 : 15)) {
         You("%s to write that.", by_descr ? "fail" : "don't know how");
@@ -343,7 +343,7 @@ found:
        specifically chosen item so hero recognizes it even if blind;
        the exception is for being lucky writing an undiscovered scroll,
        where the label associated with the type-name isn't known yet */
-    new_obj->dknown = label_known(new_obj->otyp, invent) ? 1 : 0;
+    new_obj->dknown = label_known(new_obj->otyp, g.invent) ? 1 : 0;
 
     new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
                                   The(aobjnam(new_obj, "slip")),

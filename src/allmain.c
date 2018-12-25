@@ -69,7 +69,7 @@ boolean resuming;
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
+    g.youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
     context.move = 0;
 
     program_state.in_moveloop = 1;
@@ -85,7 +85,7 @@ boolean resuming;
 
         if (context.move) {
             /* actual time passed */
-            youmonst.movement -= NORMAL_SPEED;
+            g.youmonst.movement -= NORMAL_SPEED;
 
             do { /* hero can't move this turn loop */
                 wtcap = encumber_msg();
@@ -93,12 +93,12 @@ boolean resuming;
                 context.mon_moving = TRUE;
                 do {
                     monscanmove = movemon();
-                    if (youmonst.movement >= NORMAL_SPEED)
+                    if (g.youmonst.movement >= NORMAL_SPEED)
                         break; /* it's now your turn */
                 } while (monscanmove);
                 context.mon_moving = FALSE;
 
-                if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
+                if (!monscanmove && g.youmonst.movement < NORMAL_SPEED) {
                     /* both you and the monsters are out of steam this round
                      */
                     /* set up for a new turn */
@@ -122,7 +122,7 @@ boolean resuming;
                         /* your speed doesn't augment steed's speed */
                         moveamt = mcalcmove(u.usteed);
                     } else {
-                        moveamt = youmonst.data->mmove;
+                        moveamt = g.youmonst.data->mmove;
 
                         if (Very_fast) { /* speed boots or potion */
                             /* gain a free action on 2/3 of turns */
@@ -154,9 +154,9 @@ boolean resuming;
                         break;
                     }
 
-                    youmonst.movement += moveamt;
-                    if (youmonst.movement < 0)
-                        youmonst.movement = 0;
+                    g.youmonst.movement += moveamt;
+                    if (g.youmonst.movement < 0)
+                        g.youmonst.movement = 0;
                     settrack();
 
                     g.monstermoves++;
@@ -189,7 +189,7 @@ boolean resuming;
                         wtcap = UNENCUMBERED;
                     } else if (!Upolyd ? (u.uhp < u.uhpmax)
                                        : (u.mh < u.mhmax
-                                          || youmonst.data->mlet == S_EEL)) {
+                                          || g.youmonst.data->mlet == S_EEL)) {
                         /* maybe heal */
                         regen_hp(wtcap);
                     }
@@ -306,7 +306,7 @@ boolean resuming;
                         }
                     }
                 }
-            } while (youmonst.movement
+            } while (g.youmonst.movement
                      < NORMAL_SPEED); /* hero can't move loop */
 
             /******************************************/
@@ -449,7 +449,7 @@ int wtcap;
     if (Upolyd) {
         if (u.mh < 1) { /* shouldn't happen... */
             rehumanize();
-        } else if (youmonst.data->mlet == S_EEL
+        } else if (g.youmonst.data->mlet == S_EEL
                    && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
             /* eel out of water loses hp, similar to monster eels;
                as hp gets lower, rate of further loss slows down */

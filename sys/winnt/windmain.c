@@ -160,10 +160,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         int fd;
         boolean have_syscf = FALSE;
 
-        (void) strncpy(hackdir, dir, PATHLEN - 1);
-        hackdir[PATHLEN - 1] = '\0';
-        fqn_prefix[0] = (char *) alloc(strlen(hackdir) + 2);
-        Strcpy(fqn_prefix[0], hackdir);
+        (void) strncpy(g.hackdir, dir, PATHLEN - 1);
+        g.hackdir[PATHLEN - 1] = '\0';
+        fqn_prefix[0] = (char *) alloc(strlen(g.hackdir) + 2);
+        Strcpy(fqn_prefix[0], g.hackdir);
         append_slash(fqn_prefix[0]);
         for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
              fqn_prefix[prefcnt] = fqn_prefix[0];
@@ -235,8 +235,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                    failbuf);
         nethack_exit(EXIT_FAILURE);
     }
-    if (!hackdir[0])
-        Strcpy(hackdir, orgdir);
+    if (!g.hackdir[0])
+        Strcpy(g.hackdir, orgdir);
     process_options(argc, argv);
     
 /*
@@ -414,7 +414,7 @@ char *argv[];
             }
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
-            Strcpy(hackdir, dir);
+            Strcpy(g.hackdir, dir);
         }
 
         if (argc > 1) {

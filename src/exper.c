@@ -194,7 +194,7 @@ const char *drainer; /* cause of death, if drain should be fatal */
        wizard mode request to reduce level; never fatal though */
     if (drainer && !strcmp(drainer, "#levelchange"))
         drainer = 0;
-    else if (resists_drli(&youmonst))
+    else if (resists_drli(&g.youmonst))
         return;
 
     if (u.ulevel > 1) {
@@ -236,7 +236,7 @@ const char *drainer; /* cause of death, if drain should be fatal */
         u.uexp = newuexp(u.ulevel) - 1;
 
     if (Upolyd) {
-        num = monhp_per_lvl(&youmonst);
+        num = monhp_per_lvl(&g.youmonst);
         u.mhmax -= num;
         u.mh -= num;
         if (u.mh <= 0)
@@ -271,7 +271,7 @@ boolean incr; /* true iff via incremental experience growth */
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */
     if (Upolyd) {
-        hpinc = monhp_per_lvl(&youmonst);
+        hpinc = monhp_per_lvl(&g.youmonst);
         u.mhmax += hpinc;
         u.mh += hpinc;
     }

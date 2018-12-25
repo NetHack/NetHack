@@ -41,7 +41,7 @@ struct attribs {
 };
 
 #define ATTRMAX(x)                                        \
-    ((x == A_STR && Upolyd && strongmonst(youmonst.data)) \
+    ((x == A_STR && Upolyd && strongmonst(g.youmonst.data)) \
          ? STR18(100)                                     \
          : urace.attrmax[x])
 #define ATTRMIN(x) (urace.attrmin[x])

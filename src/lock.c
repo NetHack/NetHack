@@ -90,7 +90,7 @@ picklock(VOID_ARGS)
         }
     }
 
-    if (g.xlock.usedtime++ >= 50 || nohands(youmonst.data)) {
+    if (g.xlock.usedtime++ >= 50 || nohands(g.youmonst.data)) {
         You("give up your attempt at %s.", lock_action());
         exercise(A_DEX, TRUE); /* even if you don't succeed */
         return ((g.xlock.usedtime = 0));
@@ -216,7 +216,7 @@ forcelock(VOID_ARGS)
     if ((g.xlock.box->ox != u.ux) || (g.xlock.box->oy != u.uy))
         return ((g.xlock.usedtime = 0)); /* you or it moved */
 
-    if (g.xlock.usedtime++ >= 50 || !uwep || nohands(youmonst.data)) {
+    if (g.xlock.usedtime++ >= 50 || !uwep || nohands(g.youmonst.data)) {
         You("give up your attempt to force the lock.");
         if (g.xlock.usedtime >= 50) /* you made the effort */
             exercise((g.xlock.picktyp) ? A_DEX : A_STR, TRUE);
@@ -291,7 +291,7 @@ struct obj *pick;
     if (g.xlock.usedtime && picktyp == g.xlock.picktyp) {
         static char no_longer[] = "Unfortunately, you can no longer %s %s.";
 
-        if (nohands(youmonst.data)) {
+        if (nohands(g.youmonst.data)) {
             const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
 
             if (picktyp == CREDIT_CARD)
@@ -307,13 +307,13 @@ struct obj *pick;
             const char *action = lock_action();
 
             You("resume your attempt at %s.", action);
-            g.xlock.magic_key = is_magic_key(&youmonst, pick);
+            g.xlock.magic_key = is_magic_key(&g.youmonst, pick);
             set_occupation(picklock, action, 0);
             return PICKLOCK_DID_SOMETHING;
         }
     }
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You_cant("hold %s -- you have no hands!", doname(pick));
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
@@ -493,7 +493,7 @@ struct obj *pick;
     context.move = 0;
     g.xlock.chance = ch;
     g.xlock.picktyp = picktyp;
-    g.xlock.magic_key = is_magic_key(&youmonst, pick);
+    g.xlock.magic_key = is_magic_key(&g.youmonst, pick);
     g.xlock.usedtime = 0;
     set_occupation(picklock, lock_action(), 0);
     return PICKLOCK_DID_SOMETHING;
@@ -611,7 +611,7 @@ int x, y;
     boolean portcullis;
     int res = 0;
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You_cant("open anything -- you have no hands!");
         return 0;
     }
@@ -686,7 +686,7 @@ int x, y;
         return res;
     }
 
-    if (verysmall(youmonst.data)) {
+    if (verysmall(g.youmonst.data)) {
         pline("You're too small to pull the door open.");
         return res;
     }
@@ -754,7 +754,7 @@ doclose()
     boolean portcullis;
     int res = 0;
 
-    if (nohands(youmonst.data)) {
+    if (nohands(g.youmonst.data)) {
         You_cant("close anything -- you have no hands!");
         return 0;
     }
@@ -823,7 +823,7 @@ doclose()
     }
 
     if (door->doormask == D_ISOPEN) {
-        if (verysmall(youmonst.data) && !u.usteed) {
+        if (verysmall(g.youmonst.data) && !u.usteed) {
             pline("You're too small to push the door closed.");
             return res;
         }
@@ -1053,7 +1053,7 @@ struct obj *otmp;
 
     if (otmp->oclass == POTION_CLASS) {
         You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
-        if (!breathless(youmonst.data) || haseyes(youmonst.data))
+        if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data))
             potionbreathe(otmp);
         return;
     }

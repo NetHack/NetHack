@@ -89,8 +89,8 @@ char *outbuf;
             mons[u.umonnum].mname, g.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-    if (u.uundetected || (Upolyd && youmonst.m_ap_type))
-        mhidden_description(&youmonst, FALSE, eos(outbuf));
+    if (u.uundetected || (Upolyd && g.youmonst.m_ap_type))
+        mhidden_description(&g.youmonst, FALSE, eos(outbuf));
     return outbuf;
 }
 
@@ -103,7 +103,7 @@ boolean altmon; /* for probing: if mimicking a monster, say so */
 char *outbuf;
 {
     struct obj *otmp;
-    boolean fakeobj, isyou = (mon == &youmonst);
+    boolean fakeobj, isyou = (mon == &g.youmonst);
     int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
         glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                     : glyph_at(x, y);
@@ -272,7 +272,7 @@ int x, y;
             Strcat(buf, is_animal(mtmp->data)
                           ? ", swallowing you" : ", engulfing you");
         else
-            Strcat(buf, (Upolyd && sticks(youmonst.data))
+            Strcat(buf, (Upolyd && sticks(g.youmonst.data))
                           ? ", being held" : ", holding you");
     }
     if (mtmp->mleashed)
@@ -1161,7 +1161,7 @@ coord *click_cc;
             if (!invlet || invlet == '\033')
                 return 0;
             *out_str = '\0';
-            for (invobj = invent; invobj; invobj = invobj->nobj)
+            for (invobj = g.invent; invobj; invobj = invobj->nobj)
                 if (invobj->invlet == invlet) {
                     strcpy(out_str, singular(invobj, xname));
                     break;

@@ -87,13 +87,13 @@
 /* ...means blind because of a cover */
 #define Blind                                     \
     ((u.uroleplay.blind || Blinded || Blindfolded \
-      || !haseyes(youmonst.data))                 \
+      || !haseyes(g.youmonst.data))                 \
      && !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
 /* ...the Eyes operate even when you really are blind
     or don't have any eyes */
 #define Blindfolded_only                                            \
     (Blindfolded && ublindf->oartifact != ART_EYES_OF_THE_OVERWORLD \
-     && !u.uroleplay.blind && !Blinded && haseyes(youmonst.data))
+     && !u.uroleplay.blind && !Blinded && haseyes(g.youmonst.data))
 /* ...blind because of a blindfold, and *only* that */
 
 #define Sick u.uprops[SICK].intrinsic
@@ -248,11 +248,11 @@
 #define HMagical_breathing u.uprops[MAGICAL_BREATHING].intrinsic
 #define EMagical_breathing u.uprops[MAGICAL_BREATHING].extrinsic
 #define Amphibious \
-    (HMagical_breathing || EMagical_breathing || amphibious(youmonst.data))
+    (HMagical_breathing || EMagical_breathing || amphibious(g.youmonst.data))
 /* Get wet, may go under surface */
 
 #define Breathless \
-    (HMagical_breathing || EMagical_breathing || breathless(youmonst.data))
+    (HMagical_breathing || EMagical_breathing || breathless(g.youmonst.data))
 
 #define Underwater (u.uinwater)
 /* Note that Underwater and u.uinwater are both used in code.
@@ -372,6 +372,6 @@
    redundant but allows the function calls to be skipped most of the time */
 #define Unaware (g.multi < 0 && (unconscious() || is_fainted()))
 
-#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(youmonst.data))
+#define Hate_silver (u.ulycn >= LOW_PM || hates_silver(g.youmonst.data))
 
 #endif /* YOUPROP_H */

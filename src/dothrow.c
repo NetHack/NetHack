@@ -73,7 +73,7 @@ int shotlimit;
         return 0;
     }
     if ((obj->oartifact == ART_MJOLLNIR && ACURR(A_STR) < STR19(25))
-        || (obj->otyp == BOULDER && !throws_rocks(youmonst.data))) {
+        || (obj->otyp == BOULDER && !throws_rocks(g.youmonst.data))) {
         pline("It's too heavy.");
         return 1;
     }
@@ -240,10 +240,10 @@ int *shotlimit_p; /* (see dothrow()) */
     *shotlimit_p = (g.multi || g.save_cm) ? g.multi + 1 : 0;
     g.multi = 0; /* reset; it's been used up */
 
-    if (notake(youmonst.data)) {
+    if (notake(g.youmonst.data)) {
         You("are physically incapable of throwing or shooting anything.");
         return FALSE;
-    } else if (nohands(youmonst.data)) {
+    } else if (nohands(g.youmonst.data)) {
         You_cant("throw or shoot without hands."); /* not body_part(HAND) */
         return FALSE;
         /*[what about !freehand(), aside from cursed missile launcher?]*/
@@ -292,7 +292,7 @@ autoquiver()
         return;
 
     /* Scan through the inventory */
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
             ; /* Skip it */
         } else if (otmp->otyp == ROCK
@@ -630,12 +630,12 @@ int x, y;
             wake_nearto(x,y, 10);
             return FALSE;
         }
-        if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
-            && bad_rock(youmonst.data, x, u.uy)) {
-            boolean too_much = (invent && (inv_weight() + weight_cap() > 600));
+        if ((u.ux - x) && (u.uy - y) && bad_rock(g.youmonst.data, u.ux, y)
+            && bad_rock(g.youmonst.data, x, u.uy)) {
+            boolean too_much = (g.invent && (inv_weight() + weight_cap() > 600));
 
             /* Move at a diagonal. */
-            if (bigmonst(youmonst.data) || too_much) {
+            if (bigmonst(g.youmonst.data) || too_much) {
                 You("%sget forcefully wedged into a crevice.",
                     too_much ? "and all your belongings " : "");
                 dmg = rnd(2 + *range);
@@ -679,8 +679,8 @@ int x, y;
     }
 
     if ((u.ux - x) && (u.uy - y)
-        && bad_rock(youmonst.data, u.ux, y)
-        && bad_rock(youmonst.data, x, u.uy)) {
+        && bad_rock(g.youmonst.data, u.ux, y)
+        && bad_rock(g.youmonst.data, x, u.uy)) {
         /* Move at a diagonal. */
         if (Sokoban) {
             You("come to an abrupt halt!");
@@ -953,7 +953,7 @@ boolean hitsroof;
     /* object now hits you */
 
     if (obj->oclass == POTION_CLASS) {
-        potionhit(&youmonst, obj, POTHIT_HERO_THROW);
+        potionhit(&g.youmonst, obj, POTHIT_HERO_THROW);
     } else if (breaktest(obj)) {
         int otyp = obj->otyp;
         int blindinc;
@@ -961,7 +961,7 @@ boolean hitsroof;
         /* need to check for blindness result prior to destroying obj */
         blindinc = ((otyp == CREAM_PIE || otyp == BLINDING_VENOM)
                     /* AT_WEAP is ok here even if attack type was AT_SPIT */
-                    && can_blnd(&youmonst, &youmonst, AT_WEAP, obj))
+                    && can_blnd(&g.youmonst, &g.youmonst, AT_WEAP, obj))
                        ? rnd(25)
                        : 0;
         breakmsg(obj, !Blind);
@@ -970,7 +970,7 @@ boolean hitsroof;
         switch (otyp) {
         case EGG:
             if (petrifier && !Stone_resistance
-                && !(poly_when_stoned(youmonst.data)
+                && !(poly_when_stoned(g.youmonst.data)
                      && polymon(PM_STONE_GOLEM))) {
                 /* egg ends up "all over your face"; perhaps
                    visored helmet should still save you here */
@@ -997,11 +997,11 @@ boolean hitsroof;
         return FALSE;
     } else { /* neither potion nor other breaking object */
         boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
-        int dmg = dmgval(obj, &youmonst);
+        int dmg = dmgval(obj, &g.youmonst);
 
         if (obj->oartifact)
             /* need a fake die roll here; rn1(18,2) avoids 1 and 20 */
-            artimsg = artifact_hit((struct monst *) 0, &youmonst, obj, &dmg,
+            artimsg = artifact_hit((struct monst *) 0, &g.youmonst, obj, &dmg,
                                    rn1(18, 2));
 
         if (!dmg) { /* probably wasn't a weapon; base damage on weight */
@@ -1010,7 +1010,7 @@ boolean hitsroof;
                 dmg = 1;
             else if (dmg > 6)
                 dmg = 6;
-            if (youmonst.data == &mons[PM_SHADE]
+            if (g.youmonst.data == &mons[PM_SHADE]
                 && objects[obj->otyp].oc_material != SILVER)
                 dmg = 0;
         }
@@ -1033,7 +1033,7 @@ boolean hitsroof;
                     Your("%s does not protect you.", helm_simple_name(uarmh));
             }
         } else if (petrifier && !Stone_resistance
-                   && !(poly_when_stoned(youmonst.data)
+                   && !(poly_when_stoned(g.youmonst.data)
                         && polymon(PM_STONE_GOLEM))) {
         petrify:
             g.killer.format = KILLED_BY;
@@ -1175,7 +1175,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
         if (Is_airlevel(&u.uz) || Levitation)
             hurtle(-u.dx, -u.dy, 1, TRUE);
         mon = boomhit(obj, u.dx, u.dy);
-        if (mon == &youmonst) { /* the thing was caught */
+        if (mon == &g.youmonst) { /* the thing was caught */
             exercise(A_DEX, TRUE);
             obj = addinv(obj);
             (void) encumber_msg();
@@ -1344,7 +1344,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                               Tobjnam(obj, Blind ? "hit" : "fly"),
                               body_part(ARM));
                         if (obj->oartifact)
-                            (void) artifact_hit((struct monst *) 0, &youmonst,
+                            (void) artifact_hit((struct monst *) 0, &g.youmonst,
                                                 obj, &dmg, 0);
                         losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
                                KILLED_BY);
@@ -1527,7 +1527,7 @@ register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
      * Distance and monster size affect chance to hit.
      */
     tmp = -1 + Luck + find_mac(mon) + u.uhitinc
-          + maybe_polyd(youmonst.data->mlevel, u.ulevel);
+          + maybe_polyd(g.youmonst.data->mlevel, u.ulevel);
     if (ACURR(A_DEX) < 4)
         tmp -= 3;
     else if (ACURR(A_DEX) < 6)
@@ -1566,7 +1566,7 @@ register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
 
     tmp += omon_adj(mon, obj, TRUE);
     if (is_orc(mon->data)
-        && maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+        && maybe_polyd(is_elf(g.youmonst.data), Race_if(PM_ELF)))
         tmp++;
     if (guaranteed_hit) {
         tmp += 1000; /* Guaranteed hit */
@@ -1638,7 +1638,7 @@ register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
                  * Polymorphing won't make you a bow expert.
                  */
                 if ((Race_if(PM_ELF) || Role_if(PM_SAMURAI))
-                    && (!Upolyd || your_race(youmonst.data))
+                    && (!Upolyd || your_race(g.youmonst.data))
                     && objects[uwep->otyp].oc_skill == P_BOW) {
                     tmp++;
                     if (Race_if(PM_ELF) && uwep->otyp == ELVEN_BOW)
@@ -1960,15 +1960,15 @@ boolean from_invent;
         if (obj->otyp == POT_OIL && obj->lamplit) {
             explode_oil(obj, x, y);
         } else if (distu(x, y) <= 2) {
-            if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
+            if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)) {
                 if (obj->otyp != POT_WATER) {
-                    if (!breathless(youmonst.data)) {
+                    if (!breathless(g.youmonst.data)) {
                         /* [what about "familiar odor" when known?] */
                         You("smell a peculiar odor...");
                     } else {
                         const char *eyes = body_part(EYE);
 
-                        if (eyecount(youmonst.data) != 1)
+                        if (eyecount(g.youmonst.data) != 1)
                             eyes = makeplural(eyes);
                         Your("%s %s.", eyes, vtense(eyes, "water"));
                     }

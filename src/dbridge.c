@@ -323,10 +323,10 @@ STATIC_OVL void
 u_to_e(etmp)
 struct entity *etmp;
 {
-    etmp->emon = &youmonst;
+    etmp->emon = &g.youmonst;
     etmp->ex = u.ux;
     etmp->ey = u.uy;
-    etmp->edata = youmonst.data;
+    etmp->edata = g.youmonst.data;
 }
 
 STATIC_OVL void
@@ -342,7 +342,7 @@ struct entity *etmp;
         etmp->edata = (struct permonst *) 0;
 }
 
-#define is_u(etmp) (etmp->emon == &youmonst)
+#define is_u(etmp) (etmp->emon == &g.youmonst)
 #define e_canseemon(etmp) \
     (is_u(etmp) ? (boolean) TRUE : canseemon(etmp->emon))
 

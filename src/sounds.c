@@ -512,7 +512,7 @@ register struct monst *mtmp;
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
-             && (same_race(ptr, youmonst.data)           /* current form, */
+             && (same_race(ptr, g.youmonst.data)           /* current form, */
                  || same_race(ptr, &mons[Race_switch]))) /* unpoly'd form */
         msound = MS_HUMANOID;
     /* silliness, with slight chance to interfere with shopping */
@@ -598,11 +598,11 @@ register struct monst *mtmp;
             if (kindred)
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
-            else if (youmonst.data == &mons[PM_SILVER_DRAGON]
-                     || youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
+            else if (g.youmonst.data == &mons[PM_SILVER_DRAGON]
+                     || g.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf, "%s!  Your silver sheen does not frighten me!",
-                        youmonst.data == &mons[PM_SILVER_DRAGON]
+                        g.youmonst.data == &mons[PM_SILVER_DRAGON]
                             ? "Fool"
                             : "Young Fool");
                 verbl_msg = verbuf;
@@ -828,7 +828,7 @@ register struct monst *mtmp;
 
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
-                && could_seduce(mtmp, &youmonst, (struct attack *) 0) == 1) {
+                && could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
                 (void) doseduce(mtmp);
                 break;
             }
@@ -889,7 +889,7 @@ register struct monst *mtmp;
             verbl_msg = "Relax, this won't hurt a bit.";
         break;
     case MS_GUARD:
-        if (money_cnt(invent))
+        if (money_cnt(g.invent))
             verbl_msg = "Please drop that gold and follow me.";
         else
             verbl_msg = "Please follow me.";
@@ -974,8 +974,8 @@ dochat()
     int tx, ty;
     struct obj *otmp;
 
-    if (is_silent(youmonst.data)) {
-        pline("As %s, you cannot speak.", an(youmonst.data->mname));
+    if (is_silent(g.youmonst.data)) {
+        pline("As %s, you cannot speak.", an(g.youmonst.data->mname));
         return 0;
     }
     if (Strangled) {

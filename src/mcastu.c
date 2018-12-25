@@ -60,7 +60,7 @@ boolean undirected;
             point_msg = "all around, then curses";
         else if ((Invis && !perceives(mtmp->data)
                   && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-                 || is_obj_mappear(&youmonst, STRANGE_OBJECT)
+                 || is_obj_mappear(&g.youmonst, STRANGE_OBJECT)
                  || u.uundetected)
             point_msg = "and curses in your general direction";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
@@ -360,7 +360,7 @@ int spellnum;
     switch (spellnum) {
     case MGC_DEATH_TOUCH:
         pline("Oh no, %s's using the touch of death!", mhe(mtmp));
-        if (nonliving(youmonst.data) || is_demon(youmonst.data)) {
+        if (nonliving(g.youmonst.data) || is_demon(g.youmonst.data)) {
             You("seem no deader than before.");
         } else if (!Antimagic && rn2(mtmp->m_lev) > 12) {
             if (Hallucination) {
@@ -422,7 +422,7 @@ int spellnum;
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
             pline("A field of force surrounds you!");
-        } else if (!destroy_arm(some_armor(&youmonst))) {
+        } else if (!destroy_arm(some_armor(&g.youmonst))) {
             Your("skin itches.");
         }
         dmg = 0;
@@ -541,7 +541,7 @@ int spellnum;
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
         burn_away_slime();
-        (void) burnarmor(&youmonst);
+        (void) burnarmor(&g.youmonst);
         destroy_item(SCROLL_CLASS, AD_FIRE);
         destroy_item(POTION_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
@@ -646,7 +646,7 @@ int spellnum;
     case CLC_BLIND_YOU:
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
-            int num_eyes = eyecount(youmonst.data);
+            int num_eyes = eyecount(g.youmonst.data);
             pline("Scales cover your %s!", (num_eyes == 1)
                                                ? body_part(EYE)
                                                : makeplural(body_part(EYE)));

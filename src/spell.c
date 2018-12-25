@@ -232,7 +232,7 @@ struct obj *book2;
             return;
         }
 
-        for (otmp = invent; otmp; otmp = otmp->nobj) {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
             if (otmp->otyp == CANDELABRUM_OF_INVOCATION && otmp->spe == 7
                 && otmp->lamplit) {
                 if (!otmp->cursed)
@@ -285,7 +285,7 @@ struct obj *book2;
             set_malign(mtmp);
         }
         /* next handle the affect on things you're carrying */
-        (void) unturn_dead(&youmonst);
+        (void) unturn_dead(&g.youmonst);
         /* last place some monsters around you */
         mm.x = u.ux;
         mm.y = u.uy;
@@ -454,7 +454,7 @@ register struct obj *spellbook;
 
         if (dullbook > 0) {
             eyes = body_part(EYE);
-            if (eyecount(youmonst.data) > 1)
+            if (eyecount(g.youmonst.data) > 1)
                 eyes = makeplural(eyes);
             pline("This book is so dull that you can't keep your %s open.",
                   eyes);
@@ -644,7 +644,7 @@ rejectcasting()
     if (Stunned) {
         You("are too impaired to cast a spell.");
         return TRUE;
-    } else if (!can_chant(&youmonst)) {
+    } else if (!can_chant(&g.youmonst)) {
         You("are unable to chant the incantation.");
         return TRUE;
     } else if (!freehand()) {

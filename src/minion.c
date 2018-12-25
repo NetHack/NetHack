@@ -251,14 +251,14 @@ register struct monst *mtmp;
         }
         newsym(mtmp->mx, mtmp->my);
     }
-    if (youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
+    if (g.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
         pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
               flags.female ? "Sister" : "Brother");
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
         return 1;
     }
-    cash = money_cnt(invent);
+    cash = money_cnt(g.invent);
     demand =
         (cash * (rnd(80) + 20 * Athome))
         / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
@@ -301,7 +301,7 @@ struct monst *mtmp;
 {
     char buf[BUFSZ] = DUMMY;
     long offer;
-    long umoney = money_cnt(invent);
+    long umoney = money_cnt(g.invent);
 
     getlin("How much will you offer?", buf);
     if (sscanf(buf, "%ld", &offer) != 1)

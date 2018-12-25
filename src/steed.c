@@ -70,7 +70,7 @@ struct obj *otmp;
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        if (!(poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))) {
+        if (!(poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s", an(mtmp->data->mname));
             instapetrify(kbuf);
         }
@@ -162,8 +162,8 @@ boolean
 can_ride(mtmp)
 struct monst *mtmp;
 {
-    return (mtmp->mtame && humanoid(youmonst.data)
-            && !verysmall(youmonst.data) && !bigmonst(youmonst.data)
+    return (mtmp->mtame && humanoid(g.youmonst.data)
+            && !verysmall(g.youmonst.data) && !bigmonst(g.youmonst.data)
             && (!Underwater || is_swimmer(mtmp->data)));
 }
 
@@ -226,8 +226,8 @@ boolean force;      /* Quietly force this animal */
             return (FALSE);
     }
 
-    if (Upolyd && (!humanoid(youmonst.data) || verysmall(youmonst.data)
-                   || bigmonst(youmonst.data) || slithy(youmonst.data))) {
+    if (Upolyd && (!humanoid(g.youmonst.data) || verysmall(g.youmonst.data)
+                   || bigmonst(g.youmonst.data) || slithy(g.youmonst.data))) {
         You("won't fit on a saddle.");
         return (FALSE);
     }
@@ -455,7 +455,7 @@ int forceit;
                         || (distance == min_distance && rn2(2))) {
                         if (i > 0 || (((t = t_at(x, y)) == 0 || !t->tseen)
                                       && (!sobj_at(BOULDER, x, y)
-                                          || throws_rocks(youmonst.data)))) {
+                                          || throws_rocks(g.youmonst.data)))) {
                             spot->x = x;
                             spot->y = y;
                             min_distance = distance;
@@ -468,7 +468,7 @@ int forceit;
 
     /* If we didn't find a good spot and forceit is on, try enexto(). */
     if (forceit && min_distance < 0
-        && !enexto(spot, u.ux, u.uy, youmonst.data))
+        && !enexto(spot, u.ux, u.uy, g.youmonst.data))
         return FALSE;
 
     return found;

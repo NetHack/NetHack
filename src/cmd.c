@@ -673,38 +673,38 @@ extcmd_via_menu()
 int
 domonability(VOID_ARGS)
 {
-    if (can_breathe(youmonst.data))
+    if (can_breathe(g.youmonst.data))
         return dobreathe();
-    else if (attacktype(youmonst.data, AT_SPIT))
+    else if (attacktype(g.youmonst.data, AT_SPIT))
         return dospit();
-    else if (youmonst.data->mlet == S_NYMPH)
+    else if (g.youmonst.data->mlet == S_NYMPH)
         return doremove();
-    else if (attacktype(youmonst.data, AT_GAZE))
+    else if (attacktype(g.youmonst.data, AT_GAZE))
         return dogaze();
-    else if (is_were(youmonst.data))
+    else if (is_were(g.youmonst.data))
         return dosummon();
-    else if (webmaker(youmonst.data))
+    else if (webmaker(g.youmonst.data))
         return dospinweb();
-    else if (is_hider(youmonst.data))
+    else if (is_hider(g.youmonst.data))
         return dohide();
-    else if (is_mind_flayer(youmonst.data))
+    else if (is_mind_flayer(g.youmonst.data))
         return domindblast();
     else if (u.umonnum == PM_GREMLIN) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
-            if (split_mon(&youmonst, (struct monst *) 0))
+            if (split_mon(&g.youmonst, (struct monst *) 0))
                 dryup(u.ux, u.uy, TRUE);
         } else
             There("is no fountain here.");
-    } else if (is_unicorn(youmonst.data)) {
+    } else if (is_unicorn(g.youmonst.data)) {
         use_unicorn_horn((struct obj *) 0);
         return 1;
-    } else if (youmonst.data->msound == MS_SHRIEK) {
+    } else if (g.youmonst.data->msound == MS_SHRIEK) {
         You("shriek.");
         if (u.uburied)
             pline("Unfortunately sound does not carry well through rock.");
         else
             aggravate();
-    } else if (youmonst.data->mlet == S_VAMPIRE)
+    } else if (g.youmonst.data->mlet == S_VAMPIRE)
         return dopoly();
     else if (Upolyd)
         pline("Any special ability you may have is purely reflexive.");
@@ -1279,7 +1279,7 @@ wiz_smell(VOID_ARGS)
     cc.x = u.ux;
     cc.y = u.uy;
     mndx = 0; /* gcc -Wall lint */
-    if (!olfaction(youmonst.data)) {
+    if (!olfaction(g.youmonst.data)) {
         You("are incapable of detecting odors in your present form.");
         return 0;
     }
@@ -1663,7 +1663,7 @@ int propindx; /* index of a property which can be conveyed by worn item */
 
     /* simpler than from_what()/what_gives(); we don't attempt to
        handle artifacts and we deliberately ignore wielded items */
-    for (o = invent; o; o = o->nobj) {
+    for (o = g.invent; o; o = o->nobj) {
         if (!(o->owornmask & mask))
             continue;
         if ((int) objects[o->otyp].oc_oprop == propindx
@@ -1774,7 +1774,7 @@ int final;
        (with countdown timer appended for wizard mode); we really want
        the player to know he's not a samurai at the moment... */
     if (Upolyd) {
-        struct permonst *uasmon = youmonst.data;
+        struct permonst *uasmon = g.youmonst.data;
 
         tmpbuf[0] = '\0';
         /* here we always use current gender, not saved role gender */
@@ -1995,7 +1995,7 @@ int final;
        same amount as shown on status line which ignores container contents */
     {
         static const char Your_wallet[] = "Your wallet ";
-        long umoney = money_cnt(invent);
+        long umoney = money_cnt(g.invent);
 
         if (!umoney) {
             enl_msg(Your_wallet, "is ", "was ", "empty", "");
@@ -2204,7 +2204,7 @@ int final;
                   : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
         you_are(buf, from_what(WWALKING));
     }
-    if (Upolyd && (u.uundetected || youmonst.m_ap_type != M_AP_NOTHING))
+    if (Upolyd && (u.uundetected || g.youmonst.m_ap_type != M_AP_NOTHING))
         youhiding(TRUE, final);
 
     /* internal troubles, mostly in the order that prayer ranks them */
@@ -2241,16 +2241,16 @@ int final;
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
         Sprintf(buf, "%s blind",
-                !haseyes(youmonst.data) ? "innately"
+                !haseyes(g.youmonst.data) ? "innately"
                 : u.uroleplay.blind ? "permanently"
                   /* better phrasing desperately wanted... */
                   : Blindfolded_only ? "deliberately"
                     : "temporarily");
         if (wizard && (Blinded & TIMEOUT) != 0L
-            && !u.uroleplay.blind && haseyes(youmonst.data))
+            && !u.uroleplay.blind && haseyes(g.youmonst.data))
             Sprintf(eos(buf), " (%ld)", (Blinded & TIMEOUT));
         /* !haseyes: avoid "you are innately blind innately" */
-        you_are(buf, !haseyes(youmonst.data) ? "" : from_what(BLINDED));
+        you_are(buf, !haseyes(g.youmonst.data) ? "" : from_what(BLINDED));
     }
     if (Deaf)
         you_are("deaf", from_what(DEAF));
@@ -2295,7 +2295,7 @@ int final;
         you_are(buf, "");
     } else if (u.ustuck) {
         Sprintf(buf, "%s %s",
-                (Upolyd && sticks(youmonst.data)) ? "holding" : "held by",
+                (Upolyd && sticks(g.youmonst.data)) ? "holding" : "held by",
                 a_monnam(u.ustuck));
         you_are(buf, "");
     }
@@ -2390,7 +2390,7 @@ int final;
     /* report being weaponless; distinguish whether gloves are worn */
     if (!uwep) {
         you_are(uarmg ? "empty handed" /* gloves imply hands */
-                      : humanoid(youmonst.data)
+                      : humanoid(g.youmonst.data)
                          /* hands but no weapon and no gloves */
                          ? "bare handed"
                          /* alternate phrasing for paws or lack of hands */
@@ -2517,7 +2517,7 @@ int final;
         you_can("recognize detrimental food", "");
 
     /*** Vision and senses ***/
-    if (!Blind && (Blinded || !haseyes(youmonst.data)))
+    if (!Blind && (Blinded || !haseyes(g.youmonst.data)))
         you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
     if (See_invisible) {
         if (!Blind)
@@ -2701,7 +2701,7 @@ int final;
         if (prot)
             you_have(enlght_combatinc("defense", prot, final, buf), "");
     }
-    if ((armpro = magic_negation(&youmonst)) > 0) {
+    if ((armpro = magic_negation(&g.youmonst)) > 0) {
         /* magic cancellation factor, conferred by worn armor */
         static const char *const mc_types[] = {
             "" /*ordinary*/, "warded", "guarded", "protected",
@@ -2748,12 +2748,12 @@ int final;
         && !(final == ENL_GAMEOVERDEAD
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
-        Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
+        Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
     }
-    if (lays_eggs(youmonst.data) && flags.female) /* Upolyd */
+    if (lays_eggs(g.youmonst.data) && flags.female) /* Upolyd */
         you_can("lay eggs", "");
     if (u.ulycn >= LOW_PM) {
         /* "you are a werecreature [in beast form]" */
@@ -2943,7 +2943,7 @@ minimal_enlightenment()
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Current", FALSE);
-    Sprintf(buf, fmtstr, "race", Upolyd ? youmonst.data->mname : urace.noun);
+    Sprintf(buf, fmtstr, "race", Upolyd ? g.youmonst.data->mname : urace.noun);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     if (Upolyd) {
         Sprintf(buf, fmtstr, "role (base)",
@@ -2957,7 +2957,7 @@ minimal_enlightenment()
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     }
     /* don't want poly_gender() here; it forces `2' for non-humanoids */
-    genidx = is_neuter(youmonst.data) ? 2 : flags.female;
+    genidx = is_neuter(g.youmonst.data) ? 2 : flags.female;
     Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     if (Upolyd && (int) u.mfemale != genidx) {
@@ -3026,31 +3026,31 @@ int msgflag;          /* for variant message phrasing */
     char *bp, buf[BUFSZ];
 
     Strcpy(buf, "hiding");
-    if (youmonst.m_ap_type != M_AP_NOTHING) {
+    if (g.youmonst.m_ap_type != M_AP_NOTHING) {
         /* mimic; hero is only able to mimic a strange object or gold
            or hallucinatory alternative to gold, so we skip the details
            for the hypothetical furniture and monster cases */
         bp = eos(strcpy(buf, "mimicking"));
-        if (youmonst.m_ap_type == M_AP_OBJECT) {
-            Sprintf(bp, " %s", an(simple_typename(youmonst.mappearance)));
-        } else if (youmonst.m_ap_type == M_AP_FURNITURE) {
+        if (g.youmonst.m_ap_type == M_AP_OBJECT) {
+            Sprintf(bp, " %s", an(simple_typename(g.youmonst.mappearance)));
+        } else if (g.youmonst.m_ap_type == M_AP_FURNITURE) {
             Strcpy(bp, " something");
-        } else if (youmonst.m_ap_type == M_AP_MONSTER) {
+        } else if (g.youmonst.m_ap_type == M_AP_MONSTER) {
             Strcpy(bp, " someone");
         } else {
             ; /* something unexpected; leave 'buf' as-is */
         }
     } else if (u.uundetected) {
         bp = eos(buf); /* points past "hiding" */
-        if (youmonst.data->mlet == S_EEL) {
+        if (g.youmonst.data->mlet == S_EEL) {
             if (is_pool(u.ux, u.uy))
                 Sprintf(bp, " in the %s", waterbody_name(u.ux, u.uy));
-        } else if (hides_under(youmonst.data)) {
+        } else if (hides_under(g.youmonst.data)) {
             struct obj *o = g.level.objects[u.ux][u.uy];
 
             if (o)
                 Sprintf(bp, " underneath %s", ansimpleoname(o));
-        } else if (is_clinger(youmonst.data) || Flying) {
+        } else if (is_clinger(g.youmonst.data) || Flying) {
             /* Flying: 'lurker above' hides on ceiling but doesn't cling */
             Sprintf(bp, " on the %s", ceiling(u.ux, u.uy));
         } else {
@@ -3746,7 +3746,7 @@ long *total_size;
     long count = 0, size = 0;
     struct monst *mon;
 
-    count_obj(invent, &count, &size, FALSE, TRUE);
+    count_obj(g.invent, &count, &size, FALSE, TRUE);
     count_obj(fobj, &count, &size, FALSE, TRUE);
     count_obj(g.level.buriedobjlist, &count, &size, FALSE, TRUE);
     count_obj(g.migrating_objs, &count, &size, FALSE, TRUE);
@@ -3961,7 +3961,7 @@ wiz_show_stats()
     putstr(win, 0, stats_hdr);
     Sprintf(buf, "  Objects, base size %ld", (long) sizeof (struct obj));
     putstr(win, 0, buf);
-    obj_chain(win, "invent", invent, TRUE, &total_obj_count, &total_obj_size);
+    obj_chain(win, "invent", g.invent, TRUE, &total_obj_count, &total_obj_size);
     obj_chain(win, "fobj", fobj, TRUE, &total_obj_count, &total_obj_size);
     obj_chain(win, "buried", g.level.buriedobjlist, FALSE,
               &total_obj_count, &total_obj_size);
@@ -5293,7 +5293,7 @@ boolean doit;
         }
     }
 
-    if (invent)
+    if (g.invent)
         add_herecmd_menuitem(win, dodrop, "Drop items");
 
     add_herecmd_menuitem(win, donull, "Rest one turn");

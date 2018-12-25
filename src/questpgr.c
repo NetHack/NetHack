@@ -213,7 +213,7 @@ unsigned whichchains;
     struct obj *qarti = 0;
 
     if ((whichchains & (1 << OBJ_INVENT)) != 0)
-        qarti = find_qarti(invent);
+        qarti = find_qarti(g.invent);
     if (!qarti && (whichchains & (1 << OBJ_FLOOR)) != 0)
         qarti = find_qarti(fobj);
     if (!qarti && (whichchains & (1 << OBJ_MINVENT)) != 0)

@@ -955,7 +955,7 @@ genericptr_t p2;
     reg = (NhRegion *) p1;
     dam = reg->arg.a_int;
     if (p2 == (genericptr_t) 0) { /* This means *YOU* Bozo! */
-        if (u.uinvulnerable || nonliving(youmonst.data) || Breathless
+        if (u.uinvulnerable || nonliving(g.youmonst.data) || Breathless
             || Underwater)
             return FALSE;
         if (!Blind) {
@@ -1064,7 +1064,7 @@ region_danger()
         /* the only type of region we understand is gas_cloud */
         if (f_indx == INSIDE_GAS_CLOUD) {
             /* completely harmless if you don't need to breathe */
-            if (nonliving(youmonst.data) || Breathless)
+            if (nonliving(g.youmonst.data) || Breathless)
                 continue;
             /* minor inconvenience if you're poison resistant;
                not harmful enough to be a prayer-level trouble */

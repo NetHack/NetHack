@@ -86,8 +86,8 @@ register struct obj *obj;
     /* above also prevents the Amulet from being eaten, so we must never
        allow fake amulets to be eaten either [which is already the case] */
 
-    if (metallivorous(youmonst.data) && is_metallic(obj)
-        && (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
+    if (metallivorous(g.youmonst.data) && is_metallic(obj)
+        && (g.youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
         return TRUE;
 
     /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
@@ -155,8 +155,8 @@ eatmdone(VOID_ARGS)
         free((genericptr_t) g.eatmbuf), g.eatmbuf = 0;
     }
     /* update display */
-    if (youmonst.m_ap_type) {
-        youmonst.m_ap_type = M_AP_NOTHING;
+    if (g.youmonst.m_ap_type) {
+        g.youmonst.m_ap_type = M_AP_NOTHING;
         newsym(u.ux, u.uy);
     }
     return 0;
@@ -172,11 +172,11 @@ eatmupdate()
     if (!g.eatmbuf || g.nomovemsg != g.eatmbuf)
         return;
 
-    if (is_obj_mappear(&youmonst,ORANGE) && !Hallucination) {
+    if (is_obj_mappear(&g.youmonst,ORANGE) && !Hallucination) {
         /* revert from hallucinatory to "normal" mimicking */
         altmsg = "You now prefer mimicking yourself.";
         altapp = GOLD_PIECE;
-    } else if (is_obj_mappear(&youmonst,GOLD_PIECE) && Hallucination) {
+    } else if (is_obj_mappear(&g.youmonst,GOLD_PIECE) && Hallucination) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
@@ -192,7 +192,7 @@ eatmupdate()
         }
         g.nomovemsg = strcpy(g.eatmbuf, altmsg);
         /* update current image */
-        youmonst.mappearance = altapp;
+        g.youmonst.mappearance = altapp;
         newsym(u.ux, u.uy);
     }
 }
@@ -315,9 +315,9 @@ struct obj *otmp;
                          : (unsigned) objects[otmp->otyp].oc_nutrition;
 
     if (otmp->otyp == LEMBAS_WAFER) {
-        if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF)))
+        if (maybe_polyd(is_elf(g.youmonst.data), Race_if(PM_ELF)))
             nut += nut / 4; /* 800 -> 1000 */
-        else if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+        else if (maybe_polyd(is_orc(g.youmonst.data), Race_if(PM_ORC)))
             nut -= nut / 4; /* 800 -> 600 */
         /* prevent polymorph making a partly eaten wafer
            become more nutritious than an untouched one */
@@ -325,7 +325,7 @@ struct obj *otmp;
             otmp->oeaten = (otmp->oeaten < objects[LEMBAS_WAFER].oc_nutrition)
                               ? (nut - 1) : nut;
     } else if (otmp->otyp == CRAM_RATION) {
-        if (maybe_polyd(is_dwarf(youmonst.data), Race_if(PM_DWARF)))
+        if (maybe_polyd(is_dwarf(g.youmonst.data), Race_if(PM_DWARF)))
             nut += nut / 6; /* 600 -> 700 */
     }
     return nut;
@@ -499,11 +499,11 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
     if (noncorporeal(pd)) {
         if (visflag)
             pline("%s brain is unharmed.",
-                  (mdef == &youmonst) ? "Your" : s_suffix(Monnam(mdef)));
+                  (mdef == &g.youmonst) ? "Your" : s_suffix(Monnam(mdef)));
         return MM_MISS; /* side-effects can't occur */
-    } else if (magr == &youmonst) {
+    } else if (magr == &g.youmonst) {
         You("eat %s brain!", s_suffix(mon_nam(mdef)));
-    } else if (mdef == &youmonst) {
+    } else if (mdef == &g.youmonst) {
         Your("brain is eaten!");
     } else { /* monster against monster */
         if (visflag && canspotmon(mdef))
@@ -514,7 +514,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         /* mind flayer has attempted to eat the brains of a petrification
            inducing critter (most likely Medusa; attacking a cockatrice via
            tentacle-touch should have been caught before reaching this far) */
-        if (magr == &youmonst) {
+        if (magr == &g.youmonst) {
             if (!Stone_resistance && !Stoned)
                 make_stoned(5L, (char *) 0, KILLED_BY_AN, pd->mname);
         } else {
@@ -535,7 +535,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         }
     }
 
-    if (magr == &youmonst) {
+    if (magr == &g.youmonst) {
         /*
          * player mind flayer is eating something's brain
          */
@@ -568,7 +568,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
            is cannibalism */
         (void) maybe_cannibal(monsndx(pd), TRUE);
 
-    } else if (mdef == &youmonst) {
+    } else if (mdef == &g.youmonst) {
         /*
          * monster mind flayer is eating hero's brain
          */
@@ -653,7 +653,7 @@ boolean allowmsg;
            (even if having the form of something which doesn't care
            about cannibalism--hero's innate traits aren't altered) */
         && (your_race(fptr)
-            || (Upolyd && same_race(youmonst.data, fptr))
+            || (Upolyd && same_race(g.youmonst.data, fptr))
             || (u.ulycn >= LOW_PM && were_beastie(pm) == u.ulycn))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
@@ -674,7 +674,7 @@ register int pm;
     (void) maybe_cannibal(pm, TRUE);
     if (flesh_petrifies(&mons[pm])) {
         if (!Stone_resistance
-            && !(poly_when_stoned(youmonst.data)
+            && !(poly_when_stoned(g.youmonst.data)
                  && polymon(PM_STONE_GOLEM))) {
             Sprintf(g.killer.name, "tasting %s meat", mons[pm].mname);
             g.killer.format = KILLED_BY;
@@ -722,7 +722,7 @@ register int pm;
         return;
     }
     case PM_GREEN_SLIME:
-        if (!Slimed && !Unchanging && !slimeproof(youmonst.data)) {
+        if (!Slimed && !Unchanging && !slimeproof(g.youmonst.data)) {
             You("don't feel very well.");
             make_slimed(10L, (char *) 0);
             delayed_killer(SLIMED, KILLED_BY_AN, "");
@@ -1015,7 +1015,7 @@ int pm;
         /*FALLTHRU*/
     case PM_SMALL_MIMIC:
         tmp += 20;
-        if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
+        if (g.youmonst.data->mlet != S_MIMIC && !Unchanging) {
             char buf[BUFSZ];
 
             u.uconduct.polyselfs++; /* you're changing form */
@@ -1030,13 +1030,13 @@ int pm;
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
-                    an(Upolyd ? youmonst.data->mname : urace.noun));
+                    an(Upolyd ? g.youmonst.data->mname : urace.noun));
             g.eatmbuf = dupstr(buf);
             g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
             /* ??? what if this was set before? */
-            youmonst.m_ap_type = M_AP_OBJECT;
-            youmonst.mappearance = Hallucination ? ORANGE : GOLD_PIECE;
+            g.youmonst.m_ap_type = M_AP_OBJECT;
+            g.youmonst.mappearance = Hallucination ? ORANGE : GOLD_PIECE;
             newsym(u.ux, u.uy);
             curs_on_u();
             /* make gold symbol show up now */
@@ -1457,10 +1457,10 @@ struct obj *otmp;
     const char *mesg = 0;
     register int tmp;
 
-    if (metallivorous(youmonst.data)) {
+    if (metallivorous(g.youmonst.data)) {
         mesg = "You bite right into the metal tin...";
         tmp = 0;
-    } else if (cantwield(youmonst.data)) { /* nohands || verysmall */
+    } else if (cantwield(g.youmonst.data)) { /* nohands || verysmall */
         You("cannot handle the tin properly to open it.");
         return;
     } else if (otmp->blessed) {
@@ -1590,9 +1590,9 @@ struct obj *otmp;
     int retcode = 0, tp = 0, mnum = otmp->corpsenm;
     long rotted = 0L;
     boolean stoneable = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
-                         && !poly_when_stoned(youmonst.data)),
+                         && !poly_when_stoned(g.youmonst.data)),
             slimeable = (mnum == PM_GREEN_SLIME && !Slimed && !Unchanging
-                         && !slimeproof(youmonst.data)),
+                         && !slimeproof(g.youmonst.data)),
             glob = otmp->globby ? TRUE : FALSE;
 
     /* KMH, conduct */
@@ -1691,13 +1691,13 @@ struct obj *otmp;
     } else {
         /* yummy is always False for omnivores, palatable always True */
         boolean yummy = (vegan(&mons[mnum])
-                            ? (!carnivorous(youmonst.data)
-                               && herbivorous(youmonst.data))
-                            : (carnivorous(youmonst.data)
-                               && !herbivorous(youmonst.data))),
+                            ? (!carnivorous(g.youmonst.data)
+                               && herbivorous(g.youmonst.data))
+                            : (carnivorous(g.youmonst.data)
+                               && !herbivorous(g.youmonst.data))),
             palatable = ((vegetarian(&mons[mnum])
-                          ? herbivorous(youmonst.data)
-                          : carnivorous(youmonst.data))
+                          ? herbivorous(g.youmonst.data)
+                          : carnivorous(g.youmonst.data))
                          && rn2(10)
                          && ((rotted < 1) ? TRUE : !rn2(rotted+1)));
         const char *pmxnam = food_xname(otmp, FALSE);
@@ -1794,9 +1794,9 @@ struct obj *otmp;
             pline("That satiated your %s!", body_part(STOMACH));
         break;
     case TRIPE_RATION:
-        if (carnivorous(youmonst.data) && !humanoid(youmonst.data))
+        if (carnivorous(g.youmonst.data) && !humanoid(g.youmonst.data))
             pline("That tripe ration was surprisingly good!");
-        else if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+        else if (maybe_polyd(is_orc(g.youmonst.data), Race_if(PM_ORC)))
             pline(Hallucination ? "Tastes great!  Less filling!"
                                 : "Mmm, tripe... not bad!");
         else {
@@ -1810,10 +1810,10 @@ struct obj *otmp;
         }
         break;
     case LEMBAS_WAFER:
-        if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC))) {
+        if (maybe_polyd(is_orc(g.youmonst.data), Race_if(PM_ORC))) {
             pline("%s", "!#?&* elf kibble!");
             break;
-        } else if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
+        } else if (maybe_polyd(is_elf(g.youmonst.data), Race_if(PM_ELF))) {
             pline("A little goes a long way.");
             break;
         }
@@ -1824,7 +1824,7 @@ struct obj *otmp;
     case MEAT_RING:
         goto give_feedback;
     case CLOVE_OF_GARLIC:
-        if (is_undead(youmonst.data)) {
+        if (is_undead(g.youmonst.data)) {
             make_vomiting((long) rn1(context.victual.reqtime, 5), FALSE);
             break;
         }
@@ -1964,7 +1964,7 @@ struct obj *otmp;
                 set_mimic_blocking();
                 see_monsters();
                 if (Invis && !oldprop && !ESee_invisible
-                    && !perceives(youmonst.data) && !Blind) {
+                    && !perceives(g.youmonst.data) && !Blind) {
                     newsym(u.ux, u.uy);
                     pline("Suddenly you can see yourself.");
                     makeknown(typ);
@@ -2181,7 +2181,7 @@ struct obj *otmp;
 {
     switch (otmp->otyp) {
     case SPRIG_OF_WOLFSBANE:
-        if (u.ulycn >= LOW_PM || is_were(youmonst.data))
+        if (u.ulycn >= LOW_PM || is_were(g.youmonst.data))
             you_unwere(TRUE);
         break;
     case CARROT:
@@ -2224,7 +2224,7 @@ struct obj *otmp;
     case EGG:
         if (flesh_petrifies(&mons[otmp->corpsenm])) {
             if (!Stone_resistance
-                && !(poly_when_stoned(youmonst.data)
+                && !(poly_when_stoned(g.youmonst.data)
                      && polymon(PM_STONE_GOLEM))) {
                 if (!Stoned) {
                     Sprintf(g.killer.name, "%s egg",
@@ -2307,10 +2307,10 @@ struct obj *otmp;
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
         /* These checks must match those in eatcorpse() */
         stoneorslime = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
-                        && !poly_when_stoned(youmonst.data));
+                        && !poly_when_stoned(g.youmonst.data));
 
         if (mnum == PM_GREEN_SLIME || otmp->otyp == GLOB_OF_GREEN_SLIME)
-            stoneorslime = (!Unchanging && !slimeproof(youmonst.data));
+            stoneorslime = (!Unchanging && !slimeproof(g.youmonst.data));
 
         if (cadaver && !nonrotting_corpse(mnum)) {
             long age = peek_at_iced_corpse_age(otmp);
@@ -2476,7 +2476,7 @@ doeat()
         You_cant("eat %s you're wearing.", something);
         return 0;
     } else if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
-                               : touch_artifact(otmp, &youmonst))) {
+                               : touch_artifact(otmp, &g.youmonst))) {
         return 1; /* got blasted so use a turn */
     }
     if (is_metallic(otmp) && u.umonnum == PM_RUST_MONSTER
@@ -2780,9 +2780,9 @@ gethungry()
        will need to wear an Amulet of Unchanging so still burn a small
        amount of nutrition in the 'moves % 20' ring/amulet check below */
     if ((!Unaware || !rn2(10)) /* slow metabolic rate while asleep */
-        && (carnivorous(youmonst.data)
-            || herbivorous(youmonst.data)
-            || metallivorous(youmonst.data))
+        && (carnivorous(g.youmonst.data)
+            || herbivorous(g.youmonst.data)
+            || metallivorous(g.youmonst.data))
         && !Slow_digestion)
         u.uhunger--; /* ordinary food consumption */
 
@@ -3085,11 +3085,11 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     if (iflags.menu_requested /* command was preceded by 'm' prefix */
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
-            && (Wwalking || is_clinger(youmonst.data)
+            && (Wwalking || is_clinger(g.youmonst.data)
                 || (Flying && !Breathless))))
         goto skipfloor;
 
-    if (feeding && metallivorous(youmonst.data)) {
+    if (feeding && metallivorous(g.youmonst.data)) {
         struct obj *gold;
         struct trap *ttmp = t_at(u.ux, u.uy);
 
@@ -3111,7 +3111,7 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
             }
         }
 
-        if (youmonst.data != &mons[PM_RUST_MONSTER]
+        if (g.youmonst.data != &mons[PM_RUST_MONSTER]
             && (gold = g_at(u.ux, u.uy)) != 0) {
             if (gold->quan == 1L)
                 Sprintf(qbuf, "There is 1 gold piece here; eat it?");
@@ -3178,7 +3178,7 @@ skipfloor:
 void
 vomit() /* A good idea from David Neves */
 {
-    if (cantvomit(youmonst.data)) {
+    if (cantvomit(g.youmonst.data)) {
         /* doesn't cure food poisoning; message assumes that we aren't
            dealing with some esoteric body_part() */
         Your("jaw gapes convulsively.");

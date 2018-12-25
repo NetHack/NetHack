@@ -570,7 +570,7 @@ int after, udist, whappr;
         }
         /* if you have dog food it'll follow you more closely */
         if (appr == 0)
-            for (obj = invent; obj; obj = obj->nobj)
+            for (obj = g.invent; obj; obj = obj->nobj)
                 if (dogfood(mtmp, obj) == DOGFOOD) {
                     appr = 1;
                     break;
@@ -650,7 +650,7 @@ int maxdist;
         targ = m_at(curx, cury);
 
         if (curx == mtmp->mux && cury == mtmp->muy)
-            return &youmonst;
+            return &g.youmonst;
 
         if (targ) {
             /* Is the monster visible to the pet? */
@@ -754,7 +754,7 @@ struct monst *mtmp, *mtarg;
             return score;
         }
         /* Is the monster peaceful or tame? */
-        if (/*mtarg->mpeaceful ||*/ mtarg->mtame || mtarg == &youmonst) {
+        if (/*mtarg->mpeaceful ||*/ mtarg->mtame || mtarg == &g.youmonst) {
             /* Pets will never be targeted */
             score -= 3000L;
             return score;
@@ -953,7 +953,7 @@ int after; /* this is extra fast monster movement */
     }
 #if 0 /* [this is now handled in dochug()] */
     if (!Conflict && !mtmp->mconf
-        && mtmp == u.ustuck && !sticks(youmonst.data)) {
+        && mtmp == u.ustuck && !sticks(g.youmonst.data)) {
         unstuck(mtmp); /* swallowed case handled above */
         You("get released!");
     }
@@ -1155,7 +1155,7 @@ int after; /* this is extra fast monster movement */
         if (mtarg && (!hungry || !rn2(5))) {
             int mstatus;
 
-            if (mtarg == &youmonst) {
+            if (mtarg == &g.youmonst) {
                 if (mattacku(mtmp))
                     return 2;
             } else {
@@ -1170,7 +1170,7 @@ int after; /* this is extra fast monster movement */
                  * nothing will happen.
                  */
                 if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED)
-                    && rn2(4) && mtarg != &youmonst) {
+                    && rn2(4) && mtarg != &g.youmonst) {
 
                     /* Can monster see? If it can, it can retaliate
                      * even if the pet is invisible, since it'll see
