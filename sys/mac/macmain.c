@@ -102,7 +102,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
@@ -227,7 +227,7 @@ process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
                 Str255 save_f_p;
                 P2C(*(StringHandle) name, g.plname);
                 set_savefile_name(TRUE);
-                C2P(fqname(SAVEF, SAVEPREFIX, 0), save_f_p);
+                C2P(fqname(g.SAVEF, SAVEPREFIX, 0), save_f_p);
                 force_hdelete(theDirs.dataRefNum, theDirs.dataDirID,
                               save_f_p);
 

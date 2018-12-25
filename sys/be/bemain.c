@@ -88,7 +88,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }

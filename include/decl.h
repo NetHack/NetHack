@@ -8,9 +8,54 @@
 
 #define E extern
 
-E char SAVEF[];
-#ifdef MICRO
-E char SAVEP[];
+#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
+#define LOCKNAMESIZE (PL_NSIZ + 14) /* long enough for uid+name+.99 */
+#define LOCKNAMEINIT "1lock"
+#define BONESINIT "bonesnn.xxx"
+#define BONESSIZE sizeof(BONESINIT)
+#else
+#if defined(MFLOPPY)
+#define LOCKNAMESIZE FILENAME
+#define LOCKNAMEINIT ""
+#define BONESINIT ""
+#define BONESSIZE FILENAME
+#endif
+#if defined(VMS)
+#define LOCKNAMESIZE (PL_NSIZ + 17) /* long enough for _uid+name+.99;1 */
+#define LOCKNAMEINIT "1lock"
+#define BONESINIT "bonesnn.xxx;1"
+#define BONESSIZE sizeof(BONESINIT)
+#endif
+#if defined(WIN32)
+#define LOCKNAMESIZE (PL_NSIZ + 25) /* long enough for username+-+name+.99 */
+#define LOCKNAMEINIT ""
+#define BONESINIT "bonesnn.xxx"
+#define BONESSIZE sizeof(BONESINIT)
+#endif
+#endif
+
+#if defined(UNIX) || defined(__BEOS__)
+#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
+#else
+#ifdef VMS
+#define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */
+#else
+#if defined(WIN32)
+#define SAVESIZE (PL_NSIZ + 40) /* username-player.NetHack-saved-game */
+#else
+#define SAVESIZE FILENAME /* from macconf.h or pcconf.h */
+#endif
+#endif
+#endif
+
+/* used in files.c */
+#ifdef HOLD_LOCKFILE_OPEN
+struct level_ftrack {
+    int init;
+    int fd;    /* file descriptor for level file     */
+    int oflag; /* open flags                         */
+    boolean nethack_thinks_it_is_open; /* Does NetHack think it's open? */
+};
 #endif
 
 /* max size of a windowtype option */
@@ -136,8 +181,6 @@ struct kinfo {
 #define NO_KILLER_PREFIX 2
     char name[BUFSZ]; /* actual killer name */
 };
-
-E char lock[];
 
 E const schar xdir[], ydir[], zdir[];
 
@@ -796,6 +839,16 @@ struct instance_globals {
     boolean chosen_symset_start;
     boolean chosen_symset_end;
     int symset_which_set;
+#ifdef HOLD_LOCKFILE_OPEN
+    struct level_ftrack lftrack;
+#endif /*HOLD_LOCKFILE_OPEN*/
+    char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
+#ifdef MICRO
+    char SAVEP[SAVESIZE]; /* holds path of directory for save file */
+#endif
+    char bones[BONESSIZE];
+    char lock[LOCKNAMESIZE];
+
 
     /* hack.c */
     anything tmp_anything;

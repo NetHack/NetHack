@@ -67,38 +67,6 @@ const
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #endif
 
-#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
-char bones[] = "bonesnn.xxx";
-char lock[PL_NSIZ + 14] = "1lock"; /* long enough for uid+name+.99 */
-#else
-#if defined(MFLOPPY)
-char bones[FILENAME]; /* pathname of bones files */
-char lock[FILENAME];  /* pathname of level files */
-#endif
-#if defined(VMS)
-char bones[] = "bonesnn.xxx;1";
-char lock[PL_NSIZ + 17] = "1lock"; /* long enough for _uid+name+.99;1 */
-#endif
-#if defined(WIN32)
-char bones[] = "bonesnn.xxx";
-char lock[PL_NSIZ + 25]; /* long enough for username+-+name+.99 */
-#endif
-#endif
-
-#if defined(UNIX) || defined(__BEOS__)
-#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
-#else
-#ifdef VMS
-#define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */
-#else
-#if defined(WIN32)
-#define SAVESIZE (PL_NSIZ + 40) /* username-player.NetHack-saved-game */
-#else
-#define SAVESIZE FILENAME /* from macconf.h or pcconf.h */
-#endif
-#endif
-#endif
-
 #if !defined(SAVE_EXTENSION)
 #ifdef MICRO
 #define SAVE_EXTENSION ".sav"
@@ -108,18 +76,7 @@ char lock[PL_NSIZ + 25]; /* long enough for username+-+name+.99 */
 #endif
 #endif
 
-char SAVEF[SAVESIZE]; /* holds relative path of save file from playground */
-#ifdef MICRO
-char SAVEP[SAVESIZE]; /* holds path of directory for save file */
-#endif
-
 #ifdef HOLD_LOCKFILE_OPEN
-struct level_ftrack {
-    int init;
-    int fd;    /* file descriptor for level file     */
-    int oflag; /* open flags                         */
-    boolean nethack_thinks_it_is_open; /* Does NetHack think it's open? */
-} lftrack;
 #if defined(WIN32)
 #include <share.h>
 #endif
@@ -435,18 +392,18 @@ set_lock_and_bones()
 {
     if (!g.ramdisk) {
         Strcpy(levels, g.permbones);
-        Strcpy(bones, g.permbones);
+        Strcpy(g.bones, g.permbones);
     }
     append_slash(g.permbones);
     append_slash(g.levels);
 #ifdef AMIGA
     strncat(levels, bbs_id, PATHLEN);
 #endif
-    append_slash(bones);
-    Strcat(bones, "bonesnn.*");
-    Strcpy(lock, g.levels);
+    append_slash(g.bones);
+    Strcat(g.bones, "bonesnn.*");
+    Strcpy(g.lock, g.levels);
 #ifndef AMIGA
-    Strcat(lock, g.alllevels);
+    Strcat(g.lock, g.alllevels);
 #endif
     return;
 }
@@ -485,8 +442,8 @@ char errbuf[];
 
     if (errbuf)
         *errbuf = '\0';
-    set_levelfile_name(lock, lev);
-    fq_lock = fqname(lock, LEVELPREFIX, 0);
+    set_levelfile_name(g.lock, lev);
+    fq_lock = fqname(g.lock, LEVELPREFIX, 0);
 
 #if defined(MICRO) || defined(WIN32)
 /* Use O_TRUNC to force the file to be shortened if it already
@@ -511,7 +468,7 @@ char errbuf[];
         g.level_info[lev].flags |= LFILE_EXISTS;
     else if (errbuf) /* failure explanation */
         Sprintf(errbuf, "Cannot create file \"%s\" for level %d (errno %d).",
-                lock, lev, errno);
+                g.lock, lev, errno);
 
     return fd;
 }
@@ -526,8 +483,8 @@ char errbuf[];
 
     if (errbuf)
         *errbuf = '\0';
-    set_levelfile_name(lock, lev);
-    fq_lock = fqname(lock, LEVELPREFIX, 0);
+    set_levelfile_name(g.lock, lev);
+    fq_lock = fqname(g.lock, LEVELPREFIX, 0);
 #ifdef MFLOPPY
     /* If not currently accessible, swap it in. */
     if (g.level_info[lev].where != ACTIVE)
@@ -549,7 +506,7 @@ char errbuf[];
        might end up being too big for nethack's BUFSZ */
     if (fd < 0 && errbuf)
         Sprintf(errbuf, "Cannot open file \"%s\" for level %d (errno %d).",
-                lock, lev, errno);
+                g.lock, lev, errno);
 
     return fd;
 }
@@ -563,12 +520,12 @@ int lev;
      * call create_levfile(), so always assume that it exists.
      */
     if (lev == 0 || (g.level_info[lev].flags & LFILE_EXISTS)) {
-        set_levelfile_name(lock, lev);
+        set_levelfile_name(g.lock, lev);
 #ifdef HOLD_LOCKFILE_OPEN
         if (lev == 0)
             really_close();
 #endif
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
         g.level_info[lev].flags &= ~LFILE_EXISTS;
     }
 }
@@ -624,31 +581,31 @@ int lev, oflag;
 {
     int reslt, fd;
 
-    if (!lftrack.init) {
-        lftrack.init = 1;
-        lftrack.fd = -1;
+    if (!g.lftrack.init) {
+        g.lftrack.init = 1;
+        g.lftrack.fd = -1;
     }
-    if (lftrack.fd >= 0) {
+    if (g.lftrack.fd >= 0) {
         /* check for compatible access */
-        if (lftrack.oflag == oflag) {
-            fd = lftrack.fd;
+        if (g.lftrack.oflag == oflag) {
+            fd = g.lftrack.fd;
             reslt = lseek(fd, 0L, SEEK_SET);
             if (reslt == -1L)
                 panic("open_levelfile_exclusively: lseek failed %d", errno);
-            lftrack.nethack_thinks_it_is_open = TRUE;
+            g.lftrack.nethack_thinks_it_is_open = TRUE;
         } else {
             really_close();
             fd = sopen(name, oflag, SH_DENYRW, FCMASK);
-            lftrack.fd = fd;
-            lftrack.oflag = oflag;
-            lftrack.nethack_thinks_it_is_open = TRUE;
+            g.lftrack.fd = fd;
+            g.lftrack.oflag = oflag;
+            g.lftrack.nethack_thinks_it_is_open = TRUE;
         }
     } else {
         fd = sopen(name, oflag, SH_DENYRW, FCMASK);
-        lftrack.fd = fd;
-        lftrack.oflag = oflag;
+        g.lftrack.fd = fd;
+        g.lftrack.oflag = oflag;
         if (fd >= 0)
-            lftrack.nethack_thinks_it_is_open = TRUE;
+            g.lftrack.nethack_thinks_it_is_open = TRUE;
     }
     return fd;
 }
@@ -658,12 +615,12 @@ really_close()
 {
     int fd;
 
-    if (lftrack.init) {
-        fd = lftrack.fd;
+    if (g.lftrack.init) {
+        fd = g.lftrack.fd;
 
-        lftrack.nethack_thinks_it_is_open = FALSE;
-        lftrack.fd = -1;
-        lftrack.oflag = 0;
+        g.lftrack.nethack_thinks_it_is_open = FALSE;
+        g.lftrack.fd = -1;
+        g.lftrack.oflag = 0;
         if (fd != -1)
             (void) close(fd);
     }
@@ -674,10 +631,10 @@ int
 nhclose(fd)
 int fd;
 {
-    if (lftrack.fd == fd) {
+    if (g.lftrack.fd == fd) {
         really_close(); /* close it, but reopen it to hold it */
         fd = open_levelfile(0, (char *) 0);
-        lftrack.nethack_thinks_it_is_open = FALSE;
+        g.lftrack.nethack_thinks_it_is_open = FALSE;
         return 0;
     }
     return close(fd);
@@ -761,14 +718,14 @@ set_bonestemp_name()
 {
     char *tf;
 
-    tf = rindex(lock, '.');
+    tf = rindex(g.lock, '.');
     if (!tf)
-        tf = eos(lock);
+        tf = eos(g.lock);
     Sprintf(tf, ".bn");
 #ifdef VMS
     Strcat(tf, ";1");
 #endif
-    return lock;
+    return g.lock;
 }
 
 int
@@ -782,7 +739,7 @@ char errbuf[];
 
     if (errbuf)
         *errbuf = '\0';
-    *bonesid = set_bonesfile_name(bones, lev);
+    *bonesid = set_bonesfile_name(g.bones, lev);
     file = set_bonestemp_name();
     file = fqname(file, BONESPREFIX, 0);
 
@@ -799,7 +756,7 @@ char errbuf[];
 #endif
 #endif
     if (fd < 0 && errbuf) /* failure explanation */
-        Sprintf(errbuf, "Cannot create bones \"%s\", id %s (errno %d).", lock,
+        Sprintf(errbuf, "Cannot create bones \"%s\", id %s (errno %d).", g.lock,
                 *bonesid, errno);
 
 #if defined(VMS) && !defined(SECURE)
@@ -838,8 +795,8 @@ d_level *lev;
     const char *fq_bones, *tempname;
     int ret;
 
-    (void) set_bonesfile_name(bones, lev);
-    fq_bones = fqname(bones, BONESPREFIX, 0);
+    (void) set_bonesfile_name(g.bones, lev);
+    fq_bones = fqname(g.bones, BONESPREFIX, 0);
     tempname = set_bonestemp_name();
     tempname = fqname(tempname, BONESPREFIX, 1);
 
@@ -865,8 +822,8 @@ char **bonesid;
     const char *fq_bones;
     int fd;
 
-    *bonesid = set_bonesfile_name(bones, lev);
-    fq_bones = fqname(bones, BONESPREFIX, 0);
+    *bonesid = set_bonesfile_name(g.bones, lev);
+    fq_bones = fqname(g.bones, BONESPREFIX, 0);
     nh_uncompress(fq_bones); /* no effect if nonexistent */
 #ifdef MAC
     fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
@@ -880,8 +837,8 @@ int
 delete_bonesfile(lev)
 d_level *lev;
 {
-    (void) set_bonesfile_name(bones, lev);
-    return !(unlink(fqname(bones, BONESPREFIX, 0)) < 0);
+    (void) set_bonesfile_name(g.bones, lev);
+    return !(unlink(fqname(g.bones, BONESPREFIX, 0)) < 0);
 }
 
 /* assume we're compressing the recently read or created bonesfile, so the
@@ -889,7 +846,7 @@ d_level *lev;
 void
 compress_bonesfile()
 {
-    nh_compress(fqname(bones, BONESPREFIX, 0));
+    nh_compress(fqname(g.bones, BONESPREFIX, 0));
 }
 
 /* ----------  END BONES FILE HANDLING ----------- */
@@ -903,28 +860,28 @@ set_savefile_name(regularize_it)
 boolean regularize_it;
 {
 #ifdef VMS
-    Sprintf(SAVEF, "[.save]%d%s", getuid(), g.plname);
+    Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
     if (regularize_it)
-        regularize(SAVEF + 7);
-    Strcat(SAVEF, ";1");
+        regularize(g.SAVEF + 7);
+    Strcat(g.SAVEF, ";1");
 #else
 #if defined(MICRO)
-    Strcpy(SAVEF, SAVEP);
+    Strcpy(g.SAVEF, g.SAVEP);
 #ifdef AMIGA
-    strncat(SAVEF, bbs_id, PATHLEN);
+    strncat(g.SAVEF, bbs_id, PATHLEN);
 #endif
     {
-        int i = strlen(SAVEP);
+        int i = strlen(g.SAVEP);
 #ifdef AMIGA
-        /* g.plname has to share space with SAVEP and ".sav" */
-        (void) strncat(SAVEF, g.plname, FILENAME - i - 4);
+        /* g.plname has to share space with g.SAVEP and ".sav" */
+        (void) strncat(g.SAVEF, g.plname, FILENAME - i - 4);
 #else
-        (void) strncat(SAVEF, g.plname, 8);
+        (void) strncat(g.SAVEF, g.plname, 8);
 #endif
         if (regularize_it)
-            regularize(SAVEF + i);
+            regularize(g.SAVEF + i);
     }
-    Strcat(SAVEF, SAVE_EXTENSION);
+    Strcat(g.SAVEF, SAVE_EXTENSION);
 #else
 #if defined(WIN32)
     {
@@ -939,12 +896,12 @@ boolean regularize_it;
         if (regularize_it)
             ++legal; /* skip '*' wildcard character */
         (void) fname_encode(legal, '%', fnamebuf, encodedfnamebuf, BUFSZ);
-        Sprintf(SAVEF, "%s%s", encodedfnamebuf, SAVE_EXTENSION);
+        Sprintf(g.SAVEF, "%s%s", encodedfnamebuf, SAVE_EXTENSION);
     }
 #else  /* not VMS or MICRO or WIN32 */
-    Sprintf(SAVEF, "save/%d%s", (int) getuid(), g.plname);
+    Sprintf(g.SAVEF, "save/%d%s", (int) getuid(), g.plname);
     if (regularize_it)
-        regularize(SAVEF + 5); /* avoid . or / in name */
+        regularize(g.SAVEF + 5); /* avoid . or / in name */
 #endif /* WIN32 */
 #endif /* MICRO */
 #endif /* VMS   */
@@ -955,7 +912,7 @@ void
 save_savefile_name(fd)
 int fd;
 {
-    (void) write(fd, (genericptr_t) SAVEF, sizeof(SAVEF));
+    (void) write(fd, (genericptr_t) g.SAVEF, sizeof(g.SAVEF));
 }
 #endif
 
@@ -966,17 +923,17 @@ set_error_savefile()
 {
 #ifdef VMS
     {
-        char *semi_colon = rindex(SAVEF, ';');
+        char *semi_colon = rindex(g.SAVEF, ';');
 
         if (semi_colon)
             *semi_colon = '\0';
     }
-    Strcat(SAVEF, ".e;1");
+    Strcat(g.SAVEF, ".e;1");
 #else
 #ifdef MAC
-    Strcat(SAVEF, "-e");
+    Strcat(g.SAVEF, "-e");
 #else
-    Strcat(SAVEF, ".e");
+    Strcat(g.SAVEF, ".e");
 #endif
 #endif
 }
@@ -989,7 +946,7 @@ create_savefile()
     const char *fq_save;
     int fd;
 
-    fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+    fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
 #if defined(MICRO) || defined(WIN32)
     fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 #else
@@ -1020,7 +977,7 @@ open_savefile()
     const char *fq_save;
     int fd;
 
-    fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+    fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
 #ifdef MAC
     fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
 #else
@@ -1033,7 +990,7 @@ open_savefile()
 int
 delete_savefile()
 {
-    (void) unlink(fqname(SAVEF, SAVEPREFIX, 0));
+    (void) unlink(fqname(g.SAVEF, SAVEPREFIX, 0));
     return 0; /* for restore_saved_game() (ex-xxxmain.c) test */
 }
 
@@ -1050,7 +1007,7 @@ restore_saved_game()
     if (!saveDiskPrompt(1))
         return -1;
 #endif /* MFLOPPY */
-    fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+    fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
 
     nh_uncompress(fq_save);
     if ((fd = open_savefile()) < 0)
@@ -1071,11 +1028,11 @@ const char *filename;
     int fd;
     char *result = 0;
 
-    Strcpy(SAVEF, filename);
+    Strcpy(g.SAVEF, filename);
 #ifdef COMPRESS_EXTENSION
-    SAVEF[strlen(SAVEF) - strlen(COMPRESS_EXTENSION)] = '\0';
+    g.SAVEF[strlen(g.SAVEF) - strlen(COMPRESS_EXTENSION)] = '\0';
 #endif
-    nh_uncompress(SAVEF);
+    nh_uncompress(g.SAVEF);
     if ((fd = open_savefile()) >= 0) {
         if (validate(fd, filename) == 0) {
             char tplname[PL_NSIZ];
@@ -1084,7 +1041,7 @@ const char *filename;
         }
         (void) nhclose(fd);
     }
-    nh_compress(SAVEF);
+    nh_compress(g.SAVEF);
 
     return result;
 #if 0
@@ -1133,9 +1090,9 @@ get_saved_games()
         Strcpy(g.plname, "*");
         set_savefile_name(FALSE);
 #if defined(ZLIB_COMP)
-        Strcat(SAVEF, COMPRESS_EXTENSION);
+        Strcat(g.SAVEF, COMPRESS_EXTENSION);
 #endif
-        fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+        fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
 
         n = 0;
         foundfile = foundfile_buffer();
@@ -1202,7 +1159,7 @@ get_saved_games()
 #ifdef VMS
     Strcpy(g.plname, "*");
     set_savefile_name(FALSE);
-    j = vms_get_saved_games(SAVEF, &result);
+    j = vms_get_saved_games(g.SAVEF, &result);
 #endif /* VMS */
 
     if (j > 0) {
@@ -2350,8 +2307,8 @@ char *origbuf;
             g.saveprompt = sysflags.asksavedisk;
 #endif
 
-        (void) strncpy(SAVEP, bufp, SAVESIZE - 1);
-        append_slash(SAVEP);
+        (void) strncpy(g.SAVEP, bufp, SAVESIZE - 1);
+        append_slash(g.SAVEP);
 #endif /* MICRO */
 #endif /*NOCWD_ASSUMPTIONS*/
 
@@ -3622,7 +3579,7 @@ recover_savefile()
         != sizeof(savelev)) {
         raw_printf(
          "\nCheckpointing was not in effect for %s -- recovery impossible.\n",
-                   lock);
+                   g.lock);
         (void) nhclose(gfd);
         return FALSE;
     }
@@ -3634,7 +3591,7 @@ recover_savefile()
         || (read(gfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
             != sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ)
         || (read(gfd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz)) {
-        raw_printf("\nError reading %s -- can't recover.\n", lock);
+        raw_printf("\nError reading %s -- can't recover.\n", g.lock);
         (void) nhclose(gfd);
         return FALSE;
     }
@@ -3650,7 +3607,7 @@ recover_savefile()
     set_savefile_name(TRUE);
     sfd = create_savefile();
     if (sfd < 0) {
-        raw_printf("\nCannot recover savefile %s.\n", SAVEF);
+        raw_printf("\nCannot recover savefile %s.\n", g.SAVEF);
         (void) nhclose(gfd);
         return FALSE;
     }
@@ -3666,7 +3623,7 @@ recover_savefile()
 
     if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
         != sizeof version_data) {
-        raw_printf("\nError writing %s; recovery failed.", SAVEF);
+        raw_printf("\nError writing %s; recovery failed.", g.SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
         (void) nhclose(lfd);
@@ -3676,7 +3633,7 @@ recover_savefile()
 
     if (write(sfd, (genericptr_t) &sfi, sizeof sfi) != sizeof sfi) {
         raw_printf("\nError writing %s; recovery failed (savefile_info).\n",
-                   SAVEF);
+                   g.SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
         (void) nhclose(lfd);
@@ -3687,7 +3644,7 @@ recover_savefile()
     if (write(sfd, (genericptr_t) &pltmpsiz, sizeof pltmpsiz)
         != sizeof pltmpsiz) {
         raw_printf("Error writing %s; recovery failed (player name size).\n",
-                   SAVEF);
+                   g.SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
         (void) nhclose(lfd);
@@ -3697,7 +3654,7 @@ recover_savefile()
 
     if (write(sfd, (genericptr_t) &tmpplbuf, pltmpsiz) != pltmpsiz) {
         raw_printf("Error writing %s; recovery failed (player name).\n",
-                   SAVEF);
+                   g.SAVEF);
         (void) nhclose(gfd);
         (void) nhclose(sfd);
         (void) nhclose(lfd);
@@ -3758,8 +3715,8 @@ recover_savefile()
         if (processed[lev]) {
             const char *fq_lock;
 
-            set_levelfile_name(lock, lev);
-            fq_lock = fqname(lock, LEVELPREFIX, 3);
+            set_levelfile_name(g.lock, lev);
+            fq_lock = fqname(g.lock, LEVELPREFIX, 3);
             (void) unlink(fq_lock);
         }
     }

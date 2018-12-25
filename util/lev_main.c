@@ -1614,11 +1614,6 @@ const char *s2;
 struct attribs attrmax, attrmin;
 /* files.c */
 const char *configfile;
-char lock[ARBITRARY_SIZE];
-char SAVEF[ARBITRARY_SIZE];
-#ifdef MICRO
-char SAVEP[ARBITRARY_SIZE];
-#endif
 /* termcap.c */
 struct tc_lcl_data tc_lcl_data;
 #ifdef TEXTCOLOR

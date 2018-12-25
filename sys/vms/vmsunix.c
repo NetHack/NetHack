@@ -564,7 +564,7 @@ char ***outarray;
     char *charname, wildcard[255 + 1], filename[255 + 1];
     genericptr_t context = 0;
 
-    Strcpy(wildcard, savetemplate); /* plname_from_file overwrites SAVEF */
+    Strcpy(wildcard, savetemplate); /* plname_from_file overwrites g.SAVEF */
     in.mbz = 0; /* class and type; leave them unspecified */
     in.len = (unsigned short) strlen(wildcard);
     in.adr = wildcard;

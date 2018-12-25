@@ -281,7 +281,7 @@ attempt_restore:
     }
 
     if (*g.plname && (fd = restore_saved_game()) >= 0) {
-        const char *fq_save = fqname(SAVEF, SAVEPREFIX, 1);
+        const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
 #ifndef NO_SIGNAL

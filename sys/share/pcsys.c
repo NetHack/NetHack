@@ -285,7 +285,7 @@ int start;
         clear_nhwindow(WIN_MESSAGE);
         pline("If save file is on a save disk, insert that disk now.");
         mark_synch();
-        Sprintf(qbuf, "File name (default \"%s\"%s) ?", SAVEF,
+        Sprintf(qbuf, "File name (default \"%s\"%s) ?", g.SAVEF,
                 start ? "" : ", <Esc> cancels save");
         getlin(qbuf, buf);
         clear_nhwindow(WIN_MESSAGE);
@@ -293,11 +293,11 @@ int start;
             return 0;
 
         /* Strip any whitespace. Also, if nothing was entered except
-         * whitespace, do not change the value of SAVEF.
+         * whitespace, do not change the value of g.SAVEF.
          */
         for (bp = buf; *bp; bp++)
             if (!isspace((uchar) *bp)) {
-                strncpy(SAVEF, bp, PATHLEN);
+                strncpy(g.SAVEF, bp, PATHLEN);
                 break;
             }
     }

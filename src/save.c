@@ -120,9 +120,9 @@ dosave0()
     if (iflags.save_uburied)
         u.uburied = 1, iflags.save_uburied = 0;
 
-    if (!g.program_state.something_worth_saving || !SAVEF[0])
+    if (!g.program_state.something_worth_saving || !g.SAVEF[0])
         return 0;
-    fq_save = fqname(SAVEF, SAVEPREFIX, 1); /* level files take 0 */
+    fq_save = fqname(g.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
 
 #if defined(UNIX) || defined(VMS)
     sethanguphandler((void FDECL((*), (int) )) SIG_IGN);

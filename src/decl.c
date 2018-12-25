@@ -368,6 +368,16 @@ const struct instance_globals g_init = {
     FALSE, /* chosen_symset_start */
     FALSE, /* chosen_symset_end */
     0, /* symset_which_set */
+#ifdef HOLD_LOCKFILE_OPEN
+    DUMMY, /* lftrack */
+#endif
+    DUMMY, /* SAVEF */
+#ifdef MICRO
+    DUMMY, /* SAVEP */
+#endif
+    BONESINIT, /* bones */
+    LOCKNAMEINIT, /* lock */
+
 
     /* hack.c */
     UNDEFINED_VALUES,

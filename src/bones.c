@@ -6,7 +6,6 @@
 #include "hack.h"
 #include "lev.h"
 
-extern char bones[]; /* from files.c */
 #ifdef MFLOPPY
 extern long bytes_counted;
 #endif
@@ -573,7 +572,7 @@ getbones()
     if (fd < 0)
         return 0;
 
-    if (validate(fd, bones) != 0) {
+    if (validate(fd, g.bones) != 0) {
         if (!wizard)
             pline("Discarding unuseable bones; no need to panic...");
         ok = FALSE;
