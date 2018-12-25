@@ -1182,7 +1182,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     wprintw(win, "%s", buf);
 
-    print_statdiff("$", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff("$", &prevau, money_cnt(g.invent), STAT_GOLD);
 
     /* HP/Pw use special coloring rules */
     attr_t hpattr, pwattr;
@@ -1220,7 +1220,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
 
     curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
@@ -1293,7 +1293,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "Pw:");
     draw_bar(FALSE, u.uen, u.uenmax, NULL);
 
-    print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff(" $", &prevau, money_cnt(g.invent), STAT_GOLD);
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
@@ -1301,7 +1301,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 #endif /* SCORE_ON_BOTL */
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
 
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 
@@ -1409,7 +1409,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         wprintw(win, "%d", depth(&u.uz));
     wmove(win, y++, x);
 
-    print_statdiff("Gold:          ", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff("Gold:          ", &prevau, money_cnt(g.invent), STAT_GOLD);
     wmove(win, y++, x);
 
     /* HP/Pw use special coloring rules */
@@ -1453,7 +1453,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     if (flags.time) {
-        print_statdiff("Time:          ", &prevtime, moves, STAT_TIME);
+        print_statdiff("Time:          ", &prevtime, g.moves, STAT_TIME);
         wmove(win, y++, x);
     }
 

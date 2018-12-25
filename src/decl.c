@@ -313,7 +313,9 @@ const struct instance_globals g_init = {
     0, /* wailmsg */
     NULL, /* migrating_objs */
     NULL, /* billobjs */
+#if defined(MICRO) || defined(WIN32)
     UNDEFINED_VALUES, /* hackdir */
+#endif /* MICRO || WIN32 */
     DUMMY, /* youmonst */
     NULL, /* invent */
 

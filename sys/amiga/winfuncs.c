@@ -2317,7 +2317,7 @@ register int x, y;
         clipymax = saveymax;
         clipxmax = savexmax;
 #endif
-        if (on_level(&u.uz0, &u.uz) && !restoring && moves > 1)
+        if (on_level(&u.uz0, &u.uz) && !restoring && g.moves > 1)
             (void) doredraw();
         flush_glyph_buffer(amii_wins[WIN_MAP]->win);
     }

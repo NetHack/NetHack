@@ -2558,7 +2558,7 @@ void NetHackQtStatusWindow::updateStats()
 	dlevel.setLabel(buf,(long)depth(&u.uz));
     }
 
-    gold.setLabel("Au:", money_cnt(invent));
+    gold.setLabel("Au:", money_cnt(g.invent));
     if (u.mtimedone) {
 	// You're a monster!
 
@@ -2592,7 +2592,7 @@ void NetHackQtStatusWindow::updateStats()
 	align.setLabel("Lawful");
     }
 
-    if (::flags.time) time.setLabel("Time:",(long)moves);
+    if (::flags.time) time.setLabel("Time:",(long)g.moves);
     else time.setLabel("");
 #ifdef SCORE_ON_BOTL
     if (::flags.showscore) {

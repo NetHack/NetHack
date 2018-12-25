@@ -51,12 +51,12 @@ int fd;
 #else
 #if (defined(MICRO)) && !defined(NO_FSTAT)
     if(fstat(fd, &buf)) {
-	if(moves > 1) pline("Cannot get status of saved level? ");
+	if(g.moves > 1) pline("Cannot get status of saved level? ");
 	else pline("Cannot get status of saved game.");
 	return(0);
     } 
     if(comp_times(buf.st_mtime)) { 
-	if(moves > 1) pline("Saved level is out of date.");
+	if(g.moves > 1) pline("Saved level is out of date.");
 	else pline("Saved game is out of date. ");
 	/* This problem occurs enough times we need to give the player
 	 * some more information about what causes it, and how to fix.

@@ -1362,7 +1362,7 @@ int i;
             val = (long) 0L;
             break; /* special */
         case F_GOLD:
-            val = money_cnt(invent);
+            val = money_cnt(g.invent);
             if (val < 0L)
                 val = 0L; /* ought to issue impossible() and discard gold */
             break;
@@ -1392,7 +1392,7 @@ int i;
             val = (long) u.ualign.type;
             break;
         case F_TIME:
-            val = flags.time ? (long) moves : 0L;
+            val = flags.time ? (long) g.moves : 0L;
             break;
         case F_SCORE:
 #ifdef SCORE_ON_BOTL

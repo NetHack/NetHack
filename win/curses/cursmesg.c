@@ -55,7 +55,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         return;
     }
 
-    if (suppress_turn == moves) {
+    if (suppress_turn == g.moves) {
         return;
     }
 
@@ -94,7 +94,7 @@ curses_message_win_puts(const char *message, boolean recursed)
                 /* Pause until key is hit - Esc suppresses any further
                    messages that turn */
                 if (curses_more() == '\033') {
-                    suppress_turn = moves;
+                    suppress_turn = g.moves;
                     return;
                 }
             } else {
@@ -566,7 +566,7 @@ mesg_add_line(char *mline)
     nhprev_mesg *current_mesg = malloc(sizeof (nhprev_mesg));
 
     current_mesg->str = curses_copy_of(mline);
-    current_mesg->turn = moves;
+    current_mesg->turn = g.moves;
     current_mesg->next_mesg = NULL;
 
     if (num_messages == 0) {
