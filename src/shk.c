@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545383616 2018/12/21 09:13:36 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1545774524 2018/12/25 21:48:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.145 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -921,7 +921,7 @@ register struct obj *obj, *merge;
             if (onbill(obj, shkp, TRUE))
                 break;
     }
-    /* sanity check, more or less */
+    /* sanity check, in case obj is on bill but not marked 'unpaid' */
     if (!shkp)
         shkp = shop_keeper(*u.ushops);
     /*
@@ -1962,8 +1962,8 @@ unsigned id;
     return (struct obj *) 0;
 }
 
-/* Returns the price of an arbitrary item in the shop.
-   Returns 0 if the item doesn't belong to a shopkeeper. */
+/* Returns the price of an arbitrary item in the shop,
+   0 if the item doesn't belong to a shopkeeper or hero is not in the shop. */
 long
 get_cost_of_shop_item(obj)
 register struct obj *obj;
@@ -1972,16 +1972,12 @@ register struct obj *obj;
     xchar x, y;
     long cost = 0L;
 
-    if (*u.ushops
-        && obj->oclass != COIN_CLASS
+    if (*u.ushops && obj->oclass != COIN_CLASS
         && obj != uball && obj != uchain
         && get_obj_location(obj, &x, &y, 0)
-        && (obj->unpaid
-            || (obj->where == OBJ_FLOOR
-                && !obj->no_charge && costly_spot(x, y)))
-        && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
-        && inhishop(shkp)) {
-        cost = obj->quan * get_cost(obj, shkp);
+        && *in_rooms(u.ux, u.uy, SHOPBASE) == *in_rooms(x, y, SHOPBASE)
+        && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
+        cost = obj->no_charge ? 0L : obj->quan * get_cost(obj, shkp);
         if (Has_contents(obj))
             cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
     }
@@ -4168,9 +4164,8 @@ register struct obj *first_obj;
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
         if (otmp->oclass == COIN_CLASS)
             continue;
-        cost = (otmp->no_charge || otmp == uball || otmp == uchain)
-                   ? 0L
-                   : get_cost(otmp, (struct monst *) 0);
+        cost = (otmp->no_charge || otmp == uball || otmp == uchain) ? 0L
+                 : get_cost(otmp, shkp);
         contentsonly = !cost;
         if (Has_contents(otmp))
             cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
