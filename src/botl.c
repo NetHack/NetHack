@@ -585,8 +585,8 @@ bot_via_windowport()
     Sprintf(g.blstats[idx][BL_GOLD].val, "%s:%ld",
             (iflags.in_dumplog || iflags.invis_goldsym) ? "$"
               : encglyph(objnum_to_glyph(GOLD_PIECE)),
-            blstats[idx][BL_GOLD].a.a_long);
-    valset[BL_GOLD] = TRUE; /* indicate val already set */
+            g.blstats[idx][BL_GOLD].a.a_long);
+    g.valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
     g.blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
