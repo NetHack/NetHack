@@ -129,7 +129,7 @@ int x, y;
 {
     struct obj *otmp;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (otmp->cursed)
             return TRUE;
     return FALSE;
@@ -430,7 +430,7 @@ int udist;
                 edog->droptime = monstermoves;
             }
     } else {
-        if ((obj = level.objects[omx][omy]) != 0
+        if ((obj = g.level.objects[omx][omy]) != 0
             && !index(nofetch, obj->oclass)
 #ifdef MAIL
             && obj->otyp != SCR_MAIL
@@ -1082,7 +1082,7 @@ int after; /* this is extra fast monster movement */
         /* dog eschews cursed objects, but likes dog food */
         /* (minion isn't interested; `cursemsg' stays FALSE) */
         if (has_edog)
-            for (obj = level.objects[nx][ny]; obj; obj = obj->nexthere) {
+            for (obj = g.level.objects[nx][ny]; obj; obj = obj->nexthere) {
                 if (obj->cursed) {
                     cursemsg[i] = TRUE;
                 } else if ((otyp = dogfood(mtmp, obj)) < MANFOOD
@@ -1213,7 +1213,7 @@ int after; /* this is extra fast monster movement */
             /* describe top item of pile, not necessarily cursed item itself;
                don't use glyph_at() here--it would return the pet but we want
                to know whether an object is remembered at this map location */
-            struct obj *o = (!Hallucination && level.flags.hero_memory
+            struct obj *o = (!Hallucination && g.level.flags.hero_memory
                              && glyph_is_object(levl[nix][niy].glyph))
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;

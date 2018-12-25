@@ -416,18 +416,18 @@ int xkill_flags, how;
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
-            killer.name[0] = 0; /* drown() sets its own killer */
+            g.killer.name[0] = 0; /* drown() sets its own killer */
             (void) drown();
         } else if (how == BURNING) {
-            killer.name[0] = 0; /* lava_effects() sets own killer */
+            g.killer.name[0] = 0; /* lava_effects() sets own killer */
             (void) lava_effects();
         } else {
             coord xy;
 
             /* use more specific killer if specified */
-            if (!killer.name[0]) {
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "falling drawbridge");
+            if (!g.killer.name[0]) {
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "falling drawbridge");
             }
             done(how);
             /* So, you didn't die */
@@ -447,7 +447,7 @@ int xkill_flags, how;
     } else {
         int entitycnt;
 
-        killer.name[0] = 0;
+        g.killer.name[0] = 0;
 /* fake "digested to death" damage-type suppresses corpse */
 #define mk_message(dest) (((dest & XKILL_NOMSG) != 0) ? (char *) 0 : "")
 #define mk_corpse(dest) (((dest & XKILL_NOCORPSE) != 0) ? AD_DGST : AD_PHYS)
@@ -589,8 +589,8 @@ struct entity *etmp;
     } else {
         if (crm->typ == DRAWBRIDGE_DOWN) {
             if (is_u(etmp)) {
-                killer.format = NO_KILLER_PREFIX;
-                Strcpy(killer.name,
+                g.killer.format = NO_KILLER_PREFIX;
+                Strcpy(g.killer.name,
                        "crushed to death underneath a drawbridge");
             }
             pline("%s crushed underneath the drawbridge.",
@@ -707,8 +707,8 @@ struct entity *etmp;
                       E_phrase(etmp, "disappear"));
         }
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "closing drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "closing drawbridge");
             e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
@@ -738,8 +738,8 @@ struct entity *etmp;
                     pline("%s into the %s.", E_phrase(etmp, "fall"),
                           lava ? hliquid("lava") : "moat");
             }
-        killer.format = NO_KILLER_PREFIX;
-        Strcpy(killer.name, "fell from a drawbridge");
+        g.killer.format = NO_KILLER_PREFIX;
+        Strcpy(g.killer.name, "fell from a drawbridge");
         e_died(etmp, /* CRUSHING is arbitrary */
                XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                is_pool(etmp->ex, etmp->ey) ? DROWNING
@@ -750,7 +750,7 @@ struct entity *etmp;
 }
 
 /* clear stale reason for death before returning */
-#define nokiller() (killer.name[0] = '\0', killer.format = 0)
+#define nokiller() (g.killer.name[0] = '\0', g.killer.format = 0)
 
 /*
  * Close the drawbridge located at x,y
@@ -947,8 +947,8 @@ int x, y;
             if (e_inview)
                 pline("%s blown apart by flying debris.",
                       E_phrase(etmp2, "are"));
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "exploding drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "exploding drawbridge");
             e_died(etmp2,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/
@@ -979,8 +979,8 @@ int x, y;
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));
                 }
             }
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "collapsing drawbridge");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "collapsing drawbridge");
             e_died(etmp1,
                    XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
                    CRUSHING); /*no corpse*/

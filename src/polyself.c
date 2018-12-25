@@ -202,11 +202,11 @@ const char *fmt, *arg;
         struct kinfo *kptr = find_delayed_killer(POLYMORPH);
 
         if (kptr != (struct kinfo *) 0 && kptr->name[0]) {
-            killer.format = kptr->format;
-            Strcpy(killer.name, kptr->name);
+            g.killer.format = kptr->format;
+            Strcpy(g.killer.name, kptr->name);
         } else {
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, "self-genocide");
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, "self-genocide");
         }
         dealloc_killer(kptr);
         done(GENOCIDED);
@@ -359,8 +359,8 @@ newman()
         dead: /* we come directly here if their experience level went to 0 or
                  less */
             Your("new form doesn't seem healthy enough to survive.");
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "unsuccessful polymorph");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "unsuccessful polymorph");
             done(DIED);
             newuhs(FALSE);
             return; /* lifesaved */
@@ -1031,8 +1031,8 @@ rehumanize()
     /* You can't revert back while unchanging */
     if (Unchanging) {
         if (u.mh < 1) {
-            killer.format = NO_KILLER_PREFIX;
-            Strcpy(killer.name, "killed while stuck in creature form");
+            g.killer.format = NO_KILLER_PREFIX;
+            Strcpy(g.killer.name, "killed while stuck in creature form");
             done(DIED);
         } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
             Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
@@ -1049,8 +1049,8 @@ rehumanize()
         /* can only happen if some bit of code reduces u.uhp
            instead of u.mh while poly'd */
         Your("old form was not healthy enough to survive.");
-        Sprintf(killer.name, "reverting to unhealthy %s form", urace.adj);
-        killer.format = KILLED_BY;
+        Sprintf(g.killer.name, "reverting to unhealthy %s form", urace.adj);
+        g.killer.format = KILLED_BY;
         done(DIED);
     }
     nomul(0);
@@ -1401,8 +1401,8 @@ dogaze()
                           l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
                     You("turn to stone...");
-                    killer.format = KILLED_BY;
-                    Strcpy(killer.name, "deliberately meeting Medusa's gaze");
+                    g.killer.format = KILLED_BY;
+                    Strcpy(g.killer.name, "deliberately meeting Medusa's gaze");
                     done(STONING);
                 }
             }
@@ -1447,7 +1447,7 @@ dohide()
         u.uundetected = 0;
         return 0;
     }
-    if (hides_under(youmonst.data) && !level.objects[u.ux][u.uy]) {
+    if (hides_under(youmonst.data) && !g.level.objects[u.ux][u.uy]) {
         There("is nothing to hide under here.");
         u.uundetected = 0;
         return 0;

@@ -2120,7 +2120,7 @@ int x, y;
                 ++ret;
                 continue;
             }
-            for (otmp = level.objects[dx][dy]; otmp; otmp = otmp->nexthere)
+            for (otmp = g.level.objects[dx][dy]; otmp; otmp = otmp->nexthere)
                 if (Is_container(otmp) && otmp->otrapped) {
                     ++ret; /* we're counting locations, so just */
                     break; /* count the first one in a pile     */

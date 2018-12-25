@@ -263,7 +263,7 @@ struct monst *oracle;
 
     oracle->mpeaceful = 1;
     o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
-    if (o_ridx >= 0 && rooms[o_ridx].rtype == DELPHI)
+    if (o_ridx >= 0 && g.rooms[o_ridx].rtype == DELPHI)
         return TRUE; /* no fixup needed */
 
     /*
@@ -274,14 +274,14 @@ struct monst *oracle;
      */
 
     /* find original delphi chamber; should always succeed */
-    for (ridx = 0; ridx < SIZE(rooms); ++ridx)
-        if (rooms[ridx].orig_rtype == DELPHI)
+    for (ridx = 0; ridx < SIZE(g.rooms); ++ridx)
+        if (g.rooms[ridx].orig_rtype == DELPHI)
             break;
 
-    if (o_ridx != ridx && ridx < SIZE(rooms)) {
+    if (o_ridx != ridx && ridx < SIZE(g.rooms)) {
         /* room found and she's not not in it, so try to move her there */
-        cc.x = (rooms[ridx].lx + rooms[ridx].hx) / 2;
-        cc.y = (rooms[ridx].ly + rooms[ridx].hy) / 2;
+        cc.x = (g.rooms[ridx].lx + g.rooms[ridx].hx) / 2;
+        cc.y = (g.rooms[ridx].ly + g.rooms[ridx].hy) / 2;
         if (enexto(&cc, cc.x, cc.y, oracle->data)) {
             rloc_to(oracle, cc.x, cc.y);
             o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
@@ -291,7 +291,7 @@ struct monst *oracle;
            same as used to happen before this fixup was introduced] */
     }
     if (ridx == o_ridx) /* if she's in her room, mark it as such */
-        rooms[ridx].rtype = DELPHI;
+        g.rooms[ridx].rtype = DELPHI;
     return TRUE; /* keep oracle in new bones file */
 }
 
@@ -456,7 +456,7 @@ make_bones:
         ttmp->tseen = (ttmp->ttyp == HOLE);
     }
     resetobjs(fobj, FALSE);
-    resetobjs(level.buriedobjlist, FALSE);
+    resetobjs(g.level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
     u.ux0 = u.ux, u.uy0 = u.uy;
@@ -489,13 +489,13 @@ make_bones:
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
-    newbones->next = level.bonesinfo;
-    level.bonesinfo = newbones;
+    newbones->next = g.level.bonesinfo;
+    g.level.bonesinfo = newbones;
     /* flag these bones if they are being created in wizard mode;
        they might already be flagged as such, even when we're playing
        in normal mode, if this level came from a previous bones file */
     if (wizard)
-        level.flags.wizard_bones = 1;
+        g.level.flags.wizard_bones = 1;
 
     fd = create_bonesfile(&u.uz, &bonesid, whynot);
     if (fd < 0) {
@@ -632,7 +632,7 @@ getbones()
                     resetobjs(mtmp->minvent, TRUE);
             }
             resetobjs(fobj, TRUE);
-            resetobjs(level.buriedobjlist, TRUE);
+            resetobjs(g.level.buriedobjlist, TRUE);
         }
     }
     (void) nhclose(fd);

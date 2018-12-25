@@ -81,7 +81,7 @@ extern int amii_numcolors;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
-/* Recalculate level.objects[x][y], since this info was not saved. */
+/* Recalculate g.level.objects[x][y], since this info was not saved. */
 STATIC_OVL void
 find_lev_obj()
 {
@@ -91,7 +91,7 @@ find_lev_obj()
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            level.objects[x][y] = (struct obj *) 0;
+            g.level.objects[x][y] = (struct obj *) 0;
 
     /*
      * Reverse the entire fobj chain, which is necessary so that we can
@@ -106,7 +106,7 @@ find_lev_obj()
     }
     /* fobj should now be empty */
 
-    /* Set level.objects (as well as reversing the chain back again) */
+    /* Set g.level.objects (as well as reversing the chain back again) */
     while ((otmp = fobjtmp) != 0) {
         fobjtmp = otmp->nobj;
         place_object(otmp, otmp->ox, otmp->oy);
@@ -190,8 +190,8 @@ boolean ghostly;
             }
         }
         if (!shp || !*shp) {
-            tmp_dam->next = level.damagelist;
-            level.damagelist = tmp_dam;
+            tmp_dam->next = g.level.damagelist;
+            g.level.damagelist = tmp_dam;
             tmp_dam = (struct damage *) alloc(sizeof(*tmp_dam));
         }
     }
@@ -998,7 +998,7 @@ char *reason;
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
     pline("This game is void.");
-    Strcpy(killer.name, reason ? reason : "");
+    Strcpy(g.killer.name, reason ? reason : "");
     done(TRICKED);
 }
 
@@ -1052,7 +1052,7 @@ boolean ghostly;
             pline1(trickbuf);
         trickery(trickbuf);
     }
-    restcemetery(fd, &level.bonesinfo);
+    restcemetery(fd, &g.level.bonesinfo);
     rest_levl(fd,
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     mread(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
@@ -1065,11 +1065,11 @@ boolean ghostly;
     mread(fd, (genericptr_t) &g.sstairs, sizeof(stairway));
     mread(fd, (genericptr_t) &g.updest, sizeof(dest_area));
     mread(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
-    mread(fd, (genericptr_t) &level.flags, sizeof(level.flags));
+    mread(fd, (genericptr_t) &g.level.flags, sizeof(g.level.flags));
     mread(fd, (genericptr_t) g.doors, sizeof(g.doors));
     rest_rooms(fd); /* No joke :-) */
     if (g.nroom)
-        g.doorindex = rooms[g.nroom - 1].fdoor + rooms[g.nroom - 1].doorct;
+        g.doorindex = g.rooms[g.nroom - 1].fdoor + g.rooms[g.nroom - 1].doorct;
     else
         g.doorindex = 0;
 
@@ -1090,14 +1090,14 @@ boolean ghostly;
     find_lev_obj();
     /* restobjchn()'s `frozen' argument probably ought to be a callback
        routine so that we can check for objects being buried under ice */
-    level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
+    g.level.buriedobjlist = restobjchn(fd, ghostly, FALSE);
     billobjs = restobjchn(fd, ghostly, FALSE);
     rest_engravings(fd);
 
     /* reset level.monsters for new level */
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            level.monsters[x][y] = (struct monst *) 0;
+            g.level.monsters[x][y] = (struct monst *) 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);

@@ -379,11 +379,11 @@ struct kinfo *kptr;
     }
     /* more sure killer reason is set up */
     if (kptr && kptr->name[0]) {
-        killer.format = kptr->format;
-        Strcpy(killer.name, kptr->name);
+        g.killer.format = kptr->format;
+        Strcpy(g.killer.name, kptr->name);
     } else {
-        killer.format = NO_KILLER_PREFIX;
-        Strcpy(killer.name, "turned into green slime");
+        g.killer.format = NO_KILLER_PREFIX;
+        Strcpy(g.killer.name, "turned into green slime");
     }
     dealloc_killer(kptr);
 
@@ -410,8 +410,8 @@ struct kinfo *kptr;
     /* life-saved; even so, hero still has turned into green slime;
        player may have genocided green slimes after being infected */
     if ((g.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
-        killer.format = KILLED_BY;
-        Strcpy(killer.name, "slimicide");
+        g.killer.format = KILLED_BY;
+        Strcpy(g.killer.name, "slimicide");
         /* immediately follows "OK, so you don't die." */
         pline("Yes, you do.  Green slime has been genocided...");
         done(GENOCIDED);
@@ -522,11 +522,11 @@ nh_timeout()
             switch (upp - u.uprops) {
             case STONED:
                 if (kptr && kptr->name[0]) {
-                    killer.format = kptr->format;
-                    Strcpy(killer.name, kptr->name);
+                    g.killer.format = kptr->format;
+                    Strcpy(g.killer.name, kptr->name);
                 } else {
-                    killer.format = NO_KILLER_PREFIX;
-                    Strcpy(killer.name, "killed by petrification");
+                    g.killer.format = NO_KILLER_PREFIX;
+                    Strcpy(g.killer.name, "killed by petrification");
                 }
                 dealloc_killer(kptr);
                 /* (unlike sliming, you aren't changing form here) */
@@ -541,20 +541,20 @@ nh_timeout()
             case SICK:
                 You("die from your illness.");
                 if (kptr && kptr->name[0]) {
-                    killer.format = kptr->format;
-                    Strcpy(killer.name, kptr->name);
+                    g.killer.format = kptr->format;
+                    Strcpy(g.killer.name, kptr->name);
                 } else {
-                    killer.format = KILLED_BY_AN;
-                    killer.name[0] = 0; /* take the default */
+                    g.killer.format = KILLED_BY_AN;
+                    g.killer.name[0] = 0; /* take the default */
                 }
                 dealloc_killer(kptr);
 
-                if ((m_idx = name_to_mon(killer.name)) >= LOW_PM) {
+                if ((m_idx = name_to_mon(g.killer.name)) >= LOW_PM) {
                     if (type_is_pname(&mons[m_idx])) {
-                        killer.format = KILLED_BY;
+                        g.killer.format = KILLED_BY;
                     } else if (mons[m_idx].geno & G_UNIQ) {
-                        Strcpy(killer.name, the(killer.name));
-                        killer.format = KILLED_BY;
+                        Strcpy(g.killer.name, the(g.killer.name));
+                        g.killer.format = KILLED_BY;
                     }
                 }
                 u.usick_type = 0;
@@ -658,8 +658,8 @@ nh_timeout()
                 }
                 break;
             case STRANGLED:
-                killer.format = KILLED_BY;
-                Strcpy(killer.name,
+                g.killer.format = KILLED_BY;
+                Strcpy(g.killer.name,
                        (u.uburied) ? "suffocation" : "strangulation");
                 done(DIED);
                 /* must be declining to die in explore|wizard mode;
@@ -1000,9 +1000,9 @@ slip_or_trip()
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
-            Sprintf(killer.name, "tripping over %s corpse",
+            Sprintf(g.killer.name, "tripping over %s corpse",
                     an(mons[otmp->corpsenm].mname));
-            instapetrify(killer.name);
+            instapetrify(g.killer.name);
         }
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {
         pline("%s %s%s on the ice.",

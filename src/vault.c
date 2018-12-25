@@ -228,7 +228,7 @@ char *array;
     register char *ptr;
 
     for (ptr = array; *ptr; ptr++)
-        if (rooms[*ptr - ROOMOFFSET].rtype == VAULT)
+        if (g.rooms[*ptr - ROOMOFFSET].rtype == VAULT)
             return *ptr;
     return '\0';
 }
@@ -496,8 +496,8 @@ invault()
             EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
         } else { /* the initial guard location is a dug door */
             int vlt = EGD(guard)->vroom;
-            xchar lowx = rooms[vlt].lx, hix = rooms[vlt].hx;
-            xchar lowy = rooms[vlt].ly, hiy = rooms[vlt].hy;
+            xchar lowx = g.rooms[vlt].lx, hix = g.rooms[vlt].hx;
+            xchar lowy = g.rooms[vlt].ly, hiy = g.rooms[vlt].hy;
 
             if (x == lowx - 1 && y == lowy - 1)
                 EGD(guard)->fakecorr[0].ftyp = TLCORNER;
@@ -529,8 +529,8 @@ int vroom;
 
     remove_object(gold);
     newsym(gold->ox, gold->oy);
-    nx = rooms[vroom].lx + rn2(2);
-    ny = rooms[vroom].ly + rn2(2);
+    nx = g.rooms[vroom].lx + rn2(2);
+    ny = g.rooms[vroom].ly + rn2(2);
     place_object(gold, nx, ny);
     stackobj(gold);
     newsym(nx, ny);
@@ -543,8 +543,8 @@ struct monst *grd;
     int x, y, typ;
     int vlt = EGD(grd)->vroom;
     char tmp_viz;
-    xchar lox = rooms[vlt].lx - 1, hix = rooms[vlt].hx + 1,
-          loy = rooms[vlt].ly - 1, hiy = rooms[vlt].hy + 1;
+    xchar lox = g.rooms[vlt].lx - 1, hix = g.rooms[vlt].hx + 1,
+          loy = g.rooms[vlt].ly - 1, hiy = g.rooms[vlt].hy + 1;
     struct monst *mon;
     struct obj *gold;
     struct trap *trap;
@@ -1057,8 +1057,8 @@ paygd()
         }
         mnexto(grd);
         pline("%s remits your gold to the vault.", Monnam(grd));
-        gx = rooms[EGD(grd)->vroom].lx + rn2(2);
-        gy = rooms[EGD(grd)->vroom].ly + rn2(2);
+        gx = g.rooms[EGD(grd)->vroom].lx + rn2(2);
+        gy = g.rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
                 g.plname, mons[u.umonster].mname);
         make_grave(gx, gy, buf);

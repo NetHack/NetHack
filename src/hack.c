@@ -17,7 +17,7 @@ STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
 STATIC_DCL boolean FDECL(doorless_door, (int, int));
 STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
 
-#define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
+#define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
 
 /* mode values for findtravelpath() */
 #define TRAVP_TRAVEL 0
@@ -70,7 +70,7 @@ const char *msg;
     coord cc;
     boolean revived = FALSE;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp2) {
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
         if (otmp->otyp == CORPSE
             && (is_rider(&mons[otmp->corpsenm])
@@ -108,7 +108,7 @@ moverock()
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
         /* make sure that this boulder is visible as the top object */
-        if (otmp != level.objects[sx][sy])
+        if (otmp != g.level.objects[sx][sy])
             movobj(otmp, sx, sy);
 
         rx = u.ux + 2 * u.dx; /* boulder destination position */
@@ -462,9 +462,9 @@ xchar x, y;
             dmgtxt = "damage";
         }
         digtxt = "chew a hole in the wall.";
-        if (level.flags.is_maze_lev) {
+        if (g.level.flags.is_maze_lev) {
             lev->typ = ROOM;
-        } else if (level.flags.is_cavernous_lev && !in_town(x, y)) {
+        } else if (g.level.flags.is_cavernous_lev && !in_town(x, y)) {
             lev->typ = CORR;
         } else {
             lev->typ = DOOR;
@@ -560,7 +560,7 @@ dosinkfall()
         losehp(Maybe_Half_Phys(dmg), fell_on_sink, NO_KILLER_PREFIX);
         exercise(A_DEX, FALSE);
         selftouch("Falling, you");
-        for (obj = level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
+        for (obj = g.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj)) {
                 You("fell on %s.", doname(obj));
                 losehp(Maybe_Half_Phys(rnd(3)), fell_on_sink,
@@ -2239,7 +2239,7 @@ register int typewanted;
 
 #define goodtype(rno)   \
     (!typewanted                                                    \
-     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted   \
+     || (typefound = g.rooms[rno - ROOMOFFSET].rtype) == typewanted   \
      || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
@@ -2310,7 +2310,7 @@ register int x, y;
      * See if (x,y) is in a room with subrooms, if so, assume it's the
      * town.  If there are no subrooms, the whole level is in town.
      */
-    for (sroom = &rooms[0]; sroom->hx > 0; sroom++) {
+    for (sroom = &g.rooms[0]; sroom->hx > 0; sroom++) {
         if (sroom->nsubrooms > 0) {
             has_subrooms = TRUE;
             if (inside_room(sroom, x, y))
@@ -2382,7 +2382,7 @@ register boolean newlev;
         u_entered_shop(u.ushops_entered);
 
     for (ptr = &u.uentered[0]; *ptr; ptr++) {
-        int roomno = *ptr - ROOMOFFSET, rt = rooms[roomno].rtype;
+        int roomno = *ptr - ROOMOFFSET, rt = g.rooms[roomno].rtype;
         boolean msg_given = TRUE;
 
         /* Did we just enter some other special room? */
@@ -2452,30 +2452,30 @@ register boolean newlev;
             room_discovered(roomno);
 
         if (rt != 0) {
-            rooms[roomno].rtype = OROOM;
+            g.rooms[roomno].rtype = OROOM;
             if (!search_special(rt)) {
                 /* No more room of that type */
                 switch (rt) {
                 case COURT:
-                    level.flags.has_court = 0;
+                    g.level.flags.has_court = 0;
                     break;
                 case SWAMP:
-                    level.flags.has_swamp = 0;
+                    g.level.flags.has_swamp = 0;
                     break;
                 case MORGUE:
-                    level.flags.has_morgue = 0;
+                    g.level.flags.has_morgue = 0;
                     break;
                 case ZOO:
-                    level.flags.has_zoo = 0;
+                    g.level.flags.has_zoo = 0;
                     break;
                 case BARRACKS:
-                    level.flags.has_barracks = 0;
+                    g.level.flags.has_barracks = 0;
                     break;
                 case TEMPLE:
-                    level.flags.has_temple = 0;
+                    g.level.flags.has_temple = 0;
                     break;
                 case BEEHIVE:
-                    level.flags.has_beehive = 0;
+                    g.level.flags.has_beehive = 0;
                     break;
                 }
             }
@@ -2915,9 +2915,9 @@ boolean k_format;
         context.travel = context.travel1 = context.mv = context.run = 0;
     context.botl = 1;
     if (u.uhp < 1) {
-        killer.format = k_format;
-        if (killer.name != knam) /* the thing that killed you */
-            Strcpy(killer.name, knam ? knam : "");
+        g.killer.format = k_format;
+        if (g.killer.name != knam) /* the thing that killed you */
+            Strcpy(g.killer.name, knam ? knam : "");
         You("die...");
         done(DIED);
     } else if (n > 0 && u.uhp * 10 < u.uhpmax) {

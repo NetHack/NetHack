@@ -30,7 +30,7 @@ STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
 /* note: duplicated in dog.c */
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
-     || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
+     || (g.level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
@@ -104,7 +104,7 @@ mon_sanity_check()
             if (x != u.ux || y != u.uy)
                 impossible("steed (%s) claims to be at <%d,%d>?",
                            fmt_ptr((genericptr_t) mtmp), x, y);
-        } else if (level.monsters[x][y] != mtmp) {
+        } else if (g.level.monsters[x][y] != mtmp) {
             impossible("mon (%s) at <%d,%d> is not there!",
                        fmt_ptr((genericptr_t) mtmp), x, y);
         } else if (mtmp->wormno) {
@@ -114,7 +114,7 @@ mon_sanity_check()
 
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            if ((mtmp = level.monsters[x][y]) != 0) {
+            if ((mtmp = g.level.monsters[x][y]) != 0) {
                 for (m = fmon; m; m = m->nmon)
                     if (m == mtmp)
                         break;
@@ -874,7 +874,7 @@ register struct monst *mtmp;
         return 0;
 
     /* Eats topmost metal object if it is there */
-    for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp;
+    for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp;
          otmp = otmp->nexthere) {
         /* Don't eat indigestible/choking/inappropriate objects */
         if ((mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp))
@@ -970,7 +970,7 @@ struct monst *mtmp;
     /* eat organic objects, including cloth and wood, if present;
        engulf others, except huge rocks and metal attached to player
        [despite comment at top, doesn't assume that eater is a g-cube] */
-    for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
+    for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
 
         /* touch sensitive items */
@@ -1122,7 +1122,7 @@ register const char *str;
     if (mtmp->isshk && inhishop(mtmp))
         return FALSE;
 
-    for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
+    for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
         if (!str ? searches_for_item(mtmp, otmp)
@@ -1458,7 +1458,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                     }
                     /* Note: ALLOW_SANCT only prevents movement, not
                        attack, into a temple. */
-                    if (level.flags.has_temple && *in_rooms(nx, ny, TEMPLE)
+                    if (g.level.flags.has_temple && *in_rooms(nx, ny, TEMPLE)
                         && !*in_rooms(x, y, TEMPLE)
                         && in_your_sanctuary((struct monst *) 0, nx, ny)) {
                         if (!(flag & ALLOW_SANCT))
@@ -1810,7 +1810,7 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     mtmp->mtrapped = 0;
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
     relobj(mtmp, 0, FALSE);
-    if (onmap || mtmp == level.monsters[0][0]) {
+    if (onmap || mtmp == g.level.monsters[0][0]) {
         if (mtmp->wormno)
             remove_worm(mtmp);
         else
@@ -2068,9 +2068,9 @@ boolean was_swallowed; /* digestion */
             if (was_swallowed && magr) {
                 if (magr == &youmonst) {
                     There("is an explosion in your %s!", body_part(STOMACH));
-                    Sprintf(killer.name, "%s explosion",
+                    Sprintf(g.killer.name, "%s explosion",
                             s_suffix(mdat->mname));
-                    losehp(Maybe_Half_Phys(tmp), killer.name, KILLED_BY_AN);
+                    losehp(Maybe_Half_Phys(tmp), g.killer.name, KILLED_BY_AN);
                 } else {
                     You_hear("an explosion.");
                     magr->mhp -= tmp;
@@ -2086,11 +2086,11 @@ boolean was_swallowed; /* digestion */
                 return FALSE;
             }
 
-            Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
-            killer.format = KILLED_BY_AN;
+            Sprintf(g.killer.name, "%s explosion", s_suffix(mdat->mname));
+            g.killer.format = KILLED_BY_AN;
             explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
-            killer.name[0] = '\0';
-            killer.format = 0;
+            g.killer.name[0] = '\0';
+            g.killer.format = 0;
             return FALSE;
         }
     }
@@ -3042,7 +3042,7 @@ struct monst *mtmp;
     } else if (mtmp->data->mlet == S_EEL) {
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
     } else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
-        struct obj *otmp = level.objects[x][y];
+        struct obj *otmp = g.level.objects[x][y];
 
         /* most monsters won't hide under cockatrice corpse */
         if (otmp->nexthere || otmp->otyp != CORPSE
@@ -3824,7 +3824,7 @@ kill_genocided_monsters()
     kill_eggs(invent);
     kill_eggs(fobj);
     kill_eggs(migrating_objs);
-    kill_eggs(level.buriedobjlist);
+    kill_eggs(g.level.buriedobjlist);
 }
 
 void

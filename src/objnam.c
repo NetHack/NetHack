@@ -3579,7 +3579,7 @@ wiztrap:
         p = eos(bp);
         if (!BSTRCMPI(bp, p - 8, "fountain")) {
             lev->typ = FOUNTAIN;
-            level.flags.nfountains++;
+            g.level.flags.nfountains++;
             if (!strncmpi(bp, "magic ", 6))
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
@@ -3594,7 +3594,7 @@ wiztrap:
         }
         if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
-            level.flags.nsinks++;
+            g.level.flags.nsinks++;
             pline("A sink.");
             newsym(x, y);
             return &zeroobj;
@@ -3605,7 +3605,7 @@ wiztrap:
             del_engr_at(x, y);
             pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
             /* Must manually make kelp! */
-            water_damage_chain(level.objects[x][y], TRUE);
+            water_damage_chain(g.level.objects[x][y], TRUE);
             newsym(x, y);
             return &zeroobj;
         }

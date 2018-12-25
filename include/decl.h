@@ -23,7 +23,7 @@ E char SAVEP[];
 /* max size of a windowtype option */
 #define WINTYPELEN 16
 
-E struct dgn_topology { /* special dungeon levels for speed */
+struct dgn_topology { /* special dungeon levels for speed */
     d_level d_oracle_level;
     d_level d_bigroom_level; /* unused */
     d_level d_rogue_level;
@@ -51,39 +51,40 @@ E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_knox_level;
     d_level d_mineend_level;
     d_level d_sokoend_level;
-} dungeon_topology;
+};
+
 /* macros for accessing the dungeon levels by their old names */
 /* clang-format off */
-#define oracle_level            (dungeon_topology.d_oracle_level)
-#define bigroom_level           (dungeon_topology.d_bigroom_level)
-#define rogue_level             (dungeon_topology.d_rogue_level)
-#define medusa_level            (dungeon_topology.d_medusa_level)
-#define stronghold_level        (dungeon_topology.d_stronghold_level)
-#define valley_level            (dungeon_topology.d_valley_level)
-#define wiz1_level              (dungeon_topology.d_wiz1_level)
-#define wiz2_level              (dungeon_topology.d_wiz2_level)
-#define wiz3_level              (dungeon_topology.d_wiz3_level)
-#define juiblex_level           (dungeon_topology.d_juiblex_level)
-#define orcus_level             (dungeon_topology.d_orcus_level)
-#define baalzebub_level         (dungeon_topology.d_baalzebub_level)
-#define asmodeus_level          (dungeon_topology.d_asmodeus_level)
-#define portal_level            (dungeon_topology.d_portal_level)
-#define sanctum_level           (dungeon_topology.d_sanctum_level)
-#define earth_level             (dungeon_topology.d_earth_level)
-#define water_level             (dungeon_topology.d_water_level)
-#define fire_level              (dungeon_topology.d_fire_level)
-#define air_level               (dungeon_topology.d_air_level)
-#define astral_level            (dungeon_topology.d_astral_level)
-#define tower_dnum              (dungeon_topology.d_tower_dnum)
-#define sokoban_dnum            (dungeon_topology.d_sokoban_dnum)
-#define mines_dnum              (dungeon_topology.d_mines_dnum)
-#define quest_dnum              (dungeon_topology.d_quest_dnum)
-#define qstart_level            (dungeon_topology.d_qstart_level)
-#define qlocate_level           (dungeon_topology.d_qlocate_level)
-#define nemesis_level           (dungeon_topology.d_nemesis_level)
-#define knox_level              (dungeon_topology.d_knox_level)
-#define mineend_level           (dungeon_topology.d_mineend_level)
-#define sokoend_level           (dungeon_topology.d_sokoend_level)
+#define oracle_level            (g.dungeon_topology.d_oracle_level)
+#define bigroom_level           (g.dungeon_topology.d_bigroom_level)
+#define rogue_level             (g.dungeon_topology.d_rogue_level)
+#define medusa_level            (g.dungeon_topology.d_medusa_level)
+#define stronghold_level        (g.dungeon_topology.d_stronghold_level)
+#define valley_level            (g.dungeon_topology.d_valley_level)
+#define wiz1_level              (g.dungeon_topology.d_wiz1_level)
+#define wiz2_level              (g.dungeon_topology.d_wiz2_level)
+#define wiz3_level              (g.dungeon_topology.d_wiz3_level)
+#define juiblex_level           (g.dungeon_topology.d_juiblex_level)
+#define orcus_level             (g.dungeon_topology.d_orcus_level)
+#define baalzebub_level         (g.dungeon_topology.d_baalzebub_level)
+#define asmodeus_level          (g.dungeon_topology.d_asmodeus_level)
+#define portal_level            (g.dungeon_topology.d_portal_level)
+#define sanctum_level           (g.dungeon_topology.d_sanctum_level)
+#define earth_level             (g.dungeon_topology.d_earth_level)
+#define water_level             (g.dungeon_topology.d_water_level)
+#define fire_level              (g.dungeon_topology.d_fire_level)
+#define air_level               (g.dungeon_topology.d_air_level)
+#define astral_level            (g.dungeon_topology.d_astral_level)
+#define tower_dnum              (g.dungeon_topology.d_tower_dnum)
+#define sokoban_dnum            (g.dungeon_topology.d_sokoban_dnum)
+#define mines_dnum              (g.dungeon_topology.d_mines_dnum)
+#define quest_dnum              (g.dungeon_topology.d_quest_dnum)
+#define qstart_level            (g.dungeon_topology.d_qstart_level)
+#define qlocate_level           (g.dungeon_topology.d_qlocate_level)
+#define nemesis_level           (g.dungeon_topology.d_nemesis_level)
+#define knox_level              (g.dungeon_topology.d_knox_level)
+#define mineend_level           (g.dungeon_topology.d_mineend_level)
+#define sokoend_level           (g.dungeon_topology.d_sokoend_level)
 /* clang-format on */
 
 #define xdnstair (g.dnstair.sx)
@@ -133,7 +134,7 @@ E NEARDATA long yn_number;
 
 E const char disclosure_options[];
 
-E NEARDATA struct kinfo {
+struct kinfo {
     struct kinfo *next; /* chain of delayed killers */
     int id;             /* uprop keys to ID a delayed killer */
     int format;         /* one of the killer formats */
@@ -141,7 +142,7 @@ E NEARDATA struct kinfo {
 #define KILLED_BY 1
 #define NO_KILLER_PREFIX 2
     char name[BUFSZ]; /* actual killer name */
-} killer;
+};
 
 E char lock[];
 
@@ -688,7 +689,11 @@ struct instance_globals {
     struct obj *current_wand;  /* wand currently zapped/applied */
     struct obj *thrownobj;     /* object in flight due to throwing */
     struct obj *kickedobj;     /* object in flight due to kicking */
-
+    struct dgn_topology dungeon_topology;
+    struct kinfo killer;
+    struct mkroom rooms[(MAXNROFROOMS + 1) * 2];
+    struct mkroom *subrooms;
+    dlevel_t level; /* level map */
 
     /* dig.c */
 

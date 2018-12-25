@@ -144,7 +144,7 @@ register char *array;
     register char *ptr;
 
     for (ptr = array; *ptr; ptr++)
-        if (rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
+        if (g.rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
             return *ptr;
     return '\0';
 }
@@ -237,7 +237,7 @@ boolean sanctum; /* is it the seat of the high priest? */
     priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
                      sx + 1, sy, MM_EPRI);
     if (priest) {
-        EPRI(priest)->shroom = (schar) ((sroom - rooms) + ROOMOFFSET);
+        EPRI(priest)->shroom = (schar) ((sroom - g.rooms) + ROOMOFFSET);
         EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
         EPRI(priest)->shrpos.x = sx;
         EPRI(priest)->shrpos.y = sy;
@@ -729,7 +729,7 @@ struct monst *priest;
 
     ax = x = EPRI(priest)->shrpos.x;
     ay = y = EPRI(priest)->shrpos.y;
-    troom = &rooms[roomno - ROOMOFFSET];
+    troom = &g.rooms[roomno - ROOMOFFSET];
 
     if ((u.ux == x && u.uy == y) || !linedup(u.ux, u.uy, x, y, 1)) {
         if (IS_DOOR(levl[u.ux][u.uy].typ)) {

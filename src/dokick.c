@@ -259,7 +259,7 @@ doit:
             if (mon->mx != x || mon->my != y) {
                 (void) unmap_invisible(x, y);
                 pline("%s %s, %s evading your %skick.", Monnam(mon),
-                      (!level.flags.noteleport && can_teleport(mon->data))
+                      (!g.level.flags.noteleport && can_teleport(mon->data))
                           ? "teleports"
                           : is_floater(mon->data)
                                 ? "floats"
@@ -463,7 +463,7 @@ char *kickobjnam;
 
     *kickobjnam = '\0';
     /* if a pile, the "top" object gets kicked */
-    g.kickedobj = level.objects[x][y];
+    g.kickedobj = g.level.objects[x][y];
     if (g.kickedobj) {
         /* kick object; if doing is fatal, done() will clean up g.kickedobj */
         Strcpy(kickobjnam, killer_xname(g.kickedobj)); /* matters iff res==0 */
@@ -519,9 +519,9 @@ xchar x, y;
             ; /* hero has been transformed but kick continues */
         } else {
             /* normalize body shape here; foot, not body_part(FOOT) */
-            Sprintf(killer.name, "kicking %s barefoot",
+            Sprintf(g.killer.name, "kicking %s barefoot",
                     killer_xname(g.kickedobj));
-            instapetrify(killer.name);
+            instapetrify(g.killer.name);
         }
     }
 
@@ -1392,7 +1392,7 @@ xchar dlev;          /* if !0 send to dlev near player */
 
     isrock = (missile && missile->otyp == ROCK);
     oct = dct = 0L;
-    for (obj = level.objects[x][y]; obj; obj = obj2) {
+    for (obj = g.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj->nexthere;
         if (obj == missile)
             continue;
@@ -1501,7 +1501,7 @@ boolean shop_floor_obj;
     unpaid = is_unpaid(otmp);
 
     if (OBJ_AT(x, y)) {
-        for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
+        for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere)
             if (obj != otmp)
                 n += obj->quan;
         if (n)

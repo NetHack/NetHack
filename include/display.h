@@ -19,7 +19,7 @@
  * Returns the head of the list of objects that the player can see
  * at location (x,y).
  */
-#define vobj_at(x, y) (level.objects[x][y])
+#define vobj_at(x, y) (g.level.objects[x][y])
 
 /*
  * sensemon()

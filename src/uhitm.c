@@ -188,7 +188,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
                       mtmp->mtame ? "tame" : "wild", l_monnam(mtmp));
             else if (Blind || (is_pool(mtmp->mx, mtmp->my) && !Underwater))
                 pline("Wait!  There's a hidden monster there!");
-            else if ((obj = level.objects[mtmp->mx][mtmp->my]) != 0)
+            else if ((obj = g.level.objects[mtmp->mx][mtmp->my]) != 0)
                 pline("Wait!  There's %s hiding under %s!",
                       an(l_monnam(mtmp)), doname(obj));
             return TRUE;
@@ -353,7 +353,7 @@ register struct monst *mtmp;
             /* only check for in-shop if don't already have reason to stop */
             if (!foo) {
                 for (p = in_rooms(mtmp->mx, mtmp->my, SHOPBASE); *p; p++)
-                    if (tended_shop(&rooms[*p - ROOMOFFSET])) {
+                    if (tended_shop(&g.rooms[*p - ROOMOFFSET])) {
                         inshop = TRUE;
                         break;
                     }
@@ -2099,9 +2099,9 @@ register struct attack *mattk;
                 if (is_rider(pd)) {
                     pline("Unfortunately, digesting any of it is fatal.");
                     end_engulf();
-                    Sprintf(killer.name, "unwisely tried to eat %s",
+                    Sprintf(g.killer.name, "unwisely tried to eat %s",
                             pd->mname);
-                    killer.format = NO_KILLER_PREFIX;
+                    g.killer.format = NO_KILLER_PREFIX;
                     done(DIED);
                     return 0; /* lifesaved */
                 }

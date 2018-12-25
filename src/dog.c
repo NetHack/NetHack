@@ -10,7 +10,7 @@ STATIC_DCL int NDECL(pet_type);
 /* cloned from mon.c; used here if mon_arrive() can't place mon */
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
-     || (level.flags.graveyard && is_undead(mdat) && rn2(3)))
+     || (g.level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
 void
 newedog(mtmp)
@@ -437,7 +437,7 @@ boolean with_you;
             coord c;
 
             /* somexy() handles irregular rooms */
-            if (somexy(&rooms[*r - ROOMOFFSET], &c))
+            if (somexy(&g.rooms[*r - ROOMOFFSET], &c))
                 xlocale = c.x, ylocale = c.y;
             else
                 xlocale = ylocale = 0;

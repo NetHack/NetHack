@@ -141,7 +141,7 @@ boolean perform_write, free_data;
         bwrite(fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
         bwrite(fd, (genericptr_t) g.dungeons,
                sizeof(dungeon) * (unsigned) g.n_dgns);
-        bwrite(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
+        bwrite(fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
         bwrite(fd, (genericptr_t) g.tune, sizeof tune);
 
         for (count = 0, curr = g.branches; curr; curr = curr->next)
@@ -193,7 +193,7 @@ int fd;
 
     mread(fd, (genericptr_t) &g.n_dgns, sizeof(g.n_dgns));
     mread(fd, (genericptr_t) g.dungeons, sizeof(dungeon) * (unsigned) g.n_dgns);
-    mread(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
+    mread(fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
     mread(fd, (genericptr_t) g.tune, sizeof tune);
 
     last = g.branches = (branch *) 0;
@@ -1280,7 +1280,7 @@ boolean
 Can_dig_down(lev)
 d_level *lev;
 {
-    return (boolean) (!level.flags.hardfloor
+    return (boolean) (!g.level.flags.hardfloor
                       && !Is_botlevel(lev)
                       && !Invocation_lev(lev));
 }
@@ -2449,9 +2449,9 @@ recalc_mapseen()
         ridx = u.urooms[i] - ROOMOFFSET;
         mptr->msrooms[ridx].seen = 1;
         mptr->msrooms[ridx].untended =
-            (rooms[ridx].rtype >= SHOPBASE)
+            (g.rooms[ridx].rtype >= SHOPBASE)
                 ? (!(mtmp = shop_keeper(u.urooms[i])) || !inhishop(mtmp))
-                : (rooms[ridx].rtype == TEMPLE)
+                : (g.rooms[ridx].rtype == TEMPLE)
                       ? (!(mtmp = findpriest(u.urooms[i]))
                          || !inhistemple(mtmp))
                       : 0;
@@ -2462,22 +2462,22 @@ recalc_mapseen()
      */
     for (i = 0; i < SIZE(mptr->msrooms); ++i) {
         if (mptr->msrooms[i].seen) {
-            if (rooms[i].rtype >= SHOPBASE) {
+            if (g.rooms[i].rtype >= SHOPBASE) {
                 if (mptr->msrooms[i].untended)
                     mptr->feat.shoptype = SHOPBASE - 1;
                 else if (!mptr->feat.nshop)
-                    mptr->feat.shoptype = rooms[i].rtype;
-                else if (mptr->feat.shoptype != (unsigned) rooms[i].rtype)
+                    mptr->feat.shoptype = g.rooms[i].rtype;
+                else if (mptr->feat.shoptype != (unsigned) g.rooms[i].rtype)
                     mptr->feat.shoptype = 0;
                 count = mptr->feat.nshop + 1;
                 if (count <= 3)
                     mptr->feat.nshop = count;
-            } else if (rooms[i].rtype == TEMPLE) {
+            } else if (g.rooms[i].rtype == TEMPLE) {
                 /* altar and temple alignment handled below */
                 count = mptr->feat.ntemple + 1;
                 if (count <= 3)
                     mptr->feat.ntemple = count;
-            } else if (rooms[i].orig_rtype == DELPHI) {
+            } else if (g.rooms[i].orig_rtype == DELPHI) {
                 mptr->flags.oracle = 1;
             }
         }
@@ -2620,11 +2620,11 @@ recalc_mapseen()
         }
     }
 
-    if (level.bonesinfo && !mptr->final_resting_place) {
+    if (g.level.bonesinfo && !mptr->final_resting_place) {
         /* clone the bonesinfo so we aren't dependent upon this
            level being in memory */
         bonesaddr = &mptr->final_resting_place;
-        bp = level.bonesinfo;
+        bp = g.level.bonesinfo;
         do {
             *bonesaddr = (struct cemetery *) alloc(sizeof **bonesaddr);
             **bonesaddr = *bp;

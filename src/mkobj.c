@@ -589,7 +589,7 @@ struct obj *otmp;
         obj->nobj = otmp;
         obj->nexthere = otmp;
         extract_nobj(obj, &fobj);
-        extract_nexthere(obj, &level.objects[obj->ox][obj->oy]);
+        extract_nexthere(obj, &g.level.objects[obj->ox][obj->oy]);
         break;
     default:
         panic("replace_object: obj position");
@@ -810,7 +810,7 @@ boolean artif;
                        && (--tryct > 0));
                 if (tryct == 0) {
                     /* perhaps rndmonnum() only wants to make G_NOCORPSE
-                       monsters on this level; create an adventurer's
+                       monsters on this g.level; create an adventurer's
                        corpse instead, then */
                     otmp->corpsenm = PM_HUMAN;
                 }
@@ -1691,7 +1691,7 @@ register struct obj *otmp;
 }
 
 /*
- * These routines maintain the single-linked lists headed in level.objects[][]
+ * These routines maintain the single-linked lists headed in g.level.objects[][]
  * and threaded through the nexthere fields in the object-instance structure.
  */
 
@@ -1701,7 +1701,7 @@ place_object(otmp, x, y)
 register struct obj *otmp;
 int x, y;
 {
-    register struct obj *otmp2 = level.objects[x][y];
+    register struct obj *otmp2 = g.level.objects[x][y];
 
     if (otmp->where != OBJ_FREE)
         panic("place_object: obj not free");
@@ -1717,7 +1717,7 @@ int x, y;
         otmp2->nexthere = otmp;
     } else {
         otmp->nexthere = otmp2;
-        level.objects[x][y] = otmp;
+        g.level.objects[x][y] = otmp;
     }
 
     /* set the new object's location */
@@ -1745,12 +1745,12 @@ boolean do_buried;
 {
     struct obj *otmp;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere) {
         if (otmp->timed)
             obj_timer_checks(otmp, x, y, 0);
     }
     if (do_buried) {
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->ox == x && otmp->oy == y) {
                 if (otmp->timed)
                     obj_timer_checks(otmp, x, y, 0);
@@ -1861,7 +1861,7 @@ register struct obj *otmp;
 
     if (otmp->where != OBJ_FLOOR)
         panic("remove_object: obj not on floor");
-    extract_nexthere(otmp, &level.objects[x][y]);
+    extract_nexthere(otmp, &g.level.objects[x][y]);
     extract_nobj(otmp, &fobj);
     /* update vision iff this was the only boulder at its spot */
     if (otmp->otyp == BOULDER && !sobj_at(BOULDER, x, y))
@@ -1933,7 +1933,7 @@ struct obj *obj;
         extract_nobj(obj, &migrating_objs);
         break;
     case OBJ_BURIED:
-        extract_nobj(obj, &level.buriedobjlist);
+        extract_nobj(obj, &g.level.buriedobjlist);
         break;
     case OBJ_ONBILL:
         extract_nobj(obj, &billobjs);
@@ -2067,8 +2067,8 @@ struct obj *obj;
         panic("add_to_buried: obj not free");
 
     obj->where = OBJ_BURIED;
-    obj->nobj = level.buriedobjlist;
-    level.buriedobjlist = obj;
+    obj->nobj = g.level.buriedobjlist;
+    g.level.buriedobjlist = obj;
 }
 
 /* Recalculate the weight of this container and all of _its_ containers. */
@@ -2229,7 +2229,7 @@ obj_sanity_check()
        the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
+            for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj->where != OBJ_FLOOR || x == 0
                     || obj->ox != x || obj->oy != y) {
@@ -2244,7 +2244,7 @@ obj_sanity_check()
 
     objlist_sanity(invent, OBJ_INVENT, "invent sanity");
     objlist_sanity(migrating_objs, OBJ_MIGRATING, "migrating sanity");
-    objlist_sanity(level.buriedobjlist, OBJ_BURIED, "buried sanity");
+    objlist_sanity(g.level.buriedobjlist, OBJ_BURIED, "buried sanity");
     objlist_sanity(billobjs, OBJ_ONBILL, "bill sanity");
 
     mon_obj_sanity(fmon, "minvent sanity");

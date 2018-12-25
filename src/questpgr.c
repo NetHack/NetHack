@@ -235,7 +235,7 @@ unsigned whichchains;
             qarti = find_qarti(migrating_objs);
     }
     if (!qarti && (whichchains & (1 << OBJ_BURIED)) != 0)
-        qarti = find_qarti(level.buriedobjlist);
+        qarti = find_qarti(g.level.buriedobjlist);
 
     return qarti;
 }

@@ -757,7 +757,7 @@ doengrave()
                                  ? "Chips fly out from the headstone."
                                  : is_ice(u.ux, u.uy)
                                     ? "Ice chips fly up from the ice surface!"
-                                    : (level.locations[u.ux][u.uy].typ
+                                    : (g.level.locations[u.ux][u.uy].typ
                                        == DRAWBRIDGE_DOWN)
                                        ? "Splinters fly up from the bridge."
                                        : "Gravel flies up from the floor.");

@@ -353,7 +353,7 @@ struct obj *pick;
 
         count = 0;
         c = 'n'; /* in case there are no boxes here */
-        for (otmp = level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
+        for (otmp = g.level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
             if (Is_box(otmp)) {
                 ++count;
                 if (!can_reach_floor(TRUE)) {
@@ -538,7 +538,7 @@ doforce()
 
     /* A lock is made only for the honest man, the thief will break it. */
     g.xlock.box = (struct obj *) 0;
-    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+    for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
         if (Is_box(otmp)) {
             if (otmp->obroken || !otmp->olocked) {
                 /* force doname() to omit known "broken" or "unlocked"

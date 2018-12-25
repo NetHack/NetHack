@@ -1892,7 +1892,7 @@ struct obj *obj, *otmp;
 
             if (obj_shudders(obj)) {
                 boolean cover =
-                    ((obj == level.objects[u.ux][u.uy]) && u.uundetected
+                    ((obj == g.level.objects[u.ux][u.uy]) && u.uundetected
                      && hides_under(youmonst.data));
 
                 if (cansee(obj->ox, obj->oy))
@@ -2069,17 +2069,17 @@ schar zz;
     }
 
     g.poly_zapped = -1;
-    for (otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
+    for (otmp = g.level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
         /* for zap downwards, don't hit object poly'd hero is hiding under */
-        if (zz > 0 && u.uundetected && otmp == level.objects[u.ux][u.uy]
+        if (zz > 0 && u.uundetected && otmp == g.level.objects[u.ux][u.uy]
             && hides_under(youmonst.data))
             continue;
 
         hitanything += (*fhito)(otmp, obj);
     }
     if (g.poly_zapped >= 0)
-        create_polymon(level.objects[tx][ty], g.poly_zapped);
+        create_polymon(g.level.objects[tx][ty], g.poly_zapped);
 
     return hitanything;
 }
@@ -2412,8 +2412,8 @@ boolean ordinary;
             break;
         }
         learn_it = TRUE;
-        Sprintf(killer.name, "shot %sself with a death ray", uhim());
-        killer.format = NO_KILLER_PREFIX;
+        Sprintf(g.killer.name, "shot %sself with a death ray", uhim());
+        g.killer.format = NO_KILLER_PREFIX;
         You("irradiate yourself with pure energy!");
         You("die.");
         /* They might survive with an amulet of life saving */
@@ -2935,7 +2935,7 @@ struct obj *obj; /* wand or spell */
          */
         if (u.uundetected && hides_under(youmonst.data)) {
             int hitit = 0;
-            otmp = level.objects[u.ux][u.uy];
+            otmp = g.level.objects[u.ux][u.uy];
 
             if (otmp)
                 hitit = bhito(otmp, obj);
@@ -3769,8 +3769,8 @@ xchar sx, sy;
             You("aren't affected.");
             break;
         }
-        killer.format = KILLED_BY_AN;
-        Strcpy(killer.name, fltxt ? fltxt : "");
+        g.killer.format = KILLED_BY_AN;
+        Strcpy(g.killer.name, fltxt ? fltxt : "");
         /* when killed by disintegration breath, don't leave corpse */
         u.ugrave_arise = (type == -ZT_BREATH(ZT_DEATH)) ? -3 : NON_PM;
         done(DIED);
@@ -3834,7 +3834,7 @@ boolean u_caused;
     char buf1[BUFSZ], buf2[BUFSZ];
     int cnt = 0;
 
-    for (obj = level.objects[x][y]; obj; obj = obj2) {
+    for (obj = g.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj->nexthere;
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS
             || (obj->oclass == FOOD_CLASS

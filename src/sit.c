@@ -70,7 +70,7 @@ dosit()
         && !uteetering_at_seen_pit(trap)) {
         register struct obj *obj;
 
-        obj = level.objects[u.ux][u.uy];
+        obj = g.level.objects[u.ux][u.uy];
         if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
             You("coil up around your %shoard.",
                 (obj->quan + money_cnt(invent) < u.ulevel * 1000) ? "meager "
@@ -233,7 +233,7 @@ dosit()
                 break;
             case 10:
                 if (Luck < 0 || (HSee_invisible & INTRINSIC)) {
-                    if (level.flags.nommap) {
+                    if (g.level.flags.nommap) {
                         pline("A terrible drone fills your head!");
                         make_confused((HConfusion & TIMEOUT) + (long) rnd(30),
                                       FALSE);

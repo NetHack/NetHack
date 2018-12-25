@@ -159,7 +159,7 @@ xchar x, y;
                      : IS_TREE(levl[x][y].typ)
                         ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE)
                         : (ispick && IS_ROCK(levl[x][y].typ)
-                           && (!level.flags.arboreal
+                           && (!g.level.flags.arboreal
                                || IS_WALL(levl[x][y].typ)))
                            ? DIGTYP_ROCK
                            : DIGTYP_UNDIGGABLE);
@@ -407,9 +407,9 @@ dig(VOID_ARGS)
                 add_damage(dpx, dpy, SHOP_WALL_DMG);
                 dmgtxt = "damage";
             }
-            if (level.flags.is_maze_lev) {
+            if (g.level.flags.is_maze_lev) {
                 lev->typ = ROOM, lev->flags = 0;
-            } else if (level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
+            } else if (g.level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
                 lev->typ = CORR, lev->flags = 0;
             } else {
                 lev->typ = DOOR, lev->doormask = D_NODOOR;
@@ -590,11 +590,11 @@ int ttyp;
     else
         Strcpy(surface_type, surface(x, y));
     shopdoor = IS_DOOR(lev->typ) && *in_rooms(x, y, SHOPBASE);
-    oldobjs = level.objects[x][y];
+    oldobjs = g.level.objects[x][y];
     ttmp = maketrap(x, y, ttyp);
     if (!ttmp)
         return;
-    newobjs = level.objects[x][y];
+    newobjs = g.level.objects[x][y];
     ttmp->madeby_u = madeby_u;
     ttmp->tseen = 0;
     if (cansee(x, y))
@@ -1295,9 +1295,9 @@ register struct monst *mtmp;
             You_hear("crashing rock.");
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
-        if (level.flags.is_maze_lev) {
+        if (g.level.flags.is_maze_lev) {
             here->typ = ROOM, here->flags = 0;
-        } else if (level.flags.is_cavernous_lev
+        } else if (g.level.flags.is_cavernous_lev
                    && !in_town(mtmp->mx, mtmp->my)) {
             here->typ = CORR, here->flags = 0;
         } else {
@@ -1432,7 +1432,7 @@ zap_dig()
 
     /* normal case: digging across the level */
     shopdoor = shopwall = FALSE;
-    maze_dig = level.flags.is_maze_lev && !Is_earthlevel(&u.uz);
+    maze_dig = g.level.flags.is_maze_lev && !Is_earthlevel(&u.uz);
     zx = u.ux + u.dx;
     zy = u.uy + u.dy;
     if (u.utrap && u.utraptype == TT_PIT
@@ -1538,7 +1538,7 @@ zap_dig()
                     shopwall = TRUE;
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
-                if (level.flags.is_cavernous_lev && !in_town(zx, zy)) {
+                if (g.level.flags.is_cavernous_lev && !in_town(zx, zy)) {
                     room->typ = CORR, room->flags = 0;
                 } else {
                     room->typ = DOOR, room->doormask = D_NODOOR;
@@ -1729,7 +1729,7 @@ coord *cc;
      */
 
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
             /* if found at the target spot, we're done */
@@ -1885,10 +1885,10 @@ int x, y;
     costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))
               && costly_spot(x, y));
 
-    if (level.objects[x][y] != (struct obj *) 0) {
+    if (g.level.objects[x][y] != (struct obj *) 0) {
         debugpline2("bury_objs: at <%d,%d>", x, y);
     }
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp2) {
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp2) {
         if (costly) {
             loss += stolen_value(otmp, x, y, (boolean) shkp->mpeaceful, TRUE);
             if (otmp->oclass != COIN_CLASS)
@@ -1919,7 +1919,7 @@ int x, y;
     cc.x = x;
     cc.y = y;
     bball = buried_ball(&cc);
-    for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
+    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox == x && otmp->oy == y) {
             if (bball && otmp == bball

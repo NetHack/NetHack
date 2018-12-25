@@ -418,9 +418,9 @@ int x, y, typ;
         else if (lev->typ == STONE || lev->typ == SCORR)
             lev->typ = CORR;
         else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
-            lev->typ = level.flags.is_maze_lev
+            lev->typ = g.level.flags.is_maze_lev
                            ? ROOM
-                           : level.flags.is_cavernous_lev ? CORR : DOOR;
+                           : g.level.flags.is_cavernous_lev ? CORR : DOOR;
 
         unearth_objs(x, y);
         break;
@@ -2723,9 +2723,9 @@ const char *str;
     if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
         return;
     You("turn to stone...");
-    killer.format = KILLED_BY;
-    if (str != killer.name)
-        Strcpy(killer.name, str ? str : "");
+    g.killer.format = KILLED_BY;
+    if (str != g.killer.name)
+        Strcpy(g.killer.name, str ? str : "");
     done(STONING);
 }
 
@@ -3770,7 +3770,7 @@ drown()
     if ((Teleportation || can_teleport(youmonst.data)) && !Unaware
         && (Teleport_control || rn2(3) < Luck + 2)) {
         You("attempt a teleport spell."); /* utcsri!carroll */
-        if (!level.flags.noteleport) {
+        if (!g.level.flags.noteleport) {
             (void) dotele(FALSE);
             if (!is_pool(u.ux, u.uy))
                 return TRUE;
@@ -3834,11 +3834,11 @@ crawl:
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
-        killer.format = KILLED_BY_AN;
+        g.killer.format = KILLED_BY_AN;
         /* avoid "drowned in [a] water" */
         if (!strcmp(pool_of_water, "water"))
-            pool_of_water = "deep water", killer.format = KILLED_BY;
-        Strcpy(killer.name, pool_of_water);
+            pool_of_water = "deep water", g.killer.format = KILLED_BY;
+        Strcpy(g.killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */
         if (safe_teleds(TRUE))
@@ -4366,7 +4366,7 @@ boolean force;
     here = (x == u.ux && y == u.uy); /* !u.dx && !u.dy */
 
     if (here) /* are there are one or more containers here? */
-        for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+        for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
             if (Is_box(otmp)) {
                 if (++boxcnt > 1)
                     break;
@@ -4459,7 +4459,7 @@ boolean force;
         } /* end if */
 
         if (boxcnt) {
-            for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+            for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
                 if (Is_box(otmp)) {
                     (void) safe_qbuf(qbuf, "There is ",
                                      " here.  Check it for traps?", otmp,
@@ -4835,7 +4835,7 @@ boolean disarm;
                                  && uball->ox == u.ux && uball->oy == u.uy)))
                 unpunish();
 
-            for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
+            for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
                 otmp2 = otmp->nexthere;
                 if (costly)
                     loss += stolen_value(otmp, otmp->ox, otmp->oy,
@@ -5297,8 +5297,8 @@ lava_effects()
             u.uhp = -1;
             /* killer format and name are reconstructed every iteration
                because lifesaving resets them */
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, lava_killer);
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, lava_killer);
             You("%s...", boil_away ? "boil away" : "burn to a crisp");
             done(BURNING);
             if (safe_teleds(TRUE))
@@ -5349,8 +5349,8 @@ sink_into_lava()
 
         u.utrap -= (1 << 8);
         if (u.utrap < (1 << 8)) {
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, "molten lava");
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, "molten lava");
             You("sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);

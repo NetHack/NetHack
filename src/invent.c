@@ -1121,7 +1121,7 @@ int x, y;
 {
     struct obj *otmp, *otmp2;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp2) {
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp2) {
         if (otmp == uball)
             unpunish();
         /* after unpunish(), or might get deallocated chain */
@@ -1165,7 +1165,7 @@ int x, y;
 {
     register struct obj *otmp;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (otmp->otyp == otyp)
             break;
 
@@ -1289,7 +1289,7 @@ int x, y;
 {
     register struct obj *otmp;
 
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
+    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (obj == otmp)
             return TRUE;
     return FALSE;
@@ -1299,7 +1299,7 @@ struct obj *
 g_at(x, y)
 register int x, y;
 {
-    register struct obj *obj = level.objects[x][y];
+    register struct obj *obj = g.level.objects[x][y];
 
     while (obj) {
         if (obj->oclass == COIN_CLASS)
@@ -3328,7 +3328,7 @@ boolean picked_some;
         There("is %s here.",
               an(defsyms[trap_to_defsym(trap->ttyp)].explanation));
 
-    otmp = level.objects[u.ux][u.uy];
+    otmp = g.level.objects[u.ux][u.uy];
     dfeature = dfeature_at(u.ux, u.uy, fbuf2);
     if (dfeature && !strcmp(dfeature, "pool of water") && Underwater)
         dfeature = 0;
@@ -3497,7 +3497,7 @@ struct obj *obj;
 {
     struct obj *otmp;
 
-    for (otmp = level.objects[obj->ox][obj->oy]; otmp; otmp = otmp->nexthere)
+    for (otmp = g.level.objects[obj->ox][obj->oy]; otmp; otmp = otmp->nexthere)
         if (otmp != obj && merged(&obj, &otmp))
             break;
     return;
@@ -4316,7 +4316,7 @@ boolean as_if_seen;
     int n;
 
     /* count # of objects here */
-    for (n = 0, obj = level.buriedobjlist; obj; obj = obj->nobj)
+    for (n = 0, obj = g.level.buriedobjlist; obj; obj = obj->nobj)
         if (obj->ox == x && obj->oy == y) {
             if (as_if_seen)
                 obj->dknown = 1;
@@ -4327,7 +4327,7 @@ boolean as_if_seen;
         g.only.x = x;
         g.only.y = y;
         if (query_objlist("Things that are buried here:",
-                          &level.buriedobjlist, INVORDER_SORT,
+                          &g.level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
         g.only.x = g.only.y = 0;

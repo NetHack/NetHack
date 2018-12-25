@@ -249,7 +249,7 @@ dosave0()
             HUP pline1(whynot);
             (void) nhclose(fd);
             (void) delete_savefile();
-            HUP Strcpy(killer.name, whynot);
+            HUP Strcpy(g.killer.name, whynot);
             HUP done(TRICKED);
             return 0;
         }
@@ -354,7 +354,7 @@ char *whynot;
     if (fd < 0) {
         pline1(whynot);
         pline("Probably someone removed it.");
-        Strcpy(killer.name, whynot);
+        Strcpy(g.killer.name, whynot);
         done(TRICKED);
         return TRUE;
     }
@@ -395,7 +395,7 @@ savestateinlock()
             Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
                     hpid, g.hackpid);
             pline1(whynot);
-            Strcpy(killer.name, whynot);
+            Strcpy(g.killer.name, whynot);
             done(TRICKED);
         }
         (void) nhclose(fd);
@@ -403,7 +403,7 @@ savestateinlock()
         fd = create_levelfile(0, whynot);
         if (fd < 0) {
             pline1(whynot);
-            Strcpy(killer.name, whynot);
+            Strcpy(g.killer.name, whynot);
             done(TRICKED);
             return;
         }
@@ -500,7 +500,7 @@ int mode;
 #else
     bwrite(fd, (genericptr_t) &lev, sizeof(lev));
 #endif
-    savecemetery(fd, mode, &level.bonesinfo);
+    savecemetery(fd, mode, &g.level.bonesinfo);
     savelevl(fd,
              (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     bwrite(fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
@@ -512,7 +512,7 @@ int mode;
     bwrite(fd, (genericptr_t) &g.sstairs, sizeof(stairway));
     bwrite(fd, (genericptr_t) &g.updest, sizeof(dest_area));
     bwrite(fd, (genericptr_t) &g.dndest, sizeof(dest_area));
-    bwrite(fd, (genericptr_t) &level.flags, sizeof(level.flags));
+    bwrite(fd, (genericptr_t) &g.level.flags, sizeof(g.level.flags));
     bwrite(fd, (genericptr_t) g.doors, sizeof(g.doors));
     save_rooms(fd); /* no dynamic memory to reclaim */
 
@@ -520,7 +520,7 @@ int mode;
 skip_lots:
     /* this comes before the map, so need cleanup here if we skipped */
     if (mode == FREE_SAVE)
-        savecemetery(fd, mode, &level.bonesinfo);
+        savecemetery(fd, mode, &g.level.bonesinfo);
     /* must be saved before mons, objs, and buried objs */
     save_timers(fd, mode, RANGE_LEVEL);
     save_light_sources(fd, mode, RANGE_LEVEL);
@@ -529,18 +529,18 @@ skip_lots:
     save_worm(fd, mode); /* save worm information */
     savetrapchn(fd, g.ftrap, mode);
     saveobjchn(fd, fobj, mode);
-    saveobjchn(fd, level.buriedobjlist, mode);
+    saveobjchn(fd, g.level.buriedobjlist, mode);
     saveobjchn(fd, billobjs, mode);
     if (release_data(mode)) {
         int x,y;
 
         for (y = 0; y < ROWNO; y++)
             for (x = 0; x < COLNO; x++)
-                level.monsters[x][y] = 0;
+                g.level.monsters[x][y] = 0;
         fmon = 0;
         g.ftrap = 0;
         fobj = 0;
-        level.buriedobjlist = 0;
+        g.level.buriedobjlist = 0;
         billobjs = 0;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
@@ -946,7 +946,7 @@ register int fd, mode;
     register struct damage *damageptr, *tmp_dam;
     unsigned int xl = 0;
 
-    damageptr = level.damagelist;
+    damageptr = g.level.damagelist;
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next)
         xl++;
     if (perform_bwrite(mode))
@@ -961,7 +961,7 @@ register int fd, mode;
             free((genericptr_t) tmp_dam);
     }
     if (release_data(mode))
-        level.damagelist = 0;
+        g.level.damagelist = 0;
 }
 
 STATIC_OVL void
@@ -1359,7 +1359,7 @@ freedynamicdata()
     free_worm(); /* release worm segment information */
     freetrapchn(g.ftrap);
     freeobjchn(fobj);
-    freeobjchn(level.buriedobjlist);
+    freeobjchn(g.level.buriedobjlist);
     freeobjchn(billobjs);
     free_engravings();
     freedamage();

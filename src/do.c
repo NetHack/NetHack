@@ -280,7 +280,7 @@ polymorph_sink()
         return;
 
     sinklooted = levl[u.ux][u.uy].looted != 0;
-    level.flags.nsinks--;
+    g.level.flags.nsinks--;
     levl[u.ux][u.uy].doormask = 0; /* levl[][].flags */
     switch (rn2(4)) {
     default:
@@ -290,7 +290,7 @@ polymorph_sink()
         levl[u.ux][u.uy].blessedftn = 0;
         if (sinklooted)
             SET_FOUNTAIN_LOOTED(u.ux, u.uy);
-        level.flags.nfountains++;
+        g.level.flags.nfountains++;
         break;
     case 1:
         sym = S_throne;
@@ -414,7 +414,7 @@ register struct obj *obj;
         break;
     case RIN_HUNGER:
         ideed = FALSE;
-        for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
+        for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
             otmp2 = otmp->nexthere;
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
@@ -711,7 +711,7 @@ boolean with_impact;
             container_impact_dmg(obj, u.ux, u.uy);
         if (obj == uball)
             drop_ball(u.ux, u.uy);
-        else if (level.flags.has_shop)
+        else if (g.level.flags.has_shop)
             sellobj(obj, u.ux, u.uy);
         stackobj(obj);
         if (Blind && Levitation)

@@ -160,7 +160,7 @@ register struct rm *lev;
         return 1;
 
     /* Boulders block light. */
-    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
+    for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere)
         if (obj->otyp == BOULDER)
             return 1;
 
@@ -295,12 +295,12 @@ char *rmin, *rmax;
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
     if (rnum >= 0) {
-        for (zy = rooms[rnum].ly - 1; zy <= rooms[rnum].hy + 1; zy++) {
-            rmin[zy] = start = rooms[rnum].lx - 1;
-            rmax[zy] = stop = rooms[rnum].hx + 1;
+        for (zy = g.rooms[rnum].ly - 1; zy <= g.rooms[rnum].hy + 1; zy++) {
+            rmin[zy] = start = g.rooms[rnum].lx - 1;
+            rmax[zy] = stop = g.rooms[rnum].hx + 1;
 
             for (zx = start; zx <= stop; zx++) {
-                if (rooms[rnum].rlit) {
+                if (g.rooms[rnum].rlit) {
                     next[zy][zx] = COULD_SEE | IN_SIGHT;
                     levl[zx][zy].seenv = SVALL; /* see the walls */
                 } else

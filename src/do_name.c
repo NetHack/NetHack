@@ -903,7 +903,7 @@ const char *goal;
                                     goto foundc;
                                 /* next, try glyph that's remembered here
                                    (might be trap or object) */
-                                if (level.flags.hero_memory
+                                if (g.level.flags.hero_memory
                                     /* !terrainmode: don't move to remembered
                                        trap or object if not currently shown */
                                     && !iflags.terrainmode) {

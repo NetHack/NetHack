@@ -88,7 +88,7 @@ enum levl_typ_types {
 #define IS_DOOR(typ) ((typ) == DOOR)
 #define IS_DOORJOIN(typ) (IS_ROCK(typ) || (typ) == IRONBARS)
 #define IS_TREE(typ)                                            \
-    ((typ) == TREE || (level.flags.arboreal && (typ) == STONE))
+    ((typ) == TREE || (g.level.flags.arboreal && (typ) == STONE))
 #define ACCESSIBLE(typ) ((typ) >= DOOR) /* good position */
 #define IS_ROOM(typ) ((typ) >= ROOM)    /* ROOM, STAIRS, furniture.. */
 #define ZAP_POS(typ) ((typ) >= POOL)
@@ -596,14 +596,12 @@ typedef struct {
     struct levelflags flags;
 } dlevel_t;
 
-extern dlevel_t level; /* structure describing the current level */
-
 /*
  * Macros for compatibility with old code. Someday these will go away.
  */
-#define levl level.locations
-#define fobj level.objlist
-#define fmon level.monlist
+#define levl g.level.locations
+#define fobj g.level.objlist
+#define fmon g.level.monlist
 
 /*
  * Covert a trap number into the defsym graphics array.
@@ -613,38 +611,38 @@ extern dlevel_t level; /* structure describing the current level */
 #define trap_to_defsym(t) (S_arrow_trap + (t) -1)
 #define defsym_to_trap(d) ((d) -S_arrow_trap + 1)
 
-#define OBJ_AT(x, y) (level.objects[x][y] != (struct obj *) 0)
+#define OBJ_AT(x, y) (g.level.objects[x][y] != (struct obj *) 0)
 /*
  * Macros for encapsulation of level.monsters references.
  */
 #define MON_AT(x, y)                            \
-    (level.monsters[x][y] != (struct monst *) 0 \
-     && !(level.monsters[x][y])->mburied)
+    (g.level.monsters[x][y] != (struct monst *) 0 \
+     && !(g.level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x, y)                     \
-    (level.monsters[x][y] != (struct monst *) 0 \
-     && (level.monsters[x][y])->mburied)
+    (g.level.monsters[x][y] != (struct monst *) 0 \
+     && (g.level.monsters[x][y])->mburied)
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
     do {                                                        \
-        if (level.monsters[x][y] && level.monsters[x][y] != m)  \
+        if (g.level.monsters[x][y] && g.level.monsters[x][y] != m)  \
             impossible("place_worm_seg over mon");              \
-        level.monsters[x][y] = m;                               \
+        g.level.monsters[x][y] = m;                               \
     } while(0)
 #define remove_monster(x, y) \
     do {                                                \
-        if (!level.monsters[x][y])                      \
+        if (!g.level.monsters[x][y])                      \
             impossible("no monster to remove");         \
-        level.monsters[x][y] = (struct monst *) 0;      \
+        g.level.monsters[x][y] = (struct monst *) 0;      \
     } while(0)
 #else
-#define place_worm_seg(m, x, y) level.monsters[x][y] = m
-#define remove_monster(x, y) level.monsters[x][y] = (struct monst *) 0
+#define place_worm_seg(m, x, y) g.level.monsters[x][y] = m
+#define remove_monster(x, y) g.level.monsters[x][y] = (struct monst *) 0
 #endif
-#define m_at(x, y) (MON_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)
+#define m_at(x, y) (MON_AT(x, y) ? g.level.monsters[x][y] : (struct monst *) 0)
 #define m_buried_at(x, y) \
-    (MON_BURIED_AT(x, y) ? level.monsters[x][y] : (struct monst *) 0)
+    (MON_BURIED_AT(x, y) ? g.level.monsters[x][y] : (struct monst *) 0)
 
 /* restricted movement, potential luck penalties */
-#define Sokoban level.flags.sokoban_rules
+#define Sokoban g.level.flags.sokoban_rules
 
 #endif /* RM_H */

@@ -253,7 +253,7 @@ struct obj *food;
         morehungry(1000); /* you just got *very* sick! */
         vomit();
     } else {
-        killer.format = KILLED_BY_AN;
+        g.killer.format = KILLED_BY_AN;
         /*
          * Note all "killer"s below read "Choked on %s" on the
          * high score list & tombstone.  So plan accordingly.
@@ -261,14 +261,14 @@ struct obj *food;
         if (food) {
             You("choke over your %s.", foodword(food));
             if (food->oclass == COIN_CLASS) {
-                Strcpy(killer.name, "very rich meal");
+                Strcpy(g.killer.name, "very rich meal");
             } else {
-                killer.format = KILLED_BY;
-                Strcpy(killer.name, killer_xname(food));
+                g.killer.format = KILLED_BY;
+                Strcpy(g.killer.name, killer_xname(food));
             }
         } else {
             You("choke over it.");
-            Strcpy(killer.name, "quick snack");
+            Strcpy(g.killer.name, "quick snack");
         }
         You("die...");
         done(CHOKING);
@@ -546,8 +546,8 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             return MM_MISS;
         } else if (is_rider(pd)) {
             pline("Ingesting that is fatal.");
-            Sprintf(killer.name, "unwisely ate the brain of %s", pd->mname);
-            killer.format = NO_KILLER_PREFIX;
+            Sprintf(g.killer.name, "unwisely ate the brain of %s", pd->mname);
+            g.killer.format = NO_KILLER_PREFIX;
             done(DIED);
             /* life-saving needed to reach here */
             exercise(A_WIS, FALSE);
@@ -577,8 +577,8 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             static NEARDATA const char brainlessness[] = "brainlessness";
 
             if (Lifesaved) {
-                Strcpy(killer.name, brainlessness);
-                killer.format = KILLED_BY;
+                Strcpy(g.killer.name, brainlessness);
+                g.killer.format = KILLED_BY;
                 done(DIED);
                 /* amulet of life saving has now been used up */
                 pline("Unfortunately your brain is still gone.");
@@ -588,8 +588,8 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             } else {
                 Your("last thought fades away.");
             }
-            Strcpy(killer.name, brainlessness);
-            killer.format = KILLED_BY;
+            Strcpy(g.killer.name, brainlessness);
+            g.killer.format = KILLED_BY;
             done(DIED);
             /* can only get here when in wizard or explore mode and user has
                explicitly chosen not to die; arbitrarily boost intelligence */
@@ -676,8 +676,8 @@ register int pm;
         if (!Stone_resistance
             && !(poly_when_stoned(youmonst.data)
                  && polymon(PM_STONE_GOLEM))) {
-            Sprintf(killer.name, "tasting %s meat", mons[pm].mname);
-            killer.format = KILLED_BY;
+            Sprintf(g.killer.name, "tasting %s meat", mons[pm].mname);
+            g.killer.format = KILLED_BY;
             You("turn to stone.");
             done(STONING);
             if (context.victual.piece)
@@ -707,8 +707,8 @@ register int pm;
     case PM_PESTILENCE:
     case PM_FAMINE: {
         pline("Eating that is instantly fatal.");
-        Sprintf(killer.name, "unwisely ate the body of %s", mons[pm].mname);
-        killer.format = NO_KILLER_PREFIX;
+        Sprintf(g.killer.name, "unwisely ate the body of %s", mons[pm].mname);
+        g.killer.format = NO_KILLER_PREFIX;
         done(DIED);
         /* life-saving needed to reach here */
         exercise(A_WIS, FALSE);
@@ -2213,8 +2213,8 @@ struct obj *otmp;
                     u.uhpmax++;
                 u.uhp = u.uhpmax;
             } else if (u.uhp <= 0) {
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "rotten lump of royal jelly");
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "rotten lump of royal jelly");
                 done(POISONING);
             }
         }
@@ -2227,9 +2227,9 @@ struct obj *otmp;
                 && !(poly_when_stoned(youmonst.data)
                      && polymon(PM_STONE_GOLEM))) {
                 if (!Stoned) {
-                    Sprintf(killer.name, "%s egg",
+                    Sprintf(g.killer.name, "%s egg",
                             mons[otmp->corpsenm].mname);
-                    make_stoned(5L, (char *) 0, KILLED_BY_AN, killer.name);
+                    make_stoned(5L, (char *) 0, KILLED_BY_AN, g.killer.name);
                 }
             }
             /* note: no "tastes like chicken" message for eggs */
@@ -2992,8 +2992,8 @@ boolean incr;
             context.botl = 1;
             bot();
             You("die from starvation.");
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, "starvation");
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, "starvation");
             done(STARVING);
             /* if we return, we lifesaved, and that calls newuhs */
             return;
@@ -3059,8 +3059,8 @@ boolean incr;
         bot();
         if ((Upolyd ? u.mh : u.uhp) < 1) {
             You("die from hunger and exhaustion.");
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, "exhaustion");
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, "exhaustion");
             done(STARVING);
             return;
         }
@@ -3127,7 +3127,7 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     }
 
     /* Is there some food (probably a heavy corpse) here on the ground? */
-    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
+    for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
         if (corpsecheck
                 ? (otmp->otyp == CORPSE
                    && (corpsecheck == 1 || tinnable(otmp)))

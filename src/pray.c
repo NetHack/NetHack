@@ -632,8 +632,8 @@ boolean via_disintegration;
 {
     You("%s!", !via_disintegration ? "fry to a crisp"
                                    : "disintegrate into a pile of dust");
-    killer.format = KILLED_BY;
-    Sprintf(killer.name, "the wrath of %s", align_gname(resp_god));
+    g.killer.format = KILLED_BY;
+    Sprintf(g.killer.name, "the wrath of %s", align_gname(resp_god));
     done(DIED);
 }
 
@@ -1205,7 +1205,7 @@ boolean bless_water;
     register long changed = 0;
     boolean other = FALSE, bc_known = !(Blind || Hallucination);
 
-    for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
+    for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
         /* turn water into (un)holy water */
         if (otmp->otyp == POT_WATER
             && (bless_water ? !otmp->blessed : !otmp->cursed)) {
@@ -1499,8 +1499,8 @@ dosacrifice()
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());
                 pline("then mercilessly snuffs out your life.");
-                Sprintf(killer.name, "%s indifference", s_suffix(Moloch));
-                killer.format = KILLED_BY;
+                Sprintf(g.killer.name, "%s indifference", s_suffix(Moloch));
+                g.killer.format = KILLED_BY;
                 done(DIED);
                 /* life-saved (or declined to die in wizard/explore mode) */
                 pline("%s snarls and tries again...", Moloch);
@@ -2179,7 +2179,7 @@ int dx, dy;
     int nx, ny;
     long count = 0L;
 
-    for (otmp = level.objects[u.ux + dx][u.uy + dy]; otmp;
+    for (otmp = g.level.objects[u.ux + dx][u.uy + dy]; otmp;
          otmp = otmp->nexthere) {
         if (otmp->otyp == BOULDER)
             count += otmp->quan;

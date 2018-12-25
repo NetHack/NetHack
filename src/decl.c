@@ -17,9 +17,7 @@ char *catmore = 0; /* default pager */
  *      The following structure will be initialized at startup time with
  *      the level numbers of some "important" things in the game.
  */
-struct dgn_topology dungeon_topology = { DUMMY };
 
-NEARDATA struct kinfo killer = DUMMY;
 
 const char quitchars[] = " \r\n\033";
 const char vowels[] = "aeiouAEIOU";
@@ -53,10 +51,6 @@ const schar xdir[10] = { -1, -1, 0, 1, 1, 1, 0, -1, 0, 0 };
 const schar ydir[10] = { 0, -1, -1, -1, 0, 1, 1, 1, 0, 0 };
 const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
-NEARDATA struct mkroom rooms[(MAXNROFROOMS + 1) * 2] = { DUMMY };
-NEARDATA struct mkroom *subrooms = &rooms[MAXNROFROOMS + 1];
-
-dlevel_t level; /* level map */
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct context_info context = DUMMY;
 NEARDATA struct flag flags = DUMMY;
@@ -323,6 +317,11 @@ const struct instance_globals g_init = {
     NULL, /* current_wand */
     NULL, /* thrownobj */
     NULL, /* kickedobj */
+    DUMMY, /* dungeon_topology */
+    DUMMY, /* killer */
+    DUMMY, /* rooms */
+    NULL, /* subrooms */
+    UNDEFINED_VALUES, /* level */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
@@ -637,6 +636,9 @@ decl_globals_init()
     sfcap = default_sfinfo;
     sfrestinfo = default_sfinfo;
     sfsaveinfo = default_sfinfo;
+
+    g.subrooms = &g.rooms[MAXNROFROOMS + 1];
+
 }
 
 /*decl.c*/

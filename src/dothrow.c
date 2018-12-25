@@ -89,8 +89,8 @@ int shotlimit;
             /* throwing with one hand, but pluralize since the
                expression "with your bare hands" sounds better */
             makeplural(body_part(HAND)));
-        Sprintf(killer.name, "throwing %s bare-handed", killer_xname(obj));
-        instapetrify(killer.name);
+        Sprintf(g.killer.name, "throwing %s bare-handed", killer_xname(obj));
+        instapetrify(g.killer.name);
     }
     if (welded(obj)) {
         weldmsg(obj);
@@ -1036,8 +1036,8 @@ boolean hitsroof;
                    && !(poly_when_stoned(youmonst.data)
                         && polymon(PM_STONE_GOLEM))) {
         petrify:
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, "elementary physics"); /* "what goes up..." */
             You("turn to stone.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */

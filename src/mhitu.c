@@ -469,7 +469,7 @@ register struct monst *mtmp;
                  * parallelism to work, we can't rephrase it, so we
                  * zap the "laid by you" momentarily instead.
                  */
-                struct obj *obj = level.objects[u.ux][u.uy];
+                struct obj *obj = g.level.objects[u.ux][u.uy];
 
                 if (obj || u.umonnum == PM_TRAPPER
                     || (youmonst.data->mlet == S_EEL
@@ -492,7 +492,7 @@ register struct monst *mtmp;
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
                               m_monnam(mtmp), youmonst.data->mname, g.plname,
-                              doname(level.objects[u.ux][u.uy]));
+                              doname(g.level.objects[u.ux][u.uy]));
                     if (obj)
                         obj->spe = save_spe;
                 } else
@@ -921,7 +921,7 @@ register struct attack *mattk;
             struct obj *obj;
             const char *what;
 
-            if ((obj = level.objects[mtmp->mx][mtmp->my]) != 0) {
+            if ((obj = g.level.objects[mtmp->mx][mtmp->my]) != 0) {
                 if (Blind && !obj->dknown)
                     what = something;
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
@@ -1272,8 +1272,8 @@ register struct attack *mattk;
                                    && !Is_waterlevel(&u.uz);
 
                     pline("%s drowns you...", Monnam(mtmp));
-                    killer.format = KILLED_BY_AN;
-                    Sprintf(killer.name, "%s by %s",
+                    g.killer.format = KILLED_BY_AN;
+                    Sprintf(g.killer.name, "%s by %s",
                             moat ? "moat" : "pool of water",
                             an(mtmp->data->mname));
                     done(DROWNING);
@@ -1546,8 +1546,8 @@ register struct attack *mattk;
         case 18:
         case 17:
             if (!Antimagic) {
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "touch of death");
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "touch of death");
                 done(DIED);
                 dmg = 0;
                 break;
@@ -2152,8 +2152,8 @@ struct attack *mattk;
             if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
             You("turn to stone...");
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, mtmp->data->mname);
+            g.killer.format = KILLED_BY;
+            Strcpy(g.killer.name, mtmp->data->mname);
             done(STONING);
         }
         break;

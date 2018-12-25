@@ -2098,7 +2098,7 @@ long timeout;
     mtmp = make_familiar(figurine, cc.x, cc.y, TRUE);
     if (mtmp) {
         char and_vanish[BUFSZ];
-        struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
+        struct obj *mshelter = g.level.objects[mtmp->mx][mtmp->my];
 
         /* [m_monnam() yields accurate mon type, overriding hallucination] */
         Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
@@ -2657,7 +2657,7 @@ struct obj *obj;
         }
         if (Levitation || u.usteed) {
             /* Have a shot at snaring something on the floor */
-            otmp = level.objects[u.ux][u.uy];
+            otmp = g.level.objects[u.ux][u.uy];
             if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
                 pline("Why beat a dead horse?");
                 return 1;
@@ -3182,7 +3182,7 @@ struct obj *obj;
         /* FIXME -- untrap needs to deal with non-adjacent traps */
         break;
     case 1: /* Object */
-        if ((otmp = level.objects[cc.x][cc.y]) != 0) {
+        if ((otmp = g.level.objects[cc.x][cc.y]) != 0) {
             You("snag an object from the %s!", surface(cc.x, cc.y));
             (void) pickup_object(otmp, 1L, FALSE);
             /* If pickup fails, leave it alone */
@@ -3413,7 +3413,7 @@ struct obj *obj;
                 (void) bhitm(mon, obj);
                 /* if (context.botl) bot(); */
             }
-            if (affects_objects && level.objects[x][y]) {
+            if (affects_objects && g.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
                 if (context.botl)
                     bot(); /* potion effects */
@@ -3431,7 +3431,7 @@ struct obj *obj;
              * of obj->bypass in the zap code to accomplish that last case
              * since it's also used by retouch_equipment() for polyself.)
              */
-            if (affects_objects && level.objects[x][y]) {
+            if (affects_objects && g.level.objects[x][y]) {
                 (void) bhitpile(obj, bhito, x, y, 0);
                 if (context.botl)
                     bot(); /* potion effects */

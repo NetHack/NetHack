@@ -1120,48 +1120,48 @@ wiz_map_levltyp(VOID_ARGS)
             /* alignment currently omitted to save space */
         }
         /* level features */
-        if (level.flags.nfountains)
+        if (g.level.flags.nfountains)
             Sprintf(eos(dsc), " %c:%d", defsyms[S_fountain].sym,
-                    (int) level.flags.nfountains);
-        if (level.flags.nsinks)
+                    (int) g.level.flags.nfountains);
+        if (g.level.flags.nsinks)
             Sprintf(eos(dsc), " %c:%d", defsyms[S_sink].sym,
-                    (int) level.flags.nsinks);
-        if (level.flags.has_vault)
+                    (int) g.level.flags.nsinks);
+        if (g.level.flags.has_vault)
             Strcat(dsc, " vault");
-        if (level.flags.has_shop)
+        if (g.level.flags.has_shop)
             Strcat(dsc, " shop");
-        if (level.flags.has_temple)
+        if (g.level.flags.has_temple)
             Strcat(dsc, " temple");
-        if (level.flags.has_court)
+        if (g.level.flags.has_court)
             Strcat(dsc, " throne");
-        if (level.flags.has_zoo)
+        if (g.level.flags.has_zoo)
             Strcat(dsc, " zoo");
-        if (level.flags.has_morgue)
+        if (g.level.flags.has_morgue)
             Strcat(dsc, " morgue");
-        if (level.flags.has_barracks)
+        if (g.level.flags.has_barracks)
             Strcat(dsc, " barracks");
-        if (level.flags.has_beehive)
+        if (g.level.flags.has_beehive)
             Strcat(dsc, " hive");
-        if (level.flags.has_swamp)
+        if (g.level.flags.has_swamp)
             Strcat(dsc, " swamp");
         /* level flags */
-        if (level.flags.noteleport)
+        if (g.level.flags.noteleport)
             Strcat(dsc, " noTport");
-        if (level.flags.hardfloor)
+        if (g.level.flags.hardfloor)
             Strcat(dsc, " noDig");
-        if (level.flags.nommap)
+        if (g.level.flags.nommap)
             Strcat(dsc, " noMMap");
-        if (!level.flags.hero_memory)
+        if (!g.level.flags.hero_memory)
             Strcat(dsc, " noMem");
-        if (level.flags.shortsighted)
+        if (g.level.flags.shortsighted)
             Strcat(dsc, " shortsight");
-        if (level.flags.graveyard)
+        if (g.level.flags.graveyard)
             Strcat(dsc, " graveyard");
-        if (level.flags.is_maze_lev)
+        if (g.level.flags.is_maze_lev)
             Strcat(dsc, " maze");
-        if (level.flags.is_cavernous_lev)
+        if (g.level.flags.is_cavernous_lev)
             Strcat(dsc, " cave");
-        if (level.flags.arboreal)
+        if (g.level.flags.arboreal)
             Strcat(dsc, " tree");
         if (Sokoban)
             Strcat(dsc, " sokoban-rules");
@@ -2151,7 +2151,7 @@ int final;
                       /* if hero dies while dismounting, u.usteed will still
                          be set; we want to ignore steed in that situation */
                       && !(final == ENL_GAMEOVERDEAD
-                           && !strcmp(killer.name, "riding accident")));
+                           && !strcmp(g.killer.name, "riding accident")));
     const char *steedname = (!Riding ? (char *) 0
                       : x_monnam(u.usteed,
                                  u.usteed->mtame ? ARTICLE_YOUR : ARTICLE_THE,
@@ -3046,7 +3046,7 @@ int msgflag;          /* for variant message phrasing */
             if (is_pool(u.ux, u.uy))
                 Sprintf(bp, " in the %s", waterbody_name(u.ux, u.uy));
         } else if (hides_under(youmonst.data)) {
-            struct obj *o = level.objects[u.ux][u.uy];
+            struct obj *o = g.level.objects[u.ux][u.uy];
 
             if (o)
                 Sprintf(bp, " underneath %s", ansimpleoname(o));
@@ -3748,7 +3748,7 @@ long *total_size;
 
     count_obj(invent, &count, &size, FALSE, TRUE);
     count_obj(fobj, &count, &size, FALSE, TRUE);
-    count_obj(level.buriedobjlist, &count, &size, FALSE, TRUE);
+    count_obj(g.level.buriedobjlist, &count, &size, FALSE, TRUE);
     count_obj(migrating_objs, &count, &size, FALSE, TRUE);
     /* DEADMONSTER check not required in this loop since they have no
      * inventory */
@@ -3876,7 +3876,7 @@ long *total_size;
     }
 
     count = size = 0L;
-    for (sd = level.damagelist; sd; sd = sd->next) {
+    for (sd = g.level.damagelist; sd; sd = sd->next) {
         ++count;
         size += (long) sizeof *sd;
     }
@@ -3899,7 +3899,7 @@ long *total_size;
     }
 
     count = size = 0L;
-    for (k = killer.next; k; k = k->next) {
+    for (k = g.killer.next; k; k = k->next) {
         ++count;
         size += (long) sizeof *k;
     }
@@ -3913,7 +3913,7 @@ long *total_size;
     }
 
     count = size = 0L;
-    for (bi = level.bonesinfo; bi; bi = bi->next) {
+    for (bi = g.level.bonesinfo; bi; bi = bi->next) {
         ++count;
         size += (long) sizeof *bi;
     }
@@ -3963,7 +3963,7 @@ wiz_show_stats()
     putstr(win, 0, buf);
     obj_chain(win, "invent", invent, TRUE, &total_obj_count, &total_obj_size);
     obj_chain(win, "fobj", fobj, TRUE, &total_obj_count, &total_obj_size);
-    obj_chain(win, "buried", level.buriedobjlist, FALSE,
+    obj_chain(win, "buried", g.level.buriedobjlist, FALSE,
               &total_obj_count, &total_obj_size);
     obj_chain(win, "migrating obj", migrating_objs, FALSE,
               &total_obj_count, &total_obj_size);
@@ -5278,7 +5278,7 @@ boolean doit;
 #endif
 
     if (OBJ_AT(u.ux, u.uy)) {
-        struct obj *otmp = level.objects[u.ux][u.uy];
+        struct obj *otmp = g.level.objects[u.ux][u.uy];
 
         Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
         add_herecmd_menuitem(win, dopickup, buf);
@@ -5377,7 +5377,7 @@ int x, y, mod;
                 cmd[0] = cmd_from_func(dodown);
                 return cmd;
             } else if (OBJ_AT(u.ux, u.uy)) {
-                cmd[0] = cmd_from_func(Is_container(level.objects[u.ux][u.uy])
+                cmd[0] = cmd_from_func(Is_container(g.level.objects[u.ux][u.uy])
                                        ? doloot : dopickup);
                 return cmd;
             } else {

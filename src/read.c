@@ -1536,7 +1536,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
         break;
     case SCR_MAGIC_MAPPING:
-        if (level.flags.nommap) {
+        if (g.level.flags.nommap) {
             Your("mind is filled with crazy lines!");
             if (Hallucination)
                 pline("Wow!  Modern art.");
@@ -1557,7 +1557,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         g.known = TRUE;
         /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
-        if (level.flags.nommap) {
+        if (g.level.flags.nommap) {
             Your("%s spins as %s blocks the spell!", body_part(HEAD),
                  something);
             make_confused(HConfusion + rnd(30), FALSE);
@@ -1981,11 +1981,11 @@ struct obj *obj;
         int rx, ry;
 
         if (rnum >= 0) {
-            for (rx = rooms[rnum].lx - 1; rx <= rooms[rnum].hx + 1; rx++)
-                for (ry = rooms[rnum].ly - 1; ry <= rooms[rnum].hy + 1; ry++)
+            for (rx = g.rooms[rnum].lx - 1; rx <= g.rooms[rnum].hx + 1; rx++)
+                for (ry = g.rooms[rnum].ly - 1; ry <= g.rooms[rnum].hy + 1; ry++)
                     set_lit(rx, ry,
                             (genericptr_t) (on ? &is_lit : (char *) 0));
-            rooms[rnum].rlit = on;
+            g.rooms[rnum].rlit = on;
         }
         /* hallways remain dark on the rogue level */
     } else
@@ -2161,8 +2161,8 @@ do_class_genocide()
             }
         }
         if (gameover || u.uhp == -1) {
-            killer.format = KILLED_BY_AN;
-            Strcpy(killer.name, "scroll of genocide");
+            g.killer.format = KILLED_BY_AN;
+            Strcpy(g.killer.name, "scroll of genocide");
             if (gameover)
                 done(GENOCIDED);
         }
@@ -2287,22 +2287,22 @@ int how;
 
             u.uhp = -1;
             if (how & PLAYER) {
-                killer.format = KILLED_BY;
-                Strcpy(killer.name, "genocidal confusion");
+                g.killer.format = KILLED_BY;
+                Strcpy(g.killer.name, "genocidal confusion");
             } else if (how & ONTHRONE) {
                 /* player selected while on a throne */
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "imperious order");
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "imperious order");
             } else { /* selected player deliberately, not confused */
-                killer.format = KILLED_BY_AN;
-                Strcpy(killer.name, "scroll of genocide");
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "scroll of genocide");
             }
 
             /* Polymorphed characters will die as soon as they're rehumanized.
              */
             /* KMH -- Unchanging prevents rehumanization */
             if (Upolyd && ptr != youmonst.data) {
-                delayed_killer(POLYMORPH, killer.format, killer.name);
+                delayed_killer(POLYMORPH, g.killer.format, g.killer.name);
                 You_feel("%s inside.", udeadinside());
             } else
                 done(GENOCIDED);

@@ -294,7 +294,7 @@ boolean picked_some;
     register int ct = 0;
 
     /* count the objects here */
-    for (obj = level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
+    for (obj = g.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere) {
         if (obj != uchain)
             ct++;
     }
@@ -537,7 +537,7 @@ int what; /* should be a long */
 
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
-        objchain_p = &level.objects[u.ux][u.uy];
+        objchain_p = &g.level.objects[u.ux][u.uy];
         traverse_how = BY_NEXTHERE;
     } else {
         objchain_p = &u.ustuck->minvent;
@@ -1613,7 +1613,7 @@ boolean countem;
     struct obj *cobj, *nobj;
     int container_count = 0;
 
-    for (cobj = level.objects[x][y]; cobj; cobj = nobj) {
+    for (cobj = g.level.objects[x][y]; cobj; cobj = nobj) {
         nobj = cobj->nexthere;
         if (Is_container(cobj)) {
             container_count++;
@@ -1781,7 +1781,7 @@ doloot()
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
 
-            for (cobj = level.objects[cc.x][cc.y]; cobj;
+            for (cobj = g.level.objects[cc.x][cc.y]; cobj;
                  cobj = cobj->nexthere)
                 if (Is_container(cobj)) {
                     any.a_obj = cobj;
@@ -1807,7 +1807,7 @@ doloot()
             if (n != 0)
                 c = 'y';
         } else {
-            for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+            for (cobj = g.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
                 nobj = cobj->nexthere;
 
                 if (Is_container(cobj)) {
@@ -2934,7 +2934,7 @@ dotip()
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
 
-                for (cobj = level.objects[cc.x][cc.y], i = 0; cobj;
+                for (cobj = g.level.objects[cc.x][cc.y], i = 0; cobj;
                      cobj = cobj->nexthere)
                     if (Is_container(cobj)) {
                         ++i;
@@ -2976,7 +2976,7 @@ dotip()
                     return 0;
                 /* else pick-from-invent below */
             } else {
-                for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+                for (cobj = g.level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;

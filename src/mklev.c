@@ -97,10 +97,10 @@ void
 sort_rooms()
 {
 #if defined(SYSV) || defined(DGUX)
-    qsort((genericptr_t) rooms, (unsigned) g.nroom, sizeof(struct mkroom),
+    qsort((genericptr_t) g.rooms, (unsigned) g.nroom, sizeof(struct mkroom),
           do_comp);
 #else
-    qsort((genericptr_t) rooms, g.nroom, sizeof(struct mkroom), do_comp);
+    qsort((genericptr_t) g.rooms, g.nroom, sizeof(struct mkroom), do_comp);
 #endif
 }
 
@@ -189,7 +189,7 @@ boolean special;
 {
     register struct mkroom *croom;
 
-    croom = &rooms[g.nroom];
+    croom = &g.rooms[g.nroom];
     do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
                        (boolean) TRUE);
     croom++;
@@ -207,7 +207,7 @@ boolean special;
 {
     register struct mkroom *croom;
 
-    croom = &subrooms[g.nsubroom];
+    croom = &g.subrooms[g.nsubroom];
     do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special,
                        (boolean) FALSE);
     proom->sbrooms[proom->nsubrooms++] = croom;
@@ -227,9 +227,9 @@ makerooms()
         if (g.nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
             tried_vault = TRUE;
             if (create_vault()) {
-                g.vault_x = rooms[g.nroom].lx;
-                g.vault_y = rooms[g.nroom].ly;
-                rooms[g.nroom].hx = -1;
+                g.vault_x = g.rooms[g.nroom].lx;
+                g.vault_y = g.rooms[g.nroom].ly;
+                g.rooms[g.nroom].hx = -1;
             }
         } else if (!create_room(-1, -1, -1, -1, -1, -1, OROOM, -1))
             return;
@@ -247,8 +247,8 @@ boolean nxcor;
     register struct mkroom *croom, *troom;
     register int dx, dy;
 
-    croom = &rooms[a];
-    troom = &rooms[b];
+    croom = &g.rooms[a];
+    troom = &g.rooms[b];
 
     /* find positions cc and tt for doors in croom and troom
        and direction for a corridor between them */
@@ -298,7 +298,7 @@ boolean nxcor;
     dest.x = tx;
     dest.y = ty;
 
-    if (!dig_corridor(&org, &dest, nxcor, level.flags.arboreal ? ROOM : CORR,
+    if (!dig_corridor(&org, &dest, nxcor, g.level.flags.arboreal ? ROOM : CORR,
                       STONE))
         return;
 
@@ -362,12 +362,12 @@ register struct mkroom *aroom;
         g.doors[tmp] = g.doors[tmp - 1];
 
     for (i = 0; i < g.nroom; i++) {
-        broom = &rooms[i];
+        broom = &g.rooms[i];
         if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
             broom->fdoor++;
     }
     for (i = 0; i < g.nsubroom; i++) {
-        broom = &subrooms[i];
+        broom = &g.subrooms[i];
         if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
             broom->fdoor++;
     }
@@ -412,7 +412,7 @@ int type;
         }
 
         /* also done in roguecorr(); doing it here first prevents
-           making mimics in place of trapped doors on rogue level */
+           making mimics in place of trapped doors on rogue g.level */
         if (Is_rogue_level(&u.uz))
             levl[x][y].doormask = D_NODOOR;
 
@@ -489,7 +489,7 @@ int trap_type;
 
     if (g.doorindex < DOORMAX) {
         while (vct--) {
-            aroom = &rooms[rn2(g.nroom)];
+            aroom = &g.rooms[rn2(g.nroom)];
             if (aroom->rtype != OROOM)
                 continue; /* not an ordinary room */
             if (aroom->doorct == 1 && rn2(5))
@@ -530,7 +530,7 @@ int trap_type;
                                               mkclass(S_HUMAN, 0), xx,
                                               yy + dy, TRUE);
                     }
-                    if (!level.flags.noteleport)
+                    if (!g.level.flags.noteleport)
                         (void) mksobj_at(SCR_TELEPORTATION, xx, yy + dy, TRUE,
                                          FALSE);
                     if (!rn2(3))
@@ -546,7 +546,7 @@ STATIC_OVL void
 make_niches()
 {
     int ct = rnd((g.nroom >> 1) + 1), dep = depth(&u.uz);
-    boolean ltptr = (!level.flags.noteleport && dep > 15),
+    boolean ltptr = (!g.level.flags.noteleport && dep > 15),
             vamp = (dep > 5 && dep < 25);
 
     while (ct--) {
@@ -588,46 +588,46 @@ clear_level_structures()
              * These used to be '#if MICROPORT_BUG',
              * with use of memset(0) for '#if !MICROPORT_BUG' below,
              * but memset is not appropriate for initializing pointers,
-             * so do these level.objects[][] and level.monsters[][]
+             * so do these g.level.objects[][] and level.monsters[][]
              * initializations unconditionally.
              */
-            level.objects[x][y] = (struct obj *) 0;
-            level.monsters[x][y] = (struct monst *) 0;
+            g.level.objects[x][y] = (struct obj *) 0;
+            g.level.monsters[x][y] = (struct monst *) 0;
         }
     }
-    level.objlist = (struct obj *) 0;
-    level.buriedobjlist = (struct obj *) 0;
-    level.monlist = (struct monst *) 0;
-    level.damagelist = (struct damage *) 0;
-    level.bonesinfo = (struct cemetery *) 0;
+    g.level.objlist = (struct obj *) 0;
+    g.level.buriedobjlist = (struct obj *) 0;
+    g.level.monlist = (struct monst *) 0;
+    g.level.damagelist = (struct damage *) 0;
+    g.level.bonesinfo = (struct cemetery *) 0;
 
-    level.flags.nfountains = 0;
-    level.flags.nsinks = 0;
-    level.flags.has_shop = 0;
-    level.flags.has_vault = 0;
-    level.flags.has_zoo = 0;
-    level.flags.has_court = 0;
-    level.flags.has_morgue = level.flags.graveyard = 0;
-    level.flags.has_beehive = 0;
-    level.flags.has_barracks = 0;
-    level.flags.has_temple = 0;
-    level.flags.has_swamp = 0;
-    level.flags.noteleport = 0;
-    level.flags.hardfloor = 0;
-    level.flags.nommap = 0;
-    level.flags.hero_memory = 1;
-    level.flags.shortsighted = 0;
-    level.flags.sokoban_rules = 0;
-    level.flags.is_maze_lev = 0;
-    level.flags.is_cavernous_lev = 0;
-    level.flags.arboreal = 0;
-    level.flags.wizard_bones = 0;
-    level.flags.corrmaze = 0;
+    g.level.flags.nfountains = 0;
+    g.level.flags.nsinks = 0;
+    g.level.flags.has_shop = 0;
+    g.level.flags.has_vault = 0;
+    g.level.flags.has_zoo = 0;
+    g.level.flags.has_court = 0;
+    g.level.flags.has_morgue = g.level.flags.graveyard = 0;
+    g.level.flags.has_beehive = 0;
+    g.level.flags.has_barracks = 0;
+    g.level.flags.has_temple = 0;
+    g.level.flags.has_swamp = 0;
+    g.level.flags.noteleport = 0;
+    g.level.flags.hardfloor = 0;
+    g.level.flags.nommap = 0;
+    g.level.flags.hero_memory = 1;
+    g.level.flags.shortsighted = 0;
+    g.level.flags.sokoban_rules = 0;
+    g.level.flags.is_maze_lev = 0;
+    g.level.flags.is_cavernous_lev = 0;
+    g.level.flags.arboreal = 0;
+    g.level.flags.wizard_bones = 0;
+    g.level.flags.corrmaze = 0;
 
     g.nroom = 0;
-    rooms[0].hx = -1;
+    g.rooms[0].hx = -1;
     g.nsubroom = 0;
-    subrooms[0].hx = -1;
+    g.subrooms[0].hx = -1;
     g.doorindex = 0;
     init_rect();
     init_vault();
@@ -696,12 +696,12 @@ makelevel()
     sort_rooms();
 
     /* construct stairs (up and down in different rooms if possible) */
-    croom = &rooms[rn2(g.nroom)];
+    croom = &g.rooms[rn2(g.nroom)];
     if (!Is_botlevel(&u.uz))
         mkstairs(somex(croom), somey(croom), 0, croom); /* down */
     if (g.nroom > 1) {
         troom = croom;
-        croom = &rooms[rn2(g.nroom - 1)];
+        croom = &g.rooms[rn2(g.nroom - 1)];
         if (croom == troom)
             croom++;
     }
@@ -733,19 +733,19 @@ makelevel()
         fill_vault:
             add_room(g.vault_x, g.vault_y, g.vault_x + w, g.vault_y + h, TRUE, VAULT,
                      FALSE);
-            level.flags.has_vault = 1;
+            g.level.flags.has_vault = 1;
             ++room_threshold;
-            fill_room(&rooms[g.nroom - 1], FALSE);
+            fill_room(&g.rooms[g.nroom - 1], FALSE);
             mk_knox_portal(g.vault_x + w, g.vault_y + h);
-            if (!level.flags.noteleport && !rn2(3))
+            if (!g.level.flags.noteleport && !rn2(3))
                 makevtele();
         } else if (rnd_rect() && create_vault()) {
-            g.vault_x = rooms[g.nroom].lx;
-            g.vault_y = rooms[g.nroom].ly;
+            g.vault_x = g.rooms[g.nroom].lx;
+            g.vault_y = g.rooms[g.nroom].ly;
             if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE))
                 goto fill_vault;
             else
-                rooms[g.nroom].hx = -1;
+                g.rooms[g.nroom].hx = -1;
         }
     }
 
@@ -788,7 +788,7 @@ skip0:
     place_branch(branchp, 0, 0);
 
     /* for each room: put things inside */
-    for (croom = rooms; croom->hx > 0; croom++) {
+    for (croom = g.rooms; croom->hx > 0; croom++) {
         if (croom->rtype != OROOM)
             continue;
 
@@ -905,7 +905,7 @@ boolean skip_lvl_checks;
        almost all special levels are excluded */
     if (!skip_lvl_checks
         && (In_hell(&u.uz) || In_V_tower(&u.uz) || Is_rogue_level(&u.uz)
-            || level.flags.arboreal
+            || g.level.flags.arboreal
             || ((sp = Is_special(&u.uz)) != 0 && !Is_oracle_level(&u.uz)
                 && (!In_mines(&u.uz) || sp->flags.town))))
         return;
@@ -992,10 +992,10 @@ mklev()
     /* has_morgue gets cleared once morgue is entered; graveyard stays
        set (graveyard might already be set even when has_morgue is clear
        [see fixup_special()], so don't update it unconditionally) */
-    if (level.flags.has_morgue)
-        level.flags.graveyard = 1;
-    if (!level.flags.is_maze_lev) {
-        for (croom = &rooms[0]; croom != &rooms[g.nroom]; croom++)
+    if (g.level.flags.has_morgue)
+        g.level.flags.graveyard = 1;
+    if (!g.level.flags.is_maze_lev) {
+        for (croom = &g.rooms[0]; croom != &g.rooms[g.nroom]; croom++)
 #ifdef SPECIALIZATION
             topologize(croom, FALSE);
 #else
@@ -1003,10 +1003,10 @@ mklev()
 #endif
     }
     set_wall_state();
-    /* for many room types, rooms[].rtype is zeroed once the room has been
-       entered; rooms[].orig_rtype always retains original rtype value */
-    for (ridx = 0; ridx < SIZE(rooms); ridx++)
-        rooms[ridx].orig_rtype = rooms[ridx].rtype;
+    /* for many room types, g.rooms[].rtype is zeroed once the room has been
+       entered; g.rooms[].orig_rtype always retains original rtype value */
+    for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
+        g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
 }
 
 void
@@ -1019,7 +1019,7 @@ topologize(croom)
 struct mkroom *croom;
 #endif
 {
-    register int x, y, roomno = (int) ((croom - rooms) + ROOMOFFSET);
+    register int x, y, roomno = (int) ((croom - g.rooms) + ROOMOFFSET);
     int lowx = croom->lx, lowy = croom->ly;
     int hix = croom->hx, hiy = croom->hy;
 #ifdef SPECIALIZATION
@@ -1065,7 +1065,7 @@ struct mkroom *croom;
                     levl[x][y].roomno = roomno;
             }
     }
-    /* subrooms */
+    /* g.subrooms */
     for (subindex = 0; subindex < nsubrooms; subindex++)
 #ifdef SPECIALIZATION
         topologize(croom->sbrooms[subindex], (boolean) (rtype != OROOM));
@@ -1089,11 +1089,11 @@ coord *mp;
             int tryct = 0;
 
             do
-                croom = &rooms[rn2(g.nroom)];
+                croom = &g.rooms[rn2(g.nroom)];
             while ((croom == g.dnstairs_room || croom == g.upstairs_room
                     || croom->rtype != OROOM) && (++tryct < 100));
         } else
-            croom = &rooms[rn2(g.nroom)];
+            croom = &g.rooms[rn2(g.nroom)];
 
         do {
             if (!somexy(croom, mp))
@@ -1113,7 +1113,7 @@ xchar x, y;
     int i;
     struct mkroom *curr;
 
-    for (curr = rooms, i = 0; i < g.nroom; curr++, i++)
+    for (curr = g.rooms, i = 0; i < g.nroom; curr++, i++)
         if (inside_room(curr, x, y))
             return curr;
     ;
@@ -1302,7 +1302,7 @@ coord *tm;
                     kind = NO_TRAP;
                 break;
             case LEVEL_TELEP:
-                if (lvl < 5 || level.flags.noteleport)
+                if (lvl < 5 || g.level.flags.noteleport)
                     kind = NO_TRAP;
                 break;
             case SPIKED_PIT:
@@ -1327,7 +1327,7 @@ coord *tm;
                     kind = NO_TRAP;
                 break;
             case TELEP_TRAP:
-                if (level.flags.noteleport)
+                if (g.level.flags.noteleport)
                     kind = NO_TRAP;
                 break;
             case HOLE:
@@ -1554,7 +1554,7 @@ struct mkroom *croom;
     if (!rn2(7))
         levl[m.x][m.y].blessedftn = 1;
 
-    level.flags.nfountains++;
+    g.level.flags.nfountains++;
 }
 
 STATIC_OVL void
@@ -1574,7 +1574,7 @@ struct mkroom *croom;
     /* Put a sink at m.x, m.y */
     levl[m.x][m.y].typ = SINK;
 
-    level.flags.nsinks++;
+    g.level.flags.nsinks++;
 }
 
 STATIC_OVL void

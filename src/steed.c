@@ -755,10 +755,10 @@ int x, y;
                    (mon == u.usteed) ? "steed" : "defunct monster");
         return;
     }
-    if (level.monsters[x][y])
+    if (g.level.monsters[x][y])
         impossible("placing monster over another at <%d,%d>?", x, y);
     mon->mx = x, mon->my = y;
-    level.monsters[x][y] = mon;
+    g.level.monsters[x][y] = mon;
 }
 
 /*steed.c*/

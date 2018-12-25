@@ -204,9 +204,9 @@ const char *drainer; /* cause of death, if drain should be fatal */
         reset_rndmonst(NON_PM); /* new monster selection */
     } else {
         if (drainer) {
-            killer.format = KILLED_BY;
-            if (killer.name != drainer)
-                Strcpy(killer.name, drainer);
+            g.killer.format = KILLED_BY;
+            if (g.killer.name != drainer)
+                Strcpy(g.killer.name, drainer);
             done(DIED);
         }
         /* no drainer or lifesaved */

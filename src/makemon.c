@@ -1697,7 +1697,7 @@ aligntyp atyp;
                    against picking the next demon resulted in incubus
                    being picked nearly twice as often as sucubus);
                    we need the '+1' in case the entire set is too high
-                   level (really low level hero) */
+                   level (really low g.level hero) */
                 nums[last] = k + 1 - (adj_lev(&mons[last]) > (u.ulevel * 2));
                 num += nums[last];
             }
@@ -2139,7 +2139,7 @@ register struct monst *mtmp;
     /* only valid for INSIDE of room */
     roomno = levl[mx][my].roomno - ROOMOFFSET;
     if (roomno >= 0)
-        rt = rooms[roomno].rtype;
+        rt = g.rooms[roomno].rtype;
 #ifdef SPECIALIZATION
     else if (IS_ROOM(typ))
         rt = OROOM, roomno = 0;
@@ -2149,7 +2149,7 @@ register struct monst *mtmp;
 
     if (OBJ_AT(mx, my)) {
         ap_type = M_AP_OBJECT;
-        appear = level.objects[mx][my]->otyp;
+        appear = g.level.objects[mx][my]->otyp;
     } else if (IS_DOOR(typ) || IS_WALL(typ) || typ == SDOOR || typ == SCORR) {
         ap_type = M_AP_FURNITURE;
         /*
@@ -2169,7 +2169,7 @@ register struct monst *mtmp;
             appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
         else
             appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-    } else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {
+    } else if (g.level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {
         ap_type = M_AP_OBJECT;
         appear = STATUE;
     } else if (roomno < 0 && !t_at(mx, my)) {

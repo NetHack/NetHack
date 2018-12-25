@@ -437,7 +437,7 @@ struct obj *scroll;
     boolean result = FALSE; /* don't learn scroll */
 
     /* Disable teleportation in stronghold && Vlad's Tower */
-    if (level.flags.noteleport) {
+    if (g.level.flags.noteleport) {
         if (!wizard) {
             pline("A mysterious force prevents you from teleporting!");
             return TRUE;
@@ -700,8 +700,8 @@ level_tele()
             if (invent)
                 Your("possessions land on the %s with a thud.",
                      surface(u.ux, u.uy));
-            killer.format = NO_KILLER_PREFIX;
-            Strcpy(killer.name, "committed suicide");
+            g.killer.format = NO_KILLER_PREFIX;
+            Strcpy(g.killer.name, "committed suicide");
             done(DIED);
             pline("An energized cloud of dust begins to coalesce.");
             Your("body rematerializes%s.",
@@ -755,7 +755,7 @@ level_tele()
         return;
     }
 
-    killer.name[0] = 0; /* still alive, so far... */
+    g.killer.name[0] = 0; /* still alive, so far... */
 
     if (iflags.debug_fuzzer && newlev < 0)
         goto random_levtport;
@@ -771,8 +771,8 @@ level_tele()
         if (newlev <= -10) {
             You("arrive in heaven.");
             verbalize("Thou art early, but we'll admit thee.");
-            killer.format = NO_KILLER_PREFIX;
-            Strcpy(killer.name, "went to heaven prematurely");
+            g.killer.format = NO_KILLER_PREFIX;
+            Strcpy(g.killer.name, "went to heaven prematurely");
         } else if (newlev == -9) {
             You_feel("deliriously happy.");
             pline("(In fact, you're on Cloud 9!)");
@@ -780,7 +780,7 @@ level_tele()
         } else
             You("are now high above the clouds...");
 
-        if (killer.name[0]) {
+        if (g.killer.name[0]) {
             ; /* arrival in heaven is pending */
         } else if (Levitation) {
             escape_by_flying = "float gently down to earth";
@@ -789,14 +789,14 @@ level_tele()
         } else {
             pline("Unfortunately, you don't know how to fly.");
             You("plummet a few thousand feet to your death.");
-            Sprintf(killer.name,
+            Sprintf(g.killer.name,
                     "teleported out of the dungeon and fell to %s death",
                     uhis());
-            killer.format = NO_KILLER_PREFIX;
+            g.killer.format = NO_KILLER_PREFIX;
         }
     }
 
-    if (killer.name[0]) { /* the chosen destination was not survivable */
+    if (g.killer.name[0]) { /* the chosen destination was not survivable */
         d_level lsav;
 
         /* set specific death location; this also suppresses bones */
@@ -1119,7 +1119,7 @@ boolean
 tele_restrict(mon)
 struct monst *mon;
 {
-    if (level.flags.noteleport) {
+    if (g.level.flags.noteleport) {
         if (canseemon(mon))
             pline("A mysterious force prevents %s from teleporting!",
                   mon_nam(mon));
@@ -1389,7 +1389,7 @@ boolean give_feedback;
         if (give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         return FALSE;
-    } else if (level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
+    } else if (g.level.flags.noteleport && u.uswallow && mtmp == u.ustuck) {
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);

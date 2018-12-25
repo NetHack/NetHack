@@ -678,17 +678,17 @@ do_positionbar()
     p = pbar;
     /* up stairway */
     if (g.upstair.sx
-        && (glyph_to_cmap(level.locations[g.upstair.sx][g.upstair.sy].glyph)
+        && (glyph_to_cmap(g.level.locations[g.upstair.sx][g.upstair.sy].glyph)
                 == S_upstair
-            || glyph_to_cmap(level.locations[g.upstair.sx][g.upstair.sy].glyph)
+            || glyph_to_cmap(g.level.locations[g.upstair.sx][g.upstair.sy].glyph)
                    == S_upladder)) {
         *p++ = '<';
         *p++ = g.upstair.sx;
     }
     if (g.sstairs.sx
-        && (glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
+        && (glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                 == S_upstair
-            || glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
+            || glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                    == S_upladder)) {
         *p++ = '<';
         *p++ = g.sstairs.sx;
@@ -696,17 +696,17 @@ do_positionbar()
 
     /* down stairway */
     if (g.dnstair.sx
-        && (glyph_to_cmap(level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
+        && (glyph_to_cmap(g.level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
                 == S_dnstair
-            || glyph_to_cmap(level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
+            || glyph_to_cmap(g.level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
                    == S_dnladder)) {
         *p++ = '>';
         *p++ = g.dnstair.sx;
     }
     if (g.sstairs.sx
-        && (glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
+        && (glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                 == S_dnstair
-            || glyph_to_cmap(level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
+            || glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
                    == S_dnladder)) {
         *p++ = '>';
         *p++ = g.sstairs.sx;

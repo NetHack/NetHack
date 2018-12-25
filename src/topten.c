@@ -82,7 +82,7 @@ STATIC_DCL void FDECL(nsb_mung_line, (char *));
 STATIC_DCL void FDECL(nsb_unmung_line, (char *));
 #endif
 
-/* "killed by",&c ["an"] 'killer.name' */
+/* "killed by",&c ["an"] 'g.killer.name' */
 void
 formatkiller(buf, siz, how, incl_helpless)
 char *buf;
@@ -101,12 +101,12 @@ boolean incl_helpless;
         "", "", "", "", ""
     };
     unsigned l;
-    char c, *kname = killer.name;
+    char c, *kname = g.killer.name;
 
     buf[0] = '\0'; /* lint suppression */
-    switch (killer.format) {
+    switch (g.killer.format) {
     default:
-        impossible("bad killer format? (%d)", killer.format);
+        impossible("bad killer format? (%d)", g.killer.format);
         /*FALLTHRU*/
     case NO_KILLER_PREFIX:
         break;

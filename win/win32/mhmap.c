@@ -925,12 +925,12 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         if (data->bUnicodeFont) {
             wch = winos_ascii_to_wide(ch);
             if (wch == 0x2591 || wch == 0x2592) {
-                int level = 80;
-                HBRUSH brush = CreateSolidBrush(RGB(level, level, level));
+                int intensity = 80;
+                HBRUSH brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
                 FillRect(data->backBufferDC, rect, brush);
                 DeleteObject(brush);
-                level = (wch == 0x2591 ? 100 : 200);
-                brush = CreateSolidBrush(RGB(level, level, level));
+                intensity = (wch == 0x2591 ? 100 : 200);
+                brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
                 RECT smallRect = { rect->left + 1, rect->top + 1,
                                     rect->right - 1, rect->bottom - 1 };
                 FillRect(data->backBufferDC, &smallRect, brush);

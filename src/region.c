@@ -314,7 +314,7 @@ NhRegion *reg;
             if (!isok(i, j))
                 continue;
             if (MON_AT(i, j) && inside_region(reg, i, j))
-                add_mon_to_reg(reg, level.monsters[i][j]);
+                add_mon_to_reg(reg, g.level.monsters[i][j]);
             if (reg->visible && cansee(i, j))
                 newsym(i, j);
         }

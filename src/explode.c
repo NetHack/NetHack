@@ -114,9 +114,9 @@ int expltype;
      */
 
     if (olet == MON_EXPLODE) {
-        /* when explode() is called recursively, killer.name might change so
+        /* when explode() is called recursively, g.killer.name might change so
            we need to retain a copy of the current value for this explosion */
-        str = strcpy(killr_buf, killer.name);
+        str = strcpy(killr_buf, g.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
                         || strstri(str, "s' explosion")));
@@ -530,20 +530,20 @@ int expltype;
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* killer.name=="gas spore's explosion"    */
-                    else if (str != killer.name && str != hallu_buf)
-                        Strcpy(killer.name, str);
-                    killer.format = KILLED_BY_AN;
+                        ;        /* g.killer.name=="gas spore's explosion"    */
+                    else if (str != g.killer.name && str != hallu_buf)
+                        Strcpy(g.killer.name, str);
+                    g.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    killer.format = NO_KILLER_PREFIX;
-                    Sprintf(killer.name, "caught %sself in %s own %s", uhim(),
+                    g.killer.format = NO_KILLER_PREFIX;
+                    Sprintf(g.killer.name, "caught %sself in %s own %s", uhim(),
                             uhis(), str);
                 } else {
-                    killer.format = (!strcmpi(str, "tower of flame")
+                    g.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    Strcpy(killer.name, str);
+                    Strcpy(g.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -620,7 +620,7 @@ struct obj *obj; /* only scatter this obj        */
         impossible("scattered object <%d,%d> not at scatter site <%d,%d>",
                    obj->ox, obj->oy, sx, sy);
 
-    while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
+    while ((otmp = (individual_object ? obj : g.level.objects[sx][sy])) != 0) {
         if (otmp->quan > 1L) {
             qtmp = otmp->quan - 1L;
             if (qtmp > LARGEST_INT)

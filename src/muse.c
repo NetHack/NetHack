@@ -410,7 +410,7 @@ struct monst *mtmp;
                or some other monster is there */
             if ((xx == u.ux && yy == u.uy)
                 || (xx != x && yy != y && !diag_ok)
-                || (level.monsters[xx][yy] && !(xx == x && yy == y)))
+                || (g.level.monsters[xx][yy] && !(xx == x && yy == y)))
                 continue;
             /* skip if there's no trap or can't/won't move onto trap */
             if ((t = t_at(xx, yy)) == 0
@@ -506,7 +506,7 @@ struct monst *mtmp;
              * mean if the monster leaves the level, they'll know
              * about teleport traps.
              */
-            if (!level.flags.noteleport
+            if (!g.level.flags.noteleport
                 || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
                 g.m.defensive = obj;
                 g.m.has_defense = (mon_has_amulet(mtmp))
@@ -520,7 +520,7 @@ struct monst *mtmp;
             && (!obj->cursed || (!(mtmp->isshk && inhishop(mtmp))
                                  && !mtmp->isgd && !mtmp->ispriest))) {
             /* see WAN_TELEPORTATION case above */
-            if (!level.flags.noteleport
+            if (!g.level.flags.noteleport
                 || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
                 g.m.defensive = obj;
                 g.m.has_defense = MUSE_SCR_TELEPORTATION;
@@ -634,7 +634,7 @@ struct monst *mtmp;
             if (vismon && how)     /* mentions 'teleport' */
                 makeknown(how);
             /* monster learns that teleportation isn't useful here */
-            if (level.flags.noteleport)
+            if (g.level.flags.noteleport)
                 mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
             return 2;
         }
@@ -654,7 +654,7 @@ struct monst *mtmp;
         g.m_using = TRUE;
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
         /* monster learns that teleportation isn't useful here */
-        if (level.flags.noteleport)
+        if (g.level.flags.noteleport)
             mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
         g.m_using = FALSE;
         return 2;
@@ -980,7 +980,7 @@ try_again:
     switch (rn2(8 + (difficulty > 3) + (difficulty > 6) + (difficulty > 8))) {
     case 6:
     case 9:
-        if (level.flags.noteleport && ++trycnt < 2)
+        if (g.level.flags.noteleport && ++trycnt < 2)
             goto try_again;
         if (!rn2(3))
             return WAN_TELEPORTATION;
@@ -1314,7 +1314,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
             int hitanything = 0;
             register struct obj *next_obj;
 
-            for (otmp = level.objects[g.bhitpos.x][g.bhitpos.y]; otmp;
+            for (otmp = g.level.objects[g.bhitpos.x][g.bhitpos.y]; otmp;
                  otmp = next_obj) {
                 /* Fix for polymorph bug, Tim Wright */
                 next_obj = otmp->nexthere;
@@ -1624,7 +1624,7 @@ struct monst *mtmp;
             for (yy = y - 1; yy <= y + 1; yy++)
                 if (isok(xx, yy) && (xx != u.ux || yy != u.uy)
                     && (diag_ok || xx == x || yy == y)
-                    && ((xx == x && yy == y) || !level.monsters[xx][yy]))
+                    && ((xx == x && yy == y) || !g.level.monsters[xx][yy]))
                     if ((t = t_at(xx, yy)) != 0
                         && (ignore_boulders || !sobj_at(BOULDER, xx, yy))
                         && !onscary(xx, yy, mtmp)) {

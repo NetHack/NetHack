@@ -310,8 +310,8 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     }
 
     if (u.uhp < 1) {
-        killer.format = kprefix;
-        Strcpy(killer.name, pkiller);
+        g.killer.format = kprefix;
+        Strcpy(g.killer.name, pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         done(strstri(pkiller, "poison") ? DIED : POISONING);
     }

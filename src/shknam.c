@@ -601,7 +601,7 @@ struct mkroom *sroom;
 
     /* check that the shopkeeper placement is sane */
     if (sroom->irregular) {
-        int rmno = (int) ((sroom - rooms) + ROOMOFFSET);
+        int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
 
         if (isok(sx - 1, sy) && !levl[sx - 1][sy].edge
             && (int) levl[sx - 1][sy].roomno == rmno)
@@ -659,7 +659,7 @@ struct mkroom *sroom;
     set_malign(shk);
     shk->msleeping = 0;
     shk->mtrapseen = ~0; /* we know all the traps already */
-    eshkp->shoproom = (schar) ((sroom - rooms) + ROOMOFFSET);
+    eshkp->shoproom = (schar) ((sroom - g.rooms) + ROOMOFFSET);
     sroom->resident = shk;
     eshkp->shoptype = sroom->rtype;
     assign_level(&eshkp->shoplevel, &u.uz);
@@ -712,7 +712,7 @@ register struct mkroom *sroom;
     int sx, sy, sh;
     int stockcount = 0, specialspot = 0;
     char buf[BUFSZ];
-    int rmno = (int) ((sroom - rooms) + ROOMOFFSET);
+    int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     const struct shclass *shp = &shtypes[shp_indx];
 
     /* first, try to place a shopkeeper in the room */
@@ -774,7 +774,7 @@ register struct mkroom *sroom;
      * monsters will sit on top of objects and not the other way around.
      */
 
-    level.flags.has_shop = TRUE;
+    g.level.flags.has_shop = TRUE;
 }
 
 /* does shkp's shop stock this item type? */

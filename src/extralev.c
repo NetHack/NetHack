@@ -64,7 +64,7 @@ int x, y, dir;
             fromy += 7 * y;
             if (!IS_WALL(levl[fromx][fromy].typ))
                 impossible("down: no wall at %d,%d?", fromx, fromy);
-            dodoor(fromx, fromy, &rooms[g.r[x][y].nroom]);
+            dodoor(fromx, fromy, &g.rooms[g.r[x][y].nroom]);
             levl[fromx][fromy].doormask = D_NODOOR;
             fromy++;
         }
@@ -86,7 +86,7 @@ int x, y, dir;
             toy += 7 * y;
             if (!IS_WALL(levl[tox][toy].typ))
                 impossible("up: no wall at %d,%d?", tox, toy);
-            dodoor(tox, toy, &rooms[g.r[x][y].nroom]);
+            dodoor(tox, toy, &g.rooms[g.r[x][y].nroom]);
             levl[tox][toy].doormask = D_NODOOR;
             toy--;
         }
@@ -106,7 +106,7 @@ int x, y, dir;
             fromy += 7 * y;
             if (!IS_WALL(levl[fromx][fromy].typ))
                 impossible("down: no wall at %d,%d?", fromx, fromy);
-            dodoor(fromx, fromy, &rooms[g.r[x][y].nroom]);
+            dodoor(fromx, fromy, &g.rooms[g.r[x][y].nroom]);
             levl[fromx][fromy].doormask = D_NODOOR;
             fromx++;
         }
@@ -128,7 +128,7 @@ int x, y, dir;
             toy += 7 * y;
             if (!IS_WALL(levl[tox][toy].typ))
                 impossible("left: no wall at %d,%d?", tox, toy);
-            dodoor(tox, toy, &rooms[g.r[x][y].nroom]);
+            dodoor(tox, toy, &g.rooms[g.r[x][y].nroom]);
             levl[tox][toy].doormask = D_NODOOR;
             tox--;
         }
@@ -299,7 +299,7 @@ makerogueghost()
 
     if (!g.nroom)
         return; /* Should never happen */
-    croom = &rooms[rn2(g.nroom)];
+    croom = &g.rooms[rn2(g.nroom)];
     x = somex(croom);
     y = somey(croom);
     if (!(ghost = makemon(&mons[PM_GHOST], x, y, NO_MM_FLAGS)))

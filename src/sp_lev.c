@@ -586,7 +586,7 @@ schar filling;
 
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
-            if (level.flags.corrmaze)
+            if (g.level.flags.corrmaze)
                 levl[x][y].typ = STONE;
             else
                 levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE
@@ -659,14 +659,14 @@ count_features()
 {
     xchar x, y;
 
-    level.flags.nfountains = level.flags.nsinks = 0;
+    g.level.flags.nfountains = g.level.flags.nsinks = 0;
     for (y = 0; y < ROWNO; y++)
         for (x = 0; x < COLNO; x++) {
             int typ = levl[x][y].typ;
             if (typ == FOUNTAIN)
-                level.flags.nfountains++;
+                g.level.flags.nfountains++;
             else if (typ == SINK)
-                level.flags.nsinks++;
+                g.level.flags.nsinks++;
         }
 }
 
@@ -767,9 +767,9 @@ link_doors_rooms()
                 set_door_orientation(x, y);
 
                 for (tmpi = 0; tmpi < g.nroom; tmpi++) {
-                    maybe_add_door(x, y, &rooms[tmpi]);
-                    for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
-                        maybe_add_door(x, y, rooms[tmpi].sbrooms[m]);
+                    maybe_add_door(x, y, &g.rooms[tmpi]);
+                    for (m = 0; m < g.rooms[tmpi].nsubrooms; m++) {
+                        maybe_add_door(x, y, g.rooms[tmpi].sbrooms[m]);
                     }
                 }
             }
@@ -781,11 +781,11 @@ fill_rooms()
     int tmpi, m;
 
     for (tmpi = 0; tmpi < g.nroom; tmpi++) {
-        if (rooms[tmpi].needfill)
-            fill_room(&rooms[tmpi], (rooms[tmpi].needfill == 2));
-        for (m = 0; m < rooms[tmpi].nsubrooms; m++)
-            if (rooms[tmpi].sbrooms[m]->needfill)
-                fill_room(rooms[tmpi].sbrooms[m], FALSE);
+        if (g.rooms[tmpi].needfill)
+            fill_room(&g.rooms[tmpi], (g.rooms[tmpi].needfill == 2));
+        for (m = 0; m < g.rooms[tmpi].nsubrooms; m++)
+            if (g.rooms[tmpi].sbrooms[m]->needfill)
+                fill_room(g.rooms[tmpi].sbrooms[m], FALSE);
     }
 }
 
@@ -823,7 +823,7 @@ rndtrap()
             break;
         case LEVEL_TELEP:
         case TELEP_TRAP:
-            if (level.flags.noteleport)
+            if (g.level.flags.noteleport)
                 rtrap = NO_TRAP;
             break;
         case ROLLING_BOULDER_TRAP:
@@ -1264,8 +1264,8 @@ xchar rtype, rlit;
         add_room(xabs, yabs, xabs + wtmp - 1, yabs + htmp - 1, rlit, rtype,
                  FALSE);
     } else {
-        rooms[g.nroom].lx = xabs;
-        rooms[g.nroom].ly = yabs;
+        g.rooms[g.nroom].lx = xabs;
+        g.rooms[g.nroom].ly = yabs;
     }
     return TRUE;
 }
@@ -2076,7 +2076,7 @@ struct mkroom *croom;
     } else {
         get_location_coord(&x, &y, DRY, croom, a->coord);
         if ((sproom = (schar) *in_rooms(x, y, TEMPLE)) != 0)
-            croom = &rooms[sproom - ROOMOFFSET];
+            croom = &g.rooms[sproom - ROOMOFFSET];
         else
             croom_is_temple = FALSE;
     }
@@ -2113,7 +2113,7 @@ struct mkroom *croom;
     if (a->shrine) { /* Is it a shrine  or sanctum? */
         priestini(&u.uz, croom, x, y, (a->shrine > 1));
         levl[x][y].altarmask |= AM_SHRINE;
-        level.flags.has_temple = TRUE;
+        g.level.flags.has_temple = TRUE;
     }
 }
 
@@ -2328,7 +2328,7 @@ fix_stair_rooms()
              && (g.dnstairs_room->ly <= ydnstair
                  && ydnstair <= g.dnstairs_room->hy))) {
         for (i = 0; i < g.nroom; i++) {
-            croom = &rooms[i];
+            croom = &g.rooms[i];
             if ((croom->lx <= xdnstair && xdnstair <= croom->hx)
                 && (croom->ly <= ydnstair && ydnstair <= croom->hy)) {
                 g.dnstairs_room = croom;
@@ -2343,7 +2343,7 @@ fix_stair_rooms()
              && (g.upstairs_room->ly <= yupstair
                  && yupstair <= g.upstairs_room->hy))) {
         for (i = 0; i < g.nroom; i++) {
-            croom = &rooms[i];
+            croom = &g.rooms[i];
             if ((croom->lx <= xupstair && xupstair <= croom->hx)
                 && (croom->ly <= yupstair && yupstair <= croom->hy)) {
                 g.upstairs_room = croom;
@@ -2372,12 +2372,12 @@ corridor *c;
         return;
     }
 
-    if (!search_door(&rooms[c->src.room], &org.x, &org.y, c->src.wall,
+    if (!search_door(&g.rooms[c->src.room], &org.x, &org.y, c->src.wall,
                      c->src.door))
         return;
 
     if (c->dest.room != -1) {
-        if (!search_door(&rooms[c->dest.room], &dest.x, &dest.y, c->dest.wall,
+        if (!search_door(&g.rooms[c->dest.room], &dest.x, &dest.y, c->dest.wall,
                          c->dest.door))
             return;
         switch (c->src.wall) {
@@ -2429,7 +2429,7 @@ boolean prefilled;
         /* Shop ? */
         if (croom->rtype >= SHOPBASE) {
             stock_room(croom->rtype - SHOPBASE, croom);
-            level.flags.has_shop = TRUE;
+            g.level.flags.has_shop = TRUE;
             return;
         }
 
@@ -2454,28 +2454,28 @@ boolean prefilled;
     }
     switch (croom->rtype) {
     case VAULT:
-        level.flags.has_vault = TRUE;
+        g.level.flags.has_vault = TRUE;
         break;
     case ZOO:
-        level.flags.has_zoo = TRUE;
+        g.level.flags.has_zoo = TRUE;
         break;
     case COURT:
-        level.flags.has_court = TRUE;
+        g.level.flags.has_court = TRUE;
         break;
     case MORGUE:
-        level.flags.has_morgue = TRUE;
+        g.level.flags.has_morgue = TRUE;
         break;
     case BEEHIVE:
-        level.flags.has_beehive = TRUE;
+        g.level.flags.has_beehive = TRUE;
         break;
     case BARRACKS:
-        level.flags.has_barracks = TRUE;
+        g.level.flags.has_barracks = TRUE;
         break;
     case TEMPLE:
-        level.flags.has_temple = TRUE;
+        g.level.flags.has_temple = TRUE;
         break;
     case SWAMP:
-        level.flags.has_swamp = TRUE;
+        g.level.flags.has_swamp = TRUE;
         break;
     }
 }
@@ -2490,10 +2490,10 @@ struct mkroom *mkr;
     xchar rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
 
     if (mkr) {
-        aroom = &subrooms[g.nsubroom];
+        aroom = &g.subrooms[g.nsubroom];
         okroom = create_subroom(mkr, r->x, r->y, r->w, r->h, rtype, r->rlit);
     } else {
-        aroom = &rooms[g.nroom];
+        aroom = &g.rooms[g.nroom];
         okroom = create_room(r->x, r->y, r->w, r->h, r->xalign, r->yalign,
                              rtype, r->rlit);
     }
@@ -3270,29 +3270,29 @@ struct sp_coder *coder;
     lflags = OV_i(flagdata);
 
     if (lflags & NOTELEPORT)
-        level.flags.noteleport = 1;
+        g.level.flags.noteleport = 1;
     if (lflags & HARDFLOOR)
-        level.flags.hardfloor = 1;
+        g.level.flags.hardfloor = 1;
     if (lflags & NOMMAP)
-        level.flags.nommap = 1;
+        g.level.flags.nommap = 1;
     if (lflags & SHORTSIGHTED)
-        level.flags.shortsighted = 1;
+        g.level.flags.shortsighted = 1;
     if (lflags & ARBOREAL)
-        level.flags.arboreal = 1;
+        g.level.flags.arboreal = 1;
     if (lflags & MAZELEVEL)
-        level.flags.is_maze_lev = 1;
+        g.level.flags.is_maze_lev = 1;
     if (lflags & PREMAPPED)
         coder->premapped = TRUE;
     if (lflags & SHROUD)
-        level.flags.hero_memory = 0;
+        g.level.flags.hero_memory = 0;
     if (lflags & GRAVEYARD)
-        level.flags.graveyard = 1;
+        g.level.flags.graveyard = 1;
     if (lflags & ICEDPOOLS)
         g.icedpools = TRUE;
     if (lflags & SOLIDIFY)
         coder->solidify = TRUE;
     if (lflags & CORRMAZE)
-        level.flags.corrmaze = TRUE;
+        g.level.flags.corrmaze = TRUE;
     if (lflags & CHECK_INACCESSIBLES)
         coder->check_inaccessibles = TRUE;
 
@@ -4639,7 +4639,7 @@ struct sp_coder *coder;
         return;
     }
 
-    troom = &rooms[g.nroom];
+    troom = &g.rooms[g.nroom];
 
     /* mark rooms that must be filled, but do it later */
     if (OV_i(rtype) != OROOM)
@@ -4722,7 +4722,7 @@ struct sp_coder *coder;
         return;
 
     if (OV_i(ftyp) < 1) {
-        OV_i(ftyp) = level.flags.corrmaze ? CORR : ROOM;
+        OV_i(ftyp) = g.level.flags.corrmaze ? CORR : ROOM;
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */
@@ -5330,7 +5330,7 @@ sp_lev *lvl;
 
     (void) memset((genericptr_t) &g.SpLev_Map[0][0], 0, sizeof g.SpLev_Map);
 
-    level.flags.is_maze_lev = 0;
+    g.level.flags.is_maze_lev = 0;
 
     g.xstart = 1;
     g.ystart = 0;
@@ -5979,7 +5979,7 @@ sp_lev *lvl;
      * is currently not possible, we overload the corrmaze flag for this
      * purpose.
      */
-    if (!level.flags.corrmaze)
+    if (!g.level.flags.corrmaze)
         wallification(1, 0, COLNO - 1, ROWNO - 1);
 
     count_features();

@@ -105,7 +105,7 @@ char *outbuf;
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &youmonst);
     int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
-        glyph = (level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+        glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                     : glyph_at(x, y);
 
     *outbuf = '\0';
@@ -166,7 +166,7 @@ struct obj **obj_p;
     *obj_p = (struct obj *) 0;
     /* TODO: check inside containers in case glyph came from detection */
     if ((otmp = sobj_at(glyphotyp, x, y)) == 0)
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj)
+        for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj)
             if (otmp->ox == x && otmp->oy == y && otmp->otyp == glyphotyp)
                 break;
 
