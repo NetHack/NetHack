@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1543395733 2018/11/28 09:02:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1545702598 2018/12/25 01:49:58 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2994,7 +2994,8 @@ boolean FDECL((*proc), (char *));
                     *ep = '\0';
 
                 /* trim off spaces at end of line */
-                while (--ep >= inbuf && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
+                while (--ep >= inbuf
+                       && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
                     *ep = '\0';
 
                 if (!config_error_nextline(inbuf)) {
@@ -3132,9 +3133,7 @@ int which_set;
         config_error_add("Missing finish for symset \"%s\"",
                          g.symset[which_set].name ? g.symset[which_set].name
                                                 : "unknown");
-
     config_error_done();
-
     return 1;
 }
 
