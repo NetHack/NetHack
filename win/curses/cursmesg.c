@@ -73,18 +73,18 @@ curses_message_win_puts(const char *message, boolean recursed)
     linespace = ((width + border_space) - 3) - mx;
 
     if (strcmp(message, "#") == 0) {    /* Extended command or Count: */
-        if ((strcmp(toplines, "#") != 0) && (my >= (height - 1 + border_space)) && (height != 1)) {     /* Bottom of message window */
+        if ((strcmp(g.toplines, "#") != 0) && (my >= (height - 1 + border_space)) && (height != 1)) {     /* Bottom of message window */
             scroll_window(MESSAGE_WIN);
             mx = width;
             my--;
-            strcpy(toplines, message);
+            strcpy(g.toplines, message);
         }
 
         return;
     }
 
     if (!recursed) {
-        strcpy(toplines, message);
+        strcpy(g.toplines, message);
         mesg_add_line((char *) message);
     }
 
@@ -239,7 +239,7 @@ curses_last_messages()
         if (mesg && mesg->str && strcmp(mesg->str, ""))
             curses_message_win_puts(mesg->str, TRUE);
     }
-    curses_message_win_puts(toplines, TRUE);
+    curses_message_win_puts(g.toplines, TRUE);
 }
 
 
@@ -466,7 +466,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         case '\n':
             free(linestarts);
             strncpy(answer, p_answer, buffer);
-            strcpy(toplines, tmpbuf);
+            strcpy(g.toplines, tmpbuf);
             mesg_add_line((char *) tmpbuf);
             free(tmpbuf);
             curs_set(orig_cursor);
