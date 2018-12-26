@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1545774524 2018/12/25 21:48:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1545785119 2018/12/26 00:45:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2811,11 +2811,13 @@ boolean peaceful, silent;
     if (!billable(&shkp, obj, roomno, FALSE)) {
         /* things already on the bill yield a not-billable result, so
            we need to check bill before deciding that shk doesn't care */
-        if ((bp = onbill(obj, shkp, FALSE)) == 0)
+        if ((bp = onbill(obj, shkp, FALSE)) != 0) {
+            /* shk does care; take obj off bill to avoid double billing */
+            billamt = bp->bquan * bp->price;
+            sub_one_frombill(obj, shkp);
+        }
+        if (!bp && !u_count)
             return 0L;
-        /* shk does care; take obj off bill to avoid double billing */
-        billamt = bp->bquan * bp->price;
-        sub_one_frombill(obj, shkp);
     }
 
     if (obj->oclass == COIN_CLASS) {
