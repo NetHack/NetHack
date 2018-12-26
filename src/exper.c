@@ -47,19 +47,19 @@ newpw()
     int en = 0, enrnd, enfix;
 
     if (u.ulevel == 0) {
-        en = urole.enadv.infix + urace.enadv.infix;
-        if (urole.enadv.inrnd > 0)
-            en += rnd(urole.enadv.inrnd);
-        if (urace.enadv.inrnd > 0)
-            en += rnd(urace.enadv.inrnd);
+        en = g.urole.enadv.infix + g.urace.enadv.infix;
+        if (g.urole.enadv.inrnd > 0)
+            en += rnd(g.urole.enadv.inrnd);
+        if (g.urace.enadv.inrnd > 0)
+            en += rnd(g.urace.enadv.inrnd);
     } else {
         enrnd = (int) ACURR(A_WIS) / 2;
-        if (u.ulevel < urole.xlev) {
-            enrnd += urole.enadv.lornd + urace.enadv.lornd;
-            enfix = urole.enadv.lofix + urace.enadv.lofix;
+        if (u.ulevel < g.urole.xlev) {
+            enrnd += g.urole.enadv.lornd + g.urace.enadv.lornd;
+            enfix = g.urole.enadv.lofix + g.urace.enadv.lofix;
         } else {
-            enrnd += urole.enadv.hirnd + urace.enadv.hirnd;
-            enfix = urole.enadv.hifix + urace.enadv.hifix;
+            enrnd += g.urole.enadv.hirnd + g.urace.enadv.hirnd;
+            enfix = g.urole.enadv.hifix + g.urace.enadv.hifix;
         }
         en = enermod(rn1(enrnd, enfix));
     }

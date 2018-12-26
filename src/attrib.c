@@ -599,15 +599,15 @@ register int np;
     register int i, x, tryct;
 
     for (i = 0; i < A_MAX; i++) {
-        ABASE(i) = AMAX(i) = urole.attrbase[i];
+        ABASE(i) = AMAX(i) = g.urole.attrbase[i];
         ATEMP(i) = ATIME(i) = 0;
-        np -= urole.attrbase[i];
+        np -= g.urole.attrbase[i];
     }
 
     tryct = 0;
     while (np > 0 && tryct < 100) {
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
             ;
         if (i >= A_MAX)
             continue; /* impossible */
@@ -626,7 +626,7 @@ register int np;
     while (np < 0 && tryct < 100) { /* for redistribution */
 
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= urole.attrdist[i]) > 0); i++)
+        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
             ;
         if (i >= A_MAX)
             continue; /* impossible */
@@ -966,30 +966,30 @@ newhp()
 
     if (u.ulevel == 0) {
         /* Initialize hit points */
-        hp = urole.hpadv.infix + urace.hpadv.infix;
-        if (urole.hpadv.inrnd > 0)
-            hp += rnd(urole.hpadv.inrnd);
-        if (urace.hpadv.inrnd > 0)
-            hp += rnd(urace.hpadv.inrnd);
+        hp = g.urole.hpadv.infix + g.urace.hpadv.infix;
+        if (g.urole.hpadv.inrnd > 0)
+            hp += rnd(g.urole.hpadv.inrnd);
+        if (g.urace.hpadv.inrnd > 0)
+            hp += rnd(g.urace.hpadv.inrnd);
         if (g.moves <= 1L) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
-            u.ualign.record = urole.initrecord;
+            u.ualign.record = g.urole.initrecord;
         }
         /* no Con adjustment for initial hit points */
     } else {
-        if (u.ulevel < urole.xlev) {
-            hp = urole.hpadv.lofix + urace.hpadv.lofix;
-            if (urole.hpadv.lornd > 0)
-                hp += rnd(urole.hpadv.lornd);
-            if (urace.hpadv.lornd > 0)
-                hp += rnd(urace.hpadv.lornd);
+        if (u.ulevel < g.urole.xlev) {
+            hp = g.urole.hpadv.lofix + g.urace.hpadv.lofix;
+            if (g.urole.hpadv.lornd > 0)
+                hp += rnd(g.urole.hpadv.lornd);
+            if (g.urace.hpadv.lornd > 0)
+                hp += rnd(g.urace.hpadv.lornd);
         } else {
-            hp = urole.hpadv.hifix + urace.hpadv.hifix;
-            if (urole.hpadv.hirnd > 0)
-                hp += rnd(urole.hpadv.hirnd);
-            if (urace.hpadv.hirnd > 0)
-                hp += rnd(urace.hpadv.hirnd);
+            hp = g.urole.hpadv.hifix + g.urace.hpadv.hifix;
+            if (g.urole.hpadv.hirnd > 0)
+                hp += rnd(g.urole.hpadv.hirnd);
+            if (g.urace.hpadv.hirnd > 0)
+                hp += rnd(g.urace.hpadv.hirnd);
         }
         if (ACURR(A_CON) <= 3)
             conplus = -2;

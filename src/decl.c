@@ -151,6 +151,53 @@ unsigned nhUse_dummy = 0;
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 #endif
 
+const struct Role urole_init_data = {
+    { "Undefined", 0 },
+    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
+      { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+    "L", "N", "C",
+    "Xxx", "home", "locate",
+    NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM, NON_PM,
+    0, 0, 0, 0,
+    /* Str Int Wis Dex Con Cha */
+    { 7, 7, 7, 7, 7, 7 },
+    { 20, 15, 15, 20, 20, 10 },
+    /* Init   Lower  Higher */
+    { 10, 0, 0, 8, 1, 0 }, /* Hit points */
+    { 2, 0, 0, 2, 0, 3 },
+    14, /* Energy */
+     0,
+    10,
+     0,
+     0,
+     4,
+    A_INT,
+     0,
+    -3
+};
+
+const struct Race urace_init_data = {
+    "something",
+    "undefined",
+    "something",
+    "Xxx",
+    { 0, 0 },
+    NON_PM,
+    NON_PM,
+    NON_PM,
+    NON_PM,
+    0,
+    0,
+    0,
+    0,
+    /*    Str     Int Wis Dex Con Cha */
+    { 3, 3, 3, 3, 3, 3 },
+    { STR18(100), 18, 18, 18, 18, 18 },
+    /* Init   Lower  Higher */
+    { 2, 0, 0, 2, 1, 0 }, /* Hit points */
+    { 1, 0, 2, 0, 2, 0 }  /* Energy */
+};
+
 const struct instance_globals g_init = {
     /* apply.c */
     0,  /* jumping_is_magic */
@@ -443,12 +490,21 @@ const struct instance_globals g_init = {
     NULL, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
 
+    /* mthrowu.c */
+    UNDEFINED_VALUE, /* mesg_given */
+    NULL, /* mtarget */
+    NULL, /* marcher */
+
     /* muse.c */
     FALSE, /* m_using */
     UNDEFINED_VALUE, /* trapx */
     UNDEFINED_VALUE, /* trapy */
     UNDEFINED_VALUE, /* zap_oseen */
     UNDEFINED_VALUES, /* m */
+
+    /* nhlan.c */
+    UNDEFINED_VALUES, /* lusername */
+    MAX_LAN_USERNAME, /* lusername_size */
 
     /* o_init.c */
     DUMMY, /* disco */
@@ -458,6 +514,12 @@ const struct instance_globals g_init = {
 
     /* options.c */
     NULL, /* symset_list */
+    UNDEFINED_VALUES, /* mapped_menu_cmds */
+    UNDEFINED_VALUES, /* mapped_menu_op */
+    0, /* n_menu_mapped */
+    UNDEFINED_VALUE, /* opt_initial */
+    UNDEFINED_VALUE, /* opt_from_file */
+    UNDEFINED_VALUE, /* opt_need_redraw */
 
     /* pickup.c */
     0,  /* oldcap */
@@ -504,12 +566,27 @@ const struct instance_globals g_init = {
     /* read.c */
     UNDEFINED_VALUE, /* known */
 
+    /* region.c */
+    NULL, /* regions */
+    0, /* n_regions */
+    0, /* max_regions */
+
     /* restore.c */
     0, /* n_ids_mapped */
     0, /* id_map */
     FALSE, /* restoring */
     UNDEFINED_PTR, /* oldfruit */
     UNDEFINED_VALUE, /* omoves */
+
+    /* rip.c */
+    UNDEFINED_PTR, /* rip */
+
+    /* role.c */
+    UNDEFINED_VALUES, /* urole */
+    UNDEFINED_VALUES, /* urace */
+    UNDEFINED_VALUES, /* role_pa */
+    UNDEFINED_VALUE, /* role_post_attrib */
+    UNDEFINED_VALUES, /* rfilter */
 
     /* rumors.c */
     0, /* true_rumor_size */
@@ -634,6 +711,9 @@ decl_globals_init()
     ublindf = uchain = uball = NULL;
 
     WIN_MESSAGE =  WIN_STATUS =  WIN_MAP = WIN_INVEN = WIN_ERR;
+
+    g.urole = urole_init_data;
+    g.urace = urace_init_data;
 
 
 }

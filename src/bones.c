@@ -478,8 +478,8 @@ make_bones:
     /* format name+role,&c, death reason, and date+time;
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
-    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", g.plname, urole.filecode,
-            urace.filecode, genders[flags.female].filecode,
+    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", g.plname, g.urole.filecode,
+            g.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));

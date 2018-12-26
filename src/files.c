@@ -696,7 +696,7 @@ d_level *lev;
        first letter of the role's filecode; bones loading still worked
        because the bonesid used for validation had the same error */
     Sprintf(dptr, "%c%s", g.dungeons[lev->dnum].boneid,
-            In_quest(lev) ? urole.filecode : "0");
+            In_quest(lev) ? g.urole.filecode : "0");
     if ((sptr = Is_special(lev)) != 0)
         Sprintf(eos(dptr), ".%c", sptr->boneid);
     else

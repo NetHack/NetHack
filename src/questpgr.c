@@ -117,10 +117,10 @@ load_qtlist()
     for (i = 0; i < n_classes; i++) {
         if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR))
             g.qt_list.common = construct_qtlist(qt_offsets[i]);
-        else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR))
+        else if (!strncmp(g.urole.filecode, qt_classes[i], LEN_HDR))
             g.qt_list.chrole = construct_qtlist(qt_offsets[i]);
 #if 0 /* UNUSED but available */
-        else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR))
+        else if (!strncmp(g.urace.filecode, qt_classes[i], LEN_HDR))
             g.qt_list.chrace = construct_qtlist(qt_offsets[i]);
 #endif
     }
@@ -150,13 +150,13 @@ int typ;
 {
     switch (typ) {
     case 0:
-        return urole.questarti;
+        return g.urole.questarti;
     case MS_LEADER:
-        return urole.ldrnum;
+        return g.urole.ldrnum;
     case MS_NEMESIS:
-        return urole.neminum;
+        return g.urole.neminum;
     case MS_GUARDIAN:
-        return urole.guardnum;
+        return g.urole.guardnum;
     default:
         impossible("quest_info(%d)", typ);
     }
@@ -167,7 +167,7 @@ int typ;
 const char *
 ldrname()
 {
-    int i = urole.ldrnum;
+    int i = g.urole.ldrnum;
 
     Sprintf(g.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
@@ -178,14 +178,14 @@ ldrname()
 STATIC_OVL const char *
 intermed()
 {
-    return urole.intermed;
+    return g.urole.intermed;
 }
 
 boolean
 is_quest_artifact(otmp)
 struct obj *otmp;
 {
-    return (boolean) (otmp->oartifact == urole.questarti);
+    return (boolean) (otmp->oartifact == g.urole.questarti);
 }
 
 STATIC_OVL struct obj *
@@ -244,7 +244,7 @@ unsigned whichchains;
 STATIC_OVL const char *
 neminame()
 {
-    int i = urole.neminum;
+    int i = g.urole.neminum;
 
     Sprintf(g.nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
@@ -254,7 +254,7 @@ neminame()
 STATIC_OVL const char *
 guardname() /* return your role leader's guard monster name */
 {
-    int i = urole.guardnum;
+    int i = g.urole.guardnum;
 
     return mons[i].mname;
 }
@@ -262,7 +262,7 @@ guardname() /* return your role leader's guard monster name */
 STATIC_OVL const char *
 homebase() /* return your role leader's location */
 {
-    return urole.homebase;
+    return g.urole.homebase;
 }
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
@@ -329,7 +329,7 @@ char c;
         str = g.plname;
         break;
     case 'c':
-        str = (flags.female && urole.name.f) ? urole.name.f : urole.name.m;
+        str = (flags.female && g.urole.name.f) ? g.urole.name.f : g.urole.name.m;
         break;
     case 'r':
         str = rank_of(u.ulevel, Role_switch, flags.female);
@@ -351,7 +351,7 @@ char c;
         break;
     case 'O':
     case 'o':
-        str = the(artiname(urole.questarti));
+        str = the(artiname(g.urole.questarti));
         if (c == 'O') {
             /* shorten "the Foo of Bar" to "the Foo"
                (buffer returned by the() is modifiable) */
@@ -649,15 +649,15 @@ qt_montype()
     int qpm;
 
     if (rn2(5)) {
-        qpm = urole.enemy1num;
+        qpm = g.urole.enemy1num;
         if (qpm != NON_PM && rn2(5) && !(g.mvitals[qpm].mvflags & G_GENOD))
             return &mons[qpm];
-        return mkclass(urole.enemy1sym, 0);
+        return mkclass(g.urole.enemy1sym, 0);
     }
-    qpm = urole.enemy2num;
+    qpm = g.urole.enemy2num;
     if (qpm != NON_PM && rn2(5) && !(g.mvitals[qpm].mvflags & G_GENOD))
         return &mons[qpm];
-    return mkclass(urole.enemy2sym, 0);
+    return mkclass(g.urole.enemy2sym, 0);
 }
 
 /* special levels can include a custom arrival message; display it */

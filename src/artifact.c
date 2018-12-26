@@ -59,9 +59,9 @@ hack_artifacts()
         artilist[ART_EXCALIBUR].role = NON_PM;
 
     /* Fix up the quest artifact */
-    if (urole.questarti) {
-        artilist[urole.questarti].alignment = alignmnt;
-        artilist[urole.questarti].role = Role_switch;
+    if (g.urole.questarti) {
+        artilist[g.urole.questarti].alignment = alignmnt;
+        artilist[g.urole.questarti].role = Role_switch;
     }
     return;
 }
@@ -763,7 +763,7 @@ struct monst *mtmp;
     } else if (weap->spfx & SPFX_DFLAG2) {
         return ((ptr->mflags2 & weap->mtype)
                 || (yours
-                    && ((!Upolyd && (urace.selfmask & weap->mtype))
+                    && ((!Upolyd && (g.urace.selfmask & weap->mtype))
                         || ((weap->mtype & M2_WERE) && u.ulycn >= LOW_PM))));
     } else if (weap->spfx & SPFX_DALIGN) {
         return yours ? (u.ualign.type != weap->alignment)

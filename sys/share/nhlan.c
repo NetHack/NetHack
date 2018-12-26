@@ -27,17 +27,15 @@ init_lan_features()
  * the other LAN features depend on a unique username being available.
  *
  */
-char lusername[MAX_LAN_USERNAME];
-int lusername_size = MAX_LAN_USERNAME;
 
 char *
 lan_username()
 {
     char *lu;
-    lu = get_username(&lusername_size);
+    lu = get_username(&g.lusername_size);
     if (lu) {
-        Strcpy(lusername, lu);
-        return lusername;
+        Strcpy(g.lusername, lu);
+        return g.lusername;
     } else
         return (char *) 0;
 }

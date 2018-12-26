@@ -1528,9 +1528,9 @@ namefloorobj()
         char tmpbuf[BUFSZ];
 
         /* straight role name */
-        unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
-                     ? urole.name.f
-                     : urole.name.m;
+        unames[0] = ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
+                     ? g.urole.name.f
+                     : g.urole.name.m;
         /* random rank title for hero's role */
         unames[1] = rank_of(rnd(30), Role_switch, flags.female);
         /* random fake monster */

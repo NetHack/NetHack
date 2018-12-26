@@ -1076,7 +1076,7 @@ raceptr(mtmp)
 struct monst *mtmp;
 {
     if (mtmp == &g.youmonst && !Upolyd)
-        return &mons[urace.malenum];
+        return &mons[g.urace.malenum];
     else
         return mtmp->data;
 }

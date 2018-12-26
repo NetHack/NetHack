@@ -480,8 +480,8 @@ int how;
     Strcpy(g.killer.name, buf);
     if (mptr->mlet == S_WRAITH)
         u.ugrave_arise = PM_WRAITH;
-    else if (mptr->mlet == S_MUMMY && urace.mummynum != NON_PM)
-        u.ugrave_arise = urace.mummynum;
+    else if (mptr->mlet == S_MUMMY && g.urace.mummynum != NON_PM)
+        u.ugrave_arise = g.urace.mummynum;
     else if (mptr->mlet == S_VAMPIRE && Race_if(PM_HUMAN))
         u.ugrave_arise = PM_VAMPIRE;
     else if (mptr == &mons[PM_GHOUL])
@@ -718,8 +718,8 @@ time_t when; /* date+time at end of game */
     Sprintf(pbuf, "%s, %s %s %s %s", g.plname,
             aligns[1 - u.ualign.type].adj,
             genders[flags.female].adj,
-            urace.adj,
-            (flags.female && urole.name.f) ? urole.name.f : urole.name.m);
+            g.urace.adj,
+            (flags.female && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 
@@ -1266,9 +1266,9 @@ int how;
              * u.umonnum is based on role, and all role monsters
              * are human.
              */
-            mnum = (flags.female && urace.femalenum != NON_PM)
-                       ? urace.femalenum
-                       : urace.malenum;
+            mnum = (flags.female && g.urace.femalenum != NON_PM)
+                       ? g.urace.femalenum
+                       : g.urace.malenum;
         }
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, g.plname);
         Sprintf(pbuf, "%s, ", g.plname);
@@ -1376,9 +1376,9 @@ int how;
 
     Sprintf(pbuf, "%s %s the %s...", Goodbye(), g.plname,
             (how != ASCENDED)
-                ? (const char *) ((flags.female && urole.name.f)
-                    ? urole.name.f
-                    : urole.name.m)
+                ? (const char *) ((flags.female && g.urole.name.f)
+                    ? g.urole.name.f
+                    : g.urole.name.m)
                 : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
     dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
     dump_forward_putstr(endwin, 0, "", done_stopprint);

@@ -1355,7 +1355,7 @@ dosacrifice()
                 goto desecrate_high_altar;
             } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
                 /* curse the lawful/neutral altar */
-                pline_The("altar is stained with %s blood.", urace.adj);
+                pline_The("altar is stained with %s blood.", g.urace.adj);
                 levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
                 angry_priest();
             } else {
@@ -2043,13 +2043,13 @@ aligntyp alignment;
         gnam = Moloch;
         break;
     case A_LAWFUL:
-        gnam = urole.lgod;
+        gnam = g.urole.lgod;
         break;
     case A_NEUTRAL:
-        gnam = urole.ngod;
+        gnam = g.urole.ngod;
         break;
     case A_CHAOTIC:
-        gnam = urole.cgod;
+        gnam = g.urole.cgod;
         break;
     default:
         impossible("unknown alignment.");
@@ -2137,13 +2137,13 @@ aligntyp alignment;
 
     switch (alignment) {
     case A_LAWFUL:
-        gnam = urole.lgod;
+        gnam = g.urole.lgod;
         break;
     case A_NEUTRAL:
-        gnam = urole.ngod;
+        gnam = g.urole.ngod;
         break;
     case A_CHAOTIC:
-        gnam = urole.cgod;
+        gnam = g.urole.cgod;
         break;
     default:
         gnam = 0;

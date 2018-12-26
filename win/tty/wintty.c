@@ -72,8 +72,6 @@ extern short glyph2tile[];
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
 
-extern char mapped_menu_cmds[]; /* from options.c */
-
 /* this is only needed until tty_status_* routines are written */
 extern NEARDATA winid WIN_STATUS;
 
@@ -1930,7 +1928,7 @@ struct WinDesc *cw;
             Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
-            Strcat(resp, mapped_menu_cmds);
+            Strcat(resp, g.mapped_menu_cmds);
 
             if (cw->npages > 1)
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,

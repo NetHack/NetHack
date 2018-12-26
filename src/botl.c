@@ -281,7 +281,7 @@ boolean female;
         if (monnum == role->malenum || monnum == role->femalenum)
             break;
     if (!role->name.m)
-        role = &urole;
+        role = &g.urole;
 
     /* Find the rank */
     for (i = xlev_to_rank((int) lev); i >= 0; i--) {
@@ -343,9 +343,9 @@ max_rank_sz()
 {
     register int i, r, maxr = 0;
     for (i = 0; i < 9; i++) {
-        if (urole.rank[i].m && (r = strlen(urole.rank[i].m)) > maxr)
+        if (g.urole.rank[i].m && (r = strlen(g.urole.rank[i].m)) > maxr)
             maxr = r;
-        if (urole.rank[i].f && (r = strlen(urole.rank[i].f)) > maxr)
+        if (g.urole.rank[i].f && (r = strlen(g.urole.rank[i].f)) > maxr)
             maxr = r;
     }
     g.mrank_sz = maxr;
@@ -3160,9 +3160,9 @@ choose_value:
             int i, j, rv;
 
             for (i = j = 0; i < 9; i++) {
-                Sprintf(mbuf, "\"%s\"", urole.rank[i].m);
-                if (urole.rank[i].f) {
-                    Sprintf(fbuf, "\"%s\"", urole.rank[i].f);
+                Sprintf(mbuf, "\"%s\"", g.urole.rank[i].m);
+                if (g.urole.rank[i].f) {
+                    Sprintf(fbuf, "\"%s\"", g.urole.rank[i].f);
                     Sprintf(obuf, "%s or %s",
                             flags.female ? fbuf : mbuf,
                             flags.female ? mbuf : fbuf);

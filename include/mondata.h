@@ -84,7 +84,7 @@
 #define is_gnome(ptr) (((ptr)->mflags2 & M2_GNOME) != 0L)
 #define is_orc(ptr) (((ptr)->mflags2 & M2_ORC) != 0L)
 #define is_human(ptr) (((ptr)->mflags2 & M2_HUMAN) != 0L)
-#define your_race(ptr) (((ptr)->mflags2 & urace.selfmask) != 0L)
+#define your_race(ptr) (((ptr)->mflags2 & g.urace.selfmask) != 0L)
 #define is_bat(ptr)                                         \
     ((ptr) == &mons[PM_BAT] || (ptr) == &mons[PM_GIANT_BAT] \
      || (ptr) == &mons[PM_VAMPIRE_BAT])
@@ -100,8 +100,8 @@
 #define is_wanderer(ptr) (((ptr)->mflags2 & M2_WANDER) != 0L)
 #define always_hostile(ptr) (((ptr)->mflags2 & M2_HOSTILE) != 0L)
 #define always_peaceful(ptr) (((ptr)->mflags2 & M2_PEACEFUL) != 0L)
-#define race_hostile(ptr) (((ptr)->mflags2 & urace.hatemask) != 0L)
-#define race_peaceful(ptr) (((ptr)->mflags2 & urace.lovemask) != 0L)
+#define race_hostile(ptr) (((ptr)->mflags2 & g.urace.hatemask) != 0L)
+#define race_peaceful(ptr) (((ptr)->mflags2 & g.urace.lovemask) != 0L)
 #define extra_nasty(ptr) (((ptr)->mflags2 & M2_NASTY) != 0L)
 #define strongmonst(ptr) (((ptr)->mflags2 & M2_STRONG) != 0L)
 #define can_breathe(ptr) attacktype(ptr, AT_BREA)

@@ -459,7 +459,6 @@ static struct Bool_Opt boolopt[SIZE(boolopt_init)];
 extern char configfile[]; /* for messages */
 
 extern struct symparse loadsyms[];
-static boolean need_redraw; /* for doset() */
 
 #if defined(TOS) && defined(TEXTCOLOR)
 extern boolean colors_changed;  /* in tos.c */
@@ -470,7 +469,7 @@ extern char *shade[3];          /* in sys/msdos/video.c */
 extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
 
-static char def_inv_order[MAXOCLASSES] = {
+static const char def_inv_order[MAXOCLASSES] = {
     COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
     SCROLL_CLASS, SPBOOK_CLASS, POTION_CLASS, RING_CLASS, WAND_CLASS,
     TOOL_CLASS, GEM_CLASS, ROCK_CLASS, BALL_CLASS, CHAIN_CLASS, 0,
@@ -522,17 +521,6 @@ static const menu_cmd_t default_menu_cmd_info[] = {
  { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
  { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
 };
-
-/*
- * Allow the user to map incoming characters to various menu commands.
- * The accelerator list must be a valid C string.
- */
-#define MAX_MENU_MAPPED_CMDS 32 /* some number */
-char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS + 1]; /* exported */
-static char mapped_menu_op[MAX_MENU_MAPPED_CMDS + 1];
-static short n_menu_mapped = 0;
-
-static boolean initial, from_file;
 
 STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
 STATIC_DCL void FDECL(escapes, (const char *, char *));
@@ -1059,7 +1047,7 @@ const char *optname;
 char *opts;
 boolean val_optional;
 {
-    if (!initial) {
+    if (!g.opt_initial) {
         rejectoption(optname);
         return (char *) 0;
     }
@@ -1176,7 +1164,7 @@ const char *optn;
     if (fnv == 0L)
         return 0;
     if (fnv > get_current_feature_ver()) {
-        if (!initial) {
+        if (!g.opt_initial) {
             You_cant("disable new feature alerts for future versions.");
         } else {
             config_error_add(
@@ -1187,7 +1175,7 @@ const char *optn;
     }
 
     flags.suppress_alert = fnv;
-    if (!initial) {
+    if (!g.opt_initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
         pline(
@@ -1236,7 +1224,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
 {
     int i, *optptr;
 
-    if (!iscompound && iflags.opt_booldup && initial && from_file) {
+    if (!iscompound && iflags.opt_booldup && g.opt_initial && g.opt_from_file) {
         for (i = 0; boolopt[i].name; i++) {
             if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
                 optptr = iflags.opt_booldup + i;
@@ -1247,7 +1235,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
                     return FALSE;
             }
         }
-    } else if (iscompound && iflags.opt_compdup && initial && from_file) {
+    } else if (iscompound && iflags.opt_compdup && g.opt_initial && g.opt_from_file) {
         for (i = 0; compopt[i].name; i++) {
             if (match_optname(opts, compopt[i].name, strlen(compopt[i].name),
                               TRUE)) {
@@ -1992,11 +1980,11 @@ boolean tinitial, tfrom_file;
     const char *fullname;
     boolean retval = TRUE;
 
-    initial = tinitial;
-    from_file = tfrom_file;
+    g.opt_initial = tinitial;
+    g.opt_from_file = tfrom_file;
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        if (!parseoptions(op, initial, from_file))
+        if (!parseoptions(op, g.opt_initial, g.opt_from_file))
             retval = FALSE;
     }
     if (strlen(opts) > BUFSZ / 2) {
@@ -2035,7 +2023,7 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, "female", 3, FALSE)) {
         if (duplicate_opt_detection(opts, 0))
             complain_about_duplicate(opts, 0);
-        if (!initial && flags.female == negated) {
+        if (!g.opt_initial && flags.female == negated) {
             config_error_add("That is not anatomically possible.");
             return FALSE;
         } else
@@ -2046,7 +2034,7 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, "male", 4, FALSE)) {
         if (duplicate_opt_detection(opts, 0))
             complain_about_duplicate(opts, 0);
-        if (!initial && flags.female != negated) {
+        if (!g.opt_initial && flags.female != negated) {
             config_error_add("That is not anatomically possible.");
             return FALSE;
         } else
@@ -2217,9 +2205,9 @@ boolean tinitial, tfrom_file;
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        op = string_for_opt(opts, (compat || !initial));
+        op = string_for_opt(opts, (compat || !g.opt_initial));
         if (!op) {
-            if (compat || negated || initial) {
+            if (compat || negated || g.opt_initial) {
                 /* for backwards compatibility, "mouse_support" without a
                    value is a synonym for mouse_support:1 */
                 iflags.wc_mouse_support = !negated;
@@ -2246,9 +2234,9 @@ boolean tinitial, tfrom_file;
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        op = string_for_opt(opts, (compat || !initial));
+        op = string_for_opt(opts, (compat || !g.opt_initial));
         if (!op) {
-            if (compat || negated || initial) {
+            if (compat || negated || g.opt_initial) {
                 /* for backwards compatibility, "number_pad" without a
                    value is a synonym for number_pad:1 */
                 iflags.num_pad = !negated;
@@ -2299,9 +2287,9 @@ boolean tinitial, tfrom_file;
                                  op, SYMBOLS);
                 return FALSE;
             } else {
-                if (!initial && Is_rogue_level(&u.uz))
+                if (!g.opt_initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
             }
         } else
             return FALSE;
@@ -2325,7 +2313,7 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else {
                 switch_symbols(g.symset[PRIMARY].name != (char *) 0);
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
             }
         } else
             return FALSE;
@@ -2578,8 +2566,8 @@ boolean tinitial, tfrom_file;
             }
         }
 #endif /* !WIN32 */
-        if (!initial) {
-            need_redraw = TRUE;
+        if (!g.opt_initial) {
+            g.opt_need_redraw = TRUE;
         }
         return retval;
     }
@@ -2591,7 +2579,7 @@ boolean tinitial, tfrom_file;
 
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        op = string_for_opt(opts, negated || !initial);
+        op = string_for_opt(opts, negated || !g.opt_initial);
         if (negated) {
             if (op) {
                 bad_negation("fruit", TRUE);
@@ -2604,7 +2592,7 @@ boolean tinitial, tfrom_file;
             return FALSE;
         /* 3.6.2: strip leading and trailing spaces, condense internal ones */
         mungspaces(op);
-        if (!initial) {
+        if (!g.opt_initial) {
             struct fruit *f;
             int fnum = 0;
 
@@ -2629,7 +2617,7 @@ boolean tinitial, tfrom_file;
            initialization; it gets changed to generic "fruit" */
         if (!*g.pl_fruit)
             nmcpy(g.pl_fruit, "slime mold", PL_FSIZ);
-        if (!initial) {
+        if (!g.opt_initial) {
             /* if 'forig' is nonNull, we replace it rather than add
                a new fruit; it can only be nonNull if no fruits have
                been created since the previous name was put in place */
@@ -2744,9 +2732,9 @@ boolean tinitial, tfrom_file;
         }
         /* for 'initial', update_bouldersym() is done in initoptions_finish(),
            after all symset options have been processed */
-        if (!initial) {
+        if (!g.opt_initial) {
             update_bouldersym();
-            need_redraw = TRUE;
+            g.opt_need_redraw = TRUE;
         }
         return retval;
 #else
@@ -2975,9 +2963,9 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         oc_to_str(flags.pickup_types, tbuf);
         flags.pickup_types[0] = '\0'; /* all */
-        op = string_for_opt(opts, (compat || !initial));
+        op = string_for_opt(opts, (compat || !g.opt_initial));
         if (!op) {
-            if (compat || negated || initial) {
+            if (compat || negated || g.opt_initial) {
                 /* for backwards compatibility, "pickup" without a
                    value is a synonym for autopickup of all types
                    (and during initialization, we can't prompt yet) */
@@ -3833,7 +3821,7 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else {
                 switch_symbols(TRUE);
-                if (!initial && Is_rogue_level(&u.uz))
+                if (!g.opt_initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
             }
         }
@@ -3867,7 +3855,7 @@ boolean tinitial, tfrom_file;
                 return FALSE;
             } else {
                 switch_symbols(TRUE);
-                if (!initial && Is_rogue_level(&u.uz))
+                if (!g.opt_initial && Is_rogue_level(&u.uz))
                     assign_graphics(ROGUESET);
             }
         }
@@ -3892,13 +3880,13 @@ boolean tinitial, tfrom_file;
         if (match_optname(opts, boolopt[i].name, 3, TRUE)) {
             /* options that don't exist */
             if (!boolopt[i].addr) {
-                if (!initial && !negated)
+                if (!g.opt_initial && !negated)
                     pline_The("\"%s\" option is not available.",
                               boolopt[i].name);
                 return retval;
             }
             /* options that must come from config file */
-            if (!initial && (boolopt[i].optflags == SET_IN_FILE)) {
+            if (!g.opt_initial && (boolopt[i].optflags == SET_IN_FILE)) {
                 rejectoption(boolopt[i].name);
                 return retval;
             }
@@ -3947,7 +3935,7 @@ boolean tinitial, tfrom_file;
                 iflags.wc_ascii_map = negated;
             }
             /* only do processing below if setting with doset() */
-            if (initial)
+            if (g.opt_initial)
                 return retval;
 
             if (boolopt[i].addr == &flags.time
@@ -3974,26 +3962,26 @@ boolean tinitial, tfrom_file;
                 vision_recalc(2);       /* shut down vision */
                 g.vision_full_recalc = 1; /* delayed recalc */
                 if (iflags.use_color)
-                    need_redraw = TRUE; /* darkroom refresh */
+                    g.opt_need_redraw = TRUE; /* darkroom refresh */
             } else if (boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
                        || boolopt[i].addr == &iflags.hilite_pet
                        || boolopt[i].addr == &iflags.wc_ascii_map
                        || boolopt[i].addr == &iflags.wc_tiled_map) {
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
 #ifdef STATUS_HILITES
             } else if (boolopt[i].addr == &iflags.wc2_hitpointbar) {
                 status_initialize(REASSESS_ONLY);
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
 #endif
 #ifdef CURSES_GRAPHICS
             } else if ((boolopt[i].addr) == &iflags.cursesgraphics) {
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
 #endif
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
-                need_redraw = TRUE;
+                g.opt_need_redraw = TRUE;
 #ifdef TOS
                 if (iflags.BIOS) {
                     if (colors_changed)
@@ -4113,14 +4101,14 @@ void
 add_menu_cmd_alias(from_ch, to_ch)
 char from_ch, to_ch;
 {
-    if (n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
+    if (g.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
         pline("out of menu map space.");
     } else {
-        mapped_menu_cmds[n_menu_mapped] = from_ch;
-        mapped_menu_op[n_menu_mapped] = to_ch;
-        n_menu_mapped++;
-        mapped_menu_cmds[n_menu_mapped] = 0;
-        mapped_menu_op[n_menu_mapped] = 0;
+        g.mapped_menu_cmds[g.n_menu_mapped] = from_ch;
+        g.mapped_menu_op[g.n_menu_mapped] = to_ch;
+        g.n_menu_mapped++;
+        g.mapped_menu_cmds[g.n_menu_mapped] = 0;
+        g.mapped_menu_op[g.n_menu_mapped] = 0;
     }
 }
 
@@ -4128,12 +4116,12 @@ char
 get_menu_cmd_key(ch)
 char ch;
 {
-    char *found = index(mapped_menu_op, ch);
+    char *found = index(g.mapped_menu_op, ch);
 
     if (found) {
-        int idx = (int) (found - mapped_menu_op);
+        int idx = (int) (found - g.mapped_menu_op);
 
-        ch = mapped_menu_cmds[idx];
+        ch = g.mapped_menu_cmds[idx];
     }
     return ch;
 }
@@ -4146,12 +4134,12 @@ char
 map_menu_cmd(ch)
 char ch;
 {
-    char *found = index(mapped_menu_cmds, ch);
+    char *found = index(g.mapped_menu_cmds, ch);
 
     if (found) {
-        int idx = (int) (found - mapped_menu_cmds);
+        int idx = (int) (found - g.mapped_menu_cmds);
 
-        ch = mapped_menu_op[idx];
+        ch = g.mapped_menu_op[idx];
     }
     return ch;
 }
@@ -4453,7 +4441,7 @@ doset() /* changing options via menu by Per Liboriussen */
         doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
 #endif
     end_menu(tmpwin, "Set what options?");
-    need_redraw = FALSE;
+    g.opt_need_redraw = FALSE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
         /*
          * Walk down the selection list and either invert the booleans
@@ -4514,7 +4502,7 @@ doset() /* changing options via menu by Per Liboriussen */
     }
 
     destroy_nhwindow(tmpwin);
-    if (need_redraw) {
+    if (g.opt_need_redraw) {
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
@@ -5365,7 +5353,7 @@ boolean setinitial, setfromfile;
         } else if (!rogueflag)
             assign_graphics(PRIMARY);
         preference_update("symset");
-        need_redraw = TRUE;
+        g.opt_need_redraw = TRUE;
         return TRUE;
 
     } else {

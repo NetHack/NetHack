@@ -82,7 +82,7 @@ char *outbuf;
     /* include race with role unless polymorphed */
     race[0] = '\0';
     if (!Upolyd)
-        Sprintf(race, "%s ", urace.adj);
+        Sprintf(race, "%s ", g.urace.adj);
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,

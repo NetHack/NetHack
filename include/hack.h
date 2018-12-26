@@ -211,6 +211,8 @@ typedef struct {
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
+#include "rect.h"
+#include "region.h"
 #include "decl.h"
 #include "timeout.h"
 
@@ -258,8 +260,6 @@ typedef struct sortloot_item Loot;
 #include "vision.h"
 #include "display.h"
 #include "engrave.h"
-#include "rect.h"
-#include "region.h"
 
 #ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
 #undef NDECL

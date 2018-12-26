@@ -1705,9 +1705,9 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
     Sprintf(buf, "%s the %s's attributes:", tmpbuf,
-            ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
-                ? urole.name.f
-                : urole.name.m);
+            ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
+                ? g.urole.name.f
+                : g.urole.name.m);
 
     /* title */
     enlght_out(buf); /* "Conan the Archeologist's attributes:" */
@@ -1761,7 +1761,7 @@ int final;
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
        to access hero's saved gender-as-human/elf/&c rather than current one */
     innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
-    role_titl = (innategend && urole.name.f) ? urole.name.f : urole.name.m;
+    role_titl = (innategend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
@@ -1787,8 +1787,8 @@ int final;
 
     /* report role; omit gender if it's redundant (eg, "female priestess") */
     tmpbuf[0] = '\0';
-    if (!urole.name.f
-        && ((urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
+    if (!g.urole.name.f
+        && ((g.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             || innategend != flags.initgend))
         Sprintf(tmpbuf, "%s ", genders[innategend].adj);
     buf[0] = '\0';
@@ -1797,10 +1797,10 @@ int final;
     if (!strcmpi(rank_titl, role_titl)) {
         /* omit role when rank title matches it */
         Sprintf(eos(buf), "%s, level %d %s%s", an(rank_titl), u.ulevel,
-                tmpbuf, urace.noun);
+                tmpbuf, g.urace.noun);
     } else {
         Sprintf(eos(buf), "%s, a level %d %s%s %s", an(rank_titl), u.ulevel,
-                tmpbuf, urace.adj, role_titl);
+                tmpbuf, g.urace.adj, role_titl);
     }
     you_are(buf, "");
 
@@ -2927,10 +2927,10 @@ minimal_enlightenment()
     /* Starting name, race, role, gender */
     Sprintf(buf, fmtstr, "name", g.plname);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-    Sprintf(buf, fmtstr, "race", urace.noun);
+    Sprintf(buf, fmtstr, "race", g.urace.noun);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     Sprintf(buf, fmtstr, "role",
-            (flags.initgend && urole.name.f) ? urole.name.f : urole.name.m);
+            (flags.initgend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
@@ -2943,17 +2943,17 @@ minimal_enlightenment()
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Current", FALSE);
-    Sprintf(buf, fmtstr, "race", Upolyd ? g.youmonst.data->mname : urace.noun);
+    Sprintf(buf, fmtstr, "race", Upolyd ? g.youmonst.data->mname : g.urace.noun);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     if (Upolyd) {
         Sprintf(buf, fmtstr, "role (base)",
-                (u.mfemale && urole.name.f) ? urole.name.f
-                                            : urole.name.m);
+                (u.mfemale && g.urole.name.f) ? g.urole.name.f
+                                            : g.urole.name.m);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     } else {
         Sprintf(buf, fmtstr, "role",
-                (flags.female && urole.name.f) ? urole.name.f
-                                               : urole.name.m);
+                (flags.female && g.urole.name.f) ? g.urole.name.f
+                                               : g.urole.name.m);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     }
     /* don't want poly_gender() here; it forces `2' for non-humanoids */
