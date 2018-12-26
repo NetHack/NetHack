@@ -611,6 +611,7 @@ const struct instance_globals g_init = {
     SELL_NORMAL, /* sell_how */
     FALSE, /* auto_credit */
     UNDEFINED_VALUES, /* repo */
+    UNDEFINED_VALUES, /* followmsg */
 
     /* sp_lev.c */
     NULL, /* lev_message */

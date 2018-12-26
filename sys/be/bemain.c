@@ -25,7 +25,7 @@ MAIN(int argc, char **argv)
     char *dir;
     boolean resuming = FALSE; /* assume new game */
 
-    sys_early_init();
+    early_init();
 
     dir = nh_getenv("NETHACKDIR");
     if (!dir)

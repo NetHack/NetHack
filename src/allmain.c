@@ -20,6 +20,15 @@ STATIC_DCL void FDECL(interrupt_multi, (const char *));
 STATIC_DCL void FDECL(debug_fields, (const char *));
 
 void
+early_init()
+{
+    decl_globals_init();
+    objects_globals_init();
+    monst_globals_init();
+    sys_early_init();
+}
+
+void
 moveloop(resuming)
 boolean resuming;
 {

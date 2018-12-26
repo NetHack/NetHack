@@ -1090,6 +1090,8 @@ struct instance_globals {
        shouldn't carry over from ordinary selling to credit selling */
     boolean auto_credit;
     struct repo repo;
+   long int followmsg; /* last time of follow message */
+
 
     /* sp_lev.c */
     char *lev_message;

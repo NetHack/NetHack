@@ -77,7 +77,7 @@ char *argv[];
 {
     boolean resuming;
 
-    sys_early_init();
+    early_init();
     resuming = pcmain(argc, argv);
     moveloop(resuming);
     nethack_exit(EXIT_SUCCESS);

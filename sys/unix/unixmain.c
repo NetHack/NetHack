@@ -58,7 +58,7 @@ char *argv[];
     boolean resuming = FALSE; /* assume new game */
     boolean plsel_once = FALSE;
 
-    sys_early_init();
+    early_init();
 
 #if defined(__APPLE__)
     {
